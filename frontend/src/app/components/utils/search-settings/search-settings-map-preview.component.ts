@@ -23,6 +23,7 @@ export class SearchSettingsMapPreviewComponent implements AfterViewInit, OnChang
   @Input() disabled = false;
   @Input() markers: MapMarker[] = [];
   @Input() fitMarkers = false;
+  @Input() fitMaxZoom = 8;
   @Input() interactive = false;
   @Input() markerIconUrl = DEFAULT_MARKER_ICON_URL;
   @Output() markerClick = new EventEmitter<MapMarker>();
@@ -151,7 +152,7 @@ export class SearchSettingsMapPreviewComponent implements AfterViewInit, OnChang
 
     if (this.fitMarkers && bounds.length > 0) {
       const fitBounds = leaflet.latLngBounds(bounds);
-      this.map.fitBounds(fitBounds, { padding: [24, 24], maxZoom: 8 });
+      this.map.fitBounds(fitBounds, { padding: [24, 24], maxZoom: this.fitMaxZoom });
     }
   }
 

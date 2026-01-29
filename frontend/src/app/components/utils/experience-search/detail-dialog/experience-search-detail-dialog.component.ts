@@ -256,7 +256,7 @@ export class ExperienceSearchDetailDialogComponent {
         label: this.transloco.translate('common.experiences.startPoint')
       });
     }
-    if (end) {
+    if (end && (!start || !this.isSameLocation(start, end))) {
       markers.push({
         latitude: end.center!.latitude!,
         longitude: end.center!.longitude!,
@@ -287,5 +287,19 @@ export class ExperienceSearchDetailDialogComponent {
       }
     }
     return null;
+  }
+
+  private isSameLocation(a: ViatorLocation, b: ViatorLocation): boolean {
+    if (a.reference && b.reference && a.reference === b.reference) {
+      return true;
+    }
+    const aLat = a.center?.latitude;
+    const aLng = a.center?.longitude;
+    const bLat = b.center?.latitude;
+    const bLng = b.center?.longitude;
+    if (aLat === undefined || aLng === undefined || bLat === undefined || bLng === undefined) {
+      return false;
+    }
+    return Math.abs(aLat - bLat) < 1e-6 && Math.abs(aLng - bLng) < 1e-6;
   }
 }

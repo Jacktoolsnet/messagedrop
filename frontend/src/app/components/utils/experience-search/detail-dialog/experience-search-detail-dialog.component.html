@@ -24,19 +24,12 @@
       }
     </div>
 
-    <mat-card class="detail-card">
+    <mat-card class="detail-tile">
+      <div class="detail-tile__header">
+        <mat-icon>description</mat-icon>
+        <span class="detail-tile__title">{{ 'common.experiences.description' | transloco }}</span>
+      </div>
       <mat-card-content class="detail-body">
-        <div class="detail-actions">
-          <button mat-stroked-button class="open-viator-button" type="button"
-            (click)="onOpen()" [disabled]="!data.result.productUrl"
-            [attr.aria-label]="'common.experiences.openOn' | transloco : { provider: 'Viator' }">
-            <mat-icon>shopping_cart</mat-icon>
-            <span class="open-viator-label">
-              {{ getPriceLabel() || ('common.experiences.openOn' | transloco : { provider: 'Viator' }) }}
-            </span>
-          </button>
-        </div>
-
         <p class="detail-description">
           {{ detail()?.description || data.result.description }}
         </p>
@@ -44,89 +37,122 @@
     </mat-card>
 
     @if (startItems().length) {
-      <section class="detail-section">
-        <h3 class="detail-section__title">{{ 'common.experiences.startPoint' | transloco }}</h3>
-        <div class="detail-section__body">
-          @for (item of startItems(); track item.ref) {
-            <div class="detail-location">
-              <div class="detail-location__title">{{ item.name || item.ref }}</div>
-              @if (item.address) {
-                <div class="detail-location__address">{{ item.address }}</div>
-              }
-              @if (item.description) {
-                <div class="detail-location__desc">{{ item.description }}</div>
-              }
-            </div>
-          }
+      <mat-card class="detail-tile">
+        <div class="detail-tile__header">
+          <mat-icon>flag</mat-icon>
+          <span class="detail-tile__title">{{ 'common.experiences.startPoint' | transloco }}</span>
         </div>
-      </section>
+        <mat-card-content class="detail-tile__body">
+          <div class="detail-section__body">
+            @for (item of startItems(); track item.ref) {
+              <div class="detail-location">
+                <div class="detail-location__title">
+                  {{ item.name || (item.address ? item.address : ('common.experiences.locationUnavailable' | transloco)) }}
+                </div>
+                @if (item.address) {
+                  <div class="detail-location__address">{{ item.address }}</div>
+                }
+                @if (item.description) {
+                  <div class="detail-location__desc">{{ item.description }}</div>
+                }
+              </div>
+            }
+          </div>
+        </mat-card-content>
+      </mat-card>
     }
 
     @if (endItems().length) {
-      <section class="detail-section">
-        <h3 class="detail-section__title">{{ 'common.experiences.endPoint' | transloco }}</h3>
-        <div class="detail-section__body">
-          @for (item of endItems(); track item.ref) {
-            <div class="detail-location">
-              <div class="detail-location__title">{{ item.name || item.ref }}</div>
-              @if (item.address) {
-                <div class="detail-location__address">{{ item.address }}</div>
-              }
-              @if (item.description) {
-                <div class="detail-location__desc">{{ item.description }}</div>
-              }
-            </div>
-          }
+      <mat-card class="detail-tile">
+        <div class="detail-tile__header">
+          <mat-icon>outlined_flag</mat-icon>
+          <span class="detail-tile__title">{{ 'common.experiences.endPoint' | transloco }}</span>
         </div>
-      </section>
+        <mat-card-content class="detail-tile__body">
+          <div class="detail-section__body">
+            @for (item of endItems(); track item.ref) {
+              <div class="detail-location">
+                <div class="detail-location__title">
+                  {{ item.name || (item.address ? item.address : ('common.experiences.locationUnavailable' | transloco)) }}
+                </div>
+                @if (item.address) {
+                  <div class="detail-location__address">{{ item.address }}</div>
+                }
+                @if (item.description) {
+                  <div class="detail-location__desc">{{ item.description }}</div>
+                }
+              </div>
+            }
+          </div>
+        </mat-card-content>
+      </mat-card>
     }
 
     @if (redemptionItems().length) {
-      <section class="detail-section">
-        <h3 class="detail-section__title">{{ 'common.experiences.redemptionPoint' | transloco }}</h3>
-        <div class="detail-section__body">
-          @for (item of redemptionItems(); track item.ref) {
-            <div class="detail-location">
-              <div class="detail-location__title">{{ item.name || item.ref }}</div>
-              @if (item.address) {
-                <div class="detail-location__address">{{ item.address }}</div>
-              }
-              @if (item.description) {
-                <div class="detail-location__desc">{{ item.description }}</div>
-              }
-            </div>
-          }
+      <mat-card class="detail-tile">
+        <div class="detail-tile__header">
+          <mat-icon>confirmation_number</mat-icon>
+          <span class="detail-tile__title">{{ 'common.experiences.redemptionPoint' | transloco }}</span>
         </div>
-      </section>
+        <mat-card-content class="detail-tile__body">
+          <div class="detail-section__body">
+            @for (item of redemptionItems(); track item.ref) {
+              <div class="detail-location">
+                <div class="detail-location__title">
+                  {{ item.name || (item.address ? item.address : ('common.experiences.locationUnavailable' | transloco)) }}
+                </div>
+                @if (item.address) {
+                  <div class="detail-location__address">{{ item.address }}</div>
+                }
+                @if (item.description) {
+                  <div class="detail-location__desc">{{ item.description }}</div>
+                }
+              </div>
+            }
+          </div>
+        </mat-card-content>
+      </mat-card>
     }
 
     @if (pickupItems().length) {
-      <section class="detail-section">
-        <h3 class="detail-section__title">{{ 'common.experiences.pickupPoint' | transloco }}</h3>
-        <div class="detail-section__body">
-          @for (item of pickupItems(); track item.ref) {
-            <div class="detail-location">
-              <div class="detail-location__title">{{ item.name || item.ref }}</div>
-              @if (item.address) {
-                <div class="detail-location__address">{{ item.address }}</div>
-              }
-              @if (item.description) {
-                <div class="detail-location__desc">{{ item.description }}</div>
-              }
-            </div>
-          }
+      <mat-card class="detail-tile">
+        <div class="detail-tile__header">
+          <mat-icon>place</mat-icon>
+          <span class="detail-tile__title">{{ 'common.experiences.pickupPoint' | transloco }}</span>
         </div>
-      </section>
+        <mat-card-content class="detail-tile__body">
+          <div class="detail-section__body">
+            @for (item of pickupItems(); track item.ref) {
+              <div class="detail-location">
+                <div class="detail-location__title">
+                  {{ item.name || (item.address ? item.address : ('common.experiences.locationUnavailable' | transloco)) }}
+                </div>
+                @if (item.address) {
+                  <div class="detail-location__address">{{ item.address }}</div>
+                }
+                @if (item.description) {
+                  <div class="detail-location__desc">{{ item.description }}</div>
+                }
+              </div>
+            }
+          </div>
+        </mat-card-content>
+      </mat-card>
     }
 
     @if (mapMarkers().length) {
-      <section class="detail-section">
-        <h3 class="detail-section__title">{{ 'common.experiences.map' | transloco }}</h3>
-        <app-search-settings-map-preview class="detail-map" [center]="mapCenter()" [zoom]="5"
-          [markers]="mapMarkers()" [fitMarkers]="true" [interactive]="false"
-          [markerIconUrl]="'assets/markers/experience-marker.svg'">
-        </app-search-settings-map-preview>
-      </section>
+      <mat-card class="detail-tile">
+        <div class="detail-tile__header">
+          <mat-icon>map</mat-icon>
+          <span class="detail-tile__title">{{ 'common.experiences.map' | transloco }}</span>
+        </div>
+        <mat-card-content class="detail-tile__body">
+          <app-search-settings-map-preview class="detail-map" [center]="mapCenter()" [zoom]="5"
+            [markers]="mapMarkers()" [fitMarkers]="true" [fitMaxZoom]="10" [interactive]="false"
+            [markerIconUrl]="'assets/markers/experience-marker.svg'">
+          </app-search-settings-map-preview>
+        </mat-card-content>
+      </mat-card>
     }
   </div>
 </mat-dialog-content>
@@ -139,5 +165,13 @@
   <button mat-icon-button type="button" (click)="help.open('experienceSearch')"
     [attr.aria-label]="'common.actions.help' | transloco">
     <mat-icon>help</mat-icon>
+  </button>
+  <button mat-stroked-button class="open-viator-button" type="button" (click)="onOpen()"
+    [disabled]="!data.result.productUrl"
+    [attr.aria-label]="'common.experiences.openOn' | transloco : { provider: 'Viator' }">
+    <mat-icon>shopping_cart</mat-icon>
+    <span class="open-viator-label">
+      {{ getPriceLabel() || ('common.experiences.openOn' | transloco : { provider: 'Viator' }) }}
+    </span>
   </button>
 </mat-dialog-actions>

@@ -31,8 +31,9 @@
   flex: 1 1 auto;
   overflow-y: auto;
   overflow-x: hidden;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-auto-rows: max-content;
+  align-content: start;
   gap: 0.75rem;
   min-height: 0;
   padding: 0 1rem 0.75rem;
@@ -48,8 +49,8 @@
   padding: 0.75rem 1rem;
   background-color: var(--mat-card-filled-container-color);
   box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
-  margin: 0 -1rem;
-  width: calc(100% + 2rem);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .detail-header mat-icon {
@@ -109,11 +110,42 @@
   z-index: 1;
 }
 
-.detail-card {
+.detail-card,
+.detail-tile {
   border-radius: 1.25rem;
   border: 1px solid var(--mat-card-outlined-outline-color);
   box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
   background: var(--mat-card-filled-container-color);
+}
+
+.detail-tile {
+  overflow: hidden;
+}
+
+.detail-tile__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background-color: var(--mat-card-filled-container-color);
+  border-bottom: 1px solid var(--mat-card-outlined-outline-color);
+  font-weight: 600;
+}
+
+.detail-tile__header mat-icon {
+  font-size: 1.1rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  color: var(--mat-card-subtitle-text-color);
+}
+
+.detail-tile__title {
+  font-size: 0.95rem;
+  color: var(--mat-app-text-color);
+}
+
+.detail-tile__body {
+  padding: 0.75rem 1rem 1rem;
 }
 
 .detail-body {
@@ -135,20 +167,6 @@
   color: var(--mat-card-subtitle-text-color);
 }
 
-.detail-section {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 0.25rem 0.5rem 0;
-}
-
-.detail-section__title {
-  margin: 0;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--mat-app-text-color);
-}
-
 .detail-section__body {
   display: grid;
   gap: 0.5rem;
@@ -156,11 +174,7 @@
 }
 
 .detail-location {
-  padding: 0.75rem 0.9rem;
-  border-radius: 1rem;
-  border: 1px solid var(--mat-card-outlined-outline-color);
-  background: var(--mat-card-filled-container-color);
-  box-shadow: 0 2px 8px var(--mat-card-outlined-outline-color);
+  padding: 0.25rem 0;
 }
 
 .detail-location__title {
@@ -177,7 +191,8 @@
 
 .detail-map {
   width: 100%;
-  height: 220px;
+  height: 18.75rem;
+  min-height: 18.75rem;
   border-radius: 1rem;
   overflow: hidden;
   border: 1px solid var(--mat-card-outlined-outline-color);
