@@ -19,6 +19,13 @@ import { startWith } from 'rxjs';
 import { DisplayMessageConfig } from '../../../interfaces/display-message-config';
 import { Location } from '../../../interfaces/location';
 import {
+  ExperienceMapMarker,
+  ExperienceProvider,
+  ExperienceResult,
+  ExperienceSearchForm,
+  ExperienceSearchFormValue,
+  ExperienceSearchPinDialogData,
+  ExperienceSortOption,
   ViatorDestinationLookup,
   ViatorFreetextProductFiltering,
   ViatorFreetextProductSorting,
@@ -38,10 +45,7 @@ import { DisplayMessage } from '../display-message/display-message.component';
 import { HelpDialogService } from '../help-dialog/help-dialog.service';
 import { SearchSettingsMapPreviewComponent } from '../search-settings/search-settings-map-preview.component';
 import { ExperienceSearchDetailDialogComponent } from './detail-dialog/experience-search-detail-dialog.component';
-import { ExperienceSearchPinDialogComponent, ExperienceSearchPinDialogData } from './pin-dialog/experience-search-pin-dialog.component';
-
-export type ExperienceProvider = 'viator';
-export type ExperienceSortOption = 'relevance' | 'price_low' | 'price_high';
+import { ExperienceSearchPinDialogComponent } from './pin-dialog/experience-search-pin-dialog.component';
 
 const PAGE_SIZE = 20;
 const PRICE_RANGE_MIN = 0;
@@ -69,55 +73,6 @@ const SUPPORTED_CURRENCIES = [
 ] as const;
 const SUPPORTED_CURRENCY_SET = new Set<string>(SUPPORTED_CURRENCIES);
 const DEFAULT_CURRENCY = resolveCurrencyFromLocale();
-
-interface ExperienceSearchForm {
-  term: FormControl<string>;
-  startDate: FormControl<Date | null>;
-  endDate: FormControl<Date | null>;
-  minPrice: FormControl<number>;
-  maxPrice: FormControl<number>;
-  minDurationHours: FormControl<number>;
-  maxDurationHours: FormControl<number>;
-  currency: FormControl<string>;
-  sort: FormControl<ExperienceSortOption>;
-}
-
-interface ExperienceSearchFormValue {
-  term: string;
-  startDate: Date | null;
-  endDate: Date | null;
-  minPrice: number;
-  maxPrice: number;
-  minDurationHours: number;
-  maxDurationHours: number;
-  currency: string;
-  sort: ExperienceSortOption;
-}
-
-export interface ExperienceResult {
-  provider: ExperienceProvider;
-  trackId: string;
-  productCode?: string;
-  destinationIds?: number[];
-  avatarUrl?: string;
-  title?: string;
-  description?: string;
-  rating?: number;
-  reviewCount?: number;
-  priceFrom?: number;
-  currency?: string;
-  duration?: string;
-  imageUrl?: string;
-  productUrl?: string;
-  raw: unknown;
-}
-
-interface ExperienceMapMarker {
-  destinationId?: number;
-  latitude: number;
-  longitude: number;
-  label?: string;
-}
 
 @Component({
   selector: 'app-experience-search',

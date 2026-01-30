@@ -6,13 +6,7 @@ import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { HelpDialogService } from '../../help-dialog/help-dialog.service';
 import { ExperienceSearchDetailDialogComponent } from '../detail-dialog/experience-search-detail-dialog.component';
-import { ExperienceResult } from '../experience-search.component';
-
-export interface ExperienceSearchPinDialogData {
-  destinationId: number;
-  destinationName?: string;
-  results: ExperienceResult[];
-}
+import { ExperienceSearchPinDialogData, ExperienceResult } from '../../../../interfaces/viator';
 
 @Component({
   selector: 'app-experience-search-pin-dialog',

@@ -16,6 +16,10 @@ export type ViatorFreetextProductSort =
 
 export type ViatorSearchType = 'ATTRACTIONS' | 'DESTINATIONS' | 'PRODUCTS';
 
+export type ExperienceProvider = 'viator';
+
+export type ExperienceSortOption = 'relevance' | 'price_low' | 'price_high';
+
 export interface ViatorRangeNumber {
   from?: number;
   to?: number;
@@ -56,6 +60,55 @@ export interface ViatorProductSearchRequest {
   sorting?: ViatorProductSearchSorting;
   pagination?: ViatorProductSearchPagination;
   currency: string;
+}
+
+export interface ExperienceSearchForm {
+  term: import('@angular/forms').FormControl<string>;
+  startDate: import('@angular/forms').FormControl<Date | null>;
+  endDate: import('@angular/forms').FormControl<Date | null>;
+  minPrice: import('@angular/forms').FormControl<number>;
+  maxPrice: import('@angular/forms').FormControl<number>;
+  minDurationHours: import('@angular/forms').FormControl<number>;
+  maxDurationHours: import('@angular/forms').FormControl<number>;
+  currency: import('@angular/forms').FormControl<string>;
+  sort: import('@angular/forms').FormControl<ExperienceSortOption>;
+}
+
+export interface ExperienceSearchFormValue {
+  term: string;
+  startDate: Date | null;
+  endDate: Date | null;
+  minPrice: number;
+  maxPrice: number;
+  minDurationHours: number;
+  maxDurationHours: number;
+  currency: string;
+  sort: ExperienceSortOption;
+}
+
+export interface ExperienceResult {
+  provider: ExperienceProvider;
+  trackId: string;
+  productCode?: string;
+  destinationIds?: number[];
+  avatarUrl?: string;
+  title?: string;
+  description?: string;
+  rating?: number;
+  reviewCount?: number;
+  priceFrom?: number;
+  currency?: string;
+  duration?: string;
+  imageUrl?: string;
+  productUrl?: string;
+  raw: unknown;
+}
+
+export interface ExperienceMapMarker {
+  destinationId?: number;
+  latitude: number;
+  longitude: number;
+  label?: string;
 }
 
 export interface ViatorFreetextProductFiltering {
@@ -197,4 +250,30 @@ export interface ViatorProductDetail {
     }>;
   }>;
   logistics?: ViatorProductLogistics;
+}
+
+export interface ExperienceSearchPinDialogData {
+  destinationId: number;
+  destinationName?: string;
+  results: ExperienceResult[];
+}
+
+export interface ExperienceSearchDetailDialogData {
+  result: ExperienceResult;
+}
+
+export interface ExperienceDetailLocationItem {
+  ref: string;
+  name?: string;
+  address?: string;
+  description?: string;
+  latitude?: number;
+  longitude?: number;
+}
+
+export interface ExperienceDetailMapMarker {
+  latitude: number;
+  longitude: number;
+  label?: string;
+  iconUrl?: string;
 }

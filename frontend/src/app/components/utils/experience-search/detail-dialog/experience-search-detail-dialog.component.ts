@@ -7,6 +7,9 @@ import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { Location } from '../../../../interfaces/location';
 import {
+  ExperienceDetailLocationItem,
+  ExperienceDetailMapMarker,
+  ExperienceSearchDetailDialogData,
   ViatorLocation,
   ViatorLocationsResponse,
   ViatorLogisticsPoint,
@@ -16,27 +19,7 @@ import {
 import { ViatorService } from '../../../../services/viator.service';
 import { SearchSettingsMapPreviewComponent } from '../../search-settings/search-settings-map-preview.component';
 import { HelpDialogService } from '../../help-dialog/help-dialog.service';
-import { ExperienceResult } from '../experience-search.component';
-
-export interface ExperienceSearchDetailDialogData {
-  result: ExperienceResult;
-}
-
-interface LocationItem {
-  ref: string;
-  name?: string;
-  address?: string;
-  description?: string;
-  latitude?: number;
-  longitude?: number;
-}
-
-interface MapMarker {
-  latitude: number;
-  longitude: number;
-  label?: string;
-  iconUrl?: string;
-}
+import { ExperienceResult } from '../../../../interfaces/viator';
 
 const DEFAULT_CENTER: Location = { latitude: 0, longitude: 0, plusCode: '' };
 
@@ -65,7 +48,7 @@ export class ExperienceSearchDetailDialogComponent {
   readonly loading = signal(false);
   readonly detail = signal<ViatorProductDetail | null>(null);
   readonly locationIndex = signal<Map<string, ViatorLocation>>(new Map());
-  readonly mapMarkers = signal<MapMarker[]>([]);
+  readonly mapMarkers = signal<ExperienceDetailMapMarker[]>([]);
   readonly mapCenter = signal<Location>(DEFAULT_CENTER);
 
   readonly startItems = computed(() => this.buildPointItems(this.detail()?.logistics?.start));
@@ -178,14 +161,14 @@ export class ExperienceSearchDetailDialogComponent {
     return Array.from(refs);
   }
 
-  private buildPointItems(points?: ViatorLogisticsPoint[]): LocationItem[] {
+  private buildPointItems(points?: ViatorLogisticsPoint[]): ExperienceDetailLocationItem[] {
     if (!points?.length) return [];
     return points
       .map((point) => this.buildLocationItem(point.location?.ref, point.description))
-      .filter((item): item is LocationItem => Boolean(item));
+      .filter((item): item is ExperienceDetailLocationItem => Boolean(item));
   }
 
-  getCombinedPointItems(): LocationItem[] {
+  getCombinedPointItems(): ExperienceDetailLocationItem[] {
     const start = this.startItems();
     if (start.length) {
       return start;
@@ -193,14 +176,14 @@ export class ExperienceSearchDetailDialogComponent {
     return this.endItems();
   }
 
-  private buildRedemptionItems(): LocationItem[] {
+  private buildRedemptionItems(): ExperienceDetailLocationItem[] {
     const redemption = this.detail()?.logistics?.redemption;
     if (!redemption?.locations?.length && !redemption?.specialInstructions) {
       return [];
     }
     const items = (redemption?.locations || [])
       .map((loc) => this.buildLocationItem(loc?.ref, redemption?.specialInstructions))
-      .filter((item): item is LocationItem => Boolean(item));
+      .filter((item): item is ExperienceDetailLocationItem => Boolean(item));
     if (items.length === 0 && redemption?.specialInstructions) {
       items.push({
         ref: 'redemption-info',
@@ -211,14 +194,14 @@ export class ExperienceSearchDetailDialogComponent {
     return items;
   }
 
-  private buildPickupItems(): LocationItem[] {
+  private buildPickupItems(): ExperienceDetailLocationItem[] {
     const pickup = this.detail()?.logistics?.travelerPickup;
     if (!pickup?.locations?.length && !pickup?.additionalInfo) {
       return [];
     }
     const items = (pickup?.locations || [])
       .map((loc) => this.buildPickupLocationItem(loc, pickup?.additionalInfo))
-      .filter((item): item is LocationItem => Boolean(item));
+      .filter((item): item is ExperienceDetailLocationItem => Boolean(item));
     if (items.length === 0 && pickup?.additionalInfo) {
       items.push({
         ref: 'pickup-info',
@@ -229,7 +212,7 @@ export class ExperienceSearchDetailDialogComponent {
     return items;
   }
 
-  private buildPickupLocationItem(pickup: ViatorPickupLocation, description?: string): LocationItem | null {
+  private buildPickupLocationItem(pickup: ViatorPickupLocation, description?: string): ExperienceDetailLocationItem | null {
     const item = this.buildLocationItem(pickup?.location?.ref, description);
     if (item && pickup?.pickupType) {
       item.description = item.description ? `${pickup.pickupType} · ${item.description}` : pickup.pickupType;
@@ -237,7 +220,7 @@ export class ExperienceSearchDetailDialogComponent {
     return item;
   }
 
-  private buildLocationItem(ref?: string, description?: string): LocationItem | null {
+  private buildLocationItem(ref?: string, description?: string): ExperienceDetailLocationItem | null {
     if (!ref) return null;
     const location = this.locationIndex().get(ref);
     return {
@@ -264,7 +247,7 @@ export class ExperienceSearchDetailDialogComponent {
   }
 
   private updateMapMarkers(): void {
-    const markers: MapMarker[] = [];
+    const markers: ExperienceDetailMapMarker[] = [];
     const start = this.firstCenteredLocation(this.detail()?.logistics?.start);
     const end = this.firstCenteredLocation(this.detail()?.logistics?.end);
     const sameLocation = Boolean(start && end && this.isSameLocation(start, end));
@@ -310,7 +293,7 @@ export class ExperienceSearchDetailDialogComponent {
     return null;
   }
 
-  getMapsUrl(item: LocationItem): string | null {
+  getMapsUrl(item: ExperienceDetailLocationItem): string | null {
     const query = this.formatMapsQuery(item);
     if (!query) {
       return null;
@@ -318,7 +301,7 @@ export class ExperienceSearchDetailDialogComponent {
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
   }
 
-  openMaps(item: LocationItem): void {
+  openMaps(item: ExperienceDetailLocationItem): void {
     const query = this.formatMapsQuery(item);
     if (!query) {
       return;
@@ -327,7 +310,7 @@ export class ExperienceSearchDetailDialogComponent {
     window.open(url, '_blank');
   }
 
-  private formatMapsQuery(item: LocationItem): string | null {
+  private formatMapsQuery(item: ExperienceDetailLocationItem): string | null {
     const lat = item.latitude;
     const lng = item.longitude;
     if (Number.isFinite(lat) && Number.isFinite(lng)) {
@@ -336,7 +319,7 @@ export class ExperienceSearchDetailDialogComponent {
     return item.address || null;
   }
 
-  getFirstMappableItem(items: LocationItem[]): LocationItem | null {
+  getFirstMappableItem(items: ExperienceDetailLocationItem[]): ExperienceDetailLocationItem | null {
     for (const item of items) {
       if (this.getMapsUrl(item)) {
         return item;

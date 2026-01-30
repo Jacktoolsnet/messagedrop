@@ -42,7 +42,7 @@ import { DeleteUserComponent } from './components/user/delete-user/delete-user.c
 import { UserProfileComponent } from './components/user/user-profile/user-profile.component';
 import { UserComponent } from './components/user/user.component';
 import { DisplayMessage } from './components/utils/display-message/display-message.component';
-import { ExperienceResult, ExperienceSearchComponent } from './components/utils/experience-search/experience-search.component';
+import { ExperienceSearchComponent } from './components/utils/experience-search/experience-search.component';
 import { NominatimSearchComponent } from './components/utils/nominatim-search/nominatim-search.component';
 import { SearchSettingsComponent } from './components/utils/search-settings/search-settings.component';
 import { WeatherComponent } from './components/weather/weather.component';
@@ -64,7 +64,7 @@ import { Place } from './interfaces/place';
 import { PlusCodeArea } from './interfaces/plus-code-area';
 import { DEFAULT_SEARCH_SETTINGS, SearchSettings } from './interfaces/search-settings';
 import { SharedContent } from './interfaces/shared-content';
-import { ViatorDestinationLookup } from './interfaces/viator';
+import { ExperienceResult, ViatorDestinationLookup } from './interfaces/viator';
 import { ShortNumberPipe } from './pipes/short-number.pipe';
 import { AirQualityService } from './services/air-quality.service';
 import { AppService } from './services/app.service';
