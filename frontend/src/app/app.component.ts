@@ -194,6 +194,7 @@ export class AppComponent implements OnInit {
   private experienceDestinationsInView: ViatorDestinationLookup[] = [];
   private experienceDestinationsLoaded = false;
   private experienceDestinationsLoading = false;
+  private experienceDestinationsLastFailure?: number;
 
   constructor() {
     this.setupExitBackupPrompt();
@@ -718,7 +719,10 @@ export class AppComponent implements OnInit {
     const canSearchNotes = isNotesEnabled && zoom >= settings.privateNotes.minZoom;
     const canSearchImages = isImagesEnabled && zoom >= settings.privateImages.minZoom;
     const canSearchDocuments = isDocumentsEnabled && zoom >= settings.privateDocuments.minZoom;
-    const canSearchExperiences = isExperiencesEnabled && zoom >= settings.experiences.minZoom;
+    const experienceMinZoom = ignoreSearchSettings
+      ? DEFAULT_SEARCH_SETTINGS.experiences.minZoom
+      : settings.experiences.minZoom;
+    const canSearchExperiences = isExperiencesEnabled && zoom >= experienceMinZoom;
     // notes from local device
     if (this.userService.isReady()) {
       if (canSearchNotes) {
@@ -1956,6 +1960,9 @@ export class AppComponent implements OnInit {
   }
 
   private async ensureExperienceDestinationsLoaded(): Promise<void> {
+    if (this.experienceDestinationsLastFailure && Date.now() - this.experienceDestinationsLastFailure < 60_000) {
+      return;
+    }
     if (this.experienceDestinationsLoaded || this.experienceDestinationsLoading) {
       return;
     }
@@ -1966,6 +1973,7 @@ export class AppComponent implements OnInit {
       this.experienceDestinationsLoaded = true;
     } catch {
       this.experienceDestinations = [];
+      this.experienceDestinationsLastFailure = Date.now();
     } finally {
       this.experienceDestinationsLoading = false;
     }
@@ -1993,10 +2001,10 @@ export class AppComponent implements OnInit {
   }
 
   private getExperienceDestinationTypes(zoom: number): string[] {
-    if (zoom <= 4) {
+    if (zoom <= 7) {
       return ['COUNTRY'];
     }
-    if (zoom <= 6) {
+    if (zoom <= 8) {
       return ['REGION', 'STATE', 'PROVINCE', 'COUNTY'];
     }
     return ['CITY', 'TOWN', 'VILLAGE', 'METRO', 'NEIGHBORHOOD', 'DISTRICT'];
