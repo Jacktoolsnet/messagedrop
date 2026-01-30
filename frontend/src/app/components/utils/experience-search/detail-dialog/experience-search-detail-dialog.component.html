@@ -44,7 +44,7 @@
       <mat-card class="detail-tile">
         <div class="detail-tile__header">
           <div class="detail-tile__header-left">
-            <mat-icon>flag</mat-icon>
+            <img class="detail-tile__icon" src="assets/markers/experience-start-marker.svg" alt="" />
             <span class="detail-tile__title">{{ 'common.experiences.startEndPoint' | transloco }}</span>
           </div>
           @if (getFirstMappableItem(getCombinedPointItems()); as mapItem) {
@@ -76,7 +76,7 @@
         <mat-card class="detail-tile">
           <div class="detail-tile__header">
             <div class="detail-tile__header-left">
-              <mat-icon>flag</mat-icon>
+              <img class="detail-tile__icon" src="assets/markers/experience-start-marker.svg" alt="" />
               <span class="detail-tile__title">{{ 'common.experiences.startPoint' | transloco }}</span>
             </div>
             @if (getFirstMappableItem(startItems()); as mapItem) {
@@ -109,7 +109,7 @@
         <mat-card class="detail-tile">
           <div class="detail-tile__header">
             <div class="detail-tile__header-left">
-              <mat-icon>outlined_flag</mat-icon>
+              <img class="detail-tile__icon" src="assets/markers/experience-stop-marker.svg" alt="" />
               <span class="detail-tile__title">{{ 'common.experiences.endPoint' | transloco }}</span>
             </div>
             @if (getFirstMappableItem(endItems()); as mapItem) {

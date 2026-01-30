@@ -35,6 +35,7 @@ interface MapMarker {
   latitude: number;
   longitude: number;
   label?: string;
+  iconUrl?: string;
 }
 
 const DEFAULT_CENTER: Location = { latitude: 0, longitude: 0, plusCode: '' };
@@ -271,14 +272,16 @@ export class ExperienceSearchDetailDialogComponent {
       markers.push({
         latitude: start.center!.latitude!,
         longitude: start.center!.longitude!,
-        label: this.transloco.translate(sameLocation ? 'common.experiences.startEndPoint' : 'common.experiences.startPoint')
+        label: this.transloco.translate(sameLocation ? 'common.experiences.startEndPoint' : 'common.experiences.startPoint'),
+        iconUrl: 'assets/markers/experience-start-marker.svg'
       });
     }
     if (end && !sameLocation) {
       markers.push({
         latitude: end.center!.latitude!,
         longitude: end.center!.longitude!,
-        label: this.transloco.translate('common.experiences.endPoint')
+        label: this.transloco.translate('common.experiences.endPoint'),
+        iconUrl: 'assets/markers/experience-stop-marker.svg'
       });
     }
 

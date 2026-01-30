@@ -146,22 +146,16 @@
   margin-left: auto;
 }
 
-.detail-tile__header-action {
-  font-size: 1.7rem;
-}
-
-.detail-tile__header-action .mat-icon {
-  font-size: 1.7rem;
-  width: 1.7rem;
-  height: 1.7rem;
-  line-height: 1.7rem;
-}
-
 .detail-tile__header mat-icon {
   font-size: 1.1rem;
   width: 1.1rem;
   height: 1.1rem;
   color: var(--mat-card-subtitle-text-color);
+}
+
+.detail-tile__icon {
+  width: 1.35rem;
+  height: 1.35rem;
 }
 
 .detail-tile__title {
