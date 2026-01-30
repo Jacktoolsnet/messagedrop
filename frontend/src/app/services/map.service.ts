@@ -40,6 +40,13 @@ const documentMarker = leaflet.icon({
   iconSize: [32, 40], // size of the icon
   iconAnchor: [16, 40], // point of the icon which will correspond to marker's location
 });
+
+const experienceMarker = leaflet.icon({
+  iconUrl: 'assets/markers/experience-marker.svg',
+
+  iconSize: [32, 40], // size of the icon
+  iconAnchor: [16, 40], // point of the icon which will correspond to marker's location
+});
 @Injectable({
   providedIn: 'root'
 })
@@ -343,6 +350,8 @@ export class MapService {
         return leaflet.marker(latLng, { icon: documentMarker, zIndexOffset: 15 });
       case MarkerType.MULTI:
         return leaflet.marker(latLng, { icon: multiMarker, zIndexOffset: 5 });
+      case MarkerType.EXPERIENCE_DESTINATION:
+        return leaflet.marker(latLng, { icon: experienceMarker, zIndexOffset: 10 });
       default:
         return null;
     }

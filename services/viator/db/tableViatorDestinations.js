@@ -91,10 +91,28 @@ const getByIds = function (db, destinationIds) {
   return db.prepare(sql).all(...destinationIds);
 };
 
+const getAll = function (db, types) {
+  if (Array.isArray(types) && types.length > 0) {
+    const placeholders = types.map(() => '?').join(', ');
+    const sql = `
+      SELECT *
+      FROM ${tableName}
+      WHERE type IN (${placeholders});
+    `;
+    return db.prepare(sql).all(...types);
+  }
+  const sql = `
+    SELECT *
+    FROM ${tableName};
+  `;
+  return db.prepare(sql).all();
+};
+
 module.exports = {
   init,
   countAll,
   prepareUpsert,
   deleteNotRunId,
-  getByIds
+  getByIds,
+  getAll
 };

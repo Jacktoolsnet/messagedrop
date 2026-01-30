@@ -319,6 +319,14 @@ async function setCachedResponse(db, cacheKey, payload, status, headers, ttlSeco
   });
 }
 
+function normalizeDestinationTypes(input) {
+  if (!input) return [];
+  const raw = Array.isArray(input) ? input : String(input).split(',');
+  return raw
+    .map((entry) => String(entry).trim())
+    .filter(Boolean);
+}
+
 router.use(security.checkToken);
 router.use(express.json({ limit: MAX_BODY_BYTES }));
 
@@ -332,6 +340,33 @@ router.get('/destinations', (req, res, next) => {
     return next(buildError(400, 'destination_ids_required'));
   }
   const rows = tableViatorDestinations.getByIds(db, ids);
+  const destinations = rows.map((row) => {
+    const hasCenter = Number.isFinite(row.centerLat) && Number.isFinite(row.centerLng);
+    return {
+      destinationId: row.destinationId,
+      name: row.name || undefined,
+      type: row.type || undefined,
+      parentDestinationId: row.parentDestinationId ?? undefined,
+      lookupId: row.lookupId || undefined,
+      destinationUrl: row.destinationUrl || undefined,
+      defaultCurrencyCode: row.defaultCurrencyCode || undefined,
+      timeZone: row.timeZone || undefined,
+      iataCodes: safeJsonParse(row.iataCodes),
+      countryCallingCode: row.countryCallingCode || undefined,
+      languages: safeJsonParse(row.languages),
+      center: hasCenter ? { latitude: row.centerLat, longitude: row.centerLng } : undefined
+    };
+  });
+  return res.status(200).json({ destinations, totalCount: destinations.length });
+});
+
+router.get('/destinations/all', (req, res, next) => {
+  const db = req.database?.db;
+  if (!db) {
+    return next(buildError(500, 'database_unavailable'));
+  }
+  const types = normalizeDestinationTypes(req.query?.types);
+  const rows = tableViatorDestinations.getAll(db, types);
   const destinations = rows.map((row) => {
     const hasCenter = Number.isFinite(row.centerLat) && Number.isFinite(row.centerLng);
     return {

@@ -844,13 +844,14 @@
       "toggle": "Suche aktivieren",
       "zoomLabel": "Suche ab Zoomstufe",
       "zoomValue": "Zoom",
-      "items": {
-        "publicMessages": "Öffentliche Nachrichten",
-        "privateNotes": "Private Notizen",
-        "privateImages": "Private Bilder",
-        "privateDocuments": "Private Dokumente"
-      }
-    },
+    "items": {
+      "publicMessages": "Öffentliche Nachrichten",
+      "privateNotes": "Private Notizen",
+      "privateImages": "Private Bilder",
+      "privateDocuments": "Private Dokumente",
+      "experiences": "Erlebnisse"
+    }
+  },
     "place": {
       "title": "Ort-Dienst",
       "creating": "Ort wird erstellt",

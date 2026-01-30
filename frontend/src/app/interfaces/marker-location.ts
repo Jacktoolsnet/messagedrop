@@ -4,6 +4,7 @@ import { Location } from "./location";
 import { MarkerType } from "./marker-type";
 import { Message } from "./message";
 import { Note } from "./note";
+import { ViatorDestinationLookup } from "./viator";
 
 export interface MarkerLocation {
     location: Location,
@@ -11,5 +12,6 @@ export interface MarkerLocation {
     notes: Note[];
     images: LocalImage[];
     documents: LocalDocument[];
+    experiences?: ViatorDestinationLookup[];
     type: MarkerType
 }

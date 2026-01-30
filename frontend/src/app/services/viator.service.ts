@@ -146,6 +146,24 @@ export class ViatorService {
       .pipe(catchError(this.handleError));
   }
 
+  getAllDestinations(showAlways = false): Observable<ViatorDestinationsResponse> {
+    const url = `${environment.apiUrl}/viator/destinations/all`;
+    this.networkService.setNetworkMessageConfig(url, {
+      showAlways,
+      title: this.i18n.t('common.viator.title'),
+      image: '',
+      icon: '',
+      message: this.i18n.t('common.viator.loading'),
+      button: '',
+      delay: 0,
+      showSpinner: true,
+      autoclose: false
+    });
+
+    return this.http.get<ViatorDestinationsResponse>(url, this.httpOptions)
+      .pipe(catchError(this.handleError));
+  }
+
   getLocationsBulk(references: string[], showAlways = false): Observable<ViatorLocationsResponse> {
     const locations = Array.isArray(references)
       ? Array.from(new Set(references.map((ref) => String(ref).trim()).filter(Boolean)))

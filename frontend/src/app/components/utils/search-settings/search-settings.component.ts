@@ -53,7 +53,8 @@ export class SearchSettingsComponent {
     { key: 'publicMessages', icon: 'public', titleKey: 'common.searchSettings.items.publicMessages' },
     { key: 'privateNotes', icon: 'sticky_note_2', titleKey: 'common.searchSettings.items.privateNotes' },
     { key: 'privateImages', icon: 'image', titleKey: 'common.searchSettings.items.privateImages' },
-    { key: 'privateDocuments', icon: 'description', titleKey: 'common.searchSettings.items.privateDocuments' }
+    { key: 'privateDocuments', icon: 'description', titleKey: 'common.searchSettings.items.privateDocuments' },
+    { key: 'experiences', icon: 'local_activity', titleKey: 'common.searchSettings.items.experiences' }
   ];
   readonly minZoom = 3;
   readonly maxZoom = 19;
@@ -93,7 +94,8 @@ export class SearchSettingsComponent {
       publicMessages: { ...DEFAULT_SEARCH_SETTINGS.publicMessages, ...settings.publicMessages },
       privateNotes: { ...DEFAULT_SEARCH_SETTINGS.privateNotes, ...settings.privateNotes },
       privateImages: { ...DEFAULT_SEARCH_SETTINGS.privateImages, ...settings.privateImages },
-      privateDocuments: { ...DEFAULT_SEARCH_SETTINGS.privateDocuments, ...settings.privateDocuments }
+      privateDocuments: { ...DEFAULT_SEARCH_SETTINGS.privateDocuments, ...settings.privateDocuments },
+      experiences: { ...DEFAULT_SEARCH_SETTINGS.experiences, ...settings.experiences }
     };
   }
 }

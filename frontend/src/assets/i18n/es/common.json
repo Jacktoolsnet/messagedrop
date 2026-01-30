@@ -844,13 +844,14 @@
       "toggle": "Activar búsqueda",
       "zoomLabel": "Buscar a partir del nivel de zoom",
       "zoomValue": "Zoom",
-      "items": {
-        "publicMessages": "Mensajes públicos",
-        "privateNotes": "Notas privadas",
-        "privateImages": "Imágenes privadas",
-        "privateDocuments": "Documentos privados"
-      }
-    },
+    "items": {
+      "publicMessages": "Mensajes públicos",
+      "privateNotes": "Notas privadas",
+      "privateImages": "Imágenes privadas",
+      "privateDocuments": "Documentos privados",
+      "experiences": "Experiencias"
+    }
+  },
     "place": {
       "title": "Servicio de lugares",
       "creating": "Creando lugar",

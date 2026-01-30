@@ -844,13 +844,14 @@
       "toggle": "Activer la recherche",
       "zoomLabel": "Rechercher à partir du niveau de zoom",
       "zoomValue": "Zoom",
-      "items": {
-        "publicMessages": "Messages publics",
-        "privateNotes": "Notes privées",
-        "privateImages": "Images privées",
-        "privateDocuments": "Documents privés"
-      }
-    },
+    "items": {
+      "publicMessages": "Messages publics",
+      "privateNotes": "Notes privées",
+      "privateImages": "Images privées",
+      "privateDocuments": "Documents privés",
+      "experiences": "Expériences"
+    }
+  },
     "place": {
       "title": "Service de lieux",
       "creating": "Création du lieu",

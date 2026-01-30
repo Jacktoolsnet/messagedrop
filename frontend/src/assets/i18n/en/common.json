@@ -844,13 +844,14 @@
       "toggle": "Enable search",
       "zoomLabel": "Search from zoom level",
       "zoomValue": "Zoom",
-      "items": {
-        "publicMessages": "Public messages",
-        "privateNotes": "Private notes",
-        "privateImages": "Private images",
-        "privateDocuments": "Private documents"
-      }
-    },
+    "items": {
+      "publicMessages": "Public messages",
+      "privateNotes": "Private notes",
+      "privateImages": "Private images",
+      "privateDocuments": "Private documents",
+      "experiences": "Experiences"
+    }
+  },
     "place": {
       "title": "Place service",
       "creating": "Creating place",

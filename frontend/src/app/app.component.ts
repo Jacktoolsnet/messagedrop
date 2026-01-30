@@ -46,6 +46,7 @@ import { ExperienceSearchComponent, ExperienceResult } from './components/utils/
 import { NominatimSearchComponent } from './components/utils/nominatim-search/nominatim-search.component';
 import { SearchSettingsComponent } from './components/utils/search-settings/search-settings.component';
 import { WeatherComponent } from './components/weather/weather.component';
+import { BoundingBox } from './interfaces/bounding-box';
 import { GetGeoStatisticResponse } from './interfaces/get-geo-statistic-response';
 import { LocalDocument } from './interfaces/local-document';
 import { LocalImage } from './interfaces/local-image';
@@ -64,6 +65,7 @@ import { Place } from './interfaces/place';
 import { PlusCodeArea } from './interfaces/plus-code-area';
 import { SharedContent } from './interfaces/shared-content';
 import { DEFAULT_SEARCH_SETTINGS, SearchSettings } from './interfaces/search-settings';
+import { ViatorDestinationLookup } from './interfaces/viator';
 import { ShortNumberPipe } from './pipes/short-number.pipe';
 import { AirQualityService } from './services/air-quality.service';
 import { AppService } from './services/app.service';
@@ -91,6 +93,7 @@ import { SharedContentService } from './services/shared-content.service';
 import { SystemNotificationService } from './services/system-notification.service';
 import { TranslationHelperService } from './services/translation-helper.service';
 import { UserService } from './services/user.service';
+import { ViatorService } from './services/viator.service';
 import { WeatherService } from './services/weather.service';
 import { isQuotaExceededError } from './utils/storage-error.util';
 
@@ -153,6 +156,7 @@ export class AppComponent implements OnInit {
   private readonly localImageService = inject(LocalImageService);
   private readonly localDocumentService = inject(LocalDocumentService);
   private readonly messageService = inject(MessageService);
+  private readonly viatorService = inject(ViatorService);
   private readonly airQualityService = inject(AirQualityService);
   private readonly weatherService = inject(WeatherService);
   private readonly geoStatisticService = inject(GeoStatisticService);
@@ -186,6 +190,10 @@ export class AppComponent implements OnInit {
   private initialPublicMessagesRequested = false;
 
   private markerMessageListOpen = false;
+  private experienceDestinations: ViatorDestinationLookup[] = [];
+  private experienceDestinationsInView: ViatorDestinationLookup[] = [];
+  private experienceDestinationsLoaded = false;
+  private experienceDestinationsLoading = false;
 
   constructor() {
     this.setupExitBackupPrompt();
@@ -705,10 +713,12 @@ export class AppComponent implements OnInit {
     const isNotesEnabled = ignoreSearchSettings ? true : settings.privateNotes.enabled;
     const isImagesEnabled = ignoreSearchSettings ? true : settings.privateImages.enabled;
     const isDocumentsEnabled = ignoreSearchSettings ? true : settings.privateDocuments.enabled;
+    const isExperiencesEnabled = ignoreSearchSettings ? true : settings.experiences.enabled;
     const canSearchMessages = ignoreSearchSettings ? true : isMessagesEnabled && zoom >= settings.publicMessages.minZoom;
     const canSearchNotes = isNotesEnabled && zoom >= settings.privateNotes.minZoom;
     const canSearchImages = isImagesEnabled && zoom >= settings.privateImages.minZoom;
     const canSearchDocuments = isDocumentsEnabled && zoom >= settings.privateDocuments.minZoom;
+    const canSearchExperiences = isExperiencesEnabled && zoom >= settings.experiences.minZoom;
     // notes from local device
     if (this.userService.isReady()) {
       if (canSearchNotes) {
@@ -737,6 +747,9 @@ export class AppComponent implements OnInit {
     } else if (canSearchMessages && !this.markerMessageListOpen) {
       this.messageService.getByVisibleMapBoundingBox();
     }
+
+    await this.updateExperiencePins(canSearchExperiences, zoom);
+    this.createMarkerLocations();
   }
 
   private async loadSearchSettings(): Promise<void> {
@@ -749,7 +762,8 @@ export class AppComponent implements OnInit {
       publicMessages: { ...DEFAULT_SEARCH_SETTINGS.publicMessages, ...(settings?.publicMessages ?? {}) },
       privateNotes: { ...DEFAULT_SEARCH_SETTINGS.privateNotes, ...(settings?.privateNotes ?? {}) },
       privateImages: { ...DEFAULT_SEARCH_SETTINGS.privateImages, ...(settings?.privateImages ?? {}) },
-      privateDocuments: { ...DEFAULT_SEARCH_SETTINGS.privateDocuments, ...(settings?.privateDocuments ?? {}) }
+      privateDocuments: { ...DEFAULT_SEARCH_SETTINGS.privateDocuments, ...(settings?.privateDocuments ?? {}) },
+      experiences: { ...DEFAULT_SEARCH_SETTINGS.experiences, ...(settings?.experiences ?? {}) }
     };
   }
 
@@ -1901,8 +1915,91 @@ export class AppComponent implements OnInit {
       }
     });
 
+    // Process experience destinations
+    this.experienceDestinationsInView.forEach((destination) => {
+      const centerLocation = destination.center;
+      if (!centerLocation) {
+        return;
+      }
+      const markerKey = `experience:${destination.destinationId}`;
+      const location: Location = {
+        latitude: centerLocation.latitude ?? 0,
+        longitude: centerLocation.longitude ?? 0,
+        plusCode: markerKey
+      };
+      this.markerLocations.set(markerKey, {
+        location,
+        messages: [],
+        notes: [],
+        images: [],
+        documents: [],
+        experiences: [destination],
+        type: MarkerType.EXPERIENCE_DESTINATION
+      });
+    });
+
     // Save last markerupdet to fire the angular change listener
     this.lastMarkerUpdate = Date.now();
+  }
+
+  private async updateExperiencePins(enabled: boolean, zoom: number): Promise<void> {
+    if (!enabled) {
+      this.experienceDestinationsInView = [];
+      return;
+    }
+    await this.ensureExperienceDestinationsLoaded();
+    const bbox = this.mapService.getVisibleMapBoundingBox();
+    const candidates = this.filterDestinationsInBounds(this.experienceDestinations, bbox);
+    const types = this.getExperienceDestinationTypes(zoom);
+    const filtered = this.filterDestinationsByType(candidates, types);
+    this.experienceDestinationsInView = (filtered.length ? filtered : candidates).slice(0, 250);
+  }
+
+  private async ensureExperienceDestinationsLoaded(): Promise<void> {
+    if (this.experienceDestinationsLoaded || this.experienceDestinationsLoading) {
+      return;
+    }
+    this.experienceDestinationsLoading = true;
+    try {
+      const response = await firstValueFrom(this.viatorService.getAllDestinations(false));
+      this.experienceDestinations = response?.destinations ?? [];
+      this.experienceDestinationsLoaded = true;
+    } catch {
+      this.experienceDestinations = [];
+    } finally {
+      this.experienceDestinationsLoading = false;
+    }
+  }
+
+  private filterDestinationsInBounds(destinations: ViatorDestinationLookup[], bbox: BoundingBox): ViatorDestinationLookup[] {
+    return destinations.filter((dest) => {
+      const center = dest.center;
+      if (!center || center.latitude === undefined || center.longitude === undefined) {
+        return false;
+      }
+      return (
+        center.latitude >= bbox.latMin &&
+        center.latitude <= bbox.latMax &&
+        center.longitude >= bbox.lonMin &&
+        center.longitude <= bbox.lonMax
+      );
+    });
+  }
+
+  private filterDestinationsByType(destinations: ViatorDestinationLookup[], types: string[]): ViatorDestinationLookup[] {
+    if (!types.length) return destinations;
+    const allowed = new Set(types.map((type) => type.toUpperCase()));
+    return destinations.filter((dest) => dest.type && allowed.has(dest.type.toUpperCase()));
+  }
+
+  private getExperienceDestinationTypes(zoom: number): string[] {
+    if (zoom <= 4) {
+      return ['COUNTRY'];
+    }
+    if (zoom <= 6) {
+      return ['REGION', 'STATE', 'PROVINCE', 'COUNTY'];
+    }
+    return ['CITY', 'TOWN', 'VILLAGE', 'METRO', 'NEIGHBORHOOD', 'DISTRICT'];
   }
 
 }
