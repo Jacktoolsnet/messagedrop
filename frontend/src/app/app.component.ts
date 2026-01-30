@@ -42,11 +42,10 @@ import { DeleteUserComponent } from './components/user/delete-user/delete-user.c
 import { UserProfileComponent } from './components/user/user-profile/user-profile.component';
 import { UserComponent } from './components/user/user.component';
 import { DisplayMessage } from './components/utils/display-message/display-message.component';
-import { ExperienceSearchComponent, ExperienceResult } from './components/utils/experience-search/experience-search.component';
+import { ExperienceResult, ExperienceSearchComponent } from './components/utils/experience-search/experience-search.component';
 import { NominatimSearchComponent } from './components/utils/nominatim-search/nominatim-search.component';
 import { SearchSettingsComponent } from './components/utils/search-settings/search-settings.component';
 import { WeatherComponent } from './components/weather/weather.component';
-import { BoundingBox } from './interfaces/bounding-box';
 import { GetGeoStatisticResponse } from './interfaces/get-geo-statistic-response';
 import { LocalDocument } from './interfaces/local-document';
 import { LocalImage } from './interfaces/local-image';
@@ -63,8 +62,8 @@ import { Note } from './interfaces/note';
 import { NotificationAction } from './interfaces/notification-action';
 import { Place } from './interfaces/place';
 import { PlusCodeArea } from './interfaces/plus-code-area';
-import { SharedContent } from './interfaces/shared-content';
 import { DEFAULT_SEARCH_SETTINGS, SearchSettings } from './interfaces/search-settings';
+import { SharedContent } from './interfaces/shared-content';
 import { ViatorDestinationLookup } from './interfaces/viator';
 import { ShortNumberPipe } from './pipes/short-number.pipe';
 import { AirQualityService } from './services/air-quality.service';
@@ -90,10 +89,10 @@ import { PowService } from './services/pow.service';
 import { RestoreService } from './services/restore.service';
 import { ServerService } from './services/server.service';
 import { SharedContentService } from './services/shared-content.service';
+import { ExperienceMapService } from './services/experience-map.service';
 import { SystemNotificationService } from './services/system-notification.service';
 import { TranslationHelperService } from './services/translation-helper.service';
 import { UserService } from './services/user.service';
-import { ViatorService } from './services/viator.service';
 import { WeatherService } from './services/weather.service';
 import { isQuotaExceededError } from './utils/storage-error.util';
 
@@ -156,7 +155,7 @@ export class AppComponent implements OnInit {
   private readonly localImageService = inject(LocalImageService);
   private readonly localDocumentService = inject(LocalDocumentService);
   private readonly messageService = inject(MessageService);
-  private readonly viatorService = inject(ViatorService);
+  private readonly experienceMapService = inject(ExperienceMapService);
   private readonly airQualityService = inject(AirQualityService);
   private readonly weatherService = inject(WeatherService);
   private readonly geoStatisticService = inject(GeoStatisticService);
@@ -190,11 +189,7 @@ export class AppComponent implements OnInit {
   private initialPublicMessagesRequested = false;
 
   private markerMessageListOpen = false;
-  private experienceDestinations: ViatorDestinationLookup[] = [];
   private experienceDestinationsInView: ViatorDestinationLookup[] = [];
-  private experienceDestinationsLoaded = false;
-  private experienceDestinationsLoading = false;
-  private experienceDestinationsLastFailure?: number;
 
   constructor() {
     this.setupExitBackupPrompt();
@@ -714,15 +709,10 @@ export class AppComponent implements OnInit {
     const isNotesEnabled = ignoreSearchSettings ? true : settings.privateNotes.enabled;
     const isImagesEnabled = ignoreSearchSettings ? true : settings.privateImages.enabled;
     const isDocumentsEnabled = ignoreSearchSettings ? true : settings.privateDocuments.enabled;
-    const isExperiencesEnabled = ignoreSearchSettings ? true : settings.experiences.enabled;
     const canSearchMessages = ignoreSearchSettings ? true : isMessagesEnabled && zoom >= settings.publicMessages.minZoom;
     const canSearchNotes = isNotesEnabled && zoom >= settings.privateNotes.minZoom;
     const canSearchImages = isImagesEnabled && zoom >= settings.privateImages.minZoom;
     const canSearchDocuments = isDocumentsEnabled && zoom >= settings.privateDocuments.minZoom;
-    const experienceMinZoom = ignoreSearchSettings
-      ? DEFAULT_SEARCH_SETTINGS.experiences.minZoom
-      : settings.experiences.minZoom;
-    const canSearchExperiences = isExperiencesEnabled && zoom >= experienceMinZoom;
     // notes from local device
     if (this.userService.isReady()) {
       if (canSearchNotes) {
@@ -752,7 +742,7 @@ export class AppComponent implements OnInit {
       this.messageService.getByVisibleMapBoundingBox();
     }
 
-    await this.updateExperiencePins(canSearchExperiences, zoom);
+    await this.updateExperiencePins(settings, ignoreSearchSettings, zoom);
     this.createMarkerLocations();
   }
 
@@ -1946,68 +1936,18 @@ export class AppComponent implements OnInit {
     this.lastMarkerUpdate = Date.now();
   }
 
-  private async updateExperiencePins(enabled: boolean, zoom: number): Promise<void> {
-    if (!enabled) {
-      this.experienceDestinationsInView = [];
-      return;
-    }
-    await this.ensureExperienceDestinationsLoaded();
+  private async updateExperiencePins(
+    settings: SearchSettings,
+    ignoreSearchSettings: boolean,
+    zoom: number
+  ): Promise<void> {
     const bbox = this.mapService.getVisibleMapBoundingBox();
-    const candidates = this.filterDestinationsInBounds(this.experienceDestinations, bbox);
-    const types = this.getExperienceDestinationTypes(zoom);
-    const filtered = this.filterDestinationsByType(candidates, types);
-    this.experienceDestinationsInView = (filtered.length ? filtered : candidates).slice(0, 250);
-  }
-
-  private async ensureExperienceDestinationsLoaded(): Promise<void> {
-    if (this.experienceDestinationsLastFailure && Date.now() - this.experienceDestinationsLastFailure < 60_000) {
-      return;
-    }
-    if (this.experienceDestinationsLoaded || this.experienceDestinationsLoading) {
-      return;
-    }
-    this.experienceDestinationsLoading = true;
-    try {
-      const response = await firstValueFrom(this.viatorService.getAllDestinations(false));
-      this.experienceDestinations = response?.destinations ?? [];
-      this.experienceDestinationsLoaded = true;
-    } catch {
-      this.experienceDestinations = [];
-      this.experienceDestinationsLastFailure = Date.now();
-    } finally {
-      this.experienceDestinationsLoading = false;
-    }
-  }
-
-  private filterDestinationsInBounds(destinations: ViatorDestinationLookup[], bbox: BoundingBox): ViatorDestinationLookup[] {
-    return destinations.filter((dest) => {
-      const center = dest.center;
-      if (!center || center.latitude === undefined || center.longitude === undefined) {
-        return false;
-      }
-      return (
-        center.latitude >= bbox.latMin &&
-        center.latitude <= bbox.latMax &&
-        center.longitude >= bbox.lonMin &&
-        center.longitude <= bbox.lonMax
-      );
-    });
-  }
-
-  private filterDestinationsByType(destinations: ViatorDestinationLookup[], types: string[]): ViatorDestinationLookup[] {
-    if (!types.length) return destinations;
-    const allowed = new Set(types.map((type) => type.toUpperCase()));
-    return destinations.filter((dest) => dest.type && allowed.has(dest.type.toUpperCase()));
-  }
-
-  private getExperienceDestinationTypes(zoom: number): string[] {
-    if (zoom <= 7) {
-      return ['COUNTRY'];
-    }
-    if (zoom <= 8) {
-      return ['REGION', 'STATE', 'PROVINCE', 'COUNTY'];
-    }
-    return ['CITY', 'TOWN', 'VILLAGE', 'METRO', 'NEIGHBORHOOD', 'DISTRICT'];
+    this.experienceDestinationsInView = await this.experienceMapService.getDestinationsInView(
+      bbox,
+      zoom,
+      settings,
+      ignoreSearchSettings
+    );
   }
 
 }
