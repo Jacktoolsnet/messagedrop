@@ -44,15 +44,18 @@
 
 .detail-hero {
   position: relative;
-  min-height: 12rem;
+  min-height: 12.5rem;
   border-radius: 1.25rem;
   overflow: hidden;
   background-color: var(--mat-card-filled-container-color);
   border: 1px solid var(--mat-card-outlined-outline-color);
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  padding: 0.75rem 1rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem 2.6rem;
+  text-align: center;
 }
 
 .detail-hero::before {
@@ -70,6 +73,70 @@
 .detail-hero>* {
   position: relative;
   z-index: 1;
+}
+
+.detail-hero > *:not(.viator-badge):not(.identity-badge):not(.rating-badge) {
+  position: relative;
+  z-index: 1;
+}
+
+.detail-hero .identity-badge {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  z-index: 2;
+  min-height: 3rem;
+  padding: 0.35rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: min(82%, 22rem);
+  overflow: hidden;
+  color: var(--mat-card-subtitle-text-color);
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+  border-radius: 1.5rem;
+}
+
+.detail-hero .identity-badge mat-icon {
+  flex: 0 0 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 2rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+
+.detail-hero .identity-badge .avatar {
+  flex: 0 0 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.detail-hero .identity-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.detail-hero .identity-text .name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  max-width: 100%;
+}
+
+.detail-hero .identity-text .subtitle {
+  font-size: 0.75rem;
 }
 
 .detail-card,
@@ -183,32 +250,47 @@
   min-height: 37.5rem;
 }
 
-.viator-badge {
+.detail-hero .viator-badge {
+  position: absolute;
+  left: 0.6rem;
+  bottom: 0.6rem;
+  z-index: 2;
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: 0.8rem;
-  padding: 0.25rem 0.5rem;
+  padding: 0.2rem 0.55rem;
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.45);
-  color: #fff;
-}
-
-.viator-badge__link {
-  color: #fff;
+  font-size: 0.65rem;
   text-decoration: none;
-  font-weight: 600;
+  color: var(--mat-app-text-color);
+  background: color-mix(in srgb, var(--mat-card-filled-container-color) 85%, transparent);
+  border: 1px solid color-mix(in srgb, var(--mat-card-outlined-outline-color) 70%, transparent);
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--mat-card-outlined-outline-color) 40%, transparent);
+  backdrop-filter: blur(6px);
 }
 
-.rating-badge {
+.detail-hero .viator-badge__link {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.detail-hero .rating-badge {
+  position: absolute;
+  right: 0.6rem;
+  bottom: 0.6rem;
+  z-index: 2;
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  font-size: 0.85rem;
-  padding: 0.25rem 0.55rem;
+  padding: 0.2rem 0.55rem;
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.55);
-  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--mat-app-text-color);
+  background: color-mix(in srgb, var(--mat-card-filled-container-color) 85%, transparent);
+  border: 1px solid color-mix(in srgb, var(--mat-card-outlined-outline-color) 70%, transparent);
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--mat-card-outlined-outline-color) 40%, transparent);
+  backdrop-filter: blur(6px);
 }
 
 .sticky-actions {

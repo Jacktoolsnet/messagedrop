@@ -800,6 +800,7 @@
     },
     "experiences": {
       "title": "Expériences",
+      "detailTitle": "Expérience",
       "provider": "Fournisseur",
       "searchPlaceholder": "Que voulez-vous faire ?",
       "destinationPlaceholder": "ID de destination",

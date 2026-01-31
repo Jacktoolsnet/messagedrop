@@ -800,6 +800,7 @@
     },
     "experiences": {
       "title": "Experiences",
+      "detailTitle": "Experience",
       "provider": "Provider",
       "searchPlaceholder": "What do you want to do?",
       "destinationPlaceholder": "Destination ID",

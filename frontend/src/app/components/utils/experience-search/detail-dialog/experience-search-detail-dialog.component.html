@@ -1,7 +1,6 @@
 <app-dialog-header
   icon="local_activity"
-  [title]="data.result.title || data.result.productCode || ''"
-  [subtitle]="getDurationLabel() ? (('common.experiences.durationPrefix' | transloco) + ' ' + getDurationLabel()) : ''">
+  [title]="'common.experiences.detailTitle' | transloco">
 </app-dialog-header>
 
 <mat-dialog-content class="detail-dialog-content">
@@ -10,6 +9,21 @@
 
     <div class="detail-hero" [style.--detail-hero-bg-image]="getExperienceHeaderBackgroundImage()"
       [style.--detail-hero-bg-opacity]="getExperienceHeaderBackgroundOpacity()">
+      <div class="identity-badge">
+        @if (data.result.avatarUrl) {
+        <img class="avatar" [src]="data.result.avatarUrl" [alt]="data.result.title || data.result.productCode || ''" />
+        } @else {
+        <mat-icon>local_activity</mat-icon>
+        }
+        <div class="identity-text">
+          <span class="name" [attr.title]="data.result.title || data.result.productCode || ''">
+            {{ data.result.title || data.result.productCode || '' }}
+          </span>
+          @if (getDurationLabel()) {
+          <span class="subtitle">{{ 'common.experiences.durationPrefix' | transloco }} {{ getDurationLabel() }}</span>
+          }
+        </div>
+      </div>
       <div class="viator-badge">
         <span class="viator-badge__text">{{ 'common.experiences.sourceViator' | transloco }}</span>
         <a class="viator-badge__link" href="https://www.viator.com/?pid=P00285785&mcid=42383&medium=link"
