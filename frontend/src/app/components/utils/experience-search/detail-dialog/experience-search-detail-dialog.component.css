@@ -42,8 +42,9 @@
 }
 
 h2[mat-dialog-title].dialog-title {
-  height: 3rem;
-  padding: 0.35rem 1rem;
+  min-height: 3.5rem;
+  height: auto;
+  padding: 0.75rem 1rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
