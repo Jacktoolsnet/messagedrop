@@ -65,6 +65,7 @@ import { PlusCodeArea } from './interfaces/plus-code-area';
 import { DEFAULT_SEARCH_SETTINGS, SearchSettings } from './interfaces/search-settings';
 import { SharedContent } from './interfaces/shared-content';
 import { ExperienceResult, ViatorDestinationLookup } from './interfaces/viator';
+import { ExperiencelistComponent } from './components/experiencelist/experiencelist.component';
 import { ShortNumberPipe } from './pipes/short-number.pipe';
 import { AirQualityService } from './services/air-quality.service';
 import { AppService } from './services/app.service';
@@ -704,12 +705,12 @@ export class AppComponent implements OnInit {
   private async updateDataForLocation() {
     const settings = this.normalizeSearchSettings(this.searchSettings);
     const zoom = this.mapService.getMapZoom();
-    const ignoreSearchSettings = !this.userService.isReady();
-    const isMessagesEnabled = ignoreSearchSettings ? true : settings.publicMessages.enabled;
-    const isNotesEnabled = ignoreSearchSettings ? true : settings.privateNotes.enabled;
-    const isImagesEnabled = ignoreSearchSettings ? true : settings.privateImages.enabled;
-    const isDocumentsEnabled = ignoreSearchSettings ? true : settings.privateDocuments.enabled;
-    const canSearchMessages = ignoreSearchSettings ? true : isMessagesEnabled && zoom >= settings.publicMessages.minZoom;
+    const ignoreSearchSettings = false;
+    const isMessagesEnabled = settings.publicMessages.enabled;
+    const isNotesEnabled = settings.privateNotes.enabled;
+    const isImagesEnabled = settings.privateImages.enabled;
+    const isDocumentsEnabled = settings.privateDocuments.enabled;
+    const canSearchMessages = isMessagesEnabled && zoom >= settings.publicMessages.minZoom;
     const canSearchNotes = isNotesEnabled && zoom >= settings.privateNotes.minZoom;
     const canSearchImages = isImagesEnabled && zoom >= settings.privateImages.minZoom;
     const canSearchDocuments = isDocumentsEnabled && zoom >= settings.privateDocuments.minZoom;
@@ -798,8 +799,11 @@ export class AppComponent implements OnInit {
           });
         }
         break;
+      case MarkerType.EXPERIENCE_DESTINATION:
+        this.openMarkerExperienceListDialog(event.experiences ?? []);
+        break;
       case MarkerType.MULTI:
-        this.openMarkerMultiDialog(event.messages, event.notes, event.images, event.documents);
+        this.openMarkerMultiDialog(event.messages, event.notes, event.images, event.documents, event.experiences ?? []);
         break;
     }
   }
@@ -1181,9 +1185,15 @@ export class AppComponent implements OnInit {
 
   }
 
-  public openMarkerMultiDialog(messages: Message[], notes: Note[], images: LocalImage[], documents: LocalDocument[]) {
+  public openMarkerMultiDialog(
+    messages: Message[],
+    notes: Note[],
+    images: LocalImage[],
+    documents: LocalDocument[],
+    experiences: ViatorDestinationLookup[]
+  ) {
     const dialogRef = this.dialog.open(MultiMarkerComponent, {
-      data: { messages: messages, notes: notes, images: images, documents: documents },
+      data: { messages: messages, notes: notes, images: images, documents: documents, experiences: experiences },
       closeOnNavigation: true,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
@@ -1211,8 +1221,32 @@ export class AppComponent implements OnInit {
           case 'private_document':
             this.openMarkerDocumentListDialog(result.documents);
             break
+          case 'experience':
+            this.openMarkerExperienceListDialog(result.experiences ?? []);
+            break
         }
       }
+    });
+  }
+
+  private openMarkerExperienceListDialog(destinations: ViatorDestinationLookup[]): void {
+    const ids = Array.isArray(destinations)
+      ? Array.from(new Set(destinations.map((dest) => dest.destinationId).filter((id) => Number.isFinite(id) && id > 0)))
+      : [];
+    if (!ids.length) {
+      return;
+    }
+    const destinationName = ids.length === 1
+      ? destinations.find((dest) => dest.destinationId === ids[0])?.name
+      : undefined;
+    this.dialog.open(ExperiencelistComponent, {
+      data: { destinationIds: ids, destinationName },
+      panelClass: 'pin-dialog',
+      backdropClass: 'dialog-backdrop',
+      closeOnNavigation: false,
+      maxWidth: '80vw',
+      maxHeight: '75vh',
+      autoFocus: false
     });
   }
 

@@ -1,0 +1,91 @@
+<mat-dialog-content class="experience-dialog-content">
+  <div class="pin-dialog-header">
+    <mat-icon>place</mat-icon>
+    <div class="pin-dialog-header__text">
+      <span class="pin-dialog-title">
+        {{ data.destinationName || ('common.experiences.title' | transloco) }}
+      </span>
+      @if (errorMessage()) {
+      <span class="pin-dialog-subtitle">{{ errorMessage() }}</span>
+      }
+    </div>
+  </div>
+
+  <div class="experience-scroll">
+    @if (loading()) {
+    <div class="experience-loading">
+      <mat-progress-spinner diameter="32" mode="indeterminate"></mat-progress-spinner>
+    </div>
+    }
+    <div class="results pin-dialog-results" role="list">
+      @for (result of results(); track result.trackId) {
+      <mat-card class="experience-tile" role="listitem" [attr.title]="result.title || result.productCode || ''">
+        <div class="tile-header" [style.--experience-header-bg-image]="getExperienceHeaderBackgroundImage(result)"
+          [style.--experience-header-bg-opacity]="getExperienceHeaderBackgroundOpacity(result)">
+          <div class="identity-badge">
+            @if (result.avatarUrl) {
+            <img class="avatar" [src]="result.avatarUrl" [alt]="result.title || result.productCode || ''" />
+            } @else {
+            <mat-icon>{{ getExperienceIcon() }}</mat-icon>
+            }
+            <div class="identity-text">
+              <span class="name" [attr.title]="result.title || result.productCode || ''">
+                {{ result.title || result.productCode }}
+              </span>
+              @if (getDurationLabel(result)) {
+              <span class="subtitle">{{ 'common.experiences.durationPrefix' | transloco }} {{ getDurationLabel(result)
+                }}</span>
+              }
+            </div>
+          </div>
+          <div class="viator-badge">
+            <span class="viator-badge__text">{{ 'common.experiences.sourceViator' | transloco }}</span>
+            <a class="viator-badge__link" href="https://www.viator.com/?pid=P00285785&mcid=42383&medium=link"
+              target="_blank" rel="noopener">
+              Viator
+            </a>
+          </div>
+          @if (getRatingLabel(result)) {
+          <div class="rating-badge">★ {{ getRatingLabel(result) }}</div>
+          }
+        </div>
+        <mat-card-content class="experience-content">
+          @if (result.description) {
+          <p class="result-description">
+            {{ result.description }}
+          </p>
+          }
+        </mat-card-content>
+        <mat-card-actions class="tile-actions">
+          <div class="tile-actions__left">
+            <button mat-stroked-button class="open-viator-button" type="button" (click)="openDetails(result)">
+              <mat-icon>expand_content</mat-icon>
+              <span class="open-viator-label">{{ 'common.experiences.showMore' | transloco }}</span>
+            </button>
+          </div>
+          <div class="tile-actions__right">
+            <button mat-stroked-button class="open-viator-button" type="button" (click)="onOpen(result)"
+              [disabled]="!result.productUrl"
+              [attr.aria-label]="'common.experiences.openOn' | transloco : { provider: 'Viator' }">
+              <mat-icon>shopping_cart</mat-icon>
+              <span class="open-viator-label">
+                {{ getPriceLabel(result) || ('common.experiences.openOn' | transloco : { provider: 'Viator' }) }}
+              </span>
+            </button>
+          </div>
+        </mat-card-actions>
+      </mat-card>
+      }
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-dialog-close mat-icon-button class="action-close" [attr.aria-label]="'common.actions.abort' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+  <button mat-icon-button type="button" (click)="help.open('experienceSearch')"
+    [attr.aria-label]="'common.actions.help' | transloco">
+    <mat-icon>help</mat-icon>
+  </button>
+</mat-dialog-actions>

@@ -43,6 +43,7 @@ const DEFAULT_CURRENCY = resolveCurrencyFromLocale();
 
 @Component({
   selector: 'app-experiencelist',
+  standalone: true,
   imports: [
     MatDialogContent,
     MatDialogActions,

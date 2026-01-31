@@ -259,6 +259,11 @@ export interface ExperienceSearchPinDialogData {
   results: ExperienceResult[];
 }
 
+export interface ExperienceListDialogData {
+  destinationIds: number[];
+  destinationName?: string;
+}
+
 export interface ExperienceSearchDetailDialogData {
   result: ExperienceResult;
 }

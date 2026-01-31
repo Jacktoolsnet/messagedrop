@@ -314,7 +314,8 @@
         "showMessages": "Mostrar mensajes",
         "showNotes": "Mostrar notas",
         "showImages": "Mostrar imágenes",
-        "showDocuments": "Mostrar documentos"
+        "showDocuments": "Mostrar documentos",
+        "showExperiences": "Experiencias"
       }
     },
     "messageList": {
