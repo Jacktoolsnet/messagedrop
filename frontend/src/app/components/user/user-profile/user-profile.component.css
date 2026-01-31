@@ -41,7 +41,7 @@ h2[mat-dialog-title].dialog-title {
   flex: 1 1 auto;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 0 1rem 1rem;
+  padding: 1rem 1rem 1rem;
   min-height: 0;
 }
 
