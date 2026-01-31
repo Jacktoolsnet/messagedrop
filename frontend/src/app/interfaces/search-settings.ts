@@ -17,5 +17,5 @@ export const DEFAULT_SEARCH_SETTINGS: SearchSettings = {
   privateNotes: { enabled: true, minZoom: 3 },
   privateImages: { enabled: true, minZoom: 3 },
   privateDocuments: { enabled: true, minZoom: 3 },
-  experiences: { enabled: true, minZoom: 12 }
+  experiences: { enabled: true, minZoom: 8 }
 };
