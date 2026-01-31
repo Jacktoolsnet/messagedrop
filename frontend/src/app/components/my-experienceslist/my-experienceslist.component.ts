@@ -54,7 +54,8 @@ export class MyExperienceslistComponent implements OnInit {
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
       disableClose: false,
-      maxWidth: '95vw'
+      maxWidth: '95vw',
+      maxHeight: '95vh'
     });
   }
 
