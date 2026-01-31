@@ -391,27 +391,32 @@ function formatDurationMinutes(minutes: number): string {
 }
 
 function resolveImageUrl(record: Record<string, unknown> | null): string | undefined {
-  const image = firstString(
-    record?.['imageUrl'],
-    record?.['image'],
-    record?.['primaryImageUrl'],
-    record?.['heroImageUrl']
+  if (!record) return undefined;
+  const images = Array.isArray(record['images']) ? (record['images'] as unknown[]) : [];
+  if (images.length > 0) {
+    const cover = images.map((entry) => asRecord(entry)).find((entry) => entry?.['isCover'] === true);
+    const imageRecord = cover ?? asRecord(images[0]);
+    if (imageRecord) {
+      const variants = Array.isArray(imageRecord['variants']) ? (imageRecord['variants'] as unknown[]) : [];
+      const bestVariant = pickLargestVariant(variants);
+      const bestUrl = firstString(bestVariant?.['url'], bestVariant?.['imageUrl']);
+      if (bestUrl) return bestUrl;
+      const direct = firstString(
+        imageRecord['url'],
+        imageRecord['imageUrl'],
+        imageRecord['original'],
+        imageRecord['medium'],
+        imageRecord['small']
+      );
+      if (direct) return direct;
+    }
+  }
+  return firstString(
+    record['imageUrl'],
+    record['image'],
+    record['primaryImageUrl'],
+    record['heroImageUrl']
   );
-  if (image) return image;
-  const images = Array.isArray(record?.['images']) ? (record?.['images'] as unknown[]) : [];
-  const imageRecord = images.map((item) => asRecord(item)).find(Boolean);
-  if (!imageRecord) return undefined;
-  const direct = firstString(
-    imageRecord['url'],
-    imageRecord['imageUrl'],
-    imageRecord['original'],
-    imageRecord['medium'],
-    imageRecord['small']
-  );
-  if (direct) return direct;
-  const variants = Array.isArray(imageRecord['variants']) ? (imageRecord['variants'] as unknown[]) : [];
-  const variantRecord = variants.map((item) => asRecord(item)).find(Boolean);
-  return firstString(variantRecord?.['url'], variantRecord?.['imageUrl']);
 }
 
 function resolveAvatarUrl(record: Record<string, unknown> | null): string | undefined {
@@ -430,4 +435,21 @@ function resolveAvatarUrl(record: Record<string, unknown> | null): string | unde
     }
   }
   return undefined;
+}
+
+function pickLargestVariant(variants: unknown[]): Record<string, unknown> | null {
+  let best: Record<string, unknown> | null = null;
+  let bestArea = -1;
+  for (const variant of variants) {
+    const record = asRecord(variant);
+    if (!record) continue;
+    const width = firstNumber(record['width']) ?? 0;
+    const height = firstNumber(record['height']) ?? 0;
+    const area = width * height;
+    if (area > bestArea) {
+      bestArea = area;
+      best = record;
+    }
+  }
+  return best;
 }
