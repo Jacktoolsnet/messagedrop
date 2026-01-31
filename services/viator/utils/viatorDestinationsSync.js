@@ -1,6 +1,7 @@
 const axios = require('axios');
 const { randomUUID } = require('node:crypto');
-const OpenLocationCode = require('open-location-code-typescript');
+const OpenLocationCode = require('open-location-code-typescript').default
+  || require('open-location-code-typescript');
 const tableViatorDestinations = require('../db/tableViatorDestinations');
 
 const DEFAULT_TIMEOUT_MS = 15000;
@@ -65,7 +66,7 @@ function normalizeDestination(entry) {
   const centerLat = Number.isFinite(lat) ? lat : null;
   const centerLng = Number.isFinite(lng) ? lng : null;
   let plusCode = null;
-  if (Number.isFinite(centerLat) && Number.isFinite(centerLng)) {
+  if (Number.isFinite(centerLat) && Number.isFinite(centerLng) && typeof OpenLocationCode?.encode === 'function') {
     try {
       const encoded = OpenLocationCode.encode(centerLat, centerLng, 10);
       plusCode = encoded || null;
