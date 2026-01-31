@@ -5,6 +5,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialog
 import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { HelpDialogService } from '../../help-dialog/help-dialog.service';
+import { DialogHeaderComponent } from '../../dialog-header/dialog-header.component';
 import { ExperienceSearchDetailDialogComponent } from '../detail-dialog/experience-search-detail-dialog.component';
 import { ExperienceSearchPinDialogData, ExperienceResult } from '../../../../interfaces/viator';
 
@@ -18,7 +19,8 @@ import { ExperienceSearchPinDialogData, ExperienceResult } from '../../../../int
     MatButtonModule,
     MatCardModule,
     MatIcon,
-    TranslocoPipe
+    TranslocoPipe,
+    DialogHeaderComponent
   ],
   templateUrl: './experience-search-pin-dialog.component.html',
   styleUrl: './experience-search-pin-dialog.component.css',

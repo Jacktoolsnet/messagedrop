@@ -14,6 +14,7 @@ import {
 } from '../../interfaces/viator';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { ViatorService } from '../../services/viator.service';
+import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { ExperienceSearchDetailDialogComponent } from '../utils/experience-search/detail-dialog/experience-search-detail-dialog.component';
 
@@ -52,7 +53,8 @@ const DEFAULT_CURRENCY = resolveCurrencyFromLocale();
     MatCardModule,
     MatIcon,
     MatProgressSpinnerModule,
-    TranslocoPipe
+    TranslocoPipe,
+    DialogHeaderComponent
   ],
   templateUrl: './experiencelist.component.html',
   styleUrl: './experiencelist.component.css',

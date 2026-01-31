@@ -1,16 +1,10 @@
-<h2 mat-dialog-title class="dialog-title">
-  <mat-icon class="dialog-title__icon" aria-hidden="true">local_activity</mat-icon>
-  <span class="dialog-title__text">
-    {{ data.result.title || data.result.productCode }}
-  </span>
-</h2>
+<app-dialog-header
+  icon="local_activity"
+  [title]="data.result.title || data.result.productCode || ''"
+  [subtitle]="getDurationLabel() ? (('common.experiences.durationPrefix' | transloco) + ' ' + getDurationLabel()) : ''">
+</app-dialog-header>
 
 <mat-dialog-content class="detail-dialog-content">
-  @if (getDurationLabel()) {
-  <div class="dialog-subtitle">
-    {{ 'common.experiences.durationPrefix' | transloco }} {{ getDurationLabel() }}
-  </div>
-  }
 
   <div class="detail-scroll">
 

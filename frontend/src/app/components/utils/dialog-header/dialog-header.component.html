@@ -1,0 +1,11 @@
+<h2 mat-dialog-title class="dialog-title">
+  @if (icon) {
+  <mat-icon class="dialog-title__icon" aria-hidden="true">{{ icon }}</mat-icon>
+  }
+  <span class="dialog-title__content">
+    <span class="dialog-title__text">{{ title }}</span>
+    @if (subtitle) {
+    <span class="dialog-subtitle">{{ subtitle }}</span>
+    }
+  </span>
+</h2>

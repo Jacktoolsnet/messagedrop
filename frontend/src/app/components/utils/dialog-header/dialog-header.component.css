@@ -1,0 +1,41 @@
+:host {
+  display: block;
+}
+
+h2[mat-dialog-title].dialog-title {
+  min-height: 2.6rem;
+  height: auto;
+  padding: 0.3rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.dialog-title__icon {
+  font-size: 1.8rem;
+  width: 1.8rem;
+  height: 1.8rem;
+  flex: 0 0 auto;
+}
+
+.dialog-title__content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.15;
+}
+
+.dialog-title__text {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.dialog-subtitle {
+  font-size: 0.75rem;
+  color: var(--mat-card-subtitle-text-color);
+  line-height: 1.1;
+}

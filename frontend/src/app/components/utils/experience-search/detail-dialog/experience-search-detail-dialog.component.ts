@@ -20,6 +20,7 @@ import { ViatorService } from '../../../../services/viator.service';
 import { SearchSettingsMapPreviewComponent } from '../../search-settings/search-settings-map-preview.component';
 import { HelpDialogService } from '../../help-dialog/help-dialog.service';
 import { ExperienceResult } from '../../../../interfaces/viator';
+import { DialogHeaderComponent } from '../../dialog-header/dialog-header.component';
 
 const DEFAULT_CENTER: Location = { latitude: 0, longitude: 0, plusCode: '' };
 
@@ -34,7 +35,8 @@ const DEFAULT_CENTER: Location = { latitude: 0, longitude: 0, plusCode: '' };
     MatCardModule,
     MatIcon,
     TranslocoPipe,
-    SearchSettingsMapPreviewComponent
+    SearchSettingsMapPreviewComponent,
+    DialogHeaderComponent
   ],
   templateUrl: './experience-search-detail-dialog.component.html',
   styleUrl: './experience-search-detail-dialog.component.css',

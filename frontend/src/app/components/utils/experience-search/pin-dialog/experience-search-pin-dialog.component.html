@@ -1,9 +1,7 @@
-<h2 mat-dialog-title class="dialog-title">
-  <mat-icon class="dialog-title__icon" aria-hidden="true">place</mat-icon>
-  <span class="dialog-title__text">
-    {{ data.destinationName || ('common.experiences.title' | transloco) }}
-  </span>
-</h2>
+<app-dialog-header
+  icon="place"
+  [title]="data.destinationName || ('common.experiences.title' | transloco)">
+</app-dialog-header>
 
 <mat-dialog-content class="experience-dialog-content">
 
