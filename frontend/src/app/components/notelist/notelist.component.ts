@@ -26,10 +26,12 @@ import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultim
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { DeleteNoteComponent } from './delete-note/delete-note.component';
+import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 
 @Component({
   selector: 'app-notelist',
   imports: [
+    DialogHeaderComponent,
     ShowmessageComponent,
     ShowmultimediaComponent,
     MatBadgeModule,

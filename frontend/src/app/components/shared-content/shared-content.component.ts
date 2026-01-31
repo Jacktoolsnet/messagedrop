@@ -1,7 +1,7 @@
 
 import { Component, OnInit, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogModule, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Location } from '../../interfaces/location';
@@ -10,14 +10,15 @@ import { MapService } from '../../services/map.service';
 import { SharedContentService } from '../../services/shared-content.service';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
+import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 
 @Component({
   standalone: true,
   selector: 'app-shared-content',
   imports: [
+    DialogHeaderComponent,
     MatDialogContent,
     MatButtonModule,
-    MatDialogTitle,
     MatDialogActions,
     MatDialogClose,
     ShowmultimediaComponent,

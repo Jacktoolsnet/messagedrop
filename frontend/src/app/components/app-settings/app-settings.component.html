@@ -1,7 +1,7 @@
-<h2 mat-dialog-title class="dialog-title">
-  <mat-icon aria-hidden="true">settings_applications</mat-icon>
-  {{ 'settings.title' | transloco }}
-</h2>
+<app-dialog-header
+  icon="settings"
+  [title]="'settings.title' | transloco">
+</app-dialog-header>
 <mat-dialog-content class="settings-scroll">
   <div class="platform-tile-container">
     <div class="platform-tile theme-settings-tile">

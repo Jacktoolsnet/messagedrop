@@ -1,22 +1,6 @@
-<h2 mat-dialog-title class="dialog-title">
-  @if (selectedNotification(); as detail) {
-  <div class="dialog-title">
-    <button mat-icon-button class="back-button" (click)="backToList()"
-      [attr.aria-label]="'common.systemMessages.backAria' | transloco">
-      <mat-icon>arrow_back</mat-icon>
-    </button>
-    <span class="dialog-title__text">{{ detail.title }}</span>
-  </div>
-  } @else {
-  <div class="dialog-title">
-    <button mat-icon-button class="back-button" (click)="reloadNotifications()"
-      [attr.aria-label]="'common.systemMessages.refreshAria' | transloco">
-      <mat-icon>refresh</mat-icon>
-    </button>
-    <span class="dialog-title__text">{{ 'common.systemMessages.title' | transloco }}</span>
-  </div>
-  }
-</h2>
+<app-dialog-header
+  [title]="selectedNotification()?.title ?? ('common.systemMessages.title' | transloco)">
+</app-dialog-header>
 
 <mat-dialog-content>
   <div class="dialog-content">

@@ -2,7 +2,7 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -23,16 +23,17 @@ import { AvatarCropperComponent } from '../../utils/avatar-cropper/avatar-croppe
 import { AvatarSourceChoice, AvatarSourceDialogComponent } from '../../utils/avatar-source-dialog/avatar-source-dialog.component';
 import { HelpDialogComponent, HelpDialogData } from '../../utils/help-dialog/help-dialog.component';
 import { UnsplashComponent } from '../../utils/unsplash/unsplash.component';
+import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
   imports: [
+    DialogHeaderComponent,
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatDialogTitle,
     MatDialogContent,
     MatDialogActions,
     MatIconModule,

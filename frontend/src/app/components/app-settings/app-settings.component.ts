@@ -3,7 +3,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -17,18 +17,19 @@ import { LanguageMode, LanguageService } from '../../services/language.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { EnableLocationComponent } from "../utils/enable-location/enable-location.component";
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
+import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 
 
 @Component({
   selector: 'app-app-settings',
   providers: [provideTranslocoScope('settings')],
   imports: [
+    DialogHeaderComponent,
     CommonModule,
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatDialogTitle,
     MatDialogContent,
     MatDialogActions,
     MatDialogClose,

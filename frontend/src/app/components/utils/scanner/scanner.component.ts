@@ -1,19 +1,20 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from "@angular/material/icon";
 import { TranslocoPipe } from '@jsverse/transloco';
 import { BrowserMultiFormatReader, IScannerControls } from '@zxing/browser';
 import { Result } from '@zxing/library';
 import { Mode } from '../../../interfaces/mode';
 import { HelpDialogService } from '../help-dialog/help-dialog.service';
+import { DialogHeaderComponent } from '../dialog-header/dialog-header.component';
 
 @Component({
   selector: 'app-scanner',
   imports: [
+    DialogHeaderComponent,
     MatDialogContent,
     MatButtonModule,
-    MatDialogTitle,
     MatDialogActions,
     MatDialogClose,
     TranslocoPipe,

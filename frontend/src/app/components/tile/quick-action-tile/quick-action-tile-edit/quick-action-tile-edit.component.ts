@@ -4,7 +4,7 @@ import { A11yModule } from '@angular/cdk/a11y';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogModule, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -14,6 +14,7 @@ import { TranslationHelperService } from '../../../../services/translation-helpe
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
 import { QuickActionActionEditComponent } from '../quick-action-action-edit/quick-action-action-edit.component';
+import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
 
 interface QuickActionTileDialogData {
   tile: TileSetting;
@@ -23,9 +24,9 @@ interface QuickActionTileDialogData {
   selector: 'app-quick-action-tile-edit',
   standalone: true,
   imports: [
+    DialogHeaderComponent,
     ReactiveFormsModule,
     MatDialogModule,
-    MatDialogTitle,
     MatDialogContent,
     MatDialogActions,
     MatFormFieldModule,

@@ -8,6 +8,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
+import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
 
 export type DsaStatusKind = 'signal' | 'notice';
 
@@ -21,7 +22,8 @@ export interface DsaStatusLinkDialogData {
 @Component({
   selector: 'app-dsa-status-link-dialog',
   standalone: true,
-  imports: [MatDialogModule, MatButtonModule, MatIconModule, MatTooltipModule, TranslocoPipe],
+  imports: [
+    DialogHeaderComponent,MatDialogModule, MatButtonModule, MatIconModule, MatTooltipModule, TranslocoPipe],
   templateUrl: './status-link-dialog.component.html',
   styleUrl: './status-link-dialog.component.css'
 })

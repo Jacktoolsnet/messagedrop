@@ -28,6 +28,7 @@ import { isQuotaExceededError } from '../../utils/storage-error.util';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { DeleteImageComponent } from './delete-image/delete-image.component';
 import { OverrideExifDataComponent } from './override-exif-data/override-exif-data.component';
+import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 
 interface ImageDialogData {
   location: Location;
@@ -39,6 +40,7 @@ interface ImageDialogData {
 @Component({
   selector: 'app-notelist',
   imports: [
+    DialogHeaderComponent,
     MatBadgeModule,
     MatCardModule,
     FormsModule,

@@ -1,7 +1,7 @@
-<h2 mat-dialog-title class="dialog-title">
-  <mat-icon class="dialog-title__icon" aria-hidden="true">description</mat-icon>
-  <span class="dialog-title__text">{{ 'common.documents.title' | transloco }}</span>
-</h2>
+<app-dialog-header
+  icon="description"
+  [title]="'common.documents.title' | transloco">
+</app-dialog-header>
 
 <mat-dialog-content class="document-dialog-content">
   <div class="document-scroll">

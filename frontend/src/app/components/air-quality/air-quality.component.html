@@ -1,12 +1,12 @@
-<h2 mat-dialog-title class="dialog-title">
-    <span class="dialog-title__text">
-        @if (locationName$ | async; as locationName) {
-            {{ 'weather.airQuality.headerFor' | transloco:{ category: getCategoryLabel(selectedCategory), location: locationName } }}
-        } @else {
-            {{ 'weather.airQuality.header' | transloco:{ category: getCategoryLabel(selectedCategory) } }}
-        }
-    </span>
-</h2>
+@if (locationName$ | async; as locationName) {
+  <app-dialog-header
+    [title]="'weather.airQuality.headerFor' | transloco:{ category: getCategoryLabel(selectedCategory), location: locationName }">
+  </app-dialog-header>
+} @else {
+  <app-dialog-header
+    [title]="'weather.airQuality.header' | transloco:{ category: getCategoryLabel(selectedCategory) }">
+  </app-dialog-header>
+}
 
 <mat-dialog-content #dialogContent class="air-quality-dialog-content">
     <div class="air-quality-scroll">

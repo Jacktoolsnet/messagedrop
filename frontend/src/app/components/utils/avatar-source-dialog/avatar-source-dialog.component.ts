@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { AppSettings } from '../../../interfaces/app-settings';
 import { AppService } from '../../../services/app.service';
 import { EnableExternalContentComponent } from '../enable-external-content/enable-external-content.component';
 import { HelpDialogService } from '../help-dialog/help-dialog.service';
+import { DialogHeaderComponent } from '../dialog-header/dialog-header.component';
 
 export type AvatarSourceChoice = 'file' | 'unsplash';
 
@@ -21,8 +22,8 @@ export interface AvatarSourceDialogData {
   selector: 'app-avatar-source-dialog',
   standalone: true,
   imports: [
+    DialogHeaderComponent,
     MatButtonModule,
-    MatDialogTitle,
     MatDialogContent,
     MatDialogActions,
     MatDialogClose,

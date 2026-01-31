@@ -1,7 +1,7 @@
-<h2 mat-dialog-title class="dialog-title">
-    <mat-icon class="dialog-title__icon" aria-hidden="true">clinical_notes</mat-icon>
-    <span class="dialog-title__text">{{ 'common.tiles.notes.title' | transloco }}</span>
-</h2>
+<app-dialog-header
+  icon="clinical_notes"
+  [title]="'common.tiles.notes.title' | transloco">
+</app-dialog-header>
 
 <mat-dialog-content class="note-dialog-content">
     <div class="note-scroll">

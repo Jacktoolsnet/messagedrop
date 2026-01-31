@@ -1,7 +1,7 @@
-<h2 mat-dialog-title class="dialog-title">
-  <mat-icon class="dialog-title__icon" aria-hidden="true">badge</mat-icon>
-  <span class="dialog-title__text">{{ 'common.user.profile.title' | transloco }}</span>
-</h2>
+<app-dialog-header
+  icon="badge"
+  [title]="'common.user.profile.title' | transloco">
+</app-dialog-header>
 <mat-dialog-content class="profile-dialog-content">
   <div class="profile-scroll">
   <mat-form-field appearance="fill" class="full-width">

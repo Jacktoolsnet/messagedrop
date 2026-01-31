@@ -1,13 +1,7 @@
-<h2 mat-dialog-title class="dialog-title">
-    <mat-icon class="dialog-title__icon" aria-hidden="true">
-        @if (messageService.selectedMessagesSignal().length === 0) { speaker_notes } @else { forum }
-    </mat-icon>
-    @if (messageService.selectedMessagesSignal().length === 0) {
-    <span class="dialog-title__text">{{ 'common.tiles.messages.title' | transloco }}</span>
-    } @else {
-    <span class="dialog-title__text">{{ 'common.messageList.commentsAria' | transloco }}</span>
-    }
-</h2>
+<app-dialog-header
+  icon="@if (messageService.selectedMessagesSignal().length === 0) { speaker_notes } @else { forum }"
+  [title]="'common.tiles.messages.title' | transloco">
+</app-dialog-header>
 
 <mat-dialog-content class="message-dialog-content">
     <div class="message-scroll">

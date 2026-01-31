@@ -20,6 +20,7 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
 import { DisplayMessage } from '../../utils/display-message/display-message.component';
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 import { DsaStatusLinkDialogComponent } from './status-link-dialog/status-link-dialog.component';
+import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 
 interface DigitalServicesActReportDialogData {
   message?: Partial<Message> | null;
@@ -32,6 +33,7 @@ interface DigitalServicesActReportDialogData {
   selector: 'app-digital-services-act-report-dialog',
   standalone: true,
   imports: [
+    DialogHeaderComponent,
     ReactiveFormsModule,
     MatDialogModule,
     MatTabsModule,

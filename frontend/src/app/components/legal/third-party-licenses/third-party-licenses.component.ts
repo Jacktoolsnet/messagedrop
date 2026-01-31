@@ -7,11 +7,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
+import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 
 @Component({
   selector: 'app-third-party-licenses-dialog',
   standalone: true,
-  imports: [MatDialogModule, MatButtonModule, MatIconModule, MatProgressBarModule, TranslocoPipe],
+  imports: [
+    DialogHeaderComponent,MatDialogModule, MatButtonModule, MatIconModule, MatProgressBarModule, TranslocoPipe],
   templateUrl: './third-party-licenses.component.html',
   styleUrls: ['./third-party-licenses.component.css']
 })

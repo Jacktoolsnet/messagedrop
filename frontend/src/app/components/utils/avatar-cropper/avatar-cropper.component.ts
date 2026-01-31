@@ -1,12 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ImageCroppedEvent, ImageCropperComponent } from 'ngx-image-cropper';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { HelpDialogService } from '../help-dialog/help-dialog.service';
+import { DialogHeaderComponent } from '../dialog-header/dialog-header.component';
 
 export interface AvatarCropperData {
   file: File;
@@ -23,8 +24,8 @@ export interface AvatarCropperData {
   selector: 'app-avatar-cropper',
   standalone: true,
   imports: [
+    DialogHeaderComponent,
     MatButtonModule,
-    MatDialogTitle,
     MatDialogContent,
     MatDialogActions,
     MatIcon,

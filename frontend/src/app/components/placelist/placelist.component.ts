@@ -30,12 +30,14 @@ import { LocationPickerDialogComponent } from '../utils/location-picker-dialog/l
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { PlaceProfileComponent } from './place-settings/place-settings.component';
 import { PlaceSortDialogComponent } from './place-sort-dialog/place-sort-dialog.component';
+import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 
 interface TimezoneResponse { status: number; timezone: string }
 
 @Component({
   selector: 'app-placelist',
   imports: [
+    DialogHeaderComponent,
     MatBadgeModule,
     MatCardModule,
     CommonModule,

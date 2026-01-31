@@ -20,11 +20,13 @@ import { getWeatherLevelInfo } from '../../utils/weather-level.util';
 import { WeatherDetailComponent } from './weather-detail/weather-detail.component';
 import { WeatherTile, WeatherTileType } from './weather-tile.interface';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
+import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 
 @Component({
   selector: 'app-weather',
   standalone: true,
   imports: [
+    DialogHeaderComponent,
     CommonModule,
     MatDialogModule,
     MatButtonModule,

@@ -1,7 +1,7 @@
-<h2 mat-dialog-title class="dialog-title">
-    <mat-icon aria-hidden="true">receipt_long</mat-icon>
-    {{ 'common.legal.thirdParty.title' | transloco }}
-</h2>
+<app-dialog-header
+  icon="receipt_long"
+  [title]="'common.legal.thirdParty.title' | transloco">
+</app-dialog-header>
 
 <div mat-dialog-content>
     @if (loading()) {

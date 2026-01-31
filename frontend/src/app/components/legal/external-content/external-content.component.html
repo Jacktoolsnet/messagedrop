@@ -1,7 +1,7 @@
-<h2 mat-dialog-title class="dialog-title">
-    <mat-icon aria-hidden="true">public</mat-icon>
-    {{ 'common.legal.externalContent.title' | transloco }}
-</h2>
+<app-dialog-header
+  icon="public"
+  [title]="'common.legal.externalContent.title' | transloco">
+</app-dialog-header>
 
 <mat-dialog-content class="content">
     <div class="platform-tile-container">

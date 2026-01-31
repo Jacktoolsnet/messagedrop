@@ -2,24 +2,19 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import {
-  MatDialogActions,
-  MatDialogContent,
-  MatDialogModule,
-  MatDialogRef,
-  MatDialogTitle
-} from '@angular/material/dialog';
+import { MatDialogActions, MatDialogContent, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
+import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 
 @Component({
   selector: 'app-legal-notice',
   standalone: true,
   imports: [
+    DialogHeaderComponent,
     MatDialogModule,
-    MatDialogTitle,
     MatDialogContent,
     MatDialogActions,
     MatButtonModule,

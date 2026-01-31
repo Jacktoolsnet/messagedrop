@@ -1,7 +1,7 @@
-<h2 mat-dialog-title class="dialog-title">
-    <mat-icon class="dialog-title__icon" aria-hidden="true">contacts</mat-icon>
-    <span class="dialog-title__text">{{ 'common.menu.myContacts' | transloco }}</span>
-</h2>
+<app-dialog-header
+  icon="contacts"
+  [title]="'common.menu.myContacts' | transloco">
+</app-dialog-header>
 
 <mat-dialog-content class="contact-dialog-content">
     <div class="contact-scroll">

@@ -30,6 +30,7 @@ import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { QrcodeComponent } from '../utils/qrcode/qrcode.component';
 import { ScannerComponent } from '../utils/scanner/scanner.component';
 import { ContactSortDialogComponent } from './contact-sort-dialog/contact-sort-dialog.component';
+import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 
 interface ConnectDialogResult {
   connectId?: string;
@@ -38,6 +39,7 @@ interface ConnectDialogResult {
 @Component({
   selector: 'app-contactlist',
   imports: [
+    DialogHeaderComponent,
     MatCardModule,
     CommonModule,
     MatBadgeModule,

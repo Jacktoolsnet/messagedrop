@@ -1,5 +1,7 @@
 @if (multimedia) {
-<h2 mat-dialog-title class="dialog-title">{{ 'common.sharedContent.multimediaTitle' | transloco }}</h2>
+<app-dialog-header
+  [title]="'common.sharedContent.multimediaTitle' | transloco">
+</app-dialog-header>
 <mat-dialog-content class="full-width">
     <app-showmultimedia [multimedia]="multimedia"></app-showmultimedia>
     <h4>{{ 'common.sharedContent.multimediaHint' | transloco }}</h4>
@@ -15,7 +17,9 @@
 }
 
 @else if (location) {
-<h2 mat-dialog-title class="dialog-title">{{ 'common.sharedContent.locationTitle' | transloco }}</h2>
+<app-dialog-header
+  [title]="'common.sharedContent.locationTitle' | transloco">
+</app-dialog-header>
 <mat-dialog-content class="full-width">
     <h4>{{ 'common.sharedContent.locationHint' | transloco }}</h4>
 </mat-dialog-content>

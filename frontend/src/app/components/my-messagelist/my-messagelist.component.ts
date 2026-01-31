@@ -36,6 +36,7 @@ import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultim
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
 import { DisplayMessage } from '../utils/display-message/display-message.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
+import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 
 type ResolvedDsaStatus = 'RECEIVED' | 'UNDER_REVIEW' | 'DECIDED' | 'UNKNOWN';
 type ModerationStatus = 'published' | 'review' | 'hidden';
@@ -43,6 +44,7 @@ type ModerationStatus = 'published' | 'review' | 'hidden';
 @Component({
   selector: 'app-my-messagelist',
   imports: [
+    DialogHeaderComponent,
     ShowmessageComponent,
     ShowmultimediaComponent,
     ShortNumberPipe,

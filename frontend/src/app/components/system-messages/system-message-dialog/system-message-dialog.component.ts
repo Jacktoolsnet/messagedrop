@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, effect, inject, OnInit, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleChange, MatButtonToggleModule } from '@angular/material/button-toggle';
-import { MatDialog, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -14,15 +14,16 @@ import { SystemNotificationService } from '../../../services/system-notification
 import { HelpDialogComponent, HelpDialogData } from '../../utils/help-dialog/help-dialog.component';
 import { DeleteAllSystemNotificationComponent } from '../delete-all-system-notification/delete-all-system-notification.component';
 import { DeleteSystemNotificationComponent } from '../delete-system-notification/delete-system-notification.component';
+import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 
 @Component({
   selector: 'app-system-message-dialog',
   standalone: true,
   imports: [
+    DialogHeaderComponent,
     CommonModule,
     MatButtonModule,
     MatButtonToggleModule,
-    MatDialogTitle,
     MatDialogContent,
     MatDialogActions,
     MatIconModule,

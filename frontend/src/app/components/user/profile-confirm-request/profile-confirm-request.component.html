@@ -1,4 +1,6 @@
-<h2 mat-dialog-title class="dialog-title">{{ 'common.user.profileShare.title' | transloco }}</h2>
+<app-dialog-header
+  [title]="'common.user.profileShare.title' | transloco">
+</app-dialog-header>
 <mat-dialog-content class="confirm-content">
   <div class="confirm-box">{{ 'common.user.profileShare.body' | transloco: { userId: contact.userId } }}</div>
 </mat-dialog-content>

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, NgZone, inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogModule, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 
 
 import { FormsModule } from '@angular/forms';
@@ -24,15 +24,16 @@ import { AvatarCropperComponent } from '../../utils/avatar-cropper/avatar-croppe
 import { AvatarSourceChoice, AvatarSourceDialogComponent } from '../../utils/avatar-source-dialog/avatar-source-dialog.component';
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 import { UnsplashComponent } from '../../utils/unsplash/unsplash.component';
+import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 
 @Component({
   selector: 'app-place',
   imports: [
+    DialogHeaderComponent,
     FormsModule,
     MatButtonModule,
     MatDialogActions,
     MatDialogClose,
-    MatDialogTitle,
     MatDialogContent,
     MatDialogModule,
     MatIcon,

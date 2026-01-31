@@ -2,7 +2,7 @@ import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray } fro
 import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -12,6 +12,7 @@ import { PlaceService } from '../../../services/place.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 import { PlaceProfileComponent } from '../place-settings/place-settings.component';
+import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 
 interface PlaceSortDialogData {
   places: Place[];
@@ -24,9 +25,9 @@ interface PlaceSortDialogResult {
 @Component({
   selector: 'app-place-sort-dialog',
   imports: [
+    DialogHeaderComponent,
     CommonModule,
     MatButtonModule,
-    MatDialogTitle,
     MatDialogContent,
     MatDialogActions,
     MatIcon,

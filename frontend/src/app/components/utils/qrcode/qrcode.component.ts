@@ -1,18 +1,19 @@
 
 import { Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent } from '@angular/material/dialog';
 import { MatIcon } from "@angular/material/icon";
 import { TranslocoPipe } from '@jsverse/transloco';
 import QRCode from 'qrcode';
 import { HelpDialogService } from '../help-dialog/help-dialog.service';
+import { DialogHeaderComponent } from '../dialog-header/dialog-header.component';
 
 @Component({
   selector: 'app-qrcode',
   imports: [
+    DialogHeaderComponent,
     MatDialogContent,
     MatButtonModule,
-    MatDialogTitle,
     MatDialogActions,
     MatDialogClose,
     TranslocoPipe,

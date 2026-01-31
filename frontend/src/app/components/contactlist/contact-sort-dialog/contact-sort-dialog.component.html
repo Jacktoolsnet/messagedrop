@@ -1,7 +1,7 @@
-<h2 mat-dialog-title class="dialog-title">
-  <mat-icon class="dialog-title__icon" aria-hidden="true">swap_vert</mat-icon>
-  <span class="dialog-title__text">{{ 'common.contact.list.sortTitle' | transloco }}</span>
-</h2>
+<app-dialog-header
+  icon="swap_vert"
+  [title]="'common.contact.list.sortTitle' | transloco">
+</app-dialog-header>
 
 <mat-dialog-content class="sort-dialog-content">
   <div cdkDropList class="sort-list" (cdkDropListDropped)="drop($event)">

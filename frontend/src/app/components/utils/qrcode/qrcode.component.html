@@ -1,4 +1,6 @@
-<h2 mat-dialog-title class="dialog-title">{{ 'common.contact.connect.qrTitle' | transloco }}</h2>
+<app-dialog-header
+  [title]="'common.contact.connect.qrTitle' | transloco">
+</app-dialog-header>
 <mat-dialog-content class="dialog">
     <canvas #canvas class="qrcode center"></canvas>
 </mat-dialog-content>

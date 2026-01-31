@@ -1,7 +1,7 @@
-<h2 mat-dialog-title class="dialog-title">
-  <mat-icon aria-hidden="true">crop_square</mat-icon>
-  <span>{{ titleKey | transloco }}</span>
-</h2>
+<app-dialog-header
+  icon="crop_square"
+  [title]="titleKey | transloco">
+</app-dialog-header>
 
 <mat-dialog-content class="dialog-content">
   <div class="cropper-card" [class.is-loading]="isLoading">

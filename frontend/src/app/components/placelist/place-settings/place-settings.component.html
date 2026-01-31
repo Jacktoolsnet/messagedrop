@@ -1,7 +1,11 @@
 @if (data.mode === 'add_place') {
-<h2 mat-dialog-title class="dialog-title">{{ 'common.placeSettings.addTitle' | transloco }}</h2>
+<app-dialog-header
+  [title]="'common.placeSettings.addTitle' | transloco">
+</app-dialog-header>
 } @else if (data.mode === 'edit_place') {
-<h2 mat-dialog-title class="dialog-title">{{ 'common.placeSettings.editTitle' | transloco }}</h2>
+<app-dialog-header
+  [title]="'common.placeSettings.editTitle' | transloco">
+</app-dialog-header>
 }
 
 <mat-dialog-content>

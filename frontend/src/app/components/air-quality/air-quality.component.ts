@@ -19,11 +19,13 @@ import { DatasetState, OpenMeteoRefreshService } from '../../services/open-meteo
 import { AirQualityDetailComponent } from './air-quality-detail/air-quality-detail.component';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
+import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 
 @Component({
   selector: 'app-air-quality',
   standalone: true,
   imports: [
+    DialogHeaderComponent,
     CommonModule,
     MatDialogModule,
     MatButtonModule,

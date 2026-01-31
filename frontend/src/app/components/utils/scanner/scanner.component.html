@@ -1,4 +1,6 @@
-<h2 mat-dialog-title class="dialog-title">{{ 'common.contact.connect.scannerTitle' | transloco }}</h2>
+<app-dialog-header
+  [title]="'common.contact.connect.scannerTitle' | transloco">
+</app-dialog-header>
 <mat-dialog-content class="dialog">
     <video #video class="video-preview" autoplay muted playsinline></video>
 </mat-dialog-content>

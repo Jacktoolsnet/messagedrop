@@ -1,4 +1,6 @@
-<h2 mat-dialog-title class="dialog-title">{{ 'common.tileEdit.anniversaryTitle' | transloco }}</h2>
+<app-dialog-header
+  [title]="'common.tileEdit.anniversaryTitle' | transloco">
+</app-dialog-header>
 
 <mat-dialog-content class="edit-content">
   <button class="icon-pick-button" mat-stroked-button color="primary" type="button" (click)="pickIcon()"

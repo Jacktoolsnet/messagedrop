@@ -1,11 +1,12 @@
 import { ChangeDetectorRef, Component, DestroyRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { switchMap } from 'rxjs';
+import { DialogHeaderComponent } from '../dialog-header/dialog-header.component';
 
 export interface HelpItem {
   icon: string;
@@ -22,9 +23,9 @@ export interface HelpDialogData {
 @Component({
   selector: 'app-help-dialog',
   imports: [
+    DialogHeaderComponent,
     CommonModule,
     MatButtonModule,
-    MatDialogTitle,
     MatDialogContent,
     MatDialogActions,
     MatIcon,

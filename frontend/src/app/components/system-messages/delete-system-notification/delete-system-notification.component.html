@@ -1,4 +1,6 @@
-<h2 mat-dialog-title class="dialog-title">{{ 'common.systemMessages.deleteTitle' | transloco }}</h2>
+<app-dialog-header
+  [title]="'common.systemMessages.deleteTitle' | transloco">
+</app-dialog-header>
 <mat-dialog-content class="confirm-content">
   <div class="confirm-box"><p>{{ 'common.systemMessages.deleteConfirm' | transloco }}</p></div>
 </mat-dialog-content>

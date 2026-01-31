@@ -24,11 +24,13 @@ import { Message } from '../../../../interfaces/message';
 import { DsaStatusService } from '../../../../services/dsa-status.service';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
+import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
 
 @Component({
   selector: 'app-dsa-case-dialog',
   standalone: true,
   imports: [
+    DialogHeaderComponent,
     CommonModule,
     MatDialogModule,
     MatButtonModule,

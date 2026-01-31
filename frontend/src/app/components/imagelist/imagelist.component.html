@@ -1,7 +1,7 @@
-<h2 mat-dialog-title class="dialog-title">
-    <mat-icon class="dialog-title__icon" aria-hidden="true">image</mat-icon>
-    <span class="dialog-title__text">{{ 'common.tiles.images.title' | transloco }}</span>
-</h2>
+<app-dialog-header
+  icon="image"
+  [title]="'common.tiles.images.title' | transloco">
+</app-dialog-header>
 
 <mat-dialog-content class="image-dialog-content">
     <div class="image-scroll">

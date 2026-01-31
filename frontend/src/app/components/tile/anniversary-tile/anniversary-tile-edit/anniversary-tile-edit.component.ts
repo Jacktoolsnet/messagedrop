@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
 import { MatCalendar, MatDatepickerModule } from '@angular/material/datepicker';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogModule, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -15,6 +15,7 @@ import { TileSetting } from '../../../../interfaces/tile-settings';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
+import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
 
 interface AnniversaryTileDialogData {
   tile: TileSetting;
@@ -25,9 +26,9 @@ interface AnniversaryTileDialogData {
   standalone: true,
   providers: [provideNativeDateAdapter()],
   imports: [
+    DialogHeaderComponent,
     ReactiveFormsModule,
     MatDialogModule,
-    MatDialogTitle,
     MatDialogContent,
     MatDialogActions,
     MatFormFieldModule,

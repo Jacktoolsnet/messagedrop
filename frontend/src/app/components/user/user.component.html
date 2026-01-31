@@ -1,7 +1,7 @@
-<h2 mat-dialog-title class="dialog-title">
-  <mat-icon class="dialog-title__icon">person</mat-icon>
-  <span class="dialog-title__text">{{ 'common.user.dialog.title' | transloco }}</span>
-</h2>
+<app-dialog-header
+  icon="person"
+  [title]="'common.user.dialog.title' | transloco">
+</app-dialog-header>
 <mat-dialog-content class="dialog">
   <div class="tile-grid">
     <mat-card class="tile tile-info">

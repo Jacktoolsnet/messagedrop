@@ -1,7 +1,7 @@
-<h2 mat-dialog-title class="dialog-title">
-  <mat-icon class="dialog-title__icon" aria-hidden="true">help</mat-icon>
-  <span class="dialog-title__text">{{ t(data.titleKey) }}</span>
-</h2>
+<app-dialog-header
+  icon="help"
+  [title]="t(data.titleKey)">
+</app-dialog-header>
 
 <mat-dialog-content class="help-dialog-content">
   <p class="help-intro">{{ t(data.introKey) }}</p>

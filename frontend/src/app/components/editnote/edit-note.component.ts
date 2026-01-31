@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 
 
 import { FormsModule } from '@angular/forms';
@@ -25,6 +25,7 @@ import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultim
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { LocationPickerTileComponent } from '../utils/location-picker/location-picker-tile.component';
 import { TextComponent } from '../utils/text/text.component';
+import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 
 interface TextDialogResult {
   text: string;
@@ -38,6 +39,7 @@ type DialogHeaderConfig = {
 @Component({
   selector: 'app-note',
   imports: [
+    DialogHeaderComponent,
     SelectMultimediaComponent,
     ShowmultimediaComponent,
     LocationPickerTileComponent,
@@ -45,7 +47,6 @@ type DialogHeaderConfig = {
     MatButtonModule,
     MatDialogActions,
     MatDialogContent,
-    MatDialogTitle,
     MatIcon,
     FormsModule,
     MatFormFieldModule,

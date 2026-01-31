@@ -1,12 +1,12 @@
-<h2 mat-dialog-title class="dialog-title">
-  <span class="dialog-title__text">
-    @if (locationName$ | async; as locationName) {
-      {{ 'weather.titleForLocation' | transloco: { location: locationName } }}
-    } @else {
-      {{ 'weather.title' | transloco }}
-    }
-  </span>
-</h2>
+@if (locationName$ | async; as locationName) {
+  <app-dialog-header
+    [title]="'weather.titleForLocation' | transloco: { location: locationName }">
+  </app-dialog-header>
+} @else {
+  <app-dialog-header
+    [title]="'weather.title' | transloco">
+  </app-dialog-header>
+}
 
 <mat-dialog-content #dialogContent class="weather-dialog-content">
   <div class="weather-scroll">

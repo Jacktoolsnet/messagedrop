@@ -20,6 +20,7 @@ import { getFileIcon } from '../../utils/file-icon.util';
 import { isQuotaExceededError } from '../../utils/storage-error.util';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { DeleteDocumentComponent } from './delete-document/delete-document.component';
+import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 
 interface DocumentDialogData {
   location: Location;
@@ -30,6 +31,7 @@ interface DocumentDialogData {
 @Component({
   selector: 'app-documentlist',
   imports: [
+    DialogHeaderComponent,
     DatePipe,
     MatCardModule,
     MatButtonModule,

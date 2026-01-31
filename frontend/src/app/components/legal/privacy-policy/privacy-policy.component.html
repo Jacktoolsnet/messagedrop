@@ -1,7 +1,7 @@
-<h2 mat-dialog-title class="dialog-title">
-    <mat-icon aria-hidden="true">privacy_tip</mat-icon>
-    {{ 'common.legal.privacy.title' | transloco }}
-</h2>
+<app-dialog-header
+  icon="privacy_tip"
+  [title]="'common.legal.privacy.title' | transloco">
+</app-dialog-header>
 
 <mat-dialog-actions class="lang-actions sticky-actions" align="start">
     <button mat-stroked-button [color]="lang() === 'de' ? 'primary' : undefined" (click)="setLanguage('de')"

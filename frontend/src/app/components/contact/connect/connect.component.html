@@ -1,5 +1,7 @@
 @if (data.mode === 'add_connect') {
-<h2 mat-dialog-title class="dialog-title">{{ 'common.contact.connect.title' | transloco }}</h2>
+<app-dialog-header
+  [title]="'common.contact.connect.title' | transloco">
+</app-dialog-header>
 }
 
 <mat-dialog-content>
