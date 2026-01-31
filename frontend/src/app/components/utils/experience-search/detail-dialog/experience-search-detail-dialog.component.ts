@@ -133,39 +133,56 @@ export class ExperienceSearchDetailDialogComponent {
     if (!productCode) {
       return;
     }
-    const performSave = () => {
-      this.bookmarkService.hasBookmark(productCode)
-        .then((exists) => {
-          if (exists) {
-            this.bookmarkService.removeBookmark(productCode)
-              .then(() => {
-                this.showDisplayMessage('common.experiences.saveRemovedTitle', 'common.experiences.saveRemovedMessage', 'bookmark_remove');
-              })
-              .catch(() => {
-                this.showDisplayMessage('common.experiences.saveFailedTitle', 'common.experiences.saveFailedMessage', 'error', false);
-              });
-            return undefined;
-          }
-          return this.bookmarkService.saveBookmark(productCode, {
-            ...this.data.result,
-            productCode,
-            trackId: this.data.result.trackId || `viator:${productCode}`,
-            provider: 'viator'
-          }, Date.now()).then(() => {
-            this.showDisplayMessage('common.experiences.saveTitle', 'common.experiences.saveMessage', 'bookmark_add');
+    const saveBookmark = () =>
+      this.bookmarkService.saveBookmark(productCode, {
+        ...this.data.result,
+        productCode,
+        trackId: this.data.result.trackId || `viator:${productCode}`,
+        provider: 'viator'
+      }, Date.now()).then(() => {
+        this.showDisplayMessage('common.experiences.saveTitle', 'common.experiences.saveMessage', 'bookmark_add');
+      });
+
+    const removeBookmark = () =>
+      this.bookmarkService.removeBookmark(productCode).then(() => {
+        this.showDisplayMessage('common.experiences.saveRemovedTitle', 'common.experiences.saveRemovedMessage', 'bookmark_remove');
+      });
+
+    this.bookmarkService.hasBookmark(productCode)
+      .then((exists) => {
+        if (!this.userService.hasJwt()) {
+          this.userService.loginWithBackend(() => {
+            if (exists) {
+              this.showConfirmMessage(
+                'common.experiences.saveExistsTitle',
+                'common.experiences.saveExistsPrompt',
+                () => removeBookmark().catch(() => {
+                  this.showDisplayMessage('common.experiences.saveFailedTitle', 'common.experiences.saveFailedMessage', 'error', false);
+                })
+              );
+              return;
+            }
+            saveBookmark().catch(() => {
+              this.showDisplayMessage('common.experiences.saveFailedTitle', 'common.experiences.saveFailedMessage', 'error', false);
+            });
           });
-        })
-        .catch(() => {
+          return;
+        }
+
+        if (exists) {
+          removeBookmark().catch(() => {
+            this.showDisplayMessage('common.experiences.saveFailedTitle', 'common.experiences.saveFailedMessage', 'error', false);
+          });
+          return;
+        }
+
+        saveBookmark().catch(() => {
           this.showDisplayMessage('common.experiences.saveFailedTitle', 'common.experiences.saveFailedMessage', 'error', false);
         });
-    };
-
-    if (!this.userService.hasJwt()) {
-      this.userService.loginWithBackend(performSave);
-      return;
-    }
-
-    performSave();
+      })
+      .catch(() => {
+        this.showDisplayMessage('common.experiences.saveFailedTitle', 'common.experiences.saveFailedMessage', 'error', false);
+      });
   }
 
   private loadBookmarksIfNeeded(): void {
