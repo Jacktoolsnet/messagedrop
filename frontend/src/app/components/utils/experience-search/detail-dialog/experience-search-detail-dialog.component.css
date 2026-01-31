@@ -41,45 +41,33 @@
   scroll-padding-top: 0.75rem;
 }
 
-.detail-header {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+h2[mat-dialog-title].dialog-title {
+  height: 3rem;
+  padding: 0.35rem 1rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
-  background-color: var(--mat-card-filled-container-color);
-  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
-  margin: 0 -1rem;
-  width: calc(100% + 2rem);
-  box-sizing: border-box;
+  margin: 0;
 }
 
-.detail-header mat-icon {
+.dialog-title__icon {
+  font-size: 1.8rem;
+  width: 1.8rem;
+  height: 1.8rem;
   flex: 0 0 auto;
 }
 
-.detail-header__text {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  flex: 1 1 auto;
-  overflow: hidden;
-}
-
-.detail-title {
+.dialog-title__text {
   font-weight: 600;
-  font-size: 1.15rem;
-  color: var(--mat-app-text-color);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  display: block;
+  min-width: 0;
 }
 
-.detail-subtitle {
-  font-size: 0.8rem;
+.dialog-subtitle {
+  padding: 0.5rem 1rem 0;
+  font-size: 0.85rem;
   color: var(--mat-card-subtitle-text-color);
 }
 
@@ -255,13 +243,21 @@
 .sticky-actions {
   position: sticky;
   bottom: 0;
+  z-index: 3;
   background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 -2px 8px var(--mat-card-outlined-outline-color);
   border-top: 1px solid var(--mat-card-outlined-outline-color);
-  z-index: 1000;
+  padding: 0.3rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .action-close {
   margin-right: auto;
+  margin-inline-end: auto;
 }
 
 .open-viator-button {

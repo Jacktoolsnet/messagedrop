@@ -1,12 +1,11 @@
+<h2 mat-dialog-title class="dialog-title">
+  <mat-icon class="dialog-title__icon" aria-hidden="true">place</mat-icon>
+  <span class="dialog-title__text">
+    {{ data.destinationName || ('common.experiences.title' | transloco) }}
+  </span>
+</h2>
+
 <mat-dialog-content class="experience-dialog-content">
-  <div class="pin-dialog-header">
-    <mat-icon>place</mat-icon>
-    <div class="pin-dialog-header__text">
-      <span class="pin-dialog-title">
-        {{ data.destinationName || ('common.experiences.title' | transloco) }}
-      </span>
-    </div>
-  </div>
 
   <div class="experience-scroll">
     <div class="results pin-dialog-results" role="list">

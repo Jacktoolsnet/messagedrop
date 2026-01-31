@@ -2,6 +2,36 @@
   color: var(--mat-app-text-color);
 }
 
+h2[mat-dialog-title].dialog-title {
+  height: 3rem;
+  padding: 0.35rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.dialog-title__icon {
+  font-size: 1.8rem;
+  width: 1.8rem;
+  height: 1.8rem;
+  flex: 0 0 auto;
+}
+
+.dialog-title__text {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.dialog-subtitle {
+  padding: 0.5rem 1rem 0;
+  font-size: 0.85rem;
+  color: var(--mat-card-subtitle-text-color);
+}
+
 .mat-mdc-dialog-content {
   display: flex;
   flex-direction: column;
@@ -47,39 +77,6 @@
   padding: 1rem 0;
 }
 
-.pin-dialog-header {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
-  background-color: var(--mat-card-filled-container-color);
-  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
-  margin: 0 -1rem;
-  width: calc(100% + 2rem);
-}
-
-.pin-dialog-header__text {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.pin-dialog-title {
-  font-weight: 600;
-  font-size: 1.1rem;
-  color: var(--mat-app-text-color);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.pin-dialog-subtitle {
-  font-size: 0.8rem;
-  color: var(--mat-card-subtitle-text-color);
-}
 
 .results {
   display: grid;
@@ -266,11 +263,25 @@
 .sticky-actions {
   position: sticky;
   bottom: 0;
-  z-index: 10;
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.4rem;
-  padding: 0.4rem 1rem;
+  z-index: 3;
   background-color: var(--mat-card-filled-container-color);
-  box-shadow: 0 -4px 12px var(--mat-card-outlined-outline-color);
+  box-shadow: 0 -2px 8px var(--mat-card-outlined-outline-color);
+  border-top: 1px solid var(--mat-card-outlined-outline-color);
+  padding: 0.3rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.sticky-actions .action-close {
+  margin-right: auto;
+  margin-inline-end: auto;
+}
+
+.sticky-actions button {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
 }
