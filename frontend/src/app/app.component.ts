@@ -72,6 +72,7 @@ import { BackupStateService } from './services/backup-state.service';
 import { BackupService } from './services/backup.service';
 import { ContactMessageService } from './services/contact-message.service';
 import { ContactService } from './services/contact.service';
+import { ExperienceMapService } from './services/experience-map.service';
 import { GeoStatisticService } from './services/geo-statistic.service';
 import { GeolocationService } from './services/geolocation.service';
 import { IndexedDbService } from './services/indexed-db.service';
@@ -89,7 +90,6 @@ import { PowService } from './services/pow.service';
 import { RestoreService } from './services/restore.service';
 import { ServerService } from './services/server.service';
 import { SharedContentService } from './services/shared-content.service';
-import { ExperienceMapService } from './services/experience-map.service';
 import { SystemNotificationService } from './services/system-notification.service';
 import { TranslationHelperService } from './services/translation-helper.service';
 import { UserService } from './services/user.service';
@@ -1915,21 +1915,46 @@ export class AppComponent implements OnInit {
       if (!centerLocation) {
         return;
       }
-      const markerKey = `experience:${destination.destinationId}`;
-      const location: Location = {
-        latitude: centerLocation.latitude ?? 0,
-        longitude: centerLocation.longitude ?? 0,
-        plusCode: markerKey
+      const latitude = centerLocation.latitude ?? 0;
+      const longitude = centerLocation.longitude ?? 0;
+      const basePlusCode = destination.plusCode
+        || this.geolocationService.getPlusCode(latitude, longitude);
+      const baseLocation: Location = {
+        latitude,
+        longitude,
+        plusCode: basePlusCode || `experience:${destination.destinationId}`
       };
-      this.markerLocations.set(markerKey, {
-        location,
-        messages: [],
-        notes: [],
-        images: [],
-        documents: [],
-        experiences: [destination],
-        type: MarkerType.EXPERIENCE_DESTINATION
-      });
+      if (this.mapService.getMapZoom() > 17) {
+        center = baseLocation;
+      } else {
+        const groupedPlusCode = this.geolocationService.getGroupedPlusCodeBasedOnMapZoom(baseLocation, this.mapService.getMapZoom());
+        const plusCodeArea: PlusCodeArea = this.geolocationService.getGridFromPlusCode(groupedPlusCode);
+        center = {
+          latitude: plusCodeArea.latitudeCenter,
+          longitude: plusCodeArea.longitudeCenter,
+          plusCode: groupedPlusCode
+        };
+      }
+      if (this.markerLocations.has(center.plusCode)) {
+        const existing = this.markerLocations.get(center.plusCode)!;
+        if (!existing.experiences) {
+          existing.experiences = [];
+        }
+        existing.experiences.push(destination);
+        if (existing.type !== MarkerType.EXPERIENCE_DESTINATION) {
+          existing.type = MarkerType.MULTI;
+        }
+      } else {
+        this.markerLocations.set(center.plusCode, {
+          location: center,
+          messages: [],
+          notes: [],
+          images: [],
+          documents: [],
+          experiences: [destination],
+          type: MarkerType.EXPERIENCE_DESTINATION
+        });
+      }
     });
 
     // Save last markerupdet to fire the angular change listener
