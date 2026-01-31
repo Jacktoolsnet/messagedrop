@@ -31,15 +31,15 @@
         [attr.alt]="data.place.name ? ('common.placeSettings.avatarAltName' | transloco:{ name: data.place.name }) : ('common.placeSettings.avatarAltFallback' | transloco)" /><br />
     </div>
     @if (data.place.avatarAttribution?.source === 'unsplash') {
-    <p class="avatar-attribution">
+    <p class="unsplash-badge">
       <span>{{ 'common.avatarAttribution.photoBy' | transloco }}</span>
-      <a class="avatar-attribution__link"
+      <a class="unsplash-badge__link"
         [href]="data.place.avatarAttribution?.authorUrl" target="_blank"
         rel="noopener">
         {{ data.place.avatarAttribution?.authorName }}
       </a>
       <span>{{ 'common.avatarAttribution.onUnsplash' | transloco }}</span>
-      <a class="avatar-attribution__link" [href]="data.place.avatarAttribution?.unsplashUrl"
+      <a class="unsplash-badge__link" [href]="data.place.avatarAttribution?.unsplashUrl"
         target="_blank" rel="noopener">
         Unsplash
       </a>
@@ -75,15 +75,15 @@
       [style.--place-bg-image]="getPlaceBackgroundPreviewImage()"
       [style.--place-bg-opacity]="getPlaceBackgroundPreviewOpacity()"></div>
     @if (data.place.placeBackgroundAttribution?.source === 'unsplash') {
-    <p class="avatar-attribution">
+    <p class="unsplash-badge">
       <span>{{ 'common.avatarAttribution.photoBy' | transloco }}</span>
-      <a class="avatar-attribution__link"
+      <a class="unsplash-badge__link"
         [href]="data.place.placeBackgroundAttribution?.authorUrl"
         target="_blank" rel="noopener">
         {{ data.place.placeBackgroundAttribution?.authorName }}
       </a>
       <span>{{ 'common.avatarAttribution.onUnsplash' | transloco }}</span>
-      <a class="avatar-attribution__link"
+      <a class="unsplash-badge__link"
         [href]="data.place.placeBackgroundAttribution?.unsplashUrl"
         target="_blank" rel="noopener">
         Unsplash
