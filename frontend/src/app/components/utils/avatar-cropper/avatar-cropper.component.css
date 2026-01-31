@@ -51,7 +51,11 @@ image-cropper {
 .dialog-actions {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   padding: 0.5rem 1rem 1rem;
   gap: 1rem;
+}
+
+.dialog-actions button:first-child {
+  margin-right: auto;
 }
