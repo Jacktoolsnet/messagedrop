@@ -32,9 +32,7 @@
   </button>
   }
   @if (data.experiences.length) {
-  <button mat-stroked-button [mat-dialog-close]="{type: 'experience', experiences: data.experiences}"
-    matBadge="{{data.experiences.length | shortNumber}}" matBadgePosition="after" matBadgeColor="accent"
-    matBadgeOverlap="true">
+  <button mat-stroked-button [mat-dialog-close]="{type: 'experience', experiences: data.experiences}">
     <mat-icon>local_activity</mat-icon>
     {{ 'common.map.multiMarker.showExperiences' | transloco }}
   </button>

@@ -23,12 +23,16 @@ export class DisplayMessage implements OnInit {
   readonly data = inject<DisplayMessageConfig>(MAT_DIALOG_DATA);
 
   ngOnInit(): void {
+    const delay = Math.max(0, this.data.delay ?? 0);
+    if (this.data.autoclose) {
+      setTimeout(() => {
+        this.dialogRef.close();
+      }, delay);
+      return;
+    }
     setTimeout(() => {
       this.showOk = true;
-      if (this.data.autoclose) {
-        this.dialogRef.close();
-      }
-    }, this.data.delay);
+    }, delay);
   }
 
   onPrimaryClick(): void {
