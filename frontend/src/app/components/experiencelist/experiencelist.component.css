@@ -219,6 +219,18 @@
   padding: 0 1rem 1rem;
 }
 
+.tile-actions__left,
+.tile-actions__right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tile-actions__left .mat-mdc-mini-fab,
+.tile-actions__right .mat-mdc-raised-button {
+  box-shadow: 0 4px 10px color-mix(in srgb, var(--mat-card-outlined-outline-color) 55%, transparent);
+}
+
 .open-viator-button {
   border-radius: 999px;
   display: inline-flex;

@@ -447,6 +447,11 @@
   gap: 0.25rem;
 }
 
+.tile-actions__left .mat-mdc-mini-fab,
+.tile-actions__right .mat-mdc-raised-button {
+  box-shadow: 0 4px 10px color-mix(in srgb, var(--mat-card-outlined-outline-color) 55%, transparent);
+}
+
 .open-viator-button {
   display: inline-flex;
   align-items: center;

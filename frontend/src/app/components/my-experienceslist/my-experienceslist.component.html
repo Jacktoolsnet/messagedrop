@@ -49,20 +49,23 @@
               </p>
             </mat-card-content>
             <mat-card-actions class="tile-actions">
-              <button mat-stroked-button class="open-viator-button" type="button"
-                (click)="openDetails(bookmark.snapshot)">
-                <mat-icon>expand_content</mat-icon>
-                <span class="open-viator-label">{{ 'common.experiences.showMore' | transloco }}</span>
-              </button>
-              <button mat-stroked-button class="open-viator-button" type="button"
-                (click)="onOpen(bookmark.snapshot)"
-                [disabled]="!bookmark.snapshot.productUrl"
-                [attr.aria-label]="'common.experiences.openOn' | transloco : { provider: 'Viator' }">
-                <mat-icon>shopping_cart</mat-icon>
-                <span class="open-viator-label">
-                  {{ getPriceLabel(bookmark.snapshot) || ('common.experiences.openOn' | transloco : { provider: 'Viator' }) }}
-                </span>
-              </button>
+              <div class="tile-actions__left">
+                <button mat-mini-fab color="primary" type="button" (click)="openDetails(bookmark.snapshot)"
+                  [attr.aria-label]="'common.experiences.showMore' | transloco">
+                  <mat-icon>expand_content</mat-icon>
+                </button>
+              </div>
+              <div class="tile-actions__right">
+                <button mat-raised-button color="primary" class="open-viator-button" type="button"
+                  (click)="onOpen(bookmark.snapshot)"
+                  [disabled]="!bookmark.snapshot.productUrl"
+                  [attr.aria-label]="'common.experiences.openOn' | transloco : { provider: 'Viator' }">
+                  <mat-icon>shopping_cart</mat-icon>
+                  <span class="open-viator-label">
+                    {{ getPriceLabel(bookmark.snapshot) || ('common.experiences.openOn' | transloco : { provider: 'Viator' }) }}
+                  </span>
+                </button>
+              </div>
             </mat-card-actions>
           </mat-card>
         }

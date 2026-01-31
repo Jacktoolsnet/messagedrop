@@ -53,13 +53,13 @@
         </mat-card-content>
         <mat-card-actions class="tile-actions">
           <div class="tile-actions__left">
-            <button mat-stroked-button class="open-viator-button" type="button" (click)="openDetails(result)">
+            <button mat-mini-fab color="primary" type="button" (click)="openDetails(result)"
+              [attr.aria-label]="'common.experiences.showMore' | transloco">
               <mat-icon>expand_content</mat-icon>
-              <span class="open-viator-label">{{ 'common.experiences.showMore' | transloco }}</span>
             </button>
           </div>
           <div class="tile-actions__right">
-            <button mat-stroked-button class="open-viator-button" type="button" (click)="onOpen(result)"
+            <button mat-raised-button color="primary" class="open-viator-button" type="button" (click)="onOpen(result)"
               [disabled]="!result.productUrl"
               [attr.aria-label]="'common.experiences.openOn' | transloco : { provider: 'Viator' }">
               <mat-icon>shopping_cart</mat-icon>
