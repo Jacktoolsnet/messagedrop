@@ -271,8 +271,8 @@
     <mat-icon>help</mat-icon>
   </button>
   <button mat-icon-button type="button" (click)="onBookmark()"
-    [attr.aria-label]="'common.experiences.save' | transloco">
-    <mat-icon>bookmark_add</mat-icon>
+    [attr.aria-label]="(isBookmarked() ? 'common.experiences.saved' : 'common.experiences.save') | transloco">
+    <mat-icon>{{ isBookmarked() ? 'bookmark_added' : 'bookmark_add' }}</mat-icon>
   </button>
   <button mat-stroked-button class="open-viator-button" type="button" (click)="onOpen()"
     [disabled]="!data.result.productUrl"

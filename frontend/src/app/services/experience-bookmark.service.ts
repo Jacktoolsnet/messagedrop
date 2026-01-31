@@ -42,6 +42,12 @@ export class ExperienceBookmarkService {
     await this.loadBookmarks();
   }
 
+  async hasBookmark(productCode: string): Promise<boolean> {
+    if (!productCode) return false;
+    const existing = await this.indexedDb.getExperienceBookmark(productCode);
+    return Boolean(existing);
+  }
+
   ensureLoaded(): Promise<void> {
     if (this.loaded) {
       return Promise.resolve();
