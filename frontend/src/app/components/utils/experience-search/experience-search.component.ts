@@ -839,6 +839,25 @@ function formatDurationMinutes(minutes: number): string {
 
 function resolveImageUrl(record: Record<string, unknown> | null): string | undefined {
   if (!record) return undefined;
+  const images = Array.isArray(record['images']) ? (record['images'] as unknown[]) : [];
+  if (images.length > 0) {
+    const cover = images.map((entry) => asRecord(entry)).find((entry) => entry?.['isCover'] === true);
+    const imageRecord = cover ?? asRecord(images[0]);
+    if (imageRecord) {
+      const variants = Array.isArray(imageRecord['variants']) ? (imageRecord['variants'] as unknown[]) : [];
+      const bestVariant = pickLargestVariant(variants);
+      const bestUrl = firstString(bestVariant?.['url'], bestVariant?.['imageUrl']);
+      if (bestUrl) return bestUrl;
+      const nestedDirect = firstString(
+        imageRecord['url'],
+        imageRecord['imageUrl'],
+        imageRecord['original'],
+        imageRecord['medium'],
+        imageRecord['small']
+      );
+      if (nestedDirect) return nestedDirect;
+    }
+  }
   const direct = firstString(
     record['imageUrl'],
     record['image'],
@@ -846,22 +865,8 @@ function resolveImageUrl(record: Record<string, unknown> | null): string | undef
     record['heroImageUrl']
   );
   if (direct) return direct;
-  const images = Array.isArray(record['images']) ? (record['images'] as unknown[]) : [];
   if (images.length === 0) return undefined;
-  const cover = images.map((entry) => asRecord(entry)).find((entry) => entry?.['isCover'] === true);
-  const imageRecord = cover ?? asRecord(images[0]);
-  if (!imageRecord) return undefined;
-  const nestedDirect = firstString(
-    imageRecord['url'],
-    imageRecord['imageUrl'],
-    imageRecord['original'],
-    imageRecord['medium'],
-    imageRecord['small']
-  );
-  if (nestedDirect) return nestedDirect;
-  const variants = Array.isArray(imageRecord['variants']) ? (imageRecord['variants'] as unknown[]) : [];
-  const bestVariant = pickLargestVariant(variants);
-  return firstString(bestVariant?.['url'], bestVariant?.['imageUrl']);
+  return undefined;
 }
 
 function resolveAvatarUrl(record: Record<string, unknown> | null): string | undefined {
