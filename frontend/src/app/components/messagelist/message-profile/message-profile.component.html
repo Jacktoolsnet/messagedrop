@@ -28,15 +28,15 @@
         [attr.alt]="profile.name ? ('common.messageProfile.avatarAltName' | transloco:{ name: profile.name }) : ('common.messageProfile.avatarAltFallback' | transloco)" /><br />
     </div>
     @if (profile.avatarAttribution?.source === 'unsplash') {
-    <p class="avatar-attribution">
+    <p class="unsplash-badge">
       <span>{{ 'common.avatarAttribution.photoBy' | transloco }}</span>
-      <a class="avatar-attribution__link"
+      <a class="unsplash-badge__link"
         [href]="profile.avatarAttribution?.authorUrl" target="_blank"
         rel="noopener">
         {{ profile.avatarAttribution?.authorName }}
       </a>
       <span>{{ 'common.avatarAttribution.onUnsplash' | transloco }}</span>
-      <a class="avatar-attribution__link" [href]="profile.avatarAttribution?.unsplashUrl"
+      <a class="unsplash-badge__link" [href]="profile.avatarAttribution?.unsplashUrl"
         target="_blank" rel="noopener">
         Unsplash
       </a>
