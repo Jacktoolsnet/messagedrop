@@ -203,6 +203,10 @@
   font-size: 0.9rem;
   line-height: 1.45;
   color: var(--mat-card-subtitle-text-color);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .tile-actions {
