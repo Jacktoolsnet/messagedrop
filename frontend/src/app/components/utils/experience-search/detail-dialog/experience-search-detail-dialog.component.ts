@@ -137,20 +137,14 @@ export class ExperienceSearchDetailDialogComponent {
       this.bookmarkService.hasBookmark(productCode)
         .then((exists) => {
           if (exists) {
-            this.showConfirmMessage(
-              'common.experiences.saveExistsTitle',
-              'common.experiences.saveExistsPrompt',
-              () => {
-                this.bookmarkService.removeBookmark(productCode)
-                  .then(() => {
-                    this.showDisplayMessage('common.experiences.saveRemovedTitle', 'common.experiences.saveRemovedMessage', 'bookmark_remove');
-                  })
-                  .catch(() => {
-                    this.showDisplayMessage('common.experiences.saveFailedTitle', 'common.experiences.saveFailedMessage', 'error', false);
-                  });
-              }
-            );
-            return;
+            this.bookmarkService.removeBookmark(productCode)
+              .then(() => {
+                this.showDisplayMessage('common.experiences.saveRemovedTitle', 'common.experiences.saveRemovedMessage', 'bookmark_remove');
+              })
+              .catch(() => {
+                this.showDisplayMessage('common.experiences.saveFailedTitle', 'common.experiences.saveFailedMessage', 'error', false);
+              });
+            return undefined;
           }
           return this.bookmarkService.saveBookmark(productCode, {
             ...this.data.result,
