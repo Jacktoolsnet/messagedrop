@@ -36,6 +36,7 @@ import { MessagelistComponent } from './components/messagelist/messagelist.compo
 import { MyMessagelistComponent } from './components/my-messagelist/my-messagelist.component';
 import { NotelistComponent } from './components/notelist/notelist.component';
 import { PlacelistComponent } from './components/placelist/placelist.component';
+import { MyExperienceslistComponent } from './components/my-experienceslist/my-experienceslist.component';
 import { SharedContentComponent } from './components/shared-content/shared-content.component';
 import { SystemMessageDialogComponent } from './components/system-messages/system-message-dialog/system-message-dialog.component';
 import { DeleteUserComponent } from './components/user/delete-user/delete-user.component';
@@ -1155,6 +1156,31 @@ export class AppComponent implements OnInit {
           });
         });
       }
+      this.updateDataForLocation();
+    });
+  }
+
+  public openMyExperiencesListDialog(): void {
+    const dialogRef = this.dialog.open(MyExperienceslistComponent, {
+      closeOnNavigation: true,
+      data: {},
+      minWidth: 'min(360px, 95vw)',
+      maxWidth: '95vw',
+      width: 'min(900px, 95vw)',
+      maxHeight: '95vh',
+      height: 'auto',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    dialogRef.afterOpened().subscribe(() => {
+      this.myHistory.push("myExperienceList");
+      window.history.replaceState(this.myHistory, '', '');
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
       this.updateDataForLocation();
     });
   }

@@ -1,0 +1,22 @@
+<app-dialog-header
+  icon="local_activity"
+  [title]="'common.menu.myExperiences' | transloco">
+</app-dialog-header>
+
+<mat-dialog-content class="experience-dialog-content">
+  <div class="experience-scroll">
+    <div class="empty-state">
+      <p class="empty-text">{{ 'common.experiences.noResults' | transloco }}</p>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-dialog-close mat-icon-button class="action-close" [attr.aria-label]="'common.actions.close' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+  <button mat-icon-button type="button" (click)="help.open('experienceSearch')"
+    [attr.aria-label]="'common.actions.help' | transloco">
+    <mat-icon>help</mat-icon>
+  </button>
+</mat-dialog-actions>

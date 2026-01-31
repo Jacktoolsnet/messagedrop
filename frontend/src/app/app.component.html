@@ -109,6 +109,13 @@
     </button>
     }
 
+    @if (userService.isReady()) {
+    <button mat-menu-item (click)="openMyExperiencesListDialog()">
+        <mat-icon>local_activity</mat-icon>
+        <span>{{ 'common.menu.myExperiences' | transloco }}</span>
+    </button>
+    }
+
     @if (userService.isReady() && contactService.isReady()) {
     <button mat-menu-item (click)="openContactListDialog()">
         <mat-icon [attr.aria-hidden]="false" matBadge="{{ getContactsBadge() }}" [matBadgeHidden]="!getContactsBadge()"
