@@ -25,19 +25,21 @@
         [attr.alt]="contact.name ? ('common.contact.profile.avatarAltName' | transloco:{ name: contact.name }) : ('common.contact.profile.avatarAlt' | transloco)" /><br />
     </div>
     @if (contact.avatarAttribution?.source === 'unsplash') {
-    <p class="unsplash-badge">
-      <span>{{ 'common.avatarAttribution.photoBy' | transloco }}</span>
-      <a class="unsplash-badge__link"
-        [href]="contact.avatarAttribution?.authorUrl" target="_blank"
-        rel="noopener">
-        {{ contact.avatarAttribution?.authorName }}
-      </a>
-      <span>{{ 'common.avatarAttribution.onUnsplash' | transloco }}</span>
-      <a class="unsplash-badge__link" [href]="contact.avatarAttribution?.unsplashUrl"
-        target="_blank" rel="noopener">
-        Unsplash
-      </a>
-    </p>
+    <div class="unsplash-badge-wrapper">
+      <p class="unsplash-badge">
+        <span>{{ 'common.avatarAttribution.photoBy' | transloco }}</span>
+        <a class="unsplash-badge__link"
+          [href]="contact.avatarAttribution?.authorUrl" target="_blank"
+          rel="noopener">
+          {{ contact.avatarAttribution?.authorName }}
+        </a>
+        <span>{{ 'common.avatarAttribution.onUnsplash' | transloco }}</span>
+        <a class="unsplash-badge__link" [href]="contact.avatarAttribution?.unsplashUrl"
+          target="_blank" rel="noopener">
+          Unsplash
+        </a>
+      </p>
+    </div>
     }
     <div class="button-style">
       <button mat-mini-fab color="primary" class="upload-button" (click)="editAvatar()"
@@ -68,19 +70,21 @@
       [style.--chat-bg-image]="getChatBackgroundPreviewImage()"
       [style.--chat-bg-opacity]="getChatBackgroundPreviewOpacity()"></div>
     @if (contact.chatBackgroundAttribution?.source === 'unsplash') {
-    <p class="unsplash-badge">
-      <span>{{ 'common.avatarAttribution.photoBy' | transloco }}</span>
-      <a class="unsplash-badge__link"
-        [href]="contact.chatBackgroundAttribution?.authorUrl"
-        target="_blank" rel="noopener">
-        {{ contact.chatBackgroundAttribution?.authorName }}
-      </a>
-      <span>{{ 'common.avatarAttribution.onUnsplash' | transloco }}</span>
-      <a class="unsplash-badge__link" [href]="contact.chatBackgroundAttribution?.unsplashUrl"
-        target="_blank" rel="noopener">
-        Unsplash
-      </a>
-    </p>
+    <div class="unsplash-badge-wrapper">
+      <p class="unsplash-badge">
+        <span>{{ 'common.avatarAttribution.photoBy' | transloco }}</span>
+        <a class="unsplash-badge__link"
+          [href]="contact.chatBackgroundAttribution?.authorUrl"
+          target="_blank" rel="noopener">
+          {{ contact.chatBackgroundAttribution?.authorName }}
+        </a>
+        <span>{{ 'common.avatarAttribution.onUnsplash' | transloco }}</span>
+        <a class="unsplash-badge__link" [href]="contact.chatBackgroundAttribution?.unsplashUrl"
+          target="_blank" rel="noopener">
+          Unsplash
+        </a>
+      </p>
+    </div>
     }
     <div class="button-style">
       <button mat-mini-fab color="primary" class="upload-button" (click)="editChatBackground()"

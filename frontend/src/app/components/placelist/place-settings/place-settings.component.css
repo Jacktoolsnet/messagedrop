@@ -87,6 +87,10 @@
   padding: 1rem;
 }
 
+.background-area .unsplash-badge-wrapper {
+  margin-bottom: 0.75rem;
+}
+
 .background-preview {
   width: 100%;
   height: 140px;
@@ -184,6 +188,11 @@
   text-decoration: underline;
 }
 
+.unsplash-badge-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
 .button_legal {
   position: absolute;
   bottom: 0;
@@ -217,7 +226,7 @@
   position: absolute;
   bottom: 0;
   right: 0;
-  transform: translate(0, 65%);
+  transform: translate(0, 50%);
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
