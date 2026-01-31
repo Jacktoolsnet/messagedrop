@@ -48,7 +48,7 @@ export class NoteTileComponent implements OnInit {
       data: { location: this.geolocationService.getCenterOfBoundingBox(this.place.boundingBox!), notesSignal: this.allPlaceNotes },
       minWidth: 'min(450px, 95vw)',
       maxWidth: '95vw',
-      width: 'min(900px, 95vw)',
+      width: '95vw',
       maxHeight: 'none',
       height: 'auto',
       hasBackdrop: true,
