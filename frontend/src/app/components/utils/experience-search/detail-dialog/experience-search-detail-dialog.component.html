@@ -57,25 +57,31 @@
             <img class="detail-tile__icon" src="assets/markers/experience-start-marker.svg" alt="" />
             <span class="detail-tile__title">{{ 'common.experiences.startEndPoint' | transloco }}</span>
           </div>
-          @if (getFirstMappableItem(getCombinedPointItems()); as mapItem) {
-            <button mat-icon-button class="detail-tile__header-action" type="button" (click)="openMaps(mapItem)">
-              <mat-icon>assistant_direction</mat-icon>
-            </button>
-          }
         </div>
         <mat-card-content class="detail-tile__body">
           <div class="detail-section__body">
             @for (item of getCombinedPointItems(); track item.ref) {
-              <div class="detail-location">
-                <div class="detail-location__title">
-                  {{ item.name || (item.address ? item.address : ('common.experiences.locationUnavailable' | transloco)) }}
+              <div class="detail-subtile">
+                <div class="detail-subtile__header">
+                  <div class="detail-subtile__meta">
+                    <span class="detail-subtile__title">
+                      {{ item.name || (item.address ? item.address : ('common.experiences.locationUnavailable' | transloco)) }}
+                    </span>
+                    @if (item.address && item.name) {
+                      <div class="detail-subtile__address">{{ item.address }}</div>
+                    }
+                  </div>
+                  @if (getMapsUrl(item)) {
+                    <button mat-icon-button class="detail-subtile__action" type="button" (click)="openMaps(item)">
+                      <mat-icon>assistant_direction</mat-icon>
+                    </button>
+                  }
                 </div>
-                @if (item.address) {
-                  <div class="detail-location__address">{{ item.address }}</div>
-                }
-                @if (item.description) {
-                  <div class="detail-location__desc">{{ item.description }}</div>
-                }
+                <div class="detail-subtile__body">
+                  @if (item.description) {
+                    <div class="detail-location__desc">{{ item.description }}</div>
+                  }
+                </div>
               </div>
             }
           </div>
@@ -89,25 +95,31 @@
               <img class="detail-tile__icon" src="assets/markers/experience-start-marker.svg" alt="" />
               <span class="detail-tile__title">{{ 'common.experiences.startPoint' | transloco }}</span>
             </div>
-            @if (getFirstMappableItem(startItems()); as mapItem) {
-              <button mat-icon-button class="detail-tile__header-action" type="button" (click)="openMaps(mapItem)">
-                <mat-icon>assistant_direction</mat-icon>
-              </button>
-            }
           </div>
           <mat-card-content class="detail-tile__body">
             <div class="detail-section__body">
               @for (item of startItems(); track item.ref) {
-                <div class="detail-location">
-                  <div class="detail-location__title">
-                    {{ item.name || (item.address ? item.address : ('common.experiences.locationUnavailable' | transloco)) }}
+                <div class="detail-subtile">
+                  <div class="detail-subtile__header">
+                    <div class="detail-subtile__meta">
+                      <span class="detail-subtile__title">
+                        {{ item.name || (item.address ? item.address : ('common.experiences.locationUnavailable' | transloco)) }}
+                      </span>
+                      @if (item.address && item.name) {
+                        <div class="detail-subtile__address">{{ item.address }}</div>
+                      }
+                    </div>
+                    @if (getMapsUrl(item)) {
+                      <button mat-icon-button class="detail-subtile__action" type="button" (click)="openMaps(item)">
+                        <mat-icon>assistant_direction</mat-icon>
+                      </button>
+                    }
                   </div>
-                  @if (item.address) {
-                    <div class="detail-location__address">{{ item.address }}</div>
-                  }
-                  @if (item.description) {
-                    <div class="detail-location__desc">{{ item.description }}</div>
-                  }
+                  <div class="detail-subtile__body">
+                    @if (item.description) {
+                      <div class="detail-location__desc">{{ item.description }}</div>
+                    }
+                  </div>
                 </div>
               }
             </div>
@@ -122,25 +134,31 @@
               <img class="detail-tile__icon" src="assets/markers/experience-stop-marker.svg" alt="" />
               <span class="detail-tile__title">{{ 'common.experiences.endPoint' | transloco }}</span>
             </div>
-            @if (getFirstMappableItem(endItems()); as mapItem) {
-              <button mat-icon-button class="detail-tile__header-action" type="button" (click)="openMaps(mapItem)">
-                <mat-icon>assistant_direction</mat-icon>
-              </button>
-            }
           </div>
           <mat-card-content class="detail-tile__body">
             <div class="detail-section__body">
               @for (item of endItems(); track item.ref) {
-                <div class="detail-location">
-                  <div class="detail-location__title">
-                    {{ item.name || (item.address ? item.address : ('common.experiences.locationUnavailable' | transloco)) }}
+                <div class="detail-subtile">
+                  <div class="detail-subtile__header">
+                    <div class="detail-subtile__meta">
+                      <span class="detail-subtile__title">
+                        {{ item.name || (item.address ? item.address : ('common.experiences.locationUnavailable' | transloco)) }}
+                      </span>
+                      @if (item.address && item.name) {
+                        <div class="detail-subtile__address">{{ item.address }}</div>
+                      }
+                    </div>
+                    @if (getMapsUrl(item)) {
+                      <button mat-icon-button class="detail-subtile__action" type="button" (click)="openMaps(item)">
+                        <mat-icon>assistant_direction</mat-icon>
+                      </button>
+                    }
                   </div>
-                  @if (item.address) {
-                    <div class="detail-location__address">{{ item.address }}</div>
-                  }
-                  @if (item.description) {
-                    <div class="detail-location__desc">{{ item.description }}</div>
-                  }
+                  <div class="detail-subtile__body">
+                    @if (item.description) {
+                      <div class="detail-location__desc">{{ item.description }}</div>
+                    }
+                  </div>
                 </div>
               }
             </div>
@@ -156,25 +174,31 @@
           <mat-icon>confirmation_number</mat-icon>
           <span class="detail-tile__title">{{ 'common.experiences.redemptionPoint' | transloco }}</span>
         </div>
-        @if (getFirstMappableItem(redemptionItems()); as mapItem) {
-          <button mat-icon-button class="detail-tile__header-action" type="button" (click)="openMaps(mapItem)">
-            <mat-icon>assistant_direction</mat-icon>
-          </button>
-        }
       </div>
       <mat-card-content class="detail-tile__body">
         <div class="detail-section__body">
           @for (item of redemptionItems(); track item.ref) {
-          <div class="detail-location">
-            <div class="detail-location__title">
-              {{ item.name || (item.address ? item.address : ('common.experiences.locationUnavailable' | transloco)) }}
+          <div class="detail-subtile">
+            <div class="detail-subtile__header">
+              <div class="detail-subtile__meta">
+                <span class="detail-subtile__title">
+                  {{ item.name || (item.address ? item.address : ('common.experiences.locationUnavailable' | transloco)) }}
+                </span>
+                @if (item.address && item.name) {
+                  <div class="detail-subtile__address">{{ item.address }}</div>
+                }
+              </div>
+              @if (getMapsUrl(item)) {
+                <button mat-icon-button class="detail-subtile__action" type="button" (click)="openMaps(item)">
+                  <mat-icon>assistant_direction</mat-icon>
+                </button>
+              }
             </div>
-            @if (item.address) {
-            <div class="detail-location__address">{{ item.address }}</div>
-            }
-            @if (item.description) {
-            <div class="detail-location__desc">{{ item.description }}</div>
-            }
+            <div class="detail-subtile__body">
+              @if (item.description) {
+              <div class="detail-location__desc">{{ item.description }}</div>
+              }
+            </div>
           </div>
           }
         </div>
@@ -189,25 +213,31 @@
           <mat-icon>place</mat-icon>
           <span class="detail-tile__title">{{ 'common.experiences.pickupPoint' | transloco }}</span>
         </div>
-        @if (getFirstMappableItem(pickupItems()); as mapItem) {
-          <button mat-icon-button class="detail-tile__header-action" type="button" (click)="openMaps(mapItem)">
-            <mat-icon>assistant_direction</mat-icon>
-          </button>
-        }
       </div>
       <mat-card-content class="detail-tile__body">
         <div class="detail-section__body">
           @for (item of pickupItems(); track item.ref) {
-          <div class="detail-location">
-            <div class="detail-location__title">
-              {{ item.name || (item.address ? item.address : ('common.experiences.locationUnavailable' | transloco)) }}
+          <div class="detail-subtile">
+            <div class="detail-subtile__header">
+              <div class="detail-subtile__meta">
+                <span class="detail-subtile__title">
+                  {{ item.name || (item.address ? item.address : ('common.experiences.locationUnavailable' | transloco)) }}
+                </span>
+                @if (item.address && item.name) {
+                  <div class="detail-subtile__address">{{ item.address }}</div>
+                }
+              </div>
+              @if (getMapsUrl(item)) {
+                <button mat-icon-button class="detail-subtile__action" type="button" (click)="openMaps(item)">
+                  <mat-icon>assistant_direction</mat-icon>
+                </button>
+              }
             </div>
-            @if (item.address) {
-            <div class="detail-location__address">{{ item.address }}</div>
-            }
-            @if (item.description) {
-            <div class="detail-location__desc">{{ item.description }}</div>
-            }
+            <div class="detail-subtile__body">
+              @if (item.description) {
+              <div class="detail-location__desc">{{ item.description }}</div>
+              }
+            </div>
           </div>
           }
         </div>
