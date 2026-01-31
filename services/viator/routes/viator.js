@@ -354,6 +354,7 @@ router.get('/destinations', (req, res, next) => {
       iataCodes: safeJsonParse(row.iataCodes),
       countryCallingCode: row.countryCallingCode || undefined,
       languages: safeJsonParse(row.languages),
+      plusCode: row.plusCode || undefined,
       center: hasCenter ? { latitude: row.centerLat, longitude: row.centerLng } : undefined
     };
   });
@@ -381,6 +382,7 @@ router.get('/destinations/all', (req, res, next) => {
       iataCodes: safeJsonParse(row.iataCodes),
       countryCallingCode: row.countryCallingCode || undefined,
       languages: safeJsonParse(row.languages),
+      plusCode: row.plusCode || undefined,
       center: hasCenter ? { latitude: row.centerLat, longitude: row.centerLng } : undefined
     };
   });

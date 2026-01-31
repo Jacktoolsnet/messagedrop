@@ -168,6 +168,7 @@ export interface ViatorDestinationLookup {
   iataCodes?: string[];
   countryCallingCode?: string;
   languages?: string[];
+  plusCode?: string;
   center?: ViatorDestinationCenter;
 }
 

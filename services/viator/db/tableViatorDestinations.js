@@ -17,6 +17,7 @@ const init = function (db) {
       languages TEXT,
       centerLat REAL,
       centerLng REAL,
+      plusCode TEXT,
       syncRunId TEXT,
       updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
     );
@@ -46,9 +47,10 @@ const prepareUpsert = function (db) {
       languages,
       centerLat,
       centerLng,
+      plusCode,
       syncRunId,
       updatedAt
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
     ON CONFLICT(destinationId) DO UPDATE SET
       name = excluded.name,
       type = excluded.type,
@@ -62,6 +64,7 @@ const prepareUpsert = function (db) {
       languages = excluded.languages,
       centerLat = excluded.centerLat,
       centerLng = excluded.centerLng,
+      plusCode = excluded.plusCode,
       syncRunId = excluded.syncRunId,
       updatedAt = datetime('now');
   `;

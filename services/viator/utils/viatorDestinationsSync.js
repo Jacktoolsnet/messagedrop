@@ -1,5 +1,6 @@
 const axios = require('axios');
 const { randomUUID } = require('node:crypto');
+const OpenLocationCode = require('open-location-code-typescript');
 const tableViatorDestinations = require('../db/tableViatorDestinations');
 
 const DEFAULT_TIMEOUT_MS = 15000;
@@ -63,6 +64,15 @@ function normalizeDestination(entry) {
   const lng = Number.isFinite(rawLng) ? rawLng : Number(rawLng);
   const centerLat = Number.isFinite(lat) ? lat : null;
   const centerLng = Number.isFinite(lng) ? lng : null;
+  let plusCode = null;
+  if (Number.isFinite(centerLat) && Number.isFinite(centerLng)) {
+    try {
+      const encoded = OpenLocationCode.encode(centerLat, centerLng, 10);
+      plusCode = encoded || null;
+    } catch {
+      plusCode = null;
+    }
+  }
   return {
     destinationId: Number(entry.destinationId),
     name: entry.name ? String(entry.name) : null,
@@ -76,7 +86,8 @@ function normalizeDestination(entry) {
     countryCallingCode: entry.countryCallingCode ? String(entry.countryCallingCode) : null,
     languages: Array.isArray(entry.languages) ? JSON.stringify(entry.languages) : null,
     centerLat,
-    centerLng
+    centerLng,
+    plusCode
   };
 }
 
@@ -182,6 +193,7 @@ async function syncDestinations({ db, logger, force = false } = {}) {
         normalized.languages,
         normalized.centerLat,
         normalized.centerLng,
+        normalized.plusCode,
         syncRunId
       );
       written += 1;
