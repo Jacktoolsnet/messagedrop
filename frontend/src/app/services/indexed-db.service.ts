@@ -5,6 +5,7 @@ import { BoundingBox } from '../interfaces/bounding-box';
 import { Contact } from '../interfaces/contact';
 import { ContactProfile } from '../interfaces/contact-profile';
 import { CryptedUser } from '../interfaces/crypted-user';
+import { ExperienceBookmark } from '../interfaces/experience-bookmark';
 import { IndexedDbBackup, IndexedDbBackupEntry } from '../interfaces/indexed-db-backup';
 import { LocalDocument } from '../interfaces/local-document';
 import { LocalImage } from '../interfaces/local-image';
@@ -27,13 +28,14 @@ type StoredLocalDocumentMeta = string;
 export class IndexedDbService {
   private readonly backupState = inject(BackupStateService);
   private dbName = 'MessageDrop';
-  private dbVersion = 6;
+  private dbVersion = 7;
   private settingStore = 'setting';
   private userStore = 'user';
   private profileStore = 'profile';
   private contactStore = 'contact';
   private contactProfileStore = 'contactprofile';
   private placeStore = 'place';
+  private experienceBookmarkStore = 'experienceBookmark';
   private tileSettingsStore = 'tileSettings';
   private noteStore = 'note';
   private imageStore = 'image';
@@ -136,6 +138,9 @@ export class IndexedDbService {
         }
         if (!db.objectStoreNames.contains(this.placeStore)) {
           db.createObjectStore(this.placeStore);
+        }
+        if (!db.objectStoreNames.contains(this.experienceBookmarkStore)) {
+          db.createObjectStore(this.experienceBookmarkStore);
         }
         if (!db.objectStoreNames.contains(this.tileSettingsStore)) {
           db.createObjectStore(this.tileSettingsStore);
@@ -722,6 +727,75 @@ export class IndexedDbService {
         resolve(places);
       };
 
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async setExperienceBookmark(bookmark: ExperienceBookmark): Promise<void> {
+    const db = await this.openDB();
+
+    return new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(this.experienceBookmarkStore, 'readwrite');
+      const store = tx.objectStore(this.experienceBookmarkStore);
+      const compressed = this.compress(bookmark);
+      const request = store.put(compressed, bookmark.productCode);
+
+      request.onsuccess = () => {
+        this.backupState.markDirty();
+        resolve();
+      };
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async getExperienceBookmark(productCode: string): Promise<ExperienceBookmark | undefined> {
+    const db = await this.openDB();
+
+    return new Promise<ExperienceBookmark | undefined>((resolve, reject) => {
+      const tx = db.transaction(this.experienceBookmarkStore, 'readonly');
+      const store = tx.objectStore(this.experienceBookmarkStore);
+      const request = store.get(productCode);
+
+      request.onsuccess = () => {
+        resolve(this.decompress<ExperienceBookmark>(request.result));
+      };
+
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async getAllExperienceBookmarks(): Promise<ExperienceBookmark[]> {
+    const db = await this.openDB();
+
+    return new Promise<ExperienceBookmark[]>((resolve, reject) => {
+      const tx = db.transaction(this.experienceBookmarkStore, 'readonly');
+      const store = tx.objectStore(this.experienceBookmarkStore);
+      const request = store.getAll();
+
+      request.onsuccess = () => {
+        const values = request.result as string[];
+        const bookmarks = values
+          .map((value) => this.decompress<ExperienceBookmark>(value))
+          .filter((value): value is ExperienceBookmark => Boolean(value));
+        resolve(bookmarks);
+      };
+
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async deleteExperienceBookmark(productCode: string): Promise<void> {
+    const db = await this.openDB();
+
+    return new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(this.experienceBookmarkStore, 'readwrite');
+      const store = tx.objectStore(this.experienceBookmarkStore);
+      const request = store.delete(productCode);
+
+      request.onsuccess = () => {
+        this.backupState.markDirty();
+        resolve();
+      };
       request.onerror = () => reject(request.error);
     });
   }

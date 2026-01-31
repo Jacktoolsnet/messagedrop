@@ -1,13 +1,73 @@
 <app-dialog-header
-  icon="local_activity"
+  icon="bookmark_star"
   [title]="'common.menu.myExperiences' | transloco">
 </app-dialog-header>
 
 <mat-dialog-content class="experience-dialog-content">
   <div class="experience-scroll">
-    <div class="empty-state">
-      <p class="empty-text">{{ 'common.experiences.noResults' | transloco }}</p>
-    </div>
+    @if (!hasBookmarks()) {
+      <div class="empty-state">
+        <p class="empty-text">{{ 'common.experiences.noResults' | transloco }}</p>
+      </div>
+    } @else {
+      <div class="results" role="list">
+        @for (bookmark of bookmarks(); track bookmark.productCode) {
+          <mat-card class="experience-tile" role="listitem">
+            <div class="tile-header"
+              [style.--experience-header-bg-image]="getExperienceHeaderBackgroundImage(bookmark.snapshot)"
+              [style.--experience-header-bg-opacity]="getExperienceHeaderBackgroundOpacity(bookmark.snapshot)">
+              <div class="identity-badge">
+                @if (bookmark.snapshot.avatarUrl) {
+                  <img class="avatar" [src]="bookmark.snapshot.avatarUrl"
+                    [alt]="bookmark.snapshot.title || bookmark.snapshot.productCode || ''" />
+                } @else {
+                  <mat-icon>local_activity</mat-icon>
+                }
+                <div class="identity-text">
+                  <span class="name"
+                    [attr.title]="bookmark.snapshot.title || bookmark.snapshot.productCode || ''">
+                    {{ bookmark.snapshot.title || bookmark.snapshot.productCode || '' }}
+                  </span>
+                  @if (getDurationLabel(bookmark.snapshot)) {
+                    <span class="subtitle">{{ 'common.experiences.durationPrefix' | transloco }}
+                      {{ getDurationLabel(bookmark.snapshot) }}</span>
+                  }
+                </div>
+              </div>
+              <div class="viator-badge">
+                <span class="viator-badge__text">{{ 'common.experiences.sourceViator' | transloco }}</span>
+                <a class="viator-badge__link" href="https://www.viator.com/?pid=P00285785&mcid=42383&medium=link"
+                  target="_blank" rel="noopener">Viator</a>
+              </div>
+              @if (getRatingLabel(bookmark.snapshot)) {
+                <div class="rating-badge">★ {{ getRatingLabel(bookmark.snapshot) }}</div>
+              }
+            </div>
+            <mat-card-content class="experience-content">
+              <p class="experience-description">
+                {{ bookmark.snapshot.description }}
+              </p>
+            </mat-card-content>
+            <mat-card-actions class="tile-actions">
+              <button mat-stroked-button class="open-viator-button" type="button"
+                (click)="openDetails(bookmark.snapshot)">
+                <mat-icon>expand_content</mat-icon>
+                <span class="open-viator-label">{{ 'common.experiences.showMore' | transloco }}</span>
+              </button>
+              <button mat-stroked-button class="open-viator-button" type="button"
+                (click)="onOpen(bookmark.snapshot)"
+                [disabled]="!bookmark.snapshot.productUrl"
+                [attr.aria-label]="'common.experiences.openOn' | transloco : { provider: 'Viator' }">
+                <mat-icon>shopping_cart</mat-icon>
+                <span class="open-viator-label">
+                  {{ getPriceLabel(bookmark.snapshot) || ('common.experiences.openOn' | transloco : { provider: 'Viator' }) }}
+                </span>
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        }
+      </div>
+    }
   </div>
 </mat-dialog-content>
 

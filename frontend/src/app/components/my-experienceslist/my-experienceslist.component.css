@@ -41,6 +41,186 @@
   scroll-padding-top: 0.75rem;
 }
 
+.results {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  gap: 0.75rem;
+  padding-inline: 0.5rem;
+  padding-bottom: 0.25rem;
+}
+
+.experience-tile {
+  align-self: start;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--mat-card-outlined-outline-color);
+  background: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+}
+
+.tile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem 2.6rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  min-height: 12.5rem;
+}
+
+.tile-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--experience-header-bg-image, none);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: var(--experience-header-bg-opacity, 0);
+  z-index: 0;
+}
+
+.tile-header > *:not(.viator-badge):not(.identity-badge):not(.rating-badge) {
+  position: relative;
+  z-index: 1;
+}
+
+.viator-badge {
+  position: absolute;
+  left: 0.6rem;
+  bottom: 0.6rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  text-decoration: none;
+  color: var(--mat-app-text-color);
+  background: color-mix(in srgb, var(--mat-card-filled-container-color) 85%, transparent);
+  border: 1px solid color-mix(in srgb, var(--mat-card-outlined-outline-color) 70%, transparent);
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--mat-card-outlined-outline-color) 40%, transparent);
+  backdrop-filter: blur(6px);
+}
+
+.viator-badge__link {
+  color: inherit;
+}
+
+.rating-badge {
+  position: absolute;
+  right: 0.6rem;
+  bottom: 0.6rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--mat-app-text-color);
+  background: color-mix(in srgb, var(--mat-card-filled-container-color) 85%, transparent);
+  border: 1px solid color-mix(in srgb, var(--mat-card-outlined-outline-color) 70%, transparent);
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--mat-card-outlined-outline-color) 40%, transparent);
+  backdrop-filter: blur(6px);
+}
+
+.identity-badge {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  z-index: 2;
+  min-height: 3rem;
+  padding: 0.35rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 75%;
+  overflow: hidden;
+  color: var(--mat-card-subtitle-text-color);
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+  border-radius: 1.5rem;
+}
+
+.identity-badge mat-icon {
+  flex: 0 0 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 2rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+
+.identity-badge .avatar {
+  flex: 0 0 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.identity-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.identity-text .name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  max-width: 100%;
+}
+
+.identity-text .subtitle {
+  font-size: 0.75rem;
+}
+
+.experience-content {
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.experience-description {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--mat-card-subtitle-text-color);
+}
+
+.tile-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0 0.75rem 0.75rem;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.open-viator-button {
+  gap: 0.35rem;
+}
+
+.open-viator-label {
+  font-weight: 600;
+}
+
 .empty-state {
   display: grid;
   place-items: center;

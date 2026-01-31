@@ -837,6 +837,7 @@
     "locationUnavailable": "Los detalles de la ubicación no están disponibles.",
     "openInMaps": "Abrir en Maps",
     "openOn": "Abrir en {{ provider }}",
+    "save": "Guardar experiencia",
       "select": "Seleccionar",
       "loadMore": "Cargar más",
       "searchFailed": "La búsqueda falló. Inténtalo de nuevo.",

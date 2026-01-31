@@ -270,6 +270,10 @@
     [attr.aria-label]="'common.actions.help' | transloco">
     <mat-icon>help</mat-icon>
   </button>
+  <button mat-icon-button type="button" (click)="onBookmark()"
+    [attr.aria-label]="'common.experiences.save' | transloco">
+    <mat-icon>bookmark_add</mat-icon>
+  </button>
   <button mat-stroked-button class="open-viator-button" type="button" (click)="onOpen()"
     [disabled]="!data.result.productUrl"
     [attr.aria-label]="'common.experiences.openOn' | transloco : { provider: 'Viator' }">

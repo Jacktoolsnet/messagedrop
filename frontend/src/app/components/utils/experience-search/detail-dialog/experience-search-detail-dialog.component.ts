@@ -17,6 +17,8 @@ import {
   ViatorProductDetail
 } from '../../../../interfaces/viator';
 import { ViatorService } from '../../../../services/viator.service';
+import { ExperienceBookmarkService } from '../../../../services/experience-bookmark.service';
+import { UserService } from '../../../../services/user.service';
 import { SearchSettingsMapPreviewComponent } from '../../search-settings/search-settings-map-preview.component';
 import { HelpDialogService } from '../../help-dialog/help-dialog.service';
 import { ExperienceResult } from '../../../../interfaces/viator';
@@ -46,6 +48,8 @@ export class ExperienceSearchDetailDialogComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly viatorService = inject(ViatorService);
   private readonly transloco = inject(TranslocoService);
+  private readonly bookmarkService = inject(ExperienceBookmarkService);
+  private readonly userService = inject(UserService);
 
   readonly loading = signal(false);
   readonly detail = signal<ViatorProductDetail | null>(null);
@@ -104,6 +108,28 @@ export class ExperienceSearchDetailDialogComponent {
     if (this.data.result.productUrl) {
       window.open(this.data.result.productUrl, '_blank');
     }
+  }
+
+  onBookmark(): void {
+    const productCode = this.data.result.productCode;
+    if (!productCode) {
+      return;
+    }
+    const performSave = () => {
+      void this.bookmarkService.saveBookmark(productCode, {
+        ...this.data.result,
+        productCode,
+        trackId: this.data.result.trackId || `viator:${productCode}`,
+        provider: 'viator'
+      }, Date.now());
+    };
+
+    if (!this.userService.hasJwt()) {
+      this.userService.loginWithBackend(performSave);
+      return;
+    }
+
+    performSave();
   }
 
   private loadDetails(): void {

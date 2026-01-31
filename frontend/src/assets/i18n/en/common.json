@@ -837,6 +837,7 @@
     "locationUnavailable": "Location details not available.",
     "openInMaps": "Open in Maps",
     "openOn": "Open on {{ provider }}",
+    "save": "Save experience",
       "select": "Select",
       "loadMore": "Load more",
       "searchFailed": "Search failed. Please try again.",
