@@ -1294,13 +1294,19 @@ export class AppComponent implements OnInit {
 
   private openMarkerExperienceListDialog(destinations: ViatorDestinationLookup[]): void {
     const ids = Array.isArray(destinations)
-      ? Array.from(new Set(destinations.map((dest) => dest.destinationId).filter((id) => Number.isFinite(id) && id > 0)))
+      ? Array.from(
+          new Set(
+            destinations
+              .map((dest) => Number(dest.destinationId))
+              .filter((id) => Number.isFinite(id) && id > 0)
+          )
+        )
       : [];
     if (!ids.length) {
       return;
     }
     const destinationName = ids.length === 1
-      ? destinations.find((dest) => dest.destinationId === ids[0])?.name
+      ? destinations.find((dest) => Number(dest.destinationId) === ids[0])?.name
       : undefined;
     this.dialog.open(ExperiencelistComponent, {
       data: { destinationIds: ids, destinationName },

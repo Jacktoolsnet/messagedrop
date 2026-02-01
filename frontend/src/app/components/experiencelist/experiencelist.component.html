@@ -7,11 +7,6 @@
 <mat-dialog-content class="experience-dialog-content">
 
   <div class="experience-scroll">
-    @if (loading()) {
-    <div class="experience-loading">
-      <mat-progress-spinner diameter="32" mode="indeterminate"></mat-progress-spinner>
-    </div>
-    }
     <div class="results pin-dialog-results" role="list">
       @for (result of results(); track result.trackId) {
       <mat-card class="experience-tile" role="listitem" [attr.title]="result.title || result.productCode || ''">

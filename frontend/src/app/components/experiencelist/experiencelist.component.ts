@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, effect, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
@@ -73,6 +73,7 @@ export class ExperiencelistComponent implements OnInit {
   private readonly bookmarkService = inject(ExperienceBookmarkService);
   private readonly userService = inject(UserService);
   readonly data = inject<ExperienceListDialogData>(MAT_DIALOG_DATA);
+  private loadingDialogRef?: MatDialogRef<DisplayMessage>;
 
   readonly loading = signal(true);
   readonly errorMessage = signal<string | null>(null);
@@ -89,7 +90,9 @@ export class ExperiencelistComponent implements OnInit {
 
   async loadResults(): Promise<void> {
     const destinationIds = Array.isArray(this.data.destinationIds)
-      ? Array.from(new Set(this.data.destinationIds.filter((id) => Number.isFinite(id) && id > 0)))
+      ? Array.from(new Set(this.data.destinationIds
+          .map((id) => Number(id))
+          .filter((id) => Number.isFinite(id) && id > 0)))
       : [];
     if (!destinationIds.length) {
       this.results.set([]);
@@ -98,6 +101,7 @@ export class ExperiencelistComponent implements OnInit {
     }
 
     this.loading.set(true);
+    this.openLoadingMessage();
     this.errorMessage.set(null);
     const combined: ExperienceResult[] = [];
 
@@ -121,6 +125,7 @@ export class ExperiencelistComponent implements OnInit {
       console.error('Viator experience list failed', error);
       this.errorMessage.set(this.i18n.t('common.experiences.searchFailed'));
     } finally {
+      this.closeLoadingMessage();
       this.loading.set(false);
     }
   }
@@ -293,6 +298,38 @@ export class ExperiencelistComponent implements OnInit {
         onConfirm();
       }
     });
+  }
+
+  private openLoadingMessage(): void {
+    if (this.loadingDialogRef) {
+      return;
+    }
+    const config: DisplayMessageConfig = {
+      showAlways: true,
+      title: this.transloco.translate('common.experiences.title'),
+      image: '',
+      icon: 'travel_explore',
+      message: this.transloco.translate('common.viator.loading'),
+      button: '',
+      delay: 600000,
+      showSpinner: true,
+      autoclose: false
+    };
+    this.loadingDialogRef = this.dialog.open(DisplayMessage, {
+      closeOnNavigation: false,
+      data: config,
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: false,
+      autoFocus: false
+    });
+  }
+
+  private closeLoadingMessage(): void {
+    if (this.loadingDialogRef) {
+      this.loadingDialogRef.close();
+      this.loadingDialogRef = undefined;
+    }
   }
 }
 
