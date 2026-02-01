@@ -91,8 +91,9 @@ export function normalizeTileSettings(
   const defaults = includeDefaults ? createDefaultTileSettings() : [];
   const incoming = tileSettings ?? [];
 
+  const defaultTypes = new Set(defaults.map((setting) => setting.type));
   const defaultsNormalized = defaults.map(defaultSetting => {
-    const current = incoming.find(setting => setting.type === defaultSetting.type && !setting.custom);
+    const current = incoming.find(setting => setting.type === defaultSetting.type);
     return {
       ...defaultSetting,
       id: current?.id ?? defaultSetting.id,
@@ -103,7 +104,7 @@ export function normalizeTileSettings(
   });
 
   const customTiles = incoming
-    .filter(setting => setting.custom || setting.type.startsWith('custom-'))
+    .filter(setting => !defaultTypes.has(setting.type) && (setting.custom || setting.type.startsWith('custom-')))
     .map((setting, index) => ({
       ...setting,
       id: setting.id ?? `custom-${setting.type}-${index}`,

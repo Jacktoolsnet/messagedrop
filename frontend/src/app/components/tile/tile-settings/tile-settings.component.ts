@@ -71,9 +71,6 @@ export class TileSettingsComponent {
 
   get addableTiles(): { type: TileSetting['type']; labelKey: string; icon: string }[] {
     const tiles = [...this.baseAddableTiles];
-    if (this.isPlaceContext) {
-      tiles.push({ type: 'custom-experience', labelKey: 'common.tileTypes.experiences', icon: 'local_activity' });
-    }
     if (this.isExperienceContext) {
       return tiles.filter(tile => tile.type !== 'custom-date');
     }
