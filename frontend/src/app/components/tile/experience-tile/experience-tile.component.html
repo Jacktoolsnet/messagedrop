@@ -4,14 +4,6 @@
       <mat-icon class="tile-icon">local_activity</mat-icon>
       <span class="tile-title">{{ 'common.tiles.experiences.title' | transloco }}</span>
     </div>
-    <button
-      mat-icon-button
-      type="button"
-      class="tile-add"
-      (click)="openSearch($event)"
-      [attr.aria-label]="'common.tiles.experiences.add' | transloco">
-      <mat-icon>add</mat-icon>
-    </button>
   </div>
 
   @if (previewExperiences().length > 0) {

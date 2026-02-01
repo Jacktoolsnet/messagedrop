@@ -40,10 +40,6 @@
   font-size: 1.5rem;
 }
 
-.tile-add {
-  color: var(--mat-fab-small-foreground-color);
-}
-
 .experience-list {
   display: grid;
   gap: 0.6rem;
