@@ -60,7 +60,7 @@ export class TileSettingsComponent {
     this.data.place?.tileSettings ?? this.data.contact?.tileSettings ?? this.data.experience?.tileSettings,
     { includeDefaults: this.isPlaceContext, includeSystem: this.isPlaceContext }
   ).filter(tile => tile.type !== 'custom-link'));
-  readonly addableTiles: { type: TileSetting['type']; labelKey: string; icon: string }[] = [
+  private readonly baseAddableTiles: ReadonlyArray<{ type: TileSetting['type']; labelKey: string; icon: string }> = [
     { type: 'custom-text', labelKey: 'common.tileTypes.text', icon: 'text_fields' },
     { type: 'custom-multitext', labelKey: 'common.tileTypes.multitext', icon: 'notes' },
     { type: 'custom-date', labelKey: 'common.tileTypes.anniversary', icon: 'event' },
@@ -68,6 +68,13 @@ export class TileSettingsComponent {
     { type: 'custom-quickaction', labelKey: 'common.tileTypes.quickActions', icon: 'bolt' },
     { type: 'custom-file', labelKey: 'common.tileTypes.files', icon: 'attach_file' }
   ];
+
+  get addableTiles(): { type: TileSetting['type']; labelKey: string; icon: string }[] {
+    if (!this.isExperienceContext) {
+      return [...this.baseAddableTiles];
+    }
+    return this.baseAddableTiles.filter(tile => tile.type !== 'custom-date');
+  }
 
   private readonly tileTypeLabelKeys: Partial<Record<TileSetting['type'], string>> = {
     datetime: 'common.tileTypes.datetime',
