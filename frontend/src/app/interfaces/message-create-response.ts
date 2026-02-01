@@ -12,4 +12,6 @@ export interface MessageCreateResponse {
     status: number;
     moderation?: MessageModerationResult | null;
     err?: string;
+    messageId?: number | null;
+    messageUuid?: string | null;
 }

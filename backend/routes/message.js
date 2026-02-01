@@ -442,6 +442,8 @@ router.post('/create',
     }
 
     response.status = 200;
+    response.messageId = createResult.id ?? null;
+    response.messageUuid = req.body.uuid ?? null;
     response.moderation = requiresModeration ? {
       decision: moderationDecision,
       reason: moderationReason,

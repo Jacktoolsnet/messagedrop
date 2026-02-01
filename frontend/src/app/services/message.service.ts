@@ -311,7 +311,15 @@ export class MessageService {
             this.showModerationRejected(this.getModerationRejectedMessage(res?.moderation?.reason ?? null));
             return;
           }
-          this.messagesSignal.update(messages => [{ ...message, ...moderationPatch }, ...messages]);
+          const createdId = res?.messageId ?? null;
+          const createdUuid = res?.messageUuid ?? null;
+          const nextMessage: Message = {
+            ...message,
+            ...moderationPatch,
+            id: createdId ?? message.id,
+            uuid: createdUuid ?? message.uuid
+          };
+          this.messagesSignal.update(messages => [nextMessage, ...messages]);
           if (decision === 'review') {
             this.showModerationReviewMessage(this.i18n.t('common.message.moderationReview'));
           } else {
@@ -364,7 +372,15 @@ export class MessageService {
 
           const parentUuid = message.parentUuid!;
           const commentsSignal = this.getCommentsSignalForMessage(parentUuid);
-          const nextComments = [...commentsSignal(), { ...message, ...moderationPatch }];
+          const createdId = res?.messageId ?? null;
+          const createdUuid = res?.messageUuid ?? null;
+          const nextMessage: Message = {
+            ...message,
+            ...moderationPatch,
+            id: createdId ?? message.id,
+            uuid: createdUuid ?? message.uuid
+          };
+          const nextComments = [...commentsSignal(), nextMessage];
           commentsSignal.set(nextComments);
           const nextCount = (this.commentCounts[parentUuid] ?? 0) + 1;
           this.commentCounts[parentUuid] = nextCount;
@@ -374,9 +390,9 @@ export class MessageService {
           }));
           if (includeInRootList) {
             this.messagesSignal.update(messages =>
-              messages.some(item => item.uuid === message.uuid)
+              messages.some(item => item.uuid === nextMessage.uuid)
                 ? messages
-                : [{ ...message, ...moderationPatch }, ...messages]
+                : [nextMessage, ...messages]
             );
           }
 
@@ -591,7 +607,12 @@ export class MessageService {
   }
 
   deleteMessage(message: Message, showAlways = false) {
-    const url = `${environment.apiUrl}/message/delete/${message.id}`;
+    const idOrUuid = message.id ?? message.uuid;
+    if (!idOrUuid) {
+      this.snackBar.open(this.i18n.t('common.message.deleteFailed'), this.i18n.t('common.actions.ok'));
+      return;
+    }
+    const url = `${environment.apiUrl}/message/delete/${idOrUuid}`;
 
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
