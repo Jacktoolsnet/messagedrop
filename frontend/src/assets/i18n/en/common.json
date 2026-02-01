@@ -811,6 +811,7 @@
       "detailTitle": "Experience",
       "provider": "Provider",
       "searchPlaceholder": "What do you want to do?",
+      "searchPlaceholderWithDestination": "What do you want to do in {{ destination }}?",
       "destinationPlaceholder": "Destination ID",
       "dateFrom": "From",
       "dateTo": "To",

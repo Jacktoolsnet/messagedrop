@@ -1308,13 +1308,13 @@ export class AppComponent implements OnInit {
     const destinationName = ids.length === 1
       ? destinations.find((dest) => Number(dest.destinationId) === ids[0])?.name
       : undefined;
-    this.dialog.open(ExperiencelistComponent, {
-      data: { destinationIds: ids, destinationName },
+    this.dialog.open(ExperienceSearchComponent, {
+      data: { destinationId: ids[0], destinationName },
       panelClass: 'pin-dialog',
       backdropClass: 'dialog-backdrop',
       closeOnNavigation: false,
-      maxWidth: '80vw',
-      maxHeight: '75vh',
+      maxWidth: '95vw',
+      maxHeight: '95vh',
       autoFocus: false
     });
   }

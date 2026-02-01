@@ -1,7 +1,9 @@
 <mat-dialog-content class="experience-dialog-content">
   <div class="search-bar">
     <input type="search" enterkeyhint="search" [formControl]="form.controls.term" (keyup.enter)="onSearch()"
-      [placeholder]="'common.experiences.searchPlaceholder' | transloco" />
+      [placeholder]="destinationName
+        ? ('common.experiences.searchPlaceholderWithDestination' | transloco: { destination: destinationName })
+        : ('common.experiences.searchPlaceholder' | transloco)" />
     <button type="button" class="filter-button" [matMenuTriggerFor]="filterMenu"
       [attr.aria-label]="'common.actions.more' | transloco">
       <mat-icon>tune</mat-icon>

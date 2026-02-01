@@ -811,6 +811,7 @@
       "detailTitle": "Erlebnis",
       "provider": "Anbieter",
       "searchPlaceholder": "Was möchtest du erleben?",
+      "searchPlaceholderWithDestination": "Was möchtest du in {{ destination }} erleben?",
       "destinationPlaceholder": "Ziel-ID",
       "dateFrom": "Von",
       "dateTo": "Bis",

@@ -811,6 +811,7 @@
       "detailTitle": "Expérience",
       "provider": "Fournisseur",
       "searchPlaceholder": "Que voulez-vous faire ?",
+      "searchPlaceholderWithDestination": "Que voulez-vous faire à {{ destination }} ?",
       "destinationPlaceholder": "ID de destination",
       "dateFrom": "Du",
       "dateTo": "Au",

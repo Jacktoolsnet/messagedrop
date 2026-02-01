@@ -120,6 +120,7 @@ export class ExperienceSearchComponent {
   readonly help = inject(HelpDialogService);
   private readonly dialog = inject(MatDialog);
   private readonly dialogData = inject<ExperienceSearchDialogData | null>(MAT_DIALOG_DATA, { optional: true });
+  readonly destinationName = (this.dialogData?.destinationName ?? '').trim();
 
   readonly sortOptions: { value: ExperienceSortOption; labelKey: string }[] = [
     { value: 'relevance', labelKey: 'common.experiences.sortRelevance' },

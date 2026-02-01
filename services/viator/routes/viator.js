@@ -332,6 +332,9 @@ function normalizeDestinationTypes(input) {
 const PUBLIC_ENDPOINTS = [
   { method: 'GET', pattern: /^\/destinations$/ },
   { method: 'GET', pattern: /^\/destinations\/all$/ },
+  { method: 'POST', pattern: /^\/products\/search$/ },
+  { method: 'GET', pattern: /^\/products\/search$/ },
+  { method: 'POST', pattern: /^\/search\/freetext$/ },
   { method: 'POST', pattern: /^\/suppliers\/search\/product-codes$/ }
 ];
 
