@@ -1,4 +1,7 @@
-<div class="tile">
+<div class="tile" role="button" tabindex="0"
+  (click)="openTileDialog()"
+  (keyup.enter)="openTileDialog()"
+  (keyup.space)="openTileDialog()">
   <div class="tile-header">
     <div class="tile-header__title">
       <mat-icon class="tile-icon">local_activity</mat-icon>
@@ -9,7 +12,7 @@
   @if (previewExperiences().length > 0) {
     <div class="experience-list">
       @for (experience of previewExperiences(); track experience.trackId || experience.productCode) {
-        <button type="button" class="experience-item" (click)="openDetail(experience, $event)">
+        <div class="experience-item">
           @if (getExperienceImage(experience)) {
             <img class="experience-avatar" [src]="getExperienceImage(experience)!" [alt]="getExperienceTitle(experience)" />
           } @else {
@@ -25,7 +28,7 @@
               <span class="experience-subtitle">{{ getExperienceDuration(experience) }}</span>
             }
           </div>
-        </button>
+        </div>
       }
     </div>
   } @else {

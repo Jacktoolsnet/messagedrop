@@ -6,7 +6,7 @@ import { ExperienceResult, ViatorDestinationLookup } from '../../../interfaces/v
 import { Place } from '../../../interfaces/place';
 import { ExperienceBookmarkService } from '../../../services/experience-bookmark.service';
 import { ExperienceMapService } from '../../../services/experience-map.service';
-import { ExperienceSearchDetailDialogComponent } from '../../utils/experience-search/detail-dialog/experience-search-detail-dialog.component';
+import { ExperienceTileDetailComponent } from './experience-tile-detail/experience-tile-detail.component';
 
 @Component({
   selector: 'app-experience-tile',
@@ -52,14 +52,25 @@ export class ExperienceTileComponent implements OnChanges {
     this.destination.set(destination);
   }
 
-  openDetail(result: ExperienceResult, event?: Event): void {
+  openTileDialog(event?: Event): void {
     event?.stopPropagation();
-    this.dialog.open(ExperienceSearchDetailDialogComponent, {
-      data: { result },
-      autoFocus: false,
-      backdropClass: 'dialog-backdrop',
-      maxWidth: '95vw',
-      maxHeight: '95vh'
+    void this.ensureDestination().then((destination) => {
+      this.dialog.open(ExperienceTileDetailComponent, {
+        data: {
+          destinationId: destination?.destinationId ?? 0,
+          destinationName: destination?.name ?? ''
+        },
+        closeOnNavigation: true,
+        minWidth: 'min(450px, 95vw)',
+        maxWidth: '95vw',
+        width: '95vw',
+        maxHeight: 'none',
+        height: 'auto',
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop',
+        disableClose: false,
+        autoFocus: false
+      });
     });
   }
 
@@ -73,6 +84,13 @@ export class ExperienceTileComponent implements OnChanges {
 
   getExperienceImage(result: ExperienceResult): string | null {
     return result.imageUrl || result.avatarUrl || null;
+  }
+
+  private async ensureDestination(): Promise<ViatorDestinationLookup | null> {
+    if (!this.destination()) {
+      await this.loadDestination();
+    }
+    return this.destination();
   }
 
   // Bookmarking happens in detail dialog; no add button in tile overview.

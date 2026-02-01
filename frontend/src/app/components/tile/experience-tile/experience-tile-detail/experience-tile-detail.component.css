@@ -1,0 +1,110 @@
+:host {
+  color: var(--mat-app-text-color);
+}
+
+.mat-mdc-dialog-content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: calc(90vh - 7rem);
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0;
+}
+
+.experience-detail-content {
+  padding: 0;
+}
+
+:host ::ng-deep .mat-mdc-dialog-surface {
+  padding-top: 0;
+}
+
+.experience-scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 1.5rem 1rem 1.5rem;
+  min-height: 0;
+}
+
+.empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  text-align: center;
+}
+
+.empty-text {
+  color: var(--mat-card-subtitle-text-color);
+  font-size: 0.95rem;
+}
+
+.experience-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.experience-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+  border: none;
+  background: rgba(0, 0, 0, 0.04);
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.85rem;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+}
+
+.experience-item:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.experience-avatar {
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 0.7rem;
+  object-fit: cover;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.experience-avatar--fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.experience-avatar--fallback mat-icon {
+  font-size: 1.35rem;
+  width: 1.35rem;
+  height: 1.35rem;
+}
+
+.experience-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.experience-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.experience-title {
+  font-weight: 600;
+  font-size: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.experience-subtitle {
+  font-size: 0.85rem;
+  color: var(--mat-card-subtitle-text-color);
+}

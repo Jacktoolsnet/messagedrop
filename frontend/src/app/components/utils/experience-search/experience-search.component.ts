@@ -145,6 +145,12 @@ export class ExperienceSearchComponent {
   });
 
   constructor() {
+    if (this.lockedDestinationId !== undefined) {
+      this.viewMode.set('list');
+      queueMicrotask(() => {
+        this.executeSearch(false);
+      });
+    }
     this.form.controls.startDate.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((startDate) => {

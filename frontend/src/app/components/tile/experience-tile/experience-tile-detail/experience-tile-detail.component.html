@@ -1,0 +1,61 @@
+<app-dialog-header
+  icon="local_activity"
+  [title]="'common.tiles.experiences.title' | transloco"
+  [subtitle]="destinationName()">
+</app-dialog-header>
+
+<mat-dialog-content class="experience-detail-content">
+  <div class="experience-scroll">
+    @if (experiences().length === 0) {
+      <div class="empty-state">
+        <p class="empty-text">{{ 'common.tiles.experiences.empty' | transloco }}</p>
+      </div>
+    } @else {
+      <div class="experience-list">
+        @for (experience of experiences(); track experience.trackId || experience.productCode) {
+          <div class="experience-item">
+            @if (getExperienceImage(experience)) {
+              <img class="experience-avatar" [src]="getExperienceImage(experience)!" [alt]="getExperienceTitle(experience)" />
+            } @else {
+              <div class="experience-avatar experience-avatar--fallback">
+                <mat-icon>local_activity</mat-icon>
+              </div>
+            }
+            <div class="experience-text">
+              <span class="experience-title" [attr.title]="getExperienceTitle(experience)">
+                {{ getExperienceTitle(experience) }}
+              </span>
+              @if (getExperienceDuration(experience)) {
+                <span class="experience-subtitle">{{ getExperienceDuration(experience) }}</span>
+              }
+            </div>
+            <div class="experience-actions">
+              <button mat-icon-button type="button" (click)="removeExperience(experience, $event)"
+                [attr.aria-label]="'common.actions.remove' | transloco">
+                <mat-icon>bookmark_remove</mat-icon>
+              </button>
+              <button mat-icon-button type="button" (click)="openDetail(experience, $event)"
+                [attr.aria-label]="'common.actions.open' | transloco">
+                <mat-icon>expand_content</mat-icon>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-icon-button class="action-close" (click)="close()" [attr.aria-label]="'common.actions.close' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+  <button mat-icon-button type="button" (click)="help.open('experienceSearch')"
+    [attr.aria-label]="'common.actions.help' | transloco">
+    <mat-icon>help</mat-icon>
+  </button>
+  <button mat-icon-button color="primary" type="button" (click)="openSearch()"
+    [attr.aria-label]="'common.actions.add' | transloco">
+    <mat-icon>bookmark_add</mat-icon>
+  </button>
+</mat-dialog-actions>
