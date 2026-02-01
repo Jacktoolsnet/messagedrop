@@ -191,6 +191,10 @@ export class ViatorService {
       ? Array.from(new Set(productCodes.map((code) => String(code).trim()).filter(Boolean)))
       : [];
     const url = `${environment.apiUrl}/viator/suppliers/search/product-codes`;
+    const options = {
+      ...this.httpOptions,
+      headers: this.httpOptions.headers.set('x-skip-ui', 'true')
+    };
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
       title: this.i18n.t('common.viator.title'),
@@ -203,7 +207,7 @@ export class ViatorService {
       autoclose: false
     });
 
-    return this.http.post<ViatorSuppliersResponse>(url, { productCodes: codes }, this.httpOptions)
+    return this.http.post<ViatorSuppliersResponse>(url, { productCodes: codes }, options)
       .pipe(catchError(this.handleError));
   }
 }
