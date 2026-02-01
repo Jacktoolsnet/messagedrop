@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, effect, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent } from '@angular/material/dialog';
@@ -6,6 +6,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
+import { DisplayMessageConfig } from '../../interfaces/display-message-config';
 import {
   ExperienceListDialogData,
   ExperienceResult,
@@ -13,7 +14,10 @@ import {
   ViatorProductSearchResponse
 } from '../../interfaces/viator';
 import { TranslationHelperService } from '../../services/translation-helper.service';
+import { ExperienceBookmarkService } from '../../services/experience-bookmark.service';
+import { UserService } from '../../services/user.service';
 import { ViatorService } from '../../services/viator.service';
+import { DisplayMessage } from '../utils/display-message/display-message.component';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { ExperienceSearchDetailDialogComponent } from '../utils/experience-search/detail-dialog/experience-search-detail-dialog.component';
@@ -66,6 +70,8 @@ export class ExperiencelistComponent implements OnInit {
   private readonly i18n = inject(TranslationHelperService);
   private readonly transloco = inject(TranslocoService);
   private readonly dialog = inject(MatDialog);
+  private readonly bookmarkService = inject(ExperienceBookmarkService);
+  private readonly userService = inject(UserService);
   readonly data = inject<ExperienceListDialogData>(MAT_DIALOG_DATA);
 
   readonly loading = signal(true);
@@ -73,6 +79,11 @@ export class ExperiencelistComponent implements OnInit {
   readonly results = signal<ExperienceResult[]>([]);
 
   ngOnInit(): void {
+    effect(() => {
+      if (this.userService.hasJwt()) {
+        this.bookmarkService.ensureLoaded().catch(() => undefined);
+      }
+    });
     void this.loadResults();
   }
 
@@ -162,6 +173,126 @@ export class ExperiencelistComponent implements OnInit {
     } catch {
       return `${result.priceFrom} ${currency}`;
     }
+  }
+
+  isBookmarked(result: ExperienceResult): boolean {
+    if (!this.userService.hasJwt()) return false;
+    const productCode = result.productCode;
+    if (!productCode) return false;
+    return this.bookmarkService.bookmarksSignal().some((bookmark) => bookmark.productCode === productCode);
+  }
+
+  onToggleBookmark(result: ExperienceResult, event?: Event): void {
+    event?.stopPropagation();
+    const productCode = result.productCode;
+    if (!productCode) {
+      return;
+    }
+
+    const saveBookmark = async () => {
+      await this.bookmarkService.saveBookmark(productCode, {
+        ...result,
+        productCode,
+        trackId: result.trackId || `viator:${productCode}`,
+        provider: 'viator'
+      }, Date.now());
+      this.showDisplayMessage('common.experiences.saveTitle', 'common.experiences.saveMessage', 'bookmark_add', true);
+    };
+
+    const removeBookmark = () =>
+      this.bookmarkService.removeBookmark(productCode).then(() => {
+        this.showDisplayMessage('common.experiences.saveRemovedTitle', 'common.experiences.saveRemovedMessage', 'bookmark_remove', true);
+      });
+
+    this.bookmarkService.hasBookmark(productCode)
+      .then((exists) => {
+        if (!this.userService.hasJwt()) {
+          this.userService.loginWithBackend(() => {
+            if (exists) {
+              this.showConfirmMessage(
+                'common.experiences.saveExistsTitle',
+                'common.experiences.saveExistsPrompt',
+                () => removeBookmark().catch(() => {
+                  this.showDisplayMessage('common.experiences.saveFailedTitle', 'common.experiences.saveFailedMessage', 'error', false);
+                })
+              );
+              return;
+            }
+            saveBookmark().catch(() => {
+              this.showDisplayMessage('common.experiences.saveFailedTitle', 'common.experiences.saveFailedMessage', 'error', false);
+            });
+          });
+          return;
+        }
+
+        if (exists) {
+          removeBookmark().catch(() => {
+            this.showDisplayMessage('common.experiences.saveFailedTitle', 'common.experiences.saveFailedMessage', 'error', false);
+          });
+          return;
+        }
+
+        saveBookmark().catch(() => {
+          this.showDisplayMessage('common.experiences.saveFailedTitle', 'common.experiences.saveFailedMessage', 'error', false);
+        });
+      })
+      .catch(() => {
+        this.showDisplayMessage('common.experiences.saveFailedTitle', 'common.experiences.saveFailedMessage', 'error', false);
+      });
+  }
+
+  private showDisplayMessage(titleKey: string, messageKey: string, icon: string, autoclose = true): void {
+    const config: DisplayMessageConfig = {
+      showAlways: true,
+      title: this.transloco.translate(titleKey),
+      image: '',
+      icon,
+      message: this.transloco.translate(messageKey),
+      button: this.transloco.translate('common.actions.ok'),
+      delay: autoclose ? 1000 : 0,
+      showSpinner: false,
+      autoclose
+    };
+    this.dialog.open(DisplayMessage, {
+      closeOnNavigation: false,
+      data: config,
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+  }
+
+  private showConfirmMessage(titleKey: string, messageKey: string, onConfirm: () => void): void {
+    const config: DisplayMessageConfig = {
+      showAlways: true,
+      title: this.transloco.translate(titleKey),
+      image: '',
+      icon: 'bookmark_added',
+      message: this.transloco.translate(messageKey),
+      button: this.transloco.translate('common.actions.yes'),
+      secondaryButton: this.transloco.translate('common.actions.no'),
+      delay: 0,
+      showSpinner: false,
+      autoclose: false
+    };
+    const dialogRef = this.dialog.open(DisplayMessage, {
+      closeOnNavigation: false,
+      data: config,
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === true) {
+        onConfirm();
+      }
+    });
   }
 }
 

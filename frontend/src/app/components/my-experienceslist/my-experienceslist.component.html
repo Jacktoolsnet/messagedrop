@@ -54,6 +54,12 @@
                   [attr.aria-label]="'common.experiences.showMore' | transloco">
                   <mat-icon>expand_content</mat-icon>
                 </button>
+                <button mat-mini-fab color="secondary" type="button" (click)="onToggleBookmark(bookmark.snapshot, $event)"
+                  [attr.aria-label]="isBookmarked(bookmark.snapshot)
+                    ? ('common.experiences.saveRemovedTitle' | transloco)
+                    : ('common.experiences.saveTitle' | transloco)">
+                  <mat-icon>{{ isBookmarked(bookmark.snapshot) ? 'bookmark_remove' : 'bookmark_add' }}</mat-icon>
+                </button>
                 <button mat-mini-fab color="primary" type="button" (click)="showOnMap(bookmark.snapshot)"
                   [disabled]="!hasDestination(bookmark.snapshot)"
                   [attr.aria-label]="'common.experiences.showOnMap' | transloco">
