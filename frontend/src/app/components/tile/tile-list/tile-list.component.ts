@@ -5,9 +5,11 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { MasonryItemDirective } from "../../../directives/masonry-item.directive";
 import { AvatarAttribution } from '../../../interfaces/avatar-attribution';
 import { Contact } from '../../../interfaces/contact';
+import { ExperienceTileContext } from '../../../interfaces/experience-tile-context';
 import { Place } from '../../../interfaces/place';
 import { TileSetting, normalizeTileSettings } from '../../../interfaces/tile-settings';
 import { ContactService } from '../../../services/contact.service';
+import { ExperienceBookmarkService } from '../../../services/experience-bookmark.service';
 import { PlaceService } from '../../../services/place.service';
 import { AirQualityTileComponent } from "../air-quality-tile/air-quality-tile.component";
 import { AnniversaryTileComponent } from "../anniversary-tile/anniversary-tile.component";
@@ -35,13 +37,37 @@ import { WeatherTileComponent } from "../weather-tile/weather-tile.component";
 export class TileListComponent {
   @Input() place?: Place;
   @Input() contact?: Contact;
+  @Input() experience?: ExperienceTileContext;
 
   private readonly dialog = inject(MatDialog);
   private readonly placeService = inject(PlaceService);
   private readonly contactService = inject(ContactService);
+  private readonly experienceBookmarkService = inject(ExperienceBookmarkService);
   private readonly cdr = inject(ChangeDetectorRef);
 
-  private readonly renderableTypes = new Set<TileSetting['type']>(['datetime', 'weather', 'airQuality', 'note', 'message', 'image', 'custom-text', 'custom-multitext', 'custom-date', 'custom-todo', 'custom-quickaction', 'custom-file', 'custom-migraine', 'custom-pollution']);
+  private readonly renderableTypes = new Set<TileSetting['type']>([
+    'datetime',
+    'weather',
+    'airQuality',
+    'note',
+    'message',
+    'image',
+    'custom-text',
+    'custom-multitext',
+    'custom-date',
+    'custom-todo',
+    'custom-quickaction',
+    'custom-file',
+    'custom-migraine',
+    'custom-pollution'
+  ]);
+  private readonly experienceRenderableTypes = new Set<TileSetting['type']>([
+    'custom-text',
+    'custom-multitext',
+    'custom-todo',
+    'custom-quickaction',
+    'custom-file'
+  ]);
 
   get resolvedPlace(): Place | undefined {
     if (!this.place) return undefined;
@@ -53,14 +79,24 @@ export class TileListComponent {
     return this.contactService.contactsSignal().find(c => c.id === this.contact?.id) ?? this.contact;
   }
 
+  get resolvedExperience(): ExperienceTileContext | undefined {
+    return this.experience;
+  }
+
   get visibleTiles(): TileSetting[] {
-    if (!this.place && !this.contact) return [];
+    if (!this.place && !this.contact && !this.experience) return [];
     const contact = this.resolvedContact;
     const place = this.resolvedPlace;
-    const sourceTiles = contact ? contact.tileSettings : place?.tileSettings;
-    const opts = contact ? { includeDefaults: false, includeSystem: false } : undefined;
+    const experience = this.resolvedExperience;
+    const sourceTiles = contact
+      ? contact.tileSettings
+      : place
+        ? place.tileSettings
+        : experience?.tileSettings;
+    const opts = contact || experience ? { includeDefaults: false, includeSystem: false } : undefined;
+    const allowed = experience ? this.experienceRenderableTypes : this.renderableTypes;
     return normalizeTileSettings(sourceTiles, opts)
-      .filter((tile: TileSetting) => tile.enabled && this.renderableTypes.has(tile.type));
+      .filter((tile: TileSetting) => tile.enabled && allowed.has(tile.type));
   }
 
   get hasVisibleTiles(): boolean {
@@ -94,8 +130,12 @@ export class TileListComponent {
   getTileBackgroundImage(): string {
     const contact = this.resolvedContact;
     const place = this.resolvedPlace;
+    const experience = this.resolvedExperience;
     if (contact?.chatBackgroundImage) {
       return `url(${contact.chatBackgroundImage})`;
+    }
+    if (experience?.imageUrl) {
+      return `url(${experience.imageUrl})`;
     }
     return place?.placeBackgroundImage ? `url(${place.placeBackgroundImage})` : 'none';
   }
@@ -103,13 +143,14 @@ export class TileListComponent {
   getTileBackgroundOpacity(): number {
     const contact = this.resolvedContact;
     const place = this.resolvedPlace;
+    const experience = this.resolvedExperience;
     if (contact?.chatBackgroundImage) {
       const transparency = contact.chatBackgroundTransparency ?? 40;
       const clamped = Math.min(Math.max(transparency, 0), 100);
       return 1 - clamped / 100;
     }
     if (!place?.placeBackgroundImage) {
-      return 0;
+      return experience?.imageUrl ? 0.9 : 0;
     }
     const transparency = place.placeBackgroundTransparency ?? 40;
     const clamped = Math.min(Math.max(transparency, 0), 100);
@@ -119,12 +160,13 @@ export class TileListComponent {
   openTileSettings(): void {
     const contact = this.resolvedContact;
     const place = this.resolvedPlace;
+    const experience = this.resolvedExperience;
     const dialogRef = this.dialog.open(TileSettingsComponent, {
       width: 'auto',
       minWidth: 'min(450px, 95vw)',
       maxWidth: '90vw',
       maxHeight: '90vh',
-      data: contact ? { contact } : { place },
+      data: contact ? { contact } : place ? { place } : { experience },
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
       disableClose: false,
@@ -148,6 +190,10 @@ export class TileListComponent {
         const updatedPlace = { ...place, tileSettings: normalized };
         this.place = updatedPlace;
         this.placeService.saveAdditionalPlaceInfos(updatedPlace);
+      } else if (experience?.productCode) {
+        const updatedExperience = { ...experience, tileSettings: normalized };
+        this.experience = updatedExperience;
+        void this.experienceBookmarkService.saveTileSettings(experience.productCode, normalized);
       }
       this.cdr.detectChanges();
     });

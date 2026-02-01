@@ -11,10 +11,12 @@ import { ExperienceBookmarkService } from '../../services/experience-bookmark.se
 import { GeolocationService } from '../../services/geolocation.service';
 import { MapService } from '../../services/map.service';
 import { ViatorService } from '../../services/viator.service';
+import { ExperienceTileContext } from '../../interfaces/experience-tile-context';
 import { ExperienceResult, ViatorDestinationLookup, ViatorProductDetail } from '../../interfaces/viator';
 import { MatDialog } from '@angular/material/dialog';
 import { ExperienceSearchDetailDialogComponent } from '../utils/experience-search/detail-dialog/experience-search-detail-dialog.component';
 import { Location } from '../../interfaces/location';
+import { TileListDialogComponent } from '../tile/tile-list-dialog/tile-list-dialog.component';
 
 @Component({
   selector: 'app-my-experienceslist',
@@ -64,6 +66,35 @@ export class MyExperienceslistComponent implements OnInit {
       maxWidth: '95vw',
       maxHeight: '95vh'
     });
+  }
+
+  async openTileList(result: ExperienceResult): Promise<void> {
+    const productCode = result.productCode || '';
+    if (!productCode) return;
+    const tileSettings = await this.bookmarkService.getTileSettings(productCode);
+    const experience: ExperienceTileContext = {
+      productCode,
+      title: result.title,
+      imageUrl: result.imageUrl,
+      tileSettings
+    };
+    this.dialog.open(TileListDialogComponent, {
+      data: { experience },
+      minWidth: 'min(500px, 95vw)',
+      maxWidth: '95vw',
+      width: 'min(900px, 95vw)',
+      maxHeight: '90vh',
+      height: 'auto',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+  }
+
+  tileListAriaLabel(result: ExperienceResult): string {
+    const name = result.title || result.productCode || this.transloco.translate('common.experiences.title');
+    return this.transloco.translate('common.tileList.openAria', { name });
   }
 
   onOpen(result: ExperienceResult): void {

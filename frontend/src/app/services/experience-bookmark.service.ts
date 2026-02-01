@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { ExperienceBookmark } from '../interfaces/experience-bookmark';
 import { ExperienceResult } from '../interfaces/viator';
+import { TileSetting } from '../interfaces/tile-settings';
 import { IndexedDbService } from './indexed-db.service';
 
 @Injectable({
@@ -46,6 +47,21 @@ export class ExperienceBookmarkService {
     if (!productCode) return false;
     const existing = await this.indexedDb.getExperienceBookmark(productCode);
     return Boolean(existing);
+  }
+
+  async getTileSettings(productCode: string): Promise<TileSetting[] | undefined> {
+    if (!productCode) return undefined;
+    return this.indexedDb.getTileSettings(productCode);
+  }
+
+  async saveTileSettings(productCode: string, tileSettings: TileSetting[]): Promise<void> {
+    if (!productCode) return;
+    await this.indexedDb.setTileSettings(productCode, tileSettings);
+  }
+
+  async deleteTileSettings(productCode: string): Promise<void> {
+    if (!productCode) return;
+    await this.indexedDb.deleteTileSettings(productCode);
   }
 
   ensureLoaded(): Promise<void> {

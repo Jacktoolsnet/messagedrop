@@ -4,6 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, Ma
 import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Contact } from '../../../interfaces/contact';
+import { ExperienceTileContext } from '../../../interfaces/experience-tile-context';
 import { Place } from '../../../interfaces/place';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
@@ -28,7 +29,7 @@ import { TileListComponent } from '../tile-list/tile-list.component';
 export class TileListDialogComponent {
   private readonly translation = inject(TranslationHelperService);
   readonly help = inject(HelpDialogService);
-  readonly data = inject<{ contact?: Contact; place?: Place }>(MAT_DIALOG_DATA);
+  readonly data = inject<{ contact?: Contact; place?: Place; experience?: ExperienceTileContext }>(MAT_DIALOG_DATA);
 
   @ViewChild(TileListComponent) private tileList?: TileListComponent;
 
@@ -40,27 +41,45 @@ export class TileListDialogComponent {
     return this.data.place;
   }
 
+  get experience(): ExperienceTileContext | undefined {
+    return this.data.experience;
+  }
+
   get tileSettingsAriaLabel(): string {
     if (this.contact) {
       const name = this.contact.name || this.translation.t('common.contact.profile.nameFallback');
       return this.translation.t('common.contact.profile.tileSettingsAria', { name });
     }
 
-    const name = this.place?.name || this.translation.t('common.placeSettings.nameFallback');
-    return this.translation.t('common.placeSettings.openTileSettingsAria', { name });
-  }
-
-  getPlaceHeaderBackgroundImage(): string {
-    return this.place?.placeBackgroundImage ? `url(${this.place.placeBackgroundImage})` : 'none';
-  }
-
-  getPlaceHeaderBackgroundOpacity(): number {
-    if (!this.place?.placeBackgroundImage) {
-      return 0;
+    if (this.place) {
+      const name = this.place.name || this.translation.t('common.placeSettings.nameFallback');
+      return this.translation.t('common.placeSettings.openTileSettingsAria', { name });
     }
-    const transparency = this.place.placeBackgroundTransparency ?? 40;
-    const clamped = Math.min(Math.max(transparency, 0), 100);
-    return 1 - clamped / 100;
+
+    const name = this.experience?.title || this.experience?.productCode || this.translation.t('common.experiences.title');
+    return this.translation.t('common.experiences.tileSettingsAria', { name });
+  }
+
+  getHeaderBackgroundImage(): string {
+    if (this.place?.placeBackgroundImage) {
+      return `url(${this.place.placeBackgroundImage})`;
+    }
+    if (this.experience?.imageUrl) {
+      return `url(${this.experience.imageUrl})`;
+    }
+    return 'none';
+  }
+
+  getHeaderBackgroundOpacity(): number {
+    if (this.place?.placeBackgroundImage) {
+      const transparency = this.place.placeBackgroundTransparency ?? 40;
+      const clamped = Math.min(Math.max(transparency, 0), 100);
+      return 1 - clamped / 100;
+    }
+    if (this.experience?.imageUrl) {
+      return 0.9;
+    }
+    return 0;
   }
 
   openTileSettings(): void {

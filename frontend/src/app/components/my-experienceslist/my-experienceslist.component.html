@@ -59,6 +59,10 @@
                   [attr.aria-label]="'common.experiences.showOnMap' | transloco">
                   <mat-icon>place</mat-icon>
                 </button>
+                <button mat-mini-fab color="primary" type="button" (click)="openTileList(bookmark.snapshot)"
+                  [attr.aria-label]="tileListAriaLabel(bookmark.snapshot)">
+                  <mat-icon>dashboard</mat-icon>
+                </button>
               </div>
               <div class="tile-actions__right">
                 <button mat-mini-fab color="primary" type="button" (click)="openInMaps(bookmark.snapshot)"

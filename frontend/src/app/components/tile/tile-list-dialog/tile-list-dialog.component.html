@@ -1,6 +1,6 @@
 <h2 mat-dialog-title class="tile-dialog-title"
-  [style.--place-header-bg-image]="getPlaceHeaderBackgroundImage()"
-  [style.--place-header-bg-opacity]="getPlaceHeaderBackgroundOpacity()">
+  [style.--place-header-bg-image]="getHeaderBackgroundImage()"
+  [style.--place-header-bg-opacity]="getHeaderBackgroundOpacity()">
   @if (contact) {
     <span class="tile-dialog-title__avatar">
       @if (contact.base64Avatar) {
@@ -21,11 +21,21 @@
       }
     </span>
     <span class="tile-dialog-title__text">{{ place.name || ('common.placeList.nameFallback' | transloco) }}</span>
+  } @else if (experience) {
+    <span class="tile-dialog-title__avatar">
+      @if (experience.imageUrl) {
+        <img class="tile-dialog-title__image" [src]="experience.imageUrl"
+          [attr.alt]="experience.title || experience.productCode || ''" />
+      } @else {
+        <mat-icon aria-hidden="true">local_activity</mat-icon>
+      }
+    </span>
+    <span class="tile-dialog-title__text">{{ experience.title || experience.productCode || ('common.experiences.title' | transloco) }}</span>
   }
 </h2>
 
 <mat-dialog-content class="tile-dialog-content">
-  <app-tile-list [contact]="contact" [place]="place"></app-tile-list>
+  <app-tile-list [contact]="contact" [place]="place" [experience]="experience"></app-tile-list>
 </mat-dialog-content>
 
 <mat-dialog-actions class="tile-dialog-actions">

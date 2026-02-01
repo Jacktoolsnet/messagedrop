@@ -8,9 +8,11 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Contact } from '../../../interfaces/contact';
+import { ExperienceTileContext } from '../../../interfaces/experience-tile-context';
 import { Place } from '../../../interfaces/place';
 import { TileSetting, normalizeTileSettings } from '../../../interfaces/tile-settings';
 import { ContactService } from '../../../services/contact.service';
+import { ExperienceBookmarkService } from '../../../services/experience-bookmark.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 import { AnniversaryTileEditComponent } from '../anniversary-tile/anniversary-tile-edit/anniversary-tile-edit.component';
@@ -47,13 +49,15 @@ export class TileSettingsComponent {
   private readonly dialogRef = inject(MatDialogRef<TileSettingsComponent>);
   private readonly dialog = inject(MatDialog);
   private readonly contactService = inject(ContactService);
+  private readonly experienceBookmarkService = inject(ExperienceBookmarkService);
   private readonly translation = inject(TranslationHelperService);
   readonly help = inject(HelpDialogService);
-  readonly data = inject<{ place?: Place; contact?: Contact }>(MAT_DIALOG_DATA);
+  readonly data = inject<{ place?: Place; contact?: Contact; experience?: ExperienceTileContext }>(MAT_DIALOG_DATA);
 
   private readonly isPlaceContext = !!this.data.place;
+  private readonly isExperienceContext = !!this.data.experience;
   readonly tileSettings = signal<TileSetting[]>(normalizeTileSettings(
-    this.data.place?.tileSettings ?? this.data.contact?.tileSettings,
+    this.data.place?.tileSettings ?? this.data.contact?.tileSettings ?? this.data.experience?.tileSettings,
     { includeDefaults: this.isPlaceContext, includeSystem: this.isPlaceContext }
   ).filter(tile => tile.type !== 'custom-link'));
   readonly addableTiles: { type: TileSetting['type']; labelKey: string; icon: string }[] = [
@@ -331,6 +335,10 @@ export class TileSettingsComponent {
     if (this.data.contact) {
       this.data.contact.tileSettings = normalized;
       this.contactService.saveContactTileSettings(this.data.contact);
+    }
+    if (this.data.experience?.productCode) {
+      this.data.experience.tileSettings = normalized;
+      void this.experienceBookmarkService.saveTileSettings(this.data.experience.productCode, normalized);
     }
     this.dialogRef.close(normalized);
   }
