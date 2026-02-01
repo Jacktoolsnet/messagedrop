@@ -109,6 +109,12 @@ export class ExperienceMapService {
     }
   }
 
+  async getDestinationById(id: number): Promise<ViatorDestinationLookup | undefined> {
+    if (!id) return undefined;
+    await this.ensureDestinationsLoaded();
+    return this.destinations.find((dest) => dest.destinationId === id);
+  }
+
   async getDestinationForLocation(location: Location): Promise<ViatorDestinationLookup | null> {
     if (!location) return null;
     await this.ensureDestinationsLoaded();

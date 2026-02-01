@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
@@ -48,10 +48,23 @@ export class MyExperienceslistComponent implements OnInit {
   private readonly userService = inject(UserService);
   private readonly dialog = inject(MatDialog);
   private readonly dialogRef = inject(MatDialogRef<MyExperienceslistComponent>);
+  private readonly dialogData = inject<{ experiences?: ExperienceResult[] } | null>(MAT_DIALOG_DATA, { optional: true });
 
   readonly loading = signal(true);
   readonly bookmarks = this.bookmarkService.bookmarksSignal;
-  readonly hasBookmarks = computed(() => this.bookmarks().length > 0);
+  private readonly filterCodes = new Set<string>(
+    (this.dialogData?.experiences ?? [])
+      .map((experience) => experience.productCode)
+      .filter((code): code is string => Boolean(code))
+  );
+  readonly visibleBookmarks = computed(() => {
+    const all = this.bookmarks();
+    if (!this.filterCodes.size) {
+      return all;
+    }
+    return all.filter((bookmark) => this.filterCodes.has(bookmark.productCode));
+  });
+  readonly hasBookmarks = computed(() => this.visibleBookmarks().length > 0);
   private readonly destinationCache = new Map<number, ViatorDestinationLookup>();
 
   async ngOnInit(): Promise<void> {

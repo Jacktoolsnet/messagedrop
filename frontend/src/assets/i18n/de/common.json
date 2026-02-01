@@ -314,11 +314,12 @@
       "multiMarker": {
         "showMessages": "Nachrichten anzeigen",
         "showNotes": "Notizen anzeigen",
-        "showImages": "Bilder anzeigen",
-        "showDocuments": "Dokumente anzeigen",
-        "showExperiences": "Erlebnisse"
-      }
-    },
+      "showImages": "Bilder anzeigen",
+      "showDocuments": "Dokumente anzeigen",
+      "showExperiences": "Erlebnisse",
+      "showMyExperiences": "Meine Erlebnisse"
+    }
+  },
     "messageList": {
       "myTitle": "Meine öffentlichen Nachrichten",
       "addFirstMessage": "Erste öffentliche Nachricht hinzufügen",
@@ -873,7 +874,8 @@
       "privateNotes": "Private Notizen",
       "privateImages": "Private Bilder",
       "privateDocuments": "Private Dokumente",
-      "experiences": "Erlebnisse"
+      "experiences": "Erlebnisse",
+      "myExperiences": "Meine Erlebnisse"
     }
   },
     "place": {

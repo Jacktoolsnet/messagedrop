@@ -37,4 +37,12 @@
     {{ 'common.map.multiMarker.showExperiences' | transloco }}
   </button>
   }
+  @if (data.myExperiences.length) {
+  <button mat-stroked-button [mat-dialog-close]="{type: 'my_experience', experiences: data.myExperiences}"
+    matBadge="{{data.myExperiences.length | shortNumber}}" matBadgePosition="after" matBadgeColor="accent"
+    matBadgeOverlap="true">
+    <mat-icon>bookmark_star</mat-icon>
+    {{ 'common.map.multiMarker.showMyExperiences' | transloco }}
+  </button>
+  }
 </mat-dialog-content>

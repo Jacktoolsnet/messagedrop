@@ -12,7 +12,7 @@ import { LocalDocument } from '../../../interfaces/local-document';
 import { LocalImage } from '../../../interfaces/local-image';
 import { Message } from '../../../interfaces/message';
 import { Note } from '../../../interfaces/note';
-import { ViatorDestinationLookup } from '../../../interfaces/viator';
+import { ExperienceResult, ViatorDestinationLookup } from '../../../interfaces/viator';
 import { ShortNumberPipe } from '../../../pipes/short-number.pipe';
 
 @Component({
@@ -40,5 +40,6 @@ export class MultiMarkerComponent {
         images: LocalImage[];
         documents: LocalDocument[];
         experiences: ViatorDestinationLookup[];
+        myExperiences: ExperienceResult[];
     }>(MAT_DIALOG_DATA);
 }

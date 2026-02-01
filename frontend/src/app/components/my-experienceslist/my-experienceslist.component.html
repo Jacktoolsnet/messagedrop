@@ -11,7 +11,7 @@
       </div>
     } @else {
       <div class="results" role="list">
-        @for (bookmark of bookmarks(); track bookmark.productCode) {
+        @for (bookmark of visibleBookmarks(); track bookmark.productCode) {
           <mat-card class="experience-tile" role="listitem">
             <div class="tile-header"
               [style.--experience-header-bg-image]="getExperienceHeaderBackgroundImage(bookmark.snapshot)"

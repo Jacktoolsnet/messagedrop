@@ -64,6 +64,7 @@ import { NotificationAction } from './interfaces/notification-action';
 import { Place } from './interfaces/place';
 import { PlusCodeArea } from './interfaces/plus-code-area';
 import { DEFAULT_SEARCH_SETTINGS, SearchSettings } from './interfaces/search-settings';
+import { ExperienceBookmarkService } from './services/experience-bookmark.service';
 import { SharedContent } from './interfaces/shared-content';
 import { ExperienceResult, ViatorDestinationLookup } from './interfaces/viator';
 import { ExperiencelistComponent } from './components/experiencelist/experiencelist.component';
@@ -158,6 +159,7 @@ export class AppComponent implements OnInit {
   private readonly localDocumentService = inject(LocalDocumentService);
   private readonly messageService = inject(MessageService);
   private readonly experienceMapService = inject(ExperienceMapService);
+  private readonly experienceBookmarkService = inject(ExperienceBookmarkService);
   private readonly airQualityService = inject(AirQualityService);
   private readonly weatherService = inject(WeatherService);
   private readonly geoStatisticService = inject(GeoStatisticService);
@@ -192,6 +194,7 @@ export class AppComponent implements OnInit {
 
   private markerMessageListOpen = false;
   private experienceDestinationsInView: ViatorDestinationLookup[] = [];
+  private myExperienceLocationsInView: { result: ExperienceResult; location: Location }[] = [];
 
   constructor() {
     this.setupExitBackupPrompt();
@@ -709,10 +712,12 @@ export class AppComponent implements OnInit {
     const isNotesEnabled = settings.privateNotes.enabled;
     const isImagesEnabled = settings.privateImages.enabled;
     const isDocumentsEnabled = settings.privateDocuments.enabled;
+    const isMyExperiencesEnabled = settings.myExperiences.enabled;
     const canSearchMessages = isMessagesEnabled && zoom >= settings.publicMessages.minZoom;
     const canSearchNotes = isNotesEnabled && zoom >= settings.privateNotes.minZoom;
     const canSearchImages = isImagesEnabled && zoom >= settings.privateImages.minZoom;
     const canSearchDocuments = isDocumentsEnabled && zoom >= settings.privateDocuments.minZoom;
+    const canSearchMyExperiences = isMyExperiencesEnabled && zoom >= settings.myExperiences.minZoom;
     // notes from local device
     if (this.userService.isReady()) {
       if (canSearchNotes) {
@@ -743,6 +748,7 @@ export class AppComponent implements OnInit {
     }
 
     await this.updateExperiencePins(settings, ignoreSearchSettings, zoom);
+    await this.updateMyExperiencePins(settings, ignoreSearchSettings, zoom, canSearchMyExperiences);
     this.createMarkerLocations();
   }
 
@@ -757,7 +763,8 @@ export class AppComponent implements OnInit {
       privateNotes: { ...DEFAULT_SEARCH_SETTINGS.privateNotes, ...(settings?.privateNotes ?? {}) },
       privateImages: { ...DEFAULT_SEARCH_SETTINGS.privateImages, ...(settings?.privateImages ?? {}) },
       privateDocuments: { ...DEFAULT_SEARCH_SETTINGS.privateDocuments, ...(settings?.privateDocuments ?? {}) },
-      experiences: { ...DEFAULT_SEARCH_SETTINGS.experiences, ...(settings?.experiences ?? {}) }
+      experiences: { ...DEFAULT_SEARCH_SETTINGS.experiences, ...(settings?.experiences ?? {}) },
+      myExperiences: { ...DEFAULT_SEARCH_SETTINGS.myExperiences, ...(settings?.myExperiences ?? {}) }
     };
   }
 
@@ -801,8 +808,18 @@ export class AppComponent implements OnInit {
       case MarkerType.EXPERIENCE_DESTINATION:
         this.openMarkerExperienceListDialog(event.experiences ?? []);
         break;
+      case MarkerType.MY_EXPERIENCE:
+        this.openMarkerMyExperienceListDialog(event.myExperiences ?? []);
+        break;
       case MarkerType.MULTI:
-        this.openMarkerMultiDialog(event.messages, event.notes, event.images, event.documents, event.experiences ?? []);
+        this.openMarkerMultiDialog(
+          event.messages,
+          event.notes,
+          event.images,
+          event.documents,
+          event.experiences ?? [],
+          event.myExperiences ?? []
+        );
         break;
     }
   }
@@ -1217,10 +1234,11 @@ export class AppComponent implements OnInit {
     notes: Note[],
     images: LocalImage[],
     documents: LocalDocument[],
-    experiences: ViatorDestinationLookup[]
+    experiences: ViatorDestinationLookup[],
+    myExperiences: ExperienceResult[]
   ) {
     const dialogRef = this.dialog.open(MultiMarkerComponent, {
-      data: { messages: messages, notes: notes, images: images, documents: documents, experiences: experiences },
+      data: { messages: messages, notes: notes, images: images, documents: documents, experiences: experiences, myExperiences: myExperiences },
       closeOnNavigation: true,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
@@ -1251,8 +1269,26 @@ export class AppComponent implements OnInit {
           case 'experience':
             this.openMarkerExperienceListDialog(result.experiences ?? []);
             break
+          case 'my_experience':
+            this.openMarkerMyExperienceListDialog(result.experiences ?? []);
+            break
         }
       }
+    });
+  }
+
+  private openMarkerMyExperienceListDialog(experiences: ExperienceResult[]): void {
+    if (!experiences.length) {
+      return;
+    }
+    this.dialog.open(MyExperienceslistComponent, {
+      data: { experiences },
+      panelClass: 'pin-dialog',
+      backdropClass: 'dialog-backdrop',
+      closeOnNavigation: false,
+      maxWidth: '80vw',
+      maxHeight: '75vh',
+      autoFocus: false
     });
   }
 
@@ -2018,6 +2054,41 @@ export class AppComponent implements OnInit {
       }
     });
 
+    // Process my experiences
+    this.myExperienceLocationsInView.forEach(({ result, location }) => {
+      if (this.mapService.getMapZoom() > 17) {
+        center = location;
+      } else {
+        const groupedPlusCode = this.geolocationService.getGroupedPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());
+        const plusCodeArea: PlusCodeArea = this.geolocationService.getGridFromPlusCode(groupedPlusCode);
+        center = {
+          latitude: plusCodeArea.latitudeCenter,
+          longitude: plusCodeArea.longitudeCenter,
+          plusCode: groupedPlusCode
+        };
+      }
+      if (this.markerLocations.has(center.plusCode)) {
+        const existing = this.markerLocations.get(center.plusCode)!;
+        if (!existing.myExperiences) {
+          existing.myExperiences = [];
+        }
+        existing.myExperiences.push(result);
+        if (existing.type !== MarkerType.MY_EXPERIENCE) {
+          existing.type = MarkerType.MULTI;
+        }
+      } else {
+        this.markerLocations.set(center.plusCode, {
+          location: center,
+          messages: [],
+          notes: [],
+          images: [],
+          documents: [],
+          myExperiences: [result],
+          type: MarkerType.MY_EXPERIENCE
+        });
+      }
+    });
+
     // Save last markerupdet to fire the angular change listener
     this.lastMarkerUpdate = Date.now();
   }
@@ -2034,6 +2105,61 @@ export class AppComponent implements OnInit {
       settings,
       ignoreSearchSettings
     );
+  }
+
+  private async updateMyExperiencePins(
+    settings: SearchSettings,
+    ignoreSearchSettings: boolean,
+    zoom: number,
+    canSearchMyExperiences: boolean
+  ): Promise<void> {
+    if (!this.userService.isReady()) {
+      this.myExperienceLocationsInView = [];
+      return;
+    }
+    const enabled = ignoreSearchSettings ? true : settings.myExperiences.enabled;
+    const minZoom = ignoreSearchSettings
+      ? DEFAULT_SEARCH_SETTINGS.myExperiences.minZoom
+      : settings.myExperiences.minZoom;
+
+    if (!enabled || !canSearchMyExperiences || zoom < minZoom) {
+      this.myExperienceLocationsInView = [];
+      return;
+    }
+
+    await this.experienceBookmarkService.ensureLoaded().catch(() => undefined);
+    const bookmarks = this.experienceBookmarkService.bookmarksSignal();
+    const bbox = this.mapService.getVisibleMapBoundingBox();
+    const items: { result: ExperienceResult; location: Location }[] = [];
+
+    for (const bookmark of bookmarks) {
+      const snapshot = bookmark.snapshot;
+      const destinationId = Array.isArray(snapshot.destinationIds) ? snapshot.destinationIds[0] : undefined;
+      if (!destinationId) {
+        continue;
+      }
+      const destination = await this.experienceMapService.getDestinationById(destinationId);
+      const center = destination?.center;
+      if (!center || center.latitude === undefined || center.longitude === undefined) {
+        continue;
+      }
+      const latitude = center.latitude;
+      const longitude = center.longitude;
+      if (
+        latitude < bbox.latMin ||
+        latitude > bbox.latMax ||
+        longitude < bbox.lonMin ||
+        longitude > bbox.lonMax
+      ) {
+        continue;
+      }
+      const plusCode = destination?.plusCode || this.geolocationService.getPlusCode(latitude, longitude);
+      items.push({
+        result: snapshot,
+        location: { latitude, longitude, plusCode: plusCode || '' }
+      });
+    }
+    this.myExperienceLocationsInView = items;
   }
 
 }

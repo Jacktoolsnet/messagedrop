@@ -3,7 +3,8 @@ export type SearchSettingsKey =
   | 'privateNotes'
   | 'privateImages'
   | 'privateDocuments'
-  | 'experiences';
+  | 'experiences'
+  | 'myExperiences';
 
 export interface SearchSettingsEntry {
   enabled: boolean;
@@ -17,5 +18,6 @@ export const DEFAULT_SEARCH_SETTINGS: SearchSettings = {
   privateNotes: { enabled: true, minZoom: 3 },
   privateImages: { enabled: true, minZoom: 3 },
   privateDocuments: { enabled: true, minZoom: 3 },
-  experiences: { enabled: true, minZoom: 8 }
+  experiences: { enabled: true, minZoom: 8 },
+  myExperiences: { enabled: true, minZoom: 3 }
 };
