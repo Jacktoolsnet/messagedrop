@@ -261,9 +261,7 @@ export class AppComponent implements OnInit {
 
     effect(() => {
       this.contactService.contactsSet(); // track changes for unread badge
-      if (this.appService.isConsentCompleted() && this.userService.hasJwt()) {
-        this.refreshContactUnreadCounts();
-      } else {
+      if (!this.appService.isConsentCompleted() || !this.userService.hasJwt()) {
         this.unreadContactCounts.set({});
       }
     });
@@ -1207,6 +1205,9 @@ export class AppComponent implements OnInit {
     dialogRef.afterOpened().subscribe(() => {
       this.myHistory.push("contactList");
       window.history.replaceState(this.myHistory, '', '');
+      if (this.appService.isConsentCompleted() && this.userService.hasJwt()) {
+        this.refreshContactUnreadCounts();
+      }
     });
 
   }
