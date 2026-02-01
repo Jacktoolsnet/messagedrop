@@ -9,7 +9,8 @@ import {
   ViatorLocationsResponse,
   ViatorProductDetail,
   ViatorProductSearchRequest,
-  ViatorProductSearchResponse
+  ViatorProductSearchResponse,
+  ViatorSuppliersResponse
 } from '../interfaces/viator';
 import { NetworkService } from './network.service';
 import { TranslationHelperService } from './translation-helper.service';
@@ -182,6 +183,27 @@ export class ViatorService {
     });
 
     return this.http.post<ViatorLocationsResponse>(url, { locations }, this.httpOptions)
+      .pipe(catchError(this.handleError));
+  }
+
+  getSuppliersByProductCodes(productCodes: string[], showAlways = false): Observable<ViatorSuppliersResponse> {
+    const codes = Array.isArray(productCodes)
+      ? Array.from(new Set(productCodes.map((code) => String(code).trim()).filter(Boolean)))
+      : [];
+    const url = `${environment.apiUrl}/viator/suppliers/search/product-codes`;
+    this.networkService.setNetworkMessageConfig(url, {
+      showAlways,
+      title: this.i18n.t('common.viator.title'),
+      image: '',
+      icon: '',
+      message: this.i18n.t('common.viator.loading'),
+      button: '',
+      delay: 0,
+      showSpinner: true,
+      autoclose: false
+    });
+
+    return this.http.post<ViatorSuppliersResponse>(url, { productCodes: codes }, this.httpOptions)
       .pipe(catchError(this.handleError));
   }
 }

@@ -266,6 +266,13 @@
   gap: 0.25rem;
 }
 
+.detail-link {
+  color: var(--mat-app-text-color);
+  font-size: 0.85rem;
+  text-decoration: underline;
+  word-break: break-word;
+}
+
 .detail-location {
   padding: 0.25rem 0;
   display: flex;

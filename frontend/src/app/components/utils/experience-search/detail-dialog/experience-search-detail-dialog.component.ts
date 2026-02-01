@@ -5,6 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { firstValueFrom } from 'rxjs';
 import { DisplayMessageConfig } from '../../../../interfaces/display-message-config';
 import { Location } from '../../../../interfaces/location';
 import {
@@ -15,7 +16,9 @@ import {
   ViatorLocationsResponse,
   ViatorLogisticsPoint,
   ViatorPickupLocation,
-  ViatorProductDetail
+  ViatorProductDetail,
+  ViatorSupplierProductInfo,
+  ViatorSuppliersResponse
 } from '../../../../interfaces/viator';
 import { ViatorService } from '../../../../services/viator.service';
 import { ExperienceBookmarkService } from '../../../../services/experience-bookmark.service';
@@ -25,6 +28,7 @@ import { HelpDialogService } from '../../help-dialog/help-dialog.service';
 import { DisplayMessage } from '../../display-message/display-message.component';
 import { ExperienceResult } from '../../../../interfaces/viator';
 import { DialogHeaderComponent } from '../../dialog-header/dialog-header.component';
+import { TileQuickAction, TileSetting } from '../../../../interfaces/tile-settings';
 
 const DEFAULT_CENTER: Location = { latitude: 0, longitude: 0, plusCode: '' };
 
@@ -57,6 +61,8 @@ export class ExperienceSearchDetailDialogComponent {
 
   readonly loading = signal(false);
   readonly detail = signal<ViatorProductDetail | null>(null);
+  readonly supplierInfo = signal<ViatorSupplierProductInfo | null>(null);
+  readonly supplierAccessDenied = signal(false);
   readonly locationIndex = signal<Map<string, ViatorLocation>>(new Map());
   readonly mapMarkers = signal<ExperienceDetailMapMarker[]>([]);
   readonly mapCenter = signal<Location>(DEFAULT_CENTER);
@@ -83,6 +89,7 @@ export class ExperienceSearchDetailDialogComponent {
     readonly help: HelpDialogService
   ) {
     this.loadDetails();
+    this.loadSupplierInfo();
     this.loadBookmarksIfNeeded();
     effect(() => {
       this.userSet();
@@ -98,6 +105,10 @@ export class ExperienceSearchDetailDialogComponent {
 
   getExperienceHeaderBackgroundOpacity(): string {
     return this.data.result.imageUrl ? '0.9' : '0';
+  }
+
+  getAvatarUrl(): string | undefined {
+    return this.supplierInfo()?.logo || this.data.result.avatarUrl;
   }
 
   getDurationLabel(): string {
@@ -133,15 +144,22 @@ export class ExperienceSearchDetailDialogComponent {
     if (!productCode) {
       return;
     }
-    const saveBookmark = () =>
-      this.bookmarkService.saveBookmark(productCode, {
+    const saveBookmark = async () => {
+      const supplier = await this.getSupplierForBookmark();
+      const avatarUrl = supplier?.logo || this.data.result.avatarUrl;
+      await this.bookmarkService.saveBookmark(productCode, {
         ...this.data.result,
         productCode,
         trackId: this.data.result.trackId || `viator:${productCode}`,
-        provider: 'viator'
-      }, Date.now()).then(() => {
-        this.showDisplayMessage('common.experiences.saveTitle', 'common.experiences.saveMessage', 'bookmark_add');
-      });
+        provider: 'viator',
+        supplier: supplier ?? undefined,
+        avatarUrl
+      }, Date.now());
+      if (supplier) {
+        await this.ensureSupplierActionTile(productCode, supplier);
+      }
+      this.showDisplayMessage('common.experiences.saveTitle', 'common.experiences.saveMessage', 'bookmark_add');
+    };
 
     const removeBookmark = () =>
       this.bookmarkService.removeBookmark(productCode).then(() => {
@@ -267,6 +285,110 @@ export class ExperienceSearchDetailDialogComponent {
           this.loading.set(false);
         }
       });
+  }
+
+  private loadSupplierInfo(): void {
+    const productCode = this.data.result.productCode;
+    if (!productCode) {
+      return;
+    }
+    this.viatorService.getSuppliersByProductCodes([productCode], false)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response: ViatorSuppliersResponse) => {
+          const supplier = response?.suppliers?.find((item) => item?.productCode === productCode) || response?.suppliers?.[0] || null;
+          this.supplierInfo.set(supplier ?? null);
+          this.supplierAccessDenied.set(false);
+          if (supplier?.logo && !this.data.result.avatarUrl) {
+            this.data.result.avatarUrl = supplier.logo;
+          }
+        },
+        error: (err) => {
+          if (err?.status === 403) {
+            this.supplierAccessDenied.set(true);
+          }
+        }
+      });
+  }
+
+  private async getSupplierForBookmark(): Promise<ViatorSupplierProductInfo | null> {
+    const productCode = this.data.result.productCode;
+    if (!productCode) {
+      return null;
+    }
+    const cached = this.supplierInfo();
+    if (cached) {
+      return cached;
+    }
+    try {
+      const response = await firstValueFrom(this.viatorService.getSuppliersByProductCodes([productCode], false));
+      const supplier = response?.suppliers?.find((item) => item?.productCode === productCode) || response?.suppliers?.[0] || null;
+      if (supplier) {
+        this.supplierInfo.set(supplier);
+      }
+      return supplier ?? null;
+    } catch {
+      return null;
+    }
+  }
+
+  private async ensureSupplierActionTile(productCode: string, supplier: ViatorSupplierProductInfo): Promise<void> {
+    const contact = supplier?.contact;
+    if (!contact || (!contact.email && !contact.phone)) {
+      return;
+    }
+
+    const existing = await this.bookmarkService.getTileSettings(productCode);
+    if (existing?.some((tile) => tile.id === 'supplier-actions')) {
+      return;
+    }
+
+    const actions: TileQuickAction[] = [];
+    if (contact.email) {
+      actions.push({
+        id: `supplier-email-${productCode}`,
+        label: contact.email,
+        type: 'email',
+        value: contact.email,
+        icon: 'mail',
+        order: actions.length
+      });
+    }
+    if (contact.phone) {
+      actions.push({
+        id: `supplier-phone-${productCode}`,
+        label: contact.phone,
+        type: 'phone',
+        value: contact.phone,
+        icon: 'phone',
+        order: actions.length
+      });
+    }
+
+    if (!actions.length) {
+      return;
+    }
+
+    const label = this.transloco.translate('common.experiences.supplierActions');
+    const supplierTile: TileSetting = {
+      id: 'supplier-actions',
+      type: 'custom-quickaction',
+      label,
+      enabled: true,
+      order: 0,
+      custom: true,
+      payload: {
+        title: label,
+        icon: 'support_agent',
+        actions
+      }
+    };
+
+    const next = [supplierTile, ...(existing ?? [])].map((tile, index) => ({
+      ...tile,
+      order: index
+    }));
+    await this.bookmarkService.saveTileSettings(productCode, next);
   }
 
   private loadLocations(references: string[]): void {

@@ -92,6 +92,7 @@ export interface ExperienceResult {
   productCode?: string;
   destinationIds?: number[];
   avatarUrl?: string;
+  supplier?: ViatorSupplierProductInfo;
   title?: string;
   description?: string;
   rating?: number;
@@ -202,6 +203,26 @@ export interface ViatorLocation {
 
 export interface ViatorLocationsResponse {
   locations: ViatorLocation[];
+}
+
+export interface ViatorSupplierContact {
+  email?: string;
+  address?: string;
+  phone?: string;
+  countryCode?: string;
+}
+
+export interface ViatorSupplierProductInfo {
+  reference: string;
+  name: string;
+  type: string;
+  logo?: string;
+  productCode: string;
+  contact?: ViatorSupplierContact;
+}
+
+export interface ViatorSuppliersResponse {
+  suppliers: ViatorSupplierProductInfo[];
 }
 
 export interface ViatorLocationReference {

@@ -30,7 +30,8 @@ const CACHE_TTLS = {
   productsSearch: 60 * 15, // 15m
   productDetail: 60 * 60 * 24, // 1d
   availabilitySchedules: 60 * 30, // 30m
-  locationsBulk: 60 * 60 * 24 * 30 // 30d
+  locationsBulk: 60 * 60 * 24 * 30, // 30d
+  suppliers: 60 * 60 * 24 * 7 // 7d
 };
 
 const ALLOWED_ENDPOINTS = [
@@ -43,7 +44,8 @@ const ALLOWED_ENDPOINTS = [
   { method: 'POST', pattern: /^\/attractions\/search$/, cacheTtl: CACHE_TTLS.attractionsSearch },
   { method: 'GET', pattern: /^\/attractions\/[^/]+$/, cacheTtl: CACHE_TTLS.attractionsDetail },
   { method: 'GET', pattern: /^\/availability\/schedules\/[^/]+$/, cacheTtl: CACHE_TTLS.availabilitySchedules },
-  { method: 'POST', pattern: /^\/locations\/bulk$/, cacheTtl: CACHE_TTLS.locationsBulk }
+  { method: 'POST', pattern: /^\/locations\/bulk$/, cacheTtl: CACHE_TTLS.locationsBulk },
+  { method: 'POST', pattern: /^\/suppliers\/search\/product-codes$/, cacheTtl: CACHE_TTLS.suppliers }
 ];
 
 function getEndpointConfig(method, path) {
@@ -327,7 +329,19 @@ function normalizeDestinationTypes(input) {
     .filter(Boolean);
 }
 
-router.use(security.checkToken);
+const PUBLIC_ENDPOINTS = [
+  { method: 'GET', pattern: /^\/destinations$/ },
+  { method: 'GET', pattern: /^\/destinations\/all$/ },
+  { method: 'POST', pattern: /^\/suppliers\/search\/product-codes$/ }
+];
+
+router.use((req, res, next) => {
+  const isPublic = PUBLIC_ENDPOINTS.some((entry) => entry.method === req.method && entry.pattern.test(req.path));
+  if (isPublic) {
+    return next();
+  }
+  return security.checkToken(req, res, next);
+});
 router.use(express.json({ limit: MAX_BODY_BYTES }));
 
 router.get('/destinations', (req, res, next) => {
@@ -441,6 +455,14 @@ router.use(async (req, res, next) => {
         method: req.method,
         path: req.path,
         status: upstream.status
+      });
+    }
+    if (upstream.status >= 400) {
+      req.logger?.warn?.('Viator upstream error response', {
+        method: req.method,
+        path: req.path,
+        status: upstream.status,
+        data: upstream.data
       });
     }
     logTiming(req.logger, {

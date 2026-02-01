@@ -10,8 +10,8 @@
     <div class="detail-hero" [style.--detail-hero-bg-image]="getExperienceHeaderBackgroundImage()"
       [style.--detail-hero-bg-opacity]="getExperienceHeaderBackgroundOpacity()">
       <div class="identity-badge">
-        @if (data.result.avatarUrl) {
-        <img class="avatar" [src]="data.result.avatarUrl" [alt]="data.result.title || data.result.productCode || ''" />
+        @if (getAvatarUrl()) {
+        <img class="avatar" [src]="getAvatarUrl()" [alt]="data.result.title || data.result.productCode || ''" />
         } @else {
         <mat-icon>local_activity</mat-icon>
         }
@@ -49,6 +49,49 @@
         </p>
       </mat-card-content>
     </mat-card>
+
+    @if (supplierInfo() || supplierAccessDenied()) {
+    <mat-card class="detail-tile">
+      <div class="detail-tile__header">
+        <div class="detail-tile__header-left">
+          <mat-icon>support_agent</mat-icon>
+          <span class="detail-tile__title">{{ 'common.experiences.supplier' | transloco }}</span>
+        </div>
+      </div>
+      <mat-card-content class="detail-tile__body">
+        @if (supplierAccessDenied()) {
+          <div class="detail-section__body">
+            <div class="detail-subtile">
+              <div class="detail-subtile__body">
+                <span>{{ 'common.experiences.supplierUnavailable' | transloco }}</span>
+              </div>
+            </div>
+          </div>
+        } @else {
+          <div class="detail-section__body">
+            <div class="detail-subtile">
+              <div class="detail-subtile__header">
+                <div class="detail-subtile__meta">
+                  <span class="detail-subtile__title">{{ supplierInfo()?.name || ('common.experiences.supplier' | transloco) }}</span>
+                  @if (supplierInfo()?.contact?.address) {
+                    <div class="detail-subtile__address">{{ supplierInfo()?.contact?.address }}</div>
+                  }
+                </div>
+              </div>
+              <div class="detail-subtile__body">
+                @if (supplierInfo()?.contact?.email) {
+                  <a class="detail-link" [href]="'mailto:' + supplierInfo()?.contact?.email">{{ supplierInfo()?.contact?.email }}</a>
+                }
+                @if (supplierInfo()?.contact?.phone) {
+                  <a class="detail-link" [href]="'tel:' + supplierInfo()?.contact?.phone">{{ supplierInfo()?.contact?.phone }}</a>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+    }
 
     @if (sameStartEnd() && getCombinedPointItems().length) {
       <mat-card class="detail-tile">
