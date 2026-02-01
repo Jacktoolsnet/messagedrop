@@ -5,7 +5,7 @@
 
 <mat-dialog-content class="search-settings-content">
   <div class="search-settings-grid">
-    @for (item of items; track item.key) {
+    @for (item of items(); track item.key) {
     <div class="search-settings-tile">
       <div class="tile-header">
         <mat-icon aria-hidden="true">{{ item.icon }}</mat-icon>

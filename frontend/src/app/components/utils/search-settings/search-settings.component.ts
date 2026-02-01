@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
@@ -11,6 +11,7 @@ import { Location } from '../../../interfaces/location';
 import { DEFAULT_SEARCH_SETTINGS, SearchSettings, SearchSettingsKey } from '../../../interfaces/search-settings';
 import { HelpDialogService } from '../help-dialog/help-dialog.service';
 import { SearchSettingsMapPreviewComponent } from './search-settings-map-preview.component';
+import { UserService } from '../../../services/user.service';
 
 interface SearchSettingsItem {
   key: SearchSettingsKey;
@@ -46,10 +47,11 @@ interface SearchSettingsDialogData {
 export class SearchSettingsComponent {
   private readonly dialogRef = inject(MatDialogRef<SearchSettingsComponent>);
   private readonly dialogData = inject<SearchSettingsDialogData>(MAT_DIALOG_DATA);
+  private readonly userService = inject(UserService);
   readonly help = inject(HelpDialogService);
 
   readonly location = this.dialogData.location;
-  readonly items: SearchSettingsItem[] = [
+  private readonly allItems: SearchSettingsItem[] = [
     { key: 'publicMessages', icon: 'public', titleKey: 'common.searchSettings.items.publicMessages' },
     { key: 'privateNotes', icon: 'sticky_note_2', titleKey: 'common.searchSettings.items.privateNotes' },
     { key: 'privateImages', icon: 'image', titleKey: 'common.searchSettings.items.privateImages' },
@@ -57,6 +59,13 @@ export class SearchSettingsComponent {
     { key: 'experiences', icon: 'local_activity', titleKey: 'common.searchSettings.items.experiences' },
     { key: 'myExperiences', icon: 'bookmark_star', titleKey: 'common.searchSettings.items.myExperiences' }
   ];
+  readonly items = computed(() => {
+    this.userService.userSet();
+    if (this.userService.hasJwt()) {
+      return this.allItems;
+    }
+    return this.allItems.filter((item) => item.key === 'publicMessages' || item.key === 'experiences');
+  });
   readonly minZoom = 3;
   readonly maxZoom = 19;
 
