@@ -847,6 +847,7 @@
     "saveRemovedMessage": "Das Erlebnis wurde aus deiner Liste entfernt.",
     "saveFailedTitle": "Speichern fehlgeschlagen",
     "saveFailedMessage": "Bitte versuche es erneut.",
+    "showOnMap": "Auf Karte anzeigen",
       "select": "Auswählen",
       "loadMore": "Mehr laden",
       "searchFailed": "Suche fehlgeschlagen. Bitte erneut versuchen.",

@@ -225,7 +225,8 @@
 }
 
 .tile-actions__left .mat-mdc-mini-fab,
-.tile-actions__right .mat-mdc-raised-button {
+.tile-actions__right .mat-mdc-raised-button,
+.tile-actions__right .mat-mdc-mini-fab {
   box-shadow: 0 4px 10px color-mix(in srgb, var(--mat-card-outlined-outline-color) 55%, transparent);
 }
 

@@ -1,6 +1,5 @@
-<app-dialog-header
-  icon="@if (messageService.selectedMessagesSignal().length === 0) { speaker_notes } @else { forum }"
-  [title]="'common.tiles.messages.title' | transloco">
+<app-dialog-header icon="@if (messageService.selectedMessagesSignal().length === 0) { tooltip } @else { tooltip_2 }"
+    [title]="'common.tiles.messages.title' | transloco">
 </app-dialog-header>
 
 <mat-dialog-content class="message-dialog-content">
@@ -14,141 +13,148 @@
         <div class="content">
             @for (message of filteredMessagesSignal(); track message.id) {
             <mat-card class="item" appMasonryItem>
-            @if (this.userService.getUser().id === message.userId) {
-            <div class="avatar-box" role="button" tabindex="0"
-                (click)="!userService.isReady() ? openOwnProfileAfterLogin() : openOwnProfile()"
-                (keyup.enter)="!userService.isReady() ? openOwnProfileAfterLogin() : openOwnProfile()"
-                (keyup.space)="!userService.isReady() ? openOwnProfileAfterLogin() : openOwnProfile()">
-                @if (userProfile.base64Avatar) {
-                <img class="avatar" [src]="userProfile.base64Avatar"
-                    [attr.alt]="userProfile.name ? ('common.messageList.avatarAltName' | transloco:{ name: userProfile.name }) : ('common.messageList.avatarAltFallback' | transloco)" />
-                } @else {
-                <mat-icon>person</mat-icon>
-                }
-                <div class="avatar-text">
-                    <span class="name">{{ userProfile.name || ('common.messageList.myself' | transloco) }}</span>
-                    @if (message.createDateTime !== null) {
-                    <span class="timestamp-inline">{{ message.createDateTime | date:'medium' }}</span>
-                    }
-                </div>
-            </div>
-            } @else {
-            <div class="avatar-box" role="button" tabindex="0"
-                (click)="!userService.isReady() ? editMessageUserProfileAfterLogin(message) : editMessageUserProfile(message)"
-                (keyup.enter)="!userService.isReady() ? editMessageUserProfileAfterLogin(message) : editMessageUserProfile(message)"
-                (keyup.space)="!userService.isReady() ? editMessageUserProfileAfterLogin(message) : editMessageUserProfile(message)">
-                @if (profileService.getProfile(message.userId)?.base64Avatar) {
-                <img class="avatar" [src]="profileService.getProfile(message.userId)?.base64Avatar"
-                    [attr.alt]="profileService.getProfile(message.userId)?.name ? ('common.messageList.avatarAltName' | transloco:{ name: profileService.getProfile(message.userId)?.name }) : ('common.messageList.avatarAltFallback' | transloco)">
-                } @else {
-                <mat-icon>person</mat-icon>
-                }
-                <div class="avatar-text">
-                    <span class="name">{{ profileService.getProfile(message.userId)?.name || ('common.messageList.nameFallback' | transloco) }}</span>
-                    @if (message.createDateTime !== null) {
-                    <span class="timestamp-inline">{{ message.createDateTime | date:'medium' }}</span>
-                    }
-                </div>
-            </div>
-            }
-
-            <mat-card-content role="button" tabindex="0" (click)="onMessageCardActivate(message)"
-                (keyup.enter)="onMessageCardActivate(message)" (keyup.space)="onMessageCardActivate(message)">
-                <div class="message-content">
-                    <app-showmultimedia (click)="$event.stopPropagation()"
-                        [multimedia]="message.multimedia"></app-showmultimedia>
-                    @if (message.message) {
-                    <app-showmessage [message]="message.translatedMessage ?? message.message"
-                        [style]="message.style"></app-showmessage>
-                    }
-                </div>
-            </mat-card-content>
-
-            <mat-card-actions class="buttonbar">
                 @if (this.userService.getUser().id === message.userId) {
-                @if (userService.hasJwt()) {
-                <button mat-mini-fab color="secondary" class="button-delete"
-                    [attr.aria-label]="'common.messageList.deleteAria' | transloco"
-                    (click)="!userService.isReady() ? deleteMessageAfterLoginClick(message) : deleteMessageClick(message)">
-                    <mat-icon aria-hidden="false">delete_forever</mat-icon>
-                </button>
-                }
-                }
-                <div class="button-group">
-                    <button mat-mini-fab color="secondary"
-                        [attr.aria-label]="'common.messageList.commentsAria' | transloco"
-                        (click)="!userService.isReady() ? handleCommentAfterLoginClick(message) : handleCommentClick(message)">
-                        <mat-icon aria-hidden="false"
-                            matBadge="{{ getCommentBadge(message.uuid) === 0 ? '' : getCommentBadge(message.uuid)}}"
-                            matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">forum</mat-icon>
-                    </button>
-                    @if (!userService.isReady() || userService.hasJwt()) {
-                    <button mat-mini-fab color="secondary" [attr.aria-label]="'common.messageList.likeAria' | transloco"
-                        (click)="!userService.isReady() ? likeMessageAfterLoginClick(message) : likeMessageClick(message)">
-                        <mat-icon aria-hidden="false" matBadge="{{ message.likes | shortNumber }}"
-                            matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_up</mat-icon>
-                    </button>
-                    <button mat-mini-fab color="secondary" [attr.aria-label]="'common.messageList.dislikeAria' | transloco"
-                        (click)="!userService.isReady() ? dislikeMessageAfterLoginClick(message) : dislikeMessageClick(message)">
-                        <mat-icon aria-hidden="false" matBadge="{{ message.dislikes | shortNumber }}"
-                            matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_down</mat-icon>
-                    </button>
+                <div class="avatar-box" role="button" tabindex="0"
+                    (click)="!userService.isReady() ? openOwnProfileAfterLogin() : openOwnProfile()"
+                    (keyup.enter)="!userService.isReady() ? openOwnProfileAfterLogin() : openOwnProfile()"
+                    (keyup.space)="!userService.isReady() ? openOwnProfileAfterLogin() : openOwnProfile()">
+                    @if (userProfile.base64Avatar) {
+                    <img class="avatar" [src]="userProfile.base64Avatar"
+                        [attr.alt]="userProfile.name ? ('common.messageList.avatarAltName' | transloco:{ name: userProfile.name }) : ('common.messageList.avatarAltFallback' | transloco)" />
+                    } @else {
+                    <mat-icon>person</mat-icon>
                     }
+                    <div class="avatar-text">
+                        <span class="name">{{ userProfile.name || ('common.messageList.myself' | transloco) }}</span>
+                        @if (message.createDateTime !== null) {
+                        <span class="timestamp-inline">{{ message.createDateTime | date:'medium' }}</span>
+                        }
+                    </div>
+                </div>
+                } @else {
+                <div class="avatar-box" role="button" tabindex="0"
+                    (click)="!userService.isReady() ? editMessageUserProfileAfterLogin(message) : editMessageUserProfile(message)"
+                    (keyup.enter)="!userService.isReady() ? editMessageUserProfileAfterLogin(message) : editMessageUserProfile(message)"
+                    (keyup.space)="!userService.isReady() ? editMessageUserProfileAfterLogin(message) : editMessageUserProfile(message)">
+                    @if (profileService.getProfile(message.userId)?.base64Avatar) {
+                    <img class="avatar" [src]="profileService.getProfile(message.userId)?.base64Avatar"
+                        [attr.alt]="profileService.getProfile(message.userId)?.name ? ('common.messageList.avatarAltName' | transloco:{ name: profileService.getProfile(message.userId)?.name }) : ('common.messageList.avatarAltFallback' | transloco)">
+                    } @else {
+                    <mat-icon>person</mat-icon>
+                    }
+                    <div class="avatar-text">
+                        <span class="name">{{ profileService.getProfile(message.userId)?.name ||
+                            ('common.messageList.nameFallback' | transloco) }}</span>
+                        @if (message.createDateTime !== null) {
+                        <span class="timestamp-inline">{{ message.createDateTime | date:'medium' }}</span>
+                        }
+                    </div>
+                </div>
+                }
+
+                <mat-card-content role="button" tabindex="0" (click)="onMessageCardActivate(message)"
+                    (keyup.enter)="onMessageCardActivate(message)" (keyup.space)="onMessageCardActivate(message)">
+                    <div class="message-content">
+                        <app-showmultimedia (click)="$event.stopPropagation()"
+                            [multimedia]="message.multimedia"></app-showmultimedia>
+                        @if (message.message) {
+                        <app-showmessage [message]="message.translatedMessage ?? message.message"
+                            [style]="message.style"></app-showmessage>
+                        }
+                    </div>
+                </mat-card-content>
+
+                <mat-card-actions class="buttonbar">
                     @if (this.userService.getUser().id === message.userId) {
                     @if (userService.hasJwt()) {
-                    <button mat-mini-fab color="secondary" [attr.aria-label]="'common.messageList.editAria' | transloco"
-                        (click)="!userService.isReady() ? editMessageAfterLoginClick(message) : editMessageClick(message)">
-                        <mat-icon aria-hidden="false">edit</mat-icon>
+                    <button mat-mini-fab color="secondary" class="button-delete"
+                        [attr.aria-label]="'common.messageList.deleteAria' | transloco"
+                        (click)="!userService.isReady() ? deleteMessageAfterLoginClick(message) : deleteMessageClick(message)">
+                        <mat-icon aria-hidden="false">delete_forever</mat-icon>
                     </button>
                     }
                     }
-                    <button mat-mini-fab color="secondary" [matMenuTriggerFor]="messageMenu"
-                        [attr.aria-label]="'common.actions.more' | transloco">
-                        <mat-icon aria-hidden="false">more_horiz</mat-icon>
-                    </button>
-                    <mat-menu #messageMenu="matMenu">
-                        @if (message.message) {
-                        <button mat-menu-item (click)="translateMessage(message)">
-                            <mat-icon aria-hidden="true">translate</mat-icon>
-                            <span>{{ 'common.messageList.translateAria' | transloco:{ language: translationTargetLabel() } }}</span>
+                    <div class="button-group">
+                        <button mat-mini-fab color="secondary"
+                            [attr.aria-label]="'common.messageList.commentsAria' | transloco"
+                            (click)="!userService.isReady() ? handleCommentAfterLoginClick(message) : handleCommentClick(message)">
+                            <mat-icon aria-hidden="false"
+                                matBadge="{{ getCommentBadge(message.uuid) === 0 ? '' : getCommentBadge(message.uuid)}}"
+                                matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">forum</mat-icon>
+                        </button>
+                        @if (!userService.isReady() || userService.hasJwt()) {
+                        <button mat-mini-fab color="secondary"
+                            [attr.aria-label]="'common.messageList.likeAria' | transloco"
+                            (click)="!userService.isReady() ? likeMessageAfterLoginClick(message) : likeMessageClick(message)">
+                            <mat-icon aria-hidden="false" matBadge="{{ message.likes | shortNumber }}"
+                                matBadgePosition="after" matBadgeColor="accent"
+                                matBadgeOverlap="true">thumb_up</mat-icon>
+                        </button>
+                        <button mat-mini-fab color="secondary"
+                            [attr.aria-label]="'common.messageList.dislikeAria' | transloco"
+                            (click)="!userService.isReady() ? dislikeMessageAfterLoginClick(message) : dislikeMessageClick(message)">
+                            <mat-icon aria-hidden="false" matBadge="{{ message.dislikes | shortNumber }}"
+                                matBadgePosition="after" matBadgeColor="accent"
+                                matBadgeOverlap="true">thumb_down</mat-icon>
                         </button>
                         }
-                        <button mat-menu-item (click)="flyTo(message)">
-                            <mat-icon aria-hidden="true">place</mat-icon>
-                            <span>{{ 'common.messageList.flyToAria' | transloco }}</span>
-                        </button>
-                        <button mat-menu-item (click)="navigateToMessageLocation(message)">
-                            <mat-icon aria-hidden="true">assistant_direction</mat-icon>
-                            <span>{{ 'common.messageList.navigateAria' | transloco }}</span>
-                        </button>
-                        @if (this.userService.getUser().id !== message.userId) {
-                        <button mat-menu-item (click)="editMessageUserProfile(message)">
-                            <mat-icon aria-hidden="true">settings_account_box</mat-icon>
-                            <span>{{ 'common.messageList.editProfileAria' | transloco }}</span>
+                        @if (this.userService.getUser().id === message.userId) {
+                        @if (userService.hasJwt()) {
+                        <button mat-mini-fab color="secondary"
+                            [attr.aria-label]="'common.messageList.editAria' | transloco"
+                            (click)="!userService.isReady() ? editMessageAfterLoginClick(message) : editMessageClick(message)">
+                            <mat-icon aria-hidden="false">edit</mat-icon>
                         </button>
                         }
-                        @if (this.userService.getUser().id === message.userId && isOwnPublicMessage(message)) {
-                        <button mat-menu-item (click)="openModerationStatus(message)">
-                            <mat-icon aria-hidden="true">{{ getModerationStatusIcon(message) }}</mat-icon>
-                            <span>{{ getModerationStatusAriaLabel(message) }}</span>
-                        </button>
                         }
-                        @if (this.userService.getUser().id !== message.userId) {
-                        <button mat-menu-item (click)="dsaReportMessage(message)">
-                            <mat-icon aria-hidden="true">flag</mat-icon>
-                            <span>{{ 'common.messageList.blockAria' | transloco }}</span>
+                        <button mat-mini-fab color="secondary" [matMenuTriggerFor]="messageMenu"
+                            [attr.aria-label]="'common.actions.more' | transloco">
+                            <mat-icon aria-hidden="false">more_horiz</mat-icon>
                         </button>
-                        }
-                        @if (message.status === 'disabled' && message.dsaStatusToken) {
-                        <button mat-menu-item (click)="openDsaStatus(message)">
-                            <mat-icon aria-hidden="true">flag</mat-icon>
-                            <span>{{ getDsaStatusAriaLabel(message) }}</span>
-                        </button>
-                        }
-                    </mat-menu>
-                </div>
-            </mat-card-actions>
-        </mat-card>
+                        <mat-menu #messageMenu="matMenu">
+                            @if (message.message) {
+                            <button mat-menu-item (click)="translateMessage(message)">
+                                <mat-icon aria-hidden="true">translate</mat-icon>
+                                <span>{{ 'common.messageList.translateAria' | transloco:{ language:
+                                    translationTargetLabel() } }}</span>
+                            </button>
+                            }
+                            <button mat-menu-item (click)="flyTo(message)">
+                                <mat-icon aria-hidden="true">place</mat-icon>
+                                <span>{{ 'common.messageList.flyToAria' | transloco }}</span>
+                            </button>
+                            <button mat-menu-item (click)="navigateToMessageLocation(message)">
+                                <mat-icon aria-hidden="true">assistant_direction</mat-icon>
+                                <span>{{ 'common.messageList.navigateAria' | transloco }}</span>
+                            </button>
+                            @if (this.userService.getUser().id !== message.userId) {
+                            <button mat-menu-item (click)="editMessageUserProfile(message)">
+                                <mat-icon aria-hidden="true">settings_account_box</mat-icon>
+                                <span>{{ 'common.messageList.editProfileAria' | transloco }}</span>
+                            </button>
+                            }
+                            @if (this.userService.getUser().id === message.userId && isOwnPublicMessage(message)) {
+                            <button mat-menu-item (click)="openModerationStatus(message)">
+                                <mat-icon aria-hidden="true">{{ getModerationStatusIcon(message) }}</mat-icon>
+                                <span>{{ getModerationStatusAriaLabel(message) }}</span>
+                            </button>
+                            }
+                            @if (this.userService.getUser().id !== message.userId) {
+                            <button mat-menu-item (click)="dsaReportMessage(message)">
+                                <mat-icon aria-hidden="true">flag</mat-icon>
+                                <span>{{ 'common.messageList.blockAria' | transloco }}</span>
+                            </button>
+                            }
+                            @if (message.status === 'disabled' && message.dsaStatusToken) {
+                            <button mat-menu-item (click)="openDsaStatus(message)">
+                                <mat-icon aria-hidden="true">flag</mat-icon>
+                                <span>{{ getDsaStatusAriaLabel(message) }}</span>
+                            </button>
+                            }
+                        </mat-menu>
+                    </div>
+                </mat-card-actions>
+            </mat-card>
             }
         </div>
         }
@@ -164,141 +170,148 @@
         <div class="content">
             @for (message of commentsSignal(); track message.id) {
             <mat-card class="item" appMasonryItem>
-            @if (this.userService.getUser().id === message.userId) {
-            <div class="avatar-box" role="button" tabindex="0"
-                (click)="!userService.isReady() ? openOwnProfileAfterLogin() : openOwnProfile()"
-                (keyup.enter)="!userService.isReady() ? openOwnProfileAfterLogin() : openOwnProfile()"
-                (keyup.space)="!userService.isReady() ? openOwnProfileAfterLogin() : openOwnProfile()">
-                @if (userProfile.base64Avatar) {
-                <img class="avatar" [src]="userProfile.base64Avatar"
-                    [attr.alt]="userProfile.name ? ('common.messageList.avatarAltName' | transloco:{ name: userProfile.name }) : ('common.messageList.avatarAltFallback' | transloco)" />
-                } @else {
-                <mat-icon>person</mat-icon>
-                }
-                <div class="avatar-text">
-                    <span class="name">{{ userProfile.name || ('common.messageList.myself' | transloco) }}</span>
-                    @if (message.createDateTime !== null) {
-                    <span class="timestamp-inline">{{ message.createDateTime | date:'medium' }}</span>
-                    }
-                </div>
-            </div>
-            } @else {
-            <div class="avatar-box" role="button" tabindex="0"
-                (click)="!userService.isReady() ? editMessageUserProfileAfterLogin(message) : editMessageUserProfile(message)"
-                (keyup.enter)="!userService.isReady() ? editMessageUserProfileAfterLogin(message) : editMessageUserProfile(message)"
-                (keyup.space)="!userService.isReady() ? editMessageUserProfileAfterLogin(message) : editMessageUserProfile(message)">
-                @if (profileService.getProfile(message.userId)?.base64Avatar) {
-                <img class="avatar" [src]="profileService.getProfile(message.userId)?.base64Avatar"
-                    [attr.alt]="profileService.getProfile(message.userId)?.name ? ('common.messageList.avatarAltName' | transloco:{ name: profileService.getProfile(message.userId)?.name }) : ('common.messageList.avatarAltFallback' | transloco)">
-                } @else {
-                <mat-icon>person</mat-icon>
-                }
-                <div class="avatar-text">
-                    <span class="name">{{ profileService.getProfile(message.userId)?.name || ('common.messageList.nameFallback' | transloco) }}</span>
-                    @if (message.createDateTime !== null) {
-                    <span class="timestamp-inline">{{ message.createDateTime | date:'medium' }}</span>
-                    }
-                </div>
-            </div>
-            }
-
-            <mat-card-content role="button" tabindex="0" (click)="onMessageCardActivate(message)"
-                (keyup.enter)="onMessageCardActivate(message)" (keyup.space)="onMessageCardActivate(message)">
-                <div class="message-content">
-                    <app-showmultimedia (click)="$event.stopPropagation()"
-                        [multimedia]="message.multimedia"></app-showmultimedia>
-                    @if (message.message) {
-                    <app-showmessage [message]="message.translatedMessage ?? message.message"
-                        [style]="message.style"></app-showmessage>
-                    }
-                </div>
-            </mat-card-content>
-
-            <mat-card-actions class="buttonbar">
                 @if (this.userService.getUser().id === message.userId) {
-                @if (userService.hasJwt()) {
-                <button mat-mini-fab color="secondary" class="button-delete"
-                    [attr.aria-label]="'common.messageList.deleteAria' | transloco"
-                    (click)="!userService.isReady() ? deleteMessageAfterLoginClick(message) : deleteMessageClick(message)">
-                    <mat-icon aria-hidden="false">delete_forever</mat-icon>
-                </button>
-                }
-                }
-                <div class="button-group">
-                    <button mat-mini-fab color="secondary"
-                        [attr.aria-label]="'common.messageList.commentsAria' | transloco"
-                        (click)="!userService.isReady() ? handleCommentAfterLoginClick(message) : handleCommentClick(message)">
-                        <mat-icon aria-hidden="false"
-                            matBadge="{{ getCommentBadge(message.uuid) === 0 ? '' : getCommentBadge(message.uuid)}}"
-                            matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">forum</mat-icon>
-                    </button>
-                    @if (!userService.isReady() || userService.hasJwt()) {
-                    <button mat-mini-fab color="secondary" [attr.aria-label]="'common.messageList.likeAria' | transloco"
-                        (click)="!userService.isReady() ? likeMessageAfterLoginClick(message) : likeMessageClick(message)">
-                        <mat-icon aria-hidden="false" matBadge="{{ message.likes | shortNumber }}"
-                            matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_up</mat-icon>
-                    </button>
-                    <button mat-mini-fab color="secondary" [attr.aria-label]="'common.messageList.dislikeAria' | transloco"
-                        (click)="!userService.isReady() ? dislikeMessageAfterLoginClick(message) : dislikeMessageClick(message)">
-                        <mat-icon aria-hidden="false" matBadge="{{ message.dislikes | shortNumber }}"
-                            matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_down</mat-icon>
-                    </button>
+                <div class="avatar-box" role="button" tabindex="0"
+                    (click)="!userService.isReady() ? openOwnProfileAfterLogin() : openOwnProfile()"
+                    (keyup.enter)="!userService.isReady() ? openOwnProfileAfterLogin() : openOwnProfile()"
+                    (keyup.space)="!userService.isReady() ? openOwnProfileAfterLogin() : openOwnProfile()">
+                    @if (userProfile.base64Avatar) {
+                    <img class="avatar" [src]="userProfile.base64Avatar"
+                        [attr.alt]="userProfile.name ? ('common.messageList.avatarAltName' | transloco:{ name: userProfile.name }) : ('common.messageList.avatarAltFallback' | transloco)" />
+                    } @else {
+                    <mat-icon>person</mat-icon>
                     }
+                    <div class="avatar-text">
+                        <span class="name">{{ userProfile.name || ('common.messageList.myself' | transloco) }}</span>
+                        @if (message.createDateTime !== null) {
+                        <span class="timestamp-inline">{{ message.createDateTime | date:'medium' }}</span>
+                        }
+                    </div>
+                </div>
+                } @else {
+                <div class="avatar-box" role="button" tabindex="0"
+                    (click)="!userService.isReady() ? editMessageUserProfileAfterLogin(message) : editMessageUserProfile(message)"
+                    (keyup.enter)="!userService.isReady() ? editMessageUserProfileAfterLogin(message) : editMessageUserProfile(message)"
+                    (keyup.space)="!userService.isReady() ? editMessageUserProfileAfterLogin(message) : editMessageUserProfile(message)">
+                    @if (profileService.getProfile(message.userId)?.base64Avatar) {
+                    <img class="avatar" [src]="profileService.getProfile(message.userId)?.base64Avatar"
+                        [attr.alt]="profileService.getProfile(message.userId)?.name ? ('common.messageList.avatarAltName' | transloco:{ name: profileService.getProfile(message.userId)?.name }) : ('common.messageList.avatarAltFallback' | transloco)">
+                    } @else {
+                    <mat-icon>person</mat-icon>
+                    }
+                    <div class="avatar-text">
+                        <span class="name">{{ profileService.getProfile(message.userId)?.name ||
+                            ('common.messageList.nameFallback' | transloco) }}</span>
+                        @if (message.createDateTime !== null) {
+                        <span class="timestamp-inline">{{ message.createDateTime | date:'medium' }}</span>
+                        }
+                    </div>
+                </div>
+                }
+
+                <mat-card-content role="button" tabindex="0" (click)="onMessageCardActivate(message)"
+                    (keyup.enter)="onMessageCardActivate(message)" (keyup.space)="onMessageCardActivate(message)">
+                    <div class="message-content">
+                        <app-showmultimedia (click)="$event.stopPropagation()"
+                            [multimedia]="message.multimedia"></app-showmultimedia>
+                        @if (message.message) {
+                        <app-showmessage [message]="message.translatedMessage ?? message.message"
+                            [style]="message.style"></app-showmessage>
+                        }
+                    </div>
+                </mat-card-content>
+
+                <mat-card-actions class="buttonbar">
                     @if (this.userService.getUser().id === message.userId) {
                     @if (userService.hasJwt()) {
-                    <button mat-mini-fab color="secondary" [attr.aria-label]="'common.messageList.editAria' | transloco"
-                        (click)="!userService.isReady() ? editMessageAfterLoginClick(message) : editMessageClick(message)">
-                        <mat-icon aria-hidden="false">edit</mat-icon>
+                    <button mat-mini-fab color="secondary" class="button-delete"
+                        [attr.aria-label]="'common.messageList.deleteAria' | transloco"
+                        (click)="!userService.isReady() ? deleteMessageAfterLoginClick(message) : deleteMessageClick(message)">
+                        <mat-icon aria-hidden="false">delete_forever</mat-icon>
                     </button>
                     }
                     }
-                    <button mat-mini-fab color="secondary" [matMenuTriggerFor]="commentMenu"
-                        [attr.aria-label]="'common.actions.more' | transloco">
-                        <mat-icon aria-hidden="false">more_horiz</mat-icon>
-                    </button>
-                    <mat-menu #commentMenu="matMenu">
-                        @if (message.message) {
-                        <button mat-menu-item (click)="translateMessage(message)">
-                            <mat-icon aria-hidden="true">translate</mat-icon>
-                            <span>{{ 'common.messageList.translateAria' | transloco:{ language: translationTargetLabel() } }}</span>
+                    <div class="button-group">
+                        <button mat-mini-fab color="secondary"
+                            [attr.aria-label]="'common.messageList.commentsAria' | transloco"
+                            (click)="!userService.isReady() ? handleCommentAfterLoginClick(message) : handleCommentClick(message)">
+                            <mat-icon aria-hidden="false"
+                                matBadge="{{ getCommentBadge(message.uuid) === 0 ? '' : getCommentBadge(message.uuid)}}"
+                                matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">forum</mat-icon>
+                        </button>
+                        @if (!userService.isReady() || userService.hasJwt()) {
+                        <button mat-mini-fab color="secondary"
+                            [attr.aria-label]="'common.messageList.likeAria' | transloco"
+                            (click)="!userService.isReady() ? likeMessageAfterLoginClick(message) : likeMessageClick(message)">
+                            <mat-icon aria-hidden="false" matBadge="{{ message.likes | shortNumber }}"
+                                matBadgePosition="after" matBadgeColor="accent"
+                                matBadgeOverlap="true">thumb_up</mat-icon>
+                        </button>
+                        <button mat-mini-fab color="secondary"
+                            [attr.aria-label]="'common.messageList.dislikeAria' | transloco"
+                            (click)="!userService.isReady() ? dislikeMessageAfterLoginClick(message) : dislikeMessageClick(message)">
+                            <mat-icon aria-hidden="false" matBadge="{{ message.dislikes | shortNumber }}"
+                                matBadgePosition="after" matBadgeColor="accent"
+                                matBadgeOverlap="true">thumb_down</mat-icon>
                         </button>
                         }
-                        <button mat-menu-item (click)="flyTo(message)">
-                            <mat-icon aria-hidden="true">place</mat-icon>
-                            <span>{{ 'common.messageList.flyToAria' | transloco }}</span>
-                        </button>
-                        <button mat-menu-item (click)="navigateToMessageLocation(message)">
-                            <mat-icon aria-hidden="true">assistant_direction</mat-icon>
-                            <span>{{ 'common.messageList.navigateAria' | transloco }}</span>
-                        </button>
-                        @if (this.userService.getUser().id !== message.userId) {
-                        <button mat-menu-item (click)="editMessageUserProfile(message)">
-                            <mat-icon aria-hidden="true">settings_account_box</mat-icon>
-                            <span>{{ 'common.messageList.editProfileAria' | transloco }}</span>
+                        @if (this.userService.getUser().id === message.userId) {
+                        @if (userService.hasJwt()) {
+                        <button mat-mini-fab color="secondary"
+                            [attr.aria-label]="'common.messageList.editAria' | transloco"
+                            (click)="!userService.isReady() ? editMessageAfterLoginClick(message) : editMessageClick(message)">
+                            <mat-icon aria-hidden="false">edit</mat-icon>
                         </button>
                         }
-                        @if (this.userService.getUser().id === message.userId && isOwnPublicMessage(message)) {
-                        <button mat-menu-item (click)="openModerationStatus(message)">
-                            <mat-icon aria-hidden="true">{{ getModerationStatusIcon(message) }}</mat-icon>
-                            <span>{{ getModerationStatusAriaLabel(message) }}</span>
-                        </button>
                         }
-                        @if (this.userService.getUser().id !== message.userId) {
-                        <button mat-menu-item (click)="dsaReportMessage(message)">
-                            <mat-icon aria-hidden="true">flag</mat-icon>
-                            <span>{{ 'common.messageList.blockAria' | transloco }}</span>
+                        <button mat-mini-fab color="secondary" [matMenuTriggerFor]="commentMenu"
+                            [attr.aria-label]="'common.actions.more' | transloco">
+                            <mat-icon aria-hidden="false">more_horiz</mat-icon>
                         </button>
-                        }
-                        @if (message.status === 'disabled' && message.dsaStatusToken) {
-                        <button mat-menu-item (click)="openDsaStatus(message)">
-                            <mat-icon aria-hidden="true">flag</mat-icon>
-                            <span>{{ getDsaStatusAriaLabel(message) }}</span>
-                        </button>
-                        }
-                    </mat-menu>
-                </div>
-            </mat-card-actions>
-        </mat-card>
+                        <mat-menu #commentMenu="matMenu">
+                            @if (message.message) {
+                            <button mat-menu-item (click)="translateMessage(message)">
+                                <mat-icon aria-hidden="true">translate</mat-icon>
+                                <span>{{ 'common.messageList.translateAria' | transloco:{ language:
+                                    translationTargetLabel() } }}</span>
+                            </button>
+                            }
+                            <button mat-menu-item (click)="flyTo(message)">
+                                <mat-icon aria-hidden="true">place</mat-icon>
+                                <span>{{ 'common.messageList.flyToAria' | transloco }}</span>
+                            </button>
+                            <button mat-menu-item (click)="navigateToMessageLocation(message)">
+                                <mat-icon aria-hidden="true">assistant_direction</mat-icon>
+                                <span>{{ 'common.messageList.navigateAria' | transloco }}</span>
+                            </button>
+                            @if (this.userService.getUser().id !== message.userId) {
+                            <button mat-menu-item (click)="editMessageUserProfile(message)">
+                                <mat-icon aria-hidden="true">settings_account_box</mat-icon>
+                                <span>{{ 'common.messageList.editProfileAria' | transloco }}</span>
+                            </button>
+                            }
+                            @if (this.userService.getUser().id === message.userId && isOwnPublicMessage(message)) {
+                            <button mat-menu-item (click)="openModerationStatus(message)">
+                                <mat-icon aria-hidden="true">{{ getModerationStatusIcon(message) }}</mat-icon>
+                                <span>{{ getModerationStatusAriaLabel(message) }}</span>
+                            </button>
+                            }
+                            @if (this.userService.getUser().id !== message.userId) {
+                            <button mat-menu-item (click)="dsaReportMessage(message)">
+                                <mat-icon aria-hidden="true">flag</mat-icon>
+                                <span>{{ 'common.messageList.blockAria' | transloco }}</span>
+                            </button>
+                            }
+                            @if (message.status === 'disabled' && message.dsaStatusToken) {
+                            <button mat-menu-item (click)="openDsaStatus(message)">
+                                <mat-icon aria-hidden="true">flag</mat-icon>
+                                <span>{{ getDsaStatusAriaLabel(message) }}</span>
+                            </button>
+                            }
+                        </mat-menu>
+                    </div>
+                </mat-card-actions>
+            </mat-card>
             }
         </div>
         }
@@ -319,8 +332,7 @@
     </button>
     @if (messageService.selectedMessagesSignal().length !== 0) {
     @if (!userService.isReady() || userService.hasJwt()) {
-    <button mat-icon-button color="primary"
-        [attr.aria-label]="'common.messageList.addCommentAria' | transloco"
+    <button mat-icon-button color="primary" [attr.aria-label]="'common.messageList.addCommentAria' | transloco"
         (click)="!userService.isReady() ? userService.loginWithBackend(addCommentAfterLogin.bind(this)) : addComment(currentParentSignal()!)">
         <mat-icon>add_comment</mat-icon>
     </button>
@@ -328,8 +340,7 @@
     }
     @if (messageService.selectedMessagesSignal().length === 0) {
     @if (!userService.isReady() || userService.hasJwt()) {
-    <button mat-icon-button color="primary"
-        [attr.aria-label]="'common.messageList.addMessageAria' | transloco"
+    <button mat-icon-button color="primary" [attr.aria-label]="'common.messageList.addMessageAria' | transloco"
         (click)="!userService.isReady() ? userService.loginWithBackend(addMessagDialog.bind(this)) : addMessagDialog()">
         <mat-icon>chat_add_on</mat-icon>
     </button>

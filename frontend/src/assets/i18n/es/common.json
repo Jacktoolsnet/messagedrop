@@ -847,6 +847,7 @@
     "saveRemovedMessage": "La experiencia se eliminó de tu lista.",
     "saveFailedTitle": "Error al guardar",
     "saveFailedMessage": "Inténtalo de nuevo.",
+    "showOnMap": "Mostrar en el mapa",
       "select": "Seleccionar",
       "loadMore": "Cargar más",
       "searchFailed": "La búsqueda falló. Inténtalo de nuevo.",

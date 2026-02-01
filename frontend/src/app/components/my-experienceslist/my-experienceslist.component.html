@@ -54,8 +54,18 @@
                   [attr.aria-label]="'common.experiences.showMore' | transloco">
                   <mat-icon>expand_content</mat-icon>
                 </button>
+                <button mat-mini-fab color="primary" type="button" (click)="showOnMap(bookmark.snapshot)"
+                  [disabled]="!hasDestination(bookmark.snapshot)"
+                  [attr.aria-label]="'common.experiences.showOnMap' | transloco">
+                  <mat-icon>place</mat-icon>
+                </button>
               </div>
               <div class="tile-actions__right">
+                <button mat-mini-fab color="primary" type="button" (click)="openInMaps(bookmark.snapshot)"
+                  [disabled]="!hasDestination(bookmark.snapshot)"
+                  [attr.aria-label]="'common.experiences.openInMaps' | transloco">
+                  <mat-icon>map</mat-icon>
+                </button>
                 <button mat-raised-button color="primary" class="open-viator-button" type="button"
                   (click)="onOpen(bookmark.snapshot)"
                   [disabled]="!bookmark.snapshot.productUrl"

@@ -847,6 +847,7 @@
     "saveRemovedMessage": "L’expérience a été retirée de votre liste.",
     "saveFailedTitle": "Échec de l’enregistrement",
     "saveFailedMessage": "Veuillez réessayer.",
+    "showOnMap": "Afficher sur la carte",
       "select": "Sélectionner",
       "loadMore": "Charger plus",
       "searchFailed": "La recherche a échoué. Veuillez réessayer.",

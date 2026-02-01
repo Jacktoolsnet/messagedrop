@@ -1,17 +1,20 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatDialogActions, MatDialogClose, MatDialogContent } from '@angular/material/dialog';
+import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { ExperienceBookmarkService } from '../../services/experience-bookmark.service';
+import { GeolocationService } from '../../services/geolocation.service';
+import { MapService } from '../../services/map.service';
 import { ViatorService } from '../../services/viator.service';
-import { ExperienceResult, ViatorProductDetail } from '../../interfaces/viator';
+import { ExperienceResult, ViatorDestinationLookup, ViatorProductDetail } from '../../interfaces/viator';
 import { MatDialog } from '@angular/material/dialog';
 import { ExperienceSearchDetailDialogComponent } from '../utils/experience-search/detail-dialog/experience-search-detail-dialog.component';
+import { Location } from '../../interfaces/location';
 
 @Component({
   selector: 'app-my-experienceslist',
@@ -34,12 +37,16 @@ export class MyExperienceslistComponent implements OnInit {
   readonly help = inject(HelpDialogService);
   private readonly bookmarkService = inject(ExperienceBookmarkService);
   private readonly viatorService = inject(ViatorService);
+  private readonly mapService = inject(MapService);
+  private readonly geolocationService = inject(GeolocationService);
   private readonly transloco = inject(TranslocoService);
   private readonly dialog = inject(MatDialog);
+  private readonly dialogRef = inject(MatDialogRef<MyExperienceslistComponent>);
 
   readonly loading = signal(true);
   readonly bookmarks = this.bookmarkService.bookmarksSignal;
   readonly hasBookmarks = computed(() => this.bookmarks().length > 0);
+  private readonly destinationCache = new Map<number, ViatorDestinationLookup>();
 
   async ngOnInit(): Promise<void> {
     await this.bookmarkService.ensureLoaded();
@@ -63,6 +70,27 @@ export class MyExperienceslistComponent implements OnInit {
     if (result.productUrl) {
       window.open(result.productUrl, '_blank');
     }
+  }
+
+  async showOnMap(result: ExperienceResult): Promise<void> {
+    const destination = await this.getPrimaryDestination(result);
+    const location = this.buildLocationFromDestination(destination);
+    if (!location) return;
+    this.mapService.flyToWithZoom(location, 19);
+    this.dialogRef.close();
+  }
+
+  async openInMaps(result: ExperienceResult): Promise<void> {
+    const destination = await this.getPrimaryDestination(result);
+    const location = this.buildLocationFromDestination(destination);
+    if (!location) return;
+    const query = `${location.latitude},${location.longitude}`;
+    const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+    window.open(url, '_blank');
+  }
+
+  hasDestination(result: ExperienceResult): boolean {
+    return Array.isArray(result.destinationIds) && result.destinationIds.length > 0;
   }
 
   getExperienceHeaderBackgroundImage(result: ExperienceResult): string {
@@ -137,5 +165,35 @@ export class MyExperienceslistComponent implements OnInit {
       }
     }
     return best?.url;
+  }
+
+  private async getPrimaryDestination(result: ExperienceResult): Promise<ViatorDestinationLookup | undefined> {
+    const destinationId = Array.isArray(result.destinationIds) ? result.destinationIds[0] : undefined;
+    if (!destinationId) return undefined;
+    const cached = this.destinationCache.get(destinationId);
+    if (cached) return cached;
+    try {
+      const response = await firstValueFrom(this.viatorService.getDestinations([destinationId], false));
+      const destination = response.destinations?.find((item) => item.destinationId === destinationId);
+      if (destination) {
+        this.destinationCache.set(destinationId, destination);
+      }
+      return destination;
+    } catch {
+      return undefined;
+    }
+  }
+
+  private buildLocationFromDestination(destination?: ViatorDestinationLookup): Location | null {
+    const center = destination?.center;
+    if (!center || center.latitude === undefined || center.longitude === undefined) {
+      return null;
+    }
+    const plusCode = destination?.plusCode || this.geolocationService.getPlusCode(center.latitude, center.longitude);
+    return {
+      latitude: center.latitude,
+      longitude: center.longitude,
+      plusCode
+    };
   }
 }
