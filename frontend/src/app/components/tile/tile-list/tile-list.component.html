@@ -23,6 +23,9 @@
         @case ('image') {
           <app-image-tile class="tile" appMasonryItem [place]="resolvedPlace!"></app-image-tile>
         }
+        @case ('custom-experience') {
+          <app-experience-tile class="tile" appMasonryItem [place]="resolvedPlace!"></app-experience-tile>
+        }
         @case ('custom-text') {
           <app-text-tile class="tile" appMasonryItem [place]="resolvedPlace" [contact]="resolvedContact" [tile]="tile"></app-text-tile>
         }

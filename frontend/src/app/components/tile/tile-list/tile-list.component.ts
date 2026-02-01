@@ -15,6 +15,7 @@ import { AirQualityTileComponent } from "../air-quality-tile/air-quality-tile.co
 import { AnniversaryTileComponent } from "../anniversary-tile/anniversary-tile.component";
 import { DateTimeTileComponent } from "../datetime-tile/datetime-tile.component";
 import { FileTileComponent } from "../file-tile/file-tile.component";
+import { ExperienceTileComponent } from "../experience-tile/experience-tile.component";
 import { ImageTileComponent } from "../image-tile/image-tile.component";
 import { MessageTileComponent } from "../message-tile/messagetile.component";
 import { MigraineTileComponent } from "../migraine-tile/migraine-tile.component";
@@ -29,7 +30,7 @@ import { WeatherTileComponent } from "../weather-tile/weather-tile.component";
 
 @Component({
   selector: 'app-tile-list',
-  imports: [DateTimeTileComponent, WeatherTileComponent, AirQualityTileComponent, NoteTileComponent, MessageTileComponent, ImageTileComponent, FileTileComponent, TextTileComponent, MultitextTileComponent, AnniversaryTileComponent, MigraineTileComponent, PollutionTileComponent, TodoTileComponent, QuickActionTileComponent, MasonryItemDirective, MatButtonModule, TranslocoPipe],
+  imports: [DateTimeTileComponent, WeatherTileComponent, AirQualityTileComponent, NoteTileComponent, MessageTileComponent, ImageTileComponent, FileTileComponent, ExperienceTileComponent, TextTileComponent, MultitextTileComponent, AnniversaryTileComponent, MigraineTileComponent, PollutionTileComponent, TodoTileComponent, QuickActionTileComponent, MasonryItemDirective, MatButtonModule, TranslocoPipe],
   templateUrl: './tile-list.component.html',
   styleUrl: './tile-list.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -52,6 +53,7 @@ export class TileListComponent {
     'note',
     'message',
     'image',
+    'custom-experience',
     'custom-text',
     'custom-multitext',
     'custom-date',

@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatDialog, MatDialogActions, MatDialogClose, MatDialogContent } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -46,6 +46,11 @@ import { HelpDialogService } from '../help-dialog/help-dialog.service';
 import { SearchSettingsMapPreviewComponent } from '../search-settings/search-settings-map-preview.component';
 import { ExperienceSearchDetailDialogComponent } from './detail-dialog/experience-search-detail-dialog.component';
 import { ExperienceSearchPinDialogComponent } from './pin-dialog/experience-search-pin-dialog.component';
+
+interface ExperienceSearchDialogData {
+  destinationId?: number;
+  destinationName?: string;
+}
 
 const PAGE_SIZE = 20;
 const PRICE_RANGE_MIN = 0;
@@ -110,6 +115,7 @@ export class ExperienceSearchComponent {
   private readonly transloco = inject(TranslocoService);
   readonly help = inject(HelpDialogService);
   private readonly dialog = inject(MatDialog);
+  private readonly dialogData = inject<ExperienceSearchDialogData | null>(MAT_DIALOG_DATA, { optional: true });
 
   readonly sortOptions: { value: ExperienceSortOption; labelKey: string }[] = [
     { value: 'relevance', labelKey: 'common.experiences.sortRelevance' },
@@ -177,11 +183,12 @@ export class ExperienceSearchComponent {
   private lastSearchTerm = '';
   private lastSearchMode: 'freetext' | 'product' = 'product';
   private lastSearchSignature = '';
+  private readonly lockedDestinationId = this.dialogData?.destinationId;
 
   readonly canSearch = computed(() => {
     const value = this.formValue();
     const term = value.term?.trim() ?? '';
-    return term.length > 0;
+    return term.length > 0 || this.lockedDestinationId !== undefined;
   });
 
   readonly hasSearchChanged = computed(() => {
@@ -189,7 +196,7 @@ export class ExperienceSearchComponent {
       return false;
     }
     const value = this.formValue();
-    return buildSearchSignature(value) !== this.lastSearchSignature;
+    return buildSearchSignature(value, this.lockedDestinationId) !== this.lastSearchSignature;
   });
 
   readonly showEmptyState = computed(() => !this.loading() && this.hasSearched() && this.results().length === 0);
@@ -356,7 +363,7 @@ export class ExperienceSearchComponent {
 
     this.lastSearchTerm = term;
     this.lastSearchMode = mode;
-    this.lastSearchSignature = buildSearchSignature(value);
+    this.lastSearchSignature = buildSearchSignature(value, this.lockedDestinationId);
 
     if (mode === 'freetext' && term.length > 0) {
       const request = this.buildFreetextSearchRequest(term, start);
@@ -403,6 +410,9 @@ export class ExperienceSearchComponent {
       endDate: formatDateInput(value.endDate),
       durationInMinutes: duration ?? undefined
     };
+    if (this.lockedDestinationId !== undefined) {
+      filtering.destination = String(this.lockedDestinationId);
+    }
     const priceRange = buildPriceRange(value.minPrice, value.maxPrice);
     if (priceRange) {
       filtering.lowestPrice = priceRange.from;
@@ -426,6 +436,9 @@ export class ExperienceSearchComponent {
     const value = this.form.getRawValue();
     const duration = buildDurationRange(value.minDurationHours, value.maxDurationHours);
     const productFiltering: ViatorFreetextProductFiltering = {};
+    if (this.lockedDestinationId !== undefined) {
+      productFiltering.destination = String(this.lockedDestinationId);
+    }
     const dateRange = buildDateRange(value.startDate, value.endDate);
     if (dateRange) {
       productFiltering.dateRange = dateRange;
@@ -609,8 +622,9 @@ function buildDateRange(startDate: Date | string | null, endDate: Date | string 
   return { from: from || undefined, to: to || undefined };
 }
 
-function buildSearchSignature(value: Partial<ExperienceSearchFormValue>): string {
+function buildSearchSignature(value: Partial<ExperienceSearchFormValue>, destinationId?: number): string {
   return [
+    destinationId ?? '',
     value.term?.trim() ?? '',
     formatDateInput(value.startDate) ?? '',
     formatDateInput(value.endDate) ?? '',

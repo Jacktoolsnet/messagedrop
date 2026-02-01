@@ -1,4 +1,4 @@
-export type DefaultTileType = 'datetime' | 'weather' | 'airQuality' | 'note' | 'message' | 'image';
+export type DefaultTileType = 'datetime' | 'weather' | 'airQuality' | 'note' | 'message' | 'image' | 'custom-experience';
 export type TileType = DefaultTileType | `custom-${string}`;
 export type TileLinkType = 'web' | 'phone' | 'email' | 'whatsapp' | 'sms' | 'map';
 
@@ -64,10 +64,11 @@ export const tileTypeToLabel: Record<DefaultTileType, string> = {
   airQuality: 'Air quality',
   note: 'Notes',
   message: 'Messages',
-  image: 'Images'
+  image: 'Images',
+  'custom-experience': 'Experiences'
 };
 
-const tileTypeOrder: DefaultTileType[] = ['datetime', 'weather', 'airQuality', 'note', 'message', 'image'];
+const tileTypeOrder: DefaultTileType[] = ['datetime', 'weather', 'airQuality', 'note', 'message', 'image', 'custom-experience'];
 
 export function createDefaultTileSettings(): TileSetting[] {
   return tileTypeOrder.map((type, index) => {

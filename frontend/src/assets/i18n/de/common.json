@@ -495,6 +495,7 @@
       "todo": "Aufgabenliste",
       "quickActions": "Schnellaktionen",
       "files": "Dateien",
+      "experiences": "Erlebnisse",
       "migraine": "Migräne-Alarm",
       "pollution": "Luftverschmutzung"
     },
@@ -513,6 +514,11 @@
         "notFound": "Nicht gefunden",
         "previewAlt": "Bildvorschau",
         "empty": "Keine Bilder gefunden."
+      },
+      "experiences": {
+        "title": "Erlebnisse",
+        "empty": "Noch keine Erlebnisse.",
+        "add": "Erlebnis hinzufügen"
       },
       "messages": {
         "title": "Öffentliche Nachrichten",

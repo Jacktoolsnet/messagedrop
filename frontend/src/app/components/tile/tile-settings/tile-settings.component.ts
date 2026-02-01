@@ -70,10 +70,14 @@ export class TileSettingsComponent {
   ];
 
   get addableTiles(): { type: TileSetting['type']; labelKey: string; icon: string }[] {
-    if (!this.isExperienceContext) {
-      return [...this.baseAddableTiles];
+    const tiles = [...this.baseAddableTiles];
+    if (this.isPlaceContext) {
+      tiles.push({ type: 'custom-experience', labelKey: 'common.tileTypes.experiences', icon: 'local_activity' });
     }
-    return this.baseAddableTiles.filter(tile => tile.type !== 'custom-date');
+    if (this.isExperienceContext) {
+      return tiles.filter(tile => tile.type !== 'custom-date');
+    }
+    return tiles;
   }
 
   private readonly tileTypeLabelKeys: Partial<Record<TileSetting['type'], string>> = {
@@ -89,6 +93,7 @@ export class TileSettingsComponent {
     'custom-todo': 'common.tileTypes.todo',
     'custom-quickaction': 'common.tileTypes.quickActions',
     'custom-file': 'common.tileTypes.files',
+    'custom-experience': 'common.tileTypes.experiences',
     'custom-migraine': 'common.tileTypes.migraine',
     'custom-pollution': 'common.tileTypes.pollution'
   };
@@ -154,6 +159,13 @@ export class TileSettingsComponent {
         title: label,
         icon: 'attach_file',
         files: []
+      };
+    }
+
+    if (tileToAdd.type === 'custom-experience') {
+      baseTile.payload = {
+        title: label,
+        icon: 'local_activity'
       };
     }
 

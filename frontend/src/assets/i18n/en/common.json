@@ -495,6 +495,7 @@
       "todo": "Todo list",
       "quickActions": "Quick actions",
       "files": "Files",
+      "experiences": "Experiences",
       "migraine": "Migraine alert",
       "pollution": "Pollution"
     },
@@ -513,6 +514,11 @@
         "notFound": "Not found",
         "previewAlt": "Image preview",
         "empty": "No images found."
+      },
+      "experiences": {
+        "title": "Experiences",
+        "empty": "No experiences yet.",
+        "add": "Add experience"
       },
       "messages": {
         "title": "Öffentliche Nachrichten",

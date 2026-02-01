@@ -495,6 +495,7 @@
       "todo": "Lista de tareas",
       "quickActions": "Acciones rápidas",
       "files": "Archivos",
+      "experiences": "Experiencias",
       "migraine": "Alerta de migraña",
       "pollution": "Contaminación"
     },
@@ -513,6 +514,11 @@
         "notFound": "No encontrado",
         "previewAlt": "Vista previa de la imagen",
         "empty": "No se encontraron imágenes."
+      },
+      "experiences": {
+        "title": "Experiencias",
+        "empty": "Todavía no hay experiencias.",
+        "add": "Agregar experiencia"
       },
       "messages": {
         "title": "Öffentliche Nachrichten",

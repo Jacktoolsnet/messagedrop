@@ -1,0 +1,42 @@
+<div class="tile">
+  <div class="tile-header">
+    <div class="tile-header__title">
+      <mat-icon class="tile-icon">local_activity</mat-icon>
+      <span class="tile-title">{{ 'common.tiles.experiences.title' | transloco }}</span>
+    </div>
+    <button
+      mat-icon-button
+      type="button"
+      class="tile-add"
+      (click)="openSearch($event)"
+      [attr.aria-label]="'common.tiles.experiences.add' | transloco">
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
+
+  @if (previewExperiences().length > 0) {
+    <div class="experience-list">
+      @for (experience of previewExperiences(); track experience.trackId || experience.productCode) {
+        <button type="button" class="experience-item" (click)="openDetail(experience, $event)">
+          @if (getExperienceImage(experience)) {
+            <img class="experience-avatar" [src]="getExperienceImage(experience)!" [alt]="getExperienceTitle(experience)" />
+          } @else {
+            <div class="experience-avatar experience-avatar--fallback">
+              <mat-icon>local_activity</mat-icon>
+            </div>
+          }
+          <div class="experience-text">
+            <span class="experience-title" [attr.title]="getExperienceTitle(experience)">
+              {{ getExperienceTitle(experience) }}
+            </span>
+            @if (getExperienceDuration(experience)) {
+              <span class="experience-subtitle">{{ getExperienceDuration(experience) }}</span>
+            }
+          </div>
+        </button>
+      }
+    </div>
+  } @else {
+    <div class="empty">{{ 'common.tiles.experiences.empty' | transloco }}</div>
+  }
+</div>

@@ -1,0 +1,113 @@
+.tile {
+  position: relative;
+  border-radius: 1rem;
+  color: var(--mat-card-subtitle-text-color);
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tile:hover {
+  transform: scale(1.02);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.tile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.tile-header__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.tile-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+.tile-add {
+  color: var(--mat-fab-small-foreground-color);
+}
+
+.experience-list {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.experience-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.6rem;
+  border: none;
+  background: rgba(0, 0, 0, 0.04);
+  padding: 0.45rem 0.6rem;
+  border-radius: 0.75rem;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+}
+
+.experience-item:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.experience-avatar {
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 0.6rem;
+  object-fit: cover;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.experience-avatar--fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.experience-avatar--fallback mat-icon {
+  font-size: 1.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.experience-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.experience-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.experience-subtitle {
+  font-size: 0.8rem;
+  color: var(--mat-card-subtitle-text-color);
+}
+
+.empty {
+  font-style: italic;
+  color: var(--mat-card-subtitle-text-color);
+}
