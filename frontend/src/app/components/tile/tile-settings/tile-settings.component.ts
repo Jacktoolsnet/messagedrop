@@ -60,7 +60,7 @@ export class TileSettingsComponent {
     this.data.place?.tileSettings ?? this.data.contact?.tileSettings ?? this.data.experience?.tileSettings,
     { includeDefaults: this.isPlaceContext, includeSystem: this.isPlaceContext }
   ).filter(tile => tile.type !== 'custom-link'));
-  private readonly baseAddableTiles: ReadonlyArray<{ type: TileSetting['type']; labelKey: string; icon: string }> = [
+  private readonly baseAddableTiles: readonly { type: TileSetting['type']; labelKey: string; icon: string }[] = [
     { type: 'custom-text', labelKey: 'common.tileTypes.text', icon: 'text_fields' },
     { type: 'custom-multitext', labelKey: 'common.tileTypes.multitext', icon: 'notes' },
     { type: 'custom-date', labelKey: 'common.tileTypes.anniversary', icon: 'event' },

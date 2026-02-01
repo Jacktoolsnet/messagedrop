@@ -11,7 +11,6 @@ import {
   ExperienceListDialogData,
   ExperienceResult,
   ViatorProductSearchRequest,
-  ViatorProductSearchResponse
 } from '../../interfaces/viator';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { ExperienceBookmarkService } from '../../services/experience-bookmark.service';

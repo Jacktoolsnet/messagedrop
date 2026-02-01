@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Inject, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent } from '@angular/material/dialog';
@@ -34,13 +34,12 @@ export class ExperienceSearchPinDialogComponent {
   private readonly bookmarkService = inject(ExperienceBookmarkService);
   private readonly userService = inject(UserService);
   private readonly userSet = this.userService.userSet;
+  readonly data = inject<ExperienceSearchPinDialogData>(MAT_DIALOG_DATA);
+  readonly help = inject(HelpDialogService);
+  private readonly transloco = inject(TranslocoService);
+  private readonly dialog = inject(MatDialog);
 
-  constructor(
-    @Inject(MAT_DIALOG_DATA) readonly data: ExperienceSearchPinDialogData,
-    readonly help: HelpDialogService,
-    private readonly transloco: TranslocoService,
-    private readonly dialog: MatDialog
-  ) {
+  constructor() {
     effect(() => {
       this.userSet();
       if (this.userService.hasJwt()) {

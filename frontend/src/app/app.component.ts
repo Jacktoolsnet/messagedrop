@@ -67,7 +67,6 @@ import { DEFAULT_SEARCH_SETTINGS, SearchSettings } from './interfaces/search-set
 import { ExperienceBookmarkService } from './services/experience-bookmark.service';
 import { SharedContent } from './interfaces/shared-content';
 import { ExperienceResult, ViatorDestinationLookup } from './interfaces/viator';
-import { ExperiencelistComponent } from './components/experiencelist/experiencelist.component';
 import { ShortNumberPipe } from './pipes/short-number.pipe';
 import { AirQualityService } from './services/air-quality.service';
 import { AppService } from './services/app.service';

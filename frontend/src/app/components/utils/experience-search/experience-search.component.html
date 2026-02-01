@@ -30,7 +30,8 @@
       </div>
     </mat-menu>
     <mat-menu #filterMenu="matMenu">
-      <div class="filter-menu-content" (click)="$event.stopPropagation()">
+      <div class="filter-menu-content" tabindex="0" (click)="$event.stopPropagation()"
+        (keydown)="$event.stopPropagation()">
         <div class="filter-tiles">
           <section class="filter-tile">
             <div class="filter-tile-header">

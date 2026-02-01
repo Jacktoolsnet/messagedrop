@@ -20,7 +20,6 @@ import { DisplayMessageConfig } from '../../../interfaces/display-message-config
 import { Location } from '../../../interfaces/location';
 import {
   ExperienceMapMarker,
-  ExperienceProvider,
   ExperienceResult,
   ExperienceSearchForm,
   ExperienceSearchFormValue,

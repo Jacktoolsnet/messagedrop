@@ -264,13 +264,13 @@ export interface ViatorProductDetail {
   productCode?: string;
   title?: string;
   description?: string;
-  images?: Array<{
-    variants?: Array<{
+  images?: {
+    variants?: {
       height?: number;
       width?: number;
       url?: string;
-    }>;
-  }>;
+    }[];
+  }[];
   logistics?: ViatorProductLogistics;
 }
 

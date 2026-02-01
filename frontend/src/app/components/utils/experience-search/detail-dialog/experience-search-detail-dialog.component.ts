@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, Inject, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -26,7 +26,6 @@ import { UserService } from '../../../../services/user.service';
 import { SearchSettingsMapPreviewComponent } from '../../search-settings/search-settings-map-preview.component';
 import { HelpDialogService } from '../../help-dialog/help-dialog.service';
 import { DisplayMessage } from '../../display-message/display-message.component';
-import { ExperienceResult } from '../../../../interfaces/viator';
 import { DialogHeaderComponent } from '../../dialog-header/dialog-header.component';
 import { TileQuickAction, TileSetting } from '../../../../interfaces/tile-settings';
 
@@ -58,6 +57,8 @@ export class ExperienceSearchDetailDialogComponent {
   private readonly userService = inject(UserService);
   private readonly dialog = inject(MatDialog);
   private readonly userSet = this.userService.userSet;
+  readonly data = inject<ExperienceSearchDetailDialogData>(MAT_DIALOG_DATA);
+  readonly help = inject(HelpDialogService);
 
   readonly loading = signal(false);
   readonly detail = signal<ViatorProductDetail | null>(null);
@@ -84,10 +85,7 @@ export class ExperienceSearchDetailDialogComponent {
     return bookmarks.some((bookmark) => bookmark.productCode === productCode);
   });
 
-  constructor(
-    @Inject(MAT_DIALOG_DATA) readonly data: ExperienceSearchDetailDialogData,
-    readonly help: HelpDialogService
-  ) {
+  constructor() {
     this.loadDetails();
     this.loadSupplierInfo();
     this.loadBookmarksIfNeeded();

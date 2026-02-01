@@ -11,11 +11,11 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { HelpDialogService } from '../help-dialog/help-dialog.service';
 import { DialogHeaderComponent } from '../dialog-header/dialog-header.component';
 
-type TextDialogData = {
+interface TextDialogData {
   text: string;
   titleKey?: string;
   titleIcon?: string;
-};
+}
 
 @Component({
   selector: 'app-message',

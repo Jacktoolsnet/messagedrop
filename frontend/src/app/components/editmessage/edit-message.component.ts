@@ -31,10 +31,10 @@ interface TextDialogResult {
   text: string;
 }
 
-type DialogHeaderConfig = {
+interface DialogHeaderConfig {
   icon: string;
   labelKey: string;
-};
+}
 
 @Component({
   selector: 'app-message',

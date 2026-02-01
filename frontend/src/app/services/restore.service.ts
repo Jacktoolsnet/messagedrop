@@ -481,7 +481,7 @@ export class RestoreService {
     if (!currentUser?.id || currentUser.id !== payload.userId) {
       return false;
     }
-    const tableUser = (payload.server?.tables?.['tableUser'] ?? []) as Array<Record<string, unknown>>;
+    const tableUser = (payload.server?.tables?.['tableUser'] ?? []) as Record<string, unknown>[];
     const backupRow = tableUser.find((row) => row['id'] === payload.userId) ?? tableUser[0];
     if (!backupRow) {
       return false;

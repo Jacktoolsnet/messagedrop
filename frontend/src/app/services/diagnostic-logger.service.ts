@@ -217,7 +217,7 @@ export class DiagnosticLoggerService {
 
   private safeStack(value?: string, maxLen = 4000): string | undefined {
     if (!value) return undefined;
-    return value.replace(/[^\x09\x0A\x0D\x20-\x7E]/g, '').slice(0, maxLen) || undefined;
+    return value.replace(/[^\t\n\r\x20-\x7E]/g, '').slice(0, maxLen) || undefined;
   }
 
   private safeSource(value?: string): string | undefined {
