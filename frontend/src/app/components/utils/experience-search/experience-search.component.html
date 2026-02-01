@@ -215,6 +215,12 @@
     [attr.aria-label]="'common.actions.help' | transloco">
     <mat-icon>help</mat-icon>
   </button>
+  <button mat-icon-button type="button" (click)="onSearchButtonClick()" [disabled]="loading() || !canSearch()"
+    [attr.aria-label]="canLoadMore() && !hasSearchChanged()
+        ? ('common.experiences.loadMore' | transloco)
+        : ('common.experiences.search' | transloco)">
+    <mat-icon>{{ canLoadMore() && !hasSearchChanged() ? 'refresh' : 'search' }}</mat-icon>
+  </button>
   <button mat-icon-button type="button" (click)="toggleViewMode()"
     [attr.aria-label]="viewMode() === 'list' ? ('common.location.switchToMap' | transloco) : ('common.location.switchToList' | transloco)">
     <mat-icon>{{ viewMode() === 'list' ? 'map' : 'list' }}</mat-icon>
