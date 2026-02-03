@@ -460,6 +460,31 @@ export class ContactChatroomComponent implements AfterViewInit {
     if (!contact || message.direction !== 'user') {
       return;
     }
+    if (message.payload?.location) {
+      const dialogRef = this.matDialog.open(LocationPickerDialogComponent, {
+        data: { location: { ...message.payload.location }, markerType: 'message' },
+        maxWidth: '95vw',
+        maxHeight: '95vh',
+        width: '95vw',
+        height: '95vh',
+        autoFocus: false,
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop',
+        disableClose: false
+      });
+
+      dialogRef.afterClosed().subscribe((location?: Location) => {
+        if (!location) {
+          return;
+        }
+        const payload: ShortMessage = message.payload ? { ...message.payload, location: { ...location } } : {
+          ...this.createEmptyMessage(),
+          location: { ...location }
+        };
+        void this.sendAsNewMessage(contact, payload);
+      });
+      return;
+    }
     const initialPayload: ShortMessage = message.payload
       ? { ...message.payload }
       : this.createEmptyMessage();

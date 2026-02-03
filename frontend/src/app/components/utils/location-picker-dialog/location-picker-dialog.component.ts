@@ -25,7 +25,7 @@ interface LocationPickerDialogData {
 
 const markerIcons: Record<MarkerKind, leaflet.Icon> = {
   message: leaflet.icon({
-    iconUrl: 'assets/markers/message-marker.svg',
+    iconUrl: 'assets/markers/location-marker.svg',
     iconSize: [32, 40],
     iconAnchor: [16, 40]
   }),
