@@ -452,6 +452,7 @@ export class ContactChatroomComponent implements AfterViewInit {
 
   jumpToLocation(location: Location): void {
     this.mapService.moveToWithZoom(location, 18);
+    this.matDialog.getDialogById('contactListDialog')?.close();
     this.dialogRef.close();
   }
 

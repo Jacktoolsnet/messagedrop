@@ -1204,6 +1204,7 @@ export class AppComponent implements OnInit {
     const hasContacts = contactCount > 0;
     const dialogWidth = contactCount > 1 ? 'min(900px, 95vw)' : 'min(520px, 95vw)';
     const dialogRef = this.dialog.open(ContactlistComponent, {
+      id: 'contactListDialog',
       panelClass: hasContacts ? 'ContactListDialog' : undefined,
       closeOnNavigation: true,
       data: {},
