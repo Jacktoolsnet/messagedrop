@@ -218,7 +218,7 @@
         <span>{{ 'common.menu.privateDocument' | transloco }}</span>
     </button>
     @if (!userService.isReady() || userService.hasJwt()) {
-    <button mat-menu-item
+    <!--button mat-menu-item
         (click)="!userService.isReady() ? userService.loginWithBackend(openContactListDialog.bind(this)) : openContactListDialog()">
         @if (!userService.isReady()){
         <mat-icon>locked</mat-icon>
@@ -226,7 +226,7 @@
         <mat-icon>contacts</mat-icon>
         }
         <span>{{ 'common.menu.contactsMessage' | transloco }}</span>
-    </button>
+    </button-->
     }
 
     @if (networkService.backendOnline() && !maintenanceActive()) {
