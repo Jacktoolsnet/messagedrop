@@ -5,7 +5,17 @@
   </div>
 
   <div class="audio-recorder__wave">
+    @if (audioPayload?.waveform?.length) {
+    <div class="audio-recorder__bars">
+      @for (bar of audioPayload!.waveform; track $index) {
+      <span class="audio-recorder__bar"
+        [style.transform]="'scaleY(' + (bar ?? 0.2) + ')'"
+        [class.audio-recorder__bar--active]="isAudioBarActive($index)"></span>
+      }
+    </div>
+    } @else {
     <div class="audio-recorder__wave-bars"></div>
+    }
   </div>
 
   @if (errorMessage && !isTooLarge) {
@@ -20,7 +30,21 @@
   </div>
   }
 
-  <div class="audio-recorder__controls">
+  <div class="audio-recorder__controls" aria-hidden="true"></div>
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <div class="audio-recorder__actionbar audio-recorder__actionbar--left">
+    <button mat-icon-button type="button" (click)="cancel()" [attr.aria-label]="'common.actions.abort' | transloco">
+      <mat-icon>close</mat-icon>
+    </button>
+    <button mat-icon-button type="button" (click)="openHelp()"
+      [attr.aria-label]="'common.actions.help' | transloco">
+      <mat-icon>help</mat-icon>
+    </button>
+  </div>
+
+  <div class="audio-recorder__actionbar audio-recorder__actionbar--right">
     <button mat-icon-button type="button" (click)="toggleRecording()"
       [attr.aria-label]="recording ? ('common.audioRecorder.stop' | transloco) : ('common.audioRecorder.record' | transloco)">
       <mat-icon>{{ recording ? 'mic_off' : 'mic' }}</mat-icon>
@@ -35,15 +59,10 @@
       [attr.aria-label]="'common.audioRecorder.retry' | transloco">
       <mat-icon>delete</mat-icon>
     </button>
-  </div>
-</mat-dialog-content>
 
-<mat-dialog-actions class="sticky-actions" align="end">
-  <button mat-icon-button type="button" (click)="cancel()" [attr.aria-label]="'common.actions.abort' | transloco">
-    <mat-icon>close</mat-icon>
-  </button>
-  <button mat-icon-button color="primary" type="button" (click)="send()" [disabled]="!hasAudio || isTooLarge"
-    [attr.aria-label]="'common.audioRecorder.send' | transloco">
-    <mat-icon>send</mat-icon>
-  </button>
+    <button mat-icon-button color="primary" type="button" (click)="send()" [disabled]="!hasAudio || isTooLarge"
+      [attr.aria-label]="'common.audioRecorder.send' | transloco">
+      <mat-icon>send</mat-icon>
+    </button>
+  </div>
 </mat-dialog-actions>

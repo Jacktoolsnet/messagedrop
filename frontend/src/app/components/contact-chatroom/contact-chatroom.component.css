@@ -291,26 +291,53 @@
   display: grid;
   gap: 0.35rem;
   margin-top: 0.75rem;
+  margin-bottom: 0.6rem;
   padding: 0.6rem 0.75rem;
   border-radius: 0.75rem;
-  background: color-mix(in srgb, var(--mat-card-filled-container-color) 88%, transparent);
-  border: 1px solid color-mix(in srgb, var(--mat-card-outlined-outline-color) 60%, transparent);
-  box-shadow: 0 2px 6px color-mix(in srgb, var(--mat-card-outlined-outline-color) 35%, transparent);
+  background-color: var(--mat-card-filled-container-color);
+  border: 1px solid var(--mat-card-outlined-outline-color);
+  box-shadow: 0 2px 6px var(--mat-card-outlined-outline-color);
 }
 
 .chat-audio__wave {
-  height: 36px;
+  height: 52px;
   border-radius: 0.5rem;
   background-image:
     repeating-linear-gradient(90deg,
-      color-mix(in srgb, var(--mat-primary-color) 35%, transparent) 0 6px,
+      rgba(0, 0, 0, 0.15) 0 6px,
       transparent 6px 10px),
     linear-gradient(90deg,
       transparent 0%,
-      color-mix(in srgb, var(--mat-primary-color) 65%, transparent) 35%,
+      var(--mat-primary-color) 35%,
       transparent 70%);
   background-size: 10px 100%, 120px 100%;
   opacity: 0.9;
+}
+
+.chat-audio__bars {
+  height: 52px;
+  display: grid;
+  grid-auto-flow: column;
+  gap: 1px;
+  align-items: center;
+  padding: 2px 0;
+  background: color-mix(in srgb, var(--mat-primary-color, #0b5fff) 18%, transparent);
+  border-radius: 0.4rem;
+}
+
+.chat-audio__bar {
+  width: 4px;
+  border-radius: 999px;
+  background: var(--mat-primary-color, #0b5fff);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--mat-primary-color, #0b5fff) 45%, transparent);
+  opacity: 1;
+  height: 100%;
+  transform-origin: center;
+}
+
+.chat-audio__bar--active {
+  background: var(--mat-accent-color, #00b37a);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--mat-accent-color, #00b37a) 50%, transparent);
 }
 
 .chat-audio__duration {

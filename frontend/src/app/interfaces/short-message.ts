@@ -15,6 +15,7 @@ export interface ShortMessage {
         base64: string,
         mimeType: string,
         sizeBytes: number,
-        durationMs: number
+        durationMs: number,
+        waveform?: number[]
     } | null
 }
