@@ -94,6 +94,26 @@
             @if (msg.payload.message.trim() !== '') {
             <app-showmessage [message]="msg.payload!.message" [style]="msg.payload!.style"></app-showmessage>
             }
+            @if (msg.payload.experience) {
+            <div class="chat-experience">
+              @if (getExperienceImage(msg.payload.experience); as imageUrl) {
+              <img class="chat-experience__image" [src]="imageUrl" [alt]="getExperienceTitle(msg.payload.experience)" />
+              } @else {
+              <div class="chat-experience__image chat-experience__image--fallback">
+                <mat-icon>local_activity</mat-icon>
+              </div>
+              }
+              <div class="chat-experience__body">
+                <span class="chat-experience__title">{{ getExperienceTitle(msg.payload.experience) }}</span>
+                @if (getExperienceDuration(msg.payload.experience)) {
+                <span class="chat-experience__meta">{{ getExperienceDuration(msg.payload.experience) }}</span>
+                }
+                @if (getExperiencePriceLabel(msg.payload.experience)) {
+                <span class="chat-experience__price">{{ getExperiencePriceLabel(msg.payload.experience) }}</span>
+                }
+              </div>
+            </div>
+            }
             @if (msg.payload.location) {
             <div class="chat-location">
               <app-location-preview [location]="msg.payload.location"></app-location-preview>
@@ -108,6 +128,12 @@
           </div>
           <div class="message-actions-row button-me">
             <div class="message-actions">
+              @if (msg.payload?.experience; as exp) {
+              <button mat-mini-fab color="primary" [attr.aria-label]="'common.experiences.showMore' | transloco"
+                (click)="openExperienceDetails(exp)">
+                <mat-icon>expand_content</mat-icon>
+              </button>
+              }
               @if (msg.payload?.location; as loc) {
               <button mat-mini-fab color="primary" [attr.aria-label]="'common.contact.chatroom.showOnMap' | transloco"
                 (click)="jumpToLocation(loc)">
@@ -166,6 +192,26 @@
             @if (msg.payload.message.trim() !== '') {
             <app-showmessage [message]="getDisplayedMessage(msg)" [style]="msg.payload!.style"></app-showmessage>
             }
+            @if (msg.payload.experience) {
+            <div class="chat-experience">
+              @if (getExperienceImage(msg.payload.experience); as imageUrl) {
+              <img class="chat-experience__image" [src]="imageUrl" [alt]="getExperienceTitle(msg.payload.experience)" />
+              } @else {
+              <div class="chat-experience__image chat-experience__image--fallback">
+                <mat-icon>local_activity</mat-icon>
+              </div>
+              }
+              <div class="chat-experience__body">
+                <span class="chat-experience__title">{{ getExperienceTitle(msg.payload.experience) }}</span>
+                @if (getExperienceDuration(msg.payload.experience)) {
+                <span class="chat-experience__meta">{{ getExperienceDuration(msg.payload.experience) }}</span>
+                }
+                @if (getExperiencePriceLabel(msg.payload.experience)) {
+                <span class="chat-experience__price">{{ getExperiencePriceLabel(msg.payload.experience) }}</span>
+                }
+              </div>
+            </div>
+            }
             @if (msg.payload.location) {
             <div class="chat-location">
               <app-location-preview [location]="msg.payload.location"></app-location-preview>
@@ -180,6 +226,12 @@
           </div>
           <div class="message-actions-row button-them">
             <div class="message-actions">
+              @if (msg.payload?.experience; as exp) {
+              <button mat-mini-fab color="primary" [attr.aria-label]="'common.experiences.showMore' | transloco"
+                (click)="openExperienceDetails(exp)">
+                <mat-icon>expand_content</mat-icon>
+              </button>
+              }
               @if (msg.payload?.location; as loc) {
               <button mat-mini-fab color="primary" [attr.aria-label]="'common.contact.chatroom.showOnMap' | transloco"
                 (click)="jumpToLocation(loc)">

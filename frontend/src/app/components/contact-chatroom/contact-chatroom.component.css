@@ -287,6 +287,54 @@
   margin-bottom: 1.5rem;
 }
 
+.chat-experience {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  padding: 0.6rem;
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--mat-card-filled-container-color) 85%, transparent);
+  border: 1px solid color-mix(in srgb, var(--mat-card-outlined-outline-color) 60%, transparent);
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--mat-card-outlined-outline-color) 35%, transparent);
+}
+
+.chat-experience__image {
+  width: 72px;
+  height: 72px;
+  border-radius: 0.6rem;
+  object-fit: cover;
+  display: block;
+}
+
+.chat-experience__image--fallback {
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--mat-card-outlined-outline-color) 12%, transparent);
+  color: var(--mat-card-subtitle-text-color);
+}
+
+.chat-experience__body {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.chat-experience__title {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.chat-experience__meta {
+  color: var(--mat-card-subtitle-text-color);
+  font-size: 0.8rem;
+}
+
+.chat-experience__price {
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-bottom: 0.6rem;
+}
+
 .bubble--me {
   text-align: right;
 }

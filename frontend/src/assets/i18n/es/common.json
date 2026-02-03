@@ -852,6 +852,7 @@
     "locationUnavailable": "Los detalles de la ubicación no están disponibles.",
     "openInMaps": "Abrir en Maps",
     "openOn": "Abrir en {{ provider }}",
+    "sendToChat": "Compartir en el chat",
     "save": "Guardar experiencia",
     "saved": "Guardado",
     "saveTitle": "Añadido a mis experiencias",

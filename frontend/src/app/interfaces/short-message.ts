@@ -1,5 +1,6 @@
 import { Location } from "./location";
 import { Multimedia } from "./multimedia";
+import { ExperienceResult } from "./viator";
 
 export interface ShortMessage {
     message: string,
@@ -7,5 +8,7 @@ export interface ShortMessage {
     verified?: boolean,
     style: string,
     multimedia: Multimedia,
-    location?: Location | null
+    location?: Location | null,
+    experience?: ExperienceResult | null,
+    experienceSearchTerm?: string | null
 }

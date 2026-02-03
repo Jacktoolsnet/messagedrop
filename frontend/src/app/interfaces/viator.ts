@@ -278,6 +278,7 @@ export interface ExperienceSearchPinDialogData {
   destinationId: number;
   destinationName?: string;
   results: ExperienceResult[];
+  source?: 'chat';
 }
 
 export interface ExperienceListDialogData {

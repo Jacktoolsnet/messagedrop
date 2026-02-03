@@ -12,6 +12,7 @@ import { Location } from '../../interfaces/location';
 import { Mode } from '../../interfaces/mode';
 import { MultimediaType } from '../../interfaces/multimedia-type';
 import { ShortMessage } from '../../interfaces/short-message';
+import { ExperienceResult } from '../../interfaces/viator';
 import { ContactMessageService } from '../../services/contact-message.service';
 import { ContactService } from '../../services/contact.service';
 import { LanguageService } from '../../services/language.service';
@@ -30,6 +31,7 @@ import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { LocationPickerDialogComponent } from '../utils/location-picker-dialog/location-picker-dialog.component';
 import { LocationPreviewComponent } from '../utils/location-preview/location-preview.component';
 import { ExperienceSearchComponent } from '../utils/experience-search/experience-search.component';
+import { ExperienceSearchDetailDialogComponent } from '../utils/experience-search/detail-dialog/experience-search-detail-dialog.component';
 import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
 
 interface ChatroomMessage {
@@ -351,6 +353,7 @@ export class ContactChatroomComponent implements AfterViewInit {
 
   openExperienceSearch(): void {
     const dialogRef = this.matDialog.open(ExperienceSearchComponent, {
+      data: { source: 'chat' },
       panelClass: '',
       closeOnNavigation: true,
       minWidth: 'min(450px, 95vw)',
@@ -365,12 +368,17 @@ export class ContactChatroomComponent implements AfterViewInit {
     });
 
     const subscription = dialogRef.componentInstance.selected.subscribe((result) => {
+      const contact = this.contact();
+      if (contact) {
+        const payload = this.createEmptyMessage();
+        payload.experience = result;
+        payload.experienceSearchTerm = dialogRef.componentInstance.getChatSearchTerm();
+        void this.sendAsNewMessage(contact, payload);
+      }
       dialogRef.close(result);
     });
 
-    dialogRef.afterClosed().subscribe(() => {
-      subscription.unsubscribe();
-    });
+    dialogRef.afterClosed().subscribe(() => subscription.unsubscribe());
   }
 
   openLocationPicker(): void {
@@ -481,9 +489,75 @@ export class ContactChatroomComponent implements AfterViewInit {
     this.dialogRef.close();
   }
 
+  openExperienceDetails(result: ExperienceResult): void {
+    this.matDialog.open(ExperienceSearchDetailDialogComponent, {
+      data: { result },
+      autoFocus: false,
+      backdropClass: 'dialog-backdrop',
+      maxWidth: '95vw',
+      maxHeight: '95vh'
+    });
+  }
+
+  getExperienceTitle(result: ExperienceResult): string {
+    return result.title || result.productCode || '';
+  }
+
+  getExperienceDuration(result: ExperienceResult): string {
+    return result.duration || '';
+  }
+
+  getExperiencePriceLabel(result: ExperienceResult): string {
+    if (result.priceFrom === undefined || result.priceFrom === null) {
+      return '';
+    }
+    const currency = result.currency || 'EUR';
+    const locale = this.languageService.effectiveLanguage() || 'en';
+    try {
+      return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(result.priceFrom);
+    } catch {
+      return `${result.priceFrom} ${currency}`;
+    }
+  }
+
+  getExperienceImage(result: ExperienceResult): string | null {
+    return result.imageUrl || result.avatarUrl || null;
+  }
+
   editMessage(message: ChatroomMessage): void {
     const contact = this.contact();
     if (!contact || message.direction !== 'user') {
+      return;
+    }
+    if (message.payload?.experience) {
+      const initialTerm = message.payload.experienceSearchTerm
+        || message.payload.experience.title
+        || message.payload.experience.productCode
+        || '';
+      const dialogRef = this.matDialog.open(ExperienceSearchComponent, {
+        data: { source: 'chat', initialTerm, autoSearch: true },
+        panelClass: '',
+        closeOnNavigation: true,
+        minWidth: 'min(450px, 95vw)',
+        width: '90vw',
+        maxWidth: '90vw',
+        height: '90vh',
+        maxHeight: '90vh',
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop',
+        disableClose: false,
+        autoFocus: false
+      });
+
+      const subscription = dialogRef.componentInstance.selected.subscribe((result) => {
+        const payload = this.createEmptyMessage();
+        payload.experience = result;
+        payload.experienceSearchTerm = dialogRef.componentInstance.getChatSearchTerm();
+        void this.sendAsNewMessage(contact, payload);
+        dialogRef.close(result);
+      });
+
+      dialogRef.afterClosed().subscribe(() => subscription.unsubscribe());
       return;
     }
     if (message.payload?.location) {

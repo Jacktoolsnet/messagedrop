@@ -183,12 +183,19 @@
                 [attr.aria-label]="'common.experiences.showMore' | transloco">
                 <mat-icon>expand_content</mat-icon>
               </button>
+              @if (isChatContext) {
+              <button mat-mini-fab color="secondary" type="button" (click)="sendToChat(result, $event)"
+                [attr.aria-label]="'common.experiences.sendToChat' | transloco">
+                <mat-icon>chat_paste_go_2</mat-icon>
+              </button>
+              } @else {
               <button mat-mini-fab color="secondary" type="button" (click)="onToggleBookmark(result, $event)"
                 [attr.aria-label]="isBookmarked(result)
                   ? ('common.experiences.saveRemovedTitle' | transloco)
                   : ('common.experiences.saveTitle' | transloco)">
                 <mat-icon>{{ isBookmarked(result) ? 'bookmark_remove' : 'bookmark_add' }}</mat-icon>
               </button>
+              }
             </div>
             <div class="tile-actions__right">
               <button mat-raised-button color="primary" class="open-viator-button" type="button"

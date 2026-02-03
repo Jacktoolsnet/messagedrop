@@ -849,6 +849,7 @@
     "locationUnavailable": "Location details not available.",
       "openInMaps": "Open in Maps",
       "openOn": "Open on {{ provider }}",
+      "sendToChat": "Send to chat",
       "save": "Save experience",
       "saved": "Saved",
       "saveTitle": "Added to my experiences",

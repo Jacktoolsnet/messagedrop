@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { HelpDialogService } from '../../help-dialog/help-dialog.service';
@@ -38,6 +38,8 @@ export class ExperienceSearchPinDialogComponent {
   readonly help = inject(HelpDialogService);
   private readonly transloco = inject(TranslocoService);
   private readonly dialog = inject(MatDialog);
+  private readonly dialogRef = inject(MatDialogRef<ExperienceSearchPinDialogComponent>);
+  readonly isChatContext = this.data.source === 'chat';
 
   constructor() {
     effect(() => {
@@ -52,6 +54,11 @@ export class ExperienceSearchPinDialogComponent {
     if (result.productUrl) {
       window.open(result.productUrl, '_blank');
     }
+  }
+
+  sendToChat(result: ExperienceResult, event?: Event): void {
+    event?.stopPropagation();
+    this.dialogRef.close(result);
   }
 
   openDetails(result: ExperienceResult): void {

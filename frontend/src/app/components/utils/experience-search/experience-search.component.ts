@@ -51,6 +51,9 @@ import { ExperienceSearchPinDialogComponent } from './pin-dialog/experience-sear
 interface ExperienceSearchDialogData {
   destinationId?: number;
   destinationName?: string;
+  source?: 'chat';
+  initialTerm?: string;
+  autoSearch?: boolean;
 }
 
 const PAGE_SIZE = 20;
@@ -120,6 +123,8 @@ export class ExperienceSearchComponent {
   private readonly dialog = inject(MatDialog);
   private readonly dialogData = inject<ExperienceSearchDialogData | null>(MAT_DIALOG_DATA, { optional: true });
   readonly destinationName = (this.dialogData?.destinationName ?? '').trim();
+  readonly isChatContext = this.dialogData?.source === 'chat';
+  private lastChatSearchTerm = '';
 
   readonly sortOptions: { value: ExperienceSortOption; labelKey: string }[] = [
     { value: 'relevance', labelKey: 'common.experiences.sortRelevance' },
@@ -149,6 +154,13 @@ export class ExperienceSearchComponent {
   });
 
   constructor() {
+    if (this.dialogData?.initialTerm) {
+      this.form.controls.term.setValue(this.dialogData.initialTerm);
+      this.lastChatSearchTerm = this.dialogData.initialTerm.trim();
+    }
+    if (this.dialogData?.autoSearch && this.form.controls.term.value.trim()) {
+      queueMicrotask(() => this.onSearch());
+    }
     if (this.lockedDestinationId !== undefined) {
       this.viewMode.set('list');
       queueMicrotask(() => {
@@ -280,6 +292,16 @@ export class ExperienceSearchComponent {
     }
   }
 
+  sendToChat(result: ExperienceResult, event?: Event): void {
+    event?.stopPropagation();
+    this.lastChatSearchTerm = this.form.controls.term.value.trim();
+    this.selected.emit(result);
+  }
+
+  getChatSearchTerm(): string {
+    return this.lastChatSearchTerm || this.form.controls.term.value.trim();
+  }
+
   toggleViewMode(): void {
     this.viewMode.update((mode) => (mode === 'map' ? 'list' : 'map'));
   }
@@ -305,9 +327,10 @@ export class ExperienceSearchComponent {
     const data: ExperienceSearchPinDialogData = {
       destinationId: marker.destinationId,
       destinationName: destinationName || undefined,
-      results: matches
+      results: matches,
+      source: this.isChatContext ? 'chat' : undefined
     };
-    this.dialog.open(ExperienceSearchPinDialogComponent, {
+    const dialogRef = this.dialog.open(ExperienceSearchPinDialogComponent, {
       data,
       panelClass: 'pin-dialog',
       backdropClass: 'dialog-backdrop',
@@ -315,6 +338,12 @@ export class ExperienceSearchComponent {
       maxWidth: '80vw',
       maxHeight: '75vh',
       autoFocus: false
+    });
+    dialogRef.afterClosed().subscribe((result?: ExperienceResult) => {
+      if (result && this.isChatContext) {
+        this.lastChatSearchTerm = this.form.controls.term.value.trim();
+        this.selected.emit(result);
+      }
     });
   }
 
