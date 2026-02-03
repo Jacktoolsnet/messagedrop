@@ -198,6 +198,7 @@
       "chatroom": {
         "closeAria": "Fermer la discussion",
         "composeAria": "Rédiger un message",
+        "addVoiceAria": "Nouveau message vocal",
         "addExperienceAria": "Ajouter un message d’expérience",
         "addLocationAria": "Ajouter un message de localisation",
         "avatarAltName": "Avatar de {{ name }}",
@@ -223,12 +224,24 @@
           "confirm": "Ce message sera supprimé définitivement. Êtes-vous sûr ?"
         }
       },
-      "message": {
-        "addText": "Ajouter du texte",
+    "message": {
+      "addText": "Ajouter du texte",
         "dropNewAria": "Publier un nouveau message",
         "applyAria": "Publier votre message",
         "policy": "Ces informations sont stockées sur notre serveur et sont visibles par tous."
       }
+    },
+    "audioRecorder": {
+      "title": "Message vocal",
+      "record": "Enregistrer",
+      "stop": "Arrêter",
+      "play": "Lire",
+      "pause": "Pause",
+      "retry": "Réenregistrer",
+      "send": "Envoyer",
+      "notSupported": "L’enregistrement audio n’est pas pris en charge par ce navigateur.",
+      "permissionDenied": "Accès au microphone refusé.",
+      "tooLarge": "L’enregistrement est trop volumineux. Max {{ maxMb }} Mo."
     },
     "geoStatistic": {
       "title": "Service GeoStatistic",

@@ -1,0 +1,49 @@
+<mat-dialog-content class="audio-recorder">
+  <div class="audio-recorder__header">
+    <mat-icon>mic</mat-icon>
+    <span>{{ 'common.audioRecorder.title' | transloco }}</span>
+  </div>
+
+  <div class="audio-recorder__wave">
+    <div class="audio-recorder__wave-bars"></div>
+  </div>
+
+  @if (errorMessage && !isTooLarge) {
+  <div class="audio-recorder__error">
+    {{ errorMessage | transloco }}
+  </div>
+  }
+
+  @if (isTooLarge) {
+  <div class="audio-recorder__error">
+    {{ 'common.audioRecorder.tooLarge' | transloco:{ maxMb: (maxBase64Bytes / 1_000_000) } }}
+  </div>
+  }
+
+  <div class="audio-recorder__controls">
+    <button mat-icon-button type="button" (click)="toggleRecording()"
+      [attr.aria-label]="recording ? ('common.audioRecorder.stop' | transloco) : ('common.audioRecorder.record' | transloco)">
+      <mat-icon>{{ recording ? 'mic_off' : 'mic' }}</mat-icon>
+    </button>
+
+    <button mat-icon-button type="button" (click)="togglePlayback()" [disabled]="!hasAudio"
+      [attr.aria-label]="isPlaying() ? ('common.audioRecorder.pause' | transloco) : ('common.audioRecorder.play' | transloco)">
+      <mat-icon>{{ isPlaying() ? 'pause' : 'play_arrow' }}</mat-icon>
+    </button>
+
+    <button mat-icon-button type="button" (click)="resetAudio()" [disabled]="!hasAudio && !isTooLarge"
+      [attr.aria-label]="'common.audioRecorder.retry' | transloco">
+      <mat-icon>delete</mat-icon>
+    </button>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-icon-button type="button" (click)="cancel()" [attr.aria-label]="'common.actions.abort' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+  <button mat-icon-button color="primary" type="button" (click)="send()" [disabled]="!hasAudio || isTooLarge"
+    [attr.aria-label]="'common.audioRecorder.send' | transloco">
+    <mat-icon>send</mat-icon>
+  </button>
+</mat-dialog-actions>

@@ -8,6 +8,14 @@ const metric = require('../middleware/metric');
 const tableContactMessage = require('../db/tableContactMessage');
 const { apiError } = require('../middleware/api-error');
 
+const DEFAULT_MAX_MESSAGE_BYTES = 1_500_000;
+const MAX_MESSAGE_BYTES = (() => {
+  const raw = process.env.CONTACT_MESSAGE_MAX_BYTES;
+  if (!raw) return DEFAULT_MAX_MESSAGE_BYTES;
+  const parsed = Number.parseInt(raw, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_MAX_MESSAGE_BYTES;
+})();
+
 function getAuthUserId(req) {
   return req.jwtUser?.userId ?? req.jwtUser?.id ?? null;
 }
@@ -61,6 +69,12 @@ const validateSendBody = (body) => {
   if (!['user', 'contactUser'].includes(body.direction)) {
     return 'direction must be "user" or "contactUser"';
   }
+  if (Buffer.byteLength(body.encryptedMessageForUser, 'utf8') > MAX_MESSAGE_BYTES) {
+    return 'encryptedMessageForUser_too_large';
+  }
+  if (Buffer.byteLength(body.encryptedMessageForContact, 'utf8') > MAX_MESSAGE_BYTES) {
+    return 'encryptedMessageForContact_too_large';
+  }
   return null;
 };
 
@@ -68,13 +82,14 @@ const validateSendBody = (body) => {
 router.post('/send',
   [
     security.authenticate,
-    express.json({ type: 'application/json' }),
+    express.json({ type: 'application/json', limit: '2mb' }),
     metric.count('contactMessage.send', { when: 'always', timezone: 'utc', amount: 1 })
   ],
   (req, res, next) => {
     const validationError = validateSendBody(req.body);
     if (validationError) {
-      return next(apiError.badRequest(validationError));
+      const code = validationError.endsWith('_too_large') ? 413 : 400;
+      return next(apiError.custom(code, validationError));
     }
 
     const {
@@ -144,7 +159,7 @@ router.post('/send',
 router.post('/update',
   [
     security.authenticate,
-    express.json({ type: 'application/json' }),
+    express.json({ type: 'application/json', limit: '2mb' }),
     metric.count('contactMessage.update', { when: 'always', timezone: 'utc', amount: 1 })
   ],
   (req, res, next) => {
@@ -161,6 +176,10 @@ router.post('/update',
 
     if (!messageId || !contactId || !encryptedMessageForUser || !encryptedMessageForContact || !signature || !userId || !contactUserId) {
       return next(apiError.badRequest('missing_required_fields'));
+    }
+    if (Buffer.byteLength(encryptedMessageForUser, 'utf8') > MAX_MESSAGE_BYTES
+      || Buffer.byteLength(encryptedMessageForContact, 'utf8') > MAX_MESSAGE_BYTES) {
+      return next(apiError.custom(413, 'encrypted_message_too_large'));
     }
 
     if (!ensureSameUser(req, res, userId, next)) {
@@ -196,7 +215,7 @@ router.post('/update',
 router.post('/translate',
   [
     security.authenticate,
-    express.json({ type: 'application/json' }),
+    express.json({ type: 'application/json', limit: '2mb' }),
     metric.count('contactMessage.translate', { when: 'always', timezone: 'utc', amount: 1 })
   ],
   (req, res, next) => {
@@ -224,7 +243,7 @@ router.post('/translate',
 router.post('/delete',
   [
     security.authenticate,
-    express.json({ type: 'application/json' }),
+    express.json({ type: 'application/json', limit: '2mb' }),
     metric.count('contactMessage.delete', { when: 'always', timezone: 'utc', amount: 1 })
   ],
   (req, res, next) => {

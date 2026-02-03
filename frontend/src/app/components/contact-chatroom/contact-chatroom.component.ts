@@ -28,6 +28,7 @@ import { ShowmessageComponent } from '../showmessage/showmessage.component';
 import { UserProfileComponent } from '../user/user-profile/user-profile.component';
 import { EmoticonPickerComponent } from '../utils/emoticon-picker/emoticon-picker.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
+import { AudioRecorderComponent } from '../utils/audio-recorder/audio-recorder.component';
 import { LocationPickerDialogComponent } from '../utils/location-picker-dialog/location-picker-dialog.component';
 import { LocationPreviewComponent } from '../utils/location-preview/location-preview.component';
 import { ExperienceSearchComponent } from '../utils/experience-search/experience-search.component';
@@ -103,6 +104,10 @@ export class ContactChatroomComponent implements AfterViewInit {
   private currentContactId?: string;
   private lastLiveMessageId?: string;
   private lastResetToken?: number;
+  private readonly audioUrlCache = new Map<string, string>();
+  private audioPlayer?: HTMLAudioElement;
+  private playingMessageId?: string;
+  private readonly maxAudioBase64Bytes = 1_000_000;
   readonly reactions: readonly string[] = [
     // faces/emotions
     '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '🙂', '😉', '😎',
@@ -132,6 +137,16 @@ export class ContactChatroomComponent implements AfterViewInit {
     '🏁', '🇩🇪', '🇦🇹', '🇨🇭', '🇫🇷', '🇪🇸', '🇮🇹', '🇬🇧', '🇺🇸', '🇨🇦', '🇧🇷', '🇯🇵', '🇨🇳', '🇰🇷', '🇮🇳',
     '🇦🇺', '🇳🇿', '🇸🇪', '🇳🇴', '🇫🇮', '🇳🇱', '🇧🇪', '🇨🇿', '🇵🇱', '🇵🇹', '🇬🇷', '🇷🇺', '🇲🇽', '🇦🇷'
   ];
+
+  constructor() {
+    this.destroyRef.onDestroy(() => {
+      this.audioUrlCache.forEach((url) => URL.revokeObjectURL(url));
+      this.audioUrlCache.clear();
+      this.audioPlayer?.pause();
+      this.audioPlayer = undefined;
+      this.playingMessageId = undefined;
+    });
+  }
 
   getChatBackgroundImage(contact: Contact): string {
     return contact.chatBackgroundImage ? `url(${contact.chatBackgroundImage})` : 'none';
@@ -408,8 +423,41 @@ export class ContactChatroomComponent implements AfterViewInit {
     });
   }
 
+  openAudioRecorder(initialAudio?: ShortMessage['audio'] | null): void {
+    const contact = this.contact();
+    if (!contact) {
+      return;
+    }
+    const dialogRef = this.matDialog.open(AudioRecorderComponent, {
+      data: { initialAudio, maxBase64Bytes: this.maxAudioBase64Bytes },
+      closeOnNavigation: true,
+      minWidth: 'min(360px, 95vw)',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((result?: { audio?: ShortMessage['audio'] }) => {
+      if (!result?.audio) {
+        return;
+      }
+      const payload = this.createEmptyMessage();
+      payload.audio = result.audio;
+      void this.sendAsNewMessage(contact, payload);
+    });
+  }
+
   hasContent(message?: ShortMessage): boolean {
-    return !!message && (message.message?.trim() !== '' || message.multimedia?.type !== 'undefined');
+    return !!message && (
+      message.message?.trim() !== ''
+      || message.multimedia?.type !== 'undefined'
+      || !!message.location
+      || !!message.experience
+      || !!message.audio
+    );
   }
 
   isUnread(message: { direction: 'user' | 'contactUser'; readAt?: string | null }): boolean {
@@ -425,6 +473,60 @@ export class ContactChatroomComponent implements AfterViewInit {
       return payload.translatedMessage;
     }
     return payload.message;
+  }
+
+  getAudioUrl(message: ChatroomMessage): string | null {
+    const audio = message.payload?.audio;
+    if (!audio?.base64 || !audio.mimeType) {
+      return null;
+    }
+    const cacheKey = message.messageId || message.id;
+    const cached = this.audioUrlCache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+    const blob = this.base64ToBlob(audio.base64, audio.mimeType);
+    const url = URL.createObjectURL(blob);
+    this.audioUrlCache.set(cacheKey, url);
+    return url;
+  }
+
+  toggleAudioPlayback(message: ChatroomMessage): void {
+    const url = this.getAudioUrl(message);
+    if (!url) {
+      return;
+    }
+    const messageId = message.messageId || message.id;
+    if (this.audioPlayer && this.playingMessageId && this.playingMessageId !== messageId) {
+      this.audioPlayer.pause();
+    }
+    if (!this.audioPlayer || this.playingMessageId !== messageId) {
+      this.audioPlayer = new Audio(url);
+      this.playingMessageId = messageId;
+      this.audioPlayer.addEventListener('ended', () => {
+        this.playingMessageId = undefined;
+      });
+    }
+    if (this.audioPlayer.paused) {
+      void this.audioPlayer.play();
+    } else {
+      this.audioPlayer.pause();
+    }
+  }
+
+  isAudioPlaying(message: ChatroomMessage): boolean {
+    const messageId = message.messageId || message.id;
+    return this.playingMessageId === messageId && !!this.audioPlayer && !this.audioPlayer.paused;
+  }
+
+  formatAudioDuration(durationMs?: number): string {
+    if (!durationMs || durationMs <= 0) {
+      return '';
+    }
+    const totalSeconds = Math.round(durationMs / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   }
 
   showOriginalMessage(message: ChatroomMessage): void {
@@ -527,6 +629,10 @@ export class ContactChatroomComponent implements AfterViewInit {
   editMessage(message: ChatroomMessage): void {
     const contact = this.contact();
     if (!contact || message.direction !== 'user') {
+      return;
+    }
+    if (message.payload?.audio) {
+      this.openAudioRecorder(message.payload.audio);
       return;
     }
     if (message.payload?.experience) {
@@ -943,8 +1049,18 @@ export class ContactChatroomComponent implements AfterViewInit {
         url: '',
         sourceUrl: '',
         contentId: ''
-      }
+      },
+      audio: null
     };
+  }
+
+  private base64ToBlob(base64: string, mimeType: string): Blob {
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i += 1) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return new Blob([bytes], { type: mimeType });
   }
 
   private async sendAsNewMessage(contact: Contact, payload: ShortMessage): Promise<void> {

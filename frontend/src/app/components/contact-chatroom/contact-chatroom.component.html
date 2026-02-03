@@ -114,6 +114,14 @@
               </div>
             </div>
             }
+            @if (msg.payload.audio) {
+            <div class="chat-audio">
+              <div class="chat-audio__wave"></div>
+              @if (formatAudioDuration(msg.payload.audio.durationMs)) {
+              <span class="chat-audio__duration">{{ formatAudioDuration(msg.payload.audio.durationMs) }}</span>
+              }
+            </div>
+            }
             @if (msg.payload.location) {
             <div class="chat-location">
               <app-location-preview [location]="msg.payload.location"></app-location-preview>
@@ -128,6 +136,12 @@
           </div>
           <div class="message-actions-row button-me">
             <div class="message-actions">
+              @if (msg.payload?.audio) {
+              <button mat-mini-fab color="primary" [attr.aria-label]="'common.audioRecorder.play' | transloco"
+                (click)="toggleAudioPlayback(msg)">
+                <mat-icon>{{ isAudioPlaying(msg) ? 'pause' : 'play_arrow' }}</mat-icon>
+              </button>
+              }
               @if (msg.payload?.experience; as exp) {
               <button mat-mini-fab color="primary" [attr.aria-label]="'common.experiences.showMore' | transloco"
                 (click)="openExperienceDetails(exp)">
@@ -212,6 +226,14 @@
               </div>
             </div>
             }
+            @if (msg.payload.audio) {
+            <div class="chat-audio">
+              <div class="chat-audio__wave"></div>
+              @if (formatAudioDuration(msg.payload.audio.durationMs)) {
+              <span class="chat-audio__duration">{{ formatAudioDuration(msg.payload.audio.durationMs) }}</span>
+              }
+            </div>
+            }
             @if (msg.payload.location) {
             <div class="chat-location">
               <app-location-preview [location]="msg.payload.location"></app-location-preview>
@@ -226,6 +248,12 @@
           </div>
           <div class="message-actions-row button-them">
             <div class="message-actions">
+              @if (msg.payload?.audio) {
+              <button mat-mini-fab color="primary" [attr.aria-label]="'common.audioRecorder.play' | transloco"
+                (click)="toggleAudioPlayback(msg)">
+                <mat-icon>{{ isAudioPlaying(msg) ? 'pause' : 'play_arrow' }}</mat-icon>
+              </button>
+              }
               @if (msg.payload?.experience; as exp) {
               <button mat-mini-fab color="primary" [attr.aria-label]="'common.experiences.showMore' | transloco"
                 (click)="openExperienceDetails(exp)">
@@ -297,6 +325,10 @@
   <button mat-icon-button type="button" [attr.aria-label]="'common.contact.chatroom.addLocationAria' | transloco"
     (click)="openLocationPicker()">
     <mat-icon>add_location_alt</mat-icon>
+  </button>
+  <button mat-icon-button type="button" [attr.aria-label]="'common.contact.chatroom.addVoiceAria' | transloco"
+    (click)="openAudioRecorder()">
+    <mat-icon>mic</mat-icon>
   </button>
   <button mat-icon-button color="primary" [attr.aria-label]="'common.contact.chatroom.composeAria' | transloco"
     (click)="requestCompose()">

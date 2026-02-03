@@ -10,5 +10,11 @@ export interface ShortMessage {
     multimedia: Multimedia,
     location?: Location | null,
     experience?: ExperienceResult | null,
-    experienceSearchTerm?: string | null
+    experienceSearchTerm?: string | null,
+    audio?: {
+        base64: string,
+        mimeType: string,
+        sizeBytes: number,
+        durationMs: number
+    } | null
 }

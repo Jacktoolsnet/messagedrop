@@ -198,6 +198,7 @@
       "chatroom": {
         "closeAria": "Chatraum schließen",
         "composeAria": "Nachricht schreiben",
+        "addVoiceAria": "Neue Sprachnachricht",
         "addExperienceAria": "Erlebnis-Nachricht hinzufügen",
         "addLocationAria": "Ortsnachricht hinzufügen",
         "avatarAltName": "Avatar von {{ name }}",
@@ -223,12 +224,24 @@
           "confirm": "Diese Nachricht wird dauerhaft gelöscht. Bist du sicher?"
         }
       },
-      "message": {
-        "addText": "Text hinzufügen",
+    "message": {
+      "addText": "Text hinzufügen",
         "dropNewAria": "Neue Nachricht senden",
         "applyAria": "Nachricht senden",
         "policy": "Diese Information wird auf unserem Server gespeichert und ist für alle sichtbar."
       }
+    },
+    "audioRecorder": {
+      "title": "Sprachnachricht",
+      "record": "Aufnehmen",
+      "stop": "Stopp",
+      "play": "Abspielen",
+      "pause": "Pause",
+      "retry": "Neu aufnehmen",
+      "send": "Senden",
+      "notSupported": "Audioaufnahme wird in diesem Browser nicht unterstützt.",
+      "permissionDenied": "Mikrofonzugriff verweigert.",
+      "tooLarge": "Die Aufnahme ist zu groß. Max {{ maxMb }} MB."
     },
     "geoStatistic": {
       "title": "Geo-Statistik-Dienst",

@@ -287,6 +287,37 @@
   margin-bottom: 1.5rem;
 }
 
+.chat-audio {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--mat-card-filled-container-color) 88%, transparent);
+  border: 1px solid color-mix(in srgb, var(--mat-card-outlined-outline-color) 60%, transparent);
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--mat-card-outlined-outline-color) 35%, transparent);
+}
+
+.chat-audio__wave {
+  height: 36px;
+  border-radius: 0.5rem;
+  background-image:
+    repeating-linear-gradient(90deg,
+      color-mix(in srgb, var(--mat-primary-color) 35%, transparent) 0 6px,
+      transparent 6px 10px),
+    linear-gradient(90deg,
+      transparent 0%,
+      color-mix(in srgb, var(--mat-primary-color) 65%, transparent) 35%,
+      transparent 70%);
+  background-size: 10px 100%, 120px 100%;
+  opacity: 0.9;
+}
+
+.chat-audio__duration {
+  font-size: 0.75rem;
+  color: var(--mat-card-subtitle-text-color);
+}
+
 .chat-experience {
   display: grid;
   grid-template-columns: 72px 1fr;

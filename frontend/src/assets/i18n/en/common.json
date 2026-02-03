@@ -197,9 +197,10 @@
       },
       "chatroom": {
         "closeAria": "Close chatroom",
-        "composeAria": "Compose message",
-        "addExperienceAria": "Add experience message",
-        "addLocationAria": "Add location message",
+      "composeAria": "Compose message",
+      "addVoiceAria": "New voice message",
+      "addExperienceAria": "Add experience message",
+      "addLocationAria": "Add location message",
         "avatarAltName": "{{ name }} avatar",
         "avatarAltMe": "My avatar",
         "meLabel": "Me",
@@ -223,12 +224,24 @@
           "confirm": "This message will be permanently deleted. Are you sure?"
         }
       },
-      "message": {
-        "addText": "Add a text",
+    "message": {
+      "addText": "Add a text",
         "dropNewAria": "Drop a new message",
         "applyAria": "Drop your message",
         "policy": "This information is stored on our server and is visible to everyone."
       }
+    },
+    "audioRecorder": {
+      "title": "Voice message",
+      "record": "Record",
+      "stop": "Stop",
+      "play": "Play",
+      "pause": "Pause",
+      "retry": "Record again",
+      "send": "Send",
+      "notSupported": "Audio recording is not supported in this browser.",
+      "permissionDenied": "Microphone access denied.",
+      "tooLarge": "The recording is too large. Max {{ maxMb }} MB."
     },
     "geoStatistic": {
       "title": "GeoStatistic Service",
