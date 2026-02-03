@@ -238,7 +238,8 @@
     [attr.aria-label]="'common.actions.help' | transloco">
     <mat-icon>help</mat-icon>
   </button>
-  <button mat-icon-button type="button" [attr.aria-label]="'common.contact.chatroom.addExperienceAria' | transloco">
+  <button mat-icon-button type="button" [attr.aria-label]="'common.contact.chatroom.addExperienceAria' | transloco"
+    (click)="openExperienceSearch()">
     <mat-icon>bookmark_add</mat-icon>
   </button>
   <button mat-icon-button type="button" [attr.aria-label]="'common.contact.chatroom.addLocationAria' | transloco"

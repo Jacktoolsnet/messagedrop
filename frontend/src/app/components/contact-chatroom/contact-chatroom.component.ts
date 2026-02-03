@@ -29,6 +29,7 @@ import { EmoticonPickerComponent } from '../utils/emoticon-picker/emoticon-picke
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { LocationPickerDialogComponent } from '../utils/location-picker-dialog/location-picker-dialog.component';
 import { LocationPreviewComponent } from '../utils/location-preview/location-preview.component';
+import { ExperienceSearchComponent } from '../utils/experience-search/experience-search.component';
 import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
 
 interface ChatroomMessage {
@@ -345,6 +346,30 @@ export class ContactChatroomComponent implements AfterViewInit {
         return;
       }
       void this.sendAsNewMessage(currentContact, result.shortMessage);
+    });
+  }
+
+  openExperienceSearch(): void {
+    const dialogRef = this.matDialog.open(ExperienceSearchComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      minWidth: 'min(450px, 95vw)',
+      width: '90vw',
+      maxWidth: '90vw',
+      height: '90vh',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    const subscription = dialogRef.componentInstance.selected.subscribe((result) => {
+      dialogRef.close(result);
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      subscription.unsubscribe();
     });
   }
 
