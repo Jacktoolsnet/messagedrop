@@ -280,6 +280,36 @@
   height: 1.1rem;
 }
 
+.chat-location {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.chat-location__actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.bubble--me .chat-location__actions {
+  justify-content: flex-end;
+}
+
+.bubble--them .chat-location__actions {
+  justify-content: flex-start;
+}
+
+.chat-location__button {
+  font-size: 0.75rem;
+  line-height: 1.1;
+  padding: 0.15rem 0.6rem;
+}
+
+.chat-location__button mat-icon {
+  margin-right: 0.35rem;
+}
+
 .bubble--me {
   text-align: right;
 }

@@ -198,6 +198,8 @@
       "chatroom": {
         "closeAria": "Close chatroom",
         "composeAria": "Compose message",
+        "addExperienceAria": "Add experience message",
+        "addLocationAria": "Add location message",
         "avatarAltName": "{{ name }} avatar",
         "avatarAltMe": "My avatar",
         "meLabel": "Me",
@@ -214,6 +216,8 @@
         "keyResetNotice": "System: I reset my security keys. Older messages may no longer be readable.",
         "translateFailed": "Translation failed.",
         "storeTranslationFailed": "Translated message could not be stored.",
+        "openInMaps": "Open in Google Maps",
+        "showOnMap": "Show on map",
         "deleteMessage": {
           "title": "Delete message",
           "confirm": "This message will be permanently deleted. Are you sure?"

@@ -1,3 +1,4 @@
+import { Location } from "./location";
 import { Multimedia } from "./multimedia";
 
 export interface ShortMessage {
@@ -5,5 +6,6 @@ export interface ShortMessage {
     translatedMessage?: string,
     verified?: boolean,
     style: string,
-    multimedia: Multimedia
+    multimedia: Multimedia,
+    location?: Location | null
 }

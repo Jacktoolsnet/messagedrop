@@ -198,6 +198,8 @@
       "chatroom": {
         "closeAria": "Cerrar chat",
         "composeAria": "Redactar mensaje",
+        "addExperienceAria": "Agregar mensaje de experiencia",
+        "addLocationAria": "Agregar mensaje de ubicación",
         "avatarAltName": "Avatar de {{ name }}",
         "avatarAltMe": "Mi avatar",
         "meLabel": "Yo",
@@ -214,6 +216,8 @@
         "keyResetNotice": "Sistema: He restablecido mis claves de seguridad. Los mensajes antiguos puede que ya no se puedan leer.",
         "translateFailed": "Falló la traducción.",
         "storeTranslationFailed": "No se pudo guardar el mensaje traducido.",
+        "openInMaps": "Abrir en Google Maps",
+        "showOnMap": "Mostrar en el mapa",
         "deleteMessage": {
           "title": "Eliminar mensaje",
           "confirm": "Este mensaje se eliminará permanentemente. ¿Estás seguro?"

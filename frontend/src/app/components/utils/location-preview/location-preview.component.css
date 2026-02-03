@@ -1,0 +1,13 @@
+.location-preview {
+  width: 100%;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--mat-card-outlined-outline-color) 70%, transparent);
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--mat-card-outlined-outline-color) 35%, transparent);
+  background-color: var(--mat-card-filled-container-color);
+}
+
+.location-preview__map {
+  width: 100%;
+  height: 160px;
+}

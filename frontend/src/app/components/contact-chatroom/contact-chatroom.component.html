@@ -94,6 +94,25 @@
             @if (msg.payload.message.trim() !== '') {
             <app-showmessage [message]="msg.payload!.message" [style]="msg.payload!.style"></app-showmessage>
             }
+            @if (msg.payload.location) {
+            <div class="chat-location">
+              <app-location-preview [location]="msg.payload.location"></app-location-preview>
+              <div class="chat-location__actions">
+                <button mat-stroked-button color="primary" type="button" class="chat-location__button"
+                  [attr.aria-label]="'common.contact.chatroom.openInMaps' | transloco"
+                  (click)="openLocationInMaps(msg.payload.location)">
+                  <mat-icon>map</mat-icon>
+                  <span>{{ 'common.contact.chatroom.openInMaps' | transloco }}</span>
+                </button>
+                <button mat-stroked-button color="primary" type="button" class="chat-location__button"
+                  [attr.aria-label]="'common.contact.chatroom.showOnMap' | transloco"
+                  (click)="jumpToLocation(msg.payload.location)">
+                  <mat-icon>my_location</mat-icon>
+                  <span>{{ 'common.contact.chatroom.showOnMap' | transloco }}</span>
+                </button>
+              </div>
+            </div>
+            }
             }
             @if (msg.reaction) {
             <div class="reaction-chip reaction-chip--me">
@@ -151,6 +170,25 @@
             @if (msg.payload.message.trim() !== '') {
             <app-showmessage [message]="getDisplayedMessage(msg)" [style]="msg.payload!.style"></app-showmessage>
             }
+            @if (msg.payload.location) {
+            <div class="chat-location">
+              <app-location-preview [location]="msg.payload.location"></app-location-preview>
+              <div class="chat-location__actions">
+                <button mat-stroked-button color="primary" type="button" class="chat-location__button"
+                  [attr.aria-label]="'common.contact.chatroom.openInMaps' | transloco"
+                  (click)="openLocationInMaps(msg.payload.location)">
+                  <mat-icon>map</mat-icon>
+                  <span>{{ 'common.contact.chatroom.openInMaps' | transloco }}</span>
+                </button>
+                <button mat-stroked-button color="primary" type="button" class="chat-location__button"
+                  [attr.aria-label]="'common.contact.chatroom.showOnMap' | transloco"
+                  (click)="jumpToLocation(msg.payload.location)">
+                  <mat-icon>my_location</mat-icon>
+                  <span>{{ 'common.contact.chatroom.showOnMap' | transloco }}</span>
+                </button>
+              </div>
+            </div>
+            }
             }
             <div class="reaction-chip reaction-chip--them" role="button" tabindex="0"
               (click)="openReactionPicker(msg, $event)" (keyup.enter)="openReactionPicker(msg, $event)"
@@ -207,6 +245,13 @@
   <button mat-icon-button type="button" (click)="help.open('contactChatroom')"
     [attr.aria-label]="'common.actions.help' | transloco">
     <mat-icon>help</mat-icon>
+  </button>
+  <button mat-icon-button type="button" [attr.aria-label]="'common.contact.chatroom.addExperienceAria' | transloco">
+    <mat-icon>bookmark_add</mat-icon>
+  </button>
+  <button mat-icon-button type="button" [attr.aria-label]="'common.contact.chatroom.addLocationAria' | transloco"
+    (click)="openLocationPicker()">
+    <mat-icon>add_location_alt</mat-icon>
   </button>
   <button mat-icon-button color="primary" [attr.aria-label]="'common.contact.chatroom.composeAria' | transloco"
     (click)="requestCompose()">

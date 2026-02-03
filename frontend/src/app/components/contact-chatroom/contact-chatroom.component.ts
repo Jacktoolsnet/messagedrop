@@ -8,12 +8,14 @@ import { MatIcon } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Contact } from '../../interfaces/contact';
+import { Location } from '../../interfaces/location';
 import { Mode } from '../../interfaces/mode';
 import { MultimediaType } from '../../interfaces/multimedia-type';
 import { ShortMessage } from '../../interfaces/short-message';
 import { ContactMessageService } from '../../services/contact-message.service';
 import { ContactService } from '../../services/contact.service';
 import { LanguageService } from '../../services/language.service';
+import { MapService } from '../../services/map.service';
 import { SocketioService } from '../../services/socketio.service';
 import { TranslateService } from '../../services/translate.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
@@ -25,6 +27,8 @@ import { ShowmessageComponent } from '../showmessage/showmessage.component';
 import { UserProfileComponent } from '../user/user-profile/user-profile.component';
 import { EmoticonPickerComponent } from '../utils/emoticon-picker/emoticon-picker.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
+import { LocationPickerDialogComponent } from '../utils/location-picker-dialog/location-picker-dialog.component';
+import { LocationPreviewComponent } from '../utils/location-preview/location-preview.component';
 import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
 
 interface ChatroomMessage {
@@ -49,6 +53,7 @@ interface ChatroomMessage {
     MatIcon,
     ShowmultimediaComponent,
     ShowmessageComponent,
+    LocationPreviewComponent,
     TranslocoPipe
   ],
   templateUrl: './contact-chatroom.component.html',
@@ -59,6 +64,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   private readonly userService = inject(UserService);
   private readonly socketioService = inject(SocketioService);
   private readonly contactService = inject(ContactService);
+  private readonly mapService = inject(MapService);
   readonly help = inject(HelpDialogService);
   private readonly contactMessageService = inject(ContactMessageService);
   private readonly destroyRef = inject(DestroyRef);
@@ -342,6 +348,33 @@ export class ContactChatroomComponent implements AfterViewInit {
     });
   }
 
+  openLocationPicker(): void {
+    const contact = this.contact();
+    if (!contact) {
+      return;
+    }
+    const dialogRef = this.matDialog.open(LocationPickerDialogComponent, {
+      data: { location: this.mapService.getMapLocation(), markerType: 'message' },
+      maxWidth: '95vw',
+      maxHeight: '95vh',
+      width: '95vw',
+      height: '95vh',
+      autoFocus: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false
+    });
+
+    dialogRef.afterClosed().subscribe((location?: Location) => {
+      if (!location) {
+        return;
+      }
+      const payload = this.createEmptyMessage();
+      payload.location = { ...location };
+      void this.sendAsNewMessage(contact, payload);
+    });
+  }
+
   hasContent(message?: ShortMessage): boolean {
     return !!message && (message.message?.trim() !== '' || message.multimedia?.type !== 'undefined');
   }
@@ -407,6 +440,19 @@ export class ContactChatroomComponent implements AfterViewInit {
         this.snackBar.open(errorMessage, '', { duration: 3000 });
       }
     });
+  }
+
+  openLocationInMaps(location: Location): void {
+    const query = location.plusCode?.trim()
+      ? location.plusCode.trim()
+      : `${location.latitude},${location.longitude}`;
+    const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+    window.open(url, '_blank');
+  }
+
+  jumpToLocation(location: Location): void {
+    this.mapService.moveToWithZoom(location, 18);
+    this.dialogRef.close();
   }
 
   editMessage(message: ChatroomMessage): void {

@@ -198,6 +198,8 @@
       "chatroom": {
         "closeAria": "Chatraum schließen",
         "composeAria": "Nachricht schreiben",
+        "addExperienceAria": "Erlebnis-Nachricht hinzufügen",
+        "addLocationAria": "Ortsnachricht hinzufügen",
         "avatarAltName": "Avatar von {{ name }}",
         "avatarAltMe": "Mein Avatar",
         "meLabel": "Ich",
@@ -214,6 +216,8 @@
         "keyResetNotice": "System: Ich habe meine Sicherheitsschlüssel erneuert. Ältere Nachrichten können eventuell nicht mehr gelesen werden.",
         "translateFailed": "Übersetzung fehlgeschlagen.",
         "storeTranslationFailed": "Übersetzte Nachricht konnte nicht gespeichert werden.",
+        "openInMaps": "In Google Maps öffnen",
+        "showOnMap": "Auf der Karte anzeigen",
         "deleteMessage": {
           "title": "Nachricht löschen",
           "confirm": "Diese Nachricht wird dauerhaft gelöscht. Bist du sicher?"
