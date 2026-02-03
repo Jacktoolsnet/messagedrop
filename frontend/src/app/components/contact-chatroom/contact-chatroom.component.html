@@ -97,20 +97,6 @@
             @if (msg.payload.location) {
             <div class="chat-location">
               <app-location-preview [location]="msg.payload.location"></app-location-preview>
-              <div class="chat-location__actions">
-                <button mat-stroked-button color="primary" type="button" class="chat-location__button"
-                  [attr.aria-label]="'common.contact.chatroom.openInMaps' | transloco"
-                  (click)="openLocationInMaps(msg.payload.location)">
-                  <mat-icon>map</mat-icon>
-                  <span>{{ 'common.contact.chatroom.openInMaps' | transloco }}</span>
-                </button>
-                <button mat-stroked-button color="primary" type="button" class="chat-location__button"
-                  [attr.aria-label]="'common.contact.chatroom.showOnMap' | transloco"
-                  (click)="jumpToLocation(msg.payload.location)">
-                  <mat-icon>my_location</mat-icon>
-                  <span>{{ 'common.contact.chatroom.showOnMap' | transloco }}</span>
-                </button>
-              </div>
             </div>
             }
             }
@@ -122,6 +108,16 @@
           </div>
           <div class="message-actions-row button-me">
             <div class="message-actions">
+              @if (msg.payload?.location; as loc) {
+              <button mat-mini-fab color="primary" [attr.aria-label]="'common.contact.chatroom.showOnMap' | transloco"
+                (click)="jumpToLocation(loc)">
+                <mat-icon>my_location</mat-icon>
+              </button>
+              <button mat-mini-fab color="primary" [attr.aria-label]="'common.contact.chatroom.openInMaps' | transloco"
+                (click)="openLocationInMaps(loc)">
+                <mat-icon>map</mat-icon>
+              </button>
+              }
               @if (msg.payload) {
               <button mat-mini-fab color="primary" [attr.aria-label]="'common.contact.chatroom.editAria' | transloco"
                 (click)="editMessage(msg)">
@@ -173,20 +169,6 @@
             @if (msg.payload.location) {
             <div class="chat-location">
               <app-location-preview [location]="msg.payload.location"></app-location-preview>
-              <div class="chat-location__actions">
-                <button mat-stroked-button color="primary" type="button" class="chat-location__button"
-                  [attr.aria-label]="'common.contact.chatroom.openInMaps' | transloco"
-                  (click)="openLocationInMaps(msg.payload.location)">
-                  <mat-icon>map</mat-icon>
-                  <span>{{ 'common.contact.chatroom.openInMaps' | transloco }}</span>
-                </button>
-                <button mat-stroked-button color="primary" type="button" class="chat-location__button"
-                  [attr.aria-label]="'common.contact.chatroom.showOnMap' | transloco"
-                  (click)="jumpToLocation(msg.payload.location)">
-                  <mat-icon>my_location</mat-icon>
-                  <span>{{ 'common.contact.chatroom.showOnMap' | transloco }}</span>
-                </button>
-              </div>
             </div>
             }
             }
@@ -198,6 +180,16 @@
           </div>
           <div class="message-actions-row button-them">
             <div class="message-actions">
+              @if (msg.payload?.location; as loc) {
+              <button mat-mini-fab color="primary" [attr.aria-label]="'common.contact.chatroom.showOnMap' | transloco"
+                (click)="jumpToLocation(loc)">
+                <mat-icon>my_location</mat-icon>
+              </button>
+              <button mat-mini-fab color="primary" [attr.aria-label]="'common.contact.chatroom.openInMaps' | transloco"
+                (click)="openLocationInMaps(loc)">
+                <mat-icon>map</mat-icon>
+              </button>
+              }
               @if (msg.payload?.message?.trim() !== '') {
               @if (msg.payload?.translatedMessage && !msg.showOriginal) {
               <button mat-mini-fab color="primary" [attr.aria-label]="'common.contact.chatroom.showOriginalAria' | transloco"
