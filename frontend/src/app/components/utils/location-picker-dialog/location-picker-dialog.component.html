@@ -27,6 +27,10 @@
     [attr.aria-label]="'common.actions.help' | transloco">
     <mat-icon>help</mat-icon>
   </button>
+  <button mat-icon-button type="button" (click)="locateMe()"
+    [attr.aria-label]="'common.location.locateMeAria' | transloco">
+    <mat-icon>my_location</mat-icon>
+  </button>
   <button mat-icon-button type="button" (click)="toggleViewMode()"
     [attr.aria-label]="viewMode === 'list' ? ('common.location.switchToMap' | transloco) : ('common.location.switchToList' | transloco)">
     <mat-icon>{{ viewMode === 'list' ? 'map' : 'list' }}</mat-icon>

@@ -945,6 +945,7 @@
     "location": {
       "locatingTitle": "Localizándote",
       "locatingMessage": "Por favor espera mientras tu dispositivo determina tu ubicación actual...",
+      "locateMeAria": "Localizarme",
       "authorizationRequired": "Por favor autoriza la ubicación.",
       "failed": "No se pudo determinar la posición. Inténtalo de nuevo más tarde.",
       "nominatimTitle": "Servicio Nominatim",

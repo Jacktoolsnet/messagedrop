@@ -97,6 +97,63 @@ export class LocationPickerDialogComponent implements AfterViewInit, OnDestroy {
     this.dialogRef.close({ ...this.location });
   }
 
+  locateMe(): void {
+    const dialogRef = this.dialog.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: {
+        showAlways: true,
+        title: this.translation.t('common.location.locatingTitle'),
+        image: '',
+        icon: 'my_location',
+        message: this.translation.t('common.location.locatingMessage'),
+        button: '',
+        delay: 0,
+        showSpinner: true
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      autoFocus: false
+    });
+
+    dialogRef.afterOpened().subscribe(() => {
+      this.geolocationService.getCurrentPosition().subscribe({
+        next: (position) => {
+          dialogRef.close();
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+          this.location = {
+            latitude,
+            longitude,
+            plusCode: this.geolocationService.getPlusCode(latitude, longitude)
+          };
+          this.marker?.setLatLng([latitude, longitude]);
+          this.map?.setView([latitude, longitude], 15);
+          this.hasAutoZoomed = true;
+          this.resetSearchMarkerIcons();
+        },
+        error: (error) => {
+          dialogRef.close();
+          const messageKey = error?.code === 1
+            ? 'common.location.authorizationRequired'
+            : 'common.location.failed';
+          this.openDisplayMessage({
+            showAlways: true,
+            title: this.translation.t('common.location.locatingTitle'),
+            image: '',
+            icon: 'info',
+            message: this.translation.t(messageKey),
+            button: '',
+            delay: 1500,
+            showSpinner: false,
+            autoclose: true
+          }, false);
+        }
+      });
+    });
+  }
+
   toggleViewMode(): void {
     this.viewMode = this.viewMode === 'list' ? 'map' : 'list';
     if (this.viewMode === 'map') {
