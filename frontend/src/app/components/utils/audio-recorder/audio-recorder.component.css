@@ -3,6 +3,8 @@
   gap: 1rem;
   padding: 1rem 1.25rem;
   color: var(--mat-app-text-color);
+  --wave-color: var(--mat-sys-primary, var(--mat-primary-color, var(--mat-app-text-color)));
+  --wave-bg: color-mix(in srgb, var(--mat-card-filled-container-color) 85%, var(--wave-color) 15%);
 }
 
 .audio-recorder__header {
@@ -21,7 +23,7 @@
   border: 1px solid var(--mat-card-outlined-outline-color);
   min-height: 80px;
   overflow: hidden;
-  color: var(--mat-app-text-color);
+  color: var(--wave-color);
 }
 
 .audio-recorder__wave-bars {
@@ -48,12 +50,12 @@
   grid-auto-flow: column;
   gap: 2px;
   align-items: center;
-  background: color-mix(in srgb, var(--mat-card-filled-container-color) 85%, var(--mat-app-text-color) 15%);
+  background: var(--wave-bg);
   border-radius: 0.4rem;
   padding: 2px;
   box-sizing: border-box;
   overflow: hidden;
-  color: var(--mat-app-text-color);
+  color: var(--wave-color);
 }
 
 .audio-recorder__bar {

@@ -298,11 +298,14 @@
   border: 1px solid var(--mat-card-outlined-outline-color);
   box-shadow: 0 2px 6px var(--mat-card-outlined-outline-color);
   color: var(--mat-app-text-color);
+  --wave-color: var(--mat-sys-primary, var(--mat-primary-color, var(--mat-app-text-color)));
+  --wave-bg: color-mix(in srgb, var(--mat-card-filled-container-color) 85%, var(--wave-color) 15%);
 }
 
 .chat-audio__wave {
   height: 52px;
   border-radius: 0.5rem;
+  color: var(--wave-color);
   background-image:
     repeating-linear-gradient(90deg,
       color-mix(in srgb, currentColor 20%, transparent) 0 6px,
@@ -322,8 +325,9 @@
   gap: 1px;
   align-items: center;
   padding: 2px 0;
-  background: color-mix(in srgb, var(--mat-card-filled-container-color) 85%, var(--mat-app-text-color) 15%);
+  background: var(--wave-bg);
   border-radius: 0.4rem;
+  color: var(--wave-color);
 }
 
 .chat-audio__bar {
