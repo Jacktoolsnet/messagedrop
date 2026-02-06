@@ -297,6 +297,7 @@
   background-color: var(--mat-card-filled-container-color);
   border: 1px solid var(--mat-card-outlined-outline-color);
   box-shadow: 0 2px 6px var(--mat-card-outlined-outline-color);
+  color: var(--mat-app-text-color);
 }
 
 .chat-audio__wave {
@@ -304,14 +305,14 @@
   border-radius: 0.5rem;
   background-image:
     repeating-linear-gradient(90deg,
-      rgba(0, 0, 0, 0.15) 0 6px,
+      color-mix(in srgb, currentColor 20%, transparent) 0 6px,
       transparent 6px 10px),
     linear-gradient(90deg,
       transparent 0%,
-      var(--mat-primary-color) 35%,
+      color-mix(in srgb, currentColor 40%, transparent) 35%,
       transparent 70%);
   background-size: 10px 100%, 120px 100%;
-  opacity: 0.9;
+  opacity: 0.5;
 }
 
 .chat-audio__bars {
@@ -321,23 +322,23 @@
   gap: 1px;
   align-items: center;
   padding: 2px 0;
-  background: color-mix(in srgb, var(--mat-primary-color, #0b5fff) 18%, transparent);
+  background: color-mix(in srgb, var(--mat-card-filled-container-color) 85%, var(--mat-app-text-color) 15%);
   border-radius: 0.4rem;
 }
 
 .chat-audio__bar {
   width: 4px;
   border-radius: 999px;
-  background: var(--mat-primary-color, #0b5fff);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--mat-primary-color, #0b5fff) 45%, transparent);
-  opacity: 1;
+  background: currentColor;
+  box-shadow: 0 0 0 1px color-mix(in srgb, currentColor 45%, transparent);
+  opacity: 0.7;
   height: 100%;
   transform-origin: center;
 }
 
 .chat-audio__bar--active {
-  background: var(--mat-accent-color, #00b37a);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--mat-accent-color, #00b37a) 50%, transparent);
+  opacity: 1;
+  filter: brightness(1.4) saturate(1.2);
 }
 
 .chat-audio__duration {
