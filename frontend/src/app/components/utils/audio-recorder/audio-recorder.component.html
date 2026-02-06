@@ -8,6 +8,12 @@
       <span>{{ remainingLabel() }}</span>
     </span>
     }
+    @if (!recording && audioPayload?.durationMs && isPlaying()) {
+    <span class="audio-recorder__timer" aria-live="polite">
+      <mat-icon>play_arrow</mat-icon>
+      <span>{{ playbackLabel() }}</span>
+    </span>
+    }
   </div>
 
   <div class="audio-recorder__wave">

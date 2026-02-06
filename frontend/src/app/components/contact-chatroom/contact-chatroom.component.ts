@@ -120,7 +120,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   private readonly maxPerMessageBytes = Math.min(this.maxEncryptedMessageBytes, Math.floor(this.maxRequestBytes * 0.45));
   private readonly maxAudioBase64Bytes = Math.floor(this.maxPerMessageBytes / 4.3);
   private readonly audioWaveWindow = 60;
-  private readonly clearedWaveValue = 0;
+  private readonly clearedWaveValue = 0.08;
   readonly reactions: readonly string[] = [
     // faces/emotions
     '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '🙂', '😉', '😎',
@@ -525,7 +525,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     if (this.audioPlayer.paused) {
       this.setAudioProgress(messageId, 0);
       void this.audioPlayer.play();
-      this.startPlaybackProgress(messageId);
+      this.startPlaybackProgress(messageId, message.payload?.audio?.durationMs);
     } else {
       this.audioPlayer.pause();
       this.stopPlaybackProgress();
@@ -556,7 +556,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       return bars;
     }
     const progress = this.audioProgress()[messageId] ?? 0;
-    const currentIndex = Math.floor(progress * totalBars) - 1;
+    const currentIndex = Math.min(totalBars - 1, Math.floor(progress * totalBars));
     const bars: AudioWaveBar[] = [];
     for (let i = 0; i < this.audioWaveWindow; i += 1) {
       const offset = this.audioWaveWindow - 1 - i;
@@ -576,6 +576,26 @@ export class ContactChatroomComponent implements AfterViewInit {
       return '';
     }
     const totalSeconds = Math.round(durationMs / 1000);
+    return this.formatSeconds(totalSeconds);
+  }
+
+  getAudioTimer(message: ChatroomMessage): string {
+    const durationMs = message.payload?.audio?.durationMs;
+    if (!durationMs || durationMs <= 0) {
+      return '';
+    }
+    const totalSeconds = Math.max(1, Math.round(durationMs / 1000));
+    const messageId = message.messageId || message.id;
+    const isActive = this.playingMessageId === messageId;
+    if (!isActive) {
+      return this.formatSeconds(totalSeconds);
+    }
+    const progress = this.audioProgress()[messageId] ?? 0;
+    const elapsedSeconds = Math.min(totalSeconds, Math.round(totalSeconds * progress));
+    return `${this.formatSeconds(elapsedSeconds)} / ${this.formatSeconds(totalSeconds)}`;
+  }
+
+  private formatSeconds(totalSeconds: number): string {
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
@@ -588,14 +608,17 @@ export class ContactChatroomComponent implements AfterViewInit {
     return Math.max(20, Math.round(value * 100));
   }
 
-  private startPlaybackProgress(messageId: string): void {
+  private startPlaybackProgress(messageId: string, fallbackDurationMs?: number): void {
     this.stopPlaybackProgress();
+    const fallbackDuration = (fallbackDurationMs ?? 0) / 1000;
     this.playbackTimer = setInterval(() => {
       if (!this.audioPlayer || !this.playingMessageId || this.playingMessageId !== messageId) {
         this.stopPlaybackProgress();
         return;
       }
-      const duration = this.audioPlayer.duration;
+      const duration = Number.isFinite(this.audioPlayer.duration) && this.audioPlayer.duration > 0
+        ? this.audioPlayer.duration
+        : fallbackDuration;
       if (!Number.isFinite(duration) || duration <= 0) {
         return;
       }

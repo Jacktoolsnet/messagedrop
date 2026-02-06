@@ -129,8 +129,8 @@
               <div class="chat-audio__wave"></div>
               }
               }
-              @if (formatAudioDuration(msg.payload.audio.durationMs)) {
-              <span class="chat-audio__duration">{{ formatAudioDuration(msg.payload.audio.durationMs) }}</span>
+              @if (getAudioTimer(msg)) {
+              <span class="chat-audio__duration">{{ getAudioTimer(msg) }}</span>
               }
             </div>
             }
@@ -253,8 +253,8 @@
               <div class="chat-audio__wave"></div>
               }
               }
-              @if (formatAudioDuration(msg.payload.audio.durationMs)) {
-              <span class="chat-audio__duration">{{ formatAudioDuration(msg.payload.audio.durationMs) }}</span>
+              @if (getAudioTimer(msg)) {
+              <span class="chat-audio__duration">{{ getAudioTimer(msg) }}</span>
               }
             </div>
             }

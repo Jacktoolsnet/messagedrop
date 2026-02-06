@@ -69,7 +69,7 @@ export class AudioRecorderComponent {
   private readonly liveBars = 60;
   private livePeaks: number[] = [];
   private readonly stopAtRatio = 0.92;
-  private readonly clearedWaveValue = 0;
+  private readonly clearedWaveValue = 0.08;
 
   audioPayload?: AudioPayload;
   liveWaveform: number[] = [];
@@ -203,7 +203,7 @@ export class AudioRecorderComponent {
       }
       return bars;
     }
-    const currentIndex = Math.floor(this.playbackProgress * totalBars) - 1;
+    const currentIndex = Math.min(totalBars - 1, Math.floor(this.playbackProgress * totalBars));
     const bars: AudioWaveBar[] = [];
     for (let i = 0; i < this.liveBars; i += 1) {
       const offset = this.liveBars - 1 - i;
@@ -291,7 +291,10 @@ export class AudioRecorderComponent {
       if (!this.audioPlayer) {
         return;
       }
-      const duration = this.audioPlayer.duration;
+      const fallbackDuration = (this.audioPayload?.durationMs ?? 0) / 1000;
+      const duration = Number.isFinite(this.audioPlayer.duration) && this.audioPlayer.duration > 0
+        ? this.audioPlayer.duration
+        : fallbackDuration;
       if (!Number.isFinite(duration) || duration <= 0) {
         return;
       }
@@ -479,6 +482,21 @@ export class AudioRecorderComponent {
     }
     const minutes = Math.floor(this.recordingRemainingSeconds / 60);
     const seconds = this.recordingRemainingSeconds % 60;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  playbackLabel(): string {
+    if (!this.audioPayload?.durationMs) {
+      return '';
+    }
+    const totalSeconds = Math.max(1, Math.round(this.audioPayload.durationMs / 1000));
+    const elapsedSeconds = Math.min(totalSeconds, Math.round(totalSeconds * this.playbackProgress));
+    return `${this.formatSeconds(elapsedSeconds)} / ${this.formatSeconds(totalSeconds)}`;
+  }
+
+  private formatSeconds(totalSeconds: number): string {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   }
 
