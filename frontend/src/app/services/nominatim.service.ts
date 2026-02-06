@@ -73,6 +73,26 @@ export class NominatimService {
     );
   }
 
+  getNominatimPlaceBySearchTerm(searchTerm: string, limit = 100, showAlways = true): Observable<{ sattus: number, result: NominatimPlace[] }> {
+    const encodedTerm = encodeURIComponent(searchTerm);
+    const url = `${environment.apiUrl}/nominatim/search/${encodedTerm}/${limit}`;
+    this.networkService.setNetworkMessageConfig(url, {
+      showAlways: showAlways,
+      title: this.i18n.t('common.location.searchTitle'),
+      image: '',
+      icon: '',
+      message: this.i18n.t('common.location.searching', { term: searchTerm }),
+      button: '',
+      delay: 0,
+      showSpinner: true,
+      autoclose: false
+    });
+
+    return this.http.get<{ sattus: number, result: NominatimPlace[] }>(url, this.httpOptions).pipe(
+      catchError(this.handleError)
+    );
+  }
+
   getBoundingBoxFromNominatimPlace(place: NominatimPlace): BoundingBox {
     let boundingBox: BoundingBox = {
       latMin: 0,

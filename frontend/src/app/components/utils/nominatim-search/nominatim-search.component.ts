@@ -115,14 +115,7 @@ export class NominatimSearchComponent {
     }
 
     const limit = 50;
-    const bounds = this.currentBounds ?? {
-      latMin: -85,
-      lonMin: -180,
-      latMax: 85,
-      lonMax: 180
-    };
-
-    this.nominatimService.getNominatimPlaceBySearchTermWithBoundingBox(term, bounds, limit).subscribe({
+    this.nominatimService.getNominatimPlaceBySearchTerm(term, limit).subscribe({
       next: (response) => this.handleSearchResponse(response, this.data.location),
       error: (error) => this.handleSearchError(error)
     });
@@ -134,6 +127,9 @@ export class NominatimSearchComponent {
       location.longitude,
       response.result
     );
+    if (this.nominatimPlaces.length) {
+      this.focusMapOnResults(this.nominatimPlaces);
+    }
     if (!this.nominatimPlaces.length) {
       this.openDisplayMessage({
         showAlways: true,
@@ -348,6 +344,57 @@ export class NominatimSearchComponent {
     } else {
       this.pendingBounds = bounds;
     }
+  }
+
+  private focusMapOnResults(places: NominatimPlace[]): void {
+    if (!places.length) {
+      return;
+    }
+    if (places.length === 1) {
+      this.focusMapOnPlace(places[0]);
+      return;
+    }
+    const bounds = this.getBoundsForPlaces(places);
+    if (!bounds) {
+      return;
+    }
+    this.currentBounds = bounds;
+    this.mapView = {
+      center: this.geolocationService.getCenterOfBoundingBox(bounds),
+      zoom: this.mapView.zoom
+    };
+    if (this._mapComponent) {
+      this._mapComponent.fitBounds(bounds);
+    } else {
+      this.pendingBounds = bounds;
+    }
+  }
+
+  private getBoundsForPlaces(places: NominatimPlace[]): BoundingBox | null {
+    let latMin = 90;
+    let latMax = -90;
+    let lonMin = 180;
+    let lonMax = -180;
+    let hasValue = false;
+
+    places.forEach((place) => {
+      const lat = Number(place.lat);
+      const lon = Number(place.lon);
+      if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+        return;
+      }
+      hasValue = true;
+      latMin = Math.min(latMin, lat);
+      latMax = Math.max(latMax, lat);
+      lonMin = Math.min(lonMin, lon);
+      lonMax = Math.max(lonMax, lon);
+    });
+
+    if (!hasValue) {
+      return null;
+    }
+
+    return { latMin, latMax, lonMin, lonMax };
   }
 
   toggleViewMode(): void {
