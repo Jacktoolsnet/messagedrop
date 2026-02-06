@@ -13,6 +13,14 @@
         [class.audio-recorder__bar--active]="isAudioBarActive($index)"></span>
       }
     </div>
+    } @else if (liveWaveform.length) {
+    <div class="audio-recorder__bars">
+      @for (bar of liveWaveform; track $index) {
+      <span class="audio-recorder__bar"
+        [style.transform]="'scaleY(' + (bar ?? 0.2) + ')'"
+      ></span>
+      }
+    </div>
     } @else {
     <div class="audio-recorder__wave-bars"></div>
     }

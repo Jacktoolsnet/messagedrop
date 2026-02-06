@@ -110,7 +110,10 @@ export class ContactChatroomComponent implements AfterViewInit {
   private playingMessageId?: string;
   private playbackTimer?: ReturnType<typeof setInterval>;
   private readonly audioProgress = signal<Record<string, number>>({});
-  private readonly maxAudioBase64Bytes = 1_500_000;
+  private readonly maxEncryptedMessageBytes = 1_500_000;
+  private readonly maxRequestBytes = 2_000_000;
+  private readonly maxPerMessageBytes = Math.min(this.maxEncryptedMessageBytes, Math.floor(this.maxRequestBytes * 0.45));
+  private readonly maxAudioBase64Bytes = Math.floor(this.maxPerMessageBytes / 4.3);
   readonly reactions: readonly string[] = [
     // faces/emotions
     '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '🙂', '😉', '😎',
@@ -1116,9 +1119,27 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   private async sendAsNewMessage(contact: Contact, payload: ShortMessage): Promise<void> {
+    let encryptedMessageForUser = '';
+    let encryptedMessageForContact = '';
+    let signature = '';
+    try {
+      ({ encryptedMessageForUser, encryptedMessageForContact, signature } =
+        await this.contactMessageService.encryptMessageForContact(contact, payload));
+    } catch {
+      this.snackBar.open(this.translation.t('common.contact.chatroom.sendFailed'), '', { duration: 3000 });
+      return;
+    }
+
+    if (!this.isEncryptedMessageWithinLimit(encryptedMessageForUser, encryptedMessageForContact)) {
+      this.snackBar.open(this.translation.t('common.contact.chatroom.messageTooLarge'), '', { duration: 3000 });
+      return;
+    }
+    if (!this.isRequestWithinLimit(contact, encryptedMessageForUser, encryptedMessageForContact, signature)) {
+      this.snackBar.open(this.translation.t('common.contact.chatroom.messageTooLarge'), '', { duration: 3000 });
+      return;
+    }
+
     const tempId = this.addOptimisticMessage(payload);
-    const { encryptedMessageForUser, encryptedMessageForContact, signature } =
-      await this.contactMessageService.encryptMessageForContact(contact, payload);
 
     this.contactMessageService.send({
       contactId: contact.id,
@@ -1144,10 +1165,43 @@ export class ContactChatroomComponent implements AfterViewInit {
           contactUserEncryptedMessage: encryptedMessageForContact
         });
       },
-      error: () => {
-        // optionally notify user
+      error: (err) => {
+        const isTooLarge = err?.status === 413 || `${err?.error?.error ?? ''}`.includes('too_large');
+        if (tempId && isTooLarge) {
+          this.removeOptimisticMessage(tempId);
+        }
+        const errorMessage = isTooLarge
+          ? this.translation.t('common.contact.chatroom.messageTooLarge')
+          : (err?.error?.error ?? this.translation.t('common.contact.chatroom.sendFailed'));
+        this.snackBar.open(errorMessage, '', { duration: 3000 });
       }
     });
+  }
+
+  private isEncryptedMessageWithinLimit(forUser: string, forContact: string): boolean {
+    return this.utf8Size(forUser) <= this.maxEncryptedMessageBytes
+      && this.utf8Size(forContact) <= this.maxEncryptedMessageBytes;
+  }
+
+  private isRequestWithinLimit(contact: Contact, forUser: string, forContact: string, signature: string): boolean {
+    const payload = {
+      contactId: contact.id,
+      userId: contact.userId,
+      contactUserId: contact.contactUserId,
+      direction: 'user',
+      encryptedMessageForUser: forUser,
+      encryptedMessageForContact: forContact,
+      signature
+    };
+    return this.utf8Size(JSON.stringify(payload)) <= this.maxRequestBytes;
+  }
+
+  private utf8Size(value: string): number {
+    return new TextEncoder().encode(value).length;
+  }
+
+  private removeOptimisticMessage(messageId: string): void {
+    this.messages.update((msgs) => msgs.filter((msg) => msg.messageId !== messageId));
   }
 
   mapStatus(status?: string): string {

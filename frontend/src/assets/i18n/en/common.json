@@ -216,6 +216,8 @@
         "messageUnverified": "Signature could not be verified.",
         "keyResetNotice": "System: I reset my security keys. Older messages may no longer be readable.",
         "translateFailed": "Translation failed.",
+        "sendFailed": "Message could not be sent.",
+        "messageTooLarge": "Message is too large to send.",
         "storeTranslationFailed": "Translated message could not be stored.",
         "openInMaps": "Open in Google Maps",
         "showOnMap": "Show on map",

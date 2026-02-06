@@ -58,8 +58,10 @@ export class AudioRecorderComponent {
   private analyserData?: Uint8Array<ArrayBuffer>;
   private analyserTimer?: ReturnType<typeof setInterval>;
   private peakSamples: number[] = [];
+  private recordedBytes = 0;
 
   audioPayload?: AudioPayload;
+  liveWaveform: number[] = [];
 
   constructor() {
     if (this.data.initialAudio) {
@@ -79,6 +81,8 @@ export class AudioRecorderComponent {
     this.isTooLarge = false;
     this.audioPayload = undefined;
     this.hasAudio = false;
+    this.liveWaveform = [];
+    this.recordedBytes = 0;
     this.cleanupAudioUrl();
 
     if (!('mediaDevices' in navigator)) {
@@ -98,10 +102,9 @@ export class AudioRecorderComponent {
       this.mediaRecorder.addEventListener('dataavailable', (event) => {
         if (event.data?.size) {
           this.chunks.push(event.data);
-          const sizeBytes = this.chunks.reduce((acc, part) => acc + (part as Blob).size, 0);
-          const estimatedBase64Size = Math.ceil(sizeBytes / 3) * 4;
-          if (estimatedBase64Size > this.maxBase64Bytes) {
-            this.isTooLarge = true;
+          this.recordedBytes += event.data.size;
+          const estimatedBase64Size = Math.ceil(this.recordedBytes / 3) * 4;
+          if (estimatedBase64Size >= this.maxBase64Bytes) {
             this.stopRecording();
           }
         }
@@ -177,6 +180,7 @@ export class AudioRecorderComponent {
     this.hasAudio = false;
     this.isTooLarge = false;
     this.errorMessage = '';
+    this.liveWaveform = [];
     this.cleanupAudioUrl();
   }
 
@@ -262,6 +266,7 @@ export class AudioRecorderComponent {
     this.hasAudio = true;
     this.isTooLarge = false;
     this.errorMessage = '';
+    this.liveWaveform = [];
     if (!this.audioUrl) {
       const blob = this.base64ToBlob(payload.base64, payload.mimeType);
       this.audioUrl = URL.createObjectURL(blob);
@@ -315,6 +320,10 @@ export class AudioRecorderComponent {
           }
         }
         this.peakSamples.push(peak);
+        const waveform = this.buildWaveformFromPeaks();
+        if (waveform) {
+          this.liveWaveform = waveform;
+        }
       }, 120);
     } catch {
       this.stopAnalyser();

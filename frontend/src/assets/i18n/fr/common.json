@@ -216,6 +216,8 @@
         "messageUnverified": "La signature n’a pas pu être vérifiée.",
         "keyResetNotice": "Système : j’ai réinitialisé mes clés de sécurité. Les anciens messages peuvent ne plus être lisibles.",
         "translateFailed": "La traduction a échoué.",
+        "sendFailed": "Le message n’a pas pu être envoyé.",
+        "messageTooLarge": "Le message est trop volumineux pour être envoyé.",
         "storeTranslationFailed": "Le message traduit n'a pas pu être enregistré.",
         "openInMaps": "Ouvrir dans Google Maps",
         "showOnMap": "Afficher sur la carte",
