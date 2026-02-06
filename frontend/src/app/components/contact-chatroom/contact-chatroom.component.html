@@ -51,6 +51,14 @@
   }
   <mat-card-content #messageScroll class="chatroom-card__content">
     <div class="message-content">
+      @if (audioLimitReached()) {
+      <div class="system-notice">
+        <div class="system-notice__chip">
+          <mat-icon class="system-notice__icon">mic_off</mat-icon>
+          <span>{{ 'common.contact.chatroom.audioLimitReached' | transloco }}</span>
+        </div>
+      </div>
+      }
       @for (msg of messages(); track msg.id; let last = $last; let idx = $index) {
       @if (isNewDay(idx)) {
       <div class="day-separator">
@@ -347,7 +355,7 @@
     <mat-icon>add_location_alt</mat-icon>
   </button>
   <button mat-icon-button type="button" [attr.aria-label]="'common.contact.chatroom.addVoiceAria' | transloco"
-    (click)="openAudioRecorder()">
+    (click)="openAudioRecorder()" [disabled]="audioLimitReached()">
     <mat-icon>mic</mat-icon>
   </button>
   <button mat-icon-button color="primary" [attr.aria-label]="'common.contact.chatroom.composeAria' | transloco"

@@ -218,6 +218,7 @@
         "translateFailed": "Falló la traducción.",
         "sendFailed": "No se pudo enviar el mensaje.",
         "messageTooLarge": "El mensaje es demasiado grande para enviarse.",
+        "audioLimitReached": "Solo puedes enviar hasta 5 mensajes de voz en este chat.",
         "storeTranslationFailed": "No se pudo guardar el mensaje traducido.",
         "openInMaps": "Abrir en Google Maps",
         "showOnMap": "Mostrar en el mapa",

@@ -124,6 +124,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   private readonly maxRequestBytes = 2_000_000;
   private readonly maxPerMessageBytes = Math.min(this.maxEncryptedMessageBytes, Math.floor(this.maxRequestBytes * 0.45));
   private readonly maxAudioBase64Bytes = Math.floor(this.maxPerMessageBytes / 4.3);
+  private readonly maxAudioMessages = 5;
   private readonly audioWaveWindow = 60;
   private readonly clearedWaveValue = 0.08;
   readonly reactions: readonly string[] = [
@@ -155,6 +156,18 @@ export class ContactChatroomComponent implements AfterViewInit {
     '🏁', '🇩🇪', '🇦🇹', '🇨🇭', '🇫🇷', '🇪🇸', '🇮🇹', '🇬🇧', '🇺🇸', '🇨🇦', '🇧🇷', '🇯🇵', '🇨🇳', '🇰🇷', '🇮🇳',
     '🇦🇺', '🇳🇿', '🇸🇪', '🇳🇴', '🇫🇮', '🇳🇱', '🇧🇪', '🇨🇿', '🇵🇱', '🇵🇹', '🇬🇷', '🇷🇺', '🇲🇽', '🇦🇷'
   ];
+  readonly audioLimitReached = computed(() => {
+    let count = 0;
+    for (const msg of this.messages()) {
+      if (msg.direction === 'user' && msg.payload?.audio) {
+        count += 1;
+        if (count >= this.maxAudioMessages) {
+          return true;
+        }
+      }
+    }
+    return false;
+  });
 
   constructor() {
     this.destroyRef.onDestroy(() => {
@@ -446,6 +459,10 @@ export class ContactChatroomComponent implements AfterViewInit {
   openAudioRecorder(initialAudio?: ShortMessage['audio'] | null): void {
     const contact = this.contact();
     if (!contact) {
+      return;
+    }
+    if (this.audioLimitReached()) {
+      this.snackBar.open(this.translation.t('common.contact.chatroom.audioLimitReached'), '', { duration: 3000 });
       return;
     }
     const dialogRef = this.matDialog.open(AudioRecorderComponent, {

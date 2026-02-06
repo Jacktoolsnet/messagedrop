@@ -218,6 +218,7 @@
         "translateFailed": "La traduction a échoué.",
         "sendFailed": "Le message n’a pas pu être envoyé.",
         "messageTooLarge": "Le message est trop volumineux pour être envoyé.",
+        "audioLimitReached": "Vous ne pouvez envoyer que 5 messages vocaux dans cette discussion.",
         "storeTranslationFailed": "Le message traduit n'a pas pu être enregistré.",
         "openInMaps": "Ouvrir dans Google Maps",
         "showOnMap": "Afficher sur la carte",
