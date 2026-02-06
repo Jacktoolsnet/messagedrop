@@ -58,6 +58,9 @@ export class AudioRecorderComponent {
   private audioPlayer?: HTMLAudioElement;
   private playbackTimer?: ReturnType<typeof setInterval>;
   private playbackProgress = 0;
+  private playbackStartedAt = 0;
+  private playbackStartedOffset = 0;
+  playbackActive = false;
   private audioContext?: AudioContext;
   private analyser?: AnalyserNode;
   private analyserData?: Uint8Array<ArrayBuffer>;
@@ -168,17 +171,31 @@ export class AudioRecorderComponent {
         this.audioPlayer?.pause();
         this.stopPlaybackProgress();
         this.playbackProgress = 0;
+        this.playbackActive = false;
       });
     }
     if (this.audioPlayer.paused) {
-      if (!this.audioPlayer.currentTime) {
+      const fallbackDuration = (this.audioPayload?.durationMs ?? 0) / 1000;
+      const duration = Number.isFinite(this.audioPlayer.duration) && this.audioPlayer.duration > 0
+        ? this.audioPlayer.duration
+        : fallbackDuration;
+      const atEnd = Number.isFinite(duration) && duration > 0
+        ? (this.audioPlayer.currentTime >= duration - 0.05)
+        : (this.playbackProgress >= 1);
+      if (this.audioPlayer.ended || atEnd) {
+        this.audioPlayer.currentTime = 0;
         this.playbackProgress = 0;
       }
+      this.playbackActive = true;
+      this.playbackStartedAt = performance.now();
+      this.playbackStartedOffset = this.audioPlayer.currentTime || 0;
+      this.playbackProgress = 0.001;
       void this.audioPlayer.play();
       this.startPlaybackProgress();
     } else {
       this.audioPlayer.pause();
       this.stopPlaybackProgress();
+      this.playbackActive = false;
     }
   }
 
@@ -272,7 +289,10 @@ export class AudioRecorderComponent {
     this.audioUrl = url;
     const audio = new Audio(url);
     audio.addEventListener('loadedmetadata', async () => {
-      const durationMs = Number.isFinite(audio.duration) ? Math.round(audio.duration * 1000) : 0;
+      let durationMs = Number.isFinite(audio.duration) ? Math.round(audio.duration * 1000) : 0;
+      if (!durationMs) {
+        durationMs = await this.computeDurationMs(blob);
+      }
       const waveform = this.buildWaveformFromPeaks() || await this.buildWaveform(blob);
       const payload: AudioPayload = {
         base64,
@@ -298,7 +318,10 @@ export class AudioRecorderComponent {
       if (!Number.isFinite(duration) || duration <= 0) {
         return;
       }
-      this.playbackProgress = Math.min(1, Math.max(0, this.audioPlayer.currentTime / duration));
+      const elapsed = (performance.now() - this.playbackStartedAt) / 1000 + this.playbackStartedOffset;
+      const currentTime = this.audioPlayer.currentTime || 0;
+      const effectiveTime = Math.max(currentTime, elapsed);
+      this.playbackProgress = Math.min(1, Math.max(0, effectiveTime / duration));
     }, 120);
   }
 
@@ -476,6 +499,19 @@ export class AudioRecorderComponent {
     return 0.2 + boosted * 0.8;
   }
 
+  private async computeDurationMs(blob: Blob): Promise<number> {
+    try {
+      const arrayBuffer = await blob.arrayBuffer();
+      const audioContext = new (window.AudioContext || (window as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext!)();
+      const decoded = await audioContext.decodeAudioData(arrayBuffer.slice(0));
+      const durationMs = Number.isFinite(decoded.duration) ? Math.round(decoded.duration * 1000) : 0;
+      await audioContext.close();
+      return durationMs;
+    } catch {
+      return 0;
+    }
+  }
+
   remainingLabel(): string {
     if (this.recordingRemainingSeconds === null) {
       return '--:--';
@@ -486,10 +522,10 @@ export class AudioRecorderComponent {
   }
 
   playbackLabel(): string {
-    if (!this.audioPayload?.durationMs) {
-      return '';
+    const totalSeconds = this.getPlaybackDurationSeconds();
+    if (!totalSeconds) {
+      return '--:--';
     }
-    const totalSeconds = Math.max(1, Math.round(this.audioPayload.durationMs / 1000));
     const elapsedSeconds = Math.min(totalSeconds, Math.round(totalSeconds * this.playbackProgress));
     return `${this.formatSeconds(elapsedSeconds)} / ${this.formatSeconds(totalSeconds)}`;
   }
@@ -498,6 +534,17 @@ export class AudioRecorderComponent {
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  private getPlaybackDurationSeconds(): number | null {
+    const playerDuration = this.audioPlayer?.duration;
+    if (Number.isFinite(playerDuration) && (playerDuration ?? 0) > 0) {
+      return Math.round(playerDuration as number);
+    }
+    if (this.audioPayload?.durationMs && this.audioPayload.durationMs > 0) {
+      return Math.round(this.audioPayload.durationMs / 1000);
+    }
+    return null;
   }
 
   private updateRemainingEstimate(estimatedBase64Size: number, softLimit: number): void {

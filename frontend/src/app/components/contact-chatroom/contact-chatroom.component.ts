@@ -111,9 +111,14 @@ export class ContactChatroomComponent implements AfterViewInit {
   private lastLiveMessageId?: string;
   private lastResetToken?: number;
   private readonly audioUrlCache = new Map<string, string>();
+  private readonly audioDurationCache = new Map<string, number>();
+  private readonly audioDurationPending = new Set<string>();
   private audioPlayer?: HTMLAudioElement;
   private playingMessageId?: string;
   private playbackTimer?: ReturnType<typeof setInterval>;
+  private playbackStartedAt = 0;
+  private playbackStartedOffset = 0;
+  private playbackFallbackDuration = 0;
   private readonly audioProgress = signal<Record<string, number>>({});
   private readonly maxEncryptedMessageBytes = 1_500_000;
   private readonly maxRequestBytes = 2_000_000;
@@ -155,6 +160,8 @@ export class ContactChatroomComponent implements AfterViewInit {
     this.destroyRef.onDestroy(() => {
       this.audioUrlCache.forEach((url) => URL.revokeObjectURL(url));
       this.audioUrlCache.clear();
+      this.audioDurationCache.clear();
+      this.audioDurationPending.clear();
       this.audioPlayer?.pause();
       this.audioPlayer = undefined;
       this.playingMessageId = undefined;
@@ -501,6 +508,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     const blob = this.base64ToBlob(audio.base64, audio.mimeType);
     const url = URL.createObjectURL(blob);
     this.audioUrlCache.set(cacheKey, url);
+    this.ensureAudioDuration(cacheKey, blob);
     return url;
   }
 
@@ -523,7 +531,20 @@ export class ContactChatroomComponent implements AfterViewInit {
       });
     }
     if (this.audioPlayer.paused) {
-      this.setAudioProgress(messageId, 0);
+      const cachedDuration = this.audioDurationCache.get(messageId) ?? 0;
+      this.playbackFallbackDuration = cachedDuration || ((message.payload?.audio?.durationMs ?? 0) / 1000);
+      const duration = Number.isFinite(this.audioPlayer.duration) && this.audioPlayer.duration > 0
+        ? this.audioPlayer.duration
+        : this.playbackFallbackDuration;
+      const atEnd = Number.isFinite(duration) && duration > 0
+        ? (this.audioPlayer.currentTime >= duration - 0.05)
+        : (this.audioProgress()[messageId] ?? 0) >= 1;
+      if (this.audioPlayer.ended || atEnd) {
+        this.audioPlayer.currentTime = 0;
+      }
+      this.playbackStartedAt = performance.now();
+      this.playbackStartedOffset = this.audioPlayer.currentTime || 0;
+      this.setAudioProgress(messageId, 0.001);
       void this.audioPlayer.play();
       this.startPlaybackProgress(messageId, message.payload?.audio?.durationMs);
     } else {
@@ -581,12 +602,18 @@ export class ContactChatroomComponent implements AfterViewInit {
 
   getAudioTimer(message: ChatroomMessage): string {
     const durationMs = message.payload?.audio?.durationMs;
-    if (!durationMs || durationMs <= 0) {
-      return '';
-    }
-    const totalSeconds = Math.max(1, Math.round(durationMs / 1000));
     const messageId = message.messageId || message.id;
     const isActive = this.playingMessageId === messageId;
+    const playerDuration = isActive && Number.isFinite(this.audioPlayer?.duration)
+      ? (this.audioPlayer?.duration ?? 0)
+      : 0;
+    const cachedDuration = this.audioDurationCache.get(messageId) ?? 0;
+    const totalSeconds = playerDuration > 0
+      ? Math.round(playerDuration)
+      : (cachedDuration || (durationMs && durationMs > 0 ? Math.max(1, Math.round(durationMs / 1000)) : 0));
+    if (!totalSeconds) {
+      return '--:--';
+    }
     if (!isActive) {
       return this.formatSeconds(totalSeconds);
     }
@@ -599,6 +626,35 @@ export class ContactChatroomComponent implements AfterViewInit {
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  private ensureAudioDuration(cacheKey: string, blob: Blob): void {
+    if (this.audioDurationCache.has(cacheKey) || this.audioDurationPending.has(cacheKey)) {
+      return;
+    }
+    this.audioDurationPending.add(cacheKey);
+    this.computeAudioDuration(blob)
+      .then((durationSeconds) => {
+        if (durationSeconds > 0) {
+          this.audioDurationCache.set(cacheKey, durationSeconds);
+        }
+      })
+      .finally(() => {
+        this.audioDurationPending.delete(cacheKey);
+      });
+  }
+
+  private async computeAudioDuration(blob: Blob): Promise<number> {
+    try {
+      const arrayBuffer = await blob.arrayBuffer();
+      const audioContext = new (window.AudioContext || (window as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext!)();
+      const decoded = await audioContext.decodeAudioData(arrayBuffer.slice(0));
+      const duration = Number.isFinite(decoded.duration) ? decoded.duration : 0;
+      await audioContext.close();
+      return duration > 0 ? Math.round(duration) : 0;
+    } catch {
+      return 0;
+    }
   }
 
   waveHeight(value: number): number {
@@ -618,11 +674,14 @@ export class ContactChatroomComponent implements AfterViewInit {
       }
       const duration = Number.isFinite(this.audioPlayer.duration) && this.audioPlayer.duration > 0
         ? this.audioPlayer.duration
-        : fallbackDuration;
+        : (this.playbackFallbackDuration || fallbackDuration);
       if (!Number.isFinite(duration) || duration <= 0) {
         return;
       }
-      const progress = Math.min(1, Math.max(0, this.audioPlayer.currentTime / duration));
+      const elapsed = (performance.now() - this.playbackStartedAt) / 1000 + this.playbackStartedOffset;
+      const currentTime = this.audioPlayer.currentTime || 0;
+      const effectiveTime = Math.max(currentTime, elapsed);
+      const progress = Math.min(1, Math.max(0, effectiveTime / duration));
       this.setAudioProgress(messageId, progress);
     }, 120);
   }

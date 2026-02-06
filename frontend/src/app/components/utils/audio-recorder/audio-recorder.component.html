@@ -8,9 +8,9 @@
       <span>{{ remainingLabel() }}</span>
     </span>
     }
-    @if (!recording && audioPayload?.durationMs && isPlaying()) {
+    @if (!recording && playbackActive) {
     <span class="audio-recorder__timer" aria-live="polite">
-      <mat-icon>play_arrow</mat-icon>
+      <mat-icon>hourglass_bottom</mat-icon>
       <span>{{ playbackLabel() }}</span>
     </span>
     }
@@ -22,7 +22,7 @@
     <div class="audio-recorder__bars">
       @for (bar of playbackBars; track $index) {
       <span class="audio-recorder__bar"
-        [style.transform]="'scaleY(' + (bar.value ?? 0.2) + ')'"
+        [style.transform]="'scaleY(' + bar.value + ')'"
         [class.audio-recorder__bar--active]="bar.active"></span>
       }
     </div>
