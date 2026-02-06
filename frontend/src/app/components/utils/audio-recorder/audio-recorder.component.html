@@ -2,17 +2,25 @@
   <div class="audio-recorder__header">
     <mat-icon>mic</mat-icon>
     <span>{{ 'common.audioRecorder.title' | transloco }}</span>
+    @if (recording) {
+    <span class="audio-recorder__timer" aria-live="polite">
+      <mat-icon>schedule</mat-icon>
+      <span>{{ remainingLabel() }}</span>
+    </span>
+    }
   </div>
 
   <div class="audio-recorder__wave">
     @if (audioPayload?.waveform?.length) {
+    @if (getPlaybackBars(); as playbackBars) {
     <div class="audio-recorder__bars">
-      @for (bar of audioPayload!.waveform; track $index) {
+      @for (bar of playbackBars; track $index) {
       <span class="audio-recorder__bar"
-        [style.transform]="'scaleY(' + (bar ?? 0.2) + ')'"
-        [class.audio-recorder__bar--active]="isAudioBarActive($index)"></span>
+        [style.transform]="'scaleY(' + (bar.value ?? 0.2) + ')'"
+        [class.audio-recorder__bar--active]="bar.active"></span>
       }
     </div>
+    }
     } @else if (liveWaveform.length) {
     <div class="audio-recorder__bars">
       @for (bar of liveWaveform; track $index) {

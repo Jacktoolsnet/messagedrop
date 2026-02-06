@@ -116,16 +116,18 @@
             }
             @if (msg.payload.audio) {
             <div class="chat-audio">
-              @if (msg.payload.audio.waveform?.length) {
+              @if (getAudioBars(msg); as audioBars) {
+              @if (audioBars.length) {
               <div class="chat-audio__bars">
-                @for (bar of msg.payload.audio.waveform; track $index) {
+                @for (bar of audioBars; track $index) {
                 <span class="chat-audio__bar"
-                  [style.transform]="'scaleY(' + (bar ?? 0.2) + ')'"
-                  [class.chat-audio__bar--active]="isAudioBarActive(msg, $index)"></span>
+                  [style.transform]="'scaleY(' + (bar.value ?? 0.2) + ')'"
+                  [class.chat-audio__bar--active]="bar.active"></span>
                 }
               </div>
               } @else {
               <div class="chat-audio__wave"></div>
+              }
               }
               @if (formatAudioDuration(msg.payload.audio.durationMs)) {
               <span class="chat-audio__duration">{{ formatAudioDuration(msg.payload.audio.durationMs) }}</span>
@@ -238,16 +240,18 @@
             }
             @if (msg.payload.audio) {
             <div class="chat-audio">
-              @if (msg.payload.audio.waveform?.length) {
+              @if (getAudioBars(msg); as audioBars) {
+              @if (audioBars.length) {
               <div class="chat-audio__bars">
-                @for (bar of msg.payload.audio.waveform; track $index) {
+                @for (bar of audioBars; track $index) {
                 <span class="chat-audio__bar"
-                  [style.transform]="'scaleY(' + (bar ?? 0.2) + ')'"
-                  [class.chat-audio__bar--active]="isAudioBarActive(msg, $index)"></span>
+                  [style.transform]="'scaleY(' + (bar.value ?? 0.2) + ')'"
+                  [class.chat-audio__bar--active]="bar.active"></span>
                 }
               </div>
               } @else {
               <div class="chat-audio__wave"></div>
+              }
               }
               @if (formatAudioDuration(msg.payload.audio.durationMs)) {
               <span class="chat-audio__duration">{{ formatAudioDuration(msg.payload.audio.durationMs) }}</span>

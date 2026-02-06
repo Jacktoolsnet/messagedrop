@@ -47,6 +47,11 @@ interface ChatroomMessage {
   showOriginal?: boolean;
 }
 
+interface AudioWaveBar {
+  value: number;
+  active: boolean;
+}
+
 @Component({
   selector: 'app-contact-chatroom',
   imports: [
@@ -114,6 +119,8 @@ export class ContactChatroomComponent implements AfterViewInit {
   private readonly maxRequestBytes = 2_000_000;
   private readonly maxPerMessageBytes = Math.min(this.maxEncryptedMessageBytes, Math.floor(this.maxRequestBytes * 0.45));
   private readonly maxAudioBase64Bytes = Math.floor(this.maxPerMessageBytes / 4.3);
+  private readonly audioWaveWindow = 60;
+  private readonly clearedWaveValue = 0;
   readonly reactions: readonly string[] = [
     // faces/emotions
     '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '🙂', '😉', '😎',
@@ -516,6 +523,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       });
     }
     if (this.audioPlayer.paused) {
+      this.setAudioProgress(messageId, 0);
       void this.audioPlayer.play();
       this.startPlaybackProgress(messageId);
     } else {
@@ -529,15 +537,38 @@ export class ContactChatroomComponent implements AfterViewInit {
     return this.playingMessageId === messageId && !!this.audioPlayer && !this.audioPlayer.paused;
   }
 
-  isAudioBarActive(message: ChatroomMessage, index: number): boolean {
-    const messageId = message.messageId || message.id;
-    const progress = this.audioProgress()[messageId] ?? 0;
-    const totalBars = message.payload?.audio?.waveform?.length ?? 0;
+  getAudioBars(message: ChatroomMessage): AudioWaveBar[] {
+    const waveform = message.payload?.audio?.waveform ?? [];
+    const totalBars = waveform.length;
     if (!totalBars) {
-      return false;
+      return [];
     }
-    const activeIndex = Math.floor(progress * totalBars);
-    return index <= activeIndex;
+    const messageId = message.messageId || message.id;
+    const isActive = this.playingMessageId === messageId;
+    if (!isActive) {
+      const startIndex = Math.max(0, totalBars - this.audioWaveWindow);
+      const bars: AudioWaveBar[] = [];
+      for (let i = 0; i < this.audioWaveWindow; i += 1) {
+        const sourceIndex = startIndex + i;
+        const value = waveform[sourceIndex] ?? 0.2;
+        bars.push({ value, active: false });
+      }
+      return bars;
+    }
+    const progress = this.audioProgress()[messageId] ?? 0;
+    const currentIndex = Math.floor(progress * totalBars) - 1;
+    const bars: AudioWaveBar[] = [];
+    for (let i = 0; i < this.audioWaveWindow; i += 1) {
+      const offset = this.audioWaveWindow - 1 - i;
+      const sourceIndex = currentIndex - offset;
+      if (sourceIndex < 0 || sourceIndex >= totalBars) {
+        bars.push({ value: this.clearedWaveValue, active: false });
+        continue;
+      }
+      const value = waveform[sourceIndex] ?? 0.2;
+      bars.push({ value, active: sourceIndex === currentIndex && currentIndex >= 0 });
+    }
+    return bars;
   }
 
   formatAudioDuration(durationMs?: number): string {

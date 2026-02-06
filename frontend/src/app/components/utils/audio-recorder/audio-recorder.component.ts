@@ -18,6 +18,11 @@ interface AudioRecorderDialogData {
   maxBase64Bytes?: number;
 }
 
+interface AudioWaveBar {
+  value: number;
+  active: boolean;
+}
+
 const DEFAULT_MAX_BASE64_BYTES = 1_500_000;
 
 @Component({
@@ -59,6 +64,12 @@ export class AudioRecorderComponent {
   private analyserTimer?: ReturnType<typeof setInterval>;
   private peakSamples: number[] = [];
   private recordedBytes = 0;
+  private recordingStartedAt = 0;
+  recordingRemainingSeconds: number | null = null;
+  private readonly liveBars = 60;
+  private livePeaks: number[] = [];
+  private readonly stopAtRatio = 0.92;
+  private readonly clearedWaveValue = 0;
 
   audioPayload?: AudioPayload;
   liveWaveform: number[] = [];
@@ -81,8 +92,11 @@ export class AudioRecorderComponent {
     this.isTooLarge = false;
     this.audioPayload = undefined;
     this.hasAudio = false;
-    this.liveWaveform = [];
+    this.livePeaks = Array(this.liveBars).fill(0);
+    this.liveWaveform = Array(this.liveBars).fill(0.2);
     this.recordedBytes = 0;
+    this.recordingStartedAt = performance.now();
+    this.recordingRemainingSeconds = null;
     this.cleanupAudioUrl();
 
     if (!('mediaDevices' in navigator)) {
@@ -104,7 +118,9 @@ export class AudioRecorderComponent {
           this.chunks.push(event.data);
           this.recordedBytes += event.data.size;
           const estimatedBase64Size = Math.ceil(this.recordedBytes / 3) * 4;
-          if (estimatedBase64Size >= this.maxBase64Bytes) {
+          const softLimit = Math.floor(this.maxBase64Bytes * this.stopAtRatio);
+          this.updateRemainingEstimate(estimatedBase64Size, softLimit);
+          if (estimatedBase64Size >= softLimit) {
             this.stopRecording();
           }
         }
@@ -138,6 +154,7 @@ export class AudioRecorderComponent {
       this.mediaRecorder.stop();
     }
     this.recording = false;
+    this.recordingRemainingSeconds = null;
     this.stopAnalyser();
   }
 
@@ -154,6 +171,9 @@ export class AudioRecorderComponent {
       });
     }
     if (this.audioPlayer.paused) {
+      if (!this.audioPlayer.currentTime) {
+        this.playbackProgress = 0;
+      }
       void this.audioPlayer.play();
       this.startPlaybackProgress();
     } else {
@@ -166,13 +186,36 @@ export class AudioRecorderComponent {
     return !!this.audioPlayer && !this.audioPlayer.paused;
   }
 
-  isAudioBarActive(index: number): boolean {
-    const totalBars = this.audioPayload?.waveform?.length ?? 0;
+  getPlaybackBars(): AudioWaveBar[] {
+    const waveform = this.audioPayload?.waveform ?? [];
+    const totalBars = waveform.length;
     if (!totalBars) {
-      return false;
+      return [];
     }
-    const activeIndex = Math.floor(this.playbackProgress * totalBars);
-    return index <= activeIndex;
+    const useScroll = !!this.audioPlayer && (this.playbackProgress > 0 || this.isPlaying());
+    if (!useScroll) {
+      const startIndex = Math.max(0, totalBars - this.liveBars);
+      const bars: AudioWaveBar[] = [];
+      for (let i = 0; i < this.liveBars; i += 1) {
+        const sourceIndex = startIndex + i;
+        const value = waveform[sourceIndex] ?? 0.2;
+        bars.push({ value, active: false });
+      }
+      return bars;
+    }
+    const currentIndex = Math.floor(this.playbackProgress * totalBars) - 1;
+    const bars: AudioWaveBar[] = [];
+    for (let i = 0; i < this.liveBars; i += 1) {
+      const offset = this.liveBars - 1 - i;
+      const sourceIndex = currentIndex - offset;
+      if (sourceIndex < 0 || sourceIndex >= totalBars) {
+        bars.push({ value: this.clearedWaveValue, active: false });
+        continue;
+      }
+      const value = waveform[sourceIndex] ?? 0.2;
+      bars.push({ value, active: sourceIndex === currentIndex && currentIndex >= 0 });
+    }
+    return bars;
   }
 
   resetAudio(): void {
@@ -181,6 +224,8 @@ export class AudioRecorderComponent {
     this.isTooLarge = false;
     this.errorMessage = '';
     this.liveWaveform = [];
+    this.livePeaks = [];
+    this.recordingRemainingSeconds = null;
     this.cleanupAudioUrl();
   }
 
@@ -267,6 +312,7 @@ export class AudioRecorderComponent {
     this.isTooLarge = false;
     this.errorMessage = '';
     this.liveWaveform = [];
+    this.livePeaks = [];
     if (!this.audioUrl) {
       const blob = this.base64ToBlob(payload.base64, payload.mimeType);
       this.audioUrl = URL.createObjectURL(blob);
@@ -320,10 +366,7 @@ export class AudioRecorderComponent {
           }
         }
         this.peakSamples.push(peak);
-        const waveform = this.buildWaveformFromPeaks();
-        if (waveform) {
-          this.liveWaveform = waveform;
-        }
+        this.updateLiveWaveform(peak);
       }, 120);
     } catch {
       this.stopAnalyser();
@@ -343,11 +386,28 @@ export class AudioRecorderComponent {
     this.analyserData = undefined;
   }
 
+  private updateLiveWaveform(peak: number): void {
+    if (this.livePeaks.length < this.liveBars) {
+      this.livePeaks.push(peak);
+    } else {
+      this.livePeaks.shift();
+      this.livePeaks.push(peak);
+    }
+    let maxPeak = 0;
+    for (let i = 0; i < this.livePeaks.length; i += 1) {
+      if (this.livePeaks[i] > maxPeak) {
+        maxPeak = this.livePeaks[i];
+      }
+    }
+    const safeMax = maxPeak > 0.001 ? maxPeak : 0.001;
+    this.liveWaveform = this.livePeaks.map((value) => this.normalizeWaveValue(value, safeMax));
+  }
+
   private buildWaveformFromPeaks(): number[] | null {
     if (!this.peakSamples.length) {
       return null;
     }
-    const bars = 60;
+    const bars = this.liveBars;
     const blockSize = Math.max(1, Math.floor(this.peakSamples.length / bars));
     const waveform: number[] = [];
     let maxPeak = 0;
@@ -376,7 +436,7 @@ export class AudioRecorderComponent {
       const audioContext = new (window.AudioContext || (window as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext!)();
       const decoded = await audioContext.decodeAudioData(arrayBuffer.slice(0));
       const channel = decoded.getChannelData(0);
-      const bars = 60;
+      const bars = this.liveBars;
       const blockSize = Math.max(1, Math.floor(channel.length / bars));
       const waveform: number[] = [];
       let maxPeak = 0;
@@ -411,6 +471,29 @@ export class AudioRecorderComponent {
     const normalized = Math.min(1, value / maxPeak);
     const boosted = Math.pow(normalized, 0.6);
     return 0.2 + boosted * 0.8;
+  }
+
+  remainingLabel(): string {
+    if (this.recordingRemainingSeconds === null) {
+      return '--:--';
+    }
+    const minutes = Math.floor(this.recordingRemainingSeconds / 60);
+    const seconds = this.recordingRemainingSeconds % 60;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  private updateRemainingEstimate(estimatedBase64Size: number, softLimit: number): void {
+    const elapsedMs = performance.now() - this.recordingStartedAt;
+    if (!Number.isFinite(elapsedMs) || elapsedMs < 600) {
+      return;
+    }
+    const bytesPerMs = estimatedBase64Size / elapsedMs;
+    if (!Number.isFinite(bytesPerMs) || bytesPerMs <= 0) {
+      return;
+    }
+    const remainingBytes = Math.max(0, softLimit - estimatedBase64Size);
+    const remainingMs = remainingBytes / bytesPerMs;
+    this.recordingRemainingSeconds = Math.max(0, Math.ceil(remainingMs / 1000));
   }
 
   private stopStream(): void {
