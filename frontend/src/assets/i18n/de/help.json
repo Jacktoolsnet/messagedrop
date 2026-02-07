@@ -483,7 +483,66 @@
     "title": "PIN-Hinweis"
   },
   "placeList": {
-    "title": "Orte"
+    "title": "Meine Orte",
+    "intro": "Hier verwaltest du deine gespeicherten Orte. Du kannst Orte öffnen, auf der Karte anspringen, Kacheln verwalten, abonnieren und neue Orte hinzufügen.",
+    "items": {
+      "open": {
+        "title": "Ort öffnen",
+        "desc": "Mit dieser Funktion öffnest du die Ort-Einstellungen für den ausgewählten Ort."
+      },
+      "delete": {
+        "title": "Ort löschen",
+        "desc": "Mit dieser Funktion entfernst du den ausgewählten Ort dauerhaft aus deiner Liste."
+      },
+      "tiles": {
+        "title": "Kacheln öffnen",
+        "desc": "Mit dieser Funktion öffnest du die Kachelansicht des Ortes und verwaltest die zugehörigen Inhalte."
+      },
+      "flyTo": {
+        "title": "Auf Karte anspringen",
+        "desc": "Mit dieser Funktion zentrierst du die App-Karte auf den ausgewählten Ort."
+      },
+      "more": {
+        "title": "Weitere Aktionen öffnen",
+        "desc": "Mit dieser Funktion öffnest du das Untermenü mit zusätzlichen Aktionen für den Ort."
+      },
+      "edit": {
+        "title": "Ort-Einstellungen bearbeiten",
+        "desc": "Mit dieser Funktion bearbeitest du Name, Darstellung und weitere Einstellungen des Ortes."
+      },
+      "openMaps": {
+        "title": "In Google Maps öffnen",
+        "desc": "Mit dieser Funktion öffnest du die Ortsposition in Google Maps."
+      },
+      "subscribe": {
+        "title": "Ort abonnieren",
+        "desc": "Mit dieser Funktion aktivierst du Benachrichtigungen für den ausgewählten Ort."
+      },
+      "unsubscribe": {
+        "title": "Ort-Abo beenden",
+        "desc": "Mit dieser Funktion deaktivierst du Benachrichtigungen für den ausgewählten Ort."
+      },
+      "sort": {
+        "title": "Orte sortieren",
+        "desc": "Mit dieser Funktion öffnest du den Sortierdialog und änderst die Reihenfolge deiner Orte."
+      },
+      "add": {
+        "title": "Neuen Ort hinzufügen",
+        "desc": "Mit dieser Funktion legst du einen neuen Ort über den Location-Picker an."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Mit dieser Funktion schließt du die Ortsliste."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "privacy": {
+        "title": "Datenschutz und Speicherung",
+        "desc": "Ortsdaten sind an dein Benutzerkonto gebunden. Der Ortsname wird serverseitig verschlüsselt gespeichert; Positionsdaten werden für die Kartenfunktionen verarbeitet. Beim Öffnen in Google Maps werden nur die Positionsdaten an Google übertragen."
+      }
+    }
   },
   "placeSettings": {
     "title": "Ort-Einstellungen"

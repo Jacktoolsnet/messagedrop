@@ -483,7 +483,66 @@
     "title": "Indice PIN"
   },
   "placeList": {
-    "title": "Lieux"
+    "title": "Mes lieux",
+    "intro": "Cette vue gère vos lieux enregistrés. Vous pouvez ouvrir des lieux, centrer la carte, gérer les tuiles, vous abonner et ajouter de nouveaux lieux.",
+    "items": {
+      "open": {
+        "title": "Ouvrir le lieu",
+        "desc": "Cette fonction ouvre les paramètres du lieu sélectionné."
+      },
+      "delete": {
+        "title": "Supprimer le lieu",
+        "desc": "Cette fonction supprime définitivement le lieu sélectionné de votre liste."
+      },
+      "tiles": {
+        "title": "Ouvrir les tuiles",
+        "desc": "Cette fonction ouvre la vue des tuiles du lieu et gère les contenus associés."
+      },
+      "flyTo": {
+        "title": "Aller sur la carte",
+        "desc": "Cette fonction centre la carte de l'application sur le lieu sélectionné."
+      },
+      "more": {
+        "title": "Ouvrir plus d'actions",
+        "desc": "Cette fonction ouvre le sous-menu avec des actions supplémentaires pour le lieu."
+      },
+      "edit": {
+        "title": "Modifier les paramètres du lieu",
+        "desc": "Cette fonction modifie le nom, le style visuel et d'autres paramètres du lieu."
+      },
+      "openMaps": {
+        "title": "Ouvrir dans Google Maps",
+        "desc": "Cette fonction ouvre la position du lieu dans Google Maps."
+      },
+      "subscribe": {
+        "title": "S'abonner au lieu",
+        "desc": "Cette fonction active les notifications pour le lieu sélectionné."
+      },
+      "unsubscribe": {
+        "title": "Se désabonner du lieu",
+        "desc": "Cette fonction désactive les notifications pour le lieu sélectionné."
+      },
+      "sort": {
+        "title": "Trier les lieux",
+        "desc": "Cette fonction ouvre la boîte de tri et modifie l'ordre de vos lieux."
+      },
+      "add": {
+        "title": "Ajouter un nouveau lieu",
+        "desc": "Cette fonction crée un nouveau lieu via le sélecteur de lieu."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Cette fonction ferme la liste des lieux."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "privacy": {
+        "title": "Confidentialité et stockage",
+        "desc": "Les données du lieu sont liées à votre compte utilisateur. Le nom du lieu est stocké chiffré côté serveur ; les données de position sont traitées pour les fonctions cartographiques. Lors de l'ouverture dans Google Maps, seules les données de position sont transmises à Google."
+      }
+    }
   },
   "placeSettings": {
     "title": "Paramètres du lieu"

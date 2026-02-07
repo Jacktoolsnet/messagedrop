@@ -483,7 +483,66 @@
     "title": "PIN hint"
   },
   "placeList": {
-    "title": "Places"
+    "title": "My places",
+    "intro": "This view manages your saved places. You can open places, jump to map position, manage tiles, subscribe, and add new places.",
+    "items": {
+      "open": {
+        "title": "Open place",
+        "desc": "This action opens place settings for the selected place."
+      },
+      "delete": {
+        "title": "Delete place",
+        "desc": "This action permanently removes the selected place from your list."
+      },
+      "tiles": {
+        "title": "Open tiles",
+        "desc": "This action opens the place tile view and manages related content."
+      },
+      "flyTo": {
+        "title": "Jump on map",
+        "desc": "This action centers the app map on the selected place."
+      },
+      "more": {
+        "title": "Open more actions",
+        "desc": "This action opens the submenu with additional actions for the place."
+      },
+      "edit": {
+        "title": "Edit place settings",
+        "desc": "This action edits the name, visual style, and additional place settings."
+      },
+      "openMaps": {
+        "title": "Open in Google Maps",
+        "desc": "This action opens the place position in Google Maps."
+      },
+      "subscribe": {
+        "title": "Subscribe place",
+        "desc": "This action enables notifications for the selected place."
+      },
+      "unsubscribe": {
+        "title": "Unsubscribe place",
+        "desc": "This action disables notifications for the selected place."
+      },
+      "sort": {
+        "title": "Sort places",
+        "desc": "This action opens the sorting dialog and changes the order of your places."
+      },
+      "add": {
+        "title": "Add new place",
+        "desc": "This action creates a new place using the location picker."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "This action closes the places list."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "privacy": {
+        "title": "Privacy and storage",
+        "desc": "Place data is bound to your user account. Place names are stored encrypted on the server; position data is processed for map features. Opening in Google Maps transfers only location data to Google."
+      }
+    }
   },
   "placeSettings": {
     "title": "Place settings"

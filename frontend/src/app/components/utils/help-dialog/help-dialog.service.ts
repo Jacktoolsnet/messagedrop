@@ -729,8 +729,79 @@ const HELP_TOPICS = {
   },
   placeList: {
     titleKey: 'placeList.title',
-    introKey: 'common.intros.list',
-    items: ITEMS.listSort
+    introKey: 'placeList.intro',
+    items: [
+      {
+        icon: 'touch_app',
+        titleKey: 'placeList.items.open.title',
+        descriptionKey: 'placeList.items.open.desc'
+      },
+      {
+        icon: 'delete_forever',
+        titleKey: 'placeList.items.delete.title',
+        descriptionKey: 'placeList.items.delete.desc'
+      },
+      {
+        icon: 'dashboard',
+        titleKey: 'placeList.items.tiles.title',
+        descriptionKey: 'placeList.items.tiles.desc'
+      },
+      {
+        icon: 'place',
+        titleKey: 'placeList.items.flyTo.title',
+        descriptionKey: 'placeList.items.flyTo.desc'
+      },
+      {
+        icon: 'more_horiz',
+        titleKey: 'placeList.items.more.title',
+        descriptionKey: 'placeList.items.more.desc'
+      },
+      {
+        icon: 'settings_account_box',
+        titleKey: 'placeList.items.edit.title',
+        descriptionKey: 'placeList.items.edit.desc'
+      },
+      {
+        icon: 'map',
+        titleKey: 'placeList.items.openMaps.title',
+        descriptionKey: 'placeList.items.openMaps.desc'
+      },
+      {
+        icon: 'bookmark_add',
+        titleKey: 'placeList.items.subscribe.title',
+        descriptionKey: 'placeList.items.subscribe.desc'
+      },
+      {
+        icon: 'bookmark_remove',
+        titleKey: 'placeList.items.unsubscribe.title',
+        descriptionKey: 'placeList.items.unsubscribe.desc'
+      },
+      {
+        icon: 'swap_vert',
+        titleKey: 'placeList.items.sort.title',
+        descriptionKey: 'placeList.items.sort.desc'
+      },
+      {
+        icon: 'add_location',
+        titleKey: 'placeList.items.add.title',
+        descriptionKey: 'placeList.items.add.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'placeList.items.close.title',
+        descriptionKey: 'placeList.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'placeList.items.help.title',
+        descriptionKey: 'placeList.items.help.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'placeList.items.privacy.title',
+        descriptionKey: 'placeList.items.privacy.desc'
+      }
+    ]
   },
   placeSettings: {
     titleKey: 'placeSettings.title',

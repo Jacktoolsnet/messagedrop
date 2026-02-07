@@ -483,7 +483,66 @@
     "title": "Ayuda de PIN"
   },
   "placeList": {
-    "title": "Lugares"
+    "title": "Mis lugares",
+    "intro": "Esta vista gestiona tus lugares guardados. Puedes abrir lugares, centrar su posición en el mapa, gestionar tarjetas, suscribirte y añadir nuevos lugares.",
+    "items": {
+      "open": {
+        "title": "Abrir lugar",
+        "desc": "Con esta función abres los ajustes del lugar seleccionado."
+      },
+      "delete": {
+        "title": "Eliminar lugar",
+        "desc": "Con esta función eliminas de forma permanente el lugar seleccionado de tu lista."
+      },
+      "tiles": {
+        "title": "Abrir tarjetas",
+        "desc": "Con esta función abres la vista de tarjetas del lugar y gestionas su contenido asociado."
+      },
+      "flyTo": {
+        "title": "Ir al mapa",
+        "desc": "Con esta función centras el mapa de la app en el lugar seleccionado."
+      },
+      "more": {
+        "title": "Abrir más acciones",
+        "desc": "Con esta función abres el submenú con acciones adicionales para el lugar."
+      },
+      "edit": {
+        "title": "Editar ajustes del lugar",
+        "desc": "Con esta función editas el nombre, el estilo visual y otros ajustes del lugar."
+      },
+      "openMaps": {
+        "title": "Abrir en Google Maps",
+        "desc": "Con esta función abres la posición del lugar en Google Maps."
+      },
+      "subscribe": {
+        "title": "Suscribirse al lugar",
+        "desc": "Con esta función activas notificaciones para el lugar seleccionado."
+      },
+      "unsubscribe": {
+        "title": "Cancelar suscripción del lugar",
+        "desc": "Con esta función desactivas notificaciones para el lugar seleccionado."
+      },
+      "sort": {
+        "title": "Ordenar lugares",
+        "desc": "Con esta función abres el diálogo de ordenación y cambias el orden de tus lugares."
+      },
+      "add": {
+        "title": "Añadir nuevo lugar",
+        "desc": "Con esta función creas un nuevo lugar mediante el selector de ubicación."
+      },
+      "close": {
+        "title": "Cerrar",
+        "desc": "Con esta función cierras la lista de lugares."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "privacy": {
+        "title": "Privacidad y almacenamiento",
+        "desc": "Los datos del lugar están vinculados a tu cuenta de usuario. El nombre del lugar se guarda cifrado en el servidor; los datos de posición se procesan para las funciones de mapa. Al abrir Google Maps, solo se transfieren datos de ubicación a Google."
+      }
+    }
   },
   "placeSettings": {
     "title": "Ajustes de lugar"
