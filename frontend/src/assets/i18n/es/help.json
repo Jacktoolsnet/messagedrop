@@ -312,7 +312,30 @@
     "title": "Tarjeta de tareas"
   },
   "avatarCropper": {
-    "title": "Recortar avatar"
+    "title": "Recortar avatar",
+    "intro": "En esta pantalla ajustas el área visible de tu imagen de perfil antes de aplicarla.",
+    "items": {
+      "crop": {
+        "title": "Definir recorte",
+        "desc": "Arrastra y escala el marco de selección para elegir la parte de la imagen que se usará como avatar."
+      },
+      "abort": {
+        "title": "Cancelar",
+        "desc": "Cierra el diálogo sin aplicar la imagen recortada."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Abre esta vista de ayuda."
+      },
+      "apply": {
+        "title": "Aplicar",
+        "desc": "Aplica el recorte actual como nuevo avatar del perfil."
+      },
+      "privacy": {
+        "title": "Privacidad y procesamiento",
+        "desc": "El recorte y la compresión se realizan localmente en el navegador. El resultado solo se guarda en tu perfil; solo se comparte si compartes tu perfil de forma explícita con contactos."
+      }
+    }
   },
   "avatarSource": {
     "title": "Origen del avatar"

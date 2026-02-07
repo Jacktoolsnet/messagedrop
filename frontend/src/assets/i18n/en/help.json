@@ -312,7 +312,30 @@
     "title": "To-do tile"
   },
   "avatarCropper": {
-    "title": "Crop avatar"
+    "title": "Crop avatar",
+    "intro": "This screen lets you adjust the visible area of your profile image before applying it.",
+    "items": {
+      "crop": {
+        "title": "Set crop area",
+        "desc": "Drag and scale the selection frame to choose the part of the image you want to use as avatar."
+      },
+      "abort": {
+        "title": "Cancel",
+        "desc": "Closes the dialog without applying the cropped image."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "Opens this help view."
+      },
+      "apply": {
+        "title": "Apply",
+        "desc": "Applies the current crop as your new profile avatar."
+      },
+      "privacy": {
+        "title": "Privacy and processing",
+        "desc": "Cropping and compression run locally in the browser. The result is stored only in your profile; sharing happens only if you explicitly share your profile with contacts."
+      }
+    }
   },
   "avatarSource": {
     "title": "Avatar source"

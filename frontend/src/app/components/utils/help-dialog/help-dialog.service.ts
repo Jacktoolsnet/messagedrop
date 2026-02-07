@@ -519,8 +519,34 @@ const HELP_TOPICS = {
   },
   avatarCropper: {
     titleKey: 'avatarCropper.title',
-    introKey: 'common.intros.editor',
-    items: ITEMS.editorMedia
+    introKey: 'avatarCropper.intro',
+    items: [
+      {
+        icon: 'crop_square',
+        titleKey: 'avatarCropper.items.crop.title',
+        descriptionKey: 'avatarCropper.items.crop.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'avatarCropper.items.abort.title',
+        descriptionKey: 'avatarCropper.items.abort.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'avatarCropper.items.help.title',
+        descriptionKey: 'avatarCropper.items.help.desc'
+      },
+      {
+        icon: 'check',
+        titleKey: 'avatarCropper.items.apply.title',
+        descriptionKey: 'avatarCropper.items.apply.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'avatarCropper.items.privacy.title',
+        descriptionKey: 'avatarCropper.items.privacy.desc'
+      }
+    ]
   },
   avatarSource: {
     titleKey: 'avatarSource.title',

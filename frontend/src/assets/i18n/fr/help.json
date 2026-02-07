@@ -312,7 +312,30 @@
     "title": "Tuile tâches"
   },
   "avatarCropper": {
-    "title": "Rogner l'avatar"
+    "title": "Rogner l'avatar",
+    "intro": "Cet écran vous permet d'ajuster la zone visible de votre image de profil avant validation.",
+    "items": {
+      "crop": {
+        "title": "Définir le cadrage",
+        "desc": "Déplacez et redimensionnez le cadre de sélection pour choisir la partie de l'image utilisée comme avatar."
+      },
+      "abort": {
+        "title": "Annuler",
+        "desc": "Ferme la boîte de dialogue sans appliquer l'image recadrée."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Ouvre cette vue d'aide."
+      },
+      "apply": {
+        "title": "Valider",
+        "desc": "Applique le recadrage actuel comme nouvel avatar du profil."
+      },
+      "privacy": {
+        "title": "Confidentialité et traitement",
+        "desc": "Le recadrage et la compression sont effectués localement dans le navigateur. Le résultat est stocké uniquement dans votre profil ; un partage n'a lieu que si vous partagez explicitement votre profil avec des contacts."
+      }
+    }
   },
   "avatarSource": {
     "title": "Source de l'avatar"

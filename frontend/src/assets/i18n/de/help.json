@@ -312,7 +312,30 @@
     "title": "To-do-Kachel"
   },
   "avatarCropper": {
-    "title": "Avatar zuschneiden"
+    "title": "Avatar zuschneiden",
+    "intro": "Hier passt du den sichtbaren Ausschnitt deines Profilbilds an, bevor du ihn übernimmst.",
+    "items": {
+      "crop": {
+        "title": "Ausschnitt festlegen",
+        "desc": "Ziehe und skaliere den Auswahlbereich im Bild, um den gewünschten Avatar-Ausschnitt zu wählen."
+      },
+      "abort": {
+        "title": "Abbrechen",
+        "desc": "Schließt den Dialog ohne Übernahme des zugeschnittenen Bildes."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Öffnet diese Hilfeansicht."
+      },
+      "apply": {
+        "title": "Übernehmen",
+        "desc": "Übernimmt den aktuellen Zuschnitt als neues Profilbild."
+      },
+      "privacy": {
+        "title": "Datenschutz und Verarbeitung",
+        "desc": "Das Zuschneiden und Komprimieren erfolgt lokal im Browser. Das Ergebnis wird nur im Profil gespeichert; eine Weitergabe passiert nur, wenn du dein Profil aktiv mit Kontakten teilst."
+      }
+    }
   },
   "avatarSource": {
     "title": "Avatar-Quelle"
