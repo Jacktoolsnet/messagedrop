@@ -240,7 +240,46 @@
     "title": "Editar mensaje"
   },
   "editNote": {
-    "title": "Editar nota"
+    "title": "Crear o editar nota",
+    "intro": "Este formulario te permite crear o editar una nota privada para la ubicación actual. Puedes ajustar texto, contenido multimedia y posición antes de guardar.",
+    "items": {
+      "media": {
+        "title": "Seleccionar contenido multimedia",
+        "desc": "Con esta función agregas contenido multimedia a la nota o sustituyes el contenido existente."
+      },
+      "text": {
+        "title": "Editar texto de la nota",
+        "desc": "Con esta función abres el diálogo de texto para escribir o cambiar el contenido de la nota."
+      },
+      "style": {
+        "title": "Cambiar estilo de texto",
+        "desc": "Con esta función aplicas un nuevo estilo para la visualización del texto de la nota."
+      },
+      "location": {
+        "title": "Elegir posición",
+        "desc": "Con esta función seleccionas la posición de la nota mediante el selector de ubicación."
+      },
+      "remove": {
+        "title": "Eliminar contenido",
+        "desc": "Con esta función eliminas el texto actual o el contenido multimedia seleccionado de la nota."
+      },
+      "close": {
+        "title": "Cancelar",
+        "desc": "Con esta función cierras el diálogo sin guardar."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "apply": {
+        "title": "Guardar",
+        "desc": "Con esta función guardas la nota y aplicas todos los cambios."
+      },
+      "privacy": {
+        "title": "Privacidad y almacenamiento",
+        "desc": "El contenido de la nota se guarda localmente en IndexedDB y siempre se almacena cifrado. La función de notas no guarda el contenido de la nota en el backend. La navegación externa solo recibe datos de posición; al integrar contenido multimedia externo pueden generarse solicitudes a proveedores externos."
+      }
+    }
   },
   "imageList": {
     "title": "Imágenes"

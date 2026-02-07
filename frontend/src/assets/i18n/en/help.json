@@ -240,7 +240,46 @@
     "title": "Edit message"
   },
   "editNote": {
-    "title": "Edit note"
+    "title": "Create or edit note",
+    "intro": "This form lets you create or edit a private note for the current location. You can adjust text, media, and position before saving.",
+    "items": {
+      "media": {
+        "title": "Select media",
+        "desc": "This action adds media to the note or replaces existing media."
+      },
+      "text": {
+        "title": "Edit note text",
+        "desc": "This action opens the text dialog to write or update the note content."
+      },
+      "style": {
+        "title": "Change text style",
+        "desc": "This action applies a new style for how the note text is displayed."
+      },
+      "location": {
+        "title": "Choose position",
+        "desc": "This action selects the note position using the location picker."
+      },
+      "remove": {
+        "title": "Remove content",
+        "desc": "This action removes current text or selected media from the note."
+      },
+      "close": {
+        "title": "Cancel",
+        "desc": "This action closes the dialog without saving."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "apply": {
+        "title": "Save",
+        "desc": "This action saves the note and applies all changes."
+      },
+      "privacy": {
+        "title": "Privacy and storage",
+        "desc": "Note content is stored locally in IndexedDB and always stored in encrypted form. The note feature does not store note content on the backend. External navigation only receives position data; embedding external media can create requests to third-party providers."
+      }
+    }
   },
   "imageList": {
     "title": "Images"

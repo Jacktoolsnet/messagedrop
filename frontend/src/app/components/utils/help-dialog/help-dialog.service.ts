@@ -420,8 +420,54 @@ const HELP_TOPICS = {
   },
   editNote: {
     titleKey: 'editNote.title',
-    introKey: 'common.intros.editor',
-    items: ITEMS.editorBasic
+    introKey: 'editNote.intro',
+    items: [
+      {
+        icon: 'photo',
+        titleKey: 'editNote.items.media.title',
+        descriptionKey: 'editNote.items.media.desc'
+      },
+      {
+        icon: 'edit',
+        titleKey: 'editNote.items.text.title',
+        descriptionKey: 'editNote.items.text.desc'
+      },
+      {
+        icon: 'cycle',
+        titleKey: 'editNote.items.style.title',
+        descriptionKey: 'editNote.items.style.desc'
+      },
+      {
+        icon: 'place',
+        titleKey: 'editNote.items.location.title',
+        descriptionKey: 'editNote.items.location.desc'
+      },
+      {
+        icon: 'delete',
+        titleKey: 'editNote.items.remove.title',
+        descriptionKey: 'editNote.items.remove.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'editNote.items.close.title',
+        descriptionKey: 'editNote.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'editNote.items.help.title',
+        descriptionKey: 'editNote.items.help.desc'
+      },
+      {
+        icon: 'send',
+        titleKey: 'editNote.items.apply.title',
+        descriptionKey: 'editNote.items.apply.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'editNote.items.privacy.title',
+        descriptionKey: 'editNote.items.privacy.desc'
+      }
+    ]
   },
   imageList: {
     titleKey: 'imageList.title',

@@ -240,7 +240,46 @@
     "title": "Nachricht bearbeiten"
   },
   "editNote": {
-    "title": "Notiz bearbeiten"
+    "title": "Notiz erstellen oder bearbeiten",
+    "intro": "In diesem Formular erstellst oder bearbeitest du eine private Notiz für den aktuellen Ort. Du kannst Text, Medien und Position anpassen und anschließend speichern.",
+    "items": {
+      "media": {
+        "title": "Medien auswählen",
+        "desc": "Mit dieser Funktion fügst du ein Medium zur Notiz hinzu oder ersetzt ein vorhandenes Medium."
+      },
+      "text": {
+        "title": "Notiztext bearbeiten",
+        "desc": "Mit dieser Funktion öffnest du den Textdialog, um den Inhalt der Notiz zu schreiben oder zu ändern."
+      },
+      "style": {
+        "title": "Textstil wechseln",
+        "desc": "Mit dieser Funktion vergibst du einen neuen Stil für die Darstellung des Notiztexts."
+      },
+      "location": {
+        "title": "Position auswählen",
+        "desc": "Mit dieser Funktion wählst du die Position der Notiz über den Location-Picker."
+      },
+      "remove": {
+        "title": "Inhalt entfernen",
+        "desc": "Mit dieser Funktion entfernst du den aktuellen Text oder das ausgewählte Medium aus der Notiz."
+      },
+      "close": {
+        "title": "Abbrechen",
+        "desc": "Mit dieser Funktion schließt du den Dialog ohne zu speichern."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "apply": {
+        "title": "Speichern",
+        "desc": "Mit dieser Funktion speicherst du die Notiz und übernimmst alle Änderungen."
+      },
+      "privacy": {
+        "title": "Datenschutz und Speicherung",
+        "desc": "Notizinhalte werden lokal in IndexedDB gespeichert und immer verschlüsselt abgelegt. Die Notizfunktion speichert keine Notizinhalte auf dem Backend. Bei externer Navigation werden nur Positionsdaten übergeben; beim Einbinden externer Medien können Anfragen an Drittanbieter entstehen."
+      }
+    }
   },
   "imageList": {
     "title": "Bilder"

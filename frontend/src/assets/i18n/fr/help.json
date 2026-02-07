@@ -240,7 +240,46 @@
     "title": "Modifier le message"
   },
   "editNote": {
-    "title": "Modifier la note"
+    "title": "Créer ou modifier une note",
+    "intro": "Ce formulaire vous permet de créer ou modifier une note privée pour le lieu actuel. Vous pouvez ajuster le texte, les médias et la position avant l'enregistrement.",
+    "items": {
+      "media": {
+        "title": "Sélectionner un média",
+        "desc": "Cette fonction ajoute un média à la note ou remplace un média existant."
+      },
+      "text": {
+        "title": "Modifier le texte de la note",
+        "desc": "Cette fonction ouvre la boîte de dialogue de texte pour écrire ou modifier le contenu de la note."
+      },
+      "style": {
+        "title": "Changer le style du texte",
+        "desc": "Cette fonction applique un nouveau style d'affichage au texte de la note."
+      },
+      "location": {
+        "title": "Choisir la position",
+        "desc": "Cette fonction sélectionne la position de la note via le sélecteur de lieu."
+      },
+      "remove": {
+        "title": "Supprimer du contenu",
+        "desc": "Cette fonction supprime le texte actuel ou le média sélectionné de la note."
+      },
+      "close": {
+        "title": "Annuler",
+        "desc": "Cette fonction ferme la boîte de dialogue sans enregistrer."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "apply": {
+        "title": "Enregistrer",
+        "desc": "Cette fonction enregistre la note et applique toutes les modifications."
+      },
+      "privacy": {
+        "title": "Confidentialité et stockage",
+        "desc": "Le contenu de la note est stocké localement dans IndexedDB et toujours chiffré. La fonction de notes ne stocke pas le contenu des notes sur le backend. La navigation externe ne reçoit que des données de position ; l'intégration de médias externes peut entraîner des requêtes vers des fournisseurs tiers."
+      }
+    }
   },
   "imageList": {
     "title": "Images"
