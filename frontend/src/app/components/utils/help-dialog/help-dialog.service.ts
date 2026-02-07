@@ -753,8 +753,54 @@ const HELP_TOPICS = {
   },
   importMultimedia: {
     titleKey: 'importMultimedia.title',
-    introKey: 'common.intros.editor',
-    items: ITEMS.editorMedia
+    introKey: 'importMultimedia.intro',
+    items: [
+      {
+        icon: 'link',
+        titleKey: 'importMultimedia.items.url.title',
+        descriptionKey: 'importMultimedia.items.url.desc'
+      },
+      {
+        icon: 'content_paste_go',
+        titleKey: 'importMultimedia.items.paste.title',
+        descriptionKey: 'importMultimedia.items.paste.desc'
+      },
+      {
+        icon: 'visibility',
+        titleKey: 'importMultimedia.items.preview.title',
+        descriptionKey: 'importMultimedia.items.preview.desc'
+      },
+      {
+        icon: 'tune',
+        titleKey: 'importMultimedia.items.external.title',
+        descriptionKey: 'importMultimedia.items.external.desc'
+      },
+      {
+        icon: 'delete',
+        titleKey: 'importMultimedia.items.clear.title',
+        descriptionKey: 'importMultimedia.items.clear.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'importMultimedia.items.close.title',
+        descriptionKey: 'importMultimedia.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'importMultimedia.items.help.title',
+        descriptionKey: 'importMultimedia.items.help.desc'
+      },
+      {
+        icon: 'check',
+        titleKey: 'importMultimedia.items.apply.title',
+        descriptionKey: 'importMultimedia.items.apply.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'importMultimedia.items.privacy.title',
+        descriptionKey: 'importMultimedia.items.privacy.desc'
+      }
+    ]
   },
   tenorSearch: {
     titleKey: 'tenorSearch.title',

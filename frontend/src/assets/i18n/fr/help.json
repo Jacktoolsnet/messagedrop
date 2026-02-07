@@ -470,7 +470,46 @@
     "title": "Recherche d'expériences"
   },
   "importMultimedia": {
-    "title": "Importer des médias"
+    "title": "Importer des médias",
+    "intro": "Cette boîte de dialogue permet d'insérer du contenu externe via URL, par exemple depuis YouTube, Spotify, TikTok ou Pinterest.",
+    "items": {
+      "url": {
+        "title": "Saisir une URL",
+        "desc": "Cette fonction permet de saisir l'URL du média. L'application valide automatiquement l'adresse."
+      },
+      "paste": {
+        "title": "Coller depuis le presse-papiers",
+        "desc": "Cette fonction insère directement une URL depuis votre presse-papiers."
+      },
+      "preview": {
+        "title": "Vérifier l'aperçu",
+        "desc": "Cette fonction affiche un aperçu du contenu intégré avant validation."
+      },
+      "external": {
+        "title": "Activer le contenu externe",
+        "desc": "Cette fonction ouvre les paramètres de contenu externe si une plateforme est actuellement désactivée."
+      },
+      "clear": {
+        "title": "Effacer la saisie",
+        "desc": "Cette fonction supprime l'URL actuelle et l'aperçu."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Cette fonction ferme la boîte de dialogue sans appliquer le contenu."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "apply": {
+        "title": "Valider",
+        "desc": "Cette fonction applique le contenu validé à la boîte de dialogue précédente."
+      },
+      "privacy": {
+        "title": "Confidentialité et traitement",
+        "desc": "La vérification et l'affichage de contenu externe envoient des requêtes à des fournisseurs tiers. L'application stocke uniquement les données de référence du média sélectionné ; le texte de vos notes ou messages n'est pas transmis à ces plateformes à cette étape."
+      }
+    }
   },
   "tenorSearch": {
     "title": "Recherche de GIF",

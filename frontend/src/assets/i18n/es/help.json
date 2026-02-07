@@ -470,7 +470,46 @@
     "title": "Búsqueda de experiencias"
   },
   "importMultimedia": {
-    "title": "Importar contenido"
+    "title": "Importar contenido",
+    "intro": "Este diálogo te permite insertar contenido externo mediante URL, por ejemplo de YouTube, Spotify, TikTok o Pinterest.",
+    "items": {
+      "url": {
+        "title": "Introducir URL",
+        "desc": "Con esta función introduces la URL del contenido. La app valida la dirección automáticamente."
+      },
+      "paste": {
+        "title": "Pegar desde el portapapeles",
+        "desc": "Con esta función insertas una URL directamente desde el portapapeles."
+      },
+      "preview": {
+        "title": "Comprobar vista previa",
+        "desc": "Con esta función ves una vista previa del contenido incrustado antes de aplicarlo."
+      },
+      "external": {
+        "title": "Activar contenido externo",
+        "desc": "Con esta función abres los ajustes de contenido externo si una plataforma está desactivada."
+      },
+      "clear": {
+        "title": "Limpiar entrada",
+        "desc": "Con esta función eliminas la URL actual y la vista previa."
+      },
+      "close": {
+        "title": "Cerrar",
+        "desc": "Con esta función cierras el diálogo sin aplicar el contenido."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "apply": {
+        "title": "Aplicar",
+        "desc": "Con esta función aplicas el contenido validado al diálogo anterior."
+      },
+      "privacy": {
+        "title": "Privacidad y procesamiento",
+        "desc": "Al comprobar y mostrar contenido externo se envían solicitudes a proveedores de terceros. La app solo guarda datos de referencia del contenido seleccionado; en este paso no se envía a esas plataformas el texto propio de tus notas o mensajes."
+      }
+    }
   },
   "tenorSearch": {
     "title": "Búsqueda de GIF",

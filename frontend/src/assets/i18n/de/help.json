@@ -470,7 +470,46 @@
     "title": "Erlebnissuche"
   },
   "importMultimedia": {
-    "title": "Medien importieren"
+    "title": "Medien importieren",
+    "intro": "In diesem Dialog fügst du externe Inhalte über eine URL ein, zum Beispiel von YouTube, Spotify, TikTok oder Pinterest.",
+    "items": {
+      "url": {
+        "title": "URL einfügen",
+        "desc": "Mit dieser Funktion gibst du die Medien-URL ein. Die App prüft die Adresse automatisch."
+      },
+      "paste": {
+        "title": "Aus Zwischenablage einfügen",
+        "desc": "Mit dieser Funktion übernimmst du eine URL direkt aus der Zwischenablage."
+      },
+      "preview": {
+        "title": "Vorschau prüfen",
+        "desc": "Mit dieser Funktion siehst du eine Vorschau des eingebetteten Inhalts, bevor du ihn übernimmst."
+      },
+      "external": {
+        "title": "Externe Inhalte freigeben",
+        "desc": "Mit dieser Funktion öffnest du die Einstellungen für externe Inhalte, falls eine Plattform derzeit deaktiviert ist."
+      },
+      "clear": {
+        "title": "Eingabe leeren",
+        "desc": "Mit dieser Funktion entfernst du die aktuelle URL und Vorschau."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Mit dieser Funktion schließt du den Dialog ohne Übernahme."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "apply": {
+        "title": "Übernehmen",
+        "desc": "Mit dieser Funktion übernimmst du den validierten Inhalt in den vorherigen Dialog."
+      },
+      "privacy": {
+        "title": "Datenschutz und Verarbeitung",
+        "desc": "Beim Prüfen und Anzeigen externer Inhalte werden Anfragen an Drittanbieter gesendet. In der App werden nur die ausgewählten Referenzdaten zum Medium gespeichert; eigene Notiz- oder Nachrichtentexte werden dadurch nicht an diese Plattformen übertragen."
+      }
+    }
   },
   "tenorSearch": {
     "title": "GIF-Suche",

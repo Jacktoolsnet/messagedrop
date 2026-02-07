@@ -470,7 +470,46 @@
     "title": "Experience search"
   },
   "importMultimedia": {
-    "title": "Media import"
+    "title": "Import media",
+    "intro": "This dialog lets you insert external content by URL, for example from YouTube, Spotify, TikTok, or Pinterest.",
+    "items": {
+      "url": {
+        "title": "Enter URL",
+        "desc": "This action enters a media URL. The app validates the address automatically."
+      },
+      "paste": {
+        "title": "Paste from clipboard",
+        "desc": "This action inserts a URL directly from your clipboard."
+      },
+      "preview": {
+        "title": "Check preview",
+        "desc": "This action shows a preview of the embedded content before you apply it."
+      },
+      "external": {
+        "title": "Enable external content",
+        "desc": "This action opens external content settings if a platform is currently disabled."
+      },
+      "clear": {
+        "title": "Clear input",
+        "desc": "This action removes the current URL and preview."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "This action closes the dialog without applying content."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "apply": {
+        "title": "Apply",
+        "desc": "This action applies validated content to the previous dialog."
+      },
+      "privacy": {
+        "title": "Privacy and processing",
+        "desc": "Checking and displaying external content sends requests to third-party providers. The app stores only selected media reference data; your own note or message text is not sent to these platforms by this step."
+      }
+    }
   },
   "tenorSearch": {
     "title": "GIF search",
