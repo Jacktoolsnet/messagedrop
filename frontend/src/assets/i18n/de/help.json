@@ -554,37 +554,422 @@
     "title": "Geteilte Inhalte"
   },
   "tileList": {
-    "title": "Kacheln"
+    "title": "Kacheln",
+    "intro": "In dieser Ansicht siehst du die Kacheln eines Ortes, Kontakts oder Erlebnisses. Du kannst Inhalte öffnen und in die Kachel-Einstellungen wechseln.",
+    "items": {
+      "open": {
+        "title": "Kachel öffnen",
+        "desc": "Mit dieser Funktion öffnest du den Inhalt einer Kachel direkt aus der Liste."
+      },
+      "settings": {
+        "title": "Kachel-Einstellungen öffnen",
+        "desc": "Mit dieser Funktion wechselst du in die Kachel-Einstellungen, um Reihenfolge, Sichtbarkeit und individuelle Kacheln zu bearbeiten."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Mit dieser Funktion schließt du die Kachelübersicht."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "privacy": {
+        "title": "Datenschutz und Verarbeitung",
+        "desc": "Die Kachelübersicht zeigt nur die für den gewählten Kontext gespeicherten Daten. Beim Öffnen externer Inhalte können Anfragen an Drittanbieter ausgelöst werden."
+      }
+    }
   },
   "tileSettings": {
-    "title": "Kachel-Einstellungen"
+    "title": "Kachel-Einstellungen",
+    "intro": "In diesem Dialog konfigurierst du, welche Kacheln angezeigt werden, in welcher Reihenfolge sie erscheinen und welche individuellen Kacheln verfügbar sind.",
+    "items": {
+      "add": {
+        "title": "Kachel hinzufügen",
+        "desc": "Mit dieser Funktion öffnest du das Menü für neue Kacheltypen und fügst eine Kachel hinzu."
+      },
+      "reorder": {
+        "title": "Reihenfolge ändern",
+        "desc": "Mit dieser Funktion verschiebst du Kacheln per Drag-and-Drop in die gewünschte Reihenfolge."
+      },
+      "edit": {
+        "title": "Kachel bearbeiten",
+        "desc": "Mit dieser Funktion öffnest du den Bearbeitungsdialog der ausgewählten Kachel."
+      },
+      "delete": {
+        "title": "Kachel löschen",
+        "desc": "Mit dieser Funktion entfernst du eine bearbeitbare benutzerdefinierte Kachel."
+      },
+      "toggle": {
+        "title": "Sichtbarkeit umschalten",
+        "desc": "Mit dieser Funktion blendest du Kacheln ein oder aus, ohne sie zu löschen."
+      },
+      "close": {
+        "title": "Abbrechen",
+        "desc": "Mit dieser Funktion schließt du den Dialog ohne Übernahme der Änderungen."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "apply": {
+        "title": "Übernehmen",
+        "desc": "Mit dieser Funktion speicherst du deine Kachel-Konfiguration."
+      },
+      "privacy": {
+        "title": "Datenschutz und Speicherung",
+        "desc": "Kachel-Einstellungen werden lokal in deiner App gespeichert und verschlüsselt abgelegt. Bei einem Backup werden diese Einstellungen mitgesichert."
+      }
+    }
   },
   "tileEditAnniversary": {
-    "title": "Jahrestag-Kachel"
+    "title": "Jahrestag-Kachel",
+    "intro": "In diesem Dialog bearbeitest du die Jahrestag-Kachel mit Icon, Titel und Datum.",
+    "items": {
+      "icon": {
+        "title": "Icon auswählen",
+        "desc": "Mit dieser Funktion legst du das Icon der Kachel fest."
+      },
+      "title": {
+        "title": "Titel bearbeiten",
+        "desc": "Mit dieser Funktion vergibst du den Anzeigenamen der Kachel."
+      },
+      "date": {
+        "title": "Datum festlegen",
+        "desc": "Mit dieser Funktion wählst du das Jahrestag-Datum über den Kalender."
+      },
+      "close": {
+        "title": "Abbrechen",
+        "desc": "Mit dieser Funktion schließt du den Dialog ohne zu speichern."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "apply": {
+        "title": "Speichern",
+        "desc": "Mit dieser Funktion übernimmst du die Änderungen."
+      },
+      "privacy": {
+        "title": "Datenschutz und Speicherung",
+        "desc": "Die Konfiguration der Jahrestag-Kachel wird lokal gespeichert und verschlüsselt abgelegt."
+      }
+    }
   },
   "tileEditFile": {
-    "title": "Datei-Kachel"
+    "title": "Datei-Kachel",
+    "intro": "In diesem Dialog verwaltest du Dateien in einer Kachel, inklusive Reihenfolge und Vorschauaktionen.",
+    "items": {
+      "icon": {
+        "title": "Icon auswählen",
+        "desc": "Mit dieser Funktion legst du das Icon der Kachel fest."
+      },
+      "title": {
+        "title": "Titel bearbeiten",
+        "desc": "Mit dieser Funktion vergibst du den Anzeigenamen der Kachel."
+      },
+      "addFiles": {
+        "title": "Dateien hinzufügen",
+        "desc": "Mit dieser Funktion fügst du neue Dateien zur Kachel hinzu."
+      },
+      "reorder": {
+        "title": "Dateien sortieren",
+        "desc": "Mit dieser Funktion änderst du die Reihenfolge der Dateien per Drag-and-Drop."
+      },
+      "open": {
+        "title": "Datei öffnen",
+        "desc": "Mit dieser Funktion öffnest du eine Datei aus der Kachel."
+      },
+      "remove": {
+        "title": "Datei entfernen",
+        "desc": "Mit dieser Funktion entfernst du eine Datei aus der Kachel."
+      },
+      "close": {
+        "title": "Abbrechen",
+        "desc": "Mit dieser Funktion schließt du den Dialog ohne zu speichern."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "apply": {
+        "title": "Speichern",
+        "desc": "Mit dieser Funktion übernimmst du die Änderungen."
+      },
+      "privacy": {
+        "title": "Datenschutz und Speicherung",
+        "desc": "Datei-Metadaten der Kachel werden lokal gespeichert und verschlüsselt abgelegt. Beim Öffnen einer Datei wird die Datei mit der jeweiligen App oder Browser-Funktion verarbeitet."
+      }
+    }
   },
   "tileEditMigraine": {
-    "title": "Migräne-Kachel"
+    "title": "Migräne-Kachel",
+    "intro": "In diesem Dialog konfigurierst du Warn- und Alarmwerte der Migräne-Kachel für Temperatur und Luftdruck.",
+    "items": {
+      "icon": {
+        "title": "Icon auswählen",
+        "desc": "Mit dieser Funktion legst du das Icon der Kachel fest."
+      },
+      "title": {
+        "title": "Titel bearbeiten",
+        "desc": "Mit dieser Funktion vergibst du den Anzeigenamen der Kachel."
+      },
+      "temperature": {
+        "title": "Temperatur-Grenzen setzen",
+        "desc": "Mit dieser Funktion definierst du Warn- und Alarmwerte für Temperatur."
+      },
+      "pressure": {
+        "title": "Luftdruck-Grenzen setzen",
+        "desc": "Mit dieser Funktion definierst du Warn- und Alarmwerte für Luftdruck."
+      },
+      "close": {
+        "title": "Abbrechen",
+        "desc": "Mit dieser Funktion schließt du den Dialog ohne zu speichern."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "apply": {
+        "title": "Speichern",
+        "desc": "Mit dieser Funktion übernimmst du die Änderungen."
+      },
+      "privacy": {
+        "title": "Datenschutz und Speicherung",
+        "desc": "Die Grenzwerte der Migräne-Kachel werden lokal gespeichert und verschlüsselt abgelegt."
+      }
+    }
   },
   "tileEditMultitext": {
-    "title": "Multi-Text-Kachel"
+    "title": "Multi-Text-Kachel",
+    "intro": "In diesem Dialog bearbeitest du eine mehrzeilige Text-Kachel mit Icon, Titel und Inhalt.",
+    "items": {
+      "icon": {
+        "title": "Icon auswählen",
+        "desc": "Mit dieser Funktion legst du das Icon der Kachel fest."
+      },
+      "title": {
+        "title": "Titel bearbeiten",
+        "desc": "Mit dieser Funktion vergibst du den Anzeigenamen der Kachel."
+      },
+      "text": {
+        "title": "Text bearbeiten",
+        "desc": "Mit dieser Funktion bearbeitest du den mehrzeiligen Inhalt der Kachel."
+      },
+      "close": {
+        "title": "Abbrechen",
+        "desc": "Mit dieser Funktion schließt du den Dialog ohne zu speichern."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "apply": {
+        "title": "Speichern",
+        "desc": "Mit dieser Funktion übernimmst du die Änderungen."
+      },
+      "privacy": {
+        "title": "Datenschutz und Speicherung",
+        "desc": "Textinhalte dieser Kachel werden lokal gespeichert und verschlüsselt abgelegt."
+      }
+    }
   },
   "tileEditPollution": {
-    "title": "Verschmutzungs-Kachel"
+    "title": "Verschmutzungs-Kachel",
+    "intro": "In diesem Dialog legst du fest, welche Luftqualitätswerte in der Verschmutzungs-Kachel angezeigt werden.",
+    "items": {
+      "icon": {
+        "title": "Icon auswählen",
+        "desc": "Mit dieser Funktion legst du das Icon der Kachel fest."
+      },
+      "title": {
+        "title": "Titel bearbeiten",
+        "desc": "Mit dieser Funktion vergibst du den Anzeigenamen der Kachel."
+      },
+      "keys": {
+        "title": "Werte auswählen",
+        "desc": "Mit dieser Funktion aktivierst oder deaktivierst du einzelne Messwerte für die Anzeige."
+      },
+      "close": {
+        "title": "Abbrechen",
+        "desc": "Mit dieser Funktion schließt du den Dialog ohne zu speichern."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "apply": {
+        "title": "Speichern",
+        "desc": "Mit dieser Funktion übernimmst du die Änderungen."
+      },
+      "privacy": {
+        "title": "Datenschutz und Speicherung",
+        "desc": "Die Auswahl der Luftqualitätswerte wird lokal gespeichert und verschlüsselt abgelegt."
+      }
+    }
   },
   "tileEditQuickActionAction": {
-    "title": "Schnellaktion"
+    "title": "Schnellaktion",
+    "intro": "In diesem Dialog bearbeitest du eine einzelne Aktion innerhalb der Schnellaktions-Kachel.",
+    "items": {
+      "icon": {
+        "title": "Icon auswählen",
+        "desc": "Mit dieser Funktion legst du das Icon der Aktion fest."
+      },
+      "label": {
+        "title": "Beschriftung setzen",
+        "desc": "Mit dieser Funktion bearbeitest du den Namen der Aktion."
+      },
+      "type": {
+        "title": "Aktionstyp wählen",
+        "desc": "Mit dieser Funktion legst du fest, welche Art von Aktion ausgeführt wird."
+      },
+      "target": {
+        "title": "Ziel eintragen",
+        "desc": "Mit dieser Funktion hinterlegst du das Ziel der Aktion, zum Beispiel URL, Telefonnummer oder Adresse."
+      },
+      "close": {
+        "title": "Abbrechen",
+        "desc": "Mit dieser Funktion schließt du den Dialog ohne zu speichern."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "apply": {
+        "title": "Speichern",
+        "desc": "Mit dieser Funktion übernimmst du die Änderungen."
+      },
+      "privacy": {
+        "title": "Datenschutz und Verarbeitung",
+        "desc": "Aktionsdaten werden lokal gespeichert und verschlüsselt abgelegt. Beim Ausführen können je nach Aktion externe Ziele aufgerufen werden."
+      }
+    }
   },
   "tileEditQuickAction": {
-    "title": "Schnellaktions-Kachel"
+    "title": "Schnellaktions-Kachel",
+    "intro": "In diesem Dialog verwaltest du eine Kachel mit mehreren Schnellaktionen.",
+    "items": {
+      "icon": {
+        "title": "Icon auswählen",
+        "desc": "Mit dieser Funktion legst du das Icon der Kachel fest."
+      },
+      "title": {
+        "title": "Titel bearbeiten",
+        "desc": "Mit dieser Funktion vergibst du den Anzeigenamen der Kachel."
+      },
+      "addAction": {
+        "title": "Aktion hinzufügen",
+        "desc": "Mit dieser Funktion fügst du eine neue Schnellaktion hinzu."
+      },
+      "reorder": {
+        "title": "Aktionen sortieren",
+        "desc": "Mit dieser Funktion änderst du die Reihenfolge der Aktionen per Drag-and-Drop."
+      },
+      "editAction": {
+        "title": "Aktion bearbeiten",
+        "desc": "Mit dieser Funktion öffnest du den Bearbeitungsdialog einer vorhandenen Aktion."
+      },
+      "deleteAction": {
+        "title": "Aktion löschen",
+        "desc": "Mit dieser Funktion entfernst du eine Aktion aus der Kachel."
+      },
+      "close": {
+        "title": "Abbrechen",
+        "desc": "Mit dieser Funktion schließt du den Dialog ohne zu speichern."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "apply": {
+        "title": "Speichern",
+        "desc": "Mit dieser Funktion übernimmst du die Änderungen."
+      },
+      "privacy": {
+        "title": "Datenschutz und Verarbeitung",
+        "desc": "Schnellaktionen werden lokal gespeichert und verschlüsselt abgelegt. Beim Ausführen einzelner Aktionen können externe Dienste oder Apps aufgerufen werden."
+      }
+    }
   },
   "tileEditText": {
-    "title": "Text-Kachel"
+    "title": "Text-Kachel",
+    "intro": "In diesem Dialog bearbeitest du eine einzeilige Text-Kachel.",
+    "items": {
+      "icon": {
+        "title": "Icon auswählen",
+        "desc": "Mit dieser Funktion legst du das Icon der Kachel fest."
+      },
+      "title": {
+        "title": "Titel bearbeiten",
+        "desc": "Mit dieser Funktion vergibst du den Anzeigenamen der Kachel."
+      },
+      "text": {
+        "title": "Text bearbeiten",
+        "desc": "Mit dieser Funktion bearbeitest du den Inhalt der Kachel."
+      },
+      "close": {
+        "title": "Abbrechen",
+        "desc": "Mit dieser Funktion schließt du den Dialog ohne zu speichern."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "apply": {
+        "title": "Speichern",
+        "desc": "Mit dieser Funktion übernimmst du die Änderungen."
+      },
+      "privacy": {
+        "title": "Datenschutz und Speicherung",
+        "desc": "Textinhalte dieser Kachel werden lokal gespeichert und verschlüsselt abgelegt."
+      }
+    }
   },
   "tileEditTodo": {
-    "title": "To-do-Kachel"
+    "title": "To-do-Kachel",
+    "intro": "In diesem Dialog verwaltest du Aufgaben einer To-do-Kachel.",
+    "items": {
+      "icon": {
+        "title": "Icon auswählen",
+        "desc": "Mit dieser Funktion legst du das Icon der Kachel fest."
+      },
+      "title": {
+        "title": "Titel bearbeiten",
+        "desc": "Mit dieser Funktion vergibst du den Anzeigenamen der Kachel."
+      },
+      "addTodo": {
+        "title": "Aufgabe hinzufügen",
+        "desc": "Mit dieser Funktion fügst du eine neue Aufgabe zur Liste hinzu."
+      },
+      "reorder": {
+        "title": "Aufgaben sortieren",
+        "desc": "Mit dieser Funktion änderst du die Reihenfolge der Aufgaben per Drag-and-Drop."
+      },
+      "toggleDone": {
+        "title": "Erledigt-Status umschalten",
+        "desc": "Mit dieser Funktion markierst du Aufgaben als erledigt oder wieder offen."
+      },
+      "deleteTodo": {
+        "title": "Aufgabe löschen",
+        "desc": "Mit dieser Funktion entfernst du eine Aufgabe aus der Liste."
+      },
+      "close": {
+        "title": "Abbrechen",
+        "desc": "Mit dieser Funktion schließt du den Dialog ohne zu speichern."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "apply": {
+        "title": "Speichern",
+        "desc": "Mit dieser Funktion übernimmst du die Änderungen."
+      },
+      "privacy": {
+        "title": "Datenschutz und Speicherung",
+        "desc": "Aufgabeninhalte werden lokal gespeichert und verschlüsselt abgelegt."
+      }
+    }
   },
   "avatarCropper": {
     "title": "Avatar zuschneiden",

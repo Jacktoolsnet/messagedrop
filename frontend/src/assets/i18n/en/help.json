@@ -554,37 +554,422 @@
     "title": "Shared content"
   },
   "tileList": {
-    "title": "Tiles"
+    "title": "Tiles",
+    "intro": "This view shows the tiles for a place, contact, or experience. You can open tile content and switch to tile settings.",
+    "items": {
+      "open": {
+        "title": "Open tile",
+        "desc": "This action opens a tile content directly from the list."
+      },
+      "settings": {
+        "title": "Open tile settings",
+        "desc": "This action switches to tile settings to edit order, visibility, and custom tiles."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "This action closes the tile overview."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "privacy": {
+        "title": "Privacy and processing",
+        "desc": "The tile overview only displays data stored for the selected context. Opening external content can trigger requests to third-party providers."
+      }
+    }
   },
   "tileSettings": {
-    "title": "Tile settings"
+    "title": "Tile settings",
+    "intro": "In this dialog you configure which tiles are shown, in which order they appear, and which custom tiles are available.",
+    "items": {
+      "add": {
+        "title": "Add tile",
+        "desc": "This action opens the menu of tile types and adds a new tile."
+      },
+      "reorder": {
+        "title": "Reorder tiles",
+        "desc": "This action moves tiles by drag and drop."
+      },
+      "edit": {
+        "title": "Edit tile",
+        "desc": "This action opens the editor for the selected tile."
+      },
+      "delete": {
+        "title": "Delete tile",
+        "desc": "This action removes an editable custom tile."
+      },
+      "toggle": {
+        "title": "Toggle visibility",
+        "desc": "This action shows or hides tiles without deleting them."
+      },
+      "close": {
+        "title": "Cancel",
+        "desc": "This action closes the dialog without applying changes."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "apply": {
+        "title": "Apply",
+        "desc": "This action saves your tile configuration."
+      },
+      "privacy": {
+        "title": "Privacy and storage",
+        "desc": "Tile settings are stored locally in the app and stored in encrypted form. They are included in backups."
+      }
+    }
   },
   "tileEditAnniversary": {
-    "title": "Anniversary tile"
+    "title": "Anniversary tile",
+    "intro": "This dialog edits the anniversary tile with icon, title, and date.",
+    "items": {
+      "icon": {
+        "title": "Select icon",
+        "desc": "This action sets the icon of the tile."
+      },
+      "title": {
+        "title": "Edit title",
+        "desc": "This action sets the display name of the tile."
+      },
+      "date": {
+        "title": "Set date",
+        "desc": "This action picks the anniversary date using the calendar."
+      },
+      "close": {
+        "title": "Cancel",
+        "desc": "This action closes the dialog without saving."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "apply": {
+        "title": "Save",
+        "desc": "This action applies your changes."
+      },
+      "privacy": {
+        "title": "Privacy and storage",
+        "desc": "Anniversary tile settings are stored locally and stored in encrypted form."
+      }
+    }
   },
   "tileEditFile": {
-    "title": "File tile"
+    "title": "File tile",
+    "intro": "This dialog manages files inside a tile, including order and file actions.",
+    "items": {
+      "icon": {
+        "title": "Select icon",
+        "desc": "This action sets the icon of the tile."
+      },
+      "title": {
+        "title": "Edit title",
+        "desc": "This action sets the display name of the tile."
+      },
+      "addFiles": {
+        "title": "Add files",
+        "desc": "This action adds new files to the tile."
+      },
+      "reorder": {
+        "title": "Reorder files",
+        "desc": "This action changes file order using drag and drop."
+      },
+      "open": {
+        "title": "Open file",
+        "desc": "This action opens a file from the tile."
+      },
+      "remove": {
+        "title": "Remove file",
+        "desc": "This action removes a file from the tile."
+      },
+      "close": {
+        "title": "Cancel",
+        "desc": "This action closes the dialog without saving."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "apply": {
+        "title": "Save",
+        "desc": "This action applies your changes."
+      },
+      "privacy": {
+        "title": "Privacy and storage",
+        "desc": "Tile file metadata is stored locally and in encrypted form. Opening a file uses the browser or device app handler."
+      }
+    }
   },
   "tileEditMigraine": {
-    "title": "Migraine tile"
+    "title": "Migraine tile",
+    "intro": "This dialog configures warning and alert thresholds for temperature and air pressure.",
+    "items": {
+      "icon": {
+        "title": "Select icon",
+        "desc": "This action sets the icon of the tile."
+      },
+      "title": {
+        "title": "Edit title",
+        "desc": "This action sets the display name of the tile."
+      },
+      "temperature": {
+        "title": "Set temperature thresholds",
+        "desc": "This action defines warning and alert levels for temperature."
+      },
+      "pressure": {
+        "title": "Set pressure thresholds",
+        "desc": "This action defines warning and alert levels for air pressure."
+      },
+      "close": {
+        "title": "Cancel",
+        "desc": "This action closes the dialog without saving."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "apply": {
+        "title": "Save",
+        "desc": "This action applies your changes."
+      },
+      "privacy": {
+        "title": "Privacy and storage",
+        "desc": "Migraine threshold settings are stored locally and in encrypted form."
+      }
+    }
   },
   "tileEditMultitext": {
-    "title": "Multi-text tile"
+    "title": "Multi-text tile",
+    "intro": "This dialog edits a multi-line text tile with icon, title, and content.",
+    "items": {
+      "icon": {
+        "title": "Select icon",
+        "desc": "This action sets the icon of the tile."
+      },
+      "title": {
+        "title": "Edit title",
+        "desc": "This action sets the display name of the tile."
+      },
+      "text": {
+        "title": "Edit text",
+        "desc": "This action edits the multi-line tile content."
+      },
+      "close": {
+        "title": "Cancel",
+        "desc": "This action closes the dialog without saving."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "apply": {
+        "title": "Save",
+        "desc": "This action applies your changes."
+      },
+      "privacy": {
+        "title": "Privacy and storage",
+        "desc": "Text contents of this tile are stored locally and in encrypted form."
+      }
+    }
   },
   "tileEditPollution": {
-    "title": "Pollution tile"
+    "title": "Pollution tile",
+    "intro": "This dialog defines which air-quality values are shown in the pollution tile.",
+    "items": {
+      "icon": {
+        "title": "Select icon",
+        "desc": "This action sets the icon of the tile."
+      },
+      "title": {
+        "title": "Edit title",
+        "desc": "This action sets the display name of the tile."
+      },
+      "keys": {
+        "title": "Select values",
+        "desc": "This action enables or disables individual measurement values."
+      },
+      "close": {
+        "title": "Cancel",
+        "desc": "This action closes the dialog without saving."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "apply": {
+        "title": "Save",
+        "desc": "This action applies your changes."
+      },
+      "privacy": {
+        "title": "Privacy and storage",
+        "desc": "The selected pollution values are stored locally and in encrypted form."
+      }
+    }
   },
   "tileEditQuickActionAction": {
-    "title": "Quick action"
+    "title": "Quick action",
+    "intro": "This dialog edits one action inside a quick-actions tile.",
+    "items": {
+      "icon": {
+        "title": "Select icon",
+        "desc": "This action sets the icon for the action."
+      },
+      "label": {
+        "title": "Set label",
+        "desc": "This action edits the action label."
+      },
+      "type": {
+        "title": "Choose action type",
+        "desc": "This action selects which type of action should be executed."
+      },
+      "target": {
+        "title": "Set target",
+        "desc": "This action defines the action target, for example URL, phone number, or address."
+      },
+      "close": {
+        "title": "Cancel",
+        "desc": "This action closes the dialog without saving."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "apply": {
+        "title": "Save",
+        "desc": "This action applies your changes."
+      },
+      "privacy": {
+        "title": "Privacy and processing",
+        "desc": "Action data is stored locally and in encrypted form. Running an action can call external targets depending on its type."
+      }
+    }
   },
   "tileEditQuickAction": {
-    "title": "Quick action tile"
+    "title": "Quick action tile",
+    "intro": "This dialog manages a tile with multiple quick actions.",
+    "items": {
+      "icon": {
+        "title": "Select icon",
+        "desc": "This action sets the icon of the tile."
+      },
+      "title": {
+        "title": "Edit title",
+        "desc": "This action sets the display name of the tile."
+      },
+      "addAction": {
+        "title": "Add action",
+        "desc": "This action creates a new quick action."
+      },
+      "reorder": {
+        "title": "Reorder actions",
+        "desc": "This action changes action order using drag and drop."
+      },
+      "editAction": {
+        "title": "Edit action",
+        "desc": "This action opens the editor for an existing action."
+      },
+      "deleteAction": {
+        "title": "Delete action",
+        "desc": "This action removes an action from the tile."
+      },
+      "close": {
+        "title": "Cancel",
+        "desc": "This action closes the dialog without saving."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "apply": {
+        "title": "Save",
+        "desc": "This action applies your changes."
+      },
+      "privacy": {
+        "title": "Privacy and processing",
+        "desc": "Quick actions are stored locally and in encrypted form. Executing actions can open external services or apps."
+      }
+    }
   },
   "tileEditText": {
-    "title": "Text tile"
+    "title": "Text tile",
+    "intro": "This dialog edits a single-line text tile.",
+    "items": {
+      "icon": {
+        "title": "Select icon",
+        "desc": "This action sets the icon of the tile."
+      },
+      "title": {
+        "title": "Edit title",
+        "desc": "This action sets the display name of the tile."
+      },
+      "text": {
+        "title": "Edit text",
+        "desc": "This action edits the tile content."
+      },
+      "close": {
+        "title": "Cancel",
+        "desc": "This action closes the dialog without saving."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "apply": {
+        "title": "Save",
+        "desc": "This action applies your changes."
+      },
+      "privacy": {
+        "title": "Privacy and storage",
+        "desc": "Text content of this tile is stored locally and in encrypted form."
+      }
+    }
   },
   "tileEditTodo": {
-    "title": "To-do tile"
+    "title": "To-do tile",
+    "intro": "This dialog manages tasks inside a to-do tile.",
+    "items": {
+      "icon": {
+        "title": "Select icon",
+        "desc": "This action sets the icon of the tile."
+      },
+      "title": {
+        "title": "Edit title",
+        "desc": "This action sets the display name of the tile."
+      },
+      "addTodo": {
+        "title": "Add task",
+        "desc": "This action adds a new task to the list."
+      },
+      "reorder": {
+        "title": "Reorder tasks",
+        "desc": "This action changes task order using drag and drop."
+      },
+      "toggleDone": {
+        "title": "Toggle done status",
+        "desc": "This action marks tasks as done or open."
+      },
+      "deleteTodo": {
+        "title": "Delete task",
+        "desc": "This action removes a task from the list."
+      },
+      "close": {
+        "title": "Cancel",
+        "desc": "This action closes the dialog without saving."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "apply": {
+        "title": "Save",
+        "desc": "This action applies your changes."
+      },
+      "privacy": {
+        "title": "Privacy and storage",
+        "desc": "Task contents are stored locally and in encrypted form."
+      }
+    }
   },
   "avatarCropper": {
     "title": "Crop avatar",

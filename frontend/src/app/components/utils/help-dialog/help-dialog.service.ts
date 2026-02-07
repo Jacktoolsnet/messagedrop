@@ -820,58 +820,509 @@ const HELP_TOPICS = {
   },
   tileList: {
     titleKey: 'tileList.title',
-    introKey: 'common.intros.list',
-    items: ITEMS.listBasic
+    introKey: 'tileList.intro',
+    items: [
+      {
+        icon: 'touch_app',
+        titleKey: 'tileList.items.open.title',
+        descriptionKey: 'tileList.items.open.desc'
+      },
+      {
+        icon: 'settings',
+        titleKey: 'tileList.items.settings.title',
+        descriptionKey: 'tileList.items.settings.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'tileList.items.close.title',
+        descriptionKey: 'tileList.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'tileList.items.help.title',
+        descriptionKey: 'tileList.items.help.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'tileList.items.privacy.title',
+        descriptionKey: 'tileList.items.privacy.desc'
+      }
+    ]
   },
   tileSettings: {
     titleKey: 'tileSettings.title',
-    introKey: 'common.intros.settings',
-    items: ITEMS.settings
+    introKey: 'tileSettings.intro',
+    items: [
+      {
+        icon: 'add',
+        titleKey: 'tileSettings.items.add.title',
+        descriptionKey: 'tileSettings.items.add.desc'
+      },
+      {
+        icon: 'drag_indicator',
+        titleKey: 'tileSettings.items.reorder.title',
+        descriptionKey: 'tileSettings.items.reorder.desc'
+      },
+      {
+        icon: 'edit',
+        titleKey: 'tileSettings.items.edit.title',
+        descriptionKey: 'tileSettings.items.edit.desc'
+      },
+      {
+        icon: 'delete',
+        titleKey: 'tileSettings.items.delete.title',
+        descriptionKey: 'tileSettings.items.delete.desc'
+      },
+      {
+        icon: 'visibility',
+        titleKey: 'tileSettings.items.toggle.title',
+        descriptionKey: 'tileSettings.items.toggle.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'tileSettings.items.close.title',
+        descriptionKey: 'tileSettings.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'tileSettings.items.help.title',
+        descriptionKey: 'tileSettings.items.help.desc'
+      },
+      {
+        icon: 'check',
+        titleKey: 'tileSettings.items.apply.title',
+        descriptionKey: 'tileSettings.items.apply.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'tileSettings.items.privacy.title',
+        descriptionKey: 'tileSettings.items.privacy.desc'
+      }
+    ]
   },
   tileEditAnniversary: {
     titleKey: 'tileEditAnniversary.title',
-    introKey: 'common.intros.tileEdit',
-    items: ITEMS.tiles
+    introKey: 'tileEditAnniversary.intro',
+    items: [
+      {
+        icon: 'style',
+        titleKey: 'tileEditAnniversary.items.icon.title',
+        descriptionKey: 'tileEditAnniversary.items.icon.desc'
+      },
+      {
+        icon: 'edit',
+        titleKey: 'tileEditAnniversary.items.title.title',
+        descriptionKey: 'tileEditAnniversary.items.title.desc'
+      },
+      {
+        icon: 'calendar_month',
+        titleKey: 'tileEditAnniversary.items.date.title',
+        descriptionKey: 'tileEditAnniversary.items.date.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'tileEditAnniversary.items.close.title',
+        descriptionKey: 'tileEditAnniversary.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'tileEditAnniversary.items.help.title',
+        descriptionKey: 'tileEditAnniversary.items.help.desc'
+      },
+      {
+        icon: 'save',
+        titleKey: 'tileEditAnniversary.items.apply.title',
+        descriptionKey: 'tileEditAnniversary.items.apply.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'tileEditAnniversary.items.privacy.title',
+        descriptionKey: 'tileEditAnniversary.items.privacy.desc'
+      }
+    ]
   },
   tileEditFile: {
     titleKey: 'tileEditFile.title',
-    introKey: 'common.intros.tileEdit',
-    items: ITEMS.tiles
+    introKey: 'tileEditFile.intro',
+    items: [
+      {
+        icon: 'style',
+        titleKey: 'tileEditFile.items.icon.title',
+        descriptionKey: 'tileEditFile.items.icon.desc'
+      },
+      {
+        icon: 'edit',
+        titleKey: 'tileEditFile.items.title.title',
+        descriptionKey: 'tileEditFile.items.title.desc'
+      },
+      {
+        icon: 'add',
+        titleKey: 'tileEditFile.items.addFiles.title',
+        descriptionKey: 'tileEditFile.items.addFiles.desc'
+      },
+      {
+        icon: 'drag_indicator',
+        titleKey: 'tileEditFile.items.reorder.title',
+        descriptionKey: 'tileEditFile.items.reorder.desc'
+      },
+      {
+        icon: 'open_in_new',
+        titleKey: 'tileEditFile.items.open.title',
+        descriptionKey: 'tileEditFile.items.open.desc'
+      },
+      {
+        icon: 'delete',
+        titleKey: 'tileEditFile.items.remove.title',
+        descriptionKey: 'tileEditFile.items.remove.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'tileEditFile.items.close.title',
+        descriptionKey: 'tileEditFile.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'tileEditFile.items.help.title',
+        descriptionKey: 'tileEditFile.items.help.desc'
+      },
+      {
+        icon: 'save',
+        titleKey: 'tileEditFile.items.apply.title',
+        descriptionKey: 'tileEditFile.items.apply.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'tileEditFile.items.privacy.title',
+        descriptionKey: 'tileEditFile.items.privacy.desc'
+      }
+    ]
   },
   tileEditMigraine: {
     titleKey: 'tileEditMigraine.title',
-    introKey: 'common.intros.tileEdit',
-    items: ITEMS.tiles
+    introKey: 'tileEditMigraine.intro',
+    items: [
+      {
+        icon: 'style',
+        titleKey: 'tileEditMigraine.items.icon.title',
+        descriptionKey: 'tileEditMigraine.items.icon.desc'
+      },
+      {
+        icon: 'edit',
+        titleKey: 'tileEditMigraine.items.title.title',
+        descriptionKey: 'tileEditMigraine.items.title.desc'
+      },
+      {
+        icon: 'device_thermostat',
+        titleKey: 'tileEditMigraine.items.temperature.title',
+        descriptionKey: 'tileEditMigraine.items.temperature.desc'
+      },
+      {
+        icon: 'compress',
+        titleKey: 'tileEditMigraine.items.pressure.title',
+        descriptionKey: 'tileEditMigraine.items.pressure.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'tileEditMigraine.items.close.title',
+        descriptionKey: 'tileEditMigraine.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'tileEditMigraine.items.help.title',
+        descriptionKey: 'tileEditMigraine.items.help.desc'
+      },
+      {
+        icon: 'save',
+        titleKey: 'tileEditMigraine.items.apply.title',
+        descriptionKey: 'tileEditMigraine.items.apply.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'tileEditMigraine.items.privacy.title',
+        descriptionKey: 'tileEditMigraine.items.privacy.desc'
+      }
+    ]
   },
   tileEditMultitext: {
     titleKey: 'tileEditMultitext.title',
-    introKey: 'common.intros.tileEdit',
-    items: ITEMS.tiles
+    introKey: 'tileEditMultitext.intro',
+    items: [
+      {
+        icon: 'style',
+        titleKey: 'tileEditMultitext.items.icon.title',
+        descriptionKey: 'tileEditMultitext.items.icon.desc'
+      },
+      {
+        icon: 'edit',
+        titleKey: 'tileEditMultitext.items.title.title',
+        descriptionKey: 'tileEditMultitext.items.title.desc'
+      },
+      {
+        icon: 'notes',
+        titleKey: 'tileEditMultitext.items.text.title',
+        descriptionKey: 'tileEditMultitext.items.text.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'tileEditMultitext.items.close.title',
+        descriptionKey: 'tileEditMultitext.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'tileEditMultitext.items.help.title',
+        descriptionKey: 'tileEditMultitext.items.help.desc'
+      },
+      {
+        icon: 'save',
+        titleKey: 'tileEditMultitext.items.apply.title',
+        descriptionKey: 'tileEditMultitext.items.apply.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'tileEditMultitext.items.privacy.title',
+        descriptionKey: 'tileEditMultitext.items.privacy.desc'
+      }
+    ]
   },
   tileEditPollution: {
     titleKey: 'tileEditPollution.title',
-    introKey: 'common.intros.tileEdit',
-    items: ITEMS.tiles
+    introKey: 'tileEditPollution.intro',
+    items: [
+      {
+        icon: 'style',
+        titleKey: 'tileEditPollution.items.icon.title',
+        descriptionKey: 'tileEditPollution.items.icon.desc'
+      },
+      {
+        icon: 'edit',
+        titleKey: 'tileEditPollution.items.title.title',
+        descriptionKey: 'tileEditPollution.items.title.desc'
+      },
+      {
+        icon: 'checklist',
+        titleKey: 'tileEditPollution.items.keys.title',
+        descriptionKey: 'tileEditPollution.items.keys.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'tileEditPollution.items.close.title',
+        descriptionKey: 'tileEditPollution.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'tileEditPollution.items.help.title',
+        descriptionKey: 'tileEditPollution.items.help.desc'
+      },
+      {
+        icon: 'save',
+        titleKey: 'tileEditPollution.items.apply.title',
+        descriptionKey: 'tileEditPollution.items.apply.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'tileEditPollution.items.privacy.title',
+        descriptionKey: 'tileEditPollution.items.privacy.desc'
+      }
+    ]
   },
   tileEditQuickActionAction: {
     titleKey: 'tileEditQuickActionAction.title',
-    introKey: 'common.intros.tileEdit',
-    items: ITEMS.tiles
+    introKey: 'tileEditQuickActionAction.intro',
+    items: [
+      {
+        icon: 'style',
+        titleKey: 'tileEditQuickActionAction.items.icon.title',
+        descriptionKey: 'tileEditQuickActionAction.items.icon.desc'
+      },
+      {
+        icon: 'label',
+        titleKey: 'tileEditQuickActionAction.items.label.title',
+        descriptionKey: 'tileEditQuickActionAction.items.label.desc'
+      },
+      {
+        icon: 'category',
+        titleKey: 'tileEditQuickActionAction.items.type.title',
+        descriptionKey: 'tileEditQuickActionAction.items.type.desc'
+      },
+      {
+        icon: 'ads_click',
+        titleKey: 'tileEditQuickActionAction.items.target.title',
+        descriptionKey: 'tileEditQuickActionAction.items.target.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'tileEditQuickActionAction.items.close.title',
+        descriptionKey: 'tileEditQuickActionAction.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'tileEditQuickActionAction.items.help.title',
+        descriptionKey: 'tileEditQuickActionAction.items.help.desc'
+      },
+      {
+        icon: 'save',
+        titleKey: 'tileEditQuickActionAction.items.apply.title',
+        descriptionKey: 'tileEditQuickActionAction.items.apply.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'tileEditQuickActionAction.items.privacy.title',
+        descriptionKey: 'tileEditQuickActionAction.items.privacy.desc'
+      }
+    ]
   },
   tileEditQuickAction: {
     titleKey: 'tileEditQuickAction.title',
-    introKey: 'common.intros.tileEdit',
-    items: ITEMS.tiles
+    introKey: 'tileEditQuickAction.intro',
+    items: [
+      {
+        icon: 'style',
+        titleKey: 'tileEditQuickAction.items.icon.title',
+        descriptionKey: 'tileEditQuickAction.items.icon.desc'
+      },
+      {
+        icon: 'edit',
+        titleKey: 'tileEditQuickAction.items.title.title',
+        descriptionKey: 'tileEditQuickAction.items.title.desc'
+      },
+      {
+        icon: 'add',
+        titleKey: 'tileEditQuickAction.items.addAction.title',
+        descriptionKey: 'tileEditQuickAction.items.addAction.desc'
+      },
+      {
+        icon: 'drag_indicator',
+        titleKey: 'tileEditQuickAction.items.reorder.title',
+        descriptionKey: 'tileEditQuickAction.items.reorder.desc'
+      },
+      {
+        icon: 'edit',
+        titleKey: 'tileEditQuickAction.items.editAction.title',
+        descriptionKey: 'tileEditQuickAction.items.editAction.desc'
+      },
+      {
+        icon: 'delete',
+        titleKey: 'tileEditQuickAction.items.deleteAction.title',
+        descriptionKey: 'tileEditQuickAction.items.deleteAction.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'tileEditQuickAction.items.close.title',
+        descriptionKey: 'tileEditQuickAction.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'tileEditQuickAction.items.help.title',
+        descriptionKey: 'tileEditQuickAction.items.help.desc'
+      },
+      {
+        icon: 'save',
+        titleKey: 'tileEditQuickAction.items.apply.title',
+        descriptionKey: 'tileEditQuickAction.items.apply.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'tileEditQuickAction.items.privacy.title',
+        descriptionKey: 'tileEditQuickAction.items.privacy.desc'
+      }
+    ]
   },
   tileEditText: {
     titleKey: 'tileEditText.title',
-    introKey: 'common.intros.tileEdit',
-    items: ITEMS.tiles
+    introKey: 'tileEditText.intro',
+    items: [
+      {
+        icon: 'style',
+        titleKey: 'tileEditText.items.icon.title',
+        descriptionKey: 'tileEditText.items.icon.desc'
+      },
+      {
+        icon: 'edit',
+        titleKey: 'tileEditText.items.title.title',
+        descriptionKey: 'tileEditText.items.title.desc'
+      },
+      {
+        icon: 'text_fields',
+        titleKey: 'tileEditText.items.text.title',
+        descriptionKey: 'tileEditText.items.text.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'tileEditText.items.close.title',
+        descriptionKey: 'tileEditText.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'tileEditText.items.help.title',
+        descriptionKey: 'tileEditText.items.help.desc'
+      },
+      {
+        icon: 'save',
+        titleKey: 'tileEditText.items.apply.title',
+        descriptionKey: 'tileEditText.items.apply.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'tileEditText.items.privacy.title',
+        descriptionKey: 'tileEditText.items.privacy.desc'
+      }
+    ]
   },
   tileEditTodo: {
     titleKey: 'tileEditTodo.title',
-    introKey: 'common.intros.tileEdit',
-    items: ITEMS.tiles
+    introKey: 'tileEditTodo.intro',
+    items: [
+      {
+        icon: 'style',
+        titleKey: 'tileEditTodo.items.icon.title',
+        descriptionKey: 'tileEditTodo.items.icon.desc'
+      },
+      {
+        icon: 'edit',
+        titleKey: 'tileEditTodo.items.title.title',
+        descriptionKey: 'tileEditTodo.items.title.desc'
+      },
+      {
+        icon: 'add',
+        titleKey: 'tileEditTodo.items.addTodo.title',
+        descriptionKey: 'tileEditTodo.items.addTodo.desc'
+      },
+      {
+        icon: 'drag_indicator',
+        titleKey: 'tileEditTodo.items.reorder.title',
+        descriptionKey: 'tileEditTodo.items.reorder.desc'
+      },
+      {
+        icon: 'check_circle',
+        titleKey: 'tileEditTodo.items.toggleDone.title',
+        descriptionKey: 'tileEditTodo.items.toggleDone.desc'
+      },
+      {
+        icon: 'delete',
+        titleKey: 'tileEditTodo.items.deleteTodo.title',
+        descriptionKey: 'tileEditTodo.items.deleteTodo.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'tileEditTodo.items.close.title',
+        descriptionKey: 'tileEditTodo.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'tileEditTodo.items.help.title',
+        descriptionKey: 'tileEditTodo.items.help.desc'
+      },
+      {
+        icon: 'save',
+        titleKey: 'tileEditTodo.items.apply.title',
+        descriptionKey: 'tileEditTodo.items.apply.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'tileEditTodo.items.privacy.title',
+        descriptionKey: 'tileEditTodo.items.privacy.desc'
+      }
+    ]
   },
   avatarCropper: {
     titleKey: 'avatarCropper.title',

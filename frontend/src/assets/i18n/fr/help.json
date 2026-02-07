@@ -554,37 +554,422 @@
     "title": "Contenu partagé"
   },
   "tileList": {
-    "title": "Tuiles"
+    "title": "Tuiles",
+    "intro": "Cette vue affiche les tuiles d'un lieu, d'un contact ou d'une expérience. Vous pouvez ouvrir le contenu et accéder aux paramètres des tuiles.",
+    "items": {
+      "open": {
+        "title": "Ouvrir la tuile",
+        "desc": "Cette fonction ouvre directement le contenu d'une tuile depuis la liste."
+      },
+      "settings": {
+        "title": "Ouvrir les paramètres des tuiles",
+        "desc": "Cette fonction ouvre les paramètres pour modifier l'ordre, la visibilité et les tuiles personnalisées."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Cette fonction ferme la vue des tuiles."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "privacy": {
+        "title": "Confidentialité et traitement",
+        "desc": "La vue des tuiles n'affiche que les données du contexte sélectionné. L'ouverture de contenus externes peut déclencher des requêtes vers des services tiers."
+      }
+    }
   },
   "tileSettings": {
-    "title": "Paramètres de tuile"
+    "title": "Paramètres de tuile",
+    "intro": "Dans cette boîte de dialogue, vous configurez les tuiles affichées, leur ordre et les tuiles personnalisées disponibles.",
+    "items": {
+      "add": {
+        "title": "Ajouter une tuile",
+        "desc": "Cette fonction ouvre le menu des types de tuiles et ajoute une nouvelle tuile."
+      },
+      "reorder": {
+        "title": "Réorganiser les tuiles",
+        "desc": "Cette fonction modifie l'ordre des tuiles par glisser-déposer."
+      },
+      "edit": {
+        "title": "Modifier la tuile",
+        "desc": "Cette fonction ouvre l'éditeur de la tuile sélectionnée."
+      },
+      "delete": {
+        "title": "Supprimer la tuile",
+        "desc": "Cette fonction supprime une tuile personnalisée modifiable."
+      },
+      "toggle": {
+        "title": "Changer la visibilité",
+        "desc": "Cette fonction affiche ou masque des tuiles sans les supprimer."
+      },
+      "close": {
+        "title": "Annuler",
+        "desc": "Cette fonction ferme la boîte de dialogue sans appliquer les modifications."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "apply": {
+        "title": "Appliquer",
+        "desc": "Cette fonction enregistre votre configuration des tuiles."
+      },
+      "privacy": {
+        "title": "Confidentialité et stockage",
+        "desc": "Les paramètres des tuiles sont stockés localement dans l'application et sous forme chiffrée. Ils sont inclus dans les sauvegardes."
+      }
+    }
   },
   "tileEditAnniversary": {
-    "title": "Tuile anniversaire"
+    "title": "Tuile anniversaire",
+    "intro": "Cette boîte de dialogue permet de modifier la tuile anniversaire avec icône, titre et date.",
+    "items": {
+      "icon": {
+        "title": "Choisir une icône",
+        "desc": "Cette fonction définit l'icône de la tuile."
+      },
+      "title": {
+        "title": "Modifier le titre",
+        "desc": "Cette fonction définit le nom affiché de la tuile."
+      },
+      "date": {
+        "title": "Définir la date",
+        "desc": "Cette fonction sélectionne la date d'anniversaire via le calendrier."
+      },
+      "close": {
+        "title": "Annuler",
+        "desc": "Cette fonction ferme la boîte de dialogue sans enregistrer."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "apply": {
+        "title": "Enregistrer",
+        "desc": "Cette fonction applique vos modifications."
+      },
+      "privacy": {
+        "title": "Confidentialité et stockage",
+        "desc": "La configuration de la tuile anniversaire est stockée localement et sous forme chiffrée."
+      }
+    }
   },
   "tileEditFile": {
-    "title": "Tuile fichier"
+    "title": "Tuile fichier",
+    "intro": "Cette boîte de dialogue gère les fichiers d'une tuile, y compris l'ordre et les actions sur les fichiers.",
+    "items": {
+      "icon": {
+        "title": "Choisir une icône",
+        "desc": "Cette fonction définit l'icône de la tuile."
+      },
+      "title": {
+        "title": "Modifier le titre",
+        "desc": "Cette fonction définit le nom affiché de la tuile."
+      },
+      "addFiles": {
+        "title": "Ajouter des fichiers",
+        "desc": "Cette fonction ajoute de nouveaux fichiers à la tuile."
+      },
+      "reorder": {
+        "title": "Réordonner les fichiers",
+        "desc": "Cette fonction modifie l'ordre des fichiers par glisser-déposer."
+      },
+      "open": {
+        "title": "Ouvrir le fichier",
+        "desc": "Cette fonction ouvre un fichier depuis la tuile."
+      },
+      "remove": {
+        "title": "Supprimer le fichier",
+        "desc": "Cette fonction retire un fichier de la tuile."
+      },
+      "close": {
+        "title": "Annuler",
+        "desc": "Cette fonction ferme la boîte de dialogue sans enregistrer."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "apply": {
+        "title": "Enregistrer",
+        "desc": "Cette fonction applique vos modifications."
+      },
+      "privacy": {
+        "title": "Confidentialité et stockage",
+        "desc": "Les métadonnées de fichiers de la tuile sont stockées localement et sous forme chiffrée. L'ouverture d'un fichier utilise le navigateur ou l'application du terminal."
+      }
+    }
   },
   "tileEditMigraine": {
-    "title": "Tuile migraine"
+    "title": "Tuile migraine",
+    "intro": "Cette boîte de dialogue configure les seuils d'alerte pour la température et la pression atmosphérique.",
+    "items": {
+      "icon": {
+        "title": "Choisir une icône",
+        "desc": "Cette fonction définit l'icône de la tuile."
+      },
+      "title": {
+        "title": "Modifier le titre",
+        "desc": "Cette fonction définit le nom affiché de la tuile."
+      },
+      "temperature": {
+        "title": "Définir les seuils de température",
+        "desc": "Cette fonction définit les niveaux d'avertissement et d'alerte pour la température."
+      },
+      "pressure": {
+        "title": "Définir les seuils de pression",
+        "desc": "Cette fonction définit les niveaux d'avertissement et d'alerte pour la pression de l'air."
+      },
+      "close": {
+        "title": "Annuler",
+        "desc": "Cette fonction ferme la boîte de dialogue sans enregistrer."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "apply": {
+        "title": "Enregistrer",
+        "desc": "Cette fonction applique vos modifications."
+      },
+      "privacy": {
+        "title": "Confidentialité et stockage",
+        "desc": "Les seuils de migraine sont stockés localement et sous forme chiffrée."
+      }
+    }
   },
   "tileEditMultitext": {
-    "title": "Tuile texte multiple"
+    "title": "Tuile texte multiple",
+    "intro": "Cette boîte de dialogue modifie une tuile de texte multiligne avec icône, titre et contenu.",
+    "items": {
+      "icon": {
+        "title": "Choisir une icône",
+        "desc": "Cette fonction définit l'icône de la tuile."
+      },
+      "title": {
+        "title": "Modifier le titre",
+        "desc": "Cette fonction définit le nom affiché de la tuile."
+      },
+      "text": {
+        "title": "Modifier le texte",
+        "desc": "Cette fonction modifie le contenu multiligne de la tuile."
+      },
+      "close": {
+        "title": "Annuler",
+        "desc": "Cette fonction ferme la boîte de dialogue sans enregistrer."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "apply": {
+        "title": "Enregistrer",
+        "desc": "Cette fonction applique vos modifications."
+      },
+      "privacy": {
+        "title": "Confidentialité et stockage",
+        "desc": "Le contenu texte de cette tuile est stocké localement et sous forme chiffrée."
+      }
+    }
   },
   "tileEditPollution": {
-    "title": "Tuile pollution"
+    "title": "Tuile pollution",
+    "intro": "Cette boîte de dialogue définit les mesures de qualité de l'air affichées dans la tuile pollution.",
+    "items": {
+      "icon": {
+        "title": "Choisir une icône",
+        "desc": "Cette fonction définit l'icône de la tuile."
+      },
+      "title": {
+        "title": "Modifier le titre",
+        "desc": "Cette fonction définit le nom affiché de la tuile."
+      },
+      "keys": {
+        "title": "Sélectionner les valeurs",
+        "desc": "Cette fonction active ou désactive les valeurs de mesure affichées."
+      },
+      "close": {
+        "title": "Annuler",
+        "desc": "Cette fonction ferme la boîte de dialogue sans enregistrer."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "apply": {
+        "title": "Enregistrer",
+        "desc": "Cette fonction applique vos modifications."
+      },
+      "privacy": {
+        "title": "Confidentialité et stockage",
+        "desc": "La sélection des valeurs de pollution est stockée localement et sous forme chiffrée."
+      }
+    }
   },
   "tileEditQuickActionAction": {
-    "title": "Action rapide"
+    "title": "Action rapide",
+    "intro": "Cette boîte de dialogue modifie une action individuelle dans une tuile d'actions rapides.",
+    "items": {
+      "icon": {
+        "title": "Choisir une icône",
+        "desc": "Cette fonction définit l'icône de l'action."
+      },
+      "label": {
+        "title": "Définir le libellé",
+        "desc": "Cette fonction modifie le nom de l'action."
+      },
+      "type": {
+        "title": "Choisir le type d'action",
+        "desc": "Cette fonction sélectionne le type d'action à exécuter."
+      },
+      "target": {
+        "title": "Définir la cible",
+        "desc": "Cette fonction définit la cible de l'action, par exemple URL, numéro de téléphone ou adresse."
+      },
+      "close": {
+        "title": "Annuler",
+        "desc": "Cette fonction ferme la boîte de dialogue sans enregistrer."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "apply": {
+        "title": "Enregistrer",
+        "desc": "Cette fonction applique vos modifications."
+      },
+      "privacy": {
+        "title": "Confidentialité et traitement",
+        "desc": "Les données d'action sont stockées localement et chiffrées. Selon le type, l'exécution d'une action peut appeler des cibles externes."
+      }
+    }
   },
   "tileEditQuickAction": {
-    "title": "Tuile action rapide"
+    "title": "Tuile action rapide",
+    "intro": "Cette boîte de dialogue gère une tuile contenant plusieurs actions rapides.",
+    "items": {
+      "icon": {
+        "title": "Choisir une icône",
+        "desc": "Cette fonction définit l'icône de la tuile."
+      },
+      "title": {
+        "title": "Modifier le titre",
+        "desc": "Cette fonction définit le nom affiché de la tuile."
+      },
+      "addAction": {
+        "title": "Ajouter une action",
+        "desc": "Cette fonction crée une nouvelle action rapide."
+      },
+      "reorder": {
+        "title": "Réordonner les actions",
+        "desc": "Cette fonction modifie l'ordre des actions par glisser-déposer."
+      },
+      "editAction": {
+        "title": "Modifier une action",
+        "desc": "Cette fonction ouvre l'éditeur d'une action existante."
+      },
+      "deleteAction": {
+        "title": "Supprimer une action",
+        "desc": "Cette fonction supprime une action de la tuile."
+      },
+      "close": {
+        "title": "Annuler",
+        "desc": "Cette fonction ferme la boîte de dialogue sans enregistrer."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "apply": {
+        "title": "Enregistrer",
+        "desc": "Cette fonction applique vos modifications."
+      },
+      "privacy": {
+        "title": "Confidentialité et traitement",
+        "desc": "Les actions rapides sont stockées localement et chiffrées. L'exécution d'actions peut ouvrir des services ou applications externes."
+      }
+    }
   },
   "tileEditText": {
-    "title": "Tuile texte"
+    "title": "Tuile texte",
+    "intro": "Cette boîte de dialogue modifie une tuile de texte sur une seule ligne.",
+    "items": {
+      "icon": {
+        "title": "Choisir une icône",
+        "desc": "Cette fonction définit l'icône de la tuile."
+      },
+      "title": {
+        "title": "Modifier le titre",
+        "desc": "Cette fonction définit le nom affiché de la tuile."
+      },
+      "text": {
+        "title": "Modifier le texte",
+        "desc": "Cette fonction modifie le contenu de la tuile."
+      },
+      "close": {
+        "title": "Annuler",
+        "desc": "Cette fonction ferme la boîte de dialogue sans enregistrer."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "apply": {
+        "title": "Enregistrer",
+        "desc": "Cette fonction applique vos modifications."
+      },
+      "privacy": {
+        "title": "Confidentialité et stockage",
+        "desc": "Le contenu texte de cette tuile est stocké localement et sous forme chiffrée."
+      }
+    }
   },
   "tileEditTodo": {
-    "title": "Tuile tâches"
+    "title": "Tuile tâches",
+    "intro": "Cette boîte de dialogue gère les tâches d'une tuile to-do.",
+    "items": {
+      "icon": {
+        "title": "Choisir une icône",
+        "desc": "Cette fonction définit l'icône de la tuile."
+      },
+      "title": {
+        "title": "Modifier le titre",
+        "desc": "Cette fonction définit le nom affiché de la tuile."
+      },
+      "addTodo": {
+        "title": "Ajouter une tâche",
+        "desc": "Cette fonction ajoute une nouvelle tâche à la liste."
+      },
+      "reorder": {
+        "title": "Réordonner les tâches",
+        "desc": "Cette fonction modifie l'ordre des tâches par glisser-déposer."
+      },
+      "toggleDone": {
+        "title": "Changer l'état d'avancement",
+        "desc": "Cette fonction marque les tâches comme faites ou ouvertes."
+      },
+      "deleteTodo": {
+        "title": "Supprimer une tâche",
+        "desc": "Cette fonction retire une tâche de la liste."
+      },
+      "close": {
+        "title": "Annuler",
+        "desc": "Cette fonction ferme la boîte de dialogue sans enregistrer."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "apply": {
+        "title": "Enregistrer",
+        "desc": "Cette fonction applique vos modifications."
+      },
+      "privacy": {
+        "title": "Confidentialité et stockage",
+        "desc": "Le contenu des tâches est stocké localement et sous forme chiffrée."
+      }
+    }
   },
   "avatarCropper": {
     "title": "Rogner l'avatar",

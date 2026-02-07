@@ -554,37 +554,422 @@
     "title": "Contenido compartido"
   },
   "tileList": {
-    "title": "Tarjetas"
+    "title": "Tarjetas",
+    "intro": "En esta vista ves las tarjetas de un lugar, contacto o experiencia. Puedes abrir contenido y cambiar a la configuración de tarjetas.",
+    "items": {
+      "open": {
+        "title": "Abrir tarjeta",
+        "desc": "Con esta función abres el contenido de una tarjeta directamente desde la lista."
+      },
+      "settings": {
+        "title": "Abrir ajustes de tarjetas",
+        "desc": "Con esta función cambias a los ajustes para editar orden, visibilidad y tarjetas personalizadas."
+      },
+      "close": {
+        "title": "Cerrar",
+        "desc": "Con esta función cierras la vista de tarjetas."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "privacy": {
+        "title": "Privacidad y procesamiento",
+        "desc": "La vista de tarjetas solo muestra datos del contexto seleccionado. Al abrir contenido externo pueden generarse solicitudes a terceros."
+      }
+    }
   },
   "tileSettings": {
-    "title": "Ajustes de tarjeta"
+    "title": "Ajustes de tarjeta",
+    "intro": "En este diálogo configuras qué tarjetas se muestran, en qué orden aparecen y qué tarjetas personalizadas están disponibles.",
+    "items": {
+      "add": {
+        "title": "Añadir tarjeta",
+        "desc": "Con esta función abres el menú de tipos y añades una nueva tarjeta."
+      },
+      "reorder": {
+        "title": "Reordenar tarjetas",
+        "desc": "Con esta función cambias el orden de las tarjetas con arrastrar y soltar."
+      },
+      "edit": {
+        "title": "Editar tarjeta",
+        "desc": "Con esta función abres el editor de la tarjeta seleccionada."
+      },
+      "delete": {
+        "title": "Eliminar tarjeta",
+        "desc": "Con esta función eliminas una tarjeta personalizada editable."
+      },
+      "toggle": {
+        "title": "Cambiar visibilidad",
+        "desc": "Con esta función muestras u ocultas tarjetas sin eliminarlas."
+      },
+      "close": {
+        "title": "Cancelar",
+        "desc": "Con esta función cierras el diálogo sin aplicar cambios."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "apply": {
+        "title": "Aplicar",
+        "desc": "Con esta función guardas la configuración de tarjetas."
+      },
+      "privacy": {
+        "title": "Privacidad y almacenamiento",
+        "desc": "La configuración de tarjetas se guarda localmente en la app y se almacena cifrada. También se incluye en la copia de seguridad."
+      }
+    }
   },
   "tileEditAnniversary": {
-    "title": "Tarjeta de aniversario"
+    "title": "Tarjeta de aniversario",
+    "intro": "En este diálogo editas la tarjeta de aniversario con icono, título y fecha.",
+    "items": {
+      "icon": {
+        "title": "Seleccionar icono",
+        "desc": "Con esta función defines el icono de la tarjeta."
+      },
+      "title": {
+        "title": "Editar título",
+        "desc": "Con esta función defines el nombre visible de la tarjeta."
+      },
+      "date": {
+        "title": "Definir fecha",
+        "desc": "Con esta función eliges la fecha del aniversario con el calendario."
+      },
+      "close": {
+        "title": "Cancelar",
+        "desc": "Con esta función cierras el diálogo sin guardar."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "apply": {
+        "title": "Guardar",
+        "desc": "Con esta función aplicas los cambios."
+      },
+      "privacy": {
+        "title": "Privacidad y almacenamiento",
+        "desc": "La configuración de la tarjeta de aniversario se guarda localmente y en formato cifrado."
+      }
+    }
   },
   "tileEditFile": {
-    "title": "Tarjeta de archivo"
+    "title": "Tarjeta de archivo",
+    "intro": "En este diálogo gestionas archivos dentro de una tarjeta, incluido el orden y las acciones de archivo.",
+    "items": {
+      "icon": {
+        "title": "Seleccionar icono",
+        "desc": "Con esta función defines el icono de la tarjeta."
+      },
+      "title": {
+        "title": "Editar título",
+        "desc": "Con esta función defines el nombre visible de la tarjeta."
+      },
+      "addFiles": {
+        "title": "Añadir archivos",
+        "desc": "Con esta función agregas nuevos archivos a la tarjeta."
+      },
+      "reorder": {
+        "title": "Reordenar archivos",
+        "desc": "Con esta función cambias el orden de los archivos con arrastrar y soltar."
+      },
+      "open": {
+        "title": "Abrir archivo",
+        "desc": "Con esta función abres un archivo de la tarjeta."
+      },
+      "remove": {
+        "title": "Eliminar archivo",
+        "desc": "Con esta función eliminas un archivo de la tarjeta."
+      },
+      "close": {
+        "title": "Cancelar",
+        "desc": "Con esta función cierras el diálogo sin guardar."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "apply": {
+        "title": "Guardar",
+        "desc": "Con esta función aplicas los cambios."
+      },
+      "privacy": {
+        "title": "Privacidad y almacenamiento",
+        "desc": "Los metadatos de archivos de la tarjeta se guardan localmente y cifrados. Al abrir un archivo se usa el navegador o la app del dispositivo."
+      }
+    }
   },
   "tileEditMigraine": {
-    "title": "Tarjeta de migraña"
+    "title": "Tarjeta de migraña",
+    "intro": "En este diálogo configuras los umbrales de aviso y alerta para temperatura y presión del aire.",
+    "items": {
+      "icon": {
+        "title": "Seleccionar icono",
+        "desc": "Con esta función defines el icono de la tarjeta."
+      },
+      "title": {
+        "title": "Editar título",
+        "desc": "Con esta función defines el nombre visible de la tarjeta."
+      },
+      "temperature": {
+        "title": "Definir umbrales de temperatura",
+        "desc": "Con esta función defines valores de aviso y alerta para temperatura."
+      },
+      "pressure": {
+        "title": "Definir umbrales de presión",
+        "desc": "Con esta función defines valores de aviso y alerta para presión del aire."
+      },
+      "close": {
+        "title": "Cancelar",
+        "desc": "Con esta función cierras el diálogo sin guardar."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "apply": {
+        "title": "Guardar",
+        "desc": "Con esta función aplicas los cambios."
+      },
+      "privacy": {
+        "title": "Privacidad y almacenamiento",
+        "desc": "Los umbrales de migraña se guardan localmente y en formato cifrado."
+      }
+    }
   },
   "tileEditMultitext": {
-    "title": "Tarjeta de texto múltiple"
+    "title": "Tarjeta de texto múltiple",
+    "intro": "En este diálogo editas una tarjeta de texto multilínea con icono, título y contenido.",
+    "items": {
+      "icon": {
+        "title": "Seleccionar icono",
+        "desc": "Con esta función defines el icono de la tarjeta."
+      },
+      "title": {
+        "title": "Editar título",
+        "desc": "Con esta función defines el nombre visible de la tarjeta."
+      },
+      "text": {
+        "title": "Editar texto",
+        "desc": "Con esta función editas el contenido multilínea de la tarjeta."
+      },
+      "close": {
+        "title": "Cancelar",
+        "desc": "Con esta función cierras el diálogo sin guardar."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "apply": {
+        "title": "Guardar",
+        "desc": "Con esta función aplicas los cambios."
+      },
+      "privacy": {
+        "title": "Privacidad y almacenamiento",
+        "desc": "El contenido de texto de esta tarjeta se guarda localmente y en formato cifrado."
+      }
+    }
   },
   "tileEditPollution": {
-    "title": "Tarjeta de contaminación"
+    "title": "Tarjeta de contaminación",
+    "intro": "En este diálogo defines qué valores de calidad del aire se muestran en la tarjeta de contaminación.",
+    "items": {
+      "icon": {
+        "title": "Seleccionar icono",
+        "desc": "Con esta función defines el icono de la tarjeta."
+      },
+      "title": {
+        "title": "Editar título",
+        "desc": "Con esta función defines el nombre visible de la tarjeta."
+      },
+      "keys": {
+        "title": "Seleccionar valores",
+        "desc": "Con esta función activas o desactivas valores individuales para mostrar."
+      },
+      "close": {
+        "title": "Cancelar",
+        "desc": "Con esta función cierras el diálogo sin guardar."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "apply": {
+        "title": "Guardar",
+        "desc": "Con esta función aplicas los cambios."
+      },
+      "privacy": {
+        "title": "Privacidad y almacenamiento",
+        "desc": "La selección de valores de contaminación se guarda localmente y en formato cifrado."
+      }
+    }
   },
   "tileEditQuickActionAction": {
-    "title": "Acción rápida"
+    "title": "Acción rápida",
+    "intro": "En este diálogo editas una acción individual dentro de una tarjeta de acciones rápidas.",
+    "items": {
+      "icon": {
+        "title": "Seleccionar icono",
+        "desc": "Con esta función defines el icono de la acción."
+      },
+      "label": {
+        "title": "Definir etiqueta",
+        "desc": "Con esta función editas el nombre de la acción."
+      },
+      "type": {
+        "title": "Elegir tipo de acción",
+        "desc": "Con esta función seleccionas qué tipo de acción se ejecuta."
+      },
+      "target": {
+        "title": "Definir destino",
+        "desc": "Con esta función defines el destino de la acción, por ejemplo URL, teléfono o dirección."
+      },
+      "close": {
+        "title": "Cancelar",
+        "desc": "Con esta función cierras el diálogo sin guardar."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "apply": {
+        "title": "Guardar",
+        "desc": "Con esta función aplicas los cambios."
+      },
+      "privacy": {
+        "title": "Privacidad y procesamiento",
+        "desc": "Los datos de acción se guardan localmente y cifrados. Al ejecutar una acción pueden abrirse destinos externos según el tipo."
+      }
+    }
   },
   "tileEditQuickAction": {
-    "title": "Tarjeta de acción rápida"
+    "title": "Tarjeta de acción rápida",
+    "intro": "En este diálogo gestionas una tarjeta con varias acciones rápidas.",
+    "items": {
+      "icon": {
+        "title": "Seleccionar icono",
+        "desc": "Con esta función defines el icono de la tarjeta."
+      },
+      "title": {
+        "title": "Editar título",
+        "desc": "Con esta función defines el nombre visible de la tarjeta."
+      },
+      "addAction": {
+        "title": "Añadir acción",
+        "desc": "Con esta función creas una nueva acción rápida."
+      },
+      "reorder": {
+        "title": "Reordenar acciones",
+        "desc": "Con esta función cambias el orden de las acciones con arrastrar y soltar."
+      },
+      "editAction": {
+        "title": "Editar acción",
+        "desc": "Con esta función abres el editor de una acción existente."
+      },
+      "deleteAction": {
+        "title": "Eliminar acción",
+        "desc": "Con esta función eliminas una acción de la tarjeta."
+      },
+      "close": {
+        "title": "Cancelar",
+        "desc": "Con esta función cierras el diálogo sin guardar."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "apply": {
+        "title": "Guardar",
+        "desc": "Con esta función aplicas los cambios."
+      },
+      "privacy": {
+        "title": "Privacidad y procesamiento",
+        "desc": "Las acciones rápidas se guardan localmente y cifradas. Al ejecutar acciones pueden abrirse servicios o apps externas."
+      }
+    }
   },
   "tileEditText": {
-    "title": "Tarjeta de texto"
+    "title": "Tarjeta de texto",
+    "intro": "En este diálogo editas una tarjeta de texto de una sola línea.",
+    "items": {
+      "icon": {
+        "title": "Seleccionar icono",
+        "desc": "Con esta función defines el icono de la tarjeta."
+      },
+      "title": {
+        "title": "Editar título",
+        "desc": "Con esta función defines el nombre visible de la tarjeta."
+      },
+      "text": {
+        "title": "Editar texto",
+        "desc": "Con esta función editas el contenido de la tarjeta."
+      },
+      "close": {
+        "title": "Cancelar",
+        "desc": "Con esta función cierras el diálogo sin guardar."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "apply": {
+        "title": "Guardar",
+        "desc": "Con esta función aplicas los cambios."
+      },
+      "privacy": {
+        "title": "Privacidad y almacenamiento",
+        "desc": "El contenido de texto de esta tarjeta se guarda localmente y en formato cifrado."
+      }
+    }
   },
   "tileEditTodo": {
-    "title": "Tarjeta de tareas"
+    "title": "Tarjeta de tareas",
+    "intro": "En este diálogo gestionas tareas dentro de una tarjeta de tareas.",
+    "items": {
+      "icon": {
+        "title": "Seleccionar icono",
+        "desc": "Con esta función defines el icono de la tarjeta."
+      },
+      "title": {
+        "title": "Editar título",
+        "desc": "Con esta función defines el nombre visible de la tarjeta."
+      },
+      "addTodo": {
+        "title": "Añadir tarea",
+        "desc": "Con esta función agregas una nueva tarea a la lista."
+      },
+      "reorder": {
+        "title": "Reordenar tareas",
+        "desc": "Con esta función cambias el orden de las tareas con arrastrar y soltar."
+      },
+      "toggleDone": {
+        "title": "Cambiar estado completado",
+        "desc": "Con esta función marcas tareas como hechas o pendientes."
+      },
+      "deleteTodo": {
+        "title": "Eliminar tarea",
+        "desc": "Con esta función eliminas una tarea de la lista."
+      },
+      "close": {
+        "title": "Cancelar",
+        "desc": "Con esta función cierras el diálogo sin guardar."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "apply": {
+        "title": "Guardar",
+        "desc": "Con esta función aplicas los cambios."
+      },
+      "privacy": {
+        "title": "Privacidad y almacenamiento",
+        "desc": "El contenido de tareas se guarda localmente y en formato cifrado."
+      }
+    }
   },
   "avatarCropper": {
     "title": "Recortar avatar",
