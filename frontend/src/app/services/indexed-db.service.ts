@@ -19,6 +19,15 @@ import { BackupStateService } from './backup-state.service';
 type StoredLocalImageMeta = string;
 type StoredLocalDocumentMeta = string;
 
+interface EncryptedStoreEnvelope {
+  format: 'messagedrop-idb';
+  version: 1;
+  cipher: 'AES-GCM';
+  payloadEncoding: 'base64';
+  iv: string;
+  payload: string;
+}
+
 /**
  * Service for managing data in IndexedDB for the MessageDrop application.
  * Provides CRUD operations for settings, users, profiles, contact profiles, places, and notes.
@@ -45,6 +54,19 @@ export class IndexedDbService {
   private documentHandleStore = 'documentHandle';
   private fileHandleStore = 'fileHandle';
   private contactMessagePayloadStore = 'contactMessagePayload';
+  private atRestEncryptionKey: CryptoKey | null = null;
+  private readonly encryptedStores = new Set<string>([
+    this.profileStore,
+    this.contactStore,
+    this.contactProfileStore,
+    this.placeStore,
+    this.experienceBookmarkStore,
+    this.tileSettingsStore,
+    this.noteStore,
+    this.imageStore,
+    this.documentStore,
+    this.contactMessagePayloadStore
+  ]);
 
   private stripContactMedia(contact: Contact): Contact {
     return {
@@ -77,30 +99,143 @@ export class IndexedDbService {
     };
   }
 
-  private compress<T>(value: T): string {
-    const json = JSON.stringify(value);
-    if (!environment.production) {
-      return json;
-    }
-    return compressToUTF16(json);
+  setAtRestEncryptionKey(key: CryptoKey | null): void {
+    this.atRestEncryptionKey = key;
   }
 
-  private decompress<T>(data: string | undefined): T | undefined {
-    if (typeof data !== 'string') {
+  private shouldEncryptStore(storeName: string): boolean {
+    return environment.production && this.encryptedStores.has(storeName);
+  }
+
+  private createRandomBytes(length: number): Uint8Array<ArrayBuffer> {
+    const bytes = new Uint8Array(length) as Uint8Array<ArrayBuffer>;
+    crypto.getRandomValues(bytes);
+    return bytes;
+  }
+
+  private bytesToBase64(bytes: Uint8Array): string {
+    let binary = '';
+    const chunkSize = 0x8000;
+    for (let offset = 0; offset < bytes.length; offset += chunkSize) {
+      const chunk = bytes.subarray(offset, offset + chunkSize);
+      binary += String.fromCharCode(...chunk);
+    }
+    return btoa(binary);
+  }
+
+  private base64ToBytes(value: string): Uint8Array<ArrayBuffer> {
+    const binary = atob(value);
+    const bytes = new Uint8Array(binary.length) as Uint8Array<ArrayBuffer>;
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes;
+  }
+
+  private async encryptForStore(storeName: string, plaintext: string): Promise<string> {
+    if (!this.atRestEncryptionKey) {
+      throw new Error(`Missing IndexedDB encryption key for store "${storeName}"`);
+    }
+    const iv = this.createRandomBytes(12);
+    const encrypted = await crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv },
+      this.atRestEncryptionKey,
+      new TextEncoder().encode(plaintext)
+    );
+    const envelope: EncryptedStoreEnvelope = {
+      format: 'messagedrop-idb',
+      version: 1,
+      cipher: 'AES-GCM',
+      payloadEncoding: 'base64',
+      iv: this.bytesToBase64(iv),
+      payload: this.bytesToBase64(new Uint8Array(encrypted))
+    };
+    return JSON.stringify(envelope);
+  }
+
+  private async decryptForStore(storeName: string, encryptedPayload: string): Promise<string | undefined> {
+    if (!this.atRestEncryptionKey) {
+      return undefined;
+    }
+
+    let envelope: Partial<EncryptedStoreEnvelope>;
+    try {
+      envelope = JSON.parse(encryptedPayload) as Partial<EncryptedStoreEnvelope>;
+    } catch {
+      return undefined;
+    }
+
+    if (
+      envelope.format !== 'messagedrop-idb'
+      || envelope.version !== 1
+      || envelope.cipher !== 'AES-GCM'
+      || envelope.payloadEncoding !== 'base64'
+      || typeof envelope.iv !== 'string'
+      || typeof envelope.payload !== 'string'
+    ) {
       return undefined;
     }
 
     try {
-      const decompressed = decompressFromUTF16(data);
-      if (typeof decompressed === 'string') {
-        return JSON.parse(decompressed) as T;
-      }
+      const decrypted = await crypto.subtle.decrypt(
+        { name: 'AES-GCM', iv: this.base64ToBytes(envelope.iv) },
+        this.atRestEncryptionKey,
+        this.base64ToBytes(envelope.payload)
+      );
+      return new TextDecoder().decode(decrypted);
     } catch {
-      // fall through to plain JSON parsing
+      console.warn(`IndexedDB decrypt failed for store "${storeName}"`);
+      return undefined;
+    }
+  }
+
+  private async encodeValue<T>(storeName: string, value: T): Promise<string> {
+    const json = JSON.stringify(value);
+    if (!environment.production) {
+      return json;
+    }
+
+    if (!this.shouldEncryptStore(storeName)) {
+      return compressToUTF16(json);
+    }
+
+    const encrypted = await this.encryptForStore(storeName, json);
+    return compressToUTF16(encrypted);
+  }
+
+  private async decodeValue<T>(storeName: string, data: unknown): Promise<T | undefined> {
+    if (typeof data !== 'string') {
+      return undefined;
+    }
+
+    if (!environment.production) {
+      try {
+        return JSON.parse(data) as T;
+      } catch {
+        return undefined;
+      }
+    }
+
+    const decompressed = decompressFromUTF16(data);
+    if (typeof decompressed !== 'string') {
+      return undefined;
+    }
+
+    if (!this.shouldEncryptStore(storeName)) {
+      try {
+        return JSON.parse(decompressed) as T;
+      } catch {
+        return undefined;
+      }
+    }
+
+    const decrypted = await this.decryptForStore(storeName, decompressed);
+    if (!decrypted) {
+      return undefined;
     }
 
     try {
-      return JSON.parse(data) as T;
+      return JSON.parse(decrypted) as T;
     } catch {
       return undefined;
     }
@@ -284,12 +419,12 @@ export class IndexedDbService {
    */
   async setSetting<T = unknown>(key: string, value: T): Promise<void> {
     const db = await this.openDB();
+    const encoded = await this.encodeValue(this.settingStore, value);
 
     return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(this.settingStore, 'readwrite');
       const store = tx.objectStore(this.settingStore);
-      const compressed = this.compress(value);
-      const request = store.put(compressed, key);
+      const request = store.put(encoded, key);
 
       request.onsuccess = () => resolve();
       request.onerror = () => {
@@ -312,7 +447,7 @@ export class IndexedDbService {
       const request = store.get(key);
 
       request.onsuccess = () => {
-        resolve(this.decompress<T>(request.result));
+        this.decodeValue<T>(this.settingStore, request.result).then(resolve).catch(reject);
       };
 
       request.onerror = () => {
@@ -346,12 +481,12 @@ export class IndexedDbService {
    */
   async setUser(cryptedUser: CryptedUser): Promise<void> {
     const db = await this.openDB();
+    const encoded = await this.encodeValue(this.userStore, cryptedUser);
 
     return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(this.userStore, 'readwrite');
       const store = tx.objectStore(this.userStore);
-      const compressed = this.compress(cryptedUser);
-      const request = store.put(compressed, 'user');
+      const request = store.put(encoded, 'user');
 
       request.onsuccess = () => resolve();
       request.onerror = () => {
@@ -373,7 +508,7 @@ export class IndexedDbService {
       const request = store.get('user');
 
       request.onsuccess = () => {
-        resolve(this.decompress<CryptedUser>(request.result));
+        this.decodeValue<CryptedUser>(this.userStore, request.result).then(resolve).catch(reject);
       };
 
       request.onerror = () => {
@@ -428,12 +563,12 @@ export class IndexedDbService {
    */
   async setProfile(userId: string, profile: Profile): Promise<void> {
     const db = await this.openDB();
+    const encoded = await this.encodeValue(this.profileStore, this.stripProfileMedia(profile));
 
     return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(this.profileStore, 'readwrite');
       const store = tx.objectStore(this.profileStore);
-      const compressed = this.compress(this.stripProfileMedia(profile));
-      const request = store.put(compressed, userId);
+      const request = store.put(encoded, userId);
 
       request.onsuccess = () => {
         this.backupState.markDirty();
@@ -459,7 +594,7 @@ export class IndexedDbService {
       const request = store.get(userId);
 
       request.onsuccess = () => {
-        resolve(this.decompress<Profile>(request.result));
+        this.decodeValue<Profile>(this.profileStore, request.result).then(resolve).catch(reject);
       };
 
       request.onerror = () => {
@@ -486,16 +621,18 @@ export class IndexedDbService {
         valuesRequest.onsuccess = () => {
           const keys = keysRequest.result as string[];
           const values = valuesRequest.result as string[];
-
-          const map = new Map<string, Profile>();
-          for (let i = 0; i < keys.length; i++) {
-            const profile = this.decompress<Profile>(values[i]);
-            if (profile) {
-              map.set(keys[i], profile);
-            }
-          }
-
-          resolve(map);
+          Promise.all(values.map((value) => this.decodeValue<Profile>(this.profileStore, value)))
+            .then((decoded) => {
+              const map = new Map<string, Profile>();
+              for (let i = 0; i < keys.length; i++) {
+                const profile = decoded[i];
+                if (profile) {
+                  map.set(keys[i], profile);
+                }
+              }
+              resolve(map);
+            })
+            .catch(reject);
         };
 
         valuesRequest.onerror = () => reject(valuesRequest.error);
@@ -536,12 +673,12 @@ export class IndexedDbService {
    */
   async setContactProfile(contactProfileId: string, contactProfile: ContactProfile): Promise<void> {
     const db = await this.openDB();
+    const encoded = await this.encodeValue(this.contactProfileStore, this.stripContactProfileMedia(contactProfile));
 
     return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(this.contactProfileStore, 'readwrite');
       const store = tx.objectStore(this.contactProfileStore);
-      const compressed = this.compress(this.stripContactProfileMedia(contactProfile));
-      const request = store.put(compressed, contactProfileId);
+      const request = store.put(encoded, contactProfileId);
 
       request.onsuccess = () => {
         this.backupState.markDirty();
@@ -567,7 +704,7 @@ export class IndexedDbService {
       const request = store.get(contactProfileId);
 
       request.onsuccess = () => {
-        resolve(this.decompress<ContactProfile>(request.result));
+        this.decodeValue<ContactProfile>(this.contactProfileStore, request.result).then(resolve).catch(reject);
       };
 
       request.onerror = () => {
@@ -581,6 +718,10 @@ export class IndexedDbService {
    */
   async replaceContacts(contacts: Contact[], markDirty = true): Promise<void> {
     const db = await this.openDB();
+    const encodedContacts = await Promise.all(contacts.map(async (contact) => ({
+      id: contact.id,
+      value: await this.encodeValue(this.contactStore, this.stripContactMedia(contact))
+    })));
 
     return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(this.contactStore, 'readwrite');
@@ -588,8 +729,8 @@ export class IndexedDbService {
       const clearRequest = store.clear();
 
       clearRequest.onsuccess = () => {
-        contacts.forEach((contact) => {
-          store.put(this.compress(this.stripContactMedia(contact)), contact.id);
+        encodedContacts.forEach((contact) => {
+          store.put(contact.value, contact.id);
         });
       };
 
@@ -619,10 +760,12 @@ export class IndexedDbService {
 
       request.onsuccess = () => {
         const values = request.result as string[];
-        const contacts = values
-          .map((value) => this.decompress<Contact>(value))
-          .filter((value): value is Contact => Boolean(value));
-        resolve(contacts);
+        Promise.all(values.map((value) => this.decodeValue<Contact>(this.contactStore, value)))
+          .then((decoded) => {
+            const contacts = decoded.filter((value): value is Contact => Boolean(value));
+            resolve(contacts);
+          })
+          .catch(reject);
       };
 
       request.onerror = () => reject(request.error);
@@ -646,16 +789,18 @@ export class IndexedDbService {
         valuesRequest.onsuccess = () => {
           const keys = keysRequest.result as string[];
           const values = valuesRequest.result as string[];
-
-          const map = new Map<string, ContactProfile>();
-          for (let i = 0; i < keys.length; i++) {
-            const profile = this.decompress<ContactProfile>(values[i]);
-            if (profile) {
-              map.set(keys[i], profile);
-            }
-          }
-
-          resolve(map);
+          Promise.all(values.map((value) => this.decodeValue<ContactProfile>(this.contactProfileStore, value)))
+            .then((decoded) => {
+              const map = new Map<string, ContactProfile>();
+              for (let i = 0; i < keys.length; i++) {
+                const profile = decoded[i];
+                if (profile) {
+                  map.set(keys[i], profile);
+                }
+              }
+              resolve(map);
+            })
+            .catch(reject);
         };
 
         valuesRequest.onerror = () => reject(valuesRequest.error);
@@ -673,12 +818,12 @@ export class IndexedDbService {
    */
   async setPlaceProfile(placeId: string, place: Place): Promise<void> {
     const db = await this.openDB();
+    const encoded = await this.encodeValue(this.placeStore, this.stripPlaceMedia(place));
 
     return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(this.placeStore, 'readwrite');
       const store = tx.objectStore(this.placeStore);
-      const compressed = this.compress(this.stripPlaceMedia(place));
-      const request = store.put(compressed, placeId);
+      const request = store.put(encoded, placeId);
 
       request.onsuccess = () => {
         this.backupState.markDirty();
@@ -704,7 +849,7 @@ export class IndexedDbService {
       const request = store.get(placeId);
 
       request.onsuccess = () => {
-        resolve(this.decompress<Place>(request.result));
+        this.decodeValue<Place>(this.placeStore, request.result).then(resolve).catch(reject);
       };
 
       request.onerror = () => {
@@ -726,10 +871,12 @@ export class IndexedDbService {
 
       request.onsuccess = () => {
         const values = request.result as string[];
-        const places = values
-          .map((value) => this.decompress<Place>(value))
-          .filter((value): value is Place => Boolean(value));
-        resolve(places);
+        Promise.all(values.map((value) => this.decodeValue<Place>(this.placeStore, value)))
+          .then((decoded) => {
+            const places = decoded.filter((value): value is Place => Boolean(value));
+            resolve(places);
+          })
+          .catch(reject);
       };
 
       request.onerror = () => reject(request.error);
@@ -738,12 +885,12 @@ export class IndexedDbService {
 
   async setExperienceBookmark(bookmark: ExperienceBookmark): Promise<void> {
     const db = await this.openDB();
+    const encoded = await this.encodeValue(this.experienceBookmarkStore, bookmark);
 
     return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(this.experienceBookmarkStore, 'readwrite');
       const store = tx.objectStore(this.experienceBookmarkStore);
-      const compressed = this.compress(bookmark);
-      const request = store.put(compressed, bookmark.productCode);
+      const request = store.put(encoded, bookmark.productCode);
 
       request.onsuccess = () => {
         this.backupState.markDirty();
@@ -762,7 +909,7 @@ export class IndexedDbService {
       const request = store.get(productCode);
 
       request.onsuccess = () => {
-        resolve(this.decompress<ExperienceBookmark>(request.result));
+        this.decodeValue<ExperienceBookmark>(this.experienceBookmarkStore, request.result).then(resolve).catch(reject);
       };
 
       request.onerror = () => reject(request.error);
@@ -779,10 +926,12 @@ export class IndexedDbService {
 
       request.onsuccess = () => {
         const values = request.result as string[];
-        const bookmarks = values
-          .map((value) => this.decompress<ExperienceBookmark>(value))
-          .filter((value): value is ExperienceBookmark => Boolean(value));
-        resolve(bookmarks);
+        Promise.all(values.map((value) => this.decodeValue<ExperienceBookmark>(this.experienceBookmarkStore, value)))
+          .then((decoded) => {
+            const bookmarks = decoded.filter((value): value is ExperienceBookmark => Boolean(value));
+            resolve(bookmarks);
+          })
+          .catch(reject);
       };
 
       request.onerror = () => reject(request.error);
@@ -810,12 +959,12 @@ export class IndexedDbService {
    */
   async setTileSettings(ownerId: string, tileSettings: TileSetting[]): Promise<void> {
     const db = await this.openDB();
+    const encoded = await this.encodeValue(this.tileSettingsStore, tileSettings);
 
     return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(this.tileSettingsStore, 'readwrite');
       const store = tx.objectStore(this.tileSettingsStore);
-      const compressed = this.compress(tileSettings);
-      const request = store.put(compressed, ownerId);
+      const request = store.put(encoded, ownerId);
 
       request.onsuccess = () => {
         this.backupState.markDirty();
@@ -837,7 +986,7 @@ export class IndexedDbService {
       const request = store.get(ownerId);
 
       request.onsuccess = () => {
-        resolve(this.decompress<TileSetting[]>(request.result));
+        this.decodeValue<TileSetting[]>(this.tileSettingsStore, request.result).then(resolve).catch(reject);
       };
 
       request.onerror = () => reject(request.error);
@@ -900,11 +1049,11 @@ export class IndexedDbService {
       id: key,
       timestamp: Date.now()
     };
+    const encoded = await this.encodeValue(this.noteStore, noteWithMeta);
     return new Promise<string>((resolve, reject) => {
       const tx = db.transaction(this.noteStore, 'readwrite');
       const store = tx.objectStore(this.noteStore);
-      const compressed = this.compress(noteWithMeta);
-      const request = store.put(compressed, key);
+      const request = store.put(encoded, key);
       request.onsuccess = () => {
         this.backupState.markDirty();
         resolve(key);
@@ -926,12 +1075,12 @@ export class IndexedDbService {
       ...note,
       timestamp: Date.now() // Refresh timestamp
     };
+    const encoded = await this.encodeValue(this.noteStore, updatedNote);
 
     return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(this.noteStore, 'readwrite');
       const store = tx.objectStore(this.noteStore);
-      const compressed = this.compress(updatedNote);
-      const request = store.put(compressed, note.id);
+      const request = store.put(encoded, note.id);
       request.onsuccess = () => {
         this.backupState.markDirty();
         resolve();
@@ -970,15 +1119,13 @@ export class IndexedDbService {
       const store = tx.objectStore(this.noteStore);
       const request = store.getAll();
       request.onsuccess = () => {
-        const compressedNotes = request.result as string[];
-        const notes: Note[] = [];
-        compressedNotes.forEach(compressedNote => {
-          const note = this.decompress<Note>(compressedNote);
-          if (note) {
-            notes.push(note);
-          }
-        })
-        resolve(notes.sort((a, b) => b.timestamp - a.timestamp)); // Newest first
+        const encodedNotes = request.result as unknown[];
+        Promise.all(encodedNotes.map((encodedNote) => this.decodeValue<Note>(this.noteStore, encodedNote)))
+          .then((decoded) => {
+            const notes = decoded.filter((note): note is Note => Boolean(note));
+            resolve(notes.sort((a, b) => b.timestamp - a.timestamp)); // Newest first
+          })
+          .catch(reject);
       };
       request.onerror = () => reject(request.error);
     });
@@ -990,12 +1137,13 @@ export class IndexedDbService {
    */
   async saveImage(image: LocalImage): Promise<string> {
     const db = await this.openDB();
+    const encodedMeta = await this.encodeImageEntry(image);
     return new Promise<string>((resolve, reject) => {
       const tx = db.transaction([this.imageStore, this.imageHandleStore], 'readwrite');
       const metaStore = tx.objectStore(this.imageStore);
       const handleStore = tx.objectStore(this.imageHandleStore);
 
-      metaStore.put(this.encodeImageEntry(image), image.id);
+      metaStore.put(encodedMeta, image.id);
       handleStore.put(image.handle, image.id);
 
       tx.oncomplete = () => resolve(image.id);
@@ -1023,12 +1171,13 @@ export class IndexedDbService {
    */
   async saveDocument(document: LocalDocument): Promise<string> {
     const db = await this.openDB();
+    const encodedMeta = await this.encodeDocumentEntry(document);
     return new Promise<string>((resolve, reject) => {
       const tx = db.transaction([this.documentStore, this.documentHandleStore], 'readwrite');
       const metaStore = tx.objectStore(this.documentStore);
       const handleStore = tx.objectStore(this.documentHandleStore);
 
-      metaStore.put(this.encodeDocumentEntry(document), document.id);
+      metaStore.put(encodedMeta, document.id);
       handleStore.put(document.handle, document.id);
 
       tx.oncomplete = () => resolve(document.id);
@@ -1097,10 +1246,11 @@ export class IndexedDbService {
    */
   async setContactMessagePayload(messageId: string, payload: ShortMessage): Promise<void> {
     const db = await this.openDB();
+    const encoded = await this.encodeValue(this.contactMessagePayloadStore, payload);
     return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(this.contactMessagePayloadStore, 'readwrite');
       const store = tx.objectStore(this.contactMessagePayloadStore);
-      const request = store.put(this.compress(payload), messageId);
+      const request = store.put(encoded, messageId);
       request.onsuccess = () => {
         this.backupState.markDirty();
         resolve();
@@ -1119,7 +1269,7 @@ export class IndexedDbService {
       const store = tx.objectStore(this.contactMessagePayloadStore);
       const request = store.get(messageId);
       request.onsuccess = () => {
-        resolve(this.decompress<ShortMessage>(request.result as string | undefined));
+        this.decodeValue<ShortMessage>(this.contactMessagePayloadStore, request.result).then(resolve).catch(reject);
       };
       request.onerror = () => reject(request.error);
     });
@@ -1167,33 +1317,32 @@ export class IndexedDbService {
           handleMap.set(String(key), handles[idx]);
         });
 
-        const decoded: LocalImage[] = [];
-        metas.forEach((meta, idx) => {
+        Promise.all(metas.map((meta, idx) => {
           const key = String(metaKeys[idx]);
-          const entry = this.decodeImageEntry(meta, handleMap.get(key));
-          if (entry) {
-            decoded.push(entry);
-          }
-        });
-
-        resolve(decoded.sort((a, b) => b.timestamp - a.timestamp)); // Newest first
+          return this.decodeImageEntry(meta, handleMap.get(key));
+        }))
+          .then((decoded) => {
+            const images = decoded.filter((entry): entry is LocalImage => Boolean(entry));
+            resolve(images.sort((a, b) => b.timestamp - a.timestamp)); // Newest first
+          })
+          .catch(reject);
       };
       tx.onerror = () => reject(tx.error);
     });
   }
 
-  private encodeImageEntry(entry: LocalImage): StoredLocalImageMeta {
+  private async encodeImageEntry(entry: LocalImage): Promise<StoredLocalImageMeta> {
     const { handle: _handle, ...rest } = entry;
     void _handle;
-    return this.compress(rest);
+    return this.encodeValue(this.imageStore, rest);
   }
 
   /**
    * Accepts compressed layout and legacy uncompressed LocalImageEntry.
    */
-  private decodeImageEntry(rawMeta: unknown, handle: unknown): LocalImage | undefined {
+  private async decodeImageEntry(rawMeta: unknown, handle: unknown): Promise<LocalImage | undefined> {
     if (typeof rawMeta === 'string') {
-      const decoded = this.decompress<Omit<LocalImage, 'handle'>>(rawMeta);
+      const decoded = await this.decodeValue<Omit<LocalImage, 'handle'>>(this.imageStore, rawMeta);
       if (decoded && handle && typeof (handle as FileSystemFileHandle).getFile === 'function') {
         return {
           ...decoded,
@@ -1207,7 +1356,7 @@ export class IndexedDbService {
     if (rawMeta && typeof rawMeta === 'object') {
       const typed = rawMeta as Partial<LocalImage> & { meta?: string; handle?: FileSystemFileHandle };
       if (typed.meta && typed.handle) {
-        const decoded = this.decompress<LocalImage>(typed.meta);
+        const decoded = await this.decodeValue<LocalImage>(this.imageStore, typed.meta);
         if (!decoded || typeof typed.handle.getFile !== 'function') {
           return undefined;
         }
@@ -1223,15 +1372,15 @@ export class IndexedDbService {
     return undefined;
   }
 
-  private encodeDocumentEntry(entry: LocalDocument): StoredLocalDocumentMeta {
+  private async encodeDocumentEntry(entry: LocalDocument): Promise<StoredLocalDocumentMeta> {
     const { handle: _handle, ...rest } = entry;
     void _handle;
-    return this.compress(rest);
+    return this.encodeValue(this.documentStore, rest);
   }
 
-  private decodeDocumentEntry(rawMeta: unknown, handle: unknown): LocalDocument | undefined {
+  private async decodeDocumentEntry(rawMeta: unknown, handle: unknown): Promise<LocalDocument | undefined> {
     if (typeof rawMeta === 'string') {
-      const decoded = this.decompress<Omit<LocalDocument, 'handle'>>(rawMeta);
+      const decoded = await this.decodeValue<Omit<LocalDocument, 'handle'>>(this.documentStore, rawMeta);
       if (decoded && handle && typeof (handle as FileSystemFileHandle).getFile === 'function') {
         return {
           ...decoded,
@@ -1244,7 +1393,7 @@ export class IndexedDbService {
     if (rawMeta && typeof rawMeta === 'object') {
       const typed = rawMeta as Partial<LocalDocument> & { meta?: string; handle?: FileSystemFileHandle };
       if (typed.meta && typed.handle) {
-        const decoded = this.decompress<LocalDocument>(typed.meta);
+        const decoded = await this.decodeValue<LocalDocument>(this.documentStore, typed.meta);
         if (!decoded || typeof typed.handle.getFile !== 'function') {
           return undefined;
         }
@@ -1352,16 +1501,15 @@ export class IndexedDbService {
           handleMap.set(String(key), handles[idx]);
         });
 
-        const decoded: LocalDocument[] = [];
-        metas.forEach((meta, idx) => {
+        Promise.all(metas.map((meta, idx) => {
           const key = String(metaKeys[idx]);
-          const entry = this.decodeDocumentEntry(meta, handleMap.get(key));
-          if (entry) {
-            decoded.push(entry);
-          }
-        });
-
-        resolve(decoded.sort((a, b) => b.timestamp - a.timestamp));
+          return this.decodeDocumentEntry(meta, handleMap.get(key));
+        }))
+          .then((decoded) => {
+            const documents = decoded.filter((entry): entry is LocalDocument => Boolean(entry));
+            resolve(documents.sort((a, b) => b.timestamp - a.timestamp));
+          })
+          .catch(reject);
       };
       tx.onerror = () => reject(tx.error);
     });

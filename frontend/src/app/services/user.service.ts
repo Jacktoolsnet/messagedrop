@@ -142,6 +142,7 @@ export class UserService {
     this.ready = false;
     this.blocked = false;
     this.pinKey = null;
+    this.indexedDbService.setAtRestEncryptionKey(null);
     this.pinSalt = null;
     this.backupState.clearDirty();
     this.initUserId();
@@ -191,6 +192,7 @@ export class UserService {
           try {
             const encrypted = await this.cryptoService.encryptWithPin(pin, JSON.stringify(this.user), this.pinIterations);
             this.pinKey = encrypted.key;
+            this.indexedDbService.setAtRestEncryptionKey(this.pinKey);
             this.pinSalt = encrypted.salt;
             this.pinIterations = encrypted.iterations;
             const cryptedUser: CryptedUser = {
@@ -1263,6 +1265,7 @@ export class UserService {
     try {
       const encrypted = await this.cryptoService.encryptWithPin(pin, JSON.stringify(this.user), this.pinIterations);
       this.pinKey = encrypted.key;
+      this.indexedDbService.setAtRestEncryptionKey(this.pinKey);
       this.pinSalt = encrypted.salt;
       this.pinIterations = encrypted.iterations;
 
@@ -1610,6 +1613,7 @@ export class UserService {
 
       const user = JSON.parse(decrypted.plaintext) as User;
       this.pinKey = decrypted.key;
+      this.indexedDbService.setAtRestEncryptionKey(this.pinKey);
       this.pinSalt = decrypted.salt;
       this.pinIterations = decrypted.iterations;
       this.setLocalUser(user);
