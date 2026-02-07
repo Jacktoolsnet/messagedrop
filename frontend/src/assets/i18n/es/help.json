@@ -237,7 +237,46 @@
     "title": "Documentos"
   },
   "editMessage": {
-    "title": "Editar mensaje"
+    "title": "Crear o editar mensaje",
+    "intro": "Este formulario te permite crear o editar un mensaje público o un comentario. Puedes ajustar texto, contenido multimedia y, en mensajes públicos, también la ubicación antes de enviarlo.",
+    "items": {
+      "media": {
+        "title": "Seleccionar contenido multimedia",
+        "desc": "Con esta función agregas contenido multimedia al mensaje o sustituyes el contenido existente."
+      },
+      "text": {
+        "title": "Editar texto del mensaje",
+        "desc": "Con esta función abres el diálogo de texto para escribir o cambiar el texto del mensaje."
+      },
+      "style": {
+        "title": "Cambiar estilo de texto",
+        "desc": "Con esta función aplicas un nuevo estilo para la visualización del texto del mensaje."
+      },
+      "location": {
+        "title": "Elegir ubicación",
+        "desc": "Con esta función seleccionas la ubicación del mensaje mediante el selector de ubicación. Esta opción solo está disponible para mensajes públicos."
+      },
+      "remove": {
+        "title": "Eliminar contenido",
+        "desc": "Con esta función eliminas el texto actual o el contenido multimedia seleccionado del mensaje."
+      },
+      "close": {
+        "title": "Cancelar",
+        "desc": "Con esta función cierras el diálogo sin guardar."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "apply": {
+        "title": "Enviar",
+        "desc": "Con esta función envías el mensaje o aplicas tus cambios."
+      },
+      "privacy": {
+        "title": "Privacidad y procesamiento",
+        "desc": "Los mensajes públicos son visibles para otras personas y no se guardan en el servidor con cifrado de extremo a extremo. El texto público se revisa antes de publicar y editar mediante detección automática de patrones y moderación. Los mensajes privados de chat se procesan por separado con cifrado. Al integrar contenido multimedia externo pueden generarse solicitudes a proveedores externos; la navegación solo transmite datos de posición."
+      }
+    }
   },
   "editNote": {
     "title": "Crear o editar nota",

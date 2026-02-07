@@ -237,7 +237,46 @@
     "title": "Documents"
   },
   "editMessage": {
-    "title": "Edit message"
+    "title": "Create or edit message",
+    "intro": "This form lets you create or edit a public message or a comment. You can adjust text, media, and for public messages the location before sending.",
+    "items": {
+      "media": {
+        "title": "Select media",
+        "desc": "This action adds media to the message or replaces existing media."
+      },
+      "text": {
+        "title": "Edit message text",
+        "desc": "This action opens the text dialog to write or update the message text."
+      },
+      "style": {
+        "title": "Change text style",
+        "desc": "This action applies a new style for how the message text is displayed."
+      },
+      "location": {
+        "title": "Choose location",
+        "desc": "This action selects the message location using the location picker. This option is only available for public messages."
+      },
+      "remove": {
+        "title": "Remove content",
+        "desc": "This action removes current text or selected media from the message."
+      },
+      "close": {
+        "title": "Cancel",
+        "desc": "This action closes the dialog without saving."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "apply": {
+        "title": "Send",
+        "desc": "This action sends the message or applies your edits."
+      },
+      "privacy": {
+        "title": "Privacy and processing",
+        "desc": "Public messages are visible to others and are not stored with end-to-end encryption on the server. Public text is checked before publish and edit by automated pattern detection and moderation. Private chat messages are handled separately with encryption. Embedding external media can trigger requests to third-party providers; navigation only transfers position data."
+      }
+    }
   },
   "editNote": {
     "title": "Create or edit note",

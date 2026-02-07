@@ -237,7 +237,46 @@
     "title": "Documents"
   },
   "editMessage": {
-    "title": "Modifier le message"
+    "title": "Créer ou modifier un message",
+    "intro": "Ce formulaire vous permet de créer ou modifier un message public ou un commentaire. Vous pouvez ajuster le texte, les médias et, pour les messages publics, la position avant l'envoi.",
+    "items": {
+      "media": {
+        "title": "Sélectionner un média",
+        "desc": "Cette fonction ajoute un média au message ou remplace un média existant."
+      },
+      "text": {
+        "title": "Modifier le texte du message",
+        "desc": "Cette fonction ouvre la boîte de dialogue de texte pour écrire ou modifier le texte du message."
+      },
+      "style": {
+        "title": "Changer le style du texte",
+        "desc": "Cette fonction applique un nouveau style d'affichage au texte du message."
+      },
+      "location": {
+        "title": "Choisir la position",
+        "desc": "Cette fonction sélectionne la position du message via le sélecteur de lieu. Cette option est disponible uniquement pour les messages publics."
+      },
+      "remove": {
+        "title": "Supprimer du contenu",
+        "desc": "Cette fonction supprime le texte actuel ou le média sélectionné du message."
+      },
+      "close": {
+        "title": "Annuler",
+        "desc": "Cette fonction ferme la boîte de dialogue sans enregistrer."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "apply": {
+        "title": "Envoyer",
+        "desc": "Cette fonction envoie le message ou applique vos modifications."
+      },
+      "privacy": {
+        "title": "Confidentialité et traitement",
+        "desc": "Les messages publics sont visibles par d'autres personnes et ne sont pas stockés côté serveur avec un chiffrement de bout en bout. Le texte public est contrôlé avant publication et modification via détection automatique de motifs et modération. Les messages privés de chat sont traités séparément avec chiffrement. L'intégration de médias externes peut entraîner des requêtes vers des fournisseurs tiers ; la navigation ne transmet que des données de position."
+      }
+    }
   },
   "editNote": {
     "title": "Créer ou modifier une note",

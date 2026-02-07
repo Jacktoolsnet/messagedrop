@@ -1,5 +1,5 @@
 <app-dialog-header
-  icon="@if (messageService.selectedMessagesSignal().length === 0) { speaker_notes } @else { forum }"
+  [icon]="messageService.selectedMessagesSignal().length === 0 ? 'speaker_notes' : 'forum'"
   [title]="'common.messageList.myTitle' | transloco">
 </app-dialog-header>
 

@@ -237,7 +237,46 @@
     "title": "Dokumente"
   },
   "editMessage": {
-    "title": "Nachricht bearbeiten"
+    "title": "Nachricht erstellen oder bearbeiten",
+    "intro": "In diesem Formular erstellst oder bearbeitest du eine öffentliche Nachricht oder einen Kommentar. Du kannst Text, Medien und bei öffentlichen Nachrichten auch den Ort anpassen und anschließend absenden.",
+    "items": {
+      "media": {
+        "title": "Medien auswählen",
+        "desc": "Mit dieser Funktion fügst du ein Medium zur Nachricht hinzu oder ersetzt ein vorhandenes Medium."
+      },
+      "text": {
+        "title": "Nachrichtentext bearbeiten",
+        "desc": "Mit dieser Funktion öffnest du den Textdialog, um den Nachrichtentext zu schreiben oder zu ändern."
+      },
+      "style": {
+        "title": "Textstil wechseln",
+        "desc": "Mit dieser Funktion vergibst du einen neuen Stil für die Darstellung des Textes."
+      },
+      "location": {
+        "title": "Ort auswählen",
+        "desc": "Mit dieser Funktion wählst du den Ort der Nachricht über den Location-Picker. Diese Option ist nur bei öffentlichen Nachrichten verfügbar."
+      },
+      "remove": {
+        "title": "Inhalt entfernen",
+        "desc": "Mit dieser Funktion entfernst du den aktuellen Text oder das ausgewählte Medium aus der Nachricht."
+      },
+      "close": {
+        "title": "Abbrechen",
+        "desc": "Mit dieser Funktion schließt du den Dialog ohne zu speichern."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "apply": {
+        "title": "Senden",
+        "desc": "Mit dieser Funktion sendest du die Nachricht oder übernimmst deine Änderungen."
+      },
+      "privacy": {
+        "title": "Datenschutz und Verarbeitung",
+        "desc": "Öffentliche Nachrichten sind für andere sichtbar und werden serverseitig nicht Ende-zu-Ende-verschlüsselt gespeichert. Öffentliche Texte werden vor Veröffentlichung und Bearbeitung automatisiert geprüft (Mustererkennung und Moderation). Private Chatnachrichten werden getrennt davon verschlüsselt verarbeitet. Beim Einbinden externer Medien können Anfragen an Drittanbieter entstehen; bei Navigation werden nur Positionsdaten übergeben."
+      }
+    }
   },
   "editNote": {
     "title": "Notiz erstellen oder bearbeiten",

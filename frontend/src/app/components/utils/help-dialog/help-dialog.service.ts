@@ -415,8 +415,54 @@ const HELP_TOPICS = {
   },
   editMessage: {
     titleKey: 'editMessage.title',
-    introKey: 'common.intros.editor',
-    items: ITEMS.editorMedia
+    introKey: 'editMessage.intro',
+    items: [
+      {
+        icon: 'photo',
+        titleKey: 'editMessage.items.media.title',
+        descriptionKey: 'editMessage.items.media.desc'
+      },
+      {
+        icon: 'edit',
+        titleKey: 'editMessage.items.text.title',
+        descriptionKey: 'editMessage.items.text.desc'
+      },
+      {
+        icon: 'cycle',
+        titleKey: 'editMessage.items.style.title',
+        descriptionKey: 'editMessage.items.style.desc'
+      },
+      {
+        icon: 'place',
+        titleKey: 'editMessage.items.location.title',
+        descriptionKey: 'editMessage.items.location.desc'
+      },
+      {
+        icon: 'delete',
+        titleKey: 'editMessage.items.remove.title',
+        descriptionKey: 'editMessage.items.remove.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'editMessage.items.close.title',
+        descriptionKey: 'editMessage.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'editMessage.items.help.title',
+        descriptionKey: 'editMessage.items.help.desc'
+      },
+      {
+        icon: 'send',
+        titleKey: 'editMessage.items.apply.title',
+        descriptionKey: 'editMessage.items.apply.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'editMessage.items.privacy.title',
+        descriptionKey: 'editMessage.items.privacy.desc'
+      }
+    ]
   },
   editNote: {
     titleKey: 'editNote.title',
@@ -597,11 +643,6 @@ const HELP_TOPICS = {
         icon: 'assistant_direction',
         titleKey: 'myMessageList.items.navigate.title',
         descriptionKey: 'myMessageList.items.navigate.desc'
-      },
-      {
-        icon: 'settings_account_box',
-        titleKey: 'myMessageList.items.profile.title',
-        descriptionKey: 'myMessageList.items.profile.desc'
       },
       {
         icon: 'flag',
