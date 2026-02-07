@@ -405,6 +405,33 @@ router.get('/unread/:contactId',
   }
 );
 
+// Sync deleted message ids for local payload cleanup (delta by cursor)
+router.get('/sync/:contactId',
+  [
+    security.authenticate
+  ],
+  (req, res, next) => {
+    const contactId = req.params.contactId;
+    const sinceRaw = Number.parseInt(String(req.query.since ?? '0'), 10);
+    const limitRaw = Number.parseInt(String(req.query.limit ?? '500'), 10);
+    const since = Number.isFinite(sinceRaw) ? Math.max(0, sinceRaw) : 0;
+    const limit = Number.isFinite(limitRaw) ? Math.max(1, Math.min(1000, limitRaw)) : 500;
+
+    withContactOwnership(req, res, contactId, () => {
+      tableContactMessage.getDeletedEventsByContact(req.database.db, contactId, since, limit, (err, result) => {
+        if (err) {
+          return next(apiError.internal('db_error'));
+        }
+        return res.status(200).json({
+          status: 200,
+          purgedMessageIds: result?.messageIds ?? [],
+          nextCursor: result?.nextCursor ?? since
+        });
+      });
+    }, next);
+  }
+);
+
 // Mark messages as read: either by IDs or all (unread) up to timestamp for a contact
 router.post('/read',
   [
@@ -452,6 +479,41 @@ router.post('/read',
         }
         return res.status(200).json({ status: 200 });
       });
+    }, next);
+  }
+);
+
+// Acknowledge message payload persisted locally and clear encrypted payload on server
+router.post('/payload/ack',
+  [
+    security.authenticate,
+    express.json({ type: 'application/json' }),
+    metric.count('contactMessage.payload.ack', { when: 'always', timezone: 'utc', amount: 1 })
+  ],
+  (req, res, next) => {
+    const { contactId, messageIds } = req.body ?? {};
+    if (!contactId || !Array.isArray(messageIds) || messageIds.length === 0) {
+      return next(apiError.badRequest('missing_required_fields'));
+    }
+    const normalizedMessageIds = [...new Set(messageIds
+      .map((id) => (typeof id === 'string' ? id.trim() : ''))
+      .filter(Boolean))];
+    if (normalizedMessageIds.length === 0) {
+      return next(apiError.badRequest('invalid_messageIds'));
+    }
+
+    withContactOwnership(req, res, contactId, () => {
+      tableContactMessage.clearPayloadByContactAndMessageIds(
+        req.database.db,
+        contactId,
+        normalizedMessageIds,
+        (err, updated) => {
+          if (err) {
+            return next(apiError.internal('db_error'));
+          }
+          return res.status(200).json({ status: 200, updated: updated ?? 0 });
+        }
+      );
     }, next);
   }
 );

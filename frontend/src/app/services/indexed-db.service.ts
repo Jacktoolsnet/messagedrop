@@ -12,6 +12,7 @@ import { LocalImage } from '../interfaces/local-image';
 import { Note } from '../interfaces/note';
 import { Place } from '../interfaces/place';
 import { Profile } from '../interfaces/profile';
+import { ShortMessage } from '../interfaces/short-message';
 import { TileSetting } from '../interfaces/tile-settings';
 import { BackupStateService } from './backup-state.service';
 
@@ -28,7 +29,7 @@ type StoredLocalDocumentMeta = string;
 export class IndexedDbService {
   private readonly backupState = inject(BackupStateService);
   private dbName = 'MessageDrop';
-  private dbVersion = 7;
+  private dbVersion = 8;
   private settingStore = 'setting';
   private userStore = 'user';
   private profileStore = 'profile';
@@ -43,6 +44,7 @@ export class IndexedDbService {
   private documentStore = 'document';
   private documentHandleStore = 'documentHandle';
   private fileHandleStore = 'fileHandle';
+  private contactMessagePayloadStore = 'contactMessagePayload';
 
   private stripContactMedia(contact: Contact): Contact {
     return {
@@ -162,6 +164,9 @@ export class IndexedDbService {
         }
         if (!db.objectStoreNames.contains(this.fileHandleStore)) {
           db.createObjectStore(this.fileHandleStore);
+        }
+        if (!db.objectStoreNames.contains(this.contactMessagePayloadStore)) {
+          db.createObjectStore(this.contactMessagePayloadStore);
         }
       };
 
@@ -1083,6 +1088,56 @@ export class IndexedDbService {
       const store = tx.objectStore(this.fileHandleStore);
       const request = store.delete(id);
       request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  /**
+   * Stores a decrypted private chat payload by shared messageId.
+   */
+  async setContactMessagePayload(messageId: string, payload: ShortMessage): Promise<void> {
+    const db = await this.openDB();
+    return new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(this.contactMessagePayloadStore, 'readwrite');
+      const store = tx.objectStore(this.contactMessagePayloadStore);
+      const request = store.put(this.compress(payload), messageId);
+      request.onsuccess = () => {
+        this.backupState.markDirty();
+        resolve();
+      };
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  /**
+   * Retrieves a decrypted private chat payload by shared messageId.
+   */
+  async getContactMessagePayload(messageId: string): Promise<ShortMessage | undefined> {
+    const db = await this.openDB();
+    return new Promise<ShortMessage | undefined>((resolve, reject) => {
+      const tx = db.transaction(this.contactMessagePayloadStore, 'readonly');
+      const store = tx.objectStore(this.contactMessagePayloadStore);
+      const request = store.get(messageId);
+      request.onsuccess = () => {
+        resolve(this.decompress<ShortMessage>(request.result as string | undefined));
+      };
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  /**
+   * Deletes a cached private chat payload by shared messageId.
+   */
+  async deleteContactMessagePayload(messageId: string): Promise<void> {
+    const db = await this.openDB();
+    return new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(this.contactMessagePayloadStore, 'readwrite');
+      const store = tx.objectStore(this.contactMessagePayloadStore);
+      const request = store.delete(messageId);
+      request.onsuccess = () => {
+        this.backupState.markDirty();
+        resolve();
+      };
       request.onerror = () => reject(request.error);
     });
   }

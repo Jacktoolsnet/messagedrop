@@ -7,7 +7,9 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogRef, MatDialogTi
 import { MatIcon } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { firstValueFrom } from 'rxjs';
 import { Contact } from '../../interfaces/contact';
+import { ContactMessage } from '../../interfaces/contact-message';
 import { Location } from '../../interfaces/location';
 import { Mode } from '../../interfaces/mode';
 import { MultimediaType } from '../../interfaces/multimedia-type';
@@ -50,6 +52,11 @@ interface ChatroomMessage {
 interface AudioWaveBar {
   value: number;
   active: boolean;
+}
+
+interface PersistedPayloadEntry {
+  messageId: string;
+  payload: ShortMessage;
 }
 
 @Component({
@@ -104,6 +111,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     this.translation.t(`common.languageNames.${this.languageService.effectiveLanguage()}`)
   );
   private readonly messageKeys = new Set<string>();
+  private readonly payloadSyncInFlightContacts = new Set<string>();
   private scrolledToFirstUnread = false;
   private readTrackingEnabled = false;
   private visibilityObserver?: IntersectionObserver;
@@ -212,6 +220,9 @@ export class ContactChatroomComponent implements AfterViewInit {
         reaction: incoming.reaction,
         showOriginal: false
       }, ...msgs]);
+      if (payload) {
+        void this.persistPayloadBatch(contact.id, [{ messageId: incoming.messageId, payload }]);
+      }
       this.lastLiveMessageId = incoming.id;
       queueMicrotask(() => this.scrollToTopIfNeeded());
     }
@@ -295,6 +306,9 @@ export class ContactChatroomComponent implements AfterViewInit {
     }
     if (removed && contact) {
       this.contactMessageService.emitUnreadCountUpdate(contact.id);
+    }
+    if (removed) {
+      void this.contactMessageService.deleteLocalPayload(deleted.messageId);
     }
     this.contactMessageService.deletedMessage.set(null);
   });
@@ -753,6 +767,7 @@ export class ContactChatroomComponent implements AfterViewInit {
               : msg
           )
         );
+        this.persistPayloadFromState(message.messageId);
         void this.persistTranslation(message.messageId, translated);
       },
       error: (err) => {
@@ -928,6 +943,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       }).subscribe({
         next: () => {
           this.messages.update((msgs) => msgs.filter((msg) => msg.messageId !== _message.messageId));
+          void this.contactMessageService.deleteLocalPayload(_message.messageId);
           this.contactMessageService.emitUnreadCountUpdate(contact.id);
           const remove = scope === 'both';
           if (scope === 'both' || scope === 'single') {
@@ -974,6 +990,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   private loadMessages(force = false): void {
     const contact = this.contact();
     if (!contact) return;
+    this.runPayloadSync(contact.id);
     const newContact = this.currentContactId !== contact.id;
     if (force || newContact) {
       this.currentContactId = contact.id;
@@ -992,9 +1009,13 @@ export class ContactChatroomComponent implements AfterViewInit {
           const merged = new Map<string, ChatroomMessage>(
             this.messages().map((msg) => [msg.messageId, msg])
           );
+          const payloadsToPersist: PersistedPayloadEntry[] = [];
           for (const msg of res.rows ?? []) {
-            const payload = await this.contactMessageService.decryptAndVerify(contact, msg);
-            const key = this.buildMessageKey(msg.id, msg.signature, msg.message);
+            const { payload, needsPayloadAck } = await this.resolveMessagePayload(contact, msg);
+            if (payload && needsPayloadAck) {
+              payloadsToPersist.push({ messageId: msg.messageId, payload });
+            }
+            const key = this.buildMessageKey(msg.id, msg.signature, msg.message ?? '');
             this.messageKeys.add(key);
             const existing = merged.get(msg.messageId);
             merged.set(msg.messageId, {
@@ -1011,6 +1032,9 @@ export class ContactChatroomComponent implements AfterViewInit {
           }
           const mergedMessages = Array.from(merged.values()).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
           this.messages.set(mergedMessages);
+          if (payloadsToPersist.length > 0) {
+            void this.persistPayloadBatch(contact.id, payloadsToPersist);
+          }
           this.loading.set(false);
           this.loaded.set(true);
           setTimeout(() => this.scrollToFirstUnread(), 0);
@@ -1020,6 +1044,100 @@ export class ContactChatroomComponent implements AfterViewInit {
           this.loaded.set(true);
         }
       });
+  }
+
+  private runPayloadSync(contactId: string): void {
+    if (!contactId || this.payloadSyncInFlightContacts.has(contactId)) {
+      return;
+    }
+    this.payloadSyncInFlightContacts.add(contactId);
+
+    void (async () => {
+      try {
+        const since = await this.contactMessageService.getPayloadSyncCursor(contactId);
+        const syncResult = await firstValueFrom(this.contactMessageService.syncPayloadState(contactId, since));
+        const purgedMessageIds = [...new Set((syncResult.purgedMessageIds ?? [])
+          .map((id) => (typeof id === 'string' ? id.trim() : ''))
+          .filter(Boolean))];
+
+        if (purgedMessageIds.length > 0) {
+          const purgedSet = new Set(purgedMessageIds);
+          this.messages.update((msgs) => msgs.filter((msg) => !purgedSet.has(msg.messageId)));
+          await Promise.all(purgedMessageIds.map((messageId) =>
+            this.contactMessageService.deleteLocalPayload(messageId).catch(() => undefined)
+          ));
+        }
+
+        const nextCursorRaw = syncResult.nextCursor;
+        const nextCursor = Number.isFinite(nextCursorRaw) ? Math.max(since, Math.floor(nextCursorRaw)) : since;
+        if (nextCursor !== since) {
+          await this.contactMessageService.setPayloadSyncCursor(contactId, nextCursor);
+        }
+      } catch {
+        // Sync is best effort. Local fallback remains functional.
+      } finally {
+        this.payloadSyncInFlightContacts.delete(contactId);
+      }
+    })();
+  }
+
+  private async resolveMessagePayload(contact: Contact, msg: ContactMessage): Promise<{ payload: ShortMessage | null; needsPayloadAck: boolean }> {
+    const hasServerPayload = !!msg.message?.trim();
+    if (hasServerPayload) {
+      const decrypted = await this.contactMessageService.decryptAndVerify(contact, msg);
+      if (decrypted) {
+        return { payload: decrypted, needsPayloadAck: true };
+      }
+    }
+    const cachedPayload = await this.contactMessageService.getLocalPayload(msg.messageId);
+    return { payload: cachedPayload, needsPayloadAck: false };
+  }
+
+  private async persistPayloadBatch(contactId: string, entries: PersistedPayloadEntry[]): Promise<void> {
+    if (!contactId || entries.length === 0) {
+      return;
+    }
+    const uniqueEntries = new Map<string, ShortMessage>();
+    entries.forEach((entry) => {
+      if (!entry.messageId || !entry.payload) {
+        return;
+      }
+      uniqueEntries.set(entry.messageId, entry.payload);
+    });
+    if (uniqueEntries.size === 0) {
+      return;
+    }
+    const ackMessageIds: string[] = [];
+    for (const [messageId, payload] of uniqueEntries.entries()) {
+      try {
+        await this.contactMessageService.storeLocalPayload(messageId, payload);
+        ackMessageIds.push(messageId);
+      } catch {
+        // Ignore cache write errors; message still remains on server until next successful ack.
+      }
+    }
+    if (ackMessageIds.length === 0) {
+      return;
+    }
+    this.contactMessageService.ackPayloadStored({
+      contactId,
+      messageIds: ackMessageIds
+    }).subscribe({
+      error: () => {
+        // Best effort. If this fails, next sync/list call can retry.
+      }
+    });
+  }
+
+  private persistPayloadFromState(messageId: string): void {
+    if (!messageId) {
+      return;
+    }
+    const payload = this.messages().find((msg) => msg.messageId === messageId)?.payload;
+    if (!payload) {
+      return;
+    }
+    void this.contactMessageService.storeLocalPayload(messageId, payload);
   }
 
   private scrollToFirstUnread(): void {
@@ -1284,6 +1402,7 @@ export class ContactChatroomComponent implements AfterViewInit {
         if (tempId) {
           this.finalizeOptimisticMessage(tempId, res.messageId, res.sharedMessageId);
         }
+        void this.persistPayloadBatch(contact.id, [{ messageId: res.sharedMessageId, payload }]);
         this.socketioService.sendContactMessage({
           id: res.mirrorMessageId ?? res.messageId,
           messageId: res.sharedMessageId,

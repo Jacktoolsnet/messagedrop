@@ -51,6 +51,12 @@ const tableContactMessage = require('./db/tableContactMessage');
 const tableGeoStatistic = require('./db/tableGeoStatistic');
 const tableWeatherHistory = require('./db/tableWeatherHistory');
 
+const CONTACT_MESSAGE_TOMBSTONE_RETENTION_DAYS = (() => {
+  const raw = process.env.CONTACT_MESSAGE_TOMBSTONE_RETENTION_DAYS;
+  const parsed = Number.parseInt(raw ?? '', 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 30;
+})();
+
 // ExpressJs
 const express = require('express');
 const app = express();
@@ -481,6 +487,12 @@ cron.schedule('5 0 * * *', () => {
   });
 
   tableWeatherHistory.cleanExpired(database.db, function (err) {
+    if (err) {
+      logger.error(err);
+    }
+  });
+
+  tableContactMessage.cleanupDeletedEvents(database.db, CONTACT_MESSAGE_TOMBSTONE_RETENTION_DAYS, function (err) {
     if (err) {
       logger.error(err);
     }

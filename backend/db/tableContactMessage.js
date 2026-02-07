@@ -1,4 +1,5 @@
 const tableName = 'tableContactMessage';
+const deletedEventTableName = 'tableContactMessageDeletedEvent';
 
 const columnId = 'id';
 const columnMessageId = 'messageId';
@@ -11,6 +12,10 @@ const columnCreatedAt = 'createdAt'; // ISO8601
 const columnReadAt = 'readAt';       // ISO8601 | NULL
 const columnStatus = 'status';       // sent | delivered | read | deleted
 const columnReaction = 'reaction';   // nullable TEXT emoji/keyword
+const deletedEventColumnId = 'id';
+const deletedEventColumnContactId = 'contactId';
+const deletedEventColumnMessageId = 'messageId';
+const deletedEventColumnDeletedAt = 'deletedAt';
 
 const init = function (db) {
     const sql = `
@@ -45,6 +50,22 @@ const init = function (db) {
   `;
     db.exec(sql, (err) => { if (err) throw err; });
 
+    const deletedEventSql = `
+    CREATE TABLE IF NOT EXISTS ${deletedEventTableName} (
+      ${deletedEventColumnId} INTEGER PRIMARY KEY AUTOINCREMENT,
+      ${deletedEventColumnContactId} TEXT NOT NULL,
+      ${deletedEventColumnMessageId} TEXT NOT NULL,
+      ${deletedEventColumnDeletedAt} TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now'))
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_msg_deleted_event_contact_id
+      ON ${deletedEventTableName} (${deletedEventColumnContactId}, ${deletedEventColumnId});
+
+    CREATE INDEX IF NOT EXISTS idx_msg_deleted_event_deleted_at
+      ON ${deletedEventTableName} (${deletedEventColumnDeletedAt});
+  `;
+    db.exec(deletedEventSql, (err) => { if (err) throw err; });
+
     db.all(`PRAGMA table_info(${tableName});`, (err, rows) => {
         if (err || !rows) {
             return;
@@ -67,6 +88,17 @@ const init = function (db) {
     END;
   `;
     db.exec(trig, (err) => { if (err) throw err; });
+
+    const deleteTrig = `
+    CREATE TRIGGER IF NOT EXISTS trg_contact_message_deleted_event
+    AFTER DELETE ON ${tableName}
+    BEGIN
+      INSERT INTO ${deletedEventTableName}
+      (${deletedEventColumnContactId}, ${deletedEventColumnMessageId}, ${deletedEventColumnDeletedAt})
+      VALUES (OLD.${columnContactId}, OLD.${columnMessageId}, strftime('%Y-%m-%dT%H:%M:%S','now'));
+    END;
+  `;
+    db.exec(deleteTrig, (err) => { if (err) throw err; });
 };
 
 // Nachrichten-CRUD
@@ -250,6 +282,67 @@ const setReactionByMessageId = function (db, messageId, reaction, callback) {
     db.run(sql, [reaction ?? null, messageId], (err) => callback(err));
 };
 
+const clearPayloadByContactAndMessageIds = function (db, contactId, messageIds, callback) {
+    const normalizedMessageIds = Array.isArray(messageIds)
+        ? [...new Set(messageIds
+            .map((id) => (typeof id === 'string' ? id.trim() : ''))
+            .filter(Boolean))]
+        : [];
+    if (!contactId || normalizedMessageIds.length === 0) {
+        callback(null, 0);
+        return;
+    }
+    const placeholders = normalizedMessageIds.map(() => '?').join(', ');
+    const sql = `
+    UPDATE ${tableName}
+    SET ${columnMessage} = ''
+    WHERE ${columnContactId} = ?
+      AND ${columnMessageId} IN (${placeholders})
+      AND ${columnMessage} <> '';
+  `;
+    db.run(sql, [contactId, ...normalizedMessageIds], function (err) {
+        callback(err, this?.changes ?? 0);
+    });
+};
+
+const getDeletedEventsByContact = function (db, contactId, sinceId = 0, limit = 500, callback) {
+    const normalizedSince = Number.isFinite(sinceId) ? Math.max(0, Math.floor(sinceId)) : 0;
+    const normalizedLimit = Number.isFinite(limit) ? Math.max(1, Math.min(1000, Math.floor(limit))) : 500;
+    const sql = `
+    SELECT ${deletedEventColumnId} AS id, ${deletedEventColumnMessageId} AS messageId
+    FROM ${deletedEventTableName}
+    WHERE ${deletedEventColumnContactId} = ?
+      AND ${deletedEventColumnId} > ?
+    ORDER BY ${deletedEventColumnId} ASC
+    LIMIT ?;
+  `;
+    db.all(sql, [contactId, normalizedSince, normalizedLimit], (err, rows) => {
+        if (err) {
+            callback(err);
+            return;
+        }
+        const safeRows = rows || [];
+        const messageIds = [...new Set(safeRows
+            .map((row) => row?.messageId)
+            .filter((messageId) => typeof messageId === 'string' && messageId.trim() !== ''))];
+        const nextCursor = safeRows.length
+            ? Number(safeRows[safeRows.length - 1]?.id) || normalizedSince
+            : normalizedSince;
+        callback(null, { messageIds, nextCursor });
+    });
+};
+
+const cleanupDeletedEvents = function (db, retentionDays = 30, callback) {
+    const normalizedDays = Number.isFinite(retentionDays)
+        ? Math.max(1, Math.floor(retentionDays))
+        : 30;
+    const sql = `
+    DELETE FROM ${deletedEventTableName}
+    WHERE ${deletedEventColumnDeletedAt} <= datetime('now', ?);
+  `;
+    db.run(sql, [`-${normalizedDays} days`], (err) => callback(err));
+};
+
 module.exports = {
     init,
     createMessage,
@@ -270,4 +363,7 @@ module.exports = {
     markAsReadByContactAndMessageId,
     setReactionForContact,
     setReactionByMessageId,
+    clearPayloadByContactAndMessageIds,
+    getDeletedEventsByContact,
+    cleanupDeletedEvents,
 };
