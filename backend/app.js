@@ -47,6 +47,7 @@ const maintenanceMode = require('./middleware/maintenance');
 const tableUser = require('./db/tableUser');
 const tableConnect = require('./db/tableConnect');
 const tableMessage = require('./db/tableMessage')
+const tableContactMessage = require('./db/tableContactMessage');
 const tableGeoStatistic = require('./db/tableGeoStatistic');
 const tableWeatherHistory = require('./db/tableWeatherHistory');
 
@@ -456,6 +457,15 @@ cron.schedule('0 * * * *', () => {
 // Clean messages clsevery 5 minutes
 cron.schedule('*/5 * * * *', () => {
   tableMessage.cleanPublic(database.db, function (err) {
+    if (err) {
+      logger.error(err);
+    }
+  });
+});
+
+// Clean read private chat messages every hour
+cron.schedule('15 * * * *', () => {
+  tableContactMessage.cleanupReadMessages(database.db, function (err) {
     if (err) {
       logger.error(err);
     }

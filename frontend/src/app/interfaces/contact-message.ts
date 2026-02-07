@@ -6,7 +6,7 @@ export interface ContactMessage {
   message: string;
   signature: string;
   translatedMessage?: string | null;
-  status: 'sent' | 'delivered' | 'read';
+  status: 'sent' | 'delivered' | 'read' | 'deleted';
   createdAt: string;
   readAt?: string | null;
   reaction?: string | null;

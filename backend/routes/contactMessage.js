@@ -375,13 +375,15 @@ router.get('/list/:contactId',
     const offset = Math.max(0, parseInt(req.query.offset, 10) || 0);
     const before = req.query.before;
 
-    tableContactMessage.getActiveByContact(req.database.db, contactId, limit, offset, before, (err, rows) => {
-      if (err) {
-        return next(apiError.internal('db_error'));
-      }
-      // Auch bei leeren Ergebnissen 200 zurückgeben, damit das Frontend sauber rendern kann
-      return res.status(200).json({ status: 200, rows: rows || [] });
-    });
+    withContactOwnership(req, res, contactId, () => {
+      tableContactMessage.getActiveByContact(req.database.db, contactId, limit, offset, before, (err, rows) => {
+        if (err) {
+          return next(apiError.internal('db_error'));
+        }
+        // Auch bei leeren Ergebnissen 200 zurückgeben, damit das Frontend sauber rendern kann
+        return res.status(200).json({ status: 200, rows: rows || [] });
+      });
+    }, next);
   }
 );
 
@@ -391,12 +393,15 @@ router.get('/unread/:contactId',
     security.authenticate
   ],
   (req, res, next) => {
-    tableContactMessage.getUnreadCount(req.database.db, req.params.contactId, (err, cnt) => {
-      if (err) {
-        return next(apiError.internal('db_error'));
-      }
-      return res.status(200).json({ status: 200, unread: cnt });
-    });
+    const contactId = req.params.contactId;
+    withContactOwnership(req, res, contactId, () => {
+      tableContactMessage.getUnreadCount(req.database.db, contactId, (err, cnt) => {
+        if (err) {
+          return next(apiError.internal('db_error'));
+        }
+        return res.status(200).json({ status: 200, unread: cnt });
+      });
+    }, next);
   }
 );
 
@@ -407,40 +412,47 @@ router.post('/read',
     express.json({ type: 'application/json' })
   ],
   (req, res, next) => {
-    const { messageIds, contactId, before } = req.body;
-
-    if (Array.isArray(messageIds) && messageIds.length > 0) {
-      let remaining = messageIds.length;
-      let errored = false;
-      messageIds.forEach((id) => {
-        tableContactMessage.markAsRead(req.database.db, id, (err) => {
-          if (errored) {
-            return;
-          }
-          if (err) {
-            errored = true;
-            return next(apiError.internal('db_error'));
-          }
-          remaining -= 1;
-          if (remaining === 0) {
-            return res.status(200).json({ status: 200, updated: messageIds.length });
-          }
-        });
-      });
-      return;
+    const { messageIds, contactId, before } = req.body ?? {};
+    if (!contactId) {
+      return next(apiError.badRequest('missing_contactId'));
     }
 
-    if (contactId) {
+    withContactOwnership(req, res, contactId, () => {
+      if (Array.isArray(messageIds) && messageIds.length > 0) {
+        const normalizedMessageIds = [...new Set(messageIds
+          .map((id) => (typeof id === 'string' ? id.trim() : ''))
+          .filter(Boolean))];
+        if (normalizedMessageIds.length === 0) {
+          return next(apiError.badRequest('invalid_messageIds'));
+        }
+
+        let remaining = normalizedMessageIds.length;
+        let errored = false;
+        normalizedMessageIds.forEach((messageId) => {
+          tableContactMessage.markAsReadByContactAndMessageId(req.database.db, contactId, messageId, (err) => {
+            if (errored) {
+              return;
+            }
+            if (err) {
+              errored = true;
+              return next(apiError.internal('db_error'));
+            }
+            remaining -= 1;
+            if (remaining === 0) {
+              return res.status(200).json({ status: 200, updated: normalizedMessageIds.length });
+            }
+          });
+        });
+        return;
+      }
+
       tableContactMessage.markManyAsReadByContact(req.database.db, contactId, before, (err) => {
         if (err) {
           return next(apiError.internal('db_error'));
         }
         return res.status(200).json({ status: 200 });
       });
-      return;
-    }
-
-    return next(apiError.badRequest('provide_messageIds_or_contactId'));
+    }, next);
   }
 );
 
