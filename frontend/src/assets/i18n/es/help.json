@@ -158,27 +158,51 @@
   },
   "systemMessages": {
     "title": "Mensajes del sistema",
-    "intro": "Los mensajes del sistema te informan sobre moderación y eventos. Toca un mensaje para ver detalles.",
+    "intro": "Este componente muestra avisos del sistema y de moderación. Puedes filtrar mensajes, abrir detalles y gestionar cada entrada.",
     "items": {
-      "inbox": {
-        "title": "Bandeja",
-        "desc": "Muestra todos los mensajes; los no leídos se resaltan."
+      "filterUnread": {
+        "title": "Filtro: No leídos",
+        "desc": "Muestra solo mensajes del sistema no leídos."
       },
-      "filters": {
-        "title": "Filtros",
-        "desc": "Cambia entre no leídos, leídos y todos."
+      "filterRead": {
+        "title": "Filtro: Leídos",
+        "desc": "Muestra solo mensajes ya marcados como leídos."
       },
-      "details": {
-        "title": "Detalles",
-        "desc": "Abre un mensaje para ver información del caso, motivo, tipo de contenido y fecha."
+      "filterAll": {
+        "title": "Filtro: Todos",
+        "desc": "Muestra todos los mensajes del sistema sin importar su estado."
       },
-      "actions": {
-        "title": "Acciones",
-        "desc": "Marcar como leído/no leído, eliminar o abrir el enlace de estado cuando exista."
+      "openDetails": {
+        "title": "Abrir mensaje",
+        "desc": "Abre la vista de detalle del mensaje del sistema seleccionado."
+      },
+      "openCaseLink": {
+        "title": "Abrir estado del caso",
+        "desc": "Abre en el navegador el enlace de estado del caso cuando esté disponible."
+      },
+      "toggleRead": {
+        "title": "Cambiar estado de lectura",
+        "desc": "Marca el mensaje como leído o no leído."
+      },
+      "deleteOne": {
+        "title": "Eliminar mensaje",
+        "desc": "Elimina el mensaje del sistema seleccionado."
       },
       "deleteAll": {
         "title": "Eliminar todo",
-        "desc": "Elimina todos los mensajes de la lista actual."
+        "desc": "Elimina todos los mensajes del sistema que se muestran en la lista actual."
+      },
+      "close": {
+        "title": "Cerrar",
+        "desc": "Cierra el diálogo de mensajes del sistema."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Abre esta vista de ayuda."
+      },
+      "privacy": {
+        "title": "Privacidad y almacenamiento",
+        "desc": "Los mensajes del sistema contienen información de moderación y estado. Se almacenan localmente en caché para mostrarlos; el contenido privado de comunicación no se expone aquí en texto claro."
       }
     }
   },

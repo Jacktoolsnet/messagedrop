@@ -1,34 +1,35 @@
 :host {
   color: var(--mat-app-text-color);
-  display: block;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 90vh;
+  max-height: 90vh;
+  min-height: 0;
+  overflow: hidden;
 }
 
-.dialog-title__icon {
-  font-size: 1.8rem;
-  width: 1.8rem;
-  height: 1.8rem;
-}
-
-.dialog-title__text {
-  font-weight: 600;
-}
-
-h2[mat-dialog-title].dialog-title {
-  height: 3rem;
-  padding: 0.35rem 1rem;
+app-dialog-header {
+  flex: 0 0 auto;
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  background-color: var(--mat-card-filled-container-color);
+  border-bottom: 1px solid var(--mat-card-outlined-outline-color);
 }
 
 .mat-mdc-dialog-content {
-  display: flex;
-  flex-direction: column;
+  display: block;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow: hidden;
-  max-height: calc(90vh - 10rem);
+  max-height: none;
   width: 100%;
   box-sizing: border-box;
   padding: 0;
 }
 
 .help-dialog-content {
+  min-height: 0;
   padding: 1rem;
   overflow-y: auto;
 }
@@ -76,4 +77,14 @@ h2[mat-dialog-title].dialog-title {
 .help-item__desc {
   color: var(--mat-card-subtitle-text-color);
   line-height: 1.4;
+}
+
+.sticky-actions {
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 4;
+  background-color: var(--mat-card-filled-container-color);
+  border-top: 1px solid var(--mat-card-outlined-outline-color);
+  box-shadow: 0 -2px 8px var(--mat-card-outlined-outline-color);
+  padding: 0.3rem 1rem;
 }

@@ -158,27 +158,51 @@
   },
   "systemMessages": {
     "title": "System messages",
-    "intro": "System messages keep you informed about moderation and system events. Tap a message to see details.",
+    "intro": "This component shows moderation and system notices. You can filter messages, open details, and manage entries directly.",
     "items": {
-      "inbox": {
-        "title": "Inbox",
-        "desc": "Shows all system messages; unread ones are highlighted."
+      "filterUnread": {
+        "title": "Filter: Unread",
+        "desc": "Shows only unread system messages."
       },
-      "filters": {
-        "title": "Filters",
-        "desc": "Switch between unread, read, and all."
+      "filterRead": {
+        "title": "Filter: Read",
+        "desc": "Shows only messages already marked as read."
       },
-      "details": {
-        "title": "Details",
-        "desc": "Open a message to view case info, reason, content type, and timestamp."
+      "filterAll": {
+        "title": "Filter: All",
+        "desc": "Shows all system messages regardless of read state."
       },
-      "actions": {
-        "title": "Actions",
-        "desc": "Mark as read/unread, delete a message, or open the case status link when available."
+      "openDetails": {
+        "title": "Open message",
+        "desc": "Opens the detail view for the selected system message."
+      },
+      "openCaseLink": {
+        "title": "Open case status",
+        "desc": "Opens the related case status link in your browser when available."
+      },
+      "toggleRead": {
+        "title": "Toggle read state",
+        "desc": "Marks the message as read or unread."
+      },
+      "deleteOne": {
+        "title": "Delete message",
+        "desc": "Removes the selected system message."
       },
       "deleteAll": {
         "title": "Delete all",
-        "desc": "Removes all messages in the current list."
+        "desc": "Removes all system messages currently shown in the list."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "Closes the system messages dialog."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "Opens this help view."
+      },
+      "privacy": {
+        "title": "Privacy and storage",
+        "desc": "System messages contain moderation and status information. They are cached locally for display; private communication content is not exposed as plaintext here."
       }
     }
   },

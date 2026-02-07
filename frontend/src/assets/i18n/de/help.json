@@ -158,27 +158,51 @@
   },
   "systemMessages": {
     "title": "Systemnachrichten",
-    "intro": "Systemnachrichten informieren dich über Moderation und Systemereignisse. Tippe auf eine Nachricht, um Details zu sehen.",
+    "intro": "Diese Komponente zeigt dir System- und Moderationshinweise. Du kannst Nachrichten filtern, im Detail ansehen und gezielt verwalten.",
     "items": {
-      "inbox": {
-        "title": "Posteingang",
-        "desc": "Zeigt alle Systemnachrichten; ungelesene sind hervorgehoben."
+      "filterUnread": {
+        "title": "Filter: Ungelesen",
+        "desc": "Zeigt nur ungelesene Systemnachrichten."
       },
-      "filters": {
-        "title": "Filter",
-        "desc": "Wechsle zwischen ungelesen, gelesen und allen."
+      "filterRead": {
+        "title": "Filter: Gelesen",
+        "desc": "Zeigt nur bereits gelesene Systemnachrichten."
       },
-      "details": {
-        "title": "Details",
-        "desc": "Öffne eine Nachricht, um Fallinfo, Grund, Inhaltstyp und Zeitstempel zu sehen."
+      "filterAll": {
+        "title": "Filter: Alle",
+        "desc": "Zeigt alle Systemnachrichten unabhängig vom Status."
       },
-      "actions": {
-        "title": "Aktionen",
-        "desc": "Als gelesen/ungelesen markieren, löschen oder den Statuslink öffnen (falls vorhanden)."
+      "openDetails": {
+        "title": "Nachricht öffnen",
+        "desc": "Öffnet die Detailansicht der ausgewählten Nachricht."
+      },
+      "openCaseLink": {
+        "title": "Fallstatus öffnen",
+        "desc": "Öffnet den zugehörigen Statuslink im Browser, falls vorhanden."
+      },
+      "toggleRead": {
+        "title": "Gelesen/Ungelesen umschalten",
+        "desc": "Markiert die Nachricht als gelesen oder wieder als ungelesen."
+      },
+      "deleteOne": {
+        "title": "Nachricht löschen",
+        "desc": "Entfernt genau diese Systemnachricht."
       },
       "deleteAll": {
         "title": "Alles löschen",
-        "desc": "Entfernt alle Nachrichten aus der aktuellen Liste."
+        "desc": "Entfernt alle aktuell angezeigten Systemnachrichten."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Schließt den Dialog für Systemnachrichten."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Öffnet diese Hilfeansicht."
+      },
+      "privacy": {
+        "title": "Datenschutz und Speicherung",
+        "desc": "Systemnachrichten enthalten Moderations- und Statusinformationen. Sie werden für die Anzeige lokal zwischengespeichert; private Kommunikationsinhalte werden dabei nicht als Klartext offengelegt."
       }
     }
   },

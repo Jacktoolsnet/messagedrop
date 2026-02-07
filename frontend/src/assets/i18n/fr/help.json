@@ -158,27 +158,51 @@
   },
   "systemMessages": {
     "title": "Messages système",
-    "intro": "Les messages système vous informent sur la modération et les événements. Touchez un message pour voir les détails.",
+    "intro": "Ce composant affiche les notifications système et de modération. Vous pouvez filtrer les messages, ouvrir les détails et gérer chaque entrée.",
     "items": {
-      "inbox": {
-        "title": "Boîte de réception",
-        "desc": "Affiche tous les messages; les non lus sont mis en évidence."
+      "filterUnread": {
+        "title": "Filtre : Non lus",
+        "desc": "Affiche uniquement les messages système non lus."
       },
-      "filters": {
-        "title": "Filtres",
-        "desc": "Basculez entre non lus, lus et tous."
+      "filterRead": {
+        "title": "Filtre : Lus",
+        "desc": "Affiche uniquement les messages déjà marqués comme lus."
       },
-      "details": {
-        "title": "Détails",
-        "desc": "Ouvrez un message pour voir l'info de dossier, la raison, le type de contenu et l'heure."
+      "filterAll": {
+        "title": "Filtre : Tous",
+        "desc": "Affiche tous les messages système, quel que soit leur état."
       },
-      "actions": {
-        "title": "Actions",
-        "desc": "Marquer comme lu/non lu, supprimer ou ouvrir le lien de statut si disponible."
+      "openDetails": {
+        "title": "Ouvrir le message",
+        "desc": "Ouvre la vue détaillée du message système sélectionné."
+      },
+      "openCaseLink": {
+        "title": "Ouvrir le statut du dossier",
+        "desc": "Ouvre dans le navigateur le lien de statut du dossier lorsqu'il est disponible."
+      },
+      "toggleRead": {
+        "title": "Basculer l'état de lecture",
+        "desc": "Marque le message comme lu ou non lu."
+      },
+      "deleteOne": {
+        "title": "Supprimer le message",
+        "desc": "Supprime le message système sélectionné."
       },
       "deleteAll": {
         "title": "Tout supprimer",
-        "desc": "Supprime tous les messages de la liste actuelle."
+        "desc": "Supprime tous les messages système affichés dans la liste actuelle."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Ferme la boîte de dialogue des messages système."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Ouvre cette vue d'aide."
+      },
+      "privacy": {
+        "title": "Confidentialité et stockage",
+        "desc": "Les messages système contiennent des informations de modération et de statut. Ils sont mis en cache localement pour l'affichage ; le contenu privé de communication n'y est pas exposé en clair."
       }
     }
   },

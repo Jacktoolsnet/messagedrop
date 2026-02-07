@@ -317,6 +317,67 @@ const HELP_TOPICS = {
       items
     };
   },
+  systemMessages: {
+    titleKey: 'systemMessages.title',
+    introKey: 'systemMessages.intro',
+    items: [
+      {
+        icon: 'mark_email_unread',
+        titleKey: 'systemMessages.items.filterUnread.title',
+        descriptionKey: 'systemMessages.items.filterUnread.desc'
+      },
+      {
+        icon: 'drafts',
+        titleKey: 'systemMessages.items.filterRead.title',
+        descriptionKey: 'systemMessages.items.filterRead.desc'
+      },
+      {
+        icon: 'all_inbox',
+        titleKey: 'systemMessages.items.filterAll.title',
+        descriptionKey: 'systemMessages.items.filterAll.desc'
+      },
+      {
+        icon: 'notifications',
+        titleKey: 'systemMessages.items.openDetails.title',
+        descriptionKey: 'systemMessages.items.openDetails.desc'
+      },
+      {
+        icon: 'open_in_new',
+        titleKey: 'systemMessages.items.openCaseLink.title',
+        descriptionKey: 'systemMessages.items.openCaseLink.desc'
+      },
+      {
+        icon: 'mark_email_read',
+        titleKey: 'systemMessages.items.toggleRead.title',
+        descriptionKey: 'systemMessages.items.toggleRead.desc'
+      },
+      {
+        icon: 'delete',
+        titleKey: 'systemMessages.items.deleteOne.title',
+        descriptionKey: 'systemMessages.items.deleteOne.desc'
+      },
+      {
+        icon: 'delete_sweep',
+        titleKey: 'systemMessages.items.deleteAll.title',
+        descriptionKey: 'systemMessages.items.deleteAll.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'systemMessages.items.close.title',
+        descriptionKey: 'systemMessages.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'systemMessages.items.help.title',
+        descriptionKey: 'systemMessages.items.help.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'systemMessages.items.privacy.title',
+        descriptionKey: 'systemMessages.items.privacy.desc'
+      }
+    ]
+  },
   contactChatroom: {
     titleKey: 'contactChatroom.title',
     introKey: 'common.intros.chat',
