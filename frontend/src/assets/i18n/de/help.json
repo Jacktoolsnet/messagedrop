@@ -446,7 +446,46 @@
     "title": "Emojis"
   },
   "locationPicker": {
-    "title": "Ort auswählen"
+    "title": "Ort auswählen",
+    "intro": "Mit diesem Dialog suchst du weltweit nach Orten und legst die Position fest, die in deiner Notiz oder Nachricht gespeichert werden soll.",
+    "items": {
+      "search": {
+        "title": "Ort suchen",
+        "desc": "Mit dieser Funktion suchst du nach einem Ortsnamen oder einer Adresse."
+      },
+      "select": {
+        "title": "Position auswählen",
+        "desc": "Mit dieser Funktion wählst du ein Suchergebnis oder direkt einen Punkt auf der Karte aus."
+      },
+      "locate": {
+        "title": "Meine Position ermitteln",
+        "desc": "Mit dieser Funktion wird deine aktuelle Position verwendet, sofern du den Standortzugriff erlaubst."
+      },
+      "view": {
+        "title": "Karten- und Listenansicht wechseln",
+        "desc": "Mit dieser Funktion wechselst du zwischen Kartenansicht und Trefferliste."
+      },
+      "navigate": {
+        "title": "Externe Navigation öffnen",
+        "desc": "Mit dieser Funktion startest du aus der Trefferliste eine externe Navigation zum ausgewählten Ort."
+      },
+      "close": {
+        "title": "Abbrechen",
+        "desc": "Mit dieser Funktion schließt du den Dialog ohne die neue Position zu übernehmen."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "apply": {
+        "title": "Übernehmen",
+        "desc": "Mit dieser Funktion übernimmst du die aktuell ausgewählte Position."
+      },
+      "privacy": {
+        "title": "Datenschutz und Verarbeitung",
+        "desc": "Suchanfragen werden an den Nominatim-Suchdienst über das Backend gesendet. Standortdaten werden erst nach Übernehmen im jeweiligen Inhalt gespeichert. Eine externe Navigation übermittelt nur die gewählte Zieladresse bzw. Koordinaten an den Kartendienst."
+      }
+    }
   },
   "maticonPicker": {
     "title": "Icon-Auswahl"

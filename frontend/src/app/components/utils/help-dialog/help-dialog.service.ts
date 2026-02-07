@@ -713,8 +713,54 @@ const HELP_TOPICS = {
   },
   locationPicker: {
     titleKey: 'locationPicker.title',
-    introKey: 'common.intros.searchMap',
-    items: ITEMS.searchMap
+    introKey: 'locationPicker.intro',
+    items: [
+      {
+        icon: 'search',
+        titleKey: 'locationPicker.items.search.title',
+        descriptionKey: 'locationPicker.items.search.desc'
+      },
+      {
+        icon: 'touch_app',
+        titleKey: 'locationPicker.items.select.title',
+        descriptionKey: 'locationPicker.items.select.desc'
+      },
+      {
+        icon: 'my_location',
+        titleKey: 'locationPicker.items.locate.title',
+        descriptionKey: 'locationPicker.items.locate.desc'
+      },
+      {
+        icon: 'map',
+        titleKey: 'locationPicker.items.view.title',
+        descriptionKey: 'locationPicker.items.view.desc'
+      },
+      {
+        icon: 'assistant_direction',
+        titleKey: 'locationPicker.items.navigate.title',
+        descriptionKey: 'locationPicker.items.navigate.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'locationPicker.items.close.title',
+        descriptionKey: 'locationPicker.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'locationPicker.items.help.title',
+        descriptionKey: 'locationPicker.items.help.desc'
+      },
+      {
+        icon: 'check',
+        titleKey: 'locationPicker.items.apply.title',
+        descriptionKey: 'locationPicker.items.apply.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'locationPicker.items.privacy.title',
+        descriptionKey: 'locationPicker.items.privacy.desc'
+      }
+    ]
   },
   maticonPicker: {
     titleKey: 'maticonPicker.title',

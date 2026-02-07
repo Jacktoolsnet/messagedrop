@@ -446,7 +446,46 @@
     "title": "Emojis"
   },
   "locationPicker": {
-    "title": "Sélectionner un lieu"
+    "title": "Sélectionner un lieu",
+    "intro": "Cette boîte de dialogue recherche des lieux dans le monde entier et définit la position à enregistrer dans votre note ou message.",
+    "items": {
+      "search": {
+        "title": "Rechercher un lieu",
+        "desc": "Cette fonction lance une recherche par nom de lieu ou par adresse."
+      },
+      "select": {
+        "title": "Sélectionner une position",
+        "desc": "Cette fonction sélectionne un résultat de recherche ou un point cliqué directement sur la carte."
+      },
+      "locate": {
+        "title": "Détecter ma position",
+        "desc": "Cette fonction utilise votre position actuelle lorsque l'accès à la localisation est autorisé."
+      },
+      "view": {
+        "title": "Basculer carte et liste",
+        "desc": "Cette fonction bascule entre la vue carte et la liste des résultats."
+      },
+      "navigate": {
+        "title": "Ouvrir la navigation externe",
+        "desc": "Cette fonction démarre une navigation externe vers le lieu sélectionné depuis la liste."
+      },
+      "close": {
+        "title": "Annuler",
+        "desc": "Cette fonction ferme la boîte de dialogue sans appliquer la nouvelle position."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "apply": {
+        "title": "Valider",
+        "desc": "Cette fonction valide la position actuellement sélectionnée."
+      },
+      "privacy": {
+        "title": "Confidentialité et traitement",
+        "desc": "Les requêtes de recherche sont envoyées au service Nominatim via le backend. Les données de position ne sont enregistrées dans votre contenu qu'après validation. La navigation externe transmet uniquement l'adresse de destination ou les coordonnées sélectionnées au fournisseur cartographique."
+      }
+    }
   },
   "maticonPicker": {
     "title": "Sélecteur d'icônes"

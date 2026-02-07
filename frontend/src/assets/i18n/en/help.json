@@ -446,7 +446,46 @@
     "title": "Emojis"
   },
   "locationPicker": {
-    "title": "Location picker"
+    "title": "Location picker",
+    "intro": "This dialog searches places globally and sets the position that should be saved with your note or message.",
+    "items": {
+      "search": {
+        "title": "Search place",
+        "desc": "This action searches by place name or address."
+      },
+      "select": {
+        "title": "Select position",
+        "desc": "This action selects a search result or a point clicked directly on the map."
+      },
+      "locate": {
+        "title": "Detect my position",
+        "desc": "This action uses your current position when location access is allowed."
+      },
+      "view": {
+        "title": "Switch map and list view",
+        "desc": "This action switches between map view and results list."
+      },
+      "navigate": {
+        "title": "Open external navigation",
+        "desc": "This action starts external navigation to the selected place from the results list."
+      },
+      "close": {
+        "title": "Cancel",
+        "desc": "This action closes the dialog without applying the new position."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "apply": {
+        "title": "Apply",
+        "desc": "This action applies the currently selected position."
+      },
+      "privacy": {
+        "title": "Privacy and processing",
+        "desc": "Search requests are sent to the Nominatim search service through the backend. Location data is only stored in your content after you apply it. External navigation sends only the selected destination address or coordinates to the map provider."
+      }
+    }
   },
   "maticonPicker": {
     "title": "Icon picker"

@@ -446,7 +446,46 @@
     "title": "Emojis"
   },
   "locationPicker": {
-    "title": "Seleccionar ubicación"
+    "title": "Seleccionar ubicación",
+    "intro": "Este diálogo busca lugares en todo el mundo y define la posición que se guardará en tu nota o mensaje.",
+    "items": {
+      "search": {
+        "title": "Buscar lugar",
+        "desc": "Con esta función buscas por nombre de lugar o dirección."
+      },
+      "select": {
+        "title": "Seleccionar posición",
+        "desc": "Con esta función seleccionas un resultado de búsqueda o un punto pulsado directamente en el mapa."
+      },
+      "locate": {
+        "title": "Detectar mi posición",
+        "desc": "Con esta función se usa tu posición actual cuando permites el acceso a ubicación."
+      },
+      "view": {
+        "title": "Cambiar entre mapa y lista",
+        "desc": "Con esta función alternas entre la vista de mapa y la lista de resultados."
+      },
+      "navigate": {
+        "title": "Abrir navegación externa",
+        "desc": "Con esta función inicias navegación externa al lugar seleccionado desde la lista."
+      },
+      "close": {
+        "title": "Cancelar",
+        "desc": "Con esta función cierras el diálogo sin aplicar la nueva posición."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "apply": {
+        "title": "Aplicar",
+        "desc": "Con esta función aplicas la posición seleccionada actualmente."
+      },
+      "privacy": {
+        "title": "Privacidad y procesamiento",
+        "desc": "Las búsquedas se envían al servicio Nominatim a través del backend. Los datos de ubicación solo se guardan en tu contenido cuando confirmas con Aplicar. La navegación externa solo envía la dirección de destino o coordenadas seleccionadas al proveedor de mapas."
+      }
+    }
   },
   "maticonPicker": {
     "title": "Selector de iconos"
