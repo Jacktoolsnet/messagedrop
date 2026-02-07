@@ -124,19 +124,35 @@
   },
   "profile": {
     "title": "Mi perfil",
-    "intro": "Tu perfil se guarda solo de forma local y se usa únicamente para tus propios contenidos. Puedes compartirlo opcionalmente con tus contactos.",
+    "intro": "En esta pantalla gestionas tu perfil en este dispositivo: elegir o eliminar avatar, ajustar estilo y guardar cambios.",
     "items": {
-      "name": {
-        "title": "Nombre visible",
-        "desc": "Se muestra solo en tus mensajes, comentarios y notas de este dispositivo."
-      },
       "avatar": {
-        "title": "Foto de perfil",
-        "desc": "Elige una imagen del dispositivo o de Unsplash; el avatar es local salvo que lo compartas con contactos."
+        "title": "Seleccionar o editar avatar",
+        "desc": "Abre la selección de avatar (archivo o Unsplash) o la edición de un avatar ya existente."
+      },
+      "avatarDelete": {
+        "title": "Eliminar avatar",
+        "desc": "Quita del perfil el avatar seleccionado actualmente."
       },
       "style": {
-        "title": "Estilo predeterminado",
-        "desc": "Elige el estilo de letra que se usa en tus mensajes, comentarios, notas, etc."
+        "title": "Cambiar estilo",
+        "desc": "Cambia cíclicamente el estilo predeterminado usado en tus propios contenidos."
+      },
+      "close": {
+        "title": "Cerrar",
+        "desc": "Cierra el diálogo y descarta los cambios no guardados."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Abre esta vista de ayuda."
+      },
+      "apply": {
+        "title": "Aplicar",
+        "desc": "Guarda los cambios del perfil."
+      },
+      "privacy": {
+        "title": "Privacidad y almacenamiento",
+        "desc": "El nombre y el avatar del perfil se guardan localmente. Si compartes tu perfil de forma explícita con contactos, esos datos se transmiten con cifrado de extremo a extremo."
       }
     }
   },

@@ -124,19 +124,35 @@
   },
   "profile": {
     "title": "My profile",
-    "intro": "Your profile is stored locally and used only for your own content. You can optionally share it with contacts.",
+    "intro": "This screen manages your profile on this device: choose or remove an avatar, adjust style, and save changes.",
     "items": {
-      "name": {
-        "title": "Display name",
-        "desc": "Shown only on your own messages, comments, and notes on this device."
-      },
       "avatar": {
-        "title": "Profile picture",
-        "desc": "Choose an image from your device or Unsplash; the avatar stays local unless you share it with contacts."
+        "title": "Select or edit avatar",
+        "desc": "Opens avatar selection (file or Unsplash) or editing for an existing avatar."
+      },
+      "avatarDelete": {
+        "title": "Remove avatar",
+        "desc": "Removes the currently selected avatar from your profile."
       },
       "style": {
-        "title": "Default style",
-        "desc": "Choose the font style used for your messages, comments, notes, and more."
+        "title": "Change style",
+        "desc": "Cycles the default style used for your own content."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "Closes the dialog and discards unsaved changes."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "Opens this help view."
+      },
+      "apply": {
+        "title": "Apply",
+        "desc": "Saves your profile changes."
+      },
+      "privacy": {
+        "title": "Privacy and storage",
+        "desc": "Profile name and avatar are stored locally. If you explicitly share your profile with contacts, shared profile data is transferred end-to-end encrypted."
       }
     }
   },

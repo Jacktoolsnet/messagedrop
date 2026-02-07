@@ -124,19 +124,35 @@
   },
   "profile": {
     "title": "Mon profil",
-    "intro": "Votre profil est stocké localement et utilisé uniquement pour vos propres contenus. Vous pouvez le partager avec vos contacts.",
+    "intro": "Cet écran permet de gérer votre profil sur cet appareil : choisir ou supprimer l’avatar, ajuster le style et enregistrer les modifications.",
     "items": {
-      "name": {
-        "title": "Nom affiché",
-        "desc": "Affiché uniquement sur vos messages, commentaires et notes de cet appareil."
-      },
       "avatar": {
-        "title": "Photo de profil",
-        "desc": "Choisissez une image de l'appareil ou d'Unsplash; l'avatar reste local sauf si vous le partagez avec des contacts."
+        "title": "Choisir ou modifier l’avatar",
+        "desc": "Ouvre la sélection d’avatar (fichier ou Unsplash) ou l’édition d’un avatar existant."
+      },
+      "avatarDelete": {
+        "title": "Supprimer l’avatar",
+        "desc": "Retire du profil l’avatar actuellement sélectionné."
       },
       "style": {
-        "title": "Style par défaut",
-        "desc": "Choisissez le style de police utilisé pour vos messages, commentaires, notes, etc."
+        "title": "Changer le style",
+        "desc": "Fait défiler le style par défaut utilisé pour vos contenus."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Ferme la boîte de dialogue et annule les modifications non enregistrées."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Ouvre cette vue d’aide."
+      },
+      "apply": {
+        "title": "Valider",
+        "desc": "Enregistre les modifications du profil."
+      },
+      "privacy": {
+        "title": "Confidentialité et stockage",
+        "desc": "Le nom et l’avatar du profil sont stockés localement. Si vous partagez explicitement votre profil avec des contacts, ces informations sont transmises avec chiffrement de bout en bout."
       }
     }
   },

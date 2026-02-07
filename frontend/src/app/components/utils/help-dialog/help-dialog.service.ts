@@ -225,6 +225,47 @@ const HELP_TOPICS = {
     introKey: 'common.intros.settings',
     items: ITEMS.settings
   },
+  profile: {
+    titleKey: 'profile.title',
+    introKey: 'profile.intro',
+    items: [
+      {
+        icon: 'photo_camera',
+        titleKey: 'profile.items.avatar.title',
+        descriptionKey: 'profile.items.avatar.desc'
+      },
+      {
+        icon: 'delete',
+        titleKey: 'profile.items.avatarDelete.title',
+        descriptionKey: 'profile.items.avatarDelete.desc'
+      },
+      {
+        icon: 'cycle',
+        titleKey: 'profile.items.style.title',
+        descriptionKey: 'profile.items.style.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'profile.items.close.title',
+        descriptionKey: 'profile.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'profile.items.help.title',
+        descriptionKey: 'profile.items.help.desc'
+      },
+      {
+        icon: 'check',
+        titleKey: 'profile.items.apply.title',
+        descriptionKey: 'profile.items.apply.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'profile.items.privacy.title',
+        descriptionKey: 'profile.items.privacy.desc'
+      }
+    ]
+  },
   user: (context: HelpOpenContext): HelpDialogData => {
     const items: HelpItem[] = [
       {

@@ -124,19 +124,35 @@
   },
   "profile": {
     "title": "Mein Profil",
-    "intro": "Dein Profil wird nur lokal gespeichert und nur für deine eigenen Inhalte verwendet. Du kannst es optional mit Kontakten teilen.",
+    "intro": "Hier pflegst du dein Profil auf diesem Gerät: Profilbild wählen oder entfernen, Stil anpassen und Änderungen speichern.",
     "items": {
-      "name": {
-        "title": "Anzeigename",
-        "desc": "Wird nur bei deinen eigenen Nachrichten, Kommentaren und Notizen auf diesem Gerät angezeigt."
-      },
       "avatar": {
-        "title": "Profilbild",
-        "desc": "Wähle ein Bild vom Gerät oder von Unsplash; der Avatar bleibt lokal, außer du teilst ihn mit Kontakten."
+        "title": "Profilbild auswählen oder bearbeiten",
+        "desc": "Öffnet die Auswahl für ein Profilbild (Datei oder Unsplash) oder die Bearbeitung eines bestehenden Bildes."
+      },
+      "avatarDelete": {
+        "title": "Profilbild entfernen",
+        "desc": "Löscht das aktuell gesetzte Profilbild aus dem Profil."
       },
       "style": {
-        "title": "Standardstil",
-        "desc": "Wähle den Schriftstil, der für deine Nachrichten, Kommentare, Notizen usw. verwendet wird."
+        "title": "Stil wechseln",
+        "desc": "Wechselt den Standardstil, der für deine eigenen Inhalte verwendet wird."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Schließt den Dialog und verwirft ungespeicherte Änderungen."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Öffnet diese Hilfeansicht."
+      },
+      "apply": {
+        "title": "Übernehmen",
+        "desc": "Speichert deine Änderungen am Profil."
+      },
+      "privacy": {
+        "title": "Datenschutz und Speicherung",
+        "desc": "Profilname und Profilbild werden lokal gespeichert. Wenn du dein Profil aktiv mit Kontakten teilst, werden die freigegebenen Profilinformationen Ende-zu-Ende verschlüsselt übertragen."
       }
     }
   },
