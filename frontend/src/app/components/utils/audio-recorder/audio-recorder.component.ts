@@ -392,8 +392,8 @@ export class AudioRecorderComponent {
         }
         this.analyser.getByteTimeDomainData(this.analyserData);
         let peak = 0;
-        for (let i = 0; i < this.analyserData.length; i += 1) {
-          const normalized = Math.abs((this.analyserData[i] - 128) / 128);
+        for (const sample of this.analyserData) {
+          const normalized = Math.abs((sample - 128) / 128);
           if (normalized > peak) {
             peak = normalized;
           }
@@ -427,9 +427,9 @@ export class AudioRecorderComponent {
       this.livePeaks.push(peak);
     }
     let maxPeak = 0;
-    for (let i = 0; i < this.livePeaks.length; i += 1) {
-      if (this.livePeaks[i] > maxPeak) {
-        maxPeak = this.livePeaks[i];
+    for (const peakValue of this.livePeaks) {
+      if (peakValue > maxPeak) {
+        maxPeak = peakValue;
       }
     }
     const safeMax = maxPeak > 0.001 ? maxPeak : 0.001;
@@ -444,9 +444,9 @@ export class AudioRecorderComponent {
     const blockSize = Math.max(1, Math.floor(this.peakSamples.length / bars));
     const waveform: number[] = [];
     let maxPeak = 0;
-    for (let i = 0; i < this.peakSamples.length; i += 1) {
-      if (this.peakSamples[i] > maxPeak) {
-        maxPeak = this.peakSamples[i];
+    for (const samplePeak of this.peakSamples) {
+      if (samplePeak > maxPeak) {
+        maxPeak = samplePeak;
       }
     }
     for (let i = 0; i < bars; i += 1) {
@@ -473,8 +473,8 @@ export class AudioRecorderComponent {
       const blockSize = Math.max(1, Math.floor(channel.length / bars));
       const waveform: number[] = [];
       let maxPeak = 0;
-      for (let i = 0; i < channel.length; i += 1) {
-        const value = Math.abs(channel[i] ?? 0);
+      for (const sample of channel) {
+        const value = Math.abs(sample ?? 0);
         if (value > maxPeak) {
           maxPeak = value;
         }
