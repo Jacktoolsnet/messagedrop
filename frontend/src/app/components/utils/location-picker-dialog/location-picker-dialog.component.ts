@@ -42,6 +42,12 @@ const searchMarkerIcon = leaflet.icon({
   iconAnchor: [16, 40]
 });
 
+const selectedSearchMarkerIcon = leaflet.icon({
+  iconUrl: 'assets/markers/selected-marker.svg',
+  iconSize: [32, 40],
+  iconAnchor: [16, 40]
+});
+
 @Component({
   selector: 'app-location-picker-dialog',
   standalone: true,
@@ -325,7 +331,7 @@ export class LocationPickerDialogComponent implements AfterViewInit, OnDestroy {
     }
     const currentMarker = this.searchMarkers.get(placeId);
     if (currentMarker) {
-      currentMarker.setIcon(markerIcons[this.data.markerType]);
+      currentMarker.setIcon(selectedSearchMarkerIcon);
       this.selectedPlaceId = placeId;
     }
   }
@@ -365,6 +371,7 @@ export class LocationPickerDialogComponent implements AfterViewInit, OnDestroy {
         plusCode: this.geolocationService.getPlusCode(lat, lng)
       };
       this.marker?.setLatLng(event.latlng);
+      this.marker?.setIcon(selectedSearchMarkerIcon);
       this.resetSearchMarkerIcons();
     });
 

@@ -10,6 +10,12 @@ const markerIcon = leaflet.icon({
   iconAnchor: [16, 40]
 });
 
+const selectedMarkerIcon = leaflet.icon({
+  iconUrl: 'assets/markers/selected-marker.svg',
+  iconSize: [32, 40],
+  iconAnchor: [16, 40]
+});
+
 @Component({
   selector: 'app-nominatim-results-map',
   standalone: true,
@@ -20,12 +26,15 @@ export class NominatimResultsMapComponent implements AfterViewInit, OnChanges, O
   @Input() places: NominatimPlace[] = [];
   @Input() initialCenter?: Location;
   @Input() initialZoom?: number;
+  @Input() selectedPlaceId: number | null = null;
   @Output() placeSelected = new EventEmitter<NominatimPlace>();
   @Output() viewChange = new EventEmitter<{ center: Location; zoom: number; bounds: BoundingBox }>();
 
   readonly mapId = `nominatim-results-map-${Math.random().toString(36).slice(2)}`;
   private map?: leaflet.Map;
   private markerLayer?: leaflet.LayerGroup;
+  private readonly markersByPlaceId = new Map<number, leaflet.Marker>();
+  private activeSelectedPlaceId?: number;
   private pendingBounds?: BoundingBox;
   private pendingView?: { center: Location; zoom?: number };
 
@@ -36,6 +45,9 @@ export class NominatimResultsMapComponent implements AfterViewInit, OnChanges, O
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['places'] && this.map) {
       this.updateMarkers();
+    }
+    if (changes['selectedPlaceId'] && this.map && !changes['selectedPlaceId'].firstChange) {
+      this.applySelection(this.selectedPlaceId ?? undefined);
     }
   }
 
@@ -80,6 +92,8 @@ export class NominatimResultsMapComponent implements AfterViewInit, OnChanges, O
   private updateMarkers(): void {
     if (!this.map || !this.markerLayer) return;
     this.markerLayer.clearLayers();
+    this.markersByPlaceId.clear();
+    this.activeSelectedPlaceId = undefined;
 
     this.places.forEach(place => {
       const latitude = Number(place.lat);
@@ -92,9 +106,38 @@ export class NominatimResultsMapComponent implements AfterViewInit, OnChanges, O
       if (label) {
         marker.bindTooltip(label, { direction: 'top', offset: [0, -6] });
       }
-      marker.on('click', () => this.placeSelected.emit(place));
+      marker.on('click', () => {
+        this.applySelection(place.place_id);
+        this.placeSelected.emit(place);
+      });
       marker.addTo(this.markerLayer!);
+      this.markersByPlaceId.set(place.place_id, marker);
     });
+
+    this.applySelection(this.selectedPlaceId ?? undefined);
+  }
+
+  private applySelection(placeId?: number): void {
+    if (this.activeSelectedPlaceId !== undefined) {
+      const previous = this.markersByPlaceId.get(this.activeSelectedPlaceId);
+      if (previous) {
+        previous.setIcon(markerIcon);
+      }
+    }
+
+    if (placeId === undefined) {
+      this.activeSelectedPlaceId = undefined;
+      return;
+    }
+
+    const next = this.markersByPlaceId.get(placeId);
+    if (!next) {
+      this.activeSelectedPlaceId = undefined;
+      return;
+    }
+
+    next.setIcon(selectedMarkerIcon);
+    this.activeSelectedPlaceId = placeId;
   }
 
   setView(center: Location, zoom?: number): void {

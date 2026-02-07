@@ -14,6 +14,7 @@
     </app-nominatim-results-list>
     } @else {
     <app-nominatim-results-map [places]="nominatimPlaces" [initialCenter]="mapView.center"
+        [selectedPlaceId]="selectedPlace?.place_id ?? null"
         [initialZoom]="mapView.zoom" (viewChange)="onViewChange($event)"
         (placeSelected)="openPlaceDialog($event)">
     </app-nominatim-results-map>
