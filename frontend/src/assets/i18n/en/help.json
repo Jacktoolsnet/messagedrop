@@ -90,27 +90,35 @@
   },
   "user": {
     "title": "My account",
-    "intro": "Manage your local account, backups, and security settings.",
+    "intro": "This screen manages your local account on this device: create backups, change your PIN, control security actions, and delete the account.",
     "items": {
-      "userId": {
-        "title": "User ID",
-        "desc": "Your unique identifier on this device."
-      },
       "backup": {
         "title": "Backup",
-        "desc": "Choose a save location, set and confirm a backup PIN, then store the file safely. You can restore it later via the import/restore option."
+        "desc": "Creates an encrypted backup of your local data. You choose the storage location and set a dedicated backup PIN."
       },
       "changePin": {
         "title": "Change PIN",
-        "desc": "Set a new PIN for this user on this device."
+        "desc": "Sets a new PIN for this user on this device. The PIN protects local access to the account."
       },
       "resetKeys": {
         "title": "Reset security keys",
-        "desc": "Generates new keys used to encrypt your messages and clears chat history."
+        "desc": "Generates new cryptographic keys for private communication. Existing private messages can no longer be decrypted afterwards."
       },
       "delete": {
         "title": "Delete user",
-        "desc": "Remove this user and all local data."
+        "desc": "Permanently removes this user including related data on this device and on the backend."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "Closes the dialog without taking further action."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "Opens this help view."
+      },
+      "privacy": {
+        "title": "Privacy and storage",
+        "desc": "Frontend: user data is stored locally in IndexedDB and additionally protected by PIN. Backend: only operational metadata is stored (for example user ID, public keys, status data). Private content is transferred end-to-end encrypted and stored encrypted wherever technically possible."
       }
     }
   },

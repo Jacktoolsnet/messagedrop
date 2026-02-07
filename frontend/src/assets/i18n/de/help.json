@@ -90,27 +90,35 @@
   },
   "user": {
     "title": "Mein Benutzer",
-    "intro": "Verwalte deinen lokalen Benutzer, Backups und Sicherheitseinstellungen.",
+    "intro": "In diesem Bereich verwaltest du deinen lokalen Benutzer auf diesem Gerät: Backup erstellen, PIN ändern, Sicherheitsfunktionen steuern und den Benutzer löschen.",
     "items": {
-      "userId": {
-        "title": "User-ID",
-        "desc": "Deine eindeutige Kennung auf diesem Gerät."
-      },
       "backup": {
         "title": "Daten sichern",
-        "desc": "Wähle einen Speicherort, lege eine Backup-PIN fest und bestätige sie, dann speichere die Datei. Du kannst sie später über die Importfunktion wiederherstellen."
+        "desc": "Erstellt ein verschlüsseltes Backup deiner lokalen Daten. Du wählst den Speicherort und vergibst dafür eine eigene Backup-PIN."
       },
       "changePin": {
         "title": "PIN ändern",
-        "desc": "Lege eine neue PIN für diesen Benutzer auf diesem Gerät fest."
+        "desc": "Setzt eine neue PIN für diesen Benutzer auf diesem Gerät. Die PIN schützt den lokalen Zugriff auf den Benutzer."
       },
       "resetKeys": {
         "title": "Sicherheits-Reset",
-        "desc": "Erzeugt neue Schlüssel für die Verschlüsselung deiner Nachrichten und löscht den Chatverlauf."
+        "desc": "Erzeugt neue Kryptoschlüssel für private Kommunikation. Vorhandene private Nachrichten können danach nicht mehr entschlüsselt werden."
       },
       "delete": {
         "title": "Benutzer löschen",
-        "desc": "Entfernt diesen Benutzer und alle lokalen Daten."
+        "desc": "Entfernt diesen Benutzer dauerhaft inklusive zugehöriger Daten auf diesem Gerät und auf dem Backend."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Schließt den Dialog ohne weitere Aktion."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Öffnet diese Hilfeansicht."
+      },
+      "privacy": {
+        "title": "Datenschutz und Speicherung",
+        "desc": "Frontend: Benutzerdaten werden lokal in IndexedDB gespeichert und zusätzlich durch PIN geschützt. Backend: Es werden nur für den Betrieb notwendige Metadaten gespeichert (z. B. User-ID, öffentliche Schlüssel, Statusdaten). Private Inhalte werden Ende-zu-Ende verschlüsselt übertragen und soweit technisch möglich verschlüsselt gespeichert."
       }
     }
   },

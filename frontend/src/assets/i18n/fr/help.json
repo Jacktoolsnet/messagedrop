@@ -26,6 +26,18 @@
         "title": "Barre d’actions",
         "desc": "Utilisez la barre d’actions pour fermer, valider ou confirmer."
       },
+      "cancel": {
+        "title": "Annuler",
+        "desc": "Ferme la boîte de dialogue sans enregistrer les modifications."
+      },
+      "apply": {
+        "title": "Valider",
+        "desc": "Ferme la boîte de dialogue et enregistre les modifications."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Ouvre la boîte de dialogue d’aide."
+      },
       "sort": {
         "title": "Tri",
         "desc": "Faites glisser les éléments pour changer l'ordre."
@@ -78,27 +90,35 @@
   },
   "user": {
     "title": "Mon utilisateur",
-    "intro": "Gérez votre utilisateur local, les sauvegardes et les paramètres de sécurité.",
+    "intro": "Cet écran permet de gérer votre utilisateur local sur cet appareil : créer des sauvegardes, changer le PIN, gérer les actions de sécurité et supprimer l’utilisateur.",
     "items": {
-      "userId": {
-        "title": "ID utilisateur",
-        "desc": "Votre identifiant unique sur cet appareil."
-      },
       "backup": {
         "title": "Sauvegarde",
-        "desc": "Choisissez un emplacement, définissez et confirmez un PIN de sauvegarde, puis enregistrez le fichier. Vous pourrez le restaurer plus tard via la fonction d'import."
+        "desc": "Crée une sauvegarde chiffrée de vos données locales. Vous choisissez l’emplacement et définissez un PIN de sauvegarde dédié."
       },
       "changePin": {
         "title": "Modifier le PIN",
-        "desc": "Définissez un nouveau PIN pour cet utilisateur sur cet appareil."
+        "desc": "Définit un nouveau PIN pour cet utilisateur sur cet appareil. Le PIN protège l’accès local au compte."
       },
       "resetKeys": {
         "title": "Réinitialiser les clés de sécurité",
-        "desc": "Régénère les clés utilisées pour chiffrer vos messages et efface l'historique des discussions."
+        "desc": "Génère de nouvelles clés cryptographiques pour la communication privée. Les anciens messages privés ne pourront plus être déchiffrés ensuite."
       },
       "delete": {
         "title": "Supprimer l'utilisateur",
-        "desc": "Supprime cet utilisateur et toutes les données locales."
+        "desc": "Supprime définitivement cet utilisateur, y compris les données associées sur cet appareil et sur le backend."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Ferme la boîte de dialogue sans autre action."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Ouvre cette vue d’aide."
+      },
+      "privacy": {
+        "title": "Confidentialité et stockage",
+        "desc": "Frontend : les données utilisateur sont stockées localement dans IndexedDB et en plus protégées par PIN. Backend : seules les métadonnées nécessaires au fonctionnement sont conservées (par exemple ID utilisateur, clés publiques, états). Le contenu privé est transmis avec chiffrement de bout en bout et stocké chiffré dès que techniquement possible."
       }
     }
   },

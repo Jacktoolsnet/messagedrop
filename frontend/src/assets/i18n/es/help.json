@@ -26,6 +26,18 @@
         "title": "Barra de acciones",
         "desc": "Usa la barra de acciones para cerrar, aplicar o confirmar."
       },
+      "cancel": {
+        "title": "Cancelar",
+        "desc": "Cierra el diálogo sin guardar cambios."
+      },
+      "apply": {
+        "title": "Aplicar",
+        "desc": "Cierra el diálogo y guarda los cambios."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Abre el diálogo de ayuda."
+      },
       "sort": {
         "title": "Orden",
         "desc": "Arrastra los elementos para cambiar el orden."
@@ -78,27 +90,35 @@
   },
   "user": {
     "title": "Mi usuario",
-    "intro": "Gestiona tu usuario local, copias de seguridad y ajustes de seguridad.",
+    "intro": "En esta pantalla gestionas tu usuario local en este dispositivo: crear copias de seguridad, cambiar el PIN, controlar acciones de seguridad y eliminar el usuario.",
     "items": {
-      "userId": {
-        "title": "ID de usuario",
-        "desc": "Tu identificador único en este dispositivo."
-      },
       "backup": {
         "title": "Copia de seguridad",
-        "desc": "Elige una ubicación, define y confirma un PIN de copia, luego guarda el archivo. Puedes restaurarlo más adelante mediante la función de importar."
+        "desc": "Crea una copia de seguridad cifrada de tus datos locales. Tú eliges dónde guardarla y defines un PIN de copia específico."
       },
       "changePin": {
         "title": "Cambiar PIN",
-        "desc": "Establece un nuevo PIN para este usuario en este dispositivo."
+        "desc": "Define un nuevo PIN para este usuario en este dispositivo. El PIN protege el acceso local al usuario."
       },
       "resetKeys": {
         "title": "Restablecer claves de seguridad",
-        "desc": "Regenera las claves que se usan para cifrar tus mensajes y borra el historial del chat."
+        "desc": "Genera nuevas claves criptográficas para la comunicación privada. Los mensajes privados anteriores ya no podrán descifrarse después."
       },
       "delete": {
         "title": "Eliminar usuario",
-        "desc": "Elimina este usuario y todos los datos locales."
+        "desc": "Elimina de forma permanente este usuario, incluidos los datos asociados en este dispositivo y en el backend."
+      },
+      "close": {
+        "title": "Cerrar",
+        "desc": "Cierra el diálogo sin realizar más acciones."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Abre esta vista de ayuda."
+      },
+      "privacy": {
+        "title": "Privacidad y almacenamiento",
+        "desc": "Frontend: los datos del usuario se guardan localmente en IndexedDB y además se protegen con PIN. Backend: solo se guardan metadatos necesarios para operar (por ejemplo ID de usuario, claves públicas, estado). El contenido privado se transmite con cifrado de extremo a extremo y se guarda cifrado siempre que sea técnicamente posible."
       }
     }
   },

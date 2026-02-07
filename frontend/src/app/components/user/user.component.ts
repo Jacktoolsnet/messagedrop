@@ -2,13 +2,13 @@
 import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarRef, SimpleSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
-import { HelpDialogComponent, HelpDialogData, HelpItem } from '../utils/help-dialog/help-dialog.component';
+import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 
 @Component({
@@ -30,8 +30,8 @@ export class UserComponent {
   private snackBarRef?: MatSnackBarRef<SimpleSnackBar>;
   public connectHint = '';
   readonly userService = inject(UserService);
+  readonly help = inject(HelpDialogService);
   private readonly dialogRef = inject(MatDialogRef<UserComponent>);
-  private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly translation = inject(TranslationHelperService);
 
@@ -48,56 +48,7 @@ export class UserComponent {
   }
 
   public openHelp(): void {
-    const items: HelpItem[] = [
-      {
-        icon: 'badge',
-        titleKey: 'user.items.userId.title',
-        descriptionKey: 'user.items.userId.desc'
-      },
-      {
-        icon: 'download',
-        titleKey: 'user.items.backup.title',
-        descriptionKey: 'user.items.backup.desc'
-      },
-      {
-        icon: 'lock_reset',
-        titleKey: 'user.items.changePin.title',
-        descriptionKey: 'user.items.changePin.desc'
-      }
-    ];
-
-    if (this.userService.hasJwt()) {
-      items.push({
-        icon: 'security',
-        titleKey: 'user.items.resetKeys.title',
-        descriptionKey: 'user.items.resetKeys.desc'
-      });
-    }
-
-    items.push({
-      icon: 'delete',
-      titleKey: 'user.items.delete.title',
-      descriptionKey: 'user.items.delete.desc'
-    });
-
-    const data: HelpDialogData = {
-      titleKey: 'user.title',
-      introKey: 'user.intro',
-      items
-    };
-
-    this.dialog.open(HelpDialogComponent, {
-      data,
-      minWidth: 'min(520px, 95vw)',
-      maxWidth: '95vw',
-      width: 'min(680px, 95vw)',
-      maxHeight: '90vh',
-      height: 'auto',
-      hasBackdrop: true,
-      backdropClass: 'dialog-backdrop',
-      disableClose: false,
-      autoFocus: false
-    });
+    this.help.open('user', { hasJwt: this.userService.hasJwt() });
   }
 
 }

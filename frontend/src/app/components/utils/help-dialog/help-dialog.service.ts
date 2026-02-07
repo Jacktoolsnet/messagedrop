@@ -32,6 +32,12 @@ const STANDARD_ACTIONS: HelpItem[] = [
   }
 ];
 
+export interface HelpOpenContext {
+  hasJwt?: boolean;
+}
+
+type HelpTopicDefinition = HelpDialogData | ((context: HelpOpenContext) => HelpDialogData);
+
 const ITEMS = {
   listBasic: [
     {
@@ -218,6 +224,57 @@ const HELP_TOPICS = {
     titleKey: 'appSettings.title',
     introKey: 'common.intros.settings',
     items: ITEMS.settings
+  },
+  user: (context: HelpOpenContext): HelpDialogData => {
+    const items: HelpItem[] = [
+      {
+        icon: 'download',
+        titleKey: 'user.items.backup.title',
+        descriptionKey: 'user.items.backup.desc'
+      },
+      {
+        icon: 'lock_reset',
+        titleKey: 'user.items.changePin.title',
+        descriptionKey: 'user.items.changePin.desc'
+      }
+    ];
+
+    if (context.hasJwt) {
+      items.push({
+        icon: 'security',
+        titleKey: 'user.items.resetKeys.title',
+        descriptionKey: 'user.items.resetKeys.desc'
+      });
+    }
+
+    items.push(
+      {
+        icon: 'delete',
+        titleKey: 'user.items.delete.title',
+        descriptionKey: 'user.items.delete.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'user.items.close.title',
+        descriptionKey: 'user.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'user.items.help.title',
+        descriptionKey: 'user.items.help.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'user.items.privacy.title',
+        descriptionKey: 'user.items.privacy.desc'
+      }
+    );
+
+    return {
+      titleKey: 'user.title',
+      introKey: 'user.intro',
+      items
+    };
   },
   contactChatroom: {
     titleKey: 'contactChatroom.title',
@@ -489,7 +546,7 @@ const HELP_TOPICS = {
     introKey: 'common.intros.info',
     items: ITEMS.info
   }
-} as const satisfies Record<string, HelpDialogData>;
+} as const satisfies Record<string, HelpTopicDefinition>;
 
 export type HelpTopic = keyof typeof HELP_TOPICS;
 
@@ -497,8 +554,9 @@ export type HelpTopic = keyof typeof HELP_TOPICS;
 export class HelpDialogService {
   private readonly dialog = inject(MatDialog);
 
-  open(topic: HelpTopic): void {
-    const data = HELP_TOPICS[topic];
+  open(topic: HelpTopic, context: HelpOpenContext = {}): void {
+    const topicConfig = HELP_TOPICS[topic];
+    const data = typeof topicConfig === 'function' ? topicConfig(context) : topicConfig;
     this.dialog.open(HelpDialogComponent, {
       data,
       ...DEFAULT_HELP_DIALOG_CONFIG
