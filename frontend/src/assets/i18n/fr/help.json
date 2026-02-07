@@ -318,7 +318,82 @@
     "title": "Messages"
   },
   "myMessageList": {
-    "title": "Mes messages publics"
+    "title": "Mes messages publics",
+    "intro": "Cette vue permet de gérer vos publications et commentaires publics. Vous pouvez modifier, supprimer, consulter les détails de modération et ouvrir les informations de dossier DSA.",
+    "items": {
+      "add": {
+        "title": "Créer un message ou un commentaire",
+        "desc": "Cette fonction crée une nouvelle publication publique ou un commentaire dans le fil actuel."
+      },
+      "comments": {
+        "title": "Ouvrir les commentaires",
+        "desc": "Cette fonction ouvre le fil de commentaires d'une publication."
+      },
+      "like": {
+        "title": "Ajouter un like",
+        "desc": "Cette fonction ajoute une réaction positive (pouce vers le haut) à une publication ou un commentaire. Un nouveau clic retire la réaction."
+      },
+      "unlike": {
+        "title": "Ajouter un unlike",
+        "desc": "Cette fonction ajoute une réaction négative (pouce vers le bas) à une publication ou un commentaire. Un nouveau clic retire la réaction."
+      },
+      "edit": {
+        "title": "Modifier la publication",
+        "desc": "Cette fonction modifie votre propre publication ou commentaire."
+      },
+      "delete": {
+        "title": "Supprimer la publication",
+        "desc": "Cette fonction supprime manuellement et immédiatement votre publication ou commentaire."
+      },
+      "moderation": {
+        "title": "Voir le statut de modération",
+        "desc": "Cette fonction affiche le statut de modération (publié, en examen, masqué) avec les détails de décision."
+      },
+      "retention": {
+        "title": "Règles de suppression automatique",
+        "desc": "Les publications publiques sont créées avec une durée de vie de 30 jours. Les entrées expirées sont nettoyées automatiquement côté serveur à intervalles réguliers."
+      },
+      "dsa": {
+        "title": "Statut de dossier DSA",
+        "desc": "Si une procédure DSA existe pour une publication, vous pouvez consulter son statut (par exemple reçu, en examen, décidé) et suivre son évolution."
+      },
+      "more": {
+        "title": "Ouvrir plus d'actions",
+        "desc": "Cette fonction ouvre le sous-menu avec des actions supplémentaires pour la publication ou le commentaire sélectionné."
+      },
+      "translate": {
+        "title": "Traduire le texte",
+        "desc": "Cette fonction traduit le texte du message dans la langue configurée dans l'application."
+      },
+      "flyTo": {
+        "title": "Aller sur la carte",
+        "desc": "Cette fonction centre la carte de l'application directement sur la position du message."
+      },
+      "navigate": {
+        "title": "Démarrer la navigation",
+        "desc": "Cette fonction ouvre une navigation externe vers la position du message."
+      },
+      "profile": {
+        "title": "Ouvrir le profil de messages",
+        "desc": "Cette fonction ouvre le profil public de messages de l'auteur quand la publication ne vous appartient pas."
+      },
+      "report": {
+        "title": "Signaler le contenu",
+        "desc": "Cette fonction signale les publications d'autres personnes dans le processus DSA si vous suspectez une violation."
+      },
+      "close": {
+        "title": "Fermer / Retour",
+        "desc": "Cette fonction quitte le niveau actuel ou ferme la vue."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "privacy": {
+        "title": "Confidentialité et modération",
+        "desc": "Le texte public est contrôlé côté serveur avant publication et mise à jour via détection automatique de motifs (par exemple e-mail, URL, UUID, numéros de téléphone) et en plus via la modération OpenAI. Les détections peuvent entraîner un masquage ou un examen manuel. Les signalements DSA créent un processus de dossier avec jeton de statut ; seules les métadonnées nécessaires à la modération et au traitement légal sont traitées."
+      }
+    }
   },
   "messageProfile": {
     "title": "Profil du message"

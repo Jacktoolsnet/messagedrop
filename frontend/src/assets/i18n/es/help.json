@@ -318,7 +318,82 @@
     "title": "Mensajes"
   },
   "myMessageList": {
-    "title": "Mis mensajes públicos"
+    "title": "Mis mensajes públicos",
+    "intro": "Esta vista gestiona tus publicaciones y comentarios públicos. Puedes editar, eliminar, revisar detalles de moderación y abrir información de casos DSA.",
+    "items": {
+      "add": {
+        "title": "Crear mensaje o comentario",
+        "desc": "Con esta función creas una nueva publicación pública o un comentario en el hilo actual."
+      },
+      "comments": {
+        "title": "Abrir comentarios",
+        "desc": "Con esta función abres el hilo de comentarios de una publicación."
+      },
+      "like": {
+        "title": "Dar like",
+        "desc": "Con esta función dejas una reacción positiva (pulgar arriba) en una publicación o comentario. Al pulsar de nuevo, se elimina la reacción."
+      },
+      "unlike": {
+        "title": "Dar unlike",
+        "desc": "Con esta función dejas una reacción negativa (pulgar abajo) en una publicación o comentario. Al pulsar de nuevo, se elimina la reacción."
+      },
+      "edit": {
+        "title": "Editar publicación",
+        "desc": "Con esta función editas tu propia publicación o comentario."
+      },
+      "delete": {
+        "title": "Eliminar publicación",
+        "desc": "Con esta función eliminas tu publicación o comentario de forma manual e inmediata."
+      },
+      "moderation": {
+        "title": "Ver estado de moderación",
+        "desc": "Con esta función ves el estado de moderación (publicado, en revisión, oculto) con detalles de la decisión."
+      },
+      "retention": {
+        "title": "Reglas de borrado automático",
+        "desc": "Las publicaciones públicas se crean con una vida útil de 30 días. Las entradas vencidas se limpian automáticamente en el servidor de forma periódica."
+      },
+      "dsa": {
+        "title": "Estado de caso DSA",
+        "desc": "Si existe un proceso DSA para una publicación, puedes ver su estado (por ejemplo recibido, en revisión, decidido) y hacer seguimiento."
+      },
+      "more": {
+        "title": "Abrir más acciones",
+        "desc": "Con esta función abres el submenú con acciones adicionales para la publicación o comentario seleccionado."
+      },
+      "translate": {
+        "title": "Traducir texto",
+        "desc": "Con esta función traduces el texto del mensaje al idioma configurado en la app."
+      },
+      "flyTo": {
+        "title": "Ir al mapa",
+        "desc": "Con esta función centras el mapa de la app directamente en la ubicación del mensaje."
+      },
+      "navigate": {
+        "title": "Iniciar navegación",
+        "desc": "Con esta función abres una navegación externa hacia la ubicación del mensaje."
+      },
+      "profile": {
+        "title": "Abrir perfil de mensajes",
+        "desc": "Con esta función abres el perfil público de mensajes de la persona autora cuando la publicación no es tuya."
+      },
+      "report": {
+        "title": "Reportar contenido",
+        "desc": "Con esta función reportas publicaciones de otras personas en el proceso DSA si sospechas una infracción."
+      },
+      "close": {
+        "title": "Cerrar / Volver",
+        "desc": "Con esta función sales del nivel actual o cierras la vista."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "privacy": {
+        "title": "Privacidad y moderación",
+        "desc": "El texto público se revisa en el servidor antes de publicar o actualizar mediante detección automática de patrones (por ejemplo correo, URL, UUID, teléfonos) y además con moderación de OpenAI. Las coincidencias pueden causar ocultación o revisión manual. Los reportes DSA crean un proceso de caso con token de estado; solo se procesan metadatos necesarios para moderación y proceso legal."
+      }
+    }
   },
   "messageProfile": {
     "title": "Perfil del mensaje"

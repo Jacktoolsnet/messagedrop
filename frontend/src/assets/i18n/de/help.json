@@ -318,7 +318,82 @@
     "title": "Nachrichten"
   },
   "myMessageList": {
-    "title": "Meine öffentlichen Nachrichten"
+    "title": "Meine öffentlichen Nachrichten",
+    "intro": "Hier verwaltest du deine veröffentlichten Beiträge und Kommentare. Du kannst Inhalte bearbeiten, löschen, moderationsbezogene Infos einsehen und auf DSA-Fälle zugreifen.",
+    "items": {
+      "add": {
+        "title": "Neue Nachricht oder Kommentar erstellen",
+        "desc": "Mit dieser Funktion erstellst du einen neuen öffentlichen Beitrag oder einen Kommentar im aktuellen Thread."
+      },
+      "comments": {
+        "title": "Kommentare öffnen",
+        "desc": "Mit dieser Funktion öffnest du den Kommentarverlauf zu einem Beitrag."
+      },
+      "like": {
+        "title": "Like setzen",
+        "desc": "Mit dieser Funktion gibst du einem Beitrag oder Kommentar ein positives Feedback (Daumen hoch). Ein erneuter Klick nimmt die Reaktion wieder zurück."
+      },
+      "unlike": {
+        "title": "Unlike setzen",
+        "desc": "Mit dieser Funktion gibst du einem Beitrag oder Kommentar ein negatives Feedback (Daumen runter). Ein erneuter Klick nimmt die Reaktion wieder zurück."
+      },
+      "edit": {
+        "title": "Beitrag bearbeiten",
+        "desc": "Mit dieser Funktion bearbeitest du deinen eigenen Beitrag oder Kommentar."
+      },
+      "delete": {
+        "title": "Beitrag löschen",
+        "desc": "Mit dieser Funktion löschst du deinen Beitrag oder Kommentar manuell und sofort."
+      },
+      "moderation": {
+        "title": "Moderationsstatus einsehen",
+        "desc": "Mit dieser Funktion siehst du den aktuellen Moderationsstatus (veröffentlicht, Prüfung, ausgeblendet) inklusive Entscheidungsdetails."
+      },
+      "retention": {
+        "title": "Automatische Löschregeln",
+        "desc": "Öffentliche Beiträge erhalten beim Erstellen eine Laufzeit von 30 Tagen. Abgelaufene Einträge werden serverseitig regelmäßig automatisiert bereinigt."
+      },
+      "dsa": {
+        "title": "DSA-Fallstatus",
+        "desc": "Wenn ein DSA-Verfahren für einen Beitrag existiert, kannst du den Fallstatus einsehen (z. B. eingegangen, in Prüfung, entschieden) und den weiteren Prozess nachverfolgen."
+      },
+      "more": {
+        "title": "Weitere Aktionen öffnen",
+        "desc": "Mit dieser Funktion öffnest du das Untermenü mit zusätzlichen Aktionen für den ausgewählten Beitrag oder Kommentar."
+      },
+      "translate": {
+        "title": "Text übersetzen",
+        "desc": "Mit dieser Funktion lässt du den Nachrichtentext in deine eingestellte App-Sprache übersetzen."
+      },
+      "flyTo": {
+        "title": "Auf Karte anspringen",
+        "desc": "Mit dieser Funktion zentrierst du die App-Karte direkt auf den Ort des Beitrags."
+      },
+      "navigate": {
+        "title": "Navigation starten",
+        "desc": "Mit dieser Funktion öffnest du externe Navigation zur Position des Beitrags."
+      },
+      "profile": {
+        "title": "Nachrichtenprofil öffnen",
+        "desc": "Mit dieser Funktion öffnest du bei fremden Beiträgen das öffentliche Nachrichtenprofil der verfassenden Person."
+      },
+      "report": {
+        "title": "Inhalt melden",
+        "desc": "Mit dieser Funktion meldest du fremde Beiträge im DSA-Prozess, wenn du einen Verstoß vermutest."
+      },
+      "close": {
+        "title": "Schließen / Zurück",
+        "desc": "Mit dieser Funktion verlässt du die aktuelle Ebene oder schließt die Ansicht."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "privacy": {
+        "title": "Datenschutz und Moderation",
+        "desc": "Öffentliche Texte werden serverseitig vor Veröffentlichung und Bearbeitung automatisiert geprüft: durch Mustererkennung (z. B. E-Mail, URL, UUID, Telefonnummern) und zusätzlich über die OpenAI-Moderation. Treffer können zur Ausblendung oder manuellen Prüfung führen. DSA-Meldungen erzeugen einen Fallprozess mit Status-Token; dabei werden nur für Moderation und Rechtsprozess notwendige Metadaten verarbeitet."
+      }
+    }
   },
   "messageProfile": {
     "title": "Nachrichtenprofil"

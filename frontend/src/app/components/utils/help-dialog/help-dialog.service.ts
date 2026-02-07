@@ -531,8 +531,99 @@ const HELP_TOPICS = {
   },
   myMessageList: {
     titleKey: 'myMessageList.title',
-    introKey: 'common.intros.list',
-    items: ITEMS.listBasic
+    introKey: 'myMessageList.intro',
+    items: [
+      {
+        icon: 'chat_add_on',
+        titleKey: 'myMessageList.items.add.title',
+        descriptionKey: 'myMessageList.items.add.desc'
+      },
+      {
+        icon: 'forum',
+        titleKey: 'myMessageList.items.comments.title',
+        descriptionKey: 'myMessageList.items.comments.desc'
+      },
+      {
+        icon: 'thumb_up',
+        titleKey: 'myMessageList.items.like.title',
+        descriptionKey: 'myMessageList.items.like.desc'
+      },
+      {
+        icon: 'thumb_down',
+        titleKey: 'myMessageList.items.unlike.title',
+        descriptionKey: 'myMessageList.items.unlike.desc'
+      },
+      {
+        icon: 'edit',
+        titleKey: 'myMessageList.items.edit.title',
+        descriptionKey: 'myMessageList.items.edit.desc'
+      },
+      {
+        icon: 'delete_forever',
+        titleKey: 'myMessageList.items.delete.title',
+        descriptionKey: 'myMessageList.items.delete.desc'
+      },
+      {
+        icon: 'public',
+        titleKey: 'myMessageList.items.moderation.title',
+        descriptionKey: 'myMessageList.items.moderation.desc'
+      },
+      {
+        icon: 'auto_delete',
+        titleKey: 'myMessageList.items.retention.title',
+        descriptionKey: 'myMessageList.items.retention.desc'
+      },
+      {
+        icon: 'flag',
+        titleKey: 'myMessageList.items.dsa.title',
+        descriptionKey: 'myMessageList.items.dsa.desc'
+      },
+      {
+        icon: 'more_horiz',
+        titleKey: 'myMessageList.items.more.title',
+        descriptionKey: 'myMessageList.items.more.desc'
+      },
+      {
+        icon: 'translate',
+        titleKey: 'myMessageList.items.translate.title',
+        descriptionKey: 'myMessageList.items.translate.desc'
+      },
+      {
+        icon: 'place',
+        titleKey: 'myMessageList.items.flyTo.title',
+        descriptionKey: 'myMessageList.items.flyTo.desc'
+      },
+      {
+        icon: 'assistant_direction',
+        titleKey: 'myMessageList.items.navigate.title',
+        descriptionKey: 'myMessageList.items.navigate.desc'
+      },
+      {
+        icon: 'settings_account_box',
+        titleKey: 'myMessageList.items.profile.title',
+        descriptionKey: 'myMessageList.items.profile.desc'
+      },
+      {
+        icon: 'flag',
+        titleKey: 'myMessageList.items.report.title',
+        descriptionKey: 'myMessageList.items.report.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'myMessageList.items.close.title',
+        descriptionKey: 'myMessageList.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'myMessageList.items.help.title',
+        descriptionKey: 'myMessageList.items.help.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'myMessageList.items.privacy.title',
+        descriptionKey: 'myMessageList.items.privacy.desc'
+      }
+    ]
   },
   messageProfile: {
     titleKey: 'messageProfile.title',

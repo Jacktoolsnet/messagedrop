@@ -318,7 +318,82 @@
     "title": "Messages"
   },
   "myMessageList": {
-    "title": "My public messages"
+    "title": "My public messages",
+    "intro": "This view manages your published posts and comments. You can edit, delete, review moderation details, and open DSA case information.",
+    "items": {
+      "add": {
+        "title": "Create message or comment",
+        "desc": "This action creates a new public post or a comment in the current thread."
+      },
+      "comments": {
+        "title": "Open comments",
+        "desc": "This action opens the comment thread of a post."
+      },
+      "like": {
+        "title": "Set like",
+        "desc": "This action adds positive feedback (thumbs up) to a post or comment. Clicking again removes your reaction."
+      },
+      "unlike": {
+        "title": "Set unlike",
+        "desc": "This action adds negative feedback (thumbs down) to a post or comment. Clicking again removes your reaction."
+      },
+      "edit": {
+        "title": "Edit post",
+        "desc": "This action edits your own post or comment."
+      },
+      "delete": {
+        "title": "Delete post",
+        "desc": "This action deletes your post or comment manually and immediately."
+      },
+      "moderation": {
+        "title": "View moderation status",
+        "desc": "This action shows moderation status (published, review, hidden) including decision details."
+      },
+      "retention": {
+        "title": "Automatic deletion rules",
+        "desc": "Public posts start with a 30-day lifetime. Expired entries are cleaned up automatically on the server at regular intervals."
+      },
+      "dsa": {
+        "title": "DSA case status",
+        "desc": "If a DSA procedure exists for a post, you can view case status (for example received, under review, decided) and follow up."
+      },
+      "more": {
+        "title": "Open more actions",
+        "desc": "This action opens the submenu with additional actions for the selected post or comment."
+      },
+      "translate": {
+        "title": "Translate text",
+        "desc": "This action translates the message text into your configured app language."
+      },
+      "flyTo": {
+        "title": "Jump on map",
+        "desc": "This action centers the app map directly on the message location."
+      },
+      "navigate": {
+        "title": "Start navigation",
+        "desc": "This action opens external navigation to the message location."
+      },
+      "profile": {
+        "title": "Open message profile",
+        "desc": "This action opens the public message profile of the author for messages from other users."
+      },
+      "report": {
+        "title": "Report content",
+        "desc": "This action reports messages from other users through the DSA process if you suspect a violation."
+      },
+      "close": {
+        "title": "Close / Back",
+        "desc": "This action leaves the current level or closes the view."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "privacy": {
+        "title": "Privacy and moderation",
+        "desc": "Public text is checked server-side before publish/update by automated pattern detection (for example email, URL, UUID, phone numbers) and additionally by OpenAI moderation. Matches can lead to hiding or manual review. DSA reports create a case process with status tokens; only metadata required for moderation and legal processing is handled."
+      }
+    }
   },
   "messageProfile": {
     "title": "Message profile"
