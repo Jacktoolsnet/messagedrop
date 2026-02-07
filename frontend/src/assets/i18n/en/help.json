@@ -1066,6 +1066,48 @@
   "experienceSearch": {
     "title": "Experience search"
   },
+  "myExperienceList": {
+    "title": "My experiences",
+    "intro": "This view shows the experiences you saved from experience search. You can open details, jump to map positions, open tiles, and continue in external maps or on Viator.",
+    "items": {
+      "details": {
+        "title": "Open details",
+        "desc": "This action opens the selected experience in the detail dialog."
+      },
+      "remove": {
+        "title": "Remove bookmark",
+        "desc": "This action removes the selected experience from your saved list."
+      },
+      "flyTo": {
+        "title": "Jump on map",
+        "desc": "This action centers the app map on the destination of the selected experience."
+      },
+      "tiles": {
+        "title": "Open tiles",
+        "desc": "This action opens the tile list for the selected experience."
+      },
+      "openMaps": {
+        "title": "Open in Google Maps",
+        "desc": "This action opens external maps for the selected destination."
+      },
+      "openProvider": {
+        "title": "Open on Viator",
+        "desc": "This action opens the selected experience page on Viator."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "This action closes the dialog."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "privacy": {
+        "title": "Privacy and processing",
+        "desc": "Saved experiences are linked to your account and loaded through the backend. Opening Google Maps sends destination coordinates to Google. Opening Viator sends a request to Viator and may process usage data there."
+      }
+    }
+  },
   "importMultimedia": {
     "title": "Import media",
     "intro": "This dialog lets you insert external content by URL, for example from YouTube, Spotify, TikTok, or Pinterest.",

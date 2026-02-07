@@ -1066,6 +1066,48 @@
   "experienceSearch": {
     "title": "Erlebnissuche"
   },
+  "myExperienceList": {
+    "title": "Meine Erlebnisse",
+    "intro": "Hier siehst du die Erlebnisse, die du in der Erlebnissuche gespeichert hast. Du kannst Details öffnen, auf der Karte anspringen, Kacheln öffnen und externe Karten oder Viator verwenden.",
+    "items": {
+      "details": {
+        "title": "Details öffnen",
+        "desc": "Mit dieser Funktion öffnest du das ausgewählte Erlebnis im Detaildialog."
+      },
+      "remove": {
+        "title": "Lesezeichen entfernen",
+        "desc": "Mit dieser Funktion entfernst du das ausgewählte Erlebnis aus deiner Merkliste."
+      },
+      "flyTo": {
+        "title": "Auf Karte anspringen",
+        "desc": "Mit dieser Funktion zentrierst du die App-Karte auf das Ziel des ausgewählten Erlebnisses."
+      },
+      "tiles": {
+        "title": "Kacheln öffnen",
+        "desc": "Mit dieser Funktion öffnest du die Kachelliste für das ausgewählte Erlebnis."
+      },
+      "openMaps": {
+        "title": "In Google Maps öffnen",
+        "desc": "Mit dieser Funktion öffnest du eine externe Kartenansicht für das ausgewählte Ziel."
+      },
+      "openProvider": {
+        "title": "Auf Viator öffnen",
+        "desc": "Mit dieser Funktion öffnest du die Angebotsseite des ausgewählten Erlebnisses bei Viator."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Mit dieser Funktion schließt du den Dialog."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "privacy": {
+        "title": "Datenschutz und Verarbeitung",
+        "desc": "Gespeicherte Erlebnisse sind deinem Konto zugeordnet und werden über das Backend geladen. Beim Öffnen in Google Maps werden Zielkoordinaten an Google übertragen. Beim Öffnen auf Viator wird eine Anfrage an Viator gesendet und dort können Nutzungsdaten verarbeitet werden."
+      }
+    }
+  },
   "importMultimedia": {
     "title": "Medien importieren",
     "intro": "In diesem Dialog fügst du externe Inhalte über eine URL ein, zum Beispiel von YouTube, Spotify, TikTok oder Pinterest.",

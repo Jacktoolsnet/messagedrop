@@ -1066,6 +1066,48 @@
   "experienceSearch": {
     "title": "Búsqueda de experiencias"
   },
+  "myExperienceList": {
+    "title": "Mis experiencias",
+    "intro": "Aquí ves las experiencias que guardaste desde la búsqueda de experiencias. Puedes abrir detalles, saltar al mapa, abrir mosaicos y continuar en mapas externos o en Viator.",
+    "items": {
+      "details": {
+        "title": "Abrir detalles",
+        "desc": "Con esta función abres la experiencia seleccionada en el diálogo de detalle."
+      },
+      "remove": {
+        "title": "Quitar marcador",
+        "desc": "Con esta función quitas la experiencia seleccionada de tu lista guardada."
+      },
+      "flyTo": {
+        "title": "Saltar en el mapa",
+        "desc": "Con esta función centras el mapa de la app en el destino de la experiencia seleccionada."
+      },
+      "tiles": {
+        "title": "Abrir mosaicos",
+        "desc": "Con esta función abres la lista de mosaicos de la experiencia seleccionada."
+      },
+      "openMaps": {
+        "title": "Abrir en Google Maps",
+        "desc": "Con esta función abres un mapa externo para el destino seleccionado."
+      },
+      "openProvider": {
+        "title": "Abrir en Viator",
+        "desc": "Con esta función abres la página de la experiencia seleccionada en Viator."
+      },
+      "close": {
+        "title": "Cerrar",
+        "desc": "Con esta función cierras el diálogo."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "privacy": {
+        "title": "Privacidad y procesamiento",
+        "desc": "Las experiencias guardadas están vinculadas a tu cuenta y se cargan mediante el backend. Al abrir Google Maps se envían coordenadas de destino a Google. Al abrir Viator se envía una solicitud a Viator y allí pueden procesarse datos de uso."
+      }
+    }
+  },
   "importMultimedia": {
     "title": "Importar contenido",
     "intro": "Este diálogo te permite insertar contenido externo mediante URL, por ejemplo de YouTube, Spotify, TikTok o Pinterest.",

@@ -1066,6 +1066,48 @@
   "experienceSearch": {
     "title": "Recherche d'expériences"
   },
+  "myExperienceList": {
+    "title": "Mes expériences",
+    "intro": "Cette vue affiche les expériences que vous avez enregistrées depuis la recherche d'expériences. Vous pouvez ouvrir les détails, recentrer la carte, ouvrir les tuiles et continuer dans des cartes externes ou sur Viator.",
+    "items": {
+      "details": {
+        "title": "Ouvrir les détails",
+        "desc": "Cette fonction ouvre l'expérience sélectionnée dans la boîte de dialogue de détail."
+      },
+      "remove": {
+        "title": "Retirer le favori",
+        "desc": "Cette fonction retire l'expérience sélectionnée de votre liste enregistrée."
+      },
+      "flyTo": {
+        "title": "Recentrer sur la carte",
+        "desc": "Cette fonction centre la carte de l'application sur la destination de l'expérience sélectionnée."
+      },
+      "tiles": {
+        "title": "Ouvrir les tuiles",
+        "desc": "Cette fonction ouvre la liste des tuiles de l'expérience sélectionnée."
+      },
+      "openMaps": {
+        "title": "Ouvrir dans Google Maps",
+        "desc": "Cette fonction ouvre une carte externe pour la destination sélectionnée."
+      },
+      "openProvider": {
+        "title": "Ouvrir sur Viator",
+        "desc": "Cette fonction ouvre la page de l'expérience sélectionnée sur Viator."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Cette fonction ferme la boîte de dialogue."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "privacy": {
+        "title": "Confidentialité et traitement",
+        "desc": "Les expériences enregistrées sont liées à votre compte et chargées via le backend. L'ouverture de Google Maps transmet les coordonnées de destination à Google. L'ouverture de Viator envoie une requête à Viator, où des données d'usage peuvent être traitées."
+      }
+    }
+  },
   "importMultimedia": {
     "title": "Importer des médias",
     "intro": "Cette boîte de dialogue permet d'insérer du contenu externe via URL, par exemple depuis YouTube, Spotify, TikTok ou Pinterest.",

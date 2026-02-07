@@ -1451,6 +1451,57 @@ const HELP_TOPICS = {
     introKey: 'common.intros.searchMap',
     items: ITEMS.searchMap
   },
+  myExperienceList: {
+    titleKey: 'myExperienceList.title',
+    introKey: 'myExperienceList.intro',
+    items: [
+      {
+        icon: 'expand_content',
+        titleKey: 'myExperienceList.items.details.title',
+        descriptionKey: 'myExperienceList.items.details.desc'
+      },
+      {
+        icon: 'bookmark_remove',
+        titleKey: 'myExperienceList.items.remove.title',
+        descriptionKey: 'myExperienceList.items.remove.desc'
+      },
+      {
+        icon: 'place',
+        titleKey: 'myExperienceList.items.flyTo.title',
+        descriptionKey: 'myExperienceList.items.flyTo.desc'
+      },
+      {
+        icon: 'dashboard',
+        titleKey: 'myExperienceList.items.tiles.title',
+        descriptionKey: 'myExperienceList.items.tiles.desc'
+      },
+      {
+        icon: 'map',
+        titleKey: 'myExperienceList.items.openMaps.title',
+        descriptionKey: 'myExperienceList.items.openMaps.desc'
+      },
+      {
+        icon: 'shopping_cart',
+        titleKey: 'myExperienceList.items.openProvider.title',
+        descriptionKey: 'myExperienceList.items.openProvider.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'myExperienceList.items.close.title',
+        descriptionKey: 'myExperienceList.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'myExperienceList.items.help.title',
+        descriptionKey: 'myExperienceList.items.help.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'myExperienceList.items.privacy.title',
+        descriptionKey: 'myExperienceList.items.privacy.desc'
+      }
+    ]
+  },
   importMultimedia: {
     titleKey: 'importMultimedia.title',
     introKey: 'importMultimedia.intro',
