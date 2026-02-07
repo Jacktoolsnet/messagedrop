@@ -178,31 +178,7 @@ export class LocationPickerDialogComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
-    const bounds = this.map?.getBounds();
-    if (bounds) {
-      const southWest = bounds.getSouthWest();
-      const northEast = bounds.getNorthEast();
-      this.nominatimService.getNominatimPlaceBySearchTermWithBoundingBox(term, {
-        latMin: southWest.lat,
-        lonMin: southWest.lng,
-        latMax: northEast.lat,
-        lonMax: northEast.lng
-      }, 25).subscribe({
-        next: (response) => {
-          this.applySearchResults(response.result ?? []);
-        },
-        error: (error) => this.handleSearchError(error)
-      });
-      return;
-    }
-
-    this.nominatimService.getNominatimPlaceBySearchTermWithViewbox(
-      term,
-      this.location.latitude,
-      this.location.longitude,
-      25,
-      20000
-    ).subscribe({
+    this.nominatimService.getNominatimPlaceBySearchTerm(term, 25).subscribe({
       next: (response) => {
         this.applySearchResults(response.result ?? []);
       },
@@ -245,6 +221,7 @@ export class LocationPickerDialogComponent implements AfterViewInit, OnDestroy {
   private applySearchResults(results: NominatimPlace[]): void {
     this.searchResults = results;
     this.updateSearchMarkers();
+    this.focusMapOnResults(results);
     if (results.length === 0) {
       this.openDisplayMessage({
         showAlways: true,
@@ -260,6 +237,38 @@ export class LocationPickerDialogComponent implements AfterViewInit, OnDestroy {
       return;
     }
     this.selectResult(results[0], false);
+  }
+
+  private focusMapOnResults(results: NominatimPlace[]): void {
+    if (!this.map || results.length === 0) {
+      return;
+    }
+
+    const validPoints = results
+      .map((place) => {
+        const latitude = Number(place.lat);
+        const longitude = Number(place.lon);
+        return Number.isFinite(latitude) && Number.isFinite(longitude)
+          ? leaflet.latLng(latitude, longitude)
+          : null;
+      })
+      .filter((point): point is leaflet.LatLng => point !== null);
+
+    if (validPoints.length === 0) {
+      return;
+    }
+
+    if (validPoints.length === 1) {
+      this.map.setView(validPoints[0], 15);
+      this.hasAutoZoomed = true;
+      return;
+    }
+
+    this.map.fitBounds(leaflet.latLngBounds(validPoints), {
+      padding: [24, 24],
+      maxZoom: 15
+    });
+    this.hasAutoZoomed = true;
   }
 
   private openDisplayMessage(config: DisplayMessageConfig, hasBackdrop = true): void {

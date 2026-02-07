@@ -972,7 +972,7 @@
       "searching": "Searching for \"{{ term }}\"",
       "searchingNear": "Searching for \"{{ term }}\" near your location",
       "searchingWithArea": "Searching for \"{{ term }}\" {{ area }}",
-      "searchPlaceholder": "Search within the visible map area",
+      "searchPlaceholder": "Search locations worldwide",
       "distanceLabel": "Distance",
       "noResults": "No locations found.",
       "searchFailed": "Search failed. Please try again later.",

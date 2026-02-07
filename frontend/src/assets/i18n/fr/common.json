@@ -972,7 +972,7 @@
       "searching": "Recherche de « {{ term }} »",
       "searchingNear": "Recherche de « {{ term }} » près de votre position",
       "searchingWithArea": "Recherche de « {{ term }} » {{ area }}",
-      "searchPlaceholder": "Rechercher dans la zone visible de la carte",
+      "searchPlaceholder": "Rechercher des lieux dans le monde entier",
       "distanceLabel": "Distance",
       "noResults": "Aucun lieu trouvé.",
       "searchFailed": "La recherche a échoué. Veuillez réessayer plus tard.",
