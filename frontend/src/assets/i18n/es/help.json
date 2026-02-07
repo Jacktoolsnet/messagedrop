@@ -473,7 +473,38 @@
     "title": "Importar contenido"
   },
   "tenorSearch": {
-    "title": "Búsqueda de GIF"
+    "title": "Búsqueda de GIF",
+    "intro": "Este diálogo te permite buscar GIF en Tenor y aplicar el resultado seleccionado a tu nota o mensaje.",
+    "items": {
+      "search": {
+        "title": "Buscar GIF",
+        "desc": "Con esta función buscas por término o cargas GIF destacados cuando no hay término de búsqueda."
+      },
+      "select": {
+        "title": "Seleccionar GIF",
+        "desc": "Con esta función aplicas un resultado directamente al diálogo anterior."
+      },
+      "more": {
+        "title": "Cargar más resultados",
+        "desc": "Con esta función cargas más resultados para la búsqueda actual."
+      },
+      "enable": {
+        "title": "Activar contenido externo",
+        "desc": "Con esta función permites mostrar contenido de Tenor cuando el contenido externo está desactivado."
+      },
+      "close": {
+        "title": "Cerrar",
+        "desc": "Con esta función cierras el diálogo sin seleccionar un GIF."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "privacy": {
+        "title": "Privacidad y procesamiento",
+        "desc": "La búsqueda de GIF envía solicitudes a Tenor/Google. La app solo guarda datos de referencia del GIF seleccionado (por ejemplo URL, fuente, título); en este paso no se envía a Tenor el texto privado de notas o mensajes."
+      }
+    }
   },
   "textDialog": {
     "title": "Texto"

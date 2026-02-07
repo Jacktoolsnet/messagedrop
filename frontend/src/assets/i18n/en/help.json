@@ -473,7 +473,38 @@
     "title": "Media import"
   },
   "tenorSearch": {
-    "title": "GIF search"
+    "title": "GIF search",
+    "intro": "This dialog lets you search GIFs via Tenor and apply a selected result to your note or message.",
+    "items": {
+      "search": {
+        "title": "Search GIFs",
+        "desc": "This action searches by term or loads featured GIFs when no term is entered."
+      },
+      "select": {
+        "title": "Select GIF",
+        "desc": "This action applies one result directly to the previous dialog."
+      },
+      "more": {
+        "title": "Load more results",
+        "desc": "This action loads additional results for the current search."
+      },
+      "enable": {
+        "title": "Enable external content",
+        "desc": "This action allows Tenor content display when external content is currently disabled."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "This action closes the dialog without selecting a GIF."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "privacy": {
+        "title": "Privacy and processing",
+        "desc": "GIF search sends requests to Tenor/Google. The app stores only reference data for the GIF you select (for example URL, source, title); private note or message text is not sent to Tenor by this step."
+      }
+    }
   },
   "textDialog": {
     "title": "Text"

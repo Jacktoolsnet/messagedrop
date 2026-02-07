@@ -473,7 +473,38 @@
     "title": "Medien importieren"
   },
   "tenorSearch": {
-    "title": "GIF-Suche"
+    "title": "GIF-Suche",
+    "intro": "In diesem Dialog suchst du GIFs über Tenor und übernimmst ein ausgewähltes Ergebnis in deine Notiz oder Nachricht.",
+    "items": {
+      "search": {
+        "title": "GIFs suchen",
+        "desc": "Mit dieser Funktion suchst du nach einem Begriff oder lädst ohne Suchbegriff empfohlene GIFs."
+      },
+      "select": {
+        "title": "GIF auswählen",
+        "desc": "Mit dieser Funktion übernimmst du ein Ergebnis direkt in den vorherigen Dialog."
+      },
+      "more": {
+        "title": "Weitere Treffer laden",
+        "desc": "Mit dieser Funktion lädst du weitere Ergebnisse zur aktuellen Suche."
+      },
+      "enable": {
+        "title": "Externe Inhalte aktivieren",
+        "desc": "Mit dieser Funktion erlaubst du die Anzeige von Tenor-Inhalten, falls sie aktuell deaktiviert sind."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Mit dieser Funktion schließt du den Dialog ohne Auswahl."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "privacy": {
+        "title": "Datenschutz und Verarbeitung",
+        "desc": "Bei der GIF-Suche werden Anfragen an Tenor/Google gesendet. In der App wird nur das von dir ausgewählte GIF als Referenzdaten (z. B. URL, Quelle, Titel) gespeichert; private Notiz- oder Nachrichtentexte werden dadurch nicht an Tenor übertragen."
+      }
+    }
   },
   "textDialog": {
     "title": "Text"

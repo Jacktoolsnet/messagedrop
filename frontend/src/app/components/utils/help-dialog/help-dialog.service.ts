@@ -758,8 +758,44 @@ const HELP_TOPICS = {
   },
   tenorSearch: {
     titleKey: 'tenorSearch.title',
-    introKey: 'common.intros.search',
-    items: ITEMS.searchList
+    introKey: 'tenorSearch.intro',
+    items: [
+      {
+        icon: 'search',
+        titleKey: 'tenorSearch.items.search.title',
+        descriptionKey: 'tenorSearch.items.search.desc'
+      },
+      {
+        icon: 'photo_library',
+        titleKey: 'tenorSearch.items.select.title',
+        descriptionKey: 'tenorSearch.items.select.desc'
+      },
+      {
+        icon: 'arrow_circle_right',
+        titleKey: 'tenorSearch.items.more.title',
+        descriptionKey: 'tenorSearch.items.more.desc'
+      },
+      {
+        icon: 'toggle_on',
+        titleKey: 'tenorSearch.items.enable.title',
+        descriptionKey: 'tenorSearch.items.enable.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'tenorSearch.items.close.title',
+        descriptionKey: 'tenorSearch.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'tenorSearch.items.help.title',
+        descriptionKey: 'tenorSearch.items.help.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'tenorSearch.items.privacy.title',
+        descriptionKey: 'tenorSearch.items.privacy.desc'
+      }
+    ]
   },
   textDialog: {
     titleKey: 'textDialog.title',
