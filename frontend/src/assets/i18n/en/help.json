@@ -285,7 +285,46 @@
     "title": "Message profile"
   },
   "noteList": {
-    "title": "Notes"
+    "title": "My private notes",
+    "intro": "This screen manages your private notes for one location. You can open, edit, delete notes, and jump to their map position.",
+    "items": {
+      "open": {
+        "title": "Open note",
+        "desc": "Tap the note card content to open it in the edit dialog."
+      },
+      "delete": {
+        "title": "Delete note",
+        "desc": "This action permanently removes the selected note."
+      },
+      "edit": {
+        "title": "Edit note",
+        "desc": "This action opens the selected note for editing."
+      },
+      "flyTo": {
+        "title": "Jump on map",
+        "desc": "This action centers the app map on the note location."
+      },
+      "navigate": {
+        "title": "Start navigation",
+        "desc": "This action opens external navigation to the note location."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "This action closes the notes list."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "add": {
+        "title": "Create note",
+        "desc": "This action creates a new private note for the current location."
+      },
+      "privacy": {
+        "title": "Privacy and storage",
+        "desc": "Private notes are stored locally in IndexedDB and always stored in encrypted form. The note feature does not store note contents on the backend. When you start navigation, only start and destination position (as plus code/coordinates) are sent to Google Maps, not note text or media content. If you create a backup, notes are included in the encrypted backup file."
+      }
+    }
   },
   "pinHint": {
     "title": "PIN hint"

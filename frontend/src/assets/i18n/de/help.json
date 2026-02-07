@@ -285,7 +285,46 @@
     "title": "Nachrichtenprofil"
   },
   "noteList": {
-    "title": "Notizen"
+    "title": "Meine privaten Notizen",
+    "intro": "Hier verwaltest du deine privaten Notizen zu einem Ort. Du kannst Notizen öffnen, bearbeiten, löschen und direkt zur Position auf der Karte springen.",
+    "items": {
+      "open": {
+        "title": "Notiz öffnen",
+        "desc": "Tippe auf den Inhalt einer Notizkarte, um sie im Bearbeitungsdialog zu öffnen."
+      },
+      "delete": {
+        "title": "Notiz löschen",
+        "desc": "Mit dieser Funktion entfernst du die ausgewählte Notiz dauerhaft."
+      },
+      "edit": {
+        "title": "Notiz bearbeiten",
+        "desc": "Mit dieser Funktion öffnest du die ausgewählte Notiz zur Bearbeitung."
+      },
+      "flyTo": {
+        "title": "Auf Karte anspringen",
+        "desc": "Mit dieser Funktion zentrierst du die App-Karte auf die Position der Notiz."
+      },
+      "navigate": {
+        "title": "Navigation starten",
+        "desc": "Mit dieser Funktion öffnest du eine externe Navigation zur Position der Notiz."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Mit dieser Funktion schließt du die Notizliste."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "add": {
+        "title": "Neue Notiz erstellen",
+        "desc": "Mit dieser Funktion erstellst du eine neue private Notiz für den aktuellen Ort."
+      },
+      "privacy": {
+        "title": "Datenschutz und Speicherung",
+        "desc": "Private Notizen werden lokal in deiner IndexedDB gespeichert und immer verschlüsselt abgelegt. Für die Notizfunktion werden keine Notizinhalte auf dem Backend gespeichert. Wenn du eine Navigation startest, werden an Google Maps nur Start- und Zielposition (als Plus-Code/Koordinaten) übergeben, nicht der Notiztext oder Medieninhalt. Bei einem Backup sind Notizen Teil der verschlüsselten Backup-Datei."
+      }
+    }
   },
   "pinHint": {
     "title": "PIN-Hinweis"

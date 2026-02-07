@@ -285,7 +285,46 @@
     "title": "Perfil del mensaje"
   },
   "noteList": {
-    "title": "Notas"
+    "title": "Mis notas privadas",
+    "intro": "Esta pantalla gestiona tus notas privadas para una ubicación. Puedes abrir, editar, eliminar notas y centrar su posición en el mapa.",
+    "items": {
+      "open": {
+        "title": "Abrir nota",
+        "desc": "Toca el contenido de la tarjeta para abrir la nota en el diálogo de edición."
+      },
+      "delete": {
+        "title": "Eliminar nota",
+        "desc": "Con esta función eliminas de forma permanente la nota seleccionada."
+      },
+      "edit": {
+        "title": "Editar nota",
+        "desc": "Con esta función abres la nota seleccionada para editarla."
+      },
+      "flyTo": {
+        "title": "Ir al mapa",
+        "desc": "Con esta función centras el mapa de la app en la ubicación de la nota."
+      },
+      "navigate": {
+        "title": "Iniciar navegación",
+        "desc": "Con esta función abres la navegación externa hacia la ubicación de la nota."
+      },
+      "close": {
+        "title": "Cerrar",
+        "desc": "Con esta función cierras la lista de notas."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "add": {
+        "title": "Crear nota",
+        "desc": "Con esta función creas una nueva nota privada para la ubicación actual."
+      },
+      "privacy": {
+        "title": "Privacidad y almacenamiento",
+        "desc": "Las notas privadas se guardan localmente en IndexedDB y siempre se almacenan cifradas. La función de notas no guarda el contenido de las notas en el backend. Cuando inicias una navegación, solo se envían a Google Maps la posición de inicio y destino (como plus code/coordenadas), no el texto de la nota ni su contenido multimedia. Si creas una copia de seguridad, las notas se incluyen en el archivo de copia cifrado."
+      }
+    }
   },
   "pinHint": {
     "title": "Ayuda de PIN"

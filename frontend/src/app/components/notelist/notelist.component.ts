@@ -13,6 +13,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { MasonryItemDirective } from '../../directives/masonry-item.directive';
 import { Location } from '../../interfaces/location';
+import { Mode } from '../../interfaces/mode';
 import { MultimediaType } from '../../interfaces/multimedia-type';
 import { Note } from '../../interfaces/note';
 import { User } from '../../interfaces/user';
@@ -54,6 +55,7 @@ import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.comp
   standalone: true
 })
 export class NotelistComponent {
+  readonly mode = Mode;
   private readonly dialogData = inject<{ location: Location; notesSignal: WritableSignal<Note[]> }>(MAT_DIALOG_DATA);
   public readonly userService = inject(UserService);
   private readonly noteService = inject(NoteService);
@@ -114,7 +116,7 @@ export class NotelistComponent {
     }
 
     const dialogRef = this.dialog.open(EditNoteComponent, {
-      data: { note },
+      data: { mode: this.mode.EDIT_NOTE, note },
       closeOnNavigation: true,
       minWidth: '20vw',
       maxWidth: '90vw',
@@ -151,7 +153,7 @@ export class NotelistComponent {
 
     this.sharedContentService.addSharedContentToNote(note);
     const dialogRef = this.dialog.open(EditNoteComponent, {
-      data: { note },
+      data: { mode: this.mode.ADD_NOTE, note },
       closeOnNavigation: true,
       minWidth: '20vw',
       maxWidth: '90vw',

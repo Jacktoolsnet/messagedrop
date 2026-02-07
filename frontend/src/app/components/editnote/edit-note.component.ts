@@ -67,8 +67,8 @@ export class EditNoteComponent implements OnInit {
   readonly help = inject(HelpDialogService);
   readonly dialogRef = inject(MatDialogRef<EditNoteComponent>);
   private readonly style = inject(StyleService);
-  readonly data = inject<{ mode: Mode; note: Note }>(MAT_DIALOG_DATA);
-  readonly headerConfig = this.resolveHeaderConfig(this.data.mode);
+  readonly data = inject<{ mode?: Mode; note: Note }>(MAT_DIALOG_DATA);
+  readonly headerConfig = this.resolveHeaderConfig(this.data.mode, this.data.note);
   readonly mode = Mode;
   readonly isLocationEditable = !this.data.mode
     || this.data.mode === Mode.ADD_NOTE
@@ -88,13 +88,16 @@ export class EditNoteComponent implements OnInit {
     this.applyNewMultimedia(this.data.note.multimedia);
   }
 
-  private resolveHeaderConfig(mode: Mode): DialogHeaderConfig {
+  private resolveHeaderConfig(mode: Mode | undefined, note: Note): DialogHeaderConfig {
     switch (mode) {
       case Mode.EDIT_NOTE:
         return { icon: 'edit_note', labelKey: 'common.noteList.editTitle' };
       case Mode.ADD_NOTE:
-      default:
         return { icon: 'add_notes', labelKey: 'common.noteList.addNoteAria' };
+      default:
+        return note?.id
+          ? { icon: 'edit_note', labelKey: 'common.noteList.editTitle' }
+          : { icon: 'add_notes', labelKey: 'common.noteList.addNoteAria' };
     }
   }
 

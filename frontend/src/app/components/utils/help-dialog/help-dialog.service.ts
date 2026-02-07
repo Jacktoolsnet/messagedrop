@@ -495,8 +495,54 @@ const HELP_TOPICS = {
   },
   noteList: {
     titleKey: 'noteList.title',
-    introKey: 'common.intros.list',
-    items: ITEMS.listBasic
+    introKey: 'noteList.intro',
+    items: [
+      {
+        icon: 'touch_app',
+        titleKey: 'noteList.items.open.title',
+        descriptionKey: 'noteList.items.open.desc'
+      },
+      {
+        icon: 'delete_forever',
+        titleKey: 'noteList.items.delete.title',
+        descriptionKey: 'noteList.items.delete.desc'
+      },
+      {
+        icon: 'edit',
+        titleKey: 'noteList.items.edit.title',
+        descriptionKey: 'noteList.items.edit.desc'
+      },
+      {
+        icon: 'place',
+        titleKey: 'noteList.items.flyTo.title',
+        descriptionKey: 'noteList.items.flyTo.desc'
+      },
+      {
+        icon: 'assistant_direction',
+        titleKey: 'noteList.items.navigate.title',
+        descriptionKey: 'noteList.items.navigate.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'noteList.items.close.title',
+        descriptionKey: 'noteList.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'noteList.items.help.title',
+        descriptionKey: 'noteList.items.help.desc'
+      },
+      {
+        icon: 'add_notes',
+        titleKey: 'noteList.items.add.title',
+        descriptionKey: 'noteList.items.add.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'noteList.items.privacy.title',
+        descriptionKey: 'noteList.items.privacy.desc'
+      }
+    ]
   },
   pinHint: {
     titleKey: 'pinHint.title',

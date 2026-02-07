@@ -285,7 +285,46 @@
     "title": "Profil du message"
   },
   "noteList": {
-    "title": "Notes"
+    "title": "Mes notes privées",
+    "intro": "Cet écran gère vos notes privées pour un lieu. Vous pouvez ouvrir, modifier, supprimer des notes et centrer leur position sur la carte.",
+    "items": {
+      "open": {
+        "title": "Ouvrir une note",
+        "desc": "Touchez le contenu de la carte pour ouvrir la note dans la boîte de dialogue d'édition."
+      },
+      "delete": {
+        "title": "Supprimer la note",
+        "desc": "Cette fonction supprime définitivement la note sélectionnée."
+      },
+      "edit": {
+        "title": "Modifier la note",
+        "desc": "Cette fonction ouvre la note sélectionnée pour modification."
+      },
+      "flyTo": {
+        "title": "Aller sur la carte",
+        "desc": "Cette fonction centre la carte de l'application sur la position de la note."
+      },
+      "navigate": {
+        "title": "Démarrer la navigation",
+        "desc": "Cette fonction ouvre une navigation externe vers la position de la note."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Cette fonction ferme la liste des notes."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "add": {
+        "title": "Créer une note",
+        "desc": "Cette fonction crée une nouvelle note privée pour le lieu actuel."
+      },
+      "privacy": {
+        "title": "Confidentialité et stockage",
+        "desc": "Les notes privées sont stockées localement dans IndexedDB et toujours stockées sous forme chiffrée. La fonction de notes ne stocke pas le contenu des notes sur le backend. Quand vous lancez la navigation, seules la position de départ et d'arrivée (plus code/coordonnées) sont transmises à Google Maps, pas le texte de la note ni son contenu multimédia. Si vous créez une sauvegarde, les notes sont incluses dans le fichier de sauvegarde chiffré."
+      }
+    }
   },
   "pinHint": {
     "title": "Indice PIN"
