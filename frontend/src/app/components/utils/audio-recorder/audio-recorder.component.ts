@@ -269,6 +269,7 @@ export class AudioRecorderComponent {
       return;
     }
     const sizeBytes = blob.size;
+    const measuredDurationMs = Math.max(0, Math.round(performance.now() - this.recordingStartedAt));
     const reader = new FileReader();
     reader.onload = () => {
       const result = reader.result as string;
@@ -278,31 +279,37 @@ export class AudioRecorderComponent {
         this.errorMessage = 'common.audioRecorder.tooLarge';
         return;
       }
-      this.createAudioPayload(base64, mimeType, sizeBytes, blob);
+      this.createAudioPayload(base64, mimeType, sizeBytes, blob, measuredDurationMs);
     };
     reader.readAsDataURL(blob);
   }
 
-  private async createAudioPayload(base64: string, mimeType: string, sizeBytes: number, blob: Blob): Promise<void> {
+  private async createAudioPayload(
+    base64: string,
+    mimeType: string,
+    sizeBytes: number,
+    blob: Blob,
+    measuredDurationMs: number
+  ): Promise<void> {
     const url = URL.createObjectURL(blob);
     this.cleanupAudioUrl();
     this.audioUrl = url;
-    const audio = new Audio(url);
-    audio.addEventListener('loadedmetadata', async () => {
-      let durationMs = Number.isFinite(audio.duration) ? Math.round(audio.duration * 1000) : 0;
-      if (!durationMs) {
-        durationMs = await this.computeDurationMs(blob);
-      }
-      const waveform = this.buildWaveformFromPeaks() || await this.buildWaveform(blob);
-      const payload: AudioPayload = {
-        base64,
-        mimeType,
-        sizeBytes,
-        durationMs,
-        waveform
-      };
-      this.setAudioPayload(payload);
-    });
+    let durationMs = measuredDurationMs;
+    if (!durationMs) {
+      durationMs = await this.computeDurationMs(blob);
+    }
+    let waveform = this.buildWaveformFromPeaks();
+    if (!waveform?.length) {
+      waveform = await this.buildWaveform(blob);
+    }
+    const payload: AudioPayload = {
+      base64,
+      mimeType,
+      sizeBytes,
+      durationMs,
+      waveform: waveform ?? undefined
+    };
+    this.setAudioPayload(payload);
   }
 
   private startPlaybackProgress(): void {
