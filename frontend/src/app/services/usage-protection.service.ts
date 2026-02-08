@@ -184,9 +184,10 @@ export class UsageProtectionService {
     if (!hash || hash !== settings.parentPinHash) {
       return false;
     }
+    const extensionSeconds = Math.max(0, settings.parentalExtensionMinutes) * 60;
     this.stateSignal.update((state) => ({
       ...state,
-      consumedSeconds: 0,
+      consumedSeconds: Math.max(0, state.consumedSeconds - extensionSeconds),
       selfExtensionUsed: false,
       dateKey: getLocalDateKey(new Date(this.nowSignal()))
     }));
@@ -329,6 +330,7 @@ export class UsageProtectionService {
     const mode = this.normalizeMode(raw?.['mode']);
     const dailyLimitMinutes = this.clampInt(raw?.['dailyLimitMinutes'], 5, 720, DEFAULT_USAGE_PROTECTION_SETTINGS.dailyLimitMinutes);
     const selfExtensionMinutes = this.clampInt(raw?.['selfExtensionMinutes'], 0, 120, DEFAULT_USAGE_PROTECTION_SETTINGS.selfExtensionMinutes);
+    const parentalExtensionMinutes = this.clampInt(raw?.['parentalExtensionMinutes'], 1, 240, DEFAULT_USAGE_PROTECTION_SETTINGS.parentalExtensionMinutes);
     const scheduleEnabled = Boolean(raw?.['scheduleEnabled']);
     const weekdayStart = this.normalizeTime(raw?.['weekdayStart'], DEFAULT_USAGE_PROTECTION_SETTINGS.weekdayStart);
     const weekdayEnd = this.normalizeTime(raw?.['weekdayEnd'], DEFAULT_USAGE_PROTECTION_SETTINGS.weekdayEnd);
@@ -339,6 +341,7 @@ export class UsageProtectionService {
       mode,
       dailyLimitMinutes,
       selfExtensionMinutes,
+      parentalExtensionMinutes,
       scheduleEnabled,
       weekdayStart,
       weekdayEnd,

@@ -297,6 +297,19 @@ export class AppSettingsComponent implements OnInit {
     };
   }
 
+  setUsageParentalExtensionMinutes(value: number): void {
+    if (this.needsUsageProtectionUnlock()) {
+      return;
+    }
+    this.appSettings = {
+      ...this.appSettings,
+      usageProtection: {
+        ...this.appSettings.usageProtection,
+        parentalExtensionMinutes: this.clampInteger(value, 1, 240, 5)
+      }
+    };
+  }
+
   setUsageWeekdayStart(value: string): void {
     if (this.needsUsageProtectionUnlock()) {
       return;
@@ -476,6 +489,7 @@ export class AppSettingsComponent implements OnInit {
       ...settings,
       dailyLimitMinutes: this.clampInteger(settings.dailyLimitMinutes, 5, 720, 60),
       selfExtensionMinutes: this.clampInteger(settings.selfExtensionMinutes, 0, 120, 5),
+      parentalExtensionMinutes: this.clampInteger(settings.parentalExtensionMinutes, 1, 240, 5),
       weekdayStart: this.normalizeTime(settings.weekdayStart, '06:00'),
       weekdayEnd: this.normalizeTime(settings.weekdayEnd, '22:00'),
       weekendStart: this.normalizeTime(settings.weekendStart, '06:00'),

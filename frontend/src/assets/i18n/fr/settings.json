@@ -50,6 +50,7 @@
     },
     "dailyLimit": "Limite quotidienne (minutes)",
     "selfExtension": "Extension autonome (minutes)",
+    "parentalExtension": "Extension parentale (minutes)",
     "scheduleToggle": "Limiter aux plages horaires autorisées",
     "weekdayStart": "Début semaine",
     "weekdayEnd": "Fin semaine",

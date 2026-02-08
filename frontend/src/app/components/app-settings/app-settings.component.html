@@ -129,11 +129,6 @@
       <button mat-stroked-button type="button" (click)="unlockUsageProtectionSettings()">
         {{ 'settings.usageProtection.unlockAction' | transloco }}
       </button>
-      @if (hasConfiguredParentPin()) {
-      <button mat-stroked-button type="button" (click)="removeUsageParentPin()">
-        {{ 'settings.usageProtection.pinDeleteAction' | transloco }}
-      </button>
-      }
       } @else {
       <mat-button-toggle-group [hideSingleSelectionIndicator]="true" [value]="appSettings.usageProtection.mode"
         (change)="setUsageMode($event.value)" class="usage-mode-toggle-group" exclusive
@@ -157,6 +152,14 @@
         <mat-label>{{ 'settings.usageProtection.selfExtension' | transloco }}</mat-label>
         <input matInput type="number" min="0" max="120" [ngModel]="appSettings.usageProtection.selfExtensionMinutes"
           (ngModelChange)="setUsageSelfExtensionMinutes($event)">
+      </mat-form-field>
+      }
+
+      @if (appSettings.usageProtection.mode === 'parental') {
+      <mat-form-field appearance="fill">
+        <mat-label>{{ 'settings.usageProtection.parentalExtension' | transloco }}</mat-label>
+        <input matInput type="number" min="1" max="240" [ngModel]="appSettings.usageProtection.parentalExtensionMinutes"
+          (ngModelChange)="setUsageParentalExtensionMinutes($event)">
       </mat-form-field>
       }
 

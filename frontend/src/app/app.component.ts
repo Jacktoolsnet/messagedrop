@@ -201,7 +201,6 @@ export class AppComponent implements OnInit {
   private lastSharedContentTimestamp?: string;
   private sharedContentDialogOpen = false;
   private initialPublicMessagesRequested = false;
-  usageProtectionUnlockError = '';
   usageProtectionUnlockBusy = false;
 
   private markerMessageListOpen = false;
@@ -293,7 +292,7 @@ export class AppComponent implements OnInit {
 
     effect(() => {
       if (!this.usageProtectionService.isLocked()) {
-        this.usageProtectionUnlockError = '';
+        this.usageProtectionUnlockBusy = false;
       }
     });
 
@@ -395,10 +394,9 @@ export class AppComponent implements OnInit {
   }
 
   public applyUsageProtectionSelfExtension(): void {
-    this.usageProtectionUnlockError = '';
     const applied = this.usageProtectionService.applySelfExtension();
     if (!applied) {
-      this.usageProtectionUnlockError = this.translation.t('common.usageProtection.selfExtensionUnavailable');
+      void this.showUsageProtectionMessage('common.usageProtection.selfExtensionUnavailable');
     }
   }
 
@@ -406,7 +404,6 @@ export class AppComponent implements OnInit {
     if (this.usageProtectionUnlockBusy) {
       return;
     }
-    this.usageProtectionUnlockError = '';
 
     this.usageProtectionUnlockBusy = true;
     const dialogRef = this.dialog.open(CheckPinComponent, {
@@ -423,14 +420,14 @@ export class AppComponent implements OnInit {
       return;
     }
     if (!this.usageProtectionService.isValidPinFormat(pin)) {
-      this.usageProtectionUnlockError = this.translation.t('common.usageProtection.invalidPin');
       this.usageProtectionUnlockBusy = false;
+      await this.showUsageProtectionMessage('common.usageProtection.invalidPin');
       return;
     }
     const unlocked = await this.usageProtectionService.unlockWithParentPin(pin.trim());
     this.usageProtectionUnlockBusy = false;
     if (!unlocked) {
-      this.usageProtectionUnlockError = this.translation.t('common.usageProtection.unlockFailed');
+      await this.showUsageProtectionMessage('common.usageProtection.unlockFailed');
       return;
     }
   }
@@ -441,6 +438,31 @@ export class AppComponent implements OnInit {
 
   public openUsageProtectionHelp(): void {
     this.helpDialog.open('usageProtectionLock');
+  }
+
+  private async showUsageProtectionMessage(messageKey: string): Promise<void> {
+    const dialogRef = this.dialog.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: {
+        showAlways: true,
+        title: this.translation.t('common.usageProtection.title'),
+        image: '',
+        icon: 'warning',
+        message: this.translation.t(messageKey),
+        button: this.translation.t('common.actions.ok'),
+        delay: 0,
+        showSpinner: false,
+        autoclose: false
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+    await firstValueFrom(dialogRef.afterClosed());
   }
 
   private refreshContactUnreadCounts(): void {

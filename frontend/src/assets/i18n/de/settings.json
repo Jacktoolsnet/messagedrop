@@ -50,6 +50,7 @@
     },
     "dailyLimit": "Tageslimit (Minuten)",
     "selfExtension": "Selbstverlängerung (Minuten)",
+    "parentalExtension": "Eltern-Verlängerung (Minuten)",
     "scheduleToggle": "Auf erlaubte Zeitfenster begrenzen",
     "weekdayStart": "Start werktags",
     "weekdayEnd": "Ende werktags",

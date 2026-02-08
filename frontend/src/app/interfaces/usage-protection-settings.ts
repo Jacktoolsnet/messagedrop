@@ -4,6 +4,7 @@ export interface UsageProtectionSettings {
   mode: UsageProtectionMode;
   dailyLimitMinutes: number;
   selfExtensionMinutes: number;
+  parentalExtensionMinutes: number;
   scheduleEnabled: boolean;
   weekdayStart: string;
   weekdayEnd: string;
@@ -27,6 +28,7 @@ export const DEFAULT_USAGE_PROTECTION_SETTINGS: UsageProtectionSettings = {
   mode: 'off',
   dailyLimitMinutes: 60,
   selfExtensionMinutes: 5,
+  parentalExtensionMinutes: 5,
   scheduleEnabled: false,
   weekdayStart: '06:00',
   weekdayEnd: '22:00',

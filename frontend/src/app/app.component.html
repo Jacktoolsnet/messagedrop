@@ -36,10 +36,6 @@
         </button>
         }
 
-        @if (usageProtectionUnlockError) {
-        <p class="usage-protection-error">{{ usageProtectionUnlockError }}</p>
-        }
-
         <div class="usage-protection-actions">
             <button mat-stroked-button type="button" (click)="editAppSettings()">
                 {{ 'common.menu.appSettings' | transloco }}
