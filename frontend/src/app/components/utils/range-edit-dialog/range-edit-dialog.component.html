@@ -6,59 +6,65 @@
 
 <mat-dialog-content class="range-edit-content">
   <div class="range-grid">
-    <mat-form-field appearance="outline" class="range-number-field">
-      <button mat-icon-button matPrefix type="button" class="step-button step-button--prefix"
-        (click)="decreaseMin()"
-        [attr.aria-label]="getMinFieldLabel() + ' -'">
-        <mat-icon>remove</mat-icon>
-      </button>
-      <mat-label>{{ getMinFieldLabel() }}</mat-label>
-      <input
-        matInput
-        type="number"
-        inputmode="decimal"
-        [step]="data.step"
-        [min]="data.minBound"
-        [max]="data.maxBound"
-        [formControl]="form.controls.minValue"
-        (blur)="onMinBlur()"
-      />
-      @if (data.unit) {
-        <span matTextSuffix>{{ data.unit }}</span>
-      }
-      <button mat-icon-button matSuffix type="button" class="step-button step-button--suffix"
-        (click)="increaseMin()"
-        [attr.aria-label]="getMinFieldLabel() + ' +'">
-        <mat-icon>add</mat-icon>
-      </button>
-    </mat-form-field>
+    <section class="range-value-tile">
+      <div class="range-value-tile__label">{{ getMinFieldLabel() }}</div>
+      <mat-form-field appearance="outline" class="range-number-field" subscriptSizing="dynamic">
+        <button mat-icon-button matPrefix type="button" class="step-button step-button--prefix"
+          (click)="decreaseMin()"
+          [attr.aria-label]="getMinFieldLabel() + ' -'">
+          <mat-icon>remove</mat-icon>
+        </button>
+        <input
+          matInput
+          type="number"
+          inputmode="decimal"
+          [step]="data.step"
+          [min]="data.minBound"
+          [max]="data.maxBound"
+          [formControl]="form.controls.minValue"
+          [attr.aria-label]="getMinFieldLabel()"
+          (blur)="onMinBlur()"
+        />
+        @if (data.unit) {
+          <span matTextSuffix>{{ data.unit }}</span>
+        }
+        <button mat-icon-button matSuffix type="button" class="step-button step-button--suffix"
+          (click)="increaseMin()"
+          [attr.aria-label]="getMinFieldLabel() + ' +'">
+          <mat-icon>add</mat-icon>
+        </button>
+      </mat-form-field>
+    </section>
 
-    <mat-form-field appearance="outline" class="range-number-field">
-      <button mat-icon-button matPrefix type="button" class="step-button step-button--prefix"
-        (click)="decreaseMax()"
-        [attr.aria-label]="getMaxFieldLabel() + ' -'">
-        <mat-icon>remove</mat-icon>
-      </button>
-      <mat-label>{{ getMaxFieldLabel() }}</mat-label>
-      <input
-        matInput
-        type="number"
-        inputmode="decimal"
-        [step]="data.step"
-        [min]="data.minBound"
-        [max]="data.maxBound"
-        [formControl]="form.controls.maxValue"
-        (blur)="onMaxBlur()"
-      />
-      @if (data.unit) {
-        <span matTextSuffix>{{ data.unit }}</span>
-      }
-      <button mat-icon-button matSuffix type="button" class="step-button step-button--suffix"
-        (click)="increaseMax()"
-        [attr.aria-label]="getMaxFieldLabel() + ' +'">
-        <mat-icon>add</mat-icon>
-      </button>
-    </mat-form-field>
+    <section class="range-value-tile">
+      <div class="range-value-tile__label">{{ getMaxFieldLabel() }}</div>
+      <mat-form-field appearance="outline" class="range-number-field" subscriptSizing="dynamic">
+        <button mat-icon-button matPrefix type="button" class="step-button step-button--prefix"
+          (click)="decreaseMax()"
+          [attr.aria-label]="getMaxFieldLabel() + ' -'">
+          <mat-icon>remove</mat-icon>
+        </button>
+        <input
+          matInput
+          type="number"
+          inputmode="decimal"
+          [step]="data.step"
+          [min]="data.minBound"
+          [max]="data.maxBound"
+          [formControl]="form.controls.maxValue"
+          [attr.aria-label]="getMaxFieldLabel()"
+          (blur)="onMaxBlur()"
+        />
+        @if (data.unit) {
+          <span matTextSuffix>{{ data.unit }}</span>
+        }
+        <button mat-icon-button matSuffix type="button" class="step-button step-button--suffix"
+          (click)="increaseMax()"
+          [attr.aria-label]="getMaxFieldLabel() + ' +'">
+          <mat-icon>add</mat-icon>
+        </button>
+      </mat-form-field>
+    </section>
   </div>
 </mat-dialog-content>
 
