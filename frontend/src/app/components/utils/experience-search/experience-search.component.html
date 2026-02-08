@@ -136,7 +136,7 @@
       @if (viewMode() === 'list') {
       <div class="results" role="list">
         @for (result of results(); track result.trackId) {
-        <mat-card class="experience-tile" role="listitem" (click)="onSelect(result)"
+        <mat-card class="experience-tile" role="listitem" (click)="onSelect(result); openDetails(result)"
           [class.experience-tile--selected]="selectedResult()?.trackId === result.trackId"
           [attr.title]="result.title || result.productCode || ''">
           <div class="tile-header" [style.--experience-header-bg-image]="getExperienceHeaderBackgroundImage(result)"
@@ -160,6 +160,7 @@
             <div class="viator-badge">
               <span class="viator-badge__text">{{ 'common.experiences.sourceViator' | transloco }}</span>
               <a class="viator-badge__link" href="https://www.viator.com/?pid=P00285785&mcid=42383&medium=link"
+                (click)="$event.stopPropagation()"
                 target="_blank" rel="noopener">
                 Viator
               </a>

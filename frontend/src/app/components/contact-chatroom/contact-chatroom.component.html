@@ -103,7 +103,10 @@
             <app-showmessage [message]="msg.payload!.message" [style]="msg.payload!.style"></app-showmessage>
             }
             @if (msg.payload.experience) {
-            <div class="chat-experience">
+            <div class="chat-experience" role="button" tabindex="0"
+              (click)="openExperienceDetails(msg.payload.experience)"
+              (keyup.enter)="openExperienceDetails(msg.payload.experience)"
+              (keyup.space)="openExperienceDetails(msg.payload.experience)">
               @if (getExperienceImage(msg.payload.experience); as imageUrl) {
               <img class="chat-experience__image" [src]="imageUrl" [alt]="getExperienceTitle(msg.payload.experience)" />
               } @else {
@@ -225,7 +228,10 @@
             <app-showmessage [message]="getDisplayedMessage(msg)" [style]="msg.payload!.style"></app-showmessage>
             }
             @if (msg.payload.experience) {
-            <div class="chat-experience">
+            <div class="chat-experience" role="button" tabindex="0"
+              (click)="openExperienceDetails(msg.payload.experience)"
+              (keyup.enter)="openExperienceDetails(msg.payload.experience)"
+              (keyup.space)="openExperienceDetails(msg.payload.experience)">
               @if (getExperienceImage(msg.payload.experience); as imageUrl) {
               <img class="chat-experience__image" [src]="imageUrl" [alt]="getExperienceTitle(msg.payload.experience)" />
               } @else {

@@ -8,7 +8,8 @@
   <div class="experience-scroll">
     <div class="results pin-dialog-results" role="list">
       @for (result of data.results; track result.trackId) {
-      <mat-card class="experience-tile" role="listitem" [attr.title]="result.title || result.productCode || ''">
+      <mat-card class="experience-tile" role="listitem" (click)="openDetails(result)"
+        [attr.title]="result.title || result.productCode || ''">
         <div class="tile-header" [style.--experience-header-bg-image]="getExperienceHeaderBackgroundImage(result)"
           [style.--experience-header-bg-opacity]="getExperienceHeaderBackgroundOpacity(result)">
           <div class="identity-badge">
@@ -30,6 +31,7 @@
           <div class="viator-badge">
             <span class="viator-badge__text">{{ 'common.experiences.sourceViator' | transloco }}</span>
             <a class="viator-badge__link" href="https://www.viator.com/?pid=P00285785&mcid=42383&medium=link"
+              (click)="$event.stopPropagation()"
               target="_blank" rel="noopener">
               Viator
             </a>
@@ -47,7 +49,7 @@
         </mat-card-content>
         <mat-card-actions class="tile-actions">
           <div class="tile-actions__left">
-            <button mat-mini-fab color="primary" type="button" (click)="openDetails(result)"
+            <button mat-mini-fab color="primary" type="button" (click)="openDetails(result); $event.stopPropagation()"
               [attr.aria-label]="'common.experiences.showMore' | transloco">
               <mat-icon>expand_content</mat-icon>
             </button>
@@ -66,7 +68,8 @@
             }
           </div>
           <div class="tile-actions__right">
-            <button mat-raised-button color="primary" class="open-viator-button" type="button" (click)="onOpen(result)"
+            <button mat-raised-button color="primary" class="open-viator-button" type="button"
+              (click)="onOpen(result); $event.stopPropagation()"
               [disabled]="!result.productUrl"
               [attr.aria-label]="'common.experiences.openOn' | transloco : { provider: 'Viator' }">
               <mat-icon>shopping_cart</mat-icon>

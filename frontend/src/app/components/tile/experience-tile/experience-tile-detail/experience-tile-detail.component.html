@@ -13,7 +13,7 @@
     } @else {
       <div class="experience-list">
         @for (experience of experiences(); track experience.trackId || experience.productCode) {
-          <div class="experience-item">
+          <div class="experience-item" (click)="openDetail(experience)">
             @if (getExperienceImage(experience)) {
               <img class="experience-avatar" [src]="getExperienceImage(experience)!" [alt]="getExperienceTitle(experience)" />
             } @else {

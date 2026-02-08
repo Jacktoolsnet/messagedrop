@@ -60,6 +60,7 @@
   border: 1px solid var(--mat-card-outlined-outline-color);
   background: var(--mat-card-filled-container-color);
   box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+  cursor: pointer;
 }
 
 .tile-header {

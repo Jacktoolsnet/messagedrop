@@ -12,7 +12,7 @@
     } @else {
       <div class="results" role="list">
         @for (bookmark of visibleBookmarks(); track bookmark.productCode) {
-          <mat-card class="experience-tile" role="listitem">
+          <mat-card class="experience-tile" role="listitem" (click)="openDetails(bookmark.snapshot)">
             <div class="tile-header"
               [style.--experience-header-bg-image]="getExperienceHeaderBackgroundImage(bookmark.snapshot)"
               [style.--experience-header-bg-opacity]="getExperienceHeaderBackgroundOpacity(bookmark.snapshot)">
@@ -37,6 +37,7 @@
               <div class="viator-badge">
                 <span class="viator-badge__text">{{ 'common.experiences.sourceViator' | transloco }}</span>
                 <a class="viator-badge__link" href="https://www.viator.com/?pid=P00285785&mcid=42383&medium=link"
+                  (click)="$event.stopPropagation()"
                   target="_blank" rel="noopener">Viator</a>
               </div>
               @if (getRatingLabel(bookmark.snapshot)) {
@@ -50,7 +51,8 @@
             </mat-card-content>
             <mat-card-actions class="tile-actions">
               <div class="tile-actions__left">
-                <button mat-mini-fab color="primary" type="button" (click)="openDetails(bookmark.snapshot)"
+                <button mat-mini-fab color="primary" type="button"
+                  (click)="openDetails(bookmark.snapshot); $event.stopPropagation()"
                   [attr.aria-label]="'common.experiences.showMore' | transloco">
                   <mat-icon>expand_content</mat-icon>
                 </button>
@@ -60,24 +62,24 @@
                     : ('common.experiences.saveTitle' | transloco)">
                   <mat-icon>{{ isBookmarked(bookmark.snapshot) ? 'bookmark_remove' : 'bookmark_add' }}</mat-icon>
                 </button>
-                <button mat-mini-fab color="primary" type="button" (click)="showOnMap(bookmark.snapshot)"
+                <button mat-mini-fab color="primary" type="button" (click)="showOnMap(bookmark.snapshot); $event.stopPropagation()"
                   [disabled]="!hasDestination(bookmark.snapshot)"
                   [attr.aria-label]="'common.experiences.showOnMap' | transloco">
                   <mat-icon>place</mat-icon>
                 </button>
-                <button mat-mini-fab color="primary" type="button" (click)="openTileList(bookmark.snapshot)"
+                <button mat-mini-fab color="primary" type="button" (click)="openTileList(bookmark.snapshot); $event.stopPropagation()"
                   [attr.aria-label]="tileListAriaLabel(bookmark.snapshot)">
                   <mat-icon>dashboard</mat-icon>
                 </button>
               </div>
               <div class="tile-actions__right">
-                <button mat-mini-fab color="primary" type="button" (click)="openInMaps(bookmark.snapshot)"
+                <button mat-mini-fab color="primary" type="button" (click)="openInMaps(bookmark.snapshot); $event.stopPropagation()"
                   [disabled]="!hasDestination(bookmark.snapshot)"
                   [attr.aria-label]="'common.experiences.openInMaps' | transloco">
                   <mat-icon>map</mat-icon>
                 </button>
                 <button mat-raised-button color="primary" class="open-viator-button" type="button"
-                  (click)="onOpen(bookmark.snapshot)"
+                  (click)="onOpen(bookmark.snapshot); $event.stopPropagation()"
                   [disabled]="!bookmark.snapshot.productUrl"
                   [attr.aria-label]="'common.experiences.openOn' | transloco : { provider: 'Viator' }">
                   <mat-icon>shopping_cart</mat-icon>
