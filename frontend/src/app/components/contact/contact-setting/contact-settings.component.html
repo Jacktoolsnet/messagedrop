@@ -105,9 +105,8 @@
         <mat-icon>opacity</mat-icon>
         <span>{{ 'common.contact.profile.chatBackgroundTransparency' | transloco }}</span>
       </div>
-      <span class="slider-value">{{ contact.chatBackgroundTransparency ?? 0 }}%</span>
     </div>
-    <mat-slider min="0" max="100" step="5" thumbLabel tickInterval="20"
+    <mat-slider [min]="0" [max]="100" [step]="5" discrete [displayWith]="formatPercentLabel"
       [disabled]="!contact.chatBackgroundImage">
       <input matSliderThumb [(ngModel)]="contact.chatBackgroundTransparency" />
     </mat-slider>

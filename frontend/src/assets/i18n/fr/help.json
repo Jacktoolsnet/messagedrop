@@ -2110,6 +2110,40 @@
       }
     }
   },
+  "valueEditDialog": {
+    "title": "Modifier la valeur",
+    "intro": "Cette boîte de dialogue permet d'ajuster précisément une seule valeur numérique.",
+    "items": {
+      "field": {
+        "title": "Saisir la valeur directement",
+        "desc": "Saisissez la valeur directement au clavier. Les bornes autorisées sont affichées dans l'étiquette du champ."
+      },
+      "step": {
+        "title": "Ajuster avec plus et moins",
+        "desc": "Utilisez - et + pour diminuer ou augmenter la valeur selon le pas défini."
+      },
+      "close": {
+        "title": "Annuler",
+        "desc": "Ferme la boîte de dialogue sans appliquer la nouvelle valeur."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Ouvre cette vue d'aide."
+      },
+      "reset": {
+        "title": "Réinitialiser la valeur",
+        "desc": "Réinitialise la valeur à la valeur initiale utilisée lors de l'ouverture de la boîte de dialogue."
+      },
+      "apply": {
+        "title": "Valider la valeur",
+        "desc": "Applique la valeur actuellement sélectionnée."
+      },
+      "privacy": {
+        "title": "Confidentialité et traitement",
+        "desc": "La valeur est traitée localement dans l'application. Aucun service externe n'est appelé."
+      }
+    }
+  },
   "myExperienceList": {
     "title": "Mes expériences",
     "intro": "Cette vue affiche les expériences que vous avez enregistrées depuis la recherche d'expériences. Vous pouvez ouvrir les détails, recentrer la carte, ouvrir les tuiles et continuer dans des cartes externes ou sur Viator.",

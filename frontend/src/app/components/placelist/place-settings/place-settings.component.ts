@@ -251,6 +251,11 @@ export class PlaceProfileComponent {
     return 1 - clamped / 100;
   }
 
+  formatPercentLabel(value: number): string {
+    const numeric = Number.isFinite(value) ? Math.round(value) : 0;
+    return `${numeric}%`;
+  }
+
   private showStorageUnsupported(): void {
     this.snackBar.open(
       this.translation.t('common.media.storageUnsupported'),

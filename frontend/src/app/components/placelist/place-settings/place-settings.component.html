@@ -113,9 +113,8 @@
         <mat-icon>opacity</mat-icon>
         <span>{{ 'common.placeSettings.tileBackgroundTransparency' | transloco }}</span>
       </div>
-      <span class="slider-value">{{ data.place.placeBackgroundTransparency ?? 0 }}%</span>
     </div>
-    <mat-slider min="0" max="100" step="5" thumbLabel tickInterval="20"
+    <mat-slider [min]="0" [max]="100" [step]="5" discrete [displayWith]="formatPercentLabel"
       [disabled]="!data.place.placeBackgroundImage">
       <input matSliderThumb [(ngModel)]="data.place.placeBackgroundTransparency" />
     </mat-slider>

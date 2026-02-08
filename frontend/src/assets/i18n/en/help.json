@@ -2110,6 +2110,40 @@
       }
     }
   },
+  "valueEditDialog": {
+    "title": "Value editor",
+    "intro": "This dialog lets you adjust one numeric value precisely.",
+    "items": {
+      "field": {
+        "title": "Enter value directly",
+        "desc": "Type the value directly with the keyboard. The allowed bounds are shown in the field label."
+      },
+      "step": {
+        "title": "Adjust with plus and minus",
+        "desc": "Use - and + to decrease or increase the value in the configured step size."
+      },
+      "close": {
+        "title": "Cancel",
+        "desc": "Closes the dialog without applying the new value."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "Opens this help view."
+      },
+      "reset": {
+        "title": "Reset value",
+        "desc": "Resets the value back to the initial value used when opening the dialog."
+      },
+      "apply": {
+        "title": "Apply value",
+        "desc": "Applies the currently selected value."
+      },
+      "privacy": {
+        "title": "Privacy and processing",
+        "desc": "The value is processed locally in the app. No external service is called."
+      }
+    }
+  },
   "myExperienceList": {
     "title": "My experiences",
     "intro": "This view shows the experiences you saved from experience search. You can open details, jump to map positions, open tiles, and continue in external maps or on Viator.",

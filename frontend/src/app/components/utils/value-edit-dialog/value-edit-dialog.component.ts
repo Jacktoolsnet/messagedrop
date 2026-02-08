@@ -50,7 +50,7 @@ export class ValueEditDialogComponent {
   readonly help = inject(HelpDialogService);
   private readonly dialogRef = inject(MatDialogRef<ValueEditDialogComponent>);
   readonly data = inject<ValueEditDialogData>(MAT_DIALOG_DATA);
-  private readonly resolvedHelpTopic: HelpTopic = this.data.helpTopic ?? 'rangeEditDialog';
+  private readonly resolvedHelpTopic: HelpTopic = this.data.helpTopic ?? 'valueEditDialog';
 
   readonly form = new FormGroup<ValueEditForm>({
     value: new FormControl(this.alignToStep(this.data.value), { nonNullable: true })
@@ -112,4 +112,3 @@ export class ValueEditDialogComponent {
     return this.data.unit ? `${value} ${this.data.unit}` : `${value}`;
   }
 }
-

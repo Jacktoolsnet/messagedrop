@@ -2710,6 +2710,47 @@ const HELP_TOPICS = {
       }
     ]
   },
+  valueEditDialog: {
+    titleKey: 'valueEditDialog.title',
+    introKey: 'valueEditDialog.intro',
+    items: [
+      {
+        icon: 'edit',
+        titleKey: 'valueEditDialog.items.field.title',
+        descriptionKey: 'valueEditDialog.items.field.desc'
+      },
+      {
+        icon: 'swap_vert',
+        titleKey: 'valueEditDialog.items.step.title',
+        descriptionKey: 'valueEditDialog.items.step.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'valueEditDialog.items.close.title',
+        descriptionKey: 'valueEditDialog.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'valueEditDialog.items.help.title',
+        descriptionKey: 'valueEditDialog.items.help.desc'
+      },
+      {
+        icon: 'restart_alt',
+        titleKey: 'valueEditDialog.items.reset.title',
+        descriptionKey: 'valueEditDialog.items.reset.desc'
+      },
+      {
+        icon: 'check',
+        titleKey: 'valueEditDialog.items.apply.title',
+        descriptionKey: 'valueEditDialog.items.apply.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'valueEditDialog.items.privacy.title',
+        descriptionKey: 'valueEditDialog.items.privacy.desc'
+      }
+    ]
+  },
   myExperienceList: {
     titleKey: 'myExperienceList.title',
     introKey: 'myExperienceList.intro',

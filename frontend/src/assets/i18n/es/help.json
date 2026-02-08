@@ -2110,6 +2110,40 @@
       }
     }
   },
+  "valueEditDialog": {
+    "title": "Editar valor",
+    "intro": "En este diálogo puedes ajustar con precisión un único valor numérico.",
+    "items": {
+      "field": {
+        "title": "Introducir valor directamente",
+        "desc": "Escribe el valor directamente con el teclado. Los límites permitidos se muestran en la etiqueta del campo."
+      },
+      "step": {
+        "title": "Ajustar con más y menos",
+        "desc": "Usa - y + para reducir o aumentar el valor en los pasos permitidos."
+      },
+      "close": {
+        "title": "Cancelar",
+        "desc": "Cierra el diálogo sin aplicar el nuevo valor."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Abre esta vista de ayuda."
+      },
+      "reset": {
+        "title": "Restablecer valor",
+        "desc": "Restablece el valor al valor inicial con el que se abrió el diálogo."
+      },
+      "apply": {
+        "title": "Aplicar valor",
+        "desc": "Aplica el valor seleccionado actualmente."
+      },
+      "privacy": {
+        "title": "Privacidad y procesamiento",
+        "desc": "El valor se procesa localmente en la app. No se llama a servicios externos."
+      }
+    }
+  },
   "myExperienceList": {
     "title": "Mis experiencias",
     "intro": "Aquí ves las experiencias que guardaste desde la búsqueda de experiencias. Puedes abrir detalles, saltar al mapa, abrir mosaicos y continuar en mapas externos o en Viator.",

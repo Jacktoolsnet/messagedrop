@@ -2110,6 +2110,40 @@
       }
     }
   },
+  "valueEditDialog": {
+    "title": "Wert bearbeiten",
+    "intro": "In diesem Dialog passt du einen einzelnen Zahlenwert präzise an.",
+    "items": {
+      "field": {
+        "title": "Wert direkt eingeben",
+        "desc": "Gib den gewünschten Wert direkt per Tastatur ein. Der erlaubte Bereich steht im Feldtitel."
+      },
+      "step": {
+        "title": "Wert mit Plus und Minus ändern",
+        "desc": "Mit den Schaltflächen - und + verringerst oder erhöhst du den Wert in den erlaubten Schritten."
+      },
+      "close": {
+        "title": "Abbrechen",
+        "desc": "Schließt den Dialog ohne den neuen Wert zu übernehmen."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Öffnet diese Hilfeansicht."
+      },
+      "reset": {
+        "title": "Wert zurücksetzen",
+        "desc": "Setzt den Wert auf den Ausgangswert zurück, mit dem der Dialog geöffnet wurde."
+      },
+      "apply": {
+        "title": "Wert übernehmen",
+        "desc": "Übernimmt den aktuell eingestellten Wert."
+      },
+      "privacy": {
+        "title": "Datenschutz und Verarbeitung",
+        "desc": "Der Wert wird nur lokal in der App verarbeitet. Es werden keine externen Dienste aufgerufen."
+      }
+    }
+  },
   "myExperienceList": {
     "title": "Meine Erlebnisse",
     "intro": "Hier siehst du die Erlebnisse, die du in der Erlebnissuche gespeichert hast. Du kannst Details öffnen, auf der Karte anspringen, Kacheln öffnen und externe Karten oder Viator verwenden.",
