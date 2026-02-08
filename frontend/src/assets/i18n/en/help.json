@@ -207,13 +207,146 @@
     }
   },
   "airQuality": {
-    "title": "Air quality"
+    "title": "Air quality",
+    "intro": "In this dialog you review air-quality data for a location and switch between tile and chart view.",
+    "items": {
+      "day": {
+        "title": "Select day",
+        "desc": "Use the day toggle bar to switch between available forecast days."
+      },
+      "category": {
+        "title": "Switch category",
+        "desc": "Use categories (pollen, particulate matter, pollutants) to filter visible metrics."
+      },
+      "hour": {
+        "title": "Select hour",
+        "desc": "Use the hour slider to choose the time used for tile values."
+      },
+      "tiles": {
+        "title": "Open metric tile",
+        "desc": "Tap a tile to open the detailed view for that metric."
+      },
+      "detail": {
+        "title": "View detail chart",
+        "desc": "The detail view shows the daily timeline of the selected metric as a chart."
+      },
+      "navigation": {
+        "title": "Navigate metrics",
+        "desc": "In detail view, use arrows to switch to previous or next metric and X to return to tile view."
+      },
+      "source": {
+        "title": "Data source",
+        "desc": "The link in the dialog shows the provider used for these values (Open-Meteo)."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "Closes the air-quality dialog."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "Opens this help view."
+      },
+      "privacy": {
+        "title": "Privacy and processing",
+        "desc": "For air-quality requests, location data is sent to the app server and weather provider. Loaded values are cached locally in app storage (IndexedDB)."
+      }
+    }
   },
   "weather": {
-    "title": "Weather"
+    "title": "Weather",
+    "intro": "In this dialog you review weather data for a location and switch between tile and chart view.",
+    "items": {
+      "day": {
+        "title": "Select day",
+        "desc": "Use the day toggle bar to switch between available forecast days."
+      },
+      "hour": {
+        "title": "Select hour",
+        "desc": "Use the hour slider to choose the time shown in weather tiles."
+      },
+      "tiles": {
+        "title": "Open weather tile",
+        "desc": "Tap a tile to open the detailed view for that metric."
+      },
+      "detail": {
+        "title": "View detail chart",
+        "desc": "The detail view shows the daily timeline of the selected weather metric as a chart."
+      },
+      "navigation": {
+        "title": "Navigate metrics",
+        "desc": "In detail view, use arrows to switch to previous or next metric and X to return to tile view."
+      },
+      "source": {
+        "title": "Data source",
+        "desc": "The link in the dialog shows the provider used for these values (Open-Meteo)."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "Closes the weather dialog."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "Opens this help view."
+      },
+      "privacy": {
+        "title": "Privacy and processing",
+        "desc": "For weather requests, location data is sent to the app server and weather provider. Loaded values are cached locally in app storage (IndexedDB)."
+      }
+    }
   },
   "appSettings": {
-    "title": "App settings"
+    "title": "App settings",
+    "intro": "In this dialog you configure global app settings such as theme, language, storage, and backup options.",
+    "items": {
+      "theme": {
+        "title": "Choose theme color",
+        "desc": "Sets the app color theme."
+      },
+      "themeMode": {
+        "title": "Light/Dark/System",
+        "desc": "Controls whether the app uses light mode, dark mode, or the device theme."
+      },
+      "language": {
+        "title": "Set language",
+        "desc": "Selects the app language or system language."
+      },
+      "location": {
+        "title": "Location on startup",
+        "desc": "Enables location detection when the app starts (only available when location permission is granted)."
+      },
+      "storage": {
+        "title": "Request persistent storage",
+        "desc": "Requests persistent browser storage so local data is less likely to be cleared by the system."
+      },
+      "logging": {
+        "title": "Diagnostic logging",
+        "desc": "Enables technical logs for analysis and troubleshooting."
+      },
+      "backup": {
+        "title": "Backup on exit",
+        "desc": "Creates a local backup automatically when leaving the app."
+      },
+      "version": {
+        "title": "Version info",
+        "desc": "Shows installed version, build, commit, and timestamp."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "Closes the dialog and discards unapplied changes."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "Opens this help view."
+      },
+      "apply": {
+        "title": "Apply",
+        "desc": "Saves the current settings."
+      },
+      "privacy": {
+        "title": "Privacy and storage",
+        "desc": "These settings are stored locally in app storage (IndexedDB). External requests occur only when you actively use related features (for example location permission)."
+      }
+    }
   },
   "contactChatroom": {
     "title": "Contact chat"
@@ -558,22 +691,236 @@
     "title": "Case status"
   },
   "legalDisclaimer": {
-    "title": "Disclaimer"
+    "title": "Disclaimer",
+    "intro": "Here you read the disclaimer, switch language, and can open or download the text.",
+    "items": {
+      "language": {
+        "title": "Switch language",
+        "desc": "Switches between German and English versions."
+      },
+      "content": {
+        "title": "Read text",
+        "desc": "Shows the full disclaimer in the dialog."
+      },
+      "consent": {
+        "title": "Set consent",
+        "desc": "Use the toggle to confirm or revoke your consent."
+      },
+      "retry": {
+        "title": "Retry on load error",
+        "desc": "Loads the text again if an error is shown."
+      },
+      "open": {
+        "title": "Open in new tab",
+        "desc": "Opens the current legal text in a browser tab."
+      },
+      "download": {
+        "title": "Download file",
+        "desc": "Downloads the currently selected language version as a text file."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "Closes the dialog."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "Opens this help view."
+      },
+      "privacy": {
+        "title": "Privacy and storage",
+        "desc": "Consent status is stored locally in app settings. Opening in a new tab follows browser and server privacy/logging rules."
+      }
+    }
   },
   "legalExternalContent": {
-    "title": "External content"
+    "title": "External content",
+    "intro": "Here you control which external content is allowed to load in the app.",
+    "items": {
+      "providers": {
+        "title": "Select providers",
+        "desc": "Each supported provider has its own settings tile (for example YouTube, Spotify, Tenor, Unsplash)."
+      },
+      "toggle": {
+        "title": "Allow or block content",
+        "desc": "The toggle enables or disables content per provider."
+      },
+      "links": {
+        "title": "Terms and privacy links",
+        "desc": "For each provider, you can open linked terms and privacy notices directly."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "Closes the dialog without applying changes."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "Opens this help view."
+      },
+      "apply": {
+        "title": "Apply",
+        "desc": "Saves the external content settings."
+      },
+      "privacy": {
+        "title": "Privacy and external requests",
+        "desc": "When providers are enabled, loading external content can send requests to third parties (for example IP address and browser data). Disabled providers are not embedded in the app."
+      }
+    }
   },
   "legalNotice": {
-    "title": "Legal notice"
+    "title": "Legal notice",
+    "intro": "Here you read the legal notice, switch language, and can open or download the text.",
+    "items": {
+      "language": {
+        "title": "Switch language",
+        "desc": "Switches between German and English versions."
+      },
+      "content": {
+        "title": "Read text",
+        "desc": "Shows the full legal notice in the dialog."
+      },
+      "retry": {
+        "title": "Retry on load error",
+        "desc": "Loads the text again if an error is shown."
+      },
+      "open": {
+        "title": "Open in new tab",
+        "desc": "Opens the legal notice in a browser tab."
+      },
+      "download": {
+        "title": "Download file",
+        "desc": "Downloads the currently selected language version as a text file."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "Closes the dialog."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "Opens this help view."
+      },
+      "privacy": {
+        "title": "Privacy and processing",
+        "desc": "The legal notice is loaded as static legal text. Opening in a new tab or downloading can create browser and server log data."
+      }
+    }
   },
   "privacyPolicy": {
-    "title": "Privacy policy"
+    "title": "Privacy policy",
+    "intro": "Here you read the privacy policy, switch language, and can open or download the text.",
+    "items": {
+      "language": {
+        "title": "Switch language",
+        "desc": "Switches between German and English versions."
+      },
+      "content": {
+        "title": "Read text",
+        "desc": "Shows the full privacy policy in the dialog."
+      },
+      "consent": {
+        "title": "Set consent",
+        "desc": "Use the toggle to confirm or revoke your consent."
+      },
+      "retry": {
+        "title": "Retry on load error",
+        "desc": "Loads the text again if an error is shown."
+      },
+      "open": {
+        "title": "Open in new tab",
+        "desc": "Opens the privacy policy in a browser tab."
+      },
+      "download": {
+        "title": "Download file",
+        "desc": "Downloads the currently selected language version as a text file."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "Closes the dialog."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "Opens this help view."
+      },
+      "privacy": {
+        "title": "Privacy and storage",
+        "desc": "Consent status is stored locally in app settings. Opening in a new tab follows browser and server privacy/logging rules."
+      }
+    }
   },
   "termsOfService": {
-    "title": "Terms of service"
+    "title": "Terms of service",
+    "intro": "Here you read the terms of service, switch language, and can open or download the text.",
+    "items": {
+      "language": {
+        "title": "Switch language",
+        "desc": "Switches between German and English versions."
+      },
+      "content": {
+        "title": "Read text",
+        "desc": "Shows the full terms of service in the dialog."
+      },
+      "consent": {
+        "title": "Set consent",
+        "desc": "Use the toggle to confirm or revoke your consent."
+      },
+      "retry": {
+        "title": "Retry on load error",
+        "desc": "Loads the text again if an error is shown."
+      },
+      "open": {
+        "title": "Open in new tab",
+        "desc": "Opens the terms of service in a browser tab."
+      },
+      "download": {
+        "title": "Download file",
+        "desc": "Downloads the currently selected language version as a text file."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "Closes the dialog."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "Opens this help view."
+      },
+      "privacy": {
+        "title": "Privacy and storage",
+        "desc": "Consent status is stored locally in app settings. Opening in a new tab follows browser and server privacy/logging rules."
+      }
+    }
   },
   "thirdPartyLicenses": {
-    "title": "Third-party licenses"
+    "title": "Third-party licenses",
+    "intro": "Here you can view license texts of third-party libraries used in the app and open or download them.",
+    "items": {
+      "content": {
+        "title": "Read license texts",
+        "desc": "Shows collected third-party licenses in the dialog."
+      },
+      "retry": {
+        "title": "Retry on load error",
+        "desc": "Loads the license file again if an error is shown."
+      },
+      "open": {
+        "title": "Open in new tab",
+        "desc": "Opens the license file in a browser tab."
+      },
+      "download": {
+        "title": "Download file",
+        "desc": "Downloads the license file as a text document."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "Closes the dialog."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "Opens this help view."
+      },
+      "privacy": {
+        "title": "Privacy and processing",
+        "desc": "License texts are static app files. Opening in a new tab or downloading can create browser and server log data."
+      }
+    }
   },
   "messageList": {
     "title": "Messages"
@@ -1350,7 +1697,42 @@
     "title": "Search result"
   },
   "nominatimSearch": {
-    "title": "Search places"
+    "title": "Search places",
+    "intro": "In this dialog you search places via Nominatim and open results in list or map view.",
+    "items": {
+      "query": {
+        "title": "Enter search term",
+        "desc": "Enter an address, place name, or POI and start the search."
+      },
+      "viewMap": {
+        "title": "Open map view",
+        "desc": "Use the map icon to switch to map view for the search results."
+      },
+      "viewList": {
+        "title": "Open list view",
+        "desc": "Use the list icon to switch back to the result list."
+      },
+      "actions": {
+        "title": "Use result actions",
+        "desc": "For each result, you can jump to the place on the map or open external navigation."
+      },
+      "add": {
+        "title": "Use as place",
+        "desc": "When available, you can save a result as one of your own places."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "Closes place search."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "Opens this help view."
+      },
+      "privacy": {
+        "title": "Privacy and processing",
+        "desc": "Search requests are sent to the Nominatim service. External navigation sends location data to the selected map provider."
+      }
+    }
   },
   "qrCode": {
     "title": "QR code"
@@ -1411,10 +1793,92 @@
     }
   },
   "searchSettings": {
-    "title": "Search settings"
+    "title": "Search settings",
+    "intro": "Here you define which search sources appear on the map and from which zoom level they are loaded.",
+    "items": {
+      "sources": {
+        "title": "Show or hide sources",
+        "desc": "You can enable or disable each data source. Some private sources are only available with backend login."
+      },
+      "zoom": {
+        "title": "Minimum zoom per source",
+        "desc": "Defines from which map zoom level pins of that source are shown."
+      },
+      "preview": {
+        "title": "Map preview",
+        "desc": "The preview shows immediately how your selected zoom values affect visibility."
+      },
+      "close": {
+        "title": "Cancel",
+        "desc": "Closes the dialog without applying changes."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "Opens this help view."
+      },
+      "apply": {
+        "title": "Apply",
+        "desc": "Saves the current search settings."
+      },
+      "privacy": {
+        "title": "Privacy and storage",
+        "desc": "Search settings are stored locally in app storage (IndexedDB). They only control how data sources are shown and loaded."
+      }
+    }
   },
   "experienceSearch": {
-    "title": "Experience search"
+    "title": "Experience search",
+    "intro": "In this dialog you search experiences, filter results, and open details, bookmarks, or provider pages.",
+    "items": {
+      "query": {
+        "title": "Start search",
+        "desc": "Enter a search term and start searching. On later pages, the same button loads more results."
+      },
+      "filter": {
+        "title": "Set filters",
+        "desc": "Use the filter menu to set date range, price, duration, and currency."
+      },
+      "sort": {
+        "title": "Choose sorting",
+        "desc": "Set result order (for example relevance or price)."
+      },
+      "viewMap": {
+        "title": "Open map view",
+        "desc": "Use the map icon to switch to map view and tap pins to open matching results."
+      },
+      "viewList": {
+        "title": "Open list view",
+        "desc": "Use the list icon to switch back to the result list."
+      },
+      "loadMore": {
+        "title": "Load more results",
+        "desc": "When available, search can load additional result pages."
+      },
+      "details": {
+        "title": "Open details",
+        "desc": "Opens the detail dialog with description, meeting points, map, and supplier information."
+      },
+      "saveOrShare": {
+        "title": "Bookmark or send to chat",
+        "desc": "Depending on context, you can save an experience as a bookmark or send it directly to chat."
+      },
+      "provider": {
+        "title": "Open on Viator",
+        "desc": "Opens the selected experience offer page on the provider site."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "Closes experience search."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "Opens this help view."
+      },
+      "privacy": {
+        "title": "Privacy and processing",
+        "desc": "Search and detail requests are sent to the experience provider. External provider or map links follow their own privacy policies."
+      }
+    }
   },
   "myExperienceList": {
     "title": "My experiences",

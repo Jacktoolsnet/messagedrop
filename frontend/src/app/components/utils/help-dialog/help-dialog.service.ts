@@ -212,18 +212,176 @@ const ITEMS = {
 const HELP_TOPICS = {
   airQuality: {
     titleKey: 'airQuality.title',
-    introKey: 'common.intros.info',
-    items: ITEMS.info
+    introKey: 'airQuality.intro',
+    items: [
+      {
+        icon: 'calendar_today',
+        titleKey: 'airQuality.items.day.title',
+        descriptionKey: 'airQuality.items.day.desc'
+      },
+      {
+        icon: 'tune',
+        titleKey: 'airQuality.items.category.title',
+        descriptionKey: 'airQuality.items.category.desc'
+      },
+      {
+        icon: 'schedule',
+        titleKey: 'airQuality.items.hour.title',
+        descriptionKey: 'airQuality.items.hour.desc'
+      },
+      {
+        icon: 'dashboard',
+        titleKey: 'airQuality.items.tiles.title',
+        descriptionKey: 'airQuality.items.tiles.desc'
+      },
+      {
+        icon: 'show_chart',
+        titleKey: 'airQuality.items.detail.title',
+        descriptionKey: 'airQuality.items.detail.desc'
+      },
+      {
+        icon: 'swap_horiz',
+        titleKey: 'airQuality.items.navigation.title',
+        descriptionKey: 'airQuality.items.navigation.desc'
+      },
+      {
+        icon: 'public',
+        titleKey: 'airQuality.items.source.title',
+        descriptionKey: 'airQuality.items.source.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'airQuality.items.close.title',
+        descriptionKey: 'airQuality.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'airQuality.items.help.title',
+        descriptionKey: 'airQuality.items.help.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'airQuality.items.privacy.title',
+        descriptionKey: 'airQuality.items.privacy.desc'
+      }
+    ]
   },
   weather: {
     titleKey: 'weather.title',
-    introKey: 'common.intros.info',
-    items: ITEMS.info
+    introKey: 'weather.intro',
+    items: [
+      {
+        icon: 'calendar_today',
+        titleKey: 'weather.items.day.title',
+        descriptionKey: 'weather.items.day.desc'
+      },
+      {
+        icon: 'schedule',
+        titleKey: 'weather.items.hour.title',
+        descriptionKey: 'weather.items.hour.desc'
+      },
+      {
+        icon: 'dashboard',
+        titleKey: 'weather.items.tiles.title',
+        descriptionKey: 'weather.items.tiles.desc'
+      },
+      {
+        icon: 'show_chart',
+        titleKey: 'weather.items.detail.title',
+        descriptionKey: 'weather.items.detail.desc'
+      },
+      {
+        icon: 'swap_horiz',
+        titleKey: 'weather.items.navigation.title',
+        descriptionKey: 'weather.items.navigation.desc'
+      },
+      {
+        icon: 'public',
+        titleKey: 'weather.items.source.title',
+        descriptionKey: 'weather.items.source.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'weather.items.close.title',
+        descriptionKey: 'weather.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'weather.items.help.title',
+        descriptionKey: 'weather.items.help.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'weather.items.privacy.title',
+        descriptionKey: 'weather.items.privacy.desc'
+      }
+    ]
   },
   appSettings: {
     titleKey: 'appSettings.title',
-    introKey: 'common.intros.settings',
-    items: ITEMS.settings
+    introKey: 'appSettings.intro',
+    items: [
+      {
+        icon: 'palette',
+        titleKey: 'appSettings.items.theme.title',
+        descriptionKey: 'appSettings.items.theme.desc'
+      },
+      {
+        icon: 'light_mode',
+        titleKey: 'appSettings.items.themeMode.title',
+        descriptionKey: 'appSettings.items.themeMode.desc'
+      },
+      {
+        icon: 'translate',
+        titleKey: 'appSettings.items.language.title',
+        descriptionKey: 'appSettings.items.language.desc'
+      },
+      {
+        icon: 'my_location',
+        titleKey: 'appSettings.items.location.title',
+        descriptionKey: 'appSettings.items.location.desc'
+      },
+      {
+        icon: 'inventory_2',
+        titleKey: 'appSettings.items.storage.title',
+        descriptionKey: 'appSettings.items.storage.desc'
+      },
+      {
+        icon: 'bug_report',
+        titleKey: 'appSettings.items.logging.title',
+        descriptionKey: 'appSettings.items.logging.desc'
+      },
+      {
+        icon: 'save',
+        titleKey: 'appSettings.items.backup.title',
+        descriptionKey: 'appSettings.items.backup.desc'
+      },
+      {
+        icon: 'info',
+        titleKey: 'appSettings.items.version.title',
+        descriptionKey: 'appSettings.items.version.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'appSettings.items.close.title',
+        descriptionKey: 'appSettings.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'appSettings.items.help.title',
+        descriptionKey: 'appSettings.items.help.desc'
+      },
+      {
+        icon: 'check',
+        titleKey: 'appSettings.items.apply.title',
+        descriptionKey: 'appSettings.items.apply.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'appSettings.items.privacy.title',
+        descriptionKey: 'appSettings.items.privacy.desc'
+      }
+    ]
   },
   profile: {
     titleKey: 'profile.title',
@@ -812,33 +970,284 @@ const HELP_TOPICS = {
   },
   legalDisclaimer: {
     titleKey: 'legalDisclaimer.title',
-    introKey: 'common.intros.legal',
-    items: ITEMS.legal
+    introKey: 'legalDisclaimer.intro',
+    items: [
+      {
+        icon: 'translate',
+        titleKey: 'legalDisclaimer.items.language.title',
+        descriptionKey: 'legalDisclaimer.items.language.desc'
+      },
+      {
+        icon: 'description',
+        titleKey: 'legalDisclaimer.items.content.title',
+        descriptionKey: 'legalDisclaimer.items.content.desc'
+      },
+      {
+        icon: 'fact_check',
+        titleKey: 'legalDisclaimer.items.consent.title',
+        descriptionKey: 'legalDisclaimer.items.consent.desc'
+      },
+      {
+        icon: 'restart_alt',
+        titleKey: 'legalDisclaimer.items.retry.title',
+        descriptionKey: 'legalDisclaimer.items.retry.desc'
+      },
+      {
+        icon: 'open_in_new',
+        titleKey: 'legalDisclaimer.items.open.title',
+        descriptionKey: 'legalDisclaimer.items.open.desc'
+      },
+      {
+        icon: 'download',
+        titleKey: 'legalDisclaimer.items.download.title',
+        descriptionKey: 'legalDisclaimer.items.download.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'legalDisclaimer.items.close.title',
+        descriptionKey: 'legalDisclaimer.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'legalDisclaimer.items.help.title',
+        descriptionKey: 'legalDisclaimer.items.help.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'legalDisclaimer.items.privacy.title',
+        descriptionKey: 'legalDisclaimer.items.privacy.desc'
+      }
+    ]
   },
   legalExternalContent: {
     titleKey: 'legalExternalContent.title',
-    introKey: 'common.intros.legal',
-    items: ITEMS.legal
+    introKey: 'legalExternalContent.intro',
+    items: [
+      {
+        icon: 'public',
+        titleKey: 'legalExternalContent.items.providers.title',
+        descriptionKey: 'legalExternalContent.items.providers.desc'
+      },
+      {
+        icon: 'toggle_on',
+        titleKey: 'legalExternalContent.items.toggle.title',
+        descriptionKey: 'legalExternalContent.items.toggle.desc'
+      },
+      {
+        icon: 'open_in_new',
+        titleKey: 'legalExternalContent.items.links.title',
+        descriptionKey: 'legalExternalContent.items.links.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'legalExternalContent.items.close.title',
+        descriptionKey: 'legalExternalContent.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'legalExternalContent.items.help.title',
+        descriptionKey: 'legalExternalContent.items.help.desc'
+      },
+      {
+        icon: 'check',
+        titleKey: 'legalExternalContent.items.apply.title',
+        descriptionKey: 'legalExternalContent.items.apply.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'legalExternalContent.items.privacy.title',
+        descriptionKey: 'legalExternalContent.items.privacy.desc'
+      }
+    ]
   },
   legalNotice: {
     titleKey: 'legalNotice.title',
-    introKey: 'common.intros.legal',
-    items: ITEMS.legal
+    introKey: 'legalNotice.intro',
+    items: [
+      {
+        icon: 'translate',
+        titleKey: 'legalNotice.items.language.title',
+        descriptionKey: 'legalNotice.items.language.desc'
+      },
+      {
+        icon: 'description',
+        titleKey: 'legalNotice.items.content.title',
+        descriptionKey: 'legalNotice.items.content.desc'
+      },
+      {
+        icon: 'restart_alt',
+        titleKey: 'legalNotice.items.retry.title',
+        descriptionKey: 'legalNotice.items.retry.desc'
+      },
+      {
+        icon: 'open_in_new',
+        titleKey: 'legalNotice.items.open.title',
+        descriptionKey: 'legalNotice.items.open.desc'
+      },
+      {
+        icon: 'download',
+        titleKey: 'legalNotice.items.download.title',
+        descriptionKey: 'legalNotice.items.download.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'legalNotice.items.close.title',
+        descriptionKey: 'legalNotice.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'legalNotice.items.help.title',
+        descriptionKey: 'legalNotice.items.help.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'legalNotice.items.privacy.title',
+        descriptionKey: 'legalNotice.items.privacy.desc'
+      }
+    ]
   },
   privacyPolicy: {
     titleKey: 'privacyPolicy.title',
-    introKey: 'common.intros.legal',
-    items: ITEMS.legal
+    introKey: 'privacyPolicy.intro',
+    items: [
+      {
+        icon: 'translate',
+        titleKey: 'privacyPolicy.items.language.title',
+        descriptionKey: 'privacyPolicy.items.language.desc'
+      },
+      {
+        icon: 'description',
+        titleKey: 'privacyPolicy.items.content.title',
+        descriptionKey: 'privacyPolicy.items.content.desc'
+      },
+      {
+        icon: 'fact_check',
+        titleKey: 'privacyPolicy.items.consent.title',
+        descriptionKey: 'privacyPolicy.items.consent.desc'
+      },
+      {
+        icon: 'restart_alt',
+        titleKey: 'privacyPolicy.items.retry.title',
+        descriptionKey: 'privacyPolicy.items.retry.desc'
+      },
+      {
+        icon: 'open_in_new',
+        titleKey: 'privacyPolicy.items.open.title',
+        descriptionKey: 'privacyPolicy.items.open.desc'
+      },
+      {
+        icon: 'download',
+        titleKey: 'privacyPolicy.items.download.title',
+        descriptionKey: 'privacyPolicy.items.download.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'privacyPolicy.items.close.title',
+        descriptionKey: 'privacyPolicy.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'privacyPolicy.items.help.title',
+        descriptionKey: 'privacyPolicy.items.help.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'privacyPolicy.items.privacy.title',
+        descriptionKey: 'privacyPolicy.items.privacy.desc'
+      }
+    ]
   },
   termsOfService: {
     titleKey: 'termsOfService.title',
-    introKey: 'common.intros.legal',
-    items: ITEMS.legal
+    introKey: 'termsOfService.intro',
+    items: [
+      {
+        icon: 'translate',
+        titleKey: 'termsOfService.items.language.title',
+        descriptionKey: 'termsOfService.items.language.desc'
+      },
+      {
+        icon: 'description',
+        titleKey: 'termsOfService.items.content.title',
+        descriptionKey: 'termsOfService.items.content.desc'
+      },
+      {
+        icon: 'fact_check',
+        titleKey: 'termsOfService.items.consent.title',
+        descriptionKey: 'termsOfService.items.consent.desc'
+      },
+      {
+        icon: 'restart_alt',
+        titleKey: 'termsOfService.items.retry.title',
+        descriptionKey: 'termsOfService.items.retry.desc'
+      },
+      {
+        icon: 'open_in_new',
+        titleKey: 'termsOfService.items.open.title',
+        descriptionKey: 'termsOfService.items.open.desc'
+      },
+      {
+        icon: 'download',
+        titleKey: 'termsOfService.items.download.title',
+        descriptionKey: 'termsOfService.items.download.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'termsOfService.items.close.title',
+        descriptionKey: 'termsOfService.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'termsOfService.items.help.title',
+        descriptionKey: 'termsOfService.items.help.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'termsOfService.items.privacy.title',
+        descriptionKey: 'termsOfService.items.privacy.desc'
+      }
+    ]
   },
   thirdPartyLicenses: {
     titleKey: 'thirdPartyLicenses.title',
-    introKey: 'common.intros.legal',
-    items: ITEMS.legal
+    introKey: 'thirdPartyLicenses.intro',
+    items: [
+      {
+        icon: 'description',
+        titleKey: 'thirdPartyLicenses.items.content.title',
+        descriptionKey: 'thirdPartyLicenses.items.content.desc'
+      },
+      {
+        icon: 'restart_alt',
+        titleKey: 'thirdPartyLicenses.items.retry.title',
+        descriptionKey: 'thirdPartyLicenses.items.retry.desc'
+      },
+      {
+        icon: 'open_in_new',
+        titleKey: 'thirdPartyLicenses.items.open.title',
+        descriptionKey: 'thirdPartyLicenses.items.open.desc'
+      },
+      {
+        icon: 'download',
+        titleKey: 'thirdPartyLicenses.items.download.title',
+        descriptionKey: 'thirdPartyLicenses.items.download.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'thirdPartyLicenses.items.close.title',
+        descriptionKey: 'thirdPartyLicenses.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'thirdPartyLicenses.items.help.title',
+        descriptionKey: 'thirdPartyLicenses.items.help.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'thirdPartyLicenses.items.privacy.title',
+        descriptionKey: 'thirdPartyLicenses.items.privacy.desc'
+      }
+    ]
   },
   messageList: {
     titleKey: 'messageList.title',
@@ -1795,8 +2204,49 @@ const HELP_TOPICS = {
   },
   nominatimSearch: {
     titleKey: 'nominatimSearch.title',
-    introKey: 'common.intros.searchMap',
-    items: ITEMS.searchMap
+    introKey: 'nominatimSearch.intro',
+    items: [
+      {
+        icon: 'search',
+        titleKey: 'nominatimSearch.items.query.title',
+        descriptionKey: 'nominatimSearch.items.query.desc'
+      },
+      {
+        icon: 'map',
+        titleKey: 'nominatimSearch.items.viewMap.title',
+        descriptionKey: 'nominatimSearch.items.viewMap.desc'
+      },
+      {
+        icon: 'list',
+        titleKey: 'nominatimSearch.items.viewList.title',
+        descriptionKey: 'nominatimSearch.items.viewList.desc'
+      },
+      {
+        icon: 'place',
+        titleKey: 'nominatimSearch.items.actions.title',
+        descriptionKey: 'nominatimSearch.items.actions.desc'
+      },
+      {
+        icon: 'add_location',
+        titleKey: 'nominatimSearch.items.add.title',
+        descriptionKey: 'nominatimSearch.items.add.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'nominatimSearch.items.close.title',
+        descriptionKey: 'nominatimSearch.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'nominatimSearch.items.help.title',
+        descriptionKey: 'nominatimSearch.items.help.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'nominatimSearch.items.privacy.title',
+        descriptionKey: 'nominatimSearch.items.privacy.desc'
+      }
+    ]
   },
   qrCode: {
     titleKey: 'qrCode.title',
@@ -1872,13 +2322,110 @@ const HELP_TOPICS = {
   },
   searchSettings: {
     titleKey: 'searchSettings.title',
-    introKey: 'common.intros.settings',
-    items: ITEMS.settings
+    introKey: 'searchSettings.intro',
+    items: [
+      {
+        icon: 'manage_search',
+        titleKey: 'searchSettings.items.sources.title',
+        descriptionKey: 'searchSettings.items.sources.desc'
+      },
+      {
+        icon: 'zoom_in_map',
+        titleKey: 'searchSettings.items.zoom.title',
+        descriptionKey: 'searchSettings.items.zoom.desc'
+      },
+      {
+        icon: 'map',
+        titleKey: 'searchSettings.items.preview.title',
+        descriptionKey: 'searchSettings.items.preview.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'searchSettings.items.close.title',
+        descriptionKey: 'searchSettings.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'searchSettings.items.help.title',
+        descriptionKey: 'searchSettings.items.help.desc'
+      },
+      {
+        icon: 'check',
+        titleKey: 'searchSettings.items.apply.title',
+        descriptionKey: 'searchSettings.items.apply.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'searchSettings.items.privacy.title',
+        descriptionKey: 'searchSettings.items.privacy.desc'
+      }
+    ]
   },
   experienceSearch: {
     titleKey: 'experienceSearch.title',
-    introKey: 'common.intros.searchMap',
-    items: ITEMS.searchMap
+    introKey: 'experienceSearch.intro',
+    items: [
+      {
+        icon: 'search',
+        titleKey: 'experienceSearch.items.query.title',
+        descriptionKey: 'experienceSearch.items.query.desc'
+      },
+      {
+        icon: 'tune',
+        titleKey: 'experienceSearch.items.filter.title',
+        descriptionKey: 'experienceSearch.items.filter.desc'
+      },
+      {
+        icon: 'sort',
+        titleKey: 'experienceSearch.items.sort.title',
+        descriptionKey: 'experienceSearch.items.sort.desc'
+      },
+      {
+        icon: 'map',
+        titleKey: 'experienceSearch.items.viewMap.title',
+        descriptionKey: 'experienceSearch.items.viewMap.desc'
+      },
+      {
+        icon: 'list',
+        titleKey: 'experienceSearch.items.viewList.title',
+        descriptionKey: 'experienceSearch.items.viewList.desc'
+      },
+      {
+        icon: 'refresh',
+        titleKey: 'experienceSearch.items.loadMore.title',
+        descriptionKey: 'experienceSearch.items.loadMore.desc'
+      },
+      {
+        icon: 'expand_content',
+        titleKey: 'experienceSearch.items.details.title',
+        descriptionKey: 'experienceSearch.items.details.desc'
+      },
+      {
+        icon: 'bookmark_add',
+        titleKey: 'experienceSearch.items.saveOrShare.title',
+        descriptionKey: 'experienceSearch.items.saveOrShare.desc'
+      },
+      {
+        icon: 'shopping_cart',
+        titleKey: 'experienceSearch.items.provider.title',
+        descriptionKey: 'experienceSearch.items.provider.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'experienceSearch.items.close.title',
+        descriptionKey: 'experienceSearch.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'experienceSearch.items.help.title',
+        descriptionKey: 'experienceSearch.items.help.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'experienceSearch.items.privacy.title',
+        descriptionKey: 'experienceSearch.items.privacy.desc'
+      }
+    ]
   },
   myExperienceList: {
     titleKey: 'myExperienceList.title',

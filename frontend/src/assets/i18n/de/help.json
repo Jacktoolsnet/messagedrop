@@ -207,13 +207,146 @@
     }
   },
   "airQuality": {
-    "title": "Luftqualität"
+    "title": "Luftqualität",
+    "intro": "In diesem Dialog prüfst du Luftqualitätsdaten für einen Ort und wechselst zwischen Kachel- und Diagrammansicht.",
+    "items": {
+      "day": {
+        "title": "Tag wählen",
+        "desc": "Über die Tagesleiste wechselst du zwischen den verfügbaren Vorhersagetagen."
+      },
+      "category": {
+        "title": "Kategorie wechseln",
+        "desc": "Über die Kategorien (Pollen, Feinstaub, Schadstoffe) filterst du die angezeigten Messwerte."
+      },
+      "hour": {
+        "title": "Stunde wählen",
+        "desc": "Mit dem Stundenregler legst du fest, für welche Uhrzeit die Kacheln berechnet werden."
+      },
+      "tiles": {
+        "title": "Messkachel öffnen",
+        "desc": "Tippe eine Kachel an, um die Detailansicht des Messwerts zu öffnen."
+      },
+      "detail": {
+        "title": "Detaildiagramm ansehen",
+        "desc": "In der Detailansicht siehst du den Tagesverlauf des ausgewählten Messwerts als Diagramm."
+      },
+      "navigation": {
+        "title": "Zwischen Messwerten wechseln",
+        "desc": "In der Detailansicht wechselst du mit den Pfeilen zum vorherigen oder nächsten Messwert und mit X zurück zur Kachelansicht."
+      },
+      "source": {
+        "title": "Datenquelle",
+        "desc": "Der Link im Dialog zeigt den verwendeten Datenanbieter Open-Meteo."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Schließt den Luftqualitätsdialog."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Öffnet diese Hilfeansicht."
+      },
+      "privacy": {
+        "title": "Datenschutz und Verarbeitung",
+        "desc": "Für die Luftqualitätsabfrage werden Standortdaten an den App-Server und den Wetteranbieter übermittelt. Geladene Werte werden lokal im App-Speicher (IndexedDB) zwischengespeichert."
+      }
+    }
   },
   "weather": {
-    "title": "Wetter"
+    "title": "Wetter",
+    "intro": "In diesem Dialog prüfst du Wetterdaten für einen Ort und wechselst zwischen Kachel- und Diagrammansicht.",
+    "items": {
+      "day": {
+        "title": "Tag wählen",
+        "desc": "Über die Tagesleiste wechselst du zwischen den verfügbaren Vorhersagetagen."
+      },
+      "hour": {
+        "title": "Stunde wählen",
+        "desc": "Mit dem Stundenregler legst du fest, für welche Uhrzeit die Wetterkacheln angezeigt werden."
+      },
+      "tiles": {
+        "title": "Wetterkachel öffnen",
+        "desc": "Tippe eine Kachel an, um die Detailansicht des Messwerts zu öffnen."
+      },
+      "detail": {
+        "title": "Detaildiagramm ansehen",
+        "desc": "In der Detailansicht siehst du den Tagesverlauf des ausgewählten Wetterwerts als Diagramm."
+      },
+      "navigation": {
+        "title": "Zwischen Wetterwerten wechseln",
+        "desc": "In der Detailansicht wechselst du mit den Pfeilen zum vorherigen oder nächsten Wert und mit X zurück zur Kachelansicht."
+      },
+      "source": {
+        "title": "Datenquelle",
+        "desc": "Der Link im Dialog zeigt den verwendeten Wetteranbieter Open-Meteo."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Schließt den Wetterdialog."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Öffnet diese Hilfeansicht."
+      },
+      "privacy": {
+        "title": "Datenschutz und Verarbeitung",
+        "desc": "Für die Wetterabfrage werden Standortdaten an den App-Server und den Wetteranbieter übermittelt. Geladene Werte werden lokal im App-Speicher (IndexedDB) zwischengespeichert."
+      }
+    }
   },
   "appSettings": {
-    "title": "App-Einstellungen"
+    "title": "App-Einstellungen",
+    "intro": "In diesem Dialog konfigurierst du globale App-Einstellungen wie Design, Sprache, Speicher- und Sicherungsoptionen.",
+    "items": {
+      "theme": {
+        "title": "Design-Farbe wählen",
+        "desc": "Legt das Farbschema der App fest."
+      },
+      "themeMode": {
+        "title": "Hell/Dunkel/System",
+        "desc": "Steuert, ob das helle, dunkle oder das Geräte-Design verwendet wird."
+      },
+      "language": {
+        "title": "Sprache festlegen",
+        "desc": "Wählt die App-Sprache oder die Systemsprache."
+      },
+      "location": {
+        "title": "Standort beim Start",
+        "desc": "Aktiviert die Standorterkennung beim App-Start (nur verfügbar, wenn Standortfreigabe erteilt wurde)."
+      },
+      "storage": {
+        "title": "Dauerhaften Speicher anfragen",
+        "desc": "Fordert persistente Browser-Speicherung an, damit lokale Daten seltener durch das System bereinigt werden."
+      },
+      "logging": {
+        "title": "Diagnose-Logging",
+        "desc": "Aktiviert technische Protokolle für Analyse und Fehlersuche."
+      },
+      "backup": {
+        "title": "Backup beim Beenden",
+        "desc": "Erstellt beim Verlassen der App automatisch ein lokales Backup."
+      },
+      "version": {
+        "title": "Versionsinfo",
+        "desc": "Zeigt installierte Version, Build, Commit und Zeitstempel."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Schließt den Dialog und verwirft nicht übernommene Änderungen."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Öffnet diese Hilfeansicht."
+      },
+      "apply": {
+        "title": "Übernehmen",
+        "desc": "Speichert die aktuellen Einstellungen."
+      },
+      "privacy": {
+        "title": "Datenschutz und Speicherung",
+        "desc": "Diese Einstellungen werden lokal im App-Speicher (IndexedDB) gespeichert. Externe Anfragen entstehen nur, wenn du entsprechende Funktionen aktiv nutzt (z. B. Standortfreigabe)."
+      }
+    }
   },
   "contactChatroom": {
     "title": "Kontakt-Chat"
@@ -558,22 +691,236 @@
     "title": "Fallstatus"
   },
   "legalDisclaimer": {
-    "title": "Haftungsausschluss"
+    "title": "Haftungsausschluss",
+    "intro": "Hier liest du den Haftungsausschluss, wechselst die Sprache und kannst den Text in neuem Tab öffnen oder herunterladen.",
+    "items": {
+      "language": {
+        "title": "Sprache wechseln",
+        "desc": "Schaltet zwischen deutscher und englischer Fassung um."
+      },
+      "content": {
+        "title": "Text lesen",
+        "desc": "Zeigt den vollständigen Haftungsausschluss im Dialog an."
+      },
+      "consent": {
+        "title": "Zustimmung setzen",
+        "desc": "Über den Schalter bestätigst oder widerrufst du die Zustimmung."
+      },
+      "retry": {
+        "title": "Bei Ladefehler neu laden",
+        "desc": "Lädt den Text erneut, falls ein Fehler angezeigt wird."
+      },
+      "open": {
+        "title": "In neuem Tab öffnen",
+        "desc": "Öffnet den aktuellen Rechtstext in einem Browser-Tab."
+      },
+      "download": {
+        "title": "Datei herunterladen",
+        "desc": "Lädt die aktuell gewählte Sprachfassung als Textdatei herunter."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Schließt den Dialog."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Öffnet diese Hilfeansicht."
+      },
+      "privacy": {
+        "title": "Datenschutz und Speicherung",
+        "desc": "Der Zustimmungsstatus wird lokal in den App-Einstellungen gespeichert. Beim Öffnen in neuem Tab gelten die Datenschutzbestimmungen des Browsers und Servers."
+      }
+    }
   },
   "legalExternalContent": {
-    "title": "Externe Inhalte"
+    "title": "Externe Inhalte",
+    "intro": "Hier steuerst du, welche externen Inhalte in der App geladen werden dürfen.",
+    "items": {
+      "providers": {
+        "title": "Anbieter auswählen",
+        "desc": "Für jeden unterstützten Anbieter gibt es eine eigene Einstellungskachel (z. B. YouTube, Spotify, Tenor, Unsplash)."
+      },
+      "toggle": {
+        "title": "Inhalte erlauben oder sperren",
+        "desc": "Der Schalter aktiviert oder deaktiviert Inhalte je Anbieter."
+      },
+      "links": {
+        "title": "Nutzungsbedingungen und Datenschutz",
+        "desc": "Zu jedem Anbieter kannst du die verlinkten Bedingungen und Datenschutzhinweise direkt öffnen."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Schließt den Dialog ohne Übernahme der Änderungen."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Öffnet diese Hilfeansicht."
+      },
+      "apply": {
+        "title": "Übernehmen",
+        "desc": "Speichert die Einstellungen für externe Inhalte."
+      },
+      "privacy": {
+        "title": "Datenschutz und externe Anfragen",
+        "desc": "Bei aktivierten Anbietern können beim Laden externer Inhalte Anfragen an Drittanbieter übertragen werden (z. B. IP-Adresse, Browserdaten). Deaktivierte Anbieter werden in der App nicht eingebunden."
+      }
+    }
   },
   "legalNotice": {
-    "title": "Impressum"
+    "title": "Impressum",
+    "intro": "Hier liest du das Impressum, wechselst die Sprache und kannst den Text in neuem Tab öffnen oder herunterladen.",
+    "items": {
+      "language": {
+        "title": "Sprache wechseln",
+        "desc": "Schaltet zwischen deutscher und englischer Fassung um."
+      },
+      "content": {
+        "title": "Text lesen",
+        "desc": "Zeigt das vollständige Impressum im Dialog an."
+      },
+      "retry": {
+        "title": "Bei Ladefehler neu laden",
+        "desc": "Lädt den Text erneut, falls ein Fehler angezeigt wird."
+      },
+      "open": {
+        "title": "In neuem Tab öffnen",
+        "desc": "Öffnet das Impressum in einem Browser-Tab."
+      },
+      "download": {
+        "title": "Datei herunterladen",
+        "desc": "Lädt die aktuell gewählte Sprachfassung als Textdatei herunter."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Schließt den Dialog."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Öffnet diese Hilfeansicht."
+      },
+      "privacy": {
+        "title": "Datenschutz und Verarbeitung",
+        "desc": "Das Impressum wird als statischer Rechtstext geladen. Beim Öffnen in neuem Tab oder Download können Browser- und Server-Logdaten anfallen."
+      }
+    }
   },
   "privacyPolicy": {
-    "title": "Datenschutzerklärung"
+    "title": "Datenschutzerklärung",
+    "intro": "Hier liest du die Datenschutzerklärung, wechselst die Sprache und kannst den Text in neuem Tab öffnen oder herunterladen.",
+    "items": {
+      "language": {
+        "title": "Sprache wechseln",
+        "desc": "Schaltet zwischen deutscher und englischer Fassung um."
+      },
+      "content": {
+        "title": "Text lesen",
+        "desc": "Zeigt die vollständige Datenschutzerklärung im Dialog an."
+      },
+      "consent": {
+        "title": "Zustimmung setzen",
+        "desc": "Über den Schalter bestätigst oder widerrufst du die Zustimmung."
+      },
+      "retry": {
+        "title": "Bei Ladefehler neu laden",
+        "desc": "Lädt den Text erneut, falls ein Fehler angezeigt wird."
+      },
+      "open": {
+        "title": "In neuem Tab öffnen",
+        "desc": "Öffnet die Datenschutzerklärung in einem Browser-Tab."
+      },
+      "download": {
+        "title": "Datei herunterladen",
+        "desc": "Lädt die aktuell gewählte Sprachfassung als Textdatei herunter."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Schließt den Dialog."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Öffnet diese Hilfeansicht."
+      },
+      "privacy": {
+        "title": "Datenschutz und Speicherung",
+        "desc": "Der Zustimmungsstatus wird lokal in den App-Einstellungen gespeichert. Beim Öffnen in neuem Tab gelten die Datenschutzbestimmungen des Browsers und Servers."
+      }
+    }
   },
   "termsOfService": {
-    "title": "Nutzungsbedingungen"
+    "title": "Nutzungsbedingungen",
+    "intro": "Hier liest du die Nutzungsbedingungen, wechselst die Sprache und kannst den Text in neuem Tab öffnen oder herunterladen.",
+    "items": {
+      "language": {
+        "title": "Sprache wechseln",
+        "desc": "Schaltet zwischen deutscher und englischer Fassung um."
+      },
+      "content": {
+        "title": "Text lesen",
+        "desc": "Zeigt die vollständigen Nutzungsbedingungen im Dialog an."
+      },
+      "consent": {
+        "title": "Zustimmung setzen",
+        "desc": "Über den Schalter bestätigst oder widerrufst du die Zustimmung."
+      },
+      "retry": {
+        "title": "Bei Ladefehler neu laden",
+        "desc": "Lädt den Text erneut, falls ein Fehler angezeigt wird."
+      },
+      "open": {
+        "title": "In neuem Tab öffnen",
+        "desc": "Öffnet die Nutzungsbedingungen in einem Browser-Tab."
+      },
+      "download": {
+        "title": "Datei herunterladen",
+        "desc": "Lädt die aktuell gewählte Sprachfassung als Textdatei herunter."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Schließt den Dialog."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Öffnet diese Hilfeansicht."
+      },
+      "privacy": {
+        "title": "Datenschutz und Speicherung",
+        "desc": "Der Zustimmungsstatus wird lokal in den App-Einstellungen gespeichert. Beim Öffnen in neuem Tab gelten die Datenschutzbestimmungen des Browsers und Servers."
+      }
+    }
   },
   "thirdPartyLicenses": {
-    "title": "Drittanbieter-Lizenzen"
+    "title": "Drittanbieter-Lizenzen",
+    "intro": "Hier siehst du die Lizenztexte verwendeter Drittanbieter-Bibliotheken und kannst sie öffnen oder herunterladen.",
+    "items": {
+      "content": {
+        "title": "Lizenztexte lesen",
+        "desc": "Zeigt die gesammelten Drittanbieter-Lizenzen im Dialog an."
+      },
+      "retry": {
+        "title": "Bei Ladefehler neu laden",
+        "desc": "Lädt die Lizenzdatei erneut, falls ein Fehler angezeigt wird."
+      },
+      "open": {
+        "title": "In neuem Tab öffnen",
+        "desc": "Öffnet die Lizenzdatei in einem Browser-Tab."
+      },
+      "download": {
+        "title": "Datei herunterladen",
+        "desc": "Lädt die Lizenzdatei als Textdokument herunter."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Schließt den Dialog."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Öffnet diese Hilfeansicht."
+      },
+      "privacy": {
+        "title": "Datenschutz und Verarbeitung",
+        "desc": "Die Lizenztexte sind statische Dateien der App. Beim Öffnen in neuem Tab oder Download können Browser- und Server-Logdaten anfallen."
+      }
+    }
   },
   "messageList": {
     "title": "Nachrichten"
@@ -1350,7 +1697,42 @@
     "title": "Suchergebnis"
   },
   "nominatimSearch": {
-    "title": "Orte suchen"
+    "title": "Orte suchen",
+    "intro": "In diesem Dialog suchst du Orte per Nominatim und öffnest Ergebnisse in Liste oder Karte.",
+    "items": {
+      "query": {
+        "title": "Suchbegriff eingeben",
+        "desc": "Gib eine Adresse, einen Ortsnamen oder einen POI ein und starte die Suche."
+      },
+      "viewMap": {
+        "title": "Kartenansicht öffnen",
+        "desc": "Über das Karten-Symbol wechselst du in die Kartenansicht der Suchergebnisse."
+      },
+      "viewList": {
+        "title": "Listenansicht öffnen",
+        "desc": "Über das Listen-Symbol wechselst du zurück zur Ergebnisliste."
+      },
+      "actions": {
+        "title": "Ergebnisaktionen nutzen",
+        "desc": "Pro Treffer kannst du den Ort auf der Karte anspringen oder externe Navigation öffnen."
+      },
+      "add": {
+        "title": "Als Ort übernehmen",
+        "desc": "Wenn die Funktion verfügbar ist, kannst du einen Treffer als eigenen Ort speichern."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Schließt die Ortssuche."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Öffnet diese Hilfeansicht."
+      },
+      "privacy": {
+        "title": "Datenschutz und Verarbeitung",
+        "desc": "Suchanfragen werden an den Nominatim-Dienst gesendet. Bei externer Navigation werden Positionsdaten an den gewählten Kartenanbieter übermittelt."
+      }
+    }
   },
   "qrCode": {
     "title": "QR-Code"
@@ -1411,10 +1793,92 @@
     }
   },
   "searchSettings": {
-    "title": "Sucheinstellungen"
+    "title": "Sucheinstellungen",
+    "intro": "Hier legst du fest, welche Suchquellen auf der Karte erscheinen und ab welchem Zoomlevel sie geladen werden.",
+    "items": {
+      "sources": {
+        "title": "Suchquellen ein-/ausblenden",
+        "desc": "Pro Datenquelle kannst du die Anzeige aktivieren oder deaktivieren. Einige private Quellen sind nur mit Backend-Anmeldung verfügbar."
+      },
+      "zoom": {
+        "title": "Mindest-Zoom pro Quelle",
+        "desc": "Bestimmt, ab welchem Kartenzoom Pins dieser Quelle eingeblendet werden."
+      },
+      "preview": {
+        "title": "Kartenvorschau",
+        "desc": "Die Vorschau zeigt direkt, wie sich die gewählten Zoomwerte auswirken."
+      },
+      "close": {
+        "title": "Abbrechen",
+        "desc": "Schließt den Dialog ohne Übernahme der Änderungen."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Öffnet diese Hilfeansicht."
+      },
+      "apply": {
+        "title": "Übernehmen",
+        "desc": "Speichert die aktuellen Sucheinstellungen."
+      },
+      "privacy": {
+        "title": "Datenschutz und Speicherung",
+        "desc": "Sucheinstellungen werden lokal im App-Speicher (IndexedDB) abgelegt. Sie steuern nur die Anzeige und das Nachladen von Datenquellen."
+      }
+    }
   },
   "experienceSearch": {
-    "title": "Erlebnissuche"
+    "title": "Erlebnissuche",
+    "intro": "In diesem Dialog suchst du Erlebnisse, filterst Ergebnisse und öffnest Details, Merkliste oder Anbieterseiten.",
+    "items": {
+      "query": {
+        "title": "Suche starten",
+        "desc": "Gib einen Suchbegriff ein und starte die Suche. Bei weiteren Seiten lädt dieselbe Taste zusätzliche Ergebnisse nach."
+      },
+      "filter": {
+        "title": "Filter einstellen",
+        "desc": "Über das Filtermenü setzt du Zeitraum, Preis, Dauer und Währung."
+      },
+      "sort": {
+        "title": "Sortierung wählen",
+        "desc": "Lege die Reihenfolge der Treffer fest (z. B. Relevanz oder Preis)."
+      },
+      "viewMap": {
+        "title": "Kartenansicht öffnen",
+        "desc": "Über das Karten-Symbol wechselst du in die Kartenansicht und kannst Pins antippen, um zugehörige Treffer zu öffnen."
+      },
+      "viewList": {
+        "title": "Listenansicht öffnen",
+        "desc": "Über das Listen-Symbol wechselst du zurück zur Listenansicht der Treffer."
+      },
+      "loadMore": {
+        "title": "Weitere Ergebnisse laden",
+        "desc": "Wenn verfügbar, lädt die Suche weitere Trefferseiten nach."
+      },
+      "details": {
+        "title": "Details öffnen",
+        "desc": "Öffnet den Detaildialog mit Beschreibung, Treffpunkten, Karte und Anbieterinformationen."
+      },
+      "saveOrShare": {
+        "title": "Merken oder in Chat senden",
+        "desc": "Je nach Kontext kannst du ein Erlebnis als Lesezeichen speichern oder direkt in einen Chat senden."
+      },
+      "provider": {
+        "title": "Bei Viator öffnen",
+        "desc": "Öffnet die Angebotsseite des ausgewählten Erlebnisses beim Anbieter."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Schließt die Erlebnissuche."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Öffnet diese Hilfeansicht."
+      },
+      "privacy": {
+        "title": "Datenschutz und Verarbeitung",
+        "desc": "Such- und Detailabfragen werden an den Erlebnisanbieter übermittelt. Bei externen Anbieter- oder Kartenlinks gelten deren Datenschutzbestimmungen."
+      }
+    }
   },
   "myExperienceList": {
     "title": "Meine Erlebnisse",

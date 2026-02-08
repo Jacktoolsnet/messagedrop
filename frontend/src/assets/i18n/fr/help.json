@@ -207,13 +207,146 @@
     }
   },
   "airQuality": {
-    "title": "Qualité de l'air"
+    "title": "Qualité de l'air",
+    "intro": "Dans cette boîte de dialogue, vous consultez la qualité de l'air d'un lieu et basculez entre vue tuiles et graphique.",
+    "items": {
+      "day": {
+        "title": "Sélectionner le jour",
+        "desc": "Utilisez la barre des jours pour passer d'un jour de prévision disponible à un autre."
+      },
+      "category": {
+        "title": "Changer de catégorie",
+        "desc": "Utilisez les catégories (pollens, particules, polluants) pour filtrer les mesures affichées."
+      },
+      "hour": {
+        "title": "Sélectionner l'heure",
+        "desc": "Utilisez le curseur horaire pour choisir l'heure utilisée dans les tuiles."
+      },
+      "tiles": {
+        "title": "Ouvrir une tuile",
+        "desc": "Touchez une tuile pour ouvrir la vue détaillée de cette mesure."
+      },
+      "detail": {
+        "title": "Voir le graphique détaillé",
+        "desc": "La vue détaillée affiche l'évolution journalière de la mesure sélectionnée sous forme de graphique."
+      },
+      "navigation": {
+        "title": "Naviguer entre mesures",
+        "desc": "Dans la vue détaillée, utilisez les flèches pour passer à la mesure précédente ou suivante et X pour revenir aux tuiles."
+      },
+      "source": {
+        "title": "Source des données",
+        "desc": "Le lien du dialogue indique le fournisseur utilisé pour ces données (Open-Meteo)."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Ferme la boîte de dialogue de qualité de l'air."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Ouvre cette vue d'aide."
+      },
+      "privacy": {
+        "title": "Confidentialité et traitement",
+        "desc": "Pour la qualité de l'air, les données de position sont envoyées au serveur de l'app et au fournisseur météo. Les valeurs chargées sont mises en cache localement dans IndexedDB."
+      }
+    }
   },
   "weather": {
-    "title": "Météo"
+    "title": "Météo",
+    "intro": "Dans cette boîte de dialogue, vous consultez les données météo d'un lieu et basculez entre vue tuiles et graphique.",
+    "items": {
+      "day": {
+        "title": "Sélectionner le jour",
+        "desc": "Utilisez la barre des jours pour passer d'un jour de prévision disponible à un autre."
+      },
+      "hour": {
+        "title": "Sélectionner l'heure",
+        "desc": "Utilisez le curseur horaire pour choisir l'heure affichée dans les tuiles météo."
+      },
+      "tiles": {
+        "title": "Ouvrir une tuile météo",
+        "desc": "Touchez une tuile pour ouvrir la vue détaillée de cette mesure."
+      },
+      "detail": {
+        "title": "Voir le graphique détaillé",
+        "desc": "La vue détaillée affiche l'évolution journalière de la mesure météo sélectionnée sous forme de graphique."
+      },
+      "navigation": {
+        "title": "Naviguer entre mesures",
+        "desc": "Dans la vue détaillée, utilisez les flèches pour passer à la mesure précédente ou suivante et X pour revenir aux tuiles."
+      },
+      "source": {
+        "title": "Source des données",
+        "desc": "Le lien du dialogue indique le fournisseur utilisé pour ces données (Open-Meteo)."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Ferme la boîte de dialogue météo."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Ouvre cette vue d'aide."
+      },
+      "privacy": {
+        "title": "Confidentialité et traitement",
+        "desc": "Pour la météo, les données de position sont envoyées au serveur de l'app et au fournisseur météo. Les valeurs chargées sont mises en cache localement dans IndexedDB."
+      }
+    }
   },
   "appSettings": {
-    "title": "Paramètres de l'app"
+    "title": "Paramètres de l'app",
+    "intro": "Dans cette boîte de dialogue, vous configurez les paramètres globaux de l'app, comme le thème, la langue, le stockage et les options de sauvegarde.",
+    "items": {
+      "theme": {
+        "title": "Choisir la couleur du thème",
+        "desc": "Définit le thème de couleur de l'application."
+      },
+      "themeMode": {
+        "title": "Clair/Sombre/Système",
+        "desc": "Détermine si l'app utilise le mode clair, le mode sombre ou le thème de l'appareil."
+      },
+      "language": {
+        "title": "Définir la langue",
+        "desc": "Sélectionne la langue de l'app ou la langue du système."
+      },
+      "location": {
+        "title": "Position au démarrage",
+        "desc": "Active la détection de position au démarrage de l'app (disponible uniquement si l'autorisation de localisation est accordée)."
+      },
+      "storage": {
+        "title": "Demander un stockage persistant",
+        "desc": "Demande un stockage persistant du navigateur afin que les données locales soient moins souvent supprimées par le système."
+      },
+      "logging": {
+        "title": "Journalisation de diagnostic",
+        "desc": "Active des journaux techniques pour l'analyse et le dépannage."
+      },
+      "backup": {
+        "title": "Sauvegarde à la fermeture",
+        "desc": "Crée automatiquement une sauvegarde locale lorsque vous quittez l'app."
+      },
+      "version": {
+        "title": "Informations de version",
+        "desc": "Affiche la version installée, le build, le commit et l'horodatage."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Ferme la boîte de dialogue et annule les modifications non appliquées."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Ouvre cette vue d'aide."
+      },
+      "apply": {
+        "title": "Valider",
+        "desc": "Enregistre les paramètres actuels."
+      },
+      "privacy": {
+        "title": "Confidentialité et stockage",
+        "desc": "Ces paramètres sont enregistrés localement dans le stockage de l'app (IndexedDB). Les requêtes externes ne se produisent que lorsque vous utilisez activement des fonctions associées (par exemple l'autorisation de localisation)."
+      }
+    }
   },
   "contactChatroom": {
     "title": "Chat du contact"
@@ -558,22 +691,236 @@
     "title": "Statut du dossier"
   },
   "legalDisclaimer": {
-    "title": "Avertissement"
+    "title": "Avertissement",
+    "intro": "Ici, vous lisez l'avertissement, changez la langue et pouvez ouvrir ou télécharger le texte.",
+    "items": {
+      "language": {
+        "title": "Changer la langue",
+        "desc": "Bascule entre la version allemande et anglaise."
+      },
+      "content": {
+        "title": "Lire le texte",
+        "desc": "Affiche l'avertissement complet dans la boîte de dialogue."
+      },
+      "consent": {
+        "title": "Définir le consentement",
+        "desc": "Le commutateur permet de confirmer ou retirer votre consentement."
+      },
+      "retry": {
+        "title": "Réessayer en cas d'erreur",
+        "desc": "Recharge le texte si une erreur est affichée."
+      },
+      "open": {
+        "title": "Ouvrir dans un nouvel onglet",
+        "desc": "Ouvre le texte légal actuel dans un onglet du navigateur."
+      },
+      "download": {
+        "title": "Télécharger le fichier",
+        "desc": "Télécharge la version de langue sélectionnée sous forme de fichier texte."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Ferme la boîte de dialogue."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Ouvre cette vue d'aide."
+      },
+      "privacy": {
+        "title": "Confidentialité et stockage",
+        "desc": "Le statut de consentement est stocké localement dans les paramètres de l'app. L'ouverture dans un nouvel onglet suit les règles de confidentialité et de journalisation du navigateur et du serveur."
+      }
+    }
   },
   "legalExternalContent": {
-    "title": "Contenu externe"
+    "title": "Contenu externe",
+    "intro": "Ici, vous contrôlez quels contenus externes peuvent être chargés dans l'application.",
+    "items": {
+      "providers": {
+        "title": "Sélectionner les fournisseurs",
+        "desc": "Chaque fournisseur pris en charge dispose de sa propre tuile de réglage (par exemple YouTube, Spotify, Tenor, Unsplash)."
+      },
+      "toggle": {
+        "title": "Autoriser ou bloquer le contenu",
+        "desc": "L'interrupteur active ou désactive le contenu pour chaque fournisseur."
+      },
+      "links": {
+        "title": "Liens vers conditions et confidentialité",
+        "desc": "Pour chaque fournisseur, vous pouvez ouvrir directement les conditions d'utilisation et les informations de confidentialité."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Ferme la boîte de dialogue sans appliquer les modifications."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Ouvre cette vue d'aide."
+      },
+      "apply": {
+        "title": "Valider",
+        "desc": "Enregistre les paramètres de contenu externe."
+      },
+      "privacy": {
+        "title": "Confidentialité et requêtes externes",
+        "desc": "Lorsque des fournisseurs sont activés, le chargement de contenus externes peut envoyer des requêtes à des tiers (par exemple adresse IP et données du navigateur). Les fournisseurs désactivés ne sont pas intégrés dans l'app."
+      }
+    }
   },
   "legalNotice": {
-    "title": "Mentions légales"
+    "title": "Mentions légales",
+    "intro": "Ici, vous lisez les mentions légales, changez la langue et pouvez ouvrir ou télécharger le texte.",
+    "items": {
+      "language": {
+        "title": "Changer la langue",
+        "desc": "Bascule entre la version allemande et anglaise."
+      },
+      "content": {
+        "title": "Lire le texte",
+        "desc": "Affiche les mentions légales complètes dans la boîte de dialogue."
+      },
+      "retry": {
+        "title": "Réessayer en cas d'erreur",
+        "desc": "Recharge le texte si une erreur est affichée."
+      },
+      "open": {
+        "title": "Ouvrir dans un nouvel onglet",
+        "desc": "Ouvre les mentions légales dans un onglet du navigateur."
+      },
+      "download": {
+        "title": "Télécharger le fichier",
+        "desc": "Télécharge la version de langue sélectionnée sous forme de fichier texte."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Ferme la boîte de dialogue."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Ouvre cette vue d'aide."
+      },
+      "privacy": {
+        "title": "Confidentialité et traitement",
+        "desc": "Les mentions légales sont chargées comme texte juridique statique. L'ouverture dans un nouvel onglet ou le téléchargement peut générer des données de journal du navigateur et du serveur."
+      }
+    }
   },
   "privacyPolicy": {
-    "title": "Politique de confidentialité"
+    "title": "Politique de confidentialité",
+    "intro": "Ici, vous lisez la politique de confidentialité, changez la langue et pouvez ouvrir ou télécharger le texte.",
+    "items": {
+      "language": {
+        "title": "Changer la langue",
+        "desc": "Bascule entre la version allemande et anglaise."
+      },
+      "content": {
+        "title": "Lire le texte",
+        "desc": "Affiche la politique de confidentialité complète dans la boîte de dialogue."
+      },
+      "consent": {
+        "title": "Définir le consentement",
+        "desc": "Le commutateur permet de confirmer ou retirer votre consentement."
+      },
+      "retry": {
+        "title": "Réessayer en cas d'erreur",
+        "desc": "Recharge le texte si une erreur est affichée."
+      },
+      "open": {
+        "title": "Ouvrir dans un nouvel onglet",
+        "desc": "Ouvre la politique de confidentialité dans un onglet du navigateur."
+      },
+      "download": {
+        "title": "Télécharger le fichier",
+        "desc": "Télécharge la version de langue sélectionnée sous forme de fichier texte."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Ferme la boîte de dialogue."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Ouvre cette vue d'aide."
+      },
+      "privacy": {
+        "title": "Confidentialité et stockage",
+        "desc": "Le statut de consentement est stocké localement dans les paramètres de l'app. L'ouverture dans un nouvel onglet suit les règles de confidentialité et de journalisation du navigateur et du serveur."
+      }
+    }
   },
   "termsOfService": {
-    "title": "Conditions d'utilisation"
+    "title": "Conditions d'utilisation",
+    "intro": "Ici, vous lisez les conditions d'utilisation, changez la langue et pouvez ouvrir ou télécharger le texte.",
+    "items": {
+      "language": {
+        "title": "Changer la langue",
+        "desc": "Bascule entre la version allemande et anglaise."
+      },
+      "content": {
+        "title": "Lire le texte",
+        "desc": "Affiche les conditions d'utilisation complètes dans la boîte de dialogue."
+      },
+      "consent": {
+        "title": "Définir le consentement",
+        "desc": "Le commutateur permet de confirmer ou retirer votre consentement."
+      },
+      "retry": {
+        "title": "Réessayer en cas d'erreur",
+        "desc": "Recharge le texte si une erreur est affichée."
+      },
+      "open": {
+        "title": "Ouvrir dans un nouvel onglet",
+        "desc": "Ouvre les conditions d'utilisation dans un onglet du navigateur."
+      },
+      "download": {
+        "title": "Télécharger le fichier",
+        "desc": "Télécharge la version de langue sélectionnée sous forme de fichier texte."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Ferme la boîte de dialogue."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Ouvre cette vue d'aide."
+      },
+      "privacy": {
+        "title": "Confidentialité et stockage",
+        "desc": "Le statut de consentement est stocké localement dans les paramètres de l'app. L'ouverture dans un nouvel onglet suit les règles de confidentialité et de journalisation du navigateur et du serveur."
+      }
+    }
   },
   "thirdPartyLicenses": {
-    "title": "Licences tierces"
+    "title": "Licences tierces",
+    "intro": "Ici, vous consultez les textes de licence des bibliothèques tierces utilisées par l'app et pouvez les ouvrir ou les télécharger.",
+    "items": {
+      "content": {
+        "title": "Lire les textes de licence",
+        "desc": "Affiche les licences tierces regroupées dans la boîte de dialogue."
+      },
+      "retry": {
+        "title": "Réessayer en cas d'erreur",
+        "desc": "Recharge le fichier de licences si une erreur est affichée."
+      },
+      "open": {
+        "title": "Ouvrir dans un nouvel onglet",
+        "desc": "Ouvre le fichier de licences dans un onglet du navigateur."
+      },
+      "download": {
+        "title": "Télécharger le fichier",
+        "desc": "Télécharge le fichier de licences sous forme de document texte."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Ferme la boîte de dialogue."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Ouvre cette vue d'aide."
+      },
+      "privacy": {
+        "title": "Confidentialité et traitement",
+        "desc": "Les textes de licence sont des fichiers statiques de l'app. L'ouverture dans un nouvel onglet ou le téléchargement peut générer des données de journal du navigateur et du serveur."
+      }
+    }
   },
   "messageList": {
     "title": "Messages"
@@ -1350,7 +1697,42 @@
     "title": "Résultat de recherche"
   },
   "nominatimSearch": {
-    "title": "Rechercher des lieux"
+    "title": "Rechercher des lieux",
+    "intro": "Dans cette boîte de dialogue, vous recherchez des lieux via Nominatim et ouvrez les résultats en liste ou sur la carte.",
+    "items": {
+      "query": {
+        "title": "Saisir la recherche",
+        "desc": "Saisissez une adresse, un nom de lieu ou un POI puis lancez la recherche."
+      },
+      "viewMap": {
+        "title": "Ouvrir la vue carte",
+        "desc": "Avec l'icône carte, vous passez à la vue carte des résultats."
+      },
+      "viewList": {
+        "title": "Ouvrir la vue liste",
+        "desc": "Avec l'icône liste, vous revenez à la liste des résultats."
+      },
+      "actions": {
+        "title": "Utiliser les actions de résultat",
+        "desc": "Pour chaque résultat, vous pouvez centrer le lieu sur la carte ou ouvrir une navigation externe."
+      },
+      "add": {
+        "title": "Utiliser comme lieu",
+        "desc": "Lorsque l'option est disponible, vous pouvez enregistrer un résultat comme lieu personnel."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Ferme la recherche de lieux."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Ouvre cette vue d'aide."
+      },
+      "privacy": {
+        "title": "Confidentialité et traitement",
+        "desc": "Les requêtes de recherche sont envoyées au service Nominatim. La navigation externe transmet les données de position au fournisseur de carte sélectionné."
+      }
+    }
   },
   "qrCode": {
     "title": "Code QR"
@@ -1411,10 +1793,92 @@
     }
   },
   "searchSettings": {
-    "title": "Paramètres de recherche"
+    "title": "Paramètres de recherche",
+    "intro": "Ici, vous définissez quelles sources de recherche apparaissent sur la carte et à partir de quel niveau de zoom elles sont chargées.",
+    "items": {
+      "sources": {
+        "title": "Afficher ou masquer les sources",
+        "desc": "Vous pouvez activer ou désactiver chaque source de données. Certaines sources privées ne sont disponibles qu'avec une connexion backend."
+      },
+      "zoom": {
+        "title": "Zoom minimal par source",
+        "desc": "Définit à partir de quel niveau de zoom de la carte les épingles de cette source sont affichées."
+      },
+      "preview": {
+        "title": "Aperçu de la carte",
+        "desc": "L'aperçu montre immédiatement l'effet des valeurs de zoom sélectionnées."
+      },
+      "close": {
+        "title": "Annuler",
+        "desc": "Ferme la boîte de dialogue sans appliquer les modifications."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Ouvre cette vue d'aide."
+      },
+      "apply": {
+        "title": "Valider",
+        "desc": "Enregistre les paramètres de recherche actuels."
+      },
+      "privacy": {
+        "title": "Confidentialité et stockage",
+        "desc": "Les paramètres de recherche sont enregistrés localement dans le stockage de l'app (IndexedDB). Ils ne contrôlent que l'affichage et le chargement des sources de données."
+      }
+    }
   },
   "experienceSearch": {
-    "title": "Recherche d'expériences"
+    "title": "Recherche d'expériences",
+    "intro": "Dans cette boîte de dialogue, vous recherchez des expériences, filtrez les résultats et ouvrez les détails, favoris ou pages fournisseur.",
+    "items": {
+      "query": {
+        "title": "Lancer la recherche",
+        "desc": "Saisissez un terme de recherche puis lancez la recherche. Sur les pages suivantes, le même bouton charge plus de résultats."
+      },
+      "filter": {
+        "title": "Définir les filtres",
+        "desc": "Le menu filtre permet de définir période, prix, durée et devise."
+      },
+      "sort": {
+        "title": "Choisir le tri",
+        "desc": "Définit l'ordre des résultats (par exemple pertinence ou prix)."
+      },
+      "viewMap": {
+        "title": "Ouvrir la vue carte",
+        "desc": "Avec l'icône carte, vous passez à la vue carte et pouvez toucher les épingles pour ouvrir les résultats associés."
+      },
+      "viewList": {
+        "title": "Ouvrir la vue liste",
+        "desc": "Avec l'icône liste, vous revenez à la vue liste des résultats."
+      },
+      "loadMore": {
+        "title": "Charger plus de résultats",
+        "desc": "Quand disponible, la recherche peut charger des pages supplémentaires de résultats."
+      },
+      "details": {
+        "title": "Ouvrir les détails",
+        "desc": "Ouvre la boîte de dialogue détaillée avec description, points de rendez-vous, carte et informations fournisseur."
+      },
+      "saveOrShare": {
+        "title": "Enregistrer ou envoyer au chat",
+        "desc": "Selon le contexte, vous pouvez enregistrer une expérience en favori ou l'envoyer directement dans un chat."
+      },
+      "provider": {
+        "title": "Ouvrir sur Viator",
+        "desc": "Ouvre la page de l'expérience sélectionnée sur le site du fournisseur."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Ferme la recherche d'expériences."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Ouvre cette vue d'aide."
+      },
+      "privacy": {
+        "title": "Confidentialité et traitement",
+        "desc": "Les requêtes de recherche et de détail sont transmises au fournisseur d'expériences. Les liens externes fournisseur ou carte suivent leurs propres politiques de confidentialité."
+      }
+    }
   },
   "myExperienceList": {
     "title": "Mes expériences",
