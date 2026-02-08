@@ -2,7 +2,6 @@ import { HttpClient } from '@angular/common/http';
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { AppSettings } from '../interfaces/app-settings';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import {
   createDefaultUsageProtectionState,
@@ -281,18 +280,17 @@ export class UsageProtectionService {
         return;
       }
 
-      const remoteSettings = this.normalizeSettings(response.usageProtection.settings);
+      const localSettings = this.normalizeSettings(this.appService.getAppSettings().usageProtection);
       const remoteState = this.normalizeState(response.usageProtection.state);
-      this.settingsSignal.set(remoteSettings);
-      this.stateSignal.set(this.getStateForDate(remoteState, getLocalDateKey(new Date(this.nowSignal()))));
+      const today = getLocalDateKey(new Date(this.nowSignal()));
+      const localStateForToday = this.getStateForDate(this.stateSignal(), today);
+      const remoteStateForToday = this.getStateForDate(remoteState, today);
 
-      const appSettings = this.appService.getAppSettings();
-      const mergedAppSettings: AppSettings = {
-        ...appSettings,
-        usageProtection: remoteSettings
-      };
-      await this.appService.setAppSettings(mergedAppSettings);
+      // Local settings are the single source of truth on this device, independent of login state.
+      this.settingsSignal.set(localSettings);
+      this.stateSignal.set(this.mergeStateForToday(localStateForToday, remoteStateForToday));
       await this.indexedDb.setSetting(UsageProtectionService.stateStorageKey, JSON.stringify(this.stateSignal()));
+      await this.syncToServer();
     } catch {
       // ignore server sync issues and continue with local fallback
     } finally {
@@ -376,6 +374,14 @@ export class UsageProtectionService {
       dateKey,
       consumedSeconds: 0,
       selfExtensionUsed: false
+    };
+  }
+
+  private mergeStateForToday(localState: UsageProtectionState, remoteState: UsageProtectionState): UsageProtectionState {
+    return {
+      dateKey: localState.dateKey,
+      consumedSeconds: Math.max(localState.consumedSeconds, remoteState.consumedSeconds),
+      selfExtensionUsed: localState.selfExtensionUsed || remoteState.selfExtensionUsed
     };
   }
 
