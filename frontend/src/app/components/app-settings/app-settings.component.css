@@ -364,6 +364,45 @@ h4 {
     }
 }
 
+.usage-slider-block {
+    border: 1px solid color-mix(in srgb, var(--mat-card-outlined-outline-color) 72%, transparent);
+    border-radius: 0.9rem;
+    background-color: color-mix(in srgb, var(--mat-card-filled-container-color) 95%, transparent);
+    padding: 0.55rem 0.7rem 0.4rem;
+}
+
+.usage-slider-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.usage-slider-label {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.3;
+    color: var(--mat-app-text-color);
+}
+
+.usage-slider-edit-button {
+    flex: 0 0 auto;
+}
+
+.usage-slider-block mat-slider {
+    width: 100%;
+    display: block;
+}
+
+.usage-slider-value {
+    margin: 0.1rem 0 0;
+    font-size: 0.85rem;
+    text-align: right;
+    color: var(--mat-card-subtitle-text-color);
+    font-variant-numeric: tabular-nums;
+}
+
 .usage-time-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

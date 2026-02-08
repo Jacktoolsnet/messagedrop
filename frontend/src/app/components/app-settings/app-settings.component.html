@@ -141,26 +141,53 @@
       </mat-button-toggle-group>
 
       @if (appSettings.usageProtection.mode !== 'off') {
-      <mat-form-field appearance="fill">
-        <mat-label>{{ 'settings.usageProtection.dailyLimit' | transloco }}</mat-label>
-        <input matInput type="number" min="5" max="720" [ngModel]="appSettings.usageProtection.dailyLimitMinutes"
-          (ngModelChange)="setUsageDailyLimitMinutes($event)">
-      </mat-form-field>
+      <section class="usage-slider-block">
+        <div class="usage-slider-header">
+          <p class="usage-slider-label">{{ 'settings.usageProtection.dailyLimit' | transloco }}</p>
+          <button mat-icon-button type="button" class="usage-slider-edit-button" (click)="openUsageDailyLimitEditor()"
+            [attr.aria-label]="('common.actions.edit' | transloco) + ' ' + ('settings.usageProtection.dailyLimit' | transloco)">
+            <mat-icon>edit</mat-icon>
+          </button>
+        </div>
+        <mat-slider [min]="usageDailyLimitMin" [max]="usageDailyLimitMax" [step]="usageDailyLimitStep" discrete>
+          <input matSliderThumb [value]="appSettings.usageProtection.dailyLimitMinutes"
+            (valueChange)="setUsageDailyLimitMinutes($event)">
+        </mat-slider>
+        <p class="usage-slider-value">{{ appSettings.usageProtection.dailyLimitMinutes }}</p>
+      </section>
 
       @if (appSettings.usageProtection.mode === 'self') {
-      <mat-form-field appearance="fill">
-        <mat-label>{{ 'settings.usageProtection.selfExtension' | transloco }}</mat-label>
-        <input matInput type="number" min="0" max="120" [ngModel]="appSettings.usageProtection.selfExtensionMinutes"
-          (ngModelChange)="setUsageSelfExtensionMinutes($event)">
-      </mat-form-field>
+      <section class="usage-slider-block">
+        <div class="usage-slider-header">
+          <p class="usage-slider-label">{{ 'settings.usageProtection.selfExtension' | transloco }}</p>
+          <button mat-icon-button type="button" class="usage-slider-edit-button" (click)="openUsageSelfExtensionEditor()"
+            [attr.aria-label]="('common.actions.edit' | transloco) + ' ' + ('settings.usageProtection.selfExtension' | transloco)">
+            <mat-icon>edit</mat-icon>
+          </button>
+        </div>
+        <mat-slider [min]="usageSelfExtensionMin" [max]="usageSelfExtensionMax" [step]="usageSelfExtensionStep" discrete>
+          <input matSliderThumb [value]="appSettings.usageProtection.selfExtensionMinutes"
+            (valueChange)="setUsageSelfExtensionMinutes($event)">
+        </mat-slider>
+        <p class="usage-slider-value">{{ appSettings.usageProtection.selfExtensionMinutes }}</p>
+      </section>
       }
 
       @if (appSettings.usageProtection.mode === 'parental') {
-      <mat-form-field appearance="fill">
-        <mat-label>{{ 'settings.usageProtection.parentalExtension' | transloco }}</mat-label>
-        <input matInput type="number" min="1" max="240" [ngModel]="appSettings.usageProtection.parentalExtensionMinutes"
-          (ngModelChange)="setUsageParentalExtensionMinutes($event)">
-      </mat-form-field>
+      <section class="usage-slider-block">
+        <div class="usage-slider-header">
+          <p class="usage-slider-label">{{ 'settings.usageProtection.parentalExtension' | transloco }}</p>
+          <button mat-icon-button type="button" class="usage-slider-edit-button" (click)="openUsageParentalExtensionEditor()"
+            [attr.aria-label]="('common.actions.edit' | transloco) + ' ' + ('settings.usageProtection.parentalExtension' | transloco)">
+            <mat-icon>edit</mat-icon>
+          </button>
+        </div>
+        <mat-slider [min]="usageParentalExtensionMin" [max]="usageParentalExtensionMax" [step]="usageParentalExtensionStep" discrete>
+          <input matSliderThumb [value]="appSettings.usageProtection.parentalExtensionMinutes"
+            (valueChange)="setUsageParentalExtensionMinutes($event)">
+        </mat-slider>
+        <p class="usage-slider-value">{{ appSettings.usageProtection.parentalExtensionMinutes }}</p>
+      </section>
       }
 
       <mat-slide-toggle color="primary" [checked]="appSettings.usageProtection.scheduleEnabled"

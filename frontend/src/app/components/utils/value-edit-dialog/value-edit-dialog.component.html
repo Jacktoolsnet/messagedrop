@@ -1,0 +1,56 @@
+<app-dialog-header
+  icon="edit"
+  [title]="data.title">
+</app-dialog-header>
+
+<mat-dialog-content class="value-edit-content">
+  <section class="value-edit-tile">
+    <div class="value-edit-label">{{ getFieldLabel() }}</div>
+    <mat-form-field appearance="outline" class="value-edit-field" subscriptSizing="dynamic">
+      <button mat-icon-button matPrefix type="button" class="step-button step-button--prefix"
+        (click)="decrease()"
+        [attr.aria-label]="data.label + ' -'">
+        <mat-icon>remove</mat-icon>
+      </button>
+      <input
+        matInput
+        type="number"
+        inputmode="decimal"
+        [step]="data.step"
+        [min]="data.minBound"
+        [max]="data.maxBound"
+        [formControl]="form.controls.value"
+        [attr.aria-label]="data.label"
+        (blur)="onBlur()"
+      />
+      @if (data.unit) {
+        <span matTextSuffix>{{ data.unit }}</span>
+      }
+      <button mat-icon-button matSuffix type="button" class="step-button step-button--suffix"
+        (click)="increase()"
+        [attr.aria-label]="data.label + ' +'">
+        <mat-icon>add</mat-icon>
+      </button>
+    </mat-form-field>
+  </section>
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions value-edit-actions" align="end">
+  <button mat-icon-button class="action-close" type="button" (click)="close()"
+    [attr.aria-label]="'common.actions.close' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+  <button mat-icon-button type="button" (click)="openHelp()"
+    [attr.aria-label]="'common.actions.help' | transloco">
+    <mat-icon>help</mat-icon>
+  </button>
+  <button mat-icon-button type="button" (click)="reset()"
+    [attr.aria-label]="'common.experiences.reset' | transloco">
+    <mat-icon>restart_alt</mat-icon>
+  </button>
+  <button mat-icon-button color="primary" type="button" (click)="apply()"
+    [attr.aria-label]="'common.actions.apply' | transloco">
+    <mat-icon>check</mat-icon>
+  </button>
+</mat-dialog-actions>
+

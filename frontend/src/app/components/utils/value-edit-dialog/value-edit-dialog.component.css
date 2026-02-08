@@ -1,0 +1,164 @@
+:host {
+  color: var(--mat-app-text-color);
+  display: block;
+  --value-field-height: var(--mat-form-field-container-height, 56px);
+  --value-field-shape: 1.2rem;
+  --value-step-button-width: 2.55rem;
+}
+
+.value-edit-content {
+  padding: 0.75rem 1rem 0.75rem;
+}
+
+:host ::ng-deep .mat-mdc-dialog-surface {
+  padding-top: 0;
+}
+
+.value-edit-tile {
+  border: 1px solid color-mix(in srgb, var(--mat-card-outlined-outline-color) 78%, transparent);
+  border-radius: 1rem;
+  background-color: color-mix(in srgb, var(--mat-card-filled-container-color) 94%, transparent);
+  box-shadow: 0 4px 10px color-mix(in srgb, var(--mat-card-outlined-outline-color) 35%, transparent);
+  padding: 0.55rem 0.6rem 0.35rem;
+}
+
+.value-edit-label {
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--mat-card-subtitle-text-color);
+  padding: 0 0.2rem 0.35rem;
+}
+
+.value-edit-field {
+  width: 100%;
+  margin: 0;
+  --mat-form-field-outlined-container-shape: var(--value-field-shape);
+  --mat-form-field-filled-container-shape: var(--value-field-shape);
+  --value-step-border-width: var(--mat-form-field-outlined-outline-width, 1px);
+  --value-step-border-color: var(--mat-form-field-outlined-hover-outline-color, var(--mat-sys-on-surface));
+}
+
+.step-button {
+  width: var(--value-step-button-width);
+  height: var(--value-field-height);
+  min-width: var(--value-step-button-width);
+  min-height: var(--value-field-height);
+  color: var(--mat-form-field-outlined-input-text-color, var(--mat-app-text-color));
+  background-color: color-mix(
+    in srgb,
+    var(--mat-form-field-outlined-outline-color, var(--mat-sys-outline)) 22%,
+    var(--mat-card-filled-container-color) 78%
+  );
+  border-radius: 0;
+  border: var(--value-step-border-width) solid var(--value-step-border-color);
+  box-sizing: border-box;
+  overflow: hidden;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.step-button mat-icon {
+  font-size: 1.1rem;
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+:host ::ng-deep .step-button .mat-mdc-button-ripple,
+:host ::ng-deep .step-button .mat-mdc-button-persistent-ripple,
+:host ::ng-deep .step-button .mat-mdc-button-persistent-ripple::before,
+:host ::ng-deep .step-button .mat-focus-indicator,
+:host ::ng-deep .step-button .mat-focus-indicator::before {
+  border-radius: inherit !important;
+}
+
+:host ::ng-deep .step-button:hover,
+:host ::ng-deep .step-button.cdk-keyboard-focused,
+:host ::ng-deep .step-button.cdk-program-focused {
+  background-color: color-mix(
+    in srgb,
+    var(--mat-form-field-outlined-focus-outline-color, var(--mat-sys-primary)) 26%,
+    var(--mat-card-filled-container-color) 74%
+  );
+}
+
+:host ::ng-deep .value-edit-field .mat-mdc-form-field-icon-prefix {
+  align-self: stretch;
+  display: flex;
+  padding: 0;
+}
+
+:host ::ng-deep .value-edit-field .mat-mdc-form-field-icon-suffix {
+  align-self: stretch;
+  display: flex;
+  padding-inline-start: 0.4rem;
+  padding-inline-end: 0;
+}
+
+:host ::ng-deep .value-edit-field .mat-mdc-form-field-text-suffix {
+  margin-inline-start: 0.45rem;
+  margin-inline-end: 0.45rem;
+  white-space: nowrap;
+  color: var(--mat-form-field-outlined-label-text-color, var(--mat-card-subtitle-text-color));
+}
+
+:host ::ng-deep .value-edit-field .mat-mdc-form-field-icon-prefix > .mdc-icon-button,
+:host ::ng-deep .value-edit-field .mat-mdc-form-field-icon-suffix > .mdc-icon-button {
+  margin: 0;
+  padding: 0;
+}
+
+:host ::ng-deep .value-edit-field .mat-mdc-form-field-infix {
+  min-height: 2.75rem;
+}
+
+:host ::ng-deep .value-edit-field .mdc-notched-outline__leading {
+  border-start-start-radius: var(--value-field-shape);
+  border-end-start-radius: var(--value-field-shape);
+}
+
+:host ::ng-deep .value-edit-field .mdc-notched-outline__trailing {
+  border-start-end-radius: var(--value-field-shape);
+  border-end-end-radius: var(--value-field-shape);
+}
+
+.step-button--prefix {
+  border-inline-end-color: transparent;
+  border-start-start-radius: var(--value-field-shape);
+  border-end-start-radius: var(--value-field-shape);
+}
+
+.step-button--suffix {
+  border-inline-start-color: transparent;
+  border-start-end-radius: var(--value-field-shape);
+  border-end-end-radius: var(--value-field-shape);
+}
+
+:host ::ng-deep .value-edit-field.mat-focused {
+  --value-step-border-width: var(--mat-form-field-outlined-focus-outline-width, 2px);
+  --value-step-border-color: var(--mat-form-field-outlined-focus-outline-color, var(--mat-sys-primary));
+}
+
+:host ::ng-deep .value-edit-field.mat-form-field-invalid {
+  --value-step-border-width: var(--mat-form-field-outlined-outline-width, 1px);
+  --value-step-border-color: var(--mat-form-field-outlined-error-outline-color, var(--mat-sys-error));
+}
+
+:host ::ng-deep .value-edit-field.mat-form-field-invalid.mat-focused {
+  --value-step-border-width: var(--mat-form-field-outlined-focus-outline-width, 2px);
+  --value-step-border-color: var(--mat-form-field-outlined-error-focus-outline-color, var(--mat-sys-error));
+}
+
+/* Number input spinners are tiny on touch devices; hide them and use +/- buttons instead. */
+:host ::ng-deep input[type='number']::-webkit-outer-spin-button,
+:host ::ng-deep input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+:host ::ng-deep input[type='number'] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+

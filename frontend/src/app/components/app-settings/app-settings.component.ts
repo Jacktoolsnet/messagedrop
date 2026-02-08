@@ -8,6 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSliderModule } from '@angular/material/slider';
 import { MatSlideToggleChange, MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { provideTranslocoScope, TranslocoPipe } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
@@ -24,6 +25,11 @@ import { DisplayMessage } from '../utils/display-message/display-message.compone
 import { EnableLocationComponent } from "../utils/enable-location/enable-location.component";
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
+import {
+  ValueEditDialogComponent,
+  ValueEditDialogData,
+  ValueEditDialogResult
+} from '../utils/value-edit-dialog/value-edit-dialog.component';
 
 
 @Component({
@@ -43,6 +49,7 @@ import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.comp
     MatSelectModule,
     MatFormFieldModule,
     MatButtonToggleModule,
+    MatSliderModule,
     MatSlideToggleModule,
     TranslocoPipe,
     EnableLocationComponent
@@ -88,6 +95,15 @@ export class AppSettingsComponent implements OnInit {
   public storagePersistenceWarning = '';
   public storageQuotaWarning = '';
   private readonly storageWarningThreshold = 0.9;
+  readonly usageDailyLimitMin = 5;
+  readonly usageDailyLimitMax = 720;
+  readonly usageDailyLimitStep = 1;
+  readonly usageSelfExtensionMin = 0;
+  readonly usageSelfExtensionMax = 120;
+  readonly usageSelfExtensionStep = 1;
+  readonly usageParentalExtensionMin = 1;
+  readonly usageParentalExtensionMax = 240;
+  readonly usageParentalExtensionStep = 1;
 
   ngOnInit(): void {
     this.dialogRef.beforeClosed().subscribe(() => {
@@ -310,6 +326,39 @@ export class AppSettingsComponent implements OnInit {
     };
   }
 
+  async openUsageDailyLimitEditor(): Promise<void> {
+    await this.openUsageValueEditor({
+      title: this.translation.t('settings.usageProtection.dailyLimit'),
+      label: this.translation.t('settings.usageProtection.dailyLimit'),
+      minBound: this.usageDailyLimitMin,
+      maxBound: this.usageDailyLimitMax,
+      step: this.usageDailyLimitStep,
+      value: this.appSettings.usageProtection.dailyLimitMinutes
+    }, value => this.setUsageDailyLimitMinutes(value));
+  }
+
+  async openUsageSelfExtensionEditor(): Promise<void> {
+    await this.openUsageValueEditor({
+      title: this.translation.t('settings.usageProtection.selfExtension'),
+      label: this.translation.t('settings.usageProtection.selfExtension'),
+      minBound: this.usageSelfExtensionMin,
+      maxBound: this.usageSelfExtensionMax,
+      step: this.usageSelfExtensionStep,
+      value: this.appSettings.usageProtection.selfExtensionMinutes
+    }, value => this.setUsageSelfExtensionMinutes(value));
+  }
+
+  async openUsageParentalExtensionEditor(): Promise<void> {
+    await this.openUsageValueEditor({
+      title: this.translation.t('settings.usageProtection.parentalExtension'),
+      label: this.translation.t('settings.usageProtection.parentalExtension'),
+      minBound: this.usageParentalExtensionMin,
+      maxBound: this.usageParentalExtensionMax,
+      step: this.usageParentalExtensionStep,
+      value: this.appSettings.usageProtection.parentalExtensionMinutes
+    }, value => this.setUsageParentalExtensionMinutes(value));
+  }
+
   setUsageWeekdayStart(value: string): void {
     if (this.needsUsageProtectionUnlock()) {
       return;
@@ -482,6 +531,32 @@ export class AppSettingsComponent implements OnInit {
       autoFocus: false
     });
     await firstValueFrom(dialogRef.afterClosed());
+  }
+
+  private async openUsageValueEditor(
+    dialogData: ValueEditDialogData,
+    applyValue: (value: number) => void
+  ): Promise<void> {
+    if (this.needsUsageProtectionUnlock()) {
+      return;
+    }
+
+    const dialogRef = this.dialog.open<ValueEditDialogComponent, ValueEditDialogData, ValueEditDialogResult>(
+      ValueEditDialogComponent,
+      {
+        panelClass: '',
+        closeOnNavigation: true,
+        data: dialogData,
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop',
+        disableClose: false
+      }
+    );
+    const result = await firstValueFrom(dialogRef.afterClosed());
+    if (!result) {
+      return;
+    }
+    applyValue(result.value);
   }
 
   private async prepareUsageProtectionSettings(settings: UsageProtectionSettings): Promise<UsageProtectionSettings | null> {
