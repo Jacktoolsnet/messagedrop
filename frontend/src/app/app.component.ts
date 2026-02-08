@@ -44,6 +44,7 @@ import { UserProfileComponent } from './components/user/user-profile/user-profil
 import { UserComponent } from './components/user/user.component';
 import { DisplayMessage } from './components/utils/display-message/display-message.component';
 import { ExperienceSearchComponent } from './components/utils/experience-search/experience-search.component';
+import { HelpDialogService } from './components/utils/help-dialog/help-dialog.service';
 import { NominatimSearchComponent } from './components/utils/nominatim-search/nominatim-search.component';
 import { SearchSettingsComponent } from './components/utils/search-settings/search-settings.component';
 import { WeatherComponent } from './components/weather/weather.component';
@@ -166,6 +167,7 @@ export class AppComponent implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly platformLocation = inject(PlatformLocation);
   private readonly translation = inject(TranslationHelperService);
+  private readonly helpDialog = inject(HelpDialogService);
   private readonly languageService = inject(LanguageService);
   private readonly locale = inject<string>(LOCALE_ID);
   readonly powService = inject(PowService);
@@ -1563,6 +1565,10 @@ export class AppComponent implements OnInit {
 
   public startRestore() {
     this.restoreService.startRestore();
+  }
+
+  public openAppMenuHelp(): void {
+    this.helpDialog.open('appMenu');
   }
 
   public editUserProfile() {

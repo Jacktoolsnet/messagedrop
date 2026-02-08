@@ -294,6 +294,160 @@
       }
     }
   },
+  "appMenu": {
+    "title": "App menu",
+    "intro": "MessageDrop is an app for sharing public messages, private chats, and location-based content such as weather, experiences, and personal places. This help section explains all menu and submenu entries visible in the app view.",
+    "items": {
+      "overview": {
+        "title": "Core functionality",
+        "desc": "The map is the central view. Depending on map area, zoom, and search settings, matching content is loaded as pins. Menus are used to create, search, and manage data."
+      },
+      "userMenu": {
+        "title": "User menu",
+        "desc": "Use the person button to open the user menu."
+      },
+      "logout": {
+        "title": "Logout",
+        "desc": "Signs out from the current user account."
+      },
+      "connectBackend": {
+        "title": "Connect to backend",
+        "desc": "Establishes backend access so server-based features are available (when offered)."
+      },
+      "myUser": {
+        "title": "My user",
+        "desc": "Opens the user view with your account information."
+      },
+      "myProfile": {
+        "title": "My profile",
+        "desc": "Opens your profile to adjust personal details."
+      },
+      "systemMessages": {
+        "title": "System messages",
+        "desc": "Shows important notices such as maintenance or procedure updates."
+      },
+      "myPublicMessages": {
+        "title": "My public messages",
+        "desc": "Opens the list of your public messages."
+      },
+      "myPrivateNotes": {
+        "title": "My private notes",
+        "desc": "Opens the list of your private notes."
+      },
+      "myPlaces": {
+        "title": "My places",
+        "desc": "Opens your saved places."
+      },
+      "myExperiences": {
+        "title": "My experiences",
+        "desc": "Opens your saved experiences."
+      },
+      "myContacts": {
+        "title": "My contacts",
+        "desc": "Opens your contacts and their chat entries."
+      },
+      "appMenu": {
+        "title": "App menu",
+        "desc": "Use the apps button to open settings, legal texts, and restore options."
+      },
+      "appSettings": {
+        "title": "App settings",
+        "desc": "Opens global settings such as theme, language, storage, and backup options."
+      },
+      "searchSettings": {
+        "title": "Search settings",
+        "desc": "Defines which data sources are visible on the map and the minimum zoom level to load them."
+      },
+      "externalContent": {
+        "title": "External content",
+        "desc": "Enable or disable third-party content providers (for example YouTube or Spotify)."
+      },
+      "restore": {
+        "title": "Restore backup",
+        "desc": "Starts the restore flow to import an encrypted backup."
+      },
+      "terms": {
+        "title": "Terms of service",
+        "desc": "Opens the current terms of service."
+      },
+      "privacyPolicy": {
+        "title": "Privacy policy",
+        "desc": "Opens the privacy policy with details about data processing."
+      },
+      "disclaimer": {
+        "title": "Disclaimer",
+        "desc": "Opens the legal disclaimer."
+      },
+      "legalNotice": {
+        "title": "Legal notice",
+        "desc": "Shows provider and contact information."
+      },
+      "licenses": {
+        "title": "Third-party licenses",
+        "desc": "Shows open-source and third-party licenses used by the app."
+      },
+      "menuHelp": {
+        "title": "Help",
+        "desc": "Opens this help dialog for all menus in the app view."
+      },
+      "mainMenu": {
+        "title": "Main menu",
+        "desc": "Use the pin button to open the main menu for location-based actions."
+      },
+      "locateMe": {
+        "title": "Locate me",
+        "desc": "Detects your current position and centers the map there."
+      },
+      "publicMessage": {
+        "title": "Public message",
+        "desc": "Creates a new public message at the current map point."
+      },
+      "privateNote": {
+        "title": "Private note",
+        "desc": "Creates a private note at the current map point."
+      },
+      "privateImage": {
+        "title": "Private image",
+        "desc": "Adds a private image at the current map point."
+      },
+      "privateDocument": {
+        "title": "Private document",
+        "desc": "Adds a private document at the current map point."
+      },
+      "weather": {
+        "title": "Weather",
+        "desc": "Opens the weather dialog for the current map position."
+      },
+      "airQuality": {
+        "title": "Air quality",
+        "desc": "Opens the air-quality dialog for the current map position."
+      },
+      "searchMenu": {
+        "title": "Search menu",
+        "desc": "Use the search button to open place and experience search."
+      },
+      "searchPlace": {
+        "title": "Search place",
+        "desc": "Starts place search and shows results in list or map view."
+      },
+      "searchExperiences": {
+        "title": "Search experiences",
+        "desc": "Starts experience search and shows matching offers."
+      },
+      "zoom": {
+        "title": "Map zoom",
+        "desc": "Use the +/- zoom buttons to zoom in or out. Higher zoom shows more detail and can load additional nearby results."
+      },
+      "pins": {
+        "title": "Map pins",
+        "desc": "Different pin types represent different content (for example public messages, private notes/images/documents, experience destinations, and your own experiences). The multi pin marks multiple items at the same location."
+      },
+      "privacy": {
+        "title": "Privacy first",
+        "desc": "Privacy is especially important to us: data is processed locally and encrypted where possible. External transfers happen only when technically required or after your active choice."
+      }
+    }
+  },
   "appSettings": {
     "title": "App settings",
     "intro": "In this dialog you configure global app settings such as theme, language, storage, and backup options.",

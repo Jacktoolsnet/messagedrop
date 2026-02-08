@@ -171,6 +171,10 @@
         <mat-icon>receipt_long</mat-icon>
         <span>{{ 'common.menu.thirdPartyLicenses' | transloco }}</span>
     </button>
+    <button mat-menu-item (click)="openAppMenuHelp()">
+        <mat-icon>help</mat-icon>
+        <span>{{ 'common.actions.help' | transloco }}</span>
+    </button>
 </mat-menu>
 
 <mat-menu #messageMenu="matMenu">

@@ -294,6 +294,160 @@
       }
     }
   },
+  "appMenu": {
+    "title": "Menú de la app",
+    "intro": "MessageDrop es una app para compartir mensajes públicos, chats privados y contenido geolocalizado como tiempo, experiencias y lugares propios. Esta ayuda explica todos los menús y submenús visibles en la vista principal.",
+    "items": {
+      "overview": {
+        "title": "Funcionamiento básico",
+        "desc": "El mapa es la vista central. Según el área visible, el zoom y los ajustes de búsqueda, se cargan contenidos como pines. Los menús se usan para crear, buscar y gestionar datos."
+      },
+      "userMenu": {
+        "title": "Menú de usuario",
+        "desc": "Con el botón de persona abres el menú de usuario."
+      },
+      "logout": {
+        "title": "Cerrar sesión",
+        "desc": "Cierra la sesión de la cuenta actual."
+      },
+      "connectBackend": {
+        "title": "Conectar con backend",
+        "desc": "Activa la conexión con backend para funciones del servidor (cuando estén disponibles)."
+      },
+      "myUser": {
+        "title": "Mi usuario",
+        "desc": "Abre la vista de usuario con la información de tu cuenta."
+      },
+      "myProfile": {
+        "title": "Mi perfil",
+        "desc": "Abre tu perfil para ajustar datos personales."
+      },
+      "systemMessages": {
+        "title": "Mensajes del sistema",
+        "desc": "Muestra avisos importantes como mantenimiento o información de procedimientos."
+      },
+      "myPublicMessages": {
+        "title": "Mis mensajes públicos",
+        "desc": "Abre la lista de tus mensajes públicos."
+      },
+      "myPrivateNotes": {
+        "title": "Mis notas privadas",
+        "desc": "Abre la lista de tus notas privadas."
+      },
+      "myPlaces": {
+        "title": "Mis lugares",
+        "desc": "Abre tus lugares guardados."
+      },
+      "myExperiences": {
+        "title": "Mis experiencias",
+        "desc": "Abre tus experiencias guardadas."
+      },
+      "myContacts": {
+        "title": "Mis contactos",
+        "desc": "Abre tus contactos y sus accesos de chat."
+      },
+      "appMenu": {
+        "title": "Menú de la app",
+        "desc": "Con el botón de apps abres ajustes, textos legales y opciones de restauración."
+      },
+      "appSettings": {
+        "title": "Ajustes de la app",
+        "desc": "Abre ajustes globales como tema, idioma, almacenamiento y opciones de copia de seguridad."
+      },
+      "searchSettings": {
+        "title": "Ajustes de búsqueda",
+        "desc": "Define qué fuentes de datos se muestran en el mapa y desde qué nivel de zoom se cargan."
+      },
+      "externalContent": {
+        "title": "Contenido externo",
+        "desc": "Permite activar o desactivar proveedores externos (por ejemplo YouTube o Spotify)."
+      },
+      "restore": {
+        "title": "Restaurar copia",
+        "desc": "Inicia el flujo de restauración para importar una copia cifrada."
+      },
+      "terms": {
+        "title": "Términos de servicio",
+        "desc": "Abre los términos de servicio vigentes."
+      },
+      "privacyPolicy": {
+        "title": "Política de privacidad",
+        "desc": "Abre la política de privacidad con detalles del tratamiento de datos."
+      },
+      "disclaimer": {
+        "title": "Aviso legal",
+        "desc": "Abre el aviso legal de responsabilidad."
+      },
+      "legalNotice": {
+        "title": "Aviso legal (imprint)",
+        "desc": "Muestra la información del proveedor y los datos de contacto."
+      },
+      "licenses": {
+        "title": "Licencias de terceros",
+        "desc": "Muestra las licencias de código abierto y de terceros usadas en la app."
+      },
+      "menuHelp": {
+        "title": "Ayuda",
+        "desc": "Abre este diálogo de ayuda para todos los menús visibles en la app."
+      },
+      "mainMenu": {
+        "title": "Menú principal",
+        "desc": "Con el botón de pin abres el menú principal de acciones geolocalizadas."
+      },
+      "locateMe": {
+        "title": "Localizarme",
+        "desc": "Detecta tu posición actual y centra el mapa en ella."
+      },
+      "publicMessage": {
+        "title": "Mensaje público",
+        "desc": "Crea un nuevo mensaje público en el punto actual del mapa."
+      },
+      "privateNote": {
+        "title": "Nota privada",
+        "desc": "Crea una nota privada en el punto actual del mapa."
+      },
+      "privateImage": {
+        "title": "Imagen privada",
+        "desc": "Añade una imagen privada en el punto actual del mapa."
+      },
+      "privateDocument": {
+        "title": "Documento privado",
+        "desc": "Añade un documento privado en el punto actual del mapa."
+      },
+      "weather": {
+        "title": "Tiempo",
+        "desc": "Abre el diálogo del tiempo para la posición actual del mapa."
+      },
+      "airQuality": {
+        "title": "Calidad del aire",
+        "desc": "Abre el diálogo de calidad del aire para la posición actual del mapa."
+      },
+      "searchMenu": {
+        "title": "Menú de búsqueda",
+        "desc": "Con el botón de búsqueda abres las búsquedas de lugares y experiencias."
+      },
+      "searchPlace": {
+        "title": "Buscar un lugar",
+        "desc": "Inicia la búsqueda de lugares y muestra resultados en lista o mapa."
+      },
+      "searchExperiences": {
+        "title": "Buscar experiencias",
+        "desc": "Inicia la búsqueda de experiencias y muestra ofertas relacionadas."
+      },
+      "zoom": {
+        "title": "Zoom del mapa",
+        "desc": "Usa los botones +/- para acercar o alejar el mapa. Con más zoom ves más detalle y pueden cargarse más resultados cercanos."
+      },
+      "pins": {
+        "title": "Pines del mapa",
+        "desc": "Los distintos tipos de pin representan contenidos diferentes (por ejemplo mensajes públicos, notas/imágenes/documentos privados, destinos de experiencias y tus propias experiencias). El pin múltiple marca varios contenidos en la misma posición."
+      },
+      "privacy": {
+        "title": "Privacidad como prioridad",
+        "desc": "La privacidad es especialmente importante para nosotros: los datos se procesan localmente y cifrados siempre que sea posible. Las transferencias externas solo ocurren cuando son técnicamente necesarias o tras tu decisión activa."
+      }
+    }
+  },
   "appSettings": {
     "title": "Ajustes de la app",
     "intro": "En este diálogo configuras ajustes globales de la app, como tema, idioma, almacenamiento y opciones de copia de seguridad.",

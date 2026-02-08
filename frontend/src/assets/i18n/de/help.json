@@ -294,6 +294,160 @@
       }
     }
   },
+  "appMenu": {
+    "title": "App-Menü",
+    "intro": "MessageDrop ist eine App zum Teilen öffentlicher Nachrichten, privaten Chats und ortsgebundenen Inhalten wie Wetter, Erlebnissen und eigenen Orten. Diese Hilfe erklärt alle Menüpunkte und Untermenüpunkte aus der App-Ansicht.",
+    "items": {
+      "overview": {
+        "title": "Grundlegende Funktionsweise",
+        "desc": "Die Karte ist die zentrale Ansicht. Je nach Kartenausschnitt, Zoom und Sucheinstellungen werden passende Inhalte als Pins geladen. Über die Menüs erstellst, suchst und verwaltest du Daten."
+      },
+      "userMenu": {
+        "title": "Benutzer-Menü",
+        "desc": "Über den Person-Button öffnest du das Benutzer-Menü."
+      },
+      "logout": {
+        "title": "Abmelden",
+        "desc": "Meldet dich vom aktuellen Nutzerkonto ab."
+      },
+      "connectBackend": {
+        "title": "Mit Backend verbinden",
+        "desc": "Stellt eine Backend-Verbindung her, damit serverbasierte Funktionen verfügbar sind (nur wenn angeboten)."
+      },
+      "myUser": {
+        "title": "Mein Benutzer",
+        "desc": "Öffnet die Benutzeransicht mit deinen Kontoinformationen."
+      },
+      "myProfile": {
+        "title": "Mein Profil",
+        "desc": "Öffnet dein Profil zum Anpassen persönlicher Angaben."
+      },
+      "systemMessages": {
+        "title": "Systemnachrichten",
+        "desc": "Zeigt wichtige Hinweise wie Wartungen oder Verfahrensinformationen."
+      },
+      "myPublicMessages": {
+        "title": "Meine öffentlichen Nachrichten",
+        "desc": "Öffnet die Liste deiner öffentlichen Nachrichten."
+      },
+      "myPrivateNotes": {
+        "title": "Meine privaten Notizen",
+        "desc": "Öffnet die Liste deiner privaten Notizen."
+      },
+      "myPlaces": {
+        "title": "Meine Orte",
+        "desc": "Öffnet deine gespeicherten Orte."
+      },
+      "myExperiences": {
+        "title": "Meine Erlebnisse",
+        "desc": "Öffnet deine gespeicherten Erlebnisse."
+      },
+      "myContacts": {
+        "title": "Meine Kontakte",
+        "desc": "Öffnet deine Kontakte und deren Chatzugänge."
+      },
+      "appMenu": {
+        "title": "App-Menü",
+        "desc": "Über den Apps-Button öffnest du Einstellungen, Rechtstexte und Wiederherstellung."
+      },
+      "appSettings": {
+        "title": "App-Einstellungen",
+        "desc": "Öffnet globale Einstellungen wie Design, Sprache, Speicher- und Backup-Optionen."
+      },
+      "searchSettings": {
+        "title": "Sucheinstellungen",
+        "desc": "Legt fest, welche Quellen auf der Karte sichtbar sind und ab welchem Zoomlevel sie geladen werden."
+      },
+      "externalContent": {
+        "title": "Externe Inhalte",
+        "desc": "Hier aktivierst oder deaktivierst du Drittanbieter-Inhalte (z. B. YouTube, Spotify) pro Anbieter."
+      },
+      "restore": {
+        "title": "Backup wiederherstellen",
+        "desc": "Startet den Restore-Assistenten, um ein verschlüsseltes Backup einzuspielen."
+      },
+      "terms": {
+        "title": "Nutzungsbedingungen",
+        "desc": "Öffnet die aktuellen Nutzungsbedingungen."
+      },
+      "privacyPolicy": {
+        "title": "Datenschutz",
+        "desc": "Öffnet die Datenschutzerklärung mit Details zur Datenverarbeitung."
+      },
+      "disclaimer": {
+        "title": "Haftungsausschluss",
+        "desc": "Öffnet den rechtlichen Haftungshinweis."
+      },
+      "legalNotice": {
+        "title": "Impressum",
+        "desc": "Zeigt Anbieter- und Kontaktinformationen."
+      },
+      "licenses": {
+        "title": "Drittanbieter-Lizenzen",
+        "desc": "Zeigt die verwendeten Open-Source- und Drittanbieter-Lizenzen."
+      },
+      "menuHelp": {
+        "title": "Hilfe",
+        "desc": "Öffnet diesen Hilfedialog für alle Menüs in der App-Ansicht."
+      },
+      "mainMenu": {
+        "title": "Hauptmenü",
+        "desc": "Über den Pin-Button öffnest du das Hauptmenü für ortsbezogene Aktionen."
+      },
+      "locateMe": {
+        "title": "Standort bestimmen",
+        "desc": "Bestimmt deine aktuelle Position und zentriert die Karte darauf."
+      },
+      "publicMessage": {
+        "title": "Öffentliche Nachricht",
+        "desc": "Erstellt eine neue öffentliche Nachricht am aktuellen Kartenpunkt."
+      },
+      "privateNote": {
+        "title": "Private Notiz",
+        "desc": "Erstellt eine private Notiz am aktuellen Kartenpunkt."
+      },
+      "privateImage": {
+        "title": "Privates Bild",
+        "desc": "Fügt ein privates Bild am aktuellen Kartenpunkt hinzu."
+      },
+      "privateDocument": {
+        "title": "Privates Dokument",
+        "desc": "Fügt ein privates Dokument am aktuellen Kartenpunkt hinzu."
+      },
+      "weather": {
+        "title": "Wetter",
+        "desc": "Öffnet den Wetterdialog für die aktuelle Kartenposition."
+      },
+      "airQuality": {
+        "title": "Luftqualität",
+        "desc": "Öffnet den Luftqualitätsdialog für die aktuelle Kartenposition."
+      },
+      "searchMenu": {
+        "title": "Suchmenü",
+        "desc": "Über den Such-Button öffnest du das Menü für Ort- und Erlebnissuche."
+      },
+      "searchPlace": {
+        "title": "Ort suchen",
+        "desc": "Startet die Ortssuche und zeigt Treffer in Liste oder Karte."
+      },
+      "searchExperiences": {
+        "title": "Erlebnisse suchen",
+        "desc": "Startet die Erlebnissuche und zeigt passende Angebote."
+      },
+      "zoom": {
+        "title": "Karten-Zoom",
+        "desc": "Mit den +/- Zoom-Buttons vergrößerst oder verkleinerst du die Karte. Höherer Zoom zeigt mehr Details und kann zusätzliche Treffer einblenden."
+      },
+      "pins": {
+        "title": "Pins auf der Karte",
+        "desc": "Unterschiedliche Pin-Typen stehen für verschiedene Inhalte (z. B. öffentliche Nachrichten, private Notizen/Bilder/Dokumente, Erlebnisziele, eigene Erlebnisse). Der Multi-Pin markiert mehrere Inhalte an derselben Position."
+      },
+      "privacy": {
+        "title": "Datenschutz hat Priorität",
+        "desc": "Datenschutz ist uns besonders wichtig: Daten werden soweit möglich lokal und verschlüsselt verarbeitet. Externe Übertragungen erfolgen nur technisch notwendig oder nach deiner aktiven Entscheidung."
+      }
+    }
+  },
   "appSettings": {
     "title": "App-Einstellungen",
     "intro": "In diesem Dialog konfigurierst du globale App-Einstellungen wie Design, Sprache, Speicher- und Sicherungsoptionen.",

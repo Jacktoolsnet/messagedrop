@@ -294,6 +294,160 @@
       }
     }
   },
+  "appMenu": {
+    "title": "Menu de l'app",
+    "intro": "MessageDrop est une application pour partager des messages publics, des chats privés et des contenus géolocalisés comme la météo, les expériences et les lieux personnels. Cette aide décrit tous les menus et sous-menus visibles dans la vue principale.",
+    "items": {
+      "overview": {
+        "title": "Fonctionnement de base",
+        "desc": "La carte est la vue centrale. Selon la zone affichée, le zoom et les paramètres de recherche, les contenus correspondants sont chargés sous forme d'épingles. Les menus servent à créer, rechercher et gérer les données."
+      },
+      "userMenu": {
+        "title": "Menu utilisateur",
+        "desc": "Le bouton personne ouvre le menu utilisateur."
+      },
+      "logout": {
+        "title": "Se déconnecter",
+        "desc": "Déconnecte le compte utilisateur actuel."
+      },
+      "connectBackend": {
+        "title": "Se connecter au backend",
+        "desc": "Active la connexion backend pour les fonctions serveur (si disponibles)."
+      },
+      "myUser": {
+        "title": "Mon utilisateur",
+        "desc": "Ouvre la vue utilisateur avec les informations du compte."
+      },
+      "myProfile": {
+        "title": "Mon profil",
+        "desc": "Ouvre le profil pour modifier les informations personnelles."
+      },
+      "systemMessages": {
+        "title": "Messages système",
+        "desc": "Affiche les notifications importantes, par exemple maintenance ou informations de procédure."
+      },
+      "myPublicMessages": {
+        "title": "Mes messages publics",
+        "desc": "Ouvre la liste de vos messages publics."
+      },
+      "myPrivateNotes": {
+        "title": "Mes notes privées",
+        "desc": "Ouvre la liste de vos notes privées."
+      },
+      "myPlaces": {
+        "title": "Mes lieux",
+        "desc": "Ouvre vos lieux enregistrés."
+      },
+      "myExperiences": {
+        "title": "Mes expériences",
+        "desc": "Ouvre vos expériences enregistrées."
+      },
+      "myContacts": {
+        "title": "Mes contacts",
+        "desc": "Ouvre vos contacts et leurs accès au chat."
+      },
+      "appMenu": {
+        "title": "Menu de l'app",
+        "desc": "Le bouton apps ouvre les paramètres, les textes légaux et les options de restauration."
+      },
+      "appSettings": {
+        "title": "Paramètres de l'app",
+        "desc": "Ouvre les paramètres globaux comme le thème, la langue, le stockage et les options de sauvegarde."
+      },
+      "searchSettings": {
+        "title": "Paramètres de recherche",
+        "desc": "Définit quelles sources de données s'affichent sur la carte et à partir de quel niveau de zoom elles sont chargées."
+      },
+      "externalContent": {
+        "title": "Contenus externes",
+        "desc": "Permet d'activer ou de désactiver les fournisseurs tiers (par exemple YouTube ou Spotify)."
+      },
+      "restore": {
+        "title": "Restaurer une sauvegarde",
+        "desc": "Démarre le processus de restauration pour importer une sauvegarde chiffrée."
+      },
+      "terms": {
+        "title": "Conditions d'utilisation",
+        "desc": "Ouvre les conditions d'utilisation en vigueur."
+      },
+      "privacyPolicy": {
+        "title": "Politique de confidentialité",
+        "desc": "Ouvre la politique de confidentialité avec les détails du traitement des données."
+      },
+      "disclaimer": {
+        "title": "Avertissement",
+        "desc": "Ouvre la clause de non-responsabilité."
+      },
+      "legalNotice": {
+        "title": "Mentions légales",
+        "desc": "Affiche les informations sur l'éditeur et les coordonnées."
+      },
+      "licenses": {
+        "title": "Licences tierces",
+        "desc": "Affiche les licences open source et tierces utilisées dans l'app."
+      },
+      "menuHelp": {
+        "title": "Aide",
+        "desc": "Ouvre cette aide pour tous les menus visibles dans l'application."
+      },
+      "mainMenu": {
+        "title": "Menu principal",
+        "desc": "Le bouton épingle ouvre le menu principal pour les actions géolocalisées."
+      },
+      "locateMe": {
+        "title": "Me localiser",
+        "desc": "Détermine votre position actuelle et centre la carte dessus."
+      },
+      "publicMessage": {
+        "title": "Message public",
+        "desc": "Crée un nouveau message public au point actuel de la carte."
+      },
+      "privateNote": {
+        "title": "Note privée",
+        "desc": "Crée une note privée au point actuel de la carte."
+      },
+      "privateImage": {
+        "title": "Image privée",
+        "desc": "Ajoute une image privée au point actuel de la carte."
+      },
+      "privateDocument": {
+        "title": "Document privé",
+        "desc": "Ajoute un document privé au point actuel de la carte."
+      },
+      "weather": {
+        "title": "Météo",
+        "desc": "Ouvre la boîte de dialogue météo pour la position actuelle de la carte."
+      },
+      "airQuality": {
+        "title": "Qualité de l'air",
+        "desc": "Ouvre la boîte de dialogue qualité de l'air pour la position actuelle de la carte."
+      },
+      "searchMenu": {
+        "title": "Menu de recherche",
+        "desc": "Le bouton recherche ouvre les recherches de lieux et d'expériences."
+      },
+      "searchPlace": {
+        "title": "Rechercher un lieu",
+        "desc": "Lance la recherche de lieux et affiche les résultats en liste ou sur la carte."
+      },
+      "searchExperiences": {
+        "title": "Rechercher des expériences",
+        "desc": "Lance la recherche d'expériences et affiche les offres correspondantes."
+      },
+      "zoom": {
+        "title": "Zoom de la carte",
+        "desc": "Utilisez les boutons +/- pour zoomer ou dézoomer. Un zoom plus élevé affiche plus de détails et peut charger des résultats supplémentaires à proximité."
+      },
+      "pins": {
+        "title": "Épingles de la carte",
+        "desc": "Les différents types d'épingles représentent différents contenus (par exemple messages publics, notes/images/documents privés, destinations d'expériences et vos propres expériences). L'épingle multiple indique plusieurs contenus au même endroit."
+      },
+      "privacy": {
+        "title": "Confidentialité prioritaire",
+        "desc": "La confidentialité est particulièrement importante pour nous : les données sont traitées localement et chiffrées lorsque c'est possible. Les transferts externes n'ont lieu que s'ils sont techniquement nécessaires ou après votre choix explicite."
+      }
+    }
+  },
   "appSettings": {
     "title": "Paramètres de l'app",
     "intro": "Dans cette boîte de dialogue, vous configurez les paramètres globaux de l'app, comme le thème, la langue, le stockage et les options de sauvegarde.",

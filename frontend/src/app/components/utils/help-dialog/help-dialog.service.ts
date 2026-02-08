@@ -317,6 +317,197 @@ const HELP_TOPICS = {
       }
     ]
   },
+  appMenu: {
+    titleKey: 'appMenu.title',
+    introKey: 'appMenu.intro',
+    items: [
+      {
+        icon: 'apps',
+        titleKey: 'appMenu.items.overview.title',
+        descriptionKey: 'appMenu.items.overview.desc'
+      },
+      {
+        icon: 'person',
+        titleKey: 'appMenu.items.userMenu.title',
+        descriptionKey: 'appMenu.items.userMenu.desc'
+      },
+      {
+        icon: 'lock',
+        titleKey: 'appMenu.items.logout.title',
+        descriptionKey: 'appMenu.items.logout.desc'
+      },
+      {
+        icon: 'cloud_sync',
+        titleKey: 'appMenu.items.connectBackend.title',
+        descriptionKey: 'appMenu.items.connectBackend.desc'
+      },
+      {
+        icon: 'account_circle',
+        titleKey: 'appMenu.items.myUser.title',
+        descriptionKey: 'appMenu.items.myUser.desc'
+      },
+      {
+        icon: 'badge',
+        titleKey: 'appMenu.items.myProfile.title',
+        descriptionKey: 'appMenu.items.myProfile.desc'
+      },
+      {
+        icon: 'notifications',
+        titleKey: 'appMenu.items.systemMessages.title',
+        descriptionKey: 'appMenu.items.systemMessages.desc'
+      },
+      {
+        icon: 'speaker_notes',
+        titleKey: 'appMenu.items.myPublicMessages.title',
+        descriptionKey: 'appMenu.items.myPublicMessages.desc'
+      },
+      {
+        icon: 'clinical_notes',
+        titleKey: 'appMenu.items.myPrivateNotes.title',
+        descriptionKey: 'appMenu.items.myPrivateNotes.desc'
+      },
+      {
+        icon: 'personal_places',
+        titleKey: 'appMenu.items.myPlaces.title',
+        descriptionKey: 'appMenu.items.myPlaces.desc'
+      },
+      {
+        icon: 'bookmark_star',
+        titleKey: 'appMenu.items.myExperiences.title',
+        descriptionKey: 'appMenu.items.myExperiences.desc'
+      },
+      {
+        icon: 'contacts',
+        titleKey: 'appMenu.items.myContacts.title',
+        descriptionKey: 'appMenu.items.myContacts.desc'
+      },
+      {
+        icon: 'apps',
+        titleKey: 'appMenu.items.appMenu.title',
+        descriptionKey: 'appMenu.items.appMenu.desc'
+      },
+      {
+        icon: 'settings_applications',
+        titleKey: 'appMenu.items.appSettings.title',
+        descriptionKey: 'appMenu.items.appSettings.desc'
+      },
+      {
+        icon: 'manage_search',
+        titleKey: 'appMenu.items.searchSettings.title',
+        descriptionKey: 'appMenu.items.searchSettings.desc'
+      },
+      {
+        icon: 'public',
+        titleKey: 'appMenu.items.externalContent.title',
+        descriptionKey: 'appMenu.items.externalContent.desc'
+      },
+      {
+        icon: 'restore',
+        titleKey: 'appMenu.items.restore.title',
+        descriptionKey: 'appMenu.items.restore.desc'
+      },
+      {
+        icon: 'rule',
+        titleKey: 'appMenu.items.terms.title',
+        descriptionKey: 'appMenu.items.terms.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'appMenu.items.privacyPolicy.title',
+        descriptionKey: 'appMenu.items.privacyPolicy.desc'
+      },
+      {
+        icon: 'policy',
+        titleKey: 'appMenu.items.disclaimer.title',
+        descriptionKey: 'appMenu.items.disclaimer.desc'
+      },
+      {
+        icon: 'gavel',
+        titleKey: 'appMenu.items.legalNotice.title',
+        descriptionKey: 'appMenu.items.legalNotice.desc'
+      },
+      {
+        icon: 'receipt_long',
+        titleKey: 'appMenu.items.licenses.title',
+        descriptionKey: 'appMenu.items.licenses.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'appMenu.items.menuHelp.title',
+        descriptionKey: 'appMenu.items.menuHelp.desc'
+      },
+      {
+        icon: 'pin_drop',
+        titleKey: 'appMenu.items.mainMenu.title',
+        descriptionKey: 'appMenu.items.mainMenu.desc'
+      },
+      {
+        icon: 'my_location',
+        titleKey: 'appMenu.items.locateMe.title',
+        descriptionKey: 'appMenu.items.locateMe.desc'
+      },
+      {
+        icon: 'send',
+        titleKey: 'appMenu.items.publicMessage.title',
+        descriptionKey: 'appMenu.items.publicMessage.desc'
+      },
+      {
+        icon: 'add_notes',
+        titleKey: 'appMenu.items.privateNote.title',
+        descriptionKey: 'appMenu.items.privateNote.desc'
+      },
+      {
+        icon: 'image_search',
+        titleKey: 'appMenu.items.privateImage.title',
+        descriptionKey: 'appMenu.items.privateImage.desc'
+      },
+      {
+        icon: 'description',
+        titleKey: 'appMenu.items.privateDocument.title',
+        descriptionKey: 'appMenu.items.privateDocument.desc'
+      },
+      {
+        icon: 'weather_mix',
+        titleKey: 'appMenu.items.weather.title',
+        descriptionKey: 'appMenu.items.weather.desc'
+      },
+      {
+        icon: 'eco',
+        titleKey: 'appMenu.items.airQuality.title',
+        descriptionKey: 'appMenu.items.airQuality.desc'
+      },
+      {
+        icon: 'search',
+        titleKey: 'appMenu.items.searchMenu.title',
+        descriptionKey: 'appMenu.items.searchMenu.desc'
+      },
+      {
+        icon: 'travel_explore',
+        titleKey: 'appMenu.items.searchPlace.title',
+        descriptionKey: 'appMenu.items.searchPlace.desc'
+      },
+      {
+        icon: 'local_activity',
+        titleKey: 'appMenu.items.searchExperiences.title',
+        descriptionKey: 'appMenu.items.searchExperiences.desc'
+      },
+      {
+        icon: 'zoom_in_map',
+        titleKey: 'appMenu.items.zoom.title',
+        descriptionKey: 'appMenu.items.zoom.desc'
+      },
+      {
+        icon: 'pin_drop',
+        titleKey: 'appMenu.items.pins.title',
+        descriptionKey: 'appMenu.items.pins.desc'
+      },
+      {
+        icon: 'verified_user',
+        titleKey: 'appMenu.items.privacy.title',
+        descriptionKey: 'appMenu.items.privacy.desc'
+      }
+    ]
+  },
   appSettings: {
     titleKey: 'appSettings.title',
     introKey: 'appSettings.intro',
