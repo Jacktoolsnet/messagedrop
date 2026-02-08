@@ -621,7 +621,9 @@ export class AppSettingsComponent implements OnInit {
     }
 
     if (!pin && !normalized.parentPinHash) {
-      this.usageProtectionWarning = this.translation.t('settings.usageProtection.pinMissing');
+      const messageKey = 'settings.usageProtection.pinMissing';
+      this.usageProtectionWarning = this.translation.t(messageKey);
+      await this.showUsageProtectionMessage(messageKey);
       return null;
     }
 
