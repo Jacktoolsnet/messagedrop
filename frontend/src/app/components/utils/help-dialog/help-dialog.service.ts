@@ -915,6 +915,11 @@ const HELP_TOPICS = {
         descriptionKey: 'myMessageList.items.navigate.desc'
       },
       {
+        icon: 'person',
+        titleKey: 'myMessageList.items.profile.title',
+        descriptionKey: 'myMessageList.items.profile.desc'
+      },
+      {
         icon: 'flag',
         titleKey: 'myMessageList.items.report.title',
         descriptionKey: 'myMessageList.items.report.desc'
