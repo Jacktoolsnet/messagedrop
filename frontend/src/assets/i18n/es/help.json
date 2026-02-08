@@ -295,12 +295,16 @@
     }
   },
   "appMenu": {
-    "title": "Menú de la app",
-    "intro": "MessageDrop es una app para compartir mensajes públicos, chats privados y contenido geolocalizado como tiempo, experiencias y lugares propios. Esta ayuda explica todos los menús y submenús visibles en la vista principal.",
+    "title": "Ayuda de MessageDrop",
+    "intro": "MessageDrop es una app para compartir mensajes públicos, chats privados y contenido geolocalizado como el tiempo y las experiencias.",
     "items": {
       "overview": {
         "title": "Funcionamiento básico",
         "desc": "El mapa es la vista central. Según el área visible, el zoom y los ajustes de búsqueda, se cargan contenidos como pines. Los menús se usan para crear, buscar y gestionar datos."
+      },
+      "restricted": {
+        "title": "Inicio de sesión requerido",
+        "desc": "Algunas funciones solo están disponibles tras iniciar sesión. Según la acción, también se necesita conexión con backend; antes de eso, ciertos puntos aparecen bloqueados u ocultos."
       },
       "userMenu": {
         "title": "Menú de usuario",

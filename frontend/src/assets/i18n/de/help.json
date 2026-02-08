@@ -295,12 +295,16 @@
     }
   },
   "appMenu": {
-    "title": "App-Menü",
-    "intro": "MessageDrop ist eine App zum Teilen öffentlicher Nachrichten, privaten Chats und ortsgebundenen Inhalten wie Wetter, Erlebnissen und eigenen Orten. Diese Hilfe erklärt alle Menüpunkte und Untermenüpunkte aus der App-Ansicht.",
+    "title": "MessageDrop Hilfe",
+    "intro": "MessageDrop ist eine App zum Teilen öffentlicher Nachrichten, privaten Chats und ortsgebundenen Inhalten wie Wetter, Erlebnissen.",
     "items": {
       "overview": {
         "title": "Grundlegende Funktionsweise",
         "desc": "Die Karte ist die zentrale Ansicht. Je nach Kartenausschnitt, Zoom und Sucheinstellungen werden passende Inhalte als Pins geladen. Über die Menüs erstellst, suchst und verwaltest du Daten."
+      },
+      "restricted": {
+        "title": "Anmeldung erforderlich",
+        "desc": "Einige Funktionen sind nur nach Anmeldung verfügbar. Je nach Aktion ist zusätzlich eine Backend-Verbindung nötig; vorher erscheinen bestimmte Punkte gesperrt oder ausgeblendet."
       },
       "userMenu": {
         "title": "Benutzer-Menü",

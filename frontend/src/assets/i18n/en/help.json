@@ -295,12 +295,16 @@
     }
   },
   "appMenu": {
-    "title": "App menu",
-    "intro": "MessageDrop is an app for sharing public messages, private chats, and location-based content such as weather, experiences, and personal places. This help section explains all menu and submenu entries visible in the app view.",
+    "title": "MessageDrop help",
+    "intro": "MessageDrop is an app for sharing public messages, private chats, and location-based content such as weather and experiences.",
     "items": {
       "overview": {
         "title": "Core functionality",
         "desc": "The map is the central view. Depending on map area, zoom, and search settings, matching content is loaded as pins. Menus are used to create, search, and manage data."
+      },
+      "restricted": {
+        "title": "Login required",
+        "desc": "Some features are only available after login. Depending on the action, a backend connection is also required; before that, certain items are locked or hidden."
       },
       "userMenu": {
         "title": "User menu",

@@ -327,6 +327,11 @@ const HELP_TOPICS = {
         descriptionKey: 'appMenu.items.overview.desc'
       },
       {
+        icon: 'lock',
+        titleKey: 'appMenu.items.restricted.title',
+        descriptionKey: 'appMenu.items.restricted.desc'
+      },
+      {
         icon: 'person',
         titleKey: 'appMenu.items.userMenu.title',
         descriptionKey: 'appMenu.items.userMenu.desc'
