@@ -141,6 +141,34 @@
       </mat-button-toggle-group>
 
       @if (appSettings.usageProtection.mode !== 'off') {
+      @if (appSettings.usageProtection.mode === 'parental') {
+      <section class="usage-slider-block usage-parent-pin-tile">
+        <p class="usage-protection-pin-state usage-parent-pin-state">
+          @if (usageParentPin) {
+          {{ 'settings.usageProtection.pinPending' | transloco }}
+          } @else if (appSettings.usageProtection.parentPinHash) {
+          {{ 'settings.usageProtection.pinSet' | transloco }}
+          } @else {
+          {{ 'settings.usageProtection.pinMissing' | transloco }}
+          }
+        </p>
+        <div class="usage-parent-pin-actions">
+          <button mat-stroked-button type="button" (click)="openUsageParentPinDialog()">
+            @if (usageParentPin || appSettings.usageProtection.parentPinHash) {
+            {{ 'settings.usageProtection.pinChangeAction' | transloco }}
+            } @else {
+            {{ 'settings.usageProtection.pinSetAction' | transloco }}
+            }
+          </button>
+          @if (hasConfiguredParentPin()) {
+          <button mat-stroked-button type="button" (click)="removeUsageParentPin()">
+            {{ 'settings.usageProtection.pinDeleteAction' | transloco }}
+          </button>
+          }
+        </div>
+      </section>
+      }
+
       <section class="usage-slider-block">
         <div class="usage-slider-header">
           <p class="usage-slider-label">{{ 'settings.usageProtection.dailyLimit' | transloco }}</p>
@@ -190,60 +218,44 @@
       </section>
       }
 
-      <mat-slide-toggle color="primary" [checked]="appSettings.usageProtection.scheduleEnabled"
-        (change)="setUsageScheduleEnabled($event.checked)">
-        {{ 'settings.usageProtection.scheduleToggle' | transloco }}
-      </mat-slide-toggle>
-
-      @if (appSettings.usageProtection.scheduleEnabled) {
-      <div class="usage-time-grid">
-        <mat-form-field appearance="fill">
-          <mat-label>{{ 'settings.usageProtection.weekdayStart' | transloco }}</mat-label>
-          <input matInput type="time" [ngModel]="appSettings.usageProtection.weekdayStart"
-            (ngModelChange)="setUsageWeekdayStart($event)">
-        </mat-form-field>
-        <mat-form-field appearance="fill">
-          <mat-label>{{ 'settings.usageProtection.weekdayEnd' | transloco }}</mat-label>
-          <input matInput type="time" [ngModel]="appSettings.usageProtection.weekdayEnd"
-            (ngModelChange)="setUsageWeekdayEnd($event)">
-        </mat-form-field>
-        <mat-form-field appearance="fill">
-          <mat-label>{{ 'settings.usageProtection.weekendStart' | transloco }}</mat-label>
-          <input matInput type="time" [ngModel]="appSettings.usageProtection.weekendStart"
-            (ngModelChange)="setUsageWeekendStart($event)">
-        </mat-form-field>
-        <mat-form-field appearance="fill">
-          <mat-label>{{ 'settings.usageProtection.weekendEnd' | transloco }}</mat-label>
-          <input matInput type="time" [ngModel]="appSettings.usageProtection.weekendEnd"
-            (ngModelChange)="setUsageWeekendEnd($event)">
-        </mat-form-field>
-      </div>
-      }
-      }
-
-      @if (appSettings.usageProtection.mode === 'parental') {
-      <p class="usage-protection-pin-state">
-        @if (usageParentPin) {
-        {{ 'settings.usageProtection.pinPending' | transloco }}
-        } @else if (appSettings.usageProtection.parentPinHash) {
-        {{ 'settings.usageProtection.pinSet' | transloco }}
-        } @else {
-        {{ 'settings.usageProtection.pinMissing' | transloco }}
+      <section class="usage-slider-block usage-schedule-toggle-tile">
+        <mat-slide-toggle color="primary" [checked]="appSettings.usageProtection.scheduleEnabled"
+          (change)="setUsageScheduleEnabled($event.checked)">
+          {{ 'settings.usageProtection.scheduleToggle' | transloco }}
+        </mat-slide-toggle>
+        @if (appSettings.usageProtection.scheduleEnabled) {
+        <p class="usage-schedule-heading">{{ 'settings.usageProtection.scheduleByDay' | transloco }}</p>
+        <div class="usage-time-grid">
+          @for (day of usageScheduleDays; track day) {
+          <section class="usage-day-tile">
+            <h4>{{ ('settings.usageProtection.days.' + day) | transloco }}</h4>
+            <mat-form-field appearance="fill" class="usage-day-time-field">
+              <mat-label>{{ 'settings.usageProtection.startLabel' | transloco }}</mat-label>
+              <input
+                matInput
+                [matTimepicker]="startPicker"
+                [ngModel]="getUsageDayStartDate(day)"
+                (ngModelChange)="setUsageDayStart(day, $event)"
+                readonly>
+              <mat-timepicker-toggle matSuffix [for]="startPicker"></mat-timepicker-toggle>
+              <mat-timepicker #startPicker interval="5m"></mat-timepicker>
+            </mat-form-field>
+            <mat-form-field appearance="fill" class="usage-day-time-field">
+              <mat-label>{{ 'settings.usageProtection.endLabel' | transloco }}</mat-label>
+              <input
+                matInput
+                [matTimepicker]="endPicker"
+                [ngModel]="getUsageDayEndDate(day)"
+                (ngModelChange)="setUsageDayEnd(day, $event)"
+                readonly>
+              <mat-timepicker-toggle matSuffix [for]="endPicker"></mat-timepicker-toggle>
+              <mat-timepicker #endPicker interval="5m"></mat-timepicker>
+            </mat-form-field>
+          </section>
+          }
+        </div>
         }
-      </p>
-      <button mat-stroked-button type="button" (click)="openUsageParentPinDialog()">
-        @if (appSettings.usageProtection.parentPinHash) {
-        {{ 'settings.usageProtection.pinChangeAction' | transloco }}
-        } @else {
-        {{ 'settings.usageProtection.pinSetAction' | transloco }}
-        }
-      </button>
-      }
-
-      @if (hasConfiguredParentPin()) {
-      <button mat-stroked-button type="button" (click)="removeUsageParentPin()">
-        {{ 'settings.usageProtection.pinDeleteAction' | transloco }}
-      </button>
+      </section>
       }
       }
 

@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, effect, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { DateAdapter, MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -10,11 +11,19 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatSlideToggleChange, MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatTimepickerModule } from '@angular/material/timepicker';
 import { provideTranslocoScope, TranslocoPipe } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 import { APP_VERSION_INFO } from '../../../environments/version';
 import { AppSettings } from '../../interfaces/app-settings';
-import { UsageProtectionMode, UsageProtectionSettings } from '../../interfaces/usage-protection-settings';
+import {
+  createDefaultUsageProtectionDailyWindows,
+  USAGE_PROTECTION_DAY_KEYS,
+  UsageProtectionDailyWindows,
+  UsageProtectionDayKey,
+  UsageProtectionMode,
+  UsageProtectionSettings
+} from '../../interfaces/usage-protection-settings';
 import { AppService } from '../../services/app.service';
 import { LanguageMode, LanguageService } from '../../services/language.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
@@ -31,14 +40,17 @@ import {
   ValueEditDialogResult
 } from '../utils/value-edit-dialog/value-edit-dialog.component';
 
+type UsageTimePickerModel = Record<UsageProtectionDayKey, { start: Date; end: Date }>;
+
 
 @Component({
   selector: 'app-app-settings',
-  providers: [provideTranslocoScope('settings')],
+  providers: [provideTranslocoScope('settings'), provideNativeDateAdapter()],
   imports: [
     DialogHeaderComponent,
     CommonModule,
     FormsModule,
+    MatNativeDateModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
@@ -51,6 +63,7 @@ import {
     MatButtonToggleModule,
     MatSliderModule,
     MatSlideToggleModule,
+    MatTimepickerModule,
     TranslocoPipe,
     EnableLocationComponent
   ],
@@ -65,6 +78,7 @@ export class AppSettingsComponent implements OnInit {
   private readonly languageService = inject(LanguageService);
   private readonly translation = inject(TranslationHelperService);
   private readonly usageProtectionService = inject(UsageProtectionService);
+  private readonly dateAdapter = inject<DateAdapter<Date>>(DateAdapter);
   readonly help = inject(HelpDialogService);
 
   public versionInfo = APP_VERSION_INFO;
@@ -104,6 +118,15 @@ export class AppSettingsComponent implements OnInit {
   readonly usageParentalExtensionMin = 1;
   readonly usageParentalExtensionMax = 240;
   readonly usageParentalExtensionStep = 1;
+  readonly usageScheduleDays = [...USAGE_PROTECTION_DAY_KEYS];
+  private readonly defaultDailyWindows = createDefaultUsageProtectionDailyWindows();
+  usageTimePickerModel: UsageTimePickerModel = this.createUsageTimePickerModel(this.defaultDailyWindows);
+
+  constructor() {
+    effect(() => {
+      this.dateAdapter.setLocale(this.languageService.effectiveLanguage());
+    });
+  }
 
   ngOnInit(): void {
     this.dialogRef.beforeClosed().subscribe(() => {
@@ -114,6 +137,28 @@ export class AppSettingsComponent implements OnInit {
       this.appSettings = { ...this.appSettings, languageMode: initialLanguage };
       this.baselineSettings = { ...this.baselineSettings, languageMode: initialLanguage };
     }
+    const normalizedDailyWindows = this.normalizeDailyWindows(
+      this.appSettings.usageProtection.dailyWindows,
+      this.appSettings.usageProtection
+    );
+    this.appSettings = {
+      ...this.appSettings,
+      usageProtection: {
+        ...this.appSettings.usageProtection,
+        dailyWindows: normalizedDailyWindows
+      }
+    };
+    this.baselineSettings = {
+      ...this.baselineSettings,
+      usageProtection: {
+        ...this.baselineSettings.usageProtection,
+        dailyWindows: this.normalizeDailyWindows(
+          this.baselineSettings.usageProtection.dailyWindows,
+          this.baselineSettings.usageProtection
+        )
+      }
+    };
+    this.usageTimePickerModel = this.createUsageTimePickerModel(normalizedDailyWindows);
     this.usageProtectionUnlocked = !this.hasParentPinConfigured(this.appSettings.usageProtection);
     if ('permissions' in navigator && navigator.permissions?.query) {
       navigator.permissions
@@ -359,32 +404,26 @@ export class AppSettingsComponent implements OnInit {
     }, value => this.setUsageParentalExtensionMinutes(value));
   }
 
-  setUsageWeekdayStart(value: string): void {
-    if (this.needsUsageProtectionUnlock()) {
-      return;
-    }
-    this.updateUsageTimeField('weekdayStart', value);
+  getUsageDayStartDate(day: UsageProtectionDayKey): Date {
+    return this.usageTimePickerModel[day].start;
   }
 
-  setUsageWeekdayEnd(value: string): void {
-    if (this.needsUsageProtectionUnlock()) {
-      return;
-    }
-    this.updateUsageTimeField('weekdayEnd', value);
+  getUsageDayEndDate(day: UsageProtectionDayKey): Date {
+    return this.usageTimePickerModel[day].end;
   }
 
-  setUsageWeekendStart(value: string): void {
+  setUsageDayStart(day: UsageProtectionDayKey, value: unknown): void {
     if (this.needsUsageProtectionUnlock()) {
       return;
     }
-    this.updateUsageTimeField('weekendStart', value);
+    this.updateUsageTimeField(day, 'start', value);
   }
 
-  setUsageWeekendEnd(value: string): void {
+  setUsageDayEnd(day: UsageProtectionDayKey, value: unknown): void {
     if (this.needsUsageProtectionUnlock()) {
       return;
     }
-    this.updateUsageTimeField('weekendEnd', value);
+    this.updateUsageTimeField(day, 'end', value);
   }
 
   setDiagnosticLogging(enabled: boolean): void {
@@ -467,6 +506,9 @@ export class AppSettingsComponent implements OnInit {
   private resetPreviewState(): void {
     const baseline = structuredClone(this.baselineSettings);
     this.appSettings = baseline;
+    this.usageTimePickerModel = this.createUsageTimePickerModel(
+      this.normalizeDailyWindows(baseline.usageProtection.dailyWindows, baseline.usageProtection)
+    );
     this.usageParentPin = '';
     this.usageProtectionWarning = '';
     this.usageProtectionUnlocked = !this.hasParentPinConfigured(baseline.usageProtection);
@@ -565,10 +607,7 @@ export class AppSettingsComponent implements OnInit {
       dailyLimitMinutes: this.clampInteger(settings.dailyLimitMinutes, 5, 720, 60),
       selfExtensionMinutes: this.clampInteger(settings.selfExtensionMinutes, 0, 120, 5),
       parentalExtensionMinutes: this.clampInteger(settings.parentalExtensionMinutes, 1, 240, 5),
-      weekdayStart: this.normalizeTime(settings.weekdayStart, '06:00'),
-      weekdayEnd: this.normalizeTime(settings.weekdayEnd, '22:00'),
-      weekendStart: this.normalizeTime(settings.weekendStart, '06:00'),
-      weekendEnd: this.normalizeTime(settings.weekendEnd, '23:00')
+      dailyWindows: this.normalizeDailyWindows(settings.dailyWindows, settings)
     };
 
     if (normalized.mode !== 'parental') {
@@ -603,14 +642,116 @@ export class AppSettingsComponent implements OnInit {
     };
   }
 
-  private updateUsageTimeField(field: 'weekdayStart' | 'weekdayEnd' | 'weekendStart' | 'weekendEnd', value: string): void {
+  private updateUsageTimeField(day: UsageProtectionDayKey, bound: 'start' | 'end', value: unknown): void {
+    const currentWindows = this.getUsageDailyWindows();
+    const fallback = currentWindows[day][bound];
+    const nextValue = this.normalizeTime(this.toTimeString(value, fallback), fallback);
+
     this.appSettings = {
       ...this.appSettings,
       usageProtection: {
         ...this.appSettings.usageProtection,
-        [field]: this.normalizeTime(value, this.appSettings.usageProtection[field])
+        dailyWindows: {
+          ...currentWindows,
+          [day]: {
+            ...currentWindows[day],
+            [bound]: nextValue
+          }
+        }
       }
     };
+
+    if (bound === 'start') {
+      this.usageTimePickerModel = {
+        ...this.usageTimePickerModel,
+        [day]: {
+          ...this.usageTimePickerModel[day],
+          start: this.toDateFromTime(nextValue)
+        }
+      };
+    } else {
+      this.usageTimePickerModel = {
+        ...this.usageTimePickerModel,
+        [day]: {
+          ...this.usageTimePickerModel[day],
+          end: this.toDateFromTime(nextValue)
+        }
+      };
+    }
+  }
+
+  private getUsageDailyWindows(): UsageProtectionDailyWindows {
+    return this.normalizeDailyWindows(
+      this.appSettings.usageProtection.dailyWindows,
+      this.appSettings.usageProtection
+    );
+  }
+
+  private normalizeDailyWindows(
+    dailyWindows: UsageProtectionDailyWindows | undefined,
+    legacy?: Partial<UsageProtectionSettings>
+  ): UsageProtectionDailyWindows {
+    const base = createDefaultUsageProtectionDailyWindows();
+    if (dailyWindows) {
+      for (const day of this.usageScheduleDays) {
+        const source = dailyWindows[day];
+        if (!source) {
+          continue;
+        }
+        base[day] = {
+          start: this.normalizeTime(source.start, base[day].start),
+          end: this.normalizeTime(source.end, base[day].end)
+        };
+      }
+      return base;
+    }
+
+    const weekdayStart = this.normalizeTime(legacy?.weekdayStart ?? '', this.defaultDailyWindows.monday.start);
+    const weekdayEnd = this.normalizeTime(legacy?.weekdayEnd ?? '', this.defaultDailyWindows.monday.end);
+    const weekendStart = this.normalizeTime(legacy?.weekendStart ?? '', this.defaultDailyWindows.saturday.start);
+    const weekendEnd = this.normalizeTime(legacy?.weekendEnd ?? '', this.defaultDailyWindows.saturday.end);
+
+    return {
+      monday: { start: weekdayStart, end: weekdayEnd },
+      tuesday: { start: weekdayStart, end: weekdayEnd },
+      wednesday: { start: weekdayStart, end: weekdayEnd },
+      thursday: { start: weekdayStart, end: weekdayEnd },
+      friday: { start: weekdayStart, end: weekdayEnd },
+      saturday: { start: weekendStart, end: weekendEnd },
+      sunday: { start: weekendStart, end: weekendEnd }
+    };
+  }
+
+  private toDateFromTime(value: string): Date {
+    const normalized = this.normalizeTime(value, '00:00');
+    const [hours, minutes] = normalized.split(':').map(part => Number.parseInt(part, 10));
+    const date = new Date();
+    date.setHours(hours, minutes, 0, 0);
+    return date;
+  }
+
+  private createUsageTimePickerModel(windows: UsageProtectionDailyWindows): UsageTimePickerModel {
+    return {
+      monday: { start: this.toDateFromTime(windows.monday.start), end: this.toDateFromTime(windows.monday.end) },
+      tuesday: { start: this.toDateFromTime(windows.tuesday.start), end: this.toDateFromTime(windows.tuesday.end) },
+      wednesday: { start: this.toDateFromTime(windows.wednesday.start), end: this.toDateFromTime(windows.wednesday.end) },
+      thursday: { start: this.toDateFromTime(windows.thursday.start), end: this.toDateFromTime(windows.thursday.end) },
+      friday: { start: this.toDateFromTime(windows.friday.start), end: this.toDateFromTime(windows.friday.end) },
+      saturday: { start: this.toDateFromTime(windows.saturday.start), end: this.toDateFromTime(windows.saturday.end) },
+      sunday: { start: this.toDateFromTime(windows.sunday.start), end: this.toDateFromTime(windows.sunday.end) }
+    };
+  }
+
+  private toTimeString(value: unknown, fallback: string): string {
+    if (value instanceof Date && Number.isFinite(value.getTime())) {
+      const hours = `${value.getHours()}`.padStart(2, '0');
+      const minutes = `${value.getMinutes()}`.padStart(2, '0');
+      return `${hours}:${minutes}`;
+    }
+    if (typeof value === 'string') {
+      return value;
+    }
+    return fallback;
   }
 
   private clampInteger(value: unknown, min: number, max: number, fallback: number): number {

@@ -52,6 +52,18 @@
     "selfExtension": "Self extension (minutes)",
     "parentalExtension": "Parent extension (minutes)",
     "scheduleToggle": "Limit to allowed time windows",
+    "scheduleByDay": "Allowed time windows per day",
+    "startLabel": "Start",
+    "endLabel": "End",
+    "days": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    },
     "weekdayStart": "Weekday start",
     "weekdayEnd": "Weekday end",
     "weekendStart": "Weekend start",

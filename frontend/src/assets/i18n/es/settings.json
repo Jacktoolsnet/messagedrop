@@ -52,6 +52,18 @@
     "selfExtension": "Ampliación propia (minutos)",
     "parentalExtension": "Ampliación parental (minutos)",
     "scheduleToggle": "Limitar a franjas horarias permitidas",
+    "scheduleByDay": "Franjas horarias permitidas por día",
+    "startLabel": "Inicio",
+    "endLabel": "Fin",
+    "days": {
+      "monday": "Lunes",
+      "tuesday": "Martes",
+      "wednesday": "Miércoles",
+      "thursday": "Jueves",
+      "friday": "Viernes",
+      "saturday": "Sábado",
+      "sunday": "Domingo"
+    },
     "weekdayStart": "Inicio entre semana",
     "weekdayEnd": "Fin entre semana",
     "weekendStart": "Inicio fin de semana",

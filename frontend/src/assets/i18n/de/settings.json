@@ -52,6 +52,18 @@
     "selfExtension": "Selbstverlängerung (Minuten)",
     "parentalExtension": "Eltern-Verlängerung (Minuten)",
     "scheduleToggle": "Auf erlaubte Zeitfenster begrenzen",
+    "scheduleByDay": "Erlaubte Zeitfenster pro Wochentag",
+    "startLabel": "Start",
+    "endLabel": "Ende",
+    "days": {
+      "monday": "Montag",
+      "tuesday": "Dienstag",
+      "wednesday": "Mittwoch",
+      "thursday": "Donnerstag",
+      "friday": "Freitag",
+      "saturday": "Samstag",
+      "sunday": "Sonntag"
+    },
     "weekdayStart": "Start werktags",
     "weekdayEnd": "Ende werktags",
     "weekendStart": "Start am Wochenende",

@@ -4,10 +4,15 @@ import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import {
+  createDefaultUsageProtectionDailyWindows,
   createDefaultUsageProtectionState,
   DEFAULT_USAGE_PROTECTION_SETTINGS,
   getLocalDateKey,
+  UsageProtectionDayKey,
+  UsageProtectionDayWindow,
+  UsageProtectionDailyWindows,
   UsageProtectionMode,
+  USAGE_PROTECTION_DAY_KEYS,
   UsageProtectionServerPayload,
   UsageProtectionSettings,
   UsageProtectionState
@@ -46,6 +51,7 @@ export class UsageProtectionService {
   private serverLoadInProgress = false;
   private lastSyncedAt = 0;
   private lastLoadedUserId = '';
+  private readonly defaultDailyWindows = createDefaultUsageProtectionDailyWindows();
 
   readonly settings = this.settingsSignal.asReadonly();
   readonly state = this.stateSignal.asReadonly();
@@ -330,10 +336,7 @@ export class UsageProtectionService {
     const selfExtensionMinutes = this.clampInt(raw?.['selfExtensionMinutes'], 0, 120, DEFAULT_USAGE_PROTECTION_SETTINGS.selfExtensionMinutes);
     const parentalExtensionMinutes = this.clampInt(raw?.['parentalExtensionMinutes'], 1, 240, DEFAULT_USAGE_PROTECTION_SETTINGS.parentalExtensionMinutes);
     const scheduleEnabled = Boolean(raw?.['scheduleEnabled']);
-    const weekdayStart = this.normalizeTime(raw?.['weekdayStart'], DEFAULT_USAGE_PROTECTION_SETTINGS.weekdayStart);
-    const weekdayEnd = this.normalizeTime(raw?.['weekdayEnd'], DEFAULT_USAGE_PROTECTION_SETTINGS.weekdayEnd);
-    const weekendStart = this.normalizeTime(raw?.['weekendStart'], DEFAULT_USAGE_PROTECTION_SETTINGS.weekendStart);
-    const weekendEnd = this.normalizeTime(raw?.['weekendEnd'], DEFAULT_USAGE_PROTECTION_SETTINGS.weekendEnd);
+    const dailyWindows = this.normalizeDailyWindows(raw);
     const parentPinHash = typeof raw?.['parentPinHash'] === 'string' ? raw['parentPinHash'] : undefined;
     return {
       mode,
@@ -341,10 +344,7 @@ export class UsageProtectionService {
       selfExtensionMinutes,
       parentalExtensionMinutes,
       scheduleEnabled,
-      weekdayStart,
-      weekdayEnd,
-      weekendStart,
-      weekendEnd,
+      dailyWindows,
       parentPinHash
     };
   }
@@ -398,10 +398,9 @@ export class UsageProtectionService {
       return { locked: false };
     }
     const currentMinutes = now.getHours() * 60 + now.getMinutes();
-    const day = now.getDay();
-    const useWeekend = day === 0 || day === 6;
-    const start = this.timeToMinutes(useWeekend ? settings.weekendStart : settings.weekdayStart);
-    const end = this.timeToMinutes(useWeekend ? settings.weekendEnd : settings.weekdayEnd);
+    const window = this.getWindowForDay(settings, now.getDay());
+    const start = this.timeToMinutes(window.start);
+    const end = this.timeToMinutes(window.end);
     if (start === null || end === null) {
       return { locked: false };
     }
@@ -423,10 +422,9 @@ export class UsageProtectionService {
     for (let dayOffset = 0; dayOffset <= 7; dayOffset += 1) {
       const candidate = new Date(now);
       candidate.setDate(now.getDate() + dayOffset);
-      const day = candidate.getDay();
-      const useWeekend = day === 0 || day === 6;
-      const startMinutes = this.timeToMinutes(useWeekend ? settings.weekendStart : settings.weekdayStart);
-      const endMinutes = this.timeToMinutes(useWeekend ? settings.weekendEnd : settings.weekdayEnd);
+      const window = this.getWindowForDay(settings, candidate.getDay());
+      const startMinutes = this.timeToMinutes(window.start);
+      const endMinutes = this.timeToMinutes(window.end);
       if (startMinutes === null || endMinutes === null || startMinutes === endMinutes) {
         continue;
       }
@@ -443,6 +441,72 @@ export class UsageProtectionService {
       return value;
     }
     return 'off';
+  }
+
+  private normalizeDailyWindows(raw: Record<string, unknown> | null): UsageProtectionDailyWindows {
+    const dailyWindowsRaw = this.asRecord(raw?.['dailyWindows']);
+    if (dailyWindowsRaw) {
+      const normalized = createDefaultUsageProtectionDailyWindows();
+      for (const day of USAGE_PROTECTION_DAY_KEYS) {
+        const source = this.asRecord(dailyWindowsRaw[day]);
+        if (!source) {
+          continue;
+        }
+        normalized[day] = {
+          start: this.normalizeTime(source['start'], normalized[day].start),
+          end: this.normalizeTime(source['end'], normalized[day].end)
+        };
+      }
+      return normalized;
+    }
+
+    const weekdayStart = this.normalizeTime(raw?.['weekdayStart'], this.defaultDailyWindows.monday.start);
+    const weekdayEnd = this.normalizeTime(raw?.['weekdayEnd'], this.defaultDailyWindows.monday.end);
+    const weekendStart = this.normalizeTime(raw?.['weekendStart'], this.defaultDailyWindows.saturday.start);
+    const weekendEnd = this.normalizeTime(raw?.['weekendEnd'], this.defaultDailyWindows.saturday.end);
+    return {
+      monday: { start: weekdayStart, end: weekdayEnd },
+      tuesday: { start: weekdayStart, end: weekdayEnd },
+      wednesday: { start: weekdayStart, end: weekdayEnd },
+      thursday: { start: weekdayStart, end: weekdayEnd },
+      friday: { start: weekdayStart, end: weekdayEnd },
+      saturday: { start: weekendStart, end: weekendEnd },
+      sunday: { start: weekendStart, end: weekendEnd }
+    };
+  }
+
+  private getWindowForDay(settings: UsageProtectionSettings, jsDay: number): UsageProtectionDayWindow {
+    const dayKey = this.resolveDayKey(jsDay);
+    const fallback = this.defaultDailyWindows[dayKey];
+    const source = settings.dailyWindows?.[dayKey];
+    if (!source) {
+      return fallback;
+    }
+    return {
+      start: this.normalizeTime(source.start, fallback.start),
+      end: this.normalizeTime(source.end, fallback.end)
+    };
+  }
+
+  private resolveDayKey(jsDay: number): UsageProtectionDayKey {
+    switch (jsDay) {
+      case 0:
+        return 'sunday';
+      case 1:
+        return 'monday';
+      case 2:
+        return 'tuesday';
+      case 3:
+        return 'wednesday';
+      case 4:
+        return 'thursday';
+      case 5:
+        return 'friday';
+      case 6:
+        return 'saturday';
+      default:
+        return 'monday';
+    }
   }
 
   private normalizeTime(value: unknown, fallback: string): string {

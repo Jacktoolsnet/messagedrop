@@ -403,10 +403,69 @@ h4 {
     font-variant-numeric: tabular-nums;
 }
 
+.usage-schedule-heading {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.35;
+    color: var(--mat-card-subtitle-text-color);
+}
+
+.usage-parent-pin-tile {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+}
+
+.usage-parent-pin-state {
+    margin: 0;
+}
+
+.usage-parent-pin-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    justify-items: center;
+}
+
+.usage-parent-pin-actions button {
+    width: 95%;
+}
+
+.usage-schedule-toggle-tile mat-slide-toggle {
+    width: 100%;
+}
+
+.usage-schedule-toggle-tile {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.55rem;
+}
+
 .usage-time-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.6rem;
+}
+
+.usage-day-tile {
+    border: 1px solid color-mix(in srgb, var(--mat-card-outlined-outline-color) 72%, transparent);
+    border-radius: 0.9rem;
+    background-color: color-mix(in srgb, var(--mat-card-filled-container-color) 95%, transparent);
+    padding: 0.55rem 0.6rem 0.2rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+}
+
+.usage-day-tile h4 {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--mat-app-text-color);
+}
+
+.usage-day-time-field {
+    width: 100%;
 }
 
 .usage-protection-warning {

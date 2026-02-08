@@ -1,4 +1,29 @@
 export type UsageProtectionMode = 'off' | 'self' | 'parental';
+export type UsageProtectionDayKey =
+  | 'monday'
+  | 'tuesday'
+  | 'wednesday'
+  | 'thursday'
+  | 'friday'
+  | 'saturday'
+  | 'sunday';
+
+export const USAGE_PROTECTION_DAY_KEYS: readonly UsageProtectionDayKey[] = [
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+  'sunday'
+] as const;
+
+export interface UsageProtectionDayWindow {
+  start: string;
+  end: string;
+}
+
+export type UsageProtectionDailyWindows = Record<UsageProtectionDayKey, UsageProtectionDayWindow>;
 
 export interface UsageProtectionSettings {
   mode: UsageProtectionMode;
@@ -6,10 +31,12 @@ export interface UsageProtectionSettings {
   selfExtensionMinutes: number;
   parentalExtensionMinutes: number;
   scheduleEnabled: boolean;
-  weekdayStart: string;
-  weekdayEnd: string;
-  weekendStart: string;
-  weekendEnd: string;
+  dailyWindows: UsageProtectionDailyWindows;
+  // Legacy fields for migration of older persisted/server payloads.
+  weekdayStart?: string;
+  weekdayEnd?: string;
+  weekendStart?: string;
+  weekendEnd?: string;
   parentPinHash?: string;
 }
 
@@ -24,16 +51,25 @@ export interface UsageProtectionServerPayload {
   state: UsageProtectionState;
 }
 
+export function createDefaultUsageProtectionDailyWindows(): UsageProtectionDailyWindows {
+  return {
+    monday: { start: '06:00', end: '22:00' },
+    tuesday: { start: '06:00', end: '22:00' },
+    wednesday: { start: '06:00', end: '22:00' },
+    thursday: { start: '06:00', end: '22:00' },
+    friday: { start: '06:00', end: '22:00' },
+    saturday: { start: '06:00', end: '23:00' },
+    sunday: { start: '06:00', end: '23:00' }
+  };
+}
+
 export const DEFAULT_USAGE_PROTECTION_SETTINGS: UsageProtectionSettings = {
   mode: 'off',
   dailyLimitMinutes: 60,
   selfExtensionMinutes: 5,
   parentalExtensionMinutes: 5,
   scheduleEnabled: false,
-  weekdayStart: '06:00',
-  weekdayEnd: '22:00',
-  weekendStart: '06:00',
-  weekendEnd: '23:00'
+  dailyWindows: createDefaultUsageProtectionDailyWindows()
 };
 
 export function createDefaultUsageProtectionState(dateKey = getLocalDateKey()): UsageProtectionState {
