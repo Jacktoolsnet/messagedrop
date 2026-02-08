@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { AppSettings } from '../interfaces/app-settings';
 import { NotificationAction } from '../interfaces/notification-action';
+import { DEFAULT_USAGE_PROTECTION_SETTINGS } from '../interfaces/usage-protection-settings';
 import { IndexedDbService } from './indexed-db.service';
 
 @Injectable({
@@ -36,6 +37,7 @@ export class AppService {
     enableUnsplashContent: false,
     diagnosticLogging: false,
     backupOnExit: false,
+    usageProtection: { ...DEFAULT_USAGE_PROTECTION_SETTINGS },
     consentSettings: {
       disclaimer: false,
       privacyPolicy: false,

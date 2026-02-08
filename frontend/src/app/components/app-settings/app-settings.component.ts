@@ -12,9 +12,11 @@ import { MatSlideToggleChange, MatSlideToggleModule } from '@angular/material/sl
 import { provideTranslocoScope, TranslocoPipe } from '@jsverse/transloco';
 import { APP_VERSION_INFO } from '../../../environments/version';
 import { AppSettings } from '../../interfaces/app-settings';
+import { UsageProtectionMode, UsageProtectionSettings } from '../../interfaces/usage-protection-settings';
 import { AppService } from '../../services/app.service';
 import { LanguageMode, LanguageService } from '../../services/language.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
+import { UsageProtectionService } from '../../services/usage-protection.service';
 import { EnableLocationComponent } from "../utils/enable-location/enable-location.component";
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
@@ -50,6 +52,7 @@ export class AppSettingsComponent implements OnInit {
   private readonly dialogData = inject<{ appSettings: AppSettings }>(MAT_DIALOG_DATA);
   private readonly languageService = inject(LanguageService);
   private readonly translation = inject(TranslationHelperService);
+  private readonly usageProtectionService = inject(UsageProtectionService);
   readonly help = inject(HelpDialogService);
 
   public versionInfo = APP_VERSION_INFO;
@@ -70,6 +73,10 @@ export class AppSettingsComponent implements OnInit {
   ];
   public appSettings: AppSettings = structuredClone(this.dialogData.appSettings);
   private baselineSettings: AppSettings = structuredClone(this.dialogData.appSettings);
+  public readonly usageModes: UsageProtectionMode[] = ['off', 'self', 'parental'];
+  public usageParentPin = '';
+  public usageParentPinConfirm = '';
+  public usageProtectionWarning = '';
   public showDetectLocationOnStart = false;
   public storagePersistenceSupported = this.appService.isStoragePersistenceSupported();
   public storagePersistenceBusy = false;
@@ -106,6 +113,13 @@ export class AppSettingsComponent implements OnInit {
   async onApplyClick(): Promise<void> {
     let nextSettings = { ...this.appSettings };
     let shouldClose = true;
+    this.usageProtectionWarning = '';
+
+    const preparedUsageProtection = await this.prepareUsageProtectionSettings(nextSettings.usageProtection);
+    if (!preparedUsageProtection) {
+      return;
+    }
+    nextSettings = { ...nextSettings, usageProtection: preparedUsageProtection };
 
     if (this.storagePersistenceSupported) {
       const wantsPersistence = !!nextSettings.persistStorage;
@@ -129,6 +143,8 @@ export class AppSettingsComponent implements OnInit {
     this.appService.setTheme(nextSettings);
     this.appSettings = nextSettings;
     this.baselineSettings = structuredClone(nextSettings);
+    this.usageParentPin = '';
+    this.usageParentPinConfirm = '';
     this.languageService.endLanguagePreview();
 
     if (shouldClose) {
@@ -152,6 +168,63 @@ export class AppSettingsComponent implements OnInit {
 
   setBackupOnExit(enabled: boolean): void {
     this.appSettings = { ...this.appSettings, backupOnExit: enabled };
+  }
+
+  setUsageMode(mode: UsageProtectionMode): void {
+    this.appSettings = {
+      ...this.appSettings,
+      usageProtection: {
+        ...this.appSettings.usageProtection,
+        mode
+      }
+    };
+    this.usageProtectionWarning = '';
+  }
+
+  setUsageScheduleEnabled(enabled: boolean): void {
+    this.appSettings = {
+      ...this.appSettings,
+      usageProtection: {
+        ...this.appSettings.usageProtection,
+        scheduleEnabled: enabled
+      }
+    };
+  }
+
+  setUsageDailyLimitMinutes(value: number): void {
+    this.appSettings = {
+      ...this.appSettings,
+      usageProtection: {
+        ...this.appSettings.usageProtection,
+        dailyLimitMinutes: this.clampInteger(value, 5, 720, 60)
+      }
+    };
+  }
+
+  setUsageSelfExtensionMinutes(value: number): void {
+    this.appSettings = {
+      ...this.appSettings,
+      usageProtection: {
+        ...this.appSettings.usageProtection,
+        selfExtensionMinutes: this.clampInteger(value, 0, 120, 5)
+      }
+    };
+  }
+
+  setUsageWeekdayStart(value: string): void {
+    this.updateUsageTimeField('weekdayStart', value);
+  }
+
+  setUsageWeekdayEnd(value: string): void {
+    this.updateUsageTimeField('weekdayEnd', value);
+  }
+
+  setUsageWeekendStart(value: string): void {
+    this.updateUsageTimeField('weekendStart', value);
+  }
+
+  setUsageWeekendEnd(value: string): void {
+    this.updateUsageTimeField('weekendEnd', value);
   }
 
   setDiagnosticLogging(enabled: boolean): void {
@@ -234,10 +307,84 @@ export class AppSettingsComponent implements OnInit {
   private resetPreviewState(): void {
     const baseline = structuredClone(this.baselineSettings);
     this.appSettings = baseline;
+    this.usageParentPin = '';
+    this.usageParentPinConfirm = '';
+    this.usageProtectionWarning = '';
     this.appService.setTheme(baseline);
     const languageMode = baseline.languageMode ?? 'system';
     this.languageService.setLanguageModePreview(languageMode);
     this.languageService.endLanguagePreview();
+  }
+
+  private async prepareUsageProtectionSettings(settings: UsageProtectionSettings): Promise<UsageProtectionSettings | null> {
+    const normalized: UsageProtectionSettings = {
+      ...settings,
+      dailyLimitMinutes: this.clampInteger(settings.dailyLimitMinutes, 5, 720, 60),
+      selfExtensionMinutes: this.clampInteger(settings.selfExtensionMinutes, 0, 120, 5),
+      weekdayStart: this.normalizeTime(settings.weekdayStart, '06:00'),
+      weekdayEnd: this.normalizeTime(settings.weekdayEnd, '22:00'),
+      weekendStart: this.normalizeTime(settings.weekendStart, '06:00'),
+      weekendEnd: this.normalizeTime(settings.weekendEnd, '23:00')
+    };
+
+    if (normalized.mode !== 'parental') {
+      return normalized;
+    }
+
+    const pin = this.usageParentPin.trim();
+    const confirm = this.usageParentPinConfirm.trim();
+
+    if (!pin && !confirm && normalized.parentPinHash) {
+      return normalized;
+    }
+
+    if (!pin && !confirm && !normalized.parentPinHash) {
+      this.usageProtectionWarning = this.translation.t('settings.usageProtection.pinMissing');
+      return null;
+    }
+
+    if (!this.usageProtectionService.isValidPinFormat(pin)) {
+      this.usageProtectionWarning = this.translation.t('settings.usageProtection.pinFormat');
+      return null;
+    }
+
+    if (pin !== confirm) {
+      this.usageProtectionWarning = this.translation.t('settings.usageProtection.pinMismatch');
+      return null;
+    }
+
+    const hashed = await this.usageProtectionService.hashPin(pin);
+    if (!hashed) {
+      this.usageProtectionWarning = this.translation.t('settings.usageProtection.pinHashFailed');
+      return null;
+    }
+
+    return {
+      ...normalized,
+      parentPinHash: hashed
+    };
+  }
+
+  private updateUsageTimeField(field: 'weekdayStart' | 'weekdayEnd' | 'weekendStart' | 'weekendEnd', value: string): void {
+    this.appSettings = {
+      ...this.appSettings,
+      usageProtection: {
+        ...this.appSettings.usageProtection,
+        [field]: this.normalizeTime(value, this.appSettings.usageProtection[field])
+      }
+    };
+  }
+
+  private clampInteger(value: unknown, min: number, max: number, fallback: number): number {
+    const parsed = typeof value === 'number' ? value : Number.parseInt(String(value ?? ''), 10);
+    if (!Number.isFinite(parsed)) {
+      return fallback;
+    }
+    return Math.min(max, Math.max(min, Math.round(parsed)));
+  }
+
+  private normalizeTime(value: string, fallback: string): string {
+    return /^([01]\d|2[0-3]):([0-5]\d)$/.test(value) ? value : fallback;
   }
 
 }

@@ -38,6 +38,31 @@
     "quotaWarning": "Storage almost full ({{ percent }}% used: {{ used }} of {{ total }}).",
     "confirmDisable": "Disabling may allow the browser to prune stored data. Do you really want to continue?"
   },
+  "usageProtection": {
+    "title": "Usage protection",
+    "description": "Set daily limits and time windows for app usage.",
+    "note": "Use this feature to reduce screen time. In self mode one extra extension is allowed per day. In parental mode a PIN is required once the limit is reached.",
+    "modeLabel": "Usage mode",
+    "mode": {
+      "off": "Off",
+      "self": "Self-managed",
+      "parental": "Parental PIN"
+    },
+    "dailyLimit": "Daily limit (minutes)",
+    "selfExtension": "Self extension (minutes)",
+    "scheduleToggle": "Limit to allowed time windows",
+    "weekdayStart": "Weekday start",
+    "weekdayEnd": "Weekday end",
+    "weekendStart": "Weekend start",
+    "weekendEnd": "Weekend end",
+    "pinSet": "A parental PIN is already configured.",
+    "pinMissing": "Set a parental PIN (4-12 digits) before saving.",
+    "pinLabel": "Parental PIN",
+    "pinConfirmLabel": "Confirm parental PIN",
+    "pinFormat": "PIN must contain 4 to 12 digits.",
+    "pinMismatch": "PIN and confirmation do not match.",
+    "pinHashFailed": "PIN could not be secured. Please try again."
+  },
   "backup": {
     "title": "Backup reminder",
     "description": "Ask before closing if new data should be backed up.",

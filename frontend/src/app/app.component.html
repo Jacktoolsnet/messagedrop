@@ -6,6 +6,58 @@
     (markerClickEvent)="handleMarkerClickEvent($event)">
 </app-map>
 
+@if (usageProtectionLocked()) {
+<div class="usage-protection-overlay" role="dialog" aria-modal="true" [attr.aria-label]="'common.usageProtection.title' | transloco">
+    <div class="usage-protection-dialog">
+        <mat-icon aria-hidden="true">timer_off</mat-icon>
+        <h2>{{ 'common.usageProtection.title' | transloco }}</h2>
+
+        @if (usageProtectionService.lockReason() === 'daily_limit') {
+        <p>{{ 'common.usageProtection.dailyLimitReached' | transloco }}</p>
+        }
+
+        @if (usageProtectionService.lockReason() === 'schedule') {
+        <p>{{ 'common.usageProtection.scheduleLocked' | transloco }}</p>
+        @if (usageProtectionService.nextAllowedAt()) {
+        <p>{{ 'common.usageProtection.nextAllowedAt' | transloco : { time: getUsageProtectionNextAllowedTime() } }}</p>
+        }
+        }
+
+        @if (usageProtectionService.canUseSelfExtension()) {
+        <button mat-raised-button color="primary" type="button" (click)="applyUsageProtectionSelfExtension()">
+            {{ 'common.usageProtection.selfExtensionAction' | transloco }}
+        </button>
+        }
+
+        @if (usageProtectionService.requiresParentPin()) {
+        <label class="usage-protection-pin-label" for="usage-protection-pin-input">
+            {{ 'common.usageProtection.parentPinLabel' | transloco }}
+        </label>
+        <input id="usage-protection-pin-input" class="usage-protection-pin-input" type="password" inputmode="numeric"
+            autocomplete="off" [value]="usageProtectionUnlockPin"
+            (input)="usageProtectionUnlockPin = $any($event.target).value; usageProtectionUnlockError = ''">
+        <button mat-raised-button color="primary" type="button" [disabled]="usageProtectionUnlockBusy"
+            (click)="unlockUsageProtection()">
+            {{ 'common.usageProtection.unlockAction' | transloco }}
+        </button>
+        }
+
+        @if (usageProtectionUnlockError) {
+        <p class="usage-protection-error">{{ usageProtectionUnlockError }}</p>
+        }
+
+        <div class="usage-protection-actions">
+            <button mat-stroked-button type="button" (click)="editAppSettings()">
+                {{ 'common.menu.appSettings' | transloco }}
+            </button>
+            <button mat-stroked-button type="button" (click)="openUsageProtectionHelp()">
+                {{ 'common.actions.help' | transloco }}
+            </button>
+        </div>
+    </div>
+</div>
+}
+
 @if (!networkService.backendOnline() || maintenanceActive()) {
 <button mat-fab class="button_backend_status" (click)="showBackendOfflineInfo()"
     [attr.aria-label]="maintenanceActive() ? ('common.maintenance.title' | transloco) : ('common.serverDown.title' | transloco)">

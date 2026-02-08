@@ -38,6 +38,31 @@
     "quotaWarning": "Stockage presque plein ({{ percent }}% utilisés : {{ used }} sur {{ total }}).",
     "confirmDisable": "La désactivation peut permettre au navigateur de supprimer des données stockées. Voulez-vous continuer ?"
   },
+  "usageProtection": {
+    "title": "Protection d'usage",
+    "description": "Définissez des limites quotidiennes et des plages horaires autorisées.",
+    "note": "Utilisez cette fonction pour réduire le temps d'écran. En mode autonome, une extension supplémentaire par jour est autorisée. En mode parental, un PIN est requis lorsque la limite est atteinte.",
+    "modeLabel": "Mode de protection",
+    "mode": {
+      "off": "Désactivé",
+      "self": "Autogéré",
+      "parental": "PIN parental"
+    },
+    "dailyLimit": "Limite quotidienne (minutes)",
+    "selfExtension": "Extension autonome (minutes)",
+    "scheduleToggle": "Limiter aux plages horaires autorisées",
+    "weekdayStart": "Début semaine",
+    "weekdayEnd": "Fin semaine",
+    "weekendStart": "Début week-end",
+    "weekendEnd": "Fin week-end",
+    "pinSet": "Un PIN parental est déjà configuré.",
+    "pinMissing": "Définissez un PIN parental (4-12 chiffres) avant d'enregistrer.",
+    "pinLabel": "PIN parental",
+    "pinConfirmLabel": "Confirmer le PIN parental",
+    "pinFormat": "Le PIN doit contenir de 4 à 12 chiffres.",
+    "pinMismatch": "Le PIN et la confirmation ne correspondent pas.",
+    "pinHashFailed": "Le PIN n'a pas pu être sécurisé. Veuillez réessayer."
+  },
   "backup": {
     "title": "Rappel de sauvegarde",
     "description": "Demander avant de fermer si de nouvelles données doivent être sauvegardées.",

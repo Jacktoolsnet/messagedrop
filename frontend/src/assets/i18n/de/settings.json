@@ -38,6 +38,31 @@
     "quotaWarning": "Speicher fast voll ({{ percent }}% belegt: {{ used }} von {{ total }}).",
     "confirmDisable": "Wenn du es deaktivierst, kann der Browser gespeicherte Daten entfernen. Möchtest du wirklich fortfahren?"
   },
+  "usageProtection": {
+    "title": "Nutzungszeit-Schutz",
+    "description": "Lege tägliche Limits und erlaubte Zeitfenster fest.",
+    "note": "Mit dieser Funktion reduzierst du die Bildschirmzeit. Im Selbstmodus ist pro Tag eine zusätzliche Verlängerung möglich. Im Elternmodus ist nach Erreichen des Limits eine PIN erforderlich.",
+    "modeLabel": "Schutzmodus",
+    "mode": {
+      "off": "Aus",
+      "self": "Selbstverwaltet",
+      "parental": "Eltern-PIN"
+    },
+    "dailyLimit": "Tageslimit (Minuten)",
+    "selfExtension": "Selbstverlängerung (Minuten)",
+    "scheduleToggle": "Auf erlaubte Zeitfenster begrenzen",
+    "weekdayStart": "Start werktags",
+    "weekdayEnd": "Ende werktags",
+    "weekendStart": "Start am Wochenende",
+    "weekendEnd": "Ende am Wochenende",
+    "pinSet": "Eine Eltern-PIN ist bereits gesetzt.",
+    "pinMissing": "Bitte setze vor dem Speichern eine Eltern-PIN (4-12 Ziffern).",
+    "pinLabel": "Eltern-PIN",
+    "pinConfirmLabel": "Eltern-PIN bestätigen",
+    "pinFormat": "Die PIN muss 4 bis 12 Ziffern enthalten.",
+    "pinMismatch": "PIN und Bestätigung stimmen nicht überein.",
+    "pinHashFailed": "Die PIN konnte nicht sicher gespeichert werden. Bitte erneut versuchen."
+  },
   "backup": {
     "title": "Backup-Erinnerung",
     "description": "Vor dem Schließen fragen, ob neue Daten gesichert werden sollen.",

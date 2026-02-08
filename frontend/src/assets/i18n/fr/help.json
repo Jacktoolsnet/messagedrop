@@ -476,6 +476,10 @@
         "title": "Demander un stockage persistant",
         "desc": "Demande un stockage persistant du navigateur afin que les données locales soient moins souvent supprimées par le système."
       },
+      "usageProtection": {
+        "title": "Protection d'usage",
+        "desc": "Configure la limite quotidienne, les plages horaires autorisées et le mode de déverrouillage (autogéré ou PIN parental)."
+      },
       "logging": {
         "title": "Journalisation de diagnostic",
         "desc": "Active des journaux techniques pour l'analyse et le dépannage."
@@ -503,6 +507,40 @@
       "privacy": {
         "title": "Confidentialité et stockage",
         "desc": "Ces paramètres sont enregistrés localement dans le stockage de l'app (IndexedDB). Les requêtes externes ne se produisent que lorsque vous utilisez activement des fonctions associées (par exemple l'autorisation de localisation)."
+      }
+    }
+  },
+  "usageProtectionLock": {
+    "title": "Verrouillage de protection d'usage",
+    "intro": "Cet écran apparaît lorsque la limite quotidienne est atteinte ou lorsque l'application est en dehors de la plage horaire autorisée.",
+    "items": {
+      "dailyLimit": {
+        "title": "Limite quotidienne atteinte",
+        "desc": "L'application se verrouille après consommation du nombre de minutes configuré pour aujourd'hui."
+      },
+      "schedule": {
+        "title": "Verrouillage horaire",
+        "desc": "L'application peut aussi se verrouiller en dehors des plages autorisées pour la semaine et le week-end."
+      },
+      "selfExtension": {
+        "title": "Extension autonome",
+        "desc": "En mode autogéré, une extension supplémentaire peut être activée après la limite quotidienne."
+      },
+      "parentPin": {
+        "title": "Déverrouiller avec PIN parental",
+        "desc": "En mode parental, seul un PIN parental valide déverrouille l'usage après la limite quotidienne."
+      },
+      "settings": {
+        "title": "Ouvrir les paramètres de l'app",
+        "desc": "Utilisez cette action pour ajuster les paramètres de protection d'usage."
+      },
+      "help": {
+        "title": "Ouvrir l'aide",
+        "desc": "Ouvre cette vue d'aide dédiée à la protection d'usage."
+      },
+      "privacy": {
+        "title": "Confidentialité et stockage",
+        "desc": "Les paramètres et compteurs d'usage sont enregistrés localement et peuvent être synchronisés avec votre compte si la connexion backend est active."
       }
     }
   },

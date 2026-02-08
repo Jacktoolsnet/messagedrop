@@ -962,6 +962,18 @@
       "title": "¿Crear copia de seguridad antes de salir?",
       "message": "Tienes cambios sin guardar. ¿Quieres crear una copia de seguridad ahora?"
     },
+    "usageProtection": {
+      "title": "Límite de uso activo",
+      "dailyLimitReached": "Se alcanzó el límite de uso de hoy.",
+      "scheduleLocked": "La aplicación está fuera de la franja horaria permitida.",
+      "nextAllowedAt": "Próximo horario permitido: {{ time }}",
+      "selfExtensionAction": "Usar ampliación propia ahora",
+      "parentPinLabel": "PIN parental (4-12 dígitos)",
+      "unlockAction": "Desbloquear con PIN parental",
+      "invalidPin": "Introduce un PIN válido de 4 a 12 dígitos.",
+      "unlockFailed": "La verificación del PIN falló.",
+      "selfExtensionUnavailable": "La ampliación propia no está disponible actualmente."
+    },
     "location": {
       "locatingTitle": "Localizándote",
       "locatingMessage": "Por favor espera mientras tu dispositivo determina tu ubicación actual...",

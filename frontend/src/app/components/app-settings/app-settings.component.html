@@ -110,6 +110,98 @@
       }
       </div>
     }
+    <div class="platform-tile usage-protection-tile">
+      <div class="usage-protection-header">
+        <mat-icon>timer</mat-icon>
+        <div>
+          <h3>{{ 'settings.usageProtection.title' | transloco }}</h3>
+          <p class="usage-protection-subtitle">{{ 'settings.usageProtection.description' | transloco }}</p>
+        </div>
+      </div>
+      <p class="usage-protection-note">
+        {{ 'settings.usageProtection.note' | transloco }}
+      </p>
+
+      <mat-button-toggle-group [hideSingleSelectionIndicator]="true" [value]="appSettings.usageProtection.mode"
+        (change)="setUsageMode($event.value)" class="usage-mode-toggle-group" exclusive
+        [attr.aria-label]="'settings.usageProtection.modeLabel' | transloco">
+        @for (mode of usageModes; track mode) {
+        <mat-button-toggle [value]="mode">
+          {{ ('settings.usageProtection.mode.' + mode) | transloco }}
+        </mat-button-toggle>
+        }
+      </mat-button-toggle-group>
+
+      @if (appSettings.usageProtection.mode !== 'off') {
+      <mat-form-field appearance="fill">
+        <mat-label>{{ 'settings.usageProtection.dailyLimit' | transloco }}</mat-label>
+        <input matInput type="number" min="5" max="720" [ngModel]="appSettings.usageProtection.dailyLimitMinutes"
+          (ngModelChange)="setUsageDailyLimitMinutes($event)">
+      </mat-form-field>
+
+      @if (appSettings.usageProtection.mode === 'self') {
+      <mat-form-field appearance="fill">
+        <mat-label>{{ 'settings.usageProtection.selfExtension' | transloco }}</mat-label>
+        <input matInput type="number" min="0" max="120" [ngModel]="appSettings.usageProtection.selfExtensionMinutes"
+          (ngModelChange)="setUsageSelfExtensionMinutes($event)">
+      </mat-form-field>
+      }
+
+      <mat-slide-toggle color="primary" [checked]="appSettings.usageProtection.scheduleEnabled"
+        (change)="setUsageScheduleEnabled($event.checked)">
+        {{ 'settings.usageProtection.scheduleToggle' | transloco }}
+      </mat-slide-toggle>
+
+      @if (appSettings.usageProtection.scheduleEnabled) {
+      <div class="usage-time-grid">
+        <mat-form-field appearance="fill">
+          <mat-label>{{ 'settings.usageProtection.weekdayStart' | transloco }}</mat-label>
+          <input matInput type="time" [ngModel]="appSettings.usageProtection.weekdayStart"
+            (ngModelChange)="setUsageWeekdayStart($event)">
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>{{ 'settings.usageProtection.weekdayEnd' | transloco }}</mat-label>
+          <input matInput type="time" [ngModel]="appSettings.usageProtection.weekdayEnd"
+            (ngModelChange)="setUsageWeekdayEnd($event)">
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>{{ 'settings.usageProtection.weekendStart' | transloco }}</mat-label>
+          <input matInput type="time" [ngModel]="appSettings.usageProtection.weekendStart"
+            (ngModelChange)="setUsageWeekendStart($event)">
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>{{ 'settings.usageProtection.weekendEnd' | transloco }}</mat-label>
+          <input matInput type="time" [ngModel]="appSettings.usageProtection.weekendEnd"
+            (ngModelChange)="setUsageWeekendEnd($event)">
+        </mat-form-field>
+      </div>
+      }
+      }
+
+      @if (appSettings.usageProtection.mode === 'parental') {
+      <p class="usage-protection-pin-state">
+        @if (appSettings.usageProtection.parentPinHash) {
+        {{ 'settings.usageProtection.pinSet' | transloco }}
+        } @else {
+        {{ 'settings.usageProtection.pinMissing' | transloco }}
+        }
+      </p>
+      <mat-form-field appearance="fill">
+        <mat-label>{{ 'settings.usageProtection.pinLabel' | transloco }}</mat-label>
+        <input matInput type="password" inputmode="numeric" autocomplete="new-password" [ngModel]="usageParentPin"
+          (ngModelChange)="usageParentPin = $event; usageProtectionWarning = ''">
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>{{ 'settings.usageProtection.pinConfirmLabel' | transloco }}</mat-label>
+        <input matInput type="password" inputmode="numeric" autocomplete="new-password" [ngModel]="usageParentPinConfirm"
+          (ngModelChange)="usageParentPinConfirm = $event; usageProtectionWarning = ''">
+      </mat-form-field>
+      }
+
+      @if (usageProtectionWarning) {
+      <p class="usage-protection-warning">{{ usageProtectionWarning }}</p>
+      }
+    </div>
     <div class="platform-tile logging-settings-tile">
       <div class="logging-settings-header">
         <mat-icon>bug_report</mat-icon>

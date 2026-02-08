@@ -476,6 +476,10 @@
         "title": "Request persistent storage",
         "desc": "Requests persistent browser storage so local data is less likely to be cleared by the system."
       },
+      "usageProtection": {
+        "title": "Usage protection",
+        "desc": "Configures daily limits, allowed time windows, and unlock mode (self or parental PIN)."
+      },
       "logging": {
         "title": "Diagnostic logging",
         "desc": "Enables technical logs for analysis and troubleshooting."
@@ -503,6 +507,40 @@
       "privacy": {
         "title": "Privacy and storage",
         "desc": "These settings are stored locally in app storage (IndexedDB). External requests occur only when you actively use related features (for example location permission)."
+      }
+    }
+  },
+  "usageProtectionLock": {
+    "title": "Usage protection lock",
+    "intro": "This screen appears when the daily usage limit is reached or when the app is outside the configured usage window.",
+    "items": {
+      "dailyLimit": {
+        "title": "Daily limit reached",
+        "desc": "The app is locked after the configured minutes are consumed for today."
+      },
+      "schedule": {
+        "title": "Schedule lock",
+        "desc": "The app can also lock outside the allowed weekday/weekend time windows."
+      },
+      "selfExtension": {
+        "title": "Self extension",
+        "desc": "In self-managed mode, one additional extension can be activated after the daily limit is reached."
+      },
+      "parentPin": {
+        "title": "Unlock with parent PIN",
+        "desc": "In parental mode, only a valid parent PIN unlocks usage after the daily limit."
+      },
+      "settings": {
+        "title": "Open app settings",
+        "desc": "Use this action to adjust usage protection settings."
+      },
+      "help": {
+        "title": "Open help",
+        "desc": "Opens this help view for usage protection."
+      },
+      "privacy": {
+        "title": "Privacy and storage",
+        "desc": "Usage settings and counters are stored locally and can be synced with your user account if backend login is active."
       }
     }
   },

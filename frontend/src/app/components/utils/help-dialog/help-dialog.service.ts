@@ -543,6 +543,11 @@ const HELP_TOPICS = {
         descriptionKey: 'appSettings.items.storage.desc'
       },
       {
+        icon: 'timer',
+        titleKey: 'appSettings.items.usageProtection.title',
+        descriptionKey: 'appSettings.items.usageProtection.desc'
+      },
+      {
         icon: 'bug_report',
         titleKey: 'appSettings.items.logging.title',
         descriptionKey: 'appSettings.items.logging.desc'
@@ -576,6 +581,47 @@ const HELP_TOPICS = {
         icon: 'privacy_tip',
         titleKey: 'appSettings.items.privacy.title',
         descriptionKey: 'appSettings.items.privacy.desc'
+      }
+    ]
+  },
+  usageProtectionLock: {
+    titleKey: 'usageProtectionLock.title',
+    introKey: 'usageProtectionLock.intro',
+    items: [
+      {
+        icon: 'timer_off',
+        titleKey: 'usageProtectionLock.items.dailyLimit.title',
+        descriptionKey: 'usageProtectionLock.items.dailyLimit.desc'
+      },
+      {
+        icon: 'schedule',
+        titleKey: 'usageProtectionLock.items.schedule.title',
+        descriptionKey: 'usageProtectionLock.items.schedule.desc'
+      },
+      {
+        icon: 'bolt',
+        titleKey: 'usageProtectionLock.items.selfExtension.title',
+        descriptionKey: 'usageProtectionLock.items.selfExtension.desc'
+      },
+      {
+        icon: 'pin',
+        titleKey: 'usageProtectionLock.items.parentPin.title',
+        descriptionKey: 'usageProtectionLock.items.parentPin.desc'
+      },
+      {
+        icon: 'settings_applications',
+        titleKey: 'usageProtectionLock.items.settings.title',
+        descriptionKey: 'usageProtectionLock.items.settings.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'usageProtectionLock.items.help.title',
+        descriptionKey: 'usageProtectionLock.items.help.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'usageProtectionLock.items.privacy.title',
+        descriptionKey: 'usageProtectionLock.items.privacy.desc'
       }
     ]
   },

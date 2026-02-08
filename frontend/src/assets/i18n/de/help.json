@@ -476,6 +476,10 @@
         "title": "Dauerhaften Speicher anfragen",
         "desc": "Fordert persistente Browser-Speicherung an, damit lokale Daten seltener durch das System bereinigt werden."
       },
+      "usageProtection": {
+        "title": "Nutzungszeit-Schutz",
+        "desc": "Konfiguriert Tageslimit, erlaubte Zeitfenster und den Entsperrmodus (selbst oder Eltern-PIN)."
+      },
       "logging": {
         "title": "Diagnose-Logging",
         "desc": "Aktiviert technische Protokolle für Analyse und Fehlersuche."
@@ -503,6 +507,40 @@
       "privacy": {
         "title": "Datenschutz und Speicherung",
         "desc": "Diese Einstellungen werden lokal im App-Speicher (IndexedDB) gespeichert. Externe Anfragen entstehen nur, wenn du entsprechende Funktionen aktiv nutzt (z. B. Standortfreigabe)."
+      }
+    }
+  },
+  "usageProtectionLock": {
+    "title": "Nutzungszeit-Sperre",
+    "intro": "Dieser Bildschirm erscheint, wenn das tägliche Zeitlimit erreicht wurde oder wenn die App außerhalb des erlaubten Zeitfensters liegt.",
+    "items": {
+      "dailyLimit": {
+        "title": "Tageslimit erreicht",
+        "desc": "Nach Verbrauch der eingestellten Minuten für heute wird die App gesperrt."
+      },
+      "schedule": {
+        "title": "Zeitfenster-Sperre",
+        "desc": "Die App kann zusätzlich außerhalb der erlaubten Zeiten für Wochentage und Wochenende gesperrt werden."
+      },
+      "selfExtension": {
+        "title": "Selbstverlängerung",
+        "desc": "Im Selbstmodus kann nach Erreichen des Tageslimits einmalig eine Verlängerung aktiviert werden."
+      },
+      "parentPin": {
+        "title": "Mit Eltern-PIN entsperren",
+        "desc": "Im Elternmodus entsperrt nach dem Tageslimit nur eine gültige Eltern-PIN die Nutzung."
+      },
+      "settings": {
+        "title": "App-Einstellungen öffnen",
+        "desc": "Mit dieser Aktion passt du die Einstellungen zum Nutzungszeit-Schutz an."
+      },
+      "help": {
+        "title": "Hilfe öffnen",
+        "desc": "Öffnet diese Hilfeansicht zum Nutzungszeit-Schutz."
+      },
+      "privacy": {
+        "title": "Datenschutz und Speicherung",
+        "desc": "Nutzungseinstellungen und Zähler werden lokal gespeichert und bei aktivem Backend-Login mit deinem Benutzerkonto synchronisiert."
       }
     }
   },

@@ -476,6 +476,10 @@
         "title": "Solicitar almacenamiento persistente",
         "desc": "Solicita almacenamiento persistente del navegador para que los datos locales se limpien con menos frecuencia por el sistema."
       },
+      "usageProtection": {
+        "title": "Protección de uso",
+        "desc": "Configura límite diario, franjas horarias permitidas y modo de desbloqueo (autogestión o PIN parental)."
+      },
       "logging": {
         "title": "Registro de diagnóstico",
         "desc": "Activa registros técnicos para análisis y solución de errores."
@@ -503,6 +507,40 @@
       "privacy": {
         "title": "Privacidad y almacenamiento",
         "desc": "Estos ajustes se guardan localmente en el almacenamiento de la app (IndexedDB). Las solicitudes externas solo se producen cuando usas activamente funciones relacionadas (por ejemplo, permiso de ubicación)."
+      }
+    }
+  },
+  "usageProtectionLock": {
+    "title": "Bloqueo por protección de uso",
+    "intro": "Esta pantalla aparece cuando se alcanza el límite diario de uso o cuando la app está fuera de la franja horaria permitida.",
+    "items": {
+      "dailyLimit": {
+        "title": "Límite diario alcanzado",
+        "desc": "La app se bloquea cuando se consumen los minutos configurados para hoy."
+      },
+      "schedule": {
+        "title": "Bloqueo por horario",
+        "desc": "La app también puede bloquearse fuera de las franjas permitidas para días laborables y fin de semana."
+      },
+      "selfExtension": {
+        "title": "Ampliación propia",
+        "desc": "En modo de autogestión, se puede activar una ampliación adicional tras alcanzar el límite diario."
+      },
+      "parentPin": {
+        "title": "Desbloquear con PIN parental",
+        "desc": "En modo parental, solo un PIN parental válido desbloquea el uso tras el límite diario."
+      },
+      "settings": {
+        "title": "Abrir ajustes de la app",
+        "desc": "Usa esta acción para ajustar la protección de uso."
+      },
+      "help": {
+        "title": "Abrir ayuda",
+        "desc": "Abre esta vista de ayuda sobre la protección de uso."
+      },
+      "privacy": {
+        "title": "Privacidad y almacenamiento",
+        "desc": "Los ajustes y contadores de uso se guardan localmente y pueden sincronizarse con tu cuenta si el inicio de sesión con backend está activo."
       }
     }
   },

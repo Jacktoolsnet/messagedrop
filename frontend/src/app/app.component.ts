@@ -96,6 +96,7 @@ import { SharedContentService } from './services/shared-content.service';
 import { SystemNotificationService } from './services/system-notification.service';
 import { TranslationHelperService } from './services/translation-helper.service';
 import { UserService } from './services/user.service';
+import { UsageProtectionService } from './services/usage-protection.service';
 import { WeatherService } from './services/weather.service';
 import { isQuotaExceededError } from './utils/storage-error.util';
 
@@ -169,6 +170,7 @@ export class AppComponent implements OnInit {
   private readonly translation = inject(TranslationHelperService);
   private readonly helpDialog = inject(HelpDialogService);
   private readonly languageService = inject(LanguageService);
+  readonly usageProtectionService = inject(UsageProtectionService);
   private readonly locale = inject<string>(LOCALE_ID);
   readonly powService = inject(PowService);
   private exitBackupPromptPending = false;
@@ -188,10 +190,19 @@ export class AppComponent implements OnInit {
   );
   readonly unreadTotalAll = computed(() => this.unreadContactsTotal() + this.unreadSystemNotificationCount());
   readonly maintenanceActive = computed(() => this.networkService.maintenanceInfo()?.enabled ?? false);
+  readonly usageProtectionLocked = computed(() => {
+    this.appService.settingsSet();
+    return this.appService.isSettingsReady()
+      && this.appService.isConsentCompleted()
+      && this.usageProtectionService.isLocked();
+  });
   private pendingSharedContent?: SharedContent;
   private lastSharedContentTimestamp?: string;
   private sharedContentDialogOpen = false;
   private initialPublicMessagesRequested = false;
+  usageProtectionUnlockPin = '';
+  usageProtectionUnlockError = '';
+  usageProtectionUnlockBusy = false;
 
   private markerMessageListOpen = false;
   private experienceDestinationsInView: ViatorDestinationLookup[] = [];
@@ -199,6 +210,9 @@ export class AppComponent implements OnInit {
 
   constructor() {
     this.setupExitBackupPrompt();
+    this.destroyRef.onDestroy(() => {
+      this.usageProtectionService.stopTracking();
+    });
     effect(async () => {
       this.appService.settingsSet(); // <-- track changes
       this.appService.chekConsentCompleted();
@@ -264,6 +278,27 @@ export class AppComponent implements OnInit {
     });
 
     effect(() => {
+      this.appService.settingsSet();
+      if (!this.appService.isSettingsReady() || !this.appService.isConsentCompleted()) {
+        this.usageProtectionService.stopTracking();
+        return;
+      }
+      const mode = this.appService.getAppSettings().usageProtection.mode;
+      if (mode === 'off') {
+        this.usageProtectionService.stopTracking();
+        return;
+      }
+      this.usageProtectionService.startTracking();
+    });
+
+    effect(() => {
+      if (!this.usageProtectionService.isLocked()) {
+        this.usageProtectionUnlockPin = '';
+        this.usageProtectionUnlockError = '';
+      }
+    });
+
+    effect(() => {
       this.contactService.contactsSet(); // track changes for unread badge
       if (!this.appService.isConsentCompleted() || !this.userService.hasJwt()) {
         this.unreadContactCounts.set({});
@@ -305,6 +340,7 @@ export class AppComponent implements OnInit {
 
   async initApp() {
     await this.appService.loadAppSettings();
+    await this.usageProtectionService.init();
     await this.userService.preloadVapidPublicKey();
     await this.loadSearchSettings();
   }
@@ -357,6 +393,43 @@ export class AppComponent implements OnInit {
 
   public connectToBackend(): void {
     void this.userService.connectToBackend();
+  }
+
+  public applyUsageProtectionSelfExtension(): void {
+    this.usageProtectionUnlockError = '';
+    const applied = this.usageProtectionService.applySelfExtension();
+    if (!applied) {
+      this.usageProtectionUnlockError = this.translation.t('common.usageProtection.selfExtensionUnavailable');
+    }
+  }
+
+  public async unlockUsageProtection(): Promise<void> {
+    if (this.usageProtectionUnlockBusy) {
+      return;
+    }
+    const pin = this.usageProtectionUnlockPin.trim();
+    this.usageProtectionUnlockError = '';
+    if (!this.usageProtectionService.isValidPinFormat(pin)) {
+      this.usageProtectionUnlockError = this.translation.t('common.usageProtection.invalidPin');
+      return;
+    }
+
+    this.usageProtectionUnlockBusy = true;
+    const unlocked = await this.usageProtectionService.unlockWithParentPin(pin);
+    this.usageProtectionUnlockBusy = false;
+    if (!unlocked) {
+      this.usageProtectionUnlockError = this.translation.t('common.usageProtection.unlockFailed');
+      return;
+    }
+    this.usageProtectionUnlockPin = '';
+  }
+
+  public getUsageProtectionNextAllowedTime(): string {
+    return this.usageProtectionService.formatNextAllowedTime(this.languageService.effectiveLanguage());
+  }
+
+  public openUsageProtectionHelp(): void {
+    this.helpDialog.open('usageProtectionLock');
   }
 
   private refreshContactUnreadCounts(): void {

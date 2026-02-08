@@ -962,6 +962,18 @@
       "title": "Créer une sauvegarde avant de quitter ?",
       "message": "Vous avez des modifications non enregistrées. Voulez-vous créer une sauvegarde maintenant ?"
     },
+    "usageProtection": {
+      "title": "Limite d'usage active",
+      "dailyLimitReached": "La limite d'utilisation d'aujourd'hui est atteinte.",
+      "scheduleLocked": "L'application est actuellement hors de la plage horaire autorisée.",
+      "nextAllowedAt": "Prochaine heure autorisée : {{ time }}",
+      "selfExtensionAction": "Utiliser l'extension autonome maintenant",
+      "parentPinLabel": "PIN parental (4-12 chiffres)",
+      "unlockAction": "Déverrouiller avec le PIN parental",
+      "invalidPin": "Saisissez un PIN valide de 4 à 12 chiffres.",
+      "unlockFailed": "La vérification du PIN a échoué.",
+      "selfExtensionUnavailable": "L'extension autonome n'est pas disponible actuellement."
+    },
     "location": {
       "locatingTitle": "Localisation en cours",
       "locatingMessage": "Veuillez patienter pendant que votre appareil détermine votre position actuelle...",

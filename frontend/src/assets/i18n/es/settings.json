@@ -38,6 +38,31 @@
     "quotaWarning": "Almacenamiento casi lleno ({{ percent }}% usado: {{ used }} de {{ total }}).",
     "confirmDisable": "Desactivarlo puede permitir que el navegador elimine datos almacenados. ¿Quieres continuar?"
   },
+  "usageProtection": {
+    "title": "Protección de uso",
+    "description": "Define límites diarios y franjas horarias permitidas.",
+    "note": "Usa esta función para reducir el tiempo de pantalla. En modo autónomo se permite una ampliación adicional por día. En modo parental se requiere un PIN cuando se alcanza el límite.",
+    "modeLabel": "Modo de protección",
+    "mode": {
+      "off": "Desactivado",
+      "self": "Autogestión",
+      "parental": "PIN parental"
+    },
+    "dailyLimit": "Límite diario (minutos)",
+    "selfExtension": "Ampliación propia (minutos)",
+    "scheduleToggle": "Limitar a franjas horarias permitidas",
+    "weekdayStart": "Inicio entre semana",
+    "weekdayEnd": "Fin entre semana",
+    "weekendStart": "Inicio fin de semana",
+    "weekendEnd": "Fin fin de semana",
+    "pinSet": "Ya hay un PIN parental configurado.",
+    "pinMissing": "Define un PIN parental (4-12 dígitos) antes de guardar.",
+    "pinLabel": "PIN parental",
+    "pinConfirmLabel": "Confirmar PIN parental",
+    "pinFormat": "El PIN debe contener entre 4 y 12 dígitos.",
+    "pinMismatch": "El PIN y la confirmación no coinciden.",
+    "pinHashFailed": "No se pudo asegurar el PIN. Inténtalo de nuevo."
+  },
   "backup": {
     "title": "Recordatorio de copia de seguridad",
     "description": "Preguntar antes de cerrar si hay datos nuevos para respaldar.",

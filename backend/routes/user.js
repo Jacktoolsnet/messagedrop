@@ -11,6 +11,7 @@ const router = express.Router();
 const rateLimit = require('express-rate-limit');
 const security = require('../middleware/security');
 const tableUser = require('../db/tableUser');
+const tableUsageProtection = require('../db/tableUsageProtection');
 const metric = require('../middleware/metric');
 const { apiError } = require('../middleware/api-error');
 const { signServiceJwt } = require('../utils/serviceJwt');
@@ -105,6 +106,33 @@ function queryGet(db, sql, params = []) {
   });
 }
 
+function parseJsonObject(value) {
+  let parsed = value;
+  if (typeof parsed === 'string') {
+    try {
+      parsed = JSON.parse(parsed);
+    } catch {
+      return null;
+    }
+  }
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    return null;
+  }
+  return parsed;
+}
+
+function normalizeUsageProtectionPayload(payload) {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    return null;
+  }
+  const settings = parseJsonObject(payload.settings);
+  const state = parseJsonObject(payload.state);
+  if (!settings || !state) {
+    return null;
+  }
+  return { settings, state };
+}
+
 async function buildUserBackup(db, userId) {
   const [
     userRow,
@@ -115,7 +143,8 @@ async function buildUserBackup(db, userId) {
     notifications,
     likes,
     dislikes,
-    connects
+    connects,
+    usageProtectionRows
   ] = await Promise.all([
     queryGet(db, 'SELECT * FROM tableUser WHERE id = ?', [userId]),
     queryAll(db, 'SELECT * FROM tableMessage WHERE userId = ?', [userId]),
@@ -130,7 +159,8 @@ async function buildUserBackup(db, userId) {
     queryAll(db, 'SELECT * FROM tableNotification WHERE userId = ?', [userId]),
     queryAll(db, 'SELECT * FROM tableLike WHERE likeUserId = ?', [userId]),
     queryAll(db, 'SELECT * FROM tableDislike WHERE dislikeUserId = ?', [userId]),
-    queryAll(db, 'SELECT * FROM tableConnect WHERE userId = ?', [userId])
+    queryAll(db, 'SELECT * FROM tableConnect WHERE userId = ?', [userId]),
+    queryAll(db, 'SELECT * FROM tableUsageProtection WHERE userId = ?', [userId])
   ]);
 
   return {
@@ -146,7 +176,8 @@ async function buildUserBackup(db, userId) {
       tableNotification: notifications,
       tableLike: likes,
       tableDislike: dislikes,
-      tableConnect: connects
+      tableConnect: connects,
+      tableUsageProtection: usageProtectionRows
     }
   };
 }
@@ -286,6 +317,12 @@ async function restoreUserBackup(db, backup) {
     'timeOfCreation'
   ];
 
+  const usageProtectionColumns = [
+    'userId',
+    'settings',
+    'state'
+  ];
+
   const likeColumns = ['likeMessageUuid', 'likeUserId'];
   const dislikeColumns = ['dislikeMessageUuid', 'dislikeUserId'];
 
@@ -324,6 +361,7 @@ async function restoreUserBackup(db, backup) {
     await insertRows(db, 'tablePlace', placeColumns, tables.tablePlace);
     await insertRows(db, 'tableNotification', notificationColumns, tables.tableNotification);
     await insertRows(db, 'tableConnect', connectColumns, tables.tableConnect);
+    await insertRows(db, 'tableUsageProtection', usageProtectionColumns, tables.tableUsageProtection);
 
     const contactMessages = normalizeRows(tables.tableContactMessage);
     for (const row of contactMessages) {
@@ -501,6 +539,72 @@ router.post('/restore',
     } catch (err) {
       next(apiError.internal('restore_failed'));
     }
+  });
+
+router.get('/usage-protection/:userId',
+  [
+    security.authenticate
+  ],
+  function (req, res, next) {
+    const userId = req.params.userId;
+    if (!ensureSameUser(req, res, userId, next)) {
+      return;
+    }
+
+    tableUsageProtection.getByUserId(req.database.db, userId, (err, row) => {
+      if (err) {
+        return next(apiError.internal('db_error'));
+      }
+      if (!row) {
+        return res.status(200).json({ status: 200, usageProtection: null });
+      }
+
+      const settings = parseJsonObject(row.settings);
+      const state = parseJsonObject(row.state);
+      if (!settings || !state) {
+        return res.status(200).json({ status: 200, usageProtection: null });
+      }
+      return res.status(200).json({
+        status: 200,
+        usageProtection: {
+          settings,
+          state
+        }
+      });
+    });
+  });
+
+router.post('/usage-protection/:userId',
+  [
+    security.authenticate,
+    express.json({ type: 'application/json', limit: '200kb' })
+  ],
+  function (req, res, next) {
+    const userId = req.params.userId;
+    if (!ensureSameUser(req, res, userId, next)) {
+      return;
+    }
+
+    const usageProtection = normalizeUsageProtectionPayload(req.body);
+    if (!usageProtection) {
+      return next(apiError.badRequest('invalid_request'));
+    }
+
+    let settingsJson;
+    let stateJson;
+    try {
+      settingsJson = JSON.stringify(usageProtection.settings);
+      stateJson = JSON.stringify(usageProtection.state);
+    } catch {
+      return next(apiError.badRequest('invalid_request'));
+    }
+
+    tableUsageProtection.upsert(req.database.db, userId, settingsJson, stateJson, (err) => {
+      if (err) {
+        return next(apiError.internal('db_error'));
+      }
+      return res.status(200).json({ status: 200 });
+    });
   });
 
 router.post('/hashpin',

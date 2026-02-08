@@ -962,6 +962,18 @@
       "title": "Backup vor dem Beenden erstellen?",
       "message": "Du hast ungespeicherte Änderungen. Möchtest du jetzt ein Backup erstellen?"
     },
+    "usageProtection": {
+      "title": "Nutzungsbegrenzung aktiv",
+      "dailyLimitReached": "Das heutige Nutzungszeitlimit wurde erreicht.",
+      "scheduleLocked": "Die App liegt aktuell außerhalb des erlaubten Nutzungszeitfensters.",
+      "nextAllowedAt": "Nächste erlaubte Zeit: {{ time }}",
+      "selfExtensionAction": "Selbstverlängerung jetzt nutzen",
+      "parentPinLabel": "Eltern-PIN (4-12 Ziffern)",
+      "unlockAction": "Mit Eltern-PIN entsperren",
+      "invalidPin": "Bitte gib eine gültige PIN mit 4 bis 12 Ziffern ein.",
+      "unlockFailed": "PIN-Prüfung fehlgeschlagen.",
+      "selfExtensionUnavailable": "Die Selbstverlängerung ist aktuell nicht verfügbar."
+    },
     "location": {
       "locatingTitle": "Standort wird ermittelt",
       "locatingMessage": "Bitte warte, während dein Gerät deinen Standort ermittelt...",
