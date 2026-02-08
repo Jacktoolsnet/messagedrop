@@ -1,6 +1,8 @@
 :host {
   color: var(--mat-app-text-color);
   display: block;
+  --range-field-height: var(--mat-form-field-container-height, 56px);
+  --range-field-shape: 1.2rem;
 }
 
 .range-edit-content {
@@ -14,11 +16,83 @@
 .range-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 0.75rem;
+  gap: 0.65rem;
+}
+
+.range-number-field {
+  width: 100%;
+  --mat-form-field-outlined-container-shape: var(--range-field-shape);
+  --mat-form-field-filled-container-shape: var(--range-field-shape);
+}
+
+.step-button {
+  width: 2.55rem;
+  height: var(--range-field-height);
+  min-width: 2.55rem;
+  min-height: var(--range-field-height);
+  background-color: color-mix(in srgb, var(--mat-card-filled-container-color) 92%, transparent);
+  border-radius: 0;
+}
+
+.step-button mat-icon {
+  font-size: 1.1rem;
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+:host ::ng-deep .range-number-field .mat-mdc-form-field-icon-prefix,
+:host ::ng-deep .range-number-field .mat-mdc-form-field-icon-suffix {
+  align-self: stretch;
+  display: flex;
+  padding: 0;
+}
+
+:host ::ng-deep .range-number-field .mat-mdc-form-field-icon-prefix>.mdc-icon-button,
+:host ::ng-deep .range-number-field .mat-mdc-form-field-icon-suffix>.mdc-icon-button {
+  margin: 0;
+  padding: 0;
+}
+
+:host ::ng-deep .range-number-field .mat-mdc-form-field-infix {
+  min-height: 2.75rem;
+}
+
+:host ::ng-deep .range-number-field .mdc-notched-outline__leading {
+  border-start-start-radius: var(--range-field-shape);
+  border-end-start-radius: var(--range-field-shape);
+}
+
+:host ::ng-deep .range-number-field .mdc-notched-outline__trailing {
+  border-start-end-radius: var(--range-field-shape);
+  border-end-end-radius: var(--range-field-shape);
+}
+
+.step-button--prefix {
+  border-start-start-radius: var(--range-field-shape);
+  border-end-start-radius: var(--range-field-shape);
+}
+
+.step-button--suffix {
+  border-start-end-radius: var(--range-field-shape);
+  border-end-end-radius: var(--range-field-shape);
+}
+
+/* Number input spinners are tiny on touch devices; hide them and use +/- buttons instead. */
+:host ::ng-deep input[type='number']::-webkit-outer-spin-button,
+:host ::ng-deep input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+:host ::ng-deep input[type='number'] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 @media (min-width: 560px) {
   .range-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
   }
 }

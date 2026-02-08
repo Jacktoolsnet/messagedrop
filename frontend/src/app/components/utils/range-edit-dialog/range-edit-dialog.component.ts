@@ -96,6 +96,22 @@ export class RangeEditDialogComponent {
     this.form.controls.maxValue.setValue(this.alignToStep(this.form.controls.maxValue.value));
   }
 
+  decreaseMin(): void {
+    this.stepControl('minValue', -1);
+  }
+
+  increaseMin(): void {
+    this.stepControl('minValue', 1);
+  }
+
+  decreaseMax(): void {
+    this.stepControl('maxValue', -1);
+  }
+
+  increaseMax(): void {
+    this.stepControl('maxValue', 1);
+  }
+
   getMinFieldLabel(): string {
     return `${this.data.minLabel} (${this.formatBound(this.data.minBound)})`;
   }
@@ -120,6 +136,13 @@ export class RangeEditDialogComponent {
     const rounded = minBound + Math.round((clamped - minBound) / safeStep) * safeStep;
     const bounded = Math.max(minBound, Math.min(maxBound, rounded));
     return Number.isFinite(bounded) ? bounded : minBound;
+  }
+
+  private stepControl(control: 'minValue' | 'maxValue', direction: -1 | 1): void {
+    const stepSize = Number.isFinite(this.data.step) && this.data.step > 0 ? this.data.step : 1;
+    const current = this.form.controls[control].value;
+    const next = this.alignToStep(current + stepSize * direction);
+    this.form.controls[control].setValue(next);
   }
 
   private formatBound(value: number): string {
