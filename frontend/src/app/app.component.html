@@ -30,12 +30,6 @@
         }
 
         @if (usageProtectionService.requiresParentPin()) {
-        <label class="usage-protection-pin-label" for="usage-protection-pin-input">
-            {{ 'common.usageProtection.parentPinLabel' | transloco }}
-        </label>
-        <input id="usage-protection-pin-input" class="usage-protection-pin-input" type="password" inputmode="numeric"
-            autocomplete="off" [value]="usageProtectionUnlockPin"
-            (input)="usageProtectionUnlockPin = $any($event.target).value; usageProtectionUnlockError = ''">
         <button mat-raised-button color="primary" type="button" [disabled]="usageProtectionUnlockBusy"
             (click)="unlockUsageProtection()">
             {{ 'common.usageProtection.unlockAction' | transloco }}

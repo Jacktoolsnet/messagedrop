@@ -122,6 +122,19 @@
         {{ 'settings.usageProtection.note' | transloco }}
       </p>
 
+      @if (needsUsageProtectionUnlock()) {
+      <p class="usage-protection-pin-state">
+        {{ 'settings.usageProtection.unlockRequired' | transloco }}
+      </p>
+      <button mat-stroked-button type="button" (click)="unlockUsageProtectionSettings()">
+        {{ 'settings.usageProtection.unlockAction' | transloco }}
+      </button>
+      @if (hasConfiguredParentPin()) {
+      <button mat-stroked-button type="button" (click)="removeUsageParentPin()">
+        {{ 'settings.usageProtection.pinDeleteAction' | transloco }}
+      </button>
+      }
+      } @else {
       <mat-button-toggle-group [hideSingleSelectionIndicator]="true" [value]="appSettings.usageProtection.mode"
         (change)="setUsageMode($event.value)" class="usage-mode-toggle-group" exclusive
         [attr.aria-label]="'settings.usageProtection.modeLabel' | transloco">
@@ -180,22 +193,28 @@
 
       @if (appSettings.usageProtection.mode === 'parental') {
       <p class="usage-protection-pin-state">
-        @if (appSettings.usageProtection.parentPinHash) {
+        @if (usageParentPin) {
+        {{ 'settings.usageProtection.pinPending' | transloco }}
+        } @else if (appSettings.usageProtection.parentPinHash) {
         {{ 'settings.usageProtection.pinSet' | transloco }}
         } @else {
         {{ 'settings.usageProtection.pinMissing' | transloco }}
         }
       </p>
-      <mat-form-field appearance="fill">
-        <mat-label>{{ 'settings.usageProtection.pinLabel' | transloco }}</mat-label>
-        <input matInput type="password" inputmode="numeric" autocomplete="new-password" [ngModel]="usageParentPin"
-          (ngModelChange)="usageParentPin = $event; usageProtectionWarning = ''">
-      </mat-form-field>
-      <mat-form-field appearance="fill">
-        <mat-label>{{ 'settings.usageProtection.pinConfirmLabel' | transloco }}</mat-label>
-        <input matInput type="password" inputmode="numeric" autocomplete="new-password" [ngModel]="usageParentPinConfirm"
-          (ngModelChange)="usageParentPinConfirm = $event; usageProtectionWarning = ''">
-      </mat-form-field>
+      <button mat-stroked-button type="button" (click)="openUsageParentPinDialog()">
+        @if (appSettings.usageProtection.parentPinHash) {
+        {{ 'settings.usageProtection.pinChangeAction' | transloco }}
+        } @else {
+        {{ 'settings.usageProtection.pinSetAction' | transloco }}
+        }
+      </button>
+      }
+
+      @if (hasConfiguredParentPin()) {
+      <button mat-stroked-button type="button" (click)="removeUsageParentPin()">
+        {{ 'settings.usageProtection.pinDeleteAction' | transloco }}
+      </button>
+      }
       }
 
       @if (usageProtectionWarning) {

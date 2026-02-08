@@ -3,13 +3,14 @@ import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleChange, MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { provideTranslocoScope, TranslocoPipe } from '@jsverse/transloco';
+import { firstValueFrom } from 'rxjs';
 import { APP_VERSION_INFO } from '../../../environments/version';
 import { AppSettings } from '../../interfaces/app-settings';
 import { UsageProtectionMode, UsageProtectionSettings } from '../../interfaces/usage-protection-settings';
@@ -17,6 +18,9 @@ import { AppService } from '../../services/app.service';
 import { LanguageMode, LanguageService } from '../../services/language.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UsageProtectionService } from '../../services/usage-protection.service';
+import { CheckPinComponent } from '../pin/check-pin/check-pin.component';
+import { CreatePinComponent } from '../pin/create-pin/create-pin.component';
+import { DisplayMessage } from '../utils/display-message/display-message.component';
 import { EnableLocationComponent } from "../utils/enable-location/enable-location.component";
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
@@ -48,6 +52,7 @@ import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.comp
 })
 export class AppSettingsComponent implements OnInit {
   private readonly appService = inject(AppService);
+  private readonly dialog = inject(MatDialog);
   private readonly dialogRef = inject(MatDialogRef<AppSettingsComponent>);
   private readonly dialogData = inject<{ appSettings: AppSettings }>(MAT_DIALOG_DATA);
   private readonly languageService = inject(LanguageService);
@@ -75,8 +80,8 @@ export class AppSettingsComponent implements OnInit {
   private baselineSettings: AppSettings = structuredClone(this.dialogData.appSettings);
   public readonly usageModes: UsageProtectionMode[] = ['off', 'self', 'parental'];
   public usageParentPin = '';
-  public usageParentPinConfirm = '';
   public usageProtectionWarning = '';
+  public usageProtectionUnlocked = false;
   public showDetectLocationOnStart = false;
   public storagePersistenceSupported = this.appService.isStoragePersistenceSupported();
   public storagePersistenceBusy = false;
@@ -93,6 +98,7 @@ export class AppSettingsComponent implements OnInit {
       this.appSettings = { ...this.appSettings, languageMode: initialLanguage };
       this.baselineSettings = { ...this.baselineSettings, languageMode: initialLanguage };
     }
+    this.usageProtectionUnlocked = !this.hasParentPinConfigured(this.appSettings.usageProtection);
     if ('permissions' in navigator && navigator.permissions?.query) {
       navigator.permissions
         .query({ name: 'geolocation' })
@@ -144,7 +150,6 @@ export class AppSettingsComponent implements OnInit {
     this.appSettings = nextSettings;
     this.baselineSettings = structuredClone(nextSettings);
     this.usageParentPin = '';
-    this.usageParentPinConfirm = '';
     this.languageService.endLanguagePreview();
 
     if (shouldClose) {
@@ -170,7 +175,20 @@ export class AppSettingsComponent implements OnInit {
     this.appSettings = { ...this.appSettings, backupOnExit: enabled };
   }
 
-  setUsageMode(mode: UsageProtectionMode): void {
+  async setUsageMode(mode: UsageProtectionMode): Promise<void> {
+    if (this.needsUsageProtectionUnlock()) {
+      return;
+    }
+
+    const currentMode = this.appSettings.usageProtection.mode;
+    const hasParentPin = Boolean(this.appSettings.usageProtection.parentPinHash?.trim());
+    if (currentMode === 'parental' && mode !== 'parental' && hasParentPin) {
+      const verified = await this.verifyCurrentParentPin();
+      if (!verified) {
+        return;
+      }
+    }
+
     this.appSettings = {
       ...this.appSettings,
       usageProtection: {
@@ -181,7 +199,69 @@ export class AppSettingsComponent implements OnInit {
     this.usageProtectionWarning = '';
   }
 
+  async unlockUsageProtectionSettings(): Promise<void> {
+    const verified = await this.verifyCurrentParentPin();
+    if (!verified) {
+      return;
+    }
+    this.usageProtectionUnlocked = true;
+  }
+
+  async removeUsageParentPin(): Promise<void> {
+    if (!this.hasParentPinConfigured(this.appSettings.usageProtection)) {
+      return;
+    }
+    const verified = await this.verifyCurrentParentPin();
+    if (!verified) {
+      return;
+    }
+
+    const current = this.appSettings.usageProtection;
+    this.appSettings = {
+      ...this.appSettings,
+      usageProtection: {
+        ...current,
+        mode: current.mode === 'parental' ? 'self' : current.mode,
+        parentPinHash: undefined
+      }
+    };
+    this.usageParentPin = '';
+    this.usageProtectionWarning = '';
+    this.usageProtectionUnlocked = true;
+  }
+
+  async openUsageParentPinDialog(): Promise<void> {
+    if (this.needsUsageProtectionUnlock()) {
+      return;
+    }
+    this.usageProtectionWarning = '';
+    const existingParentHash = this.appSettings.usageProtection.parentPinHash?.trim();
+    if (existingParentHash) {
+      const verified = await this.verifyCurrentParentPin();
+      if (!verified) {
+        return;
+      }
+    }
+
+    const dialogRef = this.dialog.open(CreatePinComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: {},
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+    });
+    const pin = await firstValueFrom(dialogRef.afterClosed());
+    if (!pin || !this.usageProtectionService.isValidPinFormat(pin)) {
+      return;
+    }
+    this.usageParentPin = pin.trim();
+  }
+
   setUsageScheduleEnabled(enabled: boolean): void {
+    if (this.needsUsageProtectionUnlock()) {
+      return;
+    }
     this.appSettings = {
       ...this.appSettings,
       usageProtection: {
@@ -192,6 +272,9 @@ export class AppSettingsComponent implements OnInit {
   }
 
   setUsageDailyLimitMinutes(value: number): void {
+    if (this.needsUsageProtectionUnlock()) {
+      return;
+    }
     this.appSettings = {
       ...this.appSettings,
       usageProtection: {
@@ -202,6 +285,9 @@ export class AppSettingsComponent implements OnInit {
   }
 
   setUsageSelfExtensionMinutes(value: number): void {
+    if (this.needsUsageProtectionUnlock()) {
+      return;
+    }
     this.appSettings = {
       ...this.appSettings,
       usageProtection: {
@@ -212,18 +298,30 @@ export class AppSettingsComponent implements OnInit {
   }
 
   setUsageWeekdayStart(value: string): void {
+    if (this.needsUsageProtectionUnlock()) {
+      return;
+    }
     this.updateUsageTimeField('weekdayStart', value);
   }
 
   setUsageWeekdayEnd(value: string): void {
+    if (this.needsUsageProtectionUnlock()) {
+      return;
+    }
     this.updateUsageTimeField('weekdayEnd', value);
   }
 
   setUsageWeekendStart(value: string): void {
+    if (this.needsUsageProtectionUnlock()) {
+      return;
+    }
     this.updateUsageTimeField('weekendStart', value);
   }
 
   setUsageWeekendEnd(value: string): void {
+    if (this.needsUsageProtectionUnlock()) {
+      return;
+    }
     this.updateUsageTimeField('weekendEnd', value);
   }
 
@@ -308,12 +406,69 @@ export class AppSettingsComponent implements OnInit {
     const baseline = structuredClone(this.baselineSettings);
     this.appSettings = baseline;
     this.usageParentPin = '';
-    this.usageParentPinConfirm = '';
     this.usageProtectionWarning = '';
+    this.usageProtectionUnlocked = !this.hasParentPinConfigured(baseline.usageProtection);
     this.appService.setTheme(baseline);
     const languageMode = baseline.languageMode ?? 'system';
     this.languageService.setLanguageModePreview(languageMode);
     this.languageService.endLanguagePreview();
+  }
+
+  private async verifyCurrentParentPin(): Promise<boolean> {
+    if (this.usageProtectionUnlocked) {
+      return true;
+    }
+    const existingParentHash = this.appSettings.usageProtection.parentPinHash?.trim();
+    if (!existingParentHash) {
+      return true;
+    }
+
+    const checkDialogRef = this.dialog.open(CheckPinComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: {},
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+    });
+
+    const currentPin = await firstValueFrom(checkDialogRef.afterClosed());
+    if (!currentPin || !this.usageProtectionService.isValidPinFormat(currentPin)) {
+      return false;
+    }
+
+    const currentHash = await this.usageProtectionService.hashPin(currentPin.trim());
+    if (!currentHash || currentHash !== existingParentHash) {
+      await this.showUsageProtectionMessage('settings.usageProtection.pinCurrentMismatch');
+      return false;
+    }
+    this.usageProtectionUnlocked = true;
+    return true;
+  }
+
+  private async showUsageProtectionMessage(messageKey: string): Promise<void> {
+    const dialogRef = this.dialog.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: {
+        showAlways: true,
+        title: this.translation.t('settings.usageProtection.title'),
+        image: '',
+        icon: 'warning',
+        message: this.translation.t(messageKey),
+        button: this.translation.t('common.actions.ok'),
+        delay: 0,
+        showSpinner: false,
+        autoclose: false
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+    await firstValueFrom(dialogRef.afterClosed());
   }
 
   private async prepareUsageProtectionSettings(settings: UsageProtectionSettings): Promise<UsageProtectionSettings | null> {
@@ -332,24 +487,18 @@ export class AppSettingsComponent implements OnInit {
     }
 
     const pin = this.usageParentPin.trim();
-    const confirm = this.usageParentPinConfirm.trim();
 
-    if (!pin && !confirm && normalized.parentPinHash) {
+    if (!pin && normalized.parentPinHash) {
       return normalized;
     }
 
-    if (!pin && !confirm && !normalized.parentPinHash) {
+    if (!pin && !normalized.parentPinHash) {
       this.usageProtectionWarning = this.translation.t('settings.usageProtection.pinMissing');
       return null;
     }
 
     if (!this.usageProtectionService.isValidPinFormat(pin)) {
       this.usageProtectionWarning = this.translation.t('settings.usageProtection.pinFormat');
-      return null;
-    }
-
-    if (pin !== confirm) {
-      this.usageProtectionWarning = this.translation.t('settings.usageProtection.pinMismatch');
       return null;
     }
 
@@ -385,6 +534,18 @@ export class AppSettingsComponent implements OnInit {
 
   private normalizeTime(value: string, fallback: string): string {
     return /^([01]\d|2[0-3]):([0-5]\d)$/.test(value) ? value : fallback;
+  }
+
+  private hasParentPinConfigured(settings: UsageProtectionSettings): boolean {
+    return Boolean(settings.parentPinHash?.trim());
+  }
+
+  needsUsageProtectionUnlock(): boolean {
+    return this.hasParentPinConfigured(this.appSettings.usageProtection) && !this.usageProtectionUnlocked;
+  }
+
+  hasConfiguredParentPin(): boolean {
+    return this.hasParentPinConfigured(this.appSettings.usageProtection);
   }
 
 }

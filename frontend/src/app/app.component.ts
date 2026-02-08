@@ -23,6 +23,7 @@ import { EditNoteComponent } from './components/editnote/edit-note.component';
 import { GeoStatisticComponent } from './components/geo-statistic/geo-statistic.component';
 import { ImagelistComponent } from './components/imagelist/imagelist.component';
 import { OverrideExifDataComponent } from './components/imagelist/override-exif-data/override-exif-data.component';
+import { CheckPinComponent } from './components/pin/check-pin/check-pin.component';
 import { ConsentGateComponent } from './components/legal/consent-gate/consent-gate.component';
 import { DisclaimerComponent } from './components/legal/disclaimer/disclaimer.component';
 import { ExternalContentComponent } from './components/legal/external-content/external-content.component';
@@ -200,7 +201,6 @@ export class AppComponent implements OnInit {
   private lastSharedContentTimestamp?: string;
   private sharedContentDialogOpen = false;
   private initialPublicMessagesRequested = false;
-  usageProtectionUnlockPin = '';
   usageProtectionUnlockError = '';
   usageProtectionUnlockBusy = false;
 
@@ -293,7 +293,6 @@ export class AppComponent implements OnInit {
 
     effect(() => {
       if (!this.usageProtectionService.isLocked()) {
-        this.usageProtectionUnlockPin = '';
         this.usageProtectionUnlockError = '';
       }
     });
@@ -407,21 +406,33 @@ export class AppComponent implements OnInit {
     if (this.usageProtectionUnlockBusy) {
       return;
     }
-    const pin = this.usageProtectionUnlockPin.trim();
     this.usageProtectionUnlockError = '';
-    if (!this.usageProtectionService.isValidPinFormat(pin)) {
-      this.usageProtectionUnlockError = this.translation.t('common.usageProtection.invalidPin');
-      return;
-    }
 
     this.usageProtectionUnlockBusy = true;
-    const unlocked = await this.usageProtectionService.unlockWithParentPin(pin);
+    const dialogRef = this.dialog.open(CheckPinComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: {},
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+    });
+    const pin = await firstValueFrom(dialogRef.afterClosed());
+    if (!pin) {
+      this.usageProtectionUnlockBusy = false;
+      return;
+    }
+    if (!this.usageProtectionService.isValidPinFormat(pin)) {
+      this.usageProtectionUnlockError = this.translation.t('common.usageProtection.invalidPin');
+      this.usageProtectionUnlockBusy = false;
+      return;
+    }
+    const unlocked = await this.usageProtectionService.unlockWithParentPin(pin.trim());
     this.usageProtectionUnlockBusy = false;
     if (!unlocked) {
       this.usageProtectionUnlockError = this.translation.t('common.usageProtection.unlockFailed');
       return;
     }
-    this.usageProtectionUnlockPin = '';
   }
 
   public getUsageProtectionNextAllowedTime(): string {
