@@ -2076,6 +2076,40 @@
       }
     }
   },
+  "rangeEditDialog": {
+    "title": "Range editor",
+    "intro": "In this dialog you can enter precise minimum and maximum values for a range.",
+    "items": {
+      "fields": {
+        "title": "Enter minimum and maximum",
+        "desc": "Type lower and upper bounds directly with the keyboard."
+      },
+      "validation": {
+        "title": "Validation hint",
+        "desc": "If minimum is greater than maximum, an error hint appears in the subtitle and apply stays disabled."
+      },
+      "close": {
+        "title": "Cancel",
+        "desc": "Closes the dialog without applying values."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "Opens this help view."
+      },
+      "reset": {
+        "title": "Reset range",
+        "desc": "Resets the range to the full allowed limits."
+      },
+      "apply": {
+        "title": "Apply values",
+        "desc": "Applies the entered range values."
+      },
+      "privacy": {
+        "title": "Privacy and processing",
+        "desc": "Values are processed locally in the app. No external service is called."
+      }
+    }
+  },
   "myExperienceList": {
     "title": "My experiences",
     "intro": "This view shows the experiences you saved from experience search. You can open details, jump to map positions, open tiles, and continue in external maps or on Viator.",

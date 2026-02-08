@@ -2076,6 +2076,40 @@
       }
     }
   },
+  "rangeEditDialog": {
+    "title": "Modifier la plage",
+    "intro": "Dans cette boîte de dialogue, vous pouvez saisir précisément les valeurs minimale et maximale d'une plage au clavier.",
+    "items": {
+      "fields": {
+        "title": "Saisir minimum et maximum",
+        "desc": "Saisissez directement la borne inférieure et la borne supérieure au clavier."
+      },
+      "validation": {
+        "title": "Indice de validation",
+        "desc": "Si le minimum est supérieur au maximum, un message d'erreur apparaît dans le sous-titre et valider reste désactivé."
+      },
+      "close": {
+        "title": "Annuler",
+        "desc": "Ferme la boîte de dialogue sans appliquer les valeurs."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Ouvre cette vue d'aide."
+      },
+      "reset": {
+        "title": "Réinitialiser la plage",
+        "desc": "Réinitialise la plage aux limites complètes autorisées."
+      },
+      "apply": {
+        "title": "Valider les valeurs",
+        "desc": "Applique les valeurs de plage saisies."
+      },
+      "privacy": {
+        "title": "Confidentialité et traitement",
+        "desc": "Les valeurs sont traitées localement dans l'application. Aucun service externe n'est appelé."
+      }
+    }
+  },
   "myExperienceList": {
     "title": "Mes expériences",
     "intro": "Cette vue affiche les expériences que vous avez enregistrées depuis la recherche d'expériences. Vous pouvez ouvrir les détails, recentrer la carte, ouvrir les tuiles et continuer dans des cartes externes ou sur Viator.",

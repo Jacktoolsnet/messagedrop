@@ -2076,6 +2076,40 @@
       }
     }
   },
+  "rangeEditDialog": {
+    "title": "Bereich bearbeiten",
+    "intro": "In diesem Dialog kannst du Mindest- und Höchstwert für einen Bereich präzise per Tastatur eingeben.",
+    "items": {
+      "fields": {
+        "title": "Mindest- und Höchstwert eingeben",
+        "desc": "Trage Unter- und Obergrenze direkt per Tastatur ein."
+      },
+      "validation": {
+        "title": "Validierungshinweis",
+        "desc": "Ist der Mindestwert größer als der Höchstwert, erscheint ein Fehlerhinweis im Untertitel und Übernehmen bleibt deaktiviert."
+      },
+      "close": {
+        "title": "Abbrechen",
+        "desc": "Schließt den Dialog ohne Werte zu übernehmen."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Öffnet diese Hilfeansicht."
+      },
+      "reset": {
+        "title": "Bereich zurücksetzen",
+        "desc": "Setzt den Bereich auf die vollständigen erlaubten Grenzwerte zurück."
+      },
+      "apply": {
+        "title": "Werte übernehmen",
+        "desc": "Übernimmt die eingegebenen Bereichswerte."
+      },
+      "privacy": {
+        "title": "Datenschutz und Verarbeitung",
+        "desc": "Die Werte werden nur lokal in der App verarbeitet. Es werden keine externen Dienste aufgerufen."
+      }
+    }
+  },
   "myExperienceList": {
     "title": "Meine Erlebnisse",
     "intro": "Hier siehst du die Erlebnisse, die du in der Erlebnissuche gespeichert hast. Du kannst Details öffnen, auf der Karte anspringen, Kacheln öffnen und externe Karten oder Viator verwenden.",

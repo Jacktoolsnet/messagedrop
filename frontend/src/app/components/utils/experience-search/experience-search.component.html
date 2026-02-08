@@ -4,7 +4,7 @@
       [placeholder]="destinationName
         ? ('common.experiences.searchPlaceholderWithDestination' | transloco: { destination: destinationName })
         : ('common.experiences.searchPlaceholder' | transloco)" />
-    <button type="button" class="filter-button" [matMenuTriggerFor]="filterMenu"
+    <button #filterMenuTrigger="matMenuTrigger" type="button" class="filter-button" [matMenuTriggerFor]="filterMenu"
       [attr.aria-label]="'common.actions.more' | transloco">
       <mat-icon>tune</mat-icon>
     </button>
@@ -62,6 +62,11 @@
               <mat-icon>payments</mat-icon>
               <span>{{ 'common.experiences.minPrice' | transloco }} / {{ 'common.experiences.maxPrice' | transloco
                 }}</span>
+              <button mat-icon-button type="button" class="filter-tile-edit-button"
+                (click)="openPriceRangeEditor(filterMenuTrigger, $event)"
+                [attr.aria-label]="'common.actions.edit' | transloco">
+                <mat-icon>edit</mat-icon>
+              </button>
             </div>
             <div class="tile-body">
               <div class="slider-block">
@@ -83,6 +88,11 @@
               <mat-icon>schedule</mat-icon>
               <span>{{ 'common.experiences.minDuration' | transloco }} / {{ 'common.experiences.maxDuration' | transloco
                 }}</span>
+              <button mat-icon-button type="button" class="filter-tile-edit-button"
+                (click)="openDurationRangeEditor(filterMenuTrigger, $event)"
+                [attr.aria-label]="'common.actions.edit' | transloco">
+                <mat-icon>edit</mat-icon>
+              </button>
             </div>
             <div class="tile-body">
               <div class="slider-block">

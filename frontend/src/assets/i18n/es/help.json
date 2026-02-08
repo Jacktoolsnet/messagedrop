@@ -2076,6 +2076,40 @@
       }
     }
   },
+  "rangeEditDialog": {
+    "title": "Editar rango",
+    "intro": "En este diálogo puedes introducir con precisión los valores mínimo y máximo de un rango usando el teclado.",
+    "items": {
+      "fields": {
+        "title": "Introducir mínimo y máximo",
+        "desc": "Escribe directamente el límite inferior y superior con el teclado."
+      },
+      "validation": {
+        "title": "Aviso de validación",
+        "desc": "Si el mínimo es mayor que el máximo, aparece un aviso de error en el subtítulo y aplicar queda desactivado."
+      },
+      "close": {
+        "title": "Cancelar",
+        "desc": "Cierra el diálogo sin aplicar los valores."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Abre esta vista de ayuda."
+      },
+      "reset": {
+        "title": "Restablecer rango",
+        "desc": "Restablece el rango a los límites permitidos completos."
+      },
+      "apply": {
+        "title": "Aplicar valores",
+        "desc": "Aplica los valores de rango introducidos."
+      },
+      "privacy": {
+        "title": "Privacidad y procesamiento",
+        "desc": "Los valores se procesan localmente en la app. No se llama a servicios externos."
+      }
+    }
+  },
   "myExperienceList": {
     "title": "Mis experiencias",
     "intro": "Aquí ves las experiencias que guardaste desde la búsqueda de experiencias. Puedes abrir detalles, saltar al mapa, abrir mosaicos y continuar en mapas externos o en Viator.",

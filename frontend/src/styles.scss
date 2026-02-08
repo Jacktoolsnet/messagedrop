@@ -258,6 +258,27 @@ h2[mat-dialog-title].dialog-title {
   max-width: 100%;
 }
 
+.range-edit-dialog .mat-mdc-dialog-container {
+  --mdc-dialog-container-max-width: 95vw;
+  --mdc-dialog-container-min-width: min(420px, 95vw);
+}
+
+.range-edit-dialog .mat-mdc-dialog-surface {
+  width: min(420px, 95vw);
+  max-width: 95vw;
+}
+
+.range-edit-dialog--mobile .mat-mdc-dialog-container {
+  --mdc-dialog-container-max-width: 100vw;
+  --mdc-dialog-container-min-width: 100vw;
+}
+
+.range-edit-dialog--mobile .mat-mdc-dialog-surface {
+  width: 100vw;
+  max-width: 100vw;
+  border-radius: 1rem 1rem 0 0;
+}
+
 @font-face {
   font-family: 'DancingScript';
   src: url('/assets/fonts/DancingScript.ttf') format('truetype');

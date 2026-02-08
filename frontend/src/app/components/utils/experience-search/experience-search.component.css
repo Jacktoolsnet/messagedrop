@@ -151,6 +151,21 @@
   text-align: left;
 }
 
+.filter-tile-edit-button {
+  margin-left: auto;
+  width: 2rem;
+  height: 2rem;
+  min-width: 2rem;
+  min-height: 2rem;
+  color: inherit;
+}
+
+.filter-tile-edit-button mat-icon {
+  font-size: 1.05rem;
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
 .tile-body {
   display: flex;
   flex-direction: column;

@@ -2669,6 +2669,47 @@ const HELP_TOPICS = {
       }
     ]
   },
+  rangeEditDialog: {
+    titleKey: 'rangeEditDialog.title',
+    introKey: 'rangeEditDialog.intro',
+    items: [
+      {
+        icon: 'edit',
+        titleKey: 'rangeEditDialog.items.fields.title',
+        descriptionKey: 'rangeEditDialog.items.fields.desc'
+      },
+      {
+        icon: 'warning',
+        titleKey: 'rangeEditDialog.items.validation.title',
+        descriptionKey: 'rangeEditDialog.items.validation.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'rangeEditDialog.items.close.title',
+        descriptionKey: 'rangeEditDialog.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'rangeEditDialog.items.help.title',
+        descriptionKey: 'rangeEditDialog.items.help.desc'
+      },
+      {
+        icon: 'restart_alt',
+        titleKey: 'rangeEditDialog.items.reset.title',
+        descriptionKey: 'rangeEditDialog.items.reset.desc'
+      },
+      {
+        icon: 'check',
+        titleKey: 'rangeEditDialog.items.apply.title',
+        descriptionKey: 'rangeEditDialog.items.apply.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'rangeEditDialog.items.privacy.title',
+        descriptionKey: 'rangeEditDialog.items.privacy.desc'
+      }
+    ]
+  },
   myExperienceList: {
     titleKey: 'myExperienceList.title',
     introKey: 'myExperienceList.intro',

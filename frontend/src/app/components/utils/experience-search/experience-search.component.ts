@@ -9,7 +9,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialog
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatMenuModule } from '@angular/material/menu';
+import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
@@ -44,6 +44,11 @@ import { ExperienceBookmarkService } from '../../../services/experience-bookmark
 import { UserService } from '../../../services/user.service';
 import { DisplayMessage } from '../display-message/display-message.component';
 import { HelpDialogService } from '../help-dialog/help-dialog.service';
+import {
+  RangeEditDialogComponent,
+  RangeEditDialogData,
+  RangeEditDialogResult
+} from '../range-edit-dialog/range-edit-dialog.component';
 import { SearchSettingsMapPreviewComponent } from '../search-settings/search-settings-map-preview.component';
 import { ExperienceSearchDetailDialogComponent } from './detail-dialog/experience-search-detail-dialog.component';
 import { ExperienceSearchPinDialogComponent } from './pin-dialog/experience-search-pin-dialog.component';
@@ -306,6 +311,16 @@ export class ExperienceSearchComponent {
     this.viewMode.update((mode) => (mode === 'map' ? 'list' : 'map'));
   }
 
+  openPriceRangeEditor(menuTrigger: MatMenuTrigger, event?: Event): void {
+    event?.stopPropagation();
+    this.openRangeEditor('price', menuTrigger);
+  }
+
+  openDurationRangeEditor(menuTrigger: MatMenuTrigger, event?: Event): void {
+    event?.stopPropagation();
+    this.openRangeEditor('duration', menuTrigger);
+  }
+
   onOpen(result: ExperienceResult): void {
     if (result.productUrl) {
       window.open(result.productUrl, '_blank');
@@ -391,6 +406,113 @@ export class ExperienceSearchComponent {
 
   getExperienceHeaderBackgroundOpacity(result: ExperienceResult): string {
     return result.imageUrl ? '0.9' : '0';
+  }
+
+  private openRangeEditor(type: 'price' | 'duration', menuTrigger?: MatMenuTrigger): void {
+    menuTrigger?.closeMenu();
+    const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches;
+
+    const dialogData: RangeEditDialogData = type === 'price'
+      ? {
+          title: `${this.i18n.t('common.experiences.minPrice')} / ${this.i18n.t('common.experiences.maxPrice')}`,
+          minLabel: this.i18n.t('common.experiences.minPrice'),
+          maxLabel: this.i18n.t('common.experiences.maxPrice'),
+          unit: this.getPriceRangeUnitLabel(this.form.controls.currency.value || DEFAULT_CURRENCY),
+          minBound: this.priceRange.min,
+          maxBound: this.priceRange.max,
+          step: this.priceRange.step,
+          minValue: this.form.controls.minPrice.value,
+          maxValue: this.form.controls.maxPrice.value,
+          helpTopic: 'rangeEditDialog'
+        }
+      : {
+          title: `${this.i18n.t('common.experiences.minDuration')} / ${this.i18n.t('common.experiences.maxDuration')}`,
+          minLabel: this.i18n.t('common.experiences.minDuration'),
+          maxLabel: this.i18n.t('common.experiences.maxDuration'),
+          unit: 'h',
+          minBound: this.durationRange.min,
+          maxBound: this.durationRange.max,
+          step: this.durationRange.step,
+          minValue: this.form.controls.minDurationHours.value,
+          maxValue: this.form.controls.maxDurationHours.value,
+          helpTopic: 'rangeEditDialog'
+        };
+
+    const dialogRef = this.dialog.open(RangeEditDialogComponent, {
+      data: dialogData,
+      panelClass: [
+        'range-edit-dialog',
+        ...(isMobile ? ['range-edit-dialog--mobile'] : [])
+      ],
+      closeOnNavigation: true,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false,
+      maxWidth: isMobile ? '100vw' : '95vw',
+      width: isMobile ? '100vw' : 'min(420px, 95vw)',
+      position: isMobile ? { bottom: '0' } : undefined
+    });
+
+    dialogRef.afterClosed().subscribe((result?: RangeEditDialogResult) => {
+      if (!result) {
+        return;
+      }
+      if (type === 'price') {
+        const normalized = this.normalizeRangeValues(
+          result.minValue,
+          result.maxValue,
+          this.priceRange.min,
+          this.priceRange.max,
+          this.priceRange.step
+        );
+        this.form.controls.minPrice.setValue(normalized.minValue);
+        this.form.controls.maxPrice.setValue(normalized.maxValue);
+        return;
+      }
+
+      const normalized = this.normalizeRangeValues(
+        result.minValue,
+        result.maxValue,
+        this.durationRange.min,
+        this.durationRange.max,
+        this.durationRange.step
+      );
+      this.form.controls.minDurationHours.setValue(normalized.minValue);
+      this.form.controls.maxDurationHours.setValue(normalized.maxValue);
+    });
+  }
+
+  private normalizeRangeValues(
+    minValue: number,
+    maxValue: number,
+    minBound: number,
+    maxBound: number,
+    step: number
+  ): RangeEditDialogResult {
+    const min = this.alignToStep(minValue, minBound, maxBound, step);
+    const max = this.alignToStep(maxValue, minBound, maxBound, step);
+    return {
+      minValue: Math.min(min, max),
+      maxValue: Math.max(min, max)
+    };
+  }
+
+  private alignToStep(value: number, minBound: number, maxBound: number, step: number): number {
+    const numeric = Number.isFinite(value) ? value : minBound;
+    const clamped = Math.max(minBound, Math.min(maxBound, numeric));
+    const safeStep = Number.isFinite(step) && step > 0 ? step : 1;
+    const rounded = minBound + Math.round((clamped - minBound) / safeStep) * safeStep;
+    const bounded = Math.max(minBound, Math.min(maxBound, rounded));
+    return Number.isFinite(bounded) ? bounded : minBound;
+  }
+
+  private getPriceRangeUnitLabel(currencyCode: string): string {
+    const normalized = normalizeCurrency(currencyCode || DEFAULT_CURRENCY);
+    if (normalized === 'EUR') {
+      return 'Euro';
+    }
+    return normalized;
   }
 
   private executeSearch(

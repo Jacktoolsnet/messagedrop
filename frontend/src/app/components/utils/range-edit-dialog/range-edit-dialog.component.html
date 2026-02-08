@@ -1,0 +1,63 @@
+<app-dialog-header
+  icon="edit"
+  [title]="data.title"
+  [subtitle]="getHeaderSubtitle()">
+</app-dialog-header>
+
+<mat-dialog-content class="range-edit-content">
+  <div class="range-grid">
+    <mat-form-field appearance="outline">
+      <mat-label>{{ getMinFieldLabel() }}</mat-label>
+      <input
+        matInput
+        type="number"
+        inputmode="decimal"
+        [step]="data.step"
+        [min]="data.minBound"
+        [max]="data.maxBound"
+        [formControl]="form.controls.minValue"
+        (blur)="onMinBlur()"
+      />
+      @if (data.unit) {
+        <span matTextSuffix>{{ data.unit }}</span>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>{{ getMaxFieldLabel() }}</mat-label>
+      <input
+        matInput
+        type="number"
+        inputmode="decimal"
+        [step]="data.step"
+        [min]="data.minBound"
+        [max]="data.maxBound"
+        [formControl]="form.controls.maxValue"
+        (blur)="onMaxBlur()"
+      />
+      @if (data.unit) {
+        <span matTextSuffix>{{ data.unit }}</span>
+      }
+    </mat-form-field>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions range-edit-actions" align="end">
+  <button mat-icon-button class="action-close" type="button" (click)="close()"
+    [attr.aria-label]="'common.actions.close' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+  <button mat-icon-button type="button" (click)="openHelp()"
+    [attr.aria-label]="'common.actions.help' | transloco">
+    <mat-icon>help</mat-icon>
+  </button>
+  <button mat-icon-button type="button" (click)="reset()"
+    [attr.aria-label]="'common.experiences.reset' | transloco">
+    <mat-icon>restart_alt</mat-icon>
+  </button>
+  <button mat-icon-button color="primary" type="button" (click)="apply()"
+    [disabled]="isRangeOrderInvalid()"
+    [attr.aria-label]="'common.actions.apply' | transloco">
+    <mat-icon>check</mat-icon>
+  </button>
+</mat-dialog-actions>
