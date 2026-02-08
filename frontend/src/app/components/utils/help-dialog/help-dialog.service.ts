@@ -2658,6 +2658,11 @@ const HELP_TOPICS = {
         descriptionKey: 'myExperienceList.items.openProvider.desc'
       },
       {
+        icon: 'swap_vert',
+        titleKey: 'myExperienceList.items.sort.title',
+        descriptionKey: 'myExperienceList.items.sort.desc'
+      },
+      {
         icon: 'close',
         titleKey: 'myExperienceList.items.close.title',
         descriptionKey: 'myExperienceList.items.close.desc'
@@ -2671,6 +2676,37 @@ const HELP_TOPICS = {
         icon: 'privacy_tip',
         titleKey: 'myExperienceList.items.privacy.title',
         descriptionKey: 'myExperienceList.items.privacy.desc'
+      }
+    ]
+  },
+  myExperienceSort: {
+    titleKey: 'myExperienceSort.title',
+    introKey: 'myExperienceSort.intro',
+    items: [
+      {
+        icon: 'drag_indicator',
+        titleKey: 'myExperienceSort.items.reorder.title',
+        descriptionKey: 'myExperienceSort.items.reorder.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'myExperienceSort.items.close.title',
+        descriptionKey: 'myExperienceSort.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'myExperienceSort.items.help.title',
+        descriptionKey: 'myExperienceSort.items.help.desc'
+      },
+      {
+        icon: 'check',
+        titleKey: 'myExperienceSort.items.apply.title',
+        descriptionKey: 'myExperienceSort.items.apply.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'myExperienceSort.items.privacy.title',
+        descriptionKey: 'myExperienceSort.items.privacy.desc'
       }
     ]
   },

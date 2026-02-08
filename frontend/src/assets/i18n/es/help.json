@@ -2066,6 +2066,10 @@
         "title": "Abrir en Viator",
         "desc": "Con esta función abres la página de la experiencia seleccionada en Viator."
       },
+      "sort": {
+        "title": "Ordenar experiencias",
+        "desc": "Con esta función abres el diálogo de ordenación y cambias el orden de tus experiencias guardadas."
+      },
       "close": {
         "title": "Cerrar",
         "desc": "Con esta función cierras el diálogo."
@@ -2077,6 +2081,32 @@
       "privacy": {
         "title": "Privacidad y procesamiento",
         "desc": "Las experiencias guardadas están vinculadas a tu cuenta y se cargan mediante el backend. Al abrir Google Maps se envían coordenadas de destino a Google. Al abrir Viator se envía una solicitud a Viator y allí pueden procesarse datos de uso."
+      }
+    }
+  },
+  "myExperienceSort": {
+    "title": "Ordenar mis experiencias",
+    "intro": "En este diálogo cambias el orden de tus experiencias guardadas.",
+    "items": {
+      "reorder": {
+        "title": "Reordenar experiencias",
+        "desc": "Con esta función cambias el orden mediante arrastrar y soltar."
+      },
+      "close": {
+        "title": "Cerrar",
+        "desc": "Con esta función cierras el diálogo de ordenación sin aplicar cambios."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "apply": {
+        "title": "Aplicar",
+        "desc": "Con esta función guardas y aplicas el nuevo orden."
+      },
+      "privacy": {
+        "title": "Privacidad y procesamiento",
+        "desc": "El orden de tus experiencias guardadas se almacena localmente en el almacenamiento de la app. Solo se procesan los datos necesarios para ordenación y visualización."
       }
     }
   },

@@ -2066,6 +2066,10 @@
         "title": "Ouvrir sur Viator",
         "desc": "Cette fonction ouvre la page de l'expérience sélectionnée sur Viator."
       },
+      "sort": {
+        "title": "Trier les expériences",
+        "desc": "Cette fonction ouvre la boîte de dialogue de tri et modifie l'ordre de vos expériences enregistrées."
+      },
       "close": {
         "title": "Fermer",
         "desc": "Cette fonction ferme la boîte de dialogue."
@@ -2077,6 +2081,32 @@
       "privacy": {
         "title": "Confidentialité et traitement",
         "desc": "Les expériences enregistrées sont liées à votre compte et chargées via le backend. L'ouverture de Google Maps transmet les coordonnées de destination à Google. L'ouverture de Viator envoie une requête à Viator, où des données d'usage peuvent être traitées."
+      }
+    }
+  },
+  "myExperienceSort": {
+    "title": "Trier mes expériences",
+    "intro": "Cette boîte de dialogue permet de modifier l'ordre de vos expériences enregistrées.",
+    "items": {
+      "reorder": {
+        "title": "Réorganiser les expériences",
+        "desc": "Cette fonction modifie l'ordre par glisser-déposer."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Cette fonction ferme la boîte de dialogue de tri sans appliquer les modifications."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "apply": {
+        "title": "Valider",
+        "desc": "Cette fonction enregistre et applique le nouvel ordre."
+      },
+      "privacy": {
+        "title": "Confidentialité et traitement",
+        "desc": "L'ordre de vos expériences enregistrées est stocké localement dans le stockage de l'application. Seules les données nécessaires au tri et à l'affichage sont traitées."
       }
     }
   },

@@ -2066,6 +2066,10 @@
         "title": "Auf Viator öffnen",
         "desc": "Mit dieser Funktion öffnest du die Angebotsseite des ausgewählten Erlebnisses bei Viator."
       },
+      "sort": {
+        "title": "Erlebnisse sortieren",
+        "desc": "Mit dieser Funktion öffnest du den Sortierdialog und änderst die Reihenfolge deiner gespeicherten Erlebnisse."
+      },
       "close": {
         "title": "Schließen",
         "desc": "Mit dieser Funktion schließt du den Dialog."
@@ -2077,6 +2081,32 @@
       "privacy": {
         "title": "Datenschutz und Verarbeitung",
         "desc": "Gespeicherte Erlebnisse sind deinem Konto zugeordnet und werden über das Backend geladen. Beim Öffnen in Google Maps werden Zielkoordinaten an Google übertragen. Beim Öffnen auf Viator wird eine Anfrage an Viator gesendet und dort können Nutzungsdaten verarbeitet werden."
+      }
+    }
+  },
+  "myExperienceSort": {
+    "title": "Meine Erlebnisse sortieren",
+    "intro": "In diesem Dialog änderst du die Reihenfolge deiner gespeicherten Erlebnisse.",
+    "items": {
+      "reorder": {
+        "title": "Erlebnisse neu anordnen",
+        "desc": "Mit dieser Funktion änderst du die Reihenfolge per Drag-and-Drop."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Mit dieser Funktion schließt du den Sortierdialog ohne Übernahme der Änderungen."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "apply": {
+        "title": "Übernehmen",
+        "desc": "Mit dieser Funktion speicherst und übernimmst du die neue Reihenfolge."
+      },
+      "privacy": {
+        "title": "Datenschutz und Verarbeitung",
+        "desc": "Die Reihenfolge deiner gespeicherten Erlebnisse wird lokal in deinem App-Speicher abgelegt. Es werden nur Daten verarbeitet, die für Sortierung und Anzeige erforderlich sind."
       }
     }
   },

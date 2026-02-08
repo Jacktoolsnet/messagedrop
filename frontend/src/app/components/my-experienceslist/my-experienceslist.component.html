@@ -102,4 +102,12 @@
     [attr.aria-label]="'common.actions.help' | transloco">
     <mat-icon>help</mat-icon>
   </button>
+  @if (userService.hasJwt()) {
+  @if (visibleBookmarks().length > 1) {
+  <button mat-icon-button color="primary" (click)="openSortDialog()"
+    [attr.aria-label]="'common.experiences.sortAria' | transloco">
+    <mat-icon>swap_vert</mat-icon>
+  </button>
+  }
+  }
 </mat-dialog-actions>

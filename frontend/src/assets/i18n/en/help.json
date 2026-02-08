@@ -2066,6 +2066,10 @@
         "title": "Open on Viator",
         "desc": "This action opens the selected experience page on Viator."
       },
+      "sort": {
+        "title": "Sort experiences",
+        "desc": "This action opens the sorting dialog and changes the order of your saved experiences."
+      },
       "close": {
         "title": "Close",
         "desc": "This action closes the dialog."
@@ -2077,6 +2081,32 @@
       "privacy": {
         "title": "Privacy and processing",
         "desc": "Saved experiences are linked to your account and loaded through the backend. Opening Google Maps sends destination coordinates to Google. Opening Viator sends a request to Viator and may process usage data there."
+      }
+    }
+  },
+  "myExperienceSort": {
+    "title": "Sort my experiences",
+    "intro": "This dialog changes the order of your saved experiences.",
+    "items": {
+      "reorder": {
+        "title": "Reorder experiences",
+        "desc": "This action changes the order using drag and drop."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "This action closes the sorting dialog without applying changes."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "apply": {
+        "title": "Apply",
+        "desc": "This action saves and applies the new order."
+      },
+      "privacy": {
+        "title": "Privacy and processing",
+        "desc": "The order of your saved experiences is stored locally in app storage. Only data required for sorting and display is processed."
       }
     }
   },

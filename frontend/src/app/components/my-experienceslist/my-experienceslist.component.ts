@@ -20,6 +20,7 @@ import { TileListDialogComponent } from '../tile/tile-list-dialog/tile-list-dial
 import { DisplayMessageConfig } from '../../interfaces/display-message-config';
 import { DisplayMessage } from '../utils/display-message/display-message.component';
 import { UserService } from '../../services/user.service';
+import { MyExperienceSortDialogComponent } from './my-experience-sort-dialog/my-experience-sort-dialog.component';
 
 @Component({
   selector: 'app-my-experienceslist',
@@ -45,7 +46,7 @@ export class MyExperienceslistComponent implements OnInit {
   private readonly mapService = inject(MapService);
   private readonly geolocationService = inject(GeolocationService);
   private readonly transloco = inject(TranslocoService);
-  private readonly userService = inject(UserService);
+  readonly userService = inject(UserService);
   private readonly dialog = inject(MatDialog);
   private readonly dialogRef = inject(MatDialogRef<MyExperienceslistComponent>);
   private readonly dialogData = inject<{ experiences?: ExperienceResult[] } | null>(MAT_DIALOG_DATA, { optional: true });
@@ -118,6 +119,31 @@ export class MyExperienceslistComponent implements OnInit {
     if (result.productUrl) {
       window.open(result.productUrl, '_blank');
     }
+  }
+
+  openSortDialog(): void {
+    if (!this.userService.hasJwt()) {
+      return;
+    }
+
+    const dialogRef = this.dialog.open(MyExperienceSortDialogComponent, {
+      data: { bookmarks: this.visibleBookmarks() },
+      minWidth: 'min(520px, 95vw)',
+      maxWidth: '95vw',
+      width: 'min(680px, 95vw)',
+      maxHeight: '90vh',
+      height: 'auto',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((result?: { orderedProductCodes?: string[] }) => {
+      if (result?.orderedProductCodes?.length) {
+        void this.bookmarkService.updateBookmarkOrder(result.orderedProductCodes);
+      }
+    });
   }
 
   async showOnMap(result: ExperienceResult): Promise<void> {
