@@ -87,11 +87,24 @@
   );
 }
 
-:host ::ng-deep .range-number-field .mat-mdc-form-field-icon-prefix,
-:host ::ng-deep .range-number-field .mat-mdc-form-field-icon-suffix {
+:host ::ng-deep .range-number-field .mat-mdc-form-field-icon-prefix {
   align-self: stretch;
   display: flex;
   padding: 0;
+}
+
+:host ::ng-deep .range-number-field .mat-mdc-form-field-icon-suffix {
+  align-self: stretch;
+  display: flex;
+  padding-inline-start: 0.4rem;
+  padding-inline-end: 0;
+}
+
+:host ::ng-deep .range-number-field .mat-mdc-form-field-text-suffix {
+  margin-inline-start: 0.45rem;
+  margin-inline-end: 0.45rem;
+  white-space: nowrap;
+  color: var(--mat-form-field-outlined-label-text-color, var(--mat-card-subtitle-text-color));
 }
 
 :host ::ng-deep .range-number-field .mat-mdc-form-field-icon-prefix>.mdc-icon-button,
@@ -115,11 +128,13 @@
 }
 
 .step-button--prefix {
+  border-inline-end-color: transparent;
   border-start-start-radius: var(--range-field-shape);
   border-end-start-radius: var(--range-field-shape);
 }
 
 .step-button--suffix {
+  border-inline-start-color: transparent;
   border-start-end-radius: var(--range-field-shape);
   border-end-end-radius: var(--range-field-shape);
 }
