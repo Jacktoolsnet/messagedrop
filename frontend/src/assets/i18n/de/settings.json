@@ -70,7 +70,7 @@
     "weekendEnd": "Ende am Wochenende",
     "pinSet": "Eine Eltern-PIN ist bereits gesetzt.",
     "pinPending": "Neue Eltern-PIN erfasst. Mit \"Anwenden\" speichern.",
-    "pinMissing": "Bitte setze vor dem Speichern eine Eltern-PIN (4-12 Ziffern).",
+    "pinMissing": "Bitte setze vor dem Speichern eine Eltern-PIN.",
     "pinSetAction": "Eltern-PIN festlegen",
     "pinChangeAction": "Eltern-PIN ändern",
     "pinDeleteAction": "Eltern-PIN löschen",

@@ -70,7 +70,7 @@
     "weekendEnd": "Fin week-end",
     "pinSet": "Un PIN parental est déjà configuré.",
     "pinPending": "Nouveau PIN parental saisi. Enregistrez avec Valider.",
-    "pinMissing": "Définissez un PIN parental (4-12 chiffres) avant d'enregistrer.",
+    "pinMissing": "Définissez un PIN parental avant d'enregistrer.",
     "pinSetAction": "Définir le PIN parental",
     "pinChangeAction": "Modifier le PIN parental",
     "pinDeleteAction": "Supprimer le PIN parental",

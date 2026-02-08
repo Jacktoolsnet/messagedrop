@@ -70,7 +70,7 @@
     "weekendEnd": "Fin fin de semana",
     "pinSet": "Ya hay un PIN parental configurado.",
     "pinPending": "Nuevo PIN parental capturado. Guarda con Aplicar.",
-    "pinMissing": "Define un PIN parental (4-12 dígitos) antes de guardar.",
+    "pinMissing": "Define un PIN parental antes de guardar.",
     "pinSetAction": "Definir PIN parental",
     "pinChangeAction": "Cambiar PIN parental",
     "pinDeleteAction": "Eliminar PIN parental",

@@ -968,7 +968,7 @@
       "scheduleLocked": "This app is currently outside the allowed usage window.",
       "nextAllowedAt": "Next allowed time: {{ time }}",
       "selfExtensionAction": "Use self extension now",
-      "parentPinLabel": "Parent PIN (4-12 digits)",
+      "parentPinLabel": "Parent PIN",
       "unlockAction": "Unlock with parent PIN",
       "invalidPin": "Enter a valid PIN with 4 to 12 digits.",
       "unlockFailed": "PIN verification failed.",

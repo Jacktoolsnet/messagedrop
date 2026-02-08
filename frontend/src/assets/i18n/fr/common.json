@@ -968,7 +968,7 @@
       "scheduleLocked": "L'application est actuellement hors de la plage horaire autorisée.",
       "nextAllowedAt": "Prochaine heure autorisée : {{ time }}",
       "selfExtensionAction": "Utiliser l'extension autonome maintenant",
-      "parentPinLabel": "PIN parental (4-12 chiffres)",
+      "parentPinLabel": "PIN parental",
       "unlockAction": "Déverrouiller avec le PIN parental",
       "invalidPin": "Saisissez un PIN valide de 4 à 12 chiffres.",
       "unlockFailed": "La vérification du PIN a échoué.",
