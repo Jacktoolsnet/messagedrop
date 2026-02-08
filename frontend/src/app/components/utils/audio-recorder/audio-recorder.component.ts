@@ -258,7 +258,7 @@ export class AudioRecorderComponent {
   }
 
   openHelp(): void {
-    this.help.open('contactChatroom');
+    this.help.open('myContactChatroom');
   }
 
   private finalizeRecording(): void {

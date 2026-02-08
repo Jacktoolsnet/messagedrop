@@ -218,8 +218,96 @@
   "contactChatroom": {
     "title": "Chat du contact"
   },
+  "myContactChatroom": {
+    "title": "Salon de chat du contact",
+    "intro": "Dans ce salon de chat, vous échangez des messages privés avec un contact sous forme de texte, médias, note vocale, expérience ou message de lieu.",
+    "items": {
+      "profile": {
+        "title": "Ouvrir profils et paramètres",
+        "desc": "Cette fonction ouvre votre profil ou les paramètres du contact via les zones avatar et titre."
+      },
+      "compose": {
+        "title": "Rédiger un message",
+        "desc": "Cette fonction démarre un nouveau message de chat."
+      },
+      "experience": {
+        "title": "Ajouter une expérience",
+        "desc": "Cette fonction ajoute à votre message une carte d'expérience depuis la recherche d'expériences."
+      },
+      "location": {
+        "title": "Envoyer un message de lieu",
+        "desc": "L'icône de lieu envoie un message de lieu distinct. Ce message inclut des boutons pour l'afficher sur la carte de l'application ou l'ouvrir dans Google Maps."
+      },
+      "audio": {
+        "title": "Enregistrer un message vocal",
+        "desc": "Cette fonction enregistre et envoie un message audio."
+      },
+      "reaction": {
+        "title": "Définir une réaction",
+        "desc": "Cette fonction ouvre les réactions emoji pour les messages reçus."
+      },
+      "translate": {
+        "title": "Traduire un message",
+        "desc": "Cette fonction traduit le texte entrant et permet de revenir à l'original."
+      },
+      "map": {
+        "title": "Ouvrir les actions de carte",
+        "desc": "Cette fonction centre des lieux partagés sur la carte de l'application ou ouvre des cartes externes."
+      },
+      "edit": {
+        "title": "Modifier le message",
+        "desc": "Le crayon ouvre la boîte de dialogue de modification. Les changements sont envoyés comme un nouveau message modifié ; le message d'origine est conservé."
+      },
+      "delete": {
+        "title": "Supprimer le message",
+        "desc": "Les messages peuvent être supprimés via la corbeille. Vos propres messages envoyés sont supprimés dans les deux chats. Les messages reçus sont supprimés uniquement dans votre chat ; chez l'expéditeur, le message est conservé et marqué comme supprimé."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Cette fonction ferme le salon de chat."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "privacy": {
+        "title": "Confidentialité et traitement",
+        "desc": "Les messages de contact sont transmis en chiffrement de bout en bout et stockés sous forme de payload chiffré. Le serveur ne conserve le contenu que temporairement et supprime le payload après un stockage local réussi sur l'appareil du destinataire. Le contenu local est stocké dans le stockage local protégé de l'application (IndexedDB)."
+      }
+    }
+  },
   "contactConnect": {
     "title": "Connecter un contact"
+  },
+  "myContactConnectId": {
+    "title": "Se connecter avec un ID de connexion",
+    "intro": "Cette boîte de dialogue permet de connecter un contact en saisissant son ID de connexion.",
+    "items": {
+      "id": {
+        "title": "Saisir l'ID de connexion",
+        "desc": "Cette fonction permet de saisir ou modifier l'ID de connexion du contact."
+      },
+      "paste": {
+        "title": "Coller depuis le presse-papiers",
+        "desc": "Cette fonction insère un ID de connexion directement depuis votre presse-papiers."
+      },
+      "close": {
+        "title": "Annuler",
+        "desc": "Cette fonction ferme la boîte de dialogue sans connecter."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "apply": {
+        "title": "Connecter",
+        "desc": "Cette fonction confirme l'ID saisi et lance la connexion du contact."
+      },
+      "privacy": {
+        "title": "Confidentialité et traitement",
+        "desc": "L'ID de connexion est transmis au backend pour créer le lien de contact. Seules les données nécessaires à l'établissement de la relation sont traitées."
+      }
+    }
   },
   "contactEditMessage": {
     "title": "Modifier le message du chat"
@@ -227,11 +315,145 @@
   "contactSettings": {
     "title": "Paramètres du contact"
   },
+  "myContactSettings": {
+    "title": "Mes paramètres de contact",
+    "intro": "Cette boîte de dialogue permet d'éditer un profil de contact. Vous pouvez modifier le nom, l'avatar, l'arrière-plan du chat et la transparence, puis enregistrer.",
+    "items": {
+      "name": {
+        "title": "Modifier le nom du contact",
+        "desc": "Cette fonction modifie le nom affiché du contact sélectionné."
+      },
+      "avatar": {
+        "title": "Définir ou modifier l'avatar",
+        "desc": "Cette fonction définit une nouvelle image d'avatar ou remplace l'avatar actuel."
+      },
+      "avatarRemove": {
+        "title": "Supprimer l'avatar",
+        "desc": "Cette fonction supprime l'avatar actuel du contact."
+      },
+      "background": {
+        "title": "Définir ou modifier l'arrière-plan du chat",
+        "desc": "Cette fonction définit ou remplace l'image d'arrière-plan utilisée dans le chat du contact."
+      },
+      "backgroundRemove": {
+        "title": "Supprimer l'arrière-plan du chat",
+        "desc": "Cette fonction supprime l'image d'arrière-plan actuelle du chat."
+      },
+      "transparency": {
+        "title": "Ajuster la transparence du fond",
+        "desc": "Cette fonction modifie le pourcentage de transparence de l'arrière-plan du chat."
+      },
+      "syncProfile": {
+        "title": "Demander une mise à jour du profil",
+        "desc": "Cette fonction demande les données de profil actuelles au contact lorsque cette option est disponible."
+      },
+      "close": {
+        "title": "Annuler",
+        "desc": "Cette fonction ferme la boîte de dialogue sans appliquer les modifications."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "apply": {
+        "title": "Valider",
+        "desc": "Cette fonction enregistre et applique vos paramètres de contact."
+      },
+      "privacy": {
+        "title": "Confidentialité et traitement",
+        "desc": "Les paramètres de profil de contact sont liés à votre compte. Les images et métadonnées sont traitées pour les fonctions d'avatar et d'arrière-plan. L'ouverture des liens d'attribution peut envoyer des requêtes à des fournisseurs externes tels qu'Unsplash."
+      }
+    }
+  },
   "contactList": {
     "title": "Contacts"
   },
+  "myContactList": {
+    "title": "Mes contacts",
+    "intro": "Cette vue permet de gérer vos contacts. Vous pouvez ouvrir les paramètres d'un contact, démarrer des chats, gérer les tuiles et utiliser les actions de connexion comme partager un ID ou connecter par QR.",
+    "items": {
+      "open": {
+        "title": "Ouvrir les paramètres du contact",
+        "desc": "Cette fonction ouvre les paramètres du contact sélectionné."
+      },
+      "delete": {
+        "title": "Supprimer le contact",
+        "desc": "Cette fonction supprime définitivement le contact sélectionné."
+      },
+      "chat": {
+        "title": "Ouvrir le chat",
+        "desc": "Cette fonction ouvre le chat privé avec le contact sélectionné."
+      },
+      "tiles": {
+        "title": "Ouvrir les tuiles",
+        "desc": "Cette fonction ouvre la liste des tuiles du contact sélectionné."
+      },
+      "more": {
+        "title": "Ouvrir plus d'actions",
+        "desc": "Cette fonction ouvre le sous-menu avec des actions supplémentaires pour le contact sélectionné."
+      },
+      "subscribe": {
+        "title": "S'abonner au contact",
+        "desc": "Cette fonction active les notifications pour le contact sélectionné."
+      },
+      "unsubscribe": {
+        "title": "Se désabonner du contact",
+        "desc": "Cette fonction désactive les notifications pour le contact sélectionné."
+      },
+      "sort": {
+        "title": "Trier les contacts",
+        "desc": "Cette fonction ouvre la boîte de dialogue de tri et modifie l'ordre de vos contacts."
+      },
+      "add": {
+        "title": "Ajouter ou connecter un contact",
+        "desc": "Cette fonction ouvre le menu de connexion (partager un ID, connecter avec un ID, partager un QR ou scanner un QR)."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Cette fonction ferme la liste des contacts."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "privacy": {
+        "title": "Confidentialité et traitement",
+        "desc": "Les relations de contact sont liées à votre compte. L'ouverture des liens d'attribution peut envoyer des requêtes à des fournisseurs externes (par exemple Unsplash). Les actions de connexion échangent des IDs de contact ou des données QR nécessaires pour créer la liaison."
+      }
+    }
+  },
   "contactSort": {
     "title": "Trier les contacts"
+  },
+  "myContactSort": {
+    "title": "Trier mes contacts",
+    "intro": "Cette boîte de dialogue permet de modifier l'ordre de vos contacts.",
+    "items": {
+      "reorder": {
+        "title": "Réorganiser les contacts",
+        "desc": "Cette fonction modifie l'ordre des contacts par glisser-déposer."
+      },
+      "settings": {
+        "title": "Ouvrir les paramètres du contact",
+        "desc": "Cette fonction ouvre les paramètres du contact sélectionné directement depuis la liste de tri."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Cette fonction ferme la boîte de dialogue de tri sans appliquer les modifications."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "apply": {
+        "title": "Valider",
+        "desc": "Cette fonction enregistre et applique le nouvel ordre des contacts."
+      },
+      "privacy": {
+        "title": "Confidentialité et traitement",
+        "desc": "L'ordre des contacts est enregistré avec vos données de contact. Seules les données nécessaires au tri et à l'affichage sont traitées."
+      }
+    }
   },
   "documentList": {
     "title": "Documents"
@@ -547,8 +769,84 @@
   "placeSettings": {
     "title": "Paramètres du lieu"
   },
+  "myPlaceSettings": {
+    "title": "Mes paramètres du lieu",
+    "intro": "Cette boîte de dialogue permet d'éditer un lieu. Vous pouvez modifier le nom du lieu, l'avatar, l'arrière-plan des tuiles et la transparence, puis enregistrer.",
+    "items": {
+      "name": {
+        "title": "Modifier le nom du lieu",
+        "desc": "Cette fonction modifie le nom affiché du lieu sélectionné."
+      },
+      "avatar": {
+        "title": "Définir ou modifier l'avatar",
+        "desc": "Cette fonction définit une nouvelle image d'avatar du lieu ou remplace l'avatar actuel."
+      },
+      "avatarRemove": {
+        "title": "Supprimer l'avatar",
+        "desc": "Cette fonction supprime l'avatar actuel du lieu."
+      },
+      "background": {
+        "title": "Définir ou modifier l'arrière-plan des tuiles",
+        "desc": "Cette fonction définit ou remplace l'image d'arrière-plan utilisée pour les tuiles du lieu."
+      },
+      "backgroundRemove": {
+        "title": "Supprimer l'arrière-plan des tuiles",
+        "desc": "Cette fonction supprime l'image d'arrière-plan actuelle des tuiles du lieu."
+      },
+      "transparency": {
+        "title": "Ajuster la transparence du fond",
+        "desc": "Cette fonction modifie le pourcentage de transparence de l'arrière-plan des tuiles."
+      },
+      "close": {
+        "title": "Annuler",
+        "desc": "Cette fonction ferme la boîte de dialogue sans appliquer les modifications."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "apply": {
+        "title": "Valider",
+        "desc": "Cette fonction enregistre et applique vos paramètres du lieu."
+      },
+      "privacy": {
+        "title": "Confidentialité et traitement",
+        "desc": "Les paramètres du lieu sont liés à votre compte. Les noms de lieux sont stockés chiffrés, tandis que les données de position et de style sont traitées pour les fonctions de carte et de tuiles. L'ouverture des liens d'attribution peut envoyer des requêtes à des fournisseurs externes tels qu'Unsplash."
+      }
+    }
+  },
   "placeSort": {
     "title": "Trier les lieux"
+  },
+  "myPlaceSort": {
+    "title": "Trier mes lieux",
+    "intro": "Cette boîte de dialogue permet de modifier l'ordre de vos lieux.",
+    "items": {
+      "reorder": {
+        "title": "Réorganiser les lieux",
+        "desc": "Cette fonction modifie l'ordre des lieux par glisser-déposer."
+      },
+      "settings": {
+        "title": "Ouvrir les paramètres du lieu",
+        "desc": "Cette fonction ouvre les paramètres du lieu sélectionné directement depuis la liste de tri."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Cette fonction ferme la boîte de dialogue de tri sans appliquer les modifications."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "apply": {
+        "title": "Valider",
+        "desc": "Cette fonction enregistre et applique le nouvel ordre des lieux."
+      },
+      "privacy": {
+        "title": "Confidentialité et traitement",
+        "desc": "L'ordre des lieux est enregistré avec vos données de lieu. Seules les données nécessaires au tri et à l'affichage sont traitées."
+      }
+    }
   },
   "sharedContent": {
     "title": "Contenu partagé"
@@ -1057,8 +1355,60 @@
   "qrCode": {
     "title": "Code QR"
   },
+  "myContactShareQr": {
+    "title": "Partager le code QR",
+    "intro": "Cette boîte de dialogue affiche votre ID de connexion sous forme de code QR afin qu'une autre personne puisse le scanner.",
+    "items": {
+      "show": {
+        "title": "Afficher le code QR",
+        "desc": "Cette fonction affiche l'ID de connexion actuel sous forme de code QR."
+      },
+      "scanByOther": {
+        "title": "Faire scanner par une autre personne",
+        "desc": "Cette fonction permet à une autre personne de scanner votre code QR et de lancer une connexion avec vous."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Cette fonction ferme la boîte de dialogue du code QR."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "privacy": {
+        "title": "Confidentialité et traitement",
+        "desc": "Le code QR contient votre ID de connexion. Partagez-le uniquement avec des personnes avec lesquelles vous souhaitez vous connecter."
+      }
+    }
+  },
   "scanner": {
     "title": "Scanner"
+  },
+  "myContactScanQr": {
+    "title": "Scanner un code QR",
+    "intro": "Cette boîte de dialogue scanne un code QR pour se connecter à un autre contact.",
+    "items": {
+      "camera": {
+        "title": "Autoriser l'accès à la caméra",
+        "desc": "Cette fonction nécessite l'autorisation de la caméra pour reconnaître les codes QR."
+      },
+      "scan": {
+        "title": "Scanner et connecter",
+        "desc": "Cette fonction lit un code QR et utilise l'ID de connexion scanné pour lancer la connexion du contact."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Cette fonction ferme le scanner sans connecter."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "privacy": {
+        "title": "Confidentialité et traitement",
+        "desc": "Le contenu QR scanné est utilisé pour établir le lien de contact. Les données caméra sont traitées localement pour le scan."
+      }
+    }
   },
   "searchSettings": {
     "title": "Paramètres de recherche"

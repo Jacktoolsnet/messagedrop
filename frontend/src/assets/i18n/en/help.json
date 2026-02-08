@@ -218,8 +218,96 @@
   "contactChatroom": {
     "title": "Contact chat"
   },
+  "myContactChatroom": {
+    "title": "Contact chatroom",
+    "intro": "This chatroom lets you exchange private messages with one contact as text, media, voice note, experience, or location message.",
+    "items": {
+      "profile": {
+        "title": "Open profiles and settings",
+        "desc": "This action opens your profile or the contact settings by tapping the avatar/title areas."
+      },
+      "compose": {
+        "title": "Compose message",
+        "desc": "This action starts a new chat message."
+      },
+      "experience": {
+        "title": "Add experience",
+        "desc": "This action adds an experience card from experience search to your message."
+      },
+      "location": {
+        "title": "Send location message",
+        "desc": "The location icon sends a dedicated location message. That message includes buttons to show it on the app map or open it in Google Maps."
+      },
+      "audio": {
+        "title": "Record voice message",
+        "desc": "This action records and sends an audio message."
+      },
+      "reaction": {
+        "title": "Set reaction",
+        "desc": "This action opens emoji reactions for received messages."
+      },
+      "translate": {
+        "title": "Translate message",
+        "desc": "This action translates incoming text and can switch back to the original."
+      },
+      "map": {
+        "title": "Open map actions",
+        "desc": "This action jumps to shared locations on the app map or opens external maps."
+      },
+      "edit": {
+        "title": "Edit message",
+        "desc": "The pencil opens the edit dialog. Changes are sent as a new edited message; the original message remains."
+      },
+      "delete": {
+        "title": "Delete message",
+        "desc": "Messages can be deleted via the trash icon. Your own sent messages are removed in both chats. Received messages are removed only in your chat; for the sender, the message remains and is marked as deleted."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "This action closes the chatroom."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "privacy": {
+        "title": "Privacy and processing",
+        "desc": "Contact messages are transmitted end-to-end encrypted and stored as encrypted payloads. The server keeps message content only temporarily and removes the payload after successful local storage on the recipient device. Local content is stored in protected local app storage (IndexedDB)."
+      }
+    }
+  },
   "contactConnect": {
     "title": "Connect contact"
+  },
+  "myContactConnectId": {
+    "title": "Connect with connect ID",
+    "intro": "This dialog connects a contact by entering their connect ID.",
+    "items": {
+      "id": {
+        "title": "Enter connect ID",
+        "desc": "This action enters or edits the connect ID of the contact."
+      },
+      "paste": {
+        "title": "Paste from clipboard",
+        "desc": "This action inserts a connect ID directly from your clipboard."
+      },
+      "close": {
+        "title": "Cancel",
+        "desc": "This action closes the dialog without connecting."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "apply": {
+        "title": "Connect",
+        "desc": "This action confirms the entered ID and starts the contact connection."
+      },
+      "privacy": {
+        "title": "Privacy and processing",
+        "desc": "The connect ID is transmitted to the backend to create a contact link. Only data required to establish the contact relationship is processed."
+      }
+    }
   },
   "contactEditMessage": {
     "title": "Edit chat message"
@@ -227,11 +315,145 @@
   "contactSettings": {
     "title": "Contact settings"
   },
+  "myContactSettings": {
+    "title": "My contact settings",
+    "intro": "This dialog edits one contact profile. You can change name, avatar, chat background, and transparency, then save the settings.",
+    "items": {
+      "name": {
+        "title": "Edit contact name",
+        "desc": "This action changes the display name of the selected contact."
+      },
+      "avatar": {
+        "title": "Set or edit avatar",
+        "desc": "This action sets a new avatar image or replaces the current avatar."
+      },
+      "avatarRemove": {
+        "title": "Remove avatar",
+        "desc": "This action removes the current contact avatar."
+      },
+      "background": {
+        "title": "Set or edit chat background",
+        "desc": "This action sets or replaces the background image used in the contact chat."
+      },
+      "backgroundRemove": {
+        "title": "Remove chat background",
+        "desc": "This action removes the current chat background image."
+      },
+      "transparency": {
+        "title": "Adjust background transparency",
+        "desc": "This action changes the chat background transparency percentage."
+      },
+      "syncProfile": {
+        "title": "Request profile update",
+        "desc": "This action requests the current profile data from the contact when this option is available."
+      },
+      "close": {
+        "title": "Cancel",
+        "desc": "This action closes the dialog without applying changes."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "apply": {
+        "title": "Apply",
+        "desc": "This action saves and applies your contact settings."
+      },
+      "privacy": {
+        "title": "Privacy and processing",
+        "desc": "Contact profile settings are linked to your account. Images and metadata are processed for avatar and background features. Opening attribution links can send requests to external providers such as Unsplash."
+      }
+    }
+  },
   "contactList": {
     "title": "Contacts"
   },
+  "myContactList": {
+    "title": "My contacts",
+    "intro": "This view manages your contacts. You can open contact settings, start chats, manage tiles, and use connection actions such as share ID or QR connect.",
+    "items": {
+      "open": {
+        "title": "Open contact settings",
+        "desc": "This action opens settings for the selected contact."
+      },
+      "delete": {
+        "title": "Delete contact",
+        "desc": "This action permanently removes the selected contact."
+      },
+      "chat": {
+        "title": "Open chat",
+        "desc": "This action opens the private chat with the selected contact."
+      },
+      "tiles": {
+        "title": "Open tiles",
+        "desc": "This action opens the tile list for the selected contact."
+      },
+      "more": {
+        "title": "Open more actions",
+        "desc": "This action opens the submenu with additional actions for the selected contact."
+      },
+      "subscribe": {
+        "title": "Subscribe contact",
+        "desc": "This action enables notifications for the selected contact."
+      },
+      "unsubscribe": {
+        "title": "Unsubscribe contact",
+        "desc": "This action disables notifications for the selected contact."
+      },
+      "sort": {
+        "title": "Sort contacts",
+        "desc": "This action opens the sorting dialog and changes your contact order."
+      },
+      "add": {
+        "title": "Add or connect contact",
+        "desc": "This action opens the connection menu (share ID, connect with ID, share QR, or scan QR)."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "This action closes the contacts list."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "privacy": {
+        "title": "Privacy and processing",
+        "desc": "Contact relations are linked to your account. Opening attribution links can send requests to external providers (for example Unsplash). Connection actions exchange contact IDs or QR data needed to create the contact link."
+      }
+    }
+  },
   "contactSort": {
     "title": "Sort contacts"
+  },
+  "myContactSort": {
+    "title": "Sort my contacts",
+    "intro": "This dialog changes the order of your contacts.",
+    "items": {
+      "reorder": {
+        "title": "Reorder contacts",
+        "desc": "This action changes the contact order using drag and drop."
+      },
+      "settings": {
+        "title": "Open contact settings",
+        "desc": "This action opens settings for the selected contact directly from the sort list."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "This action closes the sorting dialog without applying changes."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "apply": {
+        "title": "Apply",
+        "desc": "This action saves and applies the new contact order."
+      },
+      "privacy": {
+        "title": "Privacy and processing",
+        "desc": "The contact order is stored with your contact data. Only data required for sorting and display is processed."
+      }
+    }
   },
   "documentList": {
     "title": "Documents"
@@ -547,8 +769,84 @@
   "placeSettings": {
     "title": "Place settings"
   },
+  "myPlaceSettings": {
+    "title": "My place settings",
+    "intro": "This dialog edits one place. You can change the place name, avatar, tile background, and transparency, then save your changes.",
+    "items": {
+      "name": {
+        "title": "Edit place name",
+        "desc": "This action changes the display name of the selected place."
+      },
+      "avatar": {
+        "title": "Set or edit avatar",
+        "desc": "This action sets a new place avatar image or replaces the current avatar."
+      },
+      "avatarRemove": {
+        "title": "Remove avatar",
+        "desc": "This action removes the current place avatar."
+      },
+      "background": {
+        "title": "Set or edit tile background",
+        "desc": "This action sets or replaces the background image used for place tiles."
+      },
+      "backgroundRemove": {
+        "title": "Remove tile background",
+        "desc": "This action removes the current place tile background image."
+      },
+      "transparency": {
+        "title": "Adjust background transparency",
+        "desc": "This action changes the tile background transparency percentage."
+      },
+      "close": {
+        "title": "Cancel",
+        "desc": "This action closes the dialog without applying changes."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "apply": {
+        "title": "Apply",
+        "desc": "This action saves and applies your place settings."
+      },
+      "privacy": {
+        "title": "Privacy and processing",
+        "desc": "Place settings are linked to your account. Place names are stored encrypted, while location and style data are processed for map and tile features. Opening attribution links can send requests to external providers such as Unsplash."
+      }
+    }
+  },
   "placeSort": {
     "title": "Sort places"
+  },
+  "myPlaceSort": {
+    "title": "Sort my places",
+    "intro": "This dialog changes the order of your places.",
+    "items": {
+      "reorder": {
+        "title": "Reorder places",
+        "desc": "This action changes the place order using drag and drop."
+      },
+      "settings": {
+        "title": "Open place settings",
+        "desc": "This action opens settings for the selected place directly from the sort list."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "This action closes the sorting dialog without applying changes."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "apply": {
+        "title": "Apply",
+        "desc": "This action saves and applies the new place order."
+      },
+      "privacy": {
+        "title": "Privacy and processing",
+        "desc": "The place order is stored with your place data. Only data required for sorting and display is processed."
+      }
+    }
   },
   "sharedContent": {
     "title": "Shared content"
@@ -1057,8 +1355,60 @@
   "qrCode": {
     "title": "QR code"
   },
+  "myContactShareQr": {
+    "title": "Share QR code",
+    "intro": "This dialog shows your connect ID as a QR code so another person can scan it.",
+    "items": {
+      "show": {
+        "title": "Show QR code",
+        "desc": "This action displays the current connect ID as a QR code."
+      },
+      "scanByOther": {
+        "title": "Let another person scan",
+        "desc": "This action allows another person to scan your QR code and connect with you."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "This action closes the QR code dialog."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "privacy": {
+        "title": "Privacy and processing",
+        "desc": "The QR code contains your connect ID. Share it only with people you want to connect with."
+      }
+    }
+  },
   "scanner": {
     "title": "Scanner"
+  },
+  "myContactScanQr": {
+    "title": "Scan QR code",
+    "intro": "This dialog scans a QR code to connect with another contact.",
+    "items": {
+      "camera": {
+        "title": "Allow camera access",
+        "desc": "This action requires camera permission so QR codes can be recognized."
+      },
+      "scan": {
+        "title": "Scan and connect",
+        "desc": "This action reads a QR code and uses the scanned connect ID to start the contact connection."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "This action closes the scanner without connecting."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "privacy": {
+        "title": "Privacy and processing",
+        "desc": "The scanned QR content is used to establish a contact link. Camera data is processed locally for scanning."
+      }
+    }
   },
   "searchSettings": {
     "title": "Search settings"

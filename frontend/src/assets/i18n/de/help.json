@@ -218,8 +218,96 @@
   "contactChatroom": {
     "title": "Kontakt-Chat"
   },
+  "myContactChatroom": {
+    "title": "Kontakt-Chatroom",
+    "intro": "In diesem Chatroom tauschst du private Nachrichten mit einem Kontakt aus: als Text, Medien, Sprachnachricht, Erlebnis oder Ortsnachricht.",
+    "items": {
+      "profile": {
+        "title": "Profile und Einstellungen öffnen",
+        "desc": "Mit dieser Funktion öffnest du dein Profil oder die Kontakt-Einstellungen über Avatar- und Titelbereiche."
+      },
+      "compose": {
+        "title": "Nachricht verfassen",
+        "desc": "Mit dieser Funktion startest du eine neue Chatnachricht."
+      },
+      "experience": {
+        "title": "Erlebnis hinzufügen",
+        "desc": "Mit dieser Funktion fügst du deiner Nachricht eine Erlebnis-Karte aus der Erlebnissuche hinzu."
+      },
+      "location": {
+        "title": "Ortsnachricht senden",
+        "desc": "Mit dem Orti-Symbol sendest du eine eigene Ortsnachricht. Diese Nachricht bietet Buttons für App-Karte und Google Maps."
+      },
+      "audio": {
+        "title": "Sprachnachricht aufnehmen",
+        "desc": "Mit dieser Funktion nimmst du eine Audionachricht auf und sendest sie."
+      },
+      "reaction": {
+        "title": "Reaktion setzen",
+        "desc": "Mit dieser Funktion öffnest du Emoji-Reaktionen für empfangene Nachrichten."
+      },
+      "translate": {
+        "title": "Nachricht übersetzen",
+        "desc": "Mit dieser Funktion übersetzt du eingehende Texte und kannst auf den Originaltext zurückschalten."
+      },
+      "map": {
+        "title": "Kartenaktionen öffnen",
+        "desc": "Mit dieser Funktion springst du zu geteilten Orten auf der App-Karte oder öffnest externe Karten."
+      },
+      "edit": {
+        "title": "Nachricht bearbeiten",
+        "desc": "Der Bleistift öffnet den Bearbeiten-Dialog. Änderungen werden als neue, bearbeitete Nachricht gesendet; die Originalnachricht bleibt bestehen."
+      },
+      "delete": {
+        "title": "Nachricht löschen",
+        "desc": "Über den Papierkorb können Nachrichten gelöscht werden. Eigene gesendete Nachrichten werden in beiden Chats entfernt. Empfangene Nachrichten werden nur in deinem Chat entfernt; beim Sender bleibt die Nachricht erhalten und wird als gelöscht markiert."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Mit dieser Funktion schließt du den Chatroom."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "privacy": {
+        "title": "Datenschutz und Verarbeitung",
+        "desc": "Kontaktnachrichten werden Ende-zu-Ende verschlüsselt übertragen und als verschlüsselte Payload gespeichert. Der Server hält Nachrichteninhalte nur temporär und entfernt den Payload nach erfolgreicher lokaler Speicherung auf dem Empfängergerät. Lokal werden Inhalte im geschützten lokalen App-Speicher (IndexedDB) abgelegt."
+      }
+    }
+  },
   "contactConnect": {
     "title": "Kontakt verbinden"
+  },
+  "myContactConnectId": {
+    "title": "Mit Connect-ID verbinden",
+    "intro": "In diesem Dialog verbindest du einen Kontakt über dessen Connect-ID.",
+    "items": {
+      "id": {
+        "title": "Connect-ID eingeben",
+        "desc": "Mit dieser Funktion gibst du die Connect-ID des Kontakts ein oder bearbeitest sie."
+      },
+      "paste": {
+        "title": "Aus Zwischenablage einfügen",
+        "desc": "Mit dieser Funktion fügst du eine Connect-ID direkt aus der Zwischenablage ein."
+      },
+      "close": {
+        "title": "Abbrechen",
+        "desc": "Mit dieser Funktion schließt du den Dialog ohne Verbindung."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "apply": {
+        "title": "Verbinden",
+        "desc": "Mit dieser Funktion bestätigst du die eingegebene ID und startest die Kontaktverbindung."
+      },
+      "privacy": {
+        "title": "Datenschutz und Verarbeitung",
+        "desc": "Die Connect-ID wird an das Backend übertragen, um eine Kontaktverknüpfung zu erstellen. Es werden nur Daten verarbeitet, die für den Verbindungsaufbau erforderlich sind."
+      }
+    }
   },
   "contactEditMessage": {
     "title": "Chatnachricht bearbeiten"
@@ -227,11 +315,145 @@
   "contactSettings": {
     "title": "Kontakt-Einstellungen"
   },
+  "myContactSettings": {
+    "title": "Meine Kontakt-Einstellungen",
+    "intro": "In diesem Dialog bearbeitest du ein Kontaktprofil. Du kannst Namen, Avatar, Chat-Hintergrund und Transparenz anpassen und anschließend speichern.",
+    "items": {
+      "name": {
+        "title": "Kontaktname bearbeiten",
+        "desc": "Mit dieser Funktion änderst du den Anzeigenamen des ausgewählten Kontakts."
+      },
+      "avatar": {
+        "title": "Avatar setzen oder bearbeiten",
+        "desc": "Mit dieser Funktion setzt du ein neues Avatarbild oder ersetzt das aktuelle Avatarbild."
+      },
+      "avatarRemove": {
+        "title": "Avatar entfernen",
+        "desc": "Mit dieser Funktion entfernst du den aktuellen Kontakt-Avatar."
+      },
+      "background": {
+        "title": "Chat-Hintergrund setzen oder bearbeiten",
+        "desc": "Mit dieser Funktion setzt oder ersetzt du das Hintergrundbild für den Kontakt-Chat."
+      },
+      "backgroundRemove": {
+        "title": "Chat-Hintergrund entfernen",
+        "desc": "Mit dieser Funktion entfernst du das aktuelle Chat-Hintergrundbild."
+      },
+      "transparency": {
+        "title": "Hintergrund-Transparenz anpassen",
+        "desc": "Mit dieser Funktion änderst du den Transparenzwert des Chat-Hintergrunds in Prozent."
+      },
+      "syncProfile": {
+        "title": "Profil-Aktualisierung anfordern",
+        "desc": "Mit dieser Funktion forderst du aktuelle Profildaten vom Kontakt an, wenn diese Option verfügbar ist."
+      },
+      "close": {
+        "title": "Abbrechen",
+        "desc": "Mit dieser Funktion schließt du den Dialog ohne Übernahme der Änderungen."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "apply": {
+        "title": "Übernehmen",
+        "desc": "Mit dieser Funktion speicherst und übernimmst du deine Kontakt-Einstellungen."
+      },
+      "privacy": {
+        "title": "Datenschutz und Verarbeitung",
+        "desc": "Kontaktprofil-Einstellungen sind an dein Konto gebunden. Bilder und Metadaten werden für Avatar- und Hintergrundfunktionen verarbeitet. Beim Öffnen von Quellen-Links können Anfragen an externe Anbieter wie Unsplash entstehen."
+      }
+    }
+  },
   "contactList": {
     "title": "Kontakte"
   },
+  "myContactList": {
+    "title": "Meine Kontakte",
+    "intro": "Hier verwaltest du deine Kontakte. Du kannst Kontakt-Einstellungen öffnen, Chats starten, Kacheln verwalten und Verbindungsaktionen wie ID teilen oder QR verbinden nutzen.",
+    "items": {
+      "open": {
+        "title": "Kontakt-Einstellungen öffnen",
+        "desc": "Mit dieser Funktion öffnest du die Einstellungen des ausgewählten Kontakts."
+      },
+      "delete": {
+        "title": "Kontakt löschen",
+        "desc": "Mit dieser Funktion entfernst du den ausgewählten Kontakt dauerhaft."
+      },
+      "chat": {
+        "title": "Chat öffnen",
+        "desc": "Mit dieser Funktion öffnest du den privaten Chat mit dem ausgewählten Kontakt."
+      },
+      "tiles": {
+        "title": "Kacheln öffnen",
+        "desc": "Mit dieser Funktion öffnest du die Kachelliste des ausgewählten Kontakts."
+      },
+      "more": {
+        "title": "Weitere Aktionen öffnen",
+        "desc": "Mit dieser Funktion öffnest du das Untermenü mit zusätzlichen Aktionen für den ausgewählten Kontakt."
+      },
+      "subscribe": {
+        "title": "Kontakt abonnieren",
+        "desc": "Mit dieser Funktion aktivierst du Benachrichtigungen für den ausgewählten Kontakt."
+      },
+      "unsubscribe": {
+        "title": "Kontakt-Abo beenden",
+        "desc": "Mit dieser Funktion deaktivierst du Benachrichtigungen für den ausgewählten Kontakt."
+      },
+      "sort": {
+        "title": "Kontakte sortieren",
+        "desc": "Mit dieser Funktion öffnest du den Sortierdialog und änderst die Reihenfolge deiner Kontakte."
+      },
+      "add": {
+        "title": "Kontakt hinzufügen oder verbinden",
+        "desc": "Mit dieser Funktion öffnest du das Verbindungsmenü (ID teilen, mit ID verbinden, QR teilen oder QR scannen)."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Mit dieser Funktion schließt du die Kontaktliste."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "privacy": {
+        "title": "Datenschutz und Verarbeitung",
+        "desc": "Kontaktbeziehungen sind an dein Konto gebunden. Beim Öffnen von Quellen-Links können Anfragen an externe Anbieter entstehen (z. B. Unsplash). Verbindungsaktionen tauschen Kontakt-IDs bzw. QR-Daten aus, die für die Kontaktverknüpfung benötigt werden."
+      }
+    }
+  },
   "contactSort": {
     "title": "Kontakte sortieren"
+  },
+  "myContactSort": {
+    "title": "Meine Kontakte sortieren",
+    "intro": "In diesem Dialog änderst du die Reihenfolge deiner Kontakte.",
+    "items": {
+      "reorder": {
+        "title": "Kontakte neu anordnen",
+        "desc": "Mit dieser Funktion änderst du die Kontaktreihenfolge per Drag-and-Drop."
+      },
+      "settings": {
+        "title": "Kontakt-Einstellungen öffnen",
+        "desc": "Mit dieser Funktion öffnest du die Einstellungen des ausgewählten Kontakts direkt aus der Sortierliste."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Mit dieser Funktion schließt du den Sortierdialog ohne Übernahme der Änderungen."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "apply": {
+        "title": "Übernehmen",
+        "desc": "Mit dieser Funktion speicherst und übernimmst du die neue Kontaktreihenfolge."
+      },
+      "privacy": {
+        "title": "Datenschutz und Verarbeitung",
+        "desc": "Die Kontaktreihenfolge wird zusammen mit deinen Kontaktdaten gespeichert. Es werden nur Daten verarbeitet, die für Sortierung und Anzeige erforderlich sind."
+      }
+    }
   },
   "documentList": {
     "title": "Dokumente"
@@ -547,8 +769,84 @@
   "placeSettings": {
     "title": "Ort-Einstellungen"
   },
+  "myPlaceSettings": {
+    "title": "Meine Ort-Einstellungen",
+    "intro": "In diesem Dialog bearbeitest du einen Ort. Du kannst Ortsname, Avatar, Kachel-Hintergrund und Transparenz anpassen und anschließend speichern.",
+    "items": {
+      "name": {
+        "title": "Ortsname bearbeiten",
+        "desc": "Mit dieser Funktion änderst du den Anzeigenamen des ausgewählten Ortes."
+      },
+      "avatar": {
+        "title": "Avatar setzen oder bearbeiten",
+        "desc": "Mit dieser Funktion setzt du ein neues Orts-Avatarbild oder ersetzt das aktuelle."
+      },
+      "avatarRemove": {
+        "title": "Avatar entfernen",
+        "desc": "Mit dieser Funktion entfernst du den aktuellen Orts-Avatar."
+      },
+      "background": {
+        "title": "Kachel-Hintergrund setzen oder bearbeiten",
+        "desc": "Mit dieser Funktion setzt oder ersetzt du das Hintergrundbild für Orts-Kacheln."
+      },
+      "backgroundRemove": {
+        "title": "Kachel-Hintergrund entfernen",
+        "desc": "Mit dieser Funktion entfernst du das aktuelle Kachel-Hintergrundbild des Ortes."
+      },
+      "transparency": {
+        "title": "Hintergrund-Transparenz anpassen",
+        "desc": "Mit dieser Funktion änderst du den Transparenzwert des Kachel-Hintergrunds in Prozent."
+      },
+      "close": {
+        "title": "Abbrechen",
+        "desc": "Mit dieser Funktion schließt du den Dialog ohne Übernahme der Änderungen."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "apply": {
+        "title": "Übernehmen",
+        "desc": "Mit dieser Funktion speicherst und übernimmst du deine Ort-Einstellungen."
+      },
+      "privacy": {
+        "title": "Datenschutz und Verarbeitung",
+        "desc": "Ort-Einstellungen sind an dein Konto gebunden. Ortsnamen werden verschlüsselt gespeichert, Positions- und Darstellungsdaten für Karten- und Kachelfunktionen verarbeitet. Beim Öffnen von Quellen-Links können Anfragen an externe Anbieter wie Unsplash entstehen."
+      }
+    }
+  },
   "placeSort": {
     "title": "Orte sortieren"
+  },
+  "myPlaceSort": {
+    "title": "Meine Orte sortieren",
+    "intro": "In diesem Dialog änderst du die Reihenfolge deiner Orte.",
+    "items": {
+      "reorder": {
+        "title": "Orte neu anordnen",
+        "desc": "Mit dieser Funktion änderst du die Ortsreihenfolge per Drag-and-Drop."
+      },
+      "settings": {
+        "title": "Ort-Einstellungen öffnen",
+        "desc": "Mit dieser Funktion öffnest du die Einstellungen des ausgewählten Ortes direkt aus der Sortierliste."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Mit dieser Funktion schließt du den Sortierdialog ohne Übernahme der Änderungen."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "apply": {
+        "title": "Übernehmen",
+        "desc": "Mit dieser Funktion speicherst und übernimmst du die neue Ortsreihenfolge."
+      },
+      "privacy": {
+        "title": "Datenschutz und Verarbeitung",
+        "desc": "Die Ortsreihenfolge wird zusammen mit deinen Ortsdaten gespeichert. Es werden nur Daten verarbeitet, die für Sortierung und Anzeige erforderlich sind."
+      }
+    }
   },
   "sharedContent": {
     "title": "Geteilte Inhalte"
@@ -1057,8 +1355,60 @@
   "qrCode": {
     "title": "QR-Code"
   },
+  "myContactShareQr": {
+    "title": "QR-Code teilen",
+    "intro": "In diesem Dialog wird deine Connect-ID als QR-Code angezeigt, damit eine andere Person sie scannen kann.",
+    "items": {
+      "show": {
+        "title": "QR-Code anzeigen",
+        "desc": "Mit dieser Funktion wird die aktuelle Connect-ID als QR-Code dargestellt."
+      },
+      "scanByOther": {
+        "title": "Von anderer Person scannen lassen",
+        "desc": "Mit dieser Funktion kann eine andere Person deinen QR-Code scannen und eine Verbindung mit dir starten."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Mit dieser Funktion schließt du den QR-Code-Dialog."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "privacy": {
+        "title": "Datenschutz und Verarbeitung",
+        "desc": "Der QR-Code enthält deine Connect-ID. Teile ihn nur mit Personen, mit denen du dich verbinden möchtest."
+      }
+    }
+  },
   "scanner": {
     "title": "Scanner"
+  },
+  "myContactScanQr": {
+    "title": "QR-Code scannen",
+    "intro": "In diesem Dialog scannst du einen QR-Code, um einen Kontakt zu verbinden.",
+    "items": {
+      "camera": {
+        "title": "Kamerazugriff erlauben",
+        "desc": "Mit dieser Funktion wird die Kameraberechtigung benötigt, damit QR-Codes erkannt werden können."
+      },
+      "scan": {
+        "title": "Scannen und verbinden",
+        "desc": "Mit dieser Funktion wird ein QR-Code gelesen und die gescannte Connect-ID für die Kontaktverbindung verwendet."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Mit dieser Funktion schließt du den Scanner ohne Verbindung."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "privacy": {
+        "title": "Datenschutz und Verarbeitung",
+        "desc": "Der gescannte QR-Inhalt wird für den Aufbau einer Kontaktverknüpfung verwendet. Kameradaten werden lokal zur Erkennung verarbeitet."
+      }
+    }
   },
   "searchSettings": {
     "title": "Sucheinstellungen"

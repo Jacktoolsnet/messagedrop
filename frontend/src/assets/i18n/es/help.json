@@ -218,8 +218,96 @@
   "contactChatroom": {
     "title": "Chat de contacto"
   },
+  "myContactChatroom": {
+    "title": "Sala de chat del contacto",
+    "intro": "En esta sala de chat intercambias mensajes privados con un contacto como texto, multimedia, nota de voz, experiencia o mensaje de ubicación.",
+    "items": {
+      "profile": {
+        "title": "Abrir perfiles y ajustes",
+        "desc": "Con esta función abres tu perfil o los ajustes del contacto tocando las áreas de avatar y título."
+      },
+      "compose": {
+        "title": "Redactar mensaje",
+        "desc": "Con esta función inicias un nuevo mensaje de chat."
+      },
+      "experience": {
+        "title": "Añadir experiencia",
+        "desc": "Con esta función añades a tu mensaje una tarjeta de experiencia desde la búsqueda de experiencias."
+      },
+      "location": {
+        "title": "Enviar mensaje de ubicación",
+        "desc": "El icono de ubicación envía un mensaje de ubicación independiente. Ese mensaje incluye botones para verlo en el mapa de la app o abrirlo en Google Maps."
+      },
+      "audio": {
+        "title": "Grabar mensaje de voz",
+        "desc": "Con esta función grabas y envías un mensaje de audio."
+      },
+      "reaction": {
+        "title": "Establecer reacción",
+        "desc": "Con esta función abres reacciones con emoji para los mensajes recibidos."
+      },
+      "translate": {
+        "title": "Traducir mensaje",
+        "desc": "Con esta función traduces texto entrante y puedes volver al original."
+      },
+      "map": {
+        "title": "Abrir acciones de mapa",
+        "desc": "Con esta función saltas a ubicaciones compartidas en el mapa de la app o abres mapas externos."
+      },
+      "edit": {
+        "title": "Editar mensaje",
+        "desc": "El lápiz abre el diálogo de edición. Los cambios se envían como un nuevo mensaje editado; el mensaje original se mantiene."
+      },
+      "delete": {
+        "title": "Eliminar mensaje",
+        "desc": "A través de la papelera se pueden eliminar mensajes. Tus mensajes enviados se eliminan en ambos chats. Los mensajes recibidos solo se eliminan en tu chat; para el remitente, el mensaje se mantiene y se marca como eliminado."
+      },
+      "close": {
+        "title": "Cerrar",
+        "desc": "Con esta función cierras la sala de chat."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "privacy": {
+        "title": "Privacidad y procesamiento",
+        "desc": "Los mensajes de contacto se transmiten cifrados de extremo a extremo y se almacenan como payload cifrado. El servidor conserva el contenido solo de forma temporal y elimina el payload tras el almacenamiento local correcto en el dispositivo del destinatario. El contenido local se guarda en el almacenamiento local protegido de la app (IndexedDB)."
+      }
+    }
+  },
   "contactConnect": {
     "title": "Conectar contacto"
+  },
+  "myContactConnectId": {
+    "title": "Conectar con ID de conexión",
+    "intro": "En este diálogo conectas un contacto introduciendo su ID de conexión.",
+    "items": {
+      "id": {
+        "title": "Introducir ID de conexión",
+        "desc": "Con esta función introduces o editas el ID de conexión del contacto."
+      },
+      "paste": {
+        "title": "Pegar desde el portapapeles",
+        "desc": "Con esta función insertas un ID de conexión directamente desde el portapapeles."
+      },
+      "close": {
+        "title": "Cancelar",
+        "desc": "Con esta función cierras el diálogo sin conectar."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "apply": {
+        "title": "Conectar",
+        "desc": "Con esta función confirmas el ID introducido e inicias la conexión de contacto."
+      },
+      "privacy": {
+        "title": "Privacidad y procesamiento",
+        "desc": "El ID de conexión se envía al backend para crear el vínculo de contacto. Solo se procesan los datos necesarios para establecer la relación."
+      }
+    }
   },
   "contactEditMessage": {
     "title": "Editar mensaje de chat"
@@ -227,11 +315,145 @@
   "contactSettings": {
     "title": "Ajustes de contacto"
   },
+  "myContactSettings": {
+    "title": "Mis ajustes de contacto",
+    "intro": "En este diálogo editas un perfil de contacto. Puedes cambiar nombre, avatar, fondo del chat y transparencia, y después guardar los cambios.",
+    "items": {
+      "name": {
+        "title": "Editar nombre del contacto",
+        "desc": "Con esta función cambias el nombre mostrado del contacto seleccionado."
+      },
+      "avatar": {
+        "title": "Establecer o editar avatar",
+        "desc": "Con esta función estableces una nueva imagen de avatar o reemplazas la actual."
+      },
+      "avatarRemove": {
+        "title": "Eliminar avatar",
+        "desc": "Con esta función eliminas el avatar actual del contacto."
+      },
+      "background": {
+        "title": "Establecer o editar fondo del chat",
+        "desc": "Con esta función estableces o reemplazas la imagen de fondo usada en el chat del contacto."
+      },
+      "backgroundRemove": {
+        "title": "Eliminar fondo del chat",
+        "desc": "Con esta función eliminas la imagen de fondo actual del chat."
+      },
+      "transparency": {
+        "title": "Ajustar transparencia del fondo",
+        "desc": "Con esta función cambias el porcentaje de transparencia del fondo del chat."
+      },
+      "syncProfile": {
+        "title": "Solicitar actualización del perfil",
+        "desc": "Con esta función solicitas los datos de perfil actuales al contacto cuando esta opción está disponible."
+      },
+      "close": {
+        "title": "Cancelar",
+        "desc": "Con esta función cierras el diálogo sin aplicar cambios."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "apply": {
+        "title": "Aplicar",
+        "desc": "Con esta función guardas y aplicas tus ajustes de contacto."
+      },
+      "privacy": {
+        "title": "Privacidad y procesamiento",
+        "desc": "Los ajustes del perfil de contacto están vinculados a tu cuenta. Las imágenes y metadatos se procesan para las funciones de avatar y fondo. Al abrir enlaces de atribución pueden enviarse solicitudes a proveedores externos como Unsplash."
+      }
+    }
+  },
   "contactList": {
     "title": "Contactos"
   },
+  "myContactList": {
+    "title": "Mis contactos",
+    "intro": "Aquí gestionas tus contactos. Puedes abrir ajustes del contacto, iniciar chats, gestionar mosaicos y usar acciones de conexión como compartir ID o conectar con QR.",
+    "items": {
+      "open": {
+        "title": "Abrir ajustes del contacto",
+        "desc": "Con esta función abres los ajustes del contacto seleccionado."
+      },
+      "delete": {
+        "title": "Eliminar contacto",
+        "desc": "Con esta función eliminas de forma permanente el contacto seleccionado."
+      },
+      "chat": {
+        "title": "Abrir chat",
+        "desc": "Con esta función abres el chat privado con el contacto seleccionado."
+      },
+      "tiles": {
+        "title": "Abrir mosaicos",
+        "desc": "Con esta función abres la lista de mosaicos del contacto seleccionado."
+      },
+      "more": {
+        "title": "Abrir más acciones",
+        "desc": "Con esta función abres el submenú con acciones adicionales para el contacto seleccionado."
+      },
+      "subscribe": {
+        "title": "Suscribir contacto",
+        "desc": "Con esta función activas las notificaciones del contacto seleccionado."
+      },
+      "unsubscribe": {
+        "title": "Cancelar suscripción del contacto",
+        "desc": "Con esta función desactivas las notificaciones del contacto seleccionado."
+      },
+      "sort": {
+        "title": "Ordenar contactos",
+        "desc": "Con esta función abres el diálogo de ordenación y cambias el orden de tus contactos."
+      },
+      "add": {
+        "title": "Añadir o conectar contacto",
+        "desc": "Con esta función abres el menú de conexión (compartir ID, conectar con ID, compartir QR o escanear QR)."
+      },
+      "close": {
+        "title": "Cerrar",
+        "desc": "Con esta función cierras la lista de contactos."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "privacy": {
+        "title": "Privacidad y procesamiento",
+        "desc": "Las relaciones de contacto están vinculadas a tu cuenta. Al abrir enlaces de atribución pueden enviarse solicitudes a proveedores externos (por ejemplo Unsplash). Las acciones de conexión intercambian IDs de contacto o datos QR necesarios para crear el vínculo."
+      }
+    }
+  },
   "contactSort": {
     "title": "Ordenar contactos"
+  },
+  "myContactSort": {
+    "title": "Ordenar mis contactos",
+    "intro": "En este diálogo cambias el orden de tus contactos.",
+    "items": {
+      "reorder": {
+        "title": "Reordenar contactos",
+        "desc": "Con esta función cambias el orden de contactos mediante arrastrar y soltar."
+      },
+      "settings": {
+        "title": "Abrir ajustes del contacto",
+        "desc": "Con esta función abres los ajustes del contacto seleccionado directamente desde la lista de ordenación."
+      },
+      "close": {
+        "title": "Cerrar",
+        "desc": "Con esta función cierras el diálogo de ordenación sin aplicar cambios."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "apply": {
+        "title": "Aplicar",
+        "desc": "Con esta función guardas y aplicas el nuevo orden de contactos."
+      },
+      "privacy": {
+        "title": "Privacidad y procesamiento",
+        "desc": "El orden de contactos se guarda junto con tus datos de contacto. Solo se procesan los datos necesarios para ordenación y visualización."
+      }
+    }
   },
   "documentList": {
     "title": "Documentos"
@@ -547,8 +769,84 @@
   "placeSettings": {
     "title": "Ajustes de lugar"
   },
+  "myPlaceSettings": {
+    "title": "Mis ajustes del lugar",
+    "intro": "En este diálogo editas un lugar. Puedes cambiar el nombre del lugar, avatar, fondo de mosaico y transparencia, y luego guardar.",
+    "items": {
+      "name": {
+        "title": "Editar nombre del lugar",
+        "desc": "Con esta función cambias el nombre mostrado del lugar seleccionado."
+      },
+      "avatar": {
+        "title": "Establecer o editar avatar",
+        "desc": "Con esta función estableces una nueva imagen de avatar del lugar o reemplazas la actual."
+      },
+      "avatarRemove": {
+        "title": "Eliminar avatar",
+        "desc": "Con esta función eliminas el avatar actual del lugar."
+      },
+      "background": {
+        "title": "Establecer o editar fondo del mosaico",
+        "desc": "Con esta función estableces o reemplazas la imagen de fondo usada en los mosaicos del lugar."
+      },
+      "backgroundRemove": {
+        "title": "Eliminar fondo del mosaico",
+        "desc": "Con esta función eliminas la imagen de fondo actual de los mosaicos del lugar."
+      },
+      "transparency": {
+        "title": "Ajustar transparencia del fondo",
+        "desc": "Con esta función cambias el porcentaje de transparencia del fondo del mosaico."
+      },
+      "close": {
+        "title": "Cancelar",
+        "desc": "Con esta función cierras el diálogo sin aplicar cambios."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "apply": {
+        "title": "Aplicar",
+        "desc": "Con esta función guardas y aplicas tus ajustes del lugar."
+      },
+      "privacy": {
+        "title": "Privacidad y procesamiento",
+        "desc": "Los ajustes del lugar están vinculados a tu cuenta. Los nombres de lugar se guardan cifrados, y los datos de posición y estilo se procesan para funciones de mapa y mosaicos. Al abrir enlaces de atribución pueden enviarse solicitudes a proveedores externos como Unsplash."
+      }
+    }
+  },
   "placeSort": {
     "title": "Ordenar lugares"
+  },
+  "myPlaceSort": {
+    "title": "Ordenar mis lugares",
+    "intro": "En este diálogo cambias el orden de tus lugares.",
+    "items": {
+      "reorder": {
+        "title": "Reordenar lugares",
+        "desc": "Con esta función cambias el orden de lugares mediante arrastrar y soltar."
+      },
+      "settings": {
+        "title": "Abrir ajustes del lugar",
+        "desc": "Con esta función abres los ajustes del lugar seleccionado directamente desde la lista de ordenación."
+      },
+      "close": {
+        "title": "Cerrar",
+        "desc": "Con esta función cierras el diálogo de ordenación sin aplicar cambios."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "apply": {
+        "title": "Aplicar",
+        "desc": "Con esta función guardas y aplicas el nuevo orden de lugares."
+      },
+      "privacy": {
+        "title": "Privacidad y procesamiento",
+        "desc": "El orden de lugares se guarda junto con tus datos de lugar. Solo se procesan los datos necesarios para ordenación y visualización."
+      }
+    }
   },
   "sharedContent": {
     "title": "Contenido compartido"
@@ -1057,8 +1355,60 @@
   "qrCode": {
     "title": "Código QR"
   },
+  "myContactShareQr": {
+    "title": "Compartir código QR",
+    "intro": "Este diálogo muestra tu ID de conexión como código QR para que otra persona pueda escanearlo.",
+    "items": {
+      "show": {
+        "title": "Mostrar código QR",
+        "desc": "Con esta función se muestra el ID de conexión actual como código QR."
+      },
+      "scanByOther": {
+        "title": "Permitir escaneo por otra persona",
+        "desc": "Con esta función otra persona puede escanear tu código QR e iniciar una conexión contigo."
+      },
+      "close": {
+        "title": "Cerrar",
+        "desc": "Con esta función cierras el diálogo del código QR."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "privacy": {
+        "title": "Privacidad y procesamiento",
+        "desc": "El código QR contiene tu ID de conexión. Compártelo solo con personas con las que quieras conectarte."
+      }
+    }
+  },
   "scanner": {
     "title": "Escáner"
+  },
+  "myContactScanQr": {
+    "title": "Escanear código QR",
+    "intro": "Este diálogo escanea un código QR para conectar con otro contacto.",
+    "items": {
+      "camera": {
+        "title": "Permitir acceso a la cámara",
+        "desc": "Con esta función se requiere permiso de cámara para reconocer códigos QR."
+      },
+      "scan": {
+        "title": "Escanear y conectar",
+        "desc": "Con esta función se lee un código QR y se usa el ID de conexión escaneado para iniciar la conexión de contacto."
+      },
+      "close": {
+        "title": "Cerrar",
+        "desc": "Con esta función cierras el escáner sin conectar."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "privacy": {
+        "title": "Privacidad y procesamiento",
+        "desc": "El contenido QR escaneado se utiliza para crear el vínculo de contacto. Los datos de cámara se procesan localmente para el escaneo."
+      }
+    }
   },
   "searchSettings": {
     "title": "Ajustes de búsqueda"

@@ -383,10 +383,117 @@ const HELP_TOPICS = {
     introKey: 'common.intros.chat',
     items: ITEMS.chat
   },
+  myContactChatroom: {
+    titleKey: 'myContactChatroom.title',
+    introKey: 'myContactChatroom.intro',
+    items: [
+      {
+        icon: 'person',
+        titleKey: 'myContactChatroom.items.profile.title',
+        descriptionKey: 'myContactChatroom.items.profile.desc'
+      },
+      {
+        icon: 'add_comment',
+        titleKey: 'myContactChatroom.items.compose.title',
+        descriptionKey: 'myContactChatroom.items.compose.desc'
+      },
+      {
+        icon: 'bookmark_add',
+        titleKey: 'myContactChatroom.items.experience.title',
+        descriptionKey: 'myContactChatroom.items.experience.desc'
+      },
+      {
+        icon: 'add_location_alt',
+        titleKey: 'myContactChatroom.items.location.title',
+        descriptionKey: 'myContactChatroom.items.location.desc'
+      },
+      {
+        icon: 'mic',
+        titleKey: 'myContactChatroom.items.audio.title',
+        descriptionKey: 'myContactChatroom.items.audio.desc'
+      },
+      {
+        icon: 'mood',
+        titleKey: 'myContactChatroom.items.reaction.title',
+        descriptionKey: 'myContactChatroom.items.reaction.desc'
+      },
+      {
+        icon: 'translate',
+        titleKey: 'myContactChatroom.items.translate.title',
+        descriptionKey: 'myContactChatroom.items.translate.desc'
+      },
+      {
+        icon: 'map',
+        titleKey: 'myContactChatroom.items.map.title',
+        descriptionKey: 'myContactChatroom.items.map.desc'
+      },
+      {
+        icon: 'edit',
+        titleKey: 'myContactChatroom.items.edit.title',
+        descriptionKey: 'myContactChatroom.items.edit.desc'
+      },
+      {
+        icon: 'delete',
+        titleKey: 'myContactChatroom.items.delete.title',
+        descriptionKey: 'myContactChatroom.items.delete.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'myContactChatroom.items.close.title',
+        descriptionKey: 'myContactChatroom.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'myContactChatroom.items.help.title',
+        descriptionKey: 'myContactChatroom.items.help.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'myContactChatroom.items.privacy.title',
+        descriptionKey: 'myContactChatroom.items.privacy.desc'
+      }
+    ]
+  },
   contactConnect: {
     titleKey: 'contactConnect.title',
     introKey: 'common.intros.connect',
     items: ITEMS.qr
+  },
+  myContactConnectId: {
+    titleKey: 'myContactConnectId.title',
+    introKey: 'myContactConnectId.intro',
+    items: [
+      {
+        icon: 'link',
+        titleKey: 'myContactConnectId.items.id.title',
+        descriptionKey: 'myContactConnectId.items.id.desc'
+      },
+      {
+        icon: 'content_paste_go',
+        titleKey: 'myContactConnectId.items.paste.title',
+        descriptionKey: 'myContactConnectId.items.paste.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'myContactConnectId.items.close.title',
+        descriptionKey: 'myContactConnectId.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'myContactConnectId.items.help.title',
+        descriptionKey: 'myContactConnectId.items.help.desc'
+      },
+      {
+        icon: 'check',
+        titleKey: 'myContactConnectId.items.apply.title',
+        descriptionKey: 'myContactConnectId.items.apply.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'myContactConnectId.items.privacy.title',
+        descriptionKey: 'myContactConnectId.items.privacy.desc'
+      }
+    ]
   },
   contactEditMessage: {
     titleKey: 'contactEditMessage.title',
@@ -398,15 +505,178 @@ const HELP_TOPICS = {
     introKey: 'common.intros.settings',
     items: ITEMS.settings
   },
+  myContactSettings: {
+    titleKey: 'myContactSettings.title',
+    introKey: 'myContactSettings.intro',
+    items: [
+      {
+        icon: 'edit',
+        titleKey: 'myContactSettings.items.name.title',
+        descriptionKey: 'myContactSettings.items.name.desc'
+      },
+      {
+        icon: 'photo_camera',
+        titleKey: 'myContactSettings.items.avatar.title',
+        descriptionKey: 'myContactSettings.items.avatar.desc'
+      },
+      {
+        icon: 'delete',
+        titleKey: 'myContactSettings.items.avatarRemove.title',
+        descriptionKey: 'myContactSettings.items.avatarRemove.desc'
+      },
+      {
+        icon: 'wallpaper',
+        titleKey: 'myContactSettings.items.background.title',
+        descriptionKey: 'myContactSettings.items.background.desc'
+      },
+      {
+        icon: 'delete',
+        titleKey: 'myContactSettings.items.backgroundRemove.title',
+        descriptionKey: 'myContactSettings.items.backgroundRemove.desc'
+      },
+      {
+        icon: 'opacity',
+        titleKey: 'myContactSettings.items.transparency.title',
+        descriptionKey: 'myContactSettings.items.transparency.desc'
+      },
+      {
+        icon: 'connect_without_contact',
+        titleKey: 'myContactSettings.items.syncProfile.title',
+        descriptionKey: 'myContactSettings.items.syncProfile.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'myContactSettings.items.close.title',
+        descriptionKey: 'myContactSettings.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'myContactSettings.items.help.title',
+        descriptionKey: 'myContactSettings.items.help.desc'
+      },
+      {
+        icon: 'check',
+        titleKey: 'myContactSettings.items.apply.title',
+        descriptionKey: 'myContactSettings.items.apply.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'myContactSettings.items.privacy.title',
+        descriptionKey: 'myContactSettings.items.privacy.desc'
+      }
+    ]
+  },
   contactList: {
     titleKey: 'contactList.title',
     introKey: 'common.intros.list',
     items: ITEMS.listSort
   },
+  myContactList: {
+    titleKey: 'myContactList.title',
+    introKey: 'myContactList.intro',
+    items: [
+      {
+        icon: 'settings_account_box',
+        titleKey: 'myContactList.items.open.title',
+        descriptionKey: 'myContactList.items.open.desc'
+      },
+      {
+        icon: 'delete_forever',
+        titleKey: 'myContactList.items.delete.title',
+        descriptionKey: 'myContactList.items.delete.desc'
+      },
+      {
+        icon: 'conversation',
+        titleKey: 'myContactList.items.chat.title',
+        descriptionKey: 'myContactList.items.chat.desc'
+      },
+      {
+        icon: 'dashboard',
+        titleKey: 'myContactList.items.tiles.title',
+        descriptionKey: 'myContactList.items.tiles.desc'
+      },
+      {
+        icon: 'more_horiz',
+        titleKey: 'myContactList.items.more.title',
+        descriptionKey: 'myContactList.items.more.desc'
+      },
+      {
+        icon: 'bookmark_add',
+        titleKey: 'myContactList.items.subscribe.title',
+        descriptionKey: 'myContactList.items.subscribe.desc'
+      },
+      {
+        icon: 'bookmark_remove',
+        titleKey: 'myContactList.items.unsubscribe.title',
+        descriptionKey: 'myContactList.items.unsubscribe.desc'
+      },
+      {
+        icon: 'swap_vert',
+        titleKey: 'myContactList.items.sort.title',
+        descriptionKey: 'myContactList.items.sort.desc'
+      },
+      {
+        icon: 'connect_without_contact',
+        titleKey: 'myContactList.items.add.title',
+        descriptionKey: 'myContactList.items.add.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'myContactList.items.close.title',
+        descriptionKey: 'myContactList.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'myContactList.items.help.title',
+        descriptionKey: 'myContactList.items.help.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'myContactList.items.privacy.title',
+        descriptionKey: 'myContactList.items.privacy.desc'
+      }
+    ]
+  },
   contactSort: {
     titleKey: 'contactSort.title',
     introKey: 'common.intros.sort',
     items: ITEMS.sortDialog
+  },
+  myContactSort: {
+    titleKey: 'myContactSort.title',
+    introKey: 'myContactSort.intro',
+    items: [
+      {
+        icon: 'drag_indicator',
+        titleKey: 'myContactSort.items.reorder.title',
+        descriptionKey: 'myContactSort.items.reorder.desc'
+      },
+      {
+        icon: 'settings',
+        titleKey: 'myContactSort.items.settings.title',
+        descriptionKey: 'myContactSort.items.settings.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'myContactSort.items.close.title',
+        descriptionKey: 'myContactSort.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'myContactSort.items.help.title',
+        descriptionKey: 'myContactSort.items.help.desc'
+      },
+      {
+        icon: 'check',
+        titleKey: 'myContactSort.items.apply.title',
+        descriptionKey: 'myContactSort.items.apply.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'myContactSort.items.privacy.title',
+        descriptionKey: 'myContactSort.items.privacy.desc'
+      }
+    ]
   },
   documentList: {
     titleKey: 'documentList.title',
@@ -808,10 +1078,102 @@ const HELP_TOPICS = {
     introKey: 'common.intros.settings',
     items: ITEMS.settings
   },
+  myPlaceSettings: {
+    titleKey: 'myPlaceSettings.title',
+    introKey: 'myPlaceSettings.intro',
+    items: [
+      {
+        icon: 'edit',
+        titleKey: 'myPlaceSettings.items.name.title',
+        descriptionKey: 'myPlaceSettings.items.name.desc'
+      },
+      {
+        icon: 'photo_camera',
+        titleKey: 'myPlaceSettings.items.avatar.title',
+        descriptionKey: 'myPlaceSettings.items.avatar.desc'
+      },
+      {
+        icon: 'delete',
+        titleKey: 'myPlaceSettings.items.avatarRemove.title',
+        descriptionKey: 'myPlaceSettings.items.avatarRemove.desc'
+      },
+      {
+        icon: 'wallpaper',
+        titleKey: 'myPlaceSettings.items.background.title',
+        descriptionKey: 'myPlaceSettings.items.background.desc'
+      },
+      {
+        icon: 'delete',
+        titleKey: 'myPlaceSettings.items.backgroundRemove.title',
+        descriptionKey: 'myPlaceSettings.items.backgroundRemove.desc'
+      },
+      {
+        icon: 'opacity',
+        titleKey: 'myPlaceSettings.items.transparency.title',
+        descriptionKey: 'myPlaceSettings.items.transparency.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'myPlaceSettings.items.close.title',
+        descriptionKey: 'myPlaceSettings.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'myPlaceSettings.items.help.title',
+        descriptionKey: 'myPlaceSettings.items.help.desc'
+      },
+      {
+        icon: 'check',
+        titleKey: 'myPlaceSettings.items.apply.title',
+        descriptionKey: 'myPlaceSettings.items.apply.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'myPlaceSettings.items.privacy.title',
+        descriptionKey: 'myPlaceSettings.items.privacy.desc'
+      }
+    ]
+  },
   placeSort: {
     titleKey: 'placeSort.title',
     introKey: 'common.intros.sort',
     items: ITEMS.sortDialog
+  },
+  myPlaceSort: {
+    titleKey: 'myPlaceSort.title',
+    introKey: 'myPlaceSort.intro',
+    items: [
+      {
+        icon: 'drag_indicator',
+        titleKey: 'myPlaceSort.items.reorder.title',
+        descriptionKey: 'myPlaceSort.items.reorder.desc'
+      },
+      {
+        icon: 'settings',
+        titleKey: 'myPlaceSort.items.settings.title',
+        descriptionKey: 'myPlaceSort.items.settings.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'myPlaceSort.items.close.title',
+        descriptionKey: 'myPlaceSort.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'myPlaceSort.items.help.title',
+        descriptionKey: 'myPlaceSort.items.help.desc'
+      },
+      {
+        icon: 'check',
+        titleKey: 'myPlaceSort.items.apply.title',
+        descriptionKey: 'myPlaceSort.items.apply.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'myPlaceSort.items.privacy.title',
+        descriptionKey: 'myPlaceSort.items.privacy.desc'
+      }
+    ]
   },
   sharedContent: {
     titleKey: 'sharedContent.title',
@@ -1436,10 +1798,72 @@ const HELP_TOPICS = {
     introKey: 'common.intros.qr',
     items: ITEMS.qr
   },
+  myContactShareQr: {
+    titleKey: 'myContactShareQr.title',
+    introKey: 'myContactShareQr.intro',
+    items: [
+      {
+        icon: 'qr_code_2',
+        titleKey: 'myContactShareQr.items.show.title',
+        descriptionKey: 'myContactShareQr.items.show.desc'
+      },
+      {
+        icon: 'qr_code_scanner',
+        titleKey: 'myContactShareQr.items.scanByOther.title',
+        descriptionKey: 'myContactShareQr.items.scanByOther.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'myContactShareQr.items.close.title',
+        descriptionKey: 'myContactShareQr.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'myContactShareQr.items.help.title',
+        descriptionKey: 'myContactShareQr.items.help.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'myContactShareQr.items.privacy.title',
+        descriptionKey: 'myContactShareQr.items.privacy.desc'
+      }
+    ]
+  },
   scanner: {
     titleKey: 'scanner.title',
     introKey: 'common.intros.scan',
     items: ITEMS.scan
+  },
+  myContactScanQr: {
+    titleKey: 'myContactScanQr.title',
+    introKey: 'myContactScanQr.intro',
+    items: [
+      {
+        icon: 'photo_camera',
+        titleKey: 'myContactScanQr.items.camera.title',
+        descriptionKey: 'myContactScanQr.items.camera.desc'
+      },
+      {
+        icon: 'qr_code_scanner',
+        titleKey: 'myContactScanQr.items.scan.title',
+        descriptionKey: 'myContactScanQr.items.scan.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'myContactScanQr.items.close.title',
+        descriptionKey: 'myContactScanQr.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'myContactScanQr.items.help.title',
+        descriptionKey: 'myContactScanQr.items.help.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'myContactScanQr.items.privacy.title',
+        descriptionKey: 'myContactScanQr.items.privacy.desc'
+      }
+    ]
   },
   searchSettings: {
     titleKey: 'searchSettings.title',
