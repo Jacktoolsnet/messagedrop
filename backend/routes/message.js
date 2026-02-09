@@ -72,8 +72,33 @@ const moderationModel = process.env.OPENAI_MODERATION_MODEL || 'omni-moderation-
 const adminAudience = process.env.SERVICE_JWT_AUDIENCE_ADMIN || 'service.admin-backend';
 
 function detectPersonalInformation(text) {
+  const commonTlds = new Set([
+    'com', 'org', 'net', 'edu', 'gov', 'mil', 'int', 'info', 'biz', 'name', 'pro', 'dev', 'app', 'io',
+    'de', 'at', 'ch', 'fr', 'es', 'it', 'pt', 'nl', 'be', 'lu', 'uk', 'ie',
+    'us', 'ca', 'au', 'nz', 'jp', 'kr', 'cn', 'in', 'br', 'mx', 'ar', 'cl', 'co',
+    'se', 'no', 'dk', 'fi', 'pl', 'cz', 'sk', 'hu', 'ro', 'bg', 'hr', 'si', 'gr', 'tr', 'ru', 'ua'
+  ]);
+  const normalizedTokenText = String(text ?? '')
+    .toLowerCase()
+    .replace(/[#]+/g, ' ')
+    .replace(/[()[\]{};,]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  const normalizedObfuscatedText = String(text ?? '')
+    .toLowerCase()
+    .replace(/[\(\[\{]\s*at\s*[\)\]\}]/g, ' @ ')
+    .replace(/\bat\b/g, ' @ ')
+    .replace(/[\(\[\{]\s*(dot|punkt)\s*[\)\]\}]/g, ' . ')
+    .replace(/\b(dot|punkt)\b/g, ' . ')
+    .replace(/[#]+/g, ' ')
+    .replace(/[()[\]{};,]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
   const patterns = [
     /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/,
+    /\b[a-z0-9._%+-]+\s*@\s*[a-z0-9-]+(?:\s*\.\s*[a-z0-9-]+)+\b/i,
     /\b(?:\d[ -]*?){13,19}\b/,
     /\b[A-Z]{2}[0-9]{2}[A-Z0-9]{11,30}\b/,
     /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/i,
@@ -84,8 +109,36 @@ function detectPersonalInformation(text) {
     /\b(?:[a-z0-9-]+\.)+[a-z]{2,}(?:\/[^\s]*)?/i
   ];
 
-  if (patterns.some(pattern => pattern.test(text))) {
+  if (patterns.some(pattern => pattern.test(text) || pattern.test(normalizedObfuscatedText))) {
     return true;
+  }
+
+  const tokens = normalizedTokenText.split(' ').filter(Boolean);
+  const isLocalPart = (value) => /^[a-z0-9._%+-]{2,64}$/i.test(value);
+  const isDomainLabel = (value) => /^[a-z0-9-]{2,63}$/i.test(value);
+  const isTld = (value) => /^[a-z]{2,24}$/i.test(value) && commonTlds.has(value.toLowerCase());
+
+  for (let index = 1; index < tokens.length - 2; index += 1) {
+    const marker = tokens[index];
+    if (marker !== '@' && marker !== 'at' && marker !== 'ät') {
+      continue;
+    }
+    const localPart = tokens[index - 1];
+    const domain = tokens[index + 1];
+    if (!isLocalPart(localPart) || !isDomainLabel(domain)) {
+      continue;
+    }
+    let tldIndex = index + 2;
+    if (tokens[tldIndex] === '.' || tokens[tldIndex] === 'dot' || tokens[tldIndex] === 'punkt') {
+      tldIndex += 1;
+    }
+    const tld = tokens[tldIndex];
+    if (!tld) {
+      continue;
+    }
+    if (isTld(tld)) {
+      return true;
+    }
   }
 
   const phoneCandidates = String(text ?? '').match(/\+?[0-9][0-9()\s.-]{6,}[0-9]/g);
@@ -330,6 +383,69 @@ router.get('/get/boundingbox/:latMin/:lonMin/:latMax/:lonMax',
         res.status(200).json(response);
       }
     );
+  });
+
+router.post('/moderate/hashtags',
+  [
+    security.authenticate,
+    express.json({ type: 'application/json' })
+  ],
+  async function (req, res, next) {
+    const hashtags = parsePublicHashtags(req.body.hashtags);
+    if (!hashtags) {
+      return next(apiError.badRequest('invalid_hashtags'));
+    }
+
+    const moderationInput = formatHashtagsForModeration(hashtags);
+    const moderation = {};
+    let moderationDecision = 'approved';
+    let moderationScore = null;
+    let moderationFlagged = null;
+    let moderationReason = null;
+
+    moderation.patternMatch = detectPersonalInformation(moderationInput);
+    moderation.patternMatchAt = Date.now();
+
+    if (moderation.patternMatch) {
+      moderationDecision = 'rejected';
+      moderationReason = 'pattern';
+      moderationFlagged = true;
+    }
+
+    try {
+      if (!moderation.patternMatch) {
+        const moderationResult = await openai.moderations.create({
+          model: moderationModel,
+          input: moderationInput
+        });
+        moderationScore = extractModerationScore(moderationResult);
+        moderationFlagged = moderationResult?.results?.[0]?.flagged ?? false;
+        moderationDecision = decideModeration(moderationScore, moderationFlagged);
+        if (moderationDecision === 'rejected') {
+          moderationReason = 'ai';
+        }
+        moderation.aiModeration = JSON.stringify(moderationResult);
+        moderation.aiScore = moderationScore;
+        moderation.aiFlagged = moderationFlagged;
+        moderation.aiDecision = moderationDecision;
+        moderation.aiCheckedAt = Date.now();
+      }
+    } catch (err) {
+      const apiErr = apiError.internal('openai_failed');
+      apiErr.detail = err?.message || err;
+      return next(apiErr);
+    }
+
+    res.status(200).json({
+      status: 200,
+      moderation: {
+        decision: moderationDecision,
+        reason: moderationReason,
+        score: moderationScore,
+        flagged: moderationFlagged,
+        patternMatch: moderation.patternMatch ?? null
+      }
+    });
   });
 
 router.post('/create',

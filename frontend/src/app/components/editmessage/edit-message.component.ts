@@ -11,6 +11,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { firstValueFrom } from 'rxjs';
 import { Location } from '../../interfaces/location';
 import { Message } from '../../interfaces/message';
 import { Mode } from '../../interfaces/mode';
@@ -85,6 +86,7 @@ export class EditMessageComponent implements OnInit {
   showSaveHtml = false;
   hashtagInput = '';
   hashtagTags: string[] = [];
+  hashtagCheckInProgress = false;
 
   private readonly oriMessage: string | undefined = this.data.message.message;
   private readonly oriMultimedia: Multimedia | undefined = structuredClone(this.data.message.multimedia);
@@ -111,8 +113,11 @@ export class EditMessageComponent implements OnInit {
     }
   }
 
-  onApplyClick(): void {
-    if (!this.addHashtagsFromInput(true)) {
+  async onApplyClick(): Promise<void> {
+    if (!(await this.addHashtagsFromInput(true))) {
+      return;
+    }
+    if (!(await this.moderateHashtags(this.hashtagTags, true))) {
       return;
     }
     if (this.containsPrivateData(this.hashtagTags)) {
@@ -168,12 +173,19 @@ export class EditMessageComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  onHashtagEnter(event: Event): void {
+  async onHashtagEnter(event: Event): Promise<void> {
     event.preventDefault();
-    this.addHashtagsFromInput(true);
+    await this.addHashtagsFromInput(true);
   }
 
-  addHashtagsFromInput(showErrors = true): boolean {
+  async onAddHashtagClick(): Promise<void> {
+    await this.addHashtagsFromInput(true);
+  }
+
+  async addHashtagsFromInput(showErrors = true): Promise<boolean> {
+    if (this.hashtagCheckInProgress) {
+      return false;
+    }
     const candidate = this.hashtagInput.trim();
     if (!candidate) {
       return true;
@@ -209,6 +221,21 @@ export class EditMessageComponent implements OnInit {
           'warning'
         );
       }
+      return false;
+    }
+
+    if (this.containsPrivateData(merged.tags)) {
+      if (showErrors) {
+        this.showHashtagValidationError(
+          'common.message.moderationRejectedPattern',
+          'common.moderation.title',
+          'block'
+        );
+      }
+      return false;
+    }
+
+    if (!(await this.moderateHashtags(merged.tags, showErrors))) {
       return false;
     }
 
@@ -264,6 +291,38 @@ export class EditMessageComponent implements OnInit {
       disableClose: false,
       autoFocus: false
     });
+  }
+
+  private async moderateHashtags(tags: string[], showErrors = true): Promise<boolean> {
+    if ((tags ?? []).length === 0) {
+      return true;
+    }
+    this.hashtagCheckInProgress = true;
+    try {
+      const response = await firstValueFrom(this.messageService.moderatePublicHashtags(tags));
+      const decision = response?.moderation?.decision ?? 'approved';
+      if (decision === 'rejected') {
+        if (!showErrors) {
+          return false;
+        }
+        const reason = response?.moderation?.reason ?? null;
+        const key = reason === 'pattern'
+          ? 'common.message.moderationRejectedPattern'
+          : reason === 'ai'
+            ? 'common.message.moderationRejectedAi'
+            : 'common.message.moderationRejected';
+        this.showHashtagValidationError(key, 'common.moderation.title', 'block');
+        return false;
+      }
+      return true;
+    } catch {
+      if (showErrors) {
+        this.showHashtagValidationError('common.message.moderationFailed', 'common.moderation.title', 'warning');
+      }
+      return false;
+    } finally {
+      this.hashtagCheckInProgress = false;
+    }
   }
 
   public showPolicy() {

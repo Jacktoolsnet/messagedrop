@@ -58,7 +58,8 @@
                         [(ngModel)]="hashtagInput"
                         (keydown.enter)="onHashtagEnter($event)" />
                 </mat-chip-grid>
-                <button mat-icon-button matSuffix type="button" (click)="addHashtagsFromInput(true)"
+                <button mat-icon-button matSuffix type="button" (click)="onAddHashtagClick()"
+                    [disabled]="hashtagCheckInProgress"
                     [attr.aria-label]="'common.actions.apply' | transloco">
                     <mat-icon>add</mat-icon>
                 </button>
@@ -84,6 +85,6 @@
 
     @if (data.message.message !== '' || data.message.multimedia.type !== 'undefined') {
     <button [attr.aria-label]="'common.message.updateAria' | transloco" (click)="onApplyClick()"
-        mat-icon-button><mat-icon>send</mat-icon></button>
+        [disabled]="hashtagCheckInProgress" mat-icon-button><mat-icon>send</mat-icon></button>
     }
 </mat-dialog-actions>

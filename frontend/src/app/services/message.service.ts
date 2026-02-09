@@ -632,6 +632,15 @@ export class MessageService {
     );
   }
 
+  moderatePublicHashtags(tags: string[]): Observable<MessageCreateResponse> {
+    const normalized = normalizeHashtags(tags ?? [], MAX_PUBLIC_HASHTAGS).tags;
+    const url = `${environment.apiUrl}/message/moderate/hashtags`;
+    const body = { hashtags: normalized };
+    return this.http.post<MessageCreateResponse>(url, body, this.httpOptions).pipe(
+      catchError(this.handleError)
+    );
+  }
+
   navigateToMessageLocation(message: Message) {
     const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(message.location.plusCode)}`;
     window.open(url, '_blank');
@@ -787,8 +796,33 @@ export class MessageService {
   }
 
   detectPersonalInformation(text: string): boolean {
+    const commonTlds = new Set([
+      'com', 'org', 'net', 'edu', 'gov', 'mil', 'int', 'info', 'biz', 'name', 'pro', 'dev', 'app', 'io',
+      'de', 'at', 'ch', 'fr', 'es', 'it', 'pt', 'nl', 'be', 'lu', 'uk', 'ie',
+      'us', 'ca', 'au', 'nz', 'jp', 'kr', 'cn', 'in', 'br', 'mx', 'ar', 'cl', 'co',
+      'se', 'no', 'dk', 'fi', 'pl', 'cz', 'sk', 'hu', 'ro', 'bg', 'hr', 'si', 'gr', 'tr', 'ru', 'ua'
+    ]);
+    const normalizedTokenText = String(text ?? '')
+      .toLowerCase()
+      .replace(/[#]+/g, ' ')
+      .replace(/[()[\]{};,]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    const normalizedObfuscatedText = String(text ?? '')
+      .toLowerCase()
+      .replace(/[\(\[\{]\s*at\s*[\)\]\}]/g, ' @ ')
+      .replace(/\bat\b/g, ' @ ')
+      .replace(/[\(\[\{]\s*(dot|punkt)\s*[\)\]\}]/g, ' . ')
+      .replace(/\b(dot|punkt)\b/g, ' . ')
+      .replace(/[#]+/g, ' ')
+      .replace(/[()[\]{};,]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
     const patterns: RegExp[] = [
       /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/,
+      /\b[a-z0-9._%+-]+\s*@\s*[a-z0-9-]+(?:\s*\.\s*[a-z0-9-]+)+\b/i,
       /\b(?:\d[ -]*?){13,19}\b/,
       /\b[A-Z]{2}[0-9]{2}[A-Z0-9]{11,30}\b/,
       /\b(?:\d{1,3}\.){3}\d{1,3}\b/,
@@ -798,8 +832,36 @@ export class MessageService {
       /\b(?:[a-z0-9-]+\.)+[a-z]{2,}(?:\/[^\s]*)?/i
     ];
 
-    if (patterns.some((pattern) => pattern.test(text))) {
+    if (patterns.some((pattern) => pattern.test(text) || pattern.test(normalizedObfuscatedText))) {
       return true;
+    }
+
+    const tokens = normalizedTokenText.split(' ').filter(Boolean);
+    const isLocalPart = (value: string) => /^[a-z0-9._%+-]{2,64}$/i.test(value);
+    const isDomainLabel = (value: string) => /^[a-z0-9-]{2,63}$/i.test(value);
+    const isTld = (value: string) => /^[a-z]{2,24}$/i.test(value) && commonTlds.has(value.toLowerCase());
+
+    for (let index = 1; index < tokens.length - 2; index += 1) {
+      const marker = tokens[index];
+      if (marker !== '@' && marker !== 'at') {
+        continue;
+      }
+      const localPart = tokens[index - 1];
+      const domain = tokens[index + 1];
+      if (!isLocalPart(localPart) || !isDomainLabel(domain)) {
+        continue;
+      }
+      let tldIndex = index + 2;
+      if (tokens[tldIndex] === '.' || tokens[tldIndex] === 'dot' || tokens[tldIndex] === 'punkt') {
+        tldIndex += 1;
+      }
+      const tld = tokens[tldIndex];
+      if (!tld) {
+        continue;
+      }
+      if (isTld(tld)) {
+        return true;
+      }
     }
 
     const phoneCandidates = String(text ?? '').match(/\+?[0-9][0-9()\s.-]{6,}[0-9]/g);
