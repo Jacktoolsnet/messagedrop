@@ -811,6 +811,10 @@
         "title": "Choisir la position",
         "desc": "Cette fonction sélectionne la position du message via le sélecteur de lieu. Cette option est disponible uniquement pour les messages publics."
       },
+      "hashtags": {
+        "title": "Gérer les hashtags",
+        "desc": "Les hashtags publics sont modérés comme le texte du message (détection de motifs et contrôle de modération)."
+      },
       "remove": {
         "title": "Supprimer du contenu",
         "desc": "Cette fonction supprime le texte actuel ou le média sélectionné du message."

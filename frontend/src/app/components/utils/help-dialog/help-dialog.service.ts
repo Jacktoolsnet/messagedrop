@@ -1113,6 +1113,11 @@ const HELP_TOPICS = {
         descriptionKey: 'editMessage.items.location.desc'
       },
       {
+        icon: 'tag',
+        titleKey: 'editMessage.items.hashtags.title',
+        descriptionKey: 'editMessage.items.hashtags.desc'
+      },
+      {
         icon: 'delete',
         titleKey: 'editMessage.items.remove.title',
         descriptionKey: 'editMessage.items.remove.desc'

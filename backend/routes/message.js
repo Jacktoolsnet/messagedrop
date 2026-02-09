@@ -134,7 +134,9 @@ function extractModerationScore(moderation) {
   return 0;
 }
 
-function decideModeration(score) {
+function decideModeration(score, flagged) {
+  // If OpenAI already flags the content, reject it deterministically.
+  if (flagged === true) return 'rejected';
   if (score > 0.6) return 'rejected';
   if (score >= 0.4) return 'review';
   return 'approved';
@@ -389,7 +391,7 @@ router.post('/create',
           });
           moderationScore = extractModerationScore(moderationResult);
           moderationFlagged = moderationResult?.results?.[0]?.flagged ?? false;
-          moderationDecision = decideModeration(moderationScore);
+          moderationDecision = decideModeration(moderationScore, moderationFlagged);
           if (moderationDecision === 'rejected') {
             moderationReason = 'ai';
           }
@@ -581,7 +583,7 @@ router.post('/update',
           });
           moderationScore = extractModerationScore(moderationResult);
           moderationFlagged = moderationResult?.results?.[0]?.flagged ?? false;
-          moderationDecision = decideModeration(moderationScore);
+          moderationDecision = decideModeration(moderationScore, moderationFlagged);
           if (moderationDecision === 'rejected') {
             moderationReason = 'ai';
           }

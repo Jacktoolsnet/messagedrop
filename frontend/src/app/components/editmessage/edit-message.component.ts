@@ -22,6 +22,7 @@ import { SharedContentService } from '../../services/shared-content.service';
 import { StyleService } from '../../services/style.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
+import { MessageService } from '../../services/message.service';
 import { SelectMultimediaComponent } from '../multimedia/select-multimedia/select-multimedia.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
@@ -70,6 +71,7 @@ export class EditMessageComponent implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
   private readonly matDialog = inject(MatDialog);
   private readonly translation = inject(TranslationHelperService);
+  private readonly messageService = inject(MessageService);
   readonly help = inject(HelpDialogService);
   readonly dialogRef = inject(MatDialogRef<EditMessageComponent>);
   private readonly style = inject(StyleService);
@@ -113,9 +115,21 @@ export class EditMessageComponent implements OnInit {
     if (!this.addHashtagsFromInput(true)) {
       return;
     }
+    if (this.containsPrivateData(this.hashtagTags)) {
+      this.showHashtagValidationError(
+        'common.message.moderationRejectedPattern',
+        'common.moderation.title',
+        'block'
+      );
+      return;
+    }
     const hashtagParse = normalizeHashtags(this.hashtagTags, MAX_PUBLIC_HASHTAGS);
     if (hashtagParse.invalidTokens.length > 0 || hashtagParse.overflow > 0) {
-      this.showHashtagValidationError();
+      this.showHashtagValidationError(
+        hashtagParse.overflow > 0 ? 'common.hashtags.limitExceeded' : 'common.hashtags.invalidPublic',
+        'common.hashtags.label',
+        'warning'
+      );
       return;
     }
     this.data.message.hashtags = hashtagParse.tags;
@@ -164,10 +178,24 @@ export class EditMessageComponent implements OnInit {
     if (!candidate) {
       return true;
     }
+    if (this.containsPrivateData(candidate)) {
+      if (showErrors) {
+        this.showHashtagValidationError(
+          'common.message.moderationRejectedPattern',
+          'common.moderation.title',
+          'block'
+        );
+      }
+      return false;
+    }
     const parsed = normalizeHashtags(candidate, MAX_PUBLIC_HASHTAGS);
     if (parsed.invalidTokens.length > 0) {
       if (showErrors) {
-        this.showHashtagValidationError();
+        this.showHashtagValidationError(
+          'common.hashtags.invalidPublic',
+          'common.hashtags.label',
+          'warning'
+        );
       }
       return false;
     }
@@ -175,7 +203,11 @@ export class EditMessageComponent implements OnInit {
     const merged = normalizeHashtags([...this.hashtagTags, ...parsed.tags], MAX_PUBLIC_HASHTAGS);
     if (merged.overflow > 0) {
       if (showErrors) {
-        this.showHashtagValidationError();
+        this.showHashtagValidationError(
+          'common.hashtags.limitExceeded',
+          'common.hashtags.label',
+          'warning'
+        );
       }
       return false;
     }
@@ -197,17 +229,28 @@ export class EditMessageComponent implements OnInit {
     this.data.message.style = this.style.getRandomStyle();
   }
 
-  private showHashtagValidationError(): void {
+  private containsPrivateData(input: string[] | string): boolean {
+    const raw = Array.isArray(input)
+      ? input.map((tag) => `#${String(tag ?? '').trim()}`).join(' ')
+      : String(input ?? '').trim();
+    return this.messageService.detectPersonalInformation(raw);
+  }
+
+  private showHashtagValidationError(
+    messageKey: string,
+    titleKey = 'common.hashtags.label',
+    icon = 'warning'
+  ): void {
     const config: DisplayMessageConfig = {
       showAlways: true,
-      title: this.translation.t('common.hashtags.label'),
+      title: this.translation.t(titleKey),
       image: '',
-      icon: 'warning',
-      message: this.translation.t('common.hashtags.invalidPublic', { max: MAX_PUBLIC_HASHTAGS }),
-      button: this.translation.t('common.actions.ok'),
-      delay: 0,
+      icon,
+      message: this.translation.t(messageKey, { max: MAX_PUBLIC_HASHTAGS }),
+      button: '',
+      delay: 2000,
       showSpinner: false,
-      autoclose: false
+      autoclose: true
     };
 
     this.matDialog.open(DisplayMessage, {

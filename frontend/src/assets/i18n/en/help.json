@@ -811,6 +811,10 @@
         "title": "Choose location",
         "desc": "This action selects the message location using the location picker. This option is only available for public messages."
       },
+      "hashtags": {
+        "title": "Manage hashtags",
+        "desc": "Public hashtags are moderated like message text (pattern detection and moderation checks)."
+      },
       "remove": {
         "title": "Remove content",
         "desc": "This action removes current text or selected media from the message."

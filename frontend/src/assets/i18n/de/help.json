@@ -811,6 +811,10 @@
         "title": "Ort auswählen",
         "desc": "Mit dieser Funktion wählst du den Ort der Nachricht über den Location-Picker. Diese Option ist nur bei öffentlichen Nachrichten verfügbar."
       },
+      "hashtags": {
+        "title": "Hashtags verwalten",
+        "desc": "Öffentliche Hashtags werden wie Nachrichtentexte moderiert (Mustererkennung und Moderationsprüfung)."
+      },
       "remove": {
         "title": "Inhalt entfernen",
         "desc": "Mit dieser Funktion entfernst du den aktuellen Text oder das ausgewählte Medium aus der Nachricht."

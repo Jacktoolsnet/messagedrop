@@ -811,6 +811,10 @@
         "title": "Elegir ubicación",
         "desc": "Con esta función seleccionas la ubicación del mensaje mediante el selector de ubicación. Esta opción solo está disponible para mensajes públicos."
       },
+      "hashtags": {
+        "title": "Gestionar hashtags",
+        "desc": "Los hashtags públicos se moderan igual que el texto del mensaje (detección de patrones y revisión de moderación)."
+      },
       "remove": {
         "title": "Eliminar contenido",
         "desc": "Con esta función eliminas el texto actual o el contenido multimedia seleccionado del mensaje."
