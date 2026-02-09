@@ -61,6 +61,13 @@
                         <app-showmessage [message]="message.translatedMessage ?? message.message"
                             [style]="message.style"></app-showmessage>
                         }
+                        @if (message.hashtags?.length) {
+                        <div class="hashtag-chip-list" [attr.aria-label]="'common.hashtags.label' | transloco">
+                            @for (tag of message.hashtags; track tag) {
+                            <span class="hashtag-chip">#{{ tag }}</span>
+                            }
+                        </div>
+                        }
                     </div>
                 </mat-card-content>
 
@@ -217,6 +224,13 @@
                         @if (message.message) {
                         <app-showmessage [message]="message.translatedMessage ?? message.message"
                             [style]="message.style"></app-showmessage>
+                        }
+                        @if (message.hashtags?.length) {
+                        <div class="hashtag-chip-list" [attr.aria-label]="'common.hashtags.label' | transloco">
+                            @for (tag of message.hashtags; track tag) {
+                            <span class="hashtag-chip">#{{ tag }}</span>
+                            }
+                        </div>
                         }
                     </div>
                 </mat-card-content>
