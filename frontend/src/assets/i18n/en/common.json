@@ -99,7 +99,40 @@
       "weather": "Weather",
       "airQuality": "Air quality",
       "searchPlace": "Search a place",
-      "searchExperiences": "Search experiences"
+      "searchExperiences": "Search experiences",
+      "searchHashtags": "Search hashtags"
+    },
+    "hashtags": {
+      "label": "Hashtags",
+      "placeholder": "#travel #family #work",
+      "publicHint": "Only public topics. Up to {{ max }} hashtags, each 2-32 letters or numbers.",
+      "localHint": "Local tags for your own organization. Up to {{ max }} hashtags, each 2-32 letters or numbers.",
+      "invalidPublic": "Please use valid public hashtags (max {{ max }}, only letters, numbers, underscore).",
+      "invalidLocal": "Please use valid local hashtags (max {{ max }}, only letters, numbers, underscore).",
+      "invalidSearch": "Please enter exactly one valid hashtag (e.g. #travel).",
+      "editAction": "Edit hashtags",
+      "editExperienceTitle": "Edit hashtags for experience"
+    },
+    "hashtagSearch": {
+      "title": "Search hashtags",
+      "intro": "Search by one hashtag across public messages/comments and your local places, contacts, and experiences.",
+      "inputLabel": "Hashtag",
+      "placeholder": "#travel",
+      "inputHint": "Enter one hashtag. Example: #travel",
+      "scopeAll": "All",
+      "scopeLocal": "Local",
+      "scopePublic": "Public",
+      "searchAction": "Search hashtag",
+      "searching": "Searching hashtags...",
+      "noResults": "No entries found for this hashtag.",
+      "publicFailed": "Public hashtag search is currently unavailable.",
+      "sections": {
+        "places": "Places",
+        "contacts": "Contacts",
+        "experiences": "Experiences",
+        "publicMessages": "Public messages",
+        "comments": "Comments"
+      }
     },
     "meta": {
       "title": "MessageDrop - Explore Places & News",

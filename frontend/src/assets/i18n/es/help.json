@@ -428,7 +428,7 @@
       },
       "searchMenu": {
         "title": "Menú de búsqueda",
-        "desc": "Con el botón de búsqueda abres las búsquedas de lugares y experiencias."
+        "desc": "Con el botón de búsqueda abres las búsquedas de lugares, experiencias y hashtags."
       },
       "searchPlace": {
         "title": "Buscar un lugar",
@@ -437,6 +437,10 @@
       "searchExperiences": {
         "title": "Buscar experiencias",
         "desc": "Inicia la búsqueda de experiencias y muestra ofertas relacionadas."
+      },
+      "searchHashtags": {
+        "title": "Buscar hashtags",
+        "desc": "Busca un hashtag en mensajes/comentarios públicos y en lugares, contactos y experiencias locales."
       },
       "zoom": {
         "title": "Zoom del mapa",
@@ -2289,6 +2293,36 @@
       "privacy": {
         "title": "Privacidad y procesamiento",
         "desc": "La búsqueda de GIF envía solicitudes a Tenor/Google. La app solo guarda datos de referencia del GIF seleccionado (por ejemplo URL, fuente, título); en este paso no se envía a Tenor el texto privado de notas o mensajes."
+      }
+    }
+  },
+  "hashtagSearch": {
+    "title": "Búsqueda por hashtag",
+    "intro": "Busca por un hashtag y abre coincidencias de fuentes públicas y locales.",
+    "items": {
+      "input": {
+        "title": "Introducir hashtag",
+        "desc": "Introduce exactamente un hashtag (por ejemplo #viaje)."
+      },
+      "scope": {
+        "title": "Elegir alcance",
+        "desc": "Cambia entre todos los resultados, solo locales o solo públicos."
+      },
+      "search": {
+        "title": "Iniciar búsqueda",
+        "desc": "Usa la acción de búsqueda para ejecutar o actualizar la consulta por hashtag."
+      },
+      "result": {
+        "title": "Abrir resultado",
+        "desc": "Toca una fila de resultado para abrir el mensaje, lugar, contacto o lista de experiencias correspondiente."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Abre esta vista de ayuda."
+      },
+      "privacy": {
+        "title": "Privacidad y procesamiento",
+        "desc": "Las consultas públicas por hashtag se envían al backend solo para mensajes/comentarios públicos. Los resultados locales se buscan completamente en el dispositivo, en el almacenamiento de la app."
       }
     }
   },

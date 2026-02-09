@@ -99,7 +99,40 @@
       "weather": "Wetter",
       "airQuality": "Luftqualität",
       "searchPlace": "Ort suchen",
-      "searchExperiences": "Erlebnisse suchen"
+      "searchExperiences": "Erlebnisse suchen",
+      "searchHashtags": "Hashtags suchen"
+    },
+    "hashtags": {
+      "label": "Hashtags",
+      "placeholder": "#reise #familie #arbeit",
+      "publicHint": "Nur öffentliche Themen. Bis zu {{ max }} Hashtags, jeweils 2-32 Zeichen (Buchstaben/Zahlen).",
+      "localHint": "Lokale Tags für deine eigene Organisation. Bis zu {{ max }} Hashtags, jeweils 2-32 Zeichen (Buchstaben/Zahlen).",
+      "invalidPublic": "Bitte gültige öffentliche Hashtags verwenden (max {{ max }}, nur Buchstaben, Zahlen, Unterstrich).",
+      "invalidLocal": "Bitte gültige lokale Hashtags verwenden (max {{ max }}, nur Buchstaben, Zahlen, Unterstrich).",
+      "invalidSearch": "Bitte genau einen gültigen Hashtag eingeben (z. B. #reise).",
+      "editAction": "Hashtags bearbeiten",
+      "editExperienceTitle": "Hashtags für Erlebnis bearbeiten"
+    },
+    "hashtagSearch": {
+      "title": "Hashtags suchen",
+      "intro": "Suche mit einem Hashtag über öffentliche Nachrichten/Kommentare und deine lokalen Orte, Kontakte und Erlebnisse.",
+      "inputLabel": "Hashtag",
+      "placeholder": "#reise",
+      "inputHint": "Einen Hashtag eingeben. Beispiel: #reise",
+      "scopeAll": "Alle",
+      "scopeLocal": "Lokal",
+      "scopePublic": "Öffentlich",
+      "searchAction": "Hashtag suchen",
+      "searching": "Hashtags werden gesucht...",
+      "noResults": "Keine Einträge für diesen Hashtag gefunden.",
+      "publicFailed": "Öffentliche Hashtag-Suche ist aktuell nicht verfügbar.",
+      "sections": {
+        "places": "Orte",
+        "contacts": "Kontakte",
+        "experiences": "Erlebnisse",
+        "publicMessages": "Öffentliche Nachrichten",
+        "comments": "Kommentare"
+      }
     },
     "meta": {
       "title": "MessageDrop - Orte und Nachrichten entdecken",

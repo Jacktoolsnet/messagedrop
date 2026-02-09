@@ -428,7 +428,7 @@
       },
       "searchMenu": {
         "title": "Menu de recherche",
-        "desc": "Le bouton recherche ouvre les recherches de lieux et d'expériences."
+        "desc": "Le bouton de recherche ouvre les recherches de lieux, d'expériences et de hashtags."
       },
       "searchPlace": {
         "title": "Rechercher un lieu",
@@ -437,6 +437,10 @@
       "searchExperiences": {
         "title": "Rechercher des expériences",
         "desc": "Lance la recherche d'expériences et affiche les offres correspondantes."
+      },
+      "searchHashtags": {
+        "title": "Rechercher des hashtags",
+        "desc": "Recherche un hashtag dans les messages/commentaires publics ainsi que dans les lieux, contacts et expériences locaux."
       },
       "zoom": {
         "title": "Zoom de la carte",
@@ -2289,6 +2293,36 @@
       "privacy": {
         "title": "Confidentialité et traitement",
         "desc": "La recherche GIF envoie des requêtes à Tenor/Google. L'application stocke uniquement les données de référence du GIF sélectionné (par exemple URL, source, titre) ; le texte privé des notes ou messages n'est pas transmis à Tenor à cette étape."
+      }
+    }
+  },
+  "hashtagSearch": {
+    "title": "Recherche par hashtag",
+    "intro": "Recherchez un hashtag et ouvrez les résultats correspondants provenant de sources publiques et locales.",
+    "items": {
+      "input": {
+        "title": "Saisir un hashtag",
+        "desc": "Saisissez exactement un hashtag (par exemple #voyage)."
+      },
+      "scope": {
+        "title": "Choisir la portée",
+        "desc": "Basculez entre tous les résultats, uniquement locaux ou uniquement publics."
+      },
+      "search": {
+        "title": "Lancer la recherche",
+        "desc": "Utilisez l'action de recherche pour exécuter ou actualiser la requête de hashtag."
+      },
+      "result": {
+        "title": "Ouvrir un résultat",
+        "desc": "Touchez une ligne de résultat pour ouvrir le message, le lieu, le contact ou la liste d'expériences associée."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Ouvre cette vue d'aide."
+      },
+      "privacy": {
+        "title": "Confidentialité et traitement",
+        "desc": "Les requêtes publiques par hashtag sont envoyées au backend uniquement pour les messages/commentaires publics. Les résultats locaux sont recherchés entièrement sur l'appareil, dans le stockage de l'application."
       }
     }
   },

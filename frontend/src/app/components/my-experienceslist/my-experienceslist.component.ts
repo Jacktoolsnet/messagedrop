@@ -21,6 +21,8 @@ import { DisplayMessageConfig } from '../../interfaces/display-message-config';
 import { DisplayMessage } from '../utils/display-message/display-message.component';
 import { UserService } from '../../services/user.service';
 import { MyExperienceSortDialogComponent } from './my-experience-sort-dialog/my-experience-sort-dialog.component';
+import { HashtagEditDialogComponent, HashtagEditDialogResult } from '../utils/hashtag-edit-dialog/hashtag-edit-dialog.component';
+import { stringifyHashtags } from '../../utils/hashtag.util';
 
 @Component({
   selector: 'app-my-experienceslist',
@@ -119,6 +121,40 @@ export class MyExperienceslistComponent implements OnInit {
     if (result.productUrl) {
       window.open(result.productUrl, '_blank');
     }
+  }
+
+  getHashtagLabel(tags: string[] | undefined): string {
+    return stringifyHashtags(tags ?? []);
+  }
+
+  editBookmarkHashtags(productCode: string, event?: Event): void {
+    event?.stopPropagation();
+    const bookmark = this.visibleBookmarks().find((item) => item.productCode === productCode);
+    if (!bookmark) {
+      return;
+    }
+    const dialogRef = this.dialog.open(HashtagEditDialogComponent, {
+      data: {
+        titleKey: 'common.hashtags.editExperienceTitle',
+        mode: 'local',
+        initialTags: bookmark.hashtags ?? [],
+        helpKey: 'hashtagSearch'
+      },
+      closeOnNavigation: true,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false,
+      maxWidth: '90vw',
+      maxHeight: '90vh'
+    });
+
+    dialogRef.afterClosed().subscribe((result?: HashtagEditDialogResult) => {
+      if (!result) {
+        return;
+      }
+      void this.bookmarkService.saveHashtags(productCode, result.hashtags);
+    });
   }
 
   openSortDialog(): void {

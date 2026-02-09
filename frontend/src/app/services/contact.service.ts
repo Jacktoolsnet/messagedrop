@@ -115,6 +115,7 @@ export class ContactService {
       pinned: false,
       hint: raw.hint ?? '',
       name: this.sanitizeContactName(raw.name),
+      hashtags: [],
       base64Avatar: raw.base64Avatar ?? '',
       provided: raw.provided ?? false,
       lastMessageFrom: raw.lastMessageFrom ?? '',
@@ -179,6 +180,7 @@ export class ContactService {
         ? (await this.avatarStorage.getImageUrl(contact.chatBackgroundFileId)) || ''
         : '';
       contact.chatBackgroundTransparency = profile?.chatBackgroundTransparency ?? contact.chatBackgroundTransparency;
+      contact.hashtags = profile?.hashtags ?? contact.hashtags ?? [];
       contact.pinned = profile?.pinned || false;
       contact.sortOrder = profile?.sortOrder ?? contact.sortOrder;
       const tileSettings = await this.indexedDbService.getTileSettings(contact.id);
@@ -201,6 +203,7 @@ export class ContactService {
         chatBackgroundOriginalFileId: contact.chatBackgroundOriginalFileId,
         chatBackgroundAttribution: contact.chatBackgroundAttribution,
         chatBackgroundTransparency: contact.chatBackgroundTransparency ?? 40,
+        hashtags: [...(contact.hashtags ?? [])],
         pinned: contact.pinned,
         sortOrder: contact.sortOrder
       });

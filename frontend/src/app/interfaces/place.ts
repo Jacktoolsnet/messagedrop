@@ -11,6 +11,7 @@ export interface Place {
     userId: string,
     location: Location,
     name: string,
+    hashtags?: string[],
     base64Avatar: string
     avatarFileId?: string,
     avatarOriginalFileId?: string,

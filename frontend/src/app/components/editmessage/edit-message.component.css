@@ -36,6 +36,10 @@
     justify-self: stretch;
 }
 
+.full-width {
+    width: 100%;
+}
+
 /* Ab mittleren Bildschirmen zwei Spalten */
 @media (min-width: 800px) {
     .content {

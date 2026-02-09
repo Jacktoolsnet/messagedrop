@@ -323,6 +323,7 @@ export class PlacelistComponent {
       id: '',
       userId: this.userService.getUser().id,
       name: '',
+      hashtags: [],
       location: resolvedLocation,
       base64Avatar: '',
       placeBackgroundImage: '',

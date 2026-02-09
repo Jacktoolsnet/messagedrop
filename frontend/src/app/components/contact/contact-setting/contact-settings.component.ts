@@ -23,6 +23,7 @@ import { AvatarSourceChoice, AvatarSourceDialogComponent } from '../../utils/ava
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 import { UnsplashComponent } from '../../utils/unsplash/unsplash.component';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
+import { MAX_LOCAL_HASHTAGS, normalizeHashtags, stringifyHashtags } from '../../../utils/hashtag.util';
 
 @Component({
   selector: 'app-profile',
@@ -68,11 +69,13 @@ export class ContactSettingsComponent {
   private readonly originalBackgroundFileId = this.oriContact.chatBackgroundFileId;
   private readonly originalAvatarOriginalFileId = this.oriContact.avatarOriginalFileId;
   private readonly originalBackgroundOriginalFileId = this.oriContact.chatBackgroundOriginalFileId;
+  hashtagInput = '';
 
   constructor() {
     if (this.contact.chatBackgroundTransparency == null) {
       this.contact.chatBackgroundTransparency = 40;
     }
+    this.hashtagInput = stringifyHashtags(this.contact.hashtags ?? []);
   }
 
   openAvatarSourceDialog(fileInput: HTMLInputElement): void {
@@ -587,6 +590,9 @@ export class ContactSettingsComponent {
   }
 
   async onApplyClick() {
+    if (!this.applyHashtags()) {
+      return;
+    }
     if (this.originalAvatarFileId && this.originalAvatarFileId !== this.contact.avatarFileId) {
       await this.avatarStorage.deleteImage(this.originalAvatarFileId);
     }
@@ -600,5 +606,20 @@ export class ContactSettingsComponent {
       await this.avatarStorage.deleteImage(this.originalBackgroundOriginalFileId);
     }
     this.dialogRef.close();
+  }
+
+  private applyHashtags(): boolean {
+    const parsed = normalizeHashtags(this.hashtagInput, MAX_LOCAL_HASHTAGS);
+    if (parsed.invalidTokens.length > 0 || parsed.overflow > 0) {
+      this.snackBar.open(
+        this.translation.t('common.hashtags.invalidLocal', { max: MAX_LOCAL_HASHTAGS }),
+        this.translation.t('common.actions.ok'),
+        { duration: 2500 }
+      );
+      return false;
+    }
+    this.contact.hashtags = parsed.tags;
+    this.hashtagInput = stringifyHashtags(parsed.tags);
+    return true;
   }
 }

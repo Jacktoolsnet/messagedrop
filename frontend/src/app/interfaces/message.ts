@@ -14,6 +14,7 @@ export interface Message {
     translatedMessage?: string,
     markerType: string,
     style: string,
+    hashtags?: string[],
     views: number,
     likes: number,
     dislikes: number,

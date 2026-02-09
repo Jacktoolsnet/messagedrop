@@ -12,6 +12,13 @@ const OpenAI = require('openai');
 const { signServiceJwt } = require('../utils/serviceJwt');
 const { apiError } = require('../middleware/api-error');
 const { resolveBaseUrl } = require('../utils/adminLogForwarder');
+const {
+  MAX_PUBLIC_HASHTAGS,
+  normalizeHashtags,
+  encodeHashtags,
+  decodeHashtags,
+  formatHashtagsForModeration
+} = require('../utils/hashtags');
 
 function getAuthUserId(req) {
   return req.jwtUser?.userId ?? req.jwtUser?.id ?? null;
@@ -133,6 +140,14 @@ function decideModeration(score) {
   return 'approved';
 }
 
+function parsePublicHashtags(input) {
+  const parsed = normalizeHashtags(input, { max: MAX_PUBLIC_HASHTAGS });
+  if (parsed.invalidTokens.length > 0 || parsed.overflow > 0) {
+    return null;
+  }
+  return parsed.tags;
+}
+
 async function forwardModerationRequest(payload, logger) {
   const baseUrl = resolveBaseUrl(process.env.ADMIN_BASE_URL, process.env.ADMIN_PORT);
   if (!baseUrl) {
@@ -235,6 +250,19 @@ router.get('/get/comment/:parentUuid', function (req, res, next) {
   });
 });
 
+router.get('/get/hashtag/:tag', function (req, res, next) {
+  const tags = parsePublicHashtags([req.params.tag]);
+  if (!tags || tags.length === 0) {
+    return next(apiError.badRequest('invalid_hashtags'));
+  }
+  tableMessage.getByHashtag(req.database.db, tags[0], function (err, rows) {
+    if (err) {
+      return next(apiError.internal('db_error'));
+    }
+    res.status(200).json({ status: 200, rows: rows || [] });
+  });
+});
+
 router.get('/get/pluscode/:plusCode', function (req, res, next) {
   let response = { 'status': 0, 'rows': [] };
   // It is not allowed to get all messages with this route.
@@ -319,6 +347,12 @@ router.post('/create',
     }
     const rawMessage = String(req.body.message ?? '');
     const sanitizedMessage = sanitizeSingleQuotes(rawMessage);
+    const hashtags = parsePublicHashtags(req.body.hashtags);
+    if (!hashtags) {
+      return next(apiError.badRequest('invalid_hashtags'));
+    }
+    const encodedHashtags = encodeHashtags(hashtags);
+    const moderationInput = [rawMessage, formatHashtagsForModeration(hashtags)].filter(Boolean).join(' ').trim();
     const moderation = {};
     let status = tableMessage.messageStatus.ENABLED;
     let moderationDecision = null;
@@ -334,7 +368,7 @@ router.post('/create',
     ].includes(req.body.messageTyp);
 
     if (requiresModeration) {
-      const patternMatch = detectPersonalInformation(rawMessage);
+      const patternMatch = detectPersonalInformation(moderationInput);
       const patternMatchAt = Date.now();
       moderation.patternMatch = patternMatch;
       moderation.patternMatchAt = patternMatchAt;
@@ -351,7 +385,7 @@ router.post('/create',
         if (!patternMatch) {
           const moderationResult = await openai.moderations.create({
             model: moderationModel,
-            input: rawMessage
+            input: moderationInput
           });
           moderationScore = extractModerationScore(moderationResult);
           moderationFlagged = moderationResult?.results?.[0]?.flagged ?? false;
@@ -389,7 +423,7 @@ router.post('/create',
         req.body.style,
         req.body.messageUserId,
         sanitizeSingleQuotes(req.body.multimedia),
-        { status, moderation },
+        { status, moderation, hashtags: encodedHashtags },
         function (err, result) {
           if (err) {
             return reject(err);
@@ -419,6 +453,7 @@ router.post('/create',
         plusCode: req.body.plusCode,
         markerType: req.body.markerType,
         style: req.body.style,
+        hashtags,
         aiScore: moderationScore,
         aiFlagged: moderationFlagged,
         aiDecision: moderationDecision,
@@ -483,6 +518,16 @@ router.post('/update',
       const plusCode = typeof req.body.plusCode === 'string' && req.body.plusCode.trim()
         ? req.body.plusCode.trim()
         : row.plusCode;
+      const existingHashtags = decodeHashtags(row.hashtags);
+      const parsedHashtags = req.body.hashtags === undefined
+        ? { tags: existingHashtags, invalidTokens: [], overflow: 0 }
+        : normalizeHashtags(req.body.hashtags, { max: MAX_PUBLIC_HASHTAGS });
+      if (parsedHashtags.invalidTokens.length > 0 || parsedHashtags.overflow > 0) {
+        return next(apiError.badRequest('invalid_hashtags'));
+      }
+      const hashtags = parsedHashtags.tags;
+      const encodedHashtags = encodeHashtags(hashtags);
+      const moderationInput = [rawMessage, formatHashtagsForModeration(hashtags)].filter(Boolean).join(' ').trim();
       const requiresModeration = [
         tableMessage.messageType.PUBLIC,
         tableMessage.messageType.COMMENT
@@ -498,6 +543,7 @@ router.post('/update',
           latitude,
           longitude,
           plusCode,
+          encodedHashtags,
           function (err) {
             if (err) {
               return next(apiError.internal('db_error'));
@@ -516,7 +562,7 @@ router.post('/update',
       let moderationRequestSent = false;
       let moderationRequestId = null;
 
-      moderation.patternMatch = detectPersonalInformation(rawMessage);
+      moderation.patternMatch = detectPersonalInformation(moderationInput);
       moderation.patternMatchAt = Date.now();
 
       if (moderation.patternMatch) {
@@ -531,7 +577,7 @@ router.post('/update',
         if (!moderation.patternMatch) {
           const moderationResult = await openai.moderations.create({
             model: moderationModel,
-            input: rawMessage
+            input: moderationInput
           });
           moderationScore = extractModerationScore(moderationResult);
           moderationFlagged = moderationResult?.results?.[0]?.flagged ?? false;
@@ -563,6 +609,7 @@ router.post('/update',
         latitude,
         longitude,
         plusCode,
+        encodedHashtags,
         moderation,
         status,
         async function (err) {
@@ -583,6 +630,7 @@ router.post('/update',
               plusCode: row.plusCode,
               markerType: row.markerType,
               style: req.body.style,
+              hashtags,
               aiScore: moderationScore,
               aiFlagged: moderationFlagged,
               aiDecision: moderationDecision,

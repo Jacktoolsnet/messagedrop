@@ -27,6 +27,7 @@ export class ExperienceBookmarkService {
     const bookmark: ExperienceBookmark = {
       productCode,
       snapshot,
+      hashtags: existing?.hashtags ?? [],
       lastUpdatedAt,
       sortOrder: existing?.sortOrder ?? (hasManualSort ? this.getNextSortOrder(currentBookmarks) : undefined)
     };
@@ -40,6 +41,7 @@ export class ExperienceBookmarkService {
     const next: ExperienceBookmark = {
       productCode,
       snapshot,
+      hashtags: existing?.hashtags ?? [],
       lastUpdatedAt: lastUpdatedAt ?? existing?.lastUpdatedAt ?? Date.now(),
       sortOrder: existing?.sortOrder
     };
@@ -49,6 +51,22 @@ export class ExperienceBookmarkService {
 
   async removeBookmark(productCode: string): Promise<void> {
     await this.indexedDb.deleteExperienceBookmark(productCode);
+    await this.loadBookmarks();
+  }
+
+  async saveHashtags(productCode: string, hashtags: string[]): Promise<void> {
+    if (!productCode) {
+      return;
+    }
+    const existing = await this.indexedDb.getExperienceBookmark(productCode);
+    if (!existing) {
+      return;
+    }
+    const next: ExperienceBookmark = {
+      ...existing,
+      hashtags: [...hashtags]
+    };
+    await this.indexedDb.setExperienceBookmark(next);
     await this.loadBookmarks();
   }
 

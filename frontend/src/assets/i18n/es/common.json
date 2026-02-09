@@ -99,7 +99,40 @@
       "weather": "Tiempo",
       "airQuality": "Calidad del aire",
       "searchPlace": "Buscar un lugar",
-      "searchExperiences": "Buscar experiencias"
+      "searchExperiences": "Buscar experiencias",
+      "searchHashtags": "Buscar hashtags"
+    },
+    "hashtags": {
+      "label": "Hashtags",
+      "placeholder": "#viaje #familia #trabajo",
+      "publicHint": "Solo temas públicos. Hasta {{ max }} hashtags, cada uno con 2-32 letras o números.",
+      "localHint": "Etiquetas locales para tu propia organización. Hasta {{ max }} hashtags, cada uno con 2-32 letras o números.",
+      "invalidPublic": "Usa hashtags públicos válidos (máx. {{ max }}, solo letras, números y guion bajo).",
+      "invalidLocal": "Usa hashtags locales válidos (máx. {{ max }}, solo letras, números y guion bajo).",
+      "invalidSearch": "Introduce exactamente un hashtag válido (p. ej. #viaje).",
+      "editAction": "Editar hashtags",
+      "editExperienceTitle": "Editar hashtags de la experiencia"
+    },
+    "hashtagSearch": {
+      "title": "Buscar hashtags",
+      "intro": "Busca por un hashtag en mensajes/comentarios públicos y en tus lugares, contactos y experiencias locales.",
+      "inputLabel": "Hashtag",
+      "placeholder": "#viaje",
+      "inputHint": "Introduce un hashtag. Ejemplo: #viaje",
+      "scopeAll": "Todo",
+      "scopeLocal": "Local",
+      "scopePublic": "Público",
+      "searchAction": "Buscar hashtag",
+      "searching": "Buscando hashtags...",
+      "noResults": "No se encontraron entradas para este hashtag.",
+      "publicFailed": "La búsqueda pública de hashtags no está disponible en este momento.",
+      "sections": {
+        "places": "Lugares",
+        "contacts": "Contactos",
+        "experiences": "Experiencias",
+        "publicMessages": "Mensajes públicos",
+        "comments": "Comentarios"
+      }
     },
     "meta": {
       "title": "MessageDrop - Explora lugares y noticias",

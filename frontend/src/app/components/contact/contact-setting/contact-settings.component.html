@@ -8,6 +8,12 @@
     <input matInput maxlength="64" [(ngModel)]="contact.name" />
   </mat-form-field>
 
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>{{ 'common.hashtags.label' | transloco }}</mat-label>
+    <input matInput [placeholder]="'common.hashtags.placeholder' | transloco" [(ngModel)]="hashtagInput" />
+    <mat-hint>{{ 'common.hashtags.localHint' | transloco : { max: 12 } }}</mat-hint>
+  </mat-form-field>
+
   <input type="file" id="avatar" name="avatar" accept="image/png, image/jpeg" class="file-input"
     (change)="onFileSelected($event)" #fileUpload />
 

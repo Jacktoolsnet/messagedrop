@@ -13,6 +13,7 @@ export interface RawMessage {
     translatedMessage?: string,
     markerType: string,
     style: string,
+    hashtags?: string | string[] | null,
     views: number,
     likes: number,
     dislikes: number,

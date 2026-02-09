@@ -17,6 +17,11 @@ import { GeolocationService } from './geolocation.service';
 import { MapService } from './map.service';
 import { NetworkService } from './network.service';
 import { TranslationHelperService } from './translation-helper.service';
+import {
+  MAX_PUBLIC_HASHTAGS,
+  normalizeHashtags,
+  parseHashtagStorageValue
+} from '../utils/hashtag.util';
 
 @Injectable({
   providedIn: 'root'
@@ -250,6 +255,7 @@ export class MessageService {
       message: raw.message,
       markerType: raw.markerType,
       style: raw.style,
+      hashtags: parseHashtagStorageValue(raw.hashtags),
       views: raw.views,
       likes: raw.likes,
       dislikes: raw.dislikes,
@@ -296,6 +302,7 @@ export class MessageService {
       message: message.message,
       markerType: message.markerType,
       style: message.style,
+      hashtags: normalizeHashtags(message.hashtags ?? [], MAX_PUBLIC_HASHTAGS).tags,
       messageUserId: user.id,
       multimedia: JSON.stringify(message.multimedia)
     };
@@ -355,6 +362,7 @@ export class MessageService {
       message: message.message,
       markerType: message.markerType,
       style: message.style,
+      hashtags: normalizeHashtags(message.hashtags ?? [], MAX_PUBLIC_HASHTAGS).tags,
       messageUserId: user.id,
       multimedia: JSON.stringify(message.multimedia)
     };
@@ -431,6 +439,7 @@ export class MessageService {
       'id': messageIdentifier,
       'message': message.message,
       'style': message.style,
+      'hashtags': normalizeHashtags(message.hashtags ?? [], MAX_PUBLIC_HASHTAGS).tags,
       'multimedia': JSON.stringify(message.multimedia),
       'latitude': message.location?.latitude,
       'longitude': message.location?.longitude,
@@ -599,6 +608,28 @@ export class MessageService {
       .pipe(
         catchError(this.handleError)
       );
+  }
+
+  searchByHashtag(tag: string, showAlways = false): Observable<GetMessageResponse> {
+    const normalized = normalizeHashtags([tag], 1).tags[0];
+    const encoded = encodeURIComponent(normalized ?? '');
+    const url = `${environment.apiUrl}/message/get/hashtag/${encoded}`;
+
+    this.networkService.setNetworkMessageConfig(url, {
+      showAlways,
+      title: this.i18n.t('common.hashtagSearch.title'),
+      image: '',
+      icon: '',
+      message: this.i18n.t('common.hashtagSearch.searching'),
+      button: '',
+      delay: 0,
+      showSpinner: true,
+      autoclose: false
+    });
+
+    return this.http.get<GetMessageResponse>(url, this.httpOptions).pipe(
+      catchError(this.handleError)
+    );
   }
 
   navigateToMessageLocation(message: Message) {

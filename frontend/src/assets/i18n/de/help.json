@@ -428,7 +428,7 @@
       },
       "searchMenu": {
         "title": "Suchmenü",
-        "desc": "Über den Such-Button öffnest du das Menü für Ort- und Erlebnissuche."
+        "desc": "Über den Such-Button öffnest du das Menü für Ort-, Erlebnis- und Hashtag-Suche."
       },
       "searchPlace": {
         "title": "Ort suchen",
@@ -437,6 +437,10 @@
       "searchExperiences": {
         "title": "Erlebnisse suchen",
         "desc": "Startet die Erlebnissuche und zeigt passende Angebote."
+      },
+      "searchHashtags": {
+        "title": "Hashtags suchen",
+        "desc": "Sucht einen Hashtag über öffentliche Nachrichten/Kommentare sowie lokale Orte, Kontakte und Erlebnisse."
       },
       "zoom": {
         "title": "Karten-Zoom",
@@ -2289,6 +2293,36 @@
       "privacy": {
         "title": "Datenschutz und Verarbeitung",
         "desc": "Bei der GIF-Suche werden Anfragen an Tenor/Google gesendet. In der App wird nur das von dir ausgewählte GIF als Referenzdaten (z. B. URL, Quelle, Titel) gespeichert; private Notiz- oder Nachrichtentexte werden dadurch nicht an Tenor übertragen."
+      }
+    }
+  },
+  "hashtagSearch": {
+    "title": "Hashtag-Suche",
+    "intro": "Suche mit einem Hashtag und öffne passende Treffer aus öffentlichen und lokalen Quellen.",
+    "items": {
+      "input": {
+        "title": "Hashtag eingeben",
+        "desc": "Gib genau einen Hashtag ein (z. B. #reise)."
+      },
+      "scope": {
+        "title": "Suchbereich wählen",
+        "desc": "Wechsle zwischen allen, nur lokalen oder nur öffentlichen Treffern."
+      },
+      "search": {
+        "title": "Suche starten",
+        "desc": "Mit der Suchaktion führst du die Hashtag-Suche aus oder aktualisierst sie."
+      },
+      "result": {
+        "title": "Treffer öffnen",
+        "desc": "Tippe auf einen Treffer, um die zugehörige Nachricht, den Ort, Kontakt oder die Erlebnisliste zu öffnen."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Öffnet diese Hilfeansicht."
+      },
+      "privacy": {
+        "title": "Datenschutz und Verarbeitung",
+        "desc": "Für öffentliche Hashtag-Suche werden nur Anfragen zu öffentlichen Nachrichten/Kommentaren ans Backend gesendet. Lokale Treffer werden komplett auf dem Gerät im App-Speicher gesucht."
       }
     }
   },

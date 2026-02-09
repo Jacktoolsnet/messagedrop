@@ -30,6 +30,7 @@ const columnLikes = 'likes'; // Each like add on day to the lifetime of the mess
 const columnDislikes = 'dislikes'; // Each dislike reduce the liftime of the message by one day.
 const columnCommentsNumber = 'commentsNumber';
 const columnStatus = 'status';
+const columnHashtags = 'hashtags';
 const columnUserId = 'userId';
 const columnMultimedia = 'multimedia';
 const columnDsaStatusToken = 'dsaStatusToken';
@@ -67,6 +68,7 @@ const init = function (db) {
             ${columnDislikes} INTEGER NOT NULL DEFAULT 0,
             ${columnCommentsNumber} INTEGER NOT NULL DEFAULT 0,
             ${columnStatus} TEXT NOT NULL DEFAULT '${messageStatus.ENABLED}',
+            ${columnHashtags} TEXT DEFAULT '',
             ${columnUserId} TEXT NOT NULL,
             ${columnMultimedia} TEXT DEFAULT NULL,
             ${columnDsaStatusToken} TEXT DEFAULT NULL,
@@ -117,6 +119,7 @@ const init = function (db) {
             addColumn(columnManualModerationReason, 'TEXT DEFAULT NULL');
             addColumn(columnManualModerationAt, 'INTEGER DEFAULT NULL');
             addColumn(columnManualModerationBy, 'TEXT DEFAULT NULL');
+            addColumn(columnHashtags, "TEXT DEFAULT ''");
         });
     } catch (error) {
         throw error;
@@ -144,6 +147,7 @@ const create = function (db, uuid, parentUuid, messageTyp, latitude, longitude, 
             : (moderation.patternMatch ? 1 : 0);
         const patternMatchAt = Number.isFinite(moderation.patternMatchAt) ? moderation.patternMatchAt : null;
         const status = opts.status || messageStatus.ENABLED;
+        const hashtags = typeof opts.hashtags === 'string' ? opts.hashtags : '';
 
         const insertSql = `
       INSERT INTO ${tableName} (
@@ -160,6 +164,7 @@ const create = function (db, uuid, parentUuid, messageTyp, latitude, longitude, 
         ${columnStyle},
         ${columnUserId},
         ${columnMultimedia},
+        ${columnHashtags},
         ${columnDsaStatusToken},
         ${columnDsaStatusTokenCreatedAt},
         ${columnStatus},
@@ -176,7 +181,7 @@ const create = function (db, uuid, parentUuid, messageTyp, latitude, longitude, 
         ${columnManualModerationBy}
     ) VALUES (
       ?, ?, ?, strftime('%s','now'), strftime('%s','now','+30 days'),
-      ?, ?, UPPER(?), ?, ?, ?, ?, ?, NULL, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+      ?, ?, UPPER(?), ?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
     );`;
 
         const params = [
@@ -191,6 +196,7 @@ const create = function (db, uuid, parentUuid, messageTyp, latitude, longitude, 
             style !== undefined ? style : '',
             userId,
             multimedia !== '' ? multimedia : null,
+            hashtags,
             status,
             aiModeration,
             aiModerationScore,
@@ -217,7 +223,13 @@ const create = function (db, uuid, parentUuid, messageTyp, latitude, longitude, 
     }
 };
 
-const update = function (db, messageId, message, style, multimedia, latitude, longitude, plusCode, callback) {
+const update = function (db, messageId, message, style, multimedia, latitude, longitude, plusCode, hashtags, callback) {
+    let nextHashtags = hashtags;
+    let cb = callback;
+    if (typeof hashtags === 'function') {
+        cb = hashtags;
+        nextHashtags = '';
+    }
     try {
         const sql = `
         UPDATE ${tableName}
@@ -226,19 +238,21 @@ const update = function (db, messageId, message, style, multimedia, latitude, lo
             ${columnMultimedia} = ?,
             ${columnLatitude} = ?,
             ${columnLongitude} = ?,
-            ${columnPlusCode} = ?
+            ${columnPlusCode} = ?,
+            ${columnHashtags} = ?
         WHERE ${columnMessageId} = ?;`;
 
-        db.run(sql, [message, style, multimedia, latitude, longitude, plusCode, messageId], (err) => {
-            callback(err);
+        db.run(sql, [message, style, multimedia, latitude, longitude, plusCode, nextHashtags ?? '', messageId], (err) => {
+            cb(err);
         });
     } catch (error) {
         throw error;
     }
 };
 
-const updateWithModeration = function (db, messageId, message, style, multimedia, latitude, longitude, plusCode, moderation, status, callback) {
+const updateWithModeration = function (db, messageId, message, style, multimedia, latitude, longitude, plusCode, hashtags, moderation, status, callback) {
     try {
+        const nextHashtags = typeof hashtags === 'string' ? hashtags : '';
         const aiModeration = moderation?.aiModeration ?? null;
         const aiModerationScore = Number.isFinite(moderation?.aiScore) ? moderation.aiScore : null;
         const aiModerationFlagged = moderation?.aiFlagged === undefined || moderation?.aiFlagged === null
@@ -260,6 +274,7 @@ const updateWithModeration = function (db, messageId, message, style, multimedia
             ${columnLatitude} = ?,
             ${columnLongitude} = ?,
             ${columnPlusCode} = ?,
+            ${columnHashtags} = ?,
             ${columnStatus} = ?,
             ${columnAiModeration} = ?,
             ${columnAiModerationScore} = ?,
@@ -281,6 +296,7 @@ const updateWithModeration = function (db, messageId, message, style, multimedia
             latitude,
             longitude,
             plusCode,
+            nextHashtags,
             normalizedStatus,
             aiModeration,
             aiModerationScore,
@@ -444,6 +460,25 @@ const getByParentUuid = function (db, parentUuid, callback) {
         LIMIT 256;`;
 
         db.all(sql, [parentUuid, messageStatus.ENABLED], (err, rows) => {
+            callback(err, rows);
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
+const getByHashtag = function (db, hashtag, callback) {
+    try {
+        const token = `|${String(hashtag ?? '').trim().toLowerCase()}|`;
+        const sql = `
+        SELECT * FROM ${tableName}
+        WHERE ${columnStatus} = ?
+        AND ${columnMessageType} IN (?, ?)
+        AND ${columnHashtags} LIKE ?
+        ORDER BY ${columnMessageCreateDateTime} DESC
+        LIMIT 256;`;
+
+        db.all(sql, [messageStatus.ENABLED, messageType.PUBLIC, messageType.COMMENT, `%${token}%`], (err, rows) => {
             callback(err, rows);
         });
     } catch (error) {
@@ -616,6 +651,7 @@ module.exports = {
     getByPlusCode,
     getByBoundingBox,
     getByParentUuid,
+    getByHashtag,
     countView,
     countComment,
     deleteById,

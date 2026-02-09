@@ -99,7 +99,40 @@
       "weather": "Météo",
       "airQuality": "Qualité de l’air",
       "searchPlace": "Rechercher un lieu",
-      "searchExperiences": "Rechercher des expériences"
+      "searchExperiences": "Rechercher des expériences",
+      "searchHashtags": "Rechercher des hashtags"
+    },
+    "hashtags": {
+      "label": "Hashtags",
+      "placeholder": "#voyage #famille #travail",
+      "publicHint": "Sujets publics uniquement. Jusqu'à {{ max }} hashtags, chacun de 2 à 32 lettres ou chiffres.",
+      "localHint": "Tags locaux pour votre propre organisation. Jusqu'à {{ max }} hashtags, chacun de 2 à 32 lettres ou chiffres.",
+      "invalidPublic": "Veuillez utiliser des hashtags publics valides (max {{ max }}, lettres, chiffres et underscore uniquement).",
+      "invalidLocal": "Veuillez utiliser des hashtags locaux valides (max {{ max }}, lettres, chiffres et underscore uniquement).",
+      "invalidSearch": "Veuillez saisir exactement un hashtag valide (p. ex. #voyage).",
+      "editAction": "Modifier les hashtags",
+      "editExperienceTitle": "Modifier les hashtags de l'expérience"
+    },
+    "hashtagSearch": {
+      "title": "Rechercher des hashtags",
+      "intro": "Recherchez un hashtag dans les messages/commentaires publics et dans vos lieux, contacts et expériences locaux.",
+      "inputLabel": "Hashtag",
+      "placeholder": "#voyage",
+      "inputHint": "Saisissez un hashtag. Exemple : #voyage",
+      "scopeAll": "Tout",
+      "scopeLocal": "Local",
+      "scopePublic": "Public",
+      "searchAction": "Rechercher un hashtag",
+      "searching": "Recherche de hashtags...",
+      "noResults": "Aucun élément trouvé pour ce hashtag.",
+      "publicFailed": "La recherche publique de hashtags est actuellement indisponible.",
+      "sections": {
+        "places": "Lieux",
+        "contacts": "Contacts",
+        "experiences": "Expériences",
+        "publicMessages": "Messages publics",
+        "comments": "Commentaires"
+      }
     },
     "meta": {
       "title": "MessageDrop - Explorer les lieux et les actualités",

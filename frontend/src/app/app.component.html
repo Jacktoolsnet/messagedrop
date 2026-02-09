@@ -302,6 +302,10 @@
         <mat-icon>local_activity</mat-icon>
         <span>{{ 'common.menu.searchExperiences' | transloco }}</span>
     </button>
+    <button mat-menu-item (click)="showHashtagSearchDialog()">
+        <mat-icon>tag</mat-icon>
+        <span>{{ 'common.menu.searchHashtags' | transloco }}</span>
+    </button>
 </mat-menu>
 }
 <router-outlet />

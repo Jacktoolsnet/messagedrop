@@ -18,6 +18,7 @@ export interface Contact {
     contactUserEncryptionPublicKey?: JsonWebKey,
     hint?: string,
     name?: string,
+    hashtags?: string[],
     base64Avatar?: string,
     avatarFileId?: string,
     avatarOriginalFileId?: string,

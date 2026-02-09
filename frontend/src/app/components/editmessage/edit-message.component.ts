@@ -26,6 +26,7 @@ import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { LocationPickerTileComponent } from '../utils/location-picker/location-picker-tile.component';
 import { TextComponent } from '../utils/text/text.component';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
+import { MAX_PUBLIC_HASHTAGS, normalizeHashtags, stringifyHashtags } from '../../utils/hashtag.util';
 
 interface TextDialogResult {
   text: string;
@@ -76,13 +77,16 @@ export class EditMessageComponent implements OnInit {
 
   safeHtml: SafeHtml | undefined = undefined;
   showSaveHtml = false;
+  hashtagInput = '';
 
   private readonly oriMessage: string | undefined = this.data.message.message;
   private readonly oriMultimedia: Multimedia | undefined = structuredClone(this.data.message.multimedia);
   private readonly oriStyle: string | undefined = this.data.message.style;
+  private readonly oriHashtags: string[] = [...(this.data.message.hashtags ?? [])];
 
   ngOnInit(): void {
     this.applyNewMultimedia(this.data.message.multimedia);
+    this.hashtagInput = stringifyHashtags(this.oriHashtags);
   }
 
   private resolveHeaderConfig(mode: Mode): DialogHeaderConfig {
@@ -100,6 +104,18 @@ export class EditMessageComponent implements OnInit {
   }
 
   onApplyClick(): void {
+    const hashtagParse = normalizeHashtags(this.hashtagInput, MAX_PUBLIC_HASHTAGS);
+    if (hashtagParse.invalidTokens.length > 0 || hashtagParse.overflow > 0) {
+      this.snackBar.open(
+        this.translation.t('common.hashtags.invalidPublic', { max: MAX_PUBLIC_HASHTAGS }),
+        this.translation.t('common.actions.ok'),
+        { duration: 2500 }
+      );
+      return;
+    }
+    this.data.message.hashtags = hashtagParse.tags;
+    this.hashtagInput = stringifyHashtags(hashtagParse.tags);
+
     switch (this.data.mode) {
       case 'add_public_message':
       case 'edit_public_message':
@@ -126,6 +142,8 @@ export class EditMessageComponent implements OnInit {
     if (undefined != this.oriStyle) {
       this.data.message.style = this.oriStyle;
     }
+    this.data.message.hashtags = [...this.oriHashtags];
+    this.hashtagInput = stringifyHashtags(this.oriHashtags);
     this.dialogRef.close();
   }
 

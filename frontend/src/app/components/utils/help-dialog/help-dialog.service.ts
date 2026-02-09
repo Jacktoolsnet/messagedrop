@@ -497,6 +497,11 @@ const HELP_TOPICS = {
         descriptionKey: 'appMenu.items.searchExperiences.desc'
       },
       {
+        icon: 'tag',
+        titleKey: 'appMenu.items.searchHashtags.title',
+        descriptionKey: 'appMenu.items.searchHashtags.desc'
+      },
+      {
         icon: 'zoom_in_map',
         titleKey: 'appMenu.items.zoom.title',
         descriptionKey: 'appMenu.items.zoom.desc'
@@ -2927,6 +2932,42 @@ const HELP_TOPICS = {
         icon: 'privacy_tip',
         titleKey: 'tenorSearch.items.privacy.title',
         descriptionKey: 'tenorSearch.items.privacy.desc'
+      }
+    ]
+  },
+  hashtagSearch: {
+    titleKey: 'hashtagSearch.title',
+    introKey: 'hashtagSearch.intro',
+    items: [
+      {
+        icon: 'tag',
+        titleKey: 'hashtagSearch.items.input.title',
+        descriptionKey: 'hashtagSearch.items.input.desc'
+      },
+      {
+        icon: 'toggle_on',
+        titleKey: 'hashtagSearch.items.scope.title',
+        descriptionKey: 'hashtagSearch.items.scope.desc'
+      },
+      {
+        icon: 'search',
+        titleKey: 'hashtagSearch.items.search.title',
+        descriptionKey: 'hashtagSearch.items.search.desc'
+      },
+      {
+        icon: 'touch_app',
+        titleKey: 'hashtagSearch.items.result.title',
+        descriptionKey: 'hashtagSearch.items.result.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'hashtagSearch.items.help.title',
+        descriptionKey: 'hashtagSearch.items.help.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'hashtagSearch.items.privacy.title',
+        descriptionKey: 'hashtagSearch.items.privacy.desc'
       }
     ]
   },

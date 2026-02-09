@@ -48,6 +48,9 @@
               <p class="experience-description">
                 {{ bookmark.snapshot.description }}
               </p>
+              @if (bookmark.hashtags?.length) {
+              <p class="experience-hashtags">{{ getHashtagLabel(bookmark.hashtags) }}</p>
+              }
             </mat-card-content>
             <mat-card-actions class="tile-actions">
               <div class="tile-actions__left">
@@ -70,6 +73,11 @@
                 <button mat-mini-fab color="primary" type="button" (click)="openTileList(bookmark.snapshot); $event.stopPropagation()"
                   [attr.aria-label]="tileListAriaLabel(bookmark.snapshot)">
                   <mat-icon>dashboard</mat-icon>
+                </button>
+                <button mat-mini-fab color="primary" type="button"
+                  (click)="editBookmarkHashtags(bookmark.productCode, $event)"
+                  [attr.aria-label]="'common.hashtags.editAction' | transloco">
+                  <mat-icon>tag</mat-icon>
                 </button>
               </div>
               <div class="tile-actions__right">

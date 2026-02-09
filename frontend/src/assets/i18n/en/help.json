@@ -428,7 +428,7 @@
       },
       "searchMenu": {
         "title": "Search menu",
-        "desc": "Use the search button to open place and experience search."
+        "desc": "Use the search button to open place, experience, and hashtag search."
       },
       "searchPlace": {
         "title": "Search place",
@@ -437,6 +437,10 @@
       "searchExperiences": {
         "title": "Search experiences",
         "desc": "Starts experience search and shows matching offers."
+      },
+      "searchHashtags": {
+        "title": "Search hashtags",
+        "desc": "Searches one hashtag across public messages/comments and local places, contacts, and experiences."
       },
       "zoom": {
         "title": "Map zoom",
@@ -2289,6 +2293,36 @@
       "privacy": {
         "title": "Privacy and processing",
         "desc": "GIF search sends requests to Tenor/Google. The app stores only reference data for the GIF you select (for example URL, source, title); private note or message text is not sent to Tenor by this step."
+      }
+    }
+  },
+  "hashtagSearch": {
+    "title": "Hashtag search",
+    "intro": "Search by one hashtag and open matching entries from public and local sources.",
+    "items": {
+      "input": {
+        "title": "Enter hashtag",
+        "desc": "Enter exactly one hashtag (for example #travel)."
+      },
+      "scope": {
+        "title": "Choose scope",
+        "desc": "Switch between all, local only, or public only results."
+      },
+      "search": {
+        "title": "Start search",
+        "desc": "Use the search action to run or refresh the hashtag query."
+      },
+      "result": {
+        "title": "Open result",
+        "desc": "Tap a result row to open the related message, place, contact, or experience list."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "Opens this help view."
+      },
+      "privacy": {
+        "title": "Privacy and processing",
+        "desc": "Public hashtag search requests are sent to the backend only for public messages/comments. Local results are searched entirely on-device in app storage."
       }
     }
   },

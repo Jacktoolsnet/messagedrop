@@ -46,6 +46,7 @@ import { UserComponent } from './components/user/user.component';
 import { DisplayMessage } from './components/utils/display-message/display-message.component';
 import { ExperienceSearchComponent } from './components/utils/experience-search/experience-search.component';
 import { HelpDialogService } from './components/utils/help-dialog/help-dialog.service';
+import { HashtagSearchComponent, HashtagSearchResult } from './components/utils/hashtag-search/hashtag-search.component';
 import { NominatimSearchComponent } from './components/utils/nominatim-search/nominatim-search.component';
 import { SearchSettingsComponent } from './components/utils/search-settings/search-settings.component';
 import { WeatherComponent } from './components/weather/weather.component';
@@ -948,6 +949,7 @@ export class AppComponent implements OnInit {
       message: '',
       markerType: 'default',
       style: '',
+      hashtags: [],
       views: 0,
       likes: 0,
       dislikes: 0,
@@ -1980,6 +1982,45 @@ export class AppComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(() => {
       subscription.unsubscribe();
+    });
+  }
+
+  showHashtagSearchDialog(): void {
+    const dialogRef = this.dialog.open(HashtagSearchComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      minWidth: 'min(450px, 95vw)',
+      width: '90vw',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((result?: HashtagSearchResult) => {
+      if (!result) {
+        return;
+      }
+      if (result.type === 'message' && result.message) {
+        this.mapService.flyTo(result.message.location);
+        this.messageService.setMessages([result.message]);
+        this.openMarkerMessageListDialog([result.message]);
+        return;
+      }
+      if (result.type === 'place' && result.place) {
+        this.mapService.flyTo(result.place.location);
+        this.openPlaceListDialog();
+        return;
+      }
+      if (result.type === 'contact' && result.contact) {
+        this.openContactListDialog();
+        return;
+      }
+      if (result.type === 'experience' && result.experience?.snapshot) {
+        this.openMarkerMyExperienceListDialog([result.experience.snapshot]);
+      }
     });
   }
 
