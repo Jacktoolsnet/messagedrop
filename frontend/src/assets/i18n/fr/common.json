@@ -105,7 +105,7 @@
     "hashtags": {
       "label": "Hashtags",
       "placeholder": "#voyage #famille #travail",
-      "publicHint": "Sujets publics uniquement. Jusqu'à {{ max }} hashtags, chacun de 2 à 32 lettres ou chiffres.",
+      "publicHint": "Jusqu'à {{ max }} tags, de 2 à 32 caractères chacun.",
       "localHint": "Tags locaux pour votre propre organisation. Jusqu'à {{ max }} hashtags, chacun de 2 à 32 lettres ou chiffres.",
       "invalidPublic": "Veuillez utiliser des hashtags publics valides (max {{ max }}, lettres, chiffres et underscore uniquement).",
       "invalidLocal": "Veuillez utiliser des hashtags locaux valides (max {{ max }}, lettres, chiffres et underscore uniquement).",

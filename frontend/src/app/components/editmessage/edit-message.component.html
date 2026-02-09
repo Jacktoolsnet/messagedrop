@@ -39,16 +39,37 @@
         </div>
         }
 
+        <div class="hashtag_container">
+            <mat-form-field appearance="outline" class="full-width hashtag-field">
+                <mat-label>{{ 'common.hashtags.label' | transloco }}</mat-label>
+                <mat-chip-grid #hashtagChipGrid aria-label="Hashtags">
+                    @for (tag of hashtagTags; track tag) {
+                    <mat-chip-row (removed)="removeHashtag(tag)">
+                        #{{ tag }}
+                        <button matChipRemove type="button" [attr.aria-label]="'common.actions.delete' | transloco">
+                            <mat-icon>cancel</mat-icon>
+                        </button>
+                    </mat-chip-row>
+                    }
+                    <input
+                        matInput
+                        [matChipInputFor]="hashtagChipGrid"
+                        [placeholder]="'common.hashtags.placeholder' | transloco"
+                        [(ngModel)]="hashtagInput"
+                        (keydown.enter)="onHashtagEnter($event)" />
+                </mat-chip-grid>
+                <button mat-icon-button matSuffix type="button" (click)="addHashtagsFromInput(true)"
+                    [attr.aria-label]="'common.actions.apply' | transloco">
+                    <mat-icon>add</mat-icon>
+                </button>
+                <mat-hint>{{ 'common.hashtags.publicHint' | transloco : { max: 8 } }}</mat-hint>
+            </mat-form-field>
+        </div>
+
         @if (isLocationEditable) {
         <app-location-picker-tile [location]="data.message.location" markerType="message"
             (locationChange)="updateLocation($event)"></app-location-picker-tile>
         }
-
-        <mat-form-field appearance="fill" class="full-width">
-            <mat-label>{{ 'common.hashtags.label' | transloco }}</mat-label>
-            <input matInput [placeholder]="'common.hashtags.placeholder' | transloco" [(ngModel)]="hashtagInput" />
-            <mat-hint>{{ 'common.hashtags.publicHint' | transloco : { max: 8 } }}</mat-hint>
-        </mat-form-field>
 
     </div>
 </mat-dialog-content>

@@ -36,6 +36,11 @@
     justify-self: stretch;
 }
 
+.content .hashtag_container {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+}
+
 .full-width {
     width: 100%;
 }
@@ -49,7 +54,8 @@
 
 /* === CONTAINER FÜR MULTIMEDIA UND TEXT === */
 .oembed_container,
-.text_container {
+.text_container,
+.hashtag_container {
     width: 100%;
     color: var(--mat-card-subtitle-text-color);
     background-color: var(--mat-card-filled-container-color);
@@ -121,4 +127,30 @@
     margin: 1rem;
     width: 95%;
     border-radius: 0.5rem;
+}
+
+.hashtag-field {
+    margin-bottom: -0.2rem;
+}
+
+:host ::ng-deep .hashtag-field .mat-mdc-form-field-infix {
+    min-height: 3.25rem;
+    padding-top: 0.55rem;
+    padding-bottom: 0.45rem;
+}
+
+:host ::ng-deep .hashtag-field .mat-mdc-form-field-subscript-wrapper {
+    padding-top: 0.3rem;
+}
+
+:host ::ng-deep .hashtag-field .mat-mdc-chip-set {
+    min-height: 2.25rem;
+}
+
+:host ::ng-deep .hashtag-field .mat-mdc-chip-row {
+    margin: 0.2rem 0.25rem 0.2rem 0;
+}
+
+:host ::ng-deep .hashtag-field .mat-mdc-form-field-icon-suffix {
+    padding-right: 0.2rem;
 }

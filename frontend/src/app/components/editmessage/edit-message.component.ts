@@ -2,6 +2,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatChipsModule } from '@angular/material/chips';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
@@ -15,6 +16,7 @@ import { Message } from '../../interfaces/message';
 import { Mode } from '../../interfaces/mode';
 import { Multimedia } from '../../interfaces/multimedia';
 import { MultimediaType } from '../../interfaces/multimedia-type';
+import { DisplayMessageConfig } from '../../interfaces/display-message-config';
 import { OembedService } from '../../services/oembed.service';
 import { SharedContentService } from '../../services/shared-content.service';
 import { StyleService } from '../../services/style.service';
@@ -26,7 +28,8 @@ import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { LocationPickerTileComponent } from '../utils/location-picker/location-picker-tile.component';
 import { TextComponent } from '../utils/text/text.component';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
-import { MAX_PUBLIC_HASHTAGS, normalizeHashtags, stringifyHashtags } from '../../utils/hashtag.util';
+import { DisplayMessage } from '../utils/display-message/display-message.component';
+import { MAX_PUBLIC_HASHTAGS, normalizeHashtags } from '../../utils/hashtag.util';
 
 interface TextDialogResult {
   text: string;
@@ -50,6 +53,7 @@ interface DialogHeaderConfig {
     MatDialogContent,
     MatIcon,
     FormsModule,
+    MatChipsModule,
     MatFormFieldModule,
     MatInputModule,
     MatMenuModule,
@@ -78,6 +82,7 @@ export class EditMessageComponent implements OnInit {
   safeHtml: SafeHtml | undefined = undefined;
   showSaveHtml = false;
   hashtagInput = '';
+  hashtagTags: string[] = [];
 
   private readonly oriMessage: string | undefined = this.data.message.message;
   private readonly oriMultimedia: Multimedia | undefined = structuredClone(this.data.message.multimedia);
@@ -86,7 +91,8 @@ export class EditMessageComponent implements OnInit {
 
   ngOnInit(): void {
     this.applyNewMultimedia(this.data.message.multimedia);
-    this.hashtagInput = stringifyHashtags(this.oriHashtags);
+    this.hashtagTags = [...this.oriHashtags];
+    this.hashtagInput = '';
   }
 
   private resolveHeaderConfig(mode: Mode): DialogHeaderConfig {
@@ -104,17 +110,17 @@ export class EditMessageComponent implements OnInit {
   }
 
   onApplyClick(): void {
-    const hashtagParse = normalizeHashtags(this.hashtagInput, MAX_PUBLIC_HASHTAGS);
+    if (!this.addHashtagsFromInput(true)) {
+      return;
+    }
+    const hashtagParse = normalizeHashtags(this.hashtagTags, MAX_PUBLIC_HASHTAGS);
     if (hashtagParse.invalidTokens.length > 0 || hashtagParse.overflow > 0) {
-      this.snackBar.open(
-        this.translation.t('common.hashtags.invalidPublic', { max: MAX_PUBLIC_HASHTAGS }),
-        this.translation.t('common.actions.ok'),
-        { duration: 2500 }
-      );
+      this.showHashtagValidationError();
       return;
     }
     this.data.message.hashtags = hashtagParse.tags;
-    this.hashtagInput = stringifyHashtags(hashtagParse.tags);
+    this.hashtagTags = [...hashtagParse.tags];
+    this.hashtagInput = '';
 
     switch (this.data.mode) {
       case 'add_public_message':
@@ -143,8 +149,44 @@ export class EditMessageComponent implements OnInit {
       this.data.message.style = this.oriStyle;
     }
     this.data.message.hashtags = [...this.oriHashtags];
-    this.hashtagInput = stringifyHashtags(this.oriHashtags);
+    this.hashtagTags = [...this.oriHashtags];
+    this.hashtagInput = '';
     this.dialogRef.close();
+  }
+
+  onHashtagEnter(event: Event): void {
+    event.preventDefault();
+    this.addHashtagsFromInput(true);
+  }
+
+  addHashtagsFromInput(showErrors = true): boolean {
+    const candidate = this.hashtagInput.trim();
+    if (!candidate) {
+      return true;
+    }
+    const parsed = normalizeHashtags(candidate, MAX_PUBLIC_HASHTAGS);
+    if (parsed.invalidTokens.length > 0) {
+      if (showErrors) {
+        this.showHashtagValidationError();
+      }
+      return false;
+    }
+
+    const merged = normalizeHashtags([...this.hashtagTags, ...parsed.tags], MAX_PUBLIC_HASHTAGS);
+    if (merged.overflow > 0) {
+      if (showErrors) {
+        this.showHashtagValidationError();
+      }
+      return false;
+    }
+
+    this.hashtagTags = [...merged.tags];
+    this.hashtagInput = '';
+    return true;
+  }
+
+  removeHashtag(tag: string): void {
+    this.hashtagTags = this.hashtagTags.filter((item) => item !== tag);
   }
 
   onNewFontClick(): void {
@@ -153,6 +195,32 @@ export class EditMessageComponent implements OnInit {
 
   private getRandomFont(): void {
     this.data.message.style = this.style.getRandomStyle();
+  }
+
+  private showHashtagValidationError(): void {
+    const config: DisplayMessageConfig = {
+      showAlways: true,
+      title: this.translation.t('common.hashtags.label'),
+      image: '',
+      icon: 'warning',
+      message: this.translation.t('common.hashtags.invalidPublic', { max: MAX_PUBLIC_HASHTAGS }),
+      button: this.translation.t('common.actions.ok'),
+      delay: 0,
+      showSpinner: false,
+      autoclose: false
+    };
+
+    this.matDialog.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: config,
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
   }
 
   public showPolicy() {
