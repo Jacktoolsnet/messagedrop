@@ -235,6 +235,27 @@ h2[mat-dialog-title].dialog-title {
   height: auto;
 }
 
+.hashtag-chip-list {
+  margin-top: 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.hashtag-chip {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  border: 1px solid var(--mat-card-outlined-outline-color);
+  background-color: color-mix(in srgb, var(--mat-card-filled-container-color) 88%, #ffffff 12%);
+  color: var(--mat-app-text-color);
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.78rem;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
 /* === Lists and buttons inside cards === */
 .list {
   border-radius: 1.25rem;

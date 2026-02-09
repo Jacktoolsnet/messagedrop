@@ -5,9 +5,9 @@ export interface Note {
     id: string,
     location: Location,
     note: string,
+    hashtags?: string[],
     markerType: string,
     style: string,
     timestamp: number;
     multimedia: Multimedia
 }
-

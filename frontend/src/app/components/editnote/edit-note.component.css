@@ -60,6 +60,29 @@
     margin-bottom: 1.5rem;
 }
 
+.hashtag_container {
+    grid-column: 1 / -1;
+    width: 100%;
+    color: var(--mat-card-subtitle-text-color);
+    background-color: var(--mat-card-filled-container-color);
+    box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+    border-radius: 0.25rem;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.full-width {
+    width: 100%;
+}
+
+:host ::ng-deep .hashtag-field .mat-mdc-chip-set {
+    padding-bottom: 0.25rem;
+}
+
+:host ::ng-deep .hashtag-field .mat-mdc-chip-row {
+    margin-bottom: 0.25rem;
+}
+
 /* === TEXT-INHALT === */
 .text {
     max-width: 100%;

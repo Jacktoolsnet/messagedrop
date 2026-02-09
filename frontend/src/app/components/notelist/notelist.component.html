@@ -20,6 +20,13 @@
                     <div class="message-content">
                         <app-showmultimedia [multimedia]="note.multimedia"></app-showmultimedia>
                         <app-showmessage [message]="note.note" [style]="note.style"></app-showmessage>
+                        @if (note.hashtags?.length) {
+                        <div class="hashtag-chip-list" [attr.aria-label]="'common.hashtags.label' | transloco">
+                            @for (tag of note.hashtags; track tag) {
+                            <span class="hashtag-chip">#{{ tag }}</span>
+                            }
+                        </div>
+                        }
                     </div>
                 </mat-card-content>
                 <mat-card-actions class="buttonbar">

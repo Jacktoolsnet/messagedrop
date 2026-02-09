@@ -4,6 +4,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDial
 
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -15,13 +16,16 @@ import { Mode } from '../../interfaces/mode';
 import { Multimedia } from '../../interfaces/multimedia';
 import { MultimediaType } from '../../interfaces/multimedia-type';
 import { Note } from '../../interfaces/note';
+import { DisplayMessageConfig } from '../../interfaces/display-message-config';
 import { OembedService } from '../../services/oembed.service';
 import { SharedContentService } from '../../services/shared-content.service';
 import { StyleService } from '../../services/style.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
+import { MAX_LOCAL_HASHTAGS, normalizeHashtags } from '../../utils/hashtag.util';
 import { SelectMultimediaComponent } from '../multimedia/select-multimedia/select-multimedia.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
+import { DisplayMessage } from '../utils/display-message/display-message.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { LocationPickerTileComponent } from '../utils/location-picker/location-picker-tile.component';
 import { TextComponent } from '../utils/text/text.component';
@@ -49,6 +53,7 @@ interface DialogHeaderConfig {
     MatDialogContent,
     MatIcon,
     FormsModule,
+    MatChipsModule,
     MatFormFieldModule,
     MatInputModule,
     TranslocoPipe
@@ -70,21 +75,28 @@ export class EditNoteComponent implements OnInit {
   readonly data = inject<{ mode?: Mode; note: Note }>(MAT_DIALOG_DATA);
   readonly headerConfig = this.resolveHeaderConfig(this.data.mode, this.data.note);
   readonly mode = Mode;
+  readonly maxLocalHashtags = MAX_LOCAL_HASHTAGS;
   readonly isLocationEditable = !this.data.mode
     || this.data.mode === Mode.ADD_NOTE
     || this.data.mode === Mode.EDIT_NOTE;
 
   safeHtml: SafeHtml | undefined = undefined;
   showSaveHtml = false;
+  hashtagInput = '';
+  hashtagTags: string[] = [];
 
   private readonly oriNote: string | undefined = this.data.note.note;
   private readonly oriMultimedia: Multimedia | undefined = structuredClone(this.data.note.multimedia);
   private readonly oriStyle: string | undefined = this.data.note.style;
+  private readonly oriHashtags: string[] = [...(this.data.note.hashtags ?? [])];
 
   ngOnInit(): void {
     if (!this.data.note.style) {
       this.data.note.style = this.userService.getProfile().defaultStyle ?? '';
     }
+    this.data.note.hashtags = [...this.oriHashtags];
+    this.hashtagTags = [...this.oriHashtags];
+    this.hashtagInput = '';
     this.applyNewMultimedia(this.data.note.multimedia);
   }
 
@@ -102,6 +114,17 @@ export class EditNoteComponent implements OnInit {
   }
 
   onApplyClick(): void {
+    if (!this.addHashtagsFromInput(true)) {
+      return;
+    }
+    const parsed = normalizeHashtags(this.hashtagTags, MAX_LOCAL_HASHTAGS);
+    if (parsed.invalidTokens.length > 0 || parsed.overflow > 0) {
+      this.showHashtagValidationError();
+      return;
+    }
+    this.data.note.hashtags = parsed.tags;
+    this.hashtagTags = [...parsed.tags];
+    this.hashtagInput = '';
     this.dialogRef.close(this.data);
   }
 
@@ -115,7 +138,76 @@ export class EditNoteComponent implements OnInit {
     if (undefined != this.oriStyle) {
       this.data.note.style = this.oriStyle;
     }
+    this.data.note.hashtags = [...this.oriHashtags];
+    this.hashtagTags = [...this.oriHashtags];
+    this.hashtagInput = '';
     this.dialogRef.close();
+  }
+
+  onHashtagEnter(event: Event): void {
+    event.preventDefault();
+    this.addHashtagsFromInput(true);
+  }
+
+  onAddHashtagClick(): void {
+    this.addHashtagsFromInput(true);
+  }
+
+  addHashtagsFromInput(showErrors = true): boolean {
+    const candidate = this.hashtagInput.trim();
+    if (!candidate) {
+      return true;
+    }
+
+    const parsed = normalizeHashtags(candidate, MAX_LOCAL_HASHTAGS);
+    if (parsed.invalidTokens.length > 0) {
+      if (showErrors) {
+        this.showHashtagValidationError();
+      }
+      return false;
+    }
+
+    const merged = normalizeHashtags([...this.hashtagTags, ...parsed.tags], MAX_LOCAL_HASHTAGS);
+    if (merged.overflow > 0) {
+      if (showErrors) {
+        this.showHashtagValidationError();
+      }
+      return false;
+    }
+
+    this.hashtagTags = [...merged.tags];
+    this.hashtagInput = '';
+    return true;
+  }
+
+  removeHashtag(tag: string): void {
+    this.hashtagTags = this.hashtagTags.filter((item) => item !== tag);
+  }
+
+  private showHashtagValidationError(): void {
+    const config: DisplayMessageConfig = {
+      showAlways: true,
+      title: this.translation.t('common.hashtags.label'),
+      image: '',
+      icon: 'warning',
+      message: this.translation.t('common.hashtags.invalidLocal', { max: MAX_LOCAL_HASHTAGS }),
+      button: '',
+      delay: 2000,
+      showSpinner: false,
+      autoclose: true
+    };
+
+    this.matDialog.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: config,
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
   }
 
   onNewFontClick(): void {

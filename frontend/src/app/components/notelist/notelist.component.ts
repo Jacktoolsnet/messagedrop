@@ -137,6 +137,7 @@ export class NotelistComponent {
       id: '',
       location: this.location,
       note: '',
+      hashtags: [],
       markerType: 'note',
       style: '',
       timestamp: 0,
