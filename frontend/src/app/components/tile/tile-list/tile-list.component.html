@@ -20,6 +20,9 @@
         @case ('message') {
           <app-message-tile class="tile" appMasonryItem [place]="resolvedPlace!"></app-message-tile>
         }
+        @case ('hashtags') {
+          <app-hashtag-tile class="tile" appMasonryItem [place]="resolvedPlace" [contact]="resolvedContact"></app-hashtag-tile>
+        }
         @case ('image') {
           <app-image-tile class="tile" appMasonryItem [place]="resolvedPlace!"></app-image-tile>
         }

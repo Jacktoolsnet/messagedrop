@@ -55,10 +55,15 @@ export class TileSettingsComponent {
   readonly data = inject<{ place?: Place; contact?: Contact; experience?: ExperienceTileContext }>(MAT_DIALOG_DATA);
 
   private readonly isPlaceContext = !!this.data.place;
+  private readonly isContactContext = !!this.data.contact;
   private readonly isExperienceContext = !!this.data.experience;
   readonly tileSettings = signal<TileSetting[]>(normalizeTileSettings(
     this.data.place?.tileSettings ?? this.data.contact?.tileSettings ?? this.data.experience?.tileSettings,
-    { includeDefaults: this.isPlaceContext, includeSystem: this.isPlaceContext }
+    {
+      includeDefaults: this.isPlaceContext || this.isContactContext,
+      includeSystem: this.isPlaceContext,
+      defaultContext: this.isContactContext ? 'contact' : 'place'
+    }
   ).filter(tile => tile.type !== 'custom-link'));
   private readonly baseAddableTiles: readonly { type: TileSetting['type']; labelKey: string; icon: string }[] = [
     { type: 'custom-text', labelKey: 'common.tileTypes.text', icon: 'text_fields' },
@@ -83,6 +88,7 @@ export class TileSettingsComponent {
     airQuality: 'common.tileTypes.airQuality',
     note: 'common.tileTypes.note',
     message: 'common.tileTypes.message',
+    hashtags: 'common.tileTypes.hashtags',
     image: 'common.tileTypes.image',
     'custom-text': 'common.tileTypes.text',
     'custom-multitext': 'common.tileTypes.multitext',

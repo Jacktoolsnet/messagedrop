@@ -1,0 +1,33 @@
+<div class="hashtag-tile"
+  role="button"
+  tabindex="0"
+  (click)="editHashtags()"
+  (keyup.enter)="editHashtags()"
+  (keyup.space)="editHashtags()">
+  <div class="hashtag-tile__header">
+    <div class="hashtag-tile__title-wrap">
+      <mat-icon class="hashtag-tile__icon">tag</mat-icon>
+      <span class="hashtag-tile__title">{{ 'common.tiles.hashtags.title' | transloco }}</span>
+    </div>
+    <button mat-icon-button type="button" class="hashtag-tile__edit" (click)="editHashtags($event)"
+      [attr.aria-label]="'common.hashtags.editAction' | transloco">
+      <mat-icon>edit</mat-icon>
+    </button>
+  </div>
+
+  @if (hashtags.length) {
+  <div class="hashtag-tile__tags" [attr.aria-label]="'common.hashtags.label' | transloco">
+    @for (tag of hashtags; track tag) {
+    <span class="hashtag-chip">
+      <span class="hashtag-chip__label">#{{ tag }}</span>
+      <button type="button" class="hashtag-chip__remove" (click)="removeHashtag(tag, $event)"
+        [attr.aria-label]="('common.hashtags.removeAction' | transloco) + ' #' + tag">
+        <mat-icon>close</mat-icon>
+      </button>
+    </span>
+    }
+  </div>
+  } @else {
+  <p class="hashtag-tile__empty">{{ 'common.tiles.hashtags.empty' | transloco }}</p>
+  }
+</div>

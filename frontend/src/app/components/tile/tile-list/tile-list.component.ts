@@ -16,6 +16,7 @@ import { AnniversaryTileComponent } from "../anniversary-tile/anniversary-tile.c
 import { DateTimeTileComponent } from "../datetime-tile/datetime-tile.component";
 import { FileTileComponent } from "../file-tile/file-tile.component";
 import { ExperienceTileComponent } from "../experience-tile/experience-tile.component";
+import { HashtagTileComponent } from "../hashtag-tile/hashtag-tile.component";
 import { ImageTileComponent } from "../image-tile/image-tile.component";
 import { MessageTileComponent } from "../message-tile/messagetile.component";
 import { MigraineTileComponent } from "../migraine-tile/migraine-tile.component";
@@ -30,7 +31,7 @@ import { WeatherTileComponent } from "../weather-tile/weather-tile.component";
 
 @Component({
   selector: 'app-tile-list',
-  imports: [DateTimeTileComponent, WeatherTileComponent, AirQualityTileComponent, NoteTileComponent, MessageTileComponent, ImageTileComponent, FileTileComponent, ExperienceTileComponent, TextTileComponent, MultitextTileComponent, AnniversaryTileComponent, MigraineTileComponent, PollutionTileComponent, TodoTileComponent, QuickActionTileComponent, MasonryItemDirective, MatButtonModule, TranslocoPipe],
+  imports: [DateTimeTileComponent, WeatherTileComponent, AirQualityTileComponent, NoteTileComponent, MessageTileComponent, HashtagTileComponent, ImageTileComponent, FileTileComponent, ExperienceTileComponent, TextTileComponent, MultitextTileComponent, AnniversaryTileComponent, MigraineTileComponent, PollutionTileComponent, TodoTileComponent, QuickActionTileComponent, MasonryItemDirective, MatButtonModule, TranslocoPipe],
   templateUrl: './tile-list.component.html',
   styleUrl: './tile-list.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -52,6 +53,7 @@ export class TileListComponent {
     'airQuality',
     'note',
     'message',
+    'hashtags',
     'image',
     'custom-experience',
     'custom-text',
@@ -95,7 +97,11 @@ export class TileListComponent {
       : place
         ? place.tileSettings
         : experience?.tileSettings;
-    const opts = contact || experience ? { includeDefaults: false, includeSystem: false } : undefined;
+    const opts = contact
+      ? { includeDefaults: true, includeSystem: false, defaultContext: 'contact' as const }
+      : experience
+        ? { includeDefaults: false, includeSystem: false }
+        : { includeDefaults: true, includeSystem: true, defaultContext: 'place' as const };
     const allowed = experience ? this.experienceRenderableTypes : this.renderableTypes;
     return normalizeTileSettings(sourceTiles, opts)
       .filter((tile: TileSetting) => tile.enabled && allowed.has(tile.type));
@@ -179,10 +185,13 @@ export class TileListComponent {
         return;
       }
 
-      const normalized = normalizeTileSettings(updatedSettings, {
-        includeDefaults: !!this.place,
-        includeSystem: !!this.place
-      }).map((tile: TileSetting) => ({ ...tile }));
+      const normalizeOptions = contact
+        ? { includeDefaults: true, includeSystem: false, defaultContext: 'contact' as const }
+        : place
+          ? { includeDefaults: true, includeSystem: true, defaultContext: 'place' as const }
+          : { includeDefaults: false, includeSystem: false };
+      const normalized = normalizeTileSettings(updatedSettings, normalizeOptions)
+        .map((tile: TileSetting) => ({ ...tile }));
 
       if (contact) {
         const updatedContact = { ...contact, tileSettings: normalized };

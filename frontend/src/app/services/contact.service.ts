@@ -184,7 +184,11 @@ export class ContactService {
       contact.pinned = profile?.pinned || false;
       contact.sortOrder = profile?.sortOrder ?? contact.sortOrder;
       const tileSettings = await this.indexedDbService.getTileSettings(contact.id);
-      contact.tileSettings = tileSettings ?? contact.tileSettings ?? [];
+      contact.tileSettings = normalizeTileSettings(tileSettings ?? contact.tileSettings ?? [], {
+        includeDefaults: true,
+        includeSystem: false,
+        defaultContext: 'contact'
+      });
     }));
     this._contacts.set(this._contacts());
   }
@@ -237,8 +241,9 @@ export class ContactService {
 
   async saveContactTileSettings(contact: Contact, tileSettings?: TileSetting[]): Promise<void> {
     const normalized = normalizeTileSettings(tileSettings ?? contact.tileSettings ?? [], {
-      includeDefaults: false,
-      includeSystem: false
+      includeDefaults: true,
+      includeSystem: false,
+      defaultContext: 'contact'
     });
 
     this._contacts.update((contacts) =>

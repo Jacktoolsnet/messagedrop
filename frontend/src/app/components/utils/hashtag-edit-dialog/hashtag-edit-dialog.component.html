@@ -4,8 +4,8 @@
   [subtitle]="errorText">
 </app-dialog-header>
 
-<mat-dialog-content>
-  <mat-form-field appearance="fill" class="full-width">
+<mat-dialog-content class="hashtag-dialog-content">
+  <mat-form-field appearance="fill" class="full-width" subscriptSizing="dynamic">
     <mat-label>{{ 'common.hashtags.label' | transloco }}</mat-label>
     <input matInput [placeholder]="'common.hashtags.placeholder' | transloco" [(ngModel)]="inputValue" />
     <mat-hint>

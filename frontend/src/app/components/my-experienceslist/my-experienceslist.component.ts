@@ -140,13 +140,14 @@ export class MyExperienceslistComponent implements OnInit {
         initialTags: bookmark.hashtags ?? [],
         helpKey: 'hashtagSearch'
       },
+      width: 'min(680px, 96vw)',
       closeOnNavigation: true,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
       disableClose: false,
       autoFocus: false,
-      maxWidth: '90vw',
-      maxHeight: '90vh'
+      maxWidth: '96vw',
+      maxHeight: '95vh'
     });
 
     dialogRef.afterClosed().subscribe((result?: HashtagEditDialogResult) => {

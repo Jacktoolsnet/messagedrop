@@ -1,6 +1,15 @@
-export type DefaultTileType = 'datetime' | 'weather' | 'airQuality' | 'note' | 'message' | 'image' | 'custom-experience';
+export type DefaultTileType =
+  | 'datetime'
+  | 'weather'
+  | 'airQuality'
+  | 'note'
+  | 'message'
+  | 'hashtags'
+  | 'image'
+  | 'custom-experience';
 export type TileType = DefaultTileType | `custom-${string}`;
 export type TileLinkType = 'web' | 'phone' | 'email' | 'whatsapp' | 'sms' | 'map';
+export type TileDefaultsContext = 'place' | 'contact';
 
 export interface TileTodoItem {
   id: string;
@@ -64,13 +73,25 @@ export const tileTypeToLabel: Record<DefaultTileType, string> = {
   airQuality: 'Air quality',
   note: 'Notes',
   message: 'Messages',
+  hashtags: 'Hashtags',
   image: 'Images',
   'custom-experience': 'Experiences'
 };
 
-const tileTypeOrder: DefaultTileType[] = ['datetime', 'weather', 'airQuality', 'note', 'message', 'image', 'custom-experience'];
+const placeDefaultTileTypeOrder: DefaultTileType[] = [
+  'datetime',
+  'weather',
+  'airQuality',
+  'note',
+  'message',
+  'hashtags',
+  'image',
+  'custom-experience'
+];
+const contactDefaultTileTypeOrder: DefaultTileType[] = ['hashtags'];
 
-export function createDefaultTileSettings(): TileSetting[] {
+export function createDefaultTileSettings(context: TileDefaultsContext = 'place'): TileSetting[] {
+  const tileTypeOrder = context === 'contact' ? contactDefaultTileTypeOrder : placeDefaultTileTypeOrder;
   return tileTypeOrder.map((type, index) => {
     return {
       id: `default-${type}`,
@@ -84,11 +105,12 @@ export function createDefaultTileSettings(): TileSetting[] {
 
 export function normalizeTileSettings(
   tileSettings: TileSetting[] | undefined,
-  options?: { includeDefaults?: boolean; includeSystem?: boolean }
+  options?: { includeDefaults?: boolean; includeSystem?: boolean; defaultContext?: TileDefaultsContext }
 ): TileSetting[] {
   const includeDefaults = options?.includeDefaults ?? true;
   const includeSystem = options?.includeSystem ?? true;
-  const defaults = includeDefaults ? createDefaultTileSettings() : [];
+  const defaultContext = options?.defaultContext ?? 'place';
+  const defaults = includeDefaults ? createDefaultTileSettings(defaultContext) : [];
   const incoming = tileSettings ?? [];
 
   const defaultTypes = new Set(defaults.map((setting) => setting.type));

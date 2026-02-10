@@ -113,7 +113,10 @@
       "invalidLocal": "Please use valid local hashtags (max {{ max }}, only letters, numbers, underscore).",
       "invalidSearch": "Please enter exactly one valid hashtag (e.g. #travel).",
       "editAction": "Edit hashtags",
-      "editExperienceTitle": "Edit hashtags for experience"
+      "removeAction": "Remove hashtag",
+      "editExperienceTitle": "Edit hashtags for experience",
+      "editPlaceTitle": "Edit hashtags for place",
+      "editContactTitle": "Edit hashtags for contact"
     },
     "hashtagSearch": {
       "title": "Search hashtags",
@@ -543,6 +546,7 @@
       "airQuality": "Air quality",
       "note": "Notes",
       "message": "Messages",
+      "hashtags": "Hashtags",
       "image": "Images",
       "text": "Text",
       "multitext": "Multitext",
@@ -585,6 +589,10 @@
         "title": "Private notes",
         "multimediaOnly": "Multimedia note",
         "empty": "No notes found."
+      },
+      "hashtags": {
+        "title": "Hashtags",
+        "empty": "No hashtags yet. Tap to add."
       },
       "text": {
         "empty": "No text yet. Tap to add one."
