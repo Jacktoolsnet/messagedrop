@@ -1,13 +1,14 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatChipsModule } from '@angular/material/chips';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
-import { MAX_LOCAL_HASHTAGS, MAX_PUBLIC_HASHTAGS, normalizeHashtags, stringifyHashtags } from '../../../utils/hashtag.util';
+import { MAX_LOCAL_HASHTAGS, MAX_PUBLIC_HASHTAGS, normalizeHashtags } from '../../../utils/hashtag.util';
 import { DialogHeaderComponent } from '../dialog-header/dialog-header.component';
 import { HelpDialogService, HelpTopic } from '../help-dialog/help-dialog.service';
 
@@ -32,6 +33,7 @@ export interface HashtagEditDialogResult {
     MatDialogContent,
     MatDialogActions,
     MatDialogClose,
+    MatChipsModule,
     MatFormFieldModule,
     MatInputModule,
     MatIconModule,
@@ -47,11 +49,28 @@ export class HashtagEditDialogComponent {
   readonly help = inject(HelpDialogService);
 
   readonly maxTags = this.data.mode === 'public' ? MAX_PUBLIC_HASHTAGS : MAX_LOCAL_HASHTAGS;
-  inputValue = stringifyHashtags(this.data.initialTags ?? []);
+  hashtagInput = '';
+  hashtagTags = [...(this.data.initialTags ?? [])];
   errorText = '';
 
+  onHashtagEnter(event: Event): void {
+    event.preventDefault();
+    this.addHashtagsFromInput();
+  }
+
+  onAddHashtagClick(): void {
+    this.addHashtagsFromInput();
+  }
+
+  removeHashtag(tag: string): void {
+    this.hashtagTags = this.hashtagTags.filter((item) => item !== tag);
+  }
+
   onApply(): void {
-    const parsed = normalizeHashtags(this.inputValue, this.maxTags);
+    if (!this.addHashtagsFromInput()) {
+      return;
+    }
+    const parsed = normalizeHashtags(this.hashtagTags, this.maxTags);
     if (parsed.invalidTokens.length > 0 || parsed.overflow > 0) {
       this.errorText = this.i18n.t(
         this.data.mode === 'public' ? 'common.hashtags.invalidPublic' : 'common.hashtags.invalidLocal',
@@ -61,5 +80,32 @@ export class HashtagEditDialogComponent {
     }
     this.errorText = '';
     this.dialogRef.close({ hashtags: parsed.tags });
+  }
+
+  private addHashtagsFromInput(): boolean {
+    const candidate = this.hashtagInput.trim();
+    if (!candidate) {
+      return true;
+    }
+
+    const parsed = normalizeHashtags(candidate, this.maxTags);
+    if (parsed.invalidTokens.length > 0) {
+      this.errorText = this.i18n.t(
+        this.data.mode === 'public' ? 'common.hashtags.invalidPublic' : 'common.hashtags.invalidLocal',
+        { max: this.maxTags }
+      );
+      return false;
+    }
+
+    const merged = normalizeHashtags([...this.hashtagTags, ...parsed.tags], this.maxTags);
+    if (merged.overflow > 0) {
+      this.errorText = this.i18n.t('common.hashtags.limitExceeded', { max: this.maxTags });
+      return false;
+    }
+
+    this.hashtagTags = [...merged.tags];
+    this.hashtagInput = '';
+    this.errorText = '';
+    return true;
   }
 }
