@@ -259,6 +259,25 @@ mat-progress-bar {
   font-size: 0.92rem;
 }
 
+.message-hashtags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem;
+  margin: -.15rem 0 .2rem;
+}
+
+.message-hashtag-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: .2rem .55rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  color: var(--text);
+  font-size: .78rem;
+  line-height: 1.2;
+}
+
 .notice-summary {
   display: flex;
   flex-wrap: wrap;

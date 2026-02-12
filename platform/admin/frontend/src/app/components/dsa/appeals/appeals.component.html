@@ -162,6 +162,13 @@
             <div class="block">
               @if (c.message; as message) {
               <div class="bubble">{{ message }}</div>
+              @if ((c.hashtags?.length ?? 0) > 0) {
+              <div class="message-hashtags" aria-label="Message hashtags">
+                @for (tag of c.hashtags ?? []; track tag) {
+                <span class="message-hashtag-chip">#{{ tag }}</span>
+                }
+              </div>
+              }
               <mat-divider class="sp"></mat-divider>
               }
               <div class="section">

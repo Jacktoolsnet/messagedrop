@@ -206,6 +206,7 @@ export class DigitalServicesActReportDialogComponent {
       parentUuid: msg.parentUuid ?? null,
       type: msg.typ ?? null,
       message: msg.message ?? null,
+      hashtags: msg.hashtags ?? null,
       translatedMessage: msg.translatedMessage ?? null,
       userId: msg.userId ?? null,
       createDateTime: msg.createDateTime ?? null,

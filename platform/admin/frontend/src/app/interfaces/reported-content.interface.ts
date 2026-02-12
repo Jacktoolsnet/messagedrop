@@ -18,6 +18,7 @@ export interface ReportedMultimedia {
 
 export interface ReportedContentPayload {
   message?: string | null;
+  hashtags?: string[] | null;
   userId?: string | null;
   aiModerationDecision?: string | null;
   aiModerationScore?: number | null;

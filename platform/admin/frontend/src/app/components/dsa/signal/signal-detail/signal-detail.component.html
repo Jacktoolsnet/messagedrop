@@ -48,6 +48,13 @@
             <div class="snippet-text" [attr.style]="msg()?.style || null">
                 {{ msg()?.message }}
             </div>
+            @if ((msg()?.hashtags?.length ?? 0) > 0) {
+            <div class="message-hashtags" aria-label="Message hashtags">
+                @for (tag of msg()?.hashtags ?? []; track tag) {
+                <span class="message-hashtag-chip">#{{ tag }}</span>
+                }
+            </div>
+            }
             @if (tMsg()) {
             <div class="snippet-translation">
                 <mat-icon>g_translate</mat-icon>

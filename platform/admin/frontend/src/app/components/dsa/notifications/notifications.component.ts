@@ -171,6 +171,14 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     return candidates.find(text => !!text && text.trim().length > 0)?.trim() || 'No additional context available.';
   }
 
+  noticeHashtags(notice: DsaNotice): string[] {
+    const parsed = this.safeParse(notice.reportedContent);
+    if (!Array.isArray(parsed?.hashtags)) return [];
+    return parsed.hashtags
+      .map((tag) => String(tag ?? '').trim())
+      .filter((tag) => tag.length > 0);
+  }
+
   channelIcon(notification: DsaNotification | null | undefined): string {
     const channel = (notification?.channel || '').toLowerCase();
     switch (channel) {

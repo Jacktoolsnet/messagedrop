@@ -143,6 +143,25 @@ mat-chip.status {
     color: var(--text, #1f2937);
 }
 
+.message-hashtags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+    margin: 0 0 .65rem;
+}
+
+.message-hashtag-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: .22rem .62rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--primary) 12%, transparent);
+    color: var(--text);
+    font-size: .82rem;
+    line-height: 1.2;
+}
+
 /* Stelle sicher, dass Text im Content-Bereich immer deine Token-Farbe nutzt */
 .pm-content,
 .pm-content * {

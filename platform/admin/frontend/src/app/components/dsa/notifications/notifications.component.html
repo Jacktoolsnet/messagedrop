@@ -119,6 +119,15 @@
           }
 
           <p class="preview">{{ noticePreview(notice) }}</p>
+          @if (noticeHashtags(notice); as hashtags) {
+          @if (hashtags.length > 0) {
+          <div class="message-hashtags" aria-label="Message hashtags">
+            @for (tag of hashtags; track tag) {
+            <span class="message-hashtag-chip">#{{ tag }}</span>
+            }
+          </div>
+          }
+          }
 
           <div class="actions">
             <button mat-stroked-button color="primary" type="button" (click)="openNoticeDetail(notice, $event)">

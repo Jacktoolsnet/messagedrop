@@ -75,6 +75,13 @@
                         <div class="bubble">
                             @if (c.message; as message) {
                             <div class="msg">{{ message }}</div>
+                            @if ((c.hashtags?.length ?? 0) > 0) {
+                            <div class="message-hashtags" aria-label="Message hashtags">
+                                @for (tag of c.hashtags ?? []; track tag) {
+                                <span class="message-hashtag-chip">#{{ tag }}</span>
+                                }
+                            </div>
+                            }
                             <div class="i18n-row">
                                 <button mat-stroked-button (click)="translateToGerman('message')"
                                     [disabled]="messageI18n().loading">

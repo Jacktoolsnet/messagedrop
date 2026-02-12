@@ -8,6 +8,7 @@ export interface PublicMessage {
     deleteDateTime?: number;
     location?: { latitude: number; longitude: number; plusCode?: string };
     message: string;
+    hashtags?: string[] | null;
     markerType?: string;
     style?: string; // inline css from your example
     views?: number;
