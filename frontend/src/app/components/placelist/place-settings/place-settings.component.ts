@@ -25,7 +25,6 @@ import { AvatarSourceChoice, AvatarSourceDialogComponent } from '../../utils/ava
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 import { UnsplashComponent } from '../../utils/unsplash/unsplash.component';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
-import { MAX_LOCAL_HASHTAGS, normalizeHashtags, stringifyHashtags } from '../../../utils/hashtag.util';
 
 @Component({
   selector: 'app-place',
@@ -67,8 +66,6 @@ export class PlaceProfileComponent {
   private oriIcon: string | undefined = undefined;
   private oriTileSettings: TileSetting[] | undefined = undefined;
   private oriAvatarAttribution: AvatarAttribution | undefined = undefined;
-  private oriHashtags: string[] = [];
-  hashtagInput = '';
 
   readonly dialogRef = inject(MatDialogRef<PlaceProfileComponent>);
   private readonly snackBar = inject(MatSnackBar);
@@ -94,8 +91,6 @@ export class PlaceProfileComponent {
     this.oriBackgroundAttribution = this.data.place.placeBackgroundAttribution;
     this.oriIcon = this.data.place.icon;
     this.oriAvatarAttribution = this.data.place.avatarAttribution;
-    this.oriHashtags = [...(this.data.place.hashtags ?? [])];
-    this.hashtagInput = stringifyHashtags(this.oriHashtags);
     const normalizedTileSettings = normalizeTileSettings(this.data.place.tileSettings);
     this.oriTileSettings = normalizedTileSettings.map((tile: TileSetting) => ({ ...tile }));
     this.data.place.tileSettings = normalizedTileSettings;
@@ -105,9 +100,6 @@ export class PlaceProfileComponent {
   }
 
   async onApplyClick(): Promise<void> {
-    if (!this.applyHashtags()) {
-      return;
-    }
     if (this.oriAvatarFileId && this.oriAvatarFileId !== this.data.place.avatarFileId) {
       await this.avatarStorage.deleteImage(this.oriAvatarFileId);
     }
@@ -153,8 +145,6 @@ export class PlaceProfileComponent {
     if (undefined != this.oriIcon) {
       this.data.place.icon = this.oriIcon;
     }
-    this.data.place.hashtags = [...this.oriHashtags];
-    this.hashtagInput = stringifyHashtags(this.oriHashtags);
     if (this.oriTileSettings) {
       this.data.place.tileSettings = this.oriTileSettings.map(tile => ({ ...tile }));
     }
@@ -264,21 +254,6 @@ export class PlaceProfileComponent {
   formatPercentLabel(value: number): string {
     const numeric = Number.isFinite(value) ? Math.round(value) : 0;
     return `${numeric}%`;
-  }
-
-  private applyHashtags(): boolean {
-    const parsed = normalizeHashtags(this.hashtagInput, MAX_LOCAL_HASHTAGS);
-    if (parsed.invalidTokens.length > 0 || parsed.overflow > 0) {
-      this.snackBar.open(
-        this.translation.t('common.hashtags.invalidLocal', { max: MAX_LOCAL_HASHTAGS }),
-        this.translation.t('common.actions.ok'),
-        { duration: 2500 }
-      );
-      return false;
-    }
-    this.data.place.hashtags = parsed.tags;
-    this.hashtagInput = stringifyHashtags(parsed.tags);
-    return true;
   }
 
   private showStorageUnsupported(): void {
