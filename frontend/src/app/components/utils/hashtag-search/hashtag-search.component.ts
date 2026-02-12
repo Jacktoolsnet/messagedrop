@@ -106,50 +106,46 @@ export class HashtagSearchComponent {
   );
   readonly mapItems = computed<HashtagMapItem[]>(() => {
     const items: HashtagMapItem[] = [];
-
-    if (this.localMode()) {
-      const experienceLocations = this.experienceLocations();
-      this.localPlaceResults().forEach((place) => {
-        const location = this.normalizeLocation(place.location);
-        if (!location) {
-          return;
-        }
-        items.push({
-          id: `place:${place.id}`,
-          type: 'place',
-          label: place.name || this.i18n.t('common.placeList.nameFallback'),
-          location
-        });
+    const experienceLocations = this.experienceLocations();
+    this.localPlaceResults().forEach((place) => {
+      const location = this.normalizeLocation(place.location);
+      if (!location) {
+        return;
+      }
+      items.push({
+        id: `place:${place.id}`,
+        type: 'place',
+        label: place.name || this.i18n.t('common.placeList.nameFallback'),
+        location
       });
+    });
 
-      this.localExperienceResults().forEach((experience) => {
-        const key = this.getExperienceMapKey(experience);
-        const location = experienceLocations.get(key);
-        if (!location) {
-          return;
-        }
-        items.push({
-          id: `experience:${key}`,
-          type: 'experience',
-          label: experience.snapshot.title || experience.productCode,
-          location
-        });
+    this.localExperienceResults().forEach((experience) => {
+      const key = this.getExperienceMapKey(experience);
+      const location = experienceLocations.get(key);
+      if (!location) {
+        return;
+      }
+      items.push({
+        id: `experience:${key}`,
+        type: 'experience',
+        label: experience.snapshot.title || experience.productCode,
+        location
       });
-      return items;
-    }
+    });
 
     this.publicResults().forEach((message) => {
-        const location = this.normalizeLocation(message.location);
-        if (!location) {
-          return;
-        }
-        items.push({
-          id: `message:${message.uuid}`,
-          type: 'message',
-          label: this.getPublicPreview(message),
-          location
-        });
+      const location = this.normalizeLocation(message.location);
+      if (!location) {
+        return;
+      }
+      items.push({
+        id: `message:${message.uuid}`,
+        type: 'message',
+        label: this.getPublicPreview(message),
+        location
       });
+    });
     return items;
   });
 
@@ -176,20 +172,14 @@ export class HashtagSearchComponent {
       return;
     }
     this.errorText.set('');
+    this.clearResults();
     const tag = parsed.tags[0];
     this.normalizedTag.set(tag);
     this.hasSearched.set(true);
     if (this.localMode()) {
-      this.loadingPublic.set(false);
-      this.publicResults.set([]);
       this.searchLocal(tag);
-    } else {
-      this.localPlaceResults.set([]);
-      this.localContactResults.set([]);
-      this.localExperienceResults.set([]);
-      this.experienceLocations.set(new Map());
-      this.searchPublic(tag);
     }
+    this.searchPublic(tag);
   }
 
   selectMessage(message: Message): void {
