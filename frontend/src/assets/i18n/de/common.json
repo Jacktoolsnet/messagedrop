@@ -120,7 +120,7 @@
     },
     "hashtagSearch": {
       "title": "Hashtags suchen",
-      "intro": "Suche mit einem Hashtag über öffentliche Nachrichten/Kommentare und deine lokalen Orte, Kontakte und Erlebnisse.",
+      "intro": "Suche mit einem Hashtag über öffentliche Nachrichten/Kommentare und deine lokalen Orte, Kontakte, Notizen und Erlebnisse.",
       "inputLabel": "Hashtag",
       "placeholder": "#reise",
       "inputHint": "Einen Hashtag eingeben. Beispiel: #reise",
@@ -134,6 +134,7 @@
       "sections": {
         "places": "Orte",
         "contacts": "Kontakte",
+        "notes": "Notizen",
         "experiences": "Erlebnisse",
         "publicMessages": "Öffentliche Nachrichten",
         "comments": "Kommentare"

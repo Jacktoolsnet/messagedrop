@@ -3,7 +3,7 @@ import * as leaflet from 'leaflet';
 import { BoundingBox } from '../../../../../interfaces/bounding-box';
 import { Location } from '../../../../../interfaces/location';
 
-export type HashtagMapItemType = 'place' | 'message' | 'experience' | 'contact';
+export type HashtagMapItemType = 'place' | 'message' | 'experience' | 'contact' | 'note';
 
 export interface HashtagMapItem {
   id: string;
@@ -32,6 +32,12 @@ const experienceMarkerIcon = leaflet.icon({
 
 const contactMarkerIcon = leaflet.icon({
   iconUrl: 'assets/markers/user-marker.svg',
+  iconSize: [32, 40],
+  iconAnchor: [16, 40]
+});
+
+const noteMarkerIcon = leaflet.icon({
+  iconUrl: 'assets/markers/note-marker.svg',
   iconSize: [32, 40],
   iconAnchor: [16, 40]
 });
@@ -192,6 +198,8 @@ export class HashtagResultsMapComponent implements AfterViewInit, OnChanges, OnD
         return experienceMarkerIcon;
       case 'contact':
         return contactMarkerIcon;
+      case 'note':
+        return noteMarkerIcon;
       default:
         return placeMarkerIcon;
     }

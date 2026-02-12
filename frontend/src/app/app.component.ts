@@ -2021,6 +2021,11 @@ export class AppComponent implements OnInit {
       }
       if (result.type === 'experience' && result.experience?.snapshot) {
         this.openMarkerMyExperienceListDialog([result.experience.snapshot]);
+        return;
+      }
+      if (result.type === 'note' && result.note) {
+        this.mapService.flyTo(result.note.location);
+        this.openMarkerNoteListDialog([result.note]);
       }
     });
   }

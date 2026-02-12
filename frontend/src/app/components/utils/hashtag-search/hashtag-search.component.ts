@@ -1,4 +1,4 @@
-import { DestroyRef, Component, computed, inject, signal } from '@angular/core';
+import { DestroyRef, Component, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,6 +10,7 @@ import { HelpDialogService, HelpTopic } from '../help-dialog/help-dialog.service
 import { Contact } from '../../../interfaces/contact';
 import { Location } from '../../../interfaces/location';
 import { Message } from '../../../interfaces/message';
+import { Note } from '../../../interfaces/note';
 import { Place } from '../../../interfaces/place';
 import { ExperienceBookmark } from '../../../interfaces/experience-bookmark';
 import { ViatorDestinationLookup } from '../../../interfaces/viator';
@@ -18,6 +19,7 @@ import { ExperienceBookmarkService } from '../../../services/experience-bookmark
 import { GeolocationService } from '../../../services/geolocation.service';
 import { MapService } from '../../../services/map.service';
 import { MessageService } from '../../../services/message.service';
+import { NoteService } from '../../../services/note.service';
 import { PlaceService } from '../../../services/place.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { UserService } from '../../../services/user.service';
@@ -31,11 +33,22 @@ export interface HashtagSearchDialogData {
 }
 
 export interface HashtagSearchResult {
-  type: 'message' | 'place' | 'contact' | 'experience';
+  type: 'message' | 'place' | 'contact' | 'experience' | 'note';
   message?: Message;
   place?: Place;
   contact?: Contact;
   experience?: ExperienceBookmark;
+  note?: Note;
+}
+
+interface HashtagSearchListTile {
+  id: string;
+  icon: string;
+  categoryKey: string;
+  title: string;
+  description?: string;
+  tagsLabel?: string;
+  result: HashtagSearchResult;
 }
 
 @Component({
@@ -61,6 +74,7 @@ export class HashtagSearchComponent {
   private readonly messageService = inject(MessageService);
   private readonly placeService = inject(PlaceService);
   private readonly contactService = inject(ContactService);
+  private readonly noteService = inject(NoteService);
   private readonly bookmarkService = inject(ExperienceBookmarkService);
   private readonly geolocationService = inject(GeolocationService);
   private readonly mapService = inject(MapService);
@@ -86,7 +100,9 @@ export class HashtagSearchComponent {
   readonly publicResults = signal<Message[]>([]);
   readonly localPlaceResults = signal<Place[]>([]);
   readonly localContactResults = signal<Contact[]>([]);
+  readonly localNoteResults = signal<Note[]>([]);
   readonly localExperienceResults = signal<ExperienceBookmark[]>([]);
+  private readonly noteResultsSignal = this.noteService.getNotesSignal();
   private readonly destinationCache = new Map<number, ViatorDestinationLookup>();
   private readonly experienceLocations = signal<Map<string, Location>>(new Map());
   private experienceLookupRevision = 0;
@@ -102,8 +118,81 @@ export class HashtagSearchComponent {
     this.publicResults().length > 0
     || this.localPlaceResults().length > 0
     || this.localContactResults().length > 0
+    || this.localNoteResults().length > 0
     || this.localExperienceResults().length > 0
   );
+  readonly listTiles = computed<HashtagSearchListTile[]>(() => {
+    const tiles: HashtagSearchListTile[] = [];
+
+    this.localPlaceResults().forEach((place) => {
+      tiles.push({
+        id: `tile-place:${place.id}`,
+        icon: 'place',
+        categoryKey: 'common.hashtagSearch.sections.places',
+        title: place.name || this.i18n.t('common.placeList.nameFallback'),
+        tagsLabel: place.hashtags?.length ? this.hashtagsLabel(place.hashtags) : undefined,
+        result: { type: 'place', place }
+      });
+    });
+
+    this.localContactResults().forEach((contact) => {
+      tiles.push({
+        id: `tile-contact:${contact.id}`,
+        icon: 'contacts',
+        categoryKey: 'common.hashtagSearch.sections.contacts',
+        title: contact.name || this.i18n.t('common.contact.list.nameFallback'),
+        tagsLabel: contact.hashtags?.length ? this.hashtagsLabel(contact.hashtags) : undefined,
+        result: { type: 'contact', contact }
+      });
+    });
+
+    this.localExperienceResults().forEach((experience) => {
+      tiles.push({
+        id: `tile-experience:${this.getExperienceMapKey(experience)}`,
+        icon: 'bookmark_star',
+        categoryKey: 'common.hashtagSearch.sections.experiences',
+        title: experience.snapshot.title || experience.productCode,
+        description: this.getExperiencePreview(experience),
+        tagsLabel: experience.hashtags?.length ? this.hashtagsLabel(experience.hashtags) : undefined,
+        result: { type: 'experience', experience }
+      });
+    });
+
+    this.localNoteResults().forEach((note) => {
+      tiles.push({
+        id: `tile-note:${note.id}`,
+        icon: 'clinical_notes',
+        categoryKey: 'common.hashtagSearch.sections.notes',
+        title: this.getNotePreview(note),
+        tagsLabel: note.hashtags?.length ? this.hashtagsLabel(note.hashtags) : undefined,
+        result: { type: 'note', note }
+      });
+    });
+
+    this.publicMessages().forEach((message) => {
+      tiles.push({
+        id: `tile-public-message:${message.uuid}`,
+        icon: 'forum',
+        categoryKey: 'common.hashtagSearch.sections.publicMessages',
+        title: this.getPublicPreview(message),
+        tagsLabel: message.hashtags?.length ? this.hashtagsLabel(message.hashtags) : undefined,
+        result: { type: 'message', message }
+      });
+    });
+
+    this.publicComments().forEach((message) => {
+      tiles.push({
+        id: `tile-comment:${message.uuid}`,
+        icon: 'chat',
+        categoryKey: 'common.hashtagSearch.sections.comments',
+        title: this.getPublicPreview(message),
+        tagsLabel: message.hashtags?.length ? this.hashtagsLabel(message.hashtags) : undefined,
+        result: { type: 'message', message }
+      });
+    });
+
+    return tiles;
+  });
   readonly mapItems = computed<HashtagMapItem[]>(() => {
     const items: HashtagMapItem[] = [];
     const experienceLocations = this.experienceLocations();
@@ -134,6 +223,19 @@ export class HashtagSearchComponent {
       });
     });
 
+    this.localNoteResults().forEach((note) => {
+      const location = this.normalizeLocation(note.location);
+      if (!location) {
+        return;
+      }
+      items.push({
+        id: `note:${note.id}`,
+        type: 'note',
+        label: this.getNotePreview(note),
+        location
+      });
+    });
+
     this.publicResults().forEach((message) => {
       const location = this.normalizeLocation(message.location);
       if (!location) {
@@ -151,11 +253,28 @@ export class HashtagSearchComponent {
 
   constructor() {
     void this.bookmarkService.ensureLoaded();
+    if (this.userService.isReady()) {
+      this.contactService.initContacts(this.userService.hasJwt());
+      void this.noteService.loadNotes();
+    }
     const bounds = this.mapService.getVisibleMapBoundingBox();
     this.mapView = {
       center: this.geolocationService.getCenterOfBoundingBox(bounds),
       zoom: this.mapService.getMapZoom()
     };
+    effect(() => {
+      const tag = this.normalizedTag();
+      const searched = this.hasSearched();
+      const localAvailable = this.localMode();
+      this.placeService.sortedPlacesSignal();
+      this.contactService.sortedContactsSignal();
+      this.noteResultsSignal();
+      this.bookmarkService.bookmarksSignal();
+      if (!searched || !localAvailable || !tag) {
+        return;
+      }
+      this.searchLocal(tag);
+    });
     if (this.query) {
       this.search();
     }
@@ -177,6 +296,7 @@ export class HashtagSearchComponent {
     this.normalizedTag.set(tag);
     this.hasSearched.set(true);
     if (this.localMode()) {
+      void this.noteService.loadNotes();
       this.searchLocal(tag);
     }
     this.searchPublic(tag);
@@ -196,6 +316,10 @@ export class HashtagSearchComponent {
 
   selectExperience(experience: ExperienceBookmark): void {
     this.dialogRef.close({ type: 'experience', experience });
+  }
+
+  selectNote(note: Note): void {
+    this.dialogRef.close({ type: 'note', note });
   }
 
   toggleViewMode(): void {
@@ -229,12 +353,44 @@ export class HashtagSearchComponent {
       return;
     }
 
+    if (itemId.startsWith('note:')) {
+      const noteId = itemId.slice('note:'.length);
+      const note = this.localNoteResults().find((entry) => entry.id === noteId);
+      if (note) {
+        this.selectNote(note);
+      }
+      return;
+    }
+
     if (itemId.startsWith('message:')) {
       const uuid = itemId.slice('message:'.length);
       const message = this.publicResults().find((entry) => entry.uuid === uuid);
       if (message) {
         this.selectMessage(message);
       }
+    }
+  }
+
+  onListTileSelected(tile: HashtagSearchListTile): void {
+    const result = tile.result;
+    if (result.type === 'place' && result.place) {
+      this.selectPlace(result.place);
+      return;
+    }
+    if (result.type === 'contact' && result.contact) {
+      this.selectContact(result.contact);
+      return;
+    }
+    if (result.type === 'experience' && result.experience) {
+      this.selectExperience(result.experience);
+      return;
+    }
+    if (result.type === 'note' && result.note) {
+      this.selectNote(result.note);
+      return;
+    }
+    if (result.type === 'message' && result.message) {
+      this.selectMessage(result.message);
     }
   }
 
@@ -250,11 +406,34 @@ export class HashtagSearchComponent {
     return `${text.slice(0, 140)}…`;
   }
 
+  getExperiencePreview(experience: ExperienceBookmark): string | undefined {
+    const text = (experience.snapshot.description || '').trim();
+    if (!text) {
+      return undefined;
+    }
+    if (text.length <= 140) {
+      return text;
+    }
+    return `${text.slice(0, 140)}…`;
+  }
+
+  getNotePreview(note: Note): string {
+    const text = (note.note || '').trim();
+    if (!text) {
+      return this.i18n.t('common.menu.myPrivateNotes');
+    }
+    if (text.length <= 140) {
+      return text;
+    }
+    return `${text.slice(0, 140)}…`;
+  }
+
   private clearResults(): void {
     this.experienceLookupRevision += 1;
     this.publicResults.set([]);
     this.localPlaceResults.set([]);
     this.localContactResults.set([]);
+    this.localNoteResults.set([]);
     this.localExperienceResults.set([]);
     this.experienceLocations.set(new Map());
   }
@@ -262,9 +441,11 @@ export class HashtagSearchComponent {
   private searchLocal(tag: string): void {
     const places = this.placeService.sortedPlacesSignal().filter((place) => this.hasTag(place.hashtags, tag));
     const contacts = this.contactService.sortedContactsSignal().filter((contact) => this.hasTag(contact.hashtags, tag));
+    const notes = this.noteResultsSignal().filter((note) => this.hasTag(note.hashtags, tag));
     const experiences = this.bookmarkService.bookmarksSignal().filter((bookmark) => this.hasTag(bookmark.hashtags, tag));
     this.localPlaceResults.set(places);
     this.localContactResults.set(contacts);
+    this.localNoteResults.set(notes);
     this.localExperienceResults.set(experiences);
     this.resolveExperienceLocations(experiences);
   }

@@ -28,80 +28,23 @@
     (viewChange)="onViewChange($event)">
   </app-hashtag-results-map>
   } @else {
-  <div class="results-list">
-    @if (localPlaceResults().length > 0) {
-    <section class="result-section">
-      <h3>{{ 'common.hashtagSearch.sections.places' | transloco }}</h3>
-      @for (place of localPlaceResults(); track place.id) {
-      <button mat-stroked-button type="button" class="result-button" (click)="selectPlace(place)">
-        <mat-icon>place</mat-icon>
-        <span class="result-main">{{ place.name || ('common.placeList.nameFallback' | transloco) }}</span>
-        @if (place.hashtags?.length) {
-        <span class="result-tags">{{ hashtagsLabel(place.hashtags) }}</span>
+  <div class="results-grid">
+    @for (tile of listTiles(); track tile.id) {
+    <article class="result-tile">
+      <button type="button" class="result-tile__button" (click)="onListTileSelected(tile)">
+        <span class="result-tile__icon">
+          <mat-icon>{{ tile.icon }}</mat-icon>
+        </span>
+        <span class="result-tile__category">{{ tile.categoryKey | transloco }}</span>
+        <span class="result-tile__title">{{ tile.title }}</span>
+        @if (tile.description) {
+        <span class="result-tile__description">{{ tile.description }}</span>
+        }
+        @if (tile.tagsLabel) {
+        <span class="result-tile__tags">{{ tile.tagsLabel }}</span>
         }
       </button>
-      }
-    </section>
-    }
-
-    @if (localContactResults().length > 0) {
-    <section class="result-section">
-      <h3>{{ 'common.hashtagSearch.sections.contacts' | transloco }}</h3>
-      @for (contact of localContactResults(); track contact.id) {
-      <button mat-stroked-button type="button" class="result-button" (click)="selectContact(contact)">
-        <mat-icon>contacts</mat-icon>
-        <span class="result-main">{{ contact.name || ('common.contact.list.nameFallback' | transloco) }}</span>
-        @if (contact.hashtags?.length) {
-        <span class="result-tags">{{ hashtagsLabel(contact.hashtags) }}</span>
-        }
-      </button>
-      }
-    </section>
-    }
-
-    @if (localExperienceResults().length > 0) {
-    <section class="result-section">
-      <h3>{{ 'common.hashtagSearch.sections.experiences' | transloco }}</h3>
-      @for (experience of localExperienceResults(); track experience.productCode) {
-      <button mat-stroked-button type="button" class="result-button" (click)="selectExperience(experience)">
-        <mat-icon>bookmark_star</mat-icon>
-        <span class="result-main">{{ experience.snapshot.title || experience.productCode }}</span>
-        @if (experience.hashtags?.length) {
-        <span class="result-tags">{{ hashtagsLabel(experience.hashtags) }}</span>
-        }
-      </button>
-      }
-    </section>
-    }
-
-    @if (publicMessages().length > 0) {
-    <section class="result-section">
-      <h3>{{ 'common.hashtagSearch.sections.publicMessages' | transloco }}</h3>
-      @for (message of publicMessages(); track message.uuid) {
-      <button mat-stroked-button type="button" class="result-button result-button--message" (click)="selectMessage(message)">
-        <mat-icon>forum</mat-icon>
-        <span class="result-main">{{ getPublicPreview(message) }}</span>
-        @if (message.hashtags?.length) {
-        <span class="result-tags">{{ hashtagsLabel(message.hashtags) }}</span>
-        }
-      </button>
-      }
-    </section>
-    }
-
-    @if (publicComments().length > 0) {
-    <section class="result-section">
-      <h3>{{ 'common.hashtagSearch.sections.comments' | transloco }}</h3>
-      @for (message of publicComments(); track message.uuid) {
-      <button mat-stroked-button type="button" class="result-button result-button--message" (click)="selectMessage(message)">
-        <mat-icon>chat</mat-icon>
-        <span class="result-main">{{ getPublicPreview(message) }}</span>
-        @if (message.hashtags?.length) {
-        <span class="result-tags">{{ hashtagsLabel(message.hashtags) }}</span>
-        }
-      </button>
-      }
-    </section>
+    </article>
     }
   </div>
   }
