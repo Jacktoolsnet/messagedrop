@@ -1992,6 +1992,7 @@ export class AppComponent implements OnInit {
       minWidth: 'min(450px, 95vw)',
       width: '90vw',
       maxWidth: '90vw',
+      height: '90vh',
       maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',

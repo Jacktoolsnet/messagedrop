@@ -1,25 +1,18 @@
-<app-dialog-header
-  icon="tag"
-  [title]="'common.hashtagSearch.title' | transloco"
-  [subtitle]="errorText()">
-</app-dialog-header>
+<div class="searchTerm-container">
+  <input type="search"
+    enterkeyhint="search"
+    [placeholder]="'common.hashtagSearch.placeholder' | transloco"
+    [(ngModel)]="query"
+    (keyup.enter)="search()" />
+  <button type="button" (click)="search()" [attr.aria-label]="'common.hashtagSearch.searchAction' | transloco">
+    <mat-icon>search</mat-icon>
+  </button>
+</div>
 
 <mat-dialog-content class="hashtag-search-content">
-  <mat-form-field appearance="outline" class="full-width">
-    <mat-label>{{ 'common.hashtagSearch.inputLabel' | transloco }}</mat-label>
-    <input
-      matInput
-      [placeholder]="'common.hashtagSearch.placeholder' | transloco"
-      [(ngModel)]="query"
-      (keyup.enter)="search()" />
-    <mat-hint>{{ 'common.hashtagSearch.inputHint' | transloco }}</mat-hint>
-  </mat-form-field>
-
-  <mat-button-toggle-group class="scope-toggle" [value]="scope()" (change)="onScopeChange($event.value)">
-    <mat-button-toggle value="all">{{ 'common.hashtagSearch.scopeAll' | transloco }}</mat-button-toggle>
-    <mat-button-toggle value="local">{{ 'common.hashtagSearch.scopeLocal' | transloco }}</mat-button-toggle>
-    <mat-button-toggle value="public">{{ 'common.hashtagSearch.scopePublic' | transloco }}</mat-button-toggle>
-  </mat-button-toggle-group>
+  @if (errorText()) {
+  <p class="state-line state-line--error">{{ errorText() }}</p>
+  }
 
   @if (loadingPublic()) {
   <p class="state-line">{{ 'common.hashtagSearch.searching' | transloco }}</p>
@@ -29,79 +22,88 @@
   <p class="state-line">{{ 'common.hashtagSearch.noResults' | transloco }}</p>
   }
 
-  @if (localPlaceResults().length > 0) {
-  <section class="result-section">
-    <h3>{{ 'common.hashtagSearch.sections.places' | transloco }}</h3>
-    @for (place of localPlaceResults(); track place.id) {
-    <button mat-stroked-button type="button" class="result-button" (click)="selectPlace(place)">
-      <mat-icon>place</mat-icon>
-      <span class="result-main">{{ place.name || ('common.placeList.nameFallback' | transloco) }}</span>
-      @if (place.hashtags?.length) {
-      <span class="result-tags">{{ hashtagsLabel(place.hashtags) }}</span>
+  @if (viewMode === 'map') {
+  <app-hashtag-results-map [items]="mapItems()" [initialCenter]="mapView.center" [initialZoom]="mapView.zoom"
+    [selectedItemId]="selectedMapItemId()" (itemSelected)="onMapItemSelected($event)"
+    (viewChange)="onViewChange($event)">
+  </app-hashtag-results-map>
+  } @else {
+  <div class="results-list">
+    @if (localPlaceResults().length > 0) {
+    <section class="result-section">
+      <h3>{{ 'common.hashtagSearch.sections.places' | transloco }}</h3>
+      @for (place of localPlaceResults(); track place.id) {
+      <button mat-stroked-button type="button" class="result-button" (click)="selectPlace(place)">
+        <mat-icon>place</mat-icon>
+        <span class="result-main">{{ place.name || ('common.placeList.nameFallback' | transloco) }}</span>
+        @if (place.hashtags?.length) {
+        <span class="result-tags">{{ hashtagsLabel(place.hashtags) }}</span>
+        }
+      </button>
       }
-    </button>
+    </section>
     }
-  </section>
-  }
 
-  @if (localContactResults().length > 0) {
-  <section class="result-section">
-    <h3>{{ 'common.hashtagSearch.sections.contacts' | transloco }}</h3>
-    @for (contact of localContactResults(); track contact.id) {
-    <button mat-stroked-button type="button" class="result-button" (click)="selectContact(contact)">
-      <mat-icon>contacts</mat-icon>
-      <span class="result-main">{{ contact.name || ('common.contact.list.nameFallback' | transloco) }}</span>
-      @if (contact.hashtags?.length) {
-      <span class="result-tags">{{ hashtagsLabel(contact.hashtags) }}</span>
+    @if (localContactResults().length > 0) {
+    <section class="result-section">
+      <h3>{{ 'common.hashtagSearch.sections.contacts' | transloco }}</h3>
+      @for (contact of localContactResults(); track contact.id) {
+      <button mat-stroked-button type="button" class="result-button" (click)="selectContact(contact)">
+        <mat-icon>contacts</mat-icon>
+        <span class="result-main">{{ contact.name || ('common.contact.list.nameFallback' | transloco) }}</span>
+        @if (contact.hashtags?.length) {
+        <span class="result-tags">{{ hashtagsLabel(contact.hashtags) }}</span>
+        }
+      </button>
       }
-    </button>
+    </section>
     }
-  </section>
-  }
 
-  @if (localExperienceResults().length > 0) {
-  <section class="result-section">
-    <h3>{{ 'common.hashtagSearch.sections.experiences' | transloco }}</h3>
-    @for (experience of localExperienceResults(); track experience.productCode) {
-    <button mat-stroked-button type="button" class="result-button" (click)="selectExperience(experience)">
-      <mat-icon>bookmark_star</mat-icon>
-      <span class="result-main">{{ experience.snapshot.title || experience.productCode }}</span>
-      @if (experience.hashtags?.length) {
-      <span class="result-tags">{{ hashtagsLabel(experience.hashtags) }}</span>
+    @if (localExperienceResults().length > 0) {
+    <section class="result-section">
+      <h3>{{ 'common.hashtagSearch.sections.experiences' | transloco }}</h3>
+      @for (experience of localExperienceResults(); track experience.productCode) {
+      <button mat-stroked-button type="button" class="result-button" (click)="selectExperience(experience)">
+        <mat-icon>bookmark_star</mat-icon>
+        <span class="result-main">{{ experience.snapshot.title || experience.productCode }}</span>
+        @if (experience.hashtags?.length) {
+        <span class="result-tags">{{ hashtagsLabel(experience.hashtags) }}</span>
+        }
+      </button>
       }
-    </button>
+    </section>
     }
-  </section>
-  }
 
-  @if (publicMessages().length > 0) {
-  <section class="result-section">
-    <h3>{{ 'common.hashtagSearch.sections.publicMessages' | transloco }}</h3>
-    @for (message of publicMessages(); track message.uuid) {
-    <button mat-stroked-button type="button" class="result-button result-button--message" (click)="selectMessage(message)">
-      <mat-icon>forum</mat-icon>
-      <span class="result-main">{{ getPublicPreview(message) }}</span>
-      @if (message.hashtags?.length) {
-      <span class="result-tags">{{ hashtagsLabel(message.hashtags) }}</span>
+    @if (publicMessages().length > 0) {
+    <section class="result-section">
+      <h3>{{ 'common.hashtagSearch.sections.publicMessages' | transloco }}</h3>
+      @for (message of publicMessages(); track message.uuid) {
+      <button mat-stroked-button type="button" class="result-button result-button--message" (click)="selectMessage(message)">
+        <mat-icon>forum</mat-icon>
+        <span class="result-main">{{ getPublicPreview(message) }}</span>
+        @if (message.hashtags?.length) {
+        <span class="result-tags">{{ hashtagsLabel(message.hashtags) }}</span>
+        }
+      </button>
       }
-    </button>
+    </section>
     }
-  </section>
-  }
 
-  @if (publicComments().length > 0) {
-  <section class="result-section">
-    <h3>{{ 'common.hashtagSearch.sections.comments' | transloco }}</h3>
-    @for (message of publicComments(); track message.uuid) {
-    <button mat-stroked-button type="button" class="result-button result-button--message" (click)="selectMessage(message)">
-      <mat-icon>chat</mat-icon>
-      <span class="result-main">{{ getPublicPreview(message) }}</span>
-      @if (message.hashtags?.length) {
-      <span class="result-tags">{{ hashtagsLabel(message.hashtags) }}</span>
+    @if (publicComments().length > 0) {
+    <section class="result-section">
+      <h3>{{ 'common.hashtagSearch.sections.comments' | transloco }}</h3>
+      @for (message of publicComments(); track message.uuid) {
+      <button mat-stroked-button type="button" class="result-button result-button--message" (click)="selectMessage(message)">
+        <mat-icon>chat</mat-icon>
+        <span class="result-main">{{ getPublicPreview(message) }}</span>
+        @if (message.hashtags?.length) {
+        <span class="result-tags">{{ hashtagsLabel(message.hashtags) }}</span>
+        }
+      </button>
       }
-    </button>
+    </section>
     }
-  </section>
+  </div>
   }
 </mat-dialog-content>
 
@@ -114,8 +116,8 @@
     [attr.aria-label]="'common.actions.help' | transloco">
     <mat-icon>help</mat-icon>
   </button>
-  <button mat-icon-button color="primary" type="button" (click)="search()"
-    [attr.aria-label]="'common.hashtagSearch.searchAction' | transloco">
-    <mat-icon>search</mat-icon>
+  <button mat-icon-button type="button" (click)="toggleViewMode()"
+    [attr.aria-label]="viewMode === 'list' ? ('common.location.switchToMap' | transloco) : ('common.location.switchToList' | transloco)">
+    <mat-icon>{{ viewMode === 'list' ? 'map' : 'list' }}</mat-icon>
   </button>
 </mat-dialog-actions>

@@ -1,0 +1,14 @@
+:host {
+  display: block;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.map-container {
+  height: 100%;
+  width: 100%;
+  min-height: 320px;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+}
