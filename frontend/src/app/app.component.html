@@ -294,6 +294,10 @@
 </mat-menu>
 
 <mat-menu #searchMenu="matMenu">
+    <button mat-menu-item (click)="showHashtagSearchDialog()">
+        <mat-icon>tag</mat-icon>
+        <span>{{ 'common.menu.searchHashtags' | transloco }}</span>
+    </button>
     <button mat-menu-item (click)="showNominatimSearchDialog()">
         <mat-icon>travel_explore</mat-icon>
         <span>{{ 'common.menu.searchPlace' | transloco }}</span>
@@ -301,10 +305,6 @@
     <button mat-menu-item (click)="showExperienceSearchDialog()">
         <mat-icon>local_activity</mat-icon>
         <span>{{ 'common.menu.searchExperiences' | transloco }}</span>
-    </button>
-    <button mat-menu-item (click)="showHashtagSearchDialog()">
-        <mat-icon>tag</mat-icon>
-        <span>{{ 'common.menu.searchHashtags' | transloco }}</span>
     </button>
 </mat-menu>
 }
