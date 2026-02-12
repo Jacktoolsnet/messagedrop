@@ -66,6 +66,7 @@ export class TileListComponent {
     'custom-pollution'
   ]);
   private readonly experienceRenderableTypes = new Set<TileSetting['type']>([
+    'hashtags',
     'custom-text',
     'custom-multitext',
     'custom-todo',
@@ -100,7 +101,7 @@ export class TileListComponent {
     const opts = contact
       ? { includeDefaults: true, includeSystem: false, defaultContext: 'contact' as const }
       : experience
-        ? { includeDefaults: false, includeSystem: false }
+        ? { includeDefaults: true, includeSystem: false, defaultContext: 'experience' as const }
         : { includeDefaults: true, includeSystem: true, defaultContext: 'place' as const };
     const allowed = experience ? this.experienceRenderableTypes : this.renderableTypes;
     return normalizeTileSettings(sourceTiles, opts)
@@ -189,7 +190,7 @@ export class TileListComponent {
         ? { includeDefaults: true, includeSystem: false, defaultContext: 'contact' as const }
         : place
           ? { includeDefaults: true, includeSystem: true, defaultContext: 'place' as const }
-          : { includeDefaults: false, includeSystem: false };
+          : { includeDefaults: true, includeSystem: false, defaultContext: 'experience' as const };
       const normalized = normalizeTileSettings(updatedSettings, normalizeOptions)
         .map((tile: TileSetting) => ({ ...tile }));
 

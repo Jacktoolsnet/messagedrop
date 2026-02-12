@@ -60,9 +60,9 @@ export class TileSettingsComponent {
   readonly tileSettings = signal<TileSetting[]>(normalizeTileSettings(
     this.data.place?.tileSettings ?? this.data.contact?.tileSettings ?? this.data.experience?.tileSettings,
     {
-      includeDefaults: this.isPlaceContext || this.isContactContext,
+      includeDefaults: this.isPlaceContext || this.isContactContext || this.isExperienceContext,
       includeSystem: this.isPlaceContext,
-      defaultContext: this.isContactContext ? 'contact' : 'place'
+      defaultContext: this.isContactContext ? 'contact' : this.isExperienceContext ? 'experience' : 'place'
     }
   ).filter(tile => tile.type !== 'custom-link'));
   private readonly baseAddableTiles: readonly { type: TileSetting['type']; labelKey: string; icon: string }[] = [

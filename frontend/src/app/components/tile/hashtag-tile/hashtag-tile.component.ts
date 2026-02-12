@@ -4,8 +4,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Contact } from '../../../interfaces/contact';
+import { ExperienceTileContext } from '../../../interfaces/experience-tile-context';
 import { Place } from '../../../interfaces/place';
 import { ContactService } from '../../../services/contact.service';
+import { ExperienceBookmarkService } from '../../../services/experience-bookmark.service';
 import { PlaceService } from '../../../services/place.service';
 import { HashtagEditDialogComponent, HashtagEditDialogResult } from '../../utils/hashtag-edit-dialog/hashtag-edit-dialog.component';
 
@@ -23,14 +25,16 @@ import { HashtagEditDialogComponent, HashtagEditDialogResult } from '../../utils
 export class HashtagTileComponent {
   @Input() place?: Place;
   @Input() contact?: Contact;
+  @Input() experience?: ExperienceTileContext;
 
   private readonly dialog = inject(MatDialog);
   private readonly placeService = inject(PlaceService);
   private readonly contactService = inject(ContactService);
+  private readonly experienceBookmarkService = inject(ExperienceBookmarkService);
   private readonly cdr = inject(ChangeDetectorRef);
 
   get hashtags(): string[] {
-    return [...(this.place?.hashtags ?? this.contact?.hashtags ?? [])];
+    return [...(this.place?.hashtags ?? this.contact?.hashtags ?? this.experience?.hashtags ?? [])];
   }
 
   editHashtags(event?: Event): void {
@@ -43,7 +47,11 @@ export class HashtagTileComponent {
       height: 'auto',
       maxHeight: '95vh',
       data: {
-        titleKey: this.contact ? 'common.hashtags.editContactTitle' : 'common.hashtags.editPlaceTitle',
+        titleKey: this.contact
+          ? 'common.hashtags.editContactTitle'
+          : this.experience
+            ? 'common.hashtags.editExperienceTitle'
+            : 'common.hashtags.editPlaceTitle',
         mode: 'local',
         initialTags: this.hashtags,
         helpKey: 'hashtagSearch'
@@ -79,6 +87,11 @@ export class HashtagTileComponent {
       this.contact.hashtags = [...tags];
       void this.contactService.saveAditionalContactInfos();
       this.contactService.refreshContact(this.contact.id);
+    }
+
+    if (this.experience?.productCode) {
+      this.experience.hashtags = [...tags];
+      void this.experienceBookmarkService.saveHashtags(this.experience.productCode, tags);
     }
 
     this.cdr.markForCheck();

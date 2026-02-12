@@ -9,7 +9,7 @@ export type DefaultTileType =
   | 'custom-experience';
 export type TileType = DefaultTileType | `custom-${string}`;
 export type TileLinkType = 'web' | 'phone' | 'email' | 'whatsapp' | 'sms' | 'map';
-export type TileDefaultsContext = 'place' | 'contact';
+export type TileDefaultsContext = 'place' | 'contact' | 'experience';
 
 export interface TileTodoItem {
   id: string;
@@ -89,9 +89,14 @@ const placeDefaultTileTypeOrder: DefaultTileType[] = [
   'custom-experience'
 ];
 const contactDefaultTileTypeOrder: DefaultTileType[] = ['hashtags'];
+const experienceDefaultTileTypeOrder: DefaultTileType[] = ['hashtags'];
 
 export function createDefaultTileSettings(context: TileDefaultsContext = 'place'): TileSetting[] {
-  const tileTypeOrder = context === 'contact' ? contactDefaultTileTypeOrder : placeDefaultTileTypeOrder;
+  const tileTypeOrder = context === 'contact'
+    ? contactDefaultTileTypeOrder
+    : context === 'experience'
+      ? experienceDefaultTileTypeOrder
+      : placeDefaultTileTypeOrder;
   return tileTypeOrder.map((type, index) => {
     return {
       id: `default-${type}`,
