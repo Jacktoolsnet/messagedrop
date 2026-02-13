@@ -52,6 +52,14 @@ export class TextTileEditComponent {
   readonly textControl = new FormControl(this.data.tile.payload?.text ?? '', { nonNullable: true });
   readonly icon = signal<string | undefined>(this.data.tile.payload?.icon);
 
+  get headerTitle(): string {
+    return this.titleControl.value.trim() || this.translation.t('common.tileTypes.text');
+  }
+
+  get headerIcon(): string {
+    return this.icon() || 'text_fields';
+  }
+
   pickIcon(): void {
     const ref = this.dialog.open(MaticonPickerComponent, {
       width: '520px',

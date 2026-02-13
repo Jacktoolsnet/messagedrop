@@ -57,6 +57,14 @@ export class TodoTileEditComponent {
   readonly icon = signal<string | undefined>(this.data.tile.payload?.icon);
   readonly todos = signal<TileTodoItem[]>(this.normalizeTodos(this.data.tile.payload?.todos));
 
+  get headerTitle(): string {
+    return this.titleControl.value.trim() || this.translation.t('common.tileTypes.todo');
+  }
+
+  get headerIcon(): string {
+    return this.icon() || 'list';
+  }
+
   get hasTodos(): boolean {
     return this.todos().length > 0;
   }

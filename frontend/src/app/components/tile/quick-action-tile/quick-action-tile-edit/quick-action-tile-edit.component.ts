@@ -58,6 +58,14 @@ export class QuickActionTileEditComponent {
   readonly icon = signal<string | undefined>(this.data.tile.payload?.icon ?? 'bolt');
   readonly actions = signal<TileQuickAction[]>(this.normalizeActions(this.data.tile.payload?.actions));
 
+  get headerTitle(): string {
+    return this.titleControl.value.trim() || this.translation.t('common.tileTypes.quickActions');
+  }
+
+  get headerIcon(): string {
+    return this.icon() || 'bolt';
+  }
+
   get hasActions(): boolean {
     return this.actions().length > 0;
   }

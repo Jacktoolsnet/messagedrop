@@ -63,6 +63,14 @@ export class MigraineTileEditComponent {
   readonly pressureWarn2 = new FormControl(this.data.tile.payload?.migraine?.pressureWarn2 ?? this.defaults.pressureWarn2, { nonNullable: true, validators: [Validators.required, Validators.min(0)] });
   readonly icon = signal<string | undefined>(this.data.tile.payload?.icon ?? 'crisis_alert');
 
+  get headerTitle(): string {
+    return this.titleControl.value.trim() || this.translation.t('common.tileTypes.migraine');
+  }
+
+  get headerIcon(): string {
+    return this.icon() || 'crisis_alert';
+  }
+
   pickIcon(): void {
     const ref = this.dialog.open(MaticonPickerComponent, {
       width: '520px',

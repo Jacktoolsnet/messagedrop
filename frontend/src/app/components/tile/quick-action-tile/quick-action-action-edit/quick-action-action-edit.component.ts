@@ -65,6 +65,14 @@ export class QuickActionActionEditComponent {
   readonly typeControl = new FormControl<TileLinkType>(this.normalizeType(this.data.action.type), { nonNullable: true });
   readonly icon = signal<string | undefined>(this.data.action.icon ?? this.defaultIconForType(this.data.action.type));
 
+  get headerTitle(): string {
+    return this.labelControl.value.trim() || this.translation.t('common.tiles.quickActions.actionFallback');
+  }
+
+  get headerIcon(): string {
+    return this.icon() || this.defaultIconForType(this.typeControl.value);
+  }
+
   constructor() {
     this.iconAuto = this.isDefaultIcon(this.icon(), this.typeControl.value);
     this.lastType = this.typeControl.value;

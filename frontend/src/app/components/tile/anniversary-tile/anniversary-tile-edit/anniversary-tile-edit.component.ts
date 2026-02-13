@@ -60,6 +60,14 @@ export class AnniversaryTileEditComponent {
   readonly dateControl = new FormControl<Date | null>(this.toDate(this.data.tile.payload?.date), { validators: [Validators.required] });
   readonly icon = signal<string | undefined>(this.data.tile.payload?.icon ?? 'event');
 
+  get headerTitle(): string {
+    return this.titleControl.value.trim() || this.translation.t('common.tileTypes.anniversary');
+  }
+
+  get headerIcon(): string {
+    return this.icon() || 'event';
+  }
+
   private toDate(value: string | undefined): Date | null {
     if (!value) return null;
     const [y, m, d] = value.split('-').map(Number);

@@ -65,6 +65,14 @@ export class FileTileEditComponent {
   readonly files = signal<TileFileEntry[]>(this.initialFiles);
   private readonly pendingHandles = new Map<string, FileSystemFileHandle>();
 
+  get headerTitle(): string {
+    return this.titleControl.value.trim() || this.translation.t('common.tileTypes.files');
+  }
+
+  get headerIcon(): string {
+    return this.icon() || 'attach_file';
+  }
+
   get hasFiles(): boolean {
     return this.files().length > 0;
   }
