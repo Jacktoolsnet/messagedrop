@@ -11,8 +11,12 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { TileSetting } from '../../../../interfaces/tile-settings';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
-import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
+import {
+  TileDisplaySettingsDialogComponent,
+  TileDisplaySettingsDialogData,
+  TileDisplaySettingsDialogResult
+} from '../../tile-display-settings-dialog/tile-display-settings-dialog.component';
 
 interface TextTileDialogData {
   tile: TileSetting;
@@ -44,35 +48,47 @@ export class TextTileEditComponent {
   private readonly translation = inject(TranslationHelperService);
   readonly help = inject(HelpDialogService);
   readonly data = inject<TextTileDialogData>(MAT_DIALOG_DATA);
+  private readonly fallbackTitle = this.translation.t('common.tileTypes.text');
 
   readonly titleControl = new FormControl(
-    this.data.tile.payload?.title ?? this.data.tile.label ?? this.translation.t('common.tileTypes.text'),
+    this.data.tile.payload?.title ?? this.data.tile.label ?? this.fallbackTitle,
     { nonNullable: true }
   );
   readonly textControl = new FormControl(this.data.tile.payload?.text ?? '', { nonNullable: true });
   readonly icon = signal<string | undefined>(this.data.tile.payload?.icon);
 
   get headerTitle(): string {
-    return this.titleControl.value.trim() || this.translation.t('common.tileTypes.text');
+    return this.titleControl.value.trim() || this.fallbackTitle;
   }
 
   get headerIcon(): string {
     return this.icon() || 'text_fields';
   }
 
-  pickIcon(): void {
-    const ref = this.dialog.open(MaticonPickerComponent, {
-      width: '520px',
-      data: { current: this.icon() },
-      hasBackdrop: true,
-      backdropClass: 'dialog-backdrop',
-      disableClose: false,
-    });
-
-    ref.afterClosed().subscribe((selected?: string | null) => {
-      if (selected !== undefined) {
-        this.icon.set(selected || undefined);
+  openDisplaySettings(): void {
+    const ref = this.dialog.open<TileDisplaySettingsDialogComponent, TileDisplaySettingsDialogData, TileDisplaySettingsDialogResult | undefined>(
+      TileDisplaySettingsDialogComponent,
+      {
+        width: '460px',
+        maxWidth: '95vw',
+        data: {
+          title: this.headerTitle,
+          icon: this.icon(),
+          fallbackTitle: this.fallbackTitle,
+          dialogTitleKey: 'common.tileEdit.displaySettingsTitle'
+        },
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop',
+        disableClose: false,
       }
+    );
+
+    ref.afterClosed().subscribe((result) => {
+      if (!result) {
+        return;
+      }
+      this.titleControl.setValue(result.title);
+      this.icon.set(result.icon);
     });
   }
 
@@ -81,7 +97,7 @@ export class TextTileEditComponent {
   }
 
   save(): void {
-    const title = this.titleControl.value.trim() || this.translation.t('common.tileTypes.text');
+    const title = this.titleControl.value.trim() || this.fallbackTitle;
     const text = this.textControl.value;
     const updated: TileSetting = {
       ...this.data.tile,

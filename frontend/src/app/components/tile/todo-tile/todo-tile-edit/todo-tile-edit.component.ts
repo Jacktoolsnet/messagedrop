@@ -12,8 +12,12 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { TileSetting, TileTodoItem } from '../../../../interfaces/tile-settings';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
-import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
+import {
+  TileDisplaySettingsDialogComponent,
+  TileDisplaySettingsDialogData,
+  TileDisplaySettingsDialogResult
+} from '../../tile-display-settings-dialog/tile-display-settings-dialog.component';
 
 interface TodoTileDialogData {
   tile: TileSetting;
@@ -48,9 +52,10 @@ export class TodoTileEditComponent {
   private readonly translation = inject(TranslationHelperService);
   readonly help = inject(HelpDialogService);
   readonly data = inject<TodoTileDialogData>(MAT_DIALOG_DATA);
+  private readonly fallbackTitle = this.translation.t('common.tileTypes.todo');
 
   readonly titleControl = new FormControl(
-    this.data.tile.payload?.title ?? this.data.tile.label ?? this.translation.t('common.tileTypes.todo'),
+    this.data.tile.payload?.title ?? this.data.tile.label ?? this.fallbackTitle,
     { nonNullable: true }
   );
   readonly newTodoControl = new FormControl('', { nonNullable: true });
@@ -58,7 +63,7 @@ export class TodoTileEditComponent {
   readonly todos = signal<TileTodoItem[]>(this.normalizeTodos(this.data.tile.payload?.todos));
 
   get headerTitle(): string {
-    return this.titleControl.value.trim() || this.translation.t('common.tileTypes.todo');
+    return this.titleControl.value.trim() || this.fallbackTitle;
   }
 
   get headerIcon(): string {
@@ -69,19 +74,30 @@ export class TodoTileEditComponent {
     return this.todos().length > 0;
   }
 
-  pickIcon(): void {
-    const ref = this.dialog.open(MaticonPickerComponent, {
-      width: '520px',
-      data: { current: this.icon() },
-      hasBackdrop: true,
-      backdropClass: 'dialog-backdrop',
-      disableClose: false,
-    });
-
-    ref.afterClosed().subscribe((selected?: string | null) => {
-      if (selected !== undefined) {
-        this.icon.set(selected || undefined);
+  openDisplaySettings(): void {
+    const ref = this.dialog.open<TileDisplaySettingsDialogComponent, TileDisplaySettingsDialogData, TileDisplaySettingsDialogResult | undefined>(
+      TileDisplaySettingsDialogComponent,
+      {
+        width: '460px',
+        maxWidth: '95vw',
+        data: {
+          title: this.headerTitle,
+          icon: this.icon(),
+          fallbackTitle: this.fallbackTitle,
+          dialogTitleKey: 'common.tileEdit.displaySettingsTitle'
+        },
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop',
+        disableClose: false,
       }
+    );
+
+    ref.afterClosed().subscribe((result) => {
+      if (!result) {
+        return;
+      }
+      this.titleControl.setValue(result.title);
+      this.icon.set(result.icon);
     });
   }
 
@@ -118,7 +134,7 @@ export class TodoTileEditComponent {
   }
 
   save(): void {
-    const title = this.titleControl.value.trim() || this.translation.t('common.tileTypes.todo');
+    const title = this.titleControl.value.trim() || this.fallbackTitle;
     const todos = this.normalizeTodos(this.todos()).map((todo, index) => ({ ...todo, order: index }));
     const updated: TileSetting = {
       ...this.data.tile,

@@ -4,24 +4,10 @@
 </app-dialog-header>
 
 <mat-dialog-content class="edit-content">
-  <button class="icon-pick-button" mat-stroked-button color="primary" type="button" (click)="pickIcon()"
-    [attr.aria-label]="'common.tileFields.pickIcon' | transloco">
-    @if (icon()) {
-      <mat-icon>{{ icon() }}</mat-icon>
-    } @else {
-      <span>{{ 'common.tileFields.pickIcon' | transloco }}</span>
-    }
-  </button>
-
-  <mat-form-field appearance="outline" class="full-width">
-    <mat-label>{{ 'common.tileFields.title' | transloco }}</mat-label>
-    <input matInput cdkFocusInitial [formControl]="titleControl" maxlength="64" />
-  </mat-form-field>
-
   <div class="todo-add-row">
     <mat-form-field appearance="outline" class="todo-input">
       <mat-label>{{ 'common.tiles.todo.addLabel' | transloco }}</mat-label>
-      <input matInput [formControl]="newTodoControl" (keyup.enter)="addTodo()" />
+      <input matInput cdkFocusInitial [formControl]="newTodoControl" (keyup.enter)="addTodo()" />
     </mat-form-field>
     <button mat-mini-fab class="todo-add-button" color="primary" type="button" (click)="addTodo()"
       [disabled]="!newTodoControl.value.trim()" [attr.aria-label]="'common.tiles.todo.addAria' | transloco">
@@ -59,6 +45,10 @@
   <button mat-icon-button type="button" (click)="help.open('tileEditTodo')"
     [attr.aria-label]="'common.actions.help' | transloco">
     <mat-icon>help</mat-icon>
+  </button>
+  <button mat-icon-button type="button" (click)="openDisplaySettings()"
+    [attr.aria-label]="'common.tileSettings.title' | transloco">
+    <mat-icon>settings</mat-icon>
   </button>
   <button color="primary" type="button" (click)="save()" mat-icon-button [attr.aria-label]="'common.save' | transloco"><mat-icon>save</mat-icon></button>
 </mat-dialog-actions>

@@ -14,8 +14,12 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { TileSetting } from '../../../../interfaces/tile-settings';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
-import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
+import {
+  TileDisplaySettingsDialogComponent,
+  TileDisplaySettingsDialogData,
+  TileDisplaySettingsDialogResult
+} from '../../tile-display-settings-dialog/tile-display-settings-dialog.component';
 
 interface AnniversaryTileDialogData {
   tile: TileSetting;
@@ -52,16 +56,17 @@ export class AnniversaryTileEditComponent {
   private readonly translation = inject(TranslationHelperService);
   readonly help = inject(HelpDialogService);
   readonly data = inject<AnniversaryTileDialogData>(MAT_DIALOG_DATA);
+  private readonly fallbackTitle = this.translation.t('common.tileTypes.anniversary');
 
   readonly titleControl = new FormControl(
-    this.data.tile.payload?.title ?? this.data.tile.label ?? this.translation.t('common.tileTypes.anniversary'),
+    this.data.tile.payload?.title ?? this.data.tile.label ?? this.fallbackTitle,
     { nonNullable: true }
   );
   readonly dateControl = new FormControl<Date | null>(this.toDate(this.data.tile.payload?.date), { validators: [Validators.required] });
   readonly icon = signal<string | undefined>(this.data.tile.payload?.icon ?? 'event');
 
   get headerTitle(): string {
-    return this.titleControl.value.trim() || this.translation.t('common.tileTypes.anniversary');
+    return this.titleControl.value.trim() || this.fallbackTitle;
   }
 
   get headerIcon(): string {
@@ -85,19 +90,30 @@ export class AnniversaryTileEditComponent {
     this.dateControl.markAsTouched();
   }
 
-  pickIcon(): void {
-    const ref = this.dialog.open(MaticonPickerComponent, {
-      width: '520px',
-      data: { current: this.icon() },
-      hasBackdrop: true,
-      backdropClass: 'dialog-backdrop',
-      disableClose: false,
-    });
-
-    ref.afterClosed().subscribe((selected?: string | null) => {
-      if (selected !== undefined) {
-        this.icon.set(selected || undefined);
+  openDisplaySettings(): void {
+    const ref = this.dialog.open<TileDisplaySettingsDialogComponent, TileDisplaySettingsDialogData, TileDisplaySettingsDialogResult | undefined>(
+      TileDisplaySettingsDialogComponent,
+      {
+        width: '460px',
+        maxWidth: '95vw',
+        data: {
+          title: this.headerTitle,
+          icon: this.icon(),
+          fallbackTitle: this.fallbackTitle,
+          dialogTitleKey: 'common.tileEdit.displaySettingsTitle'
+        },
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop',
+        disableClose: false,
       }
+    );
+
+    ref.afterClosed().subscribe((result) => {
+      if (!result) {
+        return;
+      }
+      this.titleControl.setValue(result.title);
+      this.icon.set(result.icon);
     });
   }
 
@@ -111,7 +127,7 @@ export class AnniversaryTileEditComponent {
       return;
     }
 
-    const title = this.titleControl.value.trim() || this.translation.t('common.tileTypes.anniversary');
+    const title = this.titleControl.value.trim() || this.fallbackTitle;
     const date = this.dateControl.value ? this.formatLocalDate(this.dateControl.value) : '';
     const updated: TileSetting = {
       ...this.data.tile,

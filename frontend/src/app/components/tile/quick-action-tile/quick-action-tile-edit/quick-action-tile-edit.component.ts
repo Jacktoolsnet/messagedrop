@@ -12,9 +12,13 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { TileQuickAction, TileSetting } from '../../../../interfaces/tile-settings';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
-import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
 import { QuickActionActionEditComponent } from '../quick-action-action-edit/quick-action-action-edit.component';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
+import {
+  TileDisplaySettingsDialogComponent,
+  TileDisplaySettingsDialogData,
+  TileDisplaySettingsDialogResult
+} from '../../tile-display-settings-dialog/tile-display-settings-dialog.component';
 
 interface QuickActionTileDialogData {
   tile: TileSetting;
@@ -50,16 +54,17 @@ export class QuickActionTileEditComponent {
   readonly help = inject(HelpDialogService);
   readonly data = inject<QuickActionTileDialogData>(MAT_DIALOG_DATA);
   private readonly allowedActionTypes: TileQuickAction['type'][] = ['web', 'email', 'phone', 'whatsapp', 'sms'];
+  private readonly fallbackTitle = this.translation.t('common.tileTypes.quickActions');
 
   readonly titleControl = new FormControl(
-    this.data.tile.payload?.title ?? this.data.tile.label ?? this.translation.t('common.tileTypes.quickActions'),
+    this.data.tile.payload?.title ?? this.data.tile.label ?? this.fallbackTitle,
     { nonNullable: true }
   );
   readonly icon = signal<string | undefined>(this.data.tile.payload?.icon ?? 'bolt');
   readonly actions = signal<TileQuickAction[]>(this.normalizeActions(this.data.tile.payload?.actions));
 
   get headerTitle(): string {
-    return this.titleControl.value.trim() || this.translation.t('common.tileTypes.quickActions');
+    return this.titleControl.value.trim() || this.fallbackTitle;
   }
 
   get headerIcon(): string {
@@ -70,19 +75,30 @@ export class QuickActionTileEditComponent {
     return this.actions().length > 0;
   }
 
-  pickIcon(): void {
-    const ref = this.dialog.open(MaticonPickerComponent, {
-      width: '520px',
-      data: { current: this.icon() },
-      hasBackdrop: true,
-      backdropClass: 'dialog-backdrop',
-      disableClose: false,
-    });
-
-    ref.afterClosed().subscribe((selected?: string | null) => {
-      if (selected !== undefined) {
-        this.icon.set(selected || undefined);
+  openDisplaySettings(): void {
+    const ref = this.dialog.open<TileDisplaySettingsDialogComponent, TileDisplaySettingsDialogData, TileDisplaySettingsDialogResult | undefined>(
+      TileDisplaySettingsDialogComponent,
+      {
+        width: '460px',
+        maxWidth: '95vw',
+        data: {
+          title: this.headerTitle,
+          icon: this.icon(),
+          fallbackTitle: this.fallbackTitle,
+          dialogTitleKey: 'common.tileEdit.displaySettingsTitle'
+        },
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop',
+        disableClose: false,
       }
+    );
+
+    ref.afterClosed().subscribe((result) => {
+      if (!result) {
+        return;
+      }
+      this.titleControl.setValue(result.title);
+      this.icon.set(result.icon);
     });
   }
 
@@ -117,7 +133,7 @@ export class QuickActionTileEditComponent {
   }
 
   save(): void {
-    const title = this.titleControl.value.trim() || this.translation.t('common.tileTypes.quickActions');
+    const title = this.titleControl.value.trim() || this.fallbackTitle;
     const actions = this.normalizeActions(this.actions());
     const updated: TileSetting = {
       ...this.data.tile,
