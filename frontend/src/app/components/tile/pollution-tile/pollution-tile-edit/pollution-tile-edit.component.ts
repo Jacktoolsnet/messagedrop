@@ -50,6 +50,10 @@ export class PollutionTileEditComponent {
   );
   readonly icon = signal<string | undefined>(this.data.tile.payload?.icon ?? 'air');
 
+  get headerIcon(): string {
+    return this.icon() || 'air';
+  }
+
   private readonly allKeys = [
     { key: 'alder_pollen', labelKey: 'weather.airQuality.metric.alderPollen' },
     { key: 'birch_pollen', labelKey: 'weather.airQuality.metric.birchPollen' },
