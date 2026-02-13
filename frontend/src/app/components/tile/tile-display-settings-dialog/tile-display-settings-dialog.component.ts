@@ -8,6 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { MaticonPickerComponent } from '../../utils/maticon-picker/maticon-picker.component';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
+import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 
 export interface TileDisplaySettingsDialogData {
   title: string;
@@ -43,6 +44,7 @@ export interface TileDisplaySettingsDialogResult {
 export class TileDisplaySettingsDialogComponent {
   private readonly dialogRef = inject(MatDialogRef<TileDisplaySettingsDialogComponent, TileDisplaySettingsDialogResult | undefined>);
   private readonly dialog = inject(MatDialog);
+  readonly help = inject(HelpDialogService);
   readonly data = inject<TileDisplaySettingsDialogData>(MAT_DIALOG_DATA);
 
   readonly titleControl = new FormControl(this.data.title, { nonNullable: true });

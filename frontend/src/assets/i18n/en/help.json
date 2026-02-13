@@ -1626,13 +1626,9 @@
     "title": "Pollution tile",
     "intro": "This dialog defines which air-quality values are shown in the pollution tile.",
     "items": {
-      "icon": {
-        "title": "Select icon",
-        "desc": "This action sets the icon of the tile."
-      },
-      "title": {
-        "title": "Edit title",
-        "desc": "This action sets the display name of the tile."
+      "displaySettings": {
+        "title": "Open display settings",
+        "desc": "This action opens the dialog for tile icon and title."
       },
       "keys": {
         "title": "Select values",
@@ -1653,6 +1649,32 @@
       "privacy": {
         "title": "Privacy and storage",
         "desc": "The selected pollution values are stored locally and in encrypted form."
+      }
+    }
+  },
+  "tileDisplaySettings": {
+    "title": "Tile display settings",
+    "intro": "This dialog lets you define the tile icon and title.",
+    "items": {
+      "icon": {
+        "title": "Select icon",
+        "desc": "This action sets the icon of the tile."
+      },
+      "title": {
+        "title": "Edit title",
+        "desc": "This action sets the display name of the tile."
+      },
+      "close": {
+        "title": "Cancel",
+        "desc": "This action closes the dialog without saving."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "apply": {
+        "title": "Save",
+        "desc": "This action applies your changes."
       }
     }
   },

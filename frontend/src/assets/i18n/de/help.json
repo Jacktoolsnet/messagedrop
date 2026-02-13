@@ -1626,13 +1626,9 @@
     "title": "Verschmutzungs-Kachel",
     "intro": "In diesem Dialog legst du fest, welche Luftqualitätswerte in der Verschmutzungs-Kachel angezeigt werden.",
     "items": {
-      "icon": {
-        "title": "Icon auswählen",
-        "desc": "Mit dieser Funktion legst du das Icon der Kachel fest."
-      },
-      "title": {
-        "title": "Titel bearbeiten",
-        "desc": "Mit dieser Funktion vergibst du den Anzeigenamen der Kachel."
+      "displaySettings": {
+        "title": "Darstellung öffnen",
+        "desc": "Mit dieser Funktion öffnest du den Dialog für Icon und Titel der Kachel."
       },
       "keys": {
         "title": "Werte auswählen",
@@ -1653,6 +1649,32 @@
       "privacy": {
         "title": "Datenschutz und Speicherung",
         "desc": "Die Auswahl der Luftqualitätswerte wird lokal gespeichert und verschlüsselt abgelegt."
+      }
+    }
+  },
+  "tileDisplaySettings": {
+    "title": "Kachel-Darstellung",
+    "intro": "In diesem Dialog legst du das Icon und den Titel einer Kachel fest.",
+    "items": {
+      "icon": {
+        "title": "Icon auswählen",
+        "desc": "Mit dieser Funktion legst du das Icon der Kachel fest."
+      },
+      "title": {
+        "title": "Titel bearbeiten",
+        "desc": "Mit dieser Funktion vergibst du den Anzeigenamen der Kachel."
+      },
+      "close": {
+        "title": "Abbrechen",
+        "desc": "Mit dieser Funktion schließt du den Dialog ohne zu speichern."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "apply": {
+        "title": "Speichern",
+        "desc": "Mit dieser Funktion übernimmst du die Änderungen."
       }
     }
   },

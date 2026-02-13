@@ -2117,14 +2117,9 @@ const HELP_TOPICS = {
     introKey: 'tileEditPollution.intro',
     items: [
       {
-        icon: 'style',
-        titleKey: 'tileEditPollution.items.icon.title',
-        descriptionKey: 'tileEditPollution.items.icon.desc'
-      },
-      {
-        icon: 'edit',
-        titleKey: 'tileEditPollution.items.title.title',
-        descriptionKey: 'tileEditPollution.items.title.desc'
+        icon: 'settings',
+        titleKey: 'tileEditPollution.items.displaySettings.title',
+        descriptionKey: 'tileEditPollution.items.displaySettings.desc'
       },
       {
         icon: 'checklist',
@@ -2150,6 +2145,37 @@ const HELP_TOPICS = {
         icon: 'privacy_tip',
         titleKey: 'tileEditPollution.items.privacy.title',
         descriptionKey: 'tileEditPollution.items.privacy.desc'
+      }
+    ]
+  },
+  tileDisplaySettings: {
+    titleKey: 'tileDisplaySettings.title',
+    introKey: 'tileDisplaySettings.intro',
+    items: [
+      {
+        icon: 'style',
+        titleKey: 'tileDisplaySettings.items.icon.title',
+        descriptionKey: 'tileDisplaySettings.items.icon.desc'
+      },
+      {
+        icon: 'edit',
+        titleKey: 'tileDisplaySettings.items.title.title',
+        descriptionKey: 'tileDisplaySettings.items.title.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'tileDisplaySettings.items.close.title',
+        descriptionKey: 'tileDisplaySettings.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'tileDisplaySettings.items.help.title',
+        descriptionKey: 'tileDisplaySettings.items.help.desc'
+      },
+      {
+        icon: 'save',
+        titleKey: 'tileDisplaySettings.items.apply.title',
+        descriptionKey: 'tileDisplaySettings.items.apply.desc'
       }
     ]
   },

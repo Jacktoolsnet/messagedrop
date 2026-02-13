@@ -654,6 +654,7 @@
       }
     },
     "tileEdit": {
+      "displaySettingsTitle": "Modifier l'affichage de la tuile",
       "textTitle": "Modifier la tuile de texte",
       "multitextTitle": "Modifier la tuile de texte multiligne",
       "linkTitle": "Modifier la tuile de lien",

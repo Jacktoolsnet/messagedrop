@@ -89,7 +89,7 @@ export class PollutionTileEditComponent {
           title: this.title(),
           icon: this.icon(),
           fallbackTitle: this.fallbackTitle,
-          dialogTitleKey: 'common.tileSettings.title'
+          dialogTitleKey: 'common.tileEdit.displaySettingsTitle'
         },
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',

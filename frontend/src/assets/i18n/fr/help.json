@@ -1626,13 +1626,9 @@
     "title": "Tuile pollution",
     "intro": "Cette boîte de dialogue définit les mesures de qualité de l'air affichées dans la tuile pollution.",
     "items": {
-      "icon": {
-        "title": "Choisir une icône",
-        "desc": "Cette fonction définit l'icône de la tuile."
-      },
-      "title": {
-        "title": "Modifier le titre",
-        "desc": "Cette fonction définit le nom affiché de la tuile."
+      "displaySettings": {
+        "title": "Ouvrir l'affichage",
+        "desc": "Cette fonction ouvre la boîte de dialogue pour l'icône et le titre de la tuile."
       },
       "keys": {
         "title": "Sélectionner les valeurs",
@@ -1653,6 +1649,32 @@
       "privacy": {
         "title": "Confidentialité et stockage",
         "desc": "La sélection des valeurs de pollution est stockée localement et sous forme chiffrée."
+      }
+    }
+  },
+  "tileDisplaySettings": {
+    "title": "Affichage de la tuile",
+    "intro": "Cette boîte de dialogue vous permet de définir l'icône et le titre d'une tuile.",
+    "items": {
+      "icon": {
+        "title": "Choisir une icône",
+        "desc": "Cette fonction définit l'icône de la tuile."
+      },
+      "title": {
+        "title": "Modifier le titre",
+        "desc": "Cette fonction définit le nom affiché de la tuile."
+      },
+      "close": {
+        "title": "Annuler",
+        "desc": "Cette fonction ferme la boîte de dialogue sans enregistrer."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "apply": {
+        "title": "Enregistrer",
+        "desc": "Cette fonction applique vos modifications."
       }
     }
   },

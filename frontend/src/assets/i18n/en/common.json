@@ -654,6 +654,7 @@
       }
     },
     "tileEdit": {
+      "displaySettingsTitle": "Edit tile display settings",
       "textTitle": "Edit text tile",
       "multitextTitle": "Edit multi-line tile",
       "linkTitle": "Edit link tile",

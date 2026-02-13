@@ -1626,13 +1626,9 @@
     "title": "Tarjeta de contaminación",
     "intro": "En este diálogo defines qué valores de calidad del aire se muestran en la tarjeta de contaminación.",
     "items": {
-      "icon": {
-        "title": "Seleccionar icono",
-        "desc": "Con esta función defines el icono de la tarjeta."
-      },
-      "title": {
-        "title": "Editar título",
-        "desc": "Con esta función defines el nombre visible de la tarjeta."
+      "displaySettings": {
+        "title": "Abrir ajustes visuales",
+        "desc": "Con esta función abres el diálogo para icono y título de la tarjeta."
       },
       "keys": {
         "title": "Seleccionar valores",
@@ -1653,6 +1649,32 @@
       "privacy": {
         "title": "Privacidad y almacenamiento",
         "desc": "La selección de valores de contaminación se guarda localmente y en formato cifrado."
+      }
+    }
+  },
+  "tileDisplaySettings": {
+    "title": "Ajustes visuales de la tarjeta",
+    "intro": "En este diálogo defines el icono y el título de una tarjeta.",
+    "items": {
+      "icon": {
+        "title": "Seleccionar icono",
+        "desc": "Con esta función defines el icono de la tarjeta."
+      },
+      "title": {
+        "title": "Editar título",
+        "desc": "Con esta función defines el nombre visible de la tarjeta."
+      },
+      "close": {
+        "title": "Cancelar",
+        "desc": "Con esta función cierras el diálogo sin guardar."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "apply": {
+        "title": "Guardar",
+        "desc": "Con esta función aplicas los cambios."
       }
     }
   },
