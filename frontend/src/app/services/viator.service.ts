@@ -124,12 +124,13 @@ export class ViatorService {
       .pipe(catchError(this.handleError));
   }
 
-  getDestinations(ids: number[], showAlways = false): Observable<ViatorDestinationsResponse> {
+  getDestinations(ids: number[], showAlways = false, skipUi = false): Observable<ViatorDestinationsResponse> {
     const sanitized = Array.isArray(ids)
       ? Array.from(new Set(ids.filter((id) => Number.isFinite(id) && id > 0)))
       : [];
     const url = `${environment.apiUrl}/viator/destinations`;
     const params = new HttpParams().set('ids', sanitized.join(','));
+    const headers = skipUi ? this.httpOptions.headers.set('x-skip-ui', 'true') : this.httpOptions.headers;
 
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
@@ -143,7 +144,7 @@ export class ViatorService {
       autoclose: false
     });
 
-    return this.http.get<ViatorDestinationsResponse>(url, { ...this.httpOptions, params })
+    return this.http.get<ViatorDestinationsResponse>(url, { ...this.httpOptions, params, headers })
       .pipe(catchError(this.handleError));
   }
 

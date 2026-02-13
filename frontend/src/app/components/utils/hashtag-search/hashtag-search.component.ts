@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { finalize } from 'rxjs';
 import { BoundingBox } from '../../../interfaces/bounding-box';
 import { HelpDialogService, HelpTopic } from '../help-dialog/help-dialog.service';
 import { Contact } from '../../../interfaces/contact';
@@ -104,6 +105,10 @@ export class HashtagSearchComponent {
   readonly localExperienceResults = signal<ExperienceBookmark[]>([]);
   private readonly noteResultsSignal = this.noteService.getNotesSignal();
   private readonly destinationCache = new Map<number, ViatorDestinationLookup>();
+  private readonly unresolvedDestinationIds = new Set<number>();
+  private readonly destinationLookupsInFlight = new Set<number>();
+  private readonly destinationRetryAfter = new Map<number, number>();
+  private readonly destinationRetryDelayMs = 60_000;
   private readonly experienceLocations = signal<Map<string, Location>>(new Map());
   private experienceLookupRevision = 0;
 
@@ -297,7 +302,6 @@ export class HashtagSearchComponent {
     this.hasSearched.set(true);
     if (this.localMode()) {
       void this.noteService.loadNotes();
-      this.searchLocal(tag);
     }
     this.searchPublic(tag);
   }
@@ -479,28 +483,49 @@ export class HashtagSearchComponent {
     const missingDestinationIds = new Set<number>();
     experiences.forEach((experience) => {
       this.getExperienceDestinationIds(experience).forEach((id) => {
-        if (!this.destinationCache.has(id)) {
+        if (!this.destinationCache.has(id) && !this.unresolvedDestinationIds.has(id)) {
           missingDestinationIds.add(id);
         }
       });
     });
 
-    const missing = Array.from(missingDestinationIds).slice(0, 200);
+    const now = Date.now();
+    const missing = Array.from(missingDestinationIds)
+      .filter((id) => !this.destinationLookupsInFlight.has(id))
+      .filter((id) => (this.destinationRetryAfter.get(id) ?? 0) <= now)
+      .slice(0, 200);
+
     if (!missing.length) {
       return;
     }
 
-    this.viatorService.getDestinations(missing, false)
-      .pipe(takeUntilDestroyed(this.destroyRef))
+    missing.forEach((id) => this.destinationLookupsInFlight.add(id));
+
+    this.viatorService.getDestinations(missing, false, true)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          missing.forEach((id) => this.destinationLookupsInFlight.delete(id));
+        })
+      )
       .subscribe({
         next: (response) => {
           if (revision !== this.experienceLookupRevision) {
             return;
           }
           const destinations = Array.isArray(response.destinations) ? response.destinations : [];
+          const returnedIds = new Set<number>();
           destinations.forEach((destination) => {
             if (destination && typeof destination.destinationId === 'number' && destination.destinationId > 0) {
               this.destinationCache.set(destination.destinationId, destination);
+              this.unresolvedDestinationIds.delete(destination.destinationId);
+              this.destinationRetryAfter.delete(destination.destinationId);
+              returnedIds.add(destination.destinationId);
+            }
+          });
+          missing.forEach((id) => {
+            if (!returnedIds.has(id) && !this.destinationCache.has(id)) {
+              this.unresolvedDestinationIds.add(id);
             }
           });
           this.rebuildExperienceLocations(experiences, revision);
@@ -509,6 +534,8 @@ export class HashtagSearchComponent {
           if (revision !== this.experienceLookupRevision) {
             return;
           }
+          const retryAt = Date.now() + this.destinationRetryDelayMs;
+          missing.forEach((id) => this.destinationRetryAfter.set(id, retryAt));
           this.rebuildExperienceLocations(experiences, revision);
         }
       });
