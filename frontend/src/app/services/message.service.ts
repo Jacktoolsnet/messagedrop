@@ -811,9 +811,9 @@ export class MessageService {
 
     const normalizedObfuscatedText = String(text ?? '')
       .toLowerCase()
-      .replace(/[\(\[\{]\s*at\s*[\)\]\}]/g, ' @ ')
+      .replace(/[([{]\s*at\s*[)\]}]/g, ' @ ')
       .replace(/\bat\b/g, ' @ ')
-      .replace(/[\(\[\{]\s*(dot|punkt)\s*[\)\]\}]/g, ' . ')
+      .replace(/[([{]\s*(dot|punkt)\s*[)\]}]/g, ' . ')
       .replace(/\b(dot|punkt)\b/g, ' . ')
       .replace(/[#]+/g, ' ')
       .replace(/[()[\]{};,]+/g, ' ')
