@@ -104,20 +104,17 @@ export class MigraineTileComponent {
     if (!tile) return;
     const ref = this.dialog.open(MigraineTileEditComponent, {
       width: '520px',
-      data: { tile },
+      data: {
+        tile,
+        onTileCommit: (updated: TileSetting) => this.applyTileUpdate(updated)
+      },
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
       disableClose: false,
     });
     ref.afterClosed().subscribe((updated?: TileSetting) => {
       if (!updated) return;
-      const place = this.placeSignal();
-      if (!place) return;
-      const tiles = (place.tileSettings ?? []).map(t => t.id === updated.id ? { ...t, ...updated } : t);
-      const updatedPlace = { ...place, tileSettings: tiles };
-      this.placeSignal.set(updatedPlace);
-      this.currentTile.set(updated);
-      this.placeService.saveAdditionalPlaceInfos(updatedPlace);
+      this.applyTileUpdate(updated);
     });
   }
 
@@ -160,5 +157,15 @@ export class MigraineTileComponent {
       };
       comp?.onTileClick(placeholder);
     });
+  }
+
+  private applyTileUpdate(updated: TileSetting): void {
+    const place = this.placeSignal();
+    if (!place) return;
+    const tiles = (place.tileSettings ?? []).map(t => t.id === updated.id ? { ...t, ...updated } : t);
+    const updatedPlace = { ...place, tileSettings: tiles };
+    this.placeSignal.set(updatedPlace);
+    this.currentTile.set(updated);
+    this.placeService.saveAdditionalPlaceInfos(updatedPlace);
   }
 }

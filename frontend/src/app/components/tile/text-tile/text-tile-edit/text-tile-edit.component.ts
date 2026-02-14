@@ -20,6 +20,7 @@ import {
 
 interface TextTileDialogData {
   tile: TileSetting;
+  onTileCommit?: (updated: TileSetting) => void;
 }
 
 @Component({
@@ -89,6 +90,7 @@ export class TextTileEditComponent {
       }
       this.titleControl.setValue(result.title);
       this.icon.set(result.icon);
+      this.commitDisplaySettings();
     });
   }
 
@@ -97,9 +99,29 @@ export class TextTileEditComponent {
   }
 
   save(): void {
+    const updated = this.buildUpdatedTile();
+    this.dialogRef.close(updated);
+  }
+
+  private commitDisplaySettings(): void {
+    const title = this.titleControl.value.trim() || this.fallbackTitle;
+    const updated: TileSetting = {
+      ...this.data.tile,
+      label: title,
+      payload: {
+        ...this.data.tile.payload,
+        title,
+        icon: this.icon()
+      }
+    };
+    this.data.tile = updated;
+    this.data.onTileCommit?.(updated);
+  }
+
+  private buildUpdatedTile(): TileSetting {
     const title = this.titleControl.value.trim() || this.fallbackTitle;
     const text = this.textControl.value;
-    const updated: TileSetting = {
+    return {
       ...this.data.tile,
       label: title,
       payload: {
@@ -109,6 +131,5 @@ export class TextTileEditComponent {
         icon: this.icon()
       }
     };
-    this.dialogRef.close(updated);
   }
 }

@@ -12,8 +12,12 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { TileLinkType, TileQuickAction } from '../../../../interfaces/tile-settings';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
-import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
+import {
+  TileDisplaySettingsDialogComponent,
+  TileDisplaySettingsDialogData,
+  TileDisplaySettingsDialogResult
+} from '../../tile-display-settings-dialog/tile-display-settings-dialog.component';
 
 interface QuickActionDialogData {
   action: TileQuickAction;
@@ -46,6 +50,7 @@ export class QuickActionActionEditComponent {
   private readonly translation = inject(TranslationHelperService);
   readonly help = inject(HelpDialogService);
   readonly data = inject<QuickActionDialogData>(MAT_DIALOG_DATA);
+  private readonly fallbackLabel = this.translation.t('common.tiles.quickActions.actionFallback');
   private iconAuto = true;
   private lastType: TileLinkType;
 
@@ -58,7 +63,7 @@ export class QuickActionActionEditComponent {
   ];
 
   readonly labelControl = new FormControl(
-    this.data.action.label ?? this.translation.t('common.tiles.quickActions.actionFallback'),
+    this.data.action.label ?? this.fallbackLabel,
     { nonNullable: true }
   );
   readonly valueControl = new FormControl(this.data.action.value ?? '', { nonNullable: true });
@@ -66,7 +71,7 @@ export class QuickActionActionEditComponent {
   readonly icon = signal<string | undefined>(this.data.action.icon ?? this.defaultIconForType(this.data.action.type));
 
   get headerTitle(): string {
-    return this.labelControl.value.trim() || this.translation.t('common.tiles.quickActions.actionFallback');
+    return this.labelControl.value.trim() || this.fallbackLabel;
   }
 
   get headerIcon(): string {
@@ -86,25 +91,31 @@ export class QuickActionActionEditComponent {
     });
   }
 
-  pickIcon(): void {
-    const ref = this.dialog.open(MaticonPickerComponent, {
-      width: '520px',
-      data: { current: this.icon() },
-      hasBackdrop: true,
-      backdropClass: 'dialog-backdrop',
-      disableClose: false,
-    });
-
-    ref.afterClosed().subscribe((selected?: string | null) => {
-      if (selected !== undefined) {
-        if (selected === null) {
-          this.icon.set(undefined);
-          this.iconAuto = true;
-          return;
-        }
-        this.icon.set(selected);
-        this.iconAuto = selected === this.defaultIconForType(this.typeControl.value);
+  openDisplaySettings(): void {
+    const ref = this.dialog.open<TileDisplaySettingsDialogComponent, TileDisplaySettingsDialogData, TileDisplaySettingsDialogResult | undefined>(
+      TileDisplaySettingsDialogComponent,
+      {
+        width: '460px',
+        maxWidth: '95vw',
+        data: {
+          title: this.headerTitle,
+          icon: this.icon(),
+          fallbackTitle: this.fallbackLabel,
+          dialogTitleKey: 'common.tileEdit.displaySettingsTitle'
+        },
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop',
+        disableClose: false,
       }
+    );
+
+    ref.afterClosed().subscribe((result) => {
+      if (!result) {
+        return;
+      }
+      this.labelControl.setValue(result.title);
+      this.icon.set(result.icon);
+      this.iconAuto = !result.icon || result.icon === this.defaultIconForType(this.typeControl.value);
     });
   }
 
@@ -118,7 +129,7 @@ export class QuickActionActionEditComponent {
       return;
     }
 
-    const label = this.labelControl.value.trim() || this.translation.t('common.tiles.quickActions.actionFallback');
+    const label = this.labelControl.value.trim() || this.fallbackLabel;
     const value = this.valueControl.value.trim();
     const type = this.typeControl.value;
 

@@ -25,6 +25,7 @@ import {
 
 interface FileTileDialogData {
   tile: TileSetting;
+  onTileCommit?: (updated: TileSetting) => void;
 }
 
 @Component({
@@ -106,6 +107,7 @@ export class FileTileEditComponent {
       }
       this.titleControl.setValue(result.title);
       this.icon.set(result.icon);
+      this.commitDisplaySettings();
     });
   }
 
@@ -232,5 +234,20 @@ export class FileTileEditComponent {
       return crypto.randomUUID();
     }
     return `file-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  }
+
+  private commitDisplaySettings(): void {
+    const title = this.titleControl.value.trim() || this.fallbackTitle;
+    const updated: TileSetting = {
+      ...this.data.tile,
+      label: title,
+      payload: {
+        ...this.data.tile.payload,
+        title,
+        icon: this.icon()
+      }
+    };
+    this.data.tile = updated;
+    this.data.onTileCommit?.(updated);
   }
 }

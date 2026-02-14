@@ -77,7 +77,10 @@ export class FileTileComponent implements OnChanges {
       width: '560px',
       maxWidth: '95vw',
       maxHeight: '98vh',
-      data: { tile },
+      data: {
+        tile,
+        onTileCommit: (updated: TileSetting) => this.applyTileUpdate(updated)
+      },
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
       disableClose: false,

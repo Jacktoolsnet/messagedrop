@@ -1933,14 +1933,9 @@ const HELP_TOPICS = {
     introKey: 'tileEditAnniversary.intro',
     items: [
       {
-        icon: 'style',
-        titleKey: 'tileEditAnniversary.items.icon.title',
-        descriptionKey: 'tileEditAnniversary.items.icon.desc'
-      },
-      {
-        icon: 'edit',
-        titleKey: 'tileEditAnniversary.items.title.title',
-        descriptionKey: 'tileEditAnniversary.items.title.desc'
+        icon: 'settings',
+        titleKey: 'tileEditAnniversary.items.displaySettings.title',
+        descriptionKey: 'tileEditAnniversary.items.displaySettings.desc'
       },
       {
         icon: 'calendar_month',
@@ -1974,14 +1969,9 @@ const HELP_TOPICS = {
     introKey: 'tileEditFile.intro',
     items: [
       {
-        icon: 'style',
-        titleKey: 'tileEditFile.items.icon.title',
-        descriptionKey: 'tileEditFile.items.icon.desc'
-      },
-      {
-        icon: 'edit',
-        titleKey: 'tileEditFile.items.title.title',
-        descriptionKey: 'tileEditFile.items.title.desc'
+        icon: 'settings',
+        titleKey: 'tileEditFile.items.displaySettings.title',
+        descriptionKey: 'tileEditFile.items.displaySettings.desc'
       },
       {
         icon: 'add',
@@ -2030,14 +2020,9 @@ const HELP_TOPICS = {
     introKey: 'tileEditMigraine.intro',
     items: [
       {
-        icon: 'style',
-        titleKey: 'tileEditMigraine.items.icon.title',
-        descriptionKey: 'tileEditMigraine.items.icon.desc'
-      },
-      {
-        icon: 'edit',
-        titleKey: 'tileEditMigraine.items.title.title',
-        descriptionKey: 'tileEditMigraine.items.title.desc'
+        icon: 'settings',
+        titleKey: 'tileEditMigraine.items.displaySettings.title',
+        descriptionKey: 'tileEditMigraine.items.displaySettings.desc'
       },
       {
         icon: 'device_thermostat',
@@ -2076,14 +2061,9 @@ const HELP_TOPICS = {
     introKey: 'tileEditMultitext.intro',
     items: [
       {
-        icon: 'style',
-        titleKey: 'tileEditMultitext.items.icon.title',
-        descriptionKey: 'tileEditMultitext.items.icon.desc'
-      },
-      {
-        icon: 'edit',
-        titleKey: 'tileEditMultitext.items.title.title',
-        descriptionKey: 'tileEditMultitext.items.title.desc'
+        icon: 'settings',
+        titleKey: 'tileEditMultitext.items.displaySettings.title',
+        descriptionKey: 'tileEditMultitext.items.displaySettings.desc'
       },
       {
         icon: 'notes',
@@ -2184,14 +2164,9 @@ const HELP_TOPICS = {
     introKey: 'tileEditQuickActionAction.intro',
     items: [
       {
-        icon: 'style',
-        titleKey: 'tileEditQuickActionAction.items.icon.title',
-        descriptionKey: 'tileEditQuickActionAction.items.icon.desc'
-      },
-      {
-        icon: 'label',
-        titleKey: 'tileEditQuickActionAction.items.label.title',
-        descriptionKey: 'tileEditQuickActionAction.items.label.desc'
+        icon: 'settings',
+        titleKey: 'tileEditQuickActionAction.items.displaySettings.title',
+        descriptionKey: 'tileEditQuickActionAction.items.displaySettings.desc'
       },
       {
         icon: 'category',
@@ -2230,14 +2205,9 @@ const HELP_TOPICS = {
     introKey: 'tileEditQuickAction.intro',
     items: [
       {
-        icon: 'style',
-        titleKey: 'tileEditQuickAction.items.icon.title',
-        descriptionKey: 'tileEditQuickAction.items.icon.desc'
-      },
-      {
-        icon: 'edit',
-        titleKey: 'tileEditQuickAction.items.title.title',
-        descriptionKey: 'tileEditQuickAction.items.title.desc'
+        icon: 'settings',
+        titleKey: 'tileEditQuickAction.items.displaySettings.title',
+        descriptionKey: 'tileEditQuickAction.items.displaySettings.desc'
       },
       {
         icon: 'add',
@@ -2286,14 +2256,9 @@ const HELP_TOPICS = {
     introKey: 'tileEditText.intro',
     items: [
       {
-        icon: 'style',
-        titleKey: 'tileEditText.items.icon.title',
-        descriptionKey: 'tileEditText.items.icon.desc'
-      },
-      {
-        icon: 'edit',
-        titleKey: 'tileEditText.items.title.title',
-        descriptionKey: 'tileEditText.items.title.desc'
+        icon: 'settings',
+        titleKey: 'tileEditText.items.displaySettings.title',
+        descriptionKey: 'tileEditText.items.displaySettings.desc'
       },
       {
         icon: 'text_fields',
@@ -2327,14 +2292,9 @@ const HELP_TOPICS = {
     introKey: 'tileEditTodo.intro',
     items: [
       {
-        icon: 'style',
-        titleKey: 'tileEditTodo.items.icon.title',
-        descriptionKey: 'tileEditTodo.items.icon.desc'
-      },
-      {
-        icon: 'edit',
-        titleKey: 'tileEditTodo.items.title.title',
-        descriptionKey: 'tileEditTodo.items.title.desc'
+        icon: 'settings',
+        titleKey: 'tileEditTodo.items.displaySettings.title',
+        descriptionKey: 'tileEditTodo.items.displaySettings.desc'
       },
       {
         icon: 'add',

@@ -18,6 +18,7 @@ import {
 interface PollutionTileDialogData {
   tile: TileSetting;
   availableKeys?: string[];
+  onTileCommit?: (updated: TileSetting) => void;
 }
 
 @Component({
@@ -107,6 +108,7 @@ export class PollutionTileEditComponent {
       }
       this.title.set(result.title);
       this.icon.set(result.icon);
+      this.commitDisplaySettings();
     });
   }
 
@@ -130,6 +132,21 @@ export class PollutionTileEditComponent {
       }
     };
     this.dialogRef.close(updated);
+  }
+
+  private commitDisplaySettings(): void {
+    const title = this.title().trim() || this.fallbackTitle;
+    const updated: TileSetting = {
+      ...this.data.tile,
+      label: title,
+      payload: {
+        ...this.data.tile.payload,
+        title,
+        icon: this.icon()
+      }
+    };
+    this.data.tile = updated;
+    this.data.onTileCommit?.(updated);
   }
 
   private filterKeys() {

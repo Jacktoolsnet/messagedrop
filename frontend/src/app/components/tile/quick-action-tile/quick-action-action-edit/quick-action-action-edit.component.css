@@ -10,18 +10,3 @@
 .full-width {
   width: 100%;
 }
-
-.icon-pick-button {
-  width: 95%;
-  align-self: center;
-  justify-content: center;
-  gap: 1.75rem;
-  margin: auto;
-  padding: 1.5rem;
-}
-
-.icon-pick-button mat-icon {
-  font-size: 2rem;
-  width: 2rem;
-  height: 2rem;
-}

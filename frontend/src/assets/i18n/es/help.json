@@ -1472,15 +1472,11 @@
   },
   "tileEditAnniversary": {
     "title": "Tarjeta de aniversario",
-    "intro": "En este diálogo editas la tarjeta de aniversario con icono, título y fecha.",
+    "intro": "En este diálogo editas la fecha del aniversario y, si hace falta, abres los ajustes visuales.",
     "items": {
-      "icon": {
-        "title": "Seleccionar icono",
-        "desc": "Con esta función defines el icono de la tarjeta."
-      },
-      "title": {
-        "title": "Editar título",
-        "desc": "Con esta función defines el nombre visible de la tarjeta."
+      "displaySettings": {
+        "title": "Abrir ajustes visuales",
+        "desc": "Con esta función abres el diálogo para icono y título de la tarjeta."
       },
       "date": {
         "title": "Definir fecha",
@@ -1506,15 +1502,11 @@
   },
   "tileEditFile": {
     "title": "Tarjeta de archivo",
-    "intro": "En este diálogo gestionas archivos dentro de una tarjeta, incluido el orden y las acciones de archivo.",
+    "intro": "En este diálogo gestionas archivos dentro de una tarjeta, incluido el orden, las acciones de archivo y los ajustes visuales.",
     "items": {
-      "icon": {
-        "title": "Seleccionar icono",
-        "desc": "Con esta función defines el icono de la tarjeta."
-      },
-      "title": {
-        "title": "Editar título",
-        "desc": "Con esta función defines el nombre visible de la tarjeta."
+      "displaySettings": {
+        "title": "Abrir ajustes visuales",
+        "desc": "Con esta función abres el diálogo para icono y título de la tarjeta."
       },
       "addFiles": {
         "title": "Añadir archivos",
@@ -1552,15 +1544,11 @@
   },
   "tileEditMigraine": {
     "title": "Tarjeta de migraña",
-    "intro": "En este diálogo configuras los umbrales de aviso y alerta para temperatura y presión del aire.",
+    "intro": "En este diálogo configuras los umbrales de aviso y alerta para temperatura y presión del aire, y también los ajustes visuales.",
     "items": {
-      "icon": {
-        "title": "Seleccionar icono",
-        "desc": "Con esta función defines el icono de la tarjeta."
-      },
-      "title": {
-        "title": "Editar título",
-        "desc": "Con esta función defines el nombre visible de la tarjeta."
+      "displaySettings": {
+        "title": "Abrir ajustes visuales",
+        "desc": "Con esta función abres el diálogo para icono y título de la tarjeta."
       },
       "temperature": {
         "title": "Definir umbrales de temperatura",
@@ -1590,15 +1578,11 @@
   },
   "tileEditMultitext": {
     "title": "Tarjeta de texto múltiple",
-    "intro": "En este diálogo editas una tarjeta de texto multilínea con icono, título y contenido.",
+    "intro": "En este diálogo editas el contenido multilínea de la tarjeta y, si hace falta, abres los ajustes visuales.",
     "items": {
-      "icon": {
-        "title": "Seleccionar icono",
-        "desc": "Con esta función defines el icono de la tarjeta."
-      },
-      "title": {
-        "title": "Editar título",
-        "desc": "Con esta función defines el nombre visible de la tarjeta."
+      "displaySettings": {
+        "title": "Abrir ajustes visuales",
+        "desc": "Con esta función abres el diálogo para icono y título de la tarjeta."
       },
       "text": {
         "title": "Editar texto",
@@ -1682,13 +1666,9 @@
     "title": "Acción rápida",
     "intro": "En este diálogo editas una acción individual dentro de una tarjeta de acciones rápidas.",
     "items": {
-      "icon": {
-        "title": "Seleccionar icono",
-        "desc": "Con esta función defines el icono de la acción."
-      },
-      "label": {
-        "title": "Definir etiqueta",
-        "desc": "Con esta función editas el nombre de la acción."
+      "displaySettings": {
+        "title": "Abrir ajustes visuales",
+        "desc": "Con esta función abres el diálogo para icono y nombre de la acción."
       },
       "type": {
         "title": "Elegir tipo de acción",
@@ -1718,15 +1698,11 @@
   },
   "tileEditQuickAction": {
     "title": "Tarjeta de acción rápida",
-    "intro": "En este diálogo gestionas una tarjeta con varias acciones rápidas.",
+    "intro": "En este diálogo gestionas una tarjeta con varias acciones rápidas y, si hace falta, abres los ajustes visuales.",
     "items": {
-      "icon": {
-        "title": "Seleccionar icono",
-        "desc": "Con esta función defines el icono de la tarjeta."
-      },
-      "title": {
-        "title": "Editar título",
-        "desc": "Con esta función defines el nombre visible de la tarjeta."
+      "displaySettings": {
+        "title": "Abrir ajustes visuales",
+        "desc": "Con esta función abres el diálogo para icono y título de la tarjeta."
       },
       "addAction": {
         "title": "Añadir acción",
@@ -1764,15 +1740,11 @@
   },
   "tileEditText": {
     "title": "Tarjeta de texto",
-    "intro": "En este diálogo editas una tarjeta de texto de una sola línea.",
+    "intro": "En este diálogo editas una tarjeta de texto de una sola línea y, si hace falta, abres los ajustes visuales.",
     "items": {
-      "icon": {
-        "title": "Seleccionar icono",
-        "desc": "Con esta función defines el icono de la tarjeta."
-      },
-      "title": {
-        "title": "Editar título",
-        "desc": "Con esta función defines el nombre visible de la tarjeta."
+      "displaySettings": {
+        "title": "Abrir ajustes visuales",
+        "desc": "Con esta función abres el diálogo para icono y título de la tarjeta."
       },
       "text": {
         "title": "Editar texto",
@@ -1798,15 +1770,11 @@
   },
   "tileEditTodo": {
     "title": "Tarjeta de tareas",
-    "intro": "En este diálogo gestionas tareas dentro de una tarjeta de tareas.",
+    "intro": "En este diálogo gestionas tareas dentro de una tarjeta de tareas y, si hace falta, abres los ajustes visuales.",
     "items": {
-      "icon": {
-        "title": "Seleccionar icono",
-        "desc": "Con esta función defines el icono de la tarjeta."
-      },
-      "title": {
-        "title": "Editar título",
-        "desc": "Con esta función defines el nombre visible de la tarjeta."
+      "displaySettings": {
+        "title": "Abrir ajustes visuales",
+        "desc": "Con esta función abres el diálogo para icono y título de la tarjeta."
       },
       "addTodo": {
         "title": "Añadir tarea",

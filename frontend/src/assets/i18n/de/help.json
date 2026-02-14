@@ -1472,15 +1472,11 @@
   },
   "tileEditAnniversary": {
     "title": "Jahrestag-Kachel",
-    "intro": "In diesem Dialog bearbeitest du die Jahrestag-Kachel mit Icon, Titel und Datum.",
+    "intro": "In diesem Dialog bearbeitest du das Datum der Jahrestag-Kachel und öffnest bei Bedarf die Darstellungseinstellungen.",
     "items": {
-      "icon": {
-        "title": "Icon auswählen",
-        "desc": "Mit dieser Funktion legst du das Icon der Kachel fest."
-      },
-      "title": {
-        "title": "Titel bearbeiten",
-        "desc": "Mit dieser Funktion vergibst du den Anzeigenamen der Kachel."
+      "displaySettings": {
+        "title": "Darstellung öffnen",
+        "desc": "Mit dieser Funktion öffnest du den Dialog für Icon und Titel der Kachel."
       },
       "date": {
         "title": "Datum festlegen",
@@ -1506,15 +1502,11 @@
   },
   "tileEditFile": {
     "title": "Datei-Kachel",
-    "intro": "In diesem Dialog verwaltest du Dateien in einer Kachel, inklusive Reihenfolge und Vorschauaktionen.",
+    "intro": "In diesem Dialog verwaltest du Dateien in einer Kachel, inklusive Reihenfolge, Vorschauaktionen und Darstellungseinstellungen.",
     "items": {
-      "icon": {
-        "title": "Icon auswählen",
-        "desc": "Mit dieser Funktion legst du das Icon der Kachel fest."
-      },
-      "title": {
-        "title": "Titel bearbeiten",
-        "desc": "Mit dieser Funktion vergibst du den Anzeigenamen der Kachel."
+      "displaySettings": {
+        "title": "Darstellung öffnen",
+        "desc": "Mit dieser Funktion öffnest du den Dialog für Icon und Titel der Kachel."
       },
       "addFiles": {
         "title": "Dateien hinzufügen",
@@ -1552,15 +1544,11 @@
   },
   "tileEditMigraine": {
     "title": "Migräne-Kachel",
-    "intro": "In diesem Dialog konfigurierst du Warn- und Alarmwerte der Migräne-Kachel für Temperatur und Luftdruck.",
+    "intro": "In diesem Dialog konfigurierst du Warn- und Alarmwerte der Migräne-Kachel für Temperatur und Luftdruck sowie die Darstellung.",
     "items": {
-      "icon": {
-        "title": "Icon auswählen",
-        "desc": "Mit dieser Funktion legst du das Icon der Kachel fest."
-      },
-      "title": {
-        "title": "Titel bearbeiten",
-        "desc": "Mit dieser Funktion vergibst du den Anzeigenamen der Kachel."
+      "displaySettings": {
+        "title": "Darstellung öffnen",
+        "desc": "Mit dieser Funktion öffnest du den Dialog für Icon und Titel der Kachel."
       },
       "temperature": {
         "title": "Temperatur-Grenzen setzen",
@@ -1590,15 +1578,11 @@
   },
   "tileEditMultitext": {
     "title": "Multi-Text-Kachel",
-    "intro": "In diesem Dialog bearbeitest du eine mehrzeilige Text-Kachel mit Icon, Titel und Inhalt.",
+    "intro": "In diesem Dialog bearbeitest du den mehrzeiligen Inhalt der Kachel und öffnest bei Bedarf die Darstellungseinstellungen.",
     "items": {
-      "icon": {
-        "title": "Icon auswählen",
-        "desc": "Mit dieser Funktion legst du das Icon der Kachel fest."
-      },
-      "title": {
-        "title": "Titel bearbeiten",
-        "desc": "Mit dieser Funktion vergibst du den Anzeigenamen der Kachel."
+      "displaySettings": {
+        "title": "Darstellung öffnen",
+        "desc": "Mit dieser Funktion öffnest du den Dialog für Icon und Titel der Kachel."
       },
       "text": {
         "title": "Text bearbeiten",
@@ -1682,13 +1666,9 @@
     "title": "Schnellaktion",
     "intro": "In diesem Dialog bearbeitest du eine einzelne Aktion innerhalb der Schnellaktions-Kachel.",
     "items": {
-      "icon": {
-        "title": "Icon auswählen",
-        "desc": "Mit dieser Funktion legst du das Icon der Aktion fest."
-      },
-      "label": {
-        "title": "Beschriftung setzen",
-        "desc": "Mit dieser Funktion bearbeitest du den Namen der Aktion."
+      "displaySettings": {
+        "title": "Darstellung öffnen",
+        "desc": "Mit dieser Funktion öffnest du den Dialog für Icon und Name der Aktion."
       },
       "type": {
         "title": "Aktionstyp wählen",
@@ -1718,15 +1698,11 @@
   },
   "tileEditQuickAction": {
     "title": "Schnellaktions-Kachel",
-    "intro": "In diesem Dialog verwaltest du eine Kachel mit mehreren Schnellaktionen.",
+    "intro": "In diesem Dialog verwaltest du eine Kachel mit mehreren Schnellaktionen und öffnest bei Bedarf die Darstellungseinstellungen.",
     "items": {
-      "icon": {
-        "title": "Icon auswählen",
-        "desc": "Mit dieser Funktion legst du das Icon der Kachel fest."
-      },
-      "title": {
-        "title": "Titel bearbeiten",
-        "desc": "Mit dieser Funktion vergibst du den Anzeigenamen der Kachel."
+      "displaySettings": {
+        "title": "Darstellung öffnen",
+        "desc": "Mit dieser Funktion öffnest du den Dialog für Icon und Titel der Kachel."
       },
       "addAction": {
         "title": "Aktion hinzufügen",
@@ -1764,15 +1740,11 @@
   },
   "tileEditText": {
     "title": "Text-Kachel",
-    "intro": "In diesem Dialog bearbeitest du eine einzeilige Text-Kachel.",
+    "intro": "In diesem Dialog bearbeitest du eine einzeilige Text-Kachel und öffnest bei Bedarf die Darstellungseinstellungen.",
     "items": {
-      "icon": {
-        "title": "Icon auswählen",
-        "desc": "Mit dieser Funktion legst du das Icon der Kachel fest."
-      },
-      "title": {
-        "title": "Titel bearbeiten",
-        "desc": "Mit dieser Funktion vergibst du den Anzeigenamen der Kachel."
+      "displaySettings": {
+        "title": "Darstellung öffnen",
+        "desc": "Mit dieser Funktion öffnest du den Dialog für Icon und Titel der Kachel."
       },
       "text": {
         "title": "Text bearbeiten",
@@ -1798,15 +1770,11 @@
   },
   "tileEditTodo": {
     "title": "To-do-Kachel",
-    "intro": "In diesem Dialog verwaltest du Aufgaben einer To-do-Kachel.",
+    "intro": "In diesem Dialog verwaltest du Aufgaben einer To-do-Kachel und öffnest bei Bedarf die Darstellungseinstellungen.",
     "items": {
-      "icon": {
-        "title": "Icon auswählen",
-        "desc": "Mit dieser Funktion legst du das Icon der Kachel fest."
-      },
-      "title": {
-        "title": "Titel bearbeiten",
-        "desc": "Mit dieser Funktion vergibst du den Anzeigenamen der Kachel."
+      "displaySettings": {
+        "title": "Darstellung öffnen",
+        "desc": "Mit dieser Funktion öffnest du den Dialog für Icon und Titel der Kachel."
       },
       "addTodo": {
         "title": "Aufgabe hinzufügen",

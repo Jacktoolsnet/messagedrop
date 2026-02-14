@@ -186,21 +186,29 @@ export class PollutionTileComponent {
       maxWidth: '95vw',
       maxHeight: '95vh',
       height: 'auto',
-      data: { tile, availableKeys },
+      data: {
+        tile,
+        availableKeys,
+        onTileCommit: (updated: TileSetting) => this.applyTileUpdate(updated)
+      },
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
       disableClose: false,
     });
     ref.afterClosed().subscribe((updated?: TileSetting) => {
       if (!updated) return;
-      const place = this.placeSignal();
-      if (!place) return;
-      const tiles = (place.tileSettings ?? []).map(t => t.id === updated.id ? { ...t, ...updated } : t);
-      const updatedPlace = { ...place, tileSettings: tiles };
-      this.placeSignal.set(updatedPlace);
-      this.currentTile.set(updated);
-      this.placeService.saveAdditionalPlaceInfos(updatedPlace);
+      this.applyTileUpdate(updated);
     });
+  }
+
+  private applyTileUpdate(updated: TileSetting): void {
+    const place = this.placeSignal();
+    if (!place) return;
+    const tiles = (place.tileSettings ?? []).map(t => t.id === updated.id ? { ...t, ...updated } : t);
+    const updatedPlace = { ...place, tileSettings: tiles };
+    this.placeSignal.set(updatedPlace);
+    this.currentTile.set(updated);
+    this.placeService.saveAdditionalPlaceInfos(updatedPlace);
   }
 
   openAirQualityDetails(key: string): void {

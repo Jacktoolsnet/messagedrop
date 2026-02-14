@@ -1472,15 +1472,11 @@
   },
   "tileEditAnniversary": {
     "title": "Tuile anniversaire",
-    "intro": "Cette boîte de dialogue permet de modifier la tuile anniversaire avec icône, titre et date.",
+    "intro": "Cette boîte de dialogue modifie la date d'anniversaire et permet d'ouvrir les réglages d'affichage si nécessaire.",
     "items": {
-      "icon": {
-        "title": "Choisir une icône",
-        "desc": "Cette fonction définit l'icône de la tuile."
-      },
-      "title": {
-        "title": "Modifier le titre",
-        "desc": "Cette fonction définit le nom affiché de la tuile."
+      "displaySettings": {
+        "title": "Ouvrir l'affichage",
+        "desc": "Cette fonction ouvre la boîte de dialogue pour l'icône et le titre de la tuile."
       },
       "date": {
         "title": "Définir la date",
@@ -1506,15 +1502,11 @@
   },
   "tileEditFile": {
     "title": "Tuile fichier",
-    "intro": "Cette boîte de dialogue gère les fichiers d'une tuile, y compris l'ordre et les actions sur les fichiers.",
+    "intro": "Cette boîte de dialogue gère les fichiers d'une tuile, y compris l'ordre, les actions et les réglages d'affichage.",
     "items": {
-      "icon": {
-        "title": "Choisir une icône",
-        "desc": "Cette fonction définit l'icône de la tuile."
-      },
-      "title": {
-        "title": "Modifier le titre",
-        "desc": "Cette fonction définit le nom affiché de la tuile."
+      "displaySettings": {
+        "title": "Ouvrir l'affichage",
+        "desc": "Cette fonction ouvre la boîte de dialogue pour l'icône et le titre de la tuile."
       },
       "addFiles": {
         "title": "Ajouter des fichiers",
@@ -1552,15 +1544,11 @@
   },
   "tileEditMigraine": {
     "title": "Tuile migraine",
-    "intro": "Cette boîte de dialogue configure les seuils d'alerte pour la température et la pression atmosphérique.",
+    "intro": "Cette boîte de dialogue configure les seuils d'alerte pour la température et la pression atmosphérique, ainsi que l'affichage.",
     "items": {
-      "icon": {
-        "title": "Choisir une icône",
-        "desc": "Cette fonction définit l'icône de la tuile."
-      },
-      "title": {
-        "title": "Modifier le titre",
-        "desc": "Cette fonction définit le nom affiché de la tuile."
+      "displaySettings": {
+        "title": "Ouvrir l'affichage",
+        "desc": "Cette fonction ouvre la boîte de dialogue pour l'icône et le titre de la tuile."
       },
       "temperature": {
         "title": "Définir les seuils de température",
@@ -1590,15 +1578,11 @@
   },
   "tileEditMultitext": {
     "title": "Tuile texte multiple",
-    "intro": "Cette boîte de dialogue modifie une tuile de texte multiligne avec icône, titre et contenu.",
+    "intro": "Cette boîte de dialogue modifie le contenu multiligne de la tuile et permet d'ouvrir les réglages d'affichage si nécessaire.",
     "items": {
-      "icon": {
-        "title": "Choisir une icône",
-        "desc": "Cette fonction définit l'icône de la tuile."
-      },
-      "title": {
-        "title": "Modifier le titre",
-        "desc": "Cette fonction définit le nom affiché de la tuile."
+      "displaySettings": {
+        "title": "Ouvrir l'affichage",
+        "desc": "Cette fonction ouvre la boîte de dialogue pour l'icône et le titre de la tuile."
       },
       "text": {
         "title": "Modifier le texte",
@@ -1682,13 +1666,9 @@
     "title": "Action rapide",
     "intro": "Cette boîte de dialogue modifie une action individuelle dans une tuile d'actions rapides.",
     "items": {
-      "icon": {
-        "title": "Choisir une icône",
-        "desc": "Cette fonction définit l'icône de l'action."
-      },
-      "label": {
-        "title": "Définir le libellé",
-        "desc": "Cette fonction modifie le nom de l'action."
+      "displaySettings": {
+        "title": "Ouvrir l'affichage",
+        "desc": "Cette fonction ouvre la boîte de dialogue pour l'icône et le libellé de l'action."
       },
       "type": {
         "title": "Choisir le type d'action",
@@ -1718,15 +1698,11 @@
   },
   "tileEditQuickAction": {
     "title": "Tuile action rapide",
-    "intro": "Cette boîte de dialogue gère une tuile contenant plusieurs actions rapides.",
+    "intro": "Cette boîte de dialogue gère une tuile contenant plusieurs actions rapides et permet d'ouvrir les réglages d'affichage si nécessaire.",
     "items": {
-      "icon": {
-        "title": "Choisir une icône",
-        "desc": "Cette fonction définit l'icône de la tuile."
-      },
-      "title": {
-        "title": "Modifier le titre",
-        "desc": "Cette fonction définit le nom affiché de la tuile."
+      "displaySettings": {
+        "title": "Ouvrir l'affichage",
+        "desc": "Cette fonction ouvre la boîte de dialogue pour l'icône et le titre de la tuile."
       },
       "addAction": {
         "title": "Ajouter une action",
@@ -1764,15 +1740,11 @@
   },
   "tileEditText": {
     "title": "Tuile texte",
-    "intro": "Cette boîte de dialogue modifie une tuile de texte sur une seule ligne.",
+    "intro": "Cette boîte de dialogue modifie une tuile de texte sur une seule ligne et permet d'ouvrir les réglages d'affichage si nécessaire.",
     "items": {
-      "icon": {
-        "title": "Choisir une icône",
-        "desc": "Cette fonction définit l'icône de la tuile."
-      },
-      "title": {
-        "title": "Modifier le titre",
-        "desc": "Cette fonction définit le nom affiché de la tuile."
+      "displaySettings": {
+        "title": "Ouvrir l'affichage",
+        "desc": "Cette fonction ouvre la boîte de dialogue pour l'icône et le titre de la tuile."
       },
       "text": {
         "title": "Modifier le texte",
@@ -1798,15 +1770,11 @@
   },
   "tileEditTodo": {
     "title": "Tuile tâches",
-    "intro": "Cette boîte de dialogue gère les tâches d'une tuile to-do.",
+    "intro": "Cette boîte de dialogue gère les tâches d'une tuile to-do et permet d'ouvrir les réglages d'affichage si nécessaire.",
     "items": {
-      "icon": {
-        "title": "Choisir une icône",
-        "desc": "Cette fonction définit l'icône de la tuile."
-      },
-      "title": {
-        "title": "Modifier le titre",
-        "desc": "Cette fonction définit le nom affiché de la tuile."
+      "displaySettings": {
+        "title": "Ouvrir l'affichage",
+        "desc": "Cette fonction ouvre la boîte de dialogue pour l'icône et le titre de la tuile."
       },
       "addTodo": {
         "title": "Ajouter une tâche",

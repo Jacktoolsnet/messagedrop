@@ -67,26 +67,33 @@ export class AnniversaryTileComponent implements OnChanges {
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
       disableClose: false,
-      data: { tile }
+      data: {
+        tile,
+        onTileCommit: (updated: TileSetting) => this.applyTileUpdate(updated)
+      }
     });
 
     ref.afterClosed().subscribe((updated?: TileSetting) => {
       if (!updated) return;
-      if (this.place) {
-        const tiles = (this.place.tileSettings ?? []).map(t => t.id === updated.id ? { ...t, ...updated } : t);
-        const updatedPlace = { ...this.place, tileSettings: tiles };
-        this.place = updatedPlace;
-        this.currentTile.set(updated);
-        this.placeService.saveAdditionalPlaceInfos(updatedPlace);
-      } else if (this.contact) {
-        const tiles = (this.contact.tileSettings ?? []).map(t => t.id === updated.id ? { ...t, ...updated } : t);
-        this.contact = { ...this.contact, tileSettings: tiles };
-        this.currentTile.set(updated);
-        this.contactService.saveContactTileSettings(this.contact);
-        this.contactService.refreshContact(this.contact.id);
-      }
-      this.cdr.markForCheck();
+      this.applyTileUpdate(updated);
     });
+  }
+
+  private applyTileUpdate(updated: TileSetting): void {
+    if (this.place) {
+      const tiles = (this.place.tileSettings ?? []).map(t => t.id === updated.id ? { ...t, ...updated } : t);
+      const updatedPlace = { ...this.place, tileSettings: tiles };
+      this.place = updatedPlace;
+      this.currentTile.set(updated);
+      this.placeService.saveAdditionalPlaceInfos(updatedPlace);
+    } else if (this.contact) {
+      const tiles = (this.contact.tileSettings ?? []).map(t => t.id === updated.id ? { ...t, ...updated } : t);
+      this.contact = { ...this.contact, tileSettings: tiles };
+      this.currentTile.set(updated);
+      this.contactService.saveContactTileSettings(this.contact);
+      this.contactService.refreshContact(this.contact.id);
+    }
+    this.cdr.markForCheck();
   }
 
   private parseLocalDate(value: string): Date | null {

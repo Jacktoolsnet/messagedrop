@@ -21,6 +21,7 @@ import {
 
 interface TodoTileDialogData {
   tile: TileSetting;
+  onTileCommit?: (updated: TileSetting) => void;
 }
 
 @Component({
@@ -98,6 +99,7 @@ export class TodoTileEditComponent {
       }
       this.titleControl.setValue(result.title);
       this.icon.set(result.icon);
+      this.commitDisplaySettings();
     });
   }
 
@@ -134,9 +136,29 @@ export class TodoTileEditComponent {
   }
 
   save(): void {
+    const updated = this.buildUpdatedTile();
+    this.dialogRef.close(updated);
+  }
+
+  private commitDisplaySettings(): void {
+    const title = this.titleControl.value.trim() || this.fallbackTitle;
+    const updated: TileSetting = {
+      ...this.data.tile,
+      label: title,
+      payload: {
+        ...this.data.tile.payload,
+        title,
+        icon: this.icon()
+      }
+    };
+    this.data.tile = updated;
+    this.data.onTileCommit?.(updated);
+  }
+
+  private buildUpdatedTile(): TileSetting {
     const title = this.titleControl.value.trim() || this.fallbackTitle;
     const todos = this.normalizeTodos(this.todos()).map((todo, index) => ({ ...todo, order: index }));
-    const updated: TileSetting = {
+    return {
       ...this.data.tile,
       label: title,
       payload: {
@@ -146,7 +168,6 @@ export class TodoTileEditComponent {
         todos
       }
     };
-    this.dialogRef.close(updated);
   }
 
   private normalizeTodos(todos?: TileTodoItem[]): TileTodoItem[] {

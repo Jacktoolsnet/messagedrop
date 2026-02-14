@@ -1472,15 +1472,11 @@
   },
   "tileEditAnniversary": {
     "title": "Anniversary tile",
-    "intro": "This dialog edits the anniversary tile with icon, title, and date.",
+    "intro": "This dialog edits the anniversary date and lets you open display settings when needed.",
     "items": {
-      "icon": {
-        "title": "Select icon",
-        "desc": "This action sets the icon of the tile."
-      },
-      "title": {
-        "title": "Edit title",
-        "desc": "This action sets the display name of the tile."
+      "displaySettings": {
+        "title": "Open display settings",
+        "desc": "This action opens the dialog for tile icon and title."
       },
       "date": {
         "title": "Set date",
@@ -1506,15 +1502,11 @@
   },
   "tileEditFile": {
     "title": "File tile",
-    "intro": "This dialog manages files inside a tile, including order and file actions.",
+    "intro": "This dialog manages files inside a tile, including order, file actions, and display settings.",
     "items": {
-      "icon": {
-        "title": "Select icon",
-        "desc": "This action sets the icon of the tile."
-      },
-      "title": {
-        "title": "Edit title",
-        "desc": "This action sets the display name of the tile."
+      "displaySettings": {
+        "title": "Open display settings",
+        "desc": "This action opens the dialog for tile icon and title."
       },
       "addFiles": {
         "title": "Add files",
@@ -1552,15 +1544,11 @@
   },
   "tileEditMigraine": {
     "title": "Migraine tile",
-    "intro": "This dialog configures warning and alert thresholds for temperature and air pressure.",
+    "intro": "This dialog configures warning and alert thresholds for temperature and air pressure, and includes display settings.",
     "items": {
-      "icon": {
-        "title": "Select icon",
-        "desc": "This action sets the icon of the tile."
-      },
-      "title": {
-        "title": "Edit title",
-        "desc": "This action sets the display name of the tile."
+      "displaySettings": {
+        "title": "Open display settings",
+        "desc": "This action opens the dialog for tile icon and title."
       },
       "temperature": {
         "title": "Set temperature thresholds",
@@ -1590,15 +1578,11 @@
   },
   "tileEditMultitext": {
     "title": "Multi-text tile",
-    "intro": "This dialog edits a multi-line text tile with icon, title, and content.",
+    "intro": "This dialog edits multi-line tile content and lets you open display settings when needed.",
     "items": {
-      "icon": {
-        "title": "Select icon",
-        "desc": "This action sets the icon of the tile."
-      },
-      "title": {
-        "title": "Edit title",
-        "desc": "This action sets the display name of the tile."
+      "displaySettings": {
+        "title": "Open display settings",
+        "desc": "This action opens the dialog for tile icon and title."
       },
       "text": {
         "title": "Edit text",
@@ -1682,13 +1666,9 @@
     "title": "Quick action",
     "intro": "This dialog edits one action inside a quick-actions tile.",
     "items": {
-      "icon": {
-        "title": "Select icon",
-        "desc": "This action sets the icon for the action."
-      },
-      "label": {
-        "title": "Set label",
-        "desc": "This action edits the action label."
+      "displaySettings": {
+        "title": "Open display settings",
+        "desc": "This action opens the dialog for action icon and label."
       },
       "type": {
         "title": "Choose action type",
@@ -1718,15 +1698,11 @@
   },
   "tileEditQuickAction": {
     "title": "Quick action tile",
-    "intro": "This dialog manages a tile with multiple quick actions.",
+    "intro": "This dialog manages a tile with multiple quick actions and lets you open display settings when needed.",
     "items": {
-      "icon": {
-        "title": "Select icon",
-        "desc": "This action sets the icon of the tile."
-      },
-      "title": {
-        "title": "Edit title",
-        "desc": "This action sets the display name of the tile."
+      "displaySettings": {
+        "title": "Open display settings",
+        "desc": "This action opens the dialog for tile icon and title."
       },
       "addAction": {
         "title": "Add action",
@@ -1764,15 +1740,11 @@
   },
   "tileEditText": {
     "title": "Text tile",
-    "intro": "This dialog edits a single-line text tile.",
+    "intro": "This dialog edits a single-line text tile and lets you open display settings when needed.",
     "items": {
-      "icon": {
-        "title": "Select icon",
-        "desc": "This action sets the icon of the tile."
-      },
-      "title": {
-        "title": "Edit title",
-        "desc": "This action sets the display name of the tile."
+      "displaySettings": {
+        "title": "Open display settings",
+        "desc": "This action opens the dialog for tile icon and title."
       },
       "text": {
         "title": "Edit text",
@@ -1798,15 +1770,11 @@
   },
   "tileEditTodo": {
     "title": "To-do tile",
-    "intro": "This dialog manages tasks inside a to-do tile.",
+    "intro": "This dialog manages tasks inside a to-do tile and lets you open display settings when needed.",
     "items": {
-      "icon": {
-        "title": "Select icon",
-        "desc": "This action sets the icon of the tile."
-      },
-      "title": {
-        "title": "Edit title",
-        "desc": "This action sets the display name of the tile."
+      "displaySettings": {
+        "title": "Open display settings",
+        "desc": "This action opens the dialog for tile icon and title."
       },
       "addTodo": {
         "title": "Add task",

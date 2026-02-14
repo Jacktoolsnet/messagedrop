@@ -22,6 +22,7 @@ import {
 
 interface QuickActionTileDialogData {
   tile: TileSetting;
+  onTileCommit?: (updated: TileSetting) => void;
 }
 
 @Component({
@@ -99,6 +100,7 @@ export class QuickActionTileEditComponent {
       }
       this.titleControl.setValue(result.title);
       this.icon.set(result.icon);
+      this.commitDisplaySettings();
     });
   }
 
@@ -133,18 +135,7 @@ export class QuickActionTileEditComponent {
   }
 
   save(): void {
-    const title = this.titleControl.value.trim() || this.fallbackTitle;
-    const actions = this.normalizeActions(this.actions());
-    const updated: TileSetting = {
-      ...this.data.tile,
-      label: title,
-      payload: {
-        ...this.data.tile.payload,
-        title,
-        icon: this.icon(),
-        actions
-      }
-    };
+    const updated = this.buildUpdatedTile();
     this.dialogRef.close(updated);
   }
 
@@ -198,6 +189,36 @@ export class QuickActionTileEditComponent {
       .filter(action => action.value !== '')
       .sort((a, b) => a.order - b.order)
       .map((action, index) => ({ ...action, order: index }));
+  }
+
+  private commitDisplaySettings(): void {
+    const title = this.titleControl.value.trim() || this.fallbackTitle;
+    const updated: TileSetting = {
+      ...this.data.tile,
+      label: title,
+      payload: {
+        ...this.data.tile.payload,
+        title,
+        icon: this.icon()
+      }
+    };
+    this.data.tile = updated;
+    this.data.onTileCommit?.(updated);
+  }
+
+  private buildUpdatedTile(): TileSetting {
+    const title = this.titleControl.value.trim() || this.fallbackTitle;
+    const actions = this.normalizeActions(this.actions());
+    return {
+      ...this.data.tile,
+      label: title,
+      payload: {
+        ...this.data.tile.payload,
+        title,
+        icon: this.icon(),
+        actions
+      }
+    };
   }
 
   private createActionId(): string {
