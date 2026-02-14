@@ -9,7 +9,6 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 import { Location } from '../../interfaces/location';
@@ -67,7 +66,6 @@ interface DialogHeaderConfig {
 export class EditMessageComponent implements OnInit {
   private readonly userService = inject(UserService);
   private readonly sharedContentService = inject(SharedContentService);
-  private readonly sanitizer = inject(DomSanitizer);
   private readonly oembedService = inject(OembedService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly matDialog = inject(MatDialog);
@@ -82,7 +80,7 @@ export class EditMessageComponent implements OnInit {
   readonly isLocationEditable = this.data.mode === Mode.ADD_PUBLIC_MESSAGE
     || this.data.mode === Mode.EDIT_PUBLIC_MESSAGE;
 
-  safeHtml: SafeHtml | undefined = undefined;
+  safeHtml: string | undefined = undefined;
   showSaveHtml = false;
   hashtagInput = '';
   hashtagTags: string[] = [];
@@ -333,7 +331,7 @@ export class EditMessageComponent implements OnInit {
     this.data.message.multimedia = newMultimedia;
     const html = newMultimedia?.oembed?.html ?? '';
     this.safeHtml = this.oembedService.isAllowedOembedSource(newMultimedia?.sourceUrl, newMultimedia?.oembed?.provider_url)
-      ? this.sanitizer.bypassSecurityTrustHtml(html)
+      ? html
       : undefined;
     this.showSaveHtml = newMultimedia.type !== MultimediaType.TENOR;
   }

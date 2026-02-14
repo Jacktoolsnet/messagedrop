@@ -9,7 +9,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Location } from '../../interfaces/location';
 import { Mode } from '../../interfaces/mode';
@@ -64,7 +63,6 @@ interface DialogHeaderConfig {
 export class EditNoteComponent implements OnInit {
   private readonly userService = inject(UserService);
   private readonly sharedContentService = inject(SharedContentService);
-  private readonly sanitizer = inject(DomSanitizer);
   private readonly oembedService = inject(OembedService);
   private readonly matDialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
@@ -80,7 +78,7 @@ export class EditNoteComponent implements OnInit {
     || this.data.mode === Mode.ADD_NOTE
     || this.data.mode === Mode.EDIT_NOTE;
 
-  safeHtml: SafeHtml | undefined = undefined;
+  safeHtml: string | undefined = undefined;
   showSaveHtml = false;
   hashtagInput = '';
   hashtagTags: string[] = [];
@@ -226,7 +224,7 @@ export class EditNoteComponent implements OnInit {
     this.data.note.multimedia = newMultimedia;
     const html = newMultimedia?.oembed?.html ?? '';
     this.safeHtml = this.oembedService.isAllowedOembedSource(newMultimedia?.sourceUrl, newMultimedia?.oembed?.provider_url)
-      ? this.sanitizer.bypassSecurityTrustHtml(html)
+      ? html
       : undefined;
     this.showSaveHtml = newMultimedia.type !== MultimediaType.TENOR;
   }

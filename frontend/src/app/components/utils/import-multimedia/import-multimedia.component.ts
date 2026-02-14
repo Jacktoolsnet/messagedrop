@@ -7,7 +7,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Multimedia } from '../../../interfaces/multimedia';
 import { AppService } from '../../../services/app.service';
@@ -40,7 +39,7 @@ export class ImportMultimediaComponent {
   multimediaUrl = '';
   multimedia?: Multimedia;
   urlInvalid = true;
-  safeHtml?: SafeHtml;
+  safeHtml?: string;
   disabledReason = '';
   showExternalSettingsButton = false;
   isPasting = false;
@@ -48,7 +47,6 @@ export class ImportMultimediaComponent {
   readonly dialogRef = inject(MatDialogRef<ImportMultimediaComponent>);
   private readonly dialog = inject(MatDialog);
   private readonly oembedService = inject(OembedService);
-  private readonly sanitizer = inject(DomSanitizer);
   private readonly appService = inject(AppService);
   private readonly translation = inject(TranslationHelperService);
   private readonly snackBar = inject(MatSnackBar);
@@ -150,7 +148,7 @@ export class ImportMultimediaComponent {
       }
       this.disabledReason = '';
       this.urlInvalid = false;
-      this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.multimedia.oembed?.html ?? '');
+      this.safeHtml = this.multimedia.oembed?.html ?? '';
     } else {
       this.urlInvalid = true;
     }

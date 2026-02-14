@@ -8,7 +8,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Contact } from '../../../interfaces/contact';
 import { Mode } from '../../../interfaces/mode';
@@ -55,7 +54,6 @@ interface TextDialogResult {
   styleUrl: './contact-edit-message.component.css'
 })
 export class ContactEditMessageComponent implements OnInit {
-  private readonly sanitizer = inject(DomSanitizer);
   readonly userService = inject(UserService);
   private readonly oembedService = inject(OembedService);
   private readonly snackBar = inject(MatSnackBar);
@@ -66,7 +64,7 @@ export class ContactEditMessageComponent implements OnInit {
   private readonly translation = inject(TranslationHelperService);
   readonly data = inject<{ mode: Mode; contact: Contact; shortMessage: ShortMessage }>(MAT_DIALOG_DATA);
 
-  safeHtml: SafeHtml | undefined = undefined;
+  safeHtml: string | undefined = undefined;
   showSaveHtml = false;
 
   ngOnInit(): void {
@@ -182,7 +180,7 @@ export class ContactEditMessageComponent implements OnInit {
     const multimedia = this.data.shortMessage.multimedia;
     const html = multimedia?.oembed?.html ?? '';
     this.safeHtml = this.oembedService.isAllowedOembedSource(multimedia?.sourceUrl, multimedia?.oembed?.provider_url)
-      ? this.sanitizer.bypassSecurityTrustHtml(html)
+      ? html
       : undefined;
   }
 }

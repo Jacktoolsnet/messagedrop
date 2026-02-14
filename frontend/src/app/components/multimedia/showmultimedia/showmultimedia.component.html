@@ -7,16 +7,16 @@
             [attr.alt]="multimedia?.title || ('common.multimedia.embeddedAlt' | transloco)" />
     </div>
     @if (multimedia?.attribution !== '') {
-    <a class="attribution-link" [href]="multimedia?.sourceUrl" target="_blank">
+    <a class="attribution-link" [href]="multimedia?.sourceUrl" target="_blank" rel="noopener noreferrer">
         {{ multimedia?.attribution }}
     </a>
     }
 </div>
-} @else if (multimedia?.type !== 'tenor' && safeHtml !== '') {
+} @else if (multimedia?.type !== 'tenor' && safeHtml) {
 <div class="media_block">
     <div class="oembed_container" [innerHTML]="safeHtml"></div>
     @if (multimedia?.attribution !== '') {
-    <a class="attribution-link" [href]="multimedia?.sourceUrl" target="_blank">
+    <a class="attribution-link" [href]="multimedia?.sourceUrl" target="_blank" rel="noopener noreferrer">
         {{ multimedia?.attribution }}
     </a>
     }

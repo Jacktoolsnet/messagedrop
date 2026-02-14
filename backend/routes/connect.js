@@ -130,6 +130,9 @@ router.get('/get/:connectId',
   , function (req, res, next) {
     let response = { 'status': 0 };
     fetchConnectRecord(req, res, req.params.connectId, (row) => {
+      if (!ensureSameUser(req, res, row.userId, next)) {
+        return;
+      }
       response.status = 200;
       response.connect = row;
       res.status(response.status).json(response);
@@ -163,7 +166,10 @@ router.get('/delete/:connectId',
   ]
   , function (req, res, next) {
     let response = { 'status': 0 };
-    fetchConnectRecord(req, res, req.params.connectId, (_row, normalizedConnectId) => {
+    fetchConnectRecord(req, res, req.params.connectId, (row, normalizedConnectId) => {
+      if (!ensureSameUser(req, res, row.userId, next)) {
+        return;
+      }
       tableConnect.deleteById(req.database.db, normalizedConnectId, function (err) {
         if (err) {
           return next(apiError.internal('db_error'));
