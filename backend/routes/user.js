@@ -18,6 +18,10 @@ const { signServiceJwt } = require('../utils/serviceJwt');
 const { resolveBaseUrl } = require('../utils/adminLogForwarder');
 
 const SOCKET_AUDIENCE = process.env.SERVICE_JWT_AUDIENCE_SOCKET || 'service.socketio';
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const MAX_RESTORE_CONTACT_ROWS = 5000;
+const MAX_RESTORE_PLACE_ROWS = 5000;
+const MAX_RESTORE_USER_ROWS = 10000;
 
 function resolveSocketIoBaseUrl() {
   return resolveBaseUrl(process.env.SOCKETIO_BASE_URL || process.env.BASE_URL, process.env.SOCKETIO_PORT);
@@ -199,6 +203,243 @@ function normalizeRows(rows) {
     return [];
   }
   return rows;
+}
+
+function createInvalidBackupError() {
+  const err = new Error('invalid_backup');
+  err.code = 'INVALID_BACKUP';
+  return err;
+}
+
+function isUuid(value) {
+  return UUID_REGEX.test(String(value ?? '').trim());
+}
+
+function normalizeText(value, maxLength = 65535) {
+  if (typeof value !== 'string') {
+    return '';
+  }
+  return value.slice(0, maxLength);
+}
+
+function normalizeOptionalText(value, maxLength = 65535) {
+  if (typeof value !== 'string') {
+    return null;
+  }
+  return value.slice(0, maxLength);
+}
+
+function normalizeSubscribed(value) {
+  return value === true || value === 1 || value === '1' ? 1 : 0;
+}
+
+function normalizeTimestamp(value) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return null;
+  }
+  return Math.floor(parsed);
+}
+
+function normalizePublicKeyValue(value) {
+  if (!value) {
+    return null;
+  }
+  if (typeof value === 'string') {
+    return value;
+  }
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return null;
+  }
+}
+
+function normalizeOwnUserType(value) {
+  if (typeof value !== 'string') {
+    return 'user';
+  }
+  const normalized = value.trim().toLowerCase();
+  return ['user', 'admin', 'business'].includes(normalized) ? normalized : 'user';
+}
+
+function sanitizeRestoreContacts(rawContacts, userId) {
+  const rows = normalizeRows(rawContacts);
+  if (rows.length > MAX_RESTORE_CONTACT_ROWS) {
+    throw createInvalidBackupError();
+  }
+
+  const contacts = [];
+  const relatedUsers = new Map();
+  const seenContactIds = new Set();
+
+  rows.forEach((row) => {
+    if (!row || String(row.userId ?? '') !== userId) {
+      return;
+    }
+    const contactId = String(row.id ?? '').trim();
+    const contactUserId = String(row.contactUserId ?? '').trim();
+    if (!isUuid(contactId) || !isUuid(contactUserId) || contactUserId === userId || seenContactIds.has(contactId)) {
+      return;
+    }
+
+    const signingPublicKey = normalizePublicKeyValue(row.contactUserSigningPublicKey);
+    const encryptionPublicKey = normalizePublicKeyValue(row.contactUserEncryptionPublicKey);
+    if (!signingPublicKey || !encryptionPublicKey) {
+      return;
+    }
+
+    seenContactIds.add(contactId);
+    contacts.push({
+      id: contactId,
+      userId,
+      contactUserId,
+      contactUserSigningPublicKey: signingPublicKey,
+      contactUserEncryptionPublicKey: encryptionPublicKey,
+      subscribed: normalizeSubscribed(row.subscribed),
+      hint: normalizeText(row.hint, 4096),
+      name: normalizeOptionalText(row.name, 65535),
+      lastMessageFrom: normalizeText(row.lastMessageFrom, 32),
+      lastMessageAt: normalizeTimestamp(row.lastMessageAt)
+    });
+
+    if (!relatedUsers.has(contactUserId)) {
+      relatedUsers.set(contactUserId, {
+        id: contactUserId,
+        cryptoPublicKey: encryptionPublicKey,
+        signingPublicKey,
+        numberOfMessages: 0,
+        numberOfBlockedMessages: 0,
+        userStatus: tableUser.userStatus.ENABLED,
+        lastSignOfLife: Math.floor(Date.now() / 1000),
+        subscription: '',
+        type: 'user'
+      });
+    }
+  });
+
+  return { contacts, relatedUsers };
+}
+
+function sanitizeRestorePlaces(rawPlaces, userId) {
+  const rows = normalizeRows(rawPlaces);
+  if (rows.length > MAX_RESTORE_PLACE_ROWS) {
+    throw createInvalidBackupError();
+  }
+
+  const places = [];
+  const seenPlaceIds = new Set();
+  rows.forEach((row) => {
+    if (!row || String(row.userId ?? '') !== userId) {
+      return;
+    }
+    const placeId = String(row.id ?? '').trim();
+    if (!isUuid(placeId) || seenPlaceIds.has(placeId)) {
+      return;
+    }
+    const latMin = Number(row.latMin);
+    const latMax = Number(row.latMax);
+    const lonMin = Number(row.lonMin);
+    const lonMax = Number(row.lonMax);
+    const inRange = Number.isFinite(latMin)
+      && Number.isFinite(latMax)
+      && Number.isFinite(lonMin)
+      && Number.isFinite(lonMax)
+      && latMin >= -90 && latMax <= 90
+      && lonMin >= -180 && lonMax <= 180
+      && latMin <= latMax
+      && lonMin <= lonMax;
+    if (!inRange) {
+      return;
+    }
+    const placeName = normalizeOptionalText(row.name, 65535);
+    if (!placeName) {
+      return;
+    }
+
+    seenPlaceIds.add(placeId);
+    places.push({
+      id: placeId,
+      userId,
+      name: placeName,
+      subscribed: normalizeSubscribed(row.subscribed),
+      latMin,
+      latMax,
+      lonMin,
+      lonMax
+    });
+  });
+
+  return places;
+}
+
+function sanitizeRestoreUsageProtection(rawRows, userId) {
+  const rows = normalizeRows(rawRows);
+  if (!rows.length) {
+    return [];
+  }
+  const ownRow = rows.find((row) => row && String(row.userId ?? '') === userId);
+  if (!ownRow) {
+    return [];
+  }
+  const settings = parseJsonObject(ownRow.settings);
+  const state = parseJsonObject(ownRow.state);
+  if (!settings || !state) {
+    return [];
+  }
+  return [{
+    userId,
+    settings: JSON.stringify(settings),
+    state: JSON.stringify(state)
+  }];
+}
+
+function sanitizeBackupForRestore(backup) {
+  const userId = String(backup?.userId ?? '').trim();
+  if (!isUuid(userId)) {
+    throw createInvalidBackupError();
+  }
+  const tables = backup?.tables && typeof backup.tables === 'object' ? backup.tables : {};
+  const { contacts, relatedUsers } = sanitizeRestoreContacts(tables.tableContact, userId);
+  const places = sanitizeRestorePlaces(tables.tablePlace, userId);
+  const usageProtection = sanitizeRestoreUsageProtection(tables.tableUsageProtection, userId);
+
+  const rawUserRows = normalizeRows(tables.tableUser);
+  const ownUserRowRaw = rawUserRows.find((row) => row && String(row.id ?? '') === userId) || {};
+  const ownUserRow = {
+    id: userId,
+    cryptoPublicKey: normalizePublicKeyValue(ownUserRowRaw.cryptoPublicKey),
+    signingPublicKey: normalizePublicKeyValue(ownUserRowRaw.signingPublicKey),
+    numberOfMessages: 0,
+    numberOfBlockedMessages: 0,
+    userStatus: tableUser.userStatus.ENABLED,
+    lastSignOfLife: Math.floor(Date.now() / 1000),
+    subscription: normalizeText(ownUserRowRaw.subscription, 20000),
+    type: normalizeOwnUserType(ownUserRowRaw.type)
+  };
+
+  const userRows = [ownUserRow, ...Array.from(relatedUsers.values())];
+  if (userRows.length > MAX_RESTORE_USER_ROWS) {
+    throw createInvalidBackupError();
+  }
+
+  return {
+    schemaVersion: 1,
+    createdAt: new Date().toISOString(),
+    userId,
+    tables: {
+      tableUser: userRows,
+      tableMessage: [],
+      tableContact: contacts,
+      tableContactMessage: [],
+      tablePlace: places,
+      tableNotification: [],
+      tableLike: [],
+      tableDislike: [],
+      tableConnect: [],
+      tableUsageProtection: usageProtection
+    }
+  };
 }
 
 async function insertRows(db, tableName, columns, rows) {
@@ -514,7 +755,7 @@ router.get('/backup/:userId',
     try {
       const backup = await buildUserBackup(req.database.db, req.params.userId);
       res.status(200).json({ status: 200, backup });
-    } catch (err) {
+    } catch {
       next(apiError.internal('backup_failed'));
     }
   });
@@ -534,9 +775,13 @@ router.post('/restore',
     }
 
     try {
-      await restoreUserBackup(req.database.db, backup);
+      const sanitizedBackup = sanitizeBackupForRestore(backup);
+      await restoreUserBackup(req.database.db, sanitizedBackup);
       res.status(200).json({ status: 200 });
     } catch (err) {
+      if (err?.code === 'INVALID_BACKUP') {
+        return next(apiError.badRequest('invalid_backup'));
+      }
       next(apiError.internal('restore_failed'));
     }
   });
@@ -626,7 +871,7 @@ router.post('/hashpin',
 
         return res.status(200).json({ status: 200, pinHash: derivedKey.toString('hex') });
       });
-    } catch (err) {
+    } catch {
       return next(apiError.internal('hashing_failed'));
     }
 
@@ -799,7 +1044,7 @@ router.post('/reset-keys',
       });
 
       res.status(200).json({ status: 200 });
-    } catch (err) {
+    } catch {
       try {
         await runQuery(req.database.db, 'ROLLBACK');
       } catch {
@@ -832,7 +1077,7 @@ router.post('/challenge',
 
       const challenge = issueLoginChallenge(userId);
       res.status(200).json({ status: 200, challenge });
-    } catch (err) {
+    } catch {
       return next(apiError.internal('db_error'));
     }
   });
@@ -866,7 +1111,7 @@ router.post('/login',
       let signingPublicKey;
       try {
         signingPublicKey = JSON.parse(row.signingPublicKey);
-      } catch (err) {
+      } catch {
         return next(apiError.internal('invalid_public_key'));
       }
 
@@ -891,7 +1136,7 @@ router.post('/login',
       );
 
       res.status(200).json({ status: 200, jwt: token });
-    } catch (err) {
+    } catch {
       return next(apiError.internal('db_error'));
     }
   });

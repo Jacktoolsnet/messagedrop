@@ -7,14 +7,24 @@ const tableUser = require('../db/tableUser');
 
 const placeSubscriptions = function (logger, db, lat, lon, userId, message) {
     try {
+        const latValue = Number(lat);
+        const lonValue = Number(lon);
+        if (!Number.isFinite(latValue) || !Number.isFinite(lonValue)) {
+            logger.warn('placeSubscriptions: invalid coordinates', { lat, lon, userId });
+            return;
+        }
         const sql = `SELECT tablePlace.id, tablePlace.userId, tablePlace.subscribed, tablePlace.name, tablePlace.latMin,tablePlace.latMax,tablePlace.lonMin,tablePlace.lonMax,tableUser.subscription
         FROM tablePlace
         INNER JOIN tableUser ON tablePlace.userId = tableUser.id
-        WHERE '${lat}' BETWEEN tablePlace.latMin AND tablePlace.latMax
-        AND '${lon}' BETWEEN tablePlace.lonMin AND tablePlace.lonMax
+        WHERE ? BETWEEN tablePlace.latMin AND tablePlace.latMax
+        AND ? BETWEEN tablePlace.lonMin AND tablePlace.lonMax
         AND tablePlace.subscribed = 1
-        AND tablePlace.userId <> '${userId}';`;
-        db.all(sql, (err, rows) => {
+        AND tablePlace.userId <> ?;`;
+        db.all(sql, [latValue, lonValue, String(userId ?? '')], (err, rows) => {
+            if (err) {
+                logger.error('placeSubscriptions query failed', { error: err?.message, userId });
+                return;
+            }
             if (undefined != rows) {
                 rows.forEach(async (row) => {
                     if (row.subscription != '') {
@@ -67,10 +77,18 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
         SELECT tableContact.id, tableContact.userId, tableContact.contactUserId, tableContact.subscribed, tableContact.name, tableUser.subscription
         FROM tableContact
         INNER JOIN tableUser ON tableContact.userId = tableUser.id
-        WHERE contactUserId = '${userId}'
-        AND userId = '${contactUserId}'
+        WHERE contactUserId = ?
+        AND userId = ?
         AND subscribed = 1;`;
-        db.all(sql, (err, rows) => {
+        db.all(sql, [String(userId ?? ''), String(contactUserId ?? '')], (err, rows) => {
+            if (err) {
+                logger.error('contactSubscriptions query failed', {
+                    error: err?.message,
+                    userId,
+                    contactUserId
+                });
+                return;
+            }
             if (undefined != rows) {
                 rows.forEach(async (row) => {
                     if (row.subscription != '') {
