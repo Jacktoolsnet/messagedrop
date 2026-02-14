@@ -196,7 +196,11 @@ app.use(errorHandler);
 (async () => {
   try {
     await generateOrLoadKeypairs();
-    const server = app.listen(process.env.VIATOR_PORT, () => {
+    const configuredPort = Number(process.env.VIATOR_PORT || process.env.PORT || 3500);
+    if (!Number.isFinite(configuredPort) || configuredPort <= 0) {
+      throw new Error('Invalid VIATOR_PORT/PORT configuration');
+    }
+    const server = app.listen(configuredPort, () => {
       const address = server.address();
       const port = typeof address === 'string' ? address : address.port;
       logger.info(`Server läuft auf Port ${port}`);

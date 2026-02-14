@@ -50,6 +50,21 @@ function loadSigningPublicJwk(signingKeyPath, password, serviceName) {
   }
 }
 
+function fileExists(filePath) {
+  return fs.existsSync(filePath);
+}
+
+function readJsonFile(filePath) {
+  if (!fileExists(filePath)) {
+    return {};
+  }
+  try {
+    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  } catch {
+    return {};
+  }
+}
+
 function createInterface() {
   return readline.createInterface({
     input: process.stdin,
@@ -99,6 +114,22 @@ async function run() {
       throw new Error(`Stage keys directory not found: ${stageDir}`);
     }
 
+    const availableServices = SERVICES.filter((svc) => {
+      const signingKeyPath = path.join(stageDir, svc.dir, 'signing.key.enc');
+      return fileExists(signingKeyPath);
+    });
+    const skippedServices = SERVICES.filter((svc) => !availableServices.includes(svc));
+
+    if (availableServices.length === 0) {
+      throw new Error(`No signing.key.enc files found in ${stageDir}`);
+    }
+
+    if (skippedServices.length > 0) {
+      console.log(
+        `Skipping services without signing.key.enc: ${skippedServices.map((svc) => svc.name).join(', ')}`
+      );
+    }
+
     const useSame = await promptYesNo(
       rl,
       'Use same SIGNING_KEY_PASSWORD for all services? (y/N): '
@@ -106,11 +137,11 @@ async function run() {
     const passwords = new Map();
     if (useSame) {
       const password = await promptPassword(rl, 'SIGNING_KEY_PASSWORD: ');
-      for (const svc of SERVICES) {
+      for (const svc of availableServices) {
         passwords.set(svc.name, password);
       }
     } else {
-      for (const svc of SERVICES) {
+      for (const svc of availableServices) {
         const password = await promptPassword(
           rl,
           `SIGNING_KEY_PASSWORD for ${svc.name}: `
@@ -120,20 +151,22 @@ async function run() {
     }
 
     const jwks = {};
-    for (const svc of SERVICES) {
+    for (const svc of availableServices) {
       const keyDir = path.join(stageDir, svc.dir);
       const signingKeyPath = path.join(keyDir, 'signing.key.enc');
       const password = passwords.get(svc.name);
       jwks[svc.issuer] = loadSigningPublicJwk(signingKeyPath, password, svc.name);
     }
 
-    for (const svc of SERVICES) {
+    for (const svc of availableServices) {
       const outDir = path.join(stageDir, svc.dir);
       if (!fs.existsSync(outDir)) {
         fs.mkdirSync(outDir, { recursive: true });
       }
       const outPath = path.join(outDir, 'service-jwks.json');
-      fs.writeFileSync(outPath, JSON.stringify(jwks, null, 2));
+      const existing = readJsonFile(outPath);
+      const merged = { ...existing, ...jwks };
+      fs.writeFileSync(outPath, JSON.stringify(merged, null, 2));
       console.log(`Wrote ${outPath}`);
     }
   } finally {
