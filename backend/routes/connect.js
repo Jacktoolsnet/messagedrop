@@ -5,6 +5,7 @@ const security = require('../middleware/security');
 const tableConnect = require('../db/tableConnect');
 const metric = require('../middleware/metric');
 const { apiError } = require('../middleware/api-error');
+const CONNECT_ID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function getAuthUserId(req) {
   return req.jwtUser?.userId ?? req.jwtUser?.id ?? null;
@@ -31,9 +32,62 @@ function ensureSameUser(req, res, userId, next) {
   return true;
 }
 
-function fetchConnectRecord(req, res, connectId, handler, next) {
+function normalizeConnectId(connectId) {
   const normalizedConnectId = String(connectId ?? '').trim();
-  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(normalizedConnectId)) {
+  if (!CONNECT_ID_REGEX.test(normalizedConnectId)) {
+    return null;
+  }
+  return normalizedConnectId;
+}
+
+function queryGet(db, sql, params = []) {
+  return new Promise((resolve, reject) => {
+    db.get(sql, params, (err, row) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(row || null);
+    });
+  });
+}
+
+function runQuery(db, sql, params = []) {
+  return new Promise((resolve, reject) => {
+    db.run(sql, params, function (err) {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(this);
+    });
+  });
+}
+
+async function consumeConnectRecord(db, connectId) {
+  await runQuery(db, 'BEGIN IMMEDIATE');
+  try {
+    const row = await queryGet(db, 'SELECT * FROM tableConnect WHERE id = ?;', [connectId]);
+    if (!row) {
+      await runQuery(db, 'ROLLBACK');
+      return null;
+    }
+    await runQuery(db, 'DELETE FROM tableConnect WHERE id = ?;', [connectId]);
+    await runQuery(db, 'COMMIT');
+    return row;
+  } catch (err) {
+    try {
+      await runQuery(db, 'ROLLBACK');
+    } catch {
+      // ignore rollback errors
+    }
+    throw err;
+  }
+}
+
+function fetchConnectRecord(req, res, connectId, handler, next) {
+  const normalizedConnectId = normalizeConnectId(connectId);
+  if (!normalizedConnectId) {
     return next(apiError.badRequest('invalid_connect_id'));
   }
   tableConnect.getById(req.database.db, normalizedConnectId, (err, row) => {
@@ -43,7 +97,7 @@ function fetchConnectRecord(req, res, connectId, handler, next) {
     if (!row) {
       return next(apiError.notFound('not_found'));
     }
-    handler(row);
+    handler(row, normalizedConnectId);
   });
 }
 
@@ -82,14 +136,35 @@ router.get('/get/:connectId',
     }, next);
   });
 
+router.get('/consume/:connectId',
+  [
+    security.authenticate,
+    metric.count('connect.consume', { when: 'always', timezone: 'utc', amount: 1 })
+  ],
+  async function (req, res, next) {
+    const normalizedConnectId = normalizeConnectId(req.params.connectId);
+    if (!normalizedConnectId) {
+      return next(apiError.badRequest('invalid_connect_id'));
+    }
+    try {
+      const row = await consumeConnectRecord(req.database.db, normalizedConnectId);
+      if (!row) {
+        return next(apiError.notFound('not_found'));
+      }
+      return res.status(200).json({ status: 200, connect: row });
+    } catch {
+      return next(apiError.internal('db_error'));
+    }
+  });
+
 router.get('/delete/:connectId',
   [
     security.authenticate
   ]
   , function (req, res, next) {
     let response = { 'status': 0 };
-    fetchConnectRecord(req, res, req.params.connectId, () => {
-      tableConnect.deleteById(req.database.db, req.params.connectId, function (err) {
+    fetchConnectRecord(req, res, req.params.connectId, (_row, normalizedConnectId) => {
+      tableConnect.deleteById(req.database.db, normalizedConnectId, function (err) {
         if (err) {
           return next(apiError.internal('db_error'));
         }

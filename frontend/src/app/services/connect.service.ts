@@ -64,7 +64,7 @@ export class ConnectService {
   }
 
   getById(connectId: string, contact: Contact, socketioService: SocketioService, showAlways = false) {
-    const url = `${environment.apiUrl}/connect/get/${connectId}`;
+    const url = `${environment.apiUrl}/connect/consume/${connectId}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: this.i18n.t('common.connect.title'),
@@ -101,16 +101,12 @@ export class ConnectService {
                   if (valid) {
                     // Generate Id
                     this.contactService.createContact(contact, socketioService);
-                    // Delete connect record
-                    this.deleteConnect(getConnectResponse.connect);
                     this.snackBar.open(this.i18n.t('common.contact.created'), '', { duration: 1000 });
                   } else {
                     this.snackBar.open(this.i18n.t('common.connect.invalidData'), this.i18n.t('common.actions.ok'));
                   }
                 });
             } else {
-              // Delete connect record
-              this.deleteConnect(getConnectResponse.connect);
               this.snackBar.open(this.i18n.t('common.connect.selfAddBlocked'), this.i18n.t('common.actions.ok'));
             }
           }
