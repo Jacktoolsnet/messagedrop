@@ -1,7 +1,6 @@
 require('dotenv').config()
 require('winston-daily-rotate-file');
 const compression = require('compression');
-const bearerToken = require('express-bearer-token');
 const databaseMw = require('./middleware/database');
 const loggerMw = require('./middleware/logger');
 const traceId = require('./middleware/trace-id');
@@ -162,17 +161,6 @@ attachForwarding(logger, {
 - xssFilter sets X-XSS-Protection headers to enable XSS (cross-site scripting) filters in most current web browsers.
 */
 app.use(helmet()); // Add security headers.
-
-/*
-Per RFC6750 this module will attempt to extract a bearer token from a request from these locations:
-
-The key access_token in the request body.
-The key access_token in the request params.
-The value from the header Authorization: Bearer <token>.
-(Optional) Get a token from cookies header with key access_token.
-If a token is found, it will be stored on req.token. If one has been provided in more than one location, this will abort the request immediately by sending code 400 (per RFC6750).
-*/
-app.use(bearerToken());
 app.use(traceId());
 
 app.use(express.json({ limit: '1mb' }));
