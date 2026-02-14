@@ -2,6 +2,8 @@ const express = require('express');
 const crypto = require('crypto');
 const path = require('path');
 const fs = require('fs');
+const dns = require('dns').promises;
+const net = require('net');
 const multer = require('multer');
 const axios = require('axios');
 const { requireAdminJwt, requireRole } = require('../middleware/security');
@@ -60,6 +62,131 @@ const upload = multer({
 function db(req) { return req.database?.db; }
 function asString(v) { return (v === undefined || v === null) ? null : String(v); }
 function asNum(v, d) { const n = Number(v); return Number.isFinite(n) ? n : d; }
+
+function normalizeHostname(hostname) {
+    return String(hostname || '').trim().replace(/\.$/, '').toLowerCase();
+}
+
+function isPrivateOrReservedIpv4(ip) {
+    const parts = ip.split('.').map((part) => Number.parseInt(part, 10));
+    if (parts.length !== 4 || parts.some((part) => !Number.isInteger(part) || part < 0 || part > 255)) {
+        return true;
+    }
+    const [a, b] = parts;
+    if (a === 10 || a === 127 || a === 0) return true;
+    if (a === 169 && b === 254) return true;
+    if (a === 172 && b >= 16 && b <= 31) return true;
+    if (a === 192 && b === 168) return true;
+    if (a === 100 && b >= 64 && b <= 127) return true;
+    if (a === 198 && (b === 18 || b === 19)) return true;
+    if (a >= 224) return true;
+    return false;
+}
+
+function isPrivateOrReservedIpv6(ip) {
+    const normalized = ip.toLowerCase();
+    if (normalized === '::' || normalized === '::1') return true;
+    if (normalized.startsWith('fc') || normalized.startsWith('fd')) return true; // ULA fc00::/7
+    if (normalized.startsWith('fe8') || normalized.startsWith('fe9') || normalized.startsWith('fea') || normalized.startsWith('feb')) {
+        return true; // link-local fe80::/10
+    }
+    const mapped = normalized.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/);
+    if (mapped) {
+        return isPrivateOrReservedIpv4(mapped[1]);
+    }
+    return false;
+}
+
+function isPrivateOrReservedIp(ip) {
+    const family = net.isIP(ip);
+    if (family === 4) return isPrivateOrReservedIpv4(ip);
+    if (family === 6) return isPrivateOrReservedIpv6(ip);
+    return true;
+}
+
+function hasAllowedScreenshotPort(parsedTarget) {
+    if (!parsedTarget.port) {
+        return true;
+    }
+    const port = Number.parseInt(parsedTarget.port, 10);
+    if (!Number.isFinite(port)) {
+        return false;
+    }
+    if (parsedTarget.protocol === 'https:') {
+        return port === 443;
+    }
+    if (parsedTarget.protocol === 'http:') {
+        return port === 80;
+    }
+    return false;
+}
+
+async function isPublicScreenshotTarget(hostname) {
+    const normalizedHost = normalizeHostname(hostname);
+    if (!normalizedHost) {
+        return false;
+    }
+    if (
+        normalizedHost === 'localhost'
+        || normalizedHost.endsWith('.localhost')
+        || normalizedHost.endsWith('.local')
+        || normalizedHost.endsWith('.internal')
+        || normalizedHost.endsWith('.home')
+        || normalizedHost.endsWith('.lan')
+    ) {
+        return false;
+    }
+
+    if (net.isIP(normalizedHost)) {
+        return !isPrivateOrReservedIp(normalizedHost);
+    }
+
+    let addresses;
+    try {
+        addresses = await dns.lookup(normalizedHost, { all: true, verbatim: true });
+    } catch {
+        return false;
+    }
+    if (!Array.isArray(addresses) || addresses.length === 0) {
+        return false;
+    }
+    return addresses.every((entry) => entry?.address && !isPrivateOrReservedIp(entry.address));
+}
+
+function isAllowedBrowserProtocol(protocol) {
+    return protocol === 'http:' || protocol === 'https:' || protocol === 'about:' || protocol === 'data:' || protocol === 'blob:';
+}
+
+async function isSafeBrowserRequestUrl(rawUrl, hostCache) {
+    let parsed;
+    try {
+        parsed = new URL(rawUrl);
+    } catch {
+        return false;
+    }
+    if (!isAllowedBrowserProtocol(parsed.protocol)) {
+        return false;
+    }
+    if (parsed.protocol === 'about:' || parsed.protocol === 'data:' || parsed.protocol === 'blob:') {
+        return true;
+    }
+    if (parsed.username || parsed.password) {
+        return false;
+    }
+    if (!hasAllowedScreenshotPort(parsed)) {
+        return false;
+    }
+
+    const host = normalizeHostname(parsed.hostname);
+    if (!host) {
+        return false;
+    }
+    if (!hostCache.has(host)) {
+        hostCache.set(host, isPublicScreenshotTarget(host));
+    }
+    return hostCache.get(host);
+}
+
 function resolveBackendBase() {
     const base = (process.env.BASE_URL || '').replace(/\/+$/, '');
     if (!base) return null;
@@ -1077,7 +1204,7 @@ router.post('/notices/:id/evidence', (req, res, next) => {
  * Captures a server-side screenshot of the given URL and stores it as file-evidence.
  * Notes:
  *  - Requires Playwright (or Playwright Chromium) to be installed in the backend runtime.
- *  - Applies basic SSRF protections (scheme/http(s), disallow local/priv ranges, localhost).
+ *  - Applies SSRF protections (scheme/http(s), credentials/port restrictions, DNS + private-range blocking).
  */
 router.post('/notices/:id/evidence/screenshot', async (req, res, next) => {
     const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
@@ -1101,22 +1228,14 @@ router.post('/notices/:id/evidence/screenshot', async (req, res, next) => {
     if (!/^https?:$/.test(u.protocol)) {
         return next(apiError.badRequest('unsupported_scheme'));
     }
-    const hostLc = u.hostname.toLowerCase();
-    // naive SSRF guards (IP-literals and localhost names)
-    const isPrivateIp = (host) => {
-        // IPv4 patterns only (basic). IPv6 localhost also blocked.
-        if (host === 'localhost' || host === '::1') return true;
-        const m = host.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/);
-        if (!m) return false;
-        const a = m.slice(1).map(n => Number(n));
-        if (a[0] === 10) return true;
-        if (a[0] === 127) return true;
-        if (a[0] === 169 && a[1] === 254) return true; // link-local
-        if (a[0] === 192 && a[1] === 168) return true;
-        if (a[0] === 172 && a[1] >= 16 && a[1] <= 31) return true;
-        return false;
-    };
-    if (isPrivateIp(hostLc)) {
+    if (u.username || u.password) {
+        return next(apiError.badRequest('invalid_url'));
+    }
+    if (!hasAllowedScreenshotPort(u)) {
+        return next(apiError.badRequest('unsupported_port'));
+    }
+    const isPublicTarget = await isPublicScreenshotTarget(u.hostname);
+    if (!isPublicTarget) {
         return next(apiError.badRequest('blocked_destination'));
     }
 
@@ -1165,6 +1284,17 @@ router.post('/notices/:id/evidence/screenshot', async (req, res, next) => {
             viewport: { width, height },
             locale: 'de-DE',
             userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119 Safari/537.36',
+        });
+        const hostAccessCache = new Map([
+            [normalizeHostname(u.hostname), Promise.resolve(true)]
+        ]);
+        await context.route('**/*', async (route) => {
+            const requestUrl = route.request().url();
+            const safe = await isSafeBrowserRequestUrl(requestUrl, hostAccessCache);
+            if (!safe) {
+                return route.abort();
+            }
+            return route.continue();
         });
 
         if (cookies && cookies.length) {

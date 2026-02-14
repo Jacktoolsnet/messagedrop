@@ -47,7 +47,7 @@ export class CreateUserComponent {
 
     this.userService.createUser(payload).subscribe({
       next: () => this.dialogRef.close(true),
-      error: () => { }
+      error: () => this.form.setErrors({ submitFailed: true })
     });
   }
 

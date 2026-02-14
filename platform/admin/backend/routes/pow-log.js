@@ -1,23 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { requireAdminJwt, checkToken } = require('../middleware/security');
-const { verifyServiceJwt } = require('../utils/serviceJwt');
+const { requireServiceOrAdminJwt } = require('../middleware/security');
 const tablePowLog = require('../db/tablePowLog');
 const { logPowEvent } = require('../utils/powLogger');
 const { apiError } = require('../middleware/api-error');
 
 // Allow internal services via service JWT and admins via JWT
-router.use((req, res, next) => {
-  if (req.token) {
-    try {
-      verifyServiceJwt(req.token);
-      return next();
-    } catch {
-      return requireAdminJwt(req, res, next);
-    }
-  }
-  return checkToken(req, res, next);
-});
+router.use(requireServiceOrAdminJwt);
 
 /**
  * GET /pow-log

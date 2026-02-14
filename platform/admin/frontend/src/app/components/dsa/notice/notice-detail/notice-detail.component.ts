@@ -15,7 +15,7 @@ import { DecisionDialogComponent, DecisionDialogResult, DecisionOutcome } from '
 import { DecisionSummaryComponent } from '../../decisions/decision-summary/decision-summary.component';
 import { NoticeAppealsComponent } from '../appeals/notice-appeals.component';
 import { EvidenceListComponent } from "../evidence/evidence-list/evidence-list.component";
-import { ReportedContentPayload } from '../../../../interfaces/reported-content.interface';
+import { ReportedContentPayload, ReportedMultimedia } from '../../../../interfaces/reported-content.interface';
 
 // Optional: wenn du die vorhandene PublicMessageDetailComponent nutzen willst
 // import { PublicMessageDetailComponent } from '../../../shared/public-message-detail/public-message-detail.component';
@@ -63,6 +63,9 @@ export class NoticeDetailComponent implements OnInit {
   notice = signal<DsaNotice>(this.data);
   status = signal<DsaNoticeStatus>(this.data.status as DsaNoticeStatus);
   private autoStatusApplied = false;
+  mediaKind = signal<'iframe' | 'image' | 'none'>('none');
+  embedUrl = signal<string | null>(null);
+  imageUrl = signal<string | null>(null);
 
   // reportedContent kommt aus der DB als JSON-String → parsen
   contentObj = computed<ReportedContentPayload | null>(() => {
@@ -155,6 +158,7 @@ export class NoticeDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.updateMediaFromContent();
     this.ensureUnderReview();
   }
 
@@ -201,31 +205,14 @@ export class NoticeDetailComponent implements OnInit {
     }
   }
 
-  /** kleine Embed-Helfer */
-  youtubeEmbedHtml(): string | null {
-    const c = this.contentObj();
-    const id = c?.multimedia?.contentId;
-    if (!c || c?.multimedia?.type !== 'youtube' || !id) return null;
-    const safeId = String(id).replace(/^.*v=/, '').replace(/^shorts\//, '');
-    return `<iframe width="560" height="315"
-            src="https://www.youtube.com/embed/${safeId}"
-            frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`;
-  }
-
-  tenorGifUrl(): string | null {
-    const c = this.contentObj();
-    return c?.multimedia?.type === 'tenor' ? (c?.multimedia?.url || null) : null;
-  }
-
   hasExternalLink(): boolean {
     const c = this.contentObj();
-    return !!(this.notice().contentUrl || c?.multimedia?.sourceUrl);
+    return !!this.toSafeHttpUrl(this.notice().contentUrl || c?.multimedia?.sourceUrl);
   }
 
   externalLink(): string | null {
     const c = this.contentObj();
-    return this.notice().contentUrl || c?.multimedia?.sourceUrl || null;
+    return this.toSafeHttpUrl(this.notice().contentUrl || c?.multimedia?.sourceUrl);
   }
 
   addScreenshotEvidence(): void {
@@ -241,6 +228,163 @@ export class NoticeDetailComponent implements OnInit {
         },
         error: () => this.makingScreenshot.set(false)
       });
+  }
+
+  private updateMediaFromContent(): void {
+    const mm = this.contentObj()?.multimedia;
+    this.embedUrl.set(null);
+    this.imageUrl.set(null);
+    this.mediaKind.set('none');
+
+    const type = (mm?.type || '').toLowerCase();
+    if (!type) return;
+
+    if (type === 'youtube') {
+      const id = this.getYouTubeId(mm);
+      if (id) {
+        this.embedUrl.set(`https://www.youtube.com/embed/${id}`);
+        this.mediaKind.set('iframe');
+      }
+      return;
+    }
+
+    if (type === 'spotify') {
+      const url = this.buildSpotifyEmbed(mm);
+      if (url) {
+        this.embedUrl.set(url);
+        this.mediaKind.set('iframe');
+      }
+      return;
+    }
+
+    if (type === 'tiktok') {
+      const id = this.getTikTokId(mm);
+      if (id) {
+        this.embedUrl.set(`https://www.tiktok.com/embed/v2/${id}`);
+        this.mediaKind.set('iframe');
+      }
+      return;
+    }
+
+    if (type === 'tenor' || type === 'image') {
+      const url = this.toSafeHttpUrl(mm?.url || mm?.sourceUrl);
+      if (url) {
+        this.imageUrl.set(url);
+        this.mediaKind.set('image');
+      }
+    }
+  }
+
+  private isAllowedHost(host: string, allowedHosts: string[]): boolean {
+    const normalized = host.toLowerCase();
+    return allowedHosts.some((allowed) => normalized === allowed || normalized.endsWith(`.${allowed}`));
+  }
+
+  private toSafeHttpUrl(value?: string | null): string | null {
+    if (typeof value !== 'string' || !value.trim()) {
+      return null;
+    }
+    try {
+      const parsed = new URL(value);
+      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+        return null;
+      }
+      return parsed.toString();
+    } catch {
+      return null;
+    }
+  }
+
+  private sanitizeYoutubeId(value?: string | null): string | null {
+    if (!value) return null;
+    const cleaned = value.trim();
+    return /^[a-zA-Z0-9_-]{6,20}$/.test(cleaned) ? cleaned : null;
+  }
+
+  private sanitizeTikTokId(value?: string | null): string | null {
+    if (!value) return null;
+    const cleaned = value.trim();
+    return /^\d{6,32}$/.test(cleaned) ? cleaned : null;
+  }
+
+  private getYouTubeId(mm: ReportedMultimedia | null | undefined): string | null {
+    const fromContent = this.sanitizeYoutubeId(String(mm?.contentId || '').split('?')[0]);
+    if (fromContent) return fromContent;
+
+    const sourceUrl = this.toSafeHttpUrl(mm?.sourceUrl || mm?.url);
+    if (!sourceUrl) return null;
+
+    try {
+      const parsed = new URL(sourceUrl);
+      if (!this.isAllowedHost(parsed.hostname, ['youtube.com', 'youtu.be'])) {
+        return null;
+      }
+      if (this.isAllowedHost(parsed.hostname, ['youtu.be'])) {
+        const id = parsed.pathname.split('/').filter(Boolean)[0];
+        return this.sanitizeYoutubeId(id);
+      }
+
+      const queryId = parsed.searchParams.get('v');
+      const safeQueryId = this.sanitizeYoutubeId(queryId);
+      if (safeQueryId) return safeQueryId;
+
+      const segments = parsed.pathname.split('/').filter(Boolean);
+      if (segments.length >= 2 && (segments[0] === 'shorts' || segments[0] === 'embed')) {
+        return this.sanitizeYoutubeId(segments[1]);
+      }
+    } catch {
+      return null;
+    }
+    return null;
+  }
+
+  private buildSpotifyEmbed(mm: ReportedMultimedia | null | undefined): string | null {
+    const allowedTypes = new Set(['track', 'album', 'playlist', 'episode', 'show']);
+
+    const fromContent = typeof mm?.contentId === 'string' ? mm.contentId.trim().replace(/^\/+/, '') : '';
+    if (fromContent) {
+      const parts = fromContent.split('/').filter(Boolean);
+      if (parts.length === 2 && allowedTypes.has(parts[0]) && /^[a-zA-Z0-9]+$/.test(parts[1])) {
+        return `https://open.spotify.com/embed/${parts[0]}/${parts[1]}`;
+      }
+    }
+
+    const sourceUrl = this.toSafeHttpUrl(mm?.sourceUrl || mm?.url);
+    if (!sourceUrl) return null;
+
+    try {
+      const parsed = new URL(sourceUrl);
+      if (!this.isAllowedHost(parsed.hostname, ['open.spotify.com'])) {
+        return null;
+      }
+      const segments = parsed.pathname.split('/').filter(Boolean);
+      const startIndex = segments[0] === 'embed' ? 1 : 0;
+      const type = segments[startIndex];
+      const id = segments[startIndex + 1];
+      if (!type || !id || !allowedTypes.has(type) || !/^[a-zA-Z0-9]+$/.test(id)) {
+        return null;
+      }
+      return `https://open.spotify.com/embed/${type}/${id}`;
+    } catch {
+      return null;
+    }
+  }
+
+  private getTikTokId(mm: ReportedMultimedia | null | undefined): string | null {
+    const sourceUrl = this.toSafeHttpUrl(mm?.sourceUrl || mm?.url);
+    if (sourceUrl) {
+      try {
+        const parsed = new URL(sourceUrl);
+        if (this.isAllowedHost(parsed.hostname, ['tiktok.com', 'vm.tiktok.com'])) {
+          const match = parsed.pathname.match(/\/@[^/]+\/video\/(\d+)/);
+          const safeMatch = this.sanitizeTikTokId(match?.[1] || null);
+          if (safeMatch) return safeMatch;
+        }
+      } catch {
+        // ignore
+      }
+    }
+    return this.sanitizeTikTokId(mm?.contentId || null);
   }
 
   private ensureUnderReview(): void {

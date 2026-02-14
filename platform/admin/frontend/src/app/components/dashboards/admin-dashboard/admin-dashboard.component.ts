@@ -98,7 +98,7 @@ export class AdminDashboardComponent implements OnInit {
                 this.moderationCountPending.set(fallbackCount);
               }
             },
-            error: () => { }
+            error: () => this.moderationCountPending.set(safeCount)
           });
         }
       },

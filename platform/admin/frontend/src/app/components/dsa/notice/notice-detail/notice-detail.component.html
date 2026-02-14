@@ -125,10 +125,16 @@
                         </div>
 
                         <!-- Media Preview -->
-                        @if (youtubeEmbedHtml(); as yth) {
-                        <div class="embed" [innerHTML]="yth"></div>
-                        } @else if (tenorGifUrl(); as gif) {
-                        <div class="tenor-wrap"><img [src]="gif" alt="tenor gif" /></div>
+                        @if (mediaKind() === 'iframe' && embedUrl()) {
+                        <div class="embed">
+                            <iframe [src]="embedUrl()!" title="Embedded content" loading="lazy"
+                                referrerpolicy="strict-origin-when-cross-origin"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowfullscreen>
+                            </iframe>
+                        </div>
+                        } @else if (mediaKind() === 'image' && imageUrl()) {
+                        <div class="tenor-wrap"><img [src]="imageUrl()!" alt="media" /></div>
                         }
 
                         <!-- Open original + Add to evidence (screenshot) -->

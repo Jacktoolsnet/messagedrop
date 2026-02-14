@@ -1,23 +1,12 @@
 const express = require('express');
 const crypto = require('crypto');
 const router = express.Router();
-const { requireAdminJwt, checkToken } = require('../middleware/security');
-const { verifyServiceJwt } = require('../utils/serviceJwt');
+const { requireServiceOrAdminJwt } = require('../middleware/security');
 const tableFrontendErrorLog = require('../db/tableFrontendErrorLog');
 const { apiError } = require('../middleware/api-error');
 
 // Allow internal services via static token and admins via JWT
-router.use((req, res, next) => {
-  if (req.token) {
-    try {
-      verifyServiceJwt(req.token);
-      return next();
-    } catch {
-      return requireAdminJwt(req, res, next);
-    }
-  }
-  return checkToken(req, res, next);
-});
+router.use(requireServiceOrAdminJwt);
 
 const allowedEvents = new Set(['http_error', 'runtime_error', 'unhandled_rejection', 'resource_error']);
 const allowedSeverities = new Set(['warning', 'error']);
@@ -34,7 +23,7 @@ function safeMessage(value, maxLen = 300) {
 
 function safeStack(value, maxLen = 4000) {
   if (typeof value !== 'string') return '';
-  return value.replace(/[^\x09\x0A\x0D\x20-\x7E]/g, '').slice(0, maxLen);
+  return value.replace(/[^\t\n\r -~]/g, '').slice(0, maxLen);
 }
 
 function safePath(value) {
@@ -45,7 +34,7 @@ function safePath(value) {
 function safeSource(value) {
   if (typeof value !== 'string') return '';
   try {
-    const parsed = new URL(value, typeof window !== 'undefined' ? window.location.origin : undefined);
+    const parsed = new URL(value, 'http://localhost');
     return safePath(parsed.pathname + (parsed.hash ?? ''));
   } catch {
     return safePath(value);

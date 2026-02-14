@@ -1,24 +1,13 @@
 const express = require('express');
 const crypto = require('crypto');
 const router = express.Router();
-const { requireAdminJwt, checkToken } = require('../middleware/security');
-const { verifyServiceJwt } = require('../utils/serviceJwt');
+const { requireServiceOrAdminJwt } = require('../middleware/security');
 const tableErrorLog = require('../db/tableErrorLog');
 const { apiError } = require('../middleware/api-error');
 const { parseRetentionMs, DAY_MS } = require('../utils/logRetention');
 
 // Allow internal services via static token and admins via JWT
-router.use((req, res, next) => {
-  if (req.token) {
-    try {
-      verifyServiceJwt(req.token);
-      return next();
-    } catch {
-      return requireAdminJwt(req, res, next);
-    }
-  }
-  return checkToken(req, res, next);
-});
+router.use(requireServiceOrAdminJwt);
 
 /**
  * GET /error-log

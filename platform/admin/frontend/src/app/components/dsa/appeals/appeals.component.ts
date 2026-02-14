@@ -12,7 +12,6 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 
 import { DsaAppeal } from '../../../interfaces/dsa-appeal.interface';
@@ -57,7 +56,6 @@ export class AppealsComponent implements OnInit {
   private readonly snack = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
   private readonly auth = inject(AuthService);
-  private readonly sanitizer = inject(DomSanitizer);
 
   readonly loading = signal(false);
   readonly appeals = signal<DsaAppeal[]>([]);
@@ -70,7 +68,7 @@ export class AppealsComponent implements OnInit {
   // Parsed content of selected notice
   contentObj = signal<ReportedContentPayload | null>(null);
   mediaKind = signal<'iframe' | 'image' | 'none'>('none');
-  embedUrl = signal<SafeResourceUrl | null>(null);
+  embedUrl = signal<string | null>(null);
   imageUrl = signal<string | null>(null);
 
   ngOnInit(): void {
@@ -205,13 +203,13 @@ export class AppealsComponent implements OnInit {
   hasExternalLink(): boolean {
     const n = this.selectedNotice();
     const c = this.contentObj();
-    return !!(n?.contentUrl || c?.multimedia?.sourceUrl);
+    return !!this.toSafeHttpUrl(n?.contentUrl || c?.multimedia?.sourceUrl);
   }
 
   externalLink(): string | null {
     const n = this.selectedNotice();
     const c = this.contentObj();
-    return n?.contentUrl || c?.multimedia?.sourceUrl || null;
+    return this.toSafeHttpUrl(n?.contentUrl || c?.multimedia?.sourceUrl);
   }
 
   addScreenshotEvidence(): void {
@@ -241,7 +239,7 @@ export class AppealsComponent implements OnInit {
     if (type === 'youtube') {
       const id = this.getYouTubeId(mm);
       if (id) {
-        this.embedUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${id}`));
+        this.embedUrl.set(`https://www.youtube.com/embed/${id}`);
         this.mediaKind.set('iframe');
       }
       return;
@@ -250,7 +248,7 @@ export class AppealsComponent implements OnInit {
     if (type === 'spotify') {
       const url = this.buildSpotifyEmbed(mm);
       if (url) {
-        this.embedUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
+        this.embedUrl.set(url);
         this.mediaKind.set('iframe');
       }
       return;
@@ -259,14 +257,14 @@ export class AppealsComponent implements OnInit {
     if (type === 'tiktok') {
       const id = this.getTikTokId(mm);
       if (id) {
-        this.embedUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.tiktok.com/embed/v2/${id}`));
+        this.embedUrl.set(`https://www.tiktok.com/embed/v2/${id}`);
         this.mediaKind.set('iframe');
       }
       return;
     }
 
     if (type === 'tenor' || type === 'image') {
-      const url = mm?.url || mm?.sourceUrl;
+      const url = this.toSafeHttpUrl(mm?.url || mm?.sourceUrl);
       if (url) {
         this.imageUrl.set(url);
         this.mediaKind.set('image');
@@ -275,38 +273,117 @@ export class AppealsComponent implements OnInit {
     }
   }
 
-  private getYouTubeId(mm: ReportedMultimedia | null | undefined): string | null {
-    if (mm?.contentId) return String(mm.contentId).split('?')[0];
-    const html = mm?.oembed?.html ?? undefined;
-    if (html) {
-      const m = html.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/);
-      if (m?.[1]) return m[1];
+  private isAllowedHost(host: string, allowedHosts: string[]): boolean {
+    const normalized = host.toLowerCase();
+    return allowedHosts.some((allowed) => normalized === allowed || normalized.endsWith(`.${allowed}`));
+  }
+
+  private toSafeHttpUrl(value?: string | null): string | null {
+    if (typeof value !== 'string' || !value.trim()) {
+      return null;
     }
-    const src = String(mm?.sourceUrl ?? mm?.url ?? '');
-    const watch = src.match(/[?&]v=([a-zA-Z0-9_-]+)/);
-    if (watch?.[1]) return watch[1];
-    const shorts = src.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/);
-    if (shorts?.[1]) return shorts[1];
-    const embed = src.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/);
-    if (embed?.[1]) return embed[1];
+    try {
+      const parsed = new URL(value);
+      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+        return null;
+      }
+      return parsed.toString();
+    } catch {
+      return null;
+    }
+  }
+
+  private sanitizeYoutubeId(value?: string | null): string | null {
+    if (!value) return null;
+    const cleaned = value.trim();
+    return /^[a-zA-Z0-9_-]{6,20}$/.test(cleaned) ? cleaned : null;
+  }
+
+  private sanitizeTikTokId(value?: string | null): string | null {
+    if (!value) return null;
+    const cleaned = value.trim();
+    return /^\d{6,32}$/.test(cleaned) ? cleaned : null;
+  }
+
+  private getYouTubeId(mm: ReportedMultimedia | null | undefined): string | null {
+    const fromContent = this.sanitizeYoutubeId(String(mm?.contentId || '').split('?')[0]);
+    if (fromContent) return fromContent;
+
+    const sourceUrl = this.toSafeHttpUrl(mm?.sourceUrl || mm?.url);
+    if (!sourceUrl) return null;
+
+    try {
+      const parsed = new URL(sourceUrl);
+      if (!this.isAllowedHost(parsed.hostname, ['youtube.com', 'youtu.be'])) {
+        return null;
+      }
+
+      if (this.isAllowedHost(parsed.hostname, ['youtu.be'])) {
+        const id = parsed.pathname.split('/').filter(Boolean)[0];
+        return this.sanitizeYoutubeId(id);
+      }
+
+      const queryId = parsed.searchParams.get('v');
+      const safeQueryId = this.sanitizeYoutubeId(queryId);
+      if (safeQueryId) return safeQueryId;
+
+      const segments = parsed.pathname.split('/').filter(Boolean);
+      if (segments.length >= 2 && (segments[0] === 'shorts' || segments[0] === 'embed')) {
+        return this.sanitizeYoutubeId(segments[1]);
+      }
+    } catch {
+      return null;
+    }
     return null;
   }
 
   private buildSpotifyEmbed(mm: ReportedMultimedia | null | undefined): string | null {
-    if (mm?.contentId) return `https://open.spotify.com/embed/${mm.contentId}`;
-    const src = mm?.sourceUrl ?? mm?.url;
-    if (!src) return null;
-    if (src.includes('open.spotify.com')) {
-      return src.replace('open.spotify.com/', 'open.spotify.com/embed/');
+    const allowedTypes = new Set(['track', 'album', 'playlist', 'episode', 'show']);
+
+    const fromContent = typeof mm?.contentId === 'string' ? mm.contentId.trim().replace(/^\/+/, '') : '';
+    if (fromContent) {
+      const parts = fromContent.split('/').filter(Boolean);
+      if (parts.length === 2 && allowedTypes.has(parts[0]) && /^[a-zA-Z0-9]+$/.test(parts[1])) {
+        return `https://open.spotify.com/embed/${parts[0]}/${parts[1]}`;
+      }
     }
-    return null;
+
+    const sourceUrl = this.toSafeHttpUrl(mm?.sourceUrl || mm?.url);
+    if (!sourceUrl) return null;
+
+    try {
+      const parsed = new URL(sourceUrl);
+      if (!this.isAllowedHost(parsed.hostname, ['open.spotify.com'])) {
+        return null;
+      }
+      const segments = parsed.pathname.split('/').filter(Boolean);
+      const startIndex = segments[0] === 'embed' ? 1 : 0;
+      const type = segments[startIndex];
+      const id = segments[startIndex + 1];
+      if (!type || !id || !allowedTypes.has(type) || !/^[a-zA-Z0-9]+$/.test(id)) {
+        return null;
+      }
+      return `https://open.spotify.com/embed/${type}/${id}`;
+    } catch {
+      return null;
+    }
   }
 
   private getTikTokId(mm: ReportedMultimedia | null | undefined): string | null {
-    const src = String(mm?.sourceUrl ?? mm?.url ?? '');
-    const m = src.match(/tiktok\.com\/@[^/]+\/video\/(\d+)/);
-    if (m?.[1]) return m[1];
-    return mm?.contentId || null;
+    const sourceUrl = this.toSafeHttpUrl(mm?.sourceUrl || mm?.url);
+    if (sourceUrl) {
+      try {
+        const parsed = new URL(sourceUrl);
+        if (this.isAllowedHost(parsed.hostname, ['tiktok.com', 'vm.tiktok.com'])) {
+          const match = parsed.pathname.match(/\/@[^/]+\/video\/(\d+)/);
+          const safeMatch = this.sanitizeTikTokId(match?.[1] || null);
+          if (safeMatch) return safeMatch;
+        }
+      } catch {
+        // ignore
+      }
+    }
+    return this.sanitizeTikTokId(mm?.contentId || null);
   }
 
   private ensureSelectionIsValid(list: DsaAppeal[]): void {
