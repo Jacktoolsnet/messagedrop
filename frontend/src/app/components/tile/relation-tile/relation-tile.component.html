@@ -1,0 +1,36 @@
+<div class="relation-tile"
+  role="button"
+  tabindex="0"
+  (click)="editRelations()"
+  (keyup.enter)="editRelations()"
+  (keyup.space)="editRelations()">
+  <div class="relation-tile__header">
+    <div class="relation-tile__title-wrap">
+      <mat-icon class="relation-tile__icon">{{ icon }}</mat-icon>
+      <span class="relation-tile__title">{{ title }}</span>
+    </div>
+    <button mat-icon-button type="button" class="relation-tile__edit" (click)="editRelations($event)"
+      [attr.aria-label]="'common.actions.edit' | transloco">
+      <mat-icon>edit</mat-icon>
+    </button>
+  </div>
+
+  @if (linkedItems.length) {
+  <div class="relation-tile__list">
+    @for (item of linkedItems; track trackByItem($index, item)) {
+    <div class="relation-item">
+      <span class="relation-item__avatar">
+        @if (item.avatarUrl) {
+        <img [src]="item.avatarUrl" [attr.alt]="item.avatarAlt" />
+        } @else {
+        <mat-icon>{{ item.fallbackIcon }}</mat-icon>
+        }
+      </span>
+      <span class="relation-item__name">{{ item.name }}</span>
+    </div>
+    }
+  </div>
+  } @else {
+  <p class="relation-tile__empty">{{ emptyTextKey | transloco }}</p>
+  }
+</div>

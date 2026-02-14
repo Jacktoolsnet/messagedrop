@@ -5,6 +5,8 @@ export type DefaultTileType =
   | 'note'
   | 'message'
   | 'hashtags'
+  | 'placeContacts'
+  | 'contactPlaces'
   | 'image'
   | 'custom-experience';
 export type TileType = DefaultTileType | `custom-${string}`;
@@ -64,6 +66,8 @@ export interface TileSetting {
       keys: string[];
       icon?: string;
     };
+    relatedContactIds?: string[];
+    relatedPlaceIds?: string[];
   };
 }
 
@@ -74,6 +78,8 @@ export const tileTypeToLabel: Record<DefaultTileType, string> = {
   note: 'Notes',
   message: 'Messages',
   hashtags: 'Hashtags',
+  placeContacts: 'Contacts',
+  contactPlaces: 'Places',
   image: 'Images',
   'custom-experience': 'Experiences'
 };
@@ -85,10 +91,11 @@ const placeDefaultTileTypeOrder: DefaultTileType[] = [
   'note',
   'message',
   'hashtags',
+  'placeContacts',
   'image',
   'custom-experience'
 ];
-const contactDefaultTileTypeOrder: DefaultTileType[] = ['hashtags'];
+const contactDefaultTileTypeOrder: DefaultTileType[] = ['contactPlaces', 'hashtags'];
 const experienceDefaultTileTypeOrder: DefaultTileType[] = ['hashtags'];
 
 export function createDefaultTileSettings(context: TileDefaultsContext = 'place'): TileSetting[] {

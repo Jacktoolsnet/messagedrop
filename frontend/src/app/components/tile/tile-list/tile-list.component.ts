@@ -24,6 +24,7 @@ import { MultitextTileComponent } from "../multitext-tile/multitext-tile.compone
 import { NoteTileComponent } from "../note-tile/note-tile.component";
 import { PollutionTileComponent } from "../pollution-tile/pollution-tile.component";
 import { QuickActionTileComponent } from "../quick-action-tile/quick-action-tile.component";
+import { RelationTileComponent } from "../relation-tile/relation-tile.component";
 import { TextTileComponent } from "../text-tile/text-tile.component";
 import { TileSettingsComponent } from '../tile-settings/tile-settings.component';
 import { TodoTileComponent } from "../todo-tile/todo-tile.component";
@@ -31,7 +32,7 @@ import { WeatherTileComponent } from "../weather-tile/weather-tile.component";
 
 @Component({
   selector: 'app-tile-list',
-  imports: [DateTimeTileComponent, WeatherTileComponent, AirQualityTileComponent, NoteTileComponent, MessageTileComponent, HashtagTileComponent, ImageTileComponent, FileTileComponent, ExperienceTileComponent, TextTileComponent, MultitextTileComponent, AnniversaryTileComponent, MigraineTileComponent, PollutionTileComponent, TodoTileComponent, QuickActionTileComponent, MasonryItemDirective, MatButtonModule, TranslocoPipe],
+  imports: [DateTimeTileComponent, WeatherTileComponent, AirQualityTileComponent, NoteTileComponent, MessageTileComponent, HashtagTileComponent, RelationTileComponent, ImageTileComponent, FileTileComponent, ExperienceTileComponent, TextTileComponent, MultitextTileComponent, AnniversaryTileComponent, MigraineTileComponent, PollutionTileComponent, TodoTileComponent, QuickActionTileComponent, MasonryItemDirective, MatButtonModule, TranslocoPipe],
   templateUrl: './tile-list.component.html',
   styleUrl: './tile-list.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -54,6 +55,8 @@ export class TileListComponent {
     'note',
     'message',
     'hashtags',
+    'placeContacts',
+    'contactPlaces',
     'image',
     'custom-experience',
     'custom-text',

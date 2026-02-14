@@ -548,6 +548,8 @@
       "note": "Notas",
       "message": "Mensajes",
       "hashtags": "Hashtags",
+      "placeContacts": "Contactos",
+      "contactPlaces": "Lugares",
       "image": "Imágenes",
       "text": "Texto",
       "multitext": "Texto multilínea",
@@ -594,6 +596,14 @@
       "hashtags": {
         "title": "Hashtags",
         "empty": "Aún no hay hashtags. Toca para añadir."
+      },
+      "relations": {
+        "emptyPlaceContacts": "Todavía no hay contactos asignados. Toca para vincular contactos.",
+        "emptyContactPlaces": "Todavía no hay lugares asignados. Toca para vincular lugares.",
+        "emptyFiltered": "No se encontraron entradas coincidentes.",
+        "filterContactsPlaceholder": "Filtrar contactos",
+        "filterPlacesPlaceholder": "Filtrar lugares",
+        "toggleAria": "Asignar {{ name }}"
       },
       "text": {
         "empty": "Aún no hay texto. Toca para añadir uno."
@@ -669,6 +679,7 @@
     "tileFields": {
       "pickIcon": "Elegir un icono",
       "title": "Título",
+      "filter": "Filtro",
       "text": "Texto",
       "linkType": "Tipo de enlace",
       "target": "Destino",

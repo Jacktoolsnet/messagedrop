@@ -1,0 +1,87 @@
+.edit-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 0;
+  max-height: calc(95vh - 10.5rem);
+  overflow: hidden;
+}
+
+.filter-row {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: var(--mat-card-filled-container-color);
+  padding-top: 0.2rem;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.relations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-y: auto;
+  min-height: 0;
+  padding-right: 0.25rem;
+}
+
+.relation-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-radius: 0.85rem;
+  border: 1px solid var(--mat-card-outlined-outline-color);
+  padding: 0.45rem 0.65rem;
+  background: var(--mat-card-filled-container-color);
+}
+
+.relation-identity {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.relation-avatar {
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 2px 6px var(--mat-card-outlined-outline-color);
+  flex-shrink: 0;
+}
+
+.relation-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.relation-avatar mat-icon {
+  font-size: 1.2rem;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.relation-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.text-muted {
+  margin: 0;
+  padding: 0.35rem 0;
+  font-style: italic;
+}

@@ -1636,6 +1636,40 @@
       }
     }
   },
+  "tileEditRelations": {
+    "title": "Tarjeta de relaciones",
+    "intro": "En este diálogo vinculas contactos y lugares entre sí y puedes ajustar la visualización de la tarjeta.",
+    "items": {
+      "displaySettings": {
+        "title": "Abrir ajustes visuales",
+        "desc": "Con esta función abres el diálogo para icono y título de la tarjeta."
+      },
+      "filter": {
+        "title": "Filtrar la lista",
+        "desc": "Con esta función filtras la lista por nombre."
+      },
+      "toggle": {
+        "title": "Alternar asignación",
+        "desc": "Con esta función asignas o quitas asignaciones con el control deslizante."
+      },
+      "close": {
+        "title": "Cancelar",
+        "desc": "Con esta función cierras el diálogo sin guardar."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Con esta función abres esta vista de ayuda."
+      },
+      "apply": {
+        "title": "Guardar",
+        "desc": "Con esta función aplicas los cambios."
+      },
+      "privacy": {
+        "title": "Privacidad y almacenamiento",
+        "desc": "Las asignaciones se guardan localmente y en formato cifrado."
+      }
+    }
+  },
   "tileDisplaySettings": {
     "title": "Ajustes visuales de la tarjeta",
     "intro": "En este diálogo defines el icono y el título de una tarjeta.",

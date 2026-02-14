@@ -1636,6 +1636,40 @@
       }
     }
   },
+  "tileEditRelations": {
+    "title": "Relation tile",
+    "intro": "This dialog links contacts and places and lets you adjust tile display settings.",
+    "items": {
+      "displaySettings": {
+        "title": "Open display settings",
+        "desc": "This action opens the dialog for tile icon and title."
+      },
+      "filter": {
+        "title": "Filter the list",
+        "desc": "This action filters the list by name."
+      },
+      "toggle": {
+        "title": "Toggle assignment",
+        "desc": "This action links or unlinks entries using the slide toggle."
+      },
+      "close": {
+        "title": "Cancel",
+        "desc": "This action closes the dialog without saving."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "apply": {
+        "title": "Save",
+        "desc": "This action applies your changes."
+      },
+      "privacy": {
+        "title": "Privacy and storage",
+        "desc": "Assignments are stored locally and in encrypted form."
+      }
+    }
+  },
   "tileDisplaySettings": {
     "title": "Tile display settings",
     "intro": "This dialog lets you define the tile icon and title.",

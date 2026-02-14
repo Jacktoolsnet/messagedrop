@@ -89,6 +89,8 @@ export class TileSettingsComponent {
     note: 'common.tileTypes.note',
     message: 'common.tileTypes.message',
     hashtags: 'common.tileTypes.hashtags',
+    placeContacts: 'common.tileTypes.placeContacts',
+    contactPlaces: 'common.tileTypes.contactPlaces',
     image: 'common.tileTypes.image',
     'custom-text': 'common.tileTypes.text',
     'custom-multitext': 'common.tileTypes.multitext',

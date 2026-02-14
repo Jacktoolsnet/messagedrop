@@ -1636,6 +1636,40 @@
       }
     }
   },
+  "tileEditRelations": {
+    "title": "Verknüpfungs-Kachel",
+    "intro": "In diesem Dialog verknüpfst du Kontakte und Orte miteinander und kannst die Kachel-Darstellung anpassen.",
+    "items": {
+      "displaySettings": {
+        "title": "Darstellung öffnen",
+        "desc": "Mit dieser Funktion öffnest du den Dialog für Icon und Titel der Kachel."
+      },
+      "filter": {
+        "title": "Liste filtern",
+        "desc": "Mit dieser Funktion filterst du die Liste nach Name."
+      },
+      "toggle": {
+        "title": "Zuordnung umschalten",
+        "desc": "Mit dieser Funktion ordnest du Einträge per Schieberegler zu oder entfernst die Zuordnung."
+      },
+      "close": {
+        "title": "Abbrechen",
+        "desc": "Mit dieser Funktion schließt du den Dialog ohne zu speichern."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "apply": {
+        "title": "Speichern",
+        "desc": "Mit dieser Funktion übernimmst du die Änderungen."
+      },
+      "privacy": {
+        "title": "Datenschutz und Speicherung",
+        "desc": "Die Zuordnungen werden lokal gespeichert und verschlüsselt abgelegt."
+      }
+    }
+  },
   "tileDisplaySettings": {
     "title": "Kachel-Darstellung",
     "intro": "In diesem Dialog legst du das Icon und den Titel einer Kachel fest.",

@@ -1636,6 +1636,40 @@
       }
     }
   },
+  "tileEditRelations": {
+    "title": "Tuile de relations",
+    "intro": "Cette boîte de dialogue permet de lier des contacts et des lieux, et d'ajuster l'affichage de la tuile.",
+    "items": {
+      "displaySettings": {
+        "title": "Ouvrir l'affichage",
+        "desc": "Cette fonction ouvre la boîte de dialogue pour l'icône et le titre de la tuile."
+      },
+      "filter": {
+        "title": "Filtrer la liste",
+        "desc": "Cette fonction filtre la liste par nom."
+      },
+      "toggle": {
+        "title": "Basculer l'association",
+        "desc": "Cette fonction associe ou retire des éléments via l'interrupteur."
+      },
+      "close": {
+        "title": "Annuler",
+        "desc": "Cette fonction ferme la boîte de dialogue sans enregistrer."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette fonction ouvre cette vue d'aide."
+      },
+      "apply": {
+        "title": "Enregistrer",
+        "desc": "Cette fonction applique vos modifications."
+      },
+      "privacy": {
+        "title": "Confidentialité et stockage",
+        "desc": "Les associations sont stockées localement et sous forme chiffrée."
+      }
+    }
+  },
   "tileDisplaySettings": {
     "title": "Affichage de la tuile",
     "intro": "Cette boîte de dialogue vous permet de définir l'icône et le titre d'une tuile.",

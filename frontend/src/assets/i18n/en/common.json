@@ -548,6 +548,8 @@
       "note": "Notes",
       "message": "Messages",
       "hashtags": "Hashtags",
+      "placeContacts": "Contacts",
+      "contactPlaces": "Places",
       "image": "Images",
       "text": "Text",
       "multitext": "Multitext",
@@ -594,6 +596,14 @@
       "hashtags": {
         "title": "Hashtags",
         "empty": "No hashtags yet. Tap to add."
+      },
+      "relations": {
+        "emptyPlaceContacts": "No contacts assigned yet. Tap to link contacts.",
+        "emptyContactPlaces": "No places assigned yet. Tap to link places.",
+        "emptyFiltered": "No matching entries found.",
+        "filterContactsPlaceholder": "Filter contacts",
+        "filterPlacesPlaceholder": "Filter places",
+        "toggleAria": "Assign {{ name }}"
       },
       "text": {
         "empty": "No text yet. Tap to add one."
@@ -669,6 +679,7 @@
     "tileFields": {
       "pickIcon": "Pick an icon",
       "title": "Title",
+      "filter": "Filter",
       "text": "Text",
       "linkType": "Link type",
       "target": "Target",

@@ -23,6 +23,12 @@
         @case ('hashtags') {
           <app-hashtag-tile class="tile" appMasonryItem [place]="resolvedPlace" [contact]="resolvedContact" [experience]="resolvedExperience"></app-hashtag-tile>
         }
+        @case ('placeContacts') {
+          <app-relation-tile class="tile" appMasonryItem [place]="resolvedPlace!" [tile]="tile"></app-relation-tile>
+        }
+        @case ('contactPlaces') {
+          <app-relation-tile class="tile" appMasonryItem [contact]="resolvedContact!" [tile]="tile"></app-relation-tile>
+        }
         @case ('image') {
           <app-image-tile class="tile" appMasonryItem [place]="resolvedPlace!"></app-image-tile>
         }

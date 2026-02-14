@@ -1,0 +1,99 @@
+.relation-tile {
+  position: relative;
+  border-radius: 1rem;
+  color: var(--mat-card-subtitle-text-color);
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.relation-tile:hover {
+  transform: scale(1.02);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.relation-tile__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.relation-tile__title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.relation-tile__icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+.relation-tile__title {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.relation-tile__edit {
+  flex-shrink: 0;
+}
+
+.relation-tile__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.relation-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.relation-item__avatar {
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--mat-card-filled-container-color);
+  box-shadow: 0 2px 6px var(--mat-card-outlined-outline-color);
+  flex-shrink: 0;
+}
+
+.relation-item__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.relation-item__avatar mat-icon {
+  width: 1.15rem;
+  height: 1.15rem;
+  font-size: 1.15rem;
+}
+
+.relation-item__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.relation-tile__empty {
+  margin: 0;
+  font-style: italic;
+}

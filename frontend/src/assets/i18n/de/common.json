@@ -548,6 +548,8 @@
       "note": "Notizen",
       "message": "Nachrichten",
       "hashtags": "Hashtags",
+      "placeContacts": "Kontakte",
+      "contactPlaces": "Orte",
       "image": "Bilder",
       "text": "Text",
       "multitext": "Mehrzeiliger Text",
@@ -594,6 +596,14 @@
       "hashtags": {
         "title": "Hashtags",
         "empty": "Noch keine Hashtags. Tippe zum Hinzufügen."
+      },
+      "relations": {
+        "emptyPlaceContacts": "Noch keine Kontakte zugeordnet. Tippe zum Verknüpfen.",
+        "emptyContactPlaces": "Noch keine Orte zugeordnet. Tippe zum Verknüpfen.",
+        "emptyFiltered": "Keine passenden Einträge gefunden.",
+        "filterContactsPlaceholder": "Kontakte filtern",
+        "filterPlacesPlaceholder": "Orte filtern",
+        "toggleAria": "{{ name }} zuordnen"
       },
       "text": {
         "empty": "Noch kein Text. Tippe, um einen hinzuzufügen."
@@ -669,6 +679,7 @@
     "tileFields": {
       "pickIcon": "Icon auswählen",
       "title": "Titel",
+      "filter": "Filter",
       "text": "Text",
       "linkType": "Linktyp",
       "target": "Ziel",

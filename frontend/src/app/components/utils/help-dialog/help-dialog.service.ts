@@ -2128,6 +2128,47 @@ const HELP_TOPICS = {
       }
     ]
   },
+  tileEditRelations: {
+    titleKey: 'tileEditRelations.title',
+    introKey: 'tileEditRelations.intro',
+    items: [
+      {
+        icon: 'settings',
+        titleKey: 'tileEditRelations.items.displaySettings.title',
+        descriptionKey: 'tileEditRelations.items.displaySettings.desc'
+      },
+      {
+        icon: 'filter_list',
+        titleKey: 'tileEditRelations.items.filter.title',
+        descriptionKey: 'tileEditRelations.items.filter.desc'
+      },
+      {
+        icon: 'toggle_on',
+        titleKey: 'tileEditRelations.items.toggle.title',
+        descriptionKey: 'tileEditRelations.items.toggle.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'tileEditRelations.items.close.title',
+        descriptionKey: 'tileEditRelations.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'tileEditRelations.items.help.title',
+        descriptionKey: 'tileEditRelations.items.help.desc'
+      },
+      {
+        icon: 'save',
+        titleKey: 'tileEditRelations.items.apply.title',
+        descriptionKey: 'tileEditRelations.items.apply.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'tileEditRelations.items.privacy.title',
+        descriptionKey: 'tileEditRelations.items.privacy.desc'
+      }
+    ]
+  },
   tileDisplaySettings: {
     titleKey: 'tileDisplaySettings.title',
     introKey: 'tileDisplaySettings.intro',

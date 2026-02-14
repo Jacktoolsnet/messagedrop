@@ -1,0 +1,68 @@
+<app-dialog-header
+  [icon]="headerIcon"
+  [title]="headerTitle">
+</app-dialog-header>
+
+<mat-dialog-content class="edit-content">
+  <div class="filter-row">
+    <mat-form-field appearance="outline" class="full-width" subscriptSizing="dynamic">
+      <mat-label>{{ 'common.tileFields.filter' | transloco }}</mat-label>
+      <input
+        matInput
+        cdkFocusInitial
+        [value]="filterValue()"
+        (input)="onFilterInput($event)"
+        [placeholder]="filterPlaceholderKey | transloco" />
+      @if (filterValue()) {
+      <button mat-icon-button matSuffix type="button" (click)="clearFilter()"
+        [attr.aria-label]="'common.actions.delete' | transloco">
+        <mat-icon>close</mat-icon>
+      </button>
+      }
+    </mat-form-field>
+  </div>
+
+  @if (filteredItems.length) {
+  <div class="relations-list">
+    @for (item of filteredItems; track trackByItem($index, item)) {
+    <div class="relation-row">
+      <div class="relation-identity">
+        <span class="relation-avatar">
+          @if (item.avatarUrl) {
+          <img [src]="item.avatarUrl" [attr.alt]="item.avatarAlt" />
+          } @else {
+          <mat-icon>{{ item.fallbackIcon }}</mat-icon>
+          }
+        </span>
+        <span class="relation-name">{{ item.name }}</span>
+      </div>
+
+      <mat-slide-toggle
+        [checked]="selectedIds().has(item.id)"
+        (change)="toggleItem(item.id, $event.checked)"
+        [attr.aria-label]="'common.tiles.relations.toggleAria' | transloco : { name: item.name }">
+      </mat-slide-toggle>
+    </div>
+    }
+  </div>
+  } @else {
+  <p class="text-muted">{{ 'common.tiles.relations.emptyFiltered' | transloco }}</p>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button type="button" (click)="cancel()" mat-icon-button [attr.aria-label]="'common.cancel' | transloco" class="action-close">
+    <mat-icon>close</mat-icon>
+  </button>
+  <button mat-icon-button type="button" (click)="help.open('tileEditRelations')"
+    [attr.aria-label]="'common.actions.help' | transloco">
+    <mat-icon>help</mat-icon>
+  </button>
+  <button mat-icon-button type="button" (click)="openDisplaySettings()"
+    [attr.aria-label]="'common.tileSettings.title' | transloco">
+    <mat-icon>settings</mat-icon>
+  </button>
+  <button color="primary" type="button" (click)="save()" mat-icon-button [attr.aria-label]="'common.save' | transloco">
+    <mat-icon>save</mat-icon>
+  </button>
+</mat-dialog-actions>
