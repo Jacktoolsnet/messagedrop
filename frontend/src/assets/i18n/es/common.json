@@ -160,6 +160,7 @@
       "invalidData": "Los datos de conexión no son válidos.",
       "selfAddBlocked": "No es posible añadir mi usuario a la lista de contactos.",
       "notFound": "No se encontró el ID de conexión.",
+      "consumedOrExpired": "El ID de conexión no es válido, ya fue usado o ha caducado.",
       "deletingInfo": "Eliminando información de conexión",
       "deleteFailed": "No se pudo eliminar el registro de conexión.",
       "deleteUnavailable": "No se puede eliminar el registro de conexión."

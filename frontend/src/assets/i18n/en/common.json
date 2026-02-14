@@ -160,6 +160,7 @@
       "invalidData": "Connect data is invalid.",
       "selfAddBlocked": "It is not possible to add my user to the contact list.",
       "notFound": "Connect ID not found.",
+      "consumedOrExpired": "Connect ID is invalid, already used, or expired.",
       "deletingInfo": "Deleting connect information",
       "deleteFailed": "Failed to delete connect record.",
       "deleteUnavailable": "Unable to delete connect record."

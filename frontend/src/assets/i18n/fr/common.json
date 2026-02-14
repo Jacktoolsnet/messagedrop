@@ -160,6 +160,7 @@
       "invalidData": "Les données de connexion ne sont pas valides.",
       "selfAddBlocked": "Il n'est pas possible d'ajouter mon utilisateur à la liste de contacts.",
       "notFound": "ID de connexion introuvable.",
+      "consumedOrExpired": "L'ID de connexion est invalide, déjà utilisé ou expiré.",
       "deletingInfo": "Suppression des informations de connexion",
       "deleteFailed": "Échec de la suppression de l'enregistrement de connexion.",
       "deleteUnavailable": "Impossible de supprimer l'enregistrement de connexion."

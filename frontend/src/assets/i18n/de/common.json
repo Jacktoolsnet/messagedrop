@@ -160,6 +160,7 @@
       "invalidData": "Connect-Daten sind ungültig.",
       "selfAddBlocked": "Du kannst deinen eigenen Benutzer nicht zur Kontaktliste hinzufügen.",
       "notFound": "Connect-ID nicht gefunden.",
+      "consumedOrExpired": "Connect-ID ist ungültig, bereits verwendet oder abgelaufen.",
       "deletingInfo": "Connect-Informationen werden gelöscht",
       "deleteFailed": "Connect-Eintrag konnte nicht gelöscht werden.",
       "deleteUnavailable": "Connect-Eintrag konnte nicht gelöscht werden."

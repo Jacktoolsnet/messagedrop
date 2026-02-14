@@ -113,7 +113,10 @@ export class ConnectService {
         },
         error: (error) => {
           console.error('Failed to load connect record', error);
-          this.snackBar.open(this.i18n.t('common.connect.notFound'), this.i18n.t('common.actions.ok'));
+          const messageKey = error?.status === 404
+            ? 'common.connect.consumedOrExpired'
+            : 'common.connect.notFound';
+          this.snackBar.open(this.i18n.t(messageKey), this.i18n.t('common.actions.ok'));
         }
       });
   }
