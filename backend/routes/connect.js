@@ -32,7 +32,11 @@ function ensureSameUser(req, res, userId, next) {
 }
 
 function fetchConnectRecord(req, res, connectId, handler, next) {
-  tableConnect.getById(req.database.db, connectId, (err, row) => {
+  const normalizedConnectId = String(connectId ?? '').trim();
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(normalizedConnectId)) {
+    return next(apiError.badRequest('invalid_connect_id'));
+  }
+  tableConnect.getById(req.database.db, normalizedConnectId, (err, row) => {
     if (err) {
       return next(apiError.internal('db_error'));
     }

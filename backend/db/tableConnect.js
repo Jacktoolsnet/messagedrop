@@ -112,7 +112,7 @@ const clean = function (db, callback) {
     try {
         let sql = `
         DELETE FROM ${tableName}
-        WHERE ${columnTimeOfCreation} < datetime('now','-1 days');`;
+        WHERE datetime(${columnTimeOfCreation}, 'unixepoch') < datetime('now','-1 days');`;
 
         db.run(sql, (err) => {
             callback(err)

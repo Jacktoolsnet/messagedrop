@@ -917,10 +917,14 @@ router.get('/renewjwt',
   [
     security.authenticate
   ]
-  , (req, res) => {
+  , (req, res, next) => {
     const secret = process.env.JWT_SECRET;
+    const userId = req.jwtUser?.userId ?? req.jwtUser?.id;
+    if (!userId) {
+      return next(apiError.unauthorized('unauthorized'));
+    }
     const token = jwt.sign(
-      { userId: req.jwtUser.id },
+      { userId },
       secret,
       { expiresIn: '1h' }
     );
