@@ -1,7 +1,7 @@
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 
 import { A11yModule } from '@angular/cdk/a11y';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -51,6 +51,7 @@ interface QuickActionTileDialogData {
 export class QuickActionTileEditComponent {
   private readonly dialogRef = inject(MatDialogRef<QuickActionTileEditComponent>);
   private readonly dialog = inject(MatDialog);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly translation = inject(TranslationHelperService);
   readonly help = inject(HelpDialogService);
   readonly data = inject<QuickActionTileDialogData>(MAT_DIALOG_DATA);
@@ -100,6 +101,7 @@ export class QuickActionTileEditComponent {
       }
       this.titleControl.setValue(result.title);
       this.icon.set(result.icon);
+      this.cdr.markForCheck();
       this.commitDisplaySettings();
     });
   }

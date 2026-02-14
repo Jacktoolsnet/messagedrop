@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal } from '@angular/core';
 
 import { A11yModule } from '@angular/cdk/a11y';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -47,6 +47,7 @@ interface QuickActionDialogData {
 export class QuickActionActionEditComponent {
   private readonly dialogRef = inject(MatDialogRef<QuickActionActionEditComponent>);
   private readonly dialog = inject(MatDialog);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly translation = inject(TranslationHelperService);
   readonly help = inject(HelpDialogService);
   readonly data = inject<QuickActionDialogData>(MAT_DIALOG_DATA);
@@ -115,6 +116,7 @@ export class QuickActionActionEditComponent {
       }
       this.labelControl.setValue(result.title);
       this.icon.set(result.icon);
+      this.cdr.markForCheck();
       this.iconAuto = !result.icon || result.icon === this.defaultIconForType(this.typeControl.value);
     });
   }

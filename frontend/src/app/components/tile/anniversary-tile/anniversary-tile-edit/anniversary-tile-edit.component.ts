@@ -1,6 +1,6 @@
 
 import { A11yModule } from '@angular/cdk/a11y';
-import { ChangeDetectionStrategy, Component, ViewChild, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -54,6 +54,7 @@ export class AnniversaryTileEditComponent {
   @ViewChild(MatCalendar) calendar?: MatCalendar<Date>;
   private readonly dialogRef = inject(MatDialogRef<AnniversaryTileEditComponent>);
   private readonly dialog = inject(MatDialog);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly translation = inject(TranslationHelperService);
   readonly help = inject(HelpDialogService);
   readonly data = inject<AnniversaryTileDialogData>(MAT_DIALOG_DATA);
@@ -115,6 +116,7 @@ export class AnniversaryTileEditComponent {
       }
       this.titleControl.setValue(result.title);
       this.icon.set(result.icon);
+      this.cdr.markForCheck();
       this.commitDisplaySettings();
     });
   }

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal } from '@angular/core';
 
 import { A11yModule } from '@angular/cdk/a11y';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -46,6 +46,7 @@ interface TextTileDialogData {
 export class TextTileEditComponent {
   private readonly dialogRef = inject(MatDialogRef<TextTileEditComponent>);
   private readonly dialog = inject(MatDialog);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly translation = inject(TranslationHelperService);
   readonly help = inject(HelpDialogService);
   readonly data = inject<TextTileDialogData>(MAT_DIALOG_DATA);
@@ -90,6 +91,7 @@ export class TextTileEditComponent {
       }
       this.titleControl.setValue(result.title);
       this.icon.set(result.icon);
+      this.cdr.markForCheck();
       this.commitDisplaySettings();
     });
   }

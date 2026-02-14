@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal } from '@angular/core';
 
 import { A11yModule } from '@angular/cdk/a11y';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -46,6 +46,7 @@ interface MigraineTileDialogData {
 export class MigraineTileEditComponent {
   private readonly dialogRef = inject(MatDialogRef<MigraineTileEditComponent>);
   private readonly dialog = inject(MatDialog);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly translation = inject(TranslationHelperService);
   readonly help = inject(HelpDialogService);
   readonly data = inject<MigraineTileDialogData>(MAT_DIALOG_DATA);
@@ -101,6 +102,7 @@ export class MigraineTileEditComponent {
       }
       this.titleControl.setValue(result.title);
       this.icon.set(result.icon);
+      this.cdr.markForCheck();
       this.commitDisplaySettings();
     });
   }
