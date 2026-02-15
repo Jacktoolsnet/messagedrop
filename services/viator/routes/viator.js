@@ -334,7 +334,10 @@ const PUBLIC_ENDPOINTS = [
   { method: 'GET', pattern: /^\/destinations\/all$/ },
   { method: 'POST', pattern: /^\/products\/search$/ },
   { method: 'GET', pattern: /^\/products\/search$/ },
+  { method: 'GET', pattern: /^\/products\/[^/]+$/ },
   { method: 'POST', pattern: /^\/search\/freetext$/ },
+  { method: 'POST', pattern: /^\/locations\/bulk$/ },
+  { method: 'GET', pattern: /^\/availability\/schedules\/[^/]+$/ },
   { method: 'POST', pattern: /^\/suppliers\/search\/product-codes$/ }
 ];
 
