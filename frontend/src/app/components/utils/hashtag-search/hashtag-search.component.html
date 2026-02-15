@@ -65,9 +65,8 @@
     [attr.aria-label]="viewMode === 'list' ? ('common.location.switchToMap' | transloco) : ('common.location.switchToList' | transloco)">
     <mat-icon>{{ viewMode === 'list' ? 'map' : 'list' }}</mat-icon>
   </button>
-  <button mat-stroked-button type="button" (click)="onApply()" [disabled]="!selectedResult()"
+  <button mat-icon-button type="button" (click)="onApply()" [disabled]="!selectedResult()"
     [attr.aria-label]="'common.actions.apply' | transloco">
-    <mat-icon>done</mat-icon>
-    {{ 'common.actions.apply' | transloco }}
+    <mat-icon>check</mat-icon>
   </button>
 </mat-dialog-actions>

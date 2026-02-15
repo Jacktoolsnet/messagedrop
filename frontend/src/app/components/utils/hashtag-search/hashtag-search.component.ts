@@ -2,7 +2,7 @@ import { DestroyRef, Component, computed, effect, inject, signal } from '@angula
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { finalize } from 'rxjs';
@@ -27,6 +27,10 @@ import { UserService } from '../../../services/user.service';
 import { ViatorService } from '../../../services/viator.service';
 import { normalizeHashtags, stringifyHashtags } from '../../../utils/hashtag.util';
 import { HashtagMapItem, HashtagResultsMapComponent } from './components/hashtag-results-map/hashtag-results-map.component';
+import { MessagelistComponent } from '../../messagelist/messagelist.component';
+import { NotelistComponent } from '../../notelist/notelist.component';
+import { PlacelistComponent } from '../../placelist/placelist.component';
+import { ExperienceSearchDetailDialogComponent } from '../experience-search/detail-dialog/experience-search-detail-dialog.component';
 
 export interface HashtagSearchDialogData {
   initialTag?: string;
@@ -72,6 +76,7 @@ interface HashtagSearchListTile {
 export class HashtagSearchComponent {
   readonly data = inject<HashtagSearchDialogData | null>(MAT_DIALOG_DATA, { optional: true });
   private readonly dialogRef = inject(MatDialogRef<HashtagSearchComponent, HashtagSearchResult>);
+  private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);
   private readonly messageService = inject(MessageService);
   private readonly placeService = inject(PlaceService);
@@ -375,6 +380,7 @@ export class HashtagSearchComponent {
       const place = this.localPlaceResults().find((entry) => entry.id === placeId);
       if (place) {
         this.selectPlace(place);
+        this.openPlacePreview();
       }
       return;
     }
@@ -384,6 +390,7 @@ export class HashtagSearchComponent {
       const experience = this.localExperienceResults().find((entry) => this.getExperienceMapKey(entry) === key);
       if (experience) {
         this.selectExperience(experience);
+        this.openExperiencePreview(experience);
       }
       return;
     }
@@ -393,6 +400,7 @@ export class HashtagSearchComponent {
       const note = this.localNoteResults().find((entry) => entry.id === noteId);
       if (note) {
         this.selectNote(note);
+        this.openNotePreview(note);
       }
       return;
     }
@@ -402,6 +410,7 @@ export class HashtagSearchComponent {
       const message = this.publicResults().find((entry) => entry.uuid === uuid);
       if (message) {
         this.selectMessage(message);
+        this.openMessagePreview(message);
       }
     }
   }
@@ -469,6 +478,74 @@ export class HashtagSearchComponent {
       return `tile-public-message:${id}`;
     }
     return null;
+  }
+
+  private openPlacePreview(): void {
+    this.dialog.open(PlacelistComponent, {
+      panelClass: 'PalceListDialog',
+      closeOnNavigation: true,
+      data: {},
+      minWidth: 'min(360px, 95vw)',
+      maxWidth: '95vw',
+      width: 'min(520px, 95vw)',
+      maxHeight: '95vh',
+      height: 'auto',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+  }
+
+  private openMessagePreview(message: Message): void {
+    this.dialog.open(MessagelistComponent, {
+      panelClass: 'MessageListDialog',
+      closeOnNavigation: true,
+      data: {
+        location: message.location,
+        messageSignal: signal([message])
+      },
+      width: 'min(900px, 95vw)',
+      maxWidth: '95vw',
+      maxHeight: '95vh',
+      height: 'auto',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+  }
+
+  private openNotePreview(note: Note): void {
+    this.dialog.open(NotelistComponent, {
+      panelClass: 'MessageListDialog',
+      closeOnNavigation: true,
+      data: {
+        location: note.location,
+        notesSignal: signal([note])
+      },
+      minWidth: 'min(450px, 95vw)',
+      maxWidth: '95vw',
+      width: '95vw',
+      maxHeight: 'none',
+      height: 'auto',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+  }
+
+  private openExperiencePreview(experience: ExperienceBookmark): void {
+    this.dialog.open(ExperienceSearchDetailDialogComponent, {
+      data: { result: experience.snapshot },
+      autoFocus: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      maxWidth: '95vw',
+      maxHeight: '95vh'
+    });
   }
 
   hashtagsLabel(tags: string[] | undefined): string {

@@ -1986,6 +1986,7 @@ export class AppComponent implements OnInit {
   }
 
   showHashtagSearchDialog(): void {
+    const hashtagApplyZoom = 18;
     const dialogRef = this.dialog.open(HashtagSearchComponent, {
       panelClass: '',
       closeOnNavigation: true,
@@ -2005,19 +2006,19 @@ export class AppComponent implements OnInit {
         return;
       }
       if (result.location) {
-        this.mapService.flyTo(result.location);
+        this.mapService.flyToWithZoom(result.location, hashtagApplyZoom);
         return;
       }
       if (result.type === 'message' && result.message) {
-        this.mapService.flyTo(result.message.location);
+        this.mapService.flyToWithZoom(result.message.location, hashtagApplyZoom);
         return;
       }
       if (result.type === 'place' && result.place) {
-        this.mapService.flyTo(result.place.location);
+        this.mapService.flyToWithZoom(result.place.location, hashtagApplyZoom);
         return;
       }
       if (result.type === 'note' && result.note) {
-        this.mapService.flyTo(result.note.location);
+        this.mapService.flyToWithZoom(result.note.location, hashtagApplyZoom);
         return;
       }
       if (result.type === 'experience' && result.experience?.snapshot) {
