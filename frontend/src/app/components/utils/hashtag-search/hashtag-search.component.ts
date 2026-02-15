@@ -40,6 +40,7 @@ export interface HashtagSearchResult {
   contact?: Contact;
   experience?: ExperienceBookmark;
   note?: Note;
+  location?: Location;
 }
 
 interface HashtagSearchListTile {
@@ -91,6 +92,8 @@ export class HashtagSearchComponent {
   normalizedTag = signal('');
   hasSearched = signal(false);
   selectedMapItemId = signal<string | null>(null);
+  selectedListTileId = signal<string | null>(null);
+  selectedResult = signal<HashtagSearchResult | null>(null);
   readonly localMode = computed(() => this.userService.isReady());
   viewMode: 'list' | 'map' = 'map';
   mapView = {
@@ -287,6 +290,8 @@ export class HashtagSearchComponent {
 
   search(): void {
     this.selectedMapItemId.set(null);
+    this.selectedListTileId.set(null);
+    this.selectedResult.set(null);
     this.viewMode = 'map';
     const parsed = normalizeHashtags([this.query], 1);
     if (parsed.invalidTokens.length > 0 || parsed.tags.length === 0 || parsed.overflow > 0) {
@@ -307,23 +312,48 @@ export class HashtagSearchComponent {
   }
 
   selectMessage(message: Message): void {
-    this.dialogRef.close({ type: 'message', message });
+    this.selectedResult.set({
+      type: 'message',
+      message,
+      location: this.normalizeLocation(message.location) ?? undefined
+    });
   }
 
   selectPlace(place: Place): void {
-    this.dialogRef.close({ type: 'place', place });
+    this.selectedResult.set({
+      type: 'place',
+      place,
+      location: this.normalizeLocation(place.location) ?? undefined
+    });
   }
 
   selectContact(contact: Contact): void {
-    this.dialogRef.close({ type: 'contact', contact });
+    this.selectedResult.set({ type: 'contact', contact });
   }
 
   selectExperience(experience: ExperienceBookmark): void {
-    this.dialogRef.close({ type: 'experience', experience });
+    const location = this.resolveExperienceLocation(experience);
+    this.selectedResult.set({
+      type: 'experience',
+      experience,
+      location: location ?? undefined
+    });
   }
 
   selectNote(note: Note): void {
-    this.dialogRef.close({ type: 'note', note });
+    this.selectedResult.set({
+      type: 'note',
+      note,
+      location: this.normalizeLocation(note.location) ?? undefined
+    });
+  }
+
+  onApply(): void {
+    const selected = this.selectedResult();
+    if (!selected) {
+      return;
+    }
+    this.dialogRef.close(selected);
   }
 
   toggleViewMode(): void {
@@ -339,6 +369,7 @@ export class HashtagSearchComponent {
 
   onMapItemSelected(itemId: string): void {
     this.selectedMapItemId.set(itemId);
+    this.selectedListTileId.set(this.getListTileIdForMapItem(itemId));
     if (itemId.startsWith('place:')) {
       const placeId = itemId.slice('place:'.length);
       const place = this.localPlaceResults().find((entry) => entry.id === placeId);
@@ -376,6 +407,8 @@ export class HashtagSearchComponent {
   }
 
   onListTileSelected(tile: HashtagSearchListTile): void {
+    this.selectedListTileId.set(tile.id);
+    this.selectedMapItemId.set(this.getMapItemIdForListTile(tile));
     const result = tile.result;
     if (result.type === 'place' && result.place) {
       this.selectPlace(result.place);
@@ -396,6 +429,46 @@ export class HashtagSearchComponent {
     if (result.type === 'message' && result.message) {
       this.selectMessage(result.message);
     }
+  }
+
+  private getMapItemIdForListTile(tile: HashtagSearchListTile): string | null {
+    if (tile.id.startsWith('tile-place:')) {
+      return `place:${tile.id.slice('tile-place:'.length)}`;
+    }
+    if (tile.id.startsWith('tile-note:')) {
+      return `note:${tile.id.slice('tile-note:'.length)}`;
+    }
+    if (tile.id.startsWith('tile-experience:')) {
+      return `experience:${tile.id.slice('tile-experience:'.length)}`;
+    }
+    if (tile.id.startsWith('tile-public-message:')) {
+      return `message:${tile.id.slice('tile-public-message:'.length)}`;
+    }
+    if (tile.id.startsWith('tile-comment:')) {
+      return `message:${tile.id.slice('tile-comment:'.length)}`;
+    }
+    return null;
+  }
+
+  private getListTileIdForMapItem(itemId: string): string | null {
+    if (itemId.startsWith('place:')) {
+      return `tile-place:${itemId.slice('place:'.length)}`;
+    }
+    if (itemId.startsWith('note:')) {
+      return `tile-note:${itemId.slice('note:'.length)}`;
+    }
+    if (itemId.startsWith('experience:')) {
+      return `tile-experience:${itemId.slice('experience:'.length)}`;
+    }
+    if (itemId.startsWith('message:')) {
+      const id = itemId.slice('message:'.length);
+      const message = this.publicResults().find((entry) => entry.uuid === id);
+      if (message?.typ === 'comment') {
+        return `tile-comment:${id}`;
+      }
+      return `tile-public-message:${id}`;
+    }
+    return null;
   }
 
   hashtagsLabel(tags: string[] | undefined): string {

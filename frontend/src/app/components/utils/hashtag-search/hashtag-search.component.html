@@ -31,7 +31,9 @@
   <div class="results-grid">
     @for (tile of listTiles(); track tile.id) {
     <article class="result-tile">
-      <button type="button" class="result-tile__button" (click)="onListTileSelected(tile)">
+      <button type="button" class="result-tile__button"
+        [class.result-tile__button--selected]="selectedListTileId() === tile.id"
+        (click)="onListTileSelected(tile)">
         <span class="result-tile__icon">
           <mat-icon>{{ tile.icon }}</mat-icon>
         </span>
@@ -62,5 +64,10 @@
   <button mat-icon-button type="button" (click)="toggleViewMode()"
     [attr.aria-label]="viewMode === 'list' ? ('common.location.switchToMap' | transloco) : ('common.location.switchToList' | transloco)">
     <mat-icon>{{ viewMode === 'list' ? 'map' : 'list' }}</mat-icon>
+  </button>
+  <button mat-stroked-button type="button" (click)="onApply()" [disabled]="!selectedResult()"
+    [attr.aria-label]="'common.actions.apply' | transloco">
+    <mat-icon>done</mat-icon>
+    {{ 'common.actions.apply' | transloco }}
   </button>
 </mat-dialog-actions>

@@ -2004,28 +2004,28 @@ export class AppComponent implements OnInit {
       if (!result) {
         return;
       }
+      if (result.location) {
+        this.mapService.flyTo(result.location);
+        return;
+      }
       if (result.type === 'message' && result.message) {
         this.mapService.flyTo(result.message.location);
-        this.messageService.setMessages([result.message]);
-        this.openMarkerMessageListDialog([result.message]);
         return;
       }
       if (result.type === 'place' && result.place) {
         this.mapService.flyTo(result.place.location);
-        this.openPlaceListDialog();
         return;
       }
-      if (result.type === 'contact' && result.contact) {
-        this.openContactListDialog();
+      if (result.type === 'note' && result.note) {
+        this.mapService.flyTo(result.note.location);
         return;
       }
       if (result.type === 'experience' && result.experience?.snapshot) {
         this.openMarkerMyExperienceListDialog([result.experience.snapshot]);
         return;
       }
-      if (result.type === 'note' && result.note) {
-        this.mapService.flyTo(result.note.location);
-        this.openMarkerNoteListDialog([result.note]);
+      if (result.type === 'contact' && result.contact) {
+        this.openContactListDialog();
       }
     });
   }
