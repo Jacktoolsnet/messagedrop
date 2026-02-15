@@ -20,8 +20,7 @@
                         <div class="tile-subtitle">{{ 'common.legal.consent.legalSubtitle' | transloco }}</div>
                     </div>
                 </div>
-                <button type="button" class="consent-button" mat-flat-button (click)="review('termsOfService')"
-                    [disabled]="!isAgeConfirmed">
+                <button type="button" class="consent-button" mat-flat-button (click)="review('termsOfService')">
                     <mat-icon>
                         {{ !appService.getAppSettings().consentSettings.termsOfService ? 'check_box_outline_blank' :
                         'check_box'}}
@@ -34,8 +33,7 @@
                     }}
                 </button>
 
-                <button type="button" class="consent-button" mat-flat-button (click)="review('privacyPolicy')"
-                    [disabled]="!isAgeConfirmed">
+                <button type="button" class="consent-button" mat-flat-button (click)="review('privacyPolicy')">
                     <mat-icon>
                         {{ !appService.getAppSettings().consentSettings.privacyPolicy ? 'check_box_outline_blank' :
                         'check_box'}}
@@ -48,8 +46,7 @@
                     }}
                 </button>
 
-                <button type="button" class="consent-button" mat-flat-button (click)="review('disclaimer')"
-                    [disabled]="!isAgeConfirmed">
+                <button type="button" class="consent-button" mat-flat-button (click)="review('disclaimer')">
                     <mat-icon>
                         {{ !appService.getAppSettings().consentSettings.disclaimer ? 'check_box_outline_blank' :
                         'check_box'
@@ -97,8 +94,7 @@
                         <div class="tile-subtitle">{{ 'common.legal.consent.externalSubtitle' | transloco }}</div>
                     </div>
                 </div>
-                <button type="button" class="consent-button" mat-flat-button (click)="editExternalContentSettings()"
-                    [disabled]="!isAgeConfirmed">
+                <button type="button" class="consent-button" mat-flat-button (click)="editExternalContentSettings()">
                     {{ 'common.legal.consent.externalButton' | transloco }}
                 </button>
             </section>
@@ -111,8 +107,7 @@
                         <div class="tile-subtitle">{{ 'common.legal.consent.usageSubtitle' | transloco }}</div>
                     </div>
                 </div>
-                <button type="button" class="consent-button" mat-flat-button (click)="editUsageProtectionSettings()"
-                    [disabled]="!isAgeConfirmed">
+                <button type="button" class="consent-button" mat-flat-button (click)="editUsageProtectionSettings()">
                     {{ 'common.legal.consent.usageButton' | transloco }}
                 </button>
             </section>
@@ -128,8 +123,7 @@
                         </p>
                     </div>
                 </div>
-                <mat-slide-toggle color="primary" [disabled]="!isAgeConfirmed"
-                    [checked]="appService.getAppSettings().diagnosticLogging"
+                <mat-slide-toggle color="primary" [checked]="appService.getAppSettings().diagnosticLogging"
                     (change)="toggleDiagnosticLogging($event.checked)">
                     {{ 'common.legal.consent.loggingToggle' | transloco }}
                 </mat-slide-toggle>
@@ -146,8 +140,7 @@
                         </p>
                     </div>
                 </div>
-                <mat-slide-toggle color="primary" [disabled]="!isAgeConfirmed"
-                    [checked]="appService.getAppSettings().backupOnExit" (change)="toggleBackupOnExit($event.checked)">
+                <mat-slide-toggle color="primary" [checked]="appService.getAppSettings().backupOnExit" (change)="toggleBackupOnExit($event.checked)">
                     {{ 'common.legal.consent.backupToggle' | transloco }}
                 </mat-slide-toggle>
             </section>

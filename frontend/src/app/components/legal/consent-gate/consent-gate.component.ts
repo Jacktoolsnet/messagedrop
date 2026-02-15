@@ -156,10 +156,6 @@ export class ConsentGateComponent implements OnInit, OnDestroy {
     this.appService.setAppSettings({ ...current, backupOnExit: enabled });
   }
 
-  get isAgeConfirmed(): boolean {
-    return this.hasAgeConsent(this.appService.getAppSettings().consentSettings);
-  }
-
   get ageConsentSelection(): 'adult' | 'minor' | null {
     const consent = this.appService.getAppSettings().consentSettings;
     if (consent.ageAdultConfirmed) {
