@@ -71,6 +71,7 @@
     "pinSet": "A parental PIN is already configured.",
     "pinPending": "New parent PIN captured. Save with Apply.",
     "pinMissing": "Set a parental PIN before saving.",
+    "pinSetFirst": "Please set a parental PIN first.",
     "pinSetAction": "Set parent PIN",
     "pinChangeAction": "Change parent PIN",
     "pinDeleteAction": "Remove parent PIN",

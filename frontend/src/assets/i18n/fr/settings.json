@@ -71,6 +71,7 @@
     "pinSet": "Un PIN parental est déjà configuré.",
     "pinPending": "Nouveau PIN parental saisi. Enregistrez avec Valider.",
     "pinMissing": "Définissez un PIN parental avant d'enregistrer.",
+    "pinSetFirst": "Veuillez d'abord définir un PIN parental.",
     "pinSetAction": "Définir le PIN parental",
     "pinChangeAction": "Modifier le PIN parental",
     "pinDeleteAction": "Supprimer le PIN parental",

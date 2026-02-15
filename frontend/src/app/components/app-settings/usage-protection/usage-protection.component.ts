@@ -77,7 +77,6 @@ export class UsageProtectionComponent implements OnInit {
   public appSettings: AppSettings = structuredClone(this.dialogData.appSettings);
   public readonly usageModes: UsageProtectionMode[] = ['off', 'self', 'parental'];
   public usageParentPin = '';
-  public usageProtectionWarning = '';
   public usageProtectionUnlocked = false;
   readonly usageDailyLimitMin = 5;
   readonly usageDailyLimitMax = 720;
@@ -119,8 +118,6 @@ export class UsageProtectionComponent implements OnInit {
   }
 
   async onApplyClick(): Promise<void> {
-    this.usageProtectionWarning = '';
-
     const preparedUsageProtection = await this.prepareUsageProtectionSettings(this.appSettings.usageProtection);
     if (!preparedUsageProtection) {
       return;
@@ -150,14 +147,18 @@ export class UsageProtectionComponent implements OnInit {
       }
     }
 
+    const removeParentPin = mode !== 'parental';
     this.appSettings = {
       ...this.appSettings,
       usageProtection: {
         ...this.appSettings.usageProtection,
-        mode
+        mode,
+        parentPinHash: removeParentPin ? undefined : this.appSettings.usageProtection.parentPinHash
       }
     };
-    this.usageProtectionWarning = '';
+    if (removeParentPin) {
+      this.usageParentPin = '';
+    }
   }
 
   async unlockUsageProtectionSettings(): Promise<void> {
@@ -187,7 +188,6 @@ export class UsageProtectionComponent implements OnInit {
       }
     };
     this.usageParentPin = '';
-    this.usageProtectionWarning = '';
     this.usageProtectionUnlocked = true;
   }
 
@@ -195,7 +195,6 @@ export class UsageProtectionComponent implements OnInit {
     if (this.needsUsageProtectionUnlock()) {
       return;
     }
-    this.usageProtectionWarning = '';
     const existingParentHash = this.appSettings.usageProtection.parentPinHash?.trim();
     if (existingParentHash) {
       const verified = await this.verifyCurrentParentPin();
@@ -220,7 +219,7 @@ export class UsageProtectionComponent implements OnInit {
   }
 
   setUsageScheduleEnabled(enabled: boolean): void {
-    if (this.needsUsageProtectionUnlock()) {
+    if (!this.canEditUsageProtectionValues()) {
       return;
     }
     this.appSettings = {
@@ -233,7 +232,7 @@ export class UsageProtectionComponent implements OnInit {
   }
 
   setUsageDailyLimitMinutes(value: number): void {
-    if (this.needsUsageProtectionUnlock()) {
+    if (!this.canEditUsageProtectionValues()) {
       return;
     }
     this.appSettings = {
@@ -246,7 +245,7 @@ export class UsageProtectionComponent implements OnInit {
   }
 
   setUsageSelfExtensionMinutes(value: number): void {
-    if (this.needsUsageProtectionUnlock()) {
+    if (!this.canEditUsageProtectionValues()) {
       return;
     }
     this.appSettings = {
@@ -259,7 +258,7 @@ export class UsageProtectionComponent implements OnInit {
   }
 
   setUsageParentalExtensionMinutes(value: number): void {
-    if (this.needsUsageProtectionUnlock()) {
+    if (!this.canEditUsageProtectionValues()) {
       return;
     }
     this.appSettings = {
@@ -313,14 +312,14 @@ export class UsageProtectionComponent implements OnInit {
   }
 
   setUsageDayStart(day: UsageProtectionDayKey, value: unknown): void {
-    if (this.needsUsageProtectionUnlock()) {
+    if (!this.canEditUsageProtectionValues()) {
       return;
     }
     this.updateUsageTimeField(day, 'start', value);
   }
 
   setUsageDayEnd(day: UsageProtectionDayKey, value: unknown): void {
-    if (this.needsUsageProtectionUnlock()) {
+    if (!this.canEditUsageProtectionValues()) {
       return;
     }
     this.updateUsageTimeField(day, 'end', value);
@@ -390,6 +389,9 @@ export class UsageProtectionComponent implements OnInit {
     if (this.needsUsageProtectionUnlock()) {
       return;
     }
+    if (this.isParentalModeWithoutPin()) {
+      return;
+    }
 
     const dialogRef = this.dialog.open<ValueEditDialogComponent, ValueEditDialogData, ValueEditDialogResult>(
       ValueEditDialogComponent,
@@ -419,7 +421,10 @@ export class UsageProtectionComponent implements OnInit {
     };
 
     if (normalized.mode !== 'parental') {
-      return normalized;
+      return {
+        ...normalized,
+        parentPinHash: undefined
+      };
     }
 
     const pin = this.usageParentPin.trim();
@@ -429,20 +434,19 @@ export class UsageProtectionComponent implements OnInit {
     }
 
     if (!pin && !normalized.parentPinHash) {
-      const messageKey = 'settings.usageProtection.pinMissing';
-      this.usageProtectionWarning = this.translation.t(messageKey);
+      const messageKey = 'settings.usageProtection.pinSetFirst';
       await this.showUsageProtectionMessage(messageKey);
       return null;
     }
 
     if (!this.usageProtectionService.isValidPinFormat(pin)) {
-      this.usageProtectionWarning = this.translation.t('settings.usageProtection.pinFormat');
+      await this.showUsageProtectionMessage('settings.usageProtection.pinFormat');
       return null;
     }
 
     const hashed = await this.usageProtectionService.hashPin(pin);
     if (!hashed) {
-      this.usageProtectionWarning = this.translation.t('settings.usageProtection.pinHashFailed');
+      await this.showUsageProtectionMessage('settings.usageProtection.pinHashFailed');
       return null;
     }
 
@@ -578,6 +582,22 @@ export class UsageProtectionComponent implements OnInit {
 
   private hasParentPinConfigured(settings: UsageProtectionSettings): boolean {
     return Boolean(settings.parentPinHash?.trim());
+  }
+
+  hasParentPinReady(): boolean {
+    return Boolean(this.usageParentPin.trim() || this.appSettings.usageProtection.parentPinHash?.trim());
+  }
+
+  isParentalModeWithoutPin(): boolean {
+    return this.appSettings.usageProtection.mode === 'parental' && !this.hasParentPinReady();
+  }
+
+  canEditUsageProtectionValues(): boolean {
+    return !this.needsUsageProtectionUnlock() && !this.isParentalModeWithoutPin();
+  }
+
+  isApplyDisabled(): boolean {
+    return this.isParentalModeWithoutPin();
   }
 
   needsUsageProtectionUnlock(): boolean {

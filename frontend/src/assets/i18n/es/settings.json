@@ -71,6 +71,7 @@
     "pinSet": "Ya hay un PIN parental configurado.",
     "pinPending": "Nuevo PIN parental capturado. Guarda con Aplicar.",
     "pinMissing": "Define un PIN parental antes de guardar.",
+    "pinSetFirst": "Define primero un PIN parental.",
     "pinSetAction": "Definir PIN parental",
     "pinChangeAction": "Cambiar PIN parental",
     "pinDeleteAction": "Eliminar PIN parental",

@@ -161,12 +161,6 @@
   width: 100%;
 }
 
-.usage-protection-warning {
-  margin: 0;
-  font-size: 0.9rem;
-  color: var(--mat-form-field-error-text-color, #ba1a1a);
-}
-
 @media (max-width: 640px) {
   .usage-time-grid {
     grid-template-columns: minmax(0, 1fr);
