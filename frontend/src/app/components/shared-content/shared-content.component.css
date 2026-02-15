@@ -23,3 +23,28 @@ h4 {
     padding: 1rem;
     border-radius: 0.5rem;
 }
+
+.shared-field {
+    margin: 0.75rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.shared-field .label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    opacity: 0.75;
+}
+
+.shared-field p {
+    margin: 0;
+}
+
+.shared-field a {
+    overflow-wrap: anywhere;
+}
+
+.pre-wrap {
+    white-space: pre-wrap;
+}

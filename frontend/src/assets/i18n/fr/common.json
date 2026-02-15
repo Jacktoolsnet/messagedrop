@@ -720,7 +720,13 @@
       "removeContent": "Supprimer le contenu partagé",
       "locationTitle": "Localisation partagée reçue",
       "locationHint": "Aller à la localisation partagée sur la carte.",
-      "removeLocation": "Supprimer la localisation partagée"
+      "removeLocation": "Supprimer la localisation partagée",
+      "genericTitle": "Contenu partagé reçu",
+      "genericHint": "MessageDrop a reçu un contenu partagé depuis une autre application.",
+      "titleLabel": "Titre",
+      "textLabel": "Texte",
+      "urlLabel": "Lien",
+      "empty": "Le contenu partagé n'a pas pu être interprété."
     },
     "systemMessages": {
       "title": "Messages système",

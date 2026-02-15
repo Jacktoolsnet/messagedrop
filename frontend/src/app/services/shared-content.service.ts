@@ -7,16 +7,18 @@ import { OembedService } from './oembed.service';
 
 @Injectable({ providedIn: 'root' })
 export class SharedContentService {
-  private dbName = 'ShareTargets';
-  private storeName = 'shared';
-  private lastKey = 'last';
+  private readonly dbName = 'ShareTargets';
+  private readonly storeName = 'shared';
+  private readonly lastKey = 'last';
 
-  private broadcastChannel = new BroadcastChannel('shared-content');
-  private sharedContentSignal = signal<SharedContent | null>(null);
+  private readonly broadcastChannel = typeof BroadcastChannel !== 'undefined'
+    ? new BroadcastChannel('shared-content')
+    : undefined;
+  private readonly sharedContentSignal = signal<SharedContent | null>(null);
   private readonly oembedService = inject(OembedService);
 
   constructor() {
-    this.broadcastChannel.addEventListener('message', (event) => {
+    this.broadcastChannel?.addEventListener('message', (event) => {
       if (event.data?.type === 'shared' && event.data.content) {
         this.sharedContentSignal.set(event.data.content);
       }
@@ -31,7 +33,7 @@ export class SharedContentService {
     }
 
     this.openDB().then(async () => {
-      const content = await this.getSharedContent('last');
+      const content = await this.getSharedContent(this.lastKey);
       if (content) {
         this.sharedContentSignal.set(content);
       }
@@ -83,8 +85,8 @@ export class SharedContentService {
   public async addSharedContentToMessage(message: Message): Promise<void> {
     const lastMultimediaContent = await this.getSharedContent('lastMultimedia');
     let lastMultimedia: Multimedia | undefined = undefined;
-    if (lastMultimediaContent) {
-      lastMultimedia = await this.oembedService.getObjectFromUrl(lastMultimediaContent!.url) as Multimedia;
+    if (lastMultimediaContent?.url) {
+      lastMultimedia = await this.oembedService.getObjectFromUrl(lastMultimediaContent.url) as Multimedia;
       if (undefined != lastMultimedia) {
         message.multimedia = lastMultimedia;
       }
@@ -94,8 +96,8 @@ export class SharedContentService {
   public async addSharedContentToNote(note: Note): Promise<void> {
     const lastMultimediaContent = await this.getSharedContent('lastMultimedia');
     let lastMultimedia: Multimedia | undefined = undefined;
-    if (lastMultimediaContent) {
-      lastMultimedia = await this.oembedService.getObjectFromUrl(lastMultimediaContent!.url) as Multimedia;
+    if (lastMultimediaContent?.url) {
+      lastMultimedia = await this.oembedService.getObjectFromUrl(lastMultimediaContent.url) as Multimedia;
       if (undefined != lastMultimedia) {
         note.multimedia = lastMultimedia;
       }

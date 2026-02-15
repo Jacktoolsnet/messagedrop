@@ -588,25 +588,32 @@ export class AppComponent implements OnInit {
     }
     let multimedia: Multimedia | undefined = undefined;
     let location: Location | undefined = undefined;
+    const normalizedUrl = typeof content.url === 'string' ? content.url.trim() : '';
 
-    if (content.url) {
-      const objectFromUrl = await this.oembedService.getObjectFromUrl(content.url);
-      if (this.oembedService.isMultimedia(objectFromUrl)) {
-        multimedia = objectFromUrl;
-      } else if (this.oembedService.isLocation(objectFromUrl)) {
-        location = objectFromUrl;
-      } else {
-        this.snackBar.open(JSON.stringify(content, null, 2), this.translation.t('common.actions.ok'), {
-          horizontalPosition: 'center',
-          verticalPosition: 'top',
-        });
+    if (normalizedUrl) {
+      try {
+        const objectFromUrl = await this.oembedService.getObjectFromUrl(normalizedUrl);
+        if (this.oembedService.isMultimedia(objectFromUrl)) {
+          multimedia = objectFromUrl;
+        } else if (this.oembedService.isLocation(objectFromUrl)) {
+          location = objectFromUrl;
+        }
+      } catch (error) {
+        console.warn('Failed to resolve shared content URL', error);
       }
     }
 
     this.sharedContentDialogOpen = true;
     this.lastSharedContentTimestamp = content.timestamp;
     const dialogRef = this.dialog.open(SharedContentComponent, {
-      data: { multimedia, location },
+      data: {
+        multimedia,
+        location,
+        content: {
+          ...content,
+          url: normalizedUrl || null
+        }
+      },
       closeOnNavigation: true,
       minWidth: 'min(450px, 95vw)',
       maxWidth: '90vw',

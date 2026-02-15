@@ -720,7 +720,13 @@
       "removeContent": "Remove shared content",
       "locationTitle": "Shared location received",
       "locationHint": "Jumping to the shared location on the map.",
-      "removeLocation": "Remove shared location"
+      "removeLocation": "Remove shared location",
+      "genericTitle": "Shared content received",
+      "genericHint": "MessageDrop received shared content from another app.",
+      "titleLabel": "Title",
+      "textLabel": "Text",
+      "urlLabel": "Link",
+      "empty": "The shared content could not be parsed."
     },
     "systemMessages": {
       "title": "System messages",

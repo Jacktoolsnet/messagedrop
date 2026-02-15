@@ -720,7 +720,13 @@
       "removeContent": "Geteilten Inhalt entfernen",
       "locationTitle": "Geteilten Standort empfangen",
       "locationHint": "Zur geteilten Position auf der Karte springen.",
-      "removeLocation": "Geteilten Standort entfernen"
+      "removeLocation": "Geteilten Standort entfernen",
+      "genericTitle": "Geteilten Inhalt empfangen",
+      "genericHint": "Ein geteilter Inhalt wurde an MessageDrop übergeben.",
+      "titleLabel": "Titel",
+      "textLabel": "Text",
+      "urlLabel": "Link",
+      "empty": "Der geteilte Inhalt konnte nicht gelesen werden."
     },
     "systemMessages": {
       "title": "Systemnachrichten",
