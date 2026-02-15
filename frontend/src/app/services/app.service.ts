@@ -1,5 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { AppSettings } from '../interfaces/app-settings';
+import { ConsentSettings } from '../interfaces/consent-settings.interface';
 import { NotificationAction } from '../interfaces/notification-action';
 import { DEFAULT_USAGE_PROTECTION_SETTINGS } from '../interfaces/usage-protection-settings';
 import { IndexedDbService } from './indexed-db.service';
@@ -42,7 +43,8 @@ export class AppService {
       disclaimer: false,
       privacyPolicy: false,
       termsOfService: false,
-      ageConfirmed: false
+      ageAdultConfirmed: false,
+      ageMinorWithParentalConsentConfirmed: false
     },
     legalVersion: this.legalVersion,
     acceptedLegalVersion: undefined
@@ -62,14 +64,27 @@ export class AppService {
 
   async setAppSettings(newAppSettings: AppSettings): Promise<void> {
     const current = this.appSettings ?? this.defaultAppSettings;
-    const merged = { ...this.defaultAppSettings, ...current, ...newAppSettings };
+    const merged: AppSettings = {
+      ...this.defaultAppSettings,
+      ...current,
+      ...newAppSettings,
+      usageProtection: {
+        ...this.defaultAppSettings.usageProtection,
+        ...current.usageProtection,
+        ...newAppSettings.usageProtection
+      },
+      consentSettings: this.normalizeConsentSettings({
+        ...current.consentSettings,
+        ...newAppSettings.consentSettings
+      })
+    };
 
     // Wenn alle Zustimmungen erteilt sind, die akzeptierte Version mitschreiben
     const isConsentComplete =
       merged.consentSettings.disclaimer === true &&
       merged.consentSettings.privacyPolicy === true &&
       merged.consentSettings.termsOfService === true &&
-      merged.consentSettings.ageConfirmed === true;
+      this.hasAgeConsent(merged.consentSettings);
 
     merged.acceptedLegalVersion = isConsentComplete ? this.legalVersion : undefined;
     await this.indexedDbService.setSetting('appSettings', JSON.stringify(merged)).then(() => {
@@ -91,7 +106,15 @@ export class AppService {
     try {
       const raw = await this.indexedDbService.getSetting<string>('appSettings');
       const parsed = raw ? JSON.parse(raw) as Partial<AppSettings> : null;
-      this.appSettings = { ...this.defaultAppSettings, ...(parsed ?? {}) };
+      this.appSettings = {
+        ...this.defaultAppSettings,
+        ...(parsed ?? {}),
+        usageProtection: {
+          ...this.defaultAppSettings.usageProtection,
+          ...(parsed?.usageProtection ?? {})
+        },
+        consentSettings: this.normalizeConsentSettings(parsed?.consentSettings)
+      };
 
       // Wenn die gespeicherte Version nicht der aktuellen entspricht, Consent zurücksetzen
       if (this.appSettings.acceptedLegalVersion !== this.legalVersion) {
@@ -102,7 +125,8 @@ export class AppService {
             disclaimer: false,
             privacyPolicy: false,
             termsOfService: false,
-            ageConfirmed: false
+            ageAdultConfirmed: false,
+            ageMinorWithParentalConsentConfirmed: false
           },
           acceptedLegalVersion: undefined,
           legalVersion: this.legalVersion
@@ -123,13 +147,32 @@ export class AppService {
       this.appSettings?.consentSettings.disclaimer === true
       && this.appSettings?.consentSettings.privacyPolicy === true
       && this.appSettings?.consentSettings.termsOfService === true
-      && this.appSettings?.consentSettings.ageConfirmed === true
+      && this.hasAgeConsent(this.appSettings?.consentSettings)
     );
 
     const versionAccepted = this.appSettings?.acceptedLegalVersion === this.legalVersion;
 
     // Consent gilt nur, wenn alle Häkchen gesetzt und die aktuelle Version akzeptiert wurde
     this.consentCompleted = consentsComplete && versionAccepted;
+  }
+
+  private normalizeConsentSettings(input: Partial<ConsentSettings> | undefined): ConsentSettings {
+    const raw = input ?? {};
+    const legacyAgeConfirmed = raw.ageConfirmed === true;
+    return {
+      disclaimer: raw.disclaimer === true,
+      privacyPolicy: raw.privacyPolicy === true,
+      termsOfService: raw.termsOfService === true,
+      ageAdultConfirmed: raw.ageAdultConfirmed === true || (legacyAgeConfirmed && raw.ageMinorWithParentalConsentConfirmed !== true),
+      ageMinorWithParentalConsentConfirmed: raw.ageMinorWithParentalConsentConfirmed === true
+    };
+  }
+
+  private hasAgeConsent(consent: Partial<ConsentSettings> | undefined): boolean {
+    if (!consent) {
+      return false;
+    }
+    return consent.ageAdultConfirmed === true || consent.ageMinorWithParentalConsentConfirmed === true;
   }
 
   // Notification-Daten

@@ -2,7 +2,11 @@ export interface ConsentSettings {
     disclaimer: boolean;
     privacyPolicy: boolean;
     termsOfService: boolean;
-    ageConfirmed: boolean;
+    ageAdultConfirmed: boolean;
+    ageMinorWithParentalConsentConfirmed: boolean;
+    // Legacy field (older app versions)
+    ageConfirmed?: boolean;
 }
 
-export type ConsentKey = keyof ConsentSettings;
+export type LegalConsentKey = 'disclaimer' | 'privacyPolicy' | 'termsOfService';
+export type ConsentKey = LegalConsentKey | 'ageConsent';

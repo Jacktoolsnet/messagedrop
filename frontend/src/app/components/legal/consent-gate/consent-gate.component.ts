@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Observable, Subscription } from 'rxjs';
-import { ConsentKey } from '../../../interfaces/consent-settings.interface';
+import { ConsentKey, ConsentSettings, LegalConsentKey } from '../../../interfaces/consent-settings.interface';
 import { AppService } from '../../../services/app.service';
 import { UsageProtectionComponent } from '../../app-settings/usage-protection/usage-protection.component';
 import { DisclaimerComponent } from '../disclaimer/disclaimer.component';
@@ -39,6 +39,7 @@ export class ConsentGateComponent implements OnInit, OnDestroy {
   public appService = inject(AppService);
   private dialog = inject(MatDialog);
   private sub?: Subscription;
+  private readonly legalConsentKeys: LegalConsentKey[] = ['disclaimer', 'privacyPolicy', 'termsOfService'];
 
   ngOnInit(): void {
     this.computeMissing();
@@ -56,14 +57,19 @@ export class ConsentGateComponent implements OnInit, OnDestroy {
 
   private computeMissing(): void {
     const s = this.appService.getAppSettings();
-    const consents: Partial<Record<ConsentKey, boolean>> = s.consentSettings ?? {};
+    const consents = s.consentSettings ?? this.getDefaultConsentSettings();
     const keys: ConsentKey[] = this.requiredKeys?.length
       ? this.requiredKeys
-      : (Object.keys(consents) as ConsentKey[]);
+      : [...this.legalConsentKeys, 'ageConsent'];
 
     const versionMismatch = s.acceptedLegalVersion !== this.appService.getLegalVersion();
 
-    this.missing = keys.filter(k => !consents[k]);
+    this.missing = keys.filter((k) => {
+      if (k === 'ageConsent') {
+        return !this.hasAgeConsent(consents);
+      }
+      return consents[k] !== true;
+    });
     this.show = this.missing.length > 0 || versionMismatch;
   }
 
@@ -73,7 +79,7 @@ export class ConsentGateComponent implements OnInit, OnDestroy {
       disclaimer: 'Disclaimer',
       privacyPolicy: 'Privacy Policy',
       termsOfService: 'Terms of Service',
-      ageConfirmed: 'I confirm I am at least 16 years old'
+      ageConsent: 'Age and parental consent'
     };
     if (map[k]) return map[k];
     return k.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase()).trim();
@@ -119,16 +125,24 @@ export class ConsentGateComponent implements OnInit, OnDestroy {
       }).afterClosed().subscribe(() => this.computeMissing());
       return;
     }
-    if (key === 'ageConfirmed') {
-      this.toggleAgeConfirmed(true);
+    if (key === 'ageConsent') {
       return;
     }
   }
 
-  toggleAgeConfirmed(val: boolean): void {
+  setAgeConsentSelection(selection: 'adult' | 'minor' | null | undefined): void {
+    if (selection !== 'adult' && selection !== 'minor') {
+      return;
+    }
     const current = this.appService.getAppSettings();
-    current.consentSettings.ageConfirmed = val;
-    this.appService.setAppSettings(current);
+    void this.appService.setAppSettings({
+      ...current,
+      consentSettings: {
+        ...current.consentSettings,
+        ageAdultConfirmed: selection === 'adult',
+        ageMinorWithParentalConsentConfirmed: selection === 'minor'
+      }
+    });
     this.computeMissing();
   }
 
@@ -143,7 +157,49 @@ export class ConsentGateComponent implements OnInit, OnDestroy {
   }
 
   get isAgeConfirmed(): boolean {
-    return this.appService.getAppSettings().consentSettings.ageConfirmed === true;
+    return this.hasAgeConsent(this.appService.getAppSettings().consentSettings);
+  }
+
+  get ageConsentSelection(): 'adult' | 'minor' | null {
+    const consent = this.appService.getAppSettings().consentSettings;
+    if (consent.ageAdultConfirmed) {
+      return 'adult';
+    }
+    if (consent.ageMinorWithParentalConsentConfirmed) {
+      return 'minor';
+    }
+    return null;
+  }
+
+  toggleAgeConsent(selection: 'adult' | 'minor', enabled: boolean): void {
+    if (enabled) {
+      this.setAgeConsentSelection(selection);
+      return;
+    }
+    const current = this.appService.getAppSettings();
+    void this.appService.setAppSettings({
+      ...current,
+      consentSettings: {
+        ...current.consentSettings,
+        ageAdultConfirmed: false,
+        ageMinorWithParentalConsentConfirmed: false
+      }
+    });
+    this.computeMissing();
+  }
+
+  private hasAgeConsent(consent: ConsentSettings): boolean {
+    return consent.ageAdultConfirmed === true || consent.ageMinorWithParentalConsentConfirmed === true;
+  }
+
+  private getDefaultConsentSettings(): ConsentSettings {
+    return {
+      disclaimer: false,
+      privacyPolicy: false,
+      termsOfService: false,
+      ageAdultConfirmed: false,
+      ageMinorWithParentalConsentConfirmed: false
+    };
   }
 
   public editExternalContentSettings() {

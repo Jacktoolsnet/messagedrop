@@ -14,84 +14,6 @@
 
             <section class="tile">
                 <div class="tile-header">
-                    <mat-icon>how_to_reg</mat-icon>
-                    <div>
-                        <div class="tile-title">{{ 'common.legal.consent.ageConfirm' | transloco }}</div>
-                        <div class="tile-subtitle">{{ 'common.legal.consent.ageNote' | transloco }}</div>
-                    </div>
-                </div>
-                <mat-slide-toggle class="age-toggle" color="primary"
-                    [checked]="appService.getAppSettings().consentSettings.ageConfirmed"
-                    (change)="toggleAgeConfirmed($event.checked)">
-                    {{ 'common.legal.consent.ageConfirm' | transloco }}
-                </mat-slide-toggle>
-            </section>
-
-            <section class="tile">
-                <div class="tile-header">
-                    <mat-icon>public</mat-icon>
-                    <div>
-                        <div class="tile-title">{{ 'common.legal.consent.externalTitle' | transloco }}</div>
-                        <div class="tile-subtitle">{{ 'common.legal.consent.externalSubtitle' | transloco }}</div>
-                    </div>
-                </div>
-                <button type="button" class="consent-button" mat-flat-button (click)="editExternalContentSettings()"
-                    [disabled]="!isAgeConfirmed">
-                    {{ 'common.legal.consent.externalButton' | transloco }}
-                </button>
-            </section>
-
-            <section class="tile">
-                <div class="tile-header">
-                    <mat-icon>timer</mat-icon>
-                    <div>
-                        <div class="tile-title">{{ 'common.legal.consent.usageTitle' | transloco }}</div>
-                        <div class="tile-subtitle">{{ 'common.legal.consent.usageSubtitle' | transloco }}</div>
-                    </div>
-                </div>
-                <button type="button" class="consent-button" mat-flat-button (click)="editUsageProtectionSettings()"
-                    [disabled]="!isAgeConfirmed">
-                    {{ 'common.legal.consent.usageButton' | transloco }}
-                </button>
-            </section>
-
-            <section class="tile">
-                <div class="tile-header">
-                    <mat-icon>bug_report</mat-icon>
-                    <div>
-                        <div class="tile-title">{{ 'common.legal.consent.loggingTitle' | transloco }}</div>
-                        <div class="tile-subtitle">{{ 'common.legal.consent.loggingSubtitle' | transloco }}</div>
-                        <p class="age-note">
-                            {{ 'common.legal.consent.loggingNote' | transloco }}
-                        </p>
-                    </div>
-                </div>
-                <mat-slide-toggle color="primary" [disabled]="!isAgeConfirmed"
-                    [checked]="appService.getAppSettings().diagnosticLogging"
-                    (change)="toggleDiagnosticLogging($event.checked)">
-                    {{ 'common.legal.consent.loggingToggle' | transloco }}
-                </mat-slide-toggle>
-            </section>
-
-            <section class="tile">
-                <div class="tile-header">
-                    <mat-icon>save</mat-icon>
-                    <div>
-                        <div class="tile-title">{{ 'common.legal.consent.backupTitle' | transloco }}</div>
-                        <div class="tile-subtitle">{{ 'common.legal.consent.backupSubtitle' | transloco }}</div>
-                        <p class="age-note">
-                            {{ 'common.legal.consent.backupNote' | transloco }}
-                        </p>
-                    </div>
-                </div>
-                <mat-slide-toggle color="primary" [disabled]="!isAgeConfirmed"
-                    [checked]="appService.getAppSettings().backupOnExit" (change)="toggleBackupOnExit($event.checked)">
-                    {{ 'common.legal.consent.backupToggle' | transloco }}
-                </mat-slide-toggle>
-            </section>
-
-            <section class="tile">
-                <div class="tile-header">
                     <mat-icon>gavel</mat-icon>
                     <div>
                         <div class="tile-title">{{ 'common.legal.consent.legalTitle' | transloco }}</div>
@@ -141,6 +63,95 @@
                     }}
                 </button>
             </section>
+
+            <section class="tile">
+                <div class="tile-header">
+                    <mat-icon>how_to_reg</mat-icon>
+                    <div>
+                        <div class="tile-title">{{ 'common.legal.consent.ageTitle' | transloco }}</div>
+                        <div class="tile-subtitle">{{ 'common.legal.consent.ageNote' | transloco }}</div>
+                        <p class="tile-note">
+                            {{ 'common.legal.consent.ageParentNote' | transloco }}
+                        </p>
+                    </div>
+                </div>
+                <div class="age-consent-toggle-list">
+                    <mat-slide-toggle color="primary" class="age-consent-toggle"
+                        [checked]="ageConsentSelection === 'minor'"
+                        (change)="toggleAgeConsent('minor', $event.checked)">
+                        {{ 'common.legal.consent.ageOptionMinorWithConsent' | transloco }}
+                    </mat-slide-toggle>
+                    <mat-slide-toggle color="primary" class="age-consent-toggle"
+                        [checked]="ageConsentSelection === 'adult'"
+                        (change)="toggleAgeConsent('adult', $event.checked)">
+                        {{ 'common.legal.consent.ageOptionAdult' | transloco }}
+                    </mat-slide-toggle>
+                </div>
+            </section>
+
+            <section class="tile">
+                <div class="tile-header">
+                    <mat-icon>public</mat-icon>
+                    <div>
+                        <div class="tile-title">{{ 'common.legal.consent.externalTitle' | transloco }}</div>
+                        <div class="tile-subtitle">{{ 'common.legal.consent.externalSubtitle' | transloco }}</div>
+                    </div>
+                </div>
+                <button type="button" class="consent-button" mat-flat-button (click)="editExternalContentSettings()"
+                    [disabled]="!isAgeConfirmed">
+                    {{ 'common.legal.consent.externalButton' | transloco }}
+                </button>
+            </section>
+
+            <section class="tile">
+                <div class="tile-header">
+                    <mat-icon>timer</mat-icon>
+                    <div>
+                        <div class="tile-title">{{ 'common.legal.consent.usageTitle' | transloco }}</div>
+                        <div class="tile-subtitle">{{ 'common.legal.consent.usageSubtitle' | transloco }}</div>
+                    </div>
+                </div>
+                <button type="button" class="consent-button" mat-flat-button (click)="editUsageProtectionSettings()"
+                    [disabled]="!isAgeConfirmed">
+                    {{ 'common.legal.consent.usageButton' | transloco }}
+                </button>
+            </section>
+
+            <section class="tile">
+                <div class="tile-header">
+                    <mat-icon>bug_report</mat-icon>
+                    <div>
+                        <div class="tile-title">{{ 'common.legal.consent.loggingTitle' | transloco }}</div>
+                        <div class="tile-subtitle">{{ 'common.legal.consent.loggingSubtitle' | transloco }}</div>
+                        <p class="tile-note">
+                            {{ 'common.legal.consent.loggingNote' | transloco }}
+                        </p>
+                    </div>
+                </div>
+                <mat-slide-toggle color="primary" [disabled]="!isAgeConfirmed"
+                    [checked]="appService.getAppSettings().diagnosticLogging"
+                    (change)="toggleDiagnosticLogging($event.checked)">
+                    {{ 'common.legal.consent.loggingToggle' | transloco }}
+                </mat-slide-toggle>
+            </section>
+
+            <section class="tile">
+                <div class="tile-header">
+                    <mat-icon>save</mat-icon>
+                    <div>
+                        <div class="tile-title">{{ 'common.legal.consent.backupTitle' | transloco }}</div>
+                        <div class="tile-subtitle">{{ 'common.legal.consent.backupSubtitle' | transloco }}</div>
+                        <p class="tile-note">
+                            {{ 'common.legal.consent.backupNote' | transloco }}
+                        </p>
+                    </div>
+                </div>
+                <mat-slide-toggle color="primary" [disabled]="!isAgeConfirmed"
+                    [checked]="appService.getAppSettings().backupOnExit" (change)="toggleBackupOnExit($event.checked)">
+                    {{ 'common.legal.consent.backupToggle' | transloco }}
+                </mat-slide-toggle>
+            </section>
+
         </div>
     </div>
 </div>

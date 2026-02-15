@@ -86,15 +86,28 @@
     margin-bottom: 0.5rem;
 }
 
-.age-note {
+.tile-note {
     margin: 0.25rem 0 0 0;
     font-size: 0.95rem;
     color: var(--mat-app-text-color);
 }
 
-.age-toggle {
-    margin-top: 0.25rem;
-    margin-bottom: 1rem;
+.age-consent-toggle-list {
+    margin-top: 0.5rem;
+    width: 100%;
+    display: grid;
+    gap: 0.45rem;
+}
+
+.age-consent-toggle {
+    width: 100%;
+    display: block;
+
+    ::ng-deep .mdc-label {
+        white-space: normal;
+        line-height: 1.35;
+        font-size: 0.95rem;
+    }
 }
 
 @media (max-width: 768px) {
