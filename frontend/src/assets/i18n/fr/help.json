@@ -358,6 +358,10 @@
         "title": "Paramètres de l'app",
         "desc": "Ouvre les paramètres globaux comme le thème, la langue, le stockage et les options de sauvegarde."
       },
+      "usageProtection": {
+        "title": "Protection d'usage",
+        "desc": "Ouvre les réglages de limite quotidienne, plages horaires et PIN parental."
+      },
       "searchSettings": {
         "title": "Paramètres de recherche",
         "desc": "Définit quelles sources de données s'affichent sur la carte et à partir de quel niveau de zoom elles sont chargées."
@@ -535,8 +539,8 @@
         "desc": "En mode parental, seul un PIN parental valide déverrouille l'usage après la limite quotidienne."
       },
       "settings": {
-        "title": "Ouvrir les paramètres de l'app",
-        "desc": "Utilisez cette action pour ajuster les paramètres de protection d'usage."
+        "title": "Ouvrir la protection d'usage",
+        "desc": "Ouvre directement le dialogue des limites d'usage et du mode de déverrouillage."
       },
       "help": {
         "title": "Ouvrir l'aide",

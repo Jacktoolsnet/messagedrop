@@ -43,6 +43,20 @@
 
             <section class="tile">
                 <div class="tile-header">
+                    <mat-icon>timer</mat-icon>
+                    <div>
+                        <div class="tile-title">{{ 'common.legal.consent.usageTitle' | transloco }}</div>
+                        <div class="tile-subtitle">{{ 'common.legal.consent.usageSubtitle' | transloco }}</div>
+                    </div>
+                </div>
+                <button type="button" class="consent-button" mat-flat-button (click)="editUsageProtectionSettings()"
+                    [disabled]="!isAgeConfirmed">
+                    {{ 'common.legal.consent.usageButton' | transloco }}
+                </button>
+            </section>
+
+            <section class="tile">
+                <div class="tile-header">
                     <mat-icon>bug_report</mat-icon>
                     <div>
                         <div class="tile-title">{{ 'common.legal.consent.loggingTitle' | transloco }}</div>

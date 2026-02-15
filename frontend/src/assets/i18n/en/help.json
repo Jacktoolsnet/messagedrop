@@ -358,6 +358,10 @@
         "title": "App settings",
         "desc": "Opens global settings such as theme, language, storage, and backup options."
       },
+      "usageProtection": {
+        "title": "Usage protection",
+        "desc": "Opens settings for daily limits, time windows, and parental PIN."
+      },
       "searchSettings": {
         "title": "Search settings",
         "desc": "Defines which data sources are visible on the map and the minimum zoom level to load them."
@@ -535,8 +539,8 @@
         "desc": "In parental mode, only a valid parent PIN unlocks usage after the daily limit."
       },
       "settings": {
-        "title": "Open app settings",
-        "desc": "Use this action to adjust usage protection settings."
+        "title": "Open usage protection",
+        "desc": "Opens the dedicated dialog for usage limits and unlock mode."
       },
       "help": {
         "title": "Open help",

@@ -397,6 +397,11 @@ const HELP_TOPICS = {
         descriptionKey: 'appMenu.items.appSettings.desc'
       },
       {
+        icon: 'timer',
+        titleKey: 'appMenu.items.usageProtection.title',
+        descriptionKey: 'appMenu.items.usageProtection.desc'
+      },
+      {
         icon: 'manage_search',
         titleKey: 'appMenu.items.searchSettings.title',
         descriptionKey: 'appMenu.items.searchSettings.desc'
@@ -548,11 +553,6 @@ const HELP_TOPICS = {
         descriptionKey: 'appSettings.items.storage.desc'
       },
       {
-        icon: 'timer',
-        titleKey: 'appSettings.items.usageProtection.title',
-        descriptionKey: 'appSettings.items.usageProtection.desc'
-      },
-      {
         icon: 'bug_report',
         titleKey: 'appSettings.items.logging.title',
         descriptionKey: 'appSettings.items.logging.desc'
@@ -614,7 +614,7 @@ const HELP_TOPICS = {
         descriptionKey: 'usageProtectionLock.items.parentPin.desc'
       },
       {
-        icon: 'settings_applications',
+        icon: 'timer',
         titleKey: 'usageProtectionLock.items.settings.title',
         descriptionKey: 'usageProtectionLock.items.settings.desc'
       },

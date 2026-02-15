@@ -358,6 +358,10 @@
         "title": "Ajustes de la app",
         "desc": "Abre ajustes globales como tema, idioma, almacenamiento y opciones de copia de seguridad."
       },
+      "usageProtection": {
+        "title": "Protección de uso",
+        "desc": "Abre la configuración de límite diario, franjas horarias y PIN parental."
+      },
       "searchSettings": {
         "title": "Ajustes de búsqueda",
         "desc": "Define qué fuentes de datos se muestran en el mapa y desde qué nivel de zoom se cargan."
@@ -535,8 +539,8 @@
         "desc": "En modo parental, solo un PIN parental válido desbloquea el uso tras el límite diario."
       },
       "settings": {
-        "title": "Abrir ajustes de la app",
-        "desc": "Usa esta acción para ajustar la protección de uso."
+        "title": "Abrir protección de uso",
+        "desc": "Abre directamente el diálogo de límites de uso y modo de desbloqueo."
       },
       "help": {
         "title": "Abrir ayuda",

@@ -16,6 +16,7 @@ import { firstValueFrom } from 'rxjs';
 import { environment } from '../environments/environment';
 import { AirQualityComponent } from './components/air-quality/air-quality.component';
 import { AppSettingsComponent } from './components/app-settings/app-settings.component';
+import { UsageProtectionComponent } from './components/app-settings/usage-protection/usage-protection.component';
 import { ContactlistComponent } from './components/contactlist/contactlist.component';
 import { DocumentlistComponent } from './components/documentlist/documentlist.component';
 import { EditMessageComponent } from './components/editmessage/edit-message.component';
@@ -1628,6 +1629,20 @@ export class AppComponent implements OnInit {
       disableClose: false,
     });
 
+  }
+
+  public openUsageProtectionSettings() {
+    this.dialog.open(UsageProtectionComponent, {
+      data: { appSettings: this.appService.getAppSettings() },
+      closeOnNavigation: true,
+      maxHeight: '90vh',
+      width: '800px',
+      maxWidth: '90vw',
+      autoFocus: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+    });
   }
 
   public openSearchSettings(): void {

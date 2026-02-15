@@ -37,8 +37,8 @@
         }
 
         <div class="usage-protection-actions">
-            <button mat-stroked-button type="button" (click)="editAppSettings()">
-                {{ 'common.menu.appSettings' | transloco }}
+            <button mat-stroked-button type="button" (click)="openUsageProtectionSettings()">
+                {{ 'common.menu.usageProtectionSettings' | transloco }}
             </button>
             <button mat-stroked-button type="button" (click)="openUsageProtectionHelp()">
                 {{ 'common.actions.help' | transloco }}
@@ -180,6 +180,10 @@
     <button mat-menu-item (click)="editAppSettings()">
         <mat-icon>settings_applications</mat-icon>
         <span>{{ 'common.menu.appSettings' | transloco }}</span>
+    </button>
+    <button mat-menu-item (click)="openUsageProtectionSettings()">
+        <mat-icon>timer</mat-icon>
+        <span>{{ 'common.menu.usageProtectionSettings' | transloco }}</span>
     </button>
     <button mat-menu-item (click)="openSearchSettings()">
         <mat-icon>manage_search</mat-icon>

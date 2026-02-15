@@ -358,6 +358,10 @@
         "title": "App-Einstellungen",
         "desc": "Öffnet globale Einstellungen wie Design, Sprache, Speicher- und Backup-Optionen."
       },
+      "usageProtection": {
+        "title": "Nutzungszeit-Schutz",
+        "desc": "Öffnet die Einstellungen für Tageslimit, Zeitfenster und Eltern-PIN."
+      },
       "searchSettings": {
         "title": "Sucheinstellungen",
         "desc": "Legt fest, welche Quellen auf der Karte sichtbar sind und ab welchem Zoomlevel sie geladen werden."
@@ -535,8 +539,8 @@
         "desc": "Im Elternmodus entsperrt nach dem Tageslimit nur eine gültige Eltern-PIN die Nutzung."
       },
       "settings": {
-        "title": "App-Einstellungen öffnen",
-        "desc": "Mit dieser Aktion passt du die Einstellungen zum Nutzungszeit-Schutz an."
+        "title": "Nutzungszeit-Schutz öffnen",
+        "desc": "Öffnet direkt den Dialog für Nutzungszeit-Limits und Entsperrmodus."
       },
       "help": {
         "title": "Hilfe öffnen",

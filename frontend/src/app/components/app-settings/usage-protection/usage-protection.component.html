@@ -1,0 +1,168 @@
+<app-dialog-header
+  icon="timer"
+  [title]="'settings.usageProtection.title' | transloco">
+</app-dialog-header>
+
+<mat-dialog-content class="content">
+  <section class="usage-protection-tile">
+    <p class="usage-protection-note">
+      {{ 'settings.usageProtection.note' | transloco }}
+    </p>
+
+    @if (needsUsageProtectionUnlock()) {
+      <p class="usage-protection-pin-state">
+        {{ 'settings.usageProtection.unlockRequired' | transloco }}
+      </p>
+      <button mat-stroked-button type="button" (click)="unlockUsageProtectionSettings()">
+        {{ 'settings.usageProtection.unlockAction' | transloco }}
+      </button>
+    } @else {
+      <mat-button-toggle-group [hideSingleSelectionIndicator]="true" [value]="appSettings.usageProtection.mode"
+        (change)="setUsageMode($event.value)" class="usage-mode-toggle-group" exclusive
+        [attr.aria-label]="'settings.usageProtection.modeLabel' | transloco">
+        @for (mode of usageModes; track mode) {
+          <mat-button-toggle [value]="mode">
+            {{ ('settings.usageProtection.mode.' + mode) | transloco }}
+          </mat-button-toggle>
+        }
+      </mat-button-toggle-group>
+
+      @if (appSettings.usageProtection.mode !== 'off') {
+        @if (appSettings.usageProtection.mode === 'parental') {
+          <section class="usage-slider-block usage-parent-pin-tile">
+            <p class="usage-protection-pin-state usage-parent-pin-state">
+              @if (usageParentPin) {
+                {{ 'settings.usageProtection.pinPending' | transloco }}
+              } @else if (appSettings.usageProtection.parentPinHash) {
+                {{ 'settings.usageProtection.pinSet' | transloco }}
+              } @else {
+                {{ 'settings.usageProtection.pinMissing' | transloco }}
+              }
+            </p>
+            <div class="usage-parent-pin-actions">
+              <button mat-stroked-button type="button" (click)="openUsageParentPinDialog()">
+                @if (usageParentPin || appSettings.usageProtection.parentPinHash) {
+                  {{ 'settings.usageProtection.pinChangeAction' | transloco }}
+                } @else {
+                  {{ 'settings.usageProtection.pinSetAction' | transloco }}
+                }
+              </button>
+              @if (hasConfiguredParentPin()) {
+                <button mat-stroked-button type="button" (click)="removeUsageParentPin()">
+                  {{ 'settings.usageProtection.pinDeleteAction' | transloco }}
+                </button>
+              }
+            </div>
+          </section>
+        }
+
+        <section class="usage-slider-block">
+          <div class="usage-slider-header">
+            <p class="usage-slider-label">{{ 'settings.usageProtection.dailyLimit' | transloco }}</p>
+            <button mat-icon-button type="button" class="usage-slider-edit-button" (click)="openUsageDailyLimitEditor()"
+              [attr.aria-label]="('common.actions.edit' | transloco) + ' ' + ('settings.usageProtection.dailyLimit' | transloco)">
+              <mat-icon>edit</mat-icon>
+            </button>
+          </div>
+          <mat-slider [min]="usageDailyLimitMin" [max]="usageDailyLimitMax" [step]="usageDailyLimitStep" discrete>
+            <input matSliderThumb [value]="appSettings.usageProtection.dailyLimitMinutes"
+              (valueChange)="setUsageDailyLimitMinutes($event)">
+          </mat-slider>
+          <p class="usage-slider-value">{{ appSettings.usageProtection.dailyLimitMinutes }}</p>
+        </section>
+
+        @if (appSettings.usageProtection.mode === 'self') {
+          <section class="usage-slider-block">
+            <div class="usage-slider-header">
+              <p class="usage-slider-label">{{ 'settings.usageProtection.selfExtension' | transloco }}</p>
+              <button mat-icon-button type="button" class="usage-slider-edit-button" (click)="openUsageSelfExtensionEditor()"
+                [attr.aria-label]="('common.actions.edit' | transloco) + ' ' + ('settings.usageProtection.selfExtension' | transloco)">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </div>
+            <mat-slider [min]="usageSelfExtensionMin" [max]="usageSelfExtensionMax" [step]="usageSelfExtensionStep" discrete>
+              <input matSliderThumb [value]="appSettings.usageProtection.selfExtensionMinutes"
+                (valueChange)="setUsageSelfExtensionMinutes($event)">
+            </mat-slider>
+            <p class="usage-slider-value">{{ appSettings.usageProtection.selfExtensionMinutes }}</p>
+          </section>
+        }
+
+        @if (appSettings.usageProtection.mode === 'parental') {
+          <section class="usage-slider-block">
+            <div class="usage-slider-header">
+              <p class="usage-slider-label">{{ 'settings.usageProtection.parentalExtension' | transloco }}</p>
+              <button mat-icon-button type="button" class="usage-slider-edit-button" (click)="openUsageParentalExtensionEditor()"
+                [attr.aria-label]="('common.actions.edit' | transloco) + ' ' + ('settings.usageProtection.parentalExtension' | transloco)">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </div>
+            <mat-slider [min]="usageParentalExtensionMin" [max]="usageParentalExtensionMax" [step]="usageParentalExtensionStep" discrete>
+              <input matSliderThumb [value]="appSettings.usageProtection.parentalExtensionMinutes"
+                (valueChange)="setUsageParentalExtensionMinutes($event)">
+            </mat-slider>
+            <p class="usage-slider-value">{{ appSettings.usageProtection.parentalExtensionMinutes }}</p>
+          </section>
+        }
+
+        <section class="usage-slider-block usage-schedule-toggle-tile">
+          <mat-slide-toggle color="primary" [checked]="appSettings.usageProtection.scheduleEnabled"
+            (change)="setUsageScheduleEnabled($event.checked)">
+            {{ 'settings.usageProtection.scheduleToggle' | transloco }}
+          </mat-slide-toggle>
+          @if (appSettings.usageProtection.scheduleEnabled) {
+            <p class="usage-schedule-heading">{{ 'settings.usageProtection.scheduleByDay' | transloco }}</p>
+            <div class="usage-time-grid">
+              @for (day of usageScheduleDays; track day) {
+                <section class="usage-day-tile">
+                  <h4>{{ ('settings.usageProtection.days.' + day) | transloco }}</h4>
+                  <mat-form-field appearance="fill" class="usage-day-time-field">
+                    <mat-label>{{ 'settings.usageProtection.startLabel' | transloco }}</mat-label>
+                    <input
+                      matInput
+                      [matTimepicker]="startPicker"
+                      [ngModel]="getUsageDayStartDate(day)"
+                      (ngModelChange)="setUsageDayStart(day, $event)"
+                      readonly>
+                    <mat-timepicker-toggle matSuffix [for]="startPicker"></mat-timepicker-toggle>
+                    <mat-timepicker #startPicker interval="5m"></mat-timepicker>
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="usage-day-time-field">
+                    <mat-label>{{ 'settings.usageProtection.endLabel' | transloco }}</mat-label>
+                    <input
+                      matInput
+                      [matTimepicker]="endPicker"
+                      [ngModel]="getUsageDayEndDate(day)"
+                      (ngModelChange)="setUsageDayEnd(day, $event)"
+                      readonly>
+                    <mat-timepicker-toggle matSuffix [for]="endPicker"></mat-timepicker-toggle>
+                    <mat-timepicker #endPicker interval="5m"></mat-timepicker>
+                  </mat-form-field>
+                </section>
+              }
+            </div>
+          }
+        </section>
+      }
+    }
+
+    @if (usageProtectionWarning) {
+      <p class="usage-protection-warning">{{ usageProtectionWarning }}</p>
+    }
+  </section>
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-dialog-close cdkFocusInitial (click)="onCloseClick()" mat-icon-button
+    [attr.aria-label]="'common.actions.close' | transloco" class="action-close">
+    <mat-icon>close</mat-icon>
+  </button>
+  <button mat-icon-button type="button" (click)="help.open('usageProtectionLock')"
+    [attr.aria-label]="'common.actions.help' | transloco">
+    <mat-icon>help</mat-icon>
+  </button>
+  <button mat-icon-button color="primary" [attr.aria-label]="'common.actions.apply' | transloco"
+    (click)="onApplyClick()">
+    <mat-icon>check</mat-icon>
+  </button>
+</mat-dialog-actions>

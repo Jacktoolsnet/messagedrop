@@ -9,6 +9,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { Observable, Subscription } from 'rxjs';
 import { ConsentKey } from '../../../interfaces/consent-settings.interface';
 import { AppService } from '../../../services/app.service';
+import { UsageProtectionComponent } from '../../app-settings/usage-protection/usage-protection.component';
 import { DisclaimerComponent } from '../disclaimer/disclaimer.component';
 import { ExternalContentComponent } from '../external-content/external-content.component';
 import { PrivacyPolicyComponent } from '../privacy-policy/privacy-policy.component';
@@ -147,6 +148,22 @@ export class ConsentGateComponent implements OnInit, OnDestroy {
 
   public editExternalContentSettings() {
     const dialogRef = this.dialog.open(ExternalContentComponent, {
+      data: { appSettings: this.appService.getAppSettings() },
+      closeOnNavigation: true,
+      maxHeight: '90vh',
+      width: '800px',
+      maxWidth: '90vw',
+      autoFocus: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+    });
+
+    dialogRef.afterClosed().subscribe(() => this.computeMissing());
+  }
+
+  public editUsageProtectionSettings() {
+    const dialogRef = this.dialog.open(UsageProtectionComponent, {
       data: { appSettings: this.appService.getAppSettings() },
       closeOnNavigation: true,
       maxHeight: '90vh',
