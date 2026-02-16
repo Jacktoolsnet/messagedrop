@@ -91,7 +91,7 @@ async function handleShareTargetPost(event) {
         };
 
         await deliverToClientAndSave(sharedContent, type);
-        return caches.match('/index.html') || fetch('/index.html');
+        return Response.redirect('/', 303);
     } catch (err) {
         return new Response('Error processing POST share target', { status: 500 });
     }
@@ -117,7 +117,7 @@ async function handleShareTargetGet(urlObj) {
         };
 
         await deliverToClientAndSave(sharedContent, type);
-        return caches.match('/index.html') || fetch('/index.html');
+        return Response.redirect('/', 302);
     } catch (err) {
         return new Response('Error processing GET share target', { status: 500 });
     }

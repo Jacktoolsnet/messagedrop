@@ -336,11 +336,27 @@ export class AppComponent implements OnInit {
         return;
       }
       this.pendingSharedContent = content;
-      if (!this.appService.isConsentCompleted()) {
+      if (!this.appService.isConsentCompleted() || !this.isAppVisible()) {
         return;
       }
-      this.handleSharedContent(content);
+      void this.handleSharedContent(content);
     });
+
+    if (typeof document !== 'undefined') {
+      const onVisibilityChange = () => {
+        if (document.visibilityState === 'visible') {
+          this.flushPendingSharedContent();
+        }
+      };
+      document.addEventListener('visibilitychange', onVisibilityChange);
+      this.destroyRef.onDestroy(() => document.removeEventListener('visibilitychange', onVisibilityChange));
+    }
+
+    if (typeof window !== 'undefined') {
+      const onWindowFocus = () => this.flushPendingSharedContent();
+      window.addEventListener('focus', onWindowFocus);
+      this.destroyRef.onDestroy(() => window.removeEventListener('focus', onWindowFocus));
+    }
 
     this.initApp();
   }
@@ -585,6 +601,10 @@ export class AppComponent implements OnInit {
   }
 
   private async handleSharedContent(content: SharedContent) {
+    if (!this.isAppVisible()) {
+      this.pendingSharedContent = content;
+      return;
+    }
     if (this.sharedContentDialogOpen) {
       this.pendingSharedContent = content;
       return;
@@ -636,16 +656,25 @@ export class AppComponent implements OnInit {
       if (result) {
         this.userService.saveProfile();
       }
-      if (this.pendingSharedContent) {
-        if (this.pendingSharedContent.timestamp !== this.lastSharedContentTimestamp) {
-          const pending = this.pendingSharedContent;
-          this.pendingSharedContent = undefined;
-          this.handleSharedContent(pending);
-        } else {
-          this.pendingSharedContent = undefined;
-        }
-      }
+      this.flushPendingSharedContent();
     });
+  }
+
+  private isAppVisible(): boolean {
+    return typeof document === 'undefined' || document.visibilityState === 'visible';
+  }
+
+  private flushPendingSharedContent(): void {
+    if (!this.pendingSharedContent || !this.appService.isConsentCompleted() || this.sharedContentDialogOpen || !this.isAppVisible()) {
+      return;
+    }
+    if (this.pendingSharedContent.timestamp === this.lastSharedContentTimestamp) {
+      this.pendingSharedContent = undefined;
+      return;
+    }
+    const pending = this.pendingSharedContent;
+    this.pendingSharedContent = undefined;
+    void this.handleSharedContent(pending);
   }
 
   private async handleNotification(notificationAction: NotificationAction): Promise<void> {
