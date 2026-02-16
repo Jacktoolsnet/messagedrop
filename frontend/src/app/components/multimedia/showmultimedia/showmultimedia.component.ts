@@ -2,6 +2,7 @@
 import { Component, Input, OnChanges, SimpleChanges, effect, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Multimedia } from '../../../interfaces/multimedia';
 import { AppService } from '../../../services/app.service';
@@ -23,13 +24,14 @@ export class ShowmultimediaComponent implements OnChanges {
 
   termsLinks?: { terms: string; privacy: string };
 
-  safeHtml: string | undefined;
+  safeHtml: SafeHtml | undefined;
 
   // Activation logic
   isPlatformEnabled = false;
   disabledReason = '';
   showExternalSettingsButton = false;
 
+  private readonly sanitizer = inject(DomSanitizer);
   private readonly dialog = inject(MatDialog);
   private readonly appService = inject(AppService);
   private readonly oembedService = inject(OembedService);
@@ -83,7 +85,7 @@ export class ShowmultimediaComponent implements OnChanges {
     }
 
     this.safeHtml = this.isPlatformEnabled && this.isOembedAllowed()
-      ? (this.multimedia?.oembed?.html ?? '')
+      ? this.sanitizer.bypassSecurityTrustHtml(this.multimedia?.oembed?.html ?? '')
       : undefined;
   }
 
