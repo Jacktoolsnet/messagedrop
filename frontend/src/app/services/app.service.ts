@@ -14,12 +14,13 @@ export class AppService {
   private consentCompleted = false;
   private _settingsSet = signal(0);
   readonly settingsSet = this._settingsSet.asReadonly();
+  private readonly _notificationAction = signal<NotificationAction | null>(null);
+  readonly notificationAction = this._notificationAction.asReadonly();
 
   private readonly legalVersion = 1;
 
   private themeListener: ((e: MediaQueryListEvent) => void) | null = null;
   private appSettings: AppSettings | undefined;
-  private notificationAction?: NotificationAction;
 
   private readonly indexedDbService = inject(IndexedDbService);
 
@@ -177,11 +178,17 @@ export class AppService {
 
   // Notification-Daten
   public setNotificationAction(action: NotificationAction): void {
-    this.notificationAction = action;
+    this._notificationAction.set(action);
   }
 
-  public getNotificationAction(): NotificationAction | undefined {
-    return this.notificationAction;
+  public consumeNotificationAction(): NotificationAction | null {
+    const action = this._notificationAction();
+    this._notificationAction.set(null);
+    return action;
+  }
+
+  public clearNotificationAction(): void {
+    this._notificationAction.set(null);
   }
 
   setTheme(appSettings: AppSettings): void {

@@ -591,7 +591,11 @@ router.post('/create',
         req.body.latitude,
         req.body.longitude,
         req.body.messageUserId,
-        sanitizedMessage
+        sanitizedMessage,
+        {
+          messageUuid: req.body.uuid,
+          messagePlusCode: req.body.plusCode
+        }
       );
     }
 

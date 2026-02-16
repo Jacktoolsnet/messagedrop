@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { inject, Injectable, signal, WritableSignal } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { catchError, forkJoin, Observable, of, throwError } from 'rxjs';
+import { catchError, forkJoin, map, Observable, of, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { DisplayMessage } from '../components/utils/display-message/display-message.component';
 import { BoundingBox } from '../interfaces/bounding-box';
@@ -608,6 +608,37 @@ export class MessageService {
       .pipe(
         catchError(this.handleError)
       );
+  }
+
+  getByUuid(messageUuid: string, showAlways = false): Observable<Message | null> {
+    const trimmedUuid = typeof messageUuid === 'string' ? messageUuid.trim() : '';
+    if (!trimmedUuid) {
+      return of(null);
+    }
+
+    const url = `${environment.apiUrl}/message/get/uuid/${encodeURIComponent(trimmedUuid)}`;
+
+    this.networkService.setNetworkMessageConfig(url, {
+      showAlways,
+      title: this.i18n.t('common.message.title'),
+      image: '',
+      icon: '',
+      message: this.i18n.t('common.message.loading'),
+      button: '',
+      delay: 0,
+      showSpinner: true,
+      autoclose: false
+    });
+
+    return this.http.get<{ status: number; message?: RawMessage }>(url, this.httpOptions).pipe(
+      map((response) => {
+        if (!response?.message) {
+          return null;
+        }
+        return this.mapRawMessage(response.message);
+      }),
+      catchError(() => of(null))
+    );
   }
 
   searchByHashtag(tag: string, showAlways = false): Observable<GetMessageResponse> {

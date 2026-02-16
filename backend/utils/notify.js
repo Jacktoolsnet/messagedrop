@@ -5,10 +5,16 @@ const cryptoUtil = require('../utils/cryptoUtils');
 const tableUser = require('../db/tableUser');
 
 
-const placeSubscriptions = function (logger, db, lat, lon, userId, message) {
+const placeSubscriptions = function (logger, db, lat, lon, userId, messageText, options = {}) {
     try {
         const latValue = Number(lat);
         const lonValue = Number(lon);
+        const messageUuid = typeof options.messageUuid === 'string' && options.messageUuid.trim() !== ''
+            ? options.messageUuid.trim()
+            : null;
+        const messagePlusCode = typeof options.messagePlusCode === 'string'
+            ? options.messagePlusCode
+            : '';
         if (!Number.isFinite(latValue) || !Number.isFinite(lonValue)) {
             logger.warn('placeSubscriptions: invalid coordinates', { lat, lon, userId });
             return;
@@ -34,21 +40,34 @@ const placeSubscriptions = function (logger, db, lat, lon, userId, message) {
                         } catch (cryptoError) {
                             logger.warn('Failed to decrypt place name', { error: cryptoError?.message });
                         }
+                        const notificationData = {
+                            "dateOfArrival": Date.now(),
+                            "primaryKey": { "type": "place", "id": row.id },
+                            "onActionClick": {
+                                "default": {
+                                    "operation": "focusLastFocusedOrOpen"
+                                }
+                            }
+                        };
+                        if (messageUuid) {
+                            notificationData.target = {
+                                type: 'message',
+                                id: messageUuid,
+                                placeId: row.id,
+                                location: {
+                                    latitude: latValue,
+                                    longitude: lonValue,
+                                    plusCode: messagePlusCode
+                                }
+                            };
+                        }
                         const payload = {
                             "notification": {
                                 "title": `Messagedrop @${placeName}`,
-                                "body": message,
+                                "body": messageText,
                                 "icon": "assets/icons/notify-icon.png",
                                 "vibrate": [100, 50, 100],
-                                "data": {
-                                    "dateOfArrival": Date.now(),
-                                    "primaryKey": { "type": "place", "id": row.id },
-                                    "onActionClick": {
-                                        "default": {
-                                            "operation": "focusLastFocusedOrOpen"
-                                        }
-                                    },
-                                }
+                                "data": notificationData
                             }
                         };
                         try {

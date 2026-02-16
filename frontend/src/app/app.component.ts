@@ -319,6 +319,15 @@ export class AppComponent implements OnInit {
       }
     });
 
+    effect(() => {
+      const notificationAction = this.appService.notificationAction();
+      if (!notificationAction) {
+        return;
+      }
+      this.appService.clearNotificationAction();
+      void this.handleNotification(notificationAction);
+    });
+
     // Shared Content
     effect(() => {
       this.appService.settingsSet(); // <-- track changes
@@ -334,8 +343,6 @@ export class AppComponent implements OnInit {
     });
 
     this.initApp();
-    // Notification Action
-    this.handleNotification();
   }
 
   async initApp() {
@@ -641,15 +648,71 @@ export class AppComponent implements OnInit {
     });
   }
 
-  public handleNotification() {
-    const notificationAction: NotificationAction | undefined = this.appService.getNotificationAction();
-    if (notificationAction) {
-      this.snackBar.open(
-        this.translation.t('common.notifications.received', { action: notificationAction }),
-        this.translation.t('common.actions.ok')
-      );
-      // z. B. Navigation starten, Dialog öffnen, etc.
-      void this.systemNotificationService.refreshUnreadCount();
+  private async handleNotification(notificationAction: NotificationAction): Promise<void> {
+    this.snackBar.open(
+      this.translation.t('common.notifications.received', { action: notificationAction.type }),
+      this.translation.t('common.actions.ok'),
+      { duration: 3500, verticalPosition: 'top' }
+    );
+
+    void this.systemNotificationService.refreshUnreadCount();
+
+    if (notificationAction.type === 'contact') {
+      this.openContactListDialog();
+      return;
+    }
+
+    if (notificationAction.type === 'message') {
+      await this.handleMessageNotification(notificationAction);
+      return;
+    }
+
+    if (notificationAction.type === 'place') {
+      await this.handlePlaceNotification(notificationAction);
+    }
+  }
+
+  private async handleMessageNotification(action: NotificationAction): Promise<void> {
+    const messageId = typeof action.id === 'string' ? action.id.trim() : '';
+    let message = messageId ? await firstValueFrom(this.messageService.getByUuid(messageId)) : null;
+
+    const targetLocation = message?.location ?? action.location;
+    if (!targetLocation) {
+      return;
+    }
+
+    await this.waitForMapReady();
+    this.mapService.flyToWithZoom(targetLocation, 18);
+
+    if (!message) {
+      return;
+    }
+
+    this.messageService.setMessages([message]);
+    this.openMarkerMessageListDialog([message]);
+  }
+
+  private async handlePlaceNotification(action: NotificationAction): Promise<void> {
+    const placeId = typeof action.id === 'string' ? action.id.trim() : '';
+    const place = placeId
+      ? this.placeService.getPlaces().find((entry) => entry.id === placeId)
+      : undefined;
+
+    if (!place) {
+      return;
+    }
+
+    await this.waitForMapReady();
+    this.mapService.flyToWithZoom(place.location, 18);
+  }
+
+  private async waitForMapReady(timeoutMs = 8000, stepMs = 100): Promise<void> {
+    if (this.mapService.isReady()) {
+      return;
+    }
+    const timeoutAt = Date.now() + timeoutMs;
+    while (!this.mapService.isReady() && Date.now() < timeoutAt) {
+      await new Promise((resolve) => setTimeout(resolve, stepMs));
     }
   }
 
