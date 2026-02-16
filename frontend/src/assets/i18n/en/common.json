@@ -213,7 +213,10 @@
         "openChatroomAria": "Open chatroom",
         "editAria": "Edit contact",
         "subscribeAria": "Subscribe to contact",
-        "unsubscribeAria": "Unsubscribe from contact"
+        "unsubscribeAria": "Unsubscribe from contact",
+        "subscriptionSaved": "The contact subscription setting was saved.",
+        "subscribeFailed": "Could not subscribe to the contact.",
+        "unsubscribeFailed": "Could not unsubscribe from the contact."
       },
       "profile": {
         "title": "Contact profile",
@@ -502,6 +505,7 @@
       "deleteFailed": "Could not delete the place.",
       "subscribeFailed": "Subscribing failed.",
       "unsubscribeFailed": "Unsubscribing failed.",
+      "subscriptionSaved": "The place subscription setting was saved.",
       "createSuccess": "Place successfully created.",
       "createFailed": "Creating the place failed. Please try again.",
       "resolveFailed": "Could not determine the current place."
@@ -1195,6 +1199,8 @@
     "deletingUser": "Deleting user",
     "subscribingUser": "Subscribing to user",
     "unsubscribingUser": "Unsubscribing from user",
+    "pushPermissionTitle": "Enable notifications",
+    "pushPermissionMessage": "To make sure you don't miss new messages, MessageDrop needs permission to send you notifications.",
     "createUserTitle": "Want to create a user? It's that easy:",
     "createUserMessage": "Just choose a PIN - no username and no password required.\n\nPlease keep this PIN safe. We do not store it, cannot reset it, and cannot recover it for you.\n\nIf the PIN is lost, access to this user is permanently lost as well.\n\nYou can delete your user at any time in the app.\n\nIf the user is not used for 90 days, it will be automatically and permanently deleted, including all associated data.",
     "createUserAction": "Get started",

@@ -82,6 +82,7 @@ export class UserService {
   private pinSalt: Uint8Array<ArrayBuffer> | null = null;
   private pinIterations = 250000;
   private connectInProgress = false;
+  private pushPermissionInfoDialog?: Promise<void>;
 
   private ready = false;
   private blocked = false;
@@ -741,10 +742,52 @@ export class UserService {
     });
   }
 
+  private async showPushPermissionInfoDialog(): Promise<void> {
+    if (this.pushPermissionInfoDialog) {
+      await this.pushPermissionInfoDialog;
+      return;
+    }
+
+    const dialogRef = this.displayMessage.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: {
+        showAlways: true,
+        title: this.i18n.t('auth.pushPermissionTitle'),
+        image: '',
+        icon: 'notifications_active',
+        message: this.i18n.t('auth.pushPermissionMessage'),
+        button: this.i18n.t('common.actions.ok'),
+        delay: 0,
+        showSpinner: false,
+        autoclose: false
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: true,
+      autoFocus: false
+    });
+
+    this.pushPermissionInfoDialog = firstValueFrom(dialogRef.afterClosed())
+      .catch(() => undefined)
+      .finally(() => {
+        this.pushPermissionInfoDialog = undefined;
+      });
+
+    await this.pushPermissionInfoDialog;
+  }
+
   async registerSubscription(user: User): Promise<void> {
     if (!this.swPush.isEnabled || Notification.permission === 'denied') {
       return;
     }
+
+    if (Notification.permission === 'default') {
+      await this.showPushPermissionInfoDialog();
+    }
+
     let publicKey: string;
     try {
       publicKey = await this.getVapidPublicKey();

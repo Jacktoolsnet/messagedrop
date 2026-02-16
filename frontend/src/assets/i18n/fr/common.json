@@ -213,7 +213,10 @@
         "openChatroomAria": "Ouvrir la discussion",
         "editAria": "Modifier le contact",
         "subscribeAria": "S'abonner au contact",
-        "unsubscribeAria": "Se désabonner du contact"
+        "unsubscribeAria": "Se désabonner du contact",
+        "subscriptionSaved": "Le réglage d'abonnement du contact a été enregistré.",
+        "subscribeFailed": "Impossible de s'abonner au contact.",
+        "unsubscribeFailed": "Impossible de se désabonner du contact."
       },
       "profile": {
         "title": "Profil du contact",
@@ -502,6 +505,7 @@
       "deleteFailed": "Impossible de supprimer le lieu.",
       "subscribeFailed": "Échec de l'abonnement.",
       "unsubscribeFailed": "Échec du désabonnement.",
+      "subscriptionSaved": "Le réglage d'abonnement du lieu a été enregistré.",
       "createSuccess": "Lieu créé avec succès.",
       "createFailed": "La création du lieu a échoué. Veuillez réessayer.",
       "resolveFailed": "Impossible de déterminer le lieu actuel."
@@ -1195,6 +1199,8 @@
     "deletingUser": "Suppression de l'utilisateur",
     "subscribingUser": "Abonnement à l'utilisateur",
     "unsubscribingUser": "Désabonnement de l'utilisateur",
+    "pushPermissionTitle": "Activer les notifications",
+    "pushPermissionMessage": "Pour que vous ne manquiez aucun nouveau message, MessageDrop a besoin de votre autorisation pour vous envoyer des notifications.",
     "createUserTitle": "Envie de créer un utilisateur ? C'est aussi simple que ça:",
     "createUserMessage": "Choisissez simplement un PIN — aucun nom d'utilisateur et aucun mot de passe requis.\n\nVeuillez conserver ce PIN précieusement. Nous ne le stockons pas, ne pouvons pas le réinitialiser et ne pouvons pas le récupérer.\n\nSi le PIN est perdu, l'accès à cet utilisateur est également perdu définitivement.\n\nVous pouvez supprimer votre utilisateur à tout moment dans l'application.\n\nSi l'utilisateur n'est pas utilisé pendant 90 jours, il sera automatiquement et définitivement supprimé, ainsi que toutes les données associées.",
     "createUserAction": "Commencer",

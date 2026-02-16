@@ -213,7 +213,10 @@
         "openChatroomAria": "Chatraum öffnen",
         "editAria": "Kontakt bearbeiten",
         "subscribeAria": "Kontakt abonnieren",
-        "unsubscribeAria": "Kontakt-Abo beenden"
+        "unsubscribeAria": "Kontakt-Abo beenden",
+        "subscriptionSaved": "Abo-Einstellung für den Kontakt gespeichert.",
+        "subscribeFailed": "Kontakt konnte nicht abonniert werden.",
+        "unsubscribeFailed": "Kontakt-Abo konnte nicht beendet werden."
       },
       "profile": {
         "title": "Kontaktprofil",
@@ -502,6 +505,7 @@
       "deleteFailed": "Der Ort konnte nicht gelöscht werden.",
       "subscribeFailed": "Abonnieren fehlgeschlagen.",
       "unsubscribeFailed": "Abbestellen fehlgeschlagen.",
+      "subscriptionSaved": "Abo-Einstellung für den Ort gespeichert.",
       "createSuccess": "Ort erfolgreich erstellt.",
       "createFailed": "Der Ort konnte nicht erstellt werden. Bitte versuche es erneut.",
       "resolveFailed": "Der aktuelle Ort konnte nicht bestimmt werden."
@@ -1195,6 +1199,8 @@
     "deletingUser": "Benutzer wird gelöscht",
     "subscribingUser": "Benutzer wird abonniert",
     "unsubscribingUser": "Abonnement wird beendet",
+    "pushPermissionTitle": "Benachrichtigungen aktivieren",
+    "pushPermissionMessage": "Damit du keine neuen Nachrichten verpasst, benötigt MessageDrop die Berechtigung, dir Benachrichtigungen zu senden.",
     "createUserTitle": "Möchtest du einen Benutzer erstellen? So einfach geht's:",
     "createUserMessage": "Wähle einfach eine PIN - kein Benutzername und kein Passwort erforderlich.\n\nBitte bewahre diese PIN sicher auf. Wir speichern sie nicht, können sie nicht zurücksetzen und nicht wiederherstellen.\n\nWenn die PIN verloren geht, ist der Zugriff auf diesen Benutzer dauerhaft verloren.\n\nDu kannst deinen Benutzer jederzeit in der App löschen.\n\nWenn der Benutzer 90 Tage lang nicht verwendet wird, wird er automatisch und dauerhaft gelöscht, einschließlich aller zugehörigen Daten.",
     "createUserAction": "Los geht's",

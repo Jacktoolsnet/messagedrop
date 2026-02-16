@@ -213,7 +213,10 @@
         "openChatroomAria": "Abrir chat",
         "editAria": "Editar contacto",
         "subscribeAria": "Suscribirse al contacto",
-        "unsubscribeAria": "Cancelar suscripción al contacto"
+        "unsubscribeAria": "Cancelar suscripción al contacto",
+        "subscriptionSaved": "Se guardó la configuración de suscripción del contacto.",
+        "subscribeFailed": "No se pudo suscribir al contacto.",
+        "unsubscribeFailed": "No se pudo cancelar la suscripción al contacto."
       },
       "profile": {
         "title": "Perfil del contacto",
@@ -502,6 +505,7 @@
       "deleteFailed": "No se pudo eliminar el lugar.",
       "subscribeFailed": "Falló la suscripción.",
       "unsubscribeFailed": "Falló la cancelación de suscripción.",
+      "subscriptionSaved": "Se guardó la configuración de suscripción del lugar.",
       "createSuccess": "Lugar creado correctamente.",
       "createFailed": "No se pudo crear el lugar. Inténtalo de nuevo.",
       "resolveFailed": "No se pudo determinar el lugar actual."
@@ -1195,6 +1199,8 @@
     "deletingUser": "Eliminando usuario",
     "subscribingUser": "Suscribiéndose al usuario",
     "unsubscribingUser": "Cancelando suscripción al usuario",
+    "pushPermissionTitle": "Activar notificaciones",
+    "pushPermissionMessage": "Para que no te pierdas mensajes nuevos, MessageDrop necesita tu permiso para enviarte notificaciones.",
     "createUserTitle": "¿Quieres crear un usuario? Así de fácil:",
     "createUserMessage": "Solo elige un PIN: no se requiere nombre de usuario ni contraseña.\n\nPor favor guarda este PIN en un lugar seguro. No lo almacenamos, no podemos restablecerlo ni recuperarlo.\n\nSi pierdes el PIN, el acceso a este usuario se pierde para siempre.\n\nPuedes eliminar tu usuario en cualquier momento dentro de la app.\n\nSi el usuario no se utiliza durante 90 días, se eliminará automáticamente y de forma permanente, incluidos todos los datos asociados.",
     "createUserAction": "Empezar",

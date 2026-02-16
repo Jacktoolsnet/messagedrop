@@ -460,30 +460,70 @@ export class ContactService {
   }
 
   public subscribe(contact: Contact) {
+    const previous = contact.subscribed;
     contact.subscribed = true;
     const url = `${environment.apiUrl}/contact/subscribe/${contact.id}`;
-    this.http.get<boolean>(url, this.httpOptions)
+    this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(catchError(this.handleError))
       .subscribe({
-        next: () => {
-          contact.subscribed = true;
-          this.persistContacts();
+        next: (response) => {
+          if (response?.status === 200) {
+            contact.subscribed = true;
+            this.persistContacts();
+            this.snackBar.open(
+              this.i18n.t('common.contact.list.subscriptionSaved'),
+              this.i18n.t('common.actions.ok'),
+              { duration: 2500 }
+            );
+            return;
+          }
+          contact.subscribed = previous;
+          this.snackBar.open(
+            this.i18n.t('common.contact.list.subscribeFailed'),
+            this.i18n.t('common.actions.ok')
+          );
         },
-        error: (err) => { this.snackBar.open(err.message, this.i18n.t('common.actions.ok')); }
+        error: (err) => {
+          contact.subscribed = previous;
+          this.snackBar.open(
+            err?.message ?? this.i18n.t('common.contact.list.subscribeFailed'),
+            this.i18n.t('common.actions.ok')
+          );
+        }
       });
   }
 
   public unsubscribe(contact: Contact) {
+    const previous = contact.subscribed;
     contact.subscribed = false;
     const url = `${environment.apiUrl}/contact/unsubscribe/${contact.id}`;
-    this.http.get<boolean>(url, this.httpOptions)
+    this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(catchError(this.handleError))
       .subscribe({
-        next: () => {
-          contact.subscribed = false;
-          this.persistContacts();
+        next: (response) => {
+          if (response?.status === 200) {
+            contact.subscribed = false;
+            this.persistContacts();
+            this.snackBar.open(
+              this.i18n.t('common.contact.list.subscriptionSaved'),
+              this.i18n.t('common.actions.ok'),
+              { duration: 2500 }
+            );
+            return;
+          }
+          contact.subscribed = previous;
+          this.snackBar.open(
+            this.i18n.t('common.contact.list.unsubscribeFailed'),
+            this.i18n.t('common.actions.ok')
+          );
         },
-        error: (err) => { this.snackBar.open(err.message, this.i18n.t('common.actions.ok')); }
+        error: (err) => {
+          contact.subscribed = previous;
+          this.snackBar.open(
+            err?.message ?? this.i18n.t('common.contact.list.unsubscribeFailed'),
+            this.i18n.t('common.actions.ok')
+          );
+        }
       });
   }
 }

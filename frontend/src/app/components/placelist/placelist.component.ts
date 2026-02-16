@@ -161,6 +161,11 @@ export class PlacelistComponent {
           if (simpleStatusResponse.status === 200) {
             place.subscribed = true;
             this.placeService.saveAdditionalPlaceInfos(place);
+            this.snackBar.open(
+              this.translation.t('common.placeList.subscriptionSaved'),
+              this.translation.t('common.actions.ok'),
+              { duration: 2500 }
+            );
           }
         },
         error: err => {
@@ -178,6 +183,11 @@ export class PlacelistComponent {
           if (simpleStatusResponse.status === 200) {
             place.subscribed = false;
             this.placeService.saveAdditionalPlaceInfos(place);
+            this.snackBar.open(
+              this.translation.t('common.placeList.subscriptionSaved'),
+              this.translation.t('common.actions.ok'),
+              { duration: 2500 }
+            );
           }
         },
         error: err => {
