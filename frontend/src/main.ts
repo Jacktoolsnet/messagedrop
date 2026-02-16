@@ -27,15 +27,6 @@ registerLocaleData(localePt);
 registerLocaleData(localeJa);
 registerLocaleData(localeKo);
 
-if ('serviceWorker' in navigator) {
-navigator.serviceWorker.register('/messagedrop-service-worker.js', {
-    scope: '/',
-    type: 'classic' // wichtig: nicht module!
-  })
-    .then(() => console.info('Share-handler service worker registered'))
-    .catch(err => console.warn('Failed to register share-handler service worker', err));
-}
-
 bootstrapApplication(AppComponent, {
   ...appConfig,
   providers: [provideZoneChangeDetection(), ...appConfig.providers]

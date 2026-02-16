@@ -1038,7 +1038,7 @@ export class AppComponent implements OnInit {
         contentId: ''
       }
     };
-    this.sharedContentService.addSharedContentToMessage(message);
+    await this.sharedContentService.addSharedContentToMessage(message);
 
     const dialogRef = this.dialog.open(EditMessageComponent, {
       panelClass: '',
@@ -1084,7 +1084,7 @@ export class AppComponent implements OnInit {
         contentId: ''
       }
     };
-    this.sharedContentService.addSharedContentToNote(note);
+    await this.sharedContentService.addSharedContentToNote(note);
     const dialogRef = this.dialog.open(EditNoteComponent, {
       panelClass: '',
       closeOnNavigation: true,

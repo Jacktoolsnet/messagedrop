@@ -2,12 +2,18 @@ self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
 
     if (event.request.method === 'POST' && url.pathname === '/share-target') {
+        if (typeof event.stopImmediatePropagation === 'function') {
+            event.stopImmediatePropagation();
+        }
         event.respondWith(handleShareTargetPost(event));
         return;
     }
 
     if (event.request.method === 'GET' && url.pathname === '/share-target' &&
         (url.searchParams.has('text') || url.searchParams.has('title') || url.searchParams.has('url'))) {
+        if (typeof event.stopImmediatePropagation === 'function') {
+            event.stopImmediatePropagation();
+        }
         event.respondWith(handleShareTargetGet(url));
         return;
     }
@@ -28,7 +34,7 @@ self.addEventListener('message', (event) => {
             body,
             icon: '/icons/notify-icon.png',
             badge: '/icons/icon-72x72.png',
-            data: { url },
+            data: { url, source: 'messagedrop-custom' },
             tag,
             renotify: true,
             vibrate: [80, 40, 80]
@@ -37,6 +43,13 @@ self.addEventListener('message', (event) => {
 });
 
 self.addEventListener('notificationclick', (event) => {
+    const source = event.notification.data?.source;
+    if (source !== 'messagedrop-custom') {
+        return;
+    }
+    if (typeof event.stopImmediatePropagation === 'function') {
+        event.stopImmediatePropagation();
+    }
     event.notification.close();
     const url = event.notification.data?.url || '/';
     event.waitUntil(
@@ -44,12 +57,25 @@ self.addEventListener('notificationclick', (event) => {
     );
 });
 
+function toTextValue(value) {
+    if (typeof value === 'string') {
+        return value;
+    }
+    if (value == null) {
+        return '';
+    }
+    if (typeof value === 'object' && 'name' in value) {
+        return '';
+    }
+    return String(value);
+}
+
 async function handleShareTargetPost(event) {
     try {
         const formData = await event.request.formData();
-        let title = formData.get('title') || '';
-        let text = formData.get('text') || '';
-        let url = formData.get('url');
+        let title = toTextValue(formData.get('title')).trim();
+        let text = toTextValue(formData.get('text')).trim();
+        let url = toTextValue(formData.get('url')).trim();
 
         if (!url && text) url = extractUrlFromText(text);
 
@@ -73,9 +99,9 @@ async function handleShareTargetPost(event) {
 
 async function handleShareTargetGet(urlObj) {
     try {
-        let title = urlObj.searchParams.get('title') || '';
-        let text = urlObj.searchParams.get('text') || '';
-        let url = urlObj.searchParams.get('url');
+        let title = toTextValue(urlObj.searchParams.get('title')).trim();
+        let text = toTextValue(urlObj.searchParams.get('text')).trim();
+        let url = toTextValue(urlObj.searchParams.get('url')).trim();
 
         if (!url && text) url = extractUrlFromText(text);
 
@@ -202,3 +228,5 @@ function saveSharedContentToDB(data, type) {
 function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+importScripts('./ngsw-worker.js');

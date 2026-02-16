@@ -624,13 +624,13 @@ export class MessagelistComponent implements OnInit, OnDestroy {
     this.editMessage();
   }
 
-  public editMessage() {
+  public async editMessage(): Promise<void> {
     if (!this.userService.hasJwt()) {
       return;
     }
     if (this.clickedMessage) {
       if (this.clickedMessage.multimedia.type !== MultimediaType.UNDEFINED) {
-        this.sharedContentService.addSharedContentToMessage(this.clickedMessage);
+        await this.sharedContentService.addSharedContentToMessage(this.clickedMessage);
       }
 
       const dialogRef = this.messageDialog.open(EditMessageComponent, {
@@ -716,7 +716,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
     });
   }
 
-  addMessagDialog(): void {
+  async addMessagDialog(): Promise<void> {
     if (!this.userService.hasJwt()) {
       return;
     }
@@ -751,7 +751,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
       }
     };
 
-    this.sharedContentService.addSharedContentToMessage(message);
+    await this.sharedContentService.addSharedContentToMessage(message);
 
     const dialogRef = this.messageDialog.open(EditMessageComponent, {
       panelClass: '',
@@ -811,7 +811,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
     this.addComment(this.currentParentSignal()!)
   }
 
-  public addComment(parentMessage: Message) {
+  public async addComment(parentMessage: Message): Promise<void> {
     if (!this.userService.hasJwt()) {
       return;
     }
@@ -846,7 +846,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
       }
     };
 
-    this.sharedContentService.addSharedContentToMessage(message);
+    await this.sharedContentService.addSharedContentToMessage(message);
 
     const dialogRef = this.messageDialog.open(EditMessageComponent, {
       panelClass: '',

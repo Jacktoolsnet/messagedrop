@@ -49,7 +49,7 @@ export const appConfig: ApplicationConfig = {
     }),
     provideRouter(routes),
     provideAnimationsAsync(),
-    provideServiceWorker('ngsw-worker.js', {
+    provideServiceWorker('messagedrop-service-worker.js', {
       enabled: !isDevMode(),
       registrationStrategy: 'registerImmediately'
     })]

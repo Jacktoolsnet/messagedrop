@@ -3,6 +3,7 @@ import { Message } from '../interfaces/message';
 import { Multimedia } from '../interfaces/multimedia';
 import { Note } from '../interfaces/note';
 import { SharedContent } from '../interfaces/shared-content';
+import { MultimediaType } from '../interfaces/multimedia-type';
 import { OembedService } from './oembed.service';
 
 @Injectable({ providedIn: 'root' })
@@ -24,7 +25,7 @@ export class SharedContentService {
       }
     });
 
-    if ('serviceWorker' in navigator) {
+    if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
       navigator.serviceWorker.addEventListener('message', (event) => {
         if (event.data?.type === 'shared' && event.data.content) {
           this.sharedContentSignal.set(event.data.content);
@@ -32,16 +33,36 @@ export class SharedContentService {
       });
     }
 
-    this.openDB().then(async () => {
-      const content = await this.getSharedContent(this.lastKey);
-      if (content) {
-        this.sharedContentSignal.set(content);
-      }
-    });
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          void this.refreshSharedContentFromStorage();
+        }
+      });
+    }
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('focus', () => {
+        void this.refreshSharedContentFromStorage();
+      });
+    }
+
+    void this.refreshSharedContentFromStorage();
   }
 
   public getSharedContentSignal() {
     return this.sharedContentSignal.asReadonly();
+  }
+
+  public async refreshSharedContentFromStorage(): Promise<void> {
+    try {
+      const content = await this.getSharedContent(this.lastKey);
+      if (content) {
+        this.sharedContentSignal.set(content);
+      }
+    } catch {
+      // Best effort only
+    }
   }
 
   private openDB(): Promise<IDBDatabase> {
@@ -82,24 +103,62 @@ export class SharedContentService {
     });
   }
 
-  public async addSharedContentToMessage(message: Message): Promise<void> {
+  private async resolveSharedMultimedia(): Promise<Multimedia | undefined> {
     const lastMultimediaContent = await this.getSharedContent('lastMultimedia');
-    let lastMultimedia: Multimedia | undefined = undefined;
-    if (lastMultimediaContent?.url) {
-      lastMultimedia = await this.oembedService.getObjectFromUrl(lastMultimediaContent.url) as Multimedia;
-      if (undefined != lastMultimedia) {
-        message.multimedia = lastMultimedia;
+    const fallbackContent = await this.getSharedContent(this.lastKey);
+    const candidateUrl = lastMultimediaContent?.url ?? fallbackContent?.url;
+    if (!candidateUrl) {
+      return undefined;
+    }
+
+    const resolved = await this.oembedService.getObjectFromUrl(candidateUrl);
+    if (this.oembedService.isMultimedia(resolved)) {
+      return resolved;
+    }
+    return undefined;
+  }
+
+  private async resolveSharedText(): Promise<string | undefined> {
+    const content = await this.getSharedContent(this.lastKey);
+    if (!content) {
+      return undefined;
+    }
+    const text = typeof content.text === 'string' ? content.text.trim() : '';
+    const title = typeof content.title === 'string' ? content.title.trim() : '';
+    const url = typeof content.url === 'string' ? content.url.trim() : '';
+    const segments = [text, title, url].filter(Boolean);
+    if (!segments.length) {
+      return undefined;
+    }
+    return segments.join('\n').trim();
+  }
+
+  public async addSharedContentToMessage(message: Message): Promise<void> {
+    const multimedia = await this.resolveSharedMultimedia();
+    if (multimedia) {
+      message.multimedia = multimedia;
+      return;
+    }
+
+    if (message.multimedia.type === MultimediaType.UNDEFINED && !message.message?.trim()) {
+      const fallbackText = await this.resolveSharedText();
+      if (fallbackText) {
+        message.message = fallbackText;
       }
     }
   }
 
   public async addSharedContentToNote(note: Note): Promise<void> {
-    const lastMultimediaContent = await this.getSharedContent('lastMultimedia');
-    let lastMultimedia: Multimedia | undefined = undefined;
-    if (lastMultimediaContent?.url) {
-      lastMultimedia = await this.oembedService.getObjectFromUrl(lastMultimediaContent.url) as Multimedia;
-      if (undefined != lastMultimedia) {
-        note.multimedia = lastMultimedia;
+    const multimedia = await this.resolveSharedMultimedia();
+    if (multimedia) {
+      note.multimedia = multimedia;
+      return;
+    }
+
+    if (note.multimedia.type === MultimediaType.UNDEFINED && !note.note?.trim()) {
+      const fallbackText = await this.resolveSharedText();
+      if (fallbackText) {
+        note.note = fallbackText;
       }
     }
   }

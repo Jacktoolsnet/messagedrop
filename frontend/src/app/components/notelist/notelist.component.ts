@@ -110,9 +110,9 @@ export class NotelistComponent {
     });
   }
 
-  editNote(note: Note) {
+  async editNote(note: Note): Promise<void> {
     if (note.multimedia.type !== MultimediaType.UNDEFINED) {
-      this.sharedContentService.addSharedContentToNote(note);
+      await this.sharedContentService.addSharedContentToNote(note);
     }
 
     const dialogRef = this.dialog.open(EditNoteComponent, {
@@ -132,7 +132,7 @@ export class NotelistComponent {
     });
   }
 
-  openNoteDialog(): void {
+  async openNoteDialog(): Promise<void> {
     const note: Note = {
       id: '',
       location: this.location,
@@ -152,7 +152,7 @@ export class NotelistComponent {
       }
     };
 
-    this.sharedContentService.addSharedContentToNote(note);
+    await this.sharedContentService.addSharedContentToNote(note);
     const dialogRef = this.dialog.open(EditNoteComponent, {
       data: { mode: this.mode.ADD_NOTE, note },
       closeOnNavigation: true,
