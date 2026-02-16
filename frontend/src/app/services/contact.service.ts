@@ -1,8 +1,10 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, finalize, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { DisplayMessage } from '../components/utils/display-message/display-message.component';
 import { Contact } from '../interfaces/contact';
 import { CreateContactResponse } from '../interfaces/create-contact-response';
 import { GetContactsResponse } from '../interfaces/get-contacts-response';
@@ -40,6 +42,7 @@ export class ContactService {
   private readonly http = inject(HttpClient);
   private readonly userService = inject(UserService);
   private readonly indexedDbService = inject(IndexedDbService);
+  private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly networkService = inject(NetworkService);
   private readonly avatarStorage = inject(AvatarStorageService);
@@ -459,6 +462,28 @@ export class ContactService {
       );
   }
 
+  private showSubscriptionMessage(message: string, icon: string): void {
+    this.dialog.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: {
+        showAlways: true,
+        title: this.i18n.t('common.contact.title'),
+        image: '',
+        icon,
+        message,
+        button: '',
+        delay: 1000,
+        showSpinner: false,
+        autoclose: true
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: false,
+      autoFocus: false
+    });
+  }
+
   public subscribe(contact: Contact) {
     const previous = contact.subscribed;
     contact.subscribed = true;
@@ -470,24 +495,23 @@ export class ContactService {
           if (response?.status === 200) {
             contact.subscribed = true;
             this.persistContacts();
-            this.snackBar.open(
+            this.showSubscriptionMessage(
               this.i18n.t('common.contact.list.subscriptionSaved'),
-              this.i18n.t('common.actions.ok'),
-              { duration: 2500 }
+              'check_circle'
             );
             return;
           }
           contact.subscribed = previous;
-          this.snackBar.open(
+          this.showSubscriptionMessage(
             this.i18n.t('common.contact.list.subscribeFailed'),
-            this.i18n.t('common.actions.ok')
+            'warning'
           );
         },
         error: (err) => {
           contact.subscribed = previous;
-          this.snackBar.open(
+          this.showSubscriptionMessage(
             err?.message ?? this.i18n.t('common.contact.list.subscribeFailed'),
-            this.i18n.t('common.actions.ok')
+            'warning'
           );
         }
       });
@@ -504,24 +528,23 @@ export class ContactService {
           if (response?.status === 200) {
             contact.subscribed = false;
             this.persistContacts();
-            this.snackBar.open(
+            this.showSubscriptionMessage(
               this.i18n.t('common.contact.list.subscriptionSaved'),
-              this.i18n.t('common.actions.ok'),
-              { duration: 2500 }
+              'check_circle'
             );
             return;
           }
           contact.subscribed = previous;
-          this.snackBar.open(
+          this.showSubscriptionMessage(
             this.i18n.t('common.contact.list.unsubscribeFailed'),
-            this.i18n.t('common.actions.ok')
+            'warning'
           );
         },
         error: (err) => {
           contact.subscribed = previous;
-          this.snackBar.open(
+          this.showSubscriptionMessage(
             err?.message ?? this.i18n.t('common.contact.list.unsubscribeFailed'),
-            this.i18n.t('common.actions.ok')
+            'warning'
           );
         }
       });

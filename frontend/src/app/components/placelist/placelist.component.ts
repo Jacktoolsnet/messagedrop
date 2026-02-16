@@ -31,6 +31,7 @@ import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { PlaceProfileComponent } from './place-settings/place-settings.component';
 import { PlaceSortDialogComponent } from './place-sort-dialog/place-sort-dialog.component';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
+import { DisplayMessage } from '../utils/display-message/display-message.component';
 
 interface TimezoneResponse { status: number; timezone: string }
 
@@ -161,18 +162,21 @@ export class PlacelistComponent {
           if (simpleStatusResponse.status === 200) {
             place.subscribed = true;
             this.placeService.saveAdditionalPlaceInfos(place);
-            this.snackBar.open(
+            this.showSubscriptionMessage(
               this.translation.t('common.placeList.subscriptionSaved'),
-              this.translation.t('common.actions.ok'),
-              { duration: 2500 }
+              'check_circle'
             );
+            return;
           }
+          this.showSubscriptionMessage(
+            this.translation.t('common.placeList.subscribeFailed'),
+            'warning'
+          );
         },
         error: err => {
-          this.snackBar.open(
+          this.showSubscriptionMessage(
             err?.message ?? this.translation.t('common.placeList.subscribeFailed'),
-            this.translation.t('common.actions.ok'),
-            { duration: 3000 }
+            'warning'
           );
         }
       });
@@ -183,22 +187,47 @@ export class PlacelistComponent {
           if (simpleStatusResponse.status === 200) {
             place.subscribed = false;
             this.placeService.saveAdditionalPlaceInfos(place);
-            this.snackBar.open(
+            this.showSubscriptionMessage(
               this.translation.t('common.placeList.subscriptionSaved'),
-              this.translation.t('common.actions.ok'),
-              { duration: 2500 }
+              'check_circle'
             );
+            return;
           }
+          this.showSubscriptionMessage(
+            this.translation.t('common.placeList.unsubscribeFailed'),
+            'warning'
+          );
         },
         error: err => {
-          this.snackBar.open(
+          this.showSubscriptionMessage(
             err?.message ?? this.translation.t('common.placeList.unsubscribeFailed'),
-            this.translation.t('common.actions.ok'),
-            { duration: 3000 }
+            'warning'
           );
         }
       });
     }
+  }
+
+  private showSubscriptionMessage(message: string, icon: string): void {
+    this.matDialog.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: {
+        showAlways: true,
+        title: this.translation.t('common.place.title'),
+        image: '',
+        icon,
+        message,
+        button: '',
+        delay: 1000,
+        showSpinner: false,
+        autoclose: true
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: false,
+      autoFocus: false
+    });
   }
 
   openTileList(place: Place): void {
