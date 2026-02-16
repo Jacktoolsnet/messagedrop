@@ -39,13 +39,21 @@ function authenticateOptionalUser(req, _res, next) {
   next();
 }
 
+function verifyAdminJwt(token) {
+  return jwt.verify(token, process.env.ADMIN_JWT_SECRET, {
+    algorithms: ['HS256'],
+    audience: process.env.ADMIN_AUD || 'messagedrop-admin',
+    issuer: process.env.ADMIN_ISS || 'https://admin-auth.messagedrop.app/'
+  });
+}
+
 /**
  * Pflicht-Auth für Admin-Routen.
  * - Nutzt ausschließlich Authorization: Bearer <token>
  * - Verifiziert gegen ADMIN_* (iss/aud/secret)
  * - Schreibt req.admin (payload) oder sendet 401
  */
-function requireAdminJwt(req, res, next) {
+function requireAdminJwt(req, res, next, { suppressInvalidTokenLog = false } = {}) {
   const token = extractBearerFromHeader(req);
   if (!token) {
     return res.status(401).json({
@@ -56,15 +64,13 @@ function requireAdminJwt(req, res, next) {
   }
 
   try {
-    const payload = jwt.verify(token, process.env.ADMIN_JWT_SECRET, {
-      algorithms: ['HS256'],
-      audience: process.env.ADMIN_AUD || 'messagedrop-admin',
-      issuer: process.env.ADMIN_ISS || 'https://admin-auth.messagedrop.app/'
-    });
+    const payload = verifyAdminJwt(token);
     req.admin = payload; // { sub, roles: [...] }
     next();
   } catch (error) {
-    req.logger?.warn('Invalid admin token', { error: error?.message });
+    if (!suppressInvalidTokenLog) {
+      req.logger?.warn('Invalid admin token', { error: error?.message });
+    }
     return res.status(401).json({
       errorCode: 'UNAUTHORIZED',
       message: 'invalid_admin_token',
@@ -92,7 +98,7 @@ function requireServiceOrAdminJwt(req, res, next) {
     req.service = verifyServiceJwt(token);
     return next();
   } catch {
-    return requireAdminJwt(req, res, next);
+    return requireAdminJwt(req, res, next, { suppressInvalidTokenLog: true });
   }
 }
 
