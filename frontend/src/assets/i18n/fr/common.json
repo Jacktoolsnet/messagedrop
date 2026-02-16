@@ -1200,7 +1200,7 @@
     "subscribingUser": "Abonnement à l'utilisateur",
     "unsubscribingUser": "Désabonnement de l'utilisateur",
     "pushPermissionTitle": "Activer les notifications",
-    "pushPermissionMessage": "Pour que vous ne manquiez aucun nouveau message, MessageDrop a besoin de votre autorisation pour vous envoyer des notifications.",
+    "pushPermissionMessage": "Pour que vous ne manquiez rien, MessageDrop a besoin de votre autorisation pour les notifications. Vous serez notifié uniquement des contenus des lieux et des contacts que vous suivez.",
     "createUserTitle": "Envie de créer un utilisateur ? C'est aussi simple que ça:",
     "createUserMessage": "Choisissez simplement un PIN — aucun nom d'utilisateur et aucun mot de passe requis.\n\nVeuillez conserver ce PIN précieusement. Nous ne le stockons pas, ne pouvons pas le réinitialiser et ne pouvons pas le récupérer.\n\nSi le PIN est perdu, l'accès à cet utilisateur est également perdu définitivement.\n\nVous pouvez supprimer votre utilisateur à tout moment dans l'application.\n\nSi l'utilisateur n'est pas utilisé pendant 90 jours, il sera automatiquement et définitivement supprimé, ainsi que toutes les données associées.",
     "createUserAction": "Commencer",
