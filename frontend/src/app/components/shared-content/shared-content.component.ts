@@ -55,12 +55,7 @@ export class SharedContentComponent implements OnInit {
   }
 
   public get hasGenericContent(): boolean {
-    return !!this.sharedTitle || !!this.sharedText || !!this.sharedUrl;
-  }
-
-  public get sharedTitle(): string | null {
-    const title = this.content?.title?.trim();
-    return title ? title : null;
+    return !!this.sharedText || !!this.sharedUrl;
   }
 
   public get sharedText(): string | null {
