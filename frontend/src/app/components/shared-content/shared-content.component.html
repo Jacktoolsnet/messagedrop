@@ -20,7 +20,7 @@
             <p>{{ location.plusCode }}</p>
         </div>
         }
-        } @else {
+        } @else if (!loadFailed) {
         <p>{{ 'common.sharedContent.empty' | transloco }}</p>
         }
         </div>
