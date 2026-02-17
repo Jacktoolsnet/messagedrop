@@ -16,7 +16,7 @@ const OEMBED_PROVIDERS = [
     {
         name: 'spotify',
         providerUrl: 'https://open.spotify.com/oembed',
-        allowedHosts: ['open.spotify.com']
+        allowedHosts: ['open.spotify.com', 'spotify.com', 'spotify.link', 'spotify.app.link', 'spoti.fi']
     },
     {
         name: 'pinterest',
@@ -29,6 +29,43 @@ const OEMBED_PROVIDERS = [
         allowedHosts: ['tiktok.com', 'vm.tiktok.com']
     }
 ];
+
+function parsePositiveInt(value, fallback) {
+    const parsed = Number.parseInt(String(value ?? ''), 10);
+    if (!Number.isFinite(parsed) || parsed <= 0) {
+        return fallback;
+    }
+    return parsed;
+}
+
+const RESOLVE_REQUEST_TIMEOUT_MS = parsePositiveInt(process.env.RESOLVE_REQUEST_TIMEOUT_MS, 5000);
+const RESOLVE_DNS_TIMEOUT_MS = parsePositiveInt(process.env.RESOLVE_DNS_TIMEOUT_MS, 3000);
+
+function withTimeout(promise, timeoutMs) {
+    let timeoutId;
+    const timeoutPromise = new Promise((_, reject) => {
+        timeoutId = setTimeout(() => reject(new Error('timeout')), timeoutMs);
+    });
+    return Promise.race([promise, timeoutPromise]).finally(() => {
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+        }
+    });
+}
+
+function createResolveRequestConfig() {
+    const config = {
+        maxRedirects: 0,
+        validateStatus: null,
+        timeout: RESOLVE_REQUEST_TIMEOUT_MS,
+        maxContentLength: 64 * 1024,
+        responseType: 'text'
+    };
+    if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') {
+        config.signal = AbortSignal.timeout(RESOLVE_REQUEST_TIMEOUT_MS + 250);
+    }
+    return config;
+}
 
 function isAllowedHost(host, allowedHosts) {
     if (!host) return false;
@@ -139,7 +176,10 @@ async function isPublicResolveTarget(hostname) {
 
     let addresses;
     try {
-        addresses = await dns.lookup(normalizedHost, { all: true, verbatim: true });
+        addresses = await withTimeout(
+            dns.lookup(normalizedHost, { all: true, verbatim: true }),
+            RESOLVE_DNS_TIMEOUT_MS
+        );
     } catch {
         return false;
     }
@@ -154,13 +194,7 @@ async function resolveAllowedRedirectTarget(initialUrl, allowedHosts, maxRedirec
     for (let i = 0; i < maxRedirects; i++) {
         let axiosResponse;
         try {
-            axiosResponse = await axios.get(currentUrl, {
-                maxRedirects: 0,
-                validateStatus: null,
-                timeout: 5000,
-                maxContentLength: 64 * 1024,
-                responseType: 'text'
-            });
+            axiosResponse = await axios.get(currentUrl, createResolveRequestConfig());
         } catch {
             break;
         }
@@ -249,19 +283,18 @@ router.get('/resolve/:url', security.authenticate, async function (req, res, nex
     const targetUrl = parsedTarget.toString();
     let axiosResponse;
     try {
-        axiosResponse = await axios.get(targetUrl, {
-            maxRedirects: 0,
-            validateStatus: null,
-            timeout: 5000,
-            maxContentLength: 64 * 1024,
-            responseType: 'text'
-        });
+        axiosResponse = await axios.get(targetUrl, createResolveRequestConfig());
     } catch {
         return next(apiError.badGateway('resolve_failed'));
     }
 
     if (axiosResponse.status >= 300 && axiosResponse.status < 400 && typeof axiosResponse.headers.location === 'string') {
-        return res.status(200).json({ status: 200, result: axiosResponse.headers.location });
+        try {
+            const normalizedLocation = new URL(axiosResponse.headers.location, targetUrl).toString();
+            return res.status(200).json({ status: 200, result: normalizedLocation });
+        } catch {
+            return res.status(200).json({ status: 200, result: targetUrl });
+        }
     }
 
     return res.status(200).json({ status: 200, result: targetUrl });

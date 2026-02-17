@@ -23,11 +23,15 @@ export class OembedService {
   private readonly allowedOembedHosts = [
     'youtube.com',
     'youtu.be',
+    'youtube-nocookie.com',
     'tiktok.com',
-    'vm.tiktok.com',
     'pinterest.com',
     'pin.it',
-    'open.spotify.com'
+    'open.spotify.com',
+    'spotify.com',
+    'spotify.link',
+    'spotify.app.link',
+    'spoti.fi'
   ];
   private readonly allowedGoogleMapsHosts = ['maps.app.goo.gl'];
 
@@ -94,19 +98,30 @@ export class OembedService {
   }
 
   private isYouTubeUrl(url: string): boolean {
-    return this.isAllowedHost(this.getHostname(url), ['youtube.com', 'youtu.be']);
+    const host = this.getHostname(url);
+    if (!host) {
+      return false;
+    }
+    return this.isAllowedHost(host, ['youtube.com', 'youtu.be', 'youtube-nocookie.com']);
   }
 
   private isTikTokUrl(url: string): boolean {
-    return this.isAllowedHost(this.getHostname(url), ['tiktok.com', 'vm.tiktok.com']);
+    return this.isAllowedHost(this.getHostname(url), ['tiktok.com']);
   }
 
   private isPinterestUrl(url: string): boolean {
-    return this.isAllowedHost(this.getHostname(url), ['pinterest.com', 'pin.it']);
+    const host = this.getHostname(url);
+    if (!host) {
+      return false;
+    }
+    if (this.isAllowedHost(host, ['pin.it'])) {
+      return true;
+    }
+    return /^([a-z0-9-]+\.)*pinterest\.[a-z]{2,3}(?:\.[a-z]{2,3})?$/i.test(host);
   }
 
   private isSpotifyUrl(url: string): boolean {
-    return this.isAllowedHost(this.getHostname(url), ['open.spotify.com']);
+    return this.isAllowedHost(this.getHostname(url), ['open.spotify.com', 'spotify.com', 'spotify.link', 'spotify.app.link', 'spoti.fi']);
   }
 
   private isGoogleMapsUrl(url: string): boolean {
@@ -173,40 +188,32 @@ export class OembedService {
   }
 
   private async getYouTubeMultimedia(url: string): Promise<Multimedia | undefined> {
-    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|shorts\/)|youtu\.be\/)([?=a-zA-Z0-9_-]+)/;
-    const youtubeMatch = url.match(youtubeRegex);
-    if (youtubeMatch && youtubeMatch[5]) {
-      try {
-        const response = await firstValueFrom(this.getYoutubeEmbedCode(url));
-        return {
-          type: MultimediaType.YOUTUBE,
-          url: '',
-          contentId: null != youtubeMatch[5] ? youtubeMatch[5] : '',
-          sourceUrl: url,
-          attribution: this.poweredBy('YouTube'),
-          title: '',
-          description: '',
-          oembed: response.result
-        };
-      } catch (error) {
-        console.error('Failed to load YouTube embed data', error);
-        return undefined;
-      }
-    } else {
+    const videoId = this.extractYouTubeVideoId(url);
+    if (!videoId) {
+      return undefined;
+    }
+    const canonicalUrl = `https://www.youtube.com/watch?v=${videoId}`;
+    try {
+      const response = await firstValueFrom(this.getYoutubeEmbedCode(canonicalUrl));
+      return {
+        type: MultimediaType.YOUTUBE,
+        url: '',
+        contentId: videoId,
+        sourceUrl: canonicalUrl,
+        attribution: this.poweredBy('YouTube'),
+        title: '',
+        description: '',
+        oembed: response.result
+      };
+    } catch (error) {
+      console.error('Failed to load YouTube embed data', error);
       return undefined;
     }
   }
 
-  private async getTikTokMultimedia(url: string): Promise<Multimedia | undefined> {
-    const tiktokRegex = /^(https?:\/\/)?(www\.)?tiktok\.com\/@[\w.-]+\/video\/(\d+)/;
-    const tiktokMatch = url.match(tiktokRegex);
-    const tiktokVmRegex = /^(https?:\/\/)?vm\.tiktok\.com\/([a-zA-Z0-9]+)\/?/;
-    const tiktokVmMatch = url.match(tiktokVmRegex);
-    const tiktokShortRegex = /^(https?:\/\/)?(www\.)?tiktok\.com\/t\/([a-zA-Z0-9]+)\/?/;
-    const tiktokShortMatch = url.match(tiktokShortRegex);
-
-    if (tiktokMatch && tiktokMatch[3]) {
-      const tiktokId = tiktokMatch[3];
+  private async getTikTokMultimedia(url: string, depth = 0): Promise<Multimedia | undefined> {
+    const tiktokId = this.extractTikTokVideoId(url);
+    if (tiktokId) {
       const oembedHtml = this.getTikTokEmbedCode(tiktokId);
       return {
         type: MultimediaType.TIKTOK,
@@ -226,60 +233,50 @@ export class OembedService {
           version: '1.0'
         }
       };
-    } else if ((tiktokVmMatch && tiktokVmMatch[2]) || (tiktokShortMatch && tiktokShortMatch[3])) {
-      try {
-        const response = await firstValueFrom(this.getTikTokVmEmbedCode(url));
-        const regex = /cite=["']([^"']+)["']/i;
-        const match = response.result.html?.match(regex);
-        if (match && match[1]) {
-          url = match[1];
-          return await this.getTikTokMultimedia(url);
-        } else {
-          return undefined;
-        }
-      } catch (error) {
-        console.error('Failed to resolve TikTok short URL', error);
-        return undefined;
-      }
     }
-
+    if (depth >= 4) {
+      return undefined;
+    }
+    try {
+      const response = await firstValueFrom(this.getTikTokVmEmbedCode(url));
+      const citeUrl = this.extractCiteUrl(response.result?.html);
+      if (citeUrl && citeUrl !== url) {
+        return await this.getTikTokMultimedia(citeUrl, depth + 1);
+      }
+    } catch (error) {
+      console.error('Failed to resolve TikTok short URL', error);
+    }
     return undefined;
   }
 
   private async getPinterestMultimedia(url: string): Promise<Multimedia | undefined> {
-    const pinterestRegex = /pinterest\.[a-z]{2,3}(\.[a-z]{2,3})?\/pin\/.*-([^/]+)/i;
-    const pinterestMatch = url.match(pinterestRegex);
-    const pinterestShortRegex = /https:\/\/pin\.it\/([a-zA-Z0-9]+)/;
-    const pinterestShortMatch = url.match(pinterestShortRegex);
-    const pinterestFinalRegex = /pinterest\.[a-z]{2,3}(\.[a-z]{2,3})?\/pin\/(\d+)/i;
-    const pinterestFinalMatch = url.match(pinterestFinalRegex);
+    const normalizedUrl = url.trim();
+    const pinterestShortRegex = /^https?:\/\/(?:www\.)?pin\.it\/([a-zA-Z0-9_-]+)/i;
+    const pinterestShortMatch = normalizedUrl.match(pinterestShortRegex);
 
-    if (pinterestShortMatch) {
+    if (pinterestShortMatch && pinterestShortMatch[1]) {
+      const shortCode = pinterestShortMatch[1];
+      let sourceUrl = normalizedUrl;
+      let contentId = shortCode;
+
       try {
-        const firstResponse = await firstValueFrom(this.resolveRedirectUrl(url));
-        const finalResponse = await firstValueFrom(this.resolveRedirectUrl(firstResponse.result));
-        const regex = /^(https?:\/\/)?(www\.)?pinterest\.[a-z]{2,3}\/pin\/\d+/;
-        const match = finalResponse.result.match(regex);
-
-        if (match) {
-          const resolvedUrl = match[0].replace(/pinterest\.[a-z]{2,3}/, 'pinterest.com');
-          return await this.getPinterestMultimedia(resolvedUrl);
+        const resolvedUrl = await this.resolveRedirectChain(normalizedUrl, 6);
+        const resolvedPinId = this.extractPinterestPinId(resolvedUrl);
+        if (resolvedPinId) {
+          contentId = resolvedPinId;
+          sourceUrl = `https://www.pinterest.com/pin/${resolvedPinId}`;
         }
       } catch (error) {
         console.error('Failed to resolve Pinterest short URL', error);
-        return undefined;
       }
-    } else if (pinterestMatch && pinterestMatch[2]) {
-      const normalizedUrl = url.substring(0, url.indexOf('/pin/') + 5) + pinterestMatch[2];
-      return await this.getPinterestMultimedia(normalizedUrl);
-    } else if (pinterestFinalMatch && pinterestFinalMatch[2]) {
+
       try {
-        const response = await firstValueFrom(this.getPinterestEmbedCode(url));
+        const response = await firstValueFrom(this.getPinterestEmbedCode(sourceUrl));
         return {
           type: MultimediaType.PINTEREST,
           url: '',
-          contentId: pinterestFinalMatch[2],
-          sourceUrl: url,
+          contentId,
+          sourceUrl,
           attribution: this.poweredBy('Pinterest'),
           title: '',
           description: '',
@@ -290,21 +287,75 @@ export class OembedService {
         return undefined;
       }
     }
-    return undefined;
+
+    const pinId = this.extractPinterestPinId(normalizedUrl);
+    if (!pinId) {
+      return undefined;
+    }
+
+    const canonicalUrl = `https://www.pinterest.com/pin/${pinId}`;
+    try {
+      const response = await firstValueFrom(this.getPinterestEmbedCode(canonicalUrl));
+      return {
+        type: MultimediaType.PINTEREST,
+        url: '',
+        contentId: pinId,
+        sourceUrl: canonicalUrl,
+        attribution: this.poweredBy('Pinterest'),
+        title: '',
+        description: '',
+        oembed: response.result
+      };
+    } catch (error) {
+      console.error('Failed to fetch Pinterest embed data', error);
+      return undefined;
+    }
+  }
+
+  private async resolveRedirectChain(url: string, maxRedirects = 4): Promise<string> {
+    let currentUrl = url;
+    for (let i = 0; i < maxRedirects; i++) {
+      const response = await firstValueFrom(this.resolveRedirectUrl(currentUrl));
+      const nextUrl = typeof response.result === 'string' ? response.result.trim() : '';
+      if (!nextUrl || nextUrl === currentUrl) {
+        break;
+      }
+      currentUrl = nextUrl;
+    }
+    return currentUrl;
+  }
+
+  private extractPinterestPinId(url: string): string | null {
+    const pinterestPinRegex = /pinterest\.[a-z]{2,3}(?:\.[a-z]{2,3})?\/pin\/(?:[^/?#]*-)?(\d+)/i;
+    const match = url.match(pinterestPinRegex);
+    if (!match || !match[1]) {
+      return null;
+    }
+    return match[1];
   }
 
   private async getSpotifyMultimedia(url: string): Promise<Multimedia | undefined> {
-    const spotifyRegex = /https?:\/\/open\.spotify\.com\/(track|album|artist|playlist)\/([a-zA-Z0-9]+)/;
-    const spotifyMatch = url.match(spotifyRegex);
-
-    if (spotifyMatch && spotifyMatch[2]) {
+    const normalizedUrl = url.trim();
+    const host = this.getHostname(normalizedUrl);
+    let canonical = this.extractSpotifyCanonical(normalizedUrl);
+    const shouldResolve = !!host && host !== 'open.spotify.com' && this.isAllowedHost(host, ['spotify.com', 'spotify.link', 'spotify.app.link', 'spoti.fi']);
+    if (!canonical && shouldResolve) {
       try {
-        const response = await firstValueFrom(this.getSpotifyEmbedCode(spotifyMatch[0]));
+        const resolvedUrl = await this.resolveRedirectChain(normalizedUrl, 6);
+        canonical = this.extractSpotifyCanonical(resolvedUrl);
+      } catch (error) {
+        console.error('Failed to resolve Spotify URL', error);
+      }
+    }
+
+    if (!canonical) {
+      try {
+        const response = await firstValueFrom(this.getSpotifyEmbedCode(normalizedUrl));
         return {
           type: MultimediaType.SPOTIFY,
           url: '',
-          contentId: spotifyMatch[2],
-          sourceUrl: spotifyMatch[0],
+          contentId: '',
+          sourceUrl: normalizedUrl,
           attribution: this.poweredBy('Spotify'),
           title: '',
           description: '',
@@ -316,7 +367,84 @@ export class OembedService {
       }
     }
 
-    return undefined;
+    try {
+      const response = await firstValueFrom(this.getSpotifyEmbedCode(canonical.sourceUrl));
+      return {
+        type: MultimediaType.SPOTIFY,
+        url: '',
+        contentId: canonical.contentId,
+        sourceUrl: canonical.sourceUrl,
+        attribution: this.poweredBy('Spotify'),
+        title: '',
+        description: '',
+        oembed: response.result
+      };
+    } catch (error) {
+      console.error('Failed to load Spotify embed data', error);
+      return undefined;
+    }
+  }
+
+  private extractYouTubeVideoId(url: string): string | null {
+    let parsedUrl: URL;
+    try {
+      parsedUrl = new URL(url);
+    } catch {
+      return null;
+    }
+
+    const host = parsedUrl.hostname.toLowerCase();
+    if (this.isAllowedHost(host, ['youtu.be'])) {
+      const id = parsedUrl.pathname.split('/').filter(Boolean)[0];
+      return id || null;
+    }
+
+    if (!this.isAllowedHost(host, ['youtube.com', 'youtube-nocookie.com'])) {
+      return null;
+    }
+
+    const pathSegments = parsedUrl.pathname.split('/').filter(Boolean);
+    if (pathSegments[0] === 'watch') {
+      const id = parsedUrl.searchParams.get('v');
+      return id ? id.trim() : null;
+    }
+    if ((pathSegments[0] === 'shorts' || pathSegments[0] === 'embed' || pathSegments[0] === 'live') && pathSegments[1]) {
+      return pathSegments[1];
+    }
+    return null;
+  }
+
+  private extractTikTokVideoId(url: string): string | null {
+    const tiktokRegex = /tiktok\.com\/@[\w.-]+\/video\/(\d+)/i;
+    const match = url.match(tiktokRegex);
+    if (!match || !match[1]) {
+      return null;
+    }
+    return match[1];
+  }
+
+  private extractCiteUrl(html?: string): string | null {
+    if (!html) {
+      return null;
+    }
+    const regex = /cite=["']([^"']+)["']/i;
+    const match = html.match(regex);
+    if (!match || !match[1]) {
+      return null;
+    }
+    return match[1];
+  }
+
+  private extractSpotifyCanonical(url: string): { sourceUrl: string, contentId: string } | null {
+    const spotifyRegex = /^https?:\/\/open\.spotify\.com\/(track|album|artist|playlist|episode|show)\/([a-zA-Z0-9]+)(?:[/?#].*)?$/i;
+    const match = url.trim().match(spotifyRegex);
+    if (!match || !match[1] || !match[2]) {
+      return null;
+    }
+    return {
+      sourceUrl: `https://open.spotify.com/${match[1].toLowerCase()}/${match[2]}`,
+      contentId: match[2]
+    };
   }
 
   public getYoutubeEmbedCode(sourceUrl: string): Observable<GetOembedResponse> {

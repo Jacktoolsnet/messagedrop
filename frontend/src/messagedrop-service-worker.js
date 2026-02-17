@@ -139,20 +139,26 @@ function detectContentType(url) {
         /youtube\.com\/watch/,
         /youtube\.com\/shorts/,
         /youtube\.com\/embed/,
+        /youtube\.com\/live\//,
+        /youtube-nocookie\.com\/embed\//,
         /youtu\.be\//,
 
         // Spotify
-        /open\.spotify\.com\/(track|album|artist|playlist)/,
+        /open\.spotify\.com\/(track|album|artist|playlist|episode|show)/,
         /spotify\.com\/.+/,
+        /spotify\.link\//,
+        /spotify\.app\.link\//,
+        /spoti\.fi\//,
 
         // Pinterest
-        /pinterest\.com\/pin\//,
+        /pinterest\.[^/]+\/pin\//,
         /pin\.it/, // Shortlink
 
         // TikTok
         /tiktok\.com\/@.*\/video\//,
         /tiktok\.com\/t\//,
-        /vm\.tiktok\.com\//
+        /vm\.tiktok\.com\//,
+        /vt\.tiktok\.com\//
     ];
 
     const locationPatterns = [
