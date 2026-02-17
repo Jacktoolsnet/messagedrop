@@ -284,6 +284,14 @@ export class OembedService {
     return match[1];
   }
 
+  private extractPinterestPinIdFromEmbedHtml(html: string): string | null {
+    const match = html.match(/embed\.html\?id=(\d+)/i);
+    if (!match || !match[1]) {
+      return null;
+    }
+    return match[1];
+  }
+
   private buildPinterestMultimedia(
     oembed: GetOembedResponse['result'],
     sourceUrl: string,
@@ -293,10 +301,11 @@ export class OembedService {
       ?? this.extractPinterestPinId(sourceUrl)
       ?? this.extractPinterestPinId(oembed?.url ?? '')
       ?? this.extractPinterestPinId(oembed?.author_url ?? '')
-      ?? this.extractPinterestPinId(oembed?.html ?? '');
+      ?? this.extractPinterestPinId(oembed?.html ?? '')
+      ?? this.extractPinterestPinIdFromEmbedHtml(oembed?.html ?? '');
 
-    const html = pinId ? this.getPinterestIframeEmbedCode(pinId) : '';
-    if (!html) {
+    const html = pinId ? this.getPinterestIframeEmbedCode(pinId) : (oembed?.html ?? '');
+    if (!html || !html.trim()) {
       return undefined;
     }
 
