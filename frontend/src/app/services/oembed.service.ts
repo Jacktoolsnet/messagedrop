@@ -251,61 +251,29 @@ export class OembedService {
 
   private async getPinterestMultimedia(url: string): Promise<Multimedia | undefined> {
     const normalizedUrl = url.trim();
-    const pinterestShortRegex = /^https?:\/\/(?:www\.)?pin\.it\/([a-zA-Z0-9_-]+)/i;
-    const pinterestShortMatch = normalizedUrl.match(pinterestShortRegex);
+    let pinId = this.extractPinterestPinId(normalizedUrl);
 
-    if (pinterestShortMatch && pinterestShortMatch[1]) {
-      const shortCode = pinterestShortMatch[1];
-      let sourceUrl = normalizedUrl;
-      let contentId = shortCode;
-
-      try {
-        const resolvedUrl = await this.resolveRedirectChain(normalizedUrl, 6);
-        const resolvedPinId = this.extractPinterestPinId(resolvedUrl);
-        if (resolvedPinId) {
-          contentId = resolvedPinId;
-          sourceUrl = `https://www.pinterest.com/pin/${resolvedPinId}`;
+    if (!pinId) {
+      const shortCode = this.extractPinterestShortCode(normalizedUrl);
+      if (shortCode) {
+        const resolverUrl = `https://api.pinterest.com/url_shortener/${shortCode}/redirect/`;
+        try {
+          const resolvedUrl = await this.resolveRedirectChain(resolverUrl, 5);
+          pinId = this.extractPinterestPinId(resolvedUrl);
+        } catch (error) {
+          console.error('Failed to resolve Pinterest short URL', error);
         }
-      } catch (error) {
-        console.error('Failed to resolve Pinterest short URL', error);
-      }
-
-      try {
-        const response = await firstValueFrom(this.getPinterestEmbedCode(sourceUrl));
-        return {
-          type: MultimediaType.PINTEREST,
-          url: '',
-          contentId,
-          sourceUrl,
-          attribution: this.poweredBy('Pinterest'),
-          title: '',
-          description: '',
-          oembed: response.result
-        };
-      } catch (error) {
-        console.error('Failed to fetch Pinterest embed data', error);
-        return undefined;
       }
     }
 
-    const pinId = this.extractPinterestPinId(normalizedUrl);
     if (!pinId) {
       return undefined;
     }
 
-    const canonicalUrl = `https://www.pinterest.com/pin/${pinId}`;
+    const canonicalUrl = `https://www.pinterest.com/pin/${pinId}/`;
     try {
       const response = await firstValueFrom(this.getPinterestEmbedCode(canonicalUrl));
-      return {
-        type: MultimediaType.PINTEREST,
-        url: '',
-        contentId: pinId,
-        sourceUrl: canonicalUrl,
-        attribution: this.poweredBy('Pinterest'),
-        title: '',
-        description: '',
-        oembed: response.result
-      };
+      return this.buildPinterestMultimedia(response.result, canonicalUrl, pinId);
     } catch (error) {
       console.error('Failed to fetch Pinterest embed data', error);
       return undefined;
@@ -332,6 +300,56 @@ export class OembedService {
       return null;
     }
     return match[1];
+  }
+
+  private extractPinterestShortCode(url: string): string | null {
+    const pinShortRegex = /^https?:\/\/(?:www\.)?pin\.it\/([a-zA-Z0-9_-]+)/i;
+    const match = url.match(pinShortRegex);
+    if (!match || !match[1]) {
+      return null;
+    }
+    return match[1];
+  }
+
+  private buildPinterestMultimedia(
+    oembed: GetOembedResponse['result'],
+    sourceUrl: string,
+    pinIdFromInput?: string | null
+  ): Multimedia | undefined {
+    const pinId = pinIdFromInput
+      ?? this.extractPinterestPinId(sourceUrl)
+      ?? this.extractPinterestPinId(oembed?.url ?? '')
+      ?? this.extractPinterestPinId(oembed?.author_url ?? '')
+      ?? this.extractPinterestPinId(oembed?.html ?? '');
+
+    const html = pinId ? this.getPinterestIframeEmbedCode(pinId) : '';
+    if (!html) {
+      return undefined;
+    }
+
+    const normalizedSourceUrl = pinId ? `https://www.pinterest.com/pin/${pinId}` : sourceUrl;
+
+    return {
+      type: MultimediaType.PINTEREST,
+      url: '',
+      contentId: pinId ?? '',
+      sourceUrl: normalizedSourceUrl,
+      attribution: this.poweredBy('Pinterest'),
+      title: '',
+      description: '',
+      oembed: {
+        ...oembed,
+        html,
+        provider_name: oembed?.provider_name || 'Pinterest',
+        provider_url: oembed?.provider_url || 'https://www.pinterest.com/',
+        type: oembed?.type || 'rich',
+        version: oembed?.version || '1.0'
+      }
+    };
+  }
+
+  private getPinterestIframeEmbedCode(pinId: string): string {
+    return `<iframe width="100%" style="aspect-ratio: 3 / 4; border: none;" src="https://assets.pinterest.com/ext/embed.html?id=${pinId}" loading="lazy" title="Pinterest"></iframe>`;
   }
 
   private async getSpotifyMultimedia(url: string): Promise<Multimedia | undefined> {

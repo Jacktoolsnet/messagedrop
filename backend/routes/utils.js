@@ -38,8 +38,8 @@ function parsePositiveInt(value, fallback) {
     return parsed;
 }
 
-const RESOLVE_REQUEST_TIMEOUT_MS = parsePositiveInt(process.env.RESOLVE_REQUEST_TIMEOUT_MS, 5000);
-const RESOLVE_DNS_TIMEOUT_MS = parsePositiveInt(process.env.RESOLVE_DNS_TIMEOUT_MS, 3000);
+const RESOLVE_REQUEST_TIMEOUT_MS = parsePositiveInt(process.env.RESOLVE_REQUEST_TIMEOUT_MS, 10000);
+const RESOLVE_DNS_TIMEOUT_MS = parsePositiveInt(process.env.RESOLVE_DNS_TIMEOUT_MS, 5000);
 
 function withTimeout(promise, timeoutMs) {
     let timeoutId;
