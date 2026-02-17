@@ -149,8 +149,47 @@ async function isPublicResolveTarget(hostname) {
     return addresses.every((entry) => entry?.address && !isPrivateOrReservedIp(entry.address));
 }
 
-function handleOembedRequest(providerUrl, targetUrl, res, next) {
-    let response = { 'status': 0 };
+async function resolveAllowedRedirectTarget(initialUrl, allowedHosts, maxRedirects = 4) {
+    let currentUrl = initialUrl;
+    for (let i = 0; i < maxRedirects; i++) {
+        let axiosResponse;
+        try {
+            axiosResponse = await axios.get(currentUrl, {
+                maxRedirects: 0,
+                validateStatus: null,
+                timeout: 5000,
+                maxContentLength: 64 * 1024,
+                responseType: 'text'
+            });
+        } catch {
+            break;
+        }
+
+        if (!(axiosResponse.status >= 300 && axiosResponse.status < 400) || typeof axiosResponse.headers.location !== 'string') {
+            break;
+        }
+
+        let nextUrl;
+        try {
+            nextUrl = new URL(axiosResponse.headers.location, currentUrl).toString();
+        } catch {
+            break;
+        }
+        const parsedNextUrl = parseUrl(nextUrl);
+        if (!parsedNextUrl || !/^https?:$/i.test(parsedNextUrl.protocol)) {
+            break;
+        }
+        if (!isAllowedHost(parsedNextUrl.hostname, allowedHosts)) {
+            break;
+        }
+
+        currentUrl = parsedNextUrl.toString();
+    }
+    return currentUrl;
+}
+
+async function handleOembedRequest(providerUrl, targetUrl, res, next) {
+    const response = { 'status': 0 };
     const provider = OEMBED_PROVIDERS.find((entry) => entry.providerUrl === providerUrl);
     if (!provider) {
         return next(apiError.badRequest('oembed_provider_not_allowed'));
@@ -165,24 +204,29 @@ function handleOembedRequest(providerUrl, targetUrl, res, next) {
         return next(apiError.badRequest('oembed_url_not_allowed'));
     }
 
-    axios.get(provider.providerUrl, {
-        params: { url: targetUrl, format: 'json' },
-        timeout: 5000,
-        maxRedirects: 0,
-        validateStatus: null
-    })
-        .then(axiosResponse => {
-            if (axiosResponse.status === 200) {
-                response.status = axiosResponse.status;
-                response.result = axiosResponse.data;
-                res.status(response.status).json(response);
-            } else {
-                response.status = axiosResponse.status;
-                response.result = axiosResponse.statusText;
-                res.status(response.status).json(response);
-            }
-        })
-        .catch(() => next(apiError.badGateway('oembed_failed')));
+    let normalizedTargetUrl = parsedTarget.toString();
+    if (provider.name === 'tiktok' && isAllowedHost(parsedTarget.hostname, ['vm.tiktok.com'])) {
+        normalizedTargetUrl = await resolveAllowedRedirectTarget(normalizedTargetUrl, provider.allowedHosts);
+    }
+
+    try {
+        const axiosResponse = await axios.get(provider.providerUrl, {
+            params: { url: normalizedTargetUrl, format: 'json' },
+            timeout: 5000,
+            maxRedirects: 0,
+            validateStatus: null
+        });
+        if (axiosResponse.status === 200) {
+            response.status = axiosResponse.status;
+            response.result = axiosResponse.data;
+            return res.status(response.status).json(response);
+        }
+        response.status = axiosResponse.status;
+        response.result = axiosResponse.statusText;
+        return res.status(response.status).json(response);
+    } catch {
+        return next(apiError.badGateway('oembed_failed'));
+    }
 }
 
 router.get('/resolve/:url', security.authenticate, async function (req, res, next) {

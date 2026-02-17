@@ -202,9 +202,10 @@ export class OembedService {
     const tiktokMatch = url.match(tiktokRegex);
     const tiktokVmRegex = /^(https?:\/\/)?vm\.tiktok\.com\/([a-zA-Z0-9]+)\/?/;
     const tiktokVmMatch = url.match(tiktokVmRegex);
+    const tiktokShortRegex = /^(https?:\/\/)?(www\.)?tiktok\.com\/t\/([a-zA-Z0-9]+)\/?/;
+    const tiktokShortMatch = url.match(tiktokShortRegex);
 
     if (tiktokMatch && tiktokMatch[3]) {
-      this.getTikTokEmbedCode(url)
       const tiktokId = tiktokMatch[3];
       const oembedHtml = this.getTikTokEmbedCode(tiktokId);
       return {
@@ -225,10 +226,10 @@ export class OembedService {
           version: '1.0'
         }
       };
-    } else if (tiktokVmMatch && tiktokVmMatch[2]) {
+    } else if ((tiktokVmMatch && tiktokVmMatch[2]) || (tiktokShortMatch && tiktokShortMatch[3])) {
       try {
         const response = await firstValueFrom(this.getTikTokVmEmbedCode(url));
-        const regex = /<blockquote class="tiktok-embed" cite="([^"]+)"/;
+        const regex = /cite=["']([^"']+)["']/i;
         const match = response.result.html?.match(regex);
         if (match && match[1]) {
           url = match[1];
