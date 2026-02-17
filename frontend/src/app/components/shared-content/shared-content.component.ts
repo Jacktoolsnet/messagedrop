@@ -56,21 +56,15 @@ export class SharedContentComponent implements OnInit {
     }
   }
 
-  public get hasGenericContent(): boolean {
-    return !!this.sharedText || !!this.sharedUrl;
-  }
-
-  public get sharedText(): string | null {
-    const text = this.content?.text?.trim();
-    return text ? text : null;
-  }
-
   public get sharedUrl(): string | null {
     const url = this.content?.url?.trim();
     return url ? url : null;
   }
 
   public get hasOpenableUrl(): boolean {
+    if (this.loadFailed) {
+      return false;
+    }
     const url = this.sharedUrl;
     if (!url) {
       return false;
@@ -91,6 +85,10 @@ export class SharedContentComponent implements OnInit {
     window.open(url, '_blank', 'noopener,noreferrer');
   }
 
+  public get canDeleteSharedContent(): boolean {
+    return !this.loadFailed;
+  }
+
   private clearSharedPayload(keys: string[]): void {
     for (const key of keys) {
       void this.sharedContentService.deleteSharedContent(key);
@@ -98,11 +96,17 @@ export class SharedContentComponent implements OnInit {
   }
 
   public deleteSharedContent(): void {
+    if (!this.canDeleteSharedContent) {
+      return;
+    }
     this.clearSharedPayload(['last', 'lastMultimedia', 'lastLocation']);
     this.dialogRef.close();
   }
 
   public deleteSharedLocation(): void {
+    if (!this.canDeleteSharedContent) {
+      return;
+    }
     if (this.location) {
       this.clearSharedPayload(['last', 'lastLocation']);
     }

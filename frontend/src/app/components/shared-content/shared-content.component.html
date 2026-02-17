@@ -20,20 +20,6 @@
             <p>{{ location.plusCode }}</p>
         </div>
         }
-        } @else if (hasGenericContent) {
-        @if (sharedText) {
-        <div class="shared-field">
-            <span class="label">{{ 'common.sharedContent.textLabel' | transloco }}</span>
-            <p class="pre-wrap">{{ sharedText }}</p>
-        </div>
-        }
-
-        @if (sharedUrl) {
-        <div class="shared-field">
-            <span class="label">{{ 'common.sharedContent.urlLabel' | transloco }}</span>
-            <p class="pre-wrap">{{ sharedUrl }}</p>
-        </div>
-        }
         } @else {
         <p>{{ 'common.sharedContent.empty' | transloco }}</p>
         }
@@ -53,8 +39,10 @@
     </button>
     }
     @if (location) {
-    <button color="warn" (click)="deleteSharedLocation()" mat-icon-button [attr.aria-label]="'common.sharedContent.removeLocation' | transloco"><mat-icon>location_off</mat-icon></button>
+    <button color="warn" (click)="deleteSharedLocation()" mat-icon-button [disabled]="!canDeleteSharedContent"
+        [attr.aria-label]="'common.sharedContent.removeLocation' | transloco"><mat-icon>location_off</mat-icon></button>
     } @else {
-    <button color="warn" (click)="deleteSharedContent()" mat-icon-button [attr.aria-label]="'common.sharedContent.removeContent' | transloco"><mat-icon>delete</mat-icon></button>
+    <button color="warn" (click)="deleteSharedContent()" mat-icon-button [disabled]="!canDeleteSharedContent"
+        [attr.aria-label]="'common.sharedContent.removeContent' | transloco"><mat-icon>delete</mat-icon></button>
     }
 </mat-dialog-actions>
