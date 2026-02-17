@@ -1404,7 +1404,30 @@
     }
   },
   "sharedContent": {
-    "title": "Contenu partagé"
+    "title": "Contenu partagé",
+    "intro": "Cette boîte de dialogue affiche le contenu transmis à MessageDrop depuis une autre application.",
+    "items": {
+      "content": {
+        "title": "Afficher le contenu",
+        "desc": "Le contenu partagé est affiché dans une tuile afin de pouvoir le vérifier et l'utiliser directement."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Cette action ferme la boîte de dialogue sans autre modification."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette action ouvre cette vue d'aide."
+      },
+      "openLink": {
+        "title": "Ouvrir le lien partagé",
+        "desc": "Cette action ouvre le lien partagé dans le navigateur. Elle n'est disponible que lorsqu'un lien valide existe."
+      },
+      "delete": {
+        "title": "Supprimer le contenu partagé",
+        "desc": "Cette action supprime le contenu partagé actuellement stocké localement."
+      }
+    }
   },
   "tileList": {
     "title": "Tuiles",

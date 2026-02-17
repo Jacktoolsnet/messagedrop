@@ -719,17 +719,21 @@
       "sms": "SMS"
     },
     "sharedContent": {
-      "multimediaTitle": "Geteilter Multimedia-Inhalt empfangen",
+      "title": "Geteilter Inhalt",
+      "multimediaTitle": "Geteilter Inhalt",
       "multimediaHint": "Diesen Inhalt zu einem Beitrag, einer Notiz oder einer Nachricht hinzufügen.",
       "removeContent": "Geteilten Inhalt entfernen",
-      "locationTitle": "Geteilten Standort empfangen",
+      "locationTitle": "Geteilter Inhalt",
       "locationHint": "Zur geteilten Position auf der Karte springen.",
       "removeLocation": "Geteilten Standort entfernen",
-      "genericTitle": "Geteilten Inhalt empfangen",
+      "genericTitle": "Geteilter Inhalt",
       "genericHint": "Ein geteilter Inhalt wurde an MessageDrop übergeben.",
       "titleLabel": "Titel",
       "textLabel": "Text",
       "urlLabel": "Link",
+      "openLink": "Geteilten Link öffnen",
+      "coordinatesLabel": "Koordinaten",
+      "plusCodeLabel": "Plus Code",
       "empty": "Der geteilte Inhalt konnte nicht gelesen werden."
     },
     "systemMessages": {

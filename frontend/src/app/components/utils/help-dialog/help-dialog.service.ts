@@ -1843,8 +1843,34 @@ const HELP_TOPICS = {
   },
   sharedContent: {
     titleKey: 'sharedContent.title',
-    introKey: 'common.intros.info',
-    items: ITEMS.info
+    introKey: 'sharedContent.intro',
+    items: [
+      {
+        icon: 'info',
+        titleKey: 'sharedContent.items.content.title',
+        descriptionKey: 'sharedContent.items.content.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'sharedContent.items.close.title',
+        descriptionKey: 'sharedContent.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'sharedContent.items.help.title',
+        descriptionKey: 'sharedContent.items.help.desc'
+      },
+      {
+        icon: 'open_in_new',
+        titleKey: 'sharedContent.items.openLink.title',
+        descriptionKey: 'sharedContent.items.openLink.desc'
+      },
+      {
+        icon: 'delete',
+        titleKey: 'sharedContent.items.delete.title',
+        descriptionKey: 'sharedContent.items.delete.desc'
+      }
+    ]
   },
   tileList: {
     titleKey: 'tileList.title',

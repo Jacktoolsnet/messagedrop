@@ -1404,7 +1404,30 @@
     }
   },
   "sharedContent": {
-    "title": "Geteilte Inhalte"
+    "title": "Geteilter Inhalt",
+    "intro": "Dieser Dialog zeigt Inhalte, die aus einer anderen App an MessageDrop übergeben wurden.",
+    "items": {
+      "content": {
+        "title": "Inhalt anzeigen",
+        "desc": "Geteilte Inhalte werden in einer Kachel dargestellt und können direkt übernommen werden."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Mit dieser Aktion schließt du den Dialog ohne weitere Änderungen."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Aktion öffnest du diese Hilfeansicht."
+      },
+      "openLink": {
+        "title": "Geteilten Link öffnen",
+        "desc": "Mit dieser Aktion öffnest du den geteilten Link im Browser. Die Aktion ist nur verfügbar, wenn ein gültiger Link vorhanden ist."
+      },
+      "delete": {
+        "title": "Geteilten Inhalt entfernen",
+        "desc": "Mit dieser Aktion entfernst du den aktuell geteilten Inhalt aus dem lokalen Speicher."
+      }
+    }
   },
   "tileList": {
     "title": "Kacheln",

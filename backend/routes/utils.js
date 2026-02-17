@@ -223,7 +223,7 @@ router.get('/resolve/:url', security.authenticate, async function (req, res, nex
     return res.status(200).json({ status: 200, result: targetUrl });
 });
 
-router.get('/oembed', security.authenticate, function (req, res, next) {
+router.get('/oembed', security.authenticateOptional, function (req, res, next) {
     const providerUrl = safeDecode(getQueryParam(req.query.provider));
     const targetUrl = safeDecode(getQueryParam(req.query.url));
     return handleOembedRequest(providerUrl, targetUrl, res, next);

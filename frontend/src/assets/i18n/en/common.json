@@ -719,17 +719,21 @@
       "sms": "SMS"
     },
     "sharedContent": {
-      "multimediaTitle": "Shared multimedia content received",
+      "title": "Shared content",
+      "multimediaTitle": "Shared content",
       "multimediaHint": "Add this content to a post, note, or message.",
       "removeContent": "Remove shared content",
-      "locationTitle": "Shared location received",
+      "locationTitle": "Shared content",
       "locationHint": "Jumping to the shared location on the map.",
       "removeLocation": "Remove shared location",
-      "genericTitle": "Shared content received",
+      "genericTitle": "Shared content",
       "genericHint": "MessageDrop received shared content from another app.",
       "titleLabel": "Title",
       "textLabel": "Text",
       "urlLabel": "Link",
+      "openLink": "Open shared link",
+      "coordinatesLabel": "Coordinates",
+      "plusCodeLabel": "Plus Code",
       "empty": "The shared content could not be parsed."
     },
     "systemMessages": {

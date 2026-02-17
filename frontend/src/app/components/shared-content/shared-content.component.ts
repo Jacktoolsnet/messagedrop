@@ -73,6 +73,27 @@ export class SharedContentComponent implements OnInit {
     return url ? url : null;
   }
 
+  public get hasOpenableUrl(): boolean {
+    const url = this.sharedUrl;
+    if (!url) {
+      return false;
+    }
+    try {
+      const parsed = new URL(url);
+      return parsed.protocol === 'https:' || parsed.protocol === 'http:';
+    } catch {
+      return false;
+    }
+  }
+
+  public openSharedUrl(): void {
+    const url = this.sharedUrl;
+    if (!url || !this.hasOpenableUrl || typeof window === 'undefined') {
+      return;
+    }
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+
   private clearSharedPayload(keys: string[]): void {
     for (const key of keys) {
       void this.sharedContentService.deleteSharedContent(key);
@@ -90,11 +111,6 @@ export class SharedContentComponent implements OnInit {
     if (this.location) {
       this.clearSharedPayload(['last', 'lastLocation']);
     }
-    this.dialogRef.close();
-  }
-
-  public deleteSharedGenericContent(): void {
-    this.clearSharedPayload(['last', 'lastMultimedia', 'lastLocation']);
     this.dialogRef.close();
   }
 }

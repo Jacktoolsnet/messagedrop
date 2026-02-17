@@ -1404,7 +1404,30 @@
     }
   },
   "sharedContent": {
-    "title": "Shared content"
+    "title": "Shared content",
+    "intro": "This dialog shows content that was sent to MessageDrop from another app.",
+    "items": {
+      "content": {
+        "title": "View content",
+        "desc": "Shared content is shown inside a tile so it can be reviewed and applied directly."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "This action closes the dialog without further changes."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "openLink": {
+        "title": "Open shared link",
+        "desc": "This action opens the shared link in the browser. It is only available when a valid link exists."
+      },
+      "delete": {
+        "title": "Remove shared content",
+        "desc": "This action removes the currently shared content from local storage."
+      }
+    }
   },
   "tileList": {
     "title": "Tiles",

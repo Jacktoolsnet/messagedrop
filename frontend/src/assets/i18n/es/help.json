@@ -1404,7 +1404,30 @@
     }
   },
   "sharedContent": {
-    "title": "Contenido compartido"
+    "title": "Contenido compartido",
+    "intro": "Este diálogo muestra contenido que se envió a MessageDrop desde otra aplicación.",
+    "items": {
+      "content": {
+        "title": "Ver contenido",
+        "desc": "El contenido compartido se muestra dentro de una tarjeta para revisarlo y aplicarlo directamente."
+      },
+      "close": {
+        "title": "Cerrar",
+        "desc": "Esta acción cierra el diálogo sin cambios adicionales."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Esta acción abre esta vista de ayuda."
+      },
+      "openLink": {
+        "title": "Abrir enlace compartido",
+        "desc": "Esta acción abre el enlace compartido en el navegador. Solo está disponible si existe un enlace válido."
+      },
+      "delete": {
+        "title": "Eliminar contenido compartido",
+        "desc": "Esta acción elimina el contenido compartido actual del almacenamiento local."
+      }
+    }
   },
   "tileList": {
     "title": "Tarjetas",

@@ -1,10 +1,46 @@
-@if (multimedia) {
 <app-dialog-header
-  [title]="'common.sharedContent.multimediaTitle' | transloco">
+  [title]="'common.sharedContent.title' | transloco">
 </app-dialog-header>
 <mat-dialog-content class="full-width">
-    <app-showmultimedia [multimedia]="multimedia"></app-showmultimedia>
-    <h4>{{ 'common.sharedContent.multimediaHint' | transloco }}</h4>
+    <div class="shared-tile">
+        @if (multimedia) {
+        <app-showmultimedia [multimedia]="multimedia"></app-showmultimedia>
+        } @else if (location) {
+        <div class="shared-field">
+            <span class="label">{{ 'common.sharedContent.coordinatesLabel' | transloco }}</span>
+            <p class="pre-wrap">{{ location.latitude }}, {{ location.longitude }}</p>
+        </div>
+        @if (location.plusCode) {
+        <div class="shared-field">
+            <span class="label">{{ 'common.sharedContent.plusCodeLabel' | transloco }}</span>
+            <p>{{ location.plusCode }}</p>
+        </div>
+        }
+        } @else if (hasGenericContent) {
+        @if (sharedTitle) {
+        <div class="shared-field">
+            <span class="label">{{ 'common.sharedContent.titleLabel' | transloco }}</span>
+            <p>{{ sharedTitle }}</p>
+        </div>
+        }
+
+        @if (sharedText) {
+        <div class="shared-field">
+            <span class="label">{{ 'common.sharedContent.textLabel' | transloco }}</span>
+            <p class="pre-wrap">{{ sharedText }}</p>
+        </div>
+        }
+
+        @if (sharedUrl) {
+        <div class="shared-field">
+            <span class="label">{{ 'common.sharedContent.urlLabel' | transloco }}</span>
+            <p class="pre-wrap">{{ sharedUrl }}</p>
+        </div>
+        }
+        } @else {
+        <p>{{ 'common.sharedContent.empty' | transloco }}</p>
+        }
+    </div>
 </mat-dialog-content>
 <mat-dialog-actions class="sticky-actions" align="end">
     <button color="primary" mat-dialog-close [mat-dialog-close]="undefined" mat-icon-button [attr.aria-label]="'common.actions.close' | transloco" class="action-close"><mat-icon>close</mat-icon></button>
@@ -12,65 +48,15 @@
         [attr.aria-label]="'common.actions.help' | transloco">
         <mat-icon>help</mat-icon>
     </button>
-    <button color="warn" (click)="deleteSharedContent()" mat-icon-button [attr.aria-label]="'common.sharedContent.removeContent' | transloco"><mat-icon>delete</mat-icon></button>
-</mat-dialog-actions>
-}
-
-@else if (location) {
-<app-dialog-header
-  [title]="'common.sharedContent.locationTitle' | transloco">
-</app-dialog-header>
-<mat-dialog-content class="full-width">
-    <h4>{{ 'common.sharedContent.locationHint' | transloco }}</h4>
-</mat-dialog-content>
-<mat-dialog-actions class="sticky-actions" align="end">
-    <button color="primary" mat-dialog-close [mat-dialog-close]="undefined" mat-icon-button [attr.aria-label]="'common.actions.close' | transloco" class="action-close"><mat-icon>close</mat-icon></button>
-    <button mat-icon-button type="button" (click)="help.open('sharedContent')"
-        [attr.aria-label]="'common.actions.help' | transloco">
-        <mat-icon>help</mat-icon>
+    @if (hasOpenableUrl) {
+    <button mat-icon-button type="button" (click)="openSharedUrl()"
+        [attr.aria-label]="'common.sharedContent.openLink' | transloco">
+        <mat-icon>open_in_new</mat-icon>
     </button>
-    <button color="warn" (click)="deleteSharedLocation()" mat-icon-button [attr.aria-label]="'common.sharedContent.removeLocation' | transloco"><mat-icon>location_off</mat-icon></button>
-</mat-dialog-actions>
-}
-
-@else {
-<app-dialog-header
-  [title]="'common.sharedContent.genericTitle' | transloco">
-</app-dialog-header>
-<mat-dialog-content class="full-width">
-    <h4>{{ 'common.sharedContent.genericHint' | transloco }}</h4>
-
-    @if (hasGenericContent) {
-      @if (sharedTitle) {
-      <div class="shared-field">
-          <span class="label">{{ 'common.sharedContent.titleLabel' | transloco }}</span>
-          <p>{{ sharedTitle }}</p>
-      </div>
-      }
-
-      @if (sharedText) {
-      <div class="shared-field">
-          <span class="label">{{ 'common.sharedContent.textLabel' | transloco }}</span>
-          <p class="pre-wrap">{{ sharedText }}</p>
-      </div>
-      }
-
-      @if (sharedUrl) {
-      <div class="shared-field">
-          <span class="label">{{ 'common.sharedContent.urlLabel' | transloco }}</span>
-          <a [href]="sharedUrl" target="_blank" rel="noopener noreferrer">{{ sharedUrl }}</a>
-      </div>
-      }
-    } @else {
-      <p>{{ 'common.sharedContent.empty' | transloco }}</p>
     }
-</mat-dialog-content>
-<mat-dialog-actions class="sticky-actions" align="end">
-    <button color="primary" mat-dialog-close [mat-dialog-close]="undefined" mat-icon-button [attr.aria-label]="'common.actions.close' | transloco" class="action-close"><mat-icon>close</mat-icon></button>
-    <button mat-icon-button type="button" (click)="help.open('sharedContent')"
-        [attr.aria-label]="'common.actions.help' | transloco">
-        <mat-icon>help</mat-icon>
-    </button>
-    <button color="warn" (click)="deleteSharedGenericContent()" mat-icon-button [attr.aria-label]="'common.sharedContent.removeContent' | transloco"><mat-icon>delete</mat-icon></button>
+    @if (location) {
+    <button color="warn" (click)="deleteSharedLocation()" mat-icon-button [attr.aria-label]="'common.sharedContent.removeLocation' | transloco"><mat-icon>location_off</mat-icon></button>
+    } @else {
+    <button color="warn" (click)="deleteSharedContent()" mat-icon-button [attr.aria-label]="'common.sharedContent.removeContent' | transloco"><mat-icon>delete</mat-icon></button>
+    }
 </mat-dialog-actions>
-}
