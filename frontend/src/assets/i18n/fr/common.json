@@ -732,6 +732,7 @@
       "textLabel": "Texte",
       "urlLabel": "Lien",
       "openLink": "Ouvrir le lien partagé",
+      "loadFailed": "Le contenu partagé n'a pas pu être chargé. L'entrée a été supprimée automatiquement.",
       "coordinatesLabel": "Coordonnées",
       "plusCodeLabel": "Plus Code",
       "empty": "Le contenu partagé n'a pas pu être interprété."

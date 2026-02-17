@@ -101,6 +101,7 @@ import { TranslationHelperService } from './services/translation-helper.service'
 import { UserService } from './services/user.service';
 import { UsageProtectionService } from './services/usage-protection.service';
 import { WeatherService } from './services/weather.service';
+import { DiagnosticLoggerService } from './services/diagnostic-logger.service';
 import { isQuotaExceededError } from './utils/storage-error.util';
 
 @Component({
@@ -167,6 +168,7 @@ export class AppComponent implements OnInit {
   private readonly airQualityService = inject(AirQualityService);
   private readonly weatherService = inject(WeatherService);
   private readonly geoStatisticService = inject(GeoStatisticService);
+  private readonly diagnosticLogger = inject(DiagnosticLoggerService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
   private readonly platformLocation = inject(PlatformLocation);
@@ -616,6 +618,7 @@ export class AppComponent implements OnInit {
     let multimedia: Multimedia | undefined = undefined;
     let location: Location | undefined = undefined;
     const normalizedUrl = typeof content.url === 'string' ? content.url.trim() : '';
+    let resolveError: unknown;
 
     if (normalizedUrl) {
       try {
@@ -626,8 +629,16 @@ export class AppComponent implements OnInit {
           location = objectFromUrl;
         }
       } catch (error) {
+        resolveError = error;
         console.warn('Failed to resolve shared content URL', error);
       }
+    }
+
+    const expectsResolvedContent = content.type === 'multimedia' || content.type === 'location';
+    const loadFailed = !!normalizedUrl && expectsResolvedContent && !multimedia && !location;
+    if (loadFailed) {
+      this.clearFailedSharedContent(content.type);
+      this.logSharedContentResolveFailure(normalizedUrl, content.type, resolveError);
     }
 
     this.sharedContentDialogOpen = true;
@@ -636,6 +647,7 @@ export class AppComponent implements OnInit {
       data: {
         multimedia,
         location,
+        loadFailed,
         content: {
           ...content,
           url: normalizedUrl || null
@@ -657,6 +669,28 @@ export class AppComponent implements OnInit {
         this.userService.saveProfile();
       }
       this.flushPendingSharedContent();
+    });
+  }
+
+  private clearFailedSharedContent(type?: SharedContent['type']): void {
+    const keys = new Set<string>(['last']);
+    if (type === 'multimedia') {
+      keys.add('lastMultimedia');
+    } else if (type === 'location') {
+      keys.add('lastLocation');
+    }
+    keys.forEach((key) => void this.sharedContentService.deleteSharedContent(key));
+  }
+
+  private logSharedContentResolveFailure(url: string, type?: SharedContent['type'], error?: unknown): void {
+    const logPrefix = '[shared-content]';
+    const fallbackError = error instanceof Error ? error : new Error('shared_content_resolve_failed');
+    const reason = error instanceof Error ? error.message : 'no_result';
+    const expectedType = type ?? 'unknown';
+    this.diagnosticLogger.logHealthCheckError('shared_content', fallbackError, {
+      path: '/share-target',
+      errorCode: 'shared_content_resolve_failed',
+      errorMessage: `${logPrefix} Failed to resolve shared content (${expectedType}) URL: ${url} reason: ${reason}`
     });
   }
 

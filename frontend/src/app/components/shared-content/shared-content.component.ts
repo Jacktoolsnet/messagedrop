@@ -16,6 +16,7 @@ import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.comp
 interface SharedContentDialogData {
   multimedia?: Multimedia;
   location?: Location;
+  loadFailed?: boolean;
   content?: SharedContent | null;
 }
 
@@ -46,6 +47,7 @@ export class SharedContentComponent implements OnInit {
 
   public multimedia: Multimedia | undefined = this.data.multimedia;
   public location: Location | undefined = this.data.location;
+  public loadFailed = this.data.loadFailed === true;
   private readonly content: SharedContent | null = this.data.content ?? null;
 
   public async ngOnInit(): Promise<void> {
@@ -96,9 +98,7 @@ export class SharedContentComponent implements OnInit {
   }
 
   public deleteSharedContent(): void {
-    if (this.multimedia) {
-      this.clearSharedPayload(['last', 'lastMultimedia']);
-    }
+    this.clearSharedPayload(['last', 'lastMultimedia', 'lastLocation']);
     this.dialogRef.close();
   }
 

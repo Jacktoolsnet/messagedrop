@@ -732,6 +732,7 @@
       "textLabel": "Text",
       "urlLabel": "Link",
       "openLink": "Geteilten Link öffnen",
+      "loadFailed": "Der geteilte Inhalt konnte nicht geladen werden. Der Eintrag wurde automatisch entfernt.",
       "coordinatesLabel": "Koordinaten",
       "plusCodeLabel": "Plus Code",
       "empty": "Der geteilte Inhalt konnte nicht gelesen werden."

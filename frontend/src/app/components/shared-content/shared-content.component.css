@@ -83,6 +83,15 @@
     gap: 0.25rem;
 }
 
+.load-failed-hint {
+    margin: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--mat-card-outlined-outline-color);
+    background-color: color-mix(in srgb, var(--mat-card-filled-container-color) 82%, #ffd54f 18%);
+    font-size: 0.9rem;
+}
+
 .shared-field .label {
     font-size: 0.8rem;
     font-weight: 600;

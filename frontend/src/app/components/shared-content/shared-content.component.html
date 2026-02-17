@@ -4,6 +4,9 @@
 <mat-dialog-content class="shared-dialog-content">
     <div class="shared-scroll">
         <div class="shared-tile">
+        @if (loadFailed) {
+        <p class="load-failed-hint">{{ 'common.sharedContent.loadFailed' | transloco }}</p>
+        }
         @if (multimedia) {
         <app-showmultimedia [multimedia]="multimedia"></app-showmultimedia>
         } @else if (location) {

@@ -732,6 +732,7 @@
       "textLabel": "Text",
       "urlLabel": "Link",
       "openLink": "Open shared link",
+      "loadFailed": "The shared content could not be loaded. The entry was removed automatically.",
       "coordinatesLabel": "Coordinates",
       "plusCodeLabel": "Plus Code",
       "empty": "The shared content could not be parsed."
