@@ -644,7 +644,7 @@ export class AppComponent implements OnInit {
       closeOnNavigation: true,
       minWidth: 'min(450px, 95vw)',
       maxWidth: '90vw',
-      maxHeight: '90vh',
+      maxHeight: '95vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
       disableClose: false,

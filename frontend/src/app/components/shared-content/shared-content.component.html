@@ -1,8 +1,9 @@
 <app-dialog-header
   [title]="'common.sharedContent.title' | transloco">
 </app-dialog-header>
-<mat-dialog-content class="full-width">
-    <div class="shared-tile">
+<mat-dialog-content class="shared-dialog-content">
+    <div class="shared-scroll">
+        <div class="shared-tile">
         @if (multimedia) {
         <app-showmultimedia [multimedia]="multimedia"></app-showmultimedia>
         } @else if (location) {
@@ -33,6 +34,7 @@
         } @else {
         <p>{{ 'common.sharedContent.empty' | transloco }}</p>
         }
+        </div>
     </div>
 </mat-dialog-content>
 <mat-dialog-actions class="sticky-actions" align="end">

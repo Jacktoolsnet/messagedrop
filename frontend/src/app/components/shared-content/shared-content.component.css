@@ -1,13 +1,44 @@
 :host {
     color: var(--mat-app-text-color);
+    display: block;
     --shared-content-gap: 1rem;
 }
 
-mat-dialog-content {
-    max-height: calc(90vh - 64px);
-    /* oder je nach Header-Höhe */
+:host ::ng-deep .mat-mdc-dialog-surface {
+    max-height: 95vh;
+    display: flex;
+    flex-direction: column;
+    padding-top: 0;
+}
+
+:host ::ng-deep h2[mat-dialog-title].dialog-title {
+    position: sticky;
+    top: 0;
+    z-index: 4;
+    background-color: var(--mat-card-filled-container-color);
+    box-shadow: 0 2px 8px var(--mat-card-outlined-outline-color);
+}
+
+.mat-mdc-dialog-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.shared-dialog-content {
+    padding: 0;
+}
+
+.shared-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
     overflow-y: auto;
-    display: block;
     padding: var(--shared-content-gap);
 }
 
@@ -17,6 +48,32 @@ mat-dialog-content {
     border-radius: 0.75rem;
     background-color: var(--mat-card-filled-container-color);
     box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+}
+
+.sticky-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 4;
+    background-color: var(--mat-card-filled-container-color);
+    box-shadow: 0 -2px 8px var(--mat-card-outlined-outline-color);
+    border-top: 1px solid var(--mat-card-outlined-outline-color);
+    padding: 0.3rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.sticky-actions .action-close {
+    margin-right: auto;
+    margin-inline-end: auto;
+}
+
+.sticky-actions button {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
 }
 
 .shared-field {
