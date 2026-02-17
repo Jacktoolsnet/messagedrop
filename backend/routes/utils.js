@@ -222,6 +222,86 @@ async function resolveAllowedRedirectTarget(initialUrl, allowedHosts, maxRedirec
     return currentUrl;
 }
 
+function isPinterestHost(hostname) {
+    const normalizedHost = normalizeHostname(hostname);
+    if (!normalizedHost) {
+        return false;
+    }
+    if (normalizedHost === 'pin.it' || normalizedHost.endsWith('.pin.it')) {
+        return true;
+    }
+    if (isAllowedHost(normalizedHost, ['pinterest.com'])) {
+        return true;
+    }
+    return /^([a-z0-9-]+\.)*pinterest\.[a-z]{2,3}(?:\.[a-z]{2,3})?$/i.test(normalizedHost);
+}
+
+function extractPinterestShortCode(url) {
+    const match = String(url || '').match(/^https?:\/\/(?:www\.)?pin\.it\/([a-zA-Z0-9_-]+)/i);
+    if (!match || !match[1]) {
+        return null;
+    }
+    return match[1];
+}
+
+function extractPinterestPinId(url) {
+    const match = String(url || '').match(/pinterest\.[a-z]{2,3}(?:\.[a-z]{2,3})?\/pin\/(?:[^/?#]*-)?(\d+)/i);
+    if (!match || !match[1]) {
+        return null;
+    }
+    return match[1];
+}
+
+async function resolvePinterestRedirectTarget(initialUrl, maxRedirects = 5) {
+    let currentUrl = initialUrl;
+    for (let i = 0; i < maxRedirects; i++) {
+        let axiosResponse;
+        try {
+            axiosResponse = await axios.get(currentUrl, createResolveRequestConfig());
+        } catch {
+            break;
+        }
+
+        if (!(axiosResponse.status >= 300 && axiosResponse.status < 400) || typeof axiosResponse.headers.location !== 'string') {
+            break;
+        }
+
+        let nextUrl;
+        try {
+            nextUrl = new URL(axiosResponse.headers.location, currentUrl).toString();
+        } catch {
+            break;
+        }
+        const parsedNextUrl = parseUrl(nextUrl);
+        if (!parsedNextUrl || !/^https?:$/i.test(parsedNextUrl.protocol)) {
+            break;
+        }
+        if (!isPinterestHost(parsedNextUrl.hostname)) {
+            break;
+        }
+
+        currentUrl = parsedNextUrl.toString();
+    }
+    return currentUrl;
+}
+
+async function normalizePinterestTargetUrl(targetUrl) {
+    let candidateUrl = targetUrl;
+    const shortCode = extractPinterestShortCode(candidateUrl);
+    if (shortCode) {
+        const resolverUrl = `https://api.pinterest.com/url_shortener/${shortCode}/redirect/`;
+        candidateUrl = await resolvePinterestRedirectTarget(resolverUrl, 5);
+        if (!extractPinterestPinId(candidateUrl)) {
+            candidateUrl = await resolvePinterestRedirectTarget(targetUrl, 5);
+        }
+    }
+    const pinId = extractPinterestPinId(candidateUrl);
+    if (!pinId) {
+        return candidateUrl;
+    }
+    return `https://www.pinterest.com/pin/${pinId}/`;
+}
+
 async function handleOembedRequest(providerUrl, targetUrl, res, next) {
     const response = { 'status': 0 };
     const provider = OEMBED_PROVIDERS.find((entry) => entry.providerUrl === providerUrl);
@@ -241,6 +321,8 @@ async function handleOembedRequest(providerUrl, targetUrl, res, next) {
     let normalizedTargetUrl = parsedTarget.toString();
     if (provider.name === 'tiktok' && isAllowedHost(parsedTarget.hostname, ['vm.tiktok.com'])) {
         normalizedTargetUrl = await resolveAllowedRedirectTarget(normalizedTargetUrl, provider.allowedHosts);
+    } else if (provider.name === 'pinterest') {
+        normalizedTargetUrl = await normalizePinterestTargetUrl(normalizedTargetUrl);
     }
 
     try {

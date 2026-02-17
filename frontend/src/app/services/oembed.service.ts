@@ -251,29 +251,11 @@ export class OembedService {
 
   private async getPinterestMultimedia(url: string): Promise<Multimedia | undefined> {
     const normalizedUrl = url.trim();
-    let pinId = this.extractPinterestPinId(normalizedUrl);
-
-    if (!pinId) {
-      const shortCode = this.extractPinterestShortCode(normalizedUrl);
-      if (shortCode) {
-        const resolverUrl = `https://api.pinterest.com/url_shortener/${shortCode}/redirect/`;
-        try {
-          const resolvedUrl = await this.resolveRedirectChain(resolverUrl, 5);
-          pinId = this.extractPinterestPinId(resolvedUrl);
-        } catch (error) {
-          console.error('Failed to resolve Pinterest short URL', error);
-        }
-      }
-    }
-
-    if (!pinId) {
-      return undefined;
-    }
-
-    const canonicalUrl = `https://www.pinterest.com/pin/${pinId}/`;
+    const pinId = this.extractPinterestPinId(normalizedUrl);
+    const targetUrl = pinId ? `https://www.pinterest.com/pin/${pinId}/` : normalizedUrl;
     try {
-      const response = await firstValueFrom(this.getPinterestEmbedCode(canonicalUrl));
-      return this.buildPinterestMultimedia(response.result, canonicalUrl, pinId);
+      const response = await firstValueFrom(this.getPinterestEmbedCode(targetUrl));
+      return this.buildPinterestMultimedia(response.result, targetUrl, pinId);
     } catch (error) {
       console.error('Failed to fetch Pinterest embed data', error);
       return undefined;
@@ -296,15 +278,6 @@ export class OembedService {
   private extractPinterestPinId(url: string): string | null {
     const pinterestPinRegex = /pinterest\.[a-z]{2,3}(?:\.[a-z]{2,3})?\/pin\/(?:[^/?#]*-)?(\d+)/i;
     const match = url.match(pinterestPinRegex);
-    if (!match || !match[1]) {
-      return null;
-    }
-    return match[1];
-  }
-
-  private extractPinterestShortCode(url: string): string | null {
-    const pinShortRegex = /^https?:\/\/(?:www\.)?pin\.it\/([a-zA-Z0-9_-]+)/i;
-    const match = url.match(pinShortRegex);
     if (!match || !match[1]) {
       return null;
     }
