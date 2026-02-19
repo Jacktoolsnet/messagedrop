@@ -6,6 +6,7 @@ import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { CheckPinComponent } from '../components/pin/check-pin/check-pin.component';
 import { DeleteUserComponent } from '../components/user/delete-user/delete-user.component';
+import { DisplayMessage } from '../components/utils/display-message/display-message.component';
 import { BackupEnvelope, BackupLocalImage, BackupMediaFile, BackupPayload, UserServerBackup } from '../interfaces/backup';
 import { IndexedDbBackup } from '../interfaces/indexed-db-backup';
 import { LocalImage } from '../interfaces/local-image';
@@ -300,11 +301,27 @@ export class RestoreService {
       const decoded = new TextDecoder().decode(decrypted);
       return JSON.parse(decoded) as BackupPayload;
     } catch {
-      this.snackBar.open(this.i18n.t('common.restore.pinIncorrect'), undefined, {
-        duration: 3500,
-        horizontalPosition: 'center',
-        verticalPosition: 'top'
+      const dialogRef = this.dialog.open(DisplayMessage, {
+        panelClass: '',
+        closeOnNavigation: false,
+        data: {
+          showAlways: true,
+          title: this.i18n.t('common.restore.title'),
+          image: '',
+          icon: 'warning',
+          message: this.i18n.t('common.restore.pinIncorrect'),
+          button: this.i18n.t('common.actions.ok'),
+          delay: 0,
+          showSpinner: false
+        },
+        maxWidth: '90vw',
+        maxHeight: '90vh',
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop',
+        disableClose: false,
+        autoFocus: false
       });
+      await firstValueFrom(dialogRef.afterClosed());
       return null;
     }
   }
