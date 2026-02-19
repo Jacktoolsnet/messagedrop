@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnChanges, Output, inject } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, inject } from '@angular/core';
 import { Location } from '../../interfaces/location';
 import { MarkerLocation } from '../../interfaces/marker-location';
 import { MapService } from '../../services/map.service';
@@ -11,7 +11,7 @@ import { UserService } from '../../services/user.service';
   templateUrl: './map.component.html',
   styleUrl: './map.component.css'
 })
-export class MapComponent implements AfterViewInit, OnChanges {
+export class MapComponent implements AfterViewInit, OnChanges, OnDestroy {
   // The members of location are used for change detection
   @Input() lastMarkerUpdate = 0;
   @Input() location: Location = { latitude: 0, longitude: 0, plusCode: '' };
@@ -22,6 +22,7 @@ export class MapComponent implements AfterViewInit, OnChanges {
 
   private readonly mapService = inject(MapService);
   readonly userService = inject(UserService);
+  private destroyed = false;
 
   ngOnChanges(): void {
     this.mapService.createMarkers(this.markerLocations);
@@ -31,12 +32,18 @@ export class MapComponent implements AfterViewInit, OnChanges {
     this.initComponent();
   }
 
+  ngOnDestroy(): void {
+    this.destroyed = true;
+  }
+
   private async initComponent() {
-    while (!this.mapService.isReady()) {
+    while (!this.mapService.isReady() && !this.destroyed) {
       await new Promise(f => setTimeout(f, 100));
+    }
+    if (this.destroyed) {
+      return;
     }
     this.mapService.initMapEvents(this.location, this.clickEvent, this.moveEndEvent, this.markerClickEvent);
   }
 
 }
-

@@ -737,7 +737,7 @@ export class AppComponent implements OnInit {
 
   private async handleMessageNotification(action: NotificationAction): Promise<void> {
     const messageId = typeof action.id === 'string' ? action.id.trim() : '';
-    let message = messageId ? await firstValueFrom(this.messageService.getByUuid(messageId)) : null;
+    const message = messageId ? await firstValueFrom(this.messageService.getByUuid(messageId)) : null;
 
     const targetLocation = message?.location ?? action.location;
     if (!targetLocation) {
@@ -1564,6 +1564,9 @@ export class AppComponent implements OnInit {
   }
 
   public openMarkerMessageListDialog(messages: Message[]) {
+    if (!Array.isArray(messages) || messages.length === 0) {
+      return;
+    }
     this.markerMessageListOpen = true;
     const dialogRef = this.dialog.open(MessagelistComponent, {
       panelClass: 'MessageListDialog',

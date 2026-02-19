@@ -143,6 +143,16 @@ export class MapService {
     // this.drawSearchRectange(this.location);
 
     this._mapSet.update(trigger => trigger + 1);
+
+    // When map is created after a full-screen gate/splash, Leaflet can start with a stale size.
+    // Recalculate layout shortly after mount so bounds + marker hitboxes are reliable.
+    const refreshMapLayout = () => {
+      if (!this.map) return;
+      this.map.invalidateSize();
+      moveEndEvent.emit(this.location);
+    };
+    setTimeout(refreshMapLayout, 0);
+    setTimeout(refreshMapLayout, 180);
   }
 
   isReady(): boolean {

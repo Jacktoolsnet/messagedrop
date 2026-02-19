@@ -42,6 +42,7 @@ export class MessageService {
   readonly messageSet = this._messageSet.asReadonly();
 
   private commentCounts: Record<string, number> = {};
+  private publicMessageFetchToken = 0;
 
   private lastSearchedLocation = '';
 
@@ -217,6 +218,7 @@ export class MessageService {
   }
 
   clearMessages() {
+    this.publicMessageFetchToken += 1;
     this.messagesSignal.set([]);
     this._messageSet.update(trigger => trigger + 1);
   }
@@ -540,8 +542,14 @@ export class MessageService {
   }
 
   getByVisibleMapBoundingBox(showAlways = false) {
+    const fetchToken = ++this.publicMessageFetchToken;
     const boundingBoxes = this.mapService.getVisibleMapBoundingBoxes();
     if (boundingBoxes.length === 0) {
+      if (fetchToken !== this.publicMessageFetchToken) {
+        return;
+      }
+      this.messagesSignal.set([]);
+      this._messageSet.update(trigger => trigger + 1);
       return;
     }
 
@@ -553,6 +561,9 @@ export class MessageService {
 
     forkJoin(requests).subscribe({
       next: (responses) => {
+        if (fetchToken !== this.publicMessageFetchToken) {
+          return;
+        }
         const successfulResponses = responses.filter((response): response is GetMessageResponse => response !== null);
 
         this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(
@@ -578,6 +589,9 @@ export class MessageService {
         this._messageSet.update(trigger => trigger + 1);
       },
       error: () => {
+        if (fetchToken !== this.publicMessageFetchToken) {
+          return;
+        }
         this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(
           this.mapService.getMapLocation(),
           this.mapService.getMapZoom()
