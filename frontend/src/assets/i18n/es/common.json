@@ -1021,9 +1021,11 @@
       "keysMismatch": "Esta copia de seguridad se creó con claves de seguridad diferentes. Está desactualizada y no se puede restaurar.",
       "overwriteTitle": "Restaurar copia de seguridad",
       "overwriteMessage": "Restaurar esta copia de seguridad eliminará el usuario actual y todos los datos relacionados en este dispositivo y en el servidor. ¿Continuar?",
+      "overwriteMessageLocal": "Restaurar esta copia de seguridad sobrescribirá los datos locales de este dispositivo. Los datos del servidor solo se pueden restaurar después de iniciar sesión.",
       "overwriteUserHint": "La copia de seguridad pertenece al usuario {{ userId }}.",
       "deleteUserFailed": "No se pudo eliminar el usuario actual.",
       "restoringServerData": "Restaurando datos del servidor",
+      "serverRestoreSkipped": "Se omitieron los datos del servidor. Inicia sesión más tarde y vuelve a restaurar si es necesario.",
       "imageRestoreUnsupported": "La restauración de imágenes no es compatible con este navegador.",
       "imageRestoreSkipped": "La restauración de imágenes se omitió."
     },

@@ -24,7 +24,7 @@
       },
       "actions": {
         "title": "Action bar",
-        "desc": "Use the action bar buttons to close, apply, or confirm."
+        "desc": "Use the action bar to close, apply, confirm, or choose a specific action (for example “Create new user” or “Restore backup”)."
       },
       "cancel": {
         "title": "Cancel",

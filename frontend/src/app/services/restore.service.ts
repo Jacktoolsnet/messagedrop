@@ -58,12 +58,7 @@ export class RestoreService {
     }
 
     const hasUser = await this.indexedDbService.hasUser();
-    if (hasUser && !this.userService.isReady()) {
-      this.userService.loginWithBackend(() => {
-        this.startRestore();
-      });
-      return;
-    }
+    const canRestoreServerData = this.userService.isReady() && this.userService.hasJwt();
 
     this.restoreInProgress = true;
 
@@ -106,8 +101,8 @@ export class RestoreService {
         return;
       }
 
-      if (hasUser && this.userService.isReady()) {
-        if (this.hasKeyMismatch(payload)) {
+      if (hasUser) {
+        if (this.userService.isReady() && this.hasKeyMismatch(payload)) {
           this.snackBar.open(this.i18n.t('common.restore.keysMismatch'), undefined, {
             duration: 3500,
             horizontalPosition: 'center',
@@ -115,19 +110,29 @@ export class RestoreService {
           });
           return;
         }
-        const confirmed = await this.confirmOverwrite(payload.userId);
+        const confirmed = await this.confirmOverwrite(payload.userId, canRestoreServerData);
         if (!confirmed) {
           return;
         }
 
-        const deleted = await this.deleteCurrentUser();
-        if (!deleted) {
-          return;
+        if (canRestoreServerData) {
+          const deleted = await this.deleteCurrentUser();
+          if (!deleted) {
+            return;
+          }
         }
       }
 
       await this.indexedDbService.clearAllData();
-      await this.restoreServerData(payload.server);
+      if (canRestoreServerData) {
+        await this.restoreServerData(payload.server);
+      } else {
+        this.snackBar.open(this.i18n.t('common.restore.serverRestoreSkipped'), undefined, {
+          duration: 3500,
+          horizontalPosition: 'center',
+          verticalPosition: 'top'
+        });
+      }
       await this.restoreIndexedDb(payload.indexedDb);
       await this.restoreLocalImages(payload.localImages || []);
       await this.restoreMediaFiles(payload.mediaFiles || []);
@@ -304,12 +309,14 @@ export class RestoreService {
     }
   }
 
-  private async confirmOverwrite(backupUserId: string): Promise<boolean> {
+  private async confirmOverwrite(backupUserId: string, includeServerData: boolean): Promise<boolean> {
     const currentUserId = this.userService.getUser().id;
     const userHint = backupUserId && backupUserId !== currentUserId
       ? this.i18n.t('common.restore.overwriteUserHint', { userId: backupUserId })
       : '';
-    const baseMessage = this.i18n.t('common.restore.overwriteMessage');
+    const baseMessage = includeServerData
+      ? this.i18n.t('common.restore.overwriteMessage')
+      : this.i18n.t('common.restore.overwriteMessageLocal');
     const message = userHint ? `${baseMessage}\n\n${userHint}` : baseMessage;
 
     const dialogRef = this.dialog.open(DeleteUserComponent, {
@@ -344,8 +351,6 @@ export class RestoreService {
         });
         return false;
       }
-      await this.indexedDbService.clearAllData();
-      this.userService.logout();
       return true;
     } catch (error) {
       console.error('Failed to delete user before restore', error);

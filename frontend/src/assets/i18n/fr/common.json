@@ -1021,9 +1021,11 @@
       "keysMismatch": "Cette sauvegarde a été créée avec des clés de sécurité différentes. Elle est obsolète et ne peut pas être restaurée.",
       "overwriteTitle": "Restaurer une sauvegarde",
       "overwriteMessage": "Restaurer cette sauvegarde supprimera l'utilisateur actuel et toutes les données associées sur cet appareil et sur le serveur. Continuer ?",
+      "overwriteMessageLocal": "Restaurer cette sauvegarde remplacera les données locales sur cet appareil. Les données serveur ne peuvent être restaurées qu'après connexion.",
       "overwriteUserHint": "La sauvegarde appartient à l'utilisateur {{ userId }}.",
       "deleteUserFailed": "Impossible de supprimer l'utilisateur actuel.",
       "restoringServerData": "Restauration des données serveur",
+      "serverRestoreSkipped": "Les données serveur ont été ignorées. Connectez-vous plus tard et relancez la restauration si nécessaire.",
       "imageRestoreUnsupported": "La restauration des images n'est pas prise en charge dans ce navigateur.",
       "imageRestoreSkipped": "La restauration des images a été ignorée."
     },

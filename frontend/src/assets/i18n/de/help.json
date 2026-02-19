@@ -24,7 +24,7 @@
       },
       "actions": {
         "title": "Aktionsleiste",
-        "desc": "Nutze die Aktionsleiste zum Schließen, Übernehmen oder Bestätigen."
+        "desc": "Nutze die Aktionsleiste zum Schließen, Übernehmen, Bestätigen oder zum Auswählen einer konkreten Aktion (z. B. „Neuen Benutzer erstellen“ oder „Backup einspielen“)."
       },
       "cancel": {
         "title": "Abbrechen",

@@ -1021,9 +1021,11 @@
       "keysMismatch": "This backup was created with different security keys. It is outdated and cannot be restored.",
       "overwriteTitle": "Restore backup",
       "overwriteMessage": "Restoring this backup will delete the current user and all related data on this device and on the server. Continue?",
+      "overwriteMessageLocal": "Restoring this backup will overwrite local data on this device. Server data can only be restored after signing in.",
       "overwriteUserHint": "The backup belongs to user {{ userId }}.",
       "deleteUserFailed": "Unable to delete the current user.",
       "restoringServerData": "Restoring server data",
+      "serverRestoreSkipped": "Server data was skipped. Please sign in later and restore again if needed.",
       "imageRestoreUnsupported": "Image restore is not supported in this browser.",
       "imageRestoreSkipped": "Image restore was skipped."
     },

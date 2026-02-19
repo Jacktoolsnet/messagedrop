@@ -5,6 +5,28 @@
   <div class="confirm-box">{{ data?.message || ('common.user.deleteDialog.confirm' | transloco) }}</div>
 </mat-dialog-content>
 <mat-dialog-actions class="sticky-actions" align="end">
+  @if (data?.confirmLabel || data?.cancelLabel) {
+  <button
+    mat-dialog-close
+    [mat-dialog-close]="false"
+    mat-stroked-button
+    type="button"
+    cdkFocusInitial
+    [attr.aria-label]="data?.cancelLabel || ('common.actions.abort' | transloco)"
+    class="action-close">
+    {{ data?.cancelLabel || ('common.actions.abort' | transloco) }}
+  </button>
+  <button
+    mat-dialog-close
+    [mat-dialog-close]="true"
+    mat-flat-button
+    color="primary"
+    type="button"
+    [attr.aria-label]="data?.confirmLabel || ('common.actions.yes' | transloco)">
+    {{ data?.confirmLabel || ('common.actions.yes' | transloco) }}
+  </button>
+  } @else {
   <button mat-dialog-close cdkFocusInitial [mat-dialog-close]="false" mat-icon-button [attr.aria-label]="'common.actions.abort' | transloco" class="action-close"><mat-icon>close</mat-icon></button>
   <button mat-dialog-close [mat-dialog-close]="true" mat-icon-button [attr.aria-label]="'common.actions.yes' | transloco"><mat-icon>check</mat-icon></button>
+  }
 </mat-dialog-actions>

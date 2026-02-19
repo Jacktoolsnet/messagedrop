@@ -1050,7 +1050,7 @@ export class UserService {
     if (result === false) {
       await this.indexedDbService.clearAllData();
       this.logout();
-      this.openCreatePinDialog();
+      await this.login();
       return;
     }
     this.blocked = false;
