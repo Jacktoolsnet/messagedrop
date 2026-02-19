@@ -1968,8 +1968,12 @@
         "desc": "Über das Listen-Symbol wechselst du zurück zur Ergebnisliste."
       },
       "actions": {
-        "title": "Ergebnisaktionen nutzen",
-        "desc": "Pro Treffer kannst du den Ort auf der Karte anspringen oder externe Navigation öffnen."
+        "title": "Ort auf Karte anspringen",
+        "desc": "Mit dem Pin-Button springst du mit der App-Karte direkt zum ausgewählten Treffer."
+      },
+      "openMaps": {
+        "title": "In Google Maps öffnen",
+        "desc": "Mit dem Navigations-Button öffnest du den Treffer direkt in Google Maps."
       },
       "add": {
         "title": "Als Ort übernehmen",

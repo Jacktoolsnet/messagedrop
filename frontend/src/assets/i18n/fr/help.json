@@ -1968,8 +1968,12 @@
         "desc": "Avec l'icône liste, vous revenez à la liste des résultats."
       },
       "actions": {
-        "title": "Utiliser les actions de résultat",
-        "desc": "Pour chaque résultat, vous pouvez centrer le lieu sur la carte ou ouvrir une navigation externe."
+        "title": "Centrer le lieu sur la carte",
+        "desc": "Avec le bouton pin, vous centrez la carte de l'application sur le résultat sélectionné."
+      },
+      "openMaps": {
+        "title": "Ouvrir dans Google Maps",
+        "desc": "Avec le bouton de navigation, vous ouvrez directement le résultat dans Google Maps."
       },
       "add": {
         "title": "Utiliser comme lieu",

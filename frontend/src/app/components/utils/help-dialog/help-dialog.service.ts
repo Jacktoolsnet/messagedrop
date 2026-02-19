@@ -2532,6 +2532,11 @@ const HELP_TOPICS = {
         descriptionKey: 'nominatimSearch.items.actions.desc'
       },
       {
+        icon: 'assistant_direction',
+        titleKey: 'nominatimSearch.items.openMaps.title',
+        descriptionKey: 'nominatimSearch.items.openMaps.desc'
+      },
+      {
         icon: 'add_location',
         titleKey: 'nominatimSearch.items.add.title',
         descriptionKey: 'nominatimSearch.items.add.desc'

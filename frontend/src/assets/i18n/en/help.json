@@ -1968,8 +1968,12 @@
         "desc": "Use the list icon to switch back to the result list."
       },
       "actions": {
-        "title": "Use result actions",
-        "desc": "For each result, you can jump to the place on the map or open external navigation."
+        "title": "Jump to place on map",
+        "desc": "Use the pin button to center the app map on the selected result."
+      },
+      "openMaps": {
+        "title": "Open in Google Maps",
+        "desc": "Use the navigation button to open the selected result directly in Google Maps."
       },
       "add": {
         "title": "Use as place",

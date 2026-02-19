@@ -1968,8 +1968,12 @@
         "desc": "Con el icono de lista vuelves a la lista de resultados."
       },
       "actions": {
-        "title": "Usar acciones del resultado",
-        "desc": "En cada resultado puedes saltar al lugar en el mapa o abrir navegación externa."
+        "title": "Saltar al lugar en el mapa",
+        "desc": "Con el botón del pin centras el mapa de la app en el resultado seleccionado."
+      },
+      "openMaps": {
+        "title": "Abrir en Google Maps",
+        "desc": "Con el botón de navegación abres el resultado directamente en Google Maps."
       },
       "add": {
         "title": "Usar como lugar",
