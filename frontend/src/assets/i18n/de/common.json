@@ -1290,6 +1290,7 @@
         "other": "Andere illegale oder verbotene Inhalte"
       },
       "submitButton": "Absenden",
+      "submitRateLimited": "Zu viele DSA-Meldungen in kurzer Zeit. Bitte warte einen Moment und versuche es erneut.",
       "submitFailed": "Senden fehlgeschlagen. Bitte versuche es erneut.",
       "submitFailedTitle": "Senden fehlgeschlagen",
       "successSignalTitle": "Meldung gesendet",

@@ -164,15 +164,6 @@
     color: var(--mdc-sys-color-error, #d32f2f);
 }
 
-.error {
-    margin-top: .75rem;
-    padding: .5rem .75rem;
-    border-radius: .5rem;
-    background: color-mix(in oklab, #d32f2f 12%, transparent);
-    color: #b71c1c;
-    border: 1px solid color-mix(in oklab, #b71c1c 35%, transparent);
-}
-
 /* Responsive */
 @media (max-width: 640px) {
     .two-cols {

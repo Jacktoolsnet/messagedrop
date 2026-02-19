@@ -1,5 +1,6 @@
 
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ChangeDetectionStrategy, Component, OnDestroy, computed, inject, signal } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -50,7 +51,7 @@ interface DigitalServicesActReportDialogData {
   styleUrls: ['./digital-services-act-report-dialog.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DigitalServicesActReportDialogComponent {
+export class DigitalServicesActReportDialogComponent implements OnDestroy {
 
   private readonly dialogRef = inject(MatDialogRef<DigitalServicesActReportDialogComponent, { created: boolean }>);
   private readonly dialogData = inject<DigitalServicesActReportDialogData>(MAT_DIALOG_DATA);
@@ -107,8 +108,13 @@ export class DigitalServicesActReportDialogComponent {
   });
 
   submitting = false;
-  errorMsg = '';
   activeTabIndex = 0; // 0 = Quick, 1 = Formal
+  readonly rateLimitedUntil = signal<number | null>(null);
+  readonly isRateLimited = computed(() => {
+    const until = this.rateLimitedUntil();
+    return typeof until === 'number' && until > Date.now();
+  });
+  private rateLimitResetTimer: ReturnType<typeof setTimeout> | null = null;
 
   // Evidence tab state
   readonly maxEvidenceBytes = 1 * 1024 * 1024;
@@ -196,6 +202,13 @@ export class DigitalServicesActReportDialogComponent {
     return d ? d.toLocaleString() : '—';
   }
 
+  ngOnDestroy(): void {
+    if (this.rateLimitResetTimer) {
+      clearTimeout(this.rateLimitResetTimer);
+      this.rateLimitResetTimer = null;
+    }
+  }
+
   private buildReportedContent(): Record<string, unknown> | null {
     const msg = this.data?.message ?? null;
     if (!msg) return null;
@@ -234,8 +247,7 @@ export class DigitalServicesActReportDialogComponent {
   }
 
   async submit(): Promise<void> {
-    if (this.submitting) return;
-    this.errorMsg = '';
+    if (this.submitting || this.isRateLimited()) return;
     this.submitting = true;
 
     try {
@@ -277,10 +289,6 @@ export class DigitalServicesActReportDialogComponent {
         this.showSuccess('notice', response?.statusUrl ?? null, response?.token ?? null, raw.reporterEmail || '');
       }
     } catch (error) {
-      const detail =
-        (error as { error?: { message?: string } })?.error?.message ??
-        this.translation.t('dsa.report.submitFailed');
-      this.errorMsg = detail;
       this.showError(error);
     } finally {
       this.submitting = false;
@@ -371,12 +379,10 @@ export class DigitalServicesActReportDialogComponent {
   }
 
   private showError(error: unknown) {
-    const typed = error as { error?: { message?: string; detail?: string }; message?: string };
-    const detail =
-      typed?.error?.message ||
-      typed?.error?.detail ||
-      typed?.message ||
-      this.translation.t('dsa.report.submitFailed');
+    const detail = this.resolveErrorMessage(error);
+    if (this.isRateLimitError(error)) {
+      this.activateRateLimit(error);
+    }
     // Fehler: deutliches Warn-Icon, Dialog bleibt offen
     this.openDisplayMessage({
       title: this.translation.t('dsa.report.submitFailedTitle'),
@@ -422,5 +428,95 @@ export class DigitalServicesActReportDialogComponent {
       return `https://${trimmed}`;
     }
     return null;
+  }
+
+  private isRateLimitError(error: unknown): boolean {
+    return (error as { status?: unknown })?.status === 429;
+  }
+
+  private resolveErrorMessage(error: unknown): string {
+    if (this.isRateLimitError(error)) {
+      return this.translation.t('dsa.report.submitRateLimited');
+    }
+    const typed = error as { error?: { message?: string; detail?: string }; message?: string };
+    return (
+      typed?.error?.message ||
+      typed?.error?.detail ||
+      typed?.message ||
+      this.translation.t('dsa.report.submitFailed')
+    );
+  }
+
+  private activateRateLimit(error: unknown): void {
+    const retryMs = this.resolveRetryAfterMs(error);
+    if (this.rateLimitResetTimer) {
+      clearTimeout(this.rateLimitResetTimer);
+    }
+    this.rateLimitedUntil.set(Date.now() + retryMs);
+    this.rateLimitResetTimer = setTimeout(() => {
+      this.rateLimitedUntil.set(null);
+      this.rateLimitResetTimer = null;
+    }, retryMs);
+  }
+
+  private resolveRetryAfterMs(error: unknown): number {
+    const fallbackMs = 10 * 60 * 1000;
+    if (!(error instanceof HttpErrorResponse)) {
+      return fallbackMs;
+    }
+
+    const retryAfterMs = this.parseRetryAfter(error.headers.get('Retry-After'));
+    if (retryAfterMs !== null) {
+      return retryAfterMs;
+    }
+
+    const rateLimitResetMs = this.parseRateLimitReset(error.headers.get('RateLimit-Reset'));
+    if (rateLimitResetMs !== null) {
+      return rateLimitResetMs;
+    }
+
+    return fallbackMs;
+  }
+
+  private parseRetryAfter(headerValue: string | null): number | null {
+    if (!headerValue) return null;
+
+    const asNumber = Number(headerValue);
+    if (Number.isFinite(asNumber) && asNumber > 0) {
+      return this.clampRetryMs(asNumber * 1000);
+    }
+
+    const asDate = Date.parse(headerValue);
+    if (Number.isFinite(asDate)) {
+      const delta = asDate - Date.now();
+      if (delta > 0) {
+        return this.clampRetryMs(delta);
+      }
+    }
+    return null;
+  }
+
+  private parseRateLimitReset(headerValue: string | null): number | null {
+    if (!headerValue) return null;
+    const asNumber = Number(headerValue);
+    if (!Number.isFinite(asNumber) || asNumber <= 0) {
+      return null;
+    }
+
+    // Some servers return delta seconds, some absolute epoch seconds.
+    const asEpochSecondsThreshold = 1_000_000_000;
+    const ms = asNumber > asEpochSecondsThreshold
+      ? (asNumber * 1000) - Date.now()
+      : asNumber * 1000;
+
+    if (ms <= 0) {
+      return null;
+    }
+
+    return this.clampRetryMs(ms);
+  }
+
+  private clampRetryMs(ms: number): number {
+    return Math.max(15_000, Math.min(ms, 2 * 60 * 60 * 1000));
   }
 }

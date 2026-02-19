@@ -1290,6 +1290,7 @@
         "other": "Otro contenido ilegal o prohibido"
       },
       "submitButton": "Enviar",
+      "submitRateLimited": "Demasiados reportes DSA en poco tiempo. Espera un momento e inténtalo de nuevo.",
       "submitFailed": "El envío falló. Inténtalo de nuevo.",
       "submitFailedTitle": "Error al enviar",
       "successSignalTitle": "Reporte enviado",

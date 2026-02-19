@@ -1290,6 +1290,7 @@
         "other": "Other illegal or prohibited content"
       },
       "submitButton": "Submit",
+      "submitRateLimited": "Too many DSA reports in a short time. Please wait a moment and try again.",
       "submitFailed": "Submitting failed. Please try again.",
       "submitFailedTitle": "Submission failed",
       "successSignalTitle": "Report sent",

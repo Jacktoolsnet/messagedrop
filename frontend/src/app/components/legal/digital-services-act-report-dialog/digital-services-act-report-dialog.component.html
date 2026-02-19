@@ -127,9 +127,6 @@
     </mat-tab>
   </mat-tab-group>
 
-  @if (errorMsg) {
-    <div class="error" role="alert">{{ errorMsg }}</div>
-  }
 </mat-dialog-content>
 
 <mat-dialog-actions class="sticky-actions" align="end">
@@ -138,5 +135,5 @@
     [attr.aria-label]="'common.actions.help' | transloco">
     <mat-icon>help</mat-icon>
   </button>
-  <button color="primary" (click)="submit()" [disabled]="submitting || (activeTabIndex===1 && isFormalEmailInvalid)" mat-icon-button [attr.aria-label]="'dsa.report.submitButton' | transloco"><mat-icon>send</mat-icon></button>
+  <button color="primary" (click)="submit()" [disabled]="submitting || isRateLimited() || (activeTabIndex===1 && isFormalEmailInvalid)" mat-icon-button [attr.aria-label]="'dsa.report.submitButton' | transloco"><mat-icon>send</mat-icon></button>
 </mat-dialog-actions>

@@ -1290,6 +1290,7 @@
         "other": "Autre contenu illégal ou interdit"
       },
       "submitButton": "Envoyer",
+      "submitRateLimited": "Trop de signalements DSA en peu de temps. Veuillez patienter un moment puis réessayer.",
       "submitFailed": "L'envoi a échoué. Veuillez réessayer.",
       "submitFailedTitle": "Échec de l'envoi",
       "successSignalTitle": "Signalement envoyé",
