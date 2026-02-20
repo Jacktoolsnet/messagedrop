@@ -103,7 +103,7 @@
         </div>
         <mat-card-content class="detail-tile__body">
           <div class="detail-section__body">
-            @for (item of getCombinedPointItems(); track item.ref) {
+            @for (item of getCombinedPointItems(); track item.ref + '-' + $index) {
               <div class="detail-subtile">
                 <div class="detail-subtile__header">
                   <div class="detail-subtile__meta">
@@ -141,7 +141,7 @@
           </div>
           <mat-card-content class="detail-tile__body">
             <div class="detail-section__body">
-              @for (item of startItems(); track item.ref) {
+              @for (item of startItems(); track item.ref + '-' + $index) {
                 <div class="detail-subtile">
                   <div class="detail-subtile__header">
                     <div class="detail-subtile__meta">
@@ -180,7 +180,7 @@
           </div>
           <mat-card-content class="detail-tile__body">
             <div class="detail-section__body">
-              @for (item of endItems(); track item.ref) {
+              @for (item of endItems(); track item.ref + '-' + $index) {
                 <div class="detail-subtile">
                   <div class="detail-subtile__header">
                     <div class="detail-subtile__meta">
@@ -220,7 +220,7 @@
       </div>
       <mat-card-content class="detail-tile__body">
         <div class="detail-section__body">
-          @for (item of redemptionItems(); track item.ref) {
+          @for (item of redemptionItems(); track item.ref + '-' + $index) {
           <div class="detail-subtile">
             <div class="detail-subtile__header">
               <div class="detail-subtile__meta">
@@ -259,7 +259,7 @@
       </div>
       <mat-card-content class="detail-tile__body">
         <div class="detail-section__body">
-          @for (item of pickupItems(); track item.ref) {
+          @for (item of pickupItems(); track item.ref + '-' + $index) {
           <div class="detail-subtile">
             <div class="detail-subtile__header">
               <div class="detail-subtile__meta">

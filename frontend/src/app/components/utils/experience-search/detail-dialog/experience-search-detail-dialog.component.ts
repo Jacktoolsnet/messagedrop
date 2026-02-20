@@ -425,9 +425,11 @@ export class ExperienceSearchDetailDialogComponent {
 
   private buildPointItems(points?: ViatorLogisticsPoint[]): ExperienceDetailLocationItem[] {
     if (!points?.length) return [];
-    return points
+    return this.dedupeLocationItems(
+      points
       .map((point) => this.buildLocationItem(point.location?.ref, point.description))
-      .filter((item): item is ExperienceDetailLocationItem => Boolean(item));
+      .filter((item): item is ExperienceDetailLocationItem => Boolean(item))
+    );
   }
 
   getCombinedPointItems(): ExperienceDetailLocationItem[] {
@@ -453,7 +455,7 @@ export class ExperienceSearchDetailDialogComponent {
         description: redemption.specialInstructions
       });
     }
-    return items;
+    return this.dedupeLocationItems(items);
   }
 
   private buildPickupItems(): ExperienceDetailLocationItem[] {
@@ -471,7 +473,7 @@ export class ExperienceSearchDetailDialogComponent {
         description: pickup.additionalInfo
       });
     }
-    return items;
+    return this.dedupeLocationItems(items);
   }
 
   private buildPickupLocationItem(pickup: ViatorPickupLocation, description?: string): ExperienceDetailLocationItem | null {
@@ -493,6 +495,34 @@ export class ExperienceSearchDetailDialogComponent {
       latitude: location?.center?.latitude,
       longitude: location?.center?.longitude
     };
+  }
+
+  private dedupeLocationItems(items: ExperienceDetailLocationItem[]): ExperienceDetailLocationItem[] {
+    const uniqueItems = new Map<string, ExperienceDetailLocationItem>();
+    for (const item of items) {
+      const key = this.getLocationItemKey(item);
+      if (!uniqueItems.has(key)) {
+        uniqueItems.set(key, item);
+      }
+    }
+    return Array.from(uniqueItems.values());
+  }
+
+  private getLocationItemKey(item: ExperienceDetailLocationItem): string {
+    const visibleTitle = item.name || item.address || '';
+    const visibleAddress = item.name ? (item.address || '') : '';
+    return [
+      this.normalizeItemText(visibleTitle),
+      this.normalizeItemText(visibleAddress),
+      this.normalizeItemText(item.description)
+    ].join('|');
+  }
+
+  private normalizeItemText(value?: string): string {
+    return (value || '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .toLowerCase();
   }
 
   private formatLocationAddress(location?: ViatorLocation): string | undefined {
