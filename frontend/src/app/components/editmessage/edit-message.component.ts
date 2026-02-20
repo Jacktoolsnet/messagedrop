@@ -1,7 +1,7 @@
 
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatAutocompleteModule, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
@@ -83,6 +83,8 @@ export class EditMessageComponent implements OnInit {
   readonly mode = Mode;
   readonly isLocationEditable = this.data.mode === Mode.ADD_PUBLIC_MESSAGE
     || this.data.mode === Mode.EDIT_PUBLIC_MESSAGE;
+  @ViewChild(MatAutocompleteTrigger) hashtagAutocompleteTrigger?: MatAutocompleteTrigger;
+  @ViewChild('hashtagInputElement') hashtagInputElement?: ElementRef<HTMLInputElement>;
 
   safeHtml: string | undefined = undefined;
   showSaveHtml = false;
@@ -98,7 +100,7 @@ export class EditMessageComponent implements OnInit {
   ngOnInit(): void {
     this.applyNewMultimedia(this.data.message.multimedia);
     this.hashtagTags = [...this.oriHashtags];
-    this.hashtagInput = '';
+    this.clearHashtagInput();
   }
 
   private resolveHeaderConfig(mode: Mode): DialogHeaderConfig {
@@ -141,7 +143,8 @@ export class EditMessageComponent implements OnInit {
     }
     this.data.message.hashtags = hashtagParse.tags;
     this.hashtagTags = [...hashtagParse.tags];
-    this.hashtagInput = '';
+    this.hashtagSuggestionService.remember(this.hashtagTags);
+    this.clearHashtagInput();
 
     switch (this.data.mode) {
       case 'add_public_message':
@@ -171,11 +174,15 @@ export class EditMessageComponent implements OnInit {
     }
     this.data.message.hashtags = [...this.oriHashtags];
     this.hashtagTags = [...this.oriHashtags];
-    this.hashtagInput = '';
+    this.clearHashtagInput();
     this.dialogRef.close();
   }
 
   async onHashtagEnter(event: Event): Promise<void> {
+    if (this.hashtagAutocompleteTrigger?.panelOpen) {
+      event.preventDefault();
+      return;
+    }
     event.preventDefault();
     await this.addHashtagsFromInput(true);
   }
@@ -185,15 +192,18 @@ export class EditMessageComponent implements OnInit {
   }
 
   async onHashtagSuggestionSelected(tag: string): Promise<void> {
-    this.hashtagInput = tag;
-    await this.addHashtagsFromInput(true);
+    const added = await this.addHashtagsFromInput(true, tag);
+    if (added) {
+      this.clearHashtagInput();
+      setTimeout(() => this.clearHashtagInput());
+    }
   }
 
-  async addHashtagsFromInput(showErrors = true): Promise<boolean> {
+  async addHashtagsFromInput(showErrors = true, candidateOverride?: string): Promise<boolean> {
     if (this.hashtagCheckInProgress) {
       return false;
     }
-    const candidate = this.hashtagInput.trim();
+    const candidate = (candidateOverride ?? this.hashtagInput).trim();
     if (!candidate) {
       return true;
     }
@@ -247,7 +257,7 @@ export class EditMessageComponent implements OnInit {
     }
 
     this.hashtagTags = [...merged.tags];
-    this.hashtagInput = '';
+    this.clearHashtagInput();
     return true;
   }
 
@@ -260,6 +270,13 @@ export class EditMessageComponent implements OnInit {
       exclude: this.hashtagTags,
       limit: 12
     });
+  }
+
+  private clearHashtagInput(): void {
+    this.hashtagInput = '';
+    if (this.hashtagInputElement?.nativeElement) {
+      this.hashtagInputElement.nativeElement.value = '';
+    }
   }
 
   onNewFontClick(): void {

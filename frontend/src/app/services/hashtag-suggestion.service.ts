@@ -1,4 +1,4 @@
-import { computed, inject, Injectable } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { ContactService } from './contact.service';
 import { ExperienceBookmarkService } from './experience-bookmark.service';
 import { MessageService } from './message.service';
@@ -12,6 +12,9 @@ interface HashtagSuggestionOptions {
   exclude?: string[];
 }
 
+const HASHTAG_HISTORY_STORAGE_KEY = 'messagedrop.hashtag-history.v1';
+const MAX_REMEMBERED_HASHTAGS = 500;
+
 @Injectable({
   providedIn: 'root'
 })
@@ -22,6 +25,7 @@ export class HashtagSuggestionService {
   private readonly bookmarkService = inject(ExperienceBookmarkService);
   private readonly messageService = inject(MessageService);
   private readonly userService = inject(UserService);
+  private readonly rememberedHashtagsSignal = signal<string[]>(this.loadRememberedHashtags());
 
   private readonly hashtagStats = computed(() => {
     this.userService.userSet();
@@ -50,6 +54,8 @@ export class HashtagSuggestionService {
     this.messageService.messagesSignal()
       .filter((message) => !!currentUserId && message.userId === currentUserId)
       .forEach((message) => add(message.hashtags));
+
+    add(this.rememberedHashtagsSignal());
 
     return stats;
   });
@@ -81,6 +87,28 @@ export class HashtagSuggestionService {
       .slice(0, limit);
   }
 
+  remember(tags: string[] | undefined): void {
+    const normalized = this.normalizeHashtags(tags);
+    if (normalized.length === 0) {
+      return;
+    }
+    const current = new Set(this.rememberedHashtagsSignal());
+    let changed = false;
+    normalized.forEach((tag) => {
+      if (current.has(tag)) {
+        return;
+      }
+      current.add(tag);
+      changed = true;
+    });
+    if (!changed) {
+      return;
+    }
+    const next = Array.from(current.values()).slice(0, MAX_REMEMBERED_HASHTAGS);
+    this.rememberedHashtagsSignal.set(next);
+    this.persistRememberedHashtags(next);
+  }
+
   private normalizeLimit(limit: number | undefined): number {
     if (!Number.isFinite(limit)) {
       return 12;
@@ -105,5 +133,46 @@ export class HashtagSuggestionService {
       }
     });
     return result;
+  }
+
+  private normalizeHashtags(tags: string[] | undefined): string[] {
+    const normalized = new Set<string>();
+    (tags ?? []).forEach((tag) => {
+      const next = normalizeHashtagToken(tag);
+      if (next) {
+        normalized.add(next);
+      }
+    });
+    return Array.from(normalized.values());
+  }
+
+  private loadRememberedHashtags(): string[] {
+    if (typeof localStorage === 'undefined') {
+      return [];
+    }
+    try {
+      const raw = localStorage.getItem(HASHTAG_HISTORY_STORAGE_KEY);
+      if (!raw) {
+        return [];
+      }
+      const parsed = JSON.parse(raw) as unknown;
+      if (!Array.isArray(parsed)) {
+        return [];
+      }
+      return this.normalizeHashtags(parsed.map((entry) => String(entry)));
+    } catch {
+      return [];
+    }
+  }
+
+  private persistRememberedHashtags(tags: string[]): void {
+    if (typeof localStorage === 'undefined') {
+      return;
+    }
+    try {
+      localStorage.setItem(HASHTAG_HISTORY_STORAGE_KEY, JSON.stringify(tags));
+    } catch {
+      // ignore storage issues (private mode/quota)
+    }
   }
 }

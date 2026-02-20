@@ -1,9 +1,9 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 
 
 import { FormsModule } from '@angular/forms';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatAutocompleteModule, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -81,6 +81,8 @@ export class EditNoteComponent implements OnInit {
   readonly isLocationEditable = !this.data.mode
     || this.data.mode === Mode.ADD_NOTE
     || this.data.mode === Mode.EDIT_NOTE;
+  @ViewChild(MatAutocompleteTrigger) hashtagAutocompleteTrigger?: MatAutocompleteTrigger;
+  @ViewChild('hashtagInputElement') hashtagInputElement?: ElementRef<HTMLInputElement>;
 
   safeHtml: string | undefined = undefined;
   showSaveHtml = false;
@@ -98,7 +100,7 @@ export class EditNoteComponent implements OnInit {
     }
     this.data.note.hashtags = [...this.oriHashtags];
     this.hashtagTags = [...this.oriHashtags];
-    this.hashtagInput = '';
+    this.clearHashtagInput();
     this.applyNewMultimedia(this.data.note.multimedia);
   }
 
@@ -126,7 +128,8 @@ export class EditNoteComponent implements OnInit {
     }
     this.data.note.hashtags = parsed.tags;
     this.hashtagTags = [...parsed.tags];
-    this.hashtagInput = '';
+    this.hashtagSuggestionService.remember(this.hashtagTags);
+    this.clearHashtagInput();
     this.dialogRef.close(this.data);
   }
 
@@ -142,11 +145,15 @@ export class EditNoteComponent implements OnInit {
     }
     this.data.note.hashtags = [...this.oriHashtags];
     this.hashtagTags = [...this.oriHashtags];
-    this.hashtagInput = '';
+    this.clearHashtagInput();
     this.dialogRef.close();
   }
 
   onHashtagEnter(event: Event): void {
+    if (this.hashtagAutocompleteTrigger?.panelOpen) {
+      event.preventDefault();
+      return;
+    }
     event.preventDefault();
     this.addHashtagsFromInput(true);
   }
@@ -156,12 +163,15 @@ export class EditNoteComponent implements OnInit {
   }
 
   onHashtagSuggestionSelected(tag: string): void {
-    this.hashtagInput = tag;
-    this.addHashtagsFromInput(true);
+    const added = this.addHashtagsFromInput(true, tag);
+    if (added) {
+      this.clearHashtagInput();
+      setTimeout(() => this.clearHashtagInput());
+    }
   }
 
-  addHashtagsFromInput(showErrors = true): boolean {
-    const candidate = this.hashtagInput.trim();
+  addHashtagsFromInput(showErrors = true, candidateOverride?: string): boolean {
+    const candidate = (candidateOverride ?? this.hashtagInput).trim();
     if (!candidate) {
       return true;
     }
@@ -183,7 +193,7 @@ export class EditNoteComponent implements OnInit {
     }
 
     this.hashtagTags = [...merged.tags];
-    this.hashtagInput = '';
+    this.clearHashtagInput();
     return true;
   }
 
@@ -196,6 +206,13 @@ export class EditNoteComponent implements OnInit {
       exclude: this.hashtagTags,
       limit: 12
     });
+  }
+
+  private clearHashtagInput(): void {
+    this.hashtagInput = '';
+    if (this.hashtagInputElement?.nativeElement) {
+      this.hashtagInputElement.nativeElement.value = '';
+    }
   }
 
   private showHashtagValidationError(): void {

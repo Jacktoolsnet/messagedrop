@@ -1,5 +1,5 @@
-import { Component, inject } from '@angular/core';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { Component, ElementRef, ViewChild, inject } from '@angular/core';
+import { MatAutocompleteModule, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
@@ -56,8 +56,14 @@ export class HashtagEditDialogComponent {
   hashtagInput = '';
   hashtagTags = [...(this.data.initialTags ?? [])];
   errorText = '';
+  @ViewChild(MatAutocompleteTrigger) hashtagAutocompleteTrigger?: MatAutocompleteTrigger;
+  @ViewChild('hashtagInputElement') hashtagInputElement?: ElementRef<HTMLInputElement>;
 
   onHashtagEnter(event: Event): void {
+    if (this.hashtagAutocompleteTrigger?.panelOpen) {
+      event.preventDefault();
+      return;
+    }
     event.preventDefault();
     this.addHashtagsFromInput();
   }
@@ -67,8 +73,11 @@ export class HashtagEditDialogComponent {
   }
 
   onHashtagSuggestionSelected(tag: string): void {
-    this.hashtagInput = tag;
-    this.addHashtagsFromInput();
+    const added = this.addHashtagsFromInput(tag);
+    if (added) {
+      this.clearHashtagInput();
+      setTimeout(() => this.clearHashtagInput());
+    }
   }
 
   removeHashtag(tag: string): void {
@@ -88,11 +97,12 @@ export class HashtagEditDialogComponent {
       return;
     }
     this.errorText = '';
+    this.hashtagSuggestionService.remember(parsed.tags);
     this.dialogRef.close({ hashtags: parsed.tags });
   }
 
-  private addHashtagsFromInput(): boolean {
-    const candidate = this.hashtagInput.trim();
+  private addHashtagsFromInput(candidateOverride?: string): boolean {
+    const candidate = (candidateOverride ?? this.hashtagInput).trim();
     if (!candidate) {
       return true;
     }
@@ -113,7 +123,7 @@ export class HashtagEditDialogComponent {
     }
 
     this.hashtagTags = [...merged.tags];
-    this.hashtagInput = '';
+    this.clearHashtagInput();
     this.errorText = '';
     return true;
   }
@@ -123,5 +133,12 @@ export class HashtagEditDialogComponent {
       exclude: this.hashtagTags,
       limit: 12
     });
+  }
+
+  private clearHashtagInput(): void {
+    this.hashtagInput = '';
+    if (this.hashtagInputElement?.nativeElement) {
+      this.hashtagInputElement.nativeElement.value = '';
+    }
   }
 }
