@@ -25,65 +25,100 @@ const init = function (db) {
   db.exec(sql);
 };
 
-const countAll = function (db) {
+const upsertSql = `
+  INSERT INTO ${tableName} (
+    destinationId,
+    name,
+    type,
+    parentDestinationId,
+    lookupId,
+    destinationUrl,
+    defaultCurrencyCode,
+    timeZone,
+    iataCodes,
+    countryCallingCode,
+    languages,
+    centerLat,
+    centerLng,
+    plusCode,
+    syncRunId,
+    updatedAt
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+  ON CONFLICT(destinationId) DO UPDATE SET
+    name = excluded.name,
+    type = excluded.type,
+    parentDestinationId = excluded.parentDestinationId,
+    lookupId = excluded.lookupId,
+    destinationUrl = excluded.destinationUrl,
+    defaultCurrencyCode = excluded.defaultCurrencyCode,
+    timeZone = excluded.timeZone,
+    iataCodes = excluded.iataCodes,
+    countryCallingCode = excluded.countryCallingCode,
+    languages = excluded.languages,
+    centerLat = excluded.centerLat,
+    centerLng = excluded.centerLng,
+    plusCode = excluded.plusCode,
+    syncRunId = excluded.syncRunId,
+    updatedAt = datetime('now');
+`;
+
+const countAll = function (db, callback = () => { }) {
   const sql = `SELECT COUNT(1) AS total FROM ${tableName};`;
-  const row = db.prepare(sql).get();
-  return row?.total ?? 0;
+  db.get(sql, [], (err, row) => {
+    if (err) {
+      callback(err);
+      return;
+    }
+    callback(null, row?.total ?? 0);
+  });
 };
 
-const prepareUpsert = function (db) {
-  const sql = `
-    INSERT INTO ${tableName} (
-      destinationId,
-      name,
-      type,
-      parentDestinationId,
-      lookupId,
-      destinationUrl,
-      defaultCurrencyCode,
-      timeZone,
-      iataCodes,
-      countryCallingCode,
-      languages,
-      centerLat,
-      centerLng,
-      plusCode,
-      syncRunId,
-      updatedAt
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
-    ON CONFLICT(destinationId) DO UPDATE SET
-      name = excluded.name,
-      type = excluded.type,
-      parentDestinationId = excluded.parentDestinationId,
-      lookupId = excluded.lookupId,
-      destinationUrl = excluded.destinationUrl,
-      defaultCurrencyCode = excluded.defaultCurrencyCode,
-      timeZone = excluded.timeZone,
-      iataCodes = excluded.iataCodes,
-      countryCallingCode = excluded.countryCallingCode,
-      languages = excluded.languages,
-      centerLat = excluded.centerLat,
-      centerLng = excluded.centerLng,
-      plusCode = excluded.plusCode,
-      syncRunId = excluded.syncRunId,
-      updatedAt = datetime('now');
-  `;
-  return db.prepare(sql);
+const upsert = function (db, destination, syncRunId, callback = () => { }) {
+  const params = [
+    destination.destinationId,
+    destination.name ?? null,
+    destination.type ?? null,
+    destination.parentDestinationId ?? null,
+    destination.lookupId ?? null,
+    destination.destinationUrl ?? null,
+    destination.defaultCurrencyCode ?? null,
+    destination.timeZone ?? null,
+    destination.iataCodes ?? null,
+    destination.countryCallingCode ?? null,
+    destination.languages ?? null,
+    destination.centerLat ?? null,
+    destination.centerLng ?? null,
+    destination.plusCode ?? null,
+    syncRunId ?? null
+  ];
+  db.run(upsertSql, params, function (err) {
+    if (err) {
+      callback(err);
+      return;
+    }
+    callback(null, Number(this?.changes ?? 0));
+  });
 };
 
-const deleteNotRunId = function (db, syncRunId) {
+const deleteNotRunId = function (db, syncRunId, callback = () => { }) {
   const sql = `
     DELETE FROM ${tableName}
     WHERE syncRunId IS NOT NULL
       AND syncRunId != ?;
   `;
-  const result = db.prepare(sql).run(syncRunId);
-  return result?.changes ?? 0;
+  db.run(sql, [syncRunId], function (err) {
+    if (err) {
+      callback(err);
+      return;
+    }
+    callback(null, Number(this?.changes ?? 0));
+  });
 };
 
-const getByIds = function (db, destinationIds) {
+const getByIds = function (db, destinationIds, callback = () => { }) {
   if (!Array.isArray(destinationIds) || destinationIds.length === 0) {
-    return [];
+    callback(null, []);
+    return;
   }
   const placeholders = destinationIds.map(() => '?').join(', ');
   const sql = `
@@ -91,10 +126,16 @@ const getByIds = function (db, destinationIds) {
     FROM ${tableName}
     WHERE destinationId IN (${placeholders});
   `;
-  return db.prepare(sql).all(...destinationIds);
+  db.all(sql, destinationIds, (err, rows) => {
+    if (err) {
+      callback(err);
+      return;
+    }
+    callback(null, rows || []);
+  });
 };
 
-const getAll = function (db, types) {
+const getAll = function (db, types, callback = () => { }) {
   if (Array.isArray(types) && types.length > 0) {
     const placeholders = types.map(() => '?').join(', ');
     const sql = `
@@ -102,19 +143,32 @@ const getAll = function (db, types) {
       FROM ${tableName}
       WHERE type IN (${placeholders});
     `;
-    return db.prepare(sql).all(...types);
+    db.all(sql, types, (err, rows) => {
+      if (err) {
+        callback(err);
+        return;
+      }
+      callback(null, rows || []);
+    });
+    return;
   }
   const sql = `
     SELECT *
     FROM ${tableName};
   `;
-  return db.prepare(sql).all();
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      callback(err);
+      return;
+    }
+    callback(null, rows || []);
+  });
 };
 
 module.exports = {
   init,
   countAll,
-  prepareUpsert,
+  upsert,
   deleteNotRunId,
   getByIds,
   getAll

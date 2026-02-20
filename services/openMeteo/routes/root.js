@@ -3,23 +3,22 @@ const router = express.Router();
 
 function isDatabaseConnected(database) {
   const db = database?.db;
-  if (!db) return false;
-  try {
-    if (typeof db.prepare === 'function') {
-      const stmt = db.prepare('SELECT 1 AS ok');
-      return Boolean(stmt?.get?.());
-    }
-    if (typeof db.get === 'function') {
-      return Boolean(db.get('SELECT 1 AS ok'));
-    }
-  } catch {
-    return false;
+  if (!db || typeof db.get !== 'function') {
+    return Promise.resolve(false);
   }
-  return false;
+  return new Promise((resolve) => {
+    db.get('SELECT 1 AS ok', (err, row) => {
+      if (err) {
+        resolve(false);
+        return;
+      }
+      resolve(Boolean(row?.ok ?? row));
+    });
+  });
 }
 
-router.get('/', function (req, res) {
-  const isDbOpen = isDatabaseConnected(req.database);
+router.get('/', async function (req, res) {
+  const isDbOpen = await isDatabaseConnected(req.database);
   const databaseConnection = isDbOpen ? 'established' : 'not established';
   const response = {
     status: 'Service is up and running.',

@@ -4,42 +4,38 @@ const columnNominatimPlace = 'nominatimPlace';
 const columnLastUpdate = 'lastUpdate';
 
 const init = function (db) {
-    try {
-        const sql = `
+    const sql = `
         CREATE TABLE IF NOT EXISTS ${tableName} (
             ${columnCacheKey} TEXT PRIMARY KEY,
             ${columnNominatimPlace} TEXT,
             ${columnLastUpdate} DATETIME DEFAULT CURRENT_TIMESTAMP
         );`;
-        db.exec(sql);
-    } catch (error) {
-        throw error;
-    }
+    db.exec(sql);
 };
 
 const setNominatimCache = function (db, cacheKey, nominatimPlaceJson, callback) {
-    try {
-        const sql = `
+    const sql = `
         INSERT OR REPLACE INTO ${tableName}
         (${columnCacheKey}, ${columnNominatimPlace}, ${columnLastUpdate})
         VALUES (?, ?, datetime('now'));`;
-        db.prepare(sql).run(cacheKey, nominatimPlaceJson);
-        if (callback) callback(null);
-    } catch (error) {
-        if (callback) return callback(error);
-        throw error;
-    }
+    db.run(sql, [cacheKey, nominatimPlaceJson], (error) => {
+        if (callback) callback(error || null);
+    });
 };
 
 const getNominatimCache = function (db, cacheKey, callback) {
-    try {
-        const sql = `SELECT * FROM ${tableName} WHERE ${columnCacheKey} = ?;`;
-        const row = db.prepare(sql).get(cacheKey);
-        callback(null, row ?? null);
-    } catch (error) {
-        if (callback) return callback(error);
-        throw error;
-    }
+    const sql = `SELECT * FROM ${tableName} WHERE ${columnCacheKey} = ?;`;
+    db.get(sql, [cacheKey], (error, row) => {
+        if (error) {
+            if (callback) {
+                callback(error);
+            }
+            return;
+        }
+        if (callback) {
+            callback(null, row ?? null);
+        }
+    });
 };
 
 const cleanExpired = function (db, callback) {
@@ -47,13 +43,9 @@ const cleanExpired = function (db, callback) {
         DELETE FROM ${tableName}
         WHERE DATETIME(${columnLastUpdate}) < DATETIME('now', '-3 month');
     `;
-    try {
-        db.prepare(sql).run();
-        if (callback) callback(null);
-    } catch (error) {
-        if (callback) return callback(error);
-        throw error;
-    }
+    db.run(sql, [], (error) => {
+        if (callback) callback(error || null);
+    });
 };
 
 module.exports = {

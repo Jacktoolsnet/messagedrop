@@ -329,6 +329,30 @@ function normalizeDestinationTypes(input) {
     .filter(Boolean);
 }
 
+async function getDestinationsByIds(db, destinationIds) {
+  return new Promise((resolve, reject) => {
+    tableViatorDestinations.getByIds(db, destinationIds, (err, rows) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(Array.isArray(rows) ? rows : []);
+    });
+  });
+}
+
+async function getAllDestinations(db, types) {
+  return new Promise((resolve, reject) => {
+    tableViatorDestinations.getAll(db, types, (err, rows) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(Array.isArray(rows) ? rows : []);
+    });
+  });
+}
+
 const PUBLIC_ENDPOINTS = [
   { method: 'GET', pattern: /^\/destinations$/ },
   { method: 'GET', pattern: /^\/destinations\/all$/ },
@@ -350,7 +374,7 @@ router.use((req, res, next) => {
 });
 router.use(express.json({ limit: MAX_BODY_BYTES }));
 
-router.get('/destinations', (req, res, next) => {
+router.get('/destinations', async (req, res, next) => {
   const db = req.database?.db;
   if (!db) {
     return next(buildError(500, 'database_unavailable'));
@@ -359,7 +383,12 @@ router.get('/destinations', (req, res, next) => {
   if (!ids.length) {
     return next(buildError(400, 'destination_ids_required'));
   }
-  const rows = tableViatorDestinations.getByIds(db, ids);
+  let rows = [];
+  try {
+    rows = await getDestinationsByIds(db, ids);
+  } catch (err) {
+    return next(buildError(500, 'db_error', err?.message || err));
+  }
   const destinations = rows.map((row) => {
     const hasCenter = Number.isFinite(row.centerLat) && Number.isFinite(row.centerLng);
     return {
@@ -381,13 +410,18 @@ router.get('/destinations', (req, res, next) => {
   return res.status(200).json({ destinations, totalCount: destinations.length });
 });
 
-router.get('/destinations/all', (req, res, next) => {
+router.get('/destinations/all', async (req, res, next) => {
   const db = req.database?.db;
   if (!db) {
     return next(buildError(500, 'database_unavailable'));
   }
   const types = normalizeDestinationTypes(req.query?.types);
-  const rows = tableViatorDestinations.getAll(db, types);
+  let rows = [];
+  try {
+    rows = await getAllDestinations(db, types);
+  } catch (err) {
+    return next(buildError(500, 'db_error', err?.message || err));
+  }
   const destinations = rows.map((row) => {
     const hasCenter = Number.isFinite(row.centerLat) && Number.isFinite(row.centerLng);
     return {

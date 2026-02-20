@@ -146,6 +146,21 @@ class SqliteCompat {
     return { params, callback };
   }
 
+  _normalizeStatementArgs(args) {
+    const values = Array.from(args ?? []);
+    let callback;
+    if (values.length && typeof values[values.length - 1] === 'function') {
+      callback = values.pop();
+    }
+    if (values.length === 0) {
+      return { params: undefined, callback };
+    }
+    if (values.length === 1) {
+      return { params: values[0], callback };
+    }
+    return { params: values, callback };
+  }
+
   run(sql, params, callback) {
     const normalized = this._normalizeParams(params, callback);
     this._dispatch('run', { sql, params: normalized.params }, normalized.callback);
@@ -163,13 +178,16 @@ class SqliteCompat {
 
   prepare(sql) {
     return {
-      run: (params, callback) => {
+      run: (...args) => {
+        const { params, callback } = this._normalizeStatementArgs(args);
         this.run(sql, params, callback);
       },
-      get: (params, callback) => {
+      get: (...args) => {
+        const { params, callback } = this._normalizeStatementArgs(args);
         this.get(sql, params, callback);
       },
-      all: (params, callback) => {
+      all: (...args) => {
+        const { params, callback } = this._normalizeStatementArgs(args);
         this.all(sql, params, callback);
       },
       finalize: (callback) => {

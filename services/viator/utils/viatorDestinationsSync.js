@@ -112,6 +112,54 @@ function normalizeAcceptLanguage(rawValue) {
   return /^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})?$/.test(first) ? first : null;
 }
 
+function execQuery(db, sql) {
+  return new Promise((resolve, reject) => {
+    db.exec(sql, (err) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve();
+    });
+  });
+}
+
+function countDestinations(db) {
+  return new Promise((resolve, reject) => {
+    tableViatorDestinations.countAll(db, (err, total) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(Number(total) || 0);
+    });
+  });
+}
+
+function upsertDestination(db, destination, syncRunId) {
+  return new Promise((resolve, reject) => {
+    tableViatorDestinations.upsert(db, destination, syncRunId, (err) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve();
+    });
+  });
+}
+
+function deleteDestinationsNotInRun(db, syncRunId) {
+  return new Promise((resolve, reject) => {
+    tableViatorDestinations.deleteNotRunId(db, syncRunId, (err, deleted) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(Number(deleted) || 0);
+    });
+  });
+}
+
 async function syncDestinations({ db, logger, force = false } = {}) {
   if (syncInProgress) {
     logger?.warn?.('Destination sync already running, skipping.');
@@ -123,7 +171,7 @@ async function syncDestinations({ db, logger, force = false } = {}) {
   }
 
   try {
-    const existingCount = tableViatorDestinations.countAll(db);
+    const existingCount = await countDestinations(db);
     if (!force && existingCount > 0) {
       logger?.info?.(`Destination sync skipped (cache filled, ${existingCount} rows).`);
       return { ok: true, skipped: true, count: existingCount };
@@ -170,45 +218,28 @@ async function syncDestinations({ db, logger, force = false } = {}) {
     }
 
     const syncRunId = randomUUID();
-    const stmt = tableViatorDestinations.prepareUpsert(db);
 
     logger?.info?.(`Destination import started (${destinations.length} rows).`);
-    db.exec('BEGIN');
+    await execQuery(db, 'BEGIN');
     let written = 0;
     for (const entry of destinations) {
       const normalized = normalizeDestination(entry);
       if (!normalized || !Number.isFinite(normalized.destinationId)) {
         continue;
       }
-      stmt.run(
-        normalized.destinationId,
-        normalized.name,
-        normalized.type,
-        normalized.parentDestinationId,
-        normalized.lookupId,
-        normalized.destinationUrl,
-        normalized.defaultCurrencyCode,
-        normalized.timeZone,
-        normalized.iataCodes,
-        normalized.countryCallingCode,
-        normalized.languages,
-        normalized.centerLat,
-        normalized.centerLng,
-        normalized.plusCode,
-        syncRunId
-      );
+      await upsertDestination(db, normalized, syncRunId);
       written += 1;
     }
-    db.exec('COMMIT');
+    await execQuery(db, 'COMMIT');
 
-    const deleted = tableViatorDestinations.deleteNotRunId(db, syncRunId);
+    const deleted = await deleteDestinationsNotInRun(db, syncRunId);
     logger?.info?.(`Destination cleanup completed (${deleted} rows removed).`);
 
     logger?.info?.(`Destination sync completed (${written} rows).`);
     return { ok: true, count: written };
   } catch (err) {
     try {
-      db.exec('ROLLBACK');
+      await execQuery(db, 'ROLLBACK');
     } catch {
       // ignore rollback errors
     }
