@@ -1027,17 +1027,26 @@ export class UserService {
   }
 
   private async handleForgotPinFlow(): Promise<void> {
-    const dialogRef = this.displayMessage.open(DeleteUserComponent, {
+    const dialogRef = this.displayMessage.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
       data: {
+        showAlways: true,
         title: this.i18n.t('auth.pinForgotTitle'),
+        image: '',
+        icon: 'warning',
         message: this.i18n.t('auth.pinForgotMessage'),
-        confirmLabel: this.i18n.t('auth.pinForgotRestore'),
-        cancelLabel: this.i18n.t('auth.pinForgotNewUser')
+        button: this.i18n.t('auth.pinForgotRestore'),
+        secondaryButton: this.i18n.t('auth.pinForgotNewUser'),
+        delay: 0,
+        showSpinner: false
       },
-      closeOnNavigation: true,
+      maxWidth: '90vw',
+      maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
       disableClose: false,
+      autoFocus: false
     });
 
     const result = await firstValueFrom(dialogRef.afterClosed());
@@ -1047,7 +1056,7 @@ export class UserService {
       this.blocked = false;
       return;
     }
-    if (result === false) {
+    if (result === 'secondary') {
       await this.indexedDbService.clearAllData();
       this.logout();
       await this.login();
