@@ -168,6 +168,11 @@ class Database {
     return new Promise((resolve, reject) => {
       try {
         this.db = new SqliteCompat(path.join(path.dirname(__filename), 'messagedrop.db'));
+        this.db.run('PRAGMA journal_mode = WAL;', [], (pragmaErr) => {
+          if (pragmaErr) {
+            this.logger.error(pragmaErr.message);
+          }
+        });
         this.db.serialize(() => {
           this.db.run('PRAGMA foreign_keys = ON;', [], (pragmaErr) => {
             if (pragmaErr) {
