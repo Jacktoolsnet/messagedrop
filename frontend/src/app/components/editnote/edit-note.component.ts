@@ -3,6 +3,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDial
 
 
 import { FormsModule } from '@angular/forms';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -21,6 +22,7 @@ import { SharedContentService } from '../../services/shared-content.service';
 import { StyleService } from '../../services/style.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
+import { HashtagSuggestionService } from '../../services/hashtag-suggestion.service';
 import { MAX_LOCAL_HASHTAGS, normalizeHashtags } from '../../utils/hashtag.util';
 import { SelectMultimediaComponent } from '../multimedia/select-multimedia/select-multimedia.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
@@ -47,6 +49,7 @@ interface DialogHeaderConfig {
     ShowmultimediaComponent,
     LocationPickerTileComponent,
     FormsModule,
+    MatAutocompleteModule,
     MatButtonModule,
     MatDialogActions,
     MatDialogContent,
@@ -67,6 +70,7 @@ export class EditNoteComponent implements OnInit {
   private readonly matDialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly translation = inject(TranslationHelperService);
+  private readonly hashtagSuggestionService = inject(HashtagSuggestionService);
   readonly help = inject(HelpDialogService);
   readonly dialogRef = inject(MatDialogRef<EditNoteComponent>);
   private readonly style = inject(StyleService);
@@ -151,6 +155,11 @@ export class EditNoteComponent implements OnInit {
     this.addHashtagsFromInput(true);
   }
 
+  onHashtagSuggestionSelected(tag: string): void {
+    this.hashtagInput = tag;
+    this.addHashtagsFromInput(true);
+  }
+
   addHashtagsFromInput(showErrors = true): boolean {
     const candidate = this.hashtagInput.trim();
     if (!candidate) {
@@ -180,6 +189,13 @@ export class EditNoteComponent implements OnInit {
 
   removeHashtag(tag: string): void {
     this.hashtagTags = this.hashtagTags.filter((item) => item !== tag);
+  }
+
+  getHashtagSuggestions(): string[] {
+    return this.hashtagSuggestionService.suggest(this.hashtagInput, {
+      exclude: this.hashtagTags,
+      limit: 12
+    });
   }
 
   private showHashtagValidationError(): void {

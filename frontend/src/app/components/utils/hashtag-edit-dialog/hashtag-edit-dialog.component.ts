@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
@@ -7,6 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { HashtagSuggestionService } from '../../../services/hashtag-suggestion.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { MAX_LOCAL_HASHTAGS, MAX_PUBLIC_HASHTAGS, normalizeHashtags } from '../../../utils/hashtag.util';
 import { DialogHeaderComponent } from '../dialog-header/dialog-header.component';
@@ -29,6 +31,7 @@ export interface HashtagEditDialogResult {
   imports: [
     DialogHeaderComponent,
     FormsModule,
+    MatAutocompleteModule,
     MatButtonModule,
     MatDialogContent,
     MatDialogActions,
@@ -46,6 +49,7 @@ export class HashtagEditDialogComponent {
   readonly data = inject<HashtagEditDialogData>(MAT_DIALOG_DATA);
   private readonly dialogRef = inject(MatDialogRef<HashtagEditDialogComponent, HashtagEditDialogResult>);
   private readonly i18n = inject(TranslationHelperService);
+  private readonly hashtagSuggestionService = inject(HashtagSuggestionService);
   readonly help = inject(HelpDialogService);
 
   readonly maxTags = this.data.mode === 'public' ? MAX_PUBLIC_HASHTAGS : MAX_LOCAL_HASHTAGS;
@@ -59,6 +63,11 @@ export class HashtagEditDialogComponent {
   }
 
   onAddHashtagClick(): void {
+    this.addHashtagsFromInput();
+  }
+
+  onHashtagSuggestionSelected(tag: string): void {
+    this.hashtagInput = tag;
     this.addHashtagsFromInput();
   }
 
@@ -107,5 +116,12 @@ export class HashtagEditDialogComponent {
     this.hashtagInput = '';
     this.errorText = '';
     return true;
+  }
+
+  getHashtagSuggestions(): string[] {
+    return this.hashtagSuggestionService.suggest(this.hashtagInput, {
+      exclude: this.hashtagTags,
+      limit: 12
+    });
   }
 }

@@ -1,6 +1,7 @@
 import { DestroyRef, Component, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -25,6 +26,7 @@ import { PlaceService } from '../../../services/place.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { UserService } from '../../../services/user.service';
 import { ViatorService } from '../../../services/viator.service';
+import { HashtagSuggestionService } from '../../../services/hashtag-suggestion.service';
 import { normalizeHashtags, stringifyHashtags } from '../../../utils/hashtag.util';
 import { HashtagMapItem, HashtagResultsMapComponent } from './components/hashtag-results-map/hashtag-results-map.component';
 import { MessagelistComponent } from '../../messagelist/messagelist.component';
@@ -62,6 +64,7 @@ interface HashtagSearchListTile {
   standalone: true,
   imports: [
     FormsModule,
+    MatAutocompleteModule,
     MatDialogContent,
     MatDialogActions,
     MatDialogClose,
@@ -87,6 +90,7 @@ export class HashtagSearchComponent {
   private readonly mapService = inject(MapService);
   private readonly viatorService = inject(ViatorService);
   private readonly i18n = inject(TranslationHelperService);
+  private readonly hashtagSuggestionService = inject(HashtagSuggestionService);
   readonly userService = inject(UserService);
   readonly help = inject(HelpDialogService);
   readonly helpTopic: HelpTopic = this.data?.helpKey ?? 'hashtagSearch';
@@ -314,6 +318,14 @@ export class HashtagSearchComponent {
       void this.noteService.loadNotes();
     }
     this.searchPublic(tag);
+  }
+
+  onQuerySuggestionSelected(tag: string): void {
+    this.query = `#${tag}`;
+  }
+
+  getQuerySuggestions(): string[] {
+    return this.hashtagSuggestionService.suggest(this.query, { limit: 12 });
   }
 
   selectMessage(message: Message): void {

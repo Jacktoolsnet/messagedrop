@@ -1,6 +1,7 @@
 
 import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
@@ -23,6 +24,7 @@ import { StyleService } from '../../services/style.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
 import { MessageService } from '../../services/message.service';
+import { HashtagSuggestionService } from '../../services/hashtag-suggestion.service';
 import { SelectMultimediaComponent } from '../multimedia/select-multimedia/select-multimedia.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
@@ -49,6 +51,7 @@ interface DialogHeaderConfig {
     ShowmultimediaComponent,
     LocationPickerTileComponent,
     FormsModule,
+    MatAutocompleteModule,
     MatButtonModule,
     MatDialogActions,
     MatDialogContent,
@@ -71,6 +74,7 @@ export class EditMessageComponent implements OnInit {
   private readonly matDialog = inject(MatDialog);
   private readonly translation = inject(TranslationHelperService);
   private readonly messageService = inject(MessageService);
+  private readonly hashtagSuggestionService = inject(HashtagSuggestionService);
   readonly help = inject(HelpDialogService);
   readonly dialogRef = inject(MatDialogRef<EditMessageComponent>);
   private readonly style = inject(StyleService);
@@ -180,6 +184,11 @@ export class EditMessageComponent implements OnInit {
     await this.addHashtagsFromInput(true);
   }
 
+  async onHashtagSuggestionSelected(tag: string): Promise<void> {
+    this.hashtagInput = tag;
+    await this.addHashtagsFromInput(true);
+  }
+
   async addHashtagsFromInput(showErrors = true): Promise<boolean> {
     if (this.hashtagCheckInProgress) {
       return false;
@@ -244,6 +253,13 @@ export class EditMessageComponent implements OnInit {
 
   removeHashtag(tag: string): void {
     this.hashtagTags = this.hashtagTags.filter((item) => item !== tag);
+  }
+
+  getHashtagSuggestions(): string[] {
+    return this.hashtagSuggestionService.suggest(this.hashtagInput, {
+      exclude: this.hashtagTags,
+      limit: 12
+    });
   }
 
   onNewFontClick(): void {

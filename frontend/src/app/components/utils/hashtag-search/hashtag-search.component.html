@@ -1,9 +1,16 @@
 <div class="searchTerm-container">
   <input type="search"
     enterkeyhint="search"
+    [matAutocomplete]="hashtagSearchAutocomplete"
     [placeholder]="'common.hashtagSearch.placeholder' | transloco"
     [(ngModel)]="query"
     (keyup.enter)="search()" />
+  <mat-autocomplete #hashtagSearchAutocomplete="matAutocomplete"
+    (optionSelected)="onQuerySuggestionSelected($event.option.value)">
+    @for (suggestion of getQuerySuggestions(); track suggestion) {
+    <mat-option [value]="suggestion">#{{ suggestion }}</mat-option>
+    }
+  </mat-autocomplete>
   <button type="button" (click)="search()" [attr.aria-label]="'common.hashtagSearch.searchAction' | transloco">
     <mat-icon>search</mat-icon>
   </button>
