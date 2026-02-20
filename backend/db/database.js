@@ -1,5 +1,5 @@
 const path = require('path');
-const { DatabaseSync } = require('node:sqlite');
+const { Worker } = require('worker_threads');
 const tableUser = require('./tableUser');
 const tableConnect = require('./tableConnect');
 const tableContact = require('./tableContact');
@@ -16,18 +16,123 @@ const tableMaintenance = require('./tableMaintenance');
 const tableUsageProtection = require('./tableUsageProtection');
 
 class SqliteCompat {
-  constructor(filePath) {
-    this._db = new DatabaseSync(filePath);
+  constructor(filePath, logger = console) {
+    this._logger = logger ?? console;
+    this._requestId = 0;
+    this._pending = new Map();
+    this._closed = false;
+
+    this._worker = new Worker(path.join(__dirname, 'sqlite-worker.js'), {
+      workerData: { filePath }
+    });
+
+    this._worker.on('message', (message) => this._handleWorkerMessage(message));
+    this._worker.on('error', (error) => this._handleWorkerFailure(error));
+    this._worker.on('exit', (code) => {
+      if (this._closed) {
+        return;
+      }
+      if (code !== 0) {
+        this._handleWorkerFailure(new Error(`SQLite worker exited with code ${code}`));
+      }
+    });
+  }
+
+  _safeInvokeCallback(callback, error, value, context = null) {
+    if (typeof callback !== 'function') {
+      if (error) {
+        this._logger?.error?.(error?.message || error);
+      }
+      return;
+    }
+    try {
+      if (context) {
+        callback.call(context, error || null, value);
+        return;
+      }
+      callback(error || null, value);
+    } catch (callbackError) {
+      this._logger?.error?.('SQLite callback failed', callbackError);
+    }
+  }
+
+  _createError(errorPayload) {
+    const error = new Error(errorPayload?.message || 'SQLite worker error');
+    if (errorPayload?.name) {
+      error.name = errorPayload.name;
+    }
+    if (errorPayload?.code) {
+      error.code = errorPayload.code;
+    }
+    if (errorPayload?.stack) {
+      error.stack = errorPayload.stack;
+    }
+    return error;
+  }
+
+  _handleWorkerFailure(error) {
+    const pending = Array.from(this._pending.values());
+    this._pending.clear();
+    pending.forEach(({ callback }) => {
+      this._safeInvokeCallback(callback, error);
+    });
+  }
+
+  _handleWorkerMessage(message) {
+    const { id, ok, result, error } = message || {};
+    if (typeof id !== 'number') {
+      return;
+    }
+
+    const pending = this._pending.get(id);
+    if (!pending) {
+      return;
+    }
+    this._pending.delete(id);
+
+    const { action, callback } = pending;
+    if (!ok) {
+      this._safeInvokeCallback(callback, this._createError(error));
+      return;
+    }
+
+    if (action === 'run') {
+      const context = {
+        changes: Number(result?.changes ?? 0),
+        lastID: result?.lastID ?? null
+      };
+      this._safeInvokeCallback(callback, null, undefined, context);
+      return;
+    }
+    if (action === 'get') {
+      this._safeInvokeCallback(callback, null, result ?? null);
+      return;
+    }
+    if (action === 'all') {
+      this._safeInvokeCallback(callback, null, Array.isArray(result) ? result : []);
+      return;
+    }
+    this._safeInvokeCallback(callback, null, result);
+  }
+
+  _dispatch(action, payload, callback) {
+    if (this._closed && action !== 'close') {
+      this._safeInvokeCallback(callback, new Error('Database connection is closed'));
+      return;
+    }
+
+    const id = ++this._requestId;
+    this._pending.set(id, { action, callback });
+    try {
+      this._worker.postMessage({ id, action, ...payload });
+    } catch (error) {
+      this._pending.delete(id);
+      this._safeInvokeCallback(callback, error);
+    }
   }
 
   exec(sql, callback) {
-    try {
-      this._db.exec(sql);
-      if (callback) callback(null);
-    } catch (err) {
-      if (callback) return callback(err);
-      throw err;
-    }
+    this._dispatch('exec', { sql }, callback);
   }
 
   _normalizeParams(params, callback) {
@@ -37,106 +142,34 @@ class SqliteCompat {
     return { params, callback };
   }
 
-  _runStatement(stmt, params, callback) {
-    const result = params === undefined
-      ? stmt.run()
-      : Array.isArray(params)
-        ? stmt.run(...params)
-        : stmt.run(params);
-    const ctx = {
-      changes: result?.changes ?? 0,
-      lastID: result?.lastInsertRowid ?? result?.lastID
-    };
-    if (callback) callback.call(ctx, null);
-    return result;
-  }
-
   run(sql, params, callback) {
     const normalized = this._normalizeParams(params, callback);
-    try {
-      const stmt = this._db.prepare(sql);
-      this._runStatement(stmt, normalized.params, normalized.callback);
-    } catch (err) {
-      if (normalized.callback) return normalized.callback(err);
-      throw err;
-    }
+    this._dispatch('run', { sql, params: normalized.params }, normalized.callback);
   }
 
   get(sql, params, callback) {
     const normalized = this._normalizeParams(params, callback);
-    try {
-      const stmt = this._db.prepare(sql);
-      const row = normalized.params === undefined
-        ? stmt.get()
-        : Array.isArray(normalized.params)
-          ? stmt.get(...normalized.params)
-          : stmt.get(normalized.params);
-      if (normalized.callback) return normalized.callback(null, row ?? null);
-      return row ?? null;
-    } catch (err) {
-      if (normalized.callback) return normalized.callback(err);
-      throw err;
-    }
+    this._dispatch('get', { sql, params: normalized.params }, normalized.callback);
   }
 
   all(sql, params, callback) {
     const normalized = this._normalizeParams(params, callback);
-    try {
-      const stmt = this._db.prepare(sql);
-      const rows = normalized.params === undefined
-        ? stmt.all()
-        : Array.isArray(normalized.params)
-          ? stmt.all(...normalized.params)
-          : stmt.all(normalized.params);
-      if (normalized.callback) return normalized.callback(null, rows ?? []);
-      return rows ?? [];
-    } catch (err) {
-      if (normalized.callback) return normalized.callback(err);
-      throw err;
-    }
+    this._dispatch('all', { sql, params: normalized.params }, normalized.callback);
   }
 
   prepare(sql) {
-    const stmt = this._db.prepare(sql);
     return {
       run: (params, callback) => {
-        try {
-          return this._runStatement(stmt, params, callback);
-        } catch (err) {
-          if (callback) return callback(err);
-          throw err;
-        }
+        this.run(sql, params, callback);
       },
       get: (params, callback) => {
-        try {
-          const row = params === undefined
-            ? stmt.get()
-            : Array.isArray(params)
-              ? stmt.get(...params)
-              : stmt.get(params);
-          if (callback) return callback(null, row ?? null);
-          return row ?? null;
-        } catch (err) {
-          if (callback) return callback(err);
-          throw err;
-        }
+        this.get(sql, params, callback);
       },
       all: (params, callback) => {
-        try {
-          const rows = params === undefined
-            ? stmt.all()
-            : Array.isArray(params)
-              ? stmt.all(...params)
-              : stmt.all(params);
-          if (callback) return callback(null, rows ?? []);
-          return rows ?? [];
-        } catch (err) {
-          if (callback) return callback(err);
-          throw err;
-        }
+        this.all(sql, params, callback);
       },
       finalize: (callback) => {
-        if (callback) callback(null);
+        this._safeInvokeCallback(callback, null);
       }
     };
   }
@@ -146,13 +179,20 @@ class SqliteCompat {
   }
 
   close(callback) {
-    try {
-      this._db.close();
-      if (callback) callback(null);
-    } catch (err) {
-      if (callback) return callback(err);
-      throw err;
+    if (this._closed) {
+      this._safeInvokeCallback(callback, null);
+      return;
     }
+    this._closed = true;
+    this._dispatch('close', {}, (err) => {
+      if (err) {
+        this._safeInvokeCallback(callback, err);
+        return;
+      }
+      this._worker.terminate()
+        .then(() => this._safeInvokeCallback(callback, null))
+        .catch((terminateError) => this._safeInvokeCallback(callback, terminateError));
+    });
   }
 }
 
@@ -167,7 +207,7 @@ class Database {
     this.logger = logger ?? this.logger;
     return new Promise((resolve, reject) => {
       try {
-        this.db = new SqliteCompat(path.join(path.dirname(__filename), 'messagedrop.db'));
+        this.db = new SqliteCompat(path.join(path.dirname(__filename), 'messagedrop.db'), this.logger);
         this.db.exec(`
           PRAGMA journal_mode = WAL;
           PRAGMA synchronous = NORMAL;
