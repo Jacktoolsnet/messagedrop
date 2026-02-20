@@ -27,12 +27,14 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
 import { UserService } from '../../../services/user.service';
 import { ViatorService } from '../../../services/viator.service';
 import { HashtagSuggestionService } from '../../../services/hashtag-suggestion.service';
+import { DisplayMessage } from '../display-message/display-message.component';
 import { normalizeHashtags, stringifyHashtags } from '../../../utils/hashtag.util';
 import { HashtagMapItem, HashtagResultsMapComponent } from './components/hashtag-results-map/hashtag-results-map.component';
 import { MessagelistComponent } from '../../messagelist/messagelist.component';
 import { NotelistComponent } from '../../notelist/notelist.component';
 import { PlacelistComponent } from '../../placelist/placelist.component';
 import { ExperienceSearchDetailDialogComponent } from '../experience-search/detail-dialog/experience-search-detail-dialog.component';
+import { DisplayMessageConfig } from '../../../interfaces/display-message-config';
 
 export interface HashtagSearchDialogData {
   initialTag?: string;
@@ -115,6 +117,8 @@ export class HashtagSearchComponent {
   readonly localContactResults = signal<Contact[]>([]);
   readonly localNoteResults = signal<Note[]>([]);
   readonly localExperienceResults = signal<ExperienceBookmark[]>([]);
+  private readonly searchCounter = signal(0);
+  private noResultNoticeShownForSearch = -1;
   private readonly noteResultsSignal = this.noteService.getNotesSignal();
   private readonly destinationCache = new Map<number, ViatorDestinationLookup>();
   private readonly unresolvedDestinationIds = new Set<number>();
@@ -292,12 +296,28 @@ export class HashtagSearchComponent {
       }
       this.searchLocal(tag);
     });
+    effect(() => {
+      const searchCount = this.searchCounter();
+      const searched = this.hasSearched();
+      const loading = this.loadingPublic();
+      const hasResult = this.hasAnyResult();
+      const error = this.errorText();
+      if (searchCount <= 0 || !searched || loading || hasResult || !!error) {
+        return;
+      }
+      if (this.noResultNoticeShownForSearch === searchCount) {
+        return;
+      }
+      this.noResultNoticeShownForSearch = searchCount;
+      this.showNoResultsMessage();
+    });
     if (this.query) {
       this.search();
     }
   }
 
   search(): void {
+    this.searchCounter.update((counter) => counter + 1);
     this.selectedMapItemId.set(null);
     this.selectedListTileId.set(null);
     this.selectedResult.set(null);
@@ -773,5 +793,29 @@ export class HashtagSearchComponent {
       longitude,
       plusCode: location.plusCode || this.geolocationService.getPlusCode(latitude, longitude)
     };
+  }
+
+  private showNoResultsMessage(): void {
+    const config: DisplayMessageConfig = {
+      showAlways: true,
+      title: this.i18n.t('common.hashtagSearch.title'),
+      image: '',
+      icon: 'info',
+      message: this.i18n.t('common.hashtagSearch.noResults'),
+      button: '',
+      delay: 3000,
+      showSpinner: false,
+      autoclose: true
+    };
+
+    this.dialog.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: config,
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: false,
+      autoFocus: false
+    });
   }
 }

@@ -21,14 +21,6 @@
   <p class="state-line state-line--error">{{ errorText() }}</p>
   }
 
-  @if (loadingPublic()) {
-  <p class="state-line">{{ 'common.hashtagSearch.searching' | transloco }}</p>
-  }
-
-  @if (hasSearched() && !loadingPublic() && !hasAnyResult() && !errorText()) {
-  <p class="state-line">{{ 'common.hashtagSearch.noResults' | transloco }}</p>
-  }
-
   @if (viewMode === 'map') {
   <app-hashtag-results-map [items]="mapItems()" [initialCenter]="mapView.center" [initialZoom]="mapView.zoom"
     [selectedItemId]="selectedMapItemId()" (itemSelected)="onMapItemSelected($event)"
