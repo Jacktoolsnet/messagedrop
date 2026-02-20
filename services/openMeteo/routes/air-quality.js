@@ -6,6 +6,28 @@ const airQualityCache = require('../db/tableAirQuality');
 
 router.use(security.checkToken);
 
+const DEFAULT_UPSTREAM_TIMEOUT_MS = 10000;
+const parsedUpstreamTimeoutMs = Number.parseInt(process.env.OPENMETEO_UPSTREAM_TIMEOUT_MS ?? '', 10);
+const upstreamTimeoutMs = Number.isFinite(parsedUpstreamTimeoutMs) && parsedUpstreamTimeoutMs > 0
+    ? parsedUpstreamTimeoutMs
+    : DEFAULT_UPSTREAM_TIMEOUT_MS;
+
+const airQualityInFlight = new Map();
+
+function withInFlight(map, key, factory) {
+    const existing = map.get(key);
+    if (existing) {
+        return existing;
+    }
+    const promise = Promise.resolve()
+        .then(factory)
+        .finally(() => {
+            map.delete(key);
+        });
+    map.set(key, promise);
+    return promise;
+}
+
 router.get('/:pluscode/:latitude/:longitude/:days', async (req, res) => {
     const db = req.database.db;
     const { pluscode, latitude, longitude, days } = req.params;
@@ -13,7 +35,7 @@ router.get('/:pluscode/:latitude/:longitude/:days', async (req, res) => {
 
     try {
         const reducedPluscode = pluscode.substring(0, 8); // ≈100m Genauigkeit
-        const cacheKey = `${reducedPluscode}`;
+        const cacheKey = `${reducedPluscode}_${days}`;
 
         airQualityCache.getAirQualityData(db, cacheKey, async (err, row) => {
             if (err) {
@@ -46,21 +68,30 @@ router.get('/:pluscode/:latitude/:longitude/:days', async (req, res) => {
             const openMeteoUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${latitude}&longitude=${longitude}&forecast_days=${days}&hourly=${hourlyParams}&timezone=auto`;
 
             try {
-                const apiResult = await axios.get(openMeteoUrl);
-                if (!apiResult.data || Object.keys(apiResult.data).length === 0) {
+                const requestKey = `airquality:${cacheKey}`;
+                const data = await withInFlight(airQualityInFlight, requestKey, async () => {
+                    const apiResult = await axios.get(openMeteoUrl, { timeout: upstreamTimeoutMs });
+                    if (!apiResult.data || Object.keys(apiResult.data).length === 0) {
+                        return null;
+                    }
+
+                    airQualityCache.setAirQualityData(db, cacheKey, JSON.stringify(apiResult.data), (err) => {
+                        if (err) {
+                            req.logger?.warn?.('Air quality cache write failed', { cacheKey, error: err?.message || err });
+                        }
+                    });
+
+                    return apiResult.data;
+                });
+
+                if (!data || Object.keys(data).length === 0) {
                     response.status = 204; // No content
                     response.error = 'Empty data from Open-Meteo';
                     return res.status(response.status).json(response);
                 }
 
                 response.status = 200;
-                response.data = apiResult.data;
-
-                airQualityCache.setAirQualityData(db, cacheKey, JSON.stringify(apiResult.data), (err) => {
-                    if (err) {
-                        req.logger?.warn?.('Air quality cache write failed', { cacheKey, error: err?.message || err });
-                    }
-                });
+                response.data = data;
 
                 return res.status(200).json(response);
             } catch (apiErr) {

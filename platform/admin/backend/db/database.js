@@ -171,7 +171,13 @@ class Database {
     this.logger = logger ?? console;
     try {
       this.db = new SqliteCompat(path.join(path.dirname(__filename), 'messagedropAdmin.db'));
-      this.db.run('PRAGMA journal_mode = WAL;', [], (pragmaError) => {
+      this.db.exec(`
+        PRAGMA journal_mode = WAL;
+        PRAGMA synchronous = NORMAL;
+        PRAGMA busy_timeout = 5000;
+        PRAGMA temp_store = MEMORY;
+        PRAGMA wal_autocheckpoint = 1000;
+      `, (pragmaError) => {
         if (pragmaError) {
           this.logger.error(pragmaError.message);
         }

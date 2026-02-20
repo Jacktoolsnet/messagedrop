@@ -168,7 +168,13 @@ class Database {
     return new Promise((resolve, reject) => {
       try {
         this.db = new SqliteCompat(path.join(path.dirname(__filename), 'messagedrop.db'));
-        this.db.run('PRAGMA journal_mode = WAL;', [], (pragmaErr) => {
+        this.db.exec(`
+          PRAGMA journal_mode = WAL;
+          PRAGMA synchronous = NORMAL;
+          PRAGMA busy_timeout = 5000;
+          PRAGMA temp_store = MEMORY;
+          PRAGMA wal_autocheckpoint = 1000;
+        `, (pragmaErr) => {
           if (pragmaErr) {
             this.logger.error(pragmaErr.message);
           }

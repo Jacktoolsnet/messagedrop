@@ -15,7 +15,13 @@ class Database {
     this.logger = logger ?? console;
     try {
       this.db = new DatabaseSync(path.join(path.dirname(__filename), 'viator.db'));
-      this.db.exec('PRAGMA journal_mode = WAL;');
+      this.db.exec(`
+        PRAGMA journal_mode = WAL;
+        PRAGMA synchronous = NORMAL;
+        PRAGMA busy_timeout = 5000;
+        PRAGMA temp_store = MEMORY;
+        PRAGMA wal_autocheckpoint = 1000;
+      `);
       this.db.exec('PRAGMA foreign_keys = ON;');
 
       tableViatorCache.init(this.db);
