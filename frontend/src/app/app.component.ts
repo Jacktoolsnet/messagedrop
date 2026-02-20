@@ -751,7 +751,11 @@ export class AppComponent implements OnInit {
       return;
     }
 
-    this.messageService.setMessages([message]);
+    const existingMessages = this.messageService.messagesSignal();
+    if (!existingMessages.some((entry) => entry.uuid === message.uuid)) {
+      this.messageService.setMessages([...existingMessages, message]);
+      this.createMarkerLocations();
+    }
     this.openMarkerMessageListDialog([message]);
   }
 
@@ -1023,7 +1027,6 @@ export class AppComponent implements OnInit {
   public handleMarkerClickEvent(event: MarkerLocation) {
     switch (event.type) {
       case MarkerType.PUBLIC_MESSAGE:
-        this.messageService.setMessages(event.messages)
         this.openMarkerMessageListDialog(event.messages);
         break;
       case MarkerType.PRIVATE_NOTE:
@@ -1498,7 +1501,6 @@ export class AppComponent implements OnInit {
       if (result) {
         switch (result.type) {
           case 'public_message':
-            this.messageService.setMessages(result.messages)
             this.openMarkerMessageListDialog(result.messages);
             break
           case 'private_note':
@@ -1567,12 +1569,25 @@ export class AppComponent implements OnInit {
     if (!Array.isArray(messages) || messages.length === 0) {
       return;
     }
+    const messageUuids = Array.from(
+      new Set(
+        messages
+          .map((message) => message.uuid)
+          .filter((uuid): uuid is string => typeof uuid === 'string' && uuid.length > 0)
+      )
+    );
+    if (messageUuids.length === 0) {
+      return;
+    }
     this.markerMessageListOpen = true;
     const dialogRef = this.dialog.open(MessagelistComponent, {
       panelClass: 'MessageListDialog',
       closeOnNavigation: true,
-      data: { location: messages[0].location },
-        width: 'min(900px, 95vw)',
+      data: {
+        location: messages[0].location,
+        messageUuids
+      },
+      width: 'min(900px, 95vw)',
       maxWidth: '95vw',
       maxHeight: '95vh',
       height: 'auto',
@@ -1590,7 +1605,7 @@ export class AppComponent implements OnInit {
     dialogRef.afterClosed().subscribe(() => {
       this.markerMessageListOpen = false;
       this.messageService.clearSelectedMessages();
-      this.updateDataForLocation();
+      this.createMarkerLocations();
     });
   }
 

@@ -102,7 +102,11 @@ export class MessagelistComponent implements OnInit, OnDestroy {
   readonly help = inject(HelpDialogService);
   private readonly dsaStatusService = inject(DsaStatusService);
   private readonly languageService = inject(LanguageService);
-  readonly data = inject<{ location: Location; messageSignal: WritableSignal<Message[]> }>(MAT_DIALOG_DATA);
+  readonly data = inject<{
+    location: Location;
+    messageSignal?: WritableSignal<Message[]>;
+    messageUuids?: string[];
+  }>(MAT_DIALOG_DATA);
 
   readonly messagesSignal = signal<Message[]>([]);
   readonly filteredMessagesSignal = computed(() => {
@@ -143,16 +147,17 @@ export class MessagelistComponent implements OnInit, OnDestroy {
     this.userProfile = this.userService.getProfile();
     // If we come from a tile, seed the service with the tile messages
     // so create/delete/like operate on the same list.
-    if (this.data.messageSignal) {
+    if (this.data.messageSignal && !(this.data.messageUuids?.length)) {
       this.messageService.setMessages(this.data.messageSignal());
     }
 
     // Ongoing sync: service -> local view, optionally back into the provided signal.
     effect(() => {
       const serviceMessages = this.messageService.messagesSignal();
-      this.messagesSignal.set(serviceMessages);
+      const filteredMessages = this.filterMessagesForDialog(serviceMessages);
+      this.messagesSignal.set(filteredMessages);
       if (this.data.messageSignal) {
-        this.data.messageSignal.set(serviceMessages);
+        this.data.messageSignal.set(filteredMessages);
       }
     });
 
@@ -184,6 +189,21 @@ export class MessagelistComponent implements OnInit, OnDestroy {
       const width = this.listSize() > 1 ? '95vw' : 'auto';
       this.dialogRef.updateSize(width);
     });
+  }
+
+  private filterMessagesForDialog(serviceMessages: Message[]): Message[] {
+    const scopedUuids = Array.isArray(this.data.messageUuids)
+      ? this.data.messageUuids.filter((uuid): uuid is string => typeof uuid === 'string' && uuid.length > 0)
+      : [];
+
+    if (scopedUuids.length === 0) {
+      return serviceMessages;
+    }
+
+    const messageByUuid = new Map(serviceMessages.map((message) => [message.uuid, message]));
+    return scopedUuids
+      .map((uuid) => messageByUuid.get(uuid))
+      .filter((message): message is Message => !!message);
   }
 
   async ngOnInit() {
