@@ -1,5 +1,5 @@
 NUTZUNGSBEDINGUNGEN
-Stand: 22. Dezember 2025
+Stand: 12. April 2026
 
 ###
 Kurzfassung (nicht rechtsverbindlich)
@@ -7,11 +7,13 @@ Kurzfassung (nicht rechtsverbindlich)
 
 Mit der Nutzung von MessageDrop akzeptierst du diese Nutzungsbedingungen.
 
+Die Nutzung ist erst ab 16 Jahren zulässig. Für 16- und 17‑Jährige ist die Zustimmung der Eltern oder Erziehungsberechtigten erforderlich; weitergehende rechtsverbindliche Erklärungen bleiben voll geschäftsfähigen Personen (ab 18 Jahren) vorbehalten.
+
 Du bist für die von dir erstellten Inhalte selbst verantwortlich und musst sicherstellen, dass diese rechtmäßig sind und keine Rechte Dritter verletzen.
 
 Inhalte können manuell sowie automatisiert, einschließlich KI-gestützter Verfahren, moderiert, eingeschränkt oder entfernt werden. Für öffentliche Inhalte können Verfahren nach dem Digital Services Act (DSA) eingeleitet werden.
 
-Externe Dienste und Einbettungen (z. B. YouTube, OpenStreetMap, DeepL) unterliegen ausschließlich den Bedingungen der jeweiligen Anbieter.
+Externe Dienste und Einbettungen (z. B. YouTube, OpenStreetMap, DeepL, Unsplash, Viator) unterliegen ausschließlich den Bedingungen der jeweiligen Anbieter.
 
 Der Dienst kann zeitweise eingeschränkt oder nicht verfügbar sein; eine bestimmte Verfügbarkeit wird nicht garantiert.
 
@@ -20,6 +22,8 @@ Ein Großteil der Daten wird lokal auf deinem Endgerät gespeichert. Diese Daten
 Profile (Name/Avatar) können lokal genutzt werden. Bei Kontaktaufnahme kann optional eine Profilfreigabe an einen Kontakt angefragt werden; der Kontakt muss aktiv zustimmen. Nach Zustimmung werden Name und Avatar auf dem Endgerät des Kontakts lokal gespeichert; ein Zurückholen ist technisch nicht möglich.
 
 Systemmeldungen (z. B. zu DSA-Verfahren oder Wartungsarbeiten) können im Nutzerkonto angezeigt werden und werden ausschließlich durch autorisierte administrative Systeme erzeugt. Nutzer können darauf derzeit nicht antworten.
+
+Der optionale Nutzungszeit-Schutz kann als Selbstbeschränkung oder im Elternmodus (mit Eltern-PIN) genutzt werden. Im Elternmodus wird der PIN ausschließlich als Hash verarbeitet.
 
 Plätzen kann gefolgt werden; soweit technisch möglich können Push-Benachrichtigungen über neue öffentliche Inhalte an gefolgten Plätzen angezeigt werden. Push/Realtime-Funktionen erfolgen ausschließlich nach technischer Verfügbarkeit („Best Effort“); es besteht kein Anspruch auf Zustellung oder zeitnahe Benachrichtigung.
 
@@ -120,6 +124,8 @@ Der Dienst richtet sich nicht an Kinder unter 16 Jahren.
 
 Personen zwischen 16 und 17 Jahren dürfen MessageDrop nur im Rahmen der gesetzlich zulässigen beschränkten Geschäftsfähigkeit nutzen. Rechtsverbindliche Erklärungen oder Verpflichtungen, die über den vertragsgemäßen Gebrauch des Dienstes hinausgehen, dürfen ausschließlich von voll geschäftsfähigen Personen (ab 18 Jahren) abgegeben werden.
 
+Für Personen zwischen 16 und 17 Jahren ist die Nutzung nur mit Zustimmung der Eltern oder Erziehungsberechtigten zulässig.
+
 Wenn du MessageDrop im Namen einer Organisation oder juristischen Person nutzt, bestätigst du, hierzu rechtlich befugt zu sein.
 
 ###
@@ -137,6 +143,8 @@ Der Dienst kann externe Inhalte oder Funktionen einbinden, insbesondere von:
 - Pinterest
 - Tenor
 - Spotify
+- Unsplash
+- Viator
 
 Ein Anspruch auf bestimmte Funktionen, Darstellungen, Reichweiten, Rankings, Benachrichtigungen, Echtzeitfunktionen oder eine dauerhafte Verfügbarkeit besteht nicht.
 
@@ -264,6 +272,7 @@ Unzulässig sind insbesondere Inhalte oder Nutzungen, die:
 - Spam, Kettennachrichten oder missbräuchliche Automatisierungen beinhalten,
 - zur Umgehung von Sicherheitsmaßnahmen oder Schutzmechanismen auffordern oder entsprechende Anleitungen enthalten,
 - technische Beschränkungen oder Nutzungsbegrenzungen gezielt umgehen oder zu deren Umgehung anleiten,
+- den optionalen Nutzungszeit-Schutz gezielt umgehen oder Dritte zur Umgehung auffordern (insbesondere durch missbräuchliche Nutzung eines Eltern-PINs),
 - den Dienst in einer Weise missbrauchen, die die Funktionsfähigkeit, Sicherheit oder Verfügbarkeit beeinträchtigt (z. B. Flooding, Scraping, automatisierte Massennutzung),
 - eine falsche Verbindung, Partnerschaft oder Unterstützung durch uns oder durch Dritte vortäuschen,
 - offensichtlich aus rechtswidrigen, nicht autorisierten oder geleakten Quellen stammen.
@@ -309,7 +318,7 @@ Hinweis: Nach der Übertragung besteht keine technische Möglichkeit, die bereit
 Unabhängig davon kann jeder Nutzer eigene lokale Profileinträge für Kontakte festlegen (z. B. eigener Anzeigename, eigener Avatar).
 
 ###
-14. Plätzen folgen und Push-Benachrichtigungen (Best Effort)
+14. Plätzen folgen, Push-Benachrichtigungen und Nutzungszeit-Schutz (Best Effort)
 ###
 
 Nutzer können Plätzen folgen oder das Folgen beenden.
@@ -324,6 +333,12 @@ Push- und Echtzeitfunktionen werden ausschließlich nach technischer Verfügbark
 - oder die Funktion zeitweise vollständig nicht verfügbar ist.
 
 Ein Anspruch auf Zustellung, Vollständigkeit, Reihenfolge oder zeitnahe Benachrichtigung besteht nicht.
+
+MessageDrop kann optional einen Nutzungszeit-Schutz bereitstellen (Selbstbeschränkung oder Elternmodus). Der Nutzungszeit-Schutz kann insbesondere ein Tageslimit, Zeitfenster pro Wochentag sowie Verlängerungsoptionen enthalten.
+
+Im Elternmodus kann ein Eltern-PIN erforderlich sein. Der Eltern-PIN wird ausschließlich als kryptografischer Hash verarbeitet; der Klartext-PIN wird nicht gespeichert.
+
+Der Nutzungszeit-Schutz basiert auf technischen Rahmenbedingungen des jeweiligen Endgeräts und lokalen Daten. Eine lückenlose Umgehungssicherheit, geräteübergreifende Konsistenz oder Manipulationsfreiheit kann nicht garantiert werden.
 
 ###
 15. Keine Notfalldienste

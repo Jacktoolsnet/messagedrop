@@ -1,5 +1,5 @@
 HAFTUNGSHINWEIS (DISCLAIMER)
-Stand: 22. Dezember 2025
+Stand: 12. April 2026
 
 ###
 Kurzfassung (nicht rechtsverbindlich)
@@ -7,7 +7,7 @@ Kurzfassung (nicht rechtsverbindlich)
 
 MessageDrop ist eine datenschutzorientierte Web-App zur Veröffentlichung nutzergenerierter Inhalte, zur privaten Kommunikation sowie zur ortsbezogenen Organisation von Informationen.
 
-Die Nutzung von MessageDrop ist ausschließlich Personen gestattet, die mindestens 16 Jahre alt sind. Der Dienst richtet sich nicht an Kinder unter 16 Jahren. Eine Nutzung durch Personen unter 16 Jahren ist nicht vorgesehen und nicht zulässig.
+Die Nutzung von MessageDrop ist ausschließlich Personen gestattet, die mindestens 16 Jahre alt sind. Der Dienst richtet sich nicht an Kinder unter 16 Jahren. Eine Nutzung durch Personen unter 16 Jahren ist nicht vorgesehen und nicht zulässig. Personen zwischen 16 und 17 Jahren dürfen MessageDrop nur mit Zustimmung der Eltern oder Erziehungsberechtigten nutzen; weitergehende rechtsverbindliche Erklärungen sind voll geschäftsfähigen Personen (ab 18 Jahren) vorbehalten.
 
 Soweit technisch möglich, speichert MessageDrop Daten lokal auf dem Endgerät des Nutzers (z. B. IndexedDB), um einen hohen Datenschutzstandard und Datenminimierung zu gewährleisten. Lokal gespeicherte Daten können verloren gehen.
 
@@ -18,6 +18,8 @@ MessageDrop verwendet kein personalisiertes Empfehlungs- oder Ranking-System. Ö
 Private Chatnachrichten werden verschlüsselt und signiert übertragen und sind für uns und Dritte grundsätzlich nicht im Klartext einsehbar.
 
 Externe Inhalte (z. B. YouTube, TikTok, Spotify usw.) werden ausschließlich auf Wunsch der Nutzer eingebunden bzw. angezeigt und unterliegen den Bedingungen der jeweiligen Anbieter.
+
+Der optionale Nutzungszeit-Schutz (Selbstbeschränkung oder Elternmodus) kann Tageslimits und Zeitfenster umfassen. Im Elternmodus wird ein Eltern-PIN ausschließlich als Hash verarbeitet.
 
 MessageDrop bietet keinen Zugang zu Notfalldiensten.
 
@@ -87,6 +89,10 @@ Der Dienst richtet sich ausdrücklich nicht an Kinder unter 16 Jahren. Eine Nutz
 
 Mit der Nutzung von MessageDrop bestätigt der Nutzer, dass er das 16. Lebensjahr vollendet hat.
 
+Personen zwischen 16 und 17 Jahren bestätigen mit der Nutzung zusätzlich, dass die Zustimmung der Eltern oder Erziehungsberechtigten vorliegt.
+
+Rechtsverbindliche Erklärungen oder Verpflichtungen, die über die übliche Nutzung des Dienstes hinausgehen, dürfen ausschließlich von voll geschäftsfähigen Personen (ab 18 Jahren) abgegeben werden.
+
 Eine technische oder persönliche Altersverifikation findet nicht statt. Die Verantwortung für die Einhaltung der Altersvorgabe sowie für die Richtigkeit der gemachten Angaben liegt ausschließlich beim Nutzer.
 
 Sollten wir Kenntnis davon erlangen, dass MessageDrop von Personen unter 16 Jahren genutzt wird, behalten wir uns vor, entsprechende Zugriffe oder Nutzungen zu unterbinden und gegebenenfalls angelegte Nutzerkonten zu deaktivieren oder zu löschen.
@@ -117,7 +123,8 @@ MessageDrop kann grundsätzlich auch ohne Anlage eines Nutzerkontos verwendet we
 
 Im Rahmen dieser Basisnutzung können insbesondere:
 - öffentliche Inhalte gelesen werden, soweit diese verfügbar sind,
-- externe Inhalte (z. B. YouTube, TikTok, Pinterest, Spotify, Tenor) in den Einstellungen anbieterbezogen aktiviert oder deaktiviert werden.
+- externe Inhalte (z. B. YouTube, TikTok, Pinterest, Spotify, Tenor, Unsplash) in den Einstellungen anbieterbezogen aktiviert oder deaktiviert werden,
+- Erlebnisfunktionen über Viator genutzt werden.
 
 Auch im Rahmen der Basisnutzung gilt das Mindestalter von 16 Jahren uneingeschränkt.
 
@@ -226,6 +233,21 @@ Backups sind an den Schlüsselstand zum Zeitpunkt der Erstellung gebunden. Nach 
 Die Wiederherstellung eines Backups kann – insbesondere aufgrund technischer Einschränkungen, fehlerhafter Backups, inkompatibler Umgebungen, zwischenzeitlicher Änderungen der Anwendung oder unvollständiger Datensätze – fehlschlagen oder zu Abweichungen vom erwarteten Datenbestand führen. Ein Anspruch auf vollständige, fehlerfreie oder erfolgreiche Wiederherstellung aller Daten besteht nicht.
 
 ###
+5.2a Nutzungszeit-Schutz, Selbstbeschränkung und Eltern-PIN
+###
+
+MessageDrop kann optional einen Nutzungszeit-Schutz bereitstellen. Dieser kann insbesondere folgende Modi umfassen:
+- „off“ (deaktiviert),
+- „self“ (Selbstbeschränkung mit Tageslimit und optionaler Selbstverlängerung),
+- „parental“ (Tageslimit/Verlängerung mit Eltern-PIN).
+
+Im Elternmodus wird der Eltern-PIN ausschließlich als kryptografischer Hash verarbeitet; der Klartext-PIN wird weder serverseitig noch dauerhaft im Klartext lokal gespeichert.
+
+Der Nutzungszeit-Schutz basiert auf technischen Rahmenbedingungen des Endgeräts und lokal gespeicherten Zustandsdaten. Durch Löschen lokaler Daten, Gerätewechsel, Browser-/App-Neuinstallation, technische Manipulationen oder Systembesonderheiten kann die Schutzwirkung eingeschränkt sein.
+
+Soweit technisch vorgesehen und bei angemeldetem Nutzerkonto können Einstellungen/Zustandsdaten des Nutzungszeit-Schutzes mit dem Backend synchronisiert werden.
+
+###
 5.3 Öffentliche Inhalte erstellen und veröffentlichen
 ###
 
@@ -274,6 +296,7 @@ Unzulässig sind insbesondere Inhalte, die:
 - Spam, Kettennachrichten oder missbräuchliche Automatisierungen beinhalten,
 - zur Umgehung von Sicherheitsmaßnahmen oder Schutzmechanismen auffordern,
 - technische Beschränkungen oder Nutzungsbegrenzungen gezielt umgehen oder zu deren Umgehung anleiten,
+- den optionalen Nutzungszeit-Schutz gezielt umgehen oder Dritte zur Umgehung auffordern (insbesondere durch missbräuchliche Nutzung eines Eltern-PINs),
 - den Dienst in einer Weise missbrauchen, die die Funktionsfähigkeit, Sicherheit oder Verfügbarkeit beeinträchtigt (z. B. Flooding, Scraping, automatisierte Massennutzung),
 - offensichtlich aus rechtswidrigen, nicht autorisierten oder geleakten Quellen stammen.
 
@@ -388,6 +411,8 @@ Einzelne Funktionen basieren auf externen Diensten, insbesondere:
 - Übersetzungen über DeepL
 - Orts- und Reverse-Geokodierung über Nominatim / OpenStreetMap
 - Animierte Gifs von Tenor
+- Bildsuche und Bildmetadaten über Unsplash
+- Erlebnis- und Aktivitätsdaten über Viator
 
 Trotz sorgfältiger Auswahl kann es zu Abweichungen, Ausfällen, Quoten- oder Ratenbegrenzungen sowie API-Änderungen kommen.
 

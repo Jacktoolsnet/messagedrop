@@ -1,5 +1,5 @@
 DATENSCHUTZERKLÄRUNG
-Stand: 22. Dezember 2025
+Stand: 12. April 2026
 
 ###
 Kurzfassung (nicht rechtsverbindlich)
@@ -10,7 +10,7 @@ MessageDrop ist eine datenschutzorientierte Web-App zur Veröffentlichung nutzer
 Der Dienst kann ohne Nutzerkonto verwendet werden. Bestimmte Funktionen erfordern die freiwillige Anlage eines Nutzerkontos.
 Die Anmeldung erfolgt lokal über einen PIN; der PIN wird nicht an den Server übertragen. Im Nutzerkonto werden serverseitig nur die pseudonyme User-ID, öffentliche Schlüssel und Statusdaten gespeichert.
 
-Die Nutzung von MessageDrop ist ausschließlich Personen gestattet, die mindestens 16 Jahre alt sind.
+Die Nutzung von MessageDrop ist ausschließlich Personen gestattet, die mindestens 16 Jahre alt sind. Personen zwischen 16 und 17 Jahren dürfen den Dienst nur mit Zustimmung der Eltern oder Erziehungsberechtigten nutzen. Rechtsverbindliche Erklärungen, die über die gewöhnliche Nutzung des Dienstes hinausgehen, dürfen ausschließlich von voll geschäftsfähigen Personen (ab 18 Jahren) abgegeben werden.
 
 Ein Großteil der Daten wird bewusst primär lokal auf dem Endgerät des Nutzers gespeichert (z. B. im Browser- oder App-Speicher), um Datenminimierung und einen hohen Datenschutzstandard zu gewährleisten. Die Kontrolle über diese lokal gespeicherten Daten liegt grundsätzlich beim Nutzer. Ein Verlust oder eine Löschung lokaler Daten ist jederzeit möglich.
 
@@ -20,13 +20,15 @@ MessageDrop verwendet kein personalisiertes Empfehlungs- oder Ranking-System. Ö
 
 Private Chatnachrichten werden Ende-zu-Ende-verschlüsselt übertragen und sind für uns grundsätzlich nicht im Klartext einsehbar.
 
-Externe Inhalte (z. B. YouTube, TikTok, Spotify) werden nur auf ausdrücklichen Wunsch des Nutzers aktiviert und direkt von den jeweiligen Drittanbietern geladen. Es gelten deren Datenschutz- und Nutzungsbedingungen.
+Externe Inhalte und Dienste (z. B. YouTube, TikTok, Pinterest, Spotify, Tenor, Unsplash sowie Erlebnisdaten über Viator) werden nur nach aktiver Entscheidung des Nutzers geladen oder abgefragt. Es gelten ergänzend die Datenschutz- und Nutzungsbedingungen der jeweiligen Drittanbieter.
 
 Systemmeldungen (z. B. Hinweise zu DSA-Verfahren oder geplante Wartungsarbeiten) werden ausschließlich durch autorisierte administrative Systeme erzeugt und im Frontend des Nutzers angezeigt. Systemmeldungen sind stets aktiv; Nutzer können darauf derzeit nicht antworten.
 
 Profile (Name/Avatar) können lokal zur besseren Zuordnung genutzt werden. Bei Kontaktaufnahme kann ein Nutzer optional eine Profilfreigabe anfordern; der andere Nutzer muss aktiv zustimmen. Nach Zustimmung werden Name und Avatar auf dem Endgerät des Kontakts lokal gespeichert.
 
 Plätzen kann gefolgt werden; soweit technisch möglich und vom Endgerät unterstützt, kann der Nutzer Push-Benachrichtigungen erhalten, wenn an einem gefolgten Platz neue öffentliche Inhalte erscheinen. Technisch erforderliche Push-Token werden nur für die Zustellung verarbeitet. Ein Anspruch auf Zustellung von Push-Benachrichtigungen besteht nicht.
+
+MessageDrop bietet einen optionalen Nutzungszeit-Schutz (Selbstbeschränkung oder Elternmodus) mit Tageslimit und optionalen Zeitfenstern. Ein Eltern-PIN wird ausschließlich als kryptografischer Hash verarbeitet; der Klartext-PIN wird nicht gespeichert.
 
 MessageDrop bietet keinen Zugang zu Notfalldiensten.
 
@@ -75,6 +77,12 @@ Technische Funktion zur Zustellung von Benachrichtigungen an ein Endgerät. Push
 
 Lokale Speicherung
 Speicherung von Daten auf dem Endgerät des Nutzers (z. B. IndexedDB, App-Speicher, Cache). Diese Daten können durch den Nutzer oder durch technische Umstände gelöscht werden.
+
+Nutzungszeit-Schutz
+Optionale Funktion zur Begrenzung der Nutzungsdauer (Modus „self“ oder „parental“) mit Tageslimit und optionalen Zeitfenstern.
+
+Eltern-PIN-Hash
+Kryptografischer Hashwert eines vom Nutzer gesetzten Eltern-PINs im Elternmodus des Nutzungszeit-Schutzes. Der Klartext-PIN wird nicht gespeichert.
 
 ###
 1. Verantwortlicher im Sinne der DSGVO
@@ -169,6 +177,10 @@ Tenor (Google Ireland Limited)
 Datenschutzerklärung: https://policies.google.com/privacy
 Impressum / Kontakt: https://www.google.com/about/company/
 
+Unsplash (Unsplash B.V.)
+Datenschutzerklärung: https://unsplash.com/privacy
+Nutzungsbedingungen: https://unsplash.com/terms
+
 Die oben genannten Links dienen ausschließlich der Information. Für Inhalte, Aktualität, Verfügbarkeit oder Änderungen der externen Seiten übernehmen wir keine Verantwortung oder Gewähr.
 
 Die Liste der externen Anbieter kann technisch bedingt erweitert oder angepasst werden. Sofern neue Anbieter integriert werden, wird die Liste in einer aktualisierten Fassung dieser Datenschutzerklärung ergänzt.
@@ -184,6 +196,28 @@ Im Rahmen der Nutzung ohne Nutzerkonto kann der Nutzer optional lokale Profile z
 Diese Profile werden ausschließlich lokal auf dem Endgerät gespeichert und sind nur für den jeweiligen Nutzer sichtbar. Eine Übertragung an unsere Server oder eine Veröffentlichung für andere Nutzer findet nicht statt.
 
 Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an nutzerfreundlicher Darstellung) bzw. Art. 6 Abs. 1 lit. b DSGVO, soweit die Verarbeitung zur Bereitstellung einer vom Nutzer genutzten Funktion erforderlich ist.
+
+###
+2.5 Externe Funktions- und Informationsdienste
+###
+
+Für einzelne Funktionen nutzt MessageDrop externe Informations- und API-Dienste, die nicht zwingend als eingebetteter Inhalt erscheinen müssen, insbesondere:
+- Open-Meteo (Wetter- und Luftqualitätsdaten),
+- DeepL (Übersetzungen),
+- Nominatim / OpenStreetMap (Suche, Geokodierung, Kartenbezug),
+- Viator (Erlebnis-/Aktivitätsdaten),
+- Unsplash (Bildsuche und Bildmetadaten).
+
+Bei Nutzung dieser Funktionen können – abhängig vom jeweiligen Anwendungsfall – insbesondere Suchbegriffe, Sprach- und Ländereinstellungen, Ziel-/Ort-Parameter, Datums- und Preisfilter, technische Verbindungsdaten sowie ggf. Referenz-URLs verarbeitet werden. Die Kommunikation mit Drittanbietern erfolgt, soweit technisch vorgesehen, über unsere Server oder direkt aus dem Endgerät.
+
+Weiterführende Informationen zu den Anbietern sind über deren jeweilige Websites abrufbar, z. B.:
+- Open-Meteo: https://open-meteo.com/
+- DeepL: https://www.deepl.com/
+- OpenStreetMap / Nominatim: https://www.openstreetmap.org/
+- Viator: https://www.viator.com/
+- Unsplash: https://unsplash.com/
+
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Bereitstellung der vom Nutzer angeforderten Funktion) sowie Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an nutzerfreundlicher, funktionsfähiger Bereitstellung).
 
 ###
 3. Nutzung mit Nutzerkonto
@@ -258,6 +292,8 @@ Diese Inhalte werden verarbeitet zur:
 - Moderation und Durchsetzung von Nutzungsregeln,
 - Missbrauchs- und Betrugsprävention,
 - Erfüllung gesetzlicher Pflichten, insbesondere nach dem DSA.
+
+Zur Unterstützung der Moderation können Inhalte (einschließlich Hashtags) automatisiert analysiert werden. Hierbei kann – soweit technisch erforderlich – ein externer KI-Moderationsdienst eingebunden werden. Dabei kann eine Übermittlung von Inhaltsdaten und technischen Metadaten an den jeweiligen Dienstleister erfolgen. Wir verwenden die Ergebnisse ausschließlich zur Moderationsunterstützung und zur Erfüllung gesetzlicher Pflichten.
 
 Öffentliche Nachrichten und öffentliche Kommentare werden nach 30 Tagen gelöscht. Ein Anspruch auf dauerhafte Verfügbarkeit, Archivierung oder Wiederherstellung besteht nicht.
 
@@ -375,6 +411,24 @@ Push-Benachrichtigungen können aus technischen, systembedingten oder nutzerspez
 Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Funktion „Folgen“) sowie Art. 6 Abs. 1 lit. a DSGVO, sofern die Push-Nutzung als einwilligungsbasiert ausgestaltet ist bzw. eine systemseitige Berechtigung des Endgeräts erforderlich ist.
 
 ###
+3.10 Nutzungszeit-Schutz (Selbstbeschränkung / Elternmodus)
+###
+
+MessageDrop bietet optional einen Nutzungszeit-Schutz mit folgenden Grundfunktionen:
+- Modus „off“ (deaktiviert),
+- Modus „self“ (Selbstbeschränkung mit Tageslimit und optionaler einmaliger Selbstverlängerung),
+- Modus „parental“ (Tageslimit und optionale Verlängerung per Eltern-PIN).
+
+Verarbeitet werden hierfür insbesondere:
+- Einstellungen zum Nutzungszeit-Schutz (Modus, Tageslimit, Zeitfenster pro Wochentag, Verlängerungswerte),
+- lokaler Tagesstatus (Datum, konsumierte Nutzungssekunden, Status der Selbstverlängerung),
+- optional ein Eltern-PIN-Hash (kein Klartext-PIN).
+
+Der Eltern-PIN wird ausschließlich lokal gehasht (kryptografischer Hash) und nicht im Klartext gespeichert. Bei angemeldetem Nutzerkonto können Einstellungen und Statusdaten des Nutzungszeit-Schutzes zur Synchronisation mit dem Backend übertragen werden.
+
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Bereitstellung der angeforderten Schutzfunktion) sowie Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an jugendschutzorientierter und verantwortungsvoller Nutzung).
+
+###
 4. Digital Services Act (DSA)
 ###
 
@@ -442,6 +496,7 @@ Davon ausgenommen sind DSA-Verfahrensdaten (einschließlich erforderlicher Nachw
 Im Übrigen gelten insbesondere folgende Grundsätze:
 - Besucher-/Server-Logs: Speicherung nach Erforderlichkeit für Sicherheit und Betrieb (Art. 6 Abs. 1 lit. f DSGVO),
 - Nutzerkonto-Metadaten (User-ID, Status, letzter Login): bis zur Löschung des Nutzerkontos, vorbehaltlich gesetzlicher Pflichten,
+- Nutzungszeit-Schutz (Einstellungen/Status, inkl. Eltern-PIN-Hash): bis zur Änderung/Löschung durch den Nutzer bzw. bis zur Löschung des Nutzerkontos,
 - öffentliche Inhalte: Löschung nach 30 Tagen,
 - gelesene private Nachrichten: Löschung nach 7 Tagen,
 - lokal gespeicherte Daten: Löschung durch den Nutzer bzw. durch technische Umstände möglich.
@@ -462,11 +517,15 @@ Erteilte Einwilligungen können jederzeit mit Wirkung für die Zukunft widerrufe
 
 Zur Ausübung deiner Rechte kannst du dich an den Verantwortlichen (siehe Abschnitt 1) wenden.
 
+Darüber hinaus hast du das Recht, dich bei einer Datenschutz-Aufsichtsbehörde zu beschweren (Art. 77 DSGVO).
+
 ###
 8. Mindestalter
 ###
 
 Der Dienst richtet sich nicht an Personen unter 16 Jahren (Art. 8 DSGVO). Sofern wir Kenntnis davon erlangen, dass der Dienst von Personen unter 16 Jahren genutzt wird, behalten wir uns vor, entsprechende Nutzerkonten zu deaktivieren oder zu löschen.
+
+Personen zwischen 16 und 17 Jahren dürfen den Dienst nur mit Zustimmung der Eltern oder Erziehungsberechtigten nutzen. Rechtsverbindliche Erklärungen oder Verpflichtungen, die über die übliche Nutzung des Dienstes hinausgehen, dürfen ausschließlich von voll geschäftsfähigen Personen (ab 18 Jahren) abgegeben werden.
 
 ###
 9. Keine Notfalldienste
