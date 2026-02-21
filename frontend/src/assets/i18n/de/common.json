@@ -826,6 +826,8 @@
       },
       "externalContent": {
         "title": "Einstellungen für externe Inhalte",
+        "choiceTitle": "Anbieterbezogene Auswahl",
+        "choiceText": "Du entscheidest pro Anbieter. Eine Zustimmung zu allen externen Anbietern ist nicht erforderlich. Ohne Zustimmung bleibt der jeweilige Anbieter deaktiviert und es werden keine Inhalte geladen.",
         "platformTitle": "Externe Inhalte: {{ platform }}",
         "platformSubtitle": "Einbettungen, Vorschauen und Widgets dieses Anbieters erlauben.",
         "platformNote": "Durch Aktivieren erlaubst du das Laden von Inhalten von {{ platform }} und stimmst den",

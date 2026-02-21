@@ -9,15 +9,21 @@ MessageDrop ist eine datenschutzorientierte Web-App zur Veröffentlichung nutzer
 
 Die Nutzung von MessageDrop ist ausschließlich Personen gestattet, die mindestens 16 Jahre alt sind. Der Dienst richtet sich nicht an Kinder unter 16 Jahren. Eine Nutzung durch Personen unter 16 Jahren ist nicht vorgesehen und nicht zulässig. Personen zwischen 16 und 17 Jahren dürfen MessageDrop nur mit Zustimmung der Eltern oder Erziehungsberechtigten nutzen; weitergehende rechtsverbindliche Erklärungen sind voll geschäftsfähigen Personen (ab 18 Jahren) vorbehalten.
 
-Soweit technisch möglich, speichert MessageDrop Daten lokal auf dem Endgerät des Nutzers (z. B. IndexedDB), um einen hohen Datenschutzstandard und Datenminimierung zu gewährleisten. Lokal gespeicherte Daten können verloren gehen.
+Soweit technisch möglich, speichert MessageDrop Daten lokal auf dem Endgerät des Nutzers (z. B. IndexedDB), um einen hohen Datenschutzstandard und Datenminimierung zu gewährleisten. Lokal gespeicherte Daten können verloren gehen. Ohne zuvor erstelltes Backup ist eine Wiederherstellung nicht möglich.
 
 Öffentliche Inhalte werden von Nutzern erstellt und können gemäß den Vorgaben des Digital Services Act (DSA) gemeldet, überprüft und moderiert werden. Inhalte, bei denen ein DSA-Verfahren eingeleitet wird, werden vorübergehend nicht öffentlich sichtbar gestellt. Rechtswidrige Inhalte werden nach Kenntniserlangung entfernt oder gesperrt.
+
+Persönliche Informationen dürfen nicht öffentlich veröffentlicht werden – weder über sich selbst noch über andere Personen.
+
+Möglicherweise rechtswidrige öffentliche Inhalte können über die Meldefunktion im Dienst oder über die im Impressum genannte DSA-Kontaktstelle gemeldet werden. Betroffene Nutzer können – soweit gesetzlich vorgesehen – interne Beschwerden gegen Moderationsentscheidungen einreichen.
+
+Missbräuchliche Meldungen oder Beschwerden können eingeschränkt oder zurückgewiesen werden.
 
 MessageDrop verwendet kein personalisiertes Empfehlungs- oder Ranking-System. Öffentliche Inhalte werden nicht algorithmisch gefiltert oder priorisiert, sondern ausschließlich auf Basis des jeweils betrachteten geografischen Bereichs und der zeitlichen Veröffentlichung angezeigt.
 
 Private Chatnachrichten werden verschlüsselt und signiert übertragen und sind für uns und Dritte grundsätzlich nicht im Klartext einsehbar.
 
-Externe Inhalte (z. B. YouTube, TikTok, Spotify usw.) werden ausschließlich auf Wunsch der Nutzer eingebunden bzw. angezeigt und unterliegen den Bedingungen der jeweiligen Anbieter.
+Externe Inhalte (z. B. YouTube, TikTok, Spotify usw.) werden ausschließlich nach aktiver, anbieterbezogener Zustimmung der Nutzer eingebunden bzw. angezeigt. Eine pauschale Zustimmung für alle Anbieter ist nicht vorgesehen. Eine erteilte Zustimmung kann jederzeit mit Wirkung für die Zukunft widerrufen werden. Es gelten die Bedingungen der jeweiligen Anbieter.
 
 Der optionale Nutzungszeit-Schutz (Selbstbeschränkung oder Elternmodus) kann Tageslimits und Zeitfenster umfassen. Im Elternmodus wird ein Eltern-PIN ausschließlich als Hash verarbeitet.
 
@@ -135,6 +141,8 @@ Erst wenn der Nutzer einen externen Anbieter ausdrücklich aktiviert, werden des
 Dabei kann der jeweilige Anbieter technisch bedingt Informationen über den Abruf erhalten (z. B. IP-Adresse, Geräte- oder Browserinformationen) und gegebenenfalls Cookies oder vergleichbare Technologien einsetzen. Auf Art, Umfang und Zweck dieser Datenverarbeitung durch den externen Anbieter haben wir keinen Einfluss. Es gelten ausschließlich die Nutzungs- und Datenschutzbestimmungen des jeweiligen Anbieters.
 
 Ohne eine ausdrückliche Aktivierung durch den Nutzer findet kein automatischer Abruf externer Inhalte und keine Datenübertragung an diese Anbieter statt. Die Aktivierung externer Inhalte erfolgt freiwillig und kann vom Nutzer jederzeit mit Wirkung für die Zukunft wieder deaktiviert werden.
+
+Eine pauschale Zustimmung für alle externen Anbieter ist nicht vorgesehen; die Entscheidung erfolgt getrennt je Anbieter.
 
 Im Rahmen der Basisnutzung besteht zudem die Möglichkeit, lokal Profile zu erstellen. Ein Profil besteht aus einem frei wählbaren Namen und einem Avatar (Bild).
 
@@ -271,7 +279,7 @@ Unzulässig sind insbesondere Inhalte, die:
 - diskriminierend, extremistisch oder menschenverachtend sind,
 - pornografische, sexuell explizite oder jugendgefährdende Inhalte enthalten,
 - sexuelle Handlungen oder Darstellungen Minderjähriger zeigen oder andeuten,
-- private oder personenbezogene Daten Dritter ohne deren ausdrückliche Einwilligung offenlegen, insbesondere:
+- persönliche Informationen oder personenbezogene Daten öffentlich offenlegen, unabhängig davon, ob sie die eigene Person oder andere Personen betreffen, insbesondere:
   - Vor- und Nachnamen, Spitznamen oder sonstige identifizierende Namensangaben,
   - Geburtsdatum oder Geburtstag,
   - Alter oder Altersangaben in Verbindung mit identifizierenden Informationen,
@@ -300,7 +308,7 @@ Unzulässig sind insbesondere Inhalte, die:
 - den Dienst in einer Weise missbrauchen, die die Funktionsfähigkeit, Sicherheit oder Verfügbarkeit beeinträchtigt (z. B. Flooding, Scraping, automatisierte Massennutzung),
 - offensichtlich aus rechtswidrigen, nicht autorisierten oder geleakten Quellen stammen.
 
-Dies gilt unabhängig davon, ob die betroffene Person Nutzer von MessageDrop ist oder ob die Informationen öffentlich zugänglich erscheinen.
+Dies gilt unabhängig davon, ob die betroffene Person Nutzer von MessageDrop ist, ob eine Einwilligung vorliegt oder ob die Informationen an anderer Stelle bereits öffentlich zugänglich erscheinen.
 
 Die Aufzählung ist nicht abschließend.
 
@@ -329,7 +337,15 @@ Es besteht kein Anspruch darauf, dass öffentliche Inhalte innerhalb des Dienste
 6. Verfahren nach dem Digital Services Act (DSA)
 ###
 
-Für öffentliche Inhalte, einschließlich öffentlicher Kommentare, kann jederzeit ein Verfahren nach dem Digital Services Act (DSA) eingeleitet werden, insbesondere durch:
+Soweit die gesetzlichen Vorgaben des Digital Services Act (DSA) auf MessageDrop anwendbar sind, gelten ergänzend die folgenden Regelungen.
+
+Möglicherweise rechtswidrige öffentliche Inhalte (einschließlich öffentlicher Kommentare) können gemeldet werden:
+- über die Meldefunktion im Dienst,
+- oder über die im Impressum genannte DSA-Kontaktstelle.
+
+Damit eine zügige Prüfung möglich ist, sollte eine Meldung möglichst konkret sein (z. B. Link/ID des Inhalts, Begründung und optional Nachweise).
+
+Ein DSA-Verfahren kann insbesondere eingeleitet werden durch:
 - eine Meldung („Notice“),
 - eine Beschwerde („Appeal“).
 
@@ -355,6 +371,8 @@ Unabhängig davon kann sich die meldende Person jederzeit über den Stand des Ve
 
 Der von einem DSA-Verfahren betroffene Nutzer wird über den jeweiligen Verfahrensstand, Entscheidungen und etwaige Maßnahmen informiert. Diese Informationen werden über Systemmeldungen bereitgestellt.
 
+Soweit rechtlich zulässig und technisch möglich, enthalten diese Informationen insbesondere die getroffene Maßnahme, die wesentlichen Gründe der Entscheidung und den Hinweis, ob automatisierte Verfahren an der Entscheidung beteiligt waren.
+
 Systemmeldungen sind interne Nachrichten, die vom Admin-Backend an das MessageDrop-Backend übermittelt und dem Nutzer im Frontend in einem gesonderten Nachrichtenbereich angezeigt werden. Sie dienen der formellen Kommunikation im Rahmen gesetzlicher Verfahren und stellen kein klassisches E-Mail-Postfach dar.
 
 Für jeden DSA-relevanten Vorgang (Meldung oder Beschwerde) wird eine öffentlich zugängliche Fallseite bereitgestellt. Diese dient der gesetzlichen Transparenz und Nachvollziehbarkeit des Verfahrens.
@@ -368,6 +386,12 @@ Auf diesen öffentlichen Fallseiten werden ausschließlich anonymisierte oder ni
 Personenbezogene Daten der meldenden Person, des betroffenen Nutzers oder unbeteiligter Dritter werden auf öffentlichen Fallseiten nicht veröffentlicht.
 
 Nach Abschluss des Verfahrens erfolgt – abhängig vom Ergebnis – eine Wiederfreigabe, Einschränkung oder endgültige Entfernung des betroffenen Inhalts.
+
+Betroffene Nutzer können – soweit gesetzlich vorgesehen – eine interne Beschwerde gegen Moderationsentscheidungen einreichen (über die entsprechende Funktion im Dienst oder über die DSA-Kontaktstelle).
+
+Soweit gesetzlich vorgesehen, bleiben außergerichtliche und gerichtliche Rechtsbehelfe unberührt.
+
+Missbräuchliche Meldungen oder Beschwerden (z. B. offensichtlich unbegründete Serienmeldungen) können eingeschränkt, zurückgewiesen oder mit weiteren Schutzmaßnahmen beantwortet werden.
 
 ###
 7. Systemmeldungen
@@ -482,7 +506,11 @@ Unsere Website/App bietet keinen Zugang zu Notfalldiensten (z. B. Polizei, Feuer
 12. Änderungen und Funktionsanpassungen
 ###
 
-Wir behalten uns vor, diesen Haftungshinweis jederzeit zu ändern. Es gilt jeweils die zum Zeitpunkt der Veröffentlichung aktuelle Fassung.
+Wir behalten uns vor, diesen Haftungshinweis jederzeit zu ändern.
+
+Änderungen werden mit Veröffentlichung der aktualisierten Fassung wirksam, sofern kein späterer Zeitpunkt angegeben ist.
+
+Bei wesentlichen Änderungen informieren wir in angemessener Form innerhalb des Dienstes vor Inkrafttreten, soweit dies rechtlich und technisch möglich ist.
 
 Wir behalten uns außerdem vor, Funktionen und Darstellungen von MessageDrop jederzeit anzupassen, zu ändern, einzuschränken oder einzustellen, insbesondere aus technischen, sicherheitsrelevanten oder rechtlichen Gründen oder zur Optimierung des Dienstes.
 

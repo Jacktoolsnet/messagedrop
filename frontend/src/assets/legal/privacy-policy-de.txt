@@ -14,13 +14,21 @@ Die Nutzung von MessageDrop ist ausschließlich Personen gestattet, die mindeste
 
 Ein Großteil der Daten wird bewusst primär lokal auf dem Endgerät des Nutzers gespeichert (z. B. im Browser- oder App-Speicher), um Datenminimierung und einen hohen Datenschutzstandard zu gewährleisten. Die Kontrolle über diese lokal gespeicherten Daten liegt grundsätzlich beim Nutzer. Ein Verlust oder eine Löschung lokaler Daten ist jederzeit möglich.
 
+Ohne ein zuvor erstelltes Backup ist eine Wiederherstellung lokal gelöschter Daten nicht möglich.
+
 Öffentliche Inhalte und Kommentare werden von Nutzern erstellt und können gemäß den Vorgaben des Digital Services Act (DSA) gemeldet, überprüft und moderiert werden. Inhalte, für die ein DSA-Verfahren eingeleitet wird, werden vorübergehend nicht öffentlich sichtbar gestellt.
+
+Persönliche Informationen dürfen nicht öffentlich veröffentlicht werden – weder über sich selbst noch über andere Personen.
+
+Möglicherweise rechtswidrige öffentliche Inhalte können über die Meldefunktion im Dienst oder über die im Impressum genannte DSA-Kontaktstelle gemeldet werden. Betroffene Nutzer können – soweit gesetzlich vorgesehen – interne Beschwerden gegen Moderationsentscheidungen einreichen.
 
 MessageDrop verwendet kein personalisiertes Empfehlungs- oder Ranking-System. Öffentliche Inhalte werden nicht algorithmisch gefiltert oder priorisiert, sondern ausschließlich anhand des betrachteten geografischen Bereichs und der zeitlichen Veröffentlichung angezeigt.
 
 Private Chatnachrichten werden Ende-zu-Ende-verschlüsselt übertragen und sind für uns grundsätzlich nicht im Klartext einsehbar.
 
-Externe Inhalte und Dienste (z. B. YouTube, TikTok, Pinterest, Spotify, Tenor, Unsplash sowie Erlebnisdaten über Viator) werden nur nach aktiver Entscheidung des Nutzers geladen oder abgefragt. Es gelten ergänzend die Datenschutz- und Nutzungsbedingungen der jeweiligen Drittanbieter.
+Externe Inhalte und Dienste (z. B. YouTube, TikTok, Pinterest, Spotify, Tenor, Unsplash sowie Erlebnisdaten über Viator) werden nur nach aktiver, anbieterbezogener Entscheidung des Nutzers geladen oder abgefragt. Eine pauschale Zustimmung für alle Anbieter ist nicht vorgesehen. Es gelten ergänzend die Datenschutz- und Nutzungsbedingungen der jeweiligen Drittanbieter.
+
+Erteilte Einwilligungen für externe Inhalte können jederzeit mit Wirkung für die Zukunft widerrufen werden (z. B. durch Deaktivierung des jeweiligen Anbieters in den Einstellungen).
 
 Systemmeldungen (z. B. Hinweise zu DSA-Verfahren oder geplante Wartungsarbeiten) werden ausschließlich durch autorisierte administrative Systeme erzeugt und im Frontend des Nutzers angezeigt. Systemmeldungen sind stets aktiv; Nutzer können darauf derzeit nicht antworten.
 
@@ -136,6 +144,8 @@ Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an sicher
 MessageDrop ermöglicht die optionale Einbindung externer Inhalte von Drittanbietern (z. B. Videos, Musik, animierte Inhalte oder eingebettete Medien).
 
 Externe Inhalte sind standardmäßig deaktiviert. Statt der externen Inhalte wird ein Hinweistext angezeigt, der den Nutzer darüber informiert, dass Inhalte eines Drittanbieters verfügbar sind, sowie eine aktive Entscheidungsmöglichkeit (z. B. Toggle), mit der der jeweilige Anbieter ausdrücklich aktiviert werden kann.
+
+Eine pauschale Zustimmung für alle externen Anbieter ist nicht vorgesehen; die Entscheidung erfolgt getrennt je Anbieter.
 
 Erst nach einer bewussten und freiwilligen Aktivierung durch den Nutzer werden externe Inhalte technisch eingebunden.
 
@@ -287,6 +297,8 @@ Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO sowie Art. 6 Abs. 1 lit. c DSGVO,
 
 Nutzer können öffentliche Nachrichten und öffentliche Kommentare erstellen.
 
+Öffentliche Inhalte dürfen keine persönlichen Informationen enthalten, unabhängig davon, ob diese die eigene Person oder andere Personen betreffen. Solche Inhalte können moderiert, ausgeblendet oder entfernt werden.
+
 Diese Inhalte werden verarbeitet zur:
 - Bereitstellung und Darstellung innerhalb des Dienstes,
 - Moderation und Durchsetzung von Nutzungsregeln,
@@ -436,14 +448,20 @@ Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Bereitstellung der angeforderten
 4.1 DSA-Verfahren
 ###
 
-Für öffentliche Inhalte und Kommentare kann ein Verfahren nach dem Digital Services Act (DSA) eingeleitet werden, insbesondere durch Meldungen (Notices) oder Beschwerden (Appeals).
+Soweit die gesetzlichen Vorgaben des Digital Services Act (DSA) auf MessageDrop anwendbar sind, kann für öffentliche Inhalte und Kommentare ein Verfahren eingeleitet werden, insbesondere durch Meldungen (Notices) oder Beschwerden (Appeals).
+
+Meldungen können über die Meldefunktion im Dienst oder über die im Impressum genannte DSA-Kontaktstelle erfolgen.
+
+Für eine zügige Bearbeitung sollte eine Meldung möglichst konkret sein (z. B. Link/ID des Inhalts, kurze Begründung und optional Nachweise).
 
 Dabei verarbeiten wir insbesondere:
 - User-ID (soweit vorhanden),
+- Angaben zur meldenden Person, soweit diese freiwillig angegeben werden (z. B. E-Mail-Adresse),
 - Angaben zum gemeldeten Inhalt,
 - Zeitpunkte,
 - Status des Verfahrens,
-- getroffene Entscheidungen und Begründungen.
+- getroffene Entscheidungen und Begründungen,
+- Angaben aus internen Beschwerden gegen Moderationsentscheidungen (soweit gesetzlich vorgesehen).
 
 Zusätzlich kann die meldende Person im Rahmen eines DSA-Verfahrens freiwillig Belege bereitstellen, insbesondere:
 - Datei-Uploads (z. B. Screenshots oder Dokumente),
@@ -451,7 +469,11 @@ Zusätzlich kann die meldende Person im Rahmen eines DSA-Verfahrens freiwillig B
 
 Datei-Uploads werden auf unseren Servern gespeichert. Externe Links werden in unserer Datenbank gespeichert. Diese Belege werden ausschließlich zur Prüfung des gemeldeten Sachverhalts sowie zur Dokumentation im Rahmen gesetzlicher Pflichten verarbeitet und nicht öffentlich veröffentlicht.
 
+Im Rahmen von Moderationsentscheidungen verarbeiten wir zudem Daten zur Benachrichtigung betroffener Nutzer (z. B. über den Verfahrensstand, getroffene Maßnahmen, wesentliche Gründe der Entscheidung und ggf. die Beteiligung automatisierter Verfahren, soweit rechtlich zulässig und technisch möglich).
+
 Rechtsgrundlage ist Art. 6 Abs. 1 lit. c DSGVO (rechtliche Verpflichtung) sowie Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an Rechtsdurchsetzung, Missbrauchsprävention und Nachweisführung).
+
+Daten zu offensichtlich missbräuchlichen Meldungen oder Beschwerden (z. B. Serienmeldungen ohne sachlichen Bezug) können zur Missbrauchsprävention verarbeitet werden.
 
 ###
 4.2 Öffentliche Fallseite
@@ -537,4 +559,10 @@ Der Dienst stellt keinen Ersatz für Notfalldienste dar und bietet keinen Zugang
 10. Änderungen der Datenschutzerklärung
 ###
 
-Wir behalten uns vor, diese Datenschutzerklärung anzupassen. Es gilt jeweils die zum Zeitpunkt der Veröffentlichung aktuelle Fassung.
+Wir behalten uns vor, diese Datenschutzerklärung anzupassen.
+
+Änderungen werden mit Veröffentlichung der aktualisierten Fassung wirksam, sofern kein späterer Zeitpunkt angegeben ist.
+
+Bei wesentlichen Änderungen informieren wir in angemessener Form innerhalb des Dienstes vor Inkrafttreten, soweit dies rechtlich und technisch möglich ist.
+
+Soweit für einzelne Verarbeitungen eine Einwilligung erforderlich ist, kann bei wesentlichen Änderungen eine erneute Einwilligung erforderlich sein.

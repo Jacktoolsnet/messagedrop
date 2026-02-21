@@ -117,3 +117,41 @@ h4 {
     background-color: var(--mat-card-filled-container-color);
     box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
 }
+
+.intro-note {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    padding: 0.75rem;
+    margin: 0.25rem 0.5rem 0.75rem;
+    border-radius: 0.75rem;
+    background: var(--mat-option-selected-state-layer-color);
+    color: var(--mat-app-text-color);
+}
+
+.intro-note mat-icon {
+    font-size: 1.25rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    line-height: 1.25rem;
+    flex: 0 0 auto;
+}
+
+.intro-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    text-align: left;
+}
+
+.intro-title {
+    margin: 0;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.intro-text {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--mat-card-subtitle-text-color);
+}

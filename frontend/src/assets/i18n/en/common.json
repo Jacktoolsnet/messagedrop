@@ -826,6 +826,8 @@
       },
       "externalContent": {
         "title": "External content settings",
+        "choiceTitle": "Per-provider choice",
+        "choiceText": "You decide per provider. A blanket consent for all external providers is not required. Without consent, the respective provider stays disabled and no content is loaded.",
         "platformTitle": "External content: {{ platform }}",
         "platformSubtitle": "Allow embeds, previews, and widgets from this provider.",
         "platformNote": "By enabling, you allow loading content from {{ platform }} and agree to the provider's",

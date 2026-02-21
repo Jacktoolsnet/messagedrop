@@ -826,6 +826,8 @@
       },
       "externalContent": {
         "title": "Paramètres des contenus externes",
+        "choiceTitle": "Choix par fournisseur",
+        "choiceText": "Vous choisissez fournisseur par fournisseur. Un consentement global pour tous les fournisseurs externes n'est pas nécessaire. Sans consentement, le fournisseur concerné reste désactivé et aucun contenu n'est chargé.",
         "platformTitle": "Contenu externe : {{ platform }}",
         "platformSubtitle": "Autoriser les intégrations, aperçus et widgets de ce fournisseur.",
         "platformNote": "En activant, vous autorisez le chargement de contenu depuis {{ platform }} et acceptez la",

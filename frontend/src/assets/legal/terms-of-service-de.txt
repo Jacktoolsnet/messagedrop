@@ -1,5 +1,5 @@
 NUTZUNGSBEDINGUNGEN
-Stand (geplante Fassung zum Start am 12. April 2026): 12. April 2026
+Stand: 12. April 2026
 
 ###
 Kurzfassung (vereinfacht, nicht rechtsverbindlich)
@@ -11,14 +11,19 @@ Kurzfassung (vereinfacht, nicht rechtsverbindlich)
 - Rechtlich verbindliche Erklärungen, die über die normale App-Nutzung hinausgehen, sind grundsätzlich nur ab 18 Jahren möglich.
 - MessageDrop kann ohne Nutzerkonto genutzt werden. Einige Funktionen sind dann nicht verfügbar.
 - Für Inhalte, die du veröffentlichst oder versendest, bist du selbst verantwortlich.
-- Unzulässige Inhalte (z. B. rechtswidrige Inhalte, Hass, Gewalt, personenbezogene Daten Dritter ohne Erlaubnis) sind verboten.
+- Unzulässige Inhalte (z. B. rechtswidrige Inhalte, Hass, Gewalt, persönliche Informationen) sind verboten.
 - Wir dürfen Inhalte moderieren, einschränken, ausblenden oder entfernen.
 - Für öffentliche Inhalte können Meldungen und Verfahren nach dem Digital Services Act (DSA) durchgeführt werden.
+- Für DSA-Verfahren kann eine öffentliche Statusseite bereitgestellt werden (mit anonymisierten bzw. nicht personenbezogenen Verfahrensinformationen).
+- Rechtswidrige öffentliche Inhalte können über die Meldefunktion im Dienst oder über die im Impressum genannte Kontaktstelle gemeldet werden.
+- Betroffene Nutzer können bei Moderationsentscheidungen – soweit gesetzlich vorgesehen – eine interne Beschwerde einreichen.
 - Du kannst Kontakten folgen und Plätze folgen. Push-Benachrichtigungen sind technisch „Best Effort“ (also ohne Zustellgarantie).
 - Private Chats sind als vertrauliche Kommunikation gedacht. Trotzdem musst du auch dort die Gesetze einhalten.
-- Viele Daten werden lokal auf deinem Gerät gespeichert. Ohne eigenes Backup können Daten verloren gehen.
+- Viele Daten werden lokal auf deinem Gerät gespeichert. Diese Daten können verloren gehen. Ohne eigenes Backup ist eine Wiederherstellung nicht möglich.
 - Der optionale Nutzungszeit-Schutz (Selbstbeschränkung/Elternmodus mit Eltern-PIN) kann technisch umgangen werden; eine absolute Sperre ist nicht garantiert.
+- Externe Inhalte von Drittanbietern werden erst nach deiner anbieterbezogenen Zustimmung geladen. Eine pauschale Zustimmung für alle Anbieter ist nicht vorgesehen. Diese Zustimmung kannst du jederzeit wieder zurücknehmen.
 - Externe Dienste (z. B. YouTube, OpenStreetMap, DeepL, Unsplash, Viator) haben eigene Regeln.
+- Missbrauch von Melde- oder Beschwerdefunktionen kann zu Einschränkungen oder Sperren führen.
 - MessageDrop ist kein Notfalldienst.
 
 Maßgeblich ist nur die vollständige Fassung unten.
@@ -102,7 +107,7 @@ Wenn du ein Nutzerkonto anlegst:
 - musst du Missbrauch durch Dritte nach Möglichkeit verhindern,
 - bist du für Aktivitäten über dein Konto verantwortlich, soweit gesetzlich zulässig.
 
-Wenn der PIN verloren geht und kein Backup vorhanden ist, kann ein Zugriff auf dein bisheriges lokales Konto regelmäßig nicht wiederhergestellt werden.
+Wenn der PIN verloren geht und kein Backup vorhanden ist, ist ein Zugriff auf dein bisheriges lokales Konto nicht wiederherstellbar.
 
 ###
 7. Kontakte, private Chats und Kontakten folgen
@@ -150,6 +155,8 @@ Du bestätigst, dass:
 - deine Inhalte keine Rechte Dritter verletzen,
 - deine Inhalte rechtmäßig sind.
 
+Persönliche Informationen dürfen nicht öffentlich veröffentlicht werden – weder über dich selbst noch über andere Personen.
+
 Öffentliche Inhalte können zeitlich begrenzt gespeichert oder angezeigt werden. Ein Anspruch auf dauerhafte Archivierung besteht nicht.
 
 ###
@@ -160,15 +167,32 @@ Du darfst MessageDrop nicht missbrauchen.
 
 Verboten sind insbesondere:
 
-- rechtswidrige Inhalte,
-- Beleidigungen, Bedrohungen, gezielte Belästigung,
-- Hassrede, Gewaltverherrlichung, extremistische Inhalte,
-- pornografische oder jugendgefährdende Inhalte,
+- Inhalte oder Handlungen, die gegen geltendes Recht verstoßen oder zu Rechtsverstößen aufrufen,
+- Inhalte, die Rechte Dritter verletzen (z. B. Persönlichkeits-, Urheber-, Marken- oder Datenschutzrechte),
+- strafbare Inhalte oder Aufrufe zu strafbaren Handlungen,
+- Beleidigungen, Bedrohungen, gezielte Belästigung, Mobbing oder Stalking,
+- Hassrede, Gewaltverherrlichung, extremistische oder menschenverachtende Inhalte,
+- pornografische, sexuell explizite oder jugendgefährdende Inhalte,
 - Inhalte mit sexuellem Bezug zu Minderjährigen,
-- Veröffentlichung personenbezogener Daten Dritter ohne Erlaubnis,
-- Betrug, Täuschung, Spam, Malware,
-- Angriffe auf Sicherheit, Verfügbarkeit oder Schutzmechanismen,
-- Umgehung des Nutzungszeit-Schutzes oder missbräuchliche Nutzung eines Eltern-PINs.
+- Veröffentlichung oder Verbreitung persönlicher Informationen (personenbezogener Daten) – unabhängig davon, ob sie dich selbst oder andere Personen betreffen.
+
+Zu persönlichen Informationen zählen insbesondere:
+- Namen, Kontaktdaten, E-Mail-Adressen, Telefonnummern,
+- Anschriften, genaue Standorte oder Echtzeit-Standortdaten,
+- Ausweis- und Identitätsdaten,
+- Zahlungs-, Finanz- oder Kontodaten,
+- Gesundheitsdaten oder andere besonders sensible personenbezogene Daten,
+- Zugangsdaten wie Passwörter, PINs oder Sicherheitscodes.
+
+Außerdem verboten sind:
+- irreführende, betrügerische oder manipulativ täuschende Inhalte,
+- Spam, Kettennachrichten, missbräuchliche Massenverbreitung oder schädliche Automatisierung,
+- Malware, Schadcode oder Anleitungen zur Umgehung von Sicherheitsmechanismen,
+- Angriffe auf Sicherheit, Stabilität oder Verfügbarkeit des Dienstes,
+- Umgehung von Nutzungsbegrenzungen, einschließlich missbräuchlicher Umgehung des Nutzungszeit-Schutzes oder Eltern-PINs,
+- Vortäuschung einer falschen Identität, Partnerschaft oder offiziellen Vertretung.
+
+Das Verbot der Veröffentlichung persönlicher Informationen gilt ausnahmslos, also auch dann, wenn solche Informationen bereits an anderer Stelle im Internet auffindbar sind oder von der betroffenen Person selbst stammen.
 
 Die Liste ist nicht abschließend.
 
@@ -176,13 +200,81 @@ Die Liste ist nicht abschließend.
 11. Moderation, Meldungen und DSA-Verfahren
 ###
 
-Wir dürfen Inhalte prüfen, moderieren, einschränken, ausblenden oder entfernen.
+Soweit die gesetzlichen Vorgaben des Digital Services Act (DSA) auf MessageDrop anwendbar sind, gelten ergänzend die folgenden Regeln.
+
+###
+11.1 Meldung möglicher rechtswidriger Inhalte (Notice)
+###
+
+Möglicherweise rechtswidrige öffentliche Inhalte können gemeldet werden:
+
+- über die dafür vorgesehene Meldefunktion im Dienst (DSA-Meldung), oder
+- über die im Impressum genannte DSA-Kontaktstelle.
+
+Damit eine Prüfung möglich ist, sollte eine Meldung möglichst konkret sein, z. B. mit:
+
+- Link, ID oder anderer eindeutiger Kennung des Inhalts,
+- kurzer Begründung, warum der Inhalt rechtswidrig sein könnte,
+- optionalen Nachweisen (z. B. Screenshot oder ergänzende Angaben).
+
+###
+11.2 Prüfung und mögliche Maßnahmen
+###
+
+Wir dürfen gemeldete oder auffällige Inhalte prüfen, moderieren, einschränken, ausblenden oder entfernen.
 
 Dabei können manuelle und automatisierte Verfahren (inkl. KI-gestützter Unterstützung) eingesetzt werden.
 
-Für öffentliche Inhalte können Verfahren nach dem Digital Services Act (DSA) durchgeführt werden, z. B. bei Meldungen oder Beschwerden.
-
 Bei laufenden Prüfungen können Inhalte vorübergehend nicht öffentlich sichtbar sein.
+
+Je nach Ergebnis sind insbesondere folgende Maßnahmen möglich:
+
+- keine Maßnahme (Inhalt bleibt sichtbar),
+- zeitweise Einschränkung oder Ausblendung,
+- endgültige Entfernung,
+- zusätzliche Maßnahmen gegen beteiligte Konten bei Verstößen.
+
+###
+11.3 Information und Begründung
+###
+
+Betroffene Nutzer werden – soweit rechtlich zulässig und technisch möglich – über wesentliche Moderationsmaßnahmen informiert.
+
+Diese Information kann insbesondere enthalten:
+
+- welche Maßnahme getroffen wurde,
+- auf welchen Inhalt sie sich bezieht,
+- die wesentlichen Gründe der Entscheidung,
+- ob automatisierte Verfahren an der Entscheidung beteiligt waren.
+
+###
+11.4 Interne Beschwerde und weitere Rechtsbehelfe (Appeal)
+###
+
+Betroffene Nutzer können gegen Moderationsentscheidungen – soweit gesetzlich vorgesehen – eine interne Beschwerde einreichen.
+
+Die Beschwerde kann über die dafür vorgesehene Funktion im Dienst oder über die im Impressum genannte Kontaktstelle erfolgen.
+
+Wir prüfen solche Beschwerden erneut und teilen das Ergebnis in angemessener Form mit.
+
+Soweit gesetzlich vorgesehen, bleiben zusätzlich außergerichtliche und gerichtliche Rechtsbehelfe unberührt (z. B. Streitbeilegungsstellen oder Gerichte).
+
+Missbräuchliche Meldungen oder Beschwerden (z. B. offensichtlich unbegründete Serienmeldungen) können eingeschränkt oder zurückgewiesen werden.
+
+###
+11.5 Öffentliche Statusseite (DSA-Fallseite)
+###
+
+Für DSA-relevante Vorgänge kann eine öffentlich zugängliche Statusseite bereitgestellt werden.
+
+Diese Statusseite dient der Transparenz und kann insbesondere enthalten:
+
+- den Verfahrensstatus,
+- die Art des gemeldeten Inhalts,
+- getroffene Entscheidungen,
+- rechtliche Begründungen im gesetzlich zulässigen Rahmen.
+
+Auf der öffentlichen Statusseite werden ausschließlich anonymisierte oder nicht personenbezogene Informationen angezeigt.
 
 ###
 12. Systemmeldungen
@@ -213,6 +305,14 @@ MessageDrop kann externe Anbieter einbinden, z. B.:
 - Unsplash
 - Viator
 
+Externe Inhalte sind standardmäßig deaktiviert.
+
+Sie werden erst geladen, wenn du pro Anbieter aktiv zustimmst (z. B. per Schalter/Hinweis in der App).
+
+Du musst nicht allen Anbietern zustimmen. Ohne Zustimmung bleibt der jeweilige Anbieter deaktiviert und dessen Inhalte werden nicht geladen.
+
+Du kannst diese Zustimmung jederzeit mit Wirkung für die Zukunft widerrufen, indem du den jeweiligen Anbieter wieder deaktivierst.
+
 Für externe Dienste gelten die Bedingungen und Datenschutzregeln der jeweiligen Anbieter. Wir haben darauf keinen vollständigen Einfluss.
 
 ###
@@ -238,7 +338,7 @@ Dadurch gilt:
 
 - Daten können verloren gehen (z. B. durch Löschen, Gerätewechsel, Browserwechsel, Updates),
 - du bist selbst für Backups verantwortlich,
-- eine Wiederherstellung ohne eigenes Backup ist oft nicht möglich.
+- eine Wiederherstellung ohne eigenes, zuvor erstelltes Backup ist nicht möglich.
 
 Wenn eine Backup-/Restore-Funktion angeboten wird, erfolgt deren Nutzung auf eigene Verantwortung.
 
@@ -295,15 +395,26 @@ Wir können Zugänge oder Funktionen ganz oder teilweise einschränken oder sper
 - gesetzliche Pflichten es erfordern,
 - Missbrauch vorliegt.
 
+Soweit angemessen, können Maßnahmen abgestuft erfolgen, z. B.:
+
+- Hinweis oder Verwarnung,
+- vorübergehende funktionale Einschränkung,
+- zeitweise Sperrung,
+- dauerhafte Sperrung bei schweren oder wiederholten Verstößen.
+
+Bei schweren Verstößen (z. B. strafbaren Inhalten oder gravierendem Sicherheitsmissbrauch) kann eine sofortige Sperrung ohne vorherige Verwarnung erfolgen.
+
 ###
 21. Änderungen dieser Nutzungsbedingungen
 ###
 
 Wir können diese Nutzungsbedingungen anpassen, wenn dies erforderlich ist (z. B. bei neuen Funktionen oder geänderter Rechtslage).
 
-Es gilt jeweils die veröffentlichte aktuelle Fassung.
+Änderungen werden mit Veröffentlichung der aktualisierten Fassung wirksam, sofern nicht ein späterer Zeitpunkt angegeben ist.
 
-Bei wesentlichen Änderungen informieren wir in angemessener Form innerhalb des Dienstes.
+Bei wesentlichen Änderungen informieren wir in angemessener Form innerhalb des Dienstes vor Inkrafttreten, soweit dies rechtlich und technisch möglich ist.
+
+Bei wesentlichen Änderungen kann eine erneute Zustimmung erforderlich sein. Ohne erneute Zustimmung kann die Nutzung ganz oder teilweise eingeschränkt sein.
 
 ###
 22. Anwendbares Recht und Gerichtsstand

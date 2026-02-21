@@ -826,6 +826,8 @@
       },
       "externalContent": {
         "title": "Ajustes de contenido externo",
+        "choiceTitle": "Elección por proveedor",
+        "choiceText": "Decides por proveedor. No es necesario aceptar todos los proveedores externos. Sin consentimiento, el proveedor correspondiente permanece desactivado y no se carga contenido.",
         "platformTitle": "Contenido externo: {{ platform }}",
         "platformSubtitle": "Permitir incrustaciones, vistas previas y widgets de este proveedor.",
         "platformNote": "Al habilitarlo, permites cargar contenido desde {{ platform }} y aceptas los",
