@@ -13,5 +13,6 @@
     overflow-wrap: break-word;
     white-space: pre-wrap;
     text-align: center;
-    line-height: 3rem;
+    line-height: 1.45;
+    padding-block: 0.2em;
 }
