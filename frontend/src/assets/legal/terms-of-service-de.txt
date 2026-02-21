@@ -1,143 +1,210 @@
 NUTZUNGSBEDINGUNGEN
-Stand: 12. April 2026
+Stand (geplante Fassung zum Start am 12. April 2026): 12. April 2026
 
 ###
-Kurzfassung (nicht rechtsverbindlich)
+Kurzfassung (vereinfacht, nicht rechtsverbindlich)
 ###
 
-Mit der Nutzung von MessageDrop akzeptierst du diese Nutzungsbedingungen.
+- Mit der Nutzung von MessageDrop akzeptierst du diese Nutzungsbedingungen.
+- Die Nutzung ist erst ab 16 Jahren erlaubt.
+- Wenn du 16 oder 17 bist, brauchst du die Zustimmung deiner Eltern oder Erziehungsberechtigten.
+- Rechtlich verbindliche Erklärungen, die über die normale App-Nutzung hinausgehen, sind grundsätzlich nur ab 18 Jahren möglich.
+- MessageDrop kann ohne Nutzerkonto genutzt werden. Einige Funktionen sind dann nicht verfügbar.
+- Für Inhalte, die du veröffentlichst oder versendest, bist du selbst verantwortlich.
+- Unzulässige Inhalte (z. B. rechtswidrige Inhalte, Hass, Gewalt, personenbezogene Daten Dritter ohne Erlaubnis) sind verboten.
+- Wir dürfen Inhalte moderieren, einschränken, ausblenden oder entfernen.
+- Für öffentliche Inhalte können Meldungen und Verfahren nach dem Digital Services Act (DSA) durchgeführt werden.
+- Du kannst Kontakten folgen und Plätze folgen. Push-Benachrichtigungen sind technisch „Best Effort“ (also ohne Zustellgarantie).
+- Private Chats sind als vertrauliche Kommunikation gedacht. Trotzdem musst du auch dort die Gesetze einhalten.
+- Viele Daten werden lokal auf deinem Gerät gespeichert. Ohne eigenes Backup können Daten verloren gehen.
+- Der optionale Nutzungszeit-Schutz (Selbstbeschränkung/Elternmodus mit Eltern-PIN) kann technisch umgangen werden; eine absolute Sperre ist nicht garantiert.
+- Externe Dienste (z. B. YouTube, OpenStreetMap, DeepL, Unsplash, Viator) haben eigene Regeln.
+- MessageDrop ist kein Notfalldienst.
 
-Die Nutzung ist erst ab 16 Jahren zulässig. Für 16- und 17‑Jährige ist die Zustimmung der Eltern oder Erziehungsberechtigten erforderlich; weitergehende rechtsverbindliche Erklärungen bleiben voll geschäftsfähigen Personen (ab 18 Jahren) vorbehalten.
-
-Du bist für die von dir erstellten Inhalte selbst verantwortlich und musst sicherstellen, dass diese rechtmäßig sind und keine Rechte Dritter verletzen.
-
-Inhalte können manuell sowie automatisiert, einschließlich KI-gestützter Verfahren, moderiert, eingeschränkt oder entfernt werden. Für öffentliche Inhalte können Verfahren nach dem Digital Services Act (DSA) eingeleitet werden.
-
-Externe Dienste und Einbettungen (z. B. YouTube, OpenStreetMap, DeepL, Unsplash, Viator) unterliegen ausschließlich den Bedingungen der jeweiligen Anbieter.
-
-Der Dienst kann zeitweise eingeschränkt oder nicht verfügbar sein; eine bestimmte Verfügbarkeit wird nicht garantiert.
-
-Ein Großteil der Daten wird lokal auf deinem Endgerät gespeichert. Diese Daten können verloren gehen oder gelöscht werden; du bist selbst für geeignete Sicherungen verantwortlich (z. B. durch eine Backup-Funktion, soweit vorhanden).
-
-Profile (Name/Avatar) können lokal genutzt werden. Bei Kontaktaufnahme kann optional eine Profilfreigabe an einen Kontakt angefragt werden; der Kontakt muss aktiv zustimmen. Nach Zustimmung werden Name und Avatar auf dem Endgerät des Kontakts lokal gespeichert; ein Zurückholen ist technisch nicht möglich.
-
-Systemmeldungen (z. B. zu DSA-Verfahren oder Wartungsarbeiten) können im Nutzerkonto angezeigt werden und werden ausschließlich durch autorisierte administrative Systeme erzeugt. Nutzer können darauf derzeit nicht antworten.
-
-Der optionale Nutzungszeit-Schutz kann als Selbstbeschränkung oder im Elternmodus (mit Eltern-PIN) genutzt werden. Im Elternmodus wird der PIN ausschließlich als Hash verarbeitet.
-
-Plätzen kann gefolgt werden; soweit technisch möglich können Push-Benachrichtigungen über neue öffentliche Inhalte an gefolgten Plätzen angezeigt werden. Push/Realtime-Funktionen erfolgen ausschließlich nach technischer Verfügbarkeit („Best Effort“); es besteht kein Anspruch auf Zustellung oder zeitnahe Benachrichtigung.
-
-MessageDrop bietet keinen Zugang zu Notfalldiensten und ersetzt keine Aufmerksamkeit oder Sorgfalt im realen Leben.
-
-Maßgeblich ist ausschließlich die aktuelle vollständige deutsche Fassung dieser Nutzungsbedingungen.
+Maßgeblich ist nur die vollständige Fassung unten.
 
 ###
 Vollständige Fassung
 ###
 
 ###
-Begriffsverzeichnis
+1. Wer wir sind
 ###
 
-Nutzer
-Natürliche Person, die MessageDrop verwendet, unabhängig davon, ob ein Nutzerkonto angelegt wurde.
+Anbieter von MessageDrop (messagedrop.de) ist:
 
-Nutzerkonto
-Technische, pseudonyme Zugangseinheit, die ein Nutzer freiwillig anlegen kann und die durch eine User-ID identifiziert wird.
-
-User-ID
-Technische Kennung eines Nutzerkontos. Die User-ID ist pseudonym und erlaubt für sich genommen keine direkte Identifikation einer Person.
-
-Besucher
-Nutzer, der MessageDrop ohne Anlage eines Nutzerkontos verwendet.
-
-Öffentliche Inhalte
-Von Nutzern erstellte Inhalte (z. B. öffentliche Nachrichten und Kommentare), die grundsätzlich öffentlich sichtbar sind, sofern sie nicht eingeschränkt oder entfernt wurden.
-
-Private Kommunikation
-Kommunikation zwischen Nutzern, die verschlüsselt übertragen wird (z. B. private Chats), soweit angeboten.
-
-Externe Inhalte / Drittanbieter
-Inhalte, Funktionen oder Einbettungen, die von Drittanbietern bereitgestellt werden und ggf. eine Datenübertragung an den jeweiligen Anbieter auslösen (z. B. iFrames/oEmbed).
-
-Systemmeldungen
-Interne Mitteilungen, die ausschließlich durch autorisierte administrative Systeme erzeugt und im Frontend angezeigt werden (z. B. zu DSA-Verfahren oder Wartungsarbeiten). Systemmeldungen sind kein E-Mail-Postfach.
-
-DSA-Verfahren
-Verfahren nach dem Digital Services Act (DSA), insbesondere Meldungen („Notice“) und Beschwerden („Appeal“) im Zusammenhang mit öffentlichen Inhalten.
-
-Öffentliche Fallseite
-Öffentlich zugängliche Seite zu einem DSA-Verfahren, auf der ausschließlich anonymisierte oder nicht personenbezogene Informationen veröffentlicht werden.
-
-Push-Benachrichtigungen / Push-Token
-Technische Funktion zur Zustellung von Benachrichtigungen an ein Endgerät. Push-Token sind technische Kennungen, die zur Zustellung erforderlich sein können.
-
-Lokale Speicherung
-Speicherung von Daten auf dem Endgerät des Nutzers (z. B. IndexedDB, App-Speicher, Cache). Diese Daten können durch den Nutzer oder durch technische Umstände gelöscht werden.
-
-###
-1. Anbieter
-###
-
-MessageDrop (messagedrop.de) wird betrieben von:
-
-JackTools.Net UG (haftungsbeschränkt)
-Im Kirchfeld 27
-38304 Wolfenbüttel
+JackTools.Net UG (haftungsbeschränkt)  
+Im Kirchfeld 27  
+38304 Wolfenbüttel  
 Deutschland
 
-Vertreten durch den Geschäftsführer:
-Christian Wagner, Dipl.-Inform. (FH)
+Geschäftsführer: Christian Wagner, Dipl.-Inform. (FH)
 
-E-Mail: jacktoolsnet@gmail.com
+E-Mail: jacktoolsnet@gmail.com  
 Telefon: +49 (0) 176 / 41 23 57 74
 
 (im Folgenden „wir“, „uns“ oder „Anbieter“)
 
 ###
-2. Geltungsbereich und Zustimmung
+2. Für wen diese Bedingungen gelten
 ###
 
-Diese Nutzungsbedingungen regeln die Nutzung der Plattform MessageDrop.
+Diese Bedingungen gelten für alle Personen, die MessageDrop nutzen – mit oder ohne Nutzerkonto.
 
-Mit dem Zugriff auf oder der Nutzung von MessageDrop erklärst du dich mit diesen Nutzungsbedingungen einverstanden.
+Mit der Nutzung stimmst du diesen Bedingungen zu.
 
-Wenn du diesen Nutzungsbedingungen nicht zustimmst, ist eine Nutzung des Dienstes nicht zulässig.
-
-###
-3. Änderungen der Nutzungsbedingungen
-###
-
-Wir behalten uns vor, diese Nutzungsbedingungen jederzeit zu ändern oder zu aktualisieren.
-
-Es gilt jeweils die zum Zeitpunkt der Veröffentlichung aktuelle Fassung.
-
-Sofern Änderungen wesentliche Auswirkungen auf Nutzer haben, werden wir hierüber in angemessener Weise informieren, insbesondere über Systemmeldungen oder Hinweise innerhalb des Dienstes.
+Wenn du nicht zustimmst, darfst du MessageDrop nicht nutzen.
 
 ###
-4. Nutzungsberechtigung
+3. Mindestalter (16/18-Regel)
 ###
 
-Die Nutzung von MessageDrop ist ausschließlich Personen gestattet, die mindestens 16 Jahre alt sind.
+Die Nutzung ist nur für Personen ab 16 Jahren erlaubt.
 
-Der Dienst richtet sich nicht an Kinder unter 16 Jahren.
+- Unter 16 Jahren: Nutzung nicht erlaubt.
+- 16 bis 17 Jahre: Nutzung nur mit Zustimmung der Eltern oder Erziehungsberechtigten.
+- Ab 18 Jahren: volle Geschäftsfähigkeit.
 
-Personen zwischen 16 und 17 Jahren dürfen MessageDrop nur im Rahmen der gesetzlich zulässigen beschränkten Geschäftsfähigkeit nutzen. Rechtsverbindliche Erklärungen oder Verpflichtungen, die über den vertragsgemäßen Gebrauch des Dienstes hinausgehen, dürfen ausschließlich von voll geschäftsfähigen Personen (ab 18 Jahren) abgegeben werden.
-
-Für Personen zwischen 16 und 17 Jahren ist die Nutzung nur mit Zustimmung der Eltern oder Erziehungsberechtigten zulässig.
-
-Wenn du MessageDrop im Namen einer Organisation oder juristischen Person nutzt, bestätigst du, hierzu rechtlich befugt zu sein.
+Erklärungen mit weitergehender rechtlicher Bindung (also über die normale Nutzung hinaus) dürfen nur voll geschäftsfähige Personen abgeben.
 
 ###
-5. Leistungsbeschreibung
+4. Was MessageDrop ist
 ###
 
-MessageDrop ist eine Plattform zur Veröffentlichung, Anzeige und Organisation nutzergenerierter Inhalte mit optionaler privater Kommunikation.
+MessageDrop ist eine Plattform für:
 
-Der Dienst kann externe Inhalte oder Funktionen einbinden, insbesondere von:
+- öffentliche, ortsbezogene Inhalte (z. B. Nachrichten und Kommentare),
+- private Notizen (lokal auf deinem Gerät),
+- Kontakte und private Chats,
+- optionale Benachrichtigungen und Organisationsfunktionen (z. B. Folgen von Kontakten/Plätzen).
+
+Wir dürfen Funktionen jederzeit anpassen, erweitern, einschränken oder entfernen.
+
+###
+5. Nutzung ohne Nutzerkonto
+###
+
+Du kannst MessageDrop grundsätzlich auch ohne Nutzerkonto verwenden.
+
+Dann gilt insbesondere:
+
+- Es stehen nur Basisfunktionen zur Verfügung.
+- Bestimmte Funktionen (z. B. kontoabhängige Synchronisierung, private Kontaktfunktionen, Push in vollem Umfang) können eingeschränkt sein oder fehlen.
+- Lokale Daten bleiben auf deinem Gerät und können verloren gehen.
+
+###
+6. Nutzung mit Nutzerkonto
+###
+
+Wenn du ein Nutzerkonto anlegst:
+
+- bist du für die sichere Nutzung deines Geräts und deines PINs selbst verantwortlich,
+- musst du Missbrauch durch Dritte nach Möglichkeit verhindern,
+- bist du für Aktivitäten über dein Konto verantwortlich, soweit gesetzlich zulässig.
+
+Wenn der PIN verloren geht und kein Backup vorhanden ist, kann ein Zugriff auf dein bisheriges lokales Konto regelmäßig nicht wiederhergestellt werden.
+
+###
+7. Kontakte, private Chats und Kontakten folgen
+###
+
+MessageDrop kann Funktionen für Kontakte und private Kommunikation enthalten.
+
+Dazu gilt:
+
+1) Private Chats  
+Private Chats sind als vertrauliche Kommunikation gedacht. Inhalte werden technisch geschützt übertragen. Eine absolut fehlerfreie oder jederzeit verfügbare Zustellung können wir aber nicht garantieren.
+
+2) Verantwortung im Chat  
+Auch in privaten Chats sind rechtswidrige Inhalte, Belästigung, Bedrohungen, Hassrede oder die Weitergabe fremder Daten ohne Erlaubnis verboten.
+
+3) Kontakten folgen  
+Du kannst Kontakten folgen oder das Folgen beenden. Wenn technisch möglich, können Benachrichtigungen über neue Kontakt-Nachrichten gesendet werden.
+
+4) Profilfreigabe bei Kontakten  
+Eine Freigabe von Profilinfos (z. B. Name/Avatar) erfolgt nur nach aktiver Zustimmung. Nach der Übertragung auf das Endgerät eines Kontakts ist ein automatisches „Zurückholen“ technisch nicht möglich.
+
+###
+8. Plätzen folgen und Benachrichtigungen
+###
+
+Du kannst Plätzen folgen, um über neue öffentliche Inhalte informiert zu werden.
+
+Push- und Echtzeitfunktionen laufen auf „Best Effort“-Basis. Das heißt insbesondere:
+
+- Benachrichtigungen können verspätet kommen,
+- gar nicht kommen,
+- oder mehrfach kommen.
+
+Es gibt keinen Anspruch auf vollständige, sofortige oder fehlerfreie Zustellung.
+
+###
+9. Öffentliche Inhalte und deine Verantwortung
+###
+
+Für alles, was du veröffentlichst, bist du selbst verantwortlich.
+
+Du bestätigst, dass:
+
+- du die nötigen Rechte an deinen Inhalten hast,
+- deine Inhalte keine Rechte Dritter verletzen,
+- deine Inhalte rechtmäßig sind.
+
+Öffentliche Inhalte können zeitlich begrenzt gespeichert oder angezeigt werden. Ein Anspruch auf dauerhafte Archivierung besteht nicht.
+
+###
+10. Was verboten ist
+###
+
+Du darfst MessageDrop nicht missbrauchen.
+
+Verboten sind insbesondere:
+
+- rechtswidrige Inhalte,
+- Beleidigungen, Bedrohungen, gezielte Belästigung,
+- Hassrede, Gewaltverherrlichung, extremistische Inhalte,
+- pornografische oder jugendgefährdende Inhalte,
+- Inhalte mit sexuellem Bezug zu Minderjährigen,
+- Veröffentlichung personenbezogener Daten Dritter ohne Erlaubnis,
+- Betrug, Täuschung, Spam, Malware,
+- Angriffe auf Sicherheit, Verfügbarkeit oder Schutzmechanismen,
+- Umgehung des Nutzungszeit-Schutzes oder missbräuchliche Nutzung eines Eltern-PINs.
+
+Die Liste ist nicht abschließend.
+
+###
+11. Moderation, Meldungen und DSA-Verfahren
+###
+
+Wir dürfen Inhalte prüfen, moderieren, einschränken, ausblenden oder entfernen.
+
+Dabei können manuelle und automatisierte Verfahren (inkl. KI-gestützter Unterstützung) eingesetzt werden.
+
+Für öffentliche Inhalte können Verfahren nach dem Digital Services Act (DSA) durchgeführt werden, z. B. bei Meldungen oder Beschwerden.
+
+Bei laufenden Prüfungen können Inhalte vorübergehend nicht öffentlich sichtbar sein.
+
+###
+12. Systemmeldungen
+###
+
+Wir können dir Systemmeldungen anzeigen (z. B. zu DSA-Verfahren, Sicherheit, Wartung).
+
+Systemmeldungen:
+
+- werden nur durch autorisierte Systeme erzeugt,
+- können derzeit nicht beantwortet werden,
+- können im Frontend gelöscht werden, ohne dass dadurch zwingend interne Nachweise entfallen.
+
+###
+13. Externe Inhalte und Drittanbieter
+###
+
+MessageDrop kann externe Anbieter einbinden, z. B.:
+
 - Open-Meteo
+- OpenStreetMap / Nominatim
 - DeepL
-- Nominatim / OpenStreetMap
 - YouTube
 - TikTok
 - Pinterest
@@ -146,294 +213,122 @@ Der Dienst kann externe Inhalte oder Funktionen einbinden, insbesondere von:
 - Unsplash
 - Viator
 
-Ein Anspruch auf bestimmte Funktionen, Darstellungen, Reichweiten, Rankings, Benachrichtigungen, Echtzeitfunktionen oder eine dauerhafte Verfügbarkeit besteht nicht.
-
-Öffentliche Inhalte sind grundsätzlich zeitlich begrenzt verfügbar. Öffentliche Nachrichten und öffentliche Kommentare können nach einem festgelegten Zeitraum (derzeit 30 Tage) gelöscht werden. Ein Anspruch auf Archivierung, Wiederherstellung oder dauerhafte Verfügbarkeit besteht nicht.
+Für externe Dienste gelten die Bedingungen und Datenschutzregeln der jeweiligen Anbieter. Wir haben darauf keinen vollständigen Einfluss.
 
 ###
-6. Nutzerkonten und Sicherheit (sofern genutzt)
+14. Nutzungszeit-Schutz (Selbstbeschränkung / Elternmodus)
 ###
 
-Die Nutzung von MessageDrop kann ohne Nutzerkonto möglich sein. Bestimmte Funktionen setzen ein Nutzerkonto voraus.
+MessageDrop kann einen optionalen Nutzungszeit-Schutz anbieten:
 
-Sofern du ein Nutzerkonto nutzt, bist du verpflichtet, deine Zugangsdaten (z. B. PIN) vertraulich zu behandeln und vor dem Zugriff durch unbefugte Dritte zu schützen.
+- Selbstbeschränkung (z. B. Tageslimit, Zeitfenster),
+- Elternmodus mit Eltern-PIN.
 
-Du bist für sämtliche Aktivitäten verantwortlich, die über dein Nutzerkonto erfolgen, soweit gesetzlich zulässig.
+Im Elternmodus wird der Eltern-PIN nur als Hash verarbeitet (nicht als Klartext gespeichert).
 
-Du bist dafür verantwortlich, dein Endgerät und deine lokalen Daten (z. B. PIN, Schlüsselmaterial, lokale Datensätze) vor unbefugtem Zugriff zu schützen.
-
-Die Anmeldung erfolgt lokal über den PIN; der PIN wird nicht an den Server übertragen. Aus Sicherheitsgründen kann ein Sicherheits-Reset neue Schlüssel erzeugen; dabei wird der Chatverlauf gelöscht, Kontakte bleiben erhalten. Nach einem Sicherheits-Reset können ältere Backups veraltet sein.
-
-Hinweis: Wird dein PIN vergessen, kann ein Nutzerkonto ohne zuvor erstelltes Backup nicht wiederhergestellt werden.
+Wichtig: Der Schutz basiert auf technischen Rahmenbedingungen des Geräts und lokaler Daten. Eine lückenlose Umgehungssicherheit ist nicht garantiert.
 
 ###
-7. Nutzergenerierte Inhalte und Nutzungsrechte
+15. Lokale Speicherung, Backup und Datenverlust
 ###
 
-Du behältst alle Rechte an den von dir erstellten Inhalten.
+Viele Daten werden lokal auf deinem Gerät gespeichert (z. B. Browser-/App-Speicher).
 
-Mit dem Einstellen von Inhalten räumst du uns ein weltweites, nicht-exklusives und unentgeltliches Recht ein, diese Inhalte zum Betrieb des Dienstes zu speichern, zu vervielfältigen, öffentlich zugänglich zu machen, anzuzeigen, technisch zu verarbeiten und zu moderieren, soweit dies für die Bereitstellung des Dienstes erforderlich ist.
+Dadurch gilt:
 
-Du sicherst zu, dass du über alle erforderlichen Rechte verfügst und dass deine Inhalte rechtmäßig sind sowie keine Rechte Dritter verletzen.
+- Daten können verloren gehen (z. B. durch Löschen, Gerätewechsel, Browserwechsel, Updates),
+- du bist selbst für Backups verantwortlich,
+- eine Wiederherstellung ohne eigenes Backup ist oft nicht möglich.
 
-Hinweis: Soweit Inhalte im Rahmen gesetzlicher Verfahren (z. B. DSA) vorübergehend nicht öffentlich sichtbar gestellt, eingeschränkt oder entfernt werden, bleiben technische Kopien und Nachweisdaten im gesetzlich zulässigen Umfang hiervon unberührt.
-
-###
-8. Moderation und Entfernung von Inhalten
-###
-
-Wir behalten uns vor, Inhalte ganz oder teilweise zu entfernen, zu sperren oder in ihrer Sichtbarkeit einzuschränken, insbesondere bei rechtswidrigen Inhalten, Verstößen gegen diese Nutzungsbedingungen oder Meldungen im Rahmen gesetzlicher Verfahren (z. B. Digital Services Act).
-
-Zur Unterstützung der Moderation setzen wir automatisierte Prüfverfahren ein, einschließlich regelbasierter Prüfungen (z. B. auf bestimmte Muster oder Inhalte) sowie KI-gestützter Bewertungen.
-
-Automatisierte Prüfungen werden beim Erstellen öffentlicher Inhalte sowie bei jeder inhaltlichen Änderung erneut angestoßen. Werden dabei private oder personenbezogene Daten erkannt, kann der jeweilige Inhalt unabhängig von einer KI-Bewertung vorübergehend nicht öffentlich sichtbar gestellt werden.
-
-Die automatisierten Verfahren dienen ausschließlich der Unterstützung der Moderation und stellen keine abschließende inhaltliche Bewertung im rechtlichen Sinne dar. Automatisierte Prüfungen können fehlerhaft sein oder Inhalte unzutreffend bewerten.
-
-Im Rahmen des Dienstes kann dem Nutzer das Ergebnis einer automatisierten Bewertung (z. B. ein Bewertungswert/Score) angezeigt werden. Eine Veröffentlichung oder Nichtveröffentlichung stellt keine Aussage über die Rechtmäßigkeit oder Unzulässigkeit eines Inhalts dar.
-
-Abhängig vom Ergebnis automatisierter Prüfungen können Inhalte:
-- veröffentlicht werden,
-- als moderationsbedürftig gekennzeichnet und veröffentlicht bleiben oder
-- vorübergehend nicht öffentlich sichtbar gestellt werden.
-
-Wird ein Inhalt auf Grundlage automatisierter Prüfungen nicht öffentlich sichtbar gestellt, wird hierfür kein manueller Moderationsprozess angestoßen. Eine manuelle Prüfung erfolgt ausschließlich freiwillig durch den Anbieter. Ein Anspruch des Nutzers auf eine manuelle Prüfung, Überprüfung oder eine bestimmte Entscheidung besteht nicht.
-
-###
-9. Verfahren nach dem Digital Services Act (DSA)
-###
-
-Für öffentliche Inhalte, einschließlich öffentlicher Kommentare, kann jederzeit ein Verfahren nach dem Digital Services Act (DSA) eingeleitet werden, insbesondere durch:
-- eine Meldung („Notice“),
-- eine Beschwerde („Appeal“).
-
-Wird ein solches Verfahren eingeleitet, kann der betroffene Inhalt vorübergehend auf den Status „nicht öffentlich sichtbar“ gestellt werden.
-
-„Nicht öffentlich sichtbar“ bedeutet, dass der Inhalt für andere Nutzer nicht mehr öffentlich angezeigt wird, bis eine inhaltliche Entscheidung im Rahmen des Verfahrens getroffen wurde. Der Inhalt wird in diesem Zustand weder empfohlen noch öffentlich verbreitet.
-
-Hinweise auf rechtswidrige Inhalte prüfen wir unverzüglich. Bei Kenntniserlangung von rechtswidrigen Inhalten entfernen oder sperren wir diese entsprechend den gesetzlichen Vorgaben („Notice-and-Takedown“).
-
-Im Rahmen eines DSA-Verfahrens können verfahrensbezogene Informationen verarbeitet werden, darunter Angaben zum gemeldeten Inhalt, Zeitpunkte, Verfahrensstatus, Entscheidungen und Begründungen.
-
-Die meldende Person kann – soweit technisch vorgesehen – zusätzliche Informationen als Belege bereitstellen, insbesondere durch:
-- das Hochladen von Dateien,
-- das Angeben von Links.
-
-Diese Belege dienen ausschließlich der Prüfung und Dokumentation im Rahmen des DSA-Verfahrens.
-
-Der von einem DSA-Verfahren betroffene Nutzer kann über Systemmeldungen über den Verfahrensstand, Entscheidungen und Maßnahmen informiert werden.
-
-Die im Rahmen eines DSA-Verfahrens erhobenen Informationen können an zuständige Behörden, Gerichte oder sonstige hierzu befugte Stellen weitergegeben werden, soweit dies gesetzlich vorgeschrieben oder zulässig ist.
-
-Für DSA-relevante Vorgänge kann eine öffentlich zugängliche Fallseite bereitgestellt werden, die ausschließlich anonymisierte oder nicht personenbezogene Informationen enthält (z. B. Art des gemeldeten Inhalts, Verfahrensstatus, Entscheidungen, rechtliche Begründungen).
-
-Nach Abschluss des Verfahrens erfolgt – abhängig vom Ergebnis – eine Wiederfreigabe, Einschränkung oder endgültige Entfernung des betroffenen Inhalts.
-
-###
-10. Unzulässige Nutzung
-###
-
-Es ist untersagt, MessageDrop für rechtswidrige, missbräuchliche oder vertragswidrige Zwecke zu nutzen.
-
-Insbesondere ist es untersagt, Inhalte zu erstellen, zu verbreiten, zu verlinken oder bereitzustellen, die gegen geltendes Recht, diese Nutzungsbedingungen oder Rechte Dritter verstoßen.
-
-Unzulässig sind insbesondere Inhalte oder Nutzungen, die:
-- gegen geltendes Recht verstoßen oder zu solchen Verstößen auffordern,
-- Rechte Dritter verletzen, insbesondere Urheber-, Persönlichkeits-, Marken-, Namens- oder Datenschutzrechte,
-- strafbare Inhalte darstellen, fördern oder vorbereiten,
-- zu strafbaren Handlungen auffordern,
-- Hassrede, Gewaltverherrlichung, Bedrohungen oder gezielte Belästigung enthalten,
-- beleidigend, herabwürdigend oder bewusst verletzend gegenüber Einzelpersonen oder Gruppen sind,
-- diskriminierend, extremistisch oder menschenverachtend sind,
-- pornografische, sexuell explizite oder jugendgefährdende Inhalte enthalten,
-- sexuelle Handlungen oder Darstellungen Minderjähriger zeigen oder andeuten,
-- private oder personenbezogene Daten Dritter ohne deren ausdrückliche Einwilligung offenlegen, insbesondere:
-  - Vor- und Nachnamen, Spitznamen oder sonstige identifizierende Namensangaben,
-  - Geburtsdatum oder Geburtstag,
-  - Alter oder Altersangaben in Verbindung mit identifizierenden Informationen,
-  - E-Mail-Adressen,
-  - Telefonnummern,
-  - Wohn-, Aufenthalts- oder Arbeitsadressen,
-  - genaue Standortdaten (z. B. GPS-Koordinaten, Live-Standorte, regelmäßig genutzte Orte),
-  - Informationen zu Aufenthaltsorten in Echtzeit oder rückverfolgbar,
-  - Ausweiskopien, Identifikationsnummern oder amtliche Kennzeichen,
-  - Benutzernamen, IDs oder Profilverknüpfungen zu anderen Diensten,
-  - Fotos oder Videos von Personen, sofern diese eindeutig identifizierbar sind und keine Einwilligung vorliegt,
-  - biometrische Daten (z. B. Gesichtsmerkmale, Fingerabdrücke),
-  - Gesundheitsdaten oder Informationen zum körperlichen oder psychischen Zustand,
-  - Informationen zur sexuellen Orientierung oder zum Sexualleben,
-  - Informationen zu politischen Meinungen, religiösen oder weltanschaulichen Überzeugungen,
-  - Bank-, Zahlungs- oder Finanzinformationen,
-  - Zugangsdaten, Passwörter, PINs oder sonstige Sicherheitsinformationen,
-- irreführende, betrügerische oder manipulative Inhalte enthalten,
-- falsche Tatsachenbehauptungen über Personen verbreiten,
-- zu Täuschung, Betrug oder Missbrauch verleiten,
-- Schadsoftware, Malware, Spyware oder vergleichbare schädliche Inhalte enthalten,
-- Spam, Kettennachrichten oder missbräuchliche Automatisierungen beinhalten,
-- zur Umgehung von Sicherheitsmaßnahmen oder Schutzmechanismen auffordern oder entsprechende Anleitungen enthalten,
-- technische Beschränkungen oder Nutzungsbegrenzungen gezielt umgehen oder zu deren Umgehung anleiten,
-- den optionalen Nutzungszeit-Schutz gezielt umgehen oder Dritte zur Umgehung auffordern (insbesondere durch missbräuchliche Nutzung eines Eltern-PINs),
-- den Dienst in einer Weise missbrauchen, die die Funktionsfähigkeit, Sicherheit oder Verfügbarkeit beeinträchtigt (z. B. Flooding, Scraping, automatisierte Massennutzung),
-- eine falsche Verbindung, Partnerschaft oder Unterstützung durch uns oder durch Dritte vortäuschen,
-- offensichtlich aus rechtswidrigen, nicht autorisierten oder geleakten Quellen stammen.
-
-Dies gilt unabhängig davon, ob die betroffene Person Nutzer von MessageDrop ist oder ob die betreffenden Informationen öffentlich zugänglich erscheinen.
-
-Die Aufzählung ist nicht abschließend.
-
-###
-11. Inhalte und Dienste Dritter
-###
-
-Inhalte und Dienste Dritter unterliegen ausschließlich den Nutzungs- und Datenschutzbedingungen der jeweiligen Anbieter.
-
-Wir übernehmen keine Verantwortung für Inhalte Dritter, die Verfügbarkeit externer Dienste oder die Richtigkeit und Aktualität externer Informationen.
-
-Erforderliche Quellenangaben (z. B. „© OpenStreetMap-Mitwirkende“) sind zu beachten.
-
-###
-12. Systemmeldungen
-###
-
-MessageDrop kann Systemmeldungen im Nutzerkonto anzeigen (z. B. Informationen zu DSA-Verfahren, Entscheidungen, sicherheitsrelevante Hinweise oder geplante Wartungsarbeiten).
-
-Systemmeldungen werden ausschließlich durch autorisierte administrative Systeme erzeugt. Nutzer und Dritte können Systemmeldungen nicht im Namen von MessageDrop versenden.
-
-Systemmeldungen sind stets aktiv und können nicht abbestellt werden. Eine Antwortfunktion ist derzeit nicht vorgesehen.
-
-Nutzer können Systemmeldungen im Frontend löschen. Das Löschen betrifft ausschließlich die Anzeige bzw. lokale Verfügbarkeit im Nutzer-Frontend. Gesetzlich erforderliche oder dokumentationspflichtige Nachweise können hiervon unberührt bleiben.
-
-###
-13. Profile, Kontakt-Profile und Profilfreigabe
-###
-
-Nutzer können lokal Profile anlegen (z. B. Name und Avatar). Diese Profile dienen der besseren Zuordnung und Darstellung innerhalb des Dienstes.
-
-Im Rahmen der Kontaktfunktion kann ein Nutzer aktiv eine Profilfreigabe an einen Kontakt anfordern. Der Kontakt muss die Profilfreigabe aktiv bestätigen, bevor eine Übertragung erfolgt.
-
-Nach Zustimmung werden Profilname und Avatar auf das Endgerät des Kontakts übertragen und dort lokal gespeichert. Eine zentrale Speicherung dieser Profilinformationen durch uns erfolgt nicht.
-
-Hinweis: Nach der Übertragung besteht keine technische Möglichkeit, die bereits übertragenen Profilinformationen auf dem Endgerät des Kontakts zurückzuholen oder dort zu löschen. Der Kontakt kann die lokal gespeicherten Daten jedoch auf seinem Endgerät löschen.
-
-Unabhängig davon kann jeder Nutzer eigene lokale Profileinträge für Kontakte festlegen (z. B. eigener Anzeigename, eigener Avatar).
-
-###
-14. Plätzen folgen, Push-Benachrichtigungen und Nutzungszeit-Schutz (Best Effort)
-###
-
-Nutzer können Plätzen folgen oder das Folgen beenden.
-
-Soweit technisch möglich und vom Endgerät unterstützt, kann der Nutzer Push-Benachrichtigungen erhalten, wenn an einem gefolgten Platz neue öffentliche Inhalte erstellt werden.
-
-Push- und Echtzeitfunktionen werden ausschließlich nach technischer Verfügbarkeit erbracht („Best Effort“). Insbesondere kann es aus technischen, systembedingten oder nutzerspezifischen Gründen dazu kommen, dass:
-- Push-Benachrichtigungen verspätet eintreffen,
-- Benachrichtigungen gar nicht zugestellt werden,
-- Benachrichtigungen mehrfach zugestellt werden,
-- ein gefolgter Platz vorübergehend nicht korrekt benachrichtigt,
-- oder die Funktion zeitweise vollständig nicht verfügbar ist.
-
-Ein Anspruch auf Zustellung, Vollständigkeit, Reihenfolge oder zeitnahe Benachrichtigung besteht nicht.
-
-MessageDrop kann optional einen Nutzungszeit-Schutz bereitstellen (Selbstbeschränkung oder Elternmodus). Der Nutzungszeit-Schutz kann insbesondere ein Tageslimit, Zeitfenster pro Wochentag sowie Verlängerungsoptionen enthalten.
-
-Im Elternmodus kann ein Eltern-PIN erforderlich sein. Der Eltern-PIN wird ausschließlich als kryptografischer Hash verarbeitet; der Klartext-PIN wird nicht gespeichert.
-
-Der Nutzungszeit-Schutz basiert auf technischen Rahmenbedingungen des jeweiligen Endgeräts und lokalen Daten. Eine lückenlose Umgehungssicherheit, geräteübergreifende Konsistenz oder Manipulationsfreiheit kann nicht garantiert werden.
-
-###
-15. Keine Notfalldienste
-###
-
-MessageDrop bietet keinen Zugang zu Notfalldiensten (z. B. Polizei, Feuerwehr, Rettungsdienst).
-
-Der Dienst ersetzt keine Aufmerksamkeit, Vorsicht oder verantwortungsbewusstes Verhalten im realen Leben.
+Wenn eine Backup-/Restore-Funktion angeboten wird, erfolgt deren Nutzung auf eigene Verantwortung.
 
 ###
 16. Verfügbarkeit und Wartung
 ###
 
-Zur Verbesserung der Stabilität, Sicherheit und Funktionalität der Anwendung können – nach ausdrücklicher Zustimmung des Nutzers – anonymisierte technische Logmeldungen an uns übermittelt werden. Diese Logmeldungen dienen ausschließlich der Fehleranalyse und Optimierung des Dienstes. Die erteilte Zustimmung kann vom Nutzer jederzeit mit Wirkung für die Zukunft widerrufen werden.
+Wir bemühen uns um einen stabilen Betrieb, garantieren aber keine ununterbrochene Verfügbarkeit.
 
-Der Dienst kann zeitweise eingeschränkt oder unterbrochen sein, insbesondere aufgrund von Wartungsarbeiten, technischen Störungen, Ausfällen externer Dienste oder höherer Gewalt.
+Es kann zu Ausfällen oder Einschränkungen kommen, z. B. durch:
 
-Eine bestimmte Verfügbarkeit oder Erreichbarkeit wird nicht garantiert.
-
-###
-17. Lokale Speicherung, Backup und Datenverlust
-###
-
-Daten können lokal auf deinem Endgerät gespeichert werden (z. B. IndexedDB, Local Storage oder Cache). Diese Daten sind geräte- und browserabhängig und können jederzeit gelöscht werden oder verloren gehen.
-
-Du bist selbst für geeignete Sicherungen verantwortlich.
-
-Soweit eine Backup- und Restore-Funktion bereitgestellt wird, kann diese die Wiederherstellung unterstützen. Die Nutzung erfolgt freiwillig und auf eigene Verantwortung. Ein Anspruch auf erfolgreiche, vollständige oder fehlerfreie Wiederherstellung besteht nicht.
-
-Eine Wiederherstellung ohne ein vom Nutzer zuvor erstelltes Backup ist regelmäßig nicht möglich.
+- Wartung,
+- technische Störungen,
+- Ausfälle externer Dienste,
+- höhere Gewalt.
 
 ###
-18. Geistiges Eigentum
+17. Keine Notfalldienste
 ###
 
-Alle Rechte an MessageDrop, einschließlich Software, Design und Marken, liegen bei uns oder unseren Lizenzgebern.
+MessageDrop bietet keinen Zugang zu Polizei, Feuerwehr, Rettungsdienst oder anderen Notfalldiensten.
 
-Eine Nutzung unserer Marken oder Kennzeichen ohne vorherige Zustimmung ist nicht gestattet.
-
-###
-19. Beendigung der Nutzung
-###
-
-Du kannst die Nutzung von MessageDrop jederzeit einstellen.
-
-Wir behalten uns vor, den Zugang ganz oder teilweise zu sperren oder zu beenden, insbesondere bei Verstößen gegen diese Nutzungsbedingungen, gesetzlicher Verpflichtung oder missbräuchlicher Nutzung.
+Nutze in Notfällen immer die offiziellen Notrufwege.
 
 ###
-20. Haftungsausschluss
+18. Rechte an Inhalten und App
 ###
 
-Der Dienst wird „wie er ist“ und „wie verfügbar“ bereitgestellt.
+Deine Inhalte bleiben grundsätzlich deine Inhalte.
 
-Die Nutzung erfolgt auf eigene Verantwortung.
+Damit wir den Dienst betreiben können, räumst du uns die nötigen Nutzungsrechte ein (z. B. speichern, anzeigen, technisch verarbeiten, moderieren), soweit dies für den Betrieb erforderlich ist.
 
-Wir übernehmen keine Verantwortung für Schäden, die durch unsachgemäße, unaufmerksame oder zweckwidrige Nutzung entstehen und außerhalb unseres Einflussbereichs liegen.
-
-###
-21. Haftungsbeschränkung
-###
-
-Wir haften unbeschränkt nur bei Vorsatz, grober Fahrlässigkeit oder bei Verletzung von Leben, Körper oder Gesundheit.
-
-Im Übrigen ist eine Haftung, soweit gesetzlich zulässig, ausgeschlossen.
+Alle Rechte an der App selbst (Software, Design, Marken) liegen bei uns oder unseren Lizenzgebern.
 
 ###
-22. Freistellung
+19. Haftung
 ###
 
-Du stellst uns von sämtlichen Ansprüchen Dritter frei, die aufgrund deiner Inhalte oder deines Verstoßes gegen diese Nutzungsbedingungen geltend gemacht werden, soweit gesetzlich zulässig.
+Wir haften unbeschränkt nur bei Vorsatz, grober Fahrlässigkeit und bei Schäden an Leben, Körper oder Gesundheit.
+
+Im Übrigen ist unsere Haftung im gesetzlich zulässigen Umfang eingeschränkt.
+
+Du nutzt MessageDrop im Rahmen der gesetzlichen Vorgaben und auf eigene Verantwortung.
 
 ###
-23. Anwendbares Recht und Gerichtsstand
+20. Sperrung und Beendigung
 ###
 
-Es gilt das Recht der Bundesrepublik Deutschland.
+Du kannst die Nutzung jederzeit beenden.
 
-Sofern du Kaufmann oder juristische Person bist, ist Gerichtsstand unser Sitz.
+Wir können Zugänge oder Funktionen ganz oder teilweise einschränken oder sperren, wenn z. B.:
 
-Zwingende Verbraucherschutzvorschriften bleiben unberührt.
-
-###
-24. Salvatorische Klausel
-###
-
-Sollte eine Bestimmung dieser Nutzungsbedingungen unwirksam sein oder werden, bleibt die Wirksamkeit der übrigen Bestimmungen unberührt.
+- diese Bedingungen verletzt werden,
+- gesetzliche Pflichten es erfordern,
+- Missbrauch vorliegt.
 
 ###
-25. Kontakt
+21. Änderungen dieser Nutzungsbedingungen
 ###
 
-JackTools.Net UG (haftungsbeschränkt)
-Im Kirchfeld 27
-38304 Wolfenbüttel
+Wir können diese Nutzungsbedingungen anpassen, wenn dies erforderlich ist (z. B. bei neuen Funktionen oder geänderter Rechtslage).
+
+Es gilt jeweils die veröffentlichte aktuelle Fassung.
+
+Bei wesentlichen Änderungen informieren wir in angemessener Form innerhalb des Dienstes.
+
+###
+22. Anwendbares Recht und Gerichtsstand
+###
+
+Es gilt deutsches Recht.
+
+Wenn du Verbraucher bist, bleiben zwingende Verbraucherschutzvorschriften deines Wohnsitzstaats unberührt.
+
+Für Kaufleute oder juristische Personen ist – soweit zulässig – unser Sitz Gerichtsstand.
+
+###
+23. Salvatorische Klausel
+###
+
+Sollte eine Regel dieser Nutzungsbedingungen unwirksam sein, bleiben die übrigen Regelungen wirksam.
+
+###
+24. Kontakt
+###
+
+JackTools.Net UG (haftungsbeschränkt)  
+Im Kirchfeld 27  
+38304 Wolfenbüttel  
 Deutschland
 
-E-Mail: jacktoolsnet@gmail.com
+E-Mail: jacktoolsnet@gmail.com  
 Telefon: +49 (0) 176 / 41 23 57 74
