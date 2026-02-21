@@ -1,32 +1,52 @@
-module.exports = (io, socket) => {
+module.exports = (_io, socket) => {
   const getAuthUserId = () => socket.user?.userId ?? socket.user?.id ?? null;
-  const emitError = (reason) => {
-    socket.emit('user:joinUserRoom:error', { status: 403, reason });
+  const toRoom = (value) => String(value);
+
+  const emitError = (reason, ack) => {
+    const payload = { status: 403, reason };
+    socket.emit('user:joinUserRoom:error', payload);
+    if (typeof ack === 'function') {
+      try {
+        ack(payload);
+      } catch {
+        // ignore bad ack handlers on client side
+      }
+    }
   };
 
-  const joinUserRoom = (userId) => {
+  const joinUserRoom = (userId, ack) => {
     const authUserId = getAuthUserId();
     if (!authUserId) {
-      emitError('unauthorized');
+      emitError('unauthorized', ack);
       return;
     }
     if (!userId) {
-      emitError('missing_userId');
+      emitError('missing_userId', ack);
       return;
     }
     if (String(authUserId) !== String(userId)) {
-      emitError('forbidden');
+      emitError('forbidden', ack);
       return;
     }
-    socket.join(userId);
-    io.to(userId).emit(`${userId}`, {
+    const room = toRoom(userId);
+    socket.join(room);
+    const payload = {
       status: 200,
-      type: "joined",
+      type: 'joined',
       content: {
-        message: `Joined room ${userId}`
+        message: `Joined room ${room}`
       }
-    });
-  }
+    };
+    // only notify the joining socket to avoid cross-tab join fanout storms
+    socket.emit(room, payload);
+    if (typeof ack === 'function') {
+      try {
+        ack(payload);
+      } catch {
+        // ignore bad ack handlers on client side
+      }
+    }
+  };
 
-  socket.on("user:joinUserRoom", joinUserRoom);
-}
+  socket.on('user:joinUserRoom', (userId, ack) => joinUserRoom(userId, ack));
+};

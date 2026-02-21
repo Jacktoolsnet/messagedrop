@@ -25,9 +25,46 @@ app.use(express.json({ limit: '1mb' }));
 app.use(traceId());
 app.use(normalizeErrorResponses);
 
+function parsePositiveInt(value, fallback) {
+  const parsed = Number.parseInt(String(value ?? ''), 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function getClientIpFromRequest(req) {
+  const forwarded = req?.headers?.['x-forwarded-for'];
+  if (typeof forwarded === 'string' && forwarded.trim()) {
+    const [first] = forwarded.split(',');
+    return first.trim();
+  }
+  return req?.socket?.remoteAddress
+    || req?.connection?.remoteAddress
+    || req?.ip
+    || 'unknown';
+}
+
+function isLoopbackAddress(ip) {
+  return ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1';
+}
+
 const healthWindowMs = 10 * 60 * 1000;
 const healthLimit = 60;
 const healthHits = new Map();
+const handshakeWindowMs = parsePositiveInt(process.env.SOCKETIO_HANDSHAKE_WINDOW_MS, 10 * 1000);
+const handshakeLimit = parsePositiveInt(process.env.SOCKETIO_HANDSHAKE_MAX, 200);
+const handshakeHits = new Map();
+const socketEventWindowMs = parsePositiveInt(process.env.SOCKETIO_EVENT_WINDOW_MS, 10 * 1000);
+const socketEventLimit = parsePositiveInt(process.env.SOCKETIO_EVENT_MAX, 300);
+const socketEventPayloadMaxBytes = parsePositiveInt(process.env.SOCKETIO_EVENT_MAX_PAYLOAD_BYTES, 1024 * 1024);
+const knownSocketEvents = new Set([
+  'user:joinUserRoom',
+  'contact:requestProfile',
+  'contact:provideUserProfile',
+  'contact:newContactMessage',
+  'contact:updateContactMessage',
+  'contact:deleteContactMessage',
+  'contact:readContactMessage',
+  'contact:reactContactMessage'
+]);
 
 const rateLimitMessage = (message) => ({
   errorCode: 'RATE_LIMIT',
@@ -35,30 +72,52 @@ const rateLimitMessage = (message) => ({
   error: message
 });
 
-function healthLimiter(req, res, next) {
+function incrementWindowCounter(store, key, windowMs) {
   const now = Date.now();
-  const key = req.ip || req.connection?.remoteAddress || 'unknown';
-  const entry = healthHits.get(key) || { count: 0, start: now };
-  if (now - entry.start >= healthWindowMs) {
+  const entry = store.get(key) || { count: 0, start: now };
+  if (now - entry.start >= windowMs) {
     entry.count = 0;
     entry.start = now;
   }
   entry.count += 1;
-  healthHits.set(key, entry);
-  if (entry.count > healthLimit) {
+  store.set(key, entry);
+  return entry.count;
+}
+
+function cleanupWindowCounter(store, windowMs) {
+  const now = Date.now();
+  for (const [key, entry] of store.entries()) {
+    if (now - entry.start >= windowMs) {
+      store.delete(key);
+    }
+  }
+}
+
+function estimatePayloadBytes(payload) {
+  if (payload === undefined || payload === null) {
+    return 0;
+  }
+  try {
+    return Buffer.byteLength(JSON.stringify(payload), 'utf8');
+  } catch {
+    return Number.POSITIVE_INFINITY;
+  }
+}
+
+function healthLimiter(req, res, next) {
+  const key = getClientIpFromRequest(req);
+  const count = incrementWindowCounter(healthHits, key, healthWindowMs);
+  if (count > healthLimit) {
     return res.status(429).json(rateLimitMessage('Too many health requests, please try again later.'));
   }
   next();
 }
 
+const limiterCleanupIntervalMs = Math.min(healthWindowMs, handshakeWindowMs);
 setInterval(() => {
-  const now = Date.now();
-  for (const [key, entry] of healthHits.entries()) {
-    if (now - entry.start >= healthWindowMs) {
-      healthHits.delete(key);
-    }
-  }
-}, healthWindowMs).unref();
+  cleanupWindowCounter(healthHits, healthWindowMs);
+  cleanupWindowCounter(handshakeHits, handshakeWindowMs);
+}, limiterCleanupIntervalMs).unref();
 
 const allowedOrigins = process.env.ORIGIN?.split(',').map(origin => origin.trim()).filter(Boolean) ?? [];
 app.use(cors({
@@ -80,6 +139,13 @@ app.post('/emit/user', security.checkToken, (req, res) => {
     return res.status(400).json({ error: 'userId is required' });
   }
   const eventName = typeof event === 'string' && event.trim() ? event.trim() : String(userId);
+  if (eventName.length > 120) {
+    return res.status(400).json({ error: 'event is too long' });
+  }
+  const payloadBytes = estimatePayloadBytes(payload);
+  if (payloadBytes > socketEventPayloadMaxBytes) {
+    return res.status(413).json({ error: 'payload too large' });
+  }
   io.to(String(userId)).emit(eventName, payload ?? {});
   return res.json({ ok: true });
 });
@@ -181,13 +247,35 @@ attachForwarding(logger, {
 const server = createServer(app);
 
 const io = new Server(server, {
+  serveClient: false,
   cors: {
     origin: allowedOrigins,
     credentials: true
   },
   pingInterval: 20000,
   pingTimeout: 30000,
-  maxHttpBufferSize: 5.5 * 1024 * 1024
+  maxHttpBufferSize: 5.5 * 1024 * 1024,
+  allowRequest: (req, callback) => {
+    const ip = getClientIpFromRequest(req);
+    if (isLoopbackAddress(ip)) {
+      callback(null, true);
+      return;
+    }
+    const count = incrementWindowCounter(handshakeHits, ip, handshakeWindowMs);
+    if (count > handshakeLimit) {
+      if (count === handshakeLimit + 1 || count % 25 === 0) {
+        logger.warn('socket handshake rate limited', {
+          ip,
+          count,
+          windowMs: handshakeWindowMs,
+          limit: handshakeLimit
+        });
+      }
+      callback('rate_limited', false);
+      return;
+    }
+    callback(null, true);
+  }
 });
 
 io.use((socket, next) => {
@@ -213,9 +301,67 @@ io.use((socket, next) => {
 });
 
 io.on('connection', (socket) => {
+  socket.data.eventRate = {
+    start: Date.now(),
+    count: 0,
+    dropped: 0
+  };
+
   if (logSocketConnections) {
     socket.logger.info('socket connected');
   }
+
+  socket.use((packet, next) => {
+    const eventName = packet?.[0];
+    const payload = packet?.[1];
+
+    if (typeof eventName !== 'string') {
+      return next(new Error('invalid_event'));
+    }
+
+    if (!knownSocketEvents.has(eventName)) {
+      socket.logger.warn('socket event rejected', { event: eventName, reason: 'unknown_event' });
+      return next(new Error('unknown_event'));
+    }
+
+    const rate = socket.data.eventRate || { start: Date.now(), count: 0, dropped: 0 };
+    const now = Date.now();
+    if (now - rate.start >= socketEventWindowMs) {
+      rate.start = now;
+      rate.count = 0;
+      rate.dropped = 0;
+    }
+
+    rate.count += 1;
+    socket.data.eventRate = rate;
+
+    if (rate.count > socketEventLimit) {
+      rate.dropped += 1;
+      if (rate.dropped === 1 || rate.dropped % 20 === 0) {
+        socket.logger.warn('socket event rate limited', {
+          event: eventName,
+          count: rate.count,
+          windowMs: socketEventWindowMs,
+          limit: socketEventLimit
+        });
+      }
+      socket.emit(`${eventName}:error`, { status: 429, reason: 'rate_limit' });
+      return next(new Error('rate_limit'));
+    }
+
+    const payloadBytes = estimatePayloadBytes(payload);
+    if (payloadBytes > socketEventPayloadMaxBytes) {
+      socket.logger.warn('socket payload too large', {
+        event: eventName,
+        payloadBytes,
+        maxPayloadBytes: socketEventPayloadMaxBytes
+      });
+      socket.emit(`${eventName}:error`, { status: 413, reason: 'payload_too_large' });
+      return next(new Error('payload_too_large'));
+    }
+
+    return next();
+  });
 
   socket.on('disconnect', (reason) => {
     if (logSocketConnections) {
@@ -233,7 +379,7 @@ io.on('connection', (socket) => {
 
 io.engine.on('connection_error', (err) => {
   const ip = err.req?.socket?.remoteAddress;
-  if (err.code === 3 && (ip === '127.0.0.1' || ip === '::1')) {
+  if (err.code === 3 && isLoopbackAddress(ip)) {
     return;
   }
   logger.error('connection error', {

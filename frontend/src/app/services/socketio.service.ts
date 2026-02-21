@@ -296,7 +296,9 @@ export class SocketioService {
   }
 
   public receiveProfileForContactEvent(contact: Contact): void {
-    this.socket.on(`receiveProfileForContact:${contact.id}`, (payload: { status: number, contact: Contact }) => {
+    const eventName = `receiveProfileForContact:${contact.id}`;
+    this.socket.off(eventName);
+    this.socket.once(eventName, (payload: { status: number, contact: Contact }) => {
       if (payload.status == 200) {
         contact.name = payload.contact.name !== '' ? payload.contact.name : this.i18n.t('common.contact.notSet');
         const incomingAvatar = payload.contact.base64Avatar || '';
