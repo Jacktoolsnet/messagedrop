@@ -104,7 +104,7 @@ h2[mat-dialog-title].dialog-title {
 
 /* Add a small top spacer ONLY when a card has an avatar badge:
    prevents the badge from visually colliding with the previous item */
-.item:has(.avatar-box) {
+.item.has-badge {
   /* this is outside the grid-gap budget, so keep it small */
   margin-top: 6px;
 }
@@ -337,4 +337,12 @@ button,
   display: inline-flex;
   align-items: center;
   white-space: nowrap;
+}
+
+@supports (-moz-appearance: none) {
+  .item,
+  .avatar-box,
+  .sticky-actions {
+    box-shadow: 0 2px 6px var(--mat-card-outlined-outline-color);
+  }
 }

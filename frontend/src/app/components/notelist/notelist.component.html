@@ -12,7 +12,7 @@
         } @else {
         <div class="content">
             @for (note of sortedNotes(); track note.id) {
-            <mat-card class="item" appMasonryItem>
+            <mat-card class="item" [class.has-badge]="!!note.timestamp" appMasonryItem>
                 @if (note.timestamp) {
                 <div class="timestamp-box">{{ note.timestamp | date:'medium' }}</div>
                 }

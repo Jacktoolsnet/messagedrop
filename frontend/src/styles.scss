@@ -885,3 +885,15 @@ h2[mat-dialog-title].dialog-title {
 .cdk-overlay-pane .mat-mdc-select-panel .mat-mdc-menu-content {
   border-radius: 12px !important;
 }
+
+/* Firefox software rendering fallback (Chromebook): reduce costly paint effects in tile view. */
+@supports (-moz-appearance: none) {
+  .tile-area .tile-grid .tile {
+    box-shadow: 0 2px 6px var(--mat-card-outlined-outline-color) !important;
+    transition: background-color 0.15s ease, box-shadow 0.15s ease !important;
+  }
+
+  .tile-area .tile-grid .tile:hover {
+    transform: none !important;
+  }
+}

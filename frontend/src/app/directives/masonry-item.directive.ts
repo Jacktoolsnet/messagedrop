@@ -13,46 +13,66 @@ export class MasonryItemDirective implements AfterViewInit, OnDestroy {
   @Input() reflowOnImagesLoaded = true;
 
   /** Throttle reflows on rapid changes (ms). */
-  @Input() throttleMs = 16; // ~1 frame
+  @Input() throttleMs = 48;
 
   private ro?: ResizeObserver;
-  private winResizeHandler?: () => void;
-  private rafId?: number;
+  private gridEl: HTMLElement | null = null;
+  private gridMetrics?: { rowGap: number; rowUnitPx: number };
+  private span = 0;
   private lastReflowAt = 0;
+  private lastObservedHeight = -1;
+  private destroyed = false;
   private imgLoadListeners: (() => void)[] = [];
   private readonly el = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly zone = inject(NgZone);
+  private static instances = new Set<MasonryItemDirective>();
+  private static dirtyInstances = new Set<MasonryItemDirective>();
+  private static windowResizeAttached = false;
+  private static flushRafId?: number;
+
+  private static readonly onWindowResize = () => {
+    for (const instance of MasonryItemDirective.instances) {
+      instance.invalidateGridMetrics();
+      instance.scheduleReflow(true);
+    }
+  };
 
   ngAfterViewInit(): void {
     this.zone.runOutsideAngular(() => {
-      // Observe size changes of this tile (content growth/shrink)
-      this.ro = new ResizeObserver(() => this.scheduleReflow());
-      this.ro.observe(this.el.nativeElement);
+      MasonryItemDirective.instances.add(this);
+      MasonryItemDirective.attachWindowResizeListener();
 
-      // Reflow on window resize (breakpoints/columns change)
-      this.winResizeHandler = () => this.scheduleReflow();
-      window.addEventListener('resize', this.winResizeHandler, { passive: true });
+      this.gridEl = this.closestGrid(this.el.nativeElement);
+
+      // Observe size changes of this tile (content growth/shrink)
+      this.ro = new ResizeObserver((entries) => {
+        const nextHeight = entries[0]?.contentRect?.height ?? this.el.nativeElement.offsetHeight;
+        if (Math.abs(nextHeight - this.lastObservedHeight) < 0.5) {
+          return;
+        }
+        this.lastObservedHeight = nextHeight;
+        this.scheduleReflow();
+      });
+      this.ro.observe(this.el.nativeElement);
 
       // Reflow when images inside finish loading (optional)
       if (this.reflowOnImagesLoaded) {
         this.hookImageLoads();
       }
 
-      // Initial passes
-      queueMicrotask(() => this.scheduleReflow());
-      setTimeout(() => this.scheduleReflow(), 50);
-      setTimeout(() => this.scheduleReflow(), 300);
+      // Initial pass
+      queueMicrotask(() => this.scheduleReflow(true));
     });
   }
 
   ngOnDestroy(): void {
+    this.destroyed = true;
     this.ro?.disconnect();
-    if (this.winResizeHandler) {
-      window.removeEventListener('resize', this.winResizeHandler);
-    }
-    if (this.rafId != null) cancelAnimationFrame(this.rafId);
     this.imgLoadListeners.forEach(off => off());
     this.imgLoadListeners = [];
+    MasonryItemDirective.instances.delete(this);
+    MasonryItemDirective.dirtyInstances.delete(this);
+    MasonryItemDirective.detachWindowResizeListenerIfUnused();
   }
 
   /** Attach load listeners to images within the tile to trigger reflow once natural sizes are known. */
@@ -62,10 +82,10 @@ export class MasonryItemDirective implements AfterViewInit, OnDestroy {
     imgs.forEach(img => {
       // If already complete (from cache), still schedule a reflow
       if ((img as HTMLImageElement).complete) {
-        this.scheduleReflow();
+        this.scheduleReflow(true);
         return;
       }
-      const onLoad = () => this.scheduleReflow();
+      const onLoad = () => this.scheduleReflow(true);
       img.addEventListener('load', onLoad, { passive: true });
       img.addEventListener('error', onLoad, { passive: true });
       this.imgLoadListeners.push(() => {
@@ -76,50 +96,57 @@ export class MasonryItemDirective implements AfterViewInit, OnDestroy {
   }
 
   /** Batch reflow calls using rAF and an optional throttle window. */
-  private scheduleReflow(): void {
+  private scheduleReflow(force = false): void {
+    if (this.destroyed) return;
     const now = performance.now();
-    if (now - this.lastReflowAt < this.throttleMs) return;
-
-    if (this.rafId != null) cancelAnimationFrame(this.rafId);
-    this.rafId = requestAnimationFrame(() => {
-      this.reflow();
-      this.lastReflowAt = performance.now();
-      this.rafId = undefined;
-    });
+    if (!force && now - this.lastReflowAt < this.throttleMs) return;
+    MasonryItemDirective.enqueue(this);
   }
 
   /** Core measurement and span calculation. */
   private reflow(): void {
+    if (this.destroyed) return;
     const item = this.el.nativeElement;
-    const grid = this.closestGrid(item);
+
+    let grid = this.gridEl;
+    if (!grid || !grid.isConnected) {
+      grid = this.closestGrid(item);
+      this.gridEl = grid;
+      this.gridMetrics = undefined;
+    }
     if (!grid) return;
 
-    const gridCS = getComputedStyle(grid);
+    if (!this.gridMetrics) {
+      const gridCS = getComputedStyle(grid);
+      const rowGap = this.parsePx(gridCS.rowGap) ?? 0;
+      let rowUnitPx =
+        this.parsePx(gridCS.gridAutoRows) ??
+        (typeof this.rowUnitPx === 'number' ? this.rowUnitPx : undefined);
 
-    // Read row gap (vertical spacing) precisely
-    const rowGap = this.parsePx(gridCS.rowGap) ?? 0;
+      if (rowUnitPx == null) {
+        const varVal = gridCS.getPropertyValue('--masonry-row-height').trim();
+        const num = Number(varVal || '8');
+        rowUnitPx = Number.isFinite(num) && num > 0 ? num : 8;
+      }
 
-    // Determine the row unit height (in px): prefer computed grid-auto-rows, fallback to input or CSS var
-    let rowUnitPx =
-      this.parsePx(gridCS.gridAutoRows) ??
-      (typeof this.rowUnitPx === 'number' ? this.rowUnitPx : undefined);
-
-    if (rowUnitPx == null) {
-      // Fallback to CSS custom property --masonry-row-height (unitless number of px)
-      const varVal = gridCS.getPropertyValue('--masonry-row-height').trim();
-      const num = Number(varVal || '8');
-      rowUnitPx = isFinite(num) && num > 0 ? num : 8;
+      this.gridMetrics = { rowGap, rowUnitPx };
     }
 
-    // Measure the full tile height (includes padding/border; fine for spanning)
-    const full = item.getBoundingClientRect().height;
+    const { rowGap, rowUnitPx } = this.gridMetrics;
+    const full = item.offsetHeight;
+    if (full <= 0) return;
 
     // Compute the number of grid rows to span:
     // span = ceil((height + rowGap) / (rowUnitPx + rowGap))
-    const span = Math.max(1, Math.ceil((full + rowGap) / (rowUnitPx + rowGap)));
+    const nextSpan = Math.max(1, Math.ceil((full + rowGap) / (rowUnitPx + rowGap)));
 
     // Apply as grid-row-end
-    item.style.gridRowEnd = `span ${span}`;
+    if (nextSpan !== this.span) {
+      this.span = nextSpan;
+      item.style.gridRowEnd = `span ${nextSpan}`;
+    }
+
+    this.lastReflowAt = performance.now();
   }
 
   /** Traverse up to find the nearest CSS grid container. */
@@ -137,5 +164,32 @@ export class MasonryItemDirective implements AfterViewInit, OnDestroy {
   private parsePx(val: string): number | null {
     const m = /([\d.]+)px/.exec(val);
     return m ? parseFloat(m[1]) : null;
+  }
+
+  private invalidateGridMetrics(): void {
+    this.gridMetrics = undefined;
+  }
+
+  private static attachWindowResizeListener(): void {
+    if (this.windowResizeAttached) return;
+    window.addEventListener('resize', this.onWindowResize, { passive: true });
+    this.windowResizeAttached = true;
+  }
+
+  private static detachWindowResizeListenerIfUnused(): void {
+    if (!this.windowResizeAttached || this.instances.size > 0) return;
+    window.removeEventListener('resize', this.onWindowResize);
+    this.windowResizeAttached = false;
+  }
+
+  private static enqueue(instance: MasonryItemDirective): void {
+    this.dirtyInstances.add(instance);
+    if (this.flushRafId != null) return;
+    this.flushRafId = requestAnimationFrame(() => {
+      this.flushRafId = undefined;
+      const queued = Array.from(this.dirtyInstances);
+      this.dirtyInstances.clear();
+      queued.forEach((entry) => entry.reflow());
+    });
   }
 }
