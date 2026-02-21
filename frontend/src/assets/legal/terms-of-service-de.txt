@@ -292,18 +292,20 @@ Systemmeldungen:
 13. Externe Inhalte und Drittanbieter
 ###
 
-MessageDrop kann externe Anbieter einbinden, z. B.:
+MessageDrop nutzt externe Dienste in zwei Gruppen:
 
-- Open-Meteo
-- OpenStreetMap / Nominatim
-- DeepL
+###
+13.1 Inhalte mit anbieterbezogener Zustimmung (optional)
+###
+
+Für folgende Anbieter gilt eine anbieterbezogene Einwilligungs-/Freigabeentscheidung im Dienst:
+
 - YouTube
 - TikTok
 - Pinterest
 - Tenor
 - Spotify
 - Unsplash
-- Viator
 
 Externe Inhalte sind standardmäßig deaktiviert.
 
@@ -313,7 +315,28 @@ Du musst nicht allen Anbietern zustimmen. Ohne Zustimmung bleibt der jeweilige A
 
 Du kannst diese Zustimmung jederzeit mit Wirkung für die Zukunft widerrufen, indem du den jeweiligen Anbieter wieder deaktivierst.
 
-Für externe Dienste gelten die Bedingungen und Datenschutzregeln der jeweiligen Anbieter. Wir haben darauf keinen vollständigen Einfluss.
+###
+13.2 Funktionsdienste ohne separaten Anbieter-Toggle
+###
+
+Folgende externe Funktions- und Informationsdienste werden nicht über den „Externe Inhalte“-Toggle freigeschaltet:
+
+- Open-Meteo
+- OpenStreetMap / Nominatim
+- DeepL
+- Viator
+
+Diese Dienste werden genutzt, wenn du die jeweilige Funktion aktiv verwendest (z. B. Wetterabfrage, Karten-/Ortsbezug, Übersetzung oder Erlebnissuche). Eine pauschale Freigabe aller Anbieter ist auch hier nicht vorgesehen.
+
+###
+13.3 Besonderheit Unsplash (Bilddownload)
+###
+
+Wenn du Unsplash-Bilder auswählst (z. B. für Avatar oder Hintergründe), werden Bilddateien von Unsplash geladen und auf dein Endgerät heruntergeladen bzw. lokal gespeichert.
+
+Dabei kann zusätzlich ein technischer Download-Nachweis an Unsplash übermittelt werden.
+
+Für externe Dienste gelten die Nutzungs- und Datenschutzbedingungen der jeweiligen Anbieter. Wir haben auf deren Datenverarbeitung keinen vollständigen Einfluss.
 
 ###
 14. Nutzungszeit-Schutz (Selbstbeschränkung / Elternmodus)

@@ -23,7 +23,11 @@ MessageDrop verwendet kein personalisiertes Empfehlungs- oder Ranking-System. Ö
 
 Private Chatnachrichten werden verschlüsselt und signiert übertragen und sind für uns und Dritte grundsätzlich nicht im Klartext einsehbar.
 
-Externe Inhalte (z. B. YouTube, TikTok, Spotify usw.) werden ausschließlich nach aktiver, anbieterbezogener Zustimmung der Nutzer eingebunden bzw. angezeigt. Eine pauschale Zustimmung für alle Anbieter ist nicht vorgesehen. Eine erteilte Zustimmung kann jederzeit mit Wirkung für die Zukunft widerrufen werden. Es gelten die Bedingungen der jeweiligen Anbieter.
+Externe Einbettungen (z. B. YouTube, TikTok, Pinterest, Spotify, Tenor, Unsplash) werden ausschließlich nach aktiver, anbieterbezogener Zustimmung eingebunden bzw. angezeigt. Eine pauschale Zustimmung für alle Anbieter ist nicht vorgesehen. Eine erteilte Zustimmung kann jederzeit mit Wirkung für die Zukunft widerrufen werden.
+
+Davon zu unterscheiden sind externe Funktionsdienste (z. B. Open-Meteo, OpenStreetMap/Nominatim, DeepL, Viator), die bei aktiver Nutzung der jeweiligen Funktion verwendet werden und nicht über den Externe-Inhalte-Toggle freigeschaltet werden.
+
+Wenn Unsplash-Bilder ausgewählt werden, können Bilddateien von Unsplash geladen, auf das Endgerät heruntergeladen und lokal gespeichert werden.
 
 Der optionale Nutzungszeit-Schutz (Selbstbeschränkung oder Elternmodus) kann Tageslimits und Zeitfenster umfassen. Im Elternmodus wird ein Eltern-PIN ausschließlich als Hash verarbeitet.
 
@@ -130,7 +134,8 @@ MessageDrop kann grundsätzlich auch ohne Anlage eines Nutzerkontos verwendet we
 Im Rahmen dieser Basisnutzung können insbesondere:
 - öffentliche Inhalte gelesen werden, soweit diese verfügbar sind,
 - externe Inhalte (z. B. YouTube, TikTok, Pinterest, Spotify, Tenor, Unsplash) in den Einstellungen anbieterbezogen aktiviert oder deaktiviert werden,
-- Erlebnisfunktionen über Viator genutzt werden.
+- Erlebnisfunktionen über Viator genutzt werden,
+- sowie Funktionsdienste wie Open-Meteo, Nominatim / OpenStreetMap und DeepL bei aktiver Nutzung der jeweiligen Funktion verwendet werden.
 
 Auch im Rahmen der Basisnutzung gilt das Mindestalter von 16 Jahren uneingeschränkt.
 
@@ -143,6 +148,10 @@ Dabei kann der jeweilige Anbieter technisch bedingt Informationen über den Abru
 Ohne eine ausdrückliche Aktivierung durch den Nutzer findet kein automatischer Abruf externer Inhalte und keine Datenübertragung an diese Anbieter statt. Die Aktivierung externer Inhalte erfolgt freiwillig und kann vom Nutzer jederzeit mit Wirkung für die Zukunft wieder deaktiviert werden.
 
 Eine pauschale Zustimmung für alle externen Anbieter ist nicht vorgesehen; die Entscheidung erfolgt getrennt je Anbieter.
+
+Für Funktionsdienste wie Open-Meteo, Nominatim / OpenStreetMap, DeepL und Viator besteht kein separater Anbieter-Toggle. Diese Dienste werden nur genutzt, wenn die jeweilige Funktion aktiv verwendet wird.
+
+Wenn Unsplash-Bilder ausgewählt werden, können Bilddateien von Unsplash geladen, auf das Endgerät heruntergeladen und lokal gespeichert werden.
 
 Im Rahmen der Basisnutzung besteht zudem die Möglichkeit, lokal Profile zu erstellen. Ein Profil besteht aus einem frei wählbaren Namen und einem Avatar (Bild).
 
@@ -431,12 +440,12 @@ Wir übernehmen jedoch keine Gewähr für deren Richtigkeit, Vollständigkeit od
 ###
 
 Einzelne Funktionen basieren auf externen Diensten, insbesondere:
-- Wetter- und Luftqualitätsdaten von Open-Meteo
-- Übersetzungen über DeepL
-- Orts- und Reverse-Geokodierung über Nominatim / OpenStreetMap
-- Animierte Gifs von Tenor
-- Bildsuche und Bildmetadaten über Unsplash
-- Erlebnis- und Aktivitätsdaten über Viator
+- Einbettungs-/Medienanbieter mit anbieterbezogener Aktivierung (z. B. YouTube, TikTok, Pinterest, Spotify, Tenor, Unsplash),
+- Funktionsdienste ohne separaten Anbieter-Toggle (z. B. Open-Meteo, DeepL, Nominatim / OpenStreetMap, Viator).
+
+Funktionsdienste werden nur genutzt, wenn der Nutzer die jeweilige Funktion aktiv verwendet (z. B. Wetterabfrage, Übersetzung, Karten-/Ortsbezug, Erlebnissuche).
+
+Bei Unsplash kann es – je nach Funktion – zum Laden von Bildmetadaten sowie zum Herunterladen von Bilddateien auf das Endgerät kommen. Zusätzlich kann ein technischer Download-Nachweis an Unsplash übermittelt werden.
 
 Trotz sorgfältiger Auswahl kann es zu Abweichungen, Ausfällen, Quoten- oder Ratenbegrenzungen sowie API-Änderungen kommen.
 

@@ -26,7 +26,11 @@ MessageDrop verwendet kein personalisiertes Empfehlungs- oder Ranking-System. Ö
 
 Private Chatnachrichten werden Ende-zu-Ende-verschlüsselt übertragen und sind für uns grundsätzlich nicht im Klartext einsehbar.
 
-Externe Inhalte und Dienste (z. B. YouTube, TikTok, Pinterest, Spotify, Tenor, Unsplash sowie Erlebnisdaten über Viator) werden nur nach aktiver, anbieterbezogener Entscheidung des Nutzers geladen oder abgefragt. Eine pauschale Zustimmung für alle Anbieter ist nicht vorgesehen. Es gelten ergänzend die Datenschutz- und Nutzungsbedingungen der jeweiligen Drittanbieter.
+Externe Einbettungen (z. B. YouTube, TikTok, Pinterest, Spotify, Tenor, Unsplash) werden nur nach aktiver, anbieterbezogener Entscheidung des Nutzers geladen. Eine pauschale Zustimmung für alle Anbieter ist nicht vorgesehen.
+
+Davon zu unterscheiden sind externe Funktionsdienste (z. B. Open-Meteo, OpenStreetMap/Nominatim, DeepL, Viator), die bei aktiver Nutzung der jeweiligen Funktion verwendet werden und nicht über den Externe-Inhalte-Toggle freigeschaltet werden.
+
+Wenn Unsplash-Bilder ausgewählt werden, können Bilddateien geladen, auf das Endgerät heruntergeladen und lokal gespeichert werden.
 
 Erteilte Einwilligungen für externe Inhalte können jederzeit mit Wirkung für die Zukunft widerrufen werden (z. B. durch Deaktivierung des jeweiligen Anbieters in den Einstellungen).
 
@@ -147,6 +151,8 @@ Externe Inhalte sind standardmäßig deaktiviert. Statt der externen Inhalte wir
 
 Eine pauschale Zustimmung für alle externen Anbieter ist nicht vorgesehen; die Entscheidung erfolgt getrennt je Anbieter.
 
+Diese anbieterbezogene Entscheidung betrifft Einbettungen externer Inhalte. Externe Funktionsdienste (z. B. Open-Meteo, Nominatim / OpenStreetMap, DeepL, Viator) werden in Abschnitt 2.5 beschrieben.
+
 Erst nach einer bewussten und freiwilligen Aktivierung durch den Nutzer werden externe Inhalte technisch eingebunden.
 
 Die Einbindung erfolgt über Einbettungstechniken wie iFrames oder oEmbed. Dabei werden die Inhalte direkt von den Servern des jeweiligen Drittanbieters geladen. Wir haben keinen Einfluss auf Art, Umfang und Zweck der Datenverarbeitung durch diese Anbieter.
@@ -219,6 +225,10 @@ Für einzelne Funktionen nutzt MessageDrop externe Informations- und API-Dienste
 - Unsplash (Bildsuche und Bildmetadaten).
 
 Bei Nutzung dieser Funktionen können – abhängig vom jeweiligen Anwendungsfall – insbesondere Suchbegriffe, Sprach- und Ländereinstellungen, Ziel-/Ort-Parameter, Datums- und Preisfilter, technische Verbindungsdaten sowie ggf. Referenz-URLs verarbeitet werden. Die Kommunikation mit Drittanbietern erfolgt, soweit technisch vorgesehen, über unsere Server oder direkt aus dem Endgerät.
+
+Für diese Funktionsdienste besteht kein separater Externe-Inhalte-Toggle. Sie werden nur genutzt, wenn der Nutzer die jeweilige Funktion aktiv verwendet.
+
+Bei Unsplash kann – je nach Funktion – zusätzlich zum Abruf von Metadaten auch ein Download von Bilddateien erfolgen (z. B. für Avatar-/Hintergrundbilder). Dabei können Bilddateien auf das Endgerät heruntergeladen und lokal gespeichert werden. Zusätzlich kann ein technischer Download-Nachweis an Unsplash übermittelt werden.
 
 Weiterführende Informationen zu den Anbietern sind über deren jeweilige Websites abrufbar, z. B.:
 - Open-Meteo: https://open-meteo.com/
