@@ -25,8 +25,11 @@ import { MigraineTileEditComponent } from './migraine-tile-edit/migraine-tile-ed
 })
 export class MigraineTileComponent {
   private readonly placeSignal = signal<Place | null>(null);
+  readonly selectedDayOffset = signal<0 | 1>(0);
+
   @Input() set place(value: Place) {
     this.placeSignal.set(value);
+    this.selectedDayOffset.set(0);
     this.weatherState = this.refreshService.getWeatherState(value);
     this.refreshService.refreshWeather(value);
   }
@@ -62,6 +65,10 @@ export class MigraineTileComponent {
     return this.weatherState?.isStale() ?? false;
   }
 
+  get hasTomorrow(): boolean {
+    return this.getDateByOffset(1) !== undefined;
+  }
+
   private thresholds() {
     const defaults = { tempWarn1: 5, tempWarn2: 8, pressureWarn1: 6, pressureWarn2: 10 };
     return { ...defaults, ...(this.currentTile()?.payload?.migraine || {}) };
@@ -74,17 +81,44 @@ export class MigraineTileComponent {
     return Number((max - min).toFixed(1));
   }
 
-  private todaysHourly(field: keyof Weather['hourly'][number]): number[] {
-    if (!this.weather?.hourly || !this.weather.current?.time) return [];
-    const currentDate = this.weather.current.time.split('T')[0];
-    return this.weather.hourly
-      .filter(h => h.time.startsWith(currentDate))
+  private getBaseDayIndex(): number {
+    const weather = this.weather;
+    const daily = weather?.daily ?? [];
+    if (daily.length === 0) return -1;
+
+    const currentDate = weather?.current?.time?.split('T')[0];
+    const currentIndex = currentDate ? daily.findIndex((day) => day.date === currentDate) : -1;
+    return currentIndex >= 0 ? currentIndex : 0;
+  }
+
+  private getDayIndexByOffset(offset: 0 | 1): number {
+    const baseDayIndex = this.getBaseDayIndex();
+    if (baseDayIndex < 0) return -1;
+    return baseDayIndex + offset;
+  }
+
+  private getDateByOffset(offset: 0 | 1): string | undefined {
+    const weather = this.weather;
+    if (!weather?.daily?.length) return undefined;
+
+    const dayIndex = this.getDayIndexByOffset(offset);
+    if (dayIndex < 0 || dayIndex >= weather.daily.length) return undefined;
+    return weather.daily[dayIndex]?.date;
+  }
+
+  private hourlyForSelectedDay(field: keyof Weather['hourly'][number]): number[] {
+    const weather = this.weather;
+    const selectedDate = this.getDateByOffset(this.selectedDayOffset());
+    if (!weather?.hourly || !selectedDate) return [];
+
+    return weather.hourly
+      .filter(h => h.time.startsWith(selectedDate))
       .map(h => Number(h[field]))
       .filter(v => !Number.isNaN(v));
   }
 
   get tempChange(): { value: number; level: 'none' | 'warn' | 'alert' } {
-    const temps = this.todaysHourly('temperature');
+    const temps = this.hourlyForSelectedDay('temperature');
     const value = this.dailyRange(temps);
     const { tempWarn1, tempWarn2 } = this.thresholds();
     const level = value >= tempWarn2 ? 'alert' : value >= tempWarn1 ? 'warn' : 'none';
@@ -92,11 +126,18 @@ export class MigraineTileComponent {
   }
 
   get pressureChange(): { value: number; level: 'none' | 'warn' | 'alert' } {
-    const pressures = this.todaysHourly('pressure');
+    const pressures = this.hourlyForSelectedDay('pressure');
     const value = this.dailyRange(pressures);
     const { pressureWarn1, pressureWarn2 } = this.thresholds();
     const level = value >= pressureWarn2 ? 'alert' : value >= pressureWarn1 ? 'warn' : 'none';
     return { value, level };
+  }
+
+  onDayChange(offset: 0 | 1): void {
+    if (offset === 1 && !this.hasTomorrow) {
+      return;
+    }
+    this.selectedDayOffset.set(offset);
   }
 
   edit(): void {
@@ -125,6 +166,8 @@ export class MigraineTileComponent {
   openWeatherDetails(tileType: 'temperature' | 'pressure'): void {
     const place = this.placeSignal();
     if (!place?.boundingBox) return;
+
+    const selectedDayIndex = this.getDayIndexByOffset(this.selectedDayOffset());
     const dialogRef = this.dialog.open(WeatherComponent, {
       data: {
         weather: this.weather,
@@ -146,6 +189,9 @@ export class MigraineTileComponent {
 
     dialogRef.afterOpened().subscribe(() => {
       const comp = dialogRef.componentInstance as WeatherComponent | undefined;
+      if (selectedDayIndex >= 0) {
+        comp?.onDayChange(selectedDayIndex);
+      }
       const placeholder: WeatherTile = {
         type: tileType,
         label: '',

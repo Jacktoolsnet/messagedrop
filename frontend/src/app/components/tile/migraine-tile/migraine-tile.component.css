@@ -50,6 +50,21 @@
   gap: 10px;
 }
 
+.day-switch {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.day-button {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.day-button.active {
+  background: var(--mat-sys-primary-container, rgba(33, 150, 243, 0.15));
+}
+
 .metric {
   padding: 10px;
   border-radius: 10px;

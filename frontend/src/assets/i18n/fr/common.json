@@ -623,6 +623,9 @@
       },
       "migraine": {
         "stale": "Données expirées",
+        "daySwitchAria": "Sélectionner le jour",
+        "today": "Aujourd'hui",
+        "tomorrow": "Demain",
         "temperatureChange": "Variation de température",
         "pressureChange": "Variation de pression",
         "openTemperatureAria": "Ouvrir les détails de température",

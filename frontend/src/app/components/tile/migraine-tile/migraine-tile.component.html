@@ -10,12 +10,29 @@
     }
   </div>
 
+  <div class="day-switch" role="group" [attr.aria-label]="'common.tiles.migraine.daySwitchAria' | transloco"
+    (click)="$event.stopPropagation()">
+    <button mat-stroked-button type="button" class="day-button" [class.active]="selectedDayOffset() === 0"
+      [attr.aria-pressed]="selectedDayOffset() === 0" (click)="onDayChange(0); $event.stopPropagation()"
+      (keyup.enter)="$event.stopPropagation()" (keyup.space)="$event.stopPropagation()">
+      {{ 'common.tiles.migraine.today' | transloco }}
+    </button>
+    @if (hasTomorrow) {
+      <button mat-stroked-button type="button" class="day-button" [class.active]="selectedDayOffset() === 1"
+        [attr.aria-pressed]="selectedDayOffset() === 1" (click)="onDayChange(1); $event.stopPropagation()"
+        (keyup.enter)="$event.stopPropagation()" (keyup.space)="$event.stopPropagation()">
+        {{ 'common.tiles.migraine.tomorrow' | transloco }}
+      </button>
+    }
+  </div>
+
   <div class="migraine-body">
     <div class="metric" [class.warn]="tempChange.level === 'warn'" [class.alert]="tempChange.level === 'alert'">
       <div class="label">{{ 'common.tiles.migraine.temperatureChange' | transloco }}</div>
       <div class="metric-row">
         <div class="value">{{ formatValue(tempChange.value, '°C') }}</div>
         <button mat-icon-button color="primary" (click)="openWeatherDetails('temperature'); $event.stopPropagation();"
+          (keyup.enter)="$event.stopPropagation()" (keyup.space)="$event.stopPropagation()"
           type="button" [attr.aria-label]="'common.tiles.migraine.openTemperatureAria' | transloco">
           <mat-icon>thermostat</mat-icon>
         </button>
@@ -26,6 +43,7 @@
       <div class="metric-row">
         <div class="value">{{ formatValue(pressureChange.value, ' hPa') }}</div>
         <button mat-icon-button color="primary" (click)="openWeatherDetails('pressure'); $event.stopPropagation();"
+          (keyup.enter)="$event.stopPropagation()" (keyup.space)="$event.stopPropagation()"
           type="button" [attr.aria-label]="'common.tiles.migraine.openPressureAria' | transloco">
           <mat-icon>compress</mat-icon>
         </button>
