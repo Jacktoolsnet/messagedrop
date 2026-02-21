@@ -266,7 +266,7 @@ export class ContactlistComponent {
       minWidth: 'min(500px, 95vw)',
       maxWidth: '95vw',
       width: 'min(900px, 95vw)',
-      maxHeight: '90vh',
+      maxHeight: '95vh',
       height: 'auto',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',

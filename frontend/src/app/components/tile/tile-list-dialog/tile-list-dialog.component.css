@@ -66,7 +66,7 @@ h2[mat-dialog-title].tile-dialog-title > * {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  max-height: calc(90vh - 8.5rem);
+  max-height: calc(95vh - 8.5rem);
   padding: 0;
 }
 
