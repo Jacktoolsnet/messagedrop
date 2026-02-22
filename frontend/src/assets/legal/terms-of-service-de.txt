@@ -17,12 +17,12 @@ Kurzfassung (vereinfacht, nicht rechtsverbindlich)
 - Für DSA-Verfahren kann eine öffentliche Statusseite bereitgestellt werden (mit anonymisierten bzw. nicht personenbezogenen Verfahrensinformationen).
 - Rechtswidrige öffentliche Inhalte können über die Meldefunktion im Dienst oder über die im Impressum genannte Kontaktstelle gemeldet werden.
 - Betroffene Nutzer können bei Moderationsentscheidungen – soweit gesetzlich vorgesehen – eine interne Beschwerde einreichen.
-- Du kannst Kontakten folgen und Plätze folgen. Push-Benachrichtigungen sind technisch „Best Effort“ (also ohne Zustellgarantie).
+- Du kannst Kontakten und Plätze folgen. Push-Benachrichtigungen sind technisch „Best Effort“ (also ohne Zustellgarantie).
 - Private Chats sind als vertrauliche Kommunikation gedacht. Trotzdem musst du auch dort die Gesetze einhalten.
 - Viele Daten werden lokal auf deinem Gerät gespeichert. Diese Daten können verloren gehen. Ohne eigenes Backup ist eine Wiederherstellung nicht möglich.
 - Der optionale Nutzungszeit-Schutz (Selbstbeschränkung/Elternmodus mit Eltern-PIN) kann technisch umgangen werden; eine absolute Sperre ist nicht garantiert.
-- Externe Inhalte von Drittanbietern werden erst nach deiner anbieterbezogenen Zustimmung geladen. Eine pauschale Zustimmung für alle Anbieter ist nicht vorgesehen. Diese Zustimmung kannst du jederzeit wieder zurücknehmen.
-- Externe Dienste (z. B. YouTube, OpenStreetMap, DeepL, Unsplash, Viator) haben eigene Regeln.
+- Externe Inhalte von Drittanbietern werden erst nach deiner anbieterbezogenen Zustimmung geladen. Diese Zustimmung kannst du jederzeit wieder zurücknehmen.
+- Externe Dienste (z. B. YouTube, OpenStreetMap, DeepL, Unsplash, Viator) haben eigene Nutzungs- und Datenschutzbedingungen.
 - Missbrauch von Melde- oder Beschwerdefunktionen kann zu Einschränkungen oder Sperren führen.
 - MessageDrop ist kein Notfalldienst.
 
@@ -54,11 +54,7 @@ Telefon: +49 (0) 176 / 41 23 57 74
 2. Für wen diese Bedingungen gelten
 ###
 
-Diese Bedingungen gelten für alle Personen, die MessageDrop nutzen – mit oder ohne Nutzerkonto.
-
-Mit der Nutzung stimmst du diesen Bedingungen zu.
-
-Wenn du nicht zustimmst, darfst du MessageDrop nicht nutzen.
+Diese Bedingungen gelten für alle Personen, die MessageDrop nutzen – mit oder ohne Nutzerkonto. Mit der Nutzung stimmst du diesen Bedingungen zu. Wenn du nicht zustimmst, darfst du MessageDrop nicht nutzen.
 
 ###
 3. Mindestalter (16/18-Regel)
@@ -83,6 +79,10 @@ MessageDrop ist eine Plattform für:
 - Kontakte und private Chats,
 - optionale Benachrichtigungen und Organisationsfunktionen (z. B. Folgen von Kontakten/Plätzen).
 
+Datenschutz und Datensparsamkeit sind zentrale Grundsätze von MessageDrop. Wir verfolgen nach Möglichkeit einen „Local-First“-Ansatz: Viele Daten werden primär auf deinem Endgerät gespeichert. Serverseitig verarbeiten wir nur Daten, die für den Betrieb des Dienstes erforderlich sind (z. B. öffentliche Inhalte, pseudonyme Nutzerkennung, öffentliche Schlüssel sowie notwendige Status- und Sicherheitsdaten).
+
+Soweit technisch möglich und sinnvoll, werden Daten kryptografisch geschützt. Dazu gehören insbesondere die PIN-basierte, lokale Absicherung des Nutzerkontos, die verschlüsselte Speicherung sensibler lokaler Daten sowie clientseitig verschlüsselte private Chat-Inhalte. Dein PIN wird ausschließlich lokal verarbeitet und nicht an den Server übertragen.
+
 Wir dürfen Funktionen jederzeit anpassen, erweitern, einschränken oder entfernen.
 
 ###
@@ -94,8 +94,7 @@ Du kannst MessageDrop grundsätzlich auch ohne Nutzerkonto verwenden.
 Dann gilt insbesondere:
 
 - Es stehen nur Basisfunktionen zur Verfügung.
-- Bestimmte Funktionen (z. B. kontoabhängige Synchronisierung, private Kontaktfunktionen, Push in vollem Umfang) können eingeschränkt sein oder fehlen.
-- Lokale Daten bleiben auf deinem Gerät und können verloren gehen.
+- Funktionen für die ein Nutzerkonto benötigt wird (z. B. private Notizen, private Kontaktfunktionen, ortsbezogene Funktionen) können nicht verwendet werden.
 
 ###
 6. Nutzung mit Nutzerkonto
@@ -157,7 +156,11 @@ Du bestätigst, dass:
 
 Persönliche Informationen dürfen nicht öffentlich veröffentlicht werden – weder über dich selbst noch über andere Personen.
 
-Öffentliche Inhalte können zeitlich begrenzt gespeichert oder angezeigt werden. Ein Anspruch auf dauerhafte Archivierung besteht nicht.
+Du kannst Erstellern öffentlicher Inhalte lokal eigene Anzeigenamen und Avatare zuordnen. Diese Zuordnungen dienen nur deiner persönlichen Orientierung (z. B. um Beiträge desselben Nutzers wiederzuerkennen), werden ausschließlich lokal auf deinem Endgerät gespeichert und sind für andere Nutzer nicht sichtbar. Solche Zuordnungen sind keine vom jeweiligen Ersteller bestätigten Profilangaben.
+
+Wichtiger Hinweis zur Speicherdauer öffentlicher Inhalte:
+Öffentliche Nachrichten werden nach 30 Tagen gelöscht. Mit einer öffentlichen Nachricht verknüpfte öffentliche Kommentare werden dabei ebenfalls gelöscht.
+Ein Anspruch auf dauerhafte Verfügbarkeit, Archivierung oder Wiederherstellung öffentlicher Inhalte besteht nicht.
 
 ###
 10. Was verboten ist
@@ -292,7 +295,7 @@ Systemmeldungen:
 13. Externe Inhalte und Drittanbieter
 ###
 
-MessageDrop nutzt externe Dienste in zwei Gruppen:
+Für externe Dienste gelten die Nutzungs- und Datenschutzbedingungen der jeweiligen Anbieter. Wir haben auf deren Datenverarbeitung keinen Einfluss. Für Inhalte und Angaben externer Anbieter sind ausschließlich die jeweiligen Anbieter verantwortlich. Wir übernehmen – soweit gesetzlich zulässig – keine Gewähr oder Haftung für deren Richtigkeit, Vollständigkeit, Aktualität oder Verfügbarkeit. MessageDrop nutzt externe Dienste in zwei Gruppen:
 
 ###
 13.1 Inhalte mit anbieterbezogener Zustimmung (optional)
@@ -326,7 +329,7 @@ Folgende externe Funktions- und Informationsdienste werden nicht über den „Ex
 - DeepL
 - Viator
 
-Diese Dienste werden genutzt, wenn du die jeweilige Funktion aktiv verwendest (z. B. Wetterabfrage, Karten-/Ortsbezug, Übersetzung oder Erlebnissuche). Eine pauschale Freigabe aller Anbieter ist auch hier nicht vorgesehen.
+Diese Dienste werden genutzt, wenn du die jeweilige Funktion aktiv verwendest (z. B. Wetterabfrage, Karten-/Ortsbezug, Übersetzung oder Erlebnissuche).
 
 ###
 13.3 Besonderheit Unsplash (Bilddownload)
@@ -335,8 +338,6 @@ Diese Dienste werden genutzt, wenn du die jeweilige Funktion aktiv verwendest (z
 Wenn du Unsplash-Bilder auswählst (z. B. für Avatar oder Hintergründe), werden Bilddateien von Unsplash geladen und auf dein Endgerät heruntergeladen bzw. lokal gespeichert.
 
 Dabei kann zusätzlich ein technischer Download-Nachweis an Unsplash übermittelt werden.
-
-Für externe Dienste gelten die Nutzungs- und Datenschutzbedingungen der jeweiligen Anbieter. Wir haben auf deren Datenverarbeitung keinen vollständigen Einfluss.
 
 ###
 14. Nutzungszeit-Schutz (Selbstbeschränkung / Elternmodus)
@@ -411,6 +412,10 @@ Du nutzt MessageDrop im Rahmen der gesetzlichen Vorgaben und auf eigene Verantwo
 ###
 
 Du kannst die Nutzung jederzeit beenden.
+
+Du kannst dein Nutzerkonto außerdem jederzeit selbstständig über die App löschen. In diesem Fall erfolgt die sofortige und endgültige Löschung des Nutzerkontos sowie aller zugehörigen serverseitigen und lokalen Daten, vorbehaltlich gesetzlicher Aufbewahrungs- oder Nachweispflichten.
+
+Nutzerkonten, bei denen über einen Zeitraum von 90 Tagen keine Anmeldung erfolgt, werden serverseitig automatisch und ohne Vorwarnung gelöscht.
 
 Wir können Zugänge oder Funktionen ganz oder teilweise einschränken oder sperren, wenn z. B.:
 
