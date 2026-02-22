@@ -1,16 +1,7 @@
-<app-dialog-header
-  icon="public"
-  [title]="'common.legal.externalContent.title' | transloco">
+<app-dialog-header icon="public" [title]="'common.legal.externalContent.title' | transloco">
 </app-dialog-header>
 
 <mat-dialog-content class="content">
-    <div class="intro-note" role="note">
-        <mat-icon aria-hidden="true">info</mat-icon>
-        <div class="intro-copy">
-            <p class="intro-title">{{ 'common.legal.externalContent.choiceTitle' | transloco }}</p>
-            <p class="intro-text">{{ 'common.legal.externalContent.choiceText' | transloco }}</p>
-        </div>
-    </div>
     <div class="platform-tile-container">
         <div class="platform-tile">
             <app-enable-external-content [platform]="'pinterest'" [checkedOverride]="appSettings.enablePinterestContent"
