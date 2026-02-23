@@ -11,7 +11,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { MasonryItemDirective } from '../../directives/masonry-item.directive';
 import { Location } from '../../interfaces/location';
 import { Message } from '../../interfaces/message';
 import { Mode } from '../../interfaces/mode';
@@ -60,7 +59,6 @@ type ModerationStatus = 'published' | 'review' | 'hidden';
     MatFormFieldModule,
     MatMenuModule,
     MatInputModule,
-    MasonryItemDirective,
     TranslocoPipe
   ],
   templateUrl: './messagelist.component.html',

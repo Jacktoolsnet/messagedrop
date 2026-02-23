@@ -11,7 +11,6 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { MasonryItemDirective } from '../../directives/masonry-item.directive';
 import { Location } from '../../interfaces/location';
 import { Mode } from '../../interfaces/mode';
 import { MultimediaType } from '../../interfaces/multimedia-type';
@@ -47,7 +46,6 @@ import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.comp
     MatFormFieldModule,
     MatMenuModule,
     MatInputModule,
-    MasonryItemDirective,
     TranslocoPipe
   ],
   templateUrl: './notelist.component.html',

@@ -12,7 +12,7 @@
         } @else {
         <div class="content">
             @for (image of sortedImages(); track image.id) {
-            <mat-card class="item" appMasonryItem>
+            <mat-card class="item">
                 <mat-card-content>
                     <div class="message-content">
                         @if (getImageUrl(image.id) === 'NOT_FOUND') {

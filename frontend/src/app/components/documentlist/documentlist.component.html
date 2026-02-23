@@ -12,7 +12,7 @@
     } @else {
     <div class="content">
       @for (document of sortedDocuments(); track document.id) {
-      <mat-card class="item" appMasonryItem>
+      <mat-card class="item">
         <mat-card-content>
           <div class="document-content">
             <mat-icon class="file-icon">{{ getFileIcon(document) }}</mat-icon>

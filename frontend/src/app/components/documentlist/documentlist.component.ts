@@ -6,7 +6,6 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDial
 import { MatIcon } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { MasonryItemDirective } from '../../directives/masonry-item.directive';
 import { BoundingBox } from '../../interfaces/bounding-box';
 import { LocalDocument } from '../../interfaces/local-document';
 import { Location } from '../../interfaces/location';
@@ -38,7 +37,6 @@ interface DocumentDialogData {
     MatDialogContent,
     MatDialogActions,
     MatIcon,
-    MasonryItemDirective,
     TranslocoPipe
   ],
   templateUrl: './documentlist.component.html',

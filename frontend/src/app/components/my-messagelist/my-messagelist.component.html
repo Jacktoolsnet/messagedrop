@@ -13,7 +13,7 @@
         @if (messagesSignal().length !== 0 && messageService.selectedMessagesSignal().length === 0) {
         <div class="content">
             @for (message of filteredMessagesSignal(); track message.id) {
-            <mat-card class="item has-badge" appMasonryItem>
+            <mat-card class="item has-badge">
             @if (this.userService.getUser().id === message.userId) {
             <div class="avatar-box">
                 @if (userProfile.base64Avatar) {
@@ -167,7 +167,7 @@
         @if (commentsSignal().length !== 0) {
         <div class="content">
             @for (message of commentsSignal(); track message.id) {
-            <mat-card class="item" appMasonryItem>
+            <mat-card class="item">
             @if (this.userService.getUser().id === message.userId) {
             <div class="avatar-box">
                 @if (userProfile.base64Avatar) {

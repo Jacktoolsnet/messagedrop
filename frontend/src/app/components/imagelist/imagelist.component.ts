@@ -12,7 +12,6 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
-import { MasonryItemDirective } from '../../directives/masonry-item.directive';
 import { BoundingBox } from '../../interfaces/bounding-box';
 import { LocalImage } from '../../interfaces/local-image';
 import { Location } from '../../interfaces/location';
@@ -52,7 +51,6 @@ interface ImageDialogData {
     MatFormFieldModule,
     MatMenuModule,
     MatInputModule,
-    MasonryItemDirective,
     TranslocoPipe
   ],
   templateUrl: './imagelist.component.html',

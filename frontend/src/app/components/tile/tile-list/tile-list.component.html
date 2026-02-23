@@ -6,58 +6,58 @@
       @for (tile of visibleTiles; track trackByTile($index, tile)) {
         @switch (tile.type) {
           @case ('datetime') {
-          <app-datetime-tile class="tile" appMasonryItem [timezone]="resolvedPlace?.timezone || ''"></app-datetime-tile>
+          <app-datetime-tile class="tile" [timezone]="resolvedPlace?.timezone || ''"></app-datetime-tile>
         }
         @case ('weather') {
-          <app-weather-tile class="tile" appMasonryItem [place]="resolvedPlace!"></app-weather-tile>
+          <app-weather-tile class="tile" [place]="resolvedPlace!"></app-weather-tile>
         }
         @case ('airQuality') {
-          <app-air-quality-tile class="tile" appMasonryItem [place]="resolvedPlace!"></app-air-quality-tile>
+          <app-air-quality-tile class="tile" [place]="resolvedPlace!"></app-air-quality-tile>
         }
         @case ('note') {
-          <app-note-tile class="tile" appMasonryItem [place]="resolvedPlace!"></app-note-tile>
+          <app-note-tile class="tile" [place]="resolvedPlace!"></app-note-tile>
         }
         @case ('message') {
-          <app-message-tile class="tile" appMasonryItem [place]="resolvedPlace!"></app-message-tile>
+          <app-message-tile class="tile" [place]="resolvedPlace!"></app-message-tile>
         }
         @case ('hashtags') {
-          <app-hashtag-tile class="tile" appMasonryItem [place]="resolvedPlace" [contact]="resolvedContact" [experience]="resolvedExperience"></app-hashtag-tile>
+          <app-hashtag-tile class="tile" [place]="resolvedPlace" [contact]="resolvedContact" [experience]="resolvedExperience"></app-hashtag-tile>
         }
         @case ('placeContacts') {
-          <app-relation-tile class="tile" appMasonryItem [place]="resolvedPlace!" [tile]="tile"></app-relation-tile>
+          <app-relation-tile class="tile" [place]="resolvedPlace!" [tile]="tile"></app-relation-tile>
         }
         @case ('contactPlaces') {
-          <app-relation-tile class="tile" appMasonryItem [contact]="resolvedContact!" [tile]="tile"></app-relation-tile>
+          <app-relation-tile class="tile" [contact]="resolvedContact!" [tile]="tile"></app-relation-tile>
         }
         @case ('image') {
-          <app-image-tile class="tile" appMasonryItem [place]="resolvedPlace!"></app-image-tile>
+          <app-image-tile class="tile" [place]="resolvedPlace!"></app-image-tile>
         }
         @case ('custom-experience') {
-          <app-experience-tile class="tile" appMasonryItem [place]="resolvedPlace!"></app-experience-tile>
+          <app-experience-tile class="tile" [place]="resolvedPlace!"></app-experience-tile>
         }
         @case ('custom-text') {
-          <app-text-tile class="tile" appMasonryItem [place]="resolvedPlace" [contact]="resolvedContact" [tile]="tile"></app-text-tile>
+          <app-text-tile class="tile" [place]="resolvedPlace" [contact]="resolvedContact" [tile]="tile"></app-text-tile>
         }
         @case ('custom-multitext') {
-          <app-multitext-tile class="tile" appMasonryItem [place]="resolvedPlace" [contact]="resolvedContact" [tile]="tile"></app-multitext-tile>
+          <app-multitext-tile class="tile" [place]="resolvedPlace" [contact]="resolvedContact" [tile]="tile"></app-multitext-tile>
         }
         @case ('custom-date') {
-          <app-anniversary-tile class="tile" appMasonryItem [place]="resolvedPlace" [contact]="resolvedContact" [tile]="tile"></app-anniversary-tile>
+          <app-anniversary-tile class="tile" [place]="resolvedPlace" [contact]="resolvedContact" [tile]="tile"></app-anniversary-tile>
         }
         @case ('custom-todo') {
-          <app-todo-tile class="tile" appMasonryItem [place]="resolvedPlace" [contact]="resolvedContact" [tile]="tile"></app-todo-tile>
+          <app-todo-tile class="tile" [place]="resolvedPlace" [contact]="resolvedContact" [tile]="tile"></app-todo-tile>
         }
         @case ('custom-quickaction') {
-          <app-quick-action-tile class="tile" appMasonryItem [place]="resolvedPlace" [contact]="resolvedContact" [tile]="tile"></app-quick-action-tile>
+          <app-quick-action-tile class="tile" [place]="resolvedPlace" [contact]="resolvedContact" [tile]="tile"></app-quick-action-tile>
         }
         @case ('custom-file') {
-          <app-file-tile class="tile" appMasonryItem [place]="resolvedPlace" [contact]="resolvedContact" [tile]="tile"></app-file-tile>
+          <app-file-tile class="tile" [place]="resolvedPlace" [contact]="resolvedContact" [tile]="tile"></app-file-tile>
         }
         @case ('custom-migraine') {
-          <app-migraine-tile class="tile" appMasonryItem [place]="resolvedPlace!" [tile]="tile"></app-migraine-tile>
+          <app-migraine-tile class="tile" [place]="resolvedPlace!" [tile]="tile"></app-migraine-tile>
         }
         @case ('custom-pollution') {
-          <app-pollution-tile class="tile" appMasonryItem [place]="resolvedPlace!" [tile]="tile"></app-pollution-tile>
+          <app-pollution-tile class="tile" [place]="resolvedPlace!" [tile]="tile"></app-pollution-tile>
         }
       }
     }

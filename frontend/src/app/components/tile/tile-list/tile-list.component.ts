@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, inject } 
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { MasonryItemDirective } from "../../../directives/masonry-item.directive";
 import { AvatarAttribution } from '../../../interfaces/avatar-attribution';
 import { Contact } from '../../../interfaces/contact';
 import { ExperienceTileContext } from '../../../interfaces/experience-tile-context';
@@ -32,7 +31,7 @@ import { WeatherTileComponent } from "../weather-tile/weather-tile.component";
 
 @Component({
   selector: 'app-tile-list',
-  imports: [DateTimeTileComponent, WeatherTileComponent, AirQualityTileComponent, NoteTileComponent, MessageTileComponent, HashtagTileComponent, RelationTileComponent, ImageTileComponent, FileTileComponent, ExperienceTileComponent, TextTileComponent, MultitextTileComponent, AnniversaryTileComponent, MigraineTileComponent, PollutionTileComponent, TodoTileComponent, QuickActionTileComponent, MasonryItemDirective, MatButtonModule, TranslocoPipe],
+  imports: [DateTimeTileComponent, WeatherTileComponent, AirQualityTileComponent, NoteTileComponent, MessageTileComponent, HashtagTileComponent, RelationTileComponent, ImageTileComponent, FileTileComponent, ExperienceTileComponent, TextTileComponent, MultitextTileComponent, AnniversaryTileComponent, MigraineTileComponent, PollutionTileComponent, TodoTileComponent, QuickActionTileComponent, MatButtonModule, TranslocoPipe],
   templateUrl: './tile-list.component.html',
   styleUrl: './tile-list.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
