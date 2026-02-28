@@ -1300,6 +1300,48 @@ export class UserService {
     if (!this.isReady()) {
       return;
     }
+    const currentPinDialogRef = this.checkPinDialog.open(CheckPinComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: {},
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+    });
+    const currentPin = await firstValueFrom(currentPinDialogRef.afterClosed());
+    if (!currentPin) {
+      return;
+    }
+
+    const cryptedUser = await this.indexedDbService.getUser();
+    if (!cryptedUser) {
+      return;
+    }
+    if (!await this.cryptoService.decryptWithPin(currentPin, cryptedUser.cryptedUser)) {
+      const wrongPinDialog = this.displayMessage.open(DisplayMessage, {
+        panelClass: '',
+        closeOnNavigation: false,
+        data: {
+          showAlways: true,
+          title: this.i18n.t('auth.serviceTitle'),
+          image: '',
+          icon: 'warning',
+          message: this.i18n.t('auth.pinIncorrect'),
+          button: this.i18n.t('common.actions.ok'),
+          delay: 0,
+          showSpinner: false
+        },
+        maxWidth: '90vw',
+        maxHeight: '90vh',
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop',
+        disableClose: false,
+        autoFocus: false
+      });
+      await firstValueFrom(wrongPinDialog.afterClosed());
+      return;
+    }
+
     const dialogRef = this.createPinDialog.open(CreatePinComponent, {
       panelClass: '',
       closeOnNavigation: true,
