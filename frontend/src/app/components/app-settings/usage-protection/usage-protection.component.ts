@@ -214,7 +214,7 @@ export class UsageProtectionComponent implements OnInit {
     }
     const existingParentHash = this.appSettings.usageProtection.parentPinHash?.trim();
     if (existingParentHash) {
-      const verified = await this.verifyCurrentParentPin();
+      const verified = await this.verifyCurrentParentPin(true);
       if (!verified) {
         return;
       }
