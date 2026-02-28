@@ -145,10 +145,14 @@ MessageDrop bietet keinen Zugang zu Notfalldiensten (z. B. Polizei, Feuerwehr, R
 In Notfällen sind ausschließlich die offiziellen Notrufwege zu verwenden.
 
 ###
-10. Haftungsausschluss und Haftungsbeschränkung
+10. Haftungsausschluss
 ###
 
 Der Dienst wird „wie er ist“ und „wie verfügbar“ bereitgestellt.
+
+###
+11. Haftungsbeschränkung
+###
 
 Soweit gesetzlich zulässig, ist unsere Haftung für einfache Fahrlässigkeit ausgeschlossen, es sei denn, es handelt sich um die Verletzung wesentlicher Vertragspflichten (Kardinalpflichten). In diesem Fall ist die Haftung auf den bei Vertragsschluss vorhersehbaren, vertragstypischen Schaden begrenzt.
 
@@ -166,7 +170,7 @@ Soweit gesetzlich zulässig, haften wir nicht für mittelbare Schäden, Folgesch
 Vorstehende Haftungsregelungen gelten entsprechend zugunsten unserer gesetzlichen Vertreter, Mitarbeitenden und Erfüllungsgehilfen.
 
 ###
-11. Änderungen dieses Haftungshinweises
+12. Änderungen dieses Haftungshinweises
 ###
 
 Wir behalten uns vor, diesen Haftungshinweis jederzeit mit Wirkung für die Zukunft zu ändern.
@@ -174,7 +178,7 @@ Wir behalten uns vor, diesen Haftungshinweis jederzeit mit Wirkung für die Zuku
 Änderungen werden mit Veröffentlichung der aktualisierten Fassung wirksam, sofern kein späterer Zeitpunkt angegeben ist.
 
 ###
-12. Anwendbares Recht und Gerichtsstand
+13. Anwendbares Recht und Gerichtsstand
 ###
 
 Es gilt das Recht der Bundesrepublik Deutschland.
@@ -184,7 +188,7 @@ Sofern der Nutzer Kaufmann, juristische Person des öffentlichen Rechts oder öf
 Zwingende verbraucherschützende Vorschriften bleiben unberührt.
 
 ###
-13. Salvatorische Klausel
+14. Salvatorische Klausel
 ###
 
 Sollte eine Bestimmung dieses Haftungshinweises ganz oder teilweise unwirksam sein oder werden, bleibt die Wirksamkeit der übrigen Bestimmungen unberührt.
