@@ -475,8 +475,11 @@
     },
     "pin": {
       "enterTitle": "Enter PIN",
+      "enterHint": "Please enter your current PIN.",
       "createTitle": "Create PIN",
+      "createHint": "Set your new PIN now.",
       "confirmTitle": "Confirm PIN",
+      "confirmHint": "Please enter the new PIN again.",
       "hintTitle": "PIN hint",
       "hintBody": "Friendly reminder: keep your PIN safe. It's stored only on this device and can't be reset.",
       "mismatch": "PINs do not match."

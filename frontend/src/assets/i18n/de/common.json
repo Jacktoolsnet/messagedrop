@@ -475,8 +475,11 @@
     },
     "pin": {
       "enterTitle": "PIN eingeben",
+      "enterHint": "Bitte gib deine aktuelle PIN ein.",
       "createTitle": "PIN erstellen",
+      "createHint": "Lege jetzt eine neue PIN fest.",
       "confirmTitle": "PIN bestätigen",
+      "confirmHint": "Bitte gib die neue PIN erneut ein.",
       "hintTitle": "PIN-Hinweis",
       "hintBody": "Kleiner Hinweis: Merke dir deine PIN gut. Sie bleibt nur auf diesem Gerät gespeichert und kann nicht zurückgesetzt werden.",
       "mismatch": "PINs stimmen nicht überein."

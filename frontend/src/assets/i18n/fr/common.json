@@ -475,8 +475,11 @@
     },
     "pin": {
       "enterTitle": "Saisir le code PIN",
+      "enterHint": "Veuillez saisir votre PIN actuel.",
       "createTitle": "Créer un code PIN",
+      "createHint": "Définissez maintenant votre nouveau PIN.",
       "confirmTitle": "Confirmer le code PIN",
+      "confirmHint": "Veuillez saisir à nouveau le nouveau PIN.",
       "hintTitle": "Indice de PIN",
       "hintBody": "Petit rappel : garde bien ton code PIN. Il est stocké uniquement sur cet appareil et ne peut pas être réinitialisé.",
       "mismatch": "Les codes PIN ne correspondent pas."

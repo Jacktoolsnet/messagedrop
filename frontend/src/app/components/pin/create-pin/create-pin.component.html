@@ -1,6 +1,9 @@
 <h3 mat-dialog-title class="dialog-title">
     {{ isConfirming ? ('common.pin.confirmTitle' | transloco) : ('common.pin.createTitle' | transloco) }}
 </h3>
+<p class="dialog-hint">
+    {{ isConfirming ? ('common.pin.confirmHint' | transloco) : ('common.pin.createHint' | transloco) }}
+</p>
 
 <div class="pin-display">
     @for (digit of isConfirming ? confirmPinDisplay : pinDisplay; track $index) {
