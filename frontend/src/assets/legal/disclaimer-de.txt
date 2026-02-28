@@ -29,7 +29,7 @@ Davon zu unterscheiden sind externe Funktionsdienste (z. B. Open-Meteo, OpenStre
 
 Wenn Unsplash-Bilder ausgewählt werden, können Bilddateien von Unsplash geladen, auf das Endgerät heruntergeladen und lokal gespeichert werden.
 
-Der optionale Nutzungszeit-Schutz (Selbstbeschränkung oder Elternmodus) kann Tageslimits und Zeitfenster umfassen. Im Elternmodus wird ein Eltern-PIN ausschließlich als Hash verarbeitet.
+Der optionale Nutzungszeit-Schutz (Selbstbeschränkung oder Elternmodus) kann Tageslimits, Zeitfenster sowie eine konfigurierbare Anzahl von Verlängerungen umfassen. Im Elternmodus wird ein Eltern-PIN ausschließlich als kryptografischer Hash verarbeitet.
 
 MessageDrop bietet keinen Zugang zu Notfalldiensten.
 
@@ -255,12 +255,14 @@ Die Wiederherstellung eines Backups kann – insbesondere aufgrund technischer E
 
 MessageDrop kann optional einen Nutzungszeit-Schutz bereitstellen. Dieser kann insbesondere folgende Modi umfassen:
 - „off“ (deaktiviert),
-- „self“ (Selbstbeschränkung mit Tageslimit und optionaler Selbstverlängerung),
-- „parental“ (Tageslimit/Verlängerung mit Eltern-PIN).
+- „self“ (Selbstbeschränkung mit Tageslimit und konfigurierbarer Selbstverlängerung),
+- „parental“ (Tageslimit und konfigurierbarer Verlängerung per Eltern-PIN).
 
 Im Elternmodus wird der Eltern-PIN ausschließlich als kryptografischer Hash verarbeitet; der Klartext-PIN wird weder serverseitig noch dauerhaft im Klartext lokal gespeichert.
 
 Der Nutzungszeit-Schutz basiert auf technischen Rahmenbedingungen des Endgeräts und lokal gespeicherten Zustandsdaten. Durch Löschen lokaler Daten, Gerätewechsel, Browser-/App-Neuinstallation, technische Manipulationen oder Systembesonderheiten kann die Schutzwirkung eingeschränkt sein.
+
+Soweit technisch vorgesehen, können die Dauer von Verlängerungen und die zulässige Anzahl von Verlängerungen konfiguriert werden.
 
 Soweit technisch vorgesehen und bei angemeldetem Nutzerkonto können Einstellungen/Zustandsdaten des Nutzungszeit-Schutzes mit dem Backend synchronisiert werden.
 
@@ -366,7 +368,7 @@ Im Rahmen des DSA-Verfahrens werden insbesondere verfahrensbezogene Informatione
 
 Der meldenden Person wird im Rahmen einer Meldung („Notice“) oder Beschwerde („Appeal“) die Möglichkeit eingeräumt, zusätzliche Informationen bereitzustellen, insbesondere:
 - das Hochladen von Dateien (z. B. Screenshots oder Dokumente) als Belege,
-- das Angeben von externen Links als Nachweise.
+- die Angabe externer Links als Nachweise.
 
 Diese Belege werden ausschließlich zur Prüfung des gemeldeten Sachverhalts im Rahmen des DSA-Verfahrens verwendet und entsprechend den gesetzlichen Vorgaben verarbeitet. Eine Veröffentlichung dieser Belege erfolgt nicht.
 
@@ -384,7 +386,7 @@ Soweit rechtlich zulässig und technisch möglich, enthalten diese Informationen
 
 Systemmeldungen sind interne Nachrichten, die vom Admin-Backend an das MessageDrop-Backend übermittelt und dem Nutzer im Frontend in einem gesonderten Nachrichtenbereich angezeigt werden. Sie dienen der formellen Kommunikation im Rahmen gesetzlicher Verfahren und stellen kein klassisches E-Mail-Postfach dar.
 
-Für jeden DSA-relevanten Vorgang (Meldung oder Beschwerde) wird eine öffentlich zugängliche Fallseite bereitgestellt. Diese dient der gesetzlichen Transparenz und Nachvollziehbarkeit des Verfahrens.
+Für DSA-relevante Vorgänge (Meldung oder Beschwerde) kann eine öffentlich zugängliche Fallseite bereitgestellt werden. Diese dient der gesetzlichen Transparenz und Nachvollziehbarkeit des Verfahrens.
 
 Auf diesen öffentlichen Fallseiten werden ausschließlich anonymisierte oder nicht personenbezogene Informationen dargestellt, insbesondere:
 - Art des gemeldeten Inhalts,

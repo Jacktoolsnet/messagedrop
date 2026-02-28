@@ -34,7 +34,7 @@ Wenn Unsplash-Bilder ausgewählt werden, können Bilddateien geladen, auf das En
 
 Erteilte Einwilligungen für externe Inhalte können jederzeit mit Wirkung für die Zukunft widerrufen werden (z. B. durch Deaktivierung des jeweiligen Anbieters in den Einstellungen).
 
-Systemmeldungen (z. B. Hinweise zu DSA-Verfahren oder geplante Wartungsarbeiten) werden ausschließlich durch autorisierte administrative Systeme erzeugt und im Frontend des Nutzers angezeigt. Systemmeldungen sind stets aktiv; Nutzer können darauf derzeit nicht antworten.
+Systemmeldungen (z. B. Hinweise zu DSA-Verfahren oder geplante Wartungsarbeiten) werden ausschließlich durch autorisierte administrative Systeme erzeugt und im Frontend des Nutzers angezeigt. Systemmeldungen sind stets aktiv; Nutzer können sie im Frontend löschen, ohne dass dadurch zwingend interne Nachweise entfallen.
 
 Profile (Name/Avatar) können lokal zur besseren Zuordnung genutzt werden. Bei Kontaktaufnahme kann ein Nutzer optional eine Profilfreigabe anfordern; der andere Nutzer muss aktiv zustimmen. Nach Zustimmung werden Name und Avatar auf dem Endgerät des Kontakts lokal gespeichert.
 
@@ -221,14 +221,13 @@ Für einzelne Funktionen nutzt MessageDrop externe Informations- und API-Dienste
 - Open-Meteo (Wetter- und Luftqualitätsdaten),
 - DeepL (Übersetzungen),
 - Nominatim / OpenStreetMap (Suche, Geokodierung, Kartenbezug),
-- Viator (Erlebnis-/Aktivitätsdaten),
-- Unsplash (Bildsuche und Bildmetadaten).
+- Viator (Erlebnis-/Aktivitätsdaten).
 
 Bei Nutzung dieser Funktionen können – abhängig vom jeweiligen Anwendungsfall – insbesondere Suchbegriffe, Sprach- und Ländereinstellungen, Ziel-/Ort-Parameter, Datums- und Preisfilter, technische Verbindungsdaten sowie ggf. Referenz-URLs verarbeitet werden. Die Kommunikation mit Drittanbietern erfolgt, soweit technisch vorgesehen, über unsere Server oder direkt aus dem Endgerät.
 
 Für diese Funktionsdienste besteht kein separater Externe-Inhalte-Toggle. Sie werden nur genutzt, wenn der Nutzer die jeweilige Funktion aktiv verwendet.
 
-Bei Unsplash kann – je nach Funktion – zusätzlich zum Abruf von Metadaten auch ein Download von Bilddateien erfolgen (z. B. für Avatar-/Hintergrundbilder). Dabei können Bilddateien auf das Endgerät heruntergeladen und lokal gespeichert werden. Zusätzlich kann ein technischer Download-Nachweis an Unsplash übermittelt werden.
+Wenn der Anbieter Unsplash gemäß Abschnitt 2.3 aktiviert wurde, kann – je nach Funktion – zusätzlich zum Abruf von Metadaten auch ein Download von Bilddateien erfolgen (z. B. für Avatar-/Hintergrundbilder). Dabei können Bilddateien auf das Endgerät heruntergeladen und lokal gespeichert werden. Zusätzlich kann ein technischer Download-Nachweis an Unsplash übermittelt werden.
 
 Weiterführende Informationen zu den Anbietern sind über deren jeweilige Websites abrufbar, z. B.:
 - Open-Meteo: https://open-meteo.com/
@@ -426,7 +425,7 @@ Nutzer können Plätzen folgen oder das Folgen beenden.
 
 Soweit technisch möglich und vom Endgerät unterstützt, kann der Nutzer Push-Benachrichtigungen erhalten, wenn an einem gefolgten Platz neue öffentliche Inhalte erstellt werden.
 
-Für Push-Benachrichtigungen werden je nach Plattform technisch erforderliche Token/Identifiers verarbeitet, um Nachrichten an das Endgerät zustellen zu können (z. B. Push-Token). Diese Token werden zur Zustellung verarbeitet und nicht zu Profilbildungs- oder Tracking-Zwecken durch uns genutzt.
+Für Push-Benachrichtigungen werden je nach Plattform technisch erforderliche Token/Identifiers verarbeitet, damit Nachrichten an das Endgerät zugestellt werden können (z. B. Push-Token). Diese Token werden zur Zustellung verarbeitet und nicht zu Profilbildungs- oder Tracking-Zwecken durch uns genutzt.
 
 Push-Benachrichtigungen können aus technischen, systembedingten oder nutzerspezifischen Gründen verzögert, eingeschränkt oder nicht zugestellt werden; ein Anspruch auf Zustellung besteht nicht.
 
@@ -438,12 +437,12 @@ Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Funktion „Folgen“) sowie Art
 
 MessageDrop bietet optional einen Nutzungszeit-Schutz mit folgenden Grundfunktionen:
 - Modus „off“ (deaktiviert),
-- Modus „self“ (Selbstbeschränkung mit Tageslimit und optionaler einmaliger Selbstverlängerung),
-- Modus „parental“ (Tageslimit und optionale Verlängerung per Eltern-PIN).
+- Modus „self“ (Selbstbeschränkung mit Tageslimit und konfigurierbarer Selbstverlängerung),
+- Modus „parental“ (Tageslimit und konfigurierbare Verlängerung per Eltern-PIN).
 
 Verarbeitet werden hierfür insbesondere:
-- Einstellungen zum Nutzungszeit-Schutz (Modus, Tageslimit, Zeitfenster pro Wochentag, Verlängerungswerte),
-- lokaler Tagesstatus (Datum, konsumierte Nutzungssekunden, Status der Selbstverlängerung),
+- Einstellungen zum Nutzungszeit-Schutz (Modus, Tageslimit, Zeitfenster pro Wochentag, Verlängerungsdauer und zulässige Anzahl von Verlängerungen),
+- lokaler Tagesstatus (Datum, konsumierte Nutzungssekunden sowie Anzahl bereits genutzter Selbst- und Eltern-Verlängerungen),
 - optional ein Eltern-PIN-Hash (kein Klartext-PIN).
 
 Der Eltern-PIN wird ausschließlich lokal gehasht (kryptografischer Hash) und nicht im Klartext gespeichert. Bei angemeldetem Nutzerkonto können Einstellungen und Statusdaten des Nutzungszeit-Schutzes zur Synchronisation mit dem Backend übertragen werden.
@@ -489,7 +488,7 @@ Daten zu offensichtlich missbräuchlichen Meldungen oder Beschwerden (z. B. Seri
 4.2 Öffentliche Fallseite
 ###
 
-Für jeden DSA-relevanten Vorgang wird eine öffentlich zugängliche Fallseite bereitgestellt.
+Für DSA-relevante Vorgänge kann eine öffentlich zugängliche Fallseite bereitgestellt werden.
 
 Diese enthält ausschließlich anonymisierte oder nicht personenbezogene Informationen, insbesondere den Verfahrensstatus, die Art des gemeldeten Inhalts, getroffene Entscheidungen sowie rechtliche Begründungen gemäß DSA.
 
@@ -499,7 +498,7 @@ Es werden keine personenbezogenen Daten veröffentlicht. Die Veröffentlichung e
 4.3 Öffentliche DSA-Statistik
 ###
 
-MessageDrop stellt eine öffentlich zugängliche, aggregierte Statistik bereit, aus der die Anzahl eingeleiteter Verfahren, die Art der Entscheidungen sowie das Verhältnis von Meldungen zu Maßnahmen hervorgeht.
+MessageDrop kann eine öffentlich zugängliche, aggregierte Statistik bereitstellen, aus der die Anzahl eingeleiteter Verfahren, die Art der Entscheidungen sowie das Verhältnis von Meldungen zu Maßnahmen hervorgeht.
 
 Die Statistik enthält keine personenbezogenen Daten und lässt keine Rückschlüsse auf einzelne Nutzer zu.
 
