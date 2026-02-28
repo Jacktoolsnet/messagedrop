@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, HostListener, OnDestroy, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { DisplayMessage } from '../../utils/display-message/display-message.component';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 
 @Component({
@@ -15,7 +16,6 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
     MatIcon,
     MatInputModule,
     MatButtonModule,
-    MatSnackBarModule,
     TranslocoPipe
   ],
   templateUrl: './create-pin.component.html',
@@ -31,7 +31,7 @@ export class CreatePinComponent implements OnDestroy {
   private dialogClosed = false;
 
   private readonly dialogRef = inject(MatDialogRef<CreatePinComponent>);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly dialog = inject(MatDialog);
   private readonly translation = inject(TranslationHelperService);
 
   ngOnDestroy(): void {
@@ -77,12 +77,8 @@ export class CreatePinComponent implements OnDestroy {
               this.dialogClosed = true;
               this.dialogRef.close(this.pin);
             } else {
-              this.snackBar.open(this.translation.t('common.pin.mismatch'), '', {
-                duration: 2000,
-                horizontalPosition: 'center',
-                verticalPosition: 'top'
-              });
               this.reset();
+              this.showPinMismatchMessage();
             }
           }, 250);
         }
@@ -122,5 +118,29 @@ export class CreatePinComponent implements OnDestroy {
   cancel(): void {
     this.dialogClosed = true;
     this.dialogRef.close();
+  }
+
+  private showPinMismatchMessage(): void {
+    this.dialog.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: {
+        showAlways: true,
+        title: this.translation.t('common.pin.title'),
+        image: '',
+        icon: 'warning',
+        message: this.translation.t('common.pin.mismatch'),
+        button: this.translation.t('common.actions.ok'),
+        delay: 0,
+        showSpinner: false,
+        autoclose: false
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
   }
 }
