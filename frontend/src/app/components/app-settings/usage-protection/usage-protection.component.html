@@ -20,7 +20,7 @@
       <mat-button-toggle-group [hideSingleSelectionIndicator]="true" [value]="appSettings.usageProtection.mode"
         (change)="setUsageMode($event.value)" class="usage-mode-toggle-group" exclusive
         [attr.aria-label]="'settings.usageProtection.modeLabel' | transloco">
-        @for (mode of usageModes; track mode) {
+        @for (mode of getVisibleUsageModes(); track mode) {
           <mat-button-toggle [value]="mode">
             {{ ('settings.usageProtection.mode.' + mode) | transloco }}
           </mat-button-toggle>
@@ -30,21 +30,12 @@
       @if (appSettings.usageProtection.mode !== 'off') {
         @if (appSettings.usageProtection.mode === 'parental') {
           <section class="usage-slider-block usage-parent-pin-tile">
-            <p class="usage-protection-pin-state usage-parent-pin-state">
-              @if (usageParentPin) {
-                {{ 'settings.usageProtection.pinPending' | transloco }}
-              } @else if (appSettings.usageProtection.parentPinHash) {
-                {{ 'settings.usageProtection.pinSet' | transloco }}
-              } @else {
-                {{ 'settings.usageProtection.pinMissing' | transloco }}
-              }
-            </p>
             <div class="usage-parent-pin-actions">
               <button mat-stroked-button type="button" (click)="openUsageParentPinDialog()">
-                @if (usageParentPin || appSettings.usageProtection.parentPinHash) {
+                @if (appSettings.usageProtection.parentPinHash) {
                   {{ 'settings.usageProtection.pinChangeAction' | transloco }}
                 } @else {
-                  {{ 'settings.usageProtection.pinSetAction' | transloco }}
+                  {{ 'settings.usageProtection.pinSetFirst' | transloco }}
                 }
               </button>
               @if (hasConfiguredParentPin()) {

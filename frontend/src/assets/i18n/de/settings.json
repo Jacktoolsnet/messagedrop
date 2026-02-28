@@ -73,7 +73,7 @@
     "pinSet": "Eine Eltern-PIN ist bereits gesetzt.",
     "pinPending": "Neue Eltern-PIN erfasst. Mit \"Anwenden\" speichern.",
     "pinMissing": "Bitte vergib zuerst eine Eltern-PIN.",
-    "pinSetFirst": "Bitte vergib zuerst eine Eltern-PIN.",
+    "pinSetFirst": "Bitte vergib zuerst den Eltern-PIN.",
     "pinSetAction": "Eltern-PIN festlegen",
     "pinChangeAction": "Eltern-PIN ändern",
     "pinDeleteAction": "Eltern-PIN löschen",
