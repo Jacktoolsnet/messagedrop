@@ -17,13 +17,12 @@ Kurzfassung (vereinfacht, nicht rechtsverbindlich)
 - Für DSA-Verfahren kann eine öffentliche Statusseite bereitgestellt werden (mit anonymisierten bzw. nicht personenbezogenen Verfahrensinformationen).
 - Rechtswidrige öffentliche Inhalte können über die Meldefunktion im Dienst oder über die im Impressum genannte Kontaktstelle gemeldet werden.
 - Betroffene Nutzer können bei Moderationsentscheidungen – soweit gesetzlich vorgesehen – eine interne Beschwerde einreichen.
-- Du kannst Kontakten und Plätze folgen. Push-Benachrichtigungen sind technisch „Best Effort“ (also ohne Zustellgarantie).
+- Du kannst Kontakten sowie Plätzen folgen. Push-Benachrichtigungen sind technisch „Best Effort“ (also ohne Zustellgarantie).
 - Private Chats sind als vertrauliche Kommunikation gedacht. Trotzdem musst du auch dort die Gesetze einhalten.
 - Viele Daten werden lokal auf deinem Gerät gespeichert. Diese Daten können verloren gehen. Ohne eigenes Backup ist eine Wiederherstellung nicht möglich.
 - Der optionale Nutzungszeit-Schutz (Selbstbeschränkung/Elternmodus mit Eltern-PIN) kann technisch umgangen werden; eine absolute Sperre ist nicht garantiert.
 - Externe Inhalte von Drittanbietern werden erst nach deiner anbieterbezogenen Zustimmung geladen. Diese Zustimmung kannst du jederzeit wieder zurücknehmen.
 - Externe Dienste (z. B. YouTube, OpenStreetMap, DeepL, Unsplash, Viator) haben eigene Nutzungs- und Datenschutzbedingungen.
-- Missbrauch von Melde- oder Beschwerdefunktionen kann zu Einschränkungen oder Sperren führen.
 - MessageDrop ist kein Notfalldienst.
 
 Maßgeblich ist nur die vollständige Fassung unten.
@@ -62,9 +61,9 @@ Diese Bedingungen gelten für alle Personen, die MessageDrop nutzen – mit oder
 
 Die Nutzung ist nur für Personen ab 16 Jahren erlaubt.
 
-- Unter 16 Jahren: Nutzung nicht erlaubt.
-- 16 bis 17 Jahre: Nutzung nur mit Zustimmung der Eltern oder Erziehungsberechtigten.
-- Ab 18 Jahren: volle Geschäftsfähigkeit.
+- Unter 16 Jahren: Nutzung ist nicht erlaubt.
+- 16 bis 17 Jahre: Nutzung ist nur mit Zustimmung der Eltern oder Erziehungsberechtigten erlaubt.
+- Ab 18 Jahren: volle Geschäftsfähigkeit; die Nutzung ist selbstbestimmt erlaubt.
 
 Erklärungen mit weitergehender rechtlicher Bindung (also über die normale Nutzung hinaus) dürfen nur voll geschäftsfähige Personen abgeben.
 
@@ -81,7 +80,7 @@ MessageDrop ist eine Plattform für:
 
 Datenschutz und Datensparsamkeit sind zentrale Grundsätze von MessageDrop. Wir verfolgen nach Möglichkeit einen „Local-First“-Ansatz: Viele Daten werden primär auf deinem Endgerät gespeichert. Serverseitig verarbeiten wir nur Daten, die für den Betrieb des Dienstes erforderlich sind (z. B. öffentliche Inhalte, pseudonyme Nutzerkennung, öffentliche Schlüssel sowie notwendige Status- und Sicherheitsdaten).
 
-Soweit technisch möglich und sinnvoll, werden Daten kryptografisch geschützt. Dazu gehören insbesondere die PIN-basierte, lokale Absicherung des Nutzerkontos, die verschlüsselte Speicherung sensibler lokaler Daten sowie clientseitig verschlüsselte private Chat-Inhalte. Dein PIN wird ausschließlich lokal verarbeitet und nicht an den Server übertragen.
+Soweit technisch möglich und sinnvoll, werden Daten kryptografisch geschützt. Dazu gehören insbesondere die PIN-basierte, lokale Absicherung des Nutzerkontos, die verschlüsselte Speicherung sensibler lokaler Daten sowie clientseitig verschlüsselte private Chat-Inhalte. Deine PIN wird ausschließlich lokal verarbeitet und nicht an den Server übertragen.
 
 Wir dürfen Funktionen jederzeit anpassen, erweitern, einschränken oder entfernen.
 
@@ -94,7 +93,7 @@ Du kannst MessageDrop grundsätzlich auch ohne Nutzerkonto verwenden.
 Dann gilt insbesondere:
 
 - Es stehen nur Basisfunktionen zur Verfügung.
-- Funktionen für die ein Nutzerkonto benötigt wird (z. B. private Notizen, private Kontaktfunktionen, ortsbezogene Funktionen) können nicht verwendet werden.
+- Funktionen, für die ein Nutzerkonto benötigt wird (z. B. private Notizen, private Kontaktfunktionen, ortsbezogene Funktionen), können nicht verwendet werden.
 
 ###
 6. Nutzung mit Nutzerkonto
@@ -102,14 +101,14 @@ Dann gilt insbesondere:
 
 Wenn du ein Nutzerkonto anlegst:
 
-- bist du für die sichere Nutzung deines Geräts und deines PINs selbst verantwortlich,
+- bist du für die sichere Nutzung deines Geräts und deiner PIN selbst verantwortlich,
 - musst du Missbrauch durch Dritte nach Möglichkeit verhindern,
 - bist du für Aktivitäten über dein Konto verantwortlich, soweit gesetzlich zulässig.
 
-Wenn der PIN verloren geht und kein Backup vorhanden ist, ist ein Zugriff auf dein bisheriges lokales Konto nicht wiederherstellbar.
+Wenn die PIN verloren geht und kein Backup vorhanden ist, ist ein Zugriff auf dein bisheriges lokales Konto nicht wiederherstellbar.
 
 ###
-7. Kontakte, private Chats und Kontakten folgen
+7. Kontakte, private Chats und Folgen von Kontakten
 ###
 
 MessageDrop kann Funktionen für Kontakte und private Kommunikation enthalten.
@@ -123,7 +122,7 @@ Private Chats sind als vertrauliche Kommunikation gedacht. Inhalte werden techni
 Auch in privaten Chats sind rechtswidrige Inhalte, Belästigung, Bedrohungen, Hassrede oder die Weitergabe fremder Daten ohne Erlaubnis verboten.
 
 3) Kontakten folgen  
-Du kannst Kontakten folgen oder das Folgen beenden. Wenn technisch möglich, können Benachrichtigungen über neue Kontakt-Nachrichten gesendet werden.
+Du kannst Kontakten folgen oder das Folgen beenden. Wenn technisch möglich, können Benachrichtigungen über neue Nachrichten von Kontakten gesendet werden.
 
 4) Profilfreigabe bei Kontakten  
 Eine Freigabe von Profilinfos (z. B. Name/Avatar) erfolgt nur nach aktiver Zustimmung. Nach der Übertragung auf das Endgerät eines Kontakts ist ein automatisches „Zurückholen“ technisch nicht möglich.
@@ -177,7 +176,7 @@ Verboten sind insbesondere:
 - Hassrede, Gewaltverherrlichung, extremistische oder menschenverachtende Inhalte,
 - pornografische, sexuell explizite oder jugendgefährdende Inhalte,
 - Inhalte mit sexuellem Bezug zu Minderjährigen,
-- Veröffentlichung oder Verbreitung persönlicher Informationen (personenbezogener Daten) – unabhängig davon, ob sie dich selbst oder andere Personen betreffen.
+- Veröffentlichung oder Verbreitung persönlicher Informationen (personenbezogener Daten), unabhängig davon, ob sie dich selbst oder andere Personen betreffen.
 
 Zu persönlichen Informationen zählen insbesondere:
 - Namen, Kontaktdaten, E-Mail-Adressen, Telefonnummern,
@@ -216,7 +215,7 @@ Möglicherweise rechtswidrige öffentliche Inhalte können gemeldet werden:
 
 Damit eine Prüfung möglich ist, sollte eine Meldung möglichst konkret sein, z. B. mit:
 
-- Link, ID oder anderer eindeutiger Kennung des Inhalts,
+- Link, ID oder einer anderen eindeutigen Kennung des Inhalts,
 - kurzer Begründung, warum der Inhalt rechtswidrig sein könnte,
 - optionalen Nachweisen (z. B. Screenshot oder ergänzende Angaben).
 
@@ -288,20 +287,23 @@ Wir können dir Systemmeldungen anzeigen (z. B. zu DSA-Verfahren, Sicherheit, Wa
 Systemmeldungen:
 
 - werden nur durch autorisierte Systeme erzeugt,
-- können derzeit nicht beantwortet werden,
 - können im Frontend gelöscht werden, ohne dass dadurch zwingend interne Nachweise entfallen.
 
 ###
 13. Externe Inhalte und Drittanbieter
 ###
 
-Für externe Dienste gelten die Nutzungs- und Datenschutzbedingungen der jeweiligen Anbieter. Wir haben auf deren Datenverarbeitung keinen Einfluss. Für Inhalte und Angaben externer Anbieter sind ausschließlich die jeweiligen Anbieter verantwortlich. Wir übernehmen – soweit gesetzlich zulässig – keine Gewähr oder Haftung für deren Richtigkeit, Vollständigkeit, Aktualität oder Verfügbarkeit. MessageDrop nutzt externe Dienste in zwei Gruppen:
+Für externe Dienste gelten die Nutzungs- und Datenschutzbedingungen der jeweiligen Anbieter.
+Wir haben auf deren Datenverarbeitung keinen Einfluss.
+Für Inhalte und Angaben externer Anbieter sind ausschließlich die jeweiligen Anbieter verantwortlich.
+Wir übernehmen – soweit gesetzlich zulässig – keine Gewähr oder Haftung für deren Richtigkeit, Vollständigkeit, Aktualität oder Verfügbarkeit.
+MessageDrop nutzt externe Dienste in zwei Gruppen:
 
 ###
 13.1 Inhalte mit anbieterbezogener Zustimmung (optional)
 ###
 
-Für folgende Anbieter gilt eine anbieterbezogene Einwilligungs-/Freigabeentscheidung im Dienst:
+Für folgende Anbieter gilt eine anbieterbezogene Einwilligungs- bzw. Freigabeentscheidung im Dienst:
 
 - YouTube
 - TikTok
@@ -348,7 +350,7 @@ MessageDrop kann einen optionalen Nutzungszeit-Schutz anbieten:
 - Selbstbeschränkung (z. B. Tageslimit, Zeitfenster),
 - Elternmodus mit Eltern-PIN.
 
-Im Elternmodus wird der Eltern-PIN nur als Hash verarbeitet (nicht als Klartext gespeichert).
+Im Elternmodus wird die Eltern-PIN nur als Hash verarbeitet (nicht als Klartext gespeichert).
 
 Wichtig: Der Schutz basiert auf technischen Rahmenbedingungen des Geräts und lokaler Daten. Eine lückenlose Umgehungssicherheit ist nicht garantiert.
 
@@ -377,6 +379,7 @@ Es kann zu Ausfällen oder Einschränkungen kommen, z. B. durch:
 - Wartung,
 - technische Störungen,
 - Ausfälle externer Dienste,
+- Überlastung durch rechtsmissbräuchliche Nutzung,
 - höhere Gewalt.
 
 ###
@@ -452,7 +455,7 @@ Es gilt deutsches Recht.
 
 Wenn du Verbraucher bist, bleiben zwingende Verbraucherschutzvorschriften deines Wohnsitzstaats unberührt.
 
-Für Kaufleute oder juristische Personen ist – soweit zulässig – unser Sitz Gerichtsstand.
+Für Kaufleute oder juristische Personen ist – soweit zulässig – unser Sitz der Gerichtsstand.
 
 ###
 23. Salvatorische Klausel
