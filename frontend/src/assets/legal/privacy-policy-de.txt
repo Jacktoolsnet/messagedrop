@@ -405,7 +405,7 @@ Systemmeldungen dienen insbesondere der:
 - Mitteilung von Entscheidungen, Verfahrensständen oder Maßnahmen,
 - Information über technische oder organisatorische Vorgänge (z. B. geplante Wartungsarbeiten, sicherheitsrelevante Hinweise oder systembedingte Einschränkungen).
 
-Systemmeldungen sind stets aktiv und können nicht abbestellt werden. Eine direkte Antwortfunktion ist derzeit nicht vorgesehen.
+Systemmeldungen sind stets aktiv und können nicht abbestellt werden.
 
 Im Rahmen der Systemmeldungen verarbeiten wir insbesondere:
 - User-ID,

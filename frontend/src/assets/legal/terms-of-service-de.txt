@@ -404,9 +404,18 @@ Alle Rechte an der App selbst (Software, Design, Marken) liegen bei uns oder uns
 19. Haftung
 ###
 
-Wir haften unbeschränkt nur bei Vorsatz, grober Fahrlässigkeit und bei Schäden an Leben, Körper oder Gesundheit.
+Soweit gesetzlich zulässig, ist unsere Haftung für einfache Fahrlässigkeit ausgeschlossen, es sei denn, es handelt sich um die Verletzung wesentlicher Vertragspflichten (Kardinalpflichten). In diesem Fall ist die Haftung auf den bei Vertragsschluss vorhersehbaren, vertragstypischen Schaden begrenzt.
 
-Im Übrigen ist unsere Haftung im gesetzlich zulässigen Umfang eingeschränkt.
+Wir haften unbeschränkt nur bei:
+- Vorsatz,
+- grober Fahrlässigkeit,
+- Verletzung von Leben, Körper oder Gesundheit,
+- arglistigem Verschweigen eines Mangels,
+- Übernahme einer Garantie,
+- Haftung nach dem Produkthaftungsgesetz,
+- sowie in sonstigen Fällen zwingender gesetzlicher Haftung.
+
+Soweit gesetzlich zulässig, haften wir nicht für mittelbare Schäden, Folgeschäden, entgangenen Gewinn, ausgebliebene Einsparungen oder Datenverlust.
 
 Du nutzt MessageDrop im Rahmen der gesetzlichen Vorgaben und auf eigene Verantwortung.
 
