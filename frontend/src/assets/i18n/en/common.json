@@ -1059,7 +1059,7 @@
       "unlockAction": "Unlock with parent PIN",
       "invalidPin": "Enter a valid PIN with 4 to 12 digits.",
       "unlockFailed": "PIN verification failed.",
-      "selfExtensionUnavailable": "Self extension is currently not available."
+      "selfExtensionUnavailable": "Self extension is currently not available or no extensions remain for today."
     },
     "location": {
       "locatingTitle": "Locating you",

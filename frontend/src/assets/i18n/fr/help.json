@@ -532,11 +532,11 @@
       },
       "selfExtension": {
         "title": "Extension autonome",
-        "desc": "En mode autogéré, une extension supplémentaire peut être activée après la limite quotidienne."
+        "desc": "En mode autogéré, des extensions peuvent être activées après la limite quotidienne, jusqu'au nombre configuré par jour."
       },
       "parentPin": {
         "title": "Déverrouiller avec PIN parental",
-        "desc": "En mode parental, seul un PIN parental valide déverrouille l'usage après la limite quotidienne."
+        "desc": "En mode parental, un PIN parental valide déverrouille l'usage après la limite quotidienne, jusqu'au nombre configuré par jour."
       },
       "settings": {
         "title": "Ouvrir la protection d'usage",

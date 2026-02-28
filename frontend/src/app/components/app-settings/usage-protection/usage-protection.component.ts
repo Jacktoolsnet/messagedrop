@@ -84,9 +84,15 @@ export class UsageProtectionComponent implements OnInit {
   readonly usageSelfExtensionMin = 0;
   readonly usageSelfExtensionMax = 120;
   readonly usageSelfExtensionStep = 1;
+  readonly usageSelfExtensionCountMin = 0;
+  readonly usageSelfExtensionCountMax = 20;
+  readonly usageSelfExtensionCountStep = 1;
   readonly usageParentalExtensionMin = 1;
   readonly usageParentalExtensionMax = 240;
   readonly usageParentalExtensionStep = 1;
+  readonly usageParentalExtensionCountMin = 0;
+  readonly usageParentalExtensionCountMax = 20;
+  readonly usageParentalExtensionCountStep = 1;
   readonly usageScheduleDays = [...USAGE_PROTECTION_DAY_KEYS];
   private readonly defaultDailyWindows = createDefaultUsageProtectionDailyWindows();
   usageTimePickerModel: UsageTimePickerModel = this.createUsageTimePickerModel(this.defaultDailyWindows);
@@ -257,6 +263,19 @@ export class UsageProtectionComponent implements OnInit {
     };
   }
 
+  setUsageSelfExtensionMaxCount(value: number): void {
+    if (!this.canEditUsageProtectionValues()) {
+      return;
+    }
+    this.appSettings = {
+      ...this.appSettings,
+      usageProtection: {
+        ...this.appSettings.usageProtection,
+        selfExtensionMaxCount: this.clampInteger(value, 0, 20, 1)
+      }
+    };
+  }
+
   setUsageParentalExtensionMinutes(value: number): void {
     if (!this.canEditUsageProtectionValues()) {
       return;
@@ -266,6 +285,19 @@ export class UsageProtectionComponent implements OnInit {
       usageProtection: {
         ...this.appSettings.usageProtection,
         parentalExtensionMinutes: this.clampInteger(value, 1, 240, 5)
+      }
+    };
+  }
+
+  setUsageParentalExtensionMaxCount(value: number): void {
+    if (!this.canEditUsageProtectionValues()) {
+      return;
+    }
+    this.appSettings = {
+      ...this.appSettings,
+      usageProtection: {
+        ...this.appSettings.usageProtection,
+        parentalExtensionMaxCount: this.clampInteger(value, 0, 20, 20)
       }
     };
   }
@@ -292,6 +324,17 @@ export class UsageProtectionComponent implements OnInit {
     }, value => this.setUsageSelfExtensionMinutes(value));
   }
 
+  async openUsageSelfExtensionCountEditor(): Promise<void> {
+    await this.openUsageValueEditor({
+      title: this.translation.t('settings.usageProtection.selfExtensionCount'),
+      label: this.translation.t('settings.usageProtection.selfExtensionCount'),
+      minBound: this.usageSelfExtensionCountMin,
+      maxBound: this.usageSelfExtensionCountMax,
+      step: this.usageSelfExtensionCountStep,
+      value: this.appSettings.usageProtection.selfExtensionMaxCount
+    }, value => this.setUsageSelfExtensionMaxCount(value));
+  }
+
   async openUsageParentalExtensionEditor(): Promise<void> {
     await this.openUsageValueEditor({
       title: this.translation.t('settings.usageProtection.parentalExtension'),
@@ -301,6 +344,17 @@ export class UsageProtectionComponent implements OnInit {
       step: this.usageParentalExtensionStep,
       value: this.appSettings.usageProtection.parentalExtensionMinutes
     }, value => this.setUsageParentalExtensionMinutes(value));
+  }
+
+  async openUsageParentalExtensionCountEditor(): Promise<void> {
+    await this.openUsageValueEditor({
+      title: this.translation.t('settings.usageProtection.parentalExtensionCount'),
+      label: this.translation.t('settings.usageProtection.parentalExtensionCount'),
+      minBound: this.usageParentalExtensionCountMin,
+      maxBound: this.usageParentalExtensionCountMax,
+      step: this.usageParentalExtensionCountStep,
+      value: this.appSettings.usageProtection.parentalExtensionMaxCount
+    }, value => this.setUsageParentalExtensionMaxCount(value));
   }
 
   getUsageDayStartDate(day: UsageProtectionDayKey): Date {
@@ -416,7 +470,9 @@ export class UsageProtectionComponent implements OnInit {
       ...settings,
       dailyLimitMinutes: this.clampInteger(settings.dailyLimitMinutes, 5, 720, 60),
       selfExtensionMinutes: this.clampInteger(settings.selfExtensionMinutes, 0, 120, 5),
+      selfExtensionMaxCount: this.clampInteger(settings.selfExtensionMaxCount, 0, 20, 1),
       parentalExtensionMinutes: this.clampInteger(settings.parentalExtensionMinutes, 1, 240, 5),
+      parentalExtensionMaxCount: this.clampInteger(settings.parentalExtensionMaxCount, 0, 20, 20),
       dailyWindows: this.normalizeDailyWindows(settings.dailyWindows, settings)
     };
 

@@ -532,11 +532,11 @@
       },
       "selfExtension": {
         "title": "Ampliación propia",
-        "desc": "En modo de autogestión, se puede activar una ampliación adicional tras alcanzar el límite diario."
+        "desc": "En modo de autogestión, se pueden activar ampliaciones tras alcanzar el límite diario, hasta la cantidad configurada por día."
       },
       "parentPin": {
         "title": "Desbloquear con PIN parental",
-        "desc": "En modo parental, solo un PIN parental válido desbloquea el uso tras el límite diario."
+        "desc": "En modo parental, un PIN parental válido desbloquea el uso tras el límite diario, hasta la cantidad configurada por día."
       },
       "settings": {
         "title": "Abrir protección de uso",

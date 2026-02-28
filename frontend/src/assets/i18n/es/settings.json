@@ -41,7 +41,7 @@
   "usageProtection": {
     "title": "Protección de uso",
     "description": "Define límites diarios y franjas horarias permitidas.",
-    "note": "Usa esta función para reducir el tiempo de pantalla. En modo autónomo se permite una ampliación adicional por día. En modo parental se requiere un PIN cuando se alcanza el límite.",
+    "note": "Usa esta función para reducir el tiempo de pantalla. Puedes definir tanto la duración como la cantidad de ampliaciones por día para el modo autónomo y el modo parental.",
     "modeLabel": "Modo de protección",
     "mode": {
       "off": "Desactivado",
@@ -50,7 +50,9 @@
     },
     "dailyLimit": "Límite diario (minutos)",
     "selfExtension": "Ampliación propia (minutos)",
+    "selfExtensionCount": "Ampliaciones propias por día",
     "parentalExtension": "Ampliación parental (minutos)",
+    "parentalExtensionCount": "Ampliaciones parentales por día",
     "scheduleToggle": "Limitar a franjas horarias permitidas",
     "scheduleByDay": "Franjas horarias permitidas por día",
     "startLabel": "Inicio",

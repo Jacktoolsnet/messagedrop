@@ -532,11 +532,11 @@
       },
       "selfExtension": {
         "title": "Selbstverlängerung",
-        "desc": "Im Selbstmodus kann nach Erreichen des Tageslimits einmalig eine Verlängerung aktiviert werden."
+        "desc": "Im Selbstmodus können nach Erreichen des Tageslimits Verlängerungen bis zur eingestellten Anzahl pro Tag aktiviert werden."
       },
       "parentPin": {
         "title": "Mit Eltern-PIN entsperren",
-        "desc": "Im Elternmodus entsperrt nach dem Tageslimit nur eine gültige Eltern-PIN die Nutzung."
+        "desc": "Im Elternmodus entsperrt nach dem Tageslimit eine gültige Eltern-PIN die Nutzung – bis zur eingestellten Anzahl pro Tag."
       },
       "settings": {
         "title": "Nutzungszeit-Schutz öffnen",

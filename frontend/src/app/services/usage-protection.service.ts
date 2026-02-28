@@ -86,12 +86,20 @@ export class UsageProtectionService {
       return false;
     }
     const state = this.getStateForDate(this.stateSignal(), getLocalDateKey(new Date(this.nowSignal())));
-    return !state.selfExtensionUsed && settings.selfExtensionMinutes > 0;
+    return settings.selfExtensionMinutes > 0
+      && settings.selfExtensionMaxCount > 0
+      && state.selfExtensionsUsed < settings.selfExtensionMaxCount;
   });
 
   readonly requiresParentPin = computed(() => {
     const settings = this.settingsSignal();
-    return settings.mode === 'parental' && this.lockReason() === 'daily_limit' && Boolean(settings.parentPinHash);
+    if (settings.mode !== 'parental' || this.lockReason() !== 'daily_limit' || !settings.parentPinHash) {
+      return false;
+    }
+    const state = this.getStateForDate(this.stateSignal(), getLocalDateKey(new Date(this.nowSignal())));
+    return settings.parentalExtensionMinutes > 0
+      && settings.parentalExtensionMaxCount > 0
+      && state.parentalExtensionsUsed < settings.parentalExtensionMaxCount;
   });
 
   readonly remainingSeconds = computed<number | null>(() => {
@@ -174,7 +182,14 @@ export class UsageProtectionService {
     if (!this.canUseSelfExtension()) {
       return false;
     }
-    this.stateSignal.update((state) => ({ ...state, selfExtensionUsed: true }));
+    const today = getLocalDateKey(new Date(this.nowSignal()));
+    this.stateSignal.update((state) => {
+      const current = this.getStateForDate(state, today);
+      return {
+        ...current,
+        selfExtensionsUsed: current.selfExtensionsUsed + 1
+      };
+    });
     this.pendingPersistTicks = 5;
     void this.persistState();
     return true;
@@ -185,17 +200,25 @@ export class UsageProtectionService {
     if (settings.mode !== 'parental' || !settings.parentPinHash) {
       return false;
     }
+    const today = getLocalDateKey(new Date(this.nowSignal()));
+    const state = this.getStateForDate(this.stateSignal(), today);
+    if (settings.parentalExtensionMinutes <= 0
+      || settings.parentalExtensionMaxCount <= 0
+      || state.parentalExtensionsUsed >= settings.parentalExtensionMaxCount
+      || this.lockReason() !== 'daily_limit') {
+      return false;
+    }
     const hash = await this.hashPin(pin);
     if (!hash || hash !== settings.parentPinHash) {
       return false;
     }
-    const extensionSeconds = Math.max(0, settings.parentalExtensionMinutes) * 60;
-    this.stateSignal.update((state) => ({
-      ...state,
-      consumedSeconds: Math.max(0, state.consumedSeconds - extensionSeconds),
-      selfExtensionUsed: false,
-      dateKey: getLocalDateKey(new Date(this.nowSignal()))
-    }));
+    this.stateSignal.update((currentState) => {
+      const current = this.getStateForDate(currentState, today);
+      return {
+        ...current,
+        parentalExtensionsUsed: current.parentalExtensionsUsed + 1
+      };
+    });
     this.pendingPersistTicks = 5;
     await this.persistState();
     return true;
@@ -253,7 +276,10 @@ export class UsageProtectionService {
       nextState = { ...nextState, consumedSeconds: nextState.consumedSeconds + 1 };
     }
 
-    if (changedByDate || nextState.consumedSeconds !== current.consumedSeconds || nextState.selfExtensionUsed !== current.selfExtensionUsed) {
+    if (changedByDate
+      || nextState.consumedSeconds !== current.consumedSeconds
+      || nextState.selfExtensionsUsed !== current.selfExtensionsUsed
+      || nextState.parentalExtensionsUsed !== current.parentalExtensionsUsed) {
       this.stateSignal.set(nextState);
       this.pendingPersistTicks += 1;
     }
@@ -334,7 +360,9 @@ export class UsageProtectionService {
     const mode = this.normalizeMode(raw?.['mode']);
     const dailyLimitMinutes = this.clampInt(raw?.['dailyLimitMinutes'], 5, 720, DEFAULT_USAGE_PROTECTION_SETTINGS.dailyLimitMinutes);
     const selfExtensionMinutes = this.clampInt(raw?.['selfExtensionMinutes'], 0, 120, DEFAULT_USAGE_PROTECTION_SETTINGS.selfExtensionMinutes);
+    const selfExtensionMaxCount = this.clampInt(raw?.['selfExtensionMaxCount'], 0, 20, DEFAULT_USAGE_PROTECTION_SETTINGS.selfExtensionMaxCount);
     const parentalExtensionMinutes = this.clampInt(raw?.['parentalExtensionMinutes'], 1, 240, DEFAULT_USAGE_PROTECTION_SETTINGS.parentalExtensionMinutes);
+    const parentalExtensionMaxCount = this.clampInt(raw?.['parentalExtensionMaxCount'], 0, 20, DEFAULT_USAGE_PROTECTION_SETTINGS.parentalExtensionMaxCount);
     const scheduleEnabled = Boolean(raw?.['scheduleEnabled']);
     const dailyWindows = this.normalizeDailyWindows(raw);
     const parentPinHash = typeof raw?.['parentPinHash'] === 'string' ? raw['parentPinHash'] : undefined;
@@ -342,7 +370,9 @@ export class UsageProtectionService {
       mode,
       dailyLimitMinutes,
       selfExtensionMinutes,
+      selfExtensionMaxCount,
       parentalExtensionMinutes,
+      parentalExtensionMaxCount,
       scheduleEnabled,
       dailyWindows,
       parentPinHash
@@ -362,8 +392,14 @@ export class UsageProtectionService {
       ? raw['dateKey']
       : getLocalDateKey();
     const consumedSeconds = this.clampInt(raw?.['consumedSeconds'], 0, 86400, 0);
-    const selfExtensionUsed = Boolean(raw?.['selfExtensionUsed']);
-    return { dateKey, consumedSeconds, selfExtensionUsed };
+    const selfExtensionsUsed = this.clampInt(
+      raw?.['selfExtensionsUsed'],
+      0,
+      20,
+      raw?.['selfExtensionUsed'] ? 1 : 0
+    );
+    const parentalExtensionsUsed = this.clampInt(raw?.['parentalExtensionsUsed'], 0, 20, 0);
+    return { dateKey, consumedSeconds, selfExtensionsUsed, parentalExtensionsUsed };
   }
 
   private getStateForDate(state: UsageProtectionState, dateKey: string): UsageProtectionState {
@@ -373,7 +409,8 @@ export class UsageProtectionService {
     return {
       dateKey,
       consumedSeconds: 0,
-      selfExtensionUsed: false
+      selfExtensionsUsed: 0,
+      parentalExtensionsUsed: 0
     };
   }
 
@@ -381,14 +418,26 @@ export class UsageProtectionService {
     return {
       dateKey: localState.dateKey,
       consumedSeconds: Math.max(localState.consumedSeconds, remoteState.consumedSeconds),
-      selfExtensionUsed: localState.selfExtensionUsed || remoteState.selfExtensionUsed
+      selfExtensionsUsed: Math.max(localState.selfExtensionsUsed, remoteState.selfExtensionsUsed),
+      parentalExtensionsUsed: Math.max(localState.parentalExtensionsUsed, remoteState.parentalExtensionsUsed)
     };
   }
 
   private getDailyLimitSeconds(settings: UsageProtectionSettings, state: UsageProtectionState): number {
     const base = settings.dailyLimitMinutes * 60;
-    if (settings.mode === 'self' && state.selfExtensionUsed) {
-      return base + (settings.selfExtensionMinutes * 60);
+    if (settings.mode === 'self') {
+      const appliedSelfExtensions = Math.min(
+        Math.max(0, state.selfExtensionsUsed),
+        Math.max(0, settings.selfExtensionMaxCount)
+      );
+      return base + (appliedSelfExtensions * settings.selfExtensionMinutes * 60);
+    }
+    if (settings.mode === 'parental') {
+      const appliedParentalExtensions = Math.min(
+        Math.max(0, state.parentalExtensionsUsed),
+        Math.max(0, settings.parentalExtensionMaxCount)
+      );
+      return base + (appliedParentalExtensions * settings.parentalExtensionMinutes * 60);
     }
     return base;
   }

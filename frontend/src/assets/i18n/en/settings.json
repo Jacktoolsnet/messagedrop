@@ -41,7 +41,7 @@
   "usageProtection": {
     "title": "Usage protection",
     "description": "Set daily limits and time windows for app usage.",
-    "note": "Use this feature to reduce screen time. In self mode one extra extension is allowed per day. In parental mode a PIN is required once the limit is reached.",
+    "note": "Use this feature to reduce screen time. You can set both the extension duration and how many extensions are allowed per day for self and parental mode.",
     "modeLabel": "Usage mode",
     "mode": {
       "off": "Off",
@@ -50,7 +50,9 @@
     },
     "dailyLimit": "Daily limit (minutes)",
     "selfExtension": "Self extension (minutes)",
+    "selfExtensionCount": "Self extensions per day",
     "parentalExtension": "Parent extension (minutes)",
+    "parentalExtensionCount": "Parent extensions per day",
     "scheduleToggle": "Limit to allowed time windows",
     "scheduleByDay": "Allowed time windows per day",
     "startLabel": "Start",

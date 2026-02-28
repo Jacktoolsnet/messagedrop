@@ -1059,7 +1059,7 @@
       "unlockAction": "Mit Eltern-PIN entsperren",
       "invalidPin": "Bitte gib eine gültige PIN mit 4 bis 12 Ziffern ein.",
       "unlockFailed": "PIN-Prüfung fehlgeschlagen.",
-      "selfExtensionUnavailable": "Die Selbstverlängerung ist aktuell nicht verfügbar."
+      "selfExtensionUnavailable": "Die Selbstverlängerung ist aktuell nicht verfügbar oder für heute bereits ausgeschöpft."
     },
     "location": {
       "locatingTitle": "Standort wird ermittelt",

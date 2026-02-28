@@ -41,7 +41,7 @@
   "usageProtection": {
     "title": "Nutzungszeit-Schutz",
     "description": "Lege tägliche Limits und erlaubte Zeitfenster fest.",
-    "note": "Mit dieser Funktion reduzierst du die Bildschirmzeit. Im Selbstmodus ist pro Tag eine zusätzliche Verlängerung möglich. Im Elternmodus ist nach Erreichen des Limits eine PIN erforderlich.",
+    "note": "Mit dieser Funktion reduzierst du die Bildschirmzeit. Du kannst für Selbstmodus und Elternmodus sowohl die Dauer als auch die Anzahl der Verlängerungen pro Tag festlegen.",
     "modeLabel": "Schutzmodus",
     "mode": {
       "off": "Aus",
@@ -50,7 +50,9 @@
     },
     "dailyLimit": "Tageslimit (Minuten)",
     "selfExtension": "Selbstverlängerung (Minuten)",
+    "selfExtensionCount": "Selbstverlängerungen pro Tag",
     "parentalExtension": "Eltern-Verlängerung (Minuten)",
+    "parentalExtensionCount": "Eltern-Verlängerungen pro Tag",
     "scheduleToggle": "Auf erlaubte Zeitfenster begrenzen",
     "scheduleByDay": "Erlaubte Zeitfenster pro Wochentag",
     "startLabel": "Start",

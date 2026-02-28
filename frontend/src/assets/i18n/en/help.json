@@ -532,11 +532,11 @@
       },
       "selfExtension": {
         "title": "Self extension",
-        "desc": "In self-managed mode, one additional extension can be activated after the daily limit is reached."
+        "desc": "In self-managed mode, extensions can be activated after the daily limit is reached, up to the configured daily count."
       },
       "parentPin": {
         "title": "Unlock with parent PIN",
-        "desc": "In parental mode, only a valid parent PIN unlocks usage after the daily limit."
+        "desc": "In parental mode, a valid parent PIN unlocks usage after the daily limit, up to the configured daily count."
       },
       "settings": {
         "title": "Open usage protection",

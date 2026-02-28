@@ -29,7 +29,9 @@ export interface UsageProtectionSettings {
   mode: UsageProtectionMode;
   dailyLimitMinutes: number;
   selfExtensionMinutes: number;
+  selfExtensionMaxCount: number;
   parentalExtensionMinutes: number;
+  parentalExtensionMaxCount: number;
   scheduleEnabled: boolean;
   dailyWindows: UsageProtectionDailyWindows;
   // Legacy fields for migration of older persisted/server payloads.
@@ -43,7 +45,10 @@ export interface UsageProtectionSettings {
 export interface UsageProtectionState {
   dateKey: string;
   consumedSeconds: number;
-  selfExtensionUsed: boolean;
+  selfExtensionsUsed: number;
+  parentalExtensionsUsed: number;
+  // Legacy field for migration of older persisted/server payloads.
+  selfExtensionUsed?: boolean;
 }
 
 export interface UsageProtectionServerPayload {
@@ -67,7 +72,9 @@ export const DEFAULT_USAGE_PROTECTION_SETTINGS: UsageProtectionSettings = {
   mode: 'off',
   dailyLimitMinutes: 60,
   selfExtensionMinutes: 5,
+  selfExtensionMaxCount: 1,
   parentalExtensionMinutes: 5,
+  parentalExtensionMaxCount: 20,
   scheduleEnabled: false,
   dailyWindows: createDefaultUsageProtectionDailyWindows()
 };
@@ -76,7 +83,8 @@ export function createDefaultUsageProtectionState(dateKey = getLocalDateKey()): 
   return {
     dateKey,
     consumedSeconds: 0,
-    selfExtensionUsed: false
+    selfExtensionsUsed: 0,
+    parentalExtensionsUsed: 0
   };
 }
 

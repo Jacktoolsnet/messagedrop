@@ -1059,7 +1059,7 @@
       "unlockAction": "Déverrouiller avec le PIN parental",
       "invalidPin": "Saisissez un PIN valide de 4 à 12 chiffres.",
       "unlockFailed": "La vérification du PIN a échoué.",
-      "selfExtensionUnavailable": "L'extension autonome n'est pas disponible actuellement."
+      "selfExtensionUnavailable": "L'extension autonome n'est pas disponible actuellement ou le quota du jour est déjà atteint."
     },
     "location": {
       "locatingTitle": "Localisation en cours",
