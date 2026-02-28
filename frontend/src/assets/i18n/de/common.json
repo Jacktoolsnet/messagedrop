@@ -474,6 +474,7 @@
       }
     },
     "pin": {
+      "title": "PIN",
       "enterTitle": "PIN eingeben",
       "enterHint": "Bitte gib deine aktuelle PIN ein.",
       "createTitle": "PIN erstellen",
