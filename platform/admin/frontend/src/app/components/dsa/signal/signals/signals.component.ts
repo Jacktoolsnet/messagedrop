@@ -27,6 +27,7 @@ import { ConfirmDialogComponent } from '../../../shared/confirm-dialog.component
 import { SignalDetailComponent } from '../signal-detail/signal-detail.component';
 
 type SignalStatusFilter = 'open' | 'dismissed';
+type SignalRangeFilter = '24h' | '7d' | '30d' | 'all';
 
 @Component({
   selector: 'app-dsa-signals',
@@ -105,6 +106,7 @@ export class SignalsComponent implements OnInit, OnDestroy {
   get username() { return this.auth.username; }
   get role() { return this.auth.role; }
   readonly signalStatuses: SignalStatusFilter[] = ['open', 'dismissed'];
+  readonly ranges: SignalRangeFilter[] = ['24h', '7d', '30d', 'all'];
 
   // Filter-Form (type/category/search + Zeitraum)
   readonly filterForm = this.fb.nonNullable.group({
@@ -112,7 +114,7 @@ export class SignalsComponent implements OnInit, OnDestroy {
     type: [''],
     category: [''],
     q: [''],
-    range: ['all'] as ('24h' | '7d' | '30d' | 'all')[]
+    range: ['all' as SignalRangeFilter]
   });
 
   // Data
@@ -175,7 +177,7 @@ export class SignalsComponent implements OnInit, OnDestroy {
     }
   }
 
-  reload(overrides?: { status?: SignalStatusFilter; range?: '24h' | '7d' | '30d' | 'all' }) {
+  reload(overrides?: { status?: SignalStatusFilter; range?: SignalRangeFilter }) {
     const f = this.filterForm.value;
     const status = overrides?.status ?? f.status ?? 'open';
     const range = overrides?.range ?? f.range ?? 'all';
@@ -215,6 +217,24 @@ export class SignalsComponent implements OnInit, OnDestroy {
   statusLabel(status: SignalStatusFilter): string {
     if (status === 'dismissed') return 'Dismissed';
     return 'Open';
+  }
+
+  rangeFilter(): SignalRangeFilter {
+    return this.filterForm.controls.range.value;
+  }
+
+  setRange(range: SignalRangeFilter | null): void {
+    if (!range) return;
+    const control = this.filterForm.controls.range;
+    if (control.value === range) return;
+    control.setValue(range);
+  }
+
+  rangeLabel(range: SignalRangeFilter): string {
+    if (range === '24h') return '24h';
+    if (range === '7d') return '7d';
+    if (range === '30d') return '30d';
+    return 'All';
   }
 
   isNew(s: DsaSignal) {

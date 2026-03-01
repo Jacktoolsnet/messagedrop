@@ -13,6 +13,12 @@
             }
         </mat-button-toggle-group>
 
+        <mat-button-toggle-group class="range-toggle" [value]="rangeFilter()" (valueChange)="setRange($event)">
+            @for (range of ranges; track range) {
+            <mat-button-toggle [value]="range">{{ rangeLabel(range) }}</mat-button-toggle>
+            }
+        </mat-button-toggle-group>
+
         <button mat-stroked-button (click)="reload()">
             <mat-icon>refresh</mat-icon>
             Refresh
@@ -29,6 +35,14 @@
             <button mat-menu-item (click)="setStatus(status)">
                 <mat-icon>{{ statusFilter() === status ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
                 <span>{{ statusLabel(status) }}</span>
+            </button>
+            }
+            <mat-divider></mat-divider>
+            <button mat-menu-item disabled>Range</button>
+            @for (range of ranges; track range) {
+            <button mat-menu-item (click)="setRange(range)">
+                <mat-icon>{{ rangeFilter() === range ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
+                <span>{{ rangeLabel(range) }}</span>
             </button>
             }
             <mat-divider></mat-divider>
