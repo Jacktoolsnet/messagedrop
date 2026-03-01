@@ -69,7 +69,7 @@ export class DsaDashboardComponent {
 
   // Kacheln
   tiles: DsaTile[] = [
-    { key: 'signals', title: 'Signals', subtitle: 'Incoming signals (24h)', icon: 'info', route: '/dashboard/dsa/signals' },
+    { key: 'signals', title: 'Signals', subtitle: 'Open signals', icon: 'info', route: '/dashboard/dsa/signals' },
     { key: 'notices', title: 'Notices', subtitle: 'Incoming reports', icon: 'report_problem', route: '/dashboard/dsa/notices' },
     { key: 'decisions', title: 'Decisions', subtitle: 'Review & decide', icon: 'gavel', route: '/dashboard/dsa/decisions' },
     { key: 'evidence', title: 'Evidence', subtitle: 'Upload & manage proofs', icon: 'folder_shared', route: '/dashboard/dsa/evidence' },
@@ -83,8 +83,8 @@ export class DsaDashboardComponent {
   badgeCount = (tile: DsaTile) => {
     switch (tile.key) {
       case 'signals':
-        // Anzahl der letzten 24h
-        return this.signalStats()?.last24h ?? 0;
+        // offene (nicht bearbeitete) Signals
+        return this.signalStats()?.total ?? 0;
       case 'notices':
         // offene = alles außer DECIDED
         return this.noticeStats()?.open ?? 0;

@@ -66,6 +66,7 @@ export class NoticesComponent implements OnInit, OnDestroy {
   protected loading = signal(false);
   protected notices = signal<DsaNotice[]>([]);
   protected statuses = DSA_NOTICE_STATUSES;
+  protected readonly ranges: DsaNoticeRange[] = ['24h', '7d', '30d', 'all'];
 
   // „Offene“ Stati = Arbeitsvorrat
   /** Filter-Form – Status (multi), Type, Category, Q, Range */
@@ -83,15 +84,31 @@ export class NoticesComponent implements OnInit, OnDestroy {
     // Initial laden
     this.load();
 
-    // Filter-Änderungen beobachten
-    const sub = this.filterForm.valueChanges
+    // Status sofort anwenden
+    const statusSub = this.filterForm.controls.status.valueChanges
+      .pipe(distinctUntilChanged())
+      .subscribe(() => this.load());
+    this.subs.push(statusSub);
+
+    // Dauer sofort anwenden
+    const rangeSub = this.filterForm.controls.range.valueChanges
+      .pipe(distinctUntilChanged())
+      .subscribe(() => this.load());
+    this.subs.push(rangeSub);
+
+    // Text-/Typ-Filter mit Debounce
+    const textSub = this.filterForm.valueChanges
       .pipe(
         debounceTime(250),
-        map(v => JSON.stringify(v)),
+        map(v => JSON.stringify({
+          reportedContentType: v.reportedContentType ?? '',
+          category: v.category ?? '',
+          q: v.q ?? ''
+        })),
         distinctUntilChanged()
       )
       .subscribe(() => this.load());
-    this.subs.push(sub);
+    this.subs.push(textSub);
   }
 
   ngOnDestroy(): void {
@@ -130,11 +147,29 @@ export class NoticesComponent implements OnInit, OnDestroy {
     return this.filterForm.controls.status.value;
   }
 
+  rangeFilter(): DsaNoticeRange {
+    return this.filterForm.controls.range.value;
+  }
+
   setStatus(status: DsaNoticeStatus | null): void {
     if (!status) return;
     const control = this.filterForm.controls.status;
     if (control.value === status) return;
     control.setValue(status);
+  }
+
+  setRange(range: DsaNoticeRange | null): void {
+    if (!range) return;
+    const control = this.filterForm.controls.range;
+    if (control.value === range) return;
+    control.setValue(range);
+  }
+
+  rangeLabel(range: DsaNoticeRange): string {
+    if (range === '24h') return '24h';
+    if (range === '7d') return '7d';
+    if (range === '30d') return '30d';
+    return 'All';
   }
 
   /** Detail öffnen (Dialog – Placeholder; Komponente liefern wir im nächsten Schritt) */

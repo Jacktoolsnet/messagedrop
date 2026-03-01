@@ -104,7 +104,7 @@ export class SignalsComponent {
     type: [''],
     category: [''],
     q: [''],
-    range: ['7d'] as ('24h' | '7d' | '30d' | 'all')[]
+    range: ['all'] as ('24h' | '7d' | '30d' | 'all')[]
   });
 
   // Data

@@ -45,14 +45,16 @@ export class AdminDashboardComponent implements OnInit {
   readonly powCountToday = signal<number | null>(null);
   readonly moderationCountPending = signal<number | null>(null);
 
-  readonly dsaOpenCount = computed(() => {
-    const noticesOpen = this.dsaService.noticeStats()?.open ?? 0;
+  readonly dsaTodoCount = computed(() => {
+    const noticeStats = this.dsaService.noticeStats();
     const signalsOpen = this.dsaService.signalStats()?.total ?? 0;
-    return noticesOpen + signalsOpen;
+    const noticesNew = noticeStats?.byStatus?.['RECEIVED'] ?? 0;
+    const noticesInWork = noticeStats?.byStatus?.['UNDER_REVIEW'] ?? 0;
+    return noticesNew + noticesInWork + signalsOpen;
   });
 
-  readonly dsaOpenBadge = computed(() => {
-    const total = this.dsaOpenCount();
+  readonly dsaTodoBadge = computed(() => {
+    const total = this.dsaTodoCount();
     if (total <= 0) return '';
     return total >= 10 ? '10+' : String(total);
   });
