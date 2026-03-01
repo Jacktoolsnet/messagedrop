@@ -4,19 +4,23 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
-const axios = require('axios');
 const { rateLimit, ipKeyGenerator } = require('express-rate-limit');
 
 const tableUser = require('../db/tableUser');
 const tableLoginOtp = require('../db/tableLoginOtp');
 const { requireAdminJwt, requireRole } = require('../middleware/security');
 const { apiError } = require('../middleware/api-error');
+const { sendMail } = require('../utils/mailer');
+const { sendPushbulletNotification } = require('../utils/pushbullet');
 
 const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET;
 const ADMIN_ISS = process.env.ADMIN_ISS || 'https://admin-auth.messagedrop.app/';
 const ADMIN_AUD = process.env.ADMIN_AUD || 'messagedrop-admin';
 const OTP_TTL_MS = Number(process.env.ADMIN_OTP_TTL_MS || 5 * 60 * 1000);
 const OTP_LENGTH = 6;
+const ADMIN_ROOT_EMAIL = process.env.ADMIN_ROOT_EMAIL || process.env.MAIL_ADDRESS || process.env.MAIL_USER || '';
+const OTP_PUSH_REQUIRED = !['0', 'false', 'no', 'off'].includes(String(process.env.ADMIN_OTP_PUSH_REQUIRED || 'true').trim().toLowerCase());
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const rateLimitMessage = (message) => ({
     errorCode: 'RATE_LIMIT',
@@ -28,6 +32,9 @@ const toNumber = (value, fallback) => {
     const parsed = Number(value);
     return Number.isFinite(parsed) ? parsed : fallback;
 };
+
+const normalizeEmail = (value) => (typeof value === 'string' ? value.trim().toLowerCase() : '');
+const isValidEmail = (value) => EMAIL_REGEX.test(normalizeEmail(value));
 
 const LOGIN_WINDOW_MS = toNumber(process.env.ADMIN_LOGIN_LIMIT_WINDOW_MS, 10 * 60 * 1000);
 const LOGIN_LIMIT = toNumber(process.env.ADMIN_LOGIN_LIMIT, 10);
@@ -123,31 +130,8 @@ const verifySlowdown = createSlowdown({
 });
 
 // Helpers
-const stripUser = (u) => u && ({ id: u.id, username: u.username, role: u.role, createdAt: u.createdAt });
+const stripUser = (u) => u && ({ id: u.id, username: u.username, email: u.email || '', role: u.role, createdAt: u.createdAt });
 const isAdminOrRoot = (roles) => (Array.isArray(roles) ? roles : []).some(r => r === 'admin' || r === 'root');
-
-const getMakeConfig = () => ({
-    url: process.env.MAKE_PUSHBULLET_WEBHOOK_URL,
-    apiKey: process.env.MAKE_API_KEY
-});
-
-async function sendMakePush(title, text, { logger, strict } = { strict: false }) {
-    const { url, apiKey } = getMakeConfig();
-    if (!url || !apiKey) {
-        if (strict) throw new Error('MAKE_PUSHBULLET_WEBHOOK_URL/MAKE_API_KEY missing');
-        return;
-    }
-    try {
-        await axios.post(url, { title, text }, {
-            headers: { 'x-make-apikey': apiKey },
-            timeout: 4000,
-            validateStatus: () => true
-        });
-    } catch (err) {
-        logger?.warn?.('Pushbullet notify failed', { error: err?.message });
-        if (strict) throw err;
-    }
-}
 
 const hashOtp = (otp) => {
     const salt = process.env.ADMIN_OTP_SECRET || ADMIN_JWT_SECRET || '';
@@ -158,23 +142,49 @@ const generateOtp = () => {
     return String(Math.floor(Math.random() * 10 ** OTP_LENGTH)).padStart(OTP_LENGTH, '0');
 };
 
-async function sendOtp(username, otp, logger) {
-    const title = 'Messagedrop Admin Login';
-    const text = `Code: ${otp}\nUser: ${username}\nGültig für ${Math.round(OTP_TTL_MS / 60000)} Minuten.`;
+async function sendOtp(username, email, otp, logger) {
+    const validMinutes = Math.round(OTP_TTL_MS / 60000);
+    const title = 'Messagedrop Admin Login OTP';
+    const text = `Code: ${otp}\nUser: ${username}\nE-Mail: ${email}\nGültig für ${validMinutes} Minuten.`;
+    const html = `
+      <p>Hallo ${username},</p>
+      <p>dein Messagedrop Admin Login-Code lautet: <strong>${otp}</strong></p>
+      <p>Der Code ist ${validMinutes} Minuten gültig.</p>
+      <p>Falls du den Login nicht angefordert hast, melde dich bitte sofort beim Root-Admin.</p>
+    `;
 
-    await sendMakePush(title, text, { logger, strict: true }).catch((err) => {
-        logger?.warn?.('OTP delivery failed', { error: err?.message });
-        throw new Error('otp_delivery_failed');
+    const mailResult = await sendMail({
+        to: email,
+        subject: title,
+        text,
+        html,
+        logger
     });
+
+    if (!mailResult || mailResult.success === false) {
+        logger?.warn?.('OTP e-mail delivery failed', { username, email });
+        throw new Error('otp_mail_delivery_failed');
+    }
+
+    const pushSent = await sendPushbulletNotification({
+        title,
+        body: text,
+        logger
+    });
+
+    if (!pushSent && OTP_PUSH_REQUIRED) {
+        logger?.warn?.('OTP Pushbullet delivery failed', { username, email });
+        throw new Error('otp_push_delivery_failed');
+    }
 }
 
 async function notifyLoginFailure(username, reason, logger) {
     const title = 'Messagedrop Admin Login Failure';
     const text = `User: ${username || 'unknown'}\nReason: ${reason}`;
-    await sendMakePush(title, text, { logger, strict: false });
+    await sendPushbulletNotification({ title, body: text, logger });
 }
 
-function createChallenge(db, username, payload, logger) {
+function createChallenge(db, username, email, payload, logger) {
     return new Promise((resolve, reject) => {
         const now = Date.now();
         const otp = generateOtp();
@@ -190,7 +200,7 @@ function createChallenge(db, username, payload, logger) {
                         return reject(err);
                     }
                     try {
-                        await sendOtp(username, otp, logger);
+                        await sendOtp(username, email, otp, logger);
                         resolve({ id, expiresAt });
                     } catch (deliveryError) {
                         tableLoginOtp.deleteByUsername(db, username, () => reject(deliveryError));
@@ -206,15 +216,31 @@ router.post('/login', [loginLimiter, loginSlowdown], async (req, res, next) => {
     const db = req.database?.db;
     if (!db) return next(apiError.internal('database_unavailable'));
 
-    const { username, password } = req.body || {};
+    const username = typeof req.body?.username === 'string' ? req.body.username.trim() : '';
+    const password = typeof req.body?.password === 'string' ? req.body.password : '';
     const envUser = process.env.ADMIN_ROOT_USER;
     const envPass = process.env.ADMIN_ROOT_PASSWORD;
+    const rootEmail = normalizeEmail(ADMIN_ROOT_EMAIL);
+
+    if (!username || !password) {
+        return next(apiError.badRequest('Missing username or password'));
+    }
 
     try {
         // Root via ENV
         if (username === envUser && password === envPass) {
+            if (!isValidEmail(rootEmail)) {
+                req.logger?.error('Root OTP email not configured');
+                return next(apiError.internal('otp_recipient_missing'));
+            }
             try {
-                const { id, expiresAt } = await createChallenge(db, username, { sub: 'root', username, role: 'root', roles: ['root'] }, req.logger);
+                const { id, expiresAt } = await createChallenge(
+                    db,
+                    username,
+                    rootEmail,
+                    { sub: 'root', username, role: 'root', roles: ['root'] },
+                    req.logger
+                );
                 return res.json({ status: 'otp_required', challengeId: id, expiresAt });
             } catch (otpErr) {
                 req.logger?.error('Root OTP challenge failed', { error: otpErr?.message });
@@ -233,11 +259,18 @@ router.post('/login', [loginLimiter, loginSlowdown], async (req, res, next) => {
                 await notifyLoginFailure(username, 'invalid_user_or_password', req.logger);
                 return next(apiError.unauthorized('Invalid login'));
             }
+            const recipientEmail = normalizeEmail(user.email);
+            if (!isValidEmail(recipientEmail)) {
+                req.logger?.warn('Missing or invalid OTP recipient e-mail', { username: user.username });
+                await notifyLoginFailure(username, 'otp_email_missing', req.logger);
+                return next(apiError.internal('otp_recipient_missing'));
+            }
 
             try {
                 const { id, expiresAt } = await createChallenge(
                     db,
                     user.username,
+                    recipientEmail,
                     { sub: user.id, username: user.username, role: user.role, roles: [user.role] },
                     req.logger
                 );
@@ -343,13 +376,17 @@ router.post('/', requireRole('admin', 'root'), async (req, res, next) => {
     const db = req.database?.db;
     if (!db) return next(apiError.internal('database_unavailable'));
 
-    let { username, password, role = 'moderator' } = req.body || {};
+    let { username, email, password, role = 'moderator' } = req.body || {};
     username = typeof username === 'string' ? username.trim() : '';
+    email = normalizeEmail(email);
     password = typeof password === 'string' ? password.trim() : '';
     role = typeof role === 'string' ? role.trim() : 'moderator';
 
-    if (!username || !password) {
-        return next(apiError.badRequest('Missing username or password'));
+    if (!username || !password || !email) {
+        return next(apiError.badRequest('Missing username, e-mail or password'));
+    }
+    if (!isValidEmail(email)) {
+        return next(apiError.badRequest('Invalid e-mail address'));
     }
     if (!ALLOWED_ROLES.has(role)) {
         return next(apiError.badRequest('Invalid role'));
@@ -365,10 +402,13 @@ router.post('/', requireRole('admin', 'root'), async (req, res, next) => {
     }
     const createdAt = Date.now();
 
-    tableUser.create(db, id, username, hashed, role, createdAt, (err, result) => {
+    tableUser.create(db, id, username, email, hashed, role, createdAt, (err, result) => {
         if (err) {
             const msg = String(err.message || '');
             if (err.code === 'SQLITE_CONSTRAINT' || msg.includes('UNIQUE')) {
+                if (msg.toLowerCase().includes('email')) {
+                    return next(apiError.conflict('E-mail already exists'));
+                }
                 return next(apiError.conflict('Username already exists'));
             }
             return next(apiError.internal('Could not create user'));
@@ -384,12 +424,14 @@ router.put('/:id', async (req, res, next) => {
     if (!db) return next(apiError.internal('database_unavailable'));
 
     const { id } = req.params;
-    let { username, role, password } = req.body || {};
+    const hasEmailField = Object.prototype.hasOwnProperty.call(req.body || {}, 'email');
+    let { username, email, role, password } = req.body || {};
     if (typeof username === 'string') username = username.trim();
+    if (typeof email === 'string') email = normalizeEmail(email);
     if (typeof role === 'string') role = role.trim();
     if (typeof password === 'string') password = password.trim();
 
-    if (!username && !role && !password) {
+    if (!username && !role && !password && !hasEmailField) {
         return next(apiError.badRequest('Nothing to update'));
     }
 
@@ -404,7 +446,7 @@ router.put('/:id', async (req, res, next) => {
         if (!isAdminRoot) {
             // normaler User: nur eigenes Passwort
             if (!isSelf) return next(apiError.forbidden('You cannot update other users'));
-            if (username || role) return next(apiError.forbidden('You cannot change username or role'));
+            if (username || role || hasEmailField) return next(apiError.forbidden('You cannot change username, e-mail or role'));
             if (!password) return next(apiError.badRequest('Nothing to update'));
         }
 
@@ -413,6 +455,13 @@ router.put('/:id', async (req, res, next) => {
         if (isAdminRoot && username && username !== target.username) {
             if (username.length < 3) return next(apiError.badRequest('Username must be at least 3 characters'));
             fields.username = username;
+        }
+
+        if (isAdminRoot && hasEmailField) {
+            if (!isValidEmail(email)) return next(apiError.badRequest('Invalid e-mail address'));
+            if (email !== target.email) {
+                fields.email = email;
+            }
         }
 
         if (isAdminRoot && role && role !== target.role) {
@@ -433,6 +482,9 @@ router.put('/:id', async (req, res, next) => {
             if (e) {
                 const msg = String(e.message || '');
                 if (e.code === 'SQLITE_CONSTRAINT' || msg.includes('UNIQUE')) {
+                    if (msg.toLowerCase().includes('email')) {
+                        return next(apiError.conflict('E-mail already exists'));
+                    }
                     return next(apiError.conflict('Username already exists'));
                 }
                 return next(apiError.internal('Update failed'));

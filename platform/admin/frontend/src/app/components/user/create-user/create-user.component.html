@@ -5,7 +5,7 @@
         </div>
         <div class="titles">
             <h2>Create New User</h2>
-            <p>Please provide credentials and role</p>
+            <p>Please provide credentials, e-mail and role</p>
         </div>
     </div>
 
@@ -18,6 +18,14 @@
         <mat-form-field appearance="outline" class="full">
             <mat-label>Password</mat-label>
             <input matInput type="password" formControlName="password" required />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full">
+            <mat-label>E-Mail</mat-label>
+            <input matInput type="email" formControlName="email" required autocomplete="email" />
+            @if (form.controls.email.invalid && form.controls.email.touched) {
+                <mat-error>Please enter a valid e-mail address.</mat-error>
+            }
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full">

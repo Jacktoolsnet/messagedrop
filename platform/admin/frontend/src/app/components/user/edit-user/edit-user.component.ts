@@ -14,6 +14,7 @@ import { UserService } from '../../../services/user/user.service';
 export interface EditUserData {
   user: User;
   canChangeUsername: boolean;
+  canChangeEmail: boolean;
   canChangeRole: boolean;
   isSelf: boolean;
 }
@@ -41,11 +42,13 @@ export class EditUserComponent {
 
   user = this.data.user;
   canChangeUsername = this.data.canChangeUsername;
+  canChangeEmail = this.data.canChangeEmail;
   canChangeRole = this.data.canChangeRole;
   isSelf = this.data.isSelf;
 
   form = this.fb.group({
     username: [{ value: this.user.username, disabled: !this.canChangeUsername }, [Validators.required, Validators.minLength(3)]],
+    email: [{ value: this.user.email, disabled: !this.canChangeEmail }, [Validators.required, Validators.email]],
     password: [''], // optional; nur senden, wenn nicht leer
     role: [{ value: this.user.role, disabled: !this.canChangeRole }, Validators.required]
   });
@@ -55,6 +58,7 @@ export class EditUserComponent {
 
     interface FormValue {
       username: string;
+      email: string;
       password: string;
       role: UpdateUserPayload['role'];
     }
@@ -64,6 +68,9 @@ export class EditUserComponent {
     // nur setzen, wenn erlaubt und geändert
     if (this.canChangeUsername && raw.username && raw.username !== this.user.username) {
       payload.username = raw.username.trim();
+    }
+    if (this.canChangeEmail && raw.email && raw.email.trim().toLowerCase() !== this.user.email.toLowerCase()) {
+      payload.email = raw.email.trim().toLowerCase();
     }
     if (raw.password && raw.password.trim().length > 0) {
       payload.password = raw.password.trim();

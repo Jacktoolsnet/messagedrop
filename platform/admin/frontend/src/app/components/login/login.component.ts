@@ -68,7 +68,7 @@ export class LoginComponent {
           this.authService.completeLogin(response.token);
         } else if ('challengeId' in response) {
           this.switchToOtp(response.challengeId, response.expiresAt);
-          this.snackBar.open('OTP wurde per Pushbullet gesendet.', undefined, {
+          this.snackBar.open('OTP wurde per E-Mail versendet (und an Root via Pushbullet gemeldet).', undefined, {
             duration: 2000,
             panelClass: ['snack-success'],
             horizontalPosition: 'center',

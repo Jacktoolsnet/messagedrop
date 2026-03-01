@@ -108,6 +108,7 @@ export class UserDashboardComponent {
     const data: EditUserData = {
       user,
       canChangeUsername: isAdminOrRoot,
+      canChangeEmail: isAdminOrRoot,
       canChangeRole: isAdminOrRoot,
       isSelf: this.isSelf(user)
     };

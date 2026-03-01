@@ -4,6 +4,7 @@ const tableName = 'tableUser';
 // === Spalten definieren ===
 const columnId = 'id';                // TEXT PK (uuid) -> extern erzeugt
 const columnUsername = 'username';    // TEXT UNIQUE NOT NULL
+const columnEmail = 'email';          // TEXT UNIQUE NOT NULL
 const columnPassword = 'password';    // TEXT NOT NULL (bcrypt-Hash)
 const columnRole = 'role';            // TEXT NOT NULL ('root', 'admin', 'moderator', ...)
 const columnCreatedAt = 'createdAt';  // INTEGER NOT NULL (unix ms)
@@ -15,6 +16,7 @@ const init = function (db) {
       CREATE TABLE IF NOT EXISTS ${tableName} (
         ${columnId} TEXT PRIMARY KEY NOT NULL,
         ${columnUsername} TEXT UNIQUE NOT NULL,
+        ${columnEmail} TEXT UNIQUE NOT NULL,
         ${columnPassword} TEXT NOT NULL,
         ${columnRole} TEXT NOT NULL DEFAULT 'moderator',
         ${columnCreatedAt} INTEGER NOT NULL
@@ -23,11 +25,36 @@ const init = function (db) {
         ON ${tableName}(${columnUsername});
       CREATE INDEX IF NOT EXISTS idx_user_role
         ON ${tableName}(${columnRole});
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_user_email
+        ON ${tableName}(${columnEmail});
       CREATE INDEX IF NOT EXISTS idx_user_createdAt_desc
         ON ${tableName}(${columnCreatedAt} DESC);
     `;
         db.exec(sql, (err) => {
             if (err) throw err;
+        });
+
+        // Best effort for bestehende Installationen ohne email-Spalte
+        db.all(`PRAGMA table_info(${tableName})`, [], (pragmaErr, rows) => {
+            if (pragmaErr || !Array.isArray(rows)) return;
+            const hasEmailColumn = rows.some((row) => row?.name === columnEmail);
+            if (hasEmailColumn) {
+                db.run(`
+                  CREATE UNIQUE INDEX IF NOT EXISTS idx_user_email
+                    ON ${tableName}(${columnEmail})
+                `, []);
+                return;
+            }
+            db.run(`
+              ALTER TABLE ${tableName}
+              ADD COLUMN ${columnEmail} TEXT
+            `, [], (alterErr) => {
+                if (alterErr) return;
+                db.run(`
+                  CREATE UNIQUE INDEX IF NOT EXISTS idx_user_email
+                    ON ${tableName}(${columnEmail})
+                `, []);
+            });
         });
     } catch (err) {
         throw err;
@@ -39,22 +66,24 @@ const init = function (db) {
  * @param {import('sqlite3').Database} db
  * @param {string} id             // UUID (extern erzeugt)
  * @param {string} username       // Login-Name
+ * @param {string} email          // OTP-Empfängeradresse
  * @param {string} passwordHash   // gehashter Passwort-String
  * @param {string} role           // z.B. 'root', 'admin', 'moderator'
  * @param {number} createdAt      // Unix ms
  * @param {(err: any, row?: { id: string }) => void} callBack
  */
-const create = function (db, id, username, passwordHash, role, createdAt, callBack) {
+const create = function (db, id, username, email, passwordHash, role, createdAt, callBack) {
     const stmt = `
     INSERT INTO ${tableName} (
       ${columnId},
       ${columnUsername},
+      ${columnEmail},
       ${columnPassword},
       ${columnRole},
       ${columnCreatedAt}
-    ) VALUES (?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?)
   `;
-    const params = [id, username, passwordHash, role, createdAt];
+    const params = [id, username, email, passwordHash, role, createdAt];
     db.run(stmt, params, function (err) {
         if (err) return callBack(err);
         callBack(null, { id });
@@ -108,7 +137,7 @@ const list = function (db, opts, callBack) {
 /**
  * @param {import('sqlite3').Database} db
  * @param {string} id
- * @param {{ username?: string, role?: string, passwordHash?: string }} fields
+ * @param {{ username?: string, email?: string, role?: string, passwordHash?: string }} fields
  * @param {(err: any, ok?: boolean) => void} callBack
  */
 const update = function (db, id, fields, callBack) {
@@ -118,6 +147,10 @@ const update = function (db, id, fields, callBack) {
     if (typeof fields.username === 'string') {
         updates.push(`${columnUsername} = ?`);
         params.push(fields.username);
+    }
+    if (typeof fields.email === 'string') {
+        updates.push(`${columnEmail} = ?`);
+        params.push(fields.email);
     }
     if (typeof fields.role === 'string') {
         updates.push(`${columnRole} = ?`);
@@ -160,6 +193,7 @@ module.exports = {
     columns: {
         id: columnId,
         username: columnUsername,
+        email: columnEmail,
         password: columnPassword,
         role: columnRole,
         createdAt: columnCreatedAt

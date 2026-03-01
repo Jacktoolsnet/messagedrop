@@ -32,6 +32,7 @@ export class CreateUserComponent {
 
   form = this.fb.group({
     username: ['', Validators.required],
+    email: ['', [Validators.required, Validators.email]],
     password: ['', Validators.required],
     role: ['moderator', Validators.required]
   });
@@ -41,6 +42,7 @@ export class CreateUserComponent {
 
     const payload: CreateUserPayload = {
       username: this.form.value.username!,
+      email: this.form.value.email!.trim().toLowerCase(),
       password: this.form.value.password!,
       role: this.form.value.role ?? 'moderator'
     };
