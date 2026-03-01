@@ -129,12 +129,12 @@ export class SignalsComponent implements OnInit, OnDestroy {
 
     const statusSub = this.filterForm.controls.status.valueChanges
       .pipe(distinctUntilChanged())
-      .subscribe(() => this.reload());
+      .subscribe((status) => this.reload({ status }));
     this.subs.push(statusSub);
 
     const rangeSub = this.filterForm.controls.range.valueChanges
       .pipe(distinctUntilChanged())
-      .subscribe(() => this.reload());
+      .subscribe((range) => this.reload({ range }));
     this.subs.push(rangeSub);
 
     let textSnapshot = JSON.stringify({
@@ -175,16 +175,18 @@ export class SignalsComponent implements OnInit, OnDestroy {
     }
   }
 
-  reload() {
+  reload(overrides?: { status?: SignalStatusFilter; range?: '24h' | '7d' | '30d' | 'all' }) {
     const f = this.filterForm.value;
+    const status = overrides?.status ?? f.status ?? 'open';
+    const range = overrides?.range ?? f.range ?? 'all';
     const requestId = ++this.loadRequestId;
     this.loading.set(true);
     this.dsa.listSignals({
-      status: f.status || 'open',
+      status,
       type: f.type || undefined,
       category: f.category || undefined,
       q: f.q || undefined,
-      since: this.sinceFromRange(f.range || 'all'),
+      since: this.sinceFromRange(range),
       limit: 50,
       offset: 0
     }).subscribe({

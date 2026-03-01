@@ -7,7 +7,7 @@
     <span class="spacer"></span>
 
     <div class="desktop-controls">
-        <mat-button-toggle-group class="status-toggle" [formControl]="filterForm.controls.status">
+        <mat-button-toggle-group class="status-toggle" [value]="statusFilter()" (valueChange)="setStatus($event)">
             @for (status of signalStatuses; track status) {
             <mat-button-toggle [value]="status">{{ statusLabel(status) }}</mat-button-toggle>
             }
