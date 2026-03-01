@@ -36,14 +36,14 @@
             } @else if (step === 'otp') {
                 <form (ngSubmit)="onSubmitOtp()" #otpForm="ngForm" class="form">
                     <p class="info">
-                        Wir haben dir einen 6-stelligen Code per E-Mail geschickt.
-                        Zusätzlich wurde der Vorgang via Pushbullet an Root gemeldet.
+                        Wir haben dir einen 6-stelligen Code via Pushbullet gesendet.
+                        Falls verfügbar, erhältst du ihn zusätzlich per E-Mail.
                         Gib ihn hier ein, um den Login abzuschließen.
                     </p>
 
                 <mat-form-field appearance="outline" class="full-width">
                     <mat-label>6-stelliger Code</mat-label>
-                    <input matInput type="text" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" [(ngModel)]="otpCode" name="otpCode" required autocomplete="one-time-code" />
+                    <input matInput type="password" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" [(ngModel)]="otpCode" name="otpCode" required autocomplete="one-time-code" />
                 </mat-form-field>
 
                 <button mat-raised-button color="primary" type="submit" [disabled]="loading">

@@ -19,7 +19,6 @@ const ADMIN_AUD = process.env.ADMIN_AUD || 'messagedrop-admin';
 const OTP_TTL_MS = Number(process.env.ADMIN_OTP_TTL_MS || 5 * 60 * 1000);
 const OTP_LENGTH = 6;
 const ADMIN_ROOT_EMAIL = process.env.ADMIN_ROOT_EMAIL || process.env.MAIL_ADDRESS || process.env.MAIL_USER || '';
-const OTP_PUSH_REQUIRED = !['0', 'false', 'no', 'off'].includes(String(process.env.ADMIN_OTP_PUSH_REQUIRED || 'true').trim().toLowerCase());
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const rateLimitMessage = (message) => ({
@@ -35,6 +34,13 @@ const toNumber = (value, fallback) => {
 
 const normalizeEmail = (value) => (typeof value === 'string' ? value.trim().toLowerCase() : '');
 const isValidEmail = (value) => EMAIL_REGEX.test(normalizeEmail(value));
+const isMailConfigured = () => {
+    const host = process.env.MAIL_SERVER_SMTP || process.env.MAIL_SERVER_OUT || process.env.MAIL_HOST;
+    const port = Number(process.env.MAIL_PORT_SMTP || process.env.MAIL_PORT || 0);
+    const user = process.env.MAIL_USER;
+    const pass = process.env.MAIL_PASSWORD;
+    return Boolean(host && port && user && pass);
+};
 
 const LOGIN_WINDOW_MS = toNumber(process.env.ADMIN_LOGIN_LIMIT_WINDOW_MS, 10 * 60 * 1000);
 const LOGIN_LIMIT = toNumber(process.env.ADMIN_LOGIN_LIMIT, 10);
@@ -145,7 +151,8 @@ const generateOtp = () => {
 async function sendOtp(username, email, otp, logger) {
     const validMinutes = Math.round(OTP_TTL_MS / 60000);
     const title = 'Messagedrop Admin Login OTP';
-    const text = `Code: ${otp}\nUser: ${username}\nE-Mail: ${email}\nGültig für ${validMinutes} Minuten.`;
+    const normalizedEmail = normalizeEmail(email);
+    const text = `Code: ${otp}\nUser: ${username}\nE-Mail: ${normalizedEmail || '-'}\nGültig für ${validMinutes} Minuten.`;
     const html = `
       <p>Hallo ${username},</p>
       <p>dein Messagedrop Admin Login-Code lautet: <strong>${otp}</strong></p>
@@ -153,28 +160,35 @@ async function sendOtp(username, email, otp, logger) {
       <p>Falls du den Login nicht angefordert hast, melde dich bitte sofort beim Root-Admin.</p>
     `;
 
-    const mailResult = await sendMail({
-        to: email,
-        subject: title,
-        text,
-        html,
-        logger
-    });
-
-    if (!mailResult || mailResult.success === false) {
-        logger?.warn?.('OTP e-mail delivery failed', { username, email });
-        throw new Error('otp_mail_delivery_failed');
-    }
-
     const pushSent = await sendPushbulletNotification({
         title,
         body: text,
         logger
     });
 
-    if (!pushSent && OTP_PUSH_REQUIRED) {
-        logger?.warn?.('OTP Pushbullet delivery failed', { username, email });
+    if (!pushSent) {
+        logger?.warn?.('OTP Pushbullet delivery failed', { username, email: normalizedEmail || null });
         throw new Error('otp_push_delivery_failed');
+    }
+
+    if (!isValidEmail(normalizedEmail)) {
+        logger?.warn?.('Skipping OTP e-mail delivery (missing/invalid recipient)', { username });
+        return;
+    }
+    if (!isMailConfigured()) {
+        logger?.warn?.('Skipping OTP e-mail delivery (mail transport not configured)', { username, email: normalizedEmail });
+        return;
+    }
+
+    const mailResult = await sendMail({
+        to: normalizedEmail,
+        subject: title,
+        text,
+        html,
+        logger
+    });
+    if (!mailResult || mailResult.success === false) {
+        logger?.warn?.('OTP e-mail delivery failed (non-blocking)', { username, email: normalizedEmail });
     }
 }
 
@@ -229,10 +243,6 @@ router.post('/login', [loginLimiter, loginSlowdown], async (req, res, next) => {
     try {
         // Root via ENV
         if (username === envUser && password === envPass) {
-            if (!isValidEmail(rootEmail)) {
-                req.logger?.error('Root OTP email not configured');
-                return next(apiError.internal('otp_recipient_missing'));
-            }
             try {
                 const { id, expiresAt } = await createChallenge(
                     db,
@@ -260,11 +270,6 @@ router.post('/login', [loginLimiter, loginSlowdown], async (req, res, next) => {
                 return next(apiError.unauthorized('Invalid login'));
             }
             const recipientEmail = normalizeEmail(user.email);
-            if (!isValidEmail(recipientEmail)) {
-                req.logger?.warn('Missing or invalid OTP recipient e-mail', { username: user.username });
-                await notifyLoginFailure(username, 'otp_email_missing', req.logger);
-                return next(apiError.internal('otp_recipient_missing'));
-            }
 
             try {
                 const { id, expiresAt } = await createChallenge(
