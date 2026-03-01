@@ -254,8 +254,9 @@ export class SignalsComponent implements OnInit, OnDestroy {
         status: undefined
       },
       panelClass: 'mdp-dialog-xl',
-      maxWidth: '90vw',
-      maxHeight: '90vh',
+      width: 'min(1500px, 96vw)',
+      maxWidth: '96vw',
+      maxHeight: '92vh',
       autoFocus: false
     });
     ref.afterClosed().subscribe(() => this.reload());

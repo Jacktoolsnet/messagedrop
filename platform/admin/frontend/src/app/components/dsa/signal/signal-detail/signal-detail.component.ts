@@ -6,6 +6,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Multimedia } from '../../../../interfaces/multimedia.interface';
@@ -21,7 +22,7 @@ import { ConfirmDialogComponent } from '../../../shared/confirm-dialog.component
   imports: [
     CommonModule, DatePipe,
     MatDialogModule, MatIconModule, MatButtonModule,
-    MatChipsModule, MatDividerModule, MatTooltipModule, MatCardModule
+    MatChipsModule, MatDividerModule, MatTooltipModule, MatCardModule, MatMenuModule
   ],
   templateUrl: './signal-detail.component.html',
   styleUrls: ['./signal-detail.component.css']
@@ -249,7 +250,7 @@ export class SignalDetailComponent implements OnInit {
       case 'youtube': return 'smart_display';
       case 'spotify': return 'music_note';
       case 'tiktok': return 'movie';
-      case 'tenor': return 'gif_box';
+      case 'tenor': return 'gif';
       case 'image': return 'image';
       default: return 'article';
     }

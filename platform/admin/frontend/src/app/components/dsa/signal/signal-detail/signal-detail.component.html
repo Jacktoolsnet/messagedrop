@@ -1,221 +1,262 @@
 <mat-card class="pm-card">
-    <mat-card-header>
+    <mat-card-header class="pm-header">
         <div mat-card-avatar class="avatar">
             <mat-icon>{{ providerIcon() }}</mat-icon>
         </div>
-        <mat-card-title>Public Message</mat-card-title>
+        <mat-card-title>Signal Details</mat-card-title>
         <mat-card-subtitle>
             <mat-chip-set>
-                <mat-chip color="primary" selected>{{ data.source | titlecase }}</mat-chip>
-                <mat-chip>{{ providerLabel() }}</mat-chip>
                 @if (data.category) { <mat-chip>{{ data.category }}</mat-chip> }
                 @if (data.status) { <mat-chip class="status">{{ data.status }}</mat-chip> }
             </mat-chip-set>
         </mat-card-subtitle>
     </mat-card-header>
 
-    <!-- Content scrollt -->
     <mat-card-content class="pm-content">
-        <!-- Media -->
-        @if (mediaKind() === 'iframe' && embedUrl()) {
-        <div class="embed-outer" matTooltip="Embedded media">
-            <iframe [src]="embedUrl()" title="Embedded content" loading="lazy"
-                referrerpolicy="strict-origin-when-cross-origin"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowfullscreen>
-            </iframe>
-        </div>
-        }
-        @if (mediaKind() === 'image' && imageUrl()) {
-        <div class="image-outer" matTooltip="Image/GIF">
-            <img [src]="imageUrl()!" alt="media">
-        </div>
-        }
+        <div class="detail-grid">
+            <section class="detail-tile">
+                <div class="tile-header">
+                    <div class="tile-title">
+                        <mat-icon>text_snippet</mat-icon>
+                        <span>Message</span>
+                    </div>
+                    <button mat-icon-button matTooltip="Translate to German" (click)="translateMessage()"
+                        [disabled]="!msg()?.message || loadingMsg()">
+                        <mat-icon>{{ loadingMsg() ? 'hourglass_top' : 'translate' }}</mat-icon>
+                    </button>
+                </div>
 
-        <!-- SECTION: Message -->
-        <div class="snippet">
-            <div class="snippet-header">
-                <mat-icon>text_snippet</mat-icon>
-                <span>Message</span>
-                <span class="spacer"></span>
-                <button mat-icon-button matTooltip="Translate to German" (click)="translateMessage()"
-                    [disabled]="!msg()?.message || loadingMsg()">
-                    <mat-icon>{{ loadingMsg() ? 'hourglass_top' : 'translate' }}</mat-icon>
-                </button>
-            </div>
-
-            @if (msg()?.message) {
-            <div class="snippet-text" [attr.style]="msg()?.style || null">
-                {{ msg()?.message }}
-            </div>
-            @if ((msg()?.hashtags?.length ?? 0) > 0) {
-            <div class="message-hashtags" aria-label="Message hashtags">
-                @for (tag of msg()?.hashtags ?? []; track tag) {
-                <span class="message-hashtag-chip">#{{ tag }}</span>
+                @if (mediaKind() === 'iframe' && embedUrl()) {
+                <div class="embed-outer" matTooltip="Embedded media">
+                    <iframe [src]="embedUrl()" title="Embedded content" loading="lazy"
+                        referrerpolicy="strict-origin-when-cross-origin"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen>
+                    </iframe>
+                </div>
                 }
-            </div>
-            }
-            @if (tMsg()) {
-            <div class="snippet-translation">
-                <mat-icon>g_translate</mat-icon>
-                {{ tMsg() }}
-            </div>
-            }
-            } @else {
-            <div class="placeholder">
-                <mat-icon>info</mat-icon>
-                Message not provided
-            </div>
-            }
-        </div>
+                @if (mediaKind() === 'image' && imageUrl()) {
+                <div class="image-outer" matTooltip="Image/GIF">
+                    <img [src]="imageUrl()!" alt="media">
+                </div>
+                }
 
-        <!-- SECTION: Reason -->
-        <div class="snippet">
-            <div class="snippet-header">
-                <mat-icon>report</mat-icon>
-                <span>Reason</span>
-                <span class="spacer"></span>
-                <button mat-icon-button matTooltip="Translate to German" (click)="translateReason()"
-                    [disabled]="!data.reasonText || loadingReason()">
-                    <mat-icon>{{ loadingReason() ? 'hourglass_top' : 'translate' }}</mat-icon>
-                </button>
-            </div>
+                @if (msg()?.message) {
+                <div class="snippet-text" [attr.style]="msg()?.style || null">
+                    {{ msg()?.message }}
+                </div>
+                @if ((msg()?.hashtags?.length ?? 0) > 0) {
+                <div class="message-hashtags" aria-label="Message hashtags">
+                    @for (tag of msg()?.hashtags ?? []; track tag) {
+                    <span class="message-hashtag-chip">#{{ tag }}</span>
+                    }
+                </div>
+                }
+                @if (tMsg()) {
+                <div class="snippet-translation">
+                    <mat-icon>g_translate</mat-icon>
+                    {{ tMsg() }}
+                </div>
+                }
+                } @else {
+                <div class="placeholder">
+                    <mat-icon>info</mat-icon>
+                    Message not provided
+                </div>
+                }
+            </section>
 
-            @if (data.reasonText) {
-            <div class="snippet-text">
-                {{ data.reasonText }}
-            </div>
-            @if (tReason()) {
-            <div class="snippet-translation">
-                <mat-icon>g_translate</mat-icon>
-                {{ tReason() }}
-            </div>
-            }
-            } @else {
-            <div class="placeholder">
-                <mat-icon>info</mat-icon>
-                Reason not provided
-            </div>
-            }
-        </div>
+            <section class="detail-tile">
+                <div class="tile-header">
+                    <div class="tile-title">
+                        <mat-icon>assignment</mat-icon>
+                        <span>Report details</span>
+                    </div>
+                    <button mat-icon-button matTooltip="Translate to German" (click)="translateReason()"
+                        [disabled]="!data.reasonText || loadingReason()">
+                        <mat-icon>{{ loadingReason() ? 'hourglass_top' : 'translate' }}</mat-icon>
+                    </button>
+                </div>
 
-        @if (hasModeration()) {
-        <div class="snippet">
-            <div class="snippet-header">
-                <mat-icon>verified_user</mat-icon>
-                <span>Moderation ratings</span>
-            </div>
-            <div class="meta">
-                <div class="kv">
-                    <mat-icon>memory</mat-icon>
-                    <span><strong>AI decision:</strong> {{ msg()?.aiModerationDecision || '—' }}</span>
+                @if (data.reasonText) {
+                <div class="snippet-text">
+                    {{ data.reasonText }}
                 </div>
-                <div class="kv">
-                    <mat-icon>bar_chart</mat-icon>
-                    <span><strong>AI score:</strong> {{ formatScore(msg()?.aiModerationScore) }}</span>
+                @if (tReason()) {
+                <div class="snippet-translation">
+                    <mat-icon>g_translate</mat-icon>
+                    {{ tReason() }}
                 </div>
-                <div class="kv">
-                    <mat-icon>flag</mat-icon>
-                    <span><strong>AI flagged:</strong> {{ formatBool(msg()?.aiModerationFlagged) }}</span>
+                }
+                } @else {
+                <div class="placeholder">
+                    <mat-icon>info</mat-icon>
+                    Reason not provided
                 </div>
-                <div class="kv">
-                    <mat-icon>schedule</mat-icon>
-                    <span><strong>AI checked:</strong> {{ formatTimestamp(msg()?.aiModerationAt) }}</span>
-                </div>
-                <div class="kv">
-                    <mat-icon>fingerprint</mat-icon>
-                    <span><strong>Pattern match:</strong> {{ formatBool(msg()?.patternMatch) }}</span>
-                </div>
-                <div class="kv">
-                    <mat-icon>schedule</mat-icon>
-                    <span><strong>Pattern checked:</strong> {{ formatTimestamp(msg()?.patternMatchAt) }}</span>
-                </div>
-                <div class="kv">
-                    <mat-icon>gavel</mat-icon>
-                    <span><strong>Manual decision:</strong> {{ msg()?.manualModerationDecision || '—' }}</span>
-                </div>
-                <div class="kv">
-                    <mat-icon>notes</mat-icon>
-                    <span><strong>Manual reason:</strong> {{ msg()?.manualModerationReason || '—' }}</span>
-                </div>
-                <div class="kv">
-                    <mat-icon>schedule</mat-icon>
-                    <span><strong>Manual reviewed:</strong> {{ formatTimestamp(msg()?.manualModerationAt) }}</span>
-                </div>
-                <div class="kv">
-                    <mat-icon>person</mat-icon>
-                    <span><strong>Manual reviewer:</strong> {{ msg()?.manualModerationBy || '—' }}</span>
-                </div>
-            </div>
-        </div>
-        }
+                }
 
-        <!-- Meta -->
-        <div class="meta">
-            <div class="kv">
-                <mat-icon>schedule</mat-icon>
-                <span>
-                    <strong>Created:</strong> {{ normalizeEpoch(data.createdAt || msg()?.createDateTime) | date:'medium' }}
-                </span>
-            </div>
-            @if (msg()?.deleteDateTime) {
-            <div class="kv">
-                <mat-icon>hourglass_bottom</mat-icon>
-                <span><strong>Expires:</strong> {{ normalizeEpoch(msg()?.deleteDateTime) | date:'medium' }}</span>
-            </div>
-            }
-            @if (msg()?.location?.plusCode) {
-            <div class="kv">
-                <mat-icon>place</mat-icon>
-                <span><strong>Plus Code:</strong> {{ msg()?.location?.plusCode }}</span>
-            </div>
-            }
-            <div class="counters">
-                <span><mat-icon>visibility</mat-icon> {{ msg()?.views || 0 }}</span>
-                <span><mat-icon>thumb_up</mat-icon> {{ msg()?.likes || 0 }}</span>
-                <span><mat-icon>thumb_down</mat-icon> {{ msg()?.dislikes || 0 }}</span>
-            </div>
-            <div class="kv">
-                <mat-icon>fingerprint</mat-icon>
-                <span><strong>User:</strong> {{ msg()?.userId }}</span>
-            </div>
-            <div class="kv">
-                <mat-icon>link</mat-icon>
-                <span class="truncate" [matTooltip]="sourceUrl() || ''">
-                    <strong>Source:</strong> {{ sourceUrl() || '—' }}
-                </span>
-            </div>
+                <div class="meta-grid">
+                    <div class="kv">
+                        <mat-icon>schedule</mat-icon>
+                        <span><strong>Created:</strong> {{ normalizeEpoch(data.createdAt || msg()?.createDateTime) | date:'medium' }}</span>
+                    </div>
+                    @if (msg()?.deleteDateTime) {
+                    <div class="kv">
+                        <mat-icon>hourglass_bottom</mat-icon>
+                        <span><strong>Expires:</strong> {{ normalizeEpoch(msg()?.deleteDateTime) | date:'medium' }}</span>
+                    </div>
+                    }
+                    @if (msg()?.location?.plusCode) {
+                    <div class="kv">
+                        <mat-icon>place</mat-icon>
+                        <span><strong>Plus Code:</strong> {{ msg()?.location?.plusCode }}</span>
+                    </div>
+                    }
+                    @if (data.signalId) {
+                    <div class="kv">
+                        <mat-icon>sell</mat-icon>
+                        <span><strong>Signal ID:</strong> {{ data.signalId }}</span>
+                    </div>
+                    }
+                    <div class="kv">
+                        <mat-icon>person</mat-icon>
+                        <span><strong>User:</strong> {{ msg()?.userId || '—' }}</span>
+                    </div>
+                    <div class="kv">
+                        <mat-icon>link</mat-icon>
+                        <span class="truncate" [matTooltip]="sourceUrl() || ''">
+                            <strong>Source:</strong> {{ sourceUrl() || '—' }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="counters">
+                    <span><mat-icon>visibility</mat-icon> {{ msg()?.views || 0 }}</span>
+                    <span><mat-icon>thumb_up</mat-icon> {{ msg()?.likes || 0 }}</span>
+                    <span><mat-icon>thumb_down</mat-icon> {{ msg()?.dislikes || 0 }}</span>
+                </div>
+            </section>
+
+            <section class="detail-tile">
+                <div class="tile-header">
+                    <div class="tile-title">
+                        <mat-icon>verified_user</mat-icon>
+                        <span>Moderation ratings</span>
+                    </div>
+                </div>
+
+                @if (hasModeration()) {
+                <div class="meta-grid">
+                    <div class="kv">
+                        <mat-icon>memory</mat-icon>
+                        <span><strong>AI decision:</strong> {{ msg()?.aiModerationDecision || '—' }}</span>
+                    </div>
+                    <div class="kv">
+                        <mat-icon>bar_chart</mat-icon>
+                        <span><strong>AI score:</strong> {{ formatScore(msg()?.aiModerationScore) }}</span>
+                    </div>
+                    <div class="kv">
+                        <mat-icon>flag</mat-icon>
+                        <span><strong>AI flagged:</strong> {{ formatBool(msg()?.aiModerationFlagged) }}</span>
+                    </div>
+                    <div class="kv">
+                        <mat-icon>schedule</mat-icon>
+                        <span><strong>AI checked:</strong> {{ formatTimestamp(msg()?.aiModerationAt) }}</span>
+                    </div>
+                    <div class="kv">
+                        <mat-icon>fingerprint</mat-icon>
+                        <span><strong>Pattern match:</strong> {{ formatBool(msg()?.patternMatch) }}</span>
+                    </div>
+                    <div class="kv">
+                        <mat-icon>schedule</mat-icon>
+                        <span><strong>Pattern checked:</strong> {{ formatTimestamp(msg()?.patternMatchAt) }}</span>
+                    </div>
+                    <div class="kv">
+                        <mat-icon>gavel</mat-icon>
+                        <span><strong>Manual decision:</strong> {{ msg()?.manualModerationDecision || '—' }}</span>
+                    </div>
+                    <div class="kv">
+                        <mat-icon>notes</mat-icon>
+                        <span><strong>Manual reason:</strong> {{ msg()?.manualModerationReason || '—' }}</span>
+                    </div>
+                    <div class="kv">
+                        <mat-icon>schedule</mat-icon>
+                        <span><strong>Manual reviewed:</strong> {{ formatTimestamp(msg()?.manualModerationAt) }}</span>
+                    </div>
+                    <div class="kv">
+                        <mat-icon>person</mat-icon>
+                        <span><strong>Manual reviewer:</strong> {{ msg()?.manualModerationBy || '—' }}</span>
+                    </div>
+                </div>
+                } @else {
+                <div class="placeholder">
+                    <mat-icon>info</mat-icon>
+                    No moderation ratings available.
+                </div>
+                }
+            </section>
         </div>
     </mat-card-content>
 
     <mat-divider />
 
-    <mat-card-actions align="end">
-        @if (sourceUrl()) {
-        <button mat-stroked-button (click)="openContentUrl()">
-            <mat-icon>open_in_new</mat-icon>
-            Open original
-        </button>
-        }
-        @if (data.source === 'signal') {
-        <button mat-stroked-button (click)="openStatusPage()">
-            <mat-icon>open_in_new</mat-icon>
-            Status
-        </button>
-        }
-        @if (data.source === 'signal') {
-        <button mat-raised-button color="warn" (click)="dismissSignal()" [disabled]="actionBusy()">
-            <mat-icon>delete</mat-icon>
-            Dismiss
-        </button>
-        <button mat-raised-button color="primary" (click)="promoteSignal()" [disabled]="actionBusy()">
-            <mat-icon>upgrade</mat-icon>
-            Promote
-        </button>
-        }
-        <button mat-raised-button color="primary" (click)="close()">
-            <mat-icon>close</mat-icon>
-            Close
-        </button>
+    <mat-card-actions class="pm-actions">
+        <div class="actions-left">
+            <button mat-raised-button color="primary" (click)="close()">
+                <mat-icon>close</mat-icon>
+                Close
+            </button>
+        </div>
+
+        <div class="actions-right desktop-actions">
+            @if (sourceUrl()) {
+            <button mat-stroked-button (click)="openContentUrl()">
+                <mat-icon>open_in_new</mat-icon>
+                Open original
+            </button>
+            }
+            @if (data.source === 'signal') {
+            <button mat-stroked-button (click)="openStatusPage()">
+                <mat-icon>open_in_new</mat-icon>
+                Status
+            </button>
+            <button mat-raised-button color="warn" (click)="dismissSignal()" [disabled]="actionBusy()">
+                <mat-icon>delete</mat-icon>
+                Dismiss
+            </button>
+            <button mat-raised-button color="primary" (click)="promoteSignal()" [disabled]="actionBusy()">
+                <mat-icon>upgrade</mat-icon>
+                Promote
+            </button>
+            }
+        </div>
+
+        <div class="actions-right mobile-actions">
+            <button mat-icon-button [matMenuTriggerFor]="detailMenu" aria-label="More actions">
+                <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #detailMenu="matMenu">
+                @if (sourceUrl()) {
+                <button mat-menu-item (click)="openContentUrl()">
+                    <mat-icon>open_in_new</mat-icon>
+                    <span>Open original</span>
+                </button>
+                }
+                @if (data.source === 'signal') {
+                <button mat-menu-item (click)="openStatusPage()">
+                    <mat-icon>open_in_new</mat-icon>
+                    <span>Status</span>
+                </button>
+                <button mat-menu-item (click)="dismissSignal()" [disabled]="actionBusy()">
+                    <mat-icon>delete</mat-icon>
+                    <span>Dismiss</span>
+                </button>
+                <button mat-menu-item (click)="promoteSignal()" [disabled]="actionBusy()">
+                    <mat-icon>upgrade</mat-icon>
+                    <span>Promote</span>
+                </button>
+                }
+            </mat-menu>
+        </div>
     </mat-card-actions>
 </mat-card>
