@@ -24,6 +24,7 @@ import { authGuard } from './guards/auth/auth-guard';
 
 export const routes: Routes = [
     { path: 'status/:token', component: PublicStatusComponent },
+    { path: 'transparency', component: TransparencyComponent },
     { path: '', component: LoginComponent },
     {
         path: 'dashboard',

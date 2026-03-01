@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpResponse } from '@angular/common/http';
-import { AfterViewInit, Component, DestroyRef, ElementRef, OnDestroy, OnInit, ViewChild, inject, signal } from '@angular/core';
+import { AfterViewInit, Component, DestroyRef, ElementRef, OnDestroy, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -19,6 +19,7 @@ import annotationPlugin from 'chartjs-plugin-annotation';
 
 import { TransparencyReport } from '../../../interfaces/transparency-report.interface';
 import { TransparencyStats } from '../../../interfaces/transparency-stats.interface';
+import { AuthService } from '../../../services/auth/auth.service';
 import { DsaService } from '../../../services/dsa/dsa/dsa.service';
 
 Chart.register(...registerables, annotationPlugin);
@@ -54,6 +55,7 @@ export class TransparencyComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly dsa = inject(DsaService);
   private readonly snack = inject(MatSnackBar);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly auth = inject(AuthService);
 
   @ViewChild('statusChart') private statusChartRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('decisionChart') private decisionChartRef?: ElementRef<HTMLCanvasElement>;
@@ -76,6 +78,7 @@ export class TransparencyComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly loadingReports = signal(false);
 
   readonly reportColumns = ['title', 'period', 'format', 'generatedAt', 'actions'];
+  readonly backLink = computed(() => this.auth.isLoggedIn() ? '/dashboard/dsa' : '/');
 
   private charts: Chart[] = [];
   private viewReady = false;

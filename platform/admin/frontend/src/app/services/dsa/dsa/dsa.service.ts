@@ -27,6 +27,7 @@ import { DsaNotification, ListNotificationsParams, NotificationMeta, Notificatio
 @Injectable({ providedIn: 'root' })
 export class DsaService {
   private readonly baseUrl = `${environment.apiUrl}/dsa/backend`;
+  private readonly publicBaseUrl = `${environment.apiUrl}/public`;
 
   /** Dashboard-Stats-Loading */
   readonly loading = signal(false);
@@ -78,7 +79,7 @@ export class DsaService {
 
   getTransparencyStats(range: string): Observable<TransparencyStats> {
     const params = new HttpParams().set('range', range);
-    return this.http.get<TransparencyStats>(`${this.baseUrl}/transparency/stats`, { params }).pipe(
+    return this.http.get<TransparencyStats>(`${this.publicBaseUrl}/transparency/stats`, { params }).pipe(
       catchError(err => {
         this.snack.open('Could not load transparency stats.', 'OK', { duration: 3000 });
         throw err;
@@ -88,7 +89,7 @@ export class DsaService {
 
   listTransparencyReports(range: string): Observable<TransparencyReport[]> {
     const params = new HttpParams().set('range', range);
-    return this.http.get<TransparencyReport[]>(`${this.baseUrl}/transparency/reports`, { params }).pipe(
+    return this.http.get<TransparencyReport[]>(`${this.publicBaseUrl}/transparency/reports`, { params }).pipe(
       catchError(() => {
         this.snack.open('Could not load transparency reports.', 'OK', { duration: 3000 });
         return of([]);
@@ -97,7 +98,7 @@ export class DsaService {
   }
 
   downloadTransparencyReport(id: string): Observable<HttpResponse<Blob>> {
-    return this.http.get(`${this.baseUrl}/transparency/reports/${id}/download`, {
+    return this.http.get(`${this.publicBaseUrl}/transparency/reports/${id}/download`, {
       observe: 'response',
       responseType: 'blob'
     } as const).pipe(
