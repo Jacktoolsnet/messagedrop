@@ -181,6 +181,23 @@ mat-toolbar {
     align-items: stretch;
 }
 
+@media (max-width: 720px) {
+    .page {
+        max-width: 95vw;
+        padding: .75rem 0;
+    }
+
+    .tiles-container {
+        grid-template-columns: minmax(0, 95vw);
+        justify-content: center;
+    }
+
+    .tile {
+        width: 95vw;
+        max-width: 95vw;
+    }
+}
+
 /* Tile Look & Feel */
 .tile {
     display: grid;
