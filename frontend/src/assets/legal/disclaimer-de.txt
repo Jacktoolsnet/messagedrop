@@ -13,6 +13,14 @@ Regeln zur Verarbeitung personenbezogener Daten stehen in der Datenschutzerklär
 
 MessageDrop wird „wie er ist“ und „wie verfügbar“ bereitgestellt. Wir garantieren insbesondere keine ständige Verfügbarkeit, Fehlerfreiheit oder Eignung für einen bestimmten Zweck.
 
+Die Nutzung kann – abhängig von Endgerät, Tarif und Anbieter – zu Verbindungs- und Datenkosten (z. B. mobile Daten, Roaming) führen. Diese Kosten trägt ausschließlich der Nutzer.
+
+Für die Nutzung sind ein geeignetes Endgerät sowie ein aktueller, gängiger Browser erforderlich. Bei veralteten oder nicht unterstützten Geräten, Browsern oder Betriebssystemen können Funktionen eingeschränkt sein oder entfallen.
+
+Die Sicherheit des Endgeräts und der Zugangsdaten (insbesondere PIN) liegt im Verantwortungsbereich des Nutzers.
+
+Wir übernehmen keine Gewähr für die dauerhafte Kompatibilität mit allen künftigen Geräte-, Betriebssystem- oder Browserversionen.
+
 Viele Daten werden lokal auf dem Endgerät gespeichert. Lokale Daten können verloren gehen. Ohne eigenes Backup ist eine Wiederherstellung regelmäßig nicht möglich.
 
 Externe Inhalte, Dienste und verlinkte Webseiten liegen im Verantwortungsbereich der jeweiligen Drittanbieter.
@@ -79,6 +87,18 @@ Die bereitgestellten Informationen ersetzen keine individuelle fachliche oder re
 
 Wir bemühen uns um einen stabilen und sicheren Betrieb von MessageDrop.
 
+Die Nutzung setzt eine funktionierende Internetverbindung voraus.
+
+Die Nutzung kann – abhängig von Endgerät, Tarif und Anbieter – zu Verbindungs- und Datenkosten (z. B. mobile Daten, Roaming) führen. Diese Kosten trägt ausschließlich der Nutzer.
+
+Für die Nutzung sind ein geeignetes Endgerät, ein unterstütztes Betriebssystem und ein aktueller, gängiger Browser erforderlich.
+
+Bei veralteten, nicht unterstützten oder ungeeigneten Geräten, Betriebssystemen oder Browsern können Funktionen eingeschränkt sein, fehlerhaft arbeiten oder nicht verfügbar sein.
+
+Die Sicherheit des verwendeten Endgeräts, der installierten Software und des Nutzerzugangs (insbesondere regelmäßige Sicherheitsupdates, Gerätesperre, Schutz vor Schadsoftware und vertrauliche Aufbewahrung von Zugangsdaten/PINs) liegt im Verantwortungsbereich des Nutzers.
+
+Wir übernehmen keine Gewähr für die dauerhafte Kompatibilität des Dienstes mit allen künftigen Geräte-, Betriebssystem- oder Browserversionen.
+
 Eine bestimmte Verfügbarkeit, Antwortzeit, Wiederherstellungszeit oder Fehlerfreiheit wird nicht garantiert.
 
 Einschränkungen, Unterbrechungen oder Ausfälle können insbesondere auftreten durch:
@@ -89,6 +109,10 @@ Einschränkungen, Unterbrechungen oder Ausfälle können insbesondere auftreten 
 - höhere Gewalt.
 
 Wir sind berechtigt, Funktionen jederzeit technisch, organisatorisch oder rechtlich anzupassen, einzuschränken oder einzustellen.
+
+Soweit gesetzlich zulässig, haften wir nicht für Verbindungsprobleme, Onlinekosten oder Funktionsausfälle, die auf Tarifbedingungen, Providerleistungen oder ungeeignete bzw. veraltete Hard- oder Software zurückzuführen sind.
+
+Soweit gesetzlich zulässig, haften wir nicht für Funktionsausfälle oder Schäden, die auf kompromittierte Endgeräte, Schadsoftware, unzureichende Gerätesicherung oder missbräuchliche Nutzung durch Dritte zurückzuführen sind.
 
 ###
 5. Lokale Speicherung, Backup und Datenverlust

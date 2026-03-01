@@ -404,6 +404,8 @@ Alle Rechte an der App selbst (Software, Design, Marken) liegen bei uns oder uns
 19. Haftung
 ###
 
+Ergänzend gelten für Haftung und Gewährleistung die Regelungen im Haftungshinweis (Disclaimer).
+
 Soweit gesetzlich zulässig, ist unsere Haftung für einfache Fahrlässigkeit ausgeschlossen, es sei denn, es handelt sich um die Verletzung wesentlicher Vertragspflichten (Kardinalpflichten). In diesem Fall ist die Haftung auf den bei Vertragsschluss vorhersehbaren, vertragstypischen Schaden begrenzt.
 
 Wir haften unbeschränkt nur bei:

@@ -117,6 +117,8 @@ Telefon: +49 (0) 176 / 41 23 57 74
 
 Diese Datenschutzerklärung gilt für MessageDrop (messagedrop.de), zugehörige mobile Anwendungen, Progressive Web Apps (PWA) sowie interne Admin- und Moderationsoberflächen.
 
+Diese Datenschutzerklärung regelt ausschließlich die Verarbeitung personenbezogener Daten; Haftungs- und Gewährleistungsfragen werden im Haftungshinweis (Disclaimer) geregelt.
+
 ###
 2. Nutzung als Besucher (ohne Nutzerkonto)
 ###
