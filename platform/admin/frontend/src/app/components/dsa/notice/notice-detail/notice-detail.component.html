@@ -267,12 +267,38 @@
 
     <!-- Footer -->
     <div class="dialog-footer">
-        <button mat-stroked-button (click)="openStatusPage()">
-            <mat-icon>open_in_new</mat-icon>
-            Open status
-        </button>
-        <button mat-stroked-button (click)="close(false)">
-            <mat-icon>close</mat-icon> Close
-        </button>
+        <div class="actions-left">
+            <button mat-raised-button color="primary" (click)="close(false)">
+                <mat-icon>close</mat-icon>
+                Close
+            </button>
+        </div>
+
+        <div class="actions-right desktop-actions">
+            <button mat-stroked-button (click)="openStatusPage()">
+                <mat-icon>open_in_new</mat-icon>
+                Open status
+            </button>
+            <button mat-raised-button color="accent" (click)="openDecisionDialog()" [disabled]="status() === 'DECIDED'">
+                <mat-icon>gavel</mat-icon>
+                Decide
+            </button>
+        </div>
+
+        <div class="actions-right mobile-actions">
+            <button mat-icon-button [matMenuTriggerFor]="noticeDetailMenu" aria-label="More actions">
+                <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #noticeDetailMenu="matMenu">
+                <button mat-menu-item (click)="openStatusPage()">
+                    <mat-icon>open_in_new</mat-icon>
+                    <span>Open status</span>
+                </button>
+                <button mat-menu-item (click)="openDecisionDialog()" [disabled]="status() === 'DECIDED'">
+                    <mat-icon>gavel</mat-icon>
+                    <span>Decide</span>
+                </button>
+            </mat-menu>
+        </div>
     </div>
 </div>

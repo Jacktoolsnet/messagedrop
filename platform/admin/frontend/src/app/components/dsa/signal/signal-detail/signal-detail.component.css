@@ -24,58 +24,38 @@
     max-height: 92vh;
 }
 
-mat-card-header {
-    padding: 20px 22px 0 22px;
-}
-
-.pm-header {
+.dialog-header {
+    display: flex;
+    gap: .75rem;
+    align-items: center;
+    justify-content: space-between;
     position: sticky;
     top: 0;
     z-index: 4;
-    padding: 10px 22px 12px;
+    padding: .55rem .85rem .55rem .35rem;
     background: var(--card);
+    background: color-mix(in srgb, var(--primary) 6%, transparent);
     border-bottom: 1px solid var(--border);
-    align-items: flex-start;
-}
 
-.pm-header :where(.mat-mdc-card-header-text) {
-    margin: 0;
-    display: grid;
-    align-content: start;
-    gap: 4px;
-    padding-top: 2px;
-}
+    .left {
+        display: inline-flex;
+        align-items: center;
+        gap: .3rem;
 
-mat-card-title {
-    font-weight: 700;
-    font-size: 1.3rem;
-    color: var(--text);
-}
+        h3 {
+            margin: 0 .2rem;
+            font-weight: 600;
+            letter-spacing: .2px;
+            color: var(--text);
+        }
+    }
 
-mat-card-subtitle {
-    color: var(--muted);
-}
-
-.avatar {
-    background: color-mix(in srgb, var(--primary) 16%, transparent);
-    display: grid;
-    place-items: center;
-    border-radius: 50%;
-    width: 44px;
-    height: 44px;
-    min-width: 44px;
-    overflow: hidden;
-}
-
-.avatar mat-icon {
-    color: var(--primary);
-    width: 26px;
-    height: 26px;
-    line-height: 26px;
-    font-size: 26px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    .right {
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+        flex-wrap: wrap;
+    }
 }
 
 mat-chip.status {

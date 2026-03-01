@@ -1,16 +1,16 @@
 <mat-card class="pm-card">
-    <mat-card-header class="pm-header">
-        <div mat-card-avatar class="avatar">
+    <div class="dialog-header">
+        <div class="left">
             <mat-icon>{{ providerIcon() }}</mat-icon>
+            <h3>Signal Detail</h3>
         </div>
-        <mat-card-title>Signal Details</mat-card-title>
-        <mat-card-subtitle>
+        <div class="right">
             <mat-chip-set>
                 @if (data.category) { <mat-chip>{{ data.category }}</mat-chip> }
                 @if (data.status) { <mat-chip class="status">{{ data.status }}</mat-chip> }
             </mat-chip-set>
-        </mat-card-subtitle>
-    </mat-card-header>
+        </div>
+    </div>
 
     <mat-card-content class="pm-content">
         <div class="detail-grid">

@@ -133,11 +133,35 @@
 
 /* Footer */
 .dialog-footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 4;
     display: flex;
-    justify-content: flex-end;
-    gap: .5rem;
-    padding: .5rem .75rem .75rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: .65rem;
+    padding: .55rem .75rem .75rem;
+    background: var(--card);
     border-top: 1px solid var(--border);
+}
+
+.actions-left {
+    display: inline-flex;
+    align-items: center;
+}
+
+.actions-right {
+    display: inline-flex;
+    align-items: center;
+    gap: .6rem;
+}
+
+.desktop-actions {
+    display: inline-flex;
+}
+
+.mobile-actions {
+    display: none;
 }
 
 /* Content blocks */
@@ -368,5 +392,16 @@ mat-chip.status {
     &.DECIDED {
         background: #e6ffef;
         color: #0f6a3c;
+    }
+}
+
+@media (max-width: 900px) {
+    .desktop-actions {
+        display: none;
+    }
+
+    .mobile-actions {
+        display: inline-flex;
+        margin-left: auto;
     }
 }

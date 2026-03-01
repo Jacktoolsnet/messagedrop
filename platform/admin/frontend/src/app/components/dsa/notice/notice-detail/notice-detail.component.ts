@@ -6,6 +6,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { environment } from '../../../../../environments/environment';
 import { DsaNoticeStatus } from '../../../../interfaces/dsa-notice-status.type';
@@ -37,6 +38,7 @@ interface TranslationState {
     MatIconModule,
     MatChipsModule,
     MatDividerModule,
+    MatMenuModule,
     EvidenceListComponent,
     DecisionSummaryComponent,
     NoticeAppealsComponent
