@@ -1,12 +1,14 @@
 import { DatePipe } from '@angular/common';
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -20,9 +22,11 @@ import { DsaSignal } from '../../../../interfaces/dsa-signal.interface';
 import { AuthService } from '../../../../services/auth/auth.service';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
 import { TranslateService } from '../../../../services/translate-service/translate-service.service';
+import { debounceTime, distinctUntilChanged, map, Subscription } from 'rxjs';
 import { ConfirmDialogComponent } from '../../../shared/confirm-dialog.component';
 import { SignalDetailComponent } from '../signal-detail/signal-detail.component';
 
+type SignalStatusFilter = 'open' | 'dismissed';
 
 @Component({
   selector: 'app-dsa-signals',
@@ -34,19 +38,21 @@ import { SignalDetailComponent } from '../signal-detail/signal-detail.component'
     MatToolbarModule,
     MatIconModule,
     MatButtonModule,
+    MatButtonToggleModule,
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
     MatChipsModule,
     MatMenuModule,
+    MatDividerModule,
     MatProgressBarModule,
     MatBadgeModule
   ],
   templateUrl: './signals.component.html',
   styleUrls: ['./signals.component.css']
 })
-export class SignalsComponent {
+export class SignalsComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private auth = inject(AuthService);
   private dsa = inject(DsaService);
@@ -98,9 +104,11 @@ export class SignalsComponent {
 
   get username() { return this.auth.username; }
   get role() { return this.auth.role; }
+  readonly signalStatuses: SignalStatusFilter[] = ['open', 'dismissed'];
 
   // Filter-Form (type/category/search + Zeitraum)
   readonly filterForm = this.fb.nonNullable.group({
+    status: ['open' as SignalStatusFilter],
     type: [''],
     category: [''],
     q: [''],
@@ -111,23 +119,50 @@ export class SignalsComponent {
   readonly loading = signal(false);
   readonly signals = signal<DsaSignal[]>([]);
   readonly selected: DsaSignal | null = null;
+  private subs: Subscription[] = [];
+  private loadRequestId = 0;
+  constructor() { }
 
-  constructor() {
+  ngOnInit(): void {
     // Initial laden
     this.reload();
 
-    // Reaktiv nach Filter-Änderung (kleines Debounce via setTimeout)
-    let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
-    effect(() => {
-      const snapshot = JSON.stringify(this.filterForm.value);
-      if (timeoutHandle) {
-        clearTimeout(timeoutHandle);
-      }
-      timeoutHandle = setTimeout(() => {
-        void snapshot;
-        this.reload();
-      }, 250);
+    const statusSub = this.filterForm.controls.status.valueChanges
+      .pipe(distinctUntilChanged())
+      .subscribe(() => this.reload());
+    this.subs.push(statusSub);
+
+    const rangeSub = this.filterForm.controls.range.valueChanges
+      .pipe(distinctUntilChanged())
+      .subscribe(() => this.reload());
+    this.subs.push(rangeSub);
+
+    let textSnapshot = JSON.stringify({
+      type: this.filterForm.controls.type.value ?? '',
+      category: this.filterForm.controls.category.value ?? '',
+      q: this.filterForm.controls.q.value ?? ''
     });
+
+    const textSub = this.filterForm.valueChanges
+      .pipe(
+        debounceTime(250),
+        map(v => JSON.stringify({
+          type: v.type ?? '',
+          category: v.category ?? '',
+          q: v.q ?? ''
+        })),
+        distinctUntilChanged()
+      )
+      .subscribe((nextSnapshot) => {
+        if (nextSnapshot === textSnapshot) return;
+        textSnapshot = nextSnapshot;
+        this.reload();
+      });
+    this.subs.push(textSub);
+  }
+
+  ngOnDestroy(): void {
+    this.subs.forEach(s => s.unsubscribe());
   }
 
   private sinceFromRange(range: string | null | undefined): number | undefined {
@@ -142,18 +177,42 @@ export class SignalsComponent {
 
   reload() {
     const f = this.filterForm.value;
+    const requestId = ++this.loadRequestId;
     this.loading.set(true);
     this.dsa.listSignals({
+      status: f.status || 'open',
       type: f.type || undefined,
       category: f.category || undefined,
       q: f.q || undefined,
       since: this.sinceFromRange(f.range || 'all'),
       limit: 50,
       offset: 0
-    }).subscribe(items => {
-      this.signals.set(items);
-      this.loading.set(false);
+    }).subscribe({
+      next: (items) => {
+        if (requestId !== this.loadRequestId) return;
+        this.signals.set(items || []);
+      },
+      complete: () => {
+        if (requestId !== this.loadRequestId) return;
+        this.loading.set(false);
+      }
     });
+  }
+
+  statusFilter(): SignalStatusFilter {
+    return this.filterForm.controls.status.value;
+  }
+
+  setStatus(status: SignalStatusFilter | null): void {
+    if (!status) return;
+    const control = this.filterForm.controls.status;
+    if (control.value === status) return;
+    control.setValue(status);
+  }
+
+  statusLabel(status: SignalStatusFilter): string {
+    if (status === 'dismissed') return 'Dismissed';
+    return 'Open';
   }
 
   isNew(s: DsaSignal) {

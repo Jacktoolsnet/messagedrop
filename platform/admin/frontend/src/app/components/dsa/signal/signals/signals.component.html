@@ -5,10 +5,39 @@
 
     <span class="toolbar-title">Signals</span>
     <span class="spacer"></span>
-    <button mat-stroked-button (click)="reload()">
-        <mat-icon>refresh</mat-icon>
-        Refresh
-    </button>
+
+    <div class="desktop-controls">
+        <mat-button-toggle-group class="status-toggle" [formControl]="filterForm.controls.status">
+            @for (status of signalStatuses; track status) {
+            <mat-button-toggle [value]="status">{{ statusLabel(status) }}</mat-button-toggle>
+            }
+        </mat-button-toggle-group>
+
+        <button mat-stroked-button (click)="reload()">
+            <mat-icon>refresh</mat-icon>
+            Refresh
+        </button>
+    </div>
+
+    <div class="mobile-controls">
+        <button mat-icon-button [matMenuTriggerFor]="signalMenu" aria-label="Signals menu">
+            <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #signalMenu="matMenu">
+            <button mat-menu-item disabled>Status</button>
+            @for (status of signalStatuses; track status) {
+            <button mat-menu-item (click)="setStatus(status)">
+                <mat-icon>{{ statusFilter() === status ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
+                <span>{{ statusLabel(status) }}</span>
+            </button>
+            }
+            <mat-divider></mat-divider>
+            <button mat-menu-item (click)="reload()">
+                <mat-icon>refresh</mat-icon>
+                <span>Refresh</span>
+            </button>
+        </mat-menu>
+    </div>
 </mat-toolbar>
 
 @if (loading()) {

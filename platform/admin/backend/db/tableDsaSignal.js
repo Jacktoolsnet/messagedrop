@@ -139,6 +139,7 @@ const getByPublicToken = function (db, token, callBack) {
  *  - contentId
  *  - reportedContentType
  *  - category
+ *  - status ('open' | 'dismissed' | 'all')
  *  - since (createdAt >= since)
  *  - q (LIKE over reasonText, contentId, reportedContent)
  *  - limit, offset
@@ -171,9 +172,17 @@ const list = function (db, opts, callBack) {
 
     let sql = `SELECT * FROM ${tableName}`;
     // Hide dismissed signals by default
-    const baseWhere = [`${columnDismissedAt} IS NULL`];
+    const status = typeof opts?.status === 'string' ? opts.status.toLowerCase() : 'open';
+    const baseWhere = [];
+    if (status === 'dismissed') {
+        baseWhere.push(`${columnDismissedAt} IS NOT NULL`);
+    } else if (status !== 'all') {
+        baseWhere.push(`${columnDismissedAt} IS NULL`);
+    }
     if (where.length) baseWhere.push(where.join(' AND '));
-    sql += ` WHERE ${baseWhere.join(' AND ')}`;
+    if (baseWhere.length) {
+        sql += ` WHERE ${baseWhere.join(' AND ')}`;
+    }
     sql += ` ORDER BY ${columnCreatedAt} DESC`;
 
     const limit = Number.isFinite(opts?.limit) ? Math.max(1, opts.limit) : 100;

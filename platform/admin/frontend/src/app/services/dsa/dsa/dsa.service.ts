@@ -322,6 +322,7 @@ export class DsaService {
 
   listSignals(params: ListSignalsParams): Observable<DsaSignal[]> {
     let hp = new HttpParams();
+    if (params.status) hp = hp.set('status', params.status);
     if (params.type) hp = hp.set('type', params.type);
     if (params.category) hp = hp.set('category', params.category);
     if (params.since) hp = hp.set('since', String(params.since));

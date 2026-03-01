@@ -1,4 +1,5 @@
 export interface ListSignalsParams {
+    status?: 'open' | 'dismissed' | 'all';
     type?: string;        // reportedContentType
     category?: string;
     since?: number;       // unix ms

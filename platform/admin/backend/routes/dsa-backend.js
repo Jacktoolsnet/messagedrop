@@ -1939,6 +1939,7 @@ router.get('/transparency/reports/:id/download', async (req, res, next) => {
  * Optional Query:
  *  - type: reportedContentType
  *  - category: frei (z. B. 'hate', 'privacy')
+ *  - status: 'open' | 'dismissed' | 'all'
  *  - contentId: exakte ID-Suche
  *  - since: unix ms (createdAt >= since)
  *  - q: LIKE über reasonText/contentId/reportedContent
@@ -1946,8 +1947,11 @@ router.get('/transparency/reports/:id/download', async (req, res, next) => {
  */
 router.get('/signals', (req, res, next) => {
     const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
+    const requestedStatus = String(req.query.status || 'open').toLowerCase();
+    const status = ['open', 'dismissed', 'all'].includes(requestedStatus) ? requestedStatus : 'open';
 
     const opts = {
+        status,
         contentId: req.query.contentId ? String(req.query.contentId) : undefined,
         reportedContentType: req.query.type ? String(req.query.type) : undefined,
         category: req.query.category ? String(req.query.category) : undefined,
