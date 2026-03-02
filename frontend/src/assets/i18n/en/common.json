@@ -1236,6 +1236,8 @@
     "userNotFoundTitle": "User not found",
     "userNotFoundMessage": "This user is missing on the server.\n\nWe can restore your data from this device so you can continue.",
     "userNotFoundAction": "Restore from device",
+    "userRecoveredTitle": "Account restored",
+    "userRecoveredMessage": "Your account was missing on the server and has now been restored from this device as far as possible.",
     "backendErrorTitle": "Oops! Backend error!",
     "backendErrorMessage": "Something went wrong. Please try again later."
   },

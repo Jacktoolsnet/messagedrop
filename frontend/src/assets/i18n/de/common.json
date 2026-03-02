@@ -1236,6 +1236,8 @@
     "userNotFoundTitle": "Benutzer nicht gefunden",
     "userNotFoundMessage": "Dieser Benutzer ist auf dem Server nicht vorhanden.\n\nWir können deine Daten von diesem Gerät wiederherstellen, damit du weitermachen kannst.",
     "userNotFoundAction": "Vom Gerät wiederherstellen",
+    "userRecoveredTitle": "Konto wiederhergestellt",
+    "userRecoveredMessage": "Dein Konto war auf dem Server nicht mehr vorhanden und wurde jetzt so weit wie möglich von diesem Gerät wiederhergestellt.",
     "backendErrorTitle": "Ups! Backend-Fehler!",
     "backendErrorMessage": "Es ist etwas schiefgelaufen. Bitte später erneut versuchen."
   },

@@ -1266,33 +1266,77 @@ export class UserService {
     }
   }
 
+  private getHttpStatus(err: unknown): number | undefined {
+    if (!err || typeof err !== 'object') {
+      return undefined;
+    }
+    const status = (err as { status?: unknown }).status;
+    return typeof status === 'number' ? status : undefined;
+  }
+
+  private showUserRecoveredMessage(): void {
+    const dialogRef = this.displayMessage.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: {
+        showAlways: true,
+        title: this.i18n.t('auth.userRecoveredTitle'),
+        image: '',
+        icon: 'verified_user',
+        message: this.i18n.t('auth.userRecoveredMessage'),
+        button: this.i18n.t('common.actions.ok'),
+        delay: 0,
+        showSpinner: false
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      if (!this.hasJwt()) {
+        this.blocked = false;
+      }
+    });
+  }
+
   private async recoverUserFromDevice(user: User, afterLogin?: () => void): Promise<void> {
     this.blocked = true;
     try {
-      await firstValueFrom(this.registerUser(
-        user.id,
-        user.signingKeyPair.publicKey,
-        user.cryptoKeyPair.publicKey,
-        true
-      ));
-    } catch (err) {
-      const status = (err as { status?: number } | null)?.status;
-      if (status !== 409) {
-        throw err;
+      try {
+        await firstValueFrom(this.registerUser(
+          user.id,
+          user.signingKeyPair.publicKey,
+          user.cryptoKeyPair.publicKey,
+          true
+        ));
+      } catch (err) {
+        const status = (err as { status?: number } | null)?.status;
+        if (status !== 409) {
+          throw err;
+        }
       }
-    }
 
-    const challengeResponse = await firstValueFrom(this.requestLoginChallenge(user.id, true));
-    const signature = await this.cryptoService.createSignature(
-      user.signingKeyPair.privateKey,
-      challengeResponse.challenge
-    );
-    const loginResponse = await firstValueFrom(this.loginUser(user.id, challengeResponse.challenge, signature, true));
-    await this.restoreServerFromIndexedDb(user, loginResponse.jwt);
-    this.setUser(user, loginResponse.jwt);
-    void this.ensurePushSubscription(this.getUser());
-    if (afterLogin) {
-      afterLogin();
+      const challengeResponse = await firstValueFrom(this.requestLoginChallenge(user.id, true));
+      const signature = await this.cryptoService.createSignature(
+        user.signingKeyPair.privateKey,
+        challengeResponse.challenge
+      );
+      const loginResponse = await firstValueFrom(this.loginUser(user.id, challengeResponse.challenge, signature, true));
+      await this.restoreServerFromIndexedDb(user, loginResponse.jwt);
+      this.setUser(user, loginResponse.jwt);
+      void this.ensurePushSubscription(this.getUser());
+      if (afterLogin) {
+        afterLogin();
+      }
+      this.showUserRecoveredMessage();
+    } finally {
+      if (!this.hasJwt()) {
+        this.blocked = false;
+      }
     }
   }
 
@@ -1935,6 +1979,42 @@ export class UserService {
       return true;
     } catch (err) {
       console.error('Backend login failed', err);
+      if (this.getHttpStatus(err) === 404) {
+        try {
+          await this.recoverUserFromDevice(user, options?.afterLogin);
+          return this.hasJwt();
+        } catch (recoverErr) {
+          console.error('Automatic user recovery failed', recoverErr);
+          if (options?.showError ?? true) {
+            const dialogRef = this.displayMessage.open(DisplayMessage, {
+              panelClass: '',
+              closeOnNavigation: false,
+              data: {
+                showAlways: true,
+                title: this.i18n.t('auth.backendErrorTitle'),
+                image: '',
+                icon: 'bug_report',
+                message: this.i18n.t('common.restore.failed'),
+                button: this.i18n.t('common.actions.ok'),
+                delay: 0,
+                showSpinner: false
+              },
+              maxWidth: '90vw',
+              maxHeight: '90vh',
+              hasBackdrop: true,
+              backdropClass: 'dialog-backdrop',
+              disableClose: false,
+              autoFocus: false
+            });
+            dialogRef.afterClosed().subscribe(() => {
+              if (options?.blockUi) {
+                this.blocked = false;
+              }
+            });
+          }
+          return false;
+        }
+      }
       if (options?.showError ?? true) {
         const dialogRef = this.displayMessage.open(DisplayMessage, {
           panelClass: '',
