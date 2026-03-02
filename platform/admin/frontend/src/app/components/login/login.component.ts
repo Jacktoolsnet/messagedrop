@@ -1,5 +1,5 @@
 
-import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, ViewChild, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -27,6 +27,8 @@ import { AuthService } from '../../services/auth/auth.service';
 ]
 })
 export class LoginComponent {
+  @ViewChild('otpInput') private otpInput?: ElementRef<HTMLInputElement>;
+
   username = '';
   password = '';
   otpCode = '';
@@ -52,6 +54,10 @@ export class LoginComponent {
       this.challengeId = challengeId;
       this.expiresAt = expiresAt;
       this.step = 'otp';
+
+      queueMicrotask(() => {
+        this.otpInput?.nativeElement?.focus();
+      });
     });
   }
 
