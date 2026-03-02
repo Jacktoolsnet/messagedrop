@@ -1,0 +1,47 @@
+<mat-toolbar>
+  <button mat-icon-button [routerLink]="backLink()" aria-label="Back">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <span class="toolbar-title">Public Activity Statistics</span>
+  <span class="spacer"></span>
+  <button mat-stroked-button (click)="reload()">
+    <mat-icon>refresh</mat-icon>
+    Refresh
+  </button>
+</mat-toolbar>
+
+@if (loading()) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+<div class="page">
+  <p class="intro">
+    These charts show the latest 7 days for selected public platform activity metrics.
+  </p>
+
+  @if (error(); as errorMessage) {
+    <mat-card class="error-card">
+      <mat-icon>error</mat-icon>
+      <span>{{ errorMessage }}</span>
+    </mat-card>
+  }
+
+  <div class="tiles-grid">
+    @for (metric of metrics; track metric.key) {
+      <section class="tile">
+        <app-statistic-key-chart
+          [title]="metric.title"
+          [iconName]="metric.icon"
+          [color]="metric.color"
+          [chartKind]="'bar'"
+          [points]="pointsFor(metric.key)">
+        </app-statistic-key-chart>
+        <div class="tile-footer">
+          <span>Total (7 days): <strong>{{ totalFor(metric.key) }}</strong></span>
+          <span>Peak/day: <strong>{{ maxFor(metric.key) }}</strong></span>
+        </div>
+      </section>
+    }
+  </div>
+</div>
+

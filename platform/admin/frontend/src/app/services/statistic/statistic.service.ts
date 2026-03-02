@@ -8,6 +8,7 @@ import { MultiSeriesResponse } from '../../interfaces/statistic-multi-series-res
 @Injectable({ providedIn: 'root' })
 export class StatisticService {
   private readonly baseUrl = `${environment.apiUrl}/statistic`;
+  private readonly publicBaseUrl = `${environment.apiUrl}/public/statistic`;
   private readonly http = inject(HttpClient);
 
   getKeys(): Observable<{ status: number; keys: string[] }> {
@@ -27,5 +28,9 @@ export class StatisticService {
     params = params.set('fill', 'true');
 
     return this.http.get<MultiSeriesResponse>(`${this.baseUrl}/series`, { params });
+  }
+
+  getPublicOverview7d(): Observable<MultiSeriesResponse> {
+    return this.http.get<MultiSeriesResponse>(`${this.publicBaseUrl}/overview-7d`);
   }
 }

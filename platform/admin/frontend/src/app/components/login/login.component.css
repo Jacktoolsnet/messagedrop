@@ -35,16 +35,32 @@
     align-items: stretch;
 }
 
+.public-stack {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    gap: 1rem;
+    min-height: 0;
+    height: 100%;
+}
+
 @media (max-width: 900px) {
     .login-grid {
         grid-template-columns: 1fr;
         width: min(420px, 94vw);
+    }
+
+    .public-stack {
+        grid-template-rows: auto;
+        height: auto;
     }
 }
 
 /* === Glass Card === */
 .login-card {
     width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-rows: auto 1fr;
     border-radius: 16px;
     background: var(--card);
     border: 1px solid var(--border);
@@ -73,6 +89,9 @@
 
 .public-card {
     width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-rows: auto 1fr;
     border-radius: 16px;
     background: var(--card);
     border: 1px solid var(--border);
@@ -104,7 +123,7 @@
 .public-content {
     display: grid;
     gap: .9rem;
-    align-content: start;
+    align-content: space-between;
 
     p {
         margin: 0;

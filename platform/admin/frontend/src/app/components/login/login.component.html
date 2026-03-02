@@ -58,23 +58,44 @@
             </mat-card-content>
         </mat-card>
 
-        <mat-card class="public-card">
-            <mat-card-header>
-                <div mat-card-avatar class="brand-avatar info-avatar">
-                    <mat-icon class="fallback">insights</mat-icon>
-                </div>
-                <mat-card-title>Transparency</mat-card-title>
-                <mat-card-subtitle>Öffentliche DSA-Statistik</mat-card-subtitle>
-            </mat-card-header>
-            <mat-card-content class="public-content">
-                <p>
-                    Öffentliche Transparenzberichte, Kennzahlen und Downloads ohne Login ansehen.
-                </p>
-                <button mat-stroked-button routerLink="/transparency">
-                    <mat-icon>open_in_new</mat-icon>
-                    Zur Transparenzseite
-                </button>
-            </mat-card-content>
-        </mat-card>
+        <div class="public-stack">
+            <mat-card class="public-card">
+                <mat-card-header>
+                    <div mat-card-avatar class="brand-avatar info-avatar">
+                        <mat-icon class="fallback">insights</mat-icon>
+                    </div>
+                    <mat-card-title>Transparency</mat-card-title>
+                    <mat-card-subtitle>Öffentliche DSA-Statistik</mat-card-subtitle>
+                </mat-card-header>
+                <mat-card-content class="public-content">
+                    <p>
+                        Öffentliche Transparenzberichte, Kennzahlen und Downloads ohne Login ansehen.
+                    </p>
+                    <button mat-stroked-button routerLink="/transparency">
+                        <mat-icon>open_in_new</mat-icon>
+                        Zur Transparenzseite
+                    </button>
+                </mat-card-content>
+            </mat-card>
+
+            <mat-card class="public-card">
+                <mat-card-header>
+                    <div mat-card-avatar class="brand-avatar info-avatar">
+                        <mat-icon class="fallback">query_stats</mat-icon>
+                    </div>
+                    <mat-card-title>Public Statistics</mat-card-title>
+                    <mat-card-subtitle>7-day activity charts</mat-card-subtitle>
+                </mat-card-header>
+                <mat-card-content class="public-content">
+                    <p>
+                        View public activity trends for page views, new messages, searches and new users.
+                    </p>
+                    <button mat-stroked-button routerLink="/public-statistics">
+                        <mat-icon>open_in_new</mat-icon>
+                        Open public statistics
+                    </button>
+                </mat-card-content>
+            </mat-card>
+        </div>
     </div>
 </div>

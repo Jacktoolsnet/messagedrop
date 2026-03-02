@@ -10,6 +10,7 @@ const tableDecision = require('../db/tableDsaDecision');
 const tableEvidence = require('../db/tableDsaEvidence');
 const tableAudit = require('../db/tableDsaAuditLog');
 const tableAppeal = require('../db/tableDsaAppeal');
+const tableStatistic = require('../db/tableStatistic');
 const multer = require('multer');
 const { notifyContentOwner } = require('../utils/notifyContentOwner');
 const { notifyReporter } = require('../utils/notifyReporter');
@@ -95,6 +96,75 @@ const evidencePow = createPowGuard({
 function db(req) {
   return req.database?.db;
 }
+
+function toDateStrUTC(d) {
+  return new Date(d).toISOString().slice(0, 10);
+}
+
+function addDays(dateStr, delta) {
+  const d = new Date(`${dateStr}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + delta);
+  return toDateStrUTC(d);
+}
+
+function fillMissingSeries(from, to, rows) {
+  const map = new Map((rows || []).map(r => [r.date, Number(r.value) || 0]));
+  const points = [];
+  let cur = from;
+  while (cur <= to) {
+    points.push({ date: cur, value: map.get(cur) ?? 0 });
+    cur = addDays(cur, 1);
+  }
+  return points;
+}
+
+function getStatisticRangeBetween(dbInstance, key, fromDate, toDate) {
+  return new Promise((resolve, reject) => {
+    tableStatistic.getRangeBetween(dbInstance, key, fromDate, toDate, (err, rows) => {
+      if (err) return reject(err);
+      resolve(rows || []);
+    });
+  });
+}
+
+router.get('/statistic/overview-7d', async (req, res, next) => {
+  const _db = db(req);
+  if (!_db) return next(apiError.internal('database_unavailable'));
+
+  const metricKeys = [
+    'client.connect',
+    'message.create',
+    'message.search',
+    'user.create'
+  ];
+
+  try {
+    const to = toDateStrUTC(new Date());
+    const from = addDays(to, -6);
+    const series = {};
+
+    await Promise.all(metricKeys.map(async (key) => {
+      const rows = await getStatisticRangeBetween(_db, key, from, to);
+      const points = fillMissingSeries(from, to, rows);
+      series[key] = {
+        points,
+        total: points.reduce((sum, point) => sum + point.value, 0),
+        max: points.reduce((max, point) => Math.max(max, point.value), 0)
+      };
+    }));
+
+    res.json({
+      status: 200,
+      from,
+      to,
+      series
+    });
+  } catch (err) {
+    const apiErr = apiError.internal('db_error');
+    apiErr.detail = err instanceof Error ? err.message : String(err);
+    return next(apiErr);
+  }
+});
 
 function toPromise(fn, ...params) {
   return new Promise((resolve, reject) => {

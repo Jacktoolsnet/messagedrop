@@ -19,12 +19,14 @@ import { WarnLogsComponent } from './components/loging/warn-logs/warn-logs.compo
 import { MaintenanceComponent } from './components/maintenance/maintenance.component';
 import { ModerationQueueComponent } from './components/moderation/moderation-queue/moderation-queue.component';
 import { PublicStatusComponent } from './components/public-status/public-status.component';
+import { PublicOverviewComponent } from './components/statistic/public-overview/public-overview.component';
 import { StatisticComponent } from './components/statistic/statistic.component';
 import { authGuard } from './guards/auth/auth-guard';
 
 export const routes: Routes = [
     { path: 'status/:token', component: PublicStatusComponent },
     { path: 'transparency', component: TransparencyComponent },
+    { path: 'public-statistics', component: PublicOverviewComponent },
     { path: '', component: LoginComponent },
     {
         path: 'dashboard',
