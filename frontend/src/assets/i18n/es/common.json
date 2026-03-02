@@ -390,6 +390,11 @@
       "addMessageAria": "Añadir mensaje",
       "addFirstComment": "Añadir mi primer comentario público",
       "addCommentAria": "Añadir comentario",
+      "filter": {
+        "aria": "Filtrar mis mensajes públicos",
+        "all": "Todos los mensajes",
+        "missingOnline": "No está en línea"
+      },
       "commentsAria": "Mostrar o añadir comentarios",
       "likeAria": "Me gusta",
       "dislikeAria": "No me gusta",
@@ -399,6 +404,8 @@
       "editProfileAria": "Editar perfil",
       "editAria": "Editar mensaje",
       "editCommentAria": "Editar comentario",
+      "publishAria": "Publicar mensaje",
+      "unpublishAria": "Retirar publicación",
       "deleteAria": "Eliminar mensaje",
       "blockAria": "Reportar mensaje",
       "avatarAltName": "Avatar de {{ name }}",
@@ -415,6 +422,13 @@
       "deleteDialog": {
         "title": "Eliminar mensaje",
         "confirm": "El mensaje y todos los comentarios relacionados se eliminarán permanentemente. ¿Estás seguro?"
+      },
+      "publishState": {
+        "published": "Publicado",
+        "unpublished": "Retirado",
+        "serverMissing": "No está en línea",
+        "localOnly": "Solo local",
+        "dsaLocked": "Bloqueado por DSA"
       },
       "moderationStatus": {
         "title": "Estado de moderación",
@@ -1236,6 +1250,8 @@
     "userNotFoundTitle": "Usuario no encontrado",
     "userNotFoundMessage": "Este usuario no está disponible en el servidor.\n\nPodemos restaurar tus datos desde este dispositivo para que puedas continuar.",
     "userNotFoundAction": "Restaurar desde el dispositivo",
+    "userRecoveredTitle": "Cuenta restaurada",
+    "userRecoveredMessage": "Tu cuenta ya no estaba en el servidor y se ha restaurado desde este dispositivo en la medida de lo posible.",
     "backendErrorTitle": "¡Ups! ¡Error del backend!",
     "backendErrorMessage": "Algo salió mal. Inténtalo de nuevo más tarde."
   },

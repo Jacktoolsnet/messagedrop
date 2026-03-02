@@ -32,6 +32,7 @@ export interface Message {
     manualModerationAt?: number | null,
     manualModerationBy?: string | null,
     dsaStatusToken?: string,
+    publishState?: 'published' | 'unpublished' | 'server_missing' | 'local_only' | 'dsa_locked',
     userId: string
     multimedia: Multimedia
 }

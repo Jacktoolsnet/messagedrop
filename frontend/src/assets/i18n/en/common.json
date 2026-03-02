@@ -390,6 +390,11 @@
       "addMessageAria": "Add message",
       "addFirstComment": "Add my first public comment",
       "addCommentAria": "Add comment",
+      "filter": {
+        "aria": "Filter my public messages",
+        "all": "All messages",
+        "missingOnline": "Missing online"
+      },
       "commentsAria": "Show or add comments",
       "likeAria": "Like message",
       "dislikeAria": "Dislike message",
@@ -399,6 +404,8 @@
       "editProfileAria": "Edit profile",
       "editAria": "Edit message",
       "editCommentAria": "Edit comment",
+      "publishAria": "Publish message",
+      "unpublishAria": "Unpublish message",
       "deleteAria": "Delete message",
       "blockAria": "Report message",
       "avatarAltName": "{{ name }} avatar",
@@ -415,6 +422,13 @@
       "deleteDialog": {
         "title": "Delete message",
         "confirm": "The message and all related comments will be permanently deleted. Are you sure?"
+      },
+      "publishState": {
+        "published": "Published",
+        "unpublished": "Unpublished",
+        "serverMissing": "Missing online",
+        "localOnly": "Local only",
+        "dsaLocked": "DSA locked"
       },
       "moderationStatus": {
         "title": "Moderation status",

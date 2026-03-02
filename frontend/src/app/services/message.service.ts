@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { inject, Injectable, signal, WritableSignal } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { catchError, forkJoin, map, Observable, of, throwError } from 'rxjs';
+import { catchError, firstValueFrom, forkJoin, map, Observable, of, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { DisplayMessage } from '../components/utils/display-message/display-message.component';
 import { BoundingBox } from '../interfaces/bounding-box';
@@ -14,6 +14,7 @@ import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { ToggleResponse } from '../interfaces/toggle-response';
 import { User } from '../interfaces/user';
 import { GeolocationService } from './geolocation.service';
+import { IndexedDbService } from './indexed-db.service';
 import { MapService } from './map.service';
 import { NetworkService } from './network.service';
 import { TranslationHelperService } from './translation-helper.service';
@@ -60,6 +61,7 @@ export class MessageService {
   private readonly geolocationService = inject(GeolocationService);
   private readonly networkService = inject(NetworkService);
   private readonly i18n = inject(TranslationHelperService);
+  private readonly indexedDbService = inject(IndexedDbService);
 
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error);
@@ -89,6 +91,33 @@ export class MessageService {
     const num = this.toNullableNumber(value);
     if (num === null) return null;
     return num < 1_000_000_000_000 ? num * 1000 : num;
+  }
+
+  private normalizePublishState(message: Partial<Message>): Message['publishState'] {
+    if (message.manualModerationDecision === 'rejected') {
+      return 'dsa_locked';
+    }
+    if (message.status === 'disabled' && message.dsaStatusToken) {
+      return 'dsa_locked';
+    }
+    if (message.status === 'enabled') {
+      return 'published';
+    }
+    return 'unpublished';
+  }
+
+  isDsaLocked(message: Partial<Message>): boolean {
+    return this.normalizePublishState(message) === 'dsa_locked';
+  }
+
+  private getMessageIdentifier(message: Message): string | number | null {
+    if (Number.isFinite(message.id) && message.id > 0) {
+      return message.id;
+    }
+    if (typeof message.uuid === 'string' && message.uuid.trim().length > 0) {
+      return message.uuid;
+    }
+    return null;
   }
 
   private buildModerationPatch(moderation?: MessageCreateResponse['moderation'] | null): Partial<Message> {
@@ -227,6 +256,104 @@ export class MessageService {
     this.selectedMessagesSignal.set([]);
   }
 
+  async loadOwnPublicMessages(userId: string): Promise<Message[]> {
+    if (!userId) {
+      return [];
+    }
+    const messages = await this.indexedDbService.getOwnPublicMessages(userId);
+    if (!Array.isArray(messages)) {
+      return [];
+    }
+    return messages.map((message) => ({
+      ...message,
+      publishState: message.publishState ?? this.normalizePublishState(message)
+    }));
+  }
+
+  async saveOwnPublicMessages(userId: string, messages: Message[]): Promise<void> {
+    if (!userId) {
+      return;
+    }
+    const snapshot = (messages ?? []).map((message) => ({
+      ...message,
+      publishState: message.publishState ?? this.normalizePublishState(message),
+      translatedMessage: undefined
+    }));
+    await this.indexedDbService.setOwnPublicMessages(userId, snapshot);
+  }
+
+  mergeOwnPublicMessages(localMessages: Message[], serverMessages: Message[]): Message[] {
+    const merged = new Map<string, Message>();
+    const serverByUuid = new Map<string, Message>();
+
+    for (const serverMessage of serverMessages ?? []) {
+      const key = String(serverMessage?.uuid ?? '').trim();
+      if (!key) {
+        continue;
+      }
+      const normalized: Message = {
+        ...serverMessage,
+        publishState: this.normalizePublishState(serverMessage)
+      };
+      serverByUuid.set(key, normalized);
+      merged.set(key, normalized);
+    }
+
+    for (const localMessage of localMessages ?? []) {
+      const key = String(localMessage?.uuid ?? '').trim();
+      if (!key) {
+        continue;
+      }
+
+      const serverMessage = serverByUuid.get(key);
+      if (serverMessage) {
+        merged.set(key, {
+          ...localMessage,
+          ...serverMessage,
+          translatedMessage: localMessage.translatedMessage ?? serverMessage.translatedMessage,
+          publishState: this.normalizePublishState(serverMessage)
+        });
+        continue;
+      }
+
+      const localState = localMessage.publishState ?? this.normalizePublishState(localMessage);
+      const missingState: Message['publishState'] = localState === 'local_only' ? 'local_only' : 'server_missing';
+      merged.set(key, {
+        ...localMessage,
+        publishState: this.isDsaLocked(localMessage) ? 'dsa_locked' : missingState
+      });
+    }
+
+    return Array.from(merged.values()).sort((a, b) => (b.createDateTime ?? 0) - (a.createDateTime ?? 0));
+  }
+
+  async syncOwnPublicMessages(user: User): Promise<Message[]> {
+    const localMessages = await this.loadOwnPublicMessages(user.id);
+    let serverMessages: Message[] = [];
+    let serverSyncAvailable = false;
+    try {
+      const response = await firstValueFrom(this.http.get<GetMessageResponse>(
+        `${environment.apiUrl}/message/get/userId/${encodeURIComponent(user.id)}`,
+        this.httpOptions
+      ));
+      serverMessages = this.mapRawMessages(response?.rows ?? []);
+      serverSyncAvailable = true;
+    } catch {
+      const normalizedLocal = localMessages.map((message) => ({
+        ...message,
+        publishState: message.publishState ?? this.normalizePublishState(message)
+      }));
+      await this.saveOwnPublicMessages(user.id, normalizedLocal);
+      return normalizedLocal;
+    }
+
+    const merged = serverSyncAvailable
+      ? this.mergeOwnPublicMessages(localMessages, serverMessages)
+      : localMessages;
+    await this.saveOwnPublicMessages(user.id, merged);
+    return merged;
+  }
+
   getCommentsSignalForMessage(parentUuid: string): WritableSignal<Message[]> {
     if (!this.commentsSignals.has(parentUuid)) {
       this.commentsSignals.set(parentUuid, signal<Message[]>([]));
@@ -275,6 +402,11 @@ export class MessageService {
       manualModerationAt: this.toNullableNumber(raw.manualModerationAt),
       manualModerationBy: raw.manualModerationBy ?? null,
       dsaStatusToken: raw.dsaStatusToken,
+      publishState: this.normalizePublishState({
+        status: raw.status,
+        dsaStatusToken: raw.dsaStatusToken,
+        manualModerationDecision: raw.manualModerationDecision ?? null
+      }),
       userId: raw.userId,
       multimedia: JSON.parse(raw.multimedia)
     };
@@ -326,9 +458,22 @@ export class MessageService {
             ...message,
             ...moderationPatch,
             id: createdId ?? message.id,
-            uuid: createdUuid ?? message.uuid
+            uuid: createdUuid ?? message.uuid,
+            status: 'enabled',
+            publishState: this.normalizePublishState({
+              status: 'enabled',
+              dsaStatusToken: message.dsaStatusToken
+            })
           };
-          this.messagesSignal.update(messages => [nextMessage, ...messages]);
+          this.messagesSignal.update(messages => {
+            const index = messages.findIndex(item => item.uuid === nextMessage.uuid);
+            if (index >= 0) {
+              const next = [...messages];
+              next[index] = { ...next[index], ...nextMessage };
+              return next;
+            }
+            return [nextMessage, ...messages];
+          });
           if (decision === 'review') {
             this.showModerationReviewMessage(this.i18n.t('common.message.moderationReview'));
           } else {
@@ -388,7 +533,12 @@ export class MessageService {
             ...message,
             ...moderationPatch,
             id: createdId ?? message.id,
-            uuid: createdUuid ?? message.uuid
+            uuid: createdUuid ?? message.uuid,
+            status: 'enabled',
+            publishState: this.normalizePublishState({
+              status: 'enabled',
+              dsaStatusToken: message.dsaStatusToken
+            })
           };
           const nextComments = [...commentsSignal(), nextMessage];
           commentsSignal.set(nextComments);
@@ -456,11 +606,26 @@ export class MessageService {
           const moderationPatch = this.buildModerationPatch(res?.moderation);
           if (decision === 'rejected') {
             this.showModerationRejected(this.getModerationRejectedMessage(res?.moderation?.reason ?? null));
-            this.patchMessageSnapshotSmart(message, { status: 'disabled', ...moderationPatch });
+            this.patchMessageSnapshotSmart(message, {
+              status: 'disabled',
+              publishState: this.normalizePublishState({
+                ...message,
+                status: 'disabled'
+              }),
+              ...moderationPatch
+            });
             return;
           }
 
-          this.patchMessageSnapshotSmart(message, { ...message, status: 'enabled', ...moderationPatch });
+          this.patchMessageSnapshotSmart(message, {
+            ...message,
+            status: 'enabled',
+            publishState: this.normalizePublishState({
+              ...message,
+              status: 'enabled'
+            }),
+            ...moderationPatch
+          });
           if (decision === 'review') {
             this.showModerationReviewMessage(this.i18n.t('common.message.moderationReview'));
           } else if (wasDisabled) {
@@ -469,6 +634,63 @@ export class MessageService {
         },
         error: err => this.snackBar.open(err.message, this.i18n.t('common.actions.ok'))
       });
+  }
+
+  setMessagePublished(message: Message, published: boolean, showAlways = false): Observable<SimpleStatusResponse> {
+    const idOrUuid = this.getMessageIdentifier(message);
+    if (!idOrUuid) {
+      return throwError(() => new Error('invalid_message_identifier'));
+    }
+    const action = published ? 'enable' : 'disable';
+    const url = `${environment.apiUrl}/message/${action}/${encodeURIComponent(String(idOrUuid))}`;
+    this.networkService.setNetworkMessageConfig(url, {
+      showAlways,
+      title: this.i18n.t('common.message.title'),
+      image: '',
+      icon: '',
+      message: published ? this.i18n.t('common.message.updating') : this.i18n.t('common.message.disabling'),
+      button: '',
+      delay: 0,
+      showSpinner: true,
+      autoclose: false
+    });
+
+    return this.http.get<SimpleStatusResponse>(url, this.httpOptions).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  publishMissingMessage(message: Message, user: User, showAlways = false): Observable<MessageCreateResponse> {
+    const url = `${environment.apiUrl}/message/create`;
+    this.networkService.setNetworkMessageConfig(url, {
+      showAlways,
+      title: this.i18n.t('common.message.title'),
+      image: '',
+      icon: '',
+      message: this.i18n.t('common.message.creating'),
+      button: '',
+      delay: 0,
+      showSpinner: true,
+      autoclose: false
+    });
+    const body = {
+      uuid: message.uuid,
+      parentMessageId: message.parentId,
+      parentUuid: message.parentUuid,
+      messageTyp: message.typ,
+      latitude: message.location.latitude,
+      longitude: message.location.longitude,
+      plusCode: message.location.plusCode,
+      message: message.message,
+      markerType: message.markerType,
+      style: message.style,
+      hashtags: normalizeHashtags(message.hashtags ?? [], MAX_PUBLIC_HASHTAGS).tags,
+      messageUserId: user.id,
+      multimedia: JSON.stringify(message.multimedia)
+    };
+    return this.http.post<MessageCreateResponse>(url, body, this.httpOptions).pipe(
+      catchError(this.handleError)
+    );
   }
 
   private patchMessageSnapshotSmart(target: Message, patch: Partial<Message>) {
@@ -691,8 +913,71 @@ export class MessageService {
     window.open(url, '_blank');
   }
 
+  private removeMessageFromSignals(message: Message): void {
+    const isRootMessage = this.messagesSignal().some(m => m.id === message.id || m.uuid === message.uuid);
+
+    if (isRootMessage) {
+      const parentUuid = message.uuid;
+      const existing = this.messagesSignal();
+      const toRemove = new Set<string>([parentUuid]);
+      const queue: string[] = [parentUuid];
+
+      while (queue.length > 0) {
+        const current = queue.shift();
+        if (!current) {
+          continue;
+        }
+        const directFromMessages = existing
+          .filter(item => item.parentUuid === current)
+          .map(item => item.uuid);
+        const directFromSignals = this.commentsSignals.get(current)?.().map(item => item.uuid) ?? [];
+        [...directFromMessages, ...directFromSignals].forEach(uuid => {
+          if (!toRemove.has(uuid)) {
+            toRemove.add(uuid);
+            queue.push(uuid);
+          }
+        });
+      }
+
+      this.messagesSignal.update(messages =>
+        messages.filter(m => !toRemove.has(m.uuid) && !toRemove.has(m.parentUuid))
+      );
+      this.selectedMessagesSignal.set([]);
+
+      this.commentCountsSignal.update(counts => {
+        const next = { ...counts };
+        toRemove.forEach(uuid => {
+          delete next[uuid];
+        });
+        return next;
+      });
+
+      toRemove.forEach(uuid => {
+        const sig = this.commentsSignals.get(uuid);
+        if (sig) {
+          sig.set([]);
+          this.commentsSignals.delete(uuid);
+        }
+        delete this.commentCounts[uuid];
+      });
+      return;
+    }
+
+    if (message.parentUuid) {
+      const commentsSignal = this.getCommentsSignalForMessage(message.parentUuid);
+      commentsSignal.set(commentsSignal().filter(c => c.id !== message.id && c.uuid !== message.uuid));
+
+      this.commentCountsSignal.update(counts => ({
+        ...counts,
+        [message.parentUuid!]: Math.max((counts[message.parentUuid!] || 0) - 1, 0)
+      }));
+
+      this.commentCounts[message.parentUuid] = Math.max((this.commentCounts[message.parentUuid] || 0) - 1, 0);
+    }
+  }
+
   deleteMessage(message: Message, showAlways = false) {
-    const idOrUuid = message.id ?? message.uuid;
+    const idOrUuid = this.getMessageIdentifier(message);
     if (!idOrUuid) {
       this.snackBar.open(this.i18n.t('common.message.deleteFailed'), this.i18n.t('common.actions.ok'));
       return;
@@ -716,68 +1001,15 @@ export class MessageService {
       .subscribe({
         next: (simpleStatusResponse) => {
           if (simpleStatusResponse.status !== 200) return;
-
-          const isRootMessage = this.messagesSignal().some(m => m.id === message.id);
-
-          if (isRootMessage) {
-            const parentUuid = message.uuid;
-            const existing = this.messagesSignal();
-            const toRemove = new Set<string>([parentUuid]);
-            const queue: string[] = [parentUuid];
-
-            while (queue.length > 0) {
-              const current = queue.shift();
-              if (!current) {
-                continue;
-              }
-              const directFromMessages = existing
-                .filter(item => item.parentUuid === current)
-                .map(item => item.uuid);
-              const directFromSignals = this.commentsSignals.get(current)?.().map(item => item.uuid) ?? [];
-              [...directFromMessages, ...directFromSignals].forEach(uuid => {
-                if (!toRemove.has(uuid)) {
-                  toRemove.add(uuid);
-                  queue.push(uuid);
-                }
-              });
-            }
-
-            this.messagesSignal.update(messages =>
-              messages.filter(m => !toRemove.has(m.uuid) && !toRemove.has(m.parentUuid))
-            );
-            this.selectedMessagesSignal.set([]);
-
-            this.commentCountsSignal.update(counts => {
-              const next = { ...counts };
-              toRemove.forEach(uuid => {
-                delete next[uuid];
-              });
-              return next;
-            });
-
-            toRemove.forEach(uuid => {
-              const sig = this.commentsSignals.get(uuid);
-              if (sig) {
-                sig.set([]);
-                this.commentsSignals.delete(uuid);
-              }
-              delete this.commentCounts[uuid];
-            });
-          } else {
-            const commentsSignal = this.getCommentsSignalForMessage(message.parentUuid!);
-            commentsSignal.set(commentsSignal().filter(c => c.id !== message.id));
-
-            this.commentCountsSignal.update(counts => ({
-              ...counts,
-              [message.parentUuid]: Math.max((counts[message.parentUuid] || 0) - 1, 0)
-            }));
-
-            this.commentCounts[message.parentUuid] = Math.max((this.commentCounts[message.parentUuid] || 0) - 1, 0);
-          }
+          this.removeMessageFromSignals(message);
         },
         error: (err) => {
-          const message = err.message ?? this.i18n.t('common.message.deleteFailed');
-          this.snackBar.open(message, this.i18n.t('common.actions.ok'));
+          if (err?.status === 404) {
+            this.removeMessageFromSignals(message);
+            return;
+          }
+          const errorMessage = err.message ?? this.i18n.t('common.message.deleteFailed');
+          this.snackBar.open(errorMessage, this.i18n.t('common.actions.ok'));
         }
       });
   }
@@ -802,31 +1034,7 @@ export class MessageService {
       .pipe(catchError(this.handleError))
       .subscribe({
         next: (getMessageResponse) => {
-          const comments = (getMessageResponse.rows ?? []).map((rawMessage: RawMessage) => ({
-            id: rawMessage.id,
-            uuid: rawMessage.uuid,
-            parentId: rawMessage.parentId,
-            parentUuid: rawMessage.parentUuid,
-            typ: rawMessage.typ,
-            createDateTime: this.toEpochMs(rawMessage.createDateTime),
-            deleteDateTime: this.toEpochMs(rawMessage.deleteDateTime),
-            location: {
-              latitude: rawMessage.latitude,
-              longitude: rawMessage.longitude,
-              plusCode: rawMessage.plusCode,
-            },
-            message: rawMessage.message,
-            markerType: rawMessage.markerType,
-            style: rawMessage.style,
-            views: rawMessage.views,
-            likes: rawMessage.likes,
-            dislikes: rawMessage.dislikes,
-            comments: [],
-            commentsNumber: rawMessage.commentsNumber,
-            status: rawMessage.status,
-            userId: rawMessage.userId,
-            multimedia: JSON.parse(rawMessage.multimedia)
-          }));
+          const comments = (getMessageResponse.rows ?? []).map((rawMessage: RawMessage) => this.mapRawMessage(rawMessage));
           commentsSignal.set(comments);
           // commentCountsSignal aktualisieren
           comments.forEach(comment => {

@@ -27,6 +27,9 @@
                     @if (message.createDateTime !== null) {
                     <span class="timestamp-inline">{{ message.createDateTime | date:'medium' }}</span>
                     }
+                    @if (isOwnPublicMessage(message)) {
+                    <span [ngClass]="getPublishStateBadgeClass(message)">{{ getPublishStateBadgeLabel(message) }}</span>
+                    }
                 </div>
             </div>
             } @else {
@@ -76,6 +79,13 @@
                     (click)="!userService.isReady() ? deleteMessageAfterLoginClick(message) : deleteMessageClick(message)">
                     <mat-icon aria-hidden="false">delete_forever</mat-icon>
                 </button>
+                @if (canPublishMessage(message) || canUnpublishMessage(message)) {
+                <button mat-mini-fab color="secondary"
+                    [attr.aria-label]="getPublishToggleAriaLabel(message)"
+                    (click)="!userService.isReady() ? togglePublishAfterLoginClick(message) : togglePublishClick(message)">
+                    <mat-icon aria-hidden="false">{{ getPublishToggleIcon(message) }}</mat-icon>
+                </button>
+                }
                 }
                 }
                 <div class="button-group">
@@ -99,7 +109,7 @@
                     </button>
                     }
                     @if (this.userService.getUser().id === message.userId) {
-                    @if (userService.hasJwt()) {
+                    @if (canEditMessage(message)) {
                     <button mat-mini-fab color="secondary" [attr.aria-label]="'common.messageList.editAria' | transloco"
                         (click)="!userService.isReady() ? editMessageAfterLoginClick(message) : editMessageClick(message)">
                         <mat-icon aria-hidden="false">edit</mat-icon>
@@ -181,6 +191,9 @@
                     @if (message.createDateTime !== null) {
                     <span class="timestamp-inline">{{ message.createDateTime | date:'medium' }}</span>
                     }
+                    @if (isOwnPublicMessage(message)) {
+                    <span [ngClass]="getPublishStateBadgeClass(message)">{{ getPublishStateBadgeLabel(message) }}</span>
+                    }
                 </div>
             </div>
             } @else {
@@ -230,6 +243,13 @@
                     (click)="!userService.isReady() ? deleteMessageAfterLoginClick(message) : deleteMessageClick(message)">
                     <mat-icon aria-hidden="false">delete_forever</mat-icon>
                 </button>
+                @if (canPublishMessage(message) || canUnpublishMessage(message)) {
+                <button mat-mini-fab color="secondary"
+                    [attr.aria-label]="getPublishToggleAriaLabel(message)"
+                    (click)="!userService.isReady() ? togglePublishAfterLoginClick(message) : togglePublishClick(message)">
+                    <mat-icon aria-hidden="false">{{ getPublishToggleIcon(message) }}</mat-icon>
+                </button>
+                }
                 }
                 }
                 <div class="button-group">
@@ -253,7 +273,7 @@
                     </button>
                     }
                     @if (this.userService.getUser().id === message.userId) {
-                    @if (userService.hasJwt()) {
+                    @if (canEditMessage(message)) {
                     <button mat-mini-fab color="secondary" [attr.aria-label]="'common.messageList.editAria' | transloco"
                         (click)="!userService.isReady() ? editMessageAfterLoginClick(message) : editMessageClick(message)">
                         <mat-icon aria-hidden="false">edit</mat-icon>
@@ -335,6 +355,20 @@
     }
     }
     @if (messageService.selectedMessagesSignal().length === 0) {
+    <button mat-icon-button [matMenuTriggerFor]="publishFilterMenu"
+        [attr.aria-label]="'common.messageList.filter.aria' | transloco">
+        <mat-icon>filter_alt</mat-icon>
+    </button>
+    <mat-menu #publishFilterMenu="matMenu">
+        <button mat-menu-item (click)="setPublishFilter('all')">
+            <mat-icon aria-hidden="true">{{ isPublishFilterActive('all') ? 'check' : 'radio_button_unchecked' }}</mat-icon>
+            <span>{{ getPublishFilterLabel('all') }}</span>
+        </button>
+        <button mat-menu-item (click)="setPublishFilter('missing_online')">
+            <mat-icon aria-hidden="true">{{ isPublishFilterActive('missing_online') ? 'check' : 'radio_button_unchecked' }}</mat-icon>
+            <span>{{ getPublishFilterLabel('missing_online') }}</span>
+        </button>
+    </mat-menu>
     @if (!userService.isReady() || userService.hasJwt()) {
     <button mat-icon-button color="primary"
         [attr.aria-label]="'common.messageList.addMessageAria' | transloco"

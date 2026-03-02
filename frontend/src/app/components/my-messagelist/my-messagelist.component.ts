@@ -39,6 +39,7 @@ import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.comp
 
 type ResolvedDsaStatus = 'RECEIVED' | 'UNDER_REVIEW' | 'DECIDED' | 'UNKNOWN';
 type ModerationStatus = 'published' | 'review' | 'hidden';
+type PublishFilter = 'all' | 'missing_online';
 
 @Component({
   selector: 'app-my-messagelist',
@@ -78,6 +79,20 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
     DECIDED: 'decided',
     UNKNOWN: 'unknown'
   };
+  private static readonly PUBLISH_STATE_LABELS: Record<NonNullable<Message['publishState']>, string> = {
+    published: 'common.messageList.publishState.published',
+    unpublished: 'common.messageList.publishState.unpublished',
+    server_missing: 'common.messageList.publishState.serverMissing',
+    local_only: 'common.messageList.publishState.localOnly',
+    dsa_locked: 'common.messageList.publishState.dsaLocked'
+  };
+  private static readonly PUBLISH_STATE_CLASS_SUFFIX: Record<NonNullable<Message['publishState']>, string> = {
+    published: 'published',
+    unpublished: 'unpublished',
+    server_missing: 'server-missing',
+    local_only: 'local-only',
+    dsa_locked: 'dsa-locked'
+  };
 
   private static readonly DSA_UNKNOWN = 'UNKNOWN' as const;
 
@@ -102,8 +117,14 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
   readonly data = inject<{ location: Location; messageSignal: WritableSignal<Message[]> }>(MAT_DIALOG_DATA);
 
   readonly messagesSignal = signal<Message[]>([]);
+  readonly publishFilter = signal<PublishFilter>('all');
   readonly filteredMessagesSignal = computed(() => {
-    return this.messagesSignal();
+    const messages = this.messagesSignal();
+    const filter = this.publishFilter();
+    if (filter === 'missing_online') {
+      return messages.filter((message) => this.resolvePublishState(message) === 'server_missing');
+    }
+    return messages;
   });
   readonly selectedMessagesSignal = this.messageService.selectedMessagesSignal;
   readonly commentsSignal = computed(() => {
@@ -181,6 +202,15 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       const width = this.listSize() > 1 ? '95vw' : 'auto';
       this.dialogRef.updateSize(width);
     });
+
+    effect(() => {
+      const userId = this.userService.getUser().id;
+      if (!userId) {
+        return;
+      }
+      const snapshot = this.messageService.messagesSignal();
+      void this.messageService.saveOwnPublicMessages(userId, snapshot);
+    });
   }
 
   async ngOnInit() {
@@ -236,14 +266,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
   }
 
   public onMessageCardActivate(message: Message): void {
-    const userId = this.userService.getUser().id;
-    if (!userId || userId !== message.userId) {
-      return;
-    }
-    if (!this.userService.hasJwt()) {
-      if (!this.userService.isReady()) {
-        this.editMessageAfterLoginClick(message);
-      }
+    if (!this.canEditMessage(message)) {
       return;
     }
     this.editMessageClick(message);
@@ -348,6 +371,12 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
 
         const selected = this.messageService.selectedMessagesSignal();
 
+        const publishState = this.resolvePublishState(this.clickedMessage!);
+        if (publishState === 'server_missing' || publishState === 'local_only') {
+          this.removeMessageLocally(this.clickedMessage!);
+          return;
+        }
+
         // 1. Delete
         this.messageService.deleteMessage(this.clickedMessage!);
 
@@ -368,12 +397,148 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
     }
   }
 
+  public togglePublishAfterLoginClick(message: Message): void {
+    this.clickedMessage = message;
+    this.userService.loginWithBackend(this.togglePublish.bind(this));
+  }
+
+  public togglePublishClick(message: Message): void {
+    this.clickedMessage = message;
+    this.togglePublish();
+  }
+
+  public togglePublish(): void {
+    if (!this.userService.hasJwt() || !this.clickedMessage) {
+      return;
+    }
+    const message = this.clickedMessage;
+    if (this.isMessageDsaLocked(message)) {
+      return;
+    }
+
+    if (this.canUnpublishMessage(message)) {
+      this.messageService.setMessagePublished(message, false).subscribe({
+        next: (response) => {
+          if (response?.status !== 200) {
+            return;
+          }
+          this.patchMessageLocally(message, {
+            status: 'disabled',
+            publishState: 'unpublished'
+          });
+        },
+        error: (err) => {
+          const errorMessage = err?.error?.error ?? this.translation.t('common.message.disableFailed');
+          this.snackBar.open(errorMessage, this.translation.t('common.actions.ok'));
+        }
+      });
+      return;
+    }
+
+    if (!this.canPublishMessage(message)) {
+      return;
+    }
+
+    const publishState = this.resolvePublishState(message);
+    if (publishState === 'server_missing' || publishState === 'local_only') {
+      this.messageService.publishMissingMessage(message, this.userService.getUser()).subscribe({
+        next: (res) => {
+          const decision = res?.moderation?.decision ?? 'approved';
+          if (decision === 'rejected') {
+            this.patchMessageLocally(message, {
+              status: 'disabled',
+              publishState: 'unpublished'
+            });
+            return;
+          }
+          this.patchMessageLocally(message, {
+            id: res?.messageId ?? message.id,
+            uuid: res?.messageUuid ?? message.uuid,
+            status: 'enabled',
+            publishState: 'published'
+          });
+        },
+        error: (err) => {
+          const errorMessage = err?.error?.error ?? this.translation.t('auth.backendErrorMessage');
+          this.snackBar.open(errorMessage, this.translation.t('common.actions.ok'));
+        }
+      });
+      return;
+    }
+
+    this.messageService.setMessagePublished(message, true).subscribe({
+      next: (response) => {
+        if (response?.status !== 200) {
+          return;
+        }
+        this.patchMessageLocally(message, {
+          status: 'enabled',
+          publishState: 'published'
+        });
+      },
+      error: (err) => {
+        const errorMessage = err?.error?.error ?? this.translation.t('auth.backendErrorMessage');
+        this.snackBar.open(errorMessage, this.translation.t('common.actions.ok'));
+      }
+    });
+  }
+
+  private patchMessageLocally(target: Message, patch: Partial<Message>): void {
+    const mutate = (message: Message) => message.uuid === target.uuid ? { ...message, ...patch } : message;
+    this.messageService.messagesSignal.update(messages => messages.map(mutate));
+    this.messageService.selectedMessagesSignal.update(selected => selected.map(mutate));
+    if (target.parentUuid) {
+      const commentsSignal = this.messageService.getCommentsSignalForMessage(target.parentUuid);
+      commentsSignal.set(commentsSignal().map(mutate));
+    }
+  }
+
   private removeMessageLocally(message: Message) {
     const isRootMessage = this.messageService.messagesSignal().some(m => m.uuid === message.uuid);
 
     if (isRootMessage) {
-      this.messageService.messagesSignal.update(messages => messages.filter(m => m.uuid !== message.uuid));
-      this.messageService.selectedMessagesSignal.update(selected => selected.filter(m => m.uuid !== message.uuid));
+      const existing = this.messageService.messagesSignal();
+      const toRemove = new Set<string>([message.uuid]);
+      const queue: string[] = [message.uuid];
+
+      while (queue.length > 0) {
+        const current = queue.shift();
+        if (!current) {
+          continue;
+        }
+        const directFromMessages = existing
+          .filter(item => item.parentUuid === current)
+          .map(item => item.uuid);
+        const directFromSignals = this.messageService.getCommentsSignalForMessage(current)()
+          .map(item => item.uuid);
+        [...directFromMessages, ...directFromSignals].forEach(uuid => {
+          if (!toRemove.has(uuid)) {
+            toRemove.add(uuid);
+            queue.push(uuid);
+          }
+        });
+      }
+
+      this.messageService.messagesSignal.update(messages =>
+        messages.filter(m => !toRemove.has(m.uuid) && !toRemove.has(m.parentUuid))
+      );
+      this.messageService.selectedMessagesSignal.update(selected =>
+        selected.filter(m => !toRemove.has(m.uuid))
+      );
+      this.messageService.commentCountsSignal.update(counts => {
+        const next = { ...counts };
+        toRemove.forEach(uuid => {
+          delete next[uuid];
+        });
+        return next;
+      });
+      toRemove.forEach(uuid => {
+        const commentsSignal = this.messageService.commentsSignals.get(uuid);
+        if (commentsSignal) {
+          commentsSignal.set([]);
+          this.messageService.commentsSignals.delete(uuid);
+        }
+      });
       return;
     }
 
@@ -391,7 +556,9 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
   }
 
   private flagMessageLocally(message: Message, token: string) {
-    const mutate = (m: Message) => m.uuid === message.uuid ? { ...m, status: 'disabled', dsaStatusToken: token } : m;
+    const mutate = (m: Message) => m.uuid === message.uuid
+      ? { ...m, status: 'disabled', dsaStatusToken: token, publishState: 'dsa_locked' as const }
+      : m;
 
     this.messageService.messagesSignal.update(messages => messages.map(mutate));
     this.messageService.selectedMessagesSignal.update(selected => selected.map(mutate));
@@ -476,6 +643,91 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
 
   public isOwnPublicMessage(message: Message): boolean {
     return this.userService.getUser().id === message.userId && message.typ === 'public';
+  }
+
+  private resolvePublishState(message: Message): NonNullable<Message['publishState']> {
+    if (message.publishState) {
+      return message.publishState;
+    }
+    if (this.messageService.isDsaLocked(message)) {
+      return 'dsa_locked';
+    }
+    return message.status === 'enabled' ? 'published' : 'unpublished';
+  }
+
+  public setPublishFilter(filter: PublishFilter): void {
+    this.publishFilter.set(filter);
+  }
+
+  public isPublishFilterActive(filter: PublishFilter): boolean {
+    return this.publishFilter() === filter;
+  }
+
+  public getPublishFilterLabel(filter: PublishFilter): string {
+    if (filter === 'missing_online') {
+      return this.translation.t('common.messageList.filter.missingOnline');
+    }
+    return this.translation.t('common.messageList.filter.all');
+  }
+
+  public getPublishStateBadgeLabel(message: Message): string {
+    const state = this.resolvePublishState(message);
+    const key = MyMessagelistComponent.PUBLISH_STATE_LABELS[state];
+    return this.translation.t(key);
+  }
+
+  public getPublishStateBadgeClass(message: Message): Record<string, boolean> {
+    const state = this.resolvePublishState(message);
+    const suffix = MyMessagelistComponent.PUBLISH_STATE_CLASS_SUFFIX[state];
+    return {
+      'publish-state-badge': true,
+      [`publish-state-${suffix}`]: true
+    };
+  }
+
+  public isMessageDsaLocked(message: Message): boolean {
+    return this.resolvePublishState(message) === 'dsa_locked';
+  }
+
+  public canEditMessage(message: Message): boolean {
+    if (this.userService.getUser().id !== message.userId) {
+      return false;
+    }
+    if (!this.userService.hasJwt()) {
+      return false;
+    }
+    return !this.isMessageDsaLocked(message);
+  }
+
+  public canPublishMessage(message: Message): boolean {
+    if (this.userService.getUser().id !== message.userId || !this.userService.hasJwt()) {
+      return false;
+    }
+    if (this.isMessageDsaLocked(message)) {
+      return false;
+    }
+    const state = this.resolvePublishState(message);
+    return state === 'unpublished' || state === 'server_missing' || state === 'local_only';
+  }
+
+  public canUnpublishMessage(message: Message): boolean {
+    if (this.userService.getUser().id !== message.userId || !this.userService.hasJwt()) {
+      return false;
+    }
+    if (this.isMessageDsaLocked(message)) {
+      return false;
+    }
+    return this.resolvePublishState(message) === 'published';
+  }
+
+  public getPublishToggleIcon(message: Message): string {
+    return this.canPublishMessage(message) ? 'publish' : 'visibility_off';
+  }
+
+  public getPublishToggleAriaLabel(message: Message): string {
+    return this.canPublishMessage(message)
+      ? this.translation.t('common.messageList.publishAria')
+      : this.translation.t('common.messageList.unpublishAria');
   }
 
   private resolveModerationStatus(message: Message): ModerationStatus {
@@ -626,6 +878,9 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       return;
     }
     if (this.clickedMessage) {
+      if (this.isMessageDsaLocked(this.clickedMessage)) {
+        return;
+      }
       if (this.clickedMessage.multimedia.type !== MultimediaType.UNDEFINED) {
         await this.sharedContentService.addSharedContentToMessage(this.clickedMessage);
       }

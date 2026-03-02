@@ -9,6 +9,7 @@ import { ExperienceBookmark } from '../interfaces/experience-bookmark';
 import { IndexedDbBackup, IndexedDbBackupEntry } from '../interfaces/indexed-db-backup';
 import { LocalDocument } from '../interfaces/local-document';
 import { LocalImage } from '../interfaces/local-image';
+import { Message } from '../interfaces/message';
 import { Note } from '../interfaces/note';
 import { Place } from '../interfaces/place';
 import { Profile } from '../interfaces/profile';
@@ -38,7 +39,7 @@ interface EncryptedStoreEnvelope {
 export class IndexedDbService {
   private readonly backupState = inject(BackupStateService);
   private dbName = 'MessageDrop';
-  private dbVersion = 8;
+  private dbVersion = 9;
   private settingStore = 'setting';
   private userStore = 'user';
   private profileStore = 'profile';
@@ -54,6 +55,7 @@ export class IndexedDbService {
   private documentHandleStore = 'documentHandle';
   private fileHandleStore = 'fileHandle';
   private contactMessagePayloadStore = 'contactMessagePayload';
+  private publicMessageStore = 'publicMessage';
   private atRestEncryptionKey: CryptoKey | null = null;
   private readonly encryptedStores = new Set<string>([
     this.profileStore,
@@ -63,6 +65,7 @@ export class IndexedDbService {
     this.experienceBookmarkStore,
     this.tileSettingsStore,
     this.noteStore,
+    this.publicMessageStore,
     this.imageStore,
     this.documentStore,
     this.contactMessagePayloadStore
@@ -284,6 +287,9 @@ export class IndexedDbService {
         }
         if (!db.objectStoreNames.contains(this.noteStore)) {
           db.createObjectStore(this.noteStore);
+        }
+        if (!db.objectStoreNames.contains(this.publicMessageStore)) {
+          db.createObjectStore(this.publicMessageStore);
         }
         if (!db.objectStoreNames.contains(this.imageStore)) {
           db.createObjectStore(this.imageStore);
@@ -552,6 +558,63 @@ export class IndexedDbService {
       request.onerror = () => {
         resolve(false);
       };
+    });
+  }
+
+  /**
+   * Stores the own public message snapshot for a user.
+   * The snapshot is keyed by userId to support account recovery and backup/restore.
+   */
+  async setOwnPublicMessages(userId: string, messages: Message[]): Promise<void> {
+    const db = await this.openDB();
+    const encoded = await this.encodeValue(this.publicMessageStore, messages);
+
+    return new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(this.publicMessageStore, 'readwrite');
+      const store = tx.objectStore(this.publicMessageStore);
+      const request = store.put(encoded, userId);
+      request.onsuccess = () => {
+        this.backupState.markDirty();
+        resolve();
+      };
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  /**
+   * Retrieves the own public message snapshot for a user.
+   */
+  async getOwnPublicMessages(userId: string): Promise<Message[]> {
+    const db = await this.openDB();
+
+    return new Promise<Message[]>((resolve, reject) => {
+      const tx = db.transaction(this.publicMessageStore, 'readonly');
+      const store = tx.objectStore(this.publicMessageStore);
+      const request = store.get(userId);
+      request.onsuccess = () => {
+        this.decodeValue<Message[]>(this.publicMessageStore, request.result)
+          .then((value) => resolve(Array.isArray(value) ? value : []))
+          .catch(reject);
+      };
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  /**
+   * Deletes the own public message snapshot for a user.
+   */
+  async deleteOwnPublicMessages(userId: string): Promise<void> {
+    const db = await this.openDB();
+
+    return new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(this.publicMessageStore, 'readwrite');
+      const store = tx.objectStore(this.publicMessageStore);
+      const request = store.delete(userId);
+      request.onsuccess = () => {
+        this.backupState.markDirty();
+        resolve();
+      };
+      request.onerror = () => reject(request.error);
     });
   }
 

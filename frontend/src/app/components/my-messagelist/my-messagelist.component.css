@@ -186,6 +186,44 @@ h2[mat-dialog-title].dialog-title {
   text-overflow: ellipsis;
 }
 
+.publish-state-badge {
+  align-self: flex-start;
+  margin-top: 0.15rem;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.68rem;
+  line-height: 1.2;
+  font-weight: 600;
+  border: 1px solid transparent;
+}
+
+.publish-state-published {
+  background: rgba(46, 125, 50, 0.14);
+  border-color: rgba(46, 125, 50, 0.35);
+  color: #1b5e20;
+}
+
+.publish-state-unpublished {
+  background: rgba(97, 97, 97, 0.16);
+  border-color: rgba(97, 97, 97, 0.3);
+  color: #424242;
+}
+
+.publish-state-server-missing,
+.publish-state-local-only {
+  background: rgba(245, 124, 0, 0.16);
+  border-color: rgba(245, 124, 0, 0.35);
+  color: #e65100;
+}
+
+.publish-state-dsa-locked {
+  background: rgba(198, 40, 40, 0.14);
+  border-color: rgba(198, 40, 40, 0.35);
+  color: #b71c1c;
+}
+
 /* === Message content inside cards === */
 .message-content {
   font-size: 0.9rem;

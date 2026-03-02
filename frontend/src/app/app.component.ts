@@ -1290,67 +1290,43 @@ export class AppComponent implements OnInit {
     });
   }
 
-  public openUserMessagListDialog(): void {
+  public async openUserMessagListDialog(): Promise<void> {
     if (!this.userService.hasJwt()) {
       return;
     }
-    this.userService.getUserMessages(this.userService.getUser())
-      .subscribe({
-        next: (getMessageResponse) => {
-          this.messageService.setMessages(this.messageService.mapRawMessages(getMessageResponse.rows));
-          const dialogRef = this.dialog.open(MyMessagelistComponent, {
-            panelClass: 'MessageListDialog',
-            closeOnNavigation: true,
-            data: { location: this.mapService.getMapLocation() },
-            minWidth: 'min(450px, 95vw)',
-            maxWidth: '95vw',
-            width: 'auto',
-            maxHeight: '95vh',
-            height: 'auto',
-            hasBackdrop: true,
-            backdropClass: 'dialog-backdrop',
-            disableClose: false,
-            autoFocus: false
-          });
+    let ownMessages: Message[] = [];
+    const user = this.userService.getUser();
+    try {
+      ownMessages = await this.messageService.syncOwnPublicMessages(user);
+    } catch {
+      ownMessages = await this.messageService.loadOwnPublicMessages(user.id);
+    }
+    this.messageService.setMessages(ownMessages);
 
-          dialogRef.afterOpened().subscribe(() => {
-            this.myHistory.push("userMessageList");
-            window.history.replaceState(this.myHistory, '', '');
-          });
+    const dialogRef = this.dialog.open(MyMessagelistComponent, {
+      panelClass: 'MessageListDialog',
+      closeOnNavigation: true,
+      data: { location: this.mapService.getMapLocation() },
+      minWidth: 'min(450px, 95vw)',
+      maxWidth: '95vw',
+      width: 'auto',
+      maxHeight: '95vh',
+      height: 'auto',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
 
-          dialogRef.afterClosed().subscribe(() => {
-            this.messageService.clearSelectedMessages();
-            this.messageService.getByVisibleMapBoundingBox();
-          });
-        },
-        error: () => {
-          this.messageService.clearMessages();
-          const dialogRef = this.dialog.open(MyMessagelistComponent, {
-            panelClass: 'MessageListDialog',
-            closeOnNavigation: true,
-            data: { location: this.mapService.getMapLocation() },
-            minWidth: 'min(450px, 95vw)',
-            maxWidth: '95vw',
-            width: 'auto',
-            maxHeight: 'none',
-            height: 'auto',
-            hasBackdrop: true,
-            backdropClass: 'dialog-backdrop',
-            disableClose: false,
-            autoFocus: false
-          });
+    dialogRef.afterOpened().subscribe(() => {
+      this.myHistory.push("userMessageList");
+      window.history.replaceState(this.myHistory, '', '');
+    });
 
-          dialogRef.afterOpened().subscribe(() => {
-            this.myHistory.push("userMessageList");
-            window.history.replaceState(this.myHistory, '', '');
-          });
-
-          dialogRef.afterClosed().subscribe(() => {
-            this.messageService.clearSelectedMessages();
-            this.updateDataForLocation();
-          });
-        }
-      });
+    dialogRef.afterClosed().subscribe(() => {
+      this.messageService.clearSelectedMessages();
+      this.messageService.getByVisibleMapBoundingBox();
+    });
   }
 
   public openNoteListDialog(): void {

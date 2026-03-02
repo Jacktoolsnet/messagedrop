@@ -227,6 +227,19 @@ function isPostingBlocked(userRow) {
   return true;
 }
 
+function isMessageLockedByModeration(messageRow) {
+  if (!messageRow) {
+    return false;
+  }
+  if (String(messageRow.status || '').toLowerCase() !== tableMessage.messageStatus.DISABLED) {
+    return false;
+  }
+  if (messageRow.dsaStatusToken) {
+    return true;
+  }
+  return String(messageRow.manualModerationDecision || '').toLowerCase() === 'rejected';
+}
+
 async function forwardModerationRequest(payload, logger) {
   const baseUrl = resolveBaseUrl(process.env.ADMIN_BASE_URL, process.env.ADMIN_PORT);
   if (!baseUrl) {
@@ -668,6 +681,9 @@ router.post('/update',
       if (!ensureSameUser(req, res, row.userId, next)) {
         return;
       }
+      if (isMessageLockedByModeration(row)) {
+        return next(apiError.forbidden('message_locked_by_moderation'));
+      }
 
       const rawMessage = String(req.body.message ?? '');
       const sanitizedMessage = sanitizeSingleQuotes(rawMessage);
@@ -857,6 +873,9 @@ router.get('/enable/:messageId',
       }
       if (!ensureSameUser(req, res, row.userId, next)) {
         return;
+      }
+      if (isMessageLockedByModeration(row)) {
+        return next(apiError.forbidden('message_locked_by_moderation'));
       }
       tableMessage.enableMessage(req.database.db, row.uuid, function (err) {
         if (err) {

@@ -390,6 +390,11 @@
       "addMessageAria": "Nachricht hinzufügen",
       "addFirstComment": "Ersten öffentlichen Kommentar hinzufügen",
       "addCommentAria": "Kommentar hinzufügen",
+      "filter": {
+        "aria": "Meine öffentlichen Nachrichten filtern",
+        "all": "Alle Nachrichten",
+        "missingOnline": "Online nicht vorhanden"
+      },
       "commentsAria": "Kommentare anzeigen oder hinzufügen",
       "likeAria": "Nachricht positiv bewerten",
       "dislikeAria": "Nachricht negativ bewerten",
@@ -399,6 +404,8 @@
       "editProfileAria": "Profil bearbeiten",
       "editAria": "Nachricht bearbeiten",
       "editCommentAria": "Kommentar bearbeiten",
+      "publishAria": "Nachricht veröffentlichen",
+      "unpublishAria": "Nachricht zurücknehmen",
       "deleteAria": "Nachricht löschen",
       "blockAria": "Nachricht melden",
       "avatarAltName": "Avatar von {{ name }}",
@@ -415,6 +422,13 @@
       "deleteDialog": {
         "title": "Nachricht löschen",
         "confirm": "Die Nachricht und alle zugehörigen Kommentare werden dauerhaft gelöscht. Bist du sicher?"
+      },
+      "publishState": {
+        "published": "Veröffentlicht",
+        "unpublished": "Zurückgenommen",
+        "serverMissing": "Online nicht vorhanden",
+        "localOnly": "Nur lokal",
+        "dsaLocked": "DSA gesperrt"
       },
       "moderationStatus": {
         "title": "Moderationsstatus",

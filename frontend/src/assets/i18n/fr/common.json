@@ -390,6 +390,11 @@
       "addMessageAria": "Ajouter un message",
       "addFirstComment": "Ajouter mon premier commentaire public",
       "addCommentAria": "Ajouter un commentaire",
+      "filter": {
+        "aria": "Filtrer mes messages publics",
+        "all": "Tous les messages",
+        "missingOnline": "Absent en ligne"
+      },
       "commentsAria": "Afficher ou ajouter des commentaires",
       "likeAria": "Aimer le message",
       "dislikeAria": "Ne pas aimer le message",
@@ -399,6 +404,8 @@
       "editProfileAria": "Modifier le profil",
       "editAria": "Modifier le message",
       "editCommentAria": "Modifier le commentaire",
+      "publishAria": "Publier le message",
+      "unpublishAria": "Retirer la publication",
       "deleteAria": "Supprimer le message",
       "blockAria": "Signaler le message",
       "avatarAltName": "Avatar de {{ name }}",
@@ -415,6 +422,13 @@
       "deleteDialog": {
         "title": "Supprimer le message",
         "confirm": "Le message et tous les commentaires associés seront supprimés définitivement. Êtes-vous sûr ?"
+      },
+      "publishState": {
+        "published": "Publié",
+        "unpublished": "Retiré",
+        "serverMissing": "Absent en ligne",
+        "localOnly": "Local uniquement",
+        "dsaLocked": "Bloqué DSA"
       },
       "moderationStatus": {
         "title": "Statut de modération",
@@ -1236,6 +1250,8 @@
     "userNotFoundTitle": "Utilisateur introuvable",
     "userNotFoundMessage": "Cet utilisateur n'est pas disponible sur le serveur.\n\nNous pouvons restaurer vos données depuis cet appareil pour que vous puissiez continuer.",
     "userNotFoundAction": "Restaurer depuis l'appareil",
+    "userRecoveredTitle": "Compte restauré",
+    "userRecoveredMessage": "Votre compte n'était plus présent sur le serveur et a été restauré depuis cet appareil dans la mesure du possible.",
     "backendErrorTitle": "Oups ! Erreur du backend !",
     "backendErrorMessage": "Une erreur est survenue. Veuillez réessayer plus tard."
   },

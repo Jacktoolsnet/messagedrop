@@ -34,6 +34,7 @@ import { NetworkService } from './network.service';
 import { RestoreService } from './restore.service';
 import { ServerService } from './server.service';
 import { SocketioService } from './socketio.service';
+import { MessageService } from './message.service';
 import { TranslationHelperService } from './translation-helper.service';
 
 interface VapidPublicKeyResponse {
@@ -161,6 +162,7 @@ export class UserService {
     this.ready = true;
     this._userSet.update(trigger => trigger + 1);
     this.blocked = false;
+    void this.injector.get(MessageService).syncOwnPublicMessages(this.user).catch(() => undefined);
   }
 
   private setLocalUser(user: User) {
