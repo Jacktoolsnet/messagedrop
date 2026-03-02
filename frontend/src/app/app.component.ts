@@ -315,7 +315,7 @@ export class AppComponent implements OnInit {
     });
 
     effect(() => {
-      this.messageService.messageSet(); // <-- track changes
+      this.messageService.messagesSignal(); // <-- track changes
       if (this.appService.isConsentCompleted()) {
         this.createMarkerLocations();
       }
@@ -2177,7 +2177,7 @@ export class AppComponent implements OnInit {
     this.markerLocations.clear();
     let center: Location | undefined = undefined;
     // Process messages
-    const messages = this.messageService.messagesSignal();
+    const messages = this.messageService.messagesSignal().filter((message) => message.status === 'enabled');
     messages.forEach((message) => {
       if (this.mapService.getMapZoom() > 17) {
         center = message.location

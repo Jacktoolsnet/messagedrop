@@ -240,17 +240,21 @@ button,
 }
 
 .buttonbar {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: start;
+  display: flex;
+  align-items: center;
   width: 100%;
-  column-gap: 0.75rem;
-  row-gap: 0.5rem;
+  gap: 0.75rem;
   margin-top: auto;
+  flex-wrap: nowrap;
+  overflow: hidden;
 }
 
 .buttonbar button {
   margin: 0;
+}
+
+.buttonbar > button {
+  flex: 0 0 auto;
 }
 
 .buttonbar .button-delete {
@@ -258,14 +262,31 @@ button,
 }
 
 .buttonbar .button-group {
-  grid-column: 2;
+  flex: 1 1 auto;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: flex-end;
   align-items: center;
   gap: 0.35rem 0.5rem;
-  max-width: min(100%, 20rem);
-  justify-self: end;
+  min-width: 0;
+  margin-left: auto;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--mat-sys-color-outline-variant, rgba(127, 127, 127, 0.45)) transparent;
+}
+
+.buttonbar .button-group::-webkit-scrollbar {
+  height: 0.35rem;
+}
+
+.buttonbar .button-group::-webkit-scrollbar-thumb {
+  background: var(--mat-sys-color-outline-variant, rgba(127, 127, 127, 0.45));
+  border-radius: 999px;
+}
+
+.buttonbar .button-group::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .buttonbar .dsa-status-button {
