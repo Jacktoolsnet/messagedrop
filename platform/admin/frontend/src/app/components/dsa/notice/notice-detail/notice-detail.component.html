@@ -268,6 +268,15 @@
                         </div>
                     </div>
                     <div class="tile-actions">
+                        <label for="notice-blocked-until"><strong>Temporary block until:</strong></label>
+                        <input id="notice-blocked-until" type="datetime-local" [value]="blockedUntilLocal()"
+                            (change)="onBlockedUntilInput($any($event.target).value)" />
+                        <button mat-stroked-button type="button" (click)="clearBlockedUntil()" [disabled]="moderationBusy()">
+                            <mat-icon>event_busy</mat-icon>
+                            Clear expiry
+                        </button>
+                    </div>
+                    <div class="tile-actions">
                         @if (!(moderationState()?.posting?.blocked)) {
                         <button mat-stroked-button color="warn" type="button" (click)="blockPosting()" [disabled]="moderationBusy()">
                             <mat-icon>block</mat-icon>

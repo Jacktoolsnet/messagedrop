@@ -21,6 +21,14 @@
           <mat-label>User ID</mat-label>
           <input matInput [formControl]="form.controls.userId" placeholder="UUID user id">
         </mat-form-field>
+        <mat-form-field appearance="outline" class="grow">
+          <mat-label>Blocked until (optional)</mat-label>
+          <input matInput type="datetime-local" [formControl]="form.controls.blockedUntilLocal">
+        </mat-form-field>
+        <button mat-stroked-button type="button" (click)="clearBlockedUntil()" [disabled]="loading()">
+          <mat-icon>event_busy</mat-icon>
+          Clear expiry
+        </button>
         <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || loading()">
           <mat-icon>search</mat-icon>
           Load
@@ -99,4 +107,3 @@
   </div>
   }
 </div>
-

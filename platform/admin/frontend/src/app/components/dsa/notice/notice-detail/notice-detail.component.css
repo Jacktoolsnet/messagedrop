@@ -125,10 +125,21 @@
     display: flex;
     justify-content: flex-end;
     gap: .5rem;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
 .tile-actions mat-icon {
     margin-right: .35rem;
+}
+
+.tile-actions input[type="datetime-local"] {
+    min-height: 36px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: .35rem .55rem;
+    background: var(--surface);
+    color: var(--text);
 }
 
 /* Footer */

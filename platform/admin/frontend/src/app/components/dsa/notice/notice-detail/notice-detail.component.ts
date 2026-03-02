@@ -117,6 +117,7 @@ export class NoticeDetailComponent implements OnInit {
   moderationState = signal<PlatformUserModeration | null>(null);
   moderationSummary = signal<PlatformUserSummary | null>(null);
   moderationBusy = signal(false);
+  blockedUntilLocal = signal<string>('');
 
   close(ok = false) {
     this.ref.close(ok || this.dirty);
@@ -251,6 +252,9 @@ export class NoticeDetailComponent implements OnInit {
       next: (res) => {
         this.moderationState.set(res?.moderation ?? null);
         this.moderationSummary.set(res?.summary ?? null);
+        const postingUntil = this.toLocalDateTimeValue(res?.moderation?.posting?.blockedUntil ?? null);
+        const accountUntil = this.toLocalDateTimeValue(res?.moderation?.account?.blockedUntil ?? null);
+        this.blockedUntilLocal.set(postingUntil || accountUntil || '');
       },
       complete: () => this.moderationBusy.set(false)
     });
@@ -282,13 +286,31 @@ export class NoticeDetailComponent implements OnInit {
 
   private updateModeration(userId: string, target: 'posting' | 'account', blocked: boolean, reason: string) {
     this.moderationBusy.set(true);
-    this.dsa.updatePlatformUserModeration(userId, { target, blocked, reason }).subscribe({
+    this.dsa.updatePlatformUserModeration(userId, {
+      target,
+      blocked,
+      reason,
+      blockedUntil: blocked ? this.parseBlockedUntil() : null
+    }).subscribe({
       next: (res) => {
         this.moderationState.set(res?.moderation ?? null);
         this.moderationSummary.set(res?.summary ?? null);
+        if (target === 'posting') {
+          this.blockedUntilLocal.set(this.toLocalDateTimeValue(res?.moderation?.posting?.blockedUntil ?? null));
+        } else {
+          this.blockedUntilLocal.set(this.toLocalDateTimeValue(res?.moderation?.account?.blockedUntil ?? null));
+        }
       },
       complete: () => this.moderationBusy.set(false)
     });
+  }
+
+  onBlockedUntilInput(value: string) {
+    this.blockedUntilLocal.set(value || '');
+  }
+
+  clearBlockedUntil() {
+    this.blockedUntilLocal.set('');
   }
 
   formatBlockUntil(value?: number | null): string {
@@ -296,6 +318,26 @@ export class NoticeDetailComponent implements OnInit {
     const ts = Number(value);
     if (ts <= 0) return '—';
     return this.formatTimestamp(ts);
+  }
+
+  private parseBlockedUntil(): number | null {
+    const raw = this.blockedUntilLocal()?.trim();
+    if (!raw) return null;
+    const ts = new Date(raw).getTime();
+    return Number.isFinite(ts) && ts > 0 ? ts : null;
+  }
+
+  private toLocalDateTimeValue(value?: number | null): string {
+    if (!Number.isFinite(value)) return '';
+    const ts = Number(value);
+    if (ts <= 0) return '';
+    const d = new Date(ts);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mm = String(d.getMinutes()).padStart(2, '0');
+    return `${y}-${m}-${day}T${hh}:${mm}`;
   }
 
   private updateMediaFromContent(): void {

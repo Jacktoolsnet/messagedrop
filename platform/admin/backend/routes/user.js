@@ -12,6 +12,7 @@ const tableLoginOtp = require('../db/tableLoginOtp');
 const tableSignal = require('../db/tableDsaSignal');
 const tableNotice = require('../db/tableDsaNotice');
 const tableDecision = require('../db/tableDsaDecision');
+const tableAudit = require('../db/tableDsaAuditLog');
 const { requireAdminJwt, requireRole } = require('../middleware/security');
 const { apiError } = require('../middleware/api-error');
 const { sendMail } = require('../utils/mailer');
@@ -277,6 +278,37 @@ function queryAll(db, sql, params = []) {
     });
 }
 
+function recordPlatformUserAudit(db, { userId, action, actor, details }, logger) {
+    const now = Date.now();
+    const detailsJson = (() => {
+        try {
+            return JSON.stringify(details || null);
+        } catch {
+            return null;
+        }
+    })();
+
+    tableAudit.create(
+        db,
+        crypto.randomUUID(),
+        'platform_user',
+        userId,
+        action,
+        actor || 'admin',
+        now,
+        detailsJson,
+        (err) => {
+            if (err) {
+                logger?.warn?.('Failed to write platform user moderation audit', {
+                    userId,
+                    action,
+                    error: err?.message
+                });
+            }
+        }
+    );
+}
+
 function parseReportedContent(value) {
     if (!value) return null;
     if (typeof value === 'object') return value;
@@ -495,6 +527,9 @@ router.patch('/platform/:userId/moderation', requireRole('moderator', 'legal', '
     const reason = typeof req.body?.reason === 'string' ? req.body.reason.trim() : null;
     const blockedUntil = normalizeBlockUntil(req.body?.blockedUntil);
     const actor = req.admin?.username || req.admin?.sub || 'admin';
+    const action = target === 'posting'
+        ? (blocked ? 'platform_user_posting_block' : 'platform_user_posting_unblock')
+        : (blocked ? 'platform_user_account_block' : 'platform_user_account_unblock');
 
     if (target !== 'posting' && target !== 'account') {
         return next(apiError.badRequest('invalid_target'));
@@ -527,6 +562,20 @@ router.patch('/platform/:userId/moderation', requireRole('moderator', 'legal', '
         }
 
         const summary = await buildPlatformUserSummary(req.database.db, userId);
+        recordPlatformUserAudit(req.database.db, {
+            userId,
+            action,
+            actor,
+            details: {
+                target,
+                blocked,
+                reason,
+                blockedUntil,
+                moderation: moderationResp.data.moderation,
+                summary,
+                ip: req.ip || null
+            }
+        }, req.logger);
         return res.json({
             status: 200,
             moderation: moderationResp.data.moderation,

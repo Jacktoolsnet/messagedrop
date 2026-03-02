@@ -38,10 +38,11 @@ mat-toolbar {
   display: flex;
   gap: .75rem;
   align-items: flex-start;
+  flex-wrap: wrap;
 }
 
 .grow {
-  flex: 1 1 auto;
+  flex: 1 1 280px;
 }
 
 .tiles-grid {
@@ -59,4 +60,3 @@ mat-toolbar {
     flex-direction: column;
   }
 }
-

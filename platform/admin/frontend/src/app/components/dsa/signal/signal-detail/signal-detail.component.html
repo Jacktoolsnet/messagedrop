@@ -254,6 +254,16 @@
                     </div>
                 </div>
 
+                <div class="block-until-row">
+                    <label for="signal-blocked-until"><strong>Temporary block until (optional):</strong></label>
+                    <input id="signal-blocked-until" type="datetime-local" [value]="blockedUntilLocal()"
+                        (change)="onBlockedUntilInput($any($event.target).value)" />
+                    <button mat-stroked-button type="button" (click)="clearBlockedUntil()" [disabled]="moderationBusy()">
+                        <mat-icon>event_busy</mat-icon>
+                        Clear expiry
+                    </button>
+                </div>
+
                 <div class="counters">
                     @if (!(moderationState()?.posting?.blocked)) {
                     <button mat-stroked-button color="warn" (click)="blockPosting()" [disabled]="moderationBusy()">
