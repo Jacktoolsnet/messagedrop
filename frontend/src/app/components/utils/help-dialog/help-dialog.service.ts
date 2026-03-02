@@ -1546,6 +1546,11 @@ const HELP_TOPICS = {
         descriptionKey: 'myMessageList.items.publish.desc'
       },
       {
+        icon: 'visibility_off',
+        titleKey: 'myMessageList.items.unpublish.title',
+        descriptionKey: 'myMessageList.items.unpublish.desc'
+      },
+      {
         icon: 'public',
         titleKey: 'myMessageList.items.moderation.title',
         descriptionKey: 'myMessageList.items.moderation.desc'

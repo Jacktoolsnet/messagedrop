@@ -192,38 +192,39 @@ h2[mat-dialog-title].dialog-title {
   display: inline-flex;
   align-items: center;
   border-radius: 999px;
-  padding: 0.1rem 0.5rem;
-  font-size: 0.7rem;
-  line-height: 1.2;
-  font-weight: 600;
-  border: 1px solid var(--mat-sys-color-outline-variant, rgba(127, 127, 127, 0.4));
-  background: var(--mat-sys-color-surface-container-high, rgba(127, 127, 127, 0.18));
-  color: var(--mat-sys-color-on-surface, #1f1f1f);
+  padding: 0.12rem 0.56rem;
+  font-size: 0.72rem;
+  line-height: 1.25;
+  font-weight: 700;
+  border: 1px solid color-mix(in srgb, var(--mat-sys-color-on-surface, #1f1f1f) 35%, transparent);
+  background: var(--mat-sys-color-on-surface, #1f1f1f);
+  color: var(--mat-sys-color-surface, #ffffff);
+  text-shadow: none;
 }
 
 .publish-state-published {
-  background: var(--mat-sys-color-primary-container, rgba(46, 125, 50, 0.16));
-  border-color: color-mix(in srgb, var(--mat-sys-color-primary, #2e7d32) 40%, transparent);
-  color: var(--mat-sys-color-on-primary-container, #1b5e20);
+  background: var(--mat-sys-color-on-surface, #1f1f1f);
+  border-color: color-mix(in srgb, var(--mat-sys-color-on-surface, #1f1f1f) 35%, transparent);
+  color: var(--mat-sys-color-surface, #ffffff);
 }
 
 .publish-state-unpublished {
-  background: var(--mat-sys-color-surface-container-highest, rgba(97, 97, 97, 0.22));
-  border-color: color-mix(in srgb, var(--mat-sys-color-outline, #616161) 40%, transparent);
-  color: var(--mat-sys-color-on-surface-variant, #303030);
+  background: var(--mat-sys-color-on-surface, #1f1f1f);
+  border-color: color-mix(in srgb, var(--mat-sys-color-on-surface, #1f1f1f) 35%, transparent);
+  color: var(--mat-sys-color-surface, #ffffff);
 }
 
 .publish-state-server-missing,
 .publish-state-local-only {
-  background: var(--mat-sys-color-secondary-container, rgba(251, 140, 0, 0.18));
-  border-color: color-mix(in srgb, var(--mat-sys-color-secondary, #f57c00) 42%, transparent);
-  color: var(--mat-sys-color-on-secondary-container, #7a3900);
+  background: var(--mat-sys-color-on-surface, #1f1f1f);
+  border-color: color-mix(in srgb, var(--mat-sys-color-on-surface, #1f1f1f) 35%, transparent);
+  color: var(--mat-sys-color-surface, #ffffff);
 }
 
 .publish-state-dsa-locked {
-  background: var(--mat-sys-color-error-container, rgba(198, 40, 40, 0.18));
-  border-color: color-mix(in srgb, var(--mat-sys-color-error, #c62828) 40%, transparent);
-  color: var(--mat-sys-color-on-error-container, #8b0000);
+  background: var(--mat-sys-color-on-surface, #1f1f1f);
+  border-color: color-mix(in srgb, var(--mat-sys-color-on-surface, #1f1f1f) 35%, transparent);
+  color: var(--mat-sys-color-surface, #ffffff);
 }
 
 /* === Message content inside cards === */

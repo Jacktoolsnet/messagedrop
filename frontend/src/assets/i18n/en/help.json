@@ -1162,8 +1162,12 @@
         "desc": "This action deletes your post or comment manually and immediately."
       },
       "publish": {
-        "title": "Publish / unpublish",
-        "desc": "This action publishes the selected post again or takes it offline without deleting it."
+        "title": "Publish message",
+        "desc": "This action publishes an unpublished post again."
+      },
+      "unpublish": {
+        "title": "Unpublish message",
+        "desc": "This action takes a published post offline without deleting it."
       },
       "moderation": {
         "title": "View moderation status",

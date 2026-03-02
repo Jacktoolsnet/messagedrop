@@ -1162,8 +1162,12 @@
         "desc": "Mit dieser Funktion löschst du deinen Beitrag oder Kommentar manuell und sofort."
       },
       "publish": {
-        "title": "Veröffentlichen / zurücknehmen",
-        "desc": "Mit dieser Funktion veröffentlichst du den ausgewählten Beitrag erneut oder nimmst ihn ohne Löschen wieder offline."
+        "title": "Nachricht veröffentlichen",
+        "desc": "Mit dieser Funktion veröffentlichst du einen zurückgenommenen Beitrag wieder."
+      },
+      "unpublish": {
+        "title": "Veröffentlichung zurücknehmen",
+        "desc": "Mit dieser Funktion nimmst du einen veröffentlichten Beitrag offline, ohne ihn zu löschen."
       },
       "moderation": {
         "title": "Moderationsstatus einsehen",

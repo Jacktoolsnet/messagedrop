@@ -1162,8 +1162,12 @@
         "desc": "Cette fonction supprime manuellement et immédiatement votre publication ou commentaire."
       },
       "publish": {
-        "title": "Publier / retirer",
-        "desc": "Cette fonction republie la publication sélectionnée ou la retire de la mise en ligne sans la supprimer."
+        "title": "Publier le message",
+        "desc": "Cette fonction republie une publication retirée."
+      },
+      "unpublish": {
+        "title": "Retirer la publication",
+        "desc": "Cette fonction retire de la mise en ligne une publication publiée sans la supprimer."
       },
       "moderation": {
         "title": "Voir le statut de modération",

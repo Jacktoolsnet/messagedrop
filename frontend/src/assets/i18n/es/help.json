@@ -1162,8 +1162,12 @@
         "desc": "Con esta función eliminas tu publicación o comentario de forma manual e inmediata."
       },
       "publish": {
-        "title": "Publicar / retirar",
-        "desc": "Con esta función vuelves a publicar la publicación seleccionada o la retiras de línea sin eliminarla."
+        "title": "Publicar mensaje",
+        "desc": "Con esta función vuelves a publicar una publicación retirada."
+      },
+      "unpublish": {
+        "title": "Retirar publicación",
+        "desc": "Con esta función quitas de línea una publicación publicada sin eliminarla."
       },
       "moderation": {
         "title": "Ver estado de moderación",
