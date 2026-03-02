@@ -146,17 +146,17 @@ environment*
 # keys
 backend/keys
 services/*/keys
-platform/admin/backend/keys
+network/admin/backend/keys
 *.enc
 
 # service-to-service trust bundle
 config/service-jwks.json
 backend/config/service-jwks.json
-platform/admin/backend/config/service-jwks.json
+network/admin/backend/config/service-jwks.json
 services/*/config/service-jwks.json
 
 # admin backend uploads
-platform/admin/backend/uploads/
+network/admin/backend/uploads/
 
 # local documents (e.g., downloaded API docs)
 documents/
