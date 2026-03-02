@@ -12,6 +12,13 @@
   min-height: 100%;
   background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
   color: var(--text);
+  --toolbar-h: 64px;
+}
+
+@media (max-width: 599px) {
+  :host {
+    --toolbar-h: 56px;
+  }
 }
 
 mat-toolbar {
@@ -35,20 +42,41 @@ mat-toolbar {
 }
 
 .page {
-  max-width: 1200px;
+  max-width: 1300px;
   margin: 0 auto;
   padding: 1.25rem;
-}
-
-.intro {
-  margin: 0 0 1rem;
-  color: var(--muted);
 }
 
 .tiles-grid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 960px) {
+  .page {
+    min-height: calc(100dvh - var(--toolbar-h));
+    display: grid;
+    align-content: center;
+  }
+
+  .tiles-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  :host ::ng-deep .tiles-grid .chart-body {
+    min-height: 300px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .page {
+    max-width: 1500px;
+  }
+
+  :host ::ng-deep .tiles-grid .chart-body {
+    min-height: 360px;
+  }
 }
 
 .tile {
@@ -80,4 +108,3 @@ mat-toolbar {
   border: 1px solid #fecaca;
   background: #fff1f2;
 }
-

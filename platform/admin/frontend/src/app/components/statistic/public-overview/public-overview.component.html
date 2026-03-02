@@ -15,10 +15,6 @@
 }
 
 <div class="page">
-  <p class="intro">
-    These charts show the latest 7 days for selected public platform activity metrics.
-  </p>
-
   @if (error(); as errorMessage) {
     <mat-card class="error-card">
       <mat-icon>error</mat-icon>
@@ -33,7 +29,7 @@
           [title]="metric.title"
           [iconName]="metric.icon"
           [color]="metric.color"
-          [chartKind]="'bar'"
+          [chartKind]="'line'"
           [points]="pointsFor(metric.key)">
         </app-statistic-key-chart>
         <div class="tile-footer">
@@ -44,4 +40,3 @@
     }
   </div>
 </div>
-
