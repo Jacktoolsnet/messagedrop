@@ -23,11 +23,13 @@ import { TransparencyReport } from '../../../interfaces/transparency-report.inte
 import { DsaAppeal } from '../../../interfaces/dsa-appeal.interface';
 import { ListAppealsParams } from '../../../interfaces/list-appeals-params.interface';
 import { DsaNotification, ListNotificationsParams, NotificationMeta, NotificationPayload } from '../../../interfaces/dsa-notification.interface';
+import { PlatformUserModerationResponse } from '../../../interfaces/platform-user-moderation.interface';
 
 @Injectable({ providedIn: 'root' })
 export class DsaService {
   private readonly baseUrl = `${environment.apiUrl}/dsa/backend`;
   private readonly publicBaseUrl = `${environment.apiUrl}/public`;
+  private readonly userBaseUrl = `${environment.apiUrl}/user`;
 
   /** Dashboard-Stats-Loading */
   readonly loading = signal(false);
@@ -577,6 +579,30 @@ export class DsaService {
           return of([]);
         })
       );
+  }
+
+  getPlatformUserModeration(userId: string): Observable<PlatformUserModerationResponse> {
+    return this.http.get<PlatformUserModerationResponse>(`${this.userBaseUrl}/platform/${encodeURIComponent(userId)}`).pipe(
+      catchError(err => {
+        this.snack.open('Could not load user moderation state.', 'OK', { duration: 3000 });
+        throw err;
+      })
+    );
+  }
+
+  updatePlatformUserModeration(
+    userId: string,
+    payload: { target: 'posting' | 'account'; blocked: boolean; reason?: string | null; blockedUntil?: number | null; }
+  ): Observable<PlatformUserModerationResponse> {
+    return this.http.patch<PlatformUserModerationResponse>(
+      `${this.userBaseUrl}/platform/${encodeURIComponent(userId)}/moderation`,
+      payload
+    ).pipe(
+      catchError(err => {
+        this.snack.open('Could not update user moderation state.', 'OK', { duration: 3000 });
+        throw err;
+      })
+    );
   }
 
 }

@@ -4,14 +4,20 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
+const axios = require('axios');
 const { rateLimit, ipKeyGenerator } = require('express-rate-limit');
 
 const tableUser = require('../db/tableUser');
 const tableLoginOtp = require('../db/tableLoginOtp');
+const tableSignal = require('../db/tableDsaSignal');
+const tableNotice = require('../db/tableDsaNotice');
+const tableDecision = require('../db/tableDsaDecision');
 const { requireAdminJwt, requireRole } = require('../middleware/security');
 const { apiError } = require('../middleware/api-error');
 const { sendMail } = require('../utils/mailer');
 const { sendPushbulletNotification } = require('../utils/pushbullet');
+const { signServiceJwt } = require('../utils/serviceJwt');
+const { resolveBaseUrl } = require('../utils/adminLogForwarder');
 
 const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET;
 const ADMIN_ISS = process.env.ADMIN_ISS || 'https://admin-auth.messagedrop.app/';
@@ -52,6 +58,8 @@ const VERIFY_SLOWDOWN_AFTER = toNumber(process.env.ADMIN_LOGIN_VERIFY_SLOWDOWN_A
 const VERIFY_SLOWDOWN_DELAY_MS = toNumber(process.env.ADMIN_LOGIN_VERIFY_SLOWDOWN_DELAY_MS, SLOWDOWN_DELAY_MS);
 const VERIFY_SLOWDOWN_MAX_MS = toNumber(process.env.ADMIN_LOGIN_VERIFY_SLOWDOWN_MAX_MS, SLOWDOWN_MAX_MS);
 const ALLOWED_ROLES = new Set(['moderator', 'legal', 'admin', 'root']);
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const backendAudience = process.env.SERVICE_JWT_AUDIENCE_BACKEND || 'service.backend';
 
 function createSlowdown({ windowMs, delayAfter, delayMs, maxDelayMs, keyGenerator }) {
     const hits = new Map();
@@ -225,6 +233,102 @@ function createChallenge(db, username, email, payload, logger) {
     });
 }
 
+function isUuid(value) {
+    return UUID_REGEX.test(String(value || '').trim());
+}
+
+function normalizeBlockUntil(value) {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed) || parsed <= 0) {
+        return null;
+    }
+    return Math.floor(parsed);
+}
+
+function resolvePublicBackendBase() {
+    return resolveBaseUrl(process.env.BASE_URL, process.env.PORT);
+}
+
+async function callPublicBackend(method, endpoint, payload) {
+    const baseUrl = resolvePublicBackendBase();
+    if (!baseUrl) {
+        throw new Error('backend_unavailable');
+    }
+    const token = await signServiceJwt({ audience: backendAudience });
+    return axios.request({
+        method,
+        url: `${baseUrl}${endpoint}`,
+        data: payload,
+        timeout: 5000,
+        headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: 'application/json'
+        },
+        validateStatus: () => true
+    });
+}
+
+function queryAll(db, sql, params = []) {
+    return new Promise((resolve, reject) => {
+        db.all(sql, params, (err, rows) => {
+            if (err) return reject(err);
+            resolve(rows || []);
+        });
+    });
+}
+
+function parseReportedContent(value) {
+    if (!value) return null;
+    if (typeof value === 'object') return value;
+    if (typeof value !== 'string') return null;
+    try {
+        const parsed = JSON.parse(value);
+        return parsed && typeof parsed === 'object' ? parsed : null;
+    } catch {
+        return null;
+    }
+}
+
+async function buildPlatformUserSummary(db, userId) {
+    const [signals, notices, decisions] = await Promise.all([
+        queryAll(db, `SELECT id, dismissedAt, reportedContent FROM ${tableSignal.tableName}`),
+        queryAll(db, `SELECT id, status, reportedContent FROM ${tableNotice.tableName}`),
+        queryAll(db, `SELECT noticeId, outcome FROM ${tableDecision.tableName}`)
+    ]);
+
+    const signalRows = signals.filter((row) => {
+        const content = parseReportedContent(row.reportedContent);
+        return String(content?.userId || '') === userId;
+    });
+
+    const noticeRows = notices.filter((row) => {
+        const content = parseReportedContent(row.reportedContent);
+        return String(content?.userId || '') === userId;
+    });
+
+    const noticeIds = new Set(noticeRows.map((row) => row.id));
+    const enforcementOutcomes = new Set(['REMOVE_CONTENT', 'REMOVE', 'DISABLE', 'RESTRICT', 'ACCOUNT_ACTION']);
+    const linkedDecisions = decisions.filter((row) => noticeIds.has(row.noticeId));
+    const enforcedCount = linkedDecisions.filter((row) => enforcementOutcomes.has(String(row.outcome || '').toUpperCase())).length;
+
+    return {
+        signals: {
+            total: signalRows.length,
+            open: signalRows.filter((row) => !row.dismissedAt).length,
+            dismissed: signalRows.filter((row) => !!row.dismissedAt).length
+        },
+        notices: {
+            total: noticeRows.length,
+            open: noticeRows.filter((row) => String(row.status || '').toUpperCase() !== 'DECIDED').length,
+            decided: noticeRows.filter((row) => String(row.status || '').toUpperCase() === 'DECIDED').length
+        },
+        decisions: {
+            total: linkedDecisions.length,
+            enforced: enforcedCount
+        }
+    };
+}
+
 // ======================= LOGIN (ohne Guard) =======================
 router.post('/login', [loginLimiter, loginSlowdown], async (req, res, next) => {
     const db = req.database?.db;
@@ -347,6 +451,93 @@ router.post('/login/verify', [verifyLimiter, verifySlowdown], async (req, res, n
 
 // Ab hier: Admin-JWT Pflicht
 router.use(requireAdminJwt);
+
+// ======================= PLATFORM USER MODERATION =======================
+router.get('/platform/:userId', requireRole('moderator', 'legal', 'admin', 'root'), async (req, res, next) => {
+    const userId = String(req.params.userId || '').trim();
+    if (!isUuid(userId)) {
+        return next(apiError.badRequest('invalid_user_id'));
+    }
+
+    try {
+        const [moderationResp, summary] = await Promise.all([
+            callPublicBackend('get', `/user/internal/moderation/${encodeURIComponent(userId)}`),
+            buildPlatformUserSummary(req.database.db, userId)
+        ]);
+
+        if (moderationResp.status === 404) return next(apiError.notFound('not_found'));
+        if (moderationResp.status >= 400 || !moderationResp.data?.moderation) {
+            const apiErr = apiError.badGateway('backend_request_failed');
+            apiErr.detail = moderationResp.data?.error || moderationResp.data?.message || moderationResp.statusText;
+            return next(apiErr);
+        }
+
+        return res.json({
+            status: 200,
+            moderation: moderationResp.data.moderation,
+            summary
+        });
+    } catch (error) {
+        const apiErr = apiError.internal('platform_user_lookup_failed');
+        apiErr.detail = error?.message || String(error);
+        return next(apiErr);
+    }
+});
+
+router.patch('/platform/:userId/moderation', requireRole('moderator', 'legal', 'admin', 'root'), async (req, res, next) => {
+    const userId = String(req.params.userId || '').trim();
+    if (!isUuid(userId)) {
+        return next(apiError.badRequest('invalid_user_id'));
+    }
+
+    const target = String(req.body?.target || '').toLowerCase();
+    const blocked = req.body?.blocked === true || req.body?.blocked === 1 || req.body?.blocked === '1';
+    const reason = typeof req.body?.reason === 'string' ? req.body.reason.trim() : null;
+    const blockedUntil = normalizeBlockUntil(req.body?.blockedUntil);
+    const actor = req.admin?.username || req.admin?.sub || 'admin';
+
+    if (target !== 'posting' && target !== 'account') {
+        return next(apiError.badRequest('invalid_target'));
+    }
+    if (target === 'account') {
+        const roles = Array.isArray(req.admin?.roles) ? req.admin.roles : [];
+        const mayAccountBlock = roles.includes('admin') || roles.includes('root');
+        if (!mayAccountBlock) {
+            return next(apiError.forbidden('insufficient_role'));
+        }
+    }
+
+    try {
+        const endpoint = target === 'posting'
+            ? `/user/internal/moderation/${encodeURIComponent(userId)}/posting`
+            : `/user/internal/moderation/${encodeURIComponent(userId)}/account`;
+
+        const moderationResp = await callPublicBackend('patch', endpoint, {
+            blocked,
+            reason,
+            blockedUntil,
+            actor
+        });
+
+        if (moderationResp.status === 404) return next(apiError.notFound('not_found'));
+        if (moderationResp.status >= 400 || !moderationResp.data?.moderation) {
+            const apiErr = apiError.badGateway('backend_request_failed');
+            apiErr.detail = moderationResp.data?.error || moderationResp.data?.message || moderationResp.statusText;
+            return next(apiErr);
+        }
+
+        const summary = await buildPlatformUserSummary(req.database.db, userId);
+        return res.json({
+            status: 200,
+            moderation: moderationResp.data.moderation,
+            summary
+        });
+    } catch (error) {
+        const apiErr = apiError.internal('platform_user_update_failed');
+        apiErr.detail = error?.message || String(error);
+        return next(apiErr);
+    }
+});
 
 // ======================= GET /user =======================
 // admin/root: alle; sonst: nur eigener

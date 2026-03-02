@@ -230,6 +230,75 @@
             </section>
 
             <section class="tile">
+                <h3 class="tile-title">User moderation</h3>
+                <div class="tile-body">
+                    @if (platformUserId(); as userId) {
+                    <div class="section">
+                        <div class="kv">
+                            <div class="k">User ID</div>
+                            <div class="v mono">{{ userId }}</div>
+                        </div>
+                        <div class="kv">
+                            <div class="k">Posting</div>
+                            <div class="v">{{ moderationState()?.posting?.blocked ? 'Blocked' : 'Active' }}</div>
+                        </div>
+                        <div class="kv">
+                            <div class="k">Account</div>
+                            <div class="v">{{ moderationState()?.account?.blocked ? 'Blocked' : 'Active' }}</div>
+                        </div>
+                        <div class="kv">
+                            <div class="k">Posting until</div>
+                            <div class="v">{{ formatBlockUntil(moderationState()?.posting?.blockedUntil) }}</div>
+                        </div>
+                        <div class="kv">
+                            <div class="k">Account until</div>
+                            <div class="v">{{ formatBlockUntil(moderationState()?.account?.blockedUntil) }}</div>
+                        </div>
+                        <div class="kv">
+                            <div class="k">Signals</div>
+                            <div class="v">{{ moderationSummary()?.signals?.total ?? 0 }} total / {{ moderationSummary()?.signals?.open ?? 0 }} open</div>
+                        </div>
+                        <div class="kv">
+                            <div class="k">Notices</div>
+                            <div class="v">{{ moderationSummary()?.notices?.total ?? 0 }} total / {{ moderationSummary()?.notices?.open ?? 0 }} open</div>
+                        </div>
+                        <div class="kv">
+                            <div class="k">Enforced decisions</div>
+                            <div class="v">{{ moderationSummary()?.decisions?.enforced ?? 0 }}</div>
+                        </div>
+                    </div>
+                    <div class="tile-actions">
+                        @if (!(moderationState()?.posting?.blocked)) {
+                        <button mat-stroked-button color="warn" type="button" (click)="blockPosting()" [disabled]="moderationBusy()">
+                            <mat-icon>block</mat-icon>
+                            Block posting
+                        </button>
+                        } @else {
+                        <button mat-stroked-button type="button" (click)="unblockPosting()" [disabled]="moderationBusy()">
+                            <mat-icon>check_circle</mat-icon>
+                            Unblock posting
+                        </button>
+                        }
+
+                        @if (!(moderationState()?.account?.blocked)) {
+                        <button mat-stroked-button color="warn" type="button" (click)="blockAccount()" [disabled]="moderationBusy()">
+                            <mat-icon>lock</mat-icon>
+                            Block account
+                        </button>
+                        } @else {
+                        <button mat-stroked-button type="button" (click)="unblockAccount()" [disabled]="moderationBusy()">
+                            <mat-icon>lock_open</mat-icon>
+                            Unblock account
+                        </button>
+                        }
+                    </div>
+                    } @else {
+                    <div class="placeholder"><mat-icon>info</mat-icon> No platform user id in this notice payload.</div>
+                    }
+                </div>
+            </section>
+
+            <section class="tile">
                 <h3 class="tile-title">Evidence</h3>
                 <div class="tile-body">
                     <div class="tile-actions">

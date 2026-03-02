@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const security = require('../middleware/security');
 const tableMessage = require('../db/tableMessage');
+const tableUser = require('../db/tableUser');
 const tableLike = require('../db/tableLike');
 const tableDislike = require('../db/tableDislike');
 const notify = require('../utils/notify');
@@ -201,6 +202,29 @@ function parsePublicHashtags(input) {
     return null;
   }
   return parsed.tags;
+}
+
+function getUserById(db, userId) {
+  return new Promise((resolve, reject) => {
+    tableUser.getById(db, userId, (err, row) => {
+      if (err) return reject(err);
+      resolve(row || null);
+    });
+  });
+}
+
+function isPostingBlocked(userRow) {
+  if (!userRow) return false;
+  if (String(userRow.userStatus || '').toLowerCase() === tableUser.userStatus.DISABLED) {
+    return true;
+  }
+  const blocked = Number(userRow.postingBlocked) === 1;
+  if (!blocked) return false;
+  const until = Number(userRow.postingBlockedUntil);
+  if (Number.isFinite(until) && until > 0 && until < Date.now()) {
+    return false;
+  }
+  return true;
 }
 
 async function forwardModerationRequest(payload, logger) {
@@ -459,6 +483,19 @@ router.post('/create',
     let response = { 'status': 0 };
     if (!ensureSameUser(req, res, req.body.messageUserId, next)) {
       return;
+    }
+    let userRow = null;
+    try {
+      userRow = await getUserById(req.database.db, req.body.messageUserId);
+    } catch (error) {
+      req.logger?.warn?.('Failed to read user moderation status before message.create', { error: error?.message || error });
+      return next(apiError.internal('db_error'));
+    }
+    if (!userRow) {
+      return next(apiError.notFound('user_not_found'));
+    }
+    if (isPostingBlocked(userRow)) {
+      return next(apiError.forbidden('user_blocked_for_posting'));
     }
     if (undefined == req.body.parentMessageId) {
       req.body.parentMessageId = 0;

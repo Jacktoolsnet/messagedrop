@@ -19,6 +19,15 @@ const columnUserStatus = 'userStatus';
 const columnLastSignOfLife = 'lastSignOfLife';
 const columnSubscription = 'subscription';
 const columnType = 'type';
+const columnPostingBlocked = 'postingBlocked';
+const columnPostingBlockedReason = 'postingBlockedReason';
+const columnPostingBlockedAt = 'postingBlockedAt';
+const columnPostingBlockedUntil = 'postingBlockedUntil';
+const columnPostingBlockedBy = 'postingBlockedBy';
+const columnAccountBlockedReason = 'accountBlockedReason';
+const columnAccountBlockedAt = 'accountBlockedAt';
+const columnAccountBlockedUntil = 'accountBlockedUntil';
+const columnAccountBlockedBy = 'accountBlockedBy';
 
 const init = function (db) {
     try {
@@ -32,7 +41,16 @@ const init = function (db) {
             ${columnUserStatus} TEXT NOT NULL DEFAULT '${userStatus.ENABLED}',
             ${columnLastSignOfLife} INTEGER NOT NULL,
             ${columnSubscription} TEXT DEFAULT NULL,
-            ${columnType} TEXT DEFAULT NULL
+            ${columnType} TEXT DEFAULT NULL,
+            ${columnPostingBlocked} INTEGER NOT NULL DEFAULT 0,
+            ${columnPostingBlockedReason} TEXT DEFAULT NULL,
+            ${columnPostingBlockedAt} INTEGER DEFAULT NULL,
+            ${columnPostingBlockedUntil} INTEGER DEFAULT NULL,
+            ${columnPostingBlockedBy} TEXT DEFAULT NULL,
+            ${columnAccountBlockedReason} TEXT DEFAULT NULL,
+            ${columnAccountBlockedAt} INTEGER DEFAULT NULL,
+            ${columnAccountBlockedUntil} INTEGER DEFAULT NULL,
+            ${columnAccountBlockedBy} TEXT DEFAULT NULL
         );`;
 
         db.run(sql, (err) => {
@@ -40,6 +58,27 @@ const init = function (db) {
                 throw err;
             }
         });
+
+        db.run(`CREATE INDEX IF NOT EXISTS idx_user_status ON ${tableName}(${columnUserStatus});`);
+        db.run(`CREATE INDEX IF NOT EXISTS idx_user_posting_blocked ON ${tableName}(${columnPostingBlocked});`);
+
+        const ensureColumn = (name, definition) => {
+            db.run(`ALTER TABLE ${tableName} ADD COLUMN ${name} ${definition};`, (err) => {
+                if (err && !/duplicate column/i.test(String(err.message || ''))) {
+                    // ignore migration issue in old installations; table can be recreated in dev
+                }
+            });
+        };
+
+        ensureColumn(columnPostingBlocked, 'INTEGER NOT NULL DEFAULT 0');
+        ensureColumn(columnPostingBlockedReason, 'TEXT DEFAULT NULL');
+        ensureColumn(columnPostingBlockedAt, 'INTEGER DEFAULT NULL');
+        ensureColumn(columnPostingBlockedUntil, 'INTEGER DEFAULT NULL');
+        ensureColumn(columnPostingBlockedBy, 'TEXT DEFAULT NULL');
+        ensureColumn(columnAccountBlockedReason, 'TEXT DEFAULT NULL');
+        ensureColumn(columnAccountBlockedAt, 'INTEGER DEFAULT NULL');
+        ensureColumn(columnAccountBlockedUntil, 'INTEGER DEFAULT NULL');
+        ensureColumn(columnAccountBlockedBy, 'TEXT DEFAULT NULL');
     } catch (error) {
         throw error;
     }
@@ -172,6 +211,64 @@ const updatePublicKeys = function (db, userId, signingPublicKey, cryptoPublicKey
     }
 };
 
+const updatePostingBlock = function (db, userId, opts, callback) {
+    const blocked = opts?.blocked ? 1 : 0;
+    if (!blocked) {
+        const sql = `
+        UPDATE ${tableName}
+        SET ${columnPostingBlocked} = 0,
+            ${columnPostingBlockedReason} = ?,
+            ${columnPostingBlockedAt} = NULL,
+            ${columnPostingBlockedUntil} = NULL,
+            ${columnPostingBlockedBy} = ?
+        WHERE ${columnUserId} = ?;`;
+        return db.run(sql, [opts?.reason || null, opts?.actor || null, userId], function (err) {
+            callback(err, this?.changes > 0);
+        });
+    }
+
+    const sql = `
+    UPDATE ${tableName}
+    SET ${columnPostingBlocked} = 1,
+        ${columnPostingBlockedReason} = ?,
+        ${columnPostingBlockedAt} = ?,
+        ${columnPostingBlockedUntil} = ?,
+        ${columnPostingBlockedBy} = ?
+    WHERE ${columnUserId} = ?;`;
+    db.run(sql, [opts?.reason || null, opts?.at || Date.now(), opts?.until || null, opts?.actor || null, userId], function (err) {
+        callback(err, this?.changes > 0);
+    });
+};
+
+const updateAccountBlock = function (db, userId, opts, callback) {
+    const blocked = opts?.blocked ? 1 : 0;
+    if (!blocked) {
+        const sql = `
+        UPDATE ${tableName}
+        SET ${columnUserStatus} = '${userStatus.ENABLED}',
+            ${columnAccountBlockedReason} = ?,
+            ${columnAccountBlockedAt} = NULL,
+            ${columnAccountBlockedUntil} = NULL,
+            ${columnAccountBlockedBy} = ?
+        WHERE ${columnUserId} = ?;`;
+        return db.run(sql, [opts?.reason || null, opts?.actor || null, userId], function (err) {
+            callback(err, this?.changes > 0);
+        });
+    }
+
+    const sql = `
+    UPDATE ${tableName}
+    SET ${columnUserStatus} = '${userStatus.DISABLED}',
+        ${columnAccountBlockedReason} = ?,
+        ${columnAccountBlockedAt} = ?,
+        ${columnAccountBlockedUntil} = ?,
+        ${columnAccountBlockedBy} = ?
+    WHERE ${columnUserId} = ?;`;
+    db.run(sql, [opts?.reason || null, opts?.at || Date.now(), opts?.until || null, opts?.actor || null, userId], function (err) {
+        callback(err, this?.changes > 0);
+    });
+};
+
 module.exports = {
     userStatus,
     init,
@@ -182,5 +279,20 @@ module.exports = {
     clean,
     subscribe,
     unsubscribe,
-    updatePublicKeys
+    updatePublicKeys,
+    updatePostingBlock,
+    updateAccountBlock,
+    columns: {
+        userId: columnUserId,
+        userStatus: columnUserStatus,
+        postingBlocked: columnPostingBlocked,
+        postingBlockedReason: columnPostingBlockedReason,
+        postingBlockedAt: columnPostingBlockedAt,
+        postingBlockedUntil: columnPostingBlockedUntil,
+        postingBlockedBy: columnPostingBlockedBy,
+        accountBlockedReason: columnAccountBlockedReason,
+        accountBlockedAt: columnAccountBlockedAt,
+        accountBlockedUntil: columnAccountBlockedUntil,
+        accountBlockedBy: columnAccountBlockedBy
+    }
 }

@@ -1,0 +1,62 @@
+:host {
+  color-scheme: light;
+  --primary: #05a51d;
+  --bg-gradient-start: #eafde8;
+  --bg-gradient-end: #bff7c4;
+  --card: rgba(255, 255, 255, 0.94);
+  --text: #1f2937;
+  --border: rgba(0, 0, 0, 0.08);
+  display: block;
+  min-height: 100%;
+  background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+}
+
+mat-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+}
+
+.toolbar-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.2rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.lookup-form {
+  display: flex;
+  gap: .75rem;
+  align-items: flex-start;
+}
+
+.grow {
+  flex: 1 1 auto;
+}
+
+.tiles-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.tile {
+  border: 1px solid var(--border);
+}
+
+@media (max-width: 900px) {
+  .lookup-form {
+    flex-direction: column;
+  }
+}
+

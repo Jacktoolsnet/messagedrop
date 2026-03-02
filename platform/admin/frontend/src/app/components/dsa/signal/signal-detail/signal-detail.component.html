@@ -195,6 +195,97 @@
                 </div>
                 }
             </section>
+
+            <section class="detail-tile">
+                <div class="tile-header">
+                    <div class="tile-title">
+                        <mat-icon>gpp_bad</mat-icon>
+                        <span>User moderation</span>
+                    </div>
+                </div>
+
+                @if (platformUserId(); as userId) {
+                <div class="meta-grid">
+                    <div class="kv">
+                        <mat-icon>person</mat-icon>
+                        <span><strong>User ID:</strong> {{ userId }}</span>
+                    </div>
+                    <div class="kv">
+                        <mat-icon>edit_note</mat-icon>
+                        <span>
+                            <strong>Posting:</strong>
+                            @if (moderationState()?.posting?.blocked) {
+                            blocked
+                            } @else {
+                            active
+                            }
+                        </span>
+                    </div>
+                    <div class="kv">
+                        <mat-icon>lock</mat-icon>
+                        <span>
+                            <strong>Account:</strong>
+                            @if (moderationState()?.account?.blocked) {
+                            blocked
+                            } @else {
+                            active
+                            }
+                        </span>
+                    </div>
+                    <div class="kv">
+                        <mat-icon>report</mat-icon>
+                        <span><strong>Signals:</strong> {{ moderationSummary()?.signals?.total ?? 0 }} total / {{ moderationSummary()?.signals?.open ?? 0 }} open</span>
+                    </div>
+                    <div class="kv">
+                        <mat-icon>flag</mat-icon>
+                        <span><strong>Notices:</strong> {{ moderationSummary()?.notices?.total ?? 0 }} total / {{ moderationSummary()?.notices?.open ?? 0 }} open</span>
+                    </div>
+                    <div class="kv">
+                        <mat-icon>gavel</mat-icon>
+                        <span><strong>Enforced decisions:</strong> {{ moderationSummary()?.decisions?.enforced ?? 0 }}</span>
+                    </div>
+                    <div class="kv">
+                        <mat-icon>schedule</mat-icon>
+                        <span><strong>Posting blocked until:</strong> {{ formatBlockUntil(moderationState()?.posting?.blockedUntil) }}</span>
+                    </div>
+                    <div class="kv">
+                        <mat-icon>schedule</mat-icon>
+                        <span><strong>Account blocked until:</strong> {{ formatBlockUntil(moderationState()?.account?.blockedUntil) }}</span>
+                    </div>
+                </div>
+
+                <div class="counters">
+                    @if (!(moderationState()?.posting?.blocked)) {
+                    <button mat-stroked-button color="warn" (click)="blockPosting()" [disabled]="moderationBusy()">
+                        <mat-icon>block</mat-icon>
+                        Block posting
+                    </button>
+                    } @else {
+                    <button mat-stroked-button (click)="unblockPosting()" [disabled]="moderationBusy()">
+                        <mat-icon>check_circle</mat-icon>
+                        Unblock posting
+                    </button>
+                    }
+
+                    @if (!(moderationState()?.account?.blocked)) {
+                    <button mat-stroked-button color="warn" (click)="blockAccount()" [disabled]="moderationBusy()">
+                        <mat-icon>lock</mat-icon>
+                        Block account
+                    </button>
+                    } @else {
+                    <button mat-stroked-button (click)="unblockAccount()" [disabled]="moderationBusy()">
+                        <mat-icon>lock_open</mat-icon>
+                        Unblock account
+                    </button>
+                    }
+                </div>
+                } @else {
+                <div class="placeholder">
+                    <mat-icon>info</mat-icon>
+                    No platform user id in this signal payload.
+                </div>
+                }
+            </section>
         </div>
     </mat-card-content>
 

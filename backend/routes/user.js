@@ -263,6 +263,146 @@ function normalizeOwnUserType(value) {
   return ['user', 'admin', 'business'].includes(normalized) ? normalized : 'user';
 }
 
+function normalizeBlockUntil(value) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return null;
+  }
+  return Math.floor(parsed);
+}
+
+function isAccountBlockedRow(row) {
+  if (!row) return false;
+  if (String(row.userStatus || '').toLowerCase() !== tableUser.userStatus.DISABLED) {
+    return false;
+  }
+  const until = Number(row.accountBlockedUntil);
+  if (Number.isFinite(until) && until > 0 && until < Date.now()) {
+    return false;
+  }
+  return true;
+}
+
+function moderationPayloadFromUser(row) {
+  if (!row) return null;
+  const accountBlocked = isAccountBlockedRow(row);
+  const postingBlocked = Number(row.postingBlocked) === 1 && (!Number.isFinite(Number(row.postingBlockedUntil)) || Number(row.postingBlockedUntil) <= 0 || Number(row.postingBlockedUntil) > Date.now());
+  return {
+    userId: row.id,
+    posting: {
+      blocked: postingBlocked,
+      reason: row.postingBlockedReason || null,
+      blockedAt: row.postingBlockedAt || null,
+      blockedUntil: row.postingBlockedUntil || null,
+      blockedBy: row.postingBlockedBy || null
+    },
+    account: {
+      blocked: accountBlocked,
+      reason: row.accountBlockedReason || null,
+      blockedAt: row.accountBlockedAt || null,
+      blockedUntil: row.accountBlockedUntil || null,
+      blockedBy: row.accountBlockedBy || null
+    }
+  };
+}
+
+router.get('/internal/moderation/:userId',
+  [
+    security.checkToken
+  ],
+  function (req, res, next) {
+    const userId = String(req.params.userId || '').trim();
+    if (!isUuid(userId)) {
+      return next(apiError.badRequest('invalid_user_id'));
+    }
+
+    tableUser.getById(req.database.db, userId, (err, row) => {
+      if (err) {
+        return next(apiError.internal('db_error'));
+      }
+      if (!row) {
+        return next(apiError.notFound('not_found'));
+      }
+      return res.status(200).json({ status: 200, moderation: moderationPayloadFromUser(row) });
+    });
+  });
+
+router.patch('/internal/moderation/:userId/posting',
+  [
+    security.checkToken,
+    express.json({ type: 'application/json' })
+  ],
+  function (req, res, next) {
+    const userId = String(req.params.userId || '').trim();
+    if (!isUuid(userId)) {
+      return next(apiError.badRequest('invalid_user_id'));
+    }
+
+    const blocked = req.body?.blocked === true || req.body?.blocked === 1 || req.body?.blocked === '1';
+    const reason = normalizeOptionalText(req.body?.reason, 2000);
+    const actor = normalizeOptionalText(req.body?.actor, 200);
+    const until = normalizeBlockUntil(req.body?.blockedUntil);
+
+    tableUser.updatePostingBlock(req.database.db, userId, {
+      blocked,
+      reason,
+      actor,
+      until,
+      at: Date.now()
+    }, (err, ok) => {
+      if (err) {
+        return next(apiError.internal('db_error'));
+      }
+      if (!ok) {
+        return next(apiError.notFound('not_found'));
+      }
+      tableUser.getById(req.database.db, userId, (lookupErr, row) => {
+        if (lookupErr) {
+          return next(apiError.internal('db_error'));
+        }
+        return res.status(200).json({ status: 200, moderation: moderationPayloadFromUser(row) });
+      });
+    });
+  });
+
+router.patch('/internal/moderation/:userId/account',
+  [
+    security.checkToken,
+    express.json({ type: 'application/json' })
+  ],
+  function (req, res, next) {
+    const userId = String(req.params.userId || '').trim();
+    if (!isUuid(userId)) {
+      return next(apiError.badRequest('invalid_user_id'));
+    }
+
+    const blocked = req.body?.blocked === true || req.body?.blocked === 1 || req.body?.blocked === '1';
+    const reason = normalizeOptionalText(req.body?.reason, 2000);
+    const actor = normalizeOptionalText(req.body?.actor, 200);
+    const until = normalizeBlockUntil(req.body?.blockedUntil);
+
+    tableUser.updateAccountBlock(req.database.db, userId, {
+      blocked,
+      reason,
+      actor,
+      until,
+      at: Date.now()
+    }, (err, ok) => {
+      if (err) {
+        return next(apiError.internal('db_error'));
+      }
+      if (!ok) {
+        return next(apiError.notFound('not_found'));
+      }
+      tableUser.getById(req.database.db, userId, (lookupErr, row) => {
+        if (lookupErr) {
+          return next(apiError.internal('db_error'));
+        }
+        return res.status(200).json({ status: 200, moderation: moderationPayloadFromUser(row) });
+      });
+    });
+  });
+
 function sanitizeRestoreContacts(rawContacts, userId) {
   const rows = normalizeRows(rawContacts);
   if (rows.length > MAX_RESTORE_CONTACT_ROWS) {
@@ -1067,9 +1207,16 @@ router.post('/challenge',
     }
 
     try {
-      const row = await queryGet(req.database.db, 'SELECT signingPublicKey FROM tableUser WHERE id = ?;', [userId]);
+      const row = await queryGet(req.database.db, `
+        SELECT signingPublicKey, userStatus, accountBlockedUntil
+        FROM tableUser
+        WHERE id = ?;
+      `, [userId]);
       if (!row) {
         return next(apiError.notFound('not_found'));
+      }
+      if (isAccountBlockedRow(row)) {
+        return next(apiError.forbidden('user_account_blocked'));
       }
       if (!row.signingPublicKey) {
         return next(apiError.conflict('missing_public_key'));
@@ -1097,9 +1244,16 @@ router.post('/login',
     }
 
     try {
-      const row = await queryGet(req.database.db, 'SELECT signingPublicKey FROM tableUser WHERE id = ?;', [userId]);
+      const row = await queryGet(req.database.db, `
+        SELECT signingPublicKey, userStatus, accountBlockedUntil
+        FROM tableUser
+        WHERE id = ?;
+      `, [userId]);
       if (!row) {
         return next(apiError.notFound('not_found'));
+      }
+      if (isAccountBlockedRow(row)) {
+        return next(apiError.forbidden('user_account_blocked'));
       }
       if (!row.signingPublicKey) {
         return next(apiError.conflict('missing_public_key'));

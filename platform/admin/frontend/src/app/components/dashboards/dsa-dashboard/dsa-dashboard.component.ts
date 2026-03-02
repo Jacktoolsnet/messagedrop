@@ -20,7 +20,8 @@ type TileKey =
   | 'notifications'
   | 'appeals'
   | 'audit'
-  | 'transparency';
+  | 'transparency'
+  | 'userModeration';
 
 interface DsaTile {
   key: TileKey;
@@ -76,7 +77,8 @@ export class DsaDashboardComponent {
     { key: 'notifications', title: 'Notifications', subtitle: 'Notify stakeholders', icon: 'notifications', route: '/dashboard/dsa/notifications' },
     { key: 'appeals', title: 'Appeals', subtitle: 'Handle appeals', icon: 'feedback', route: '/dashboard/dsa/appeals' },
     { key: 'audit', title: 'Audit Log', subtitle: 'Trace all actions', icon: 'history', route: '/dashboard/dsa/audits' },
-    { key: 'transparency', title: 'Transparency', subtitle: 'Public stats & reports', icon: 'insights', route: '/dashboard/dsa/transparency' }
+    { key: 'transparency', title: 'Transparency', subtitle: 'Public stats & reports', icon: 'insights', route: '/dashboard/dsa/transparency' },
+    { key: 'userModeration', title: 'User Moderation', subtitle: 'Block / unblock users', icon: 'gpp_bad', route: '/dashboard/dsa/user-moderation' }
   ];
 
   // Badge-Logik pro Tile

@@ -10,6 +10,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Multimedia } from '../../../../interfaces/multimedia.interface';
+import { PlatformUserModeration, PlatformUserSummary } from '../../../../interfaces/platform-user-moderation.interface';
 import { PublicMessageDetailData } from '../../../../interfaces/public-message-detail-data.interface';
 import { PublicMessage } from '../../../../interfaces/public-message.interface';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
@@ -66,6 +67,11 @@ export class SignalDetailComponent implements OnInit {
       m.manualModerationBy
     ].some(value => value !== undefined && value !== null && value !== '');
   });
+  readonly platformUserId = computed(() => {
+    const id = this.msg()?.userId;
+    const value = typeof id === 'string' ? id.trim() : '';
+    return value || null;
+  });
 
   // Übersetzen-State
   tMsg = signal<string | null>(null);
@@ -73,6 +79,9 @@ export class SignalDetailComponent implements OnInit {
   loadingMsg = signal(false);
   loadingReason = signal(false);
   actionBusy = signal(false);
+  moderationState = signal<PlatformUserModeration | null>(null);
+  moderationSummary = signal<PlatformUserSummary | null>(null);
+  moderationBusy = signal(false);
 
   ngOnInit() {
     const raw = typeof this.data.reportedContent === 'string'
@@ -122,6 +131,11 @@ export class SignalDetailComponent implements OnInit {
       }
       default:
         this.mediaKind.set('none');
+    }
+
+    const userId = typeof raw.userId === 'string' ? raw.userId.trim() : '';
+    if (userId) {
+      this.loadPlatformUserModeration(userId);
     }
   }
 
@@ -187,6 +201,52 @@ export class SignalDetailComponent implements OnInit {
     });
   }
 
+  loadPlatformUserModeration(userId: string) {
+    this.moderationBusy.set(true);
+    this.dsa.getPlatformUserModeration(userId).subscribe({
+      next: (res) => {
+        this.moderationState.set(res?.moderation ?? null);
+        this.moderationSummary.set(res?.summary ?? null);
+      },
+      complete: () => this.moderationBusy.set(false)
+    });
+  }
+
+  blockPosting() {
+    const userId = this.platformUserId();
+    if (!userId) return;
+    this.updateModeration(userId, 'posting', true, 'blocked_from_signal_detail');
+  }
+
+  blockAccount() {
+    const userId = this.platformUserId();
+    if (!userId) return;
+    this.updateModeration(userId, 'account', true, 'blocked_from_signal_detail');
+  }
+
+  unblockPosting() {
+    const userId = this.platformUserId();
+    if (!userId) return;
+    this.updateModeration(userId, 'posting', false, 'manual_unblock');
+  }
+
+  unblockAccount() {
+    const userId = this.platformUserId();
+    if (!userId) return;
+    this.updateModeration(userId, 'account', false, 'manual_unblock');
+  }
+
+  private updateModeration(userId: string, target: 'posting' | 'account', blocked: boolean, reason: string) {
+    this.moderationBusy.set(true);
+    this.dsa.updatePlatformUserModeration(userId, { target, blocked, reason }).subscribe({
+      next: (res) => {
+        this.moderationState.set(res?.moderation ?? null);
+        this.moderationSummary.set(res?.summary ?? null);
+      },
+      complete: () => this.moderationBusy.set(false)
+    });
+  }
+
   translateMessage() {
     const text = this.msg()?.message?.trim();
     if (!text) {
@@ -232,6 +292,13 @@ export class SignalDetailComponent implements OnInit {
     } catch {
       return new Date(ts).toISOString();
     }
+  }
+
+  formatBlockUntil(value?: number | null): string {
+    if (!Number.isFinite(value)) return '—';
+    const ts = Number(value);
+    if (ts <= 0) return '—';
+    return this.formatTimestamp(ts);
   }
 
   normalizeEpoch(value?: number | string | null): number | null {

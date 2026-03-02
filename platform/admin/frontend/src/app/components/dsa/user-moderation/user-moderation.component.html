@@ -1,0 +1,102 @@
+<mat-toolbar>
+  <button mat-icon-button routerLink="/dashboard/dsa" aria-label="Back">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <span class="toolbar-title">User Moderation</span>
+</mat-toolbar>
+
+@if (loading()) {
+<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+<div class="page">
+  <mat-card class="lookup-card">
+    <mat-card-header>
+      <mat-card-title>Lookup platform user</mat-card-title>
+      <mat-card-subtitle>Enter the user id from a signal/notice or complaint</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <form class="lookup-form" (ngSubmit)="lookup()">
+        <mat-form-field appearance="outline" class="grow">
+          <mat-label>User ID</mat-label>
+          <input matInput [formControl]="form.controls.userId" placeholder="UUID user id">
+        </mat-form-field>
+        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || loading()">
+          <mat-icon>search</mat-icon>
+          Load
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  @if (moderation(); as moderationState) {
+  <div class="tiles-grid">
+    <mat-card class="tile">
+      <mat-card-header>
+        <mat-card-title>Posting status</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p><strong>Current:</strong> {{ moderationState.posting.blocked ? 'Blocked' : 'Active' }}</p>
+        <p><strong>Reason:</strong> {{ moderationState.posting.reason || '—' }}</p>
+        <p><strong>Until:</strong> {{ formatTimestamp(moderationState.posting.blockedUntil) }}</p>
+      </mat-card-content>
+      <mat-card-actions>
+        @if (!moderationState.posting.blocked) {
+        <button mat-stroked-button color="warn" (click)="blockPosting()" [disabled]="loading()">
+          <mat-icon>block</mat-icon>Block posting
+        </button>
+        } @else {
+        <button mat-stroked-button (click)="unblockPosting()" [disabled]="loading()">
+          <mat-icon>check_circle</mat-icon>Unblock posting
+        </button>
+        }
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card class="tile">
+      <mat-card-header>
+        <mat-card-title>Account status</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p><strong>Current:</strong> {{ moderationState.account.blocked ? 'Blocked' : 'Active' }}</p>
+        <p><strong>Reason:</strong> {{ moderationState.account.reason || '—' }}</p>
+        <p><strong>Until:</strong> {{ formatTimestamp(moderationState.account.blockedUntil) }}</p>
+      </mat-card-content>
+      <mat-card-actions>
+        @if (!moderationState.account.blocked) {
+        <button mat-stroked-button color="warn" (click)="blockAccount()" [disabled]="loading()">
+          <mat-icon>lock</mat-icon>Block account
+        </button>
+        } @else {
+        <button mat-stroked-button (click)="unblockAccount()" [disabled]="loading()">
+          <mat-icon>lock_open</mat-icon>Unblock account
+        </button>
+        }
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card class="tile">
+      <mat-card-header>
+        <mat-card-title>Signals</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p><strong>Total:</strong> {{ summary()?.signals?.total ?? 0 }}</p>
+        <p><strong>Open:</strong> {{ summary()?.signals?.open ?? 0 }}</p>
+        <p><strong>Dismissed:</strong> {{ summary()?.signals?.dismissed ?? 0 }}</p>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="tile">
+      <mat-card-header>
+        <mat-card-title>Notices & decisions</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p><strong>Notices total:</strong> {{ summary()?.notices?.total ?? 0 }}</p>
+        <p><strong>Notices open:</strong> {{ summary()?.notices?.open ?? 0 }}</p>
+        <p><strong>Enforced decisions:</strong> {{ summary()?.decisions?.enforced ?? 0 }}</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  }
+</div>
+

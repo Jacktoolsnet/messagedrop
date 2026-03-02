@@ -11,6 +11,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { environment } from '../../../../../environments/environment';
 import { DsaNoticeStatus } from '../../../../interfaces/dsa-notice-status.type';
 import { DsaNotice } from '../../../../interfaces/dsa-notice.interface';
+import { PlatformUserModeration, PlatformUserSummary } from '../../../../interfaces/platform-user-moderation.interface';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
 import { DecisionDialogComponent, DecisionDialogResult, DecisionOutcome } from '../../decisions/decision-dialog/decision-dialog.component';
 import { DecisionSummaryComponent } from '../../decisions/decision-summary/decision-summary.component';
@@ -108,6 +109,14 @@ export class NoticeDetailComponent implements OnInit {
       c.manualModerationBy
     ].some(value => value !== undefined && value !== null && value !== '');
   });
+  platformUserId = computed(() => {
+    const id = this.contentObj()?.userId;
+    const value = typeof id === 'string' ? id.trim() : '';
+    return value || null;
+  });
+  moderationState = signal<PlatformUserModeration | null>(null);
+  moderationSummary = signal<PlatformUserSummary | null>(null);
+  moderationBusy = signal(false);
 
   close(ok = false) {
     this.ref.close(ok || this.dirty);
@@ -162,6 +171,10 @@ export class NoticeDetailComponent implements OnInit {
   ngOnInit(): void {
     this.updateMediaFromContent();
     this.ensureUnderReview();
+    const userId = this.platformUserId();
+    if (userId) {
+      this.loadPlatformUserModeration(userId);
+    }
   }
 
   /** Übersetzung via Admin-Backend (/translate/DE/:value) */
@@ -230,6 +243,59 @@ export class NoticeDetailComponent implements OnInit {
         },
         error: () => this.makingScreenshot.set(false)
       });
+  }
+
+  loadPlatformUserModeration(userId: string) {
+    this.moderationBusy.set(true);
+    this.dsa.getPlatformUserModeration(userId).subscribe({
+      next: (res) => {
+        this.moderationState.set(res?.moderation ?? null);
+        this.moderationSummary.set(res?.summary ?? null);
+      },
+      complete: () => this.moderationBusy.set(false)
+    });
+  }
+
+  blockPosting() {
+    const userId = this.platformUserId();
+    if (!userId) return;
+    this.updateModeration(userId, 'posting', true, 'blocked_from_notice_detail');
+  }
+
+  blockAccount() {
+    const userId = this.platformUserId();
+    if (!userId) return;
+    this.updateModeration(userId, 'account', true, 'blocked_from_notice_detail');
+  }
+
+  unblockPosting() {
+    const userId = this.platformUserId();
+    if (!userId) return;
+    this.updateModeration(userId, 'posting', false, 'manual_unblock');
+  }
+
+  unblockAccount() {
+    const userId = this.platformUserId();
+    if (!userId) return;
+    this.updateModeration(userId, 'account', false, 'manual_unblock');
+  }
+
+  private updateModeration(userId: string, target: 'posting' | 'account', blocked: boolean, reason: string) {
+    this.moderationBusy.set(true);
+    this.dsa.updatePlatformUserModeration(userId, { target, blocked, reason }).subscribe({
+      next: (res) => {
+        this.moderationState.set(res?.moderation ?? null);
+        this.moderationSummary.set(res?.summary ?? null);
+      },
+      complete: () => this.moderationBusy.set(false)
+    });
+  }
+
+  formatBlockUntil(value?: number | null): string {
+    if (!Number.isFinite(value)) return '—';
+    const ts = Number(value);
+    if (ts <= 0) return '—';
+    return this.formatTimestamp(ts);
   }
 
   private updateMediaFromContent(): void {

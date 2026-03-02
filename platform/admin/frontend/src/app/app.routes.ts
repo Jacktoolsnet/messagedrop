@@ -10,6 +10,7 @@ import { NoticesComponent } from './components/dsa/notice/notices/notices.compon
 import { NotificationsComponent } from './components/dsa/notifications/notifications.component';
 import { SignalsComponent } from './components/dsa/signal/signals/signals.component';
 import { TransparencyComponent } from './components/dsa/transparency/transparency.component';
+import { UserModerationComponent } from './components/dsa/user-moderation/user-moderation.component';
 import { LoginComponent } from './components/login/login.component';
 import { AppLogsComponent } from './components/loging/app-logs/app-logs.component';
 import { ErrorLogsComponent } from './components/loging/error-logs/error-logs.component';
@@ -86,6 +87,11 @@ export const routes: Routes = [
     {
         path: 'dashboard/dsa/transparency',
         component: TransparencyComponent,
+        canActivate: [authGuard]
+    },
+    {
+        path: 'dashboard/dsa/user-moderation',
+        component: UserModerationComponent,
         canActivate: [authGuard]
     },
     {
