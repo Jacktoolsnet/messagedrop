@@ -1161,6 +1161,10 @@
         "title": "Eliminar publicación",
         "desc": "Con esta función eliminas tu publicación o comentario de forma manual e inmediata."
       },
+      "publish": {
+        "title": "Publicar / retirar",
+        "desc": "Con esta función vuelves a publicar la publicación seleccionada o la retiras de línea sin eliminarla."
+      },
       "moderation": {
         "title": "Ver estado de moderación",
         "desc": "Con esta función ves el estado de moderación (publicado, en revisión, oculto) con detalles de la decisión."
@@ -1172,6 +1176,10 @@
       "dsa": {
         "title": "Estado de caso DSA",
         "desc": "Si existe un proceso DSA para una publicación, puedes ver su estado (por ejemplo recibido, en revisión, decidido) y hacer seguimiento."
+      },
+      "filter": {
+        "title": "Filtrar lista",
+        "desc": "Con esta función filtras tu lista de mensajes por estado de publicación (por ejemplo publicado, retirado, ausente en línea o bloqueado por DSA)."
       },
       "more": {
         "title": "Abrir más acciones",

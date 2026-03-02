@@ -1161,6 +1161,10 @@
         "title": "Beitrag löschen",
         "desc": "Mit dieser Funktion löschst du deinen Beitrag oder Kommentar manuell und sofort."
       },
+      "publish": {
+        "title": "Veröffentlichen / zurücknehmen",
+        "desc": "Mit dieser Funktion veröffentlichst du den ausgewählten Beitrag erneut oder nimmst ihn ohne Löschen wieder offline."
+      },
       "moderation": {
         "title": "Moderationsstatus einsehen",
         "desc": "Mit dieser Funktion siehst du den aktuellen Moderationsstatus (veröffentlicht, Prüfung, ausgeblendet) inklusive Entscheidungsdetails."
@@ -1172,6 +1176,10 @@
       "dsa": {
         "title": "DSA-Fallstatus",
         "desc": "Wenn ein DSA-Verfahren für einen Beitrag existiert, kannst du den Fallstatus einsehen (z. B. eingegangen, in Prüfung, entschieden) und den weiteren Prozess nachverfolgen."
+      },
+      "filter": {
+        "title": "Liste filtern",
+        "desc": "Mit dieser Funktion filterst du deine Nachrichtenliste nach Veröffentlichungsstatus (z. B. veröffentlicht, zurückgenommen, online fehlend, DSA-gesperrt)."
       },
       "more": {
         "title": "Weitere Aktionen öffnen",

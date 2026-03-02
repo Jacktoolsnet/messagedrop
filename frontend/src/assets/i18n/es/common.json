@@ -393,7 +393,10 @@
       "filter": {
         "aria": "Filtrar mis mensajes públicos",
         "all": "Todos los mensajes",
-        "missingOnline": "No está en línea"
+        "published": "Solo publicados",
+        "unpublished": "Solo retirados",
+        "missingOnline": "No está en línea",
+        "dsaLocked": "Bloqueados por DSA"
       },
       "commentsAria": "Mostrar o añadir comentarios",
       "likeAria": "Me gusta",

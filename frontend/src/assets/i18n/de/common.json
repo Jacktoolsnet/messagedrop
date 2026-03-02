@@ -393,7 +393,10 @@
       "filter": {
         "aria": "Meine öffentlichen Nachrichten filtern",
         "all": "Alle Nachrichten",
-        "missingOnline": "Online nicht vorhanden"
+        "published": "Nur veröffentlicht",
+        "unpublished": "Nur zurückgenommen",
+        "missingOnline": "Online nicht vorhanden",
+        "dsaLocked": "DSA gesperrt"
       },
       "commentsAria": "Kommentare anzeigen oder hinzufügen",
       "likeAria": "Nachricht positiv bewerten",

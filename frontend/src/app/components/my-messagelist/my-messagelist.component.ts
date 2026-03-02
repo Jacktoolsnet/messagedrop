@@ -39,7 +39,7 @@ import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.comp
 
 type ResolvedDsaStatus = 'RECEIVED' | 'UNDER_REVIEW' | 'DECIDED' | 'UNKNOWN';
 type ModerationStatus = 'published' | 'review' | 'hidden';
-type PublishFilter = 'all' | 'missing_online';
+type PublishFilter = 'all' | 'published' | 'unpublished' | 'missing_online' | 'dsa_locked';
 
 @Component({
   selector: 'app-my-messagelist',
@@ -117,12 +117,25 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
   readonly data = inject<{ location: Location; messageSignal: WritableSignal<Message[]> }>(MAT_DIALOG_DATA);
 
   readonly messagesSignal = signal<Message[]>([]);
+  readonly publishFilterOptions: PublishFilter[] = ['all', 'published', 'unpublished', 'missing_online', 'dsa_locked'];
   readonly publishFilter = signal<PublishFilter>('all');
   readonly filteredMessagesSignal = computed(() => {
     const messages = this.messagesSignal();
     const filter = this.publishFilter();
+    if (filter === 'published') {
+      return messages.filter((message) => this.resolvePublishState(message) === 'published');
+    }
+    if (filter === 'unpublished') {
+      return messages.filter((message) => this.resolvePublishState(message) === 'unpublished');
+    }
     if (filter === 'missing_online') {
-      return messages.filter((message) => this.resolvePublishState(message) === 'server_missing');
+      return messages.filter((message) => {
+        const publishState = this.resolvePublishState(message);
+        return publishState === 'server_missing' || publishState === 'local_only';
+      });
+    }
+    if (filter === 'dsa_locked') {
+      return messages.filter((message) => this.resolvePublishState(message) === 'dsa_locked');
     }
     return messages;
   });
@@ -664,8 +677,17 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
   }
 
   public getPublishFilterLabel(filter: PublishFilter): string {
+    if (filter === 'published') {
+      return this.translation.t('common.messageList.filter.published');
+    }
+    if (filter === 'unpublished') {
+      return this.translation.t('common.messageList.filter.unpublished');
+    }
     if (filter === 'missing_online') {
       return this.translation.t('common.messageList.filter.missingOnline');
+    }
+    if (filter === 'dsa_locked') {
+      return this.translation.t('common.messageList.filter.dsaLocked');
     }
     return this.translation.t('common.messageList.filter.all');
   }

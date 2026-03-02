@@ -1161,6 +1161,10 @@
         "title": "Supprimer la publication",
         "desc": "Cette fonction supprime manuellement et immédiatement votre publication ou commentaire."
       },
+      "publish": {
+        "title": "Publier / retirer",
+        "desc": "Cette fonction republie la publication sélectionnée ou la retire de la mise en ligne sans la supprimer."
+      },
       "moderation": {
         "title": "Voir le statut de modération",
         "desc": "Cette fonction affiche le statut de modération (publié, en examen, masqué) avec les détails de décision."
@@ -1172,6 +1176,10 @@
       "dsa": {
         "title": "Statut de dossier DSA",
         "desc": "Si une procédure DSA existe pour une publication, vous pouvez consulter son statut (par exemple reçu, en examen, décidé) et suivre son évolution."
+      },
+      "filter": {
+        "title": "Filtrer la liste",
+        "desc": "Cette fonction filtre votre liste de messages par état de publication (par exemple publié, retiré, absent en ligne, bloqué DSA)."
       },
       "more": {
         "title": "Ouvrir plus d'actions",

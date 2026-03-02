@@ -1541,6 +1541,11 @@ const HELP_TOPICS = {
         descriptionKey: 'myMessageList.items.delete.desc'
       },
       {
+        icon: 'publish',
+        titleKey: 'myMessageList.items.publish.title',
+        descriptionKey: 'myMessageList.items.publish.desc'
+      },
+      {
         icon: 'public',
         titleKey: 'myMessageList.items.moderation.title',
         descriptionKey: 'myMessageList.items.moderation.desc'
@@ -1554,6 +1559,11 @@ const HELP_TOPICS = {
         icon: 'flag',
         titleKey: 'myMessageList.items.dsa.title',
         descriptionKey: 'myMessageList.items.dsa.desc'
+      },
+      {
+        icon: 'filter_alt',
+        titleKey: 'myMessageList.items.filter.title',
+        descriptionKey: 'myMessageList.items.filter.desc'
       },
       {
         icon: 'more_horiz',

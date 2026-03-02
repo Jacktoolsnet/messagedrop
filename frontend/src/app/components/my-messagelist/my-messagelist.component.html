@@ -360,14 +360,12 @@
         <mat-icon>filter_alt</mat-icon>
     </button>
     <mat-menu #publishFilterMenu="matMenu">
-        <button mat-menu-item (click)="setPublishFilter('all')">
-            <mat-icon aria-hidden="true">{{ isPublishFilterActive('all') ? 'check' : 'radio_button_unchecked' }}</mat-icon>
-            <span>{{ getPublishFilterLabel('all') }}</span>
+        @for (filter of publishFilterOptions; track filter) {
+        <button mat-menu-item (click)="setPublishFilter(filter)">
+            <mat-icon aria-hidden="true">{{ isPublishFilterActive(filter) ? 'check' : 'radio_button_unchecked' }}</mat-icon>
+            <span>{{ getPublishFilterLabel(filter) }}</span>
         </button>
-        <button mat-menu-item (click)="setPublishFilter('missing_online')">
-            <mat-icon aria-hidden="true">{{ isPublishFilterActive('missing_online') ? 'check' : 'radio_button_unchecked' }}</mat-icon>
-            <span>{{ getPublishFilterLabel('missing_online') }}</span>
-        </button>
+        }
     </mat-menu>
     @if (!userService.isReady() || userService.hasJwt()) {
     <button mat-icon-button color="primary"

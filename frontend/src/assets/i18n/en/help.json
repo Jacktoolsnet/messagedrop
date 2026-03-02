@@ -1161,6 +1161,10 @@
         "title": "Delete post",
         "desc": "This action deletes your post or comment manually and immediately."
       },
+      "publish": {
+        "title": "Publish / unpublish",
+        "desc": "This action publishes the selected post again or takes it offline without deleting it."
+      },
       "moderation": {
         "title": "View moderation status",
         "desc": "This action shows moderation status (published, review, hidden) including decision details."
@@ -1172,6 +1176,10 @@
       "dsa": {
         "title": "DSA case status",
         "desc": "If a DSA procedure exists for a post, you can view case status (for example received, under review, decided) and follow up."
+      },
+      "filter": {
+        "title": "Filter list",
+        "desc": "This action filters your message list by publish state (for example published, unpublished, missing online, DSA locked)."
       },
       "more": {
         "title": "Open more actions",
