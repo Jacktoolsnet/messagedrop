@@ -3,7 +3,7 @@ const path = require('path');
 
 const services = [
   { issuer: 'service.backend', keyStore: '../backend/utils/keyStore' },
-  { issuer: 'service.admin-backend', keyStore: '../network/admin/backend/utils/keyStore' },
+  { issuer: 'service.admin-backend', keyStore: '../platform/admin/backend/utils/keyStore' },
   { issuer: 'service.openmeteo', keyStore: '../services/openMeteo/utils/keyStore' },
   { issuer: 'service.nominatim', keyStore: '../services/nominatim/utils/keyStore' },
   { issuer: 'service.socketio', keyStore: '../services/socketio/utils/keyStore' },
@@ -24,7 +24,7 @@ async function run() {
   const outputDirs = [
     outDir,
     path.join(process.cwd(), 'backend', 'config'),
-    path.join(process.cwd(), 'network', 'admin', 'backend', 'config'),
+    path.join(process.cwd(), 'platform', 'admin', 'backend', 'config'),
     path.join(process.cwd(), 'services', 'openMeteo', 'config'),
     path.join(process.cwd(), 'services', 'nominatim', 'config'),
     path.join(process.cwd(), 'services', 'socketio', 'config'),
