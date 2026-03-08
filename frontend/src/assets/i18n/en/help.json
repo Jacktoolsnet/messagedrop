@@ -486,7 +486,7 @@
       },
       "speech": {
         "title": "Read aloud",
-        "desc": "Enables browser speech output, lets you prefer translated text, and configure voice and speed."
+        "desc": "Enables browser speech output, lets you prefer translated text, configure voice and speed, and play a sample preview."
       },
       "usageProtection": {
         "title": "Usage protection",

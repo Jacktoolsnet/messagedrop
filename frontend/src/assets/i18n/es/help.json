@@ -486,7 +486,7 @@
       },
       "speech": {
         "title": "Lectura en voz alta",
-        "desc": "Activa la voz del navegador, permite preferir texto traducido y configurar voz y velocidad."
+        "desc": "Activa la voz del navegador, permite preferir texto traducido, configurar voz y velocidad, y reproducir una muestra."
       },
       "usageProtection": {
         "title": "Protección de uso",

@@ -6,6 +6,7 @@ import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, Ma
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSliderModule } from '@angular/material/slider';
 import { MatSlideToggleChange, MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { provideTranslocoScope, TranslocoPipe } from '@jsverse/transloco';
 import { APP_VERSION_INFO } from '../../../environments/version';
@@ -32,6 +33,7 @@ import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.comp
     MatDialogClose,
     MatIconModule,
     MatSelectModule,
+    MatSliderModule,
     MatButtonToggleModule,
     MatSlideToggleModule,
     TranslocoPipe,
@@ -68,7 +70,10 @@ export class AppSettingsComponent implements OnInit {
 
   public appSettings: AppSettings = structuredClone(this.dialogData.appSettings);
   private baselineSettings: AppSettings = structuredClone(this.dialogData.appSettings);
-  readonly speechRateOptions = [0.8, 1, 1.2, 1.4];
+  readonly speechRateMin = 0.6;
+  readonly speechRateMax = 1.6;
+  readonly speechRateStep = 0.1;
+  private readonly speechPreviewTargetId = 'settings:speech-preview';
   public showDetectLocationOnStart = false;
   public storagePersistenceSupported = this.appService.isStoragePersistenceSupported();
   public storagePersistenceBusy = false;
@@ -103,6 +108,7 @@ export class AppSettingsComponent implements OnInit {
   }
 
   onCloseClick(): void {
+    this.stopSpeechPreview();
     this.dialogRef.close();
   }
 
@@ -188,12 +194,15 @@ export class AppSettingsComponent implements OnInit {
   }
 
   setSpeechVoiceMode(mode: SpeechVoiceMode): void {
+    const recommendedVoiceUri = mode === 'custom' ? this.getRecommendedSpeechVoiceUri() : '';
     this.appSettings = {
       ...this.appSettings,
       speech: {
         ...this.appSettings.speech,
         voiceMode: mode,
-        voiceUri: mode === 'system' ? '' : this.appSettings.speech.voiceUri
+        voiceUri: mode === 'system'
+          ? ''
+          : (this.appSettings.speech.voiceUri || recommendedVoiceUri)
       }
     };
   }
@@ -216,6 +225,41 @@ export class AppSettingsComponent implements OnInit {
         rate
       }
     };
+  }
+
+  toggleSpeechPreview(): void {
+    const previewText = this.translation.t('settings.speech.previewText');
+    this.speechService.toggle(
+      {
+        targetId: this.speechPreviewTargetId,
+        text: previewText,
+        lang: this.languageService.effectiveLanguage()
+      },
+      {
+        ...this.appSettings.speech,
+        enabled: true
+      }
+    );
+  }
+
+  stopSpeechPreview(): void {
+    this.speechService.stopIfCurrentTarget(this.speechPreviewTargetId);
+  }
+
+  isSpeechPreviewActive(): boolean {
+    return this.speechService.isActive(this.speechPreviewTargetId);
+  }
+
+  getSpeechPreviewIcon(): string {
+    return this.isSpeechPreviewActive() ? 'stop' : 'volume_up';
+  }
+
+  getSpeechPreviewLabel(): string {
+    return this.translation.t(
+      this.isSpeechPreviewActive()
+        ? 'settings.speech.stopPreviewAction'
+        : 'settings.speech.previewAction'
+    );
   }
 
   setDiagnosticLogging(enabled: boolean): void {
@@ -299,7 +343,20 @@ export class AppSettingsComponent implements OnInit {
     return `${rate.toFixed(1)}×`;
   }
 
+  getResolvedSpeechVoiceUri(): string {
+    return this.appSettings.speech.voiceUri || this.getRecommendedSpeechVoiceUri();
+  }
+
+  private getRecommendedSpeechVoiceUri(): string {
+    const voice = this.speechService.getRecommendedVoice(this.languageService.effectiveLanguage(), {
+      ...this.appSettings.speech,
+      enabled: true
+    });
+    return voice?.voiceURI ?? '';
+  }
+
   private resetPreviewState(): void {
+    this.stopSpeechPreview();
     const baseline = structuredClone(this.baselineSettings);
     this.appSettings = baseline;
     this.appService.setTheme(baseline);

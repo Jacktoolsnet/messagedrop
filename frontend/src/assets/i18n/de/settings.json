@@ -52,6 +52,9 @@
     },
     "voiceLabel": "Stimme",
     "rateLabel": "Sprechgeschwindigkeit",
+    "previewText": "Hallo von MessageDrop. Dies ist ein Beispieltext, um die aktuelle Stimme und Sprechgeschwindigkeit zu testen.",
+    "previewAction": "Beispiel abspielen",
+    "stopPreviewAction": "Beispiel stoppen",
     "unsupported": "Vorlesen wird in diesem Browser nicht unterstützt."
   },
   "usageProtection": {

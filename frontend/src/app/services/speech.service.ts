@@ -3,7 +3,7 @@ import { NavigationStart, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AppService } from './app.service';
-import { DEFAULT_SPEECH_SETTINGS } from '../interfaces/speech-settings';
+import { DEFAULT_SPEECH_SETTINGS, SpeechSettings } from '../interfaces/speech-settings';
 
 export interface SpeechRequest {
   targetId: string;
@@ -77,13 +77,13 @@ export class SpeechService {
     }
   }
 
-  speak(request: SpeechRequest): boolean {
+  speak(request: SpeechRequest, settingsOverride?: Partial<SpeechSettings>): boolean {
     const text = request.text.trim();
     if (!text || !this.supported() || !this.synth) {
       return false;
     }
 
-    const settings = this.getSpeechSettings();
+    const settings = this.getSpeechSettings(settingsOverride);
     if (!settings.enabled) {
       return false;
     }
@@ -93,7 +93,7 @@ export class SpeechService {
 
     const token = ++this.playbackToken;
     const utterance = new SpeechSynthesisUtterance(text);
-    const voice = this.resolveVoice(request.lang);
+    const voice = this.resolveVoice(request.lang, settingsOverride);
 
     if (voice) {
       utterance.voice = voice;
@@ -181,12 +181,12 @@ export class SpeechService {
     this.clearPlaybackState();
   }
 
-  toggle(request: SpeechRequest): boolean {
+  toggle(request: SpeechRequest, settingsOverride?: Partial<SpeechSettings>): boolean {
     if (this.isActive(request.targetId)) {
       this.stop();
       return false;
     }
-    return this.speak(request);
+    return this.speak(request, settingsOverride);
   }
 
   isActive(targetId: string): boolean {
@@ -195,6 +195,11 @@ export class SpeechService {
 
   isPaused(targetId: string): boolean {
     return this.currentTargetId() === targetId && this.paused();
+  }
+
+  getRecommendedVoice(lang?: string, settingsOverride?: Partial<SpeechSettings>): SpeechSynthesisVoice | undefined {
+    this.init();
+    return this.resolveVoice(lang, settingsOverride);
   }
 
   stopIfCurrentTarget(targetId: string): void {
@@ -216,8 +221,8 @@ export class SpeechService {
     );
   };
 
-  private resolveVoice(lang?: string): SpeechSynthesisVoice | undefined {
-    const settings = this.getSpeechSettings();
+  private resolveVoice(lang?: string, settingsOverride?: Partial<SpeechSettings>): SpeechSynthesisVoice | undefined {
+    const settings = this.getSpeechSettings(settingsOverride);
     const voices = this.voices();
     if (!voices.length) {
       return undefined;
@@ -245,8 +250,11 @@ export class SpeechService {
     return voices.find((voice) => voice.default) ?? voices[0];
   }
 
-  private getSpeechSettings() {
-    return this.appService.getAppSettings().speech ?? DEFAULT_SPEECH_SETTINGS;
+  private getSpeechSettings(settingsOverride?: Partial<SpeechSettings>): SpeechSettings {
+    return {
+      ...(this.appService.getAppSettings().speech ?? DEFAULT_SPEECH_SETTINGS),
+      ...(settingsOverride ?? {})
+    };
   }
 
   private clearPlaybackState(): void {

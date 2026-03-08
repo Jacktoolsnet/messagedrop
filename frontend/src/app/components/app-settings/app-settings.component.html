@@ -106,6 +106,14 @@
           {{ 'settings.speech.autoStopOnNavigation' | transloco }}
         </mat-slide-toggle>
 
+        <div class="speech-preview-card">
+          <p class="speech-preview-text">{{ 'settings.speech.previewText' | transloco }}</p>
+          <button mat-stroked-button type="button" class="speech-preview-button" (click)="toggleSpeechPreview()">
+            <mat-icon>{{ getSpeechPreviewIcon() }}</mat-icon>
+            <span>{{ getSpeechPreviewLabel() }}</span>
+          </button>
+        </div>
+
         <mat-button-toggle-group [hideSingleSelectionIndicator]="true" [value]="appSettings.speech.voiceMode"
           (change)="setSpeechVoiceMode($event.value)" class="speech-toggle-group" exclusive
           [disabled]="!appSettings.speech.enabled" [attr.aria-label]="'settings.speech.voiceModeLabel' | transloco">
@@ -122,7 +130,7 @@
         @if (appSettings.speech.voiceMode === 'custom') {
           <mat-form-field appearance="fill" class="theme-select">
             <mat-label>{{ 'settings.speech.voiceLabel' | transloco }}</mat-label>
-            <mat-select [value]="appSettings.speech.voiceUri" (selectionChange)="setSpeechVoiceUri($event.value)"
+            <mat-select [value]="getResolvedSpeechVoiceUri()" (selectionChange)="setSpeechVoiceUri($event.value)"
               [disabled]="!appSettings.speech.enabled">
               @for (voice of speechService.voices(); track voice.voiceURI) {
                 <mat-option [value]="voice.voiceURI">
@@ -133,17 +141,17 @@
           </mat-form-field>
         }
 
-        <mat-form-field appearance="fill" class="theme-select">
-          <mat-label>{{ 'settings.speech.rateLabel' | transloco }}</mat-label>
-          <mat-select [value]="appSettings.speech.rate" (selectionChange)="setSpeechRate($event.value)"
+        <section class="speech-slider-block">
+          <div class="speech-slider-header">
+            <p class="speech-slider-label">{{ 'settings.speech.rateLabel' | transloco }}</p>
+            <span class="speech-slider-value">{{ formatSpeechRate(appSettings.speech.rate) }}</span>
+          </div>
+          <mat-slider [min]="speechRateMin" [max]="speechRateMax" [step]="speechRateStep" discrete
             [disabled]="!appSettings.speech.enabled">
-            @for (rate of speechRateOptions; track rate) {
-              <mat-option [value]="rate">
-                {{ formatSpeechRate(rate) }}
-              </mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
+            <input matSliderThumb [value]="appSettings.speech.rate" [disabled]="!appSettings.speech.enabled"
+              (valueChange)="setSpeechRate($event)">
+          </mat-slider>
+        </section>
       } @else {
         <p class="speech-settings-warning">{{ 'settings.speech.unsupported' | transloco }}</p>
       }

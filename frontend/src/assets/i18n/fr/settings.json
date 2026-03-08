@@ -52,6 +52,9 @@
     },
     "voiceLabel": "Voix",
     "rateLabel": "Vitesse de lecture",
+    "previewText": "Bonjour de la part de MessageDrop. Ceci est un texte d'exemple pour tester la voix et la vitesse actuelles de lecture à voix haute.",
+    "previewAction": "Lire l'exemple",
+    "stopPreviewAction": "Arrêter l'exemple",
     "unsupported": "La lecture à voix haute n'est pas prise en charge dans ce navigateur."
   },
   "usageProtection": {

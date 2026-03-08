@@ -975,20 +975,12 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
 
   public toggleReadAloud(message: Message): void {
     if (!this.speechService.supported()) {
-      this.snackBar.open(
-        this.translation.t('common.messageList.readAloudUnsupported'),
-        this.translation.t('common.actions.ok'),
-        { duration: 3000 }
-      );
+      this.showReadAloudHint('common.messageList.readAloudUnsupported');
       return;
     }
 
     if (!this.appService.getAppSettings().speech?.enabled) {
-      this.snackBar.open(
-        this.translation.t('common.messageList.readAloudDisabled'),
-        this.translation.t('common.actions.ok'),
-        { duration: 3000 }
-      );
+      this.showReadAloudHint('common.messageList.readAloudDisabled');
       return;
     }
 
@@ -1034,6 +1026,29 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       return (message.translatedMessage ?? '').trim();
     }
     return (message.message ?? '').trim();
+  }
+
+  private showReadAloudHint(messageKey: string): void {
+    this.dialog.open(DisplayMessage, {
+      closeOnNavigation: false,
+      data: {
+        showAlways: true,
+        title: this.translation.t('common.messageList.readAloud'),
+        image: '',
+        icon: 'record_voice_over',
+        message: this.translation.t(messageKey),
+        button: this.translation.t('common.actions.ok'),
+        delay: 0,
+        showSpinner: false,
+        autoclose: false
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
   }
 
   async addMessagDialog(): Promise<void> {
