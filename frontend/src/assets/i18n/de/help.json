@@ -851,7 +851,7 @@
   },
   "editNote": {
     "title": "Notiz erstellen oder bearbeiten",
-    "intro": "In diesem Formular erstellst oder bearbeitest du eine private Notiz für den aktuellen Ort. Du kannst Text, Medien und Position anpassen und anschließend speichern.",
+    "intro": "In diesem Formular erstellst oder bearbeitest du eine private Notiz für den aktuellen Ort. Du kannst Text, Medien und Position anpassen, den Notiztext vorlesen lassen und anschließend speichern.",
     "items": {
       "media": {
         "title": "Medien auswählen",
@@ -888,6 +888,10 @@
       "privacy": {
         "title": "Datenschutz und Speicherung",
         "desc": "Notizinhalte werden lokal in IndexedDB gespeichert und immer verschlüsselt abgelegt. Die Notizfunktion speichert keine Notizinhalte auf dem Backend. Bei externer Navigation werden nur Positionsdaten übergeben; beim Einbinden externer Medien können Anfragen an Drittanbieter entstehen."
+      },
+      "readAloud": {
+        "title": "Vorlesen",
+        "desc": "Liest den aktuellen Notiztext laut vor oder stoppt die laufende Wiedergabe."
       }
     }
   },
@@ -1256,7 +1260,7 @@
   },
   "noteList": {
     "title": "Meine privaten Notizen",
-    "intro": "Hier verwaltest du deine privaten Notizen zu einem Ort. Du kannst Notizen öffnen, bearbeiten, löschen und direkt zur Position auf der Karte springen.",
+    "intro": "In dieser Liste siehst du alle privaten Notizen am ausgewählten Ort, kannst sie öffnen, vorlesen lassen, bearbeiten oder löschen.",
     "items": {
       "open": {
         "title": "Notiz öffnen",
@@ -1293,6 +1297,10 @@
       "privacy": {
         "title": "Datenschutz und Speicherung",
         "desc": "Private Notizen werden lokal in deiner IndexedDB gespeichert und immer verschlüsselt abgelegt. Für die Notizfunktion werden keine Notizinhalte auf dem Backend gespeichert. Wenn du eine Navigation startest, werden an Google Maps nur Start- und Zielposition (als Plus-Code/Koordinaten) übergeben, nicht der Notiztext oder Medieninhalt. Bei einem Backup sind Notizen Teil der verschlüsselten Backup-Datei."
+      },
+      "readAloud": {
+        "title": "Vorlesen",
+        "desc": "Liest den Text der ausgewählten Notiz laut vor oder stoppt die laufende Wiedergabe."
       }
     }
   },

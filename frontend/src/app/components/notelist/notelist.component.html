@@ -39,6 +39,10 @@
                         (click)="editNote(note)">
                         <mat-icon>edit</mat-icon>
                     </button>
+                    <button mat-mini-fab color="secondary" [attr.aria-label]="getReadAloudLabel(note)"
+                        [disabled]="!note.note.trim()" (click)="toggleReadAloud(note)">
+                        <mat-icon>{{ getReadAloudIcon(note) }}</mat-icon>
+                    </button>
                     <button mat-mini-fab color="secondary" [attr.aria-label]="'common.noteList.flyToAria' | transloco"
                         (click)="flyTo(note)">
                         <mat-icon>place</mat-icon>

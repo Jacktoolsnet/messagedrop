@@ -1164,6 +1164,11 @@ const HELP_TOPICS = {
         descriptionKey: 'editNote.items.text.desc'
       },
       {
+        icon: 'record_voice_over',
+        titleKey: 'editNote.items.readAloud.title',
+        descriptionKey: 'editNote.items.readAloud.desc'
+      },
+      {
         icon: 'cycle',
         titleKey: 'editNote.items.style.title',
         descriptionKey: 'editNote.items.style.desc'
@@ -1670,6 +1675,11 @@ const HELP_TOPICS = {
         icon: 'edit',
         titleKey: 'noteList.items.edit.title',
         descriptionKey: 'noteList.items.edit.desc'
+      },
+      {
+        icon: 'record_voice_over',
+        titleKey: 'noteList.items.readAloud.title',
+        descriptionKey: 'noteList.items.readAloud.desc'
       },
       {
         icon: 'place',

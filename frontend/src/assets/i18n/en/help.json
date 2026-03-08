@@ -851,7 +851,7 @@
   },
   "editNote": {
     "title": "Create or edit note",
-    "intro": "This form lets you create or edit a private note for the current location. You can adjust text, media, and position before saving.",
+    "intro": "Use this form to create or edit a private note for the current place. You can adjust text, media, and location, have the note text read aloud, and then save it.",
     "items": {
       "media": {
         "title": "Select media",
@@ -888,6 +888,10 @@
       "privacy": {
         "title": "Privacy and storage",
         "desc": "Note content is stored locally in IndexedDB and always stored in encrypted form. The note feature does not store note content on the backend. External navigation only receives position data; embedding external media can create requests to third-party providers."
+      },
+      "readAloud": {
+        "title": "Read aloud",
+        "desc": "Reads the current note text aloud or stops the current playback."
       }
     }
   },
@@ -1256,7 +1260,7 @@
   },
   "noteList": {
     "title": "My private notes",
-    "intro": "This screen manages your private notes for one location. You can open, edit, delete notes, and jump to their map position.",
+    "intro": "This list shows all private notes for the selected place. You can open, listen to, edit, or delete them.",
     "items": {
       "open": {
         "title": "Open note",
@@ -1293,6 +1297,10 @@
       "privacy": {
         "title": "Privacy and storage",
         "desc": "Private notes are stored locally in IndexedDB and always stored in encrypted form. The note feature does not store note contents on the backend. When you start navigation, only start and destination position (as plus code/coordinates) are sent to Google Maps, not note text or media content. If you create a backup, notes are included in the encrypted backup file."
+      },
+      "readAloud": {
+        "title": "Read aloud",
+        "desc": "Reads the selected note text aloud or stops the current playback."
       }
     }
   },

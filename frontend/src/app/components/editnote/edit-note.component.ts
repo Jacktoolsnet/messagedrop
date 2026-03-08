@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 
 
@@ -17,8 +17,10 @@ import { Multimedia } from '../../interfaces/multimedia';
 import { MultimediaType } from '../../interfaces/multimedia-type';
 import { Note } from '../../interfaces/note';
 import { DisplayMessageConfig } from '../../interfaces/display-message-config';
+import { AppService } from '../../services/app.service';
 import { OembedService } from '../../services/oembed.service';
 import { SharedContentService } from '../../services/shared-content.service';
+import { SpeechService } from '../../services/speech.service';
 import { StyleService } from '../../services/style.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
@@ -63,10 +65,13 @@ interface DialogHeaderConfig {
   templateUrl: './edit-note.component.html',
   styleUrl: './edit-note.component.css'
 })
-export class EditNoteComponent implements OnInit {
+export class EditNoteComponent implements OnInit, OnDestroy {
+  private readonly speechTargetId = 'note-editor:current';
   private readonly userService = inject(UserService);
+  private readonly appService = inject(AppService);
   private readonly sharedContentService = inject(SharedContentService);
   private readonly oembedService = inject(OembedService);
+  private readonly speechService = inject(SpeechService);
   private readonly matDialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly translation = inject(TranslationHelperService);
@@ -104,6 +109,10 @@ export class EditNoteComponent implements OnInit {
     this.applyNewMultimedia(this.data.note.multimedia);
   }
 
+  ngOnDestroy(): void {
+    this.stopReadAloud();
+  }
+
   private resolveHeaderConfig(mode: Mode | undefined, note: Note): DialogHeaderConfig {
     switch (mode) {
       case Mode.EDIT_NOTE:
@@ -118,6 +127,7 @@ export class EditNoteComponent implements OnInit {
   }
 
   onApplyClick(): void {
+    this.stopReadAloud();
     if (!this.addHashtagsFromInput(true)) {
       return;
     }
@@ -134,6 +144,7 @@ export class EditNoteComponent implements OnInit {
   }
 
   onAbortClick(): void {
+    this.stopReadAloud();
     if (undefined != this.oriNote) {
       this.data.note.note = this.oriNote;
     }
@@ -278,6 +289,7 @@ export class EditNoteComponent implements OnInit {
   }
 
   public openTextDialog(): void {
+    this.stopReadAloud();
     const dialogRef = this.matDialog.open(TextComponent, {
       panelClass: '',
       closeOnNavigation: true,
@@ -296,11 +308,84 @@ export class EditNoteComponent implements OnInit {
   }
 
   public removeText(): void {
+    this.stopReadAloud();
     this.data.note.note = '';
   }
 
   public updateLocation(location: Location): void {
     this.data.note.location = { ...location };
+  }
+
+  toggleReadAloud(): void {
+    if (!this.speechService.supported()) {
+      this.showReadAloudHint('common.speech.unsupported');
+      return;
+    }
+
+    if (!this.appService.getAppSettings().speech?.enabled) {
+      this.showReadAloudHint('common.speech.disabled');
+      return;
+    }
+
+    const text = this.getSpeechText();
+    if (!text) {
+      return;
+    }
+
+    this.speechService.toggle({
+      targetId: this.speechTargetId,
+      text
+    });
+  }
+
+  isReadAloudActive(): boolean {
+    return this.speechService.isActive(this.speechTargetId);
+  }
+
+  getReadAloudIcon(): string {
+    return this.isReadAloudActive() ? 'stop' : 'volume_up';
+  }
+
+  getReadAloudLabel(): string {
+    return this.translation.t(
+      this.isReadAloudActive()
+        ? 'common.actions.stopReadAloud'
+        : 'common.actions.readAloud'
+    );
+  }
+
+  private getSpeechText(): string {
+    return (this.data.note.note ?? '').trim();
+  }
+
+  private stopReadAloud(): void {
+    this.speechService.stopIfCurrentTarget(this.speechTargetId);
+  }
+
+  private showReadAloudHint(messageKey: string): void {
+    const config: DisplayMessageConfig = {
+      showAlways: true,
+      title: this.translation.t('common.actions.readAloud'),
+      image: '',
+      icon: 'record_voice_over',
+      message: this.translation.t(messageKey),
+      button: this.translation.t('common.actions.ok'),
+      delay: 0,
+      showSpinner: false,
+      autoclose: false
+    };
+
+    this.matDialog.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: config,
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
   }
 
 }

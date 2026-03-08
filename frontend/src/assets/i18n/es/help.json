@@ -851,7 +851,7 @@
   },
   "editNote": {
     "title": "Crear o editar nota",
-    "intro": "Este formulario te permite crear o editar una nota privada para la ubicación actual. Puedes ajustar texto, contenido multimedia y posición antes de guardar.",
+    "intro": "En este formulario puedes crear o editar una nota privada para el lugar actual. Puedes ajustar el texto, los medios y la ubicación, escuchar el texto de la nota y luego guardarlo.",
     "items": {
       "media": {
         "title": "Seleccionar contenido multimedia",
@@ -888,6 +888,10 @@
       "privacy": {
         "title": "Privacidad y almacenamiento",
         "desc": "El contenido de la nota se guarda localmente en IndexedDB y siempre se almacena cifrado. La función de notas no guarda el contenido de la nota en el backend. La navegación externa solo recibe datos de posición; al integrar contenido multimedia externo pueden generarse solicitudes a proveedores externos."
+      },
+      "readAloud": {
+        "title": "Leer en voz alta",
+        "desc": "Lee en voz alta el texto actual de la nota o detiene la reproducción en curso."
       }
     }
   },
@@ -1256,7 +1260,7 @@
   },
   "noteList": {
     "title": "Mis notas privadas",
-    "intro": "Esta pantalla gestiona tus notas privadas para una ubicación. Puedes abrir, editar, eliminar notas y centrar su posición en el mapa.",
+    "intro": "Esta lista muestra todas las notas privadas del lugar seleccionado. Puedes abrirlas, escucharlas, editarlas o eliminarlas.",
     "items": {
       "open": {
         "title": "Abrir nota",
@@ -1293,6 +1297,10 @@
       "privacy": {
         "title": "Privacidad y almacenamiento",
         "desc": "Las notas privadas se guardan localmente en IndexedDB y siempre se almacenan cifradas. La función de notas no guarda el contenido de las notas en el backend. Cuando inicias una navegación, solo se envían a Google Maps la posición de inicio y destino (como plus code/coordenadas), no el texto de la nota ni su contenido multimedia. Si creas una copia de seguridad, las notas se incluyen en el archivo de copia cifrado."
+      },
+      "readAloud": {
+        "title": "Leer en voz alta",
+        "desc": "Lee en voz alta el texto de la nota seleccionada o detiene la reproducción en curso."
       }
     }
   },

@@ -851,7 +851,7 @@
   },
   "editNote": {
     "title": "Créer ou modifier une note",
-    "intro": "Ce formulaire vous permet de créer ou modifier une note privée pour le lieu actuel. Vous pouvez ajuster le texte, les médias et la position avant l'enregistrement.",
+    "intro": "Dans ce formulaire, vous créez ou modifiez une note privée pour le lieu actuel. Vous pouvez ajuster le texte, les médias et la position, faire lire le texte de la note à voix haute, puis enregistrer.",
     "items": {
       "media": {
         "title": "Sélectionner un média",
@@ -888,6 +888,10 @@
       "privacy": {
         "title": "Confidentialité et stockage",
         "desc": "Le contenu de la note est stocké localement dans IndexedDB et toujours chiffré. La fonction de notes ne stocke pas le contenu des notes sur le backend. La navigation externe ne reçoit que des données de position ; l'intégration de médias externes peut entraîner des requêtes vers des fournisseurs tiers."
+      },
+      "readAloud": {
+        "title": "Lire à voix haute",
+        "desc": "Lit le texte actuel de la note à voix haute ou arrête la lecture en cours."
       }
     }
   },
@@ -1256,7 +1260,7 @@
   },
   "noteList": {
     "title": "Mes notes privées",
-    "intro": "Cet écran gère vos notes privées pour un lieu. Vous pouvez ouvrir, modifier, supprimer des notes et centrer leur position sur la carte.",
+    "intro": "Cette liste affiche toutes les notes privées du lieu sélectionné. Vous pouvez les ouvrir, les écouter, les modifier ou les supprimer.",
     "items": {
       "open": {
         "title": "Ouvrir une note",
@@ -1293,6 +1297,10 @@
       "privacy": {
         "title": "Confidentialité et stockage",
         "desc": "Les notes privées sont stockées localement dans IndexedDB et toujours stockées sous forme chiffrée. La fonction de notes ne stocke pas le contenu des notes sur le backend. Quand vous lancez la navigation, seules la position de départ et d'arrivée (plus code/coordonnées) sont transmises à Google Maps, pas le texte de la note ni son contenu multimédia. Si vous créez une sauvegarde, les notes sont incluses dans le fichier de sauvegarde chiffré."
+      },
+      "readAloud": {
+        "title": "Lire à voix haute",
+        "desc": "Lit le texte de la note sélectionnée à voix haute ou arrête la lecture en cours."
       }
     }
   },
