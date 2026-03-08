@@ -52,7 +52,7 @@
     },
     "voiceLabel": "Voice",
     "rateLabel": "Speech speed",
-    "previewText": "Hello from MessageDrop. This is a sample for testing the current read aloud voice and speed.",
+    "previewText": "Hello. This is a sample text to test the current voice and reading speed.",
     "previewAction": "Play sample",
     "stopPreviewAction": "Stop sample",
     "unsupported": "Read aloud is not supported in this browser."
