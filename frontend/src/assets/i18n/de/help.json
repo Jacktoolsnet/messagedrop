@@ -484,6 +484,10 @@
         "title": "Dauerhaften Speicher anfragen",
         "desc": "Fordert persistente Browser-Speicherung an, damit lokale Daten seltener durch das System bereinigt werden."
       },
+      "speech": {
+        "title": "Vorlesen",
+        "desc": "Aktiviert die Browser-Sprachausgabe, bevorzugt bei Bedarf übersetzten Text und konfiguriert Stimme und Sprechgeschwindigkeit."
+      },
       "usageProtection": {
         "title": "Nutzungszeit-Schutz",
         "desc": "Konfiguriert Tageslimit, erlaubte Zeitfenster und den Entsperrmodus (selbst oder Eltern-PIN)."
@@ -1192,6 +1196,10 @@
       "translate": {
         "title": "Text übersetzen",
         "desc": "Mit dieser Funktion lässt du den Nachrichtentext in deine eingestellte App-Sprache übersetzen."
+      },
+      "readAloud": {
+        "title": "Vorlesen",
+        "desc": "Mit dieser Funktion wird der Nachrichtentext vorgelesen oder die aktuelle Wiedergabe gestoppt."
       },
       "flyTo": {
         "title": "Auf Karte anspringen",

@@ -38,6 +38,22 @@
     "quotaWarning": "Storage almost full ({{ percent }}% used: {{ used }} of {{ total }}).",
     "confirmDisable": "Disabling may allow the browser to prune stored data. Do you really want to continue?"
   },
+  "speech": {
+    "title": "Read aloud",
+    "description": "Use the browser voice to read messages aloud.",
+    "note": "Read aloud uses the built-in speech synthesis of your browser and device. Available voices depend on browser and operating system.",
+    "toggle": "Enable read aloud",
+    "preferTranslatedText": "Prefer translated text when available",
+    "autoStopOnNavigation": "Stop playback when navigating",
+    "voiceModeLabel": "Voice mode",
+    "voiceMode": {
+      "system": "System default",
+      "custom": "Select voice"
+    },
+    "voiceLabel": "Voice",
+    "rateLabel": "Speech speed",
+    "unsupported": "Read aloud is not supported in this browser."
+  },
   "usageProtection": {
     "title": "Usage protection",
     "description": "Set daily limits and time windows for app usage.",

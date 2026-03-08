@@ -484,6 +484,10 @@
         "title": "Demander un stockage persistant",
         "desc": "Demande un stockage persistant du navigateur afin que les données locales soient moins souvent supprimées par le système."
       },
+      "speech": {
+        "title": "Lecture à voix haute",
+        "desc": "Active la voix du navigateur, permet de préférer le texte traduit et de régler la voix et la vitesse."
+      },
       "usageProtection": {
         "title": "Protection d'usage",
         "desc": "Configure la limite quotidienne, les plages horaires autorisées et le mode de déverrouillage (autogéré ou PIN parental)."
@@ -1192,6 +1196,10 @@
       "translate": {
         "title": "Traduire le texte",
         "desc": "Cette fonction traduit le texte du message dans la langue configurée dans l'application."
+      },
+      "readAloud": {
+        "title": "Lire à voix haute",
+        "desc": "Cette fonction lit le texte du message à voix haute ou arrête la lecture en cours."
       },
       "flyTo": {
         "title": "Aller sur la carte",

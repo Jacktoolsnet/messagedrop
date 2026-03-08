@@ -77,6 +77,78 @@
       </mat-button-toggle-group>
     </div>
 
+    <div class="platform-tile speech-settings-tile">
+      <div class="speech-settings-header">
+        <mat-icon>record_voice_over</mat-icon>
+        <div>
+          <h3>{{ 'settings.speech.title' | transloco }}</h3>
+          <p class="speech-settings-subtitle">{{ 'settings.speech.description' | transloco }}</p>
+        </div>
+      </div>
+
+      @if (speechService.supported()) {
+        <p class="speech-settings-note">
+          {{ 'settings.speech.note' | transloco }}
+        </p>
+
+        <mat-slide-toggle color="primary" [checked]="appSettings.speech.enabled"
+          (change)="setSpeechEnabled($event.checked)">
+          {{ 'settings.speech.toggle' | transloco }}
+        </mat-slide-toggle>
+
+        <mat-slide-toggle color="primary" [checked]="appSettings.speech.preferTranslatedText"
+          (change)="setSpeechPreferTranslatedText($event.checked)" [disabled]="!appSettings.speech.enabled">
+          {{ 'settings.speech.preferTranslatedText' | transloco }}
+        </mat-slide-toggle>
+
+        <mat-slide-toggle color="primary" [checked]="appSettings.speech.autoStopOnNavigation"
+          (change)="setSpeechAutoStopOnNavigation($event.checked)" [disabled]="!appSettings.speech.enabled">
+          {{ 'settings.speech.autoStopOnNavigation' | transloco }}
+        </mat-slide-toggle>
+
+        <mat-button-toggle-group [hideSingleSelectionIndicator]="true" [value]="appSettings.speech.voiceMode"
+          (change)="setSpeechVoiceMode($event.value)" class="speech-toggle-group" exclusive
+          [disabled]="!appSettings.speech.enabled" [attr.aria-label]="'settings.speech.voiceModeLabel' | transloco">
+          <mat-button-toggle value="system">
+            <mat-icon>settings_voice</mat-icon>
+            {{ 'settings.speech.voiceMode.system' | transloco }}
+          </mat-button-toggle>
+          <mat-button-toggle value="custom">
+            <mat-icon>graphic_eq</mat-icon>
+            {{ 'settings.speech.voiceMode.custom' | transloco }}
+          </mat-button-toggle>
+        </mat-button-toggle-group>
+
+        @if (appSettings.speech.voiceMode === 'custom') {
+          <mat-form-field appearance="fill" class="theme-select">
+            <mat-label>{{ 'settings.speech.voiceLabel' | transloco }}</mat-label>
+            <mat-select [value]="appSettings.speech.voiceUri" (selectionChange)="setSpeechVoiceUri($event.value)"
+              [disabled]="!appSettings.speech.enabled">
+              @for (voice of speechService.voices(); track voice.voiceURI) {
+                <mat-option [value]="voice.voiceURI">
+                  {{ voice.name }} ({{ voice.lang }})
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        }
+
+        <mat-form-field appearance="fill" class="theme-select">
+          <mat-label>{{ 'settings.speech.rateLabel' | transloco }}</mat-label>
+          <mat-select [value]="appSettings.speech.rate" (selectionChange)="setSpeechRate($event.value)"
+            [disabled]="!appSettings.speech.enabled">
+            @for (rate of speechRateOptions; track rate) {
+              <mat-option [value]="rate">
+                {{ formatSpeechRate(rate) }}
+              </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      } @else {
+        <p class="speech-settings-warning">{{ 'settings.speech.unsupported' | transloco }}</p>
+      }
+    </div>
+
     @if(showDetectLocationOnStart){
       <div class="platform-tile">
         <app-enable-location [checkedOverride]="appSettings.detectLocationOnStart" [persistOnToggle]="false"

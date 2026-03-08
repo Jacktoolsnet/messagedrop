@@ -23,6 +23,7 @@ import { MapService } from '../../services/map.service';
 import { MessageService } from '../../services/message.service';
 import { ProfileService } from '../../services/profile.service';
 import { SharedContentService } from '../../services/shared-content.service';
+import { SpeechService } from '../../services/speech.service';
 import { TranslateService } from '../../services/translate.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
@@ -37,6 +38,7 @@ import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { DeleteMessageComponent } from './delete-message/delete-message.component';
 import { MessageProfileComponent } from './message-profile/message-profile.component';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
+import { AppService } from '../../services/app.service';
 
 type ResolvedDsaStatus = 'RECEIVED' | 'UNDER_REVIEW' | 'DECIDED' | 'UNKNOWN';
 type ModerationStatus = 'published' | 'review' | 'hidden';
@@ -87,10 +89,12 @@ export class MessagelistComponent implements OnInit, OnDestroy {
 
   public readonly userService = inject(UserService);
   public readonly messageService = inject(MessageService);
+  private readonly appService = inject(AppService);
   private readonly translateService = inject(TranslateService);
   private readonly mapService = inject(MapService);
   public readonly profileService = inject(ProfileService);
   private readonly sharedContentService = inject(SharedContentService);
+  readonly speechService = inject(SpeechService);
   public readonly dialogRef = inject(MatDialogRef<MessagelistComponent>);
   private readonly matDialog = inject(MatDialog);
   public readonly messageDialog = this.matDialog;
@@ -938,6 +942,69 @@ export class MessagelistComponent implements OnInit, OnDestroy {
         this.snackBar.open(errorMessage, '', { duration: 3000 });
       }
     });
+  }
+
+  public toggleReadAloud(message: Message): void {
+    if (!this.speechService.supported()) {
+      this.snackBar.open(
+        this.translation.t('common.messageList.readAloudUnsupported'),
+        this.translation.t('common.actions.ok'),
+        { duration: 3000 }
+      );
+      return;
+    }
+
+    if (!this.appService.getAppSettings().speech?.enabled) {
+      this.snackBar.open(
+        this.translation.t('common.messageList.readAloudDisabled'),
+        this.translation.t('common.actions.ok'),
+        { duration: 3000 }
+      );
+      return;
+    }
+
+    const text = this.getSpeechText(message);
+    if (!text) {
+      return;
+    }
+
+    this.speechService.toggle({
+      targetId: this.getSpeechTargetId(message),
+      text,
+      lang: this.shouldPreferTranslatedSpeech(message) ? this.languageService.effectiveLanguage() : undefined
+    });
+  }
+
+  public isReadAloudActive(message: Message): boolean {
+    return this.speechService.isActive(this.getSpeechTargetId(message));
+  }
+
+  public getReadAloudIcon(message: Message): string {
+    return this.isReadAloudActive(message) ? 'stop' : 'volume_up';
+  }
+
+  public getReadAloudLabel(message: Message): string {
+    return this.translation.t(
+      this.isReadAloudActive(message)
+        ? 'common.messageList.stopReadAloud'
+        : 'common.messageList.readAloud'
+    );
+  }
+
+  private getSpeechTargetId(message: Message): string {
+    return `message:${message.uuid}`;
+  }
+
+  private shouldPreferTranslatedSpeech(message: Message): boolean {
+    return this.appService.getAppSettings().speech?.preferTranslatedText !== false
+      && !!message.translatedMessage;
+  }
+
+  private getSpeechText(message: Message): string {
+    if (this.shouldPreferTranslatedSpeech(message)) {
+      return (message.translatedMessage ?? '').trim();
+    }
+    return (message.message ?? '').trim();
   }
 
   async addMessagDialog(): Promise<void> {

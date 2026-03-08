@@ -38,6 +38,22 @@
     "quotaWarning": "Almacenamiento casi lleno ({{ percent }}% usado: {{ used }} de {{ total }}).",
     "confirmDisable": "Desactivarlo puede permitir que el navegador elimine datos almacenados. ¿Quieres continuar?"
   },
+  "speech": {
+    "title": "Lectura en voz alta",
+    "description": "Usa la voz del navegador para leer mensajes en voz alta.",
+    "note": "La lectura en voz alta usa la síntesis de voz integrada del navegador y del dispositivo. Las voces disponibles dependen del navegador y del sistema operativo.",
+    "toggle": "Activar lectura en voz alta",
+    "preferTranslatedText": "Preferir texto traducido cuando esté disponible",
+    "autoStopOnNavigation": "Detener la reproducción al navegar",
+    "voiceModeLabel": "Modo de voz",
+    "voiceMode": {
+      "system": "Predeterminada del sistema",
+      "custom": "Seleccionar voz"
+    },
+    "voiceLabel": "Voz",
+    "rateLabel": "Velocidad de lectura",
+    "unsupported": "La lectura en voz alta no es compatible con este navegador."
+  },
   "usageProtection": {
     "title": "Protección de uso",
     "description": "Define límites diarios y franjas horarias permitidas.",

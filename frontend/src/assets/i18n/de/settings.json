@@ -38,6 +38,22 @@
     "quotaWarning": "Speicher fast voll ({{ percent }}% belegt: {{ used }} von {{ total }}).",
     "confirmDisable": "Wenn du es deaktivierst, kann der Browser gespeicherte Daten entfernen. Möchtest du wirklich fortfahren?"
   },
+  "speech": {
+    "title": "Vorlesen",
+    "description": "Lässt Nachrichten mit der Browser-Stimme vorlesen.",
+    "note": "Vorlesen nutzt die eingebaute Sprachsynthese deines Browsers und Geräts. Verfügbare Stimmen hängen von Browser und Betriebssystem ab.",
+    "toggle": "Vorlesen aktivieren",
+    "preferTranslatedText": "Wenn vorhanden übersetzten Text bevorzugen",
+    "autoStopOnNavigation": "Wiedergabe bei Navigation stoppen",
+    "voiceModeLabel": "Stimmenmodus",
+    "voiceMode": {
+      "system": "Systemstandard",
+      "custom": "Stimme auswählen"
+    },
+    "voiceLabel": "Stimme",
+    "rateLabel": "Sprechgeschwindigkeit",
+    "unsupported": "Vorlesen wird in diesem Browser nicht unterstützt."
+  },
   "usageProtection": {
     "title": "Nutzungszeit-Schutz",
     "description": "Lege tägliche Limits und erlaubte Zeitfenster fest.",

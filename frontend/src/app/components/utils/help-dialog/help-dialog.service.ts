@@ -553,6 +553,11 @@ const HELP_TOPICS = {
         descriptionKey: 'appSettings.items.storage.desc'
       },
       {
+        icon: 'record_voice_over',
+        titleKey: 'appSettings.items.speech.title',
+        descriptionKey: 'appSettings.items.speech.desc'
+      },
+      {
         icon: 'bug_report',
         titleKey: 'appSettings.items.logging.title',
         descriptionKey: 'appSettings.items.logging.desc'
@@ -1579,6 +1584,11 @@ const HELP_TOPICS = {
         icon: 'translate',
         titleKey: 'myMessageList.items.translate.title',
         descriptionKey: 'myMessageList.items.translate.desc'
+      },
+      {
+        icon: 'volume_up',
+        titleKey: 'myMessageList.items.readAloud.title',
+        descriptionKey: 'myMessageList.items.readAloud.desc'
       },
       {
         icon: 'place',

@@ -10,8 +10,10 @@ import { MatSlideToggleChange, MatSlideToggleModule } from '@angular/material/sl
 import { provideTranslocoScope, TranslocoPipe } from '@jsverse/transloco';
 import { APP_VERSION_INFO } from '../../../environments/version';
 import { AppSettings } from '../../interfaces/app-settings';
+import { SpeechVoiceMode } from '../../interfaces/speech-settings';
 import { AppService } from '../../services/app.service';
 import { LanguageMode, LanguageService } from '../../services/language.service';
+import { SpeechService } from '../../services/speech.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { EnableLocationComponent } from '../utils/enable-location/enable-location.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
@@ -43,6 +45,7 @@ export class AppSettingsComponent implements OnInit {
   private readonly dialogRef = inject(MatDialogRef<AppSettingsComponent>);
   private readonly dialogData = inject<{ appSettings: AppSettings }>(MAT_DIALOG_DATA);
   private readonly languageService = inject(LanguageService);
+  readonly speechService = inject(SpeechService);
   private readonly translation = inject(TranslationHelperService);
   readonly help = inject(HelpDialogService);
 
@@ -65,6 +68,7 @@ export class AppSettingsComponent implements OnInit {
 
   public appSettings: AppSettings = structuredClone(this.dialogData.appSettings);
   private baselineSettings: AppSettings = structuredClone(this.dialogData.appSettings);
+  readonly speechRateOptions = [0.8, 1, 1.2, 1.4];
   public showDetectLocationOnStart = false;
   public storagePersistenceSupported = this.appService.isStoragePersistenceSupported();
   public storagePersistenceBusy = false;
@@ -94,6 +98,7 @@ export class AppSettingsComponent implements OnInit {
         });
     }
 
+    this.speechService.init();
     void this.refreshStorageEstimate();
   }
 
@@ -150,6 +155,67 @@ export class AppSettingsComponent implements OnInit {
 
   setBackupOnExit(enabled: boolean): void {
     this.appSettings = { ...this.appSettings, backupOnExit: enabled };
+  }
+
+  setSpeechEnabled(enabled: boolean): void {
+    this.appSettings = {
+      ...this.appSettings,
+      speech: {
+        ...this.appSettings.speech,
+        enabled
+      }
+    };
+  }
+
+  setSpeechPreferTranslatedText(enabled: boolean): void {
+    this.appSettings = {
+      ...this.appSettings,
+      speech: {
+        ...this.appSettings.speech,
+        preferTranslatedText: enabled
+      }
+    };
+  }
+
+  setSpeechAutoStopOnNavigation(enabled: boolean): void {
+    this.appSettings = {
+      ...this.appSettings,
+      speech: {
+        ...this.appSettings.speech,
+        autoStopOnNavigation: enabled
+      }
+    };
+  }
+
+  setSpeechVoiceMode(mode: SpeechVoiceMode): void {
+    this.appSettings = {
+      ...this.appSettings,
+      speech: {
+        ...this.appSettings.speech,
+        voiceMode: mode,
+        voiceUri: mode === 'system' ? '' : this.appSettings.speech.voiceUri
+      }
+    };
+  }
+
+  setSpeechVoiceUri(voiceUri: string): void {
+    this.appSettings = {
+      ...this.appSettings,
+      speech: {
+        ...this.appSettings.speech,
+        voiceUri
+      }
+    };
+  }
+
+  setSpeechRate(rate: number): void {
+    this.appSettings = {
+      ...this.appSettings,
+      speech: {
+        ...this.appSettings.speech,
+        rate
+      }
+    };
   }
 
   setDiagnosticLogging(enabled: boolean): void {
@@ -227,6 +293,10 @@ export class AppSettingsComponent implements OnInit {
       unitIndex++;
     }
     return `${value.toFixed(unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
+  }
+
+  formatSpeechRate(rate: number): string {
+    return `${rate.toFixed(1)}×`;
   }
 
   private resetPreviewState(): void {

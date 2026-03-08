@@ -484,6 +484,10 @@
         "title": "Request persistent storage",
         "desc": "Requests persistent browser storage so local data is less likely to be cleared by the system."
       },
+      "speech": {
+        "title": "Read aloud",
+        "desc": "Enables browser speech output, lets you prefer translated text, and configure voice and speed."
+      },
       "usageProtection": {
         "title": "Usage protection",
         "desc": "Configures daily limits, allowed time windows, and unlock mode (self or parental PIN)."
@@ -1192,6 +1196,10 @@
       "translate": {
         "title": "Translate text",
         "desc": "This action translates the message text into your configured app language."
+      },
+      "readAloud": {
+        "title": "Read aloud",
+        "desc": "This action reads the message text aloud or stops the current playback."
       },
       "flyTo": {
         "title": "Jump on map",

@@ -121,6 +121,12 @@
                         <mat-icon aria-hidden="false">more_horiz</mat-icon>
                     </button>
                     <mat-menu #messageMenu="matMenu">
+                        @if (message.message || message.translatedMessage) {
+                        <button mat-menu-item (click)="toggleReadAloud(message)">
+                            <mat-icon aria-hidden="true">{{ getReadAloudIcon(message) }}</mat-icon>
+                            <span>{{ getReadAloudLabel(message) }}</span>
+                        </button>
+                        }
                         @if (message.message) {
                         <button mat-menu-item (click)="translateMessage(message)">
                             <mat-icon aria-hidden="true">translate</mat-icon>
@@ -285,6 +291,12 @@
                         <mat-icon aria-hidden="false">more_horiz</mat-icon>
                     </button>
                     <mat-menu #commentMenu="matMenu">
+                        @if (message.message || message.translatedMessage) {
+                        <button mat-menu-item (click)="toggleReadAloud(message)">
+                            <mat-icon aria-hidden="true">{{ getReadAloudIcon(message) }}</mat-icon>
+                            <span>{{ getReadAloudLabel(message) }}</span>
+                        </button>
+                        }
                         @if (message.message) {
                         <button mat-menu-item (click)="translateMessage(message)">
                             <mat-icon aria-hidden="true">translate</mat-icon>

@@ -2,6 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { AppSettings } from '../interfaces/app-settings';
 import { ConsentSettings } from '../interfaces/consent-settings.interface';
 import { NotificationAction } from '../interfaces/notification-action';
+import { DEFAULT_SPEECH_SETTINGS, SpeechSettings } from '../interfaces/speech-settings';
 import { DEFAULT_USAGE_PROTECTION_SETTINGS } from '../interfaces/usage-protection-settings';
 import { IndexedDbService } from './indexed-db.service';
 
@@ -39,6 +40,7 @@ export class AppService {
     enableUnsplashContent: false,
     diagnosticLogging: false,
     backupOnExit: false,
+    speech: { ...DEFAULT_SPEECH_SETTINGS },
     usageProtection: { ...DEFAULT_USAGE_PROTECTION_SETTINGS },
     consentSettings: {
       disclaimer: false,
@@ -69,6 +71,10 @@ export class AppService {
       ...this.defaultAppSettings,
       ...current,
       ...newAppSettings,
+      speech: this.normalizeSpeechSettings({
+        ...current.speech,
+        ...newAppSettings.speech
+      }),
       usageProtection: {
         ...this.defaultAppSettings.usageProtection,
         ...current.usageProtection,
@@ -110,6 +116,7 @@ export class AppService {
       this.appSettings = {
         ...this.defaultAppSettings,
         ...(parsed ?? {}),
+        speech: this.normalizeSpeechSettings(parsed?.speech),
         usageProtection: {
           ...this.defaultAppSettings.usageProtection,
           ...(parsed?.usageProtection ?? {})
@@ -166,6 +173,18 @@ export class AppService {
       termsOfService: raw.termsOfService === true,
       ageAdultConfirmed: raw.ageAdultConfirmed === true || (legacyAgeConfirmed && raw.ageMinorWithParentalConsentConfirmed !== true),
       ageMinorWithParentalConsentConfirmed: raw.ageMinorWithParentalConsentConfirmed === true
+    };
+  }
+
+  private normalizeSpeechSettings(input: Partial<SpeechSettings> | undefined): SpeechSettings {
+    const raw = input ?? {};
+    return {
+      enabled: raw.enabled === true,
+      preferTranslatedText: raw.preferTranslatedText !== false,
+      autoStopOnNavigation: raw.autoStopOnNavigation !== false,
+      voiceMode: raw.voiceMode === 'custom' ? 'custom' : 'system',
+      voiceUri: typeof raw.voiceUri === 'string' ? raw.voiceUri : '',
+      rate: typeof raw.rate === 'number' && Number.isFinite(raw.rate) ? raw.rate : DEFAULT_SPEECH_SETTINGS.rate
     };
   }
 

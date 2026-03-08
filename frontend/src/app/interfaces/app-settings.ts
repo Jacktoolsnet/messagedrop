@@ -1,4 +1,5 @@
 import { ConsentSettings } from "./consent-settings.interface";
+import { SpeechSettings } from "./speech-settings";
 import { UsageProtectionSettings } from "./usage-protection-settings";
 
 export interface AppSettings {
@@ -16,6 +17,7 @@ export interface AppSettings {
     enableYoutubeContent: boolean,
     diagnosticLogging: boolean,
     backupOnExit: boolean,
+    speech: SpeechSettings,
     usageProtection: UsageProtectionSettings,
     consentSettings: ConsentSettings,
     legalVersion: number,

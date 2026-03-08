@@ -484,6 +484,10 @@
         "title": "Solicitar almacenamiento persistente",
         "desc": "Solicita almacenamiento persistente del navegador para que los datos locales se limpien con menos frecuencia por el sistema."
       },
+      "speech": {
+        "title": "Lectura en voz alta",
+        "desc": "Activa la voz del navegador, permite preferir texto traducido y configurar voz y velocidad."
+      },
       "usageProtection": {
         "title": "Protección de uso",
         "desc": "Configura límite diario, franjas horarias permitidas y modo de desbloqueo (autogestión o PIN parental)."
@@ -1192,6 +1196,10 @@
       "translate": {
         "title": "Traducir texto",
         "desc": "Con esta función traduces el texto del mensaje al idioma configurado en la app."
+      },
+      "readAloud": {
+        "title": "Leer en voz alta",
+        "desc": "Con esta función se lee el texto del mensaje en voz alta o se detiene la reproducción actual."
       },
       "flyTo": {
         "title": "Ir al mapa",
