@@ -85,6 +85,10 @@
       "style": {
         "title": "Style",
         "desc": "Ajustez la police ou l'apparence."
+      },
+      "readAloud": {
+        "title": "Lire à voix haute",
+        "desc": "Lit l’aide actuelle à voix haute ou arrête la lecture en cours."
       }
     }
   },

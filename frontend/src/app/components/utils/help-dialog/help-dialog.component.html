@@ -7,7 +7,7 @@
   <p class="help-intro">{{ t(data.introKey) }}</p>
 
   <div class="help-list">
-    @for (item of data.items; track item.titleKey) {
+    @for (item of items(); track item.titleKey) {
     <div class="help-item">
       <div class="help-item__icon">
         <mat-icon aria-hidden="true">{{ item.icon }}</mat-icon>
@@ -25,5 +25,9 @@
   <button mat-icon-button class="action-close" type="button" (click)="close()"
     [attr.aria-label]="'common.actions.close' | transloco">
     <mat-icon>close</mat-icon>
+  </button>
+  <button mat-icon-button type="button" (click)="toggleReadAloud()"
+    [attr.aria-label]="getReadAloudLabel()">
+    <mat-icon>{{ getReadAloudIcon() }}</mat-icon>
   </button>
 </mat-dialog-actions>

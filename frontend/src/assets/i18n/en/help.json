@@ -85,6 +85,10 @@
       "style": {
         "title": "Style",
         "desc": "Adjust font or appearance options."
+      },
+      "readAloud": {
+        "title": "Read aloud",
+        "desc": "Reads the current help text aloud or stops the current playback."
       }
     }
   },

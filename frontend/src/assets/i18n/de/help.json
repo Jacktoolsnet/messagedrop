@@ -85,6 +85,10 @@
       "style": {
         "title": "Stil",
         "desc": "Passe Schriftart oder Darstellung an."
+      },
+      "readAloud": {
+        "title": "Vorlesen",
+        "desc": "Liest die aktuelle Hilfe laut vor oder stoppt die laufende Wiedergabe."
       }
     }
   },
