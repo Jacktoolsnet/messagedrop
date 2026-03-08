@@ -1240,6 +1240,11 @@ const HELP_TOPICS = {
         descriptionKey: 'legalDisclaimer.items.content.desc'
       },
       {
+        icon: 'record_voice_over',
+        titleKey: 'legalDisclaimer.items.readAloud.title',
+        descriptionKey: 'legalDisclaimer.items.readAloud.desc'
+      },
+      {
         icon: 'fact_check',
         titleKey: 'legalDisclaimer.items.consent.title',
         descriptionKey: 'legalDisclaimer.items.consent.desc'
@@ -1332,6 +1337,11 @@ const HELP_TOPICS = {
         descriptionKey: 'legalNotice.items.content.desc'
       },
       {
+        icon: 'record_voice_over',
+        titleKey: 'legalNotice.items.readAloud.title',
+        descriptionKey: 'legalNotice.items.readAloud.desc'
+      },
+      {
         icon: 'restart_alt',
         titleKey: 'legalNotice.items.retry.title',
         descriptionKey: 'legalNotice.items.retry.desc'
@@ -1376,6 +1386,11 @@ const HELP_TOPICS = {
         icon: 'description',
         titleKey: 'privacyPolicy.items.content.title',
         descriptionKey: 'privacyPolicy.items.content.desc'
+      },
+      {
+        icon: 'record_voice_over',
+        titleKey: 'privacyPolicy.items.readAloud.title',
+        descriptionKey: 'privacyPolicy.items.readAloud.desc'
       },
       {
         icon: 'fact_check',
@@ -1427,6 +1442,11 @@ const HELP_TOPICS = {
         icon: 'description',
         titleKey: 'termsOfService.items.content.title',
         descriptionKey: 'termsOfService.items.content.desc'
+      },
+      {
+        icon: 'record_voice_over',
+        titleKey: 'termsOfService.items.readAloud.title',
+        descriptionKey: 'termsOfService.items.readAloud.desc'
       },
       {
         icon: 'fact_check',

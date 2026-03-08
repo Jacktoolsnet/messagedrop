@@ -35,6 +35,10 @@
         [attr.aria-label]="'common.actions.help' | transloco">
         <mat-icon>help</mat-icon>
     </button>
+    <button (click)="toggleReadAloud()" [disabled]="loading() || error() || !text().trim()" mat-icon-button
+        [attr.aria-label]="getReadAloudLabel()">
+        <mat-icon>{{ getReadAloudIcon() }}</mat-icon>
+    </button>
     <button (click)="openInNewTab()" [disabled]="loading() || error()" mat-icon-button [attr.aria-label]="'common.actions.openInNewTab' | transloco"><mat-icon>open_in_new</mat-icon></button>
     <button (click)="download()" [disabled]="loading() || error()" mat-icon-button [attr.aria-label]="'common.actions.download' | transloco"><mat-icon>download</mat-icon></button>
 </mat-dialog-actions>

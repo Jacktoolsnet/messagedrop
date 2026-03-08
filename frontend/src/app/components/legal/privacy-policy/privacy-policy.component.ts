@@ -1,14 +1,16 @@
 
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { AppService } from '../../../services/app.service';
+import { SpeechService } from '../../../services/speech.service';
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
+import { DisplayMessage } from '../../utils/display-message/display-message.component';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 
 @Component({
@@ -27,18 +29,22 @@ import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.c
   templateUrl: './privacy-policy.component.html',
   styleUrls: ['./privacy-policy.component.css']
 })
-export class PrivacyPolicyComponent implements OnInit {
+export class PrivacyPolicyComponent implements OnInit, OnDestroy {
   accepted = false;
   readonly lang = signal<'de' | 'en'>('de');
   readonly url = computed(() => new URL(`assets/legal/privacy-policy-${this.lang()}.txt`, document.baseURI).toString());
+  private readonly speechTargetId = 'legal:privacy-policy';
 
   readonly text = signal<string>('');
   readonly loading = signal<boolean>(true);
   readonly error = signal<boolean>(false);
 
   private http = inject(HttpClient);
+  private dialog = inject(MatDialog);
   private dialogRef = inject(MatDialogRef<PrivacyPolicyComponent>);
   private appService = inject(AppService);
+  private speechService = inject(SpeechService);
+  private translation = inject(TranslocoService);
   readonly help = inject(HelpDialogService);
 
   constructor() { this.load(); }
@@ -47,6 +53,10 @@ export class PrivacyPolicyComponent implements OnInit {
     // falls bereits zugestimmt wurde, Toggle vorbefüllen
     const settings = this.appService.getAppSettings();
     this.accepted = !!settings?.consentSettings?.privacyPolicy;
+  }
+
+  ngOnDestroy(): void {
+    this.stopReadAloud();
   }
 
   onToggle(val: boolean) {
@@ -59,11 +69,15 @@ export class PrivacyPolicyComponent implements OnInit {
 
   setLanguage(lang: 'de' | 'en'): void {
     if (this.lang() === lang) return;
+    this.stopReadAloud();
     this.lang.set(lang);
     this.load();
   }
 
-  reload(): void { this.load(); }
+  reload(): void {
+    this.stopReadAloud();
+    this.load();
+  }
   openInNewTab(): void { window.open(this.url(), '_blank', 'noopener'); }
 
   download(): void {
@@ -76,7 +90,49 @@ export class PrivacyPolicyComponent implements OnInit {
     URL.revokeObjectURL(objectUrl);
   }
 
-  close(): void { this.dialogRef.close(); }
+  toggleReadAloud(): void {
+    if (!this.speechService.supported()) {
+      this.showReadAloudHint('common.speech.unsupported');
+      return;
+    }
+
+    if (!this.appService.getAppSettings().speech?.enabled) {
+      this.showReadAloudHint('common.speech.disabled');
+      return;
+    }
+
+    const content = this.text().trim();
+    if (!content) {
+      return;
+    }
+
+    this.speechService.toggle({
+      targetId: this.speechTargetId,
+      text: content,
+      lang: this.lang()
+    });
+  }
+
+  isReadAloudActive(): boolean {
+    return this.speechService.isActive(this.speechTargetId);
+  }
+
+  getReadAloudIcon(): string {
+    return this.isReadAloudActive() ? 'stop' : 'volume_up';
+  }
+
+  getReadAloudLabel(): string {
+    return this.translation.translate(
+      this.isReadAloudActive()
+        ? 'common.actions.stopReadAloud'
+        : 'common.actions.readAloud'
+    );
+  }
+
+  close(): void {
+    this.stopReadAloud();
+    this.dialogRef.close();
+  }
 
   private load(): void {
     this.loading.set(true);
@@ -84,6 +140,33 @@ export class PrivacyPolicyComponent implements OnInit {
     this.http.get(this.url(), { responseType: 'text' }).subscribe({
       next: (content) => { this.text.set(content ?? ''); this.loading.set(false); },
       error: () => { this.error.set(true); this.loading.set(false); }
+    });
+  }
+
+  private stopReadAloud(): void {
+    this.speechService.stopIfCurrentTarget(this.speechTargetId);
+  }
+
+  private showReadAloudHint(messageKey: string): void {
+    this.dialog.open(DisplayMessage, {
+      closeOnNavigation: false,
+      data: {
+        showAlways: true,
+        title: this.translation.translate('common.actions.readAloud'),
+        image: '',
+        icon: 'record_voice_over',
+        message: this.translation.translate(messageKey),
+        button: this.translation.translate('common.actions.ok'),
+        delay: 0,
+        showSpinner: false,
+        autoclose: false
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
     });
   }
 }

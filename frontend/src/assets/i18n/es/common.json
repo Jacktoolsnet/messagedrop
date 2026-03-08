@@ -29,10 +29,12 @@
       "more": "Más",
       "close": "Cerrar",
       "edit": "Editar",
-      "help": "Ayuda"
+      "help": "Ayuda",
+      "readAloud": "Leer en voz alta",
+      "stopReadAloud": "Detener lectura"
     },
     "media": {
-      "storageUnsupported": "Esta función no es compatible con este dispositivo."
+      "tenorAttribution": "Con tecnología de Tenor"
     },
     "avatarCropper": {
       "title": "Recortar avatar",
@@ -271,8 +273,8 @@
           "confirm": "Este mensaje se eliminará permanentemente. ¿Estás seguro?"
         }
       },
-    "message": {
-      "addText": "Añadir texto",
+      "message": {
+        "addText": "Añadir texto",
         "dropNewAria": "Publicar un mensaje nuevo",
         "applyAria": "Publicar tu mensaje",
         "policy": "Esta información se almacena en nuestro servidor y es visible para todo el mundo."
@@ -378,12 +380,12 @@
       "multiMarker": {
         "showMessages": "Mostrar mensajes",
         "showNotes": "Mostrar notas",
-      "showImages": "Mostrar imágenes",
-      "showDocuments": "Mostrar documentos",
-      "showExperiences": "Experiencias",
-      "showMyExperiences": "Mis experiencias"
-    }
-  },
+        "showImages": "Mostrar imágenes",
+        "showDocuments": "Mostrar documentos",
+        "showExperiences": "Experiencias",
+        "showMyExperiences": "Mis experiencias"
+      }
+    },
     "messageList": {
       "myTitle": "Mis mensajes públicos",
       "addFirstMessage": "Añadir mi primer mensaje público",
@@ -968,30 +970,30 @@
       "supplier": "Proveedor",
       "supplierActions": "Acciones del proveedor",
       "supplierUnavailable": "La información del proveedor no está disponible en este momento.",
-    "showMore": "Mostrar más",
-    "showLess": "Mostrar menos",
-    "durationPrefix": "Duración:",
-    "description": "Descripción",
-    "startPoint": "Punto de inicio",
-    "startEndPoint": "Punto de inicio/fin",
-    "endPoint": "Punto final",
-    "redemptionPoint": "Canje",
-    "pickupPoint": "Recogida",
-    "map": "Mapa",
-    "locationUnavailable": "Los detalles de la ubicación no están disponibles.",
-    "openInMaps": "Abrir en Maps",
-    "openOn": "Abrir en {{ provider }}",
-    "sendToChat": "Compartir en el chat",
-    "save": "Guardar experiencia",
-    "saved": "Guardado",
-    "saveTitle": "Añadido a mis experiencias",
-    "saveMessage": "La experiencia se añadió a tu lista.",
-    "saveExistsTitle": "Ya guardado",
-    "saveExistsPrompt": "¿Eliminar de mis experiencias?",
-    "saveRemovedTitle": "Eliminado",
-    "saveRemovedMessage": "La experiencia se eliminó de tu lista.",
-    "saveFailedTitle": "Error al guardar",
-    "saveFailedMessage": "Inténtalo de nuevo.",
+      "showMore": "Mostrar más",
+      "showLess": "Mostrar menos",
+      "durationPrefix": "Duración:",
+      "description": "Descripción",
+      "startPoint": "Punto de inicio",
+      "startEndPoint": "Punto de inicio/fin",
+      "endPoint": "Punto final",
+      "redemptionPoint": "Canje",
+      "pickupPoint": "Recogida",
+      "map": "Mapa",
+      "locationUnavailable": "Los detalles de la ubicación no están disponibles.",
+      "openInMaps": "Abrir en Maps",
+      "openOn": "Abrir en {{ provider }}",
+      "sendToChat": "Compartir en el chat",
+      "save": "Guardar experiencia",
+      "saved": "Guardado",
+      "saveTitle": "Añadido a mis experiencias",
+      "saveMessage": "La experiencia se añadió a tu lista.",
+      "saveExistsTitle": "Ya guardado",
+      "saveExistsPrompt": "¿Eliminar de mis experiencias?",
+      "saveRemovedTitle": "Eliminado",
+      "saveRemovedMessage": "La experiencia se eliminó de tu lista.",
+      "saveFailedTitle": "Error al guardar",
+      "saveFailedMessage": "Inténtalo de nuevo.",
       "showOnMap": "Mostrar en el mapa",
       "tileSettingsAria": "Abrir la configuración de mosaicos para {{ name }}",
       "select": "Seleccionar",
@@ -1004,15 +1006,15 @@
       "toggle": "Activar búsqueda",
       "zoomLabel": "Buscar a partir del nivel de zoom",
       "zoomValue": "Zoom",
-    "items": {
-      "publicMessages": "Mensajes públicos",
-      "privateNotes": "Notas privadas",
-      "privateImages": "Imágenes privadas",
-      "privateDocuments": "Documentos privados",
-      "experiences": "Experiencias",
-      "myExperiences": "Mis experiencias"
-    }
-  },
+      "items": {
+        "publicMessages": "Mensajes públicos",
+        "privateNotes": "Notas privadas",
+        "privateImages": "Imágenes privadas",
+        "privateDocuments": "Documentos privados",
+        "experiences": "Experiencias",
+        "myExperiences": "Mis experiencias"
+      }
+    },
     "place": {
       "title": "Servicio de lugares",
       "creating": "Creando lugar",
@@ -1132,9 +1134,6 @@
     "files": {
       "pickerUnsupported": "El selector de archivos no es compatible con este navegador."
     },
-    "media": {
-      "tenorAttribution": "Con tecnología de Tenor"
-    },
     "user": {
       "deleteSuccess": "El usuario y los datos relacionados se eliminaron de forma permanente.",
       "serverInfoHint": "El ID de usuario, la clave pública de cifrado, la clave pública de firma, el número de mensajes, el número de mensajes bloqueados, el estado del usuario, el último signo de vida, la suscripción y la pista de conexión se guardan en nuestro servidor. Esta información es esencial para que la aplicación funcione.",
@@ -1171,6 +1170,10 @@
         "fileTooLarge": "La imagen es demasiado grande. El tamaño máximo permitido es {{ maxSizeMb }} MB.",
         "fileReadError": "Error al leer el archivo."
       }
+    },
+    "speech": {
+      "unsupported": "La lectura en voz alta no es compatible con este navegador.",
+      "disabled": "Activa primero la lectura en voz alta en los ajustes de la app."
     }
   },
   "errors": {

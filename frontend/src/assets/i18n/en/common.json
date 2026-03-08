@@ -29,10 +29,12 @@
       "more": "More",
       "close": "Close",
       "edit": "Edit",
-      "help": "Help"
+      "help": "Help",
+      "readAloud": "Read aloud",
+      "stopReadAloud": "Stop reading"
     },
     "media": {
-      "storageUnsupported": "This feature is not supported on this device."
+      "tenorAttribution": "Powered by Tenor"
     },
     "avatarCropper": {
       "title": "Crop avatar",
@@ -241,10 +243,10 @@
       },
       "chatroom": {
         "closeAria": "Close chatroom",
-      "composeAria": "Compose message",
-      "addVoiceAria": "New voice message",
-      "addExperienceAria": "Add experience message",
-      "addLocationAria": "Add location message",
+        "composeAria": "Compose message",
+        "addVoiceAria": "New voice message",
+        "addExperienceAria": "Add experience message",
+        "addLocationAria": "Add location message",
         "avatarAltName": "{{ name }} avatar",
         "avatarAltMe": "My avatar",
         "meLabel": "Me",
@@ -271,8 +273,8 @@
           "confirm": "This message will be permanently deleted. Are you sure?"
         }
       },
-    "message": {
-      "addText": "Add a text",
+      "message": {
+        "addText": "Add a text",
         "dropNewAria": "Drop a new message",
         "applyAria": "Drop your message",
         "policy": "This information is stored on our server and is visible to everyone."
@@ -378,12 +380,12 @@
       "multiMarker": {
         "showMessages": "Show messages",
         "showNotes": "Show notes",
-      "showImages": "Show images",
-      "showDocuments": "Show documents",
-      "showExperiences": "Experiences",
-      "showMyExperiences": "My experiences"
-    }
-  },
+        "showImages": "Show images",
+        "showDocuments": "Show documents",
+        "showExperiences": "Experiences",
+        "showMyExperiences": "My experiences"
+      }
+    },
     "messageList": {
       "myTitle": "My public messages",
       "addFirstMessage": "Add my first public message",
@@ -965,29 +967,29 @@
       "reset": "Reset",
       "noResults": "No experiences found.",
       "sourceViator": "Found on",
-    "showMore": "Show more",
-    "showLess": "Show less",
-    "durationPrefix": "Duration:",
-    "description": "Description",
-    "startPoint": "Start point",
-    "startEndPoint": "Start/End point",
-    "endPoint": "End point",
-    "redemptionPoint": "Redemption",
-    "pickupPoint": "Pickup",
-    "map": "Map",
-    "locationUnavailable": "Location details not available.",
+      "showMore": "Show more",
+      "showLess": "Show less",
+      "durationPrefix": "Duration:",
+      "description": "Description",
+      "startPoint": "Start point",
+      "startEndPoint": "Start/End point",
+      "endPoint": "End point",
+      "redemptionPoint": "Redemption",
+      "pickupPoint": "Pickup",
+      "map": "Map",
+      "locationUnavailable": "Location details not available.",
       "openInMaps": "Open in Maps",
       "openOn": "Open on {{ provider }}",
       "sendToChat": "Send to chat",
       "save": "Save experience",
       "saved": "Saved",
       "saveTitle": "Added to my experiences",
-    "saveMessage": "The experience was added to your saved list.",
-    "saveExistsTitle": "Already saved",
-    "saveExistsPrompt": "Remove from my experiences?",
-    "saveRemovedTitle": "Removed",
-    "saveRemovedMessage": "The experience was removed from your saved list.",
-    "saveFailedTitle": "Save failed",
+      "saveMessage": "The experience was added to your saved list.",
+      "saveExistsTitle": "Already saved",
+      "saveExistsPrompt": "Remove from my experiences?",
+      "saveRemovedTitle": "Removed",
+      "saveRemovedMessage": "The experience was removed from your saved list.",
+      "saveFailedTitle": "Save failed",
       "saveFailedMessage": "Please try again.",
       "supplier": "Supplier",
       "supplierActions": "Supplier actions",
@@ -1004,15 +1006,15 @@
       "toggle": "Enable search",
       "zoomLabel": "Search from zoom level",
       "zoomValue": "Zoom",
-    "items": {
-      "publicMessages": "Public messages",
-      "privateNotes": "Private notes",
-      "privateImages": "Private images",
-      "privateDocuments": "Private documents",
-      "experiences": "Experiences",
-      "myExperiences": "My experiences"
-    }
-  },
+      "items": {
+        "publicMessages": "Public messages",
+        "privateNotes": "Private notes",
+        "privateImages": "Private images",
+        "privateDocuments": "Private documents",
+        "experiences": "Experiences",
+        "myExperiences": "My experiences"
+      }
+    },
     "place": {
       "title": "Place service",
       "creating": "Creating place",
@@ -1132,9 +1134,6 @@
     "files": {
       "pickerUnsupported": "File picker is not supported in this browser."
     },
-    "media": {
-      "tenorAttribution": "Powered by Tenor"
-    },
     "user": {
       "deleteSuccess": "User and related data were removed permanently.",
       "serverInfoHint": "User ID, public encryption key, public signing key, number of messages, number of blocked messages, user status, last sign of life, subscription, and connect hint are saved on our server. This information is essential for the application to function.",
@@ -1171,6 +1170,10 @@
         "fileTooLarge": "The image is too large. Maximum allowed size is {{ maxSizeMb }} MB.",
         "fileReadError": "Error reading the file."
       }
+    },
+    "speech": {
+      "unsupported": "Read aloud is not supported in this browser.",
+      "disabled": "Enable read aloud first in app settings."
     }
   },
   "errors": {

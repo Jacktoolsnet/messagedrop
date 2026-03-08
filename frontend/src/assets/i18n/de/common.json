@@ -29,10 +29,12 @@
       "more": "Mehr",
       "close": "Schließen",
       "edit": "Bearbeiten",
-      "help": "Hilfe"
+      "help": "Hilfe",
+      "readAloud": "Vorlesen",
+      "stopReadAloud": "Vorlesen stoppen"
     },
     "media": {
-      "storageUnsupported": "Funktion wird nicht unterstützt."
+      "tenorAttribution": "Bereitgestellt von Tenor"
     },
     "avatarCropper": {
       "title": "Avatar zuschneiden",
@@ -271,8 +273,8 @@
           "confirm": "Diese Nachricht wird dauerhaft gelöscht. Bist du sicher?"
         }
       },
-    "message": {
-      "addText": "Text hinzufügen",
+      "message": {
+        "addText": "Text hinzufügen",
         "dropNewAria": "Neue Nachricht senden",
         "applyAria": "Nachricht senden",
         "policy": "Diese Information wird auf unserem Server gespeichert und ist für alle sichtbar."
@@ -378,12 +380,12 @@
       "multiMarker": {
         "showMessages": "Nachrichten anzeigen",
         "showNotes": "Notizen anzeigen",
-      "showImages": "Bilder anzeigen",
-      "showDocuments": "Dokumente anzeigen",
-      "showExperiences": "Erlebnisse",
-      "showMyExperiences": "Meine Erlebnisse"
-    }
-  },
+        "showImages": "Bilder anzeigen",
+        "showDocuments": "Dokumente anzeigen",
+        "showExperiences": "Erlebnisse",
+        "showMyExperiences": "Meine Erlebnisse"
+      }
+    },
     "messageList": {
       "myTitle": "Meine öffentlichen Nachrichten",
       "addFirstMessage": "Erste öffentliche Nachricht hinzufügen",
@@ -965,33 +967,33 @@
       "reset": "Zurücksetzen",
       "noResults": "Keine Erlebnisse gefunden.",
       "sourceViator": "Gefunden auf",
-    "showMore": "Mehr anzeigen",
-    "showLess": "Weniger anzeigen",
-    "durationPrefix": "Dauer:",
-    "description": "Beschreibung",
-    "startPoint": "Startpunkt",
-    "startEndPoint": "Start-/Endpunkt",
-    "endPoint": "Endpunkt",
-    "redemptionPoint": "Einlösung",
-    "pickupPoint": "Abholung",
-    "map": "Karte",
-    "locationUnavailable": "Standortdetails nicht verfügbar.",
-    "openInMaps": "In Maps öffnen",
-    "openOn": "Bei {{ provider }} öffnen",
-    "sendToChat": "Im Chat teilen",
-    "save": "Erlebnis speichern",
-    "saved": "Gespeichert",
-    "saveTitle": "Zu eigenen Erlebnissen hinzugefügt",
-    "saveMessage": "Das Erlebnis wurde zu deiner Liste hinzugefügt.",
-    "saveExistsTitle": "Bereits gespeichert",
-    "saveExistsPrompt": "Aus meinen Erlebnissen entfernen?",
-    "saveRemovedTitle": "Entfernt",
-    "saveRemovedMessage": "Das Erlebnis wurde aus deiner Liste entfernt.",
-    "saveFailedTitle": "Speichern fehlgeschlagen",
-    "saveFailedMessage": "Bitte versuche es erneut.",
-    "supplier": "Anbieter",
-    "supplierActions": "Anbieter-Aktionen",
-    "supplierUnavailable": "Anbieterinformationen sind derzeit nicht verfügbar.",
+      "showMore": "Mehr anzeigen",
+      "showLess": "Weniger anzeigen",
+      "durationPrefix": "Dauer:",
+      "description": "Beschreibung",
+      "startPoint": "Startpunkt",
+      "startEndPoint": "Start-/Endpunkt",
+      "endPoint": "Endpunkt",
+      "redemptionPoint": "Einlösung",
+      "pickupPoint": "Abholung",
+      "map": "Karte",
+      "locationUnavailable": "Standortdetails nicht verfügbar.",
+      "openInMaps": "In Maps öffnen",
+      "openOn": "Bei {{ provider }} öffnen",
+      "sendToChat": "Im Chat teilen",
+      "save": "Erlebnis speichern",
+      "saved": "Gespeichert",
+      "saveTitle": "Zu eigenen Erlebnissen hinzugefügt",
+      "saveMessage": "Das Erlebnis wurde zu deiner Liste hinzugefügt.",
+      "saveExistsTitle": "Bereits gespeichert",
+      "saveExistsPrompt": "Aus meinen Erlebnissen entfernen?",
+      "saveRemovedTitle": "Entfernt",
+      "saveRemovedMessage": "Das Erlebnis wurde aus deiner Liste entfernt.",
+      "saveFailedTitle": "Speichern fehlgeschlagen",
+      "saveFailedMessage": "Bitte versuche es erneut.",
+      "supplier": "Anbieter",
+      "supplierActions": "Anbieter-Aktionen",
+      "supplierUnavailable": "Anbieterinformationen sind derzeit nicht verfügbar.",
       "showOnMap": "Auf Karte anzeigen",
       "tileSettingsAria": "Kachel-Einstellungen für {{ name }} öffnen",
       "select": "Auswählen",
@@ -1004,15 +1006,15 @@
       "toggle": "Suche aktivieren",
       "zoomLabel": "Suche ab Zoomstufe",
       "zoomValue": "Zoom",
-    "items": {
-      "publicMessages": "Öffentliche Nachrichten",
-      "privateNotes": "Private Notizen",
-      "privateImages": "Private Bilder",
-      "privateDocuments": "Private Dokumente",
-      "experiences": "Erlebnisse",
-      "myExperiences": "Meine Erlebnisse"
-    }
-  },
+      "items": {
+        "publicMessages": "Öffentliche Nachrichten",
+        "privateNotes": "Private Notizen",
+        "privateImages": "Private Bilder",
+        "privateDocuments": "Private Dokumente",
+        "experiences": "Erlebnisse",
+        "myExperiences": "Meine Erlebnisse"
+      }
+    },
     "place": {
       "title": "Ort-Dienst",
       "creating": "Ort wird erstellt",
@@ -1132,9 +1134,6 @@
     "files": {
       "pickerUnsupported": "Dateiauswahl wird in diesem Browser nicht unterstützt."
     },
-    "media": {
-      "tenorAttribution": "Bereitgestellt von Tenor"
-    },
     "user": {
       "deleteSuccess": "Benutzer und zugehörige Daten wurden dauerhaft entfernt.",
       "serverInfoHint": "User-ID, öffentlicher Verschlüsselungsschlüssel, öffentlicher Signaturschlüssel, Anzahl der Nachrichten, Anzahl der blockierten Nachrichten, Benutzerstatus, letztes Lebenszeichen, Abonnement und Verbindungshinweis werden auf unserem Server gespeichert. Diese Informationen sind für die Funktion der Anwendung erforderlich.",
@@ -1171,6 +1170,10 @@
         "fileTooLarge": "Das Bild ist zu groß. Maximal erlaubt sind {{ maxSizeMb }} MB.",
         "fileReadError": "Fehler beim Lesen der Datei."
       }
+    },
+    "speech": {
+      "unsupported": "Vorlesen wird in diesem Browser nicht unterstützt.",
+      "disabled": "Aktiviere Vorlesen zuerst in den App-Einstellungen."
     }
   },
   "errors": {

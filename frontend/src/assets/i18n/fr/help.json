@@ -904,7 +904,7 @@
   },
   "legalDisclaimer": {
     "title": "Avertissement",
-    "intro": "Ici, vous lisez l'avertissement, changez la langue et pouvez ouvrir ou télécharger le texte.",
+    "intro": "Ici, vous lisez la clause de non-responsabilité, changez de langue et pouvez faire lire le texte à voix haute, l’ouvrir ou le télécharger.",
     "items": {
       "language": {
         "title": "Changer la langue",
@@ -941,6 +941,10 @@
       "privacy": {
         "title": "Confidentialité et stockage",
         "desc": "Le statut de consentement est stocké localement dans les paramètres de l'app. L'ouverture dans un nouvel onglet suit les règles de confidentialité et de journalisation du navigateur et du serveur."
+      },
+      "readAloud": {
+        "title": "Lire à voix haute",
+        "desc": "Démarre ou arrête la lecture à voix haute du texte juridique affiché à l’aide de la synthèse vocale du navigateur ou de l’appareil."
       }
     }
   },
@@ -980,7 +984,7 @@
   },
   "legalNotice": {
     "title": "Mentions légales",
-    "intro": "Ici, vous lisez les mentions légales, changez la langue et pouvez ouvrir ou télécharger le texte.",
+    "intro": "Ici, vous lisez les mentions légales, changez de langue et pouvez faire lire le texte à voix haute, l’ouvrir ou le télécharger.",
     "items": {
       "language": {
         "title": "Changer la langue",
@@ -1013,12 +1017,16 @@
       "privacy": {
         "title": "Confidentialité et traitement",
         "desc": "Les mentions légales sont chargées comme texte juridique statique. L'ouverture dans un nouvel onglet ou le téléchargement peut générer des données de journal du navigateur et du serveur."
+      },
+      "readAloud": {
+        "title": "Lire à voix haute",
+        "desc": "Démarre ou arrête la lecture à voix haute du texte juridique affiché à l’aide de la synthèse vocale du navigateur ou de l’appareil."
       }
     }
   },
   "privacyPolicy": {
     "title": "Politique de confidentialité",
-    "intro": "Ici, vous lisez la politique de confidentialité, changez la langue et pouvez ouvrir ou télécharger le texte.",
+    "intro": "Ici, vous lisez la politique de confidentialité, changez de langue et pouvez faire lire le texte à voix haute, l’ouvrir ou le télécharger.",
     "items": {
       "language": {
         "title": "Changer la langue",
@@ -1055,12 +1063,16 @@
       "privacy": {
         "title": "Confidentialité et stockage",
         "desc": "Le statut de consentement est stocké localement dans les paramètres de l'app. L'ouverture dans un nouvel onglet suit les règles de confidentialité et de journalisation du navigateur et du serveur."
+      },
+      "readAloud": {
+        "title": "Lire à voix haute",
+        "desc": "Démarre ou arrête la lecture à voix haute du texte juridique affiché à l’aide de la synthèse vocale du navigateur ou de l’appareil."
       }
     }
   },
   "termsOfService": {
     "title": "Conditions d'utilisation",
-    "intro": "Ici, vous lisez les conditions d'utilisation, changez la langue et pouvez ouvrir ou télécharger le texte.",
+    "intro": "Ici, vous lisez les conditions d’utilisation, changez de langue et pouvez faire lire le texte à voix haute, l’ouvrir ou le télécharger.",
     "items": {
       "language": {
         "title": "Changer la langue",
@@ -1097,6 +1109,10 @@
       "privacy": {
         "title": "Confidentialité et stockage",
         "desc": "Le statut de consentement est stocké localement dans les paramètres de l'app. L'ouverture dans un nouvel onglet suit les règles de confidentialité et de journalisation du navigateur et du serveur."
+      },
+      "readAloud": {
+        "title": "Lire à voix haute",
+        "desc": "Démarre ou arrête la lecture à voix haute du texte juridique affiché à l’aide de la synthèse vocale du navigateur ou de l’appareil."
       }
     }
   },

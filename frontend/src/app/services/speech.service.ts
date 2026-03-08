@@ -11,6 +11,16 @@ export interface SpeechRequest {
   lang?: string;
 }
 
+interface SpeechPlayback {
+  chunks: string[];
+  fullText: string;
+  targetId: string;
+  token: number;
+  rate: number;
+  voice?: SpeechSynthesisVoice;
+  fallbackLang?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -92,67 +102,27 @@ export class SpeechService {
     this.stop();
 
     const token = ++this.playbackToken;
-    const utterance = new SpeechSynthesisUtterance(text);
-    const voice = this.resolveVoice(request.lang, settingsOverride);
-
-    if (voice) {
-      utterance.voice = voice;
-      utterance.lang = voice.lang;
-    } else if (request.lang) {
-      utterance.lang = request.lang;
+    const chunks = this.splitIntoChunks(text);
+    if (!chunks.length) {
+      return false;
     }
 
-    utterance.rate = settings.rate;
-
-    utterance.onstart = () => {
-      if (token !== this.playbackToken) {
-        return;
-      }
-      this.currentTargetId.set(request.targetId);
-      this.currentText.set(text);
-      this.speaking.set(true);
-      this.paused.set(false);
-      this.error.set(null);
-    };
-
-    utterance.onpause = () => {
-      if (token !== this.playbackToken) {
-        return;
-      }
-      this.paused.set(true);
-      this.speaking.set(true);
-    };
-
-    utterance.onresume = () => {
-      if (token !== this.playbackToken) {
-        return;
-      }
-      this.paused.set(false);
-      this.speaking.set(true);
-    };
-
-    utterance.onend = () => {
-      if (token !== this.playbackToken) {
-        return;
-      }
-      this.clearPlaybackState();
-    };
-
-    utterance.onerror = (event) => {
-      if (token !== this.playbackToken) {
-        return;
-      }
-      this.error.set(event.error || 'speech_error');
-      this.clearPlaybackState();
-    };
-
-    this.activeUtterance = utterance;
+    const voice = this.resolveVoice(request.lang, settingsOverride);
     this.currentTargetId.set(request.targetId);
     this.currentText.set(text);
     this.error.set(null);
     this.paused.set(false);
     this.speaking.set(false);
-    this.synth.speak(utterance);
+    this.playChunks({
+      chunks,
+      fullText: text,
+      targetId: request.targetId,
+      token,
+      rate: settings.rate,
+      voice,
+      fallbackLang: request.lang
+    });
+
     return true;
   }
 
@@ -255,6 +225,155 @@ export class SpeechService {
       ...(this.appService.getAppSettings().speech ?? DEFAULT_SPEECH_SETTINGS),
       ...(settingsOverride ?? {})
     };
+  }
+
+  private playChunks(playback: SpeechPlayback, index = 0): void {
+    if (!this.synth || index >= playback.chunks.length || playback.token !== this.playbackToken) {
+      return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(playback.chunks[index]);
+
+    if (playback.voice) {
+      utterance.voice = playback.voice;
+      utterance.lang = playback.voice.lang;
+    } else if (playback.fallbackLang) {
+      utterance.lang = playback.fallbackLang;
+    }
+
+    utterance.rate = playback.rate;
+
+    utterance.onstart = () => {
+      if (playback.token !== this.playbackToken) {
+        return;
+      }
+      this.currentTargetId.set(playback.targetId);
+      this.currentText.set(playback.fullText);
+      this.speaking.set(true);
+      this.paused.set(false);
+      this.error.set(null);
+    };
+
+    utterance.onpause = () => {
+      if (playback.token !== this.playbackToken) {
+        return;
+      }
+      this.paused.set(true);
+      this.speaking.set(true);
+    };
+
+    utterance.onresume = () => {
+      if (playback.token !== this.playbackToken) {
+        return;
+      }
+      this.paused.set(false);
+      this.speaking.set(true);
+    };
+
+    utterance.onend = () => {
+      if (playback.token !== this.playbackToken) {
+        return;
+      }
+
+      if (index < playback.chunks.length - 1) {
+        this.activeUtterance = null;
+        this.speaking.set(true);
+        this.paused.set(false);
+        this.playChunks(playback, index + 1);
+        return;
+      }
+
+      this.clearPlaybackState();
+    };
+
+    utterance.onerror = (event) => {
+      if (playback.token !== this.playbackToken) {
+        return;
+      }
+      this.error.set(event.error || 'speech_error');
+      this.clearPlaybackState();
+    };
+
+    this.activeUtterance = utterance;
+    this.synth.speak(utterance);
+  }
+
+  private splitIntoChunks(text: string): string[] {
+    const normalized = text
+      .replace(/\r\n/g, '\n')
+      .replace(/\u00a0/g, ' ')
+      .trim();
+
+    if (!normalized) {
+      return [];
+    }
+
+    const paragraphs = normalized
+      .split(/\n{2,}/)
+      .map((part) => part.trim())
+      .filter(Boolean);
+
+    const chunks: string[] = [];
+    const parts = paragraphs.length ? paragraphs : [normalized];
+
+    for (const part of parts) {
+      this.pushChunks(part, chunks);
+    }
+
+    return chunks;
+  }
+
+  private pushChunks(text: string, chunks: string[]): void {
+    const maxLength = 220;
+    let remaining = text.trim();
+
+    while (remaining.length > maxLength) {
+      const breakIndex = this.findChunkBreak(remaining, maxLength);
+      const chunk = remaining.slice(0, breakIndex).trim();
+      if (chunk) {
+        chunks.push(chunk);
+      }
+      remaining = remaining.slice(breakIndex).trim();
+    }
+
+    if (remaining) {
+      chunks.push(remaining);
+    }
+  }
+
+  private findChunkBreak(text: string, maxLength: number): number {
+    const minLength = Math.floor(maxLength * 0.5);
+
+    return this.findBoundaryIndex(text, /[\.\!\?]\s+/g, maxLength, minLength)
+      ?? this.findBoundaryIndex(text, /[;:]\s+/g, maxLength, minLength)
+      ?? this.findBoundaryIndex(text, /,\s+/g, maxLength, minLength)
+      ?? this.findBoundaryIndex(text, /\n+/g, maxLength, minLength)
+      ?? this.findBoundaryIndex(text, /\s+/g, maxLength, minLength)
+      ?? maxLength;
+  }
+
+  private findBoundaryIndex(
+    text: string,
+    pattern: RegExp,
+    maxLength: number,
+    minLength: number
+  ): number | null {
+    let candidate: number | null = null;
+    let match: RegExpExecArray | null = null;
+
+    while ((match = pattern.exec(text)) !== null) {
+      const matchEnd = match.index + match[0].length;
+
+      if (matchEnd > maxLength) {
+        break;
+      }
+
+      if (matchEnd >= minLength) {
+        candidate = matchEnd;
+      }
+    }
+
+    return candidate;
   }
 
   private clearPlaybackState(): void {

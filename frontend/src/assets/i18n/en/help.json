@@ -904,7 +904,7 @@
   },
   "legalDisclaimer": {
     "title": "Disclaimer",
-    "intro": "Here you read the disclaimer, switch language, and can open or download the text.",
+    "intro": "Here you read the disclaimer, switch language, and can have the text read aloud, open it, or download it.",
     "items": {
       "language": {
         "title": "Switch language",
@@ -941,6 +941,10 @@
       "privacy": {
         "title": "Privacy and storage",
         "desc": "Consent status is stored locally in app settings. Opening in a new tab follows browser and server privacy/logging rules."
+      },
+      "readAloud": {
+        "title": "Read aloud",
+        "desc": "Starts or stops reading the currently displayed legal text aloud using your browser or device speech synthesis."
       }
     }
   },
@@ -980,7 +984,7 @@
   },
   "legalNotice": {
     "title": "Legal notice",
-    "intro": "Here you read the legal notice, switch language, and can open or download the text.",
+    "intro": "Here you read the legal notice, switch language, and can have the text read aloud, open it, or download it.",
     "items": {
       "language": {
         "title": "Switch language",
@@ -1013,12 +1017,16 @@
       "privacy": {
         "title": "Privacy and processing",
         "desc": "The legal notice is loaded as static legal text. Opening in a new tab or downloading can create browser and server log data."
+      },
+      "readAloud": {
+        "title": "Read aloud",
+        "desc": "Starts or stops reading the currently displayed legal text aloud using your browser or device speech synthesis."
       }
     }
   },
   "privacyPolicy": {
     "title": "Privacy policy",
-    "intro": "Here you read the privacy policy, switch language, and can open or download the text.",
+    "intro": "Here you read the privacy policy, switch language, and can have the text read aloud, open it, or download it.",
     "items": {
       "language": {
         "title": "Switch language",
@@ -1055,12 +1063,16 @@
       "privacy": {
         "title": "Privacy and storage",
         "desc": "Consent status is stored locally in app settings. Opening in a new tab follows browser and server privacy/logging rules."
+      },
+      "readAloud": {
+        "title": "Read aloud",
+        "desc": "Starts or stops reading the currently displayed legal text aloud using your browser or device speech synthesis."
       }
     }
   },
   "termsOfService": {
     "title": "Terms of service",
-    "intro": "Here you read the terms of service, switch language, and can open or download the text.",
+    "intro": "Here you read the terms of service, switch language, and can have the text read aloud, open it, or download it.",
     "items": {
       "language": {
         "title": "Switch language",
@@ -1097,6 +1109,10 @@
       "privacy": {
         "title": "Privacy and storage",
         "desc": "Consent status is stored locally in app settings. Opening in a new tab follows browser and server privacy/logging rules."
+      },
+      "readAloud": {
+        "title": "Read aloud",
+        "desc": "Starts or stops reading the currently displayed legal text aloud using your browser or device speech synthesis."
       }
     }
   },

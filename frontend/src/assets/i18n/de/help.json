@@ -904,7 +904,7 @@
   },
   "legalDisclaimer": {
     "title": "Haftungsausschluss",
-    "intro": "Hier liest du den Haftungsausschluss, wechselst die Sprache und kannst den Text in neuem Tab öffnen oder herunterladen.",
+    "intro": "Hier liest du den Haftungsausschluss, wechselst die Sprache und kannst den Text vorlesen lassen, in neuem Tab öffnen oder herunterladen.",
     "items": {
       "language": {
         "title": "Sprache wechseln",
@@ -941,6 +941,10 @@
       "privacy": {
         "title": "Datenschutz und Speicherung",
         "desc": "Der Zustimmungsstatus wird lokal in den App-Einstellungen gespeichert. Beim Öffnen in neuem Tab gelten die Datenschutzbestimmungen des Browsers und Servers."
+      },
+      "readAloud": {
+        "title": "Vorlesen",
+        "desc": "Startet oder stoppt das Vorlesen des aktuell angezeigten Rechtstexts über die Sprachsynthese deines Browsers oder Geräts."
       }
     }
   },
@@ -980,7 +984,7 @@
   },
   "legalNotice": {
     "title": "Impressum",
-    "intro": "Hier liest du das Impressum, wechselst die Sprache und kannst den Text in neuem Tab öffnen oder herunterladen.",
+    "intro": "Hier liest du das Impressum, wechselst die Sprache und kannst den Text vorlesen lassen, in neuem Tab öffnen oder herunterladen.",
     "items": {
       "language": {
         "title": "Sprache wechseln",
@@ -1013,12 +1017,16 @@
       "privacy": {
         "title": "Datenschutz und Verarbeitung",
         "desc": "Das Impressum wird als statischer Rechtstext geladen. Beim Öffnen in neuem Tab oder Download können Browser- und Server-Logdaten anfallen."
+      },
+      "readAloud": {
+        "title": "Vorlesen",
+        "desc": "Startet oder stoppt das Vorlesen des aktuell angezeigten Rechtstexts über die Sprachsynthese deines Browsers oder Geräts."
       }
     }
   },
   "privacyPolicy": {
     "title": "Datenschutzerklärung",
-    "intro": "Hier liest du die Datenschutzerklärung, wechselst die Sprache und kannst den Text in neuem Tab öffnen oder herunterladen.",
+    "intro": "Hier liest du die Datenschutzerklärung, wechselst die Sprache und kannst den Text vorlesen lassen, in neuem Tab öffnen oder herunterladen.",
     "items": {
       "language": {
         "title": "Sprache wechseln",
@@ -1055,12 +1063,16 @@
       "privacy": {
         "title": "Datenschutz und Speicherung",
         "desc": "Der Zustimmungsstatus wird lokal in den App-Einstellungen gespeichert. Beim Öffnen in neuem Tab gelten die Datenschutzbestimmungen des Browsers und Servers."
+      },
+      "readAloud": {
+        "title": "Vorlesen",
+        "desc": "Startet oder stoppt das Vorlesen des aktuell angezeigten Rechtstexts über die Sprachsynthese deines Browsers oder Geräts."
       }
     }
   },
   "termsOfService": {
     "title": "Nutzungsbedingungen",
-    "intro": "Hier liest du die Nutzungsbedingungen, wechselst die Sprache und kannst den Text in neuem Tab öffnen oder herunterladen.",
+    "intro": "Hier liest du die Nutzungsbedingungen, wechselst die Sprache und kannst den Text vorlesen lassen, in neuem Tab öffnen oder herunterladen.",
     "items": {
       "language": {
         "title": "Sprache wechseln",
@@ -1097,6 +1109,10 @@
       "privacy": {
         "title": "Datenschutz und Speicherung",
         "desc": "Der Zustimmungsstatus wird lokal in den App-Einstellungen gespeichert. Beim Öffnen in neuem Tab gelten die Datenschutzbestimmungen des Browsers und Servers."
+      },
+      "readAloud": {
+        "title": "Vorlesen",
+        "desc": "Startet oder stoppt das Vorlesen des aktuell angezeigten Rechtstexts über die Sprachsynthese deines Browsers oder Geräts."
       }
     }
   },

@@ -904,7 +904,7 @@
   },
   "legalDisclaimer": {
     "title": "Aviso legal",
-    "intro": "Aquí lees el descargo de responsabilidad, cambias el idioma y puedes abrir o descargar el texto.",
+    "intro": "Aquí puedes leer el descargo de responsabilidad, cambiar el idioma y hacer que el texto se lea en voz alta, abrirlo o descargarlo.",
     "items": {
       "language": {
         "title": "Cambiar idioma",
@@ -941,6 +941,10 @@
       "privacy": {
         "title": "Privacidad y almacenamiento",
         "desc": "El estado de consentimiento se guarda localmente en los ajustes de la app. Al abrir en una pestaña nueva se aplican las reglas de privacidad y registro del navegador y del servidor."
+      },
+      "readAloud": {
+        "title": "Leer en voz alta",
+        "desc": "Inicia o detiene la lectura en voz alta del texto legal mostrado actualmente mediante la síntesis de voz del navegador o del dispositivo."
       }
     }
   },
@@ -980,7 +984,7 @@
   },
   "legalNotice": {
     "title": "Aviso legal",
-    "intro": "Aquí lees el aviso legal, cambias el idioma y puedes abrir o descargar el texto.",
+    "intro": "Aquí puedes leer el aviso legal, cambiar el idioma y hacer que el texto se lea en voz alta, abrirlo o descargarlo.",
     "items": {
       "language": {
         "title": "Cambiar idioma",
@@ -1013,12 +1017,16 @@
       "privacy": {
         "title": "Privacidad y procesamiento",
         "desc": "El aviso legal se carga como texto legal estático. Al abrir en nueva pestaña o descargar pueden generarse datos de registro del navegador y del servidor."
+      },
+      "readAloud": {
+        "title": "Leer en voz alta",
+        "desc": "Inicia o detiene la lectura en voz alta del texto legal mostrado actualmente mediante la síntesis de voz del navegador o del dispositivo."
       }
     }
   },
   "privacyPolicy": {
     "title": "Política de privacidad",
-    "intro": "Aquí lees la política de privacidad, cambias el idioma y puedes abrir o descargar el texto.",
+    "intro": "Aquí puedes leer la política de privacidad, cambiar el idioma y hacer que el texto se lea en voz alta, abrirlo o descargarlo.",
     "items": {
       "language": {
         "title": "Cambiar idioma",
@@ -1055,12 +1063,16 @@
       "privacy": {
         "title": "Privacidad y almacenamiento",
         "desc": "El estado de consentimiento se guarda localmente en los ajustes de la app. Al abrir en una pestaña nueva se aplican las reglas de privacidad y registro del navegador y del servidor."
+      },
+      "readAloud": {
+        "title": "Leer en voz alta",
+        "desc": "Inicia o detiene la lectura en voz alta del texto legal mostrado actualmente mediante la síntesis de voz del navegador o del dispositivo."
       }
     }
   },
   "termsOfService": {
     "title": "Términos de servicio",
-    "intro": "Aquí lees los términos de servicio, cambias el idioma y puedes abrir o descargar el texto.",
+    "intro": "Aquí puedes leer los términos del servicio, cambiar el idioma y hacer que el texto se lea en voz alta, abrirlo o descargarlo.",
     "items": {
       "language": {
         "title": "Cambiar idioma",
@@ -1097,6 +1109,10 @@
       "privacy": {
         "title": "Privacidad y almacenamiento",
         "desc": "El estado de consentimiento se guarda localmente en los ajustes de la app. Al abrir en una pestaña nueva se aplican las reglas de privacidad y registro del navegador y del servidor."
+      },
+      "readAloud": {
+        "title": "Leer en voz alta",
+        "desc": "Inicia o detiene la lectura en voz alta del texto legal mostrado actualmente mediante la síntesis de voz del navegador o del dispositivo."
       }
     }
   },
