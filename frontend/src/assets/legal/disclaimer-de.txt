@@ -23,6 +23,8 @@ Wir übernehmen keine Gewähr für die dauerhafte Kompatibilität mit allen kün
 
 Viele Daten werden lokal auf dem Endgerät gespeichert. Lokale Daten können verloren gehen. Ohne eigenes Backup ist eine Wiederherstellung regelmäßig nicht möglich.
 
+Die optionale Vorlesefunktion hängt von Browser, Betriebssystem, Endgerät, installierten Sprachpaketen und gewählter Stimme ab. Wir garantieren weder die Verfügbarkeit bestimmter Stimmen noch eine lokale Verarbeitung, eine bestimmte Aussprachequalität oder Fehlerfreiheit.
+
 Externe Inhalte, Dienste und verlinkte Webseiten liegen im Verantwortungsbereich der jeweiligen Drittanbieter.
 
 MessageDrop bietet keinen Zugang zu Notfalldiensten.
@@ -94,6 +96,8 @@ Die Nutzung kann – abhängig von Endgerät, Tarif und Anbieter – zu Verbindu
 Für die Nutzung sind ein geeignetes Endgerät, ein unterstütztes Betriebssystem und ein aktueller, gängiger Browser erforderlich.
 
 Bei veralteten, nicht unterstützten oder ungeeigneten Geräten, Betriebssystemen oder Browsern können Funktionen eingeschränkt sein, fehlerhaft arbeiten oder nicht verfügbar sein.
+
+Dies gilt auch für die optionale Vorlesefunktion. Ob Sprachsynthese lokal auf dem Endgerät erfolgt oder Komponenten des Browser-, Betriebssystem- oder Plattformanbieters nutzt, hängt von der konkreten technischen Umgebung und der gewählten Stimme ab. Wir übernehmen keine Gewähr für Verfügbarkeit, Auswahl, Qualität, Aussprache, Unterbrechungsfreiheit oder Kompatibilität einzelner Stimmen oder Sprachpakete.
 
 Die Sicherheit des verwendeten Endgeräts, der installierten Software und des Nutzerzugangs (insbesondere regelmäßige Sicherheitsupdates, Gerätesperre, Schutz vor Schadsoftware und vertrauliche Aufbewahrung von Zugangsdaten/PINs) liegt im Verantwortungsbereich des Nutzers.
 

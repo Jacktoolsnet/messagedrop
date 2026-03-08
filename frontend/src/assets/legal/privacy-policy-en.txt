@@ -1,5 +1,5 @@
 PRIVACY POLICY
-Version: 22 December 2025
+Version: 12 April 2026
 
 IMPORTANT NOTE ON LANGUAGE
 This English translation is provided for convenience only and is not legally binding. The legally binding version is exclusively the current complete German version of this Privacy Policy, including all supplements related to the Digital Services Act (DSA).
@@ -15,6 +15,8 @@ The service can be used without a user account. Certain features require the vol
 Use of MessageDrop is permitted only for persons who are at least 16 years old.
 
 A large portion of data is deliberately stored primarily locally on the user’s device (e.g., in browser or app storage) to ensure data minimization and a high level of data protection. Control over locally stored data generally lies with the user. Local data may be lost or deleted at any time.
+
+The optional read-aloud feature uses the speech synthesis of the browser or operating system. For this purpose, the text selected by the user is passed to the speech component of the device or platform. Depending on the browser, operating system, device, and selected voice, processing may take place locally on the device or via components of the platform provider.
 
 Public content and comments are created by users and may be reported, reviewed, and moderated in accordance with the Digital Services Act (DSA). Content for which a DSA procedure is initiated is temporarily made not publicly visible.
 
@@ -77,6 +79,9 @@ Technical feature for delivering notifications to a device. Push tokens are tech
 
 Local storage
 Storage of data on the user’s device (e.g., IndexedDB, app storage, cache). This data may be deleted by the user or due to technical circumstances.
+
+Read-aloud feature
+Optional feature that allows selected text to be spoken using the browser’s or operating system’s speech synthesis. Which voices are available and whether processing takes place locally or via platform components depends on the browser, operating system, device, and selected voice.
 
 ###
 1. Controller under the GDPR
@@ -169,6 +174,25 @@ When using the service without a user account, users may optionally create local
 These profiles are stored exclusively locally on the user’s device and are visible only to the respective user. No transmission to our servers or publication to other users takes place.
 
 The legal basis is Art. 6(1)(f) GDPR (legitimate interest in user-friendly presentation) or Art. 6(1)(b) GDPR where processing is required to provide a feature used by the user.
+
+###
+2.5 Read-aloud feature / speech synthesis
+###
+
+MessageDrop may provide an optional read-aloud feature where supported by the browser and device. This feature is used only after active initiation by the user.
+
+For the read-aloud feature, the text selected by the user is passed to the speech synthesis of the browser or operating system. By using this feature, no additional content data is transmitted to our servers beyond any data already processed as part of the respective MessageDrop function.
+
+Whether speech synthesis takes place entirely locally on the device or whether components of the browser, operating system, or platform provider are involved depends on the specific technical environment, in particular:
+- browser,
+- operating system,
+- device,
+- installed language packages,
+- selected voice.
+
+We have no influence on the technical implementation or any data processing by browser, operating system, or platform providers in connection with their speech synthesis. Where such providers supply their own components, processing is carried out under the sole responsibility of the respective provider.
+
+The legal basis is Art. 6(1)(b) GDPR (provision of the function requested by the user) and, where necessary, Art. 6(1)(f) GDPR (legitimate interest in accessible and user-friendly functions).
 
 ###
 3. Use with a user account

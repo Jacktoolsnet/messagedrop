@@ -20,6 +20,7 @@ Kurzfassung (vereinfacht, nicht rechtsverbindlich)
 - Du kannst Kontakten sowie Plätzen folgen. Push-Benachrichtigungen sind technisch „Best Effort“ (also ohne Zustellgarantie).
 - Private Chats sind als vertrauliche Kommunikation gedacht. Trotzdem musst du auch dort die Gesetze einhalten.
 - Viele Daten werden lokal auf deinem Gerät gespeichert. Diese Daten können verloren gehen. Ohne eigenes Backup ist eine Wiederherstellung nicht möglich.
+- Die optionale Vorlesefunktion nutzt die Sprachsynthese deines Browsers bzw. Betriebssystems. Verfügbarkeit, Stimmenauswahl und Qualität hängen von Endgerät, Browser, Betriebssystem und gewählter Stimme ab.
 - Der optionale Nutzungszeit-Schutz (Selbstbeschränkung/Elternmodus mit Eltern-PIN) kann technisch umgangen werden; eine absolute Sperre ist nicht garantiert.
 - Externe Inhalte von Drittanbietern werden erst nach deiner anbieterbezogenen Zustimmung geladen. Diese Zustimmung kannst du jederzeit wieder zurücknehmen.
 - Externe Dienste (z. B. YouTube, OpenStreetMap, DeepL, Unsplash, Viator) haben eigene Nutzungs- und Datenschutzbedingungen.
@@ -76,11 +77,13 @@ MessageDrop ist eine Plattform für:
 - öffentliche, ortsbezogene Inhalte (z. B. Nachrichten und Kommentare),
 - private Notizen (lokal auf deinem Gerät),
 - Kontakte und private Chats,
-- optionale Benachrichtigungen und Organisationsfunktionen (z. B. Folgen von Kontakten/Plätzen).
+- optionale Benachrichtigungen, Vorlese- und Organisationsfunktionen (z. B. Folgen von Kontakten/Plätzen).
 
 Datenschutz und Datensparsamkeit sind zentrale Grundsätze von MessageDrop. Wir verfolgen nach Möglichkeit einen „Local-First“-Ansatz: Viele Daten werden primär auf deinem Endgerät gespeichert. Serverseitig verarbeiten wir nur Daten, die für den Betrieb des Dienstes erforderlich sind (z. B. öffentliche Inhalte, pseudonyme Nutzerkennung, öffentliche Schlüssel sowie notwendige Status- und Sicherheitsdaten).
 
 Soweit technisch möglich und sinnvoll, werden Daten kryptografisch geschützt. Dazu gehören insbesondere die PIN-basierte, lokale Absicherung des Nutzerkontos, die verschlüsselte Speicherung sensibler lokaler Daten sowie clientseitig verschlüsselte private Chat-Inhalte. Deine PIN wird ausschließlich lokal verarbeitet und nicht an den Server übertragen.
+
+Soweit technisch verfügbar, kann MessageDrop eine optionale Vorlesefunktion bereitstellen. Diese Funktion dient ausschließlich dem Komfort und der Barrierefreiheit. Welche Stimmen verfügbar sind und ob die Sprachsynthese lokal auf dem Endgerät oder über Komponenten des Browser- bzw. Plattformanbieters erfolgt, hängt vom verwendeten Browser, Betriebssystem, Endgerät und der gewählten Stimme ab.
 
 Wir dürfen Funktionen jederzeit anpassen, erweitern, einschränken oder entfernen.
 

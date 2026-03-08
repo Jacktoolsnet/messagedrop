@@ -14,6 +14,8 @@ Die Nutzung von MessageDrop ist ausschließlich Personen gestattet, die mindeste
 
 Ein Großteil der Daten wird bewusst primär lokal auf dem Endgerät des Nutzers gespeichert (z. B. im Browser- oder App-Speicher), um Datenminimierung und einen hohen Datenschutzstandard zu gewährleisten. Die Kontrolle über diese lokal gespeicherten Daten liegt grundsätzlich beim Nutzer. Ein Verlust oder eine Löschung lokaler Daten ist jederzeit möglich.
 
+Die optionale Vorlesefunktion verwendet die Sprachsynthese des Browsers bzw. Betriebssystems. Der vom Nutzer ausgewählte Text wird dafür an die Sprachkomponente des Endgeräts bzw. der Plattform übergeben. Je nach Browser, Betriebssystem, Endgerät und gewählter Stimme kann die Verarbeitung lokal auf dem Endgerät oder über Komponenten des Plattformanbieters erfolgen.
+
 Ohne ein zuvor erstelltes Backup ist eine Wiederherstellung lokal gelöschter Daten nicht möglich.
 
 Öffentliche Inhalte und Kommentare werden von Nutzern erstellt und können gemäß den Vorgaben des Digital Services Act (DSA) gemeldet, überprüft und moderiert werden. Inhalte, für die ein DSA-Verfahren eingeleitet wird, werden vorübergehend nicht öffentlich sichtbar gestellt.
@@ -89,6 +91,9 @@ Technische Funktion zur Zustellung von Benachrichtigungen an ein Endgerät. Push
 
 Lokale Speicherung
 Speicherung von Daten auf dem Endgerät des Nutzers (z. B. IndexedDB, App-Speicher, Cache). Diese Daten können durch den Nutzer oder durch technische Umstände gelöscht werden.
+
+Vorlesefunktion
+Optionale Funktion, mit der ausgewählte Texte über die Sprachsynthese des Browsers bzw. Betriebssystems vorgelesen werden können. Welche Stimmen verfügbar sind und ob die Verarbeitung lokal oder plattformseitig erfolgt, hängt vom verwendeten Browser, Betriebssystem, Endgerät und der gewählten Stimme ab.
 
 Nutzungszeit-Schutz
 Optionale Funktion zur Begrenzung der Nutzungsdauer (Modus „self“ oder „parental“) mit Tageslimit und optionalen Zeitfenstern.
@@ -216,7 +221,26 @@ Diese Profile werden ausschließlich lokal auf dem Endgerät gespeichert und sin
 Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an nutzerfreundlicher Darstellung) bzw. Art. 6 Abs. 1 lit. b DSGVO, soweit die Verarbeitung zur Bereitstellung einer vom Nutzer genutzten Funktion erforderlich ist.
 
 ###
-2.5 Externe Funktions- und Informationsdienste
+2.5 Vorlesefunktion / Sprachsynthese
+###
+
+MessageDrop kann – soweit vom Browser und Endgerät unterstützt – eine optionale Vorlesefunktion bereitstellen. Diese Funktion wird nur nach aktiver Auslösung durch den Nutzer verwendet.
+
+Für die Vorlesefunktion wird der vom Nutzer ausgewählte Text an die Sprachsynthese des Browsers bzw. Betriebssystems übergeben. Wir erhalten durch die Nutzung dieser Funktion keine zusätzlichen Inhaltsdaten auf unseren Servern, soweit diese Daten nicht ohnehin bereits im Rahmen der jeweiligen MessageDrop-Funktion verarbeitet werden.
+
+Ob die Sprachsynthese vollständig lokal auf dem Endgerät erfolgt oder ob Komponenten des Browser-, Betriebssystem- oder Plattformanbieters eingebunden werden, hängt von der konkreten technischen Umgebung ab, insbesondere von:
+- Browser,
+- Betriebssystem,
+- Endgerät,
+- installierten Sprachpaketen,
+- gewählter Stimme.
+
+Wir haben keinen Einfluss auf die technische Ausgestaltung und eine etwaige Datenverarbeitung durch Browser-, Betriebssystem- oder Plattformanbieter im Zusammenhang mit deren Sprachsynthese. Soweit solche Anbieter eigene Komponenten bereitstellen, erfolgt deren Verarbeitung in eigener Verantwortung des jeweiligen Anbieters.
+
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Bereitstellung der vom Nutzer angeforderten Funktion) sowie, soweit erforderlich, Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an barrierearmen und nutzerfreundlichen Funktionen).
+
+###
+2.6 Externe Funktions- und Informationsdienste
 ###
 
 Für einzelne Funktionen nutzt MessageDrop externe Informations- und API-Dienste, die nicht zwingend als eingebetteter Inhalt erscheinen müssen, insbesondere:

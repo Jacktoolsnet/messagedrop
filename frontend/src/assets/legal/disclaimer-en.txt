@@ -1,5 +1,5 @@
 LIABILITY NOTICE (DISCLAIMER)
-Version: 22 December 2025
+Version: 12 April 2026
 
 IMPORTANT NOTE ON LANGUAGE
 This English translation is provided for convenience only and is not legally binding. The legally binding version is exclusively the current complete German version of this Liability Notice (Disclaimer).
@@ -13,6 +13,8 @@ MessageDrop is a privacy-oriented web app for publishing user-generated content,
 Use of MessageDrop is permitted only for persons who are at least 16 years old. The service is not intended for children under 16. Use by persons under 16 is not intended and is not permitted.
 
 Where technically possible, MessageDrop stores data locally on the user’s device (e.g., IndexedDB) in order to ensure a high level of privacy and data minimization. Locally stored data may be lost.
+
+The optional read-aloud feature depends on the browser, operating system, device, installed language packages, and selected voice. We do not guarantee the availability of specific voices, local processing, any particular pronunciation quality, or error-free operation.
 
 Public content is created by users and may be reported, reviewed, and moderated in accordance with the Digital Services Act (DSA). Content for which a DSA procedure is initiated is temporarily made not publicly visible. Unlawful content is removed or blocked after we become aware of it.
 
@@ -111,6 +113,8 @@ We have no influence on the type, scope, or billing of the internet connection a
 Using MessageDrop requires a suitable device (e.g., smartphone, tablet, or desktop computer) and a current, common web browser that supports modern web standards. Using browsers or systems that do not meet these technical requirements may lead to limitations in functionality, display, or security.
 
 Certain features of MessageDrop may be limited or unavailable in the event of a restricted or missing internet connection or when using unsuitable devices or browsers.
+
+This also applies to the optional read-aloud feature. Whether speech synthesis takes place locally on the device or uses components of the browser, operating system, or platform provider depends on the specific technical environment and the selected voice. We provide no warranty regarding the availability, selection, quality, pronunciation, uninterrupted operation, or compatibility of individual voices or language packages.
 
 ###
 4. Use Without a User Account (Basic Use)

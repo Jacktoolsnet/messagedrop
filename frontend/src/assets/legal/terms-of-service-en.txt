@@ -1,5 +1,5 @@
 TERMS OF USE
-Version: 22 December 2025
+Version: 12 April 2026
 
 IMPORTANT NOTE ON LANGUAGE
 This English translation is provided for convenience only and is not legally binding. The legally binding version is exclusively the current complete German version of these Terms of Use.
@@ -19,6 +19,8 @@ External services and embeds (e.g., YouTube, OpenStreetMap, DeepL) are subject s
 The service may be limited or unavailable at times; no specific availability is guaranteed.
 
 A large portion of the data is stored locally on your device. This data may be lost or deleted; you are responsible for appropriate backups (e.g., via a backup feature, if available).
+
+The optional read-aloud feature uses your browser’s or operating system’s speech synthesis. Availability, voice selection, and quality depend on the device, browser, operating system, and selected voice.
 
 Profiles (name/avatar) may be used locally. When contacting someone, an optional profile sharing request may be sent to a contact; the contact must actively consent. After consent, name and avatar are stored locally on the contact’s device; it is technically impossible to retrieve them.
 
@@ -140,6 +142,8 @@ The service may embed external content or functions, in particular from:
 - Pinterest
 - Tenor
 - Spotify
+
+Where technically available, MessageDrop may also provide an optional read-aloud feature. This feature serves only convenience and accessibility purposes. Which voices are available and whether speech synthesis occurs locally on the device or via components of the browser or platform provider depends on the browser, operating system, device, and selected voice.
 
 There is no entitlement to specific features, displays, reach, rankings, notifications, real-time functions, or permanent availability.
 
