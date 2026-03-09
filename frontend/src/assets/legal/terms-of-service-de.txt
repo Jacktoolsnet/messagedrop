@@ -17,7 +17,7 @@ Kurzfassung (vereinfacht, nicht rechtsverbindlich)
 - Für DSA-Verfahren kann eine öffentliche Statusseite bereitgestellt werden (mit anonymisierten bzw. nicht personenbezogenen Verfahrensinformationen).
 - Rechtswidrige öffentliche Inhalte können über die Meldefunktion im Dienst oder über die im Impressum genannte Kontaktstelle gemeldet werden.
 - Betroffene Nutzer können bei Moderationsentscheidungen – soweit gesetzlich vorgesehen – eine interne Beschwerde einreichen.
-- Du kannst Kontakten sowie Plätzen folgen. Push-Benachrichtigungen sind technisch „Best Effort“ (also ohne Zustellgarantie).
+- Du kannst Kontakten sowie Plätzen folgen. Push-Benachrichtigungen sind eine freiwillige technische Zusatzfunktion; wir schulden keine Zustellung.
 - Private Chats sind als vertrauliche Kommunikation gedacht. Trotzdem musst du auch dort die Gesetze einhalten.
 - Viele Daten werden lokal auf deinem Gerät gespeichert. Diese Daten können verloren gehen. Ohne eigenes Backup ist eine Wiederherstellung nicht möglich.
 - Die optionale Vorlesefunktion nutzt die Sprachsynthese deines Browsers bzw. Betriebssystems. Verfügbarkeit, Stimmenauswahl und Qualität hängen von Endgerät, Browser, Betriebssystem und gewählter Stimme ab.
@@ -125,24 +125,22 @@ Private Chats sind als vertrauliche Kommunikation gedacht. Inhalte werden techni
 Auch in privaten Chats sind rechtswidrige Inhalte, Belästigung, Bedrohungen, Hassrede oder die Weitergabe fremder Daten ohne Erlaubnis verboten.
 
 3) Kontakten folgen  
-Du kannst Kontakten folgen oder das Folgen beenden. Wenn technisch möglich, können Benachrichtigungen über neue Nachrichten von Kontakten gesendet werden.
+Du kannst Kontakten folgen oder das Folgen beenden. Einzelheiten zu Benachrichtigungen regelt Abschnitt 8.
 
 4) Profilfreigabe bei Kontakten  
 Eine Freigabe von Profilinfos (z. B. Name/Avatar) erfolgt nur nach aktiver Zustimmung. Nach der Übertragung auf das Endgerät eines Kontakts ist ein automatisches „Zurückholen“ technisch nicht möglich.
 
+### 
+8. Kontakten und Plätzen folgen und Benachrichtigungen
 ###
-8. Plätzen folgen und Benachrichtigungen
-###
 
-Du kannst Plätzen folgen, um über neue öffentliche Inhalte informiert zu werden.
+Du kannst Kontakten und Plätzen folgen. Wenn die jeweilige Funktion angeboten wird, kann MessageDrop dich über neue Nachrichten von Kontakten oder neue öffentliche Inhalte an Plätzen informieren.
 
-Push- und Echtzeitfunktionen laufen auf „Best Effort“-Basis. Das heißt insbesondere:
+Benachrichtigungen sowie sonstige Push- und Echtzeitfunktionen sind freiwillige technische Zusatzfunktionen. Ihre Verfügbarkeit hängt insbesondere von deinem Endgerät, Betriebssystem, Browser, der Netzverbindung und den technischen Gegebenheiten der eingesetzten Dienste ab.
 
-- Benachrichtigungen können verspätet kommen,
-- gar nicht kommen,
-- oder mehrfach kommen.
+Benachrichtigungen können daher verspätet, unvollständig, mehrfach oder gar nicht erfolgen.
 
-Es gibt keinen Anspruch auf vollständige, sofortige oder fehlerfreie Zustellung.
+Wir schulden keine Zustellung von Benachrichtigungen. Ein Anspruch auf Zustellung besteht nicht. Dies gilt auch für eine teilweise, vollständige, sofortige oder fehlerfreie Zustellung.
 
 ###
 9. Öffentliche Inhalte und deine Verantwortung
@@ -156,13 +154,14 @@ Du bestätigst, dass:
 - deine Inhalte keine Rechte Dritter verletzen,
 - deine Inhalte rechtmäßig sind.
 
-Persönliche Informationen dürfen nicht öffentlich veröffentlicht werden – weder über dich selbst noch über andere Personen.
+Persönliche oder private Informationen dürfen nicht öffentlich veröffentlicht oder verbreitet werden – weder über dich selbst noch über andere Personen. Das gilt auch dann, wenn diese Informationen bereits an anderer Stelle öffentlich zugänglich sind oder die betroffene Person in die Veröffentlichung eingewilligt hat.
 
 Du kannst Erstellern öffentlicher Inhalte lokal eigene Anzeigenamen und Avatare zuordnen. Diese Zuordnungen dienen nur deiner persönlichen Orientierung (z. B. um Beiträge desselben Nutzers wiederzuerkennen), werden ausschließlich lokal auf deinem Endgerät gespeichert und sind für andere Nutzer nicht sichtbar. Solche Zuordnungen sind keine vom jeweiligen Ersteller bestätigten Profilangaben.
 
 Wichtiger Hinweis zur Speicherdauer öffentlicher Inhalte:
-Öffentliche Nachrichten werden nach 30 Tagen gelöscht. Mit einer öffentlichen Nachricht verknüpfte öffentliche Kommentare werden dabei ebenfalls gelöscht.
-Ein Anspruch auf dauerhafte Verfügbarkeit, Archivierung oder Wiederherstellung öffentlicher Inhalte besteht nicht.
+Öffentliche Nachrichten werden in der Regel nach 30 Tagen gelöscht. Mit einer öffentlichen Nachricht verknüpfte öffentliche Kommentare werden in der Regel zusammen mit der jeweiligen Nachricht gelöscht.
+Aus technischen, betrieblichen oder rechtlichen Gründen kann sich die Löschung im Einzelfall verzögern, sodass öffentliche Inhalte ausnahmsweise auch länger verfügbar oder sichtbar bleiben können.
+Ein Anspruch auf dauerhafte Verfügbarkeit, Archivierung, Wiederherstellung oder Löschung zu einem bestimmten Zeitpunkt besteht nicht.
 
 ###
 10. Was verboten ist
@@ -197,7 +196,7 @@ Außerdem verboten sind:
 - Umgehung von Nutzungsbegrenzungen, einschließlich missbräuchlicher Umgehung des Nutzungszeit-Schutzes oder Eltern-PINs,
 - Vortäuschung einer falschen Identität, Partnerschaft oder offiziellen Vertretung.
 
-Das Verbot der Veröffentlichung persönlicher Informationen gilt ausnahmslos, also auch dann, wenn solche Informationen bereits an anderer Stelle im Internet auffindbar sind oder von der betroffenen Person selbst stammen.
+Das Verbot der Veröffentlichung persönlicher Informationen gilt ausnahmslos. Es gilt auch dann, wenn solche Informationen bereits an anderer Stelle im Internet auffindbar sind, von der betroffenen Person selbst stammen oder die betroffene Person in die Veröffentlichung eingewilligt hat.
 
 Die Liste ist nicht abschließend.
 
@@ -237,6 +236,7 @@ Je nach Ergebnis sind insbesondere folgende Maßnahmen möglich:
 - keine Maßnahme (Inhalt bleibt sichtbar),
 - zeitweise Einschränkung oder Ausblendung,
 - endgültige Entfernung,
+- Meldung an zuständige Behörden, soweit wir hierzu rechtlich verpflichtet oder berechtigt sind,
 - zusätzliche Maßnahmen gegen beteiligte Konten bei Verstößen.
 
 ###
@@ -455,11 +455,11 @@ Bei schweren Verstößen (z. B. strafbaren Inhalten oder gravierendem Sicherheit
 
 Wir können diese Nutzungsbedingungen anpassen, wenn dies erforderlich ist (z. B. bei neuen Funktionen oder geänderter Rechtslage).
 
-Änderungen werden mit Veröffentlichung der aktualisierten Fassung wirksam, sofern nicht ein späterer Zeitpunkt angegeben ist.
+Die jeweils aktuelle Fassung wird im Dienst veröffentlicht. Änderungen werden mit Veröffentlichung der aktualisierten Fassung wirksam, sofern nicht ein späterer Zeitpunkt angegeben ist.
 
 Bei wesentlichen Änderungen informieren wir in angemessener Form innerhalb des Dienstes vor Inkrafttreten, soweit dies rechtlich und technisch möglich ist.
 
-Bei wesentlichen Änderungen kann eine erneute Zustimmung erforderlich sein. Ohne erneute Zustimmung kann die Nutzung ganz oder teilweise eingeschränkt sein.
+Bei wesentlichen Änderungen ist für die weitere Nutzung eine erneute Zustimmung erforderlich. Ohne diese Zustimmung ist eine weitere Nutzung ab Inkrafttreten der Änderungen nicht möglich.
 
 ###
 22. Anwendbares Recht und Gerichtsstand
