@@ -1967,9 +1967,13 @@
         "title": "Meine Position ermitteln",
         "desc": "Mit dieser Funktion wird deine aktuelle Position verwendet, sofern du den Standortzugriff erlaubst."
       },
-      "view": {
-        "title": "Karten- und Listenansicht wechseln",
-        "desc": "Mit dieser Funktion wechselst du zwischen Kartenansicht und Trefferliste."
+      "viewMap": {
+        "title": "Kartenansicht öffnen",
+        "desc": "Über das Karten-Symbol wechselst du in die Kartenansicht."
+      },
+      "viewList": {
+        "title": "Listenansicht öffnen",
+        "desc": "Über das Listen-Symbol wechselst du zurück zur Trefferliste."
       },
       "navigate": {
         "title": "Externe Navigation öffnen",

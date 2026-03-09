@@ -1967,9 +1967,13 @@
         "title": "Detect my position",
         "desc": "This action uses your current position when location access is allowed."
       },
-      "view": {
-        "title": "Switch map and list view",
-        "desc": "This action switches between map view and results list."
+      "viewMap": {
+        "title": "Open map view",
+        "desc": "Use the map icon to switch to the map view."
+      },
+      "viewList": {
+        "title": "Open list view",
+        "desc": "Use the list icon to switch back to the results list."
       },
       "navigate": {
         "title": "Open external navigation",

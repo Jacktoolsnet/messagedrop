@@ -1967,9 +1967,13 @@
         "title": "Détecter ma position",
         "desc": "Cette fonction utilise votre position actuelle lorsque l'accès à la localisation est autorisé."
       },
-      "view": {
-        "title": "Basculer carte et liste",
-        "desc": "Cette fonction bascule entre la vue carte et la liste des résultats."
+      "viewMap": {
+        "title": "Ouvrir la vue carte",
+        "desc": "Utilisez l’icône de carte pour passer à la vue carte."
+      },
+      "viewList": {
+        "title": "Ouvrir la vue liste",
+        "desc": "Utilisez l’icône de liste pour revenir à la liste des résultats."
       },
       "navigate": {
         "title": "Ouvrir la navigation externe",

@@ -2522,8 +2522,13 @@ const HELP_TOPICS = {
       },
       {
         icon: 'map',
-        titleKey: 'locationPicker.items.view.title',
-        descriptionKey: 'locationPicker.items.view.desc'
+        titleKey: 'locationPicker.items.viewMap.title',
+        descriptionKey: 'locationPicker.items.viewMap.desc'
+      },
+      {
+        icon: 'list',
+        titleKey: 'locationPicker.items.viewList.title',
+        descriptionKey: 'locationPicker.items.viewList.desc'
       },
       {
         icon: 'assistant_direction',

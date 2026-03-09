@@ -1967,9 +1967,13 @@
         "title": "Detectar mi posición",
         "desc": "Con esta función se usa tu posición actual cuando permites el acceso a ubicación."
       },
-      "view": {
-        "title": "Cambiar entre mapa y lista",
-        "desc": "Con esta función alternas entre la vista de mapa y la lista de resultados."
+      "viewMap": {
+        "title": "Abrir vista de mapa",
+        "desc": "Usa el icono del mapa para cambiar a la vista de mapa."
+      },
+      "viewList": {
+        "title": "Abrir vista de lista",
+        "desc": "Usa el icono de lista para volver a la lista de resultados."
       },
       "navigate": {
         "title": "Abrir navegación externa",
