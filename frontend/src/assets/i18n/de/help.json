@@ -2435,5 +2435,51 @@
   },
   "textDialog": {
     "title": "Text"
+  },
+  "experienceSearchDetail": {
+    "title": "Erlebnisdetails",
+    "intro": "In dieser Detailansicht siehst du die Informationen zu einem Erlebnis kachelweise, kannst alles der Reihe nach vorlesen lassen, es merken und beim Anbieter öffnen.",
+    "items": {
+      "description": {
+        "title": "Beschreibung",
+        "desc": "Zeigt die ausführliche Beschreibung des Erlebnisses."
+      },
+      "supplier": {
+        "title": "Anbieter",
+        "desc": "Zeigt Name, Adresse und verfügbare Kontaktdaten des Anbieters."
+      },
+      "locations": {
+        "title": "Punkte und Trefforte",
+        "desc": "Zeigt Start-, End-, Abhol- und Einlöseorte mit Zusatzhinweisen."
+      },
+      "map": {
+        "title": "Karte",
+        "desc": "Zeigt die relevanten Orte in einer Kartenansicht."
+      },
+      "readAloud": {
+        "title": "Vorlesen",
+        "desc": "Liest alle sichtbaren Informationen kachelweise der Reihe nach vor oder stoppt die Wiedergabe."
+      },
+      "bookmark": {
+        "title": "Merken oder entfernen",
+        "desc": "Speichert das Erlebnis in deiner Liste oder entfernt es wieder."
+      },
+      "provider": {
+        "title": "Bei Viator öffnen",
+        "desc": "Öffnet die Angebotsseite beim Anbieter."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Schließt die Detailansicht."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Öffnet diese Hilfeansicht."
+      },
+      "privacy": {
+        "title": "Datenschutz und Verarbeitung",
+        "desc": "Detailabfragen werden an den Erlebnisanbieter übermittelt. Beim Öffnen externer Links gelten die Datenschutzbestimmungen des Anbieters und von Kartenanbietern."
+      }
+    }
   }
 }

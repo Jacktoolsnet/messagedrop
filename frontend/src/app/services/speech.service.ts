@@ -172,6 +172,14 @@ export class SpeechService {
     return this.resolveVoice(lang, settingsOverride);
   }
 
+  getVoiceStorageId(voice: SpeechSynthesisVoice): string {
+    const uri = (voice.voiceURI || '').trim();
+    if (uri) {
+      return `uri:${uri}`;
+    }
+    return `name:${voice.name}::${voice.lang}`;
+  }
+
   stopIfCurrentTarget(targetId: string): void {
     if (this.currentTargetId() === targetId) {
       this.stop();
@@ -199,7 +207,7 @@ export class SpeechService {
     }
 
     if (settings.voiceMode === 'custom' && settings.voiceUri) {
-      const customVoice = voices.find((voice) => voice.voiceURI === settings.voiceUri);
+      const customVoice = voices.find((voice) => this.matchesStoredVoiceId(settings.voiceUri ?? '', voice));
       if (customVoice) {
         return customVoice;
       }
@@ -382,5 +390,23 @@ export class SpeechService {
     this.currentText.set('');
     this.speaking.set(false);
     this.paused.set(false);
+  }
+
+  private matchesStoredVoiceId(storedId: string, voice: SpeechSynthesisVoice): boolean {
+    const normalizedStoredId = (storedId || '').trim();
+    if (!normalizedStoredId) {
+      return false;
+    }
+
+    if (normalizedStoredId === this.getVoiceStorageId(voice)) {
+      return true;
+    }
+
+    const voiceUri = (voice.voiceURI || '').trim();
+    if (voiceUri && normalizedStoredId === voiceUri) {
+      return true;
+    }
+
+    return normalizedStoredId === `${voice.name}::${voice.lang}`;
   }
 }

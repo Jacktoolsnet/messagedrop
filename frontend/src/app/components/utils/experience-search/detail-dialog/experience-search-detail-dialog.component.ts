@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnDestroy, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -20,8 +20,10 @@ import {
   ViatorSupplierProductInfo,
   ViatorSuppliersResponse
 } from '../../../../interfaces/viator';
+import { AppService } from '../../../../services/app.service';
 import { ViatorService } from '../../../../services/viator.service';
 import { ExperienceBookmarkService } from '../../../../services/experience-bookmark.service';
+import { SpeechService } from '../../../../services/speech.service';
 import { UserService } from '../../../../services/user.service';
 import { SearchSettingsMapPreviewComponent } from '../../search-settings/search-settings-map-preview.component';
 import { HelpDialogService } from '../../help-dialog/help-dialog.service';
@@ -49,14 +51,17 @@ const DEFAULT_CENTER: Location = { latitude: 0, longitude: 0, plusCode: '' };
   styleUrl: './experience-search-detail-dialog.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ExperienceSearchDetailDialogComponent {
+export class ExperienceSearchDetailDialogComponent implements OnDestroy {
   private readonly destroyRef = inject(DestroyRef);
+  private readonly appService = inject(AppService);
   private readonly viatorService = inject(ViatorService);
   private readonly transloco = inject(TranslocoService);
   private readonly bookmarkService = inject(ExperienceBookmarkService);
+  private readonly speechService = inject(SpeechService);
   private readonly userService = inject(UserService);
   private readonly dialog = inject(MatDialog);
   private readonly userSet = this.userService.userSet;
+  private readonly speechTargetId = 'experience-search-detail';
   readonly data = inject<ExperienceSearchDetailDialogData>(MAT_DIALOG_DATA);
   readonly help = inject(HelpDialogService);
 
@@ -97,6 +102,10 @@ export class ExperienceSearchDetailDialogComponent {
     });
   }
 
+  ngOnDestroy(): void {
+    this.stopReadAloud();
+  }
+
   getExperienceHeaderBackgroundImage(): string {
     return this.data.result.imageUrl ? `url("${this.data.result.imageUrl}")` : 'none';
   }
@@ -135,6 +144,45 @@ export class ExperienceSearchDetailDialogComponent {
     if (this.data.result.productUrl) {
       window.open(this.data.result.productUrl, '_blank');
     }
+  }
+
+  toggleReadAloud(): void {
+    if (!this.speechService.supported()) {
+      this.showDisplayMessage('common.actions.readAloud', 'common.speech.unsupported', 'record_voice_over', false);
+      return;
+    }
+
+    if (!this.appService.getAppSettings().speech?.enabled) {
+      this.showDisplayMessage('common.actions.readAloud', 'common.speech.disabled', 'record_voice_over', false);
+      return;
+    }
+
+    const text = this.getReadAloudText();
+    if (!text) {
+      return;
+    }
+
+    this.speechService.toggle({
+      targetId: this.speechTargetId,
+      text,
+      lang: this.transloco.getActiveLang()
+    });
+  }
+
+  isReadAloudActive(): boolean {
+    return this.speechService.isActive(this.speechTargetId);
+  }
+
+  getReadAloudIcon(): string {
+    return this.isReadAloudActive() ? 'stop' : 'volume_up';
+  }
+
+  getReadAloudLabel(): string {
+    return this.transloco.translate(
+      this.isReadAloudActive()
+        ? 'common.actions.stopReadAloud'
+        : 'common.actions.readAloud'
+    );
   }
 
   onBookmark(): void {
@@ -260,6 +308,121 @@ export class ExperienceSearchDetailDialogComponent {
         onConfirm();
       }
     });
+  }
+
+  private getReadAloudText(): string {
+    const sections = [
+      this.buildOverviewSection(),
+      this.buildSection(
+        this.transloco.translate('common.experiences.description'),
+        [this.detail()?.description || this.data.result.description || '']
+      ),
+      this.buildSupplierSection(),
+      this.buildLocationSection(
+        this.transloco.translate(
+          this.sameStartEnd() ? 'common.experiences.startEndPoint' : 'common.experiences.startPoint'
+        ),
+        this.sameStartEnd() ? this.getCombinedPointItems() : this.startItems()
+      ),
+      this.sameStartEnd()
+        ? null
+        : this.buildLocationSection(
+          this.transloco.translate('common.experiences.endPoint'),
+          this.endItems()
+        ),
+      this.buildLocationSection(
+        this.transloco.translate('common.experiences.redemptionPoint'),
+        this.redemptionItems()
+      ),
+      this.buildLocationSection(
+        this.transloco.translate('common.experiences.pickupPoint'),
+        this.pickupItems()
+      ),
+      this.buildMapSection()
+    ].filter((section): section is string => Boolean(section));
+
+    return sections.join('\n\n').trim();
+  }
+
+  private buildOverviewSection(): string | null {
+    const lines = [
+      this.data.result.title || this.data.result.productCode || '',
+      this.transloco.translate('common.experiences.sourceViator'),
+      this.getDurationLabel()
+        ? `${this.transloco.translate('common.experiences.durationPrefix')} ${this.getDurationLabel()}`
+        : '',
+      this.getRatingLabel()
+        ? `${this.transloco.translate('common.experiences.ratingPrefix')} ${this.getRatingLabel()}`
+        : '',
+      this.getPriceLabel()
+        ? `${this.transloco.translate('common.experiences.pricePrefix')} ${this.getPriceLabel()}`
+        : ''
+    ].map((line) => line.trim()).filter(Boolean);
+
+    return lines.length ? lines.join('\n') : null;
+  }
+
+  private buildSupplierSection(): string | null {
+    if (this.supplierAccessDenied()) {
+      return this.buildSection(
+        this.transloco.translate('common.experiences.supplier'),
+        [this.transloco.translate('common.experiences.supplierUnavailable')]
+      );
+    }
+
+    const supplier = this.supplierInfo();
+    if (!supplier) {
+      return null;
+    }
+
+    return this.buildSection(
+      this.transloco.translate('common.experiences.supplier'),
+      [
+        supplier.name || '',
+        supplier.contact?.address || '',
+        supplier.contact?.email || '',
+        supplier.contact?.phone || ''
+      ]
+    );
+  }
+
+  private buildLocationSection(title: string, items: ExperienceDetailLocationItem[]): string | null {
+    if (!items.length) {
+      return null;
+    }
+
+    const lines = items
+      .map((item) => [
+        item.name || item.address || this.transloco.translate('common.experiences.locationUnavailable'),
+        item.name && item.address ? item.address : '',
+        item.description || ''
+      ].map((value) => (value ?? '').trim()).filter(Boolean).join('\n'))
+      .filter(Boolean);
+
+    return this.buildSection(title, lines);
+  }
+
+  private buildMapSection(): string | null {
+    const labels = this.mapMarkers()
+      .map((marker) => marker.label?.trim() || '')
+      .filter(Boolean);
+
+    if (!labels.length) {
+      return null;
+    }
+
+    return this.buildSection(
+      this.transloco.translate('common.experiences.map'),
+      labels
+    );
+  }
+
+  private buildSection(title: string, parts: string[]): string | null {
+    const lines = parts.map((part) => part.trim()).filter(Boolean);
+    if (!lines.length) {
+      return null;
+    }
+    return [title, ...lines].join('\n');
   }
 
   private loadDetails(): void {
@@ -632,5 +795,9 @@ export class ExperienceSearchDetailDialogComponent {
       return false;
     }
     return Math.abs(aLat - bLat) < 1e-6 && Math.abs(aLng - bLng) < 1e-6;
+  }
+
+  private stopReadAloud(): void {
+    this.speechService.stopIfCurrentTarget(this.speechTargetId);
   }
 }

@@ -132,8 +132,8 @@
             <mat-label>{{ 'settings.speech.voiceLabel' | transloco }}</mat-label>
             <mat-select [value]="getResolvedSpeechVoiceUri()" (selectionChange)="setSpeechVoiceUri($event.value)"
               [disabled]="!appSettings.speech.enabled">
-              @for (voice of speechService.voices(); track voice.voiceURI) {
-                <mat-option [value]="voice.voiceURI">
+              @for (voice of speechService.voices(); track getSpeechVoiceOptionValue(voice)) {
+                <mat-option [value]="getSpeechVoiceOptionValue(voice)">
                   {{ voice.name }} ({{ voice.lang }})
                 </mat-option>
               }

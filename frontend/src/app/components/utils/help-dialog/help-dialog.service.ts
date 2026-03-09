@@ -2792,6 +2792,62 @@ const HELP_TOPICS = {
       }
     ]
   },
+  experienceSearchDetail: {
+    titleKey: 'experienceSearchDetail.title',
+    introKey: 'experienceSearchDetail.intro',
+    items: [
+      {
+        icon: 'description',
+        titleKey: 'experienceSearchDetail.items.description.title',
+        descriptionKey: 'experienceSearchDetail.items.description.desc'
+      },
+      {
+        icon: 'support_agent',
+        titleKey: 'experienceSearchDetail.items.supplier.title',
+        descriptionKey: 'experienceSearchDetail.items.supplier.desc'
+      },
+      {
+        icon: 'place',
+        titleKey: 'experienceSearchDetail.items.locations.title',
+        descriptionKey: 'experienceSearchDetail.items.locations.desc'
+      },
+      {
+        icon: 'map',
+        titleKey: 'experienceSearchDetail.items.map.title',
+        descriptionKey: 'experienceSearchDetail.items.map.desc'
+      },
+      {
+        icon: 'record_voice_over',
+        titleKey: 'experienceSearchDetail.items.readAloud.title',
+        descriptionKey: 'experienceSearchDetail.items.readAloud.desc'
+      },
+      {
+        icon: 'bookmark_add',
+        titleKey: 'experienceSearchDetail.items.bookmark.title',
+        descriptionKey: 'experienceSearchDetail.items.bookmark.desc'
+      },
+      {
+        icon: 'shopping_cart',
+        titleKey: 'experienceSearchDetail.items.provider.title',
+        descriptionKey: 'experienceSearchDetail.items.provider.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'experienceSearchDetail.items.close.title',
+        descriptionKey: 'experienceSearchDetail.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'experienceSearchDetail.items.help.title',
+        descriptionKey: 'experienceSearchDetail.items.help.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'experienceSearchDetail.items.privacy.title',
+        descriptionKey: 'experienceSearchDetail.items.privacy.desc'
+      }
+    ]
+  },
   rangeEditDialog: {
     titleKey: 'rangeEditDialog.title',
     introKey: 'rangeEditDialog.intro',

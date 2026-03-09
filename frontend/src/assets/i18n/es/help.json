@@ -2435,5 +2435,51 @@
   },
   "textDialog": {
     "title": "Texto"
+  },
+  "experienceSearchDetail": {
+    "title": "Detalles de la experiencia",
+    "intro": "Esta vista de detalles muestra la información de la experiencia mosaico por mosaico, te permite leerlo todo en voz alta en orden, guardarla y abrirla con el proveedor.",
+    "items": {
+      "description": {
+        "title": "Descripción",
+        "desc": "Muestra la descripción completa de la experiencia."
+      },
+      "supplier": {
+        "title": "Proveedor",
+        "desc": "Muestra el nombre, la dirección y los datos de contacto disponibles del proveedor."
+      },
+      "locations": {
+        "title": "Puntos y lugares de encuentro",
+        "desc": "Muestra los puntos de inicio, fin, recogida y canje con notas adicionales."
+      },
+      "map": {
+        "title": "Mapa",
+        "desc": "Muestra los lugares relevantes en una vista de mapa."
+      },
+      "readAloud": {
+        "title": "Leer en voz alta",
+        "desc": "Lee toda la información visible en voz alta, mosaico por mosaico y en orden, o detiene la reproducción."
+      },
+      "bookmark": {
+        "title": "Guardar o quitar",
+        "desc": "Guarda la experiencia en tu lista o la elimina de nuevo."
+      },
+      "provider": {
+        "title": "Abrir en Viator",
+        "desc": "Abre la página de la oferta con el proveedor."
+      },
+      "close": {
+        "title": "Cerrar",
+        "desc": "Cierra la vista de detalles."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Abre esta vista de ayuda."
+      },
+      "privacy": {
+        "title": "Privacidad y tratamiento",
+        "desc": "Las consultas de detalles se envían al proveedor de la experiencia. Al abrir enlaces externos se aplican las políticas de privacidad del proveedor y de los servicios de mapas."
+      }
+    }
   }
 }

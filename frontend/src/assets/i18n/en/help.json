@@ -2435,5 +2435,51 @@
   },
   "textDialog": {
     "title": "Text"
+  },
+  "experienceSearchDetail": {
+    "title": "Experience details",
+    "intro": "This detail view shows the experience information tile by tile, lets you read everything aloud in order, bookmark it, and open it with the provider.",
+    "items": {
+      "description": {
+        "title": "Description",
+        "desc": "Shows the full description of the experience."
+      },
+      "supplier": {
+        "title": "Supplier",
+        "desc": "Shows the supplier name, address, and available contact details."
+      },
+      "locations": {
+        "title": "Points and meeting places",
+        "desc": "Shows start, end, pickup, and redemption points with additional notes."
+      },
+      "map": {
+        "title": "Map",
+        "desc": "Shows the relevant places in a map view."
+      },
+      "readAloud": {
+        "title": "Read aloud",
+        "desc": "Reads all visible information aloud tile by tile in order or stops playback."
+      },
+      "bookmark": {
+        "title": "Bookmark or remove",
+        "desc": "Saves the experience to your list or removes it again."
+      },
+      "provider": {
+        "title": "Open on Viator",
+        "desc": "Opens the offer page with the provider."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "Closes the detail view."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "Opens this help view."
+      },
+      "privacy": {
+        "title": "Privacy and processing",
+        "desc": "Detail requests are sent to the experience provider. When opening external links, the provider and map service privacy policies apply."
+      }
+    }
   }
 }

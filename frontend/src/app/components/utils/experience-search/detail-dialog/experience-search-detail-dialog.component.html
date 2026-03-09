@@ -309,9 +309,13 @@
   <button mat-dialog-close mat-icon-button class="action-close" [attr.aria-label]="'common.actions.abort' | transloco">
     <mat-icon>close</mat-icon>
   </button>
-  <button mat-icon-button type="button" (click)="help.open('experienceSearch')"
+  <button mat-icon-button type="button" (click)="help.open('experienceSearchDetail')"
     [attr.aria-label]="'common.actions.help' | transloco">
     <mat-icon>help</mat-icon>
+  </button>
+  <button mat-icon-button type="button" (click)="toggleReadAloud()"
+    [attr.aria-label]="getReadAloudLabel()">
+    <mat-icon>{{ getReadAloudIcon() }}</mat-icon>
   </button>
   <button mat-icon-button type="button" (click)="onBookmark()"
     [attr.aria-label]="(isBookmarked() ? 'common.experiences.saved' : 'common.experiences.save') | transloco">

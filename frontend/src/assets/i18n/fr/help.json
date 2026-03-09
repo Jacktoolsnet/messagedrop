@@ -2435,5 +2435,51 @@
   },
   "textDialog": {
     "title": "Texte"
+  },
+  "experienceSearchDetail": {
+    "title": "Détails de l’expérience",
+    "intro": "Cette vue détaillée affiche les informations de l’expérience tuile par tuile, permet de tout lire à voix haute dans l’ordre, de l’enregistrer et de l’ouvrir chez le prestataire.",
+    "items": {
+      "description": {
+        "title": "Description",
+        "desc": "Affiche la description complète de l’expérience."
+      },
+      "supplier": {
+        "title": "Prestataire",
+        "desc": "Affiche le nom, l’adresse et les coordonnées disponibles du prestataire."
+      },
+      "locations": {
+        "title": "Points et lieux de rendez-vous",
+        "desc": "Affiche les points de départ, d’arrivée, de prise en charge et d’échange avec des indications supplémentaires."
+      },
+      "map": {
+        "title": "Carte",
+        "desc": "Affiche les lieux pertinents sur une carte."
+      },
+      "readAloud": {
+        "title": "Lire à voix haute",
+        "desc": "Lit toutes les informations visibles à voix haute, tuile par tuile et dans l’ordre, ou arrête la lecture."
+      },
+      "bookmark": {
+        "title": "Enregistrer ou retirer",
+        "desc": "Enregistre l’expérience dans votre liste ou la retire à nouveau."
+      },
+      "provider": {
+        "title": "Ouvrir sur Viator",
+        "desc": "Ouvre la page de l’offre chez le prestataire."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Ferme la vue détaillée."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Ouvre cette vue d’aide."
+      },
+      "privacy": {
+        "title": "Confidentialité et traitement",
+        "desc": "Les requêtes de détail sont envoyées au prestataire de l’expérience. Lors de l’ouverture de liens externes, les règles de confidentialité du prestataire et des services de cartographie s’appliquent."
+      }
+    }
   }
 }

@@ -347,12 +347,16 @@ export class AppSettingsComponent implements OnInit {
     return this.appSettings.speech.voiceUri || this.getRecommendedSpeechVoiceUri();
   }
 
+  getSpeechVoiceOptionValue(voice: SpeechSynthesisVoice): string {
+    return this.speechService.getVoiceStorageId(voice);
+  }
+
   private getRecommendedSpeechVoiceUri(): string {
     const voice = this.speechService.getRecommendedVoice(this.languageService.effectiveLanguage(), {
       ...this.appSettings.speech,
       enabled: true
     });
-    return voice?.voiceURI ?? '';
+    return voice ? this.speechService.getVoiceStorageId(voice) : '';
   }
 
   private resetPreviewState(): void {

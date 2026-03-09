@@ -999,7 +999,9 @@
       "select": "Auswählen",
       "loadMore": "Mehr laden",
       "searchFailed": "Suche fehlgeschlagen. Bitte erneut versuchen.",
-      "providerNotAvailable": "Der ausgewählte Anbieter ist nicht verfügbar."
+      "providerNotAvailable": "Der ausgewählte Anbieter ist nicht verfügbar.",
+      "ratingPrefix": "Bewertung:",
+      "pricePrefix": "Preis:"
     },
     "searchSettings": {
       "title": "Sucheinstellungen",
