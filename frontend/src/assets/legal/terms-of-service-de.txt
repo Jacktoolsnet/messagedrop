@@ -17,7 +17,7 @@ Kurzfassung (vereinfacht, nicht rechtsverbindlich)
 - Für DSA-Verfahren kann eine öffentliche Statusseite bereitgestellt werden (mit anonymisierten bzw. nicht personenbezogenen Verfahrensinformationen).
 - Rechtswidrige öffentliche Inhalte können über die Meldefunktion im Dienst oder über die im Impressum genannte Kontaktstelle gemeldet werden.
 - Betroffene Nutzer können bei Moderationsentscheidungen – soweit gesetzlich vorgesehen – eine interne Beschwerde einreichen.
-- Du kannst Kontakten sowie Plätzen folgen. Push-Benachrichtigungen sind eine freiwillige technische Zusatzfunktion; wir schulden keine Zustellung.
+- Du kannst Kontakten sowie Plätzen folgen. Benachrichtigungen sind freiwillige technische Zusatzfunktionen; wir schulden keine Zustellung.
 - Private Chats sind als vertrauliche Kommunikation gedacht. Trotzdem musst du auch dort die Gesetze einhalten.
 - Viele Daten werden lokal auf deinem Gerät gespeichert. Diese Daten können verloren gehen. Ohne eigenes Backup ist eine Wiederherstellung nicht möglich.
 - Die optionale Vorlesefunktion nutzt die Sprachsynthese deines Browsers bzw. Betriebssystems. Verfügbarkeit, Stimmenauswahl und Qualität hängen von Endgerät, Browser, Betriebssystem und gewählter Stimme ab.
@@ -125,18 +125,18 @@ Private Chats sind als vertrauliche Kommunikation gedacht. Inhalte werden techni
 Auch in privaten Chats sind rechtswidrige Inhalte, Belästigung, Bedrohungen, Hassrede oder die Weitergabe fremder Daten ohne Erlaubnis verboten.
 
 3) Kontakten folgen  
-Du kannst Kontakten folgen oder das Folgen beenden. Einzelheiten zu Benachrichtigungen regelt Abschnitt 8.
+Du kannst Kontakten folgen oder das Folgen beenden. Für Benachrichtigungen beim Folgen von Kontakten und Plätzen gilt Abschnitt 8.
 
 4) Profilfreigabe bei Kontakten  
 Eine Freigabe von Profilinfos (z. B. Name/Avatar) erfolgt nur nach aktiver Zustimmung. Nach der Übertragung auf das Endgerät eines Kontakts ist ein automatisches „Zurückholen“ technisch nicht möglich.
 
-### 
+###
 8. Kontakten und Plätzen folgen und Benachrichtigungen
 ###
 
-Du kannst Kontakten und Plätzen folgen. Wenn die jeweilige Funktion angeboten wird, kann MessageDrop dich über neue Nachrichten von Kontakten oder neue öffentliche Inhalte an Plätzen informieren.
+Du kannst Kontakten und Plätzen folgen. Soweit die jeweilige Funktion angeboten wird, kann MessageDrop dich über neue Nachrichten von Kontakten oder neue öffentliche Inhalte an Plätzen informieren.
 
-Benachrichtigungen sowie sonstige Push- und Echtzeitfunktionen sind freiwillige technische Zusatzfunktionen. Ihre Verfügbarkeit hängt insbesondere von deinem Endgerät, Betriebssystem, Browser, der Netzverbindung und den technischen Gegebenheiten der eingesetzten Dienste ab.
+Benachrichtigungen sowie sonstige Push- oder Echtzeitfunktionen sind freiwillige technische Zusatzfunktionen. Ihre Verfügbarkeit hängt insbesondere von deinem Endgerät, Betriebssystem, Browser, der Netzverbindung und den technischen Gegebenheiten der eingesetzten Dienste ab.
 
 Benachrichtigungen können daher verspätet, unvollständig, mehrfach oder gar nicht erfolgen.
 
@@ -154,7 +154,7 @@ Du bestätigst, dass:
 - deine Inhalte keine Rechte Dritter verletzen,
 - deine Inhalte rechtmäßig sind.
 
-Persönliche oder private Informationen dürfen nicht öffentlich veröffentlicht oder verbreitet werden – weder über dich selbst noch über andere Personen. Das gilt auch dann, wenn diese Informationen bereits an anderer Stelle öffentlich zugänglich sind oder die betroffene Person in die Veröffentlichung eingewilligt hat.
+Persönliche oder private Informationen dürfen nicht öffentlich veröffentlicht oder sonst öffentlich zugänglich gemacht werden – weder über dich selbst noch über andere Personen. Das gilt auch dann, wenn diese Informationen bereits an anderer Stelle öffentlich zugänglich sind oder die betroffene Person in die Veröffentlichung eingewilligt hat.
 
 Du kannst Erstellern öffentlicher Inhalte lokal eigene Anzeigenamen und Avatare zuordnen. Diese Zuordnungen dienen nur deiner persönlichen Orientierung (z. B. um Beiträge desselben Nutzers wiederzuerkennen), werden ausschließlich lokal auf deinem Endgerät gespeichert und sind für andere Nutzer nicht sichtbar. Solche Zuordnungen sind keine vom jeweiligen Ersteller bestätigten Profilangaben.
 
@@ -178,7 +178,7 @@ Verboten sind insbesondere:
 - Hassrede, Gewaltverherrlichung, extremistische oder menschenverachtende Inhalte,
 - pornografische, sexuell explizite oder jugendgefährdende Inhalte,
 - Inhalte mit sexuellem Bezug zu Minderjährigen,
-- Veröffentlichung oder Verbreitung persönlicher Informationen (personenbezogener Daten), unabhängig davon, ob sie dich selbst oder andere Personen betreffen.
+- öffentliche Veröffentlichung oder sonstige unbefugte Verbreitung persönlicher Informationen (personenbezogener Daten), unabhängig davon, ob sie dich selbst oder andere Personen betreffen.
 
 Zu persönlichen Informationen zählen insbesondere:
 - Namen, Kontaktdaten, E-Mail-Adressen, Telefonnummern,
@@ -196,7 +196,7 @@ Außerdem verboten sind:
 - Umgehung von Nutzungsbegrenzungen, einschließlich missbräuchlicher Umgehung des Nutzungszeit-Schutzes oder Eltern-PINs,
 - Vortäuschung einer falschen Identität, Partnerschaft oder offiziellen Vertretung.
 
-Das Verbot der Veröffentlichung persönlicher Informationen gilt ausnahmslos. Es gilt auch dann, wenn solche Informationen bereits an anderer Stelle im Internet auffindbar sind, von der betroffenen Person selbst stammen oder die betroffene Person in die Veröffentlichung eingewilligt hat.
+Das Verbot der öffentlichen Veröffentlichung persönlicher Informationen gilt ausnahmslos. Es gilt auch dann, wenn solche Informationen bereits an anderer Stelle im Internet auffindbar sind, von der betroffenen Person selbst stammen oder die betroffene Person in die Veröffentlichung eingewilligt hat.
 
 Die Liste ist nicht abschließend.
 
