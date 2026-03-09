@@ -6,9 +6,9 @@ Kurzfassung (vereinfacht, nicht rechtsverbindlich)
 ###
 
 - Mit der Nutzung von MessageDrop akzeptierst du diese Nutzungsbedingungen.
-- Die Nutzung ist erst ab 16 Jahren erlaubt.
-- Wenn du 16 oder 17 bist, brauchst du die Zustimmung deiner Eltern oder Erziehungsberechtigten.
-- Rechtlich verbindliche Erklärungen, die über die normale App-Nutzung hinausgehen, sind grundsätzlich nur ab 18 Jahren möglich.
+- Die Nutzung ist erst mit Vollendung des 16. Lebensjahres erlaubt.
+- Wenn du das 16. Lebensjahr vollendet hast, aber das 18. Lebensjahr noch nicht vollendet hast, brauchst du die Zustimmung deiner Eltern oder Erziehungsberechtigten.
+- Rechtlich verbindliche Erklärungen, die über die normale App-Nutzung hinausgehen, sind grundsätzlich erst mit Vollendung des 18. Lebensjahres möglich.
 - MessageDrop kann ohne Nutzerkonto genutzt werden. Einige Funktionen sind dann nicht verfügbar.
 - Für Inhalte, die du veröffentlichst oder versendest, bist du selbst verantwortlich.
 - Unzulässige Inhalte (z. B. rechtswidrige Inhalte, Hass, Gewalt, persönliche Informationen) sind verboten.
@@ -60,11 +60,11 @@ Diese Bedingungen gelten für alle Personen, die MessageDrop nutzen – mit oder
 3. Mindestalter (16/18-Regel)
 ###
 
-Die Nutzung ist nur für Personen ab 16 Jahren erlaubt.
+Die Nutzung ist nur für Personen erlaubt, die das 16. Lebensjahr vollendet haben.
 
-- Unter 16 Jahren: Nutzung ist nicht erlaubt.
-- 16 bis 17 Jahre: Nutzung ist nur mit Zustimmung der Eltern oder Erziehungsberechtigten erlaubt.
-- Ab 18 Jahren: volle Geschäftsfähigkeit; die Nutzung ist selbstbestimmt erlaubt.
+- Wer das 16. Lebensjahr noch nicht vollendet hat: Nutzung ist nicht erlaubt.
+- Wer das 16. Lebensjahr vollendet hat, aber das 18. Lebensjahr noch nicht vollendet hat: Nutzung ist nur mit Zustimmung der Eltern oder Erziehungsberechtigten erlaubt.
+- Wer das 18. Lebensjahr vollendet hat: volle Geschäftsfähigkeit; die Nutzung ist selbstbestimmt erlaubt.
 
 Erklärungen mit weitergehender rechtlicher Bindung (also über die normale Nutzung hinaus) dürfen nur voll geschäftsfähige Personen abgeben.
 
