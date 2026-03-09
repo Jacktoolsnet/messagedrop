@@ -119,7 +119,7 @@ MessageDrop kann Funktionen für Kontakte und private Kommunikation enthalten.
 Dazu gilt:
 
 1) Private Chats  
-Private Chats sind als vertrauliche Kommunikation gedacht. Inhalte werden technisch geschützt übertragen. Eine absolut fehlerfreie oder jederzeit verfügbare Zustellung können wir aber nicht garantieren.
+Private Chats sind als vertrauliche Kommunikation gedacht. Inhalte werden technisch geschützt übertragen. Die Zustellung kann sich jedoch verzögern, technisch fehlschlagen oder im Einzelfall ausbleiben; ein Anspruch auf erfolgreiche, jederzeitige, sofortige oder fehlerfreie Zustellung besteht nicht.
 
 2) Verantwortung im Chat  
 Auch in privaten Chats sind rechtswidrige Inhalte, Belästigung, Bedrohungen, Hassrede oder die Weitergabe fremder Daten ohne Erlaubnis verboten.
