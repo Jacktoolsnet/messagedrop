@@ -249,8 +249,16 @@
                         <span><strong>Posting blocked until:</strong> {{ formatBlockUntil(moderationState()?.posting?.blockedUntil) }}</span>
                     </div>
                     <div class="kv">
+                        <mat-icon>info</mat-icon>
+                        <span><strong>Posting reason:</strong> {{ formatReason(moderationState()?.posting?.reason, 'posting') }}</span>
+                    </div>
+                    <div class="kv">
                         <mat-icon>schedule</mat-icon>
                         <span><strong>Account blocked until:</strong> {{ formatBlockUntil(moderationState()?.account?.blockedUntil) }}</span>
+                    </div>
+                    <div class="kv">
+                        <mat-icon>info</mat-icon>
+                        <span><strong>Account reason:</strong> {{ formatReason(moderationState()?.account?.reason, 'account') }}</span>
                     </div>
                 </div>
 
@@ -258,10 +266,24 @@
                     <label for="signal-blocked-until"><strong>Temporary block until (optional):</strong></label>
                     <input id="signal-blocked-until" type="datetime-local" [value]="blockedUntilLocal()"
                         (change)="onBlockedUntilInput($any($event.target).value)" />
-                    <button mat-stroked-button type="button" (click)="clearBlockedUntil()" [disabled]="moderationBusy()">
-                        <mat-icon>event_busy</mat-icon>
-                        Clear expiry
-                    </button>
+                </div>
+
+                <div class="block-reason-row">
+                    <label for="signal-posting-reason"><strong>Posting block reason:</strong></label>
+                    <select id="signal-posting-reason" [value]="postingReason()" (change)="postingReason.set($any($event.target).value)">
+                        @for (option of postingReasonOptions; track option.code) {
+                        <option [value]="option.code">{{ option.label }}</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="block-reason-row">
+                    <label for="signal-account-reason"><strong>Account block reason:</strong></label>
+                    <select id="signal-account-reason" [value]="accountReason()" (change)="accountReason.set($any($event.target).value)">
+                        @for (option of accountReasonOptions; track option.code) {
+                        <option [value]="option.code">{{ option.label }}</option>
+                        }
+                    </select>
                 </div>
 
                 <div class="counters">

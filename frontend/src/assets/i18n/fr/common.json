@@ -1186,6 +1186,40 @@
         "fileTypeInvalid": "Veuillez sélectionner un fichier image valide.",
         "fileTooLarge": "L'image est trop grande. Taille maximale autorisée : {{ maxSizeMb }} Mo.",
         "fileReadError": "Erreur lors de la lecture du fichier."
+      },
+      "appeal": {
+        "title": "Recours",
+        "hint": "Si vous pensez que cette restriction a été appliquée par erreur, vous pouvez déposer un recours ici.",
+        "messageLabel": "Motif de votre recours",
+        "submit": "Envoyer le recours",
+        "submitSuccess": "Recours envoyé.",
+        "submitError": "Le recours n’a pas pu être envoyé. Veuillez réessayer plus tard.",
+        "alreadyOpen": "Un recours est déjà ouvert pour cette restriction.",
+        "targetNotBlocked": "Cette restriction n’est plus active.",
+        "messageRequired": "Veuillez indiquer brièvement pourquoi vous contestez cette décision.",
+        "filedAt": "Déposé :",
+        "resolvedAt": "Décidé :",
+        "resolutionLabel": "Décision :",
+        "status": {
+          "open": "Ouvert",
+          "accepted": "Accepté",
+          "rejected": "Rejeté"
+        }
+      },
+      "moderationReasons": {
+        "illegal_content": "Contenu illégal ou criminel",
+        "rights_violation": "Violation des droits de tiers",
+        "harassment_or_threats": "Insultes, harcèlement ou menaces",
+        "hate_or_extremism": "Discours haineux, glorification de la violence ou contenu extrémiste",
+        "sexual_or_youth_endangering": "Contenu pornographique ou dangereux pour les mineurs",
+        "sexual_content_minors": "Contenu sexuel impliquant des mineurs",
+        "personal_data_exposure": "Divulgation de données personnelles",
+        "fraud_or_impersonation": "Fraude, tromperie ou usurpation d’identité",
+        "spam_or_abusive_automation": "Spam ou automatisation abusive",
+        "malware_or_security_attack": "Malware ou attaque contre la sécurité",
+        "circumvention_or_misuse": "Contournement des protections ou usage abusif",
+        "underage_or_missing_consent": "Utilisateur mineur ou absence de consentement parental",
+        "serious_or_repeated_violations": "Infractions graves ou répétées"
       }
     },
     "speech": {

@@ -39,14 +39,17 @@
   box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
 }
 
-.tile-blocked {
+.tile-blocked,
+.tile-posting-blocked {
   grid-column: 1 / -1;
+}
+
+.tile-blocked {
   border: 1px solid rgba(237, 108, 2, 0.28);
   background: linear-gradient(135deg, rgba(255, 183, 77, 0.16), rgba(255, 243, 224, 0.72));
 }
 
 .tile-posting-blocked {
-  grid-column: 1 / -1;
   border: 1px solid rgba(214, 142, 0, 0.28);
   background: linear-gradient(135deg, rgba(255, 224, 130, 0.16), rgba(255, 248, 225, 0.72));
 }
@@ -91,7 +94,7 @@
 
 .blocked-copy {
   display: grid;
-  gap: 0.6rem;
+  gap: 0.75rem;
 }
 
 .blocked-copy p,
@@ -126,6 +129,88 @@
   color: #dc3545;
 }
 
+.appeal-section {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.appeal-section-title {
+  font-weight: 700;
+}
+
+.appeal-hint,
+.appeal-state,
+.appeal-entry-meta {
+  color: rgba(0, 0, 0, 0.68);
+}
+
+.appeal-open {
+  font-weight: 600;
+}
+
+.appeal-field {
+  width: 100%;
+}
+
+.appeal-actions-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.appeal-history {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.appeal-entry {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.8rem;
+  border-radius: 0.8rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.appeal-entry-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.appeal-entry-message {
+  margin: 0;
+}
+
+.appeal-status-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.8rem;
+  padding: 0 0.7rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.appeal-status-chip.open {
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
+}
+
+.appeal-status-chip.accepted {
+  background: rgba(34, 197, 94, 0.12);
+  color: #15803d;
+}
+
+.appeal-status-chip.rejected {
+  background: rgba(239, 68, 68, 0.12);
+  color: #b91c1c;
+}
+
 .sticky-actions {
   position: sticky;
   bottom: 0;
@@ -150,4 +235,11 @@
   display: inline-flex;
   align-items: center;
   white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .appeal-entry-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }

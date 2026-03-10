@@ -507,6 +507,7 @@ router.get('/platform/:userId', requireRole('moderator', 'legal', 'admin', 'root
         return res.json({
             status: 200,
             moderation: moderationResp.data.moderation,
+            appeals: moderationResp.data.appeals || [],
             summary
         });
     } catch (error) {
@@ -572,6 +573,7 @@ router.patch('/platform/:userId/moderation', requireRole('moderator', 'legal', '
                 reason,
                 blockedUntil,
                 moderation: moderationResp.data.moderation,
+                appeals: moderationResp.data.appeals || [],
                 summary,
                 ip: req.ip || null
             }
@@ -579,10 +581,73 @@ router.patch('/platform/:userId/moderation', requireRole('moderator', 'legal', '
         return res.json({
             status: 200,
             moderation: moderationResp.data.moderation,
+            appeals: moderationResp.data.appeals || [],
             summary
         });
     } catch (error) {
         const apiErr = apiError.internal('platform_user_update_failed');
+        apiErr.detail = error?.message || String(error);
+        return next(apiErr);
+    }
+});
+
+router.patch('/platform/appeals/:appealId', requireRole('admin', 'root'), async (req, res, next) => {
+    const appealId = String(req.params.appealId || '').trim();
+    if (!isUuid(appealId)) {
+        return next(apiError.badRequest('invalid_appeal_id'));
+    }
+
+    const status = String(req.body?.status || '').trim().toLowerCase();
+    const resolutionMessage = typeof req.body?.resolutionMessage === 'string' ? req.body.resolutionMessage.trim() : null;
+    const reviewer = req.admin?.username || req.admin?.sub || 'admin';
+
+    if (status !== 'accepted' && status !== 'rejected') {
+        return next(apiError.badRequest('invalid_status'));
+    }
+
+    try {
+        const backendResp = await callPublicBackend('patch', `/user/internal/moderation/appeals/${encodeURIComponent(appealId)}`, {
+            status,
+            resolutionMessage,
+            reviewer
+        });
+
+        if (backendResp.status === 404) return next(apiError.notFound('not_found'));
+        if (backendResp.status === 409) return next(apiError.conflict(backendResp.data?.error || backendResp.data?.message || 'conflict'));
+        if (backendResp.status === 403) return next(apiError.forbidden(backendResp.data?.error || backendResp.data?.message || 'forbidden'));
+        if (backendResp.status >= 400 || !backendResp.data?.appeal) {
+            const apiErr = apiError.badGateway('backend_request_failed');
+            apiErr.detail = backendResp.data?.error || backendResp.data?.message || backendResp.statusText;
+            return next(apiErr);
+        }
+
+        const appeal = backendResp.data.appeal;
+        const summary = await buildPlatformUserSummary(req.database.db, appeal.userId);
+        recordPlatformUserAudit(req.database.db, {
+            userId: appeal.userId,
+            action: status === 'accepted' ? 'platform_user_appeal_accept' : 'platform_user_appeal_reject',
+            actor: reviewer,
+            details: {
+                appealId,
+                target: appeal.target,
+                status,
+                resolutionMessage,
+                moderation: backendResp.data.moderation,
+                appeals: backendResp.data.appeals || [],
+                summary,
+                ip: req.ip || null
+            }
+        }, req.logger);
+
+        return res.json({
+            status: 200,
+            appeal,
+            moderation: backendResp.data.moderation,
+            appeals: backendResp.data.appeals || [],
+            summary
+        });
+    } catch (error) {
+        const apiErr = apiError.internal('platform_user_appeal_update_failed');
         apiErr.detail = error?.message || String(error);
         return next(apiErr);
     }

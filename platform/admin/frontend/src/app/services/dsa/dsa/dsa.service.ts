@@ -605,4 +605,19 @@ export class DsaService {
     );
   }
 
+  resolvePlatformUserAppeal(
+    appealId: string,
+    payload: { status: 'accepted' | 'rejected'; resolutionMessage?: string | null; }
+  ): Observable<PlatformUserModerationResponse> {
+    return this.http.patch<PlatformUserModerationResponse>(
+      `${this.userBaseUrl}/platform/appeals/${encodeURIComponent(appealId)}`,
+      payload
+    ).pipe(
+      catchError(err => {
+        this.snack.open('Could not update user appeal.', 'OK', { duration: 3000 });
+        throw err;
+      })
+    );
+  }
+
 }

@@ -13,10 +13,10 @@
         </div>
         <div class="tile-body blocked-copy">
           <p>{{ 'common.user.blocked.message' | transloco }}</p>
-          @if (userService.getAccountBlockedReason()) {
+          @if (reasonLabel(userService.getAccountBlockedReason()); as accountReason) {
           <p class="blocked-meta">
             <strong>{{ 'common.user.blocked.reasonLabel' | transloco }}</strong>
-            <span>{{ userService.getAccountBlockedReason() }}</span>
+            <span>{{ accountReason }}</span>
           </p>
           }
           @if (userService.getAccountBlockedUntil()) {
@@ -30,6 +30,51 @@
             <span>{{ 'common.user.blocked.permanentLabel' | transloco }}</span>
           </p>
           }
+
+          <section class="appeal-section">
+            <div class="appeal-section-title">{{ 'common.user.appeal.title' | transloco }}</div>
+            <p class="appeal-hint">{{ 'common.user.appeal.hint' | transloco }}</p>
+
+            @if (hasOpenAppeal('account')) {
+            <p class="appeal-state appeal-open">{{ 'common.user.appeal.alreadyOpen' | transloco }}</p>
+            } @else {
+            <mat-form-field appearance="outline" class="appeal-field" subscriptSizing="dynamic">
+              <mat-label>{{ 'common.user.appeal.messageLabel' | transloco }}</mat-label>
+              <textarea matInput rows="4" [formControl]="appealForm.controls.accountMessage"></textarea>
+            </mat-form-field>
+            <div class="appeal-actions-row">
+              <button mat-stroked-button color="primary" type="button" (click)="submitAppeal('account')"
+                [disabled]="submittingTarget() === 'account' || appealForm.controls.accountMessage.invalid">
+                <mat-icon>mail</mat-icon>
+                {{ 'common.user.appeal.submit' | transloco }}
+              </button>
+            </div>
+            }
+
+            @if (appealsFor('account').length > 0) {
+            <div class="appeal-history">
+              @for (appeal of appealsFor('account'); track appeal.id) {
+              <article class="appeal-entry">
+                <div class="appeal-entry-header">
+                  <span class="appeal-status-chip" [class.open]="appeal.status === 'open'" [class.accepted]="appeal.status === 'accepted'" [class.rejected]="appeal.status === 'rejected'">
+                    {{ appealStatusLabel(appeal.status) }}
+                  </span>
+                  @if (appeal.createdAt) {
+                  <span class="appeal-entry-meta">{{ 'common.user.appeal.filedAt' | transloco }} {{ appeal.createdAt | date:'short' }}</span>
+                  }
+                </div>
+                <p class="appeal-entry-message">{{ appeal.message }}</p>
+                @if (appeal.resolutionMessage) {
+                <p class="appeal-entry-meta">{{ 'common.user.appeal.resolutionLabel' | transloco }} {{ appeal.resolutionMessage }}</p>
+                }
+                @if (appeal.resolvedAt) {
+                <p class="appeal-entry-meta">{{ 'common.user.appeal.resolvedAt' | transloco }} {{ appeal.resolvedAt | date:'short' }}</p>
+                }
+              </article>
+              }
+            </div>
+            }
+          </section>
         </div>
       </mat-card-content>
     </mat-card>
@@ -44,10 +89,10 @@
         </div>
         <div class="tile-body blocked-copy">
           <p>{{ 'common.user.postingBlocked.message' | transloco }}</p>
-          @if (userService.getPostingBlockedReason()) {
+          @if (reasonLabel(userService.getPostingBlockedReason()); as postingReason) {
           <p class="blocked-meta">
             <strong>{{ 'common.user.postingBlocked.reasonLabel' | transloco }}</strong>
-            <span>{{ userService.getPostingBlockedReason() }}</span>
+            <span>{{ postingReason }}</span>
           </p>
           }
           @if (userService.getPostingBlockedUntil()) {
@@ -61,6 +106,51 @@
             <span>{{ 'common.user.postingBlocked.permanentLabel' | transloco }}</span>
           </p>
           }
+
+          <section class="appeal-section">
+            <div class="appeal-section-title">{{ 'common.user.appeal.title' | transloco }}</div>
+            <p class="appeal-hint">{{ 'common.user.appeal.hint' | transloco }}</p>
+
+            @if (hasOpenAppeal('posting')) {
+            <p class="appeal-state appeal-open">{{ 'common.user.appeal.alreadyOpen' | transloco }}</p>
+            } @else {
+            <mat-form-field appearance="outline" class="appeal-field" subscriptSizing="dynamic">
+              <mat-label>{{ 'common.user.appeal.messageLabel' | transloco }}</mat-label>
+              <textarea matInput rows="4" [formControl]="appealForm.controls.postingMessage"></textarea>
+            </mat-form-field>
+            <div class="appeal-actions-row">
+              <button mat-stroked-button color="primary" type="button" (click)="submitAppeal('posting')"
+                [disabled]="submittingTarget() === 'posting' || appealForm.controls.postingMessage.invalid">
+                <mat-icon>mail</mat-icon>
+                {{ 'common.user.appeal.submit' | transloco }}
+              </button>
+            </div>
+            }
+
+            @if (appealsFor('posting').length > 0) {
+            <div class="appeal-history">
+              @for (appeal of appealsFor('posting'); track appeal.id) {
+              <article class="appeal-entry">
+                <div class="appeal-entry-header">
+                  <span class="appeal-status-chip" [class.open]="appeal.status === 'open'" [class.accepted]="appeal.status === 'accepted'" [class.rejected]="appeal.status === 'rejected'">
+                    {{ appealStatusLabel(appeal.status) }}
+                  </span>
+                  @if (appeal.createdAt) {
+                  <span class="appeal-entry-meta">{{ 'common.user.appeal.filedAt' | transloco }} {{ appeal.createdAt | date:'short' }}</span>
+                  }
+                </div>
+                <p class="appeal-entry-message">{{ appeal.message }}</p>
+                @if (appeal.resolutionMessage) {
+                <p class="appeal-entry-meta">{{ 'common.user.appeal.resolutionLabel' | transloco }} {{ appeal.resolutionMessage }}</p>
+                }
+                @if (appeal.resolvedAt) {
+                <p class="appeal-entry-meta">{{ 'common.user.appeal.resolvedAt' | transloco }} {{ appeal.resolvedAt | date:'short' }}</p>
+                }
+              </article>
+              }
+            </div>
+            }
+          </section>
         </div>
       </mat-card-content>
     </mat-card>

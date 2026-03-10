@@ -12,6 +12,21 @@ export interface PlatformUserModeration {
   account: PlatformUserModerationState;
 }
 
+export type PlatformUserModerationAppealTarget = 'posting' | 'account';
+export type PlatformUserModerationAppealStatus = 'open' | 'accepted' | 'rejected';
+
+export interface PlatformUserModerationAppeal {
+  id: string;
+  userId: string;
+  target: PlatformUserModerationAppealTarget;
+  status: PlatformUserModerationAppealStatus;
+  message: string;
+  createdAt: number | null;
+  resolvedAt: number | null;
+  resolutionMessage: string | null;
+  reviewer: string | null;
+}
+
 export interface PlatformUserSummary {
   signals: {
     total: number;
@@ -32,6 +47,7 @@ export interface PlatformUserSummary {
 export interface PlatformUserModerationResponse {
   status: number;
   moderation: PlatformUserModeration;
+  appeals?: PlatformUserModerationAppeal[];
   summary: PlatformUserSummary;
+  appeal?: PlatformUserModerationAppeal;
 }
-

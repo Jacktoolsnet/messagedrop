@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { environment } from '../../../../../environments/environment';
+import { USER_ACCOUNT_BLOCK_REASONS, USER_POSTING_BLOCK_REASONS, findModerationReasonLabel } from '../../../../constants/user-moderation-reasons';
 import { DsaNoticeStatus } from '../../../../interfaces/dsa-notice-status.type';
 import { DsaNotice } from '../../../../interfaces/dsa-notice.interface';
 import { PlatformUserModeration, PlatformUserSummary } from '../../../../interfaces/platform-user-moderation.interface';
@@ -118,6 +119,10 @@ export class NoticeDetailComponent implements OnInit {
   moderationSummary = signal<PlatformUserSummary | null>(null);
   moderationBusy = signal(false);
   blockedUntilLocal = signal<string>('');
+  readonly postingReasonOptions = USER_POSTING_BLOCK_REASONS;
+  readonly accountReasonOptions = USER_ACCOUNT_BLOCK_REASONS;
+  readonly postingReason = signal(USER_POSTING_BLOCK_REASONS[0]?.code ?? '');
+  readonly accountReason = signal(USER_ACCOUNT_BLOCK_REASONS[0]?.code ?? '');
 
   close(ok = false) {
     this.ref.close(ok || this.dirty);
@@ -255,6 +260,8 @@ export class NoticeDetailComponent implements OnInit {
         const postingUntil = this.toLocalDateTimeValue(res?.moderation?.posting?.blockedUntil ?? null);
         const accountUntil = this.toLocalDateTimeValue(res?.moderation?.account?.blockedUntil ?? null);
         this.blockedUntilLocal.set(postingUntil || accountUntil || '');
+        this.syncReasonSelection('posting', res?.moderation?.posting?.reason ?? null);
+        this.syncReasonSelection('account', res?.moderation?.account?.reason ?? null);
       },
       complete: () => this.moderationBusy.set(false)
     });
@@ -263,13 +270,13 @@ export class NoticeDetailComponent implements OnInit {
   blockPosting() {
     const userId = this.platformUserId();
     if (!userId) return;
-    this.updateModeration(userId, 'posting', true, 'blocked_from_notice_detail');
+    this.updateModeration(userId, 'posting', true, this.postingReason());
   }
 
   blockAccount() {
     const userId = this.platformUserId();
     if (!userId) return;
-    this.updateModeration(userId, 'account', true, 'blocked_from_notice_detail');
+    this.updateModeration(userId, 'account', true, this.accountReason());
   }
 
   unblockPosting() {
@@ -295,6 +302,8 @@ export class NoticeDetailComponent implements OnInit {
       next: (res) => {
         this.moderationState.set(res?.moderation ?? null);
         this.moderationSummary.set(res?.summary ?? null);
+        this.syncReasonSelection('posting', res?.moderation?.posting?.reason ?? null);
+        this.syncReasonSelection('account', res?.moderation?.account?.reason ?? null);
         if (target === 'posting') {
           this.blockedUntilLocal.set(this.toLocalDateTimeValue(res?.moderation?.posting?.blockedUntil ?? null));
         } else {
@@ -320,6 +329,10 @@ export class NoticeDetailComponent implements OnInit {
     return this.formatTimestamp(ts);
   }
 
+  formatReason(reason: string | null | undefined, target: 'posting' | 'account'): string {
+    return findModerationReasonLabel(reason, target === 'posting' ? this.postingReasonOptions : this.accountReasonOptions);
+  }
+
   private parseBlockedUntil(): number | null {
     const raw = this.blockedUntilLocal()?.trim();
     if (!raw) return null;
@@ -338,6 +351,17 @@ export class NoticeDetailComponent implements OnInit {
     const hh = String(d.getHours()).padStart(2, '0');
     const mm = String(d.getMinutes()).padStart(2, '0');
     return `${y}-${m}-${day}T${hh}:${mm}`;
+  }
+
+  private syncReasonSelection(target: 'posting' | 'account', reason: string | null): void {
+    const options = target === 'posting' ? this.postingReasonOptions : this.accountReasonOptions;
+    const fallback = options[0]?.code ?? '';
+    const next = options.some((option) => option.code === reason) ? (reason || fallback) : fallback;
+    if (target === 'posting') {
+      this.postingReason.set(next);
+      return;
+    }
+    this.accountReason.set(next);
   }
 
   private updateMediaFromContent(): void {

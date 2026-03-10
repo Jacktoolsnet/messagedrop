@@ -244,13 +244,25 @@ mat-chip.status {
     align-items: center;
 }
 
-.block-until-row input[type="datetime-local"] {
+.block-until-row input[type="datetime-local"],
+.block-reason-row select {
     min-height: 36px;
     border: 1px solid var(--border);
     border-radius: 10px;
     padding: .35rem .55rem;
     background: var(--surface);
     color: var(--text);
+}
+
+.block-reason-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .6rem;
+    align-items: center;
+}
+
+.block-reason-row select {
+    min-width: min(100%, 420px);
 }
 
 .counters span {

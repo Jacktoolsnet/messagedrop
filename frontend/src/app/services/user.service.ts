@@ -22,6 +22,7 @@ import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { User } from '../interfaces/user';
 import { UserChallengeResponse } from '../interfaces/user-challenge-response';
 import { UserLoginResponse } from '../interfaces/user-login-response';
+import { UserModerationAppeal, UserModerationResponse, UserModerationTarget } from '../interfaces/user-moderation-response.interface';
 import { UserType } from '../interfaces/user-type';
 import { AvatarStorageService } from './avatar-storage.service';
 import { BackupStateService } from './backup-state.service';
@@ -101,6 +102,8 @@ export class UserService {
   readonly postingBlockedReason = this.postingBlockedReasonSignal.asReadonly();
   private readonly postingBlockedUntilSignal = signal<number | null>(null);
   readonly postingBlockedUntil = this.postingBlockedUntilSignal.asReadonly();
+  private readonly moderationAppealsSignal = signal<UserModerationAppeal[]>([]);
+  readonly moderationAppeals = this.moderationAppealsSignal.asReadonly();
 
   private tokenRenewalTimeout: ReturnType<typeof setTimeout> | null = null;
   private accountStatusRefreshPromise?: Promise<void>;
@@ -567,12 +570,17 @@ export class UserService {
     this.postingBlockedSignal.set(false);
     this.postingBlockedReasonSignal.set(null);
     this.postingBlockedUntilSignal.set(null);
+    this.moderationAppealsSignal.set([]);
   }
 
   private markAccountBlockedWithoutDetails(): void {
     this.accountBlockedSignal.set(true);
     this.accountBlockedReasonSignal.set(null);
     this.accountBlockedUntilSignal.set(null);
+    this.postingBlockedSignal.set(false);
+    this.postingBlockedReasonSignal.set(null);
+    this.postingBlockedUntilSignal.set(null);
+    this.moderationAppealsSignal.set([]);
   }
 
   private hasApiMessage(error: unknown, expected: string): boolean {
@@ -602,10 +610,45 @@ export class UserService {
   private applyModerationStateFromAuthError(error: unknown): boolean {
     if (this.hasApiMessage(error, 'user_account_blocked')) {
       this.markAccountBlockedWithoutDetails();
+      void this.refreshAccountStatus();
       return true;
     }
 
     return false;
+  }
+
+  private applyModerationResponse(response?: UserModerationResponse | null): void {
+    const moderation = response?.moderation;
+    if (!moderation) {
+      this.clearAccountBlockedState();
+      return;
+    }
+
+    this.accountBlockedSignal.set(moderation.account?.blocked === true);
+    this.accountBlockedReasonSignal.set(
+      moderation.account?.blocked && typeof moderation.account.reason === 'string' && moderation.account.reason.trim()
+        ? moderation.account.reason.trim()
+        : null
+    );
+    this.accountBlockedUntilSignal.set(
+      moderation.account?.blocked && Number.isFinite(Number(moderation.account.blockedUntil)) && Number(moderation.account.blockedUntil) > 0
+        ? Number(moderation.account.blockedUntil)
+        : null
+    );
+
+    this.postingBlockedSignal.set(moderation.posting?.blocked === true);
+    this.postingBlockedReasonSignal.set(
+      moderation.posting?.blocked && typeof moderation.posting.reason === 'string' && moderation.posting.reason.trim()
+        ? moderation.posting.reason.trim()
+        : null
+    );
+    this.postingBlockedUntilSignal.set(
+      moderation.posting?.blocked && Number.isFinite(Number(moderation.posting.blockedUntil)) && Number(moderation.posting.blockedUntil) > 0
+        ? Number(moderation.posting.blockedUntil)
+        : null
+    );
+
+    this.moderationAppealsSignal.set(Array.isArray(response?.appeals) ? response.appeals : []);
   }
 
   private applyAccountBlockedState(rawUser?: OwnUserStatusResponse['rawUser']): void {
@@ -648,7 +691,7 @@ export class UserService {
       return;
     }
 
-    if (!this.hasJwt()) {
+    if (!this.hasJwt() && !this.user?.signingKeyPair?.privateKey) {
       return;
     }
 
@@ -658,28 +701,40 @@ export class UserService {
 
     this.accountStatusRefreshPromise = (async () => {
       const requestedUserId = this.user.id;
+      const hasJwt = this.hasJwt();
       try {
-        const response = await firstValueFrom(
-          this.http.get<OwnUserStatusResponse>(
-            `${environment.apiUrl}/user/get/${requestedUserId}`,
-            {
-              headers: new HttpHeaders({
-                'x-skip-ui': 'true'
-              })
-            }
-          ).pipe(catchError(this.handleError))
-        );
-        if (!this.hasJwt() || this.user.id !== requestedUserId) {
+        if (hasJwt) {
+          const response = await firstValueFrom(
+            this.http.get<UserModerationResponse>(
+              `${environment.apiUrl}/user/moderation/${requestedUserId}`,
+              {
+                headers: new HttpHeaders({
+                  'x-skip-ui': 'true'
+                })
+              }
+            ).pipe(catchError(this.handleError))
+          );
+          if (this.user.id !== requestedUserId) {
+            return;
+          }
+          this.applyModerationResponse(response);
           return;
         }
-        this.applyAccountBlockedState(response?.rawUser ?? null);
+
+        const response = await this.fetchSignedModerationStatus(this.user);
+        if (this.user.id !== requestedUserId) {
+          return;
+        }
+        this.applyModerationResponse(response);
       } catch (err) {
         if (this.user.id !== requestedUserId) {
           return;
         }
-        const status = this.getHttpStatus(err);
-        if (status === 401 || status === 403 || status === 404) {
-          this.clearAccountBlockedState();
+        if (hasJwt) {
+          const status = this.getHttpStatus(err);
+          if (status === 401 || status === 403 || status === 404) {
+            this.clearAccountBlockedState();
+          }
         }
       } finally {
         this.accountStatusRefreshPromise = undefined;
@@ -687,6 +742,77 @@ export class UserService {
     })();
 
     return this.accountStatusRefreshPromise;
+  }
+
+  getModerationAppeals(): UserModerationAppeal[] {
+    return this.moderationAppealsSignal();
+  }
+
+  async submitModerationAppeal(target: UserModerationTarget, message: string): Promise<UserModerationResponse> {
+    const user = this.getUser();
+    const trimmedMessage = typeof message === 'string' ? message.trim() : '';
+    if (!user?.id || !user.signingKeyPair?.privateKey || !trimmedMessage) {
+      throw new Error('missing_appeal_context');
+    }
+
+    const signedPayload = await this.createSignedModerationPayload(user);
+    const response = await firstValueFrom(
+      this.http.post<UserModerationResponse>(
+        `${environment.apiUrl}/user/moderation/appeal`,
+        {
+          ...signedPayload,
+          target,
+          message: trimmedMessage
+        },
+        {
+          headers: new HttpHeaders({
+            'x-skip-ui': 'true'
+          })
+        }
+      ).pipe(catchError(this.handleError))
+    );
+    this.applyModerationResponse(response);
+    return response;
+  }
+
+  private requestModerationChallenge(userId: string): Observable<UserChallengeResponse> {
+    return this.http.post<UserChallengeResponse>(
+      `${environment.apiUrl}/user/moderation/challenge`,
+      { userId },
+      {
+        headers: new HttpHeaders({
+          'x-skip-ui': 'true'
+        })
+      }
+    ).pipe(catchError(this.handleError));
+  }
+
+  private async createSignedModerationPayload(user: User): Promise<{ userId: string; challenge: string; signature: string; }> {
+    const challengeResponse = await firstValueFrom(this.requestModerationChallenge(user.id));
+    const signature = await this.cryptoService.createSignature(
+      user.signingKeyPair.privateKey,
+      challengeResponse.challenge
+    );
+    return {
+      userId: user.id,
+      challenge: challengeResponse.challenge,
+      signature
+    };
+  }
+
+  private async fetchSignedModerationStatus(user: User): Promise<UserModerationResponse> {
+    const signedPayload = await this.createSignedModerationPayload(user);
+    return firstValueFrom(
+      this.http.post<UserModerationResponse>(
+        `${environment.apiUrl}/user/moderation/status`,
+        signedPayload,
+        {
+          headers: new HttpHeaders({
+            'x-skip-ui': 'true'
+          })
+        }
+      ).pipe(catchError(this.handleError))
+    );
   }
 
   private renewJwt(): void {

@@ -9,11 +9,22 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTimepickerModule } from '@angular/material/timepicker';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterLink } from '@angular/router';
-import { PlatformUserModeration, PlatformUserSummary } from '../../../interfaces/platform-user-moderation.interface';
+import {
+  findModerationReasonLabel,
+  USER_ACCOUNT_BLOCK_REASONS,
+  USER_POSTING_BLOCK_REASONS
+} from '../../../constants/user-moderation-reasons';
+import {
+  PlatformUserModeration,
+  PlatformUserModerationAppeal,
+  PlatformUserModerationAppealStatus,
+  PlatformUserSummary
+} from '../../../interfaces/platform-user-moderation.interface';
 import { DsaService } from '../../../services/dsa/dsa/dsa.service';
 
 @Component({
@@ -32,6 +43,7 @@ import { DsaService } from '../../../services/dsa/dsa/dsa.service';
     MatProgressBarModule,
     MatDatepickerModule,
     MatTimepickerModule,
+    MatSelectModule,
     MatSnackBarModule
   ],
   templateUrl: './user-moderation.component.html',
@@ -43,8 +55,13 @@ export class UserModerationComponent {
   private readonly dsa = inject(DsaService);
   private readonly snackBar = inject(MatSnackBar);
 
+  readonly postingReasonOptions = USER_POSTING_BLOCK_REASONS;
+  readonly accountReasonOptions = USER_ACCOUNT_BLOCK_REASONS;
+
   readonly form = this.fb.group({
     userId: this.fb.nonNullable.control('', { validators: [Validators.required] }),
+    postingReason: this.fb.nonNullable.control(USER_POSTING_BLOCK_REASONS[0]?.code ?? '', { validators: [Validators.required] }),
+    accountReason: this.fb.nonNullable.control(USER_ACCOUNT_BLOCK_REASONS[0]?.code ?? '', { validators: [Validators.required] }),
     postingBlockedUntilDate: this.fb.control<Date | null>(null),
     postingBlockedUntilTime: this.fb.control<Date | null>(null),
     accountBlockedUntilDate: this.fb.control<Date | null>(null),
@@ -54,60 +71,43 @@ export class UserModerationComponent {
   readonly loading = signal(false);
   readonly moderation = signal<PlatformUserModeration | null>(null);
   readonly summary = signal<PlatformUserSummary | null>(null);
+  readonly appeals = signal<PlatformUserModerationAppeal[]>([]);
 
   lookup(): void {
     const userId = this.form.controls.userId.value.trim();
     if (!userId) return;
     this.loading.set(true);
     this.dsa.getPlatformUserModeration(userId).subscribe({
-      next: (res) => {
-        this.moderation.set(res?.moderation ?? null);
-        this.summary.set(res?.summary ?? null);
-        this.setBlockedUntil('posting', res?.moderation?.posting?.blockedUntil ?? null);
-        this.setBlockedUntil('account', res?.moderation?.account?.blockedUntil ?? null);
-      },
+      next: (res) => this.applyResponse(res),
       error: () => this.loading.set(false),
       complete: () => this.loading.set(false)
     });
   }
 
   blockPosting(): void {
-    this.update('posting', true, 'manual_block_from_admin');
+    this.update('posting', true, this.form.controls.postingReason.value);
   }
 
   unblockPosting(): void {
-    this.update('posting', false, 'manual_unblock_from_admin');
+    this.update('posting', false, null);
   }
 
   blockAccount(): void {
-    this.update('account', true, 'manual_block_from_admin');
+    this.update('account', true, this.form.controls.accountReason.value);
   }
 
   unblockAccount(): void {
-    this.update('account', false, 'manual_unblock_from_admin');
+    this.update('account', false, null);
   }
 
-  private update(target: 'posting' | 'account', blocked: boolean, reason: string): void {
-    const userId = this.form.controls.userId.value.trim();
-    if (!userId) return;
-    if (blocked && !this.hasValidBlockedUntilSelection(target)) return;
+  resolveAppeal(appeal: PlatformUserModerationAppeal, status: 'accepted' | 'rejected'): void {
+    if (appeal.status !== 'open') {
+      return;
+    }
 
     this.loading.set(true);
-    this.dsa.updatePlatformUserModeration(userId, {
-      target,
-      blocked,
-      reason,
-      blockedUntil: blocked ? this.parseBlockedUntil(target) : null
-    }).subscribe({
-      next: (res) => {
-        this.moderation.set(res?.moderation ?? null);
-        this.summary.set(res?.summary ?? null);
-        if (target === 'posting') {
-          this.setBlockedUntil('posting', res?.moderation?.posting?.blockedUntil ?? null);
-        } else {
-          this.setBlockedUntil('account', res?.moderation?.account?.blockedUntil ?? null);
-        }
-      },
+    this.dsa.resolvePlatformUserAppeal(appeal.id, { status }).subscribe({
+      next: (res) => this.applyResponse(res),
       error: () => this.loading.set(false),
       complete: () => this.loading.set(false)
     });
@@ -118,6 +118,65 @@ export class UserModerationComponent {
     const ts = Number(value);
     if (ts <= 0) return '—';
     return new Date(ts).toLocaleString();
+  }
+
+  formatReason(reason: string | null | undefined, target: 'posting' | 'account'): string {
+    return findModerationReasonLabel(reason, target === 'posting' ? this.postingReasonOptions : this.accountReasonOptions);
+  }
+
+  appealStatusLabel(status: PlatformUserModerationAppealStatus): string {
+    switch (status) {
+      case 'accepted':
+        return 'Accepted';
+      case 'rejected':
+        return 'Rejected';
+      default:
+        return 'Open';
+    }
+  }
+
+  private applyResponse(res?: {
+    moderation?: PlatformUserModeration | null;
+    summary?: PlatformUserSummary | null;
+    appeals?: PlatformUserModerationAppeal[] | null;
+  } | null): void {
+    this.moderation.set(res?.moderation ?? null);
+    this.summary.set(res?.summary ?? null);
+    this.appeals.set(res?.appeals ?? []);
+    this.setBlockedUntil('posting', res?.moderation?.posting?.blockedUntil ?? null);
+    this.setBlockedUntil('account', res?.moderation?.account?.blockedUntil ?? null);
+    this.syncReasonSelection('posting', res?.moderation?.posting?.reason ?? null);
+    this.syncReasonSelection('account', res?.moderation?.account?.reason ?? null);
+  }
+
+  private update(target: 'posting' | 'account', blocked: boolean, reason: string | null): void {
+    const userId = this.form.controls.userId.value.trim();
+    if (!userId) return;
+    if (blocked && !this.hasValidBlockedUntilSelection(target)) return;
+    if (blocked && !reason) return;
+
+    this.loading.set(true);
+    this.dsa.updatePlatformUserModeration(userId, {
+      target,
+      blocked,
+      reason,
+      blockedUntil: blocked ? this.parseBlockedUntil(target) : null
+    }).subscribe({
+      next: (res) => this.applyResponse(res),
+      error: () => this.loading.set(false),
+      complete: () => this.loading.set(false)
+    });
+  }
+
+  private syncReasonSelection(target: 'posting' | 'account', reason: string | null): void {
+    const options = target === 'posting' ? this.postingReasonOptions : this.accountReasonOptions;
+    const fallback = options[0]?.code ?? '';
+    const matching = options.some((option) => option.code === reason) ? (reason || fallback) : fallback;
+    if (target === 'posting') {
+      this.form.controls.postingReason.setValue(matching, { emitEvent: false });
+      return;
+    }
+    this.form.controls.accountReason.setValue(matching, { emitEvent: false });
   }
 
   private parseBlockedUntil(target: 'posting' | 'account'): number | null {
@@ -149,14 +208,14 @@ export class UserModerationComponent {
       this.form.patchValue({
         postingBlockedUntilDate: date,
         postingBlockedUntilTime: time
-      });
+      }, { emitEvent: false });
       return;
     }
 
     this.form.patchValue({
       accountBlockedUntilDate: date,
       accountBlockedUntilTime: time
-    });
+    }, { emitEvent: false });
   }
 
   private splitDateTime(value?: number | null): { date: Date | null; time: Date | null } {

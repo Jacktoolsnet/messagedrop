@@ -1186,6 +1186,40 @@
         "fileTypeInvalid": "Bitte wähle eine gültige Bilddatei aus.",
         "fileTooLarge": "Das Bild ist zu groß. Maximal erlaubt sind {{ maxSizeMb }} MB.",
         "fileReadError": "Fehler beim Lesen der Datei."
+      },
+      "appeal": {
+        "title": "Widerspruch",
+        "hint": "Wenn du denkst, dass die Sperre ein Fehler ist, kannst du hier einen Widerspruch einreichen.",
+        "messageLabel": "Begründung für deinen Widerspruch",
+        "submit": "Widerspruch senden",
+        "submitSuccess": "Widerspruch wurde gesendet.",
+        "submitError": "Der Widerspruch konnte nicht gesendet werden. Bitte versuche es später erneut.",
+        "alreadyOpen": "Für diesen Bereich läuft bereits ein Widerspruch.",
+        "targetNotBlocked": "Für diesen Bereich liegt aktuell keine aktive Sperre mehr vor.",
+        "messageRequired": "Bitte beschreibe kurz, warum du Widerspruch einlegen möchtest.",
+        "filedAt": "Eingereicht:",
+        "resolvedAt": "Entschieden:",
+        "resolutionLabel": "Entscheidung:",
+        "status": {
+          "open": "Offen",
+          "accepted": "Akzeptiert",
+          "rejected": "Abgelehnt"
+        }
+      },
+      "moderationReasons": {
+        "illegal_content": "Illegale oder strafbare Inhalte",
+        "rights_violation": "Verletzung von Rechten Dritter",
+        "harassment_or_threats": "Beleidigungen, Belästigung oder Bedrohungen",
+        "hate_or_extremism": "Hassrede, Gewaltverherrlichung oder extremistischer Inhalt",
+        "sexual_or_youth_endangering": "Pornografische oder jugendgefährdende Inhalte",
+        "sexual_content_minors": "Sexuelle Inhalte mit Minderjährigen",
+        "personal_data_exposure": "Veröffentlichung personenbezogener Daten",
+        "fraud_or_impersonation": "Betrug, Täuschung oder Identitätsmissbrauch",
+        "spam_or_abusive_automation": "Spam oder missbräuchliche Automatisierung",
+        "malware_or_security_attack": "Malware oder Sicherheitsangriff",
+        "circumvention_or_misuse": "Umgehung von Schutzmechanismen oder Missbrauch",
+        "underage_or_missing_consent": "Minderjährigkeit oder fehlende Zustimmung der Eltern",
+        "serious_or_repeated_violations": "Schwerwiegende oder wiederholte Verstöße"
       }
     },
     "speech": {

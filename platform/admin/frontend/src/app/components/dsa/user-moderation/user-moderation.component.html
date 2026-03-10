@@ -63,11 +63,23 @@
       <mat-card-content class="detail-list">
         <div class="detail-row">
           <span class="detail-label">Reason</span>
-          <span class="detail-value">{{ moderationState.posting.reason || '—' }}</span>
+          <span class="detail-value">{{ formatReason(moderationState.posting.reason, 'posting') }}</span>
         </div>
         <div class="detail-row">
           <span class="detail-label">Until</span>
           <span class="detail-value">{{ formatTimestamp(moderationState.posting.blockedUntil) }}</span>
+        </div>
+
+        <div class="tile-form-section">
+          <div class="tile-form-title">Block reason</div>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="full-width-field">
+            <mat-label>Posting block reason</mat-label>
+            <mat-select [formControl]="form.controls.postingReason">
+              @for (option of postingReasonOptions; track option.code) {
+              <mat-option [value]="option.code">{{ option.label }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
         </div>
 
         <div class="tile-form-section">
@@ -90,7 +102,7 @@
       </mat-card-content>
       <mat-card-actions class="card-actions">
         @if (!moderationState.posting.blocked) {
-        <button mat-stroked-button color="warn" (click)="blockPosting()" [disabled]="loading()">
+        <button mat-stroked-button color="warn" (click)="blockPosting()" [disabled]="loading() || form.controls.postingReason.invalid">
           <mat-icon>block</mat-icon>
           Block posting
         </button>
@@ -118,11 +130,23 @@
       <mat-card-content class="detail-list">
         <div class="detail-row">
           <span class="detail-label">Reason</span>
-          <span class="detail-value">{{ moderationState.account.reason || '—' }}</span>
+          <span class="detail-value">{{ formatReason(moderationState.account.reason, 'account') }}</span>
         </div>
         <div class="detail-row">
           <span class="detail-label">Until</span>
           <span class="detail-value">{{ formatTimestamp(moderationState.account.blockedUntil) }}</span>
+        </div>
+
+        <div class="tile-form-section">
+          <div class="tile-form-title">Block reason</div>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="full-width-field">
+            <mat-label>Account block reason</mat-label>
+            <mat-select [formControl]="form.controls.accountReason">
+              @for (option of accountReasonOptions; track option.code) {
+              <mat-option [value]="option.code">{{ option.label }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
         </div>
 
         <div class="tile-form-section">
@@ -145,7 +169,7 @@
       </mat-card-content>
       <mat-card-actions class="card-actions">
         @if (!moderationState.account.blocked) {
-        <button mat-stroked-button color="warn" (click)="blockAccount()" [disabled]="loading()">
+        <button mat-stroked-button color="warn" (click)="blockAccount()" [disabled]="loading() || form.controls.accountReason.invalid">
           <mat-icon>lock</mat-icon>
           Block account
         </button>
@@ -204,5 +228,62 @@
       </mat-card-content>
     </mat-card>
   </div>
+
+  <mat-card class="appeals-card surface-card">
+    <mat-card-header class="tile-header">
+      <div mat-card-avatar class="tile-avatar avatar-accent">
+        <mat-icon>mail</mat-icon>
+      </div>
+      <mat-card-title>Appeals</mat-card-title>
+      <mat-card-subtitle>{{ appeals().length }} total</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      @if (appeals().length === 0) {
+      <div class="empty-state">No appeals have been submitted for this user yet.</div>
+      } @else {
+      <div class="appeals-list">
+        @for (appeal of appeals(); track appeal.id) {
+        <section class="appeal-item">
+          <div class="appeal-header-row">
+            <div>
+              <div class="appeal-title">{{ appeal.target === 'posting' ? 'Posting appeal' : 'Account appeal' }}</div>
+              <div class="appeal-meta">Filed {{ formatTimestamp(appeal.createdAt) }}</div>
+            </div>
+            <span class="appeal-status" [class.open]="appeal.status === 'open'" [class.accepted]="appeal.status === 'accepted'" [class.rejected]="appeal.status === 'rejected'">
+              {{ appealStatusLabel(appeal.status) }}
+            </span>
+          </div>
+
+          <p class="appeal-message">{{ appeal.message }}</p>
+
+          @if (appeal.resolutionMessage) {
+          <div class="appeal-resolution">
+            <strong>Resolution</strong>
+            <span>{{ appeal.resolutionMessage }}</span>
+          </div>
+          }
+
+          @if (appeal.resolvedAt) {
+          <div class="appeal-meta">Resolved {{ formatTimestamp(appeal.resolvedAt) }} @if (appeal.reviewer) { · {{ appeal.reviewer }} }</div>
+          }
+
+          @if (appeal.status === 'open') {
+          <div class="appeal-actions">
+            <button mat-stroked-button color="primary" type="button" (click)="resolveAppeal(appeal, 'accepted')" [disabled]="loading()">
+              <mat-icon>check_circle</mat-icon>
+              Accept appeal
+            </button>
+            <button mat-stroked-button color="warn" type="button" (click)="resolveAppeal(appeal, 'rejected')" [disabled]="loading()">
+              <mat-icon>cancel</mat-icon>
+              Reject appeal
+            </button>
+          </div>
+          }
+        </section>
+        }
+      </div>
+      }
+    </mat-card-content>
+  </mat-card>
   }
 </div>

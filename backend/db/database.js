@@ -14,6 +14,7 @@ const tableNotification = require('./tableNotification');
 const tableGeoStatistic = require('./tableGeoStatistic');
 const tableMaintenance = require('./tableMaintenance');
 const tableUsageProtection = require('./tableUsageProtection');
+const tableUserModerationAppeal = require('./tableUserModerationAppeal');
 
 class SqliteCompat {
   constructor(filePath, logger = console) {
@@ -257,6 +258,7 @@ class Database {
           tableNotification.init(this.db);
           tableMaintenance.init(this.db);
           tableUsageProtection.init(this.db);
+          tableUserModerationAppeal.init(this.db);
 
           // Trigger initialisieren
           this.initTriggers(this.logger);

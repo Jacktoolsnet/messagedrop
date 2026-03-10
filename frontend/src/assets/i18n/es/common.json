@@ -1186,6 +1186,40 @@
         "fileTypeInvalid": "Por favor selecciona un archivo de imagen válido.",
         "fileTooLarge": "La imagen es demasiado grande. El tamaño máximo permitido es {{ maxSizeMb }} MB.",
         "fileReadError": "Error al leer el archivo."
+      },
+      "appeal": {
+        "title": "Apelación",
+        "hint": "Si crees que esta restricción se aplicó por error, puedes presentar una apelación aquí.",
+        "messageLabel": "Motivo de tu apelación",
+        "submit": "Enviar apelación",
+        "submitSuccess": "Apelación enviada.",
+        "submitError": "No se pudo enviar la apelación. Inténtalo de nuevo más tarde.",
+        "alreadyOpen": "Ya existe una apelación abierta para esta restricción.",
+        "targetNotBlocked": "Esta restricción ya no está activa.",
+        "messageRequired": "Describe brevemente por qué deseas apelar.",
+        "filedAt": "Presentada:",
+        "resolvedAt": "Resuelta:",
+        "resolutionLabel": "Decisión:",
+        "status": {
+          "open": "Abierta",
+          "accepted": "Aceptada",
+          "rejected": "Rechazada"
+        }
+      },
+      "moderationReasons": {
+        "illegal_content": "Contenido ilegal o delictivo",
+        "rights_violation": "Infracción de derechos de terceros",
+        "harassment_or_threats": "Insultos, acoso o amenazas",
+        "hate_or_extremism": "Discurso de odio, glorificación de la violencia o contenido extremista",
+        "sexual_or_youth_endangering": "Contenido pornográfico o perjudicial para menores",
+        "sexual_content_minors": "Contenido sexual con menores",
+        "personal_data_exposure": "Divulgación de datos personales",
+        "fraud_or_impersonation": "Fraude, engaño o suplantación de identidad",
+        "spam_or_abusive_automation": "Spam o automatización abusiva",
+        "malware_or_security_attack": "Malware o ataque de seguridad",
+        "circumvention_or_misuse": "Elusión de medidas de protección o uso indebido",
+        "underage_or_missing_consent": "Uso por menores o falta de consentimiento parental",
+        "serious_or_repeated_violations": "Infracciones graves o reiteradas"
       }
     },
     "speech": {

@@ -1186,6 +1186,40 @@
         "fileTypeInvalid": "Please select a valid image file.",
         "fileTooLarge": "The image is too large. Maximum allowed size is {{ maxSizeMb }} MB.",
         "fileReadError": "Error reading the file."
+      },
+      "appeal": {
+        "title": "Appeal",
+        "hint": "If you believe this restriction was applied in error, you can submit an appeal here.",
+        "messageLabel": "Why should this decision be reviewed?",
+        "submit": "Submit appeal",
+        "submitSuccess": "Appeal submitted.",
+        "submitError": "The appeal could not be submitted. Please try again later.",
+        "alreadyOpen": "There is already an open appeal for this restriction.",
+        "targetNotBlocked": "This restriction is no longer active.",
+        "messageRequired": "Please briefly explain why you are appealing.",
+        "filedAt": "Filed:",
+        "resolvedAt": "Resolved:",
+        "resolutionLabel": "Decision:",
+        "status": {
+          "open": "Open",
+          "accepted": "Accepted",
+          "rejected": "Rejected"
+        }
+      },
+      "moderationReasons": {
+        "illegal_content": "Illegal or criminal content",
+        "rights_violation": "Violation of third-party rights",
+        "harassment_or_threats": "Insults, harassment or threats",
+        "hate_or_extremism": "Hate speech, glorification of violence or extremist content",
+        "sexual_or_youth_endangering": "Pornographic or youth-endangering content",
+        "sexual_content_minors": "Sexual content involving minors",
+        "personal_data_exposure": "Disclosure of personal data",
+        "fraud_or_impersonation": "Fraud, deception or impersonation",
+        "spam_or_abusive_automation": "Spam or abusive automation",
+        "malware_or_security_attack": "Malware or security attack",
+        "circumvention_or_misuse": "Circumvention of safeguards or platform misuse",
+        "underage_or_missing_consent": "Underage use or missing parental consent",
+        "serious_or_repeated_violations": "Serious or repeated violations"
       }
     },
     "speech": {

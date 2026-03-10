@@ -11,6 +11,8 @@ const router = express.Router();
 const rateLimit = require('express-rate-limit');
 const security = require('../middleware/security');
 const tableUser = require('../db/tableUser');
+const tableUserModerationAppeal = require('../db/tableUserModerationAppeal');
+const { normalizeModerationReason } = require('../constants/userModerationReasons');
 const tableUsageProtection = require('../db/tableUsageProtection');
 const metric = require('../middleware/metric');
 const { apiError } = require('../middleware/api-error');
@@ -306,24 +308,203 @@ function moderationPayloadFromUser(row) {
   };
 }
 
+function isModerationTargetBlocked(moderation, target) {
+  if (!moderation || (target !== 'posting' && target !== 'account')) {
+    return false;
+  }
+  return moderation[target]?.blocked === true;
+}
+
+function normalizeAppealTarget(value) {
+  const normalized = String(value || '').trim().toLowerCase();
+  return normalized === tableUserModerationAppeal.appealTarget.POSTING
+    || normalized === tableUserModerationAppeal.appealTarget.ACCOUNT
+    ? normalized
+    : null;
+}
+
+function normalizeAppealStatus(value) {
+  const normalized = String(value || '').trim().toLowerCase();
+  return normalized === tableUserModerationAppeal.appealStatus.ACCEPTED
+    || normalized === tableUserModerationAppeal.appealStatus.REJECTED
+    ? normalized
+    : null;
+}
+
+function normalizeAppealMessage(value, maxLength = 4000) {
+  if (typeof value !== 'string') {
+    return null;
+  }
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return null;
+  }
+  return trimmed.slice(0, maxLength);
+}
+
+function listUserModerationAppeals(db, userId) {
+  return new Promise((resolve, reject) => {
+    tableUserModerationAppeal.listByUserId(db, userId, (err, appeals) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(appeals || []);
+    });
+  });
+}
+
+function listOpenUserModerationAppeals(db, userId, target) {
+  return new Promise((resolve, reject) => {
+    tableUserModerationAppeal.listOpenByUserIdAndTarget(db, userId, target, (err, appeals) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(appeals || []);
+    });
+  });
+}
+
+async function buildUserModerationResponse(db, row) {
+  const moderation = moderationPayloadFromUser(row);
+  const appeals = row?.id ? await listUserModerationAppeals(db, row.id) : [];
+  return {
+    moderation,
+    appeals
+  };
+}
+
+function getUserRowById(db, userId) {
+  return queryGet(db, `
+    SELECT *
+    FROM tableUser
+    WHERE id = ?;
+  `, [userId]);
+}
+
+function updatePostingBlockAsync(db, userId, options) {
+  return new Promise((resolve, reject) => {
+    tableUser.updatePostingBlock(db, userId, options, (err, ok) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(Boolean(ok));
+    });
+  });
+}
+
+function updateAccountBlockAsync(db, userId, options) {
+  return new Promise((resolve, reject) => {
+    tableUser.updateAccountBlock(db, userId, options, (err, ok) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(Boolean(ok));
+    });
+  });
+}
+
+function getModerationAppealById(db, appealId) {
+  return new Promise((resolve, reject) => {
+    tableUserModerationAppeal.getById(db, appealId, (err, appeal) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(appeal || null);
+    });
+  });
+}
+
+function createModerationAppeal(db, appeal) {
+  return new Promise((resolve, reject) => {
+    tableUserModerationAppeal.create(db, appeal, (err, createdAppeal) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(createdAppeal || null);
+    });
+  });
+}
+
+function updateModerationAppealResolution(db, appealId, status, resolvedAt, resolutionMessage, reviewer) {
+  return new Promise((resolve, reject) => {
+    tableUserModerationAppeal.updateResolution(db, appealId, status, resolvedAt, resolutionMessage, reviewer, (err, appeal) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(appeal || null);
+    });
+  });
+}
+
+async function updateModerationTarget(db, userId, target, options) {
+  const updateOptions = {
+    blocked: options?.blocked === true,
+    reason: options?.blocked ? options?.reason || null : null,
+    actor: options?.actor || null,
+    until: options?.blocked ? options?.until || null : null,
+    at: options?.at || Date.now()
+  };
+
+  const ok = target === 'posting'
+    ? await updatePostingBlockAsync(db, userId, updateOptions)
+    : await updateAccountBlockAsync(db, userId, updateOptions);
+
+  if (!ok) {
+    throw apiError.notFound('not_found');
+  }
+
+  return getUserRowById(db, userId);
+}
+
+async function resolveOpenModerationAppeals(db, userId, target, status, reviewer, resolutionMessage) {
+  const openAppeals = await listOpenUserModerationAppeals(db, userId, target);
+  if (!openAppeals.length) {
+    return [];
+  }
+
+  const resolvedAt = Date.now();
+  return Promise.all(openAppeals.map((appeal) =>
+    updateModerationAppealResolution(
+      db,
+      appeal.id,
+      status,
+      resolvedAt,
+      resolutionMessage || null,
+      reviewer || null
+    )
+  ));
+}
+
 router.get('/internal/moderation/:userId',
   [
     security.checkToken
   ],
-  function (req, res, next) {
+  async function (req, res, next) {
     const userId = String(req.params.userId || '').trim();
     if (!isUuid(userId)) {
       return next(apiError.badRequest('invalid_user_id'));
     }
 
-    tableUser.getById(req.database.db, userId, (err, row) => {
+    tableUser.getById(req.database.db, userId, async (err, row) => {
       if (err) {
         return next(apiError.internal('db_error'));
       }
       if (!row) {
         return next(apiError.notFound('not_found'));
       }
-      return res.status(200).json({ status: 200, moderation: moderationPayloadFromUser(row) });
+      try {
+        const response = await buildUserModerationResponse(req.database.db, row);
+        return res.status(200).json({ status: 200, ...response });
+      } catch {
+        return next(apiError.internal('db_error'));
+      }
     });
   });
 
@@ -332,37 +513,45 @@ router.patch('/internal/moderation/:userId/posting',
     security.checkToken,
     express.json({ type: 'application/json' })
   ],
-  function (req, res, next) {
+  async function (req, res, next) {
     const userId = String(req.params.userId || '').trim();
     if (!isUuid(userId)) {
       return next(apiError.badRequest('invalid_user_id'));
     }
 
     const blocked = req.body?.blocked === true || req.body?.blocked === 1 || req.body?.blocked === '1';
-    const reason = normalizeOptionalText(req.body?.reason, 2000);
+    const reason = blocked ? normalizeModerationReason(req.body?.reason, 'posting') : null;
     const actor = normalizeOptionalText(req.body?.actor, 200);
-    const until = normalizeBlockUntil(req.body?.blockedUntil);
+    const until = blocked ? normalizeBlockUntil(req.body?.blockedUntil) : null;
 
-    tableUser.updatePostingBlock(req.database.db, userId, {
-      blocked,
-      reason,
-      actor,
-      until,
-      at: Date.now()
-    }, (err, ok) => {
-      if (err) {
-        return next(apiError.internal('db_error'));
-      }
-      if (!ok) {
-        return next(apiError.notFound('not_found'));
-      }
-      tableUser.getById(req.database.db, userId, (lookupErr, row) => {
-        if (lookupErr) {
-          return next(apiError.internal('db_error'));
-        }
-        return res.status(200).json({ status: 200, moderation: moderationPayloadFromUser(row) });
+    if (blocked && !reason) {
+      return next(apiError.badRequest('invalid_reason'));
+    }
+
+    try {
+      await updateModerationTarget(req.database.db, userId, 'posting', {
+        blocked,
+        reason,
+        actor,
+        until,
+        at: Date.now()
       });
-    });
+      if (!blocked) {
+        await resolveOpenModerationAppeals(
+          req.database.db,
+          userId,
+          tableUserModerationAppeal.appealTarget.POSTING,
+          tableUserModerationAppeal.appealStatus.ACCEPTED,
+          actor,
+          'Resolved through moderator unblock.'
+        );
+      }
+      const row = await getUserRowById(req.database.db, userId);
+      const response = await buildUserModerationResponse(req.database.db, row);
+      return res.status(200).json({ status: 200, ...response });
+    } catch (error) {
+      return next(error?.status ? error : apiError.internal('db_error'));
+    }
   });
 
 router.patch('/internal/moderation/:userId/account',
@@ -370,37 +559,103 @@ router.patch('/internal/moderation/:userId/account',
     security.checkToken,
     express.json({ type: 'application/json' })
   ],
-  function (req, res, next) {
+  async function (req, res, next) {
     const userId = String(req.params.userId || '').trim();
     if (!isUuid(userId)) {
       return next(apiError.badRequest('invalid_user_id'));
     }
 
     const blocked = req.body?.blocked === true || req.body?.blocked === 1 || req.body?.blocked === '1';
-    const reason = normalizeOptionalText(req.body?.reason, 2000);
+    const reason = blocked ? normalizeModerationReason(req.body?.reason, 'account') : null;
     const actor = normalizeOptionalText(req.body?.actor, 200);
-    const until = normalizeBlockUntil(req.body?.blockedUntil);
+    const until = blocked ? normalizeBlockUntil(req.body?.blockedUntil) : null;
 
-    tableUser.updateAccountBlock(req.database.db, userId, {
-      blocked,
-      reason,
-      actor,
-      until,
-      at: Date.now()
-    }, (err, ok) => {
-      if (err) {
-        return next(apiError.internal('db_error'));
+    if (blocked && !reason) {
+      return next(apiError.badRequest('invalid_reason'));
+    }
+
+    try {
+      await updateModerationTarget(req.database.db, userId, 'account', {
+        blocked,
+        reason,
+        actor,
+        until,
+        at: Date.now()
+      });
+      if (!blocked) {
+        await resolveOpenModerationAppeals(
+          req.database.db,
+          userId,
+          tableUserModerationAppeal.appealTarget.ACCOUNT,
+          tableUserModerationAppeal.appealStatus.ACCEPTED,
+          actor,
+          'Resolved through moderator unblock.'
+        );
       }
-      if (!ok) {
+      const row = await getUserRowById(req.database.db, userId);
+      const response = await buildUserModerationResponse(req.database.db, row);
+      return res.status(200).json({ status: 200, ...response });
+    } catch (error) {
+      return next(error?.status ? error : apiError.internal('db_error'));
+    }
+  });
+
+router.patch('/internal/moderation/appeals/:appealId',
+  [
+    security.checkToken,
+    express.json({ type: 'application/json' })
+  ],
+  async function (req, res, next) {
+    const appealId = String(req.params.appealId || '').trim();
+    if (!isUuid(appealId)) {
+      return next(apiError.badRequest('invalid_appeal_id'));
+    }
+
+    const status = normalizeAppealStatus(req.body?.status);
+    const reviewer = normalizeOptionalText(req.body?.reviewer, 200);
+    const resolutionMessage = normalizeOptionalText(req.body?.resolutionMessage, 2000);
+
+    if (!status) {
+      return next(apiError.badRequest('invalid_status'));
+    }
+
+    try {
+      const appeal = await getModerationAppealById(req.database.db, appealId);
+      if (!appeal) {
         return next(apiError.notFound('not_found'));
       }
-      tableUser.getById(req.database.db, userId, (lookupErr, row) => {
-        if (lookupErr) {
-          return next(apiError.internal('db_error'));
-        }
-        return res.status(200).json({ status: 200, moderation: moderationPayloadFromUser(row) });
+      if (appeal.status !== tableUserModerationAppeal.appealStatus.OPEN) {
+        return next(apiError.conflict('appeal_already_resolved'));
+      }
+
+      if (status === tableUserModerationAppeal.appealStatus.ACCEPTED) {
+        await updateModerationTarget(req.database.db, appeal.userId, appeal.target, {
+          blocked: false,
+          reason: null,
+          actor: reviewer,
+          until: null,
+          at: Date.now()
+        });
+      }
+
+      const resolvedAppeal = await updateModerationAppealResolution(
+        req.database.db,
+        appealId,
+        status,
+        Date.now(),
+        resolutionMessage,
+        reviewer
+      );
+      const row = await getUserRowById(req.database.db, appeal.userId);
+      const response = await buildUserModerationResponse(req.database.db, row);
+      return res.status(200).json({
+        status: 200,
+        appeal: resolvedAppeal,
+        ...response
       });
-    });
+    } catch (error) {
+      return next(error?.status ? error : apiError.internal('db_error'));
+    }
   });
 
 function sanitizeRestoreContacts(rawContacts, userId) {
@@ -788,32 +1043,49 @@ async function restoreUserBackup(db, backup) {
 }
 
 const loginChallenges = new Map();
+const moderationAccessChallenges = new Map();
 const CHALLENGE_TTL_MS = 5 * 60 * 1000;
 
-function issueLoginChallenge(userId) {
+function issueChallenge(challengeStore, userId) {
   const challenge = crypto.randomBytes(32).toString('base64url');
-  loginChallenges.set(String(userId), {
+  challengeStore.set(String(userId), {
     challenge,
     expiresAt: Date.now() + CHALLENGE_TTL_MS
   });
   return challenge;
 }
 
-function validateLoginChallenge(userId, challenge) {
+function validateChallenge(challengeStore, userId, challenge) {
   const key = String(userId);
-  const entry = loginChallenges.get(key);
+  const entry = challengeStore.get(key);
   if (!entry) {
     return false;
   }
   if (Date.now() > entry.expiresAt) {
-    loginChallenges.delete(key);
+    challengeStore.delete(key);
     return false;
   }
   const matches = entry.challenge === challenge;
   if (matches) {
-    loginChallenges.delete(key);
+    challengeStore.delete(key);
   }
   return matches;
+}
+
+function issueLoginChallenge(userId) {
+  return issueChallenge(loginChallenges, userId);
+}
+
+function validateLoginChallenge(userId, challenge) {
+  return validateChallenge(loginChallenges, userId, challenge);
+}
+
+function issueModerationAccessChallenge(userId) {
+  return issueChallenge(moderationAccessChallenges, userId);
+}
+
+function validateModerationAccessChallenge(userId, challenge) {
+  return validateChallenge(moderationAccessChallenges, userId, challenge);
 }
 
 async function verifySignedChallenge(signingPublicKey, challenge, signature) {
@@ -837,6 +1109,54 @@ async function verifySignedChallenge(signingPublicKey, challenge, signature) {
     signatureBuffer,
     payloadBuffer
   );
+}
+
+async function verifyModerationAccessRequest(db, payload) {
+  const userId = String(payload?.userId || '').trim();
+  const challenge = String(payload?.challenge || '').trim();
+  const signature = payload?.signature;
+
+  if (!userId || !challenge || !signature) {
+    throw apiError.badRequest('invalid_request');
+  }
+
+  const row = await queryGet(db, `
+    SELECT *
+    FROM tableUser
+    WHERE id = ?;
+  `, [userId]);
+
+  if (!row) {
+    throw apiError.notFound('not_found');
+  }
+
+  if (!row.signingPublicKey) {
+    throw apiError.conflict('missing_public_key');
+  }
+
+  if (!validateModerationAccessChallenge(userId, challenge)) {
+    throw apiError.unauthorized('unauthorized');
+  }
+
+  let signingPublicKey;
+  try {
+    signingPublicKey = JSON.parse(row.signingPublicKey);
+  } catch {
+    throw apiError.internal('invalid_public_key');
+  }
+
+  let verified = false;
+  try {
+    verified = await verifySignedChallenge(signingPublicKey, challenge, signature);
+  } catch {
+    throw apiError.internal('signature_failed');
+  }
+
+  if (!verified) {
+    throw apiError.unauthorized('unauthorized');
+  }
+
+  return row;
 }
 
 const rateLimitDefaults = {
@@ -882,6 +1202,28 @@ router.get('/get/:userId',
     res.status(200).json({ status: 200, rawUser: row });
   });
 });
+
+router.get('/moderation/:userId',
+  [
+    security.authenticate
+  ],
+  async function (req, res, next) {
+    const userId = String(req.params.userId || '').trim();
+    if (!ensureSameUser(req, res, userId, next)) {
+      return;
+    }
+
+    try {
+      const row = await getUserRowById(req.database.db, userId);
+      if (!row) {
+        return next(apiError.notFound('not_found'));
+      }
+      const response = await buildUserModerationResponse(req.database.db, row);
+      return res.status(200).json({ status: 200, ...response });
+    } catch {
+      return next(apiError.internal('db_error'));
+    }
+  });
 
 router.get('/backup/:userId',
   [
@@ -1292,6 +1634,101 @@ router.post('/login',
       res.status(200).json({ status: 200, jwt: token });
     } catch {
       return next(apiError.internal('db_error'));
+    }
+  });
+
+router.post('/moderation/challenge',
+  [
+    userConfirmLimit,
+    express.json({ type: 'application/json' })
+  ],
+  async function (req, res, next) {
+    const userId = String(req.body?.userId || '').trim();
+    if (!isUuid(userId)) {
+      return next(apiError.badRequest('invalid_user_id'));
+    }
+
+    try {
+      const row = await queryGet(req.database.db, `
+        SELECT signingPublicKey
+        FROM tableUser
+        WHERE id = ?;
+      `, [userId]);
+      if (!row) {
+        return next(apiError.notFound('not_found'));
+      }
+      if (!row.signingPublicKey) {
+        return next(apiError.conflict('missing_public_key'));
+      }
+
+      const challenge = issueModerationAccessChallenge(userId);
+      return res.status(200).json({ status: 200, challenge });
+    } catch {
+      return next(apiError.internal('db_error'));
+    }
+  });
+
+router.post('/moderation/status',
+  [
+    userConfirmLimit,
+    express.json({ type: 'application/json' })
+  ],
+  async function (req, res, next) {
+    try {
+      const row = await verifyModerationAccessRequest(req.database.db, req.body);
+      const response = await buildUserModerationResponse(req.database.db, row);
+      return res.status(200).json({ status: 200, ...response });
+    } catch (error) {
+      return next(error?.status ? error : apiError.internal('db_error'));
+    }
+  });
+
+router.post('/moderation/appeal',
+  [
+    userConfirmLimit,
+    express.json({ type: 'application/json' })
+  ],
+  async function (req, res, next) {
+    const target = normalizeAppealTarget(req.body?.target);
+    const message = normalizeAppealMessage(req.body?.message, 4000);
+    if (!target) {
+      return next(apiError.badRequest('invalid_target'));
+    }
+    if (!message) {
+      return next(apiError.badRequest('appeal_message_required'));
+    }
+
+    try {
+      const row = await verifyModerationAccessRequest(req.database.db, req.body);
+      const moderation = moderationPayloadFromUser(row);
+      if (!isModerationTargetBlocked(moderation, target)) {
+        return next(apiError.conflict('appeal_target_not_blocked'));
+      }
+
+      const openAppeals = await listOpenUserModerationAppeals(req.database.db, row.id, target);
+      if (openAppeals.length > 0) {
+        return next(apiError.conflict('appeal_already_open'));
+      }
+
+      const appeal = await createModerationAppeal(req.database.db, {
+        id: crypto.randomUUID(),
+        userId: row.id,
+        target,
+        status: tableUserModerationAppeal.appealStatus.OPEN,
+        message,
+        createdAt: Date.now(),
+        resolvedAt: null,
+        resolutionMessage: null,
+        reviewer: null
+      });
+      const response = await buildUserModerationResponse(req.database.db, row);
+      return res.status(201).json({
+        status: 201,
+        appeal,
+        ...response
+      });
+    } catch (error) {
+      return next(error?.status ? error : apiError.internal('db_error'));
     }
   });
 

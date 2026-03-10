@@ -133,13 +133,18 @@
     margin-right: .35rem;
 }
 
-.tile-actions input[type="datetime-local"] {
+.tile-actions input[type="datetime-local"],
+.tile-actions select {
     min-height: 36px;
     border: 1px solid var(--border);
     border-radius: 10px;
     padding: .35rem .55rem;
     background: var(--surface);
     color: var(--text);
+}
+
+.reason-row select {
+    min-width: min(100%, 420px);
 }
 
 /* Footer */

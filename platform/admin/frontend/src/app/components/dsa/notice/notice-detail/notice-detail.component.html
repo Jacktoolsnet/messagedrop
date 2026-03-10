@@ -251,8 +251,16 @@
                             <div class="v">{{ formatBlockUntil(moderationState()?.posting?.blockedUntil) }}</div>
                         </div>
                         <div class="kv">
+                            <div class="k">Posting reason</div>
+                            <div class="v">{{ formatReason(moderationState()?.posting?.reason, 'posting') }}</div>
+                        </div>
+                        <div class="kv">
                             <div class="k">Account until</div>
                             <div class="v">{{ formatBlockUntil(moderationState()?.account?.blockedUntil) }}</div>
+                        </div>
+                        <div class="kv">
+                            <div class="k">Account reason</div>
+                            <div class="v">{{ formatReason(moderationState()?.account?.reason, 'account') }}</div>
                         </div>
                         <div class="kv">
                             <div class="k">Signals</div>
@@ -271,10 +279,22 @@
                         <label for="notice-blocked-until"><strong>Temporary block until:</strong></label>
                         <input id="notice-blocked-until" type="datetime-local" [value]="blockedUntilLocal()"
                             (change)="onBlockedUntilInput($any($event.target).value)" />
-                        <button mat-stroked-button type="button" (click)="clearBlockedUntil()" [disabled]="moderationBusy()">
-                            <mat-icon>event_busy</mat-icon>
-                            Clear expiry
-                        </button>
+                    </div>
+                    <div class="tile-actions reason-row">
+                        <label for="notice-posting-reason"><strong>Posting block reason:</strong></label>
+                        <select id="notice-posting-reason" [value]="postingReason()" (change)="postingReason.set($any($event.target).value)">
+                            @for (option of postingReasonOptions; track option.code) {
+                            <option [value]="option.code">{{ option.label }}</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="tile-actions reason-row">
+                        <label for="notice-account-reason"><strong>Account block reason:</strong></label>
+                        <select id="notice-account-reason" [value]="accountReason()" (change)="accountReason.set($any($event.target).value)">
+                            @for (option of accountReasonOptions; track option.code) {
+                            <option [value]="option.code">{{ option.label }}</option>
+                            }
+                        </select>
                     </div>
                     <div class="tile-actions">
                         @if (!(moderationState()?.posting?.blocked)) {
