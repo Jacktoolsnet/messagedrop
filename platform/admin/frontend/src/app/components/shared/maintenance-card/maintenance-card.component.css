@@ -10,7 +10,8 @@
   overflow: hidden;
 }
 
-.maintenance-avatar {
+.maintenance-avatar,
+.backup-avatar {
   width: 48px;
   height: 48px;
   min-width: 48px;
@@ -20,7 +21,8 @@
 }
 
 .maintenance-avatar mat-icon,
-.backup-avatar mat-icon {
+.backup-avatar mat-icon,
+.restore-note mat-icon {
   width: 26px;
   height: 26px;
   font-size: 26px;
@@ -43,21 +45,40 @@
 }
 
 .translations,
-.backup-panel {
-  margin-top: 0.25rem;
-  padding: 1rem;
+.backup-panel,
+.restore-panel,
+.validation-panel,
+.confirm-panel {
   border-radius: 16px;
   border: 1px solid var(--mat-sys-outline-variant);
   background: color-mix(in srgb, var(--mat-sys-surface-container-high) 88%, transparent);
 }
 
+.translations {
+  margin-top: 0.25rem;
+  padding: 1rem;
+}
+
+.backup-panel,
+.restore-panel {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.25rem;
+  padding: 1rem;
+}
+
 .translations-title,
-.meta-label {
+.meta-label,
+.section-title {
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--mat-sys-on-surface-variant);
+}
+
+.section-title {
+  margin: 0;
 }
 
 .translations-grid {
@@ -78,30 +99,20 @@
 .translations-empty,
 .backup-empty,
 .backup-subtitle,
-.backup-db-file {
+.archive-meta-row,
+.restore-placeholder,
+.validation-status,
+.state-meta,
+.state-message,
+.confirm-copy,
+.restore-note span {
   color: var(--mat-sys-on-surface-variant);
-}
-
-.backup-panel {
-  display: grid;
-  gap: 1rem;
-  margin-top: 1.25rem;
-  margin-bottom: 0.85rem;
 }
 
 .backup-header {
   display: flex;
   align-items: flex-start;
   gap: 0.9rem;
-}
-
-.backup-avatar {
-  width: 48px;
-  height: 48px;
-  min-width: 48px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .backup-copy {
@@ -138,51 +149,190 @@
   animation: backup-spin 1.2s linear infinite;
 }
 
-.backup-meta-grid {
+.backup-meta-grid,
+.restore-status-grid,
+.challenge-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 0.75rem;
 }
 
-.meta-item {
+.meta-item,
+.challenge-item,
+.restore-state-card {
   display: grid;
   gap: 0.35rem;
-  padding: 0.8rem 0.9rem;
-  border-radius: 14px;
-  background: color-mix(in srgb, var(--mat-sys-surface) 82%, transparent);
-  border: 1px solid color-mix(in srgb, var(--mat-sys-outline-variant) 78%, transparent);
-}
-
-.meta-item strong,
-.backup-db-name,
-.backup-db-size {
-  color: var(--mat-sys-on-surface);
-}
-
-.backup-db-list {
-  display: grid;
-  gap: 0.6rem;
-}
-
-.backup-db-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) auto;
-  gap: 0.75rem;
-  align-items: center;
-  padding: 0.8rem 0.9rem;
+  padding: 0.85rem 0.95rem;
   border-radius: 14px;
   background: color-mix(in srgb, var(--mat-sys-surface) 88%, transparent);
   border: 1px solid color-mix(in srgb, var(--mat-sys-outline-variant) 72%, transparent);
 }
 
-.backup-db-name,
-.backup-db-file,
-.backup-db-size {
+.meta-item strong,
+.challenge-item strong,
+.archive-name,
+.state-title,
+.state-text,
+.validation-backup {
+  color: var(--mat-sys-on-surface);
+}
+
+.archive-list,
+.validation-issues,
+.restore-steps {
+  margin: 0;
+  padding: 0;
+}
+
+.archive-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.archive-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.9rem;
+  align-items: center;
+  padding: 0.9rem;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--mat-sys-surface) 92%, transparent);
+  border: 1px solid color-mix(in srgb, var(--mat-sys-outline-variant) 68%, transparent);
+}
+
+.archive-row.selected {
+  border-color: color-mix(in srgb, var(--mat-sys-primary) 42%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--mat-sys-primary) 20%, transparent);
+}
+
+.archive-row.challenge-active {
+  border-color: color-mix(in srgb, var(--mat-sys-error) 38%, transparent);
+}
+
+.archive-main {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.archive-heading-row,
+.validation-summary-row,
+.state-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.archive-name,
+.validation-backup,
+.state-text {
+  font-weight: 700;
   overflow-wrap: anywhere;
 }
 
-.backup-db-size {
+.archive-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem 1rem;
+  font-size: 0.92rem;
+}
+
+.archive-actions,
+.confirm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.55rem;
+}
+
+.archive-validity,
+.state-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 0.2rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
   font-weight: 700;
+  background: color-mix(in srgb, var(--mat-sys-primary-container) 88%, transparent);
+  color: var(--mat-sys-on-primary-container);
+  white-space: nowrap;
+}
+
+.archive-validity.invalid,
+.state-failed .state-badge {
+  background: color-mix(in srgb, var(--mat-sys-error-container) 88%, transparent);
+  color: var(--mat-sys-on-error-container);
+}
+
+.restore-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.85rem 0.95rem;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--mat-sys-error-container) 38%, transparent);
+  border: 1px solid color-mix(in srgb, var(--mat-sys-error) 18%, transparent);
+}
+
+.restore-note mat-icon {
+  color: var(--mat-sys-error);
+}
+
+.restore-steps {
+  display: grid;
+  gap: 0.55rem;
+  padding-left: 1.25rem;
+}
+
+.restore-steps li {
+  color: var(--mat-sys-on-surface);
+  line-height: 1.5;
+}
+
+.restore-state-card.state-pending {
+  background: color-mix(in srgb, var(--mat-sys-primary-container) 34%, transparent);
+}
+
+.restore-state-card.state-success {
+  background: color-mix(in srgb, var(--mat-sys-tertiary-container) 40%, transparent);
+}
+
+.restore-state-card.state-failed {
+  background: color-mix(in srgb, var(--mat-sys-error-container) 42%, transparent);
+}
+
+.restore-state-card.state-running {
+  background: color-mix(in srgb, var(--mat-sys-secondary-container) 46%, transparent);
+}
+
+.validation-panel,
+.confirm-panel {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1rem;
+}
+
+.validation-panel.validation-invalid {
+  border-color: color-mix(in srgb, var(--mat-sys-error) 28%, transparent);
+}
+
+.validation-issues {
+  display: grid;
+  gap: 0.45rem;
+  padding-left: 1.15rem;
+  color: var(--mat-sys-on-surface);
+}
+
+.confirm-form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.restore-placeholder {
+  padding: 0.9rem 0;
 }
 
 .maintenance-actions {
@@ -203,20 +353,36 @@
   }
 }
 
+@media (max-width: 900px) {
+  .archive-row {
+    grid-template-columns: 1fr;
+  }
+
+  .archive-actions,
+  .confirm-actions {
+    justify-content: flex-start;
+  }
+}
+
 @media (max-width: 720px) {
   .translations-grid {
     grid-template-columns: 1fr;
   }
 
-  .backup-db-row {
-    grid-template-columns: 1fr;
+  .archive-heading-row,
+  .validation-summary-row,
+  .state-title-row {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .maintenance-actions {
     justify-content: stretch;
   }
 
-  .maintenance-actions button {
+  .maintenance-actions button,
+  .archive-actions button,
+  .confirm-actions button {
     flex: 1 1 100%;
   }
 }

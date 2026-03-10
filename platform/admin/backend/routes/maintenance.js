@@ -1,5 +1,6 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
+const crypto = require('node:crypto');
 const express = require('express');
 const axios = require('axios');
 const deepl = require('deepl-node');
@@ -9,11 +10,18 @@ const { apiError } = require('../middleware/api-error');
 const {
   createBackup,
   getLatestBackup,
-  resolveBackupArchivePath
+  resolveBackupArchivePath,
+  listBackups,
+  validateBackup,
+  prepareRestore,
+  getRestoreStatus
 } = require('../utils/maintenanceBackup');
 
 const router = express.Router();
 const translator = new deepl.Translator(process.env.DEEPL_API_KEY);
+const RESTORE_CONFIRMATION_WORD = 'RESTORE';
+const RESTORE_CHALLENGE_TTL_MS = 10 * 60 * 1000;
+const restoreChallenges = new Map();
 
 router.use(express.json({ limit: '64kb' }));
 router.use(requireAdminJwt);
@@ -124,12 +132,79 @@ async function translateReason(reason) {
   };
 }
 
+function purgeExpiredRestoreChallenges() {
+  const now = Date.now();
+  for (const [challengeId, challenge] of restoreChallenges.entries()) {
+    if (!challenge || Number(challenge.expiresAt) <= now) {
+      restoreChallenges.delete(challengeId);
+    }
+  }
+}
+
+function createRestoreChallenge(backupId) {
+  purgeExpiredRestoreChallenges();
+  const challengeId = typeof crypto.randomUUID === 'function'
+    ? crypto.randomUUID()
+    : crypto.randomBytes(16).toString('hex');
+  const confirmationPin = String(crypto.randomInt(0, 1000000)).padStart(6, '0');
+  const expiresAt = Date.now() + RESTORE_CHALLENGE_TTL_MS;
+  restoreChallenges.set(challengeId, { backupId, confirmationPin, expiresAt });
+  return {
+    challengeId,
+    confirmationWord: RESTORE_CONFIRMATION_WORD,
+    confirmationPin,
+    expiresAt
+  };
+}
+
+function takeRestoreChallenge(challengeId) {
+  purgeExpiredRestoreChallenges();
+  const challenge = restoreChallenges.get(challengeId) || null;
+  restoreChallenges.delete(challengeId);
+  return challenge;
+}
+
+function normalizeBackupId(value) {
+  const backupId = normalizeText(value);
+  return backupId || null;
+}
+
 router.get('/backup/latest', async (_req, res, next) => {
   try {
     const backup = await getLatestBackup();
     return res.status(200).json({ status: 200, backup });
   } catch (error) {
     const apiErr = apiError.internal('backup_metadata_unavailable');
+    apiErr.detail = error?.message || error;
+    return next(apiErr);
+  }
+});
+
+router.get('/backup/list', async (_req, res, next) => {
+  try {
+    const backups = await listBackups();
+    return res.status(200).json({ status: 200, backups });
+  } catch (error) {
+    const apiErr = apiError.internal('backup_list_unavailable');
+    apiErr.detail = error?.message || error;
+    return next(apiErr);
+  }
+});
+
+router.get('/backup/:backupId/validate', async (req, res, next) => {
+  const backupId = normalizeBackupId(req.params.backupId);
+  if (!backupId) {
+    return next(apiError.badRequest('invalid_backup_id'));
+  }
+
+  try {
+    const validation = await validateBackup(backupId);
+    if (!validation.backup) {
+      return next(apiError.notFound('backup_not_found'));
+    }
+    return res.status(200).json({ status: 200, ...validation });
+  } catch (error) {
+    const apiErr = apiError.internal('backup_validation_failed');
     apiErr.detail = error?.message || error;
     return next(apiErr);
   }
@@ -154,6 +229,90 @@ router.get('/backup/:backupId/download', async (req, res, next) => {
       next(downloadErr);
     }
   });
+});
+
+router.get('/restore/status', async (_req, res, next) => {
+  try {
+    const restoreStatus = await getRestoreStatus();
+    return res.status(200).json({ status: 200, ...restoreStatus });
+  } catch (error) {
+    const apiErr = apiError.internal('restore_status_unavailable');
+    apiErr.detail = error?.message || error;
+    return next(apiErr);
+  }
+});
+
+router.post('/restore/challenge', async (req, res, next) => {
+  const backupId = normalizeBackupId(req.body?.backupId);
+  if (!backupId) {
+    return next(apiError.badRequest('invalid_backup_id'));
+  }
+
+  try {
+    const validation = await validateBackup(backupId);
+    if (!validation.backup) {
+      return next(apiError.notFound('backup_not_found'));
+    }
+    if (!validation.valid) {
+      const apiErr = apiError.unprocessableEntity('backup_invalid');
+      apiErr.detail = validation.issues;
+      return next(apiErr);
+    }
+
+    const challenge = createRestoreChallenge(backupId);
+    return res.status(200).json({
+      status: 200,
+      backup: validation.backup,
+      valid: validation.valid,
+      issues: validation.issues,
+      challenge
+    });
+  } catch (error) {
+    const apiErr = apiError.internal('restore_challenge_failed');
+    apiErr.detail = error?.message || error;
+    return next(apiErr);
+  }
+});
+
+router.post('/restore/prepare', async (req, res, next) => {
+  const backupId = normalizeBackupId(req.body?.backupId);
+  const challengeId = normalizeText(req.body?.challengeId);
+  const confirmationWord = normalizeText(req.body?.confirmationWord);
+  const confirmationPin = typeof req.body?.confirmationPin === 'string'
+    ? req.body.confirmationPin.trim()
+    : null;
+
+  if (!backupId || !challengeId || !confirmationWord || !confirmationPin) {
+    return next(apiError.badRequest('restore_confirmation_incomplete'));
+  }
+
+  const challenge = takeRestoreChallenge(challengeId);
+  if (!challenge || challenge.backupId !== backupId) {
+    return next(apiError.badRequest('restore_challenge_invalid'));
+  }
+
+  if (confirmationWord !== RESTORE_CONFIRMATION_WORD || confirmationPin !== challenge.confirmationPin) {
+    return next(apiError.badRequest('restore_confirmation_invalid'));
+  }
+
+  try {
+    const pendingRestore = await prepareRestore(backupId, { preparedBy: req.admin?.sub ?? null });
+    const restoreStatus = await getRestoreStatus();
+    return res.status(200).json({
+      status: 200,
+      pendingRestore,
+      ...restoreStatus
+    });
+  } catch (error) {
+    if (Array.isArray(error?.issues)) {
+      const apiErr = apiError.unprocessableEntity('backup_invalid');
+      apiErr.detail = error.issues;
+      return next(apiErr);
+    }
+    const apiErr = apiError.internal('restore_prepare_failed');
+    apiErr.detail = error?.message || error;
+    return next(apiErr);
+  }
 });
 
 router.post('/backup', async (req, res, next) => {

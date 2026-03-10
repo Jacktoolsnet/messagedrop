@@ -41,6 +41,7 @@ const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder'
 const { normalizeErrorResponses, notFoundHandler, errorHandler } = require('./middleware/api-error');
 const { cleanupClosedDsaCases } = require('./utils/dsaCleanup');
 const { parseRetentionMs, DAY_MS } = require('./utils/logRetention');
+const { performPendingRestore } = require('./utils/maintenanceBackup');
 
 // ExpressJs
 const { createServer } = require('node:http');
@@ -386,6 +387,7 @@ app.use(errorHandler);
 (async () => {
   try {
     await generateOrLoadKeypairs();
+    await performPendingRestore(logger);
     server.listen(process.env.ADMIN_PORT, () => {
       const address = server.address();
       const port = typeof address === 'string' ? address : address.port;

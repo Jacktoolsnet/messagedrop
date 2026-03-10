@@ -12,7 +12,15 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTimepickerModule } from '@angular/material/timepicker';
-import { MaintenanceBackupInfo, MaintenanceInfo } from '../../../interfaces/maintenance.interface';
+import {
+  LastRestoreInfo,
+  MaintenanceBackupInfo,
+  MaintenanceBackupListItem,
+  MaintenanceBackupValidationResponse,
+  MaintenanceInfo,
+  MaintenanceRestoreChallenge,
+  PendingRestoreInfo
+} from '../../../interfaces/maintenance.interface';
 import { MaintenanceService } from '../../../services/maintenance.service';
 
 @Component({
@@ -41,10 +49,27 @@ export class MaintenanceCardComponent {
 
   readonly loading = signal(true);
   readonly saving = signal(false);
-  readonly backupLoading = signal(true);
   readonly backupRunning = signal(false);
+  readonly catalogLoading = signal(true);
+  readonly restoreStatusLoading = signal(true);
+  readonly validationBusyId = signal<string | null>(null);
+  readonly challengeBusyId = signal<string | null>(null);
+  readonly restorePreparing = signal(false);
   readonly maintenance = signal<MaintenanceInfo | null>(null);
-  readonly latestBackup = signal<MaintenanceBackupInfo | null>(null);
+  readonly backups = signal<MaintenanceBackupListItem[]>([]);
+  readonly selectedValidation = signal<MaintenanceBackupValidationResponse | null>(null);
+  readonly restoreChallenge = signal<MaintenanceRestoreChallenge | null>(null);
+  readonly restoreTargetBackup = signal<MaintenanceBackupInfo | null>(null);
+  readonly pendingRestore = signal<PendingRestoreInfo | null>(null);
+  readonly lastRestore = signal<LastRestoreInfo | null>(null);
+
+  readonly restoreSteps = [
+    'In Plesk alle Node.js-Apps stoppen: public backend, admin backend, OpenMeteo, Nominatim und Viator.',
+    'Nur das Admin-Backend einmal wieder starten.',
+    'Das Admin-Backend spielt den vorbereiteten Restore beim Start automatisch ein.',
+    'Danach die restlichen Node.js-Apps in Plesk wieder starten.',
+    'Zum Schluss diese Seite neu laden und den Restore-Status prüfen.'
+  ];
 
   readonly form = new FormGroup({
     enabled: new FormControl(false, { nonNullable: true }),
@@ -53,6 +78,11 @@ export class MaintenanceCardComponent {
     endDate: new FormControl<Date | null>(null),
     endTime: new FormControl<Date | null>(null),
     reason: new FormControl('', { nonNullable: true })
+  });
+
+  readonly restoreConfirmForm = new FormGroup({
+    confirmationWord: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    confirmationPin: new FormControl('', { nonNullable: true, validators: [Validators.required] })
   });
 
   readonly isActive = computed(() => this.maintenance()?.enabled ?? false);
@@ -66,8 +96,16 @@ export class MaintenanceCardComponent {
     if (this.hasSchedule()) return 'Scheduled';
     return 'Inactive';
   });
-  readonly canCreateBackup = computed(() => !this.loading() && !this.saving() && !this.backupRunning());
-  readonly hasBackup = computed(() => !!this.latestBackup());
+  readonly latestBackup = computed(() => this.backups()[0] ?? null);
+  readonly hasBackup = computed(() => this.backups().length > 0);
+  readonly canCreateBackup = computed(() => !this.loading() && !this.saving() && !this.backupRunning() && !this.restorePreparing());
+  readonly canPrepareRestore = computed(() => {
+    return !!this.restoreChallenge()
+      && !!this.restoreTargetBackup()
+      && this.restoreConfirmForm.valid
+      && !this.restorePreparing()
+      && !this.backupRunning();
+  });
 
   constructor() {
     this.form.controls.enabled.valueChanges
@@ -81,16 +119,17 @@ export class MaintenanceCardComponent {
   }
 
   refresh(): void {
-    this.load();
-    this.loadLatestBackup();
+    this.loadMaintenance();
+    this.loadBackupCatalog();
+    this.loadRestoreStatus();
   }
 
   canSubmit(): boolean {
-    return !this.loading() && !this.saving() && !this.backupRunning() && this.form.valid;
+    return !this.loading() && !this.saving() && !this.backupRunning() && !this.restorePreparing() && this.form.valid;
   }
 
   submit(): void {
-    if (!this.form.valid || this.loading() || this.saving() || this.backupRunning()) {
+    if (!this.form.valid || this.loading() || this.saving() || this.backupRunning() || this.restorePreparing()) {
       this.form.markAllAsTouched();
       return;
     }
@@ -176,11 +215,11 @@ export class MaintenanceCardComponent {
     this.maintenanceService.createBackup()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (response) => {
-          this.latestBackup.set(response?.backup ?? null);
+        next: () => {
           this.backupRunning.set(false);
-          this.load();
-          this.loadLatestBackup(true);
+          this.loadMaintenance();
+          this.loadBackupCatalog(true);
+          this.loadRestoreStatus(true);
           this.snackBar.open('Backup created successfully.', 'OK', {
             duration: 2500,
             panelClass: ['snack-success'],
@@ -190,8 +229,8 @@ export class MaintenanceCardComponent {
         },
         error: () => {
           this.backupRunning.set(false);
-          this.load();
-          this.loadLatestBackup(true);
+          this.loadMaintenance();
+          this.loadBackupCatalog(true);
           this.snackBar.open('Failed to create backup.', 'OK', {
             duration: 3500,
             panelClass: ['snack-error'],
@@ -207,7 +246,10 @@ export class MaintenanceCardComponent {
     if (!backup) {
       return;
     }
+    this.downloadBackupArchive(backup);
+  }
 
+  downloadBackupArchive(backup: MaintenanceBackupInfo | MaintenanceBackupListItem): void {
     this.maintenanceService.downloadBackup(backup.id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -244,6 +286,128 @@ export class MaintenanceCardComponent {
       });
   }
 
+  validateRestoreBackup(backup: MaintenanceBackupListItem): void {
+    this.validationBusyId.set(backup.id);
+    this.maintenanceService.validateBackup(backup.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.validationBusyId.set(null);
+          this.selectedValidation.set(response);
+          this.restoreChallenge.set(null);
+          this.restoreTargetBackup.set(null);
+          this.restoreConfirmForm.reset({ confirmationWord: '', confirmationPin: '' });
+          this.snackBar.open(response.valid ? 'Backup validation successful.' : 'Backup has validation issues.', 'OK', {
+            duration: 2500,
+            panelClass: [response.valid ? 'snack-success' : 'snack-error'],
+            horizontalPosition: 'center',
+            verticalPosition: 'top'
+          });
+        },
+        error: () => {
+          this.validationBusyId.set(null);
+          this.snackBar.open('Could not validate the selected backup.', 'OK', {
+            duration: 3000,
+            panelClass: ['snack-error'],
+            horizontalPosition: 'center',
+            verticalPosition: 'top'
+          });
+        }
+      });
+  }
+
+  requestRestoreChallenge(backup: MaintenanceBackupListItem): void {
+    this.challengeBusyId.set(backup.id);
+    this.maintenanceService.createRestoreChallenge(backup.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.challengeBusyId.set(null);
+          this.restoreTargetBackup.set(response.backup);
+          this.restoreChallenge.set(response.challenge);
+          this.selectedValidation.set({
+            status: response.status,
+            backup: response.backup,
+            valid: response.valid,
+            issues: response.issues
+          });
+          this.restoreConfirmForm.reset({ confirmationWord: '', confirmationPin: '' });
+          this.snackBar.open('Restore confirmation challenge created.', 'OK', {
+            duration: 2500,
+            panelClass: ['snack-success'],
+            horizontalPosition: 'center',
+            verticalPosition: 'top'
+          });
+        },
+        error: () => {
+          this.challengeBusyId.set(null);
+          this.snackBar.open('Could not create the restore challenge.', 'OK', {
+            duration: 3000,
+            panelClass: ['snack-error'],
+            horizontalPosition: 'center',
+            verticalPosition: 'top'
+          });
+        }
+      });
+  }
+
+  cancelRestoreChallenge(): void {
+    this.restoreChallenge.set(null);
+    this.restoreTargetBackup.set(null);
+    this.restoreConfirmForm.reset({ confirmationWord: '', confirmationPin: '' });
+  }
+
+  prepareRestore(): void {
+    const backup = this.restoreTargetBackup();
+    const challenge = this.restoreChallenge();
+    if (!backup || !challenge || !this.canPrepareRestore()) {
+      this.restoreConfirmForm.markAllAsTouched();
+      return;
+    }
+
+    this.restorePreparing.set(true);
+    this.maintenanceService.prepareRestore({
+      backupId: backup.id,
+      challengeId: challenge.challengeId,
+      confirmationWord: this.restoreConfirmForm.controls.confirmationWord.value.trim(),
+      confirmationPin: this.restoreConfirmForm.controls.confirmationPin.value.trim()
+    }).pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.restorePreparing.set(false);
+          this.pendingRestore.set(response.pendingRestore);
+          this.lastRestore.set(response.lastRestore);
+          this.restoreChallenge.set(null);
+          this.restoreTargetBackup.set(null);
+          this.restoreConfirmForm.reset({ confirmationWord: '', confirmationPin: '' });
+          this.loadRestoreStatus(true);
+          this.snackBar.open('Restore prepared. Follow the Plesk steps below.', 'OK', {
+            duration: 3000,
+            panelClass: ['snack-success'],
+            horizontalPosition: 'center',
+            verticalPosition: 'top'
+          });
+        },
+        error: () => {
+          this.restorePreparing.set(false);
+          this.snackBar.open('Could not prepare the restore.', 'OK', {
+            duration: 3500,
+            panelClass: ['snack-error'],
+            horizontalPosition: 'center',
+            verticalPosition: 'top'
+          });
+        }
+      });
+  }
+
+  isBackupSelected(backupId: string): boolean {
+    return this.selectedValidation()?.backup?.id === backupId;
+  }
+
+  isChallengeActiveFor(backupId: string): boolean {
+    return this.restoreTargetBackup()?.id === backupId && !!this.restoreChallenge();
+  }
+
   formatDateTime(ts: number | null | undefined): string {
     if (!ts) return '—';
     return new Date(ts).toLocaleString('de-DE');
@@ -258,7 +422,17 @@ export class MaintenanceCardComponent {
     return `${(size / (1024 * 1024 * 1024)).toFixed(2)} GB`;
   }
 
-  private load(): void {
+  formatRestoreState(status: string | null | undefined): string {
+    switch ((status || '').toLowerCase()) {
+      case 'pending': return 'Prepared';
+      case 'running': return 'Running';
+      case 'success': return 'Successful';
+      case 'failed': return 'Failed';
+      default: return status || 'Unknown';
+    }
+  }
+
+  private loadMaintenance(): void {
     this.loading.set(true);
     this.maintenanceService.getStatus()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -279,20 +453,46 @@ export class MaintenanceCardComponent {
       });
   }
 
-  private loadLatestBackup(silent = false): void {
-    this.backupLoading.set(true);
-    this.maintenanceService.getLatestBackup()
+  private loadBackupCatalog(silent = false): void {
+    this.catalogLoading.set(true);
+    this.maintenanceService.listBackups()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
-          this.latestBackup.set(response?.backup ?? null);
-          this.backupLoading.set(false);
+          this.backups.set(response.backups ?? []);
+          this.catalogLoading.set(false);
         },
         error: () => {
-          this.backupLoading.set(false);
-          this.latestBackup.set(null);
+          this.catalogLoading.set(false);
+          this.backups.set([]);
           if (!silent) {
-            this.snackBar.open('Failed to load backup information.', 'OK', {
+            this.snackBar.open('Failed to load backup catalog.', 'OK', {
+              duration: 3000,
+              panelClass: ['snack-error'],
+              horizontalPosition: 'center',
+              verticalPosition: 'top'
+            });
+          }
+        }
+      });
+  }
+
+  private loadRestoreStatus(silent = false): void {
+    this.restoreStatusLoading.set(true);
+    this.maintenanceService.getRestoreStatus()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.pendingRestore.set(response.pendingRestore ?? null);
+          this.lastRestore.set(response.lastRestore ?? null);
+          this.restoreStatusLoading.set(false);
+        },
+        error: () => {
+          this.restoreStatusLoading.set(false);
+          this.pendingRestore.set(null);
+          this.lastRestore.set(null);
+          if (!silent) {
+            this.snackBar.open('Failed to load restore status.', 'OK', {
               duration: 3000,
               panelClass: ['snack-error'],
               horizontalPosition: 'center',
