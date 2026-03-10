@@ -1,22 +1,22 @@
+import { HttpResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
-import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTimepickerModule } from '@angular/material/timepicker';
-import { MaintenanceInfo } from '../../../interfaces/maintenance.interface';
+import { MaintenanceBackupInfo, MaintenanceInfo } from '../../../interfaces/maintenance.interface';
 import { MaintenanceService } from '../../../services/maintenance.service';
 
 @Component({
   selector: 'app-maintenance-card',
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     MatCardModule,
@@ -41,7 +41,10 @@ export class MaintenanceCardComponent {
 
   readonly loading = signal(true);
   readonly saving = signal(false);
+  readonly backupLoading = signal(true);
+  readonly backupRunning = signal(false);
   readonly maintenance = signal<MaintenanceInfo | null>(null);
+  readonly latestBackup = signal<MaintenanceBackupInfo | null>(null);
 
   readonly form = new FormGroup({
     enabled: new FormControl(false, { nonNullable: true }),
@@ -63,6 +66,8 @@ export class MaintenanceCardComponent {
     if (this.hasSchedule()) return 'Scheduled';
     return 'Inactive';
   });
+  readonly canCreateBackup = computed(() => !this.loading() && !this.saving() && !this.backupRunning());
+  readonly hasBackup = computed(() => !!this.latestBackup());
 
   constructor() {
     this.form.controls.enabled.valueChanges
@@ -72,19 +77,20 @@ export class MaintenanceCardComponent {
       });
 
     this.syncReasonValidator(this.form.controls.enabled.value);
-    this.load();
+    this.refresh();
   }
 
   refresh(): void {
     this.load();
+    this.loadLatestBackup();
   }
 
   canSubmit(): boolean {
-    return !this.loading() && !this.saving() && this.form.valid;
+    return !this.loading() && !this.saving() && !this.backupRunning() && this.form.valid;
   }
 
   submit(): void {
-    if (!this.form.valid || this.loading() || this.saving()) {
+    if (!this.form.valid || this.loading() || this.saving() || this.backupRunning()) {
       this.form.markAllAsTouched();
       return;
     }
@@ -136,46 +142,165 @@ export class MaintenanceCardComponent {
     };
 
     this.saving.set(true);
-    this.maintenanceService.update(payload).subscribe({
-      next: (response) => {
-        this.applyMaintenance(response?.maintenance ?? null);
-        this.saving.set(false);
-        this.snackBar.open('Maintenance settings updated.', 'OK', {
-          duration: 2000,
-          panelClass: ['snack-success'],
-          horizontalPosition: 'center',
-          verticalPosition: 'top'
-        });
-      },
-      error: () => {
-        this.saving.set(false);
-        this.snackBar.open('Failed to update maintenance settings.', 'OK', {
-          duration: 3000,
-          panelClass: ['snack-error'],
-          horizontalPosition: 'center',
-          verticalPosition: 'top'
-        });
-      }
-    });
+    this.maintenanceService.update(payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.applyMaintenance(response?.maintenance ?? null);
+          this.saving.set(false);
+          this.snackBar.open('Maintenance settings updated.', 'OK', {
+            duration: 2000,
+            panelClass: ['snack-success'],
+            horizontalPosition: 'center',
+            verticalPosition: 'top'
+          });
+        },
+        error: () => {
+          this.saving.set(false);
+          this.snackBar.open('Failed to update maintenance settings.', 'OK', {
+            duration: 3000,
+            panelClass: ['snack-error'],
+            horizontalPosition: 'center',
+            verticalPosition: 'top'
+          });
+        }
+      });
+  }
+
+  createBackup(): void {
+    if (!this.canCreateBackup()) {
+      return;
+    }
+
+    this.backupRunning.set(true);
+    this.maintenanceService.createBackup()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.latestBackup.set(response?.backup ?? null);
+          this.backupRunning.set(false);
+          this.load();
+          this.loadLatestBackup(true);
+          this.snackBar.open('Backup created successfully.', 'OK', {
+            duration: 2500,
+            panelClass: ['snack-success'],
+            horizontalPosition: 'center',
+            verticalPosition: 'top'
+          });
+        },
+        error: () => {
+          this.backupRunning.set(false);
+          this.load();
+          this.loadLatestBackup(true);
+          this.snackBar.open('Failed to create backup.', 'OK', {
+            duration: 3500,
+            panelClass: ['snack-error'],
+            horizontalPosition: 'center',
+            verticalPosition: 'top'
+          });
+        }
+      });
+  }
+
+  downloadLatestBackup(): void {
+    const backup = this.latestBackup();
+    if (!backup) {
+      return;
+    }
+
+    this.maintenanceService.downloadBackup(backup.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          const blob = response.body;
+          if (!blob) {
+            this.snackBar.open('Empty backup archive received.', 'OK', {
+              duration: 3000,
+              panelClass: ['snack-error'],
+              horizontalPosition: 'center',
+              verticalPosition: 'top'
+            });
+            return;
+          }
+
+          const filename = this.resolveFilename(response, backup.archiveName || `messagedrop-backup-${backup.id}.zip`);
+          const url = window.URL.createObjectURL(blob);
+          const anchor = document.createElement('a');
+          anchor.href = url;
+          anchor.download = filename;
+          document.body.appendChild(anchor);
+          anchor.click();
+          document.body.removeChild(anchor);
+          window.URL.revokeObjectURL(url);
+        },
+        error: () => {
+          this.snackBar.open('Could not download the backup ZIP.', 'OK', {
+            duration: 3000,
+            panelClass: ['snack-error'],
+            horizontalPosition: 'center',
+            verticalPosition: 'top'
+          });
+        }
+      });
+  }
+
+  formatDateTime(ts: number | null | undefined): string {
+    if (!ts) return '—';
+    return new Date(ts).toLocaleString('de-DE');
+  }
+
+  formatBytes(bytes: number | null | undefined): string {
+    const size = Number(bytes);
+    if (!Number.isFinite(size) || size <= 0) return '—';
+    if (size < 1024) return `${size} B`;
+    if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+    if (size < 1024 * 1024 * 1024) return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+    return `${(size / (1024 * 1024 * 1024)).toFixed(2)} GB`;
   }
 
   private load(): void {
     this.loading.set(true);
-    this.maintenanceService.getStatus().subscribe({
-      next: (response) => {
-        this.applyMaintenance(response?.maintenance ?? null);
-        this.loading.set(false);
-      },
-      error: () => {
-        this.loading.set(false);
-        this.snackBar.open('Failed to load maintenance status.', 'OK', {
-          duration: 3000,
-          panelClass: ['snack-error'],
-          horizontalPosition: 'center',
-          verticalPosition: 'top'
-        });
-      }
-    });
+    this.maintenanceService.getStatus()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.applyMaintenance(response?.maintenance ?? null);
+          this.loading.set(false);
+        },
+        error: () => {
+          this.loading.set(false);
+          this.snackBar.open('Failed to load maintenance status.', 'OK', {
+            duration: 3000,
+            panelClass: ['snack-error'],
+            horizontalPosition: 'center',
+            verticalPosition: 'top'
+          });
+        }
+      });
+  }
+
+  private loadLatestBackup(silent = false): void {
+    this.backupLoading.set(true);
+    this.maintenanceService.getLatestBackup()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.latestBackup.set(response?.backup ?? null);
+          this.backupLoading.set(false);
+        },
+        error: () => {
+          this.backupLoading.set(false);
+          this.latestBackup.set(null);
+          if (!silent) {
+            this.snackBar.open('Failed to load backup information.', 'OK', {
+              duration: 3000,
+              panelClass: ['snack-error'],
+              horizontalPosition: 'center',
+              verticalPosition: 'top'
+            });
+          }
+        }
+      });
   }
 
   private applyMaintenance(data: MaintenanceInfo | null): void {
@@ -235,5 +360,19 @@ export class MaintenanceCardComponent {
   private normalizeText(value: string): string | null {
     const trimmed = value.trim();
     return trimmed ? trimmed : null;
+  }
+
+  private resolveFilename(response: HttpResponse<Blob>, fallback: string): string {
+    const disposition = response.headers.get('Content-Disposition');
+    if (!disposition) return fallback;
+    const match = /filename\*?=(?:UTF-8'')?"?([^";]+)/i.exec(disposition);
+    if (!match?.[1]) {
+      return fallback;
+    }
+    try {
+      return decodeURIComponent(match[1].replace(/"/g, ''));
+    } catch {
+      return match[1].replace(/"/g, '');
+    }
   }
 }

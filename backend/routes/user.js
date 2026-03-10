@@ -20,6 +20,7 @@ const { signServiceJwt } = require('../utils/serviceJwt');
 const { resolveBaseUrl } = require('../utils/adminLogForwarder');
 
 const SOCKET_AUDIENCE = process.env.SERVICE_JWT_AUDIENCE_SOCKET || 'service.socketio';
+const ADMIN_AUDIENCE = process.env.SERVICE_JWT_AUDIENCE_ADMIN || 'service.admin-backend';
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const MAX_RESTORE_CONTACT_ROWS = 5000;
 const MAX_RESTORE_PLACE_ROWS = 5000;
@@ -27,6 +28,53 @@ const MAX_RESTORE_USER_ROWS = 10000;
 
 function resolveSocketIoBaseUrl() {
   return resolveBaseUrl(process.env.SOCKETIO_BASE_URL || process.env.BASE_URL, process.env.SOCKETIO_PORT);
+}
+
+function resolveAdminAuditBaseUrl() {
+  return resolveBaseUrl(process.env.ADMIN_BASE_URL, process.env.ADMIN_PORT, process.env.ADMIN_LOG_URL);
+}
+
+async function forwardPlatformUserAudit(entry, logger) {
+  const baseUrl = resolveAdminAuditBaseUrl();
+  if (!baseUrl) {
+    return { sent: false };
+  }
+
+  try {
+    const token = await signServiceJwt({ audience: ADMIN_AUDIENCE });
+    const response = await axios.post(`${baseUrl}/audit-log`, entry, {
+      headers: {
+        'content-type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      timeout: 3000,
+      validateStatus: () => true
+    });
+
+    if (response.status >= 200 && response.status < 300) {
+      return {
+        sent: true,
+        id: response.data?.id ?? null
+      };
+    }
+
+    logger?.warn?.('Platform user audit forward failed', {
+      entityType: entry?.entityType,
+      entityId: entry?.entityId,
+      action: entry?.action,
+      status: response.status,
+      detail: response.data?.error || response.data?.message || response.statusText || null
+    });
+  } catch (error) {
+    logger?.warn?.('Platform user audit forward failed', {
+      entityType: entry?.entityType,
+      entityId: entry?.entityId,
+      action: entry?.action,
+      error: error?.message || error
+    });
+  }
+
+  return { sent: false };
 }
 
 async function emitKeyUpdate(userIds, payload) {
@@ -521,6 +569,29 @@ async function resolveOpenModerationAppeals(db, userId, target, status, reviewer
   ));
 }
 
+async function forwardAutoResolvedModerationAppeals(appeals, actor, logger) {
+  const safeAppeals = Array.isArray(appeals) ? appeals.filter(Boolean) : [];
+  if (!safeAppeals.length) {
+    return;
+  }
+
+  await Promise.all(safeAppeals.map((appeal) => forwardPlatformUserAudit({
+    entityType: 'platform_user',
+    entityId: String(appeal.userId || '').trim(),
+    action: 'platform_user_appeal_auto_accept',
+    actor: actor || 'admin',
+    at: Number(appeal.resolvedAt || Date.now()),
+    details: {
+      appealId: appeal.id,
+      target: appeal.target,
+      status: appeal.status,
+      resolutionMessage: appeal.resolutionMessage || null,
+      reviewer: appeal.reviewer || actor || null,
+      trigger: 'moderator_unblock'
+    }
+  }, logger)));
+}
+
 router.get('/internal/moderation/appeals/open',
   [
     security.checkToken
@@ -591,6 +662,7 @@ router.patch('/internal/moderation/:userId/posting',
     }
 
     try {
+      let resolvedAppeals = [];
       await updateModerationTarget(req.database.db, userId, 'posting', {
         blocked,
         reason,
@@ -599,7 +671,7 @@ router.patch('/internal/moderation/:userId/posting',
         at: Date.now()
       });
       if (!blocked) {
-        await resolveOpenModerationAppeals(
+        resolvedAppeals = await resolveOpenModerationAppeals(
           req.database.db,
           userId,
           tableUserModerationAppeal.appealTarget.POSTING,
@@ -607,6 +679,7 @@ router.patch('/internal/moderation/:userId/posting',
           actor,
           'Resolved through moderator unblock.'
         );
+        void forwardAutoResolvedModerationAppeals(resolvedAppeals, actor, req.logger);
       }
       const row = await getUserRowById(req.database.db, userId);
       const response = await buildUserModerationResponse(req.database.db, row);
@@ -644,6 +717,7 @@ router.patch('/internal/moderation/:userId/account',
     }
 
     try {
+      let resolvedAppeals = [];
       await updateModerationTarget(req.database.db, userId, 'account', {
         blocked,
         reason,
@@ -652,7 +726,7 @@ router.patch('/internal/moderation/:userId/account',
         at: Date.now()
       });
       if (!blocked) {
-        await resolveOpenModerationAppeals(
+        resolvedAppeals = await resolveOpenModerationAppeals(
           req.database.db,
           userId,
           tableUserModerationAppeal.appealTarget.ACCOUNT,
@@ -660,6 +734,7 @@ router.patch('/internal/moderation/:userId/account',
           actor,
           'Resolved through moderator unblock.'
         );
+        void forwardAutoResolvedModerationAppeals(resolvedAppeals, actor, req.logger);
       }
       const row = await getUserRowById(req.database.db, userId);
       const response = await buildUserModerationResponse(req.database.db, row);
@@ -1791,6 +1866,20 @@ router.post('/moderation/appeal',
         reviewer: null
       });
       const response = await buildUserModerationResponse(req.database.db, row);
+      void forwardPlatformUserAudit({
+        entityType: 'platform_user',
+        entityId: row.id,
+        action: 'platform_user_appeal_create',
+        actor: row.id,
+        at: Number(appeal.createdAt || Date.now()),
+        details: {
+          appealId: appeal.id,
+          target: appeal.target,
+          status: appeal.status,
+          message: appeal.message,
+          createdAt: appeal.createdAt
+        }
+      }, req.logger);
       return res.status(201).json({
         status: 201,
         appeal,

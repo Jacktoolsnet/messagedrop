@@ -1,8 +1,8 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { MaintenanceResponse } from '../interfaces/maintenance.interface';
+import { MaintenanceBackupResponse, MaintenanceResponse } from '../interfaces/maintenance.interface';
 
 export interface MaintenanceUpdatePayload {
   enabled: boolean;
@@ -22,5 +22,20 @@ export class MaintenanceService {
 
   update(payload: MaintenanceUpdatePayload): Observable<MaintenanceResponse> {
     return this.http.put<MaintenanceResponse>(this.baseUrl, payload);
+  }
+
+  createBackup(): Observable<MaintenanceBackupResponse> {
+    return this.http.post<MaintenanceBackupResponse>(`${this.baseUrl}/backup`, {});
+  }
+
+  getLatestBackup(): Observable<MaintenanceBackupResponse> {
+    return this.http.get<MaintenanceBackupResponse>(`${this.baseUrl}/backup/latest`);
+  }
+
+  downloadBackup(backupId: string): Observable<HttpResponse<Blob>> {
+    return this.http.get(`${this.baseUrl}/backup/${encodeURIComponent(backupId)}/download`, {
+      observe: 'response',
+      responseType: 'blob'
+    } as const);
   }
 }

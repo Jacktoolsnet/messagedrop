@@ -1,9 +1,16 @@
+const fs = require('node:fs/promises');
+const path = require('node:path');
 const express = require('express');
 const axios = require('axios');
 const deepl = require('deepl-node');
 const { requireAdminJwt, requireRole } = require('../middleware/security');
 const { signServiceJwt } = require('../utils/serviceJwt');
 const { apiError } = require('../middleware/api-error');
+const {
+  createBackup,
+  getLatestBackup,
+  resolveBackupArchivePath
+} = require('../utils/maintenanceBackup');
 
 const router = express.Router();
 const translator = new deepl.Translator(process.env.DEEPL_API_KEY);
@@ -25,13 +32,38 @@ function normalizeText(value) {
   return trimmed ? trimmed : null;
 }
 
+function normalizeMaintenanceSnapshot(value) {
+  const source = value && typeof value === 'object' ? value : {};
+  return {
+    enabled: Boolean(source.enabled),
+    startsAt: normalizeTimestamp(source.startsAt),
+    endsAt: normalizeTimestamp(source.endsAt),
+    reason: normalizeText(source.reason),
+    reasonEn: normalizeText(source.reasonEn),
+    reasonEs: normalizeText(source.reasonEs),
+    reasonFr: normalizeText(source.reasonFr)
+  };
+}
+
+function buildTemporaryMaintenancePayload() {
+  return {
+    enabled: true,
+    startsAt: Math.floor(Date.now() / 1000),
+    endsAt: null,
+    reason: 'Es wird gerade ein Backup erstellt.',
+    reasonEn: 'A backup is currently being created.',
+    reasonEs: 'Se está creando una copia de seguridad.',
+    reasonFr: 'Une sauvegarde est en cours de création.'
+  };
+}
+
 function resolveBackendBase() {
   const base = (process.env.BASE_URL || '').replace(/\/+$/, '');
   if (!base) return null;
   return process.env.PORT ? `${base}:${process.env.PORT}` : base;
 }
 
-async function callBackend(method, path, payload) {
+async function callBackend(method, pathName, payload) {
   const base = resolveBackendBase();
   if (!base) {
     throw new Error('backend_unavailable');
@@ -40,7 +72,7 @@ async function callBackend(method, path, payload) {
   const serviceToken = await signServiceJwt({ audience: backendAudience });
   return axios({
     method,
-    url: `${base}${path}`,
+    url: `${base}${pathName}`,
     data: payload,
     headers: {
       Authorization: `Bearer ${serviceToken}`,
@@ -50,6 +82,33 @@ async function callBackend(method, path, payload) {
     timeout: 5000,
     validateStatus: () => true
   });
+}
+
+function createBackendProxyError(response, fallbackMessage) {
+  const status = Number(response?.status) || 502;
+  const message = response?.data?.message || response?.data?.error || fallbackMessage;
+  const err = apiError.fromStatus(status, message);
+  if (response?.data !== undefined) {
+    err.detail = response.data;
+  }
+  return err;
+}
+
+async function fetchMaintenanceSnapshot() {
+  const response = await callBackend('get', '/maintenance');
+  if ((response?.status || 500) >= 400) {
+    throw createBackendProxyError(response, 'maintenance_fetch_failed');
+  }
+  return normalizeMaintenanceSnapshot(response?.data?.maintenance);
+}
+
+async function setMaintenanceSnapshot(snapshot) {
+  const payload = normalizeMaintenanceSnapshot(snapshot);
+  const response = await callBackend('put', '/maintenance', payload);
+  if ((response?.status || 500) >= 400) {
+    throw createBackendProxyError(response, 'maintenance_update_failed');
+  }
+  return normalizeMaintenanceSnapshot(response?.data?.maintenance);
 }
 
 async function translateReason(reason) {
@@ -64,6 +123,93 @@ async function translateReason(reason) {
     reasonFr: fr?.text || null
   };
 }
+
+router.get('/backup/latest', async (_req, res, next) => {
+  try {
+    const backup = await getLatestBackup();
+    return res.status(200).json({ status: 200, backup });
+  } catch (error) {
+    const apiErr = apiError.internal('backup_metadata_unavailable');
+    apiErr.detail = error?.message || error;
+    return next(apiErr);
+  }
+});
+
+router.get('/backup/:backupId/download', async (req, res, next) => {
+  let archivePath;
+  try {
+    archivePath = resolveBackupArchivePath(req.params.backupId);
+  } catch {
+    return next(apiError.badRequest('invalid_backup_id'));
+  }
+
+  try {
+    await fs.access(archivePath);
+  } catch {
+    return next(apiError.notFound('backup_not_found'));
+  }
+
+  return res.download(archivePath, path.basename(archivePath), (downloadErr) => {
+    if (downloadErr && !res.headersSent) {
+      next(downloadErr);
+    }
+  });
+});
+
+router.post('/backup', async (req, res, next) => {
+  let previousMaintenance = null;
+  let temporaryMaintenanceEnabled = false;
+
+  try {
+    previousMaintenance = await fetchMaintenanceSnapshot();
+
+    if (!previousMaintenance.enabled) {
+      await setMaintenanceSnapshot(buildTemporaryMaintenancePayload());
+      temporaryMaintenanceEnabled = true;
+    }
+
+    const backup = await createBackup({ logger: req.logger });
+
+    if (temporaryMaintenanceEnabled) {
+      try {
+        await setMaintenanceSnapshot(previousMaintenance);
+        temporaryMaintenanceEnabled = false;
+      } catch (restoreError) {
+        const apiErr = apiError.internal('backup_created_but_maintenance_restore_failed');
+        apiErr.detail = restoreError?.message || restoreError;
+        apiErr.backup = backup;
+        throw apiErr;
+      }
+    }
+
+    return res.status(201).json({
+      status: 201,
+      backup,
+      maintenanceTemporarilyEnabled: !previousMaintenance.enabled
+    });
+  } catch (error) {
+    if (temporaryMaintenanceEnabled && previousMaintenance) {
+      try {
+        await setMaintenanceSnapshot(previousMaintenance);
+      } catch (restoreError) {
+        req.logger?.error?.('Maintenance restore after backup failure failed', {
+          error: restoreError?.message || restoreError
+        });
+        if (!error?.detail) {
+          error.detail = restoreError?.message || restoreError;
+        }
+      }
+    }
+
+    if (error?.status || error?.statusCode) {
+      return next(error);
+    }
+
+    const apiErr = apiError.internal('backup_failed');
+    apiErr.detail = error?.message || error;
+    return next(apiErr);
+  }
+});
 
 router.get('/', async (_req, res, next) => {
   try {

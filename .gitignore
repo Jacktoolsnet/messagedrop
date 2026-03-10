@@ -160,3 +160,6 @@ platform/admin/backend/uploads/
 
 # local documents (e.g., downloaded API docs)
 documents/
+
+# backups
+backups/

@@ -43,35 +43,103 @@
         </mat-form-field>
       </div>
 
-      <mat-form-field appearance="outline" class="full">
+      <mat-form-field appearance="outline" class="full" subscriptSizing="dynamic">
         <mat-label>Reason</mat-label>
         <textarea matInput rows="3" formControlName="reason"></textarea>
-        <mat-hint>Translated automatically to EN, ES, and FR.</mat-hint>
         @if (form.controls.reason.invalid && form.controls.reason.touched) {
-        <mat-error>Reason is required when maintenance is active.</mat-error>
+          <mat-error>Reason is required when maintenance is active.</mat-error>
         }
       </mat-form-field>
 
       <div class="translations">
         <div class="translations-title">Translations</div>
         @if (maintenance()?.reasonEn || maintenance()?.reasonEs || maintenance()?.reasonFr) {
-        <div class="translations-grid">
-          <div class="label">English</div>
-          <div class="value">{{ maintenance()?.reasonEn || '—' }}</div>
-          <div class="label">Spanish</div>
-          <div class="value">{{ maintenance()?.reasonEs || '—' }}</div>
-          <div class="label">French</div>
-          <div class="value">{{ maintenance()?.reasonFr || '—' }}</div>
-        </div>
+          <div class="translations-grid">
+            <div class="label">English</div>
+            <div class="value">{{ maintenance()?.reasonEn || '—' }}</div>
+            <div class="label">Spanish</div>
+            <div class="value">{{ maintenance()?.reasonEs || '—' }}</div>
+            <div class="label">French</div>
+            <div class="value">{{ maintenance()?.reasonFr || '—' }}</div>
+          </div>
         } @else {
-        <div class="translations-empty">No translations yet.</div>
+          <div class="translations-empty">The reason is translated automatically after saving.</div>
         }
       </div>
     </form>
+
+    <section class="backup-panel" aria-labelledby="backup-heading">
+      <div class="backup-header">
+        <div class="backup-avatar avatar avatar-accent" aria-hidden="true">
+          <mat-icon>archive</mat-icon>
+        </div>
+        <div class="backup-copy">
+          <div class="backup-title" id="backup-heading">Database backup</div>
+          <div class="backup-subtitle">
+            Creates SQLite snapshots of all productive and service databases, stores them in the server backup
+            folder and bundles them as a ZIP archive.
+          </div>
+        </div>
+      </div>
+
+      @if (backupRunning()) {
+        <div class="backup-status backup-status-running">
+          <mat-icon>sync</mat-icon>
+          <span>Creating backup…</span>
+        </div>
+      }
+
+      @if (backupLoading()) {
+        <div class="backup-empty">Loading backup information…</div>
+      } @else if (latestBackup(); as backup) {
+        <div class="backup-meta-grid">
+          <div class="meta-item">
+            <span class="meta-label">Last backup</span>
+            <strong>{{ formatDateTime(backup.createdAt) }}</strong>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">ZIP file</span>
+            <strong>{{ backup.archiveName }}</strong>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Archive size</span>
+            <strong>{{ formatBytes(backup.archiveSizeBytes) }}</strong>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Databases</span>
+            <strong>{{ backup.databases.length }}</strong>
+          </div>
+        </div>
+
+        <div class="backup-db-list">
+          @for (database of backup.databases; track database.key) {
+            <div class="backup-db-row">
+              <div class="backup-db-name">{{ database.label }}</div>
+              <div class="backup-db-file">{{ database.fileName }}</div>
+              <div class="backup-db-size">{{ formatBytes(database.sizeBytes) }}</div>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="backup-empty">No backup has been created yet.</div>
+      }
+    </section>
   </mat-card-content>
 
   <mat-card-actions class="maintenance-actions">
-    <button mat-stroked-button type="button" (click)="refresh()" [disabled]="loading()">Refresh</button>
-    <button mat-raised-button color="primary" type="button" (click)="submit()" [disabled]="!canSubmit()">Save</button>
+    <button mat-stroked-button type="button" (click)="refresh()" [disabled]="loading() || backupLoading() || backupRunning()">
+      Refresh
+    </button>
+    <button mat-stroked-button type="button" (click)="createBackup()" [disabled]="!canCreateBackup()">
+      <mat-icon>archive</mat-icon>
+      Create backup
+    </button>
+    <button mat-stroked-button type="button" (click)="downloadLatestBackup()" [disabled]="!hasBackup() || backupRunning()">
+      <mat-icon>download</mat-icon>
+      Download ZIP
+    </button>
+    <button mat-raised-button color="primary" type="button" (click)="submit()" [disabled]="!canSubmit()">
+      Save
+    </button>
   </mat-card-actions>
 </mat-card>
