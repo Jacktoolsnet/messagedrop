@@ -20,25 +20,18 @@
         <mat-form-field appearance="outline">
             <mat-label>Entity</mat-label>
             <mat-select [formControl]="filterForm.controls.entityType">
-                <mat-option value="">All</mat-option>
-                <mat-option value="notice">Notice</mat-option>
-                <mat-option value="signal">Signal</mat-option>
-                <mat-option value="decision">Decision</mat-option>
-                <mat-option value="public_message">Public message</mat-option>
-                <mat-option value="user">User</mat-option>
-                <mat-option value="other">Other</mat-option>
+                @for (option of entityOptions; track option.value) {
+                <mat-option [value]="option.value">{{ option.label }}</mat-option>
+                }
             </mat-select>
         </mat-form-field>
 
         <mat-form-field appearance="outline">
             <mat-label>Action</mat-label>
             <mat-select [formControl]="filterForm.controls.action">
-                <mat-option value="">All</mat-option>
-                <mat-option value="create">Create</mat-option>
-                <mat-option value="status_change">Status change</mat-option>
-                <mat-option value="evidence_add">Evidence add</mat-option>
-                <mat-option value="notify">Notify</mat-option>
-                <mat-option value="delete">Delete</mat-option>
+                @for (option of actionOptions; track option.value) {
+                <mat-option [value]="option.value">{{ option.label }}</mat-option>
+                }
             </mat-select>
         </mat-form-field>
 
@@ -61,14 +54,15 @@
     <!-- Timeline -->
     <div class="timeline">
         @for (e of items(); track trackById($index, e)) {
-        <div class="row" role="button" tabindex="0" (click)="openEntity(e)" (keydown.enter)="openEntity(e)"
+        <div class="row" [class.row--clickable]="canOpenEntity(e)" [attr.role]="canOpenEntity(e) ? 'button' : null"
+            [attr.tabindex]="canOpenEntity(e) ? 0 : null" (click)="openEntity(e)" (keydown.enter)="openEntity(e)"
             (keydown.space)="openEntity(e)">
             <div class="left">
                 <div class="avatar avatar-neutral"><mat-icon>{{ iconForAction(e.action) }}</mat-icon></div>
                 <div class="head">
                     <div class="title">{{ labelForAction(e.action) }}</div>
                     <div class="meta">
-                        <span class="etype">{{ e.entityType }}</span>
+                        <span class="etype">{{ labelForEntityType(e.entityType) }}</span>
                         <span class="dot">•</span>
                         <span class="date">{{ e.createdAt | date:'medium' }}</span>
                     </div>

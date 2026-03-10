@@ -3,6 +3,7 @@ export type DsaAuditEntityType =
     | 'decision'
     | 'signal'
     | 'public_message'
+    | 'platform_user'
     | 'user'
     | 'other';
 

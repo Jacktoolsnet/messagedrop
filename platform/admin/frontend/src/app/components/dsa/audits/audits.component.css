@@ -80,13 +80,22 @@ mat-progress-bar {
     border-radius: 16px;
     padding: 12px 14px;
     box-shadow: 0 10px 30px rgba(2, 8, 20, .06);
+    cursor: default;
+}
+
+.row--clickable {
     cursor: pointer;
     transition: transform .15s ease, box-shadow .15s ease;
 }
 
-.row:hover {
+.row--clickable:hover {
     transform: translateY(-2px);
     box-shadow: 0 16px 36px rgba(2, 8, 20, .12)
+}
+
+.row--clickable:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
 }
 
 .left {
