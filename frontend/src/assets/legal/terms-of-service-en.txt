@@ -1,429 +1,493 @@
 TERMS OF USE
-Version: 12 April 2026
+As of April 12, 2026
 
 IMPORTANT NOTE ON LANGUAGE
 This English translation is provided for convenience only and is not legally binding. The legally binding version is exclusively the current complete German version of these Terms of Use.
 
 ###
-Short Version (not legally binding)
+Summary (simplified, not legally binding)
 ###
 
-By using MessageDrop, you accept these Terms of Use.
+- By using MessageDrop, you agree to these Terms of Use.
+- You must be at least 16 years old to use this service.
+- If you are at least 16 years of age but under 18 years of age, you need the consent of your parents or legal guardians.
+- Legally binding declarations that go beyond normal app use are generally only possible once you have reached the age of 18.
+- MessageDrop can be used without a user account. Some features will then not be available.
+- You are responsible for the content you publish or send.
+- Prohibited content (e.g., illegal content, hate speech, violence, personal information) is not allowed.
+- We may moderate, restrict, hide, or remove content.
+- Reports and procedures under the Digital Services Act (DSA) may be carried out for public content.
+- A public status page may be provided for DSA procedures (with anonymized or non-personal procedural information).
+- Illegal public content can be reported using the reporting function in the service or via the contact point specified in the legal notice.
+- Affected users can submit an internal complaint regarding moderation decisions, where provided for by law.
+- You can follow contacts and places. Notifications are voluntary additional technical features; we are not obligated to deliver them.
+- Private chats are intended as confidential communication. Nevertheless, you must also comply with the law there.
+- Much data is stored locally on your device. This data can be lost. Without your own backup, recovery is not possible.
+- The optional read-aloud function uses the speech synthesis of your browser or operating system. Availability, voice selection, and quality depend on the device, browser, operating system, and selected voice.
+- The optional usage time protection (self-restriction/parental mode with parental PIN) can be circumvented technically; an absolute block is not guaranteed.
+- External content from third-party providers is only loaded after you have given your provider-specific consent. You can withdraw this consent at any time.
+- External services (e.g., YouTube, OpenStreetMap, DeepL, Unsplash, Viator) have their own terms of use and privacy policies.
+- MessageDrop is not an emergency service.
 
-You are responsible for the content you create and must ensure that it is lawful and does not infringe third-party rights.
-
-Content may be moderated, restricted, or removed manually and automatically, including by AI-assisted procedures. For public content, procedures under the Digital Services Act (DSA) may be initiated.
-
-External services and embeds (e.g., YouTube, OpenStreetMap, DeepL) are subject solely to the terms of the respective providers.
-
-The service may be limited or unavailable at times; no specific availability is guaranteed.
-
-A large portion of the data is stored locally on your device. This data may be lost or deleted; you are responsible for appropriate backups (e.g., via a backup feature, if available).
-
-The optional read-aloud feature uses your browser’s or operating system’s speech synthesis. Availability, voice selection, and quality depend on the device, browser, operating system, and selected voice.
-
-Profiles (name/avatar) may be used locally. When contacting someone, an optional profile sharing request may be sent to a contact; the contact must actively consent. After consent, name and avatar are stored locally on the contact’s device; it is technically impossible to retrieve them.
-
-System messages (e.g., regarding DSA procedures or maintenance) may be shown in the user account and are generated exclusively by authorized administrative systems. Users cannot currently reply to them.
-
-Places can be followed; where technically possible, push notifications about new public content at followed places may be displayed. Push/real-time features are provided on a “best effort” basis subject to technical availability; there is no entitlement to delivery or timely notifications.
-
-MessageDrop does not provide access to emergency services and does not replace attention or care in real life.
-
-Only the current complete German version of these Terms of Use is authoritative.
-
-###
-Full Version
-###
+Only the complete version below is authoritative.
 
 ###
-Glossary
+Full version
 ###
 
-User
-Natural person who uses MessageDrop, regardless of whether a user account has been created.
-
-User account
-Technical, pseudonymous access unit that a user may voluntarily create and that is identified by a user ID.
-
-User ID
-Technical identifier of a user account. The user ID is pseudonymous and does not, by itself, allow direct identification of a person.
-
-Visitor
-User who uses MessageDrop without creating a user account.
-
-Public content
-Content created by users (e.g., public messages and comments) that is generally publicly visible unless it has been restricted or removed.
-
-Private communication
-Communication between users that is transmitted in encrypted form (e.g., private chats), where offered.
-
-External content / third-party providers
-Content, functions, or embeds provided by third parties that may trigger data transfer to the respective provider (e.g., iFrames/oEmbed).
-
-System messages
-Internal notifications generated exclusively by authorized administrative systems and displayed in the frontend (e.g., regarding DSA procedures or maintenance). System messages are not an email inbox.
-
-DSA procedure
-Procedure under the Digital Services Act (DSA), in particular notices (“Notice”) and complaints (“Appeal”) in connection with public content.
-
-Public case page
-Publicly accessible page relating to a DSA procedure on which only anonymized or non-personal information is published.
-
-Push notifications / push token
-Technical feature to deliver notifications to a device. Push tokens are technical identifiers that may be required for delivery.
-
-Local storage
-Storage of data on the user’s device (e.g., IndexedDB, app storage, cache). This data may be deleted by the user or due to technical circumstances.
-
 ###
-1. Provider
+1. Who we are
 ###
 
-MessageDrop (messagedrop.de) is operated by:
+The provider of MessageDrop (messagedrop.de) is:
 
-JackTools.Net UG (limited liability)
-Im Kirchfeld 27
-38304 Wolfenbüttel
+JackTools.Net UG (limited liability)  
+Im Kirchfeld 27  
+38304 Wolfenbüttel  
 Germany
 
-Represented by the Managing Director:
-Christian Wagner, Dipl.-Inform. (FH)
+Managing Director: Christian Wagner, Dipl.-Inform. (FH)
 
-Email: jacktoolsnet@gmail.com
+Email: jacktoolsnet@gmail.com  
 Phone: +49 (0) 176 / 41 23 57 74
 
-(hereinafter “we”, “us”, or “provider”)
+(hereinafter referred to as “we,” “us,” or “provider”)
 
 ###
-2. Scope and Acceptance
+2. Who these terms apply to
 ###
 
-These Terms of Use govern the use of the MessageDrop platform.
-
-By accessing or using MessageDrop, you agree to these Terms of Use.
-
-If you do not agree to these Terms of Use, you are not permitted to use the service.
+These Terms of Use apply to all persons who use MessageDrop – with or without a user account. By using MessageDrop, you agree to these Terms of Use. If you do not agree, you may not use MessageDrop.
 
 ###
-3. Changes to the Terms of Use
+3. Minimum age (16/18 rule)
 ###
 
-We reserve the right to change or update these Terms of Use at any time.
+Use is only permitted for persons who have reached the age of 16.
 
-The version current at the time of publication applies.
+- If you are under 16 years of age: Use is not permitted.
+- If you are 16 years of age or older but under 18 years of age: Use is only permitted with the consent of your parents or legal guardians.
+- Persons who have reached the age of 18: full legal capacity; use is permitted at their own discretion.
 
-If changes have material effects on users, we will inform users in an appropriate manner, in particular via system messages or notices within the service.
-
-###
-4. Eligibility to Use
-###
-
-Use of MessageDrop is permitted only for persons who are at least 16 years old.
-
-The service is not intended for children under 16.
-
-Persons aged 16 to 17 may use MessageDrop only within the legally permissible scope of limited contractual capacity. Legally binding declarations or obligations that go beyond the contractual use of the service may be made only by fully legally competent persons (from 18 years of age).
-
-If you use MessageDrop on behalf of an organization or legal entity, you confirm that you are legally authorized to do so.
+Declarations with further legal binding force (i.e., beyond normal use) may only be made by persons with full legal capacity.
 
 ###
-5. Service Description
+4. What MessageDrop is
 ###
 
-MessageDrop is a platform for publishing, displaying, and organizing user-generated content with optional private communication.
+MessageDrop is a platform for:
 
-The service may embed external content or functions, in particular from:
-- Open-Meteo
-- DeepL
-- Nominatim / OpenStreetMap
+- public, location-based content (e.g., messages and comments),
+- private notes (stored locally on your device),
+- contacts and private chats,
+- optional notifications, read-aloud, and organization features (e.g., following contacts/places).
+
+Data protection and data minimization are central principles of MessageDrop. Where possible, we pursue a “local-first” approach: much of the data is primarily stored on your device. On the server side, we only process data that is necessary for the operation of the service (e.g., public content, pseudonymous user ID, public keys, and necessary status and security data).
+
+Where technically possible and reasonable, data is protected by cryptography. This includes, in particular, PIN-based local security for user accounts, encrypted storage of sensitive local data, and client-side encryption of private chat content. Your PIN is processed locally only and is not transmitted to the server.
+
+Where technically available, MessageDrop may provide an optional read-aloud function. This function is intended solely for convenience and accessibility. Which voices are available and whether speech synthesis takes place locally on the end device or via components of the browser or platform provider depends on the browser, operating system, end device, and voice selected.
+
+We may modify, expand, restrict, or remove functions at any time.
+
+###
+5. Use without a user account
+###
+
+You can also use MessageDrop without a user account.
+
+In this case, the following applies in particular:
+
+- Only basic functions are available.
+- Functions that require a user account (e.g., private notes, private contact functions, location-based functions) cannot be used.
+
+###
+6. Use with a user account
+###
+
+If you create a user account:
+
+- you are responsible for the secure use of your device and your PIN,
+- you must prevent misuse by third parties as far as possible,
+- you are responsible for activities via your account, to the extent permitted by law.
+
+If the PIN is lost and no backup is available, access to your previous local account cannot be restored.
+
+###
+7. Contacts, private chats, and following contacts
+###
+
+MessageDrop may include features for contacts and private communication.
+
+The following applies:
+
+1) Private chats  
+Private chats are intended for confidential communication. Content is transmitted using technical protection measures. However, delivery may be delayed, fail for technical reasons, or not occur in individual cases; there is no entitlement to successful, continuously available, immediate, or error-free delivery.
+
+2) Responsibility in chat  
+Illegal content, harassment, threats, hate speech, or the disclosure of third-party data without permission are also prohibited in private chats.
+
+3) Following contacts  
+You can follow or unfollow contacts. Section 8 applies to notifications when following contacts and places.
+
+4) Profile sharing with contacts  
+Profile information (e.g., name/avatar) is only shared with active consent. Once transferred to a contact's device, it is not technically possible to automatically “retrieve” it.
+
+###
+8. Following contacts and places; notifications
+###
+
+You can follow contacts and places. If the respective function is offered, MessageDrop can notify you of new messages from contacts or new public content at places.
+
+Notifications and other push or real-time functions are voluntary additional technical functions. Their availability depends in particular on your device, operating system, browser, network connection, and the technical conditions of the services used.
+
+Notifications may therefore be delayed, incomplete, repeated, or not delivered at all.
+
+We are not obligated to deliver notifications. There is no entitlement to delivery, whether partial, complete, immediate, or error-free.
+
+###
+9. Public content and your responsibility
+###
+
+You are responsible for everything you publish.
+
+You confirm that:
+
+- you have the necessary rights to your content,
+- your content does not infringe on the rights of third parties,
+- your content is lawful.
+
+Personal or private information may not be published publicly or otherwise made publicly available—neither about yourself nor about other people. This also applies if this information is already publicly available elsewhere or if the person concerned has consented to its publication.
+
+You can assign your own display names and avatars to creators of public content locally. These assignments are for your personal orientation only (e.g., to recognize posts from the same user), are stored exclusively locally on your device, and are not visible to other users. Such assignments are not profile information confirmed by the respective creator.
+
+Important note on the storage period for public content:
+Public messages are usually deleted after 30 days. Public comments linked to a public message are usually deleted together with the respective message.
+For technical, operational, or legal reasons, deletion may be delayed in individual cases, so that public content may remain available or visible for longer in exceptional cases.
+There is no entitlement to permanent availability, archiving, restoration, or deletion at a specific point in time.
+
+###
+10. What is prohibited
+###
+
+You may not misuse MessageDrop.
+
+The following are prohibited in particular:
+
+- Content or actions that violate applicable law or incite legal violations,
+- Content that infringes the rights of third parties (e.g., personal rights, copyrights, trademark rights, or data protection rights),
+- Criminal content or incitement to criminal acts,
+- Insults, threats, targeted harassment, bullying, or stalking,
+- Hate speech, glorification of violence, extremist or inhuman content,
+- Pornographic, sexually explicit, or youth-endangering content,
+- Content with sexual references to minors,
+- Public disclosure or other unauthorized distribution of personal information (personal data), regardless of whether it concerns you or other persons.
+
+Personal information includes, in particular:
+- Names, contact details, email addresses, telephone numbers,
+- Addresses, exact locations, or real-time location data,
+- ID and identity data,
+- Payment, financial, or account data,
+- Health data or other particularly sensitive personal data,
+- Access data such as passwords, PINs, or security codes.
+
+The following are also prohibited:
+- Misleading, fraudulent, or manipulative content,
+- Spam, chain messages, abusive mass distribution, or harmful automation,
+- Malware, malicious code, or instructions for circumventing security mechanisms,
+- Attacks on the security, stability, or availability of the service,
+- Circumvention of usage restrictions, including abusive circumvention of usage time protection or parental PINs,
+- Falsification of identity, partnership, or official representation.
+
+The prohibition on the public disclosure of personal information applies without exception. It also applies if such information is already available elsewhere on the internet, originates from the person concerned, or the person concerned has consented to its publication.
+
+This list is not exhaustive.
+
+###
+11. Moderation, reports, and DSA procedures
+###
+
+Insofar as the legal requirements of the Digital Services Act (DSA) apply to MessageDrop, the following rules apply in addition.
+
+###
+11.1 Reporting potentially illegal content (notice)
+###
+
+Potentially illegal public content can be reported:
+
+- using the reporting function provided for this purpose in the service (DSA report), or
+- via the DSA contact point specified in the legal notice.
+
+To enable verification, reports should be as specific as possible, e.g., including:
+
+- a link, ID, or other unique identifier for the content,
+- a brief explanation of why the content may be illegal,
+- optional evidence (e.g., screenshot or additional information).
+
+###
+11.2 Review and possible measures
+###
+
+We may review, moderate, restrict, hide, or remove reported or conspicuous content.
+
+Manual and automated processes (including AI-supported assistance) may be used for this purpose.
+
+During ongoing reviews, content may be temporarily hidden from public view.
+
+Depending on the outcome, the following measures in particular may be taken:
+
+- No action (content remains visible)
+- Temporary restriction or hiding
+- Permanent removal
+- Reporting to the relevant authorities, insofar as we are legally obliged or entitled to do so
+- Additional measures against accounts involved in violations
+
+###
+11.3 Information and justification
+###
+
+Affected users will be informed of significant moderation measures, to the extent legally permissible and technically possible.
+
+This information may include, in particular:
+
+- what action was taken,
+- what content it relates to,
+- the main reasons for the decision,
+- whether automated processes were involved in the decision.
+
+###
+11.4 Internal complaints and further legal remedies (appeals)
+###
+
+Affected users may lodge an internal complaint against moderation decisions, insofar as this is provided for by law.
+
+The complaint can be lodged using the function provided for this purpose in the service or via the contact point specified in the legal notice.
+
+We will review such complaints and communicate the result in an appropriate manner.
+
+Where provided for by law, additional extrajudicial and judicial remedies remain unaffected (e.g., dispute resolution bodies or courts).
+
+Abusive reports or complaints (e.g., obviously unfounded serial reports) may be restricted or rejected.
+
+###
+11.5 Public status page (DSA case page)
+###
+
+A publicly accessible status page may be provided for DSA-relevant processes.
+
+This status page serves the purpose of transparency and may contain, in particular:
+
+- the status of the proceedings,
+- the type of reported content,
+- decisions made,
+- legal justifications within the scope permitted by law.
+
+Only anonymized or non-personal information is displayed on the public status page.
+
+###
+12. System messages
+###
+
+We may display system messages to you (e.g., regarding DSA procedures, security, maintenance).
+
+System messages:
+
+- are only generated by authorized systems,
+- can be deleted in the front end without necessarily eliminating internal evidence.
+
+###
+13. External content and third-party providers
+###
+
+The terms of use and privacy policies of the respective providers apply to external services.
+We have no influence on their data processing.
+The respective providers are solely responsible for the content and information provided by external providers.
+To the extent permitted by law, we assume no warranty or liability for their accuracy, completeness, timeliness, or availability.
+MessageDrop uses external services in two groups:
+
+###
+13.1 Content requiring provider-specific consent (optional)
+###
+
+The following providers require provider-specific consent or activation within the service:
+
 - YouTube
 - TikTok
 - Pinterest
 - Tenor
 - Spotify
+- Unsplash
 
-Where technically available, MessageDrop may also provide an optional read-aloud feature. This feature serves only convenience and accessibility purposes. Which voices are available and whether speech synthesis occurs locally on the device or via components of the browser or platform provider depends on the browser, operating system, device, and selected voice.
+External content is disabled by default.
 
-There is no entitlement to specific features, displays, reach, rankings, notifications, real-time functions, or permanent availability.
+It is only loaded once you actively consent to each provider (e.g., via a toggle or notice in the app).
 
-Public content is generally available only for a limited time. Public messages and public comments may be deleted after a defined period (currently 30 days). There is no entitlement to archiving, restoration, or permanent availability.
+You do not have to consent to all providers. Without consent, the respective provider remains deactivated and its content is not loaded.
 
-###
-6. User Accounts and Security (if used)
-###
-
-MessageDrop may be usable without a user account. Certain features require a user account.
-
-If you use a user account, you are required to keep your access credentials (e.g., PIN) confidential and protect them from unauthorized third-party access.
-
-You are responsible for all activities carried out via your user account, to the extent permitted by law.
-
-You are responsible for protecting your device and your local data (e.g., PIN, key material, local records) from unauthorized access.
-
-Note: If you forget your PIN, a user account cannot be restored without a previously created backup.
+You can revoke this consent at any time with future effect by deactivating the respective provider again.
 
 ###
-7. User-Generated Content and Usage Rights
+13.2 Functional services without separate provider toggle
 ###
 
-You retain all rights to the content you create.
+The following external functional and information services are not activated via the “External Content” toggle:
 
-By posting content, you grant us a worldwide, non-exclusive, royalty-free right to store, reproduce, make publicly available, display, technically process, and moderate such content for the operation of the service, to the extent necessary to provide the service.
+- Open-Meteo
+- OpenStreetMap / Nominatim
+- DeepL
+- Viator
 
-You warrant that you have all necessary rights and that your content is lawful and does not infringe third-party rights.
-
-Note: If content is temporarily made not publicly visible, restricted, or removed as part of statutory procedures (e.g., DSA), technical copies and evidence records may remain unaffected to the extent permitted by law.
-
-###
-8. Moderation and Removal of Content
-###
-
-We reserve the right to remove, block, or restrict the visibility of content in whole or in part, in particular in the case of unlawful content, violations of these Terms of Use, or reports under statutory procedures (e.g., Digital Services Act).
-
-To support moderation, we use automated review procedures, including rule-based checks (e.g., for certain patterns or content) as well as AI-assisted assessments.
-
-Automated checks are triggered when creating public content and each time content is edited. If private or personal data is detected, the respective content may be temporarily made not publicly visible regardless of an AI assessment.
-
-The automated procedures serve solely to support moderation and do not constitute a conclusive content assessment in the legal sense. Automated checks may be erroneous or may assess content incorrectly.
-
-Within the service, the user may be shown the result of an automated assessment (e.g., an assessment value/score). Publication or non-publication does not constitute a statement about the lawfulness or unlawfulness of content.
-
-Depending on the result of automated checks, content may:
-- be published,
-- be marked as requiring moderation while remaining published, or
-- be temporarily made not publicly visible.
-
-If content is made not publicly visible based on automated checks, no manual moderation process is initiated for this purpose. A manual review is performed solely voluntarily by the provider. The user has no entitlement to a manual review, reassessment, or a particular decision.
+These services are used when you actively use the respective function (e.g., weather query, map/location reference, translation, or experience search).
 
 ###
-9. Procedures Under the Digital Services Act (DSA)
+13.3 Special feature Unsplash (image download)
 ###
 
-For public content, including public comments, a procedure under the Digital Services Act (DSA) may be initiated at any time, in particular by:
-- a notice (“Notice”),
-- an appeal (“Appeal”).
+When you select Unsplash images (e.g., for avatars or backgrounds), image files are loaded from Unsplash and downloaded to your device or stored locally.
 
-If such a procedure is initiated, the affected content may be temporarily set to the status “not publicly visible”.
-
-“Not publicly visible” means that the content is no longer displayed publicly to other users until a substantive decision has been made within the procedure. In this status, the content is neither recommended nor publicly distributed.
-
-We review notices of unlawful content without undue delay. Upon obtaining knowledge of unlawful content, we remove or block it in accordance with legal requirements (“notice and takedown”).
-
-Within a DSA procedure, procedure-related information may be processed, including information about the reported content, timestamps, procedure status, decisions, and reasons.
-
-The reporting person may—where technically provided—provide additional information as evidence, in particular by:
-- uploading files,
-- providing links.
-
-This evidence serves exclusively for review and documentation within the DSA procedure.
-
-The user affected by a DSA procedure may be informed via system messages about the procedural status, decisions, and measures.
-
-Information collected within a DSA procedure may be disclosed to competent authorities, courts, or other authorized bodies insofar as this is legally required or permitted.
-
-For DSA-relevant events, a publicly accessible case page may be provided that contains only anonymized or non-personal information (e.g., type of reported content, procedure status, decisions, legal reasoning).
-
-After completion of the procedure, depending on the outcome, the affected content is re-enabled, restricted, or permanently removed.
+In addition, technical download verification may be transmitted to Unsplash.
 
 ###
-10. Prohibited Use
+14. Usage time protection (self-restriction / parental mode)
 ###
 
-You must not use MessageDrop for unlawful, abusive, or contract-breaching purposes.
+MessageDrop can offer optional usage time protection:
 
-In particular, you must not create, distribute, link, or provide content that violates applicable law, these Terms of Use, or third-party rights.
+- Self-restriction (e.g., daily limit, time window),
+- Parental mode with parental PIN.
 
-In particular, prohibited content or use includes, but is not limited to:
-- violating applicable law or calling for such violations,
-- infringing third-party rights, in particular copyright, personality, trademark, name, or data protection rights,
-- presenting, promoting, or preparing criminal content,
-- calling for criminal acts,
-- containing hate speech, glorification of violence, threats, or targeted harassment,
-- being insulting, derogatory, or intentionally hurtful toward individuals or groups,
-- being discriminatory, extremist, or inhumane,
-- containing pornographic, sexually explicit, or harmful-to-minors content,
-- depicting or suggesting sexual acts or depictions involving minors,
-- disclosing private or personal data of third parties without their explicit consent, in particular:
-  - first and last names, nicknames, or other identifying name information,
-  - date of birth or birthday,
-  - age or age information in combination with identifying information,
-  - email addresses,
-  - phone numbers,
-  - home, residence, or work addresses,
-  - precise location data (e.g., GPS coordinates, live locations, regularly used places),
-  - information on whereabouts in real time or traceable,
-  - copies of IDs, identification numbers, or official registration numbers,
-  - usernames, IDs, or profile links to other services,
-  - photos or videos of persons if they are clearly identifiable and no consent exists,
-  - biometric data (e.g., facial features, fingerprints),
-  - health data or information about physical or mental condition,
-  - information about sexual orientation or sex life,
-  - information about political opinions, religious or philosophical beliefs,
-  - bank, payment, or financial information,
-  - access data, passwords, PINs, or other security information,
-- containing misleading, fraudulent, or manipulative content,
-- spreading false factual claims about persons,
-- inducing deception, fraud, or misuse,
-- containing malware, spyware, or comparable harmful content,
-- containing spam, chain messages, or abusive automation,
-- calling for or containing instructions to circumvent security measures or protections,
-- intentionally circumventing or instructing how to circumvent technical restrictions or usage limits,
-- misusing the service in a way that impairs functionality, security, or availability (e.g., flooding, scraping, automated mass use),
-- pretending a false connection, partnership, or endorsement by us or by third parties,
-- obviously originating from unlawful, unauthorized, or leaked sources.
+In parental mode, the parental PIN is only processed as a hash (not stored as plain text).
 
-This applies regardless of whether the affected person is a user of MessageDrop or whether the relevant information appears publicly accessible.
-
-The list is not exhaustive.
+Important: Protection is based on the technical specifications of the device and local data. Complete protection against circumvention cannot be guaranteed.
 
 ###
-11. Third-Party Content and Services
+15. Local storage, backup, and data loss
 ###
 
-Third-party content and services are subject solely to the terms of use and privacy conditions of the respective providers.
+A lot of data is stored locally on your device (e.g., browser/app storage).
 
-We assume no responsibility for third-party content, the availability of external services, or the accuracy and timeliness of external information.
+This means that:
 
-Required attributions (e.g., “© OpenStreetMap contributors”) must be observed.
+- Data can be lost (e.g., through deletion, device change, browser change, updates).
+- You are responsible for backups yourself.
+- Recovery is not possible without your own previously created backup.
 
-###
-12. System Messages
-###
-
-MessageDrop may display system messages within the user account (e.g., information about DSA procedures, decisions, security-relevant notices, or planned maintenance).
-
-System messages are generated exclusively by authorized administrative systems. Users and third parties cannot send system messages in the name of MessageDrop.
-
-System messages are always active and cannot be unsubscribed from. A reply function is currently not provided.
-
-Users may delete system messages in the frontend. Deletion affects only the display and/or local availability in the user frontend. Legally required or documentation-relevant evidence may remain unaffected.
+If a backup/restore function is offered, its use is at your own risk.
 
 ###
-13. Profiles, Contact Profiles, and Profile Sharing
+16. Availability and maintenance
 ###
 
-Users may create local profiles (e.g., name and avatar). These profiles serve better assignment and display within the service.
+We strive to ensure stable operation, but cannot guarantee uninterrupted availability.
 
-Within the contact feature, a user may actively request profile sharing from a contact. The contact must actively confirm profile sharing before any transfer occurs.
+Outages or restrictions may occur, e.g., due to:
 
-After consent, the profile name and avatar are transmitted to the contact’s device and stored locally there. We do not centrally store this profile information.
-
-Note: After transfer, there is no technical possibility to retrieve or delete the profile information already transferred on the contact’s device. However, the contact may delete the locally stored data on their device.
-
-Independently of this, each user may set their own local profile entries for contacts (e.g., custom display name, custom avatar).
-
-###
-14. Following Places and Push Notifications (Best Effort)
-###
-
-Users may follow places or stop following them.
-
-Where technically possible and supported by the device, the user may receive push notifications when new public content is created at a followed place.
-
-Push and real-time features are provided solely subject to technical availability (“best effort”). In particular, due to technical, system-related, or user-specific reasons, it may occur that:
-- push notifications arrive late,
-- notifications are not delivered at all,
-- notifications are delivered multiple times,
-- a followed place is temporarily not notified correctly,
-- or the feature is temporarily completely unavailable.
-
-There is no entitlement to delivery, completeness, order, or timely notification.
+- Maintenance,
+- Technical malfunctions,
+- Outages of external services,
+- Overloading due to abusive use,
+- Force majeure.
 
 ###
-15. No Emergency Services
+17. No emergency services
 ###
 
-MessageDrop does not provide access to emergency services (e.g., police, fire department, emergency medical services).
+MessageDrop does not provide access to the police, fire department, ambulance service, or other emergency services.
 
-The service does not replace attention, caution, or responsible behavior in real life.
-
-###
-16. Availability and Maintenance
-###
-
-To improve the stability, security, and functionality of the application, anonymized technical log messages may be transmitted to us—following the user’s explicit consent. These log messages serve solely for error analysis and service optimization. The consent given may be revoked by the user at any time with effect for the future.
-
-The service may be limited or interrupted at times, in particular due to maintenance, technical malfunctions, outages of external services, or force majeure.
-
-No specific availability or accessibility is guaranteed.
+In emergencies, always use the official emergency call channels.
 
 ###
-17. Local Storage, Backup, and Data Loss
+18. Rights to content and app
 ###
 
-Data may be stored locally on your device (e.g., IndexedDB, local storage, or cache). This data is device- and browser-dependent and may be deleted or lost at any time.
+Your content remains your content.
 
-You are responsible for appropriate backups.
+In order for us to operate the service, you grant us the necessary rights of use (e.g., storage, display, technical processing, moderation) to the extent necessary for operation.
 
-If a backup and restore feature is provided, it may support restoration. Use is voluntary and at your own risk. There is no entitlement to successful, complete, or error-free restoration.
-
-Restoration without a backup previously created by the user is generally not possible.
+All rights to the app itself (software, design, trademarks) are held by us or our licensors.
 
 ###
-18. Intellectual Property
+19. Liability
 ###
 
-All rights to MessageDrop, including software, design, and trademarks, belong to us or our licensors.
+In addition, the provisions of the disclaimer apply to liability and warranty.
 
-Use of our trademarks or identifiers without prior consent is not permitted.
+To the extent permitted by law, our liability for simple negligence is excluded, unless it involves the breach of essential contractual obligations (cardinal obligations). In this case, liability is limited to the damage typical for this type of contract and foreseeable at the time the contract was concluded.
 
-###
-19. Termination of Use
-###
+We shall only be liable without limitation in cases of:
+- intent,
+- gross negligence,
+- injury to life, limb, or health,
+- fraudulent concealment of a defect,
+- assumption of a guarantee,
+- liability under the Product Liability Act,
+- and in other cases of mandatory statutory liability.
 
-You may stop using MessageDrop at any time.
+To the extent permitted by law, we are not liable for indirect damage, consequential damage, lost profits, lost savings, or data loss.
 
-We reserve the right to block or terminate access in whole or in part, in particular in the event of violations of these Terms of Use, statutory obligations, or abusive use.
-
-###
-20. Disclaimer of Liability
-###
-
-The service is provided “as is” and “as available”.
-
-Use is at your own risk.
-
-We assume no responsibility for damages resulting from improper, inattentive, or unintended use that lies outside our sphere of influence.
+You use MessageDrop within the scope of the legal requirements and at your own risk.
 
 ###
-21. Limitation of Liability
+20. Blocking and termination
 ###
 
-We are liable without limitation only in cases of intent, gross negligence, or injury to life, body, or health.
+You can terminate your use at any time.
 
-Otherwise, liability is excluded to the extent permitted by law.
+You can also delete your user account yourself at any time via the app. In this case, the user account and all associated server-side and local data will be deleted immediately and permanently, subject to statutory retention or documentation obligations.
 
-###
-22. Indemnification
-###
+User accounts with no login activity for a period of 90 days will be automatically deleted from the server without warning.
 
-You indemnify us against all third-party claims asserted due to your content or your violation of these Terms of Use, to the extent permitted by law.
+We may restrict or block access or functions in whole or in part if, for example:
 
-###
-23. Applicable Law and Place of Jurisdiction
-###
+- these Terms of Use are violated,
+- legal obligations require it,
+- misuse occurs.
 
-The law of the Federal Republic of Germany applies.
+Where appropriate, measures may be taken in stages, e.g.:
 
-If you are a merchant or a legal entity, the place of jurisdiction is our registered office.
+- Notice or warning,
+- Temporary functional restriction,
+- Temporary blocking,
+- Permanent blocking in the event of serious or repeated violations.
 
-Mandatory consumer protection provisions remain unaffected.
-
-###
-24. Severability Clause
-###
-
-If any provision of these Terms of Use is or becomes invalid, the validity of the remaining provisions shall remain unaffected.
+In the event of serious violations (e.g., criminal content or serious security abuse), immediate blocking may occur without prior warning.
 
 ###
-25. Contact
+21. Changes to these Terms of Use
 ###
 
-JackTools.Net UG (limited liability)
-Im Kirchfeld 27
-38304 Wolfenbüttel
+We may amend these Terms of Use if necessary (e.g., in the event of new features or changes in the legal or regulatory framework).
+
+The current version will be published in the service. Changes will take effect upon publication of the updated version, unless a later date is specified.
+
+In the event of significant changes, we will provide appropriate notification within the service before they take effect, insofar as this is legally and technically possible.
+
+In the event of significant changes, renewed consent is required for further use. Without this consent, further use is not possible from the time the changes take effect.
+
+###
+22. Applicable law and place of jurisdiction
+###
+
+German law applies.
+
+If you are a consumer, mandatory consumer protection regulations in your country of residence remain unaffected.
+
+For merchants or legal entities, our registered office is the place of jurisdiction, to the extent permitted.
+
+###
+23. Severability clause
+###
+
+Should any provision of these Terms of Use be invalid, the remaining provisions shall remain valid.
+
+###
+24. Contact
+###
+
+JackTools.Net UG (limited liability)  
+Im Kirchfeld 27  
+38304 Wolfenbüttel  
 Germany
 
-Email: jacktoolsnet@gmail.com
+Email: jacktoolsnet@gmail.com  
 Phone: +49 (0) 176 / 41 23 57 74
