@@ -83,11 +83,13 @@
 </button>
 
 <button [attr.aria-hidden]="false" [matMenuTriggerFor]="messageMenu" class="button_drop" mat-fab
+    [style.display]="userService.isAccountBlocked() ? 'none' : null"
     [attr.aria-label]="'common.aria.mainMenu' | transloco" (click)="{}">
     <mat-icon [attr.aria-hidden]="false">pin_drop</mat-icon>
 </button>
 
 <button [attr.aria-hidden]="false" [matMenuTriggerFor]="searchMenu" class="button_search" mat-fab
+    [style.display]="userService.isAccountBlocked() ? 'none' : null"
     [attr.aria-label]="'common.aria.search' | transloco" (click)="{}">
     <mat-icon [attr.aria-hidden]="false">search</mat-icon>
 </button>
@@ -179,6 +181,7 @@
 }
 
 <mat-menu #appMenu="matMenu">
+    @if (!userService.isAccountBlocked()) {
     <button mat-menu-item (click)="editAppSettings()">
         <mat-icon>settings_applications</mat-icon>
         <span>{{ 'common.menu.appSettings' | transloco }}</span>
@@ -199,6 +202,7 @@
         <mat-icon>restore</mat-icon>
         <span>{{ 'common.menu.restoreBackup' | transloco }}</span>
     </button>
+    }
     <button mat-menu-item (click)="showTermsOfService()">
         <mat-icon>rule</mat-icon>
         <span>{{ 'common.menu.termsOfService' | transloco }}</span>
