@@ -72,9 +72,17 @@
       <div class="section-eyebrow">Moderation overview</div>
       <h2 class="results-title">Current state</h2>
     </div>
-    <div class="user-id-badge">
-      <div class="user-id-label">User ID</div>
-      <div class="user-id-value">{{ form.controls.userId.value }}</div>
+    <div class="results-header-side">
+      @if (hasActiveBlock()) {
+      <button mat-stroked-button type="button" class="quick-reset-button" (click)="unblockAll()" [disabled]="loading()">
+        <mat-icon>lock_reset</mat-icon>
+        Remove all blocks
+      </button>
+      }
+      <div class="user-id-badge">
+        <div class="user-id-label">User ID</div>
+        <div class="user-id-value">{{ form.controls.userId.value }}</div>
+      </div>
     </div>
   </div>
 
@@ -118,13 +126,13 @@
           <div class="inline-expiry-group">
             <mat-form-field appearance="outline" subscriptSizing="dynamic" class="inline-expiry-field">
               <mat-label>Until date</mat-label>
-              <input matInput class="hide-placeholder" placeholder="" [matDatepicker]="postingDatePicker" [formControl]="form.controls.postingBlockedUntilDate">
+              <input matInput class="hide-placeholder" placeholder="" [matDatepicker]="postingDatePicker" [min]="minimumBlockDate()" [formControl]="form.controls.postingBlockedUntilDate">
               <mat-datepicker-toggle matIconSuffix [for]="postingDatePicker"></mat-datepicker-toggle>
               <mat-datepicker #postingDatePicker></mat-datepicker>
             </mat-form-field>
             <mat-form-field appearance="outline" subscriptSizing="dynamic" class="inline-expiry-field">
               <mat-label>Until time</mat-label>
-              <input matInput class="hide-placeholder" placeholder="" [matTimepicker]="postingTimePicker" [formControl]="form.controls.postingBlockedUntilTime">
+              <input matInput class="hide-placeholder" placeholder="" [matTimepicker]="postingTimePicker" [matTimepickerMin]="minimumBlockTime('posting')" [formControl]="form.controls.postingBlockedUntilTime">
               <mat-timepicker-toggle matIconSuffix [for]="postingTimePicker"></mat-timepicker-toggle>
               <mat-timepicker #postingTimePicker></mat-timepicker>
             </mat-form-field>
@@ -185,13 +193,13 @@
           <div class="inline-expiry-group">
             <mat-form-field appearance="outline" subscriptSizing="dynamic" class="inline-expiry-field">
               <mat-label>Until date</mat-label>
-              <input matInput class="hide-placeholder" placeholder="" [matDatepicker]="accountDatePicker" [formControl]="form.controls.accountBlockedUntilDate">
+              <input matInput class="hide-placeholder" placeholder="" [matDatepicker]="accountDatePicker" [min]="minimumBlockDate()" [formControl]="form.controls.accountBlockedUntilDate">
               <mat-datepicker-toggle matIconSuffix [for]="accountDatePicker"></mat-datepicker-toggle>
               <mat-datepicker #accountDatePicker></mat-datepicker>
             </mat-form-field>
             <mat-form-field appearance="outline" subscriptSizing="dynamic" class="inline-expiry-field">
               <mat-label>Until time</mat-label>
-              <input matInput class="hide-placeholder" placeholder="" [matTimepicker]="accountTimePicker" [formControl]="form.controls.accountBlockedUntilTime">
+              <input matInput class="hide-placeholder" placeholder="" [matTimepicker]="accountTimePicker" [matTimepickerMin]="minimumBlockTime('account')" [formControl]="form.controls.accountBlockedUntilTime">
               <mat-timepicker-toggle matIconSuffix [for]="accountTimePicker"></mat-timepicker-toggle>
               <mat-timepicker #accountTimePicker></mat-timepicker>
             </mat-form-field>

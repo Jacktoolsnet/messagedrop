@@ -7,7 +7,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { filter, startWith } from 'rxjs';
+import { filter, fromEvent, merge, startWith } from 'rxjs';
 
 import { AuthService } from '../../../services/auth/auth.service';
 import { DsaService } from '../../../services/dsa/dsa/dsa.service';
@@ -120,10 +120,17 @@ export class DsaDashboardComponent {
   trackByKey = (_: number, t: DsaTile) => t.key;
 
   private refreshStatsOnEnter(): void {
-    this.router.events.pipe(
-      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
-      filter(event => event.urlAfterRedirects.startsWith('/dashboard/dsa')),
-      startWith(null),
+    merge(
+      this.router.events.pipe(
+        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+        filter(event => event.urlAfterRedirects.startsWith('/dashboard/dsa')),
+        startWith(null)
+      ),
+      fromEvent(window, 'focus'),
+      fromEvent(document, 'visibilitychange').pipe(
+        filter(() => document.visibilityState === 'visible')
+      )
+    ).pipe(
       takeUntilDestroyed(this.destroyRef)
     ).subscribe(() => this.dsa.loadAllStats());
   }

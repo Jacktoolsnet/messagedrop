@@ -248,6 +248,10 @@ export class SignalDetailComponent implements OnInit {
   }
 
   private updateModeration(userId: string, target: 'posting' | 'account', blocked: boolean, reason: string) {
+    if (blocked && !this.hasValidBlockedUntilSelection()) {
+      return;
+    }
+
     this.moderationBusy.set(true);
     this.dsa.updatePlatformUserModeration(userId, {
       target,
@@ -276,6 +280,10 @@ export class SignalDetailComponent implements OnInit {
 
   clearBlockedUntil() {
     this.blockedUntilLocal.set('');
+  }
+
+  blockedUntilMinLocal(): string {
+    return this.toLocalDateTimeValue(this.nextAllowedBlockUntilTimestamp());
   }
 
   translateMessage() {
@@ -341,6 +349,28 @@ export class SignalDetailComponent implements OnInit {
     if (!raw) return null;
     const ts = new Date(raw).getTime();
     return Number.isFinite(ts) && ts > 0 ? ts : null;
+  }
+
+  private hasValidBlockedUntilSelection(): boolean {
+    const raw = this.blockedUntilLocal()?.trim();
+    if (!raw) {
+      return true;
+    }
+
+    const blockedUntil = this.parseBlockedUntil();
+    if (blockedUntil !== null && blockedUntil >= this.nextAllowedBlockUntilTimestamp()) {
+      return true;
+    }
+
+    this.snack.open('Please select a future date and time for a temporary block.', 'OK', { duration: 3000 });
+    return false;
+  }
+
+  private nextAllowedBlockUntilTimestamp(): number {
+    const min = new Date();
+    min.setSeconds(0, 0);
+    min.setMinutes(min.getMinutes() + 1);
+    return min.getTime();
   }
 
   private toLocalDateTimeValue(value?: number | null): string {

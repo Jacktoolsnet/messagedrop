@@ -264,7 +264,7 @@
 
                 <div class="block-until-row">
                     <label for="signal-blocked-until"><strong>Temporary block until (optional):</strong></label>
-                    <input id="signal-blocked-until" type="datetime-local" [value]="blockedUntilLocal()"
+                    <input id="signal-blocked-until" type="datetime-local" [value]="blockedUntilLocal()" [min]="blockedUntilMinLocal()"
                         (change)="onBlockedUntilInput($any($event.target).value)" />
                 </div>
 

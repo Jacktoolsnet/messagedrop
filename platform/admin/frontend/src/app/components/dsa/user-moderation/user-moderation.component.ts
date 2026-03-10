@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -14,6 +15,8 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTimepickerModule } from '@angular/material/timepicker';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterLink } from '@angular/router';
+import { filter, fromEvent, merge } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import {
   findModerationReasonLabel,
   USER_ACCOUNT_BLOCK_REASONS,
@@ -30,6 +33,7 @@ import { DsaService } from '../../../services/dsa/dsa/dsa.service';
 @Component({
   selector: 'app-user-moderation',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     RouterLink,
@@ -54,6 +58,7 @@ export class UserModerationComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly dsa = inject(DsaService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly postingReasonOptions = USER_POSTING_BLOCK_REASONS;
   readonly accountReasonOptions = USER_ACCOUNT_BLOCK_REASONS;
@@ -74,9 +79,21 @@ export class UserModerationComponent implements OnInit {
   readonly appeals = signal<PlatformUserModerationAppeal[]>([]);
   readonly openAppeals = this.dsa.openUserModerationAppeals;
   readonly openAppealsCount = this.dsa.openUserModerationAppealsCount;
+  readonly hasActiveBlock = computed(() => {
+    const moderation = this.moderation();
+    return Boolean(moderation?.posting?.blocked || moderation?.account?.blocked);
+  });
 
   ngOnInit(): void {
     this.refreshOpenAppeals();
+    merge(
+      fromEvent(window, 'focus'),
+      fromEvent(document, 'visibilitychange').pipe(
+        filter(() => document.visibilityState === 'visible')
+      )
+    ).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(() => this.refreshOpenAppeals());
   }
 
   lookup(): void {
@@ -84,7 +101,10 @@ export class UserModerationComponent implements OnInit {
     if (!userId) return;
     this.loading.set(true);
     this.dsa.getPlatformUserModeration(userId).subscribe({
-      next: (res) => this.applyResponse(res),
+      next: (res) => {
+        this.applyResponse(res);
+        this.refreshOpenAppeals();
+      },
       error: () => this.loading.set(false),
       complete: () => this.loading.set(false)
     });
@@ -120,6 +140,58 @@ export class UserModerationComponent implements OnInit {
       error: () => this.loading.set(false),
       complete: () => this.loading.set(false)
     });
+  }
+
+  async unblockAll(): Promise<void> {
+    const moderation = this.moderation();
+    const userId = this.form.controls.userId.value.trim();
+    if (!moderation || !userId) {
+      return;
+    }
+
+    if (!this.hasActiveBlock()) {
+      this.snackBar.open('There are no active blocks to remove.', 'OK', {
+        duration: 2500,
+        horizontalPosition: 'center',
+        verticalPosition: 'top'
+      });
+      return;
+    }
+
+    this.loading.set(true);
+    try {
+      if (moderation.posting.blocked) {
+        await firstValueFrom(this.dsa.updatePlatformUserModeration(userId, {
+          target: 'posting',
+          blocked: false,
+          reason: null,
+          blockedUntil: null
+        }));
+      }
+
+      if (moderation.account.blocked) {
+        await firstValueFrom(this.dsa.updatePlatformUserModeration(userId, {
+          target: 'account',
+          blocked: false,
+          reason: null,
+          blockedUntil: null
+        }));
+      }
+
+      const refreshed = await firstValueFrom(this.dsa.getPlatformUserModeration(userId));
+      this.applyResponse(refreshed);
+      this.refreshOpenAppeals();
+      this.snackBar.open('All active blocks have been removed.', 'OK', {
+        duration: 2500,
+        horizontalPosition: 'center',
+        verticalPosition: 'top'
+      });
+    } catch {
+      this.loading.set(false);
+      return;
+    }
+
+    this.loading.set(false);
   }
 
   loadUserFromAppeal(appeal: PlatformUserModerationAppeal): void {
@@ -227,6 +299,29 @@ export class UserModerationComponent implements OnInit {
     return Number.isFinite(ts) && ts > 0 ? ts : null;
   }
 
+  minimumBlockDate(): Date {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  }
+
+  minimumBlockTime(target: 'posting' | 'account'): Date | null {
+    const dateControl = target === 'posting'
+      ? this.form.controls.postingBlockedUntilDate
+      : this.form.controls.accountBlockedUntilDate;
+    const date = dateControl.value;
+    if (!date) {
+      return null;
+    }
+
+    const today = this.minimumBlockDate();
+    const selectedDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    if (selectedDay.getTime() !== today.getTime()) {
+      return null;
+    }
+
+    return this.nextAllowedBlockUntilDate();
+  }
+
   private setBlockedUntil(target: 'posting' | 'account', value?: number | null): void {
     const { date, time } = this.splitDateTime(value);
     if (target === 'posting') {
@@ -265,7 +360,17 @@ export class UserModerationComponent implements OnInit {
       : this.form.controls.accountBlockedUntilTime;
 
     if (!timeControl.value || dateControl.value) {
-      return true;
+      const blockedUntil = this.parseBlockedUntil(target);
+      if (blockedUntil === null || blockedUntil >= this.nextAllowedBlockUntilDate().getTime()) {
+        return true;
+      }
+
+      this.snackBar.open(`Bitte keinen Zeitpunkt in der Vergangenheit für ${label} auswählen.`, 'OK', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top'
+      });
+      return false;
     }
 
     this.snackBar.open(`Bitte zuerst ein Datum für ${label} auswählen, wenn eine Uhrzeit gesetzt ist.`, 'OK', {
@@ -274,5 +379,12 @@ export class UserModerationComponent implements OnInit {
       verticalPosition: 'top'
     });
     return false;
+  }
+
+  private nextAllowedBlockUntilDate(): Date {
+    const min = new Date();
+    min.setSeconds(0, 0);
+    min.setMinutes(min.getMinutes() + 1);
+    return min;
   }
 }

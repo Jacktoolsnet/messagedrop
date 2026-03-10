@@ -273,6 +273,10 @@ function normalizeBlockUntil(value) {
   return Math.floor(parsed);
 }
 
+function hasBlockUntilValue(value) {
+  return value !== undefined && value !== null && String(value).trim() !== '';
+}
+
 function isAccountBlockedRow(row) {
   if (!row) return false;
   if (String(row.userStatus || '').toLowerCase() !== tableUser.userStatus.DISABLED) {
@@ -573,10 +577,17 @@ router.patch('/internal/moderation/:userId/posting',
     const blocked = req.body?.blocked === true || req.body?.blocked === 1 || req.body?.blocked === '1';
     const reason = blocked ? normalizeModerationReason(req.body?.reason, 'posting') : null;
     const actor = normalizeOptionalText(req.body?.actor, 200);
+    const rawBlockedUntil = req.body?.blockedUntil;
     const until = blocked ? normalizeBlockUntil(req.body?.blockedUntil) : null;
 
     if (blocked && !reason) {
       return next(apiError.badRequest('invalid_reason'));
+    }
+    if (blocked && hasBlockUntilValue(rawBlockedUntil) && until === null) {
+      return next(apiError.badRequest('invalid_blocked_until'));
+    }
+    if (blocked && until !== null && until < Date.now()) {
+      return next(apiError.badRequest('blocked_until_in_past'));
     }
 
     try {
@@ -619,10 +630,17 @@ router.patch('/internal/moderation/:userId/account',
     const blocked = req.body?.blocked === true || req.body?.blocked === 1 || req.body?.blocked === '1';
     const reason = blocked ? normalizeModerationReason(req.body?.reason, 'account') : null;
     const actor = normalizeOptionalText(req.body?.actor, 200);
+    const rawBlockedUntil = req.body?.blockedUntil;
     const until = blocked ? normalizeBlockUntil(req.body?.blockedUntil) : null;
 
     if (blocked && !reason) {
       return next(apiError.badRequest('invalid_reason'));
+    }
+    if (blocked && hasBlockUntilValue(rawBlockedUntil) && until === null) {
+      return next(apiError.badRequest('invalid_blocked_until'));
+    }
+    if (blocked && until !== null && until < Date.now()) {
+      return next(apiError.badRequest('blocked_until_in_past'));
     }
 
     try {

@@ -246,6 +246,10 @@ function normalizeBlockUntil(value) {
     return Math.floor(parsed);
 }
 
+function hasBlockUntilValue(value) {
+    return value !== undefined && value !== null && String(value).trim() !== '';
+}
+
 function resolvePublicBackendBase() {
     return resolveBaseUrl(process.env.BASE_URL, process.env.PORT);
 }
@@ -550,6 +554,7 @@ router.patch('/platform/:userId/moderation', requireRole('moderator', 'legal', '
     const target = String(req.body?.target || '').toLowerCase();
     const blocked = req.body?.blocked === true || req.body?.blocked === 1 || req.body?.blocked === '1';
     const reason = typeof req.body?.reason === 'string' ? req.body.reason.trim() : null;
+    const rawBlockedUntil = req.body?.blockedUntil;
     const blockedUntil = normalizeBlockUntil(req.body?.blockedUntil);
     const actor = req.admin?.username || req.admin?.sub || 'admin';
     const action = target === 'posting'
@@ -565,6 +570,12 @@ router.patch('/platform/:userId/moderation', requireRole('moderator', 'legal', '
         if (!mayAccountBlock) {
             return next(apiError.forbidden('insufficient_role'));
         }
+    }
+    if (blocked && hasBlockUntilValue(rawBlockedUntil) && blockedUntil === null) {
+        return next(apiError.badRequest('invalid_blocked_until'));
+    }
+    if (blocked && blockedUntil !== null && blockedUntil < Date.now()) {
+        return next(apiError.badRequest('blocked_until_in_past'));
     }
 
     try {

@@ -277,7 +277,7 @@
                     </div>
                     <div class="tile-actions">
                         <label for="notice-blocked-until"><strong>Temporary block until:</strong></label>
-                        <input id="notice-blocked-until" type="datetime-local" [value]="blockedUntilLocal()"
+                        <input id="notice-blocked-until" type="datetime-local" [value]="blockedUntilLocal()" [min]="blockedUntilMinLocal()"
                             (change)="onBlockedUntilInput($any($event.target).value)" />
                     </div>
                     <div class="tile-actions reason-row">
