@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpResponse } from '@angular/common/http';
-import { AfterViewInit, Component, DestroyRef, ElementRef, OnDestroy, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, OnDestroy, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -8,11 +8,8 @@ import { MatChipListboxChange, MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatDividerModule } from '@angular/material/divider';
 import { RouterLink } from '@angular/router';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import annotationPlugin from 'chartjs-plugin-annotation';
@@ -42,19 +39,16 @@ interface RangeOption {
     MatCardModule,
     MatProgressBarModule,
     MatChipsModule,
-    MatTableModule,
-    MatTooltipModule,
-    MatMenuModule,
-    MatDividerModule
+    MatMenuModule
   ],
   templateUrl: './transparency.component.html',
-  styleUrl: './transparency.component.css'
+  styleUrl: './transparency.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TransparencyComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly dsa = inject(DsaService);
   private readonly snack = inject(MatSnackBar);
-  private readonly destroyRef = inject(DestroyRef);
   private readonly auth = inject(AuthService);
 
   @ViewChild('statusChart') private statusChartRef?: ElementRef<HTMLCanvasElement>;
@@ -280,6 +274,14 @@ export class TransparencyComponent implements OnInit, AfterViewInit, OnDestroy {
   formatDateTime(ts: number | null | undefined): string {
     if (!ts) return 'n/a';
     return new Date(ts).toLocaleString();
+  }
+
+  formatBytes(bytes: number | null | undefined): string {
+    const size = Number(bytes);
+    if (!Number.isFinite(size) || size <= 0) return 'n/a';
+    if (size < 1024) return `${size} B`;
+    if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+    return `${(size / (1024 * 1024)).toFixed(1)} MB`;
   }
 
   downloadReport(report: TransparencyReport): void {

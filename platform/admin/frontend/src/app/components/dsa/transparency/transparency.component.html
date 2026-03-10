@@ -33,142 +33,292 @@
   <mat-progress-bar mode="indeterminate"></mat-progress-bar>
 }
 
-@if (stats(); as data) {
-  <div class="page">
-    <section class="metrics">
-      <mat-card class="metric-card">
-        <div class="metric-title">
-          <mat-icon>flag</mat-icon>
-          Notices
+<div class="page">
+  @if (stats(); as data) {
+    <mat-card class="surface-card hero-card">
+      <div class="hero-header">
+        <div class="avatar avatar-success hero-avatar">
+          <mat-icon>insights</mat-icon>
         </div>
+
+        <div class="hero-copy">
+          <div class="section-eyebrow">DSA transparency</div>
+          <h1 class="hero-title">Transparency overview</h1>
+          <p class="hero-subtitle">
+            Moderation volume, decision quality and downloadable reports for {{ data.range.label }}.
+          </p>
+        </div>
+
+        <div class="hero-pills">
+          <span class="hero-pill">
+            <mat-icon>event</mat-icon>
+            {{ data.range.label }}
+          </span>
+          <span class="hero-pill">
+            <mat-icon>description</mat-icon>
+            {{ reports().length }} reports
+          </span>
+        </div>
+      </div>
+
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="stat-label">Average resolution</span>
+          <strong>{{ formatDuration(data.decisions.avgDecisionTimeMs) }}</strong>
+          <span>{{ data.decisions.total | number }} decisions total</span>
+        </div>
+
+        <div class="hero-stat">
+          <span class="stat-label">Automated review</span>
+          <strong>{{ automatedShare(data) }}</strong>
+          <span>Manual decisions: {{ data.decisions.automated.manual | number }}</span>
+        </div>
+
+        <div class="hero-stat">
+          <span class="stat-label">Signals received</span>
+          <strong>{{ data.signals.total | number }}</strong>
+          <span>Reported quick signals in this window</span>
+        </div>
+      </div>
+    </mat-card>
+
+    <section class="metrics-grid">
+      <mat-card class="surface-card metric-card">
+        <div class="metric-head">
+          <div class="avatar avatar-warn">
+            <mat-icon>flag</mat-icon>
+          </div>
+          <div>
+            <div class="metric-title">Notices</div>
+            <div class="metric-subtitle">Total cases {{ data.range.label }}</div>
+          </div>
+        </div>
+
         <div class="metric-value">{{ data.notices.total | number }}</div>
-        <div class="metric-subtitle">Total cases {{ data.range.label }}</div>
+
         <div class="pill-row">
           @for (entry of toEntries(data.notices.byStatus); track entry.key) {
-            <mat-chip>
-              {{ entry.key }}: {{ entry.value }}
-            </mat-chip>
+            <mat-chip>{{ entry.key }}: {{ entry.value }}</mat-chip>
           }
         </div>
       </mat-card>
-      <mat-card class="metric-card">
-        <div class="metric-title">
-          <mat-icon>check_circle</mat-icon>
-          Decisions
+
+      <mat-card class="surface-card metric-card">
+        <div class="metric-head">
+          <div class="avatar avatar-success">
+            <mat-icon>check_circle</mat-icon>
+          </div>
+          <div>
+            <div class="metric-title">Decisions</div>
+            <div class="metric-subtitle">Average resolution {{ formatDuration(data.decisions.avgDecisionTimeMs) }}</div>
+          </div>
         </div>
+
         <div class="metric-value">{{ data.decisions.total | number }}</div>
-        <div class="metric-subtitle">Average resolution {{ formatDuration(data.decisions.avgDecisionTimeMs) }}</div>
+
         <div class="pill-row">
           @for (entry of toEntries(data.decisions.byOutcome); track entry.key) {
-            <mat-chip>
-              {{ labelForOutcome(entry.key) }}: {{ entry.value }}
-            </mat-chip>
+            <mat-chip>{{ labelForOutcome(entry.key) }}: {{ entry.value }}</mat-chip>
           }
         </div>
-        <div class="metric-note">
-          Automated review: {{ automatedShare(data) }}
-        </div>
       </mat-card>
-      <mat-card class="metric-card">
-        <div class="metric-title">
-          <mat-icon>notifications</mat-icon>
-          Signals
+
+      <mat-card class="surface-card metric-card">
+        <div class="metric-head">
+          <div class="avatar avatar-accent">
+            <mat-icon>notifications</mat-icon>
+          </div>
+          <div>
+            <div class="metric-title">Signals</div>
+            <div class="metric-subtitle">Reported quick signals</div>
+          </div>
         </div>
+
         <div class="metric-value">{{ data.signals.total | number }}</div>
-        <div class="metric-subtitle">Reported quick signals</div>
+
         <div class="pill-row">
           @for (entry of toEntries(data.signals.byType); track entry.key) {
-            <mat-chip>
-              {{ entry.key }}: {{ entry.value }}
-            </mat-chip>
+            <mat-chip>{{ entry.key }}: {{ entry.value }}</mat-chip>
           }
         </div>
       </mat-card>
     </section>
-    <section class="charts-grid">
-      <mat-card class="chart-card">
-        <div class="chart-header">
-          <mat-icon>bar_chart</mat-icon>
-          Notices by status
+
+    <section class="section-stack">
+      <mat-card class="surface-card section-panel charts-panel">
+        <div class="section-header">
+          <div class="avatar avatar-neutral">
+            <mat-icon>bar_chart</mat-icon>
+          </div>
+          <div>
+            <h2>Charts</h2>
+            <p>Key moderation trends at a glance.</p>
+          </div>
         </div>
-        <div class="chart-container">
-          <canvas #statusChart></canvas>
-        </div>
-      </mat-card>
-      <mat-card class="chart-card">
-        <div class="chart-header">
-          <mat-icon>pie_chart</mat-icon>
-          Decision outcomes
-        </div>
-        <div class="chart-container">
-          <canvas #decisionChart></canvas>
-        </div>
-      </mat-card>
-      <mat-card class="chart-card">
-        <div class="chart-header">
-          <mat-icon>show_chart</mat-icon>
-          Monthly trend
-        </div>
-        <div class="chart-container">
-          <canvas #trendChart></canvas>
+
+        <div class="charts-grid">
+          <mat-card class="surface-card chart-card">
+            <div class="card-head">
+              <div class="avatar avatar-warn">
+                <mat-icon>bar_chart</mat-icon>
+              </div>
+              <div>
+                <div class="chart-title">Notices by status</div>
+                <div class="chart-subtitle">Current case distribution</div>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas #statusChart></canvas>
+            </div>
+          </mat-card>
+
+          <mat-card class="surface-card chart-card">
+            <div class="card-head">
+              <div class="avatar avatar-success">
+                <mat-icon>pie_chart</mat-icon>
+              </div>
+              <div>
+                <div class="chart-title">Decision outcomes</div>
+                <div class="chart-subtitle">How cases were resolved</div>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas #decisionChart></canvas>
+            </div>
+          </mat-card>
+
+          <mat-card class="surface-card chart-card chart-card-wide">
+            <div class="card-head">
+              <div class="avatar avatar-accent">
+                <mat-icon>show_chart</mat-icon>
+              </div>
+              <div>
+                <div class="chart-title">Monthly trend</div>
+                <div class="chart-subtitle">Notices and decisions over time</div>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas #trendChart></canvas>
+            </div>
+          </mat-card>
         </div>
       </mat-card>
     </section>
-    <section class="categories">
-      <mat-card>
-        <div class="chart-header">
-          <mat-icon>category</mat-icon>
-          Top categories
-        </div>
-        <div class="category-grid">
+
+    <section class="section-stack">
+      <mat-card class="surface-card section-panel categories-panel">
+        <div class="section-header">
+          <div class="avatar avatar-accent">
+            <mat-icon>category</mat-icon>
+          </div>
           <div>
-            <h4>Notices</h4>
-            <div class="pill-column">
-              @for (entry of data.notices.topCategories; track entry.category) {
-                <mat-chip>
-                  {{ entry.category || 'Uncategorized' }} · {{ entry.count }}
-                </mat-chip>
+            <h2>Top categories</h2>
+            <p>The most frequent report categories.</p>
+          </div>
+        </div>
+
+        <div class="category-card">
+          <div class="category-block">
+            <div class="category-header">
+              <div class="avatar avatar-warn">
+                <mat-icon>flag</mat-icon>
+              </div>
+              <div>
+                <h3>Notices</h3>
+                <p>Most common notice categories</p>
+              </div>
+            </div>
+
+            <div class="category-list">
+              @for (entry of data.notices.topCategories; track entry.category; let index = $index) {
+                <div class="category-item">
+                  <span class="category-rank">{{ index + 1 }}</span>
+                  <span class="category-name">{{ entry.category || 'Uncategorized' }}</span>
+                  <span class="category-count">{{ entry.count }}</span>
+                </div>
+              } @empty {
+                <div class="empty-inline">No notice categories available.</div>
               }
             </div>
           </div>
-          <div>
-            <h4>Signals</h4>
-            <div class="pill-column">
-              @for (entry of data.signals.topCategories; track entry.category) {
-                <mat-chip>
-                  {{ entry.category || 'Uncategorized' }} · {{ entry.count }}
-                </mat-chip>
+
+          <div class="category-divider"></div>
+
+          <div class="category-block">
+            <div class="category-header">
+              <div class="avatar avatar-accent">
+                <mat-icon>notifications</mat-icon>
+              </div>
+              <div>
+                <h3>Signals</h3>
+                <p>Most common signal categories</p>
+              </div>
+            </div>
+
+            <div class="category-list">
+              @for (entry of data.signals.topCategories; track entry.category; let index = $index) {
+                <div class="category-item">
+                  <span class="category-rank">{{ index + 1 }}</span>
+                  <span class="category-name">{{ entry.category || 'Uncategorized' }}</span>
+                  <span class="category-count">{{ entry.count }}</span>
+                </div>
+              } @empty {
+                <div class="empty-inline">No signal categories available.</div>
               }
             </div>
           </div>
         </div>
       </mat-card>
     </section>
-    <section class="reports">
-      <div class="reports-header">
-        <h3>
+
+    <mat-card class="surface-card section-panel reports-panel reports-section">
+      <div class="section-header reports-section-header">
+        <div class="avatar avatar-neutral">
           <mat-icon>description</mat-icon>
-          Transparency reports
-        </h3>
-        @if (loadingReports()) {
-          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-        }
+        </div>
+        <div>
+          <h2>Transparency reports</h2>
+          <p>Generated exports and downloadable snapshots.</p>
+        </div>
       </div>
+
+      @if (loadingReports()) {
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      }
+
       @if (reports().length > 0) {
         <div class="report-tiles">
-          @for (report of reports(); track $index) {
-            <mat-card class="report-tile">
+          @for (report of reports(); track report.id) {
+            <mat-card class="surface-card report-tile">
               <div class="report-head">
-                <div class="report-title">{{ report.title }}</div>
-                @if (report.description) {
-                  <div class="report-desc">{{ report.description }}</div>
-                }
+                <div class="avatar avatar-neutral">
+                  <mat-icon>description</mat-icon>
+                </div>
+                <div class="report-copy">
+                  <div class="report-title">{{ report.title }}</div>
+                  <div class="report-desc">{{ report.description || 'Generated transparency report export.' }}</div>
+                </div>
               </div>
+
               <div class="report-meta">
-                <div class="meta-row"><span class="k">Period</span><span class="v">{{ report.period.label }}</span></div>
-                <div class="meta-row"><span class="k">Format</span><span class="v">{{ report.format.toUpperCase() }}</span></div>
-                <div class="meta-row"><span class="k">Generated</span><span class="v">{{ formatDateTime(report.generatedAt) }}</span></div>
+                <div class="meta-row">
+                  <span class="k">Period</span>
+                  <span class="v">{{ report.period.label }}</span>
+                </div>
+                <div class="meta-row">
+                  <span class="k">Format</span>
+                  <span class="v">{{ report.format.toUpperCase() }}</span>
+                </div>
+                <div class="meta-row">
+                  <span class="k">Generated</span>
+                  <span class="v">{{ formatDateTime(report.generatedAt) }}</span>
+                </div>
+                <div class="meta-row">
+                  <span class="k">Size</span>
+                  <span class="v">{{ formatBytes(report.sizeBytes) }}</span>
+                </div>
               </div>
+
               <div class="report-actions">
                 <button mat-stroked-button color="primary" (click)="downloadReport(report)">
                   <mat-icon>download</mat-icon>
@@ -179,11 +329,28 @@
           }
         </div>
       } @else {
-        <div class="empty-reports">
-          <mat-icon>inventory_2</mat-icon>
-          <p>No generated reports yet for {{ data.range.label }}.</p>
+        <div class="empty-reports reports-empty-state">
+          <div class="avatar avatar-neutral">
+            <mat-icon>inventory_2</mat-icon>
+          </div>
+          <div>
+            <h3>No reports yet</h3>
+            <p>No generated reports yet for {{ data.range.label }}.</p>
+          </div>
         </div>
       }
-    </section>
-  </div>
-}
+    </mat-card>
+  } @else {
+    <mat-card class="surface-card empty-card">
+      <div class="empty-reports">
+        <div class="avatar avatar-neutral">
+          <mat-icon>hourglass_bottom</mat-icon>
+        </div>
+        <div>
+          <h3>Loading transparency data</h3>
+          <p>The overview will appear as soon as the statistics are available.</p>
+        </div>
+      </div>
+    </mat-card>
+  }
+</div>
