@@ -98,7 +98,7 @@
         @for (n of notices(); track trackById($index, n)) {
         <mat-card class="tile" (click)="detail(n)" tabindex="0" (keydown.enter)="detail(n)">
             <mat-card-header>
-                <div mat-card-avatar class="avatar">
+                <div mat-card-avatar class="avatar avatar-warn">
                     <span class="avatar-badged" [matBadge]="statusLabel(n.status)" matBadgePosition="below after"
                         matBadgeOverlap="false" matBadgeColor="primary">
                         <mat-icon>{{ statusIcon(n.status) }}</mat-icon>

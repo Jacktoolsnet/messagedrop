@@ -43,6 +43,71 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
+/* Shared admin icon styling inspired by the user moderation view */
+:root {
+  --admin-icon-shadow: 0 10px 24px rgba(15, 23, 42, 0.16);
+}
+
+.avatar,
+.brand-avatar,
+.maintenance-avatar,
+.confirm-wrap .avatar,
+.dialog-header .avatar {
+  --admin-icon-start: #16a34a;
+  --admin-icon-end: #22c55e;
+  color: #fff !important;
+  border: 0 !important;
+  border-radius: 14px !important;
+  background: linear-gradient(135deg, var(--admin-icon-start), var(--admin-icon-end)) !important;
+  box-shadow: var(--admin-icon-shadow) !important;
+  overflow: hidden;
+}
+
+.avatar mat-icon,
+.brand-avatar mat-icon,
+.brand-avatar .fallback,
+.maintenance-avatar mat-icon,
+.confirm-wrap .avatar mat-icon,
+.dialog-header .avatar mat-icon {
+  color: currentColor !important;
+}
+
+.avatar-accent,
+.avatar.info,
+.avatar.timeline,
+.brand-avatar.info-avatar {
+  --admin-icon-start: #2563eb;
+  --admin-icon-end: #38bdf8;
+}
+
+.avatar-success,
+.avatar.success,
+.avatar.evidence {
+  --admin-icon-start: #0f766e;
+  --admin-icon-end: #14b8a6;
+}
+
+.avatar-warn,
+.avatar.warn,
+.avatar.decision,
+.confirm-wrap.warn .avatar,
+.maintenance-avatar.active {
+  --admin-icon-start: #f97316;
+  --admin-icon-end: #ef4444;
+}
+
+.avatar-neutral,
+.avatar.neutral {
+  --admin-icon-start: #475569;
+  --admin-icon-end: #64748b;
+}
+
+.avatar .mat-badge-content,
+.brand-avatar .mat-badge-content,
+.maintenance-avatar .mat-badge-content {
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.24);
+}
+
 /* Limitiert die sichtbare Dialogfläche hart auf 90vw/90vh */
 .mdp-dialog-xl .mat-mdc-dialog-container .mdc-dialog__surface {
   max-width: 96vw;

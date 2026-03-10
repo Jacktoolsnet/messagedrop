@@ -26,7 +26,7 @@
             @for (req of requests(); track trackById($index, req)) {
             <div class="row" [class.active]="isSelected(req)" role="button" tabindex="0" (click)="select(req)"
                 (keydown.enter)="select(req)" (keydown.space)="select(req)">
-                <div class="avatar"><mat-icon color="warn">policy</mat-icon></div>
+                <div class="avatar avatar-warn"><mat-icon color="warn">policy</mat-icon></div>
                 <div class="head">
                     <div class="title">{{ req.messageText }}</div>
                     <div class="meta">
@@ -42,7 +42,7 @@
         <div class="detail-pane" *ngIf="selected() as sel">
             <mat-card>
                 <mat-card-header>
-                    <div mat-card-avatar class="avatar"><mat-icon color="warn">policy</mat-icon></div>
+                    <div mat-card-avatar class="avatar avatar-warn"><mat-icon color="warn">policy</mat-icon></div>
                     <mat-card-title>Moderation request</mat-card-title>
                     <mat-card-subtitle>{{ formatLocal(sel.createdAt || sel.messageCreatedAt) }}</mat-card-subtitle>
                 </mat-card-header>

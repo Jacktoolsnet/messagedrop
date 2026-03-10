@@ -115,6 +115,25 @@ export class DsaDashboardComponent {
     }
   };
 
+  avatarClass = (tile: DsaTile) => {
+    switch (tile.key) {
+      case 'signals':
+      case 'notifications':
+      case 'appeals':
+        return 'avatar avatar-accent';
+      case 'notices':
+      case 'userModeration':
+        return 'avatar avatar-warn';
+      case 'decisions':
+      case 'transparency':
+        return 'avatar avatar-success';
+      case 'evidence':
+      case 'audit':
+      default:
+        return 'avatar avatar-neutral';
+    }
+  };
+
   goBack() { this.router.navigate(['/dashboard']); }
   logout() { this.auth.logout(); }
   trackByKey = (_: number, t: DsaTile) => t.key;

@@ -1,6 +1,6 @@
 <div class="confirm-wrap" [class.warn]="data.warn">
     <div class="head">
-        <div class="avatar">
+        <div class="avatar" [class.avatar-warn]="data.warn" [class.avatar-neutral]="!data.warn">
             <mat-icon>{{ data.warn ? 'warning' : 'help' }}</mat-icon>
         </div>
         <div class="titles">

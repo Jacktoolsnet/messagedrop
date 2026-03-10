@@ -61,7 +61,7 @@
             @for (log of visibleLogs(); track trackById($index, log)) {
             <div class="row" [class.active]="isSelected(log)" role="button" tabindex="0" (click)="select(log)"
                 (keydown.enter)="select(log)" (keydown.space)="select(log)">
-                <div class="avatar"><mat-icon color="warn">{{ iconForScope(log.scope) }}</mat-icon></div>
+                <div class="avatar avatar-neutral"><mat-icon color="warn">{{ iconForScope(log.scope) }}</mat-icon></div>
                 <div class="head">
                     <div class="title">{{ log.scope }}</div>
                     <div class="meta">
@@ -77,7 +77,7 @@
         <div class="detail-pane" *ngIf="selected() as sel">
             <mat-card>
                 <mat-card-header>
-                    <div mat-card-avatar class="avatar"><mat-icon color="warn">{{ iconForScope(sel.scope) }}</mat-icon></div>
+                    <div mat-card-avatar class="avatar avatar-neutral"><mat-icon color="warn">{{ iconForScope(sel.scope) }}</mat-icon></div>
                     <mat-card-title>{{ sel.scope }}</mat-card-title>
                     <mat-card-subtitle>{{ formatLocal(sel.createdAt) }}</mat-card-subtitle>
                 </mat-card-header>
