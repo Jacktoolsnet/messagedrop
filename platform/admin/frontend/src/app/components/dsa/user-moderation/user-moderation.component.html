@@ -35,6 +35,37 @@
     </mat-card-content>
   </mat-card>
 
+  <mat-card class="appeals-card surface-card">
+    <mat-card-header class="tile-header">
+      <div mat-card-avatar class="tile-avatar avatar-accent">
+        <mat-icon>mark_email_unread</mat-icon>
+      </div>
+      <mat-card-title>Open user appeals</mat-card-title>
+      <mat-card-subtitle>{{ openAppealsCount() }} open</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      @if (openAppeals().length === 0) {
+      <div class="empty-state">There are currently no open user moderation appeals.</div>
+      } @else {
+      <div class="appeals-list compact-list">
+        @for (appeal of openAppeals(); track appeal.id) {
+        <button type="button" class="appeal-item appeal-item-button" (click)="loadUserFromAppeal(appeal)">
+          <div class="appeal-header-row">
+            <div>
+              <div class="appeal-title">{{ appeal.target === 'posting' ? 'Posting appeal' : 'Account appeal' }}</div>
+              <div class="appeal-meta">User {{ appeal.userId }}</div>
+            </div>
+            <span class="appeal-status open">Open</span>
+          </div>
+          <p class="appeal-message">{{ appeal.message }}</p>
+          <div class="appeal-meta">Filed {{ formatTimestamp(appeal.createdAt) }}</div>
+        </button>
+        }
+      </div>
+      }
+    </mat-card-content>
+  </mat-card>
+
   @if (moderation(); as moderationState) {
   <div class="results-header">
     <div>
@@ -234,7 +265,7 @@
       <div mat-card-avatar class="tile-avatar avatar-accent">
         <mat-icon>mail</mat-icon>
       </div>
-      <mat-card-title>Appeals</mat-card-title>
+      <mat-card-title>Appeals for this user</mat-card-title>
       <mat-card-subtitle>{{ appeals().length }} total</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>

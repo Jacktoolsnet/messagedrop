@@ -51,3 +51,9 @@ export interface PlatformUserModerationResponse {
   summary: PlatformUserSummary;
   appeal?: PlatformUserModerationAppeal;
 }
+
+export interface PlatformUserModerationOpenAppealsResponse {
+  status: number;
+  appeals: PlatformUserModerationAppeal[];
+  totalOpen: number;
+}

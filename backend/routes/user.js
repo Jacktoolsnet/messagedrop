@@ -366,12 +366,47 @@ function listOpenUserModerationAppeals(db, userId, target) {
   });
 }
 
+function listAllOpenUserModerationAppeals(db, limit) {
+  return new Promise((resolve, reject) => {
+    tableUserModerationAppeal.listOpen(db, limit, (err, appeals) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(appeals || []);
+    });
+  });
+}
+
+function countAllOpenUserModerationAppeals(db) {
+  return new Promise((resolve, reject) => {
+    tableUserModerationAppeal.countOpen(db, (err, total) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(Number(total || 0));
+    });
+  });
+}
+
 async function buildUserModerationResponse(db, row) {
   const moderation = moderationPayloadFromUser(row);
   const appeals = row?.id ? await listUserModerationAppeals(db, row.id) : [];
   return {
     moderation,
     appeals
+  };
+}
+
+async function buildOpenUserModerationAppealsResponse(db, limit) {
+  const [appeals, totalOpen] = await Promise.all([
+    listAllOpenUserModerationAppeals(db, limit),
+    countAllOpenUserModerationAppeals(db)
+  ]);
+  return {
+    appeals,
+    totalOpen
   };
 }
 
@@ -481,6 +516,22 @@ async function resolveOpenModerationAppeals(db, userId, target, status, reviewer
     )
   ));
 }
+
+router.get('/internal/moderation/appeals/open',
+  [
+    security.checkToken
+  ],
+  async function (req, res, next) {
+    const rawLimit = Number(req.query?.limit);
+    const limit = Number.isFinite(rawLimit) && rawLimit > 0 ? Math.min(Math.floor(rawLimit), 500) : 100;
+
+    try {
+      const response = await buildOpenUserModerationAppealsResponse(req.database.db, limit);
+      return res.status(200).json({ status: 200, ...response });
+    } catch {
+      return next(apiError.internal('db_error'));
+    }
+  });
 
 router.get('/internal/moderation/:userId',
   [

@@ -174,6 +174,49 @@ function listOpenByUserIdAndTarget(db, userId, target, callback) {
   }
 }
 
+function listOpen(db, limit, callback) {
+  try {
+    const normalizedLimit = Number.isFinite(Number(limit)) && Number(limit) > 0
+      ? Math.min(Math.floor(Number(limit)), 500)
+      : 100;
+    const sql = `
+      SELECT *
+      FROM ${tableName}
+      WHERE ${columnStatus} = '${appealStatus.OPEN}'
+      ORDER BY ${columnCreatedAt} DESC
+      LIMIT ?;
+    `;
+
+    db.all(sql, [normalizedLimit], (err, rows) => {
+      if (err) {
+        return callback(err);
+      }
+      callback(null, (rows || []).map(mapRow));
+    });
+  } catch (error) {
+    callback(error);
+  }
+}
+
+function countOpen(db, callback) {
+  try {
+    const sql = `
+      SELECT COUNT(*) AS total
+      FROM ${tableName}
+      WHERE ${columnStatus} = '${appealStatus.OPEN}';
+    `;
+
+    db.get(sql, [], (err, row) => {
+      if (err) {
+        return callback(err);
+      }
+      callback(null, Number(row?.total || 0));
+    });
+  } catch (error) {
+    callback(error);
+  }
+}
+
 function updateResolution(db, id, status, resolvedAt, resolutionMessage, reviewer, callback) {
   try {
     const sql = `
@@ -208,6 +251,8 @@ module.exports = {
   getById,
   listByUserId,
   listOpenByUserIdAndTarget,
+  listOpen,
+  countOpen,
   updateResolution,
   columns: {
     id: columnId,

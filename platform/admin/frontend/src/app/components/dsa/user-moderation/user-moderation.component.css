@@ -288,6 +288,10 @@ mat-toolbar {
   gap: 1rem;
 }
 
+.compact-list {
+  gap: .75rem;
+}
+
 .appeal-item {
   display: grid;
   gap: .75rem;
@@ -295,6 +299,23 @@ mat-toolbar {
   border-radius: 18px;
   border: 1px solid rgba(15, 23, 42, 0.08);
   background: rgba(255, 255, 255, 0.75);
+}
+
+.appeal-item-button {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.appeal-item-button:hover {
+  border-color: rgba(37, 99, 235, 0.28);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+.appeal-item-button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .appeal-header-row {

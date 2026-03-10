@@ -517,6 +517,30 @@ router.get('/platform/:userId', requireRole('moderator', 'legal', 'admin', 'root
     }
 });
 
+router.get('/platform/appeals/open', requireRole('moderator', 'legal', 'admin', 'root'), async (req, res, next) => {
+    const rawLimit = Number(req.query?.limit);
+    const limit = Number.isFinite(rawLimit) && rawLimit > 0 ? Math.min(Math.floor(rawLimit), 500) : 100;
+
+    try {
+        const backendResp = await callPublicBackend('get', `/user/internal/moderation/appeals/open?limit=${encodeURIComponent(String(limit))}`);
+        if (backendResp.status >= 400) {
+            const apiErr = apiError.badGateway('backend_request_failed');
+            apiErr.detail = backendResp.data?.error || backendResp.data?.message || backendResp.statusText;
+            return next(apiErr);
+        }
+
+        return res.json({
+            status: 200,
+            appeals: backendResp.data?.appeals || [],
+            totalOpen: Number(backendResp.data?.totalOpen || 0)
+        });
+    } catch (error) {
+        const apiErr = apiError.internal('platform_user_appeals_lookup_failed');
+        apiErr.detail = error?.message || String(error);
+        return next(apiErr);
+    }
+});
+
 router.patch('/platform/:userId/moderation', requireRole('moderator', 'legal', 'admin', 'root'), async (req, res, next) => {
     const userId = String(req.params.userId || '').trim();
     if (!isUuid(userId)) {

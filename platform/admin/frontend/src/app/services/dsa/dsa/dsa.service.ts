@@ -23,7 +23,7 @@ import { TransparencyReport } from '../../../interfaces/transparency-report.inte
 import { DsaAppeal } from '../../../interfaces/dsa-appeal.interface';
 import { ListAppealsParams } from '../../../interfaces/list-appeals-params.interface';
 import { DsaNotification, ListNotificationsParams, NotificationMeta, NotificationPayload } from '../../../interfaces/dsa-notification.interface';
-import { PlatformUserModerationResponse } from '../../../interfaces/platform-user-moderation.interface';
+import { PlatformUserModerationOpenAppealsResponse, PlatformUserModerationResponse, PlatformUserModerationAppeal } from '../../../interfaces/platform-user-moderation.interface';
 
 @Injectable({ providedIn: 'root' })
 export class DsaService {
@@ -36,6 +36,8 @@ export class DsaService {
   readonly noticeStats = signal<NoticeStats | null>(null);
   readonly signalStats = signal<SignalStats | null>(null);
   readonly appealStats = signal<AppealStats | null>(null);
+  readonly openUserModerationAppeals = signal<PlatformUserModerationAppeal[]>([]);
+  readonly openUserModerationAppealsCount = signal(0);
   private readonly http = inject(HttpClient);
   private readonly snack = inject(MatSnackBar);
 
@@ -307,12 +309,18 @@ export class DsaService {
       signals: this.http.get<SignalStats>(`${this.baseUrl}/stats/signals`)
         .pipe(catchError(() => of(null))),
       appeals: this.http.get<AppealStats>(`${this.baseUrl}/stats/appeals`)
+        .pipe(catchError(() => of(null))),
+      userModerationAppeals: this.http.get<PlatformUserModerationOpenAppealsResponse>(`${this.userBaseUrl}/platform/appeals/open?limit=25`)
         .pipe(catchError(() => of(null)))
-    }).subscribe(({ notices, signals, appeals }) => {
+    }).subscribe(({ notices, signals, appeals, userModerationAppeals }) => {
       if (notices) this.noticeStats.set(notices);
       if (signals) this.signalStats.set(signals);
       if (appeals) this.appealStats.set(appeals);
-      if (!notices || !signals || !appeals) {
+      if (userModerationAppeals) {
+        this.openUserModerationAppeals.set(userModerationAppeals.appeals || []);
+        this.openUserModerationAppealsCount.set(Number(userModerationAppeals.totalOpen || 0));
+      }
+      if (!notices || !signals || !appeals || !userModerationAppeals) {
         this.snack.open('Some DSA stats could not be loaded.', 'OK', { duration: 3000 });
       }
       this.loading.set(false);
@@ -588,6 +596,27 @@ export class DsaService {
         throw err;
       })
     );
+  }
+
+  getOpenPlatformUserAppeals(limit = 100): Observable<PlatformUserModerationOpenAppealsResponse> {
+    return this.http.get<PlatformUserModerationOpenAppealsResponse>(
+      `${this.userBaseUrl}/platform/appeals/open?limit=${encodeURIComponent(String(limit))}`
+    ).pipe(
+      catchError(err => {
+        this.snack.open('Could not load open user appeals.', 'OK', { duration: 3000 });
+        throw err;
+      })
+    );
+  }
+
+  loadOpenPlatformUserAppeals(limit = 100): void {
+    this.getOpenPlatformUserAppeals(limit).subscribe({
+      next: (res) => {
+        this.openUserModerationAppeals.set(res?.appeals || []);
+        this.openUserModerationAppealsCount.set(Number(res?.totalOpen || 0));
+      },
+      error: () => undefined
+    });
   }
 
   updatePlatformUserModeration(

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -50,7 +50,7 @@ import { DsaService } from '../../../services/dsa/dsa/dsa.service';
   styleUrls: ['./user-moderation.component.css'],
   providers: [provideNativeDateAdapter(), { provide: MAT_DATE_LOCALE, useValue: 'de-DE' }]
 })
-export class UserModerationComponent {
+export class UserModerationComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly dsa = inject(DsaService);
   private readonly snackBar = inject(MatSnackBar);
@@ -72,6 +72,12 @@ export class UserModerationComponent {
   readonly moderation = signal<PlatformUserModeration | null>(null);
   readonly summary = signal<PlatformUserSummary | null>(null);
   readonly appeals = signal<PlatformUserModerationAppeal[]>([]);
+  readonly openAppeals = this.dsa.openUserModerationAppeals;
+  readonly openAppealsCount = this.dsa.openUserModerationAppealsCount;
+
+  ngOnInit(): void {
+    this.refreshOpenAppeals();
+  }
 
   lookup(): void {
     const userId = this.form.controls.userId.value.trim();
@@ -107,10 +113,22 @@ export class UserModerationComponent {
 
     this.loading.set(true);
     this.dsa.resolvePlatformUserAppeal(appeal.id, { status }).subscribe({
-      next: (res) => this.applyResponse(res),
+      next: (res) => {
+        this.applyResponse(res);
+        this.refreshOpenAppeals();
+      },
       error: () => this.loading.set(false),
       complete: () => this.loading.set(false)
     });
+  }
+
+  loadUserFromAppeal(appeal: PlatformUserModerationAppeal): void {
+    const userId = String(appeal.userId || '').trim();
+    if (!userId) {
+      return;
+    }
+    this.form.controls.userId.setValue(userId);
+    this.lookup();
   }
 
   formatTimestamp(value?: number | null): string {
@@ -162,10 +180,17 @@ export class UserModerationComponent {
       reason,
       blockedUntil: blocked ? this.parseBlockedUntil(target) : null
     }).subscribe({
-      next: (res) => this.applyResponse(res),
+      next: (res) => {
+        this.applyResponse(res);
+        this.refreshOpenAppeals();
+      },
       error: () => this.loading.set(false),
       complete: () => this.loading.set(false)
     });
+  }
+
+  private refreshOpenAppeals(): void {
+    this.dsa.loadOpenPlatformUserAppeals(50);
   }
 
   private syncReasonSelection(target: 'posting' | 'account', reason: string | null): void {
