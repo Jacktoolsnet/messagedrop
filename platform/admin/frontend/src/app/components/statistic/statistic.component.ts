@@ -1,9 +1,10 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { RouterLink } from '@angular/router';
 import { StatisticService } from '../../services/statistic/statistic.service';
 import { StatisticRangePreset } from '../../interfaces/statistic-range-preset.type';
@@ -27,13 +28,15 @@ import { SeriesPoint } from '../../interfaces/statistic-series-point.interface';
     MatButtonModule,
     MatCardModule,
     MatButtonToggleModule,
+    MatProgressBarModule,
     StatisticKeyChartComponent,
     MatDialogModule,
     MatMenuModule,
     MatDividerModule
   ],
   templateUrl: './statistic.component.html',
-  styleUrls: ['./statistic.component.css']
+  styleUrls: ['./statistic.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class StatisticComponent {
@@ -147,6 +150,9 @@ export class StatisticComponent {
 
   titleFor(key: string): string { return this.settings()[key]?.displayName?.trim() || key; }
   iconFor(key: string): string { return this.settings()[key]?.iconName?.trim() || 'insights'; }
+  rangeLabel(): string {
+    return this.ranges.find((range) => range.value === this.selectedRange())?.label ?? this.selectedRange();
+  }
   orderedKeys(): string[] {
     const ks = this.keys();
     const map = this.settings();
@@ -161,6 +167,14 @@ export class StatisticComponent {
 
   clearSelection(): void {
     this.selectedKey.set(null);
+  }
+
+  totalFor(key: string): number {
+    return this.lastSeries()?.series?.[key]?.total ?? 0;
+  }
+
+  maxFor(key: string): number {
+    return this.lastSeries()?.series?.[key]?.max ?? 0;
   }
 
   private aggregatePoints(points: SeriesPoint[], preset: StatisticRangePreset): SeriesPoint[] {

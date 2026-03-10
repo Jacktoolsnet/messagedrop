@@ -4,11 +4,11 @@
   </button>
   <span class="toolbar-title">Statistic</span>
   <span class="spacer"></span>
-  <!-- Desktop controls -->
+
   <div class="desktop-controls">
-    <mat-button-toggle-group [value]="selectedRange()" (valueChange)="onRangeChange($event)">
+    <mat-button-toggle-group class="status-toggle" [value]="selectedRange()" (valueChange)="onRangeChange($event)">
       @for (r of ranges; track r.value) {
-      <mat-button-toggle [value]="r.value">{{ r.label }}</mat-button-toggle>
+        <mat-button-toggle [value]="r.value">{{ r.label }}</mat-button-toggle>
       }
     </mat-button-toggle-group>
     <button mat-stroked-button color="primary" (click)="openSettings()" aria-label="Settings">
@@ -27,7 +27,6 @@
     </button>
   </div>
 
-  <!-- Mobile menu -->
   <div class="mobile-controls">
     @if (selectedKey()) {
       <button mat-icon-button (click)="clearSelection()" aria-label="Show all">
@@ -50,6 +49,12 @@
         <mat-icon>settings</mat-icon>
         <span>Settings</span>
       </button>
+      @if (selectedKey()) {
+        <button mat-menu-item (click)="clearSelection()">
+          <mat-icon>close_fullscreen</mat-icon>
+          <span>Show all</span>
+        </button>
+      }
       <button mat-menu-item (click)="reload()">
         <mat-icon>refresh</mat-icon>
         <span>Refresh</span>
@@ -58,34 +63,121 @@
   </div>
 </mat-toolbar>
 
+@if (loading()) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
 <div class="page">
-  @if (selectedKey(); as currentKey) {
-    <div class="focus-chart">
-      <app-statistic-key-chart [title]="titleFor(currentKey)"
-        [points]="getPointsFor(currentKey)"
-        [chartKind]="selectedRange() === '1d' ? 'bar' : 'line'" [color]="colorFor(currentKey)"
-        [iconName]="iconFor(currentKey)" [tall]="true">
-      </app-statistic-key-chart>
-    </div>
-  } @else {
-    <div class="grid-charts">
-      @if (!hasKeys()) {
-    <mat-card class="tile-chart" appearance="raised">
-      <div class="chart-placeholder">
-        <mat-icon aria-hidden="true">insights</mat-icon>
-        <span>No metrics available.</span>
+  <mat-card class="surface-card hero-card">
+    <div class="hero-header">
+      <div class="avatar avatar-neutral hero-avatar">
+        <mat-icon>query_stats</mat-icon>
       </div>
-    </mat-card>
-      } @else {
-      @for (k of orderedKeys(); track k) {
-      <div class="chart-tile selectable" role="button" tabindex="0" (click)="selectKey(k)"
-        (keydown.enter)="selectKey(k)" (keydown.space)="$event.preventDefault(); selectKey(k)">
-        <app-statistic-key-chart [title]="titleFor(k)" [points]="getPointsFor(k)"
-          [chartKind]="selectedRange() === '1d' ? 'bar' : 'line'" [color]="colorFor(k)" [iconName]="iconFor(k)">
+
+      <div class="hero-copy">
+        <div class="section-eyebrow">Operations analytics</div>
+        <h1 class="hero-title">Internal statistics</h1>
+        <p class="hero-subtitle">
+          Explore operational metrics, switch time ranges and focus on a single metric when you need a deeper view.
+        </p>
+      </div>
+
+      <div class="hero-pills">
+        <span class="hero-pill">
+          <mat-icon>schedule</mat-icon>
+          {{ rangeLabel() }}
+        </span>
+        <span class="hero-pill">
+          <mat-icon>insights</mat-icon>
+          {{ orderedKeys().length }} metrics
+        </span>
+        @if (selectedKey(); as currentKey) {
+          <span class="hero-pill">
+            <mat-icon>{{ iconFor(currentKey) }}</mat-icon>
+            {{ titleFor(currentKey) }}
+          </span>
+        }
+      </div>
+    </div>
+  </mat-card>
+
+  @if (selectedKey(); as currentKey) {
+    <mat-card class="surface-card section-panel focus-panel">
+      <div class="section-header">
+        <div class="avatar avatar-accent">
+          <mat-icon>{{ iconFor(currentKey) }}</mat-icon>
+        </div>
+        <div>
+          <h2>{{ titleFor(currentKey) }}</h2>
+          <p>Focused metric view for {{ rangeLabel() }}.</p>
+        </div>
+      </div>
+
+      <div class="focus-summary">
+        <div class="summary-pill">
+          <span class="k">Total</span>
+          <strong>{{ totalFor(currentKey) }}</strong>
+        </div>
+        <div class="summary-pill">
+          <span class="k">Peak</span>
+          <strong>{{ maxFor(currentKey) }}</strong>
+        </div>
+      </div>
+
+      <div class="focus-chart">
+        <app-statistic-key-chart
+          [title]="titleFor(currentKey)"
+          [points]="getPointsFor(currentKey)"
+          [chartKind]="selectedRange() === '1d' ? 'bar' : 'line'"
+          [color]="colorFor(currentKey)"
+          [iconName]="iconFor(currentKey)"
+          [tall]="true">
         </app-statistic-key-chart>
       </div>
+    </mat-card>
+  } @else {
+    <mat-card class="surface-card section-panel charts-panel">
+      <div class="section-header">
+        <div class="avatar avatar-accent">
+          <mat-icon>insights</mat-icon>
+        </div>
+        <div>
+          <h2>Metric overview</h2>
+          <p>Choose a metric tile to open a focused chart view.</p>
+        </div>
+      </div>
+
+      @if (!hasKeys()) {
+        <div class="empty-state">
+          <div class="avatar avatar-neutral">
+            <mat-icon aria-hidden="true">insights</mat-icon>
+          </div>
+          <div>
+            <h3>No metrics available</h3>
+            <p>There are currently no configured metrics to display.</p>
+          </div>
+        </div>
+      } @else {
+        <div class="grid-charts">
+          @for (k of orderedKeys(); track k) {
+            <div class="chart-tile selectable" role="button" tabindex="0" (click)="selectKey(k)"
+              (keydown.enter)="selectKey(k)" (keydown.space)="$event.preventDefault(); selectKey(k)">
+              <app-statistic-key-chart
+                [title]="titleFor(k)"
+                [points]="getPointsFor(k)"
+                [chartKind]="selectedRange() === '1d' ? 'bar' : 'line'"
+                [color]="colorFor(k)"
+                [iconName]="iconFor(k)">
+              </app-statistic-key-chart>
+
+              <div class="tile-footer">
+                <span>Total: <strong>{{ totalFor(k) }}</strong></span>
+                <span>Peak: <strong>{{ maxFor(k) }}</strong></span>
+              </div>
+            </div>
+          }
+        </div>
       }
-      }
-    </div>
+    </mat-card>
   }
 </div>

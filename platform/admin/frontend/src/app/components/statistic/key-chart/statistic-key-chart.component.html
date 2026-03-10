@@ -1,7 +1,12 @@
-<div class="chart-card" [class.tall]="tall()">
+<div class="chart-card" [class.tall]="tall()" [style.--chart-accent]="color()">
   <div class="chart-header">
-    <mat-icon aria-hidden="true" class="header-icon">{{ iconName() || 'insights' }}</mat-icon>
-    <div class="header-title">{{ title() }}</div>
+    <div class="avatar chart-avatar">
+      <mat-icon aria-hidden="true" class="header-icon">{{ iconName() || 'insights' }}</mat-icon>
+    </div>
+    <div class="header-copy">
+      <div class="header-title">{{ title() }}</div>
+      <div class="header-subtitle">{{ chartKind() === 'bar' ? 'Short-range distribution' : 'Trend overview' }}</div>
+    </div>
   </div>
   <div class="chart-body">
     <canvas #canvas></canvas>

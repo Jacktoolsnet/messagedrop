@@ -42,6 +42,12 @@ export class PublicOverviewComponent implements OnInit {
   readonly error = signal<string | null>(null);
   readonly overview = signal<MultiSeriesResponse | null>(null);
   readonly backLink = computed(() => this.auth.isLoggedIn() ? '/dashboard/statistic' : '/');
+  readonly totalEvents = computed(() =>
+    this.metrics.reduce((sum, metric) => sum + this.totalFor(metric.key), 0)
+  );
+  readonly peakValue = computed(() =>
+    this.metrics.reduce((max, metric) => Math.max(max, this.maxFor(metric.key)), 0)
+  );
 
   readonly metrics: PublicMetricTile[] = [
     { key: 'client.connect', title: 'Page views', icon: 'visibility', color: '#2563eb' },
@@ -82,4 +88,3 @@ export class PublicOverviewComponent implements OnInit {
     return this.overview()?.series?.[key]?.max ?? 0;
   }
 }
-

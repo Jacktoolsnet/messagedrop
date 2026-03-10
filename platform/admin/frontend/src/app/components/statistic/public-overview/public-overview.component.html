@@ -15,28 +15,77 @@
 }
 
 <div class="page">
+  <mat-card class="surface-card hero-card">
+    <div class="hero-header">
+      <div class="avatar avatar-accent hero-avatar">
+        <mat-icon>public</mat-icon>
+      </div>
+
+      <div class="hero-copy">
+        <div class="section-eyebrow">Public analytics</div>
+        <h1 class="hero-title">Activity overview</h1>
+        <p class="hero-subtitle">
+          A simple public snapshot of page views, search activity, message creation and user growth over the last 7 days.
+        </p>
+      </div>
+
+      <div class="hero-pills">
+        <span class="hero-pill">
+          <mat-icon>event</mat-icon>
+          Last 7 days
+        </span>
+        <span class="hero-pill">
+          <mat-icon>insights</mat-icon>
+          {{ totalEvents() }} total events
+        </span>
+        <span class="hero-pill">
+          <mat-icon>show_chart</mat-icon>
+          Peak/day {{ peakValue() }}
+        </span>
+      </div>
+    </div>
+  </mat-card>
+
   @if (error(); as errorMessage) {
-    <mat-card class="error-card">
-      <mat-icon>error</mat-icon>
-      <span>{{ errorMessage }}</span>
+    <mat-card class="surface-card error-card">
+      <div class="avatar avatar-warn">
+        <mat-icon>error</mat-icon>
+      </div>
+      <div>
+        <h2>Unable to load statistics</h2>
+        <p>{{ errorMessage }}</p>
+      </div>
+    </mat-card>
+  } @else {
+    <mat-card class="surface-card section-panel">
+      <div class="section-header">
+        <div class="avatar avatar-neutral">
+          <mat-icon>query_stats</mat-icon>
+        </div>
+        <div>
+          <h2>Public metric overview</h2>
+          <p>Each tile shows the recent trend and the strongest day in the current window.</p>
+        </div>
+      </div>
+
+      <div class="tiles-grid">
+        @for (metric of metrics; track metric.key) {
+          <section class="tile">
+            <app-statistic-key-chart
+              [title]="metric.title"
+              [iconName]="metric.icon"
+              [color]="metric.color"
+              [chartKind]="'line'"
+              [points]="pointsFor(metric.key)">
+            </app-statistic-key-chart>
+
+            <div class="tile-footer">
+              <span>Total (7 days): <strong>{{ totalFor(metric.key) }}</strong></span>
+              <span>Peak/day: <strong>{{ maxFor(metric.key) }}</strong></span>
+            </div>
+          </section>
+        }
+      </div>
     </mat-card>
   }
-
-  <div class="tiles-grid">
-    @for (metric of metrics; track metric.key) {
-      <section class="tile">
-        <app-statistic-key-chart
-          [title]="metric.title"
-          [iconName]="metric.icon"
-          [color]="metric.color"
-          [chartKind]="'line'"
-          [points]="pointsFor(metric.key)">
-        </app-statistic-key-chart>
-        <div class="tile-footer">
-          <span>Total (7 days): <strong>{{ totalFor(metric.key) }}</strong></span>
-          <span>Peak/day: <strong>{{ maxFor(metric.key) }}</strong></span>
-        </div>
-      </section>
-    }
-  </div>
 </div>
