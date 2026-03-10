@@ -4,6 +4,68 @@
 </app-dialog-header>
 <mat-dialog-content class="dialog">
   <div class="tile-grid">
+    @if (userService.isAccountBlocked()) {
+    <mat-card class="tile tile-blocked">
+      <mat-card-content>
+        <div class="tile-header">
+          <mat-icon>gpp_bad</mat-icon>
+          <span class="tile-title">{{ 'common.user.blocked.title' | transloco }}</span>
+        </div>
+        <div class="tile-body blocked-copy">
+          <p>{{ 'common.user.blocked.message' | transloco }}</p>
+          @if (userService.getAccountBlockedReason()) {
+          <p class="blocked-meta">
+            <strong>{{ 'common.user.blocked.reasonLabel' | transloco }}</strong>
+            <span>{{ userService.getAccountBlockedReason() }}</span>
+          </p>
+          }
+          @if (userService.getAccountBlockedUntil()) {
+          <p class="blocked-meta">
+            <strong>{{ 'common.user.blocked.untilLabel' | transloco }}</strong>
+            <span>{{ userService.getAccountBlockedUntil() | date:'short' }}</span>
+          </p>
+          } @else {
+          <p class="blocked-meta">
+            <strong>{{ 'common.user.blocked.untilLabel' | transloco }}</strong>
+            <span>{{ 'common.user.blocked.permanentLabel' | transloco }}</span>
+          </p>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+    }
+
+    @if (userService.isPostingBlocked()) {
+    <mat-card class="tile tile-posting-blocked">
+      <mat-card-content>
+        <div class="tile-header">
+          <mat-icon>edit_off</mat-icon>
+          <span class="tile-title">{{ 'common.user.postingBlocked.title' | transloco }}</span>
+        </div>
+        <div class="tile-body blocked-copy">
+          <p>{{ 'common.user.postingBlocked.message' | transloco }}</p>
+          @if (userService.getPostingBlockedReason()) {
+          <p class="blocked-meta">
+            <strong>{{ 'common.user.postingBlocked.reasonLabel' | transloco }}</strong>
+            <span>{{ userService.getPostingBlockedReason() }}</span>
+          </p>
+          }
+          @if (userService.getPostingBlockedUntil()) {
+          <p class="blocked-meta">
+            <strong>{{ 'common.user.postingBlocked.untilLabel' | transloco }}</strong>
+            <span>{{ userService.getPostingBlockedUntil() | date:'short' }}</span>
+          </p>
+          } @else {
+          <p class="blocked-meta">
+            <strong>{{ 'common.user.postingBlocked.untilLabel' | transloco }}</strong>
+            <span>{{ 'common.user.postingBlocked.permanentLabel' | transloco }}</span>
+          </p>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+    }
+
     <mat-card class="tile tile-info">
       <mat-card-content>
         <div class="tile-header">

@@ -26,6 +26,7 @@ export class ViatorService {
   private readonly httpOptions = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
+      'x-skip-backend-status': 'true',
       withCredentials: 'true'
     })
   };
@@ -150,6 +151,7 @@ export class ViatorService {
 
   getAllDestinations(showAlways = false): Observable<ViatorDestinationsResponse> {
     const url = `${environment.apiUrl}/viator/destinations/all`;
+    const headers = this.httpOptions.headers.set('x-skip-ui', 'true');
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
       title: this.i18n.t('common.viator.title'),
@@ -162,7 +164,7 @@ export class ViatorService {
       autoclose: false
     });
 
-    return this.http.get<ViatorDestinationsResponse>(url, this.httpOptions)
+    return this.http.get<ViatorDestinationsResponse>(url, { ...this.httpOptions, headers })
       .pipe(catchError(this.handleError));
   }
 

@@ -22,6 +22,11 @@ const ERROR_CODE_TO_KEY: Record<ApiErrorCode, string> = {
   GATEWAY_TIMEOUT: 'errors.http.message.gatewayTimeout'
 };
 
+const ERROR_MESSAGE_TO_KEY: Record<string, string> = {
+  user_blocked_for_posting: 'common.message.postingBlocked',
+  user_account_blocked: 'common.user.blocked.message'
+};
+
 @Injectable({ providedIn: 'root' })
 export class ApiErrorService {
   private readonly translator = inject(TranslationHelperService);
@@ -29,6 +34,10 @@ export class ApiErrorService {
   getErrorMessage(error: unknown): string | null {
     const payload = this.extractApiErrorPayload(error);
     if (payload) {
+      const specificKey = this.getSpecificMessageKey(payload);
+      if (specificKey) {
+        return this.translator.t(specificKey, payload.params);
+      }
       const key = ERROR_CODE_TO_KEY[payload.errorCode];
       return this.translator.t(key, payload.params);
     }
@@ -58,5 +67,14 @@ export class ApiErrorService {
 
     const candidate = value as { errorCode?: unknown };
     return typeof candidate.errorCode === 'string' && candidate.errorCode in ERROR_CODE_TO_KEY;
+  }
+
+  private getSpecificMessageKey(payload: ApiErrorPayload): string | null {
+    const candidate = payload as ApiErrorPayload & { message?: unknown; error?: unknown };
+    const rawMessage = typeof candidate.message === 'string' && candidate.message.trim()
+      ? candidate.message.trim()
+      : (typeof candidate.error === 'string' && candidate.error.trim() ? candidate.error.trim() : '');
+
+    return rawMessage ? (ERROR_MESSAGE_TO_KEY[rawMessage] ?? null) : null;
   }
 }

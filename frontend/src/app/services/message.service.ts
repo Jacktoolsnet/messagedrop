@@ -480,7 +480,7 @@ export class MessageService {
             this.showPublishedMessage(this.i18n.t('common.message.created'));
           }
         },
-        error: (err) => { this.snackBar.open(err.message, this.i18n.t('common.actions.ok')); }
+        error: () => {}
       });
   }
 
@@ -562,9 +562,7 @@ export class MessageService {
             this.showPublishedMessage(this.i18n.t('common.comment.created'));
           }
         },
-        error: (err) => {
-          this.snackBar.open(err.message, this.i18n.t('common.actions.ok'))
-        }
+        error: () => {}
       });
   }
 

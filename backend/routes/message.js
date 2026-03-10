@@ -864,7 +864,7 @@ router.get('/enable/:messageId',
     security.authenticate
   ],
   function (req, res, next) {
-    findMessageByIdOrUuid(req.database.db, req.params.messageId, (lookupErr, row) => {
+    findMessageByIdOrUuid(req.database.db, req.params.messageId, async (lookupErr, row) => {
       if (lookupErr) {
         return next(apiError.internal('db_error'));
       }
@@ -876,6 +876,23 @@ router.get('/enable/:messageId',
       }
       if (isMessageLockedByModeration(row)) {
         return next(apiError.forbidden('message_locked_by_moderation'));
+      }
+      try {
+        const userRow = await getUserById(req.database.db, row.userId);
+        if (!userRow) {
+          return next(apiError.notFound('user_not_found'));
+        }
+        if (isPostingBlocked(userRow)) {
+          return next(apiError.forbidden('user_blocked_for_posting'));
+        }
+      } catch (error) {
+        req.logger?.warn?.('Failed to read user moderation status before message.enable', {
+          error: error?.message || error,
+          messageId: row.id,
+          messageUuid: row.uuid,
+          userId: row.userId
+        });
+        return next(apiError.internal('db_error'));
       }
       tableMessage.enableMessage(req.database.db, row.uuid, function (err) {
         if (err) {

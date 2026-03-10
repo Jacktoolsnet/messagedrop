@@ -60,10 +60,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const diagnosticLogger = inject(DiagnosticLoggerService);
   const backendRequest = isBackendRequest(req.url);
   const skipUi = req.headers.has('x-skip-ui');
+  const skipBackendStatus = req.headers.has('x-skip-backend-status');
 
   return next(req).pipe(
     tap((event) => {
-      if (backendRequest && event instanceof HttpResponse) {
+      if (backendRequest && !skipBackendStatus && event instanceof HttpResponse) {
         networkService.setBackendOnline(true);
       }
     }),
@@ -72,7 +73,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       const status = error instanceof HttpErrorResponse ? error.status : -1;
       const maintenanceInfo = backendRequest ? parseMaintenanceInfo(error) : null;
       const message = apiErrorService.getErrorMessage(error) ?? networkService.getErrorMessage(status);
-      if (backendRequest) {
+      if (backendRequest && !skipBackendStatus) {
         if (backendOfflineStatuses.has(status)) {
           networkService.setBackendOnline(false);
           networkService.setMaintenanceInfo(maintenanceInfo);

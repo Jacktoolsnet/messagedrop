@@ -39,6 +39,18 @@
   box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
 }
 
+.tile-blocked {
+  grid-column: 1 / -1;
+  border: 1px solid rgba(237, 108, 2, 0.28);
+  background: linear-gradient(135deg, rgba(255, 183, 77, 0.16), rgba(255, 243, 224, 0.72));
+}
+
+.tile-posting-blocked {
+  grid-column: 1 / -1;
+  border: 1px solid rgba(214, 142, 0, 0.28);
+  background: linear-gradient(135deg, rgba(255, 224, 130, 0.16), rgba(255, 248, 225, 0.72));
+}
+
 .tile-action {
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
@@ -75,6 +87,29 @@
   margin-top: 0.75rem;
   font-size: 0.95rem;
   word-break: break-word;
+}
+
+.blocked-copy {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.blocked-copy p,
+.blocked-meta {
+  margin: 0;
+}
+
+.blocked-meta {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.tile-blocked .tile-header mat-icon {
+  color: #ed6c02;
+}
+
+.tile-posting-blocked .tile-header mat-icon {
+  color: #c77800;
 }
 
 .tile-id {

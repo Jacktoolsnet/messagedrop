@@ -10,98 +10,197 @@
 }
 
 <div class="page">
-  <mat-card class="lookup-card">
-    <mat-card-header>
+  <mat-card class="lookup-card surface-card">
+    <mat-card-header class="lookup-header">
+      <div mat-card-avatar class="lookup-avatar">
+        <mat-icon>manage_accounts</mat-icon>
+      </div>
       <mat-card-title>Lookup platform user</mat-card-title>
-      <mat-card-subtitle>Enter the user id from a signal/notice or complaint</mat-card-subtitle>
+      <mat-card-subtitle>Enter the user id from a signal, notice or complaint</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
-      <form class="lookup-form" (ngSubmit)="lookup()">
-        <mat-form-field appearance="outline" class="grow">
+      <form class="lookup-form" [formGroup]="form" (ngSubmit)="lookup()">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="user-field">
           <mat-label>User ID</mat-label>
           <input matInput [formControl]="form.controls.userId" placeholder="UUID user id">
         </mat-form-field>
-        <mat-form-field appearance="outline" class="grow">
-          <mat-label>Blocked until (optional)</mat-label>
-          <input matInput type="datetime-local" [formControl]="form.controls.blockedUntilLocal">
-        </mat-form-field>
-        <button mat-stroked-button type="button" (click)="clearBlockedUntil()" [disabled]="loading()">
-          <mat-icon>event_busy</mat-icon>
-          Clear expiry
-        </button>
-        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || loading()">
-          <mat-icon>search</mat-icon>
-          Load
-        </button>
+
+        <div class="lookup-actions">
+          <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || loading()">
+            <mat-icon>search</mat-icon>
+            Load user
+          </button>
+        </div>
       </form>
     </mat-card-content>
   </mat-card>
 
   @if (moderation(); as moderationState) {
+  <div class="results-header">
+    <div>
+      <div class="section-eyebrow">Moderation overview</div>
+      <h2 class="results-title">Current state</h2>
+    </div>
+    <div class="user-id-badge">
+      <div class="user-id-label">User ID</div>
+      <div class="user-id-value">{{ form.controls.userId.value }}</div>
+    </div>
+  </div>
+
   <div class="tiles-grid">
-    <mat-card class="tile">
-      <mat-card-header>
+    <mat-card class="tile tile-posting surface-card">
+      <mat-card-header class="tile-header">
+        <div mat-card-avatar class="tile-avatar avatar-warn">
+          <mat-icon>block</mat-icon>
+        </div>
         <mat-card-title>Posting status</mat-card-title>
+        <mat-card-subtitle>
+          <span class="status-pill" [class.blocked]="moderationState.posting.blocked" [class.active]="!moderationState.posting.blocked">
+            {{ moderationState.posting.blocked ? 'Blocked' : 'Active' }}
+          </span>
+        </mat-card-subtitle>
       </mat-card-header>
-      <mat-card-content>
-        <p><strong>Current:</strong> {{ moderationState.posting.blocked ? 'Blocked' : 'Active' }}</p>
-        <p><strong>Reason:</strong> {{ moderationState.posting.reason || '—' }}</p>
-        <p><strong>Until:</strong> {{ formatTimestamp(moderationState.posting.blockedUntil) }}</p>
+      <mat-card-content class="detail-list">
+        <div class="detail-row">
+          <span class="detail-label">Reason</span>
+          <span class="detail-value">{{ moderationState.posting.reason || '—' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Until</span>
+          <span class="detail-value">{{ formatTimestamp(moderationState.posting.blockedUntil) }}</span>
+        </div>
+
+        <div class="tile-form-section">
+          <div class="tile-form-title">Temporary block</div>
+          <div class="inline-expiry-group">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="inline-expiry-field">
+              <mat-label>Until date</mat-label>
+              <input matInput class="hide-placeholder" placeholder="" [matDatepicker]="postingDatePicker" [formControl]="form.controls.postingBlockedUntilDate">
+              <mat-datepicker-toggle matIconSuffix [for]="postingDatePicker"></mat-datepicker-toggle>
+              <mat-datepicker #postingDatePicker></mat-datepicker>
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="inline-expiry-field">
+              <mat-label>Until time</mat-label>
+              <input matInput class="hide-placeholder" placeholder="" [matTimepicker]="postingTimePicker" [formControl]="form.controls.postingBlockedUntilTime">
+              <mat-timepicker-toggle matIconSuffix [for]="postingTimePicker"></mat-timepicker-toggle>
+              <mat-timepicker #postingTimePicker></mat-timepicker>
+            </mat-form-field>
+          </div>
+        </div>
       </mat-card-content>
-      <mat-card-actions>
+      <mat-card-actions class="card-actions">
         @if (!moderationState.posting.blocked) {
         <button mat-stroked-button color="warn" (click)="blockPosting()" [disabled]="loading()">
-          <mat-icon>block</mat-icon>Block posting
+          <mat-icon>block</mat-icon>
+          Block posting
         </button>
         } @else {
         <button mat-stroked-button (click)="unblockPosting()" [disabled]="loading()">
-          <mat-icon>check_circle</mat-icon>Unblock posting
+          <mat-icon>check_circle</mat-icon>
+          Unblock posting
         </button>
         }
       </mat-card-actions>
     </mat-card>
 
-    <mat-card class="tile">
-      <mat-card-header>
+    <mat-card class="tile tile-account surface-card">
+      <mat-card-header class="tile-header">
+        <div mat-card-avatar class="tile-avatar avatar-neutral">
+          <mat-icon>lock</mat-icon>
+        </div>
         <mat-card-title>Account status</mat-card-title>
+        <mat-card-subtitle>
+          <span class="status-pill" [class.blocked]="moderationState.account.blocked" [class.active]="!moderationState.account.blocked">
+            {{ moderationState.account.blocked ? 'Blocked' : 'Active' }}
+          </span>
+        </mat-card-subtitle>
       </mat-card-header>
-      <mat-card-content>
-        <p><strong>Current:</strong> {{ moderationState.account.blocked ? 'Blocked' : 'Active' }}</p>
-        <p><strong>Reason:</strong> {{ moderationState.account.reason || '—' }}</p>
-        <p><strong>Until:</strong> {{ formatTimestamp(moderationState.account.blockedUntil) }}</p>
+      <mat-card-content class="detail-list">
+        <div class="detail-row">
+          <span class="detail-label">Reason</span>
+          <span class="detail-value">{{ moderationState.account.reason || '—' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Until</span>
+          <span class="detail-value">{{ formatTimestamp(moderationState.account.blockedUntil) }}</span>
+        </div>
+
+        <div class="tile-form-section">
+          <div class="tile-form-title">Temporary block</div>
+          <div class="inline-expiry-group">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="inline-expiry-field">
+              <mat-label>Until date</mat-label>
+              <input matInput class="hide-placeholder" placeholder="" [matDatepicker]="accountDatePicker" [formControl]="form.controls.accountBlockedUntilDate">
+              <mat-datepicker-toggle matIconSuffix [for]="accountDatePicker"></mat-datepicker-toggle>
+              <mat-datepicker #accountDatePicker></mat-datepicker>
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="inline-expiry-field">
+              <mat-label>Until time</mat-label>
+              <input matInput class="hide-placeholder" placeholder="" [matTimepicker]="accountTimePicker" [formControl]="form.controls.accountBlockedUntilTime">
+              <mat-timepicker-toggle matIconSuffix [for]="accountTimePicker"></mat-timepicker-toggle>
+              <mat-timepicker #accountTimePicker></mat-timepicker>
+            </mat-form-field>
+          </div>
+        </div>
       </mat-card-content>
-      <mat-card-actions>
+      <mat-card-actions class="card-actions">
         @if (!moderationState.account.blocked) {
         <button mat-stroked-button color="warn" (click)="blockAccount()" [disabled]="loading()">
-          <mat-icon>lock</mat-icon>Block account
+          <mat-icon>lock</mat-icon>
+          Block account
         </button>
         } @else {
         <button mat-stroked-button (click)="unblockAccount()" [disabled]="loading()">
-          <mat-icon>lock_open</mat-icon>Unblock account
+          <mat-icon>lock_open</mat-icon>
+          Unblock account
         </button>
         }
       </mat-card-actions>
     </mat-card>
 
-    <mat-card class="tile">
-      <mat-card-header>
+    <mat-card class="tile tile-signals surface-card">
+      <mat-card-header class="tile-header">
+        <div mat-card-avatar class="tile-avatar avatar-accent">
+          <mat-icon>report</mat-icon>
+        </div>
         <mat-card-title>Signals</mat-card-title>
       </mat-card-header>
-      <mat-card-content>
-        <p><strong>Total:</strong> {{ summary()?.signals?.total ?? 0 }}</p>
-        <p><strong>Open:</strong> {{ summary()?.signals?.open ?? 0 }}</p>
-        <p><strong>Dismissed:</strong> {{ summary()?.signals?.dismissed ?? 0 }}</p>
+      <mat-card-content class="detail-list">
+        <div class="detail-row">
+          <span class="detail-label">Total</span>
+          <span class="detail-value">{{ summary()?.signals?.total ?? 0 }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Open</span>
+          <span class="detail-value">{{ summary()?.signals?.open ?? 0 }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Dismissed</span>
+          <span class="detail-value">{{ summary()?.signals?.dismissed ?? 0 }}</span>
+        </div>
       </mat-card-content>
     </mat-card>
 
-    <mat-card class="tile">
-      <mat-card-header>
+    <mat-card class="tile tile-notices surface-card">
+      <mat-card-header class="tile-header">
+        <div mat-card-avatar class="tile-avatar avatar-success">
+          <mat-icon>gavel</mat-icon>
+        </div>
         <mat-card-title>Notices & decisions</mat-card-title>
       </mat-card-header>
-      <mat-card-content>
-        <p><strong>Notices total:</strong> {{ summary()?.notices?.total ?? 0 }}</p>
-        <p><strong>Notices open:</strong> {{ summary()?.notices?.open ?? 0 }}</p>
-        <p><strong>Enforced decisions:</strong> {{ summary()?.decisions?.enforced ?? 0 }}</p>
+      <mat-card-content class="detail-list">
+        <div class="detail-row">
+          <span class="detail-label">Notices total</span>
+          <span class="detail-value">{{ summary()?.notices?.total ?? 0 }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Notices open</span>
+          <span class="detail-value">{{ summary()?.notices?.open ?? 0 }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Enforced decisions</span>
+          <span class="detail-value">{{ summary()?.decisions?.enforced ?? 0 }}</span>
+        </div>
       </mat-card-content>
     </mat-card>
   </div>

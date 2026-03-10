@@ -1,4 +1,4 @@
-
+import { DatePipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -15,6 +15,7 @@ import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.comp
   selector: 'app-user',
   imports: [
     DialogHeaderComponent,
+    DatePipe,
     MatButtonModule,
     MatCardModule,
     MatDialogContent,

@@ -310,6 +310,7 @@
       "moderationFailed": "La moderación falló. Inténtalo de nuevo más tarde.",
       "creating": "Creando mensaje",
       "created": "Mensaje publicado correctamente.",
+      "postingBlocked": "Actualmente no puedes publicar.",
       "republished": "El mensaje ya está publicado.",
       "updating": "Actualizando mensaje",
       "togglingLike": "Cambiando “me gusta”",
@@ -1139,6 +1140,20 @@
     "user": {
       "deleteSuccess": "El usuario y los datos relacionados se eliminaron de forma permanente.",
       "serverInfoHint": "El ID de usuario, la clave pública de cifrado, la clave pública de firma, el número de mensajes, el número de mensajes bloqueados, el estado del usuario, el último signo de vida, la suscripción y la pista de conexión se guardan en nuestro servidor. Esta información es esencial para que la aplicación funcione.",
+      "blocked": {
+        "title": "Usuario bloqueado",
+        "message": "Tu usuario ha sido bloqueado. En este momento solo están disponibles las funciones de gestión del usuario.",
+        "reasonLabel": "Motivo",
+        "untilLabel": "Bloqueado hasta",
+        "permanentLabel": "Permanente"
+      },
+      "postingBlocked": {
+        "title": "Publicación bloqueada",
+        "message": "La publicación de nuevos mensajes está actualmente bloqueada para tu usuario.",
+        "reasonLabel": "Motivo",
+        "untilLabel": "Bloqueado hasta",
+        "permanentLabel": "Permanente"
+      },
       "dialog": {
         "title": "Mi usuario",
         "userIdLabel": "ID de usuario:",

@@ -444,10 +444,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
             publishState: 'unpublished'
           });
         },
-        error: (err) => {
-          const errorMessage = err?.error?.error ?? this.translation.t('common.message.disableFailed');
-          this.snackBar.open(errorMessage, this.translation.t('common.actions.ok'));
-        }
+        error: () => {}
       });
       return;
     }
@@ -475,10 +472,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
             publishState: 'published'
           });
         },
-        error: (err) => {
-          const errorMessage = err?.error?.error ?? this.translation.t('auth.backendErrorMessage');
-          this.snackBar.open(errorMessage, this.translation.t('common.actions.ok'));
-        }
+        error: () => {}
       });
       return;
     }
@@ -493,10 +487,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
           publishState: 'published'
         });
       },
-      error: (err) => {
-        const errorMessage = err?.error?.error ?? this.translation.t('auth.backendErrorMessage');
-        this.snackBar.open(errorMessage, this.translation.t('common.actions.ok'));
-      }
+      error: () => {}
     });
   }
 

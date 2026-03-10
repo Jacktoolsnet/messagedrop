@@ -348,6 +348,7 @@ export class AppComponent implements OnInit {
       const onVisibilityChange = () => {
         if (document.visibilityState === 'visible') {
           this.flushPendingSharedContent();
+          void this.userService.refreshAccountStatus();
         }
       };
       document.addEventListener('visibilitychange', onVisibilityChange);
@@ -355,7 +356,10 @@ export class AppComponent implements OnInit {
     }
 
     if (typeof window !== 'undefined') {
-      const onWindowFocus = () => this.flushPendingSharedContent();
+      const onWindowFocus = () => {
+        this.flushPendingSharedContent();
+        void this.userService.refreshAccountStatus();
+      };
       window.addEventListener('focus', onWindowFocus);
       this.destroyRef.onDestroy(() => window.removeEventListener('focus', onWindowFocus));
     }
@@ -416,8 +420,11 @@ export class AppComponent implements OnInit {
     this.systemNotificationService.reset();
   }
 
-  public connectToBackend(): void {
-    void this.userService.connectToBackend();
+  public async connectToBackend(): Promise<void> {
+    if (!await this.ensureUserMenuActionAllowed()) {
+      return;
+    }
+    await this.userService.connectToBackend();
   }
 
   public applyUsageProtectionSelfExtension(): void {
@@ -1268,7 +1275,10 @@ export class AppComponent implements OnInit {
   }
 
 
-  public openSystemMessages(): void {
+  public async openSystemMessages(): Promise<void> {
+    if (!await this.ensureUserMenuActionAllowed()) {
+      return;
+    }
     if (!this.userService.hasJwt()) {
       return;
     }
@@ -1291,6 +1301,9 @@ export class AppComponent implements OnInit {
   }
 
   public async openUserMessagListDialog(): Promise<void> {
+    if (!await this.ensureUserMenuActionAllowed()) {
+      return;
+    }
     if (!this.userService.hasJwt()) {
       return;
     }
@@ -1329,7 +1342,10 @@ export class AppComponent implements OnInit {
     });
   }
 
-  public openNoteListDialog(): void {
+  public async openNoteListDialog(): Promise<void> {
+    if (!await this.ensureUserMenuActionAllowed()) {
+      return;
+    }
     this.noteService.loadNotes().then(() => {
       const dialogRef = this.dialog.open(NotelistComponent, {
         panelClass: 'NoteListDialog',
@@ -1357,7 +1373,10 @@ export class AppComponent implements OnInit {
     });
   }
 
-  public openPlaceListDialog(): void {
+  public async openPlaceListDialog(): Promise<void> {
+    if (!await this.ensureUserMenuActionAllowed()) {
+      return;
+    }
     const placeCount = this.placeService.isReady() ? this.placeService.getPlaces().length : 0;
     const hasPlaces = placeCount > 0;
     const dialogWidth = placeCount > 1 ? 'min(900px, 95vw)' : 'min(520px, 95vw)';
@@ -1397,7 +1416,10 @@ export class AppComponent implements OnInit {
     });
   }
 
-  public openMyExperiencesListDialog(): void {
+  public async openMyExperiencesListDialog(): Promise<void> {
+    if (!await this.ensureUserMenuActionAllowed()) {
+      return;
+    }
     const dialogRef = this.dialog.open(MyExperienceslistComponent, {
       closeOnNavigation: true,
       data: {},
@@ -1422,7 +1444,10 @@ export class AppComponent implements OnInit {
     });
   }
 
-  public openContactListDialog(): void {
+  public async openContactListDialog(): Promise<void> {
+    if (!await this.ensureUserMenuActionAllowed()) {
+      return;
+    }
     const contactCount = this.contactService.isReady() ? this.contactService.contactsSignal().length : 0;
     const hasContacts = contactCount > 0;
     const dialogWidth = contactCount > 1 ? 'min(900px, 95vw)' : 'min(520px, 95vw)';
@@ -1821,7 +1846,10 @@ export class AppComponent implements OnInit {
     this.helpDialog.open('appMenu');
   }
 
-  public editUserProfile() {
+  public async editUserProfile(): Promise<void> {
+    if (!await this.ensureUserMenuActionAllowed()) {
+      return;
+    }
     const dialogRef = this.dialog.open(UserProfileComponent, {
       data: {},
       closeOnNavigation: true,
@@ -1877,6 +1905,7 @@ export class AppComponent implements OnInit {
   }
 
   public showUser() {
+    void this.userService.refreshAccountStatus();
     const dialogRef = this.dialog.open(UserComponent, {
       data: {},
       closeOnNavigation: true,
@@ -1902,6 +1931,19 @@ export class AppComponent implements OnInit {
           break;
       }
     });
+  }
+
+  public refreshUserMenuState(): void {
+    void this.userService.refreshAccountStatus();
+  }
+
+  private async ensureUserMenuActionAllowed(): Promise<boolean> {
+    await this.userService.refreshAccountStatus();
+    if (this.userService.isAccountBlocked()) {
+      this.showUser();
+      return false;
+    }
+    return true;
   }
 
   public showWeather() {

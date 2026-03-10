@@ -310,6 +310,7 @@
       "moderationFailed": "Moderation failed. Please try again later.",
       "creating": "Creating message",
       "created": "Message successfully dropped.",
+      "postingBlocked": "You are currently blocked from publishing.",
       "republished": "Message is now published.",
       "updating": "Updating message",
       "togglingLike": "Toggling like",
@@ -1139,6 +1140,20 @@
     "user": {
       "deleteSuccess": "User and related data were removed permanently.",
       "serverInfoHint": "User ID, public encryption key, public signing key, number of messages, number of blocked messages, user status, last sign of life, subscription, and connect hint are saved on our server. This information is essential for the application to function.",
+      "blocked": {
+        "title": "User blocked",
+        "message": "Your user account has been blocked. Only user management functions are currently available.",
+        "reasonLabel": "Reason",
+        "untilLabel": "Blocked until",
+        "permanentLabel": "Permanent"
+      },
+      "postingBlocked": {
+        "title": "Publishing blocked",
+        "message": "Publishing new messages is currently blocked for your user account.",
+        "reasonLabel": "Reason",
+        "untilLabel": "Blocked until",
+        "permanentLabel": "Permanent"
+      },
       "dialog": {
         "title": "My user",
         "userIdLabel": "User ID:",

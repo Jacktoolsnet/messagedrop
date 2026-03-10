@@ -310,6 +310,7 @@
       "moderationFailed": "Moderation fehlgeschlagen. Bitte später erneut versuchen.",
       "creating": "Nachricht wird erstellt",
       "created": "Nachricht erfolgreich gesendet.",
+      "postingBlocked": "Du bist derzeit für das Veröffentlichen gesperrt.",
       "republished": "Die Nachricht ist jetzt veröffentlicht.",
       "updating": "Nachricht wird aktualisiert",
       "togglingLike": "Gefällt mir wird umgeschaltet",
@@ -1139,6 +1140,20 @@
     "user": {
       "deleteSuccess": "Benutzer und zugehörige Daten wurden dauerhaft entfernt.",
       "serverInfoHint": "User-ID, öffentlicher Verschlüsselungsschlüssel, öffentlicher Signaturschlüssel, Anzahl der Nachrichten, Anzahl der blockierten Nachrichten, Benutzerstatus, letztes Lebenszeichen, Abonnement und Verbindungshinweis werden auf unserem Server gespeichert. Diese Informationen sind für die Funktion der Anwendung erforderlich.",
+      "blocked": {
+        "title": "Benutzer gesperrt",
+        "message": "Dein Benutzer wurde gesperrt. Deshalb sind aktuell nur noch Benutzerfunktionen verfügbar.",
+        "reasonLabel": "Grund",
+        "untilLabel": "Gesperrt bis",
+        "permanentLabel": "Dauerhaft"
+      },
+      "postingBlocked": {
+        "title": "Veröffentlichen gesperrt",
+        "message": "Das Veröffentlichen neuer Nachrichten ist für deinen Benutzer derzeit gesperrt.",
+        "reasonLabel": "Grund",
+        "untilLabel": "Gesperrt bis",
+        "permanentLabel": "Dauerhaft"
+      },
       "dialog": {
         "title": "Mein Benutzer",
         "userIdLabel": "User-ID:",

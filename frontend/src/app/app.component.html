@@ -70,7 +70,7 @@
 </button>
 } @else {
 <button [matMenuTriggerFor]="userMenu" aria-hidden="false" class="button_profile" mat-fab
-    [attr.aria-label]="'common.aria.userProfile' | transloco" (click)="{}">
+    [attr.aria-label]="'common.aria.userProfile' | transloco" (click)="{}" (menuOpened)="refreshUserMenuState()">
     <mat-icon [attr.aria-hidden]="false"
         [matBadge]="userService.isReady() ? (unreadTotalAll() > 0 ? (unreadTotalAll() | shortNumber) : null) : null"
         [matBadgeHidden]="!userService.isReady()" [matBadgeSize]="'medium'" matBadgeColor="primary">person</mat-icon>
@@ -101,7 +101,7 @@
     }
 
     @if (userService.isReady()) {
-    @if (!userService.hasJwt() && networkService.backendOnline() && !maintenanceActive()) {
+    @if (!userService.hasJwt() && networkService.backendOnline() && !maintenanceActive() && !userService.isAccountBlocked()) {
     <button mat-menu-item (click)="connectToBackend()" [disabled]="userService.isConnectingToBackend()">
         <mat-icon>cloud_sync</mat-icon>
         <span>{{ 'common.menu.connectBackend' | transloco }}</span>
@@ -116,14 +116,14 @@
     </button>
     }
 
-    @if (userService.isReady()) {
+    @if (userService.isReady() && !userService.isAccountBlocked()) {
     <button mat-menu-item (click)="editUserProfile()">
         <mat-icon>badge</mat-icon>
         <span>{{ 'common.menu.myProfile' | transloco }}</span>
     </button>
     }
 
-    @if (userService.hasJwt()) {
+    @if (userService.hasJwt() && !userService.isAccountBlocked()) {
     <button mat-menu-item (click)="openSystemMessages()">
         <mat-icon [attr.aria-hidden]="false"
             [matBadge]="hasUnreadSystemNotifications() ? (unreadSystemNotificationCount() | shortNumber) : null"
@@ -132,35 +132,35 @@
     </button>
     }
 
-    @if (userService.hasJwt()) {
+    @if (userService.hasJwt() && !userService.isAccountBlocked()) {
     <button mat-menu-item (click)="openUserMessagListDialog()">
         <mat-icon>speaker_notes</mat-icon>
         <span>{{ 'common.menu.myPublicMessages' | transloco }}</span>
     </button>
     }
 
-    @if (userService.isReady()) {
+    @if (userService.isReady() && !userService.isAccountBlocked()) {
     <button mat-menu-item (click)="openNoteListDialog()">
         <mat-icon>clinical_notes</mat-icon>
         <span>{{ 'common.menu.myPrivateNotes' | transloco }}</span>
     </button>
     }
 
-    @if (userService.isReady() && placeService.isReady()) {
+    @if (userService.isReady() && placeService.isReady() && !userService.isAccountBlocked()) {
     <button mat-menu-item (click)="openPlaceListDialog()">
         <mat-icon>personal_places</mat-icon>
         <span>{{ 'common.menu.myPlaces' | transloco }}</span>
     </button>
     }
 
-    @if (userService.isReady()) {
+    @if (userService.isReady() && !userService.isAccountBlocked()) {
     <button mat-menu-item (click)="openMyExperiencesListDialog()">
         <mat-icon>bookmark_star</mat-icon>
         <span>{{ 'common.menu.myExperiences' | transloco }}</span>
     </button>
     }
 
-    @if (userService.isReady() && contactService.isReady()) {
+    @if (userService.isReady() && contactService.isReady() && !userService.isAccountBlocked()) {
     <button mat-menu-item (click)="openContactListDialog()">
         <mat-icon [attr.aria-hidden]="false" matBadge="{{ getContactsBadge() }}" [matBadgeHidden]="!getContactsBadge()"
             matBadgeColor="warn" matBadgeOverlap="true">contacts</mat-icon>

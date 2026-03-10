@@ -43,6 +43,18 @@ interface VapidPublicKeyResponse {
   message?: string;
 }
 
+interface OwnUserStatusResponse {
+  status: number;
+  rawUser?: {
+    postingBlocked?: number | string | boolean | null;
+    postingBlockedReason?: string | null;
+    postingBlockedUntil?: number | string | null;
+    userStatus?: string | null;
+    accountBlockedReason?: string | null;
+    accountBlockedUntil?: number | string | null;
+  } | null;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -77,8 +89,21 @@ export class UserService {
   };
   private readonly profileVersionSignal = signal(0);
   readonly profileVersion = this.profileVersionSignal.asReadonly();
+  private readonly accountBlockedSignal = signal(false);
+  readonly accountBlocked = this.accountBlockedSignal.asReadonly();
+  private readonly accountBlockedReasonSignal = signal<string | null>(null);
+  readonly accountBlockedReason = this.accountBlockedReasonSignal.asReadonly();
+  private readonly accountBlockedUntilSignal = signal<number | null>(null);
+  readonly accountBlockedUntil = this.accountBlockedUntilSignal.asReadonly();
+  private readonly postingBlockedSignal = signal(false);
+  readonly postingBlocked = this.postingBlockedSignal.asReadonly();
+  private readonly postingBlockedReasonSignal = signal<string | null>(null);
+  readonly postingBlockedReason = this.postingBlockedReasonSignal.asReadonly();
+  private readonly postingBlockedUntilSignal = signal<number | null>(null);
+  readonly postingBlockedUntil = this.postingBlockedUntilSignal.asReadonly();
 
   private tokenRenewalTimeout: ReturnType<typeof setTimeout> | null = null;
+  private accountStatusRefreshPromise?: Promise<void>;
   private pinKey: CryptoKey | null = null;
   private pinSalt: Uint8Array<ArrayBuffer> | null = null;
   private pinIterations = 250000;
@@ -143,6 +168,8 @@ export class UserService {
     };
     this.ready = false;
     this.blocked = false;
+    this.accountStatusRefreshPromise = undefined;
+    this.clearAccountBlockedState();
     this.pinKey = null;
     this.indexedDbService.setAtRestEncryptionKey(null);
     this.pinSalt = null;
@@ -162,6 +189,7 @@ export class UserService {
     this.ready = true;
     this._userSet.update(trigger => trigger + 1);
     this.blocked = false;
+    void this.refreshAccountStatus();
     void this.injector.get(MessageService).syncOwnPublicMessages(this.user).catch(() => undefined);
   }
 
@@ -175,6 +203,7 @@ export class UserService {
     this.ready = true;
     this._userSet.update(trigger => trigger + 1);
     this.blocked = false;
+    this.clearAccountBlockedState();
   }
 
   async initUserId() {
@@ -314,6 +343,30 @@ export class UserService {
 
   isBlocked(): boolean {
     return this.blocked;
+  }
+
+  isAccountBlocked(): boolean {
+    return this.accountBlockedSignal();
+  }
+
+  getAccountBlockedReason(): string | null {
+    return this.accountBlockedReasonSignal();
+  }
+
+  getAccountBlockedUntil(): number | null {
+    return this.accountBlockedUntilSignal();
+  }
+
+  isPostingBlocked(): boolean {
+    return this.postingBlockedSignal();
+  }
+
+  getPostingBlockedReason(): string | null {
+    return this.postingBlockedReasonSignal();
+  }
+
+  getPostingBlockedUntil(): number | null {
+    return this.postingBlockedUntilSignal();
   }
 
   isConnectingToBackend(): boolean {
@@ -507,6 +560,135 @@ export class UserService {
     }
   }
 
+  private clearAccountBlockedState(): void {
+    this.accountBlockedSignal.set(false);
+    this.accountBlockedReasonSignal.set(null);
+    this.accountBlockedUntilSignal.set(null);
+    this.postingBlockedSignal.set(false);
+    this.postingBlockedReasonSignal.set(null);
+    this.postingBlockedUntilSignal.set(null);
+  }
+
+  private markAccountBlockedWithoutDetails(): void {
+    this.accountBlockedSignal.set(true);
+    this.accountBlockedReasonSignal.set(null);
+    this.accountBlockedUntilSignal.set(null);
+  }
+
+  private hasApiMessage(error: unknown, expected: string): boolean {
+    if (!expected) {
+      return false;
+    }
+
+    const matchesPayload = (value: unknown): boolean => {
+      if (!value || typeof value !== 'object') {
+        return false;
+      }
+      const candidate = value as { message?: unknown; error?: unknown };
+      return candidate.message === expected || candidate.error === expected;
+    };
+
+    if (matchesPayload(error)) {
+      return true;
+    }
+
+    if (error instanceof HttpErrorResponse) {
+      return matchesPayload(error.error);
+    }
+
+    return false;
+  }
+
+  private applyModerationStateFromAuthError(error: unknown): boolean {
+    if (this.hasApiMessage(error, 'user_account_blocked')) {
+      this.markAccountBlockedWithoutDetails();
+      return true;
+    }
+
+    return false;
+  }
+
+  private applyAccountBlockedState(rawUser?: OwnUserStatusResponse['rawUser']): void {
+    const userStatus = String(rawUser?.userStatus || '').trim().toLowerCase();
+    const accountBlockedUntil = Number(rawUser?.accountBlockedUntil);
+    const accountBlockStillActive = !Number.isFinite(accountBlockedUntil) || accountBlockedUntil <= 0 || accountBlockedUntil > Date.now();
+    const accountBlocked = userStatus === 'disabled' && accountBlockStillActive;
+    const postingBlockedUntil = Number(rawUser?.postingBlockedUntil);
+    const postingBlockStillActive = !Number.isFinite(postingBlockedUntil) || postingBlockedUntil <= 0 || postingBlockedUntil > Date.now();
+    const postingBlocked = Number(rawUser?.postingBlocked) === 1 && postingBlockStillActive;
+
+    this.accountBlockedSignal.set(accountBlocked);
+    this.accountBlockedReasonSignal.set(
+      accountBlocked && typeof rawUser?.accountBlockedReason === 'string' && rawUser.accountBlockedReason.trim()
+        ? rawUser.accountBlockedReason.trim()
+        : null
+    );
+    this.accountBlockedUntilSignal.set(
+      accountBlocked && Number.isFinite(accountBlockedUntil) && accountBlockedUntil > 0
+        ? accountBlockedUntil
+        : null
+    );
+
+    this.postingBlockedSignal.set(postingBlocked);
+    this.postingBlockedReasonSignal.set(
+      postingBlocked && typeof rawUser?.postingBlockedReason === 'string' && rawUser.postingBlockedReason.trim()
+        ? rawUser.postingBlockedReason.trim()
+        : null
+    );
+    this.postingBlockedUntilSignal.set(
+      postingBlocked && Number.isFinite(postingBlockedUntil) && postingBlockedUntil > 0
+        ? postingBlockedUntil
+        : null
+    );
+  }
+
+  public async refreshAccountStatus(): Promise<void> {
+    if (!this.user?.id) {
+      this.clearAccountBlockedState();
+      return;
+    }
+
+    if (!this.hasJwt()) {
+      return;
+    }
+
+    if (this.accountStatusRefreshPromise) {
+      return this.accountStatusRefreshPromise;
+    }
+
+    this.accountStatusRefreshPromise = (async () => {
+      const requestedUserId = this.user.id;
+      try {
+        const response = await firstValueFrom(
+          this.http.get<OwnUserStatusResponse>(
+            `${environment.apiUrl}/user/get/${requestedUserId}`,
+            {
+              headers: new HttpHeaders({
+                'x-skip-ui': 'true'
+              })
+            }
+          ).pipe(catchError(this.handleError))
+        );
+        if (!this.hasJwt() || this.user.id !== requestedUserId) {
+          return;
+        }
+        this.applyAccountBlockedState(response?.rawUser ?? null);
+      } catch (err) {
+        if (this.user.id !== requestedUserId) {
+          return;
+        }
+        const status = this.getHttpStatus(err);
+        if (status === 401 || status === 403 || status === 404) {
+          this.clearAccountBlockedState();
+        }
+      } finally {
+        this.accountStatusRefreshPromise = undefined;
+      }
+    })();
+
+    return this.accountStatusRefreshPromise;
+  }
+
   private renewJwt(): void {
     const url = `${environment.apiUrl}/user/renewjwt/`;
     this.http.get<{ token: string }>(url, this.httpOptions).subscribe({
@@ -516,6 +698,7 @@ export class UserService {
           const payload = jwtDecode<JwtPayload>(res.token);
           this.user.jwtExpiresAt = payload.exp! * 1000;
           this.startJwtRenewal();
+          void this.refreshAccountStatus();
         } else {
           this.logout();
           const dialogRef = this.displayMessage.open(DisplayMessage, {
@@ -1783,7 +1966,9 @@ export class UserService {
                 },
                 error: (err) => {
                   console.error('Login user failed during login', err);
-                  if (err.status === 401) {
+                  if (this.applyModerationStateFromAuthError(err)) {
+                    this.blocked = false;
+                  } else if (err.status === 401) {
                     this.showPinIncorrectDialog();
                   } else if (err.status === 404) {
                     const dialogRef = this.displayMessage.open(DisplayMessage, {
@@ -1866,7 +2051,9 @@ export class UserService {
           },
           error: (err) => {
             console.error('Login challenge failed during login', err);
-            if (err.status === 404) {
+            if (this.applyModerationStateFromAuthError(err)) {
+              this.blocked = false;
+            } else if (err.status === 404) {
               const dialogRef = this.displayMessage.open(DisplayMessage, {
                 panelClass: '',
                 closeOnNavigation: false,
@@ -1981,6 +2168,9 @@ export class UserService {
       return true;
     } catch (err) {
       console.error('Backend login failed', err);
+      if (this.applyModerationStateFromAuthError(err)) {
+        return false;
+      }
       if (this.getHttpStatus(err) === 404) {
         try {
           await this.recoverUserFromDevice(user, options?.afterLogin);
