@@ -49,7 +49,8 @@ function normalizeMaintenanceSnapshot(value) {
     reason: normalizeText(source.reason),
     reasonEn: normalizeText(source.reasonEn),
     reasonEs: normalizeText(source.reasonEs),
-    reasonFr: normalizeText(source.reasonFr)
+    reasonFr: normalizeText(source.reasonFr),
+    updatedAt: normalizeTimestamp(source.updatedAt)
   };
 }
 
@@ -327,7 +328,10 @@ router.post('/backup', async (req, res, next) => {
       temporaryMaintenanceEnabled = true;
     }
 
-    const backup = await createBackup({ logger: req.logger });
+    const backup = await createBackup({
+      logger: req.logger,
+      maintenanceSnapshot: previousMaintenance
+    });
 
     if (temporaryMaintenanceEnabled) {
       try {

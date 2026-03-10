@@ -44,6 +44,31 @@ const DATABASE_DEFINITIONS = [
   }
 ];
 
+function normalizeTimestamp(value) {
+  const num = Number(value);
+  return Number.isFinite(num) ? Math.trunc(num) : null;
+}
+
+function normalizeText(value) {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  return trimmed ? trimmed : null;
+}
+
+function normalizeMaintenanceSnapshot(value) {
+  const source = value && typeof value === 'object' ? value : {};
+  return {
+    enabled: Boolean(source.enabled),
+    startsAt: normalizeTimestamp(source.startsAt),
+    endsAt: normalizeTimestamp(source.endsAt),
+    reason: normalizeText(source.reason),
+    reasonEn: normalizeText(source.reasonEn),
+    reasonEs: normalizeText(source.reasonEs),
+    reasonFr: normalizeText(source.reasonFr),
+    updatedAt: normalizeTimestamp(source.updatedAt)
+  };
+}
+
 function getDatabaseSync() {
   const { DatabaseSync } = require('node:sqlite');
   return DatabaseSync;
@@ -147,6 +172,7 @@ function normalizeBackupMetadata(raw) {
         };
       })
     : [];
+  const maintenanceSnapshot = normalizeMaintenanceSnapshot(raw.maintenanceSnapshot);
 
   return {
     id,
@@ -155,6 +181,7 @@ function normalizeBackupMetadata(raw) {
     archiveName,
     archiveSizeBytes: Number.isFinite(archiveSizeBytes) ? archiveSizeBytes : 0,
     databases,
+    maintenanceSnapshot,
     downloadPath: `/maintenance/backup/${encodeURIComponent(id)}/download`
   };
 }
@@ -192,7 +219,8 @@ function normalizePendingRestore(raw) {
       : buildDirectoryName(backupId),
     preparedAt: Number.isFinite(preparedAt) ? preparedAt : null,
     preparedBy: typeof raw.preparedBy === 'string' && raw.preparedBy.trim() ? raw.preparedBy.trim() : null,
-    databases: Array.isArray(raw.databases) ? raw.databases : []
+    databases: Array.isArray(raw.databases) ? raw.databases : [],
+    maintenanceSnapshot: normalizeMaintenanceSnapshot(raw.maintenanceSnapshot)
   };
 }
 
@@ -220,7 +248,8 @@ function normalizeRestoreStatus(raw) {
     startedAt: toNumber(raw.startedAt),
     finishedAt: toNumber(raw.finishedAt),
     preparedBy: typeof raw.preparedBy === 'string' && raw.preparedBy.trim() ? raw.preparedBy.trim() : null,
-    databases: Array.isArray(raw.databases) ? raw.databases : []
+    databases: Array.isArray(raw.databases) ? raw.databases : [],
+    maintenanceSnapshot: normalizeMaintenanceSnapshot(raw.maintenanceSnapshot)
   };
 }
 
@@ -307,6 +336,7 @@ async function zipDirectory(sourceDir, archivePath) {
 
 async function createBackup(options = {}) {
   const logger = options.logger ?? console;
+  const maintenanceSnapshot = normalizeMaintenanceSnapshot(options.maintenanceSnapshot);
 
   await ensureDirectory(BACKUP_ROOT);
 
@@ -348,7 +378,8 @@ async function createBackup(options = {}) {
       createdAt,
       directoryName,
       archiveName,
-      databases
+      databases,
+      maintenanceSnapshot
     };
 
     await fs.writeFile(
@@ -464,7 +495,8 @@ async function prepareRestore(backupId, options = {}) {
     directoryName: validation.backup.directoryName,
     preparedAt,
     preparedBy: options.preparedBy ?? null,
-    databases: validation.backup.databases
+    databases: validation.backup.databases,
+    maintenanceSnapshot: validation.backup.maintenanceSnapshot
   });
 
   await writeJson(PENDING_RESTORE_FILE, pendingRestore);
@@ -475,7 +507,8 @@ async function prepareRestore(backupId, options = {}) {
     message: 'Restore prepared. Stop all Node.js apps in Plesk and start only the admin backend once.',
     preparedAt,
     preparedBy: options.preparedBy ?? null,
-    databases: validation.backup.databases
+    databases: validation.backup.databases,
+    maintenanceSnapshot: validation.backup.maintenanceSnapshot
   });
 
   return pendingRestore;
@@ -539,6 +572,58 @@ async function performPendingRestore(logger = console) {
   const tempDir = path.join(BACKUP_ROOT, `.restore-${pendingRestore.backupId}-${restoreToken}`);
   const archivePath = resolveBackupArchivePath(pendingRestore.backupId);
 
+  const restoreMaintenanceSnapshot = async (snapshot) => {
+    if (!snapshot || typeof snapshot !== 'object') {
+      return;
+    }
+
+    const targetDbPath = path.join(REPO_ROOT, 'backend/db/messagedrop.db');
+    const DatabaseSync = getDatabaseSync();
+    const db = new DatabaseSync(targetDbPath);
+    try {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS tableMaintenance (
+          id INTEGER PRIMARY KEY NOT NULL CHECK (id = 1),
+          enabled INTEGER NOT NULL DEFAULT 0,
+          startsAt INTEGER DEFAULT NULL,
+          endsAt INTEGER DEFAULT NULL,
+          reason TEXT DEFAULT NULL,
+          reasonEn TEXT DEFAULT NULL,
+          reasonEs TEXT DEFAULT NULL,
+          reasonFr TEXT DEFAULT NULL,
+          updatedAt INTEGER NOT NULL
+        );
+        INSERT OR IGNORE INTO tableMaintenance (id, enabled, updatedAt)
+        VALUES (1, 0, strftime('%s','now'));
+      `);
+
+      const stmt = db.prepare(`
+        UPDATE tableMaintenance
+        SET enabled = ?,
+            startsAt = ?,
+            endsAt = ?,
+            reason = ?,
+            reasonEn = ?,
+            reasonEs = ?,
+            reasonFr = ?,
+            updatedAt = ?
+        WHERE id = 1;
+      `);
+      stmt.run(
+        snapshot.enabled ? 1 : 0,
+        snapshot.startsAt ?? null,
+        snapshot.endsAt ?? null,
+        snapshot.reason ?? null,
+        snapshot.reasonEn ?? null,
+        snapshot.reasonEs ?? null,
+        snapshot.reasonFr ?? null,
+        snapshot.updatedAt ?? Math.floor(Date.now() / 1000)
+      );
+    } finally {
+      db.close();
+    }
+  };
+
   try {
     await ensureDirectory(tempDir);
     const zip = openBackupZip(archivePath);
@@ -570,6 +655,10 @@ async function performPendingRestore(logger = console) {
       await removeIfExists(targetFile);
       await fs.rename(temporaryTarget, targetFile);
     }
+
+    await restoreMaintenanceSnapshot(
+      validation.backup.maintenanceSnapshot ?? pendingRestore.maintenanceSnapshot
+    );
 
     const finishedAt = Date.now();
     const successState = {

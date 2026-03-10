@@ -99,14 +99,6 @@ export class MaintenanceCardComponent {
   readonly latestBackup = computed(() => this.backups()[0] ?? null);
   readonly hasBackup = computed(() => this.backups().length > 0);
   readonly canCreateBackup = computed(() => !this.loading() && !this.saving() && !this.backupRunning() && !this.restorePreparing());
-  readonly canPrepareRestore = computed(() => {
-    return !!this.restoreChallenge()
-      && !!this.restoreTargetBackup()
-      && this.restoreConfirmForm.valid
-      && !this.restorePreparing()
-      && !this.backupRunning();
-  });
-
   constructor() {
     this.form.controls.enabled.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -430,6 +422,22 @@ export class MaintenanceCardComponent {
       case 'failed': return 'Failed';
       default: return status || 'Unknown';
     }
+  }
+
+  canPrepareRestore(): boolean {
+    const challenge = this.restoreChallenge();
+    if (!challenge || !this.restoreTargetBackup()) {
+      return false;
+    }
+
+    const confirmationWord = this.restoreConfirmForm.controls.confirmationWord.value.trim();
+    const confirmationPin = this.restoreConfirmForm.controls.confirmationPin.value.trim();
+
+    return this.restoreConfirmForm.valid
+      && confirmationWord === challenge.confirmationWord
+      && confirmationPin === challenge.confirmationPin
+      && !this.restorePreparing()
+      && !this.backupRunning();
   }
 
   private loadMaintenance(): void {
