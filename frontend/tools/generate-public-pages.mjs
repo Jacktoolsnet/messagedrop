@@ -794,7 +794,6 @@ const uiByLocale = {
     navWhat: 'Was ist es?',
     navHow: 'So funktioniert es',
     navFaq: 'FAQ',
-    navPrivacy: 'Datenschutz',
     navLegal: 'Rechtliches',
     openApp: 'App öffnen',
     legalPages: 'Rechtsseiten',
@@ -815,7 +814,6 @@ const uiByLocale = {
     navWhat: 'What is it?',
     navHow: 'How it works',
     navFaq: 'FAQ',
-    navPrivacy: 'Privacy',
     navLegal: 'Legal',
     openApp: 'Open app',
     legalPages: 'Legal pages',
@@ -1050,7 +1048,6 @@ function renderNav(currentRoute, lang = 'en') {
     { href: '/what-is-messagedrop/', label: ui.navWhat },
     { href: '/how-it-works/', label: ui.navHow },
     { href: '/faq/', label: ui.navFaq },
-    { href: '/privacy/', label: ui.navPrivacy },
     { href: '/legal/', label: ui.navLegal },
   ];
 
