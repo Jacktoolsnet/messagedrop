@@ -146,3 +146,67 @@ document.querySelectorAll('[data-legal-doc]').forEach((details) => {
     }
   });
 });
+
+const loadLegalHubDocument = async (trigger) => {
+  const viewer = document.querySelector('[data-legal-hub]');
+  if (!viewer) {
+    return;
+  }
+
+  const src = trigger.dataset.src;
+  const title = trigger.dataset.title || '';
+  const status = viewer.querySelector('[data-legal-hub-status]');
+  const titleNode = viewer.querySelector('[data-legal-hub-title]');
+  const content = viewer.querySelector('[data-legal-hub-content]');
+
+  if (!src || !status || !titleNode || !content) {
+    return;
+  }
+
+  const isGerman = document.documentElement.lang.toLowerCase().startsWith('de');
+  const loadingText = isGerman ? 'Dokument wird geladen…' : 'Loading document…';
+  const errorText = isGerman
+    ? 'Das Dokument konnte nicht geladen werden. Bitte versuche es erneut.'
+    : 'The document could not be loaded. Please try again.';
+
+  document.querySelectorAll('[data-legal-hub-trigger]').forEach((button) => {
+    button.setAttribute('aria-pressed', button === trigger ? 'true' : 'false');
+  });
+
+  titleNode.textContent = title;
+  status.hidden = false;
+  status.querySelector('p').textContent = loadingText;
+  content.hidden = true;
+  viewer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  try {
+    const response = await fetch(src, { credentials: 'same-origin' });
+    if (!response.ok) {
+      throw new Error('Request failed with status ' + response.status);
+    }
+
+    const text = await response.text();
+    content.innerHTML = renderLegalRichText(text);
+    content.hidden = false;
+    status.hidden = true;
+  } catch (error) {
+    status.hidden = false;
+    status.querySelector('p').textContent = errorText;
+    console.error(error);
+  }
+};
+
+document.querySelectorAll('[data-legal-hub-trigger]').forEach((button) => {
+  button.addEventListener('click', () => {
+    void loadLegalHubDocument(button);
+  });
+});
+
+const params = new URLSearchParams(window.location.search);
+const requestedDoc = params.get('doc');
+if (requestedDoc) {
+  const targetButton = document.querySelector('[data-legal-hub-trigger][data-doc-key="' + CSS.escape(requestedDoc) + '"]');
+  if (targetButton) {
+    void loadLegalHubDocument(targetButton);
+  }
+});

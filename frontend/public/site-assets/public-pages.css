@@ -417,6 +417,71 @@ img {
   line-height: 1.65;
 }
 
+.hero-panel-actions {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.hero-panel-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 3.25rem;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--site-outline);
+  border-radius: var(--site-radius-md);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--site-text);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+}
+
+.hero-panel-action:hover,
+.hero-panel-action:focus-visible {
+  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--site-primary) 8%, #fff);
+  border-color: color-mix(in srgb, var(--site-primary) 28%, var(--site-outline));
+}
+
+.hero-panel-action[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--site-secondary) 10%, #fff);
+  border-color: color-mix(in srgb, var(--site-secondary) 28%, var(--site-outline));
+}
+
+.hero-panel-action-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+}
+
+.legal-hub-viewer {
+  display: grid;
+  gap: 1rem;
+}
+
+.legal-hub-status {
+  display: grid;
+  gap: 0.4rem;
+  padding: 1rem 1.05rem;
+  border-radius: var(--site-radius-md);
+  border: 1px dashed var(--site-outline);
+  background: color-mix(in srgb, white 74%, transparent);
+}
+
+.legal-hub-status strong,
+.legal-hub-status p {
+  margin: 0;
+}
+
+.legal-hub-status p {
+  color: var(--site-muted);
+  line-height: 1.65;
+}
+
 .check-list li,
 .feature-list li {
   position: relative;

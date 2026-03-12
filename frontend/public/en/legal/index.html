@@ -57,68 +57,83 @@
   
     <main class="site-main">
 
-    <section class="hero hero--single">
+    <section class="hero">
       <div class="hero-copy">
         <span class="eyebrow"><span class="material-symbols-outlined eyebrow-icon" aria-hidden="true">gavel</span>Legal</span>
         <h1 class="">All legal information in one place.</h1>
         <p class="hero-text">Here you can find the privacy policy, terms of service, legal notice, and disclaimer in one place.</p>
         
       </div>
+      <aside class="hero-panel" aria-label="Quick summary">
+        <div class="hero-panel-header">
+          <div class="icon-badge info-avatar" aria-hidden="true">
+            <span class="material-symbols-outlined">gavel</span>
+          </div>
+          <h2>Open a legal document</h2>
+        </div>
+        <p class="hero-panel-text">Choose the document you want to read. It will be loaded and displayed directly on this page.</p><div class="hero-panel-actions" data-legal-hub-actions>
       
+            <button class="hero-panel-action" type="button" data-legal-hub-trigger
+              data-doc-key="privacy"
+              data-src="/assets/legal/privacy-policy-en.txt"
+              data-title="Privacy Policy">
+              <span class="icon-badge hero-panel-action-icon" aria-hidden="true"><span class="material-symbols-outlined">privacy_tip</span></span>
+              <span>Privacy Policy</span>
+            </button>
+          
+            <button class="hero-panel-action" type="button" data-legal-hub-trigger
+              data-doc-key="terms"
+              data-src="/assets/legal/terms-of-service-en.txt"
+              data-title="Terms of Service">
+              <span class="icon-badge hero-panel-action-icon" aria-hidden="true"><span class="material-symbols-outlined">rule</span></span>
+              <span>Terms of Service</span>
+            </button>
+          
+            <button class="hero-panel-action" type="button" data-legal-hub-trigger
+              data-doc-key="disclaimer"
+              data-src="/assets/legal/disclaimer-en.txt"
+              data-title="Disclaimer">
+              <span class="icon-badge hero-panel-action-icon" aria-hidden="true"><span class="material-symbols-outlined">warning</span></span>
+              <span>Disclaimer</span>
+            </button>
+          
+            <button class="hero-panel-action" type="button" data-legal-hub-trigger
+              data-doc-key="impressum"
+              data-src="/assets/legal/legal-notice-en.txt"
+              data-title="Legal Notice">
+              <span class="icon-badge hero-panel-action-icon" aria-hidden="true"><span class="material-symbols-outlined">business</span></span>
+              <span>Legal Notice</span>
+            </button>
+          
+    </div>
+      </aside>
     </section>
   
 
-      <section class="content-section">
-        <div class="section-heading">
-          <h2>Legal pages at a glance</h2>
-          <p>Choose the document you need — all important legal texts are bundled here, easy to access, and available as normal web pages.</p>
+    <section class="content-section legal-hub-section">
+      <div class="section-heading">
+        <h2>Legal document viewer</h2>
+        <p>Select one of the documents on the right. The selected text is loaded directly from the same legal source files used by the app.</p>
+      </div>
+      <div class="legal-hub-viewer" data-legal-hub>
+        <div class="legal-hub-status" data-legal-hub-status>
+          <strong data-legal-hub-title>No document selected yet</strong>
+          <p>Choose a document on the right to load it here.</p>
         </div>
-        <div class="card-grid legal-links-grid">
-          
-              <a class="info-card info-card-link" href="/privacy/">
-                <div class="tile-header">
-                  <span class="icon-badge" aria-hidden="true"><span class="material-symbols-outlined">privacy_tip</span></span>
-                  <h3>Privacy Policy</h3>
-                </div>
-                <p>Privacy-oriented, local-first storage, third-party embeds, push notifications, and GDPR information.</p>
-              </a>
-            
-              <a class="info-card info-card-link" href="/terms-of-service/">
-                <div class="tile-header">
-                  <span class="icon-badge" aria-hidden="true"><span class="material-symbols-outlined">rule</span></span>
-                  <h3>Terms of Service</h3>
-                </div>
-                <p>Rules for using MessageDrop, prohibited content, moderation, and general platform behavior.</p>
-              </a>
-            
-              <a class="info-card info-card-link" href="/impressum/">
-                <div class="tile-header">
-                  <span class="icon-badge" aria-hidden="true"><span class="material-symbols-outlined">business</span></span>
-                  <h3>Impressum / Legal Notice</h3>
-                </div>
-                <p>Provider details, company information, DSA contact point, and dispute resolution information.</p>
-              </a>
-            
-              <a class="info-card info-card-link" href="/disclaimer/">
-                <div class="tile-header">
-                  <span class="icon-badge" aria-hidden="true"><span class="material-symbols-outlined">warning</span></span>
-                  <h3>Disclaimer</h3>
-                </div>
-                <p>Scope of service, technical limitations, minimum age, local storage risks, and liability notes.</p>
-              </a>
-            
-        </div>
-      </section>
-    
+        <div class="legal-prose" data-legal-hub-content hidden></div>
+      </div>
+    </section>
+  
 </main>
     
     <footer class="site-footer">
       <div class="footer-links">
-        <a href="/what-is-messagedrop/">What is MessageDrop?</a><a href="/how-it-works/">How MessageDrop works</a><a href="/privacy/">Privacy</a><a href="/terms-of-service/">Terms</a><a href="/impressum/">Impressum</a><a href="/disclaimer/">Disclaimer</a>
+        <a href="/what-is-messagedrop/">What is MessageDrop?</a><a href="/how-it-works/">How MessageDrop works</a><a href="/legal/">Legal</a>
       </div>
     </footer>
   
   </div>
   <script src="/site-assets/public-pages.js" defer></script>
+  <script src="/site-assets/legal-documents.js" defer></script>
 </body>
 </html>

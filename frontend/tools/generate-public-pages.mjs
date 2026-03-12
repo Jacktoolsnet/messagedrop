@@ -246,35 +246,20 @@ const marketingPages = [
       'Here you can find the privacy policy, terms of service, legal notice, and disclaimer in one place.',
     showLegalCta: false,
     showPrimaryCta: false,
-    legalTilesTitle: 'Legal pages at a glance',
-    legalTilesIntro:
-      'Choose the document you need — all important legal texts are bundled here, easy to access, and available as normal web pages.',
-    legalTiles: [
-      {
-        href: '/privacy/',
-        icon: 'privacy_tip',
-        title: 'Privacy Policy',
-        body: 'Privacy-oriented, local-first storage, third-party embeds, push notifications, and GDPR information.',
-      },
-      {
-        href: '/terms-of-service/',
-        icon: 'rule',
-        title: 'Terms of Service',
-        body: 'Rules for using MessageDrop, prohibited content, moderation, and general platform behavior.',
-      },
-      {
-        href: '/impressum/',
-        icon: 'business',
-        title: 'Impressum / Legal Notice',
-        body: 'Provider details, company information, DSA contact point, and dispute resolution information.',
-      },
-      {
-        href: '/disclaimer/',
-        icon: 'warning',
-        title: 'Disclaimer',
-        body: 'Scope of service, technical limitations, minimum age, local storage risks, and liability notes.',
-      },
+    heroAsideTitle: 'Open a legal document',
+    heroAsideText:
+      'Choose the document you want to read. It will be loaded and displayed directly on this page.',
+    heroAsideActions: [
+      { key: 'privacy', label: 'Privacy Policy', icon: 'privacy_tip', src: '/assets/legal/privacy-policy-en.txt', title: 'Privacy Policy' },
+      { key: 'terms', label: 'Terms of Service', icon: 'rule', src: '/assets/legal/terms-of-service-en.txt', title: 'Terms of Service' },
+      { key: 'disclaimer', label: 'Disclaimer', icon: 'warning', src: '/assets/legal/disclaimer-en.txt', title: 'Disclaimer' },
+      { key: 'impressum', label: 'Legal Notice', icon: 'business', src: '/assets/legal/legal-notice-en.txt', title: 'Legal Notice' },
     ],
+    legalHubTitle: 'Legal document viewer',
+    legalHubIntro:
+      'Select one of the documents on the right. The selected text is loaded directly from the same legal source files used by the app.',
+    legalHubEmptyTitle: 'No document selected yet',
+    legalHubEmptyText: 'Choose a document on the right to load it here.',
   },
 ];
 
@@ -613,35 +598,20 @@ const germanMarketingPages = [
       'Hier findest du Datenschutzerklärung, Nutzungsbedingungen, Impressum und Haftungshinweis gebündelt an einem Ort.',
     showLegalCta: false,
     showPrimaryCta: false,
-    legalTilesTitle: 'Rechtstexte im Überblick',
-    legalTilesIntro:
-      'Wähle einfach das Dokument, das du brauchst — alle wichtigen Rechtstexte sind hier gebündelt, direkt erreichbar und als normale Webseiten verfügbar.',
-    legalTiles: [
-      {
-        href: '/privacy/',
-        icon: 'privacy_tip',
-        title: 'Datenschutzerklärung',
-        body: 'Datenschutzorientierung, Local-first-Speicherung, Drittanbieter-Einbettungen, Push-Benachrichtigungen und DSGVO-Informationen.',
-      },
-      {
-        href: '/terms-of-service/',
-        icon: 'rule',
-        title: 'Nutzungsbedingungen',
-        body: 'Regeln zur Nutzung von MessageDrop, zu verbotenen Inhalten, Moderation und allgemeinem Plattformverhalten.',
-      },
-      {
-        href: '/impressum/',
-        icon: 'business',
-        title: 'Impressum',
-        body: 'Anbieterangaben, Unternehmensdetails, DSA-Kontaktstelle und Hinweise zur Streitbeilegung.',
-      },
-      {
-        href: '/disclaimer/',
-        icon: 'warning',
-        title: 'Haftungshinweis',
-        body: 'Leistungsumfang, technische Grenzen, Mindestalter, Risiken lokaler Speicherung und Haftungshinweise.',
-      },
+    heroAsideTitle: 'Dokument direkt öffnen',
+    heroAsideText:
+      'Wähle das Dokument, das du lesen möchtest. Es wird direkt auf dieser Seite geladen und angezeigt.',
+    heroAsideActions: [
+      { key: 'privacy', label: 'Datenschutzerklärung', icon: 'privacy_tip', src: '/assets/legal/privacy-policy-de.txt', title: 'Datenschutzerklärung' },
+      { key: 'terms', label: 'Nutzungsbedingungen', icon: 'rule', src: '/assets/legal/terms-of-service-de.txt', title: 'Nutzungsbedingungen' },
+      { key: 'disclaimer', label: 'Haftungshinweis', icon: 'warning', src: '/assets/legal/disclaimer-de.txt', title: 'Haftungshinweis' },
+      { key: 'impressum', label: 'Impressum', icon: 'business', src: '/assets/legal/legal-notice-de.txt', title: 'Impressum' },
     ],
+    legalHubTitle: 'Dokumentanzeige',
+    legalHubIntro:
+      'Wähle eines der Dokumente auf der rechten Seite. Der ausgewählte Text wird direkt aus denselben juristischen Quelldateien geladen, die auch von der App verwendet werden.',
+    legalHubEmptyTitle: 'Noch kein Dokument ausgewählt',
+    legalHubEmptyText: 'Wähle rechts ein Dokument aus, um es hier zu laden.',
   },
 ];
 
@@ -759,10 +729,7 @@ const uiByLocale = {
     legalPages: 'Rechtsseiten',
     footerWhat: 'Was ist MessageDrop?',
     footerHow: 'So funktioniert MessageDrop',
-    footerPrivacy: 'Datenschutz',
-    footerTerms: 'Nutzungsbedingungen',
-    footerImprint: 'Impressum',
-    footerDisclaimer: 'Haftungshinweis',
+    footerLegal: 'Rechtliches',
     redirectTitle: 'Sprache wird gewählt',
     redirectText: 'Mit JavaScript wird automatisch die passende Sprachversion geöffnet. Ohne JavaScript kannst du die gewünschte Version hier direkt auswählen.',
     openGerman: 'Deutsch öffnen',
@@ -779,10 +746,7 @@ const uiByLocale = {
     legalPages: 'Legal pages',
     footerWhat: 'What is MessageDrop?',
     footerHow: 'How MessageDrop works',
-    footerPrivacy: 'Privacy',
-    footerTerms: 'Terms',
-    footerImprint: 'Impressum',
-    footerDisclaimer: 'Disclaimer',
+    footerLegal: 'Legal',
     redirectTitle: 'Choosing language',
     redirectText: 'With JavaScript enabled, the matching language version opens automatically. Without JavaScript, you can choose the version directly below.',
     openGerman: 'Open German',
@@ -804,17 +768,9 @@ const localizedMarketingPages = supportedLocales.flatMap((locale) => {
   }));
 });
 
-const localizedLegalPages = supportedLocales.flatMap((locale) => {
-  const sourcePages = locale === 'de' ? germanLegalPages : legalPages;
-  return sourcePages.map((page) => ({
-    ...page,
-    locale,
-    baseRoute: page.route,
-    route: localeRoute(locale, page.route),
-  }));
-});
+const localizedLegalPages = [];
 
-const redirectPages = [...marketingPages, ...legalPages].map((page) => ({
+const redirectPages = [...marketingPages].map((page) => ({
   route: page.route,
   englishTitle: page.title,
   germanTitle: germanMarketingByRoute.get(page.route)?.title ?? germanLegalByRoute.get(page.route)?.title ?? page.title,
@@ -1054,10 +1010,7 @@ function renderFooter(lang = 'en') {
   const links = [
     { href: '/what-is-messagedrop/', label: ui.footerWhat },
     { href: '/how-it-works/', label: ui.footerHow },
-    { href: '/privacy/', label: ui.footerPrivacy },
-    { href: '/terms-of-service/', label: ui.footerTerms },
-    { href: '/impressum/', label: ui.footerImprint },
-    { href: '/disclaimer/', label: ui.footerDisclaimer },
+    { href: '/legal/', label: ui.footerLegal },
   ];
 
   return `
@@ -1071,30 +1024,56 @@ function renderFooter(lang = 'en') {
 
 function renderHero(page) {
   const ui = uiByLocale[page.lang] ?? uiByLocale.en;
-  const hasAside = Boolean(page.heroAsideTitle) || (page.heroAsideItems?.length ?? 0) > 0;
+  const hasAside = Boolean(page.heroAsideTitle)
+    || Boolean(page.heroAsideText)
+    || (page.heroAsideItems?.length ?? 0) > 0
+    || (page.heroAsideGroups?.length ?? 0) > 0
+    || (page.heroAsideActions?.length ?? 0) > 0;
   const showLegalCta = page.showLegalCta !== false;
   const showPrimaryCta = page.showPrimaryCta !== false;
   const titleClass = page.heroTitleClass ? ` ${page.heroTitleClass}` : '';
-  const asideContent = page.heroAsideText
-    ? `<p class="hero-panel-text">${escapeHtml(page.heroAsideText)}</p>`
-    : page.heroAsideGroups?.length
-    ? `<div class="hero-panel-groups">
-        ${page.heroAsideGroups
-          .map(
-            (group) => `
-              <section class="hero-panel-group">
-                <h3>${escapeHtml(group.title)}</h3>
-                <ul class="check-list">
-                  ${group.items.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
-                </ul>
-              </section>
-            `,
-          )
-          .join('')}
-      </div>`
-    : `<ul class="check-list">
-        ${(page.heroAsideItems ?? []).map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
-      </ul>`;
+  const asideParts = [];
+  if (page.heroAsideText) {
+    asideParts.push(`<p class="hero-panel-text">${escapeHtml(page.heroAsideText)}</p>`);
+  }
+  if (page.heroAsideGroups?.length) {
+    asideParts.push(`<div class="hero-panel-groups">
+      ${page.heroAsideGroups
+        .map(
+          (group) => `
+            <section class="hero-panel-group">
+              <h3>${escapeHtml(group.title)}</h3>
+              <ul class="check-list">
+                ${group.items.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
+              </ul>
+            </section>
+          `,
+        )
+        .join('')}
+    </div>`);
+  } else if (page.heroAsideItems?.length) {
+    asideParts.push(`<ul class="check-list">
+      ${page.heroAsideItems.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
+    </ul>`);
+  }
+  if (page.heroAsideActions?.length) {
+    asideParts.push(`<div class="hero-panel-actions" data-legal-hub-actions>
+      ${page.heroAsideActions
+        .map(
+          (action) => `
+            <button class="hero-panel-action" type="button" data-legal-hub-trigger
+              data-doc-key="${escapeHtml(action.key)}"
+              data-src="${escapeHtml(action.src)}"
+              data-title="${escapeHtml(action.title ?? action.label)}">
+              <span class="icon-badge hero-panel-action-icon" aria-hidden="true"><span class="material-symbols-outlined">${escapeHtml(action.icon)}</span></span>
+              <span>${escapeHtml(action.label)}</span>
+            </button>
+          `,
+        )
+        .join('')}
+    </div>`);
+  }
+  const asideContent = asideParts.join('');
   return `
     <section class="hero${hasAside ? '' : ' hero--single'}">
       <div class="hero-copy">
@@ -1184,6 +1163,37 @@ function renderVideoGrid(videos) {
         )
         .join('')}
     </div>
+  `;
+}
+
+function renderLegalHubSection(page) {
+  const title = page.legalHubTitle ?? (page.lang === 'de' ? 'Dokumentanzeige' : 'Document viewer');
+  const intro =
+    page.legalHubIntro
+    ?? (page.lang === 'de'
+      ? 'Wähle ein Dokument aus, um es auf dieser Seite zu laden.'
+      : 'Choose a document to load it on this page.');
+  const emptyTitle = page.legalHubEmptyTitle ?? (page.lang === 'de' ? 'Noch kein Dokument ausgewählt' : 'No document selected yet');
+  const emptyText =
+    page.legalHubEmptyText
+    ?? (page.lang === 'de'
+      ? 'Wähle rechts ein Dokument aus, um es hier anzuzeigen.'
+      : 'Choose a document on the right to display it here.');
+
+  return `
+    <section class="content-section legal-hub-section">
+      <div class="section-heading">
+        <h2>${escapeHtml(title)}</h2>
+        <p>${escapeHtml(intro)}</p>
+      </div>
+      <div class="legal-hub-viewer" data-legal-hub>
+        <div class="legal-hub-status" data-legal-hub-status>
+          <strong data-legal-hub-title>${escapeHtml(emptyTitle)}</strong>
+          <p>${escapeHtml(emptyText)}</p>
+        </div>
+        <div class="legal-prose" data-legal-hub-content hidden></div>
+      </div>
+    </section>
   `;
 }
 
@@ -1295,36 +1305,8 @@ function renderMarketingPage(page) {
     `);
   }
 
-  if (page.legalTiles) {
-    const legalTilesTitle = page.legalTilesTitle ?? (isGerman ? 'Rechtsseiten' : 'Legal pages');
-    const legalTilesIntro =
-      page.legalTilesIntro
-      ?? (isGerman
-        ? 'Diese Links führen zu den öffentlichen Rechtsdokumenten, die unabhängig von der App-Oberfläche erreichbar sind.'
-        : 'These links lead to the static legal documents that are available independently from the app UI.');
-    body.push(`
-      <section class="content-section">
-        <div class="section-heading">
-          <h2>${escapeHtml(legalTilesTitle)}</h2>
-          <p>${escapeHtml(legalTilesIntro)}</p>
-        </div>
-        <div class="card-grid legal-links-grid">
-          ${page.legalTiles
-            .map(
-              (item) => `
-              <a class="info-card info-card-link" href="${item.href}">
-                <div class="tile-header">
-                  <span class="icon-badge" aria-hidden="true"><span class="material-symbols-outlined">${escapeHtml(item.icon)}</span></span>
-                  <h3>${escapeHtml(item.title)}</h3>
-                </div>
-                <p>${escapeHtml(item.body)}</p>
-              </a>
-            `,
-            )
-            .join('')}
-        </div>
-      </section>
-    `);
+  if (page.legalHubTitle || page.legalHubIntro || page.heroAsideActions?.length) {
+    body.push(renderLegalHubSection(page));
   }
 
   body.push('</main>');
@@ -1342,6 +1324,7 @@ function renderMarketingPage(page) {
     lang: page.lang,
     content: body.join('\n'),
     schemas: extraSchemas,
+    scripts: page.heroAsideActions?.length ? ['/site-assets/legal-documents.js'] : [],
     alternateLinkTags: alternateLinks(page.baseRoute),
   });
 }
@@ -1746,6 +1729,70 @@ document.querySelectorAll('[data-legal-doc]').forEach((details) => {
       void loadLegalDocument(details);
     }
   });
+});
+
+const loadLegalHubDocument = async (trigger) => {
+  const viewer = document.querySelector('[data-legal-hub]');
+  if (!viewer) {
+    return;
+  }
+
+  const src = trigger.dataset.src;
+  const title = trigger.dataset.title || '';
+  const status = viewer.querySelector('[data-legal-hub-status]');
+  const titleNode = viewer.querySelector('[data-legal-hub-title]');
+  const content = viewer.querySelector('[data-legal-hub-content]');
+
+  if (!src || !status || !titleNode || !content) {
+    return;
+  }
+
+  const isGerman = document.documentElement.lang.toLowerCase().startsWith('de');
+  const loadingText = isGerman ? 'Dokument wird geladen…' : 'Loading document…';
+  const errorText = isGerman
+    ? 'Das Dokument konnte nicht geladen werden. Bitte versuche es erneut.'
+    : 'The document could not be loaded. Please try again.';
+
+  document.querySelectorAll('[data-legal-hub-trigger]').forEach((button) => {
+    button.setAttribute('aria-pressed', button === trigger ? 'true' : 'false');
+  });
+
+  titleNode.textContent = title;
+  status.hidden = false;
+  status.querySelector('p').textContent = loadingText;
+  content.hidden = true;
+  viewer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  try {
+    const response = await fetch(src, { credentials: 'same-origin' });
+    if (!response.ok) {
+      throw new Error('Request failed with status ' + response.status);
+    }
+
+    const text = await response.text();
+    content.innerHTML = renderLegalRichText(text);
+    content.hidden = false;
+    status.hidden = true;
+  } catch (error) {
+    status.hidden = false;
+    status.querySelector('p').textContent = errorText;
+    console.error(error);
+  }
+};
+
+document.querySelectorAll('[data-legal-hub-trigger]').forEach((button) => {
+  button.addEventListener('click', () => {
+    void loadLegalHubDocument(button);
+  });
+});
+
+const params = new URLSearchParams(window.location.search);
+const requestedDoc = params.get('doc');
+if (requestedDoc) {
+  const targetButton = document.querySelector('[data-legal-hub-trigger][data-doc-key="' + CSS.escape(requestedDoc) + '"]');
+  if (targetButton) {
+    void loadLegalHubDocument(targetButton);
+  }
 });\n`;
 }
 
@@ -2165,6 +2212,71 @@ img {
 
 .hero-panel-text {
   margin: 0;
+  color: var(--site-muted);
+  line-height: 1.65;
+}
+
+.hero-panel-actions {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.hero-panel-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 3.25rem;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--site-outline);
+  border-radius: var(--site-radius-md);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--site-text);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+}
+
+.hero-panel-action:hover,
+.hero-panel-action:focus-visible {
+  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--site-primary) 8%, #fff);
+  border-color: color-mix(in srgb, var(--site-primary) 28%, var(--site-outline));
+}
+
+.hero-panel-action[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--site-secondary) 10%, #fff);
+  border-color: color-mix(in srgb, var(--site-secondary) 28%, var(--site-outline));
+}
+
+.hero-panel-action-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+}
+
+.legal-hub-viewer {
+  display: grid;
+  gap: 1rem;
+}
+
+.legal-hub-status {
+  display: grid;
+  gap: 0.4rem;
+  padding: 1rem 1.05rem;
+  border-radius: var(--site-radius-md);
+  border: 1px dashed var(--site-outline);
+  background: color-mix(in srgb, white 74%, transparent);
+}
+
+.legal-hub-status strong,
+.legal-hub-status p {
+  margin: 0;
+}
+
+.legal-hub-status p {
   color: var(--site-muted);
   line-height: 1.65;
 }
