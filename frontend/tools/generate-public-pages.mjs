@@ -12,6 +12,7 @@ const appClaim = 'A global map where people can leave messages in real-world loc
 
 const marketingPages = [
   {
+    pageKey: 'what-is-messagedrop',
     route: '/what-is-messagedrop/',
     slug: 'what-is-messagedrop',
     lang: 'en',
@@ -158,6 +159,7 @@ const marketingPages = [
     ],
   },
   {
+    pageKey: 'how-it-works',
     route: '/how-it-works/',
     slug: 'how-it-works',
     lang: 'en',
@@ -234,6 +236,7 @@ const marketingPages = [
     ],
   },
   {
+    pageKey: 'legal',
     route: '/legal/',
     slug: 'legal',
     lang: 'en',
@@ -390,8 +393,9 @@ const legalPages = [
 
 const germanMarketingPages = [
   {
-    route: '/what-is-messagedrop/',
-    slug: 'what-is-messagedrop',
+    pageKey: 'what-is-messagedrop',
+    route: '/was-ist-messagedrop/',
+    slug: 'was-ist-messagedrop',
     lang: 'de',
     title: 'Was ist MessageDrop?',
     description:
@@ -536,8 +540,9 @@ const germanMarketingPages = [
     ],
   },
   {
-    route: '/how-it-works/',
-    slug: 'how-it-works',
+    pageKey: 'how-it-works',
+    route: '/so-funktioniert-messagedrop/',
+    slug: 'so-funktioniert-messagedrop',
     lang: 'de',
     title: 'Wie MessageDrop funktioniert',
     description:
@@ -612,8 +617,9 @@ const germanMarketingPages = [
     ],
   },
   {
-    route: '/legal/',
-    slug: 'legal',
+    pageKey: 'legal',
+    route: '/rechtliches/',
+    slug: 'rechtliches',
     lang: 'de',
     title: 'Rechtliche Informationen',
     description:
@@ -811,8 +817,8 @@ const uiByLocale = {
   },
 };
 
-const germanMarketingByRoute = new Map(germanMarketingPages.map((page) => [page.route, page]));
-const germanLegalByRoute = new Map(germanLegalPages.map((page) => [page.route, page]));
+const englishMarketingByKey = new Map(marketingPages.map((page) => [page.pageKey, page]));
+const germanMarketingByKey = new Map(germanMarketingPages.map((page) => [page.pageKey, page]));
 
 const localizedMarketingPages = supportedLocales.flatMap((locale) => {
   const sourcePages = locale === 'de' ? germanMarketingPages : marketingPages;
@@ -826,13 +832,37 @@ const localizedMarketingPages = supportedLocales.flatMap((locale) => {
 
 const localizedLegalPages = [];
 
-const redirectPages = [...marketingPages].map((page) => ({
+function getLocalizedMarketingRoute(locale, pageKey) {
+  const page = locale === 'de'
+    ? germanMarketingByKey.get(pageKey)
+    : englishMarketingByKey.get(pageKey);
+
+  return page ? localeRoute(locale, page.route) : '/';
+}
+
+const redirectPages = marketingPages.map((page) => ({
   route: page.route,
+  pageKey: page.pageKey,
   englishTitle: page.title,
-  germanTitle: germanMarketingByRoute.get(page.route)?.title ?? germanLegalByRoute.get(page.route)?.title ?? page.title,
+  germanTitle: germanMarketingByKey.get(page.pageKey)?.title ?? page.title,
+  deHref: getLocalizedMarketingRoute('de', page.pageKey),
+  enHref: getLocalizedMarketingRoute('en', page.pageKey),
 }));
 
-const legalRouteSet = new Set(localizedLegalPages.map((page) => trimTrailingSlash(page.baseRoute)));
+const legacyGermanRedirectPages = marketingPages
+  .map((page) => ({
+    route: localeRoute('de', page.route),
+    target: getLocalizedMarketingRoute('de', page.pageKey),
+    title: germanMarketingByKey.get(page.pageKey)?.title ?? page.title,
+  }))
+  .filter((page) => normalizeRoute(page.route) !== normalizeRoute(page.target));
+
+const germanAliasRedirectPages = germanMarketingPages.map((page) => ({
+  route: page.route,
+  target: getLocalizedMarketingRoute('de', page.pageKey),
+  title: page.title,
+}));
+
 const allRoutes = ['/', ...localizedMarketingPages.map((page) => page.route), ...localizedLegalPages.map((page) => page.route)];
 
 function trimTrailingSlash(route) {
@@ -854,16 +884,6 @@ function normalizeRoute(route) {
 function localeRoute(locale, route) {
   const normalized = normalizeRoute(route);
   return `/${locale}${normalized}`;
-}
-
-function stripLocalePrefix(route) {
-  const normalized = normalizeRoute(route);
-  const match = normalized.match(/^\/(de|en)(\/.*)$/);
-  if (!match) {
-    return normalized;
-  }
-
-  return match[2];
 }
 
 function canonicalUrl(route) {
@@ -1005,29 +1025,27 @@ function faqSchema(page) {
   };
 }
 
-function alternateLinks(baseRoute) {
+function alternateLinks(pageKey) {
   return [
-    { hreflang: 'de', href: canonicalUrl(localeRoute('de', baseRoute)) },
-    { hreflang: 'en', href: canonicalUrl(localeRoute('en', baseRoute)) },
-    { hreflang: 'x-default', href: canonicalUrl(baseRoute) },
+    { hreflang: 'de', href: canonicalUrl(getLocalizedMarketingRoute('de', pageKey)) },
+    { hreflang: 'en', href: canonicalUrl(getLocalizedMarketingRoute('en', pageKey)) },
+    { hreflang: 'x-default', href: canonicalUrl(englishMarketingByKey.get(pageKey)?.route ?? '/') },
   ];
 }
 
 function renderNav(currentRoute, lang = 'en') {
   const ui = uiByLocale[lang] ?? uiByLocale.en;
   const navItems = [
-    { href: '/what-is-messagedrop/', label: ui.navWhat },
-    { href: '/how-it-works/', label: ui.navHow },
-    { href: '/legal/', label: ui.navLegal },
+    { href: getLocalizedMarketingRoute(lang, 'what-is-messagedrop'), label: ui.navWhat },
+    { href: getLocalizedMarketingRoute(lang, 'how-it-works'), label: ui.navHow },
+    { href: getLocalizedMarketingRoute(lang, 'legal'), label: ui.navLegal },
   ];
 
   return navItems
     .map((item) => {
-      const current = trimTrailingSlash(stripLocalePrefix(currentRoute));
-      const itemPath = trimTrailingSlash(item.href);
-      const hasExactNavItem = navItems.some((other) => trimTrailingSlash(other.href) === current);
-      const isLegalItem = itemPath === '/legal' && legalRouteSet.has(current) && !hasExactNavItem;
-      const isActive = current === itemPath || isLegalItem;
+      const current = trimTrailingSlash(normalizeRoute(currentRoute));
+      const itemPath = trimTrailingSlash(normalizeRoute(item.href));
+      const isActive = current === itemPath;
       return `<a href="${item.href}"${isActive ? ' aria-current="page"' : ''}>${escapeHtml(item.label)}</a>`;
     })
     .join('');
@@ -1064,9 +1082,9 @@ function renderHeader(currentRoute, lang = 'en') {
 function renderFooter(lang = 'en') {
   const ui = uiByLocale[lang] ?? uiByLocale.en;
   const links = [
-    { href: '/what-is-messagedrop/', label: ui.footerWhat },
-    { href: '/how-it-works/', label: ui.footerHow },
-    { href: '/legal/', label: ui.footerLegal },
+    { href: getLocalizedMarketingRoute(lang, 'what-is-messagedrop'), label: ui.footerWhat },
+    { href: getLocalizedMarketingRoute(lang, 'how-it-works'), label: ui.footerHow },
+    { href: getLocalizedMarketingRoute(lang, 'legal'), label: ui.footerLegal },
   ];
 
   return `
@@ -1410,7 +1428,7 @@ function renderMarketingPage(page) {
     content: body.join('\n'),
     schemas: extraSchemas,
     scripts: page.heroAsideActions?.length ? ['/site-assets/legal-documents.js'] : [],
-    alternateLinkTags: alternateLinks(page.baseRoute),
+    alternateLinkTags: alternateLinks(page.pageKey),
   });
 }
 
@@ -1623,8 +1641,8 @@ function renderPublicUiScript() {
 }
 
 function renderLanguageRedirectPage(page) {
-  const deHref = localeRoute('de', page.route);
-  const enHref = localeRoute('en', page.route);
+  const deHref = page.deHref ?? localeRoute('de', page.route);
+  const enHref = page.enHref ?? localeRoute('en', page.route);
   const uiDe = uiByLocale.de;
   const uiEn = uiByLocale.en;
 
@@ -1638,7 +1656,7 @@ function renderLanguageRedirectPage(page) {
   <meta name="theme-color" content="#05a51d">
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="stylesheet" href="/site-assets/public-pages.css">
-  ${alternateLinks(page.route).map((link) => `<link rel="alternate" hreflang="${link.hreflang}" href="${link.href}">`).join('\n  ')}
+  ${alternateLinks(page.pageKey).map((link) => `<link rel="alternate" hreflang="${link.hreflang}" href="${link.href}">`).join('\n  ')}
   <script>
     (function () {
       const language = ((navigator.languages && navigator.languages[0]) || navigator.language || 'en').toLowerCase();
@@ -1662,6 +1680,27 @@ function renderLanguageRedirectPage(page) {
     </section>
   </div>
 </body>
+</html>
+`;
+}
+
+function renderLegacyRedirectPage(page) {
+  const target = normalizeRoute(page.target);
+  return `<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>${escapeHtml(`${appName} | ${page.title}`)}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex,follow">
+  <meta http-equiv="refresh" content="0; url=${escapeHtml(target)}">
+  <link rel="canonical" href="${escapeHtml(canonicalUrl(target))}">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <script>
+    window.location.replace('${escapeHtml(target)}' + window.location.search + window.location.hash);
+  </script>
+</head>
+<body></body>
 </html>
 `;
 }
@@ -3017,6 +3056,14 @@ async function writeStaticFiles() {
 
   for (const page of redirectPages) {
     await writeRoute(page.route, renderLanguageRedirectPage(page));
+  }
+
+  for (const page of legacyGermanRedirectPages) {
+    await writeRoute(page.route, renderLegacyRedirectPage(page));
+  }
+
+  for (const page of germanAliasRedirectPages) {
+    await writeRoute(page.route, renderLegacyRedirectPage(page));
   }
 
   const sitemapEntries = allRoutes
