@@ -239,10 +239,16 @@ const marketingPages = [
     description:
       'Central legal hub for MessageDrop with privacy policy, terms of service, legal notice, and disclaimer.',
     heroIcon: 'gavel',
+    eyebrowIcon: 'gavel',
     eyebrow: 'Legal',
-    heroTitle: 'Public legal pages outside the app.',
+    heroTitle: 'All legal information in one place.',
     heroText:
-      'These pages are delivered as regular static HTML so visitors, search engines, and AI systems can access the legal information directly without opening the app.',
+      'Here you can find the privacy policy, terms of service, legal notice, and disclaimer in one place.',
+    showLegalCta: false,
+    showPrimaryCta: false,
+    legalTilesTitle: 'Legal pages at a glance',
+    legalTilesIntro:
+      'Choose the document you need — all important legal texts are bundled here, easy to access, and available as normal web pages.',
     legalTiles: [
       {
         href: '/privacy/',
@@ -600,10 +606,16 @@ const germanMarketingPages = [
     description:
       'Zentrale Rechtsübersicht für MessageDrop mit Datenschutzerklärung, Nutzungsbedingungen, Impressum und Haftungshinweis.',
     heroIcon: 'gavel',
+    eyebrowIcon: 'gavel',
     eyebrow: 'Rechtliches',
-    heroTitle: 'Öffentliche Rechtsseiten außerhalb der App.',
+    heroTitle: 'Alle rechtlichen Informationen an einem Ort.',
     heroText:
-      'Diese Seiten werden als normale statische HTML-Seiten ausgeliefert, damit Besucher, Suchmaschinen und KI-Systeme die rechtlichen Informationen direkt erreichen können.',
+      'Hier findest du Datenschutzerklärung, Nutzungsbedingungen, Impressum und Haftungshinweis gebündelt an einem Ort.',
+    showLegalCta: false,
+    showPrimaryCta: false,
+    legalTilesTitle: 'Rechtstexte im Überblick',
+    legalTilesIntro:
+      'Wähle einfach das Dokument, das du brauchst — alle wichtigen Rechtstexte sind hier gebündelt, direkt erreichbar und als normale Webseiten verfügbar.',
     legalTiles: [
       {
         href: '/privacy/',
@@ -1061,6 +1073,7 @@ function renderHero(page) {
   const ui = uiByLocale[page.lang] ?? uiByLocale.en;
   const hasAside = Boolean(page.heroAsideTitle) || (page.heroAsideItems?.length ?? 0) > 0;
   const showLegalCta = page.showLegalCta !== false;
+  const showPrimaryCta = page.showPrimaryCta !== false;
   const titleClass = page.heroTitleClass ? ` ${page.heroTitleClass}` : '';
   const asideContent = page.heroAsideText
     ? `<p class="hero-panel-text">${escapeHtml(page.heroAsideText)}</p>`
@@ -1088,10 +1101,12 @@ function renderHero(page) {
         <span class="eyebrow">${page.eyebrowIcon ? `<span class="material-symbols-outlined eyebrow-icon" aria-hidden="true">${escapeHtml(page.eyebrowIcon)}</span>` : ''}${escapeHtml(page.eyebrow)}</span>
         <h1 class="${titleClass.trim()}">${escapeHtml(page.heroTitle)}</h1>
         <p class="hero-text">${escapeHtml(page.heroText)}</p>
-        <div class="cta-row">
-          <a class="button button-primary" href="/">${escapeHtml(ui.openApp)}</a>
-          ${showLegalCta ? `<a class="button button-secondary" href="/legal/">${escapeHtml(ui.legalPages)}</a>` : ''}
-        </div>
+        ${(showPrimaryCta || showLegalCta)
+          ? `<div class="cta-row">
+              ${showPrimaryCta ? `<a class="button button-primary" href="/">${escapeHtml(ui.openApp)}</a>` : ''}
+              ${showLegalCta ? `<a class="button button-secondary" href="/legal/">${escapeHtml(ui.legalPages)}</a>` : ''}
+            </div>`
+          : ''}
       </div>
       ${hasAside ? `<aside class="hero-panel" aria-label="${page.lang === 'de' ? 'Kurzübersicht' : 'Quick summary'}">
         <div class="hero-panel-header">
@@ -1281,11 +1296,17 @@ function renderMarketingPage(page) {
   }
 
   if (page.legalTiles) {
+    const legalTilesTitle = page.legalTilesTitle ?? (isGerman ? 'Rechtsseiten' : 'Legal pages');
+    const legalTilesIntro =
+      page.legalTilesIntro
+      ?? (isGerman
+        ? 'Diese Links führen zu den öffentlichen Rechtsdokumenten, die unabhängig von der App-Oberfläche erreichbar sind.'
+        : 'These links lead to the static legal documents that are available independently from the app UI.');
     body.push(`
       <section class="content-section">
         <div class="section-heading">
-          <h2>${isGerman ? 'Rechtsseiten' : 'Legal pages'}</h2>
-          <p>${isGerman ? 'Diese Links führen zu den öffentlichen Rechtsdokumenten, die unabhängig von der App-Oberfläche erreichbar sind.' : 'These links lead to the static legal documents that are available independently from the app UI.'}</p>
+          <h2>${escapeHtml(legalTilesTitle)}</h2>
+          <p>${escapeHtml(legalTilesIntro)}</p>
         </div>
         <div class="card-grid legal-links-grid">
           ${page.legalTiles
