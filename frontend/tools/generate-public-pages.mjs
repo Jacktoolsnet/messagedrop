@@ -109,24 +109,23 @@ const marketingPages = [
         ],
       },
       {
-        title: 'Who it is for',
-        intro:
-          'The strongest launch story is likely a focused use case first, then broader expansion. These are natural starting points.',
+        title: 'Who MessageDrop is for',
+        icon: 'groups',
         cards: [
           {
             icon: 'groups',
-            title: 'Local communities',
-            body: 'Neighborhood signals, ad-hoc local tips, micro-updates, and place-based discussions.',
+            title: 'Less feed, more place',
+            body: 'For people who are tired of algorithmic feeds and traditional social networks and would rather explore places than profiles.',
           },
           {
-            icon: 'explore',
-            title: 'Travelers and city explorers',
-            body: 'A way to see social traces, memories, and context directly on places instead of scattered across apps.',
+            icon: 'lock',
+            title: 'Private communication with real contacts',
+            body: 'For people who prefer encrypted private communication and mainly want to connect with people they actually know.',
           },
           {
-            icon: 'storefront',
-            title: 'Places with a story',
-            body: 'Events, venues, and locations can become containers for living public context.',
+            icon: 'travel_explore',
+            title: 'More context around places',
+            body: 'For people who want to know more about places — from messages and impressions to weather, air quality, and nearby experiences.',
           },
         ],
       },
@@ -530,24 +529,23 @@ const germanMarketingPages = [
         ],
       },
       {
-        title: 'Für wen es interessant ist',
-        intro:
-          'Für den Launch ist eine fokussierte Nutzungsgeschichte meist stärker als zu breite Kommunikation. Das sind naheliegende Startpunkte.',
+        title: 'Für wen MessageDrop gemacht ist',
+        icon: 'groups',
         cards: [
           {
             icon: 'groups',
-            title: 'Lokale Communities',
-            body: 'Nachbarschaftssignale, spontane Tipps, Mikro-Updates und ortsbezogene Gespräche.',
+            title: 'Weniger Feed, mehr Ort',
+            body: 'Für Menschen, die genug von algorithmischen Feeds und gewöhnlichen sozialen Netzwerken haben und lieber Orte statt Profile entdecken.',
           },
           {
-            icon: 'explore',
-            title: 'Reisende und Stadterkunder',
-            body: 'Eine Möglichkeit, soziale Spuren, Erinnerungen und Kontext direkt an Orten statt verteilt über viele Apps zu sehen.',
+            icon: 'lock',
+            title: 'Private Kommunikation mit echten Kontakten',
+            body: 'Für Menschen, die verschlüsselte private Kommunikation bevorzugen und sich vor allem mit Menschen austauschen wollen, die sie wirklich kennen.',
           },
           {
-            icon: 'storefront',
-            title: 'Orte mit Geschichte',
-            body: 'Events, Locations und Plätze können zu Behältern für lebendigen öffentlichen Kontext werden.',
+            icon: 'travel_explore',
+            title: 'Mehr Kontext zu Orten',
+            body: 'Für Menschen, die zu Plätzen mehr wissen wollen — von Nachrichten und Eindrücken bis zu Wetter, Luftqualität und Erlebnissen in der Nähe.',
           },
         ],
       },
