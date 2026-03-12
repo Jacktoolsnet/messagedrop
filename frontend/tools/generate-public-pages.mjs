@@ -791,14 +791,16 @@ const appClaimByLocale = {
 
 const uiByLocale = {
   de: {
-    navWhat: 'Was ist es?',
-    navHow: 'So funktioniert es',
+    navWhat: 'Was ist MessageDrop?',
+    navHow: 'So funktioniert MessageDrop',
     navFaq: 'FAQ',
     navLegal: 'Rechtliches',
     openApp: 'App öffnen',
+    brandHome: 'MessageDrop-App öffnen',
+    primaryNav: 'Hauptnavigation',
     legalPages: 'Rechtsseiten',
     footerWhat: 'Was ist MessageDrop?',
-    footerHow: 'So funktioniert es',
+    footerHow: 'So funktioniert MessageDrop',
     footerFaq: 'FAQ',
     footerPrivacy: 'Datenschutz',
     footerTerms: 'Nutzungsbedingungen',
@@ -811,14 +813,16 @@ const uiByLocale = {
     openAppLegal: 'App öffnen',
   },
   en: {
-    navWhat: 'What is it?',
-    navHow: 'How it works',
+    navWhat: 'What is MessageDrop?',
+    navHow: 'How MessageDrop works',
     navFaq: 'FAQ',
     navLegal: 'Legal',
     openApp: 'Open app',
+    brandHome: 'Open MessageDrop app',
+    primaryNav: 'Primary navigation',
     legalPages: 'Legal pages',
     footerWhat: 'What is MessageDrop?',
-    footerHow: 'How it works',
+    footerHow: 'How MessageDrop works',
     footerFaq: 'FAQ',
     footerPrivacy: 'Privacy',
     footerTerms: 'Terms',
@@ -1069,7 +1073,7 @@ function renderHeader(currentRoute, lang = 'en') {
   const closeLabel = lang === 'de' ? 'Navigation schließen' : 'Close navigation';
   return `
     <header class="site-header">
-      <a class="brand" href="/" aria-label="Open MessageDrop app home">
+      <a class="brand" href="/" aria-label="${escapeHtml(ui.brandHome)}">
         <span class="brand-avatar">
           <img src="/icons/icon-192x192.png" alt="MessageDrop logo" width="64" height="64">
         </span>
@@ -1083,7 +1087,7 @@ function renderHeader(currentRoute, lang = 'en') {
         data-close-label="${escapeHtml(closeLabel)}">
         <span class="material-symbols-outlined" data-menu-icon aria-hidden="true">menu</span>
       </button>
-      <nav class="site-nav" id="site-nav" aria-label="Primary">
+      <nav class="site-nav" id="site-nav" aria-label="${escapeHtml(ui.primaryNav)}">
         ${renderNav(currentRoute, lang)}
       </nav>
       <a class="button button-primary button-small site-header-cta" href="/">${escapeHtml(ui.openApp)}</a>
