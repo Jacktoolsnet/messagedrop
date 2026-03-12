@@ -129,6 +129,31 @@ const marketingPages = [
           },
         ],
       },
+      {
+        title: 'What comes next',
+        icon: 'route',
+        intro: 'MessageDrop is still at an early stage. We have many ideas and want to keep improving it step by step.',
+        tiles: [
+          {
+            icon: 'explore',
+            title: 'More ideas around places',
+            body:
+              'We want to keep expanding how much useful context can live around a place, so the map becomes more helpful over time.',
+          },
+          {
+            icon: 'travel',
+            title: 'More ways to explore',
+            body:
+              'Exploring the real world should feel fun and natural. We want to keep building features that help people discover places in better ways.',
+          },
+          {
+            icon: 'autorenew',
+            title: 'Continuous development',
+            body:
+              'MessageDrop is meant to evolve continuously. New ideas, new use cases, and real feedback should shape where it goes next.',
+          },
+        ],
+      },
     ],
   },
   {
@@ -546,6 +571,31 @@ const germanMarketingPages = [
             icon: 'travel_explore',
             title: 'Mehr Kontext zu Orten',
             body: 'Für Menschen, die zu Plätzen mehr wissen wollen — von Nachrichten und Eindrücken bis zu Wetter, Luftqualität und Erlebnissen in der Nähe.',
+          },
+        ],
+      },
+      {
+        title: 'Wie es weitergeht',
+        icon: 'route',
+        intro: 'MessageDrop steht noch am Anfang. Wir haben viele Ideen und wollen die App Schritt für Schritt weiterentwickeln.',
+        tiles: [
+          {
+            icon: 'explore',
+            title: 'Mehr Ideen rund um Orte',
+            body:
+              'Wir wollen weiter ausbauen, wie viel nützlicher Kontext rund um einen Ort sichtbar werden kann, damit die Karte mit der Zeit immer hilfreicher wird.',
+          },
+          {
+            icon: 'travel',
+            title: 'Mehr Wege zum Entdecken',
+            body:
+              'Die echte Welt zu erkunden soll sich leicht und spannend anfühlen. Deshalb wollen wir weitere Funktionen entwickeln, die Menschen beim Entdecken von Orten helfen.',
+          },
+          {
+            icon: 'autorenew',
+            title: 'Kontinuierliche Weiterentwicklung',
+            body:
+              'MessageDrop soll sich kontinuierlich weiterentwickeln. Neue Ideen, echte Anwendungsfälle und Feedback sollen mitbestimmen, wohin sich das Produkt als Nächstes bewegt.',
           },
         ],
       },
@@ -1174,10 +1224,6 @@ function renderFooter(lang = 'en') {
 
   return `
     <footer class="site-footer">
-      <div>
-        <strong>${appName}</strong>
-        <p>${appClaimByLocale[lang] ?? appClaim}</p>
-      </div>
       <div class="footer-links">
         ${links.map((link) => `<a href="${link.href}">${escapeHtml(link.label)}</a>`).join('')}
       </div>
@@ -1285,14 +1331,25 @@ function renderTimeline(items) {
 }
 
 function renderSection(section) {
+  const headingContent = section.icon
+    ? `
+        <div class="section-heading-title">
+          <span class="icon-badge" aria-hidden="true"><span class="material-symbols-outlined">${escapeHtml(section.icon)}</span></span>
+          <div class="section-heading-copy">
+            <h2>${escapeHtml(section.title)}</h2>
+            ${section.intro ? `<p>${escapeHtml(section.intro)}</p>` : ''}
+          </div>
+        </div>
+      `
+    : `
+        <h2>${escapeHtml(section.title)}</h2>
+        ${section.intro ? `<p>${escapeHtml(section.intro)}</p>` : ''}
+      `;
+
   return `
     <section class="content-section">
       <div class="section-heading">
-        <div class="section-heading-title">
-          ${section.icon ? `<span class="icon-badge" aria-hidden="true"><span class="material-symbols-outlined">${escapeHtml(section.icon)}</span></span>` : ''}
-          <h2>${escapeHtml(section.title)}</h2>
-        </div>
-        ${section.intro ? `<p>${escapeHtml(section.intro)}</p>` : ''}
+        ${headingContent}
       </div>
       ${section.tiles ? renderTileGrid(section.tiles) : ''}
       ${section.cards ? renderCardGrid(section.cards) : ''}
@@ -2231,7 +2288,7 @@ img {
 
 .section-heading-title {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.8rem;
 }
 
@@ -2239,6 +2296,15 @@ img {
   width: 3rem;
   height: 3rem;
   flex-shrink: 0;
+}
+
+.section-heading-copy {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.section-heading-copy p {
+  margin: 0;
 }
 
 .tile-grid,
@@ -2466,17 +2532,38 @@ img {
 
 .site-footer {
   display: grid;
-  gap: 1rem;
+  justify-items: center;
   margin-top: 1rem;
-  padding: 1.1rem 1.2rem;
+  padding: 1rem;
   border-radius: var(--site-radius-lg);
   background: var(--site-surface);
 }
 
 .footer-links {
   display: flex;
+  justify-content: center;
   flex-wrap: wrap;
-  gap: 0.85rem 1rem;
+  gap: 0.75rem;
+}
+
+.footer-links a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  padding: 0.65rem 0.95rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, white 78%, transparent);
+  border: 1px solid var(--site-outline);
+  font-weight: 600;
+  transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+}
+
+.footer-links a:hover,
+.footer-links a:focus-visible {
+  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--site-primary) 8%, #fff);
+  border-color: color-mix(in srgb, var(--site-primary) 28%, var(--site-outline));
 }
 
 @media (max-width: 980px) {
