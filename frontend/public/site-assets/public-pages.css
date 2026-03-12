@@ -396,6 +396,27 @@ img {
   list-style: none;
 }
 
+.hero-panel-groups {
+  display: grid;
+  gap: 1rem;
+}
+
+.hero-panel-group {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.hero-panel-group h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.hero-panel-text {
+  margin: 0;
+  color: var(--site-muted);
+  line-height: 1.65;
+}
+
 .check-list li,
 .feature-list li {
   position: relative;
@@ -454,8 +475,17 @@ img {
   gap: 1rem;
 }
 
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 320px));
+  justify-content: center;
+  justify-items: center;
+  gap: 1rem;
+}
+
 .tile,
-.info-card {
+.info-card,
+.video-card {
   display: grid;
   gap: 0.9rem;
   align-content: start;
@@ -479,6 +509,81 @@ img {
 .tile-header .icon-badge {
   width: 3rem;
   height: 3rem;
+}
+
+.video-card {
+  grid-template-rows: auto 1fr auto;
+  width: min(100%, 320px);
+  min-height: 28rem;
+  height: 100%;
+}
+
+.video-thumb {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  min-height: 10rem;
+  border-radius: var(--site-radius-md);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--site-secondary) 18%, #fff), color-mix(in srgb, var(--site-primary) 14%, #fff));
+  border: 1px solid var(--site-outline);
+}
+
+.video-thumb .material-symbols-outlined {
+  font-size: 3.2rem;
+  color: #1d4ed8;
+  font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 48;
+}
+
+.video-card-body {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  gap: 0.55rem;
+}
+
+.video-card-body h3 {
+  margin: 0;
+}
+
+.video-card-body p {
+  margin: 0;
+  color: var(--site-muted);
+  line-height: 1.65;
+}
+
+.video-card-meta {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  min-height: 1.85rem;
+  padding: 0 0.65rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--site-secondary) 10%, #fff);
+  color: #1d4ed8;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.video-card-footer {
+  display: flex;
+  justify-content: center;
+  margin-top: auto;
+}
+
+.video-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 95%;
+  min-height: 2.5rem;
+  padding: 0.65rem 0.95rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--site-text);
+  border: 1px solid var(--site-outline);
+  font-weight: 700;
 }
 
 .timeline {

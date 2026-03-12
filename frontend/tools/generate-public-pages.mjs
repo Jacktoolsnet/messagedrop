@@ -164,154 +164,70 @@ const marketingPages = [
     description:
       'See how MessageDrop turns locations into entry points for public messages, local context, private notes, and private chats.',
     heroIcon: 'alt_route',
+    eyebrowIcon: 'alt_route',
     eyebrow: 'How it works',
-    heroTitle: 'Places first. Messages second. Context always.',
+    heroTitle: 'Open the app. Pick a place. Leave a message.',
     heroText:
-      'MessageDrop starts with the map. Users explore places, open location-based content, leave public drops, and continue with private notes or private chats when needed.',
-    heroAsideTitle: 'In one sentence',
-    heroAsideItems: [
-      'Open the map',
-      'Pick a place',
-      'Read or leave a drop',
-      'Continue privately when it makes sense',
-    ],
+      'MessageDrop starts with a place. You open the map, see what is happening at a location, and leave a message of your own if you want to add something.',
+    showLegalCta: false,
+    heroAsideTitle: 'It’s that simple',
+    heroAsideText:
+      'Before you can use MessageDrop, you open the app, set your consent preferences, and can then immediately explore places, messages, and experiences. If you want to create an account, you simply choose a PIN.',
     sections: [
       {
-        title: 'Four simple steps',
-        timeline: [
+        title: 'Video guides',
+        icon: 'smart_display',
+        intro: 'Short walkthroughs for the most important flows in MessageDrop.',
+        videos: [
           {
-            icon: 'map',
-            title: '1. Open the map',
+            icon: 'rocket_launch',
+            title: 'Open the app and get started',
             body:
-              'The map is the main entry point. Users browse nearby locations or jump to another area they want to explore.',
+              'See how MessageDrop starts, how the consent screen works, and how to get oriented after the first launch.',
+            meta: 'Guide 1',
+            ctaLabel: 'Video coming soon',
           },
           {
-            icon: 'place_item',
-            title: '2. Select a real-world place',
+            icon: 'account_circle',
+            title: 'Create your account and fill your profile',
             body:
-              'A place becomes the anchor for content. This keeps posts grounded in geography instead of drifting in a generic social feed.',
+              'Learn how to create an account with a PIN and complete your user profile with name, avatar, and personal details.',
+            meta: 'Guide 2',
+            ctaLabel: 'Video coming soon',
           },
           {
-            icon: 'chat_add_on',
-            title: '3. Read or leave a drop',
+            icon: 'edit_square',
+            title: 'Create messages and manage local profiles',
             body:
-              'Users can discover public messages, comments, and context that belong to that place — or add their own contribution.',
+              'Watch how to create your own messages and give other users local names and avatars that are only visible to you.',
+            meta: 'Guide 3',
+            ctaLabel: 'Video coming soon',
+          },
+          {
+            icon: 'place',
+            title: 'Create places and maintain place profiles',
+            body:
+              'See how to create places, keep place profiles up to date, and use tiles to surface useful information at a location.',
+            meta: 'Guide 4',
+            ctaLabel: 'Video coming soon',
           },
           {
             icon: 'forum',
-            title: '4. Continue with your own structure',
+            title: 'Connect with users and use the chatroom',
             body:
-              'Private notes, contacts, and chats support more personal or persistent workflows without turning the product into a traditional social network.',
+              'Learn how to connect with other users and use the chatroom for direct conversations around the people you know.',
+            meta: 'Guide 5',
+            ctaLabel: 'Video coming soon',
+          },
+          {
+            icon: 'travel_explore',
+            title: 'Explore experiences',
+            body:
+              'See how to search for experiences, discover activities around a place, and use MessageDrop as a starting point for exploring the real world.',
+            meta: 'Guide 6',
+            ctaLabel: 'Video coming soon',
           },
         ],
-      },
-      {
-        title: 'Product principles',
-        tiles: [
-          {
-            icon: 'privacy_tip',
-            title: 'Privacy-oriented',
-            body:
-              'Local-first storage, encrypted areas, and data minimization shape how the product works behind the scenes.',
-          },
-          {
-            icon: 'visibility',
-            title: 'Open discovery',
-            body:
-              'People can explore public content without needing a heavyweight account-first experience.',
-          },
-          {
-            icon: 'account_tree',
-            title: 'No personalized ranking feed',
-            body:
-              'Public content is not built around an engagement-maximizing recommendation stream.',
-          },
-          {
-            icon: 'near_me',
-            title: 'Useful in motion',
-            body:
-              'The product naturally fits walking, traveling, neighborhoods, events, and place-based discovery.',
-          },
-        ],
-      },
-      {
-        title: 'Typical use cases',
-        cards: [
-          {
-            icon: 'campaign',
-            title: 'Local signal board',
-            body: 'Share updates, warnings, tips, or observations that matter because they happened at a specific place.',
-          },
-          {
-            icon: 'history_edu',
-            title: 'Memory drops',
-            body: 'Treat the map as a memory layer where stories and observations can stay attached to places.',
-          },
-          {
-            icon: 'connect_without_contact',
-            title: 'Public to private handoff',
-            body: 'Discover something publicly, then move to private organization or communication when needed.',
-          },
-        ],
-      },
-    ],
-  },
-  {
-    route: '/faq/',
-    slug: 'faq',
-    lang: 'en',
-    title: 'MessageDrop FAQ',
-    description:
-      'Answers to common questions about MessageDrop, including how it works, privacy, accounts, public messages, and legal basics.',
-    heroIcon: 'quiz',
-    eyebrow: 'FAQ',
-    heroTitle: 'Short answers to the questions people will ask first.',
-    heroText:
-      'This page is designed for visitors, search engines, and AI systems that need a clean explanation of what MessageDrop is and how it behaves.',
-    faqs: [
-      {
-        question: 'What is MessageDrop?',
-        answer:
-          'MessageDrop is a global map where people can leave messages in real-world locations. The core idea is digital graffiti for the world map: public messages belong to places, not just to profiles or feeds.',
-      },
-      {
-        question: 'Do I need an account to use MessageDrop?',
-        answer:
-          'No. Public content can generally be explored without creating a user account. Some features, such as private notes, contacts, and private chats, require an account.',
-      },
-      {
-        question: 'How is MessageDrop different from a normal social network?',
-        answer:
-          'MessageDrop is place-first. The map and real-world locations are central, and public content is not organized around a personalized recommendation feed.',
-      },
-      {
-        question: 'Is MessageDrop privacy-oriented?',
-        answer:
-          'Yes. MessageDrop follows a privacy-oriented, local-first approach where a large share of data is stored primarily on the user device whenever technically possible.',
-      },
-      {
-        question: 'Are private chats encrypted?',
-        answer:
-          'According to the current product and legal documentation, private chats are transmitted with encryption and are generally not readable in plain text by the provider.',
-      },
-      {
-        question: 'Does MessageDrop use a personalized ranking system?',
-        answer:
-          'No. The legal and privacy texts state that public content is not algorithmically filtered or prioritized through a personalized recommendation or ranking system.',
-      },
-      {
-        question: 'How old do you need to be to use MessageDrop?',
-        answer:
-          'Users must be at least 16 years old. If someone is 16 or 17 years old, legal texts currently state that parental or guardian consent is required for use.',
-      },
-      {
-        question: 'Can external content providers be disabled?',
-        answer:
-          'Yes. External content such as YouTube or Spotify is designed to stay disabled until a user explicitly enables the provider.',
-      },
-      {
-        question: 'Is MessageDrop an emergency service?',
-        answer: 'No. MessageDrop is explicitly not an emergency service.',
       },
     ],
   },
@@ -609,154 +525,70 @@ const germanMarketingPages = [
     description:
       'Sieh dir an, wie MessageDrop Orte zu Einstiegspunkten für öffentliche Nachrichten, lokalen Kontext, private Notizen und private Chats macht.',
     heroIcon: 'alt_route',
+    eyebrowIcon: 'alt_route',
     eyebrow: 'So funktioniert es',
-    heroTitle: 'Erst der Ort. Dann die Nachricht. Immer mit Kontext.',
+    heroTitle: 'App öffnen. Ort wählen. Nachricht hinterlassen.',
     heroText:
-      'MessageDrop beginnt mit der Karte. Nutzer erkunden Orte, öffnen ortsbezogene Inhalte, hinterlassen öffentliche Drops und machen bei Bedarf mit privaten Notizen oder privaten Chats weiter.',
-    heroAsideTitle: 'In einem Satz',
-    heroAsideItems: [
-      'Karte öffnen',
-      'Ort auswählen',
-      'Drop lesen oder hinterlassen',
-      'Privat weitermachen, wenn es sinnvoll ist',
-    ],
+      'MessageDrop beginnt mit einem Ort. Du öffnest die Karte, schaust, was an einem Platz passiert, und hinterlässt selbst eine Nachricht, wenn du etwas beitragen willst.',
+    showLegalCta: false,
+    heroAsideTitle: 'So einfach ist es',
+    heroAsideText:
+      'Bevor du MessageDrop nutzen kannst, öffnest du die App, legst deine Consent-Einstellungen fest und kannst danach direkt Orte, Nachrichten und Erlebnisse entdecken. Wenn du ein Nutzerkonto anlegen möchtest, vergibst du einfach einen PIN.',
     sections: [
       {
-        title: 'Vier einfache Schritte',
-        timeline: [
+        title: 'Video-Guides',
+        icon: 'smart_display',
+        intro: 'Kurze Walkthroughs für die wichtigsten Abläufe in MessageDrop.',
+        videos: [
           {
-            icon: 'map',
-            title: '1. Karte öffnen',
+            icon: 'rocket_launch',
+            title: 'App öffnen und erste Schritte',
             body:
-              'Die Karte ist der Haupteinstieg. Nutzer schauen sich Orte in der Nähe an oder springen in einen anderen Bereich, den sie erkunden möchten.',
+              'So startest du MessageDrop, gehst durch den Consent-Screen und findest dich nach dem ersten Öffnen schnell zurecht.',
+            meta: 'Guide 1',
+            ctaLabel: 'Video folgt',
           },
           {
-            icon: 'place_item',
-            title: '2. Einen realen Ort auswählen',
+            icon: 'account_circle',
+            title: 'Nutzerkonto anlegen und Profil ausfüllen',
             body:
-              'Ein Ort wird zum Anker für Inhalte. So bleiben Beiträge geografisch verankert statt in einem generischen sozialen Feed zu verschwimmen.',
+              'Erfahre, wie du mit einem PIN ein Nutzerkonto anlegst und dein Profil mit Namen, Avatar und weiteren Angaben vervollständigst.',
+            meta: 'Guide 2',
+            ctaLabel: 'Video folgt',
           },
           {
-            icon: 'chat_add_on',
-            title: '3. Einen Drop lesen oder hinterlassen',
+            icon: 'edit_square',
+            title: 'Nachrichten erstellen und lokale Profile pflegen',
             body:
-              'Nutzer können öffentliche Nachrichten, Kommentare und Kontext an diesem Ort entdecken oder selbst einen Beitrag hinzufügen.',
+              'Sieh, wie du eigene Nachrichten erstellst und anderen Nutzern lokal Namen und Avatare gibst, die nur für dich sichtbar sind.',
+            meta: 'Guide 3',
+            ctaLabel: 'Video folgt',
+          },
+          {
+            icon: 'place',
+            title: 'Orte anlegen und Ortsprofile pflegen',
+            body:
+              'So legst du neue Orte an, pflegst Ortsprofile und nutzt Tiles, um Informationen an einem Ort sichtbar zu machen.',
+            meta: 'Guide 4',
+            ctaLabel: 'Video folgt',
           },
           {
             icon: 'forum',
-            title: '4. Mit eigener Struktur weitermachen',
+            title: 'Kontakte aufnehmen und Chatroom nutzen',
             body:
-              'Private Notizen, Kontakte und Chats unterstützen persönlichere oder dauerhaftere Abläufe, ohne das Produkt zu einem klassischen sozialen Netzwerk zu machen.',
+              'Lerne, wie du Kontakt mit anderen Nutzern aufnimmst und den Chatroom für direkte Gespräche rund um Menschen nutzt, die du kennst.',
+            meta: 'Guide 5',
+            ctaLabel: 'Video folgt',
+          },
+          {
+            icon: 'travel_explore',
+            title: 'Erlebnisse suchen',
+            body:
+              'Sieh, wie du nach Erlebnissen suchst, Aktivitäten rund um einen Ort entdeckst und MessageDrop als Ausgangspunkt für die echte Welt nutzt.',
+            meta: 'Guide 6',
+            ctaLabel: 'Video folgt',
           },
         ],
-      },
-      {
-        title: 'Produktprinzipien',
-        tiles: [
-          {
-            icon: 'privacy_tip',
-            title: 'Datenschutzorientiert',
-            body:
-              'Local-first-Speicherung, verschlüsselte Bereiche und Datenminimierung prägen die technische Umsetzung im Hintergrund.',
-          },
-          {
-            icon: 'visibility',
-            title: 'Offene Entdeckung',
-            body:
-              'Menschen können öffentliche Inhalte erkunden, ohne zuerst durch ein schwergewichtiges Konto-Erlebnis zu müssen.',
-          },
-          {
-            icon: 'account_tree',
-            title: 'Kein personalisierter Ranking-Feed',
-            body:
-              'Öffentliche Inhalte sind nicht um einen engagementgetriebenen Empfehlungsstrom herum gebaut.',
-          },
-          {
-            icon: 'near_me',
-            title: 'Unterwegs sinnvoll',
-            body:
-              'Das Produkt passt natürlich zu Spaziergängen, Reisen, Nachbarschaften, Events und ortsbezogener Entdeckung.',
-          },
-        ],
-      },
-      {
-        title: 'Typische Anwendungsfälle',
-        cards: [
-          {
-            icon: 'campaign',
-            title: 'Lokales Signalbrett',
-            body: 'Updates, Warnungen, Tipps oder Beobachtungen teilen, die gerade deshalb wichtig sind, weil sie an einem bestimmten Ort passiert sind.',
-          },
-          {
-            icon: 'history_edu',
-            title: 'Erinnerungs-Drops',
-            body: 'Die Karte als Erinnerungsschicht nutzen, in der Geschichten und Beobachtungen an Orten hängen bleiben.',
-          },
-          {
-            icon: 'connect_without_contact',
-            title: 'Öffentlich zu privat',
-            body: 'Etwas öffentlich entdecken und dann bei Bedarf in private Organisation oder Kommunikation wechseln.',
-          },
-        ],
-      },
-    ],
-  },
-  {
-    route: '/faq/',
-    slug: 'faq',
-    lang: 'de',
-    title: 'MessageDrop FAQ',
-    description:
-      'Antworten auf häufige Fragen zu MessageDrop, darunter Funktionsweise, Datenschutz, Konten, öffentliche Nachrichten und rechtliche Grundlagen.',
-    heroIcon: 'quiz',
-    eyebrow: 'FAQ',
-    heroTitle: 'Kurze Antworten auf die Fragen, die zuerst gestellt werden.',
-    heroText:
-      'Diese Seite ist für Besucher, Suchmaschinen und KI-Systeme gedacht, die eine klare Erklärung brauchen, was MessageDrop ist und wie es funktioniert.',
-    faqs: [
-      {
-        question: 'Was ist MessageDrop?',
-        answer:
-          'MessageDrop ist eine globale Karte, auf der Menschen Nachrichten an realen Orten hinterlassen können. Die Kernidee ist digitales Graffiti für die Weltkarte: Öffentliche Nachrichten gehören an Orte und nicht nur an Profile oder Feeds.',
-      },
-      {
-        question: 'Brauche ich ein Konto, um MessageDrop zu nutzen?',
-        answer:
-          'Nein. Öffentliche Inhalte lassen sich grundsätzlich auch ohne Nutzerkonto erkunden. Einige Funktionen wie private Notizen, Kontakte und private Chats erfordern jedoch ein Konto.',
-      },
-      {
-        question: 'Worin unterscheidet sich MessageDrop von einem normalen sozialen Netzwerk?',
-        answer:
-          'MessageDrop denkt vom Ort aus. Karte und reale Orte stehen im Mittelpunkt, und öffentliche Inhalte werden nicht um einen personalisierten Empfehlungs-Feed organisiert.',
-      },
-      {
-        question: 'Ist MessageDrop datenschutzorientiert?',
-        answer:
-          'Ja. MessageDrop verfolgt einen datenschutzorientierten Local-first-Ansatz, bei dem ein großer Teil der Daten — soweit technisch möglich — primär auf dem Gerät des Nutzers gespeichert wird.',
-      },
-      {
-        question: 'Sind private Chats verschlüsselt?',
-        answer:
-          'Laut aktueller Produkt- und Rechtsdokumentation werden private Chats verschlüsselt übertragen und sind für den Anbieter grundsätzlich nicht im Klartext einsehbar.',
-      },
-      {
-        question: 'Verwendet MessageDrop ein personalisiertes Ranking-System?',
-        answer:
-          'Nein. In den Rechts- und Datenschutztexten steht, dass öffentliche Inhalte nicht durch ein personalisiertes Empfehlungs- oder Ranking-System algorithmisch gefiltert oder priorisiert werden.',
-      },
-      {
-        question: 'Wie alt muss man sein, um MessageDrop zu nutzen?',
-        answer:
-          'Nutzer müssen mindestens 16 Jahre alt sein. Wer 16 oder 17 Jahre alt ist, benötigt laut aktueller Rechtsdokumentation die Zustimmung der Eltern oder Erziehungsberechtigten.',
-      },
-      {
-        question: 'Kann man externe Inhaltsanbieter deaktiviert lassen?',
-        answer:
-          'Ja. Externe Inhalte wie YouTube oder Spotify sind so ausgelegt, dass sie deaktiviert bleiben, bis ein Nutzer den jeweiligen Anbieter ausdrücklich aktiviert.',
-      },
-      {
-        question: 'Ist MessageDrop ein Notfalldienst?',
-        answer: 'Nein. MessageDrop ist ausdrücklich kein Notfalldienst.',
       },
     ],
   },
@@ -908,7 +740,6 @@ const uiByLocale = {
   de: {
     navWhat: 'Was ist MessageDrop?',
     navHow: 'So funktioniert MessageDrop',
-    navFaq: 'FAQ',
     navLegal: 'Rechtliches',
     openApp: 'App öffnen',
     brandHome: 'MessageDrop-App öffnen',
@@ -916,7 +747,6 @@ const uiByLocale = {
     legalPages: 'Rechtsseiten',
     footerWhat: 'Was ist MessageDrop?',
     footerHow: 'So funktioniert MessageDrop',
-    footerFaq: 'FAQ',
     footerPrivacy: 'Datenschutz',
     footerTerms: 'Nutzungsbedingungen',
     footerImprint: 'Impressum',
@@ -930,7 +760,6 @@ const uiByLocale = {
   en: {
     navWhat: 'What is MessageDrop?',
     navHow: 'How MessageDrop works',
-    navFaq: 'FAQ',
     navLegal: 'Legal',
     openApp: 'Open app',
     brandHome: 'Open MessageDrop app',
@@ -938,7 +767,6 @@ const uiByLocale = {
     legalPages: 'Legal pages',
     footerWhat: 'What is MessageDrop?',
     footerHow: 'How MessageDrop works',
-    footerFaq: 'FAQ',
     footerPrivacy: 'Privacy',
     footerTerms: 'Terms',
     footerImprint: 'Impressum',
@@ -1166,7 +994,6 @@ function renderNav(currentRoute, lang = 'en') {
   const navItems = [
     { href: '/what-is-messagedrop/', label: ui.navWhat },
     { href: '/how-it-works/', label: ui.navHow },
-    { href: '/faq/', label: ui.navFaq },
     { href: '/legal/', label: ui.navLegal },
   ];
 
@@ -1215,7 +1042,6 @@ function renderFooter(lang = 'en') {
   const links = [
     { href: '/what-is-messagedrop/', label: ui.footerWhat },
     { href: '/how-it-works/', label: ui.footerHow },
-    { href: '/faq/', label: ui.footerFaq },
     { href: '/privacy/', label: ui.footerPrivacy },
     { href: '/terms-of-service/', label: ui.footerTerms },
     { href: '/impressum/', label: ui.footerImprint },
@@ -1236,6 +1062,26 @@ function renderHero(page) {
   const hasAside = Boolean(page.heroAsideTitle) || (page.heroAsideItems?.length ?? 0) > 0;
   const showLegalCta = page.showLegalCta !== false;
   const titleClass = page.heroTitleClass ? ` ${page.heroTitleClass}` : '';
+  const asideContent = page.heroAsideText
+    ? `<p class="hero-panel-text">${escapeHtml(page.heroAsideText)}</p>`
+    : page.heroAsideGroups?.length
+    ? `<div class="hero-panel-groups">
+        ${page.heroAsideGroups
+          .map(
+            (group) => `
+              <section class="hero-panel-group">
+                <h3>${escapeHtml(group.title)}</h3>
+                <ul class="check-list">
+                  ${group.items.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
+                </ul>
+              </section>
+            `,
+          )
+          .join('')}
+      </div>`
+    : `<ul class="check-list">
+        ${(page.heroAsideItems ?? []).map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
+      </ul>`;
   return `
     <section class="hero${hasAside ? '' : ' hero--single'}">
       <div class="hero-copy">
@@ -1254,9 +1100,7 @@ function renderHero(page) {
           </div>
           <h2>${escapeHtml(page.heroAsideTitle ?? (page.lang === 'de' ? 'Kurzübersicht' : 'Quick summary'))}</h2>
         </div>
-        <ul class="check-list">
-          ${(page.heroAsideItems ?? []).map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
-        </ul>
+        ${asideContent}
       </aside>` : ''}
     </section>
   `;
@@ -1294,6 +1138,32 @@ function renderCardGrid(cards) {
               <h3>${escapeHtml(card.title)}</h3>
             </div>
             <p>${escapeHtml(card.body)}</p>
+          </article>
+        `,
+        )
+        .join('')}
+    </div>
+  `;
+}
+
+function renderVideoGrid(videos) {
+  return `
+    <div class="video-grid">
+      ${videos
+        .map(
+          (video) => `
+          <article class="video-card">
+            <div class="video-thumb" aria-hidden="true">
+              <span class="material-symbols-outlined">${escapeHtml(video.icon)}</span>
+            </div>
+            <div class="video-card-body">
+              <div class="video-card-meta">${escapeHtml(video.meta)}</div>
+              <h3>${escapeHtml(video.title)}</h3>
+              <p>${escapeHtml(video.body)}</p>
+            </div>
+            <div class="video-card-footer">
+              <span class="video-cta">${escapeHtml(video.ctaLabel)}</span>
+            </div>
           </article>
         `,
         )
@@ -1353,6 +1223,7 @@ function renderSection(section) {
       </div>
       ${section.tiles ? renderTileGrid(section.tiles) : ''}
       ${section.cards ? renderCardGrid(section.cards) : ''}
+      ${section.videos ? renderVideoGrid(section.videos) : ''}
       ${section.featureList ? renderFeatureList(section.featureList) : ''}
       ${section.timeline ? renderTimeline(section.timeline) : ''}
     </section>
@@ -2256,6 +2127,27 @@ img {
   list-style: none;
 }
 
+.hero-panel-groups {
+  display: grid;
+  gap: 1rem;
+}
+
+.hero-panel-group {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.hero-panel-group h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.hero-panel-text {
+  margin: 0;
+  color: var(--site-muted);
+  line-height: 1.65;
+}
+
 .check-list li,
 .feature-list li {
   position: relative;
@@ -2314,8 +2206,17 @@ img {
   gap: 1rem;
 }
 
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 320px));
+  justify-content: center;
+  justify-items: center;
+  gap: 1rem;
+}
+
 .tile,
-.info-card {
+.info-card,
+.video-card {
   display: grid;
   gap: 0.9rem;
   align-content: start;
@@ -2339,6 +2240,81 @@ img {
 .tile-header .icon-badge {
   width: 3rem;
   height: 3rem;
+}
+
+.video-card {
+  grid-template-rows: auto 1fr auto;
+  width: min(100%, 320px);
+  min-height: 28rem;
+  height: 100%;
+}
+
+.video-thumb {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  min-height: 10rem;
+  border-radius: var(--site-radius-md);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--site-secondary) 18%, #fff), color-mix(in srgb, var(--site-primary) 14%, #fff));
+  border: 1px solid var(--site-outline);
+}
+
+.video-thumb .material-symbols-outlined {
+  font-size: 3.2rem;
+  color: #1d4ed8;
+  font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 48;
+}
+
+.video-card-body {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  gap: 0.55rem;
+}
+
+.video-card-body h3 {
+  margin: 0;
+}
+
+.video-card-body p {
+  margin: 0;
+  color: var(--site-muted);
+  line-height: 1.65;
+}
+
+.video-card-meta {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  min-height: 1.85rem;
+  padding: 0 0.65rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--site-secondary) 10%, #fff);
+  color: #1d4ed8;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.video-card-footer {
+  display: flex;
+  justify-content: center;
+  margin-top: auto;
+}
+
+.video-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 95%;
+  min-height: 2.5rem;
+  padding: 0.65rem 0.95rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--site-text);
+  border: 1px solid var(--site-outline);
+  font-weight: 700;
 }
 
 .timeline {
