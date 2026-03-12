@@ -454,6 +454,10 @@ img {
   gap: 1rem;
 }
 
+.legal-document-card {
+  overflow: hidden;
+}
+
 .legal-card,
 .translation-card {
   padding: clamp(1rem, 2vw, 1.5rem);
@@ -468,6 +472,56 @@ img {
 .translation-card summary {
   cursor: pointer;
   font-weight: 700;
+}
+
+.legal-document-summary {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.legal-document-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.legal-document-title {
+  font-size: 1rem;
+}
+
+.legal-document-description {
+  color: var(--site-muted);
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.legal-document-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.85rem;
+  padding: 0 0.65rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--site-primary) 14%, #fff);
+  color: #0f5a1d;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.legal-document-chip--muted {
+  background: color-mix(in srgb, var(--site-secondary) 10%, #fff);
+  color: #1d4ed8;
+}
+
+.legal-status {
+  margin-top: 0.95rem;
+  padding: 0.9rem 1rem;
+  border-radius: var(--site-radius-md);
+  border: 1px dashed var(--site-outline);
+  background: color-mix(in srgb, white 74%, transparent);
+  color: var(--site-muted);
 }
 
 .translation-card > .legal-prose {

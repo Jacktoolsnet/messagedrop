@@ -5,7 +5,6 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const frontendRoot = path.resolve(__dirname, '..');
 const publicRoot = path.join(frontendRoot, 'public');
-const legalSourceRoot = path.join(frontendRoot, 'src', 'assets', 'legal');
 const baseUrl = 'https://messagedrop.net';
 const appName = 'MessageDrop';
 const appTagline = 'Digital graffiti for the world map.';
@@ -305,12 +304,12 @@ const legalPages = [
     slug: 'privacy',
     lang: 'de',
     title: 'Privacy Policy',
-    description: 'Static privacy policy page for MessageDrop, including the authoritative German version and the English translation.',
+    description: 'Dynamic privacy policy page for MessageDrop that loads the current German and English legal text files on demand.',
     heroIcon: 'privacy_tip',
     eyebrow: 'Privacy',
     heroTitle: 'Privacy policy outside the app',
     heroText:
-      'This page exposes the current privacy policy as crawlable HTML. The German version is authoritative; the English translation is provided for convenience.',
+      'This page loads the current privacy policy directly from the legal text source files. The German version is authoritative; the English translation is provided for convenience.',
     downloads: [
       { href: '/assets/legal/privacy-policy-de.txt', label: 'German text version' },
       { href: '/assets/legal/privacy-policy-en.txt', label: 'English text version' },
@@ -329,12 +328,12 @@ const legalPages = [
     slug: 'terms-of-service',
     lang: 'de',
     title: 'Terms of Service',
-    description: 'Static terms of service page for MessageDrop with German source text and English translation.',
+    description: 'Dynamic terms of service page for MessageDrop that loads the current German and English legal text files on demand.',
     heroIcon: 'rule',
     eyebrow: 'Terms',
     heroTitle: 'Terms of Service outside the app',
     heroText:
-      'This page provides a direct, static version of the terms so they can be read, linked, and indexed independently from the app experience.',
+      'This page loads the current terms directly from the legal text source files so the page stays in sync with the source documents used by the app.',
     downloads: [
       { href: '/assets/legal/terms-of-service-de.txt', label: 'German text version' },
       { href: '/assets/legal/terms-of-service-en.txt', label: 'English text version' },
@@ -353,12 +352,12 @@ const legalPages = [
     slug: 'impressum',
     lang: 'de',
     title: 'Impressum / Legal Notice',
-    description: 'Static legal notice page for MessageDrop with provider details and DSA contact information.',
+    description: 'Dynamic legal notice page for MessageDrop that loads the current German and English legal text files on demand.',
     heroIcon: 'business',
     eyebrow: 'Impressum',
     heroTitle: 'Legal notice outside the app',
     heroText:
-      'The legal notice is exposed as a normal HTML page so users and regulators can access provider details directly without opening the application.',
+      'The legal notice stays outside the app and loads directly from the legal text source files so provider details stay synchronized.',
     downloads: [
       { href: '/assets/legal/legal-notice-de.txt', label: 'German text version' },
       { href: '/assets/legal/legal-notice-en.txt', label: 'English text version' },
@@ -377,12 +376,12 @@ const legalPages = [
     slug: 'disclaimer',
     lang: 'de',
     title: 'Disclaimer',
-    description: 'Static disclaimer and liability notice page for MessageDrop with German source text and English translation.',
+    description: 'Dynamic disclaimer and liability notice page for MessageDrop that loads the current German and English legal text files on demand.',
     heroIcon: 'warning',
     eyebrow: 'Disclaimer',
     heroTitle: 'Liability notice outside the app',
     heroText:
-      'This page keeps the disclaimer accessible as regular HTML. It explains technical limitations, minimum age requirements, local storage risks, and service boundaries.',
+      'This page loads the current disclaimer directly from the legal text source files. It explains technical limitations, minimum age requirements, local storage risks, and service boundaries.',
     downloads: [
       { href: '/assets/legal/disclaimer-de.txt', label: 'German text version' },
       { href: '/assets/legal/disclaimer-en.txt', label: 'English text version' },
@@ -729,6 +728,24 @@ function renderSection(section) {
   `;
 }
 
+function renderLegalLoaderPanel({ title, description, lang, src, authoritative = false }) {
+  return `
+    <details class="translation-card legal-document-card" data-legal-doc data-src="${escapeHtml(src)}">
+      <summary>
+        <span class="legal-document-summary">
+          <span class="legal-document-title-row">
+            <span class="legal-document-title">${escapeHtml(title)}</span>
+            ${authoritative ? '<span class="legal-document-chip">Authoritative</span>' : '<span class="legal-document-chip legal-document-chip--muted">Translation</span>'}
+          </span>
+          <span class="legal-document-description">${escapeHtml(description)}</span>
+        </span>
+      </summary>
+      <div class="legal-status" data-legal-status aria-live="polite">Open this panel to load the document.</div>
+      <div class="legal-prose" data-legal-content lang="${escapeHtml(lang)}" hidden></div>
+    </details>
+  `;
+}
+
 function renderMarketingPage(page) {
   const body = [`<main class="site-main">`, renderHero(page)];
 
@@ -802,10 +819,7 @@ function renderMarketingPage(page) {
   });
 }
 
-async function renderLegalPage(page) {
-  const germanText = await fs.readFile(path.join(legalSourceRoot, page.deSource), 'utf8');
-  const englishText = await fs.readFile(path.join(legalSourceRoot, page.enSource), 'utf8');
-
+function renderLegalPage(page) {
   return renderDocument({
     route: page.route,
     title: page.title,
@@ -830,10 +844,10 @@ async function renderLegalPage(page) {
             </div>
             <h2>Quick legal overview</h2>
             <ul class="check-list">
-              <li>Static HTML page outside the app</li>
-              <li>German version is authoritative</li>
-              <li>English translation available below</li>
-              <li>Raw text files remain downloadable</li>
+              <li>Documents are loaded from the same TXT sources as the app</li>
+              <li>English is listed first for convenience</li>
+              <li>German remains the authoritative version</li>
+              <li>Both panels start collapsed so visitors can choose</li>
             </ul>
           </aside>
         </section>
@@ -847,32 +861,34 @@ async function renderLegalPage(page) {
         </section>
 
         <section class="content-section legal-section">
+          <div class="section-heading">
+            <h2>Open a document version</h2>
+            <p>Both versions stay collapsed at first. Open the version you want to read and the page will load it on demand from the legal TXT source files.</p>
+          </div>
           <div class="legal-stack">
-            <article class="legal-card">
-              <div class="legal-card-header">
-                <span class="eyebrow eyebrow-inline">Authoritative German version</span>
-                <h2>${escapeHtml(page.title)}</h2>
-              </div>
-              <div class="legal-prose" lang="de">
-                ${renderLegalRichText(germanText)}
-              </div>
-            </article>
-
-            <details class="translation-card">
-              <summary>Open English translation</summary>
-              <div class="legal-prose" lang="en">
-                ${renderLegalRichText(englishText)}
-              </div>
-            </details>
+            ${renderLegalLoaderPanel({
+              title: 'English translation',
+              description: 'Convenience translation loaded dynamically from the legal text source.',
+              lang: 'en',
+              src: page.downloads[1]?.href ?? '',
+            })}
+            ${renderLegalLoaderPanel({
+              title: 'Verbindliche deutsche Fassung',
+              description: 'Legally binding German version loaded dynamically from the legal text source.',
+              lang: 'de',
+              src: page.downloads[0]?.href ?? '',
+              authoritative: true,
+            })}
           </div>
         </section>
       </main>
     `,
     schemas: [organizationSchema()],
+    scripts: ['/site-assets/legal-documents.js'],
   });
 }
 
-function renderDocument({ route, title, description, lang, content, schemas }) {
+function renderDocument({ route, title, description, lang, content, schemas, scripts = [] }) {
   const absoluteUrl = canonicalUrl(route);
   const metaTitle = `${appName} | ${title}`;
   return `<!doctype html>
@@ -911,9 +927,155 @@ function renderDocument({ route, title, description, lang, content, schemas }) {
     ${content}
     ${renderFooter()}
   </div>
+  ${scripts.map((src) => `<script src="${src}" defer></script>`).join('\n  ')}
 </body>
 </html>
 `;
+}
+
+function renderLegalLoaderScript() {
+  return `const escapeHtml = (value) =>
+  String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+
+const toParagraph = (lines) => {
+  const trimmedLines = lines.map((line) => line.trim()).filter(Boolean);
+  if (trimmedLines.length === 0) {
+    return '';
+  }
+
+  const shouldUseBreaks =
+    trimmedLines.length > 1 &&
+    trimmedLines.every((line) => !/[.!?;:]$/.test(line)) &&
+    trimmedLines.every((line) => line.length < 100);
+
+  if (shouldUseBreaks) {
+    return '<p>' + trimmedLines.map(escapeHtml).join('<br>') + '</p>';
+  }
+
+  return '<p>' + trimmedLines.map(escapeHtml).join(' ') + '</p>';
+};
+
+const renderLegalRichText = (sourceText) => {
+  const lines = sourceText.replace(/\\r\\n/g, '\\n').split('\\n');
+  const blocks = [];
+  let paragraphLines = [];
+  let listItems = [];
+  let awaitingHeading = false;
+  let headingConsumed = false;
+
+  const flushParagraph = () => {
+    if (paragraphLines.length > 0) {
+      blocks.push(toParagraph(paragraphLines));
+      paragraphLines = [];
+    }
+  };
+
+  const flushList = () => {
+    if (listItems.length > 0) {
+      blocks.push('<ul>' + listItems.map((item) => '<li>' + escapeHtml(item) + '</li>').join('') + '</ul>');
+      listItems = [];
+    }
+  };
+
+  for (const rawLine of lines) {
+    const line = rawLine.trimEnd();
+    const trimmed = line.trim();
+
+    if (trimmed === '###') {
+      flushParagraph();
+      flushList();
+      awaitingHeading = !headingConsumed;
+      headingConsumed = !awaitingHeading;
+      continue;
+    }
+
+    if (awaitingHeading && trimmed) {
+      blocks.push('<h2>' + escapeHtml(trimmed) + '</h2>');
+      awaitingHeading = false;
+      headingConsumed = true;
+      continue;
+    }
+
+    if (trimmed === '') {
+      flushParagraph();
+      flushList();
+      headingConsumed = false;
+      continue;
+    }
+
+    if (/^[-*]\\s+/.test(trimmed)) {
+      flushParagraph();
+      listItems.push(trimmed.replace(/^[-*]\\s+/, ''));
+      headingConsumed = false;
+      continue;
+    }
+
+    if (/^\\d+\\)/.test(trimmed)) {
+      flushParagraph();
+      flushList();
+      blocks.push('<h3>' + escapeHtml(trimmed) + '</h3>');
+      headingConsumed = false;
+      continue;
+    }
+
+    paragraphLines.push(trimmed);
+    headingConsumed = false;
+  }
+
+  flushParagraph();
+  flushList();
+  return blocks.join('\\n');
+};
+
+const loadLegalDocument = async (details) => {
+  if (details.dataset.loaded === 'true' || details.dataset.loading === 'true') {
+    return;
+  }
+
+  const src = details.dataset.src;
+  const status = details.querySelector('[data-legal-status]');
+  const content = details.querySelector('[data-legal-content]');
+
+  if (!src || !status || !content) {
+    return;
+  }
+
+  details.dataset.loading = 'true';
+  status.hidden = false;
+  status.textContent = 'Loading document…';
+
+  try {
+    const response = await fetch(src, { credentials: 'same-origin' });
+    if (!response.ok) {
+      throw new Error('Request failed with status ' + response.status);
+    }
+
+    const text = await response.text();
+    content.innerHTML = renderLegalRichText(text);
+    content.hidden = false;
+    status.hidden = true;
+    details.dataset.loaded = 'true';
+  } catch (error) {
+    status.hidden = false;
+    status.textContent = 'The document could not be loaded. You can still use the text download links above.';
+    console.error(error);
+  } finally {
+    details.dataset.loading = 'false';
+  }
+};
+
+document.querySelectorAll('[data-legal-doc]').forEach((details) => {
+  details.addEventListener('toggle', () => {
+    if (details.open) {
+      void loadLegalDocument(details);
+    }
+  });
+});\n`;
 }
 
 function renderCss() {
@@ -1373,6 +1535,10 @@ img {
   gap: 1rem;
 }
 
+.legal-document-card {
+  overflow: hidden;
+}
+
 .legal-card,
 .translation-card {
   padding: clamp(1rem, 2vw, 1.5rem);
@@ -1387,6 +1553,56 @@ img {
 .translation-card summary {
   cursor: pointer;
   font-weight: 700;
+}
+
+.legal-document-summary {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.legal-document-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.legal-document-title {
+  font-size: 1rem;
+}
+
+.legal-document-description {
+  color: var(--site-muted);
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.legal-document-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.85rem;
+  padding: 0 0.65rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--site-primary) 14%, #fff);
+  color: #0f5a1d;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.legal-document-chip--muted {
+  background: color-mix(in srgb, var(--site-secondary) 10%, #fff);
+  color: #1d4ed8;
+}
+
+.legal-status {
+  margin-top: 0.95rem;
+  padding: 0.9rem 1rem;
+  border-radius: var(--site-radius-md);
+  border: 1px dashed var(--site-outline);
+  background: color-mix(in srgb, white 74%, transparent);
+  color: var(--site-muted);
 }
 
 .translation-card > .legal-prose {
@@ -1525,13 +1741,14 @@ async function writeRoute(route, html) {
 async function writeStaticFiles() {
   await ensureDir(path.join(publicRoot, 'site-assets'));
   await fs.writeFile(path.join(publicRoot, 'site-assets', 'public-pages.css'), renderCss(), 'utf8');
+  await fs.writeFile(path.join(publicRoot, 'site-assets', 'legal-documents.js'), renderLegalLoaderScript(), 'utf8');
 
   for (const page of marketingPages) {
     await writeRoute(page.route, renderMarketingPage(page));
   }
 
   for (const page of legalPages) {
-    await writeRoute(page.route, await renderLegalPage(page));
+    await writeRoute(page.route, renderLegalPage(page));
   }
 
   const sitemapEntries = allRoutes

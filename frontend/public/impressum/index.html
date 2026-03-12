@@ -4,18 +4,18 @@
   <meta charset="utf-8">
   <title>MessageDrop | Impressum / Legal Notice</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-  <meta name="description" content="Static legal notice page for MessageDrop with provider details and DSA contact information.">
+  <meta name="description" content="Dynamic legal notice page for MessageDrop that loads the current German and English legal text files on demand.">
   <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
   <meta name="theme-color" content="#05a51d">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="MessageDrop">
   <meta property="og:title" content="MessageDrop | Impressum / Legal Notice">
-  <meta property="og:description" content="Static legal notice page for MessageDrop with provider details and DSA contact information.">
+  <meta property="og:description" content="Dynamic legal notice page for MessageDrop that loads the current German and English legal text files on demand.">
   <meta property="og:url" content="https://messagedrop.net/impressum/">
   <meta property="og:image" content="https://messagedrop.net/icons/icon-512x512.png">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="MessageDrop | Impressum / Legal Notice">
-  <meta name="twitter:description" content="Static legal notice page for MessageDrop with provider details and DSA contact information.">
+  <meta name="twitter:description" content="Dynamic legal notice page for MessageDrop that loads the current German and English legal text files on demand.">
   <meta name="twitter:image" content="https://messagedrop.net/icons/icon-512x512.png">
   <link rel="canonical" href="https://messagedrop.net/impressum/">
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -53,7 +53,7 @@
           <div class="hero-copy">
             <span class="eyebrow">Impressum</span>
             <h1>Legal notice outside the app</h1>
-            <p class="hero-text">The legal notice is exposed as a normal HTML page so users and regulators can access provider details directly without opening the application.</p>
+            <p class="hero-text">The legal notice stays outside the app and loads directly from the legal text source files so provider details stay synchronized.</p>
             <div class="cta-row">
               <a class="button button-secondary" href="/assets/legal/legal-notice-de.txt">German text version</a><a class="button button-secondary" href="/assets/legal/legal-notice-en.txt">English text version</a>
             </div>
@@ -64,10 +64,10 @@
             </div>
             <h2>Quick legal overview</h2>
             <ul class="check-list">
-              <li>Static HTML page outside the app</li>
-              <li>German version is authoritative</li>
-              <li>English translation available below</li>
-              <li>Raw text files remain downloadable</li>
+              <li>Documents are loaded from the same TXT sources as the app</li>
+              <li>English is listed first for convenience</li>
+              <li>German remains the authoritative version</li>
+              <li>Both panels start collapsed so visitors can choose</li>
             </ul>
           </aside>
         </section>
@@ -117,66 +117,41 @@
         </section>
 
         <section class="content-section legal-section">
+          <div class="section-heading">
+            <h2>Open a document version</h2>
+            <p>Both versions stay collapsed at first. Open the version you want to read and the page will load it on demand from the legal TXT source files.</p>
+          </div>
           <div class="legal-stack">
-            <article class="legal-card">
-              <div class="legal-card-header">
-                <span class="eyebrow eyebrow-inline">Authoritative German version</span>
-                <h2>Impressum / Legal Notice</h2>
-              </div>
-              <div class="legal-prose" lang="de">
-                <p>IMPRESSUM</p>
-<p>(Anbieterkennzeichnung gemäß § 5 Digitale-Dienste-Gesetz – DDG)</p>
-<p>Stand: 12. April 2026</p>
-<h2>Diensteanbieter</h2>
-<p>JackTools.Net UG (haftungsbeschränkt)<br>Im Kirchfeld 27<br>38304 Wolfenbüttel<br>Deutschland</p>
-<p>Telefon: +49 (0) 176 / 41 23 57 74<br>E-Mail: jacktoolsnet@gmail.com</p>
-<h2>Vertretungsberechtigter Geschäftsführer</h2>
-<p>Christian Wagner, Dipl.-Inform. (FH)</p>
-<h2>Handelsregister</h2>
-<p>Registergericht: Ingolstadt<br>Registernummer: HRB 5933</p>
-<h2>Umsatzsteuer-Identifikationsnummer</h2>
-<p>gemäß § 27a Umsatzsteuergesetz (UStG)</p>
-<p>DE277133529</p>
-<h2>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
-<p>Christian Wagner<br>Im Kirchfeld 27<br>38304 Wolfenbüttel<br>Deutschland</p>
-<h2>Verbraucherstreitbeilegung</h2>
-<p>Wir sind weder verpflichtet noch bereit, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
-<h2>Digital Services Act (DSA) – Zentrale Kontaktstelle</h2>
-<p>Gemäß Art. 11 und Art. 12 Digital Services Act (DSA):</p>
-<p>JackTools.Net UG (haftungsbeschränkt)<br>Geschäftsführer: Christian Wagner<br>Im Kirchfeld 27<br>38304 Wolfenbüttel<br>Deutschland</p>
-<p>Telefon: +49 (0) 176 / 41 23 57 74<br>E-Mail: jacktoolsnet@gmail.com</p>
-<p>Die Kontaktaufnahme ist in deutscher oder englischer Sprache möglich.</p>
-              </div>
-            </article>
-
-            <details class="translation-card">
-              <summary>Open English translation</summary>
-              <div class="legal-prose" lang="en">
-                <p>IMPRINT (LEGAL NOTICE – ENGLISH TRANSLATION)</p>
-<p>Pursuant to Section 5 of the German Digital Services Act (Digitale-Dienste-Gesetz – DDG)</p>
-<h2>Important notice</h2>
-<p>This English version is provided for convenience only. The German version (“Impressum”) is the legally binding version. In the event of discrepancies, the German text shall prevail.</p>
-<h2>Service Provider</h2>
-<p>JackTools.Net UG (limited liability)<br>Im Kirchfeld 27<br>38304 Wolfenbüttel<br>Germany</p>
-<p>Phone: +49 (0) 176 / 41 23 57 74<br>Email: jacktoolsnet@gmail.com</p>
-<h2>Authorized Managing Director</h2>
-<p>Christian Wagner, Dipl.-Inform. (FH)</p>
-<h2>Commercial Register</h2>
-<p>Court of registration: Ingolstadt<br>Registration number: HRB 5933</p>
-<h2>VAT Identification Number</h2>
-<p>In accordance with Section 27a of the German VAT Act (UStG):</p>
-<p>DE277133529</p>
-<h2>Responsible for Content (Section 18 (2) German State Media Treaty – MStV)</h2>
-<p>Christian Wagner<br>Im Kirchfeld 27<br>38304 Wolfenbüttel<br>Germany</p>
-<h2>Consumer Dispute Resolution</h2>
-<p>We are neither willing nor obliged to participate in dispute resolution proceedings before a consumer arbitration board.</p>
-<h2>Digital Services Act (DSA) – Central Contact Point</h2>
-<p>Pursuant to Articles 11 and 12 of the Digital Services Act (DSA):</p>
-<p>JackTools.Net UG (limited liability)<br>Managing Director: Christian Wagner<br>Im Kirchfeld 27<br>38304 Wolfenbüttel<br>Germany</p>
-<p>Phone: +49 (0) 176 / 41 23 57 74<br>Email: jacktoolsnet@gmail.com</p>
-<p>Contact may be made in German or English.</p>
-              </div>
-            </details>
+            
+    <details class="translation-card legal-document-card" data-legal-doc data-src="/assets/legal/legal-notice-en.txt">
+      <summary>
+        <span class="legal-document-summary">
+          <span class="legal-document-title-row">
+            <span class="legal-document-title">English translation</span>
+            <span class="legal-document-chip legal-document-chip--muted">Translation</span>
+          </span>
+          <span class="legal-document-description">Convenience translation loaded dynamically from the legal text source.</span>
+        </span>
+      </summary>
+      <div class="legal-status" data-legal-status aria-live="polite">Open this panel to load the document.</div>
+      <div class="legal-prose" data-legal-content lang="en" hidden></div>
+    </details>
+  
+            
+    <details class="translation-card legal-document-card" data-legal-doc data-src="/assets/legal/legal-notice-de.txt">
+      <summary>
+        <span class="legal-document-summary">
+          <span class="legal-document-title-row">
+            <span class="legal-document-title">Verbindliche deutsche Fassung</span>
+            <span class="legal-document-chip">Authoritative</span>
+          </span>
+          <span class="legal-document-description">Legally binding German version loaded dynamically from the legal text source.</span>
+        </span>
+      </summary>
+      <div class="legal-status" data-legal-status aria-live="polite">Open this panel to load the document.</div>
+      <div class="legal-prose" data-legal-content lang="de" hidden></div>
+    </details>
+  
           </div>
         </section>
       </main>
@@ -193,5 +168,6 @@
     </footer>
   
   </div>
+  <script src="/site-assets/legal-documents.js" defer></script>
 </body>
 </html>
