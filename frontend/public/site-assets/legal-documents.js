@@ -109,9 +109,15 @@ const loadLegalDocument = async (details) => {
     return;
   }
 
+  const isGerman = document.documentElement.lang.toLowerCase().startsWith('de');
+  const loadingText = isGerman ? 'Dokument wird geladen…' : 'Loading document…';
+  const errorText = isGerman
+    ? 'Das Dokument konnte nicht geladen werden. Du kannst weiterhin die Textlinks oben verwenden.'
+    : 'The document could not be loaded. You can still use the text download links above.';
+
   details.dataset.loading = 'true';
   status.hidden = false;
-  status.textContent = 'Loading document…';
+  status.textContent = loadingText;
 
   try {
     const response = await fetch(src, { credentials: 'same-origin' });
@@ -126,7 +132,7 @@ const loadLegalDocument = async (details) => {
     details.dataset.loaded = 'true';
   } catch (error) {
     status.hidden = false;
-    status.textContent = 'The document could not be loaded. You can still use the text download links above.';
+    status.textContent = errorText;
     console.error(error);
   } finally {
     details.dataset.loading = 'false';

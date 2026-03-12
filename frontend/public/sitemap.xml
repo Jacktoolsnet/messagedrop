@@ -4,27 +4,51 @@
     <loc>https://messagedrop.net/</loc>
   </url>
   <url>
-    <loc>https://messagedrop.net/what-is-messagedrop/</loc>
+    <loc>https://messagedrop.net/de/what-is-messagedrop/</loc>
   </url>
   <url>
-    <loc>https://messagedrop.net/how-it-works/</loc>
+    <loc>https://messagedrop.net/de/how-it-works/</loc>
   </url>
   <url>
-    <loc>https://messagedrop.net/faq/</loc>
+    <loc>https://messagedrop.net/de/faq/</loc>
   </url>
   <url>
-    <loc>https://messagedrop.net/legal/</loc>
+    <loc>https://messagedrop.net/de/legal/</loc>
   </url>
   <url>
-    <loc>https://messagedrop.net/privacy/</loc>
+    <loc>https://messagedrop.net/en/what-is-messagedrop/</loc>
   </url>
   <url>
-    <loc>https://messagedrop.net/terms-of-service/</loc>
+    <loc>https://messagedrop.net/en/how-it-works/</loc>
   </url>
   <url>
-    <loc>https://messagedrop.net/impressum/</loc>
+    <loc>https://messagedrop.net/en/faq/</loc>
   </url>
   <url>
-    <loc>https://messagedrop.net/disclaimer/</loc>
+    <loc>https://messagedrop.net/en/legal/</loc>
+  </url>
+  <url>
+    <loc>https://messagedrop.net/de/privacy/</loc>
+  </url>
+  <url>
+    <loc>https://messagedrop.net/de/terms-of-service/</loc>
+  </url>
+  <url>
+    <loc>https://messagedrop.net/de/impressum/</loc>
+  </url>
+  <url>
+    <loc>https://messagedrop.net/de/disclaimer/</loc>
+  </url>
+  <url>
+    <loc>https://messagedrop.net/en/privacy/</loc>
+  </url>
+  <url>
+    <loc>https://messagedrop.net/en/terms-of-service/</loc>
+  </url>
+  <url>
+    <loc>https://messagedrop.net/en/impressum/</loc>
+  </url>
+  <url>
+    <loc>https://messagedrop.net/en/disclaimer/</loc>
   </url>
 </urlset>

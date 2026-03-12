@@ -86,6 +86,10 @@ img {
   padding: 1rem 0 2rem;
 }
 
+.redirect-shell {
+  max-width: 760px;
+}
+
 .site-header,
 .site-footer,
 .hero,
@@ -254,6 +258,10 @@ img {
   padding: clamp(1.25rem, 2vw, 1.9rem);
   border-radius: var(--site-radius-xl);
   background: var(--site-surface);
+}
+
+.hero--single {
+  grid-template-columns: 1fr;
 }
 
 .hero-copy,

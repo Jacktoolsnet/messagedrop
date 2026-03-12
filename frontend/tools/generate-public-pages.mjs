@@ -302,7 +302,7 @@ const legalPages = [
   {
     route: '/privacy/',
     slug: 'privacy',
-    lang: 'de',
+    lang: 'en',
     title: 'Privacy Policy',
     description: 'Dynamic privacy policy page for MessageDrop that loads the current German and English legal text files on demand.',
     heroIcon: 'privacy_tip',
@@ -326,7 +326,7 @@ const legalPages = [
   {
     route: '/terms-of-service/',
     slug: 'terms-of-service',
-    lang: 'de',
+    lang: 'en',
     title: 'Terms of Service',
     description: 'Dynamic terms of service page for MessageDrop that loads the current German and English legal text files on demand.',
     heroIcon: 'rule',
@@ -350,7 +350,7 @@ const legalPages = [
   {
     route: '/impressum/',
     slug: 'impressum',
-    lang: 'de',
+    lang: 'en',
     title: 'Impressum / Legal Notice',
     description: 'Dynamic legal notice page for MessageDrop that loads the current German and English legal text files on demand.',
     heroIcon: 'business',
@@ -374,7 +374,7 @@ const legalPages = [
   {
     route: '/disclaimer/',
     slug: 'disclaimer',
-    lang: 'de',
+    lang: 'en',
     title: 'Disclaimer',
     description: 'Dynamic disclaimer and liability notice page for MessageDrop that loads the current German and English legal text files on demand.',
     heroIcon: 'warning',
@@ -397,8 +397,474 @@ const legalPages = [
   },
 ];
 
-const legalRouteSet = new Set(legalPages.map((page) => trimTrailingSlash(page.route)));
-const allRoutes = ['/', ...marketingPages.map((page) => page.route), ...legalPages.map((page) => page.route)];
+const germanMarketingPages = [
+  {
+    route: '/what-is-messagedrop/',
+    slug: 'what-is-messagedrop',
+    lang: 'de',
+    title: 'Was ist MessageDrop?',
+    description:
+      'MessageDrop ist eine globale Karte, auf der Menschen Nachrichten an realen Orten hinterlassen können — digitales Graffiti für die Weltkarte.',
+    heroIcon: 'globe_location_pin',
+    eyebrow: 'Was ist MessageDrop?',
+    heroTitle: 'Eine globale Karte, auf der Menschen Nachrichten an realen Orten hinterlassen können.',
+    heroText:
+      'MessageDrop ist digitales Graffiti für die Weltkarte. Öffentliche Beiträge hängen an Orten statt an Timelines, während private Notizen und Chats nah am Nutzer und am Gerät bleiben.',
+    heroAsideTitle: 'Warum es sich anders anfühlt',
+    heroAsideItems: [
+      'Ortsbasiert statt feedbasiert',
+      'Local-first und datenschutzorientiert',
+      'Auch ohne Konto sinnvoll nutzbar',
+      'Gebaut für Entdeckung, Kontext und lokale Relevanz',
+    ],
+    sections: [
+      {
+        title: 'Kernideen',
+        intro:
+          'Die öffentliche Website soll das Konzept in wenigen Sekunden erklären. Darauf baut die App auf.',
+        tiles: [
+          {
+            icon: 'location_on',
+            title: 'Nachrichten gehören an Orte',
+            body:
+              'Öffentliche Notizen, Kommentare und Entdeckungen werden an reale Orte gebunden. So wird die Karte selbst zum Einstiegspunkt.',
+          },
+          {
+            icon: 'draw',
+            title: 'Digitales Graffiti statt noch ein Feed',
+            body:
+              'MessageDrop soll offen, direkt und räumlich wirken. Es geht darum, Spuren in der Welt zu hinterlassen, nicht um endlose algorithmische Timelines.',
+          },
+          {
+            icon: 'lock',
+            title: 'Local-first, wo immer möglich',
+            body:
+              'Ein großer Teil der Daten bleibt auf dem Gerät. Das reduziert serverseitige Verarbeitung und unterstützt ein datenschutzorientiertes Erlebnis.',
+          },
+          {
+            icon: 'travel_explore',
+            title: 'Kontext rund um dich entdecken',
+            body:
+              'Statt nur einem Profilgraphen zu folgen, können Nutzer Orte, lokale Informationen und soziale Spuren in einer räumlichen Oberfläche erkunden.',
+          },
+        ],
+      },
+      {
+        title: 'Was man damit tun kann',
+        intro:
+          'MessageDrop eignet sich für lokale Entdeckung, leichte Community-Signale und private Anschlusskommunikation.',
+        featureList: [
+          'Eine öffentliche Nachricht an einem realen Ort hinterlassen',
+          'Lesen, was Menschen in der Nähe oder in einer anderen Stadt hinterlassen haben',
+          'Private Notizen erstellen, die auf dem eigenen Gerät bleiben',
+          'Privat mit Kontakten chatten',
+          'Orten und Kontakten folgen, sofern unterstützt',
+          'Lokalen Kontext ohne personalisierten Ranking-Feed erkunden',
+        ],
+      },
+      {
+        title: 'Für wen es interessant ist',
+        intro:
+          'Für den Launch ist eine fokussierte Nutzungsgeschichte meist stärker als zu breite Kommunikation. Das sind naheliegende Startpunkte.',
+        cards: [
+          {
+            icon: 'groups',
+            title: 'Lokale Communities',
+            body: 'Nachbarschaftssignale, spontane Tipps, Mikro-Updates und ortsbezogene Gespräche.',
+          },
+          {
+            icon: 'explore',
+            title: 'Reisende und Stadterkunder',
+            body: 'Eine Möglichkeit, soziale Spuren, Erinnerungen und Kontext direkt an Orten statt verteilt über viele Apps zu sehen.',
+          },
+          {
+            icon: 'storefront',
+            title: 'Orte mit Geschichte',
+            body: 'Events, Locations und Plätze können zu Behältern für lebendigen öffentlichen Kontext werden.',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    route: '/how-it-works/',
+    slug: 'how-it-works',
+    lang: 'de',
+    title: 'Wie MessageDrop funktioniert',
+    description:
+      'Sieh dir an, wie MessageDrop Orte zu Einstiegspunkten für öffentliche Nachrichten, lokalen Kontext, private Notizen und private Chats macht.',
+    heroIcon: 'alt_route',
+    eyebrow: 'So funktioniert es',
+    heroTitle: 'Erst der Ort. Dann die Nachricht. Immer mit Kontext.',
+    heroText:
+      'MessageDrop beginnt mit der Karte. Nutzer erkunden Orte, öffnen ortsbezogene Inhalte, hinterlassen öffentliche Drops und machen bei Bedarf mit privaten Notizen oder privaten Chats weiter.',
+    heroAsideTitle: 'In einem Satz',
+    heroAsideItems: [
+      'Karte öffnen',
+      'Ort auswählen',
+      'Drop lesen oder hinterlassen',
+      'Privat weitermachen, wenn es sinnvoll ist',
+    ],
+    sections: [
+      {
+        title: 'Vier einfache Schritte',
+        timeline: [
+          {
+            icon: 'map',
+            title: '1. Karte öffnen',
+            body:
+              'Die Karte ist der Haupteinstieg. Nutzer schauen sich Orte in der Nähe an oder springen in einen anderen Bereich, den sie erkunden möchten.',
+          },
+          {
+            icon: 'place_item',
+            title: '2. Einen realen Ort auswählen',
+            body:
+              'Ein Ort wird zum Anker für Inhalte. So bleiben Beiträge geografisch verankert statt in einem generischen sozialen Feed zu verschwimmen.',
+          },
+          {
+            icon: 'chat_add_on',
+            title: '3. Einen Drop lesen oder hinterlassen',
+            body:
+              'Nutzer können öffentliche Nachrichten, Kommentare und Kontext an diesem Ort entdecken oder selbst einen Beitrag hinzufügen.',
+          },
+          {
+            icon: 'forum',
+            title: '4. Mit eigener Struktur weitermachen',
+            body:
+              'Private Notizen, Kontakte und Chats unterstützen persönlichere oder dauerhaftere Abläufe, ohne das Produkt zu einem klassischen sozialen Netzwerk zu machen.',
+          },
+        ],
+      },
+      {
+        title: 'Produktprinzipien',
+        tiles: [
+          {
+            icon: 'privacy_tip',
+            title: 'Datenschutzorientiert',
+            body:
+              'Local-first-Speicherung, verschlüsselte Bereiche und Datenminimierung prägen die technische Umsetzung im Hintergrund.',
+          },
+          {
+            icon: 'visibility',
+            title: 'Offene Entdeckung',
+            body:
+              'Menschen können öffentliche Inhalte erkunden, ohne zuerst durch ein schwergewichtiges Konto-Erlebnis zu müssen.',
+          },
+          {
+            icon: 'account_tree',
+            title: 'Kein personalisierter Ranking-Feed',
+            body:
+              'Öffentliche Inhalte sind nicht um einen engagementgetriebenen Empfehlungsstrom herum gebaut.',
+          },
+          {
+            icon: 'near_me',
+            title: 'Unterwegs sinnvoll',
+            body:
+              'Das Produkt passt natürlich zu Spaziergängen, Reisen, Nachbarschaften, Events und ortsbezogener Entdeckung.',
+          },
+        ],
+      },
+      {
+        title: 'Typische Anwendungsfälle',
+        cards: [
+          {
+            icon: 'campaign',
+            title: 'Lokales Signalbrett',
+            body: 'Updates, Warnungen, Tipps oder Beobachtungen teilen, die gerade deshalb wichtig sind, weil sie an einem bestimmten Ort passiert sind.',
+          },
+          {
+            icon: 'history_edu',
+            title: 'Erinnerungs-Drops',
+            body: 'Die Karte als Erinnerungsschicht nutzen, in der Geschichten und Beobachtungen an Orten hängen bleiben.',
+          },
+          {
+            icon: 'connect_without_contact',
+            title: 'Öffentlich zu privat',
+            body: 'Etwas öffentlich entdecken und dann bei Bedarf in private Organisation oder Kommunikation wechseln.',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    route: '/faq/',
+    slug: 'faq',
+    lang: 'de',
+    title: 'MessageDrop FAQ',
+    description:
+      'Antworten auf häufige Fragen zu MessageDrop, darunter Funktionsweise, Datenschutz, Konten, öffentliche Nachrichten und rechtliche Grundlagen.',
+    heroIcon: 'quiz',
+    eyebrow: 'FAQ',
+    heroTitle: 'Kurze Antworten auf die Fragen, die zuerst gestellt werden.',
+    heroText:
+      'Diese Seite ist für Besucher, Suchmaschinen und KI-Systeme gedacht, die eine klare Erklärung brauchen, was MessageDrop ist und wie es funktioniert.',
+    faqs: [
+      {
+        question: 'Was ist MessageDrop?',
+        answer:
+          'MessageDrop ist eine globale Karte, auf der Menschen Nachrichten an realen Orten hinterlassen können. Die Kernidee ist digitales Graffiti für die Weltkarte: Öffentliche Nachrichten gehören an Orte und nicht nur an Profile oder Feeds.',
+      },
+      {
+        question: 'Brauche ich ein Konto, um MessageDrop zu nutzen?',
+        answer:
+          'Nein. Öffentliche Inhalte lassen sich grundsätzlich auch ohne Nutzerkonto erkunden. Einige Funktionen wie private Notizen, Kontakte und private Chats erfordern jedoch ein Konto.',
+      },
+      {
+        question: 'Worin unterscheidet sich MessageDrop von einem normalen sozialen Netzwerk?',
+        answer:
+          'MessageDrop denkt vom Ort aus. Karte und reale Orte stehen im Mittelpunkt, und öffentliche Inhalte werden nicht um einen personalisierten Empfehlungs-Feed organisiert.',
+      },
+      {
+        question: 'Ist MessageDrop datenschutzorientiert?',
+        answer:
+          'Ja. MessageDrop verfolgt einen datenschutzorientierten Local-first-Ansatz, bei dem ein großer Teil der Daten — soweit technisch möglich — primär auf dem Gerät des Nutzers gespeichert wird.',
+      },
+      {
+        question: 'Sind private Chats verschlüsselt?',
+        answer:
+          'Laut aktueller Produkt- und Rechtsdokumentation werden private Chats verschlüsselt übertragen und sind für den Anbieter grundsätzlich nicht im Klartext einsehbar.',
+      },
+      {
+        question: 'Verwendet MessageDrop ein personalisiertes Ranking-System?',
+        answer:
+          'Nein. In den Rechts- und Datenschutztexten steht, dass öffentliche Inhalte nicht durch ein personalisiertes Empfehlungs- oder Ranking-System algorithmisch gefiltert oder priorisiert werden.',
+      },
+      {
+        question: 'Wie alt muss man sein, um MessageDrop zu nutzen?',
+        answer:
+          'Nutzer müssen mindestens 16 Jahre alt sein. Wer 16 oder 17 Jahre alt ist, benötigt laut aktueller Rechtsdokumentation die Zustimmung der Eltern oder Erziehungsberechtigten.',
+      },
+      {
+        question: 'Kann man externe Inhaltsanbieter deaktiviert lassen?',
+        answer:
+          'Ja. Externe Inhalte wie YouTube oder Spotify sind so ausgelegt, dass sie deaktiviert bleiben, bis ein Nutzer den jeweiligen Anbieter ausdrücklich aktiviert.',
+      },
+      {
+        question: 'Ist MessageDrop ein Notfalldienst?',
+        answer: 'Nein. MessageDrop ist ausdrücklich kein Notfalldienst.',
+      },
+    ],
+  },
+  {
+    route: '/legal/',
+    slug: 'legal',
+    lang: 'de',
+    title: 'Rechtliche Informationen',
+    description:
+      'Zentrale Rechtsübersicht für MessageDrop mit Datenschutzerklärung, Nutzungsbedingungen, Impressum und Haftungshinweis.',
+    heroIcon: 'gavel',
+    eyebrow: 'Rechtliches',
+    heroTitle: 'Öffentliche Rechtsseiten außerhalb der App.',
+    heroText:
+      'Diese Seiten werden als normale statische HTML-Seiten ausgeliefert, damit Besucher, Suchmaschinen und KI-Systeme die rechtlichen Informationen direkt erreichen können.',
+    legalTiles: [
+      {
+        href: '/privacy/',
+        icon: 'privacy_tip',
+        title: 'Datenschutzerklärung',
+        body: 'Datenschutzorientierung, Local-first-Speicherung, Drittanbieter-Einbettungen, Push-Benachrichtigungen und DSGVO-Informationen.',
+      },
+      {
+        href: '/terms-of-service/',
+        icon: 'rule',
+        title: 'Nutzungsbedingungen',
+        body: 'Regeln zur Nutzung von MessageDrop, zu verbotenen Inhalten, Moderation und allgemeinem Plattformverhalten.',
+      },
+      {
+        href: '/impressum/',
+        icon: 'business',
+        title: 'Impressum',
+        body: 'Anbieterangaben, Unternehmensdetails, DSA-Kontaktstelle und Hinweise zur Streitbeilegung.',
+      },
+      {
+        href: '/disclaimer/',
+        icon: 'warning',
+        title: 'Haftungshinweis',
+        body: 'Leistungsumfang, technische Grenzen, Mindestalter, Risiken lokaler Speicherung und Haftungshinweise.',
+      },
+    ],
+  },
+];
+
+const germanLegalPages = [
+  {
+    route: '/privacy/',
+    slug: 'privacy',
+    lang: 'de',
+    title: 'Datenschutzerklärung',
+    description: 'Dynamische Datenschutzerklärungs-Seite für MessageDrop, die die aktuellen deutschen und englischen Rechtstexte bei Bedarf lädt.',
+    heroIcon: 'privacy_tip',
+    eyebrow: 'Datenschutz',
+    heroTitle: 'Datenschutzerklärung außerhalb der App',
+    heroText:
+      'Diese Seite lädt die aktuelle Datenschutzerklärung direkt aus den juristischen Quelldateien. Maßgeblich ist die deutsche Fassung; die englische Version dient der Orientierung.',
+    downloads: [
+      { href: '/assets/legal/privacy-policy-de.txt', label: 'Deutsche Textfassung' },
+      { href: '/assets/legal/privacy-policy-en.txt', label: 'Englische Textfassung' },
+    ],
+    summaryTiles: [
+      { icon: 'devices', title: 'Local-first-Speicherung', body: 'Ein großer Teil der Daten soll primär auf dem Endgerät des Nutzers verbleiben.' },
+      { icon: 'visibility_off', title: 'Kein personalisiertes Ranking', body: 'Öffentliche Inhalte werden nicht über einen personalisierten Empfehlungs-Feed beschrieben.' },
+      { icon: 'encrypted', title: 'Geschützte private Kommunikation', body: 'Private Chats werden als verschlüsselt und technisch geschützt beschrieben.' },
+      { icon: 'toggle_off', title: 'Drittanbieter nur nach Aktivierung', body: 'Externe Anbieter sollen deaktiviert bleiben, bis Nutzer sie ausdrücklich freischalten.' },
+    ],
+  },
+  {
+    route: '/terms-of-service/',
+    slug: 'terms-of-service',
+    lang: 'de',
+    title: 'Nutzungsbedingungen',
+    description: 'Dynamische Seite mit den Nutzungsbedingungen für MessageDrop, die die aktuellen deutschen und englischen Rechtstexte bei Bedarf lädt.',
+    heroIcon: 'rule',
+    eyebrow: 'Nutzungsbedingungen',
+    heroTitle: 'Nutzungsbedingungen außerhalb der App',
+    heroText:
+      'Diese Seite lädt die aktuellen Nutzungsbedingungen direkt aus den juristischen Quelldateien, damit die öffentliche Seite mit den Quelldokumenten der App synchron bleibt.',
+    downloads: [
+      { href: '/assets/legal/terms-of-service-de.txt', label: 'Deutsche Textfassung' },
+      { href: '/assets/legal/terms-of-service-en.txt', label: 'Englische Textfassung' },
+    ],
+    summaryTiles: [
+      { icon: 'cake', title: '16+-Regel', body: 'Die Nutzung ist auf Personen beschränkt, die mindestens 16 Jahre alt sind.' },
+      { icon: 'public_off', title: 'Inhaltsregeln', body: 'Missbrauch, rechtswidrige Inhalte und die Veröffentlichung persönlicher Daten sind untersagt.' },
+      { icon: 'balance', title: 'DSA-Verfahren', body: 'Die Bedingungen beschreiben Moderation, Meldungen und Beschwerdeverfahren nach dem DSA.' },
+      { icon: 'save', title: 'Backups sind wichtig', body: 'Die Texte betonen, dass lokale Daten verloren gehen können und Wiederherstellung von Backups abhängt.' },
+    ],
+  },
+  {
+    route: '/impressum/',
+    slug: 'impressum',
+    lang: 'de',
+    title: 'Impressum',
+    description: 'Dynamische Impressums-Seite für MessageDrop, die die aktuellen deutschen und englischen Rechtstexte bei Bedarf lädt.',
+    heroIcon: 'business',
+    eyebrow: 'Impressum',
+    heroTitle: 'Impressum außerhalb der App',
+    heroText:
+      'Das Impressum bleibt als normale Website erreichbar und lädt direkt aus den juristischen Quelldateien, damit Anbieterangaben synchron bleiben.',
+    downloads: [
+      { href: '/assets/legal/legal-notice-de.txt', label: 'Deutsche Textfassung' },
+      { href: '/assets/legal/legal-notice-en.txt', label: 'Englische Textfassung' },
+    ],
+    summaryTiles: [
+      { icon: 'apartment', title: 'Anbieterangaben', body: 'Firmenname, Anschrift, Registerdaten und Umsatzsteuer-Identifikationsnummer.' },
+      { icon: 'person', title: 'Verantwortliche Person', body: 'Angaben zum Geschäftsführer und zur inhaltlich verantwortlichen Person.' },
+      { icon: 'support_agent', title: 'DSA-Kontaktstelle', body: 'Direkte Kontaktdaten für Kommunikation nach dem Digital Services Act.' },
+      { icon: 'gavel', title: 'Hinweis zur Streitbeilegung', body: 'Erklärung zur Teilnahme an Verbraucherstreitbeilegungsverfahren.' },
+    ],
+  },
+  {
+    route: '/disclaimer/',
+    slug: 'disclaimer',
+    lang: 'de',
+    title: 'Haftungshinweis',
+    description: 'Dynamische Seite mit Haftungshinweis und Disclaimer für MessageDrop, die die aktuellen deutschen und englischen Rechtstexte bei Bedarf lädt.',
+    heroIcon: 'warning',
+    eyebrow: 'Haftungshinweis',
+    heroTitle: 'Haftungshinweis außerhalb der App',
+    heroText:
+      'Diese Seite lädt den aktuellen Haftungshinweis direkt aus den juristischen Quelldateien. Er beschreibt technische Grenzen, Mindestalter, Risiken lokaler Speicherung und Leistungsgrenzen.',
+    downloads: [
+      { href: '/assets/legal/disclaimer-de.txt', label: 'Deutsche Textfassung' },
+      { href: '/assets/legal/disclaimer-en.txt', label: 'Englische Textfassung' },
+    ],
+    summaryTiles: [
+      { icon: 'error_med', title: 'Kein Notfalldienst', body: 'MessageDrop bietet ausdrücklich keinen Zugang zu Notfalldiensten.' },
+      { icon: 'storage', title: 'Lokale Daten können verloren gehen', body: 'Der Hinweis betont das Risiko des Verlusts lokal gespeicherter Daten auf dem Gerät.' },
+      { icon: 'shield', title: 'Datenschutzorientiertes Design', body: 'Das Produkt wird als datenschutzorientiert und datenminimierend beschrieben.' },
+      { icon: 'map', title: 'Ortsbezogene öffentliche Inhalte', body: 'Öffentliche Inhalte sind an Orte gebunden und können gemeldet, geprüft oder moderiert werden.' },
+    ],
+  },
+];
+
+const supportedLocales = ['de', 'en'];
+
+const appTaglineByLocale = {
+  de: 'Digitales Graffiti für die Weltkarte.',
+  en: appTagline,
+};
+
+const appClaimByLocale = {
+  de: 'Eine globale Karte, auf der Menschen Nachrichten an realen Orten hinterlassen können.',
+  en: appClaim,
+};
+
+const uiByLocale = {
+  de: {
+    navWhat: 'Was ist es?',
+    navHow: 'So funktioniert es',
+    navFaq: 'FAQ',
+    navPrivacy: 'Datenschutz',
+    navLegal: 'Rechtliches',
+    openApp: 'App öffnen',
+    legalPages: 'Rechtsseiten',
+    footerWhat: 'Was ist MessageDrop?',
+    footerHow: 'So funktioniert es',
+    footerFaq: 'FAQ',
+    footerPrivacy: 'Datenschutz',
+    footerTerms: 'Nutzungsbedingungen',
+    footerImprint: 'Impressum',
+    footerDisclaimer: 'Haftungshinweis',
+    redirectTitle: 'Sprache wird gewählt',
+    redirectText: 'Mit JavaScript wird automatisch die passende Sprachversion geöffnet. Ohne JavaScript kannst du die gewünschte Version hier direkt auswählen.',
+    openGerman: 'Deutsch öffnen',
+    openEnglish: 'Englisch öffnen',
+    openAppLegal: 'App öffnen',
+  },
+  en: {
+    navWhat: 'What is it?',
+    navHow: 'How it works',
+    navFaq: 'FAQ',
+    navPrivacy: 'Privacy',
+    navLegal: 'Legal',
+    openApp: 'Open app',
+    legalPages: 'Legal pages',
+    footerWhat: 'What is MessageDrop?',
+    footerHow: 'How it works',
+    footerFaq: 'FAQ',
+    footerPrivacy: 'Privacy',
+    footerTerms: 'Terms',
+    footerImprint: 'Impressum',
+    footerDisclaimer: 'Disclaimer',
+    redirectTitle: 'Choosing language',
+    redirectText: 'With JavaScript enabled, the matching language version opens automatically. Without JavaScript, you can choose the version directly below.',
+    openGerman: 'Open German',
+    openEnglish: 'Open English',
+    openAppLegal: 'Open app',
+  },
+};
+
+const germanMarketingByRoute = new Map(germanMarketingPages.map((page) => [page.route, page]));
+const germanLegalByRoute = new Map(germanLegalPages.map((page) => [page.route, page]));
+
+const localizedMarketingPages = supportedLocales.flatMap((locale) => {
+  const sourcePages = locale === 'de' ? germanMarketingPages : marketingPages;
+  return sourcePages.map((page) => ({
+    ...page,
+    locale,
+    baseRoute: page.route,
+    route: localeRoute(locale, page.route),
+  }));
+});
+
+const localizedLegalPages = supportedLocales.flatMap((locale) => {
+  const sourcePages = locale === 'de' ? germanLegalPages : legalPages;
+  return sourcePages.map((page) => ({
+    ...page,
+    locale,
+    baseRoute: page.route,
+    route: localeRoute(locale, page.route),
+  }));
+});
+
+const redirectPages = [...marketingPages, ...legalPages].map((page) => ({
+  route: page.route,
+  englishTitle: page.title,
+  germanTitle: germanMarketingByRoute.get(page.route)?.title ?? germanLegalByRoute.get(page.route)?.title ?? page.title,
+}));
+
+const legalRouteSet = new Set(localizedLegalPages.map((page) => trimTrailingSlash(page.baseRoute)));
+const allRoutes = ['/', ...localizedMarketingPages.map((page) => page.route), ...localizedLegalPages.map((page) => page.route)];
 
 function trimTrailingSlash(route) {
   if (route === '/') {
@@ -414,6 +880,21 @@ function normalizeRoute(route) {
   }
 
   return route.endsWith('/') ? route : `${route}/`;
+}
+
+function localeRoute(locale, route) {
+  const normalized = normalizeRoute(route);
+  return `/${locale}${normalized}`;
+}
+
+function stripLocalePrefix(route) {
+  const normalized = normalizeRoute(route);
+  const match = normalized.match(/^\/(de|en)(\/.*)$/);
+  if (!match) {
+    return normalized;
+  }
+
+  return match[2];
 }
 
 function canonicalUrl(route) {
@@ -524,14 +1005,14 @@ function jsonLd(data) {
   return `<script type="application/ld+json">${JSON.stringify(data)}</script>`;
 }
 
-function organizationSchema() {
+function organizationSchema(lang = 'en') {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: appName,
-    description: appClaim,
+    description: appClaimByLocale[lang] ?? appClaim,
     url: `${baseUrl}/`,
-    inLanguage: 'en',
+    inLanguage: lang,
     publisher: {
       '@type': 'Organization',
       name: 'JackTools.Net UG (limited liability)',
@@ -555,18 +1036,27 @@ function faqSchema(page) {
   };
 }
 
-function renderNav(currentRoute) {
+function alternateLinks(baseRoute) {
+  return [
+    { hreflang: 'de', href: canonicalUrl(localeRoute('de', baseRoute)) },
+    { hreflang: 'en', href: canonicalUrl(localeRoute('en', baseRoute)) },
+    { hreflang: 'x-default', href: canonicalUrl(baseRoute) },
+  ];
+}
+
+function renderNav(currentRoute, lang = 'en') {
+  const ui = uiByLocale[lang] ?? uiByLocale.en;
   const navItems = [
-    { href: '/what-is-messagedrop/', label: 'What is it?' },
-    { href: '/how-it-works/', label: 'How it works' },
-    { href: '/faq/', label: 'FAQ' },
-    { href: '/privacy/', label: 'Privacy' },
-    { href: '/legal/', label: 'Legal' },
+    { href: '/what-is-messagedrop/', label: ui.navWhat },
+    { href: '/how-it-works/', label: ui.navHow },
+    { href: '/faq/', label: ui.navFaq },
+    { href: '/privacy/', label: ui.navPrivacy },
+    { href: '/legal/', label: ui.navLegal },
   ];
 
   return navItems
     .map((item) => {
-      const current = trimTrailingSlash(currentRoute);
+      const current = trimTrailingSlash(stripLocalePrefix(currentRoute));
       const itemPath = trimTrailingSlash(item.href);
       const hasExactNavItem = navItems.some((other) => trimTrailingSlash(other.href) === current);
       const isLegalItem = itemPath === '/legal' && legalRouteSet.has(current) && !hasExactNavItem;
@@ -576,7 +1066,8 @@ function renderNav(currentRoute) {
     .join('');
 }
 
-function renderHeader(currentRoute) {
+function renderHeader(currentRoute, lang = 'en') {
+  const ui = uiByLocale[lang] ?? uiByLocale.en;
   return `
     <header class="site-header">
       <a class="brand" href="/" aria-label="Open MessageDrop app home">
@@ -585,33 +1076,34 @@ function renderHeader(currentRoute) {
         </span>
         <span class="brand-copy">
           <strong>${appName}</strong>
-          <span>${appTagline}</span>
+          <span>${appTaglineByLocale[lang] ?? appTagline}</span>
         </span>
       </a>
       <nav class="site-nav" aria-label="Primary">
-        ${renderNav(currentRoute)}
+        ${renderNav(currentRoute, lang)}
       </nav>
-      <a class="button button-primary button-small" href="/">Open app</a>
+      <a class="button button-primary button-small" href="/">${escapeHtml(ui.openApp)}</a>
     </header>
   `;
 }
 
-function renderFooter() {
+function renderFooter(lang = 'en') {
+  const ui = uiByLocale[lang] ?? uiByLocale.en;
   const links = [
-    { href: '/what-is-messagedrop/', label: 'What is MessageDrop?' },
-    { href: '/how-it-works/', label: 'How it works' },
-    { href: '/faq/', label: 'FAQ' },
-    { href: '/privacy/', label: 'Privacy' },
-    { href: '/terms-of-service/', label: 'Terms' },
-    { href: '/impressum/', label: 'Impressum' },
-    { href: '/disclaimer/', label: 'Disclaimer' },
+    { href: '/what-is-messagedrop/', label: ui.footerWhat },
+    { href: '/how-it-works/', label: ui.footerHow },
+    { href: '/faq/', label: ui.footerFaq },
+    { href: '/privacy/', label: ui.footerPrivacy },
+    { href: '/terms-of-service/', label: ui.footerTerms },
+    { href: '/impressum/', label: ui.footerImprint },
+    { href: '/disclaimer/', label: ui.footerDisclaimer },
   ];
 
   return `
     <footer class="site-footer">
       <div>
         <strong>${appName}</strong>
-        <p>${appClaim}</p>
+        <p>${appClaimByLocale[lang] ?? appClaim}</p>
       </div>
       <div class="footer-links">
         ${links.map((link) => `<a href="${link.href}">${escapeHtml(link.label)}</a>`).join('')}
@@ -621,26 +1113,28 @@ function renderFooter() {
 }
 
 function renderHero(page) {
+  const ui = uiByLocale[page.lang] ?? uiByLocale.en;
+  const hasAside = Boolean(page.heroAsideTitle) || (page.heroAsideItems?.length ?? 0) > 0;
   return `
-    <section class="hero">
+    <section class="hero${hasAside ? '' : ' hero--single'}">
       <div class="hero-copy">
         <span class="eyebrow">${escapeHtml(page.eyebrow)}</span>
         <h1>${escapeHtml(page.heroTitle)}</h1>
         <p class="hero-text">${escapeHtml(page.heroText)}</p>
         <div class="cta-row">
-          <a class="button button-primary" href="/">Open the app</a>
-          <a class="button button-secondary" href="/legal/">Legal pages</a>
+          <a class="button button-primary" href="/">${escapeHtml(ui.openApp)}</a>
+          <a class="button button-secondary" href="/legal/">${escapeHtml(ui.legalPages)}</a>
         </div>
       </div>
-      <aside class="hero-panel" aria-label="Quick summary">
+      ${hasAside ? `<aside class="hero-panel" aria-label="${page.lang === 'de' ? 'Kurzübersicht' : 'Quick summary'}">
         <div class="icon-badge info-avatar" aria-hidden="true">
           <span class="material-symbols-outlined">${escapeHtml(page.heroIcon)}</span>
         </div>
-        <h2>${escapeHtml(page.heroAsideTitle ?? 'Quick summary')}</h2>
+        <h2>${escapeHtml(page.heroAsideTitle ?? (page.lang === 'de' ? 'Kurzübersicht' : 'Quick summary'))}</h2>
         <ul class="check-list">
           ${(page.heroAsideItems ?? []).map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
         </ul>
-      </aside>
+      </aside>` : ''}
     </section>
   `;
 }
@@ -728,25 +1222,27 @@ function renderSection(section) {
   `;
 }
 
-function renderLegalLoaderPanel({ title, description, lang, src, authoritative = false }) {
+function renderLegalLoaderPanel({ title, description, lang, src, authoritative = false, pageLang = 'en' }) {
+  const isGerman = pageLang === 'de';
   return `
     <details class="translation-card legal-document-card" data-legal-doc data-src="${escapeHtml(src)}">
       <summary>
         <span class="legal-document-summary">
           <span class="legal-document-title-row">
             <span class="legal-document-title">${escapeHtml(title)}</span>
-            ${authoritative ? '<span class="legal-document-chip">Authoritative</span>' : '<span class="legal-document-chip legal-document-chip--muted">Translation</span>'}
+            ${authoritative ? `<span class="legal-document-chip">${isGerman ? 'Verbindlich' : 'Authoritative'}</span>` : `<span class="legal-document-chip legal-document-chip--muted">${isGerman ? 'Übersetzung' : 'Translation'}</span>`}
           </span>
           <span class="legal-document-description">${escapeHtml(description)}</span>
         </span>
       </summary>
-      <div class="legal-status" data-legal-status aria-live="polite">Open this panel to load the document.</div>
+      <div class="legal-status" data-legal-status aria-live="polite">${isGerman ? 'Diesen Bereich öffnen, um das Dokument zu laden.' : 'Open this panel to load the document.'}</div>
       <div class="legal-prose" data-legal-content lang="${escapeHtml(lang)}" hidden></div>
     </details>
   `;
 }
 
 function renderMarketingPage(page) {
+  const isGerman = page.lang === 'de';
   const body = [`<main class="site-main">`, renderHero(page)];
 
   if (page.sections) {
@@ -757,8 +1253,8 @@ function renderMarketingPage(page) {
     body.push(`
       <section class="content-section">
         <div class="section-heading">
-          <h2>Frequently asked questions</h2>
-          <p>Each answer is written in clear text so it can be indexed and cited easily.</p>
+          <h2>${isGerman ? 'Häufige Fragen' : 'Frequently asked questions'}</h2>
+          <p>${isGerman ? 'Jede Antwort ist bewusst in Klartext formuliert, damit sie leicht indexiert und zitiert werden kann.' : 'Each answer is written in clear text so it can be indexed and cited easily.'}</p>
         </div>
         <div class="faq-list">
           ${page.faqs
@@ -780,8 +1276,8 @@ function renderMarketingPage(page) {
     body.push(`
       <section class="content-section">
         <div class="section-heading">
-          <h2>Legal pages</h2>
-          <p>These links lead to the static legal documents that are available independently from the app UI.</p>
+          <h2>${isGerman ? 'Rechtsseiten' : 'Legal pages'}</h2>
+          <p>${isGerman ? 'Diese Links führen zu den öffentlichen Rechtsdokumenten, die unabhängig von der App-Oberfläche erreichbar sind.' : 'These links lead to the static legal documents that are available independently from the app UI.'}</p>
         </div>
         <div class="card-grid legal-links-grid">
           ${page.legalTiles
@@ -804,24 +1300,73 @@ function renderMarketingPage(page) {
 
   body.push('</main>');
 
-  const extraSchemas = [organizationSchema()];
+  const extraSchemas = [organizationSchema(page.lang)];
   if (page.faqs) {
     extraSchemas.push(faqSchema(page));
   }
 
   return renderDocument({
     route: page.route,
+    baseRoute: page.baseRoute,
     title: page.title,
     description: page.description,
     lang: page.lang,
     content: body.join('\n'),
     schemas: extraSchemas,
+    alternateLinkTags: alternateLinks(page.baseRoute),
   });
 }
 
 function renderLegalPage(page) {
+  const isGerman = page.lang === 'de';
+  const quickLegalTitle = isGerman ? 'Rechtliche Kurzinfo' : 'Quick legal overview';
+  const quickLegalItems = isGerman
+    ? [
+        'Dokumente werden aus denselben TXT-Quellen wie in der App geladen',
+        'Die bevorzugte Sprache steht oben',
+        'Die jeweils andere Fassung bleibt zusätzlich verfügbar',
+        'Beide Bereiche starten eingeklappt',
+      ]
+    : [
+        'Documents are loaded from the same TXT sources as the app',
+        'The preferred language is shown first',
+        'The other language version remains available below',
+        'Both panels start collapsed',
+      ];
+  const primaryPanel = isGerman
+    ? {
+        title: 'Verbindliche deutsche Fassung',
+        description: 'Rechtsverbindliche deutsche Fassung, dynamisch aus der juristischen Quelldatei geladen.',
+        lang: 'de',
+        src: page.downloads[0]?.href ?? '',
+        authoritative: true,
+      }
+    : {
+        title: 'English translation',
+        description: 'Convenience translation loaded dynamically from the legal text source.',
+        lang: 'en',
+        src: page.downloads[1]?.href ?? '',
+        authoritative: false,
+      };
+  const secondaryPanel = isGerman
+    ? {
+        title: 'Englische Übersetzung',
+        description: 'Unverbindliche englische Übersetzung, dynamisch aus der juristischen Quelldatei geladen.',
+        lang: 'en',
+        src: page.downloads[1]?.href ?? '',
+        authoritative: false,
+      }
+    : {
+        title: 'Authoritative German version',
+        description: 'Legally binding German version loaded dynamically from the legal text source.',
+        lang: 'de',
+        src: page.downloads[0]?.href ?? '',
+        authoritative: true,
+      };
+
   return renderDocument({
     route: page.route,
+    baseRoute: page.baseRoute,
     title: page.title,
     description: page.description,
     lang: page.lang,
@@ -838,57 +1383,55 @@ function renderLegalPage(page) {
                 .join('')}
             </div>
           </div>
-          <aside class="hero-panel" aria-label="Key legal notes">
+          <aside class="hero-panel" aria-label="${isGerman ? 'Rechtliche Hinweise' : 'Key legal notes'}">
             <div class="icon-badge info-avatar" aria-hidden="true">
               <span class="material-symbols-outlined">${escapeHtml(page.heroIcon)}</span>
             </div>
-            <h2>Quick legal overview</h2>
+            <h2>${escapeHtml(quickLegalTitle)}</h2>
             <ul class="check-list">
-              <li>Documents are loaded from the same TXT sources as the app</li>
-              <li>English is listed first for convenience</li>
-              <li>German remains the authoritative version</li>
-              <li>Both panels start collapsed so visitors can choose</li>
+              ${quickLegalItems.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
             </ul>
           </aside>
         </section>
 
         <section class="content-section">
           <div class="section-heading">
-            <h2>Summary tiles</h2>
-            <p>These short tiles help visitors understand the legal scope quickly before reading the full document.</p>
+            <h2>${isGerman ? 'Übersichtskacheln' : 'Summary tiles'}</h2>
+            <p>${isGerman ? 'Diese kurzen Kacheln geben einen schnellen Überblick über den rechtlichen Rahmen, bevor das vollständige Dokument geöffnet wird.' : 'These short tiles help visitors understand the legal scope quickly before reading the full document.'}</p>
           </div>
           ${renderTileGrid(page.summaryTiles)}
         </section>
 
         <section class="content-section legal-section">
           <div class="section-heading">
-            <h2>Open a document version</h2>
-            <p>Both versions stay collapsed at first. Open the version you want to read and the page will load it on demand from the legal TXT source files.</p>
+            <h2>${isGerman ? 'Dokumentfassung öffnen' : 'Open a document version'}</h2>
+            <p>${isGerman ? 'Beide Fassungen starten eingeklappt. Beim Öffnen wird der gewünschte Text direkt aus den juristischen TXT-Quelldateien geladen.' : 'Both versions stay collapsed at first. Open the version you want to read and the page will load it on demand from the legal TXT source files.'}</p>
           </div>
           <div class="legal-stack">
-            ${renderLegalLoaderPanel({
-              title: 'English translation',
-              description: 'Convenience translation loaded dynamically from the legal text source.',
-              lang: 'en',
-              src: page.downloads[1]?.href ?? '',
-            })}
-            ${renderLegalLoaderPanel({
-              title: 'Verbindliche deutsche Fassung',
-              description: 'Legally binding German version loaded dynamically from the legal text source.',
-              lang: 'de',
-              src: page.downloads[0]?.href ?? '',
-              authoritative: true,
-            })}
+            ${renderLegalLoaderPanel({ ...primaryPanel, pageLang: page.lang })}
+            ${renderLegalLoaderPanel({ ...secondaryPanel, pageLang: page.lang })}
           </div>
         </section>
       </main>
     `,
-    schemas: [organizationSchema()],
+    schemas: [organizationSchema(page.lang)],
     scripts: ['/site-assets/legal-documents.js'],
+    alternateLinkTags: alternateLinks(page.baseRoute),
   });
 }
 
-function renderDocument({ route, title, description, lang, content, schemas, scripts = [] }) {
+function renderDocument({
+  route,
+  baseRoute,
+  title,
+  description,
+  lang,
+  content,
+  schemas,
+  scripts = [],
+  alternateLinkTags = [],
+  robots = 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1',
+}) {
   const absoluteUrl = canonicalUrl(route);
   const metaTitle = `${appName} | ${title}`;
   return `<!doctype html>
@@ -898,7 +1441,7 @@ function renderDocument({ route, title, description, lang, content, schemas, scr
   <title>${escapeHtml(metaTitle)}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
   <meta name="description" content="${escapeHtml(description)}">
-  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+  <meta name="robots" content="${escapeHtml(robots)}">
   <meta name="theme-color" content="#05a51d">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="${escapeHtml(appName)}">
@@ -919,15 +1462,60 @@ function renderDocument({ route, title, description, lang, content, schemas, scr
   <link rel="preload" href="/assets/fonts/RobotoVariableFont.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="preload" href="/assets/fonts/MaterialSymbolsOutlined.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="stylesheet" href="/site-assets/public-pages.css">
+  ${alternateLinkTags.map((link) => `<link rel="alternate" hreflang="${link.hreflang}" href="${link.href}">`).join('\n  ')}
   ${schemas.map(jsonLd).join('\n  ')}
 </head>
 <body>
   <div class="page-shell">
-    ${renderHeader(route)}
+    ${renderHeader(route, lang)}
     ${content}
-    ${renderFooter()}
+    ${renderFooter(lang)}
   </div>
   ${scripts.map((src) => `<script src="${src}" defer></script>`).join('\n  ')}
+</body>
+</html>
+`;
+}
+
+function renderLanguageRedirectPage(page) {
+  const deHref = localeRoute('de', page.route);
+  const enHref = localeRoute('en', page.route);
+  const uiDe = uiByLocale.de;
+  const uiEn = uiByLocale.en;
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>${escapeHtml(`${appName} | ${page.englishTitle}`)}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex,follow">
+  <meta name="theme-color" content="#05a51d">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/site-assets/public-pages.css">
+  ${alternateLinks(page.route).map((link) => `<link rel="alternate" hreflang="${link.hreflang}" href="${link.href}">`).join('\n  ')}
+  <script>
+    (function () {
+      const language = ((navigator.languages && navigator.languages[0]) || navigator.language || 'en').toLowerCase();
+      const target = language.startsWith('de') ? '${deHref}' : '${enHref}';
+      window.location.replace(target + window.location.search + window.location.hash);
+    })();
+  </script>
+</head>
+<body>
+  <div class="page-shell redirect-shell">
+    <section class="content-section">
+      <div class="section-heading">
+        <h1>${escapeHtml(uiEn.redirectTitle)}</h1>
+        <p>${escapeHtml(uiEn.redirectText)}</p>
+        <p>${escapeHtml(uiDe.redirectText)}</p>
+      </div>
+      <div class="cta-row">
+        <a class="button button-secondary" href="${deHref}">${escapeHtml(uiDe.openGerman)}</a>
+        <a class="button button-secondary" href="${enHref}">${escapeHtml(uiEn.openEnglish)}</a>
+      </div>
+    </section>
+  </div>
 </body>
 </html>
 `;
@@ -1045,9 +1633,15 @@ const loadLegalDocument = async (details) => {
     return;
   }
 
+  const isGerman = document.documentElement.lang.toLowerCase().startsWith('de');
+  const loadingText = isGerman ? 'Dokument wird geladen…' : 'Loading document…';
+  const errorText = isGerman
+    ? 'Das Dokument konnte nicht geladen werden. Du kannst weiterhin die Textlinks oben verwenden.'
+    : 'The document could not be loaded. You can still use the text download links above.';
+
   details.dataset.loading = 'true';
   status.hidden = false;
-  status.textContent = 'Loading document…';
+  status.textContent = loadingText;
 
   try {
     const response = await fetch(src, { credentials: 'same-origin' });
@@ -1062,7 +1656,7 @@ const loadLegalDocument = async (details) => {
     details.dataset.loaded = 'true';
   } catch (error) {
     status.hidden = false;
-    status.textContent = 'The document could not be loaded. You can still use the text download links above.';
+    status.textContent = errorText;
     console.error(error);
   } finally {
     details.dataset.loading = 'false';
@@ -1165,6 +1759,10 @@ img {
   width: min(calc(100% - 2rem), var(--site-max));
   margin: 0 auto;
   padding: 1rem 0 2rem;
+}
+
+.redirect-shell {
+  max-width: 760px;
 }
 
 .site-header,
@@ -1335,6 +1933,10 @@ img {
   padding: clamp(1.25rem, 2vw, 1.9rem);
   border-radius: var(--site-radius-xl);
   background: var(--site-surface);
+}
+
+.hero--single {
+  grid-template-columns: 1fr;
 }
 
 .hero-copy,
@@ -1743,12 +2345,16 @@ async function writeStaticFiles() {
   await fs.writeFile(path.join(publicRoot, 'site-assets', 'public-pages.css'), renderCss(), 'utf8');
   await fs.writeFile(path.join(publicRoot, 'site-assets', 'legal-documents.js'), renderLegalLoaderScript(), 'utf8');
 
-  for (const page of marketingPages) {
+  for (const page of localizedMarketingPages) {
     await writeRoute(page.route, renderMarketingPage(page));
   }
 
-  for (const page of legalPages) {
+  for (const page of localizedLegalPages) {
     await writeRoute(page.route, renderLegalPage(page));
+  }
+
+  for (const page of redirectPages) {
+    await writeRoute(page.route, renderLanguageRedirectPage(page));
   }
 
   const sitemapEntries = allRoutes

@@ -64,6 +64,12 @@
     "!/disclaimer/**",
     "!/legal",
     "!/legal/",
-    "!/legal/**"
+    "!/legal/**",
+    "!/de",
+    "!/de/",
+    "!/de/**",
+    "!/en",
+    "!/en/",
+    "!/en/**"
   ]
 }
