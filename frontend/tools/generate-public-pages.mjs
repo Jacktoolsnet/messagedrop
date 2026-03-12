@@ -30,7 +30,7 @@ const marketingPages = [
     heroAsideItems: [
       'No algorithm decides what you see',
       'Follow places, not people',
-      'Private messages are encrypted',
+      'Connect with people you know',
       'No ads',
       'No tracking',
       'Relevance comes from place, not reach',
@@ -38,32 +38,31 @@ const marketingPages = [
     sections: [
       {
         title: 'Core ideas',
-        intro:
-          'The public website should explain the concept in seconds. These are the ideas the app is built around.',
+        icon: 'lightbulb',
         tiles: [
           {
-            icon: 'location_on',
-            title: 'Messages belong to places',
+            icon: 'pin_drop',
+            title: 'Messages stay tied to places',
             body:
-              'Public notes, comments, and discoveries are attached to real-world locations, so the map itself becomes the entry point.',
+              'A message belongs to a real-world location. Relevance comes from where it is placed, not from who can amplify it.',
           },
           {
-            icon: 'draw',
-            title: 'Digital graffiti, not another feed',
+            icon: 'filter_alt_off',
+            title: 'No algorithm decides what you see',
             body:
-              'MessageDrop is meant to feel open, direct, and spatial. It is about leaving signals in the world, not chasing endless algorithmic timelines.',
+              'MessageDrop does not rank posts through an engagement feed. People explore places directly and see what belongs there.',
           },
           {
-            icon: 'lock',
-            title: 'Local-first where possible',
+            icon: 'map',
+            title: 'Follow places, not people',
             body:
-              'A large share of data stays on the device. That reduces server-side processing and supports a privacy-oriented experience.',
+              'The focus is on locations and local context. You return to places that matter instead of building everything around personal follower graphs.',
           },
           {
-            icon: 'travel_explore',
-            title: 'Discover context around you',
+            icon: 'contacts',
+            title: 'Contacts',
             body:
-              'Instead of searching a profile graph, users can explore places, local information, and social traces in one spatial interface.',
+              'MessageDrop is built for connecting with people you actually know. Private communication is encrypted so direct conversations stay personal and protected.',
           },
         ],
       },
@@ -422,7 +421,7 @@ const germanMarketingPages = [
     heroAsideItems: [
       'Kein Algorithmus entscheidet, was du siehst',
       'Du folgst Orten statt Personen',
-      'Private Nachrichten sind verschlüsselt',
+      'Verbinde dich mit Menschen, die du kennst',
       'Keine Werbung',
       'Kein Tracking',
       'Relevanz entsteht durch Ort, nicht durch Reichweite',
@@ -430,32 +429,31 @@ const germanMarketingPages = [
     sections: [
       {
         title: 'Kernideen',
-        intro:
-          'Die öffentliche Website soll das Konzept in wenigen Sekunden erklären. Darauf baut die App auf.',
+        icon: 'lightbulb',
         tiles: [
           {
-            icon: 'location_on',
-            title: 'Nachrichten gehören an Orte',
+            icon: 'pin_drop',
+            title: 'Nachrichten bleiben an Orte gebunden',
             body:
-              'Öffentliche Notizen, Kommentare und Entdeckungen werden an reale Orte gebunden. So wird die Karte selbst zum Einstiegspunkt.',
+              'Eine Nachricht gehört zu einem realen Ort. Relevanz entsteht dadurch, wo sie platziert wird – nicht dadurch, wer sie weiterverbreitet.',
           },
           {
-            icon: 'draw',
-            title: 'Digitales Graffiti statt noch ein Feed',
+            icon: 'filter_alt_off',
+            title: 'Kein Algorithmus entscheidet, was du siehst',
             body:
-              'MessageDrop soll offen, direkt und räumlich wirken. Es geht darum, Spuren in der Welt zu hinterlassen, nicht um endlose algorithmische Timelines.',
+              'MessageDrop sortiert Inhalte nicht über einen Engagement-Feed. Menschen erkunden Orte direkt und sehen, was dorthin gehört.',
           },
           {
-            icon: 'lock',
-            title: 'Local-first, wo immer möglich',
+            icon: 'map',
+            title: 'Du folgst Orten statt Personen',
             body:
-              'Ein großer Teil der Daten bleibt auf dem Gerät. Das reduziert serverseitige Verarbeitung und unterstützt ein datenschutzorientiertes Erlebnis.',
+              'Im Mittelpunkt stehen Orte und lokaler Kontext. Du kommst zu den Plätzen zurück, die dir wichtig sind, statt einem Follower-Graphen zu folgen.',
           },
           {
-            icon: 'travel_explore',
-            title: 'Kontext rund um dich entdecken',
+            icon: 'contacts',
+            title: 'Kontakte',
             body:
-              'Statt nur einem Profilgraphen zu folgen, können Nutzer Orte, lokale Informationen und soziale Spuren in einer räumlichen Oberfläche erkunden.',
+              'Uns ist wichtig, dass du dich mit Menschen verbindest, die du wirklich kennst. Private Kommunikation ist verschlüsselt, damit direkte Gespräche persönlich und geschützt bleiben.',
           },
         ],
       },
@@ -1233,7 +1231,10 @@ function renderSection(section) {
   return `
     <section class="content-section">
       <div class="section-heading">
-        <h2>${escapeHtml(section.title)}</h2>
+        <div class="section-heading-title">
+          ${section.icon ? `<span class="icon-badge" aria-hidden="true"><span class="material-symbols-outlined">${escapeHtml(section.icon)}</span></span>` : ''}
+          <h2>${escapeHtml(section.title)}</h2>
+        </div>
         ${section.intro ? `<p>${escapeHtml(section.intro)}</p>` : ''}
       </div>
       ${section.tiles ? renderTileGrid(section.tiles) : ''}
@@ -2171,6 +2172,18 @@ img {
   gap: 0.45rem;
 }
 
+.section-heading-title {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.section-heading-title .icon-badge {
+  width: 3rem;
+  height: 3rem;
+  flex-shrink: 0;
+}
+
 .tile-grid,
 .card-grid {
   display: grid;
@@ -2182,6 +2195,7 @@ img {
 .info-card {
   display: grid;
   gap: 0.9rem;
+  align-content: start;
   padding: 1.1rem;
   border-radius: var(--site-radius-lg);
   background: color-mix(in srgb, white 86%, transparent);

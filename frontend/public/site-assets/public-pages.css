@@ -426,6 +426,18 @@ img {
   gap: 0.45rem;
 }
 
+.section-heading-title {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.section-heading-title .icon-badge {
+  width: 3rem;
+  height: 3rem;
+  flex-shrink: 0;
+}
+
 .tile-grid,
 .card-grid {
   display: grid;
@@ -437,6 +449,7 @@ img {
 .info-card {
   display: grid;
   gap: 0.9rem;
+  align-content: start;
   padding: 1.1rem;
   border-radius: var(--site-radius-lg);
   background: color-mix(in srgb, white 86%, transparent);
