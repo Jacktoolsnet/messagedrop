@@ -19,10 +19,13 @@ const marketingPages = [
     description:
       'MessageDrop is a global map where people can leave messages in real-world locations — digital graffiti for the world map.',
     heroIcon: 'globe_location_pin',
+    eyebrowIcon: 'question_mark',
     eyebrow: 'What is MessageDrop?',
-    heroTitle: appClaim,
+    heroTitle: 'Messages in real-world places.',
     heroText:
-      'MessageDrop is digital graffiti for the world map. Public posts live on places instead of timelines, while private notes and chats stay close to the user and the device.',
+      'MessageDrop is an app with a global map where people can leave messages exactly where they matter.',
+    heroTitleClass: 'hero-title-compact',
+    showLegalCta: false,
     heroAsideTitle: 'Why it feels different',
     heroAsideItems: [
       'Place-based instead of feed-based',
@@ -406,10 +409,13 @@ const germanMarketingPages = [
     description:
       'MessageDrop ist eine globale Karte, auf der Menschen Nachrichten an realen Orten hinterlassen können — digitales Graffiti für die Weltkarte.',
     heroIcon: 'globe_location_pin',
+    eyebrowIcon: 'question_mark',
     eyebrow: 'Was ist MessageDrop?',
-    heroTitle: 'Eine globale Karte, auf der Menschen Nachrichten an realen Orten hinterlassen können.',
+    heroTitle: 'Nachrichten an echten Orten.',
     heroText:
-      'MessageDrop ist digitales Graffiti für die Weltkarte. Öffentliche Beiträge hängen an Orten statt an Timelines, während private Notizen und Chats nah am Nutzer und am Gerät bleiben.',
+      'MessageDrop ist eine App mit globaler Karte, auf der Menschen Nachrichten genau dort hinterlassen können, wo sie relevant sind.',
+    heroTitleClass: 'hero-title-compact',
+    showLegalCta: false,
     heroAsideTitle: 'Warum es sich anders anfühlt',
     heroAsideItems: [
       'Ortsbasiert statt feedbasiert',
@@ -1123,15 +1129,17 @@ function renderFooter(lang = 'en') {
 function renderHero(page) {
   const ui = uiByLocale[page.lang] ?? uiByLocale.en;
   const hasAside = Boolean(page.heroAsideTitle) || (page.heroAsideItems?.length ?? 0) > 0;
+  const showLegalCta = page.showLegalCta !== false;
+  const titleClass = page.heroTitleClass ? ` ${page.heroTitleClass}` : '';
   return `
     <section class="hero${hasAside ? '' : ' hero--single'}">
       <div class="hero-copy">
-        <span class="eyebrow">${escapeHtml(page.eyebrow)}</span>
-        <h1>${escapeHtml(page.heroTitle)}</h1>
+        <span class="eyebrow">${page.eyebrowIcon ? `<span class="material-symbols-outlined eyebrow-icon" aria-hidden="true">${escapeHtml(page.eyebrowIcon)}</span>` : ''}${escapeHtml(page.eyebrow)}</span>
+        <h1 class="${titleClass.trim()}">${escapeHtml(page.heroTitle)}</h1>
         <p class="hero-text">${escapeHtml(page.heroText)}</p>
         <div class="cta-row">
           <a class="button button-primary" href="/">${escapeHtml(ui.openApp)}</a>
-          <a class="button button-secondary" href="/legal/">${escapeHtml(ui.legalPages)}</a>
+          ${showLegalCta ? `<a class="button button-secondary" href="/legal/">${escapeHtml(ui.legalPages)}</a>` : ''}
         </div>
       </div>
       ${hasAside ? `<aside class="hero-panel" aria-label="${page.lang === 'de' ? 'Kurzübersicht' : 'Quick summary'}">
@@ -2072,6 +2080,7 @@ img {
 .eyebrow {
   display: inline-flex;
   align-items: center;
+  gap: 0.45rem;
   width: fit-content;
   min-height: 2rem;
   padding: 0.35rem 0.8rem;
@@ -2084,8 +2093,19 @@ img {
   text-transform: uppercase;
 }
 
+.eyebrow-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
 .eyebrow-inline {
   margin-bottom: 0.75rem;
+}
+
+.hero-title-compact {
+  font-size: clamp(1.75rem, 3vw, 2.7rem);
+  line-height: 1.08;
+  max-width: 15ch;
 }
 
 .cta-row {

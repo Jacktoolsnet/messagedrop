@@ -343,6 +343,7 @@ img {
 .eyebrow {
   display: inline-flex;
   align-items: center;
+  gap: 0.45rem;
   width: fit-content;
   min-height: 2rem;
   padding: 0.35rem 0.8rem;
@@ -355,8 +356,19 @@ img {
   text-transform: uppercase;
 }
 
+.eyebrow-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
 .eyebrow-inline {
   margin-bottom: 0.75rem;
+}
+
+.hero-title-compact {
+  font-size: clamp(1.75rem, 3vw, 2.7rem);
+  line-height: 1.08;
+  max-width: 15ch;
 }
 
 .cta-row {
