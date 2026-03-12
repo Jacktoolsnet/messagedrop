@@ -67,6 +67,24 @@ const marketingPages = [
         ],
       },
       {
+        title: 'Expression & personality',
+        icon: 'palette',
+        tiles: [
+          {
+            icon: 'gif_box',
+            title: 'Links, videos, and GIFs',
+            body:
+              'You can link YouTube, Pinterest, and TikTok posts and use Tenor GIFs to make messages more expressive and easier to understand at a glance.',
+          },
+          {
+            icon: 'mood',
+            title: 'Local names & avatars',
+            body:
+              'You can give other people names and avatars that are only visible to you. These profiles are stored locally on your device and make MessageDrop feel more personal.',
+          },
+        ],
+      },
+      {
         title: 'What people can do',
         intro: 'Use MessageDrop for everyday local discovery, lightweight community signals, and private follow-up communication.',
         featureList: [
@@ -454,6 +472,24 @@ const germanMarketingPages = [
             title: 'Kontakte',
             body:
               'Uns ist wichtig, dass du dich mit Menschen verbindest, die du wirklich kennst. Private Kommunikation ist verschlüsselt, damit direkte Gespräche persönlich und geschützt bleiben.',
+          },
+        ],
+      },
+      {
+        title: 'Ausdruck & Persönlichkeit',
+        icon: 'palette',
+        tiles: [
+          {
+            icon: 'gif_box',
+            title: 'Links, Videos und GIFs',
+            body:
+              'Du kannst YouTube-, Pinterest- und TikTok-Beiträge verlinken und Tenor-GIFs verwenden, um Nachrichten anschaulicher und ausdrucksstärker zu machen.',
+          },
+          {
+            icon: 'mood',
+            title: 'Lokale Namen & Avatare',
+            body:
+              'Du kannst anderen Menschen Namen und Avatare geben, die nur für dich gelten. Diese Profile werden lokal auf deinem Gerät gespeichert und machen MessageDrop persönlicher.',
           },
         ],
       },
