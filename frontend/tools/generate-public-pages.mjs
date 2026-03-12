@@ -1065,6 +1065,8 @@ function renderNav(currentRoute, lang = 'en') {
 
 function renderHeader(currentRoute, lang = 'en') {
   const ui = uiByLocale[lang] ?? uiByLocale.en;
+  const openLabel = lang === 'de' ? 'Navigation öffnen' : 'Open navigation';
+  const closeLabel = lang === 'de' ? 'Navigation schließen' : 'Close navigation';
   return `
     <header class="site-header">
       <a class="brand" href="/" aria-label="Open MessageDrop app home">
@@ -1076,10 +1078,15 @@ function renderHeader(currentRoute, lang = 'en') {
           <span>${appTaglineByLocale[lang] ?? appTagline}</span>
         </span>
       </a>
-      <nav class="site-nav" aria-label="Primary">
+      <button class="site-menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav"
+        aria-label="${escapeHtml(openLabel)}" data-open-label="${escapeHtml(openLabel)}"
+        data-close-label="${escapeHtml(closeLabel)}">
+        <span class="material-symbols-outlined" data-menu-icon aria-hidden="true">menu</span>
+      </button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary">
         ${renderNav(currentRoute, lang)}
       </nav>
-      <a class="button button-primary button-small" href="/">${escapeHtml(ui.openApp)}</a>
+      <a class="button button-primary button-small site-header-cta" href="/">${escapeHtml(ui.openApp)}</a>
     </header>
   `;
 }
@@ -1431,6 +1438,7 @@ function renderDocument({
 }) {
   const absoluteUrl = canonicalUrl(route);
   const metaTitle = `${appName} | ${title}`;
+  const allScripts = ['/site-assets/public-pages.js', ...scripts];
   return `<!doctype html>
 <html lang="${escapeHtml(lang)}">
 <head>
@@ -1468,10 +1476,55 @@ function renderDocument({
     ${content}
     ${renderFooter(lang)}
   </div>
-  ${scripts.map((src) => `<script src="${src}" defer></script>`).join('\n  ')}
+  ${allScripts.map((src) => `<script src="${src}" defer></script>`).join('\n  ')}
 </body>
 </html>
 `;
+}
+
+function renderPublicUiScript() {
+  return `document.querySelectorAll('.site-menu-toggle').forEach((button) => {
+  const header = button.closest('.site-header');
+  const icon = button.querySelector('[data-menu-icon]');
+  const closeText = button.dataset.closeLabel || 'Close navigation';
+  const openText = button.dataset.openLabel || 'Open navigation';
+
+  if (!header) {
+    return;
+  }
+
+  const sync = () => {
+    const expanded = header.classList.contains('menu-open');
+    button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    button.setAttribute('aria-label', expanded ? closeText : openText);
+    if (icon) {
+      icon.textContent = expanded ? 'close' : 'menu';
+    }
+  };
+
+  button.addEventListener('click', () => {
+    header.classList.toggle('menu-open');
+    sync();
+  });
+
+  header.querySelectorAll('.site-nav a, .site-header-cta').forEach((link) => {
+    link.addEventListener('click', () => {
+      if (window.matchMedia('(max-width: 760px)').matches) {
+        header.classList.remove('menu-open');
+        sync();
+      }
+    });
+  });
+
+  window.addEventListener('resize', () => {
+    if (!window.matchMedia('(max-width: 760px)').matches) {
+      header.classList.remove('menu-open');
+      sync();
+    }
+  });
+
+  sync();
+});\n`;
 }
 
 function renderLanguageRedirectPage(page) {
@@ -1796,6 +1849,7 @@ img {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 1rem;
   padding: 1rem 1.2rem;
   margin-bottom: 1rem;
@@ -1856,6 +1910,36 @@ img {
   flex: 1;
   gap: 0.4rem;
   flex-wrap: wrap;
+}
+
+.site-header-cta {
+  flex-shrink: 0;
+}
+
+.site-menu-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 3rem;
+  height: 3rem;
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+  color: #fff;
+  background: linear-gradient(135deg, #2563eb, #38bdf8);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16);
+  cursor: pointer;
+}
+
+.site-menu-toggle .material-symbols-outlined {
+  font-size: 1.55rem;
+  font-variation-settings: 'FILL' 0, 'wght' 600, 'GRAD' 0, 'opsz' 24;
+}
+
+.site-menu-toggle:hover,
+.site-menu-toggle:focus-visible {
+  filter: brightness(0.97);
 }
 
 .site-nav a,
@@ -2299,12 +2383,31 @@ img {
 
 @media (max-width: 760px) {
   .site-header {
-    flex-direction: column;
-    align-items: stretch;
+    align-items: center;
   }
 
-  .site-nav {
+  .site-menu-toggle {
+    display: inline-grid;
+    margin-left: auto;
+  }
+
+  .site-nav,
+  .site-header-cta {
+    display: none;
+    width: 100%;
+  }
+
+  .site-header.menu-open .site-nav {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
     justify-content: flex-start;
+    gap: 0.45rem;
+  }
+
+  .site-header.menu-open .site-header-cta {
+    display: inline-flex;
+    justify-content: center;
   }
 
   .button-small {
@@ -2313,10 +2416,16 @@ img {
 
   .brand {
     align-items: flex-start;
+    flex: 1 1 auto;
   }
 
   .brand-copy span:last-child {
     line-height: 1.45;
+  }
+
+  .site-nav a {
+    width: 100%;
+    padding-inline: 0.95rem;
   }
 
   .hero h1 {
@@ -2376,6 +2485,7 @@ async function writeRoute(route, html) {
 async function writeStaticFiles() {
   await ensureDir(path.join(publicRoot, 'site-assets'));
   await fs.writeFile(path.join(publicRoot, 'site-assets', 'public-pages.css'), renderCss(), 'utf8');
+  await fs.writeFile(path.join(publicRoot, 'site-assets', 'public-pages.js'), renderPublicUiScript(), 'utf8');
   await fs.writeFile(path.join(publicRoot, 'site-assets', 'legal-documents.js'), renderLegalLoaderScript(), 'utf8');
 
   for (const page of localizedMarketingPages) {

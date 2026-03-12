@@ -124,6 +124,7 @@ img {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 1rem;
   padding: 1rem 1.2rem;
   margin-bottom: 1rem;
@@ -184,6 +185,36 @@ img {
   flex: 1;
   gap: 0.4rem;
   flex-wrap: wrap;
+}
+
+.site-header-cta {
+  flex-shrink: 0;
+}
+
+.site-menu-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 3rem;
+  height: 3rem;
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+  color: #fff;
+  background: linear-gradient(135deg, #2563eb, #38bdf8);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16);
+  cursor: pointer;
+}
+
+.site-menu-toggle .material-symbols-outlined {
+  font-size: 1.55rem;
+  font-variation-settings: 'FILL' 0, 'wght' 600, 'GRAD' 0, 'opsz' 24;
+}
+
+.site-menu-toggle:hover,
+.site-menu-toggle:focus-visible {
+  filter: brightness(0.97);
 }
 
 .site-nav a,
@@ -627,12 +658,31 @@ img {
 
 @media (max-width: 760px) {
   .site-header {
-    flex-direction: column;
-    align-items: stretch;
+    align-items: center;
   }
 
-  .site-nav {
+  .site-menu-toggle {
+    display: inline-grid;
+    margin-left: auto;
+  }
+
+  .site-nav,
+  .site-header-cta {
+    display: none;
+    width: 100%;
+  }
+
+  .site-header.menu-open .site-nav {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
     justify-content: flex-start;
+    gap: 0.45rem;
+  }
+
+  .site-header.menu-open .site-header-cta {
+    display: inline-flex;
+    justify-content: center;
   }
 
   .button-small {
@@ -641,10 +691,16 @@ img {
 
   .brand {
     align-items: flex-start;
+    flex: 1 1 auto;
   }
 
   .brand-copy span:last-child {
     line-height: 1.45;
+  }
+
+  .site-nav a {
+    width: 100%;
+    padding-inline: 0.95rem;
   }
 
   .hero h1 {
