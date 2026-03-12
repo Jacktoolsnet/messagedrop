@@ -26,12 +26,14 @@ const marketingPages = [
       'MessageDrop is an app with a global map where people can leave messages exactly where they matter.',
     heroTitleClass: 'hero-title-compact',
     showLegalCta: false,
-    heroAsideTitle: 'Why it feels different',
+    heroAsideTitle: 'What makes MessageDrop different',
     heroAsideItems: [
-      'Place-based instead of feed-based',
-      'Local-first and privacy-oriented by design',
-      'Useful with or without an account',
-      'Designed for discovery, context, and local relevance',
+      'No algorithm decides what you see',
+      'Follow places, not people',
+      'Private messages are encrypted',
+      'No ads',
+      'No tracking',
+      'Relevance comes from place, not reach',
     ],
     sections: [
       {
@@ -416,12 +418,14 @@ const germanMarketingPages = [
       'MessageDrop ist eine App mit globaler Karte, auf der Menschen Nachrichten genau dort hinterlassen können, wo sie relevant sind.',
     heroTitleClass: 'hero-title-compact',
     showLegalCta: false,
-    heroAsideTitle: 'Warum es sich anders anfühlt',
+    heroAsideTitle: 'Was MessageDrop anders macht',
     heroAsideItems: [
-      'Ortsbasiert statt feedbasiert',
-      'Local-first und datenschutzorientiert',
-      'Auch ohne Konto sinnvoll nutzbar',
-      'Gebaut für Entdeckung, Kontext und lokale Relevanz',
+      'Kein Algorithmus entscheidet, was du siehst',
+      'Du folgst Orten statt Personen',
+      'Private Nachrichten sind verschlüsselt',
+      'Keine Werbung',
+      'Kein Tracking',
+      'Relevanz entsteht durch Ort, nicht durch Reichweite',
     ],
     sections: [
       {
@@ -1143,10 +1147,12 @@ function renderHero(page) {
         </div>
       </div>
       ${hasAside ? `<aside class="hero-panel" aria-label="${page.lang === 'de' ? 'Kurzübersicht' : 'Quick summary'}">
-        <div class="icon-badge info-avatar" aria-hidden="true">
-          <span class="material-symbols-outlined">${escapeHtml(page.heroIcon)}</span>
+        <div class="hero-panel-header">
+          <div class="icon-badge info-avatar" aria-hidden="true">
+            <span class="material-symbols-outlined">${escapeHtml(page.heroIcon)}</span>
+          </div>
+          <h2>${escapeHtml(page.heroAsideTitle ?? (page.lang === 'de' ? 'Kurzübersicht' : 'Quick summary'))}</h2>
         </div>
-        <h2>${escapeHtml(page.heroAsideTitle ?? (page.lang === 'de' ? 'Kurzübersicht' : 'Quick summary'))}</h2>
         <ul class="check-list">
           ${(page.heroAsideItems ?? []).map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
         </ul>
@@ -1400,10 +1406,12 @@ function renderLegalPage(page) {
             </div>
           </div>
           <aside class="hero-panel" aria-label="${isGerman ? 'Rechtliche Hinweise' : 'Key legal notes'}">
-            <div class="icon-badge info-avatar" aria-hidden="true">
-              <span class="material-symbols-outlined">${escapeHtml(page.heroIcon)}</span>
+            <div class="hero-panel-header">
+              <div class="icon-badge info-avatar" aria-hidden="true">
+                <span class="material-symbols-outlined">${escapeHtml(page.heroIcon)}</span>
+              </div>
+              <h2>${escapeHtml(quickLegalTitle)}</h2>
             </div>
-            <h2>${escapeHtml(quickLegalTitle)}</h2>
             <ul class="check-list">
               ${quickLegalItems.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
             </ul>
@@ -2045,6 +2053,16 @@ img {
   background: color-mix(in srgb, white 82%, transparent);
   border: 1px solid var(--site-border);
   box-shadow: var(--site-shadow-soft);
+}
+
+.hero-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.hero-panel-header h2 {
+  margin: 0;
 }
 
 .hero h1,

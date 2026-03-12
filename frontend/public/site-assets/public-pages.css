@@ -310,6 +310,16 @@ img {
   box-shadow: var(--site-shadow-soft);
 }
 
+.hero-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.hero-panel-header h2 {
+  margin: 0;
+}
+
 .hero h1,
 .content-section h2,
 .tile h3,
