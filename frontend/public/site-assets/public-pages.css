@@ -478,13 +478,49 @@ img {
 }
 
 .translation-card summary {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
   cursor: pointer;
   font-weight: 700;
+  list-style: none;
+}
+
+.translation-card summary::-webkit-details-marker {
+  display: none;
+}
+
+.translation-card summary::before {
+  content: "expand_more";
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2.8rem;
+  height: 2.8rem;
+  border-radius: 14px;
+  color: #fff;
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16);
+  font-family: "Material Symbols Outlined";
+  font-size: 1.45rem;
+  line-height: 1;
+  font-variation-settings: 'FILL' 0, 'wght' 600, 'GRAD' 0, 'opsz' 24;
+  transition: transform 0.18s ease, filter 0.18s ease;
+}
+
+.translation-card[open] summary::before {
+  transform: rotate(180deg);
+}
+
+.translation-card summary:hover::before,
+.translation-card summary:focus-visible::before {
+  filter: brightness(0.97);
 }
 
 .legal-document-summary {
   display: grid;
   gap: 0.4rem;
+  min-width: 0;
 }
 
 .legal-document-title-row {
