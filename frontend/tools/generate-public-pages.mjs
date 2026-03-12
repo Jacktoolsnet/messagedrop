@@ -85,15 +85,27 @@ const marketingPages = [
         ],
       },
       {
-        title: 'What people can do',
-        intro: 'Use MessageDrop for everyday local discovery, lightweight community signals, and private follow-up communication.',
-        featureList: [
-          'Leave a public message at a real-world location',
-          'Read what people have dropped nearby or in another city',
-          'Create private notes that stay on your device',
-          'Chat privately with contacts',
-          'Follow places and contacts for updates where supported',
-          'Explore local context without a personalized ranking feed',
+        title: 'Location-based services',
+        icon: 'near_me',
+        tiles: [
+          {
+            icon: 'partly_cloudy_day',
+            title: 'Weather at a place',
+            body:
+              'MessageDrop can show weather information directly for a place, so people get useful local context without leaving the map.',
+          },
+          {
+            icon: 'air',
+            title: 'Air quality on site',
+            body:
+              'Air quality can also be displayed for a location, making local conditions visible at a glance when they matter.',
+          },
+          {
+            icon: 'local_activity',
+            title: 'Experiences nearby',
+            body:
+              'Places can also surface experiences and activities nearby, turning the map into a richer starting point for exploration.',
+          },
         ],
       },
       {
@@ -494,16 +506,27 @@ const germanMarketingPages = [
         ],
       },
       {
-        title: 'Was man damit tun kann',
-        intro:
-          'MessageDrop eignet sich für lokale Entdeckung, leichte Community-Signale und private Anschlusskommunikation.',
-        featureList: [
-          'Eine öffentliche Nachricht an einem realen Ort hinterlassen',
-          'Lesen, was Menschen in der Nähe oder in einer anderen Stadt hinterlassen haben',
-          'Private Notizen erstellen, die auf dem eigenen Gerät bleiben',
-          'Privat mit Kontakten chatten',
-          'Orten und Kontakten folgen, sofern unterstützt',
-          'Lokalen Kontext ohne personalisierten Ranking-Feed erkunden',
+        title: 'Ortsbezogene Dienste',
+        icon: 'near_me',
+        tiles: [
+          {
+            icon: 'partly_cloudy_day',
+            title: 'Wetter am Ort',
+            body:
+              'MessageDrop kann Wetterinformationen direkt für einen Ort anzeigen, damit Menschen nützlichen lokalen Kontext sehen, ohne die Karte zu verlassen.',
+          },
+          {
+            icon: 'air',
+            title: 'Luftqualität vor Ort',
+            body:
+              'Auch die Luftqualität kann für einen Ort eingeblendet werden, damit lokale Bedingungen genau dann sichtbar sind, wenn sie wichtig werden.',
+          },
+          {
+            icon: 'local_activity',
+            title: 'Erlebnisse in der Nähe',
+            body:
+              'Zu Orten können außerdem passende Erlebnisse und Aktivitäten in der Nähe angezeigt werden. So wird die Karte noch stärker zum Ausgangspunkt für Entdeckungen.',
+          },
         ],
       },
       {
