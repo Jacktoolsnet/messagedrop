@@ -4,8 +4,9 @@
   "scripts": {
     "ng": "ng",
     "gen:version": "node tools/gen-version.js",
-    "start": "npm run gen:version && ng serve",
-    "prebuild": "npm run gen:version",
+    "gen:public": "node tools/generate-public-pages.mjs",
+    "start": "npm run gen:version && npm run gen:public && ng serve",
+    "prebuild": "npm run gen:version && npm run gen:public",
     "build": "ng build",
     "install:prod": "npm install --omit=dev",
     "watch": "ng build --watch --configuration development",

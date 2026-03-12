@@ -35,5 +35,35 @@
         ]
       }
     }
+  ],
+  "navigationUrls": [
+    "/**",
+    "!/**/*.*",
+    "!/**/*__*",
+    "!/**/*__*/**",
+    "!/what-is-messagedrop",
+    "!/what-is-messagedrop/",
+    "!/what-is-messagedrop/**",
+    "!/how-it-works",
+    "!/how-it-works/",
+    "!/how-it-works/**",
+    "!/faq",
+    "!/faq/",
+    "!/faq/**",
+    "!/privacy",
+    "!/privacy/",
+    "!/privacy/**",
+    "!/terms-of-service",
+    "!/terms-of-service/",
+    "!/terms-of-service/**",
+    "!/impressum",
+    "!/impressum/",
+    "!/impressum/**",
+    "!/disclaimer",
+    "!/disclaimer/",
+    "!/disclaimer/**",
+    "!/legal",
+    "!/legal/",
+    "!/legal/**"
   ]
 }
