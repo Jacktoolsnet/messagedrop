@@ -71,36 +71,60 @@
           </div>
           <h2>Open a legal document</h2>
         </div>
-        <p class="hero-panel-text">Choose the document you want to read. It will be loaded and displayed directly on this page.</p><div class="hero-panel-actions" data-legal-hub-actions>
+        <div class="hero-panel-language" data-legal-doc-language>
+      <div class="hero-panel-language-copy">
+        <span class="hero-panel-language-label">Document language</span>
+        <p class="hero-panel-language-note">The German version is authoritative.</p>
+      </div>
+      <div class="hero-panel-language-options" role="group" aria-label="Document language">
+        
+              <button
+                class="hero-panel-language-option"
+                type="button"
+                data-legal-doc-lang-trigger
+                data-doc-lang="en"
+                aria-pressed="true"
+              >English</button>
+            
+              <button
+                class="hero-panel-language-option"
+                type="button"
+                data-legal-doc-lang-trigger
+                data-doc-lang="de"
+                aria-pressed="false"
+              >Deutsch</button>
+            
+      </div>
+    </div><div class="hero-panel-actions" data-legal-hub-actions>
       
             <button class="hero-panel-action" type="button" data-legal-hub-trigger
-              data-doc-key="privacy"
-              data-src="/assets/legal/privacy-policy-en.txt"
-              data-title="Privacy Policy">
-              <span class="icon-badge hero-panel-action-icon" aria-hidden="true"><span class="material-symbols-outlined">privacy_tip</span></span>
-              <span>Privacy Policy</span>
-            </button>
-          
-            <button class="hero-panel-action" type="button" data-legal-hub-trigger
               data-doc-key="terms"
-              data-src="/assets/legal/terms-of-service-en.txt"
-              data-title="Terms of Service">
+              data-src-de="/assets/legal/terms-of-service-de.txt"
+              data-src-en="/assets/legal/terms-of-service-en.txt">
               <span class="icon-badge hero-panel-action-icon" aria-hidden="true"><span class="material-symbols-outlined">rule</span></span>
               <span>Terms of Service</span>
             </button>
           
             <button class="hero-panel-action" type="button" data-legal-hub-trigger
               data-doc-key="disclaimer"
-              data-src="/assets/legal/disclaimer-en.txt"
-              data-title="Disclaimer">
+              data-src-de="/assets/legal/disclaimer-de.txt"
+              data-src-en="/assets/legal/disclaimer-en.txt">
               <span class="icon-badge hero-panel-action-icon" aria-hidden="true"><span class="material-symbols-outlined">warning</span></span>
               <span>Disclaimer</span>
             </button>
           
             <button class="hero-panel-action" type="button" data-legal-hub-trigger
+              data-doc-key="privacy"
+              data-src-de="/assets/legal/privacy-policy-de.txt"
+              data-src-en="/assets/legal/privacy-policy-en.txt">
+              <span class="icon-badge hero-panel-action-icon" aria-hidden="true"><span class="material-symbols-outlined">privacy_tip</span></span>
+              <span>Privacy Policy</span>
+            </button>
+          
+            <button class="hero-panel-action" type="button" data-legal-hub-trigger
               data-doc-key="impressum"
-              data-src="/assets/legal/legal-notice-en.txt"
-              data-title="Legal Notice">
+              data-src-de="/assets/legal/legal-notice-de.txt"
+              data-src-en="/assets/legal/legal-notice-en.txt">
               <span class="icon-badge hero-panel-action-icon" aria-hidden="true"><span class="material-symbols-outlined">business</span></span>
               <span>Legal Notice</span>
             </button>
@@ -111,16 +135,14 @@
   
 
     <section class="content-section legal-hub-section">
-      <div class="section-heading">
-        <h2>Legal document viewer</h2>
-        <p>Select one of the documents on the right. The selected text is loaded directly from the same legal source files used by the app.</p>
-      </div>
-      <div class="legal-hub-viewer" data-legal-hub>
-        <div class="legal-hub-status" data-legal-hub-status>
-          <strong data-legal-hub-title>No document selected yet</strong>
-          <p>Choose a document on the right to load it here.</p>
-        </div>
-        <div class="legal-prose" data-legal-hub-content hidden></div>
+      
+      <div
+        class="legal-hub-viewer"
+        data-legal-hub
+        data-default-doc-key="terms"
+        data-default-doc-lang="en"
+      >
+        <div class="legal-prose legal-hub-content" data-legal-hub-content aria-live="polite"></div>
       </div>
     </section>
   

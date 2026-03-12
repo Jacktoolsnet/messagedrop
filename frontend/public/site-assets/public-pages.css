@@ -417,6 +417,60 @@ img {
   line-height: 1.65;
 }
 
+.hero-panel-language {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.hero-panel-language-copy {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.hero-panel-language-label {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--site-text);
+}
+
+.hero-panel-language-note {
+  margin: 0;
+  color: var(--site-muted);
+  line-height: 1.55;
+  font-size: 0.94rem;
+}
+
+.hero-panel-language-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.hero-panel-language-option {
+  min-width: 7rem;
+  padding: 0.58rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid var(--site-outline);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--site-text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+}
+
+.hero-panel-language-option:hover,
+.hero-panel-language-option:focus-visible {
+  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--site-primary) 8%, #fff);
+  border-color: color-mix(in srgb, var(--site-primary) 28%, var(--site-outline));
+}
+
+.hero-panel-language-option[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--site-secondary) 10%, #fff);
+  border-color: color-mix(in srgb, var(--site-secondary) 28%, var(--site-outline));
+}
+
 .hero-panel-actions {
   display: grid;
   gap: 0.75rem;
@@ -463,23 +517,19 @@ img {
   gap: 1rem;
 }
 
-.legal-hub-status {
-  display: grid;
-  gap: 0.4rem;
-  padding: 1rem 1.05rem;
-  border-radius: var(--site-radius-md);
-  border: 1px dashed var(--site-outline);
-  background: color-mix(in srgb, white 74%, transparent);
-}
-
-.legal-hub-status strong,
-.legal-hub-status p {
+.legal-hub-loading,
+.legal-hub-error {
   margin: 0;
 }
 
-.legal-hub-status p {
+.legal-hub-loading,
+.legal-hub-error {
   color: var(--site-muted);
   line-height: 1.65;
+}
+
+.legal-hub-error {
+  color: #b91c1c;
 }
 
 .check-list li,

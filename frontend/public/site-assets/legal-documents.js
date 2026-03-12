@@ -147,19 +147,24 @@ document.querySelectorAll('[data-legal-doc]').forEach((details) => {
   });
 });
 
-const loadLegalHubDocument = async (trigger) => {
+const loadLegalHubDocument = async (trigger, options = {}) => {
   const viewer = document.querySelector('[data-legal-hub]');
   if (!viewer) {
     return;
   }
 
-  const src = trigger.dataset.src;
-  const title = trigger.dataset.title || '';
-  const status = viewer.querySelector('[data-legal-hub-status]');
+  const docKey = trigger.dataset.docKey || '';
   const titleNode = viewer.querySelector('[data-legal-hub-title]');
   const content = viewer.querySelector('[data-legal-hub-content]');
+  const preferredDocLanguage = viewer.dataset.activeDocLang
+    || viewer.dataset.defaultDocLang
+    || (document.documentElement.lang.toLowerCase().startsWith('de') ? 'de' : 'en');
+  const resolvedDocLanguage = preferredDocLanguage === 'de' ? 'de' : 'en';
+  const src = resolvedDocLanguage === 'de'
+    ? (trigger.dataset.srcDe || trigger.dataset.srcEn || '')
+    : (trigger.dataset.srcEn || trigger.dataset.srcDe || '');
 
-  if (!src || !status || !titleNode || !content) {
+  if (!src || !content) {
     return;
   }
 
@@ -173,11 +178,34 @@ const loadLegalHubDocument = async (trigger) => {
     button.setAttribute('aria-pressed', button === trigger ? 'true' : 'false');
   });
 
-  titleNode.textContent = title;
-  status.hidden = false;
-  status.querySelector('p').textContent = loadingText;
-  content.hidden = true;
-  viewer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.querySelectorAll('[data-legal-doc-lang-trigger]').forEach((button) => {
+    button.setAttribute('aria-pressed', button.dataset.docLang === resolvedDocLanguage ? 'true' : 'false');
+  });
+
+  viewer.dataset.activeDocKey = docKey;
+  viewer.dataset.activeDocLang = resolvedDocLanguage;
+  if (titleNode) {
+    titleNode.textContent = '';
+  }
+  content.setAttribute('lang', resolvedDocLanguage);
+  content.innerHTML = '<p class="legal-hub-loading">' + escapeHtml(loadingText) + '</p>';
+
+  if (window.history?.replaceState) {
+    const params = new URLSearchParams(window.location.search);
+    if (docKey) {
+      params.set('doc', docKey);
+    } else {
+      params.delete('doc');
+    }
+    params.set('docLang', resolvedDocLanguage);
+    const nextQuery = params.toString();
+    const nextUrl = nextQuery ? window.location.pathname + '?' + nextQuery : window.location.pathname;
+    window.history.replaceState({}, '', nextUrl);
+  }
+
+  if (options.scrollIntoView !== false) {
+    viewer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 
   try {
     const response = await fetch(src, { credentials: 'same-origin' });
@@ -187,11 +215,8 @@ const loadLegalHubDocument = async (trigger) => {
 
     const text = await response.text();
     content.innerHTML = renderLegalRichText(text);
-    content.hidden = false;
-    status.hidden = true;
   } catch (error) {
-    status.hidden = false;
-    status.querySelector('p').textContent = errorText;
+    content.innerHTML = '<p class="legal-hub-error">' + escapeHtml(errorText) + '</p>';
     console.error(error);
   }
 };
@@ -202,11 +227,39 @@ document.querySelectorAll('[data-legal-hub-trigger]').forEach((button) => {
   });
 });
 
+document.querySelectorAll('[data-legal-doc-lang-trigger]').forEach((button) => {
+  button.addEventListener('click', () => {
+    const viewer = document.querySelector('[data-legal-hub]');
+    if (!viewer) {
+      return;
+    }
+
+    const requestedLanguage = button.dataset.docLang === 'de' ? 'de' : 'en';
+    viewer.dataset.activeDocLang = requestedLanguage;
+    const activeDocKey = viewer.dataset.activeDocKey || viewer.dataset.defaultDocKey || '';
+    const activeButton = Array.from(document.querySelectorAll('[data-legal-hub-trigger]')).find(
+      (candidate) => candidate.dataset.docKey === activeDocKey,
+    );
+
+    if (activeButton) {
+      void loadLegalHubDocument(activeButton, { scrollIntoView: false });
+    }
+  });
+});
+
 const params = new URLSearchParams(window.location.search);
 const requestedDoc = params.get('doc');
-if (requestedDoc) {
-  const targetButton = document.querySelector('[data-legal-hub-trigger][data-doc-key="' + CSS.escape(requestedDoc) + '"]');
+const viewer = document.querySelector('[data-legal-hub]');
+if (viewer) {
+  const defaultDocKey = viewer.dataset.defaultDocKey || '';
+  const defaultDocLanguage = viewer.dataset.defaultDocLang || (document.documentElement.lang.toLowerCase().startsWith('de') ? 'de' : 'en');
+  viewer.dataset.activeDocLang = defaultDocLanguage;
+
+  const targetButton = Array.from(document.querySelectorAll('[data-legal-hub-trigger]')).find(
+    (button) => button.dataset.docKey === (requestedDoc || defaultDocKey),
+  );
+
   if (targetButton) {
-    void loadLegalHubDocument(targetButton);
+    void loadLegalHubDocument(targetButton, { scrollIntoView: false });
   }
-});
+}
