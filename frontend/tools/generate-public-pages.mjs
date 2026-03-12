@@ -26,6 +26,7 @@ const marketingPages = [
       'MessageDrop is an app with a global map where people can leave messages exactly where they matter.',
     heroTitleClass: 'hero-title-compact',
     showLegalCta: false,
+    showPrimaryCta: false,
     heroAsideTitle: 'What makes MessageDrop different',
     heroAsideItems: [
       'No algorithm decides what you see',
@@ -170,6 +171,7 @@ const marketingPages = [
     heroText:
       'MessageDrop starts with a place. You open the map, see what is happening at a location, and leave a message of your own if you want to add something.',
     showLegalCta: false,
+    showPrimaryCta: false,
     heroAsideTitle: 'It’s that simple',
     heroAsideText:
       'Before you can use MessageDrop, you open the app, set your consent preferences, and can then immediately explore places, messages, and experiences. If you want to create an account, you simply choose a PIN.',
@@ -402,6 +404,7 @@ const germanMarketingPages = [
       'MessageDrop ist eine App mit globaler Karte, auf der Menschen Nachrichten genau dort hinterlassen können, wo sie relevant sind.',
     heroTitleClass: 'hero-title-compact',
     showLegalCta: false,
+    showPrimaryCta: false,
     heroAsideTitle: 'Was MessageDrop anders macht',
     heroAsideItems: [
       'Kein Algorithmus entscheidet, was du siehst',
@@ -546,6 +549,7 @@ const germanMarketingPages = [
     heroText:
       'MessageDrop beginnt mit einem Ort. Du öffnest die Karte, schaust, was an einem Platz passiert, und hinterlässt selbst eine Nachricht, wenn du etwas beitragen willst.',
     showLegalCta: false,
+    showPrimaryCta: false,
     heroAsideTitle: 'So einfach ist es',
     heroAsideText:
       'Bevor du MessageDrop nutzen kannst, öffnest du die App, legst deine Consent-Einstellungen fest und kannst danach direkt Orte, Nachrichten und Erlebnisse entdecken. Wenn du ein Nutzerkonto anlegen möchtest, vergibst du einfach einen PIN.',
@@ -778,6 +782,8 @@ const uiByLocale = {
     footerWhat: 'Was ist MessageDrop?',
     footerHow: 'So funktioniert MessageDrop',
     footerLegal: 'Rechtliches',
+    footerCreditBeforeHeart: 'Mit',
+    footerCreditAfterHeart: 'entwickelt von',
     redirectTitle: 'Sprache wird gewählt',
     redirectText: 'Mit JavaScript wird automatisch die passende Sprachversion geöffnet. Ohne JavaScript kannst du die gewünschte Version hier direkt auswählen.',
     openGerman: 'Deutsch öffnen',
@@ -795,6 +801,8 @@ const uiByLocale = {
     footerWhat: 'What is MessageDrop?',
     footerHow: 'How MessageDrop works',
     footerLegal: 'Legal',
+    footerCreditBeforeHeart: 'Built with',
+    footerCreditAfterHeart: 'by',
     redirectTitle: 'Choosing language',
     redirectText: 'With JavaScript enabled, the matching language version opens automatically. Without JavaScript, you can choose the version directly below.',
     openGerman: 'Open German',
@@ -1066,6 +1074,12 @@ function renderFooter(lang = 'en') {
       <div class="footer-links">
         ${links.map((link) => `<a href="${link.href}">${escapeHtml(link.label)}</a>`).join('')}
       </div>
+      <p class="footer-credit">
+        ${escapeHtml(ui.footerCreditBeforeHeart)}
+        <span class="footer-heart" aria-hidden="true">❤</span>
+        ${escapeHtml(ui.footerCreditAfterHeart)}
+        <strong>JackTools.Net</strong>
+      </p>
     </footer>
   `;
 }
@@ -2816,6 +2830,7 @@ img {
 .site-footer {
   display: grid;
   justify-items: center;
+  gap: 0.9rem;
   margin-top: 1rem;
   padding: 1rem;
   border-radius: var(--site-radius-lg);
@@ -2847,6 +2862,27 @@ img {
   transform: translateY(-1px);
   background: color-mix(in srgb, var(--site-primary) 8%, #fff);
   border-color: color-mix(in srgb, var(--site-primary) 28%, var(--site-outline));
+}
+
+.footer-credit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  font-size: 0.95rem;
+  color: var(--site-muted);
+  text-align: center;
+}
+
+.footer-credit strong {
+  color: var(--site-text);
+}
+
+.footer-heart {
+  color: #ef4444;
+  font-size: 1rem;
+  line-height: 1;
 }
 
 @media (max-width: 980px) {
