@@ -376,9 +376,9 @@ img {
 }
 
 .hero-title-compact {
-  font-size: clamp(1.75rem, 3vw, 2.7rem);
+  font-size: clamp(1.55rem, 2.6vw, 2.35rem);
   line-height: 1.08;
-  max-width: 15ch;
+  max-width: 22ch;
 }
 
 .cta-row {
@@ -611,6 +611,27 @@ img {
   text-decoration: none;
 }
 
+.tile-actions {
+  margin-top: 0.15rem;
+}
+
+.tile-actions .button {
+  width: 100%;
+  justify-content: center;
+}
+
+.tile-cta-icon-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tile-cta-icon-button .material-symbols-outlined {
+  font-size: 1.1rem;
+  line-height: 1;
+  font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
 .info-card-link {
   transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
@@ -624,6 +645,38 @@ img {
 .tile-header .icon-badge {
   width: 3rem;
   height: 3rem;
+}
+
+.audience-section .card-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+}
+
+.audience-section .info-card {
+  justify-items: center;
+  text-align: center;
+}
+
+.audience-section .tile-header {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+}
+
+.audience-section .tile-header .icon-badge {
+  width: 4rem;
+  height: 4rem;
+}
+
+.audience-section .tile-header h3 {
+  line-height: 1.25;
+}
+
+.audience-section .info-card p {
+  max-width: 28ch;
+}
+
+.support-section .tile-grid {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .video-card {
@@ -942,10 +995,29 @@ img {
   color: var(--site-text);
 }
 
-.footer-heart {
-  color: #ef4444;
-  font-size: 1rem;
+.footer-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   line-height: 1;
+}
+
+.footer-icon .material-symbols-outlined {
+  font-size: 1.05rem;
+  line-height: 1;
+  font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+.footer-icon--love {
+  color: #ef4444;
+}
+
+.footer-icon--coffee {
+  color: #8b5e3c;
+}
+
+.footer-icon--chocolate {
+  font-size: 1rem;
 }
 
 @media (max-width: 980px) {
@@ -1048,5 +1120,141 @@ img {
 
   .cta-row .button {
     width: 100%;
+  }
+}
+
+@media print {
+  @page {
+    margin: 12mm;
+  }
+
+  html,
+  body {
+    min-height: auto;
+    background: #fff !important;
+  }
+
+  body {
+    color: #111827;
+  }
+
+  .page-shell {
+    width: auto;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .site-header,
+  .site-footer,
+  .hero,
+  .content-section,
+  .translation-card,
+  .legal-card,
+  .info-card,
+  .tile,
+  .hero-panel,
+  .timeline-item,
+  .faq-item,
+  .video-card {
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    background: #fff !important;
+    border: 1px solid #d1d5db !important;
+  }
+
+  .site-nav,
+  .site-header-cta,
+  .site-menu-toggle,
+  .cta-row,
+  .tile-actions,
+  .video-card-footer,
+  .hero-panel-actions,
+  .hero-panel-language,
+  .footer-links {
+    display: none !important;
+  }
+
+  .site-main,
+  .hero,
+  .hero-copy,
+  .hero-panel,
+  .tile-grid,
+  .card-grid,
+  .video-grid,
+  .legal-stack {
+    display: block !important;
+  }
+
+  .site-header,
+  .hero,
+  .content-section,
+  .site-footer,
+  .tile,
+  .info-card,
+  .video-card,
+  .timeline-item,
+  .translation-card,
+  .legal-card,
+  .faq-item {
+    margin-bottom: 0.75rem;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .site-header {
+    margin-bottom: 0.75rem;
+  }
+
+  .hero h1,
+  .content-section h2 {
+    max-width: none;
+  }
+
+  .tile-grid,
+  .card-grid,
+  .video-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 0.5rem !important;
+  }
+
+  .tile,
+  .info-card,
+  .video-card {
+    padding: 0.75rem !important;
+  }
+
+  .video-card {
+    min-height: 0 !important;
+    height: auto !important;
+    grid-template-rows: none !important;
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+
+  .video-thumb,
+  .video-card-meta {
+    display: none !important;
+  }
+
+  .video-card-body {
+    display: block !important;
+  }
+
+  .video-card-body h3 {
+    margin-bottom: 0.35rem !important;
+  }
+
+  .brand-avatar,
+  .icon-badge,
+  .translation-card summary::before {
+    box-shadow: none !important;
+  }
+
+  a,
+  a:visited {
+    color: inherit;
+    text-decoration: none;
   }
 }

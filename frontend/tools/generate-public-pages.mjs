@@ -22,20 +22,20 @@ const marketingPages = [
     heroIcon: 'globe_location_pin',
     eyebrowIcon: 'question_mark',
     eyebrow: 'What is MessageDrop?',
-    heroTitle: 'Messages in real-world places.',
+    heroTitle: 'Communicate directly and securely — and share messages in real-world places.',
     heroText:
-      'MessageDrop is an app with a global map where people can leave messages exactly where they matter.',
+      'With MessageDrop, you can place messages exactly where they matter.',
     heroTitleClass: 'hero-title-compact',
     showLegalCta: false,
     showPrimaryCta: false,
     heroAsideTitle: 'What makes MessageDrop different',
     heroAsideItems: [
-      'No algorithm decides what you see',
-      'Follow places, not people',
-      'Connect with people you know',
-      'No ads',
-      'No tracking',
-      'Relevance comes from place, not reach',
+      'Whenever possible, your data stays on your device.',
+      'You stay in control of your data. You can create, change, and delete it at any time.',
+      'MessageDrop forgets. Deleting really means deleting.',
+      'No algorithm decides what you see. We always show you the newest messages first.',
+      'No doomscrolling. We limit the number of messages we show you.',
+      'You follow places, not people. If you want to connect with other users, you need to already know them.',
     ],
     sections: [
       {
@@ -43,91 +43,74 @@ const marketingPages = [
         icon: 'lightbulb',
         tiles: [
           {
-            icon: 'pin_drop',
-            title: 'Messages stay tied to places',
+            icon: 'lock',
+            title: 'Your data stays yours',
             body:
-              'A message belongs to a real-world location. Relevance comes from where it is placed, not from who can amplify it.',
+              'Whenever possible, your data stays on your device. Deleting really means deleting. We also proactively remove stale public data and unused user accounts when they are no longer needed.',
           },
           {
             icon: 'filter_alt_off',
-            title: 'No algorithm decides what you see',
+            title: 'No profiling. No algorithm.',
             body:
-              'MessageDrop does not rank posts through an engagement feed. People explore places directly and see what belongs there.',
+              'We do not want to know who you are. We do not care what you like. You see the content that is there — no more and no less.',
+          },
+          {
+            icon: 'pin_drop',
+            title: 'All messages get the same chance',
+            body:
+              'Views, comments, and likes do not make a message more visible in MessageDrop. Visibility is not driven by popularity, but by the place and its context.',
+          },
+          {
+            icon: 'palette',
+            title: 'More freedom for real content',
+            body:
+              'You do not have to think about which content gets the most reach. That leaves more room for what you actually want to share. And if text is not enough, you can place your Pinterest, YouTube, or TikTok content on our map exactly where it happened.',
           },
           {
             icon: 'map',
             title: 'Follow places, not people',
             body:
-              'The focus is on locations and local context. You return to places that matter instead of building everything around personal follower graphs.',
+              'Follow the places that matter to you: your home, your favorite bar, or your vacation spot. Get notified when new messages appear there and add important information yourself.',
+          },
+          {
+            icon: 'near_me',
+            title: 'Location-based services',
+            body:
+              'Places can also show helpful extra context like weather, air quality, and experiences nearby. That makes the map a more useful starting point for orientation and exploration.',
           },
           {
             icon: 'contacts',
-            title: 'Contacts',
+            title: 'Get in touch',
             body:
-              'MessageDrop is built for connecting with people you actually know. Private communication is encrypted so direct conversations stay personal and protected.',
+              'The easiest way to connect with other users is in real life, for example over a coffee, by scanning the connect QR code. It also works online, but you should already know each other. Private communication is transmitted encrypted and signed. The keys are generated on your device, and the private keys never leave it.',
+          },
+          {
+            icon: 'person_search',
+            title: 'Make up your own mind',
+            body:
+              'You can give every user who writes public messages a profile of your own. It is only visible to you and helps you recognize when messages come from the same user. What image other people have of you? You will probably never know.',
           },
         ],
       },
       {
-        title: 'Expression & personality',
-        icon: 'palette',
-        tiles: [
-          {
-            icon: 'gif_box',
-            title: 'Links, videos, and GIFs',
-            body:
-              'You can link YouTube, Pinterest, and TikTok posts and use Tenor GIFs to make messages more expressive and easier to understand at a glance.',
-          },
-          {
-            icon: 'mood',
-            title: 'Local names & avatars',
-            body:
-              'You can give other people names and avatars that are only visible to you. These profiles are stored locally on your device and make MessageDrop feel more personal.',
-          },
-        ],
-      },
-      {
-        title: 'Location-based services',
-        icon: 'near_me',
-        tiles: [
-          {
-            icon: 'partly_cloudy_day',
-            title: 'Weather at a place',
-            body:
-              'MessageDrop can show weather information directly for a place, so people get useful local context without leaving the map.',
-          },
-          {
-            icon: 'air',
-            title: 'Air quality on site',
-            body:
-              'Air quality can also be displayed for a location, making local conditions visible at a glance when they matter.',
-          },
-          {
-            icon: 'local_activity',
-            title: 'Experiences nearby',
-            body:
-              'Places can also surface experiences and activities nearby, turning the map into a richer starting point for exploration.',
-          },
-        ],
-      },
-      {
-        title: 'Who MessageDrop is for',
+        title: 'MessageDrop is made for...',
         icon: 'groups',
+        className: 'audience-section',
         cards: [
           {
-            icon: 'groups',
-            title: 'Less feed, more place',
-            body: 'For people who are tired of algorithmic feeds and traditional social networks and would rather explore places than profiles.',
+            icon: 'palette',
+            title: 'You and your creativity',
+            body: 'Less reach pressure. More room for the content you actually want to share.',
           },
           {
-            icon: 'lock',
-            title: 'Private communication with real contacts',
-            body: 'For people who prefer encrypted private communication and mainly want to connect with people they actually know.',
+            icon: 'group',
+            title: 'You and your friends',
+            body: 'For private communication with people you really know.',
           },
           {
-            icon: 'travel_explore',
-            title: 'More context around places',
-            body: 'For people who want to know more about places — from messages and impressions to weather, air quality, and nearby experiences.',
+            icon: 'place',
+            title: 'You and your places',
+            body: 'For the places that matter to you and the context around them.',
           },
         ],
       },
@@ -140,19 +123,36 @@ const marketingPages = [
             icon: 'explore',
             title: 'More ideas around places',
             body:
-              'We want to keep expanding how much useful context can live around a place, so the map becomes more helpful over time.',
+              'Where is my favorite food truck today? Is there a discount code at the café around the corner? What is the next event at the concert hall in my city? And if I miss the last train — can I still find a hotel nearby? These are exactly the kinds of place-based questions we want MessageDrop to answer even better in the future.',
           },
           {
             icon: 'travel',
-            title: 'More ways to explore',
+            title: 'Explore the world',
             body:
-              'Exploring the real world should feel fun and natural. We want to keep building features that help people discover places in better ways.',
+              'We are planning a feature that helps you plan your next trip in the best possible way: when to go, where to stay, which hotel fits, what sights to visit, which events are happening, and how prices and tickets look — all in one app.',
           },
           {
             icon: 'autorenew',
             title: 'Continuous development',
             body:
-              'MessageDrop is meant to evolve continuously. New ideas, new use cases, and real feedback should shape where it goes next.',
+              '“Those who only follow paths others have already taken will only ever arrive where others have already been.” That mindset should shape MessageDrop too: continuous improvement, new ideas, and the courage to build things differently.',
+          },
+        ],
+      },
+      {
+        title: 'Support JackTools.Net',
+        icon: 'local_cafe',
+        className: 'support-section',
+        tiles: [
+          {
+            icon: 'local_cafe',
+            title: 'If you like MessageDrop, buy us a coffee',
+            body:
+              'If you like MessageDrop and the ideas behind it, you can support JackTools.Net directly. Every contribution helps us with development, operations, and new features — whether it pays for coffee, chocolate, or the next good idea.',
+            href: 'https://buymeacoffee.com/jacktoolsnet',
+            ctaLabel: 'Buy me a coffee',
+            ctaIcon: 'local_cafe',
+            external: true,
           },
         ],
       },
@@ -171,12 +171,12 @@ const marketingPages = [
     eyebrow: 'How it works',
     heroTitle: 'Open the app. Pick a place. Leave a message.',
     heroText:
-      'MessageDrop starts with a place. You open the map, see what is happening at a location, and leave a message of your own if you want to add something.',
+      'Communication can be this simple.',
     showLegalCta: false,
     showPrimaryCta: false,
-    heroAsideTitle: 'It’s that simple',
+    heroAsideTitle: 'If things get a little tricky',
     heroAsideText:
-      'Before you can use MessageDrop, you open the app, set your consent preferences, and can then immediately explore places, messages, and experiences. If you want to create an account, you simply choose a PIN.',
+      'Sometimes it can be a little more complicated. For those moments, we will gradually provide video tutorials here.',
     sections: [
       {
         title: 'Video guides',
@@ -403,20 +403,20 @@ const germanMarketingPages = [
     heroIcon: 'globe_location_pin',
     eyebrowIcon: 'question_mark',
     eyebrow: 'Was ist MessageDrop?',
-    heroTitle: 'Nachrichten an echten Orten.',
+    heroTitle: 'Kommuniziere direkt und sicher – und teile Nachrichten an echten Orten.',
     heroText:
-      'MessageDrop ist eine App mit globaler Karte, auf der Menschen Nachrichten genau dort hinterlassen können, wo sie relevant sind.',
+      'Mit MessageDrop kannst Du Nachrichten genau dort platzieren, wo sie relevant sind.',
     heroTitleClass: 'hero-title-compact',
     showLegalCta: false,
     showPrimaryCta: false,
     heroAsideTitle: 'Was MessageDrop anders macht',
     heroAsideItems: [
-      'Kein Algorithmus entscheidet, was du siehst',
-      'Du folgst Orten statt Personen',
-      'Verbinde dich mit Menschen, die du kennst',
-      'Keine Werbung',
-      'Kein Tracking',
-      'Relevanz entsteht durch Ort, nicht durch Reichweite',
+      'Wann immer möglich, bleiben Deine Daten auf Deinem Gerät.',
+      'Du behältst die Kontrolle über Deine Daten. Erstellen, ändern und löschen ist jederzeit möglich.',
+      'MessageDrop vergisst. Löschen bedeutet wirklich löschen.',
+      'Kein Algorithmus entscheidet, was Du siehst. Wir zeigen Dir immer die neuesten Nachrichten zuerst.',
+      'Kein Doomscrolling. Wir begrenzen die Anzahl der Nachrichten, die wir Dir zeigen.',
+      'Du folgst Orten statt Personen. Wenn Du Dich mit anderen Nutzern verbinden möchtest, musst Du sie bereits kennen.',
     ],
     sections: [
       {
@@ -424,91 +424,74 @@ const germanMarketingPages = [
         icon: 'lightbulb',
         tiles: [
           {
-            icon: 'pin_drop',
-            title: 'Nachrichten bleiben an Orte gebunden',
+            icon: 'lock',
+            title: 'Deine Daten sind Deine Daten',
             body:
-              'Eine Nachricht gehört zu einem realen Ort. Relevanz entsteht dadurch, wo sie platziert wird – nicht dadurch, wer sie weiterverbreitet.',
+              'Wann immer möglich, bleiben Deine Daten auf Deinem Gerät. Löschen bedeutet wirklich löschen. Außerdem entfernen wir öffentliche Alt-Daten und ungenutzte Nutzerkonten proaktiv, wenn sie nicht mehr gebraucht werden.',
           },
           {
             icon: 'filter_alt_off',
-            title: 'Kein Algorithmus entscheidet, was du siehst',
+            title: 'Kein Profiling. Kein Algorithmus.',
             body:
-              'MessageDrop sortiert Inhalte nicht über einen Engagement-Feed. Menschen erkunden Orte direkt und sehen, was dorthin gehört.',
+              'Wir wollen nicht wissen, wer Du bist. Uns ist egal, was Dir gefällt. Du siehst den Inhalt, der da ist – nicht mehr und nicht weniger.',
+          },
+          {
+            icon: 'pin_drop',
+            title: 'Alle Nachrichten haben die gleiche Chance',
+            body:
+              'Views, Kommentare und Likes machen eine Nachricht in MessageDrop nicht sichtbarer. Sichtbarkeit entsteht nicht durch Popularität, sondern durch den Ort und seinen Kontext.',
+          },
+          {
+            icon: 'palette',
+            title: 'Mehr Freiheit für echten Content',
+            body:
+              'Du musst Dir keine Gedanken darüber machen, welcher Inhalt die größte Reichweite erzielt. So bleibt mehr Raum für das, was Du wirklich teilen willst. Und wenn Text nicht reicht, kannst Du Deinen Pinterest-, YouTube- oder TikTok-Content genau dort auf unserer Karte platzieren, wo er passiert ist.',
           },
           {
             icon: 'map',
-            title: 'Du folgst Orten statt Personen',
+            title: 'Folge Orten, nicht Personen',
             body:
-              'Im Mittelpunkt stehen Orte und lokaler Kontext. Du kommst zu den Plätzen zurück, die dir wichtig sind, statt einem Follower-Graphen zu folgen.',
+              'Folge den Orten, die Dir wichtig sind: Deinem Zuhause, Deiner Lieblingsbar oder Deinem Urlaubsort. Erhalte Benachrichtigungen, wenn dort neue Nachrichten erscheinen, und füge selbst wichtige Informationen hinzu.',
+          },
+          {
+            icon: 'near_me',
+            title: 'Ortsbezogene Dienste',
+            body:
+              'Zu Orten können zusätzliche Informationen wie Wetter, Luftqualität und Erlebnisse in der Nähe angezeigt werden. So wird die Karte zu einem besseren Ausgangspunkt für Orientierung und Entdeckung.',
           },
           {
             icon: 'contacts',
-            title: 'Kontakte',
+            title: 'Tritt in Kontakt',
             body:
-              'Uns ist wichtig, dass du dich mit Menschen verbindest, die du wirklich kennst. Private Kommunikation ist verschlüsselt, damit direkte Gespräche persönlich und geschützt bleiben.',
+              'Am einfachsten verbindest Du Dich mit anderen Nutzern im echten Leben, zum Beispiel bei einem Kaffee, indem ihr den Connect-QR-Code scannt. Es geht auch online, aber ihr solltet euch bereits kennen. Private Kommunikation wird verschlüsselt und signiert übertragen. Die Schlüssel werden auf Deinem Gerät erzeugt, und die privaten Schlüssel verlassen es nicht.',
+          },
+          {
+            icon: 'person_search',
+            title: 'Mach Dir Dein eigenes Bild',
+            body:
+              'Du kannst jedem Nutzer, der öffentliche Nachrichten schreibt, ein eigenes Profil geben. Dieses Profil ist nur für Dich sichtbar und hilft Dir zu erkennen, wenn Nachrichten vom selben Nutzer stammen. Welche Bilder andere sich von Dir machen? Das wirst Du vermutlich nie erfahren.',
           },
         ],
       },
       {
-        title: 'Ausdruck & Persönlichkeit',
-        icon: 'palette',
-        tiles: [
-          {
-            icon: 'gif_box',
-            title: 'Links, Videos und GIFs',
-            body:
-              'Du kannst YouTube-, Pinterest- und TikTok-Beiträge verlinken und Tenor-GIFs verwenden, um Nachrichten anschaulicher und ausdrucksstärker zu machen.',
-          },
-          {
-            icon: 'mood',
-            title: 'Lokale Namen & Avatare',
-            body:
-              'Du kannst anderen Menschen Namen und Avatare geben, die nur für dich gelten. Diese Profile werden lokal auf deinem Gerät gespeichert und machen MessageDrop persönlicher.',
-          },
-        ],
-      },
-      {
-        title: 'Ortsbezogene Dienste',
-        icon: 'near_me',
-        tiles: [
-          {
-            icon: 'partly_cloudy_day',
-            title: 'Wetter am Ort',
-            body:
-              'MessageDrop kann Wetterinformationen direkt für einen Ort anzeigen, damit Menschen nützlichen lokalen Kontext sehen, ohne die Karte zu verlassen.',
-          },
-          {
-            icon: 'air',
-            title: 'Luftqualität vor Ort',
-            body:
-              'Auch die Luftqualität kann für einen Ort eingeblendet werden, damit lokale Bedingungen genau dann sichtbar sind, wenn sie wichtig werden.',
-          },
-          {
-            icon: 'local_activity',
-            title: 'Erlebnisse in der Nähe',
-            body:
-              'Zu Orten können außerdem passende Erlebnisse und Aktivitäten in der Nähe angezeigt werden. So wird die Karte noch stärker zum Ausgangspunkt für Entdeckungen.',
-          },
-        ],
-      },
-      {
-        title: 'Für wen MessageDrop gemacht ist',
+        title: 'MessageDrop ist gemacht für...',
         icon: 'groups',
+        className: 'audience-section',
         cards: [
           {
-            icon: 'groups',
-            title: 'Weniger Feed, mehr Ort',
-            body: 'Für Menschen, die genug von algorithmischen Feeds und gewöhnlichen sozialen Netzwerken haben und lieber Orte statt Profile entdecken.',
+            icon: 'palette',
+            title: 'Dich und Deine Kreativität',
+            body: 'Weniger Reichweitendruck. Mehr Raum für den Content, den Du wirklich teilen willst.',
           },
           {
-            icon: 'lock',
-            title: 'Private Kommunikation mit echten Kontakten',
-            body: 'Für Menschen, die verschlüsselte private Kommunikation bevorzugen und sich vor allem mit Menschen austauschen wollen, die sie wirklich kennen.',
+            icon: 'group',
+            title: 'Dich und Deine Freunde',
+            body: 'Für private Kommunikation mit Personen, die Du wirklich kennst.',
           },
           {
-            icon: 'travel_explore',
-            title: 'Mehr Kontext zu Orten',
-            body: 'Für Menschen, die zu Plätzen mehr wissen wollen — von Nachrichten und Eindrücken bis zu Wetter, Luftqualität und Erlebnissen in der Nähe.',
+            icon: 'place',
+            title: 'Dich und Deine Orte',
+            body: 'Für Orte, die Dir wichtig sind, und den Kontext rund um sie.',
           },
         ],
       },
@@ -521,19 +504,36 @@ const germanMarketingPages = [
             icon: 'explore',
             title: 'Mehr Ideen rund um Orte',
             body:
-              'Wir wollen weiter ausbauen, wie viel nützlicher Kontext rund um einen Ort sichtbar werden kann, damit die Karte mit der Zeit immer hilfreicher wird.',
+              'Wo ist mein Lieblings-Foodtruck heute? Gibt es einen Rabattcode im Café um die Ecke? Was ist das nächste Event in der Konzerthalle meiner Stadt? Und wenn ich den letzten Zug verpasse — finde ich noch ein Hotel in der Nähe? Genau solche ortsbezogenen Fragen wollen wir mit MessageDrop künftig noch besser beantworten.',
           },
           {
             icon: 'travel',
-            title: 'Mehr Wege zum Entdecken',
+            title: 'Entdecke die Welt',
             body:
-              'Die echte Welt zu erkunden soll sich leicht und spannend anfühlen. Deshalb wollen wir weitere Funktionen entwickeln, die Menschen beim Entdecken von Orten helfen.',
+              'Wir planen eine Funktion, die Dich optimal bei der Planung Deiner nächsten Reise unterstützt: wann, wohin, welches Hotel passt, welche Sehenswürdigkeiten sich lohnen, welche Events stattfinden und wie es mit Preisen und Tickets aussieht — alles in einer App.',
           },
           {
             icon: 'autorenew',
             title: 'Kontinuierliche Weiterentwicklung',
             body:
-              'MessageDrop soll sich kontinuierlich weiterentwickeln. Neue Ideen, echte Anwendungsfälle und Feedback sollen mitbestimmen, wohin sich das Produkt als Nächstes bewegt.',
+              '„Wer immer nur Wege geht, die andere gegangen sind, kommt immer nur dorthin, wo andere schon waren.“ Dieses Denken soll auch MessageDrop prägen: kontinuierliche Weiterentwicklung, neue Ideen und der Mut, Dinge anders zu bauen.',
+          },
+        ],
+      },
+      {
+        title: 'Unterstütze JackTools.Net',
+        icon: 'local_cafe',
+        className: 'support-section',
+        tiles: [
+          {
+            icon: 'local_cafe',
+            title: 'Wenn Dir MessageDrop gefällt, spendiere uns einen Kaffee',
+            body:
+              'Wenn Dir MessageDrop und die Ideen dahinter gefallen, kannst Du JackTools.Net direkt unterstützen. Jeder Beitrag hilft uns bei Entwicklung, Betrieb und neuen Funktionen — ob für Kaffee, Schokolade oder die nächste gute Idee.',
+            href: 'https://buymeacoffee.com/jacktoolsnet',
+            ctaLabel: 'Buy me a coffee',
+            ctaIcon: 'local_cafe',
+            external: true,
           },
         ],
       },
@@ -552,12 +552,12 @@ const germanMarketingPages = [
     eyebrow: 'So funktioniert es',
     heroTitle: 'App öffnen. Ort wählen. Nachricht hinterlassen.',
     heroText:
-      'MessageDrop beginnt mit einem Ort. Du öffnest die Karte, schaust, was an einem Platz passiert, und hinterlässt selbst eine Nachricht, wenn du etwas beitragen willst.',
+      'So einfach kann Kommunikation sein.',
     showLegalCta: false,
     showPrimaryCta: false,
-    heroAsideTitle: 'So einfach ist es',
+    heroAsideTitle: 'Wenn es doch mal klemmt!',
     heroAsideText:
-      'Bevor du MessageDrop nutzen kannst, öffnest du die App, legst deine Consent-Einstellungen fest und kannst danach direkt Orte, Nachrichten und Erlebnisse entdecken. Wenn du ein Nutzerkonto anlegen möchtest, vergibst du einfach einen PIN.',
+      'Manchmal ist es aber auch ein bisschen komplizierter. Für diesen Fall werden wir hier nach und nach Video-Tutorials bereitstellen.',
     sections: [
       {
         title: 'Video-Guides',
@@ -788,8 +788,8 @@ const uiByLocale = {
     footerWhat: 'Was ist MessageDrop?',
     footerHow: 'So funktioniert MessageDrop',
     footerLegal: 'Rechtliches',
-    footerCreditBeforeHeart: 'Mit',
-    footerCreditAfterHeart: 'entwickelt von',
+    footerCreditPrefix: 'Mit',
+    footerCreditSuffix: 'entwickelt von',
     redirectTitle: 'Sprache wird gewählt',
     redirectText: 'Mit JavaScript wird automatisch die passende Sprachversion geöffnet. Ohne JavaScript kannst du die gewünschte Version hier direkt auswählen.',
     openGerman: 'Deutsch öffnen',
@@ -807,8 +807,8 @@ const uiByLocale = {
     footerWhat: 'What is MessageDrop?',
     footerHow: 'How MessageDrop works',
     footerLegal: 'Legal',
-    footerCreditBeforeHeart: 'Built with',
-    footerCreditAfterHeart: 'by',
+    footerCreditPrefix: 'Built with',
+    footerCreditSuffix: 'by',
     redirectTitle: 'Choosing language',
     redirectText: 'With JavaScript enabled, the matching language version opens automatically. Without JavaScript, you can choose the version directly below.',
     openGerman: 'Open German',
@@ -1093,9 +1093,15 @@ function renderFooter(lang = 'en') {
         ${links.map((link) => `<a href="${link.href}">${escapeHtml(link.label)}</a>`).join('')}
       </div>
       <p class="footer-credit">
-        ${escapeHtml(ui.footerCreditBeforeHeart)}
-        <span class="footer-heart" aria-hidden="true">❤</span>
-        ${escapeHtml(ui.footerCreditAfterHeart)}
+        ${escapeHtml(ui.footerCreditPrefix)}
+        <span class="footer-icon footer-icon--love" aria-hidden="true">
+          <span class="material-symbols-outlined">favorite</span>
+        </span>
+        <span class="footer-icon footer-icon--coffee" aria-hidden="true">
+          <span class="material-symbols-outlined">local_cafe</span>
+        </span>
+        <span class="footer-icon footer-icon--chocolate" aria-hidden="true">🍫</span>
+        ${escapeHtml(ui.footerCreditSuffix)}
         <strong>JackTools.Net</strong>
       </p>
     </footer>
@@ -1217,6 +1223,11 @@ function renderTileGrid(tiles) {
               <h3>${escapeHtml(tile.title)}</h3>
             </div>
             <p>${escapeHtml(tile.body)}</p>
+            ${tile.href
+              ? `<div class="tile-actions">
+                  <a class="button button-secondary button-small${tile.ctaIcon ? ' tile-cta-icon-button' : ''}" href="${escapeHtml(tile.href)}"${tile.external ? ' target="_blank" rel="noreferrer noopener"' : ''}>${tile.ctaIcon ? `<span class="material-symbols-outlined" aria-hidden="true">${escapeHtml(tile.ctaIcon)}</span>` : ''}${escapeHtml(tile.ctaLabel ?? 'Learn more')}</a>
+                </div>`
+              : ''}
           </article>
         `,
         )
@@ -1345,7 +1356,7 @@ function renderSection(section) {
       `;
 
   return `
-    <section class="content-section">
+    <section class="content-section${section.className ? ` ${escapeHtml(section.className)}` : ''}">
       <div class="section-heading">
         ${headingContent}
       </div>
@@ -2352,9 +2363,9 @@ img {
 }
 
 .hero-title-compact {
-  font-size: clamp(1.75rem, 3vw, 2.7rem);
+  font-size: clamp(1.55rem, 2.6vw, 2.35rem);
   line-height: 1.08;
-  max-width: 15ch;
+  max-width: 22ch;
 }
 
 .cta-row {
@@ -2587,6 +2598,27 @@ img {
   text-decoration: none;
 }
 
+.tile-actions {
+  margin-top: 0.15rem;
+}
+
+.tile-actions .button {
+  width: 100%;
+  justify-content: center;
+}
+
+.tile-cta-icon-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tile-cta-icon-button .material-symbols-outlined {
+  font-size: 1.1rem;
+  line-height: 1;
+  font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
 .info-card-link {
   transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
@@ -2600,6 +2632,38 @@ img {
 .tile-header .icon-badge {
   width: 3rem;
   height: 3rem;
+}
+
+.audience-section .card-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+}
+
+.audience-section .info-card {
+  justify-items: center;
+  text-align: center;
+}
+
+.audience-section .tile-header {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+}
+
+.audience-section .tile-header .icon-badge {
+  width: 4rem;
+  height: 4rem;
+}
+
+.audience-section .tile-header h3 {
+  line-height: 1.25;
+}
+
+.audience-section .info-card p {
+  max-width: 28ch;
+}
+
+.support-section .tile-grid {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .video-card {
@@ -2918,10 +2982,29 @@ img {
   color: var(--site-text);
 }
 
-.footer-heart {
-  color: #ef4444;
-  font-size: 1rem;
+.footer-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   line-height: 1;
+}
+
+.footer-icon .material-symbols-outlined {
+  font-size: 1.05rem;
+  line-height: 1;
+  font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+.footer-icon--love {
+  color: #ef4444;
+}
+
+.footer-icon--coffee {
+  color: #8b5e3c;
+}
+
+.footer-icon--chocolate {
+  font-size: 1rem;
 }
 
 @media (max-width: 980px) {
@@ -3024,6 +3107,142 @@ img {
 
   .cta-row .button {
     width: 100%;
+  }
+}
+
+@media print {
+  @page {
+    margin: 12mm;
+  }
+
+  html,
+  body {
+    min-height: auto;
+    background: #fff !important;
+  }
+
+  body {
+    color: #111827;
+  }
+
+  .page-shell {
+    width: auto;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .site-header,
+  .site-footer,
+  .hero,
+  .content-section,
+  .translation-card,
+  .legal-card,
+  .info-card,
+  .tile,
+  .hero-panel,
+  .timeline-item,
+  .faq-item,
+  .video-card {
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    background: #fff !important;
+    border: 1px solid #d1d5db !important;
+  }
+
+  .site-nav,
+  .site-header-cta,
+  .site-menu-toggle,
+  .cta-row,
+  .tile-actions,
+  .video-card-footer,
+  .hero-panel-actions,
+  .hero-panel-language,
+  .footer-links {
+    display: none !important;
+  }
+
+  .site-main,
+  .hero,
+  .hero-copy,
+  .hero-panel,
+  .tile-grid,
+  .card-grid,
+  .video-grid,
+  .legal-stack {
+    display: block !important;
+  }
+
+  .site-header,
+  .hero,
+  .content-section,
+  .site-footer,
+  .tile,
+  .info-card,
+  .video-card,
+  .timeline-item,
+  .translation-card,
+  .legal-card,
+  .faq-item {
+    margin-bottom: 0.75rem;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .site-header {
+    margin-bottom: 0.75rem;
+  }
+
+  .hero h1,
+  .content-section h2 {
+    max-width: none;
+  }
+
+  .tile-grid,
+  .card-grid,
+  .video-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 0.5rem !important;
+  }
+
+  .tile,
+  .info-card,
+  .video-card {
+    padding: 0.75rem !important;
+  }
+
+  .video-card {
+    min-height: 0 !important;
+    height: auto !important;
+    grid-template-rows: none !important;
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+
+  .video-thumb,
+  .video-card-meta {
+    display: none !important;
+  }
+
+  .video-card-body {
+    display: block !important;
+  }
+
+  .video-card-body h3 {
+    margin-bottom: 0.35rem !important;
+  }
+
+  .brand-avatar,
+  .icon-badge,
+  .translation-card summary::before {
+    box-shadow: none !important;
+  }
+
+  a,
+  a:visited {
+    color: inherit;
+    text-decoration: none;
   }
 }
 `;
