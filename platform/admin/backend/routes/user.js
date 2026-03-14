@@ -39,6 +39,15 @@ const toNumber = (value, fallback) => {
     return Number.isFinite(parsed) ? parsed : fallback;
 };
 
+const toBool = (value, fallback = false) => {
+    if (value === undefined || value === null) return fallback;
+    if (typeof value === 'boolean') return value;
+    const normalized = String(value).trim().toLowerCase();
+    if (['1', 'true', 'yes', 'on'].includes(normalized)) return true;
+    if (['0', 'false', 'no', 'off'].includes(normalized)) return false;
+    return fallback;
+};
+
 const normalizeEmail = (value) => (typeof value === 'string' ? value.trim().toLowerCase() : '');
 const isValidEmail = (value) => EMAIL_REGEX.test(normalizeEmail(value));
 const isMailConfigured = () => {
@@ -61,6 +70,7 @@ const VERIFY_SLOWDOWN_MAX_MS = toNumber(process.env.ADMIN_LOGIN_VERIFY_SLOWDOWN_
 const ALLOWED_ROLES = new Set(['moderator', 'legal', 'admin', 'root']);
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const backendAudience = process.env.SERVICE_JWT_AUDIENCE_BACKEND || 'service.backend';
+const OTP_PUSH_REQUIRED = toBool(process.env.ADMIN_OTP_PUSH_REQUIRED, false);
 
 function createSlowdown({ windowMs, delayAfter, delayMs, maxDelayMs, keyGenerator }) {
     const hits = new Map();
@@ -157,6 +167,12 @@ const generateOtp = () => {
     return String(Math.floor(Math.random() * 10 ** OTP_LENGTH)).padStart(OTP_LENGTH, '0');
 };
 
+function createOtpDeliveryError(message, detail) {
+    const err = new Error(message);
+    err.detail = detail;
+    return err;
+}
+
 async function sendOtp(username, email, otp, logger) {
     const validMinutes = Math.round(OTP_TTL_MS / 60000);
     const title = 'Messagedrop Admin Login OTP';
@@ -169,36 +185,69 @@ async function sendOtp(username, email, otp, logger) {
       <p>Falls du den Login nicht angefordert hast, melde dich bitte sofort beim Root-Admin.</p>
     `;
 
-    const pushSent = await sendPushbulletNotification({
-        title,
-        body: text,
-        logger
-    });
+    let pushSent = false;
+    let emailSent = false;
+    const deliveryDetail = {
+        username,
+        email: normalizedEmail || null,
+        pushRequired: OTP_PUSH_REQUIRED,
+        pushSent: false,
+        emailSent: false,
+        emailAttempted: false,
+        mailConfigured: isMailConfigured(),
+        validEmail: isValidEmail(normalizedEmail),
+        reasons: []
+    };
 
+    try {
+        pushSent = await sendPushbulletNotification({
+            title,
+            body: text,
+            logger
+        });
+    } catch (error) {
+        pushSent = false;
+        deliveryDetail.reasons.push(`push_exception:${error?.message || error}`);
+    }
+
+    deliveryDetail.pushSent = pushSent;
     if (!pushSent) {
-        logger?.warn?.('OTP Pushbullet delivery failed', { username, email: normalizedEmail || null });
-        throw new Error('otp_push_delivery_failed');
+        logger?.warn?.('OTP push delivery failed', { username, email: normalizedEmail || null, pushRequired: OTP_PUSH_REQUIRED });
+        deliveryDetail.reasons.push('push_failed');
+        if (OTP_PUSH_REQUIRED) {
+            throw createOtpDeliveryError('otp_push_required_delivery_failed', deliveryDetail);
+        }
     }
 
-    if (!isValidEmail(normalizedEmail)) {
+    if (!deliveryDetail.validEmail) {
         logger?.warn?.('Skipping OTP e-mail delivery (missing/invalid recipient)', { username });
-        return;
-    }
-    if (!isMailConfigured()) {
+        deliveryDetail.reasons.push('email_invalid_or_missing');
+    } else if (!deliveryDetail.mailConfigured) {
         logger?.warn?.('Skipping OTP e-mail delivery (mail transport not configured)', { username, email: normalizedEmail });
-        return;
+        deliveryDetail.reasons.push('mail_transport_not_configured');
+    } else {
+        deliveryDetail.emailAttempted = true;
+        const mailResult = await sendMail({
+            to: normalizedEmail,
+            subject: title,
+            text,
+            html,
+            logger
+        });
+        if (!mailResult || mailResult.success === false) {
+            logger?.warn?.('OTP e-mail delivery failed (non-blocking)', { username, email: normalizedEmail });
+            deliveryDetail.reasons.push('email_send_failed');
+        } else {
+            emailSent = true;
+            deliveryDetail.emailSent = true;
+        }
     }
 
-    const mailResult = await sendMail({
-        to: normalizedEmail,
-        subject: title,
-        text,
-        html,
-        logger
-    });
-    if (!mailResult || mailResult.success === false) {
-        logger?.warn?.('OTP e-mail delivery failed (non-blocking)', { username, email: normalizedEmail });
+    if (!pushSent && !emailSent) {
+        throw createOtpDeliveryError('otp_delivery_failed', deliveryDetail);
     }
+
+    return { pushSent, emailSent };
 }
 
 async function notifyLoginFailure(username, reason, logger) {
@@ -393,8 +442,10 @@ router.post('/login', [loginLimiter, loginSlowdown], async (req, res, next) => {
                 );
                 return res.json({ status: 'otp_required', challengeId: id, expiresAt });
             } catch (otpErr) {
-                req.logger?.error('Root OTP challenge failed', { error: otpErr?.message });
-                return next(apiError.internal('otp_failed'));
+                req.logger?.error('Root OTP challenge failed', { error: otpErr?.message, detail: otpErr?.detail });
+                const err = apiError.internal('otp_failed');
+                err.detail = otpErr?.detail || otpErr?.message;
+                return next(err);
             }
         }
 
@@ -421,8 +472,10 @@ router.post('/login', [loginLimiter, loginSlowdown], async (req, res, next) => {
                 );
                 res.json({ status: 'otp_required', challengeId: id, expiresAt });
             } catch (otpErr) {
-                req.logger?.error('OTP challenge failed', { error: otpErr?.message });
-                return next(apiError.internal('otp_failed'));
+                req.logger?.error('OTP challenge failed', { error: otpErr?.message, detail: otpErr?.detail });
+                const err = apiError.internal('otp_failed');
+                err.detail = otpErr?.detail || otpErr?.message;
+                return next(err);
             }
         });
     } catch (error) {
