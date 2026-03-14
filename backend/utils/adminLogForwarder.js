@@ -1,6 +1,35 @@
 const axios = require('axios');
 const { signServiceJwt } = require('./serviceJwt');
 
+function safeStringify(value) {
+  const seen = new WeakSet();
+  try {
+    return JSON.stringify(value, (_key, current) => {
+      if (typeof current === 'bigint') return current.toString();
+      if (current instanceof Error) {
+        return {
+          name: current.name,
+          message: current.message,
+          stack: current.stack,
+          code: current.code,
+          status: current.status
+        };
+      }
+      if (typeof current === 'object' && current !== null) {
+        if (seen.has(current)) return '[Circular]';
+        seen.add(current);
+      }
+      return current;
+    });
+  } catch {
+    try {
+      return String(value);
+    } catch {
+      return '[Unserializable]';
+    }
+  }
+}
+
 function resolveBaseUrl(envBase, envPort, fallback) {
   if (fallback) return fallback.replace(/\/+$/, '');
   const base = (envBase || '').replace(/\/+$/, '');
@@ -26,7 +55,7 @@ function formatDetail(meta) {
     return null;
   }
   try {
-    return JSON.stringify(meta);
+    return safeStringify(meta);
   } catch {
     return String(meta);
   }
@@ -61,7 +90,7 @@ function createForwarder({ baseUrl, token, audience, source }) {
     const body = {
       source: source || 'backend',
       file,
-      message: typeof message === 'string' ? message : JSON.stringify(message),
+      message: typeof message === 'string' ? message : safeStringify(message),
       detail,
       createdAt: Date.now()
     };

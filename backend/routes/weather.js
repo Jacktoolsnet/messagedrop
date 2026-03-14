@@ -49,7 +49,13 @@ router.get('/:locale/:pluscode/:latitude/:longitude/:days', [
 
         res.status(upstream.status).json(upstream.data);
     } catch (err) {
-        req.logger.error('[weather.proxy] upstream error:', err?.message || err);
+        req.logger.error('[weather.proxy] upstream error', {
+            message: err?.message || null,
+            code: err?.code || null,
+            status: err?.response?.status || null,
+            url: err?.config?.url || null,
+            baseURL: err?.config?.baseURL || null
+        });
         return next(buildUpstreamError(err));
     }
 });
@@ -77,7 +83,13 @@ router.get('/history/:pluscode/:latitude/:longitude/:years', [
 
         res.status(upstream.status).json(upstream.data);
     } catch (err) {
-        req.logger.error('[weather.proxy.history] upstream error:', err?.message || err);
+        req.logger.error('[weather.proxy.history] upstream error', {
+            message: err?.message || null,
+            code: err?.code || null,
+            status: err?.response?.status || null,
+            url: err?.config?.url || null,
+            baseURL: err?.config?.baseURL || null
+        });
         return next(buildUpstreamError(err));
     }
 });

@@ -74,11 +74,44 @@ app.use(compression({
 
 // Logger
 
+function safeStringify(value) {
+  const seen = new WeakSet();
+  try {
+    return JSON.stringify(value, (_key, current) => {
+      if (typeof current === 'bigint') {
+        return current.toString();
+      }
+      if (current instanceof Error) {
+        return {
+          name: current.name,
+          message: current.message,
+          stack: current.stack,
+          code: current.code,
+          status: current.status
+        };
+      }
+      if (typeof current === 'object' && current !== null) {
+        if (seen.has(current)) {
+          return '[Circular]';
+        }
+        seen.add(current);
+      }
+      return current;
+    });
+  } catch {
+    try {
+      return String(value);
+    } catch {
+      return '[Unserializable]';
+    }
+  }
+}
+
 // Format für bessere Lesbarkeit
 const logFormat = winston.format.combine(
   winston.format.timestamp(),
   winston.format.printf(({ timestamp, level, message, ...meta }) => {
-    return `${timestamp} [${level.toUpperCase()}] ${message} ${Object.keys(meta).length ? JSON.stringify(meta) : ''}`;
+    return `${timestamp} [${level.toUpperCase()}] ${message} ${Object.keys(meta).length ? safeStringify(meta) : ''}`;
   })
 );
 
@@ -140,7 +173,7 @@ if (process.env.NODE_ENV !== 'production') {
 function registerProcessHandlers() {
   const exitOnUnhandled = process.env.EXIT_ON_UNHANDLED === 'true';
   const logProcessError = (label, err) => {
-    const error = err instanceof Error ? err : new Error(typeof err === 'string' ? err : JSON.stringify(err));
+    const error = err instanceof Error ? err : new Error(typeof err === 'string' ? err : safeStringify(err));
     const traceId = err?.traceId;
     logger.error(label, {
       service: 'backend',
