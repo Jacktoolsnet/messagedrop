@@ -1,11 +1,12 @@
-import { Component, inject } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { User } from '../../../interfaces/user.interface';
 import { AuthService } from '../../../services/auth/auth.service';
 import { UserService } from '../../../services/user/user.service';
@@ -15,10 +16,11 @@ import { EditUserComponent, EditUserData } from '../../user/edit-user/edit-user.
 
 @Component({
   selector: 'app-user-dashboard',
-  standalone: true,
   templateUrl: './user-dashboard.component.html',
   styleUrls: ['./user-dashboard.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    DatePipe,
     RouterLink,
     MatToolbarModule,
     MatIconModule,
@@ -30,7 +32,6 @@ import { EditUserComponent, EditUserData } from '../../user/edit-user/edit-user.
 export class UserDashboardComponent {
   private dialog = inject(MatDialog);
   private snack = inject(MatSnackBar);
-  private router = inject(Router);
   private userService = inject(UserService);
   private authService = inject(AuthService);
 

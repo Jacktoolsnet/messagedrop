@@ -32,17 +32,64 @@
     <!-- === User Tiles === -->
     <div class="tiles-container">
         @for (user of users(); track user.id) {
-        <mat-card class="tile">
-            <mat-card-header>
-                <div mat-card-avatar class="avatar avatar-neutral">
-                    <mat-icon>person</mat-icon>
+        <mat-card class="tile user-tile">
+            <mat-card-header class="user-card-header">
+                <div mat-card-avatar class="avatar avatar-neutral" [class.avatar-root]="user.role === 'root'"
+                    [class.avatar-admin]="user.role === 'admin'" [class.avatar-legal]="user.role === 'legal'">
+                    @switch (user.role) {
+                    @case ('root') {
+                    <mat-icon>workspace_premium</mat-icon>
+                    }
+                    @case ('admin') {
+                    <mat-icon>admin_panel_settings</mat-icon>
+                    }
+                    @case ('legal') {
+                    <mat-icon>gavel</mat-icon>
+                    }
+                    @default {
+                    <mat-icon>verified_user</mat-icon>
+                    }
+                    }
                 </div>
-                <mat-card-title class="tile-title">{{ user.username }}</mat-card-title>
-                <mat-card-subtitle class="tile-subtitle">{{ user.role }}</mat-card-subtitle>
-                <mat-card-subtitle class="tile-subtitle">{{ user.email }}</mat-card-subtitle>
+
+                <div class="user-card-heading">
+                    <div class="user-title-row">
+                        <mat-card-title class="tile-title">{{ user.username }}</mat-card-title>
+
+                        <div class="badge-row">
+                            <span class="role-pill" [class.role-root]="user.role === 'root'"
+                                [class.role-admin]="user.role === 'admin'" [class.role-legal]="user.role === 'legal'"
+                                [class.role-moderator]="user.role === 'moderator'">
+                                {{ user.role }}
+                            </span>
+
+                            @if (isSelf(user)) {
+                            <span class="self-pill">You</span>
+                            }
+                        </div>
+                    </div>
+
+                    <mat-card-subtitle class="tile-subtitle">
+                        Account overview
+                    </mat-card-subtitle>
+                </div>
             </mat-card-header>
 
-            <mat-card-actions align="end">
+            <mat-card-content class="user-card-content">
+                <div class="info-panel">
+                    <div class="info-row">
+                        <mat-icon>mail</mat-icon>
+                        <span>{{ user.email }}</span>
+                    </div>
+
+                    <div class="info-row">
+                        <mat-icon>calendar_month</mat-icon>
+                        <span>Created {{ user.createdAt | date:'mediumDate' }}</span>
+                    </div>
+                </div>
+            </mat-card-content>
+
+            <mat-card-actions align="end" class="user-card-actions">
                 @if (canEdit(user)) {
                 <button mat-stroked-button color="primary" aria-label="Edit" (click)="openEditUserDialog(user)">
                     <mat-icon>edit</mat-icon>
