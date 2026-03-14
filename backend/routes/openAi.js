@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const security = require('../middleware/security');
 const OpenAI = require('openai')
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY_MODERATION });
 const metric = require('../middleware/metric');
 const { apiError } = require('../middleware/api-error');
 

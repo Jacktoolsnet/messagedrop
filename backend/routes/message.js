@@ -68,7 +68,7 @@ function normalizeLon(lon) {
 
 const sanitizeSingleQuotes = (value) => String(value ?? '').replace(/'/g, "''");
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY_MODERATION });
 const moderationModel = process.env.OPENAI_MODERATION_MODEL || 'omni-moderation-latest';
 const adminAudience = process.env.SERVICE_JWT_AUDIENCE_ADMIN || 'service.admin-backend';
 
