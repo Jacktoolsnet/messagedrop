@@ -24,7 +24,9 @@ const ERROR_CODE_TO_KEY: Record<ApiErrorCode, string> = {
 
 const ERROR_MESSAGE_TO_KEY: Record<string, string> = {
   user_blocked_for_posting: 'common.message.postingBlocked',
-  user_account_blocked: 'common.user.blocked.message'
+  user_account_blocked: 'common.user.blocked.message',
+  message_locked_by_moderation: 'common.message.moderationRejected',
+  message_rejected_by_moderation: 'common.message.moderationRejected'
 };
 
 @Injectable({ providedIn: 'root' })

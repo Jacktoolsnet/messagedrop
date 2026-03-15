@@ -135,6 +135,21 @@ export class MessageService {
     };
   }
 
+  public getModerationPatch(moderation?: MessageCreateResponse['moderation'] | null): Partial<Message> {
+    return this.buildModerationPatch(moderation);
+  }
+
+  public isRejectedByAutomatedModeration(message: Partial<Message> | null | undefined): boolean {
+    if (!message) {
+      return false;
+    }
+    if (String(message.manualModerationDecision ?? '').toLowerCase() === 'approved') {
+      return false;
+    }
+    return String(message.aiModerationDecision ?? '').toLowerCase() === 'rejected'
+      || this.toNullableBool(message.patternMatch) === true;
+  }
+
   private showModerationRejected(message: string): void {
     this.moderationDialogRef?.close();
     const ref = this.dialog.open(DisplayMessage, {

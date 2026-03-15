@@ -429,7 +429,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       return;
     }
     const message = this.clickedMessage;
-    if (this.isMessageDsaLocked(message)) {
+    if (this.isMessageDsaLocked(message) || this.messageService.isRejectedByAutomatedModeration(message)) {
       return;
     }
 
@@ -457,11 +457,15 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
     if (publishState === 'server_missing' || publishState === 'local_only') {
       this.messageService.publishMissingMessage(message, this.userService.getUser()).subscribe({
         next: (res) => {
+          const moderationPatch = this.messageService.getModerationPatch(res?.moderation);
           const decision = res?.moderation?.decision ?? 'approved';
           if (decision === 'rejected') {
             this.patchMessageLocally(message, {
+              id: res?.messageId ?? message.id,
+              uuid: res?.messageUuid ?? message.uuid,
               status: 'disabled',
-              publishState: 'unpublished'
+              publishState: 'unpublished',
+              ...moderationPatch
             });
             return;
           }
@@ -469,7 +473,8 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
             id: res?.messageId ?? message.id,
             uuid: res?.messageUuid ?? message.uuid,
             status: 'enabled',
-            publishState: 'published'
+            publishState: 'published',
+            ...moderationPatch
           });
         },
         error: () => {}
@@ -720,7 +725,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
     if (this.userService.getUser().id !== message.userId || !this.userService.hasJwt()) {
       return false;
     }
-    if (this.isMessageDsaLocked(message)) {
+    if (this.isMessageDsaLocked(message) || this.messageService.isRejectedByAutomatedModeration(message)) {
       return false;
     }
     const state = this.resolvePublishState(message);

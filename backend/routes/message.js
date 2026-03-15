@@ -240,6 +240,19 @@ function isMessageLockedByModeration(messageRow) {
   return String(messageRow.manualModerationDecision || '').toLowerCase() === 'rejected';
 }
 
+function isMessageRejectedByAutomatedModeration(messageRow) {
+  if (!messageRow) {
+    return false;
+  }
+  if (String(messageRow.manualModerationDecision || '').toLowerCase() === 'approved') {
+    return false;
+  }
+  if (String(messageRow.aiModerationDecision || '').toLowerCase() === 'rejected') {
+    return true;
+  }
+  return Number(messageRow.patternMatch) === 1 || messageRow.patternMatch === true;
+}
+
 async function forwardModerationRequest(payload, logger) {
   const baseUrl = resolveBaseUrl(process.env.ADMIN_BASE_URL, process.env.ADMIN_PORT);
   if (!baseUrl) {
@@ -876,6 +889,9 @@ router.get('/enable/:messageId',
       }
       if (isMessageLockedByModeration(row)) {
         return next(apiError.forbidden('message_locked_by_moderation'));
+      }
+      if (isMessageRejectedByAutomatedModeration(row)) {
+        return next(apiError.forbidden('message_rejected_by_moderation'));
       }
       try {
         const userRow = await getUserById(req.database.db, row.userId);
