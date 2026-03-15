@@ -50,4 +50,18 @@ describe('MessageService', () => {
       manualModerationDecision: 'approved'
     })).toBeFalse();
   });
+
+  it('should detect UUIDs without hyphens as private data', () => {
+    expect(service.detectPersonalInformation('123e4567e89b12d3a456426614174000')).toBeTrue();
+  });
+
+  it('should detect UUIDs with spaces or newlines as private data', () => {
+    expect(service.detectPersonalInformation('123e4567 e89b 12d3 a456 426614174000')).toBeTrue();
+    expect(service.detectPersonalInformation('123e4567\ne89b\n12d3\na456\n426614174000')).toBeTrue();
+  });
+
+  it('should detect UUIDs with tabs, repeated spaces, and mixed separators as private data', () => {
+    expect(service.detectPersonalInformation('123e4567\t\t e89b  12d3\t a456\t426614174000')).toBeTrue();
+    expect(service.detectPersonalInformation('123e4567_e89b.12d3/a456:426614174000')).toBeTrue();
+  });
 });

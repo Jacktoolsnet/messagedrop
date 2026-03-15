@@ -79,6 +79,9 @@ function detectPersonalInformation(text) {
     'us', 'ca', 'au', 'nz', 'jp', 'kr', 'cn', 'in', 'br', 'mx', 'ar', 'cl', 'co',
     'se', 'no', 'dk', 'fi', 'pl', 'cz', 'sk', 'hu', 'ro', 'bg', 'hr', 'si', 'gr', 'tr', 'ru', 'ua'
   ]);
+  const containsUuidLikeValue = (value) =>
+    /(^|[^0-9a-f])(?:[0-9a-f]{8}[\s\u200B-\u200D\uFEFF._:,;/\\|()\[\]{}#*+=~"'`-]*[0-9a-f]{4}[\s\u200B-\u200D\uFEFF._:,;/\\|()\[\]{}#*+=~"'`-]*[1-8][0-9a-f]{3}[\s\u200B-\u200D\uFEFF._:,;/\\|()\[\]{}#*+=~"'`-]*[89ab][0-9a-f]{3}[\s\u200B-\u200D\uFEFF._:,;/\\|()\[\]{}#*+=~"'`-]*[0-9a-f]{12})([^0-9a-f]|$)/i
+      .test(value);
   const normalizedTokenText = String(text ?? '')
     .toLowerCase()
     .replace(/[#]+/g, ' ')
@@ -102,7 +105,6 @@ function detectPersonalInformation(text) {
     /\b[a-z0-9._%+-]+\s*@\s*[a-z0-9-]+(?:\s*\.\s*[a-z0-9-]+)+\b/i,
     /\b(?:\d[ -]*?){13,19}\b/,
     /\b[A-Z]{2}[0-9]{2}[A-Z0-9]{11,30}\b/,
-    /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/i,
     /\b(?:\d{1,3}\.){3}\d{1,3}\b/,
     /\b(?:[a-fA-F0-9:]+:+)+[a-fA-F0-9]+\b/,
     /\b\d{3}-\d{2}-\d{4}\b/,
@@ -110,7 +112,11 @@ function detectPersonalInformation(text) {
     /\b(?:[a-z0-9-]+\.)+[a-z]{2,}(?:\/[^\s]*)?/i
   ];
 
-  if (patterns.some(pattern => pattern.test(text) || pattern.test(normalizedObfuscatedText))) {
+  if (
+    containsUuidLikeValue(text)
+    || containsUuidLikeValue(normalizedObfuscatedText)
+    || patterns.some(pattern => pattern.test(text) || pattern.test(normalizedObfuscatedText))
+  ) {
     return true;
   }
 
