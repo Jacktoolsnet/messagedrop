@@ -103,6 +103,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
 
   private readonly dsaStatusCache = signal<Record<string, ResolvedDsaStatus>>({});
   private readonly pendingDsaTokens = new Set<string>();
+  private allowEmptyServiceSync = false;
 
   public readonly userService = inject(UserService);
   public readonly messageService = inject(MessageService);
@@ -187,11 +188,17 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
 
     // Ongoing sync: service -> local view, optionally back into the provided signal.
     effect(() => {
-      const serviceMessages = this.filterOwnMessages(this.messageService.messagesSignal());
+      const serviceSnapshot = this.messageService.messagesSignal();
+      if (!this.shouldSyncFromServiceSnapshot(serviceSnapshot)) {
+        return;
+      }
+
+      const serviceMessages = this.filterOwnMessages(serviceSnapshot);
       this.messagesSignal.set(serviceMessages);
       if (this.data.messageSignal) {
         this.data.messageSignal.set(serviceMessages);
       }
+      this.allowEmptyServiceSync = false;
     });
 
     effect(() => {
@@ -228,7 +235,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       if (!userId) {
         return;
       }
-      const snapshot = this.messageService.messagesSignal();
+      const snapshot = this.messagesSignal();
       void this.messageService.saveOwnPublicMessages(userId, snapshot);
     });
   }
@@ -239,6 +246,25 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       return [];
     }
     return (messages ?? []).filter((message) => String(message?.userId || '').trim() === userId);
+  }
+
+  private shouldSyncFromServiceSnapshot(messages: Message[]): boolean {
+    const userId = this.userService.getUser().id;
+    if (!userId) {
+      return false;
+    }
+
+    const serviceMessages = Array.isArray(messages) ? messages : [];
+    const containsForeignMessages = serviceMessages.some((message) => String(message?.userId || '').trim() !== userId);
+    if (containsForeignMessages) {
+      return false;
+    }
+
+    if (serviceMessages.length === 0 && this.messagesSignal().length > 0 && !this.allowEmptyServiceSync) {
+      return false;
+    }
+
+    return true;
   }
 
   async ngOnInit() {
@@ -406,6 +432,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
         }
 
         // 1. Delete
+        this.allowEmptyServiceSync = true;
         this.messageService.deleteMessage(this.clickedMessage!);
 
         // 2. Check if the current level still has comments.
@@ -520,6 +547,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
 
   private patchMessageLocally(target: Message, patch: Partial<Message>): void {
     const mutate = (message: Message) => message.uuid === target.uuid ? { ...message, ...patch } : message;
+    this.messagesSignal.update(messages => messages.map(mutate));
     this.messageService.messagesSignal.update(messages => messages.map(mutate));
     this.messageService.selectedMessagesSignal.update(selected => selected.map(mutate));
     if (target.parentUuid) {
@@ -554,6 +582,9 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
         });
       }
 
+      this.messagesSignal.update(messages =>
+        messages.filter(m => !toRemove.has(m.uuid) && !toRemove.has(m.parentUuid))
+      );
       this.messageService.messagesSignal.update(messages =>
         messages.filter(m => !toRemove.has(m.uuid) && !toRemove.has(m.parentUuid))
       );
@@ -595,6 +626,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       ? { ...m, status: 'disabled', dsaStatusToken: token, publishState: 'dsa_locked' as const }
       : m;
 
+    this.messagesSignal.update(messages => messages.map(mutate));
     this.messageService.messagesSignal.update(messages => messages.map(mutate));
     this.messageService.selectedMessagesSignal.update(selected => selected.map(mutate));
 
