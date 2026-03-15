@@ -111,6 +111,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
   }>(MAT_DIALOG_DATA);
 
   readonly messagesSignal = signal<Message[]>([]);
+  readonly scopedMessageUuids = signal<string[]>([]);
   readonly filteredMessagesSignal = computed(() => {
     return this.messagesSignal().filter((message) => message.status === 'enabled');
   });
@@ -141,6 +142,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
   });
 
   private clickedMessage: Message | undefined = undefined;
+  private readonly hasPinnedMessageScope: boolean;
 
   public userProfile: Profile;
   public likeButtonColor = 'secondary';
@@ -149,6 +151,10 @@ export class MessagelistComponent implements OnInit, OnDestroy {
 
   constructor() {
     this.userProfile = this.userService.getProfile();
+    const initialScopedMessageUuids = this.normalizeMessageUuids(this.data.messageUuids);
+    this.hasPinnedMessageScope = initialScopedMessageUuids.length > 0;
+    this.scopedMessageUuids.set(initialScopedMessageUuids);
+
     // If we come from a tile, seed the service with the tile messages
     // so create/delete/like operate on the same list.
     if (this.data.messageSignal && !(this.data.messageUuids?.length)) {
@@ -196,18 +202,52 @@ export class MessagelistComponent implements OnInit, OnDestroy {
   }
 
   private filterMessagesForDialog(serviceMessages: Message[]): Message[] {
-    const scopedUuids = Array.isArray(this.data.messageUuids)
-      ? this.data.messageUuids.filter((uuid): uuid is string => typeof uuid === 'string' && uuid.length > 0)
-      : [];
-
-    if (scopedUuids.length === 0) {
+    if (!this.hasPinnedMessageScope) {
       return serviceMessages;
     }
 
+    const scopedUuids = this.scopedMessageUuids();
     const messageByUuid = new Map(serviceMessages.map((message) => [message.uuid, message]));
     return scopedUuids
       .map((uuid) => messageByUuid.get(uuid))
       .filter((message): message is Message => !!message);
+  }
+
+  private normalizeMessageUuids(messageUuids?: string[]): string[] {
+    if (!Array.isArray(messageUuids)) {
+      return [];
+    }
+
+    const seen = new Set<string>();
+    const normalizedMessageUuids: string[] = [];
+
+    messageUuids.forEach((uuid) => {
+      const normalizedUuid = typeof uuid === 'string' ? uuid.trim() : '';
+      if (!normalizedUuid || seen.has(normalizedUuid)) {
+        return;
+      }
+      seen.add(normalizedUuid);
+      normalizedMessageUuids.push(normalizedUuid);
+    });
+
+    return normalizedMessageUuids;
+  }
+
+  private prependScopedMessageUuid(uuid: string | null | undefined): void {
+    if (!this.hasPinnedMessageScope) {
+      return;
+    }
+
+    const normalizedUuid = typeof uuid === 'string' ? uuid.trim() : '';
+    if (!normalizedUuid) {
+      return;
+    }
+
+    this.scopedMessageUuids.update((messageUuids) =>
+      messageUuids.includes(normalizedUuid)
+        ? messageUuids
+        : [normalizedUuid, ...messageUuids]
+    );
   }
 
   async ngOnInit() {
@@ -1070,6 +1110,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe((result?: { mode: Mode; message: Message }) => {
       if (result?.message) {
+        this.prependScopedMessageUuid(result.message.uuid);
         this.messageService.createMessage(result.message, this.userService.getUser());
       }
     });
