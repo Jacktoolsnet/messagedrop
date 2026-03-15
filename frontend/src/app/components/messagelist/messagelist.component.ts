@@ -175,19 +175,19 @@ export class MessagelistComponent implements OnInit, OnDestroy {
       const tokens = new Set<string>();
 
       for (const msg of this.filteredMessagesSignal()) {
-        if (msg.status === 'disabled' && msg.dsaStatusToken) {
+        if (this.resolvePublishState(msg) === 'dsa_locked' && msg.dsaStatusToken) {
           tokens.add(msg.dsaStatusToken);
         }
       }
 
       for (const msg of this.selectedMessagesSignal()) {
-        if (msg.status === 'disabled' && msg.dsaStatusToken) {
+        if (this.resolvePublishState(msg) === 'dsa_locked' && msg.dsaStatusToken) {
           tokens.add(msg.dsaStatusToken);
         }
       }
 
       for (const msg of this.commentsSignal()) {
-        if (msg.status === 'disabled' && msg.dsaStatusToken) {
+        if (this.resolvePublishState(msg) === 'dsa_locked' && msg.dsaStatusToken) {
           tokens.add(msg.dsaStatusToken);
         }
       }

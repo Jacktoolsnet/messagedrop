@@ -181,12 +181,12 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
     // If we come from a tile, seed the service with the tile messages
     // so create/delete/like operate on the same list.
     if (this.data.messageSignal) {
-      this.messageService.setMessages(this.data.messageSignal());
+      this.messageService.setMessages(this.filterOwnMessages(this.data.messageSignal()));
     }
 
     // Ongoing sync: service -> local view, optionally back into the provided signal.
     effect(() => {
-      const serviceMessages = this.messageService.messagesSignal();
+      const serviceMessages = this.filterOwnMessages(this.messageService.messagesSignal());
       this.messagesSignal.set(serviceMessages);
       if (this.data.messageSignal) {
         this.data.messageSignal.set(serviceMessages);
@@ -197,19 +197,19 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       const tokens = new Set<string>();
 
       for (const msg of this.filteredMessagesSignal()) {
-        if (msg.status === 'disabled' && msg.dsaStatusToken) {
+        if (this.resolvePublishState(msg) === 'dsa_locked' && msg.dsaStatusToken) {
           tokens.add(msg.dsaStatusToken);
         }
       }
 
       for (const msg of this.selectedMessagesSignal()) {
-        if (msg.status === 'disabled' && msg.dsaStatusToken) {
+        if (this.resolvePublishState(msg) === 'dsa_locked' && msg.dsaStatusToken) {
           tokens.add(msg.dsaStatusToken);
         }
       }
 
       for (const msg of this.commentsSignal()) {
-        if (msg.status === 'disabled' && msg.dsaStatusToken) {
+        if (this.resolvePublishState(msg) === 'dsa_locked' && msg.dsaStatusToken) {
           tokens.add(msg.dsaStatusToken);
         }
       }
@@ -230,6 +230,14 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       const snapshot = this.messageService.messagesSignal();
       void this.messageService.saveOwnPublicMessages(userId, snapshot);
     });
+  }
+
+  private filterOwnMessages(messages: Message[]): Message[] {
+    const userId = this.userService.getUser().id;
+    if (!userId) {
+      return [];
+    }
+    return (messages ?? []).filter((message) => String(message?.userId || '').trim() === userId);
   }
 
   async ngOnInit() {

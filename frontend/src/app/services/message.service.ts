@@ -291,6 +291,56 @@ export class MessageService {
     this.selectedMessagesSignal.set([]);
   }
 
+  private collectOwnPublicMessageSnapshot(userId: string, messages: Message[]): Message[] {
+    if (!userId) {
+      return [];
+    }
+
+    const uniqueMessages = new Map<string, Message>();
+
+    const collect = (message: Message | null | undefined): void => {
+      if (!message) {
+        return;
+      }
+
+      const uuid = typeof message.uuid === 'string' ? message.uuid.trim() : '';
+      if (!uuid || uniqueMessages.has(uuid)) {
+        return;
+      }
+
+      const normalizedUserId = typeof message.userId === 'string' ? message.userId.trim() : '';
+      if (normalizedUserId !== userId) {
+        return;
+      }
+
+      if (message.typ !== 'public' && message.typ !== 'comment') {
+        return;
+      }
+
+      uniqueMessages.set(uuid, {
+        ...message,
+        uuid,
+        userId: normalizedUserId,
+        publishState: message.publishState ?? this.normalizePublishState(message)
+      });
+
+      if (Array.isArray(message.comments)) {
+        message.comments.forEach((comment) => collect(comment));
+      }
+    };
+
+    (messages ?? []).forEach((message) => collect(message));
+    Array.from(this.commentsSignals.values()).forEach((commentsSignal) => {
+      commentsSignal().forEach((message) => collect(message));
+    });
+
+    return Array.from(uniqueMessages.values()).sort((a, b) => (b.createDateTime ?? 0) - (a.createDateTime ?? 0));
+  }
+
+  private sanitizeOwnPublicMessageSnapshot(userId: string, messages: Message[]): Message[] {
+    return this.collectOwnPublicMessageSnapshot(userId, messages);
+  }
+
   async loadOwnPublicMessages(userId: string): Promise<Message[]> {
     if (!userId) {
       return [];
@@ -299,17 +349,18 @@ export class MessageService {
     if (!Array.isArray(messages)) {
       return [];
     }
-    return messages.map((message) => ({
-      ...message,
-      publishState: message.publishState ?? this.normalizePublishState(message)
-    }));
+    const sanitized = this.sanitizeOwnPublicMessageSnapshot(userId, messages);
+    if (sanitized.length !== messages.length) {
+      await this.indexedDbService.setOwnPublicMessages(userId, sanitized);
+    }
+    return sanitized;
   }
 
   async saveOwnPublicMessages(userId: string, messages: Message[]): Promise<void> {
     if (!userId) {
       return;
     }
-    const snapshot = (messages ?? []).map((message) => ({
+    const snapshot = this.collectOwnPublicMessageSnapshot(userId, messages ?? []).map((message) => ({
       ...message,
       publishState: message.publishState ?? this.normalizePublishState(message),
       translatedMessage: undefined
@@ -380,7 +431,7 @@ export class MessageService {
           : 'server_missing';
       merged.set(key, {
         ...localMessage,
-        publishState: this.isDsaLocked(localMessage) ? 'dsa_locked' : missingState
+        publishState: missingState
       });
     }
 
@@ -396,7 +447,8 @@ export class MessageService {
         `${environment.apiUrl}/message/get/userId/${encodeURIComponent(user.id)}`,
         this.httpOptions
       ));
-      serverMessages = this.mapRawMessages(response?.rows ?? []);
+      serverMessages = this.mapRawMessages(response?.rows ?? [])
+        .filter((message) => String(message.userId || '').trim() === user.id);
       serverSyncAvailable = true;
     } catch {
       const normalizedLocal = localMessages.map((message) => ({
