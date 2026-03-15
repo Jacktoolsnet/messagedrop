@@ -655,7 +655,11 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
           [token]: status
         }));
       },
-      error: () => {
+      error: (error) => {
+        if (this.getHttpStatus(error) === 404) {
+          this.purgeMessagesForMissingDsaStatus(token);
+          return;
+        }
         this.dsaStatusCache.update(map => ({
           ...map,
           [token]: MyMessagelistComponent.DSA_UNKNOWN
@@ -673,6 +677,58 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
     return MyMessagelistComponent.DSA_NOTICE_STATUSES.has(upper)
       ? upper as ResolvedDsaStatus
       : MyMessagelistComponent.DSA_UNKNOWN;
+  }
+
+  private getHttpStatus(error: unknown): number | null {
+    if (!error || typeof error !== 'object') {
+      return null;
+    }
+    const status = (error as { status?: unknown }).status;
+    return typeof status === 'number' ? status : null;
+  }
+
+  private collectOwnMessagesForDsaToken(token: string): Message[] {
+    const ownUserId = this.userService.getUser().id;
+    if (!ownUserId) {
+      return [];
+    }
+
+    const messages = new Map<string, Message>();
+    const collect = (items: Message[]) => {
+      for (const message of items ?? []) {
+        if (
+          message?.dsaStatusToken === token
+          && String(message.userId || '').trim() === ownUserId
+          && typeof message.uuid === 'string'
+          && message.uuid.trim()
+        ) {
+          messages.set(message.uuid, message);
+        }
+      }
+    };
+
+    collect(this.messageService.messagesSignal());
+    collect(this.messageService.selectedMessagesSignal());
+    for (const commentsSignal of this.messageService.commentsSignals.values()) {
+      collect(commentsSignal());
+    }
+
+    return Array.from(messages.values());
+  }
+
+  private purgeMessagesForMissingDsaStatus(token: string): void {
+    const ownUserId = this.userService.getUser().id;
+    if (!ownUserId) {
+      return;
+    }
+
+    const staleMessages = this.collectOwnMessagesForDsaToken(token);
+    if (staleMessages.length === 0) {
+      return;
+    }
+
+    staleMessages.forEach((message) => this.removeMessageLocally(message));
+    void this.messageService.removeOwnPublicMessages(ownUserId, staleMessages.map((message) => message.uuid));
   }
 
   public isOwnPublicMessage(message: Message): boolean {

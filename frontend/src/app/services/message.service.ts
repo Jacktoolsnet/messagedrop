@@ -389,6 +389,41 @@ export class MessageService {
     await this.saveOwnPublicMessages(userId, patched);
   }
 
+  async removeOwnPublicMessages(userId: string, messageUuids: string[]): Promise<void> {
+    const normalizedUuids = Array.isArray(messageUuids)
+      ? messageUuids
+        .map((uuid) => typeof uuid === 'string' ? uuid.trim() : '')
+        .filter((uuid): uuid is string => uuid.length > 0)
+      : [];
+
+    if (!userId || normalizedUuids.length === 0) {
+      return;
+    }
+
+    const existing = await this.loadOwnPublicMessages(userId);
+    if (existing.length === 0) {
+      return;
+    }
+
+    const toRemove = new Set(normalizedUuids);
+    const queue = [...normalizedUuids];
+    while (queue.length > 0) {
+      const current = queue.shift();
+      if (!current) {
+        continue;
+      }
+      for (const message of existing) {
+        if (message.parentUuid === current && !toRemove.has(message.uuid)) {
+          toRemove.add(message.uuid);
+          queue.push(message.uuid);
+        }
+      }
+    }
+
+    const filtered = existing.filter((message) => !toRemove.has(message.uuid));
+    await this.saveOwnPublicMessages(userId, filtered);
+  }
+
   mergeOwnPublicMessages(localMessages: Message[], serverMessages: Message[]): Message[] {
     const merged = new Map<string, Message>();
     const serverByUuid = new Map<string, Message>();
