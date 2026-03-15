@@ -427,10 +427,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
           if (response?.status !== 200) {
             return;
           }
-          this.patchMessageLocally(message, {
-            status: 'disabled',
-            publishState: 'unpublished'
-          });
+          this.messageService.markMessageTreeUnpublishedLocally(message);
         },
         error: () => {}
       });
@@ -491,7 +488,13 @@ export class MessagelistComponent implements OnInit, OnDestroy {
           publishState: 'published'
         });
       },
-      error: () => {}
+      error: (error) => {
+        if (this.messageService.isParentMissingError(error)) {
+          this.patchMessageLocally(message, {
+            publishState: 'parent_missing'
+          });
+        }
+      }
     });
   }
 

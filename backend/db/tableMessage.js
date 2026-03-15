@@ -516,6 +516,27 @@ const countComment = function (db, messageId, callback) {
     }
 };
 
+const recountCommentsForUser = function (db, userId, callback) {
+    try {
+        const sql = `
+        UPDATE ${tableName} AS parent
+        SET ${columnCommentsNumber} = (
+            SELECT COUNT(*)
+            FROM ${tableName} AS child
+            WHERE child.${columnParentUuid} = parent.${columnUuid}
+              AND child.${columnStatus} = '${messageStatus.ENABLED}'
+        )
+        WHERE parent.${columnUserId} = ?;
+        `;
+
+        db.run(sql, [userId], function (err) {
+            callback(err, { updated: this?.changes ?? 0 });
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
 const setDsaStatusToken = function (db, uuid, token, createdAt, callback) {
     try {
         const sql = `
@@ -555,6 +576,32 @@ const disableMessage = function (db, messageId, callback) {
 
         db.run(sql, [messageId], (err) => {
             callback(err);
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
+const disableMessageTree = function (db, messageUuid, callback) {
+    try {
+        const sql = `
+        WITH RECURSIVE message_tree(uuid) AS (
+            SELECT ${columnUuid}
+            FROM ${tableName}
+            WHERE ${columnUuid} = ?
+            UNION ALL
+            SELECT child.${columnUuid}
+            FROM ${tableName} AS child
+            INNER JOIN message_tree AS tree
+                ON child.${columnParentUuid} = tree.uuid
+        )
+        UPDATE ${tableName}
+        SET ${columnStatus} = '${messageStatus.DISABLED}'
+        WHERE ${columnUuid} IN (SELECT uuid FROM message_tree)
+          AND ${columnStatus} <> '${messageStatus.DISABLED}';`;
+
+        db.run(sql, [messageUuid], function (err) {
+            callback(err, { affected: this?.changes ?? 0 });
         });
     } catch (error) {
         throw error;
@@ -654,8 +701,10 @@ module.exports = {
     getByHashtag,
     countView,
     countComment,
+    recountCommentsForUser,
     deleteById,
     cleanPublic,
+    disableMessageTree,
     setDsaStatusToken,
     setManualModeration,
     messageType,

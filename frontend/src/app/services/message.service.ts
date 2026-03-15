@@ -116,7 +116,10 @@ export class MessageService {
         return false;
       }
       const candidate = value as { message?: unknown; error?: unknown };
-      return candidate.message === 'parent_not_found' || candidate.error === 'parent_not_found';
+      return candidate.message === 'parent_not_found'
+        || candidate.error === 'parent_not_found'
+        || candidate.message === 'parent_not_available'
+        || candidate.error === 'parent_not_available';
     };
 
     if (matchesPayload(error)) {
@@ -425,30 +428,62 @@ export class MessageService {
   }
 
   private async refreshParentAvailability(messages: Message[]): Promise<Message[]> {
-    const parentMissingMessages = (messages ?? []).filter((message) =>
-      message.publishState === 'parent_missing'
-      && typeof message.parentUuid === 'string'
+    const allMessages = Array.isArray(messages) ? messages : [];
+    const childMessages = allMessages.filter((message) =>
+      typeof message.parentUuid === 'string'
       && message.parentUuid.trim().length > 0
     );
 
-    if (parentMissingMessages.length === 0) {
+    if (childMessages.length === 0) {
       return messages;
     }
 
-    const parentExistence = new Map<string, boolean>();
-    const parentUuids = [...new Set(parentMissingMessages.map((message) => message.parentUuid.trim()))];
+    const localMessagesByUuid = new Map<string, Message>();
+    allMessages.forEach((message) => {
+      const uuid = typeof message.uuid === 'string' ? message.uuid.trim() : '';
+      if (uuid) {
+        localMessagesByUuid.set(uuid, message);
+      }
+    });
 
-    await Promise.all(parentUuids.map(async (parentUuid) => {
+    const parentAvailability = new Map<string, boolean>();
+    const externalParentUuids = [...new Set(
+      childMessages
+        .map((message) => message.parentUuid.trim())
+        .filter((parentUuid) => !localMessagesByUuid.has(parentUuid))
+    )];
+
+    await Promise.all(externalParentUuids.map(async (parentUuid) => {
       const result = await firstValueFrom(this.verifyMessageExistsByUuid(parentUuid));
-      parentExistence.set(parentUuid, result.exists === true);
+      parentAvailability.set(parentUuid, result.published === true);
     }));
 
-    return messages.map((message) => {
+    const isParentAvailable = (parentUuid: string): boolean => {
+      const localParent = localMessagesByUuid.get(parentUuid);
+      if (localParent) {
+        const localParentState = localParent.publishState ?? this.normalizePublishState(localParent);
+        return localParentState === 'published';
+      }
+      return parentAvailability.get(parentUuid) === true;
+    };
+
+    return allMessages.map((message) => {
       const parentUuid = typeof message.parentUuid === 'string' ? message.parentUuid.trim() : '';
-      if (message.publishState !== 'parent_missing' || !parentUuid) {
+      if (!parentUuid) {
         return message;
       }
-      return parentExistence.get(parentUuid) === true
+
+      const currentState = message.publishState ?? this.normalizePublishState(message);
+      const parentAvailable = isParentAvailable(parentUuid);
+
+      if (!parentAvailable) {
+        if (currentState === 'dsa_locked') {
+          return message;
+        }
+        return { ...message, publishState: 'parent_missing' as const };
+      }
+
+      return currentState === 'parent_missing'
         ? { ...message, publishState: 'server_missing' as const }
         : message;
     });
@@ -457,6 +492,15 @@ export class MessageService {
   mergeOwnPublicMessages(localMessages: Message[], serverMessages: Message[]): Message[] {
     const merged = new Map<string, Message>();
     const serverByUuid = new Map<string, Message>();
+    const localCommentCounts = new Map<string, number>();
+
+    for (const localMessage of localMessages ?? []) {
+      const parentUuid = typeof localMessage?.parentUuid === 'string' ? localMessage.parentUuid.trim() : '';
+      if (!parentUuid) {
+        continue;
+      }
+      localCommentCounts.set(parentUuid, (localCommentCounts.get(parentUuid) ?? 0) + 1);
+    }
 
     for (const serverMessage of serverMessages ?? []) {
       const key = String(serverMessage?.uuid ?? '').trim();
@@ -496,6 +540,7 @@ export class MessageService {
           : 'server_missing';
       merged.set(key, {
         ...localMessage,
+        commentsNumber: localCommentCounts.get(key) ?? 0,
         publishState: missingState
       });
     }
@@ -508,6 +553,7 @@ export class MessageService {
     let serverMessages: Message[] = [];
     let serverSyncAvailable = false;
     try {
+      await firstValueFrom(this.recountOwnCommentCounts(user.id));
       const response = await firstValueFrom(this.http.get<GetMessageResponse>(
         `${environment.apiUrl}/message/get/userId/${encodeURIComponent(user.id)}`,
         this.httpOptions
@@ -1053,23 +1099,145 @@ export class MessageService {
     );
   }
 
-  verifyMessageExistsByUuid(messageUuid: string): Observable<{ exists: boolean; status: number | null }> {
+  verifyMessageExistsByUuid(messageUuid: string): Observable<{ exists: boolean; status: number | null; published: boolean; messageStatus: string | null }> {
     const trimmedUuid = typeof messageUuid === 'string' ? messageUuid.trim() : '';
     if (!trimmedUuid) {
-      return of({ exists: false, status: 400 });
+      return of({ exists: false, status: 400, published: false, messageStatus: null });
     }
+
+    const headers = this.httpOptions.headers
+      .set('x-skip-ui', 'true')
+      .set('x-skip-backend-status', 'true');
 
     return this.http.get<{ status: number; message?: RawMessage }>(
       `${environment.apiUrl}/message/get/uuid/${encodeURIComponent(trimmedUuid)}`,
-      this.httpOptions
+      { ...this.httpOptions, headers }
     ).pipe(
-      map((response) => ({
-        exists: Boolean(response?.message),
-        status: 200
-      })),
+      map((response) => {
+        const messageStatus = typeof response?.message?.status === 'string'
+          ? response.message.status
+          : null;
+        return {
+          exists: Boolean(response?.message),
+          status: 200,
+          published: String(messageStatus || '').trim().toLowerCase() === 'enabled',
+          messageStatus
+        };
+      }),
       catchError((error: HttpErrorResponse) => of({
         exists: false,
-        status: typeof error?.status === 'number' ? error.status : null
+        status: typeof error?.status === 'number' ? error.status : null,
+        published: false,
+        messageStatus: null
+      }))
+    );
+  }
+
+  markMessageTreeUnpublishedLocally(rootMessage: Message): void {
+    const rootUuid = typeof rootMessage?.uuid === 'string' ? rootMessage.uuid.trim() : '';
+    if (!rootUuid) {
+      return;
+    }
+
+    const allMessages = new Map<string, Message>();
+    const collect = (items: Message[]) => {
+      for (const message of items ?? []) {
+        const uuid = typeof message?.uuid === 'string' ? message.uuid.trim() : '';
+        if (uuid) {
+          allMessages.set(uuid, message);
+        }
+      }
+    };
+
+    collect(this.messagesSignal());
+    collect(this.selectedMessagesSignal());
+    for (const commentsSignal of this.commentsSignals.values()) {
+      collect(commentsSignal());
+    }
+
+    const affectedUuids = new Set<string>([rootUuid]);
+    const queue = [rootUuid];
+    while (queue.length > 0) {
+      const current = queue.shift();
+      if (!current) {
+        continue;
+      }
+      for (const message of allMessages.values()) {
+        if (message.parentUuid === current && !affectedUuids.has(message.uuid)) {
+          affectedUuids.add(message.uuid);
+          queue.push(message.uuid);
+        }
+      }
+    }
+
+    const patchMessage = (message: Message): Message => {
+      if (!affectedUuids.has(message.uuid)) {
+        return message;
+      }
+
+      return {
+        ...message,
+        status: 'disabled',
+        publishState: message.uuid === rootUuid ? 'unpublished' : 'parent_missing',
+        commentsNumber: 0
+      };
+    };
+
+    this.messagesSignal.update((messages) => messages.map(patchMessage));
+    this.selectedMessagesSignal.update((messages) => messages.map(patchMessage));
+    for (const [parentUuid, commentsSignal] of this.commentsSignals.entries()) {
+      commentsSignal.set(commentsSignal().map(patchMessage));
+      if (affectedUuids.has(parentUuid)) {
+        this.commentCountsSignal.update((counts) => ({
+          ...counts,
+          [parentUuid]: 0
+        }));
+      }
+    }
+
+    this.commentCountsSignal.update((counts) => {
+      const next = { ...counts };
+      affectedUuids.forEach((uuid) => {
+        next[uuid] = 0;
+      });
+      if (rootMessage.parentUuid) {
+        next[rootMessage.parentUuid] = Math.max((next[rootMessage.parentUuid] ?? 0) - 1, 0);
+      }
+      return next;
+    });
+
+    if (rootMessage.parentUuid) {
+      const nextParentCount = Math.max(
+        (this.commentCountsSignal()[rootMessage.parentUuid] ?? 0),
+        0
+      );
+      const patchParent = (message: Message): Message => (
+        message.uuid === rootMessage.parentUuid
+          ? { ...message, commentsNumber: nextParentCount }
+          : patchMessage(message)
+      );
+      this.messagesSignal.update((messages) => messages.map(patchParent));
+      this.selectedMessagesSignal.update((messages) => messages.map(patchParent));
+      for (const commentsSignal of this.commentsSignals.values()) {
+        commentsSignal.set(commentsSignal().map(patchParent));
+      }
+    }
+  }
+
+  recountOwnCommentCounts(userId: string): Observable<{ status: number; updated?: number }> {
+    const trimmedUserId = typeof userId === 'string' ? userId.trim() : '';
+    if (!trimmedUserId) {
+      return of({ status: 400, updated: 0 });
+    }
+
+    return this.http.post<{ status: number; updated?: number }>(
+      `${environment.apiUrl}/message/recount-comments/${encodeURIComponent(trimmedUserId)}`,
+      {},
+      this.httpOptions
+    ).pipe(
+      catchError((error: HttpErrorResponse) => of({
+        status: typeof error?.status === 'number' ? error.status : 500,
+        updated: 0
       }))
     );
   }

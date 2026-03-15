@@ -267,8 +267,29 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
     return true;
   }
 
+  private async refreshMessagesFromBackend(): Promise<void> {
+    const user = this.userService.getUser();
+    if (!this.userService.hasJwt() || !user.id) {
+      return;
+    }
+
+    this.dsaStatusCache.set({});
+    this.pendingDsaTokens.clear();
+
+    try {
+      const ownMessages = await this.messageService.syncOwnPublicMessages(user);
+      this.allowEmptyServiceSync = true;
+      this.messageService.setMessages(ownMessages);
+    } catch {
+      const fallbackMessages = await this.messageService.loadOwnPublicMessages(user.id);
+      this.allowEmptyServiceSync = true;
+      this.messageService.setMessages(fallbackMessages);
+    }
+  }
+
   async ngOnInit() {
     await this.profileService.loadAllProfiles();
+    await this.refreshMessagesFromBackend();
   }
 
   ngOnDestroy() {
@@ -477,10 +498,8 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
           if (response?.status !== 200) {
             return;
           }
-          this.patchMessageLocally(message, {
-            status: 'disabled',
-            publishState: 'unpublished'
-          });
+          this.messageService.markMessageTreeUnpublishedLocally(message);
+          void this.refreshMessagesFromBackend();
         },
         error: () => {}
       });
@@ -505,6 +524,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
               publishState: 'unpublished',
               ...moderationPatch
             });
+            void this.refreshMessagesFromBackend();
             return;
           }
           this.patchMessageLocally(message, {
@@ -514,6 +534,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
             publishState: 'published',
             ...moderationPatch
           });
+          void this.refreshMessagesFromBackend();
         },
         error: (error) => {
           if (this.messageService.isParentMissingError(error)) {
@@ -540,8 +561,15 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
           status: 'enabled',
           publishState: 'published'
         });
+        void this.refreshMessagesFromBackend();
       },
-      error: () => {}
+      error: (error) => {
+        if (this.messageService.isParentMissingError(error)) {
+          this.patchMessageLocally(message, {
+            publishState: 'parent_missing'
+          });
+        }
+      }
     });
   }
 

@@ -362,6 +362,22 @@ router.get('/get/userId/:userId',
   });
 });
 
+router.post('/recount-comments/:userId',
+  [
+    security.authenticate
+  ],
+  function (req, res, next) {
+    if (!ensureSameUser(req, res, req.params.userId, next)) {
+      return;
+    }
+    tableMessage.recountCommentsForUser(req.database.db, req.params.userId, function (err, result) {
+      if (err) {
+        return next(apiError.internal('db_error'));
+      }
+      res.status(200).json({ status: 200, updated: result?.updated ?? 0 });
+    });
+  });
+
 router.get('/get/comment/:parentUuid', function (req, res, next) {
   tableMessage.getByParentUuid(req.database.db, req.params.parentUuid, function (err, rows) {
     if (err) {
@@ -553,6 +569,9 @@ router.post('/create',
         const parentMessage = await getMessageByUuid(req.database.db, parentUuid);
         if (!parentMessage) {
           return next(apiError.notFound('parent_not_found'));
+        }
+        if (String(parentMessage.status || '').trim().toLowerCase() !== tableMessage.messageStatus.ENABLED) {
+          return next(apiError.conflict('parent_not_available'));
         }
       } catch (error) {
         req.logger?.warn?.('Failed to read parent message before message.create', { error: error?.message || error });
@@ -899,7 +918,7 @@ router.get('/disable/:messageId',
       if (!ensureSameUser(req, res, row.userId, next)) {
         return;
       }
-      tableMessage.disableMessage(req.database.db, row.uuid, function (err) {
+      tableMessage.disableMessageTree(req.database.db, row.uuid, function (err) {
         if (err) {
           return next(apiError.internal('db_error'));
         }
@@ -945,6 +964,26 @@ router.get('/enable/:messageId',
           userId: row.userId
         });
         return next(apiError.internal('db_error'));
+      }
+      if (row.parentUuid) {
+        try {
+          const parentMessage = await getMessageByUuid(req.database.db, row.parentUuid);
+          if (!parentMessage) {
+            return next(apiError.notFound('parent_not_found'));
+          }
+          if (String(parentMessage.status || '').trim().toLowerCase() !== tableMessage.messageStatus.ENABLED) {
+            return next(apiError.conflict('parent_not_available'));
+          }
+        } catch (error) {
+          req.logger?.warn?.('Failed to read parent message before message.enable', {
+            error: error?.message || error,
+            messageId: row.id,
+            messageUuid: row.uuid,
+            parentUuid: row.parentUuid,
+            userId: row.userId
+          });
+          return next(apiError.internal('db_error'));
+        }
       }
       tableMessage.enableMessage(req.database.db, row.uuid, function (err) {
         if (err) {
