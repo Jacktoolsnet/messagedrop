@@ -1,14 +1,21 @@
 <app-dialog-header
   [title]="'common.sharedContent.title' | transloco">
 </app-dialog-header>
-<mat-dialog-content class="shared-dialog-content">
+<mat-dialog-content class="shared-dialog-content"
+    [class.shared-dialog-content--multimedia]="hasMultimedia"
+    [class.shared-dialog-content--youtube]="isYoutubeMultimedia">
     <div class="shared-scroll">
-        <div class="shared-tile">
+        <div class="shared-tile"
+            [class.shared-tile--multimedia]="hasMultimedia"
+            [class.shared-tile--youtube]="isYoutubeMultimedia">
         @if (loadFailed) {
         <p class="load-failed-hint">{{ 'common.sharedContent.loadFailed' | transloco }}</p>
         }
         @if (multimedia) {
-        <app-showmultimedia [multimedia]="multimedia"></app-showmultimedia>
+        <div class="shared-media-shell"
+            [class.shared-media-shell--youtube]="isYoutubeMultimedia">
+            <app-showmultimedia [multimedia]="multimedia"></app-showmultimedia>
+        </div>
         } @else if (location) {
         <div class="shared-field">
             <span class="label">{{ 'common.sharedContent.coordinatesLabel' | transloco }}</span>

@@ -61,6 +61,14 @@ export class SharedContentComponent implements OnInit {
     return url ? url : null;
   }
 
+  public get hasMultimedia(): boolean {
+    return !!this.multimedia;
+  }
+
+  public get isYoutubeMultimedia(): boolean {
+    return this.multimedia?.type === 'youtube';
+  }
+
   public get hasOpenableUrl(): boolean {
     if (this.loadFailed) {
       return false;

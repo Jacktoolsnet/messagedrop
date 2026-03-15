@@ -650,6 +650,7 @@ export class AppComponent implements OnInit {
 
     this.sharedContentDialogOpen = true;
     this.lastSharedContentTimestamp = content.timestamp;
+    const sharedDialogWidth = this.getSharedContentDialogWidth(multimedia, location);
     const dialogRef = this.dialog.open(SharedContentComponent, {
       data: {
         multimedia,
@@ -661,8 +662,8 @@ export class AppComponent implements OnInit {
         }
       },
       closeOnNavigation: true,
-      minWidth: 'min(450px, 95vw)',
-      maxWidth: '90vw',
+      width: sharedDialogWidth,
+      maxWidth: '95vw',
       maxHeight: '95vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
@@ -677,6 +678,22 @@ export class AppComponent implements OnInit {
       }
       this.flushPendingSharedContent();
     });
+  }
+
+  private getSharedContentDialogWidth(multimedia?: Multimedia, location?: Location): string {
+    if (multimedia?.type === MultimediaType.YOUTUBE) {
+      return 'min(960px, 95vw)';
+    }
+
+    if (multimedia) {
+      return 'min(760px, 95vw)';
+    }
+
+    if (location) {
+      return 'min(520px, 95vw)';
+    }
+
+    return 'min(450px, 95vw)';
   }
 
   private clearFailedSharedContent(type?: SharedContent['type']): void {
