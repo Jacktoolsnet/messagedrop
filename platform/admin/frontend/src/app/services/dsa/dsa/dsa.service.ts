@@ -426,10 +426,17 @@ export class DsaService {
     const trimmed = contentId?.trim();
     if (!trimmed) return of({ status: 0 });
 
-    const path = visible ? 'enable' : 'disable';
-    const url = `${environment.apiUrl}/dsa/${path}/publicmessage/${encodeURIComponent(trimmed)}`;
-
-    return this.http.get<{ status: number }>(url).pipe(
+    return this.http.post<{
+      ok: boolean;
+      status: number;
+      visible: boolean;
+      contentId: string;
+      messageUuid: string;
+      messageId: number | null;
+    }>(`${this.baseUrl}/publicmessage/visibility`, {
+      contentId: trimmed,
+      visible
+    }).pipe(
       catchError(err => {
         this.snack.open('Could not update message visibility.', 'OK', { duration: 3000 });
         throw err;

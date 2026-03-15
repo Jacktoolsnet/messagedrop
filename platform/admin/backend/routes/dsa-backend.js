@@ -193,17 +193,35 @@ function resolveBackendBase() {
     return process.env.PORT ? `${base}:${process.env.PORT}` : base;
 }
 
-async function fetchMessageByContentId(contentId) {
+function createMessageLookupError(message, extra = {}) {
+    const err = new Error(message);
+    Object.assign(err, extra);
+    return err;
+}
+
+async function fetchMessageByContentId(contentId, options = {}) {
+    const strict = options?.strict === true;
     const base = resolveBackendBase();
     const raw = String(contentId ?? '').trim();
-    if (!base || !raw) return null;
+    if (!base) {
+        if (!strict) return null;
+        throw createMessageLookupError('backend_unavailable', { status: 503 });
+    }
+    if (!raw) {
+        if (!strict) return null;
+        throw createMessageLookupError('invalid_content_id', { status: 400 });
+    }
 
     const backendAudience = process.env.SERVICE_JWT_AUDIENCE_BACKEND || 'service.backend';
     let token = null;
     try {
         token = await signServiceJwt({ audience: backendAudience });
-    } catch {
-        token = null;
+    } catch (error) {
+        if (!strict) return null;
+        throw createMessageLookupError('service_token_unavailable', {
+            status: 503,
+            detail: error?.message || error
+        });
     }
 
     const headers = {
@@ -227,11 +245,36 @@ async function fetchMessageByContentId(contentId) {
         if (resp.status >= 200 && resp.status < 300) {
             return resp.data?.message ?? null;
         }
-    } catch {
+        if (!strict) {
+            return null;
+        }
+        if (resp.status === 404) {
+            throw createMessageLookupError('message_not_found', {
+                status: 404,
+                upstream: resp.data
+            });
+        }
+        throw createMessageLookupError('message_lookup_failed', {
+            status: resp.status,
+            upstream: resp.data
+        });
+    } catch (error) {
+        if (strict) {
+            if (error instanceof Error && (
+                error.message === 'backend_unavailable'
+                || error.message === 'invalid_content_id'
+                || error.message === 'service_token_unavailable'
+                || error.message === 'message_not_found'
+                || error.message === 'message_lookup_failed'
+            )) {
+                throw error;
+            }
+            throw createMessageLookupError('message_lookup_failed', {
+                detail: error?.message || error
+            });
+        }
         return null;
     }
-
-    return null;
 }
 
 function extractModerationFields(message) {
@@ -539,26 +582,141 @@ function buildTransparencyCsv(stats) {
 router.get('/health', (_req, res) => res.json({ ok: true, service: 'dsa-backend' }));
 
 /* ----------------------------- Helper ----------------------------- */
-async function enablePublicMessage(messageId) {
+async function setPublicMessageVisibility(contentId, visible) {
     const base = resolveBackendBase();
     if (!base) {
-        throw new Error('backend_unavailable');
+        throw createMessageLookupError('backend_unavailable', { status: 503 });
     }
-    const url = `${base}/digitalserviceact/enable/publicmessage/${encodeURIComponent(messageId)}`;
+    const message = await fetchMessageByContentId(contentId, { strict: true });
+    if (!message) {
+        throw createMessageLookupError('message_not_found', { status: 404 });
+    }
+
+    const rawContentId = String(contentId ?? '').trim();
+    const messageUuid = String(message?.uuid ?? rawContentId).trim();
+    if (!messageUuid) {
+        throw createMessageLookupError('message_not_found', { status: 404 });
+    }
+
+    const path = visible ? 'enable' : 'disable';
+    const url = `${base}/digitalserviceact/${path}/publicmessage/${encodeURIComponent(messageUuid)}`;
     const backendAudience = process.env.SERVICE_JWT_AUDIENCE_BACKEND || 'service.backend';
-    const serviceToken = await signServiceJwt({ audience: backendAudience });
-    const res = await fetch(url, {
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${serviceToken}`,
-            Accept: 'application/json'
-        }
-    });
-    let json = null;
-    try { json = await res.json(); } catch { /* noop */ }
-    const ok = res.ok && (json?.status === 200 || json?.ok === true);
-    return { ok, status: res.status, json };
+    let serviceToken = null;
+    try {
+        serviceToken = await signServiceJwt({ audience: backendAudience });
+    } catch (error) {
+        throw createMessageLookupError('service_token_unavailable', {
+            status: 503,
+            detail: error?.message || error
+        });
+    }
+
+    let resp = null;
+    try {
+        resp = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${serviceToken}`,
+                Accept: 'application/json'
+            },
+            timeout: 5000,
+            validateStatus: () => true
+        });
+    } catch (error) {
+        throw createMessageLookupError(visible ? 'enable_failed' : 'disable_failed', {
+            detail: error?.message || error,
+            contentId: rawContentId,
+            messageUuid,
+            messageId: message?.id ?? null
+        });
+    }
+    const json = resp.data ?? null;
+    const ok = resp.status >= 200 && resp.status < 300 && (json?.status === 200 || json?.ok === true);
+    if (!ok) {
+        throw createMessageLookupError(visible ? 'enable_failed' : 'disable_failed', {
+            status: resp.status,
+            upstream: json,
+            contentId: rawContentId,
+            messageUuid,
+            messageId: message?.id ?? null
+        });
+    }
+
+    return {
+        ok: true,
+        status: resp.status,
+        json,
+        contentId: rawContentId,
+        messageUuid,
+        messageId: message?.id ?? null
+    };
 }
+
+function toVisibilityApiError(error, visible) {
+    switch (error?.message) {
+        case 'invalid_content_id':
+            return apiError.badRequest('invalid_content_id');
+        case 'message_not_found':
+            return apiError.notFound('message_not_found');
+        case 'backend_unavailable': {
+            const apiErr = apiError.serviceUnavailable('backend_unavailable');
+            apiErr.detail = error?.detail ?? error?.message;
+            return apiErr;
+        }
+        case 'service_token_unavailable': {
+            const apiErr = apiError.serviceUnavailable('service_token_unavailable');
+            apiErr.detail = error?.detail ?? error?.message;
+            return apiErr;
+        }
+        default: {
+            const apiErr = apiError.badGateway(visible ? 'enable_failed' : 'disable_failed');
+            if (error?.detail !== undefined) {
+                apiErr.detail = error.detail;
+            } else if (error?.message && error.message !== (visible ? 'enable_failed' : 'disable_failed')) {
+                apiErr.detail = error.message;
+            }
+            if (Number.isFinite(error?.status)) {
+                apiErr.upstreamStatus = error.status;
+            }
+            if (error?.upstream !== undefined) {
+                apiErr.upstream = error.upstream;
+            }
+            if (error?.contentId) {
+                apiErr.contentId = error.contentId;
+            }
+            if (error?.messageUuid) {
+                apiErr.messageUuid = error.messageUuid;
+            }
+            if (error?.messageId) {
+                apiErr.messageId = error.messageId;
+            }
+            return apiErr;
+        }
+    }
+}
+
+router.post('/publicmessage/visibility', async (req, res, next) => {
+    const contentId = String(req.body?.contentId ?? '').trim();
+    if (!contentId) {
+        return next(apiError.badRequest('contentId is required'));
+    }
+    if (typeof req.body?.visible !== 'boolean') {
+        return next(apiError.badRequest('visible must be boolean'));
+    }
+
+    try {
+        const result = await setPublicMessageVisibility(contentId, req.body.visible);
+        return res.json({
+            ok: true,
+            status: 200,
+            visible: req.body.visible,
+            contentId: result.contentId,
+            messageUuid: result.messageUuid,
+            messageId: result.messageId
+        });
+    } catch (error) {
+        return next(toVisibilityApiError(error, req.body.visible));
+    }
+});
 
 function buildDecisionNotification({ notice, noticeId, outcome, automatedUsed }) {
     const verdict = outcome.replace(/_/g, ' ').toLowerCase();
@@ -865,7 +1023,16 @@ router.post('/notices/:id/decision', (req, res, next) => {
                 tableNotice.updateStatus(_db, req.params.id, 'DECIDED', decidedAt, () => { });
 
                 if (outcome === 'NO_ACTION' && noticeRow?.contentId) {
-                    enablePublicMessage(noticeRow.contentId).catch(() => { });
+                    void setPublicMessageVisibility(String(noticeRow.contentId), true).catch((error) => {
+                        req.logger?.warn?.('Automatic notice visibility sync failed', {
+                            noticeId: req.params.id,
+                            contentId: noticeRow.contentId,
+                            error: error?.message || error,
+                            detail: error?.detail,
+                            upstreamStatus: error?.status,
+                            messageUuid: error?.messageUuid
+                        });
+                    });
                 }
 
                 // Audit
@@ -2185,17 +2352,9 @@ router.delete('/signals/:id', (req, res, next) => {
         if (!sig) return next(apiError.notFound('not_found'));
 
         try {
-            const resp = await enablePublicMessage(String(sig.contentId));
-            if (!resp.ok) {
-                const apiErr = apiError.badGateway('enable_failed');
-                apiErr.upstreamStatus = resp.status;
-                apiErr.upstream = resp.json;
-                return next(apiErr);
-            }
-        } catch (e) {
-            const apiErr = apiError.badGateway('enable_failed');
-            apiErr.detail = String(e?.message || e);
-            return next(apiErr);
+            await setPublicMessageVisibility(String(sig.contentId), true);
+        } catch (error) {
+            return next(toVisibilityApiError(error, true));
         }
 
         // Soft-dismiss the signal to keep status page accessible via token

@@ -118,25 +118,25 @@ async function ensureContentExists(req, contentId, next) {
     const db = req.database?.db;
     if (!db) {
         next(apiError.internal('database_unavailable'));
-        return false;
+        return null;
     }
     const raw = String(contentId ?? '').trim();
     if (!raw) {
         next(apiError.badRequest('contentId is required'));
-        return false;
+        return null;
     }
     try {
         const row = await findMessageByIdOrUuid(db, raw);
         if (!row) {
             next(apiError.notFound('message_not_found'));
-            return false;
+            return null;
         }
-        return true;
+        return row;
     } catch (err) {
         const apiErr = apiError.internal('db_error');
         apiErr.detail = err?.message || err;
         next(apiErr);
-        return false;
+        return null;
     }
 }
 
@@ -173,14 +173,13 @@ async function forwardPostBackend(path, body, extraHeaders = {}) {
     return resp;
 }
 
-function disableLocallyIfPossible(req) {
+function disableLocallyIfPossible(req, messageUuid) {
     return new Promise((resolve) => {
         try {
             const db = req.database?.db;
-            const contentId = req.body?.contentId;
-            if (!db || !contentId) return resolve(false);
+            if (!db || !messageUuid) return resolve(false);
 
-            tableMessage.disableMessage(db, contentId, (err) => {
+            tableMessage.disableMessage(db, messageUuid, (err) => {
                 if (err) {
                     return resolve(false);
                 }
@@ -197,17 +196,22 @@ function disableLocallyIfPossible(req) {
 // POST /dsa/signals  -> forward an {ADMIN_BASE_URL[:ADMIN_PORT]}/dsa/frontend/signals
 router.post('/signals', signalLimiter, reportHourlyLimiter, async (req, res, next) => {
     try {
-        if (!(await ensureContentExists(req, req.body?.contentId, next))) return;
+        const messageRow = await ensureContentExists(req, req.body?.contentId, next);
+        if (!messageRow) return;
+        const canonicalContentId = String(messageRow.uuid ?? req.body?.contentId ?? '').trim();
+        if (canonicalContentId) {
+            req.body = { ...req.body, contentId: canonicalContentId };
+        }
         const resp = await forwardPost('/signals', req.body);
 
-        if (resp?.status >= 200 && resp?.status < 300 && req.body?.contentId && req.database?.db) {
-            await disableLocallyIfPossible(req);
+        if (resp?.status >= 200 && resp?.status < 300 && canonicalContentId && req.database?.db) {
+            await disableLocallyIfPossible(req, canonicalContentId);
         }
 
-        if (resp?.status >= 200 && resp?.status < 300 && resp?.data?.token && req.body?.contentId && req.database?.db) {
+        if (resp?.status >= 200 && resp?.status < 300 && resp?.data?.token && canonicalContentId && req.database?.db) {
             tableMessage.setDsaStatusToken(
                 req.database.db,
-                req.body.contentId,
+                canonicalContentId,
                 resp.data.token,
                 Date.now(),
                 () => { }
@@ -223,17 +227,22 @@ router.post('/signals', signalLimiter, reportHourlyLimiter, async (req, res, nex
 // POST /dsa/notices  -> forward an {ADMIN_BASE_URL[:ADMIN_PORT]}/dsa/frontend/notices
 router.post('/notices', noticeLimiter, reportHourlyLimiter, noticePow, async (req, res, next) => {
     try {
-        if (!(await ensureContentExists(req, req.body?.contentId, next))) return;
+        const messageRow = await ensureContentExists(req, req.body?.contentId, next);
+        if (!messageRow) return;
+        const canonicalContentId = String(messageRow.uuid ?? req.body?.contentId ?? '').trim();
+        if (canonicalContentId) {
+            req.body = { ...req.body, contentId: canonicalContentId };
+        }
         const resp = await forwardPost('/notices', req.body);
 
-        if (resp?.status >= 200 && resp?.status < 300 && req.body?.contentId && req.database?.db) {
-            await disableLocallyIfPossible(req);
+        if (resp?.status >= 200 && resp?.status < 300 && canonicalContentId && req.database?.db) {
+            await disableLocallyIfPossible(req, canonicalContentId);
         }
 
-        if (resp?.status >= 200 && resp?.status < 300 && resp?.data?.token && req.body?.contentId && req.database?.db) {
+        if (resp?.status >= 200 && resp?.status < 300 && resp?.data?.token && canonicalContentId && req.database?.db) {
             tableMessage.setDsaStatusToken(
                 req.database.db,
-                req.body.contentId,
+                canonicalContentId,
                 resp.data.token,
                 Date.now(),
                 () => { }
@@ -247,22 +256,42 @@ router.post('/notices', noticeLimiter, reportHourlyLimiter, noticePow, async (re
 });
 
 
-router.get('/disable/publicmessage/:messageId', moderationToggleLimiter, security.checkToken, function (req, res, next) {
-    tableMessage.disableMessage(req.database.db, req.params.messageId, function (err) {
-        if (err) {
-            return next(apiError.internal('db_error'));
+router.get('/disable/publicmessage/:messageId', moderationToggleLimiter, security.checkToken, async function (req, res, next) {
+    try {
+        const row = await findMessageByIdOrUuid(req.database.db, req.params.messageId);
+        if (!row) {
+            return next(apiError.notFound('message_not_found'));
         }
-        res.status(200).json({ status: 200 });
-    });
+        tableMessage.disableMessage(req.database.db, row.uuid, function (err) {
+            if (err) {
+                return next(apiError.internal('db_error'));
+            }
+            res.status(200).json({ status: 200, messageUuid: row.uuid });
+        });
+    } catch (err) {
+        const apiErr = apiError.internal('db_error');
+        apiErr.detail = err?.message || err;
+        return next(apiErr);
+    }
 });
 
-router.get('/enable/publicmessage/:messageId', moderationToggleLimiter, security.checkToken, function (req, res, next) {
-    tableMessage.enableMessage(req.database.db, req.params.messageId, function (err) {
-        if (err) {
-            return next(apiError.internal('db_error'));
+router.get('/enable/publicmessage/:messageId', moderationToggleLimiter, security.checkToken, async function (req, res, next) {
+    try {
+        const row = await findMessageByIdOrUuid(req.database.db, req.params.messageId);
+        if (!row) {
+            return next(apiError.notFound('message_not_found'));
         }
-        res.status(200).json({ status: 200 });
-    });
+        tableMessage.enableMessage(req.database.db, row.uuid, function (err) {
+            if (err) {
+                return next(apiError.internal('db_error'));
+            }
+            res.status(200).json({ status: 200, messageUuid: row.uuid });
+        });
+    } catch (err) {
+        const apiErr = apiError.internal('db_error');
+        apiErr.detail = err?.message || err;
+        return next(apiErr);
+    }
 });
 
 router.get('/health', moderationToggleLimiter, (_req, res) => res.json({ ok: true, adminBase: `${adminBaseUrl}/dsa/frontend` }));
