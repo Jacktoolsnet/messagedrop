@@ -44,8 +44,7 @@
     min-height: clamp(152px, 22vw, 352px);
 }
 
-:host ::ng-deep .oembed_container.oembed-tiktok iframe,
-:host ::ng-deep .oembed_container.oembed-pinterest iframe {
+:host ::ng-deep .oembed_container.oembed-tiktok iframe {
     max-width: min(100%, 32rem) !important;
     min-height: clamp(360px, 60vw, 720px);
 }
@@ -55,7 +54,12 @@
 }
 
 :host ::ng-deep .oembed_container.oembed-pinterest iframe {
-    aspect-ratio: 3 / 4;
+    max-width: min(100%, 30rem) !important;
+    width: 100% !important;
+    height: clamp(320px, 46vw, 520px) !important;
+    min-height: 0 !important;
+    max-height: 520px !important;
+    aspect-ratio: auto !important;
 }
 
 /* Links: Haupttextfarbe, fett, immer unterstrichen */

@@ -331,7 +331,7 @@ export class OembedService {
   }
 
   private getPinterestIframeEmbedCode(pinId: string): string {
-    return `<iframe width="100%" style="aspect-ratio: 3 / 4; border: none;" src="https://assets.pinterest.com/ext/embed.html?id=${pinId}" loading="lazy" title="Pinterest"></iframe>`;
+    return `<iframe width="100%" style="border: none;" src="https://assets.pinterest.com/ext/embed.html?id=${pinId}" loading="lazy" title="Pinterest"></iframe>`;
   }
 
   private async getSpotifyMultimedia(url: string): Promise<Multimedia | undefined> {
