@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
+import { APP_VERSION_INFO } from '../../../environments/version';
 
 @Component({
   selector: 'app-login',
@@ -29,6 +30,7 @@ import { AuthService } from '../../services/auth/auth.service';
 export class LoginComponent {
   @ViewChild('otpInput') private otpInput?: ElementRef<HTMLInputElement>;
 
+  readonly appVersion = APP_VERSION_INFO;
   username = '';
   password = '';
   otpCode = '';

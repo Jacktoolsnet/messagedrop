@@ -20,7 +20,7 @@
 
 /* === Page Background === */
 .login-page {
-    height: 100dvh;
+    min-height: 100dvh;
     display: grid;
     place-items: center;
     padding: 1.25rem;
@@ -43,6 +43,43 @@
     gap: 1rem;
     min-height: 0;
     height: 100%;
+}
+
+.version-card {
+    grid-column: 1 / -1;
+    border-radius: 16px;
+    background: color-mix(in srgb, var(--card) 92%, white 8%);
+    border: 1px solid var(--border);
+    box-shadow:
+        0 18px 50px rgba(2, 8, 20, 0.12),
+        0 2px 6px rgba(2, 8, 20, 0.05);
+    animation: fadeUp .45s ease forwards;
+    transform: translateY(10px);
+    opacity: 0;
+    animation-delay: .12s;
+}
+
+.version-content {
+    display: grid;
+    justify-items: center;
+    gap: 0.25rem;
+    padding: 1rem 1.25rem;
+    text-align: center;
+}
+
+.version-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.version-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    overflow-wrap: anywhere;
 }
 
 @media (max-width: 900px) {

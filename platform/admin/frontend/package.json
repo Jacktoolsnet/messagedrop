@@ -2,11 +2,16 @@
   "name": "Messagedrop Admin",
   "version": "1.0.0",
   "scripts": {
+    "gen:version": "node tools/gen-version.js",
     "ng": "ng",
+    "prestart": "npm run gen:version",
     "start": "ng serve",
+    "prebuild": "npm run gen:version",
     "build": "ng build",
     "install:prod": "npm install --omit=dev",
+    "prewatch": "npm run gen:version",
     "watch": "ng build --watch --configuration development",
+    "pretest": "npm run gen:version",
     "test": "ng test",
     "lint": "ng lint"
   },
