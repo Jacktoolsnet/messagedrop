@@ -424,6 +424,36 @@ export class MessageService {
     await this.saveOwnPublicMessages(userId, filtered);
   }
 
+  private async refreshParentAvailability(messages: Message[]): Promise<Message[]> {
+    const parentMissingMessages = (messages ?? []).filter((message) =>
+      message.publishState === 'parent_missing'
+      && typeof message.parentUuid === 'string'
+      && message.parentUuid.trim().length > 0
+    );
+
+    if (parentMissingMessages.length === 0) {
+      return messages;
+    }
+
+    const parentExistence = new Map<string, boolean>();
+    const parentUuids = [...new Set(parentMissingMessages.map((message) => message.parentUuid.trim()))];
+
+    await Promise.all(parentUuids.map(async (parentUuid) => {
+      const result = await firstValueFrom(this.verifyMessageExistsByUuid(parentUuid));
+      parentExistence.set(parentUuid, result.exists === true);
+    }));
+
+    return messages.map((message) => {
+      const parentUuid = typeof message.parentUuid === 'string' ? message.parentUuid.trim() : '';
+      if (message.publishState !== 'parent_missing' || !parentUuid) {
+        return message;
+      }
+      return parentExistence.get(parentUuid) === true
+        ? { ...message, publishState: 'server_missing' as const }
+        : message;
+    });
+  }
+
   mergeOwnPublicMessages(localMessages: Message[], serverMessages: Message[]): Message[] {
     const merged = new Map<string, Message>();
     const serverByUuid = new Map<string, Message>();
@@ -497,8 +527,9 @@ export class MessageService {
     const merged = serverSyncAvailable
       ? this.mergeOwnPublicMessages(localMessages, serverMessages)
       : localMessages;
-    await this.saveOwnPublicMessages(user.id, merged);
-    return merged;
+    const refreshed = await this.refreshParentAvailability(merged);
+    await this.saveOwnPublicMessages(user.id, refreshed);
+    return refreshed;
   }
 
   getCommentsSignalForMessage(parentUuid: string): WritableSignal<Message[]> {
@@ -1019,6 +1050,27 @@ export class MessageService {
         return this.mapRawMessage(response.message);
       }),
       catchError(() => of(null))
+    );
+  }
+
+  verifyMessageExistsByUuid(messageUuid: string): Observable<{ exists: boolean; status: number | null }> {
+    const trimmedUuid = typeof messageUuid === 'string' ? messageUuid.trim() : '';
+    if (!trimmedUuid) {
+      return of({ exists: false, status: 400 });
+    }
+
+    return this.http.get<{ status: number; message?: RawMessage }>(
+      `${environment.apiUrl}/message/get/uuid/${encodeURIComponent(trimmedUuid)}`,
+      this.httpOptions
+    ).pipe(
+      map((response) => ({
+        exists: Boolean(response?.message),
+        status: 200
+      })),
+      catchError((error: HttpErrorResponse) => of({
+        exists: false,
+        status: typeof error?.status === 'number' ? error.status : null
+      }))
     );
   }
 

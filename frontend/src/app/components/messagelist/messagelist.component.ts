@@ -11,6 +11,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { firstValueFrom } from 'rxjs';
 import { Location } from '../../interfaces/location';
 import { Message } from '../../interfaces/message';
 import { Mode } from '../../interfaces/mode';
@@ -675,8 +676,9 @@ export class MessagelistComponent implements OnInit, OnDestroy {
         }));
       },
       error: (error) => {
+        this.pendingDsaTokens.delete(token);
         if (this.getHttpStatus(error) === 404) {
-          this.purgeMessagesForMissingDsaStatus(token);
+          void this.reconcileMissingDsaStatus(token);
           return;
         }
         this.dsaStatusCache.update(map => ({
@@ -735,7 +737,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
     return Array.from(messages.values());
   }
 
-  private purgeMessagesForMissingDsaStatus(token: string): void {
+  private async reconcileMissingDsaStatus(token: string): Promise<void> {
     const ownUserId = this.userService.getUser().id;
     if (!ownUserId) {
       return;
@@ -746,8 +748,32 @@ export class MessagelistComponent implements OnInit, OnDestroy {
       return;
     }
 
-    staleMessages.forEach((message) => this.removeMessageLocally(message));
-    void this.messageService.removeOwnPublicMessages(ownUserId, staleMessages.map((message) => message.uuid));
+    const verificationResults = await Promise.all(staleMessages.map(async (message) => ({
+      message,
+      result: await firstValueFrom(this.messageService.verifyMessageExistsByUuid(message.uuid))
+    })));
+
+    const missingMessages = verificationResults
+      .filter(({ result }) => result.status === 404 && result.exists === false)
+      .map(({ message }) => message);
+
+    if (missingMessages.length > 0) {
+      missingMessages.forEach((message) => this.removeMessageLocally(message));
+      await this.messageService.removeOwnPublicMessages(ownUserId, missingMessages.map((message) => message.uuid));
+    }
+
+    const keptMessages = verificationResults.length - missingMessages.length;
+    this.dsaStatusCache.update((map) => {
+      if (keptMessages > 0) {
+        return {
+          ...map,
+          [token]: MessagelistComponent.DSA_UNKNOWN
+        };
+      }
+      const next = { ...map };
+      delete next[token];
+      return next;
+    });
   }
 
   public isOwnPublicMessage(message: Message): boolean {

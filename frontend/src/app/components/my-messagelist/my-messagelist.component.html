@@ -159,7 +159,7 @@
                             <span>{{ 'common.messageList.blockAria' | transloco }}</span>
                         </button>
                         }
-                        @if (message.status === 'disabled' && message.dsaStatusToken) {
+                        @if (isMessageDsaLocked(message) && message.dsaStatusToken) {
                         <button mat-menu-item (click)="openDsaStatus(message)">
                             <mat-icon aria-hidden="true">flag</mat-icon>
                             <span>{{ getDsaStatusAriaLabel(message) }}</span>
@@ -329,7 +329,7 @@
                             <span>{{ 'common.messageList.blockAria' | transloco }}</span>
                         </button>
                         }
-                        @if (message.status === 'disabled' && message.dsaStatusToken) {
+                        @if (isMessageDsaLocked(message) && message.dsaStatusToken) {
                         <button mat-menu-item (click)="openDsaStatus(message)">
                             <mat-icon aria-hidden="true">flag</mat-icon>
                             <span>{{ getDsaStatusAriaLabel(message) }}</span>
