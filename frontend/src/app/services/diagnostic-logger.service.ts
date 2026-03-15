@@ -27,6 +27,14 @@ interface FrontendErrorPayload {
   createdAt: number;
 }
 
+interface ResourceErrorContext {
+  feature: string;
+  source?: string;
+  errorCode: string;
+  errorMessage: string;
+  ignore: boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class DiagnosticLoggerService {
   private readonly appService = inject(AppService);
@@ -141,20 +149,19 @@ export class DiagnosticLoggerService {
       });
       return;
     }
-    const target = event.target as HTMLElement | null;
-    if (!target || !('tagName' in target)) {
-      return;
-    }
-    const tagName = target.tagName?.toLowerCase();
-    if (!tagName) {
+    const resourceContext = this.extractResourceErrorContext(event.target);
+    if (!resourceContext || resourceContext.ignore) {
       return;
     }
     const payload: FrontendErrorPayload = {
       client: 'web',
       event: 'resource_error',
       severity: 'warning',
-      feature: this.safeToken(tagName),
+      feature: this.safeToken(resourceContext.feature),
       path: this.getCurrentPath(),
+      errorCode: this.safeToken(resourceContext.errorCode),
+      errorMessage: this.safeMessage(resourceContext.errorMessage),
+      source: resourceContext.source,
       appVersion: APP_VERSION_INFO.version,
       environment: environment.production ? 'prod' : 'dev',
       createdAt: Date.now()
@@ -205,9 +212,9 @@ export class DiagnosticLoggerService {
     return path.split('?')[0].split('#')[0].slice(0, 200);
   }
 
-  private safeToken(value?: string): string | undefined {
+  private safeToken(value?: string, maxLen = 80): string | undefined {
     if (!value) return undefined;
-    return value.replace(/[^a-zA-Z0-9_.+-]/g, '').slice(0, 80) || undefined;
+    return value.replace(/[^a-zA-Z0-9_.+-]/g, '').slice(0, maxLen) || undefined;
   }
 
   private safeMessage(value?: string, maxLen = 300): string | undefined {
@@ -223,12 +230,134 @@ export class DiagnosticLoggerService {
   private safeSource(value?: string): string | undefined {
     if (!value) return undefined;
     try {
-      const parsed = new URL(value, typeof window !== 'undefined' ? window.location.origin : undefined);
-      const full = parsed.pathname + (parsed.hash ?? '');
-      return this.safePath(full);
+      if (/^https?:\/\//i.test(value)) {
+        const parsed = new URL(value);
+        return this.safePath(`${parsed.hostname}${parsed.pathname}`);
+      }
     } catch {
-      return this.safePath(value);
+      return undefined;
     }
+    return this.safePath(value);
+  }
+
+  private extractResourceErrorContext(target: EventTarget | null): ResourceErrorContext | null {
+    if (!(target instanceof Element)) {
+      return null;
+    }
+    const tagName = target.tagName?.toLowerCase();
+    if (!tagName) {
+      return null;
+    }
+
+    const source = this.getResourceSource(target);
+    const className = this.getResourceClassName(target);
+    const online = typeof navigator !== 'undefined' ? navigator.onLine : undefined;
+    const ignore = tagName === 'img' && this.isIgnorableTileError(source, className);
+    const classification = this.classifyResourceError(tagName, source);
+    const details = [classification.errorCode, `tag=${tagName}`];
+
+    if (source) {
+      details.push(`src=${source}`);
+    }
+    if (className) {
+      details.push(`class=${className}`);
+    }
+    if (typeof online === 'boolean') {
+      details.push(`online=${online ? 'true' : 'false'}`);
+    }
+
+    return {
+      feature: classification.feature,
+      source,
+      errorCode: classification.errorCode,
+      errorMessage: details.join(' '),
+      ignore
+    };
+  }
+
+  private getResourceSource(target: Element): string | undefined {
+    if (target instanceof HTMLImageElement) {
+      return this.normalizeResourceSource(target.currentSrc || target.src);
+    }
+    if (target instanceof HTMLScriptElement) {
+      return this.normalizeResourceSource(target.src);
+    }
+    if (target instanceof HTMLLinkElement) {
+      return this.normalizeResourceSource(target.href);
+    }
+    const candidate = target.getAttribute('src') ?? target.getAttribute('href') ?? undefined;
+    return this.normalizeResourceSource(candidate);
+  }
+
+  private normalizeResourceSource(value?: string): string | undefined {
+    if (!value) return undefined;
+    try {
+      const parsed = new URL(value, typeof window !== 'undefined' ? window.location.origin : undefined);
+      const normalized = `${parsed.origin}${parsed.pathname}`;
+      return normalized.slice(0, 240);
+    } catch {
+      return value.split('?')[0].split('#')[0].slice(0, 240) || undefined;
+    }
+  }
+
+  private classifyResourceError(tagName: string, source?: string): { feature: string; errorCode: string } {
+    const normalizedSource = String(source ?? '').toLowerCase();
+    if (this.isMarkerAssetSource(normalizedSource)) {
+      return {
+        feature: `marker_asset_${tagName}`,
+        errorCode: 'marker_asset_load_failed'
+      };
+    }
+    if (this.isLocalAssetSource(normalizedSource)) {
+      return {
+        feature: `local_asset_${tagName}`,
+        errorCode: 'local_asset_load_failed'
+      };
+    }
+    return {
+      feature: tagName,
+      errorCode: `${tagName}_load_failed`
+    };
+  }
+
+  private getResourceClassName(target: Element): string | undefined {
+    const rawClassName = target.getAttribute('class') ?? '';
+    if (!rawClassName.trim()) {
+      return undefined;
+    }
+    const normalized = rawClassName
+      .trim()
+      .split(/\s+/)
+      .map((token) => this.safeToken(token, 40))
+      .filter((token): token is string => !!token)
+      .slice(0, 5)
+      .join('.');
+    return normalized || undefined;
+  }
+
+  private isIgnorableTileError(source?: string, className?: string): boolean {
+    const normalizedSource = String(source ?? '').toLowerCase();
+    const normalizedClassName = String(className ?? '').toLowerCase();
+    return normalizedClassName.includes('leaflet-tile')
+      || normalizedSource.includes('tile.openstreetmap.org/');
+  }
+
+  private isLocalAssetSource(source: string): boolean {
+    if (!source) {
+      return false;
+    }
+    return source.startsWith('/assets/')
+      || source.startsWith('assets/')
+      || source.includes('/assets/');
+  }
+
+  private isMarkerAssetSource(source: string): boolean {
+    if (!source) {
+      return false;
+    }
+    return source.startsWith('/assets/markers/')
+      || source.startsWith('assets/markers/')
+      || source.includes('/assets/markers/');
   }
 
   private extractErrorDetails(error: unknown): {
@@ -315,9 +444,12 @@ export class DiagnosticLoggerService {
     const key = [
       payload.event,
       payload.severity,
+      payload.feature ?? '',
       payload.path ?? '',
       payload.status ?? '',
-      payload.errorName ?? ''
+      payload.errorName ?? '',
+      payload.errorCode ?? '',
+      payload.source ?? ''
     ].join('|');
     const now = Date.now();
     const last = this.lastSent.get(key);

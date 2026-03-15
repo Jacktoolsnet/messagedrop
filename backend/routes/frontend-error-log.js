@@ -35,11 +35,14 @@ function safePath(value) {
 function safeSource(value) {
   if (typeof value !== 'string') return undefined;
   try {
-    const parsed = new URL(value, typeof window !== 'undefined' ? window.location.origin : undefined);
-    return safePath(parsed.pathname + (parsed.hash ?? ''));
+    if (/^https?:\/\//i.test(value)) {
+      const parsed = new URL(value);
+      return safePath(`${parsed.hostname}${parsed.pathname}`);
+    }
   } catch {
-    return safePath(value);
+    return undefined;
   }
+  return safePath(value);
 }
 
 function sanitizePayload(body) {
