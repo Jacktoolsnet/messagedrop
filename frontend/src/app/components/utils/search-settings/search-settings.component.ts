@@ -12,6 +12,39 @@ import { DEFAULT_SEARCH_SETTINGS, SearchSettings, SearchSettingsKey } from '../.
 import { HelpDialogService } from '../help-dialog/help-dialog.service';
 import { SearchSettingsMapPreviewComponent } from './search-settings-map-preview.component';
 import { UserService } from '../../../services/user.service';
+import { LanguageService } from '../../../services/language.service';
+
+const REGION_PREVIEW_LOCATIONS: Record<string, Location> = {
+  DE: { latitude: 51.1657, longitude: 10.4515, plusCode: '' },
+  AT: { latitude: 47.5162, longitude: 14.5501, plusCode: '' },
+  CH: { latitude: 46.8182, longitude: 8.2275, plusCode: '' },
+  FR: { latitude: 46.2276, longitude: 2.2137, plusCode: '' },
+  BE: { latitude: 50.5039, longitude: 4.4699, plusCode: '' },
+  CA: { latitude: 56.1304, longitude: -106.3468, plusCode: '' },
+  ES: { latitude: 40.4637, longitude: -3.7492, plusCode: '' },
+  MX: { latitude: 23.6345, longitude: -102.5528, plusCode: '' },
+  US: { latitude: 39.8283, longitude: -98.5795, plusCode: '' },
+  GB: { latitude: 55.3781, longitude: -3.436, plusCode: '' },
+  IE: { latitude: 53.1424, longitude: -7.6921, plusCode: '' },
+  AU: { latitude: -25.2744, longitude: 133.7751, plusCode: '' },
+  NZ: { latitude: -40.9006, longitude: 174.886, plusCode: '' }
+};
+
+const LANGUAGE_PREVIEW_LOCATIONS: Record<string, Location> = {
+  de: REGION_PREVIEW_LOCATIONS['DE'],
+  fr: REGION_PREVIEW_LOCATIONS['FR'],
+  es: REGION_PREVIEW_LOCATIONS['ES'],
+  en: REGION_PREVIEW_LOCATIONS['US']
+};
+
+const SEARCH_SETTING_MARKER_ICONS: Record<SearchSettingsKey, string> = {
+  publicMessages: 'assets/markers/message-marker.svg',
+  privateNotes: 'assets/markers/note-marker.svg',
+  privateImages: 'assets/markers/image-marker.svg',
+  privateDocuments: 'assets/markers/document-marker.svg',
+  experiences: 'assets/markers/experience-marker.svg',
+  myExperiences: 'assets/markers/my-experience-marker.svg'
+};
 
 interface SearchSettingsItem {
   key: SearchSettingsKey;
@@ -48,9 +81,10 @@ export class SearchSettingsComponent {
   private readonly dialogRef = inject(MatDialogRef<SearchSettingsComponent>);
   private readonly dialogData = inject<SearchSettingsDialogData>(MAT_DIALOG_DATA);
   private readonly userService = inject(UserService);
+  private readonly languageService = inject(LanguageService);
   readonly help = inject(HelpDialogService);
 
-  readonly location = this.dialogData.location;
+  readonly previewLocation = this.resolvePreviewLocation();
   private readonly allItems: SearchSettingsItem[] = [
     { key: 'publicMessages', icon: 'public', titleKey: 'common.searchSettings.items.publicMessages' },
     { key: 'privateNotes', icon: 'sticky_note_2', titleKey: 'common.searchSettings.items.privateNotes' },
@@ -99,6 +133,18 @@ export class SearchSettingsComponent {
     };
   }
 
+  getPreviewMarkerIcon(key: SearchSettingsKey): string {
+    return SEARCH_SETTING_MARKER_ICONS[key];
+  }
+
+  getPreviewMarkers(key: SearchSettingsKey): Array<{ latitude: number; longitude: number; iconUrl: string }> {
+    return [{
+      latitude: this.previewLocation.latitude,
+      longitude: this.previewLocation.longitude,
+      iconUrl: this.getPreviewMarkerIcon(key)
+    }];
+  }
+
   private mergeSettings(settings: SearchSettings): SearchSettings {
     return {
       publicMessages: { ...DEFAULT_SEARCH_SETTINGS.publicMessages, ...settings.publicMessages },
@@ -108,5 +154,37 @@ export class SearchSettingsComponent {
       experiences: { ...DEFAULT_SEARCH_SETTINGS.experiences, ...settings.experiences },
       myExperiences: { ...DEFAULT_SEARCH_SETTINGS.myExperiences, ...settings.myExperiences }
     };
+  }
+
+  private resolvePreviewLocation(): Location {
+    const browserLocale = this.getBrowserLocale();
+    const normalizedLocale = browserLocale.replace('_', '-').trim();
+    const parts = normalizedLocale.split('-').filter(Boolean);
+    const language = parts[0]?.toLowerCase();
+    const region = parts
+      .slice(1)
+      .find((part) => /^[a-z]{2}$/i.test(part) || /^\d{3}$/.test(part))
+      ?.toUpperCase();
+
+    if (region && REGION_PREVIEW_LOCATIONS[region]) {
+      return REGION_PREVIEW_LOCATIONS[region];
+    }
+
+    if (language && LANGUAGE_PREVIEW_LOCATIONS[language]) {
+      return LANGUAGE_PREVIEW_LOCATIONS[language];
+    }
+
+    return this.dialogData.location;
+  }
+
+  private getBrowserLocale(): string {
+    if (typeof navigator !== 'undefined') {
+      const candidate = navigator.languages?.[0] || navigator.language;
+      if (typeof candidate === 'string' && candidate.trim()) {
+        return candidate.trim();
+      }
+    }
+
+    return this.languageService.effectiveLanguage();
   }
 }

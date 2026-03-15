@@ -18,7 +18,8 @@
       </mat-slide-toggle>
 
       <div class="preview">
-        <app-search-settings-map-preview [center]="location" [zoom]="searchSettings[item.key].minZoom"
+        <app-search-settings-map-preview [center]="previewLocation" [zoom]="searchSettings[item.key].minZoom"
+          [markers]="getPreviewMarkers(item.key)" [markerIconUrl]="getPreviewMarkerIcon(item.key)"
           [disabled]="!searchSettings[item.key].enabled"></app-search-settings-map-preview>
         <div class="zoom-badge">{{ 'common.searchSettings.zoomValue' | transloco }} {{ searchSettings[item.key].minZoom }}</div>
       </div>
