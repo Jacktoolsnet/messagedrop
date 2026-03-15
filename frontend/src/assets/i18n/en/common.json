@@ -438,7 +438,8 @@
         "unpublished": "Unpublished",
         "serverMissing": "Missing online",
         "localOnly": "Local only",
-        "dsaLocked": "DSA locked"
+        "dsaLocked": "DSA locked",
+        "parentMissing": "Parent message missing"
       },
       "moderationStatus": {
         "title": "Moderation status",

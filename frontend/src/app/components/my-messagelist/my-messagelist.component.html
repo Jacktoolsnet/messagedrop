@@ -27,7 +27,7 @@
                     @if (message.createDateTime !== null) {
                     <span class="timestamp-inline">{{ message.createDateTime | date:'medium' }}</span>
                     }
-                    @if (isOwnPublicMessage(message)) {
+                    @if (shouldShowPublishStateBadge(message)) {
                     <span [ngClass]="getPublishStateBadgeClass(message)">{{ getPublishStateBadgeLabel(message) }}</span>
                     }
                 </div>
@@ -197,7 +197,7 @@
                     @if (message.createDateTime !== null) {
                     <span class="timestamp-inline">{{ message.createDateTime | date:'medium' }}</span>
                     }
-                    @if (isOwnPublicMessage(message)) {
+                    @if (shouldShowPublishStateBadge(message)) {
                     <span [ngClass]="getPublishStateBadgeClass(message)">{{ getPublishStateBadgeLabel(message) }}</span>
                     }
                 </div>

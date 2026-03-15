@@ -14,6 +14,7 @@ import { Contact } from '../interfaces/contact';
 import { CreateUserResponse } from '../interfaces/create-user-response';
 import { CryptedUser } from '../interfaces/crypted-user';
 import { GetMessageResponse } from '../interfaces/get-message-response';
+import { Message } from '../interfaces/message';
 import { MultimediaType } from '../interfaces/multimedia-type';
 import { Profile } from '../interfaces/profile';
 import { RawContact } from '../interfaces/raw-contact';
@@ -54,6 +55,52 @@ interface OwnUserStatusResponse {
     accountBlockedReason?: string | null;
     accountBlockedUntil?: number | string | null;
   } | null;
+}
+
+interface RestoreSkippedMessage {
+  uuid?: string;
+  parentUuid?: string;
+  reason?: string;
+}
+
+interface RestoreSummaryResponse extends SimpleStatusResponse {
+  restoreSummary?: {
+    skippedMessages?: RestoreSkippedMessage[];
+  };
+}
+
+interface ServerRestoreMessageRow {
+  id: null;
+  uuid: string;
+  parentUuid: string | null;
+  typ: string;
+  createDateTime: number;
+  deleteDateTime: number;
+  latitude: number;
+  longitude: number;
+  plusCode: string;
+  message: string;
+  markerType: string;
+  style: string;
+  views: number;
+  likes: number;
+  dislikes: number;
+  commentsNumber: number;
+  status: string;
+  hashtags: string[];
+  userId: string;
+  multimedia: Message['multimedia'] | null;
+  dsaStatusToken: string | null;
+  aiModerationDecision: string | null;
+  aiModerationScore: number | null;
+  aiModerationFlagged: boolean | null;
+  aiModerationAt: number | null;
+  patternMatch: boolean | null;
+  patternMatchAt: number | null;
+  manualModerationDecision: string | null;
+  manualModerationReason: string | null;
+  manualModerationAt: number | null;
+  manualModerationBy: string | null;
 }
 
 @Injectable({
@@ -1459,11 +1506,100 @@ export class UserService {
     };
   }
 
+  private normalizeRestoreEpochSeconds(value: unknown): number | null {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed) || parsed <= 0) {
+      return null;
+    }
+    return parsed >= 1_000_000_000_000
+      ? Math.floor(parsed / 1000)
+      : Math.floor(parsed);
+  }
+
+  private buildServerRestoreMessageRows(userId: string, messages: Message[]): ServerRestoreMessageRow[] {
+    const nowSeconds = Math.floor(Date.now() / 1000);
+    const uniqueMessages = new Map<string, Message>();
+
+    const collect = (message: Message | null | undefined): void => {
+      if (!message) {
+        return;
+      }
+      const uuid = typeof message.uuid === 'string' ? message.uuid.trim() : '';
+      if (!uuid || uniqueMessages.has(uuid)) {
+        return;
+      }
+      if (message.userId && message.userId !== userId) {
+        return;
+      }
+      uniqueMessages.set(uuid, message);
+      if (Array.isArray(message.comments)) {
+        message.comments.forEach((comment) => collect(comment));
+      }
+    };
+
+    messages.forEach((message) => collect(message));
+
+    return Array.from(uniqueMessages.values())
+      .map<ServerRestoreMessageRow | null>((message) => {
+        const latitude = Number(message.location?.latitude);
+        const longitude = Number(message.location?.longitude);
+        if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+          return null;
+        }
+
+        const createDateTime = this.normalizeRestoreEpochSeconds(message.createDateTime) ?? nowSeconds;
+        const deleteDateTime = this.normalizeRestoreEpochSeconds(message.deleteDateTime) ?? (createDateTime + 30 * 24 * 60 * 60);
+        return {
+          id: null,
+          uuid: message.uuid,
+          parentUuid: message.parentUuid?.trim() || null,
+          typ: message.typ,
+          createDateTime,
+          deleteDateTime: Math.max(deleteDateTime, createDateTime),
+          latitude,
+          longitude,
+          plusCode: message.location?.plusCode ?? '',
+          message: message.message ?? '',
+          markerType: message.markerType ?? 'default',
+          style: message.style ?? '',
+          views: Number.isFinite(message.views) ? message.views : 0,
+          likes: Number.isFinite(message.likes) ? message.likes : 0,
+          dislikes: Number.isFinite(message.dislikes) ? message.dislikes : 0,
+          commentsNumber: Number.isFinite(message.commentsNumber) ? message.commentsNumber : 0,
+          status: message.status ?? 'enabled',
+          hashtags: Array.isArray(message.hashtags) ? message.hashtags : [],
+          userId,
+          multimedia: message.multimedia ?? null,
+          dsaStatusToken: message.dsaStatusToken ?? null,
+          aiModerationDecision: message.aiModerationDecision ?? null,
+          aiModerationScore: message.aiModerationScore ?? null,
+          aiModerationFlagged: message.aiModerationFlagged ?? null,
+          aiModerationAt: this.normalizeRestoreEpochSeconds(message.aiModerationAt),
+          patternMatch: message.patternMatch ?? null,
+          patternMatchAt: this.normalizeRestoreEpochSeconds(message.patternMatchAt),
+          manualModerationDecision: message.manualModerationDecision ?? null,
+          manualModerationReason: message.manualModerationReason ?? null,
+          manualModerationAt: this.normalizeRestoreEpochSeconds(message.manualModerationAt),
+          manualModerationBy: message.manualModerationBy ?? null
+        };
+      })
+      .filter((row): row is ServerRestoreMessageRow => row !== null)
+      .sort((a, b) => {
+        const aHasParent = typeof a.parentUuid === 'string' && a.parentUuid.length > 0;
+        const bHasParent = typeof b.parentUuid === 'string' && b.parentUuid.length > 0;
+        if (aHasParent !== bHasParent) {
+          return aHasParent ? 1 : -1;
+        }
+        return Number(a.createDateTime ?? 0) - Number(b.createDateTime ?? 0);
+      });
+  }
+
   private async buildServerRestoreBackup(user: User): Promise<UserServerBackup> {
-    const [places, contacts, contactProfiles] = await Promise.all([
+    const [places, contacts, contactProfiles, ownPublicMessages] = await Promise.all([
       this.indexedDbService.getAllPlaces(),
       this.indexedDbService.getAllContacts(),
-      this.indexedDbService.getAllContactProfilesAsMap()
+      this.indexedDbService.getAllContactProfilesAsMap(),
+      this.indexedDbService.getOwnPublicMessages(user.id)
     ]);
 
     const cryptoPublicKey = await this.ensureServerCryptoPublicKey();
@@ -1533,6 +1669,7 @@ export class UserService {
         lastMessageAt: contact.lastMessageAt ?? null
       };
     }));
+    const messageRows = this.buildServerRestoreMessageRows(user.id, ownPublicMessages);
 
     return {
       schemaVersion: 1,
@@ -1540,7 +1677,7 @@ export class UserService {
       userId: user.id,
       tables: {
         tableUser: userRows,
-        tableMessage: [],
+        tableMessage: messageRows,
         tableContact: contactRows.filter((row): row is NonNullable<typeof row> => Boolean(row)),
         tableContactMessage: [],
         tablePlace: placeRows.filter((row): row is NonNullable<typeof row> => Boolean(row)),
@@ -1550,6 +1687,23 @@ export class UserService {
         tableConnect: []
       }
     };
+  }
+
+  private async applyRestoreSummaryToOwnPublicMessages(
+    userId: string,
+    restoreSummary?: RestoreSummaryResponse['restoreSummary']
+  ): Promise<void> {
+    const skippedMessages = restoreSummary?.skippedMessages ?? [];
+    const parentMissingUuids = skippedMessages
+      .filter((entry) => entry?.reason === 'parent_missing')
+      .map((entry) => typeof entry?.uuid === 'string' ? entry.uuid.trim() : '')
+      .filter((uuid): uuid is string => uuid.length > 0);
+
+    if (parentMissingUuids.length === 0) {
+      return;
+    }
+
+    await this.injector.get(MessageService).markOwnPublicMessagesWithMissingParents(userId, parentMissingUuids);
   }
 
   private async restoreServerFromIndexedDb(user: User, jwt: string): Promise<void> {
@@ -1571,10 +1725,11 @@ export class UserService {
       withCredentials: 'true',
       Authorization: `Bearer ${jwt}`
     });
-    const response = await firstValueFrom(this.http.post<SimpleStatusResponse>(url, { backup }, { headers }));
+    const response = await firstValueFrom(this.http.post<RestoreSummaryResponse>(url, { backup }, { headers }));
     if (response.status !== 200) {
       throw new Error('restore_failed');
     }
+    await this.applyRestoreSummaryToOwnPublicMessages(user.id, response.restoreSummary);
   }
 
   private getHttpStatus(err: unknown): number | undefined {

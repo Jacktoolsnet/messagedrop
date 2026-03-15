@@ -110,6 +110,26 @@ export class MessageService {
     return this.normalizePublishState(message) === 'dsa_locked';
   }
 
+  isParentMissingError(error: unknown): boolean {
+    const matchesPayload = (value: unknown): boolean => {
+      if (!value || typeof value !== 'object') {
+        return false;
+      }
+      const candidate = value as { message?: unknown; error?: unknown };
+      return candidate.message === 'parent_not_found' || candidate.error === 'parent_not_found';
+    };
+
+    if (matchesPayload(error)) {
+      return true;
+    }
+
+    if (error instanceof HttpErrorResponse) {
+      return matchesPayload(error.error);
+    }
+
+    return false;
+  }
+
   private getMessageIdentifier(message: Message): string | number | null {
     if (Number.isFinite(message.id) && message.id > 0) {
       return message.id;
@@ -297,6 +317,27 @@ export class MessageService {
     await this.indexedDbService.setOwnPublicMessages(userId, snapshot);
   }
 
+  async markOwnPublicMessagesWithMissingParents(userId: string, messageUuids: string[]): Promise<void> {
+    const normalizedUuids = Array.isArray(messageUuids)
+      ? messageUuids
+        .map((uuid) => typeof uuid === 'string' ? uuid.trim() : '')
+        .filter((uuid): uuid is string => uuid.length > 0)
+      : [];
+
+    if (!userId || normalizedUuids.length === 0) {
+      return;
+    }
+
+    const missingParentSet = new Set(normalizedUuids);
+    const existing = await this.loadOwnPublicMessages(userId);
+    const patched = existing.map((message) =>
+      missingParentSet.has(message.uuid)
+        ? { ...message, publishState: 'parent_missing' as const }
+        : message
+    );
+    await this.saveOwnPublicMessages(userId, patched);
+  }
+
   mergeOwnPublicMessages(localMessages: Message[], serverMessages: Message[]): Message[] {
     const merged = new Map<string, Message>();
     const serverByUuid = new Map<string, Message>();
@@ -332,7 +373,11 @@ export class MessageService {
       }
 
       const localState = localMessage.publishState ?? this.normalizePublishState(localMessage);
-      const missingState: Message['publishState'] = localState === 'local_only' ? 'local_only' : 'server_missing';
+      const missingState: Message['publishState'] = localState === 'local_only'
+        ? 'local_only'
+        : localState === 'parent_missing'
+          ? 'parent_missing'
+          : 'server_missing';
       merged.set(key, {
         ...localMessage,
         publishState: this.isDsaLocked(localMessage) ? 'dsa_locked' : missingState

@@ -464,7 +464,18 @@ export class MessagelistComponent implements OnInit, OnDestroy {
             ...moderationPatch
           });
         },
-        error: () => {}
+        error: (error) => {
+          if (this.messageService.isParentMissingError(error)) {
+            this.patchMessageLocally(message, {
+              publishState: 'parent_missing'
+            });
+            this.snackBar.open(
+              this.translation.t('common.messageList.publishState.parentMissing'),
+              undefined,
+              { duration: 3000, horizontalPosition: 'center', verticalPosition: 'top' }
+            );
+          }
+        }
       });
       return;
     }
@@ -500,7 +511,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
 
         const selected = this.messageService.selectedMessagesSignal();
         const publishState = this.resolvePublishState(this.clickedMessage!);
-        if (publishState === 'server_missing' || publishState === 'local_only') {
+        if (publishState === 'server_missing' || publishState === 'local_only' || publishState === 'parent_missing') {
           this.removeMessageLocally(this.clickedMessage!);
           return;
         }

@@ -14,6 +14,7 @@ import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { AvatarStorageService } from './avatar-storage.service';
 import { BackupStateService } from './backup-state.service';
 import { IndexedDbService } from './indexed-db.service';
+import { MessageService } from './message.service';
 import { NetworkService } from './network.service';
 import { TranslationHelperService } from './translation-helper.service';
 import { UserService } from './user.service';
@@ -30,6 +31,18 @@ type FilePickerWindow = typeof window & {
   showDirectoryPicker?: () => Promise<FileSystemDirectoryHandle>;
 };
 
+interface RestoreSkippedMessage {
+  uuid?: string;
+  parentUuid?: string;
+  reason?: string;
+}
+
+interface RestoreSummaryResponse extends SimpleStatusResponse {
+  restoreSummary?: {
+    skippedMessages?: RestoreSkippedMessage[];
+  };
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -42,6 +55,7 @@ export class RestoreService {
   private readonly userService = inject(UserService);
   private readonly avatarStorage = inject(AvatarStorageService);
   private readonly indexedDbService = inject(IndexedDbService);
+  private readonly messageService = inject(MessageService);
   private readonly networkService = inject(NetworkService);
   private readonly backupState = inject(BackupStateService);
   private readonly i18n = inject(TranslationHelperService);
@@ -125,8 +139,9 @@ export class RestoreService {
       }
 
       await this.indexedDbService.clearAllData();
+      let restoreSummary: RestoreSummaryResponse['restoreSummary'] | undefined;
       if (canRestoreServerData) {
-        await this.restoreServerData(payload.server);
+        restoreSummary = await this.restoreServerData(payload.server);
       } else {
         this.snackBar.open(this.i18n.t('common.restore.serverRestoreSkipped'), undefined, {
           duration: 3500,
@@ -135,6 +150,7 @@ export class RestoreService {
         });
       }
       await this.restoreIndexedDb(payload.indexedDb);
+      await this.applyRestoreSummaryToOwnPublicMessages(payload.userId, restoreSummary);
       await this.restoreLocalImages(payload.localImages || []);
       await this.restoreMediaFiles(payload.mediaFiles || []);
 
@@ -380,7 +396,7 @@ export class RestoreService {
     }
   }
 
-  private async restoreServerData(backup: UserServerBackup): Promise<void> {
+  private async restoreServerData(backup: UserServerBackup): Promise<RestoreSummaryResponse['restoreSummary'] | undefined> {
     const url = `${environment.apiUrl}/user/restore`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: true,
@@ -396,15 +412,33 @@ export class RestoreService {
 
     try {
       const response = await firstValueFrom(
-        this.http.post<SimpleStatusResponse>(url, { backup }, this.httpOptions)
+        this.http.post<RestoreSummaryResponse>(url, { backup }, this.httpOptions)
       );
       if (response.status !== 200) {
         throw new Error('Server restore failed');
       }
+      return response.restoreSummary;
     } catch (error) {
       const httpError = error as HttpErrorResponse;
       throw new Error(httpError?.message || 'Server restore failed');
     }
+  }
+
+  private async applyRestoreSummaryToOwnPublicMessages(
+    userId: string,
+    restoreSummary?: RestoreSummaryResponse['restoreSummary']
+  ): Promise<void> {
+    const skippedMessages = restoreSummary?.skippedMessages ?? [];
+    const parentMissingUuids = skippedMessages
+      .filter((entry) => entry?.reason === 'parent_missing')
+      .map((entry) => typeof entry?.uuid === 'string' ? entry.uuid.trim() : '')
+      .filter((uuid): uuid is string => uuid.length > 0);
+
+    if (!userId || parentMissingUuids.length === 0) {
+      return;
+    }
+
+    await this.messageService.markOwnPublicMessagesWithMissingParents(userId, parentMissingUuids);
   }
 
   private async restoreIndexedDb(backup: IndexedDbBackup): Promise<void> {

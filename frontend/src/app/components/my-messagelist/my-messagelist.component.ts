@@ -86,14 +86,16 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
     unpublished: 'common.messageList.publishState.unpublished',
     server_missing: 'common.messageList.publishState.serverMissing',
     local_only: 'common.messageList.publishState.localOnly',
-    dsa_locked: 'common.messageList.publishState.dsaLocked'
+    dsa_locked: 'common.messageList.publishState.dsaLocked',
+    parent_missing: 'common.messageList.publishState.parentMissing'
   };
   private static readonly PUBLISH_STATE_CLASS_SUFFIX: Record<NonNullable<Message['publishState']>, string> = {
     published: 'published',
     unpublished: 'unpublished',
     server_missing: 'server-missing',
     local_only: 'local-only',
-    dsa_locked: 'dsa-locked'
+    dsa_locked: 'dsa-locked',
+    parent_missing: 'parent-missing'
   };
 
   private static readonly DSA_UNKNOWN = 'UNKNOWN' as const;
@@ -135,7 +137,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
     if (filter === 'missing_online') {
       return messages.filter((message) => {
         const publishState = this.resolvePublishState(message);
-        return publishState === 'server_missing' || publishState === 'local_only';
+        return publishState === 'server_missing' || publishState === 'local_only' || publishState === 'parent_missing';
       });
     }
     if (filter === 'dsa_locked') {
@@ -389,7 +391,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
         const selected = this.messageService.selectedMessagesSignal();
 
         const publishState = this.resolvePublishState(this.clickedMessage!);
-        if (publishState === 'server_missing' || publishState === 'local_only') {
+        if (publishState === 'server_missing' || publishState === 'local_only' || publishState === 'parent_missing') {
           this.removeMessageLocally(this.clickedMessage!);
           return;
         }
@@ -477,7 +479,18 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
             ...moderationPatch
           });
         },
-        error: () => {}
+        error: (error) => {
+          if (this.messageService.isParentMissingError(error)) {
+            this.patchMessageLocally(message, {
+              publishState: 'parent_missing'
+            });
+            this.snackBar.open(
+              this.translation.t('common.messageList.publishState.parentMissing'),
+              undefined,
+              { duration: 3000, horizontalPosition: 'center', verticalPosition: 'top' }
+            );
+          }
+        }
       });
       return;
     }
@@ -656,6 +669,11 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
 
   public isOwnPublicMessage(message: Message): boolean {
     return this.userService.getUser().id === message.userId && message.typ === 'public';
+  }
+
+  public shouldShowPublishStateBadge(message: Message): boolean {
+    return this.userService.getUser().id === message.userId
+      && (message.typ === 'public' || message.typ === 'comment');
   }
 
   private resolvePublishState(message: Message): NonNullable<Message['publishState']> {

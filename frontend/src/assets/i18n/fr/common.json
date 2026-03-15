@@ -438,7 +438,8 @@
         "unpublished": "Retiré",
         "serverMissing": "Absent en ligne",
         "localOnly": "Local uniquement",
-        "dsaLocked": "Bloqué DSA"
+        "dsaLocked": "Bloqué DSA",
+        "parentMissing": "Message parent manquant"
       },
       "moderationStatus": {
         "title": "Statut de modération",

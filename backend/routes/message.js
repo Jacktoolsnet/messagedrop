@@ -20,6 +20,7 @@ const {
   decodeHashtags,
   formatHashtagsForModeration
 } = require('../utils/hashtags');
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function getAuthUserId(req) {
   return req.jwtUser?.userId ?? req.jwtUser?.id ?? null;
@@ -213,6 +214,15 @@ function parsePublicHashtags(input) {
 function getUserById(db, userId) {
   return new Promise((resolve, reject) => {
     tableUser.getById(db, userId, (err, row) => {
+      if (err) return reject(err);
+      resolve(row || null);
+    });
+  });
+}
+
+function getMessageByUuid(db, messageUuid) {
+  return new Promise((resolve, reject) => {
+    tableMessage.getByUuid(db, messageUuid, (err, row) => {
       if (err) return reject(err);
       resolve(row || null);
     });
@@ -529,6 +539,26 @@ router.post('/create',
     if (isPostingBlocked(userRow)) {
       return next(apiError.forbidden('user_blocked_for_posting'));
     }
+    const parentUuid = typeof req.body.parentUuid === 'string'
+      ? req.body.parentUuid.trim()
+      : '';
+    if (String(req.body.messageTyp || '').trim().toLowerCase() === tableMessage.messageType.COMMENT && !parentUuid) {
+      return next(apiError.badRequest('invalid_parent_uuid'));
+    }
+    if (parentUuid) {
+      if (!UUID_REGEX.test(parentUuid)) {
+        return next(apiError.badRequest('invalid_parent_uuid'));
+      }
+      try {
+        const parentMessage = await getMessageByUuid(req.database.db, parentUuid);
+        if (!parentMessage) {
+          return next(apiError.notFound('parent_not_found'));
+        }
+      } catch (error) {
+        req.logger?.warn?.('Failed to read parent message before message.create', { error: error?.message || error });
+        return next(apiError.internal('db_error'));
+      }
+    }
     if (undefined == req.body.parentMessageId) {
       req.body.parentMessageId = 0;
     }
@@ -600,7 +630,7 @@ router.post('/create',
       tableMessage.create(
         req.database.db,
         req.body.uuid,
-        req.body.parentUuid,
+        parentUuid || null,
         req.body.messageTyp,
         req.body.latitude,
         req.body.longitude,

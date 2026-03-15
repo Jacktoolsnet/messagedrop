@@ -11,6 +11,7 @@ const router = express.Router();
 const rateLimit = require('express-rate-limit');
 const security = require('../middleware/security');
 const tableUser = require('../db/tableUser');
+const tableMessage = require('../db/tableMessage');
 const tableUserModerationAppeal = require('../db/tableUserModerationAppeal');
 const { normalizeModerationReason } = require('../constants/userModerationReasons');
 const tableUsageProtection = require('../db/tableUsageProtection');
@@ -18,11 +19,13 @@ const metric = require('../middleware/metric');
 const { apiError } = require('../middleware/api-error');
 const { signServiceJwt } = require('../utils/serviceJwt');
 const { resolveBaseUrl } = require('../utils/adminLogForwarder');
+const { MAX_PUBLIC_HASHTAGS, normalizeHashtags, encodeHashtags, decodeHashtags } = require('../utils/hashtags');
 
 const SOCKET_AUDIENCE = process.env.SERVICE_JWT_AUDIENCE_SOCKET || 'service.socketio';
 const ADMIN_AUDIENCE = process.env.SERVICE_JWT_AUDIENCE_ADMIN || 'service.admin-backend';
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const MAX_RESTORE_CONTACT_ROWS = 5000;
+const MAX_RESTORE_MESSAGE_ROWS = 20000;
 const MAX_RESTORE_PLACE_ROWS = 5000;
 const MAX_RESTORE_USER_ROWS = 10000;
 
@@ -323,6 +326,103 @@ function normalizeBlockUntil(value) {
 
 function hasBlockUntilValue(value) {
   return value !== undefined && value !== null && String(value).trim() !== '';
+}
+
+function normalizeRestoreCounter(value) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed < 0) {
+    return 0;
+  }
+  return Math.floor(parsed);
+}
+
+function normalizeRestoreMessageTimestamp(value) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return null;
+  }
+  return parsed >= 1_000_000_000_000
+    ? Math.floor(parsed / 1000)
+    : Math.floor(parsed);
+}
+
+function normalizeRestoreMessageBoolean(value) {
+  if (value === undefined || value === null || value === '') {
+    return null;
+  }
+  if (value === true || value === 1 || value === '1') {
+    return 1;
+  }
+  if (value === false || value === 0 || value === '0') {
+    return 0;
+  }
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+    if (!normalized) {
+      return null;
+    }
+    if (normalized === 'true') {
+      return 1;
+    }
+    if (normalized === 'false') {
+      return 0;
+    }
+  }
+  return null;
+}
+
+function normalizeRestoreMessageType(value) {
+  const normalized = String(value || '').trim().toLowerCase();
+  return Object.values(tableMessage.messageType).includes(normalized)
+    ? normalized
+    : null;
+}
+
+function normalizeRestoreMessageStatus(value) {
+  const normalized = String(value || '').trim().toLowerCase();
+  return Object.values(tableMessage.messageStatus).includes(normalized)
+    ? normalized
+    : tableMessage.messageStatus.ENABLED;
+}
+
+function normalizeRestoreMessageHashtags(value) {
+  if (Array.isArray(value)) {
+    return encodeHashtags(normalizeHashtags(value, { max: MAX_PUBLIC_HASHTAGS }).tags);
+  }
+  if (typeof value === 'string') {
+    return encodeHashtags(decodeHashtags(value));
+  }
+  return '';
+}
+
+function normalizeRestoreMessageMultimedia(value) {
+  if (value === undefined || value === null || value === '') {
+    return null;
+  }
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return null;
+    }
+    try {
+      return JSON.stringify(JSON.parse(trimmed));
+    } catch {
+      return null;
+    }
+  }
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return null;
+  }
+}
+
+function normalizeRestoreMessageDecision(value) {
+  if (typeof value !== 'string') {
+    return null;
+  }
+  const trimmed = value.trim().toLowerCase();
+  return trimmed ? trimmed.slice(0, 64) : null;
 }
 
 function isAccountBlockedRow(row) {
@@ -860,6 +960,93 @@ function sanitizeRestoreContacts(rawContacts, userId) {
   return { contacts, relatedUsers };
 }
 
+function sanitizeRestoreMessages(rawMessages, userId) {
+  const rows = normalizeRows(rawMessages);
+  if (rows.length > MAX_RESTORE_MESSAGE_ROWS) {
+    throw createInvalidBackupError();
+  }
+
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  const messages = [];
+  const seenMessageUuids = new Set();
+
+  rows.forEach((row) => {
+    if (!row || String(row.userId ?? '') !== userId) {
+      return;
+    }
+
+    const uuid = String(row.uuid ?? '').trim();
+    if (!isUuid(uuid) || seenMessageUuids.has(uuid)) {
+      return;
+    }
+
+    const typ = normalizeRestoreMessageType(row.typ);
+    if (!typ) {
+      return;
+    }
+
+    const latitude = Number(row.latitude);
+    const longitude = Number(row.longitude);
+    if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90) {
+      return;
+    }
+    if (!Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
+      return;
+    }
+
+    const rawParentUuid = String(row.parentUuid ?? '').trim();
+    const parentUuid = rawParentUuid
+      ? (isUuid(rawParentUuid) && rawParentUuid !== uuid ? rawParentUuid : null)
+      : null;
+    if (typ === tableMessage.messageType.COMMENT && !parentUuid) {
+      return;
+    }
+
+    const createDateTime = normalizeRestoreMessageTimestamp(row.createDateTime) ?? nowSeconds;
+    const deleteDateTime = normalizeRestoreMessageTimestamp(row.deleteDateTime) ?? (createDateTime + 30 * 24 * 60 * 60);
+    const dsaStatusTokenCreatedAt = normalizeRestoreMessageTimestamp(row.dsaStatusTokenCreatedAt);
+
+    seenMessageUuids.add(uuid);
+    messages.push({
+      id: null,
+      uuid,
+      parentUuid,
+      typ,
+      createDateTime,
+      deleteDateTime: Math.max(deleteDateTime, createDateTime),
+      latitude,
+      longitude,
+      plusCode: normalizeText(typeof row.plusCode === 'string' && row.plusCode.trim() ? row.plusCode : 'undefined', 64),
+      message: normalizeText(row.message, 65535),
+      markerType: normalizeText(typeof row.markerType === 'string' && row.markerType.trim() ? row.markerType : 'default', 128),
+      style: normalizeText(row.style, 65535),
+      views: normalizeRestoreCounter(row.views),
+      likes: normalizeRestoreCounter(row.likes),
+      dislikes: normalizeRestoreCounter(row.dislikes),
+      commentsNumber: normalizeRestoreCounter(row.commentsNumber),
+      status: normalizeRestoreMessageStatus(row.status),
+      hashtags: normalizeRestoreMessageHashtags(row.hashtags),
+      userId,
+      multimedia: normalizeRestoreMessageMultimedia(row.multimedia),
+      dsaStatusToken: normalizeOptionalText(row.dsaStatusToken, 255),
+      dsaStatusTokenCreatedAt,
+      aiModeration: normalizeOptionalText(row.aiModeration, 200000),
+      aiModerationScore: Number.isFinite(Number(row.aiModerationScore)) ? Number(row.aiModerationScore) : null,
+      aiModerationFlagged: normalizeRestoreMessageBoolean(row.aiModerationFlagged),
+      aiModerationDecision: normalizeRestoreMessageDecision(row.aiModerationDecision),
+      aiModerationAt: normalizeRestoreMessageTimestamp(row.aiModerationAt),
+      patternMatch: normalizeRestoreMessageBoolean(row.patternMatch),
+      patternMatchAt: normalizeRestoreMessageTimestamp(row.patternMatchAt),
+      manualModerationDecision: normalizeRestoreMessageDecision(row.manualModerationDecision),
+      manualModerationReason: normalizeOptionalText(row.manualModerationReason, 4000),
+      manualModerationAt: normalizeRestoreMessageTimestamp(row.manualModerationAt),
+      manualModerationBy: normalizeOptionalText(row.manualModerationBy, 255)
+    });
+  });
+
+  return messages;
+}
+
 function sanitizeRestorePlaces(rawPlaces, userId) {
   const rows = normalizeRows(rawPlaces);
   if (rows.length > MAX_RESTORE_PLACE_ROWS) {
@@ -940,6 +1127,7 @@ function sanitizeBackupForRestore(backup) {
   }
   const tables = backup?.tables && typeof backup.tables === 'object' ? backup.tables : {};
   const { contacts, relatedUsers } = sanitizeRestoreContacts(tables.tableContact, userId);
+  const messages = sanitizeRestoreMessages(tables.tableMessage, userId);
   const places = sanitizeRestorePlaces(tables.tablePlace, userId);
   const usageProtection = sanitizeRestoreUsageProtection(tables.tableUsageProtection, userId);
 
@@ -968,7 +1156,7 @@ function sanitizeBackupForRestore(backup) {
     userId,
     tables: {
       tableUser: userRows,
-      tableMessage: [],
+      tableMessage: messages,
       tableContact: contacts,
       tableContactMessage: [],
       tablePlace: places,
@@ -998,6 +1186,9 @@ async function insertRows(db, tableName, columns, rows) {
 
 async function restoreUserBackup(db, backup) {
   const tables = backup?.tables || {};
+  const restoreSummary = {
+    skippedMessages: []
+  };
 
   const userColumns = [
     'id',
@@ -1029,10 +1220,22 @@ async function restoreUserBackup(db, backup) {
     'dislikes',
     'commentsNumber',
     'status',
+    'hashtags',
     'userId',
     'multimedia',
     'dsaStatusToken',
-    'dsaStatusTokenCreatedAt'
+    'dsaStatusTokenCreatedAt',
+    'aiModeration',
+    'aiModerationScore',
+    'aiModerationFlagged',
+    'aiModerationDecision',
+    'aiModerationAt',
+    'patternMatch',
+    'patternMatchAt',
+    'manualModerationDecision',
+    'manualModerationReason',
+    'manualModerationAt',
+    'manualModerationBy'
   ];
 
   const contactColumns = [
@@ -1112,20 +1315,49 @@ async function restoreUserBackup(db, backup) {
     await insertRows(db, 'tableUser', userColumns, tables.tableUser);
 
     const allMessages = normalizeRows(tables.tableMessage);
-    const parentMessages = allMessages.filter((row) => !row?.parentUuid);
-    const childMessages = allMessages.filter((row) => row?.parentUuid);
+    const parentMessages = allMessages
+      .filter((row) => !row?.parentUuid)
+      .sort((a, b) => Number(a?.createDateTime || 0) - Number(b?.createDateTime || 0));
+    const pendingChildMessages = allMessages
+      .filter((row) => row?.parentUuid)
+      .sort((a, b) => Number(a?.createDateTime || 0) - Number(b?.createDateTime || 0));
 
     await insertRows(db, 'tableMessage', messageColumns, parentMessages);
-    for (const row of childMessages) {
-      if (!row?.parentUuid) {
-        continue;
+    let insertedChildMessage = true;
+    while (pendingChildMessages.length && insertedChildMessage) {
+      insertedChildMessage = false;
+
+      for (let index = 0; index < pendingChildMessages.length; index += 1) {
+        const row = pendingChildMessages[index];
+        if (!row?.parentUuid) {
+          pendingChildMessages.splice(index, 1);
+          index -= 1;
+          continue;
+        }
+
+        const parentExists = await queryGet(db, 'SELECT 1 FROM tableMessage WHERE uuid = ? LIMIT 1;', [row.parentUuid]);
+        if (!parentExists) {
+          continue;
+        }
+
+        await insertRows(db, 'tableMessage', messageColumns, [row]);
+        pendingChildMessages.splice(index, 1);
+        insertedChildMessage = true;
+        index -= 1;
       }
-      const parentExists = await queryGet(db, 'SELECT 1 FROM tableMessage WHERE uuid = ? LIMIT 1;', [row.parentUuid]);
-      if (!parentExists) {
-        continue;
-      }
-      await insertRows(db, 'tableMessage', messageColumns, [row]);
     }
+    pendingChildMessages.forEach((row) => {
+      const uuid = String(row?.uuid ?? '').trim();
+      const parentUuid = String(row?.parentUuid ?? '').trim();
+      if (!uuid || !parentUuid) {
+        return;
+      }
+      restoreSummary.skippedMessages.push({
+        uuid,
+        parentUuid,
+        reason: 'parent_missing'
+      });
+    });
 
     const contacts = normalizeRows(tables.tableContact);
     for (const row of contacts) {
@@ -1180,6 +1412,7 @@ async function restoreUserBackup(db, backup) {
     }
 
     await runQuery(db, 'COMMIT');
+    return restoreSummary;
   } catch (err) {
     await runQuery(db, 'ROLLBACK');
     throw err;
@@ -1402,8 +1635,8 @@ router.post('/restore',
 
     try {
       const sanitizedBackup = sanitizeBackupForRestore(backup);
-      await restoreUserBackup(req.database.db, sanitizedBackup);
-      res.status(200).json({ status: 200 });
+      const restoreSummary = await restoreUserBackup(req.database.db, sanitizedBackup);
+      res.status(200).json({ status: 200, restoreSummary });
     } catch (err) {
       if (err?.code === 'INVALID_BACKUP') {
         return next(apiError.badRequest('invalid_backup'));
