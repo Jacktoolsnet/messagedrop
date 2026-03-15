@@ -62,7 +62,8 @@ h2[mat-dialog-title].dialog-title {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
   align-items: start;
-  gap: 1.5rem;
+  column-gap: 1.5rem;
+  row-gap: 1.85rem;
   width: 100%;
   max-width: 100%;
   padding-top: 1rem;
@@ -87,12 +88,13 @@ h2[mat-dialog-title].dialog-title {
 /* Add a small top spacer ONLY when a card has an avatar badge:
    prevents the badge from visually colliding with the previous item */
 .item.has-badge {
-  margin-top: 6px;
+  margin-top: 0.4rem;
 }
 
 @media (max-width: 700px) {
   .content {
     grid-template-columns: 1fr;
+    row-gap: 1.65rem;
   }
 }
 
@@ -101,7 +103,7 @@ h2[mat-dialog-title].dialog-title {
   position: absolute;
   top: 0;
   left: 0;
-  transform: translate(-0.65rem, -40%);
+  transform: translate(-0.65rem, -26%);
   /* gentler overlap to reduce collisions */
   z-index: 250;
   /* above the toolbar (toolbar: 200) */
@@ -130,7 +132,7 @@ h2[mat-dialog-title].dialog-title {
 /* Slightly smaller overlap on very narrow screens */
 @media (max-width: 600px) {
   .avatar-box {
-    transform: translate(-0.5rem, -35%);
+    transform: translate(-0.45rem, -20%);
     max-width: 85%;
   }
 }
