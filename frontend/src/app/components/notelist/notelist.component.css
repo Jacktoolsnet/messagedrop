@@ -215,6 +215,20 @@ h2[mat-dialog-title].dialog-title {
   word-break: break-word;
 }
 
+.message-content--media-only {
+  margin-bottom: 0.5rem;
+}
+
+.note-media {
+  display: block;
+  width: 100%;
+}
+
+:host ::ng-deep .message-content .note-media--pinterest .attribution-link {
+  margin-top: 0.125rem;
+  margin-bottom: 0.25rem;
+}
+
 /* Scale media only inside the message content (do not affect avatar) */
 .message-content img,
 .message-content video,

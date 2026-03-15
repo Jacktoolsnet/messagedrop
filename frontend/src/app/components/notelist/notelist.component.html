@@ -17,9 +17,15 @@
                 <div class="timestamp-box">{{ note.timestamp | date:'medium' }}</div>
                 }
                 <mat-card-content (click)="editNote(note)">
-                    <div class="message-content">
-                        <app-showmultimedia [multimedia]="note.multimedia"></app-showmultimedia>
+                    <div class="message-content"
+                        [class.message-content--media-only]="note.multimedia.type !== 'undefined' && !note.note.trim() && !(note.hashtags?.length)">
+                        @if (note.multimedia.type !== 'undefined') {
+                        <app-showmultimedia class="note-media" [class.note-media--pinterest]="note.multimedia.type === 'pinterest'"
+                            [multimedia]="note.multimedia"></app-showmultimedia>
+                        }
+                        @if (note.note.trim()) {
                         <app-showmessage [message]="note.note" [style]="note.style"></app-showmessage>
+                        }
                         @if (note.hashtags?.length) {
                         <div class="hashtag-chip-list" [attr.aria-label]="'common.hashtags.label' | transloco">
                             @for (tag of note.hashtags; track tag) {

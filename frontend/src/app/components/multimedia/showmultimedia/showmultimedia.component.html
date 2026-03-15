@@ -7,7 +7,8 @@
             [attr.alt]="multimedia?.title || ('common.multimedia.embeddedAlt' | transloco)" />
     </div>
     @if (multimedia?.attribution !== '') {
-    <a class="attribution-link" [href]="multimedia?.sourceUrl" target="_blank" rel="noopener noreferrer">
+    <a class="attribution-link" [class.attribution-link--compact]="multimedia?.type === 'pinterest'"
+        [href]="multimedia?.sourceUrl" target="_blank" rel="noopener noreferrer">
         {{ multimedia?.attribution }}
     </a>
     }
@@ -18,7 +19,8 @@
         [class.oembed-spotify]="multimedia?.type === 'spotify'" [class.oembed-tiktok]="multimedia?.type === 'tiktok'"
         [class.oembed-pinterest]="multimedia?.type === 'pinterest'" [innerHTML]="safeHtml"></div>
     @if (multimedia?.attribution !== '') {
-    <a class="attribution-link" [href]="multimedia?.sourceUrl" target="_blank" rel="noopener noreferrer">
+    <a class="attribution-link" [class.attribution-link--compact]="multimedia?.type === 'pinterest'"
+        [href]="multimedia?.sourceUrl" target="_blank" rel="noopener noreferrer">
         {{ multimedia?.attribution }}
     </a>
     }
