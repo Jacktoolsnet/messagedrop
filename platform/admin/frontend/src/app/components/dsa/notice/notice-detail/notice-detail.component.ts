@@ -8,6 +8,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { environment } from '../../../../../environments/environment';
 import { USER_ACCOUNT_BLOCK_REASONS, USER_POSTING_BLOCK_REASONS, findModerationReasonLabel } from '../../../../constants/user-moderation-reasons';
 import { DsaNoticeStatus } from '../../../../interfaces/dsa-notice-status.type';
@@ -19,6 +20,7 @@ import { DecisionSummaryComponent } from '../../decisions/decision-summary/decis
 import { NoticeAppealsComponent } from '../appeals/notice-appeals.component';
 import { EvidenceListComponent } from "../evidence/evidence-list/evidence-list.component";
 import { ReportedContentPayload, ReportedMultimedia } from '../../../../interfaces/reported-content.interface';
+import { parseReportedContentPayload } from '../../../../utils/reported-content.util';
 
 // Optional: wenn du die vorhandene PublicMessageDetailComponent nutzen willst
 // import { PublicMessageDetailComponent } from '../../../shared/public-message-detail/public-message-detail.component';
@@ -55,6 +57,7 @@ export class NoticeDetailComponent implements OnInit {
   private http = inject(HttpClient);
   private dialog = inject(MatDialog);
   private snack = inject(MatSnackBar);
+  private sanitizer = inject(DomSanitizer);
   makingScreenshot = signal(false);
   private dirty = false;
 
@@ -68,21 +71,12 @@ export class NoticeDetailComponent implements OnInit {
   status = signal<DsaNoticeStatus>(this.data.status as DsaNoticeStatus);
   private autoStatusApplied = false;
   mediaKind = signal<'iframe' | 'image' | 'none'>('none');
-  embedUrl = signal<string | null>(null);
+  embedUrl = signal<SafeResourceUrl | null>(null);
   imageUrl = signal<string | null>(null);
 
   // reportedContent kommt aus der DB als JSON-String → parsen
   contentObj = computed<ReportedContentPayload | null>(() => {
-    const payload = this.notice()?.reportedContent;
-    if (!payload) {
-      return null;
-    }
-    try {
-      const parsed = JSON.parse(payload) as unknown;
-      return parsed && typeof parsed === 'object' ? parsed as ReportedContentPayload : null;
-    } catch {
-      return null;
-    }
+    return parseReportedContentPayload(this.notice()?.reportedContent);
   });
 
   // Übersetzungszustände
@@ -406,8 +400,11 @@ export class NoticeDetailComponent implements OnInit {
     if (type === 'youtube') {
       const id = this.getYouTubeId(mm);
       if (id) {
-        this.embedUrl.set(`https://www.youtube.com/embed/${id}`);
-        this.mediaKind.set('iframe');
+        const safeEmbedUrl = this.toSafeEmbedUrl(`https://www.youtube.com/embed/${id}`);
+        if (safeEmbedUrl) {
+          this.embedUrl.set(safeEmbedUrl);
+          this.mediaKind.set('iframe');
+        }
       }
       return;
     }
@@ -415,8 +412,11 @@ export class NoticeDetailComponent implements OnInit {
     if (type === 'spotify') {
       const url = this.buildSpotifyEmbed(mm);
       if (url) {
-        this.embedUrl.set(url);
-        this.mediaKind.set('iframe');
+        const safeEmbedUrl = this.toSafeEmbedUrl(url);
+        if (safeEmbedUrl) {
+          this.embedUrl.set(safeEmbedUrl);
+          this.mediaKind.set('iframe');
+        }
       }
       return;
     }
@@ -424,8 +424,11 @@ export class NoticeDetailComponent implements OnInit {
     if (type === 'tiktok') {
       const id = this.getTikTokId(mm);
       if (id) {
-        this.embedUrl.set(`https://www.tiktok.com/embed/v2/${id}`);
-        this.mediaKind.set('iframe');
+        const safeEmbedUrl = this.toSafeEmbedUrl(`https://www.tiktok.com/embed/v2/${id}`);
+        if (safeEmbedUrl) {
+          this.embedUrl.set(safeEmbedUrl);
+          this.mediaKind.set('iframe');
+        }
       }
       return;
     }
@@ -457,6 +460,11 @@ export class NoticeDetailComponent implements OnInit {
     } catch {
       return null;
     }
+  }
+
+  private toSafeEmbedUrl(value?: string | null): SafeResourceUrl | null {
+    const safeHttpUrl = this.toSafeHttpUrl(value);
+    return safeHttpUrl ? this.sanitizer.bypassSecurityTrustResourceUrl(safeHttpUrl) : null;
   }
 
   private sanitizeYoutubeId(value?: string | null): string | null {

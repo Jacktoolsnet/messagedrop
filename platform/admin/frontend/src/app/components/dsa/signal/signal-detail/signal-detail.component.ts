@@ -8,6 +8,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { USER_ACCOUNT_BLOCK_REASONS, USER_POSTING_BLOCK_REASONS, findModerationReasonLabel } from '../../../../constants/user-moderation-reasons';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Multimedia } from '../../../../interfaces/multimedia.interface';
@@ -16,6 +17,7 @@ import { PublicMessageDetailData } from '../../../../interfaces/public-message-d
 import { PublicMessage } from '../../../../interfaces/public-message.interface';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
 import { TranslateService } from '../../../../services/translate-service/translate-service.service';
+import { parsePublicMessageDetailContent } from '../../../../utils/reported-content.util';
 import { ConfirmDialogComponent } from '../../../shared/confirm-dialog.component';
 
 @Component({
@@ -34,6 +36,7 @@ export class SignalDetailComponent implements OnInit {
   private ref = inject(MatDialogRef<SignalDetailComponent>);
   private dialog = inject(MatDialog);
   private snack = inject(MatSnackBar);
+  private sanitizer = inject(DomSanitizer);
   private translator = inject(TranslateService);
   private dsa = inject(DsaService);
   protected data = inject<PublicMessageDetailData>(MAT_DIALOG_DATA);
@@ -43,7 +46,7 @@ export class SignalDetailComponent implements OnInit {
   providerIcon = signal<string>('article');
   providerLabel = signal<string>('Text');
   mediaKind = signal<'iframe' | 'image' | 'none'>('none');
-  embedUrl = signal<string | null>(null);
+  embedUrl = signal<SafeResourceUrl | null>(null);
   imageUrl = signal<string | null>(null);
 
   // Original-Quelle sichtbar?
@@ -90,9 +93,7 @@ export class SignalDetailComponent implements OnInit {
   readonly accountReason = signal(USER_ACCOUNT_BLOCK_REASONS[0]?.code ?? '');
 
   ngOnInit() {
-    const raw = typeof this.data.reportedContent === 'string'
-      ? this.safeParse(this.data.reportedContent)
-      : this.data.reportedContent;
+    const raw = parsePublicMessageDetailContent(this.data.reportedContent);
 
     if (!raw) return;
     this.msg.set(raw);
@@ -105,24 +106,33 @@ export class SignalDetailComponent implements OnInit {
       case 'youtube': {
         const id = this.getYouTubeId(raw.multimedia);
         if (id) {
-          this.embedUrl.set(`https://www.youtube.com/embed/${id}`);
-          this.mediaKind.set('iframe');
+          const safeEmbedUrl = this.toSafeEmbedUrl(`https://www.youtube.com/embed/${id}`);
+          if (safeEmbedUrl) {
+            this.embedUrl.set(safeEmbedUrl);
+            this.mediaKind.set('iframe');
+          }
         }
         break;
       }
       case 'spotify': {
         const embed = this.buildSpotifyEmbed(raw.multimedia);
         if (embed) {
-          this.embedUrl.set(embed);
-          this.mediaKind.set('iframe');
+          const safeEmbedUrl = this.toSafeEmbedUrl(embed);
+          if (safeEmbedUrl) {
+            this.embedUrl.set(safeEmbedUrl);
+            this.mediaKind.set('iframe');
+          }
         }
         break;
       }
       case 'tiktok': {
         const id = this.getTikTokId(raw.multimedia);
         if (id) {
-          this.embedUrl.set(`https://www.tiktok.com/embed/v2/${id}`);
-          this.mediaKind.set('iframe');
+          const safeEmbedUrl = this.toSafeEmbedUrl(`https://www.tiktok.com/embed/v2/${id}`);
+          if (safeEmbedUrl) {
+            this.embedUrl.set(safeEmbedUrl);
+            this.mediaKind.set('iframe');
+          }
         }
         break;
       }
@@ -405,9 +415,6 @@ export class SignalDetailComponent implements OnInit {
   }
 
   // Helpers
-  private safeParse(json: string): PublicMessage | null {
-    try { return JSON.parse(json); } catch { return null; }
-  }
   private iconFor(type: string): string {
     switch (type) {
       case 'youtube': return 'smart_display';
@@ -447,6 +454,11 @@ export class SignalDetailComponent implements OnInit {
     } catch {
       return null;
     }
+  }
+
+  private toSafeEmbedUrl(value?: string | null): SafeResourceUrl | null {
+    const safeHttpUrl = this.toSafeHttpUrl(value);
+    return safeHttpUrl ? this.sanitizer.bypassSecurityTrustResourceUrl(safeHttpUrl) : null;
   }
 
   private sanitizeYoutubeId(value?: string | null): string | null {
