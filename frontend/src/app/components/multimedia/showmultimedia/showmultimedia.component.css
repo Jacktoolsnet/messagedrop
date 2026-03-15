@@ -22,12 +22,40 @@
     background-color: transparent;
 }
 
-.oembed_container iframe {
-    width: 95%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+:host ::ng-deep .oembed_container iframe {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: block;
+    margin: 0 auto;
+    border: 0;
+    border-radius: 0.75rem;
+    background-color: transparent;
+}
+
+:host ::ng-deep .oembed_container.oembed-youtube iframe {
+    width: min(100%, 100%) !important;
+    aspect-ratio: 16 / 9;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+}
+
+:host ::ng-deep .oembed_container.oembed-spotify iframe {
+    min-height: clamp(152px, 22vw, 352px);
+}
+
+:host ::ng-deep .oembed_container.oembed-tiktok iframe,
+:host ::ng-deep .oembed_container.oembed-pinterest iframe {
+    max-width: min(100%, 32rem) !important;
+    min-height: clamp(360px, 60vw, 720px);
+}
+
+:host ::ng-deep .oembed_container.oembed-tiktok iframe {
     aspect-ratio: 9 / 16;
+}
+
+:host ::ng-deep .oembed_container.oembed-pinterest iframe {
+    aspect-ratio: 3 / 4;
 }
 
 /* Links: Haupttextfarbe, fett, immer unterstrichen */
