@@ -1,38 +1,15 @@
 <app-dialog-header icon="public" [title]="'common.legal.externalContent.title' | transloco">
 </app-dialog-header>
 
-<mat-dialog-content class="content">
-    <div class="platform-tile-container">
-        <div class="platform-tile">
-            <app-enable-external-content [platform]="'pinterest'" [checkedOverride]="appSettings.enablePinterestContent"
-                [persistOnToggle]="false" (enabledChange)="setAllowPinterestContent($event)">
+<mat-dialog-content class="content" [class.content--single]="isSinglePlatformView">
+    <div class="platform-tile-container" [class.platform-tile-container--single]="isSinglePlatformView">
+        @for (platform of visiblePlatforms; track platform) {
+        <div class="platform-tile" [class.platform-tile--single]="isSinglePlatformView">
+            <app-enable-external-content [platform]="platform" [checkedOverride]="isPlatformEnabled(platform)"
+                [persistOnToggle]="false" (enabledChange)="setPlatformEnabled(platform, $event)">
             </app-enable-external-content>
         </div>
-        <div class="platform-tile">
-            <app-enable-external-content [platform]="'spotify'" [checkedOverride]="appSettings.enableSpotifyContent"
-                [persistOnToggle]="false" (enabledChange)="setAllowSpotifyContent($event)">
-            </app-enable-external-content>
-        </div>
-        <div class="platform-tile">
-            <app-enable-external-content [platform]="'tenor'" [checkedOverride]="appSettings.enableTenorContent"
-                [persistOnToggle]="false" (enabledChange)="setAllowTenorContent($event)">
-            </app-enable-external-content>
-        </div>
-        <div class="platform-tile">
-            <app-enable-external-content [platform]="'unsplash'" [checkedOverride]="appSettings.enableUnsplashContent"
-                [persistOnToggle]="false" (enabledChange)="setAllowUnsplashContent($event)">
-            </app-enable-external-content>
-        </div>
-        <div class="platform-tile">
-            <app-enable-external-content [platform]="'tiktok'" [checkedOverride]="appSettings.enableTikTokContent"
-                [persistOnToggle]="false" (enabledChange)="setAllowTikTokContent($event)">
-            </app-enable-external-content>
-        </div>
-        <div class="platform-tile">
-            <app-enable-external-content [platform]="'youtube'" [checkedOverride]="appSettings.enableYoutubeContent"
-                [persistOnToggle]="false" (enabledChange)="setAllowYoutubeContent($event)">
-            </app-enable-external-content>
-        </div>
+        }
     </div>
 </mat-dialog-content>
 

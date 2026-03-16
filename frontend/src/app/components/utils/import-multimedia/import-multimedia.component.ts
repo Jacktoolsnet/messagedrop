@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { EXTERNAL_CONTENT_SETTINGS_KEYS, ExternalContentPlatform } from '../../../interfaces/external-content-platform';
 import { Multimedia } from '../../../interfaces/multimedia';
 import { AppService } from '../../../services/app.service';
 import { OembedService } from '../../../services/oembed.service';
@@ -16,7 +17,8 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
 import { ExternalContentComponent } from '../../legal/external-content/external-content.component';
 import { HelpDialogService } from '../help-dialog/help-dialog.service';
 
-type PlatformKey = 'youtube' | 'spotify' | 'tiktok' | 'pinterest';
+type SupportedUrlPlatform = Extract<ExternalContentPlatform, 'youtube' | 'spotify' | 'tiktok' | 'pinterest'>;
+
 @Component({
   selector: 'app-pinterest', // (optional) kannst du umbenennen, z.B. 'app-import-multimedia'
   standalone: true,
@@ -64,7 +66,7 @@ export class ImportMultimediaComponent {
     }
   });
 
-  private getPlatformFromUrl(url: string): PlatformKey | undefined {
+  private getPlatformFromUrl(url: string): SupportedUrlPlatform | undefined {
     const host = this.getHostname(url);
     if (!host) {
       return undefined;
@@ -88,7 +90,7 @@ export class ImportMultimediaComponent {
     return allowedHosts.some((allowed) => host === allowed || host.endsWith(`.${allowed}`));
   }
 
-  private getPlatformLabel(platform: PlatformKey): string {
+  private getPlatformLabel(platform: SupportedUrlPlatform): string {
     switch (platform) {
       case 'youtube':
         return 'YouTube';
@@ -108,22 +110,9 @@ export class ImportMultimediaComponent {
     this.multimedia = undefined;
 
     const platform = this.getPlatformFromUrl(this.multimediaUrl);
-    let platformEnabled = false;
-
-    switch (platform) {
-      case 'pinterest':
-        platformEnabled = this.appService.getAppSettings().enablePinterestContent;
-        break;
-      case 'spotify':
-        platformEnabled = this.appService.getAppSettings().enableSpotifyContent;
-        break;
-      case 'tiktok':
-        platformEnabled = this.appService.getAppSettings().enableTikTokContent;
-        break;
-      case 'youtube':
-        platformEnabled = this.appService.getAppSettings().enableYoutubeContent;
-        break;
-    }
+    const platformEnabled = platform
+      ? this.appService.getAppSettings()[EXTERNAL_CONTENT_SETTINGS_KEYS[platform]]
+      : false;
 
     if (platform && !platformEnabled) {
       this.urlInvalid = true;
@@ -209,11 +198,16 @@ export class ImportMultimediaComponent {
   }
 
   openExternalContentSettings(): void {
+    const platform = this.getPlatformFromUrl(this.multimediaUrl);
+    const dialogWidth = platform ? 'min(440px, 90vw)' : 'min(700px, 90vw)';
     const dialogRef = this.dialog.open(ExternalContentComponent, {
-      data: { appSettings: this.appService.getAppSettings() },
+      data: {
+        appSettings: this.appService.getAppSettings(),
+        visiblePlatforms: platform ? [platform] : undefined
+      },
       maxWidth: '90vw',
       maxHeight: '90vh',
-      width: 'min(700px, 90vw)',
+      width: dialogWidth,
       height: 'auto',
       autoFocus: false,
       hasBackdrop: true,

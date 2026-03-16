@@ -7,9 +7,15 @@
     max-height: 85vh;
     min-width: min(320px, 90vw);
     max-width: 90vw;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
     box-sizing: border-box;
     padding-bottom: 0.5rem;
+}
+
+.mat-mdc-dialog-content.content.content--single {
+    width: min(100%, 440px);
+    margin-inline: auto;
 }
 
 h4 {
@@ -100,22 +106,37 @@ h4 {
 
 .platform-tile-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
     justify-content: center;
     gap: 1rem;
     padding: 0.5rem;
-    width: auto;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.platform-tile-container--single {
+    grid-template-columns: minmax(0, 1fr);
+    width: min(95%, 420px);
+    margin-inline: auto;
 }
 
 .platform-tile {
     border-radius: 1rem;
     padding: 1rem;
+    min-width: 0;
     text-align: center;
     font-weight: 500;
     font-size: 1.05rem;
     color: var(--mat-card-subtitle-text-color);
     background-color: var(--mat-card-filled-container-color);
     box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+    box-sizing: border-box;
+    max-width: 100%;
+}
+
+.platform-tile--single {
+    width: 100%;
 }
 
 .intro-note {

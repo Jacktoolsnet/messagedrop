@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { EXTERNAL_CONTENT_SETTINGS_KEYS, ExternalContentPlatform, isExternalContentPlatform } from '../../../interfaces/external-content-platform';
 import { Multimedia } from '../../../interfaces/multimedia';
 import { AppService } from '../../../services/app.service';
 import { OembedService } from '../../../services/oembed.service';
@@ -49,35 +50,17 @@ export class ShowmultimediaComponent implements OnChanges {
 
   private updateFromMultimedia(): void {
     const settings = this.appService.getAppSettings();
+    const platform = this.getCurrentPlatform();
+
     this.disabledReason = '';
     this.showExternalSettingsButton = false;
-    switch (this.multimedia?.type) {
-      case 'youtube':
-        this.isPlatformEnabled = settings.enableYoutubeContent;
-        break;
-      case 'spotify':
-        this.isPlatformEnabled = settings.enableSpotifyContent;
-        break;
-      case 'pinterest':
-        this.isPlatformEnabled = settings.enablePinterestContent;
-        break;
-      case 'tiktok':
-        this.isPlatformEnabled = settings.enableTikTokContent;
-        break;
-      case 'tenor':
-        this.isPlatformEnabled = settings.enableTenorContent;
-        break;
-      case 'unsplash':
-        this.isPlatformEnabled = settings.enableUnsplashContent;
-        break;
-      default:
-        this.isPlatformEnabled = true; // Unknown -> do not block.
-        break;
-    }
+    this.isPlatformEnabled = platform
+      ? settings[EXTERNAL_CONTENT_SETTINGS_KEYS[platform]]
+      : true;
 
-    if (this.multimedia?.type && !this.isPlatformEnabled) {
+    if (platform && !this.isPlatformEnabled) {
       this.disabledReason = this.translation.t('common.multimedia.platformDisabled', {
-        platform: this.getPlatformLabel(this.multimedia.type)
+        platform: this.getPlatformLabel(platform)
       });
       this.showExternalSettingsButton = true;
       this.safeHtml = undefined;
@@ -90,11 +73,16 @@ export class ShowmultimediaComponent implements OnChanges {
   }
 
   openExternalContentSettings(): void {
+    const platform = this.getCurrentPlatform();
+    const dialogWidth = platform ? 'min(440px, 90vw)' : 'min(700px, 90vw)';
     const dialogRef = this.dialog.open(ExternalContentComponent, {
-      data: { appSettings: this.appService.getAppSettings() },
+      data: {
+        appSettings: this.appService.getAppSettings(),
+        visiblePlatforms: platform ? [platform] : undefined
+      },
       maxWidth: '90vw',
       maxHeight: '90vh',
-      width: 'min(700px, 90vw)',
+      width: dialogWidth,
       height: 'auto',
       autoFocus: false,
       hasBackdrop: true,
@@ -114,8 +102,12 @@ export class ShowmultimediaComponent implements OnChanges {
     );
   }
 
-  private getPlatformLabel(type: string): string {
-    switch (type) {
+  private getCurrentPlatform(): ExternalContentPlatform | undefined {
+    return isExternalContentPlatform(this.multimedia?.type) ? this.multimedia.type : undefined;
+  }
+
+  private getPlatformLabel(platform: ExternalContentPlatform): string {
+    switch (platform) {
       case 'youtube':
         return 'YouTube';
       case 'spotify':

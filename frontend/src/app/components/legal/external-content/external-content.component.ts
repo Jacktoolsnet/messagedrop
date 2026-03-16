@@ -1,42 +1,37 @@
 
 import { Component, inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { MatChipsModule } from '@angular/material/chips';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { AppSettings } from '../../../interfaces/app-settings';
+import {
+  ExternalContentPlatform,
+  EXTERNAL_CONTENT_PLATFORMS,
+  EXTERNAL_CONTENT_SETTINGS_KEYS
+} from '../../../interfaces/external-content-platform';
 import { AppService } from '../../../services/app.service';
 import { EnableExternalContentComponent } from '../../utils/enable-external-content/enable-external-content.component';
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 
+interface ExternalContentDialogData {
+  appSettings: AppSettings;
+  visiblePlatforms?: ExternalContentPlatform[];
+}
+
 @Component({
   selector: 'app-external-content',
   imports: [
     DialogHeaderComponent,
-    FormsModule,
-    MatFormFieldModule,
-    MatInputModule,
     MatButtonModule,
     MatDialogContent,
     MatDialogActions,
     MatDialogClose,
     MatIconModule,
-    MatSelectModule,
-    MatFormFieldModule,
-    MatButtonToggleModule,
-    MatChipsModule,
-    MatSlideToggleModule,
     EnableExternalContentComponent,
     TranslocoPipe
-],
+  ],
   templateUrl: './external-content.component.html',
   styleUrl: './external-content.component.css'
 })
@@ -44,10 +39,12 @@ export class ExternalContentComponent {
 
   private readonly appService = inject(AppService);
   private readonly dialogRef = inject(MatDialogRef<ExternalContentComponent>);
-  private readonly dialogData = inject<{ appSettings: AppSettings }>(MAT_DIALOG_DATA);
+  private readonly dialogData = inject<ExternalContentDialogData>(MAT_DIALOG_DATA);
   readonly help = inject(HelpDialogService);
 
   public appSettings: AppSettings = structuredClone(this.dialogData.appSettings);
+  readonly visiblePlatforms = this.getVisiblePlatforms(this.dialogData.visiblePlatforms);
+  readonly isSinglePlatformView = this.visiblePlatforms.length === 1;
 
   onCloseClick(): void {
     this.dialogRef.close();
@@ -58,28 +55,24 @@ export class ExternalContentComponent {
     this.dialogRef.close();
   }
 
-  setAllowYoutubeContent(enabled: boolean): void {
-    this.appSettings = { ...this.appSettings, enableYoutubeContent: enabled };
+  isPlatformEnabled(platform: ExternalContentPlatform): boolean {
+    return this.appSettings[EXTERNAL_CONTENT_SETTINGS_KEYS[platform]];
   }
 
-  setAllowPinterestContent(enabled: boolean): void {
-    this.appSettings = { ...this.appSettings, enablePinterestContent: enabled };
+  setPlatformEnabled(platform: ExternalContentPlatform, enabled: boolean): void {
+    const settingsKey = EXTERNAL_CONTENT_SETTINGS_KEYS[platform];
+    this.appSettings = { ...this.appSettings, [settingsKey]: enabled } as AppSettings;
   }
 
-  setAllowSpotifyContent(enabled: boolean): void {
-    this.appSettings = { ...this.appSettings, enableSpotifyContent: enabled };
-  }
+  private getVisiblePlatforms(platforms?: ExternalContentPlatform[]): readonly ExternalContentPlatform[] {
+    if (!platforms?.length) {
+      return EXTERNAL_CONTENT_PLATFORMS;
+    }
 
-  setAllowTikTokContent(enabled: boolean): void {
-    this.appSettings = { ...this.appSettings, enableTikTokContent: enabled };
-  }
+    const requestedPlatforms = new Set(platforms);
+    const visiblePlatforms = EXTERNAL_CONTENT_PLATFORMS.filter((platform) => requestedPlatforms.has(platform));
 
-  setAllowTenorContent(enabled: boolean): void {
-    this.appSettings = { ...this.appSettings, enableTenorContent: enabled };
-  }
-
-  setAllowUnsplashContent(enabled: boolean): void {
-    this.appSettings = { ...this.appSettings, enableUnsplashContent: enabled };
+    return visiblePlatforms.length > 0 ? visiblePlatforms : EXTERNAL_CONTENT_PLATFORMS;
   }
 
 }

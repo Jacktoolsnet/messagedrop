@@ -4,10 +4,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { AppSettings } from '../../../interfaces/app-settings';
+import { ExternalContentPlatform, EXTERNAL_CONTENT_SETTINGS_KEYS } from '../../../interfaces/external-content-platform';
 import { AppService } from '../../../services/app.service';
 
-type PlatformKey = 'tenor' | 'unsplash' | 'youtube' | 'spotify' | 'tiktok' | 'pinterest';
-type SettingsKey = 'enableTenorContent' | 'enableUnsplashContent' | 'enableYoutubeContent' | 'enableSpotifyContent' | 'enableTikTokContent' | 'enablePinterestContent';
+type SettingsKey = typeof EXTERNAL_CONTENT_SETTINGS_KEYS[ExternalContentPlatform];
 
 interface PlatformMeta {
   name: string;
@@ -18,20 +18,20 @@ interface PlatformMeta {
   extraTerms?: { url: string; labelKey: string };
 }
 
-const PLATFORM_META: Record<PlatformKey, PlatformMeta> = {
+const PLATFORM_META: Record<ExternalContentPlatform, PlatformMeta> = {
   tenor: {
     name: 'Tenor',
     icon: 'gif_box',
-    settingsKey: 'enableTenorContent',
+    settingsKey: EXTERNAL_CONTENT_SETTINGS_KEYS.tenor,
     terms: 'https://tenor.com/legal-terms',
     privacy: 'https://policies.google.com/privacy',
     extraTerms: { url: 'https://policies.google.com/terms', labelKey: 'common.legal.externalContent.googleTerms' }
   },
-  unsplash: { name: 'Unsplash', icon: 'photo', settingsKey: 'enableUnsplashContent', terms: 'https://unsplash.com/terms', privacy: 'https://unsplash.com/privacy' },
-  youtube: { name: 'YouTube', icon: 'smart_display', settingsKey: 'enableYoutubeContent', terms: 'https://www.youtube.com/t/terms', privacy: 'https://www.youtube.com/intl/ALL/howyoutubeworks/privacy/' },
-  spotify: { name: 'Spotify', icon: 'graphic_eq', settingsKey: 'enableSpotifyContent', terms: 'https://www.spotify.com/legal/end-user-agreement/', privacy: 'https://www.spotify.com/legal/privacy-policy/' },
-  tiktok: { name: 'TikTok', icon: 'music_note', settingsKey: 'enableTikTokContent', terms: 'https://www.tiktok.com/legal/terms-of-service', privacy: 'https://www.tiktok.com/legal/privacy-policy' },
-  pinterest: { name: 'Pinterest', icon: 'push_pin', settingsKey: 'enablePinterestContent', terms: 'https://policy.pinterest.com/terms-of-service', privacy: 'https://policy.pinterest.com/privacy-policy' }
+  unsplash: { name: 'Unsplash', icon: 'photo', settingsKey: EXTERNAL_CONTENT_SETTINGS_KEYS.unsplash, terms: 'https://unsplash.com/terms', privacy: 'https://unsplash.com/privacy' },
+  youtube: { name: 'YouTube', icon: 'smart_display', settingsKey: EXTERNAL_CONTENT_SETTINGS_KEYS.youtube, terms: 'https://www.youtube.com/t/terms', privacy: 'https://www.youtube.com/intl/ALL/howyoutubeworks/privacy/' },
+  spotify: { name: 'Spotify', icon: 'graphic_eq', settingsKey: EXTERNAL_CONTENT_SETTINGS_KEYS.spotify, terms: 'https://www.spotify.com/legal/end-user-agreement/', privacy: 'https://www.spotify.com/legal/privacy-policy/' },
+  tiktok: { name: 'TikTok', icon: 'music_note', settingsKey: EXTERNAL_CONTENT_SETTINGS_KEYS.tiktok, terms: 'https://www.tiktok.com/legal/terms-of-service', privacy: 'https://www.tiktok.com/legal/privacy-policy' },
+  pinterest: { name: 'Pinterest', icon: 'push_pin', settingsKey: EXTERNAL_CONTENT_SETTINGS_KEYS.pinterest, terms: 'https://policy.pinterest.com/terms-of-service', privacy: 'https://policy.pinterest.com/privacy-policy' }
 };
 
 @Component({
@@ -44,7 +44,7 @@ const PLATFORM_META: Record<PlatformKey, PlatformMeta> = {
 })
 export class EnableExternalContentComponent implements OnInit, OnChanges {
   /** Required: which platform to enable */
-  @Input({ required: true }) platform!: PlatformKey;
+  @Input({ required: true }) platform!: ExternalContentPlatform;
 
   /** Optional: start with toggle focused/checked style, defaults to current settings */
   @Input() checkedOverride?: boolean;
