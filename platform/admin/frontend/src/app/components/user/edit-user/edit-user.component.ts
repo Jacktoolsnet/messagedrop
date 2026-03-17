@@ -1,5 +1,6 @@
 
 import { Component, inject } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -86,11 +87,21 @@ export class EditUserComponent {
 
     this.userService.updateUser(this.user.id, payload).subscribe({
       next: () => this.dialogRef.close(true),
-      error: () => this.dialogRef.close(false)
+      error: (error: unknown) => this.form.setErrors({ submitFailed: this.resolveErrorMessage(error) })
     });
   }
 
   cancel() {
     this.dialogRef.close(false);
+  }
+
+  private resolveErrorMessage(error: unknown): string {
+    if (error instanceof HttpErrorResponse) {
+      const backendMessage = error.error?.message || error.error?.error || error.message;
+      if (typeof backendMessage === 'string' && backendMessage.trim()) {
+        return backendMessage.trim();
+      }
+    }
+    return 'User could not be updated.';
   }
 }

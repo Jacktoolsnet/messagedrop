@@ -56,6 +56,10 @@
       </mat-form-field>
     }
 
+    @if (form.errors?.['submitFailed']) {
+      <div class="form-error" role="alert">{{ form.errors?.['submitFailed'] }}</div>
+    }
+
     <div class="dialog-actions">
       <button type="button" mat-stroked-button (click)="cancel()">Cancel</button>
       <button type="submit" mat-raised-button color="primary" [disabled]="form.invalid">Save</button>

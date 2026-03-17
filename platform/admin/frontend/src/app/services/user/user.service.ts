@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, of, throwError } from 'rxjs';
@@ -19,7 +19,7 @@ export class UserService {
   private readonly snackBar = inject(MatSnackBar);
 
   private handleError = (error: unknown) => {
-    this.snackBar.open('Something went wrong.', 'OK', {
+    this.snackBar.open(this.resolveErrorMessage(error), 'OK', {
       duration: 3000,
       panelClass: ['snack-error'],
       horizontalPosition: 'center',
@@ -27,6 +27,16 @@ export class UserService {
     });
     return throwError(() => error);
   };
+
+  private resolveErrorMessage(error: unknown): string {
+    if (error instanceof HttpErrorResponse) {
+      const backendMessage = error.error?.message || error.error?.error || error.message;
+      if (typeof backendMessage === 'string' && backendMessage.trim()) {
+        return backendMessage.trim();
+      }
+    }
+    return 'Something went wrong.';
+  }
 
   loadUsers() {
     this.http.get<User[]>(this.baseUrl)

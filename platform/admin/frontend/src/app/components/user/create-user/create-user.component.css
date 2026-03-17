@@ -99,6 +99,16 @@
     gap: .5rem;
 }
 
+.form-error {
+    margin-top: -.25rem;
+    padding: .75rem .9rem;
+    border-radius: 12px;
+    border: 1px solid color-mix(in srgb, #ef4444 18%, transparent);
+    background: color-mix(in srgb, #ef4444 8%, white);
+    color: #b91c1c;
+    font-size: .9rem;
+}
+
 /* Tastaturfokus sichtbar */
 button:focus-visible {
     outline: 2px solid color-mix(in srgb, var(--primary) 60%, transparent);
