@@ -5,6 +5,19 @@
 
   <span class="toolbar-title">{{ pageTitle() }}</span>
   <span class="spacer"></span>
+
+  @if (!isPublished() && !isDeleted()) {
+    <button
+      mat-icon-button
+      type="button"
+      class="toolbar-action"
+      (click)="saveDraft()"
+      [disabled]="saving()"
+      aria-label="Save draft">
+      <mat-icon>save</mat-icon>
+    </button>
+  }
+
   <span>{{ username() }} ({{ role() }})</span>
 </mat-toolbar>
 
@@ -273,13 +286,6 @@
   </div>
 
   <div class="action-bar">
-    <button mat-stroked-button type="button" routerLink="/dashboard/content">
-      <mat-icon>list</mat-icon>
-      Content overview
-    </button>
-
-    <span class="spacer"></span>
-
     @if (isEditMode() && !isDeleted()) {
       <button mat-stroked-button type="button" color="warn" (click)="confirmDelete()" [disabled]="saving()">
         <mat-icon>delete</mat-icon>
@@ -293,11 +299,6 @@
         Withdraw
       </button>
     } @else if (!isDeleted()) {
-      <button mat-stroked-button type="button" (click)="saveDraft()" [disabled]="saving()">
-        <mat-icon>save</mat-icon>
-        Save draft
-      </button>
-
       @if (canPublish()) {
         <button mat-flat-button type="button" color="primary" (click)="saveAndPublish()" [disabled]="saving()">
           <mat-icon>publish</mat-icon>

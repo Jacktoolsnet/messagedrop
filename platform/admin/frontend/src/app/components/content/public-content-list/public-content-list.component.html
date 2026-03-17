@@ -5,6 +5,27 @@
 
   <span class="toolbar-title">Public content</span>
   <span class="spacer"></span>
+
+  @if (canAccess()) {
+    <button
+      mat-icon-button
+      type="button"
+      class="toolbar-action"
+      (click)="createContent()"
+      aria-label="Create new message">
+      <mat-icon>add</mat-icon>
+    </button>
+
+    <button
+      mat-icon-button
+      type="button"
+      class="toolbar-action"
+      (click)="load()"
+      aria-label="Refresh content list">
+      <mat-icon>refresh</mat-icon>
+    </button>
+  }
+
   <span>{{ username() }} ({{ role() }})</span>
 </mat-toolbar>
 
@@ -25,17 +46,6 @@
       <div>
         <h2>Public messages</h2>
         <p>Create, edit, publish or withdraw editorial public messages.</p>
-      </div>
-
-      <div class="header-actions">
-        <button mat-stroked-button type="button" (click)="load()">
-          <mat-icon>refresh</mat-icon>
-          Refresh
-        </button>
-        <button mat-flat-button color="primary" type="button" (click)="createContent()">
-          <mat-icon>add</mat-icon>
-          New message
-        </button>
       </div>
     </div>
 

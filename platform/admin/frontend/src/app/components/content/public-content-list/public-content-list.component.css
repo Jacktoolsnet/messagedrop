@@ -1,23 +1,41 @@
 :host {
-  --surface: rgba(255, 255, 255, 0.78);
-  --surface-strong: rgba(255, 255, 255, 0.92);
-  --border: rgba(148, 163, 184, 0.28);
-  --text: #0f172a;
-  --muted: #475569;
+  color-scheme: light;
+  --primary: #05a51d;
+  --bg-gradient-start: #eafde8;
+  --bg-gradient-end: #bff7c4;
+  --surface: rgba(255, 255, 255, 0.82);
+  --surface-strong: rgba(255, 255, 255, 0.94);
+  --card: rgba(255, 255, 255, 0.94);
+  --border: rgba(0, 0, 0, 0.08);
+  --text: #1f2937;
+  --muted: #6b7280;
   --shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
   display: block;
+  min-height: 100%;
+  background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+  color: var(--text);
 }
 
 mat-toolbar {
   position: sticky;
   top: 0;
   z-index: 20;
-  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.14);
+  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.9);
+  color: #1f2937;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  border-bottom: 1px solid var(--border);
 }
 
 .toolbar-title {
   margin-left: 1rem;
-  font-weight: 700;
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: .2px;
+}
+
+.toolbar-action {
+  margin-right: .25rem;
 }
 
 .spacer {
@@ -26,10 +44,9 @@ mat-toolbar {
 
 .page {
   min-height: calc(100vh - 64px);
-  padding: 1.25rem;
-  background:
-    radial-gradient(circle at top right, rgba(37, 99, 235, 0.14), transparent 34%),
-    linear-gradient(180deg, #f8fafc 0%, #eef4ff 100%);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 2.5rem;
 }
 
 .header-row {
@@ -50,7 +67,6 @@ mat-toolbar {
   color: var(--muted);
 }
 
-.header-actions,
 .filter-row,
 .card-actions {
   display: flex;
@@ -180,6 +196,10 @@ mat-toolbar {
 @media (max-width: 720px) {
   .page {
     padding: .85rem;
+  }
+
+  .toolbar-action {
+    margin-right: 0;
   }
 
   mat-toolbar > span:last-child {
