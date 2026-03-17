@@ -208,6 +208,47 @@ button[mat-flat-button] mat-icon {
   max-width: 260px;
 }
 
+.style-select-trigger,
+.style-select-placeholder {
+  display: inline-block;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.style-select-placeholder {
+  color: var(--muted);
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.style-option-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+}
+
+.style-option-name,
+.style-option-sample {
+  display: inline-block;
+  min-width: 0;
+}
+
+.style-option-name {
+  font-size: 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.style-option-sample {
+  flex: 0 0 auto;
+  color: rgba(31, 41, 55, 0.72);
+  font-size: .95rem;
+  white-space: nowrap;
+}
+
 .message-preview {
   min-height: 140px;
   padding: 1rem;

@@ -23,7 +23,7 @@ import { PublicContentSavePayload } from '../../../interfaces/public-content-sav
 import { PublicContent } from '../../../interfaces/public-content.interface';
 import { TenorApiResponse, TenorResult } from '../../../interfaces/tenor-response.interface';
 import { AuthService } from '../../../services/auth/auth.service';
-import { ContentStyleService } from '../../../services/content/content-style.service';
+import { ContentStyleOption, ContentStyleService } from '../../../services/content/content-style.service';
 import { PublicContentService } from '../../../services/content/public-content.service';
 import { MAX_PUBLIC_HASHTAGS, normalizeHashtags } from '../../../utils/hashtag.util';
 
@@ -73,6 +73,7 @@ export class PublicContentEditorComponent {
   private readonly styleService = inject(ContentStyleService);
 
   readonly role = this.authService.role;
+  readonly styleOptions = this.styleService.getStyleOptions();
 
   readonly loading = signal(false);
   readonly saving = signal(false);
@@ -112,8 +113,14 @@ export class PublicContentEditorComponent {
       plusCode: this.fb.nonNullable.control('')
     })
   });
+  readonly selectedStyle = signal(this.styleService.normalizeStyle(this.form.controls.style.value));
+  readonly selectedStyleOption = computed(() => this.styleService.findOptionByStyle(this.selectedStyle()));
 
   constructor() {
+    this.form.controls.style.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((style) => this.selectedStyle.set(this.styleService.normalizeStyle(style)));
+
     const contentId = this.route.snapshot.paramMap.get('id');
     if (contentId) {
       this.loadContent(contentId);
@@ -122,6 +129,10 @@ export class PublicContentEditorComponent {
 
   trackTenorResult(_index: number, result: TenorResult): string {
     return result.id;
+  }
+
+  trackStyleOption(_index: number, option: ContentStyleOption): string {
+    return option.fontFamily;
   }
 
   formatStatus(status: string): string {
@@ -465,7 +476,7 @@ export class PublicContentEditorComponent {
         plusCode: raw.location.plusCode.trim()
       },
       markerType: raw.markerType.trim() || 'default',
-      style: raw.style,
+      style: this.styleService.normalizeStyle(raw.style),
       hashtags: this.hashtags(),
       multimedia
     };
@@ -490,7 +501,7 @@ export class PublicContentEditorComponent {
     this.hashtags.set(Array.isArray(content.hashtags) ? [...content.hashtags] : []);
     this.form.setValue({
       message: content.message ?? '',
-      style: content.style ?? '',
+      style: this.styleService.normalizeStyle(content.style ?? ''),
       markerType: content.markerType ?? 'default',
       location: {
         latitude: Number(content.location?.latitude ?? 0),

@@ -85,7 +85,7 @@
           <mat-icon>edit_note</mat-icon>
         </div>
         <mat-card-title>Message content</mat-card-title>
-        <mat-card-subtitle>Text, style and location for the public message</mat-card-subtitle>
+        <mat-card-subtitle>Text, font and location for the public message</mat-card-subtitle>
       </mat-card-header>
 
       <mat-card-content>
@@ -101,18 +101,42 @@
 
           <div class="style-actions">
             <button mat-stroked-button type="button" (click)="randomizeStyle()" [disabled]="form.disabled">
-              <mat-icon>cycle</mat-icon>
-              Random style
+              <mat-icon>shuffle</mat-icon>
+              Random font
             </button>
             <button mat-stroked-button type="button" (click)="clearStyle()" [disabled]="form.disabled">
               <mat-icon>format_clear</mat-icon>
-              Clear style
+              Default font
             </button>
           </div>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Inline style</mat-label>
-            <input matInput formControlName="style" placeholder="font-family: &quot;LuckiestGuy&quot;; font-size: 1.75rem;" />
+            <mat-label>Text style</mat-label>
+            <mat-select formControlName="style">
+              <mat-select-trigger>
+                @if (selectedStyleOption(); as selected) {
+                  <span class="style-select-trigger" [style.font-family]="selected.fontFamily">
+                    {{ selected.fontFamily }}
+                  </span>
+                } @else {
+                  <span class="style-select-placeholder">Default font</span>
+                }
+              </mat-select-trigger>
+
+              @for (option of styleOptions; track trackStyleOption($index, option)) {
+                <mat-option [value]="option.style">
+                  <div class="style-option-row">
+                    <span class="style-option-name" [style.font-family]="option.fontFamily">
+                      {{ option.fontFamily }}
+                    </span>
+                    <span class="style-option-sample" [style.font-family]="option.fontFamily">
+                      Aa Bb Cc
+                    </span>
+                  </div>
+                </mat-option>
+              }
+            </mat-select>
+            <mat-hint>Uses the same font styles as the public MessageDrop app.</mat-hint>
           </mat-form-field>
 
           <div formGroupName="location" class="location-grid">

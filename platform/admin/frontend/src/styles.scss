@@ -5,6 +5,84 @@
 // custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
 
+$content-font-families: (
+  'DancingScript',
+  'Pacifico',
+  'Caveat',
+  'HachiMaruPop',
+  'Miniver',
+  'CraftyGirls',
+  'SedgwickAveDisplay',
+  'OvertheRainbow',
+  'LoveYaLikeASister',
+  'SedgwickAve',
+  'MrDafoe',
+  'GochiHand',
+  'RockSalt',
+  'GloriaHallelujah',
+  'KaushanScript',
+  'LuckiestGuy',
+  'Zeyada',
+  'Kalam',
+  'Yellowtail',
+  'IndieFlower',
+  'PermanentMarker',
+  'Satisfy',
+  'ShadowsIntoLight',
+  'AbrilFatface',
+  'Almendra',
+  'AmaticSC',
+  'Anton',
+  'Audiowide',
+  'Bangers',
+  'BebasNeue',
+  'BlackOpsOne',
+  'BriemHand',
+  'BungeeShade',
+  'BungeeSpice',
+  'Cinzel',
+  'Creepster',
+  'FjallaOne',
+  'FrederickatheGreat',
+  'Jaro',
+  'Jersey10',
+  'Jersey15',
+  'Jersey25',
+  'JosefinSans',
+  'Knewave',
+  'Lemon',
+  'LilitaOne',
+  'MadimiOne',
+  'Micro5Charted',
+  'Micro5',
+  'Monoton',
+  'Montserrat',
+  'Nosifer',
+  'Orbitron',
+  'Oswald',
+  'PlayfairDisplay',
+  'PoetsenOne',
+  'RubikMonoOne',
+  'RubikMoonrocks',
+  'RubikScribble',
+  'SedanSC',
+  'Sixtyfour',
+  'SpecialElite',
+  'UbuntuSansMono',
+  'Allura',
+  'Cookie'
+);
+
+@each $font in $content-font-families {
+  @font-face {
+    font-family: '#{$font}';
+    src: url('/assets/fonts/#{$font}.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+  }
+}
+
 html {
   @include mat.theme((color: (primary: mat.$azure-palette,
         tertiary: mat.$blue-palette,
