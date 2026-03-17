@@ -79,90 +79,236 @@
   }
 
   <div class="editor-layout">
-    <mat-card class="editor-card">
-      <mat-card-header>
-        <div mat-card-avatar class="avatar avatar-accent">
-          <mat-icon>edit_note</mat-icon>
-        </div>
-        <mat-card-title>Message content</mat-card-title>
-        <mat-card-subtitle>Text, font and location for the public message</mat-card-subtitle>
-      </mat-card-header>
-
-      <mat-card-content>
-        <form [formGroup]="form" class="form-grid">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Message text</mat-label>
-            <textarea
-              matInput
-              rows="8"
-              formControlName="message"
-              placeholder="Write the public message here"></textarea>
-          </mat-form-field>
-
-          <div class="style-actions">
-            <button mat-stroked-button type="button" (click)="randomizeStyle()" [disabled]="form.disabled">
-              <mat-icon>shuffle</mat-icon>
-              Random font
-            </button>
-            <button mat-stroked-button type="button" (click)="clearStyle()" [disabled]="form.disabled">
-              <mat-icon>format_clear</mat-icon>
-              Default font
-            </button>
+    <div class="main-column">
+      <mat-card class="editor-card">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-accent">
+            <mat-icon>edit_note</mat-icon>
           </div>
+          <mat-card-title>Message content</mat-card-title>
+          <mat-card-subtitle>Text, font and location for the public message</mat-card-subtitle>
+        </mat-card-header>
 
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Text style</mat-label>
-            <mat-select formControlName="style">
-              <mat-select-trigger>
-                @if (selectedStyleOption(); as selected) {
-                  <span class="style-select-trigger" [style.font-family]="selected.fontFamily">
-                    {{ selected.fontFamily }}
-                  </span>
-                } @else {
-                  <span class="style-select-placeholder">Default font</span>
+        <mat-card-content>
+          <form [formGroup]="form" class="form-grid">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Message text</mat-label>
+              <textarea
+                matInput
+                rows="8"
+                formControlName="message"
+                placeholder="Write the public message here"></textarea>
+            </mat-form-field>
+
+            <div class="style-actions">
+              <button mat-stroked-button type="button" (click)="randomizeStyle()" [disabled]="form.disabled">
+                <mat-icon>shuffle</mat-icon>
+                Random font
+              </button>
+              <button mat-stroked-button type="button" (click)="clearStyle()" [disabled]="form.disabled">
+                <mat-icon>format_clear</mat-icon>
+                Default font
+              </button>
+            </div>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Text style</mat-label>
+              <mat-select
+                #styleSelect
+                formControlName="style"
+                (openedChange)="handleStyleSelectOpenedChange($event)"
+                (keydown)="handleStyleSelectKeydown()"
+                (selectionChange)="resetPreviewStyle()">
+                <mat-select-trigger>
+                  @if (selectedStyleOption(); as selected) {
+                    <span class="style-select-trigger" [style.font-family]="selected.fontFamily">
+                      {{ selected.fontFamily }}
+                    </span>
+                  } @else {
+                    <span class="style-select-placeholder">Default font</span>
+                  }
+                </mat-select-trigger>
+
+                @for (option of styleOptions; track trackStyleOption($index, option)) {
+                  <mat-option [value]="option.style" (mouseenter)="previewStyleOption(option.style)">
+                    <div class="style-option-row">
+                      <span class="style-option-name" [style.font-family]="option.fontFamily">
+                        {{ option.fontFamily }}
+                      </span>
+                      <span class="style-option-sample" [style.font-family]="option.fontFamily">
+                        Aa Bb Cc
+                      </span>
+                    </div>
+                  </mat-option>
                 }
-              </mat-select-trigger>
+              </mat-select>
+              <mat-hint>Uses the same font styles as the public MessageDrop app.</mat-hint>
+            </mat-form-field>
 
-              @for (option of styleOptions; track trackStyleOption($index, option)) {
-                <mat-option [value]="option.style">
-                  <div class="style-option-row">
-                    <span class="style-option-name" [style.font-family]="option.fontFamily">
-                      {{ option.fontFamily }}
-                    </span>
-                    <span class="style-option-sample" [style.font-family]="option.fontFamily">
-                      Aa Bb Cc
-                    </span>
-                  </div>
-                </mat-option>
+            <div class="location-search">
+              <div class="location-search-row">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Location search</mat-label>
+                  <input
+                    matInput
+                    [formControl]="locationSearchControl"
+                    placeholder="Search for a city, street or place"
+                    [disabled]="locationSearchControl.disabled"
+                    (keydown.enter)="searchLocations()" />
+                </mat-form-field>
+
+                <button mat-stroked-button type="button" (click)="searchLocations()" [disabled]="locationSearchLoading() || locationSearchControl.disabled">
+                  <mat-icon>search</mat-icon>
+                  Search
+                </button>
+
+                @if (hasSelectedLocation()) {
+                  <button mat-stroked-button type="button" (click)="clearLocation()" [disabled]="locationSearchControl.disabled">
+                    <mat-icon>location_off</mat-icon>
+                    Clear
+                  </button>
+                }
+              </div>
+
+              @if (locationSearchLoading()) {
+                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
               }
-            </mat-select>
-            <mat-hint>Uses the same font styles as the public MessageDrop app.</mat-hint>
-          </mat-form-field>
 
-          <div formGroupName="location" class="location-grid">
-            <mat-form-field appearance="outline">
-              <mat-label>Latitude</mat-label>
-              <input matInput type="number" formControlName="latitude" />
-            </mat-form-field>
+              @if (locationSearchResults().length > 0) {
+                <div class="location-results">
+                  @for (place of locationSearchResults(); track trackLocationResult($index, place)) {
+                    <button type="button" class="location-result" (click)="selectLocationResult(place)" [disabled]="locationSearchControl.disabled">
+                      <span class="location-result-title">{{ place.name || place.display_name }}</span>
+                      @if (place.name && place.display_name) {
+                        <span class="location-result-subtitle">{{ place.display_name }}</span>
+                      }
+                    </button>
+                  }
+                </div>
+              }
 
-            <mat-form-field appearance="outline">
-              <mat-label>Longitude</mat-label>
-              <input matInput type="number" formControlName="longitude" />
-            </mat-form-field>
+              <div class="selected-location" [class.selected-location-empty]="!hasSelectedLocation()">
+                <div class="selected-location-head">
+                  <span class="selected-location-label">Selected location</span>
+                  @if (hasSelectedLocation()) {
+                    <mat-icon aria-hidden="true">location_on</mat-icon>
+                  }
+                </div>
+                <p>{{ hasSelectedLocation() ? activeLocationLabel() : 'No location selected yet.' }}</p>
+              </div>
 
-            <mat-form-field appearance="outline" class="plus-code-field">
-              <mat-label>Plus Code</mat-label>
-              <input matInput formControlName="plusCode" placeholder="Optional plus code" />
+              <p class="location-help">
+                Use the same place search as in MessageDrop. If no location is selected, the public message will be published without location details.
+              </p>
+            </div>
+
+            <mat-form-field appearance="outline" class="marker-field">
+              <mat-label>Marker type</mat-label>
+              <input matInput formControlName="markerType" placeholder="default" />
             </mat-form-field>
+          </form>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="media-card media-card-wide">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-accent">
+            <mat-icon>perm_media</mat-icon>
           </div>
+          <mat-card-title>Multimedia</mat-card-title>
+          <mat-card-subtitle>External embeds and Tenor GIFs</mat-card-subtitle>
+        </mat-card-header>
 
-          <mat-form-field appearance="outline" class="marker-field">
-            <mat-label>Marker type</mat-label>
-            <input matInput formControlName="markerType" placeholder="default" />
-          </mat-form-field>
-        </form>
-      </mat-card-content>
-    </mat-card>
+        <mat-card-content>
+          <div class="media-layout">
+            <div class="media-search-column">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Import external media</mat-label>
+                <input matInput [formControl]="mediaUrlControl" placeholder="https://www.youtube.com/watch?v=..." />
+              </mat-form-field>
+
+              <div class="inline-actions">
+                <button mat-stroked-button type="button" (click)="importExternalMultimedia()" [disabled]="mediaLoading() || mediaUrlControl.disabled">
+                  <mat-icon>download</mat-icon>
+                  Import media
+                </button>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <div class="tenor-head">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Search Tenor</mat-label>
+                  <input matInput [formControl]="tenorControl" placeholder="Search GIFs" (keydown.enter)="searchTenor()" />
+                </mat-form-field>
+
+                <div class="inline-actions">
+                  <button mat-stroked-button type="button" (click)="searchTenor()" [disabled]="tenorControl.disabled || tenorLoading()">
+                    <mat-icon>search</mat-icon>
+                    Search
+                  </button>
+                  <button mat-stroked-button type="button" (click)="loadFeaturedTenor()" [disabled]="tenorControl.disabled || tenorLoading()">
+                    <mat-icon>whatshot</mat-icon>
+                    Featured
+                  </button>
+                  @if (tenorNext()) {
+                    <button mat-stroked-button type="button" (click)="loadMoreTenor()" [disabled]="tenorControl.disabled || tenorLoading()">
+                      <mat-icon>arrow_forward</mat-icon>
+                      More
+                    </button>
+                  }
+                </div>
+              </div>
+
+              @if (tenorResults().length > 0) {
+                <div class="tenor-grid">
+                  @for (result of tenorResults(); track trackTenorResult($index, result)) {
+                    <button type="button" class="tenor-result" (click)="selectTenorResult(result)" [disabled]="form.disabled">
+                      <img [src]="result.media_formats.gif.url" [alt]="result.title || 'Tenor GIF'" />
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="media-selection-column">
+              @if (hasMedia()) {
+                <div class="selected-media">
+                  <div class="selected-media-head">
+                    <h3>Selected media</h3>
+                    <button mat-icon-button type="button" (click)="removeMultimedia()" [disabled]="form.disabled" aria-label="Remove media">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+
+                  <p class="media-type">{{ multimedia().type }}</p>
+                  @if (multimedia().title) {
+                    <p class="media-title">{{ multimedia().title }}</p>
+                  }
+                  @if (multimedia().description) {
+                    <p class="media-description">{{ multimedia().description }}</p>
+                  }
+                  @if (multimedia().sourceUrl) {
+                    <a [href]="multimedia().sourceUrl" target="_blank" rel="noopener">Open original source</a>
+                  }
+
+                  @if (multimedia().type === 'tenor' && multimedia().url) {
+                    <img class="tenor-preview" [src]="multimedia().url" [alt]="multimedia().title || 'Selected GIF'" />
+                  } @else if (safeOembedHtml()) {
+                    <div class="oembed-preview" [innerHTML]="safeOembedHtml()"></div>
+                  }
+                </div>
+              } @else {
+                <div class="selected-media selected-media-empty">
+                  <h3>No media selected</h3>
+                  <p>Import an external URL or pick a Tenor GIF to see the selected media here.</p>
+                </div>
+              }
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
 
     <div class="side-column">
       <mat-card class="preview-card">
@@ -171,21 +317,92 @@
             <mat-icon>visibility</mat-icon>
           </div>
           <mat-card-title>Preview</mat-card-title>
-          <mat-card-subtitle>Approximate editor preview</mat-card-subtitle>
+          <mat-card-subtitle>Live preview of the public message card</mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content>
-          <div class="message-preview" [style]="form.controls.style.value">
-            {{ form.controls.message.value || 'Add some text to preview the message.' }}
-          </div>
+          <div class="preview-canvas">
+            <mat-card class="preview-item has-badge">
+              <div class="preview-avatar-box">
+                <mat-icon class="preview-avatar-icon" aria-hidden="true">campaign</mat-icon>
+                <div class="preview-avatar-text">
+                  <span class="preview-name">Public message</span>
+                  <span class="preview-timestamp">{{ (currentContent()?.updatedAt ?? previewCreatedAt) | date:'medium' }}</span>
+                </div>
+              </div>
 
-          @if (hashtags().length > 0) {
-            <div class="chip-preview">
-              @for (tag of hashtags(); track tag) {
-                <span class="preview-chip">#{{ tag }}</span>
-              }
-            </div>
-          }
+              <mat-card-content>
+                <div class="preview-message-content">
+                  @if (hasMedia()) {
+                    <div class="preview-media">
+                      @if (isImageMultimedia(multimedia())) {
+                        <img [src]="multimedia().url" [alt]="multimedia().title || 'Selected multimedia preview'" />
+                      } @else if (safeOembedHtml()) {
+                        <div
+                          class="preview-oembed"
+                          [class.preview-oembed-youtube]="multimedia().type === 'youtube'"
+                          [class.preview-oembed-spotify]="multimedia().type === 'spotify'"
+                          [class.preview-oembed-tiktok]="multimedia().type === 'tiktok'"
+                          [class.preview-oembed-pinterest]="multimedia().type === 'pinterest'"
+                          [innerHTML]="safeOembedHtml()"></div>
+                      }
+                    </div>
+                  }
+
+                  @if (previewMessage()) {
+                    <div class="preview-message-shell" [style]="previewDisplayStyle()">
+                      <p class="preview-message-text">{{ previewMessage() }}</p>
+                    </div>
+                  }
+
+                  @if (hashtags().length > 0) {
+                    <div class="preview-hashtag-chip-list" aria-label="Selected hashtags preview">
+                      @for (tag of hashtags(); track tag) {
+                        <span class="preview-hashtag-chip">#{{ tag }}</span>
+                      }
+                    </div>
+                  }
+
+                  @if (previewHasMetadata()) {
+                    <div class="preview-meta">
+                      <span class="preview-meta-chip" [class.is-missing]="!hasSelectedLocation()">
+                        <mat-icon aria-hidden="true">location_on</mat-icon>
+                        {{ hasSelectedLocation() ? activeLocationLabel() : 'No location selected' }}
+                      </span>
+                      <span class="preview-meta-chip">
+                        <mat-icon aria-hidden="true">pin_drop</mat-icon>
+                        {{ previewMarkerType() }}
+                      </span>
+                    </div>
+                  }
+                </div>
+              </mat-card-content>
+
+              <mat-card-actions class="preview-buttonbar">
+                <button mat-mini-fab type="button" tabindex="-1">
+                  <mat-icon>delete_forever</mat-icon>
+                </button>
+
+                <div class="preview-button-group">
+                  <button mat-mini-fab type="button" tabindex="-1">
+                    <mat-icon>forum</mat-icon>
+                  </button>
+                  <button mat-mini-fab type="button" tabindex="-1">
+                    <mat-icon>thumb_up</mat-icon>
+                  </button>
+                  <button mat-mini-fab type="button" tabindex="-1">
+                    <mat-icon>thumb_down</mat-icon>
+                  </button>
+                  <button mat-mini-fab type="button" tabindex="-1">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-mini-fab type="button" tabindex="-1">
+                    <mat-icon>more_horiz</mat-icon>
+                  </button>
+                </div>
+              </mat-card-actions>
+            </mat-card>
+          </div>
         </mat-card-content>
       </mat-card>
 
@@ -227,94 +444,6 @@
               </mat-chip-row>
             }
           </mat-chip-grid>
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="media-card">
-        <mat-card-header>
-          <div mat-card-avatar class="avatar avatar-accent">
-            <mat-icon>perm_media</mat-icon>
-          </div>
-          <mat-card-title>Multimedia</mat-card-title>
-          <mat-card-subtitle>External embeds and Tenor GIFs</mat-card-subtitle>
-        </mat-card-header>
-
-        <mat-card-content>
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Import external media</mat-label>
-            <input matInput [formControl]="mediaUrlControl" placeholder="https://www.youtube.com/watch?v=..." />
-          </mat-form-field>
-
-          <div class="inline-actions">
-            <button mat-stroked-button type="button" (click)="importExternalMultimedia()" [disabled]="mediaLoading() || mediaUrlControl.disabled">
-              <mat-icon>download</mat-icon>
-              Import media
-            </button>
-          </div>
-
-          <mat-divider></mat-divider>
-
-          <div class="tenor-head">
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Search Tenor</mat-label>
-              <input matInput [formControl]="tenorControl" placeholder="Search GIFs" (keydown.enter)="searchTenor()" />
-            </mat-form-field>
-
-            <div class="inline-actions">
-              <button mat-stroked-button type="button" (click)="searchTenor()" [disabled]="tenorControl.disabled || tenorLoading()">
-                <mat-icon>search</mat-icon>
-                Search
-              </button>
-              <button mat-stroked-button type="button" (click)="loadFeaturedTenor()" [disabled]="tenorControl.disabled || tenorLoading()">
-                <mat-icon>whatshot</mat-icon>
-                Featured
-              </button>
-              @if (tenorNext()) {
-                <button mat-stroked-button type="button" (click)="loadMoreTenor()" [disabled]="tenorControl.disabled || tenorLoading()">
-                  <mat-icon>arrow_forward</mat-icon>
-                  More
-                </button>
-              }
-            </div>
-          </div>
-
-          @if (tenorResults().length > 0) {
-            <div class="tenor-grid">
-              @for (result of tenorResults(); track trackTenorResult($index, result)) {
-                <button type="button" class="tenor-result" (click)="selectTenorResult(result)" [disabled]="form.disabled">
-                  <img [src]="result.media_formats.gif.url" [alt]="result.title || 'Tenor GIF'" />
-                </button>
-              }
-            </div>
-          }
-
-          @if (hasMedia()) {
-            <div class="selected-media">
-              <div class="selected-media-head">
-                <h3>Selected media</h3>
-                <button mat-icon-button type="button" (click)="removeMultimedia()" [disabled]="form.disabled" aria-label="Remove media">
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </div>
-
-              <p class="media-type">{{ multimedia().type }}</p>
-              @if (multimedia().title) {
-                <p class="media-title">{{ multimedia().title }}</p>
-              }
-              @if (multimedia().description) {
-                <p class="media-description">{{ multimedia().description }}</p>
-              }
-              @if (multimedia().sourceUrl) {
-                <a [href]="multimedia().sourceUrl" target="_blank" rel="noopener">Open original source</a>
-              }
-
-              @if (multimedia().type === 'tenor' && multimedia().url) {
-                <img class="tenor-preview" [src]="multimedia().url" [alt]="multimedia().title || 'Selected GIF'" />
-              } @else if (safeOembedHtml()) {
-                <div class="oembed-preview" [innerHTML]="safeOembedHtml()"></div>
-              }
-            </div>
-          }
         </mat-card-content>
       </mat-card>
     </div>

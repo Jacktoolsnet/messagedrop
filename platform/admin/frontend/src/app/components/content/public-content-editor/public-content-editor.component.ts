@@ -1,6 +1,6 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, DestroyRef, ViewChild, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -13,18 +13,20 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatSelectModule } from '@angular/material/select';
+import { MatSelect, MatSelectModule } from '@angular/material/select';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { finalize } from 'rxjs';
+import { finalize, startWith } from 'rxjs';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
 import { Multimedia } from '../../../interfaces/multimedia.interface';
+import { NominatimPlace } from '../../../interfaces/nominatim-place.interface';
 import { PublicContentSavePayload } from '../../../interfaces/public-content-save-payload.interface';
 import { PublicContent } from '../../../interfaces/public-content.interface';
 import { TenorApiResponse, TenorResult } from '../../../interfaces/tenor-response.interface';
 import { AuthService } from '../../../services/auth/auth.service';
 import { ContentStyleOption, ContentStyleService } from '../../../services/content/content-style.service';
 import { PublicContentService } from '../../../services/content/public-content.service';
+import { NominatimService } from '../../../services/location/nominatim.service';
 import { MAX_PUBLIC_HASHTAGS, normalizeHashtags } from '../../../utils/hashtag.util';
 
 const EMPTY_MULTIMEDIA: Multimedia = {
@@ -61,6 +63,8 @@ const EMPTY_MULTIMEDIA: Multimedia = {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PublicContentEditorComponent {
+  @ViewChild('styleSelect') private styleSelect?: MatSelect;
+
   private readonly destroyRef = inject(DestroyRef);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -71,17 +75,22 @@ export class PublicContentEditorComponent {
   private readonly authService = inject(AuthService);
   private readonly publicContentService = inject(PublicContentService);
   private readonly styleService = inject(ContentStyleService);
+  private readonly nominatimService = inject(NominatimService);
 
   readonly role = this.authService.role;
   readonly styleOptions = this.styleService.getStyleOptions();
+  readonly previewCreatedAt = Date.now();
 
   readonly loading = signal(false);
   readonly saving = signal(false);
   readonly mediaLoading = signal(false);
   readonly tenorLoading = signal(false);
+  readonly locationSearchLoading = signal(false);
   readonly currentContent = signal<PublicContent | null>(null);
   readonly multimedia = signal<Multimedia>({ ...EMPTY_MULTIMEDIA });
   readonly hashtags = signal<string[]>([]);
+  readonly locationSearchResults = signal<NominatimPlace[]>([]);
+  readonly selectedLocationLabel = signal('');
   readonly tenorResults = signal<TenorResult[]>([]);
   readonly tenorNext = signal('');
   readonly lastTenorSearch = signal('');
@@ -102,6 +111,7 @@ export class PublicContentEditorComponent {
   readonly hashtagControl = new FormControl('', { nonNullable: true });
   readonly mediaUrlControl = new FormControl('', { nonNullable: true });
   readonly tenorControl = new FormControl('', { nonNullable: true });
+  readonly locationSearchControl = new FormControl('', { nonNullable: true });
 
   readonly form = this.fb.nonNullable.group({
     message: this.fb.nonNullable.control(''),
@@ -113,14 +123,44 @@ export class PublicContentEditorComponent {
       plusCode: this.fb.nonNullable.control('')
     })
   });
-  readonly selectedStyle = signal(this.styleService.normalizeStyle(this.form.controls.style.value));
+  readonly formValue = toSignal(
+    this.form.valueChanges.pipe(startWith(this.form.getRawValue())),
+    { initialValue: this.form.getRawValue() }
+  );
+  readonly selectedStyle = computed(() => this.styleService.normalizeStyle(this.formValue().style));
+  readonly previewStyleOverride = signal('');
   readonly selectedStyleOption = computed(() => this.styleService.findOptionByStyle(this.selectedStyle()));
+  readonly previewDisplayStyle = computed(() => this.previewStyleOverride() || this.selectedStyle());
+  readonly previewMessage = computed(() => {
+    const message = (this.formValue().message ?? '').trim();
+    if (message) {
+      return message;
+    }
+    return this.hasMedia() ? '' : 'Add some text to preview the message.';
+  });
+  readonly previewMarkerType = computed(() => (this.formValue().markerType ?? '').trim() || 'default');
+  readonly previewLocationLabel = computed(() => {
+    const location = this.formValue().location;
+    const latitude = Number(location?.latitude) || 0;
+    const longitude = Number(location?.longitude) || 0;
+    const plusCode = (location?.plusCode ?? '').trim();
+    const parts: string[] = [];
+
+    if (plusCode) {
+      parts.push(plusCode);
+    }
+    if (latitude !== 0 || longitude !== 0) {
+      parts.push(`${this.formatCoordinate(latitude)}, ${this.formatCoordinate(longitude)}`);
+    }
+
+    return parts.join(' • ');
+  });
+  readonly hasPreviewLocation = computed(() => !!this.previewLocationLabel());
+  readonly activeLocationLabel = computed(() => this.selectedLocationLabel().trim() || this.previewLocationLabel());
+  readonly hasSelectedLocation = computed(() => !!this.activeLocationLabel());
+  readonly previewHasMetadata = computed(() => !!this.previewMarkerType() || !!this.previewLocationLabel());
 
   constructor() {
-    this.form.controls.style.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((style) => this.selectedStyle.set(this.styleService.normalizeStyle(style)));
-
     const contentId = this.route.snapshot.paramMap.get('id');
     if (contentId) {
       this.loadContent(contentId);
@@ -133,6 +173,100 @@ export class PublicContentEditorComponent {
 
   trackStyleOption(_index: number, option: ContentStyleOption): string {
     return option.fontFamily;
+  }
+
+  trackLocationResult(_index: number, place: NominatimPlace): number {
+    return place.place_id;
+  }
+
+  previewStyleOption(style: string | null | undefined): void {
+    this.previewStyleOverride.set(this.styleService.normalizeStyle(style));
+  }
+
+  resetPreviewStyle(): void {
+    this.previewStyleOverride.set('');
+  }
+
+  handleStyleSelectOpenedChange(open: boolean): void {
+    if (!open) {
+      this.resetPreviewStyle();
+      return;
+    }
+
+    queueMicrotask(() => this.syncActiveStylePreview());
+  }
+
+  handleStyleSelectKeydown(): void {
+    queueMicrotask(() => this.syncActiveStylePreview());
+  }
+
+  isImageMultimedia(multimedia: Multimedia): boolean {
+    if (!multimedia.url) {
+      return false;
+    }
+
+    if (multimedia.type === 'image' || multimedia.type === 'tenor') {
+      return true;
+    }
+
+    return /\.(png|jpe?g|gif|webp|bmp|svg)(\?.*)?$/i.test(multimedia.url);
+  }
+
+  searchLocations(): void {
+    const searchTerm = this.locationSearchControl.value.trim();
+    if (!searchTerm) {
+      this.locationSearchResults.set([]);
+      return;
+    }
+
+    this.locationSearchLoading.set(true);
+    this.nominatimService.searchPlaces(searchTerm)
+      .pipe(
+        finalize(() => this.locationSearchLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: (results) => {
+          this.locationSearchResults.set(results);
+          if (results.length === 0) {
+            this.showMessage('No places found for this search.');
+          }
+        },
+        error: () => {
+          this.locationSearchResults.set([]);
+          this.showMessage('Location search failed.');
+        }
+      });
+  }
+
+  selectLocationResult(place: NominatimPlace): void {
+    const latitude = Number(place.lat);
+    const longitude = Number(place.lon);
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+      this.showMessage('The selected place does not contain valid coordinates.');
+      return;
+    }
+
+    const label = this.getLocationLabel(place);
+    this.form.controls.location.setValue({
+      latitude,
+      longitude,
+      plusCode: ''
+    });
+    this.selectedLocationLabel.set(label);
+    this.locationSearchControl.setValue(label);
+    this.locationSearchResults.set([]);
+  }
+
+  clearLocation(): void {
+    this.form.controls.location.setValue({
+      latitude: 0,
+      longitude: 0,
+      plusCode: ''
+    });
+    this.selectedLocationLabel.set('');
+    this.locationSearchControl.setValue('');
+    this.locationSearchResults.set([]);
   }
 
   formatStatus(status: string): string {
@@ -499,6 +633,9 @@ export class PublicContentEditorComponent {
     this.currentContent.set(content);
     this.multimedia.set(content.multimedia ?? { ...EMPTY_MULTIMEDIA });
     this.hashtags.set(Array.isArray(content.hashtags) ? [...content.hashtags] : []);
+    this.selectedLocationLabel.set('');
+    this.locationSearchResults.set([]);
+    this.locationSearchControl.setValue(this.formatStoredLocation(content));
     this.form.setValue({
       message: content.message ?? '',
       style: this.styleService.normalizeStyle(content.style ?? ''),
@@ -523,6 +660,7 @@ export class PublicContentEditorComponent {
       this.hashtagControl.disable({ emitEvent: false });
       this.mediaUrlControl.disable({ emitEvent: false });
       this.tenorControl.disable({ emitEvent: false });
+      this.locationSearchControl.disable({ emitEvent: false });
       return;
     }
 
@@ -530,6 +668,7 @@ export class PublicContentEditorComponent {
     this.hashtagControl.enable({ emitEvent: false });
     this.mediaUrlControl.enable({ emitEvent: false });
     this.tenorControl.enable({ emitEvent: false });
+    this.locationSearchControl.enable({ emitEvent: false });
   }
 
   private applyTenorResponse(response: TenorApiResponse, searchTerm: string): void {
@@ -540,5 +679,38 @@ export class PublicContentEditorComponent {
 
   private showMessage(message: string): void {
     this.snackBar.open(message, 'OK', { duration: 2800 });
+  }
+
+  private getLocationLabel(place: NominatimPlace): string {
+    return place.display_name?.trim() || place.name?.trim() || `${place.lat}, ${place.lon}`;
+  }
+
+  private formatStoredLocation(content: PublicContent): string {
+    const plusCode = content.location?.plusCode?.trim() ?? '';
+    if (plusCode) {
+      return plusCode;
+    }
+
+    const latitude = Number(content.location?.latitude ?? 0);
+    const longitude = Number(content.location?.longitude ?? 0);
+    if (latitude !== 0 || longitude !== 0) {
+      return `${this.formatCoordinate(latitude)}, ${this.formatCoordinate(longitude)}`;
+    }
+
+    return '';
+  }
+
+  private syncActiveStylePreview(): void {
+    const activeOption = this.styleSelect?.options?.toArray().find((option) => option.active);
+    if (!activeOption) {
+      this.resetPreviewStyle();
+      return;
+    }
+
+    this.previewStyleOption(activeOption.value as string | null | undefined);
+  }
+
+  private formatCoordinate(value: number): string {
+    return value.toFixed(5).replace(/\.?0+$/, '');
   }
 }

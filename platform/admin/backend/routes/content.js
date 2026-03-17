@@ -8,6 +8,7 @@ const { requireAdminJwt, requireRole } = require('../middleware/security');
 const { apiError } = require('../middleware/api-error');
 const { signServiceJwt } = require('../utils/serviceJwt');
 const { resolveBaseUrl } = require('../utils/adminLogForwarder');
+const { encodePlusCode } = require('../utils/plusCode');
 
 const router = express.Router();
 
@@ -171,12 +172,16 @@ function normalizeEditorPayload(body) {
   const location = body?.location && typeof body.location === 'object' && !Array.isArray(body.location)
     ? body.location
     : {};
+  const latitude = normalizeNumber(location.latitude);
+  const longitude = normalizeNumber(location.longitude);
+  const plusCode = normalizeString(location.plusCode);
+  const hasSelectedLocation = latitude !== 0 || longitude !== 0 || !!plusCode;
 
   return {
     message: normalizeString(body?.message),
-    latitude: normalizeNumber(location.latitude),
-    longitude: normalizeNumber(location.longitude),
-    plusCode: normalizeString(location.plusCode),
+    latitude,
+    longitude,
+    plusCode: plusCode || (hasSelectedLocation ? encodePlusCode(latitude, longitude) : ''),
     markerType: normalizeString(body?.markerType, 'default') || 'default',
     style: normalizeString(body?.style),
     hashtags: normalizeHashtags(body?.hashtags),
