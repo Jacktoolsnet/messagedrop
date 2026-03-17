@@ -1531,6 +1531,9 @@ export class UserService {
       if (message.userId && message.userId !== userId) {
         return;
       }
+      if (message.publishState === 'draft') {
+        return;
+      }
       uniqueMessages.set(uuid, message);
       if (Array.isArray(message.comments)) {
         message.comments.forEach((comment) => collect(comment));

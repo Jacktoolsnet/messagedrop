@@ -244,6 +244,10 @@ export class MessageService {
     });
   }
 
+  public showDraftSavedMessage(): void {
+    this.showPublishedMessage(this.i18n.t('common.message.draftSaved'));
+  }
+
   private showModerationReviewMessage(message: string): void {
     this.reviewDialogRef?.close();
     const ref = this.dialog.open(DisplayMessage, {
@@ -369,6 +373,32 @@ export class MessageService {
       translatedMessage: undefined
     }));
     await this.indexedDbService.setOwnPublicMessages(userId, snapshot);
+  }
+
+  async saveDraftMessage(message: Message, user: User): Promise<Message> {
+    const userId = typeof user?.id === 'string' ? user.id.trim() : '';
+    if (!userId) {
+      throw new Error('missing_user_id');
+    }
+
+    const draftMessage: Message = {
+      ...message,
+      id: Number.isFinite(message.id) ? message.id : 0,
+      userId,
+      status: 'disabled',
+      publishState: 'draft',
+      createDateTime: message.createDateTime ?? Date.now(),
+      deleteDateTime: message.deleteDateTime ?? null,
+      commentsNumber: Number.isFinite(message.commentsNumber) ? message.commentsNumber : 0
+    };
+
+    const existing = await this.loadOwnPublicMessages(userId);
+    const nextMessages = [
+      draftMessage,
+      ...existing.filter((entry) => entry.uuid !== draftMessage.uuid)
+    ];
+    await this.saveOwnPublicMessages(userId, nextMessages);
+    return draftMessage;
   }
 
   async markOwnPublicMessagesWithMissingParents(userId: string, messageUuids: string[]): Promise<void> {
@@ -535,6 +565,8 @@ export class MessageService {
       const localState = localMessage.publishState ?? this.normalizePublishState(localMessage);
       const missingState: Message['publishState'] = localState === 'local_only'
         ? 'local_only'
+        : localState === 'draft'
+          ? 'draft'
         : localState === 'parent_missing'
           ? 'parent_missing'
           : 'server_missing';

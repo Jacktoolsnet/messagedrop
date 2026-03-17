@@ -215,7 +215,8 @@ h2[mat-dialog-title].dialog-title {
 
 .publish-state-server-missing,
 .publish-state-local-only,
-.publish-state-parent-missing {
+.publish-state-parent-missing,
+.publish-state-draft {
   background: var(--mat-sys-color-on-surface, #1f1f1f);
   border-color: color-mix(in srgb, var(--mat-sys-color-on-surface, #1f1f1f) 35%, transparent);
   color: var(--mat-sys-color-surface, #ffffff);

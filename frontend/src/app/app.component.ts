@@ -1148,8 +1148,13 @@ export class AppComponent implements OnInit {
       window.history.replaceState(this.myHistory, '', '');
     });
 
-    dialogRef.afterClosed().subscribe((data: { mode: Mode, message: Message }) => {
+    dialogRef.afterClosed().subscribe((data?: { mode: Mode; message: Message; action?: 'publish' | 'draft' }) => {
       if (data) {
+        if (data.action === 'draft') {
+          void this.messageService.saveDraftMessage(data.message, this.userService.getUser());
+          this.messageService.showDraftSavedMessage();
+          return;
+        }
         this.messageService.createMessage(data.message, this.userService.getUser());
         this.updateDataForLocation();
       }

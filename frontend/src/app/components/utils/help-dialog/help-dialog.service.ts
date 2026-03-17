@@ -1138,6 +1138,11 @@ const HELP_TOPICS = {
         descriptionKey: 'editMessage.items.help.desc'
       },
       {
+        icon: 'save_as',
+        titleKey: 'editMessage.items.draft.title',
+        descriptionKey: 'editMessage.items.draft.desc'
+      },
+      {
         icon: 'send',
         titleKey: 'editMessage.items.apply.title',
         descriptionKey: 'editMessage.items.apply.desc'

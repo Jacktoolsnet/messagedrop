@@ -92,6 +92,12 @@
     </button>
 
     @if (data.message.message !== '' || data.message.multimedia.type !== 'undefined') {
+    @if (canSaveDraft) {
+    <button [attr.aria-label]="'common.message.saveDraftAria' | transloco" (click)="onSaveDraftClick()"
+        type="button" mat-icon-button>
+        <mat-icon>save_as</mat-icon>
+    </button>
+    }
     <button [attr.aria-label]="'common.message.updateAria' | transloco" (click)="onApplyClick()"
         [disabled]="hashtagCheckInProgress" mat-icon-button><mat-icon>send</mat-icon></button>
     }

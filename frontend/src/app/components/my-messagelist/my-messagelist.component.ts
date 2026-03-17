@@ -88,7 +88,8 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
     server_missing: 'common.messageList.publishState.serverMissing',
     local_only: 'common.messageList.publishState.localOnly',
     dsa_locked: 'common.messageList.publishState.dsaLocked',
-    parent_missing: 'common.messageList.publishState.parentMissing'
+    parent_missing: 'common.messageList.publishState.parentMissing',
+    draft: 'common.messageList.publishState.draft'
   };
   private static readonly PUBLISH_STATE_CLASS_SUFFIX: Record<NonNullable<Message['publishState']>, string> = {
     published: 'published',
@@ -96,7 +97,8 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
     server_missing: 'server-missing',
     local_only: 'local-only',
     dsa_locked: 'dsa-locked',
-    parent_missing: 'parent-missing'
+    parent_missing: 'parent-missing',
+    draft: 'draft'
   };
 
   private static readonly DSA_UNKNOWN = 'UNKNOWN' as const;
@@ -134,7 +136,10 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       return messages.filter((message) => this.resolvePublishState(message) === 'published');
     }
     if (filter === 'unpublished') {
-      return messages.filter((message) => this.resolvePublishState(message) === 'unpublished');
+      return messages.filter((message) => {
+        const state = this.resolvePublishState(message);
+        return state === 'unpublished' || state === 'draft';
+      });
     }
     if (filter === 'missing_online') {
       return messages.filter((message) => {
@@ -447,7 +452,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
         const selected = this.messageService.selectedMessagesSignal();
 
         const publishState = this.resolvePublishState(this.clickedMessage!);
-        if (publishState === 'server_missing' || publishState === 'local_only' || publishState === 'parent_missing') {
+        if (publishState === 'server_missing' || publishState === 'local_only' || publishState === 'parent_missing' || publishState === 'draft') {
           this.removeMessageLocally(this.clickedMessage!);
           return;
         }
@@ -511,7 +516,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
     }
 
     const publishState = this.resolvePublishState(message);
-    if (publishState === 'server_missing' || publishState === 'local_only') {
+    if (publishState === 'server_missing' || publishState === 'local_only' || publishState === 'draft') {
       this.messageService.publishMissingMessage(message, this.userService.getUser()).subscribe({
         next: (res) => {
           const moderationPatch = this.messageService.getModerationPatch(res?.moderation);
@@ -897,7 +902,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       return false;
     }
     const state = this.resolvePublishState(message);
-    return state === 'unpublished' || state === 'server_missing' || state === 'local_only';
+    return state === 'unpublished' || state === 'server_missing' || state === 'local_only' || state === 'draft';
   }
 
   public canUnpublishMessage(message: Message): boolean {
@@ -1088,8 +1093,18 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
         autoFocus: false
       });
 
-      dialogRef.afterClosed().subscribe((result?: { mode: Mode; message: Message }) => {
+      dialogRef.afterClosed().subscribe((result?: { mode: Mode; message: Message; action?: 'publish' | 'draft' }) => {
         if (result?.message) {
+          if (this.resolvePublishState(this.clickedMessage!) === 'draft') {
+            if (result.action === 'draft') {
+              void this.messageService.saveDraftMessage(result.message, this.userService.getUser())
+                .then(() => this.refreshMessagesFromBackend());
+              this.messageService.showDraftSavedMessage();
+              return;
+            }
+            this.messageService.createMessage(result.message, this.userService.getUser());
+            return;
+          }
           this.messageService.updateMessage(result.message);
         }
       });
@@ -1264,8 +1279,14 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       autoFocus: false
     });
 
-    dialogRef.afterClosed().subscribe((result?: { mode: Mode; message: Message }) => {
+    dialogRef.afterClosed().subscribe((result?: { mode: Mode; message: Message; action?: 'publish' | 'draft' }) => {
       if (result?.message) {
+        if (result.action === 'draft') {
+          void this.messageService.saveDraftMessage(result.message, this.userService.getUser())
+            .then(() => this.refreshMessagesFromBackend());
+          this.messageService.showDraftSavedMessage();
+          return;
+        }
         this.messageService.createMessage(result.message, this.userService.getUser());
       }
     });

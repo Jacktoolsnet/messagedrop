@@ -839,6 +839,10 @@
         "title": "Hilfe",
         "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
       },
+      "draft": {
+        "title": "Als Entwurf speichern",
+        "desc": "Mit dieser Funktion speicherst du die öffentliche Nachricht nur lokal als Entwurf. Sie erscheint in „Meine öffentlichen Nachrichten“ und wird erst beim späteren Veröffentlichen geprüft."
+      },
       "apply": {
         "title": "Senden",
         "desc": "Mit dieser Funktion sendest du die Nachricht oder übernimmst deine Änderungen."

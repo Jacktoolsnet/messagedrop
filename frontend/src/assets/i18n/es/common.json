@@ -301,6 +301,7 @@
       "title": "Servicio de mensajes",
       "addText": "Añadir texto",
       "updateAria": "Actualizar tu mensaje",
+      "saveDraftAria": "Guardar mensaje como borrador",
       "policy": "Esta información se almacena en nuestro servidor y es visible para todo el mundo.",
       "personalInfoBlocked": "Mi mensaje no se publicará porque parece contener información personal.",
       "moderationRejected": "El mensaje no se publicará.",
@@ -310,6 +311,7 @@
       "moderationFailed": "La moderación falló. Inténtalo de nuevo más tarde.",
       "creating": "Creando mensaje",
       "created": "Mensaje publicado correctamente.",
+      "draftSaved": "Borrador guardado.",
       "postingBlocked": "Actualmente no puedes publicar.",
       "republished": "El mensaje ya está publicado.",
       "updating": "Actualizando mensaje",
@@ -439,7 +441,8 @@
         "serverMissing": "No está en línea",
         "localOnly": "Solo local",
         "dsaLocked": "Bloqueado por DSA",
-        "parentMissing": "Falta el mensaje principal"
+        "parentMissing": "Falta el mensaje principal",
+        "draft": "Borrador"
       },
       "moderationStatus": {
         "title": "Estado de moderación",

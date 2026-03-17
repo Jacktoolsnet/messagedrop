@@ -301,6 +301,7 @@
       "title": "Message service",
       "addText": "Add a text",
       "updateAria": "Update your message",
+      "saveDraftAria": "Save message as draft",
       "policy": "This information is stored on our server and is visible to everyone.",
       "personalInfoBlocked": "My message will not be published because it appears to contain personal information.",
       "moderationRejected": "The message will not be published.",
@@ -310,6 +311,7 @@
       "moderationFailed": "Moderation failed. Please try again later.",
       "creating": "Creating message",
       "created": "Message successfully dropped.",
+      "draftSaved": "Draft saved.",
       "postingBlocked": "You are currently blocked from publishing.",
       "republished": "Message is now published.",
       "updating": "Updating message",
@@ -439,7 +441,8 @@
         "serverMissing": "Missing online",
         "localOnly": "Local only",
         "dsaLocked": "DSA locked",
-        "parentMissing": "Parent message missing"
+        "parentMissing": "Parent message missing",
+        "draft": "Draft"
       },
       "moderationStatus": {
         "title": "Moderation status",

@@ -839,6 +839,10 @@
         "title": "Aide",
         "desc": "Cette fonction ouvre cette vue d'aide."
       },
+      "draft": {
+        "title": "Enregistrer comme brouillon",
+        "desc": "Cette fonction enregistre le message public uniquement localement comme brouillon. Il apparaît dans « Mes messages publics » et n’est vérifié qu’au moment de sa publication."
+      },
       "apply": {
         "title": "Envoyer",
         "desc": "Cette fonction envoie le message ou applique vos modifications."

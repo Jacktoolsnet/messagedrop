@@ -43,6 +43,8 @@ interface DialogHeaderConfig {
   labelKey: string;
 }
 
+type EditMessageAction = 'publish' | 'draft';
+
 @Component({
   selector: 'app-message',
   imports: [
@@ -83,6 +85,8 @@ export class EditMessageComponent implements OnInit {
   readonly mode = Mode;
   readonly isLocationEditable = this.data.mode === Mode.ADD_PUBLIC_MESSAGE
     || this.data.mode === Mode.EDIT_PUBLIC_MESSAGE;
+  readonly canSaveDraft = this.data.mode === Mode.ADD_PUBLIC_MESSAGE
+    || (this.data.mode === Mode.EDIT_PUBLIC_MESSAGE && this.data.message.publishState === 'draft');
   @ViewChild(MatAutocompleteTrigger) hashtagAutocompleteTrigger?: MatAutocompleteTrigger;
   @ViewChild('hashtagInputElement') hashtagInputElement?: ElementRef<HTMLInputElement>;
 
@@ -118,20 +122,30 @@ export class EditMessageComponent implements OnInit {
   }
 
   async onApplyClick(): Promise<void> {
-    if (!(await this.addHashtagsFromInput(true))) {
+    if (!(await this.prepareMessageForClose('publish'))) {
       return;
     }
-    if (!(await this.moderateHashtags(this.hashtagTags, true))) {
+    this.dialogRef.close({
+      ...this.data,
+      action: 'publish' as const
+    });
+  }
+
+  async onSaveDraftClick(): Promise<void> {
+    if (!(await this.prepareMessageForClose('draft'))) {
       return;
     }
-    if (this.containsPrivateData(this.hashtagTags)) {
-      this.showHashtagValidationError(
-        'common.message.moderationRejectedPattern',
-        'common.moderation.title',
-        'block'
-      );
-      return;
+    this.dialogRef.close({
+      ...this.data,
+      action: 'draft' as const
+    });
+  }
+
+  private async prepareMessageForClose(action: EditMessageAction): Promise<boolean> {
+    if (!(await this.addHashtagsFromInput(true, undefined, action === 'publish'))) {
+      return false;
     }
+
     const hashtagParse = normalizeHashtags(this.hashtagTags, MAX_PUBLIC_HASHTAGS);
     if (hashtagParse.invalidTokens.length > 0 || hashtagParse.overflow > 0) {
       this.showHashtagValidationError(
@@ -139,8 +153,23 @@ export class EditMessageComponent implements OnInit {
         'common.hashtags.label',
         'warning'
       );
-      return;
+      return false;
     }
+
+    if (action === 'publish') {
+      if (!(await this.moderateHashtags(this.hashtagTags, true))) {
+        return false;
+      }
+      if (this.containsPrivateData(this.hashtagTags)) {
+        this.showHashtagValidationError(
+          'common.message.moderationRejectedPattern',
+          'common.moderation.title',
+          'block'
+        );
+        return false;
+      }
+    }
+
     this.data.message.hashtags = hashtagParse.tags;
     this.hashtagTags = [...hashtagParse.tags];
     this.hashtagSuggestionService.remember(this.hashtagTags);
@@ -153,13 +182,16 @@ export class EditMessageComponent implements OnInit {
       case 'edit_comment':
         this.data.message.userId = this.userService.getUser().id;
         this.data.message.message = this.data.message.message ?? '';
-        this.dialogRef.close(this.data);
-        break;
+        if (action === 'draft') {
+          this.data.message.publishState = 'draft';
+          this.data.message.status = 'disabled';
+        }
+        return true;
       default:
         this.data.message.userId = this.userService.getUser().id;
-        this.dialogRef.close();
-        break;
+        return true;
     }
+    return true;
   }
 
   onAbortClick(): void {
@@ -199,7 +231,7 @@ export class EditMessageComponent implements OnInit {
     }
   }
 
-  async addHashtagsFromInput(showErrors = true, candidateOverride?: string): Promise<boolean> {
+  async addHashtagsFromInput(showErrors = true, candidateOverride?: string, moderate = true): Promise<boolean> {
     if (this.hashtagCheckInProgress) {
       return false;
     }
@@ -207,7 +239,7 @@ export class EditMessageComponent implements OnInit {
     if (!candidate) {
       return true;
     }
-    if (this.containsPrivateData(candidate)) {
+    if (moderate && this.containsPrivateData(candidate)) {
       if (showErrors) {
         this.showHashtagValidationError(
           'common.message.moderationRejectedPattern',
@@ -241,7 +273,7 @@ export class EditMessageComponent implements OnInit {
       return false;
     }
 
-    if (this.containsPrivateData(merged.tags)) {
+    if (moderate && this.containsPrivateData(merged.tags)) {
       if (showErrors) {
         this.showHashtagValidationError(
           'common.message.moderationRejectedPattern',
@@ -252,7 +284,7 @@ export class EditMessageComponent implements OnInit {
       return false;
     }
 
-    if (!(await this.moderateHashtags(merged.tags, showErrors))) {
+    if (moderate && !(await this.moderateHashtags(merged.tags, showErrors))) {
       return false;
     }
 

@@ -839,6 +839,10 @@
         "title": "Help",
         "desc": "This action opens this help view."
       },
+      "draft": {
+        "title": "Save as draft",
+        "desc": "This action stores the public message locally as a draft only. It appears in “My Public Messages” and is checked only when you publish it later."
+      },
       "apply": {
         "title": "Send",
         "desc": "This action sends the message or applies your edits."

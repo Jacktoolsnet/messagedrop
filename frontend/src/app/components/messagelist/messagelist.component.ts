@@ -439,7 +439,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
     }
 
     const publishState = this.resolvePublishState(message);
-    if (publishState === 'server_missing' || publishState === 'local_only') {
+    if (publishState === 'server_missing' || publishState === 'local_only' || publishState === 'draft') {
       this.messageService.publishMissingMessage(message, this.userService.getUser()).subscribe({
         next: (res) => {
           const moderationPatch = this.messageService.getModerationPatch(res?.moderation);
@@ -815,7 +815,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
       return false;
     }
     const state = this.resolvePublishState(message);
-    return state === 'unpublished' || state === 'server_missing' || state === 'local_only';
+    return state === 'unpublished' || state === 'server_missing' || state === 'local_only' || state === 'draft';
   }
 
   public canUnpublishMessage(message: Message): boolean {
@@ -1204,8 +1204,13 @@ export class MessagelistComponent implements OnInit, OnDestroy {
       autoFocus: false
     });
 
-    dialogRef.afterClosed().subscribe((result?: { mode: Mode; message: Message }) => {
+    dialogRef.afterClosed().subscribe((result?: { mode: Mode; message: Message; action?: 'publish' | 'draft' }) => {
       if (result?.message) {
+        if (result.action === 'draft') {
+          void this.messageService.saveDraftMessage(result.message, this.userService.getUser());
+          this.messageService.showDraftSavedMessage();
+          return;
+        }
         this.prependScopedMessageUuid(result.message.uuid);
         this.messageService.createMessage(result.message, this.userService.getUser());
       }

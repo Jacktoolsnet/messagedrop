@@ -839,6 +839,10 @@
         "title": "Ayuda",
         "desc": "Con esta función abres esta vista de ayuda."
       },
+      "draft": {
+        "title": "Guardar como borrador",
+        "desc": "Con esta función guardas el mensaje público solo localmente como borrador. Aparece en «Mis mensajes públicos» y solo se revisa cuando lo publiques más tarde."
+      },
       "apply": {
         "title": "Enviar",
         "desc": "Con esta función envías el mensaje o aplicas tus cambios."

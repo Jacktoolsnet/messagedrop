@@ -301,6 +301,7 @@
       "title": "Nachrichten-Dienst",
       "addText": "Text hinzufügen",
       "updateAria": "Nachricht aktualisieren",
+      "saveDraftAria": "Nachricht als Entwurf speichern",
       "policy": "Diese Information wird auf unserem Server gespeichert und ist für alle sichtbar.",
       "personalInfoBlocked": "Meine Nachricht wird nicht veröffentlicht, da sie offenbar persönliche Informationen enthält.",
       "moderationRejected": "Die Nachricht wird nicht veröffentlicht.",
@@ -310,6 +311,7 @@
       "moderationFailed": "Moderation fehlgeschlagen. Bitte später erneut versuchen.",
       "creating": "Nachricht wird erstellt",
       "created": "Nachricht erfolgreich gesendet.",
+      "draftSaved": "Entwurf gespeichert.",
       "postingBlocked": "Du bist derzeit für das Veröffentlichen gesperrt.",
       "republished": "Die Nachricht ist jetzt veröffentlicht.",
       "updating": "Nachricht wird aktualisiert",
@@ -439,7 +441,8 @@
         "serverMissing": "Online nicht vorhanden",
         "localOnly": "Nur lokal",
         "dsaLocked": "DSA gesperrt",
-        "parentMissing": "Übergeordnete Nachricht fehlt"
+        "parentMissing": "Übergeordnete Nachricht fehlt",
+        "draft": "Entwurf"
       },
       "moderationStatus": {
         "title": "Moderationsstatus",
