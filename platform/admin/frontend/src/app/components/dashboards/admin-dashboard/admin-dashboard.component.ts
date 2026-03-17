@@ -34,6 +34,23 @@ export class AdminDashboardComponent implements OnInit {
 
   readonly username = this.authService.username;
   readonly role = this.authService.role;
+  readonly roleLabel = computed(() => {
+    switch (this.role()) {
+      case 'root':
+        return 'Root';
+      case 'admin':
+        return 'Admin';
+      case 'legal':
+        return 'Legal';
+      case 'editor':
+        return 'Editor';
+      case 'author':
+        return 'Author';
+      case 'moderator':
+      default:
+        return 'Moderator';
+    }
+  });
   readonly canAccessUsers = computed(() => hasAllowedRole(this.role(), USER_MODULE_ROLES));
   readonly canManageMaintenance = computed(() => hasAllowedRole(this.role(), ROOT_ADMIN_ROLES));
   readonly canManageContent = computed(() => hasAllowedRole(this.role(), CONTENT_MODULE_ROLES));

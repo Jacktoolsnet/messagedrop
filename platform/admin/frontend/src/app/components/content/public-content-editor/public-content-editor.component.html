@@ -16,9 +16,20 @@
       aria-label="Save draft">
       <mat-icon>save</mat-icon>
     </button>
-  }
 
-  <span>{{ username() }} ({{ role() }})</span>
+    @if (canPublish()) {
+      <button
+        mat-icon-button
+        type="button"
+        color="primary"
+        class="toolbar-action"
+        (click)="saveAndPublish()"
+        [disabled]="saving()"
+        aria-label="Publish message">
+        <mat-icon>publish</mat-icon>
+      </button>
+    }
+  }
 </mat-toolbar>
 
 @if (loading() || saving()) {
@@ -298,13 +309,6 @@
         <mat-icon>unpublished</mat-icon>
         Withdraw
       </button>
-    } @else if (!isDeleted()) {
-      @if (canPublish()) {
-        <button mat-flat-button type="button" color="primary" (click)="saveAndPublish()" [disabled]="saving()">
-          <mat-icon>publish</mat-icon>
-          Publish
-        </button>
-      }
     }
   </div>
 </div>

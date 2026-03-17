@@ -1,85 +1,128 @@
 import { Injectable } from '@angular/core';
 
+export interface ContentStyleOption {
+  fontFamily: string;
+  style: string;
+}
+
+const CONTENT_FONT_FAMILIES = [
+  'DancingScript',
+  'Pacifico',
+  'Caveat',
+  'HachiMaruPop',
+  'Miniver',
+  'CraftyGirls',
+  'SedgwickAveDisplay',
+  'OvertheRainbow',
+  'LoveYaLikeASister',
+  'SedgwickAve',
+  'MrDafoe',
+  'GochiHand',
+  'RockSalt',
+  'GloriaHallelujah',
+  'KaushanScript',
+  'LuckiestGuy',
+  'Zeyada',
+  'Kalam',
+  'Yellowtail',
+  'IndieFlower',
+  'PermanentMarker',
+  'Satisfy',
+  'ShadowsIntoLight',
+  'AbrilFatface',
+  'Almendra',
+  'AmaticSC',
+  'Anton',
+  'Audiowide',
+  'Bangers',
+  'BebasNeue',
+  'BlackOpsOne',
+  'BriemHand',
+  'BungeeShade',
+  'BungeeSpice',
+  'Cinzel',
+  'Creepster',
+  'FjallaOne',
+  'FrederickatheGreat',
+  'Jaro',
+  'Jersey10',
+  'Jersey15',
+  'Jersey25',
+  'JosefinSans',
+  'Knewave',
+  'Lemon',
+  'LilitaOne',
+  'MadimiOne',
+  'Micro5Charted',
+  'Micro5',
+  'Monoton',
+  'Montserrat',
+  'Nosifer',
+  'Orbitron',
+  'Oswald',
+  'PlayfairDisplay',
+  'PoetsenOne',
+  'RubikMonoOne',
+  'RubikMoonrocks',
+  'RubikScribble',
+  'SedanSC',
+  'Sixtyfour',
+  'SpecialElite',
+  'UbuntuSansMono',
+  'Allura',
+  'Cookie'
+] as const;
+
+const DEFAULT_FONT_SIZE = '1.75rem';
+
 @Injectable({
   providedIn: 'root'
 })
 export class ContentStyleService {
-  private getRandomNumber(from: number, to: number): number {
-    return Math.floor(Math.random() * (to + 1)) + from;
-  }
+  readonly styleOptions: readonly ContentStyleOption[] = CONTENT_FONT_FAMILIES.map((fontFamily) => ({
+    fontFamily,
+    style: this.buildStyle(fontFamily)
+  }));
 
-  getRandomFontFamily(): string {
-    switch (this.getRandomNumber(1, 65)) {
-      case 1: return 'font-family: "DancingScript";';
-      case 2: return 'font-family: "Pacifico";';
-      case 3: return 'font-family: "Caveat";';
-      case 4: return 'font-family: "HachiMaruPop";';
-      case 5: return 'font-family: "Miniver";';
-      case 6: return 'font-family: "CraftyGirls";';
-      case 7: return 'font-family: "SedgwickAveDisplay";';
-      case 8: return 'font-family: "OvertheRainbow";';
-      case 9: return 'font-family: "LoveYaLikeASister";';
-      case 10: return 'font-family: "SedgwickAve";';
-      case 11: return 'font-family: "MrDafoe";';
-      case 12: return 'font-family: "GochiHand";';
-      case 13: return 'font-family: "RockSalt";';
-      case 14: return 'font-family: "GloriaHallelujah";';
-      case 15: return 'font-family: "KaushanScript";';
-      case 16: return 'font-family: "LuckiestGuy";';
-      case 17: return 'font-family: "Zeyada";';
-      case 18: return 'font-family: "Kalam";';
-      case 19: return 'font-family: "Yellowtail";';
-      case 20: return 'font-family: "IndieFlower";';
-      case 21: return 'font-family: "PermanentMarker";';
-      case 22: return 'font-family: "Satisfy";';
-      case 23: return 'font-family: "ShadowsIntoLight";';
-      case 24: return 'font-family: "AbrilFatface";';
-      case 25: return 'font-family: "Almendra";';
-      case 26: return 'font-family: "AmaticSC";';
-      case 27: return 'font-family: "Anton";';
-      case 28: return 'font-family: "Audiowide";';
-      case 29: return 'font-family: "Bangers";';
-      case 30: return 'font-family: "BebasNeue";';
-      case 31: return 'font-family: "BlackOpsOne";';
-      case 32: return 'font-family: "BriemHand";';
-      case 33: return 'font-family: "BungeeShade";';
-      case 34: return 'font-family: "BungeeSpice";';
-      case 35: return 'font-family: "Cinzel";';
-      case 36: return 'font-family: "Creepster";';
-      case 37: return 'font-family: "FjallaOne";';
-      case 38: return 'font-family: "FrederickatheGreat";';
-      case 39: return 'font-family: "Jaro";';
-      case 40: return 'font-family: "Jersey10";';
-      case 41: return 'font-family: "Jersey15";';
-      case 42: return 'font-family: "Jersey25";';
-      case 43: return 'font-family: "JosefinSans";';
-      case 44: return 'font-family: "Knewave";';
-      case 45: return 'font-family: "Lemon";';
-      case 46: return 'font-family: "LilitaOne";';
-      case 47: return 'font-family: "MadimiOne";';
-      case 48: return 'font-family: "Micro5Charted";';
-      case 49: return 'font-family: "Micro5";';
-      case 50: return 'font-family: "Monoton";';
-      case 51: return 'font-family: "Montserrat";';
-      case 52: return 'font-family: "Nosifer";';
-      case 53: return 'font-family: "Orbitron";';
-      case 54: return 'font-family: "Oswald";';
-      case 55: return 'font-family: "PlayfairDisplay";';
-      case 56: return 'font-family: "PoetsenOne";';
-      case 57: return 'font-family: "RubikMonoOne";';
-      case 58: return 'font-family: "RubikMoonrocks";';
-      case 59: return 'font-family: "RubikScribble";';
-      case 60: return 'font-family: "SedanSC";';
-      case 61: return 'font-family: "Sixtyfour";';
-      case 62: return 'font-family: "SpecialElite";';
-      case 63: return 'font-family: "UbuntuSansMono";';
-      case 64: return 'font-family: "Allura";';
-      case 65: return 'font-family: "Cookie";';
-      default: return 'font-family: "LuckiestGuy";';
-    }
+  getStyleOptions(): readonly ContentStyleOption[] {
+    return this.styleOptions;
   }
 
   getRandomStyle(): string {
-    return `${this.getRandomFontFamily()} font-size: 1.75rem;`;
+    const options = this.styleOptions;
+    const randomIndex = Math.floor(Math.random() * options.length);
+    return options[randomIndex]?.style ?? this.buildStyle('LuckiestGuy');
+  }
+
+  findOptionByStyle(style: string | null | undefined): ContentStyleOption | null {
+    const normalized = this.normalizeStyle(style);
+    if (!normalized) {
+      return null;
+    }
+    return this.styleOptions.find((option) => option.style === normalized) ?? null;
+  }
+
+  normalizeStyle(style: string | null | undefined): string {
+    const fontFamily = this.extractFontFamily(style);
+    if (!fontFamily) {
+      return '';
+    }
+
+    const matchingOption = this.styleOptions.find((option) => option.fontFamily === fontFamily);
+    return matchingOption?.style ?? '';
+  }
+
+  private buildStyle(fontFamily: string): string {
+    return `font-family: "${fontFamily}"; font-size: ${DEFAULT_FONT_SIZE};`;
+  }
+
+  private extractFontFamily(style: string | null | undefined): string | null {
+    if (typeof style !== 'string' || !style.trim()) {
+      return null;
+    }
+
+    const match = style.match(/font-family:\s*["']?([^;"']+)["']?/i);
+    const fontFamily = match?.[1]?.trim();
+    return fontFamily || null;
   }
 }

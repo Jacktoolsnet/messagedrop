@@ -25,19 +25,131 @@ mat-toolbar {
     position: sticky;
     top: 0;
     z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: .75rem;
     backdrop-filter: blur(8px);
     background: rgba(255, 255, 255, 0.90);
     color: #1f2937;
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
     border-bottom: 1px solid var(--border);
     font-family: 'Roboto', system-ui, -apple-system, Segoe UI, Arial, sans-serif;
+}
 
-    .toolbar-title {
-        margin-inline: auto;
-        font-size: 1.5rem;
-        font-weight: 600;
-        letter-spacing: .2px;
-    }
+.toolbar-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: .2px;
+    text-align: center;
+}
+
+.session-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .55rem;
+    height: 40px;
+    padding: 0 .4rem 0 .3rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.74);
+    box-shadow: 0 10px 24px rgba(2, 8, 20, 0.10);
+    max-width: min(46vw, 380px);
+    box-sizing: border-box;
+}
+
+.session-item {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    min-width: 0;
+}
+
+.session-icon {
+    color: var(--muted);
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    line-height: 18px;
+    font-size: 18px;
+}
+
+.session-divider {
+    width: 1px;
+    height: 20px;
+    background: color-mix(in srgb, var(--border) 90%, white);
+}
+
+.session-avatar mat-icon,
+.session-icon {
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
+    font-size: 18px;
+}
+
+.session-user {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 700;
+    font-size: .9rem;
+    color: var(--text);
+}
+
+.role-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 24px;
+    padding: 0 .6rem;
+    border-radius: 999px;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+    border: 1px solid transparent;
+    text-transform: capitalize;
+    background: color-mix(in srgb, var(--primary) 14%, white);
+    color: color-mix(in srgb, var(--primary) 85%, #1f2937);
+    border-color: color-mix(in srgb, var(--primary) 20%, transparent);
+}
+
+.role-root {
+    background: color-mix(in srgb, #f59e0b 16%, white);
+    color: #92400e;
+    border-color: color-mix(in srgb, #f59e0b 22%, transparent);
+}
+
+.role-admin {
+    background: color-mix(in srgb, #3b82f6 14%, white);
+    color: #1d4ed8;
+    border-color: color-mix(in srgb, #3b82f6 20%, transparent);
+}
+
+.role-legal {
+    background: color-mix(in srgb, #8b5cf6 14%, white);
+    color: #6d28d9;
+    border-color: color-mix(in srgb, #8b5cf6 20%, transparent);
+}
+
+.role-editor {
+    background: color-mix(in srgb, #0284c7 14%, white);
+    color: #075985;
+    border-color: color-mix(in srgb, #0284c7 20%, transparent);
+}
+
+.role-author {
+    background: color-mix(in srgb, #0f766e 14%, white);
+    color: #115e59;
+    border-color: color-mix(in srgb, #0f766e 20%, transparent);
+}
+
+.role-moderator {
+    background: color-mix(in srgb, var(--primary) 14%, white);
+    color: #047857;
+    border-color: color-mix(in srgb, var(--primary) 22%, transparent);
 }
 
 /* ==== Page Container ==== */
@@ -264,6 +376,47 @@ button:focus-visible {
     height: 16px;
     margin-bottom: 8px;
     filter: blur(6px);
+}
+
+@media (max-width: 840px) {
+    .session-chip {
+        max-width: 50vw;
+    }
+}
+
+@media (max-width: 640px) {
+    mat-toolbar {
+        gap: .5rem;
+    }
+
+    .toolbar-title {
+        font-size: 1.2rem;
+        text-align: left;
+    }
+
+    .session-chip {
+        height: 36px;
+        padding: 0 .32rem 0 .24rem;
+        max-width: 58vw;
+    }
+
+    .session-icon {
+        width: 16px;
+        height: 16px;
+        min-width: 16px;
+        line-height: 16px;
+        font-size: 16px;
+    }
+
+    .session-divider {
+        height: 18px;
+    }
+
+    .role-pill {
+        min-height: 22px;
+        padding: 0 .5rem;
+        font-size: .7rem;
+    }
 }
 
 /* Motion-Respect */

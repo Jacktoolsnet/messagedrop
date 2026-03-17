@@ -72,7 +72,6 @@ export class PublicContentEditorComponent {
   private readonly publicContentService = inject(PublicContentService);
   private readonly styleService = inject(ContentStyleService);
 
-  readonly username = this.authService.username;
   readonly role = this.authService.role;
 
   readonly loading = signal(false);

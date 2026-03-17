@@ -8,6 +8,46 @@
     <span class="toolbar-title">
         Dashboard
     </span>
+
+    @if (username() || role()) {
+    <div class="session-chip" [attr.aria-label]="'Logged in as ' + (username() || 'User') + ' with role ' + roleLabel()">
+        <div class="session-item">
+            <mat-icon class="session-icon">person</mat-icon>
+            <span class="session-user">{{ username() || 'User' }}</span>
+        </div>
+
+        <div class="session-divider" aria-hidden="true"></div>
+
+        <div class="session-item">
+            @switch (role()) {
+            @case ('root') {
+            <mat-icon class="session-icon">workspace_premium</mat-icon>
+            }
+            @case ('admin') {
+            <mat-icon class="session-icon">admin_panel_settings</mat-icon>
+            }
+            @case ('legal') {
+            <mat-icon class="session-icon">gavel</mat-icon>
+            }
+            @case ('editor') {
+            <mat-icon class="session-icon">newspaper</mat-icon>
+            }
+            @case ('author') {
+            <mat-icon class="session-icon">edit_note</mat-icon>
+            }
+            @default {
+            <mat-icon class="session-icon">verified_user</mat-icon>
+            }
+            }
+
+            <span class="role-pill" [class.role-root]="role() === 'root'" [class.role-admin]="role() === 'admin'"
+                [class.role-legal]="role() === 'legal'" [class.role-editor]="role() === 'editor'"
+                [class.role-author]="role() === 'author'" [class.role-moderator]="role() === 'moderator'">
+                {{ roleLabel() }}
+            </span>
+        </div>
+    </div>
+    }
 </mat-toolbar>
 
 <div class="page">

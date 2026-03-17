@@ -49,7 +49,6 @@ export class PublicContentListComponent {
   private readonly authService = inject(AuthService);
   private readonly publicContentService = inject(PublicContentService);
 
-  readonly username = this.authService.username;
   readonly role = this.authService.role;
   readonly rows = this.publicContentService.rows;
   readonly loading = this.publicContentService.loading;
