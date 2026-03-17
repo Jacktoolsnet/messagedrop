@@ -4,7 +4,7 @@ const tableName = 'tableUser';
 // === Spalten definieren ===
 const columnId = 'id';                // TEXT PK (uuid) -> extern erzeugt
 const columnUsername = 'username';    // TEXT UNIQUE NOT NULL
-const columnEmail = 'email';          // TEXT UNIQUE NOT NULL
+const columnEmail = 'email';          // TEXT NOT NULL
 const columnPassword = 'password';    // TEXT NOT NULL (bcrypt-Hash)
 const columnRole = 'role';            // TEXT NOT NULL ('root', 'admin', 'moderator', ...)
 const columnPublicBackendUserId = 'publicBackendUserId'; // TEXT NULL (mapped public backend user id)
@@ -17,7 +17,7 @@ const init = function (db) {
       CREATE TABLE IF NOT EXISTS ${tableName} (
         ${columnId} TEXT PRIMARY KEY NOT NULL,
         ${columnUsername} TEXT UNIQUE NOT NULL,
-        ${columnEmail} TEXT UNIQUE NOT NULL,
+        ${columnEmail} TEXT NOT NULL,
         ${columnPassword} TEXT NOT NULL,
         ${columnRole} TEXT NOT NULL DEFAULT 'moderator',
         ${columnPublicBackendUserId} TEXT DEFAULT NULL,
@@ -29,8 +29,6 @@ const init = function (db) {
         ON ${tableName}(${columnRole});
       CREATE INDEX IF NOT EXISTS idx_user_public_backend
         ON ${tableName}(${columnPublicBackendUserId});
-      CREATE UNIQUE INDEX IF NOT EXISTS idx_user_email
-        ON ${tableName}(${columnEmail});
       CREATE INDEX IF NOT EXISTS idx_user_createdAt_desc
         ON ${tableName}(${columnCreatedAt} DESC);
     `;
@@ -43,10 +41,7 @@ const init = function (db) {
             if (pragmaErr || !Array.isArray(rows)) return;
             const hasEmailColumn = rows.some((row) => row?.name === columnEmail);
             if (hasEmailColumn) {
-                db.run(`
-                  CREATE UNIQUE INDEX IF NOT EXISTS idx_user_email
-                    ON ${tableName}(${columnEmail})
-                `, []);
+                db.run(`DROP INDEX IF EXISTS idx_user_email`, []);
                 return;
             }
             db.run(`
@@ -54,10 +49,7 @@ const init = function (db) {
               ADD COLUMN ${columnEmail} TEXT
             `, [], (alterErr) => {
                 if (alterErr) return;
-                db.run(`
-                  CREATE UNIQUE INDEX IF NOT EXISTS idx_user_email
-                    ON ${tableName}(${columnEmail})
-                `, []);
+                db.run(`DROP INDEX IF EXISTS idx_user_email`, []);
             });
         });
 

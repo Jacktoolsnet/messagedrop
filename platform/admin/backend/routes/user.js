@@ -181,14 +181,35 @@ function createOtpDeliveryError(message, detail) {
     return err;
 }
 
-async function sendOtp(username, email, otp, logger) {
+function formatRoleLabel(role) {
+    switch (String(role || '').trim().toLowerCase()) {
+        case 'root':
+            return 'Root';
+        case 'admin':
+            return 'Admin';
+        case 'author':
+            return 'Author';
+        case 'editor':
+            return 'Editor';
+        case 'moderator':
+            return 'Moderator';
+        case 'legal':
+            return 'Legal';
+        default:
+            return String(role || 'User').trim() || 'User';
+    }
+}
+
+async function sendOtp({ username, email, role, otp, logger }) {
     const validMinutes = Math.round(OTP_TTL_MS / 60000);
-    const title = 'Messagedrop Admin Login OTP';
+    const roleLabel = formatRoleLabel(role);
+    const title = `Messagedrop ${roleLabel} Login OTP`;
     const normalizedEmail = normalizeEmail(email);
-    const text = `Code: ${otp}\nUser: ${username}\nE-Mail: ${normalizedEmail || '-'}\nGültig für ${validMinutes} Minuten.`;
+    const text = `Code: ${otp}\nUser: ${username}\nRole: ${roleLabel}\nE-Mail: ${normalizedEmail || '-'}\nGültig für ${validMinutes} Minuten.`;
     const html = `
       <p>Hallo ${username},</p>
-      <p>dein Messagedrop Admin Login-Code lautet: <strong>${otp}</strong></p>
+      <p>dein Messagedrop ${roleLabel} Login-Code lautet: <strong>${otp}</strong></p>
+      <p>Benutzername: <strong>${username}</strong><br>Rolle: <strong>${roleLabel}</strong></p>
       <p>Der Code ist ${validMinutes} Minuten gültig.</p>
       <p>Falls du den Login nicht angefordert hast, melde dich bitte sofort beim Root-Admin.</p>
     `;
@@ -280,7 +301,13 @@ function createChallenge(db, username, email, payload, logger) {
                         return reject(err);
                     }
                     try {
-                        await sendOtp(username, email, otp, logger);
+                        await sendOtp({
+                            username,
+                            email,
+                            role: payload?.role,
+                            otp,
+                            logger
+                        });
                         resolve({ id, expiresAt });
                     } catch (deliveryError) {
                         tableLoginOtp.deleteByUsername(db, username, () => reject(deliveryError));
@@ -832,9 +859,6 @@ router.post('/', requireRole('admin', 'root'), async (req, res, next) => {
         if (err) {
             const msg = String(err.message || '');
             if (err.code === 'SQLITE_CONSTRAINT' || msg.includes('UNIQUE')) {
-                if (msg.toLowerCase().includes('email')) {
-                    return next(apiError.conflict('E-mail already exists'));
-                }
                 return next(apiError.conflict('Username already exists'));
             }
             return next(apiError.internal('Could not create user'));
@@ -916,9 +940,6 @@ router.put('/:id', async (req, res, next) => {
             if (e) {
                 const msg = String(e.message || '');
                 if (e.code === 'SQLITE_CONSTRAINT' || msg.includes('UNIQUE')) {
-                    if (msg.toLowerCase().includes('email')) {
-                        return next(apiError.conflict('E-mail already exists'));
-                    }
                     return next(apiError.conflict('Username already exists'));
                 }
                 return next(apiError.internal('Update failed'));
