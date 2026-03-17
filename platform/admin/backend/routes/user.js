@@ -868,7 +868,7 @@ router.post('/', requireRole('admin', 'root'), async (req, res, next) => {
 });
 
 // ======================= PUT /user/:id =======================
-// admin/root: username/role/password; normaler User: nur eigenes password
+// admin/root: username/e-mail/role/password; normaler User: eigenes password und eigene e-mail
 router.put('/:id', async (req, res, next) => {
     const db = req.database?.db;
     if (!db) return next(apiError.internal('database_unavailable'));
@@ -894,10 +894,10 @@ router.put('/:id', async (req, res, next) => {
         if (!target) return next(apiError.notFound('User not found'));
 
         if (!isAdminRoot) {
-            // normaler User: nur eigenes Passwort
+            // normaler User: nur eigenes Passwort und eigene E-Mail
             if (!isSelf) return next(apiError.forbidden('You cannot update other users'));
-            if (username || role || hasEmailField) return next(apiError.forbidden('You cannot change username, e-mail or role'));
-            if (!password) return next(apiError.badRequest('Nothing to update'));
+            if (username || role) return next(apiError.forbidden('You cannot change username or role'));
+            if (!password && !hasEmailField) return next(apiError.badRequest('Nothing to update'));
         }
 
         const fields = {};
@@ -907,7 +907,7 @@ router.put('/:id', async (req, res, next) => {
             fields.username = username;
         }
 
-        if (isAdminRoot && hasEmailField) {
+        if ((isAdminRoot || isSelf) && hasEmailField) {
             if (!isValidEmail(email)) return next(apiError.badRequest('Invalid e-mail address'));
             if (email !== target.email) {
                 fields.email = email;

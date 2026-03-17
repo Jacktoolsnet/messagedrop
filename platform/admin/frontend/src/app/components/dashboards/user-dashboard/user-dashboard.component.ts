@@ -106,12 +106,13 @@ export class UserDashboardComponent {
 
   openEditUserDialog(user: User) {
     const isAdminOrRoot = this.isAdminOrRoot();
+    const isSelf = this.isSelf(user);
     const data: EditUserData = {
       user,
       canChangeUsername: isAdminOrRoot,
-      canChangeEmail: isAdminOrRoot,
+      canChangeEmail: isAdminOrRoot || isSelf,
       canChangeRole: isAdminOrRoot,
-      isSelf: this.isSelf(user)
+      isSelf
     };
     const ref = this.dialog.open(EditUserComponent, { data });
     ref.afterClosed().subscribe((updated) => {
