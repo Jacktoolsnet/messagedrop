@@ -1,0 +1,534 @@
+import { CommonModule, DatePipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatDialog } from '@angular/material/dialog';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { finalize } from 'rxjs';
+import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
+import { Multimedia } from '../../../interfaces/multimedia.interface';
+import { PublicContentSavePayload } from '../../../interfaces/public-content-save-payload.interface';
+import { PublicContent } from '../../../interfaces/public-content.interface';
+import { TenorApiResponse, TenorResult } from '../../../interfaces/tenor-response.interface';
+import { AuthService } from '../../../services/auth/auth.service';
+import { ContentStyleService } from '../../../services/content/content-style.service';
+import { PublicContentService } from '../../../services/content/public-content.service';
+import { MAX_PUBLIC_HASHTAGS, normalizeHashtags } from '../../../utils/hashtag.util';
+
+const EMPTY_MULTIMEDIA: Multimedia = {
+  type: 'undefined',
+  url: '',
+  sourceUrl: '',
+  attribution: '',
+  title: '',
+  description: '',
+  contentId: '',
+  oembed: null
+};
+
+@Component({
+  selector: 'app-public-content-editor',
+  imports: [
+    CommonModule,
+    DatePipe,
+    RouterLink,
+    ReactiveFormsModule,
+    MatToolbarModule,
+    MatIconModule,
+    MatButtonModule,
+    MatCardModule,
+    MatDividerModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatChipsModule,
+    MatProgressBarModule
+  ],
+  templateUrl: './public-content-editor.component.html',
+  styleUrls: ['./public-content-editor.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class PublicContentEditorComponent {
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly fb = inject(FormBuilder);
+  private readonly dialog = inject(MatDialog);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly sanitizer = inject(DomSanitizer);
+  private readonly authService = inject(AuthService);
+  private readonly publicContentService = inject(PublicContentService);
+  private readonly styleService = inject(ContentStyleService);
+
+  readonly username = this.authService.username;
+  readonly role = this.authService.role;
+
+  readonly loading = signal(false);
+  readonly saving = signal(false);
+  readonly mediaLoading = signal(false);
+  readonly tenorLoading = signal(false);
+  readonly currentContent = signal<PublicContent | null>(null);
+  readonly multimedia = signal<Multimedia>({ ...EMPTY_MULTIMEDIA });
+  readonly hashtags = signal<string[]>([]);
+  readonly tenorResults = signal<TenorResult[]>([]);
+  readonly tenorNext = signal('');
+  readonly lastTenorSearch = signal('');
+
+  readonly isEditMode = computed(() => this.currentContent() !== null);
+  readonly isPublished = computed(() => this.currentContent()?.status === 'published');
+  readonly isDeleted = computed(() => this.currentContent()?.status === 'deleted');
+  readonly canPublish = computed(() => ['editor', 'admin', 'root'].includes(this.role() ?? ''));
+  readonly hasMedia = computed(() => this.multimedia().type !== 'undefined');
+  readonly safeOembedHtml = computed<SafeHtml | null>(() => {
+    const html = this.multimedia().oembed?.html;
+    return html ? this.sanitizer.bypassSecurityTrustHtml(html) : null;
+  });
+  readonly pageTitle = computed(() => this.isEditMode() ? 'Edit public message' : 'Create public message');
+  readonly statusLabel = computed(() => this.formatStatus(this.currentContent()?.status ?? 'draft'));
+  readonly maxPublicHashtags = MAX_PUBLIC_HASHTAGS;
+
+  readonly hashtagControl = new FormControl('', { nonNullable: true });
+  readonly mediaUrlControl = new FormControl('', { nonNullable: true });
+  readonly tenorControl = new FormControl('', { nonNullable: true });
+
+  readonly form = this.fb.nonNullable.group({
+    message: this.fb.nonNullable.control(''),
+    style: this.fb.nonNullable.control(''),
+    markerType: this.fb.nonNullable.control('default'),
+    location: this.fb.nonNullable.group({
+      latitude: this.fb.nonNullable.control(0),
+      longitude: this.fb.nonNullable.control(0),
+      plusCode: this.fb.nonNullable.control('')
+    })
+  });
+
+  constructor() {
+    const contentId = this.route.snapshot.paramMap.get('id');
+    if (contentId) {
+      this.loadContent(contentId);
+    }
+  }
+
+  trackTenorResult(_index: number, result: TenorResult): string {
+    return result.id;
+  }
+
+  formatStatus(status: string): string {
+    switch (status) {
+      case 'published':
+        return 'Published';
+      case 'withdrawn':
+        return 'Withdrawn';
+      case 'deleted':
+        return 'Deleted';
+      case 'draft':
+      default:
+        return 'Draft';
+    }
+  }
+
+  statusClass(status: string | null | undefined): string {
+    switch (status) {
+      case 'published':
+        return 'status-published';
+      case 'withdrawn':
+        return 'status-withdrawn';
+      case 'deleted':
+        return 'status-deleted';
+      case 'draft':
+      default:
+        return 'status-draft';
+    }
+  }
+
+  randomizeStyle(): void {
+    this.form.controls.style.setValue(this.styleService.getRandomStyle());
+  }
+
+  clearStyle(): void {
+    this.form.controls.style.setValue('');
+  }
+
+  addHashtagsFromInput(candidate?: string): void {
+    const rawCandidate = candidate ?? this.hashtagControl.value;
+    const trimmedCandidate = rawCandidate.trim();
+    if (!trimmedCandidate) {
+      return;
+    }
+
+    const parsed = normalizeHashtags(trimmedCandidate, MAX_PUBLIC_HASHTAGS);
+    if (parsed.invalidTokens.length > 0) {
+      this.showMessage('Hashtags may only contain letters, numbers and underscores.');
+      return;
+    }
+
+    const merged = normalizeHashtags([...this.hashtags(), ...parsed.tags], MAX_PUBLIC_HASHTAGS);
+    if (merged.overflow > 0) {
+      this.showMessage(`A maximum of ${MAX_PUBLIC_HASHTAGS} hashtags is allowed.`);
+      return;
+    }
+
+    this.hashtags.set([...merged.tags]);
+    this.hashtagControl.setValue('');
+  }
+
+  onHashtagKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter' || event.key === ',' || event.key === ';') {
+      event.preventDefault();
+      this.addHashtagsFromInput();
+    }
+  }
+
+  removeHashtag(tag: string): void {
+    this.hashtags.update((current) => current.filter((entry) => entry !== tag));
+  }
+
+  removeMultimedia(): void {
+    this.multimedia.set({ ...EMPTY_MULTIMEDIA });
+  }
+
+  importExternalMultimedia(): void {
+    const url = this.mediaUrlControl.value.trim();
+    if (!url) {
+      this.showMessage('Please enter a media URL first.');
+      return;
+    }
+
+    this.mediaLoading.set(true);
+    this.publicContentService.resolveOembed(url)
+      .pipe(
+        finalize(() => this.mediaLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: (multimedia) => {
+          this.multimedia.set(multimedia);
+          this.mediaUrlControl.setValue('');
+          this.showMessage('External media imported.');
+        },
+        error: () => undefined
+      });
+  }
+
+  loadFeaturedTenor(): void {
+    this.tenorLoading.set(true);
+    this.publicContentService.getFeaturedTenor()
+      .pipe(
+        finalize(() => this.tenorLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: (response) => {
+          this.applyTenorResponse(response, '');
+        },
+        error: () => undefined
+      });
+  }
+
+  searchTenor(reset = true): void {
+    const term = this.tenorControl.value.trim();
+    if (!term) {
+      this.loadFeaturedTenor();
+      return;
+    }
+
+    const next = reset ? '' : this.tenorNext();
+    this.tenorLoading.set(true);
+    this.publicContentService.searchTenor(term, next)
+      .pipe(
+        finalize(() => this.tenorLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: (response) => {
+          this.applyTenorResponse(response, term);
+        },
+        error: () => undefined
+      });
+  }
+
+  loadMoreTenor(): void {
+    const next = this.tenorNext();
+    if (!next) {
+      return;
+    }
+
+    const term = this.tenorControl.value.trim();
+    this.tenorLoading.set(true);
+    const request$ = term
+      ? this.publicContentService.searchTenor(term, next)
+      : this.publicContentService.getFeaturedTenor(next);
+
+    request$
+      .pipe(
+        finalize(() => this.tenorLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: (response) => {
+          this.applyTenorResponse(response, term);
+        },
+        error: () => undefined
+      });
+  }
+
+  selectTenorResult(result: TenorResult): void {
+    this.multimedia.set({
+      type: 'tenor',
+      url: result.media_formats.gif.url,
+      sourceUrl: result.itemurl,
+      attribution: 'Powered by Tenor',
+      title: result.title,
+      description: result.content_description,
+      contentId: '',
+      oembed: null
+    });
+    this.showMessage('Tenor GIF selected.');
+  }
+
+  saveDraft(): void {
+    this.persist('draft');
+  }
+
+  saveAndPublish(): void {
+    if (!this.canPublish()) {
+      this.showMessage('Only editors can publish public messages.');
+      return;
+    }
+
+    this.persist('publish');
+  }
+
+  confirmWithdraw(): void {
+    const content = this.currentContent();
+    if (!content) {
+      return;
+    }
+
+    this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Withdraw publication?',
+        message: 'The public message will be removed from the public backend and can be edited again afterwards.',
+        confirmText: 'Withdraw',
+        cancelText: 'Cancel',
+        warn: true
+      }
+    }).afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((confirmed) => {
+        if (!confirmed) {
+          return;
+        }
+
+        this.saving.set(true);
+        this.publicContentService.withdrawPublicContent(content.id)
+          .pipe(
+            finalize(() => this.saving.set(false)),
+            takeUntilDestroyed(this.destroyRef)
+          )
+          .subscribe({
+            next: (row) => {
+              this.applyContent(row);
+              this.showMessage('Public message withdrawn.');
+            },
+            error: () => undefined
+          });
+      });
+  }
+
+  confirmDelete(): void {
+    const content = this.currentContent();
+    if (!content) {
+      return;
+    }
+
+    this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Delete content?',
+        message: 'This draft or publication record will be deleted permanently.',
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        warn: true
+      }
+    }).afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((confirmed) => {
+        if (!confirmed) {
+          return;
+        }
+
+        this.saving.set(true);
+        this.publicContentService.deletePublicContent(content.id)
+          .pipe(
+            finalize(() => this.saving.set(false)),
+            takeUntilDestroyed(this.destroyRef)
+          )
+          .subscribe({
+            next: () => {
+              this.showMessage('Content deleted.');
+              this.router.navigate(['/dashboard/content']);
+            },
+            error: () => undefined
+          });
+      });
+  }
+
+  private persist(mode: 'draft' | 'publish'): void {
+    if (this.isPublished()) {
+      this.showMessage('Withdraw the public message before editing it.');
+      return;
+    }
+    if (this.isDeleted()) {
+      this.showMessage('Deleted content cannot be edited.');
+      return;
+    }
+
+    const payload = this.buildPayload();
+    if (!payload) {
+      return;
+    }
+
+    this.saving.set(true);
+    const request$ = this.currentContent()
+      ? this.publicContentService.updatePublicContent(this.currentContent()!.id, payload)
+      : this.publicContentService.createPublicContent(payload);
+
+    request$
+      .pipe(
+        finalize(() => {
+          if (mode === 'draft') {
+            this.saving.set(false);
+          }
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: (row) => {
+          if (mode === 'draft') {
+            this.applyContent(row, true);
+            this.showMessage('Draft saved.');
+            return;
+          }
+          this.publishSavedContent(row.id);
+        },
+        error: () => this.saving.set(false)
+      });
+  }
+
+  private publishSavedContent(id: string): void {
+    this.publicContentService.publishPublicContent(id)
+      .pipe(
+        finalize(() => this.saving.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: (row) => {
+          this.applyContent(row, true);
+          this.showMessage('Public message published.');
+        },
+        error: () => undefined
+      });
+  }
+
+  private buildPayload(): PublicContentSavePayload | null {
+    const pendingHashtagInput = this.hashtagControl.value.trim();
+    this.addHashtagsFromInput();
+    if (pendingHashtagInput && this.hashtagControl.value.trim()) {
+      return null;
+    }
+
+    const raw = this.form.getRawValue();
+    const message = raw.message.trim();
+    const multimedia = this.multimedia();
+
+    if (!message && multimedia.type === 'undefined') {
+      this.showMessage('Please add text or multimedia before saving.');
+      return null;
+    }
+
+    return {
+      message,
+      location: {
+        latitude: Number(raw.location.latitude) || 0,
+        longitude: Number(raw.location.longitude) || 0,
+        plusCode: raw.location.plusCode.trim()
+      },
+      markerType: raw.markerType.trim() || 'default',
+      style: raw.style,
+      hashtags: this.hashtags(),
+      multimedia
+    };
+  }
+
+  private loadContent(id: string): void {
+    this.loading.set(true);
+    this.publicContentService.getPublicContent(id)
+      .pipe(
+        finalize(() => this.loading.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: (row) => this.applyContent(row),
+        error: () => this.router.navigate(['/dashboard/content'])
+      });
+  }
+
+  private applyContent(content: PublicContent, updateRoute = false): void {
+    this.currentContent.set(content);
+    this.multimedia.set(content.multimedia ?? { ...EMPTY_MULTIMEDIA });
+    this.hashtags.set(Array.isArray(content.hashtags) ? [...content.hashtags] : []);
+    this.form.setValue({
+      message: content.message ?? '',
+      style: content.style ?? '',
+      markerType: content.markerType ?? 'default',
+      location: {
+        latitude: Number(content.location?.latitude ?? 0),
+        longitude: Number(content.location?.longitude ?? 0),
+        plusCode: content.location?.plusCode ?? ''
+      }
+    });
+    this.updateFormState();
+
+    if (updateRoute && this.route.snapshot.paramMap.get('id') !== content.id) {
+      this.router.navigate(['/dashboard/content', content.id, 'edit']);
+    }
+  }
+
+  private updateFormState(): void {
+    const disableEditing = this.isPublished() || this.isDeleted();
+    if (disableEditing) {
+      this.form.disable({ emitEvent: false });
+      this.hashtagControl.disable({ emitEvent: false });
+      this.mediaUrlControl.disable({ emitEvent: false });
+      this.tenorControl.disable({ emitEvent: false });
+      return;
+    }
+
+    this.form.enable({ emitEvent: false });
+    this.hashtagControl.enable({ emitEvent: false });
+    this.mediaUrlControl.enable({ emitEvent: false });
+    this.tenorControl.enable({ emitEvent: false });
+  }
+
+  private applyTenorResponse(response: TenorApiResponse, searchTerm: string): void {
+    this.tenorResults.set(response.data?.results ?? []);
+    this.tenorNext.set(response.data?.next ?? '');
+    this.lastTenorSearch.set(searchTerm);
+  }
+
+  private showMessage(message: string): void {
+    this.snackBar.open(message, 'OK', { duration: 2800 });
+  }
+}

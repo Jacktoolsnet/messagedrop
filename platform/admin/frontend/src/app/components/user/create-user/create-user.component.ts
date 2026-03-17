@@ -34,7 +34,7 @@ export class CreateUserComponent {
     username: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
     password: ['', Validators.required],
-    role: ['moderator', Validators.required]
+    role: ['author', Validators.required]
   });
 
   submit() {

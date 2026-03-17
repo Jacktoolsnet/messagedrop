@@ -35,8 +35,15 @@
         <mat-card class="tile user-tile">
             <mat-card-header class="user-card-header">
                 <div mat-card-avatar class="avatar avatar-neutral" [class.avatar-root]="user.role === 'root'"
-                    [class.avatar-admin]="user.role === 'admin'" [class.avatar-legal]="user.role === 'legal'">
+                    [class.avatar-admin]="user.role === 'admin'" [class.avatar-legal]="user.role === 'legal'"
+                    [class.avatar-editor]="user.role === 'editor'" [class.avatar-author]="user.role === 'author'">
                     @switch (user.role) {
+                    @case ('author') {
+                    <mat-icon>edit_note</mat-icon>
+                    }
+                    @case ('editor') {
+                    <mat-icon>newspaper</mat-icon>
+                    }
                     @case ('root') {
                     <mat-icon>workspace_premium</mat-icon>
                     }
@@ -59,6 +66,7 @@
                         <div class="badge-row">
                             <span class="role-pill" [class.role-root]="user.role === 'root'"
                                 [class.role-admin]="user.role === 'admin'" [class.role-legal]="user.role === 'legal'"
+                                [class.role-editor]="user.role === 'editor'" [class.role-author]="user.role === 'author'"
                                 [class.role-moderator]="user.role === 'moderator'">
                                 {{ user.role }}
                             </span>

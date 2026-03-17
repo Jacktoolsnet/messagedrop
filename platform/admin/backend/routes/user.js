@@ -67,7 +67,7 @@ const SLOWDOWN_MAX_MS = toNumber(process.env.ADMIN_LOGIN_SLOWDOWN_MAX_MS, 4000);
 const VERIFY_SLOWDOWN_AFTER = toNumber(process.env.ADMIN_LOGIN_VERIFY_SLOWDOWN_AFTER, SLOWDOWN_AFTER);
 const VERIFY_SLOWDOWN_DELAY_MS = toNumber(process.env.ADMIN_LOGIN_VERIFY_SLOWDOWN_DELAY_MS, SLOWDOWN_DELAY_MS);
 const VERIFY_SLOWDOWN_MAX_MS = toNumber(process.env.ADMIN_LOGIN_VERIFY_SLOWDOWN_MAX_MS, SLOWDOWN_MAX_MS);
-const ALLOWED_ROLES = new Set(['moderator', 'legal', 'admin', 'root']);
+const ALLOWED_ROLES = new Set(['author', 'editor', 'moderator', 'legal', 'admin', 'root']);
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const backendAudience = process.env.SERVICE_JWT_AUDIENCE_BACKEND || 'service.backend';
 const OTP_PUSH_REQUIRED = toBool(process.env.ADMIN_OTP_PUSH_REQUIRED, false);
@@ -155,8 +155,16 @@ const verifySlowdown = createSlowdown({
 });
 
 // Helpers
-const stripUser = (u) => u && ({ id: u.id, username: u.username, email: u.email || '', role: u.role, createdAt: u.createdAt });
+const stripUser = (u) => u && ({
+    id: u.id,
+    username: u.username,
+    email: u.email || '',
+    role: u.role,
+    publicBackendUserId: u.publicBackendUserId || null,
+    createdAt: u.createdAt
+});
 const isAdminOrRoot = (roles) => (Array.isArray(roles) ? roles : []).some(r => r === 'admin' || r === 'root');
+const needsPublicBackendUser = (role) => role === 'editor';
 
 const hashOtp = (otp) => {
     const salt = process.env.ADMIN_OTP_SECRET || ADMIN_JWT_SECRET || '';
@@ -320,6 +328,19 @@ async function callPublicBackend(method, endpoint, payload) {
         },
         validateStatus: () => true
     });
+}
+
+async function createPublicBackendUser(req) {
+    const response = await callPublicBackend('post', '/user/create', {});
+    if (response.status !== 200 || !response.data?.userId) {
+        const apiErr = apiError.badGateway('backend_request_failed');
+        apiErr.detail = response.data?.error || response.data?.message || response.statusText || 'public_user_create_failed';
+        throw apiErr;
+    }
+    req.logger?.info?.('Created mapped public backend user', {
+        publicBackendUserId: response.data.userId
+    });
+    return String(response.data.userId);
 }
 
 function queryAll(db, sql, params = []) {
@@ -791,16 +812,23 @@ router.post('/', requireRole('admin', 'root'), async (req, res, next) => {
     }
 
     const id = crypto.randomUUID();
+    let publicBackendUserId = null;
     let hashed;
     try {
+        if (needsPublicBackendUser(role)) {
+            publicBackendUserId = await createPublicBackendUser(req);
+        }
         hashed = await bcrypt.hash(password, 12);
     } catch (error) {
+        if (error?.status) {
+            return next(error);
+        }
         req.logger?.error?.('Password hash failed', { error: error?.message });
         return next(apiError.internal('Could not create user'));
     }
     const createdAt = Date.now();
 
-    tableUser.create(db, id, username, email, hashed, role, createdAt, (err, result) => {
+    tableUser.create(db, id, username, email, hashed, role, publicBackendUserId, createdAt, (err, result) => {
         if (err) {
             const msg = String(err.message || '');
             if (err.code === 'SQLITE_CONSTRAINT' || msg.includes('UNIQUE')) {
@@ -865,6 +893,14 @@ router.put('/:id', async (req, res, next) => {
         if (isAdminRoot && role && role !== target.role) {
             if (!ALLOWED_ROLES.has(role)) return next(apiError.badRequest('Invalid role'));
             fields.role = role;
+        }
+
+        try {
+            if (isAdminRoot && role && needsPublicBackendUser(role) && !target.publicBackendUserId) {
+                fields.publicBackendUserId = await createPublicBackendUser(req);
+            }
+        } catch (error) {
+            return next(error);
         }
 
         if (password) {

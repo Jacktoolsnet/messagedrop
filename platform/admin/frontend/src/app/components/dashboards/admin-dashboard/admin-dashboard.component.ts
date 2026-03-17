@@ -37,6 +37,10 @@ export class AdminDashboardComponent implements OnInit {
     const role = this.role();
     return role === 'admin' || role === 'root';
   });
+  readonly canManageContent = computed(() => {
+    const role = this.role();
+    return role === 'author' || role === 'editor' || role === 'admin' || role === 'root';
+  });
 
   readonly errorCountToday = signal<number | null>(null);
   readonly infoCountToday = signal<number | null>(null);

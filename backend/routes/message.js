@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const express = require('express');
 const router = express.Router();
 const security = require('../middleware/security');
@@ -54,6 +55,62 @@ function findMessageByIdOrUuid(db, messageId, callback) {
     return tableMessage.getById(db, raw, callback);
   }
   return tableMessage.getByUuid(db, raw, callback);
+}
+
+function normalizeInternalMultimedia(multimedia) {
+  if (typeof multimedia === 'string') {
+    return sanitizeSingleQuotes(multimedia);
+  }
+  if (multimedia && typeof multimedia === 'object') {
+    return sanitizeSingleQuotes(JSON.stringify(multimedia));
+  }
+  return '';
+}
+
+function updateInternalManagedMessage(db, messageUuid, payload, callback) {
+  const sql = `
+    UPDATE tableMessage
+    SET message = ?,
+        style = ?,
+        multimedia = ?,
+        latitude = ?,
+        longitude = ?,
+        plusCode = UPPER(?),
+        markerType = ?,
+        hashtags = ?,
+        userId = ?,
+        status = '${tableMessage.messageStatus.ENABLED}',
+        deleteDateTime = strftime('%s','now','+30 days'),
+        dsaStatusToken = NULL,
+        dsaStatusTokenCreatedAt = NULL,
+        aiModeration = NULL,
+        aiModerationScore = NULL,
+        aiModerationFlagged = NULL,
+        aiModerationDecision = NULL,
+        aiModerationAt = NULL,
+        patternMatch = NULL,
+        patternMatchAt = NULL,
+        manualModerationDecision = NULL,
+        manualModerationReason = NULL,
+        manualModerationAt = NULL,
+        manualModerationBy = NULL
+    WHERE uuid = ?;
+  `;
+
+  db.run(sql, [
+    payload.message,
+    payload.style,
+    payload.multimedia,
+    payload.latitude,
+    payload.longitude,
+    payload.plusCode,
+    payload.markerType,
+    payload.hashtags,
+    payload.messageUserId,
+    messageUuid
+  ], function (err) {
+    callback(err, { affected: this?.changes ?? 0 });
+  });
 }
 
 // helper
@@ -209,6 +266,46 @@ function parsePublicHashtags(input) {
     return null;
   }
   return parsed.tags;
+}
+
+function normalizeInternalPublishPayload(body) {
+  const messageUuid = typeof body?.uuid === 'string' && UUID_REGEX.test(body.uuid.trim())
+    ? body.uuid.trim()
+    : crypto.randomUUID();
+  const messageTyp = String(body?.messageTyp || tableMessage.messageType.PUBLIC).trim().toLowerCase() || tableMessage.messageType.PUBLIC;
+  const messageUserId = String(body?.messageUserId || '').trim();
+  const hashtags = parsePublicHashtags(body?.hashtags);
+
+  if (!messageUserId) {
+    return { error: apiError.badRequest('missing_user_id') };
+  }
+  if (![
+    tableMessage.messageType.PUBLIC,
+    tableMessage.messageType.COMMENT
+  ].includes(messageTyp)) {
+    return { error: apiError.badRequest('invalid_message_type') };
+  }
+  if (!hashtags) {
+    return { error: apiError.badRequest('invalid_hashtags') };
+  }
+
+  return {
+    value: {
+      uuid: messageUuid,
+      messageTyp,
+      messageUserId,
+      latitude: Number.isFinite(Number(body?.latitude)) ? Number(body.latitude) : 0,
+      longitude: Number.isFinite(Number(body?.longitude)) ? Number(body.longitude) : 0,
+      plusCode: String(body?.plusCode || '').trim(),
+      message: sanitizeSingleQuotes(String(body?.message || '')),
+      markerType: String(body?.markerType || 'default').trim() || 'default',
+      style: typeof body?.style === 'string' ? body.style : '',
+      hashtags,
+      encodedHashtags: encodeHashtags(hashtags),
+      multimedia: normalizeInternalMultimedia(body?.multimedia),
+      parentUuid: typeof body?.parentUuid === 'string' && body.parentUuid.trim() ? body.parentUuid.trim() : null
+    }
+  };
 }
 
 function getUserById(db, userId) {
@@ -527,6 +624,147 @@ router.post('/moderate/hashtags',
         flagged: moderationFlagged,
         patternMatch: moderation.patternMatch ?? null
       }
+    });
+  });
+
+router.post('/internal/publish',
+  [
+    security.checkToken,
+    express.json({ type: 'application/json' })
+  ],
+  async function (req, res, next) {
+    const normalized = normalizeInternalPublishPayload(req.body);
+    if (normalized.error) {
+      return next(normalized.error);
+    }
+
+    const payload = normalized.value;
+
+    if (payload.messageTyp === tableMessage.messageType.COMMENT && !payload.parentUuid) {
+      return next(apiError.badRequest('invalid_parent_uuid'));
+    }
+
+    try {
+      const userRow = await getUserById(req.database.db, payload.messageUserId);
+      if (!userRow) {
+        return next(apiError.notFound('user_not_found'));
+      }
+
+      if (payload.parentUuid) {
+        if (!UUID_REGEX.test(payload.parentUuid)) {
+          return next(apiError.badRequest('invalid_parent_uuid'));
+        }
+        const parentMessage = await getMessageByUuid(req.database.db, payload.parentUuid);
+        if (!parentMessage) {
+          return next(apiError.notFound('parent_not_found'));
+        }
+      }
+
+      const existing = await getMessageByUuid(req.database.db, payload.uuid);
+      if (existing) {
+        updateInternalManagedMessage(req.database.db, payload.uuid, payload, (updateErr, result) => {
+          if (updateErr) {
+            return next(apiError.internal('db_error'));
+          }
+          if (payload.messageTyp === tableMessage.messageType.PUBLIC) {
+            notify.placeSubscriptions(
+              req.logger,
+              req.database.db,
+              payload.latitude,
+              payload.longitude,
+              payload.messageUserId,
+              payload.message,
+              {
+                messageUuid: payload.uuid,
+                messagePlusCode: payload.plusCode
+              }
+            );
+          }
+          return res.status(200).json({
+            status: 200,
+            messageId: existing.id ?? null,
+            messageUuid: payload.uuid,
+            updated: (result?.affected ?? 0) > 0
+          });
+        });
+        return;
+      }
+
+      tableMessage.create(
+        req.database.db,
+        payload.uuid,
+        payload.parentUuid,
+        payload.messageTyp,
+        payload.latitude,
+        payload.longitude,
+        payload.plusCode,
+        payload.message,
+        payload.markerType,
+        payload.style,
+        payload.messageUserId,
+        payload.multimedia,
+        {
+          status: tableMessage.messageStatus.ENABLED,
+          hashtags: payload.encodedHashtags
+        },
+        function (err, result) {
+          if (err) {
+            return next(apiError.internal('db_error'));
+          }
+
+          if (payload.messageTyp === tableMessage.messageType.PUBLIC) {
+            notify.placeSubscriptions(
+              req.logger,
+              req.database.db,
+              payload.latitude,
+              payload.longitude,
+              payload.messageUserId,
+              payload.message,
+              {
+                messageUuid: payload.uuid,
+                messagePlusCode: payload.plusCode
+              }
+            );
+          }
+
+          return res.status(200).json({
+            status: 200,
+            messageId: result?.id ?? null,
+            messageUuid: payload.uuid,
+            created: true
+          });
+        }
+      );
+    } catch (error) {
+      return next(error?.status ? error : apiError.internal('db_error'));
+    }
+  });
+
+router.post('/internal/delete',
+  [
+    security.checkToken,
+    express.json({ type: 'application/json' })
+  ],
+  function (req, res, next) {
+    const messageId = String(req.body?.messageId || '').trim();
+    if (!messageId) {
+      return next(apiError.badRequest('missing_message_id'));
+    }
+
+    findMessageByIdOrUuid(req.database.db, messageId, (lookupErr, row) => {
+      if (lookupErr) {
+        return next(apiError.internal('db_error'));
+      }
+      if (!row) {
+        return res.status(200).json({ status: 200, deleted: false, notFound: true });
+      }
+
+      tableMessage.deleteById(req.database.db, row.id, function (err) {
+        if (err) {
+          return next(apiError.internal('db_error'));
+        }
+        return res.status(200).json({ status: 200, deleted: true, messageId: row.id, messageUuid: row.uuid });
+      });
     });
   });
 

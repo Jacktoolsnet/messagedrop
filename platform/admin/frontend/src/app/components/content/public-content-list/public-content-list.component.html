@@ -1,0 +1,139 @@
+<mat-toolbar color="primary">
+  <button mat-icon-button routerLink="/dashboard" aria-label="Back to dashboard">
+    <mat-icon>home</mat-icon>
+  </button>
+
+  <span class="toolbar-title">Public content</span>
+  <span class="spacer"></span>
+  <span>{{ username() }} ({{ role() }})</span>
+</mat-toolbar>
+
+@if (loading()) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+<div class="page">
+  @if (!canAccess()) {
+    <mat-card class="empty-state">
+      <mat-card-content>
+        <mat-icon>lock</mat-icon>
+        <div>You do not have access to public content management.</div>
+      </mat-card-content>
+    </mat-card>
+  } @else {
+    <div class="header-row">
+      <div>
+        <h2>Public messages</h2>
+        <p>Create, edit, publish or withdraw editorial public messages.</p>
+      </div>
+
+      <div class="header-actions">
+        <button mat-stroked-button type="button" (click)="load()">
+          <mat-icon>refresh</mat-icon>
+          Refresh
+        </button>
+        <button mat-flat-button color="primary" type="button" (click)="createContent()">
+          <mat-icon>add</mat-icon>
+          New message
+        </button>
+      </div>
+    </div>
+
+    <div class="filter-row" [formGroup]="filterForm">
+      <mat-form-field appearance="outline">
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status">
+          @for (status of statusOptions; track status) {
+            <mat-option [value]="status">{{ status === 'all' ? 'All statuses' : statusLabel(status) }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Search</mat-label>
+        <input matInput formControlName="q" placeholder="Search in message, author or plus code" />
+      </mat-form-field>
+    </div>
+
+    <div class="tiles-container">
+      @for (row of rows(); track trackById($index, row)) {
+        <mat-card class="tile content-tile" (click)="openContent(row)" tabindex="0" (keydown.enter)="openContent(row)">
+          <mat-card-header>
+            <div mat-card-avatar class="avatar avatar-accent">
+              <mat-icon>campaign</mat-icon>
+            </div>
+            <div class="title-wrap">
+              <mat-card-title class="tile-title">{{ row.message || row.multimedia.title || 'Untitled message' }}</mat-card-title>
+              <mat-card-subtitle class="tile-subtitle">
+                {{ row.authorUsername }} • {{ row.updatedAt | date:'medium' }}
+              </mat-card-subtitle>
+            </div>
+            <span class="status-pill" [class]="'status-pill ' + statusClass(row.status)">{{ statusLabel(row.status) }}</span>
+          </mat-card-header>
+
+          <mat-card-content>
+            <p class="message-preview">{{ row.message || 'No text content. Multimedia only.' }}</p>
+
+            <div class="meta-line">
+              <span>
+                <mat-icon>place</mat-icon>
+                {{ row.location.plusCode || (row.location.latitude + ', ' + row.location.longitude) }}
+              </span>
+              @if (row.multimedia.type !== 'undefined') {
+                <span>
+                  <mat-icon>perm_media</mat-icon>
+                  {{ row.multimedia.type }}
+                </span>
+              }
+            </div>
+
+            @if (row.hashtags.length > 0) {
+              <mat-chip-grid aria-label="Hashtags">
+                @for (tag of row.hashtags; track tag) {
+                  <mat-chip-row disabled>#{{ tag }}</mat-chip-row>
+                }
+              </mat-chip-grid>
+            }
+          </mat-card-content>
+
+          <mat-card-actions align="end" class="card-actions">
+            <button mat-stroked-button type="button" (click)="openContent(row); $event.stopPropagation()">
+              <mat-icon>{{ row.status === 'published' ? 'visibility' : 'edit' }}</mat-icon>
+              {{ row.status === 'published' ? 'Open' : 'Edit' }}
+            </button>
+
+            @if (canPublishRow(row)) {
+              <button mat-stroked-button type="button" color="primary" (click)="confirmPublish(row, $event)">
+                <mat-icon>publish</mat-icon>
+                Publish
+              </button>
+            }
+
+            @if (canWithdrawRow(row)) {
+              <button mat-stroked-button type="button" color="warn" (click)="confirmWithdraw(row, $event)">
+                <mat-icon>unpublished</mat-icon>
+                Withdraw
+              </button>
+            }
+
+            @if (canDeleteRow(row)) {
+              <button mat-stroked-button type="button" color="warn" (click)="confirmDelete(row, $event)">
+                <mat-icon>delete</mat-icon>
+                Delete
+              </button>
+            }
+          </mat-card-actions>
+        </mat-card>
+      }
+    </div>
+
+    @if (!loading() && rows().length === 0) {
+      <mat-card class="empty-state">
+        <mat-card-content>
+          <mat-icon>inbox</mat-icon>
+          <div>No public content matches the current filters.</div>
+        </mat-card-content>
+      </mat-card>
+    }
+  }
+</div>

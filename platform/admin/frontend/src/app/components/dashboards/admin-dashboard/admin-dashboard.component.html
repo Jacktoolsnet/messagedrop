@@ -35,6 +35,18 @@
             </mat-card-header>
         </mat-card>
 
+        @if (canManageContent()) {
+        <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/content" role="button" tabindex="0">
+            <mat-card-header>
+                <div mat-card-avatar class="avatar avatar-accent">
+                    <mat-icon>campaign</mat-icon>
+                </div>
+                <mat-card-title class="tile-title">Content</mat-card-title>
+                <mat-card-subtitle class="tile-subtitle"></mat-card-subtitle>
+            </mat-card-header>
+        </mat-card>
+        }
+
         <!-- Digital Services Act -->
         <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/dsa" role="button" tabindex="0">
             <mat-card-header>

@@ -3,5 +3,6 @@ export interface User {
     username: string;
     email: string;
     role: string;
+    publicBackendUserId?: string | null;
     createdAt: number;
 }

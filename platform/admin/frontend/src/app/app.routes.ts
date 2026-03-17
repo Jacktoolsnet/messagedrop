@@ -13,6 +13,8 @@ import { TransparencyComponent } from './components/dsa/transparency/transparenc
 import { UserModerationComponent } from './components/dsa/user-moderation/user-moderation.component';
 import { LoginComponent } from './components/login/login.component';
 import { AppLogsComponent } from './components/loging/app-logs/app-logs.component';
+import { PublicContentEditorComponent } from './components/content/public-content-editor/public-content-editor.component';
+import { PublicContentListComponent } from './components/content/public-content-list/public-content-list.component';
 import { ErrorLogsComponent } from './components/loging/error-logs/error-logs.component';
 import { InfoLogsComponent } from './components/loging/info-logs/info-logs.component';
 import { PowLogsComponent } from './components/loging/pow-logs/pow-logs.component';
@@ -52,6 +54,21 @@ export const routes: Routes = [
     {
         path: 'dashboard/user',
         component: UserDashboardComponent,
+        canActivate: [authGuard]
+    },
+    {
+        path: 'dashboard/content',
+        component: PublicContentListComponent,
+        canActivate: [authGuard]
+    },
+    {
+        path: 'dashboard/content/create',
+        component: PublicContentEditorComponent,
+        canActivate: [authGuard]
+    },
+    {
+        path: 'dashboard/content/:id/edit',
+        component: PublicContentEditorComponent,
         canActivate: [authGuard]
     },
     {

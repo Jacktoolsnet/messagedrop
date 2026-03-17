@@ -17,6 +17,7 @@ const tableWarnLog = require('./tableWarnLog');
 const tableFrontendErrorLog = require('./tableFrontendErrorLog');
 const tablePowLog = require('./tablePowLog');
 const tableModerationRequest = require('./tableModerationRequest');
+const tablePublicContent = require('./tablePublicContent');
 
 
 class SqliteCompat {
@@ -262,6 +263,7 @@ class Database {
       tableFrontendErrorLog.init(this.db);
       tablePowLog.init(this.db);
       tableModerationRequest.init(this.db);
+      tablePublicContent.init(this.db);
 
       // Trigger initialisieren
       this.initTriggers();

@@ -7,6 +7,7 @@ const columnUsername = 'username';    // TEXT UNIQUE NOT NULL
 const columnEmail = 'email';          // TEXT UNIQUE NOT NULL
 const columnPassword = 'password';    // TEXT NOT NULL (bcrypt-Hash)
 const columnRole = 'role';            // TEXT NOT NULL ('root', 'admin', 'moderator', ...)
+const columnPublicBackendUserId = 'publicBackendUserId'; // TEXT NULL (mapped public backend user id)
 const columnCreatedAt = 'createdAt';  // INTEGER NOT NULL (unix ms)
 
 // === INIT: create table + indexes ===
@@ -19,12 +20,15 @@ const init = function (db) {
         ${columnEmail} TEXT UNIQUE NOT NULL,
         ${columnPassword} TEXT NOT NULL,
         ${columnRole} TEXT NOT NULL DEFAULT 'moderator',
+        ${columnPublicBackendUserId} TEXT DEFAULT NULL,
         ${columnCreatedAt} INTEGER NOT NULL
       );
       CREATE INDEX IF NOT EXISTS idx_user_username
         ON ${tableName}(${columnUsername});
       CREATE INDEX IF NOT EXISTS idx_user_role
         ON ${tableName}(${columnRole});
+      CREATE INDEX IF NOT EXISTS idx_user_public_backend
+        ON ${tableName}(${columnPublicBackendUserId});
       CREATE UNIQUE INDEX IF NOT EXISTS idx_user_email
         ON ${tableName}(${columnEmail});
       CREATE INDEX IF NOT EXISTS idx_user_createdAt_desc
@@ -56,6 +60,21 @@ const init = function (db) {
                 `, []);
             });
         });
+
+        db.all(`PRAGMA table_info(${tableName})`, [], (pragmaErr, rows) => {
+            if (pragmaErr || !Array.isArray(rows)) return;
+            const hasPublicBackendUserIdColumn = rows.some((row) => row?.name === columnPublicBackendUserId);
+            if (!hasPublicBackendUserIdColumn) {
+                db.run(`
+                  ALTER TABLE ${tableName}
+                  ADD COLUMN ${columnPublicBackendUserId} TEXT
+                `, []);
+            }
+            db.run(`
+              CREATE INDEX IF NOT EXISTS idx_user_public_backend
+                ON ${tableName}(${columnPublicBackendUserId})
+            `, []);
+        });
     } catch (err) {
         throw err;
     }
@@ -69,10 +88,11 @@ const init = function (db) {
  * @param {string} email          // OTP-Empfängeradresse
  * @param {string} passwordHash   // gehashter Passwort-String
  * @param {string} role           // z.B. 'root', 'admin', 'moderator'
+ * @param {string | null} publicBackendUserId
  * @param {number} createdAt      // Unix ms
  * @param {(err: any, row?: { id: string }) => void} callBack
  */
-const create = function (db, id, username, email, passwordHash, role, createdAt, callBack) {
+const create = function (db, id, username, email, passwordHash, role, publicBackendUserId, createdAt, callBack) {
     const stmt = `
     INSERT INTO ${tableName} (
       ${columnId},
@@ -80,10 +100,11 @@ const create = function (db, id, username, email, passwordHash, role, createdAt,
       ${columnEmail},
       ${columnPassword},
       ${columnRole},
+      ${columnPublicBackendUserId},
       ${columnCreatedAt}
-    ) VALUES (?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?)
   `;
-    const params = [id, username, email, passwordHash, role, createdAt];
+    const params = [id, username, email, passwordHash, role, publicBackendUserId ?? null, createdAt];
     db.run(stmt, params, function (err) {
         if (err) return callBack(err);
         callBack(null, { id });
@@ -137,7 +158,7 @@ const list = function (db, opts, callBack) {
 /**
  * @param {import('sqlite3').Database} db
  * @param {string} id
- * @param {{ username?: string, email?: string, role?: string, passwordHash?: string }} fields
+ * @param {{ username?: string, email?: string, role?: string, passwordHash?: string, publicBackendUserId?: string | null }} fields
  * @param {(err: any, ok?: boolean) => void} callBack
  */
 const update = function (db, id, fields, callBack) {
@@ -155,6 +176,10 @@ const update = function (db, id, fields, callBack) {
     if (typeof fields.role === 'string') {
         updates.push(`${columnRole} = ?`);
         params.push(fields.role);
+    }
+    if (Object.prototype.hasOwnProperty.call(fields, 'publicBackendUserId')) {
+        updates.push(`${columnPublicBackendUserId} = ?`);
+        params.push(fields.publicBackendUserId ?? null);
     }
     if (typeof fields.passwordHash === 'string') {
         updates.push(`${columnPassword} = ?`);
@@ -196,6 +221,7 @@ module.exports = {
         email: columnEmail,
         password: columnPassword,
         role: columnRole,
+        publicBackendUserId: columnPublicBackendUserId,
         createdAt: columnCreatedAt
     },
     init,

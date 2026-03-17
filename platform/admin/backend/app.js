@@ -30,6 +30,7 @@ const auditLog = require('./routes/audit-log');
 const frontendErrorLog = require('./routes/frontend-error-log');
 const powLog = require('./routes/pow-log');
 const moderation = require('./routes/moderation');
+const content = require('./routes/content');
 const cors = require('cors')
 const helmet = require('helmet');
 const cron = require('node-cron');
@@ -370,6 +371,7 @@ app.use('/audit-log', adminLogLimit, auditLog);
 app.use('/frontend-error-log', adminLogLimit, frontendErrorLog);
 app.use('/pow-log', adminLogLimit, powLog);
 app.use('/moderation', adminLogLimit, moderation);
+app.use('/content', adminUserLimit, content);
 app.use('/maintenance', adminUserLimit, maintenance);
 
 

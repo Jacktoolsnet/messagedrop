@@ -1,0 +1,309 @@
+<mat-toolbar color="primary">
+  <button mat-icon-button routerLink="/dashboard/content" aria-label="Back to content overview">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+
+  <span class="toolbar-title">{{ pageTitle() }}</span>
+  <span class="spacer"></span>
+  <span>{{ username() }} ({{ role() }})</span>
+</mat-toolbar>
+
+@if (loading() || saving()) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+<div class="page">
+  @if (currentContent(); as content) {
+    <mat-card class="meta-card">
+      <mat-card-content class="meta-grid">
+        <div class="meta-item">
+          <span class="meta-label">Status</span>
+          <span class="status-pill" [class]="'status-pill ' + statusClass(content.status)">{{ statusLabel() }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Author</span>
+          <span>{{ content.authorUsername }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Updated</span>
+          <span>{{ content.updatedAt | date:'medium' }}</span>
+        </div>
+        @if (content.publishedAt) {
+          <div class="meta-item">
+            <span class="meta-label">Published</span>
+            <span>{{ content.publishedAt | date:'medium' }}</span>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+
+  @if (isPublished()) {
+    <mat-card class="hint-card warn-card">
+      <mat-card-content>
+        This message is currently published. Withdraw it first if you want to change its content.
+      </mat-card-content>
+    </mat-card>
+  }
+
+  @if (isDeleted()) {
+    <mat-card class="hint-card warn-card">
+      <mat-card-content>
+        This content entry has been deleted and is now read-only.
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <div class="editor-layout">
+    <mat-card class="editor-card">
+      <mat-card-header>
+        <div mat-card-avatar class="avatar avatar-accent">
+          <mat-icon>edit_note</mat-icon>
+        </div>
+        <mat-card-title>Message content</mat-card-title>
+        <mat-card-subtitle>Text, style and location for the public message</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <form [formGroup]="form" class="form-grid">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Message text</mat-label>
+            <textarea
+              matInput
+              rows="8"
+              formControlName="message"
+              placeholder="Write the public message here"></textarea>
+          </mat-form-field>
+
+          <div class="style-actions">
+            <button mat-stroked-button type="button" (click)="randomizeStyle()" [disabled]="form.disabled">
+              <mat-icon>cycle</mat-icon>
+              Random style
+            </button>
+            <button mat-stroked-button type="button" (click)="clearStyle()" [disabled]="form.disabled">
+              <mat-icon>format_clear</mat-icon>
+              Clear style
+            </button>
+          </div>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Inline style</mat-label>
+            <input matInput formControlName="style" placeholder="font-family: &quot;LuckiestGuy&quot;; font-size: 1.75rem;" />
+          </mat-form-field>
+
+          <div formGroupName="location" class="location-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Latitude</mat-label>
+              <input matInput type="number" formControlName="latitude" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Longitude</mat-label>
+              <input matInput type="number" formControlName="longitude" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="plus-code-field">
+              <mat-label>Plus Code</mat-label>
+              <input matInput formControlName="plusCode" placeholder="Optional plus code" />
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline" class="marker-field">
+            <mat-label>Marker type</mat-label>
+            <input matInput formControlName="markerType" placeholder="default" />
+          </mat-form-field>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <div class="side-column">
+      <mat-card class="preview-card">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-neutral">
+            <mat-icon>visibility</mat-icon>
+          </div>
+          <mat-card-title>Preview</mat-card-title>
+          <mat-card-subtitle>Approximate editor preview</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div class="message-preview" [style]="form.controls.style.value">
+            {{ form.controls.message.value || 'Add some text to preview the message.' }}
+          </div>
+
+          @if (hashtags().length > 0) {
+            <div class="chip-preview">
+              @for (tag of hashtags(); track tag) {
+                <span class="preview-chip">#{{ tag }}</span>
+              }
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="hashtag-card">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-success">
+            <mat-icon>tag</mat-icon>
+          </div>
+          <mat-card-title>Hashtags</mat-card-title>
+          <mat-card-subtitle>Up to {{ maxPublicHashtags }} public hashtags</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Add hashtags</mat-label>
+            <input
+              matInput
+              [formControl]="hashtagControl"
+              placeholder="#travel, #news"
+              (keydown)="onHashtagKeydown($event)" />
+          </mat-form-field>
+
+          <div class="inline-actions">
+            <button mat-stroked-button type="button" (click)="addHashtagsFromInput()" [disabled]="hashtagControl.disabled">
+              <mat-icon>add</mat-icon>
+              Add hashtags
+            </button>
+          </div>
+
+          <mat-chip-grid aria-label="Selected hashtags">
+            @for (tag of hashtags(); track tag) {
+              <mat-chip-row (removed)="removeHashtag(tag)">
+                #{{ tag }}
+                @if (!hashtagControl.disabled) {
+                  <button matChipRemove type="button" aria-label="Remove hashtag">
+                    <mat-icon>cancel</mat-icon>
+                  </button>
+                }
+              </mat-chip-row>
+            }
+          </mat-chip-grid>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="media-card">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-accent">
+            <mat-icon>perm_media</mat-icon>
+          </div>
+          <mat-card-title>Multimedia</mat-card-title>
+          <mat-card-subtitle>External embeds and Tenor GIFs</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Import external media</mat-label>
+            <input matInput [formControl]="mediaUrlControl" placeholder="https://www.youtube.com/watch?v=..." />
+          </mat-form-field>
+
+          <div class="inline-actions">
+            <button mat-stroked-button type="button" (click)="importExternalMultimedia()" [disabled]="mediaLoading() || mediaUrlControl.disabled">
+              <mat-icon>download</mat-icon>
+              Import media
+            </button>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <div class="tenor-head">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Search Tenor</mat-label>
+              <input matInput [formControl]="tenorControl" placeholder="Search GIFs" (keydown.enter)="searchTenor()" />
+            </mat-form-field>
+
+            <div class="inline-actions">
+              <button mat-stroked-button type="button" (click)="searchTenor()" [disabled]="tenorControl.disabled || tenorLoading()">
+                <mat-icon>search</mat-icon>
+                Search
+              </button>
+              <button mat-stroked-button type="button" (click)="loadFeaturedTenor()" [disabled]="tenorControl.disabled || tenorLoading()">
+                <mat-icon>whatshot</mat-icon>
+                Featured
+              </button>
+              @if (tenorNext()) {
+                <button mat-stroked-button type="button" (click)="loadMoreTenor()" [disabled]="tenorControl.disabled || tenorLoading()">
+                  <mat-icon>arrow_forward</mat-icon>
+                  More
+                </button>
+              }
+            </div>
+          </div>
+
+          @if (tenorResults().length > 0) {
+            <div class="tenor-grid">
+              @for (result of tenorResults(); track trackTenorResult($index, result)) {
+                <button type="button" class="tenor-result" (click)="selectTenorResult(result)" [disabled]="form.disabled">
+                  <img [src]="result.media_formats.gif.url" [alt]="result.title || 'Tenor GIF'" />
+                </button>
+              }
+            </div>
+          }
+
+          @if (hasMedia()) {
+            <div class="selected-media">
+              <div class="selected-media-head">
+                <h3>Selected media</h3>
+                <button mat-icon-button type="button" (click)="removeMultimedia()" [disabled]="form.disabled" aria-label="Remove media">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+
+              <p class="media-type">{{ multimedia().type }}</p>
+              @if (multimedia().title) {
+                <p class="media-title">{{ multimedia().title }}</p>
+              }
+              @if (multimedia().description) {
+                <p class="media-description">{{ multimedia().description }}</p>
+              }
+              @if (multimedia().sourceUrl) {
+                <a [href]="multimedia().sourceUrl" target="_blank" rel="noopener">Open original source</a>
+              }
+
+              @if (multimedia().type === 'tenor' && multimedia().url) {
+                <img class="tenor-preview" [src]="multimedia().url" [alt]="multimedia().title || 'Selected GIF'" />
+              } @else if (safeOembedHtml()) {
+                <div class="oembed-preview" [innerHTML]="safeOembedHtml()"></div>
+              }
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <div class="action-bar">
+    <button mat-stroked-button type="button" routerLink="/dashboard/content">
+      <mat-icon>list</mat-icon>
+      Content overview
+    </button>
+
+    <span class="spacer"></span>
+
+    @if (isEditMode() && !isDeleted()) {
+      <button mat-stroked-button type="button" color="warn" (click)="confirmDelete()" [disabled]="saving()">
+        <mat-icon>delete</mat-icon>
+        Delete
+      </button>
+    }
+
+    @if (isPublished()) {
+      <button mat-flat-button type="button" color="warn" (click)="confirmWithdraw()" [disabled]="saving()">
+        <mat-icon>unpublished</mat-icon>
+        Withdraw
+      </button>
+    } @else if (!isDeleted()) {
+      <button mat-stroked-button type="button" (click)="saveDraft()" [disabled]="saving()">
+        <mat-icon>save</mat-icon>
+        Save draft
+      </button>
+
+      @if (canPublish()) {
+        <button mat-flat-button type="button" color="primary" (click)="saveAndPublish()" [disabled]="saving()">
+          <mat-icon>publish</mat-icon>
+          Publish
+        </button>
+      }
+    }
+  </div>
+</div>
