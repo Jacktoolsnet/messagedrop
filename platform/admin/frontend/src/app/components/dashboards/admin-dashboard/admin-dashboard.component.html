@@ -25,6 +25,7 @@
         </mat-card>
         }
         <!-- Users -->
+        @if (canAccessUsers()) {
         <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/user" role="button" tabindex="0">
             <mat-card-header>
                 <div mat-card-avatar class="avatar avatar-neutral">
@@ -34,6 +35,7 @@
                 <mat-card-subtitle class="tile-subtitle"></mat-card-subtitle>
             </mat-card-header>
         </mat-card>
+        }
 
         @if (canManageContent()) {
         <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/content" role="button" tabindex="0">
@@ -48,6 +50,7 @@
         }
 
         <!-- Digital Services Act -->
+        @if (canAccessDsa()) {
         <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/dsa" role="button" tabindex="0">
             <mat-card-header>
                 <div mat-card-avatar class="avatar avatar-accent" [matBadge]="dsaTodoBadge()" [matBadgeHidden]="dsaTodoCount() === 0"
@@ -58,8 +61,10 @@
                 <mat-card-subtitle class="tile-subtitle"></mat-card-subtitle>
             </mat-card-header>
         </mat-card>
+        }
 
         <!-- Moderation -->
+        @if (canAccessModeration()) {
         <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/dsa/moderation" role="button"
             tabindex="0">
             <mat-card-header>
@@ -71,8 +76,10 @@
                 <mat-card-subtitle class="tile-subtitle"></mat-card-subtitle>
             </mat-card-header>
         </mat-card>
+        }
 
         <!-- Statistic -->
+        @if (canAccessStatistics()) {
         <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/statistic" role="button"
             tabindex="0">
             <mat-card-header>
@@ -83,8 +90,10 @@
                 <mat-card-subtitle class="tile-subtitle"></mat-card-subtitle>
             </mat-card-header>
         </mat-card>
+        }
 
         <!-- Error Logs -->
+        @if (canAccessLogs()) {
         <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/logs/errors" role="button"
             tabindex="0">
             <mat-card-header>
@@ -143,5 +152,6 @@
                 <mat-card-title class="tile-title">PoW Logs</mat-card-title>
             </mat-card-header>
         </mat-card>
+        }
     </div>
 </div>

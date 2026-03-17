@@ -1,11 +1,12 @@
 const express = require('express');
 const crypto = require('crypto');
 const router = express.Router();
-const { requireServiceOrAdminJwt } = require('../middleware/security');
+const { requireRoleIfAdmin, requireServiceOrAdminJwt } = require('../middleware/security');
 const tableAudit = require('../db/tableDsaAuditLog');
 const { apiError } = require('../middleware/api-error');
 
 router.use(requireServiceOrAdminJwt);
+router.use(requireRoleIfAdmin('moderator', 'legal', 'admin', 'root'));
 
 function normalizeText(value, maxLength = 255) {
   if (typeof value !== 'string') {

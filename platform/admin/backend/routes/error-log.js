@@ -1,13 +1,14 @@
 const express = require('express');
 const crypto = require('crypto');
 const router = express.Router();
-const { requireServiceOrAdminJwt } = require('../middleware/security');
+const { requireRoleIfAdmin, requireServiceOrAdminJwt } = require('../middleware/security');
 const tableErrorLog = require('../db/tableErrorLog');
 const { apiError } = require('../middleware/api-error');
 const { parseRetentionMs, DAY_MS } = require('../utils/logRetention');
 
 // Allow internal services via static token and admins via JWT
 router.use(requireServiceOrAdminJwt);
+router.use(requireRoleIfAdmin('admin', 'root'));
 
 /**
  * GET /error-log

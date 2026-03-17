@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const { requireServiceOrAdminJwt } = require('../middleware/security');
+const { requireRoleIfAdmin, requireServiceOrAdminJwt } = require('../middleware/security');
 const tablePowLog = require('../db/tablePowLog');
 const { logPowEvent } = require('../utils/powLogger');
 const { apiError } = require('../middleware/api-error');
 
 // Allow internal services via service JWT and admins via JWT
 router.use(requireServiceOrAdminJwt);
+router.use(requireRoleIfAdmin('admin', 'root'));
 
 /**
  * GET /pow-log

@@ -39,6 +39,7 @@ export class AuthService {
   constructor() {
     if (this.token) {
       this._isLoggedIn.set(true);
+      this.hydrateUserInfoFromToken(this.token);
       this.loadUserInfo();
     }
   }
@@ -56,6 +57,7 @@ export class AuthService {
   completeLogin(token: string) {
     localStorage.setItem('admin_token', token);
     this._isLoggedIn.set(true);
+    this.hydrateUserInfoFromToken(token);
     this.loadUserInfo();
     this.router.navigate(['/dashboard']);
   }
@@ -63,6 +65,8 @@ export class AuthService {
   logout() {
     localStorage.removeItem('admin_token');
     this._isLoggedIn.set(false);
+    this.username.set(null);
+    this.role.set(null);
     this.router.navigate(['/login']);
   }
 
@@ -77,19 +81,58 @@ export class AuthService {
     const token = localStorage.getItem('admin_token');
     if (!token) return;
 
-    this.http.get<{ username: string; role: string }>(`${this.baseUrl}/me`, {
+    this.http.get<{ username: string; role: string; roles?: string[] }>(`${this.baseUrl}/me`, {
       headers: new HttpHeaders({
         Authorization: `Bearer ${token}`
       })
     }).subscribe({
       next: (data) => {
         this.username.set(data.username);
-        this.role.set(data.role);
+        this.role.set(data.role || data.roles?.[0] || null);
       },
       error: () => {
         this.username.set(null);
         this.role.set(null);
       }
     });
+  }
+
+  hasAnyRole(allowedRoles: readonly string[]): boolean {
+    return allowedRoles.includes(this.role() ?? '');
+  }
+
+  private hydrateUserInfoFromToken(token: string) {
+    try {
+      const payloadPart = token.split('.')[1];
+      if (!payloadPart) {
+        return;
+      }
+
+      const normalized = payloadPart
+        .replace(/-/g, '+')
+        .replace(/_/g, '/')
+        .padEnd(Math.ceil(payloadPart.length / 4) * 4, '=');
+      const payload = JSON.parse(globalThis.atob(normalized)) as {
+        username?: string;
+        role?: string;
+        roles?: string[];
+      };
+
+      if (typeof payload.username === 'string' && payload.username.trim()) {
+        this.username.set(payload.username.trim());
+      }
+
+      const role = typeof payload.role === 'string'
+        ? payload.role
+        : Array.isArray(payload.roles) && typeof payload.roles[0] === 'string'
+          ? payload.roles[0]
+          : null;
+
+      if (role) {
+        this.role.set(role);
+      }
+    } catch {
+      // ignore malformed token payload, loadUserInfo will refresh from backend
+    }
   }
 }

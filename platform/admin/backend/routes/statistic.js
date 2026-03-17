@@ -86,14 +86,14 @@ function fillMissing(from, to, rows) {
 // ===== Endpoints =====
 
 /** Settings: Admin-JWT protected (not static token) */
-router.get('/settings', [security.requireAdminJwt], (req, res, next) => {
+router.get('/settings', [security.requireAdminJwt, security.requireRole('admin', 'root')], (req, res, next) => {
     statisticSettings.getAll(req.database.db, (err, rows) => {
         if (err) return next(apiError.internal('db_error'));
         res.json({ status: 200, settings: rows });
     });
 });
 
-router.put('/settings', [security.requireAdminJwt], (req, res, next) => {
+router.put('/settings', [security.requireAdminJwt, security.requireRole('admin', 'root')], (req, res, next) => {
     const items = Array.isArray(req.body?.settings) ? req.body.settings : [];
     statisticSettings.upsertMany(req.database.db, items, (err) => {
         if (err) return next(apiError.internal('db_error'));
@@ -101,7 +101,7 @@ router.put('/settings', [security.requireAdminJwt], (req, res, next) => {
     });
 });
 
-router.use(security.requireAdminJwt);
+router.use(security.requireAdminJwt, security.requireRole('admin', 'root'));
 
 /**
  * GET /statistic/keys

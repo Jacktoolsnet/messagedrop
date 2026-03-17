@@ -122,6 +122,20 @@ function requireRole(...allowed) {
   };
 }
 
+/**
+ * Erlaubt interne Service-JWTs immer.
+ * Falls ein Admin-JWT verwendet wird, muss die Rolle passen.
+ */
+function requireRoleIfAdmin(...allowed) {
+  const adminRoleGuard = requireRole(...allowed);
+  return (req, res, next) => {
+    if (req.service) {
+      return next();
+    }
+    return adminRoleGuard(req, res, next);
+  };
+}
+
 const checkToken = requireServiceJwt;
 
 module.exports = {
@@ -130,5 +144,6 @@ module.exports = {
   requireAdminJwt,
   requireServiceOrAdminJwt,
   requireRole,
+  requireRoleIfAdmin,
   checkToken
 };

@@ -25,6 +25,7 @@ import { PublicStatusComponent } from './components/public-status/public-status.
 import { PublicOverviewComponent } from './components/statistic/public-overview/public-overview.component';
 import { StatisticComponent } from './components/statistic/statistic.component';
 import { authGuard } from './guards/auth/auth-guard';
+import { CONTENT_MODULE_ROLES, DSA_MODULE_ROLES, MODERATION_MODULE_ROLES, ROOT_ADMIN_ROLES, USER_MODULE_ROLES } from './utils/admin-role-access';
 
 export const routes: Routes = [
     { path: 'status/:token', component: PublicStatusComponent },
@@ -39,112 +40,134 @@ export const routes: Routes = [
     {
         path: 'dashboard/statistic',
         component: StatisticComponent,
-        canActivate: [authGuard]
+        canActivate: [authGuard],
+        data: { allowedRoles: ROOT_ADMIN_ROLES }
     },
     {
         path: 'dashboard/maintenance',
         component: MaintenanceComponent,
-        canActivate: [authGuard]
+        canActivate: [authGuard],
+        data: { allowedRoles: ROOT_ADMIN_ROLES }
     },
     {
         path: 'dashboard/dsa/notifications',
         component: NotificationsComponent,
-        canActivate: [authGuard]
+        canActivate: [authGuard],
+        data: { allowedRoles: DSA_MODULE_ROLES }
     },
     {
         path: 'dashboard/user',
         component: UserDashboardComponent,
-        canActivate: [authGuard]
+        canActivate: [authGuard],
+        data: { allowedRoles: USER_MODULE_ROLES }
     },
     {
         path: 'dashboard/content',
         component: PublicContentListComponent,
-        canActivate: [authGuard]
+        canActivate: [authGuard],
+        data: { allowedRoles: CONTENT_MODULE_ROLES }
     },
     {
         path: 'dashboard/content/create',
         component: PublicContentEditorComponent,
-        canActivate: [authGuard]
+        canActivate: [authGuard],
+        data: { allowedRoles: CONTENT_MODULE_ROLES }
     },
     {
         path: 'dashboard/content/:id/edit',
         component: PublicContentEditorComponent,
-        canActivate: [authGuard]
+        canActivate: [authGuard],
+        data: { allowedRoles: CONTENT_MODULE_ROLES }
     },
     {
         path: 'dashboard/dsa',
         component: DsaDashboardComponent,
-        canActivate: [authGuard]
+        canActivate: [authGuard],
+        data: { allowedRoles: DSA_MODULE_ROLES }
     },
     {
         path: 'dashboard/dsa/signals',
         component: SignalsComponent,
-        canActivate: [authGuard]
+        canActivate: [authGuard],
+        data: { allowedRoles: DSA_MODULE_ROLES }
     },
     {
         path: 'dashboard/dsa/notices',
         component: NoticesComponent,
-        canActivate: [authGuard]
+        canActivate: [authGuard],
+        data: { allowedRoles: DSA_MODULE_ROLES }
     },
     {
         path: 'dashboard/dsa/appeals',
         component: AppealsComponent,
-        canActivate: [authGuard]
+        canActivate: [authGuard],
+        data: { allowedRoles: DSA_MODULE_ROLES }
     },
     {
         path: 'dashboard/dsa/decisions',
         component: DecisionsComponent,
-        canActivate: [authGuard]
+        canActivate: [authGuard],
+        data: { allowedRoles: DSA_MODULE_ROLES }
     },
     {
         path: 'dashboard/dsa/evidence',
         component: EvidencesComponent,
-        canActivate: [authGuard]
+        canActivate: [authGuard],
+        data: { allowedRoles: DSA_MODULE_ROLES }
     },
     {
         path: 'dashboard/dsa/transparency',
         component: TransparencyComponent,
-        canActivate: [authGuard]
+        canActivate: [authGuard],
+        data: { allowedRoles: DSA_MODULE_ROLES }
     },
     {
         path: 'dashboard/dsa/user-moderation',
         component: UserModerationComponent,
-        canActivate: [authGuard]
+        canActivate: [authGuard],
+        data: { allowedRoles: DSA_MODULE_ROLES }
     },
     {
         path: 'dashboard/dsa/audits',
         component: AuditsComponent,
-        canActivate: [authGuard]
+        canActivate: [authGuard],
+        data: { allowedRoles: DSA_MODULE_ROLES }
     },
     {
         path: 'dashboard/dsa/moderation',
         component: ModerationQueueComponent,
-        canActivate: [authGuard]
+        canActivate: [authGuard],
+        data: { allowedRoles: MODERATION_MODULE_ROLES }
     },
     {
         path: 'dashboard/logs/errors',
         component: ErrorLogsComponent,
-        canActivate: [authGuard]
+        canActivate: [authGuard],
+        data: { allowedRoles: ROOT_ADMIN_ROLES }
     },
     {
         path: 'dashboard/logs/warn',
         component: WarnLogsComponent,
-        canActivate: [authGuard]
+        canActivate: [authGuard],
+        data: { allowedRoles: ROOT_ADMIN_ROLES }
     },
     {
         path: 'dashboard/logs/info',
         component: InfoLogsComponent,
-        canActivate: [authGuard]
+        canActivate: [authGuard],
+        data: { allowedRoles: ROOT_ADMIN_ROLES }
     },
     {
         path: 'dashboard/logs/app',
         component: AppLogsComponent,
-        canActivate: [authGuard]
+        canActivate: [authGuard],
+        data: { allowedRoles: ROOT_ADMIN_ROLES }
     },
     {
         path: 'dashboard/logs/pow',
         component: PowLogsComponent,
-        canActivate: [authGuard]
+        canActivate: [authGuard],
+        data: { allowedRoles: ROOT_ADMIN_ROLES }
     },
     { path: '**', redirectTo: '' }
 ];

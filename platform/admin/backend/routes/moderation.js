@@ -1,7 +1,7 @@
 const express = require('express');
 const crypto = require('crypto');
 const axios = require('axios');
-const { requireAdminJwt, requireRole, requireServiceOrAdminJwt } = require('../middleware/security');
+const { requireAdminJwt, requireRole, requireRoleIfAdmin, requireServiceOrAdminJwt } = require('../middleware/security');
 const { signServiceJwt } = require('../utils/serviceJwt');
 const tableModerationRequest = require('../db/tableModerationRequest');
 const { formatExcerpt, sendPushbulletNotification } = require('../utils/pushbullet');
@@ -12,6 +12,7 @@ const router = express.Router();
 router.use(express.json({ limit: '256kb' }));
 
 router.use(requireServiceOrAdminJwt);
+router.use(requireRoleIfAdmin('moderator', 'legal', 'admin', 'root'));
 
 function normalizeBool(value) {
     if (value === undefined || value === null) return null;
