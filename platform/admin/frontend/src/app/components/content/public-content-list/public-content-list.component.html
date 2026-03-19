@@ -20,6 +20,15 @@
       mat-icon-button
       type="button"
       class="toolbar-action"
+      (click)="openProfiles()"
+      aria-label="Manage public profiles">
+      <mat-icon>groups</mat-icon>
+    </button>
+
+    <button
+      mat-icon-button
+      type="button"
+      class="toolbar-action"
       (click)="load()"
       aria-label="Refresh content list">
       <mat-icon>refresh</mat-icon>
@@ -59,7 +68,7 @@
 
       <mat-form-field appearance="outline" class="search-field">
         <mat-label>Search</mat-label>
-        <input matInput formControlName="q" placeholder="Search in message, author or location" />
+        <input matInput formControlName="q" placeholder="Search in message, author, profile or location" />
       </mat-form-field>
     </div>
 
@@ -67,9 +76,15 @@
       @for (row of rows(); track trackById($index, row)) {
         <mat-card class="tile content-tile" (click)="openContent(row)" tabindex="0" (keydown.enter)="openContent(row)">
           <div class="content-preview-avatar-box">
-            <mat-icon class="content-preview-avatar-icon" aria-hidden="true">{{ tileAvatarIcon(row) }}</mat-icon>
+            <div class="content-preview-avatar-icon" aria-hidden="true">
+              @if (profileAvatar(row)) {
+                <img [src]="profileAvatar(row)" [alt]="profileName(row)" />
+              } @else {
+                <span>{{ profileInitials(row) }}</span>
+              }
+            </div>
             <div class="content-preview-avatar-text">
-              <span class="content-preview-name">Public message</span>
+              <span class="content-preview-name">{{ profileName(row) }}</span>
               <span class="content-preview-timestamp">{{ row.authorUsername }} • {{ row.updatedAt | date:'dd.MM.yyyy HH:mm' }}</span>
             </div>
             <span class="status-pill content-preview-status" [class]="'status-pill content-preview-status ' + statusClass(row.status)">
@@ -96,7 +111,7 @@
             }
 
             @if (tilePreview(row)) {
-              <div class="content-preview-message-shell" [style]="row.message ? row.style : ''">
+              <div class="content-preview-message-shell" [style]="row.message ? resolvedStyle(row) : ''">
                 <p class="content-preview-message-text">{{ tilePreview(row) }}</p>
               </div>
             }

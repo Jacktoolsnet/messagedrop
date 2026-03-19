@@ -1,0 +1,176 @@
+<mat-toolbar color="primary">
+  <button mat-icon-button routerLink="/dashboard/content" aria-label="Back to public content">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+
+  <span class="toolbar-title">Public profiles</span>
+  <span class="spacer"></span>
+
+  <div class="toolbar-actions">
+    <button
+      mat-icon-button
+      type="button"
+      class="toolbar-action avatar avatar-accent"
+      (click)="startNewProfile()"
+      [disabled]="saving()"
+      aria-label="Create public profile">
+      <mat-icon>add</mat-icon>
+    </button>
+
+    <button
+      mat-icon-button
+      type="button"
+      class="toolbar-action avatar avatar-success"
+      (click)="saveProfile()"
+      [disabled]="saving() || loading()"
+      aria-label="Save public profile">
+      <mat-icon>save</mat-icon>
+    </button>
+
+    @if (selectedProfile()) {
+      <button
+        mat-icon-button
+        type="button"
+        class="toolbar-action avatar avatar-warn toolbar-danger"
+        (click)="confirmDeleteSelected()"
+        [disabled]="saving()"
+        aria-label="Delete public profile">
+        <mat-icon>delete</mat-icon>
+      </button>
+    }
+  </div>
+</mat-toolbar>
+
+@if (loading() || saving()) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+<div class="page">
+  <div class="layout">
+    <div class="list-column">
+      <mat-card class="section-card">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-neutral">
+            <mat-icon>groups</mat-icon>
+          </div>
+          <mat-card-title>Editorial profiles</mat-card-title>
+          <mat-card-subtitle>Separate public sender profiles for drafts, previews and publishing.</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          @if (rows().length === 0 && !loading()) {
+            <div class="empty-state">
+              <mat-icon>person_add</mat-icon>
+              <div>No public profiles yet. Create the first one with the plus icon above.</div>
+            </div>
+          } @else {
+            <div class="profile-list">
+              @for (row of rows(); track trackById($index, row)) {
+                <button
+                  type="button"
+                  class="profile-list-item"
+                  [class.active]="row.id === selectedProfileId() && !isCreatingNew()"
+                  (click)="selectProfile(row)">
+                  <div class="profile-avatar-shell">
+                    @if (row.avatarImage) {
+                      <img [src]="row.avatarImage" [alt]="row.name" />
+                    } @else {
+                      <span>{{ row.name.charAt(0).toUpperCase() }}</span>
+                    }
+                  </div>
+
+                  <div class="profile-copy">
+                    <strong>{{ row.name }}</strong>
+                    <span [style]="row.defaultStyle">{{ row.name }}</span>
+                    <span>{{ row.contentCount }} linked message{{ row.contentCount === 1 ? '' : 's' }}</span>
+                  </div>
+
+                  <mat-icon class="profile-chevron">chevron_right</mat-icon>
+                </button>
+              }
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div class="editor-column">
+      <mat-card class="section-card">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-accent">
+            <mat-icon>{{ selectedProfile() ? 'edit' : 'add_circle' }}</mat-icon>
+          </div>
+          <mat-card-title>{{ selectedProfile() ? 'Edit profile' : 'Create profile' }}</mat-card-title>
+          <mat-card-subtitle>Avatar, display name and default text style for public publishing.</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <form [formGroup]="form" class="form-grid">
+            <div class="profile-preview-card">
+              <div class="profile-preview-avatar">
+                @if (avatarPreview()) {
+                  <img [src]="avatarPreview()" [alt]="form.controls.name.value || 'Profile avatar preview'" />
+                } @else {
+                  <span>{{ profileInitials() }}</span>
+                }
+              </div>
+
+              <div class="profile-preview-copy">
+                <h3>{{ form.controls.name.value || 'New public profile' }}</h3>
+                <p [style]="form.controls.defaultStyle.value">Preview text in the selected default font.</p>
+              </div>
+            </div>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Profile name</mat-label>
+              <input matInput formControlName="name" placeholder="Berlin Nightlife" />
+              <mat-hint>This name is used in the admin UI to recognize the assigned public profile.</mat-hint>
+            </mat-form-field>
+
+            <div class="avatar-upload-row">
+              <input #avatarInput type="file" accept="image/*" hidden (change)="handleAvatarSelection($event)" />
+
+              <button mat-stroked-button type="button" (click)="triggerAvatarPicker(avatarInput)">
+                <mat-icon>image</mat-icon>
+                Choose avatar
+              </button>
+
+              <button mat-stroked-button type="button" (click)="removeAvatar()" [disabled]="!avatarPreview()">
+                <mat-icon>delete</mat-icon>
+                Remove avatar
+              </button>
+            </div>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Default text style</mat-label>
+              <mat-select formControlName="defaultStyle">
+                @for (option of styleOptions; track trackStyleOption($index, option)) {
+                  <mat-option [value]="option.style">
+                    <div class="style-option-row">
+                      <span class="style-option-name" [style.font-family]="option.fontFamily">
+                        {{ option.fontFamily }}
+                      </span>
+                      <span class="style-option-sample" [style.font-family]="option.fontFamily">
+                        Aa Bb Cc
+                      </span>
+                    </div>
+                  </mat-option>
+                }
+              </mat-select>
+              <mat-hint>The profile default font is used in the content editor unless a message overrides it.</mat-hint>
+            </mat-form-field>
+
+            @if (selectedStyleOption(); as option) {
+              <div class="style-preview-box">
+                <span class="style-preview-label">Default font preview</span>
+                <span class="style-preview-value" [style.font-family]="option.fontFamily">
+                  Public profile preview text
+                </span>
+              </div>
+            }
+          </form>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

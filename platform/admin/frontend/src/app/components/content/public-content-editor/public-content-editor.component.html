@@ -78,6 +78,16 @@
 
           <div class="meta-fact-card">
             <div class="meta-fact-icon">
+              <mat-icon>groups</mat-icon>
+            </div>
+            <div class="meta-fact-copy">
+              <span class="meta-fact-label">Profile</span>
+              <span class="meta-fact-value">{{ content.publicProfile?.name || 'No profile assigned' }}</span>
+            </div>
+          </div>
+
+          <div class="meta-fact-card">
+            <div class="meta-fact-icon">
               <mat-icon>schedule</mat-icon>
             </div>
             <div class="meta-fact-copy">
@@ -120,6 +130,81 @@
 
   <div class="editor-layout">
     <div class="main-column">
+      <mat-card class="profile-card">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-neutral">
+            <mat-icon>groups</mat-icon>
+          </div>
+          <mat-card-title>Public profile</mat-card-title>
+          <mat-card-subtitle>Choose the public sender profile for this message.</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          @if (publicProfiles().length === 0 && !profilesLoading()) {
+            <div class="missing-profile-state">
+              <mat-icon>person_add</mat-icon>
+              <div>
+                <strong>No public profiles available.</strong>
+                <p>Create at least one public profile before saving or publishing a public message.</p>
+              </div>
+              <button mat-stroked-button type="button" (click)="openPublicProfiles()">
+                <mat-icon>open_in_new</mat-icon>
+                Manage profiles
+              </button>
+            </div>
+          } @else {
+            <div class="profile-picker-layout">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Public profile</mat-label>
+                <mat-select [formControl]="form.controls.publicProfileId">
+                  @for (profile of publicProfiles(); track trackPublicProfile($index, profile)) {
+                    <mat-option [value]="profile.id">
+                      <div class="profile-option-row">
+                        <div class="profile-option-avatar">
+                          @if (profile.avatarImage) {
+                            <img [src]="profile.avatarImage" [alt]="profile.name" />
+                          } @else {
+                            <span>{{ profile.name.charAt(0).toUpperCase() }}</span>
+                          }
+                        </div>
+                        <div class="profile-option-copy">
+                          <span class="profile-option-name">{{ profile.name }}</span>
+                          <span class="profile-option-style" [style]="profile.defaultStyle">
+                            Default font preview
+                          </span>
+                        </div>
+                      </div>
+                    </mat-option>
+                  }
+                </mat-select>
+                <mat-hint>The selected profile determines the public sender identity and the default font.</mat-hint>
+              </mat-form-field>
+
+              <button mat-icon-button type="button" class="profile-manage-button" (click)="openPublicProfiles()" aria-label="Manage public profiles">
+                <mat-icon>open_in_new</mat-icon>
+              </button>
+            </div>
+
+            @if (selectedProfile()) {
+              <div class="selected-profile-preview">
+                <div class="selected-profile-avatar">
+                  @if (profileAvatar()) {
+                    <img [src]="profileAvatar()" [alt]="profileName()" />
+                  } @else {
+                    <span>{{ profileInitials() }}</span>
+                  }
+                </div>
+
+                <div class="selected-profile-copy">
+                  <strong>{{ profileName() }}</strong>
+                  <span [style]="selectedProfile()?.defaultStyle">Default profile font preview</span>
+                </div>
+              </div>
+            }
+          }
+        </mat-card-content>
+      </mat-card>
+
       <mat-card class="editor-card">
         <mat-card-header>
           <div mat-card-avatar class="avatar avatar-accent">
@@ -147,25 +232,29 @@
               </button>
               <button mat-stroked-button type="button" (click)="clearStyle()" [disabled]="form.disabled">
                 <mat-icon>format_clear</mat-icon>
-                Default font
+                Profile default
               </button>
             </div>
 
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Text style</mat-label>
-              <mat-select
-                #styleSelect
-                formControlName="style"
-                (openedChange)="handleStyleSelectOpenedChange($event)"
-                (keydown)="handleStyleSelectKeydown()"
-                (selectionChange)="resetPreviewStyle()">
+                <mat-select
+                  #styleSelect
+                  formControlName="style"
+                  (openedChange)="handleStyleSelectOpenedChange($event)"
+                  (keydown)="handleStyleSelectKeydown()"
+                  (selectionChange)="resetPreviewStyle()">
                 <mat-select-trigger>
                   @if (selectedStyleOption(); as selected) {
                     <span class="style-select-trigger" [style.font-family]="selected.fontFamily">
                       {{ selected.fontFamily }}
                     </span>
+                  } @else if (profileDefaultStyleOption(); as defaultOption) {
+                    <span class="style-select-trigger" [style.font-family]="defaultOption.fontFamily">
+                      Profile default • {{ defaultOption.fontFamily }}
+                    </span>
                   } @else {
-                    <span class="style-select-placeholder">Default font</span>
+                    <span class="style-select-placeholder">Choose a text style</span>
                   }
                 </mat-select-trigger>
 
@@ -182,7 +271,7 @@
                   </mat-option>
                 }
               </mat-select>
-              <mat-hint>Uses the same font styles as the public MessageDrop app.</mat-hint>
+              <mat-hint>Uses the same font styles as the public MessageDrop app. Clear the field to use the selected profile default.</mat-hint>
             </mat-form-field>
 
           </form>
@@ -450,9 +539,15 @@
           <div class="preview-canvas">
             <mat-card class="preview-item has-badge">
               <div class="preview-avatar-box">
-                <mat-icon class="preview-avatar-icon" aria-hidden="true">campaign</mat-icon>
+                <div class="preview-avatar-icon" aria-hidden="true">
+                  @if (profileAvatar()) {
+                    <img [src]="profileAvatar()" [alt]="profileName()" />
+                  } @else {
+                    <span>{{ profileInitials() }}</span>
+                  }
+                </div>
                 <div class="preview-avatar-text">
-                  <span class="preview-name">Public message</span>
+                  <span class="preview-name">{{ profileName() }}</span>
                   <span class="preview-timestamp">{{ (currentContent()?.updatedAt ?? previewCreatedAt) | date:'medium' }}</span>
                 </div>
               </div>

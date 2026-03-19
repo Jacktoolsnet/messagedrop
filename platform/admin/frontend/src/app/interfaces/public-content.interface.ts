@@ -1,5 +1,6 @@
 import { Multimedia } from './multimedia.interface';
 import { PublicContentStatus } from './public-content-status.type';
+import { PublicProfileSummary } from './public-profile.interface';
 
 export interface PublicContentLocation {
   latitude: number;
@@ -12,6 +13,7 @@ export interface PublicContent {
   id: string;
   authorAdminUserId: string;
   authorUsername: string;
+  publicProfile: PublicProfileSummary | null;
   lastEditorAdminUserId: string | null;
   lastEditorUsername: string | null;
   publisherAdminUserId: string | null;

@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, finalize, map, Observable, of, throwError } from 'rxjs';
@@ -126,6 +126,9 @@ export class PublicContentService {
     if (filters.q?.trim()) {
       params = params.set('q', filters.q.trim());
     }
+    if (filters.publicProfileId?.trim()) {
+      params = params.set('publicProfileId', filters.publicProfileId.trim());
+    }
     if (Number.isFinite(filters.limit)) {
       params = params.set('limit', String(filters.limit));
     }
@@ -137,12 +140,22 @@ export class PublicContentService {
   }
 
   private handleError(error: unknown, message: string) {
-    this.snackBar.open(message, 'OK', {
+    this.snackBar.open(this.resolveErrorMessage(error, message), 'OK', {
       duration: 3000,
       panelClass: ['snack-error'],
       horizontalPosition: 'center',
       verticalPosition: 'top'
     });
     return throwError(() => error);
+  }
+
+  private resolveErrorMessage(error: unknown, fallbackMessage: string): string {
+    if (error instanceof HttpErrorResponse) {
+      const backendMessage = error.error?.message || error.error?.error || error.message;
+      if (typeof backendMessage === 'string' && backendMessage.trim()) {
+        return backendMessage.trim();
+      }
+    }
+    return fallbackMessage;
   }
 }

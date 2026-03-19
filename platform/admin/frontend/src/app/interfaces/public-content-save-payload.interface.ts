@@ -1,6 +1,7 @@
 import { Multimedia } from './multimedia.interface';
 
 export interface PublicContentSavePayload {
+  publicProfileId: string;
   message: string;
   location: {
     latitude: number;

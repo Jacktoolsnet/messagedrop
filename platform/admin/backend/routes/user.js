@@ -164,7 +164,7 @@ const stripUser = (u) => u && ({
     createdAt: u.createdAt
 });
 const isAdminOrRoot = (roles) => (Array.isArray(roles) ? roles : []).some(r => r === 'admin' || r === 'root');
-const needsPublicBackendUser = (role) => role === 'editor';
+const needsPublicBackendUser = (_role) => false;
 
 const hashOtp = (otp) => {
     const salt = process.env.ADMIN_OTP_SECRET || ADMIN_JWT_SECRET || '';

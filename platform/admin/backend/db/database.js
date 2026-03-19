@@ -17,6 +17,7 @@ const tableWarnLog = require('./tableWarnLog');
 const tableFrontendErrorLog = require('./tableFrontendErrorLog');
 const tablePowLog = require('./tablePowLog');
 const tableModerationRequest = require('./tableModerationRequest');
+const tablePublicProfile = require('./tablePublicProfile');
 const tablePublicContent = require('./tablePublicContent');
 
 
@@ -263,6 +264,7 @@ class Database {
       tableFrontendErrorLog.init(this.db);
       tablePowLog.init(this.db);
       tableModerationRequest.init(this.db);
+      tablePublicProfile.init(this.db);
       tablePublicContent.init(this.db);
 
       // Trigger initialisieren

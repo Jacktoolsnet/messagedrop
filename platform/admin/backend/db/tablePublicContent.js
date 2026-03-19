@@ -2,6 +2,7 @@ const crypto = require('crypto');
 
 const tableName = 'tablePublicContent';
 const adminUserTableName = 'tableUser';
+const publicProfileTableName = 'tablePublicProfile';
 
 const contentStatus = {
   DRAFT: 'draft',
@@ -13,6 +14,7 @@ const contentStatus = {
 const columns = {
   id: 'id',
   authorAdminUserId: 'authorAdminUserId',
+  publicProfileId: 'publicProfileId',
   lastEditorAdminUserId: 'lastEditorAdminUserId',
   publisherAdminUserId: 'publisherAdminUserId',
   publisherPublicUserId: 'publisherPublicUserId',
@@ -40,6 +42,7 @@ function init(db) {
     CREATE TABLE IF NOT EXISTS ${tableName} (
       ${columns.id} TEXT PRIMARY KEY NOT NULL,
       ${columns.authorAdminUserId} TEXT NOT NULL,
+      ${columns.publicProfileId} TEXT DEFAULT NULL,
       ${columns.lastEditorAdminUserId} TEXT DEFAULT NULL,
       ${columns.publisherAdminUserId} TEXT DEFAULT NULL,
       ${columns.publisherPublicUserId} TEXT DEFAULT NULL,
@@ -63,6 +66,9 @@ function init(db) {
       CONSTRAINT fk_public_content_author
         FOREIGN KEY (${columns.authorAdminUserId}) REFERENCES ${adminUserTableName}(id)
         ON UPDATE CASCADE ON DELETE CASCADE,
+      CONSTRAINT fk_public_content_profile
+        FOREIGN KEY (${columns.publicProfileId}) REFERENCES ${publicProfileTableName}(id)
+        ON UPDATE CASCADE ON DELETE RESTRICT,
       CONSTRAINT fk_public_content_editor
         FOREIGN KEY (${columns.lastEditorAdminUserId}) REFERENCES ${adminUserTableName}(id)
         ON UPDATE CASCADE ON DELETE SET NULL,
@@ -73,6 +79,8 @@ function init(db) {
 
     CREATE INDEX IF NOT EXISTS idx_public_content_author
       ON ${tableName}(${columns.authorAdminUserId}, ${columns.updatedAt} DESC);
+    CREATE INDEX IF NOT EXISTS idx_public_content_profile
+      ON ${tableName}(${columns.publicProfileId}, ${columns.updatedAt} DESC);
     CREATE INDEX IF NOT EXISTS idx_public_content_status
       ON ${tableName}(${columns.status}, ${columns.updatedAt} DESC);
     CREATE INDEX IF NOT EXISTS idx_public_content_published_uuid
@@ -91,14 +99,24 @@ function init(db) {
     }
 
     const hasLocationLabelColumn = rows.some((row) => row?.name === columns.locationLabel);
-    if (hasLocationLabelColumn) {
-      return;
+    const hasPublicProfileIdColumn = rows.some((row) => row?.name === columns.publicProfileId);
+    if (!hasPublicProfileIdColumn) {
+      db.run(`
+        ALTER TABLE ${tableName}
+        ADD COLUMN ${columns.publicProfileId} TEXT DEFAULT NULL
+      `, []);
+      db.run(`
+        CREATE INDEX IF NOT EXISTS idx_public_content_profile
+          ON ${tableName}(${columns.publicProfileId}, ${columns.updatedAt} DESC)
+      `, []);
     }
 
-    db.run(`
-      ALTER TABLE ${tableName}
-      ADD COLUMN ${columns.locationLabel} TEXT NOT NULL DEFAULT ''
-    `, []);
+    if (!hasLocationLabelColumn) {
+      db.run(`
+        ALTER TABLE ${tableName}
+        ADD COLUMN ${columns.locationLabel} TEXT NOT NULL DEFAULT ''
+      `, []);
+    }
   });
 }
 
@@ -109,6 +127,7 @@ function create(db, payload, callback) {
     INSERT INTO ${tableName} (
       ${columns.id},
       ${columns.authorAdminUserId},
+      ${columns.publicProfileId},
       ${columns.lastEditorAdminUserId},
       ${columns.publisherAdminUserId},
       ${columns.publisherPublicUserId},
@@ -129,12 +148,13 @@ function create(db, payload, callback) {
       ${columns.publishedAt},
       ${columns.withdrawnAt},
       ${columns.deletedAt}
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   const params = [
     id,
     payload.authorAdminUserId,
+    payload.publicProfileId ?? null,
     payload.lastEditorAdminUserId ?? payload.authorAdminUserId,
     payload.publisherAdminUserId ?? null,
     payload.publisherPublicUserId ?? null,
@@ -169,10 +189,14 @@ function getById(db, id, callback) {
   const sql = `
     SELECT
       c.*,
+      profile.name AS publicProfileName,
+      profile.avatarImage AS publicProfileAvatarImage,
+      profile.defaultStyle AS publicProfileDefaultStyle,
       author.username AS authorUsername,
       editor.username AS lastEditorUsername,
       publisher.username AS publisherUsername
     FROM ${tableName} c
+    LEFT JOIN ${publicProfileTableName} profile ON profile.id = c.${columns.publicProfileId}
     INNER JOIN ${adminUserTableName} author ON author.id = c.${columns.authorAdminUserId}
     LEFT JOIN ${adminUserTableName} editor ON editor.id = c.${columns.lastEditorAdminUserId}
     LEFT JOIN ${adminUserTableName} publisher ON publisher.id = c.${columns.publisherAdminUserId}
@@ -209,20 +233,30 @@ function list(db, filters, callback) {
     where.push(`(
       LOWER(c.${columns.message}) LIKE ?
       OR LOWER(author.username) LIKE ?
+      OR LOWER(COALESCE(profile.name, '')) LIKE ?
       OR LOWER(c.${columns.plusCode}) LIKE ?
       OR LOWER(c.${columns.locationLabel}) LIKE ?
     )`);
     const query = `%${String(filters.query).trim().toLowerCase()}%`;
-    params.push(query, query, query, query);
+    params.push(query, query, query, query, query);
+  }
+
+  if (filters?.publicProfileId) {
+    where.push(`c.${columns.publicProfileId} = ?`);
+    params.push(filters.publicProfileId);
   }
 
   let sql = `
     SELECT
       c.*,
+      profile.name AS publicProfileName,
+      profile.avatarImage AS publicProfileAvatarImage,
+      profile.defaultStyle AS publicProfileDefaultStyle,
       author.username AS authorUsername,
       editor.username AS lastEditorUsername,
       publisher.username AS publisherUsername
     FROM ${tableName} c
+    LEFT JOIN ${publicProfileTableName} profile ON profile.id = c.${columns.publicProfileId}
     INNER JOIN ${adminUserTableName} author ON author.id = c.${columns.authorAdminUserId}
     LEFT JOIN ${adminUserTableName} editor ON editor.id = c.${columns.lastEditorAdminUserId}
     LEFT JOIN ${adminUserTableName} publisher ON publisher.id = c.${columns.publisherAdminUserId}
@@ -256,6 +290,7 @@ function update(db, id, fields, callback) {
     columns.longitude,
     columns.plusCode,
     columns.locationLabel,
+    columns.publicProfileId,
     columns.markerType,
     columns.style,
     columns.hashtags,

@@ -3,6 +3,7 @@ const express = require('express');
 const axios = require('axios');
 
 const tablePublicContent = require('../db/tablePublicContent');
+const tablePublicProfile = require('../db/tablePublicProfile');
 const tableUser = require('../db/tableUser');
 const { requireAdminJwt, requireRole } = require('../middleware/security');
 const { apiError } = require('../middleware/api-error');
@@ -142,6 +143,14 @@ function toContentDto(row) {
     id: row.id,
     authorAdminUserId: row.authorAdminUserId,
     authorUsername: row.authorUsername || '',
+    publicProfile: row.publicProfileId
+      ? {
+        id: row.publicProfileId,
+        name: row.publicProfileName || '',
+        avatarImage: row.publicProfileAvatarImage || '',
+        defaultStyle: row.publicProfileDefaultStyle || ''
+      }
+      : null,
     lastEditorAdminUserId: row.lastEditorAdminUserId || null,
     lastEditorUsername: row.lastEditorUsername || null,
     publisherAdminUserId: row.publisherAdminUserId || null,
@@ -176,6 +185,30 @@ function normalizeString(value, fallback = '') {
 function normalizeNumber(value, fallback = 0) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function normalizeAvatarImage(value) {
+  const normalized = normalizeString(value);
+  if (!normalized) {
+    return '';
+  }
+  if (normalized.length > 2_500_000) {
+    throw apiError.payloadTooLarge('Avatar image is too large');
+  }
+  if (normalized.startsWith('data:image/')) {
+    return normalized;
+  }
+
+  try {
+    const parsed = new URL(normalized);
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+      return normalized;
+    }
+  } catch {
+    // ignore
+  }
+
+  throw apiError.badRequest('Please choose a valid avatar image');
 }
 
 function normalizeHashtags(value) {
@@ -216,6 +249,7 @@ function normalizeEditorPayload(body) {
   const hasSelectedLocation = latitude !== 0 || longitude !== 0 || !!plusCode;
 
   return {
+    publicProfileId: normalizeString(body?.publicProfileId),
     message: normalizeString(body?.message),
     latitude,
     longitude,
@@ -228,10 +262,22 @@ function normalizeEditorPayload(body) {
   };
 }
 
+function normalizePublicProfilePayload(body) {
+  return {
+    name: normalizeString(body?.name),
+    avatarImage: normalizeAvatarImage(body?.avatarImage),
+    defaultStyle: normalizeString(body?.defaultStyle)
+  };
+}
+
 function hasSelectedLocation(payload) {
   return Number(payload?.latitude) !== 0
     || Number(payload?.longitude) !== 0
     || !!normalizeString(payload?.plusCode);
+}
+
+function hasSelectedPublicProfile(payload) {
+  return !!normalizeString(payload?.publicProfileId);
 }
 
 function ensureManageableContent(req, row) {
@@ -253,7 +299,23 @@ function getUserById(db, userId) {
   });
 }
 
-async function createPublicBackendUserMapping(req, adminUserId) {
+function getPublicProfileById(db, profileId) {
+  return new Promise((resolve, reject) => {
+    tablePublicProfile.getById(db, profileId, (err, row) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(row || null);
+    });
+  });
+}
+
+function isUniqueConstraintError(error) {
+  const message = String(error?.message || '').toUpperCase();
+  return error?.code === 'SQLITE_CONSTRAINT' || message.includes('UNIQUE');
+}
+
+async function createPublicBackendProfileMapping() {
   const response = await callPublicBackend('post', '/user/create', {});
   if (response.status !== 200 || !response.data?.userId) {
     const err = apiError.badGateway('backend_request_failed');
@@ -261,34 +323,42 @@ async function createPublicBackendUserMapping(req, adminUserId) {
     throw err;
   }
 
-  const publicBackendUserId = String(response.data.userId);
+  return String(response.data.userId);
+}
+
+async function ensurePublicProfileMapping(req, profileRow) {
+  if (!profileRow) {
+    throw apiError.notFound('The selected public profile no longer exists');
+  }
+
+  if (profileRow.publicBackendUserId) {
+    return {
+      ...profileRow,
+      publicBackendUserId: String(profileRow.publicBackendUserId)
+    };
+  }
+
+  const publicBackendUserId = await createPublicBackendProfileMapping();
   await new Promise((resolve, reject) => {
-    tableUser.update(req.database.db, adminUserId, { publicBackendUserId }, (updateErr, ok) => {
+    tablePublicProfile.update(req.database.db, profileRow.id, {
+      [tablePublicProfile.columns.publicBackendUserId]: publicBackendUserId,
+      updatedAt: Date.now()
+    }, (updateErr, ok) => {
       if (updateErr) {
         return reject(updateErr);
       }
       if (!ok) {
-        return reject(new Error('admin_user_update_failed'));
+        return reject(new Error('public_profile_update_failed'));
       }
       resolve(ok);
     });
   });
 
-  return publicBackendUserId;
-}
-
-async function resolvePublisherPublicUserId(req) {
-  const adminUserId = getAdminUserId(req);
-  const adminUser = await ensurePersistedAdminActor(req);
-  if (!adminUser) {
-    throw apiError.notFound('admin_user_not_found');
+  const refreshedProfile = await getPublicProfileById(req.database.db, profileRow.id);
+  if (!refreshedProfile) {
+    throw apiError.notFound('The selected public profile no longer exists');
   }
-
-  if (adminUser.publicBackendUserId) {
-    return String(adminUser.publicBackendUserId);
-  }
-
-  return createPublicBackendUserMapping(req, adminUserId);
+  return refreshedProfile;
 }
 
 function inferMediaProvider(url) {
@@ -331,12 +401,176 @@ function inferMediaProvider(url) {
   return null;
 }
 
+function toPublicProfileDto(row) {
+  if (!row) {
+    return null;
+  }
+
+  return {
+    id: row.id,
+    name: row.name || '',
+    avatarImage: row.avatarImage || '',
+    defaultStyle: row.defaultStyle || '',
+    publicBackendUserId: row.publicBackendUserId || null,
+    contentCount: Number(row.contentCount ?? 0),
+    createdAt: Number(row.createdAt || 0),
+    updatedAt: Number(row.updatedAt || 0)
+  };
+}
+
 router.use(requireAdminJwt);
+
+router.get('/public-profiles', requireRole(...CONTENT_ROLES), (req, res, next) => {
+  tablePublicProfile.list(req.database.db, {
+    query: normalizeString(req.query.q, '') || undefined
+  }, (err, rows) => {
+    if (err) {
+      return next(apiError.internal('db_error'));
+    }
+    return res.json({
+      status: 200,
+      rows: (rows || []).map(toPublicProfileDto)
+    });
+  });
+});
+
+router.post('/public-profiles', [requireRole(...CONTENT_ROLES), express.json({ limit: '5mb' })], async (req, res, next) => {
+  try {
+    const payload = normalizePublicProfilePayload(req.body);
+    if (!payload.name) {
+      return next(apiError.unprocessableEntity('Profile name is required'));
+    }
+    if (!payload.defaultStyle) {
+      return next(apiError.unprocessableEntity('Default text style is required'));
+    }
+
+    const publicBackendUserId = await createPublicBackendProfileMapping();
+    tablePublicProfile.create(req.database.db, {
+      ...payload,
+      publicBackendUserId,
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    }, (err, result) => {
+      if (err) {
+        if (isUniqueConstraintError(err)) {
+          return next(apiError.conflict('A public profile with this name already exists'));
+        }
+        return next(apiError.internal('db_error'));
+      }
+
+      tablePublicProfile.getById(req.database.db, result.id, (fetchErr, row) => {
+        if (fetchErr) {
+          return next(apiError.internal('db_error'));
+        }
+        return res.status(201).json({
+          status: 201,
+          row: toPublicProfileDto(row)
+        });
+      });
+    });
+  } catch (error) {
+    if (error?.status) {
+      return next(error);
+    }
+    return next(apiError.internal('public_profile_create_failed'));
+  }
+});
+
+router.put('/public-profiles/:id', [requireRole(...CONTENT_ROLES), express.json({ limit: '5mb' })], async (req, res, next) => {
+  try {
+    const existing = await getPublicProfileById(req.database.db, req.params.id);
+    if (!existing) {
+      return next(apiError.notFound('The selected public profile no longer exists'));
+    }
+
+    const payload = normalizePublicProfilePayload(req.body);
+    if (!payload.name) {
+      return next(apiError.unprocessableEntity('Profile name is required'));
+    }
+    if (!payload.defaultStyle) {
+      return next(apiError.unprocessableEntity('Default text style is required'));
+    }
+
+    tablePublicProfile.update(req.database.db, req.params.id, {
+      [tablePublicProfile.columns.name]: payload.name,
+      [tablePublicProfile.columns.avatarImage]: payload.avatarImage,
+      [tablePublicProfile.columns.defaultStyle]: payload.defaultStyle,
+      updatedAt: Date.now()
+    }, (err, ok) => {
+      if (err) {
+        if (isUniqueConstraintError(err)) {
+          return next(apiError.conflict('A public profile with this name already exists'));
+        }
+        return next(apiError.internal('db_error'));
+      }
+      if (!ok) {
+        return next(apiError.notFound('The selected public profile no longer exists'));
+      }
+
+      tablePublicProfile.getById(req.database.db, req.params.id, (fetchErr, row) => {
+        if (fetchErr) {
+          return next(apiError.internal('db_error'));
+        }
+        return res.json({
+          status: 200,
+          row: toPublicProfileDto(row)
+        });
+      });
+    });
+  } catch (error) {
+    if (error?.status) {
+      return next(error);
+    }
+    return next(apiError.internal('public_profile_update_failed'));
+  }
+});
+
+router.delete('/public-profiles/:id', requireRole(...CONTENT_ROLES), async (req, res, next) => {
+  try {
+    const existing = await getPublicProfileById(req.database.db, req.params.id);
+    if (!existing) {
+      return next(apiError.notFound('The selected public profile no longer exists'));
+    }
+
+    const assignedCount = await new Promise((resolve, reject) => {
+      tablePublicProfile.countContent(req.database.db, req.params.id, (err, total) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(Number(total ?? 0));
+      });
+    });
+
+    if (assignedCount > 0) {
+      return next(apiError.conflict('This public profile is still assigned to existing messages'));
+    }
+
+    tablePublicProfile.deleteById(req.database.db, req.params.id, (err, ok) => {
+      if (err) {
+        return next(apiError.internal('db_error'));
+      }
+      if (!ok) {
+        return next(apiError.notFound('The selected public profile no longer exists'));
+      }
+
+      return res.json({
+        status: 200,
+        deleted: true
+      });
+    });
+  } catch (error) {
+    if (error?.status) {
+      return next(error);
+    }
+    return next(apiError.internal('public_profile_delete_failed'));
+  }
+});
 
 router.get('/public-messages', requireRole(...CONTENT_ROLES), (req, res, next) => {
   const roles = getAdminRoles(req);
   const filters = {
     authorAdminUserId: canSeeAllContent(roles) ? normalizeString(req.query.authorId, '') || undefined : getAdminUserId(req),
+    publicProfileId: normalizeString(req.query.publicProfileId, '') || undefined,
     status: normalizeString(req.query.status, '') || undefined,
     query: normalizeString(req.query.q, '') || undefined,
     limit: Number(req.query.limit),
@@ -381,12 +615,21 @@ router.post('/public-messages', [requireRole(...CONTENT_ROLES), express.json({ l
     const payload = normalizeEditorPayload(req.body);
     const now = Date.now();
 
+    if (!hasSelectedPublicProfile(payload)) {
+      return next(apiError.unprocessableEntity('Please choose a public profile before saving'));
+    }
     if (!hasSelectedLocation(payload)) {
-      return next(apiError.unprocessableEntity('location_required'));
+      return next(apiError.unprocessableEntity('Please choose a location before saving'));
+    }
+
+    const publicProfile = await getPublicProfileById(req.database.db, payload.publicProfileId);
+    if (!publicProfile) {
+      return next(apiError.notFound('The selected public profile no longer exists'));
     }
 
     tablePublicContent.create(req.database.db, {
       authorAdminUserId: actorId,
+      publicProfileId: publicProfile.id,
       lastEditorAdminUserId: actorId,
       status: tablePublicContent.contentStatus.DRAFT,
       message: payload.message,
@@ -438,11 +681,17 @@ router.post('/public-messages', [requireRole(...CONTENT_ROLES), express.json({ l
   }
 });
 
-router.put('/public-messages/:id', [requireRole(...CONTENT_ROLES), express.json({ limit: '1mb' })], (req, res, next) => {
-  tablePublicContent.getById(req.database.db, req.params.id, (err, row) => {
-    if (err) {
-      return next(apiError.internal('db_error'));
-    }
+router.put('/public-messages/:id', [requireRole(...CONTENT_ROLES), express.json({ limit: '1mb' })], async (req, res, next) => {
+  try {
+    const row = await new Promise((resolve, reject) => {
+      tablePublicContent.getById(req.database.db, req.params.id, (err, value) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(value || null);
+      });
+    });
+
     if (!row) {
       return next(apiError.notFound('not_found'));
     }
@@ -450,76 +699,78 @@ router.put('/public-messages/:id', [requireRole(...CONTENT_ROLES), express.json(
       return next(apiError.forbidden('insufficient_role'));
     }
     if (row.status === tablePublicContent.contentStatus.PUBLISHED) {
-      return next(apiError.conflict('withdraw_before_edit'));
+      return next(apiError.conflict('Withdraw the message before editing it'));
     }
     if (row.status === tablePublicContent.contentStatus.DELETED) {
-      return next(apiError.conflict('content_deleted'));
+      return next(apiError.conflict('This content has already been deleted'));
     }
 
     const payload = normalizeEditorPayload(req.body);
-
+    if (!hasSelectedPublicProfile(payload)) {
+      return next(apiError.unprocessableEntity('Please choose a public profile before saving'));
+    }
     if (!hasSelectedLocation(payload)) {
-      return next(apiError.unprocessableEntity('location_required'));
+      return next(apiError.unprocessableEntity('Please choose a location before saving'));
     }
 
-    ensurePersistedAdminActor(req)
-      .then((actor) => {
-        const actorId = String(actor?.id || '').trim();
-        tablePublicContent.update(req.database.db, req.params.id, {
-          [tablePublicContent.columns.message]: payload.message,
-          [tablePublicContent.columns.latitude]: payload.latitude,
-          [tablePublicContent.columns.longitude]: payload.longitude,
-          [tablePublicContent.columns.plusCode]: payload.plusCode,
-          [tablePublicContent.columns.locationLabel]: payload.locationLabel,
-          [tablePublicContent.columns.markerType]: payload.markerType,
-          [tablePublicContent.columns.style]: payload.style,
-          [tablePublicContent.columns.hashtags]: JSON.stringify(payload.hashtags),
-          [tablePublicContent.columns.multimedia]: JSON.stringify(payload.multimedia),
-          [tablePublicContent.columns.lastEditorAdminUserId]: actorId,
-          updatedAt: Date.now()
-        }, (updateErr, ok) => {
-          if (updateErr) {
-            req.logger?.error?.('Update public content failed', {
-              adminId: actorId,
-              contentId: req.params.id,
-              error: updateErr?.message || String(updateErr),
-              code: updateErr?.code
-            });
-            return next(apiError.internal('db_error'));
-          }
-          if (!ok) {
-            return next(apiError.notFound('not_found'));
-          }
+    const publicProfile = await getPublicProfileById(req.database.db, payload.publicProfileId);
+    if (!publicProfile) {
+      return next(apiError.notFound('The selected public profile no longer exists'));
+    }
 
-          tablePublicContent.getById(req.database.db, req.params.id, (fetchErr, updatedRow) => {
-            if (fetchErr) {
-              req.logger?.error?.('Load updated public content failed', {
-                adminId: actorId,
-                contentId: req.params.id,
-                error: fetchErr?.message || String(fetchErr),
-                code: fetchErr?.code
-              });
-              return next(apiError.internal('db_error'));
-            }
-            return res.json({
-              status: 200,
-              row: toContentDto(updatedRow)
-            });
-          });
-        });
-      })
-      .catch((ensureErr) => {
-        if (ensureErr?.status) {
-          return next(ensureErr);
+    const actor = await ensurePersistedAdminActor(req);
+    const actorId = String(actor?.id || '').trim();
+
+    await new Promise((resolve, reject) => {
+      tablePublicContent.update(req.database.db, req.params.id, {
+        [tablePublicContent.columns.message]: payload.message,
+        [tablePublicContent.columns.publicProfileId]: publicProfile.id,
+        [tablePublicContent.columns.latitude]: payload.latitude,
+        [tablePublicContent.columns.longitude]: payload.longitude,
+        [tablePublicContent.columns.plusCode]: payload.plusCode,
+        [tablePublicContent.columns.locationLabel]: payload.locationLabel,
+        [tablePublicContent.columns.markerType]: payload.markerType,
+        [tablePublicContent.columns.style]: payload.style,
+        [tablePublicContent.columns.hashtags]: JSON.stringify(payload.hashtags),
+        [tablePublicContent.columns.multimedia]: JSON.stringify(payload.multimedia),
+        [tablePublicContent.columns.lastEditorAdminUserId]: actorId,
+        updatedAt: Date.now()
+      }, (updateErr, ok) => {
+        if (updateErr) {
+          return reject(updateErr);
         }
-        req.logger?.error?.('Ensure admin actor for public content update failed', {
-          adminId: getAdminUserId(req),
-          contentId: req.params.id,
-          error: ensureErr?.message || String(ensureErr)
-        });
-        return next(apiError.internal('db_error'));
+        if (!ok) {
+          return reject(apiError.notFound('not_found'));
+        }
+        resolve(ok);
       });
-  });
+    });
+
+    const updatedRow = await new Promise((resolve, reject) => {
+      tablePublicContent.getById(req.database.db, req.params.id, (fetchErr, value) => {
+        if (fetchErr) {
+          return reject(fetchErr);
+        }
+        resolve(value || null);
+      });
+    });
+
+    return res.json({
+      status: 200,
+      row: toContentDto(updatedRow)
+    });
+  } catch (error) {
+    if (error?.status) {
+      return next(error);
+    }
+    req.logger?.error?.('Update public content failed', {
+      adminId: getAdminUserId(req),
+      contentId: req.params.id,
+      error: error?.message || String(error),
+      code: error?.code
+    });
+    return next(apiError.internal('db_error'));
+  }
 });
 
 router.post('/public-messages/:id/publish', requireRole(...PUBLISH_ROLES), async (req, res, next) => {
@@ -535,17 +786,24 @@ router.post('/public-messages/:id/publish', requireRole(...PUBLISH_ROLES), async
       return next(apiError.notFound('not_found'));
     }
     if (row.status === tablePublicContent.contentStatus.DELETED) {
-      return next(apiError.conflict('content_deleted'));
+      return next(apiError.conflict('This content has already been deleted'));
     }
     if (row.status === tablePublicContent.contentStatus.PUBLISHED) {
-      return next(apiError.conflict('already_published'));
+      return next(apiError.conflict('This public message is already published'));
+    }
+    if (!row.publicProfileId) {
+      return next(apiError.unprocessableEntity('Please choose a public profile before publishing'));
     }
     if (!hasSelectedLocation(row)) {
-      return next(apiError.unprocessableEntity('location_required'));
+      return next(apiError.unprocessableEntity('Please choose a location before publishing'));
     }
 
     const publisherAdminUserId = getAdminUserId(req);
-    const publisherPublicUserId = await resolvePublisherPublicUserId(req);
+    const publicProfile = await ensurePublicProfileMapping(req, await getPublicProfileById(req.database.db, row.publicProfileId));
+    const publisherPublicUserId = String(publicProfile.publicBackendUserId || '');
+    if (!publisherPublicUserId) {
+      return next(apiError.badGateway('public_profile_backend_user_missing'));
+    }
     const publishedMessageUuid = row.publishedMessageUuid || crypto.randomUUID();
 
     const publishResponse = await callPublicBackend('post', '/message/internal/publish', {
@@ -557,7 +815,7 @@ router.post('/public-messages/:id/publish', requireRole(...PUBLISH_ROLES), async
       plusCode: row.plusCode || '',
       message: row.message || '',
       markerType: row.markerType || 'default',
-      style: row.style || '',
+      style: row.style || publicProfile.defaultStyle || '',
       hashtags: parseJson(row.hashtags, []),
       multimedia: row.multimedia || '{}'
     });

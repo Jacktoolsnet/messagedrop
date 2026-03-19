@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, ViewChild, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, ViewChild, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -22,10 +22,12 @@ import { Multimedia } from '../../../interfaces/multimedia.interface';
 import { NominatimPlace } from '../../../interfaces/nominatim-place.interface';
 import { PublicContentSavePayload } from '../../../interfaces/public-content-save-payload.interface';
 import { PublicContent } from '../../../interfaces/public-content.interface';
+import { PublicProfile } from '../../../interfaces/public-profile.interface';
 import { TenorApiResponse, TenorResult } from '../../../interfaces/tenor-response.interface';
 import { AuthService } from '../../../services/auth/auth.service';
 import { ContentStyleOption, ContentStyleService } from '../../../services/content/content-style.service';
 import { PublicContentService } from '../../../services/content/public-content.service';
+import { PublicProfileService } from '../../../services/content/public-profile.service';
 import { NominatimService } from '../../../services/location/nominatim.service';
 import { MAX_PUBLIC_HASHTAGS, normalizeHashtags } from '../../../utils/hashtag.util';
 
@@ -74,12 +76,15 @@ export class PublicContentEditorComponent {
   private readonly sanitizer = inject(DomSanitizer);
   private readonly authService = inject(AuthService);
   private readonly publicContentService = inject(PublicContentService);
+  private readonly publicProfileService = inject(PublicProfileService);
   private readonly styleService = inject(ContentStyleService);
   private readonly nominatimService = inject(NominatimService);
 
   readonly role = this.authService.role;
   readonly styleOptions = this.styleService.getStyleOptions();
   readonly previewCreatedAt = Date.now();
+  readonly publicProfiles = this.publicProfileService.rows;
+  readonly profilesLoading = this.publicProfileService.loading;
 
   readonly loading = signal(false);
   readonly saving = signal(false);
@@ -128,6 +133,7 @@ export class PublicContentEditorComponent {
   readonly form = this.fb.nonNullable.group({
     message: this.fb.nonNullable.control(''),
     style: this.fb.nonNullable.control(''),
+    publicProfileId: this.fb.nonNullable.control(''),
     location: this.fb.nonNullable.group({
       latitude: this.fb.nonNullable.control(0),
       longitude: this.fb.nonNullable.control(0),
@@ -142,10 +148,34 @@ export class PublicContentEditorComponent {
     this.form.controls.location.valueChanges.pipe(startWith(this.form.controls.location.getRawValue())),
     { initialValue: this.form.controls.location.getRawValue() }
   );
+  readonly selectedProfile = computed<Pick<PublicProfile, 'id' | 'name' | 'avatarImage' | 'defaultStyle'> | null>(() => {
+    const selectedId = (this.formValue().publicProfileId ?? '').trim();
+    if (!selectedId) {
+      return null;
+    }
+
+    const serviceMatch = this.publicProfiles().find((row) => row.id === selectedId);
+    if (serviceMatch) {
+      return serviceMatch;
+    }
+
+    const currentProfile = this.currentContent()?.publicProfile;
+    if (currentProfile?.id === selectedId) {
+      return currentProfile;
+    }
+
+    return null;
+  });
   readonly selectedStyle = computed(() => this.styleService.normalizeStyle(this.formValue().style));
+  readonly selectedProfileDefaultStyle = computed(() => this.styleService.normalizeStyle(this.selectedProfile()?.defaultStyle));
   readonly previewStyleOverride = signal('');
   readonly selectedStyleOption = computed(() => this.styleService.findOptionByStyle(this.selectedStyle()));
-  readonly previewDisplayStyle = computed(() => this.previewStyleOverride() || this.selectedStyle());
+  readonly profileDefaultStyleOption = computed(() => this.styleService.findOptionByStyle(this.selectedProfileDefaultStyle()));
+  readonly previewDisplayStyle = computed(() => (
+    this.previewStyleOverride()
+    || this.selectedStyle()
+    || this.selectedProfileDefaultStyle()
+  ));
   readonly previewMessage = computed(() => {
     const message = (this.formValue().message ?? '').trim();
     if (message) {
@@ -176,7 +206,8 @@ export class PublicContentEditorComponent {
   });
   readonly activeLocationLabel = computed(() => this.selectedLocationLabel().trim() || this.previewLocationLabel());
   readonly hasSelectedLocation = computed(() => !!this.activeLocationLabel());
-  readonly canSaveContent = computed(() => this.hasSelectedLocation() && !this.saving());
+  readonly hasSelectedPublicProfile = computed(() => !!this.selectedProfile());
+  readonly canSaveContent = computed(() => this.hasSelectedLocation() && this.hasSelectedPublicProfile() && !this.saving());
   readonly selectedLocationCoordinates = computed(() => {
     const location = this.locationValue();
     const latitude = Number(location?.latitude) || 0;
@@ -204,6 +235,19 @@ export class PublicContentEditorComponent {
   });
 
   constructor() {
+    this.publicProfileService.loadProfiles();
+    effect(() => {
+      const currentContent = this.currentContent();
+      const selectedProfileId = this.form.controls.publicProfileId.value.trim();
+      const publicProfiles = this.publicProfiles();
+
+      if (currentContent || selectedProfileId || publicProfiles.length === 0) {
+        return;
+      }
+
+      this.form.controls.publicProfileId.setValue(publicProfiles[0].id);
+    }, { allowSignalWrites: true });
+
     const contentId = this.route.snapshot.paramMap.get('id');
     if (contentId) {
       this.loadContent(contentId);
@@ -216,6 +260,10 @@ export class PublicContentEditorComponent {
 
   trackStyleOption(_index: number, option: ContentStyleOption): string {
     return option.fontFamily;
+  }
+
+  trackPublicProfile(_index: number, profile: PublicProfile): string {
+    return profile.id;
   }
 
   trackLocationResult(_index: number, place: NominatimPlace): number {
@@ -309,6 +357,23 @@ export class PublicContentEditorComponent {
     this.selectedLocationLabel.set('');
     this.locationSearchControl.setValue('');
     this.locationSearchResults.set([]);
+  }
+
+  openPublicProfiles(): void {
+    this.router.navigate(['/dashboard/content/profiles']);
+  }
+
+  profileAvatar(): string {
+    return this.selectedProfile()?.avatarImage?.trim() || '';
+  }
+
+  profileName(): string {
+    return this.selectedProfile()?.name?.trim() || 'No public profile selected';
+  }
+
+  profileInitials(): string {
+    const parts = this.profileName().split(/\s+/).filter(Boolean).slice(0, 2);
+    return parts.map((part) => part.charAt(0).toUpperCase()).join('') || 'P';
   }
 
   formatStatus(status: string): string {
@@ -657,12 +722,17 @@ export class PublicContentEditorComponent {
       this.showMessage('Please add text or multimedia before saving.');
       return null;
     }
+    if (!this.hasSelectedPublicProfile()) {
+      this.showMessage('Please select a public profile before saving.');
+      return null;
+    }
     if (!this.hasSelectedLocation()) {
       this.showMessage('Please select a location before saving.');
       return null;
     }
 
     return {
+      publicProfileId: raw.publicProfileId.trim(),
       message,
       location: {
         latitude: Number(raw.location.latitude) || 0,
@@ -671,7 +741,7 @@ export class PublicContentEditorComponent {
         label: this.activeLocationLabel()
       },
       markerType: 'default',
-      style: this.styleService.normalizeStyle(raw.style),
+      style: this.styleService.normalizeStyle(raw.style) || this.selectedProfileDefaultStyle(),
       hashtags: this.hashtags(),
       multimedia
     };
@@ -700,6 +770,7 @@ export class PublicContentEditorComponent {
     this.form.setValue({
       message: content.message ?? '',
       style: this.styleService.normalizeStyle(content.style ?? ''),
+      publicProfileId: content.publicProfile?.id ?? '',
       location: {
         latitude: Number(content.location?.latitude ?? 0),
         longitude: Number(content.location?.longitude ?? 0),

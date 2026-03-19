@@ -90,6 +90,10 @@ export class PublicContentListComponent {
     this.router.navigate(['/dashboard/content/create']);
   }
 
+  openProfiles(): void {
+    this.router.navigate(['/dashboard/content/profiles']);
+  }
+
   openContent(row: PublicContent): void {
     this.router.navigate(['/dashboard/content', row.id, 'edit']);
   }
@@ -117,6 +121,24 @@ export class PublicContentListComponent {
     }
 
     return /\.(png|jpe?g|gif|webp|bmp|svg)(\?.*)?$/i.test(multimedia.url);
+  }
+
+  resolvedStyle(row: PublicContent): string {
+    return row.style || row.publicProfile?.defaultStyle || '';
+  }
+
+  profileName(row: PublicContent): string {
+    return row.publicProfile?.name?.trim() || 'No profile assigned';
+  }
+
+  profileAvatar(row: PublicContent): string {
+    return row.publicProfile?.avatarImage?.trim() || '';
+  }
+
+  profileInitials(row: PublicContent): string {
+    const name = this.profileName(row);
+    const parts = name.split(/\s+/).filter(Boolean).slice(0, 2);
+    return parts.map((part) => part.charAt(0).toUpperCase()).join('') || 'P';
   }
 
   tileTitle(row: PublicContent): string {
