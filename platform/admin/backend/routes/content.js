@@ -189,6 +189,12 @@ function normalizeEditorPayload(body) {
   };
 }
 
+function hasSelectedLocation(payload) {
+  return Number(payload?.latitude) !== 0
+    || Number(payload?.longitude) !== 0
+    || !!normalizeString(payload?.plusCode);
+}
+
 function ensureManageableContent(req, row) {
   const roles = getAdminRoles(req);
   if (canSeeAllContent(roles)) {
@@ -334,6 +340,10 @@ router.post('/public-messages', [requireRole(...CONTENT_ROLES), express.json({ l
   const payload = normalizeEditorPayload(req.body);
   const now = Date.now();
 
+  if (!hasSelectedLocation(payload)) {
+    return next(apiError.unprocessableEntity('location_required'));
+  }
+
   tablePublicContent.create(req.database.db, {
     authorAdminUserId: actorId,
     lastEditorAdminUserId: actorId,
@@ -386,6 +396,10 @@ router.put('/public-messages/:id', [requireRole(...CONTENT_ROLES), express.json(
     const actorId = getAdminUserId(req);
     const payload = normalizeEditorPayload(req.body);
 
+    if (!hasSelectedLocation(payload)) {
+      return next(apiError.unprocessableEntity('location_required'));
+    }
+
     tablePublicContent.update(req.database.db, req.params.id, {
       [tablePublicContent.columns.message]: payload.message,
       [tablePublicContent.columns.latitude]: payload.latitude,
@@ -435,6 +449,9 @@ router.post('/public-messages/:id/publish', requireRole(...PUBLISH_ROLES), async
     }
     if (row.status === tablePublicContent.contentStatus.PUBLISHED) {
       return next(apiError.conflict('already_published'));
+    }
+    if (!hasSelectedLocation(row)) {
+      return next(apiError.unprocessableEntity('location_required'));
     }
 
     const publisherAdminUserId = getAdminUserId(req);

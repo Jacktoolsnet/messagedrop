@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { map } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -15,9 +15,12 @@ export class NominatimService {
   private readonly http = inject(HttpClient);
 
   searchPlaces(searchTerm: string, limit = 10) {
-    const encodedSearchTerm = encodeURIComponent(searchTerm.trim());
+    const params = new HttpParams()
+      .set('searchTerm', searchTerm.trim())
+      .set('limit', String(limit));
+
     return this.http
-      .get<NominatimSearchResponse>(`${environment.apiUrl}/nominatim/search/${encodedSearchTerm}/${limit}`)
+      .get<NominatimSearchResponse>(`${environment.apiUrl}/nominatim/search`, { params })
       .pipe(map((response) => response.result ?? []));
   }
 }

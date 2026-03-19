@@ -34,15 +34,32 @@ const nominatimBase = normalizeBaseUrl(
   resolveBaseUrl(process.env.NOMINATIM_BASE_URL, process.env.NOMINATIM_PORT)
 );
 
-router.get('/search/:searchTerm/:limit', async (req, res, next) => {
+function resolveSearchRequest(req) {
+  const rawSearchTerm = req.params.searchTerm ?? req.query.searchTerm ?? req.query.q ?? '';
+  const rawLimit = req.params.limit ?? req.query.limit ?? '10';
+  const searchTerm = String(rawSearchTerm).trim();
+  const parsedLimit = Number.parseInt(String(rawLimit), 10);
+
+  return {
+    searchTerm,
+    limit: Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : 10
+  };
+}
+
+async function handleSearch(req, res, next) {
   if (!nominatimBase) {
     return next(apiError.serviceUnavailable('nominatim_unavailable'));
+  }
+
+  const { searchTerm, limit } = resolveSearchRequest(req);
+  if (!searchTerm) {
+    return next(apiError.badRequest('missing_search_term'));
   }
 
   try {
     const token = await signServiceJwt({ audience: nominatimAudience });
     const response = await axios.get(
-      `${nominatimBase}/nominatim/search/${encodeURIComponent(req.params.searchTerm)}/${encodeURIComponent(req.params.limit)}`,
+      `${nominatimBase}/nominatim/search/${encodeURIComponent(searchTerm)}/${encodeURIComponent(limit)}`,
       {
         timeout: 5000,
         validateStatus: () => true,
@@ -68,6 +85,10 @@ router.get('/search/:searchTerm/:limit', async (req, res, next) => {
     }
     return next(error);
   }
-});
+}
+
+router.get('/search', handleSearch);
+router.get('/search/:searchTerm', handleSearch);
+router.get('/search/:searchTerm/:limit', handleSearch);
 
 module.exports = router;

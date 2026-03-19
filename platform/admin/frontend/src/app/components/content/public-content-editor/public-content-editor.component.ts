@@ -1,7 +1,7 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, ViewChild, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -104,6 +104,18 @@ export class PublicContentEditorComponent {
     const html = this.multimedia().oembed?.html;
     return html ? this.sanitizer.bypassSecurityTrustHtml(html) : null;
   });
+  readonly tiktokEmbedUrl = computed<SafeResourceUrl | null>(() => {
+    if ((this.multimedia().type || '').toLowerCase() !== 'tiktok') {
+      return null;
+    }
+
+    const id = this.getTikTokId(this.multimedia());
+    if (!id) {
+      return null;
+    }
+
+    return this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.tiktok.com/embed/v2/${id}`);
+  });
   readonly pageTitle = computed(() => this.isEditMode() ? 'Edit public message' : 'Create public message');
   readonly statusLabel = computed(() => this.formatStatus(this.currentContent()?.status ?? 'draft'));
   readonly maxPublicHashtags = MAX_PUBLIC_HASHTAGS;
@@ -116,7 +128,6 @@ export class PublicContentEditorComponent {
   readonly form = this.fb.nonNullable.group({
     message: this.fb.nonNullable.control(''),
     style: this.fb.nonNullable.control(''),
-    markerType: this.fb.nonNullable.control('default'),
     location: this.fb.nonNullable.group({
       latitude: this.fb.nonNullable.control(0),
       longitude: this.fb.nonNullable.control(0),
@@ -126,6 +137,10 @@ export class PublicContentEditorComponent {
   readonly formValue = toSignal(
     this.form.valueChanges.pipe(startWith(this.form.getRawValue())),
     { initialValue: this.form.getRawValue() }
+  );
+  readonly locationValue = toSignal(
+    this.form.controls.location.valueChanges.pipe(startWith(this.form.controls.location.getRawValue())),
+    { initialValue: this.form.controls.location.getRawValue() }
   );
   readonly selectedStyle = computed(() => this.styleService.normalizeStyle(this.formValue().style));
   readonly previewStyleOverride = signal('');
@@ -138,9 +153,8 @@ export class PublicContentEditorComponent {
     }
     return this.hasMedia() ? '' : 'Add some text to preview the message.';
   });
-  readonly previewMarkerType = computed(() => (this.formValue().markerType ?? '').trim() || 'default');
   readonly previewLocationLabel = computed(() => {
-    const location = this.formValue().location;
+    const location = this.locationValue();
     const latitude = Number(location?.latitude) || 0;
     const longitude = Number(location?.longitude) || 0;
     const plusCode = (location?.plusCode ?? '').trim();
@@ -155,10 +169,34 @@ export class PublicContentEditorComponent {
 
     return parts.join(' • ');
   });
-  readonly hasPreviewLocation = computed(() => !!this.previewLocationLabel());
   readonly activeLocationLabel = computed(() => this.selectedLocationLabel().trim() || this.previewLocationLabel());
   readonly hasSelectedLocation = computed(() => !!this.activeLocationLabel());
-  readonly previewHasMetadata = computed(() => !!this.previewMarkerType() || !!this.previewLocationLabel());
+  readonly canSaveContent = computed(() => this.hasSelectedLocation() && !this.saving());
+  readonly selectedLocationCoordinates = computed(() => {
+    const location = this.locationValue();
+    const latitude = Number(location?.latitude) || 0;
+    const longitude = Number(location?.longitude) || 0;
+    if (latitude === 0 && longitude === 0) {
+      return null;
+    }
+    return { latitude, longitude };
+  });
+  readonly locationMapEmbedUrl = computed<SafeResourceUrl | null>(() => {
+    const coordinates = this.selectedLocationCoordinates();
+    if (!coordinates) {
+      return null;
+    }
+    return this.sanitizer.bypassSecurityTrustResourceUrl(
+      this.buildLocationMapEmbedUrl(coordinates.latitude, coordinates.longitude)
+    );
+  });
+  readonly locationMapLink = computed(() => {
+    const coordinates = this.selectedLocationCoordinates();
+    if (!coordinates) {
+      return '';
+    }
+    return this.buildLocationMapLink(coordinates.latitude, coordinates.longitude);
+  });
 
   constructor() {
     const contentId = this.route.snapshot.paramMap.get('id');
@@ -255,7 +293,6 @@ export class PublicContentEditorComponent {
     });
     this.selectedLocationLabel.set(label);
     this.locationSearchControl.setValue(label);
-    this.locationSearchResults.set([]);
   }
 
   clearLocation(): void {
@@ -601,6 +638,10 @@ export class PublicContentEditorComponent {
       this.showMessage('Please add text or multimedia before saving.');
       return null;
     }
+    if (!this.hasSelectedLocation()) {
+      this.showMessage('Please select a location before saving.');
+      return null;
+    }
 
     return {
       message,
@@ -609,7 +650,7 @@ export class PublicContentEditorComponent {
         longitude: Number(raw.location.longitude) || 0,
         plusCode: raw.location.plusCode.trim()
       },
-      markerType: raw.markerType.trim() || 'default',
+      markerType: 'default',
       style: this.styleService.normalizeStyle(raw.style),
       hashtags: this.hashtags(),
       multimedia
@@ -639,7 +680,6 @@ export class PublicContentEditorComponent {
     this.form.setValue({
       message: content.message ?? '',
       style: this.styleService.normalizeStyle(content.style ?? ''),
-      markerType: content.markerType ?? 'default',
       location: {
         latitude: Number(content.location?.latitude ?? 0),
         longitude: Number(content.location?.longitude ?? 0),
@@ -712,5 +752,60 @@ export class PublicContentEditorComponent {
 
   private formatCoordinate(value: number): string {
     return value.toFixed(5).replace(/\.?0+$/, '');
+  }
+
+  private buildLocationMapEmbedUrl(latitude: number, longitude: number): string {
+    const latitudeDelta = 0.006;
+    const longitudeDelta = Math.max(0.006 / Math.cos((latitude * Math.PI) / 180), 0.006);
+    const minLatitude = Math.max(-85, latitude - latitudeDelta);
+    const maxLatitude = Math.min(85, latitude + latitudeDelta);
+    const minLongitude = Math.max(-180, longitude - longitudeDelta);
+    const maxLongitude = Math.min(180, longitude + longitudeDelta);
+    const bbox = [
+      minLongitude.toFixed(6),
+      minLatitude.toFixed(6),
+      maxLongitude.toFixed(6),
+      maxLatitude.toFixed(6)
+    ].join(',');
+
+    return `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bbox)}&layer=mapnik&marker=${encodeURIComponent(`${latitude},${longitude}`)}`;
+  }
+
+  private buildLocationMapLink(latitude: number, longitude: number): string {
+    return `https://www.openstreetmap.org/?mlat=${encodeURIComponent(String(latitude))}&mlon=${encodeURIComponent(String(longitude))}#map=15/${encodeURIComponent(String(latitude))}/${encodeURIComponent(String(longitude))}`;
+  }
+
+  private getTikTokId(multimedia: Multimedia): string | null {
+    const sourceUrl = String(multimedia.sourceUrl || multimedia.url || '').trim();
+    if (sourceUrl) {
+      try {
+        const parsed = new URL(sourceUrl);
+        const normalizedHost = parsed.hostname.toLowerCase();
+        const isTikTokHost = normalizedHost === 'tiktok.com'
+          || normalizedHost === 'www.tiktok.com'
+          || normalizedHost.endsWith('.tiktok.com')
+          || normalizedHost === 'vm.tiktok.com';
+
+        if (isTikTokHost) {
+          const match = parsed.pathname.match(/\/@[^/]+\/video\/(\d+)/);
+          const safeMatch = this.sanitizeTikTokId(match?.[1] || null);
+          if (safeMatch) {
+            return safeMatch;
+          }
+        }
+      } catch {
+        // ignore
+      }
+    }
+
+    return this.sanitizeTikTokId(multimedia.contentId || null);
+  }
+
+  private sanitizeTikTokId(value: string | null | undefined): string | null {
+    const normalized = String(value || '').trim();
+    if (!normalized || !/^\d+$/.test(normalized)) {
+      return null;
+    }
+    return normalized;
   }
 }

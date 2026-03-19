@@ -271,7 +271,20 @@ io.engine.on("connection_error", (err) => {
 - The X-Frame-Options header is set via frameguard to ensure clickjacking protection.
 - xssFilter sets X-XSS-Protection headers to enable XSS (cross-site scripting) filters in most current web browsers.
 */
-app.use(helmet()); // Add security headers.
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      'frame-src': [
+        "'self'",
+        'https://www.openstreetmap.org',
+        'https://openstreetmap.org',
+        'https://www.tiktok.com',
+        'https://tiktok.com'
+      ]
+    }
+  }
+})); // Add security headers.
 
 app.use(traceId());
 

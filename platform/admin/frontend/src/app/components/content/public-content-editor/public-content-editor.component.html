@@ -12,7 +12,7 @@
       type="button"
       class="toolbar-action"
       (click)="saveDraft()"
-      [disabled]="saving()"
+      [disabled]="!canSaveContent()"
       aria-label="Save draft">
       <mat-icon>save</mat-icon>
     </button>
@@ -24,7 +24,7 @@
         color="primary"
         class="toolbar-action"
         (click)="saveAndPublish()"
-        [disabled]="saving()"
+        [disabled]="!canSaveContent()"
         aria-label="Publish message">
         <mat-icon>publish</mat-icon>
       </button>
@@ -86,7 +86,7 @@
             <mat-icon>edit_note</mat-icon>
           </div>
           <mat-card-title>Message content</mat-card-title>
-          <mat-card-subtitle>Text, font and location for the public message</mat-card-subtitle>
+          <mat-card-subtitle>Text and font for the public message</mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content>
@@ -145,8 +145,23 @@
               <mat-hint>Uses the same font styles as the public MessageDrop app.</mat-hint>
             </mat-form-field>
 
-            <div class="location-search">
-              <div class="location-search-row">
+          </form>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="location-card">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-success">
+            <mat-icon>location_on</mat-icon>
+          </div>
+          <mat-card-title>Location</mat-card-title>
+          <mat-card-subtitle>Search and attach a required place to the public message</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div class="location-layout">
+            <div class="location-search-column">
+              <div class="location-search">
                 <mat-form-field appearance="outline" class="full-width">
                   <mat-label>Location search</mat-label>
                   <input
@@ -157,56 +172,82 @@
                     (keydown.enter)="searchLocations()" />
                 </mat-form-field>
 
-                <button mat-stroked-button type="button" (click)="searchLocations()" [disabled]="locationSearchLoading() || locationSearchControl.disabled">
-                  <mat-icon>search</mat-icon>
-                  Search
-                </button>
-
-                @if (hasSelectedLocation()) {
-                  <button mat-stroked-button type="button" (click)="clearLocation()" [disabled]="locationSearchControl.disabled">
-                    <mat-icon>location_off</mat-icon>
-                    Clear
+                <div class="inline-actions">
+                  <button
+                    mat-stroked-button
+                    type="button"
+                    (click)="searchLocations()"
+                    [disabled]="locationSearchLoading() || locationSearchControl.disabled">
+                    <mat-icon>search</mat-icon>
+                    Search
                   </button>
+                </div>
+
+                @if (locationSearchLoading()) {
+                  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
                 }
+
+                @if (locationSearchResults().length > 0) {
+                  <div class="location-results">
+                    @for (place of locationSearchResults(); track trackLocationResult($index, place)) {
+                      <button type="button" class="location-result" (click)="selectLocationResult(place)" [disabled]="locationSearchControl.disabled">
+                        <span class="location-result-title">{{ place.name || place.display_name }}</span>
+                        @if (place.name && place.display_name) {
+                          <span class="location-result-subtitle">{{ place.display_name }}</span>
+                        }
+                      </button>
+                    }
+                  </div>
+                }
+
+                @if (!hasSelectedLocation()) {
+                  <p class="location-error">
+                    A location is required. Please search and select a place before saving.
+                  </p>
+                }
+
+                <p class="location-help">
+                  Use the same place search as in MessageDrop. Public messages must always be saved with a location.
+                </p>
               </div>
-
-              @if (locationSearchLoading()) {
-                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-              }
-
-              @if (locationSearchResults().length > 0) {
-                <div class="location-results">
-                  @for (place of locationSearchResults(); track trackLocationResult($index, place)) {
-                    <button type="button" class="location-result" (click)="selectLocationResult(place)" [disabled]="locationSearchControl.disabled">
-                      <span class="location-result-title">{{ place.name || place.display_name }}</span>
-                      @if (place.name && place.display_name) {
-                        <span class="location-result-subtitle">{{ place.display_name }}</span>
-                      }
-                    </button>
-                  }
-                </div>
-              }
-
-              <div class="selected-location" [class.selected-location-empty]="!hasSelectedLocation()">
-                <div class="selected-location-head">
-                  <span class="selected-location-label">Selected location</span>
-                  @if (hasSelectedLocation()) {
-                    <mat-icon aria-hidden="true">location_on</mat-icon>
-                  }
-                </div>
-                <p>{{ hasSelectedLocation() ? activeLocationLabel() : 'No location selected yet.' }}</p>
-              </div>
-
-              <p class="location-help">
-                Use the same place search as in MessageDrop. If no location is selected, the public message will be published without location details.
-              </p>
             </div>
 
-            <mat-form-field appearance="outline" class="marker-field">
-              <mat-label>Marker type</mat-label>
-              <input matInput formControlName="markerType" placeholder="default" />
-            </mat-form-field>
-          </form>
+            <div class="location-selection-column">
+              @if (hasSelectedLocation()) {
+                <div class="selected-location-panel">
+                  <div class="selected-location-panel-head">
+                    <h3>Selected location</h3>
+                    <button mat-icon-button type="button" (click)="clearLocation()" [disabled]="locationSearchControl.disabled" aria-label="Clear selected location">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+
+                  <p class="selected-location-panel-name">{{ activeLocationLabel() }}</p>
+
+                  @if (locationMapEmbedUrl(); as mapUrl) {
+                    <div class="location-map">
+                      <iframe
+                        [src]="mapUrl"
+                        title="Selected location map"
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    </div>
+                  }
+
+                  @if (locationMapLink()) {
+                    <a class="location-map-link" [href]="locationMapLink()" target="_blank" rel="noopener">
+                      Open larger map
+                    </a>
+                  }
+                </div>
+              } @else {
+                <div class="selected-location-panel selected-location-panel-empty">
+                  <h3>No location selected</h3>
+                  <p>Search for a place on the left to see the selected location and a small map here.</p>
+                </div>
+              }
+            </div>
+          </div>
         </mat-card-content>
       </mat-card>
 
@@ -294,6 +335,10 @@
 
                   @if (multimedia().type === 'tenor' && multimedia().url) {
                     <img class="tenor-preview" [src]="multimedia().url" [alt]="multimedia().title || 'Selected GIF'" />
+                  } @else if (tiktokEmbedUrl(); as tiktokUrl) {
+                    <div class="oembed-preview oembed-preview-tiktok">
+                      <iframe [src]="tiktokUrl" title="TikTok preview" loading="lazy" allowfullscreen></iframe>
+                    </div>
                   } @else if (safeOembedHtml()) {
                     <div class="oembed-preview" [innerHTML]="safeOembedHtml()"></div>
                   }
@@ -305,103 +350,6 @@
                 </div>
               }
             </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </div>
-
-    <div class="side-column">
-      <mat-card class="preview-card">
-        <mat-card-header>
-          <div mat-card-avatar class="avatar avatar-neutral">
-            <mat-icon>visibility</mat-icon>
-          </div>
-          <mat-card-title>Preview</mat-card-title>
-          <mat-card-subtitle>Live preview of the public message card</mat-card-subtitle>
-        </mat-card-header>
-
-        <mat-card-content>
-          <div class="preview-canvas">
-            <mat-card class="preview-item has-badge">
-              <div class="preview-avatar-box">
-                <mat-icon class="preview-avatar-icon" aria-hidden="true">campaign</mat-icon>
-                <div class="preview-avatar-text">
-                  <span class="preview-name">Public message</span>
-                  <span class="preview-timestamp">{{ (currentContent()?.updatedAt ?? previewCreatedAt) | date:'medium' }}</span>
-                </div>
-              </div>
-
-              <mat-card-content>
-                <div class="preview-message-content">
-                  @if (hasMedia()) {
-                    <div class="preview-media">
-                      @if (isImageMultimedia(multimedia())) {
-                        <img [src]="multimedia().url" [alt]="multimedia().title || 'Selected multimedia preview'" />
-                      } @else if (safeOembedHtml()) {
-                        <div
-                          class="preview-oembed"
-                          [class.preview-oembed-youtube]="multimedia().type === 'youtube'"
-                          [class.preview-oembed-spotify]="multimedia().type === 'spotify'"
-                          [class.preview-oembed-tiktok]="multimedia().type === 'tiktok'"
-                          [class.preview-oembed-pinterest]="multimedia().type === 'pinterest'"
-                          [innerHTML]="safeOembedHtml()"></div>
-                      }
-                    </div>
-                  }
-
-                  @if (previewMessage()) {
-                    <div class="preview-message-shell" [style]="previewDisplayStyle()">
-                      <p class="preview-message-text">{{ previewMessage() }}</p>
-                    </div>
-                  }
-
-                  @if (hashtags().length > 0) {
-                    <div class="preview-hashtag-chip-list" aria-label="Selected hashtags preview">
-                      @for (tag of hashtags(); track tag) {
-                        <span class="preview-hashtag-chip">#{{ tag }}</span>
-                      }
-                    </div>
-                  }
-
-                  @if (previewHasMetadata()) {
-                    <div class="preview-meta">
-                      <span class="preview-meta-chip" [class.is-missing]="!hasSelectedLocation()">
-                        <mat-icon aria-hidden="true">location_on</mat-icon>
-                        {{ hasSelectedLocation() ? activeLocationLabel() : 'No location selected' }}
-                      </span>
-                      <span class="preview-meta-chip">
-                        <mat-icon aria-hidden="true">pin_drop</mat-icon>
-                        {{ previewMarkerType() }}
-                      </span>
-                    </div>
-                  }
-                </div>
-              </mat-card-content>
-
-              <mat-card-actions class="preview-buttonbar">
-                <button mat-mini-fab type="button" tabindex="-1">
-                  <mat-icon>delete_forever</mat-icon>
-                </button>
-
-                <div class="preview-button-group">
-                  <button mat-mini-fab type="button" tabindex="-1">
-                    <mat-icon>forum</mat-icon>
-                  </button>
-                  <button mat-mini-fab type="button" tabindex="-1">
-                    <mat-icon>thumb_up</mat-icon>
-                  </button>
-                  <button mat-mini-fab type="button" tabindex="-1">
-                    <mat-icon>thumb_down</mat-icon>
-                  </button>
-                  <button mat-mini-fab type="button" tabindex="-1">
-                    <mat-icon>edit</mat-icon>
-                  </button>
-                  <button mat-mini-fab type="button" tabindex="-1">
-                    <mat-icon>more_horiz</mat-icon>
-                  </button>
-                </div>
-              </mat-card-actions>
-            </mat-card>
           </div>
         </mat-card-content>
       </mat-card>
@@ -444,6 +392,102 @@
               </mat-chip-row>
             }
           </mat-chip-grid>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div class="side-column">
+      <mat-card class="preview-card">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-neutral">
+            <mat-icon>visibility</mat-icon>
+          </div>
+          <mat-card-title>Preview</mat-card-title>
+          <mat-card-subtitle>Live preview of the public message card</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div class="preview-canvas">
+            <mat-card class="preview-item has-badge">
+              <div class="preview-avatar-box">
+                <mat-icon class="preview-avatar-icon" aria-hidden="true">campaign</mat-icon>
+                <div class="preview-avatar-text">
+                  <span class="preview-name">Public message</span>
+                  <span class="preview-timestamp">{{ (currentContent()?.updatedAt ?? previewCreatedAt) | date:'medium' }}</span>
+                </div>
+              </div>
+
+              <mat-card-content>
+                <div class="preview-message-content">
+                  @if (hasMedia()) {
+                    <div class="preview-media">
+                      @if (isImageMultimedia(multimedia())) {
+                        <img [src]="multimedia().url" [alt]="multimedia().title || 'Selected multimedia preview'" />
+                      } @else if (tiktokEmbedUrl(); as tiktokUrl) {
+                        <div
+                          class="preview-oembed preview-oembed-tiktok">
+                          <iframe [src]="tiktokUrl" title="TikTok preview" loading="lazy" allowfullscreen></iframe>
+                        </div>
+                      } @else if (safeOembedHtml()) {
+                        <div
+                          class="preview-oembed"
+                          [class.preview-oembed-youtube]="multimedia().type === 'youtube'"
+                          [class.preview-oembed-spotify]="multimedia().type === 'spotify'"
+                          [class.preview-oembed-tiktok]="multimedia().type === 'tiktok'"
+                          [class.preview-oembed-pinterest]="multimedia().type === 'pinterest'"
+                          [innerHTML]="safeOembedHtml()"></div>
+                      }
+                    </div>
+                  }
+
+                  @if (previewMessage()) {
+                    <div class="preview-message-shell" [style]="previewDisplayStyle()">
+                      <p class="preview-message-text">{{ previewMessage() }}</p>
+                    </div>
+                  }
+
+                  @if (hashtags().length > 0) {
+                    <div class="preview-hashtag-chip-list" aria-label="Selected hashtags preview">
+                      @for (tag of hashtags(); track tag) {
+                        <span class="preview-hashtag-chip">#{{ tag }}</span>
+                      }
+                    </div>
+                  }
+
+                  <div class="preview-meta">
+                    <span class="preview-meta-chip" [class.is-missing]="!hasSelectedLocation()">
+                      <mat-icon aria-hidden="true">location_on</mat-icon>
+                      {{ hasSelectedLocation() ? activeLocationLabel() : 'No location selected' }}
+                    </span>
+                  </div>
+                </div>
+              </mat-card-content>
+
+              <mat-card-actions class="preview-buttonbar">
+                <button mat-mini-fab type="button" tabindex="-1">
+                  <mat-icon>delete_forever</mat-icon>
+                </button>
+
+                <div class="preview-button-group">
+                  <button mat-mini-fab type="button" tabindex="-1">
+                    <mat-icon>forum</mat-icon>
+                  </button>
+                  <button mat-mini-fab type="button" tabindex="-1">
+                    <mat-icon>thumb_up</mat-icon>
+                  </button>
+                  <button mat-mini-fab type="button" tabindex="-1">
+                    <mat-icon>thumb_down</mat-icon>
+                  </button>
+                  <button mat-mini-fab type="button" tabindex="-1">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-mini-fab type="button" tabindex="-1">
+                    <mat-icon>more_horiz</mat-icon>
+                  </button>
+                </div>
+              </mat-card-actions>
+            </mat-card>
+          </div>
         </mat-card-content>
       </mat-card>
     </div>
