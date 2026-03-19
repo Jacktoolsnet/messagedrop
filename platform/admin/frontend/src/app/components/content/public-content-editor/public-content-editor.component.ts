@@ -21,6 +21,7 @@ import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
 import { Multimedia } from '../../../interfaces/multimedia.interface';
 import { NominatimPlace } from '../../../interfaces/nominatim-place.interface';
 import { PublicContentSavePayload } from '../../../interfaces/public-content-save-payload.interface';
+import { PublicContentType } from '../../../interfaces/public-content-type.type';
 import { PublicContent } from '../../../interfaces/public-content.interface';
 import { PublicProfile, PublicProfileSummary } from '../../../interfaces/public-profile.interface';
 import { TenorApiResponse, TenorResult } from '../../../interfaces/tenor-response.interface';
@@ -92,6 +93,7 @@ export class PublicContentEditorComponent {
   readonly tenorLoading = signal(false);
   readonly locationSearchLoading = signal(false);
   readonly currentContent = signal<PublicContent | null>(null);
+  readonly selectedParentContent = signal<PublicContent | null>(null);
   readonly multimedia = signal<Multimedia>({ ...EMPTY_MULTIMEDIA });
   readonly hashtags = signal<string[]>([]);
   readonly locationSearchResults = signal<NominatimPlace[]>([]);
@@ -103,6 +105,10 @@ export class PublicContentEditorComponent {
   readonly isEditMode = computed(() => this.currentContent() !== null);
   readonly isPublished = computed(() => this.currentContent()?.status === 'published');
   readonly isDeleted = computed(() => this.currentContent()?.status === 'deleted');
+  readonly canCreateCommentFromCurrent = computed(() => {
+    const content = this.currentContent();
+    return !!content && content.contentType === 'public' && content.status === 'published';
+  });
   readonly canPublish = computed(() => ['editor', 'admin', 'root'].includes(this.role() ?? ''));
   readonly hasMedia = computed(() => this.multimedia().type !== 'undefined');
   readonly safeOembedHtml = computed<SafeHtml | null>(() => {
@@ -121,7 +127,14 @@ export class PublicContentEditorComponent {
 
     return this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.tiktok.com/embed/v2/${id}`);
   });
-  readonly pageTitle = computed(() => this.isEditMode() ? 'Edit public message' : 'Create public message');
+  readonly contentType = computed<PublicContentType>(() => (this.formValue().contentType ?? 'public') === 'comment' ? 'comment' : 'public');
+  readonly isCommentMode = computed(() => this.contentType() === 'comment');
+  readonly pageTitle = computed(() => {
+    if (this.isCommentMode()) {
+      return this.isEditMode() ? 'Edit public comment' : 'Create public comment';
+    }
+    return this.isEditMode() ? 'Edit public message' : 'Create public message';
+  });
   readonly statusLabel = computed(() => this.formatStatus(this.currentContent()?.status ?? 'draft'));
   readonly maxPublicHashtags = MAX_PUBLIC_HASHTAGS;
 
@@ -131,6 +144,8 @@ export class PublicContentEditorComponent {
   readonly locationSearchControl = new FormControl('', { nonNullable: true });
 
   readonly form = this.fb.nonNullable.group({
+    contentType: this.fb.nonNullable.control<PublicContentType>('public'),
+    parentContentId: this.fb.nonNullable.control(''),
     message: this.fb.nonNullable.control(''),
     style: this.fb.nonNullable.control(''),
     publicProfileId: this.fb.nonNullable.control(''),
@@ -185,6 +200,10 @@ export class PublicContentEditorComponent {
     return this.hasMedia() ? '' : 'Add some text to preview the message.';
   });
   readonly previewLocationLabel = computed(() => {
+    if (this.isCommentMode()) {
+      return '';
+    }
+
     const selectedLabel = this.selectedLocationLabel().trim();
     if (selectedLabel) {
       return selectedLabel;
@@ -206,10 +225,52 @@ export class PublicContentEditorComponent {
     return parts.join(' • ');
   });
   readonly activeLocationLabel = computed(() => this.selectedLocationLabel().trim() || this.previewLocationLabel());
-  readonly hasSelectedLocation = computed(() => !!this.activeLocationLabel());
+  readonly hasSelectedLocation = computed(() => this.isCommentMode() || !!this.activeLocationLabel());
   readonly hasSelectedPublicProfile = computed(() => !!this.selectedProfile());
-  readonly canSaveContent = computed(() => this.hasSelectedLocation() && this.hasSelectedPublicProfile() && !this.saving());
+  readonly selectedParentSummary = computed(() => {
+    const parent = this.selectedParentContent();
+    if (parent) {
+      return {
+        id: parent.id,
+        contentType: parent.contentType,
+        status: parent.status,
+        message: parent.message,
+        locationLabel: parent.location.label,
+        publishedMessageUuid: parent.publishedMessageUuid,
+        publicProfileName: parent.publicProfile?.name || ''
+      };
+    }
+    return this.currentContent()?.parentContent ?? null;
+  });
+  readonly hasSelectedParentContent = computed(() => !!this.selectedParentSummary() && !!(this.formValue().parentContentId ?? '').trim());
+  readonly previewParentLabel = computed(() => {
+    const parent = this.selectedParentSummary();
+    if (!parent) {
+      return 'No parent message selected';
+    }
+    const profile = parent.publicProfileName?.trim();
+    const location = parent.locationLabel?.trim();
+    if (profile && location) {
+      return `${profile} • ${location}`;
+    }
+    if (location) {
+      return location;
+    }
+    if (profile) {
+      return profile;
+    }
+    return 'Selected parent message';
+  });
+  readonly canSaveContent = computed(() => {
+    if (this.saving() || !this.hasSelectedPublicProfile()) {
+      return false;
+    }
+    return this.isCommentMode() ? this.hasSelectedParentContent() : this.hasSelectedLocation();
+  });
   readonly selectedLocationCoordinates = computed(() => {
+    if (this.isCommentMode()) {
+      return null;
+    }
     const location = this.locationValue();
     const latitude = Number(location?.latitude) || 0;
     const longitude = Number(location?.longitude) || 0;
@@ -252,6 +313,16 @@ export class PublicContentEditorComponent {
     const contentId = this.route.snapshot.paramMap.get('id');
     if (contentId) {
       this.loadContent(contentId);
+    } else {
+      const requestedType = this.route.snapshot.queryParamMap.get('type');
+      const parentId = this.route.snapshot.queryParamMap.get('parentId');
+      if (requestedType === 'comment') {
+        this.form.controls.contentType.setValue('comment');
+      }
+      if (parentId?.trim()) {
+        this.form.controls.parentContentId.setValue(parentId.trim());
+        this.loadParentContent(parentId.trim());
+      }
     }
   }
 
@@ -362,6 +433,27 @@ export class PublicContentEditorComponent {
 
   openPublicProfiles(): void {
     this.router.navigate(['/dashboard/content/profiles']);
+  }
+
+  openParentContent(): void {
+    const parentId = this.selectedParentSummary()?.id;
+    if (!parentId) {
+      return;
+    }
+    this.router.navigate(['/dashboard/content', parentId, 'edit']);
+  }
+
+  createCommentFromCurrent(): void {
+    const content = this.currentContent();
+    if (!content || content.contentType !== 'public') {
+      return;
+    }
+    this.router.navigate(['/dashboard/content/create'], {
+      queryParams: {
+        type: 'comment',
+        parentId: content.id
+      }
+    });
   }
 
   profileAvatar(): string {
@@ -727,19 +819,25 @@ export class PublicContentEditorComponent {
       this.showMessage('Please select a public profile before saving.');
       return null;
     }
-    if (!this.hasSelectedLocation()) {
+    if (this.isCommentMode() && !this.hasSelectedParentContent()) {
+      this.showMessage('Please select a parent message before saving this comment.');
+      return null;
+    }
+    if (!this.isCommentMode() && !this.hasSelectedLocation()) {
       this.showMessage('Please select a location before saving.');
       return null;
     }
 
     return {
+      contentType: this.contentType(),
+      parentContentId: this.form.controls.parentContentId.value.trim(),
       publicProfileId: raw.publicProfileId.trim(),
       message,
       location: {
-        latitude: Number(raw.location.latitude) || 0,
-        longitude: Number(raw.location.longitude) || 0,
-        plusCode: raw.location.plusCode.trim(),
-        label: this.activeLocationLabel()
+        latitude: this.isCommentMode() ? 0 : (Number(raw.location.latitude) || 0),
+        longitude: this.isCommentMode() ? 0 : (Number(raw.location.longitude) || 0),
+        plusCode: this.isCommentMode() ? '' : raw.location.plusCode.trim(),
+        label: this.isCommentMode() ? '' : this.activeLocationLabel()
       },
       markerType: 'default',
       style: this.styleService.normalizeStyle(raw.style) || this.selectedProfileDefaultStyle(),
@@ -764,12 +862,15 @@ export class PublicContentEditorComponent {
   private applyContent(content: PublicContent, updateRoute = false): void {
     const storedLocationLabel = this.normalizeLocationLabel((content.location?.label ?? '').trim());
     this.currentContent.set(content);
+    this.selectedParentContent.set(null);
     this.multimedia.set(content.multimedia ?? { ...EMPTY_MULTIMEDIA });
     this.hashtags.set(Array.isArray(content.hashtags) ? [...content.hashtags] : []);
     this.selectedLocationLabel.set(storedLocationLabel);
     this.locationSearchResults.set([]);
     this.locationSearchControl.setValue(this.formatStoredLocation(content));
     this.form.setValue({
+      contentType: content.contentType ?? 'public',
+      parentContentId: content.parentContent?.id ?? '',
       message: content.message ?? '',
       style: this.styleService.normalizeStyle(content.style ?? ''),
       publicProfileId: content.publicProfile?.id ?? '',
@@ -812,6 +913,26 @@ export class PublicContentEditorComponent {
 
   private showMessage(message: string): void {
     this.snackBar.open(message, 'OK', { duration: 2800 });
+  }
+
+  private loadParentContent(id: string): void {
+    this.loading.set(true);
+    this.publicContentService.getPublicContent(id)
+      .pipe(
+        finalize(() => this.loading.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: (row) => {
+          this.selectedParentContent.set(row);
+          this.form.controls.parentContentId.setValue(row.id);
+          this.form.controls.contentType.setValue('comment');
+        },
+        error: () => {
+          this.selectedParentContent.set(null);
+          this.showMessage('Parent message could not be loaded.');
+        }
+      });
   }
 
   private getLocationLabel(place: NominatimPlace): string {

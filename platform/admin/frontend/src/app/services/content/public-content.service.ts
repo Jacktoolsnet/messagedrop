@@ -130,6 +130,9 @@ export class PublicContentService {
     if (filters.status && filters.status !== 'all') {
       params = params.set('status', filters.status);
     }
+    if (filters.contentType && filters.contentType !== 'all') {
+      params = params.set('contentType', filters.contentType);
+    }
     if (filters.q?.trim()) {
       params = params.set('q', filters.q.trim());
     }

@@ -33,6 +33,17 @@
       </div>
     }
 
+    @if (canCreateCommentFromCurrent()) {
+      <button
+        mat-icon-button
+        type="button"
+        class="toolbar-action avatar avatar-neutral"
+        (click)="createCommentFromCurrent()"
+        aria-label="Create public comment">
+        <mat-icon>forum</mat-icon>
+      </button>
+    }
+
     @if (isEditMode() && !isDeleted()) {
       <button
         mat-icon-button
@@ -78,6 +89,16 @@
 
           <div class="meta-fact-card">
             <div class="meta-fact-icon">
+              <mat-icon>{{ isCommentMode() ? 'forum' : 'campaign' }}</mat-icon>
+            </div>
+            <div class="meta-fact-copy">
+              <span class="meta-fact-label">Type</span>
+              <span class="meta-fact-value">{{ isCommentMode() ? 'Comment' : 'Message' }}</span>
+            </div>
+          </div>
+
+          <div class="meta-fact-card">
+            <div class="meta-fact-icon">
               <mat-icon>groups</mat-icon>
             </div>
             <div class="meta-fact-copy">
@@ -95,6 +116,18 @@
               <span class="meta-fact-value">{{ content.updatedAt | date:'dd.MM.yyyy HH:mm' }}</span>
             </div>
           </div>
+
+          @if (isCommentMode()) {
+            <div class="meta-fact-card">
+              <div class="meta-fact-icon">
+                <mat-icon>reply</mat-icon>
+              </div>
+              <div class="meta-fact-copy">
+                <span class="meta-fact-label">Parent</span>
+                <span class="meta-fact-value">{{ previewParentLabel() }}</span>
+              </div>
+            </div>
+          }
 
           @if (content.publishedAt) {
             <div class="meta-fact-card meta-fact-success">
@@ -130,13 +163,54 @@
 
   <div class="editor-layout">
     <div class="main-column">
+      @if (isCommentMode()) {
+        <mat-card class="profile-card">
+          <mat-card-header>
+            <div mat-card-avatar class="avatar avatar-accent">
+              <mat-icon>reply</mat-icon>
+            </div>
+            <mat-card-title>Parent message</mat-card-title>
+            <mat-card-subtitle>The public message this comment belongs to.</mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            @if (selectedParentSummary(); as parent) {
+              <div class="parent-message-panel">
+                <div class="parent-message-copy">
+                  <span class="parent-message-kicker">Reply to</span>
+                  <strong>{{ previewParentLabel() }}</strong>
+                  @if (parent.message) {
+                    <p>{{ parent.message }}</p>
+                  }
+                </div>
+
+                <div class="parent-message-actions">
+                  <button mat-stroked-button type="button" (click)="openParentContent()">
+                    <mat-icon>open_in_new</mat-icon>
+                    Open parent
+                  </button>
+                </div>
+              </div>
+            } @else {
+              <div class="missing-profile-state">
+                <mat-icon>forum</mat-icon>
+                <div>
+                  <strong>No parent message selected.</strong>
+                  <p>Create comments from a published public message to attach them to a parent.</p>
+                </div>
+              </div>
+            }
+          </mat-card-content>
+        </mat-card>
+      }
+
       <mat-card class="profile-card">
         <mat-card-header>
           <div mat-card-avatar class="avatar avatar-neutral">
             <mat-icon>groups</mat-icon>
           </div>
           <mat-card-title>Public profile</mat-card-title>
-          <mat-card-subtitle>Choose the public sender profile for this message.</mat-card-subtitle>
+          <mat-card-subtitle>Choose the public sender profile for this {{ isCommentMode() ? 'comment' : 'message' }}.</mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content>
@@ -211,7 +285,7 @@
             <mat-icon>edit_note</mat-icon>
           </div>
           <mat-card-title>Message content</mat-card-title>
-          <mat-card-subtitle>Text and font for the public message</mat-card-subtitle>
+          <mat-card-subtitle>Text and font for the public {{ isCommentMode() ? 'comment' : 'message' }}</mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content>
@@ -278,6 +352,7 @@
         </mat-card-content>
       </mat-card>
 
+      @if (!isCommentMode()) {
       <mat-card class="location-card">
         <mat-card-header>
           <div mat-card-avatar class="avatar avatar-success">
@@ -379,6 +454,7 @@
           </div>
         </mat-card-content>
       </mat-card>
+      }
 
       <mat-card class="media-card media-card-wide">
         <mat-card-header>
@@ -532,7 +608,7 @@
             <mat-icon>visibility</mat-icon>
           </div>
           <mat-card-title>Preview</mat-card-title>
-          <mat-card-subtitle>Live preview of the public message card</mat-card-subtitle>
+          <mat-card-subtitle>Live preview of the public {{ isCommentMode() ? 'comment' : 'message' }} card</mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content>
@@ -590,10 +666,17 @@
                   }
 
                   <div class="preview-meta">
-                    <span class="preview-meta-chip" [class.is-missing]="!hasSelectedLocation()">
-                      <mat-icon aria-hidden="true">location_on</mat-icon>
-                      {{ hasSelectedLocation() ? activeLocationLabel() : 'No location selected' }}
-                    </span>
+                    @if (isCommentMode()) {
+                      <span class="preview-meta-chip" [class.is-missing]="!hasSelectedParentContent()">
+                        <mat-icon aria-hidden="true">reply</mat-icon>
+                        {{ hasSelectedParentContent() ? previewParentLabel() : 'No parent message selected' }}
+                      </span>
+                    } @else {
+                      <span class="preview-meta-chip" [class.is-missing]="!hasSelectedLocation()">
+                        <mat-icon aria-hidden="true">location_on</mat-icon>
+                        {{ hasSelectedLocation() ? activeLocationLabel() : 'No location selected' }}
+                      </span>
+                    }
                   </div>
                 </div>
               </mat-card-content>

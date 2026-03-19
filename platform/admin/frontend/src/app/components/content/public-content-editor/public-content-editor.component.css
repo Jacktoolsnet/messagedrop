@@ -358,6 +358,48 @@ mat-toolbar {
   gap: 1rem;
 }
 
+.parent-message-panel {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.parent-message-copy {
+  display: grid;
+  gap: .35rem;
+  min-width: 0;
+}
+
+.parent-message-kicker {
+  font-size: .74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+}
+
+.parent-message-copy strong {
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.parent-message-copy p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.parent-message-actions {
+  flex: 0 0 auto;
+}
+
 .profile-picker-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;

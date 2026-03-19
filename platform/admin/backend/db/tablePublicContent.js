@@ -11,9 +11,16 @@ const contentStatus = {
   DELETED: 'deleted'
 };
 
+const contentType = {
+  PUBLIC: 'public',
+  COMMENT: 'comment'
+};
+
 const columns = {
   id: 'id',
   authorAdminUserId: 'authorAdminUserId',
+  contentType: 'contentType',
+  parentContentId: 'parentContentId',
   publicProfileId: 'publicProfileId',
   lastEditorAdminUserId: 'lastEditorAdminUserId',
   publisherAdminUserId: 'publisherAdminUserId',
@@ -42,6 +49,8 @@ function init(db) {
     CREATE TABLE IF NOT EXISTS ${tableName} (
       ${columns.id} TEXT PRIMARY KEY NOT NULL,
       ${columns.authorAdminUserId} TEXT NOT NULL,
+      ${columns.contentType} TEXT NOT NULL DEFAULT '${contentType.PUBLIC}',
+      ${columns.parentContentId} TEXT DEFAULT NULL,
       ${columns.publicProfileId} TEXT DEFAULT NULL,
       ${columns.lastEditorAdminUserId} TEXT DEFAULT NULL,
       ${columns.publisherAdminUserId} TEXT DEFAULT NULL,
@@ -66,6 +75,9 @@ function init(db) {
       CONSTRAINT fk_public_content_author
         FOREIGN KEY (${columns.authorAdminUserId}) REFERENCES ${adminUserTableName}(id)
         ON UPDATE CASCADE ON DELETE CASCADE,
+      CONSTRAINT fk_public_content_parent
+        FOREIGN KEY (${columns.parentContentId}) REFERENCES ${tableName}(id)
+        ON UPDATE CASCADE ON DELETE SET NULL,
       CONSTRAINT fk_public_content_profile
         FOREIGN KEY (${columns.publicProfileId}) REFERENCES ${publicProfileTableName}(id)
         ON UPDATE CASCADE ON DELETE RESTRICT,
@@ -79,6 +91,10 @@ function init(db) {
 
     CREATE INDEX IF NOT EXISTS idx_public_content_author
       ON ${tableName}(${columns.authorAdminUserId}, ${columns.updatedAt} DESC);
+    CREATE INDEX IF NOT EXISTS idx_public_content_type
+      ON ${tableName}(${columns.contentType}, ${columns.updatedAt} DESC);
+    CREATE INDEX IF NOT EXISTS idx_public_content_parent
+      ON ${tableName}(${columns.parentContentId}, ${columns.updatedAt} DESC);
     CREATE INDEX IF NOT EXISTS idx_public_content_profile
       ON ${tableName}(${columns.publicProfileId}, ${columns.updatedAt} DESC);
     CREATE INDEX IF NOT EXISTS idx_public_content_status
@@ -100,6 +116,30 @@ function init(db) {
 
     const hasLocationLabelColumn = rows.some((row) => row?.name === columns.locationLabel);
     const hasPublicProfileIdColumn = rows.some((row) => row?.name === columns.publicProfileId);
+    const hasContentTypeColumn = rows.some((row) => row?.name === columns.contentType);
+    const hasParentContentIdColumn = rows.some((row) => row?.name === columns.parentContentId);
+    if (!hasContentTypeColumn) {
+      db.run(`
+        ALTER TABLE ${tableName}
+        ADD COLUMN ${columns.contentType} TEXT NOT NULL DEFAULT '${contentType.PUBLIC}'
+      `, []);
+      db.run(`
+        CREATE INDEX IF NOT EXISTS idx_public_content_type
+          ON ${tableName}(${columns.contentType}, ${columns.updatedAt} DESC)
+      `, []);
+    }
+
+    if (!hasParentContentIdColumn) {
+      db.run(`
+        ALTER TABLE ${tableName}
+        ADD COLUMN ${columns.parentContentId} TEXT DEFAULT NULL
+      `, []);
+      db.run(`
+        CREATE INDEX IF NOT EXISTS idx_public_content_parent
+          ON ${tableName}(${columns.parentContentId}, ${columns.updatedAt} DESC)
+      `, []);
+    }
+
     if (!hasPublicProfileIdColumn) {
       db.run(`
         ALTER TABLE ${tableName}
@@ -127,6 +167,8 @@ function create(db, payload, callback) {
     INSERT INTO ${tableName} (
       ${columns.id},
       ${columns.authorAdminUserId},
+      ${columns.contentType},
+      ${columns.parentContentId},
       ${columns.publicProfileId},
       ${columns.lastEditorAdminUserId},
       ${columns.publisherAdminUserId},
@@ -148,12 +190,14 @@ function create(db, payload, callback) {
       ${columns.publishedAt},
       ${columns.withdrawnAt},
       ${columns.deletedAt}
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   const params = [
     id,
     payload.authorAdminUserId,
+    payload.contentType ?? contentType.PUBLIC,
+    payload.parentContentId ?? null,
     payload.publicProfileId ?? null,
     payload.lastEditorAdminUserId ?? payload.authorAdminUserId,
     payload.publisherAdminUserId ?? null,
@@ -195,11 +239,20 @@ function getById(db, id, callback) {
       profile.avatarAuthorUrl AS publicProfileAvatarAuthorUrl,
       profile.avatarUnsplashUrl AS publicProfileAvatarUnsplashUrl,
       profile.defaultStyle AS publicProfileDefaultStyle,
+      parent.id AS parentContentIdResolved,
+      parent.${columns.contentType} AS parentContentType,
+      parent.${columns.status} AS parentStatus,
+      parent.${columns.message} AS parentMessage,
+      parent.${columns.locationLabel} AS parentLocationLabel,
+      parent.${columns.publishedMessageUuid} AS parentPublishedMessageUuid,
+      parentProfile.name AS parentPublicProfileName,
       author.username AS authorUsername,
       editor.username AS lastEditorUsername,
       publisher.username AS publisherUsername
     FROM ${tableName} c
     LEFT JOIN ${publicProfileTableName} profile ON profile.id = c.${columns.publicProfileId}
+    LEFT JOIN ${tableName} parent ON parent.id = c.${columns.parentContentId}
+    LEFT JOIN ${publicProfileTableName} parentProfile ON parentProfile.id = parent.${columns.publicProfileId}
     INNER JOIN ${adminUserTableName} author ON author.id = c.${columns.authorAdminUserId}
     LEFT JOIN ${adminUserTableName} editor ON editor.id = c.${columns.lastEditorAdminUserId}
     LEFT JOIN ${adminUserTableName} publisher ON publisher.id = c.${columns.publisherAdminUserId}
@@ -232,16 +285,22 @@ function list(db, filters, callback) {
     params.push(contentStatus.DELETED);
   }
 
+  if (filters?.contentType) {
+    where.push(`c.${columns.contentType} = ?`);
+    params.push(filters.contentType);
+  }
+
   if (filters?.query) {
     where.push(`(
       LOWER(c.${columns.message}) LIKE ?
       OR LOWER(author.username) LIKE ?
       OR LOWER(COALESCE(profile.name, '')) LIKE ?
+      OR LOWER(COALESCE(parentProfile.name, '')) LIKE ?
       OR LOWER(c.${columns.plusCode}) LIKE ?
       OR LOWER(c.${columns.locationLabel}) LIKE ?
     )`);
     const query = `%${String(filters.query).trim().toLowerCase()}%`;
-    params.push(query, query, query, query, query);
+    params.push(query, query, query, query, query, query);
   }
 
   if (filters?.publicProfileId) {
@@ -258,11 +317,20 @@ function list(db, filters, callback) {
       profile.avatarAuthorUrl AS publicProfileAvatarAuthorUrl,
       profile.avatarUnsplashUrl AS publicProfileAvatarUnsplashUrl,
       profile.defaultStyle AS publicProfileDefaultStyle,
+      parent.id AS parentContentIdResolved,
+      parent.${columns.contentType} AS parentContentType,
+      parent.${columns.status} AS parentStatus,
+      parent.${columns.message} AS parentMessage,
+      parent.${columns.locationLabel} AS parentLocationLabel,
+      parent.${columns.publishedMessageUuid} AS parentPublishedMessageUuid,
+      parentProfile.name AS parentPublicProfileName,
       author.username AS authorUsername,
       editor.username AS lastEditorUsername,
       publisher.username AS publisherUsername
     FROM ${tableName} c
     LEFT JOIN ${publicProfileTableName} profile ON profile.id = c.${columns.publicProfileId}
+    LEFT JOIN ${tableName} parent ON parent.id = c.${columns.parentContentId}
+    LEFT JOIN ${publicProfileTableName} parentProfile ON parentProfile.id = parent.${columns.publicProfileId}
     INNER JOIN ${adminUserTableName} author ON author.id = c.${columns.authorAdminUserId}
     LEFT JOIN ${adminUserTableName} editor ON editor.id = c.${columns.lastEditorAdminUserId}
     LEFT JOIN ${adminUserTableName} publisher ON publisher.id = c.${columns.publisherAdminUserId}
@@ -291,6 +359,8 @@ function update(db, id, fields, callback) {
   const params = [];
 
   const allowedKeys = [
+    columns.contentType,
+    columns.parentContentId,
     columns.message,
     columns.latitude,
     columns.longitude,
@@ -339,6 +409,7 @@ module.exports = {
   tableName,
   columns,
   contentStatus,
+  contentType,
   init,
   create,
   getById,

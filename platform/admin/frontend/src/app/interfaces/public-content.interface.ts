@@ -1,5 +1,6 @@
 import { Multimedia } from './multimedia.interface';
 import { PublicContentStatus } from './public-content-status.type';
+import { PublicContentType } from './public-content-type.type';
 import { PublicProfileSummary } from './public-profile.interface';
 
 export interface PublicContentLocation {
@@ -13,6 +14,16 @@ export interface PublicContent {
   id: string;
   authorAdminUserId: string;
   authorUsername: string;
+  contentType: PublicContentType;
+  parentContent: {
+    id: string;
+    contentType: PublicContentType;
+    status: PublicContentStatus;
+    message: string;
+    locationLabel: string;
+    publishedMessageUuid: string | null;
+    publicProfileName: string;
+  } | null;
   publicProfile: PublicProfileSummary | null;
   lastEditorAdminUserId: string | null;
   lastEditorUsername: string | null;

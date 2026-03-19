@@ -97,6 +97,15 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline">
+        <mat-label>Type</mat-label>
+        <mat-select formControlName="contentType">
+          @for (type of typeOptions; track type) {
+            <mat-option [value]="type">{{ type === 'all' ? 'All types' : typeLabel(type) }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
         <mat-label>Status</mat-label>
         <mat-select formControlName="status">
           @for (status of statusOptions; track status) {
@@ -164,8 +173,13 @@
             }
 
             <div class="content-preview-meta">
+              <span class="content-preview-meta-chip content-preview-meta-chip-muted">
+                <mat-icon>{{ typeIcon(row.contentType) }}</mat-icon>
+                {{ typeLabel(row.contentType) }}
+              </span>
+
               <span class="content-preview-meta-chip">
-                <mat-icon>location_on</mat-icon>
+                <mat-icon>{{ row.contentType === 'comment' ? 'reply' : 'location_on' }}</mat-icon>
                 {{ locationLabel(row) }}
               </span>
 
@@ -188,6 +202,13 @@
               <button mat-stroked-button type="button" (click)="openContent(row); $event.stopPropagation()">
                 <mat-icon>{{ row.status === 'published' ? 'visibility' : 'edit' }}</mat-icon>
                 {{ row.status === 'published' ? 'Open' : 'Edit' }}
+              </button>
+            }
+
+            @if (canCommentOnRow(row)) {
+              <button mat-stroked-button type="button" (click)="createComment(row, $event)">
+                <mat-icon>forum</mat-icon>
+                Comment
               </button>
             }
 

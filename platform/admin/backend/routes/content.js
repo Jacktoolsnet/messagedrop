@@ -144,6 +144,18 @@ function toContentDto(row) {
     id: row.id,
     authorAdminUserId: row.authorAdminUserId,
     authorUsername: row.authorUsername || '',
+    contentType: row.contentType || tablePublicContent.contentType.PUBLIC,
+    parentContent: row.parentContentIdResolved
+      ? {
+        id: row.parentContentIdResolved,
+        contentType: row.parentContentType || tablePublicContent.contentType.PUBLIC,
+        status: row.parentStatus || tablePublicContent.contentStatus.DRAFT,
+        message: row.parentMessage || '',
+        locationLabel: row.parentLocationLabel || '',
+        publishedMessageUuid: row.parentPublishedMessageUuid || null,
+        publicProfileName: row.parentPublicProfileName || ''
+      }
+      : null,
     publicProfile: row.publicProfileId
       ? {
         id: row.publicProfileId,
@@ -311,6 +323,8 @@ function normalizeEditorPayload(body) {
   const hasSelectedLocation = latitude !== 0 || longitude !== 0 || !!plusCode;
 
   return {
+    contentType: normalizeContentType(body?.contentType),
+    parentContentId: normalizeString(body?.parentContentId),
     publicProfileId: normalizeString(body?.publicProfileId),
     message: normalizeString(body?.message),
     latitude,
@@ -322,6 +336,14 @@ function normalizeEditorPayload(body) {
     hashtags: normalizeHashtags(body?.hashtags),
     multimedia: normalizeMultimedia(body?.multimedia)
   };
+}
+
+function normalizeContentType(value) {
+  const normalized = normalizeString(value, tablePublicContent.contentType.PUBLIC).toLowerCase();
+  if (normalized === tablePublicContent.contentType.COMMENT) {
+    return tablePublicContent.contentType.COMMENT;
+  }
+  return tablePublicContent.contentType.PUBLIC;
 }
 
 function normalizePublicProfilePayload(body) {
@@ -338,6 +360,10 @@ function hasSelectedLocation(payload) {
   return Number(payload?.latitude) !== 0
     || Number(payload?.longitude) !== 0
     || !!normalizeString(payload?.plusCode);
+}
+
+function isCommentPayload(payload) {
+  return normalizeContentType(payload?.contentType) === tablePublicContent.contentType.COMMENT;
 }
 
 function hasSelectedPublicProfile(payload) {
@@ -371,6 +397,54 @@ function getPublicProfileById(db, profileId) {
       }
       resolve(row || null);
     });
+  });
+}
+
+function getPublicContentById(db, contentId) {
+  return new Promise((resolve, reject) => {
+    tablePublicContent.getById(db, contentId, (err, row) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(row || null);
+    });
+  });
+}
+
+function cascadeChildCommentStatus(db, parentContentId, nextStatus) {
+  return new Promise((resolve, reject) => {
+    db.run(
+      `
+        UPDATE ${tablePublicContent.tableName}
+        SET ${tablePublicContent.columns.status} = ?,
+            ${tablePublicContent.columns.publishedMessageId} = NULL,
+            ${tablePublicContent.columns.withdrawnAt} = CASE WHEN ? = ? THEN ? ELSE ${tablePublicContent.columns.withdrawnAt} END,
+            ${tablePublicContent.columns.deletedAt} = CASE WHEN ? = ? THEN ? ELSE ${tablePublicContent.columns.deletedAt} END,
+            ${tablePublicContent.columns.updatedAt} = ?
+        WHERE ${tablePublicContent.columns.parentContentId} = ?
+          AND ${tablePublicContent.columns.contentType} = ?
+          AND ${tablePublicContent.columns.status} = ?
+      `,
+      [
+        nextStatus,
+        nextStatus,
+        tablePublicContent.contentStatus.WITHDRAWN,
+        Date.now(),
+        nextStatus,
+        tablePublicContent.contentStatus.DELETED,
+        Date.now(),
+        Date.now(),
+        parentContentId,
+        tablePublicContent.contentType.COMMENT,
+        tablePublicContent.contentStatus.PUBLISHED
+      ],
+      (err) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(true);
+      }
+    );
   });
 }
 
@@ -646,6 +720,7 @@ router.get('/public-messages', requireRole(...CONTENT_ROLES), (req, res, next) =
   const filters = {
     authorAdminUserId: canSeeAllContent(roles) ? normalizeString(req.query.authorId, '') || undefined : getAdminUserId(req),
     publicProfileId: normalizeString(req.query.publicProfileId, '') || undefined,
+    contentType: normalizeString(req.query.contentType, '') || undefined,
     status: normalizeString(req.query.status, '') || undefined,
     query: normalizeString(req.query.q, '') || undefined,
     limit: Number(req.query.limit),
@@ -693,7 +768,7 @@ router.post('/public-messages', [requireRole(...CONTENT_ROLES), express.json({ l
     if (!hasSelectedPublicProfile(payload)) {
       return next(apiError.unprocessableEntity('Please choose a public profile before saving'));
     }
-    if (!hasSelectedLocation(payload)) {
+    if (!isCommentPayload(payload) && !hasSelectedLocation(payload)) {
       return next(apiError.unprocessableEntity('Please choose a location before saving'));
     }
 
@@ -702,16 +777,36 @@ router.post('/public-messages', [requireRole(...CONTENT_ROLES), express.json({ l
       return next(apiError.notFound('The selected public profile no longer exists'));
     }
 
+    let parentContentId = null;
+    if (isCommentPayload(payload)) {
+      parentContentId = normalizeString(payload.parentContentId) || null;
+      if (!parentContentId) {
+        return next(apiError.unprocessableEntity('Please choose a parent message before saving this comment'));
+      }
+      const parentContent = await getPublicContentById(req.database.db, parentContentId);
+      if (!parentContent) {
+        return next(apiError.notFound('The selected parent message no longer exists'));
+      }
+      if ((parentContent.contentType || tablePublicContent.contentType.PUBLIC) !== tablePublicContent.contentType.PUBLIC) {
+        return next(apiError.conflict('Comments can currently only be attached to public messages'));
+      }
+      if (parentContent.status === tablePublicContent.contentStatus.DELETED) {
+        return next(apiError.conflict('The selected parent message is deleted'));
+      }
+    }
+
     tablePublicContent.create(req.database.db, {
       authorAdminUserId: actorId,
+      contentType: payload.contentType,
+      parentContentId,
       publicProfileId: publicProfile.id,
       lastEditorAdminUserId: actorId,
       status: tablePublicContent.contentStatus.DRAFT,
       message: payload.message,
-      latitude: payload.latitude,
-      longitude: payload.longitude,
-      plusCode: payload.plusCode,
-      locationLabel: payload.locationLabel,
+      latitude: isCommentPayload(payload) ? 0 : payload.latitude,
+      longitude: isCommentPayload(payload) ? 0 : payload.longitude,
+      plusCode: isCommentPayload(payload) ? '' : payload.plusCode,
+      locationLabel: isCommentPayload(payload) ? '' : payload.locationLabel,
       markerType: payload.markerType,
       style: payload.style,
       hashtags: JSON.stringify(payload.hashtags),
@@ -784,7 +879,7 @@ router.put('/public-messages/:id', [requireRole(...CONTENT_ROLES), express.json(
     if (!hasSelectedPublicProfile(payload)) {
       return next(apiError.unprocessableEntity('Please choose a public profile before saving'));
     }
-    if (!hasSelectedLocation(payload)) {
+    if (!isCommentPayload(payload) && !hasSelectedLocation(payload)) {
       return next(apiError.unprocessableEntity('Please choose a location before saving'));
     }
 
@@ -793,17 +888,40 @@ router.put('/public-messages/:id', [requireRole(...CONTENT_ROLES), express.json(
       return next(apiError.notFound('The selected public profile no longer exists'));
     }
 
+    let parentContentId = null;
+    if (isCommentPayload(payload)) {
+      parentContentId = normalizeString(payload.parentContentId) || null;
+      if (!parentContentId) {
+        return next(apiError.unprocessableEntity('Please choose a parent message before saving this comment'));
+      }
+      if (parentContentId === row.id) {
+        return next(apiError.conflict('A message cannot be the parent of itself'));
+      }
+      const parentContent = await getPublicContentById(req.database.db, parentContentId);
+      if (!parentContent) {
+        return next(apiError.notFound('The selected parent message no longer exists'));
+      }
+      if ((parentContent.contentType || tablePublicContent.contentType.PUBLIC) !== tablePublicContent.contentType.PUBLIC) {
+        return next(apiError.conflict('Comments can currently only be attached to public messages'));
+      }
+      if (parentContent.status === tablePublicContent.contentStatus.DELETED) {
+        return next(apiError.conflict('The selected parent message is deleted'));
+      }
+    }
+
     const actor = await ensurePersistedAdminActor(req);
     const actorId = String(actor?.id || '').trim();
 
     await new Promise((resolve, reject) => {
       tablePublicContent.update(req.database.db, req.params.id, {
+        [tablePublicContent.columns.contentType]: payload.contentType,
+        [tablePublicContent.columns.parentContentId]: parentContentId,
         [tablePublicContent.columns.message]: payload.message,
         [tablePublicContent.columns.publicProfileId]: publicProfile.id,
-        [tablePublicContent.columns.latitude]: payload.latitude,
-        [tablePublicContent.columns.longitude]: payload.longitude,
-        [tablePublicContent.columns.plusCode]: payload.plusCode,
-        [tablePublicContent.columns.locationLabel]: payload.locationLabel,
+        [tablePublicContent.columns.latitude]: isCommentPayload(payload) ? 0 : payload.latitude,
+        [tablePublicContent.columns.longitude]: isCommentPayload(payload) ? 0 : payload.longitude,
+        [tablePublicContent.columns.plusCode]: isCommentPayload(payload) ? '' : payload.plusCode,
+        [tablePublicContent.columns.locationLabel]: isCommentPayload(payload) ? '' : payload.locationLabel,
         [tablePublicContent.columns.markerType]: payload.markerType,
         [tablePublicContent.columns.style]: payload.style,
         [tablePublicContent.columns.hashtags]: JSON.stringify(payload.hashtags),
@@ -869,7 +987,7 @@ router.post('/public-messages/:id/publish', requireRole(...PUBLISH_ROLES), async
     if (!row.publicProfileId) {
       return next(apiError.unprocessableEntity('Please choose a public profile before publishing'));
     }
-    if (!hasSelectedLocation(row)) {
+    if ((row.contentType || tablePublicContent.contentType.PUBLIC) !== tablePublicContent.contentType.COMMENT && !hasSelectedLocation(row)) {
       return next(apiError.unprocessableEntity('Please choose a location before publishing'));
     }
 
@@ -880,19 +998,39 @@ router.post('/public-messages/:id/publish', requireRole(...PUBLISH_ROLES), async
       return next(apiError.badGateway('public_profile_backend_user_missing'));
     }
     const publishedMessageUuid = row.publishedMessageUuid || crypto.randomUUID();
+    const messageType = normalizeContentType(row.contentType);
+    let parentPublishedMessageUuid = null;
+    if (messageType === tablePublicContent.contentType.COMMENT) {
+      if (!row.parentContentIdResolved && !row.parentContentId) {
+        return next(apiError.unprocessableEntity('Please choose a parent message before publishing this comment'));
+      }
+
+      const parentContent = await getPublicContentById(req.database.db, row.parentContentIdResolved || row.parentContentId);
+      if (!parentContent) {
+        return next(apiError.notFound('The selected parent message no longer exists'));
+      }
+      if ((parentContent.contentType || tablePublicContent.contentType.PUBLIC) !== tablePublicContent.contentType.PUBLIC) {
+        return next(apiError.conflict('Comments can currently only be attached to public messages'));
+      }
+      if (parentContent.status !== tablePublicContent.contentStatus.PUBLISHED || !parentContent.publishedMessageUuid) {
+        return next(apiError.conflict('The parent message must be published before this comment can be published'));
+      }
+      parentPublishedMessageUuid = parentContent.publishedMessageUuid;
+    }
 
     const publishResponse = await callPublicBackend('post', '/message/internal/publish', {
       uuid: publishedMessageUuid,
-      messageTyp: 'public',
+      messageTyp: messageType,
       messageUserId: publisherPublicUserId,
-      latitude: Number(row.latitude || 0),
-      longitude: Number(row.longitude || 0),
-      plusCode: row.plusCode || '',
+      latitude: messageType === tablePublicContent.contentType.COMMENT ? 0 : Number(row.latitude || 0),
+      longitude: messageType === tablePublicContent.contentType.COMMENT ? 0 : Number(row.longitude || 0),
+      plusCode: messageType === tablePublicContent.contentType.COMMENT ? '' : (row.plusCode || ''),
       message: row.message || '',
       markerType: row.markerType || 'default',
       style: row.style || publicProfile.defaultStyle || '',
       hashtags: parseJson(row.hashtags, []),
-      multimedia: row.multimedia || '{}'
+      multimedia: row.multimedia || '{}',
+      parentUuid: parentPublishedMessageUuid || undefined
     });
 
     if (publishResponse.status !== 200 || !publishResponse.data?.messageUuid) {
@@ -983,6 +1121,10 @@ router.post('/public-messages/:id/withdraw', requireRole(...CONTENT_ROLES), asyn
       });
     });
 
+    if ((row.contentType || tablePublicContent.contentType.PUBLIC) === tablePublicContent.contentType.PUBLIC) {
+      await cascadeChildCommentStatus(req.database.db, row.id, tablePublicContent.contentStatus.WITHDRAWN);
+    }
+
     const updated = await new Promise((resolve, reject) => {
       tablePublicContent.getById(req.database.db, row.id, (err, value) => {
         if (err) return reject(err);
@@ -1043,6 +1185,10 @@ router.delete('/public-messages/:id', requireRole(...CONTENT_ROLES), async (req,
         resolve(ok);
       });
     });
+
+    if ((row.contentType || tablePublicContent.contentType.PUBLIC) === tablePublicContent.contentType.PUBLIC) {
+      await cascadeChildCommentStatus(req.database.db, row.id, tablePublicContent.contentStatus.DELETED);
+    }
 
     return res.json({
       status: 200,
