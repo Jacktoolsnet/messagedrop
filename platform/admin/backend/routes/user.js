@@ -322,6 +322,24 @@ function isUuid(value) {
     return UUID_REGEX.test(String(value || '').trim());
 }
 
+function ensureRootUserRow(db) {
+    return new Promise((resolve, reject) => {
+        const username = (process.env.ADMIN_ROOT_USER || 'root').trim() || 'root';
+        const email = normalizeEmail(ADMIN_ROOT_EMAIL);
+        tableUser.ensureSystemUser(db, {
+            id: 'root',
+            username,
+            email,
+            role: 'root',
+            passwordHash: tableUser.systemPasswordHash,
+            createdAt: Date.now()
+        }, (err, row) => {
+            if (err) return reject(err);
+            resolve(row || null);
+        });
+    });
+}
+
 function normalizeBlockUntil(value) {
     const parsed = Number(value);
     if (!Number.isFinite(parsed) || parsed <= 0) {
@@ -481,6 +499,7 @@ router.post('/login', [loginLimiter, loginSlowdown], async (req, res, next) => {
         // Root via ENV
         if (username === envUser && password === envPass) {
             try {
+                await ensureRootUserRow(db);
                 const { id, expiresAt } = await createChallenge(
                     db,
                     username,
@@ -500,6 +519,10 @@ router.post('/login', [loginLimiter, loginSlowdown], async (req, res, next) => {
         // Normale User
         tableUser.getByUsername(db, username, async (err, user) => {
             if (err || !user) {
+                await notifyLoginFailure(username, 'invalid_user_or_password', req.logger);
+                return next(apiError.unauthorized('Invalid login'));
+            }
+            if (user.role === 'root') {
                 await notifyLoginFailure(username, 'invalid_user_or_password', req.logger);
                 return next(apiError.unauthorized('Invalid login'));
             }

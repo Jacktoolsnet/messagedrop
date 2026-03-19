@@ -9,6 +9,7 @@ const columnPassword = 'password';    // TEXT NOT NULL (bcrypt-Hash)
 const columnRole = 'role';            // TEXT NOT NULL ('root', 'admin', 'moderator', ...)
 const columnPublicBackendUserId = 'publicBackendUserId'; // TEXT NULL (mapped public backend user id)
 const columnCreatedAt = 'createdAt';  // INTEGER NOT NULL (unix ms)
+const systemPasswordHash = '$2b$12$sAIOssllWikOXCBOvpiameidJuVBdw8/b9jkzOgMVgOUel4Am4kda';
 
 // === INIT: create table + indexes ===
 const init = function (db) {
@@ -205,6 +206,74 @@ const deleteById = function (db, id, callBack) {
     });
 };
 
+// === ENSURE SYSTEM USER: technischer System-User (z. B. Root aus ENV) ===
+/**
+ * @param {import('sqlite3').Database} db
+ * @param {{ id: string, username: string, email?: string, role?: string, publicBackendUserId?: string | null, createdAt?: number, passwordHash?: string }} user
+ * @param {(err: any, row?: any) => void} callBack
+ */
+const ensureSystemUser = function (db, user, callBack) {
+    const id = typeof user?.id === 'string' ? user.id.trim() : '';
+    const username = typeof user?.username === 'string' ? user.username.trim() : '';
+    const email = typeof user?.email === 'string' ? user.email.trim().toLowerCase() : '';
+    const role = typeof user?.role === 'string' && user.role.trim() ? user.role.trim() : 'root';
+    const createdAt = Number.isFinite(user?.createdAt) ? user.createdAt : Date.now();
+    const passwordHash = typeof user?.passwordHash === 'string' && user.passwordHash
+        ? user.passwordHash
+        : systemPasswordHash;
+    const publicBackendUserId = Object.prototype.hasOwnProperty.call(user || {}, 'publicBackendUserId')
+        ? (user.publicBackendUserId ?? null)
+        : undefined;
+
+    if (!id || !username) {
+        return callBack(new Error('Missing system user id or username'));
+    }
+
+    getById(db, id, (err, existing) => {
+        if (err) return callBack(err);
+
+        if (!existing) {
+            return create(
+                db,
+                id,
+                username,
+                email,
+                passwordHash,
+                role,
+                publicBackendUserId ?? null,
+                createdAt,
+                (createErr) => {
+                    if (createErr) return callBack(createErr);
+                    getById(db, id, callBack);
+                }
+            );
+        }
+
+        const fields = {};
+        if (username && username !== existing.username) {
+            fields.username = username;
+        }
+        if (email !== existing.email) {
+            fields.email = email;
+        }
+        if (role !== existing.role) {
+            fields.role = role;
+        }
+        if (publicBackendUserId !== undefined && publicBackendUserId !== existing.publicBackendUserId) {
+            fields.publicBackendUserId = publicBackendUserId;
+        }
+
+        if (Object.keys(fields).length === 0) {
+            return callBack(null, existing);
+        }
+
+        update(db, id, fields, (updateErr) => {
+            if (updateErr) return callBack(updateErr);
+            getById(db, id, callBack);
+        });
+    });
+};
+
 module.exports = {
     tableName,
     columns: {
@@ -222,5 +291,7 @@ module.exports = {
     getByUsername,
     list,
     update,
-    deleteById
+    deleteById,
+    ensureSystemUser,
+    systemPasswordHash
 };

@@ -65,6 +65,42 @@ function getAdminUserId(req) {
   return String(req.admin?.sub || '').trim();
 }
 
+async function ensurePersistedAdminActor(req) {
+  const adminUserId = getAdminUserId(req);
+  if (!adminUserId) {
+    throw apiError.unauthorized('invalid_admin_token');
+  }
+
+  const existingUser = await getUserById(req.database.db, adminUserId);
+  if (existingUser) {
+    return existingUser;
+  }
+
+  const roles = getAdminRoles(req);
+  if (adminUserId !== 'root' && !roles.includes('root')) {
+    throw apiError.notFound('admin_user_not_found');
+  }
+
+  const username = normalizeString(req.admin?.username, process.env.ADMIN_ROOT_USER || 'root') || 'root';
+  const email = normalizeString(process.env.ADMIN_ROOT_EMAIL || process.env.MAIL_ADDRESS || process.env.MAIL_USER, '').toLowerCase();
+
+  return new Promise((resolve, reject) => {
+    tableUser.ensureSystemUser(req.database.db, {
+      id: 'root',
+      username,
+      email,
+      role: 'root',
+      passwordHash: tableUser.systemPasswordHash,
+      createdAt: Date.now()
+    }, (err, row) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(row || null);
+    });
+  });
+}
+
 function canSeeAllContent(roles) {
   return roles.includes('editor') || roles.includes('admin') || roles.includes('root');
 }
@@ -240,7 +276,7 @@ async function createPublicBackendUserMapping(req, adminUserId) {
 
 async function resolvePublisherPublicUserId(req) {
   const adminUserId = getAdminUserId(req);
-  const adminUser = await getUserById(req.database.db, adminUserId);
+  const adminUser = await ensurePersistedAdminActor(req);
   if (!adminUser) {
     throw apiError.notFound('admin_user_not_found');
   }
@@ -335,44 +371,67 @@ router.get('/public-messages/:id', requireRole(...CONTENT_ROLES), (req, res, nex
   });
 });
 
-router.post('/public-messages', [requireRole(...CONTENT_ROLES), express.json({ limit: '1mb' })], (req, res, next) => {
-  const actorId = getAdminUserId(req);
-  const payload = normalizeEditorPayload(req.body);
-  const now = Date.now();
+router.post('/public-messages', [requireRole(...CONTENT_ROLES), express.json({ limit: '1mb' })], async (req, res, next) => {
+  try {
+    const actor = await ensurePersistedAdminActor(req);
+    const actorId = String(actor?.id || '').trim();
+    const payload = normalizeEditorPayload(req.body);
+    const now = Date.now();
 
-  if (!hasSelectedLocation(payload)) {
-    return next(apiError.unprocessableEntity('location_required'));
-  }
-
-  tablePublicContent.create(req.database.db, {
-    authorAdminUserId: actorId,
-    lastEditorAdminUserId: actorId,
-    status: tablePublicContent.contentStatus.DRAFT,
-    message: payload.message,
-    latitude: payload.latitude,
-    longitude: payload.longitude,
-    plusCode: payload.plusCode,
-    markerType: payload.markerType,
-    style: payload.style,
-    hashtags: JSON.stringify(payload.hashtags),
-    multimedia: JSON.stringify(payload.multimedia),
-    createdAt: now,
-    updatedAt: now
-  }, (err, result) => {
-    if (err) {
-      return next(apiError.internal('db_error'));
+    if (!hasSelectedLocation(payload)) {
+      return next(apiError.unprocessableEntity('location_required'));
     }
 
-    tablePublicContent.getById(req.database.db, result.id, (fetchErr, row) => {
-      if (fetchErr) {
+    tablePublicContent.create(req.database.db, {
+      authorAdminUserId: actorId,
+      lastEditorAdminUserId: actorId,
+      status: tablePublicContent.contentStatus.DRAFT,
+      message: payload.message,
+      latitude: payload.latitude,
+      longitude: payload.longitude,
+      plusCode: payload.plusCode,
+      markerType: payload.markerType,
+      style: payload.style,
+      hashtags: JSON.stringify(payload.hashtags),
+      multimedia: JSON.stringify(payload.multimedia),
+      createdAt: now,
+      updatedAt: now
+    }, (err, result) => {
+      if (err) {
+        req.logger?.error?.('Create public content failed', {
+          adminId: actorId,
+          error: err?.message || String(err),
+          code: err?.code
+        });
         return next(apiError.internal('db_error'));
       }
-      return res.status(201).json({
-        status: 201,
-        row: toContentDto(row)
+
+      tablePublicContent.getById(req.database.db, result.id, (fetchErr, row) => {
+        if (fetchErr) {
+          req.logger?.error?.('Load created public content failed', {
+            adminId: actorId,
+            contentId: result.id,
+            error: fetchErr?.message || String(fetchErr),
+            code: fetchErr?.code
+          });
+          return next(apiError.internal('db_error'));
+        }
+        return res.status(201).json({
+          status: 201,
+          row: toContentDto(row)
+        });
       });
     });
-  });
+  } catch (error) {
+    if (error?.status) {
+      return next(error);
+    }
+    req.logger?.error?.('Ensure admin actor for public content create failed', {
+      adminId: getAdminUserId(req),
+      error: error?.message || String(error)
+    });
+    return next(apiError.internal('db_error'));
+  }
 });
 
 router.put('/public-messages/:id', [requireRole(...CONTENT_ROLES), express.json({ limit: '1mb' })], (req, res, next) => {
@@ -393,42 +452,68 @@ router.put('/public-messages/:id', [requireRole(...CONTENT_ROLES), express.json(
       return next(apiError.conflict('content_deleted'));
     }
 
-    const actorId = getAdminUserId(req);
     const payload = normalizeEditorPayload(req.body);
 
     if (!hasSelectedLocation(payload)) {
       return next(apiError.unprocessableEntity('location_required'));
     }
 
-    tablePublicContent.update(req.database.db, req.params.id, {
-      [tablePublicContent.columns.message]: payload.message,
-      [tablePublicContent.columns.latitude]: payload.latitude,
-      [tablePublicContent.columns.longitude]: payload.longitude,
-      [tablePublicContent.columns.plusCode]: payload.plusCode,
-      [tablePublicContent.columns.markerType]: payload.markerType,
-      [tablePublicContent.columns.style]: payload.style,
-      [tablePublicContent.columns.hashtags]: JSON.stringify(payload.hashtags),
-      [tablePublicContent.columns.multimedia]: JSON.stringify(payload.multimedia),
-      [tablePublicContent.columns.lastEditorAdminUserId]: actorId,
-      updatedAt: Date.now()
-    }, (updateErr, ok) => {
-      if (updateErr) {
-        return next(apiError.internal('db_error'));
-      }
-      if (!ok) {
-        return next(apiError.notFound('not_found'));
-      }
+    ensurePersistedAdminActor(req)
+      .then((actor) => {
+        const actorId = String(actor?.id || '').trim();
+        tablePublicContent.update(req.database.db, req.params.id, {
+          [tablePublicContent.columns.message]: payload.message,
+          [tablePublicContent.columns.latitude]: payload.latitude,
+          [tablePublicContent.columns.longitude]: payload.longitude,
+          [tablePublicContent.columns.plusCode]: payload.plusCode,
+          [tablePublicContent.columns.markerType]: payload.markerType,
+          [tablePublicContent.columns.style]: payload.style,
+          [tablePublicContent.columns.hashtags]: JSON.stringify(payload.hashtags),
+          [tablePublicContent.columns.multimedia]: JSON.stringify(payload.multimedia),
+          [tablePublicContent.columns.lastEditorAdminUserId]: actorId,
+          updatedAt: Date.now()
+        }, (updateErr, ok) => {
+          if (updateErr) {
+            req.logger?.error?.('Update public content failed', {
+              adminId: actorId,
+              contentId: req.params.id,
+              error: updateErr?.message || String(updateErr),
+              code: updateErr?.code
+            });
+            return next(apiError.internal('db_error'));
+          }
+          if (!ok) {
+            return next(apiError.notFound('not_found'));
+          }
 
-      tablePublicContent.getById(req.database.db, req.params.id, (fetchErr, updatedRow) => {
-        if (fetchErr) {
-          return next(apiError.internal('db_error'));
-        }
-        return res.json({
-          status: 200,
-          row: toContentDto(updatedRow)
+          tablePublicContent.getById(req.database.db, req.params.id, (fetchErr, updatedRow) => {
+            if (fetchErr) {
+              req.logger?.error?.('Load updated public content failed', {
+                adminId: actorId,
+                contentId: req.params.id,
+                error: fetchErr?.message || String(fetchErr),
+                code: fetchErr?.code
+              });
+              return next(apiError.internal('db_error'));
+            }
+            return res.json({
+              status: 200,
+              row: toContentDto(updatedRow)
+            });
+          });
         });
+      })
+      .catch((ensureErr) => {
+        if (ensureErr?.status) {
+          return next(ensureErr);
+        }
+        req.logger?.error?.('Ensure admin actor for public content update failed', {
+          adminId: getAdminUserId(req),
+          contentId: req.params.id,
+          error: ensureErr?.message || String(ensureErr)
+        });
+        return next(apiError.internal('db_error'));
       });
-    });
   });
 });
 
