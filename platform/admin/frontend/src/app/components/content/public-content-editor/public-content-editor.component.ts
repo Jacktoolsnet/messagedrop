@@ -22,7 +22,7 @@ import { Multimedia } from '../../../interfaces/multimedia.interface';
 import { NominatimPlace } from '../../../interfaces/nominatim-place.interface';
 import { PublicContentSavePayload } from '../../../interfaces/public-content-save-payload.interface';
 import { PublicContent } from '../../../interfaces/public-content.interface';
-import { PublicProfile } from '../../../interfaces/public-profile.interface';
+import { PublicProfile, PublicProfileSummary } from '../../../interfaces/public-profile.interface';
 import { TenorApiResponse, TenorResult } from '../../../interfaces/tenor-response.interface';
 import { AuthService } from '../../../services/auth/auth.service';
 import { ContentStyleOption, ContentStyleService } from '../../../services/content/content-style.service';
@@ -148,7 +148,7 @@ export class PublicContentEditorComponent {
     this.form.controls.location.valueChanges.pipe(startWith(this.form.controls.location.getRawValue())),
     { initialValue: this.form.controls.location.getRawValue() }
   );
-  readonly selectedProfile = computed<Pick<PublicProfile, 'id' | 'name' | 'avatarImage' | 'defaultStyle'> | null>(() => {
+  readonly selectedProfile = computed<PublicProfileSummary | PublicProfile | null>(() => {
     const selectedId = (this.formValue().publicProfileId ?? '').trim();
     if (!selectedId) {
       return null;
@@ -166,6 +166,7 @@ export class PublicContentEditorComponent {
 
     return null;
   });
+  readonly selectedProfileAttribution = computed(() => this.selectedProfile()?.avatarAttribution ?? null);
   readonly selectedStyle = computed(() => this.styleService.normalizeStyle(this.formValue().style));
   readonly selectedProfileDefaultStyle = computed(() => this.styleService.normalizeStyle(this.selectedProfile()?.defaultStyle));
   readonly previewStyleOverride = signal('');

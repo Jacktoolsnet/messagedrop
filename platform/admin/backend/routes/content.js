@@ -41,7 +41,7 @@ async function callPublicBackend(method, endpoint, payload) {
   });
 }
 
-async function callPublicBackendPublic(method, endpoint) {
+async function callPublicBackendPublic(method, endpoint, payload) {
   const baseUrl = resolvePublicBackendBase();
   if (!baseUrl) {
     throw apiError.badGateway('backend_unavailable');
@@ -50,6 +50,7 @@ async function callPublicBackendPublic(method, endpoint) {
   return axios.request({
     method,
     url: `${baseUrl}${endpoint}`,
+    data: payload,
     timeout: 10000,
     headers: {
       Accept: 'application/json'
@@ -148,6 +149,14 @@ function toContentDto(row) {
         id: row.publicProfileId,
         name: row.publicProfileName || '',
         avatarImage: row.publicProfileAvatarImage || '',
+        avatarAttribution: row.publicProfileAvatarAuthorName
+          ? {
+            source: 'unsplash',
+            authorName: row.publicProfileAvatarAuthorName || '',
+            authorUrl: row.publicProfileAvatarAuthorUrl || '',
+            unsplashUrl: row.publicProfileAvatarUnsplashUrl || ''
+          }
+          : null,
         defaultStyle: row.publicProfileDefaultStyle || ''
       }
       : null,
@@ -211,6 +220,59 @@ function normalizeAvatarImage(value) {
   throw apiError.badRequest('Please choose a valid avatar image');
 }
 
+function normalizeOptionalHttpUrl(value) {
+  const normalized = normalizeString(value);
+  if (!normalized) {
+    return '';
+  }
+  try {
+    const parsed = new URL(normalized);
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+      return normalized;
+    }
+  } catch {
+    // ignore
+  }
+  throw apiError.badRequest('Please use a valid URL');
+}
+
+function normalizePublicProfileAvatarAttribution(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return {
+      avatarAuthorName: '',
+      avatarAuthorUrl: '',
+      avatarUnsplashUrl: ''
+    };
+  }
+
+  const source = normalizeString(value.source).toLowerCase();
+  if (source && source !== 'unsplash') {
+    throw apiError.badRequest('Unsupported avatar attribution source');
+  }
+
+  const authorName = normalizeString(value.authorName);
+  const authorUrl = normalizeOptionalHttpUrl(value.authorUrl);
+  const unsplashUrl = normalizeOptionalHttpUrl(value.unsplashUrl);
+
+  if (!authorName && !authorUrl && !unsplashUrl) {
+    return {
+      avatarAuthorName: '',
+      avatarAuthorUrl: '',
+      avatarUnsplashUrl: ''
+    };
+  }
+
+  if (!authorName || !authorUrl || !unsplashUrl) {
+    throw apiError.badRequest('Unsplash attribution is incomplete');
+  }
+
+  return {
+    avatarAuthorName: authorName,
+    avatarAuthorUrl: authorUrl,
+    avatarUnsplashUrl: unsplashUrl
+  };
+}
+
 function normalizeHashtags(value) {
   if (!Array.isArray(value)) {
     return [];
@@ -263,9 +325,11 @@ function normalizeEditorPayload(body) {
 }
 
 function normalizePublicProfilePayload(body) {
+  const avatarAttribution = normalizePublicProfileAvatarAttribution(body?.avatarAttribution);
   return {
     name: normalizeString(body?.name),
     avatarImage: normalizeAvatarImage(body?.avatarImage),
+    ...avatarAttribution,
     defaultStyle: normalizeString(body?.defaultStyle)
   };
 }
@@ -410,6 +474,14 @@ function toPublicProfileDto(row) {
     id: row.id,
     name: row.name || '',
     avatarImage: row.avatarImage || '',
+    avatarAttribution: row.avatarAuthorName
+      ? {
+        source: 'unsplash',
+        authorName: row.avatarAuthorName || '',
+        authorUrl: row.avatarAuthorUrl || '',
+        unsplashUrl: row.avatarUnsplashUrl || ''
+      }
+      : null,
     defaultStyle: row.defaultStyle || '',
     publicBackendUserId: row.publicBackendUserId || null,
     contentCount: Number(row.contentCount ?? 0),
@@ -494,6 +566,9 @@ router.put('/public-profiles/:id', [requireRole(...CONTENT_ROLES), express.json(
     tablePublicProfile.update(req.database.db, req.params.id, {
       [tablePublicProfile.columns.name]: payload.name,
       [tablePublicProfile.columns.avatarImage]: payload.avatarImage,
+      [tablePublicProfile.columns.avatarAuthorName]: payload.avatarAuthorName,
+      [tablePublicProfile.columns.avatarAuthorUrl]: payload.avatarAuthorUrl,
+      [tablePublicProfile.columns.avatarUnsplashUrl]: payload.avatarUnsplashUrl,
       [tablePublicProfile.columns.defaultStyle]: payload.defaultStyle,
       updatedAt: Date.now()
     }, (err, ok) => {
@@ -978,6 +1053,63 @@ router.delete('/public-messages/:id', requireRole(...CONTENT_ROLES), async (req,
       return next(error);
     }
     const err = apiError.internal('delete_failed');
+    err.detail = error?.message || String(error);
+    return next(err);
+  }
+});
+
+router.get('/avatars/unsplash/featured', requireRole(...CONTENT_ROLES), async (req, res, next) => {
+  const page = Math.max(Number(req.query.page) || 1, 1);
+  const endpoint = page > 1
+    ? `/unsplash/featured/${encodeURIComponent(String(page))}`
+    : '/unsplash/featured';
+
+  try {
+    const response = await callPublicBackendPublic('get', endpoint);
+    return res.status(response.status).json(response.data);
+  } catch (error) {
+    const err = apiError.badGateway('unsplash_unavailable');
+    err.detail = error?.message || String(error);
+    return next(err);
+  }
+});
+
+router.get('/avatars/unsplash/search', requireRole(...CONTENT_ROLES), async (req, res, next) => {
+  const term = normalizeString(req.query.term, '');
+  if (!term) {
+    return next(apiError.badRequest('Search term is required'));
+  }
+
+  const page = Math.max(Number(req.query.page) || 1, 1);
+  const topics = normalizeString(req.query.topics, '');
+  const params = new URLSearchParams();
+  if (topics) {
+    params.set('topics', topics);
+  }
+
+  const queryString = params.size > 0 ? `?${params.toString()}` : '';
+  const endpoint = page > 1
+    ? `/unsplash/search/${encodeURIComponent(term)}/${encodeURIComponent(String(page))}${queryString}`
+    : `/unsplash/search/${encodeURIComponent(term)}${queryString}`;
+
+  try {
+    const response = await callPublicBackendPublic('get', endpoint);
+    return res.status(response.status).json(response.data);
+  } catch (error) {
+    const err = apiError.badGateway('unsplash_unavailable');
+    err.detail = error?.message || String(error);
+    return next(err);
+  }
+});
+
+router.post('/avatars/unsplash/download', [requireRole(...CONTENT_ROLES), express.json({ limit: '64kb' })], async (req, res, next) => {
+  try {
+    const response = await callPublicBackendPublic('post', '/unsplash/download', {
+      downloadLocation: normalizeString(req.body?.downloadLocation)
+    });
+    return res.status(response.status).json(response.data);
+  } catch (error) {
+    const err = apiError.badGateway('unsplash_unavailable');
     err.detail = error?.message || String(error);
     return next(err);
   }

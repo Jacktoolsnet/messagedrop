@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, DestroyRef, ViewChild, computed, effect, inject, signal } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,12 +10,16 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSelect } from '@angular/material/select';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { finalize } from 'rxjs';
+import { finalize, startWith } from 'rxjs';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
+import { PublicProfileUnsplashDialogComponent } from '../public-profile-unsplash-dialog/public-profile-unsplash-dialog.component';
+import { PublicProfileAvatarAttribution } from '../../../interfaces/public-profile-avatar-attribution.interface';
 import { PublicProfile } from '../../../interfaces/public-profile.interface';
+import { UnsplashPhoto } from '../../../interfaces/unsplash-response.interface';
 import { ContentStyleOption, ContentStyleService } from '../../../services/content/content-style.service';
 import { PublicProfileService } from '../../../services/content/public-profile.service';
 
@@ -39,6 +43,8 @@ import { PublicProfileService } from '../../../services/content/public-profile.s
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PublicProfileManagerComponent {
+  @ViewChild('styleSelect') private styleSelect?: MatSelect;
+
   private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder);
   private readonly dialog = inject(MatDialog);
@@ -53,22 +59,32 @@ export class PublicProfileManagerComponent {
   readonly saving = signal(false);
   readonly selectedProfileId = signal<string | null>(null);
   readonly isCreatingNew = signal(false);
+  readonly avatarAttribution = signal<PublicProfileAvatarAttribution | null>(null);
 
   readonly form = this.fb.nonNullable.group({
     name: this.fb.nonNullable.control('', { validators: [Validators.required] }),
     avatarImage: this.fb.nonNullable.control(''),
     defaultStyle: this.fb.nonNullable.control(this.styleOptions[0]?.style ?? '', { validators: [Validators.required] })
   });
+  readonly formValue = toSignal(
+    this.form.valueChanges.pipe(startWith(this.form.getRawValue())),
+    { initialValue: this.form.getRawValue() }
+  );
 
   readonly selectedProfile = computed(() => {
     const selectedId = this.selectedProfileId();
     return this.rows().find((row) => row.id === selectedId) ?? null;
   });
+  readonly previewStyleOverride = signal('');
   readonly selectedStyleOption = computed<ContentStyleOption | null>(() => (
-    this.styleService.findOptionByStyle(this.form.controls.defaultStyle.value)
+    this.styleService.findOptionByStyle(this.formValue().defaultStyle)
   ));
-  readonly avatarPreview = computed(() => this.form.controls.avatarImage.value.trim());
-  readonly profileInitials = computed(() => this.buildInitials(this.form.controls.name.value));
+  readonly avatarPreview = computed(() => (this.formValue().avatarImage ?? '').trim());
+  readonly unsplashAttribution = computed(() => this.avatarAttribution()?.source === 'unsplash' ? this.avatarAttribution() : null);
+  readonly profileNamePreview = computed(() => (this.formValue().name ?? '').trim());
+  readonly profileStylePreview = computed(() => this.formValue().defaultStyle ?? '');
+  readonly previewDisplayStyle = computed(() => this.previewStyleOverride() || this.profileStylePreview());
+  readonly profileInitials = computed(() => this.buildInitials(this.profileNamePreview()));
 
   constructor() {
     effect(() => {
@@ -110,6 +126,27 @@ export class PublicProfileManagerComponent {
     return option.fontFamily;
   }
 
+  previewStyleOption(style: string | null | undefined): void {
+    this.previewStyleOverride.set(this.styleService.normalizeStyle(style));
+  }
+
+  resetPreviewStyle(): void {
+    this.previewStyleOverride.set('');
+  }
+
+  handleStyleSelectOpenedChange(open: boolean): void {
+    if (!open) {
+      this.resetPreviewStyle();
+      return;
+    }
+
+    queueMicrotask(() => this.syncActiveStylePreview());
+  }
+
+  handleStyleSelectKeydown(): void {
+    queueMicrotask(() => this.syncActiveStylePreview());
+  }
+
   goBack(): void {
     this.router.navigate(['/dashboard/content']);
   }
@@ -122,6 +159,7 @@ export class PublicProfileManagerComponent {
       avatarImage: '',
       defaultStyle: this.styleOptions[0]?.style ?? ''
     });
+    this.avatarAttribution.set(null);
     this.form.markAsPristine();
     this.form.markAsUntouched();
   }
@@ -134,6 +172,7 @@ export class PublicProfileManagerComponent {
       avatarImage: row.avatarImage ?? '',
       defaultStyle: this.styleService.normalizeStyle(row.defaultStyle) || (this.styleOptions[0]?.style ?? '')
     });
+    this.avatarAttribution.set(row.avatarAttribution ?? null);
     this.form.markAsPristine();
     this.form.markAsUntouched();
   }
@@ -152,6 +191,7 @@ export class PublicProfileManagerComponent {
     const payload = {
       name: raw.name.trim(),
       avatarImage: raw.avatarImage.trim(),
+      avatarAttribution: this.avatarAttribution(),
       defaultStyle: this.styleService.normalizeStyle(raw.defaultStyle)
     };
 
@@ -221,6 +261,21 @@ export class PublicProfileManagerComponent {
     input.click();
   }
 
+  openUnsplashAvatarPicker(): void {
+    this.dialog.open(PublicProfileUnsplashDialogComponent, {
+      width: 'min(1040px, 96vw)',
+      maxWidth: '96vw'
+    }).afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((photo?: UnsplashPhoto) => {
+        if (!photo) {
+          return;
+        }
+
+        this.applyUnsplashPhoto(photo);
+      });
+  }
+
   handleAvatarSelection(event: Event): void {
     const input = event.target as HTMLInputElement | null;
     const file = input?.files?.[0];
@@ -243,6 +298,7 @@ export class PublicProfileManagerComponent {
       const result = typeof reader.result === 'string' ? reader.result : '';
       this.form.controls.avatarImage.setValue(result);
       this.form.controls.avatarImage.markAsDirty();
+      this.avatarAttribution.set(null);
     };
     reader.onerror = () => this.showMessage('The avatar image could not be read.');
     reader.readAsDataURL(file);
@@ -252,6 +308,7 @@ export class PublicProfileManagerComponent {
   removeAvatar(): void {
     this.form.controls.avatarImage.setValue('');
     this.form.controls.avatarImage.markAsDirty();
+    this.avatarAttribution.set(null);
   }
 
   private buildInitials(name: string | null | undefined): string {
@@ -266,5 +323,48 @@ export class PublicProfileManagerComponent {
 
   private showMessage(message: string): void {
     this.snackBar.open(message, 'OK', { duration: 2600 });
+  }
+
+  private applyUnsplashPhoto(photo: UnsplashPhoto): void {
+    const url = String(photo.urls.small || photo.urls.regular || photo.urls.thumb || '').trim();
+    if (!url) {
+      this.showMessage('The selected Unsplash image does not contain a usable image URL.');
+      return;
+    }
+
+    this.form.controls.avatarImage.setValue(url);
+    this.form.controls.avatarImage.markAsDirty();
+    this.avatarAttribution.set(this.buildUnsplashAttribution(photo));
+    this.showMessage('Unsplash avatar selected.');
+  }
+
+  private buildUnsplashAttribution(photo: UnsplashPhoto): PublicProfileAvatarAttribution {
+    const authorName = photo.user?.name || photo.user?.username || 'Unsplash';
+    const authorUsername = photo.user?.username || '';
+    const baseUrl = photo.links?.html ?? `https://unsplash.com/photos/${photo.id}`;
+    const authorUrl = new URL(authorUsername ? `https://unsplash.com/@${encodeURIComponent(authorUsername)}` : baseUrl);
+    authorUrl.searchParams.set('utm_source', 'messagedrop_admin');
+    authorUrl.searchParams.set('utm_medium', 'referral');
+
+    const unsplashUrl = new URL('https://unsplash.com/');
+    unsplashUrl.searchParams.set('utm_source', 'messagedrop_admin');
+    unsplashUrl.searchParams.set('utm_medium', 'referral');
+
+    return {
+      source: 'unsplash',
+      authorName,
+      authorUrl: authorUrl.toString(),
+      unsplashUrl: unsplashUrl.toString()
+    };
+  }
+
+  private syncActiveStylePreview(): void {
+    const activeOption = this.styleSelect?.options?.toArray().find((option) => option.active);
+    if (!activeOption) {
+      this.resetPreviewStyle();
+      return;
+    }
+
+    this.previewStyleOption(activeOption.value as string | null | undefined);
   }
 }

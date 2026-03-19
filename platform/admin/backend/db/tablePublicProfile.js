@@ -7,6 +7,9 @@ const columns = {
   id: 'id',
   name: 'name',
   avatarImage: 'avatarImage',
+  avatarAuthorName: 'avatarAuthorName',
+  avatarAuthorUrl: 'avatarAuthorUrl',
+  avatarUnsplashUrl: 'avatarUnsplashUrl',
   defaultStyle: 'defaultStyle',
   publicBackendUserId: 'publicBackendUserId',
   createdAt: 'createdAt',
@@ -19,6 +22,9 @@ function init(db) {
       ${columns.id} TEXT PRIMARY KEY NOT NULL,
       ${columns.name} TEXT NOT NULL,
       ${columns.avatarImage} TEXT NOT NULL DEFAULT '',
+      ${columns.avatarAuthorName} TEXT NOT NULL DEFAULT '',
+      ${columns.avatarAuthorUrl} TEXT NOT NULL DEFAULT '',
+      ${columns.avatarUnsplashUrl} TEXT NOT NULL DEFAULT '',
       ${columns.defaultStyle} TEXT NOT NULL DEFAULT '',
       ${columns.publicBackendUserId} TEXT DEFAULT NULL,
       ${columns.createdAt} INTEGER NOT NULL,
@@ -57,6 +63,24 @@ function init(db) {
         ADD COLUMN ${columns.defaultStyle} TEXT NOT NULL DEFAULT ''
       `, []);
     }
+    if (!knownColumns.has(columns.avatarAuthorName)) {
+      db.run(`
+        ALTER TABLE ${tableName}
+        ADD COLUMN ${columns.avatarAuthorName} TEXT NOT NULL DEFAULT ''
+      `, []);
+    }
+    if (!knownColumns.has(columns.avatarAuthorUrl)) {
+      db.run(`
+        ALTER TABLE ${tableName}
+        ADD COLUMN ${columns.avatarAuthorUrl} TEXT NOT NULL DEFAULT ''
+      `, []);
+    }
+    if (!knownColumns.has(columns.avatarUnsplashUrl)) {
+      db.run(`
+        ALTER TABLE ${tableName}
+        ADD COLUMN ${columns.avatarUnsplashUrl} TEXT NOT NULL DEFAULT ''
+      `, []);
+    }
     if (!knownColumns.has(columns.publicBackendUserId)) {
       db.run(`
         ALTER TABLE ${tableName}
@@ -80,16 +104,22 @@ function create(db, payload, callback) {
       ${columns.id},
       ${columns.name},
       ${columns.avatarImage},
+      ${columns.avatarAuthorName},
+      ${columns.avatarAuthorUrl},
+      ${columns.avatarUnsplashUrl},
       ${columns.defaultStyle},
       ${columns.publicBackendUserId},
       ${columns.createdAt},
       ${columns.updatedAt}
-    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
   const params = [
     id,
     payload?.name ?? '',
     payload?.avatarImage ?? '',
+    payload?.avatarAuthorName ?? '',
+    payload?.avatarAuthorUrl ?? '',
+    payload?.avatarUnsplashUrl ?? '',
     payload?.defaultStyle ?? '',
     payload?.publicBackendUserId ?? null,
     now,
@@ -180,6 +210,9 @@ function update(db, id, fields, callback) {
   const allowedKeys = [
     columns.name,
     columns.avatarImage,
+    columns.avatarAuthorName,
+    columns.avatarAuthorUrl,
+    columns.avatarUnsplashUrl,
     columns.defaultStyle,
     columns.publicBackendUserId
   ];

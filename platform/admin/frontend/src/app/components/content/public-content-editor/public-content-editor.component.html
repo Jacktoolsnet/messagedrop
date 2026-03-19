@@ -200,6 +200,15 @@
                   <span [style]="selectedProfile()?.defaultStyle">Default profile font preview</span>
                 </div>
               </div>
+
+              @if (selectedProfileAttribution(); as attribution) {
+                <div class="profile-attribution-badge">
+                  <span>Photo by</span>
+                  <a [href]="attribution.authorUrl" target="_blank" rel="noopener">{{ attribution.authorName }}</a>
+                  <span>on</span>
+                  <a [href]="attribution.unsplashUrl" target="_blank" rel="noopener">Unsplash</a>
+                </div>
+              }
             }
           }
         </mat-card-content>

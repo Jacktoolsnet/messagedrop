@@ -130,6 +130,7 @@ mat-toolbar {
 .profile-list {
   display: grid;
   gap: .8rem;
+  margin-top: .85rem;
 }
 
 .profile-list-item {
@@ -209,6 +210,12 @@ mat-toolbar {
   color: var(--muted);
 }
 
+.profile-meta-id,
+.style-preview-id {
+  font-family: ui-monospace, SFMono-Regular, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  letter-spacing: .01em;
+}
+
 .profile-chevron {
   color: var(--muted);
 }
@@ -256,6 +263,34 @@ mat-toolbar {
   gap: .75rem;
 }
 
+.unsplash-badge-wrapper {
+  margin-top: -.1rem;
+}
+
+.unsplash-badge {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .35rem;
+  margin: 0;
+  padding: .55rem .75rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  color: var(--muted);
+  font-size: .8rem;
+}
+
+.unsplash-badge__link {
+  color: #1d4ed8;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.unsplash-badge__link:hover {
+  text-decoration: underline;
+}
+
 .style-option-row {
   width: 100%;
   display: flex;
@@ -294,6 +329,12 @@ mat-toolbar {
 
 .style-preview-value {
   font-size: 1.2rem;
+}
+
+.style-preview-id {
+  font-size: .88rem;
+  color: var(--text);
+  word-break: break-all;
 }
 
 @media (max-width: 960px) {

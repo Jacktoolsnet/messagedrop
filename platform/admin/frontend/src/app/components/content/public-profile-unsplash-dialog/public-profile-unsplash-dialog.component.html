@@ -1,0 +1,55 @@
+<h2 mat-dialog-title>{{ title() }}</h2>
+
+@if (loading()) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+<mat-dialog-content class="dialog-content">
+  <div class="toolbar-row">
+    <div class="search-box">
+      <input
+        matInput
+        type="search"
+        [formControl]="searchControl"
+        placeholder="Search Unsplash photos"
+        (keydown.enter)="search()" />
+    </div>
+
+    <button mat-stroked-button type="button" (click)="search()">
+      <mat-icon>search</mat-icon>
+      Search
+    </button>
+
+    <button mat-stroked-button type="button" (click)="loadFeatured()">
+      <mat-icon>whatshot</mat-icon>
+      Featured
+    </button>
+  </div>
+
+  @if (results().length > 0) {
+    <div class="gallery">
+      @for (photo of results(); track trackById($index, photo)) {
+        <button type="button" class="photo-tile" (click)="selectPhoto(photo)">
+          <img [src]="photo.urls.small" [alt]="photo.alt_description || photo.description || 'Unsplash photo'" />
+          <span class="photo-credit">{{ photo.user.name || photo.user.username }}</span>
+        </button>
+      }
+    </div>
+  } @else if (!loading()) {
+    <div class="empty-state">
+      <mat-icon>image_search</mat-icon>
+      <div>No Unsplash photos found for the current search.</div>
+    </div>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  @if (hasMoreSearch()) {
+    <button mat-stroked-button type="button" (click)="loadMore()">
+      <mat-icon>expand_more</mat-icon>
+      More
+    </button>
+  }
+
+  <button mat-button mat-dialog-close type="button">Close</button>
+</mat-dialog-actions>

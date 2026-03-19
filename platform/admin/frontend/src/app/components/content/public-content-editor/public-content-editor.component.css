@@ -453,6 +453,30 @@ mat-toolbar {
   color: var(--muted);
 }
 
+.profile-attribution-badge {
+  margin-top: .55rem;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: .35rem;
+  align-items: center;
+  padding: .5rem .75rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.76);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: var(--muted);
+  font-size: .8rem;
+}
+
+.profile-attribution-badge a {
+  color: #1d4ed8;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.profile-attribution-badge a:hover {
+  text-decoration: underline;
+}
+
 .profile-option-row {
   width: 100%;
   display: flex;

@@ -82,6 +82,9 @@
                   <div class="profile-copy">
                     <strong>{{ row.name }}</strong>
                     <span [style]="row.defaultStyle">{{ row.name }}</span>
+                    @if (row.publicBackendUserId) {
+                      <span class="profile-meta-id">User ID: {{ row.publicBackendUserId }}</span>
+                    }
                     <span>{{ row.contentCount }} linked message{{ row.contentCount === 1 ? '' : 's' }}</span>
                   </div>
 
@@ -109,15 +112,15 @@
             <div class="profile-preview-card">
               <div class="profile-preview-avatar">
                 @if (avatarPreview()) {
-                  <img [src]="avatarPreview()" [alt]="form.controls.name.value || 'Profile avatar preview'" />
+                  <img [src]="avatarPreview()" [alt]="profileNamePreview() || 'Profile avatar preview'" />
                 } @else {
                   <span>{{ profileInitials() }}</span>
                 }
               </div>
 
               <div class="profile-preview-copy">
-                <h3>{{ form.controls.name.value || 'New public profile' }}</h3>
-                <p [style]="form.controls.defaultStyle.value">Preview text in the selected default font.</p>
+                <h3>{{ profileNamePreview() || 'New public profile' }}</h3>
+                <p [style]="previewDisplayStyle()">Preview text in the selected default font.</p>
               </div>
             </div>
 
@@ -135,17 +138,42 @@
                 Choose avatar
               </button>
 
+              <button mat-stroked-button type="button" (click)="openUnsplashAvatarPicker()">
+                <mat-icon>photo_library</mat-icon>
+                Unsplash
+              </button>
+
               <button mat-stroked-button type="button" (click)="removeAvatar()" [disabled]="!avatarPreview()">
                 <mat-icon>delete</mat-icon>
                 Remove avatar
               </button>
             </div>
 
+            @if (unsplashAttribution(); as attribution) {
+              <div class="unsplash-badge-wrapper">
+                <p class="unsplash-badge">
+                  <span>Photo by</span>
+                  <a class="unsplash-badge__link" [href]="attribution.authorUrl" target="_blank" rel="noopener">
+                    {{ attribution.authorName }}
+                  </a>
+                  <span>on</span>
+                  <a class="unsplash-badge__link" [href]="attribution.unsplashUrl" target="_blank" rel="noopener">
+                    Unsplash
+                  </a>
+                </p>
+              </div>
+            }
+
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Default text style</mat-label>
-              <mat-select formControlName="defaultStyle">
+              <mat-select
+                #styleSelect
+                formControlName="defaultStyle"
+                (openedChange)="handleStyleSelectOpenedChange($event)"
+                (keydown)="handleStyleSelectKeydown()"
+                (selectionChange)="resetPreviewStyle()">
                 @for (option of styleOptions; track trackStyleOption($index, option)) {
-                  <mat-option [value]="option.style">
+                  <mat-option [value]="option.style" (mouseenter)="previewStyleOption(option.style)">
                     <div class="style-option-row">
                       <span class="style-option-name" [style.font-family]="option.fontFamily">
                         {{ option.fontFamily }}
@@ -163,9 +191,16 @@
             @if (selectedStyleOption(); as option) {
               <div class="style-preview-box">
                 <span class="style-preview-label">Default font preview</span>
-                <span class="style-preview-value" [style.font-family]="option.fontFamily">
+                <span class="style-preview-value" [style]="previewDisplayStyle()">
                   Public profile preview text
                 </span>
+              </div>
+            }
+
+            @if (selectedProfile()?.publicBackendUserId; as publicBackendUserId) {
+              <div class="style-preview-box">
+                <span class="style-preview-label">Generated MessageDrop user</span>
+                <span class="style-preview-id">{{ publicBackendUserId }}</span>
               </div>
             }
           </form>
