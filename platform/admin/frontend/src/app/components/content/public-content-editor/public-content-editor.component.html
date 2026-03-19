@@ -157,6 +157,23 @@
               <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Public profile</mat-label>
                 <mat-select [formControl]="form.controls.publicProfileId">
+                  <mat-select-trigger>
+                    @if (selectedProfile()) {
+                      <div class="profile-select-trigger">
+                        <div class="profile-option-avatar">
+                          @if (profileAvatar()) {
+                            <img [src]="profileAvatar()" [alt]="profileName()" />
+                          } @else {
+                            <span>{{ profileInitials() }}</span>
+                          }
+                        </div>
+                        <span class="profile-select-trigger-name">{{ profileName() }}</span>
+                      </div>
+                    } @else {
+                      <span class="style-select-placeholder">Choose a public profile</span>
+                    }
+                  </mat-select-trigger>
+
                   @for (profile of publicProfiles(); track trackPublicProfile($index, profile)) {
                     <mat-option [value]="profile.id">
                       <div class="profile-option-row">
@@ -184,32 +201,6 @@
                 <mat-icon>open_in_new</mat-icon>
               </button>
             </div>
-
-            @if (selectedProfile()) {
-              <div class="selected-profile-preview">
-                <div class="selected-profile-avatar">
-                  @if (profileAvatar()) {
-                    <img [src]="profileAvatar()" [alt]="profileName()" />
-                  } @else {
-                    <span>{{ profileInitials() }}</span>
-                  }
-                </div>
-
-                <div class="selected-profile-copy">
-                  <strong>{{ profileName() }}</strong>
-                  <span [style]="selectedProfile()?.defaultStyle">Default profile font preview</span>
-                </div>
-              </div>
-
-              @if (selectedProfileAttribution(); as attribution) {
-                <div class="profile-attribution-badge">
-                  <span>Photo by</span>
-                  <a [href]="attribution.authorUrl" target="_blank" rel="noopener">{{ attribution.authorName }}</a>
-                  <span>on</span>
-                  <a [href]="attribution.unsplashUrl" target="_blank" rel="noopener">Unsplash</a>
-                </div>
-              }
-            }
           }
         </mat-card-content>
       </mat-card>

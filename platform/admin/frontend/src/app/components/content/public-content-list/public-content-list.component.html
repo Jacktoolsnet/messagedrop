@@ -57,6 +57,45 @@
     </div>
 
     <div class="filter-row" [formGroup]="filterForm">
+      <mat-form-field appearance="outline" class="profile-field">
+        <mat-label>Public profile</mat-label>
+        <mat-select formControlName="publicProfileId">
+          <mat-select-trigger>
+            <span class="profile-filter-trigger">
+              @if (selectedProfile(); as profile) {
+                <span class="profile-filter-avatar" aria-hidden="true">
+                  @if (filterProfileAvatar(profile)) {
+                    <img [src]="filterProfileAvatar(profile)" [alt]="profile.name" />
+                  } @else {
+                    <span>{{ filterProfileInitials(profile) }}</span>
+                  }
+                </span>
+                <span class="profile-filter-name">{{ filterProfileName(profile) }}</span>
+              } @else {
+                <span class="profile-filter-name">All profiles</span>
+              }
+            </span>
+          </mat-select-trigger>
+
+          <mat-option value="">All profiles</mat-option>
+
+          @for (profile of profiles(); track profile.id) {
+            <mat-option [value]="profile.id">
+              <span class="profile-filter-option">
+                <span class="profile-filter-avatar" aria-hidden="true">
+                  @if (filterProfileAvatar(profile)) {
+                    <img [src]="filterProfileAvatar(profile)" [alt]="profile.name" />
+                  } @else {
+                    <span>{{ filterProfileInitials(profile) }}</span>
+                  }
+                </span>
+                <span class="profile-filter-name">{{ filterProfileName(profile) }}</span>
+              </span>
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
       <mat-form-field appearance="outline">
         <mat-label>Status</mat-label>
         <mat-select formControlName="status">
@@ -147,10 +186,17 @@
           </mat-card-content>
 
           <mat-card-actions align="end" class="card-actions content-preview-actions">
-            <button mat-stroked-button type="button" (click)="openContent(row); $event.stopPropagation()">
-              <mat-icon>{{ row.status === 'published' ? 'visibility' : 'edit' }}</mat-icon>
-              {{ row.status === 'published' ? 'Open' : 'Edit' }}
-            </button>
+            @if (canRestoreRow(row)) {
+              <button mat-stroked-button type="button" color="primary" (click)="confirmRestore(row, $event)">
+                <mat-icon>restore_from_trash</mat-icon>
+                Restore
+              </button>
+            } @else {
+              <button mat-stroked-button type="button" (click)="openContent(row); $event.stopPropagation()">
+                <mat-icon>{{ row.status === 'published' ? 'visibility' : 'edit' }}</mat-icon>
+                {{ row.status === 'published' ? 'Open' : 'Edit' }}
+              </button>
+            }
 
             @if (canPublishRow(row)) {
               <button mat-stroked-button type="button" color="primary" (click)="confirmPublish(row, $event)">

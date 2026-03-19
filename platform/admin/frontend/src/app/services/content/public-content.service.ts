@@ -91,6 +91,13 @@ export class PublicContentService {
     );
   }
 
+  restorePublicContent(id: string): Observable<PublicContent> {
+    return this.http.post<PublicContentRowResponse>(`${this.baseUrl}/public-messages/${encodeURIComponent(id)}/restore`, {}).pipe(
+      map((response) => response.row),
+      catchError((error) => this.handleError(error, 'Could not restore public content.'))
+    );
+  }
+
   getFeaturedTenor(next = ''): Observable<TenorApiResponse> {
     const params = next ? new HttpParams().set('next', next) : undefined;
     return this.http.get<TenorApiResponse>(`${this.baseUrl}/media/tenor/featured`, { params }).pipe(

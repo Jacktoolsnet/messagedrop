@@ -17,8 +17,10 @@ import { debounceTime, distinctUntilChanged, finalize, map } from 'rxjs';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
 import { PublicContentStatus } from '../../../interfaces/public-content-status.type';
 import { PublicContent } from '../../../interfaces/public-content.interface';
+import { PublicProfile } from '../../../interfaces/public-profile.interface';
 import { AuthService } from '../../../services/auth/auth.service';
 import { PublicContentService } from '../../../services/content/public-content.service';
+import { PublicProfileService } from '../../../services/content/public-profile.service';
 
 @Component({
   selector: 'app-public-content-list',
@@ -48,21 +50,32 @@ export class PublicContentListComponent {
   private readonly dialog = inject(MatDialog);
   private readonly authService = inject(AuthService);
   private readonly publicContentService = inject(PublicContentService);
+  private readonly publicProfileService = inject(PublicProfileService);
 
   readonly role = this.authService.role;
   readonly rows = this.publicContentService.rows;
   readonly loading = this.publicContentService.loading;
+  readonly profiles = this.publicProfileService.rows;
   readonly canPublish = computed(() => ['editor', 'admin', 'root'].includes(this.role() ?? ''));
   readonly canAccess = computed(() => ['author', 'editor', 'admin', 'root'].includes(this.role() ?? ''));
+  readonly selectedProfile = computed(() => {
+    const profileId = this.filterForm.controls.publicProfileId.value;
+    if (!profileId) {
+      return null;
+    }
+    return this.profiles().find((profile) => profile.id === profileId) ?? null;
+  });
 
   readonly statusOptions: Array<PublicContentStatus | 'all'> = ['all', 'draft', 'published', 'withdrawn', 'deleted'];
 
   readonly filterForm = this.fb.nonNullable.group({
+    publicProfileId: this.fb.nonNullable.control(''),
     status: this.fb.nonNullable.control<PublicContentStatus | 'all'>('all'),
     q: this.fb.nonNullable.control('')
   });
 
   constructor() {
+    this.publicProfileService.loadProfiles();
     this.load();
 
     this.filterForm.valueChanges.pipe(
@@ -79,6 +92,7 @@ export class PublicContentListComponent {
 
   load(): void {
     this.publicContentService.loadPublicContent({
+      publicProfileId: this.filterForm.controls.publicProfileId.value,
       status: this.filterForm.controls.status.value,
       q: this.filterForm.controls.q.value,
       limit: 100,
@@ -110,6 +124,10 @@ export class PublicContentListComponent {
     return row.status !== 'deleted';
   }
 
+  canRestoreRow(row: PublicContent): boolean {
+    return row.status === 'deleted';
+  }
+
   hasImageMultimedia(row: PublicContent): boolean {
     const multimedia = row.multimedia;
     if (!multimedia?.url) {
@@ -137,6 +155,20 @@ export class PublicContentListComponent {
 
   profileInitials(row: PublicContent): string {
     const name = this.profileName(row);
+    const parts = name.split(/\s+/).filter(Boolean).slice(0, 2);
+    return parts.map((part) => part.charAt(0).toUpperCase()).join('') || 'P';
+  }
+
+  filterProfileName(profile: PublicProfile | null): string {
+    return profile?.name?.trim() || 'All profiles';
+  }
+
+  filterProfileAvatar(profile: PublicProfile | null): string {
+    return profile?.avatarImage?.trim() || '';
+  }
+
+  filterProfileInitials(profile: PublicProfile | null): string {
+    const name = this.filterProfileName(profile);
     const parts = name.split(/\s+/).filter(Boolean).slice(0, 2);
     return parts.map((part) => part.charAt(0).toUpperCase()).join('') || 'P';
   }
@@ -363,6 +395,31 @@ export class PublicContentListComponent {
         }
 
         this.publicContentService.deletePublicContent(row.id)
+          .pipe(
+            finalize(() => this.load()),
+            takeUntilDestroyed(this.destroyRef)
+          )
+          .subscribe({ error: () => undefined });
+      });
+  }
+
+  confirmRestore(row: PublicContent, event?: Event): void {
+    event?.stopPropagation();
+    this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Restore content?',
+        message: 'The deleted message will be restored and moved back to draft.',
+        confirmText: 'Restore',
+        cancelText: 'Cancel'
+      }
+    }).afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((confirmed) => {
+        if (!confirmed) {
+          return;
+        }
+
+        this.publicContentService.restorePublicContent(row.id)
           .pipe(
             finalize(() => this.load()),
             takeUntilDestroyed(this.destroyRef)

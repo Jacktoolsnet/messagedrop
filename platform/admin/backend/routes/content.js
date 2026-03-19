@@ -1058,6 +1058,64 @@ router.delete('/public-messages/:id', requireRole(...CONTENT_ROLES), async (req,
   }
 });
 
+router.post('/public-messages/:id/restore', requireRole(...CONTENT_ROLES), async (req, res, next) => {
+  try {
+    const row = await new Promise((resolve, reject) => {
+      tablePublicContent.getById(req.database.db, req.params.id, (err, value) => {
+        if (err) return reject(err);
+        resolve(value || null);
+      });
+    });
+
+    if (!row) {
+      return next(apiError.notFound('not_found'));
+    }
+    if (!ensureManageableContent(req, row)) {
+      return next(apiError.forbidden('insufficient_role'));
+    }
+    if (row.status !== tablePublicContent.contentStatus.DELETED) {
+      return next(apiError.conflict('This content is not deleted'));
+    }
+
+    const actor = await ensurePersistedAdminActor(req);
+    const actorId = String(actor?.id || '').trim();
+
+    await new Promise((resolve, reject) => {
+      tablePublicContent.update(req.database.db, row.id, {
+        [tablePublicContent.columns.status]: tablePublicContent.contentStatus.DRAFT,
+        [tablePublicContent.columns.lastEditorAdminUserId]: actorId,
+        [tablePublicContent.columns.publishedMessageId]: null,
+        [tablePublicContent.columns.deletedAt]: null,
+        [tablePublicContent.columns.withdrawnAt]: null,
+        updatedAt: Date.now()
+      }, (updateErr, ok) => {
+        if (updateErr) return reject(updateErr);
+        if (!ok) return reject(new Error('update_failed'));
+        resolve(ok);
+      });
+    });
+
+    const updated = await new Promise((resolve, reject) => {
+      tablePublicContent.getById(req.database.db, row.id, (err, value) => {
+        if (err) return reject(err);
+        resolve(value || null);
+      });
+    });
+
+    return res.json({
+      status: 200,
+      row: toContentDto(updated)
+    });
+  } catch (error) {
+    if (error?.status) {
+      return next(error);
+    }
+    const err = apiError.internal('restore_failed');
+    err.detail = error?.message || String(error);
+    return next(err);
+  }
+});
+
 router.get('/avatars/unsplash/featured', requireRole(...CONTENT_ROLES), async (req, res, next) => {
   const page = Math.max(Number(req.query.page) || 1, 1);
   const endpoint = page > 1
