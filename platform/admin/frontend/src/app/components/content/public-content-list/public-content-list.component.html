@@ -169,13 +169,6 @@
                 {{ locationLabel(row) }}
               </span>
 
-              @if (row.location.plusCode && row.location.label) {
-                <span class="content-preview-meta-chip content-preview-meta-chip-muted">
-                  <mat-icon>grid_3x3</mat-icon>
-                  {{ row.location.plusCode }}
-                </span>
-              }
-
               @if (row.multimedia.type !== 'undefined') {
                 <span class="content-preview-meta-chip content-preview-meta-chip-muted">
                   <mat-icon>perm_media</mat-icon>

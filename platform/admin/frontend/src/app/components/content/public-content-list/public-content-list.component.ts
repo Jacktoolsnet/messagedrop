@@ -211,7 +211,7 @@ export class PublicContentListComponent {
   }
 
   locationLabel(row: PublicContent): string {
-    const label = row.location?.label?.trim();
+    const label = this.normalizeLocationLabel(row.location?.label?.trim() ?? '');
     if (label) {
       return label;
     }
@@ -324,6 +324,16 @@ export class PublicContentListComponent {
 
   private formatCoordinate(value: number): string {
     return value.toFixed(4).replace(/\.?0+$/, '');
+  }
+
+  private normalizeLocationLabel(value: string): string {
+    const normalized = String(value || '').trim();
+    if (!normalized) {
+      return '';
+    }
+
+    const firstSegment = normalized.split(',')[0]?.trim();
+    return firstSegment || normalized;
   }
 
   confirmPublish(row: PublicContent, event?: Event): void {

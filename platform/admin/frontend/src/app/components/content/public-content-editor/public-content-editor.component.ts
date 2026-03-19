@@ -762,10 +762,11 @@ export class PublicContentEditorComponent {
   }
 
   private applyContent(content: PublicContent, updateRoute = false): void {
+    const storedLocationLabel = this.normalizeLocationLabel((content.location?.label ?? '').trim());
     this.currentContent.set(content);
     this.multimedia.set(content.multimedia ?? { ...EMPTY_MULTIMEDIA });
     this.hashtags.set(Array.isArray(content.hashtags) ? [...content.hashtags] : []);
-    this.selectedLocationLabel.set((content.location?.label ?? '').trim());
+    this.selectedLocationLabel.set(storedLocationLabel);
     this.locationSearchResults.set([]);
     this.locationSearchControl.setValue(this.formatStoredLocation(content));
     this.form.setValue({
@@ -814,11 +815,19 @@ export class PublicContentEditorComponent {
   }
 
   private getLocationLabel(place: NominatimPlace): string {
-    return place.display_name?.trim() || place.name?.trim() || `${place.lat}, ${place.lon}`;
+    return this.normalizeLocationLabel(
+      place.name?.trim()
+      || place.address?.city?.trim()
+      || place.address?.town?.trim()
+      || place.address?.village?.trim()
+      || place.address?.suburb?.trim()
+      || place.display_name?.trim()
+      || `${place.lat}, ${place.lon}`
+    );
   }
 
   private formatStoredLocation(content: PublicContent): string {
-    const label = content.location?.label?.trim() ?? '';
+    const label = this.normalizeLocationLabel(content.location?.label?.trim() ?? '');
     if (label) {
       return label;
     }
@@ -849,6 +858,16 @@ export class PublicContentEditorComponent {
 
   private formatCoordinate(value: number): string {
     return value.toFixed(5).replace(/\.?0+$/, '');
+  }
+
+  private normalizeLocationLabel(value: string): string {
+    const normalized = String(value || '').trim();
+    if (!normalized) {
+      return '';
+    }
+
+    const firstSegment = normalized.split(',')[0]?.trim();
+    return firstSegment || normalized;
   }
 
   private buildLocationMapEmbedUrl(latitude: number, longitude: number): string {
