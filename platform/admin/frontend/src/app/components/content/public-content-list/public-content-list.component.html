@@ -59,52 +59,79 @@
 
       <mat-form-field appearance="outline" class="search-field">
         <mat-label>Search</mat-label>
-        <input matInput formControlName="q" placeholder="Search in message, author or plus code" />
+        <input matInput formControlName="q" placeholder="Search in message, author or location" />
       </mat-form-field>
     </div>
 
     <div class="tiles-container">
       @for (row of rows(); track trackById($index, row)) {
         <mat-card class="tile content-tile" (click)="openContent(row)" tabindex="0" (keydown.enter)="openContent(row)">
-          <mat-card-header>
-            <div mat-card-avatar class="avatar avatar-accent">
-              <mat-icon>campaign</mat-icon>
+          <div class="content-preview-avatar-box">
+            <mat-icon class="content-preview-avatar-icon" aria-hidden="true">{{ tileAvatarIcon(row) }}</mat-icon>
+            <div class="content-preview-avatar-text">
+              <span class="content-preview-name">Public message</span>
+              <span class="content-preview-timestamp">{{ row.authorUsername }} • {{ row.updatedAt | date:'dd.MM.yyyy HH:mm' }}</span>
             </div>
-            <div class="title-wrap">
-              <mat-card-title class="tile-title">{{ row.message || row.multimedia.title || 'Untitled message' }}</mat-card-title>
-              <mat-card-subtitle class="tile-subtitle">
-                {{ row.authorUsername }} • {{ row.updatedAt | date:'medium' }}
-              </mat-card-subtitle>
-            </div>
-            <span class="status-pill" [class]="'status-pill ' + statusClass(row.status)">{{ statusLabel(row.status) }}</span>
-          </mat-card-header>
+            <span class="status-pill content-preview-status" [class]="'status-pill content-preview-status ' + statusClass(row.status)">
+              <mat-icon>{{ statusIcon(row.status) }}</mat-icon>
+              {{ statusLabel(row.status) }}
+            </span>
+          </div>
 
-          <mat-card-content>
-            <p class="message-preview">{{ row.message || 'No text content. Multimedia only.' }}</p>
+          <mat-card-content class="tile-content content-preview-body">
+            @if (hasImageMultimedia(row)) {
+              <div class="content-preview-media">
+                <img [src]="row.multimedia.url" [alt]="row.multimedia.title || 'Selected multimedia preview'" />
+              </div>
+            } @else if (row.multimedia.type !== 'undefined' && (row.multimedia.title || row.multimedia.description)) {
+              <div class="content-preview-media-summary">
+                <span class="content-preview-media-type">{{ mediaTypeLabel(row.multimedia.type) }}</span>
+                @if (row.multimedia.title) {
+                  <strong>{{ row.multimedia.title }}</strong>
+                }
+                @if (row.multimedia.description) {
+                  <span>{{ row.multimedia.description }}</span>
+                }
+              </div>
+            }
 
-            <div class="meta-line">
-              <span>
-                <mat-icon>place</mat-icon>
-                {{ row.location.plusCode || (row.location.latitude + ', ' + row.location.longitude) }}
+            @if (tilePreview(row)) {
+              <div class="content-preview-message-shell" [style]="row.message ? row.style : ''">
+                <p class="content-preview-message-text">{{ tilePreview(row) }}</p>
+              </div>
+            }
+
+            @if (row.hashtags.length > 0) {
+              <div class="content-preview-hashtag-list" aria-label="Hashtags">
+                @for (tag of row.hashtags; track tag) {
+                  <span class="content-preview-hashtag-chip">#{{ tag }}</span>
+                }
+              </div>
+            }
+
+            <div class="content-preview-meta">
+              <span class="content-preview-meta-chip">
+                <mat-icon>location_on</mat-icon>
+                {{ locationLabel(row) }}
               </span>
+
+              @if (row.location.plusCode && row.location.label) {
+                <span class="content-preview-meta-chip content-preview-meta-chip-muted">
+                  <mat-icon>grid_3x3</mat-icon>
+                  {{ row.location.plusCode }}
+                </span>
+              }
+
               @if (row.multimedia.type !== 'undefined') {
-                <span>
+                <span class="content-preview-meta-chip content-preview-meta-chip-muted">
                   <mat-icon>perm_media</mat-icon>
-                  {{ row.multimedia.type }}
+                  {{ mediaTypeLabel(row.multimedia.type) }}
                 </span>
               }
             </div>
-
-            @if (row.hashtags.length > 0) {
-              <mat-chip-grid aria-label="Hashtags">
-                @for (tag of row.hashtags; track tag) {
-                  <mat-chip-row disabled>#{{ tag }}</mat-chip-row>
-                }
-              </mat-chip-grid>
-            }
           </mat-card-content>
 
-          <mat-card-actions align="end" class="card-actions">
+          <mat-card-actions align="end" class="card-actions content-preview-actions">
             <button mat-stroked-button type="button" (click)="openContent(row); $event.stopPropagation()">
               <mat-icon>{{ row.status === 'published' ? 'visibility' : 'edit' }}</mat-icon>
               {{ row.status === 'published' ? 'Open' : 'Edit' }}

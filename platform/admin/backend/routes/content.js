@@ -154,7 +154,8 @@ function toContentDto(row) {
     location: {
       latitude: Number(row.latitude || 0),
       longitude: Number(row.longitude || 0),
-      plusCode: row.plusCode || ''
+      plusCode: row.plusCode || '',
+      label: row.locationLabel || ''
     },
     markerType: row.markerType || 'default',
     style: row.style || '',
@@ -211,6 +212,7 @@ function normalizeEditorPayload(body) {
   const latitude = normalizeNumber(location.latitude);
   const longitude = normalizeNumber(location.longitude);
   const plusCode = normalizeString(location.plusCode);
+  const locationLabel = normalizeString(location.label);
   const hasSelectedLocation = latitude !== 0 || longitude !== 0 || !!plusCode;
 
   return {
@@ -218,6 +220,7 @@ function normalizeEditorPayload(body) {
     latitude,
     longitude,
     plusCode: plusCode || (hasSelectedLocation ? encodePlusCode(latitude, longitude) : ''),
+    locationLabel,
     markerType: normalizeString(body?.markerType, 'default') || 'default',
     style: normalizeString(body?.style),
     hashtags: normalizeHashtags(body?.hashtags),
@@ -390,6 +393,7 @@ router.post('/public-messages', [requireRole(...CONTENT_ROLES), express.json({ l
       latitude: payload.latitude,
       longitude: payload.longitude,
       plusCode: payload.plusCode,
+      locationLabel: payload.locationLabel,
       markerType: payload.markerType,
       style: payload.style,
       hashtags: JSON.stringify(payload.hashtags),
@@ -466,6 +470,7 @@ router.put('/public-messages/:id', [requireRole(...CONTENT_ROLES), express.json(
           [tablePublicContent.columns.latitude]: payload.latitude,
           [tablePublicContent.columns.longitude]: payload.longitude,
           [tablePublicContent.columns.plusCode]: payload.plusCode,
+          [tablePublicContent.columns.locationLabel]: payload.locationLabel,
           [tablePublicContent.columns.markerType]: payload.markerType,
           [tablePublicContent.columns.style]: payload.style,
           [tablePublicContent.columns.hashtags]: JSON.stringify(payload.hashtags),

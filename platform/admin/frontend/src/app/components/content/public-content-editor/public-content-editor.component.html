@@ -6,30 +6,45 @@
   <span class="toolbar-title">{{ pageTitle() }}</span>
   <span class="spacer"></span>
 
-  @if (!isPublished() && !isDeleted()) {
-    <button
-      mat-icon-button
-      type="button"
-      class="toolbar-action"
-      (click)="saveDraft()"
-      [disabled]="!canSaveContent()"
-      aria-label="Save draft">
-      <mat-icon>save</mat-icon>
-    </button>
+  <div class="toolbar-action-row">
+    @if (!isPublished() && !isDeleted()) {
+      <div class="toolbar-actions">
+        <button
+          mat-icon-button
+          type="button"
+          class="toolbar-action avatar avatar-accent"
+          (click)="saveDraft()"
+          [disabled]="!canSaveContent()"
+          aria-label="Save draft">
+          <mat-icon>save</mat-icon>
+        </button>
 
-    @if (canPublish()) {
+        @if (canPublish()) {
+          <button
+            mat-icon-button
+            type="button"
+            class="toolbar-action avatar avatar-success"
+            (click)="saveAndPublish()"
+            [disabled]="!canSaveContent()"
+            aria-label="Publish message">
+            <mat-icon>publish</mat-icon>
+          </button>
+        }
+      </div>
+    }
+
+    @if (isEditMode() && !isDeleted()) {
       <button
         mat-icon-button
         type="button"
-        color="primary"
-        class="toolbar-action"
-        (click)="saveAndPublish()"
-        [disabled]="!canSaveContent()"
-        aria-label="Publish message">
-        <mat-icon>publish</mat-icon>
+        class="toolbar-action toolbar-danger avatar avatar-warn"
+        (click)="confirmDelete()"
+        [disabled]="saving()"
+        aria-label="Delete content">
+        <mat-icon>delete</mat-icon>
       </button>
     }
-  }
+  </div>
 </mat-toolbar>
 
 @if (loading() || saving()) {
@@ -39,25 +54,50 @@
 <div class="page">
   @if (currentContent(); as content) {
     <mat-card class="meta-card">
-      <mat-card-content class="meta-grid">
-        <div class="meta-item">
-          <span class="meta-label">Status</span>
-          <span class="status-pill" [class]="'status-pill ' + statusClass(content.status)">{{ statusLabel() }}</span>
-        </div>
-        <div class="meta-item">
-          <span class="meta-label">Author</span>
-          <span>{{ content.authorUsername }}</span>
-        </div>
-        <div class="meta-item">
-          <span class="meta-label">Updated</span>
-          <span>{{ content.updatedAt | date:'medium' }}</span>
-        </div>
-        @if (content.publishedAt) {
-          <div class="meta-item">
-            <span class="meta-label">Published</span>
-            <span>{{ content.publishedAt | date:'medium' }}</span>
+      <mat-card-content class="meta-card-content">
+        <div class="meta-fact-grid">
+          <div class="meta-fact-card" [class]="'meta-fact-card ' + statusClass(content.status)">
+            <div class="meta-fact-icon">
+              <mat-icon>{{ statusIcon(content.status) }}</mat-icon>
+            </div>
+            <div class="meta-fact-copy">
+              <span class="meta-fact-label">Status</span>
+              <span class="meta-fact-value">{{ statusLabel() }}</span>
+            </div>
           </div>
-        }
+
+          <div class="meta-fact-card">
+            <div class="meta-fact-icon">
+              <mat-icon>person</mat-icon>
+            </div>
+            <div class="meta-fact-copy">
+              <span class="meta-fact-label">Author</span>
+              <span class="meta-fact-value">{{ content.authorUsername }}</span>
+            </div>
+          </div>
+
+          <div class="meta-fact-card">
+            <div class="meta-fact-icon">
+              <mat-icon>schedule</mat-icon>
+            </div>
+            <div class="meta-fact-copy">
+              <span class="meta-fact-label">Last update</span>
+              <span class="meta-fact-value">{{ content.updatedAt | date:'dd.MM.yyyy HH:mm' }}</span>
+            </div>
+          </div>
+
+          @if (content.publishedAt) {
+            <div class="meta-fact-card meta-fact-success">
+              <div class="meta-fact-icon">
+                <mat-icon>event_available</mat-icon>
+              </div>
+              <div class="meta-fact-copy">
+                <span class="meta-fact-label">Published</span>
+                <span class="meta-fact-value">{{ content.publishedAt | date:'dd.MM.yyyy HH:mm' }}</span>
+              </div>
+            </div>
+          }
+        </div>
       </mat-card-content>
     </mat-card>
   }
@@ -493,19 +533,12 @@
     </div>
   </div>
 
-  <div class="action-bar">
-    @if (isEditMode() && !isDeleted()) {
-      <button mat-stroked-button type="button" color="warn" (click)="confirmDelete()" [disabled]="saving()">
-        <mat-icon>delete</mat-icon>
-        Delete
-      </button>
-    }
-
-    @if (isPublished()) {
+  @if (isPublished()) {
+    <div class="action-bar">
       <button mat-flat-button type="button" color="warn" (click)="confirmWithdraw()" [disabled]="saving()">
         <mat-icon>unpublished</mat-icon>
         Withdraw
       </button>
-    }
-  </div>
+    </div>
+  }
 </div>

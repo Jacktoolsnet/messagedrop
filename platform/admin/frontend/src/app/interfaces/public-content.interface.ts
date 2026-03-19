@@ -5,6 +5,7 @@ export interface PublicContentLocation {
   latitude: number;
   longitude: number;
   plusCode: string;
+  label: string;
 }
 
 export interface PublicContent {

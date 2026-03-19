@@ -23,6 +23,7 @@ const columns = {
   latitude: 'latitude',
   longitude: 'longitude',
   plusCode: 'plusCode',
+  locationLabel: 'locationLabel',
   markerType: 'markerType',
   style: 'style',
   hashtags: 'hashtags',
@@ -49,6 +50,7 @@ function init(db) {
       ${columns.latitude} REAL NOT NULL DEFAULT 0,
       ${columns.longitude} REAL NOT NULL DEFAULT 0,
       ${columns.plusCode} TEXT NOT NULL DEFAULT '',
+      ${columns.locationLabel} TEXT NOT NULL DEFAULT '',
       ${columns.markerType} TEXT NOT NULL DEFAULT 'default',
       ${columns.style} TEXT NOT NULL DEFAULT '',
       ${columns.hashtags} TEXT NOT NULL DEFAULT '[]',
@@ -82,6 +84,22 @@ function init(db) {
       throw err;
     }
   });
+
+  db.all(`PRAGMA table_info(${tableName})`, [], (pragmaErr, rows) => {
+    if (pragmaErr || !Array.isArray(rows)) {
+      return;
+    }
+
+    const hasLocationLabelColumn = rows.some((row) => row?.name === columns.locationLabel);
+    if (hasLocationLabelColumn) {
+      return;
+    }
+
+    db.run(`
+      ALTER TABLE ${tableName}
+      ADD COLUMN ${columns.locationLabel} TEXT NOT NULL DEFAULT ''
+    `, []);
+  });
 }
 
 function create(db, payload, callback) {
@@ -101,6 +119,7 @@ function create(db, payload, callback) {
       ${columns.latitude},
       ${columns.longitude},
       ${columns.plusCode},
+      ${columns.locationLabel},
       ${columns.markerType},
       ${columns.style},
       ${columns.hashtags},
@@ -110,7 +129,7 @@ function create(db, payload, callback) {
       ${columns.publishedAt},
       ${columns.withdrawnAt},
       ${columns.deletedAt}
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   const params = [
@@ -126,6 +145,7 @@ function create(db, payload, callback) {
     Number(payload.latitude ?? 0),
     Number(payload.longitude ?? 0),
     payload.plusCode ?? '',
+    payload.locationLabel ?? '',
     payload.markerType ?? 'default',
     payload.style ?? '',
     payload.hashtags ?? '[]',
@@ -190,9 +210,10 @@ function list(db, filters, callback) {
       LOWER(c.${columns.message}) LIKE ?
       OR LOWER(author.username) LIKE ?
       OR LOWER(c.${columns.plusCode}) LIKE ?
+      OR LOWER(c.${columns.locationLabel}) LIKE ?
     )`);
     const query = `%${String(filters.query).trim().toLowerCase()}%`;
-    params.push(query, query, query);
+    params.push(query, query, query, query);
   }
 
   let sql = `
@@ -234,6 +255,7 @@ function update(db, id, fields, callback) {
     columns.latitude,
     columns.longitude,
     columns.plusCode,
+    columns.locationLabel,
     columns.markerType,
     columns.style,
     columns.hashtags,

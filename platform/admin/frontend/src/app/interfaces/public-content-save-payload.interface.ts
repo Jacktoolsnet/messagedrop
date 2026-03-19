@@ -6,6 +6,7 @@ export interface PublicContentSavePayload {
     latitude: number;
     longitude: number;
     plusCode: string;
+    label: string;
   };
   markerType: string;
   style: string;

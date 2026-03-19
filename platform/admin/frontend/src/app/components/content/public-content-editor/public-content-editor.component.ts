@@ -154,6 +154,11 @@ export class PublicContentEditorComponent {
     return this.hasMedia() ? '' : 'Add some text to preview the message.';
   });
   readonly previewLocationLabel = computed(() => {
+    const selectedLabel = this.selectedLocationLabel().trim();
+    if (selectedLabel) {
+      return selectedLabel;
+    }
+
     const location = this.locationValue();
     const latitude = Number(location?.latitude) || 0;
     const longitude = Number(location?.longitude) || 0;
@@ -331,6 +336,20 @@ export class PublicContentEditorComponent {
       case 'draft':
       default:
         return 'status-draft';
+    }
+  }
+
+  statusIcon(status: string | null | undefined): string {
+    switch (status) {
+      case 'published':
+        return 'campaign';
+      case 'withdrawn':
+        return 'unpublished';
+      case 'deleted':
+        return 'delete_outline';
+      case 'draft':
+      default:
+        return 'edit_note';
     }
   }
 
@@ -648,7 +667,8 @@ export class PublicContentEditorComponent {
       location: {
         latitude: Number(raw.location.latitude) || 0,
         longitude: Number(raw.location.longitude) || 0,
-        plusCode: raw.location.plusCode.trim()
+        plusCode: raw.location.plusCode.trim(),
+        label: this.activeLocationLabel()
       },
       markerType: 'default',
       style: this.styleService.normalizeStyle(raw.style),
@@ -674,7 +694,7 @@ export class PublicContentEditorComponent {
     this.currentContent.set(content);
     this.multimedia.set(content.multimedia ?? { ...EMPTY_MULTIMEDIA });
     this.hashtags.set(Array.isArray(content.hashtags) ? [...content.hashtags] : []);
-    this.selectedLocationLabel.set('');
+    this.selectedLocationLabel.set((content.location?.label ?? '').trim());
     this.locationSearchResults.set([]);
     this.locationSearchControl.setValue(this.formatStoredLocation(content));
     this.form.setValue({
@@ -726,6 +746,11 @@ export class PublicContentEditorComponent {
   }
 
   private formatStoredLocation(content: PublicContent): string {
+    const label = content.location?.label?.trim() ?? '';
+    if (label) {
+      return label;
+    }
+
     const plusCode = content.location?.plusCode?.trim() ?? '';
     if (plusCode) {
       return plusCode;
