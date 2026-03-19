@@ -13,6 +13,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { debounceTime, distinctUntilChanged, finalize, map } from 'rxjs';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
 import { PublicContentStatus } from '../../../interfaces/public-content-status.type';
@@ -38,7 +39,8 @@ import { PublicProfileService } from '../../../services/content/public-profile.s
     MatInputModule,
     MatSelectModule,
     MatProgressBarModule,
-    MatChipsModule
+    MatChipsModule,
+    MatTooltipModule
   ],
   templateUrl: './public-content-list.component.html',
   styleUrls: ['./public-content-list.component.css'],

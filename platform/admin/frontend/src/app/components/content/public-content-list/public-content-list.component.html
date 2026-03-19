@@ -192,46 +192,78 @@
             </div>
           </mat-card-content>
 
-          <mat-card-actions align="end" class="card-actions content-preview-actions">
-            @if (canRestoreRow(row)) {
-              <button mat-stroked-button type="button" color="primary" (click)="confirmRestore(row, $event)">
-                <mat-icon>restore_from_trash</mat-icon>
-                Restore
-              </button>
-            } @else {
-              <button mat-stroked-button type="button" (click)="openContent(row); $event.stopPropagation()">
-                <mat-icon>{{ row.status === 'published' ? 'visibility' : 'edit' }}</mat-icon>
-                {{ row.status === 'published' ? 'Open' : 'Edit' }}
-              </button>
-            }
+          <mat-card-actions class="card-actions content-preview-actions">
+            <div class="content-preview-action-bar">
+              @if (canRestoreRow(row)) {
+                <button
+                  mat-icon-button
+                  type="button"
+                  class="content-preview-action-button action-primary"
+                  (click)="confirmRestore(row, $event)"
+                  matTooltip="Restore"
+                  aria-label="Restore">
+                  <mat-icon>restore_from_trash</mat-icon>
+                </button>
+              } @else {
+                <button
+                  mat-icon-button
+                  type="button"
+                  class="content-preview-action-button action-neutral"
+                  (click)="openContent(row); $event.stopPropagation()"
+                  [matTooltip]="row.status === 'published' ? 'Open' : 'Edit'"
+                  [attr.aria-label]="row.status === 'published' ? 'Open' : 'Edit'">
+                  <mat-icon>{{ row.status === 'published' ? 'visibility' : 'edit' }}</mat-icon>
+                </button>
+              }
 
-            @if (canCommentOnRow(row)) {
-              <button mat-stroked-button type="button" (click)="createComment(row, $event)">
-                <mat-icon>forum</mat-icon>
-                Comment
-              </button>
-            }
+              @if (canCommentOnRow(row)) {
+                <button
+                  mat-icon-button
+                  type="button"
+                  class="content-preview-action-button action-secondary"
+                  (click)="createComment(row, $event)"
+                  matTooltip="Comment"
+                  aria-label="Comment">
+                  <mat-icon>forum</mat-icon>
+                </button>
+              }
 
-            @if (canPublishRow(row)) {
-              <button mat-stroked-button type="button" color="primary" (click)="confirmPublish(row, $event)">
-                <mat-icon>publish</mat-icon>
-                Publish
-              </button>
-            }
+              @if (canPublishRow(row)) {
+                <button
+                  mat-icon-button
+                  type="button"
+                  class="content-preview-action-button action-success"
+                  (click)="confirmPublish(row, $event)"
+                  matTooltip="Publish"
+                  aria-label="Publish">
+                  <mat-icon>publish</mat-icon>
+                </button>
+              }
 
-            @if (canWithdrawRow(row)) {
-              <button mat-stroked-button type="button" color="warn" (click)="confirmWithdraw(row, $event)">
-                <mat-icon>unpublished</mat-icon>
-                Withdraw
-              </button>
-            }
+              @if (canWithdrawRow(row)) {
+                <button
+                  mat-icon-button
+                  type="button"
+                  class="content-preview-action-button action-warn"
+                  (click)="confirmWithdraw(row, $event)"
+                  matTooltip="Withdraw"
+                  aria-label="Withdraw">
+                  <mat-icon>unpublished</mat-icon>
+                </button>
+              }
 
-            @if (canDeleteRow(row)) {
-              <button mat-stroked-button type="button" color="warn" (click)="confirmDelete(row, $event)">
-                <mat-icon>delete</mat-icon>
-                Delete
-              </button>
-            }
+              @if (canDeleteRow(row)) {
+                <button
+                  mat-icon-button
+                  type="button"
+                  class="content-preview-action-button action-danger action-danger-edge"
+                  (click)="confirmDelete(row, $event)"
+                  matTooltip="Delete"
+                  aria-label="Delete">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              }
+            </div>
           </mat-card-actions>
         </mat-card>
       }

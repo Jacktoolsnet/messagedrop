@@ -415,7 +415,84 @@ mat-toolbar {
 }
 
 .content-preview-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
   margin-top: auto;
+  padding: .9rem 1rem 1rem;
+}
+
+.content-preview-action-bar {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: .5rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.content-preview-action-button {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  padding: 0;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.05);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background-color .18s ease;
+}
+
+.content-preview-action-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+}
+
+.content-preview-action-button .mat-icon {
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+  line-height: 18px;
+}
+
+.action-danger-edge {
+  margin-left: auto;
+}
+
+.content-preview-action-button.action-neutral {
+  color: #334155;
+  border-color: rgba(100, 116, 139, 0.22);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.content-preview-action-button.action-primary {
+  color: #1d4ed8;
+  border-color: rgba(37, 99, 235, 0.22);
+  background: color-mix(in srgb, rgba(255, 255, 255, 0.96) 84%, #2563eb 16%);
+}
+
+.content-preview-action-button.action-secondary {
+  color: #0f766e;
+  border-color: rgba(20, 184, 166, 0.24);
+  background: color-mix(in srgb, rgba(255, 255, 255, 0.96) 84%, #14b8a6 16%);
+}
+
+.content-preview-action-button.action-success {
+  color: #15803d;
+  border-color: rgba(22, 163, 74, 0.24);
+  background: color-mix(in srgb, rgba(255, 255, 255, 0.96) 84%, #16a34a 16%);
+}
+
+.content-preview-action-button.action-warn {
+  color: #c2410c;
+  border-color: rgba(249, 115, 22, 0.24);
+  background: color-mix(in srgb, rgba(255, 255, 255, 0.96) 84%, #f97316 16%);
+}
+
+.content-preview-action-button.action-danger {
+  color: #b91c1c;
+  border-color: rgba(239, 68, 68, 0.24);
+  background: color-mix(in srgb, rgba(255, 255, 255, 0.96) 84%, #ef4444 16%);
 }
 
 @media (max-width: 720px) {
@@ -435,6 +512,10 @@ mat-toolbar {
 
   .content-preview-status {
     display: none;
+  }
+
+  .content-preview-actions {
+    padding-inline: .85rem;
   }
 
   mat-toolbar > span:last-child {
