@@ -17,7 +17,7 @@ const { normalizeModerationReason } = require('../constants/userModerationReason
 const tableUsageProtection = require('../db/tableUsageProtection');
 const metric = require('../middleware/metric');
 const { apiError } = require('../middleware/api-error');
-const { signServiceJwt } = require('../utils/serviceJwt');
+const { signServiceJwt, verifyServiceJwt } = require('../utils/serviceJwt');
 const { resolveBaseUrl } = require('../utils/adminLogForwarder');
 const { MAX_PUBLIC_HASHTAGS, normalizeHashtags, encodeHashtags, decodeHashtags } = require('../utils/hashtags');
 
@@ -1547,9 +1547,34 @@ const rateLimitMessage = (message) => ({
   error: message
 });
 
+function shouldSkipServiceRateLimit(req) {
+  const authHeader = req.headers?.authorization;
+  if (typeof authHeader !== 'string' || !authHeader.trim()) {
+    return false;
+  }
+
+  const token = authHeader.startsWith('Bearer ')
+    ? authHeader.slice(7).trim()
+    : authHeader.trim();
+
+  if (!token) {
+    return false;
+  }
+
+  try {
+    verifyServiceJwt(token, {
+      audience: process.env.SERVICE_JWT_AUDIENCE_BACKEND || process.env.SERVICE_JWT_AUDIENCE || 'service.backend'
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 const userCreateLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
   limit: 20,
+  skip: shouldSkipServiceRateLimit,
   ...rateLimitDefaults,
   message: rateLimitMessage('Too many user create requests, please try again later.')
 });
