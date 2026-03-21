@@ -1217,13 +1217,24 @@ export class MessagelistComponent implements OnInit, OnDestroy {
     });
   }
 
-  public handleCommentAfterLoginClick(message: Message) {
+  public async handleCommentAfterLoginClick(message: Message) {
     this.clickedMessage = message;
+
     if (this.getCommentBadge(message.uuid) === 0) {
-      this.userService.loginWithBackend(this.handleComment.bind(this))
-    } else {
-      this.handleComment();
+      const comments = await this.messageService.loadCommentsForParentMessage(message);
+      const refreshedMessage = this.findMessageInSignals(message.uuid);
+      this.clickedMessage = refreshedMessage ?? {
+        ...message,
+        commentsNumber: Math.max(message.commentsNumber ?? 0, comments.length)
+      };
+
+      if (comments.length === 0 && this.getCommentBadge(message.uuid) === 0) {
+        this.userService.loginWithBackend(this.handleComment.bind(this));
+        return;
+      }
     }
+
+    this.handleComment(false);
   }
 
   public handleCommentClick(message: Message) {
@@ -1231,13 +1242,15 @@ export class MessagelistComponent implements OnInit, OnDestroy {
     this.handleComment();
   }
 
-  public handleComment() {
+  public handleComment(forceRefresh = true) {
     if (this.clickedMessage) {
       const commentsSignal = this.messageService.getCommentsSignalForMessage(this.clickedMessage.uuid);
       const comments = commentsSignal();
 
       // Falls noch keine Kommentare geladen → jetzt holen
-      this.messageService.getCommentsForParentMessage(this.clickedMessage);
+      if (forceRefresh || comments.length === 0) {
+        this.messageService.getCommentsForParentMessage(this.clickedMessage);
+      }
 
       // Immer die aktuelle Ebene (die Kinder) als neue Ebene im Stack speichern
       this.messageService.selectedMessagesSignal.set([...this.messageService.selectedMessagesSignal(), this.clickedMessage]);

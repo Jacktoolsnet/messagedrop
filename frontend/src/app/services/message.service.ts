@@ -288,9 +288,35 @@ export class MessageService {
     this.messagesSignal.set(messages);
   }
 
+  private setCommentCountForMessage(uuid: string, count: number): void {
+    const normalizedUuid = typeof uuid === 'string' ? uuid.trim() : '';
+    if (!normalizedUuid) {
+      return;
+    }
+
+    const normalizedCount = Number.isFinite(count) ? Math.max(0, Math.trunc(count)) : 0;
+    this.commentCounts[normalizedUuid] = normalizedCount;
+    this.commentCountsSignal.set({
+      ...this.commentCountsSignal(),
+      [normalizedUuid]: normalizedCount
+    });
+
+    const patchMessage = (message: Message): Message => (
+      message.uuid === normalizedUuid
+        ? { ...message, commentsNumber: normalizedCount }
+        : message
+    );
+
+    this.messagesSignal.update((messages) => messages.map(patchMessage));
+    this.selectedMessagesSignal.update((messages) => messages.map(patchMessage));
+    for (const commentsSignal of this.commentsSignals.values()) {
+      commentsSignal.set(commentsSignal().map(patchMessage));
+    }
+  }
+
   clearMessages() {
     this.publicMessageFetchToken += 1;
-    this.messagesSignal.set([]);
+    this.setMessages([]);
     this._messageSet.update(trigger => trigger + 1);
   }
 
@@ -1024,7 +1050,7 @@ export class MessageService {
       if (fetchToken !== this.publicMessageFetchToken) {
         return;
       }
-      this.messagesSignal.set([]);
+      this.setMessages([]);
       this._messageSet.update(trigger => trigger + 1);
       return;
     }
@@ -1048,7 +1074,7 @@ export class MessageService {
         );
 
         if (successfulResponses.length === 0) {
-          this.messagesSignal.set([]);
+          this.setMessages([]);
           this._messageSet.update(trigger => trigger + 1);
           return;
         }
@@ -1061,7 +1087,7 @@ export class MessageService {
         });
 
         const mappedMessages = Array.from(uniqueMessages.values()).map(raw => this.mapRawMessage(raw));
-        this.messagesSignal.set(mappedMessages);
+        this.setMessages(mappedMessages);
         this._messageSet.update(trigger => trigger + 1);
       },
       error: () => {
@@ -1072,7 +1098,7 @@ export class MessageService {
           this.mapService.getMapLocation(),
           this.mapService.getMapZoom()
         );
-        this.messagesSignal.set([]);
+        this.setMessages([]);
         this._messageSet.update(trigger => trigger + 1);
       }
     });
@@ -1411,7 +1437,7 @@ export class MessageService {
       });
   }
 
-  public getCommentsForParentMessage(message: Message, showAlways = false) {
+  public async loadCommentsForParentMessage(message: Message, showAlways = false): Promise<Message[]> {
     const url = `${environment.apiUrl}/message/get/comment/${message.uuid}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
@@ -1426,23 +1452,32 @@ export class MessageService {
     });
 
     const commentsSignal = this.getCommentsSignalForMessage(message.uuid);
+    try {
+      const getMessageResponse = await firstValueFrom(
+        this.http.get<GetMessageResponse>(url, this.httpOptions).pipe(catchError(this.handleError))
+      );
+      const comments = (getMessageResponse.rows ?? []).map((rawMessage: RawMessage) => this.mapRawMessage(rawMessage));
+      commentsSignal.set(comments);
 
-    this.http.get<GetMessageResponse>(url, this.httpOptions)
-      .pipe(catchError(this.handleError))
-      .subscribe({
-        next: (getMessageResponse) => {
-          const comments = (getMessageResponse.rows ?? []).map((rawMessage: RawMessage) => this.mapRawMessage(rawMessage));
-          commentsSignal.set(comments);
-          // commentCountsSignal aktualisieren
-          comments.forEach(comment => {
-            this.commentCounts[comment.uuid] = comment.commentsNumber;
-          });
-          this.commentCountsSignal.set(this.commentCounts);
-        },
-        error: () => {
-          commentsSignal.set([]);
-        }
+      const nextParentCount = Math.max(
+        Number.isFinite(message.commentsNumber) ? message.commentsNumber : 0,
+        comments.length
+      );
+      this.setCommentCountForMessage(message.uuid, nextParentCount);
+
+      comments.forEach(comment => {
+        this.commentCounts[comment.uuid] = comment.commentsNumber;
       });
+      this.commentCountsSignal.set({ ...this.commentCounts });
+      return comments;
+    } catch {
+      commentsSignal.set([]);
+      return [];
+    }
+  }
+
+  public getCommentsForParentMessage(message: Message, showAlways = false) {
+    void this.loadCommentsForParentMessage(message, showAlways);
   }
 
   detectPersonalInformation(text: string): boolean {
