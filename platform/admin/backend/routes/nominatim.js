@@ -5,6 +5,7 @@ const { requireAdminJwt } = require('../middleware/security');
 const { apiError } = require('../middleware/api-error');
 const { signServiceJwt } = require('../utils/serviceJwt');
 const { resolveBaseUrl } = require('../utils/adminLogForwarder');
+const { encodePlusCode } = require('../utils/plusCode');
 
 const router = express.Router();
 const nominatimAudience = process.env.SERVICE_JWT_AUDIENCE_NOMINATIM || 'service.nominatim';
@@ -116,16 +117,12 @@ router.get('/reverse', async (req, res, next) => {
 
   try {
     const token = await signServiceJwt({ audience: nominatimAudience });
-    const response = await axios.get(`${nominatimBase}/nominatim/reverse`, {
+    const plusCode = encodePlusCode(latitude, longitude);
+    const response = await axios.get(
+      `${nominatimBase}/nominatim/countryCode/${encodeURIComponent(plusCode)}/${encodeURIComponent(String(latitude))}/${encodeURIComponent(String(longitude))}`,
+      {
       timeout: 5000,
       validateStatus: () => true,
-      params: {
-        lat: latitude,
-        lon: longitude,
-        format: 'jsonv2',
-        addressdetails: 1,
-        zoom: 18
-      },
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: 'application/json',
@@ -144,7 +141,7 @@ router.get('/reverse', async (req, res, next) => {
 
     return res.status(200).json({
       status: 200,
-      result: response.data ?? null
+      result: response.data?.nominatimPlace ?? null
     });
   } catch (error) {
     if (axios.isAxiosError(error)) {
