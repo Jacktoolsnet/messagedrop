@@ -115,7 +115,11 @@ export class PublicContentListComponent {
   }
 
   openAiSettings(): void {
-    this.router.navigate(['/dashboard/content/ai']);
+    this.router.navigate(['/dashboard/content/ai'], {
+      queryParams: {
+        returnTo: this.router.url
+      }
+    });
   }
 
   openContent(row: PublicContent): void {

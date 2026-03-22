@@ -1,7 +1,7 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -21,7 +21,6 @@ import { AiService } from '../../../services/content/ai.service';
   imports: [
     CommonModule,
     DatePipe,
-    RouterLink,
     ReactiveFormsModule,
     MatToolbarModule,
     MatIconModule,
@@ -41,9 +40,15 @@ export class AiSettingsComponent {
   private readonly fb = inject(FormBuilder);
   private readonly snackBar = inject(MatSnackBar);
   private readonly aiService = inject(AiService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
   readonly settings = this.aiService.settings;
   readonly models = this.aiService.models;
+  readonly returnTo = computed(() => {
+    const raw = this.route.snapshot.queryParamMap.get('returnTo')?.trim() || '';
+    return raw.startsWith('/dashboard/content') ? raw : '/dashboard/content';
+  });
   readonly loading = computed(() => this.aiService.settingsLoading() || this.aiService.modelsLoading());
   readonly savePending = signal(false);
   readonly saving = computed(() => this.savePending());
@@ -92,6 +97,10 @@ export class AiSettingsComponent {
 
   refreshModels(): void {
     this.aiService.loadModels(true);
+  }
+
+  goBack(): void {
+    this.router.navigateByUrl(this.returnTo());
   }
 
   save(): void {
