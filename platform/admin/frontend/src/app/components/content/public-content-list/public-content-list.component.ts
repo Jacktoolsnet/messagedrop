@@ -114,6 +114,10 @@ export class PublicContentListComponent {
     this.router.navigate(['/dashboard/content/profiles']);
   }
 
+  openAiSettings(): void {
+    this.router.navigate(['/dashboard/content/ai']);
+  }
+
   openContent(row: PublicContent): void {
     this.router.navigate(['/dashboard/content', row.id, 'edit']);
   }

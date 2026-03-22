@@ -19,7 +19,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { combineLatest, finalize, startWith } from 'rxjs';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
+import { PublicContentAiDialogComponent, PublicContentAiDialogResult } from '../public-content-ai-dialog/public-content-ai-dialog.component';
 import { PublicContentLocationMapDialogComponent, PublicContentLocationMapDialogResult } from '../public-content-location-map-dialog/public-content-location-map-dialog.component';
+import { AiTool } from '../../../interfaces/ai-tool.type';
 import { Multimedia } from '../../../interfaces/multimedia.interface';
 import { NominatimPlace } from '../../../interfaces/nominatim-place.interface';
 import { PublicContentSavePayload } from '../../../interfaces/public-content-save-payload.interface';
@@ -28,6 +30,7 @@ import { PublicContent } from '../../../interfaces/public-content.interface';
 import { PublicProfile, PublicProfileSummary } from '../../../interfaces/public-profile.interface';
 import { TenorApiResponse, TenorResult } from '../../../interfaces/tenor-response.interface';
 import { AuthService } from '../../../services/auth/auth.service';
+import { AiService } from '../../../services/content/ai.service';
 import { ContentStyleOption, ContentStyleService } from '../../../services/content/content-style.service';
 import { PublicContentService } from '../../../services/content/public-content.service';
 import { PublicProfileService } from '../../../services/content/public-profile.service';
@@ -79,6 +82,7 @@ export class PublicContentEditorComponent {
   private readonly snackBar = inject(MatSnackBar);
   private readonly sanitizer = inject(DomSanitizer);
   private readonly authService = inject(AuthService);
+  private readonly aiService = inject(AiService);
   private readonly publicContentService = inject(PublicContentService);
   private readonly publicProfileService = inject(PublicProfileService);
   private readonly styleService = inject(ContentStyleService);
@@ -89,6 +93,8 @@ export class PublicContentEditorComponent {
   readonly previewCreatedAt = Date.now();
   readonly publicProfiles = this.publicProfileService.rows;
   readonly profilesLoading = this.publicProfileService.loading;
+  readonly aiSettings = this.aiService.settings;
+  readonly aiSettingsLoading = this.aiService.settingsLoading;
 
   readonly loading = signal(false);
   readonly saving = signal(false);
@@ -116,6 +122,21 @@ export class PublicContentEditorComponent {
   });
   readonly canPublish = computed(() => ['editor', 'admin', 'root'].includes(this.role() ?? ''));
   readonly hasMedia = computed(() => this.multimedia().type !== 'undefined');
+  readonly aiParentContextLabel = computed(() => this.hasSelectedParentContent() ? this.previewParentLabel() : '');
+  readonly hasAiTextSource = computed(() => !!(this.formValue().message ?? '').trim());
+  readonly hasAiContext = computed(() => (
+    this.hasAiTextSource()
+    || this.hasMedia()
+    || !!this.activeLocationLabel()
+    || !!this.aiParentContextLabel()
+  ));
+  readonly aiConfigured = computed(() => this.aiSettings()?.apiConfigured !== false);
+  readonly aiModelLabel = computed(() => (
+    this.aiSettings()?.selectedModel
+    || this.aiSettings()?.defaultModel
+    || 'gpt-5.4'
+  ));
+  readonly canUseAiTools = computed(() => !this.isPublished() && !this.isDeleted() && this.aiConfigured());
   readonly safeOembedHtml = computed<SafeHtml | null>(() => {
     const html = this.multimedia().oembed?.html;
     return html ? this.sanitizer.bypassSecurityTrustHtml(html) : null;
@@ -309,6 +330,7 @@ export class PublicContentEditorComponent {
 
   constructor() {
     this.publicProfileService.loadProfiles();
+    this.aiService.loadSettings();
     effect(() => {
       const currentContent = this.currentContent();
       const selectedProfileId = this.form.controls.publicProfileId.value.trim();
@@ -477,6 +499,10 @@ export class PublicContentEditorComponent {
 
   openPublicProfiles(): void {
     this.router.navigate(['/dashboard/content/profiles']);
+  }
+
+  openAiSettings(): void {
+    this.router.navigate(['/dashboard/content/ai']);
   }
 
   openParentContent(): void {
@@ -825,6 +851,67 @@ export class PublicContentEditorComponent {
     this.showMessage('Tenor GIF selected.');
   }
 
+  openAiToolDialog(tool: AiTool): void {
+    if (!this.canUseAiTools()) {
+      if (!this.aiConfigured()) {
+        this.showMessage('Configure the OpenAI API first before using AI tools.');
+        return;
+      }
+      if (this.isPublished()) {
+        this.showMessage('Withdraw the public message before changing it with AI tools.');
+        return;
+      }
+      if (this.isDeleted()) {
+        this.showMessage('Deleted content cannot be changed with AI tools.');
+        return;
+      }
+      return;
+    }
+
+    if ((tool === 'proofread' || tool === 'rewrite' || tool === 'translate') && !this.hasAiTextSource()) {
+      this.showMessage('Please add some message text first.');
+      return;
+    }
+
+    if (tool === 'hashtags' && !this.hasAiContext()) {
+      this.showMessage('Please add some text, media or context first.');
+      return;
+    }
+
+    this.dialog.open<PublicContentAiDialogComponent, unknown, PublicContentAiDialogResult>(
+      PublicContentAiDialogComponent,
+      {
+        width: 'min(92vw, 880px)',
+        maxWidth: '92vw',
+        maxHeight: '92vh',
+        autoFocus: false,
+        panelClass: 'mdp-dialog-xl',
+        data: {
+          tool,
+          model: this.aiModelLabel(),
+          text: this.formValue().message,
+          contentType: this.contentType(),
+          locationLabel: this.activeLocationLabel(),
+          publicProfileName: this.profileName(),
+          parentLabel: this.aiParentContextLabel(),
+          existingHashtags: this.hashtags(),
+          multimedia: {
+            type: this.multimedia().type,
+            title: this.multimedia().title,
+            description: this.multimedia().description
+          }
+        }
+      }
+    ).afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((result) => {
+        if (!result) {
+          return;
+        }
+        this.applyAiDialogResult(result);
+      });
+  }
+
   saveDraft(): void {
     this.persist('draft');
   }
@@ -1083,6 +1170,23 @@ export class PublicContentEditorComponent {
 
   private showMessage(message: string): void {
     this.snackBar.open(message, 'OK', { duration: 2800 });
+  }
+
+  private applyAiDialogResult(result: PublicContentAiDialogResult): void {
+    if (result.action === 'replace_text' && result.text) {
+      this.form.controls.message.setValue(result.text);
+      this.showMessage('AI text applied.');
+      return;
+    }
+
+    if ((result.action === 'replace_hashtags' || result.action === 'append_hashtags') && Array.isArray(result.hashtags)) {
+      const mergedInput = result.action === 'replace_hashtags'
+        ? result.hashtags
+        : [...this.hashtags(), ...result.hashtags];
+      const normalized = normalizeHashtags(mergedInput, MAX_PUBLIC_HASHTAGS);
+      this.hashtags.set(normalized.tags);
+      this.showMessage(result.action === 'replace_hashtags' ? 'AI hashtags applied.' : 'AI hashtags added.');
+    }
   }
 
   private loadChildComments(parentContentId: string): void {

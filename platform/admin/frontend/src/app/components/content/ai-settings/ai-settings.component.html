@@ -1,0 +1,161 @@
+<mat-toolbar color="primary">
+  <button mat-icon-button routerLink="/dashboard/content" aria-label="Back to public content">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+
+  <span class="toolbar-title">AI settings</span>
+  <span class="spacer"></span>
+
+  <button
+    mat-icon-button
+    type="button"
+    class="toolbar-action"
+    (click)="refreshModels()"
+    [disabled]="loading()"
+    aria-label="Refresh model list">
+    <mat-icon>refresh</mat-icon>
+  </button>
+
+  <button
+    mat-icon-button
+    type="button"
+    class="toolbar-action avatar avatar-success"
+    (click)="save()"
+    [disabled]="!canSave()"
+    aria-label="Save AI settings">
+    <mat-icon>save</mat-icon>
+  </button>
+</mat-toolbar>
+
+@if (loading() || saving()) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+<div class="page">
+  <mat-card class="hero-card">
+    <mat-card-header>
+      <div mat-card-avatar class="avatar avatar-accent">
+        <mat-icon>smart_toy</mat-icon>
+      </div>
+      <mat-card-title>Editorial AI tools</mat-card-title>
+      <mat-card-subtitle>
+        Configure the model used for proofreading, translation, rewrites and hashtag generation.
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content class="hero-copy">
+      <div class="hero-copy-main">
+        <p>
+          The model list is loaded live from OpenAI. When a newer compatible model becomes available to your API
+          account, it can be selected here without code changes.
+        </p>
+      </div>
+
+      <div class="hero-chip-row">
+        <span class="hero-chip" [class.hero-chip-offline]="!configured()">
+          <mat-icon>{{ configured() ? 'cloud_done' : 'cloud_off' }}</mat-icon>
+          {{ configured() ? 'OpenAI API configured' : 'OpenAI API not configured' }}
+        </span>
+
+        @if (settings()?.selectedModel) {
+          <span class="hero-chip">
+            <mat-icon>model_training</mat-icon>
+            {{ settings()?.selectedModel }}
+          </span>
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  @if (!configured()) {
+    <mat-card class="warn-card">
+      <mat-card-content>
+        Add <code>OPENAI_API_KEY</code> to the admin backend environment to use the AI tools.
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <mat-card class="settings-card">
+    <mat-card-header>
+      <div mat-card-avatar class="avatar avatar-neutral">
+        <mat-icon>settings_suggest</mat-icon>
+      </div>
+      <mat-card-title>Model selection</mat-card-title>
+      <mat-card-subtitle>Choose which OpenAI model the admin content tools should use.</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content [formGroup]="form" class="settings-grid">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>AI model</mat-label>
+        <mat-select formControlName="selectedModel">
+          @for (row of models(); track modelTrackBy($index, row)) {
+            <mat-option [value]="row.id">
+              <span class="model-option">
+                <span class="model-option-copy">
+                  <strong>{{ row.id }}</strong>
+                  <span>
+                    {{ row.available ? 'Available now' : 'Not listed right now' }}
+                    @if (row.ownedBy) {
+                      • {{ row.ownedBy }}
+                    }
+                  </span>
+                </span>
+
+                <span class="model-option-badges">
+                  @if (row.isSelected) {
+                    <mat-chip>Current</mat-chip>
+                  }
+                  @if (row.isDefault) {
+                    <mat-chip>Default</mat-chip>
+                  }
+                </span>
+              </span>
+            </mat-option>
+          }
+        </mat-select>
+        <mat-hint>Responses API will use this model for the editorial AI tools.</mat-hint>
+      </mat-form-field>
+
+      @if (selectedModelMeta(); as model) {
+        <div class="selected-model-panel">
+          <div class="selected-model-header">
+            <strong>{{ model.id }}</strong>
+            <div class="selected-model-badges">
+              @if (model.isSelected) {
+                <mat-chip>Selected</mat-chip>
+              }
+              @if (model.isDefault) {
+                <mat-chip>Default</mat-chip>
+              }
+              @if (!model.available) {
+                <mat-chip class="muted-chip">Currently not listed</mat-chip>
+              }
+            </div>
+          </div>
+
+          <div class="selected-model-meta">
+            @if (model.createdAt) {
+              <span class="selected-model-meta-chip">
+                <mat-icon>schedule</mat-icon>
+                {{ model.createdAt | date:'dd.MM.yyyy' }}
+              </span>
+            }
+
+            @if (model.ownedBy) {
+              <span class="selected-model-meta-chip">
+                <mat-icon>account_circle</mat-icon>
+                {{ model.ownedBy }}
+              </span>
+            }
+          </div>
+        </div>
+      }
+
+      @if (settings()?.updatedAt) {
+        <p class="updated-at">
+          Last saved: {{ settings()?.updatedAt | date:'dd.MM.yyyy HH:mm' }}
+        </p>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

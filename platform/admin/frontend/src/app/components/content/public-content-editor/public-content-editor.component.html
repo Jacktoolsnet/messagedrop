@@ -710,6 +710,78 @@
           </div>
         </mat-card-content>
       </mat-card>
+
+      <mat-card class="ai-card">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-accent">
+            <mat-icon>smart_toy</mat-icon>
+          </div>
+          <div class="ai-card-header-copy">
+            <mat-card-title>AI tools</mat-card-title>
+            <mat-card-subtitle>
+              AI support for this {{ isCommentMode() ? 'comment' : 'message' }}.
+            </mat-card-subtitle>
+          </div>
+
+          <button
+            mat-icon-button
+            type="button"
+            class="ai-settings-button avatar avatar-neutral"
+            (click)="openAiSettings()"
+            aria-label="Open AI settings">
+            <mat-icon>settings_suggest</mat-icon>
+          </button>
+        </mat-card-header>
+
+        <mat-card-content class="ai-card-content">
+          <div class="ai-model-row">
+            <span class="ai-model-chip">
+              <mat-icon>model_training</mat-icon>
+              {{ aiModelLabel() }}
+            </span>
+
+            @if (aiSettingsLoading()) {
+              <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+            }
+          </div>
+
+          @if (!aiConfigured()) {
+            <p class="ai-hint ai-hint-warn">
+              Add an OpenAI API key in the admin backend to enable these tools.
+            </p>
+          } @else if (isPublished()) {
+            <p class="ai-hint ai-hint-warn">
+              Withdraw the public {{ isCommentMode() ? 'comment' : 'message' }} first before applying AI changes.
+            </p>
+          } @else if (isDeleted()) {
+            <p class="ai-hint ai-hint-warn">
+              Deleted content cannot be changed with AI tools.
+            </p>
+          }
+
+          <div class="ai-action-grid">
+            <button mat-stroked-button type="button" (click)="openAiToolDialog('proofread')" [disabled]="!canUseAiTools() || !hasAiTextSource()">
+              <mat-icon>spellcheck</mat-icon>
+              Proofread
+            </button>
+
+            <button mat-stroked-button type="button" (click)="openAiToolDialog('rewrite')" [disabled]="!canUseAiTools() || !hasAiTextSource()">
+              <mat-icon>auto_fix_high</mat-icon>
+              Rewrite
+            </button>
+
+            <button mat-stroked-button type="button" (click)="openAiToolDialog('translate')" [disabled]="!canUseAiTools() || !hasAiTextSource()">
+              <mat-icon>translate</mat-icon>
+              Translate
+            </button>
+
+            <button mat-stroked-button type="button" (click)="openAiToolDialog('hashtags')" [disabled]="!canUseAiTools() || !hasAiContext()">
+              <mat-icon>tag</mat-icon>
+              Hashtags
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
     </div>
   </div>
 

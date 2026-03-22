@@ -1,0 +1,171 @@
+<div class="dialog-header">
+  <div class="dialog-copy">
+    <h2 mat-dialog-title>{{ title() }}</h2>
+    <p>{{ subtitle() }}</p>
+  </div>
+
+  <button mat-icon-button type="button" (click)="close()" aria-label="Close AI dialog">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<mat-dialog-content class="dialog-content">
+  <div class="dialog-meta">
+    <span class="dialog-meta-chip">
+      <mat-icon>smart_toy</mat-icon>
+      {{ data.model }}
+    </span>
+
+    <span class="dialog-meta-chip">
+      <mat-icon>{{ data.contentType === 'comment' ? 'forum' : 'campaign' }}</mat-icon>
+      {{ data.contentType === 'comment' ? 'Comment' : 'Message' }}
+    </span>
+
+    @if (data.locationLabel) {
+      <span class="dialog-meta-chip">
+        <mat-icon>location_on</mat-icon>
+        {{ data.locationLabel }}
+      </span>
+    }
+  </div>
+
+  <mat-card class="source-card">
+    <mat-card-header>
+      <div mat-card-avatar class="avatar avatar-neutral">
+        <mat-icon>description</mat-icon>
+      </div>
+      <mat-card-title>Current content</mat-card-title>
+      <mat-card-subtitle>Source text and context sent to the model.</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content class="source-content">
+      <div class="source-copy">
+        @if (data.text.trim()) {
+          <pre>{{ data.text }}</pre>
+        } @else {
+          <p class="muted-copy">No message text yet. The AI tool will use the remaining context only.</p>
+        }
+      </div>
+
+      @if (data.existingHashtags.length > 0) {
+        <div class="source-hashtags">
+          @for (tag of data.existingHashtags; track hashtagTrackBy($index, tag)) {
+            <mat-chip>#{{ tag }}</mat-chip>
+          }
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="options-card">
+    <mat-card-content class="options-grid">
+      @if (tool === 'translate') {
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Target language</mat-label>
+          <input matInput [formControl]="form.controls.targetLanguage" placeholder="English" />
+        </mat-form-field>
+      }
+
+      @if (tool === 'rewrite') {
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Rewrite goal</mat-label>
+          <mat-select [formControl]="form.controls.rewriteGoal">
+            <mat-option value="clearer">Clearer</mat-option>
+            <mat-option value="friendlier">Friendlier</mat-option>
+            <mat-option value="shorter">Shorter</mat-option>
+            <mat-option value="more_formal">More formal</mat-option>
+            <mat-option value="more_engaging">More engaging</mat-option>
+          </mat-select>
+        </mat-form-field>
+      }
+
+      @if (tool === 'hashtags') {
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Hashtag count</mat-label>
+          <mat-select [formControl]="form.controls.hashtagCount">
+            <mat-option [value]="4">4</mat-option>
+            <mat-option [value]="6">6</mat-option>
+            <mat-option [value]="8">8</mat-option>
+          </mat-select>
+        </mat-form-field>
+      }
+
+      <div class="run-row">
+        <button mat-flat-button color="primary" type="button" (click)="run()" [disabled]="!canGenerate()">
+          <mat-icon>auto_awesome</mat-icon>
+          Run AI tool
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  @if (result(); as result) {
+    <mat-card class="result-card">
+      <mat-card-header>
+        <div mat-card-avatar class="avatar avatar-accent">
+          <mat-icon>auto_awesome</mat-icon>
+        </div>
+        <mat-card-title>Result</mat-card-title>
+        <mat-card-subtitle>{{ result.model }}</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content class="result-content">
+        @if ((tool === 'proofread' || tool === 'translate') && resultText()) {
+          <div class="result-text-panel">
+            <pre>{{ resultText() }}</pre>
+            <div class="result-actions-inline">
+              <button mat-flat-button color="primary" type="button" (click)="useText(resultText())">
+                <mat-icon>check</mat-icon>
+                Use text
+              </button>
+            </div>
+          </div>
+        }
+
+        @if (tool === 'rewrite' && rewriteSuggestions().length > 0) {
+          <div class="rewrite-suggestion-list">
+            @for (suggestion of rewriteSuggestions(); track suggestionTrackBy($index)) {
+              <div class="rewrite-suggestion">
+                <pre>{{ suggestion }}</pre>
+                <button mat-stroked-button type="button" (click)="useText(suggestion)">
+                  <mat-icon>check</mat-icon>
+                  Use suggestion
+                </button>
+              </div>
+            }
+          </div>
+        }
+
+        @if (tool === 'hashtags' && generatedHashtags().length > 0) {
+          <div class="hashtag-result">
+            <div class="hashtag-result-list">
+              @for (tag of generatedHashtags(); track hashtagTrackBy($index, tag)) {
+                <mat-chip>#{{ tag }}</mat-chip>
+              }
+            </div>
+
+            <div class="result-actions-inline">
+              <button mat-stroked-button type="button" (click)="appendHashtags()">
+                <mat-icon>add</mat-icon>
+                Add to current
+              </button>
+
+              <button mat-flat-button color="primary" type="button" (click)="replaceHashtags()">
+                <mat-icon>restart_alt</mat-icon>
+                Replace current
+              </button>
+            </div>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+  <button mat-button type="button" (click)="close()">Close</button>
+</mat-dialog-actions>

@@ -1,5 +1,6 @@
 // middleware/security.js
-require('dotenv').config();
+const { loadEnv } = require('../utils/loadEnv');
+loadEnv();
 const jwt = require('jsonwebtoken');
 const { requireServiceJwt, verifyServiceJwt } = require('../utils/serviceJwt');
 

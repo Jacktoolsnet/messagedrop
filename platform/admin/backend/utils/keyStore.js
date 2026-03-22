@@ -7,7 +7,8 @@ const {
     randomBytes,
     scryptSync,
 } = require('crypto');
-require('dotenv').config();
+const { loadEnv } = require('./loadEnv');
+loadEnv();
 
 const { subtle } = webcrypto;
 

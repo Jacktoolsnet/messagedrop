@@ -16,6 +16,7 @@ import { AppLogsComponent } from './components/loging/app-logs/app-logs.componen
 import { PublicContentEditorComponent } from './components/content/public-content-editor/public-content-editor.component';
 import { PublicContentListComponent } from './components/content/public-content-list/public-content-list.component';
 import { PublicProfileManagerComponent } from './components/content/public-profile-manager/public-profile-manager.component';
+import { AiSettingsComponent } from './components/content/ai-settings/ai-settings.component';
 import { ErrorLogsComponent } from './components/loging/error-logs/error-logs.component';
 import { InfoLogsComponent } from './components/loging/info-logs/info-logs.component';
 import { PowLogsComponent } from './components/loging/pow-logs/pow-logs.component';
@@ -77,6 +78,12 @@ export const routes: Routes = [
     {
         path: 'dashboard/content/profiles',
         component: PublicProfileManagerComponent,
+        canActivate: [authGuard],
+        data: { allowedRoles: CONTENT_MODULE_ROLES }
+    },
+    {
+        path: 'dashboard/content/ai',
+        component: AiSettingsComponent,
         canActivate: [authGuard],
         data: { allowedRoles: CONTENT_MODULE_ROLES }
     },

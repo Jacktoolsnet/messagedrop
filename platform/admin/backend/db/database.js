@@ -10,6 +10,7 @@ const tableDsaNotification = require('./tableDsaNotification');
 const tableDsaAuditLog = require('./tableDsaAuditLog');
 const tableStatistic = require('./tableStatistic');
 const tableStatisticSettings = require('./tableStatisticSettings');
+const tableAiSettings = require('./tableAiSettings');
 const tableLoginOtp = require('./tableLoginOtp');
 const tableErrorLog = require('./tableErrorLog');
 const tableInfoLog = require('./tableInfoLog');
@@ -257,6 +258,7 @@ class Database {
       tableDsaAuditLog.init(this.db);
       tableStatistic.init(this.db);
       tableStatisticSettings.init(this.db);
+      tableAiSettings.init(this.db);
       tableLoginOtp.init(this.db);
       tableErrorLog.init(this.db);
       tableInfoLog.init(this.db);

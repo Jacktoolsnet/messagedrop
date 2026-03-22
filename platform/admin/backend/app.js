@@ -1,4 +1,5 @@
-require('dotenv').config()
+const { loadEnv } = require('./utils/loadEnv');
+loadEnv();
 require('winston-daily-rotate-file');
 const compression = require('compression');
 const databaseMw = require('./middleware/database');
@@ -24,6 +25,7 @@ const publicStatus = require('./routes/public-status');
 const maintenance = require('./routes/maintenance');
 const statistic = require('./routes/statistic');
 const nominatim = require('./routes/nominatim');
+const ai = require('./routes/ai');
 const errorLog = require('./routes/error-log');
 const infoLog = require('./routes/info-log');
 const warnLog = require('./routes/warn-log');
@@ -360,6 +362,13 @@ const adminTranslateLimit = rateLimit({
   message: rateLimitMessage('Too many translate requests, please try again later.')
 });
 
+const adminAiLimit = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 80,
+  ...rateLimitDefaults,
+  message: rateLimitMessage('Too many AI requests, please try again later.')
+});
+
 const adminUserLimit = rateLimit({
   windowMs: 5 * 60 * 1000,
   limit: 30,
@@ -382,6 +391,7 @@ app.use('/check', check);
 app.use('/clientconnect', adminUserLimit, clientConnect);
 app.use('/user', adminUserLimit, user);
 app.use('/translate', adminTranslateLimit, translate);
+app.use('/ai', adminAiLimit, ai);
 app.use('/nominatim', adminUserLimit, nominatim);
 app.use('/statistic', statistic);
 app.use('/error-log', adminLogLimit, errorLog);

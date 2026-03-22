@@ -20,6 +20,15 @@
       mat-icon-button
       type="button"
       class="toolbar-action"
+      (click)="openAiSettings()"
+      aria-label="Open AI settings">
+      <mat-icon>smart_toy</mat-icon>
+    </button>
+
+    <button
+      mat-icon-button
+      type="button"
+      class="toolbar-action"
       (click)="openProfiles()"
       aria-label="Manage public profiles">
       <mat-icon>groups</mat-icon>
