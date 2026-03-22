@@ -672,21 +672,6 @@ mat-toolbar {
   border: 0;
 }
 
-.location-map-link {
-  display: inline-flex;
-  width: fit-content;
-  align-items: center;
-  gap: .35rem;
-  color: #1d4ed8;
-  text-decoration: none;
-  font-size: .88rem;
-  font-weight: 600;
-}
-
-.location-map-link:hover {
-  text-decoration: underline;
-}
-
 .comment-thread-card {
   margin-top: 1rem;
 }

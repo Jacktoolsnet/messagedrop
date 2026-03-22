@@ -299,13 +299,6 @@ export class PublicContentEditorComponent {
       this.buildLocationMapEmbedUrl(coordinates.latitude, coordinates.longitude)
     );
   });
-  readonly locationMapLink = computed(() => {
-    const coordinates = this.selectedLocationCoordinates();
-    if (!coordinates) {
-      return '';
-    }
-    return this.buildLocationMapLink(coordinates.latitude, coordinates.longitude);
-  });
   readonly backTarget = computed(() => {
     const parentId = this.resolveBackParentId();
     return parentId ? ['/dashboard/content', parentId, 'edit'] : ['/dashboard/content'];
@@ -1272,10 +1265,6 @@ export class PublicContentEditorComponent {
     ].join(',');
 
     return `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bbox)}&layer=mapnik&marker=${encodeURIComponent(`${latitude},${longitude}`)}`;
-  }
-
-  private buildLocationMapLink(latitude: number, longitude: number): string {
-    return `https://www.openstreetmap.org/?mlat=${encodeURIComponent(String(latitude))}&mlon=${encodeURIComponent(String(longitude))}#map=15/${encodeURIComponent(String(latitude))}/${encodeURIComponent(String(longitude))}`;
   }
 
   private getTikTokId(multimedia: Multimedia): string | null {

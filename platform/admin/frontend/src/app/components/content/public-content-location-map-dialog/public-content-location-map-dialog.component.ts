@@ -53,9 +53,6 @@ export class PublicContentLocationMapDialogComponent implements AfterViewInit, O
   readonly selectedCoordinatesText = computed(() => (
     `${this.selectedLatitude().toFixed(5)}, ${this.selectedLongitude().toFixed(5)}`
   ));
-  readonly locationMapLink = computed(() => (
-    `https://www.openstreetmap.org/?mlat=${encodeURIComponent(String(this.selectedLatitude()))}&mlon=${encodeURIComponent(String(this.selectedLongitude()))}#map=16/${encodeURIComponent(String(this.selectedLatitude()))}/${encodeURIComponent(String(this.selectedLongitude()))}`
-  ));
 
   private map?: leaflet.Map;
   private marker?: leaflet.CircleMarker;

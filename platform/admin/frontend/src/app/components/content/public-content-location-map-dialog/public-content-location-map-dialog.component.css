@@ -1,5 +1,7 @@
 :host {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  min-height: min(82vh, 760px);
   color: #1f2937;
 }
 
@@ -27,9 +29,12 @@
 }
 
 .dialog-content {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
   gap: 1rem;
-  min-height: min(72vh, 680px);
+  min-height: 0;
+  max-height: none;
   padding: 1rem;
 }
 
@@ -86,8 +91,8 @@
 }
 
 .map-container {
-  min-height: 0;
-  height: 100%;
+  flex: 1 1 auto;
+  min-height: 420px;
   border-radius: 20px;
   overflow: hidden;
   border: 1px solid rgba(15, 23, 42, 0.08);
@@ -107,6 +112,10 @@
   }
 
   .dialog-content {
-    min-height: min(70vh, 560px);
+    min-height: 0;
+  }
+
+  .map-container {
+    min-height: 340px;
   }
 }
