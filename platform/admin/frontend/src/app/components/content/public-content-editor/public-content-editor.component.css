@@ -677,16 +677,6 @@ mat-toolbar {
   margin-top: 1rem;
 }
 
-.ai-card-header-copy {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.ai-card-header-copy .mat-mdc-card-subtitle {
-  margin-top: .15rem;
-  line-height: 1.3;
-}
-
 .ai-settings-button {
   margin-left: auto;
 }
@@ -694,24 +684,6 @@ mat-toolbar {
 .ai-card-content {
   display: grid;
   gap: 1rem;
-}
-
-.ai-model-row {
-  display: grid;
-  gap: .65rem;
-}
-
-.ai-model-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: .45rem;
-  width: fit-content;
-  padding: .45rem .85rem;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.84);
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  font-size: .9rem;
-  font-weight: 600;
 }
 
 .ai-hint {
@@ -1371,7 +1343,7 @@ mat-chip-grid {
   pointer-events: none;
 }
 
-.preview-buttonbar > button {
+.preview-buttonbar>button {
   flex: 0 0 auto;
 }
 
@@ -1577,7 +1549,7 @@ mat-chip-grid {
     grid-template-columns: 1fr;
   }
 
-  mat-toolbar > span:last-child {
+  mat-toolbar>span:last-child {
     display: none;
   }
 

@@ -8,201 +8,181 @@
 
   <div class="toolbar-action-row">
     @if (!isPublished() && !isDeleted()) {
-      <div class="toolbar-actions">
-        <button
-          mat-icon-button
-          type="button"
-          class="toolbar-action avatar avatar-accent"
-          (click)="saveDraft()"
-          [disabled]="!canSaveContent()"
-          aria-label="Save draft">
-          <mat-icon>save</mat-icon>
-        </button>
+    <div class="toolbar-actions">
+      <button mat-icon-button type="button" class="toolbar-action avatar avatar-accent" (click)="saveDraft()"
+        [disabled]="!canSaveContent()" aria-label="Save draft">
+        <mat-icon>save</mat-icon>
+      </button>
 
-        @if (canPublish()) {
-          <button
-            mat-icon-button
-            type="button"
-            class="toolbar-action avatar avatar-success"
-            (click)="saveAndPublish()"
-            [disabled]="!canSaveContent()"
-            aria-label="Publish message">
-            <mat-icon>publish</mat-icon>
-          </button>
-        }
-      </div>
+      @if (canPublish()) {
+      <button mat-icon-button type="button" class="toolbar-action avatar avatar-success" (click)="saveAndPublish()"
+        [disabled]="!canSaveContent()" aria-label="Publish message">
+        <mat-icon>publish</mat-icon>
+      </button>
+      }
+    </div>
     }
 
     @if (isPublished() && !isDeleted()) {
-      <button
-        mat-icon-button
-        type="button"
-        class="toolbar-action avatar avatar-withdraw"
-        (click)="confirmWithdraw()"
-        [disabled]="saving()"
-        aria-label="Withdraw publication">
-        <mat-icon>unpublished</mat-icon>
-      </button>
+    <button mat-icon-button type="button" class="toolbar-action avatar avatar-withdraw" (click)="confirmWithdraw()"
+      [disabled]="saving()" aria-label="Withdraw publication">
+      <mat-icon>unpublished</mat-icon>
+    </button>
     }
 
     @if (isEditMode() && !isDeleted()) {
-      <button
-        mat-icon-button
-        type="button"
-        class="toolbar-action toolbar-danger avatar avatar-warn"
-        (click)="confirmDelete()"
-        [disabled]="saving()"
-        aria-label="Delete content">
-        <mat-icon>delete</mat-icon>
-      </button>
+    <button mat-icon-button type="button" class="toolbar-action toolbar-danger avatar avatar-warn"
+      (click)="confirmDelete()" [disabled]="saving()" aria-label="Delete content">
+      <mat-icon>delete</mat-icon>
+    </button>
     }
   </div>
 </mat-toolbar>
 
 @if (loading() || saving()) {
-  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+<mat-progress-bar mode="indeterminate"></mat-progress-bar>
 }
 
 <div class="page">
   @if (currentContent(); as content) {
-    <mat-card class="meta-card">
-      <mat-card-content class="meta-card-content">
-        <div class="meta-fact-grid">
-          <div class="meta-fact-card" [class]="'meta-fact-card ' + statusClass(content.status)">
-            <div class="meta-fact-icon">
-              <mat-icon>{{ statusIcon(content.status) }}</mat-icon>
-            </div>
-            <div class="meta-fact-copy">
-              <span class="meta-fact-label">Status</span>
-              <span class="meta-fact-value">{{ statusLabel() }}</span>
-            </div>
+  <mat-card class="meta-card">
+    <mat-card-content class="meta-card-content">
+      <div class="meta-fact-grid">
+        <div class="meta-fact-card" [class]="'meta-fact-card ' + statusClass(content.status)">
+          <div class="meta-fact-icon">
+            <mat-icon>{{ statusIcon(content.status) }}</mat-icon>
           </div>
-
-          <div class="meta-fact-card">
-            <div class="meta-fact-icon">
-              <mat-icon>person</mat-icon>
-            </div>
-            <div class="meta-fact-copy">
-              <span class="meta-fact-label">Author</span>
-              <span class="meta-fact-value">{{ content.authorUsername }}</span>
-            </div>
+          <div class="meta-fact-copy">
+            <span class="meta-fact-label">Status</span>
+            <span class="meta-fact-value">{{ statusLabel() }}</span>
           </div>
-
-          <div class="meta-fact-card">
-            <div class="meta-fact-icon">
-              <mat-icon>{{ isCommentMode() ? 'forum' : 'campaign' }}</mat-icon>
-            </div>
-            <div class="meta-fact-copy">
-              <span class="meta-fact-label">Type</span>
-              <span class="meta-fact-value">{{ isCommentMode() ? 'Comment' : 'Message' }}</span>
-            </div>
-          </div>
-
-          <div class="meta-fact-card">
-            <div class="meta-fact-icon">
-              <mat-icon>groups</mat-icon>
-            </div>
-            <div class="meta-fact-copy">
-              <span class="meta-fact-label">Profile</span>
-              <span class="meta-fact-value">{{ content.publicProfile?.name || 'No profile assigned' }}</span>
-            </div>
-          </div>
-
-          <div class="meta-fact-card">
-            <div class="meta-fact-icon">
-              <mat-icon>schedule</mat-icon>
-            </div>
-            <div class="meta-fact-copy">
-              <span class="meta-fact-label">Last update</span>
-              <span class="meta-fact-value">{{ content.updatedAt | date:'dd.MM.yyyy HH:mm' }}</span>
-            </div>
-          </div>
-
-          @if (isCommentMode()) {
-            <div class="meta-fact-card">
-              <div class="meta-fact-icon">
-                <mat-icon>reply</mat-icon>
-              </div>
-              <div class="meta-fact-copy">
-                <span class="meta-fact-label">Parent</span>
-                <span class="meta-fact-value">{{ previewParentLabel() }}</span>
-              </div>
-            </div>
-          }
-
-          @if (content.publishedAt) {
-            <div class="meta-fact-card meta-fact-success">
-              <div class="meta-fact-icon">
-                <mat-icon>event_available</mat-icon>
-              </div>
-              <div class="meta-fact-copy">
-                <span class="meta-fact-label">Published</span>
-                <span class="meta-fact-value">{{ content.publishedAt | date:'dd.MM.yyyy HH:mm' }}</span>
-              </div>
-            </div>
-          }
         </div>
-      </mat-card-content>
-    </mat-card>
+
+        <div class="meta-fact-card">
+          <div class="meta-fact-icon">
+            <mat-icon>person</mat-icon>
+          </div>
+          <div class="meta-fact-copy">
+            <span class="meta-fact-label">Author</span>
+            <span class="meta-fact-value">{{ content.authorUsername }}</span>
+          </div>
+        </div>
+
+        <div class="meta-fact-card">
+          <div class="meta-fact-icon">
+            <mat-icon>{{ isCommentMode() ? 'forum' : 'campaign' }}</mat-icon>
+          </div>
+          <div class="meta-fact-copy">
+            <span class="meta-fact-label">Type</span>
+            <span class="meta-fact-value">{{ isCommentMode() ? 'Comment' : 'Message' }}</span>
+          </div>
+        </div>
+
+        <div class="meta-fact-card">
+          <div class="meta-fact-icon">
+            <mat-icon>groups</mat-icon>
+          </div>
+          <div class="meta-fact-copy">
+            <span class="meta-fact-label">Profile</span>
+            <span class="meta-fact-value">{{ content.publicProfile?.name || 'No profile assigned' }}</span>
+          </div>
+        </div>
+
+        <div class="meta-fact-card">
+          <div class="meta-fact-icon">
+            <mat-icon>schedule</mat-icon>
+          </div>
+          <div class="meta-fact-copy">
+            <span class="meta-fact-label">Last update</span>
+            <span class="meta-fact-value">{{ content.updatedAt | date:'dd.MM.yyyy HH:mm' }}</span>
+          </div>
+        </div>
+
+        @if (isCommentMode()) {
+        <div class="meta-fact-card">
+          <div class="meta-fact-icon">
+            <mat-icon>reply</mat-icon>
+          </div>
+          <div class="meta-fact-copy">
+            <span class="meta-fact-label">Parent</span>
+            <span class="meta-fact-value">{{ previewParentLabel() }}</span>
+          </div>
+        </div>
+        }
+
+        @if (content.publishedAt) {
+        <div class="meta-fact-card meta-fact-success">
+          <div class="meta-fact-icon">
+            <mat-icon>event_available</mat-icon>
+          </div>
+          <div class="meta-fact-copy">
+            <span class="meta-fact-label">Published</span>
+            <span class="meta-fact-value">{{ content.publishedAt | date:'dd.MM.yyyy HH:mm' }}</span>
+          </div>
+        </div>
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
   }
 
   @if (isPublished()) {
-    <mat-card class="hint-card warn-card">
-      <mat-card-content>
-        This message is currently published. Withdraw it first if you want to change its content.
-      </mat-card-content>
-    </mat-card>
+  <mat-card class="hint-card warn-card">
+    <mat-card-content>
+      This message is currently published. Withdraw it first if you want to change its content.
+    </mat-card-content>
+  </mat-card>
   }
 
   @if (isDeleted()) {
-    <mat-card class="hint-card warn-card">
-      <mat-card-content>
-        This content entry has been deleted and is now read-only.
-      </mat-card-content>
-    </mat-card>
+  <mat-card class="hint-card warn-card">
+    <mat-card-content>
+      This content entry has been deleted and is now read-only.
+    </mat-card-content>
+  </mat-card>
   }
 
   <div class="editor-layout">
     <div class="main-column">
       @if (isCommentMode()) {
-        <mat-card class="profile-card">
-          <mat-card-header>
-            <div mat-card-avatar class="avatar avatar-accent">
-              <mat-icon>reply</mat-icon>
+      <mat-card class="profile-card">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-accent">
+            <mat-icon>reply</mat-icon>
+          </div>
+          <mat-card-title>Parent content</mat-card-title>
+          <mat-card-subtitle>The published message or comment this reply belongs to.</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          @if (selectedParentSummary(); as parent) {
+          <div class="parent-message-panel">
+            <div class="parent-message-copy">
+              <span class="parent-message-kicker">Reply to</span>
+              <strong>{{ previewParentLabel() }}</strong>
+              @if (parent.message) {
+              <p>{{ parent.message }}</p>
+              }
             </div>
-            <mat-card-title>Parent content</mat-card-title>
-            <mat-card-subtitle>The published message or comment this reply belongs to.</mat-card-subtitle>
-          </mat-card-header>
 
-          <mat-card-content>
-            @if (selectedParentSummary(); as parent) {
-              <div class="parent-message-panel">
-                <div class="parent-message-copy">
-                  <span class="parent-message-kicker">Reply to</span>
-                  <strong>{{ previewParentLabel() }}</strong>
-                  @if (parent.message) {
-                    <p>{{ parent.message }}</p>
-                  }
-                </div>
-
-                <div class="parent-message-actions">
-                  <button mat-stroked-button type="button" (click)="openParentContent()">
-                    <mat-icon>open_in_new</mat-icon>
-                    Open parent
-                  </button>
-                </div>
-              </div>
-            } @else {
-              <div class="missing-profile-state">
-                <mat-icon>forum</mat-icon>
-                <div>
-                  <strong>No parent content selected.</strong>
-                  <p>Create replies from a published message or comment to attach them to a parent.</p>
-                </div>
-              </div>
-            }
-          </mat-card-content>
-        </mat-card>
+            <div class="parent-message-actions">
+              <button mat-stroked-button type="button" (click)="openParentContent()">
+                <mat-icon>open_in_new</mat-icon>
+                Open parent
+              </button>
+            </div>
+          </div>
+          } @else {
+          <div class="missing-profile-state">
+            <mat-icon>forum</mat-icon>
+            <div>
+              <strong>No parent content selected.</strong>
+              <p>Create replies from a published message or comment to attach them to a parent.</p>
+            </div>
+          </div>
+          }
+        </mat-card-content>
+      </mat-card>
       }
 
       <mat-card class="profile-card">
@@ -211,68 +191,70 @@
             <mat-icon>groups</mat-icon>
           </div>
           <mat-card-title>Public profile</mat-card-title>
-          <mat-card-subtitle>Choose the public sender profile for this {{ isCommentMode() ? 'comment' : 'message' }}.</mat-card-subtitle>
+          <mat-card-subtitle>Choose the public sender profile for this {{ isCommentMode() ? 'comment' : 'message'
+            }}.</mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content>
           @if (publicProfiles().length === 0 && !profilesLoading()) {
-            <div class="missing-profile-state">
-              <mat-icon>person_add</mat-icon>
-              <div>
-                <strong>No public profiles available.</strong>
-                <p>Create at least one public profile before saving or publishing a public message.</p>
-              </div>
-              <button mat-stroked-button type="button" (click)="openPublicProfiles()">
-                <mat-icon>open_in_new</mat-icon>
-                Manage profiles
-              </button>
+          <div class="missing-profile-state">
+            <mat-icon>person_add</mat-icon>
+            <div>
+              <strong>No public profiles available.</strong>
+              <p>Create at least one public profile before saving or publishing a public message.</p>
             </div>
+            <button mat-stroked-button type="button" (click)="openPublicProfiles()">
+              <mat-icon>open_in_new</mat-icon>
+              Manage profiles
+            </button>
+          </div>
           } @else {
-            <div class="profile-picker-layout">
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Public profile</mat-label>
-                <mat-select [formControl]="form.controls.publicProfileId">
-                  <mat-select-trigger>
-                    @if (selectedProfile()) {
-                      <div class="profile-select-trigger">
-                        <div class="profile-option-avatar">
-                          @if (profileAvatar()) {
-                            <img [src]="profileAvatar()" [alt]="profileName()" />
-                          } @else {
-                            <span>{{ profileInitials() }}</span>
-                          }
-                        </div>
-                        <span class="profile-select-trigger-name">{{ profileName() }}</span>
-                      </div>
-                    } @else {
-                      <span class="style-select-placeholder">Choose a public profile</span>
-                    }
-                  </mat-select-trigger>
-
-                  @for (profile of publicProfiles(); track trackPublicProfile($index, profile)) {
-                    <mat-option [value]="profile.id">
-                      <div class="profile-option-row">
-                        <div class="profile-option-avatar">
-                          @if (profile.avatarImage) {
-                            <img [src]="profile.avatarImage" [alt]="profile.name" />
-                          } @else {
-                            <span>{{ profile.name.charAt(0).toUpperCase() }}</span>
-                          }
-                        </div>
-                        <div class="profile-option-copy">
-                          <span class="profile-option-name">{{ profile.name }}</span>
-                        </div>
-                      </div>
-                    </mat-option>
+          <div class="profile-picker-layout">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Public profile</mat-label>
+              <mat-select [formControl]="form.controls.publicProfileId">
+                <mat-select-trigger>
+                  @if (selectedProfile()) {
+                  <div class="profile-select-trigger">
+                    <div class="profile-option-avatar">
+                      @if (profileAvatar()) {
+                      <img [src]="profileAvatar()" [alt]="profileName()" />
+                      } @else {
+                      <span>{{ profileInitials() }}</span>
+                      }
+                    </div>
+                    <span class="profile-select-trigger-name">{{ profileName() }}</span>
+                  </div>
+                  } @else {
+                  <span class="style-select-placeholder">Choose a public profile</span>
                   }
-                </mat-select>
-                <mat-hint>The selected profile determines the public sender identity and the default font.</mat-hint>
-              </mat-form-field>
+                </mat-select-trigger>
 
-              <button mat-icon-button type="button" class="profile-manage-button" (click)="openPublicProfiles()" aria-label="Manage public profiles">
-                <mat-icon>open_in_new</mat-icon>
-              </button>
-            </div>
+                @for (profile of publicProfiles(); track trackPublicProfile($index, profile)) {
+                <mat-option [value]="profile.id">
+                  <div class="profile-option-row">
+                    <div class="profile-option-avatar">
+                      @if (profile.avatarImage) {
+                      <img [src]="profile.avatarImage" [alt]="profile.name" />
+                      } @else {
+                      <span>{{ profile.name.charAt(0).toUpperCase() }}</span>
+                      }
+                    </div>
+                    <div class="profile-option-copy">
+                      <span class="profile-option-name">{{ profile.name }}</span>
+                    </div>
+                  </div>
+                </mat-option>
+                }
+              </mat-select>
+              <mat-hint>The selected profile determines the public sender identity and the default font.</mat-hint>
+            </mat-form-field>
+
+            <button mat-icon-button type="button" class="profile-manage-button" (click)="openPublicProfiles()"
+              aria-label="Manage public profiles">
+              <mat-icon>open_in_new</mat-icon>
+            </button>
+          </div>
           }
         </mat-card-content>
       </mat-card>
@@ -283,17 +265,15 @@
             <mat-icon>edit_note</mat-icon>
           </div>
           <mat-card-title>Message content</mat-card-title>
-          <mat-card-subtitle>Text and font for the public {{ isCommentMode() ? 'comment' : 'message' }}</mat-card-subtitle>
+          <mat-card-subtitle>Text and font for the public {{ isCommentMode() ? 'comment' : 'message'
+            }}</mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content>
           <form [formGroup]="form" class="form-grid">
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Message text</mat-label>
-              <textarea
-                matInput
-                rows="8"
-                formControlName="message"
+              <textarea matInput rows="8" formControlName="message"
                 placeholder="Write the public message here"></textarea>
             </mat-form-field>
 
@@ -310,40 +290,37 @@
 
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Text style</mat-label>
-                <mat-select
-                  #styleSelect
-                  formControlName="style"
-                  (openedChange)="handleStyleSelectOpenedChange($event)"
-                  (keydown)="handleStyleSelectKeydown()"
-                  (selectionChange)="resetPreviewStyle()">
+              <mat-select #styleSelect formControlName="style" (openedChange)="handleStyleSelectOpenedChange($event)"
+                (keydown)="handleStyleSelectKeydown()" (selectionChange)="resetPreviewStyle()">
                 <mat-select-trigger>
                   @if (selectedStyleOption(); as selected) {
-                    <span class="style-select-trigger" [style.font-family]="selected.fontFamily">
-                      {{ selected.fontFamily }}
-                    </span>
+                  <span class="style-select-trigger" [style.font-family]="selected.fontFamily">
+                    {{ selected.fontFamily }}
+                  </span>
                   } @else if (profileDefaultStyleOption(); as defaultOption) {
-                    <span class="style-select-trigger" [style.font-family]="defaultOption.fontFamily">
-                      Profile default • {{ defaultOption.fontFamily }}
-                    </span>
+                  <span class="style-select-trigger" [style.font-family]="defaultOption.fontFamily">
+                    Profile default • {{ defaultOption.fontFamily }}
+                  </span>
                   } @else {
-                    <span class="style-select-placeholder">Choose a text style</span>
+                  <span class="style-select-placeholder">Choose a text style</span>
                   }
                 </mat-select-trigger>
 
                 @for (option of styleOptions; track trackStyleOption($index, option)) {
-                  <mat-option [value]="option.style" (mouseenter)="previewStyleOption(option.style)">
-                    <div class="style-option-row">
-                      <span class="style-option-name" [style.font-family]="option.fontFamily">
-                        {{ option.fontFamily }}
-                      </span>
-                      <span class="style-option-sample" [style.font-family]="option.fontFamily">
-                        Aa Bb Cc
-                      </span>
-                    </div>
-                  </mat-option>
+                <mat-option [value]="option.style" (mouseenter)="previewStyleOption(option.style)">
+                  <div class="style-option-row">
+                    <span class="style-option-name" [style.font-family]="option.fontFamily">
+                      {{ option.fontFamily }}
+                    </span>
+                    <span class="style-option-sample" [style.font-family]="option.fontFamily">
+                      Aa Bb Cc
+                    </span>
+                  </div>
+                </mat-option>
                 }
               </mat-select>
-              <mat-hint>Uses the same font styles as the public MessageDrop app. Clear the field to use the selected profile default.</mat-hint>
+              <mat-hint>Uses the same font styles as the public MessageDrop app. Clear the field to use the selected
+                profile default.</mat-hint>
             </mat-form-field>
 
           </form>
@@ -366,19 +343,12 @@
               <div class="location-search">
                 <mat-form-field appearance="outline" class="full-width">
                   <mat-label>Location search</mat-label>
-                  <input
-                    matInput
-                    [formControl]="locationSearchControl"
-                    placeholder="Search for a city, street or place"
-                    [disabled]="locationSearchControl.disabled"
-                    (keydown.enter)="searchLocations()" />
+                  <input matInput [formControl]="locationSearchControl" placeholder="Search for a city, street or place"
+                    [disabled]="locationSearchControl.disabled" (keydown.enter)="searchLocations()" />
                 </mat-form-field>
 
                 <div class="inline-actions">
-                  <button
-                    mat-stroked-button
-                    type="button"
-                    (click)="searchLocations()"
+                  <button mat-stroked-button type="button" (click)="searchLocations()"
                     [disabled]="locationSearchLoading() || locationSearchControl.disabled">
                     <mat-icon>search</mat-icon>
                     Search
@@ -386,26 +356,27 @@
                 </div>
 
                 @if (locationSearchLoading()) {
-                  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
                 }
 
                 @if (locationSearchResults().length > 0) {
-                  <div class="location-results">
-                    @for (place of locationSearchResults(); track trackLocationResult($index, place)) {
-                      <button type="button" class="location-result" (click)="selectLocationResult(place)" [disabled]="locationSearchControl.disabled">
-                        <span class="location-result-title">{{ place.name || place.display_name }}</span>
-                        @if (place.name && place.display_name) {
-                          <span class="location-result-subtitle">{{ place.display_name }}</span>
-                        }
-                      </button>
+                <div class="location-results">
+                  @for (place of locationSearchResults(); track trackLocationResult($index, place)) {
+                  <button type="button" class="location-result" (click)="selectLocationResult(place)"
+                    [disabled]="locationSearchControl.disabled">
+                    <span class="location-result-title">{{ place.name || place.display_name }}</span>
+                    @if (place.name && place.display_name) {
+                    <span class="location-result-subtitle">{{ place.display_name }}</span>
                     }
-                  </div>
+                  </button>
+                  }
+                </div>
                 }
 
                 @if (!hasSelectedLocation()) {
-                  <p class="location-error">
-                    A location is required. Please search and select a place before saving.
-                  </p>
+                <p class="location-error">
+                  A location is required. Please search and select a place before saving.
+                </p>
                 }
 
                 <p class="location-help">
@@ -416,41 +387,35 @@
 
             <div class="location-selection-column">
               @if (hasSelectedLocation()) {
-                <div class="selected-location-panel">
-                  <div class="selected-location-panel-head">
-                    <h3>Selected location</h3>
-                    <div class="selected-location-panel-actions">
-                      <button
-                        mat-icon-button
-                        type="button"
-                        (click)="openLocationMapDialog()"
-                        [disabled]="locationSearchControl.disabled"
-                        aria-label="Adjust location on map">
-                        <mat-icon>map</mat-icon>
-                      </button>
-                      <button mat-icon-button type="button" (click)="clearLocation()" [disabled]="locationSearchControl.disabled" aria-label="Clear selected location">
-                        <mat-icon>delete</mat-icon>
-                      </button>
-                    </div>
+              <div class="selected-location-panel">
+                <div class="selected-location-panel-head">
+                  <h3>Selected location</h3>
+                  <div class="selected-location-panel-actions">
+                    <button mat-icon-button type="button" (click)="openLocationMapDialog()"
+                      [disabled]="locationSearchControl.disabled" aria-label="Adjust location on map">
+                      <mat-icon>map</mat-icon>
+                    </button>
+                    <button mat-icon-button type="button" (click)="clearLocation()"
+                      [disabled]="locationSearchControl.disabled" aria-label="Clear selected location">
+                      <mat-icon>delete</mat-icon>
+                    </button>
                   </div>
-
-                  <p class="selected-location-panel-name">{{ activeLocationLabel() }}</p>
-
-                  @if (locationMapEmbedUrl(); as mapUrl) {
-                    <div class="location-map">
-                      <iframe
-                        [src]="mapUrl"
-                        title="Selected location map"
-                        loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade"></iframe>
-                    </div>
-                  }
                 </div>
+
+                <p class="selected-location-panel-name">{{ activeLocationLabel() }}</p>
+
+                @if (locationMapEmbedUrl(); as mapUrl) {
+                <div class="location-map">
+                  <iframe [src]="mapUrl" title="Selected location map" loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+                }
+              </div>
               } @else {
-                <div class="selected-location-panel selected-location-panel-empty">
-                  <h3>No location selected</h3>
-                  <p>Search for a place on the left to see the selected location and a small map here.</p>
-                </div>
+              <div class="selected-location-panel selected-location-panel-empty">
+                <h3>No location selected</h3>
+                <p>Search for a place on the left to see the selected location and a small map here.</p>
+              </div>
               }
             </div>
           </div>
@@ -476,7 +441,8 @@
               </mat-form-field>
 
               <div class="inline-actions">
-                <button mat-stroked-button type="button" (click)="importExternalMultimedia()" [disabled]="mediaLoading() || mediaUrlControl.disabled">
+                <button mat-stroked-button type="button" (click)="importExternalMultimedia()"
+                  [disabled]="mediaLoading() || mediaUrlControl.disabled">
                   <mat-icon>download</mat-icon>
                   Import media
                 </button>
@@ -487,74 +453,80 @@
               <div class="tenor-head">
                 <mat-form-field appearance="outline" class="full-width">
                   <mat-label>Search Tenor</mat-label>
-                  <input matInput [formControl]="tenorControl" placeholder="Search GIFs" (keydown.enter)="searchTenor()" />
+                  <input matInput [formControl]="tenorControl" placeholder="Search GIFs"
+                    (keydown.enter)="searchTenor()" />
                 </mat-form-field>
 
                 <div class="inline-actions">
-                  <button mat-stroked-button type="button" (click)="searchTenor()" [disabled]="tenorControl.disabled || tenorLoading()">
+                  <button mat-stroked-button type="button" (click)="searchTenor()"
+                    [disabled]="tenorControl.disabled || tenorLoading()">
                     <mat-icon>search</mat-icon>
                     Search
                   </button>
-                  <button mat-stroked-button type="button" (click)="loadFeaturedTenor()" [disabled]="tenorControl.disabled || tenorLoading()">
+                  <button mat-stroked-button type="button" (click)="loadFeaturedTenor()"
+                    [disabled]="tenorControl.disabled || tenorLoading()">
                     <mat-icon>whatshot</mat-icon>
                     Featured
                   </button>
                   @if (tenorNext()) {
-                    <button mat-stroked-button type="button" (click)="loadMoreTenor()" [disabled]="tenorControl.disabled || tenorLoading()">
-                      <mat-icon>arrow_forward</mat-icon>
-                      More
-                    </button>
+                  <button mat-stroked-button type="button" (click)="loadMoreTenor()"
+                    [disabled]="tenorControl.disabled || tenorLoading()">
+                    <mat-icon>arrow_forward</mat-icon>
+                    More
+                  </button>
                   }
                 </div>
               </div>
 
               @if (tenorResults().length > 0) {
-                <div class="tenor-grid">
-                  @for (result of tenorResults(); track trackTenorResult($index, result)) {
-                    <button type="button" class="tenor-result" (click)="selectTenorResult(result)" [disabled]="form.disabled">
-                      <img [src]="result.media_formats.gif.url" [alt]="result.title || 'Tenor GIF'" />
-                    </button>
-                  }
-                </div>
+              <div class="tenor-grid">
+                @for (result of tenorResults(); track trackTenorResult($index, result)) {
+                <button type="button" class="tenor-result" (click)="selectTenorResult(result)"
+                  [disabled]="form.disabled">
+                  <img [src]="result.media_formats.gif.url" [alt]="result.title || 'Tenor GIF'" />
+                </button>
+                }
+              </div>
               }
             </div>
 
             <div class="media-selection-column">
               @if (hasMedia()) {
-                <div class="selected-media">
-                  <div class="selected-media-head">
-                    <h3>Selected media</h3>
-                    <button mat-icon-button type="button" (click)="removeMultimedia()" [disabled]="form.disabled" aria-label="Remove media">
-                      <mat-icon>delete</mat-icon>
-                    </button>
-                  </div>
-
-                  <p class="media-type">{{ multimedia().type }}</p>
-                  @if (multimedia().title) {
-                    <p class="media-title">{{ multimedia().title }}</p>
-                  }
-                  @if (multimedia().description) {
-                    <p class="media-description">{{ multimedia().description }}</p>
-                  }
-                  @if (multimedia().sourceUrl) {
-                    <a [href]="multimedia().sourceUrl" target="_blank" rel="noopener">Open original source</a>
-                  }
-
-                  @if (multimedia().type === 'tenor' && multimedia().url) {
-                    <img class="tenor-preview" [src]="multimedia().url" [alt]="multimedia().title || 'Selected GIF'" />
-                  } @else if (tiktokEmbedUrl(); as tiktokUrl) {
-                    <div class="oembed-preview oembed-preview-tiktok">
-                      <iframe [src]="tiktokUrl" title="TikTok preview" loading="lazy" allowfullscreen></iframe>
-                    </div>
-                  } @else if (safeOembedHtml()) {
-                    <div class="oembed-preview" [innerHTML]="safeOembedHtml()"></div>
-                  }
+              <div class="selected-media">
+                <div class="selected-media-head">
+                  <h3>Selected media</h3>
+                  <button mat-icon-button type="button" (click)="removeMultimedia()" [disabled]="form.disabled"
+                    aria-label="Remove media">
+                    <mat-icon>delete</mat-icon>
+                  </button>
                 </div>
+
+                <p class="media-type">{{ multimedia().type }}</p>
+                @if (multimedia().title) {
+                <p class="media-title">{{ multimedia().title }}</p>
+                }
+                @if (multimedia().description) {
+                <p class="media-description">{{ multimedia().description }}</p>
+                }
+                @if (multimedia().sourceUrl) {
+                <a [href]="multimedia().sourceUrl" target="_blank" rel="noopener">Open original source</a>
+                }
+
+                @if (multimedia().type === 'tenor' && multimedia().url) {
+                <img class="tenor-preview" [src]="multimedia().url" [alt]="multimedia().title || 'Selected GIF'" />
+                } @else if (tiktokEmbedUrl(); as tiktokUrl) {
+                <div class="oembed-preview oembed-preview-tiktok">
+                  <iframe [src]="tiktokUrl" title="TikTok preview" loading="lazy" allowfullscreen></iframe>
+                </div>
+                } @else if (safeOembedHtml()) {
+                <div class="oembed-preview" [innerHTML]="safeOembedHtml()"></div>
+                }
+              </div>
               } @else {
-                <div class="selected-media selected-media-empty">
-                  <h3>No media selected</h3>
-                  <p>Import an external URL or pick a Tenor GIF to see the selected media here.</p>
-                </div>
+              <div class="selected-media selected-media-empty">
+                <h3>No media selected</h3>
+                <p>Import an external URL or pick a Tenor GIF to see the selected media here.</p>
+              </div>
               }
             </div>
           </div>
@@ -573,15 +545,13 @@
         <mat-card-content>
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Add hashtags</mat-label>
-            <input
-              matInput
-              [formControl]="hashtagControl"
-              placeholder="#travel, #news"
+            <input matInput [formControl]="hashtagControl" placeholder="#travel, #news"
               (keydown)="onHashtagKeydown($event)" />
           </mat-form-field>
 
           <div class="inline-actions">
-            <button mat-stroked-button type="button" (click)="addHashtagsFromInput()" [disabled]="hashtagControl.disabled">
+            <button mat-stroked-button type="button" (click)="addHashtagsFromInput()"
+              [disabled]="hashtagControl.disabled">
               <mat-icon>add</mat-icon>
               Add hashtags
             </button>
@@ -589,14 +559,14 @@
 
           <mat-chip-grid aria-label="Selected hashtags">
             @for (tag of hashtags(); track tag) {
-              <mat-chip-row (removed)="removeHashtag(tag)">
-                #{{ tag }}
-                @if (!hashtagControl.disabled) {
-                  <button matChipRemove type="button" aria-label="Remove hashtag">
-                    <mat-icon>cancel</mat-icon>
-                  </button>
-                }
-              </mat-chip-row>
+            <mat-chip-row (removed)="removeHashtag(tag)">
+              #{{ tag }}
+              @if (!hashtagControl.disabled) {
+              <button matChipRemove type="button" aria-label="Remove hashtag">
+                <mat-icon>cancel</mat-icon>
+              </button>
+              }
+            </mat-chip-row>
             }
           </mat-chip-grid>
         </mat-card-content>
@@ -610,7 +580,8 @@
             <mat-icon>visibility</mat-icon>
           </div>
           <mat-card-title>Preview</mat-card-title>
-          <mat-card-subtitle>Live preview of the public {{ isCommentMode() ? 'comment' : 'message' }} card</mat-card-subtitle>
+          <mat-card-subtitle>Live preview of the public {{ isCommentMode() ? 'comment' : 'message' }}
+            card</mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content>
@@ -619,65 +590,63 @@
               <div class="preview-avatar-box">
                 <div class="preview-avatar-icon" aria-hidden="true">
                   @if (profileAvatar()) {
-                    <img [src]="profileAvatar()" [alt]="profileName()" />
+                  <img [src]="profileAvatar()" [alt]="profileName()" />
                   } @else {
-                    <span>{{ profileInitials() }}</span>
+                  <span>{{ profileInitials() }}</span>
                   }
                 </div>
                 <div class="preview-avatar-text">
                   <span class="preview-name">{{ profileName() }}</span>
-                  <span class="preview-timestamp">{{ (currentContent()?.updatedAt ?? previewCreatedAt) | date:'medium' }}</span>
+                  <span class="preview-timestamp">{{ (currentContent()?.updatedAt ?? previewCreatedAt) | date:'medium'
+                    }}</span>
                 </div>
               </div>
 
               <mat-card-content>
                 <div class="preview-message-content">
                   @if (hasMedia()) {
-                    <div class="preview-media">
-                      @if (isImageMultimedia(multimedia())) {
-                        <img [src]="multimedia().url" [alt]="multimedia().title || 'Selected multimedia preview'" />
-                      } @else if (tiktokEmbedUrl(); as tiktokUrl) {
-                        <div
-                          class="preview-oembed preview-oembed-tiktok">
-                          <iframe [src]="tiktokUrl" title="TikTok preview" loading="lazy" allowfullscreen></iframe>
-                        </div>
-                      } @else if (safeOembedHtml()) {
-                        <div
-                          class="preview-oembed"
-                          [class.preview-oembed-youtube]="multimedia().type === 'youtube'"
-                          [class.preview-oembed-spotify]="multimedia().type === 'spotify'"
-                          [class.preview-oembed-tiktok]="multimedia().type === 'tiktok'"
-                          [class.preview-oembed-pinterest]="multimedia().type === 'pinterest'"
-                          [innerHTML]="safeOembedHtml()"></div>
-                      }
+                  <div class="preview-media">
+                    @if (isImageMultimedia(multimedia())) {
+                    <img [src]="multimedia().url" [alt]="multimedia().title || 'Selected multimedia preview'" />
+                    } @else if (tiktokEmbedUrl(); as tiktokUrl) {
+                    <div class="preview-oembed preview-oembed-tiktok">
+                      <iframe [src]="tiktokUrl" title="TikTok preview" loading="lazy" allowfullscreen></iframe>
                     </div>
+                    } @else if (safeOembedHtml()) {
+                    <div class="preview-oembed" [class.preview-oembed-youtube]="multimedia().type === 'youtube'"
+                      [class.preview-oembed-spotify]="multimedia().type === 'spotify'"
+                      [class.preview-oembed-tiktok]="multimedia().type === 'tiktok'"
+                      [class.preview-oembed-pinterest]="multimedia().type === 'pinterest'"
+                      [innerHTML]="safeOembedHtml()"></div>
+                    }
+                  </div>
                   }
 
                   @if (previewMessage()) {
-                    <div class="preview-message-shell" [style]="previewDisplayStyle()">
-                      <p class="preview-message-text">{{ previewMessage() }}</p>
-                    </div>
+                  <div class="preview-message-shell" [style]="previewDisplayStyle()">
+                    <p class="preview-message-text">{{ previewMessage() }}</p>
+                  </div>
                   }
 
                   @if (hashtags().length > 0) {
-                    <div class="preview-hashtag-chip-list" aria-label="Selected hashtags preview">
-                      @for (tag of hashtags(); track tag) {
-                        <span class="preview-hashtag-chip">#{{ tag }}</span>
-                      }
-                    </div>
+                  <div class="preview-hashtag-chip-list" aria-label="Selected hashtags preview">
+                    @for (tag of hashtags(); track tag) {
+                    <span class="preview-hashtag-chip">#{{ tag }}</span>
+                    }
+                  </div>
                   }
 
                   <div class="preview-meta">
                     @if (isCommentMode()) {
-                      <span class="preview-meta-chip" [class.is-missing]="!hasSelectedParentContent()">
-                        <mat-icon aria-hidden="true">reply</mat-icon>
-                        {{ hasSelectedParentContent() ? previewParentLabel() : 'No parent content selected' }}
-                      </span>
+                    <span class="preview-meta-chip" [class.is-missing]="!hasSelectedParentContent()">
+                      <mat-icon aria-hidden="true">reply</mat-icon>
+                      {{ hasSelectedParentContent() ? previewParentLabel() : 'No parent content selected' }}
+                    </span>
                     } @else {
-                      <span class="preview-meta-chip" [class.is-missing]="!hasSelectedLocation()">
-                        <mat-icon aria-hidden="true">location_on</mat-icon>
-                        {{ hasSelectedLocation() ? activeLocationLabel() : 'No location selected' }}
-                      </span>
+                    <span class="preview-meta-chip" [class.is-missing]="!hasSelectedLocation()">
+                      <mat-icon aria-hidden="true">location_on</mat-icon>
+                      {{ hasSelectedLocation() ? activeLocationLabel() : 'No location selected' }}
+                    </span>
                     }
                   </div>
                 </div>
@@ -716,66 +685,57 @@
           <div mat-card-avatar class="avatar avatar-accent">
             <mat-icon>smart_toy</mat-icon>
           </div>
-          <div class="ai-card-header-copy">
-            <mat-card-title>AI tools</mat-card-title>
-            <mat-card-subtitle>
-              AI support for this {{ isCommentMode() ? 'comment' : 'message' }}.
-            </mat-card-subtitle>
-          </div>
+          <mat-card-title>AI tools</mat-card-title>
+          <mat-card-subtitle>
+            {{ aiModelLabel() }}
+          </mat-card-subtitle>
 
-          <button
-            mat-icon-button
-            type="button"
-            class="ai-settings-button avatar avatar-neutral"
-            (click)="openAiSettings()"
-            aria-label="Open AI settings">
+          <button mat-icon-button type="button" class="ai-settings-button avatar avatar-neutral"
+            (click)="openAiSettings()" aria-label="Open AI settings">
             <mat-icon>settings_suggest</mat-icon>
           </button>
         </mat-card-header>
 
         <mat-card-content class="ai-card-content">
-          <div class="ai-model-row">
-            <span class="ai-model-chip">
-              <mat-icon>model_training</mat-icon>
-              {{ aiModelLabel() }}
-            </span>
-
-            @if (aiSettingsLoading()) {
-              <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-            }
-          </div>
+          @if (aiSettingsLoading()) {
+          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+          }
 
           @if (!aiConfigured()) {
-            <p class="ai-hint ai-hint-warn">
-              Add an OpenAI API key in the admin backend to enable these tools.
-            </p>
+          <p class="ai-hint ai-hint-warn">
+            Add an OpenAI API key in the admin backend to enable these tools.
+          </p>
           } @else if (isPublished()) {
-            <p class="ai-hint ai-hint-warn">
-              Withdraw the public {{ isCommentMode() ? 'comment' : 'message' }} first before applying AI changes.
-            </p>
+          <p class="ai-hint ai-hint-warn">
+            Withdraw the public {{ isCommentMode() ? 'comment' : 'message' }} first before applying AI changes.
+          </p>
           } @else if (isDeleted()) {
-            <p class="ai-hint ai-hint-warn">
-              Deleted content cannot be changed with AI tools.
-            </p>
+          <p class="ai-hint ai-hint-warn">
+            Deleted content cannot be changed with AI tools.
+          </p>
           }
 
           <div class="ai-action-grid">
-            <button mat-stroked-button type="button" (click)="openAiToolDialog('proofread')" [disabled]="!canUseAiTools() || !hasAiTextSource()">
+            <button mat-stroked-button type="button" (click)="openAiToolDialog('proofread')"
+              [disabled]="!canUseAiTools() || !hasAiTextSource()">
               <mat-icon>spellcheck</mat-icon>
               Proofread
             </button>
 
-            <button mat-stroked-button type="button" (click)="openAiToolDialog('rewrite')" [disabled]="!canUseAiTools() || !hasAiTextSource()">
+            <button mat-stroked-button type="button" (click)="openAiToolDialog('rewrite')"
+              [disabled]="!canUseAiTools() || !hasAiTextSource()">
               <mat-icon>auto_fix_high</mat-icon>
               Rewrite
             </button>
 
-            <button mat-stroked-button type="button" (click)="openAiToolDialog('translate')" [disabled]="!canUseAiTools() || !hasAiTextSource()">
+            <button mat-stroked-button type="button" (click)="openAiToolDialog('translate')"
+              [disabled]="!canUseAiTools() || !hasAiTextSource()">
               <mat-icon>translate</mat-icon>
               Translate
             </button>
 
-            <button mat-stroked-button type="button" (click)="openAiToolDialog('hashtags')" [disabled]="!canUseAiTools() || !hasAiContext()">
+            <button mat-stroked-button type="button" (click)="openAiToolDialog('hashtags')"
+              [disabled]="!canUseAiTools() || !hasAiContext()">
               <mat-icon>tag</mat-icon>
               Hashtags
             </button>
@@ -786,143 +746,132 @@
   </div>
 
   @if (currentContent()) {
-    <mat-card class="comment-thread-card">
-      <mat-card-header class="comment-thread-header">
-        <div mat-card-avatar class="avatar avatar-neutral">
-          <mat-icon>forum</mat-icon>
-        </div>
-        <div class="comment-thread-header-copy">
-          <mat-card-title>{{ childCommentsTitle() }}</mat-card-title>
-          <mat-card-subtitle>{{ childCommentsSubtitle() }}</mat-card-subtitle>
-        </div>
+  <mat-card class="comment-thread-card">
+    <mat-card-header class="comment-thread-header">
+      <div mat-card-avatar class="avatar avatar-neutral">
+        <mat-icon>forum</mat-icon>
+      </div>
+      <div class="comment-thread-header-copy">
+        <mat-card-title>{{ childCommentsTitle() }}</mat-card-title>
+        <mat-card-subtitle>{{ childCommentsSubtitle() }}</mat-card-subtitle>
+      </div>
 
-        @if (canCreateCommentFromCurrent()) {
-          <button
-            mat-icon-button
-            type="button"
-            class="comment-thread-header-action avatar avatar-neutral"
-            (click)="createCommentFromCurrent()"
-            aria-label="Create comment">
-            <mat-icon>add_comment</mat-icon>
-          </button>
-        }
-      </mat-card-header>
+      @if (canCreateCommentFromCurrent()) {
+      <button mat-icon-button type="button" class="comment-thread-header-action avatar avatar-neutral"
+        (click)="createCommentFromCurrent()" aria-label="Create comment">
+        <mat-icon>add_comment</mat-icon>
+      </button>
+      }
+    </mat-card-header>
 
-      <mat-card-content>
-        @if (childCommentsLoading()) {
-          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-        }
+    <mat-card-content>
+      @if (childCommentsLoading()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      }
 
-        @if (childComments().length > 0) {
-          <div class="tiles-container comment-tiles-container">
-            @for (row of childComments(); track trackChildComment($index, row)) {
-              <mat-card class="content-tile comment-thread-tile" (click)="openChildComment(row)" tabindex="0" (keydown.enter)="openChildComment(row)">
-                <div class="content-preview-avatar-box">
-                  <div class="content-preview-avatar-icon" aria-hidden="true">
-                    @if (childProfileAvatar(row)) {
-                      <img [src]="childProfileAvatar(row)" [alt]="childProfileName(row)" />
-                    } @else {
-                      <span>{{ childProfileInitials(row) }}</span>
-                    }
-                  </div>
-                  <div class="content-preview-avatar-text">
-                    <span class="content-preview-name">{{ childProfileName(row) }}</span>
-                    <span class="content-preview-timestamp">{{ row.authorUsername }} • {{ row.updatedAt | date:'dd.MM.yyyy HH:mm' }}</span>
-                  </div>
-                  <span class="status-pill content-preview-status" [class]="'status-pill content-preview-status ' + statusClass(row.status)">
-                    <mat-icon>{{ statusIcon(row.status) }}</mat-icon>
-                    {{ formatStatus(row.status) }}
-                  </span>
-                </div>
+      @if (childComments().length > 0) {
+      <div class="tiles-container comment-tiles-container">
+        @for (row of childComments(); track trackChildComment($index, row)) {
+        <mat-card class="content-tile comment-thread-tile" (click)="openChildComment(row)" tabindex="0"
+          (keydown.enter)="openChildComment(row)">
+          <div class="content-preview-avatar-box">
+            <div class="content-preview-avatar-icon" aria-hidden="true">
+              @if (childProfileAvatar(row)) {
+              <img [src]="childProfileAvatar(row)" [alt]="childProfileName(row)" />
+              } @else {
+              <span>{{ childProfileInitials(row) }}</span>
+              }
+            </div>
+            <div class="content-preview-avatar-text">
+              <span class="content-preview-name">{{ childProfileName(row) }}</span>
+              <span class="content-preview-timestamp">{{ row.authorUsername }} • {{ row.updatedAt | date:'dd.MM.yyyy
+                HH:mm' }}</span>
+            </div>
+            <span class="status-pill content-preview-status"
+              [class]="'status-pill content-preview-status ' + statusClass(row.status)">
+              <mat-icon>{{ statusIcon(row.status) }}</mat-icon>
+              {{ formatStatus(row.status) }}
+            </span>
+          </div>
 
-                <mat-card-content class="tile-content content-preview-body">
-                  @if (childHasImageMultimedia(row)) {
-                    <div class="content-preview-media">
-                      <img [src]="row.multimedia.url" [alt]="row.multimedia.title || 'Selected multimedia preview'" />
-                    </div>
-                  } @else if (row.multimedia.type !== 'undefined' && (row.multimedia.title || row.multimedia.description)) {
-                    <div class="content-preview-media-summary">
-                      <span class="content-preview-media-type">{{ mediaTypeLabel(row.multimedia.type) }}</span>
-                      @if (row.multimedia.title) {
-                        <strong>{{ row.multimedia.title }}</strong>
-                      }
-                      @if (row.multimedia.description) {
-                        <span>{{ row.multimedia.description }}</span>
-                      }
-                    </div>
-                  }
-
-                  @if (childTilePreview(row)) {
-                    <div class="content-preview-message-shell" [style]="row.message ? childResolvedStyle(row) : ''">
-                      <p class="content-preview-message-text">{{ childTilePreview(row) }}</p>
-                    </div>
-                  }
-
-                  @if (row.hashtags.length > 0) {
-                    <div class="content-preview-hashtag-list" aria-label="Hashtags">
-                      @for (tag of row.hashtags; track tag) {
-                        <span class="content-preview-hashtag-chip">#{{ tag }}</span>
-                      }
-                    </div>
-                  }
-
-                  <div class="content-preview-meta">
-                    <span class="content-preview-meta-chip content-preview-meta-chip-muted">
-                      <mat-icon>{{ typeIcon(row.contentType) }}</mat-icon>
-                      {{ typeLabel(row.contentType) }}
-                    </span>
-
-                    <span class="content-preview-meta-chip">
-                      <mat-icon>{{ row.contentType === 'comment' ? 'reply' : 'location_on' }}</mat-icon>
-                      {{ childLocationLabel(row) }}
-                    </span>
-
-                    @if (row.multimedia.type !== 'undefined') {
-                      <span class="content-preview-meta-chip content-preview-meta-chip-muted">
-                        <mat-icon>perm_media</mat-icon>
-                        {{ mediaTypeLabel(row.multimedia.type) }}
-                      </span>
-                    }
-                  </div>
-                </mat-card-content>
-
-                <mat-card-actions class="card-actions content-preview-actions">
-                  <div class="content-preview-action-bar">
-                    <button
-                      mat-icon-button
-                      type="button"
-                      class="content-preview-action-button action-neutral"
-                      (click)="openChildComment(row); $event.stopPropagation()"
-                      aria-label="Open comment">
-                      <mat-icon>visibility</mat-icon>
-                    </button>
-
-                    @if (childCommentCount(row) > 0) {
-                      <button
-                        mat-icon-button
-                        type="button"
-                        class="content-preview-action-button action-secondary"
-                        (click)="openChildComment(row); $event.stopPropagation()"
-                        [matBadge]="childCommentCount(row)"
-                        [matBadgeHidden]="childCommentCount(row) === 0"
-                        matBadgeColor="primary"
-                        matBadgeOverlap="false"
-                        aria-label="Open replies">
-                        <mat-icon>forum</mat-icon>
-                      </button>
-                    }
-                  </div>
-                </mat-card-actions>
-              </mat-card>
+          <mat-card-content class="tile-content content-preview-body">
+            @if (childHasImageMultimedia(row)) {
+            <div class="content-preview-media">
+              <img [src]="row.multimedia.url" [alt]="row.multimedia.title || 'Selected multimedia preview'" />
+            </div>
+            } @else if (row.multimedia.type !== 'undefined' && (row.multimedia.title || row.multimedia.description)) {
+            <div class="content-preview-media-summary">
+              <span class="content-preview-media-type">{{ mediaTypeLabel(row.multimedia.type) }}</span>
+              @if (row.multimedia.title) {
+              <strong>{{ row.multimedia.title }}</strong>
+              }
+              @if (row.multimedia.description) {
+              <span>{{ row.multimedia.description }}</span>
+              }
+            </div>
             }
-          </div>
-        } @else if (!childCommentsLoading()) {
-          <div class="empty-state comment-thread-empty-state">
-            <mat-icon>forum</mat-icon>
-            <div>No direct comments yet.</div>
-          </div>
+
+            @if (childTilePreview(row)) {
+            <div class="content-preview-message-shell" [style]="row.message ? childResolvedStyle(row) : ''">
+              <p class="content-preview-message-text">{{ childTilePreview(row) }}</p>
+            </div>
+            }
+
+            @if (row.hashtags.length > 0) {
+            <div class="content-preview-hashtag-list" aria-label="Hashtags">
+              @for (tag of row.hashtags; track tag) {
+              <span class="content-preview-hashtag-chip">#{{ tag }}</span>
+              }
+            </div>
+            }
+
+            <div class="content-preview-meta">
+              <span class="content-preview-meta-chip content-preview-meta-chip-muted">
+                <mat-icon>{{ typeIcon(row.contentType) }}</mat-icon>
+                {{ typeLabel(row.contentType) }}
+              </span>
+
+              <span class="content-preview-meta-chip">
+                <mat-icon>{{ row.contentType === 'comment' ? 'reply' : 'location_on' }}</mat-icon>
+                {{ childLocationLabel(row) }}
+              </span>
+
+              @if (row.multimedia.type !== 'undefined') {
+              <span class="content-preview-meta-chip content-preview-meta-chip-muted">
+                <mat-icon>perm_media</mat-icon>
+                {{ mediaTypeLabel(row.multimedia.type) }}
+              </span>
+              }
+            </div>
+          </mat-card-content>
+
+          <mat-card-actions class="card-actions content-preview-actions">
+            <div class="content-preview-action-bar">
+              <button mat-icon-button type="button" class="content-preview-action-button action-neutral"
+                (click)="openChildComment(row); $event.stopPropagation()" aria-label="Open comment">
+                <mat-icon>visibility</mat-icon>
+              </button>
+
+              @if (childCommentCount(row) > 0) {
+              <button mat-icon-button type="button" class="content-preview-action-button action-secondary"
+                (click)="openChildComment(row); $event.stopPropagation()" [matBadge]="childCommentCount(row)"
+                [matBadgeHidden]="childCommentCount(row) === 0" matBadgeColor="primary" matBadgeOverlap="false"
+                aria-label="Open replies">
+                <mat-icon>forum</mat-icon>
+              </button>
+              }
+            </div>
+          </mat-card-actions>
+        </mat-card>
         }
-      </mat-card-content>
-    </mat-card>
+      </div>
+      } @else if (!childCommentsLoading()) {
+      <div class="empty-state comment-thread-empty-state">
+        <mat-icon>forum</mat-icon>
+        <div>No direct comments yet.</div>
+      </div>
+      }
+    </mat-card-content>
+  </mat-card>
   }
 </div>

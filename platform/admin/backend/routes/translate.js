@@ -4,12 +4,29 @@ const deepl = require('deepl-node');
 const { requireAdminJwt } = require('../middleware/security');
 const { apiError } = require('../middleware/api-error');
 
-const translator = new deepl.Translator(process.env.DEEPL_API_KEY);
+function getTranslator() {
+    const authKey = typeof process.env.DEEPL_API_KEY === 'string'
+        ? process.env.DEEPL_API_KEY.trim()
+        : '';
+
+    if (!authKey) {
+        throw apiError.serviceUnavailable('deepl_not_configured');
+    }
+
+    return new deepl.Translator(authKey);
+}
 
 router.use(requireAdminJwt);
 
 router.get('/:language/:value', function (req, res, next) {
     let response = { 'status': 0 };
+    let translator;
+    try {
+        translator = getTranslator();
+    } catch (error) {
+        return next(error);
+    }
+
     translator
         .translateText(req.params.value, null, req.params.language)
         .then((result) => {

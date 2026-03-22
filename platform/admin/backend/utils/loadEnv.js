@@ -10,7 +10,7 @@ function loadEnv() {
 
   const candidates = [
     path.resolve(__dirname, '../.env'),
-    path.resolve(__dirname, '../../../.env')
+    path.resolve(__dirname, '../../../../.env')
   ];
 
   for (const candidate of candidates) {
