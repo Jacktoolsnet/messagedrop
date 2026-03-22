@@ -49,7 +49,6 @@ export class PublicContentLocationMapDialogComponent implements AfterViewInit, O
   readonly selectedLongitude = signal(this.data.longitude);
   readonly selectedLabel = signal(this.data.label.trim() || this.formatCoordinates(this.data.latitude, this.data.longitude));
   readonly reverseLookupPending = signal(false);
-  readonly reverseLookupError = signal('');
   readonly selectedCoordinatesText = computed(() => (
     `${this.selectedLatitude().toFixed(5)}, ${this.selectedLongitude().toFixed(5)}`
   ));
@@ -119,7 +118,6 @@ export class PublicContentLocationMapDialogComponent implements AfterViewInit, O
     this.selectedLongitude.set(longitude);
     this.marker?.setLatLng([latitude, longitude]);
     this.map?.panTo([latitude, longitude]);
-    this.reverseLookupError.set('');
     this.selectedLabel.set(this.formatCoordinates(latitude, longitude));
 
     const token = ++this.reverseLookupToken;
@@ -144,7 +142,6 @@ export class PublicContentLocationMapDialogComponent implements AfterViewInit, O
           if (token !== this.reverseLookupToken) {
             return;
           }
-          this.reverseLookupError.set('Address lookup failed. You can still use the selected coordinates.');
           this.selectedLabel.set(this.formatCoordinates(latitude, longitude));
         }
       });

@@ -25,10 +25,6 @@
     @if (reverseLookupPending()) {
       <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     }
-
-    @if (reverseLookupError()) {
-      <p class="selection-error">{{ reverseLookupError() }}</p>
-    }
   </section>
 
   <div #mapElement class="map-container" aria-label="Location picker map"></div>
