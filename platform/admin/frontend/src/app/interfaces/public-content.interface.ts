@@ -25,6 +25,7 @@ export interface PublicContent {
     publicProfileName: string;
   } | null;
   publicProfile: PublicProfileSummary | null;
+  childCommentCount: number;
   lastEditorAdminUserId: string | null;
   lastEditorUsername: string | null;
   publisherAdminUserId: string | null;

@@ -36,17 +36,23 @@ export class PublicContentService {
   loadPublicContent(filters: PublicContentFilters = {}): void {
     this._loading.set(true);
 
-    this.http.get<PublicContentListResponse>(`${this.baseUrl}/public-messages`, {
-      params: this.buildListParams(filters)
-    }).pipe(
+    this.listPublicContent(filters).pipe(
       catchError((error) => {
         this.handleError(error, 'Could not load public content.');
-        return of({ status: 0, rows: [] });
+        return of([]);
       }),
       finalize(() => this._loading.set(false))
-    ).subscribe((response) => {
-      this._rows.set(response.rows ?? []);
+    ).subscribe((rows) => {
+      this._rows.set(rows);
     });
+  }
+
+  listPublicContent(filters: PublicContentFilters = {}): Observable<PublicContent[]> {
+    return this.http.get<PublicContentListResponse>(`${this.baseUrl}/public-messages`, {
+      params: this.buildListParams(filters)
+    }).pipe(
+      map((response) => response.rows ?? [])
+    );
   }
 
   getPublicContent(id: string): Observable<PublicContent> {
@@ -132,6 +138,9 @@ export class PublicContentService {
     }
     if (filters.contentType && filters.contentType !== 'all') {
       params = params.set('contentType', filters.contentType);
+    }
+    if (filters.parentContentId?.trim()) {
+      params = params.set('parentContentId', filters.parentContentId.trim());
     }
     if (filters.q?.trim()) {
       params = params.set('q', filters.q.trim());

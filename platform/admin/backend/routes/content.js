@@ -172,6 +172,7 @@ function toContentDto(row) {
         defaultStyle: row.publicProfileDefaultStyle || ''
       }
       : null,
+    childCommentCount: Number(row.childCommentCount || 0),
     lastEditorAdminUserId: row.lastEditorAdminUserId || null,
     lastEditorUsername: row.lastEditorUsername || null,
     publisherAdminUserId: row.publisherAdminUserId || null,
@@ -411,8 +412,118 @@ function getPublicContentById(db, contentId) {
   });
 }
 
-function cascadeChildCommentStatus(db, parentContentId, nextStatus) {
+async function validateCommentParent(db, parentContentId, currentContentId = null) {
+  const normalizedParentId = normalizeString(parentContentId) || null;
+  const normalizedCurrentId = normalizeString(currentContentId) || null;
+
+  if (!normalizedParentId) {
+    throw apiError.unprocessableEntity('Please choose parent content before saving this comment');
+  }
+  if (normalizedCurrentId && normalizedParentId === normalizedCurrentId) {
+    throw apiError.conflict('A message cannot be the parent of itself');
+  }
+
+  const parentContent = await getPublicContentById(db, normalizedParentId);
+  if (!parentContent) {
+    throw apiError.notFound('The selected parent content no longer exists');
+  }
+  if (parentContent.status === tablePublicContent.contentStatus.DELETED) {
+    throw apiError.conflict('The selected parent content is deleted');
+  }
+
+  if (!normalizedCurrentId) {
+    return parentContent;
+  }
+
+  const visited = new Set([normalizedParentId]);
+  let cursor = parentContent;
+  while (cursor?.parentContentIdResolved || cursor?.parentContentId) {
+    const nextParentId = normalizeString(cursor.parentContentIdResolved || cursor.parentContentId) || null;
+    if (!nextParentId) {
+      break;
+    }
+    if (nextParentId === normalizedCurrentId) {
+      throw apiError.conflict('Parent comments cannot create a circular reply chain');
+    }
+    if (visited.has(nextParentId)) {
+      break;
+    }
+    visited.add(nextParentId);
+    cursor = await getPublicContentById(db, nextParentId);
+    if (!cursor) {
+      break;
+    }
+  }
+
+  return parentContent;
+}
+
+function getDirectPublishedChildCommentIds(db, parentIds) {
+  const normalizedParentIds = Array.from(new Set(
+    (Array.isArray(parentIds) ? parentIds : [])
+      .map((value) => normalizeString(value))
+      .filter(Boolean)
+  ));
+
+  if (normalizedParentIds.length === 0) {
+    return Promise.resolve([]);
+  }
+
   return new Promise((resolve, reject) => {
+    const placeholders = normalizedParentIds.map(() => '?').join(', ');
+    db.all(
+      `
+        SELECT ${tablePublicContent.columns.id} AS id
+        FROM ${tablePublicContent.tableName}
+        WHERE ${tablePublicContent.columns.parentContentId} IN (${placeholders})
+          AND ${tablePublicContent.columns.contentType} = ?
+          AND ${tablePublicContent.columns.status} = ?
+      `,
+      [
+        ...normalizedParentIds,
+        tablePublicContent.contentType.COMMENT,
+        tablePublicContent.contentStatus.PUBLISHED
+      ],
+      (err, rows) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve((rows || []).map((row) => row?.id).filter(Boolean));
+      }
+    );
+  });
+}
+
+async function cascadeChildCommentStatus(db, parentContentId, nextStatus) {
+  const rootId = normalizeString(parentContentId) || null;
+  if (!rootId) {
+    return true;
+  }
+
+  const queue = [rootId];
+  const affectedIds = new Set();
+
+  while (queue.length > 0) {
+    const parentBatch = queue.splice(0, 100);
+    const childIds = await getDirectPublishedChildCommentIds(db, parentBatch);
+    childIds.forEach((childId) => {
+      if (affectedIds.has(childId)) {
+        return;
+      }
+      affectedIds.add(childId);
+      queue.push(childId);
+    });
+  }
+
+  if (affectedIds.size === 0) {
+    return true;
+  }
+
+  const affectedIdList = Array.from(affectedIds);
+  const now = Date.now();
+
+  return new Promise((resolve, reject) => {
+    const placeholders = affectedIdList.map(() => '?').join(', ');
     db.run(
       `
         UPDATE ${tablePublicContent.tableName}
@@ -421,22 +532,18 @@ function cascadeChildCommentStatus(db, parentContentId, nextStatus) {
             ${tablePublicContent.columns.withdrawnAt} = CASE WHEN ? = ? THEN ? ELSE ${tablePublicContent.columns.withdrawnAt} END,
             ${tablePublicContent.columns.deletedAt} = CASE WHEN ? = ? THEN ? ELSE ${tablePublicContent.columns.deletedAt} END,
             ${tablePublicContent.columns.updatedAt} = ?
-        WHERE ${tablePublicContent.columns.parentContentId} = ?
-          AND ${tablePublicContent.columns.contentType} = ?
-          AND ${tablePublicContent.columns.status} = ?
+        WHERE ${tablePublicContent.columns.id} IN (${placeholders})
       `,
       [
         nextStatus,
         nextStatus,
         tablePublicContent.contentStatus.WITHDRAWN,
-        Date.now(),
+        now,
         nextStatus,
         tablePublicContent.contentStatus.DELETED,
-        Date.now(),
-        Date.now(),
-        parentContentId,
-        tablePublicContent.contentType.COMMENT,
-        tablePublicContent.contentStatus.PUBLISHED
+        now,
+        now,
+        ...affectedIdList
       ],
       (err) => {
         if (err) {
@@ -721,6 +828,7 @@ router.get('/public-messages', requireRole(...CONTENT_ROLES), (req, res, next) =
     authorAdminUserId: canSeeAllContent(roles) ? normalizeString(req.query.authorId, '') || undefined : getAdminUserId(req),
     publicProfileId: normalizeString(req.query.publicProfileId, '') || undefined,
     contentType: normalizeString(req.query.contentType, '') || undefined,
+    parentContentId: normalizeString(req.query.parentContentId, '') || undefined,
     status: normalizeString(req.query.status, '') || undefined,
     query: normalizeString(req.query.q, '') || undefined,
     limit: Number(req.query.limit),
@@ -780,19 +888,7 @@ router.post('/public-messages', [requireRole(...CONTENT_ROLES), express.json({ l
     let parentContentId = null;
     if (isCommentPayload(payload)) {
       parentContentId = normalizeString(payload.parentContentId) || null;
-      if (!parentContentId) {
-        return next(apiError.unprocessableEntity('Please choose a parent message before saving this comment'));
-      }
-      const parentContent = await getPublicContentById(req.database.db, parentContentId);
-      if (!parentContent) {
-        return next(apiError.notFound('The selected parent message no longer exists'));
-      }
-      if ((parentContent.contentType || tablePublicContent.contentType.PUBLIC) !== tablePublicContent.contentType.PUBLIC) {
-        return next(apiError.conflict('Comments can currently only be attached to public messages'));
-      }
-      if (parentContent.status === tablePublicContent.contentStatus.DELETED) {
-        return next(apiError.conflict('The selected parent message is deleted'));
-      }
+      await validateCommentParent(req.database.db, parentContentId);
     }
 
     tablePublicContent.create(req.database.db, {
@@ -891,22 +987,7 @@ router.put('/public-messages/:id', [requireRole(...CONTENT_ROLES), express.json(
     let parentContentId = null;
     if (isCommentPayload(payload)) {
       parentContentId = normalizeString(payload.parentContentId) || null;
-      if (!parentContentId) {
-        return next(apiError.unprocessableEntity('Please choose a parent message before saving this comment'));
-      }
-      if (parentContentId === row.id) {
-        return next(apiError.conflict('A message cannot be the parent of itself'));
-      }
-      const parentContent = await getPublicContentById(req.database.db, parentContentId);
-      if (!parentContent) {
-        return next(apiError.notFound('The selected parent message no longer exists'));
-      }
-      if ((parentContent.contentType || tablePublicContent.contentType.PUBLIC) !== tablePublicContent.contentType.PUBLIC) {
-        return next(apiError.conflict('Comments can currently only be attached to public messages'));
-      }
-      if (parentContent.status === tablePublicContent.contentStatus.DELETED) {
-        return next(apiError.conflict('The selected parent message is deleted'));
-      }
+      await validateCommentParent(req.database.db, parentContentId, row.id);
     }
 
     const actor = await ensurePersistedAdminActor(req);
@@ -1002,18 +1083,15 @@ router.post('/public-messages/:id/publish', requireRole(...PUBLISH_ROLES), async
     let parentPublishedMessageUuid = null;
     if (messageType === tablePublicContent.contentType.COMMENT) {
       if (!row.parentContentIdResolved && !row.parentContentId) {
-        return next(apiError.unprocessableEntity('Please choose a parent message before publishing this comment'));
+        return next(apiError.unprocessableEntity('Please choose parent content before publishing this comment'));
       }
 
       const parentContent = await getPublicContentById(req.database.db, row.parentContentIdResolved || row.parentContentId);
       if (!parentContent) {
-        return next(apiError.notFound('The selected parent message no longer exists'));
-      }
-      if ((parentContent.contentType || tablePublicContent.contentType.PUBLIC) !== tablePublicContent.contentType.PUBLIC) {
-        return next(apiError.conflict('Comments can currently only be attached to public messages'));
+        return next(apiError.notFound('The selected parent content no longer exists'));
       }
       if (parentContent.status !== tablePublicContent.contentStatus.PUBLISHED || !parentContent.publishedMessageUuid) {
-        return next(apiError.conflict('The parent message must be published before this comment can be published'));
+        return next(apiError.conflict('The parent content must be published before this comment can be published'));
       }
       parentPublishedMessageUuid = parentContent.publishedMessageUuid;
     }
@@ -1121,9 +1199,7 @@ router.post('/public-messages/:id/withdraw', requireRole(...CONTENT_ROLES), asyn
       });
     });
 
-    if ((row.contentType || tablePublicContent.contentType.PUBLIC) === tablePublicContent.contentType.PUBLIC) {
-      await cascadeChildCommentStatus(req.database.db, row.id, tablePublicContent.contentStatus.WITHDRAWN);
-    }
+    await cascadeChildCommentStatus(req.database.db, row.id, tablePublicContent.contentStatus.WITHDRAWN);
 
     const updated = await new Promise((resolve, reject) => {
       tablePublicContent.getById(req.database.db, row.id, (err, value) => {
@@ -1186,9 +1262,7 @@ router.delete('/public-messages/:id', requireRole(...CONTENT_ROLES), async (req,
       });
     });
 
-    if ((row.contentType || tablePublicContent.contentType.PUBLIC) === tablePublicContent.contentType.PUBLIC) {
-      await cascadeChildCommentStatus(req.database.db, row.id, tablePublicContent.contentStatus.DELETED);
-    }
+    await cascadeChildCommentStatus(req.database.db, row.id, tablePublicContent.contentStatus.DELETED);
 
     return res.json({
       status: 200,

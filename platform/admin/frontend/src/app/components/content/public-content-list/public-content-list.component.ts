@@ -4,6 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatBadgeModule } from '@angular/material/badge';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
@@ -34,6 +35,7 @@ import { PublicProfileService } from '../../../services/content/public-profile.s
     MatToolbarModule,
     MatIconModule,
     MatButtonModule,
+    MatBadgeModule,
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
@@ -69,12 +71,10 @@ export class PublicContentListComponent {
     return this.profiles().find((profile) => profile.id === profileId) ?? null;
   });
 
-  readonly typeOptions: Array<PublicContentType | 'all'> = ['all', 'public', 'comment'];
   readonly statusOptions: Array<PublicContentStatus | 'all'> = ['all', 'draft', 'published', 'withdrawn', 'deleted'];
 
   readonly filterForm = this.fb.nonNullable.group({
     publicProfileId: this.fb.nonNullable.control(''),
-    contentType: this.fb.nonNullable.control<PublicContentType | 'all'>('all'),
     status: this.fb.nonNullable.control<PublicContentStatus | 'all'>('all'),
     q: this.fb.nonNullable.control('')
   });
@@ -98,7 +98,7 @@ export class PublicContentListComponent {
   load(): void {
     this.publicContentService.loadPublicContent({
       publicProfileId: this.filterForm.controls.publicProfileId.value,
-      contentType: this.filterForm.controls.contentType.value,
+      contentType: 'public',
       status: this.filterForm.controls.status.value,
       q: this.filterForm.controls.q.value,
       limit: 100,
@@ -118,14 +118,9 @@ export class PublicContentListComponent {
     this.router.navigate(['/dashboard/content', row.id, 'edit']);
   }
 
-  createComment(row: PublicContent, event?: Event): void {
+  openComments(row: PublicContent, event?: Event): void {
     event?.stopPropagation();
-    this.router.navigate(['/dashboard/content/create'], {
-      queryParams: {
-        type: 'comment',
-        parentId: row.id
-      }
-    });
+    this.openContent(row);
   }
 
   canPublishRow(row: PublicContent): boolean {
@@ -145,7 +140,11 @@ export class PublicContentListComponent {
   }
 
   canCommentOnRow(row: PublicContent): boolean {
-    return row.contentType === 'public' && row.status === 'published';
+    return row.status === 'published';
+  }
+
+  childCommentCount(row: PublicContent): number {
+    return Math.max(0, Number(row.childCommentCount ?? 0));
   }
 
   hasImageMultimedia(row: PublicContent): boolean {

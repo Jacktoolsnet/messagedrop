@@ -233,6 +233,13 @@ function getById(db, id, callback) {
   const sql = `
     SELECT
       c.*,
+      (
+        SELECT COUNT(*)
+        FROM ${tableName} child
+        WHERE child.${columns.parentContentId} = c.${columns.id}
+          AND child.${columns.contentType} = '${contentType.COMMENT}'
+          AND child.${columns.status} <> '${contentStatus.DELETED}'
+      ) AS childCommentCount,
       profile.name AS publicProfileName,
       profile.avatarImage AS publicProfileAvatarImage,
       profile.avatarAuthorName AS publicProfileAvatarAuthorName,
@@ -290,6 +297,11 @@ function list(db, filters, callback) {
     params.push(filters.contentType);
   }
 
+  if (filters?.parentContentId) {
+    where.push(`c.${columns.parentContentId} = ?`);
+    params.push(filters.parentContentId);
+  }
+
   if (filters?.query) {
     where.push(`(
       LOWER(c.${columns.message}) LIKE ?
@@ -311,6 +323,13 @@ function list(db, filters, callback) {
   let sql = `
     SELECT
       c.*,
+      (
+        SELECT COUNT(*)
+        FROM ${tableName} child
+        WHERE child.${columns.parentContentId} = c.${columns.id}
+          AND child.${columns.contentType} = '${contentType.COMMENT}'
+          AND child.${columns.status} <> '${contentStatus.DELETED}'
+      ) AS childCommentCount,
       profile.name AS publicProfileName,
       profile.avatarImage AS publicProfileAvatarImage,
       profile.avatarAuthorName AS publicProfileAvatarAuthorName,

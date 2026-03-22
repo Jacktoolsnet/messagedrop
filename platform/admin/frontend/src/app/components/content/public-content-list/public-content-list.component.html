@@ -97,15 +97,6 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Type</mat-label>
-        <mat-select formControlName="contentType">
-          @for (type of typeOptions; track type) {
-            <mat-option [value]="type">{{ type === 'all' ? 'All types' : typeLabel(type) }}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline">
         <mat-label>Status</mat-label>
         <mat-select formControlName="status">
           @for (status of statusOptions; track status) {
@@ -221,9 +212,13 @@
                   mat-icon-button
                   type="button"
                   class="content-preview-action-button action-secondary"
-                  (click)="createComment(row, $event)"
-                  matTooltip="Comment"
-                  aria-label="Comment">
+                  (click)="openComments(row, $event)"
+                  [matBadge]="childCommentCount(row)"
+                  [matBadgeHidden]="childCommentCount(row) === 0"
+                  matBadgeColor="primary"
+                  matBadgeOverlap="false"
+                  matTooltip="Comments"
+                  aria-label="Comments">
                   <mat-icon>forum</mat-icon>
                 </button>
               }
