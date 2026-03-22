@@ -695,6 +695,11 @@ mat-toolbar {
   gap: 1rem;
 }
 
+.comment-tiles-container {
+  margin-top: 1rem;
+  padding-top: .5rem;
+}
+
 .content-tile {
   position: relative;
   cursor: pointer;

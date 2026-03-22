@@ -213,13 +213,14 @@
                   type="button"
                   class="content-preview-action-button action-secondary"
                   (click)="openComments(row, $event)"
-                  [matBadge]="childCommentCount(row)"
-                  [matBadgeHidden]="childCommentCount(row) === 0"
-                  matBadgeColor="primary"
-                  matBadgeOverlap="false"
                   matTooltip="Comments"
                   aria-label="Comments">
-                  <mat-icon>forum</mat-icon>
+                  <mat-icon
+                    [matBadge]="childCommentCount(row) === 0 ? '' : childCommentCount(row)"
+                    matBadgePosition="after"
+                    matBadgeColor="accent"
+                    matBadgeSize="small"
+                    [matBadgeOverlap]="true">forum</mat-icon>
                 </button>
               }
 

@@ -477,6 +477,19 @@ mat-toolbar {
   background: color-mix(in srgb, rgba(255, 255, 255, 0.96) 84%, #14b8a6 16%);
 }
 
+:host ::ng-deep .content-preview-action-button .mat-badge-content {
+  top: -6px;
+  right: -7px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 18px;
+  border-radius: 999px;
+  box-sizing: border-box;
+}
+
 .content-preview-action-button.action-success {
   color: #15803d;
   border-color: rgba(22, 163, 74, 0.24);
