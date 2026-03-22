@@ -1,0 +1,112 @@
+:host {
+  display: block;
+  color: #1f2937;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 1rem 0;
+}
+
+.dialog-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.dialog-copy h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.dialog-copy p {
+  margin: .35rem 0 0;
+  color: #64748b;
+}
+
+.dialog-content {
+  display: grid;
+  gap: 1rem;
+  min-height: min(72vh, 680px);
+  padding: 1rem;
+}
+
+.selection-summary {
+  display: grid;
+  gap: .75rem;
+  padding: .9rem 1rem;
+  border-radius: 18px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.92));
+}
+
+.selection-summary-main {
+  display: flex;
+  align-items: center;
+  gap: .9rem;
+}
+
+.selection-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0f766e, #14b8a6);
+  color: #fff;
+  box-shadow: 0 12px 24px rgba(20, 184, 166, 0.18);
+}
+
+.selection-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: .15rem;
+}
+
+.selection-copy strong,
+.selection-copy span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selection-copy span {
+  color: #64748b;
+  font-size: .9rem;
+}
+
+.selection-error {
+  margin: 0;
+  color: #b91c1c;
+  font-size: .9rem;
+}
+
+.map-container {
+  min-height: 0;
+  height: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.12);
+}
+
+.dialog-actions {
+  padding: 0 1rem 1rem;
+}
+
+@media (max-width: 720px) {
+  .dialog-header,
+  .dialog-content,
+  .dialog-actions {
+    padding-left: .85rem;
+    padding-right: .85rem;
+  }
+
+  .dialog-content {
+    min-height: min(70vh, 560px);
+  }
+}

@@ -17,8 +17,9 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelect, MatSelectModule } from '@angular/material/select';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { finalize, startWith } from 'rxjs';
+import { combineLatest, finalize, startWith } from 'rxjs';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
+import { PublicContentLocationMapDialogComponent, PublicContentLocationMapDialogResult } from '../public-content-location-map-dialog/public-content-location-map-dialog.component';
 import { Multimedia } from '../../../interfaces/multimedia.interface';
 import { NominatimPlace } from '../../../interfaces/nominatim-place.interface';
 import { PublicContentSavePayload } from '../../../interfaces/public-content-save-payload.interface';
@@ -111,7 +112,7 @@ export class PublicContentEditorComponent {
   readonly isDeleted = computed(() => this.currentContent()?.status === 'deleted');
   readonly canCreateCommentFromCurrent = computed(() => {
     const content = this.currentContent();
-    return !!content && content.status === 'published';
+    return !!content && content.status !== 'deleted';
   });
   readonly canPublish = computed(() => ['editor', 'admin', 'root'].includes(this.role() ?? ''));
   readonly hasMedia = computed(() => this.multimedia().type !== 'undefined');
@@ -140,10 +141,10 @@ export class PublicContentEditorComponent {
     return this.isEditMode() ? 'Edit public message' : 'Create public message';
   });
   readonly statusLabel = computed(() => this.formatStatus(this.currentContent()?.status ?? 'draft'));
-  readonly childCommentsTitle = computed(() => this.isCommentMode() ? 'Replies' : 'Comments');
+  readonly childCommentsTitle = computed(() => 'Comments');
   readonly childCommentsSubtitle = computed(() => (
     this.isCommentMode()
-      ? 'Direct replies to this comment.'
+      ? 'Direct comments for this comment.'
       : 'Direct comments for this message.'
   ));
   readonly maxPublicHashtags = MAX_PUBLIC_HASHTAGS;
@@ -327,20 +328,15 @@ export class PublicContentEditorComponent {
       this.form.controls.publicProfileId.setValue(publicProfiles[0].id);
     }, { allowSignalWrites: true });
 
-    const contentId = this.route.snapshot.paramMap.get('id');
-    if (contentId) {
-      this.loadContent(contentId);
-    } else {
-      const requestedType = this.route.snapshot.queryParamMap.get('type');
-      const parentId = this.route.snapshot.queryParamMap.get('parentId');
-      if (requestedType === 'comment') {
-        this.form.controls.contentType.setValue('comment');
-      }
-      if (parentId?.trim()) {
-        this.form.controls.parentContentId.setValue(parentId.trim());
-        this.loadParentContent(parentId.trim());
-      }
-    }
+    combineLatest([this.route.paramMap, this.route.queryParamMap])
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(([paramMap, queryParamMap]) => {
+        const contentId = paramMap.get('id')?.trim() || '';
+        const requestedType = queryParamMap.get('type')?.trim() || '';
+        const parentId = queryParamMap.get('parentId')?.trim() || '';
+
+        this.applyRouteState(contentId, requestedType, parentId);
+      });
   }
 
   trackTenorResult(_index: number, result: TenorResult): string {
@@ -448,6 +444,44 @@ export class PublicContentEditorComponent {
     this.locationSearchResults.set([]);
   }
 
+  openLocationMapDialog(): void {
+    const coordinates = this.selectedLocationCoordinates();
+    if (!coordinates) {
+      return;
+    }
+
+    this.dialog.open<PublicContentLocationMapDialogComponent, { latitude: number; longitude: number; label: string; }, PublicContentLocationMapDialogResult>(
+      PublicContentLocationMapDialogComponent,
+      {
+        data: {
+          latitude: coordinates.latitude,
+          longitude: coordinates.longitude,
+          label: this.activeLocationLabel()
+        },
+        width: 'min(92vw, 980px)',
+        maxWidth: '92vw',
+        maxHeight: '92vh',
+        autoFocus: false,
+        panelClass: 'mdp-dialog-xl'
+      }
+    ).afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((result) => {
+        if (!result) {
+          return;
+        }
+
+        this.form.controls.location.setValue({
+          latitude: Number(result.latitude) || 0,
+          longitude: Number(result.longitude) || 0,
+          plusCode: ''
+        });
+        const normalizedLabel = this.normalizeLocationLabel(result.label);
+        this.selectedLocationLabel.set(normalizedLabel);
+        this.locationSearchControl.setValue(normalizedLabel);
+      });
+  }
+
   openPublicProfiles(): void {
     this.router.navigate(['/dashboard/content/profiles']);
   }
@@ -465,10 +499,14 @@ export class PublicContentEditorComponent {
     if (!content) {
       return;
     }
+    this.openCreateCommentForContent(content.id);
+  }
+
+  private openCreateCommentForContent(parentContentId: string): void {
     this.router.navigate(['/dashboard/content/create'], {
       queryParams: {
         type: 'comment',
-        parentId: content.id
+        parentId: parentContentId
       }
     });
   }
@@ -1097,6 +1135,56 @@ export class PublicContentEditorComponent {
           this.showMessage('Parent content could not be loaded.');
         }
       });
+  }
+
+  private applyRouteState(contentId: string, requestedType: string, parentId: string): void {
+    if (contentId) {
+      if (this.currentContent()?.id !== contentId) {
+        this.loadContent(contentId);
+      }
+      return;
+    }
+
+    this.prepareCreateState(requestedType, parentId);
+  }
+
+  private prepareCreateState(requestedType: string, parentId: string): void {
+    const defaultProfileId = this.publicProfiles()[0]?.id ?? '';
+
+    this.currentContent.set(null);
+    this.selectedParentContent.set(null);
+    this.childComments.set([]);
+    this.childCommentsLoading.set(false);
+    this.multimedia.set({ ...EMPTY_MULTIMEDIA });
+    this.hashtags.set([]);
+    this.selectedLocationLabel.set('');
+    this.locationSearchResults.set([]);
+    this.previewStyleOverride.set('');
+
+    this.form.setValue({
+      contentType: requestedType === 'comment' ? 'comment' : 'public',
+      parentContentId: '',
+      message: '',
+      style: '',
+      publicProfileId: defaultProfileId,
+      location: {
+        latitude: 0,
+        longitude: 0,
+        plusCode: ''
+      }
+    }, { emitEvent: false });
+
+    this.hashtagControl.setValue('', { emitEvent: false });
+    this.mediaUrlControl.setValue('', { emitEvent: false });
+    this.tenorControl.setValue('', { emitEvent: false });
+    this.locationSearchControl.setValue('', { emitEvent: false });
+
+    this.updateFormState();
+
+    if (requestedType === 'comment' && parentId) {
+      this.form.controls.parentContentId.setValue(parentId, { emitEvent: false });
+      this.loadParentContent(parentId);
+    }
   }
 
   private resolveBackParentId(): string {

@@ -33,17 +33,6 @@
       </div>
     }
 
-    @if (canCreateCommentFromCurrent()) {
-      <button
-        mat-icon-button
-        type="button"
-        class="toolbar-action avatar avatar-neutral"
-        (click)="createCommentFromCurrent()"
-        aria-label="Create public comment">
-        <mat-icon>add_comment</mat-icon>
-      </button>
-    }
-
     @if (isPublished() && !isDeleted()) {
       <button
         mat-icon-button
@@ -272,9 +261,6 @@
                         </div>
                         <div class="profile-option-copy">
                           <span class="profile-option-name">{{ profile.name }}</span>
-                          <span class="profile-option-style" [style]="profile.defaultStyle">
-                            Default font preview
-                          </span>
                         </div>
                       </div>
                     </mat-option>
@@ -433,9 +419,19 @@
                 <div class="selected-location-panel">
                   <div class="selected-location-panel-head">
                     <h3>Selected location</h3>
-                    <button mat-icon-button type="button" (click)="clearLocation()" [disabled]="locationSearchControl.disabled" aria-label="Clear selected location">
-                      <mat-icon>delete</mat-icon>
-                    </button>
+                    <div class="selected-location-panel-actions">
+                      <button
+                        mat-icon-button
+                        type="button"
+                        (click)="openLocationMapDialog()"
+                        [disabled]="locationSearchControl.disabled"
+                        aria-label="Adjust location on map">
+                        <mat-icon>map</mat-icon>
+                      </button>
+                      <button mat-icon-button type="button" (click)="clearLocation()" [disabled]="locationSearchControl.disabled" aria-label="Clear selected location">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </div>
                   </div>
 
                   <p class="selected-location-panel-name">{{ activeLocationLabel() }}</p>
@@ -452,7 +448,7 @@
 
                   @if (locationMapLink()) {
                     <a class="location-map-link" [href]="locationMapLink()" target="_blank" rel="noopener">
-                      Open larger map
+                      Open in OpenStreetMap
                     </a>
                   }
                 </div>
@@ -725,12 +721,25 @@
 
   @if (currentContent()) {
     <mat-card class="comment-thread-card">
-      <mat-card-header>
+      <mat-card-header class="comment-thread-header">
         <div mat-card-avatar class="avatar avatar-neutral">
           <mat-icon>forum</mat-icon>
         </div>
-        <mat-card-title>{{ childCommentsTitle() }}</mat-card-title>
-        <mat-card-subtitle>{{ childCommentsSubtitle() }}</mat-card-subtitle>
+        <div class="comment-thread-header-copy">
+          <mat-card-title>{{ childCommentsTitle() }}</mat-card-title>
+          <mat-card-subtitle>{{ childCommentsSubtitle() }}</mat-card-subtitle>
+        </div>
+
+        @if (canCreateCommentFromCurrent()) {
+          <button
+            mat-icon-button
+            type="button"
+            class="comment-thread-header-action avatar avatar-neutral"
+            (click)="createCommentFromCurrent()"
+            aria-label="Create comment">
+            <mat-icon>add_comment</mat-icon>
+          </button>
+        }
       </mat-card-header>
 
       <mat-card-content>
@@ -822,18 +831,20 @@
                       <mat-icon>visibility</mat-icon>
                     </button>
 
-                    <button
-                      mat-icon-button
-                      type="button"
-                      class="content-preview-action-button action-secondary"
-                      (click)="openChildComment(row); $event.stopPropagation()"
-                      [matBadge]="childCommentCount(row)"
-                      [matBadgeHidden]="childCommentCount(row) === 0"
-                      matBadgeColor="primary"
-                      matBadgeOverlap="false"
-                      aria-label="Open replies">
-                      <mat-icon>forum</mat-icon>
-                    </button>
+                    @if (childCommentCount(row) > 0) {
+                      <button
+                        mat-icon-button
+                        type="button"
+                        class="content-preview-action-button action-secondary"
+                        (click)="openChildComment(row); $event.stopPropagation()"
+                        [matBadge]="childCommentCount(row)"
+                        [matBadgeHidden]="childCommentCount(row) === 0"
+                        matBadgeColor="primary"
+                        matBadgeOverlap="false"
+                        aria-label="Open replies">
+                        <mat-icon>forum</mat-icon>
+                      </button>
+                    }
                   </div>
                 </mat-card-actions>
               </mat-card>
@@ -842,7 +853,7 @@
         } @else if (!childCommentsLoading()) {
           <div class="empty-state comment-thread-empty-state">
             <mat-icon>forum</mat-icon>
-            <div>No direct {{ isCommentMode() ? 'replies' : 'comments' }} yet.</div>
+            <div>No direct comments yet.</div>
           </div>
         }
       </mat-card-content>

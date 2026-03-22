@@ -641,6 +641,12 @@ mat-toolbar {
   gap: .75rem;
 }
 
+.selected-location-panel-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: .2rem;
+}
+
 .selected-location-panel-head h3,
 .selected-location-panel-name {
   margin: 0;
@@ -683,6 +689,21 @@ mat-toolbar {
 
 .comment-thread-card {
   margin-top: 1rem;
+}
+
+.comment-thread-header {
+  display: flex;
+  align-items: center;
+  gap: .9rem;
+}
+
+.comment-thread-header-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.comment-thread-header-action {
+  margin-left: auto;
 }
 
 .comment-thread-card mat-progress-bar {

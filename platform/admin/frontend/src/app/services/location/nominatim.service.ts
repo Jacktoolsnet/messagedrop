@@ -8,6 +8,10 @@ interface NominatimSearchResponse {
   result?: NominatimPlace[];
 }
 
+interface NominatimReverseResponse {
+  result?: NominatimPlace | null;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -22,5 +26,15 @@ export class NominatimService {
     return this.http
       .get<NominatimSearchResponse>(`${environment.apiUrl}/nominatim/search`, { params })
       .pipe(map((response) => response.result ?? []));
+  }
+
+  reverseGeocode(latitude: number, longitude: number) {
+    const params = new HttpParams()
+      .set('lat', String(latitude))
+      .set('lon', String(longitude));
+
+    return this.http
+      .get<NominatimReverseResponse>(`${environment.apiUrl}/nominatim/reverse`, { params })
+      .pipe(map((response) => response.result ?? null));
   }
 }

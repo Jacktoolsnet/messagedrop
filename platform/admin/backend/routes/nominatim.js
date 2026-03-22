@@ -46,6 +46,19 @@ function resolveSearchRequest(req) {
   };
 }
 
+function resolveReverseRequest(req) {
+  const rawLatitude = req.params.latitude ?? req.query.latitude ?? req.query.lat ?? '';
+  const rawLongitude = req.params.longitude ?? req.query.longitude ?? req.query.lon ?? '';
+  const latitude = Number.parseFloat(String(rawLatitude));
+  const longitude = Number.parseFloat(String(rawLongitude));
+
+  return {
+    latitude,
+    longitude,
+    valid: Number.isFinite(latitude) && Number.isFinite(longitude)
+  };
+}
+
 async function handleSearch(req, res, next) {
   if (!nominatimBase) {
     return next(apiError.serviceUnavailable('nominatim_unavailable'));
@@ -90,5 +103,57 @@ async function handleSearch(req, res, next) {
 router.get('/search', handleSearch);
 router.get('/search/:searchTerm', handleSearch);
 router.get('/search/:searchTerm/:limit', handleSearch);
+
+router.get('/reverse', async (req, res, next) => {
+  if (!nominatimBase) {
+    return next(apiError.serviceUnavailable('nominatim_unavailable'));
+  }
+
+  const { latitude, longitude, valid } = resolveReverseRequest(req);
+  if (!valid) {
+    return next(apiError.badRequest('invalid_coordinates'));
+  }
+
+  try {
+    const token = await signServiceJwt({ audience: nominatimAudience });
+    const response = await axios.get(`${nominatimBase}/nominatim/reverse`, {
+      timeout: 5000,
+      validateStatus: () => true,
+      params: {
+        lat: latitude,
+        lon: longitude,
+        format: 'jsonv2',
+        addressdetails: 1,
+        zoom: 18
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/json',
+        'x-forwarded-host': req.get('host'),
+        'x-forwarded-proto': req.protocol
+      }
+    });
+
+    if (response.status === 404) {
+      return res.status(200).json({ status: 200, result: null });
+    }
+
+    if (response.status >= 400) {
+      return res.status(response.status).json(response.data);
+    }
+
+    return res.status(200).json({
+      status: 200,
+      result: response.data ?? null
+    });
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const upstreamError = apiError.fromStatus(error.response?.status || 502);
+      upstreamError.detail = error.response?.data || error.message || 'nominatim_reverse_failed';
+      return next(upstreamError);
+    }
+    return next(error);
+  }
+});
 
 module.exports = router;

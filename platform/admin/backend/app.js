@@ -275,6 +275,11 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      'img-src': [
+        "'self'",
+        'data:',
+        'https://tile.openstreetmap.org'
+      ],
       'frame-src': [
         "'self'",
         'https://www.openstreetmap.org',
