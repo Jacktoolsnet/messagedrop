@@ -3,24 +3,24 @@
     <div mat-card-avatar class="maintenance-avatar" [class.active]="isActive()">
       <mat-icon>{{ isActive() ? 'construction' : 'build_circle' }}</mat-icon>
     </div>
-    <mat-card-title class="maintenance-title">Maintenance</mat-card-title>
+    <mat-card-title class="maintenance-title">{{ i18n.t('Maintenance') }}</mat-card-title>
     <mat-card-subtitle class="maintenance-subtitle">{{ statusLabel() }}</mat-card-subtitle>
   </mat-card-header>
 
   <mat-card-content>
     <form [formGroup]="form" class="maintenance-form">
-      <mat-slide-toggle formControlName="enabled">Maintenance mode</mat-slide-toggle>
+      <mat-slide-toggle formControlName="enabled">{{ i18n.t('Maintenance mode') }}</mat-slide-toggle>
 
       <div class="date-row">
         <mat-form-field appearance="outline">
-          <mat-label>Planned start</mat-label>
+          <mat-label>{{ i18n.t('Planned start') }}</mat-label>
           <input matInput [matDatepicker]="startDatePicker" formControlName="startDate" />
           <mat-datepicker-toggle matIconSuffix [for]="startDatePicker"></mat-datepicker-toggle>
           <mat-datepicker #startDatePicker></mat-datepicker>
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Start time</mat-label>
+          <mat-label>{{ i18n.t('Start time') }}</mat-label>
           <input matInput [matTimepicker]="startTimePicker" formControlName="startTime" />
           <mat-timepicker-toggle matIconSuffix [for]="startTimePicker"></mat-timepicker-toggle>
           <mat-timepicker #startTimePicker></mat-timepicker>
@@ -29,14 +29,14 @@
 
       <div class="date-row">
         <mat-form-field appearance="outline">
-          <mat-label>Planned end</mat-label>
+          <mat-label>{{ i18n.t('Planned end') }}</mat-label>
           <input matInput [matDatepicker]="endDatePicker" formControlName="endDate" />
           <mat-datepicker-toggle matIconSuffix [for]="endDatePicker"></mat-datepicker-toggle>
           <mat-datepicker #endDatePicker></mat-datepicker>
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>End time</mat-label>
+          <mat-label>{{ i18n.t('End time') }}</mat-label>
           <input matInput [matTimepicker]="endTimePicker" formControlName="endTime" />
           <mat-timepicker-toggle matIconSuffix [for]="endTimePicker"></mat-timepicker-toggle>
           <mat-timepicker #endTimePicker></mat-timepicker>
@@ -44,26 +44,26 @@
       </div>
 
       <mat-form-field appearance="outline" class="full" subscriptSizing="dynamic">
-        <mat-label>Reason</mat-label>
+        <mat-label>{{ i18n.t('Reason') }}</mat-label>
         <textarea matInput rows="3" formControlName="reason"></textarea>
         @if (form.controls.reason.invalid && form.controls.reason.touched) {
-          <mat-error>Reason is required when maintenance is active.</mat-error>
+          <mat-error>{{ i18n.t('Reason is required when maintenance is active.') }}</mat-error>
         }
       </mat-form-field>
 
       <div class="translations">
-        <div class="translations-title">Translations</div>
+        <div class="translations-title">{{ i18n.t('Translations') }}</div>
         @if (maintenance()?.reasonEn || maintenance()?.reasonEs || maintenance()?.reasonFr) {
           <div class="translations-grid">
-            <div class="label">English</div>
+            <div class="label">{{ i18n.t('English') }}</div>
             <div class="value">{{ maintenance()?.reasonEn || '—' }}</div>
-            <div class="label">Spanish</div>
+            <div class="label">{{ i18n.t('Spanish') }}</div>
             <div class="value">{{ maintenance()?.reasonEs || '—' }}</div>
-            <div class="label">French</div>
+            <div class="label">{{ i18n.t('French') }}</div>
             <div class="value">{{ maintenance()?.reasonFr || '—' }}</div>
           </div>
         } @else {
-          <div class="translations-empty">The reason is translated automatically after saving.</div>
+          <div class="translations-empty">{{ i18n.t('The reason is translated automatically after saving.') }}</div>
         }
       </div>
     </form>
@@ -74,10 +74,9 @@
           <mat-icon>archive</mat-icon>
         </div>
         <div class="backup-copy">
-          <div class="backup-title" id="backup-heading">Database backups</div>
+          <div class="backup-title" id="backup-heading">{{ i18n.t('Database backups') }}</div>
           <div class="backup-subtitle">
-            Creates SQLite snapshots of all productive and service databases, stores them in the server backup
-            folder and bundles them as ZIP archives.
+            {{ i18n.t('Creates SQLite snapshots of all productive and service databases, stores them in the server backup folder and bundles them as ZIP archives.') }}
           </div>
         </div>
       </div>
@@ -85,34 +84,34 @@
       @if (backupRunning()) {
         <div class="backup-status backup-status-running">
           <mat-icon>sync</mat-icon>
-          <span>Creating backup…</span>
+          <span>{{ i18n.t('Creating backup…') }}</span>
         </div>
       }
 
       @if (latestBackup(); as backup) {
         <div class="backup-meta-grid">
           <div class="meta-item">
-            <span class="meta-label">Last backup</span>
+            <span class="meta-label">{{ i18n.t('Last backup') }}</span>
             <strong>{{ formatDateTime(backup.createdAt) }}</strong>
           </div>
           <div class="meta-item">
-            <span class="meta-label">ZIP file</span>
+            <span class="meta-label">{{ i18n.t('ZIP file') }}</span>
             <strong>{{ backup.archiveName }}</strong>
           </div>
           <div class="meta-item">
-            <span class="meta-label">Archive size</span>
+            <span class="meta-label">{{ i18n.t('Archive size') }}</span>
             <strong>{{ formatBytes(backup.archiveSizeBytes) }}</strong>
           </div>
           <div class="meta-item">
-            <span class="meta-label">Databases</span>
+            <span class="meta-label">{{ i18n.t('Databases') }}</span>
             <strong>{{ backup.databases.length }}</strong>
           </div>
         </div>
       }
 
-      <div class="section-title">Available archives</div>
+      <div class="section-title">{{ i18n.t('Available archives') }}</div>
       @if (catalogLoading()) {
-        <div class="backup-empty">Loading backup catalog…</div>
+        <div class="backup-empty">{{ i18n.t('Loading backup catalog…') }}</div>
       } @else if (backups().length) {
         <div class="archive-list">
           @for (backup of backups(); track backup.id) {
@@ -120,33 +119,33 @@
               <div class="archive-main">
                 <div class="archive-heading-row">
                   <div class="archive-name">{{ backup.archiveName }}</div>
-                  <span class="archive-validity" [class.invalid]="!backup.valid">{{ backup.valid ? 'Valid' : 'Needs attention' }}</span>
+                  <span class="archive-validity" [class.invalid]="!backup.valid">{{ backup.valid ? i18n.t('Valid') : i18n.t('Needs attention') }}</span>
                 </div>
                 <div class="archive-meta-row">
                   <span>{{ formatDateTime(backup.createdAt) }}</span>
                   <span>{{ formatBytes(backup.archiveSizeBytes) }}</span>
-                  <span>{{ backup.databases.length }} databases</span>
+                  <span>{{ i18n.t('{{count}} databases', { count: backup.databases.length }) }}</span>
                 </div>
               </div>
               <div class="archive-actions">
                 <button mat-stroked-button type="button" (click)="downloadBackupArchive(backup)">
                   <mat-icon>download</mat-icon>
-                  Download
+                  {{ i18n.t('Download') }}
                 </button>
                 <button mat-stroked-button type="button" (click)="validateRestoreBackup(backup)" [disabled]="validationBusyId() === backup.id">
                   <mat-icon>fact_check</mat-icon>
-                  {{ validationBusyId() === backup.id ? 'Validating…' : 'Validate' }}
+                  {{ validationBusyId() === backup.id ? i18n.t('Validating…') : i18n.t('Validate') }}
                 </button>
                 <button mat-stroked-button type="button" (click)="requestRestoreChallenge(backup)" [disabled]="challengeBusyId() === backup.id || !backup.valid">
                   <mat-icon>settings_backup_restore</mat-icon>
-                  {{ challengeBusyId() === backup.id ? 'Preparing…' : 'Prepare restore' }}
+                  {{ challengeBusyId() === backup.id ? i18n.t('Preparing…') : i18n.t('Prepare restore') }}
                 </button>
               </div>
             </div>
           }
         </div>
       } @else {
-        <div class="backup-empty">No backup archives have been created yet.</div>
+        <div class="backup-empty">{{ i18n.t('No backup archives have been created yet.') }}</div>
       }
     </section>
 
@@ -156,38 +155,38 @@
           <mat-icon>settings_backup_restore</mat-icon>
         </div>
         <div class="backup-copy">
-          <div class="backup-title" id="restore-heading">Restore backup</div>
+          <div class="backup-title" id="restore-heading">{{ i18n.t('Restore backup') }}</div>
           <div class="backup-subtitle">
-            Restore is prepared here, but executed only after you restart the admin backend in Plesk.
+            {{ i18n.t('Restore is prepared here, but executed only after you restart the admin backend in Plesk.') }}
           </div>
         </div>
       </div>
 
       <div class="restore-note">
         <mat-icon>info</mat-icon>
-        <span>The current databases will be overwritten. Use this only during a planned maintenance window.</span>
+        <span>{{ i18n.t('The current databases will be overwritten. Use this only during a planned maintenance window.') }}</span>
       </div>
 
-      <div class="section-title">Plesk steps</div>
+      <div class="section-title">{{ i18n.t('Plesk steps') }}</div>
       <ol class="restore-steps">
         @for (step of restoreSteps; track step) {
-          <li>{{ step }}</li>
+          <li>{{ i18n.t(step) }}</li>
         }
       </ol>
 
       @if (restoreStatusLoading()) {
-        <div class="backup-empty">Loading restore status…</div>
+        <div class="backup-empty">{{ i18n.t('Loading restore status…') }}</div>
       } @else {
         <div class="restore-status-grid">
           @if (pendingRestore(); as pending) {
             <div class="restore-state-card state-pending">
               <div class="state-title-row">
-                <span class="state-title">Prepared restore</span>
+                <span class="state-title">{{ i18n.t('Prepared restore') }}</span>
                 <span class="state-badge">{{ formatRestoreState('pending') }}</span>
               </div>
               <div class="state-text">{{ pending.archiveName }}</div>
-              <div class="state-meta">Prepared at {{ formatDateTime(pending.preparedAt) }}</div>
-              <div class="state-meta">{{ pending.databases.length }} databases will be overwritten.</div>
+              <div class="state-meta">{{ i18n.t('Prepared at {{date}}', { date: formatDateTime(pending.preparedAt) }) }}</div>
+              <div class="state-meta">{{ i18n.t('{{count}} databases will be overwritten.', { count: pending.databases.length }) }}</div>
             </div>
           }
 
@@ -195,12 +194,12 @@
             @if (!pendingRestore() || restore.status !== 'pending') {
             <div class="restore-state-card" [class.state-success]="restore.status === 'success'" [class.state-failed]="restore.status === 'failed'" [class.state-running]="restore.status === 'running'">
               <div class="state-title-row">
-                <span class="state-title">Last restore</span>
+                <span class="state-title">{{ i18n.t('Last restore') }}</span>
                 <span class="state-badge">{{ formatRestoreState(restore.status) }}</span>
               </div>
               <div class="state-text">{{ restore.archiveName }}</div>
-              <div class="state-meta">Started {{ formatDateTime(restore.startedAt) }}</div>
-              <div class="state-meta">Finished {{ formatDateTime(restore.finishedAt) }}</div>
+              <div class="state-meta">{{ i18n.t('Started {{date}}', { date: formatDateTime(restore.startedAt) }) }}</div>
+              <div class="state-meta">{{ i18n.t('Finished {{date}}', { date: formatDateTime(restore.finishedAt) }) }}</div>
               @if (restore.message) {
                 <div class="state-message">{{ restore.message }}</div>
               }
@@ -212,13 +211,13 @@
 
       @if (selectedValidation(); as validation) {
         <div class="validation-panel" [class.validation-invalid]="!validation.valid">
-          <div class="section-title">Validation result</div>
+          <div class="section-title">{{ i18n.t('Validation result') }}</div>
           <div class="validation-summary-row">
             <div>
-              <div class="validation-backup">{{ validation.backup?.archiveName || 'Unknown backup' }}</div>
-              <div class="validation-status">{{ validation.valid ? 'Backup is ready for restore.' : 'Backup has issues and cannot be prepared.' }}</div>
+              <div class="validation-backup">{{ validation.backup?.archiveName || i18n.t('Unknown backup') }}</div>
+              <div class="validation-status">{{ validation.valid ? i18n.t('Backup is ready for restore.') : i18n.t('Backup has issues and cannot be prepared.') }}</div>
             </div>
-            <span class="archive-validity" [class.invalid]="!validation.valid">{{ validation.valid ? 'Valid' : 'Invalid' }}</span>
+            <span class="archive-validity" [class.invalid]="!validation.valid">{{ validation.valid ? i18n.t('Valid') : i18n.t('Invalid') }}</span>
           </div>
           @if (validation.issues.length) {
             <ul class="validation-issues">
@@ -232,21 +231,21 @@
 
       @if (restoreChallenge(); as challenge) {
         <div class="confirm-panel">
-          <div class="section-title">Confirm restore preparation</div>
+          <div class="section-title">{{ i18n.t('Confirm restore preparation') }}</div>
           <div class="confirm-copy">
-            Backup <strong>{{ restoreTargetBackup()?.archiveName }}</strong> will be marked for restore.
+            {{ i18n.t('Backup') }} <strong>{{ restoreTargetBackup()?.archiveName }}</strong> {{ i18n.t('will be marked for restore.') }}
           </div>
           <div class="challenge-grid">
             <div class="challenge-item">
-              <span class="meta-label">Confirmation word</span>
+              <span class="meta-label">{{ i18n.t('Confirmation word') }}</span>
               <strong>{{ challenge.confirmationWord }}</strong>
             </div>
             <div class="challenge-item">
-              <span class="meta-label">Confirmation PIN</span>
+              <span class="meta-label">{{ i18n.t('Confirmation PIN') }}</span>
               <strong>{{ challenge.confirmationPin }}</strong>
             </div>
             <div class="challenge-item">
-              <span class="meta-label">Valid until</span>
+              <span class="meta-label">{{ i18n.t('Valid until') }}</span>
               <strong>{{ formatDateTime(challenge.expiresAt) }}</strong>
             </div>
           </div>
@@ -254,34 +253,34 @@
           <form [formGroup]="restoreConfirmForm" class="confirm-form">
             <div class="date-row">
               <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                <mat-label>Type RESTORE</mat-label>
+                <mat-label>{{ i18n.t('Type RESTORE') }}</mat-label>
                 <input matInput formControlName="confirmationWord" />
                 @if (restoreConfirmForm.controls.confirmationWord.invalid && restoreConfirmForm.controls.confirmationWord.touched) {
-                  <mat-error>Required.</mat-error>
+                  <mat-error>{{ i18n.t('Required.') }}</mat-error>
                 }
               </mat-form-field>
 
               <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                <mat-label>Type the PIN</mat-label>
+                <mat-label>{{ i18n.t('Type the PIN') }}</mat-label>
                 <input matInput formControlName="confirmationPin" />
                 @if (restoreConfirmForm.controls.confirmationPin.invalid && restoreConfirmForm.controls.confirmationPin.touched) {
-                  <mat-error>Required.</mat-error>
+                  <mat-error>{{ i18n.t('Required.') }}</mat-error>
                 }
               </mat-form-field>
             </div>
           </form>
 
           <div class="confirm-actions">
-            <button mat-stroked-button type="button" (click)="cancelRestoreChallenge()">Cancel</button>
+            <button mat-stroked-button type="button" (click)="cancelRestoreChallenge()">{{ i18n.t('Cancel') }}</button>
             <button mat-raised-button color="warn" type="button" (click)="prepareRestore()" [disabled]="!canPrepareRestore()">
               <mat-icon>warning</mat-icon>
-              {{ restorePreparing() ? 'Preparing…' : 'Prepare restore' }}
+              {{ restorePreparing() ? i18n.t('Preparing…') : i18n.t('Prepare restore') }}
             </button>
           </div>
         </div>
       } @else {
         <div class="restore-placeholder">
-          Select an archive above and use <strong>Validate</strong> or <strong>Prepare restore</strong> to continue.
+          {{ i18n.t('Select an archive above and use') }} <strong>{{ i18n.t('Validate') }}</strong> {{ i18n.t('or') }} <strong>{{ i18n.t('Prepare restore') }}</strong> {{ i18n.t('to continue.') }}
         </div>
       }
     </section>
@@ -289,18 +288,18 @@
 
   <mat-card-actions class="maintenance-actions">
     <button mat-stroked-button type="button" (click)="refresh()" [disabled]="loading() || catalogLoading() || restoreStatusLoading() || backupRunning() || restorePreparing()">
-      Refresh
+      {{ i18n.t('Refresh') }}
     </button>
     <button mat-stroked-button type="button" (click)="createBackup()" [disabled]="!canCreateBackup()">
       <mat-icon>archive</mat-icon>
-      Create backup
+      {{ i18n.t('Create backup') }}
     </button>
     <button mat-stroked-button type="button" (click)="downloadLatestBackup()" [disabled]="!hasBackup() || backupRunning()">
       <mat-icon>download</mat-icon>
-      Download latest ZIP
+      {{ i18n.t('Download latest ZIP') }}
     </button>
     <button mat-raised-button color="primary" type="button" (click)="submit()" [disabled]="!canSubmit()">
-      Save
+      {{ i18n.t('Save') }}
     </button>
   </mat-card-actions>
 </mat-card>

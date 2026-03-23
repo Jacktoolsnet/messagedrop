@@ -5,6 +5,7 @@ import { catchError, finalize, map, Observable, of, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { PublicProfileSavePayload } from '../../interfaces/public-profile-save-payload.interface';
 import { PublicProfile } from '../../interfaces/public-profile.interface';
+import { TranslationHelperService } from '../translation-helper.service';
 
 interface PublicProfileListResponse {
   status: number;
@@ -22,6 +23,7 @@ interface PublicProfileRowResponse {
 export class PublicProfileService {
   private readonly http = inject(HttpClient);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly i18n = inject(TranslationHelperService);
   private readonly baseUrl = `${environment.apiUrl}/content/public-profiles`;
 
   private readonly _rows = signal<PublicProfile[]>([]);
@@ -65,7 +67,7 @@ export class PublicProfileService {
   }
 
   private handleError(error: unknown, fallbackMessage: string) {
-    this.snackBar.open(this.resolveErrorMessage(error, fallbackMessage), 'OK', {
+    this.snackBar.open(this.resolveErrorMessage(error, fallbackMessage), this.i18n.t('OK'), {
       duration: 3200,
       panelClass: ['snack-error'],
       horizontalPosition: 'center',
@@ -81,6 +83,6 @@ export class PublicProfileService {
         return message.trim();
       }
     }
-    return fallbackMessage;
+    return this.i18n.t(fallbackMessage);
   }
 }

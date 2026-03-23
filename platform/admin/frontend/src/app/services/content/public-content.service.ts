@@ -9,6 +9,7 @@ import { PublicContentFilters } from '../../interfaces/public-content-filters.in
 import { PublicContentSavePayload } from '../../interfaces/public-content-save-payload.interface';
 import { PublicContent } from '../../interfaces/public-content.interface';
 import { TenorApiResponse } from '../../interfaces/tenor-response.interface';
+import { TranslationHelperService } from '../translation-helper.service';
 
 interface PublicContentListResponse {
   status: number;
@@ -36,6 +37,7 @@ interface ExternalPublicContentRowResponse {
 export class PublicContentService {
   private readonly http = inject(HttpClient);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly i18n = inject(TranslationHelperService);
   private readonly baseUrl = `${environment.apiUrl}/content`;
 
   private readonly _rows = signal<PublicContent[]>([]);
@@ -184,7 +186,7 @@ export class PublicContentService {
   }
 
   private handleError(error: unknown, message: string) {
-    this.snackBar.open(this.resolveErrorMessage(error, message), 'OK', {
+    this.snackBar.open(this.resolveErrorMessage(error, message), this.i18n.t('OK'), {
       duration: 3000,
       panelClass: ['snack-error'],
       horizontalPosition: 'center',
@@ -200,6 +202,6 @@ export class PublicContentService {
         return backendMessage.trim();
       }
     }
-    return fallbackMessage;
+    return this.i18n.t(fallbackMessage);
   }
 }

@@ -1,5 +1,6 @@
 
 import { Component, inject } from '@angular/core';
+import { TranslationHelperService } from '../../services/translation-helper.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -22,6 +23,7 @@ export interface ConfirmDialogData {
 export class ConfirmDialogComponent {
   private ref = inject(MatDialogRef<ConfirmDialogComponent, boolean>);
   protected data = inject<ConfirmDialogData>(MAT_DIALOG_DATA, { optional: true }) || {};
+  protected readonly i18n = inject(TranslationHelperService);
 
   cancel(): void {
     this.ref.close(false);

@@ -1,15 +1,15 @@
-
 import { ChangeDetectorRef, Component, ElementRef, ViewChild, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from "@angular/material/icon";
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { RouterLink } from '@angular/router';
-import { AuthService } from '../../services/auth/auth.service';
 import { APP_VERSION_INFO } from '../../../environments/version';
+import { AuthService } from '../../services/auth/auth.service';
+import { TranslationHelperService } from '../../services/translation-helper.service';
 
 @Component({
   selector: 'app-login',
@@ -25,12 +25,13 @@ import { APP_VERSION_INFO } from '../../../environments/version';
     MatIconModule,
     MatSnackBarModule,
     RouterLink
-]
+  ]
 })
 export class LoginComponent {
   @ViewChild('otpInput') private otpInput?: ElementRef<HTMLInputElement>;
 
   readonly appVersion = APP_VERSION_INFO;
+  readonly i18n = inject(TranslationHelperService);
   username = '';
   password = '';
   otpCode = '';
@@ -51,7 +52,6 @@ export class LoginComponent {
   }
 
   private switchToOtp(challengeId: string, expiresAt: number) {
-    // Defer to avoid ExpressionChangedAfterItHasBeenCheckedError
     this.runAsync(() => {
       this.challengeId = challengeId;
       this.expiresAt = expiresAt;
@@ -78,14 +78,14 @@ export class LoginComponent {
           this.authService.completeLogin(response.token);
         } else if ('challengeId' in response) {
           this.switchToOtp(response.challengeId, response.expiresAt);
-          this.snackBar.open('OTP wurde per Pushbullet versendet. Falls verfügbar zusätzlich per E-Mail.', undefined, {
+          this.snackBar.open(this.i18n.t('OTP was sent via Pushbullet. If available, it was also sent by email.'), undefined, {
             duration: 2000,
             panelClass: ['snack-success'],
             horizontalPosition: 'center',
             verticalPosition: 'top'
           });
         } else {
-          this.snackBar.open('Unerwartete Login-Antwort.', undefined, {
+          this.snackBar.open(this.i18n.t('Unexpected login response.'), undefined, {
             duration: 2000,
             panelClass: ['snack-error'],
             horizontalPosition: 'center',
@@ -105,7 +105,7 @@ export class LoginComponent {
     if (!this.challengeId || this.loading) return;
     const code = this.otpCode.trim();
     if (code.length !== 6) {
-      this.snackBar.open('Bitte 6-stelligen Code eingeben.', undefined, {
+      this.snackBar.open(this.i18n.t('Please enter a 6-digit code.'), undefined, {
         duration: 2000,
         panelClass: ['snack-warning'],
         horizontalPosition: 'center',
@@ -126,7 +126,7 @@ export class LoginComponent {
         if (response.token) {
           this.authService.completeLogin(response.token);
         } else {
-          this.snackBar.open('OTP konnte nicht verifiziert werden.', undefined, {
+          this.snackBar.open(this.i18n.t('OTP could not be verified.'), undefined, {
             duration: 2000,
             panelClass: ['snack-error'],
             horizontalPosition: 'center',
@@ -139,7 +139,7 @@ export class LoginComponent {
           this.loading = false;
         });
         console.error('OTP verify failed', err);
-        this.snackBar.open('OTP-Verifikation fehlgeschlagen. Bitte erneut versuchen.', undefined, {
+        this.snackBar.open(this.i18n.t('OTP verification failed. Please try again.'), undefined, {
           duration: 2500,
           panelClass: ['snack-error'],
           horizontalPosition: 'center',

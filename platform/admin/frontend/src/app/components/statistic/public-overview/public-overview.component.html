@@ -1,12 +1,12 @@
 <mat-toolbar>
-  <button mat-icon-button [routerLink]="backLink()" aria-label="Back">
+  <button mat-icon-button [routerLink]="backLink()" [attr.aria-label]="i18n.t('Back')">
     <mat-icon>arrow_back</mat-icon>
   </button>
-  <span class="toolbar-title">Public Activity Statistics</span>
+  <span class="toolbar-title">{{ i18n.t('Public Activity Statistics') }}</span>
   <span class="spacer"></span>
   <button mat-stroked-button (click)="reload()">
     <mat-icon>refresh</mat-icon>
-    Refresh
+    {{ i18n.t('Refresh') }}
   </button>
 </mat-toolbar>
 
@@ -22,25 +22,25 @@
       </div>
 
       <div class="hero-copy">
-        <div class="section-eyebrow">Public analytics</div>
-        <h1 class="hero-title">Activity overview</h1>
+        <div class="section-eyebrow">{{ i18n.t('Public analytics') }}</div>
+        <h1 class="hero-title">{{ i18n.t('Activity overview') }}</h1>
         <p class="hero-subtitle">
-          A simple public snapshot of page views, search activity, message creation and user growth over the last 7 days.
+          {{ i18n.t('A simple public snapshot of page views, search activity, message creation and user growth over the last 7 days.') }}
         </p>
       </div>
 
       <div class="hero-pills">
         <span class="hero-pill">
           <mat-icon>event</mat-icon>
-          Last 7 days
+          {{ i18n.t('Last 7 days') }}
         </span>
         <span class="hero-pill">
           <mat-icon>insights</mat-icon>
-          {{ totalEvents() }} total events
+          {{ i18n.t('{{count}} total events', { count: totalEvents() }) }}
         </span>
         <span class="hero-pill">
           <mat-icon>show_chart</mat-icon>
-          Peak/day {{ peakValue() }}
+          {{ i18n.t('Peak/day {{count}}', { count: peakValue() }) }}
         </span>
       </div>
     </div>
@@ -52,7 +52,7 @@
         <mat-icon>error</mat-icon>
       </div>
       <div>
-        <h2>Unable to load statistics</h2>
+        <h2>{{ i18n.t('Unable to load statistics') }}</h2>
         <p>{{ errorMessage }}</p>
       </div>
     </mat-card>
@@ -63,8 +63,8 @@
           <mat-icon>query_stats</mat-icon>
         </div>
         <div>
-          <h2>Public metric overview</h2>
-          <p>Each tile shows the recent trend and the strongest day in the current window.</p>
+          <h2>{{ i18n.t('Public metric overview') }}</h2>
+          <p>{{ i18n.t('Each tile shows the recent trend and the strongest day in the current window.') }}</p>
         </div>
       </div>
 
@@ -80,8 +80,8 @@
             </app-statistic-key-chart>
 
             <div class="tile-footer">
-              <span>Total (7 days): <strong>{{ totalFor(metric.key) }}</strong></span>
-              <span>Peak/day: <strong>{{ maxFor(metric.key) }}</strong></span>
+              <span>{{ i18n.t('Total (7 days):') }} <strong>{{ totalFor(metric.key) }}</strong></span>
+              <span>{{ i18n.t('Peak/day:') }} <strong>{{ maxFor(metric.key) }}</strong></span>
             </div>
           </section>
         }

@@ -1,11 +1,11 @@
 <mat-toolbar>
-  <button mat-icon-button [routerLink]="backLink()" aria-label="Back">
+  <button mat-icon-button [routerLink]="backLink()" [attr.aria-label]="i18n.t('Back')">
     <mat-icon>arrow_back</mat-icon>
   </button>
-  <span class="toolbar-title">Transparency</span>
+  <span class="toolbar-title">{{ i18n.t('Transparency') }}</span>
   <span class="spacer"></span>
   <div class="desktop-controls">
-    <mat-chip-listbox class="range-chips" [value]="filterForm.controls.range.value" (change)="onRangeChange($event)" aria-label="Select range">
+    <mat-chip-listbox class="range-chips" [value]="filterForm.controls.range.value" (change)="onRangeChange($event)" [attr.aria-label]="i18n.t('Select range')">
       @for (opt of rangeOptions; track opt.value) {
         <mat-chip-option [value]="opt.value">
           {{ opt.label }}
@@ -14,11 +14,11 @@
     </mat-chip-listbox>
   </div>
   <div class="mobile-controls">
-    <button mat-icon-button [matMenuTriggerFor]="transparencyMenu" aria-label="Transparency menu">
+    <button mat-icon-button [matMenuTriggerFor]="transparencyMenu" [attr.aria-label]="i18n.t('Transparency menu')">
       <mat-icon>more_vert</mat-icon>
     </button>
     <mat-menu #transparencyMenu="matMenu">
-      <button mat-menu-item disabled>Range</button>
+      <button mat-menu-item disabled>{{ i18n.t('Range') }}</button>
       @for (opt of rangeOptions; track opt.value) {
         <button mat-menu-item (click)="setRange(opt.value)">
           <mat-icon>{{ filterForm.controls.range.value === opt.value ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
@@ -42,10 +42,10 @@
         </div>
 
         <div class="hero-copy">
-          <div class="section-eyebrow">DSA transparency</div>
-          <h1 class="hero-title">Transparency overview</h1>
+          <div class="section-eyebrow">{{ i18n.t('DSA transparency') }}</div>
+          <h1 class="hero-title">{{ i18n.t('Transparency overview') }}</h1>
           <p class="hero-subtitle">
-            Moderation volume, decision quality and downloadable reports for {{ data.range.label }}.
+            {{ i18n.t('Moderation volume, decision quality and downloadable reports for {{range}}.', { range: data.range.label }) }}
           </p>
         </div>
 
@@ -56,28 +56,28 @@
           </span>
           <span class="hero-pill">
             <mat-icon>description</mat-icon>
-            {{ reports().length }} reports
+            {{ i18n.t('{{count}} reports', { count: reports().length }) }}
           </span>
         </div>
       </div>
 
       <div class="hero-stats">
         <div class="hero-stat">
-          <span class="stat-label">Average resolution</span>
+          <span class="stat-label">{{ i18n.t('Average resolution') }}</span>
           <strong>{{ formatDuration(data.decisions.avgDecisionTimeMs) }}</strong>
-          <span>{{ data.decisions.total | number }} decisions total</span>
+          <span>{{ i18n.t('{{count}} decisions total', { count: (data.decisions.total | number) }) }}</span>
         </div>
 
         <div class="hero-stat">
-          <span class="stat-label">Automated review</span>
+          <span class="stat-label">{{ i18n.t('Automated review') }}</span>
           <strong>{{ automatedShare(data) }}</strong>
-          <span>Manual decisions: {{ data.decisions.automated.manual | number }}</span>
+          <span>{{ i18n.t('Manual decisions: {{count}}', { count: (data.decisions.automated.manual | number) }) }}</span>
         </div>
 
         <div class="hero-stat">
-          <span class="stat-label">Signals received</span>
+          <span class="stat-label">{{ i18n.t('Signals received') }}</span>
           <strong>{{ data.signals.total | number }}</strong>
-          <span>Reported quick signals in this window</span>
+          <span>{{ i18n.t('Reported quick signals in this window') }}</span>
         </div>
       </div>
     </mat-card>
@@ -89,8 +89,8 @@
             <mat-icon>flag</mat-icon>
           </div>
           <div>
-            <div class="metric-title">Notices</div>
-            <div class="metric-subtitle">Total cases {{ data.range.label }}</div>
+            <div class="metric-title">{{ i18n.t('Notices') }}</div>
+            <div class="metric-subtitle">{{ i18n.t('Total cases {{range}}', { range: data.range.label }) }}</div>
           </div>
         </div>
 
@@ -109,8 +109,8 @@
             <mat-icon>check_circle</mat-icon>
           </div>
           <div>
-            <div class="metric-title">Decisions</div>
-            <div class="metric-subtitle">Average resolution {{ formatDuration(data.decisions.avgDecisionTimeMs) }}</div>
+            <div class="metric-title">{{ i18n.t('Decisions') }}</div>
+            <div class="metric-subtitle">{{ i18n.t('Average resolution {{duration}}', { duration: formatDuration(data.decisions.avgDecisionTimeMs) }) }}</div>
           </div>
         </div>
 
@@ -129,8 +129,8 @@
             <mat-icon>notifications</mat-icon>
           </div>
           <div>
-            <div class="metric-title">Signals</div>
-            <div class="metric-subtitle">Reported quick signals</div>
+            <div class="metric-title">{{ i18n.t('Signals') }}</div>
+            <div class="metric-subtitle">{{ i18n.t('Reported quick signals') }}</div>
           </div>
         </div>
 
@@ -151,8 +151,8 @@
             <mat-icon>bar_chart</mat-icon>
           </div>
           <div>
-            <h2>Charts</h2>
-            <p>Key moderation trends at a glance.</p>
+            <h2>{{ i18n.t('Charts') }}</h2>
+            <p>{{ i18n.t('Key moderation trends at a glance.') }}</p>
           </div>
         </div>
 
@@ -163,8 +163,8 @@
                 <mat-icon>bar_chart</mat-icon>
               </div>
               <div>
-                <div class="chart-title">Notices by status</div>
-                <div class="chart-subtitle">Current case distribution</div>
+                <div class="chart-title">{{ i18n.t('Notices by status') }}</div>
+                <div class="chart-subtitle">{{ i18n.t('Current case distribution') }}</div>
               </div>
             </div>
             <div class="chart-container">
@@ -178,8 +178,8 @@
                 <mat-icon>pie_chart</mat-icon>
               </div>
               <div>
-                <div class="chart-title">Decision outcomes</div>
-                <div class="chart-subtitle">How cases were resolved</div>
+                <div class="chart-title">{{ i18n.t('Decision outcomes') }}</div>
+                <div class="chart-subtitle">{{ i18n.t('How cases were resolved') }}</div>
               </div>
             </div>
             <div class="chart-container">
@@ -193,8 +193,8 @@
                 <mat-icon>show_chart</mat-icon>
               </div>
               <div>
-                <div class="chart-title">Monthly trend</div>
-                <div class="chart-subtitle">Notices and decisions over time</div>
+                <div class="chart-title">{{ i18n.t('Monthly trend') }}</div>
+                <div class="chart-subtitle">{{ i18n.t('Notices and decisions over time') }}</div>
               </div>
             </div>
             <div class="chart-container">
@@ -212,8 +212,8 @@
             <mat-icon>category</mat-icon>
           </div>
           <div>
-            <h2>Top categories</h2>
-            <p>The most frequent report categories.</p>
+            <h2>{{ i18n.t('Top categories') }}</h2>
+            <p>{{ i18n.t('The most frequent report categories.') }}</p>
           </div>
         </div>
 
@@ -224,8 +224,8 @@
                 <mat-icon>flag</mat-icon>
               </div>
               <div>
-                <h3>Notices</h3>
-                <p>Most common notice categories</p>
+                <h3>{{ i18n.t('Notices') }}</h3>
+                <p>{{ i18n.t('Most common notice categories') }}</p>
               </div>
             </div>
 
@@ -233,11 +233,11 @@
               @for (entry of data.notices.topCategories; track entry.category; let index = $index) {
                 <div class="category-item">
                   <span class="category-rank">{{ index + 1 }}</span>
-                  <span class="category-name">{{ entry.category || 'Uncategorized' }}</span>
+                  <span class="category-name">{{ entry.category || i18n.t('Uncategorized') }}</span>
                   <span class="category-count">{{ entry.count }}</span>
                 </div>
               } @empty {
-                <div class="empty-inline">No notice categories available.</div>
+                <div class="empty-inline">{{ i18n.t('No notice categories available.') }}</div>
               }
             </div>
           </div>
@@ -250,8 +250,8 @@
                 <mat-icon>notifications</mat-icon>
               </div>
               <div>
-                <h3>Signals</h3>
-                <p>Most common signal categories</p>
+                <h3>{{ i18n.t('Signals') }}</h3>
+                <p>{{ i18n.t('Most common signal categories') }}</p>
               </div>
             </div>
 
@@ -259,11 +259,11 @@
               @for (entry of data.signals.topCategories; track entry.category; let index = $index) {
                 <div class="category-item">
                   <span class="category-rank">{{ index + 1 }}</span>
-                  <span class="category-name">{{ entry.category || 'Uncategorized' }}</span>
+                  <span class="category-name">{{ entry.category || i18n.t('Uncategorized') }}</span>
                   <span class="category-count">{{ entry.count }}</span>
                 </div>
               } @empty {
-                <div class="empty-inline">No signal categories available.</div>
+                <div class="empty-inline">{{ i18n.t('No signal categories available.') }}</div>
               }
             </div>
           </div>
@@ -277,8 +277,8 @@
           <mat-icon>description</mat-icon>
         </div>
         <div>
-          <h2>Transparency reports</h2>
-          <p>Generated exports and downloadable snapshots.</p>
+          <h2>{{ i18n.t('Transparency reports') }}</h2>
+          <p>{{ i18n.t('Generated exports and downloadable snapshots.') }}</p>
         </div>
       </div>
 
@@ -296,25 +296,25 @@
                 </div>
                 <div class="report-copy">
                   <div class="report-title">{{ report.title }}</div>
-                  <div class="report-desc">{{ report.description || 'Generated transparency report export.' }}</div>
+                  <div class="report-desc">{{ report.description || i18n.t('Generated transparency report export.') }}</div>
                 </div>
               </div>
 
               <div class="report-meta">
                 <div class="meta-row">
-                  <span class="k">Period</span>
+                  <span class="k">{{ i18n.t('Period') }}</span>
                   <span class="v">{{ report.period.label }}</span>
                 </div>
                 <div class="meta-row">
-                  <span class="k">Format</span>
+                  <span class="k">{{ i18n.t('Format') }}</span>
                   <span class="v">{{ report.format.toUpperCase() }}</span>
                 </div>
                 <div class="meta-row">
-                  <span class="k">Generated</span>
+                  <span class="k">{{ i18n.t('Generated') }}</span>
                   <span class="v">{{ formatDateTime(report.generatedAt) }}</span>
                 </div>
                 <div class="meta-row">
-                  <span class="k">Size</span>
+                  <span class="k">{{ i18n.t('Size') }}</span>
                   <span class="v">{{ formatBytes(report.sizeBytes) }}</span>
                 </div>
               </div>
@@ -322,7 +322,7 @@
               <div class="report-actions">
                 <button mat-stroked-button color="primary" (click)="downloadReport(report)">
                   <mat-icon>download</mat-icon>
-                  Download
+                  {{ i18n.t('Download') }}
                 </button>
               </div>
             </mat-card>
@@ -334,8 +334,8 @@
             <mat-icon>inventory_2</mat-icon>
           </div>
           <div>
-            <h3>No reports yet</h3>
-            <p>No generated reports yet for {{ data.range.label }}.</p>
+            <h3>{{ i18n.t('No reports yet') }}</h3>
+            <p>{{ i18n.t('No generated reports yet for {{range}}.', { range: data.range.label }) }}</p>
           </div>
         </div>
       }
@@ -347,8 +347,8 @@
           <mat-icon>hourglass_bottom</mat-icon>
         </div>
         <div>
-          <h3>Loading transparency data</h3>
-          <p>The overview will appear as soon as the statistics are available.</p>
+          <h3>{{ i18n.t('Loading transparency data') }}</h3>
+          <p>{{ i18n.t('The overview will appear as soon as the statistics are available.') }}</p>
         </div>
       </div>
     </mat-card>

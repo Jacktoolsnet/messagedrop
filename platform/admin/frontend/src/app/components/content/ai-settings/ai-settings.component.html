@@ -1,28 +1,16 @@
 <mat-toolbar color="primary">
-  <button mat-icon-button type="button" (click)="goBack()" aria-label="Back to previous content view">
+  <button mat-icon-button type="button" (click)="goBack()" [attr.aria-label]="i18n.t('Back to previous content view')">
     <mat-icon>arrow_back</mat-icon>
   </button>
 
-  <span class="toolbar-title">AI settings</span>
+  <span class="toolbar-title">{{ i18n.t('AI settings') }}</span>
   <span class="spacer"></span>
 
-  <button
-    mat-icon-button
-    type="button"
-    class="toolbar-action"
-    (click)="refreshModels()"
-    [disabled]="loading()"
-    aria-label="Refresh model list">
+  <button mat-icon-button type="button" class="toolbar-action" (click)="refreshModels()" [disabled]="loading()" [attr.aria-label]="i18n.t('Refresh model list')">
     <mat-icon>refresh</mat-icon>
   </button>
 
-  <button
-    mat-icon-button
-    type="button"
-    class="toolbar-action avatar avatar-success"
-    (click)="save()"
-    [disabled]="!canSave()"
-    aria-label="Save AI settings">
+  <button mat-icon-button type="button" class="toolbar-action avatar avatar-success" (click)="save()" [disabled]="!canSave()" [attr.aria-label]="i18n.t('Save AI settings')">
     <mat-icon>save</mat-icon>
   </button>
 </mat-toolbar>
@@ -37,24 +25,23 @@
       <div mat-card-avatar class="avatar avatar-accent">
         <mat-icon>smart_toy</mat-icon>
       </div>
-      <mat-card-title>Editorial AI tools</mat-card-title>
+      <mat-card-title>{{ i18n.t('Editorial AI tools') }}</mat-card-title>
       <mat-card-subtitle>
-        Model, budget and usage overview for the editorial AI tools.
+        {{ i18n.t('Model, budget and usage overview for the editorial AI tools.') }}
       </mat-card-subtitle>
     </mat-card-header>
 
     <mat-card-content class="hero-copy">
       <div class="hero-copy-main">
         <p>
-          The model list is loaded live from OpenAI. When a newer compatible model becomes available to your API
-          account, it can be selected here without code changes.
+          {{ i18n.t('The model list is loaded live from OpenAI. When a newer compatible model becomes available to your API account, it can be selected here without code changes.') }}
         </p>
       </div>
 
       <div class="hero-chip-row">
         <span class="hero-chip" [class.hero-chip-offline]="!configured()">
           <mat-icon>{{ configured() ? 'cloud_done' : 'cloud_off' }}</mat-icon>
-          {{ configured() ? 'OpenAI API configured' : 'OpenAI API not configured' }}
+          {{ configured() ? i18n.t('OpenAI API configured') : i18n.t('OpenAI API not configured') }}
         </span>
 
         @if (settings()?.selectedModel) {
@@ -67,14 +54,14 @@
         @if (usage(); as usage) {
           <span class="hero-chip">
             <mat-icon>toll</mat-icon>
-            {{ usage.currentMonth.totalTokens | number:'1.0-0' }} tokens this month
+            {{ usage.currentMonth.totalTokens | number:'1.0-0' }} {{ i18n.t('tokens this month') }}
           </span>
 
           @if (usage.costsAvailable) {
             <span class="hero-chip">
               <mat-icon>payments</mat-icon>
               {{ usage.currentMonth.spend.value | currency:(usage.currentMonth.spend.currency || 'USD'):'symbol':'1.2-2' }}
-              this month
+              {{ i18n.t('this month') }}
             </span>
           }
 
@@ -82,9 +69,9 @@
             <span class="hero-chip" [class.hero-chip-offline]="budgetExceeded()">
               <mat-icon>{{ budgetExceeded() ? 'warning' : 'wallet' }}</mat-icon>
               @if (usage.remainingBudgetUsd !== null) {
-                {{ usage.remainingBudgetUsd | currency:(usage.currentMonth.spend.currency || 'USD'):'symbol':'1.2-2' }} left
+                {{ usage.remainingBudgetUsd | currency:(usage.currentMonth.spend.currency || 'USD'):'symbol':'1.2-2' }} {{ i18n.t('left') }}
               } @else {
-                No budget left indicator
+                {{ i18n.t('No budget left indicator') }}
               }
             </span>
           }
@@ -96,8 +83,7 @@
   @if (!configured()) {
     <mat-card class="warn-card">
       <mat-card-content>
-        Add <code>OPENAI_API_KEY_CONTENT_CREATION</code> (or <code>OPENAI_API_KEY</code>) to the admin backend environment
-        to use the AI tools.
+        {{ i18n.t('Add OPENAI_API_KEY_CONTENT_CREATION (or OPENAI_API_KEY) to the admin backend environment to use the AI tools.') }}
       </mat-card-content>
     </mat-card>
   }
@@ -107,8 +93,8 @@
       <div mat-card-avatar class="avatar avatar-success">
         <mat-icon>query_stats</mat-icon>
       </div>
-      <mat-card-title>Usage & budget</mat-card-title>
-      <mat-card-subtitle>Token usage, requests and spend from the OpenAI usage endpoints.</mat-card-subtitle>
+      <mat-card-title>{{ i18n.t('Usage & budget') }}</mat-card-title>
+      <mat-card-subtitle>{{ i18n.t('Token usage, requests and spend from the OpenAI usage endpoints.') }}</mat-card-subtitle>
     </mat-card-header>
 
     <mat-card-content>
@@ -116,69 +102,69 @@
         <div class="usage-source-row">
           <span class="hero-chip">
             <mat-icon>{{ usage.usageSource === 'local' ? 'memory' : usage.usageSource === 'organization' ? 'hub' : 'help' }}</mat-icon>
-            Tokens:
+            {{ i18n.t('Tokens:') }}
             @if (usage.usageSource === 'local') {
-              Tracked locally
+              {{ i18n.t('Tracked locally') }}
             } @else if (usage.usageSource === 'organization') {
-              OpenAI org usage
+              {{ i18n.t('OpenAI org usage') }}
             } @else {
-              Unavailable
+              {{ i18n.t('Unavailable') }}
             }
           </span>
 
           <span class="hero-chip">
             <mat-icon>{{ usage.costsSource === 'organization' ? 'payments' : 'info' }}</mat-icon>
-            Spend:
+            {{ i18n.t('Spend:') }}
             @if (usage.costsSource === 'organization') {
-              OpenAI org costs
+              {{ i18n.t('OpenAI org costs') }}
             } @else {
-              Unavailable
+              {{ i18n.t('Unavailable') }}
             }
           </span>
         </div>
 
         <div class="usage-stat-grid">
           <article class="usage-stat-card">
-            <span class="usage-stat-label">Today</span>
+            <span class="usage-stat-label">{{ i18n.t('Today') }}</span>
             <strong>{{ usage.today.totalTokens | number:'1.0-0' }}</strong>
             <span class="usage-stat-meta">
-              {{ usage.today.requests | number:'1.0-0' }} requests ·
+              {{ usage.today.requests | number:'1.0-0' }} {{ i18n.t('requests') }} ·
               @if (usage.costsAvailable) {
                 {{ usage.today.spend.value | currency:(usage.today.spend.currency || 'USD'):'symbol':'1.2-2' }}
               } @else {
-                spend unavailable
+                {{ i18n.t('spend unavailable') }}
               }
             </span>
           </article>
 
           <article class="usage-stat-card">
-            <span class="usage-stat-label">Last 7 days</span>
+            <span class="usage-stat-label">{{ i18n.t('Last 7 days') }}</span>
             <strong>{{ usage.last7Days.totalTokens | number:'1.0-0' }}</strong>
             <span class="usage-stat-meta">
-              {{ usage.last7Days.requests | number:'1.0-0' }} requests ·
+              {{ usage.last7Days.requests | number:'1.0-0' }} {{ i18n.t('requests') }} ·
               @if (usage.costsAvailable) {
                 {{ usage.last7Days.spend.value | currency:(usage.last7Days.spend.currency || 'USD'):'symbol':'1.2-2' }}
               } @else {
-                spend unavailable
+                {{ i18n.t('spend unavailable') }}
               }
             </span>
           </article>
 
           <article class="usage-stat-card">
-            <span class="usage-stat-label">This month</span>
+            <span class="usage-stat-label">{{ i18n.t('This month') }}</span>
             <strong>{{ usage.currentMonth.totalTokens | number:'1.0-0' }}</strong>
             <span class="usage-stat-meta">
-              {{ usage.currentMonth.requests | number:'1.0-0' }} requests ·
+              {{ usage.currentMonth.requests | number:'1.0-0' }} {{ i18n.t('requests') }} ·
               @if (usage.costsAvailable) {
                 {{ usage.currentMonth.spend.value | currency:(usage.currentMonth.spend.currency || 'USD'):'symbol':'1.2-2' }}
               } @else {
-                spend unavailable
+                {{ i18n.t('spend unavailable') }}
               }
             </span>
           </article>
 
           <article class="usage-stat-card" [class.usage-stat-card-alert]="budgetExceeded()">
-            <span class="usage-stat-label">Budget left</span>
+            <span class="usage-stat-label">{{ i18n.t('Budget left') }}</span>
             <strong>
               @if (usage.remainingBudgetUsd !== null) {
                 {{ usage.remainingBudgetUsd | currency:(usage.currentMonth.spend.currency || 'USD'):'symbol':'1.2-2' }}
@@ -188,9 +174,9 @@
             </strong>
             <span class="usage-stat-meta">
               @if (usage.budgetConfigured) {
-                Budget {{ usage.monthlyBudgetUsd | currency:(usage.currentMonth.spend.currency || 'USD'):'symbol':'1.2-2' }}
+                {{ i18n.t('Budget {{budget}}', { budget: (usage.monthlyBudgetUsd | currency:(usage.currentMonth.spend.currency || 'USD'):'symbol':'1.2-2') }) }}
               } @else {
-                No monthly budget configured
+                {{ i18n.t('No monthly budget configured') }}
               }
             </span>
           </article>
@@ -199,24 +185,24 @@
         <div class="usage-detail-grid">
           <span class="selected-model-meta-chip">
             <mat-icon>input</mat-icon>
-            {{ usage.currentMonth.inputTokens | number:'1.0-0' }} input tokens this month
+            {{ usage.currentMonth.inputTokens | number:'1.0-0' }} {{ i18n.t('input tokens this month') }}
           </span>
 
           <span class="selected-model-meta-chip">
             <mat-icon>output</mat-icon>
-            {{ usage.currentMonth.outputTokens | number:'1.0-0' }} output tokens this month
+            {{ usage.currentMonth.outputTokens | number:'1.0-0' }} {{ i18n.t('output tokens this month') }}
           </span>
 
           @if (usage.currentMonth.cachedInputTokens > 0) {
             <span class="selected-model-meta-chip">
               <mat-icon>inventory_2</mat-icon>
-              {{ usage.currentMonth.cachedInputTokens | number:'1.0-0' }} cached input tokens
+              {{ usage.currentMonth.cachedInputTokens | number:'1.0-0' }} {{ i18n.t('cached input tokens') }}
             </span>
           }
 
           <span class="selected-model-meta-chip">
             <mat-icon>schedule</mat-icon>
-            Updated {{ usage.updatedAt | date:'dd.MM.yyyy HH:mm' }}
+            {{ i18n.t('Updated {{date}}', { date: (usage.updatedAt | date:'short') }) }}
           </span>
         </div>
 
@@ -234,13 +220,13 @@
       <div mat-card-avatar class="avatar avatar-neutral">
         <mat-icon>settings_suggest</mat-icon>
       </div>
-      <mat-card-title>Model selection</mat-card-title>
-      <mat-card-subtitle>Choose which OpenAI model the admin content tools should use.</mat-card-subtitle>
+      <mat-card-title>{{ i18n.t('Model selection') }}</mat-card-title>
+      <mat-card-subtitle>{{ i18n.t('Choose which OpenAI model the admin content tools should use.') }}</mat-card-subtitle>
     </mat-card-header>
 
     <mat-card-content [formGroup]="form" class="settings-grid">
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>AI model</mat-label>
+        <mat-label>{{ i18n.t('AI model') }}</mat-label>
         <mat-select formControlName="selectedModel">
           @for (row of models(); track modelTrackBy($index, row)) {
             <mat-option [value]="row.id">
@@ -248,7 +234,7 @@
                 <span class="model-option-copy">
                   <strong>{{ row.id }}</strong>
                   <span>
-                    {{ row.available ? 'Available now' : 'Not listed right now' }}
+                    {{ row.available ? i18n.t('Available now') : i18n.t('Not listed right now') }}
                     @if (row.ownedBy) {
                       • {{ row.ownedBy }}
                     }
@@ -257,28 +243,23 @@
 
                 <span class="model-option-badges">
                   @if (row.isSelected) {
-                    <mat-chip>Current</mat-chip>
+                    <mat-chip>{{ i18n.t('Current') }}</mat-chip>
                   }
                   @if (row.isDefault) {
-                    <mat-chip>Default</mat-chip>
+                    <mat-chip>{{ i18n.t('Default') }}</mat-chip>
                   }
                 </span>
               </span>
             </mat-option>
           }
         </mat-select>
-        <mat-hint>Responses API will use this model for the editorial AI tools.</mat-hint>
+        <mat-hint>{{ i18n.t('Responses API will use this model for the editorial AI tools.') }}</mat-hint>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Monthly budget (USD)</mat-label>
-        <input
-          matInput
-          type="number"
-          min="0"
-          step="0.01"
-          formControlName="monthlyBudgetUsd">
-        <mat-hint>Optional budget used to calculate the remaining amount for the current month.</mat-hint>
+        <mat-label>{{ i18n.t('Monthly budget (USD)') }}</mat-label>
+        <input matInput type="number" min="0" step="0.01" formControlName="monthlyBudgetUsd">
+        <mat-hint>{{ i18n.t('Optional budget used to calculate the remaining amount for the current month.') }}</mat-hint>
       </mat-form-field>
 
       @if (selectedModelMeta(); as model) {
@@ -287,13 +268,13 @@
             <strong>{{ model.id }}</strong>
             <div class="selected-model-badges">
               @if (model.isSelected) {
-                <mat-chip>Selected</mat-chip>
+                <mat-chip>{{ i18n.t('Selected') }}</mat-chip>
               }
               @if (model.isDefault) {
-                <mat-chip>Default</mat-chip>
+                <mat-chip>{{ i18n.t('Default') }}</mat-chip>
               }
               @if (!model.available) {
-                <mat-chip class="muted-chip">Currently not listed</mat-chip>
+                <mat-chip class="muted-chip">{{ i18n.t('Currently not listed') }}</mat-chip>
               }
             </div>
           </div>
@@ -302,7 +283,7 @@
             @if (model.createdAt) {
               <span class="selected-model-meta-chip">
                 <mat-icon>schedule</mat-icon>
-                {{ model.createdAt | date:'dd.MM.yyyy' }}
+                {{ model.createdAt | date:'mediumDate' }}
               </span>
             }
 
@@ -318,7 +299,7 @@
 
       @if (settings()?.updatedAt) {
         <p class="updated-at">
-          Last saved: {{ settings()?.updatedAt | date:'dd.MM.yyyy HH:mm' }}
+          {{ i18n.t('Last saved: {{date}}', { date: (settings()?.updatedAt | date:'short') }) }}
         </p>
       }
     </mat-card-content>

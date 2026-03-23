@@ -8,6 +8,7 @@ import { LoginRequest } from '../../interfaces/login-request.interface';
 import { LoginResponse } from '../../interfaces/login-response.interface';
 import { LoginOtpResponse } from '../../interfaces/login-otp-response.interface';
 import { VerifyOtpRequest } from '../../interfaces/verify-otp-request.interface';
+import { TranslationHelperService } from '../translation-helper.service';
 
 @Injectable({
   providedIn: 'root'
@@ -23,11 +24,14 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly i18n = inject(TranslationHelperService);
+
   private get token() {
     return localStorage.getItem('admin_token');
   }
+
   private handleError = (error: unknown) => {
-    this.snackBar.open('Login failed. Please check your credentials.', 'OK', {
+    this.snackBar.open(this.i18n.t('Login failed. Please check your credentials.'), this.i18n.t('OK'), {
       duration: 3000,
       panelClass: ['snack-error'],
       horizontalPosition: 'center',
@@ -70,9 +74,6 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
-  /**
-   * Hilfsfunktion: Token prüfen
-   */
   hasToken(): boolean {
     return !!this.token;
   }

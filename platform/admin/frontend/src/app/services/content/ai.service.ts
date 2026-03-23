@@ -8,6 +8,7 @@ import { AiSettings } from '../../interfaces/ai-settings.interface';
 import { AiToolRequest } from '../../interfaces/ai-tool-request.interface';
 import { AiToolResult } from '../../interfaces/ai-tool-result.interface';
 import { AiUsage } from '../../interfaces/ai-usage.interface';
+import { TranslationHelperService } from '../translation-helper.service';
 
 interface AiSettingsResponse {
   status: number;
@@ -38,6 +39,7 @@ interface AiUsageResponse {
 export class AiService {
   private readonly http = inject(HttpClient);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly i18n = inject(TranslationHelperService);
   private readonly baseUrl = `${environment.apiUrl}/ai`;
 
   private readonly _settings = signal<AiSettings | null>(null);
@@ -154,7 +156,7 @@ export class AiService {
   }
 
   private handleError(error: unknown, fallbackMessage: string) {
-    this.snackBar.open(this.resolveErrorMessage(error, fallbackMessage), 'OK', {
+    this.snackBar.open(this.resolveErrorMessage(error, fallbackMessage), this.i18n.t('OK'), {
       duration: 3400,
       panelClass: ['snack-error'],
       horizontalPosition: 'center',
@@ -170,6 +172,6 @@ export class AiService {
         return message.trim();
       }
     }
-    return fallbackMessage;
+    return this.i18n.t(fallbackMessage);
   }
 }

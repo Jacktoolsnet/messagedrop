@@ -1,10 +1,9 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
 import { MatBadgeModule } from '@angular/material/badge';
+import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
@@ -15,8 +14,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Router, RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged, finalize, map } from 'rxjs';
-import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
 import { PublicContentStatus } from '../../../interfaces/public-content-status.type';
 import { PublicContentType } from '../../../interfaces/public-content-type.type';
 import { PublicContent } from '../../../interfaces/public-content.interface';
@@ -24,6 +23,8 @@ import { PublicProfile } from '../../../interfaces/public-profile.interface';
 import { AuthService } from '../../../services/auth/auth.service';
 import { PublicContentService } from '../../../services/content/public-content.service';
 import { PublicProfileService } from '../../../services/content/public-profile.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
+import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
 
 @Component({
   selector: 'app-public-content-list',
@@ -57,6 +58,7 @@ export class PublicContentListComponent {
   private readonly publicContentService = inject(PublicContentService);
   private readonly publicProfileService = inject(PublicProfileService);
 
+  readonly i18n = inject(TranslationHelperService);
   readonly role = this.authService.role;
   readonly rows = this.publicContentService.rows;
   readonly loading = this.publicContentService.loading;
@@ -173,7 +175,7 @@ export class PublicContentListComponent {
   }
 
   profileName(row: PublicContent): string {
-    return row.publicProfile?.name?.trim() || 'No profile assigned';
+    return row.publicProfile?.name?.trim() || this.i18n.t('No profile assigned');
   }
 
   profileAvatar(row: PublicContent): string {
@@ -187,7 +189,7 @@ export class PublicContentListComponent {
   }
 
   filterProfileName(profile: PublicProfile | null): string {
-    return profile?.name?.trim() || 'All profiles';
+    return profile?.name?.trim() || this.i18n.t('All profiles');
   }
 
   filterProfileAvatar(profile: PublicProfile | null): string {
@@ -198,35 +200,6 @@ export class PublicContentListComponent {
     const name = this.filterProfileName(profile);
     const parts = name.split(/\s+/).filter(Boolean).slice(0, 2);
     return parts.map((part) => part.charAt(0).toUpperCase()).join('') || 'P';
-  }
-
-  tileTitle(row: PublicContent): string {
-    if (row.contentType === 'comment' && row.parentContent) {
-      const parentProfile = row.parentContent.publicProfileName?.trim();
-      const parentLocation = row.parentContent.locationLabel?.trim();
-      if (parentProfile && parentLocation) {
-        return `${parentProfile} • ${parentLocation}`;
-      }
-      if (parentLocation) {
-        return parentLocation;
-      }
-      if (parentProfile) {
-        return parentProfile;
-      }
-      return 'Comment';
-    }
-
-    const locationLabel = row.location?.label?.trim();
-    if (locationLabel) {
-      return locationLabel;
-    }
-
-    const mediaTitle = row.multimedia?.title?.trim();
-    if (mediaTitle) {
-      return mediaTitle;
-    }
-
-    return 'Public message';
   }
 
   tilePreview(row: PublicContent): string {
@@ -246,10 +219,10 @@ export class PublicContentListComponent {
     }
 
     if (row.multimedia?.type && row.multimedia.type !== 'undefined') {
-      return `Attached media: ${this.mediaTypeLabel(row.multimedia.type)}`;
+      return this.i18n.t('Attached media: {{type}}', { type: this.mediaTypeLabel(row.multimedia.type) });
     }
 
-    return 'No text content.';
+    return this.i18n.t('No text content.');
   }
 
   locationLabel(row: PublicContent): string {
@@ -257,15 +230,15 @@ export class PublicContentListComponent {
       const parentProfile = row.parentContent?.publicProfileName?.trim();
       const parentLocation = row.parentContent?.locationLabel?.trim();
       if (parentProfile && parentLocation) {
-        return `Reply to ${parentProfile} • ${parentLocation}`;
+        return this.i18n.t('Reply to {{label}}', { label: `${parentProfile} • ${parentLocation}` });
       }
       if (parentLocation) {
-        return `Reply to ${parentLocation}`;
+        return this.i18n.t('Reply to {{label}}', { label: parentLocation });
       }
       if (parentProfile) {
-        return `Reply to ${parentProfile}`;
+        return this.i18n.t('Reply to {{label}}', { label: parentProfile });
       }
-      return 'Comment without parent';
+      return this.i18n.t('Comment without parent');
     }
 
     const label = this.normalizeLocationLabel(row.location?.label?.trim() ?? '');
@@ -284,7 +257,7 @@ export class PublicContentListComponent {
       return `${this.formatCoordinate(latitude)}, ${this.formatCoordinate(longitude)}`;
     }
 
-    return 'No location';
+    return this.i18n.t('No location');
   }
 
   mediaTypeLabel(type: string | null | undefined): string {
@@ -298,42 +271,14 @@ export class PublicContentListComponent {
       case 'tiktok':
         return 'TikTok';
       case 'tenor':
-        return 'Tenor GIF';
+        return this.i18n.t('Tenor GIF');
       case 'image':
-        return 'Image';
+        return this.i18n.t('Image');
       case 'undefined':
       case '':
-        return 'No media';
+        return this.i18n.t('No media');
       default:
-        return type ?? 'Media';
-    }
-  }
-
-  tileAvatarIcon(row: PublicContent): string {
-    switch (row.status) {
-      case 'published':
-        return 'campaign';
-      case 'withdrawn':
-        return 'unpublished';
-      case 'deleted':
-        return 'delete_outline';
-      case 'draft':
-      default:
-        return row.multimedia?.type && row.multimedia.type !== 'undefined' ? 'perm_media' : 'edit_note';
-    }
-  }
-
-  tileAvatarClass(row: PublicContent): string {
-    switch (row.status) {
-      case 'published':
-        return 'avatar avatar-success';
-      case 'withdrawn':
-        return 'avatar avatar-warn';
-      case 'deleted':
-        return 'avatar avatar-neutral';
-      case 'draft':
-      default:
-        return 'avatar avatar-accent';
+        return type ?? this.i18n.t('Media');
     }
   }
 
@@ -354,19 +299,19 @@ export class PublicContentListComponent {
   statusLabel(status: string): string {
     switch (status) {
       case 'published':
-        return 'Published';
+        return this.i18n.t('Published');
       case 'withdrawn':
-        return 'Withdrawn';
+        return this.i18n.t('Withdrawn');
       case 'deleted':
-        return 'Deleted';
+        return this.i18n.t('Deleted');
       case 'draft':
       default:
-        return 'Draft';
+        return this.i18n.t('Draft');
     }
   }
 
   typeLabel(type: PublicContentType | string): string {
-    return type === 'comment' ? 'Comment' : 'Message';
+    return type === 'comment' ? this.i18n.t('Comment') : this.i18n.t('Public message');
   }
 
   typeIcon(type: PublicContentType | string): string {

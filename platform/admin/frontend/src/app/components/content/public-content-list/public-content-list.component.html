@@ -1,45 +1,25 @@
 <mat-toolbar color="primary">
-  <button mat-icon-button routerLink="/dashboard" aria-label="Back to dashboard">
+  <button mat-icon-button routerLink="/dashboard" [attr.aria-label]="i18n.t('Back to dashboard')">
     <mat-icon>home</mat-icon>
   </button>
 
-  <span class="toolbar-title">Public content</span>
+  <span class="toolbar-title">{{ i18n.t('Public content') }}</span>
   <span class="spacer"></span>
 
   @if (canAccess()) {
-    <button
-      mat-icon-button
-      type="button"
-      class="toolbar-action"
-      (click)="createContent()"
-      aria-label="Create new message">
+    <button mat-icon-button type="button" class="toolbar-action" (click)="createContent()" [attr.aria-label]="i18n.t('Create new message')">
       <mat-icon>add</mat-icon>
     </button>
 
-    <button
-      mat-icon-button
-      type="button"
-      class="toolbar-action"
-      (click)="openAiSettings()"
-      aria-label="Open AI settings">
+    <button mat-icon-button type="button" class="toolbar-action" (click)="openAiSettings()" [attr.aria-label]="i18n.t('Open AI settings')">
       <mat-icon>smart_toy</mat-icon>
     </button>
 
-    <button
-      mat-icon-button
-      type="button"
-      class="toolbar-action"
-      (click)="openProfiles()"
-      aria-label="Manage public profiles">
+    <button mat-icon-button type="button" class="toolbar-action" (click)="openProfiles()" [attr.aria-label]="i18n.t('Manage public profiles')">
       <mat-icon>groups</mat-icon>
     </button>
 
-    <button
-      mat-icon-button
-      type="button"
-      class="toolbar-action"
-      (click)="load()"
-      aria-label="Refresh content list">
+    <button mat-icon-button type="button" class="toolbar-action" (click)="load()" [attr.aria-label]="i18n.t('Refresh content list')">
       <mat-icon>refresh</mat-icon>
     </button>
   }
@@ -54,20 +34,20 @@
     <mat-card class="empty-state">
       <mat-card-content>
         <mat-icon>lock</mat-icon>
-        <div>You do not have access to public content management.</div>
+        <div>{{ i18n.t('You do not have access to public content management.') }}</div>
       </mat-card-content>
     </mat-card>
   } @else {
     <div class="header-row">
       <div>
-        <h2>Public messages</h2>
-        <p>Create, edit, publish or withdraw editorial public messages.</p>
+        <h2>{{ i18n.t('Public messages') }}</h2>
+        <p>{{ i18n.t('Create, edit, publish or withdraw editorial public messages.') }}</p>
       </div>
     </div>
 
     <div class="filter-row" [formGroup]="filterForm">
       <mat-form-field appearance="outline" class="profile-field">
-        <mat-label>Public profile</mat-label>
+        <mat-label>{{ i18n.t('Public profile') }}</mat-label>
         <mat-select formControlName="publicProfileId">
           <mat-select-trigger>
             <span class="profile-filter-trigger">
@@ -81,12 +61,12 @@
                 </span>
                 <span class="profile-filter-name">{{ filterProfileName(profile) }}</span>
               } @else {
-                <span class="profile-filter-name">All profiles</span>
+                <span class="profile-filter-name">{{ i18n.t('All profiles') }}</span>
               }
             </span>
           </mat-select-trigger>
 
-          <mat-option value="">All profiles</mat-option>
+          <mat-option value="">{{ i18n.t('All profiles') }}</mat-option>
 
           @for (profile of profiles(); track profile.id) {
             <mat-option [value]="profile.id">
@@ -106,17 +86,17 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Status</mat-label>
+        <mat-label>{{ i18n.t('Status') }}</mat-label>
         <mat-select formControlName="status">
           @for (status of statusOptions; track status) {
-            <mat-option [value]="status">{{ status === 'all' ? 'All statuses' : statusLabel(status) }}</mat-option>
+            <mat-option [value]="status">{{ status === 'all' ? i18n.t('All statuses') : statusLabel(status) }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="search-field">
-        <mat-label>Search</mat-label>
-        <input matInput formControlName="q" placeholder="Search in message, author, profile or location" />
+        <mat-label>{{ i18n.t('Search') }}</mat-label>
+        <input matInput formControlName="q" [placeholder]="i18n.t('Search in message, author, profile or location')" />
       </mat-form-field>
     </div>
 
@@ -133,7 +113,7 @@
             </div>
             <div class="content-preview-avatar-text">
               <span class="content-preview-name">{{ profileName(row) }}</span>
-              <span class="content-preview-timestamp">{{ row.authorUsername }} • {{ row.updatedAt | date:'dd.MM.yyyy HH:mm' }}</span>
+              <span class="content-preview-timestamp">{{ row.authorUsername }} • {{ row.updatedAt | date:'short' }}</span>
             </div>
             <span class="status-pill content-preview-status" [class]="'status-pill content-preview-status ' + statusClass(row.status)">
               <mat-icon>{{ statusIcon(row.status) }}</mat-icon>
@@ -144,7 +124,7 @@
           <mat-card-content class="tile-content content-preview-body">
             @if (hasImageMultimedia(row)) {
               <div class="content-preview-media">
-                <img [src]="row.multimedia.url" [alt]="row.multimedia.title || 'Selected multimedia preview'" />
+                <img [src]="row.multimedia.url" [alt]="row.multimedia.title || i18n.t('Selected multimedia preview')" />
               </div>
             } @else if (row.multimedia.type !== 'undefined' && (row.multimedia.title || row.multimedia.description)) {
               <div class="content-preview-media-summary">
@@ -165,7 +145,7 @@
             }
 
             @if (row.hashtags.length > 0) {
-              <div class="content-preview-hashtag-list" aria-label="Hashtags">
+              <div class="content-preview-hashtag-list" [attr.aria-label]="i18n.t('Hashtags')">
                 @for (tag of row.hashtags; track tag) {
                   <span class="content-preview-hashtag-chip">#{{ tag }}</span>
                 }
@@ -195,76 +175,35 @@
           <mat-card-actions class="card-actions content-preview-actions">
             <div class="content-preview-action-bar">
               @if (canRestoreRow(row)) {
-                <button
-                  mat-icon-button
-                  type="button"
-                  class="content-preview-action-button action-primary"
-                  (click)="confirmRestore(row, $event)"
-                  matTooltip="Restore"
-                  aria-label="Restore">
+                <button mat-icon-button type="button" class="content-preview-action-button action-primary" (click)="confirmRestore(row, $event)" [matTooltip]="i18n.t('Restore')" [attr.aria-label]="i18n.t('Restore')">
                   <mat-icon>restore_from_trash</mat-icon>
                 </button>
               } @else {
-                <button
-                  mat-icon-button
-                  type="button"
-                  class="content-preview-action-button action-neutral"
-                  (click)="openContent(row); $event.stopPropagation()"
-                  [matTooltip]="row.status === 'published' ? 'Open' : 'Edit'"
-                  [attr.aria-label]="row.status === 'published' ? 'Open' : 'Edit'">
+                <button mat-icon-button type="button" class="content-preview-action-button action-neutral" (click)="openContent(row); $event.stopPropagation()" [matTooltip]="row.status === 'published' ? i18n.t('Open') : i18n.t('Edit')" [attr.aria-label]="row.status === 'published' ? i18n.t('Open') : i18n.t('Edit')">
                   <mat-icon>{{ row.status === 'published' ? 'visibility' : 'edit' }}</mat-icon>
                 </button>
               }
 
               @if (canCommentOnRow(row)) {
-                <button
-                  mat-icon-button
-                  type="button"
-                  class="content-preview-action-button action-secondary"
-                  (click)="openComments(row, $event)"
-                  matTooltip="Comments"
-                  aria-label="Comments">
-                  <mat-icon
-                    [matBadge]="childCommentCount(row) === 0 ? '' : childCommentCount(row)"
-                    matBadgePosition="after"
-                    matBadgeColor="accent"
-                    matBadgeSize="small"
-                    [matBadgeOverlap]="true">forum</mat-icon>
+                <button mat-icon-button type="button" class="content-preview-action-button action-secondary" (click)="openComments(row, $event)" [matTooltip]="i18n.t('Comments')" [attr.aria-label]="i18n.t('Comments')">
+                  <mat-icon [matBadge]="childCommentCount(row) === 0 ? '' : childCommentCount(row)" matBadgePosition="after" matBadgeColor="accent" matBadgeSize="small" [matBadgeOverlap]="true">forum</mat-icon>
                 </button>
               }
 
               @if (canPublishRow(row)) {
-                <button
-                  mat-icon-button
-                  type="button"
-                  class="content-preview-action-button action-success"
-                  (click)="confirmPublish(row, $event)"
-                  matTooltip="Publish"
-                  aria-label="Publish">
+                <button mat-icon-button type="button" class="content-preview-action-button action-success" (click)="confirmPublish(row, $event)" [matTooltip]="i18n.t('Publish')" [attr.aria-label]="i18n.t('Publish')">
                   <mat-icon>publish</mat-icon>
                 </button>
               }
 
               @if (canWithdrawRow(row)) {
-                <button
-                  mat-icon-button
-                  type="button"
-                  class="content-preview-action-button action-warn"
-                  (click)="confirmWithdraw(row, $event)"
-                  matTooltip="Withdraw"
-                  aria-label="Withdraw">
+                <button mat-icon-button type="button" class="content-preview-action-button action-warn" (click)="confirmWithdraw(row, $event)" [matTooltip]="i18n.t('Withdraw')" [attr.aria-label]="i18n.t('Withdraw')">
                   <mat-icon>unpublished</mat-icon>
                 </button>
               }
 
               @if (canDeleteRow(row)) {
-                <button
-                  mat-icon-button
-                  type="button"
-                  class="content-preview-action-button action-danger action-danger-edge"
-                  (click)="confirmDelete(row, $event)"
-                  matTooltip="Delete"
-                  aria-label="Delete">
+                <button mat-icon-button type="button" class="content-preview-action-button action-danger action-danger-edge" (click)="confirmDelete(row, $event)" [matTooltip]="i18n.t('Delete')" [attr.aria-label]="i18n.t('Delete')">
                   <mat-icon>delete</mat-icon>
                 </button>
               }
@@ -278,7 +217,7 @@
       <mat-card class="empty-state">
         <mat-card-content>
           <mat-icon>inbox</mat-icon>
-          <div>No public content matches the current filters.</div>
+          <div>{{ i18n.t('No public content matches the current filters.') }}</div>
         </mat-card-content>
       </mat-card>
     }

@@ -1,7 +1,6 @@
 import { CommonModule, CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -13,9 +12,11 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { ActivatedRoute, Router } from '@angular/router';
 import { finalize, startWith } from 'rxjs';
 import { AiModel } from '../../../interfaces/ai-model.interface';
 import { AiService } from '../../../services/content/ai.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 
 @Component({
   selector: 'app-ai-settings',
@@ -47,6 +48,7 @@ export class AiSettingsComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
+  readonly i18n = inject(TranslationHelperService);
   readonly settings = this.aiService.settings;
   readonly models = this.aiService.models;
   readonly usage = this.aiService.usage;
@@ -156,7 +158,7 @@ export class AiSettingsComponent {
           this.lastSyncedModel.set(row.selectedModel);
           this.lastSyncedBudget.set(this.normalizeBudgetValue(row.monthlyBudgetUsd));
           this.aiService.loadUsage();
-          this.snackBar.open('AI settings saved.', 'OK', {
+          this.snackBar.open(this.i18n.t('AI settings saved.'), this.i18n.t('OK'), {
             duration: 2400,
             horizontalPosition: 'center',
             verticalPosition: 'top'

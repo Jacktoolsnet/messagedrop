@@ -18,6 +18,7 @@ import { TransparencyReport } from '../../../interfaces/transparency-report.inte
 import { TransparencyStats } from '../../../interfaces/transparency-stats.interface';
 import { AuthService } from '../../../services/auth/auth.service';
 import { DsaService } from '../../../services/dsa/dsa/dsa.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 
 Chart.register(...registerables, annotationPlugin);
 
@@ -50,16 +51,17 @@ export class TransparencyComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly dsa = inject(DsaService);
   private readonly snack = inject(MatSnackBar);
   private readonly auth = inject(AuthService);
+  readonly i18n = inject(TranslationHelperService);
 
   @ViewChild('statusChart') private statusChartRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('decisionChart') private decisionChartRef?: ElementRef<HTMLCanvasElement>;
   @ViewChild('trendChart') private trendChartRef?: ElementRef<HTMLCanvasElement>;
 
   readonly rangeOptions: RangeOption[] = [
-    { value: '30d', label: 'Last 30 days' },
-    { value: '90d', label: 'Last 90 days' },
-    { value: '365d', label: 'Last 12 months' },
-    { value: 'all', label: 'All time' }
+    { value: '30d', label: this.i18n.t('Last 30 days') },
+    { value: '90d', label: this.i18n.t('Last 90 days') },
+    { value: '365d', label: this.i18n.t('Last 12 months') },
+    { value: 'all', label: this.i18n.t('All time') }
   ];
 
   readonly filterForm = this.fb.nonNullable.group({
@@ -163,7 +165,7 @@ export class TransparencyComponent implements OnInit, AfterViewInit, OnDestroy {
       data: {
         labels: statusEntries.map(([status]) => status),
         datasets: [{
-          label: 'Notices',
+          label: this.i18n.t('Notices'),
           data: statusEntries.map(([, count]) => count),
           backgroundColor: '#05a51dbd'
         }]
@@ -187,7 +189,7 @@ export class TransparencyComponent implements OnInit, AfterViewInit, OnDestroy {
       data: {
         labels: decisionEntries.map(([outcome]) => outcome),
         datasets: [{
-          label: 'Decisions',
+          label: this.i18n.t('Decisions'),
           data: decisionEntries.map(([, count]) => count),
           backgroundColor: ['#4ade80', '#60a5fa', '#fbbf24', '#f87171', '#a78bfa', '#f472b6']
         }]
@@ -210,7 +212,7 @@ export class TransparencyComponent implements OnInit, AfterViewInit, OnDestroy {
         labels: trendLabels,
         datasets: [
           {
-            label: 'Notices',
+            label: this.i18n.t('Notices'),
             data: data.trend.map(item => item.notices),
             borderColor: '#2563eb',
             backgroundColor: 'rgba(37, 99, 235, 0.3)',
@@ -219,7 +221,7 @@ export class TransparencyComponent implements OnInit, AfterViewInit, OnDestroy {
             pointRadius: 4
           },
           {
-            label: 'Decisions',
+            label: this.i18n.t('Decisions'),
             data: data.trend.map(item => item.decisions),
             borderColor: '#22c55e',
             backgroundColor: 'rgba(34, 197, 94, 0.25)',
@@ -255,30 +257,30 @@ export class TransparencyComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   formatDuration(ms: number): string {
-    if (!Number.isFinite(ms) || ms <= 0) return 'n/a';
+    if (!Number.isFinite(ms) || ms <= 0) return this.i18n.t('n/a');
     const totalHours = Math.floor(ms / (1000 * 60 * 60));
     const days = Math.floor(totalHours / 24);
     const hours = totalHours % 24;
     const parts: string[] = [];
-    if (days > 0) parts.push(`${days}d`);
-    if (hours > 0) parts.push(`${hours}h`);
-    if (parts.length === 0) parts.push('<1h');
+    if (days > 0) parts.push(this.i18n.t('{{count}}d', { count: days }));
+    if (hours > 0) parts.push(this.i18n.t('{{count}}h', { count: hours }));
+    if (parts.length === 0) parts.push(this.i18n.t('<1h'));
     return parts.join(' ');
   }
 
   formatDate(ts: number | null | undefined): string {
-    if (!ts) return 'n/a';
-    return new Date(ts).toLocaleDateString();
+    if (!ts) return this.i18n.t('n/a');
+    return new Date(ts).toLocaleDateString(this.i18n.dateLocale());
   }
 
   formatDateTime(ts: number | null | undefined): string {
-    if (!ts) return 'n/a';
-    return new Date(ts).toLocaleString();
+    if (!ts) return this.i18n.t('n/a');
+    return new Date(ts).toLocaleString(this.i18n.dateLocale());
   }
 
   formatBytes(bytes: number | null | undefined): string {
     const size = Number(bytes);
-    if (!Number.isFinite(size) || size <= 0) return 'n/a';
+    if (!Number.isFinite(size) || size <= 0) return this.i18n.t('n/a');
     if (size < 1024) return `${size} B`;
     if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
     return `${(size / (1024 * 1024)).toFixed(1)} MB`;
@@ -289,7 +291,7 @@ export class TransparencyComponent implements OnInit, AfterViewInit, OnDestroy {
       next: (response) => {
         const blob = response.body;
         if (!blob) {
-          this.snack.open('Empty report received.', 'OK', { duration: 2500 });
+          this.snack.open(this.i18n.t('Empty report received.'), this.i18n.t('OK'), { duration: 2500 });
           return;
         }
         const filename = this.resolveFilename(response, `transparency-${report.id}.csv`);
@@ -303,7 +305,7 @@ export class TransparencyComponent implements OnInit, AfterViewInit, OnDestroy {
         window.URL.revokeObjectURL(url);
       },
       error: () => {
-        this.snack.open('Could not download report.', 'OK', { duration: 3000 });
+        this.snack.open(this.i18n.t('Could not download report.'), this.i18n.t('OK'), { duration: 3000 });
       }
     });
   }
@@ -324,9 +326,9 @@ export class TransparencyComponent implements OnInit, AfterViewInit, OnDestroy {
 
   labelForType(type: string): string {
     switch ((type || '').toUpperCase()) {
-      case 'RECEIVED': return 'Received';
-      case 'UNDER_REVIEW': return 'Under review';
-      case 'DECIDED': return 'Decided';
+      case 'RECEIVED': return this.i18n.t('Received');
+      case 'UNDER_REVIEW': return this.i18n.t('Under review');
+      case 'DECIDED': return this.i18n.t('Decided');
       default: return type;
     }
   }
@@ -336,24 +338,27 @@ export class TransparencyComponent implements OnInit, AfterViewInit, OnDestroy {
     switch (key) {
       case 'REMOVE_CONTENT':
       case 'REMOVE':
-        return 'Removed';
+        return this.i18n.t('Removed');
       case 'RESTRICT':
-        return 'Restricted';
+        return this.i18n.t('Restricted');
       case 'NO_ACTION':
-        return 'No action';
+        return this.i18n.t('No action');
       case 'FORWARD_TO_AUTHORITY':
-        return 'Escalated';
+        return this.i18n.t('Escalated');
       default:
         return outcome;
     }
   }
 
   automatedShare(stats: TransparencyStats | null): string {
-    if (!stats) return 'n/a';
+    if (!stats) return this.i18n.t('n/a');
     const auto = stats.decisions.automated.automated;
     const total = stats.decisions.total || 1;
     const ratio = (auto / total) * 100;
-    return `${auto} decisions (${ratio.toFixed(1)}%)`;
+    return this.i18n.t('{{count}} decisions ({{ratio}}%)', {
+      count: auto,
+      ratio: ratio.toFixed(1)
+    });
   }
 
   toEntries(record: Record<string, number> | null | undefined) {

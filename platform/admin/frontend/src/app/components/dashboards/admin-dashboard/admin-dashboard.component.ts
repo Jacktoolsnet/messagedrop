@@ -1,14 +1,15 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
-import { MatBadgeModule } from '@angular/material/badge';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../services/auth/auth.service';
-import { LogService } from '../../../services/log.service';
 import { DsaService } from '../../../services/dsa/dsa/dsa.service';
+import { LogService } from '../../../services/log.service';
 import { ModerationService } from '../../../services/moderation.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { CONTENT_MODULE_ROLES, DSA_MODULE_ROLES, MODERATION_MODULE_ROLES, ROOT_ADMIN_ROLES, USER_MODULE_ROLES, hasAllowedRole } from '../../../utils/admin-role-access';
 
 @Component({
@@ -26,29 +27,30 @@ import { CONTENT_MODULE_ROLES, DSA_MODULE_ROLES, MODERATION_MODULE_ROLES, ROOT_A
   styleUrls: ['./admin-dashboard.component.css']
 })
 export class AdminDashboardComponent implements OnInit {
-  private router = inject(Router);
-  private authService = inject(AuthService);
-  private logService = inject(LogService);
-  private dsaService = inject(DsaService);
-  private moderationService = inject(ModerationService);
+  private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
+  private readonly logService = inject(LogService);
+  private readonly dsaService = inject(DsaService);
+  private readonly moderationService = inject(ModerationService);
 
+  readonly i18n = inject(TranslationHelperService);
   readonly username = this.authService.username;
   readonly role = this.authService.role;
   readonly roleLabel = computed(() => {
     switch (this.role()) {
       case 'root':
-        return 'Root';
+        return this.i18n.t('Root');
       case 'admin':
-        return 'Admin';
+        return this.i18n.t('Admin');
       case 'legal':
-        return 'Legal';
+        return this.i18n.t('Legal');
       case 'editor':
-        return 'Editor';
+        return this.i18n.t('Editor');
       case 'author':
-        return 'Author';
+        return this.i18n.t('Author');
       case 'moderator':
       default:
-        return 'Moderator';
+        return this.i18n.t('Moderator');
     }
   });
   readonly canAccessUsers = computed(() => hasAllowedRole(this.role(), USER_MODULE_ROLES));
@@ -96,19 +98,19 @@ export class AdminDashboardComponent implements OnInit {
   refreshCounts() {
     const since = this.startOfTodayUtc();
     if (this.canAccessLogs()) {
-      this.logService.getErrorCountSince(since).subscribe(res => {
+      this.logService.getErrorCountSince(since).subscribe((res) => {
         this.errorCountToday.set(res.count);
       });
-      this.logService.getInfoCountSince(since).subscribe(res => {
+      this.logService.getInfoCountSince(since).subscribe((res) => {
         this.infoCountToday.set(res.count);
       });
-      this.logService.getWarnCountSince(since).subscribe(res => {
+      this.logService.getWarnCountSince(since).subscribe((res) => {
         this.warnCountToday.set(res.count);
       });
-      this.logService.getFrontendErrorCountSince(since).subscribe(res => {
+      this.logService.getFrontendErrorCountSince(since).subscribe((res) => {
         this.appErrorCountToday.set(res.count);
       });
-      this.logService.getPowCountSince(since).subscribe(res => {
+      this.logService.getPowCountSince(since).subscribe((res) => {
         this.powCountToday.set(res.count);
       });
     } else {

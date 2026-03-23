@@ -16,6 +16,7 @@ import { AiToolRequest } from '../../../interfaces/ai-tool-request.interface';
 import { AiToolResult } from '../../../interfaces/ai-tool-result.interface';
 import { AiTool } from '../../../interfaces/ai-tool.type';
 import { AiService } from '../../../services/content/ai.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 
 export interface PublicContentAiDialogData {
   tool: AiTool;
@@ -66,6 +67,7 @@ export class PublicContentAiDialogComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder);
   private readonly aiService = inject(AiService);
+  readonly i18n = inject(TranslationHelperService);
 
   readonly loading = signal(false);
   readonly result = signal<AiToolResult | null>(null);
@@ -81,38 +83,38 @@ export class PublicContentAiDialogComponent {
   readonly title = computed(() => {
     switch (this.tool) {
       case 'proofread':
-        return 'Proofread text';
+        return this.i18n.t('Proofread text');
       case 'rewrite':
-        return 'Rewrite suggestions';
+        return this.i18n.t('Rewrite suggestions');
       case 'translate':
-        return 'Translate text';
+        return this.i18n.t('Translate text');
       case 'hashtags':
-        return 'Generate hashtags';
+        return this.i18n.t('Generate hashtags');
       case 'emoji':
-        return 'Emoji suggestions';
+        return this.i18n.t('Emoji suggestions');
       case 'thread':
-        return 'Thread suggestions';
+        return this.i18n.t('Thread suggestions');
       case 'quality_check':
-        return 'Quality check';
+        return this.i18n.t('Quality check');
     }
   });
 
   readonly subtitle = computed(() => {
     switch (this.tool) {
       case 'proofread':
-        return 'Correct spelling, grammar and punctuation while keeping the original tone.';
+        return this.i18n.t('Correct spelling, grammar and punctuation while keeping the original tone.');
       case 'rewrite':
-        return 'Generate alternative formulations for this message or comment.';
+        return this.i18n.t('Generate alternative formulations for this message or comment.');
       case 'translate':
-        return 'Translate the current text into another language.';
+        return this.i18n.t('Translate the current text into another language.');
       case 'hashtags':
-        return 'Suggest editorial hashtags based on text, location and media context.';
+        return this.i18n.t('Suggest editorial hashtags based on text, location and media context.');
       case 'emoji':
-        return 'Suggest fitting emojis that can be added to the current message.';
+        return this.i18n.t('Suggest fitting emojis that can be added to the current message.');
       case 'thread':
-        return 'Generate short follow-up comments or replies for the current thread.';
+        return this.i18n.t('Generate short follow-up comments or replies for the current thread.');
       case 'quality_check':
-        return 'Review clarity, tone and publication readiness and suggest improvements.';
+        return this.i18n.t('Review clarity, tone and publication readiness and suggest improvements.');
     }
   });
 

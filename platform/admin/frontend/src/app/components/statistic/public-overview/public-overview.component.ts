@@ -9,6 +9,7 @@ import { MultiSeriesResponse } from '../../../interfaces/statistic-multi-series-
 import { SeriesPoint } from '../../../interfaces/statistic-series-point.interface';
 import { AuthService } from '../../../services/auth/auth.service';
 import { StatisticService } from '../../../services/statistic/statistic.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { StatisticKeyChartComponent } from '../key-chart/statistic-key-chart.component';
 
 interface PublicMetricTile {
@@ -37,6 +38,7 @@ interface PublicMetricTile {
 export class PublicOverviewComponent implements OnInit {
   private readonly statistics = inject(StatisticService);
   private readonly auth = inject(AuthService);
+  readonly i18n = inject(TranslationHelperService);
 
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
@@ -50,10 +52,10 @@ export class PublicOverviewComponent implements OnInit {
   );
 
   readonly metrics: PublicMetricTile[] = [
-    { key: 'client.connect', title: 'Page views', icon: 'visibility', color: '#2563eb' },
-    { key: 'message.create', title: 'New messages', icon: 'chat', color: '#16a34a' },
-    { key: 'message.search', title: 'Search requests', icon: 'search', color: '#ea580c' },
-    { key: 'user.create', title: 'New users', icon: 'person_add', color: '#7c3aed' }
+    { key: 'client.connect', title: this.i18n.t('Page views'), icon: 'visibility', color: '#2563eb' },
+    { key: 'message.create', title: this.i18n.t('New messages'), icon: 'chat', color: '#16a34a' },
+    { key: 'message.search', title: this.i18n.t('Search requests'), icon: 'search', color: '#ea580c' },
+    { key: 'user.create', title: this.i18n.t('New users'), icon: 'person_add', color: '#7c3aed' }
   ];
 
   ngOnInit(): void {
@@ -68,7 +70,7 @@ export class PublicOverviewComponent implements OnInit {
         this.overview.set(data);
       },
       error: () => {
-        this.error.set('Could not load public statistics.');
+        this.error.set(this.i18n.t('Could not load public statistics.'));
       },
       complete: () => {
         this.loading.set(false);

@@ -1,108 +1,105 @@
 <div class="login-page">
-    <div class="login-grid">
-        <mat-card class="login-card">
-            <mat-card-header>
-                <div mat-card-avatar class="brand-avatar">
-                    <!-- Dein Logo (optional). Fällt automatisch auf Icon zurück, wenn nicht geladen -->
-                    <img src="assets/images/logo.jpg" alt="Messagedrop"
-                        onerror="this.style.display='none'; this.nextElementSibling?.classList.remove('hidden');" />
-                    <mat-icon class="fallback hidden">admin_panel_settings</mat-icon>
-                </div>
-                <mat-card-title>Messagedrop Admin</mat-card-title>
-                <mat-card-subtitle>Sign in to continue</mat-card-subtitle>
-            </mat-card-header>
-
-            <mat-card-content>
-                @if (step === 'credentials') {
-                    <form (ngSubmit)="onSubmitCredentials()" #loginForm="ngForm" class="form">
-                        <mat-form-field appearance="outline" class="full-width">
-                            <mat-label>Username</mat-label>
-                            <input matInput type="text" [(ngModel)]="username" name="username" required autocomplete="username" />
-                        </mat-form-field>
-
-                        <mat-form-field appearance="outline" class="full-width">
-                            <mat-label>Password</mat-label>
-                            <input matInput type="password" [(ngModel)]="password" name="password" required autocomplete="current-password" />
-                        </mat-form-field>
-
-                        <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid || loading">
-                            OTP anfordern
-                        </button>
-
-                        <p class="info">
-                            Diese Seite ist nur für interne Zwecke gedacht.<br />
-                            <a href="https://messagedrop.de" target="_blank" rel="noopener">Zu Messagedrop</a>
-                        </p>
-                    </form>
-                } @else if (step === 'otp') {
-                    <form (ngSubmit)="onSubmitOtp()" #otpForm="ngForm" class="form">
-                        <p class="info">
-                            Wir haben dir einen 6-stelligen Code via Pushbullet gesendet.
-                            Falls verfügbar, erhältst du ihn zusätzlich per E-Mail.
-                            Gib ihn hier ein, um den Login abzuschließen.
-                        </p>
-
-                    <mat-form-field appearance="outline" class="full-width">
-                        <mat-label>6-stelliger Code</mat-label>
-                        <input #otpInput matInput type="password" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" [(ngModel)]="otpCode" name="otpCode" required autocomplete="one-time-code" />
-                    </mat-form-field>
-
-                    <button mat-raised-button color="primary" type="submit" [disabled]="loading">
-                        Login abschließen
-                    </button>
-                        <button mat-button type="button" (click)="reset()" [disabled]="loading">
-                            Andere Zugangsdaten verwenden
-                        </button>
-                    </form>
-                }
-            </mat-card-content>
-        </mat-card>
-
-        <div class="public-stack">
-            <mat-card class="public-card">
-                <mat-card-header>
-                    <div mat-card-avatar class="brand-avatar info-avatar">
-                        <mat-icon class="fallback">insights</mat-icon>
-                    </div>
-                    <mat-card-title>Transparency</mat-card-title>
-                    <mat-card-subtitle>Öffentliche DSA-Statistik</mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content class="public-content">
-                    <p>
-                        Öffentliche Transparenzberichte, Kennzahlen und Downloads ohne Login ansehen.
-                    </p>
-                    <button mat-stroked-button routerLink="/transparency">
-                        <mat-icon>open_in_new</mat-icon>
-                        Zur Transparenzseite
-                    </button>
-                </mat-card-content>
-            </mat-card>
-
-            <mat-card class="public-card">
-                <mat-card-header>
-                    <div mat-card-avatar class="brand-avatar info-avatar">
-                        <mat-icon class="fallback">query_stats</mat-icon>
-                    </div>
-                    <mat-card-title>Public Statistics</mat-card-title>
-                    <mat-card-subtitle>7-day activity charts</mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content class="public-content">
-                    <p>
-                        View public activity trends for page views, new messages, searches and new users.
-                    </p>
-                    <button mat-stroked-button routerLink="/public-statistics">
-                        <mat-icon>open_in_new</mat-icon>
-                        Open public statistics
-                    </button>
-                </mat-card-content>
-            </mat-card>
+  <div class="login-grid">
+    <mat-card class="login-card">
+      <mat-card-header>
+        <div mat-card-avatar class="brand-avatar">
+          <img src="assets/images/logo.jpg" alt="Messagedrop"
+            onerror="this.style.display='none'; this.nextElementSibling?.classList.remove('hidden');" />
+          <mat-icon class="fallback hidden">admin_panel_settings</mat-icon>
         </div>
+        <mat-card-title>Messagedrop Admin</mat-card-title>
+        <mat-card-subtitle>{{ i18n.t('Sign in to continue') }}</mat-card-subtitle>
+      </mat-card-header>
 
-        <mat-card class="version-card">
-            <mat-card-content class="version-content">
-                <span class="version-label">Version</span>
-                <span class="version-value">{{ appVersion.version }}</span>
-            </mat-card-content>
-        </mat-card>
+      <mat-card-content>
+        @if (step === 'credentials') {
+          <form (ngSubmit)="onSubmitCredentials()" #loginForm="ngForm" class="form">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{ i18n.t('Username') }}</mat-label>
+              <input matInput type="text" [(ngModel)]="username" name="username" required autocomplete="username" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{ i18n.t('Password') }}</mat-label>
+              <input matInput type="password" [(ngModel)]="password" name="password" required autocomplete="current-password" />
+            </mat-form-field>
+
+            <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid || loading">
+              {{ i18n.t('Request OTP') }}
+            </button>
+
+            <p class="info">
+              {{ i18n.t('This page is intended for internal use only.') }}<br />
+              <a href="https://messagedrop.de" target="_blank" rel="noopener">{{ i18n.t('Go to MessageDrop') }}</a>
+            </p>
+          </form>
+        } @else if (step === 'otp') {
+          <form (ngSubmit)="onSubmitOtp()" #otpForm="ngForm" class="form">
+            <p class="info">
+              {{ i18n.t('We sent you a 6-digit code via Pushbullet. If available, you will also receive it by email. Enter it here to complete the sign-in.') }}
+            </p>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{ i18n.t('6-digit code') }}</mat-label>
+              <input #otpInput matInput type="password" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" [(ngModel)]="otpCode" name="otpCode" required autocomplete="one-time-code" />
+            </mat-form-field>
+
+            <button mat-raised-button color="primary" type="submit" [disabled]="loading">
+              {{ i18n.t('Complete sign-in') }}
+            </button>
+            <button mat-button type="button" (click)="reset()" [disabled]="loading">
+              {{ i18n.t('Use different credentials') }}
+            </button>
+          </form>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <div class="public-stack">
+      <mat-card class="public-card">
+        <mat-card-header>
+          <div mat-card-avatar class="brand-avatar info-avatar">
+            <mat-icon class="fallback">insights</mat-icon>
+          </div>
+          <mat-card-title>{{ i18n.t('Transparency') }}</mat-card-title>
+          <mat-card-subtitle>{{ i18n.t('Public DSA statistics') }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content class="public-content">
+          <p>
+            {{ i18n.t('View public transparency reports, metrics, and downloads without signing in.') }}
+          </p>
+          <button mat-stroked-button routerLink="/transparency">
+            <mat-icon>open_in_new</mat-icon>
+            {{ i18n.t('Open transparency page') }}
+          </button>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="public-card">
+        <mat-card-header>
+          <div mat-card-avatar class="brand-avatar info-avatar">
+            <mat-icon class="fallback">query_stats</mat-icon>
+          </div>
+          <mat-card-title>{{ i18n.t('Public Statistics') }}</mat-card-title>
+          <mat-card-subtitle>{{ i18n.t('7-day activity charts') }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content class="public-content">
+          <p>
+            {{ i18n.t('View public activity trends for page views, new messages, searches, and new users.') }}
+          </p>
+          <button mat-stroked-button routerLink="/public-statistics">
+            <mat-icon>open_in_new</mat-icon>
+            {{ i18n.t('Open public statistics') }}
+          </button>
+        </mat-card-content>
+      </mat-card>
     </div>
+
+    <mat-card class="version-card">
+      <mat-card-content class="version-content">
+        <span class="version-label">{{ i18n.t('Version') }}</span>
+        <span class="version-value">{{ appVersion.version }}</span>
+      </mat-card-content>
+    </mat-card>
+  </div>
 </div>

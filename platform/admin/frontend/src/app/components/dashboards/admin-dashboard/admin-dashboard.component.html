@@ -1,197 +1,172 @@
 <mat-toolbar color="primary">
-    <!-- Home-Button links -->
-    <button mat-icon-button (click)="logout()" aria-label="Dashboard Home">
-        <mat-icon>logout</mat-icon>
-    </button>
+  <button mat-icon-button (click)="logout()" [attr.aria-label]="i18n.t('Dashboard')">
+    <mat-icon>logout</mat-icon>
+  </button>
 
-    <!-- Titel zentriert -->
-    <span class="toolbar-title">
-        Dashboard
-    </span>
+  <span class="toolbar-title">
+    {{ i18n.t('Dashboard') }}
+  </span>
 
-    @if (username() || role()) {
-    <div class="session-chip" [attr.aria-label]="'Logged in as ' + (username() || 'User') + ' with role ' + roleLabel()">
-        <div class="session-item">
-            <mat-icon class="session-icon">person</mat-icon>
-            <span class="session-user">{{ username() || 'User' }}</span>
-        </div>
+  @if (username() || role()) {
+    <div class="session-chip" [attr.aria-label]="i18n.t('Logged in as {{username}} with role {{role}}', { username: username() || i18n.t('User'), role: roleLabel() })">
+      <div class="session-item">
+        <mat-icon class="session-icon">person</mat-icon>
+        <span class="session-user">{{ username() || i18n.t('User') }}</span>
+      </div>
 
-        <div class="session-divider" aria-hidden="true"></div>
+      <div class="session-divider" aria-hidden="true"></div>
 
-        <div class="session-item">
-            @switch (role()) {
-            @case ('root') {
+      <div class="session-item">
+        @switch (role()) {
+          @case ('root') {
             <mat-icon class="session-icon">workspace_premium</mat-icon>
-            }
-            @case ('admin') {
+          }
+          @case ('admin') {
             <mat-icon class="session-icon">admin_panel_settings</mat-icon>
-            }
-            @case ('legal') {
+          }
+          @case ('legal') {
             <mat-icon class="session-icon">gavel</mat-icon>
-            }
-            @case ('editor') {
+          }
+          @case ('editor') {
             <mat-icon class="session-icon">newspaper</mat-icon>
-            }
-            @case ('author') {
+          }
+          @case ('author') {
             <mat-icon class="session-icon">edit_note</mat-icon>
-            }
-            @default {
+          }
+          @default {
             <mat-icon class="session-icon">verified_user</mat-icon>
-            }
-            }
+          }
+        }
 
-            <span class="role-pill" [class.role-root]="role() === 'root'" [class.role-admin]="role() === 'admin'"
-                [class.role-legal]="role() === 'legal'" [class.role-editor]="role() === 'editor'"
-                [class.role-author]="role() === 'author'" [class.role-moderator]="role() === 'moderator'">
-                {{ roleLabel() }}
-            </span>
-        </div>
+        <span class="role-pill" [class.role-root]="role() === 'root'" [class.role-admin]="role() === 'admin'"
+          [class.role-legal]="role() === 'legal'" [class.role-editor]="role() === 'editor'"
+          [class.role-author]="role() === 'author'" [class.role-moderator]="role() === 'moderator'">
+          {{ roleLabel() }}
+        </span>
+      </div>
     </div>
-    }
+  }
 </mat-toolbar>
 
 <div class="page">
-    <div class="tiles-container">
-        @if (canManageMaintenance()) {
-        <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/maintenance" role="button"
-            tabindex="0">
-            <mat-card-header>
-                <div mat-card-avatar class="avatar avatar-neutral">
-                    <mat-icon>construction</mat-icon>
-                </div>
-                <mat-card-title class="tile-title">Maintenance</mat-card-title>
-                <mat-card-subtitle class="tile-subtitle"></mat-card-subtitle>
-            </mat-card-header>
-        </mat-card>
-        }
-        <!-- Users -->
-        @if (canAccessUsers()) {
-        <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/user" role="button" tabindex="0">
-            <mat-card-header>
-                <div mat-card-avatar class="avatar avatar-neutral">
-                    <mat-icon>group</mat-icon>
-                </div>
-                <mat-card-title class="tile-title">Users</mat-card-title>
-                <mat-card-subtitle class="tile-subtitle"></mat-card-subtitle>
-            </mat-card-header>
-        </mat-card>
-        }
+  <div class="tiles-container">
+    @if (canManageMaintenance()) {
+      <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/maintenance" role="button" tabindex="0">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-neutral">
+            <mat-icon>construction</mat-icon>
+          </div>
+          <mat-card-title class="tile-title">{{ i18n.t('Maintenance') }}</mat-card-title>
+          <mat-card-subtitle class="tile-subtitle"></mat-card-subtitle>
+        </mat-card-header>
+      </mat-card>
+    }
 
-        @if (canManageContent()) {
-        <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/content" role="button" tabindex="0">
-            <mat-card-header>
-                <div mat-card-avatar class="avatar avatar-accent">
-                    <mat-icon>campaign</mat-icon>
-                </div>
-                <mat-card-title class="tile-title">Content</mat-card-title>
-                <mat-card-subtitle class="tile-subtitle"></mat-card-subtitle>
-            </mat-card-header>
-        </mat-card>
-        }
+    @if (canAccessUsers()) {
+      <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/user" role="button" tabindex="0">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-neutral">
+            <mat-icon>group</mat-icon>
+          </div>
+          <mat-card-title class="tile-title">{{ i18n.t('Users') }}</mat-card-title>
+          <mat-card-subtitle class="tile-subtitle"></mat-card-subtitle>
+        </mat-card-header>
+      </mat-card>
+    }
 
-        <!-- Digital Services Act -->
-        @if (canAccessDsa()) {
-        <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/dsa" role="button" tabindex="0">
-            <mat-card-header>
-                <div mat-card-avatar class="avatar avatar-accent" [matBadge]="dsaTodoBadge()" [matBadgeHidden]="dsaTodoCount() === 0"
-                    matBadgeColor="warn" matBadgeOverlap="false">
-                    <mat-icon>gavel</mat-icon>
-                </div>
-                <mat-card-title class="tile-title">Digital Services Act</mat-card-title>
-                <mat-card-subtitle class="tile-subtitle"></mat-card-subtitle>
-            </mat-card-header>
-        </mat-card>
-        }
+    @if (canManageContent()) {
+      <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/content" role="button" tabindex="0">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-accent">
+            <mat-icon>campaign</mat-icon>
+          </div>
+          <mat-card-title class="tile-title">{{ i18n.t('Content') }}</mat-card-title>
+          <mat-card-subtitle class="tile-subtitle"></mat-card-subtitle>
+        </mat-card-header>
+      </mat-card>
+    }
 
-        <!-- Moderation -->
-        @if (canAccessModeration()) {
-        <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/dsa/moderation" role="button"
-            tabindex="0">
-            <mat-card-header>
-                <div mat-card-avatar class="avatar avatar-warn" [matBadge]="moderationCountPending() ?? 0" matBadgeColor="warn"
-                    matBadgeOverlap="false">
-                    <mat-icon>policy</mat-icon>
-                </div>
-                <mat-card-title class="tile-title">Moderation</mat-card-title>
-                <mat-card-subtitle class="tile-subtitle"></mat-card-subtitle>
-            </mat-card-header>
-        </mat-card>
-        }
+    @if (canAccessDsa()) {
+      <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/dsa" role="button" tabindex="0">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-accent" [matBadge]="dsaTodoBadge()" [matBadgeHidden]="dsaTodoCount() === 0" matBadgeColor="warn" matBadgeOverlap="false">
+            <mat-icon>gavel</mat-icon>
+          </div>
+          <mat-card-title class="tile-title">{{ i18n.t('Digital Services Act') }}</mat-card-title>
+          <mat-card-subtitle class="tile-subtitle"></mat-card-subtitle>
+        </mat-card-header>
+      </mat-card>
+    }
 
-        <!-- Statistic -->
-        @if (canAccessStatistics()) {
-        <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/statistic" role="button"
-            tabindex="0">
-            <mat-card-header>
-                <div mat-card-avatar class="avatar avatar-accent">
-                    <mat-icon>query_stats</mat-icon>
-                </div>
-                <mat-card-title class="tile-title">Statistic</mat-card-title>
-                <mat-card-subtitle class="tile-subtitle"></mat-card-subtitle>
-            </mat-card-header>
-        </mat-card>
-        }
+    @if (canAccessModeration()) {
+      <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/dsa/moderation" role="button" tabindex="0">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-warn" [matBadge]="moderationCountPending() ?? 0" matBadgeColor="warn" matBadgeOverlap="false">
+            <mat-icon>policy</mat-icon>
+          </div>
+          <mat-card-title class="tile-title">{{ i18n.t('Moderation') }}</mat-card-title>
+          <mat-card-subtitle class="tile-subtitle"></mat-card-subtitle>
+        </mat-card-header>
+      </mat-card>
+    }
 
-        <!-- Error Logs -->
-        @if (canAccessLogs()) {
-        <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/logs/errors" role="button"
-            tabindex="0">
-            <mat-card-header>
-                <div mat-card-avatar class="avatar avatar-warn" [matBadge]="errorCountToday() ?? 0" matBadgeColor="warn"
-                    matBadgeOverlap="false">
-                    <mat-icon>error_outline</mat-icon>
-                </div>
-                <mat-card-title class="tile-title">Error Logs</mat-card-title>
-            </mat-card-header>
-        </mat-card>
+    @if (canAccessStatistics()) {
+      <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/statistic" role="button" tabindex="0">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-accent">
+            <mat-icon>query_stats</mat-icon>
+          </div>
+          <mat-card-title class="tile-title">{{ i18n.t('Statistics') }}</mat-card-title>
+          <mat-card-subtitle class="tile-subtitle"></mat-card-subtitle>
+        </mat-card-header>
+      </mat-card>
+    }
 
-        <!-- Warn Logs -->
-        <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/logs/warn" role="button"
-            tabindex="0">
-            <mat-card-header>
-                <div mat-card-avatar class="avatar avatar-warn" [matBadge]="warnCountToday() ?? 0" matBadgeColor="warn"
-                    matBadgeOverlap="false">
-                    <mat-icon>warning</mat-icon>
-                </div>
-                <mat-card-title class="tile-title">Warn Logs</mat-card-title>
-            </mat-card-header>
-        </mat-card>
+    @if (canAccessLogs()) {
+      <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/logs/errors" role="button" tabindex="0">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-warn" [matBadge]="errorCountToday() ?? 0" matBadgeColor="warn" matBadgeOverlap="false">
+            <mat-icon>error_outline</mat-icon>
+          </div>
+          <mat-card-title class="tile-title">{{ i18n.t('Error Logs') }}</mat-card-title>
+        </mat-card-header>
+      </mat-card>
 
-        <!-- Info Logs -->
-        <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/logs/info" role="button"
-            tabindex="0">
-            <mat-card-header>
-                <div mat-card-avatar class="avatar avatar-accent" [matBadge]="infoCountToday() ?? 0" matBadgeColor="primary"
-                    matBadgeOverlap="false">
-                    <mat-icon>info</mat-icon>
-                </div>
-                <mat-card-title class="tile-title">Info Logs</mat-card-title>
-            </mat-card-header>
-        </mat-card>
+      <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/logs/warn" role="button" tabindex="0">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-warn" [matBadge]="warnCountToday() ?? 0" matBadgeColor="warn" matBadgeOverlap="false">
+            <mat-icon>warning</mat-icon>
+          </div>
+          <mat-card-title class="tile-title">{{ i18n.t('Warn Logs') }}</mat-card-title>
+        </mat-card-header>
+      </mat-card>
 
-        <!-- App Logs -->
-        <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/logs/app" role="button"
-            tabindex="0">
-            <mat-card-header>
-                <div mat-card-avatar class="avatar avatar-neutral" [matBadge]="appErrorCountToday() ?? 0" matBadgeColor="warn"
-                    matBadgeOverlap="false">
-                    <mat-icon>bug_report</mat-icon>
-                </div>
-                <mat-card-title class="tile-title">App Logs</mat-card-title>
-            </mat-card-header>
-        </mat-card>
+      <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/logs/info" role="button" tabindex="0">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-accent" [matBadge]="infoCountToday() ?? 0" matBadgeColor="primary" matBadgeOverlap="false">
+            <mat-icon>info</mat-icon>
+          </div>
+          <mat-card-title class="tile-title">{{ i18n.t('Info Logs') }}</mat-card-title>
+        </mat-card-header>
+      </mat-card>
 
-        <!-- PoW Logs -->
-        <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/logs/pow" role="button"
-            tabindex="0">
-            <mat-card-header>
-                <div mat-card-avatar class="avatar avatar-neutral" [matBadge]="powCountToday() ?? 0" matBadgeColor="warn"
-                    matBadgeOverlap="false">
-                    <mat-icon>shield</mat-icon>
-                </div>
-                <mat-card-title class="tile-title">PoW Logs</mat-card-title>
-            </mat-card-header>
-        </mat-card>
-        }
-    </div>
+      <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/logs/app" role="button" tabindex="0">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-neutral" [matBadge]="appErrorCountToday() ?? 0" matBadgeColor="warn" matBadgeOverlap="false">
+            <mat-icon>bug_report</mat-icon>
+          </div>
+          <mat-card-title class="tile-title">{{ i18n.t('App Logs') }}</mat-card-title>
+        </mat-card-header>
+      </mat-card>
+
+      <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/logs/pow" role="button" tabindex="0">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-neutral" [matBadge]="powCountToday() ?? 0" matBadgeColor="warn" matBadgeOverlap="false">
+            <mat-icon>shield</mat-icon>
+          </div>
+          <mat-card-title class="tile-title">{{ i18n.t('PoW Logs') }}</mat-card-title>
+        </mat-card-header>
+      </mat-card>
+    }
+  </div>
 </div>

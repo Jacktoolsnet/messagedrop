@@ -1,9 +1,9 @@
 <mat-toolbar color="primary">
-  <button mat-icon-button routerLink="/dashboard/content" aria-label="Back to public content">
+  <button mat-icon-button routerLink="/dashboard/content" [attr.aria-label]="i18n.t('Back to public content')">
     <mat-icon>arrow_back</mat-icon>
   </button>
 
-  <span class="toolbar-title">Public profiles</span>
+  <span class="toolbar-title">{{ i18n.t('Public profiles') }}</span>
   <span class="spacer"></span>
 
   <div class="toolbar-actions">
@@ -13,7 +13,7 @@
       class="toolbar-action avatar avatar-accent"
       (click)="startNewProfile()"
       [disabled]="saving()"
-      aria-label="Create public profile">
+      [attr.aria-label]="i18n.t('Create public profile')">
       <mat-icon>add</mat-icon>
     </button>
 
@@ -23,7 +23,7 @@
       class="toolbar-action avatar avatar-success"
       (click)="saveProfile()"
       [disabled]="saving() || loading()"
-      aria-label="Save public profile">
+      [attr.aria-label]="i18n.t('Save public profile')">
       <mat-icon>save</mat-icon>
     </button>
 
@@ -34,7 +34,7 @@
         class="toolbar-action avatar avatar-warn toolbar-danger"
         (click)="confirmDeleteSelected()"
         [disabled]="saving()"
-        aria-label="Delete public profile">
+        [attr.aria-label]="i18n.t('Delete public profile')">
         <mat-icon>delete</mat-icon>
       </button>
     }
@@ -53,15 +53,15 @@
           <div mat-card-avatar class="avatar avatar-neutral">
             <mat-icon>groups</mat-icon>
           </div>
-          <mat-card-title>Editorial profiles</mat-card-title>
-          <mat-card-subtitle>Separate public sender profiles for drafts, previews and publishing.</mat-card-subtitle>
+          <mat-card-title>{{ i18n.t('Editorial profiles') }}</mat-card-title>
+          <mat-card-subtitle>{{ i18n.t('Separate public sender profiles for drafts, previews and publishing.') }}</mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content>
           @if (rows().length === 0 && !loading()) {
             <div class="empty-state">
               <mat-icon>person_add</mat-icon>
-              <div>No public profiles yet. Create the first one with the plus icon above.</div>
+              <div>{{ i18n.t('No public profiles yet. Create the first one with the plus icon above.') }}</div>
             </div>
           } @else {
             <div class="profile-list">
@@ -83,9 +83,9 @@
                     <strong>{{ row.name }}</strong>
                     <span [style]="row.defaultStyle">{{ row.name }}</span>
                     @if (row.publicBackendUserId) {
-                      <span class="profile-meta-id">User ID: {{ row.publicBackendUserId }}</span>
+                      <span class="profile-meta-id">{{ i18n.t('User ID: {{id}}', { id: row.publicBackendUserId }) }}</span>
                     }
-                    <span>{{ row.contentCount }} linked message{{ row.contentCount === 1 ? '' : 's' }}</span>
+                    <span>{{ linkedMessagesLabel(row.contentCount) }}</span>
                   </div>
 
                   <mat-icon class="profile-chevron">chevron_right</mat-icon>
@@ -103,8 +103,8 @@
           <div mat-card-avatar class="avatar avatar-accent">
             <mat-icon>{{ selectedProfile() ? 'edit' : 'add_circle' }}</mat-icon>
           </div>
-          <mat-card-title>{{ selectedProfile() ? 'Edit profile' : 'Create profile' }}</mat-card-title>
-          <mat-card-subtitle>Avatar, display name and default text style for public publishing.</mat-card-subtitle>
+          <mat-card-title>{{ selectedProfile() ? i18n.t('Edit profile') : i18n.t('Create profile') }}</mat-card-title>
+          <mat-card-subtitle>{{ i18n.t('Avatar, display name and default text style for public publishing.') }}</mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content>
@@ -112,22 +112,22 @@
             <div class="profile-preview-card">
               <div class="profile-preview-avatar">
                 @if (avatarPreview()) {
-                  <img [src]="avatarPreview()" [alt]="profileNamePreview() || 'Profile avatar preview'" />
+                  <img [src]="avatarPreview()" [alt]="profileNamePreview() || i18n.t('Profile avatar preview')" />
                 } @else {
                   <span>{{ profileInitials() }}</span>
                 }
               </div>
 
               <div class="profile-preview-copy">
-                <h3>{{ profileNamePreview() || 'New public profile' }}</h3>
-                <p [style]="previewDisplayStyle()">Preview text in the selected default font.</p>
+                <h3>{{ profileNamePreview() || i18n.t('New public profile') }}</h3>
+                <p [style]="previewDisplayStyle()">{{ i18n.t('Preview text in the selected default font.') }}</p>
               </div>
             </div>
 
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Profile name</mat-label>
-              <input matInput formControlName="name" placeholder="Berlin Nightlife" />
-              <mat-hint>This name is used in the admin UI to recognize the assigned public profile.</mat-hint>
+              <mat-label>{{ i18n.t('Profile name') }}</mat-label>
+              <input matInput formControlName="name" [placeholder]="i18n.t('Berlin Nightlife')" />
+              <mat-hint>{{ i18n.t('This name is used in the admin UI to recognize the assigned public profile.') }}</mat-hint>
             </mat-form-field>
 
             <div class="avatar-upload-row">
@@ -135,7 +135,7 @@
 
               <button mat-stroked-button type="button" (click)="triggerAvatarPicker(avatarInput)">
                 <mat-icon>image</mat-icon>
-                Choose avatar
+                {{ i18n.t('Choose avatar') }}
               </button>
 
               <button mat-stroked-button type="button" (click)="openUnsplashAvatarPicker()">
@@ -145,18 +145,18 @@
 
               <button mat-stroked-button type="button" (click)="removeAvatar()" [disabled]="!avatarPreview()">
                 <mat-icon>delete</mat-icon>
-                Remove avatar
+                {{ i18n.t('Remove avatar') }}
               </button>
             </div>
 
             @if (unsplashAttribution(); as attribution) {
               <div class="unsplash-badge-wrapper">
                 <p class="unsplash-badge">
-                  <span>Photo by</span>
+                  <span>{{ i18n.t('Photo by') }}</span>
                   <a class="unsplash-badge__link" [href]="attribution.authorUrl" target="_blank" rel="noopener">
                     {{ attribution.authorName }}
                   </a>
-                  <span>on</span>
+                  <span>{{ i18n.t('on') }}</span>
                   <a class="unsplash-badge__link" [href]="attribution.unsplashUrl" target="_blank" rel="noopener">
                     Unsplash
                   </a>
@@ -165,7 +165,7 @@
             }
 
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Default text style</mat-label>
+              <mat-label>{{ i18n.t('Default text style') }}</mat-label>
               <mat-select
                 #styleSelect
                 formControlName="defaultStyle"
@@ -185,21 +185,21 @@
                   </mat-option>
                 }
               </mat-select>
-              <mat-hint>The profile default font is used in the content editor unless a message overrides it.</mat-hint>
+              <mat-hint>{{ i18n.t('The profile default font is used in the content editor unless a message overrides it.') }}</mat-hint>
             </mat-form-field>
 
             @if (selectedStyleOption(); as option) {
               <div class="style-preview-box">
-                <span class="style-preview-label">Default font preview</span>
+                <span class="style-preview-label">{{ i18n.t('Default font preview') }}</span>
                 <span class="style-preview-value" [style]="previewDisplayStyle()">
-                  Public profile preview text
+                  {{ i18n.t('Public profile preview text') }}
                 </span>
               </div>
             }
 
             @if (selectedProfile()?.publicBackendUserId; as publicBackendUserId) {
               <div class="style-preview-box">
-                <span class="style-preview-label">Generated MessageDrop user</span>
+                <span class="style-preview-label">{{ i18n.t('Generated MessageDrop user') }}</span>
                 <span class="style-preview-id">{{ publicBackendUserId }}</span>
               </div>
             }

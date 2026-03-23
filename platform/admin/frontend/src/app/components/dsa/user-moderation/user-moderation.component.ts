@@ -4,7 +4,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -51,8 +50,7 @@ import { DsaService } from '../../../services/dsa/dsa/dsa.service';
     MatSnackBarModule
   ],
   templateUrl: './user-moderation.component.html',
-  styleUrls: ['./user-moderation.component.css'],
-  providers: [provideNativeDateAdapter(), { provide: MAT_DATE_LOCALE, useValue: 'de-DE' }]
+  styleUrls: ['./user-moderation.component.css']
 })
 export class UserModerationComponent implements OnInit {
   private readonly fb = inject(FormBuilder);

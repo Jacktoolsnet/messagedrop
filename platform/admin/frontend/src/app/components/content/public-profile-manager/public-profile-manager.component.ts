@@ -22,6 +22,7 @@ import { PublicProfile } from '../../../interfaces/public-profile.interface';
 import { UnsplashPhoto } from '../../../interfaces/unsplash-response.interface';
 import { ContentStyleOption, ContentStyleService } from '../../../services/content/content-style.service';
 import { PublicProfileService } from '../../../services/content/public-profile.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 
 @Component({
   selector: 'app-public-profile-manager',
@@ -52,6 +53,7 @@ export class PublicProfileManagerComponent {
   private readonly snackBar = inject(MatSnackBar);
   private readonly publicProfileService = inject(PublicProfileService);
   private readonly styleService = inject(ContentStyleService);
+  readonly i18n = inject(TranslationHelperService);
 
   readonly rows = this.publicProfileService.rows;
   readonly loading = this.publicProfileService.loading;
@@ -124,6 +126,12 @@ export class PublicProfileManagerComponent {
 
   trackStyleOption(_index: number, option: ContentStyleOption): string {
     return option.fontFamily;
+  }
+
+  linkedMessagesLabel(count: number | null | undefined): string {
+    return count === 1
+      ? this.i18n.t('{{count}} linked message', { count: count ?? 0 })
+      : this.i18n.t('{{count}} linked messages', { count: count ?? 0 });
   }
 
   previewStyleOption(style: string | null | undefined): void {
@@ -322,7 +330,7 @@ export class PublicProfileManagerComponent {
   }
 
   private showMessage(message: string): void {
-    this.snackBar.open(message, 'OK', { duration: 2600 });
+    this.snackBar.open(this.i18n.t(message), this.i18n.t('OK'), { duration: 2600 });
   }
 
   private applyUnsplashPhoto(photo: UnsplashPhoto): void {

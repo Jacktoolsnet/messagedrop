@@ -12,6 +12,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute } from '@angular/router';
 import { PublicStatusAppeal, PublicStatusAuditEntry, PublicStatusEvidence, PublicStatusResponse, PublicStatusService } from '../../services/public-status.service';
+import { TranslationHelperService } from '../../services/translation-helper.service';
 
 interface MappedAuditEntry extends PublicStatusAuditEntry {
   detailsObj: Record<string, unknown> | null;
@@ -42,6 +43,7 @@ export class PublicStatusComponent implements OnInit {
   private readonly service = inject(PublicStatusService);
   private readonly snack = inject(MatSnackBar);
   private readonly destroyRef = inject(DestroyRef);
+  readonly i18n = inject(TranslationHelperService);
 
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
@@ -57,7 +59,7 @@ export class PublicStatusComponent implements OnInit {
       .subscribe(params => {
         const token = params.get('token');
         if (!token) {
-          this.error.set('Missing status token.');
+          this.error.set(this.i18n.t('Missing status token.'));
           this.loading.set(false);
           return;
         }
@@ -98,8 +100,8 @@ export class PublicStatusComponent implements OnInit {
       },
       error: (err) => {
         const msg = err?.error?.error === 'not_found'
-          ? 'No case was found for this token.'
-          : 'Could not load the status. Please try again later.';
+          ? this.i18n.t('No case was found for this token.')
+          : this.i18n.t('Could not load the status. Please try again later.');
         this.error.set(msg);
         this.loading.set(false);
       }
@@ -122,9 +124,9 @@ export class PublicStatusComponent implements OnInit {
   formatStatus(status: string | undefined | null): string {
     if (!status) return '—';
     switch (status.toUpperCase()) {
-      case 'RECEIVED': return 'Received';
-      case 'UNDER_REVIEW': return 'Under review';
-      case 'DECIDED': return 'Decided';
+      case 'RECEIVED': return this.i18n.t('Received');
+      case 'UNDER_REVIEW': return this.i18n.t('Under review');
+      case 'DECIDED': return this.i18n.t('Decided');
       default: return status;
     }
   }
@@ -138,26 +140,33 @@ export class PublicStatusComponent implements OnInit {
         const previous = this.extractDetailStatus(details, ['previousStatus', 'oldStatus', 'previous', 'from', 'statusFrom']);
         const next = this.extractDetailStatus(details, ['status', 'newStatus', 'to', 'statusTo']);
         if (previous && next) {
-          return `Status changed from ${this.formatStatus(previous)} to ${this.formatStatus(next)}`;
+          return this.i18n.t('Status changed from {{from}} to {{to}}', {
+            from: this.formatStatus(previous),
+            to: this.formatStatus(next)
+          });
         }
         if (next) {
-          return `Status changed to ${this.formatStatus(next)}`;
+          return this.i18n.t('Status changed to {{status}}', {
+            status: this.formatStatus(next)
+          });
         }
-        return 'Status updated';
+        return this.i18n.t('Status updated');
       }
       case 'decision_created':
       case 'decision_recorded':
-        return 'Decision recorded';
+        return this.i18n.t('Decision recorded');
       case 'create': {
         const initial = this.extractDetailStatus(entry.detailsObj, ['status', 'initialStatus']);
         if (initial) {
-          return `Notice created (status ${this.formatStatus(initial)})`;
+          return this.i18n.t('Notice created (status {{status}})', {
+            status: this.formatStatus(initial)
+          });
         }
-        return 'Notice created';
+        return this.i18n.t('Notice created');
       }
       default: {
         const readable = rawAction.replace(/_/g, ' ').toLowerCase();
-        return readable.replace(/\b\w/g, (letter) => letter.toUpperCase()) || 'Event';
+        return readable.replace(/\b\w/g, (letter) => letter.toUpperCase()) || this.i18n.t('Event');
       }
     }
   }
@@ -168,29 +177,29 @@ export class PublicStatusComponent implements OnInit {
     switch (key) {
       case 'REMOVE_CONTENT':
       case 'REMOVE':
-        return 'Removed';
+        return this.i18n.t('Removed');
       case 'RESTRICT':
-        return 'Restricted';
+        return this.i18n.t('Restricted');
       case 'NO_ACTION':
-        return 'No action';
+        return this.i18n.t('No action');
       case 'FORWARD_TO_AUTHORITY':
-        return 'Escalated';
+        return this.i18n.t('Escalated');
       default:
         return outcome;
     }
   }
 
   formatAppealOutcome(outcome: string | undefined | null): string {
-    if (!outcome) return 'Pending';
+    if (!outcome) return this.i18n.t('Pending');
     switch (outcome.toUpperCase()) {
       case 'UPHELD':
-        return 'Decision upheld';
+        return this.i18n.t('Decision upheld');
       case 'REVISED':
-        return 'Decision revised';
+        return this.i18n.t('Decision revised');
       case 'PARTIAL':
-        return 'Partially revised';
+        return this.i18n.t('Partially revised');
       case 'WITHDRAWN':
-        return 'Withdrawn';
+        return this.i18n.t('Withdrawn');
       default:
         return outcome;
     }
@@ -204,9 +213,9 @@ export class PublicStatusComponent implements OnInit {
     if (!this.currentToken) return;
     const url = window.location.href;
     navigator.clipboard.writeText(url).then(() => {
-      this.snack.open('Link copied to clipboard.', 'OK', { duration: 2500 });
+      this.snack.open(this.i18n.t('Link copied to clipboard.'), this.i18n.t('OK'), { duration: 2500 });
     }).catch(() => {
-      this.snack.open('Could not copy the link automatically.', 'OK', { duration: 3000 });
+      this.snack.open(this.i18n.t('Could not copy the link automatically.'), this.i18n.t('OK'), { duration: 3000 });
     });
   }
 
@@ -216,7 +225,7 @@ export class PublicStatusComponent implements OnInit {
       next: (response) => {
         const blob = response.body;
         if (!blob) {
-          this.snack.open('Empty file received.', 'OK', { duration: 2500 });
+          this.snack.open(this.i18n.t('Empty file received.'), this.i18n.t('OK'), { duration: 2500 });
           return;
         }
         const filename = this.resolveFilename(response.headers.get('Content-Disposition'), ev.fileName || 'evidence');
@@ -230,7 +239,7 @@ export class PublicStatusComponent implements OnInit {
         window.URL.revokeObjectURL(url);
       },
       error: () => {
-        this.snack.open('Could not download the file.', 'OK', { duration: 3000 });
+        this.snack.open(this.i18n.t('Could not download the file.'), this.i18n.t('OK'), { duration: 3000 });
       }
     });
   }

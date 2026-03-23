@@ -2,7 +2,6 @@ import { HttpResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -22,6 +21,7 @@ import {
   PendingRestoreInfo
 } from '../../../interfaces/maintenance.interface';
 import { MaintenanceService } from '../../../services/maintenance.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 
 @Component({
   selector: 'app-maintenance-card',
@@ -39,13 +39,13 @@ import { MaintenanceService } from '../../../services/maintenance.service';
   ],
   templateUrl: './maintenance-card.component.html',
   styleUrl: './maintenance-card.component.css',
-  providers: [provideNativeDateAdapter(), { provide: MAT_DATE_LOCALE, useValue: 'de-DE' }],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MaintenanceCardComponent {
   private readonly maintenanceService = inject(MaintenanceService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly destroyRef = inject(DestroyRef);
+  readonly i18n = inject(TranslationHelperService);
 
   readonly loading = signal(true);
   readonly saving = signal(false);
@@ -64,11 +64,11 @@ export class MaintenanceCardComponent {
   readonly lastRestore = signal<LastRestoreInfo | null>(null);
 
   readonly restoreSteps = [
-    'In Plesk alle Node.js-Apps stoppen: public backend, admin backend, OpenMeteo, Nominatim und Viator.',
-    'Nur das Admin-Backend einmal wieder starten.',
-    'Das Admin-Backend spielt den vorbereiteten Restore beim Start automatisch ein.',
-    'Danach die restlichen Node.js-Apps in Plesk wieder starten.',
-    'Zum Schluss diese Seite neu laden und den Restore-Status prüfen.'
+    'In Plesk stop all Node.js apps: public backend, admin backend, OpenMeteo, Nominatim, and Viator.',
+    'Start only the admin backend once.',
+    'The admin backend applies the prepared restore automatically during startup.',
+    'After that, start the remaining Node.js apps in Plesk again.',
+    'Finally, reload this page and verify the restore status.'
   ];
 
   readonly form = new FormGroup({
@@ -91,10 +91,10 @@ export class MaintenanceCardComponent {
     return !!(data?.startsAt || data?.endsAt);
   });
   readonly statusLabel = computed(() => {
-    if (this.loading()) return 'Loading...';
-    if (this.isActive()) return 'Active';
-    if (this.hasSchedule()) return 'Scheduled';
-    return 'Inactive';
+    if (this.loading()) return this.i18n.t('Loading...');
+    if (this.isActive()) return this.i18n.t('Active');
+    if (this.hasSchedule()) return this.i18n.t('Scheduled');
+    return this.i18n.t('Inactive');
   });
   readonly latestBackup = computed(() => this.backups()[0] ?? null);
   readonly hasBackup = computed(() => this.backups().length > 0);
@@ -127,7 +127,7 @@ export class MaintenanceCardComponent {
     }
 
     if (!this.form.controls.startDate.value && this.form.controls.startTime.value) {
-      this.snackBar.open('Start date is required when a start time is set.', 'OK', {
+      this.snackBar.open(this.i18n.t('Start date is required when a start time is set.'), this.i18n.t('OK'), {
         duration: 3000,
         panelClass: ['snack-error'],
         horizontalPosition: 'center',
@@ -137,7 +137,7 @@ export class MaintenanceCardComponent {
     }
 
     if (!this.form.controls.endDate.value && this.form.controls.endTime.value) {
-      this.snackBar.open('End date is required when an end time is set.', 'OK', {
+      this.snackBar.open(this.i18n.t('End date is required when an end time is set.'), this.i18n.t('OK'), {
         duration: 3000,
         panelClass: ['snack-error'],
         horizontalPosition: 'center',
@@ -156,7 +156,7 @@ export class MaintenanceCardComponent {
     );
 
     if (startsAt && endsAt && endsAt < startsAt) {
-      this.snackBar.open('End date must be after the start date.', 'OK', {
+      this.snackBar.open(this.i18n.t('End date must be after the start date.'), this.i18n.t('OK'), {
         duration: 3000,
         panelClass: ['snack-error'],
         horizontalPosition: 'center',
@@ -179,7 +179,7 @@ export class MaintenanceCardComponent {
         next: (response) => {
           this.applyMaintenance(response?.maintenance ?? null);
           this.saving.set(false);
-          this.snackBar.open('Maintenance settings updated.', 'OK', {
+          this.snackBar.open(this.i18n.t('Maintenance settings updated.'), this.i18n.t('OK'), {
             duration: 2000,
             panelClass: ['snack-success'],
             horizontalPosition: 'center',
@@ -188,7 +188,7 @@ export class MaintenanceCardComponent {
         },
         error: () => {
           this.saving.set(false);
-          this.snackBar.open('Failed to update maintenance settings.', 'OK', {
+          this.snackBar.open(this.i18n.t('Failed to update maintenance settings.'), this.i18n.t('OK'), {
             duration: 3000,
             panelClass: ['snack-error'],
             horizontalPosition: 'center',
@@ -212,7 +212,7 @@ export class MaintenanceCardComponent {
           this.loadMaintenance();
           this.loadBackupCatalog(true);
           this.loadRestoreStatus(true);
-          this.snackBar.open('Backup created successfully.', 'OK', {
+          this.snackBar.open(this.i18n.t('Backup created successfully.'), this.i18n.t('OK'), {
             duration: 2500,
             panelClass: ['snack-success'],
             horizontalPosition: 'center',
@@ -223,7 +223,7 @@ export class MaintenanceCardComponent {
           this.backupRunning.set(false);
           this.loadMaintenance();
           this.loadBackupCatalog(true);
-          this.snackBar.open('Failed to create backup.', 'OK', {
+          this.snackBar.open(this.i18n.t('Failed to create backup.'), this.i18n.t('OK'), {
             duration: 3500,
             panelClass: ['snack-error'],
             horizontalPosition: 'center',
@@ -248,7 +248,7 @@ export class MaintenanceCardComponent {
         next: (response) => {
           const blob = response.body;
           if (!blob) {
-            this.snackBar.open('Empty backup archive received.', 'OK', {
+            this.snackBar.open(this.i18n.t('Empty backup archive received.'), this.i18n.t('OK'), {
               duration: 3000,
               panelClass: ['snack-error'],
               horizontalPosition: 'center',
@@ -268,7 +268,7 @@ export class MaintenanceCardComponent {
           window.URL.revokeObjectURL(url);
         },
         error: () => {
-          this.snackBar.open('Could not download the backup ZIP.', 'OK', {
+          this.snackBar.open(this.i18n.t('Could not download the backup ZIP.'), this.i18n.t('OK'), {
             duration: 3000,
             panelClass: ['snack-error'],
             horizontalPosition: 'center',
@@ -289,7 +289,7 @@ export class MaintenanceCardComponent {
           this.restoreChallenge.set(null);
           this.restoreTargetBackup.set(null);
           this.restoreConfirmForm.reset({ confirmationWord: '', confirmationPin: '' });
-          this.snackBar.open(response.valid ? 'Backup validation successful.' : 'Backup has validation issues.', 'OK', {
+          this.snackBar.open(this.i18n.t(response.valid ? 'Backup validation successful.' : 'Backup has validation issues.'), this.i18n.t('OK'), {
             duration: 2500,
             panelClass: [response.valid ? 'snack-success' : 'snack-error'],
             horizontalPosition: 'center',
@@ -298,7 +298,7 @@ export class MaintenanceCardComponent {
         },
         error: () => {
           this.validationBusyId.set(null);
-          this.snackBar.open('Could not validate the selected backup.', 'OK', {
+          this.snackBar.open(this.i18n.t('Could not validate the selected backup.'), this.i18n.t('OK'), {
             duration: 3000,
             panelClass: ['snack-error'],
             horizontalPosition: 'center',
@@ -324,7 +324,7 @@ export class MaintenanceCardComponent {
             issues: response.issues
           });
           this.restoreConfirmForm.reset({ confirmationWord: '', confirmationPin: '' });
-          this.snackBar.open('Restore confirmation challenge created.', 'OK', {
+          this.snackBar.open(this.i18n.t('Restore confirmation challenge created.'), this.i18n.t('OK'), {
             duration: 2500,
             panelClass: ['snack-success'],
             horizontalPosition: 'center',
@@ -333,7 +333,7 @@ export class MaintenanceCardComponent {
         },
         error: () => {
           this.challengeBusyId.set(null);
-          this.snackBar.open('Could not create the restore challenge.', 'OK', {
+          this.snackBar.open(this.i18n.t('Could not create the restore challenge.'), this.i18n.t('OK'), {
             duration: 3000,
             panelClass: ['snack-error'],
             horizontalPosition: 'center',
@@ -373,7 +373,7 @@ export class MaintenanceCardComponent {
           this.restoreTargetBackup.set(null);
           this.restoreConfirmForm.reset({ confirmationWord: '', confirmationPin: '' });
           this.loadRestoreStatus(true);
-          this.snackBar.open('Restore prepared. Follow the Plesk steps below.', 'OK', {
+          this.snackBar.open(this.i18n.t('Restore prepared. Follow the Plesk steps below.'), this.i18n.t('OK'), {
             duration: 3000,
             panelClass: ['snack-success'],
             horizontalPosition: 'center',
@@ -382,7 +382,7 @@ export class MaintenanceCardComponent {
         },
         error: () => {
           this.restorePreparing.set(false);
-          this.snackBar.open('Could not prepare the restore.', 'OK', {
+          this.snackBar.open(this.i18n.t('Could not prepare the restore.'), this.i18n.t('OK'), {
             duration: 3500,
             panelClass: ['snack-error'],
             horizontalPosition: 'center',
@@ -402,7 +402,7 @@ export class MaintenanceCardComponent {
 
   formatDateTime(ts: number | null | undefined): string {
     if (!ts) return '—';
-    return new Date(ts).toLocaleString('de-DE');
+    return new Date(ts).toLocaleString(this.i18n.dateLocale());
   }
 
   formatBytes(bytes: number | null | undefined): string {
@@ -416,11 +416,11 @@ export class MaintenanceCardComponent {
 
   formatRestoreState(status: string | null | undefined): string {
     switch ((status || '').toLowerCase()) {
-      case 'pending': return 'Prepared';
-      case 'running': return 'Running';
-      case 'success': return 'Successful';
-      case 'failed': return 'Failed';
-      default: return status || 'Unknown';
+      case 'pending': return this.i18n.t('Prepared');
+      case 'running': return this.i18n.t('Running');
+      case 'success': return this.i18n.t('Successful');
+      case 'failed': return this.i18n.t('Failed');
+      default: return status || this.i18n.t('Unknown');
     }
   }
 
@@ -451,7 +451,7 @@ export class MaintenanceCardComponent {
         },
         error: () => {
           this.loading.set(false);
-          this.snackBar.open('Failed to load maintenance status.', 'OK', {
+          this.snackBar.open(this.i18n.t('Failed to load maintenance status.'), this.i18n.t('OK'), {
             duration: 3000,
             panelClass: ['snack-error'],
             horizontalPosition: 'center',
@@ -474,7 +474,7 @@ export class MaintenanceCardComponent {
           this.catalogLoading.set(false);
           this.backups.set([]);
           if (!silent) {
-            this.snackBar.open('Failed to load backup catalog.', 'OK', {
+            this.snackBar.open(this.i18n.t('Failed to load backup catalog.'), this.i18n.t('OK'), {
               duration: 3000,
               panelClass: ['snack-error'],
               horizontalPosition: 'center',
@@ -500,7 +500,7 @@ export class MaintenanceCardComponent {
           this.pendingRestore.set(null);
           this.lastRestore.set(null);
           if (!silent) {
-            this.snackBar.open('Failed to load restore status.', 'OK', {
+            this.snackBar.open(this.i18n.t('Failed to load restore status.'), this.i18n.t('OK'), {
               duration: 3000,
               panelClass: ['snack-error'],
               horizontalPosition: 'center',

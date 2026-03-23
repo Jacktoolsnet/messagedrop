@@ -94,7 +94,7 @@
           </div>
           <div class="meta-fact-copy">
             <span class="meta-fact-label">Last update</span>
-            <span class="meta-fact-value">{{ content.updatedAt | date:'dd.MM.yyyy HH:mm' }}</span>
+            <span class="meta-fact-value">{{ content.updatedAt | date:'short' }}</span>
           </div>
         </div>
 
@@ -117,7 +117,7 @@
           </div>
           <div class="meta-fact-copy">
             <span class="meta-fact-label">Published</span>
-            <span class="meta-fact-value">{{ content.publishedAt | date:'dd.MM.yyyy HH:mm' }}</span>
+            <span class="meta-fact-value">{{ content.publishedAt | date:'short' }}</span>
           </div>
         </div>
         }
@@ -804,8 +804,7 @@
             </div>
             <div class="content-preview-avatar-text">
               <span class="content-preview-name">{{ childProfileName(row) }}</span>
-              <span class="content-preview-timestamp">{{ row.authorUsername }} • {{ row.updatedAt | date:'dd.MM.yyyy
-                HH:mm' }}</span>
+              <span class="content-preview-timestamp">{{ row.authorUsername }} • {{ row.updatedAt | date:'short' }}</span>
             </div>
             <span class="status-pill content-preview-status"
               [class]="'status-pill content-preview-status ' + statusClass(row.status)">
@@ -926,7 +925,7 @@
             </div>
             <div class="content-preview-avatar-text">
               <span class="content-preview-name">{{ externalProfileName(row) }}</span>
-              <span class="content-preview-timestamp">{{ row.createdAt | date:'dd.MM.yyyy HH:mm' }}</span>
+              <span class="content-preview-timestamp">{{ row.createdAt | date:'short' }}</span>
             </div>
             <span class="status-pill content-preview-status"
               [class]="'status-pill content-preview-status ' + statusClass(row.status)">
