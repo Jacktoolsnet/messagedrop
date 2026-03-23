@@ -151,7 +151,7 @@
             <mat-icon>reply</mat-icon>
           </div>
           <mat-card-title>Parent content</mat-card-title>
-          <mat-card-subtitle>The published message or comment this reply belongs to.</mat-card-subtitle>
+          <mat-card-subtitle>The message or public comment this reply belongs to.</mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content>
@@ -165,12 +165,14 @@
               }
             </div>
 
+            @if (canOpenInternalParentContent()) {
             <div class="parent-message-actions">
               <button mat-stroked-button type="button" (click)="openParentContent()">
                 <mat-icon>open_in_new</mat-icon>
                 Open parent
               </button>
             </div>
+            }
           </div>
           } @else {
           <div class="missing-profile-state">
@@ -887,6 +889,122 @@
       <div class="empty-state comment-thread-empty-state">
         <mat-icon>forum</mat-icon>
         <div>No direct comments yet.</div>
+      </div>
+      }
+
+      @if (canLoadExternalComments()) {
+      <mat-divider></mat-divider>
+
+      <div class="comment-thread-subsection">
+        <div class="comment-thread-subsection-header">
+          <div class="comment-thread-subsection-copy">
+            <h3>Public comments</h3>
+            <p>Replies from MessageDrop visitors on this published {{ isCommentMode() ? 'comment' : 'message' }}.</p>
+          </div>
+        </div>
+
+        @if (externalCommentsLoading()) {
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        }
+
+        @if (externalComments().length > 0) {
+        <div class="tiles-container comment-tiles-container external-comment-tiles">
+          @for (row of externalComments(); track trackExternalComment($index, row)) {
+          <mat-card class="content-tile comment-thread-tile content-tile-static">
+            <div class="content-preview-avatar-box">
+              <div class="content-preview-avatar-icon" aria-hidden="true">
+                @if (externalProfileAvatar(row)) {
+                <img [src]="externalProfileAvatar(row)" [alt]="externalProfileName(row)" />
+                } @else {
+                <span>{{ externalProfileInitials(row) }}</span>
+                }
+              </div>
+              <div class="content-preview-avatar-text">
+                <span class="content-preview-name">{{ externalProfileName(row) }}</span>
+                <span class="content-preview-timestamp">{{ row.createdAt | date:'dd.MM.yyyy HH:mm' }}</span>
+              </div>
+              <span class="status-pill content-preview-status"
+                [class]="'status-pill content-preview-status ' + statusClass(row.status)">
+                <mat-icon>{{ statusIcon(row.status) }}</mat-icon>
+                {{ formatStatus(row.status) }}
+              </span>
+            </div>
+
+            <mat-card-content class="tile-content content-preview-body">
+              @if (externalHasImageMultimedia(row)) {
+              <div class="content-preview-media">
+                <img [src]="row.multimedia.url" [alt]="row.multimedia.title || 'Selected multimedia preview'" />
+              </div>
+              } @else if (row.multimedia.type !== 'undefined' && (row.multimedia.title || row.multimedia.description)) {
+              <div class="content-preview-media-summary">
+                <span class="content-preview-media-type">{{ mediaTypeLabel(row.multimedia.type) }}</span>
+                @if (row.multimedia.title) {
+                <strong>{{ row.multimedia.title }}</strong>
+                }
+                @if (row.multimedia.description) {
+                <span>{{ row.multimedia.description }}</span>
+                }
+              </div>
+              }
+
+              @if (externalTilePreview(row)) {
+              <div class="content-preview-message-shell" [style]="row.message ? externalResolvedStyle(row) : ''">
+                <p class="content-preview-message-text">{{ externalTilePreview(row) }}</p>
+              </div>
+              }
+
+              @if (row.hashtags.length > 0) {
+              <div class="content-preview-hashtag-list" aria-label="Hashtags">
+                @for (tag of row.hashtags; track tag) {
+                <span class="content-preview-hashtag-chip">#{{ tag }}</span>
+                }
+              </div>
+              }
+
+              <div class="content-preview-meta">
+                <span class="content-preview-meta-chip content-preview-meta-chip-muted">
+                  <mat-icon>{{ typeIcon(row.contentType) }}</mat-icon>
+                  {{ typeLabel(row.contentType) }}
+                </span>
+
+                <span class="content-preview-meta-chip">
+                  <mat-icon>alternate_email</mat-icon>
+                  {{ externalProfileName(row) }}
+                </span>
+
+                @if (row.multimedia.type !== 'undefined') {
+                <span class="content-preview-meta-chip content-preview-meta-chip-muted">
+                  <mat-icon>perm_media</mat-icon>
+                  {{ mediaTypeLabel(row.multimedia.type) }}
+                </span>
+                }
+
+                @if (externalCommentCount(row) > 0) {
+                <span class="content-preview-meta-chip content-preview-meta-chip-muted">
+                  <mat-icon>forum</mat-icon>
+                  {{ externalCommentCount(row) }} replies
+                </span>
+                }
+              </div>
+            </mat-card-content>
+
+            <mat-card-actions class="card-actions content-preview-actions">
+              <div class="content-preview-action-bar">
+                <button mat-icon-button type="button" class="content-preview-action-button action-secondary"
+                  (click)="replyToExternalComment(row)" aria-label="Reply to public comment">
+                  <mat-icon>add_comment</mat-icon>
+                </button>
+              </div>
+            </mat-card-actions>
+          </mat-card>
+          }
+        </div>
+        } @else if (!externalCommentsLoading()) {
+        <div class="empty-state comment-thread-empty-state comment-thread-empty-state-compact">
+          <mat-icon>chat_bubble_outline</mat-icon>
+          <div>No public comments yet.</div>
+        </div>
+        }
       </div>
       }
     </mat-card-content>

@@ -27,6 +27,7 @@ import { NominatimPlace } from '../../../interfaces/nominatim-place.interface';
 import { PublicContentSavePayload } from '../../../interfaces/public-content-save-payload.interface';
 import { PublicContentType } from '../../../interfaces/public-content-type.type';
 import { PublicContent } from '../../../interfaces/public-content.interface';
+import { ExternalPublicContent } from '../../../interfaces/external-public-content.interface';
 import { PublicProfile, PublicProfileSummary } from '../../../interfaces/public-profile.interface';
 import { TenorApiResponse, TenorResult } from '../../../interfaces/tenor-response.interface';
 import { AuthService } from '../../../services/auth/auth.service';
@@ -105,6 +106,10 @@ export class PublicContentEditorComponent {
   readonly selectedParentContent = signal<PublicContent | null>(null);
   readonly childCommentsLoading = signal(false);
   readonly childComments = signal<PublicContent[]>([]);
+  readonly externalCommentsLoading = signal(false);
+  readonly externalComments = signal<ExternalPublicContent[]>([]);
+  readonly selectedExternalParent = signal<ExternalPublicContent | null>(null);
+  readonly selectedExternalParentUuid = signal('');
   readonly multimedia = signal<Multimedia>({ ...EMPTY_MULTIMEDIA });
   readonly hashtags = signal<string[]>([]);
   readonly locationSearchResults = signal<NominatimPlace[]>([]);
@@ -260,6 +265,23 @@ export class PublicContentEditorComponent {
   readonly hasSelectedLocation = computed(() => this.isCommentMode() || !!this.activeLocationLabel());
   readonly hasSelectedPublicProfile = computed(() => !!this.selectedProfile());
   readonly selectedParentSummary = computed(() => {
+    const selectedExternalParentUuid = this.selectedExternalParentUuid().trim()
+      || this.currentContent()?.externalParentMessageUuid?.trim()
+      || '';
+    if (selectedExternalParentUuid) {
+      const externalParent = this.selectedExternalParent();
+      return {
+        id: selectedExternalParentUuid,
+        contentType: externalParent?.contentType ?? 'comment',
+        status: externalParent?.status ?? 'published',
+        message: externalParent?.message ?? '',
+        locationLabel: '',
+        publishedMessageUuid: selectedExternalParentUuid,
+        publicProfileName: externalParent?.displayName || 'Public visitor',
+        isExternal: true
+      };
+    }
+
     const parent = this.selectedParentContent();
     if (parent) {
       return {
@@ -269,12 +291,27 @@ export class PublicContentEditorComponent {
         message: parent.message,
         locationLabel: parent.location.label,
         publishedMessageUuid: parent.publishedMessageUuid,
-        publicProfileName: parent.publicProfile?.name || ''
+        publicProfileName: parent.publicProfile?.name || '',
+        isExternal: false
       };
     }
-    return this.currentContent()?.parentContent ?? null;
+    const currentParent = this.currentContent()?.parentContent;
+    if (!currentParent) {
+      return null;
+    }
+    return {
+      ...currentParent,
+      isExternal: false
+    };
   });
-  readonly hasSelectedParentContent = computed(() => !!this.selectedParentSummary() && !!(this.formValue().parentContentId ?? '').trim());
+  readonly hasSelectedParentContent = computed(() => (
+    !!this.selectedExternalParentUuid().trim()
+    || !!(this.formValue().parentContentId ?? '').trim()
+  ));
+  readonly canOpenInternalParentContent = computed(() => {
+    const parent = this.selectedParentSummary();
+    return !!parent && !parent.isExternal;
+  });
   readonly previewParentLabel = computed(() => {
     const parent = this.selectedParentSummary();
     if (!parent) {
@@ -291,7 +328,7 @@ export class PublicContentEditorComponent {
     if (profile) {
       return profile;
     }
-    return 'Selected parent content';
+    return parent.isExternal ? 'Selected public comment' : 'Selected parent content';
   });
   readonly canSaveContent = computed(() => {
     if (this.saving() || !this.hasSelectedPublicProfile()) {
@@ -327,6 +364,12 @@ export class PublicContentEditorComponent {
   readonly backAriaLabel = computed(() => (
     this.resolveBackParentId() ? 'Back to parent content' : 'Back to content overview'
   ));
+  readonly canLoadExternalComments = computed(() => {
+    const content = this.currentContent();
+    return !!content
+      && content.status === 'published'
+      && !!content.publishedMessageUuid?.trim();
+  });
 
   constructor() {
     this.publicProfileService.loadProfiles();
@@ -349,8 +392,9 @@ export class PublicContentEditorComponent {
         const contentId = paramMap.get('id')?.trim() || '';
         const requestedType = queryParamMap.get('type')?.trim() || '';
         const parentId = queryParamMap.get('parentId')?.trim() || '';
+        const externalParentUuid = queryParamMap.get('externalParentUuid')?.trim() || '';
 
-        this.applyRouteState(contentId, requestedType, parentId);
+        this.applyRouteState(contentId, requestedType, parentId, externalParentUuid);
       });
   }
 
@@ -510,11 +554,11 @@ export class PublicContentEditorComponent {
   }
 
   openParentContent(): void {
-    const parentId = this.selectedParentSummary()?.id;
-    if (!parentId) {
+    const parent = this.selectedParentSummary();
+    if (!parent || parent.isExternal) {
       return;
     }
-    this.router.navigate(['/dashboard/content', parentId, 'edit']);
+    this.router.navigate(['/dashboard/content', parent.id, 'edit']);
   }
 
   createCommentFromCurrent(): void {
@@ -538,8 +582,27 @@ export class PublicContentEditorComponent {
     return row.id;
   }
 
+  trackExternalComment(_index: number, row: ExternalPublicContent): string {
+    return row.uuid;
+  }
+
   openChildComment(row: PublicContent): void {
     this.router.navigate(['/dashboard/content', row.id, 'edit']);
+  }
+
+  replyToExternalComment(row: ExternalPublicContent): void {
+    const currentContent = this.currentContent();
+    if (!currentContent) {
+      return;
+    }
+
+    this.router.navigate(['/dashboard/content/create'], {
+      queryParams: {
+        type: 'comment',
+        parentId: currentContent.id,
+        externalParentUuid: row.uuid
+      }
+    });
   }
 
   childCommentCount(row: PublicContent): number {
@@ -592,6 +655,9 @@ export class PublicContentEditorComponent {
 
   childLocationLabel(row: PublicContent): string {
     if (row.contentType === 'comment') {
+      if (row.externalParentMessageUuid) {
+        return 'Reply to public comment';
+      }
       const parentProfile = row.parentContent?.publicProfileName?.trim();
       const parentLocation = row.parentContent?.locationLabel?.trim();
       if (parentProfile && parentLocation) {
@@ -623,6 +689,54 @@ export class PublicContentEditorComponent {
     }
 
     return 'No location';
+  }
+
+  externalCommentCount(row: ExternalPublicContent): number {
+    return Math.max(0, Number(row.commentsNumber ?? 0));
+  }
+
+  externalResolvedStyle(row: ExternalPublicContent): string {
+    return row.style || '';
+  }
+
+  externalProfileName(row: ExternalPublicContent): string {
+    return row.displayName?.trim() || 'Public visitor';
+  }
+
+  externalProfileAvatar(row: ExternalPublicContent): string {
+    return row.avatarImage?.trim() || '';
+  }
+
+  externalProfileInitials(row: ExternalPublicContent): string {
+    const parts = this.externalProfileName(row).split(/\s+/).filter(Boolean).slice(0, 2);
+    return parts.map((part) => part.charAt(0).toUpperCase()).join('') || 'P';
+  }
+
+  externalTilePreview(row: ExternalPublicContent): string {
+    const message = row.message?.trim();
+    if (message) {
+      return message;
+    }
+
+    const mediaTitle = row.multimedia?.title?.trim();
+    if (mediaTitle) {
+      return mediaTitle;
+    }
+
+    const mediaDescription = row.multimedia?.description?.trim();
+    if (mediaDescription) {
+      return mediaDescription;
+    }
+
+    if (row.multimedia?.type && row.multimedia.type !== 'undefined') {
+      return `Attached media: ${this.mediaTypeLabel(row.multimedia.type)}`;
+    }
+
+    return 'No text content.';
+  }
+
+  externalHasImageMultimedia(row: ExternalPublicContent): boolean {
+    return this.isImageMultimedia(row.multimedia);
   }
 
   profileAvatar(): string {
@@ -1091,6 +1205,9 @@ export class PublicContentEditorComponent {
     return {
       contentType: this.contentType(),
       parentContentId: this.form.controls.parentContentId.value.trim(),
+      externalParentMessageUuid: this.isCommentMode()
+        ? (this.selectedExternalParentUuid().trim() || this.currentContent()?.externalParentMessageUuid?.trim() || '')
+        : '',
       publicProfileId: raw.publicProfileId.trim(),
       message,
       location: {
@@ -1123,6 +1240,8 @@ export class PublicContentEditorComponent {
     const storedLocationLabel = this.normalizeLocationLabel((content.location?.label ?? '').trim());
     this.currentContent.set(content);
     this.selectedParentContent.set(null);
+    this.selectedExternalParent.set(null);
+    this.selectedExternalParentUuid.set(content.externalParentMessageUuid?.trim() || '');
     this.multimedia.set(content.multimedia ?? { ...EMPTY_MULTIMEDIA });
     this.hashtags.set(Array.isArray(content.hashtags) ? [...content.hashtags] : []);
     this.selectedLocationLabel.set(storedLocationLabel);
@@ -1142,6 +1261,11 @@ export class PublicContentEditorComponent {
     });
     this.updateFormState();
     this.loadChildComments(content.id);
+    this.loadExternalComments(content);
+
+    if (content.externalParentMessageUuid?.trim()) {
+      this.loadExternalParentContent(content.externalParentMessageUuid.trim());
+    }
 
     if (updateRoute && this.route.snapshot.paramMap.get('id') !== content.id) {
       this.router.navigate(['/dashboard/content', content.id, 'edit']);
@@ -1226,6 +1350,28 @@ export class PublicContentEditorComponent {
     });
   }
 
+  private loadExternalComments(content: PublicContent | null): void {
+    if (!content || content.status !== 'published' || !content.publishedMessageUuid?.trim()) {
+      this.externalComments.set([]);
+      this.externalCommentsLoading.set(false);
+      return;
+    }
+
+    this.externalCommentsLoading.set(true);
+    this.publicContentService.getExternalCommentsForContent(content.id)
+      .pipe(
+        finalize(() => this.externalCommentsLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: (rows) => this.externalComments.set(rows),
+        error: () => {
+          this.externalComments.set([]);
+          this.showMessage('Public comments could not be loaded.');
+        }
+      });
+  }
+
   private loadParentContent(id: string): void {
     this.loading.set(true);
     this.publicContentService.getPublicContent(id)
@@ -1246,7 +1392,28 @@ export class PublicContentEditorComponent {
       });
   }
 
-  private applyRouteState(contentId: string, requestedType: string, parentId: string): void {
+  private loadExternalParentContent(messageUuid: string): void {
+    const normalizedMessageUuid = messageUuid.trim();
+    if (!normalizedMessageUuid) {
+      this.selectedExternalParentUuid.set('');
+      this.selectedExternalParent.set(null);
+      return;
+    }
+
+    this.selectedExternalParentUuid.set(normalizedMessageUuid);
+    this.publicContentService.getExternalPublicContent(normalizedMessageUuid)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (row) => {
+          this.selectedExternalParent.set(row);
+        },
+        error: () => {
+          this.selectedExternalParent.set(null);
+        }
+      });
+  }
+
+  private applyRouteState(contentId: string, requestedType: string, parentId: string, externalParentUuid: string): void {
     if (contentId) {
       if (this.currentContent()?.id !== contentId) {
         this.loadContent(contentId);
@@ -1254,16 +1421,20 @@ export class PublicContentEditorComponent {
       return;
     }
 
-    this.prepareCreateState(requestedType, parentId);
+    this.prepareCreateState(requestedType, parentId, externalParentUuid);
   }
 
-  private prepareCreateState(requestedType: string, parentId: string): void {
+  private prepareCreateState(requestedType: string, parentId: string, externalParentUuid: string): void {
     const defaultProfileId = this.publicProfiles()[0]?.id ?? '';
 
     this.currentContent.set(null);
     this.selectedParentContent.set(null);
+    this.selectedExternalParent.set(null);
+    this.selectedExternalParentUuid.set('');
     this.childComments.set([]);
     this.childCommentsLoading.set(false);
+    this.externalComments.set([]);
+    this.externalCommentsLoading.set(false);
     this.multimedia.set({ ...EMPTY_MULTIMEDIA });
     this.hashtags.set([]);
     this.selectedLocationLabel.set('');
@@ -1294,6 +1465,9 @@ export class PublicContentEditorComponent {
       this.form.controls.parentContentId.setValue(parentId, { emitEvent: false });
       this.loadParentContent(parentId);
     }
+    if (requestedType === 'comment' && externalParentUuid) {
+      this.loadExternalParentContent(externalParentUuid);
+    }
   }
 
   private resolveBackParentId(): string {
@@ -1302,7 +1476,7 @@ export class PublicContentEditorComponent {
       return currentParentId;
     }
 
-    const selectedParentId = this.selectedParentSummary()?.id?.trim();
+    const selectedParentId = this.selectedParentContent()?.id?.trim();
     if (selectedParentId) {
       return selectedParentId;
     }

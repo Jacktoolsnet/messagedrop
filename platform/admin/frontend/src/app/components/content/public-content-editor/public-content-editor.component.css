@@ -726,6 +726,35 @@ mat-toolbar {
   margin-bottom: 1rem;
 }
 
+.comment-thread-subsection {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.15rem;
+}
+
+.comment-thread-subsection-header {
+  display: flex;
+  align-items: center;
+  gap: .9rem;
+}
+
+.comment-thread-subsection-copy {
+  min-width: 0;
+}
+
+.comment-thread-subsection-copy h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.comment-thread-subsection-copy p {
+  margin: .22rem 0 0;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
 .tiles-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -752,6 +781,14 @@ mat-toolbar {
   transform: translateY(-2px);
   border-color: rgba(37, 99, 235, 0.18);
   box-shadow: 0 28px 64px rgba(15, 23, 42, 0.16);
+}
+
+.content-tile-static {
+  cursor: default;
+}
+
+.content-tile-static:hover {
+  transform: none;
 }
 
 .content-preview-avatar-box {
@@ -1019,6 +1056,10 @@ mat-toolbar {
   width: 40px;
   height: 40px;
   font-size: 40px;
+}
+
+.comment-thread-empty-state-compact {
+  min-height: 120px;
 }
 
 .style-actions,

@@ -10,12 +10,14 @@ const { apiError } = require('../middleware/api-error');
 const { signServiceJwt } = require('../utils/serviceJwt');
 const { resolveBaseUrl } = require('../utils/adminLogForwarder');
 const { encodePlusCode } = require('../utils/plusCode');
+const { decodeHashtags } = require('../../../../backend/utils/hashtags');
 
 const router = express.Router();
 
 const CONTENT_ROLES = ['author', 'editor', 'admin', 'root'];
 const PUBLISH_ROLES = ['editor', 'admin', 'root'];
 const backendAudience = process.env.SERVICE_JWT_AUDIENCE_BACKEND || 'service.backend';
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function resolvePublicBackendBase() {
   return resolveBaseUrl(process.env.BASE_URL, process.env.PORT);
@@ -135,6 +137,43 @@ function defaultMultimedia() {
   };
 }
 
+function normalizeExternalCommentStatus(value) {
+  const normalized = normalizeString(value).toLowerCase();
+  if (normalized === 'enabled') {
+    return tablePublicContent.contentStatus.PUBLISHED;
+  }
+  if (normalized === 'disabled') {
+    return tablePublicContent.contentStatus.WITHDRAWN;
+  }
+  return normalized || tablePublicContent.contentStatus.PUBLISHED;
+}
+
+function toEpochMilliseconds(value) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) {
+    return 0;
+  }
+  return parsed < 1_000_000_000_000 ? parsed * 1000 : parsed;
+}
+
+function normalizeExternalParentMessageUuid(value) {
+  const normalized = normalizeString(value);
+  if (!normalized) {
+    return '';
+  }
+  return UUID_PATTERN.test(normalized) ? normalized : '';
+}
+
+function normalizeExternalMultimedia(value) {
+  if (typeof value === 'string') {
+    return parseJson(value, defaultMultimedia());
+  }
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    return value;
+  }
+  return defaultMultimedia();
+}
+
 function toContentDto(row) {
   if (!row) {
     return null;
@@ -145,6 +184,7 @@ function toContentDto(row) {
     authorAdminUserId: row.authorAdminUserId,
     authorUsername: row.authorUsername || '',
     contentType: row.contentType || tablePublicContent.contentType.PUBLIC,
+    externalParentMessageUuid: row.externalParentMessageUuid || null,
     parentContent: row.parentContentIdResolved
       ? {
         id: row.parentContentIdResolved,
@@ -326,6 +366,7 @@ function normalizeEditorPayload(body) {
   return {
     contentType: normalizeContentType(body?.contentType),
     parentContentId: normalizeString(body?.parentContentId),
+    externalParentMessageUuid: normalizeExternalParentMessageUuid(body?.externalParentMessageUuid),
     publicProfileId: normalizeString(body?.publicProfileId),
     message: normalizeString(body?.message),
     latitude,
@@ -371,6 +412,10 @@ function hasSelectedPublicProfile(payload) {
   return !!normalizeString(payload?.publicProfileId);
 }
 
+function hasExternalParentSelection(payload) {
+  return !!normalizeExternalParentMessageUuid(payload?.externalParentMessageUuid);
+}
+
 function ensureManageableContent(req, row) {
   const roles = getAdminRoles(req);
   if (canSeeAllContent(roles)) {
@@ -409,6 +454,129 @@ function getPublicContentById(db, contentId) {
       }
       resolve(row || null);
     });
+  });
+}
+
+function listPublicProfiles(db) {
+  return new Promise((resolve, reject) => {
+    tablePublicProfile.list(db, {}, (err, rows) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(rows || []);
+    });
+  });
+}
+
+async function buildPublicProfileLookup(db) {
+  const profiles = await listPublicProfiles(db);
+  const lookup = new Map();
+  for (const profile of profiles) {
+    const publicBackendUserId = normalizeString(profile?.publicBackendUserId);
+    if (!publicBackendUserId) {
+      continue;
+    }
+    lookup.set(publicBackendUserId, profile);
+  }
+  return lookup;
+}
+
+function toExternalPublicContentDto(rawMessage, publicProfileLookup = new Map()) {
+  if (!rawMessage || typeof rawMessage !== 'object') {
+    return null;
+  }
+
+  const userId = normalizeString(rawMessage.userId);
+  const profile = publicProfileLookup.get(userId) || null;
+  const displayName = normalizeString(profile?.name) || 'Public visitor';
+  const avatarImage = normalizeString(profile?.avatarImage);
+  const contentType = normalizeContentType(rawMessage.typ);
+
+  return {
+    uuid: normalizeString(rawMessage.uuid),
+    parentUuid: normalizeString(rawMessage.parentUuid),
+    userId,
+    contentType,
+    displayName,
+    avatarImage,
+    style: normalizeString(rawMessage.style) || normalizeString(profile?.defaultStyle),
+    message: normalizeString(rawMessage.message),
+    hashtags: decodeHashtags(rawMessage.hashtags),
+    multimedia: normalizeExternalMultimedia(rawMessage.multimedia),
+    commentsNumber: Math.max(0, Number(rawMessage.commentsNumber || 0)),
+    status: normalizeExternalCommentStatus(rawMessage.status),
+    createdAt: toEpochMilliseconds(rawMessage.createDateTime),
+    publicProfileId: normalizeString(profile?.id) || null
+  };
+}
+
+async function getExternalPublicContentByUuid(messageUuid) {
+  const normalizedUuid = normalizeExternalParentMessageUuid(messageUuid);
+  if (!normalizedUuid) {
+    return null;
+  }
+
+  const response = await callPublicBackendPublic('get', `/message/get/uuid/${encodeURIComponent(normalizedUuid)}`);
+  if (response.status === 404) {
+    return null;
+  }
+  if (response.status !== 200 || !response.data?.message) {
+    const err = apiError.badGateway('backend_request_failed');
+    err.detail = response.data?.error || response.data?.message || response.statusText || 'public_message_lookup_failed';
+    throw err;
+  }
+
+  return response.data.message || null;
+}
+
+async function validateExternalParentContent(messageUuid) {
+  const normalizedUuid = normalizeExternalParentMessageUuid(messageUuid);
+  if (!normalizedUuid) {
+    return null;
+  }
+
+  const externalParent = await getExternalPublicContentByUuid(normalizedUuid);
+  if (!externalParent) {
+    throw apiError.notFound('The selected public comment no longer exists');
+  }
+  if (normalizeExternalCommentStatus(externalParent.status) !== tablePublicContent.contentStatus.PUBLISHED) {
+    throw apiError.conflict('The selected public comment is no longer published');
+  }
+
+  return externalParent;
+}
+
+function getExistingPublishedMessageUuidSet(db, uuids) {
+  const normalizedUuids = Array.from(new Set(
+    (Array.isArray(uuids) ? uuids : [])
+      .map((value) => normalizeExternalParentMessageUuid(value))
+      .filter(Boolean)
+  ));
+
+  if (normalizedUuids.length === 0) {
+    return Promise.resolve(new Set());
+  }
+
+  return new Promise((resolve, reject) => {
+    const placeholders = normalizedUuids.map(() => '?').join(', ');
+    db.all(
+      `
+        SELECT ${tablePublicContent.columns.publishedMessageUuid} AS publishedMessageUuid
+        FROM ${tablePublicContent.tableName}
+        WHERE ${tablePublicContent.columns.publishedMessageUuid} IN (${placeholders})
+      `,
+      normalizedUuids,
+      (err, rows) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(new Set(
+          (rows || [])
+            .map((row) => normalizeExternalParentMessageUuid(row?.publishedMessageUuid))
+            .filter(Boolean)
+        ));
+      }
+    );
   });
 }
 
@@ -866,6 +1034,80 @@ router.get('/public-messages/:id', requireRole(...CONTENT_ROLES), (req, res, nex
   });
 });
 
+router.get('/public-messages/:id/external-comments', requireRole(...CONTENT_ROLES), async (req, res, next) => {
+  try {
+    const row = await getPublicContentById(req.database.db, req.params.id);
+    if (!row) {
+      return next(apiError.notFound('not_found'));
+    }
+    if (!ensureManageableContent(req, row)) {
+      return next(apiError.forbidden('insufficient_role'));
+    }
+
+    if (row.status !== tablePublicContent.contentStatus.PUBLISHED || !normalizeString(row.publishedMessageUuid)) {
+      return res.json({
+        status: 200,
+        rows: []
+      });
+    }
+
+    const response = await callPublicBackendPublic('get', `/message/get/comment/${encodeURIComponent(row.publishedMessageUuid)}`);
+    if (response.status !== 200) {
+      const err = apiError.badGateway('backend_request_failed');
+      err.detail = response.data?.error || response.data?.message || response.statusText || 'public_comments_lookup_failed';
+      return next(err);
+    }
+
+    const publicProfileLookup = await buildPublicProfileLookup(req.database.db);
+    const rawRows = Array.isArray(response.data?.rows) ? response.data.rows : [];
+    const existingPublishedUuidSet = await getExistingPublishedMessageUuidSet(
+      req.database.db,
+      rawRows.map((rawEntry) => rawEntry?.uuid)
+    );
+
+    return res.json({
+      status: 200,
+      rows: rawRows
+        .filter((rawEntry) => {
+          const uuid = normalizeExternalParentMessageUuid(rawEntry?.uuid);
+          return !!uuid && !existingPublishedUuidSet.has(uuid);
+        })
+        .map((rawEntry) => toExternalPublicContentDto(rawEntry, publicProfileLookup))
+        .filter(Boolean)
+    });
+  } catch (error) {
+    if (error?.status) {
+      return next(error);
+    }
+    return next(apiError.internal('external_public_comments_failed'));
+  }
+});
+
+router.get('/external-public-content/:messageUuid', requireRole(...CONTENT_ROLES), async (req, res, next) => {
+  try {
+    const rawMessage = await getExternalPublicContentByUuid(req.params.messageUuid);
+    if (!rawMessage) {
+      return next(apiError.notFound('not_found'));
+    }
+
+    const publicProfileLookup = await buildPublicProfileLookup(req.database.db);
+    const row = toExternalPublicContentDto(rawMessage, publicProfileLookup);
+    if (!row) {
+      return next(apiError.notFound('not_found'));
+    }
+
+    return res.json({
+      status: 200,
+      row
+    });
+  } catch (error) {
+    if (error?.status) {
+      return next(error);
+    }
+    return next(apiError.internal('external_public_content_failed'));
+  }
+});
+
 router.post('/public-messages', [requireRole(...CONTENT_ROLES), express.json({ limit: '1mb' })], async (req, res, next) => {
   try {
     const actor = await ensurePersistedAdminActor(req);
@@ -886,15 +1128,26 @@ router.post('/public-messages', [requireRole(...CONTENT_ROLES), express.json({ l
     }
 
     let parentContentId = null;
+    let externalParentMessageUuid = null;
     if (isCommentPayload(payload)) {
       parentContentId = normalizeString(payload.parentContentId) || null;
-      await validateCommentParent(req.database.db, parentContentId);
+      externalParentMessageUuid = normalizeExternalParentMessageUuid(payload.externalParentMessageUuid) || null;
+      if (!parentContentId && !externalParentMessageUuid) {
+        return next(apiError.unprocessableEntity('Please choose parent content before saving this comment'));
+      }
+      if (parentContentId) {
+        await validateCommentParent(req.database.db, parentContentId);
+      }
+      if (externalParentMessageUuid) {
+        await validateExternalParentContent(externalParentMessageUuid);
+      }
     }
 
     tablePublicContent.create(req.database.db, {
       authorAdminUserId: actorId,
       contentType: payload.contentType,
       parentContentId,
+      externalParentMessageUuid,
       publicProfileId: publicProfile.id,
       lastEditorAdminUserId: actorId,
       status: tablePublicContent.contentStatus.DRAFT,
@@ -985,9 +1238,19 @@ router.put('/public-messages/:id', [requireRole(...CONTENT_ROLES), express.json(
     }
 
     let parentContentId = null;
+    let externalParentMessageUuid = null;
     if (isCommentPayload(payload)) {
       parentContentId = normalizeString(payload.parentContentId) || null;
-      await validateCommentParent(req.database.db, parentContentId, row.id);
+      externalParentMessageUuid = normalizeExternalParentMessageUuid(payload.externalParentMessageUuid) || null;
+      if (!parentContentId && !externalParentMessageUuid) {
+        return next(apiError.unprocessableEntity('Please choose parent content before saving this comment'));
+      }
+      if (parentContentId) {
+        await validateCommentParent(req.database.db, parentContentId, row.id);
+      }
+      if (externalParentMessageUuid) {
+        await validateExternalParentContent(externalParentMessageUuid);
+      }
     }
 
     const actor = await ensurePersistedAdminActor(req);
@@ -997,6 +1260,7 @@ router.put('/public-messages/:id', [requireRole(...CONTENT_ROLES), express.json(
       tablePublicContent.update(req.database.db, req.params.id, {
         [tablePublicContent.columns.contentType]: payload.contentType,
         [tablePublicContent.columns.parentContentId]: parentContentId,
+        [tablePublicContent.columns.externalParentMessageUuid]: externalParentMessageUuid,
         [tablePublicContent.columns.message]: payload.message,
         [tablePublicContent.columns.publicProfileId]: publicProfile.id,
         [tablePublicContent.columns.latitude]: isCommentPayload(payload) ? 0 : payload.latitude,
@@ -1082,18 +1346,23 @@ router.post('/public-messages/:id/publish', requireRole(...PUBLISH_ROLES), async
     const messageType = normalizeContentType(row.contentType);
     let parentPublishedMessageUuid = null;
     if (messageType === tablePublicContent.contentType.COMMENT) {
-      if (!row.parentContentIdResolved && !row.parentContentId) {
+      if (!row.parentContentIdResolved && !row.parentContentId && !row.externalParentMessageUuid) {
         return next(apiError.unprocessableEntity('Please choose parent content before publishing this comment'));
       }
 
-      const parentContent = await getPublicContentById(req.database.db, row.parentContentIdResolved || row.parentContentId);
-      if (!parentContent) {
-        return next(apiError.notFound('The selected parent content no longer exists'));
+      if (row.externalParentMessageUuid) {
+        const externalParent = await validateExternalParentContent(row.externalParentMessageUuid);
+        parentPublishedMessageUuid = normalizeExternalParentMessageUuid(externalParent?.uuid) || null;
+      } else {
+        const parentContent = await getPublicContentById(req.database.db, row.parentContentIdResolved || row.parentContentId);
+        if (!parentContent) {
+          return next(apiError.notFound('The selected parent content no longer exists'));
+        }
+        if (parentContent.status !== tablePublicContent.contentStatus.PUBLISHED || !parentContent.publishedMessageUuid) {
+          return next(apiError.conflict('The parent content must be published before this comment can be published'));
+        }
+        parentPublishedMessageUuid = parentContent.publishedMessageUuid;
       }
-      if (parentContent.status !== tablePublicContent.contentStatus.PUBLISHED || !parentContent.publishedMessageUuid) {
-        return next(apiError.conflict('The parent content must be published before this comment can be published'));
-      }
-      parentPublishedMessageUuid = parentContent.publishedMessageUuid;
     }
 
     const publishResponse = await callPublicBackend('post', '/message/internal/publish', {

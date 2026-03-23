@@ -21,6 +21,7 @@ const columns = {
   authorAdminUserId: 'authorAdminUserId',
   contentType: 'contentType',
   parentContentId: 'parentContentId',
+  externalParentMessageUuid: 'externalParentMessageUuid',
   publicProfileId: 'publicProfileId',
   lastEditorAdminUserId: 'lastEditorAdminUserId',
   publisherAdminUserId: 'publisherAdminUserId',
@@ -51,6 +52,7 @@ function init(db) {
       ${columns.authorAdminUserId} TEXT NOT NULL,
       ${columns.contentType} TEXT NOT NULL DEFAULT '${contentType.PUBLIC}',
       ${columns.parentContentId} TEXT DEFAULT NULL,
+      ${columns.externalParentMessageUuid} TEXT DEFAULT NULL,
       ${columns.publicProfileId} TEXT DEFAULT NULL,
       ${columns.lastEditorAdminUserId} TEXT DEFAULT NULL,
       ${columns.publisherAdminUserId} TEXT DEFAULT NULL,
@@ -95,6 +97,8 @@ function init(db) {
       ON ${tableName}(${columns.contentType}, ${columns.updatedAt} DESC);
     CREATE INDEX IF NOT EXISTS idx_public_content_parent
       ON ${tableName}(${columns.parentContentId}, ${columns.updatedAt} DESC);
+    CREATE INDEX IF NOT EXISTS idx_public_content_external_parent_uuid
+      ON ${tableName}(${columns.externalParentMessageUuid});
     CREATE INDEX IF NOT EXISTS idx_public_content_profile
       ON ${tableName}(${columns.publicProfileId}, ${columns.updatedAt} DESC);
     CREATE INDEX IF NOT EXISTS idx_public_content_status
@@ -118,6 +122,7 @@ function init(db) {
     const hasPublicProfileIdColumn = rows.some((row) => row?.name === columns.publicProfileId);
     const hasContentTypeColumn = rows.some((row) => row?.name === columns.contentType);
     const hasParentContentIdColumn = rows.some((row) => row?.name === columns.parentContentId);
+    const hasExternalParentMessageUuidColumn = rows.some((row) => row?.name === columns.externalParentMessageUuid);
     if (!hasContentTypeColumn) {
       db.run(`
         ALTER TABLE ${tableName}
@@ -137,6 +142,17 @@ function init(db) {
       db.run(`
         CREATE INDEX IF NOT EXISTS idx_public_content_parent
           ON ${tableName}(${columns.parentContentId}, ${columns.updatedAt} DESC)
+      `, []);
+    }
+
+    if (!hasExternalParentMessageUuidColumn) {
+      db.run(`
+        ALTER TABLE ${tableName}
+        ADD COLUMN ${columns.externalParentMessageUuid} TEXT DEFAULT NULL
+      `, []);
+      db.run(`
+        CREATE INDEX IF NOT EXISTS idx_public_content_external_parent_uuid
+          ON ${tableName}(${columns.externalParentMessageUuid})
       `, []);
     }
 
@@ -169,6 +185,7 @@ function create(db, payload, callback) {
       ${columns.authorAdminUserId},
       ${columns.contentType},
       ${columns.parentContentId},
+      ${columns.externalParentMessageUuid},
       ${columns.publicProfileId},
       ${columns.lastEditorAdminUserId},
       ${columns.publisherAdminUserId},
@@ -190,7 +207,7 @@ function create(db, payload, callback) {
       ${columns.publishedAt},
       ${columns.withdrawnAt},
       ${columns.deletedAt}
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   const params = [
@@ -198,6 +215,7 @@ function create(db, payload, callback) {
     payload.authorAdminUserId,
     payload.contentType ?? contentType.PUBLIC,
     payload.parentContentId ?? null,
+    payload.externalParentMessageUuid ?? null,
     payload.publicProfileId ?? null,
     payload.lastEditorAdminUserId ?? payload.authorAdminUserId,
     payload.publisherAdminUserId ?? null,
@@ -380,6 +398,7 @@ function update(db, id, fields, callback) {
   const allowedKeys = [
     columns.contentType,
     columns.parentContentId,
+    columns.externalParentMessageUuid,
     columns.message,
     columns.latitude,
     columns.longitude,

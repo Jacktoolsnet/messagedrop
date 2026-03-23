@@ -15,6 +15,7 @@ export interface PublicContent {
   authorAdminUserId: string;
   authorUsername: string;
   contentType: PublicContentType;
+  externalParentMessageUuid: string | null;
   parentContent: {
     id: string;
     contentType: PublicContentType;
