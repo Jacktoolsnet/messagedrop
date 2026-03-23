@@ -10,6 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { UpdateUserPayload } from '../../../interfaces/update-user-payload.interface';
 import { User } from '../../../interfaces/user.interface';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { UserService } from '../../../services/user/user.service';
 
 export interface EditUserData {
@@ -40,6 +41,8 @@ export class EditUserComponent {
   private data = inject<EditUserData>(MAT_DIALOG_DATA);
   private fb = inject(FormBuilder);
   private userService = inject(UserService);
+  readonly i18n = inject(TranslationHelperService);
+  readonly roles = ['author', 'editor', 'moderator', 'legal', 'admin'] as const;
 
   user = this.data.user;
   canChangeUsername = this.data.canChangeUsername;
@@ -95,6 +98,23 @@ export class EditUserComponent {
     this.dialogRef.close(false);
   }
 
+  roleLabel(role: string): string {
+    switch (role) {
+      case 'author':
+        return this.i18n.t('Author');
+      case 'editor':
+        return this.i18n.t('Editor');
+      case 'moderator':
+        return this.i18n.t('Moderator');
+      case 'legal':
+        return this.i18n.t('Legal');
+      case 'admin':
+        return this.i18n.t('Admin');
+      default:
+        return role;
+    }
+  }
+
   private resolveErrorMessage(error: unknown): string {
     if (error instanceof HttpErrorResponse) {
       const backendMessage = error.error?.message || error.error?.error || error.message;
@@ -102,6 +122,6 @@ export class EditUserComponent {
         return backendMessage.trim();
       }
     }
-    return 'User could not be updated.';
+    return this.i18n.t('User could not be updated.');
   }
 }

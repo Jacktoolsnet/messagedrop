@@ -1,27 +1,27 @@
 <mat-toolbar color="primary">
     <!-- Home-Button -->
-    <button mat-icon-button routerLink="/dashboard" aria-label="Dashboard Home">
+    <button mat-icon-button routerLink="/dashboard" [attr.aria-label]="i18n.t('Dashboard Home')">
         <mat-icon>home</mat-icon>
     </button>
 
     <!-- Titel zentriert -->
     <span class="toolbar-title">
-        User Management
+        {{ i18n.t('User Management') }}
     </span>
 </mat-toolbar>
 
 <div class="page">
     @if (isAdminOrRoot()){
     <div class="user-header">
-        <h2>All Users</h2>
+        <h2>{{ i18n.t('All Users') }}</h2>
         <button mat-flat-button color="primary" (click)="openCreateUserDialog()">
             <mat-icon>person_add</mat-icon>
-            Add User
+            {{ i18n.t('Add User') }}
         </button>
     </div>
     } @else {
     <div class="user-header">
-        <h2>My User</h2>
+        <h2>{{ i18n.t('My User') }}</h2>
     </div>
     }
 
@@ -65,17 +65,17 @@
                                 [class.role-admin]="user.role === 'admin'" [class.role-legal]="user.role === 'legal'"
                                 [class.role-editor]="user.role === 'editor'" [class.role-author]="user.role === 'author'"
                                 [class.role-moderator]="user.role === 'moderator'">
-                                {{ user.role }}
+                                {{ roleLabel(user.role) }}
                             </span>
 
                             @if (isSelf(user)) {
-                            <span class="self-pill">You</span>
+                            <span class="self-pill">{{ i18n.t('You') }}</span>
                             }
                         </div>
                     </div>
 
                     <mat-card-subtitle class="tile-subtitle">
-                        Account overview
+                        {{ i18n.t('Account overview') }}
                     </mat-card-subtitle>
                 </div>
             </mat-card-header>
@@ -89,23 +89,23 @@
 
                     <div class="info-row">
                         <mat-icon>calendar_month</mat-icon>
-                        <span>Created {{ user.createdAt | date:'mediumDate' }}</span>
+                        <span>{{ i18n.t('Created {{date}}', { date: (user.createdAt | date:'mediumDate') }) }}</span>
                     </div>
                 </div>
             </mat-card-content>
 
             <mat-card-actions align="end" class="user-card-actions">
                 @if (canEdit(user)) {
-                <button mat-stroked-button color="primary" aria-label="Edit" (click)="openEditUserDialog(user)">
+                <button mat-stroked-button color="primary" [attr.aria-label]="i18n.t('Edit')" (click)="openEditUserDialog(user)">
                     <mat-icon>edit</mat-icon>
-                    Edit
+                    {{ i18n.t('Edit') }}
                 </button>
                 }
 
                 @if (canDelete(user)) {
-                <button mat-stroked-button color="warn" aria-label="Delete" (click)="confirmDelete(user)">
+                <button mat-stroked-button color="warn" [attr.aria-label]="i18n.t('Delete')" (click)="confirmDelete(user)">
                     <mat-icon>delete</mat-icon>
-                    Delete
+                    {{ i18n.t('Delete') }}
                 </button>
                 }
             </mat-card-actions>

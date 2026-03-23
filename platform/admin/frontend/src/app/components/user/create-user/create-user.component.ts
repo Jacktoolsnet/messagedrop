@@ -9,6 +9,7 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { CreateUserPayload } from '../../../interfaces/create-user-payload.interface';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { UserService } from '../../../services/user/user.service';
 
 @Component({
@@ -30,6 +31,8 @@ export class CreateUserComponent {
   private dialogRef = inject(MatDialogRef<CreateUserComponent>);
   private userService = inject(UserService);
   private fb = inject(FormBuilder);
+  readonly i18n = inject(TranslationHelperService);
+  readonly roles = ['author', 'editor', 'moderator', 'legal', 'admin'] as const;
 
   form = this.fb.group({
     username: ['', Validators.required],
@@ -58,6 +61,23 @@ export class CreateUserComponent {
     this.dialogRef.close(false);
   }
 
+  roleLabel(role: string): string {
+    switch (role) {
+      case 'author':
+        return this.i18n.t('Author');
+      case 'editor':
+        return this.i18n.t('Editor');
+      case 'moderator':
+        return this.i18n.t('Moderator');
+      case 'legal':
+        return this.i18n.t('Legal');
+      case 'admin':
+        return this.i18n.t('Admin');
+      default:
+        return role;
+    }
+  }
+
   private resolveErrorMessage(error: unknown): string {
     if (error instanceof HttpErrorResponse) {
       const backendMessage = error.error?.message || error.error?.error || error.message;
@@ -65,6 +85,6 @@ export class CreateUserComponent {
         return backendMessage.trim();
       }
     }
-    return 'User could not be created.';
+    return this.i18n.t('User could not be created.');
   }
 }

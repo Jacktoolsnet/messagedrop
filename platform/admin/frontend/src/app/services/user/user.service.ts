@@ -6,6 +6,7 @@ import { environment } from '../../../environments/environment';
 import { CreateUserPayload } from '../../interfaces/create-user-payload.interface';
 import { UpdateUserPayload } from '../../interfaces/update-user-payload.interface';
 import { User } from '../../interfaces/user.interface';
+import { TranslationHelperService } from '../translation-helper.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,9 +18,10 @@ export class UserService {
   private readonly baseUrl = `${environment.apiUrl}/user`;
   private readonly http = inject(HttpClient);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly i18n = inject(TranslationHelperService);
 
   private handleError = (error: unknown) => {
-    this.snackBar.open(this.resolveErrorMessage(error), 'OK', {
+    this.snackBar.open(this.resolveErrorMessage(error), this.i18n.t('OK'), {
       duration: 3000,
       panelClass: ['snack-error'],
       horizontalPosition: 'center',
@@ -35,7 +37,7 @@ export class UserService {
         return backendMessage.trim();
       }
     }
-    return 'Something went wrong.';
+    return this.i18n.t('Something went wrong.');
   }
 
   loadUsers() {

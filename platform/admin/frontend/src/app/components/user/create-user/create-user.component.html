@@ -4,38 +4,36 @@
             <mat-icon>person_add</mat-icon>
         </div>
         <div class="titles">
-            <h2>Create New User</h2>
-            <p>Please provide credentials, e-mail and role</p>
+            <h2>{{ i18n.t('Create New User') }}</h2>
+            <p>{{ i18n.t('Please provide credentials, e-mail and role') }}</p>
         </div>
     </div>
 
     <form [formGroup]="form" (ngSubmit)="submit()" class="create-user-form">
         <mat-form-field appearance="outline" class="full">
-            <mat-label>Username</mat-label>
+            <mat-label>{{ i18n.t('Username') }}</mat-label>
             <input matInput formControlName="username" required />
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full">
-            <mat-label>Password</mat-label>
+            <mat-label>{{ i18n.t('Password') }}</mat-label>
             <input matInput type="password" formControlName="password" required />
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full">
-            <mat-label>E-Mail</mat-label>
+            <mat-label>{{ i18n.t('E-Mail') }}</mat-label>
             <input matInput type="email" formControlName="email" required autocomplete="email" />
             @if (form.controls.email.invalid && form.controls.email.touched) {
-                <mat-error>Please enter a valid e-mail address.</mat-error>
+                <mat-error>{{ i18n.t('Please enter a valid e-mail address.') }}</mat-error>
             }
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full">
-            <mat-label>Role</mat-label>
+            <mat-label>{{ i18n.t('Role') }}</mat-label>
             <mat-select formControlName="role">
-                <mat-option value="author">Author</mat-option>
-                <mat-option value="editor">Editor</mat-option>
-                <mat-option value="moderator">Moderator</mat-option>
-                <mat-option value="legal">Legal</mat-option>
-                <mat-option value="admin">Admin</mat-option>
+                @for (role of roles; track role) {
+                    <mat-option [value]="role">{{ roleLabel(role) }}</mat-option>
+                }
             </mat-select>
         </mat-form-field>
 
@@ -44,9 +42,9 @@
         }
 
         <div class="dialog-actions">
-            <button mat-stroked-button type="button" (click)="cancel()">Cancel</button>
+            <button mat-stroked-button type="button" (click)="cancel()">{{ i18n.t('Cancel') }}</button>
             <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || form.pending">
-                Create
+                {{ i18n.t('Create') }}
             </button>
         </div>
     </form>

@@ -9,6 +9,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterLink } from '@angular/router';
 import { User } from '../../../interfaces/user.interface';
 import { AuthService } from '../../../services/auth/auth.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { UserService } from '../../../services/user/user.service';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
 import { CreateUserComponent } from '../../user/create-user/create-user.component';
@@ -34,6 +35,7 @@ export class UserDashboardComponent {
   private snack = inject(MatSnackBar);
   private userService = inject(UserService);
   private authService = inject(AuthService);
+  readonly i18n = inject(TranslationHelperService);
 
   readonly users = this.userService.users;
   readonly username = this.authService.username;
@@ -57,7 +59,9 @@ export class UserDashboardComponent {
     const ref = this.dialog.open(ConfirmDialogComponent, {
       data: {
         title: 'Delete user?',
-        message: `Do you really want to delete “${user.username}”? This cannot be undone.`,
+        message: this.i18n.t('Do you really want to delete “{{username}}”? This cannot be undone.', {
+          username: user.username
+        }),
         confirmText: 'Delete',
         cancelText: 'Cancel',
         warn: true
@@ -70,17 +74,17 @@ export class UserDashboardComponent {
       this.userService.deleteUser(user.id).subscribe({
         next: (res) => {
           if (res?.deleted) {
-            this.snack.open(`User “${user.username}” deleted.`, 'OK', { duration: 2500 });
+            this.snack.open(this.i18n.t('User “{{username}}” deleted.', { username: user.username }), this.i18n.t('OK'), { duration: 2500 });
             this.userService.loadUsers(); // refresh
           } else {
-            this.snack.open('Delete failed.', 'OK', { duration: 2500 });
+            this.snack.open(this.i18n.t('Delete failed.'), this.i18n.t('OK'), { duration: 2500 });
           }
         },
         error: (err) => {
           if (err?.status === 403) {
-            this.snack.open('Insufficient permissions to delete users.', 'OK', { duration: 3000 });
+            this.snack.open(this.i18n.t('Insufficient permissions to delete users.'), this.i18n.t('OK'), { duration: 3000 });
           } else {
-            this.snack.open('Backend error while deleting user.', 'OK', { duration: 3000 });
+            this.snack.open(this.i18n.t('Backend error while deleting user.'), this.i18n.t('OK'), { duration: 3000 });
           }
         }
       });
@@ -118,5 +122,24 @@ export class UserDashboardComponent {
     ref.afterClosed().subscribe((updated) => {
       if (updated) this.userService.loadUsers();
     });
+  }
+
+  roleLabel(role: string | null | undefined): string {
+    switch (role) {
+      case 'root':
+        return this.i18n.t('Root');
+      case 'admin':
+        return this.i18n.t('Admin');
+      case 'legal':
+        return this.i18n.t('Legal');
+      case 'editor':
+        return this.i18n.t('Editor');
+      case 'author':
+        return this.i18n.t('Author');
+      case 'moderator':
+        return this.i18n.t('Moderator');
+      default:
+        return role || '';
+    }
   }
 }

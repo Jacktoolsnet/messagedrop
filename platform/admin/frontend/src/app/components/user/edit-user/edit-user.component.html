@@ -4,12 +4,12 @@
       <mat-icon>manage_accounts</mat-icon>
     </div>
     <div class="titles">
-      <h2>Edit User</h2>
+      <h2>{{ i18n.t('Edit User') }}</h2>
       @if (!isSelf) {
-        <p>Change user details</p>
+        <p>{{ i18n.t('Change user details') }}</p>
       }
       @if (isSelf) {
-        <p>Change your e-mail address or password</p>
+        <p>{{ i18n.t('Change your e-mail address or password') }}</p>
       }
     </div>
   </div>
@@ -18,40 +18,38 @@
     <!-- Username (nur Admin/Root) -->
     @if (canChangeUsername) {
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Username</mat-label>
+        <mat-label>{{ i18n.t('Username') }}</mat-label>
         <input matInput formControlName="username" />
         @if (form.controls.username.invalid) {
-          <mat-error>Username is required (min 3 chars)</mat-error>
+          <mat-error>{{ i18n.t('Username is required (min 3 chars)') }}</mat-error>
         }
       </mat-form-field>
     }
 
     @if (canChangeEmail) {
       <mat-form-field appearance="outline" class="full">
-        <mat-label>E-Mail</mat-label>
+        <mat-label>{{ i18n.t('E-Mail') }}</mat-label>
         <input matInput type="email" formControlName="email" autocomplete="email" />
         @if (form.controls.email.invalid) {
-          <mat-error>Please enter a valid e-mail address.</mat-error>
+          <mat-error>{{ i18n.t('Please enter a valid e-mail address.') }}</mat-error>
         }
       </mat-form-field>
     }
 
     <!-- Password (immer sichtbar: Admin/Root können auch PW setzen; normale User nur ihr eigenes) -->
     <mat-form-field appearance="outline" class="full">
-      <mat-label>New Password (optional)</mat-label>
+      <mat-label>{{ i18n.t('New Password (optional)') }}</mat-label>
       <input matInput type="password" formControlName="password" />
     </mat-form-field>
 
     <!-- Rolle (nur Admin/Root) -->
     @if (canChangeRole) {
       <mat-form-field appearance="outline" class="full">
-        <mat-label>Role</mat-label>
+        <mat-label>{{ i18n.t('Role') }}</mat-label>
         <mat-select formControlName="role">
-          <mat-option value="author">Author</mat-option>
-          <mat-option value="editor">Editor</mat-option>
-          <mat-option value="moderator">Moderator</mat-option>
-          <mat-option value="legal">Legal</mat-option>
-          <mat-option value="admin">Admin</mat-option>
+          @for (role of roles; track role) {
+            <mat-option [value]="role">{{ roleLabel(role) }}</mat-option>
+          }
         </mat-select>
       </mat-form-field>
     }
@@ -61,8 +59,8 @@
     }
 
     <div class="dialog-actions">
-      <button type="button" mat-stroked-button (click)="cancel()">Cancel</button>
-      <button type="submit" mat-raised-button color="primary" [disabled]="form.invalid">Save</button>
+      <button type="button" mat-stroked-button (click)="cancel()">{{ i18n.t('Cancel') }}</button>
+      <button type="submit" mat-raised-button color="primary" [disabled]="form.invalid">{{ i18n.t('Save') }}</button>
     </div>
   </form>
 </div>
