@@ -137,6 +137,56 @@ mat-toolbar {
   gap: 1rem;
 }
 
+.usage-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: .9rem;
+}
+
+.usage-stat-card {
+  border-radius: 20px;
+  padding: 1rem 1.1rem;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  display: grid;
+  gap: .35rem;
+}
+
+.usage-stat-card strong {
+  font-size: 1.35rem;
+  line-height: 1.15;
+}
+
+.usage-stat-card-alert {
+  border-color: rgba(239, 68, 68, 0.28);
+  background: color-mix(in srgb, rgba(255, 255, 255, 0.9) 88%, #ef4444 12%);
+}
+
+.usage-stat-label {
+  color: var(--muted);
+  font-size: .85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.usage-stat-meta,
+.usage-note {
+  color: var(--muted);
+  font-size: .88rem;
+}
+
+.usage-note {
+  margin: .9rem 0 0;
+}
+
+.usage-detail-grid {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .65rem;
+}
+
 .full-width {
   width: 100%;
 }
@@ -205,5 +255,15 @@ mat-toolbar {
   .model-option {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .usage-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .usage-stat-grid {
+    grid-template-columns: 1fr;
   }
 }

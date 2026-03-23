@@ -739,6 +739,24 @@
               <mat-icon>tag</mat-icon>
               Hashtags
             </button>
+
+            <button mat-stroked-button type="button" (click)="openAiToolDialog('emoji')"
+              [disabled]="!canUseAiTools() || !hasAiTextSource()">
+              <mat-icon>add_reaction</mat-icon>
+              Emojis
+            </button>
+
+            <button mat-stroked-button type="button" (click)="openAiToolDialog('thread')"
+              [disabled]="!canUseAiTools() || !hasAiTextSource()">
+              <mat-icon>forum</mat-icon>
+              Thread ideas
+            </button>
+
+            <button mat-stroked-button type="button" (click)="openAiToolDialog('quality_check')"
+              [disabled]="!canUseAiTools() || !hasAiTextSource()">
+              <mat-icon>fact_check</mat-icon>
+              Quality check
+            </button>
           </div>
         </mat-card-content>
       </mat-card>

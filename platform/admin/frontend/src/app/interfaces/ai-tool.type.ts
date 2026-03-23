@@ -1,1 +1,8 @@
-export type AiTool = 'proofread' | 'rewrite' | 'translate' | 'hashtags';
+export type AiTool =
+  | 'proofread'
+  | 'rewrite'
+  | 'translate'
+  | 'hashtags'
+  | 'emoji'
+  | 'thread'
+  | 'quality_check';

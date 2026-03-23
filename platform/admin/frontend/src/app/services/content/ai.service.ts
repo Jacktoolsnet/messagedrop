@@ -7,6 +7,7 @@ import { AiModel } from '../../interfaces/ai-model.interface';
 import { AiSettings } from '../../interfaces/ai-settings.interface';
 import { AiToolRequest } from '../../interfaces/ai-tool-request.interface';
 import { AiToolResult } from '../../interfaces/ai-tool-result.interface';
+import { AiUsage } from '../../interfaces/ai-usage.interface';
 
 interface AiSettingsResponse {
   status: number;
@@ -26,6 +27,11 @@ interface AiApplyResponse {
   result: AiToolResult;
 }
 
+interface AiUsageResponse {
+  status: number;
+  row: AiUsage;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -40,11 +46,17 @@ export class AiService {
   private readonly _models = signal<AiModel[]>([]);
   readonly models = this._models.asReadonly();
 
+  private readonly _usage = signal<AiUsage | null>(null);
+  readonly usage = this._usage.asReadonly();
+
   private readonly _settingsLoading = signal(false);
   readonly settingsLoading = this._settingsLoading.asReadonly();
 
   private readonly _modelsLoading = signal(false);
   readonly modelsLoading = this._modelsLoading.asReadonly();
+
+  private readonly _usageLoading = signal(false);
+  readonly usageLoading = this._usageLoading.asReadonly();
 
   loadSettings(): void {
     this._settingsLoading.set(true);
@@ -59,11 +71,19 @@ export class AiService {
     });
   }
 
-  updateSettings(selectedModel: string): Observable<AiSettings> {
-    return this.http.put<AiSettingsResponse>(`${this.baseUrl}/settings`, { selectedModel }).pipe(
+  updateSettings(selectedModel: string, monthlyBudgetUsd: number): Observable<AiSettings> {
+    return this.http.put<AiSettingsResponse>(`${this.baseUrl}/settings`, { selectedModel, monthlyBudgetUsd }).pipe(
       map((response) => response.row),
       map((row) => {
         this._settings.set(row);
+        this._usage.update((current) => current ? {
+          ...current,
+          monthlyBudgetUsd: row.monthlyBudgetUsd,
+          budgetConfigured: row.monthlyBudgetUsd > 0,
+          remainingBudgetUsd: row.monthlyBudgetUsd > 0
+            ? Math.round((row.monthlyBudgetUsd - current.currentMonth.spend.value) * 100) / 100
+            : null
+        } : current);
         this._models.update((current) => current.map((entry) => ({
           ...entry,
           isSelected: entry.id === row.selectedModel
@@ -97,6 +117,7 @@ export class AiService {
         this._settings.set({
           selectedModel: response.selectedModel || response.defaultModel || '',
           defaultModel: response.defaultModel || response.selectedModel || '',
+          monthlyBudgetUsd: 0,
           updatedAt: 0,
           apiConfigured: response.configured === true
         });
@@ -109,6 +130,19 @@ export class AiService {
         defaultModel: response.defaultModel || current.defaultModel,
         apiConfigured: response.configured === true
       });
+    });
+  }
+
+  loadUsage(): void {
+    this._usageLoading.set(true);
+    this.http.get<AiUsageResponse>(`${this.baseUrl}/usage`).pipe(
+      catchError((error) => {
+        this.handleError(error, 'Could not load AI usage data.');
+        return of({ status: 0, row: null as AiUsage | null });
+      }),
+      finalize(() => this._usageLoading.set(false))
+    ).subscribe((response) => {
+      this._usage.set(response.row ?? null);
     });
   }
 

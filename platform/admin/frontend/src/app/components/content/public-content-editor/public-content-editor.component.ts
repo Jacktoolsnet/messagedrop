@@ -1183,6 +1183,14 @@ export class PublicContentEditorComponent {
       return;
     }
 
+    if (result.action === 'append_text' && result.text) {
+      const currentText = (this.form.controls.message.value ?? '').trim();
+      const nextText = currentText ? `${currentText} ${result.text}` : result.text;
+      this.form.controls.message.setValue(nextText);
+      this.showMessage('AI suggestion added.');
+      return;
+    }
+
     if ((result.action === 'replace_hashtags' || result.action === 'append_hashtags') && Array.isArray(result.hashtags)) {
       const mergedInput = result.action === 'replace_hashtags'
         ? result.hashtags

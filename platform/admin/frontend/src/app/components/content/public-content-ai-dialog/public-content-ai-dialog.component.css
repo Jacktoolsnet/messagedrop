@@ -124,9 +124,52 @@
 
 .rewrite-suggestion,
 .hashtag-result,
-.result-text-panel {
+.result-text-panel,
+.emoji-result,
+.quality-check-result {
   display: grid;
   gap: .9rem;
+}
+
+.emoji-result-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .65rem;
+}
+
+.emoji-pill-button {
+  min-width: 0;
+  font-size: 1.15rem;
+  line-height: 1;
+  padding-inline: 1rem;
+}
+
+.emoji-pill-button-selected {
+  border-color: rgba(37, 99, 235, 0.34) !important;
+  background: color-mix(in srgb, rgba(255, 255, 255, 0.96) 82%, #2563eb 18%);
+  box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.12);
+}
+
+.quality-check-summary p {
+  margin: .35rem 0 0;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.quality-check-section {
+  display: grid;
+  gap: .5rem;
+}
+
+.quality-check-section strong {
+  font-size: .95rem;
+}
+
+.quality-check-section ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: .4rem;
 }
 
 .dialog-actions {

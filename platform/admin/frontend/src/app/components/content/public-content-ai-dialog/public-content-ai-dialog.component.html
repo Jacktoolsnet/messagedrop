@@ -140,6 +140,49 @@
           </div>
         }
 
+        @if (tool === 'emoji' && emojiSuggestions().length > 0) {
+          <div class="emoji-result">
+            <div class="emoji-result-list">
+              @for (emoji of emojiSuggestions(); track hashtagTrackBy($index, emoji)) {
+                <button
+                  mat-stroked-button
+                  type="button"
+                  class="emoji-pill-button"
+                  [class.emoji-pill-button-selected]="isEmojiSelected(emoji)"
+                  (click)="toggleEmojiSelection(emoji)">
+                  {{ emoji }}
+                </button>
+              }
+            </div>
+
+            <div class="result-actions-inline">
+              <button mat-stroked-button type="button" (click)="appendSelectedEmojis()" [disabled]="!hasSelectedEmojis()">
+                <mat-icon>add</mat-icon>
+                Add selected
+              </button>
+
+              <button mat-stroked-button type="button" (click)="appendText(emojiSuggestions().join(' '))">
+                <mat-icon>add_reaction</mat-icon>
+                Add all
+              </button>
+            </div>
+          </div>
+        }
+
+        @if (tool === 'thread' && rewriteSuggestions().length > 0) {
+          <div class="rewrite-suggestion-list">
+            @for (suggestion of rewriteSuggestions(); track suggestionTrackBy($index)) {
+              <div class="rewrite-suggestion">
+                <pre>{{ suggestion }}</pre>
+                <button mat-stroked-button type="button" (click)="useText(suggestion)">
+                  <mat-icon>chat</mat-icon>
+                  Use as text
+                </button>
+              </div>
+            }
+          </div>
+        }
+
         @if (tool === 'hashtags' && generatedHashtags().length > 0) {
           <div class="hashtag-result">
             <div class="hashtag-result-list">
@@ -159,6 +202,65 @@
                 Replace current
               </button>
             </div>
+          </div>
+        }
+
+        @if (tool === 'quality_check' && qualityCheck(); as review) {
+          <div class="quality-check-result">
+            <div class="quality-check-summary">
+              <span class="dialog-meta-chip">
+                <mat-icon>fact_check</mat-icon>
+                {{ review.verdict }}
+              </span>
+              @if (review.summary) {
+                <p>{{ review.summary }}</p>
+              }
+            </div>
+
+            @if (review.strengths.length > 0) {
+              <div class="quality-check-section">
+                <strong>Strengths</strong>
+                <ul>
+                  @for (item of review.strengths; track suggestionTrackBy($index)) {
+                    <li>{{ item }}</li>
+                  }
+                </ul>
+              </div>
+            }
+
+            @if (review.risks.length > 0) {
+              <div class="quality-check-section">
+                <strong>Risks</strong>
+                <ul>
+                  @for (item of review.risks; track suggestionTrackBy($index)) {
+                    <li>{{ item }}</li>
+                  }
+                </ul>
+              </div>
+            }
+
+            @if (review.recommendations.length > 0) {
+              <div class="quality-check-section">
+                <strong>Recommendations</strong>
+                <ul>
+                  @for (item of review.recommendations; track suggestionTrackBy($index)) {
+                    <li>{{ item }}</li>
+                  }
+                </ul>
+              </div>
+            }
+
+            @if (review.improvedText) {
+              <div class="result-text-panel">
+                <pre>{{ review.improvedText }}</pre>
+                <div class="result-actions-inline">
+                  <button mat-flat-button color="primary" type="button" (click)="useText(review.improvedText)">
+                    <mat-icon>check</mat-icon>
+                    Use improved text
+                  </button>
+                </div>
+              </div>
+            }
           </div>
         }
       </mat-card-content>

@@ -34,7 +34,7 @@ export interface PublicContentAiDialogData {
 }
 
 export interface PublicContentAiDialogResult {
-  action: 'replace_text' | 'replace_hashtags' | 'append_hashtags';
+  action: 'replace_text' | 'append_text' | 'replace_hashtags' | 'append_hashtags';
   text?: string;
   hashtags?: string[];
 }
@@ -69,6 +69,7 @@ export class PublicContentAiDialogComponent {
 
   readonly loading = signal(false);
   readonly result = signal<AiToolResult | null>(null);
+  readonly selectedEmojis = signal<string[]>([]);
 
   readonly tool = this.data.tool;
   readonly form = this.fb.nonNullable.group({
@@ -87,6 +88,12 @@ export class PublicContentAiDialogComponent {
         return 'Translate text';
       case 'hashtags':
         return 'Generate hashtags';
+      case 'emoji':
+        return 'Emoji suggestions';
+      case 'thread':
+        return 'Thread suggestions';
+      case 'quality_check':
+        return 'Quality check';
     }
   });
 
@@ -100,6 +107,12 @@ export class PublicContentAiDialogComponent {
         return 'Translate the current text into another language.';
       case 'hashtags':
         return 'Suggest editorial hashtags based on text, location and media context.';
+      case 'emoji':
+        return 'Suggest fitting emojis that can be added to the current message.';
+      case 'thread':
+        return 'Generate short follow-up comments or replies for the current thread.';
+      case 'quality_check':
+        return 'Review clarity, tone and publication readiness and suggest improvements.';
     }
   });
 
@@ -108,7 +121,7 @@ export class PublicContentAiDialogComponent {
       return false;
     }
 
-    if (this.tool === 'proofread' || this.tool === 'rewrite' || this.tool === 'translate') {
+    if (this.tool === 'proofread' || this.tool === 'rewrite' || this.tool === 'translate' || this.tool === 'emoji' || this.tool === 'thread' || this.tool === 'quality_check') {
       return this.data.text.trim().length > 0;
     }
 
@@ -123,6 +136,9 @@ export class PublicContentAiDialogComponent {
   readonly resultText = computed(() => this.result()?.text?.trim() || '');
   readonly rewriteSuggestions = computed(() => this.result()?.suggestions ?? []);
   readonly generatedHashtags = computed(() => this.result()?.hashtags ?? []);
+  readonly emojiSuggestions = computed(() => this.result()?.emojiSuggestions ?? []);
+  readonly hasSelectedEmojis = computed(() => this.selectedEmojis().length > 0);
+  readonly qualityCheck = computed(() => this.result()?.qualityCheck ?? null);
 
   close(): void {
     this.dialogRef.close();
@@ -135,6 +151,7 @@ export class PublicContentAiDialogComponent {
 
     this.loading.set(true);
     this.result.set(null);
+    this.selectedEmojis.set([]);
     this.aiService.applyTool(this.buildRequest())
       .pipe(
         finalize(() => this.loading.set(false)),
@@ -154,6 +171,37 @@ export class PublicContentAiDialogComponent {
       action: 'replace_text',
       text: normalized
     });
+  }
+
+  appendText(text: string): void {
+    const normalized = text.trim();
+    if (!normalized) {
+      return;
+    }
+    this.dialogRef.close({
+      action: 'append_text',
+      text: normalized
+    });
+  }
+
+  toggleEmojiSelection(emoji: string): void {
+    this.selectedEmojis.update((current) => (
+      current.includes(emoji)
+        ? current.filter((entry) => entry !== emoji)
+        : [...current, emoji]
+    ));
+  }
+
+  isEmojiSelected(emoji: string): boolean {
+    return this.selectedEmojis().includes(emoji);
+  }
+
+  appendSelectedEmojis(): void {
+    const selected = this.selectedEmojis();
+    if (selected.length === 0) {
+      return;
+    }
+    this.appendText(selected.join(' '));
   }
 
   replaceHashtags(): void {

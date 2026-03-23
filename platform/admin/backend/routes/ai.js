@@ -12,7 +12,9 @@ const DEFAULT_ADMIN_MODEL = 'gpt-5.4';
 const DEFAULT_HASHTAG_COUNT = 8;
 const MAX_TEXT_LENGTH = 12_000;
 const MODEL_CACHE_TTL_MS = 5 * 60 * 1000;
-const TOOL_TYPES = new Set(['proofread', 'rewrite', 'translate', 'hashtags']);
+const DAY_IN_SECONDS = 24 * 60 * 60;
+const DAY_IN_MS = DAY_IN_SECONDS * 1000;
+const TOOL_TYPES = new Set(['proofread', 'rewrite', 'translate', 'hashtags', 'emoji', 'thread', 'quality_check']);
 const REWRITE_GOALS = new Set(['clearer', 'friendlier', 'shorter', 'more_formal', 'more_engaging']);
 
 let modelCache = {
@@ -41,9 +43,11 @@ router.put('/settings', async (req, res, next) => {
     if (!selectedModel) {
       throw apiError.unprocessableEntity('selected_model_required');
     }
+    const monthlyBudgetUsd = normalizeBudgetUsd(req.body?.monthlyBudgetUsd);
 
     await upsertAiSettings(req.database.db, {
       selectedModel,
+      monthlyBudgetUsd,
       updatedAt: Date.now()
     });
 
@@ -76,6 +80,19 @@ router.get('/models', async (req, res, next) => {
     });
   } catch (error) {
     next(error);
+  }
+});
+
+router.get('/usage', async (req, res, next) => {
+  try {
+    const settings = await getAiSettings(req.database.db);
+    const row = await getUsageSummary(settings);
+    res.status(200).json({
+      status: 200,
+      row
+    });
+  } catch (error) {
+    next(normalizeOpenAiError(error));
   }
 });
 
@@ -131,6 +148,31 @@ function getOpenAiApiKey() {
   return fallbackKey || '';
 }
 
+function getOpenAiUsageKeyConfig() {
+  const adminKey = typeof process.env.OPENAI_ADMIN_KEY === 'string'
+    ? process.env.OPENAI_ADMIN_KEY.trim()
+    : '';
+  if (adminKey) {
+    return {
+      apiKey: adminKey,
+      source: 'admin'
+    };
+  }
+
+  const fallbackKey = getOpenAiApiKey();
+  if (fallbackKey) {
+    return {
+      apiKey: fallbackKey,
+      source: 'standard'
+    };
+  }
+
+  return {
+    apiKey: '',
+    source: 'none'
+  };
+}
+
 function resolveDefaultModel() {
   const configured = normalizeModelId(process.env.OPENAI_ADMIN_MODEL);
   return configured || DEFAULT_ADMIN_MODEL;
@@ -177,9 +219,18 @@ function decorateSettings(row) {
   return {
     selectedModel,
     defaultModel: resolveDefaultModel(),
+    monthlyBudgetUsd: normalizeBudgetUsd(row?.monthlyBudgetUsd),
     updatedAt: Number(row?.updatedAt || 0),
     apiConfigured: isOpenAiConfigured()
   };
+}
+
+function normalizeBudgetUsd(value) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) {
+    return 0;
+  }
+  return Math.max(0, Math.min(1_000_000, Math.round(parsed * 100) / 100));
 }
 
 async function listAvailableModels({ selectedModel, forceRefresh = false }) {
@@ -302,6 +353,275 @@ function mergePinnedModels(rows, selectedModel, defaultModel) {
     }
     return right.id.localeCompare(left.id);
   });
+}
+
+async function getUsageSummary(settings) {
+  const monthlyBudgetUsd = normalizeBudgetUsd(settings?.monthlyBudgetUsd);
+  const usageKeyConfig = getOpenAiUsageKeyConfig();
+  if (!usageKeyConfig.apiKey) {
+    return buildUnavailableUsageSummary({
+      monthlyBudgetUsd,
+      message: 'OpenAI API not configured.'
+    });
+  }
+
+  const now = Date.now();
+  const nowSeconds = Math.floor(now / 1000);
+  const todayStartSeconds = Math.floor(startOfUtcDay(now) / 1000);
+  const currentMonthStartSeconds = Math.floor(startOfUtcMonth(now) / 1000);
+  const last7DaysStartSeconds = Math.max(0, todayStartSeconds - (6 * DAY_IN_SECONDS));
+
+  try {
+    const [monthUsagePage, monthCostsPage] = await Promise.all([
+      fetchOpenAiOrganizationJson('/v1/organization/usage/completions', {
+        start_time: currentMonthStartSeconds,
+        end_time: nowSeconds,
+        bucket_width: '1d',
+        limit: 31
+      }, usageKeyConfig.apiKey),
+      fetchOpenAiOrganizationJson('/v1/organization/costs', {
+        start_time: currentMonthStartSeconds,
+        end_time: nowSeconds,
+        bucket_width: '1d',
+        limit: 31
+      }, usageKeyConfig.apiKey)
+    ]);
+
+    const currentMonthUsage = summarizeUsageBuckets(monthUsagePage?.data, currentMonthStartSeconds * 1000, now);
+    const todayUsage = summarizeUsageBuckets(filterBucketsByStart(monthUsagePage?.data, todayStartSeconds), todayStartSeconds * 1000, now);
+    const last7DaysUsage = summarizeUsageBuckets(filterBucketsByStart(monthUsagePage?.data, last7DaysStartSeconds), last7DaysStartSeconds * 1000, now);
+
+    const currentMonthCosts = summarizeCostBuckets(monthCostsPage?.data, currentMonthStartSeconds * 1000, now);
+    const todayCosts = summarizeCostBuckets(filterBucketsByStart(monthCostsPage?.data, todayStartSeconds), todayStartSeconds * 1000, now);
+    const last7DaysCosts = summarizeCostBuckets(filterBucketsByStart(monthCostsPage?.data, last7DaysStartSeconds), last7DaysStartSeconds * 1000, now);
+
+    const currentMonth = attachSpendToUsage(currentMonthUsage, currentMonthCosts);
+    const today = attachSpendToUsage(todayUsage, todayCosts);
+    const last7Days = attachSpendToUsage(last7DaysUsage, last7DaysCosts);
+    const budgetConfigured = monthlyBudgetUsd > 0;
+    const remainingBudgetUsd = budgetConfigured
+      ? Math.round((monthlyBudgetUsd - currentMonth.spend.value) * 100) / 100
+      : null;
+
+    return {
+      usageAvailable: true,
+      costsAvailable: true,
+      requiresAdminKey: usageKeyConfig.source !== 'admin',
+      keySource: usageKeyConfig.source,
+      budgetConfigured,
+      monthlyBudgetUsd,
+      remainingBudgetUsd,
+      currency: currentMonth.spend.currency,
+      today,
+      last7Days,
+      currentMonth,
+      updatedAt: now,
+      message: usageKeyConfig.source === 'admin'
+        ? ''
+        : 'Usage and costs loaded without a dedicated organization admin key. If this stops working, set OPENAI_ADMIN_KEY.'
+    };
+  } catch (error) {
+    if (error?.status === 401 || error?.status === 403) {
+      return buildUnavailableUsageSummary({
+        monthlyBudgetUsd,
+        requiresAdminKey: true,
+        message: 'OpenAI usage and cost endpoints require an organization admin key.'
+      });
+    }
+
+    if (error?.status === 404) {
+      return buildUnavailableUsageSummary({
+        monthlyBudgetUsd,
+        requiresAdminKey: true,
+        message: 'OpenAI usage and cost endpoints are not available for the configured key.'
+      });
+    }
+
+    throw error;
+  }
+}
+
+function buildUnavailableUsageSummary({
+  monthlyBudgetUsd = 0,
+  requiresAdminKey = false,
+  message = 'OpenAI usage data is currently unavailable.'
+} = {}) {
+  const now = Date.now();
+  const budgetConfigured = monthlyBudgetUsd > 0;
+
+  return {
+    usageAvailable: false,
+    costsAvailable: false,
+    requiresAdminKey,
+    keySource: getOpenAiUsageKeyConfig().source,
+    budgetConfigured,
+    monthlyBudgetUsd,
+    remainingBudgetUsd: budgetConfigured ? monthlyBudgetUsd : null,
+    currency: 'USD',
+    today: emptyUsageWindow(startOfUtcDay(now), now),
+    last7Days: emptyUsageWindow(now - (7 * DAY_IN_MS), now),
+    currentMonth: emptyUsageWindow(startOfUtcMonth(now), now),
+    updatedAt: now,
+    message
+  };
+}
+
+function startOfUtcDay(timestamp) {
+  const date = new Date(timestamp);
+  return Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+}
+
+function startOfUtcMonth(timestamp) {
+  const date = new Date(timestamp);
+  return Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1);
+}
+
+function filterBucketsByStart(buckets, startSeconds) {
+  if (!Array.isArray(buckets)) {
+    return [];
+  }
+  return buckets.filter((bucket) => Number(bucket?.start_time || 0) >= startSeconds);
+}
+
+function emptyUsageWindow(startTime, endTime) {
+  return {
+    startTime: Number(startTime) || 0,
+    endTime: Number(endTime) || 0,
+    inputTokens: 0,
+    outputTokens: 0,
+    cachedInputTokens: 0,
+    requests: 0,
+    totalTokens: 0,
+    spend: {
+      value: 0,
+      currency: 'USD'
+    }
+  };
+}
+
+function summarizeUsageBuckets(buckets, fallbackStartTime, fallbackEndTime) {
+  const summary = emptyUsageWindow(fallbackStartTime, fallbackEndTime);
+  if (!Array.isArray(buckets)) {
+    return summary;
+  }
+
+  for (const bucket of buckets) {
+    const bucketStartTime = Number(bucket?.start_time || 0) * 1000;
+    const bucketEndTime = Number(bucket?.end_time || 0) * 1000;
+    if (bucketStartTime > 0 && (!summary.startTime || bucketStartTime < summary.startTime)) {
+      summary.startTime = bucketStartTime;
+    }
+    if (bucketEndTime > 0 && bucketEndTime > summary.endTime) {
+      summary.endTime = bucketEndTime;
+    }
+
+    const results = Array.isArray(bucket?.results) ? bucket.results : [];
+    for (const result of results) {
+      summary.inputTokens += toPositiveNumber(result?.input_tokens);
+      summary.outputTokens += toPositiveNumber(result?.output_tokens);
+      summary.cachedInputTokens += toPositiveNumber(result?.input_cached_tokens);
+      summary.requests += toPositiveNumber(result?.num_model_requests);
+    }
+  }
+
+  summary.totalTokens = summary.inputTokens + summary.outputTokens;
+  return summary;
+}
+
+function summarizeCostBuckets(buckets, fallbackStartTime, fallbackEndTime) {
+  const summary = {
+    startTime: Number(fallbackStartTime) || 0,
+    endTime: Number(fallbackEndTime) || 0,
+    value: 0,
+      currency: 'USD'
+  };
+
+  if (!Array.isArray(buckets)) {
+    return summary;
+  }
+
+  for (const bucket of buckets) {
+    const bucketStartTime = Number(bucket?.start_time || 0) * 1000;
+    const bucketEndTime = Number(bucket?.end_time || 0) * 1000;
+    if (bucketStartTime > 0 && (!summary.startTime || bucketStartTime < summary.startTime)) {
+      summary.startTime = bucketStartTime;
+    }
+    if (bucketEndTime > 0 && bucketEndTime > summary.endTime) {
+      summary.endTime = bucketEndTime;
+    }
+
+    const results = Array.isArray(bucket?.results) ? bucket.results : [];
+    for (const result of results) {
+      const amountValue = Number(result?.amount?.value);
+      if (Number.isFinite(amountValue)) {
+        summary.value += amountValue;
+      }
+
+      const currency = typeof result?.amount?.currency === 'string'
+        ? result.amount.currency.trim().toLowerCase()
+        : '';
+      if (currency) {
+        summary.currency = currency.toUpperCase();
+      }
+    }
+  }
+
+  summary.value = Math.round(summary.value * 10000) / 10000;
+  return summary;
+}
+
+function attachSpendToUsage(usageSummary, costSummary) {
+  return {
+    ...usageSummary,
+    spend: {
+      value: Math.round(Number(costSummary?.value || 0) * 100) / 100,
+      currency: typeof costSummary?.currency === 'string' && costSummary.currency
+        ? String(costSummary.currency).toUpperCase()
+        : 'USD'
+    }
+  };
+}
+
+function toPositiveNumber(value) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed < 0) {
+    return 0;
+  }
+  return parsed;
+}
+
+async function fetchOpenAiOrganizationJson(path, query, apiKey) {
+  const url = new URL(`https://api.openai.com${path}`);
+  for (const [key, value] of Object.entries(query || {})) {
+    if (value === undefined || value === null || value === '') {
+      continue;
+    }
+    url.searchParams.set(key, String(value));
+  }
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json'
+    }
+  });
+
+  const raw = await response.text();
+  let payload = null;
+  try {
+    payload = raw ? JSON.parse(raw) : null;
+  } catch {
+    payload = raw ? { message: raw } : null;
+  }
+
+  if (!response.ok) {
+    const err = apiError.fromStatus(response.status, payload?.message || payload?.error || 'openai_request_failed');
+    err.detail = payload;
+    throw err;
+  }
+
+  return payload;
 }
 
 function normalizeToolPayload(value) {
@@ -440,6 +760,12 @@ async function runAiTool(client, model, payload) {
       return runTranslate(client, model, payload);
     case 'hashtags':
       return runHashtagGeneration(client, model, payload);
+    case 'emoji':
+      return runEmojiSuggestions(client, model, payload);
+    case 'thread':
+      return runThreadSuggestions(client, model, payload);
+    case 'quality_check':
+      return runQualityCheck(client, model, payload);
     default:
       throw apiError.badRequest('unsupported_ai_tool');
   }
@@ -550,6 +876,93 @@ async function runHashtagGeneration(client, model, payload) {
   };
 }
 
+async function runEmojiSuggestions(client, model, payload) {
+  const response = await client.responses.create({
+    model,
+    instructions: [
+      'Suggest exactly 6 emoji candidates for the provided short public message or comment.',
+      'Return only a JSON array of short strings.',
+      'Each array item must contain 1 to 3 emojis and nothing else.',
+      'Avoid duplicates and keep the suggestions publication-friendly.'
+    ].join(' '),
+    input: buildEditorialInput(payload)
+  });
+
+  const emojiSuggestions = parseStringArray(response.output_text, 6)
+    .map((entry) => normalizeEmojiSuggestion(entry))
+    .filter(Boolean);
+  const unique = Array.from(new Set(emojiSuggestions)).slice(0, 6);
+
+  if (unique.length === 0) {
+    throw apiError.badGateway('ai_empty_response');
+  }
+
+  return {
+    tool: 'emoji',
+    model,
+    emojiSuggestions: unique
+  };
+}
+
+async function runThreadSuggestions(client, model, payload) {
+  const response = await client.responses.create({
+    model,
+    instructions: [
+      `Create 3 short follow-up ${payload.contentType === 'comment' ? 'reply' : 'comment'} suggestions for the provided content.`,
+      'They should feel natural as part of the same public thread.',
+      'Keep them concise, distinct and publication-ready.',
+      'Return only a JSON array with exactly 3 strings and no surrounding explanation.'
+    ].join(' '),
+    input: buildEditorialInput(payload)
+  });
+
+  const suggestions = parseStringArray(response.output_text, 3).slice(0, 3);
+  if (suggestions.length === 0) {
+    throw apiError.badGateway('ai_empty_response');
+  }
+
+  return {
+    tool: 'thread',
+    model,
+    suggestions
+  };
+}
+
+async function runQualityCheck(client, model, payload) {
+  const response = await client.responses.create({
+    model,
+    instructions: [
+      'You are an editorial quality reviewer for short public posts.',
+      'Evaluate the message for clarity, tone, structure and publication readiness.',
+      'Return only a JSON object with these keys:',
+      'verdict, summary, strengths, risks, recommendations, improvedText.',
+      'verdict must be one of: ready, good_with_minor_edits, needs_work.',
+      'strengths, risks and recommendations must be arrays of short strings.',
+      'improvedText should be a polished improved version of the original text.',
+      'Do not include markdown fences or extra commentary.'
+    ].join(' '),
+    input: buildEditorialInput(payload)
+  });
+
+  const result = parseJsonObject(response.output_text);
+  if (!result) {
+    throw apiError.badGateway('ai_empty_response');
+  }
+
+  return {
+    tool: 'quality_check',
+    model,
+    qualityCheck: {
+      verdict: normalizeShortText(result.verdict, 60) || 'needs_work',
+      summary: normalizeShortText(result.summary, 400),
+      strengths: normalizeStringArray(result.strengths, 4, 180),
+      risks: normalizeStringArray(result.risks, 4, 180),
+      recommendations: normalizeStringArray(result.recommendations, 4, 180),
+      improvedText: normalizeText(result.improvedText)
+    }
+  };
+}
+
 function buildEditorialInput(payload, options = {}) {
   const lines = [
     `Content type: ${payload.contentType}`,
@@ -612,6 +1025,47 @@ function parseStringArray(outputText, limit) {
     .map((entry) => entry.replace(/^\s*(?:[-*]|\d+\.)\s*/, '').trim())
     .filter(Boolean)
     .slice(0, limit);
+}
+
+function parseJsonObject(outputText) {
+  const raw = String(outputText || '').trim();
+  if (!raw) {
+    return null;
+  }
+
+  const fencedMatch = raw.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  const candidate = fencedMatch?.[1]?.trim() || raw;
+
+  try {
+    const parsed = JSON.parse(candidate);
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      return parsed;
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
+function normalizeStringArray(value, limit, maxLength) {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value
+    .map((entry) => normalizeShortText(entry, maxLength))
+    .filter(Boolean)
+    .slice(0, limit);
+}
+
+function normalizeEmojiSuggestion(value) {
+  if (typeof value !== 'string') {
+    return '';
+  }
+
+  const normalized = value.trim().replace(/\s+/g, ' ');
+  return normalized.slice(0, 16);
 }
 
 function normalizeOpenAiError(error) {

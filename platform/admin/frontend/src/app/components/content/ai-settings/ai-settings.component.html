@@ -39,7 +39,7 @@
       </div>
       <mat-card-title>Editorial AI tools</mat-card-title>
       <mat-card-subtitle>
-        Configure the model used for proofreading, translation, rewrites and hashtag generation.
+        Model, budget and usage overview for the editorial AI tools.
       </mat-card-subtitle>
     </mat-card-header>
 
@@ -63,6 +63,25 @@
             {{ settings()?.selectedModel }}
           </span>
         }
+
+        @if (usage(); as usage) {
+          <span class="hero-chip">
+            <mat-icon>payments</mat-icon>
+            {{ usage.currentMonth.spend.value | currency:(usage.currentMonth.spend.currency || 'USD'):'symbol':'1.2-2' }}
+            this month
+          </span>
+
+          @if (usage.budgetConfigured) {
+            <span class="hero-chip" [class.hero-chip-offline]="budgetExceeded()">
+              <mat-icon>{{ budgetExceeded() ? 'warning' : 'wallet' }}</mat-icon>
+              @if (usage.remainingBudgetUsd !== null) {
+                {{ usage.remainingBudgetUsd | currency:(usage.currentMonth.spend.currency || 'USD'):'symbol':'1.2-2' }} left
+              } @else {
+                No budget left indicator
+              }
+            </span>
+          }
+        }
       </div>
     </mat-card-content>
   </mat-card>
@@ -70,10 +89,102 @@
   @if (!configured()) {
     <mat-card class="warn-card">
       <mat-card-content>
-        Add <code>OPENAI_API_KEY</code> to the admin backend environment to use the AI tools.
+        Add <code>OPENAI_API_KEY_CONTENT_CREATION</code> (or <code>OPENAI_API_KEY</code>) to the admin backend environment
+        to use the AI tools.
       </mat-card-content>
     </mat-card>
   }
+
+  <mat-card class="settings-card">
+    <mat-card-header>
+      <div mat-card-avatar class="avatar avatar-success">
+        <mat-icon>query_stats</mat-icon>
+      </div>
+      <mat-card-title>Usage & budget</mat-card-title>
+      <mat-card-subtitle>Token usage, requests and spend from the OpenAI usage endpoints.</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (usage(); as usage) {
+        <div class="usage-stat-grid">
+          <article class="usage-stat-card">
+            <span class="usage-stat-label">Today</span>
+            <strong>{{ usage.today.totalTokens | number:'1.0-0' }}</strong>
+            <span class="usage-stat-meta">
+              {{ usage.today.requests | number:'1.0-0' }} requests ·
+              {{ usage.today.spend.value | currency:(usage.today.spend.currency || 'USD'):'symbol':'1.2-2' }}
+            </span>
+          </article>
+
+          <article class="usage-stat-card">
+            <span class="usage-stat-label">Last 7 days</span>
+            <strong>{{ usage.last7Days.totalTokens | number:'1.0-0' }}</strong>
+            <span class="usage-stat-meta">
+              {{ usage.last7Days.requests | number:'1.0-0' }} requests ·
+              {{ usage.last7Days.spend.value | currency:(usage.last7Days.spend.currency || 'USD'):'symbol':'1.2-2' }}
+            </span>
+          </article>
+
+          <article class="usage-stat-card">
+            <span class="usage-stat-label">This month</span>
+            <strong>{{ usage.currentMonth.totalTokens | number:'1.0-0' }}</strong>
+            <span class="usage-stat-meta">
+              {{ usage.currentMonth.requests | number:'1.0-0' }} requests ·
+              {{ usage.currentMonth.spend.value | currency:(usage.currentMonth.spend.currency || 'USD'):'symbol':'1.2-2' }}
+            </span>
+          </article>
+
+          <article class="usage-stat-card" [class.usage-stat-card-alert]="budgetExceeded()">
+            <span class="usage-stat-label">Budget left</span>
+            <strong>
+              @if (usage.remainingBudgetUsd !== null) {
+                {{ usage.remainingBudgetUsd | currency:(usage.currentMonth.spend.currency || 'USD'):'symbol':'1.2-2' }}
+              } @else {
+                —
+              }
+            </strong>
+            <span class="usage-stat-meta">
+              @if (usage.budgetConfigured) {
+                Budget {{ usage.monthlyBudgetUsd | currency:(usage.currentMonth.spend.currency || 'USD'):'symbol':'1.2-2' }}
+              } @else {
+                No monthly budget configured
+              }
+            </span>
+          </article>
+        </div>
+
+        <div class="usage-detail-grid">
+          <span class="selected-model-meta-chip">
+            <mat-icon>input</mat-icon>
+            {{ usage.currentMonth.inputTokens | number:'1.0-0' }} input tokens this month
+          </span>
+
+          <span class="selected-model-meta-chip">
+            <mat-icon>output</mat-icon>
+            {{ usage.currentMonth.outputTokens | number:'1.0-0' }} output tokens this month
+          </span>
+
+          @if (usage.currentMonth.cachedInputTokens > 0) {
+            <span class="selected-model-meta-chip">
+              <mat-icon>inventory_2</mat-icon>
+              {{ usage.currentMonth.cachedInputTokens | number:'1.0-0' }} cached input tokens
+            </span>
+          }
+
+          <span class="selected-model-meta-chip">
+            <mat-icon>schedule</mat-icon>
+            Updated {{ usage.updatedAt | date:'dd.MM.yyyy HH:mm' }}
+          </span>
+        </div>
+
+        @if (usage.message) {
+          <p class="updated-at usage-note">
+            {{ usage.message }}
+          </p>
+        }
+      }
+    </mat-card-content>
+  </mat-card>
 
   <mat-card class="settings-card">
     <mat-card-header>
@@ -114,6 +225,17 @@
           }
         </mat-select>
         <mat-hint>Responses API will use this model for the editorial AI tools.</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Monthly budget (USD)</mat-label>
+        <input
+          matInput
+          type="number"
+          min="0"
+          step="0.01"
+          formControlName="monthlyBudgetUsd">
+        <mat-hint>Optional budget used to calculate the remaining amount for the current month.</mat-hint>
       </mat-form-field>
 
       @if (selectedModelMeta(); as model) {
