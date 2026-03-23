@@ -1,8 +1,9 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, effect, input } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, effect, inject, input } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { Chart, ChartConfiguration, ChartType, Element, Plugin, registerables } from 'chart.js';
 import { SeriesPoint } from '../../../interfaces/statistic-series-point.interface';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 
 const valueLabelPlugin: Plugin = {
   id: 'valueLabel',
@@ -84,6 +85,7 @@ Chart.register(...registerables, valueLabelPlugin);
 export class StatisticKeyChartComponent implements AfterViewInit, OnDestroy {
   @ViewChild('canvas') private canvasRef?: ElementRef<HTMLCanvasElement>;
   private chart?: Chart;
+  readonly i18n = inject(TranslationHelperService);
 
   readonly title = input<string>('');
   readonly points = input<SeriesPoint[] | null>(null);
@@ -132,7 +134,7 @@ export class StatisticKeyChartComponent implements AfterViewInit, OnDestroy {
     const isLine = kind === 'line';
     const datasets = isLine
       ? [{
-        label: this.title() || 'Series',
+        label: this.title() || this.i18n.t('Series'),
         data,
         borderColor: color,
         backgroundColor: `${color}33`,
@@ -141,7 +143,7 @@ export class StatisticKeyChartComponent implements AfterViewInit, OnDestroy {
         pointRadius: 3
       }]
       : [{
-        label: this.title() || 'Series',
+        label: this.title() || this.i18n.t('Series'),
         data,
         backgroundColor: `${color}cc`,
         borderColor: color
