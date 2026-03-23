@@ -726,6 +726,10 @@ mat-toolbar {
   margin-bottom: 1rem;
 }
 
+.public-comment-thread-card {
+  margin-top: 1rem;
+}
+
 .comment-thread-subsection {
   display: grid;
   gap: 1rem;
