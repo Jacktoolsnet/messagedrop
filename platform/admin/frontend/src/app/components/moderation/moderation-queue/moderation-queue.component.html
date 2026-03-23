@@ -1,12 +1,12 @@
 <mat-toolbar>
-    <button mat-icon-button routerLink="/dashboard" aria-label="Back">
+    <button mat-icon-button routerLink="/dashboard" [attr.aria-label]="i18n.t('Back')">
         <mat-icon>arrow_back</mat-icon>
     </button>
-    <span class="toolbar-title">Moderation Queue</span>
+    <span class="toolbar-title">{{ i18n.t('Moderation Queue') }}</span>
     <span class="spacer"></span>
     <button mat-stroked-button color="primary" (click)="load()" [disabled]="loading()">
         <mat-icon>refresh</mat-icon>
-        Refresh
+        {{ i18n.t('Refresh') }}
     </button>
 </mat-toolbar>
 
@@ -20,7 +20,7 @@
             @if (!loading() && requests().length === 0) {
             <div class="empty">
                 <mat-icon>inbox</mat-icon>
-                <div>No moderation requests.</div>
+                <div>{{ i18n.t('No moderation requests.') }}</div>
             </div>
             }
             @for (req of requests(); track trackById($index, req)) {
@@ -32,7 +32,7 @@
                     <div class="meta">
                         <span class="file">{{ formatLocal(req.createdAt || req.messageCreatedAt) }}</span>
                         <span class="dot">•</span>
-                        <span class="msg">Score {{ formatScore(req.aiScore) }}</span>
+                        <span class="msg">{{ i18n.t('Score {{score}}', { score: formatScore(req.aiScore) }) }}</span>
                     </div>
                 </div>
             </div>
@@ -43,82 +43,82 @@
             <mat-card>
                 <mat-card-header>
                     <div mat-card-avatar class="avatar avatar-warn"><mat-icon color="warn">policy</mat-icon></div>
-                    <mat-card-title>Moderation request</mat-card-title>
+                    <mat-card-title>{{ i18n.t('Moderation request') }}</mat-card-title>
                     <mat-card-subtitle>{{ formatLocal(sel.createdAt || sel.messageCreatedAt) }}</mat-card-subtitle>
                 </mat-card-header>
                 <mat-card-content>
                     <mat-progress-bar *ngIf="actionLoading()" mode="indeterminate"></mat-progress-bar>
                     <div class="kv">
-                        <span class="k">Message UUID</span>
+                        <span class="k">{{ i18n.t('Message UUID') }}</span>
                         <span class="v">{{ sel.messageUuid }}</span>
-                        <span class="k">User ID</span>
+                        <span class="k">{{ i18n.t('User ID') }}</span>
                         <span class="v">{{ sel.messageUserId }}</span>
-                        <span class="k">Message Type</span>
+                        <span class="k">{{ i18n.t('Message Type') }}</span>
                         <span class="v">{{ sel.messageType || '-' }}</span>
-                        <span class="k">Created</span>
+                        <span class="k">{{ i18n.t('Created') }}</span>
                         <span class="v">{{ formatLocal(sel.messageCreatedAt) }}</span>
-                        <span class="k">AI Score</span>
+                        <span class="k">{{ i18n.t('AI Score') }}</span>
                         <span class="v">{{ formatScore(sel.aiScore) }}</span>
-                        <span class="k">AI Decision</span>
+                        <span class="k">{{ i18n.t('AI Decision') }}</span>
                         <span class="v">{{ sel.aiDecision || '-' }}</span>
-                        <span class="k">AI Flagged</span>
+                        <span class="k">{{ i18n.t('AI Flagged') }}</span>
                         <span class="v">{{ boolLabel(sel.aiFlagged) }}</span>
-                        <span class="k">Pattern Match</span>
+                        <span class="k">{{ i18n.t('Pattern Match') }}</span>
                         <span class="v">{{ boolLabel(sel.patternMatch) }}</span>
-                        <span class="k">Pattern Checked</span>
+                        <span class="k">{{ i18n.t('Pattern Checked') }}</span>
                         <span class="v">{{ formatLocal(sel.patternMatchAt) }}</span>
-                        <span class="k">Coordinates</span>
+                        <span class="k">{{ i18n.t('Coordinates') }}</span>
                         <span class="v">{{ sel.latitude ?? '-' }}, {{ sel.longitude ?? '-' }}</span>
-                        <span class="k">Plus Code</span>
+                        <span class="k">{{ i18n.t('Plus Code') }}</span>
                         <span class="v">{{ sel.plusCode || '-' }}</span>
-                        <span class="k">Marker</span>
+                        <span class="k">{{ i18n.t('Marker') }}</span>
                         <span class="v">{{ sel.markerType || '-' }}</span>
                     </div>
                     <mat-divider class="section-divider"></mat-divider>
                     <div class="block">
                         <div class="block-header">
-                            <div class="block-title">Message</div>
+                            <div class="block-title">{{ i18n.t('Message') }}</div>
                             <button mat-stroked-button color="primary" class="translate-btn"
                                 (click)="translateSelected()" [disabled]="translateLoading()">
                                 <mat-icon>translate</mat-icon>
-                                Translate to German
+                                {{ i18n.t('Translate to German') }}
                             </button>
                         </div>
                         <div class="block-body">{{ sel.messageText }}</div>
                         @if (translateLoading()) {
-                        <div class="translate-loading">Translating...</div>
+                        <div class="translate-loading">{{ i18n.t('Translating...') }}</div>
                         }
                         @if (translatedText()) {
-                        <div class="block-title">Translation (DE)</div>
+                        <div class="block-title">{{ i18n.t('Translation (DE)') }}</div>
                         <div class="block-body">{{ translatedText() }}</div>
                         }
                     </div>
                     <div class="block">
-                        <div class="block-title">AI Moderation Response</div>
+                        <div class="block-title">{{ i18n.t('AI Moderation Response') }}</div>
                         <pre class="block-pre">{{ formattedAiResponse(sel.aiResponse) }}</pre>
                     </div>
                     <div class="block">
-                        <div class="block-title">Rejection reason</div>
+                        <div class="block-title">{{ i18n.t('Rejection reason') }}</div>
                         <mat-form-field appearance="fill" class="reason-field">
-                            <mat-label>Select reason</mat-label>
+                            <mat-label>{{ i18n.t('Select reason') }}</mat-label>
                             <mat-select [(ngModel)]="rejectionReason">
                                 @for (reason of reasons; track reason) {
-                                <mat-option [value]="reason">{{ reason }}</mat-option>
+                                <mat-option [value]="reason">{{ reasonLabel(reason) }}</mat-option>
                                 }
                             </mat-select>
                         </mat-form-field>
-                        <div class="hint">Selected reason will be sent to the user as a system message.</div>
+                        <div class="hint">{{ i18n.t('Selected reason will be sent to the user as a system message.') }}</div>
                     </div>
                 </mat-card-content>
                 <mat-card-actions align="end">
                     <button mat-stroked-button color="primary" (click)="approveSelected()" [disabled]="actionLoading()">
                         <mat-icon>check_circle</mat-icon>
-                        Approve
+                        {{ i18n.t('Approve') }}
                     </button>
                     <button mat-stroked-button color="warn" (click)="rejectSelected()"
                         [disabled]="actionLoading() || !rejectionReason">
                         <mat-icon>block</mat-icon>
-                        Reject
+                        {{ i18n.t('Reject') }}
                     </button>
                 </mat-card-actions>
             </mat-card>

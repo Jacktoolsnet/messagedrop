@@ -14,6 +14,7 @@ import { RouterLink } from '@angular/router';
 import { ModerationRequest } from '../../../interfaces/moderation-request.interface';
 import { ModerationService } from '../../../services/moderation.service';
 import { TranslateService } from '../../../services/translate-service/translate-service.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 
 @Component({
   selector: 'app-moderation-queue',
@@ -38,6 +39,7 @@ export class ModerationQueueComponent implements OnInit {
   private readonly moderationService = inject(ModerationService);
   private readonly snack = inject(MatSnackBar);
   private readonly translator = inject(TranslateService);
+  readonly i18n = inject(TranslationHelperService);
 
   readonly loading = signal(false);
   readonly actionLoading = signal(false);
@@ -73,7 +75,7 @@ export class ModerationQueueComponent implements OnInit {
         }
       },
       error: () => {
-        this.snack.open('Could not load moderation requests.', 'OK', { duration: 3000 });
+        this.snack.open(this.i18n.t('Could not load moderation requests.'), this.i18n.t('OK'), { duration: 3000 });
       },
       complete: () => this.loading.set(false)
     });
@@ -96,7 +98,7 @@ export class ModerationQueueComponent implements OnInit {
   formatLocal(ts?: number | null): string {
     if (!ts) return '-';
     try {
-      return new Date(ts).toLocaleString(navigator.language || undefined);
+      return new Date(ts).toLocaleString(this.i18n.dateLocale());
     } catch {
       return new Date(ts).toISOString();
     }
@@ -109,7 +111,7 @@ export class ModerationQueueComponent implements OnInit {
 
   boolLabel(value?: number | boolean | null): string {
     if (value === undefined || value === null) return '-';
-    return value === true || value === 1 ? 'Yes' : 'No';
+    return value === true || value === 1 ? this.i18n.t('Yes') : this.i18n.t('No');
   }
 
   formattedAiResponse(value?: string | null): string {
@@ -125,19 +127,23 @@ export class ModerationQueueComponent implements OnInit {
     const current = this.selected();
     const text = current?.messageText?.trim() ?? '';
     if (!text) {
-      this.snack.open('No text to translate.', 'OK', { duration: 2000 });
+      this.snack.open(this.i18n.t('No text to translate.'), this.i18n.t('OK'), { duration: 2000 });
       return;
     }
     this.translateLoading.set(true);
     this.translator.translateToGerman(text).subscribe({
       next: (result) => {
-        this.translatedText.set(result || 'Translation failed.');
+        this.translatedText.set(result || this.i18n.t('Translation failed.'));
       },
       error: () => {
-        this.snack.open('Translation failed.', 'OK', { duration: 3000 });
+        this.snack.open(this.i18n.t('Translation failed.'), this.i18n.t('OK'), { duration: 3000 });
       },
       complete: () => this.translateLoading.set(false)
     });
+  }
+
+  reasonLabel(reason: string): string {
+    return this.i18n.t(reason);
   }
 
   private suggestReason(entry: ModerationRequest): string {
@@ -195,12 +201,12 @@ export class ModerationQueueComponent implements OnInit {
       next: (res) => {
         if (res.approved) {
           this.removeFromList(current.id);
-          this.snack.open('Message approved.', undefined, { duration: 2000 });
+          this.snack.open(this.i18n.t('Message approved.'), undefined, { duration: 2000 });
         } else {
-          this.snack.open('Approval failed.', 'OK', { duration: 3000 });
+          this.snack.open(this.i18n.t('Approval failed.'), this.i18n.t('OK'), { duration: 3000 });
         }
       },
-      error: () => this.snack.open('Approval failed.', 'OK', { duration: 3000 }),
+      error: () => this.snack.open(this.i18n.t('Approval failed.'), this.i18n.t('OK'), { duration: 3000 }),
       complete: () => this.actionLoading.set(false)
     });
   }
@@ -209,7 +215,7 @@ export class ModerationQueueComponent implements OnInit {
     const current = this.selected();
     if (!current) return;
     if (!this.rejectionReason) {
-      this.snack.open('Please select a rejection reason.', 'OK', { duration: 3000 });
+      this.snack.open(this.i18n.t('Please select a rejection reason.'), this.i18n.t('OK'), { duration: 3000 });
       return;
     }
     this.actionLoading.set(true);
@@ -217,12 +223,12 @@ export class ModerationQueueComponent implements OnInit {
       next: (res) => {
         if (res.rejected) {
           this.removeFromList(current.id);
-          this.snack.open('Message rejected.', undefined, { duration: 2000 });
+          this.snack.open(this.i18n.t('Message rejected.'), undefined, { duration: 2000 });
         } else {
-          this.snack.open('Rejection failed.', 'OK', { duration: 3000 });
+          this.snack.open(this.i18n.t('Rejection failed.'), this.i18n.t('OK'), { duration: 3000 });
         }
       },
-      error: () => this.snack.open('Rejection failed.', 'OK', { duration: 3000 }),
+      error: () => this.snack.open(this.i18n.t('Rejection failed.'), this.i18n.t('OK'), { duration: 3000 }),
       complete: () => this.actionLoading.set(false)
     });
   }
