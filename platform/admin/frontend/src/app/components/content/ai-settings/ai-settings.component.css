@@ -137,6 +137,13 @@ mat-toolbar {
   gap: 1rem;
 }
 
+.usage-source-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .65rem;
+  margin-bottom: 1rem;
+}
+
 .usage-stat-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

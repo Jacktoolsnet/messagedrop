@@ -15,6 +15,8 @@ export interface AiUsageWindow {
 export interface AiUsage {
   usageAvailable: boolean;
   costsAvailable: boolean;
+  usageSource: 'organization' | 'local' | 'unavailable' | string;
+  costsSource: 'organization' | 'unavailable' | string;
   requiresAdminKey: boolean;
   keySource: 'admin' | 'standard' | 'none' | string;
   budgetConfigured: boolean;

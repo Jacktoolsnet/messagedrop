@@ -2,6 +2,7 @@ const express = require('express');
 const OpenAI = require('openai');
 
 const tableAiSettings = require('../db/tableAiSettings');
+const tableAiUsageEvent = require('../db/tableAiUsageEvent');
 const { requireAdminJwt, requireRole } = require('../middleware/security');
 const { apiError } = require('../middleware/api-error');
 
@@ -86,7 +87,7 @@ router.get('/models', async (req, res, next) => {
 router.get('/usage', async (req, res, next) => {
   try {
     const settings = await getAiSettings(req.database.db);
-    const row = await getUsageSummary(settings);
+    const row = await getUsageSummary(settings, req.database.db);
     res.status(200).json({
       status: 200,
       row
@@ -106,7 +107,7 @@ router.post('/apply', async (req, res, next) => {
     const settings = await getAiSettings(req.database.db);
     const model = resolveEffectiveModel(settings?.selectedModel);
     const client = createOpenAiClient();
-    const result = await runAiTool(client, model, payload);
+    const result = await runAiTool(client, model, payload, req.database.db);
 
     res.status(200).json({
       status: 200,
@@ -149,8 +150,8 @@ function getOpenAiApiKey() {
 }
 
 function getOpenAiUsageKeyConfig() {
-  const adminKey = typeof process.env.OPENAI_ADMIN_KEY === 'string'
-    ? process.env.OPENAI_ADMIN_KEY.trim()
+  const adminKey = typeof process.env.OPENAI_API_KEY_ADMIN === 'string'
+    ? process.env.OPENAI_API_KEY_ADMIN.trim()
     : '';
   if (adminKey) {
     return {
@@ -355,30 +356,42 @@ function mergePinnedModels(rows, selectedModel, defaultModel) {
   });
 }
 
-async function getUsageSummary(settings) {
+async function getUsageSummary(settings, db) {
   const monthlyBudgetUsd = normalizeBudgetUsd(settings?.monthlyBudgetUsd);
   const usageKeyConfig = getOpenAiUsageKeyConfig();
-  if (!usageKeyConfig.apiKey) {
-    return buildUnavailableUsageSummary({
-      monthlyBudgetUsd,
-      message: 'OpenAI API not configured.'
-    });
-  }
 
   const now = Date.now();
   const nowSeconds = Math.floor(now / 1000);
   const todayStartSeconds = Math.floor(startOfUtcDay(now) / 1000);
   const currentMonthStartSeconds = Math.floor(startOfUtcMonth(now) / 1000);
   const last7DaysStartSeconds = Math.max(0, todayStartSeconds - (6 * DAY_IN_SECONDS));
+  const [localToday, localLast7Days, localCurrentMonth] = await Promise.all([
+    getLocalUsageWindow(db, todayStartSeconds * 1000, now),
+    getLocalUsageWindow(db, last7DaysStartSeconds * 1000, now),
+    getLocalUsageWindow(db, currentMonthStartSeconds * 1000, now)
+  ]);
+
+  if (!usageKeyConfig.apiKey) {
+    return buildUnavailableUsageSummary({
+      monthlyBudgetUsd,
+      now,
+      message: 'OpenAI API not configured. Showing locally tracked editorial AI token usage only.',
+      localUsage: {
+        today: localToday,
+        last7Days: localLast7Days,
+        currentMonth: localCurrentMonth
+      }
+    });
+  }
 
   try {
-    const [monthUsagePage, monthCostsPage] = await Promise.all([
-      fetchOpenAiOrganizationJson('/v1/organization/usage/completions', {
+    const [usagePages, monthCostsPage] = await Promise.all([
+      fetchOrganizationUsagePages(usageKeyConfig.apiKey, {
         start_time: currentMonthStartSeconds,
         end_time: nowSeconds,
         bucket_width: '1d',
         limit: 31
-      }, usageKeyConfig.apiKey),
+      }),
       fetchOpenAiOrganizationJson('/v1/organization/costs', {
         start_time: currentMonthStartSeconds,
         end_time: nowSeconds,
@@ -387,9 +400,18 @@ async function getUsageSummary(settings) {
       }, usageKeyConfig.apiKey)
     ]);
 
-    const currentMonthUsage = summarizeUsageBuckets(monthUsagePage?.data, currentMonthStartSeconds * 1000, now);
-    const todayUsage = summarizeUsageBuckets(filterBucketsByStart(monthUsagePage?.data, todayStartSeconds), todayStartSeconds * 1000, now);
-    const last7DaysUsage = summarizeUsageBuckets(filterBucketsByStart(monthUsagePage?.data, last7DaysStartSeconds), last7DaysStartSeconds * 1000, now);
+    const currentMonthUsage = chooseUsageSummary(
+      summarizeUsageBuckets(usagePages, currentMonthStartSeconds * 1000, now),
+      localCurrentMonth
+    );
+    const todayUsage = chooseUsageSummary(
+      summarizeUsageBuckets(filterBucketsByStart(usagePages, todayStartSeconds), todayStartSeconds * 1000, now),
+      localToday
+    );
+    const last7DaysUsage = chooseUsageSummary(
+      summarizeUsageBuckets(filterBucketsByStart(usagePages, last7DaysStartSeconds), last7DaysStartSeconds * 1000, now),
+      localLast7Days
+    );
 
     const currentMonthCosts = summarizeCostBuckets(monthCostsPage?.data, currentMonthStartSeconds * 1000, now);
     const todayCosts = summarizeCostBuckets(filterBucketsByStart(monthCostsPage?.data, todayStartSeconds), todayStartSeconds * 1000, now);
@@ -406,6 +428,8 @@ async function getUsageSummary(settings) {
     return {
       usageAvailable: true,
       costsAvailable: true,
+      usageSource: currentMonthUsage.source === 'local' ? 'local' : 'organization',
+      costsSource: 'organization',
       requiresAdminKey: usageKeyConfig.source !== 'admin',
       keySource: usageKeyConfig.source,
       budgetConfigured,
@@ -416,24 +440,38 @@ async function getUsageSummary(settings) {
       last7Days,
       currentMonth,
       updatedAt: now,
-      message: usageKeyConfig.source === 'admin'
-        ? ''
-        : 'Usage and costs loaded without a dedicated organization admin key. If this stops working, set OPENAI_ADMIN_KEY.'
+      message: buildUsageMessage({
+        usageKeySource: usageKeyConfig.source,
+        usedLocalFallback: currentMonthUsage.source === 'local',
+        localHasData: localCurrentMonth.totalTokens > 0
+      })
     };
   } catch (error) {
     if (error?.status === 401 || error?.status === 403) {
       return buildUnavailableUsageSummary({
         monthlyBudgetUsd,
+        now,
         requiresAdminKey: true,
-        message: 'OpenAI usage and cost endpoints require an organization admin key.'
+        message: 'OpenAI usage and cost endpoints require an organization admin key. Showing locally tracked editorial AI token usage only.',
+        localUsage: {
+          today: localToday,
+          last7Days: localLast7Days,
+          currentMonth: localCurrentMonth
+        }
       });
     }
 
     if (error?.status === 404) {
       return buildUnavailableUsageSummary({
         monthlyBudgetUsd,
+        now,
         requiresAdminKey: true,
-        message: 'OpenAI usage and cost endpoints are not available for the configured key.'
+        message: 'OpenAI usage endpoints are not available for the configured key. Showing locally tracked editorial AI token usage only.',
+        localUsage: {
+          today: localToday,
+          last7Days: localLast7Days,
+          currentMonth: localCurrentMonth
+        }
       });
     }
 
@@ -444,23 +482,29 @@ async function getUsageSummary(settings) {
 function buildUnavailableUsageSummary({
   monthlyBudgetUsd = 0,
   requiresAdminKey = false,
-  message = 'OpenAI usage data is currently unavailable.'
+  message = 'OpenAI usage data is currently unavailable.',
+  now = Date.now(),
+  localUsage = null
 } = {}) {
-  const now = Date.now();
   const budgetConfigured = monthlyBudgetUsd > 0;
+  const today = localUsage?.today || emptyUsageWindow(startOfUtcDay(now), now);
+  const last7Days = localUsage?.last7Days || emptyUsageWindow(now - (7 * DAY_IN_MS), now);
+  const currentMonth = localUsage?.currentMonth || emptyUsageWindow(startOfUtcMonth(now), now);
 
   return {
-    usageAvailable: false,
+    usageAvailable: (today.totalTokens + last7Days.totalTokens + currentMonth.totalTokens) > 0,
     costsAvailable: false,
+    usageSource: currentMonth.totalTokens > 0 ? 'local' : 'unavailable',
+    costsSource: 'unavailable',
     requiresAdminKey,
     keySource: getOpenAiUsageKeyConfig().source,
     budgetConfigured,
     monthlyBudgetUsd,
     remainingBudgetUsd: budgetConfigured ? monthlyBudgetUsd : null,
     currency: 'USD',
-    today: emptyUsageWindow(startOfUtcDay(now), now),
-    last7Days: emptyUsageWindow(now - (7 * DAY_IN_MS), now),
-    currentMonth: emptyUsageWindow(startOfUtcMonth(now), now),
+    today,
+    last7Days,
+    currentMonth,
     updatedAt: now,
     message
   };
@@ -490,6 +534,7 @@ function emptyUsageWindow(startTime, endTime) {
     inputTokens: 0,
     outputTokens: 0,
     cachedInputTokens: 0,
+    reasoningTokens: 0,
     requests: 0,
     totalTokens: 0,
     spend: {
@@ -501,11 +546,12 @@ function emptyUsageWindow(startTime, endTime) {
 
 function summarizeUsageBuckets(buckets, fallbackStartTime, fallbackEndTime) {
   const summary = emptyUsageWindow(fallbackStartTime, fallbackEndTime);
-  if (!Array.isArray(buckets)) {
+  const normalizedBuckets = normalizeBucketList(buckets);
+  if (!normalizedBuckets.length) {
     return summary;
   }
 
-  for (const bucket of buckets) {
+  for (const bucket of normalizedBuckets) {
     const bucketStartTime = Number(bucket?.start_time || 0) * 1000;
     const bucketEndTime = Number(bucket?.end_time || 0) * 1000;
     if (bucketStartTime > 0 && (!summary.startTime || bucketStartTime < summary.startTime)) {
@@ -515,11 +561,12 @@ function summarizeUsageBuckets(buckets, fallbackStartTime, fallbackEndTime) {
       summary.endTime = bucketEndTime;
     }
 
-    const results = Array.isArray(bucket?.results) ? bucket.results : [];
+    const results = normalizeBucketResults(bucket);
     for (const result of results) {
       summary.inputTokens += toPositiveNumber(result?.input_tokens);
       summary.outputTokens += toPositiveNumber(result?.output_tokens);
       summary.cachedInputTokens += toPositiveNumber(result?.input_cached_tokens);
+      summary.reasoningTokens += toPositiveNumber(result?.output_tokens_details?.reasoning_tokens);
       summary.requests += toPositiveNumber(result?.num_model_requests);
     }
   }
@@ -536,11 +583,12 @@ function summarizeCostBuckets(buckets, fallbackStartTime, fallbackEndTime) {
       currency: 'USD'
   };
 
-  if (!Array.isArray(buckets)) {
+  const normalizedBuckets = normalizeBucketList(buckets);
+  if (!normalizedBuckets.length) {
     return summary;
   }
 
-  for (const bucket of buckets) {
+  for (const bucket of normalizedBuckets) {
     const bucketStartTime = Number(bucket?.start_time || 0) * 1000;
     const bucketEndTime = Number(bucket?.end_time || 0) * 1000;
     if (bucketStartTime > 0 && (!summary.startTime || bucketStartTime < summary.startTime)) {
@@ -550,7 +598,7 @@ function summarizeCostBuckets(buckets, fallbackStartTime, fallbackEndTime) {
       summary.endTime = bucketEndTime;
     }
 
-    const results = Array.isArray(bucket?.results) ? bucket.results : [];
+    const results = normalizeBucketResults(bucket);
     for (const result of results) {
       const amountValue = Number(result?.amount?.value);
       if (Number.isFinite(amountValue)) {
@@ -582,12 +630,127 @@ function attachSpendToUsage(usageSummary, costSummary) {
   };
 }
 
+function normalizeBucketList(value) {
+  if (Array.isArray(value)) {
+    return value;
+  }
+  return [];
+}
+
+function normalizeBucketResults(bucket) {
+  if (Array.isArray(bucket?.results)) {
+    return bucket.results;
+  }
+  if (Array.isArray(bucket?.result)) {
+    return bucket.result;
+  }
+  if (bucket?.result && typeof bucket.result === 'object') {
+    return [bucket.result];
+  }
+  return [];
+}
+
+function chooseUsageSummary(remoteSummary, localSummary) {
+  if (!localSummary || localSummary.totalTokens <= 0) {
+    return {
+      ...remoteSummary,
+      source: 'remote'
+    };
+  }
+
+  if ((remoteSummary?.totalTokens || 0) <= 0) {
+    return {
+      ...localSummary,
+      source: 'local'
+    };
+  }
+
+  return {
+    ...remoteSummary,
+    source: 'remote'
+  };
+}
+
+function buildUsageMessage({ usageKeySource, usedLocalFallback, localHasData }) {
+  const messages = [];
+  if (usageKeySource !== 'admin') {
+    messages.push('Usage and costs loaded without a dedicated organization admin key. If this stops working, set OPENAI_API_KEY_ADMIN.');
+  }
+  if (usedLocalFallback) {
+    messages.push('Token usage is currently shown from locally tracked editorial AI calls.');
+  } else if (localHasData) {
+    messages.push('Local editorial AI usage tracking is active as a fallback.');
+  }
+  return messages.join(' ');
+}
+
 function toPositiveNumber(value) {
   const parsed = Number(value);
   if (!Number.isFinite(parsed) || parsed < 0) {
     return 0;
   }
   return parsed;
+}
+
+async function fetchOrganizationUsagePages(apiKey, query) {
+  const paths = [
+    '/v1/organization/usage/completions',
+    '/v1/organization/usage/responses'
+  ];
+
+  const settled = await Promise.allSettled(paths.map((path) => fetchOpenAiOrganizationJson(path, query, apiKey)));
+  const pages = [];
+  let firstFailure = null;
+
+  for (const result of settled) {
+    if (result.status === 'fulfilled') {
+      pages.push(result.value);
+      continue;
+    }
+
+    const error = result.reason;
+    if (error?.status === 404) {
+      continue;
+    }
+    if (!firstFailure) {
+      firstFailure = error;
+    }
+  }
+
+  if (pages.length > 0) {
+    return pages.flatMap((page) => Array.isArray(page?.data) ? page.data : []);
+  }
+
+  if (firstFailure) {
+    throw firstFailure;
+  }
+
+  return [];
+}
+
+function getLocalUsageWindow(db, startTime, endTime) {
+  return new Promise((resolve, reject) => {
+    tableAiUsageEvent.sumRange(db, { startTime, endTime }, (err, row) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve({
+        startTime,
+        endTime,
+        inputTokens: toPositiveNumber(row?.inputTokens),
+        outputTokens: toPositiveNumber(row?.outputTokens),
+        cachedInputTokens: toPositiveNumber(row?.cachedInputTokens),
+        reasoningTokens: toPositiveNumber(row?.reasoningTokens),
+        requests: toPositiveNumber(row?.requestCount),
+        totalTokens: toPositiveNumber(row?.totalTokens),
+        spend: {
+          value: 0,
+          currency: 'USD'
+        }
+      });
+    });
+  });
 }
 
 async function fetchOpenAiOrganizationJson(path, query, apiKey) {
@@ -750,28 +913,28 @@ function normalizeMultimediaSummary(value) {
   };
 }
 
-async function runAiTool(client, model, payload) {
+async function runAiTool(client, model, payload, db) {
   switch (payload.tool) {
     case 'proofread':
-      return runProofread(client, model, payload);
+      return runProofread(client, model, payload, db);
     case 'rewrite':
-      return runRewrite(client, model, payload);
+      return runRewrite(client, model, payload, db);
     case 'translate':
-      return runTranslate(client, model, payload);
+      return runTranslate(client, model, payload, db);
     case 'hashtags':
-      return runHashtagGeneration(client, model, payload);
+      return runHashtagGeneration(client, model, payload, db);
     case 'emoji':
-      return runEmojiSuggestions(client, model, payload);
+      return runEmojiSuggestions(client, model, payload, db);
     case 'thread':
-      return runThreadSuggestions(client, model, payload);
+      return runThreadSuggestions(client, model, payload, db);
     case 'quality_check':
-      return runQualityCheck(client, model, payload);
+      return runQualityCheck(client, model, payload, db);
     default:
       throw apiError.badRequest('unsupported_ai_tool');
   }
 }
 
-async function runProofread(client, model, payload) {
+async function runProofread(client, model, payload, db) {
   const response = await client.responses.create({
     model,
     instructions: [
@@ -783,6 +946,7 @@ async function runProofread(client, model, payload) {
     ].join(' '),
     input: buildEditorialInput(payload)
   });
+  await recordResponseUsage(db, 'proofread', model, response);
 
   const text = String(response.output_text || '').trim();
   if (!text) {
@@ -796,7 +960,7 @@ async function runProofread(client, model, payload) {
   };
 }
 
-async function runTranslate(client, model, payload) {
+async function runTranslate(client, model, payload, db) {
   const response = await client.responses.create({
     model,
     instructions: [
@@ -806,6 +970,7 @@ async function runTranslate(client, model, payload) {
     ].join(' '),
     input: buildEditorialInput(payload)
   });
+  await recordResponseUsage(db, 'translate', model, response);
 
   const text = String(response.output_text || '').trim();
   if (!text) {
@@ -820,7 +985,7 @@ async function runTranslate(client, model, payload) {
   };
 }
 
-async function runRewrite(client, model, payload) {
+async function runRewrite(client, model, payload, db) {
   const response = await client.responses.create({
     model,
     instructions: [
@@ -832,6 +997,7 @@ async function runRewrite(client, model, payload) {
     ].join(' '),
     input: buildEditorialInput(payload)
   });
+  await recordResponseUsage(db, 'rewrite', model, response);
 
   const suggestions = parseStringArray(response.output_text, 3).slice(0, 3);
   if (suggestions.length === 0) {
@@ -846,7 +1012,7 @@ async function runRewrite(client, model, payload) {
   };
 }
 
-async function runHashtagGeneration(client, model, payload) {
+async function runHashtagGeneration(client, model, payload, db) {
   const response = await client.responses.create({
     model,
     instructions: [
@@ -859,6 +1025,7 @@ async function runHashtagGeneration(client, model, payload) {
     ].join(' '),
     input: buildEditorialInput(payload, { includeHashtagContext: true })
   });
+  await recordResponseUsage(db, 'hashtags', model, response);
 
   const hashtags = parseStringArray(response.output_text, payload.hashtagCount)
     .map((entry) => normalizeHashtagToken(entry))
@@ -876,7 +1043,7 @@ async function runHashtagGeneration(client, model, payload) {
   };
 }
 
-async function runEmojiSuggestions(client, model, payload) {
+async function runEmojiSuggestions(client, model, payload, db) {
   const response = await client.responses.create({
     model,
     instructions: [
@@ -887,6 +1054,7 @@ async function runEmojiSuggestions(client, model, payload) {
     ].join(' '),
     input: buildEditorialInput(payload)
   });
+  await recordResponseUsage(db, 'emoji', model, response);
 
   const emojiSuggestions = parseStringArray(response.output_text, 6)
     .map((entry) => normalizeEmojiSuggestion(entry))
@@ -904,7 +1072,7 @@ async function runEmojiSuggestions(client, model, payload) {
   };
 }
 
-async function runThreadSuggestions(client, model, payload) {
+async function runThreadSuggestions(client, model, payload, db) {
   const response = await client.responses.create({
     model,
     instructions: [
@@ -915,6 +1083,7 @@ async function runThreadSuggestions(client, model, payload) {
     ].join(' '),
     input: buildEditorialInput(payload)
   });
+  await recordResponseUsage(db, 'thread', model, response);
 
   const suggestions = parseStringArray(response.output_text, 3).slice(0, 3);
   if (suggestions.length === 0) {
@@ -928,7 +1097,7 @@ async function runThreadSuggestions(client, model, payload) {
   };
 }
 
-async function runQualityCheck(client, model, payload) {
+async function runQualityCheck(client, model, payload, db) {
   const response = await client.responses.create({
     model,
     instructions: [
@@ -943,6 +1112,7 @@ async function runQualityCheck(client, model, payload) {
     ].join(' '),
     input: buildEditorialInput(payload)
   });
+  await recordResponseUsage(db, 'quality_check', model, response);
 
   const result = parseJsonObject(response.output_text);
   if (!result) {
@@ -981,6 +1151,33 @@ function buildEditorialInput(payload, options = {}) {
   ];
 
   return lines.filter(Boolean).join('\n');
+}
+
+function recordResponseUsage(db, tool, model, response) {
+  return new Promise((resolve, reject) => {
+    const usage = response?.usage;
+    if (!db || !usage) {
+      resolve();
+      return;
+    }
+
+    tableAiUsageEvent.insert(db, {
+      createdAt: Date.now(),
+      tool,
+      model,
+      inputTokens: toPositiveNumber(usage?.input_tokens),
+      outputTokens: toPositiveNumber(usage?.output_tokens),
+      totalTokens: toPositiveNumber(usage?.total_tokens),
+      cachedInputTokens: toPositiveNumber(usage?.input_tokens_details?.cached_tokens),
+      reasoningTokens: toPositiveNumber(usage?.output_tokens_details?.reasoning_tokens)
+    }, (err) => {
+      if (err) {
+        resolve();
+        return;
+      }
+      resolve();
+    });
+  });
 }
 
 function rewriteGoalLabel(goal) {

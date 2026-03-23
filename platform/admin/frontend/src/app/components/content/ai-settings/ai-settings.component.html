@@ -66,10 +66,17 @@
 
         @if (usage(); as usage) {
           <span class="hero-chip">
-            <mat-icon>payments</mat-icon>
-            {{ usage.currentMonth.spend.value | currency:(usage.currentMonth.spend.currency || 'USD'):'symbol':'1.2-2' }}
-            this month
+            <mat-icon>toll</mat-icon>
+            {{ usage.currentMonth.totalTokens | number:'1.0-0' }} tokens this month
           </span>
+
+          @if (usage.costsAvailable) {
+            <span class="hero-chip">
+              <mat-icon>payments</mat-icon>
+              {{ usage.currentMonth.spend.value | currency:(usage.currentMonth.spend.currency || 'USD'):'symbol':'1.2-2' }}
+              this month
+            </span>
+          }
 
           @if (usage.budgetConfigured) {
             <span class="hero-chip" [class.hero-chip-offline]="budgetExceeded()">
@@ -106,13 +113,41 @@
 
     <mat-card-content>
       @if (usage(); as usage) {
+        <div class="usage-source-row">
+          <span class="hero-chip">
+            <mat-icon>{{ usage.usageSource === 'local' ? 'memory' : usage.usageSource === 'organization' ? 'hub' : 'help' }}</mat-icon>
+            Tokens:
+            @if (usage.usageSource === 'local') {
+              Tracked locally
+            } @else if (usage.usageSource === 'organization') {
+              OpenAI org usage
+            } @else {
+              Unavailable
+            }
+          </span>
+
+          <span class="hero-chip">
+            <mat-icon>{{ usage.costsSource === 'organization' ? 'payments' : 'info' }}</mat-icon>
+            Spend:
+            @if (usage.costsSource === 'organization') {
+              OpenAI org costs
+            } @else {
+              Unavailable
+            }
+          </span>
+        </div>
+
         <div class="usage-stat-grid">
           <article class="usage-stat-card">
             <span class="usage-stat-label">Today</span>
             <strong>{{ usage.today.totalTokens | number:'1.0-0' }}</strong>
             <span class="usage-stat-meta">
               {{ usage.today.requests | number:'1.0-0' }} requests ·
-              {{ usage.today.spend.value | currency:(usage.today.spend.currency || 'USD'):'symbol':'1.2-2' }}
+              @if (usage.costsAvailable) {
+                {{ usage.today.spend.value | currency:(usage.today.spend.currency || 'USD'):'symbol':'1.2-2' }}
+              } @else {
+                spend unavailable
+              }
             </span>
           </article>
 
@@ -121,7 +156,11 @@
             <strong>{{ usage.last7Days.totalTokens | number:'1.0-0' }}</strong>
             <span class="usage-stat-meta">
               {{ usage.last7Days.requests | number:'1.0-0' }} requests ·
-              {{ usage.last7Days.spend.value | currency:(usage.last7Days.spend.currency || 'USD'):'symbol':'1.2-2' }}
+              @if (usage.costsAvailable) {
+                {{ usage.last7Days.spend.value | currency:(usage.last7Days.spend.currency || 'USD'):'symbol':'1.2-2' }}
+              } @else {
+                spend unavailable
+              }
             </span>
           </article>
 
@@ -130,7 +169,11 @@
             <strong>{{ usage.currentMonth.totalTokens | number:'1.0-0' }}</strong>
             <span class="usage-stat-meta">
               {{ usage.currentMonth.requests | number:'1.0-0' }} requests ·
-              {{ usage.currentMonth.spend.value | currency:(usage.currentMonth.spend.currency || 'USD'):'symbol':'1.2-2' }}
+              @if (usage.costsAvailable) {
+                {{ usage.currentMonth.spend.value | currency:(usage.currentMonth.spend.currency || 'USD'):'symbol':'1.2-2' }}
+              } @else {
+                spend unavailable
+              }
             </span>
           </article>
 

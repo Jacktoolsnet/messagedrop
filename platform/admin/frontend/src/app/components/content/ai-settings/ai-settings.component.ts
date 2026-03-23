@@ -125,6 +125,7 @@ export class AiSettingsComponent {
 
   refreshModels(): void {
     this.aiService.loadModels(true);
+    this.aiService.loadUsage();
   }
 
   goBack(): void {
