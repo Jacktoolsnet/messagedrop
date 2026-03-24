@@ -85,6 +85,10 @@ export class DecisionDialogComponent implements OnInit, OnDestroy {
     this.legalCtrl.setValue(this.form.get('legalBasis')?.value || '');
     this.tosCtrl.setValue(this.form.get('tosBasis')?.value || '');
 
+    this.form.controls.outcome.valueChanges
+      .pipe(startWith(this.form.controls.outcome.value), takeUntil(this.destroy$))
+      .subscribe((outcome) => this.syncReferenceControls(outcome));
+
     this.legalCtrl.valueChanges.pipe(takeUntil(this.destroy$))
       .subscribe(val => {
         const v = (val || '').trim();
@@ -149,18 +153,23 @@ export class DecisionDialogComponent implements OnInit, OnDestroy {
     this.applyTemplate(id);
   }
 
+  isNoActionOutcome(): boolean {
+    return this.form.controls.outcome.value === 'NO_ACTION';
+  }
+
   close(): void { this.ref.close(false); }
 
   submit(): void {
     if (this.form.invalid || this.submitting()) return;
     this.submitting.set(true);
     const { outcome, legalBasis, legalBasisEn, tosBasis, tosBasisEn, automatedUsed, statement, statementEn } = this.form.getRawValue();
+    const noAction = outcome === 'NO_ACTION';
     this.dsa.createDecision(this.data.noticeId, {
       outcome,
-      legalBasis: (legalBasis || '').trim() || null,
-      legalBasisEn: (legalBasisEn || '').trim() || null,
-      tosBasis: (tosBasis || '').trim() || null,
-      tosBasisEn: (tosBasisEn || '').trim() || null,
+      legalBasis: noAction ? null : (legalBasis || '').trim() || null,
+      legalBasisEn: noAction ? null : (legalBasisEn || '').trim() || null,
+      tosBasis: noAction ? null : (tosBasis || '').trim() || null,
+      tosBasisEn: noAction ? null : (tosBasisEn || '').trim() || null,
       automatedUsed,
       statement: (statement || '').trim() || null,
       statementEn: (statementEn || '').trim() || null
@@ -216,6 +225,29 @@ export class DecisionDialogComponent implements OnInit, OnDestroy {
   private findByGermanLabel(list: DsaTextBlock[], label: string): DsaTextBlock | undefined {
     const normalized = (label || '').trim();
     return list.find((row) => row.labelDe === normalized);
+  }
+
+  private syncReferenceControls(outcome: DecisionOutcome): void {
+    const disableReferences = outcome === 'NO_ACTION';
+
+    if (disableReferences) {
+      this.legalCtrl.disable({ emitEvent: false });
+      this.tosCtrl.disable({ emitEvent: false });
+      this.legalCtrl.setValue('', { emitEvent: false });
+      this.tosCtrl.setValue('', { emitEvent: false });
+      this.form.patchValue({
+        legalBasis: '',
+        legalBasisEn: '',
+        tosBasis: '',
+        tosBasisEn: ''
+      }, { emitEvent: false });
+      this.selectedLegalDesc = null;
+      this.selectedTosDesc = null;
+      return;
+    }
+
+    this.legalCtrl.enable({ emitEvent: false });
+    this.tosCtrl.enable({ emitEvent: false });
   }
 
   private applyTemplate(id: string, silent = false) {

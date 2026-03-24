@@ -236,8 +236,9 @@ export class NoticesComponent implements OnInit, OnDestroy {
   decide(n: DsaNotice): void {
     const ref = this.dialog.open(DecisionDialogComponent, {
       data: { noticeId: n.id },
-      width: 'min(700px, 96vw)',
-      maxHeight: '90vh',
+      width: '1100px',
+      maxWidth: '85vw',
+      maxHeight: '95vh',
       panelClass: 'md-dialog-rounded'
     });
 

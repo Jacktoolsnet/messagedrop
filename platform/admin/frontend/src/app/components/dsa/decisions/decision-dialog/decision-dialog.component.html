@@ -1,112 +1,170 @@
-<h2 mat-dialog-title class="dialog-title">
-  {{ i18n.t('Create decision') }}
-</h2>
+<div class="dialog-shell">
+  <h2 mat-dialog-title class="dialog-title">
+    {{ i18n.t('Create decision') }}
+  </h2>
 
-<form class="dialog-content" [formGroup]="form" (ngSubmit)="submit()">
-  <div class="help-text authoritative-note">
-    {{ i18n.t('Please maintain the authoritative German wording here. An English service translation is sent in addition, but only the German version is binding.') }}
-  </div>
+  <form class="dialog-form" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="dialog-scroll">
+      <div class="top-grid">
+        <section class="form-tile">
+          <div class="tile-header">
+            <div>
+              <h3>{{ i18n.t('Outcome') }}</h3>
+            </div>
+          </div>
 
-  <mat-form-field appearance="outline" class="full">
-    <mat-label>{{ i18n.t('Outcome') }}</mat-label>
-    <mat-select formControlName="outcome" required>
-      @for (o of outcomes; track o) {
-      <mat-option [value]="o.value">
-        <mat-icon class="opt-icon" aria-hidden="true">{{ o.icon }}</mat-icon>
-        {{ i18n.t(o.label) }}
-      </mat-option>
-      }
-    </mat-select>
-  </mat-form-field>
+          <mat-form-field appearance="outline" class="full">
+            <mat-label>{{ i18n.t('Outcome') }}</mat-label>
+            <mat-select formControlName="outcome" required>
+              @for (o of outcomes; track o) {
+                <mat-option [value]="o.value">
+                  <mat-icon class="opt-icon" aria-hidden="true">{{ o.icon }}</mat-icon>
+                  {{ i18n.t(o.label) }}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </section>
 
-  <mat-form-field appearance="outline" class="full">
-    <mat-label>{{ i18n.t('Legal basis (German source)') }}</mat-label>
-    <input type="text" matInput [formControl]="legalCtrl" [matAutocomplete]="legalAuto"
-      [placeholder]="i18n.t('German legal basis text')" spellcheck="false" />
-    @if (selectedLegalDesc) {
-    <button mat-icon-button matSuffix [matTooltip]="selectedLegalDesc" [attr.aria-label]="i18n.t('Info')">
-      <mat-icon>info</mat-icon>
-    </button>
-    }
-    <mat-autocomplete #legalAuto="matAutocomplete" (optionSelected)="onSelectLegal($event)" autoActiveFirstOption>
-      @for (o of filteredLegal$ | async; track o.id) {
-      <mat-option [value]="o.id">
-        <div class="opt-line">
-          <span class="opt-label">{{ localizedLabel(o) }}</span>
-          <span class="opt-desc">{{ localizedDescription(o) }}</span>
+        <section class="form-tile">
+          <div class="tile-header">
+            <div>
+              <h3>{{ i18n.t('Reasoning template') }}</h3>
+            </div>
+          </div>
+
+          <mat-form-field appearance="outline" class="full">
+            <mat-label>{{ i18n.t('Reasoning template') }}</mat-label>
+            <mat-select [(value)]="selectedTemplate" (selectionChange)="onTemplateChange($event.value)">
+              <mat-option [value]="''">{{ i18n.t('None') }}</mat-option>
+              @for (t of reasoningTemplates; track t.id) {
+                <mat-option [value]="t.id">
+                  <div class="opt-line">
+                    <span class="opt-label">{{ localizedLabel(t) }}</span>
+                    @if (localizedDescription(t)) {
+                      <span class="opt-desc">{{ localizedDescription(t) }}</span>
+                    }
+                  </div>
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </section>
+
+      </div>
+
+      <div class="reference-grid">
+        <section class="form-tile" [class.form-tile-disabled]="isNoActionOutcome()">
+          <div class="tile-header">
+            <div>
+              <h3>{{ i18n.t('Legal basis (German source)') }}</h3>
+            </div>
+          </div>
+
+          <mat-form-field appearance="outline" class="full">
+            <mat-label>{{ i18n.t('Legal basis (German source)') }}</mat-label>
+            <input type="text" matInput [formControl]="legalCtrl" [matAutocomplete]="legalAuto"
+              [placeholder]="i18n.t('German legal basis text')" spellcheck="false" />
+            @if (selectedLegalDesc) {
+              <button mat-icon-button matSuffix [matTooltip]="selectedLegalDesc" [attr.aria-label]="i18n.t('Info')">
+                <mat-icon>info</mat-icon>
+              </button>
+            }
+            <mat-autocomplete #legalAuto="matAutocomplete" (optionSelected)="onSelectLegal($event)" autoActiveFirstOption>
+              @for (o of filteredLegal$ | async; track o.id) {
+                <mat-option [value]="o.id">
+                  <div class="opt-line">
+                    <span class="opt-label">{{ localizedLabel(o) }}</span>
+                    <span class="opt-desc">{{ localizedDescription(o) }}</span>
+                  </div>
+                </mat-option>
+              }
+            </mat-autocomplete>
+            @if (selectedLegalDesc) {
+              <mat-hint class="hint-desc">{{ selectedLegalDesc }}</mat-hint>
+            }
+          </mat-form-field>
+        </section>
+
+        <section class="form-tile" [class.form-tile-disabled]="isNoActionOutcome()">
+          <div class="tile-header">
+            <div>
+              <h3>{{ i18n.t('Terms of Use clause (German source)') }}</h3>
+            </div>
+          </div>
+
+          <mat-form-field appearance="outline" class="full">
+            <mat-label>{{ i18n.t('Terms of Use clause (German source)') }}</mat-label>
+            <input type="text" matInput [formControl]="tosCtrl" [matAutocomplete]="tosAuto"
+              [placeholder]="i18n.t('German Terms of Use clause text')" spellcheck="false" />
+            @if (selectedTosDesc) {
+              <button mat-icon-button matSuffix [matTooltip]="selectedTosDesc" [attr.aria-label]="i18n.t('Info')">
+                <mat-icon>info</mat-icon>
+              </button>
+            }
+            <mat-autocomplete #tosAuto="matAutocomplete" (optionSelected)="onSelectTos($event)" autoActiveFirstOption>
+              @for (o of filteredTos$ | async; track o.id) {
+                <mat-option [value]="o.id">
+                  <div class="opt-line">
+                    <span class="opt-label">{{ localizedLabel(o) }}</span>
+                    <span class="opt-desc">{{ localizedDescription(o) }}</span>
+                  </div>
+                </mat-option>
+              }
+            </mat-autocomplete>
+            @if (selectedTosDesc) {
+              <mat-hint class="hint-desc">{{ selectedTosDesc }}</mat-hint>
+            }
+          </mat-form-field>
+        </section>
+      </div>
+
+      <section class="form-tile reasoning-tile">
+        <div class="tile-header">
+          <div>
+            <h3>{{ i18n.t('Statement / reasoning (German source)') }}</h3>
+            <p>{{ i18n.t('The English service translation is attached automatically. Only the German version is binding.') }}</p>
+          </div>
         </div>
-      </mat-option>
-      }
-    </mat-autocomplete>
-    @if (selectedLegalDesc) {
-    <mat-hint class="hint-desc">{{ selectedLegalDesc }}</mat-hint>
-    }
-  </mat-form-field>
 
-  <mat-form-field appearance="outline" class="full">
-    <mat-label>{{ i18n.t('Terms of Use clause (German source)') }}</mat-label>
-    <input type="text" matInput [formControl]="tosCtrl" [matAutocomplete]="tosAuto"
-      [placeholder]="i18n.t('German Terms of Use clause text')" spellcheck="false" />
-    @if (selectedTosDesc) {
-    <button mat-icon-button matSuffix [matTooltip]="selectedTosDesc" [attr.aria-label]="i18n.t('Info')">
-      <mat-icon>info</mat-icon>
-    </button>
-    }
-    <mat-autocomplete #tosAuto="matAutocomplete" (optionSelected)="onSelectTos($event)" autoActiveFirstOption>
-      @for (o of filteredTos$ | async; track o.id) {
-      <mat-option [value]="o.id">
-        <div class="opt-line">
-          <span class="opt-label">{{ localizedLabel(o) }}</span>
-          <span class="opt-desc">{{ localizedDescription(o) }}</span>
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>{{ i18n.t('Statement / reasoning (German source)') }}</mat-label>
+          <textarea matInput formControlName="statement" rows="9" [placeholder]="i18n.t('Authoritative German reasoning for the decision')"></textarea>
+          <mat-hint align="end">{{ (form.get('statement')?.value || '').length }}/2000</mat-hint>
+        </mat-form-field>
+      </section>
+
+      <section class="form-tile">
+        <div class="tile-header">
+          <div>
+            <h3>{{ i18n.t('Automated tools used to support the decision') }}</h3>
+          </div>
         </div>
-      </mat-option>
-      }
-    </mat-autocomplete>
-    @if(selectedTosDesc){
-    <mat-hint class="hint-desc">{{ selectedTosDesc }}</mat-hint>
-    }
-  </mat-form-field>
 
-  <div class="toggle-row" id="automatedHelp">
-    <mat-slide-toggle [formControl]="form.controls.automatedUsed" aria-describedby="automatedHelp">
-      {{ i18n.t('Automated tools used to support the decision') }}
-    </mat-slide-toggle>
-  </div>
-  <p class="help-text">
-    {{ i18n.t('Mark this if automated systems or AI tools assisted your review (e.g. content detection, duplicate matching, triage, translation, summarization).') }}
-  </p>
-
-  <mat-form-field appearance="outline" class="full">
-    <mat-label>{{ i18n.t('Reasoning template') }}</mat-label>
-    <mat-select [(value)]="selectedTemplate" (selectionChange)="onTemplateChange($event.value)">
-      <mat-option [value]="''">{{ i18n.t('None') }}</mat-option>
-      @for (t of reasoningTemplates; track t.id) {
-      <mat-option [value]="t.id">
-        <div class="opt-line">
-          <span class="opt-label">{{ localizedLabel(t) }}</span>
-          @if (localizedDescription(t)) {
-          <span class="opt-desc">{{ localizedDescription(t) }}</span>
-          }
+        <div class="toggle-panel" id="automatedHelp">
+          <mat-slide-toggle [formControl]="form.controls.automatedUsed" aria-describedby="automatedHelp">
+            {{ i18n.t('Automated tools used to support the decision') }}
+          </mat-slide-toggle>
+          <p class="help-text">
+            {{ i18n.t('Mark this if automated systems or AI tools assisted your review (e.g. content detection, duplicate matching, triage, translation, summarization).') }}
+          </p>
         </div>
-      </mat-option>
-      }
-    </mat-select>
-  </mat-form-field>
+      </section>
+    </div>
 
-  <mat-form-field appearance="outline" class="full">
-    <mat-label>{{ i18n.t('Statement / reasoning (German source)') }}</mat-label>
-    <textarea matInput formControlName="statement" rows="7" [placeholder]="i18n.t('Authoritative German reasoning for the decision')"></textarea>
-    <mat-hint>{{ i18n.t('The English service translation is attached automatically. Only the German version is binding.') }}</mat-hint>
-    <mat-hint align="end">{{ (form.get('statement')?.value || '').length }}/2000</mat-hint>
-  </mat-form-field>
-
-  <div class="dialog-actions">
-    <button mat-stroked-button type="button" (click)="close()">{{ i18n.t('Cancel') }}</button>
-    <button mat-raised-button color="primary" type="submit" [disabled]="submitting()">
-      @if (submitting()) {
-      <mat-icon class="spin">autorenew</mat-icon>
-      }
-      {{ i18n.t('Save') }}
-    </button>
-  </div>
-</form>
+    <div class="dialog-actions">
+      <button mat-stroked-button type="button" (click)="close()">
+        <mat-icon>close</mat-icon>
+        {{ i18n.t('Cancel') }}
+      </button>
+      <button mat-raised-button color="primary" type="submit" [disabled]="submitting()">
+        @if (submitting()) {
+          <mat-icon class="spin">autorenew</mat-icon>
+        } @else {
+          <mat-icon>save</mat-icon>
+        }
+        {{ i18n.t('Save') }}
+      </button>
+    </div>
+  </form>
+</div>

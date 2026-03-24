@@ -140,8 +140,9 @@ export class NoticeDetailComponent implements OnInit {
   openDecisionDialog(): void {
     const ref = this.dialog.open<DecisionDialogComponent, { noticeId: string }, DecisionDialogResult | false>(DecisionDialogComponent, {
       data: { noticeId: this.notice().id },
-      width: 'min(700px, 96vw)',
-      maxHeight: '90vh',
+      width: '1100px',
+      maxWidth: '85vw',
+      maxHeight: '95vh',
       panelClass: 'md-dialog-rounded'
     });
 

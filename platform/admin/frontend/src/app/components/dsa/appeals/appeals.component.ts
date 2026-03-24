@@ -136,8 +136,9 @@ export class AppealsComponent implements OnInit {
       if (result.outcome === 'REVISED') {
         const dref = this.dialog.open<DecisionDialogComponent, { noticeId: string }, DecisionDialogResult | false>(DecisionDialogComponent, {
           data: { noticeId: appeal.noticeId },
-          width: 'min(700px, 96vw)',
-          maxHeight: '90vh',
+          width: '1100px',
+          maxWidth: '85vw',
+          maxHeight: '95vh',
           panelClass: 'md-dialog-rounded'
         });
 
