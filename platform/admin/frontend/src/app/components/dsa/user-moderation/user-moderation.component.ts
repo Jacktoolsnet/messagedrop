@@ -28,6 +28,7 @@ import {
   PlatformUserSummary
 } from '../../../interfaces/platform-user-moderation.interface';
 import { DsaService } from '../../../services/dsa/dsa/dsa.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 
 @Component({
   selector: 'app-user-moderation',
@@ -57,6 +58,7 @@ export class UserModerationComponent implements OnInit {
   private readonly dsa = inject(DsaService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly destroyRef = inject(DestroyRef);
+  readonly i18n = inject(TranslationHelperService);
 
   readonly postingReasonOptions = USER_POSTING_BLOCK_REASONS;
   readonly accountReasonOptions = USER_ACCOUNT_BLOCK_REASONS;
@@ -148,7 +150,7 @@ export class UserModerationComponent implements OnInit {
     }
 
     if (!this.hasActiveBlock()) {
-      this.snackBar.open('There are no active blocks to remove.', 'OK', {
+      this.snackBar.open(this.i18n.t('There are no active blocks to remove.'), this.i18n.t('OK'), {
         duration: 2500,
         horizontalPosition: 'center',
         verticalPosition: 'top'
@@ -179,7 +181,7 @@ export class UserModerationComponent implements OnInit {
       const refreshed = await firstValueFrom(this.dsa.getPlatformUserModeration(userId));
       this.applyResponse(refreshed);
       this.refreshOpenAppeals();
-      this.snackBar.open('All active blocks have been removed.', 'OK', {
+      this.snackBar.open(this.i18n.t('All active blocks have been removed.'), this.i18n.t('OK'), {
         duration: 2500,
         horizontalPosition: 'center',
         verticalPosition: 'top'
@@ -202,10 +204,10 @@ export class UserModerationComponent implements OnInit {
   }
 
   formatTimestamp(value?: number | null): string {
-    if (!Number.isFinite(value)) return '—';
+    if (!Number.isFinite(value)) return this.i18n.t('—');
     const ts = Number(value);
-    if (ts <= 0) return '—';
-    return new Date(ts).toLocaleString();
+    if (ts <= 0) return this.i18n.t('—');
+    return new Date(ts).toLocaleString(this.i18n.dateLocale());
   }
 
   formatReason(reason: string | null | undefined, target: 'posting' | 'account'): string {
@@ -215,11 +217,11 @@ export class UserModerationComponent implements OnInit {
   appealStatusLabel(status: PlatformUserModerationAppealStatus): string {
     switch (status) {
       case 'accepted':
-        return 'Accepted';
+        return this.i18n.t('Accepted');
       case 'rejected':
-        return 'Rejected';
+        return this.i18n.t('Rejected');
       default:
-        return 'Open';
+        return this.i18n.t('Open');
     }
   }
 
@@ -363,7 +365,7 @@ export class UserModerationComponent implements OnInit {
         return true;
       }
 
-      this.snackBar.open(`Bitte keinen Zeitpunkt in der Vergangenheit für ${label} auswählen.`, 'OK', {
+      this.snackBar.open(this.i18n.t('Do not select a past date and time for {{label}}.', { label }), this.i18n.t('OK'), {
         duration: 3000,
         horizontalPosition: 'center',
         verticalPosition: 'top'
@@ -371,7 +373,7 @@ export class UserModerationComponent implements OnInit {
       return false;
     }
 
-    this.snackBar.open(`Bitte zuerst ein Datum für ${label} auswählen, wenn eine Uhrzeit gesetzt ist.`, 'OK', {
+    this.snackBar.open(this.i18n.t('Please choose a date for {{label}} before setting a time.', { label }), this.i18n.t('OK'), {
       duration: 3000,
       horizontalPosition: 'center',
       verticalPosition: 'top'

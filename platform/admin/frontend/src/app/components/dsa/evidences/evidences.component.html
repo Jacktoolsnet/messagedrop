@@ -1,8 +1,8 @@
 <mat-toolbar>
-    <button mat-icon-button routerLink="/dashboard/dsa" aria-label="Back">
+    <button mat-icon-button routerLink="/dashboard/dsa" [attr.aria-label]="i18n.t('Back')">
         <mat-icon>arrow_back</mat-icon>
     </button>
-    <span class="toolbar-title">Evidence</span>
+    <span class="toolbar-title">{{ i18n.t('Evidence') }}</span>
     <span class="spacer"></span>
 
     <!-- Desktop controls -->
@@ -14,17 +14,17 @@
         </mat-button-toggle-group>
         <button mat-stroked-button color="primary" (click)="reload()">
             <mat-icon>refresh</mat-icon>
-            Refresh
+            {{ i18n.t('Refresh') }}
         </button>
     </div>
 
     <!-- Mobile menu -->
     <div class="mobile-controls">
-        <button mat-icon-button [matMenuTriggerFor]="evidenceMenu" aria-label="Evidence menu">
+        <button mat-icon-button [matMenuTriggerFor]="evidenceMenu" [attr.aria-label]="i18n.t('Evidence menu')">
             <mat-icon>more_vert</mat-icon>
         </button>
         <mat-menu #evidenceMenu="matMenu">
-            <button mat-menu-item disabled>Status</button>
+            <button mat-menu-item disabled>{{ i18n.t('Status') }}</button>
             @for (status of statuses; track status) {
             <button mat-menu-item (click)="setStatus(status)">
                 <mat-icon>{{ statusFilter() === status ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
@@ -34,7 +34,7 @@
             <mat-divider></mat-divider>
             <button mat-menu-item (click)="reload()">
                 <mat-icon>refresh</mat-icon>
-                <span>Refresh</span>
+                <span>{{ i18n.t('Refresh') }}</span>
             </button>
         </mat-menu>
     </div>
@@ -47,23 +47,23 @@
 <div class="page">
     <form class="filter-row" [formGroup]="filterForm" novalidate>
         <mat-form-field appearance="outline">
-            <mat-label>Range</mat-label>
+            <mat-label>{{ i18n.t('Range') }}</mat-label>
             <mat-select formControlName="range">
-                <mat-option value="24h">Last 24h</mat-option>
-                <mat-option value="7d">Last 7 days</mat-option>
-                <mat-option value="30d">Last 30 days</mat-option>
-                <mat-option value="all">All</mat-option>
+                <mat-option value="24h">{{ i18n.t('Last 24h') }}</mat-option>
+                <mat-option value="7d">{{ i18n.t('Last 7 days') }}</mat-option>
+                <mat-option value="30d">{{ i18n.t('Last 30 days') }}</mat-option>
+                <mat-option value="all">{{ i18n.t('All') }}</mat-option>
             </mat-select>
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-            <mat-label>Content ID</mat-label>
-            <input matInput formControlName="contentId" autocomplete="off" placeholder="Search by content id" />
+            <mat-label>{{ i18n.t('Content ID') }}</mat-label>
+            <input matInput formControlName="contentId" autocomplete="off" [placeholder]="i18n.t('Search by content id')" />
         </mat-form-field>
 
         <mat-form-field class="grow" appearance="outline">
-            <mat-label>Search</mat-label>
-            <input matInput formControlName="q" autocomplete="off" placeholder="Reason text, category, reporter…" />
+            <mat-label>{{ i18n.t('Search') }}</mat-label>
+            <input matInput formControlName="q" autocomplete="off" [placeholder]="i18n.t('Reason text, category, reporter…')" />
         </mat-form-field>
     </form>
 
@@ -72,7 +72,7 @@
             <div class="list-header">
                 <div class="badge">
                     <mat-icon aria-hidden="true">gavel</mat-icon>
-                    Notices
+                    {{ i18n.t('Notices') }}
                 </div>
             </div>
 
@@ -80,21 +80,21 @@
                 @if (!loading() && notices().length === 0) {
                 <div class="empty">
                     <mat-icon>inventory_2</mat-icon>
-                    <p>No notices match the current filter.</p>
+                    <p>{{ i18n.t('No notices match the current filter.') }}</p>
                 </div>
                 }
 
                 @for (n of notices(); track n.id) {
                 <mat-card class="notice-card" [class.selected]="isSelected(n)" (click)="selectNotice(n)">
                     <div class="head">
-                        <div class="title" title="{{ n.contentId || 'No content id' }}">
-                            {{ n.contentId || 'No content id' }}
+                        <div class="title" title="{{ n.contentId || i18n.t('No content id') }}">
+                            {{ n.contentId || i18n.t('No content id') }}
                         </div>
                         <div class="head-right">
                             @if (isSelected(n)) {
                             <span class="active-pill">
                                 <mat-icon aria-hidden="true">radio_button_checked</mat-icon>
-                                Active
+                                {{ i18n.t('Active') }}
                             </span>
                             }
                             <div class="status-pill" [ngClass]="statusClass(n.status)">
@@ -127,7 +127,7 @@
                     <div class="actions">
                         <button mat-stroked-button color="primary" (click)="openNoticeDetail(n, $event)">
                             <mat-icon>open_in_new</mat-icon>
-                            Open notice
+                            {{ i18n.t('Open notice') }}
                         </button>
                     </div>
                 </mat-card>
@@ -140,11 +140,11 @@
             <div class="evidence-header">
                 <div class="badge">
                     <mat-icon aria-hidden="true">folder_open</mat-icon>
-                    Evidence
+                    {{ i18n.t('Evidence') }}
                 </div>
                 <button mat-stroked-button color="primary" type="button" (click)="evidenceList.openAdd()">
                     <mat-icon aria-hidden="true">add</mat-icon>
-                    Add evidence
+                    {{ i18n.t('Add evidence') }}
                 </button>
             </div>
             <app-evidence-list #evidenceList [noticeId]="current.id"></app-evidence-list>
@@ -152,7 +152,7 @@
             @if (!loading() && notices().length !== 0) {
             <div class="placeholder">
                 <mat-icon>folder_open</mat-icon>
-                <p>Select a notice to view and add evidence.</p>
+                <p>{{ i18n.t('Select a notice to view and add evidence.') }}</p>
             </div>
             }
             }

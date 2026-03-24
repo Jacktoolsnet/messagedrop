@@ -3,7 +3,7 @@
     <div class="dialog-header">
         <div class="left">
             <mat-icon>infos</mat-icon>
-            <h3>Notice Detail</h3>
+            <h3>{{ i18n.t('Notice Detail') }}</h3>
         </div>
         <div class="right">
             <mat-chip-set>
@@ -20,36 +20,36 @@
     <div class="dialog-body">
         <div class="tiles-grid">
             <section class="tile">
-                <h3 class="tile-title">Overview</h3>
+                <h3 class="tile-title">{{ i18n.t('Overview') }}</h3>
                 <div class="tile-body">
                     <div class="section">
                         <div class="kv">
-                            <div class="k">ID</div>
+                            <div class="k">{{ i18n.t('ID') }}</div>
                             <div class="v mono">{{ notice().id }}</div>
                         </div>
                         <div class="kv">
-                            <div class="k">Created</div>
+                            <div class="k">{{ i18n.t('Created') }}</div>
                             <div class="v">{{ notice().createdAt | date:'medium' }}</div>
                         </div>
                         <div class="kv">
-                            <div class="k">Type</div>
-                            <div class="v">{{ notice().reportedContentType }}</div>
+                            <div class="k">{{ i18n.t('Type') }}</div>
+                            <div class="v">{{ contentTypeLabel(notice().reportedContentType) }}</div>
                         </div>
                         <div class="kv">
-                            <div class="k">Category</div>
-                            <div class="v">{{ notice().category || '—' }}</div>
+                            <div class="k">{{ i18n.t('Category') }}</div>
+                            <div class="v">{{ notice().category || i18n.t('—') }}</div>
                         </div>
                     </div>
 
                     <div class="block">
-                        <h4><mat-icon>flag</mat-icon> Reason (original)</h4>
+                        <h4><mat-icon>flag</mat-icon> {{ i18n.t('Reason (original)') }}</h4>
                         @if (notice().reasonText) {
                         <div class="bubble">{{ notice().reasonText }}</div>
                         <div class="i18n-row">
                             <button mat-stroked-button (click)="translateToGerman('reason')"
                                 [disabled]="reasonI18n().loading">
                                 <mat-icon>translate</mat-icon>
-                                @if (reasonI18n().loading) { Translating… } @else { Translate to German }
+                                @if (reasonI18n().loading) { {{ i18n.t('Translating…') }} } @else { {{ i18n.t('Translate to German') }} }
                             </button>
                         </div>
                         @if (reasonI18n().translated) {
@@ -59,24 +59,24 @@
                         </div>
                         }
                         } @else {
-                        <div class="placeholder"><mat-icon>info</mat-icon> No reason provided.</div>
+                        <div class="placeholder"><mat-icon>info</mat-icon> {{ i18n.t('No reason provided.') }}</div>
                         }
                     </div>
                 </div>
             </section>
 
             <section class="tile">
-                <h3 class="tile-title">Content</h3>
+                <h3 class="tile-title">{{ i18n.t('Content') }}</h3>
                 <div class="tile-body">
                     <div class="block">
-                        <h4><mat-icon>article</mat-icon> Reported content</h4>
+                        <h4><mat-icon>article</mat-icon> {{ i18n.t('Reported content') }}</h4>
 
                         @if (contentObj(); as c) {
                         <div class="bubble">
                             @if (c.message; as message) {
                             <div class="msg">{{ message }}</div>
                             @if ((c.hashtags?.length ?? 0) > 0) {
-                            <div class="message-hashtags" aria-label="Message hashtags">
+                            <div class="message-hashtags" [attr.aria-label]="i18n.t('Message hashtags')">
                                 @for (tag of c.hashtags ?? []; track tag) {
                                 <span class="message-hashtag-chip">#{{ tag }}</span>
                                 }
@@ -86,7 +86,7 @@
                                 <button mat-stroked-button (click)="translateToGerman('message')"
                                     [disabled]="messageI18n().loading">
                                     <mat-icon>translate</mat-icon>
-                                    @if (messageI18n().loading) { Translating… } @else { Translate to German }
+                                    @if (messageI18n().loading) { {{ i18n.t('Translating…') }} } @else { {{ i18n.t('Translate to German') }} }
                                 </button>
                             </div>
                             @if (messageI18n().translated) {
@@ -100,24 +100,24 @@
 
                             <div class="meta">
                                 <div class="kv">
-                                    <div class="k">Content ID</div>
+                                    <div class="k">{{ i18n.t('Content ID') }}</div>
                                     <div class="v mono">{{ notice().contentId }}</div>
                                 </div>
                                 @if (c.userId; as userId) {
                                 <div class="kv">
-                                    <div class="k">User</div>
+                                    <div class="k">{{ i18n.t('User') }}</div>
                                     <div class="v mono">{{ userId }}</div>
                                 </div>
                                 }
                                 @if (c.location?.plusCode; as plusCode) {
                                 <div class="kv">
-                                    <div class="k">PlusCode</div>
+                                    <div class="k">{{ i18n.t('PlusCode') }}</div>
                                     <div class="v mono">{{ plusCode }}</div>
                                 </div>
                                 }
                                 @if (c.multimedia?.type; as mediaType) {
                                 <div class="kv">
-                                    <div class="k">Media</div>
+                                    <div class="k">{{ i18n.t('Media') }}</div>
                                     <div class="v">{{ mediaType }}</div>
                                 </div>
                                 }
@@ -127,7 +127,7 @@
                         <!-- Media Preview -->
                         @if (mediaKind() === 'iframe' && embedUrl()) {
                         <div class="embed">
-                            <iframe [src]="embedUrl()!" title="Embedded content" loading="lazy"
+                            <iframe [src]="embedUrl()!" [title]="i18n.t('Embedded content')" loading="lazy"
                                 referrerpolicy="strict-origin-when-cross-origin"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                                 allowfullscreen>
@@ -142,62 +142,62 @@
                         <div class="block-actions">
                             <a mat-stroked-button class="external" [href]="externalLink()!" target="_blank"
                                 rel="noopener">
-                                <mat-icon>open_in_new</mat-icon> Open original
+                                <mat-icon>open_in_new</mat-icon> {{ i18n.t('Open original') }}
                             </a>
                             <button mat-stroked-button class="external" type="button" (click)="addScreenshotEvidence()"
                                 [disabled]="makingScreenshot()">
                                 <mat-icon>photo_camera</mat-icon>
-                                Add to evidence
+                                {{ i18n.t('Add to evidence') }}
                             </button>
                         </div>
                         }
                         } @else {
-                        <div class="placeholder"><mat-icon>info</mat-icon> No content payload attached.</div>
+                        <div class="placeholder"><mat-icon>info</mat-icon> {{ i18n.t('No content payload attached.') }}</div>
                         }
                     </div>
                     @if (hasModeration()) {
                     <div class="block">
-                        <h4><mat-icon>verified_user</mat-icon> Moderation ratings</h4>
+                        <h4><mat-icon>verified_user</mat-icon> {{ i18n.t('Moderation ratings') }}</h4>
                         <div class="meta">
                             <div class="kv">
-                                <div class="k">AI decision</div>
-                                <div class="v">{{ contentObj()?.aiModerationDecision || '—' }}</div>
+                                <div class="k">{{ i18n.t('AI decision') }}</div>
+                                <div class="v">{{ contentObj()?.aiModerationDecision || i18n.t('—') }}</div>
                             </div>
                             <div class="kv">
-                                <div class="k">AI score</div>
+                                <div class="k">{{ i18n.t('AI score') }}</div>
                                 <div class="v">{{ formatScore(contentObj()?.aiModerationScore) }}</div>
                             </div>
                             <div class="kv">
-                                <div class="k">AI flagged</div>
+                                <div class="k">{{ i18n.t('AI flagged') }}</div>
                                 <div class="v">{{ formatBool(contentObj()?.aiModerationFlagged) }}</div>
                             </div>
                             <div class="kv">
-                                <div class="k">AI checked</div>
+                                <div class="k">{{ i18n.t('AI checked') }}</div>
                                 <div class="v">{{ formatTimestamp(contentObj()?.aiModerationAt) }}</div>
                             </div>
                             <div class="kv">
-                                <div class="k">Pattern match</div>
+                                <div class="k">{{ i18n.t('Pattern match') }}</div>
                                 <div class="v">{{ formatBool(contentObj()?.patternMatch) }}</div>
                             </div>
                             <div class="kv">
-                                <div class="k">Pattern checked</div>
+                                <div class="k">{{ i18n.t('Pattern checked') }}</div>
                                 <div class="v">{{ formatTimestamp(contentObj()?.patternMatchAt) }}</div>
                             </div>
                             <div class="kv">
-                                <div class="k">Manual decision</div>
-                                <div class="v">{{ contentObj()?.manualModerationDecision || '—' }}</div>
+                                <div class="k">{{ i18n.t('Manual decision') }}</div>
+                                <div class="v">{{ contentObj()?.manualModerationDecision || i18n.t('—') }}</div>
                             </div>
                             <div class="kv">
-                                <div class="k">Manual reason</div>
-                                <div class="v">{{ contentObj()?.manualModerationReason || '—' }}</div>
+                                <div class="k">{{ i18n.t('Manual reason') }}</div>
+                                <div class="v">{{ contentObj()?.manualModerationReason || i18n.t('—') }}</div>
                             </div>
                             <div class="kv">
-                                <div class="k">Manual reviewed</div>
+                                <div class="k">{{ i18n.t('Manual reviewed') }}</div>
                                 <div class="v">{{ formatTimestamp(contentObj()?.manualModerationAt) }}</div>
                             </div>
                             <div class="kv">
-                                <div class="k">Manual reviewer</div>
-                                <div class="v">{{ contentObj()?.manualModerationBy || '—' }}</div>
+                                <div class="k">{{ i18n.t('Manual reviewer') }}</div>
+                                <div class="v">{{ contentObj()?.manualModerationBy || i18n.t('—') }}</div>
                             </div>
                         </div>
                     </div>
@@ -206,23 +206,23 @@
             </section>
 
             <section class="tile">
-                <h3 class="tile-title">Metadata</h3>
+                <h3 class="tile-title">{{ i18n.t('Metadata') }}</h3>
                 <div class="tile-body">
                     <div class="section">
                         <div class="kv">
-                            <div class="k">Reporter name</div>
-                            <div class="v">{{ notice().reporterName || '—' }}</div>
+                            <div class="k">{{ i18n.t('Reporter name') }}</div>
+                            <div class="v">{{ notice().reporterName || i18n.t('—') }}</div>
                         </div>
                         <div class="kv">
-                            <div class="k">Reporter email</div>
-                            <div class="v">{{ notice().reporterEmail || '—' }}</div>
+                            <div class="k">{{ i18n.t('Reporter email') }}</div>
+                            <div class="v">{{ notice().reporterEmail || i18n.t('—') }}</div>
                         </div>
                         <div class="kv">
-                            <div class="k">Truth affirmation</div>
-                            <div class="v">{{ notice().truthAffirmation ? 'Yes' : '—' }}</div>
+                            <div class="k">{{ i18n.t('Truth affirmation') }}</div>
+                            <div class="v">{{ notice().truthAffirmation ? i18n.t('Yes') : i18n.t('—') }}</div>
                         </div>
                         <div class="kv">
-                            <div class="k">Updated</div>
+                            <div class="k">{{ i18n.t('Updated') }}</div>
                             <div class="v">{{ notice().updatedAt | date:'medium' }}</div>
                         </div>
                     </div>
@@ -230,58 +230,58 @@
             </section>
 
             <section class="tile">
-                <h3 class="tile-title">User moderation</h3>
+                <h3 class="tile-title">{{ i18n.t('User moderation') }}</h3>
                 <div class="tile-body">
                     @if (platformUserId(); as userId) {
                     <div class="section">
                         <div class="kv">
-                            <div class="k">User ID</div>
+                            <div class="k">{{ i18n.t('User ID') }}</div>
                             <div class="v mono">{{ userId }}</div>
                         </div>
                         <div class="kv">
-                            <div class="k">Posting</div>
-                            <div class="v">{{ moderationState()?.posting?.blocked ? 'Blocked' : 'Active' }}</div>
+                            <div class="k">{{ i18n.t('Posting') }}</div>
+                            <div class="v">{{ moderationState()?.posting?.blocked ? i18n.t('Blocked') : i18n.t('Active') }}</div>
                         </div>
                         <div class="kv">
-                            <div class="k">Account</div>
-                            <div class="v">{{ moderationState()?.account?.blocked ? 'Blocked' : 'Active' }}</div>
+                            <div class="k">{{ i18n.t('Account') }}</div>
+                            <div class="v">{{ moderationState()?.account?.blocked ? i18n.t('Blocked') : i18n.t('Active') }}</div>
                         </div>
                         <div class="kv">
-                            <div class="k">Posting until</div>
+                            <div class="k">{{ i18n.t('Posting until') }}</div>
                             <div class="v">{{ formatBlockUntil(moderationState()?.posting?.blockedUntil) }}</div>
                         </div>
                         <div class="kv">
-                            <div class="k">Posting reason</div>
+                            <div class="k">{{ i18n.t('Posting reason') }}</div>
                             <div class="v">{{ formatReason(moderationState()?.posting?.reason, 'posting') }}</div>
                         </div>
                         <div class="kv">
-                            <div class="k">Account until</div>
+                            <div class="k">{{ i18n.t('Account until') }}</div>
                             <div class="v">{{ formatBlockUntil(moderationState()?.account?.blockedUntil) }}</div>
                         </div>
                         <div class="kv">
-                            <div class="k">Account reason</div>
+                            <div class="k">{{ i18n.t('Account reason') }}</div>
                             <div class="v">{{ formatReason(moderationState()?.account?.reason, 'account') }}</div>
                         </div>
                         <div class="kv">
-                            <div class="k">Signals</div>
-                            <div class="v">{{ moderationSummary()?.signals?.total ?? 0 }} total / {{ moderationSummary()?.signals?.open ?? 0 }} open</div>
+                            <div class="k">{{ i18n.t('Signals') }}</div>
+                            <div class="v">{{ moderationSummary()?.signals?.total ?? 0 }} {{ i18n.t('total') }} / {{ moderationSummary()?.signals?.open ?? 0 }} {{ i18n.t('open') }}</div>
                         </div>
                         <div class="kv">
-                            <div class="k">Notices</div>
-                            <div class="v">{{ moderationSummary()?.notices?.total ?? 0 }} total / {{ moderationSummary()?.notices?.open ?? 0 }} open</div>
+                            <div class="k">{{ i18n.t('Notices') }}</div>
+                            <div class="v">{{ moderationSummary()?.notices?.total ?? 0 }} {{ i18n.t('total') }} / {{ moderationSummary()?.notices?.open ?? 0 }} {{ i18n.t('open') }}</div>
                         </div>
                         <div class="kv">
-                            <div class="k">Enforced decisions</div>
+                            <div class="k">{{ i18n.t('Enforced decisions') }}</div>
                             <div class="v">{{ moderationSummary()?.decisions?.enforced ?? 0 }}</div>
                         </div>
                     </div>
                     <div class="tile-actions">
-                        <label for="notice-blocked-until"><strong>Temporary block until:</strong></label>
+                        <label for="notice-blocked-until"><strong>{{ i18n.t('Temporary block until:') }}</strong></label>
                         <input id="notice-blocked-until" type="datetime-local" [value]="blockedUntilLocal()" [min]="blockedUntilMinLocal()"
                             (change)="onBlockedUntilInput($any($event.target).value)" />
                     </div>
                     <div class="tile-actions reason-row">
-                        <label for="notice-posting-reason"><strong>Posting block reason:</strong></label>
+                        <label for="notice-posting-reason"><strong>{{ i18n.t('Posting block reason:') }}</strong></label>
                         <select id="notice-posting-reason" [value]="postingReason()" (change)="postingReason.set($any($event.target).value)">
                             @for (option of postingReasonOptions; track option.code) {
                             <option [value]="option.code">{{ option.label }}</option>
@@ -289,7 +289,7 @@
                         </select>
                     </div>
                     <div class="tile-actions reason-row">
-                        <label for="notice-account-reason"><strong>Account block reason:</strong></label>
+                        <label for="notice-account-reason"><strong>{{ i18n.t('Account block reason:') }}</strong></label>
                         <select id="notice-account-reason" [value]="accountReason()" (change)="accountReason.set($any($event.target).value)">
                             @for (option of accountReasonOptions; track option.code) {
                             <option [value]="option.code">{{ option.label }}</option>
@@ -300,40 +300,40 @@
                         @if (!(moderationState()?.posting?.blocked)) {
                         <button mat-stroked-button color="warn" type="button" (click)="blockPosting()" [disabled]="moderationBusy()">
                             <mat-icon>block</mat-icon>
-                            Block posting
+                            {{ i18n.t('Block posting') }}
                         </button>
                         } @else {
                         <button mat-stroked-button type="button" (click)="unblockPosting()" [disabled]="moderationBusy()">
                             <mat-icon>check_circle</mat-icon>
-                            Unblock posting
+                            {{ i18n.t('Unblock posting') }}
                         </button>
                         }
 
                         @if (!(moderationState()?.account?.blocked)) {
                         <button mat-stroked-button color="warn" type="button" (click)="blockAccount()" [disabled]="moderationBusy()">
                             <mat-icon>lock</mat-icon>
-                            Block account
+                            {{ i18n.t('Block account') }}
                         </button>
                         } @else {
                         <button mat-stroked-button type="button" (click)="unblockAccount()" [disabled]="moderationBusy()">
                             <mat-icon>lock_open</mat-icon>
-                            Unblock account
+                            {{ i18n.t('Unblock account') }}
                         </button>
                         }
                     </div>
                     } @else {
-                    <div class="placeholder"><mat-icon>info</mat-icon> No platform user id in this notice payload.</div>
+                    <div class="placeholder"><mat-icon>info</mat-icon> {{ i18n.t('No platform user id in this notice payload.') }}</div>
                     }
                 </div>
             </section>
 
             <section class="tile">
-                <h3 class="tile-title">Evidence</h3>
+                <h3 class="tile-title">{{ i18n.t('Evidence') }}</h3>
                 <div class="tile-body">
                     <div class="tile-actions">
                         <button mat-stroked-button color="primary" type="button" (click)="openAddEvidence()">
                             <mat-icon>add</mat-icon>
-                            Add evidence
+                            {{ i18n.t('Add evidence') }}
                         </button>
                     </div>
                     <app-evidence-list #evidenceList [noticeId]="notice().id"></app-evidence-list>
@@ -341,13 +341,13 @@
             </section>
 
             <section class="tile">
-                <h3 class="tile-title">Decision summary</h3>
+                <h3 class="tile-title">{{ i18n.t('Decision summary') }}</h3>
                 <div class="tile-body">
                     <div class="tile-actions">
                         <button mat-stroked-button color="accent" type="button" (click)="openDecisionDialog()"
                             [disabled]="status() === 'DECIDED'">
                             <mat-icon>gavel</mat-icon>
-                            Decide
+                            {{ i18n.t('Decide') }}
                         </button>
                     </div>
                     <app-decision-summary #decisionSummary [noticeId]="notice().id"></app-decision-summary>
@@ -355,7 +355,7 @@
             </section>
 
             <section class="tile">
-                <h3 class="tile-title">Appeals</h3>
+                <h3 class="tile-title">{{ i18n.t('Appeals') }}</h3>
                 <div class="tile-body">
                     <app-notice-appeals [noticeId]="notice().id"></app-notice-appeals>
                 </div>
@@ -368,33 +368,33 @@
         <div class="actions-left">
             <button mat-raised-button color="primary" (click)="close(false)">
                 <mat-icon>close</mat-icon>
-                Close
+                {{ i18n.t('Close') }}
             </button>
         </div>
 
         <div class="actions-right desktop-actions">
             <button mat-stroked-button (click)="openStatusPage()">
                 <mat-icon>open_in_new</mat-icon>
-                Open status
+                {{ i18n.t('Open status') }}
             </button>
             <button mat-raised-button color="accent" (click)="openDecisionDialog()" [disabled]="status() === 'DECIDED'">
                 <mat-icon>gavel</mat-icon>
-                Decide
+                {{ i18n.t('Decide') }}
             </button>
         </div>
 
         <div class="actions-right mobile-actions">
-            <button mat-icon-button [matMenuTriggerFor]="noticeDetailMenu" aria-label="More actions">
+            <button mat-icon-button [matMenuTriggerFor]="noticeDetailMenu" [attr.aria-label]="i18n.t('More actions')">
                 <mat-icon>more_vert</mat-icon>
             </button>
             <mat-menu #noticeDetailMenu="matMenu">
                 <button mat-menu-item (click)="openStatusPage()">
                     <mat-icon>open_in_new</mat-icon>
-                    <span>Open status</span>
+                    <span>{{ i18n.t('Open status') }}</span>
                 </button>
                 <button mat-menu-item (click)="openDecisionDialog()" [disabled]="status() === 'DECIDED'">
                     <mat-icon>gavel</mat-icon>
-                    <span>Decide</span>
+                    <span>{{ i18n.t('Decide') }}</span>
                 </button>
             </mat-menu>
         </div>

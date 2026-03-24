@@ -1,44 +1,44 @@
 <mat-toolbar color="primary">
-  <button mat-icon-button routerLink="/dashboard/dsa" aria-label="Back to DSA dashboard">
+  <button mat-icon-button routerLink="/dashboard/dsa" [attr.aria-label]="i18n.t('Back to DSA dashboard')">
     <mat-icon>arrow_back</mat-icon>
   </button>
 
-  <span class="toolbar-title">Appeals</span>
+  <span class="toolbar-title">{{ i18n.t('Appeals') }}</span>
   <span class="spacer"></span>
   <div class="desktop-controls">
     <mat-button-toggle-group [value]="statusFilter()" (valueChange)="setStatus($event)">
-      <mat-button-toggle value="open">Open</mat-button-toggle>
-      <mat-button-toggle value="resolved">Resolved</mat-button-toggle>
-      <mat-button-toggle value="all">All</mat-button-toggle>
+      <mat-button-toggle value="open">{{ i18n.t('Open') }}</mat-button-toggle>
+      <mat-button-toggle value="resolved">{{ i18n.t('Resolved') }}</mat-button-toggle>
+      <mat-button-toggle value="all">{{ i18n.t('All') }}</mat-button-toggle>
     </mat-button-toggle-group>
     <button mat-stroked-button color="primary" type="button" (click)="refresh()">
       <mat-icon>refresh</mat-icon>
-      Refresh
+      {{ i18n.t('Refresh') }}
     </button>
   </div>
 
   <div class="mobile-controls">
-    <button mat-icon-button [matMenuTriggerFor]="appealsMenu" aria-label="Appeals menu">
+    <button mat-icon-button [matMenuTriggerFor]="appealsMenu" [attr.aria-label]="i18n.t('Appeals menu')">
       <mat-icon>more_vert</mat-icon>
     </button>
     <mat-menu #appealsMenu="matMenu">
-      <button mat-menu-item disabled>Status</button>
+      <button mat-menu-item disabled>{{ i18n.t('Status') }}</button>
       <button mat-menu-item (click)="setStatus('open')">
         <mat-icon>{{ statusFilter() === 'open' ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
-        <span>Open</span>
+        <span>{{ i18n.t('Open') }}</span>
       </button>
       <button mat-menu-item (click)="setStatus('resolved')">
         <mat-icon>{{ statusFilter() === 'resolved' ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
-        <span>Resolved</span>
+        <span>{{ i18n.t('Resolved') }}</span>
       </button>
       <button mat-menu-item (click)="setStatus('all')">
         <mat-icon>{{ statusFilter() === 'all' ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
-        <span>All</span>
+        <span>{{ i18n.t('All') }}</span>
       </button>
       <mat-divider></mat-divider>
       <button mat-menu-item (click)="refresh()">
         <mat-icon>refresh</mat-icon>
-        <span>Refresh</span>
+        <span>{{ i18n.t('Refresh') }}</span>
       </button>
     </mat-menu>
   </div>
@@ -54,14 +54,14 @@
       <div class="list-header">
         <div class="badge">
           <mat-icon aria-hidden="true">feedback</mat-icon>
-          Appeals
+          {{ i18n.t('Appeals') }}
         </div>
       </div>
 
       @if (!loading() && appeals().length === 0) {
       <div class="empty">
         <mat-icon>inventory_2</mat-icon>
-        <p>No appeals found for the selected filter.</p>
+        <p>{{ i18n.t('No appeals found for the selected filter.') }}</p>
       </div>
       }
 
@@ -70,19 +70,19 @@
         <mat-card class="notice-card" [class.selected]="isSelected(appeal)" (click)="selectAppeal(appeal)" tabindex="0"
           (keydown.enter)="selectAppeal(appeal)">
           <div class="head">
-            <div class="title" [matTooltip]="appeal.noticeContentId || 'No content id'">
-              {{ appeal.noticeContentId || 'No content id' }}
+            <div class="title" [matTooltip]="appeal.noticeContentId || i18n.t('No content id')">
+              {{ appeal.noticeContentId || i18n.t('No content id') }}
             </div>
             <div class="head-right">
               @if (isSelected(appeal)) {
               <span class="active-pill">
                 <mat-icon aria-hidden="true">radio_button_checked</mat-icon>
-                Active
+                {{ i18n.t('Active') }}
               </span>
               }
               <span class="status-pill" [ngClass]="isOpen(appeal) ? 'status-open' : 'status-resolved'">
                 <mat-icon aria-hidden="true">{{ isOpen(appeal) ? 'pending' : 'task_alt' }}</mat-icon>
-                {{ isOpen(appeal) ? 'Open' : 'Resolved' }}
+                {{ isOpen(appeal) ? i18n.t('Open') : i18n.t('Resolved') }}
               </span>
             </div>
           </div>
@@ -105,7 +105,7 @@
             <button mat-stroked-button color="accent" type="button"
               (click)="$event.stopPropagation(); resolveAppeal(appeal)">
               <mat-icon>done_all</mat-icon>
-              Resolve appeal
+              {{ i18n.t('Resolve appeal') }}
             </button>
             }
           </div>
@@ -123,32 +123,32 @@
       <div class="summary-header">
         <div class="badge">
           <mat-icon aria-hidden="true">article</mat-icon>
-          Notice
+          {{ i18n.t('Notice') }}
         </div>
       </div>
       <div class="summary-grid">
         <section class="tile">
-          <h3 class="tile-title">Overview</h3>
+          <h3 class="tile-title">{{ i18n.t('Overview') }}</h3>
           <div class="tile-body">
             <div class="section">
               <div class="kv">
-                <div class="k">ID</div>
+                <div class="k">{{ i18n.t('ID') }}</div>
                 <div class="v mono">{{ selectedNotice()!.id }}</div>
               </div>
               <div class="kv">
-                <div class="k">Created</div>
+                <div class="k">{{ i18n.t('Created') }}</div>
                 <div class="v">{{ selectedNotice()!.createdAt | date:'medium' }}</div>
               </div>
               <div class="kv">
-                <div class="k">Type</div>
-                <div class="v">{{ selectedNotice()!.reportedContentType }}</div>
+                <div class="k">{{ i18n.t('Type') }}</div>
+                <div class="v">{{ contentTypeLabel(selectedNotice()!.reportedContentType) }}</div>
               </div>
               <div class="kv">
-                <div class="k">Category</div>
-                <div class="v">{{ selectedNotice()!.category || '—' }}</div>
+                <div class="k">{{ i18n.t('Category') }}</div>
+                <div class="v">{{ selectedNotice()!.category || i18n.t('—') }}</div>
               </div>
               <div class="kv">
-                <div class="k">Status</div>
+                <div class="k">{{ i18n.t('Status') }}</div>
                 <div class="v">{{ selectedNotice()!.status }}</div>
               </div>
             </div>
@@ -156,14 +156,14 @@
         </section>
 
         <section class="tile">
-          <h3 class="tile-title">Content</h3>
+          <h3 class="tile-title">{{ i18n.t('Content') }}</h3>
           <div class="tile-body">
             @if (contentObj(); as c) {
             <div class="block">
               @if (c.message; as message) {
               <div class="bubble">{{ message }}</div>
               @if ((c.hashtags?.length ?? 0) > 0) {
-              <div class="message-hashtags" aria-label="Message hashtags">
+              <div class="message-hashtags" [attr.aria-label]="i18n.t('Message hashtags')">
                 @for (tag of c.hashtags ?? []; track tag) {
                 <span class="message-hashtag-chip">#{{ tag }}</span>
                 }
@@ -173,24 +173,24 @@
               }
               <div class="section">
                 <div class="kv">
-                  <div class="k">Content ID</div>
+                  <div class="k">{{ i18n.t('Content ID') }}</div>
                   <div class="v mono">{{ selectedNotice()!.contentId }}</div>
                 </div>
                 @if (c.userId; as userId) {
                 <div class="kv">
-                  <div class="k">User</div>
+                  <div class="k">{{ i18n.t('User') }}</div>
                   <div class="v mono">{{ userId }}</div>
                 </div>
                 }
                 @if (c.location?.plusCode; as plusCode) {
                 <div class="kv">
-                  <div class="k">PlusCode</div>
+                  <div class="k">{{ i18n.t('PlusCode') }}</div>
                   <div class="v mono">{{ plusCode }}</div>
                 </div>
                 }
                 @if (c.multimedia?.type; as mediaType) {
                 <div class="kv">
-                  <div class="k">Media</div>
+                  <div class="k">{{ i18n.t('Media') }}</div>
                   <div class="v">{{ mediaType }}</div>
                 </div>
                 }
@@ -198,7 +198,7 @@
 
               @if (mediaKind() === 'iframe' && embedUrl()) {
               <div class="embed">
-                <iframe [src]="embedUrl()" title="Embedded content" loading="lazy"
+                <iframe [src]="embedUrl()" [title]="i18n.t('Embedded content')" loading="lazy"
                   referrerpolicy="strict-origin-when-cross-origin"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowfullscreen></iframe>
@@ -215,40 +215,40 @@
               <div class="block-actions">
                 <a mat-stroked-button class="external" [href]="externalLink()!" target="_blank" rel="noopener">
                   <mat-icon>open_in_new</mat-icon>
-                  Open original
+                  {{ i18n.t('Open original') }}
                 </a>
                 <button mat-stroked-button type="button" (click)="addScreenshotEvidence()"
                   [disabled]="makingScreenshot()">
                   <mat-icon>photo_camera</mat-icon>
-                  Add to evidence
+                  {{ i18n.t('Add to evidence') }}
                 </button>
               </div>
               }
             </div>
             } @else {
-            <div class="placeholder"><mat-icon>info</mat-icon> No content payload attached.</div>
+            <div class="placeholder"><mat-icon>info</mat-icon> {{ i18n.t('No content payload attached.') }}</div>
             }
           </div>
         </section>
 
         <section class="tile">
-          <h3 class="tile-title">Metadata</h3>
+          <h3 class="tile-title">{{ i18n.t('Metadata') }}</h3>
           <div class="tile-body">
             <div class="section">
               <div class="kv">
-                <div class="k">Reporter name</div>
-                <div class="v">{{ selectedNotice()!.reporterName || '—' }}</div>
+                <div class="k">{{ i18n.t('Reporter name') }}</div>
+                <div class="v">{{ selectedNotice()!.reporterName || i18n.t('—') }}</div>
               </div>
               <div class="kv">
-                <div class="k">Reporter email</div>
-                <div class="v">{{ selectedNotice()!.reporterEmail || '—' }}</div>
+                <div class="k">{{ i18n.t('Reporter email') }}</div>
+                <div class="v">{{ selectedNotice()!.reporterEmail || i18n.t('—') }}</div>
               </div>
               <div class="kv">
-                <div class="k">Truth affirmation</div>
-                <div class="v">{{ selectedNotice()!.truthAffirmation ? 'Yes' : '—' }}</div>
+                <div class="k">{{ i18n.t('Truth affirmation') }}</div>
+                <div class="v">{{ selectedNotice()!.truthAffirmation ? i18n.t('Yes') : i18n.t('—') }}</div>
               </div>
               <div class="kv">
-                <div class="k">Updated</div>
+                <div class="k">{{ i18n.t('Updated') }}</div>
                 <div class="v">{{ selectedNotice()!.updatedAt | date:'medium' }}</div>
               </div>
             </div>
@@ -256,21 +256,21 @@
         </section>
 
         <section class="tile">
-          <h3 class="tile-title">Evidence</h3>
+          <h3 class="tile-title">{{ i18n.t('Evidence') }}</h3>
           <div class="tile-body">
             <app-evidence-list [noticeId]="selectedNotice()!.id"></app-evidence-list>
           </div>
         </section>
 
         <section class="tile">
-          <h3 class="tile-title">Decision summary</h3>
+          <h3 class="tile-title">{{ i18n.t('Decision summary') }}</h3>
           <div class="tile-body">
             <app-decision-summary [noticeId]="selectedNotice()!.id"></app-decision-summary>
           </div>
         </section>
 
         <section class="tile">
-          <h3 class="tile-title">Appeals</h3>
+          <h3 class="tile-title">{{ i18n.t('Appeals') }}</h3>
           <div class="tile-body">
             <app-notice-appeals [noticeId]="selectedNotice()!.id"></app-notice-appeals>
           </div>
@@ -281,7 +281,7 @@
       <div class="placeholder empty">
         <mat-icon>notifications_none</mat-icon>
         <div class="placeholder-text">
-          Select an appeal to view its summary.
+          {{ i18n.t('Select an appeal to view its summary.') }}
         </div>
       </div>
       }

@@ -13,6 +13,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { map, startWith, Subject, takeUntil } from 'rxjs';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
+import { TranslationHelperService } from '../../../../services/translation-helper.service';
 
 export type DecisionOutcome = 'REMOVE_CONTENT' | 'RESTRICT' | 'NO_ACTION' | 'FORWARD_TO_AUTHORITY';
 export interface DecisionDialogResult {
@@ -36,6 +37,7 @@ export class DecisionDialogComponent implements OnInit, OnDestroy {
   private dsa = inject(DsaService);
   private snack = inject(MatSnackBar);
   private ref = inject(MatDialogRef<DecisionDialogComponent, DecisionDialogResult | false>);
+  readonly i18n = inject(TranslationHelperService);
   data = inject<{ noticeId: string }>(MAT_DIALOG_DATA);
 
   private destroy$ = new Subject<void>();
@@ -193,7 +195,7 @@ The content may remain restricted pending further evaluation.`
     if (!tpl) return;
     this.form.get('statement')?.setValue(tpl.text); // visible immediately
     if (!silent) {
-      this.snack.open('Reasoning template applied.', 'OK', { duration: 1800 });
+      this.snack.open(this.i18n.t('Reasoning template applied.'), this.i18n.t('OK'), { duration: 1800 });
     }
   }
 
@@ -211,11 +213,11 @@ The content may remain restricted pending further evaluation.`
       statement: (statement || '').trim() || null
     }).subscribe({
       next: () => {
-        this.snack.open('Decision saved.', 'OK', { duration: 2500 });
+        this.snack.open(this.i18n.t('Decision saved.'), this.i18n.t('OK'), { duration: 2500 });
         this.ref.close({ saved: true, outcome });
       },
       error: () => {
-        this.snack.open('Failed to save decision.', 'OK', { duration: 3500 });
+        this.snack.open(this.i18n.t('Failed to save decision.'), this.i18n.t('OK'), { duration: 3500 });
         this.submitting.set(false);
       }
     });

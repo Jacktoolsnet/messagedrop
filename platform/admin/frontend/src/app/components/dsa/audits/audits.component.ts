@@ -14,6 +14,7 @@ import { RouterLink } from '@angular/router';
 import { debounceTime } from 'rxjs';
 import { DsaAuditEntry } from '../../../interfaces/dsa-audit-entry.interface';
 import { DsaService } from '../../../services/dsa/dsa/dsa.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { NoticeDetailComponent } from '../notice/notice-detail/notice-detail.component';
 
 const AUDIT_ENTITY_OPTIONS = [
@@ -60,6 +61,7 @@ export class AuditsComponent implements OnInit {
   private dsa = inject(DsaService);
   private fb = inject(FormBuilder);
   private dialog = inject(MatDialog);
+  readonly i18n = inject(TranslationHelperService);
 
   loading = signal(false);
   items = signal<DsaAuditEntry[]>([]);
@@ -134,41 +136,41 @@ export class AuditsComponent implements OnInit {
   }
   labelForAction(a: string): string {
     switch ((a || '').toLowerCase()) {
-      case 'create': return 'Created';
-      case 'status_change': return 'Status changed';
-      case 'evidence_add': return 'Evidence added';
-      case 'notify': return 'Notification sent';
-      case 'delete': return 'Deleted';
-      case 'platform_user_posting_block': return 'Posting blocked';
-      case 'platform_user_posting_unblock': return 'Posting unblocked';
-      case 'platform_user_account_block': return 'Account blocked';
-      case 'platform_user_account_unblock': return 'Account unblocked';
-      case 'platform_user_appeal_create': return 'Appeal created';
-      case 'platform_user_appeal_accept': return 'Appeal accepted';
-      case 'platform_user_appeal_reject': return 'Appeal rejected';
-      case 'platform_user_appeal_auto_accept': return 'Appeal auto-accepted';
-      default: return a || 'Event';
+      case 'create': return this.i18n.t('Created');
+      case 'status_change': return this.i18n.t('Status changed');
+      case 'evidence_add': return this.i18n.t('Evidence added');
+      case 'notify': return this.i18n.t('Notification sent');
+      case 'delete': return this.i18n.t('Deleted');
+      case 'platform_user_posting_block': return this.i18n.t('Posting blocked');
+      case 'platform_user_posting_unblock': return this.i18n.t('Posting unblocked');
+      case 'platform_user_account_block': return this.i18n.t('Account blocked');
+      case 'platform_user_account_unblock': return this.i18n.t('Account unblocked');
+      case 'platform_user_appeal_create': return this.i18n.t('Appeal created');
+      case 'platform_user_appeal_accept': return this.i18n.t('Appeal accepted');
+      case 'platform_user_appeal_reject': return this.i18n.t('Appeal rejected');
+      case 'platform_user_appeal_auto_accept': return this.i18n.t('Appeal auto-accepted');
+      default: return a || this.i18n.t('Event');
     }
   }
 
   labelForEntityType(entityType: string): string {
     switch ((entityType || '').toLowerCase()) {
       case 'platform_user':
-        return 'Platform user';
+        return this.i18n.t('Platform user');
       case 'public_message':
-        return 'Public message';
+        return this.i18n.t('Public message');
       case 'notice':
-        return 'Notice';
+        return this.i18n.t('Notice');
       case 'signal':
-        return 'Signal';
+        return this.i18n.t('Signal');
       case 'decision':
-        return 'Decision';
+        return this.i18n.t('Decision');
       case 'user':
-        return 'User';
+        return this.i18n.t('User');
       case 'other':
-        return 'Other';
+        return this.i18n.t('Other');
       default:
-        return entityType || 'Unknown';
+        return entityType || this.i18n.t('Unknown');
     }
   }
 
@@ -235,9 +237,9 @@ export class AuditsComponent implements OnInit {
   private labelForTarget(target: string): string {
     switch ((target || '').toLowerCase()) {
       case 'posting':
-        return 'Posting';
+        return this.i18n.t('Posting');
       case 'account':
-        return 'Account';
+        return this.i18n.t('Account');
       default:
         return target;
     }
@@ -246,7 +248,7 @@ export class AuditsComponent implements OnInit {
   private labelForTrigger(trigger: string): string {
     switch ((trigger || '').toLowerCase()) {
       case 'moderator_unblock':
-        return 'Moderator unblock';
+        return this.i18n.t('Moderator unblock');
       default:
         return trigger;
     }

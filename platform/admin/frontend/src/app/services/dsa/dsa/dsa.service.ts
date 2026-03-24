@@ -24,6 +24,7 @@ import { DsaAppeal } from '../../../interfaces/dsa-appeal.interface';
 import { ListAppealsParams } from '../../../interfaces/list-appeals-params.interface';
 import { DsaNotification, ListNotificationsParams, NotificationMeta, NotificationPayload } from '../../../interfaces/dsa-notification.interface';
 import { PlatformUserModerationOpenAppealsResponse, PlatformUserModerationResponse, PlatformUserModerationAppeal } from '../../../interfaces/platform-user-moderation.interface';
+import { TranslationHelperService } from '../../translation-helper.service';
 
 @Injectable({ providedIn: 'root' })
 export class DsaService {
@@ -40,6 +41,11 @@ export class DsaService {
   readonly openUserModerationAppealsCount = signal(0);
   private readonly http = inject(HttpClient);
   private readonly snack = inject(MatSnackBar);
+  private readonly i18n = inject(TranslationHelperService);
+
+  private openSnack(message: string, duration = 3000): void {
+    this.snack.open(this.i18n.t(message), this.i18n.t('OK'), { duration });
+  }
 
   /* =======================
    *  NOTICES (new / ergänzt)
@@ -63,7 +69,7 @@ export class DsaService {
       // Clientseitig zusätzlich filtern (category, q, range)
       map(rows => this.applyNoticeClientFilters(rows ?? [], filters)),
       catchError(() => {
-        this.snack.open('Could not load notices.', 'OK', { duration: 3000 });
+        this.openSnack('Could not load notices.', 3000);
         return of([]);
       })
     );
@@ -75,7 +81,7 @@ export class DsaService {
       responseType: 'blob'
     } as const).pipe(
       catchError(err => {
-        this.snack.open('Could not download evidence.', 'OK', { duration: 3000 });
+        this.openSnack('Could not download evidence.', 3000);
         return throwError(() => err);
       })
     );
@@ -85,7 +91,7 @@ export class DsaService {
     const params = new HttpParams().set('range', range);
     return this.http.get<TransparencyStats>(`${this.publicBaseUrl}/transparency/stats`, { params }).pipe(
       catchError(err => {
-        this.snack.open('Could not load transparency stats.', 'OK', { duration: 3000 });
+        this.openSnack('Could not load transparency stats.', 3000);
         throw err;
       })
     );
@@ -95,7 +101,7 @@ export class DsaService {
     const params = new HttpParams().set('range', range);
     return this.http.get<TransparencyReport[]>(`${this.publicBaseUrl}/transparency/reports`, { params }).pipe(
       catchError(() => {
-        this.snack.open('Could not load transparency reports.', 'OK', { duration: 3000 });
+        this.openSnack('Could not load transparency reports.', 3000);
         return of([]);
       })
     );
@@ -107,7 +113,7 @@ export class DsaService {
       responseType: 'blob'
     } as const).pipe(
       catchError(err => {
-        this.snack.open('Could not download report.', 'OK', { duration: 3000 });
+        this.openSnack('Could not download report.', 3000);
         return throwError(() => err);
       })
     );
@@ -117,7 +123,7 @@ export class DsaService {
   getNoticeById(id: string): Observable<DsaNotice> {
     return this.http.get<DsaNotice>(`${this.baseUrl}/notices/${id}`).pipe(
       catchError(err => {
-        this.snack.open('Could not load notice.', 'OK', { duration: 3000 });
+        this.openSnack('Could not load notice.', 3000);
         throw err;
       })
     );
@@ -127,7 +133,7 @@ export class DsaService {
   patchNoticeStatus(id: string, status: DsaNoticeStatus): Observable<{ ok: boolean }> {
     return this.http.patch<{ ok: boolean }>(`${this.baseUrl}/notices/${id}/status`, { status }).pipe(
       catchError(err => {
-        this.snack.open('Could not update notice status.', 'OK', { duration: 3000 });
+        this.openSnack('Could not update notice status.', 3000);
         throw err;
       })
     );
@@ -177,7 +183,7 @@ export class DsaService {
     this.http.get<NoticeStats>(`${this.baseUrl}/stats/notices`)
       .pipe(
         catchError(() => {
-          this.snack.open('Could not load notice stats.', 'OK', { duration: 3000 });
+          this.openSnack('Could not load notice stats.', 3000);
           this.loading.set(false);
           return of(null);
         })
@@ -193,7 +199,7 @@ export class DsaService {
     this.http.get<AppealStats>(`${this.baseUrl}/stats/appeals`)
       .pipe(
         catchError(() => {
-          this.snack.open('Could not load appeal stats.', 'OK', { duration: 3000 });
+          this.openSnack('Could not load appeal stats.', 3000);
           this.loading.set(false);
           return of(null);
         })
@@ -220,7 +226,7 @@ export class DsaService {
 
     return this.http.get<DsaNotification[]>(`${this.baseUrl}/notifications`, { params: httpParams }).pipe(
       catchError(() => {
-        this.snack.open('Could not load notifications.', 'OK', { duration: 3000 });
+        this.openSnack('Could not load notifications.', 3000);
         return of([]);
       })
     );
@@ -229,7 +235,7 @@ export class DsaService {
   getNotificationById(id: string): Observable<DsaNotification> {
     return this.http.get<DsaNotification>(`${this.baseUrl}/notifications/${encodeURIComponent(id)}`).pipe(
       catchError(err => {
-        this.snack.open('Could not load notification.', 'OK', { duration: 3000 });
+        this.openSnack('Could not load notification.', 3000);
         throw err;
       })
     );
@@ -241,7 +247,7 @@ export class DsaService {
         const msg = err?.error?.error === 'resend_not_supported'
           ? 'Resending is not supported for this channel.'
           : 'Could not resend notification.';
-        this.snack.open(msg, 'OK', { duration: 3000 });
+        this.openSnack(msg);
         throw err;
       })
     );
@@ -263,7 +269,7 @@ export class DsaService {
       responseType: 'blob'
     }).pipe(
       catchError(err => {
-        this.snack.open('Could not export notifications.', 'OK', { duration: 3000 });
+        this.openSnack('Could not export notifications.', 3000);
         throw err;
       })
     );
@@ -279,7 +285,7 @@ export class DsaService {
   }): Observable<{ id: string }> {
     return this.http.post<{ id: string }>(`${this.baseUrl}/notifications`, payload).pipe(
       catchError(err => {
-        this.snack.open('Could not create notification.', 'OK', { duration: 3000 });
+        this.openSnack('Could not create notification.', 3000);
         throw err;
       })
     );
@@ -290,7 +296,7 @@ export class DsaService {
     this.http.get<SignalStats>(`${this.baseUrl}/stats/signals`)
       .pipe(
         catchError(() => {
-          this.snack.open('Could not load signal stats.', 'OK', { duration: 3000 });
+          this.openSnack('Could not load signal stats.', 3000);
           this.loading.set(false);
           return of(null);
         })
@@ -321,7 +327,7 @@ export class DsaService {
         this.openUserModerationAppealsCount.set(Number(userModerationAppeals.totalOpen || 0));
       }
       if (!notices || !signals || !appeals || !userModerationAppeals) {
-        this.snack.open('Some DSA stats could not be loaded.', 'OK', { duration: 3000 });
+        this.openSnack('Some DSA stats could not be loaded.', 3000);
       }
       this.loading.set(false);
     });
@@ -343,7 +349,7 @@ export class DsaService {
 
     return this.http.get<DsaSignal[]>(`${this.baseUrl}/signals`, { params: hp })
       .pipe(catchError(() => {
-        this.snack.open('Could not load signals.', 'OK', { duration: 3000 });
+        this.openSnack('Could not load signals.', 3000);
         return of([]);
       }));
   }
@@ -358,7 +364,7 @@ export class DsaService {
 
     return this.http.get<DsaAppeal[]>(`${this.baseUrl}/appeals`, { params: hp }).pipe(
       catchError(() => {
-        this.snack.open('Could not load appeals.', 'OK', { duration: 3000 });
+        this.openSnack('Could not load appeals.', 3000);
         return of([]);
       })
     );
@@ -368,7 +374,7 @@ export class DsaService {
     return this.http.patch<{ ok: boolean }>(`${this.baseUrl}/appeals/${encodeURIComponent(appealId)}/resolution`, payload)
       .pipe(
         catchError(err => {
-          this.snack.open('Could not update appeal.', 'OK', { duration: 3000 });
+          this.openSnack('Could not update appeal.', 3000);
           throw err;
         })
       );
@@ -377,7 +383,7 @@ export class DsaService {
   getSignalById(id: string): Observable<DsaSignal> {
     return this.http.get<DsaSignal>(`${this.baseUrl}/signals/${id}`)
       .pipe(catchError(err => {
-        this.snack.open('Could not load signal detail.', 'OK', { duration: 3000 });
+        this.openSnack('Could not load signal detail.', 3000);
         throw err;
       }));
   }
@@ -385,7 +391,7 @@ export class DsaService {
   promoteSignal(id: string): Observable<PromoteResult> {
     return this.http.post<PromoteResult>(`${this.baseUrl}/signals/${id}/promote`, {})
       .pipe(catchError(err => {
-        this.snack.open('Could not promote signal to notice.', 'OK', { duration: 3000 });
+        this.openSnack('Could not promote signal to notice.', 3000);
         throw err;
       }));
   }
@@ -396,7 +402,7 @@ export class DsaService {
       { body: reason ? { reason } : undefined }
     ).pipe(
       catchError(err => {
-        this.snack.open('Could not delete signal.', 'OK', { duration: 3000 });
+        this.openSnack('Could not delete signal.', 3000);
         throw err;
       })
     );
@@ -416,7 +422,7 @@ export class DsaService {
     return this.http.post<{ id: string }>(`${this.baseUrl}/notices/${noticeId}/decision`, payload)
       .pipe(
         catchError(err => {
-          this.snack.open('Could not create decision.', 'OK', { duration: 3000 });
+          this.openSnack('Could not create decision.', 3000);
           throw err;
         })
       );
@@ -438,7 +444,7 @@ export class DsaService {
       visible
     }).pipe(
       catchError(err => {
-        this.snack.open('Could not update message visibility.', 'OK', { duration: 3000 });
+        this.openSnack('Could not update message visibility.', 3000);
         throw err;
       })
     );
@@ -449,7 +455,7 @@ export class DsaService {
     return this.http.get<DsaEvidence[]>(`${this.baseUrl}/notices/${noticeId}/evidence`)
       .pipe(
         catchError(() => {
-          this.snack.open('Could not load evidence.', 'OK', { duration: 3000 });
+          this.openSnack('Could not load evidence.', 3000);
           return of([]);
         })
       );
@@ -471,7 +477,7 @@ export class DsaService {
       return this.http.post<{ id: string }>(`${this.baseUrl}/notices/${noticeId}/evidence`, form)
         .pipe(
           catchError(err => {
-            this.snack.open('Could not add evidence.', 'OK', { duration: 3000 });
+            this.openSnack('Could not add evidence.', 3000);
             throw err;
           })
         );
@@ -486,7 +492,7 @@ export class DsaService {
     return this.http.post<{ id: string }>(`${this.baseUrl}/notices/${noticeId}/evidence`, body)
       .pipe(
         catchError(err => {
-          this.snack.open('Could not add evidence.', 'OK', { duration: 3000 });
+          this.openSnack('Could not add evidence.', 3000);
           throw err;
         })
       );
@@ -503,7 +509,7 @@ export class DsaService {
           const msg = err?.error?.error === 'screenshot_unavailable'
             ? 'Screenshot service not available on server.'
             : 'Could not create screenshot evidence.';
-          this.snack.open(msg, 'OK', { duration: 3000 });
+          this.openSnack(msg);
           throw err;
         })
       );
@@ -516,7 +522,7 @@ export class DsaService {
   getNoticeStatusUrl(noticeId: string) {
     return this.http.get<{ statusUrl: string }>(`${this.baseUrl}/notices/${noticeId}/status-url`).pipe(
       catchError(err => {
-        this.snack.open('Status page not available.', 'OK', { duration: 2000 });
+        this.openSnack('Status page not available.', 2000);
         throw err;
       })
     );
@@ -525,7 +531,7 @@ export class DsaService {
   getSignalStatusUrl(signalId: string) {
     return this.http.get<{ statusUrl: string }>(`${this.baseUrl}/signals/${signalId}/status-url`).pipe(
       catchError(err => {
-        this.snack.open('Status page not available.', 'OK', { duration: 2000 });
+        this.openSnack('Status page not available.', 2000);
         throw err;
       })
     );
@@ -558,7 +564,7 @@ export class DsaService {
         } as DsaAuditEntry;
       })),
       catchError(() => {
-        this.snack.open('Could not load audit log.', 'OK', { duration: 3000 });
+        this.openSnack('Could not load audit log.', 3000);
         return of([]);
       })
     );
@@ -572,7 +578,7 @@ export class DsaService {
   }) {
     return this.http.post(`${this.baseUrl}/notices/${noticeId}/notify`, payload).pipe(
       catchError(err => {
-        this.snack.open('Could not send notification.', 'OK', { duration: 3000 });
+        this.openSnack('Could not send notification.', 3000);
         throw err;
       })
     );
@@ -590,7 +596,7 @@ export class DsaService {
     return this.http.get<DsaAuditEntry[]>(`${this.baseUrl}/audit`, { params: hp })
       .pipe(
         catchError(() => {
-          this.snack.open('Could not load audit log.', 'OK', { duration: 3000 });
+          this.openSnack('Could not load audit log.', 3000);
           return of([]);
         })
       );
@@ -599,7 +605,7 @@ export class DsaService {
   getPlatformUserModeration(userId: string): Observable<PlatformUserModerationResponse> {
     return this.http.get<PlatformUserModerationResponse>(`${this.userBaseUrl}/platform/${encodeURIComponent(userId)}`).pipe(
       catchError(err => {
-        this.snack.open('Could not load user moderation state.', 'OK', { duration: 3000 });
+        this.openSnack('Could not load user moderation state.', 3000);
         throw err;
       })
     );
@@ -610,7 +616,7 @@ export class DsaService {
       `${this.userBaseUrl}/platform/appeals/open?limit=${encodeURIComponent(String(limit))}`
     ).pipe(
       catchError(err => {
-        this.snack.open('Could not load open user appeals.', 'OK', { duration: 3000 });
+        this.openSnack('Could not load open user appeals.', 3000);
         throw err;
       })
     );
@@ -635,7 +641,7 @@ export class DsaService {
       payload
     ).pipe(
       catchError(err => {
-        this.snack.open('Could not update user moderation state.', 'OK', { duration: 3000 });
+        this.openSnack('Could not update user moderation state.', 3000);
         throw err;
       })
     );
@@ -650,7 +656,7 @@ export class DsaService {
       payload
     ).pipe(
       catchError(err => {
-        this.snack.open('Could not update user appeal.', 'OK', { duration: 3000 });
+        this.openSnack('Could not update user appeal.', 3000);
         throw err;
       })
     );

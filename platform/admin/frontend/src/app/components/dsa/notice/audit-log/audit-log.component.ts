@@ -7,6 +7,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { DsaAuditEntry } from '../../../../interfaces/dsa-audit-entry.interface';
 import { DsaNoticeStatus, isDsaNoticeStatus } from '../../../../interfaces/dsa-notice-status.type';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
+import { TranslationHelperService } from '../../../../services/translation-helper.service';
 
 type KnownAction =
   | 'status_change'
@@ -34,6 +35,7 @@ export class AuditLogComponent implements OnChanges {
 
   private dsa = inject(DsaService);
   private snack = inject(MatSnackBar);
+  readonly i18n = inject(TranslationHelperService);
 
   loading = signal(false);
   items = signal<DsaAuditEntry[]>([]);
@@ -54,7 +56,7 @@ export class AuditLogComponent implements OnChanges {
       },
       error: () => {
         this.loading.set(false);
-        this.snack.open('Could not load audit log.', 'OK', { duration: 3000 });
+        this.snack.open(this.i18n.t('Could not load audit log.'), this.i18n.t('OK'), { duration: 3000 });
       }
     });
   }
@@ -90,15 +92,15 @@ export class AuditLogComponent implements OnChanges {
 
   actionLabel(a: string): string {
     switch ((a || '').toLowerCase()) {
-      case 'decision_create': return 'Decision created';
-      case 'decision_change': return 'Decision revised';
-      case 'create': return 'Created';
-      case 'status_change': return 'Status changed';
-      case 'evidence_add': return 'Evidence added';
-      case 'notify': return 'Notification sent';
-      case 'delete': return 'Deleted';
-      case 'promote_to_notice': return 'Promoted to notice';
-      default: return (a || 'event').replace(/_/g, ' ');
+      case 'decision_create': return this.i18n.t('Decision created');
+      case 'decision_change': return this.i18n.t('Decision revised');
+      case 'create': return this.i18n.t('Created');
+      case 'status_change': return this.i18n.t('Status changed');
+      case 'evidence_add': return this.i18n.t('Evidence added');
+      case 'notify': return this.i18n.t('Notification sent');
+      case 'delete': return this.i18n.t('Deleted');
+      case 'promote_to_notice': return this.i18n.t('Promoted to notice');
+      default: return (a || this.i18n.t('event')).replace(/_/g, ' ');
     }
   }
 

@@ -5,6 +5,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DsaDecision } from '../../../../interfaces/dsa-decision.interface';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
+import { TranslationHelperService } from '../../../../services/translation-helper.service';
 
 @Component({
   selector: 'app-decision-summary',
@@ -18,6 +19,7 @@ export class DecisionSummaryComponent implements OnChanges {
 
   private dsa = inject(DsaService);
   private snack = inject(MatSnackBar);
+  readonly i18n = inject(TranslationHelperService);
 
   loading = signal(false);
   decision = signal<DsaDecision | null>(null);
@@ -45,7 +47,7 @@ export class DecisionSummaryComponent implements OnChanges {
       error: () => {
         this.loading.set(false);
         this.decision.set(null);
-        this.snack.open('Could not load decision.', 'OK', { duration: 3000 });
+        this.snack.open(this.i18n.t('Could not load decision.'), this.i18n.t('OK'), { duration: 3000 });
       }
     });
   }
@@ -56,11 +58,11 @@ export class DecisionSummaryComponent implements OnChanges {
 
   private mapOutcome(o?: string): string {
     switch (o) {
-      case 'REMOVE_CONTENT': return 'Remove content';
-      case 'RESTRICT': return 'Restrict / mask';
-      case 'NO_ACTION': return 'No action';
-      case 'FORWARD_TO_AUTHORITY': return 'Forward to authority';
-      default: return o || '—';
+      case 'REMOVE_CONTENT': return this.i18n.t('Remove content');
+      case 'RESTRICT': return this.i18n.t('Restrict / mask');
+      case 'NO_ACTION': return this.i18n.t('No action');
+      case 'FORWARD_TO_AUTHORITY': return this.i18n.t('Forward to authority');
+      default: return o || this.i18n.t('—');
     }
   }
 

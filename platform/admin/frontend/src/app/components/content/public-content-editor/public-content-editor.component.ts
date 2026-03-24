@@ -36,6 +36,7 @@ import { ContentStyleOption, ContentStyleService } from '../../../services/conte
 import { PublicContentService } from '../../../services/content/public-content.service';
 import { PublicProfileService } from '../../../services/content/public-profile.service';
 import { NominatimService } from '../../../services/location/nominatim.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { MAX_PUBLIC_HASHTAGS, normalizeHashtags } from '../../../utils/hashtag.util';
 
 const EMPTY_MULTIMEDIA: Multimedia = {
@@ -88,6 +89,7 @@ export class PublicContentEditorComponent {
   private readonly publicProfileService = inject(PublicProfileService);
   private readonly styleService = inject(ContentStyleService);
   private readonly nominatimService = inject(NominatimService);
+  readonly i18n = inject(TranslationHelperService);
 
   readonly role = this.authService.role;
   readonly styleOptions = this.styleService.getStyleOptions();
@@ -162,16 +164,16 @@ export class PublicContentEditorComponent {
   readonly isCommentMode = computed(() => this.contentType() === 'comment');
   readonly pageTitle = computed(() => {
     if (this.isCommentMode()) {
-      return this.isEditMode() ? 'Edit public comment' : 'Create public comment';
+      return this.isEditMode() ? this.i18n.t('Edit public comment') : this.i18n.t('Create public comment');
     }
-    return this.isEditMode() ? 'Edit public message' : 'Create public message';
+    return this.isEditMode() ? this.i18n.t('Edit public message') : this.i18n.t('Create public message');
   });
   readonly statusLabel = computed(() => this.formatStatus(this.currentContent()?.status ?? 'draft'));
-  readonly childCommentsTitle = computed(() => 'Comments');
+  readonly childCommentsTitle = computed(() => this.i18n.t('Comments'));
   readonly childCommentsSubtitle = computed(() => (
     this.isCommentMode()
-      ? 'Direct comments for this comment.'
-      : 'Direct comments for this message.'
+      ? this.i18n.t('Direct comments for this comment.')
+      : this.i18n.t('Direct comments for this message.')
   ));
   readonly maxPublicHashtags = MAX_PUBLIC_HASHTAGS;
 
@@ -234,7 +236,7 @@ export class PublicContentEditorComponent {
     if (message) {
       return message;
     }
-    return this.hasMedia() ? '' : 'Add some text to preview the message.';
+    return this.hasMedia() ? '' : this.i18n.t('Add some text to preview the message.');
   });
   readonly previewLocationLabel = computed(() => {
     if (this.isCommentMode()) {
@@ -315,7 +317,7 @@ export class PublicContentEditorComponent {
   readonly previewParentLabel = computed(() => {
     const parent = this.selectedParentSummary();
     if (!parent) {
-      return 'No parent content selected';
+      return this.i18n.t('No parent content selected');
     }
     const profile = parent.publicProfileName?.trim();
     const location = parent.locationLabel?.trim();
@@ -328,7 +330,7 @@ export class PublicContentEditorComponent {
     if (profile) {
       return profile;
     }
-    return parent.isExternal ? 'Selected public comment' : 'Selected parent content';
+    return parent.isExternal ? this.i18n.t('Selected public comment') : this.i18n.t('Selected parent content');
   });
   readonly canSaveContent = computed(() => {
     if (this.saving() || !this.hasSelectedPublicProfile()) {
@@ -362,7 +364,7 @@ export class PublicContentEditorComponent {
     return parentId ? ['/dashboard/content', parentId, 'edit'] : ['/dashboard/content'];
   });
   readonly backAriaLabel = computed(() => (
-    this.resolveBackParentId() ? 'Back to parent content' : 'Back to content overview'
+    this.resolveBackParentId() ? this.i18n.t('Back to parent content') : this.i18n.t('Back to content overview')
   ));
   readonly canLoadExternalComments = computed(() => {
     const content = this.currentContent();
@@ -618,7 +620,7 @@ export class PublicContentEditorComponent {
   }
 
   childProfileName(row: PublicContent): string {
-    return row.publicProfile?.name?.trim() || 'No profile assigned';
+    return row.publicProfile?.name?.trim() || this.i18n.t('No profile assigned');
   }
 
   childProfileAvatar(row: PublicContent): string {
@@ -647,29 +649,29 @@ export class PublicContentEditorComponent {
     }
 
     if (row.multimedia?.type && row.multimedia.type !== 'undefined') {
-      return `Attached media: ${this.mediaTypeLabel(row.multimedia.type)}`;
+      return this.i18n.t('Attached media: {{media}}', { media: this.mediaTypeLabel(row.multimedia.type) });
     }
 
-    return 'No text content.';
+    return this.i18n.t('No text content.');
   }
 
   childLocationLabel(row: PublicContent): string {
     if (row.contentType === 'comment') {
       if (row.externalParentMessageUuid) {
-        return 'Reply to public comment';
+        return this.i18n.t('Reply to public comment');
       }
       const parentProfile = row.parentContent?.publicProfileName?.trim();
       const parentLocation = row.parentContent?.locationLabel?.trim();
       if (parentProfile && parentLocation) {
-        return `Reply to ${parentProfile} • ${parentLocation}`;
+        return this.i18n.t('Reply to {{target}}', { target: `${parentProfile} • ${parentLocation}` });
       }
       if (parentLocation) {
-        return `Reply to ${parentLocation}`;
+        return this.i18n.t('Reply to {{target}}', { target: parentLocation });
       }
       if (parentProfile) {
-        return `Reply to ${parentProfile}`;
+        return this.i18n.t('Reply to {{target}}', { target: parentProfile });
       }
-      return 'Comment without parent';
+      return this.i18n.t('Comment without parent');
     }
 
     const label = this.normalizeLocationLabel(row.location?.label?.trim() ?? '');
@@ -688,7 +690,7 @@ export class PublicContentEditorComponent {
       return `${this.formatCoordinate(latitude)}, ${this.formatCoordinate(longitude)}`;
     }
 
-    return 'No location';
+    return this.i18n.t('No location');
   }
 
   externalCommentCount(row: ExternalPublicContent): number {
@@ -700,7 +702,7 @@ export class PublicContentEditorComponent {
   }
 
   externalProfileName(row: ExternalPublicContent): string {
-    return row.displayName?.trim() || 'Public visitor';
+    return row.displayName?.trim() || this.i18n.t('Public visitor');
   }
 
   externalProfileAvatar(row: ExternalPublicContent): string {
@@ -729,10 +731,10 @@ export class PublicContentEditorComponent {
     }
 
     if (row.multimedia?.type && row.multimedia.type !== 'undefined') {
-      return `Attached media: ${this.mediaTypeLabel(row.multimedia.type)}`;
+      return this.i18n.t('Attached media: {{media}}', { media: this.mediaTypeLabel(row.multimedia.type) });
     }
 
-    return 'No text content.';
+    return this.i18n.t('No text content.');
   }
 
   externalHasImageMultimedia(row: ExternalPublicContent): boolean {
@@ -744,7 +746,7 @@ export class PublicContentEditorComponent {
   }
 
   profileName(): string {
-    return this.selectedProfile()?.name?.trim() || 'No public profile selected';
+    return this.selectedProfile()?.name?.trim() || this.i18n.t('No public profile selected');
   }
 
   profileInitials(): string {
@@ -755,14 +757,14 @@ export class PublicContentEditorComponent {
   formatStatus(status: string): string {
     switch (status) {
       case 'published':
-        return 'Published';
+        return this.i18n.t('Published');
       case 'withdrawn':
-        return 'Withdrawn';
+        return this.i18n.t('Withdrawn');
       case 'deleted':
-        return 'Deleted';
+        return this.i18n.t('Deleted');
       case 'draft':
       default:
-        return 'Draft';
+        return this.i18n.t('Draft');
     }
   }
 
@@ -805,19 +807,19 @@ export class PublicContentEditorComponent {
       case 'tiktok':
         return 'TikTok';
       case 'tenor':
-        return 'Tenor GIF';
+        return this.i18n.t('Tenor GIF');
       case 'image':
-        return 'Image';
+        return this.i18n.t('Image');
       case 'undefined':
       case '':
-        return 'No media';
+        return this.i18n.t('No media');
       default:
-        return type ?? 'Media';
+        return type ?? this.i18n.t('Media');
     }
   }
 
   typeLabel(type: PublicContentType | string): string {
-    return type === 'comment' ? 'Comment' : 'Message';
+    return type === 'comment' ? this.i18n.t('Comment') : this.i18n.t('Message');
   }
 
   typeIcon(type: PublicContentType | string): string {
@@ -847,7 +849,7 @@ export class PublicContentEditorComponent {
 
     const merged = normalizeHashtags([...this.hashtags(), ...parsed.tags], MAX_PUBLIC_HASHTAGS);
     if (merged.overflow > 0) {
-      this.showMessage(`A maximum of ${MAX_PUBLIC_HASHTAGS} hashtags is allowed.`);
+      this.showMessage('A maximum of {{count}} hashtags is allowed.', { count: MAX_PUBLIC_HASHTAGS });
       return;
     }
 
@@ -1296,8 +1298,8 @@ export class PublicContentEditorComponent {
     this.lastTenorSearch.set(searchTerm);
   }
 
-  private showMessage(message: string): void {
-    this.snackBar.open(message, 'OK', { duration: 2800 });
+  private showMessage(message: string, params?: Record<string, unknown>): void {
+    this.snackBar.open(this.i18n.t(message, params), this.i18n.t('OK'), { duration: 2800 });
   }
 
   private applyAiDialogResult(result: PublicContentAiDialogResult): void {

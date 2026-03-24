@@ -18,6 +18,7 @@ import { DsaAppeal } from '../../../interfaces/dsa-appeal.interface';
 import { DsaNotice } from '../../../interfaces/dsa-notice.interface';
 import { DsaService } from '../../../services/dsa/dsa/dsa.service';
 import { AuthService } from '../../../services/auth/auth.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { EvidenceListComponent } from '../notice/evidence/evidence-list/evidence-list.component';
 import { DecisionSummaryComponent } from '../decisions/decision-summary/decision-summary.component';
 import { NoticeAppealsComponent } from '../notice/appeals/notice-appeals.component';
@@ -56,6 +57,7 @@ export class AppealsComponent implements OnInit {
   private readonly snack = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
   private readonly auth = inject(AuthService);
+  readonly i18n = inject(TranslationHelperService);
 
   readonly loading = signal(false);
   readonly appeals = signal<DsaAppeal[]>([]);
@@ -91,7 +93,7 @@ export class AppealsComponent implements OnInit {
         this.appeals.set(list);
         this.ensureSelectionIsValid(list);
       },
-      error: () => this.snack.open('Could not load appeals.', 'OK', { duration: 3000 }),
+      error: () => this.snack.open(this.i18n.t('Could not load appeals.'), this.i18n.t('OK'), { duration: 3000 }),
       complete: () => this.loading.set(false)
     });
   }
@@ -113,7 +115,7 @@ export class AppealsComponent implements OnInit {
         this.contentObj.set(this.safeParse(notice.reportedContent));
         this.updateMediaFromContent();
       },
-      error: () => this.snack.open('Could not load notice detail.', 'OK', { duration: 3000 }),
+      error: () => this.snack.open(this.i18n.t('Could not load notice detail.'), this.i18n.t('OK'), { duration: 3000 }),
       complete: () => this.rightLoading.set(false)
     });
   }
@@ -146,7 +148,7 @@ export class AppealsComponent implements OnInit {
           if (cid) {
             const visible = dec.outcome === 'NO_ACTION';
             this.dsa.setPublicMessageVisibility(cid, visible).subscribe({
-              error: () => this.snack.open('Could not update public visibility.', 'OK', { duration: 3000 })
+              error: () => this.snack.open(this.i18n.t('Could not update public visibility.'), this.i18n.t('OK'), { duration: 3000 })
             });
           }
           // Appeal als REVISED auflösen
@@ -156,29 +158,40 @@ export class AppealsComponent implements OnInit {
             reason: result.reason || null
           }).subscribe({
             next: () => {
-              this.snack.open('Appeal resolved and decision revised.', 'OK', { duration: 2000 });
+              this.snack.open(this.i18n.t('Appeal resolved and decision revised.'), this.i18n.t('OK'), { duration: 2000 });
               this.load();
               this.dsa.loadAppealStats();
             },
-            error: () => this.snack.open('Could not update appeal.', 'OK', { duration: 3000 })
+            error: () => this.snack.open(this.i18n.t('Could not update appeal.'), this.i18n.t('OK'), { duration: 3000 })
           });
         });
       } else {
         this.dsa.resolveAppeal(appeal.id, result).subscribe({
           next: () => {
-            this.snack.open('Appeal updated.', 'OK', { duration: 2000 });
+            this.snack.open(this.i18n.t('Appeal updated.'), this.i18n.t('OK'), { duration: 2000 });
             this.load();
             this.dsa.loadAppealStats();
           },
-          error: () => this.snack.open('Could not update appeal.', 'OK', { duration: 3000 })
+          error: () => this.snack.open(this.i18n.t('Could not update appeal.'), this.i18n.t('OK'), { duration: 3000 })
         });
       }
     });
   }
 
   outcomeLabel(appeal: DsaAppeal): string {
-    if (!appeal.outcome) return 'Pending';
-    return appeal.outcome.replace(/_/g, ' ').toLowerCase();
+    if (!appeal.outcome) return this.i18n.t('Pending');
+    switch ((appeal.outcome || '').toUpperCase()) {
+      case 'UPHELD':
+        return this.i18n.t('Upheld');
+      case 'REVISED':
+        return this.i18n.t('Revised');
+      case 'OVERTURNED':
+        return this.i18n.t('Overturned');
+      case 'PARTIALLY_UPHELD':
+        return this.i18n.t('Partially upheld');
+      default:
+        return appeal.outcome.replace(/_/g, ' ').toLowerCase();
+    }
   }
 
   trackById(_index: number, appeal: DsaAppeal) {
@@ -221,10 +234,24 @@ export class AppealsComponent implements OnInit {
       .subscribe({
         next: () => {
           this.makingScreenshot.set(false);
-          this.snack.open('Screenshot added as evidence.', 'OK', { duration: 2000 });
+          this.snack.open(this.i18n.t('Screenshot added as evidence.'), this.i18n.t('OK'), { duration: 2000 });
         },
         error: () => this.makingScreenshot.set(false)
       });
+  }
+
+  contentTypeLabel(value: string | null | undefined): string {
+    switch ((value || '').toLowerCase()) {
+      case 'public message':
+      case 'public_message':
+        return this.i18n.t('Public message');
+      case 'comment':
+        return this.i18n.t('Comment');
+      case 'profile':
+        return this.i18n.t('Profile');
+      default:
+        return value || '';
+    }
   }
 
   private updateMediaFromContent(): void {

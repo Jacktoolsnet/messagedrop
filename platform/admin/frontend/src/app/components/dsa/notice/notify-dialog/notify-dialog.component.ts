@@ -10,6 +10,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
+import { TranslationHelperService } from '../../../../services/translation-helper.service';
 
 @Component({
   selector: 'app-notify-dialog',
@@ -32,6 +33,7 @@ export class NotifyDialogComponent {
   private snack = inject(MatSnackBar);
   private dsa = inject(DsaService);
   private ref = inject(MatDialogRef<NotifyDialogComponent>);
+  readonly i18n = inject(TranslationHelperService);
   data = inject<{ noticeId: string }>(MAT_DIALOG_DATA);
 
   sending = signal(false);
@@ -65,11 +67,11 @@ export class NotifyDialogComponent {
       sendEmail
     }).subscribe({
       next: () => {
-        this.snack.open('Notification sent successfully.', 'OK', { duration: 2500 });
+        this.snack.open(this.i18n.t('Notification sent successfully.'), this.i18n.t('OK'), { duration: 2500 });
         this.ref.close(true);
       },
       error: () => {
-        this.snack.open('Failed to send notification.', 'OK', { duration: 3500 });
+        this.snack.open(this.i18n.t('Failed to send notification.'), this.i18n.t('OK'), { duration: 3500 });
         this.sending.set(false);
       }
     });

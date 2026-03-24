@@ -21,6 +21,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { DsaSignal } from '../../../../interfaces/dsa-signal.interface';
 import { AuthService } from '../../../../services/auth/auth.service';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
+import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { TranslateService } from '../../../../services/translate-service/translate-service.service';
 import { debounceTime, distinctUntilChanged, map, Subscription } from 'rxjs';
 import { ConfirmDialogComponent } from '../../../shared/confirm-dialog.component';
@@ -61,6 +62,7 @@ export class SignalsComponent implements OnInit, OnDestroy {
   private snack = inject(MatSnackBar);
   private dialog = inject(MatDialog);
   private translate = inject(TranslateService);
+  readonly i18n = inject(TranslationHelperService);
 
   // Übersetzungen im Speicher (id -> Text)
   private tMsg = signal<Record<string, string>>({});
@@ -82,24 +84,24 @@ export class SignalsComponent implements OnInit, OnDestroy {
   translateMessage(s: DsaSignal) {
     const msg = this.getMessage(s);
     if (!msg) {
-      this.snack.open('No message to translate.', 'OK', { duration: 2000 });
+      this.snack.open(this.i18n.t('No message to translate.'), this.i18n.t('OK'), { duration: 2000 });
       return;
     }
     this.translate.translateToGerman(msg).subscribe({
       next: text => this.tMsg.update(m => ({ ...m, [s.id]: text })),
-      error: () => this.snack.open('Translation failed.', 'OK', { duration: 2500 })
+      error: () => this.snack.open(this.i18n.t('Translation failed.'), this.i18n.t('OK'), { duration: 2500 })
     });
   }
 
   translateReason(s: DsaSignal) {
     const r = s.reasonText?.trim();
     if (!r) {
-      this.snack.open('No reason to translate.', 'OK', { duration: 2000 });
+      this.snack.open(this.i18n.t('No reason to translate.'), this.i18n.t('OK'), { duration: 2000 });
       return;
     }
     this.translate.translateToGerman(r).subscribe({
       next: text => this.tReason.update(m => ({ ...m, [s.id]: text })),
-      error: () => this.snack.open('Translation failed.', 'OK', { duration: 2500 })
+      error: () => this.snack.open(this.i18n.t('Translation failed.'), this.i18n.t('OK'), { duration: 2500 })
     });
   }
 
@@ -215,8 +217,8 @@ export class SignalsComponent implements OnInit, OnDestroy {
   }
 
   statusLabel(status: SignalStatusFilter): string {
-    if (status === 'dismissed') return 'Dismissed';
-    return 'Open';
+    if (status === 'dismissed') return this.i18n.t('Dismissed');
+    return this.i18n.t('Open');
   }
 
   rangeFilter(): SignalRangeFilter {
@@ -234,7 +236,7 @@ export class SignalsComponent implements OnInit, OnDestroy {
     if (range === '24h') return '24h';
     if (range === '7d') return '7d';
     if (range === '30d') return '30d';
-    return 'All';
+    return this.i18n.t('All');
   }
 
   isNew(s: DsaSignal) {
@@ -266,7 +268,7 @@ export class SignalsComponent implements OnInit, OnDestroy {
     this.dsa.promoteSignal(s.id).subscribe({
       next: (res) => {
         this.reload();
-        this.snack.open('Signal promoted to Notice.', 'Open Notice', { duration: 4000 })
+        this.snack.open(this.i18n.t('Signal promoted to Notice.'), this.i18n.t('Open Notice'), { duration: 4000 })
           .onAction().subscribe(() => {
             this.router.navigate(['/dashboard/dsa/notices', res.noticeId]);
           });
@@ -280,7 +282,7 @@ export class SignalsComponent implements OnInit, OnDestroy {
         title: 'Delete Signal?',
         message: `Signal for content "${s.contentId}" will be delted permanently.`,
         confirmText: 'Delete',
-        cancelText: 'Cancle',
+        cancelText: 'Cancel',
         warn: true
       }
     });
@@ -289,11 +291,25 @@ export class SignalsComponent implements OnInit, OnDestroy {
       if (!ok) return;
       this.dsa.deleteSignal(s.id).subscribe({
         next: () => {
-          this.snack.open('Signal deleted.', 'OK', { duration: 2500 });
+          this.snack.open(this.i18n.t('Signal deleted.'), this.i18n.t('OK'), { duration: 2500 });
           this.reload();
         }
       });
     });
+  }
+
+  contentTypeLabel(value: string | null | undefined): string {
+    switch ((value || '').toLowerCase()) {
+      case 'public message':
+      case 'public_message':
+        return this.i18n.t('Public message');
+      case 'comment':
+        return this.i18n.t('Comment');
+      case 'profile':
+        return this.i18n.t('Profile');
+      default:
+        return value || '';
+    }
   }
 
   goBack() { this.router.navigate(['/dashboard/dsa']); }

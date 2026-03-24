@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DsaService } from '../../../../../services/dsa/dsa/dsa.service';
+import { TranslationHelperService } from '../../../../../services/translation-helper.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -26,6 +27,7 @@ export class AddEvidenceDialogComponent {
   private dsa = inject(DsaService);
   private snack = inject(MatSnackBar);
   private ref = inject(MatDialogRef<AddEvidenceDialogComponent, boolean>);
+  readonly i18n = inject(TranslationHelperService);
   data = inject<{ noticeId: string }>(MAT_DIALOG_DATA);
 
   saving = signal(false);
@@ -60,12 +62,12 @@ export class AddEvidenceDialogComponent {
     }
 
     if (!this.isAllowedFile(file)) {
-      this.snack.open('Only images or PDF files are allowed.', 'OK', { duration: 3000 });
+      this.snack.open(this.i18n.t('Only images or PDF files are allowed.'), this.i18n.t('OK'), { duration: 3000 });
       input.value = '';
       return;
     }
     if (file.size > this.maxFileBytes) {
-      this.snack.open('File must be smaller than 5 MB.', 'OK', { duration: 3000 });
+      this.snack.open(this.i18n.t('File must be smaller than 5 MB.'), this.i18n.t('OK'), { duration: 3000 });
       input.value = '';
       return;
     }
@@ -87,15 +89,15 @@ export class AddEvidenceDialogComponent {
     if (type === 'url') {
       const normalized = this.normalizeUrl((url || '').trim());
       if (!normalized) {
-        this.snack.open('Please provide a valid URL (http(s):// or domain).', 'OK', { duration: 2500 });
+        this.snack.open(this.i18n.t('Please provide a valid URL (http(s):// or domain).'), this.i18n.t('OK'), { duration: 2500 });
         return;
       }
       // write normalized back to form (for consistency)
       this.form.controls.url.setValue(normalized);
     }
-    if (type === 'hash' && !hash) { this.snack.open('Please provide a hash.', 'OK', { duration: 2500 }); return; }
+    if (type === 'hash' && !hash) { this.snack.open(this.i18n.t('Please provide a hash.'), this.i18n.t('OK'), { duration: 2500 }); return; }
     if (type === 'file' && !this.selectedFile()) {
-      this.snack.open('Please select a file.', 'OK', { duration: 2500 });
+      this.snack.open(this.i18n.t('Please select a file.'), this.i18n.t('OK'), { duration: 2500 });
       return;
     }
 
@@ -107,11 +109,11 @@ export class AddEvidenceDialogComponent {
       file: this.selectedFile()
     }).subscribe({
       next: () => {
-        this.snack.open('Evidence added.', 'OK', { duration: 2200 });
+        this.snack.open(this.i18n.t('Evidence added.'), this.i18n.t('OK'), { duration: 2200 });
         this.ref.close(true);
       },
       error: () => {
-        this.snack.open('Could not add evidence.', 'OK', { duration: 3200 });
+        this.snack.open(this.i18n.t('Could not add evidence.'), this.i18n.t('OK'), { duration: 3200 });
         this.saving.set(false);
       }
     });

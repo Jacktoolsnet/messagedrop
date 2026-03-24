@@ -1,17 +1,17 @@
 <h2 mat-dialog-title class="dialog-title">
-  Create decision
+  {{ i18n.t('Create decision') }}
 </h2>
 
 <!-- IMPORTANT: wrap everything in a form with [formGroup]! -->
 <form class="dialog-content" [formGroup]="form" (ngSubmit)="submit()">
   <!-- Outcome -->
   <mat-form-field appearance="outline" class="full">
-    <mat-label>Outcome</mat-label>
+    <mat-label>{{ i18n.t('Outcome') }}</mat-label>
     <mat-select formControlName="outcome" required>
       @for (o of outcomes; track o) {
       <mat-option [value]="o.value">
         <mat-icon class="opt-icon" aria-hidden="true">{{ o.icon }}</mat-icon>
-        {{ o.label }}
+        {{ i18n.t(o.label) }}
       </mat-option>
       }
     </mat-select>
@@ -19,11 +19,11 @@
 
   <!-- Legal basis (combo + free text) -->
   <mat-form-field appearance="outline" class="full">
-    <mat-label>Legal basis</mat-label>
+    <mat-label>{{ i18n.t('Legal basis') }}</mat-label>
     <input type="text" matInput [formControl]="legalCtrl" [matAutocomplete]="legalAuto"
       placeholder="e.g. Terms of Use violation (Section 9)" spellcheck="false" />
     @if (selectedLegalDesc) {
-    <button mat-icon-button matSuffix [matTooltip]="selectedLegalDesc" aria-label="Info">
+    <button mat-icon-button matSuffix [matTooltip]="selectedLegalDesc" [attr.aria-label]="i18n.t('Info')">
       <mat-icon>info</mat-icon>
     </button>
     }
@@ -44,11 +44,11 @@
 
   <!-- ToS clause (combo + free text) -->
   <mat-form-field appearance="outline" class="full">
-    <mat-label>Terms of Use clause (optional)</mat-label>
+    <mat-label>{{ i18n.t('Terms of Use clause (optional)') }}</mat-label>
     <input type="text" matInput [formControl]="tosCtrl" [matAutocomplete]="tosAuto"
       placeholder="e.g. Section 9 - Privacy or personal data disclosure" spellcheck="false" />
     @if (selectedTosDesc) {
-    <button mat-icon-button matSuffix [matTooltip]="selectedTosDesc" aria-label="Info">
+    <button mat-icon-button matSuffix [matTooltip]="selectedTosDesc" [attr.aria-label]="i18n.t('Info')">
       <mat-icon>info</mat-icon>
     </button>
     }
@@ -69,19 +69,18 @@
 
   <div class="toggle-row" id="automatedHelp">
     <mat-slide-toggle [formControl]="form.controls.automatedUsed" aria-describedby="automatedHelp">
-      Automated tools used to support the decision
+      {{ i18n.t('Automated tools used to support the decision') }}
     </mat-slide-toggle>
   </div>
   <p class="help-text">
-    Mark this if automated systems or AI tools assisted your review (e.g. content detection, duplicate matching,
-    triage, translation, summarization).
+    {{ i18n.t('Mark this if automated systems or AI tools assisted your review (e.g. content detection, duplicate matching, triage, translation, summarization).') }}
   </p>
 
   <!-- Reasoning template select -->
   <mat-form-field appearance="outline" class="full">
-    <mat-label>Reasoning template</mat-label>
+    <mat-label>{{ i18n.t('Reasoning template') }}</mat-label>
     <mat-select [(value)]="selectedTemplate" (selectionChange)="onTemplateChange($event.value)">
-      <mat-option [value]="''">None</mat-option>
+      <mat-option [value]="''">{{ i18n.t('None') }}</mat-option>
       @for (t of reasoningTemplates; track t) {
       <mat-option [value]="t.label">
         <div class="opt-line">
@@ -94,18 +93,18 @@
 
   <!-- Statement -->
   <mat-form-field appearance="outline" class="full">
-    <mat-label>Statement / reasoning (optional)</mat-label>
-    <textarea matInput formControlName="statement" rows="5" placeholder="Short reasoning for the decision"></textarea>
+    <mat-label>{{ i18n.t('Statement / reasoning (optional)') }}</mat-label>
+    <textarea matInput formControlName="statement" rows="5" [placeholder]="i18n.t('Short reasoning for the decision')"></textarea>
     <mat-hint align="end">{{ (form.get('statement')?.value || '').length }}/2000</mat-hint>
   </mat-form-field>
 
   <div class="dialog-actions">
-    <button mat-stroked-button type="button" (click)="close()">Cancel</button>
+    <button mat-stroked-button type="button" (click)="close()">{{ i18n.t('Cancel') }}</button>
     <button mat-raised-button color="primary" type="submit" [disabled]="submitting()">
       @if (submitting()) {
       <mat-icon class="spin">autorenew</mat-icon>
       }
-      Save
+      {{ i18n.t('Save') }}
     </button>
   </div>
 </form>

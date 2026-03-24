@@ -2,7 +2,7 @@
     <div class="dialog-header">
         <div class="left">
             <mat-icon>{{ providerIcon() }}</mat-icon>
-            <h3>Signal Detail</h3>
+            <h3>{{ i18n.t('Signal Detail') }}</h3>
         </div>
         <div class="right">
             <mat-chip-set>
@@ -18,17 +18,17 @@
                 <div class="tile-header">
                     <div class="tile-title">
                         <mat-icon>text_snippet</mat-icon>
-                        <span>Message</span>
+                        <span>{{ i18n.t('Message') }}</span>
                     </div>
-                    <button mat-icon-button matTooltip="Translate to German" (click)="translateMessage()"
+                    <button mat-icon-button [matTooltip]="i18n.t('Translate to German')" (click)="translateMessage()"
                         [disabled]="!msg()?.message || loadingMsg()">
                         <mat-icon>{{ loadingMsg() ? 'hourglass_top' : 'translate' }}</mat-icon>
                     </button>
                 </div>
 
                 @if (mediaKind() === 'iframe' && embedUrl()) {
-                <div class="embed-outer" matTooltip="Embedded media">
-                    <iframe [src]="embedUrl()" title="Embedded content" loading="lazy"
+                <div class="embed-outer" [matTooltip]="i18n.t('Embedded media')">
+                    <iframe [src]="embedUrl()" [title]="i18n.t('Embedded content')" loading="lazy"
                         referrerpolicy="strict-origin-when-cross-origin"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                         allowfullscreen>
@@ -36,7 +36,7 @@
                 </div>
                 }
                 @if (mediaKind() === 'image' && imageUrl()) {
-                <div class="image-outer" matTooltip="Image/GIF">
+                <div class="image-outer" [matTooltip]="i18n.t('Image/GIF')">
                     <img [src]="imageUrl()!" alt="media">
                 </div>
                 }
@@ -46,7 +46,7 @@
                     {{ msg()?.message }}
                 </div>
                 @if ((msg()?.hashtags?.length ?? 0) > 0) {
-                <div class="message-hashtags" aria-label="Message hashtags">
+                <div class="message-hashtags" [attr.aria-label]="i18n.t('Message hashtags')">
                     @for (tag of msg()?.hashtags ?? []; track tag) {
                     <span class="message-hashtag-chip">#{{ tag }}</span>
                     }
@@ -61,7 +61,7 @@
                 } @else {
                 <div class="placeholder">
                     <mat-icon>info</mat-icon>
-                    Message not provided
+                    {{ i18n.t('Message not provided') }}
                 </div>
                 }
             </section>
@@ -70,9 +70,9 @@
                 <div class="tile-header">
                     <div class="tile-title">
                         <mat-icon>assignment</mat-icon>
-                        <span>Report details</span>
+                        <span>{{ i18n.t('Report details') }}</span>
                     </div>
-                    <button mat-icon-button matTooltip="Translate to German" (click)="translateReason()"
+                    <button mat-icon-button [matTooltip]="i18n.t('Translate to German')" (click)="translateReason()"
                         [disabled]="!data.reasonText || loadingReason()">
                         <mat-icon>{{ loadingReason() ? 'hourglass_top' : 'translate' }}</mat-icon>
                     </button>
@@ -91,41 +91,41 @@
                 } @else {
                 <div class="placeholder">
                     <mat-icon>info</mat-icon>
-                    Reason not provided
+                    {{ i18n.t('Reason not provided') }}
                 </div>
                 }
 
                 <div class="meta-grid">
                     <div class="kv">
                         <mat-icon>schedule</mat-icon>
-                        <span><strong>Created:</strong> {{ normalizeEpoch(data.createdAt || msg()?.createDateTime) | date:'medium' }}</span>
+                        <span><strong>{{ i18n.t('Created:') }}</strong> {{ normalizeEpoch(data.createdAt || msg()?.createDateTime) | date:'medium' }}</span>
                     </div>
                     @if (msg()?.deleteDateTime) {
                     <div class="kv">
                         <mat-icon>hourglass_bottom</mat-icon>
-                        <span><strong>Expires:</strong> {{ normalizeEpoch(msg()?.deleteDateTime) | date:'medium' }}</span>
+                        <span><strong>{{ i18n.t('Expires:') }}</strong> {{ normalizeEpoch(msg()?.deleteDateTime) | date:'medium' }}</span>
                     </div>
                     }
                     @if (msg()?.location?.plusCode) {
                     <div class="kv">
                         <mat-icon>place</mat-icon>
-                        <span><strong>Plus Code:</strong> {{ msg()?.location?.plusCode }}</span>
+                        <span><strong>{{ i18n.t('Plus Code:') }}</strong> {{ msg()?.location?.plusCode }}</span>
                     </div>
                     }
                     @if (data.signalId) {
                     <div class="kv">
                         <mat-icon>sell</mat-icon>
-                        <span><strong>Signal ID:</strong> {{ data.signalId }}</span>
+                        <span><strong>{{ i18n.t('Signal ID:') }}</strong> {{ data.signalId }}</span>
                     </div>
                     }
                     <div class="kv">
                         <mat-icon>person</mat-icon>
-                        <span><strong>User:</strong> {{ msg()?.userId || '—' }}</span>
+                        <span><strong>{{ i18n.t('User:') }}</strong> {{ msg()?.userId || i18n.t('—') }}</span>
                     </div>
                     <div class="kv">
                         <mat-icon>link</mat-icon>
                         <span class="truncate" [matTooltip]="sourceUrl() || ''">
-                            <strong>Source:</strong> {{ sourceUrl() || '—' }}
+                            <strong>{{ i18n.t('Source:') }}</strong> {{ sourceUrl() || i18n.t('—') }}
                         </span>
                     </div>
                 </div>
@@ -141,7 +141,7 @@
                 <div class="tile-header">
                     <div class="tile-title">
                         <mat-icon>verified_user</mat-icon>
-                        <span>Moderation ratings</span>
+                        <span>{{ i18n.t('Moderation ratings') }}</span>
                     </div>
                 </div>
 
@@ -149,49 +149,49 @@
                 <div class="meta-grid">
                     <div class="kv">
                         <mat-icon>memory</mat-icon>
-                        <span><strong>AI decision:</strong> {{ msg()?.aiModerationDecision || '—' }}</span>
+                        <span><strong>{{ i18n.t('AI decision:') }}</strong> {{ msg()?.aiModerationDecision || i18n.t('—') }}</span>
                     </div>
                     <div class="kv">
                         <mat-icon>bar_chart</mat-icon>
-                        <span><strong>AI score:</strong> {{ formatScore(msg()?.aiModerationScore) }}</span>
+                        <span><strong>{{ i18n.t('AI score:') }}</strong> {{ formatScore(msg()?.aiModerationScore) }}</span>
                     </div>
                     <div class="kv">
                         <mat-icon>flag</mat-icon>
-                        <span><strong>AI flagged:</strong> {{ formatBool(msg()?.aiModerationFlagged) }}</span>
+                        <span><strong>{{ i18n.t('AI flagged:') }}</strong> {{ formatBool(msg()?.aiModerationFlagged) }}</span>
                     </div>
                     <div class="kv">
                         <mat-icon>schedule</mat-icon>
-                        <span><strong>AI checked:</strong> {{ formatTimestamp(msg()?.aiModerationAt) }}</span>
+                        <span><strong>{{ i18n.t('AI checked:') }}</strong> {{ formatTimestamp(msg()?.aiModerationAt) }}</span>
                     </div>
                     <div class="kv">
                         <mat-icon>fingerprint</mat-icon>
-                        <span><strong>Pattern match:</strong> {{ formatBool(msg()?.patternMatch) }}</span>
+                        <span><strong>{{ i18n.t('Pattern match:') }}</strong> {{ formatBool(msg()?.patternMatch) }}</span>
                     </div>
                     <div class="kv">
                         <mat-icon>schedule</mat-icon>
-                        <span><strong>Pattern checked:</strong> {{ formatTimestamp(msg()?.patternMatchAt) }}</span>
+                        <span><strong>{{ i18n.t('Pattern checked:') }}</strong> {{ formatTimestamp(msg()?.patternMatchAt) }}</span>
                     </div>
                     <div class="kv">
                         <mat-icon>gavel</mat-icon>
-                        <span><strong>Manual decision:</strong> {{ msg()?.manualModerationDecision || '—' }}</span>
+                        <span><strong>{{ i18n.t('Manual decision:') }}</strong> {{ msg()?.manualModerationDecision || i18n.t('—') }}</span>
                     </div>
                     <div class="kv">
                         <mat-icon>notes</mat-icon>
-                        <span><strong>Manual reason:</strong> {{ msg()?.manualModerationReason || '—' }}</span>
+                        <span><strong>{{ i18n.t('Manual reason:') }}</strong> {{ msg()?.manualModerationReason || i18n.t('—') }}</span>
                     </div>
                     <div class="kv">
                         <mat-icon>schedule</mat-icon>
-                        <span><strong>Manual reviewed:</strong> {{ formatTimestamp(msg()?.manualModerationAt) }}</span>
+                        <span><strong>{{ i18n.t('Manual reviewed:') }}</strong> {{ formatTimestamp(msg()?.manualModerationAt) }}</span>
                     </div>
                     <div class="kv">
                         <mat-icon>person</mat-icon>
-                        <span><strong>Manual reviewer:</strong> {{ msg()?.manualModerationBy || '—' }}</span>
+                        <span><strong>{{ i18n.t('Manual reviewer:') }}</strong> {{ msg()?.manualModerationBy || i18n.t('—') }}</span>
                     </div>
                 </div>
                 } @else {
                 <div class="placeholder">
                     <mat-icon>info</mat-icon>
-                    No moderation ratings available.
+                    {{ i18n.t('No moderation ratings available.') }}
                 </div>
                 }
             </section>
@@ -200,7 +200,7 @@
                 <div class="tile-header">
                     <div class="tile-title">
                         <mat-icon>gpp_bad</mat-icon>
-                        <span>User moderation</span>
+                        <span>{{ i18n.t('User moderation') }}</span>
                     </div>
                 </div>
 
@@ -208,68 +208,68 @@
                 <div class="meta-grid">
                     <div class="kv">
                         <mat-icon>person</mat-icon>
-                        <span><strong>User ID:</strong> {{ userId }}</span>
+                        <span><strong>{{ i18n.t('User ID:') }}</strong> {{ userId }}</span>
                     </div>
                     <div class="kv">
                         <mat-icon>edit_note</mat-icon>
                         <span>
-                            <strong>Posting:</strong>
+                            <strong>{{ i18n.t('Posting:') }}</strong>
                             @if (moderationState()?.posting?.blocked) {
-                            blocked
+                            {{ i18n.t('blocked') }}
                             } @else {
-                            active
+                            {{ i18n.t('active') }}
                             }
                         </span>
                     </div>
                     <div class="kv">
                         <mat-icon>lock</mat-icon>
                         <span>
-                            <strong>Account:</strong>
+                            <strong>{{ i18n.t('Account:') }}</strong>
                             @if (moderationState()?.account?.blocked) {
-                            blocked
+                            {{ i18n.t('blocked') }}
                             } @else {
-                            active
+                            {{ i18n.t('active') }}
                             }
                         </span>
                     </div>
                     <div class="kv">
                         <mat-icon>report</mat-icon>
-                        <span><strong>Signals:</strong> {{ moderationSummary()?.signals?.total ?? 0 }} total / {{ moderationSummary()?.signals?.open ?? 0 }} open</span>
+                        <span><strong>{{ i18n.t('Signals:') }}</strong> {{ moderationSummary()?.signals?.total ?? 0 }} {{ i18n.t('total') }} / {{ moderationSummary()?.signals?.open ?? 0 }} {{ i18n.t('open') }}</span>
                     </div>
                     <div class="kv">
                         <mat-icon>flag</mat-icon>
-                        <span><strong>Notices:</strong> {{ moderationSummary()?.notices?.total ?? 0 }} total / {{ moderationSummary()?.notices?.open ?? 0 }} open</span>
+                        <span><strong>{{ i18n.t('Notices:') }}</strong> {{ moderationSummary()?.notices?.total ?? 0 }} {{ i18n.t('total') }} / {{ moderationSummary()?.notices?.open ?? 0 }} {{ i18n.t('open') }}</span>
                     </div>
                     <div class="kv">
                         <mat-icon>gavel</mat-icon>
-                        <span><strong>Enforced decisions:</strong> {{ moderationSummary()?.decisions?.enforced ?? 0 }}</span>
+                        <span><strong>{{ i18n.t('Enforced decisions:') }}</strong> {{ moderationSummary()?.decisions?.enforced ?? 0 }}</span>
                     </div>
                     <div class="kv">
                         <mat-icon>schedule</mat-icon>
-                        <span><strong>Posting blocked until:</strong> {{ formatBlockUntil(moderationState()?.posting?.blockedUntil) }}</span>
+                        <span><strong>{{ i18n.t('Posting blocked until:') }}</strong> {{ formatBlockUntil(moderationState()?.posting?.blockedUntil) }}</span>
                     </div>
                     <div class="kv">
                         <mat-icon>info</mat-icon>
-                        <span><strong>Posting reason:</strong> {{ formatReason(moderationState()?.posting?.reason, 'posting') }}</span>
+                        <span><strong>{{ i18n.t('Posting reason:') }}</strong> {{ formatReason(moderationState()?.posting?.reason, 'posting') }}</span>
                     </div>
                     <div class="kv">
                         <mat-icon>schedule</mat-icon>
-                        <span><strong>Account blocked until:</strong> {{ formatBlockUntil(moderationState()?.account?.blockedUntil) }}</span>
+                        <span><strong>{{ i18n.t('Account blocked until:') }}</strong> {{ formatBlockUntil(moderationState()?.account?.blockedUntil) }}</span>
                     </div>
                     <div class="kv">
                         <mat-icon>info</mat-icon>
-                        <span><strong>Account reason:</strong> {{ formatReason(moderationState()?.account?.reason, 'account') }}</span>
+                        <span><strong>{{ i18n.t('Account reason:') }}</strong> {{ formatReason(moderationState()?.account?.reason, 'account') }}</span>
                     </div>
                 </div>
 
                 <div class="block-until-row">
-                    <label for="signal-blocked-until"><strong>Temporary block until (optional):</strong></label>
+                    <label for="signal-blocked-until"><strong>{{ i18n.t('Temporary block until (optional):') }}</strong></label>
                     <input id="signal-blocked-until" type="datetime-local" [value]="blockedUntilLocal()" [min]="blockedUntilMinLocal()"
                         (change)="onBlockedUntilInput($any($event.target).value)" />
                 </div>
 
                 <div class="block-reason-row">
-                    <label for="signal-posting-reason"><strong>Posting block reason:</strong></label>
+                    <label for="signal-posting-reason"><strong>{{ i18n.t('Posting block reason:') }}</strong></label>
                     <select id="signal-posting-reason" [value]="postingReason()" (change)="postingReason.set($any($event.target).value)">
                         @for (option of postingReasonOptions; track option.code) {
                         <option [value]="option.code">{{ option.label }}</option>
@@ -278,7 +278,7 @@
                 </div>
 
                 <div class="block-reason-row">
-                    <label for="signal-account-reason"><strong>Account block reason:</strong></label>
+                    <label for="signal-account-reason"><strong>{{ i18n.t('Account block reason:') }}</strong></label>
                     <select id="signal-account-reason" [value]="accountReason()" (change)="accountReason.set($any($event.target).value)">
                         @for (option of accountReasonOptions; track option.code) {
                         <option [value]="option.code">{{ option.label }}</option>
@@ -290,31 +290,31 @@
                     @if (!(moderationState()?.posting?.blocked)) {
                     <button mat-stroked-button color="warn" (click)="blockPosting()" [disabled]="moderationBusy()">
                         <mat-icon>block</mat-icon>
-                        Block posting
+                        {{ i18n.t('Block posting') }}
                     </button>
                     } @else {
                     <button mat-stroked-button (click)="unblockPosting()" [disabled]="moderationBusy()">
                         <mat-icon>check_circle</mat-icon>
-                        Unblock posting
+                        {{ i18n.t('Unblock posting') }}
                     </button>
                     }
 
                     @if (!(moderationState()?.account?.blocked)) {
                     <button mat-stroked-button color="warn" (click)="blockAccount()" [disabled]="moderationBusy()">
                         <mat-icon>lock</mat-icon>
-                        Block account
+                        {{ i18n.t('Block account') }}
                     </button>
                     } @else {
                     <button mat-stroked-button (click)="unblockAccount()" [disabled]="moderationBusy()">
                         <mat-icon>lock_open</mat-icon>
-                        Unblock account
+                        {{ i18n.t('Unblock account') }}
                     </button>
                     }
                 </div>
                 } @else {
                 <div class="placeholder">
                     <mat-icon>info</mat-icon>
-                    No platform user id in this signal payload.
+                    {{ i18n.t('No platform user id in this signal payload.') }}
                 </div>
                 }
             </section>
@@ -327,7 +327,7 @@
         <div class="actions-left">
             <button mat-raised-button color="primary" (click)="close()">
                 <mat-icon>close</mat-icon>
-                Close
+                {{ i18n.t('Close') }}
             </button>
         </div>
 
@@ -335,48 +335,48 @@
             @if (sourceUrl()) {
             <button mat-stroked-button (click)="openContentUrl()">
                 <mat-icon>open_in_new</mat-icon>
-                Open original
+                {{ i18n.t('Open original') }}
             </button>
             }
             @if (data.source === 'signal') {
             <button mat-stroked-button (click)="openStatusPage()">
                 <mat-icon>open_in_new</mat-icon>
-                Status
+                {{ i18n.t('Status') }}
             </button>
             <button mat-raised-button color="warn" (click)="dismissSignal()" [disabled]="actionBusy()">
                 <mat-icon>delete</mat-icon>
-                Dismiss
+                {{ i18n.t('Dismiss') }}
             </button>
             <button mat-raised-button color="primary" (click)="promoteSignal()" [disabled]="actionBusy()">
                 <mat-icon>upgrade</mat-icon>
-                Promote
+                {{ i18n.t('Promote') }}
             </button>
             }
         </div>
 
         <div class="actions-right mobile-actions">
-            <button mat-icon-button [matMenuTriggerFor]="detailMenu" aria-label="More actions">
+            <button mat-icon-button [matMenuTriggerFor]="detailMenu" [attr.aria-label]="i18n.t('More actions')">
                 <mat-icon>more_vert</mat-icon>
             </button>
             <mat-menu #detailMenu="matMenu">
                 @if (sourceUrl()) {
                 <button mat-menu-item (click)="openContentUrl()">
                     <mat-icon>open_in_new</mat-icon>
-                    <span>Open original</span>
+                    <span>{{ i18n.t('Open original') }}</span>
                 </button>
                 }
                 @if (data.source === 'signal') {
                 <button mat-menu-item (click)="openStatusPage()">
                     <mat-icon>open_in_new</mat-icon>
-                    <span>Status</span>
+                    <span>{{ i18n.t('Status') }}</span>
                 </button>
                 <button mat-menu-item (click)="dismissSignal()" [disabled]="actionBusy()">
                     <mat-icon>delete</mat-icon>
-                    <span>Dismiss</span>
+                    <span>{{ i18n.t('Dismiss') }}</span>
                 </button>
                 <button mat-menu-item (click)="promoteSignal()" [disabled]="actionBusy()">
                     <mat-icon>upgrade</mat-icon>
-                    <span>Promote</span>
+                    <span>{{ i18n.t('Promote') }}</span>
                 </button>
                 }
             </mat-menu>

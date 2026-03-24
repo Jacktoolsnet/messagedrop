@@ -9,6 +9,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
+import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { DecisionOutcome } from '../../decisions/decision-dialog/decision-dialog.component';
 
 export interface AppealResolutionData {
@@ -46,6 +47,7 @@ export class AppealResolutionDialogComponent {
   private readonly snack = inject(MatSnackBar);
   private readonly dsa = inject(DsaService);
   private readonly dialogRef = inject(MatDialogRef<AppealResolutionDialogComponent, AppealResolutionData | null>);
+  readonly i18n = inject(TranslationHelperService);
   readonly data = inject<AppealResolutionDialogData | null>(MAT_DIALOG_DATA);
   private lastAutoReason: string | null = null;
   readonly outcomes = [
@@ -145,14 +147,14 @@ export class AppealResolutionDialogComponent {
           if (cid) {
             const visible = value.decOutcome === 'NO_ACTION';
             this.dsa.setPublicMessageVisibility(cid, visible).subscribe({
-              error: () => this.snack.open('Could not update public visibility.', 'OK', { duration: 3000 })
+              error: () => this.snack.open(this.i18n.t('Could not update public visibility.'), this.i18n.t('OK'), { duration: 3000 })
             });
           }
-          this.snack.open('Decision revised.', 'OK', { duration: 2000 });
+          this.snack.open(this.i18n.t('Decision revised.'), this.i18n.t('OK'), { duration: 2000 });
           closeWith();
         },
         error: () => {
-          this.snack.open('Failed to save revised decision.', 'OK', { duration: 3000 });
+          this.snack.open(this.i18n.t('Failed to save revised decision.'), this.i18n.t('OK'), { duration: 3000 });
         }
       });
     } else {
@@ -163,5 +165,18 @@ export class AppealResolutionDialogComponent {
 
   cancel(): void {
     this.dialogRef.close(null);
+  }
+
+  decisionOutcomeLabel(value: DecisionOutcome): string {
+    switch (value) {
+      case 'NO_ACTION':
+        return this.i18n.t('No action');
+      case 'RESTRICT':
+        return this.i18n.t('Restrict / mask');
+      case 'FORWARD_TO_AUTHORITY':
+        return this.i18n.t('Forward to authority');
+      default:
+        return value;
+    }
   }
 }

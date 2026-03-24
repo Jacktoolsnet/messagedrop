@@ -26,6 +26,7 @@ import { ReportedContentPayload } from '../../../../interfaces/reported-content.
 import { MatDialog } from '@angular/material/dialog';
 import { RouterLink } from '@angular/router';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
+import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { DecisionDialogComponent } from '../../decisions/decision-dialog/decision-dialog.component';
 import { NoticeDetailComponent } from '../notice-detail/notice-detail.component';
 import { NotifyDialogComponent } from '../notify-dialog/notify-dialog.component';
@@ -62,6 +63,7 @@ export class NoticesComponent implements OnInit, OnDestroy {
   private snack = inject(MatSnackBar);
   private fb = inject(FormBuilder);
   private dialog = inject(MatDialog);
+  readonly i18n = inject(TranslationHelperService);
 
   protected loading = signal(false);
   protected notices = signal<DsaNotice[]>([]);
@@ -134,7 +136,7 @@ export class NoticesComponent implements OnInit, OnDestroy {
     this.loading.set(true);
     this.dsa.listNotices(this.toFilters()).subscribe({
       next: rows => this.notices.set(rows || []),
-      error: () => this.snack.open('Could not load notices.', 'OK', { duration: 3000 }),
+      error: () => this.snack.open(this.i18n.t('Could not load notices.'), this.i18n.t('OK'), { duration: 3000 }),
       complete: () => this.loading.set(false)
     });
   }
@@ -169,7 +171,7 @@ export class NoticesComponent implements OnInit, OnDestroy {
     if (range === '24h') return '24h';
     if (range === '7d') return '7d';
     if (range === '30d') return '30d';
-    return 'All';
+    return this.i18n.t('All');
   }
 
   /** Detail öffnen (Dialog – Placeholder; Komponente liefern wir im nächsten Schritt) */
@@ -223,7 +225,10 @@ export class NoticesComponent implements OnInit, OnDestroy {
       DECIDED: { label: 'Decided', icon: 'gavel', class: 'status-decided' },
     };
 
-  statusLabel(s: string) { const k = s as DsaNoticeStatus; return this.STATUS_META[k]?.label ?? s; }
+  statusLabel(s: string) {
+    const k = s as DsaNoticeStatus;
+    return this.i18n.t(this.STATUS_META[k]?.label ?? s);
+  }
   statusIcon(s: string) { const k = s as DsaNoticeStatus; return this.STATUS_META[k]?.icon ?? 'help'; }
   statusClass(s: string) { const k = s as DsaNoticeStatus; return this.STATUS_META[k]?.class ?? 'status-default'; }
 
@@ -255,9 +260,23 @@ export class NoticesComponent implements OnInit, OnDestroy {
 
     ref.afterClosed().subscribe(sent => {
       if (sent) {
-        this.snack.open('Notification sent.', 'OK', { duration: 2500 });
+        this.snack.open(this.i18n.t('Notification sent.'), this.i18n.t('OK'), { duration: 2500 });
         this.reload(); // optional – falls z. B. Audit neu geladen werden soll
       }
     });
+  }
+
+  contentTypeLabel(value: string | null | undefined): string {
+    switch ((value || '').toLowerCase()) {
+      case 'public_message':
+      case 'public message':
+        return this.i18n.t('Public message');
+      case 'comment':
+        return this.i18n.t('Comment');
+      case 'profile':
+        return this.i18n.t('Profile');
+      default:
+        return value || '';
+    }
   }
 }

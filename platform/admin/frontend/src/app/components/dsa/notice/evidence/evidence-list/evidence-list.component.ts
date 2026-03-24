@@ -8,6 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DsaEvidence } from '../../../../../interfaces/dsa-evidence.interface';
 import { DsaService } from '../../../../../services/dsa/dsa/dsa.service';
+import { TranslationHelperService } from '../../../../../services/translation-helper.service';
 import { AddEvidenceDialogComponent } from '../add-evidence-dialog/add-evidence-dialog.component';
 import { HttpResponse } from '@angular/common/http';
 
@@ -25,6 +26,7 @@ export class EvidenceListComponent implements OnInit, OnChanges {
   private snack = inject(MatSnackBar);
   private dialog = inject(MatDialog);
   private clipboard = inject(Clipboard);
+  readonly i18n = inject(TranslationHelperService);
 
   loading = signal(false);
   items = signal<DsaEvidence[]>([]);
@@ -45,7 +47,7 @@ export class EvidenceListComponent implements OnInit, OnChanges {
     this.loading.set(true);
     this.dsa.getEvidenceForNotice(this.noticeId).subscribe({
       next: rows => this.items.set(rows || []),
-      error: () => this.snack.open('Could not load evidence.', 'OK', { duration: 3000 }),
+      error: () => this.snack.open(this.i18n.t('Could not load evidence.'), this.i18n.t('OK'), { duration: 3000 }),
       complete: () => this.loading.set(false)
     });
   }
@@ -62,7 +64,7 @@ export class EvidenceListComponent implements OnInit, OnChanges {
     this.dsa.addEvidenceScreenshot(this.noticeId, { url: e.url, fullPage: true, viewport: { width: 1280, height: 800 } })
       .subscribe({
         next: () => {
-          this.snack.open('Screenshot added.', 'OK', { duration: 2000 });
+          this.snack.open(this.i18n.t('Screenshot added.'), this.i18n.t('OK'), { duration: 2000 });
           this.load();
         },
         error: () => { /* error snackbar handled in service */ },
@@ -72,9 +74,9 @@ export class EvidenceListComponent implements OnInit, OnChanges {
 
   labelForType(type: string): string {
     switch (type) {
-      case 'file': return 'File upload';
-      case 'url': return 'External URL';
-      case 'hash': return 'Hash digest';
+      case 'file': return this.i18n.t('File upload');
+      case 'url': return this.i18n.t('External URL');
+      case 'hash': return this.i18n.t('Hash digest');
       default: return type;
     }
   }
@@ -91,11 +93,11 @@ export class EvidenceListComponent implements OnInit, OnChanges {
 
   copyUrl(url?: string | null): void {
     if (!url) {
-      this.snack.open('No URL to copy.', 'OK', { duration: 2000 });
+      this.snack.open(this.i18n.t('No URL to copy.'), this.i18n.t('OK'), { duration: 2000 });
       return;
     }
     const ok = this.clipboard.copy(url);
-    this.snack.open(ok ? 'URL copied to clipboard.' : 'Copy failed.', 'OK', { duration: 2000 });
+    this.snack.open(this.i18n.t(ok ? 'URL copied to clipboard.' : 'Copy failed.'), this.i18n.t('OK'), { duration: 2000 });
   }
 
   downloadFile(e: DsaEvidence): void {
@@ -104,7 +106,7 @@ export class EvidenceListComponent implements OnInit, OnChanges {
       next: (response: HttpResponse<Blob>) => {
         const blob = response.body;
         if (!blob) {
-          this.snack.open('Empty file received.', 'OK', { duration: 2500 });
+          this.snack.open(this.i18n.t('Empty file received.'), this.i18n.t('OK'), { duration: 2500 });
           return;
         }
         const filename = this.resolveFilename(response, e.fileName || 'evidence');
@@ -118,7 +120,7 @@ export class EvidenceListComponent implements OnInit, OnChanges {
         window.URL.revokeObjectURL(url);
       },
       error: () => {
-        this.snack.open('Could not download evidence.', 'OK', { duration: 3000 });
+        this.snack.open(this.i18n.t('Could not download evidence.'), this.i18n.t('OK'), { duration: 3000 });
       }
     });
   }

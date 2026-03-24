@@ -16,6 +16,7 @@ import { PlatformUserModeration, PlatformUserSummary } from '../../../../interfa
 import { PublicMessageDetailData } from '../../../../interfaces/public-message-detail-data.interface';
 import { PublicMessage } from '../../../../interfaces/public-message.interface';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
+import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { TranslateService } from '../../../../services/translate-service/translate-service.service';
 import { parsePublicMessageDetailContent } from '../../../../utils/reported-content.util';
 import { ConfirmDialogComponent } from '../../../shared/confirm-dialog.component';
@@ -39,6 +40,7 @@ export class SignalDetailComponent implements OnInit {
   private sanitizer = inject(DomSanitizer);
   private translator = inject(TranslateService);
   private dsa = inject(DsaService);
+  readonly i18n = inject(TranslationHelperService);
   protected data = inject<PublicMessageDetailData>(MAT_DIALOG_DATA);
 
   // Inhalt
@@ -172,14 +174,14 @@ export class SignalDetailComponent implements OnInit {
 
   promoteSignal() {
     if (this.data.source !== 'signal' || !this.data.signalId) {
-      this.snack.open('No signal id available.', 'OK', { duration: 2000 });
+      this.snack.open(this.i18n.t('No signal id available.'), this.i18n.t('OK'), { duration: 2000 });
       return;
     }
     if (this.actionBusy()) return;
     this.actionBusy.set(true);
     this.dsa.promoteSignal(this.data.signalId).subscribe({
       next: () => {
-        this.snack.open('Signal promoted to Notice.', 'OK', { duration: 3000 });
+        this.snack.open(this.i18n.t('Signal promoted to Notice.'), this.i18n.t('OK'), { duration: 3000 });
         this.ref.close(true);
       },
       error: () => {
@@ -190,7 +192,7 @@ export class SignalDetailComponent implements OnInit {
 
   dismissSignal() {
     if (this.data.source !== 'signal' || !this.data.signalId) {
-      this.snack.open('No signal id available.', 'OK', { duration: 2000 });
+      this.snack.open(this.i18n.t('No signal id available.'), this.i18n.t('OK'), { duration: 2000 });
       return;
     }
     const ref = this.dialog.open(ConfirmDialogComponent, {
@@ -209,7 +211,7 @@ export class SignalDetailComponent implements OnInit {
       this.actionBusy.set(true);
       this.dsa.deleteSignal(this.data.signalId!).subscribe({
         next: () => {
-          this.snack.open('Signal deleted.', 'OK', { duration: 2500 });
+          this.snack.open(this.i18n.t('Signal deleted.'), this.i18n.t('OK'), { duration: 2500 });
           this.ref.close(true);
         },
         error: () => this.actionBusy.set(false)
@@ -299,13 +301,13 @@ export class SignalDetailComponent implements OnInit {
   translateMessage() {
     const text = this.msg()?.message?.trim();
     if (!text) {
-      this.snack.open('No message to translate.', 'OK', { duration: 2000 });
+      this.snack.open(this.i18n.t('No message to translate.'), this.i18n.t('OK'), { duration: 2000 });
       return;
     }
     this.loadingMsg.set(true);
     this.translator.translateToGerman(text).subscribe({
       next: (t) => this.tMsg.set(t),
-      error: () => this.snack.open('Translation failed.', 'OK', { duration: 2500 }),
+      error: () => this.snack.open(this.i18n.t('Translation failed.'), this.i18n.t('OK'), { duration: 2500 }),
       complete: () => this.loadingMsg.set(false)
     });
   }
@@ -313,40 +315,40 @@ export class SignalDetailComponent implements OnInit {
   translateReason() {
     const text = this.data.reasonText?.trim();
     if (!text) {
-      this.snack.open('No reason to translate.', 'OK', { duration: 2000 });
+      this.snack.open(this.i18n.t('No reason to translate.'), this.i18n.t('OK'), { duration: 2000 });
       return;
     }
     this.loadingReason.set(true);
     this.translator.translateToGerman(text).subscribe({
       next: (t) => this.tReason.set(t),
-      error: () => this.snack.open('Translation failed.', 'OK', { duration: 2500 }),
+      error: () => this.snack.open(this.i18n.t('Translation failed.'), this.i18n.t('OK'), { duration: 2500 }),
       complete: () => this.loadingReason.set(false)
     });
   }
 
   formatScore(value?: number | null): string {
-    return Number.isFinite(value) ? Number(value).toFixed(3) : '—';
+    return Number.isFinite(value) ? Number(value).toFixed(3) : this.i18n.t('—');
   }
 
   formatBool(value?: boolean | number | null): string {
-    if (value === undefined || value === null) return '—';
-    return value === true || value === 1 ? 'Yes' : 'No';
+    if (value === undefined || value === null) return this.i18n.t('—');
+    return value === true || value === 1 ? this.i18n.t('Yes') : this.i18n.t('No');
   }
 
   formatTimestamp(value?: number | null): string {
-    if (!Number.isFinite(value)) return '—';
+    if (!Number.isFinite(value)) return this.i18n.t('—');
     const ts = Number(value);
     try {
-      return new Date(ts).toLocaleString(navigator.language || undefined);
+      return new Date(ts).toLocaleString(this.i18n.dateLocale());
     } catch {
       return new Date(ts).toISOString();
     }
   }
 
   formatBlockUntil(value?: number | null): string {
-    if (!Number.isFinite(value)) return '—';
+    if (!Number.isFinite(value)) return this.i18n.t('—');
     const ts = Number(value);
-    if (ts <= 0) return '—';
+    if (ts <= 0) return this.i18n.t('—');
     return this.formatTimestamp(ts);
   }
 
@@ -372,7 +374,7 @@ export class SignalDetailComponent implements OnInit {
       return true;
     }
 
-    this.snack.open('Please select a future date and time for a temporary block.', 'OK', { duration: 3000 });
+    this.snack.open(this.i18n.t('Please select a future date and time for a temporary block.'), this.i18n.t('OK'), { duration: 3000 });
     return false;
   }
 
@@ -430,9 +432,9 @@ export class SignalDetailComponent implements OnInit {
       case 'youtube': return 'YouTube';
       case 'spotify': return 'Spotify';
       case 'tiktok': return 'TikTok';
-      case 'tenor': return 'Tenor GIF';
-      case 'image': return 'Bild';
-      default: return 'Text';
+      case 'tenor': return this.i18n.t('Tenor GIF');
+      case 'image': return this.i18n.t('Image');
+      default: return this.i18n.t('Text');
     }
   }
 

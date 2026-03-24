@@ -7,6 +7,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { DsaAppeal } from '../../../../interfaces/dsa-appeal.interface';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
+import { TranslationHelperService } from '../../../../services/translation-helper.service';
 
 @Component({
   selector: 'app-notice-appeals',
@@ -20,6 +21,7 @@ export class NoticeAppealsComponent implements OnChanges {
 
   private readonly dsa = inject(DsaService);
   private readonly snack = inject(MatSnackBar);
+  readonly i18n = inject(TranslationHelperService);
 
   readonly loading = signal(false);
   readonly appeals = signal<DsaAppeal[]>([]);
@@ -46,14 +48,23 @@ export class NoticeAppealsComponent implements OnChanges {
       },
       error: () => {
         this.loading.set(false);
-        this.snack.open('Could not load appeals.', 'OK', { duration: 3000 });
+        this.snack.open(this.i18n.t('Could not load appeals.'), this.i18n.t('OK'), { duration: 3000 });
       }
     });
   }
 
   outcomeLabel(appeal: DsaAppeal): string {
-    if (!appeal.outcome) return 'Pending';
-    return appeal.outcome.replace(/_/g, ' ').toLowerCase();
+    if (!appeal.outcome) return this.i18n.t('Pending');
+    switch ((appeal.outcome || '').toUpperCase()) {
+      case 'UPHELD':
+        return this.i18n.t('Upheld');
+      case 'OVERTURNED':
+        return this.i18n.t('Overturned');
+      case 'PARTIALLY_UPHELD':
+        return this.i18n.t('Partially upheld');
+      default:
+        return appeal.outcome.replace(/_/g, ' ').toLowerCase();
+    }
   }
 
   outcomeClass(appeal: DsaAppeal): string {
@@ -67,8 +78,19 @@ export class NoticeAppealsComponent implements OnChanges {
   }
 
   formatOutcome(value: string | null | undefined): string {
-    if (!value) return '—';
-    return value.replace(/_/g, ' ').toLowerCase();
+    if (!value) return this.i18n.t('—');
+    switch ((value || '').toUpperCase()) {
+      case 'REMOVE_CONTENT':
+        return this.i18n.t('Remove content');
+      case 'RESTRICT':
+        return this.i18n.t('Restrict / mask');
+      case 'NO_ACTION':
+        return this.i18n.t('No action');
+      case 'FORWARD_TO_AUTHORITY':
+        return this.i18n.t('Forward to authority');
+      default:
+        return value.replace(/_/g, ' ').toLowerCase();
+    }
   }
 
   isResolved(appeal: DsaAppeal): boolean {

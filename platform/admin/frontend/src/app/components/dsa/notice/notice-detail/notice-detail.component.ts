@@ -15,6 +15,7 @@ import { DsaNoticeStatus } from '../../../../interfaces/dsa-notice-status.type';
 import { DsaNotice } from '../../../../interfaces/dsa-notice.interface';
 import { PlatformUserModeration, PlatformUserSummary } from '../../../../interfaces/platform-user-moderation.interface';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
+import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { DecisionDialogComponent, DecisionDialogResult, DecisionOutcome } from '../../decisions/decision-dialog/decision-dialog.component';
 import { DecisionSummaryComponent } from '../../decisions/decision-summary/decision-summary.component';
 import { NoticeAppealsComponent } from '../appeals/notice-appeals.component';
@@ -58,6 +59,7 @@ export class NoticeDetailComponent implements OnInit {
   private dialog = inject(MatDialog);
   private snack = inject(MatSnackBar);
   private sanitizer = inject(DomSanitizer);
+  readonly i18n = inject(TranslationHelperService);
   makingScreenshot = signal(false);
   private dirty = false;
 
@@ -163,7 +165,7 @@ export class NoticeDetailComponent implements OnInit {
     const visible = outcome === 'NO_ACTION';
     this.dsa.setPublicMessageVisibility(contentId, visible).subscribe({
       error: () => {
-        this.snack.open('Could not update public visibility.', 'OK', { duration: 3000 });
+        this.snack.open(this.i18n.t('Could not update public visibility.'), this.i18n.t('OK'), { duration: 3000 });
       }
     });
   }
@@ -192,29 +194,29 @@ export class NoticeDetailComponent implements OnInit {
           if (res.status === 200 && res.result?.text) {
             state.update(s => ({ ...s, translated: res.result!.text, loading: false }));
           } else {
-            state.update(s => ({ ...s, error: res.error || 'Translation failed', loading: false }));
+            state.update(s => ({ ...s, error: res.error || this.i18n.t('Translation failed.'), loading: false }));
           }
         },
         error: () => {
-          state.update(s => ({ ...s, error: 'Network error while translating', loading: false }));
+          state.update(s => ({ ...s, error: this.i18n.t('Network error while translating'), loading: false }));
         }
       });
   }
 
   formatScore(value?: number | null): string {
-    return Number.isFinite(value) ? Number(value).toFixed(3) : '—';
+    return Number.isFinite(value) ? Number(value).toFixed(3) : this.i18n.t('—');
   }
 
   formatBool(value?: boolean | number | null): string {
-    if (value === undefined || value === null) return '—';
-    return value === true || value === 1 ? 'Yes' : 'No';
+    if (value === undefined || value === null) return this.i18n.t('—');
+    return value === true || value === 1 ? this.i18n.t('Yes') : this.i18n.t('No');
   }
 
   formatTimestamp(value?: number | null): string {
-    if (!Number.isFinite(value)) return '—';
+    if (!Number.isFinite(value)) return this.i18n.t('—');
     const ts = Number(value);
     try {
-      return new Date(ts).toLocaleString(navigator.language || undefined);
+      return new Date(ts).toLocaleString(this.i18n.dateLocale());
     } catch {
       return new Date(ts).toISOString();
     }
@@ -239,7 +241,7 @@ export class NoticeDetailComponent implements OnInit {
         next: () => {
           this.makingScreenshot.set(false);
           this.evidenceList?.load();
-          this.snack.open('Screenshot added as evidence.', 'OK', { duration: 2500 });
+          this.snack.open(this.i18n.t('Screenshot added as evidence.'), this.i18n.t('OK'), { duration: 2500 });
         },
         error: () => this.makingScreenshot.set(false)
       });
@@ -325,9 +327,9 @@ export class NoticeDetailComponent implements OnInit {
   }
 
   formatBlockUntil(value?: number | null): string {
-    if (!Number.isFinite(value)) return '—';
+    if (!Number.isFinite(value)) return this.i18n.t('—');
     const ts = Number(value);
-    if (ts <= 0) return '—';
+    if (ts <= 0) return this.i18n.t('—');
     return this.formatTimestamp(ts);
   }
 
@@ -353,7 +355,7 @@ export class NoticeDetailComponent implements OnInit {
       return true;
     }
 
-    this.snack.open('Please select a future date and time for a temporary block.', 'OK', { duration: 3000 });
+    this.snack.open(this.i18n.t('Please select a future date and time for a temporary block.'), this.i18n.t('OK'), { duration: 3000 });
     return false;
   }
 
@@ -386,6 +388,20 @@ export class NoticeDetailComponent implements OnInit {
       return;
     }
     this.accountReason.set(next);
+  }
+
+  contentTypeLabel(value: string | null | undefined): string {
+    switch ((value || '').toLowerCase()) {
+      case 'public_message':
+      case 'public message':
+        return this.i18n.t('Public message');
+      case 'comment':
+        return this.i18n.t('Comment');
+      case 'profile':
+        return this.i18n.t('Profile');
+      default:
+        return value || '';
+    }
   }
 
   private updateMediaFromContent(): void {

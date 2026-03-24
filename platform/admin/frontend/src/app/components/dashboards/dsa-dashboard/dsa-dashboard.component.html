@@ -1,12 +1,12 @@
 <mat-toolbar color="primary">
   <!-- Home -->
-  <button mat-icon-button routerLink="/dashboard" aria-label="Dashboard Home">
+  <button mat-icon-button routerLink="/dashboard" [attr.aria-label]="i18n.t('Dashboard Home')">
     <mat-icon>home</mat-icon>
   </button>
 
   <!-- Titel -->
   <span class="toolbar-title">
-    Digital Services Act
+    {{ i18n.t('Digital Services Act') }}
   </span>
 </mat-toolbar>
 

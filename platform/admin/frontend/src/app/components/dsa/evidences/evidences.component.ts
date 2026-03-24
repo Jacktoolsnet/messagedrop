@@ -21,6 +21,7 @@ import { DsaNoticeFilters, DsaNoticeRange } from '../../../interfaces/dsa-notice
 import { DSA_NOTICE_STATUSES, DsaNoticeStatus } from '../../../interfaces/dsa-notice-status.type';
 import { DsaNotice } from '../../../interfaces/dsa-notice.interface';
 import { DsaService } from '../../../services/dsa/dsa/dsa.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { EvidenceListComponent } from '../notice/evidence/evidence-list/evidence-list.component';
 import { NoticeDetailComponent } from '../notice/notice-detail/notice-detail.component';
 
@@ -59,6 +60,7 @@ export class EvidencesComponent implements OnInit, OnDestroy {
   private readonly dsa = inject(DsaService);
   private readonly snack = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
+  readonly i18n = inject(TranslationHelperService);
 
   readonly statuses = DSA_NOTICE_STATUSES;
 
@@ -123,7 +125,7 @@ export class EvidencesComponent implements OnInit, OnDestroy {
 
   statusLabel(status: string): string {
     const meta = this.statusMeta[status as DsaNoticeStatus];
-    return meta?.label ?? status;
+    return this.i18n.t(meta?.label ?? status);
   }
 
   statusIcon(status: string): string {
@@ -165,12 +167,26 @@ export class EvidencesComponent implements OnInit, OnDestroy {
         this.loading.set(false);
       },
       error: () => {
-        this.snack.open('Could not load notices.', 'OK', { duration: 3000 });
+        this.snack.open(this.i18n.t('Could not load notices.'), this.i18n.t('OK'), { duration: 3000 });
         this.notices.set([]);
         this.selectedNotice.set(null);
         this.loading.set(false);
       }
     });
+  }
+
+  contentTypeLabel(value: string | null | undefined): string {
+    switch ((value || '').toLowerCase()) {
+      case 'public message':
+      case 'public_message':
+        return this.i18n.t('Public message');
+      case 'comment':
+        return this.i18n.t('Comment');
+      case 'profile':
+        return this.i18n.t('Profile');
+      default:
+        return value || '';
+    }
   }
 
   private syncSelection(rows: DsaNotice[]): void {

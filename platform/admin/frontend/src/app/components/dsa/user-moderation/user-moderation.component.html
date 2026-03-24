@@ -1,8 +1,8 @@
 <mat-toolbar>
-  <button mat-icon-button routerLink="/dashboard/dsa" aria-label="Back">
+  <button mat-icon-button routerLink="/dashboard/dsa" [attr.aria-label]="i18n.t('Back')">
     <mat-icon>arrow_back</mat-icon>
   </button>
-  <span class="toolbar-title">User Moderation</span>
+  <span class="toolbar-title">{{ i18n.t('User Moderation') }}</span>
 </mat-toolbar>
 
 @if (loading()) {
@@ -15,20 +15,20 @@
       <div mat-card-avatar class="lookup-avatar">
         <mat-icon>manage_accounts</mat-icon>
       </div>
-      <mat-card-title>Lookup platform user</mat-card-title>
-      <mat-card-subtitle>Enter the user id from a signal, notice or complaint</mat-card-subtitle>
+      <mat-card-title>{{ i18n.t('Lookup platform user') }}</mat-card-title>
+      <mat-card-subtitle>{{ i18n.t('Enter the user id from a signal, notice or complaint') }}</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
       <form class="lookup-form" [formGroup]="form" (ngSubmit)="lookup()">
         <mat-form-field appearance="outline" subscriptSizing="dynamic" class="user-field">
-          <mat-label>User ID</mat-label>
-          <input matInput [formControl]="form.controls.userId" placeholder="UUID user id">
+          <mat-label>{{ i18n.t('User ID') }}</mat-label>
+          <input matInput [formControl]="form.controls.userId" [placeholder]="i18n.t('UUID user id')">
         </mat-form-field>
 
         <div class="lookup-actions">
           <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || loading()">
             <mat-icon>search</mat-icon>
-            Load user
+            {{ i18n.t('Load user') }}
           </button>
         </div>
       </form>
@@ -40,25 +40,25 @@
       <div mat-card-avatar class="tile-avatar avatar-accent">
         <mat-icon>mark_email_unread</mat-icon>
       </div>
-      <mat-card-title>Open user appeals</mat-card-title>
-      <mat-card-subtitle>{{ openAppealsCount() }} open</mat-card-subtitle>
+      <mat-card-title>{{ i18n.t('Open user appeals') }}</mat-card-title>
+      <mat-card-subtitle>{{ openAppealsCount() }} {{ i18n.t('open') }}</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
       @if (openAppeals().length === 0) {
-      <div class="empty-state">There are currently no open user moderation appeals.</div>
+      <div class="empty-state">{{ i18n.t('There are currently no open user moderation appeals.') }}</div>
       } @else {
       <div class="appeals-list compact-list">
         @for (appeal of openAppeals(); track appeal.id) {
         <button type="button" class="appeal-item appeal-item-button" (click)="loadUserFromAppeal(appeal)">
           <div class="appeal-header-row">
             <div>
-              <div class="appeal-title">{{ appeal.target === 'posting' ? 'Posting appeal' : 'Account appeal' }}</div>
-              <div class="appeal-meta">User {{ appeal.userId }}</div>
+              <div class="appeal-title">{{ appeal.target === 'posting' ? i18n.t('Posting appeal') : i18n.t('Account appeal') }}</div>
+              <div class="appeal-meta">{{ i18n.t('User {{userId}}', { userId: appeal.userId }) }}</div>
             </div>
-            <span class="appeal-status open">Open</span>
+            <span class="appeal-status open">{{ i18n.t('Open') }}</span>
           </div>
           <p class="appeal-message">{{ appeal.message }}</p>
-          <div class="appeal-meta">Filed {{ formatTimestamp(appeal.createdAt) }}</div>
+          <div class="appeal-meta">{{ i18n.t('Filed {{date}}', { date: formatTimestamp(appeal.createdAt) }) }}</div>
         </button>
         }
       </div>
@@ -69,18 +69,18 @@
   @if (moderation(); as moderationState) {
   <div class="results-header">
     <div>
-      <div class="section-eyebrow">Moderation overview</div>
-      <h2 class="results-title">Current state</h2>
+      <div class="section-eyebrow">{{ i18n.t('Moderation overview') }}</div>
+      <h2 class="results-title">{{ i18n.t('Current state') }}</h2>
     </div>
     <div class="results-header-side">
       @if (hasActiveBlock()) {
       <button mat-stroked-button type="button" class="quick-reset-button" (click)="unblockAll()" [disabled]="loading()">
         <mat-icon>lock_reset</mat-icon>
-        Remove all blocks
+        {{ i18n.t('Remove all blocks') }}
       </button>
       }
       <div class="user-id-badge">
-        <div class="user-id-label">User ID</div>
+        <div class="user-id-label">{{ i18n.t('User ID') }}</div>
         <div class="user-id-value">{{ form.controls.userId.value }}</div>
       </div>
     </div>
@@ -92,27 +92,27 @@
         <div mat-card-avatar class="tile-avatar avatar-warn">
           <mat-icon>block</mat-icon>
         </div>
-        <mat-card-title>Posting status</mat-card-title>
+        <mat-card-title>{{ i18n.t('Posting status') }}</mat-card-title>
         <mat-card-subtitle>
           <span class="status-pill" [class.blocked]="moderationState.posting.blocked" [class.active]="!moderationState.posting.blocked">
-            {{ moderationState.posting.blocked ? 'Blocked' : 'Active' }}
+            {{ moderationState.posting.blocked ? i18n.t('Blocked') : i18n.t('Active') }}
           </span>
         </mat-card-subtitle>
       </mat-card-header>
       <mat-card-content class="detail-list">
         <div class="detail-row">
-          <span class="detail-label">Reason</span>
+          <span class="detail-label">{{ i18n.t('Reason') }}</span>
           <span class="detail-value">{{ formatReason(moderationState.posting.reason, 'posting') }}</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Until</span>
+          <span class="detail-label">{{ i18n.t('Until') }}</span>
           <span class="detail-value">{{ formatTimestamp(moderationState.posting.blockedUntil) }}</span>
         </div>
 
         <div class="tile-form-section">
-          <div class="tile-form-title">Block reason</div>
+          <div class="tile-form-title">{{ i18n.t('Block reason') }}</div>
           <mat-form-field appearance="outline" subscriptSizing="dynamic" class="full-width-field">
-            <mat-label>Posting block reason</mat-label>
+            <mat-label>{{ i18n.t('Posting block reason') }}</mat-label>
             <mat-select [formControl]="form.controls.postingReason">
               @for (option of postingReasonOptions; track option.code) {
               <mat-option [value]="option.code">{{ option.label }}</mat-option>
@@ -122,16 +122,16 @@
         </div>
 
         <div class="tile-form-section">
-          <div class="tile-form-title">Temporary block</div>
+          <div class="tile-form-title">{{ i18n.t('Temporary block') }}</div>
           <div class="inline-expiry-group">
             <mat-form-field appearance="outline" subscriptSizing="dynamic" class="inline-expiry-field">
-              <mat-label>Until date</mat-label>
+              <mat-label>{{ i18n.t('Until date') }}</mat-label>
               <input matInput class="hide-placeholder" placeholder="" [matDatepicker]="postingDatePicker" [min]="minimumBlockDate()" [formControl]="form.controls.postingBlockedUntilDate">
               <mat-datepicker-toggle matIconSuffix [for]="postingDatePicker"></mat-datepicker-toggle>
               <mat-datepicker #postingDatePicker></mat-datepicker>
             </mat-form-field>
             <mat-form-field appearance="outline" subscriptSizing="dynamic" class="inline-expiry-field">
-              <mat-label>Until time</mat-label>
+              <mat-label>{{ i18n.t('Until time') }}</mat-label>
               <input matInput class="hide-placeholder" placeholder="" [matTimepicker]="postingTimePicker" [matTimepickerMin]="minimumBlockTime('posting')" [formControl]="form.controls.postingBlockedUntilTime">
               <mat-timepicker-toggle matIconSuffix [for]="postingTimePicker"></mat-timepicker-toggle>
               <mat-timepicker #postingTimePicker></mat-timepicker>
@@ -143,12 +143,12 @@
         @if (!moderationState.posting.blocked) {
         <button mat-stroked-button color="warn" (click)="blockPosting()" [disabled]="loading() || form.controls.postingReason.invalid">
           <mat-icon>block</mat-icon>
-          Block posting
+          {{ i18n.t('Block posting') }}
         </button>
         } @else {
         <button mat-stroked-button (click)="unblockPosting()" [disabled]="loading()">
           <mat-icon>check_circle</mat-icon>
-          Unblock posting
+          {{ i18n.t('Unblock posting') }}
         </button>
         }
       </mat-card-actions>
@@ -159,27 +159,27 @@
         <div mat-card-avatar class="tile-avatar avatar-neutral">
           <mat-icon>lock</mat-icon>
         </div>
-        <mat-card-title>Account status</mat-card-title>
+        <mat-card-title>{{ i18n.t('Account status') }}</mat-card-title>
         <mat-card-subtitle>
           <span class="status-pill" [class.blocked]="moderationState.account.blocked" [class.active]="!moderationState.account.blocked">
-            {{ moderationState.account.blocked ? 'Blocked' : 'Active' }}
+            {{ moderationState.account.blocked ? i18n.t('Blocked') : i18n.t('Active') }}
           </span>
         </mat-card-subtitle>
       </mat-card-header>
       <mat-card-content class="detail-list">
         <div class="detail-row">
-          <span class="detail-label">Reason</span>
+          <span class="detail-label">{{ i18n.t('Reason') }}</span>
           <span class="detail-value">{{ formatReason(moderationState.account.reason, 'account') }}</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Until</span>
+          <span class="detail-label">{{ i18n.t('Until') }}</span>
           <span class="detail-value">{{ formatTimestamp(moderationState.account.blockedUntil) }}</span>
         </div>
 
         <div class="tile-form-section">
-          <div class="tile-form-title">Block reason</div>
+          <div class="tile-form-title">{{ i18n.t('Block reason') }}</div>
           <mat-form-field appearance="outline" subscriptSizing="dynamic" class="full-width-field">
-            <mat-label>Account block reason</mat-label>
+            <mat-label>{{ i18n.t('Account block reason') }}</mat-label>
             <mat-select [formControl]="form.controls.accountReason">
               @for (option of accountReasonOptions; track option.code) {
               <mat-option [value]="option.code">{{ option.label }}</mat-option>
@@ -189,16 +189,16 @@
         </div>
 
         <div class="tile-form-section">
-          <div class="tile-form-title">Temporary block</div>
+          <div class="tile-form-title">{{ i18n.t('Temporary block') }}</div>
           <div class="inline-expiry-group">
             <mat-form-field appearance="outline" subscriptSizing="dynamic" class="inline-expiry-field">
-              <mat-label>Until date</mat-label>
+              <mat-label>{{ i18n.t('Until date') }}</mat-label>
               <input matInput class="hide-placeholder" placeholder="" [matDatepicker]="accountDatePicker" [min]="minimumBlockDate()" [formControl]="form.controls.accountBlockedUntilDate">
               <mat-datepicker-toggle matIconSuffix [for]="accountDatePicker"></mat-datepicker-toggle>
               <mat-datepicker #accountDatePicker></mat-datepicker>
             </mat-form-field>
             <mat-form-field appearance="outline" subscriptSizing="dynamic" class="inline-expiry-field">
-              <mat-label>Until time</mat-label>
+              <mat-label>{{ i18n.t('Until time') }}</mat-label>
               <input matInput class="hide-placeholder" placeholder="" [matTimepicker]="accountTimePicker" [matTimepickerMin]="minimumBlockTime('account')" [formControl]="form.controls.accountBlockedUntilTime">
               <mat-timepicker-toggle matIconSuffix [for]="accountTimePicker"></mat-timepicker-toggle>
               <mat-timepicker #accountTimePicker></mat-timepicker>
@@ -210,12 +210,12 @@
         @if (!moderationState.account.blocked) {
         <button mat-stroked-button color="warn" (click)="blockAccount()" [disabled]="loading() || form.controls.accountReason.invalid">
           <mat-icon>lock</mat-icon>
-          Block account
+          {{ i18n.t('Block account') }}
         </button>
         } @else {
         <button mat-stroked-button (click)="unblockAccount()" [disabled]="loading()">
           <mat-icon>lock_open</mat-icon>
-          Unblock account
+          {{ i18n.t('Unblock account') }}
         </button>
         }
       </mat-card-actions>
@@ -226,19 +226,19 @@
         <div mat-card-avatar class="tile-avatar avatar-accent">
           <mat-icon>report</mat-icon>
         </div>
-        <mat-card-title>Signals</mat-card-title>
+        <mat-card-title>{{ i18n.t('Signals') }}</mat-card-title>
       </mat-card-header>
       <mat-card-content class="detail-list">
         <div class="detail-row">
-          <span class="detail-label">Total</span>
+          <span class="detail-label">{{ i18n.t('Total') }}</span>
           <span class="detail-value">{{ summary()?.signals?.total ?? 0 }}</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Open</span>
+          <span class="detail-label">{{ i18n.t('Open') }}</span>
           <span class="detail-value">{{ summary()?.signals?.open ?? 0 }}</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Dismissed</span>
+          <span class="detail-label">{{ i18n.t('Dismissed') }}</span>
           <span class="detail-value">{{ summary()?.signals?.dismissed ?? 0 }}</span>
         </div>
       </mat-card-content>
@@ -249,19 +249,19 @@
         <div mat-card-avatar class="tile-avatar avatar-success">
           <mat-icon>gavel</mat-icon>
         </div>
-        <mat-card-title>Notices & decisions</mat-card-title>
+        <mat-card-title>{{ i18n.t('Notices & decisions') }}</mat-card-title>
       </mat-card-header>
       <mat-card-content class="detail-list">
         <div class="detail-row">
-          <span class="detail-label">Notices total</span>
+          <span class="detail-label">{{ i18n.t('Notices total') }}</span>
           <span class="detail-value">{{ summary()?.notices?.total ?? 0 }}</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Notices open</span>
+          <span class="detail-label">{{ i18n.t('Notices open') }}</span>
           <span class="detail-value">{{ summary()?.notices?.open ?? 0 }}</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Enforced decisions</span>
+          <span class="detail-label">{{ i18n.t('Enforced decisions') }}</span>
           <span class="detail-value">{{ summary()?.decisions?.enforced ?? 0 }}</span>
         </div>
       </mat-card-content>
@@ -273,20 +273,20 @@
       <div mat-card-avatar class="tile-avatar avatar-accent">
         <mat-icon>mail</mat-icon>
       </div>
-      <mat-card-title>Appeals for this user</mat-card-title>
-      <mat-card-subtitle>{{ appeals().length }} total</mat-card-subtitle>
+      <mat-card-title>{{ i18n.t('Appeals for this user') }}</mat-card-title>
+      <mat-card-subtitle>{{ appeals().length }} {{ i18n.t('total') }}</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
       @if (appeals().length === 0) {
-      <div class="empty-state">No appeals have been submitted for this user yet.</div>
+      <div class="empty-state">{{ i18n.t('No appeals have been submitted for this user yet.') }}</div>
       } @else {
       <div class="appeals-list">
         @for (appeal of appeals(); track appeal.id) {
         <section class="appeal-item">
           <div class="appeal-header-row">
             <div>
-              <div class="appeal-title">{{ appeal.target === 'posting' ? 'Posting appeal' : 'Account appeal' }}</div>
-              <div class="appeal-meta">Filed {{ formatTimestamp(appeal.createdAt) }}</div>
+              <div class="appeal-title">{{ appeal.target === 'posting' ? i18n.t('Posting appeal') : i18n.t('Account appeal') }}</div>
+              <div class="appeal-meta">{{ i18n.t('Filed {{date}}', { date: formatTimestamp(appeal.createdAt) }) }}</div>
             </div>
             <span class="appeal-status" [class.open]="appeal.status === 'open'" [class.accepted]="appeal.status === 'accepted'" [class.rejected]="appeal.status === 'rejected'">
               {{ appealStatusLabel(appeal.status) }}
@@ -297,24 +297,24 @@
 
           @if (appeal.resolutionMessage) {
           <div class="appeal-resolution">
-            <strong>Resolution</strong>
+            <strong>{{ i18n.t('Resolution') }}</strong>
             <span>{{ appeal.resolutionMessage }}</span>
           </div>
           }
 
           @if (appeal.resolvedAt) {
-          <div class="appeal-meta">Resolved {{ formatTimestamp(appeal.resolvedAt) }} @if (appeal.reviewer) { · {{ appeal.reviewer }} }</div>
+          <div class="appeal-meta">{{ i18n.t('Resolved {{date}}', { date: formatTimestamp(appeal.resolvedAt) }) }} @if (appeal.reviewer) { · {{ appeal.reviewer }} }</div>
           }
 
           @if (appeal.status === 'open') {
           <div class="appeal-actions">
             <button mat-stroked-button color="primary" type="button" (click)="resolveAppeal(appeal, 'accepted')" [disabled]="loading()">
               <mat-icon>check_circle</mat-icon>
-              Accept appeal
+              {{ i18n.t('Accept appeal') }}
             </button>
             <button mat-stroked-button color="warn" type="button" (click)="resolveAppeal(appeal, 'rejected')" [disabled]="loading()">
               <mat-icon>cancel</mat-icon>
-              Reject appeal
+              {{ i18n.t('Reject appeal') }}
             </button>
           </div>
           }

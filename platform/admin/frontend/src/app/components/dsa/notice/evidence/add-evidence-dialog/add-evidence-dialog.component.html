@@ -1,33 +1,33 @@
-<h2 mat-dialog-title>Add evidence</h2>
+<h2 mat-dialog-title>{{ i18n.t('Add evidence') }}</h2>
 
 <div mat-dialog-content class="content">
     <form (ngSubmit)="submit()" [formGroup]="form" class="form">
         <mat-form-field appearance="outline">
-            <mat-label>Type</mat-label>
+            <mat-label>{{ i18n.t('Type') }}</mat-label>
             <mat-select formControlName="type">
                 <mat-option value="url">URL</mat-option>
-                <mat-option value="hash">Hash / digest</mat-option>
-                <mat-option value="file">File upload</mat-option>
+                <mat-option value="hash">{{ i18n.t('Hash / digest') }}</mat-option>
+                <mat-option value="file">{{ i18n.t('File upload') }}</mat-option>
             </mat-select>
         </mat-form-field>
 
         @if (form.controls.type.value === 'url') {
         <mat-form-field appearance="outline">
-            <mat-label>Evidence URL</mat-label>
+            <mat-label>{{ i18n.t('Evidence URL') }}</mat-label>
             <mat-icon matPrefix>link</mat-icon>
-            <input matInput formControlName="url" placeholder="https://…"
+            <input matInput formControlName="url" [placeholder]="i18n.t('https://…')"
                    (keydown.enter)="submit(); $event.preventDefault()" />
-            <button mat-icon-button matSuffix type="button" (click)="submit()" aria-label="Add URL">
+            <button mat-icon-button matSuffix type="button" (click)="submit()" [attr.aria-label]="i18n.t('Add URL')">
                 <mat-icon>add_link</mat-icon>
             </button>
-            <mat-hint align="start">http(s):// or www.example.com</mat-hint>
+            <mat-hint align="start">{{ i18n.t('http(s):// or www.example.com') }}</mat-hint>
         </mat-form-field>
         }
 
         @if (form.controls.type.value === 'hash') {
         <mat-form-field appearance="outline">
-            <mat-label>Hash</mat-label>
-            <input matInput formControlName="hash" placeholder="sha256:…" />
+            <mat-label>{{ i18n.t('Hash') }}</mat-label>
+            <input matInput formControlName="hash" [placeholder]="i18n.t('sha256:…')" />
         </mat-form-field>
         }
 
@@ -35,7 +35,7 @@
         <div class="file-upload">
             <label class="upload-label" for="evidence-file">
                 <mat-icon>upload_file</mat-icon>
-                <span>Select file (images or PDF, max. 5 MB)</span>
+                <span>{{ i18n.t('Select file (images or PDF, max. 5 MB)') }}</span>
             </label>
             <input id="evidence-file" type="file" (change)="onFileChange($event)"
                 accept=".pdf,image/*" />
@@ -47,7 +47,7 @@
             } @else {
             <div class="file-info muted">
                 <mat-icon>info</mat-icon>
-                <span>No file selected yet.</span>
+                <span>{{ i18n.t('No file selected yet.') }}</span>
             </div>
             }
         </div>
@@ -56,9 +56,9 @@
 </div>
 
 <div mat-dialog-actions align="end">
-    <button mat-stroked-button (click)="close()" [disabled]="saving()">Cancel</button>
+    <button mat-stroked-button (click)="close()" [disabled]="saving()">{{ i18n.t('Cancel') }}</button>
     <button mat-raised-button color="primary" type="button" (click)="submit()" [disabled]="saving()">
         <mat-icon>save</mat-icon>
-        Save
+        {{ i18n.t('Save') }}
     </button>
 </div>

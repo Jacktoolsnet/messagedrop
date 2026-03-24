@@ -10,13 +10,13 @@
     @if (!isPublished() && !isDeleted()) {
     <div class="toolbar-actions">
       <button mat-icon-button type="button" class="toolbar-action avatar avatar-accent" (click)="saveDraft()"
-        [disabled]="!canSaveContent()" aria-label="Save draft">
+        [disabled]="!canSaveContent()" [attr.aria-label]="i18n.t('Save draft')">
         <mat-icon>save</mat-icon>
       </button>
 
       @if (canPublish()) {
       <button mat-icon-button type="button" class="toolbar-action avatar avatar-success" (click)="saveAndPublish()"
-        [disabled]="!canSaveContent()" aria-label="Publish message">
+        [disabled]="!canSaveContent()" [attr.aria-label]="i18n.t('Publish message')">
         <mat-icon>publish</mat-icon>
       </button>
       }
@@ -25,14 +25,14 @@
 
     @if (isPublished() && !isDeleted()) {
     <button mat-icon-button type="button" class="toolbar-action avatar avatar-withdraw" (click)="confirmWithdraw()"
-      [disabled]="saving()" aria-label="Withdraw publication">
+      [disabled]="saving()" [attr.aria-label]="i18n.t('Withdraw publication')">
       <mat-icon>unpublished</mat-icon>
     </button>
     }
 
     @if (isEditMode() && !isDeleted()) {
     <button mat-icon-button type="button" class="toolbar-action toolbar-danger avatar avatar-warn"
-      (click)="confirmDelete()" [disabled]="saving()" aria-label="Delete content">
+      (click)="confirmDelete()" [disabled]="saving()" [attr.aria-label]="i18n.t('Delete content')">
       <mat-icon>delete</mat-icon>
     </button>
     }
@@ -53,7 +53,7 @@
             <mat-icon>{{ statusIcon(content.status) }}</mat-icon>
           </div>
           <div class="meta-fact-copy">
-            <span class="meta-fact-label">Status</span>
+            <span class="meta-fact-label">{{ i18n.t('Status') }}</span>
             <span class="meta-fact-value">{{ statusLabel() }}</span>
           </div>
         </div>
@@ -63,7 +63,7 @@
             <mat-icon>person</mat-icon>
           </div>
           <div class="meta-fact-copy">
-            <span class="meta-fact-label">Author</span>
+            <span class="meta-fact-label">{{ i18n.t('Author') }}</span>
             <span class="meta-fact-value">{{ content.authorUsername }}</span>
           </div>
         </div>
@@ -73,8 +73,8 @@
             <mat-icon>{{ isCommentMode() ? 'forum' : 'campaign' }}</mat-icon>
           </div>
           <div class="meta-fact-copy">
-            <span class="meta-fact-label">Type</span>
-            <span class="meta-fact-value">{{ isCommentMode() ? 'Comment' : 'Message' }}</span>
+            <span class="meta-fact-label">{{ i18n.t('Type') }}</span>
+            <span class="meta-fact-value">{{ isCommentMode() ? i18n.t('Comment') : i18n.t('Message') }}</span>
           </div>
         </div>
 
@@ -83,8 +83,8 @@
             <mat-icon>groups</mat-icon>
           </div>
           <div class="meta-fact-copy">
-            <span class="meta-fact-label">Profile</span>
-            <span class="meta-fact-value">{{ content.publicProfile?.name || 'No profile assigned' }}</span>
+            <span class="meta-fact-label">{{ i18n.t('Profile') }}</span>
+            <span class="meta-fact-value">{{ content.publicProfile?.name || i18n.t('No profile assigned') }}</span>
           </div>
         </div>
 
@@ -93,7 +93,7 @@
             <mat-icon>schedule</mat-icon>
           </div>
           <div class="meta-fact-copy">
-            <span class="meta-fact-label">Last update</span>
+            <span class="meta-fact-label">{{ i18n.t('Last update') }}</span>
             <span class="meta-fact-value">{{ content.updatedAt | date:'short' }}</span>
           </div>
         </div>
@@ -104,7 +104,7 @@
             <mat-icon>reply</mat-icon>
           </div>
           <div class="meta-fact-copy">
-            <span class="meta-fact-label">Parent</span>
+            <span class="meta-fact-label">{{ i18n.t('Parent') }}</span>
             <span class="meta-fact-value">{{ previewParentLabel() }}</span>
           </div>
         </div>
@@ -116,7 +116,7 @@
             <mat-icon>event_available</mat-icon>
           </div>
           <div class="meta-fact-copy">
-            <span class="meta-fact-label">Published</span>
+            <span class="meta-fact-label">{{ i18n.t('Published') }}</span>
             <span class="meta-fact-value">{{ content.publishedAt | date:'short' }}</span>
           </div>
         </div>
@@ -129,7 +129,7 @@
   @if (isPublished()) {
   <mat-card class="hint-card warn-card">
     <mat-card-content>
-      This message is currently published. Withdraw it first if you want to change its content.
+      {{ i18n.t('This message is currently published. Withdraw it first if you want to change its content.') }}
     </mat-card-content>
   </mat-card>
   }
@@ -137,7 +137,7 @@
   @if (isDeleted()) {
   <mat-card class="hint-card warn-card">
     <mat-card-content>
-      This content entry has been deleted and is now read-only.
+      {{ i18n.t('This content entry has been deleted and is now read-only.') }}
     </mat-card-content>
   </mat-card>
   }
@@ -150,15 +150,15 @@
           <div mat-card-avatar class="avatar avatar-accent">
             <mat-icon>reply</mat-icon>
           </div>
-          <mat-card-title>Parent content</mat-card-title>
-          <mat-card-subtitle>The message or public comment this reply belongs to.</mat-card-subtitle>
+          <mat-card-title>{{ i18n.t('Parent content') }}</mat-card-title>
+          <mat-card-subtitle>{{ i18n.t('The message or public comment this reply belongs to.') }}</mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content>
           @if (selectedParentSummary(); as parent) {
           <div class="parent-message-panel">
             <div class="parent-message-copy">
-              <span class="parent-message-kicker">Reply to</span>
+              <span class="parent-message-kicker">{{ i18n.t('Reply to') }}</span>
               <strong>{{ previewParentLabel() }}</strong>
               @if (parent.message) {
               <p>{{ parent.message }}</p>
@@ -169,7 +169,7 @@
             <div class="parent-message-actions">
               <button mat-stroked-button type="button" (click)="openParentContent()">
                 <mat-icon>open_in_new</mat-icon>
-                Open parent
+                {{ i18n.t('Open parent') }}
               </button>
             </div>
             }
@@ -178,8 +178,8 @@
           <div class="missing-profile-state">
             <mat-icon>forum</mat-icon>
             <div>
-              <strong>No parent content selected.</strong>
-              <p>Create replies from a published message or comment to attach them to a parent.</p>
+              <strong>{{ i18n.t('No parent content selected.') }}</strong>
+              <p>{{ i18n.t('Create replies from a published message or comment to attach them to a parent.') }}</p>
             </div>
           </div>
           }
@@ -192,9 +192,14 @@
           <div mat-card-avatar class="avatar avatar-neutral">
             <mat-icon>groups</mat-icon>
           </div>
-          <mat-card-title>Public profile</mat-card-title>
-          <mat-card-subtitle>Choose the public sender profile for this {{ isCommentMode() ? 'comment' : 'message'
-            }}.</mat-card-subtitle>
+          <mat-card-title>{{ i18n.t('Public profile') }}</mat-card-title>
+          <mat-card-subtitle>
+            @if (isCommentMode()) {
+            {{ i18n.t('Choose the public sender profile for this comment.') }}
+            } @else {
+            {{ i18n.t('Choose the public sender profile for this message.') }}
+            }
+          </mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content>
@@ -202,18 +207,18 @@
           <div class="missing-profile-state">
             <mat-icon>person_add</mat-icon>
             <div>
-              <strong>No public profiles available.</strong>
-              <p>Create at least one public profile before saving or publishing a public message.</p>
+              <strong>{{ i18n.t('No public profiles available.') }}</strong>
+              <p>{{ i18n.t('Create at least one public profile before saving or publishing a public message.') }}</p>
             </div>
             <button mat-stroked-button type="button" (click)="openPublicProfiles()">
               <mat-icon>open_in_new</mat-icon>
-              Manage profiles
+              {{ i18n.t('Manage profiles') }}
             </button>
           </div>
           } @else {
           <div class="profile-picker-layout">
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Public profile</mat-label>
+              <mat-label>{{ i18n.t('Public profile') }}</mat-label>
               <mat-select [formControl]="form.controls.publicProfileId">
                 <mat-select-trigger>
                   @if (selectedProfile()) {
@@ -228,7 +233,7 @@
                     <span class="profile-select-trigger-name">{{ profileName() }}</span>
                   </div>
                   } @else {
-                  <span class="style-select-placeholder">Choose a public profile</span>
+                  <span class="style-select-placeholder">{{ i18n.t('Choose a public profile') }}</span>
                   }
                 </mat-select-trigger>
 
@@ -249,11 +254,11 @@
                 </mat-option>
                 }
               </mat-select>
-              <mat-hint>The selected profile determines the public sender identity and the default font.</mat-hint>
+              <mat-hint>{{ i18n.t('The selected profile determines the public sender identity and the default font.') }}</mat-hint>
             </mat-form-field>
 
             <button mat-icon-button type="button" class="profile-manage-button" (click)="openPublicProfiles()"
-              aria-label="Manage public profiles">
+              [attr.aria-label]="i18n.t('Manage public profiles')">
               <mat-icon>open_in_new</mat-icon>
             </button>
           </div>
@@ -266,32 +271,37 @@
           <div mat-card-avatar class="avatar avatar-accent">
             <mat-icon>edit_note</mat-icon>
           </div>
-          <mat-card-title>Message content</mat-card-title>
-          <mat-card-subtitle>Text and font for the public {{ isCommentMode() ? 'comment' : 'message'
-            }}</mat-card-subtitle>
+          <mat-card-title>{{ i18n.t('Message content') }}</mat-card-title>
+          <mat-card-subtitle>
+            @if (isCommentMode()) {
+            {{ i18n.t('Text and font for the public comment') }}
+            } @else {
+            {{ i18n.t('Text and font for the public message') }}
+            }
+          </mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content>
           <form [formGroup]="form" class="form-grid">
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Message text</mat-label>
+              <mat-label>{{ i18n.t('Message text') }}</mat-label>
               <textarea matInput rows="8" formControlName="message"
-                placeholder="Write the public message here"></textarea>
+                [placeholder]="i18n.t('Write the public message here')"></textarea>
             </mat-form-field>
 
             <div class="style-actions">
               <button mat-stroked-button type="button" (click)="randomizeStyle()" [disabled]="form.disabled">
                 <mat-icon>shuffle</mat-icon>
-                Random font
+                {{ i18n.t('Random font') }}
               </button>
               <button mat-stroked-button type="button" (click)="clearStyle()" [disabled]="form.disabled">
                 <mat-icon>format_clear</mat-icon>
-                Profile default
+                {{ i18n.t('Profile default') }}
               </button>
             </div>
 
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Text style</mat-label>
+              <mat-label>{{ i18n.t('Text style') }}</mat-label>
               <mat-select #styleSelect formControlName="style" (openedChange)="handleStyleSelectOpenedChange($event)"
                 (keydown)="handleStyleSelectKeydown()" (selectionChange)="resetPreviewStyle()">
                 <mat-select-trigger>
@@ -301,10 +311,10 @@
                   </span>
                   } @else if (profileDefaultStyleOption(); as defaultOption) {
                   <span class="style-select-trigger" [style.font-family]="defaultOption.fontFamily">
-                    Profile default • {{ defaultOption.fontFamily }}
+                    {{ i18n.t('Profile default') }} • {{ defaultOption.fontFamily }}
                   </span>
                   } @else {
-                  <span class="style-select-placeholder">Choose a text style</span>
+                  <span class="style-select-placeholder">{{ i18n.t('Choose a text style') }}</span>
                   }
                 </mat-select-trigger>
 
@@ -321,8 +331,7 @@
                 </mat-option>
                 }
               </mat-select>
-              <mat-hint>Uses the same font styles as the public MessageDrop app. Clear the field to use the selected
-                profile default.</mat-hint>
+              <mat-hint>{{ i18n.t('Uses the same font styles as the public MessageDrop app. Clear the field to use the selected profile default.') }}</mat-hint>
             </mat-form-field>
 
           </form>
@@ -335,8 +344,8 @@
           <div mat-card-avatar class="avatar avatar-success">
             <mat-icon>location_on</mat-icon>
           </div>
-          <mat-card-title>Location</mat-card-title>
-          <mat-card-subtitle>Search and attach a required place to the public message</mat-card-subtitle>
+          <mat-card-title>{{ i18n.t('Location') }}</mat-card-title>
+          <mat-card-subtitle>{{ i18n.t('Search and attach a required place to the public message') }}</mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content>
@@ -344,8 +353,8 @@
             <div class="location-search-column">
               <div class="location-search">
                 <mat-form-field appearance="outline" class="full-width">
-                  <mat-label>Location search</mat-label>
-                  <input matInput [formControl]="locationSearchControl" placeholder="Search for a city, street or place"
+                  <mat-label>{{ i18n.t('Location search') }}</mat-label>
+                  <input matInput [formControl]="locationSearchControl" [placeholder]="i18n.t('Search for a city, street or place')"
                     [disabled]="locationSearchControl.disabled" (keydown.enter)="searchLocations()" />
                 </mat-form-field>
 
@@ -353,7 +362,7 @@
                   <button mat-stroked-button type="button" (click)="searchLocations()"
                     [disabled]="locationSearchLoading() || locationSearchControl.disabled">
                     <mat-icon>search</mat-icon>
-                    Search
+                    {{ i18n.t('Search') }}
                   </button>
                 </div>
 
@@ -377,12 +386,12 @@
 
                 @if (!hasSelectedLocation()) {
                 <p class="location-error">
-                  A location is required. Please search and select a place before saving.
+                  {{ i18n.t('A location is required. Please search and select a place before saving.') }}
                 </p>
                 }
 
                 <p class="location-help">
-                  Use the same place search as in MessageDrop. Public messages must always be saved with a location.
+                  {{ i18n.t('Use the same place search as in MessageDrop. Public messages must always be saved with a location.') }}
                 </p>
               </div>
             </div>
@@ -391,14 +400,14 @@
               @if (hasSelectedLocation()) {
               <div class="selected-location-panel">
                 <div class="selected-location-panel-head">
-                  <h3>Selected location</h3>
+                  <h3>{{ i18n.t('Selected location') }}</h3>
                   <div class="selected-location-panel-actions">
                     <button mat-icon-button type="button" (click)="openLocationMapDialog()"
-                      [disabled]="locationSearchControl.disabled" aria-label="Adjust location on map">
+                      [disabled]="locationSearchControl.disabled" [attr.aria-label]="i18n.t('Adjust location on map')">
                       <mat-icon>map</mat-icon>
                     </button>
                     <button mat-icon-button type="button" (click)="clearLocation()"
-                      [disabled]="locationSearchControl.disabled" aria-label="Clear selected location">
+                      [disabled]="locationSearchControl.disabled" [attr.aria-label]="i18n.t('Clear selected location')">
                       <mat-icon>delete</mat-icon>
                     </button>
                   </div>
@@ -408,15 +417,15 @@
 
                 @if (locationMapEmbedUrl(); as mapUrl) {
                 <div class="location-map">
-                  <iframe [src]="mapUrl" title="Selected location map" loading="lazy"
+                  <iframe [src]="mapUrl" [title]="i18n.t('Selected location map')" loading="lazy"
                     referrerpolicy="no-referrer-when-downgrade"></iframe>
                 </div>
                 }
               </div>
               } @else {
               <div class="selected-location-panel selected-location-panel-empty">
-                <h3>No location selected</h3>
-                <p>Search for a place on the left to see the selected location and a small map here.</p>
+                <h3>{{ i18n.t('No location selected') }}</h3>
+                <p>{{ i18n.t('Search for a place on the left to see the selected location and a small map here.') }}</p>
               </div>
               }
             </div>
@@ -430,15 +439,15 @@
           <div mat-card-avatar class="avatar avatar-accent">
             <mat-icon>perm_media</mat-icon>
           </div>
-          <mat-card-title>Multimedia</mat-card-title>
-          <mat-card-subtitle>External embeds and Tenor GIFs</mat-card-subtitle>
+          <mat-card-title>{{ i18n.t('Multimedia') }}</mat-card-title>
+          <mat-card-subtitle>{{ i18n.t('External embeds and Tenor GIFs') }}</mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content>
           <div class="media-layout">
             <div class="media-search-column">
               <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Import external media</mat-label>
+                <mat-label>{{ i18n.t('Import external media') }}</mat-label>
                 <input matInput [formControl]="mediaUrlControl" placeholder="https://www.youtube.com/watch?v=..." />
               </mat-form-field>
 
@@ -446,7 +455,7 @@
                 <button mat-stroked-button type="button" (click)="importExternalMultimedia()"
                   [disabled]="mediaLoading() || mediaUrlControl.disabled">
                   <mat-icon>download</mat-icon>
-                  Import media
+                  {{ i18n.t('Import media') }}
                 </button>
               </div>
 
@@ -454,8 +463,8 @@
 
               <div class="tenor-head">
                 <mat-form-field appearance="outline" class="full-width">
-                  <mat-label>Search Tenor</mat-label>
-                  <input matInput [formControl]="tenorControl" placeholder="Search GIFs"
+                  <mat-label>{{ i18n.t('Search Tenor') }}</mat-label>
+                  <input matInput [formControl]="tenorControl" [placeholder]="i18n.t('Search GIFs')"
                     (keydown.enter)="searchTenor()" />
                 </mat-form-field>
 
@@ -463,18 +472,18 @@
                   <button mat-stroked-button type="button" (click)="searchTenor()"
                     [disabled]="tenorControl.disabled || tenorLoading()">
                     <mat-icon>search</mat-icon>
-                    Search
+                    {{ i18n.t('Search') }}
                   </button>
                   <button mat-stroked-button type="button" (click)="loadFeaturedTenor()"
                     [disabled]="tenorControl.disabled || tenorLoading()">
                     <mat-icon>whatshot</mat-icon>
-                    Featured
+                    {{ i18n.t('Featured') }}
                   </button>
                   @if (tenorNext()) {
                   <button mat-stroked-button type="button" (click)="loadMoreTenor()"
                     [disabled]="tenorControl.disabled || tenorLoading()">
                     <mat-icon>arrow_forward</mat-icon>
-                    More
+                    {{ i18n.t('More') }}
                   </button>
                   }
                 </div>
@@ -485,7 +494,7 @@
                 @for (result of tenorResults(); track trackTenorResult($index, result)) {
                 <button type="button" class="tenor-result" (click)="selectTenorResult(result)"
                   [disabled]="form.disabled">
-                  <img [src]="result.media_formats.gif.url" [alt]="result.title || 'Tenor GIF'" />
+                  <img [src]="result.media_formats.gif.url" [alt]="result.title || i18n.t('Tenor GIF')" />
                 </button>
                 }
               </div>
@@ -496,9 +505,9 @@
               @if (hasMedia()) {
               <div class="selected-media">
                 <div class="selected-media-head">
-                  <h3>Selected media</h3>
+                  <h3>{{ i18n.t('Selected media') }}</h3>
                   <button mat-icon-button type="button" (click)="removeMultimedia()" [disabled]="form.disabled"
-                    aria-label="Remove media">
+                    [attr.aria-label]="i18n.t('Remove media')">
                     <mat-icon>delete</mat-icon>
                   </button>
                 </div>
@@ -511,14 +520,14 @@
                 <p class="media-description">{{ multimedia().description }}</p>
                 }
                 @if (multimedia().sourceUrl) {
-                <a [href]="multimedia().sourceUrl" target="_blank" rel="noopener">Open original source</a>
+                <a [href]="multimedia().sourceUrl" target="_blank" rel="noopener">{{ i18n.t('Open original source') }}</a>
                 }
 
                 @if (multimedia().type === 'tenor' && multimedia().url) {
-                <img class="tenor-preview" [src]="multimedia().url" [alt]="multimedia().title || 'Selected GIF'" />
+                <img class="tenor-preview" [src]="multimedia().url" [alt]="multimedia().title || i18n.t('Selected GIF')" />
                 } @else if (tiktokEmbedUrl(); as tiktokUrl) {
                 <div class="oembed-preview oembed-preview-tiktok">
-                  <iframe [src]="tiktokUrl" title="TikTok preview" loading="lazy" allowfullscreen></iframe>
+                  <iframe [src]="tiktokUrl" [title]="i18n.t('TikTok preview')" loading="lazy" allowfullscreen></iframe>
                 </div>
                 } @else if (safeOembedHtml()) {
                 <div class="oembed-preview" [innerHTML]="safeOembedHtml()"></div>
@@ -526,8 +535,8 @@
               </div>
               } @else {
               <div class="selected-media selected-media-empty">
-                <h3>No media selected</h3>
-                <p>Import an external URL or pick a Tenor GIF to see the selected media here.</p>
+                <h3>{{ i18n.t('No media selected') }}</h3>
+                <p>{{ i18n.t('Import an external URL or pick a Tenor GIF to see the selected media here.') }}</p>
               </div>
               }
             </div>
@@ -540,14 +549,14 @@
           <div mat-card-avatar class="avatar avatar-success">
             <mat-icon>tag</mat-icon>
           </div>
-          <mat-card-title>Hashtags</mat-card-title>
-          <mat-card-subtitle>Up to {{ maxPublicHashtags }} public hashtags</mat-card-subtitle>
+          <mat-card-title>{{ i18n.t('Hashtags') }}</mat-card-title>
+          <mat-card-subtitle>{{ i18n.t('Up to {{count}} public hashtags', { count: maxPublicHashtags }) }}</mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content>
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Add hashtags</mat-label>
-            <input matInput [formControl]="hashtagControl" placeholder="#travel, #news"
+            <mat-label>{{ i18n.t('Add hashtags') }}</mat-label>
+            <input matInput [formControl]="hashtagControl" [placeholder]="i18n.t('#travel, #news')"
               (keydown)="onHashtagKeydown($event)" />
           </mat-form-field>
 
@@ -555,16 +564,16 @@
             <button mat-stroked-button type="button" (click)="addHashtagsFromInput()"
               [disabled]="hashtagControl.disabled">
               <mat-icon>add</mat-icon>
-              Add hashtags
+              {{ i18n.t('Add hashtags') }}
             </button>
           </div>
 
-          <mat-chip-grid aria-label="Selected hashtags">
+          <mat-chip-grid [attr.aria-label]="i18n.t('Selected hashtags')">
             @for (tag of hashtags(); track tag) {
             <mat-chip-row (removed)="removeHashtag(tag)">
               #{{ tag }}
               @if (!hashtagControl.disabled) {
-              <button matChipRemove type="button" aria-label="Remove hashtag">
+              <button matChipRemove type="button" [attr.aria-label]="i18n.t('Remove hashtag')">
                 <mat-icon>cancel</mat-icon>
               </button>
               }
@@ -581,9 +590,14 @@
           <div mat-card-avatar class="avatar avatar-neutral">
             <mat-icon>visibility</mat-icon>
           </div>
-          <mat-card-title>Preview</mat-card-title>
-          <mat-card-subtitle>Live preview of the public {{ isCommentMode() ? 'comment' : 'message' }}
-            card</mat-card-subtitle>
+          <mat-card-title>{{ i18n.t('Preview') }}</mat-card-title>
+          <mat-card-subtitle>
+            @if (isCommentMode()) {
+            {{ i18n.t('Live preview of the public comment card') }}
+            } @else {
+            {{ i18n.t('Live preview of the public message card') }}
+            }
+          </mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content>
@@ -609,10 +623,10 @@
                   @if (hasMedia()) {
                   <div class="preview-media">
                     @if (isImageMultimedia(multimedia())) {
-                    <img [src]="multimedia().url" [alt]="multimedia().title || 'Selected multimedia preview'" />
+                    <img [src]="multimedia().url" [alt]="multimedia().title || i18n.t('Selected multimedia preview')" />
                     } @else if (tiktokEmbedUrl(); as tiktokUrl) {
                     <div class="preview-oembed preview-oembed-tiktok">
-                      <iframe [src]="tiktokUrl" title="TikTok preview" loading="lazy" allowfullscreen></iframe>
+                      <iframe [src]="tiktokUrl" [title]="i18n.t('TikTok preview')" loading="lazy" allowfullscreen></iframe>
                     </div>
                     } @else if (safeOembedHtml()) {
                     <div class="preview-oembed" [class.preview-oembed-youtube]="multimedia().type === 'youtube'"
@@ -631,7 +645,7 @@
                   }
 
                   @if (hashtags().length > 0) {
-                  <div class="preview-hashtag-chip-list" aria-label="Selected hashtags preview">
+                  <div class="preview-hashtag-chip-list" [attr.aria-label]="i18n.t('Selected hashtags preview')">
                     @for (tag of hashtags(); track tag) {
                     <span class="preview-hashtag-chip">#{{ tag }}</span>
                     }
@@ -642,12 +656,12 @@
                     @if (isCommentMode()) {
                     <span class="preview-meta-chip" [class.is-missing]="!hasSelectedParentContent()">
                       <mat-icon aria-hidden="true">reply</mat-icon>
-                      {{ hasSelectedParentContent() ? previewParentLabel() : 'No parent content selected' }}
+                      {{ hasSelectedParentContent() ? previewParentLabel() : i18n.t('No parent content selected') }}
                     </span>
                     } @else {
                     <span class="preview-meta-chip" [class.is-missing]="!hasSelectedLocation()">
                       <mat-icon aria-hidden="true">location_on</mat-icon>
-                      {{ hasSelectedLocation() ? activeLocationLabel() : 'No location selected' }}
+                      {{ hasSelectedLocation() ? activeLocationLabel() : i18n.t('No location selected') }}
                     </span>
                     }
                   </div>
@@ -687,13 +701,13 @@
           <div mat-card-avatar class="avatar avatar-accent">
             <mat-icon>smart_toy</mat-icon>
           </div>
-          <mat-card-title>AI tools</mat-card-title>
+          <mat-card-title>{{ i18n.t('AI tools') }}</mat-card-title>
           <mat-card-subtitle>
             {{ aiModelLabel() }}
           </mat-card-subtitle>
 
           <button mat-icon-button type="button" class="ai-settings-button avatar avatar-neutral"
-            (click)="openAiSettings()" aria-label="Open AI settings">
+            (click)="openAiSettings()" [attr.aria-label]="i18n.t('Open AI settings')">
             <mat-icon>settings_suggest</mat-icon>
           </button>
         </mat-card-header>
@@ -705,15 +719,19 @@
 
           @if (!aiConfigured()) {
           <p class="ai-hint ai-hint-warn">
-            Add an OpenAI API key in the admin backend to enable these tools.
+            {{ i18n.t('Add an OpenAI API key in the admin backend to enable these tools.') }}
           </p>
           } @else if (isPublished()) {
           <p class="ai-hint ai-hint-warn">
-            Withdraw the public {{ isCommentMode() ? 'comment' : 'message' }} first before applying AI changes.
+            @if (isCommentMode()) {
+            {{ i18n.t('Withdraw the public comment first before applying AI changes.') }}
+            } @else {
+            {{ i18n.t('Withdraw the public message first before applying AI changes.') }}
+            }
           </p>
           } @else if (isDeleted()) {
           <p class="ai-hint ai-hint-warn">
-            Deleted content cannot be changed with AI tools.
+            {{ i18n.t('Deleted content cannot be changed with AI tools.') }}
           </p>
           }
 
@@ -721,43 +739,43 @@
             <button mat-stroked-button type="button" (click)="openAiToolDialog('proofread')"
               [disabled]="!canUseAiTools() || !hasAiTextSource()">
               <mat-icon>spellcheck</mat-icon>
-              Proofread
+              {{ i18n.t('Proofread') }}
             </button>
 
             <button mat-stroked-button type="button" (click)="openAiToolDialog('rewrite')"
               [disabled]="!canUseAiTools() || !hasAiTextSource()">
               <mat-icon>auto_fix_high</mat-icon>
-              Rewrite
+              {{ i18n.t('Rewrite') }}
             </button>
 
             <button mat-stroked-button type="button" (click)="openAiToolDialog('translate')"
               [disabled]="!canUseAiTools() || !hasAiTextSource()">
               <mat-icon>translate</mat-icon>
-              Translate
+              {{ i18n.t('Translate') }}
             </button>
 
             <button mat-stroked-button type="button" (click)="openAiToolDialog('hashtags')"
               [disabled]="!canUseAiTools() || !hasAiContext()">
               <mat-icon>tag</mat-icon>
-              Hashtags
+              {{ i18n.t('Hashtags') }}
             </button>
 
             <button mat-stroked-button type="button" (click)="openAiToolDialog('emoji')"
               [disabled]="!canUseAiTools() || !hasAiTextSource()">
               <mat-icon>add_reaction</mat-icon>
-              Emojis
+              {{ i18n.t('Emojis') }}
             </button>
 
             <button mat-stroked-button type="button" (click)="openAiToolDialog('thread')"
               [disabled]="!canUseAiTools() || !hasAiTextSource()">
               <mat-icon>forum</mat-icon>
-              Thread ideas
+              {{ i18n.t('Thread ideas') }}
             </button>
 
             <button mat-stroked-button type="button" (click)="openAiToolDialog('quality_check')"
               [disabled]="!canUseAiTools() || !hasAiTextSource()">
               <mat-icon>fact_check</mat-icon>
-              Quality check
+              {{ i18n.t('Quality check') }}
             </button>
           </div>
         </mat-card-content>
@@ -778,7 +796,7 @@
 
       @if (canCreateCommentFromCurrent()) {
       <button mat-icon-button type="button" class="comment-thread-header-action avatar avatar-neutral"
-        (click)="createCommentFromCurrent()" aria-label="Create comment">
+        (click)="createCommentFromCurrent()" [attr.aria-label]="i18n.t('Create comment')">
         <mat-icon>add_comment</mat-icon>
       </button>
       }
@@ -816,7 +834,7 @@
           <mat-card-content class="tile-content content-preview-body">
             @if (childHasImageMultimedia(row)) {
             <div class="content-preview-media">
-              <img [src]="row.multimedia.url" [alt]="row.multimedia.title || 'Selected multimedia preview'" />
+              <img [src]="row.multimedia.url" [alt]="row.multimedia.title || i18n.t('Selected multimedia preview')" />
             </div>
             } @else if (row.multimedia.type !== 'undefined' && (row.multimedia.title || row.multimedia.description)) {
             <div class="content-preview-media-summary">
@@ -837,7 +855,7 @@
             }
 
             @if (row.hashtags.length > 0) {
-            <div class="content-preview-hashtag-list" aria-label="Hashtags">
+            <div class="content-preview-hashtag-list" [attr.aria-label]="i18n.t('Hashtags')">
               @for (tag of row.hashtags; track tag) {
               <span class="content-preview-hashtag-chip">#{{ tag }}</span>
               }
@@ -867,7 +885,7 @@
           <mat-card-actions class="card-actions content-preview-actions">
             <div class="content-preview-action-bar">
               <button mat-icon-button type="button" class="content-preview-action-button action-neutral"
-                (click)="openChildComment(row); $event.stopPropagation()" aria-label="Open comment">
+                (click)="openChildComment(row); $event.stopPropagation()" [attr.aria-label]="i18n.t('Open comment')">
                 <mat-icon>visibility</mat-icon>
               </button>
 
@@ -875,7 +893,7 @@
               <button mat-icon-button type="button" class="content-preview-action-button action-secondary"
                 (click)="openChildComment(row); $event.stopPropagation()" [matBadge]="childCommentCount(row)"
                 [matBadgeHidden]="childCommentCount(row) === 0" matBadgeColor="primary" matBadgeOverlap="false"
-                aria-label="Open replies">
+                [attr.aria-label]="i18n.t('Open replies')">
                 <mat-icon>forum</mat-icon>
               </button>
               }
@@ -887,7 +905,7 @@
       } @else if (!childCommentsLoading()) {
       <div class="empty-state comment-thread-empty-state">
         <mat-icon>forum</mat-icon>
-        <div>No direct comments yet.</div>
+        <div>{{ i18n.t('No direct comments yet.') }}</div>
       </div>
       }
     </mat-card-content>
@@ -900,9 +918,14 @@
         <mat-icon>chat_bubble</mat-icon>
       </div>
       <div class="comment-thread-header-copy">
-        <mat-card-title>Public comments</mat-card-title>
-        <mat-card-subtitle>Replies from MessageDrop visitors on this published {{ isCommentMode() ? 'comment' : 'message'
-          }}.</mat-card-subtitle>
+        <mat-card-title>{{ i18n.t('Public comments') }}</mat-card-title>
+        <mat-card-subtitle>
+          @if (isCommentMode()) {
+          {{ i18n.t('Replies from MessageDrop visitors on this published comment.') }}
+          } @else {
+          {{ i18n.t('Replies from MessageDrop visitors on this published message.') }}
+          }
+        </mat-card-subtitle>
       </div>
     </mat-card-header>
 
@@ -937,7 +960,7 @@
           <mat-card-content class="tile-content content-preview-body">
             @if (externalHasImageMultimedia(row)) {
             <div class="content-preview-media">
-              <img [src]="row.multimedia.url" [alt]="row.multimedia.title || 'Selected multimedia preview'" />
+              <img [src]="row.multimedia.url" [alt]="row.multimedia.title || i18n.t('Selected multimedia preview')" />
             </div>
             } @else if (row.multimedia.type !== 'undefined' && (row.multimedia.title || row.multimedia.description)) {
             <div class="content-preview-media-summary">
@@ -958,7 +981,7 @@
             }
 
             @if (row.hashtags.length > 0) {
-            <div class="content-preview-hashtag-list" aria-label="Hashtags">
+            <div class="content-preview-hashtag-list" [attr.aria-label]="i18n.t('Hashtags')">
               @for (tag of row.hashtags; track tag) {
               <span class="content-preview-hashtag-chip">#{{ tag }}</span>
               }
@@ -986,7 +1009,7 @@
               @if (externalCommentCount(row) > 0) {
               <span class="content-preview-meta-chip content-preview-meta-chip-muted">
                 <mat-icon>forum</mat-icon>
-                {{ externalCommentCount(row) }} replies
+                {{ i18n.t('{{count}} replies', { count: externalCommentCount(row) }) }}
               </span>
               }
             </div>
@@ -995,7 +1018,7 @@
           <mat-card-actions class="card-actions content-preview-actions">
             <div class="content-preview-action-bar">
               <button mat-icon-button type="button" class="content-preview-action-button action-secondary"
-                (click)="replyToExternalComment(row)" aria-label="Reply to public comment">
+                (click)="replyToExternalComment(row)" [attr.aria-label]="i18n.t('Reply to public comment')">
                 <mat-icon>add_comment</mat-icon>
               </button>
             </div>
@@ -1006,7 +1029,7 @@
       } @else if (!externalCommentsLoading()) {
       <div class="empty-state comment-thread-empty-state comment-thread-empty-state-compact">
         <mat-icon>chat_bubble_outline</mat-icon>
-        <div>No public comments yet.</div>
+        <div>{{ i18n.t('No public comments yet.') }}</div>
       </div>
       }
     </mat-card-content>

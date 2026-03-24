@@ -25,6 +25,7 @@ import { DsaNotice } from '../../../interfaces/dsa-notice.interface';
 import { DsaNotification } from '../../../interfaces/dsa-notification.interface';
 import { ReportedContentPayload } from '../../../interfaces/reported-content.interface';
 import { DsaService } from '../../../services/dsa/dsa/dsa.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { NoticeDetailComponent } from '../notice/notice-detail/notice-detail.component';
 import { NotificationDialogComponent } from './notification-dialog/notification-dialog.component';
 
@@ -77,6 +78,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   private readonly dsa = inject(DsaService);
   private readonly snack = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
+  readonly i18n = inject(TranslationHelperService);
 
   readonly statuses = DSA_NOTICE_STATUSES;
 
@@ -149,7 +151,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   }
 
   statusLabel(status: string): string {
-    return this.statusMeta[status as DsaNoticeStatus]?.label ?? status;
+    return this.i18n.t(this.statusMeta[status as DsaNoticeStatus]?.label ?? status);
   }
 
   statusIcon(status: string): string {
@@ -168,7 +170,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
       typeof parsed?.multimedia?.description === 'string' ? parsed.multimedia.description : undefined,
       typeof notice.reasonText === 'string' ? notice.reasonText : undefined
     ];
-    return candidates.find(text => !!text && text.trim().length > 0)?.trim() || 'No additional context available.';
+    return candidates.find(text => !!text && text.trim().length > 0)?.trim() || this.i18n.t('No additional context available.');
   }
 
   noticeHashtags(notice: DsaNotice): string[] {
@@ -194,7 +196,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   }
 
   eventLabel(notification: DsaNotification): string {
-    return notification.meta?.event ?? notification.payload?.event ?? '—';
+    return notification.meta?.event ?? notification.payload?.event ?? this.i18n.t('—');
   }
 
   statusColor(notification: DsaNotification): 'warn' | 'accent' | 'primary' {
@@ -204,8 +206,8 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   copyPayload(notification: DsaNotification): void {
     const json = JSON.stringify(notification.payload ?? {}, null, 2);
     navigator.clipboard?.writeText(json).then(
-      () => this.snack.open('Payload copied to clipboard.', 'OK', { duration: 2000 }),
-      () => this.snack.open('Could not copy payload.', 'OK', { duration: 2000 })
+      () => this.snack.open(this.i18n.t('Payload copied to clipboard.'), this.i18n.t('OK'), { duration: 2000 }),
+      () => this.snack.open(this.i18n.t('Could not copy payload.'), this.i18n.t('OK'), { duration: 2000 })
     );
   }
 
@@ -216,15 +218,15 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   resend(notification: DsaNotification): void {
     const sub = this.dsa.resendNotification(notification.id).subscribe({
       next: resp => {
-        const msg = resp?.success ? 'Notification resent.' : 'Resend attempt finished with warnings.';
-        this.snack.open(msg, 'OK', { duration: 2500 });
+        const msg = resp?.success ? this.i18n.t('Notification resent.') : this.i18n.t('Resend attempt finished with warnings.');
+        this.snack.open(msg, this.i18n.t('OK'), { duration: 2500 });
         const current = this.selectedNotice();
         if (current) {
           this.fetchNotifications(current.id);
         }
       },
       error: () => {
-        this.snack.open('Could not resend notification.', 'OK', { duration: 3000 });
+        this.snack.open(this.i18n.t('Could not resend notification.'), this.i18n.t('OK'), { duration: 3000 });
       }
     });
     this.subs.push(sub);
@@ -299,11 +301,11 @@ export class NotificationsComponent implements OnInit, OnDestroy {
 
       this.notificationsLoading.set(true);
       Promise.allSettled(tasks).then(() => {
-        this.snack.open('Notification queued.', 'OK', { duration: 2000 });
+        this.snack.open(this.i18n.t('Notification queued.'), this.i18n.t('OK'), { duration: 2000 });
         this.fetchNotifications(notice.id, true);
       }).catch(() => {
         this.notificationsLoading.set(false);
-        this.snack.open('Could not create notification.', 'OK', { duration: 3000 });
+        this.snack.open(this.i18n.t('Could not create notification.'), this.i18n.t('OK'), { duration: 3000 });
       });
     });
   }
@@ -333,7 +335,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
         }
       },
       error: () => {
-        this.snack.open('Could not load notices.', 'OK', { duration: 3000 });
+        this.snack.open(this.i18n.t('Could not load notices.'), this.i18n.t('OK'), { duration: 3000 });
         this.notices.set([]);
         this.selectedNotice.set(null);
         this.lastFetchedNoticeId = null;
@@ -362,7 +364,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
         this.notifications.set([]);
         this.notificationsLoading.set(false);
         this.lastFetchedNoticeId = null;
-        this.snack.open('Could not load notifications for this notice.', 'OK', { duration: 3000 });
+        this.snack.open(this.i18n.t('Could not load notifications for this notice.'), this.i18n.t('OK'), { duration: 3000 });
       }
     });
     this.subs.push(this.notificationSub);

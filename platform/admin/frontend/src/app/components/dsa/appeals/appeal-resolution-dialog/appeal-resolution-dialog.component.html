@@ -1,53 +1,53 @@
-<h2 mat-dialog-title>Resolve appeal</h2>
+<h2 mat-dialog-title>{{ i18n.t('Resolve appeal') }}</h2>
 
 <mat-dialog-content>
   <form [formGroup]="form" class="resolution-form" (ngSubmit)="submit()">
     <mat-form-field appearance="outline">
-      <mat-label>Outcome</mat-label>
+      <mat-label>{{ i18n.t('Outcome') }}</mat-label>
       <mat-select formControlName="outcome" required>
         @for (option of outcomes; track option.value) {
-          <mat-option [value]="option.value">{{ option.label }}</mat-option>
+          <mat-option [value]="option.value">{{ i18n.t(option.label) }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
 
     @if (isRevised()) {
       <mat-form-field appearance="outline">
-        <mat-label>Revised decision</mat-label>
+        <mat-label>{{ i18n.t('Revised decision') }}</mat-label>
         <mat-select formControlName="decOutcome" required>
           @for (opt of decisionOutcomes; track opt) {
-            <mat-option [value]="opt">{{ opt }}</mat-option>
+            <mat-option [value]="opt">{{ decisionOutcomeLabel(opt) }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
       <mat-form-field appearance="outline">
-        <mat-label>Legal basis</mat-label>
+        <mat-label>{{ i18n.t('Legal basis') }}</mat-label>
         <input matInput formControlName="legalBasis" placeholder="e.g. Terms of Use violation (Section 9)" />
       </mat-form-field>
       <mat-form-field appearance="outline">
-        <mat-label>Terms of Use clause</mat-label>
+        <mat-label>{{ i18n.t('Terms of Use clause') }}</mat-label>
         <input matInput formControlName="tosBasis" placeholder="e.g. Section 9 - Hate speech, harassment, or threats" />
       </mat-form-field>
-      <mat-slide-toggle formControlName="automatedUsed">Automated tools used to support the decision</mat-slide-toggle>
+      <mat-slide-toggle formControlName="automatedUsed">{{ i18n.t('Automated tools used to support the decision') }}</mat-slide-toggle>
       <mat-form-field appearance="outline">
-        <mat-label>Decision statement</mat-label>
+        <mat-label>{{ i18n.t('Decision statement') }}</mat-label>
         <textarea matInput rows="3" formControlName="statement" placeholder="Reasoning for the revised decision"></textarea>
       </mat-form-field>
     }
 
     <mat-form-field appearance="outline">
-      <mat-label>Reviewer (optional)</mat-label>
+      <mat-label>{{ i18n.t('Reviewer (optional)') }}</mat-label>
       <input matInput formControlName="reviewer" placeholder="Jane Doe" />
     </mat-form-field>
 
     <mat-form-field appearance="outline">
-      <mat-label>Resolution note</mat-label>
+      <mat-label>{{ i18n.t('Resolution note') }}</mat-label>
       <textarea matInput rows="3" formControlName="reason" placeholder="Summary of the review"></textarea>
     </mat-form-field>
   </form>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button type="button" (click)="cancel()">Cancel</button>
-  <button mat-flat-button color="primary" type="submit" (click)="submit()">Save</button>
+  <button mat-button type="button" (click)="cancel()">{{ i18n.t('Cancel') }}</button>
+  <button mat-flat-button color="primary" type="submit" (click)="submit()">{{ i18n.t('Save') }}</button>
 </mat-dialog-actions>

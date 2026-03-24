@@ -11,6 +11,7 @@ import { filter, fromEvent, merge, startWith } from 'rxjs';
 
 import { AuthService } from '../../../services/auth/auth.service';
 import { DsaService } from '../../../services/dsa/dsa/dsa.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 
 type TileKey =
   | 'signals'
@@ -52,6 +53,7 @@ export class DsaDashboardComponent {
   private auth = inject(AuthService);
   private dsa = inject(DsaService);
   private destroyRef = inject(DestroyRef);
+  readonly i18n = inject(TranslationHelperService);
 
   // Auth-Signals weiterreichen
   get username() { return this.auth.username; }
@@ -71,15 +73,15 @@ export class DsaDashboardComponent {
 
   // Kacheln
   tiles: DsaTile[] = [
-    { key: 'signals', title: 'Signals', subtitle: 'Open signals', icon: 'info', route: '/dashboard/dsa/signals' },
-    { key: 'notices', title: 'Notices', subtitle: 'Incoming reports', icon: 'report_problem', route: '/dashboard/dsa/notices' },
-    { key: 'decisions', title: 'Decisions', subtitle: 'Review & decide', icon: 'gavel', route: '/dashboard/dsa/decisions' },
-    { key: 'evidence', title: 'Evidence', subtitle: 'Upload & manage proofs', icon: 'folder_shared', route: '/dashboard/dsa/evidence' },
-    { key: 'notifications', title: 'Notifications', subtitle: 'Notify stakeholders', icon: 'notifications', route: '/dashboard/dsa/notifications' },
-    { key: 'appeals', title: 'Appeals', subtitle: 'Handle appeals', icon: 'feedback', route: '/dashboard/dsa/appeals' },
-    { key: 'audit', title: 'Audit Log', subtitle: 'Trace all actions', icon: 'history', route: '/dashboard/dsa/audits' },
-    { key: 'transparency', title: 'Transparency', subtitle: 'Public stats & reports', icon: 'insights', route: '/dashboard/dsa/transparency' },
-    { key: 'userModeration', title: 'User Moderation', subtitle: 'Block / unblock users', icon: 'gpp_bad', route: '/dashboard/dsa/user-moderation' }
+    { key: 'signals', title: this.i18n.t('Signals'), subtitle: this.i18n.t('Open signals'), icon: 'info', route: '/dashboard/dsa/signals' },
+    { key: 'notices', title: this.i18n.t('Notices'), subtitle: this.i18n.t('Incoming reports'), icon: 'report_problem', route: '/dashboard/dsa/notices' },
+    { key: 'decisions', title: this.i18n.t('Decisions'), subtitle: this.i18n.t('Review & decide'), icon: 'gavel', route: '/dashboard/dsa/decisions' },
+    { key: 'evidence', title: this.i18n.t('Evidence'), subtitle: this.i18n.t('Upload & manage proofs'), icon: 'folder_shared', route: '/dashboard/dsa/evidence' },
+    { key: 'notifications', title: this.i18n.t('Notifications'), subtitle: this.i18n.t('Notify stakeholders'), icon: 'notifications', route: '/dashboard/dsa/notifications' },
+    { key: 'appeals', title: this.i18n.t('Appeals'), subtitle: this.i18n.t('Handle appeals'), icon: 'feedback', route: '/dashboard/dsa/appeals' },
+    { key: 'audit', title: this.i18n.t('Audit Log'), subtitle: this.i18n.t('Trace all actions'), icon: 'history', route: '/dashboard/dsa/audits' },
+    { key: 'transparency', title: this.i18n.t('Transparency'), subtitle: this.i18n.t('Public stats & reports'), icon: 'insights', route: '/dashboard/dsa/transparency' },
+    { key: 'userModeration', title: this.i18n.t('User Moderation'), subtitle: this.i18n.t('Block / unblock users'), icon: 'gpp_bad', route: '/dashboard/dsa/user-moderation' }
   ];
 
   // Badge-Logik pro Tile

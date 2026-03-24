@@ -10,6 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { DsaNotice } from '../../../../interfaces/dsa-notice.interface';
+import { TranslationHelperService } from '../../../../services/translation-helper.service';
 
 export interface NotificationDialogData {
   notice: DsaNotice;
@@ -34,6 +35,7 @@ export class NotificationDialogComponent {
   private readonly fb = inject(FormBuilder);
   private readonly dialogRef = inject(MatDialogRef<NotificationDialogComponent>);
   private readonly snack = inject(MatSnackBar);
+  readonly i18n = inject(TranslationHelperService);
   readonly data = inject<NotificationDialogData>(MAT_DIALOG_DATA);
 
   readonly form = this.fb.nonNullable.group({
@@ -67,7 +69,7 @@ export class NotificationDialogComponent {
   submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.snack.open('Please complete the required fields.', 'OK', { duration: 2500 });
+      this.snack.open(this.i18n.t('Please complete the required fields.'), this.i18n.t('OK'), { duration: 2500 });
       return;
     }
 
@@ -77,7 +79,7 @@ export class NotificationDialogComponent {
       const email = (value.otherEmail || '').trim();
       const emailOk = /.+@.+\..+/.test(email);
       if (!emailOk) {
-        this.snack.open('Please provide a valid email address.', 'OK', { duration: 2500 });
+        this.snack.open(this.i18n.t('Please provide a valid email address.'), this.i18n.t('OK'), { duration: 2500 });
         return;
       }
     }

@@ -18,6 +18,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { DsaNoticeFilters, DsaNoticeRange } from '../../../../interfaces/dsa-notice-filters.interface';
 import { DsaNotice } from '../../../../interfaces/dsa-notice.interface';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
+import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { NoticeDetailComponent } from '../../notice/notice-detail/notice-detail.component';
 
 @Component({
@@ -37,6 +38,7 @@ export class DecisionsComponent implements OnInit, OnDestroy {
   private dsa = inject(DsaService);
   private snack = inject(MatSnackBar);
   private dialog = inject(MatDialog);
+  readonly i18n = inject(TranslationHelperService);
 
   loading = signal(false);
   items = signal<DsaNotice[]>([]);
@@ -85,7 +87,7 @@ export class DecisionsComponent implements OnInit, OnDestroy {
     this.loading.set(true);
     this.dsa.listNotices(this.toFilters()).subscribe({
       next: rows => this.items.set(rows || []),
-      error: () => this.snack.open('Could not load decisions.', 'OK', { duration: 3000 }),
+      error: () => this.snack.open(this.i18n.t('Could not load decisions.'), this.i18n.t('OK'), { duration: 3000 }),
       complete: () => this.loading.set(false)
     });
   }
@@ -109,6 +111,20 @@ export class DecisionsComponent implements OnInit, OnDestroy {
       const rc = n.reportedContent ? JSON.parse(n.reportedContent) : null;
       return (rc?.message || rc?.multimedia?.title || rc?.multimedia?.description || '').toString().trim();
     } catch { return ''; }
+  }
+
+  contentTypeLabel(value: string | null | undefined): string {
+    switch ((value || '').toLowerCase()) {
+      case 'public message':
+      case 'public_message':
+        return this.i18n.t('Public message');
+      case 'comment':
+        return this.i18n.t('Comment');
+      case 'profile':
+        return this.i18n.t('Profile');
+      default:
+        return value || '';
+    }
   }
 
   trackById(_i: number, n: DsaNotice) { return n.id; }
