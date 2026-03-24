@@ -25,11 +25,14 @@ export interface PublicStatusDecision {
   noticeId: string;
   outcome: string;
   legalBasis?: string | null;
+  legalBasisEn?: string | null;
   tosBasis?: string | null;
+  tosBasisEn?: string | null;
   automatedUsed?: number;
   decidedBy?: string | null;
   decidedAt: number;
   statement?: string | null;
+  statementEn?: string | null;
 }
 
 export interface PublicStatusAppeal {

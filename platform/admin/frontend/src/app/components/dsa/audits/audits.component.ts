@@ -265,8 +265,9 @@ export class AuditsComponent implements OnInit {
     }
     this.dialog.open(NoticeDetailComponent, {
       data: { noticeId: e.entityId },
-      width: 'min(900px, 96vw)',
-      maxHeight: '90vh',
+      width: '95vw',
+      maxWidth: '95vw',
+      maxHeight: '95vh',
       panelClass: 'md-dialog-rounded'
     });
   }

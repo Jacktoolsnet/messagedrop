@@ -144,9 +144,9 @@ export class EvidencesComponent implements OnInit, OnDestroy {
     event?.stopPropagation();
     const ref = this.dialog.open(NoticeDetailComponent, {
       data: n,
-      width: '96vw',
-      minWidth: '96vw',
-      maxHeight: '90vh',
+      width: '95vw',
+      maxWidth: '95vw',
+      maxHeight: '95vh',
       panelClass: 'md-dialog-rounded'
     });
 

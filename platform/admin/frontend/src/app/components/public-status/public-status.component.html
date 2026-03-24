@@ -63,7 +63,7 @@
         </mat-card-content>
       </mat-card>
       @if (decision; as dec) {
-        <mat-card>
+        <mat-card class="decision-card">
           <mat-card-header>
             <div mat-card-avatar class="avatar avatar-warn decision">
               <mat-icon>gavel</mat-icon>
@@ -71,24 +71,119 @@
             <mat-card-title>{{ i18n.t('Decision') }}</mat-card-title>
             <mat-card-subtitle>{{ dec.decidedAt | date:'medium' }}</mat-card-subtitle>
           </mat-card-header>
-          <mat-card-content>
-            <div class="summary-grid">
-              <div>
+          <mat-card-content class="decision-content">
+            <div class="summary-grid decision-meta-grid">
+              <div class="decision-meta-item">
                 <span class="label">{{ i18n.t('Outcome') }}</span>
                 <mat-chip color="primary" selected>{{ formatOutcome(dec.outcome) }}</mat-chip>
               </div>
-              <div>
+              <div class="decision-meta-item">
                 <span class="label">{{ i18n.t('Decided by') }}</span>
                 <span>{{ dec.decidedBy || '—' }}</span>
               </div>
-              <div>
-                <span class="label">{{ i18n.t('Statement') }}</span>
-                @if (dec.statement) {
-                  <p class="statement">{{ dec.statement }}</p>
-                } @else {
-                  —
-                }
+            </div>
+            <section class="language-notice decision-hero" [attr.aria-label]="i18n.t('Decision language notice')">
+              <div class="decision-hero-copy">
+                <span class="eyebrow">{{ i18n.t('Decision language notice') }}</span>
+                <h3>{{ i18n.t('The German version is authoritative. The English version is included only as a non-binding service translation.') }}</h3>
               </div>
+              <div class="decision-language-badges" aria-hidden="true">
+                <span class="language-badge binding">{{ i18n.t('DE') }}</span>
+                <span class="language-badge service">{{ i18n.t('EN') }}</span>
+              </div>
+            </section>
+            <section class="decision-language-compare">
+              <header class="decision-language-compare-header">
+                <div>
+                  <span class="eyebrow">{{ i18n.t('Decision') }}</span>
+                  <h3>{{ i18n.t('Bilingual decision text') }}</h3>
+                </div>
+                <p>{{ i18n.t('Compare the binding German version with the English service translation below.') }}</p>
+              </header>
+            </section>
+            <div class="decision-language-grid">
+              <section class="decision-language-panel binding">
+                <header class="decision-language-header">
+                  <div class="decision-language-title">
+                    <mat-icon>verified</mat-icon>
+                    <div>
+                      <h3>{{ i18n.t('German version (binding)') }}</h3>
+                      <p>{{ i18n.t('This version is legally authoritative and should always be maintained first.') }}</p>
+                    </div>
+                  </div>
+                  <mat-chip selected color="primary">{{ i18n.t('DE') }}</mat-chip>
+                </header>
+                <div class="decision-field-grid">
+                  <article class="decision-field decision-field-main">
+                    <div class="decision-field-header">
+                      <mat-icon>article</mat-icon>
+                      <span class="label">{{ i18n.t('Statement') }}</span>
+                    </div>
+                    <p class="statement">{{ dec.statement || '—' }}</p>
+                  </article>
+                  <article class="decision-field">
+                    <div class="decision-field-header">
+                      <mat-icon>balance</mat-icon>
+                      <span class="label">{{ i18n.t('Legal basis') }}</span>
+                    </div>
+                    <p class="decision-value">{{ dec.legalBasis || '—' }}</p>
+                  </article>
+                  <article class="decision-field">
+                    <div class="decision-field-header">
+                      <mat-icon>rule</mat-icon>
+                      <span class="label">{{ i18n.t('Terms of Use clause') }}</span>
+                    </div>
+                    <p class="decision-value">{{ dec.tosBasis || '—' }}</p>
+                  </article>
+                </div>
+              </section>
+              <section class="decision-language-panel service">
+                <header class="decision-language-header">
+                  <div class="decision-language-title">
+                    <mat-icon>translate</mat-icon>
+                    <div>
+                      <h3>{{ i18n.t('English service translation') }}</h3>
+                      <p>{{ i18n.t('This version is optional, non-binding, and can be generated from the German source.') }}</p>
+                    </div>
+                  </div>
+                  <mat-chip selected>{{ i18n.t('EN') }}</mat-chip>
+                </header>
+                <div class="decision-field-grid">
+                  <article class="decision-field decision-field-main">
+                    <div class="decision-field-header">
+                      <mat-icon>article</mat-icon>
+                      <span class="label">{{ i18n.t('Statement') }}</span>
+                    </div>
+                    @if (dec.statementEn) {
+                      <p class="statement">{{ dec.statementEn }}</p>
+                    } @else {
+                      <p class="decision-value missing-translation">{{ i18n.t('No English translation yet') }}</p>
+                    }
+                  </article>
+                  <article class="decision-field">
+                    <div class="decision-field-header">
+                      <mat-icon>balance</mat-icon>
+                      <span class="label">{{ i18n.t('Legal basis') }}</span>
+                    </div>
+                    @if (dec.legalBasisEn) {
+                      <p class="decision-value">{{ dec.legalBasisEn }}</p>
+                    } @else {
+                      <p class="decision-value missing-translation">{{ i18n.t('No English translation yet') }}</p>
+                    }
+                  </article>
+                  <article class="decision-field">
+                    <div class="decision-field-header">
+                      <mat-icon>rule</mat-icon>
+                      <span class="label">{{ i18n.t('Terms of Use clause') }}</span>
+                    </div>
+                    @if (dec.tosBasisEn) {
+                      <p class="decision-value">{{ dec.tosBasisEn }}</p>
+                    } @else {
+                      <p class="decision-value missing-translation">{{ i18n.t('No English translation yet') }}</p>
+                    }
+                  </article>
+                </div>
+              </section>
             </div>
           </mat-card-content>
         </mat-card>

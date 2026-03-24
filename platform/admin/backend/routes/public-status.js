@@ -549,7 +549,20 @@ router.get('/status/:token', async (req, res, next) => {
       return res.json({
         entityType: 'notice',
         notice,
-        decision: decision || null,
+        decision: decision ? {
+          id: decision.id,
+          noticeId: decision.noticeId,
+          outcome: decision.outcome,
+          legalBasis: decision.legalBasis,
+          legalBasisEn: decision.legalBasisEn,
+          tosBasis: decision.tosBasis,
+          tosBasisEn: decision.tosBasisEn,
+          automatedUsed: decision.automatedUsed,
+          decidedBy: decision.decidedBy,
+          decidedAt: decision.decidedAt,
+          statement: decision.statement,
+          statementEn: decision.statementEn
+        } : null,
         evidence: evidence.map(ev => ({
           id: ev.id,
           type: ev.type,

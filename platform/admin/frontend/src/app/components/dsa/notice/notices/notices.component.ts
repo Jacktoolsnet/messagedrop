@@ -178,9 +178,9 @@ export class NoticesComponent implements OnInit, OnDestroy {
   detail(n: DsaNotice) {
     const ref = this.dialog.open(NoticeDetailComponent, {
       data: n,                             // ganzen Datensatz reinreichen
-      width: 'auto',
-      maxWidth: '96vw',
-      maxHeight: '90vh',
+      width: '95vw',
+      maxWidth: '95vw',
+      maxHeight: '95vh',
       panelClass: 'md-dialog-rounded'      // optional
     });
 

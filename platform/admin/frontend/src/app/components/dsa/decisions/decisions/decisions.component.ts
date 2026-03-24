@@ -97,9 +97,9 @@ export class DecisionsComponent implements OnInit, OnDestroy {
   openSummary(n: DsaNotice): void {
     const ref = this.dialog.open(NoticeDetailComponent, {
       data: n,
-      width: '96vw',
-      minWidth: '96vw',
-      maxHeight: '90vh',
+      width: '95vw',
+      maxWidth: '95vw',
+      maxHeight: '95vh',
       panelClass: 'md-dialog-rounded'
     });
     ref.afterClosed().subscribe(updated => { if (updated) this.reload(); });
