@@ -12,7 +12,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { merge } from 'rxjs';
-import { DsaTextBlock, DsaTextBlockSavePayload, DsaTextBlockType } from '../../../../interfaces/dsa-text-block.interface';
+import { DsaDecisionOutcome, DsaTextBlock, DsaTextBlockSavePayload, DsaTextBlockType } from '../../../../interfaces/dsa-text-block.interface';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 
@@ -58,9 +58,18 @@ export class DecisionTextBlockEditorDialogComponent {
     { value: 'legal_basis', label: 'Legal basis' },
     { value: 'tos_clause', label: 'Terms of Use clause' }
   ];
+  readonly decisionOutcomeOptions: { value: DsaDecisionOutcome; label: string }[] = [
+    { value: 'NO_ACTION', label: 'No action' },
+    { value: 'RESTRICT', label: 'Restrict visibility' },
+    { value: 'FORWARD_TO_AUTHORITY', label: 'Forward to authority' },
+    { value: 'REMOVE_CONTENT', label: 'Remove content' }
+  ];
 
   readonly form = this.fb.nonNullable.group({
     type: this.fb.nonNullable.control<DsaTextBlockType>(this.data.block?.type ?? 'reasoning_template', { validators: [Validators.required] }),
+    decisionOutcomes: this.fb.nonNullable.control<DsaDecisionOutcome[]>(
+      this.data.block?.decisionOutcomes?.length ? this.data.block.decisionOutcomes : ['RESTRICT']
+    ),
     labelDe: this.fb.nonNullable.control(this.data.block?.labelDe ?? '', { validators: [Validators.required] }),
     descriptionDe: this.fb.nonNullable.control(this.data.block?.descriptionDe ?? ''),
     contentDe: this.fb.nonNullable.control(this.data.block?.contentDe ?? ''),
@@ -107,6 +116,7 @@ export class DecisionTextBlockEditorDialogComponent {
     if (this.form.controls.labelDe.invalid || (this.requiresContent() && this.form.controls.contentDe.invalid)) {
       this.form.controls.labelDe.markAsTouched();
       this.form.controls.contentDe.markAsTouched();
+      this.form.controls.decisionOutcomes.markAsTouched();
       return;
     }
 
@@ -154,6 +164,7 @@ export class DecisionTextBlockEditorDialogComponent {
       labelDe: raw.labelDe.trim(),
       descriptionDe: raw.descriptionDe.trim(),
       contentDe: this.requiresContent() ? raw.contentDe.trim() : '',
+      decisionOutcomes: this.requiresContent() ? raw.decisionOutcomes : [],
       labelEn: raw.labelEn.trim(),
       descriptionEn: raw.descriptionEn.trim(),
       contentEn: this.requiresContent() ? raw.contentEn.trim() : '',
@@ -182,6 +193,17 @@ export class DecisionTextBlockEditorDialogComponent {
     const validators = type === 'reasoning_template' ? [Validators.required] : [];
     this.form.controls.contentDe.setValidators(validators);
     this.form.controls.contentDe.updateValueAndValidity({ emitEvent: false });
+    this.form.controls.decisionOutcomes.setValidators(validators);
+    this.form.controls.decisionOutcomes.updateValueAndValidity({ emitEvent: false });
+
+    if (type !== 'reasoning_template') {
+      this.form.controls.decisionOutcomes.setValue([], { emitEvent: false });
+      return;
+    }
+
+    if (this.form.controls.decisionOutcomes.value.length === 0) {
+      this.form.controls.decisionOutcomes.setValue(['RESTRICT'], { emitEvent: false });
+    }
   }
 
   private germanFingerprint(): string {

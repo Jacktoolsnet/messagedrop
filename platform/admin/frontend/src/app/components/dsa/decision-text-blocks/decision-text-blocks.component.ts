@@ -14,7 +14,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
-import { DsaTextBlock, DsaTextBlockType } from '../../../interfaces/dsa-text-block.interface';
+import { DsaDecisionOutcome, DsaTextBlock, DsaTextBlockType } from '../../../interfaces/dsa-text-block.interface';
 import { DsaService } from '../../../services/dsa/dsa/dsa.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { DecisionTextBlockEditorDialogComponent } from './decision-text-block-editor-dialog/decision-text-block-editor-dialog.component';
@@ -195,6 +195,21 @@ export class DecisionTextBlocksComponent {
         return 'rule';
       default:
         return 'notes';
+    }
+  }
+
+  outcomeLabel(outcome: DsaDecisionOutcome): string {
+    switch (outcome) {
+      case 'NO_ACTION':
+        return this.i18n.t('No action');
+      case 'RESTRICT':
+        return this.i18n.t('Restrict visibility');
+      case 'FORWARD_TO_AUTHORITY':
+        return this.i18n.t('Forward to authority');
+      case 'REMOVE_CONTENT':
+        return this.i18n.t('Remove content');
+      default:
+        return outcome;
     }
   }
 

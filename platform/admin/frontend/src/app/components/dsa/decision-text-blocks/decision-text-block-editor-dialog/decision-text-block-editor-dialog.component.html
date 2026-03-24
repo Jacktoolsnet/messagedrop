@@ -25,6 +25,18 @@
           </mat-form-field>
         </div>
 
+        @if (requiresContent()) {
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ i18n.t('Applicable outcomes') }}</mat-label>
+            <mat-select formControlName="decisionOutcomes" multiple>
+              @for (option of decisionOutcomeOptions; track option.value) {
+                <mat-option [value]="option.value">{{ i18n.t(option.label) }}</mat-option>
+              }
+            </mat-select>
+            <mat-hint>{{ i18n.t('Choose one or more outcomes that should offer this reasoning template.') }}</mat-hint>
+          </mat-form-field>
+        }
+
         <mat-slide-toggle formControlName="isActive">
           {{ i18n.t('Active and available in the decision dialog') }}
         </mat-slide-toggle>

@@ -12,11 +12,11 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { map, startWith, Subject, takeUntil } from 'rxjs';
-import { DsaTextBlock } from '../../../../interfaces/dsa-text-block.interface';
+import { DsaDecisionOutcome, DsaTextBlock } from '../../../../interfaces/dsa-text-block.interface';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 
-export type DecisionOutcome = 'REMOVE_CONTENT' | 'RESTRICT' | 'NO_ACTION' | 'FORWARD_TO_AUTHORITY';
+export type DecisionOutcome = DsaDecisionOutcome;
 export interface DecisionDialogResult {
   saved: boolean;
   outcome: DecisionOutcome;
@@ -87,7 +87,10 @@ export class DecisionDialogComponent implements OnInit, OnDestroy {
 
     this.form.controls.outcome.valueChanges
       .pipe(startWith(this.form.controls.outcome.value), takeUntil(this.destroy$))
-      .subscribe((outcome) => this.syncReferenceControls(outcome));
+      .subscribe((outcome) => {
+        this.syncReferenceControls(outcome);
+        this.syncReasoningTemplateSelection(outcome);
+      });
 
     this.legalCtrl.valueChanges.pipe(takeUntil(this.destroy$))
       .subscribe(val => {
@@ -150,11 +153,19 @@ export class DecisionDialogComponent implements OnInit, OnDestroy {
   }
 
   onTemplateChange(id: string) {
+    if (!id) {
+      this.selectedTemplate = '';
+      return;
+    }
     this.applyTemplate(id);
   }
 
   isNoActionOutcome(): boolean {
     return this.form.controls.outcome.value === 'NO_ACTION';
+  }
+
+  filteredReasoningTemplates(): DsaTextBlock[] {
+    return this.filterTemplatesForOutcome(this.form.controls.outcome.value);
   }
 
   close(): void { this.ref.close(false); }
@@ -196,14 +207,7 @@ export class DecisionDialogComponent implements OnInit, OnDestroy {
         this.selectedTosDesc = this.findByGermanLabel(this.tosClauses, this.tosCtrl.value || '')?.descriptionDe || null;
         this.legalCtrl.setValue(this.legalCtrl.value || '', { emitEvent: true });
         this.tosCtrl.setValue(this.tosCtrl.value || '', { emitEvent: true });
-
-        if (!this.form.get('statement')?.value && this.form.get('outcome')?.value === 'NO_ACTION') {
-          const defaultTemplate = this.reasoningTemplates.find((row) => row.key === 'no_action') || this.reasoningTemplates[0];
-          if (defaultTemplate) {
-            this.selectedTemplate = defaultTemplate.id;
-            this.applyTemplate(defaultTemplate.id, true);
-          }
-        }
+        this.syncReasoningTemplateSelection(this.form.controls.outcome.value);
       },
       error: () => {
         this.snack.open(this.i18n.t('Could not load DSA text blocks.'), this.i18n.t('OK'), { duration: 3000 });
@@ -225,6 +229,13 @@ export class DecisionDialogComponent implements OnInit, OnDestroy {
   private findByGermanLabel(list: DsaTextBlock[], label: string): DsaTextBlock | undefined {
     const normalized = (label || '').trim();
     return list.find((row) => row.labelDe === normalized);
+  }
+
+  private filterTemplatesForOutcome(outcome: DecisionOutcome): DsaTextBlock[] {
+    return this.reasoningTemplates.filter((template) => {
+      const targets = template.decisionOutcomes || [];
+      return targets.length === 0 || targets.includes(outcome);
+    });
   }
 
   private syncReferenceControls(outcome: DecisionOutcome): void {
@@ -250,9 +261,43 @@ export class DecisionDialogComponent implements OnInit, OnDestroy {
     this.tosCtrl.enable({ emitEvent: false });
   }
 
+  private syncReasoningTemplateSelection(outcome: DecisionOutcome): void {
+    const availableTemplates = this.filterTemplatesForOutcome(outcome);
+    const hasSelectedTemplate = !!this.selectedTemplate;
+    const selectedStillAllowed = availableTemplates.some((template) => template.id === this.selectedTemplate);
+
+    if (hasSelectedTemplate && !selectedStillAllowed) {
+      const previousTemplate = this.reasoningTemplates.find((template) => template.id === this.selectedTemplate);
+      const shouldClearStatement = this.matchesTemplateContent(previousTemplate);
+      this.selectedTemplate = '';
+      if (shouldClearStatement) {
+        this.form.patchValue({ statement: '', statementEn: '' }, { emitEvent: false });
+      }
+    }
+
+    if (outcome === 'NO_ACTION' && !this.selectedTemplate && !(this.form.get('statement')?.value || '').trim()) {
+      const defaultTemplate = availableTemplates.find((template) => template.key === 'no_action') || availableTemplates[0];
+      if (defaultTemplate) {
+        this.applyTemplate(defaultTemplate.id, true);
+      }
+    }
+  }
+
+  private matchesTemplateContent(template?: DsaTextBlock): boolean {
+    if (!template) {
+      return false;
+    }
+
+    const statement = (this.form.get('statement')?.value || '').trim();
+    const statementEn = (this.form.get('statementEn')?.value || '').trim();
+    return statement === (template.contentDe || '').trim()
+      && statementEn === (template.contentEn || '').trim();
+  }
+
   private applyTemplate(id: string, silent = false) {
     const tpl = this.reasoningTemplates.find(t => t.id === id);
     if (!tpl) return;
+    this.selectedTemplate = tpl.id;
     this.form.get('statement')?.setValue(tpl.contentDe || '');
     this.form.get('statementEn')?.setValue(tpl.contentEn || '');
     if (!silent) {

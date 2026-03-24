@@ -1,4 +1,5 @@
 export type DsaTextBlockType = 'reasoning_template' | 'legal_basis' | 'tos_clause';
+export type DsaDecisionOutcome = 'NO_ACTION' | 'REMOVE_CONTENT' | 'RESTRICT' | 'FORWARD_TO_AUTHORITY';
 
 export interface DsaTextBlock {
   id: string;
@@ -10,6 +11,7 @@ export interface DsaTextBlock {
   descriptionEn: string;
   contentDe: string;
   contentEn: string;
+  decisionOutcomes: DsaDecisionOutcome[];
   sortOrder: number;
   isActive: boolean;
   translatedAt: number | null;
@@ -32,6 +34,7 @@ export interface DsaTextBlockSavePayload {
   descriptionEn: string;
   contentDe: string;
   contentEn: string;
+  decisionOutcomes?: DsaDecisionOutcome[];
   sortOrder: number;
   isActive: boolean;
   translatedAt?: number | null;

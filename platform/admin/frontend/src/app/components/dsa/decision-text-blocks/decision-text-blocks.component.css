@@ -134,6 +134,11 @@ mat-card-content {
   background: color-mix(in srgb, var(--primary) 16%, white);
 }
 
+.chip-outline {
+  border: 1px solid rgba(100, 116, 139, 0.22);
+  background: rgba(255, 255, 255, 0.82);
+}
+
 .chip-warn {
   background: color-mix(in srgb, #f57c00 18%, white);
 }

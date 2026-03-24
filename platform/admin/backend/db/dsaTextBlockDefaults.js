@@ -18,6 +18,7 @@ Das Verfahren wurde dokumentiert und ohne weitere Moderationsmaßnahme abgeschlo
         contentEn: `After reviewing the reported public content, we could not identify a sufficient violation of the Terms of Use or of applicable law.
 Based on the information currently available, there was therefore no sufficient basis to restrict or remove the content.
 The case was documented and closed without further moderation measures.`,
+        decisionOutcomes: ['NO_ACTION'],
         sortOrder: 10,
         isActive: 1
     },
@@ -34,6 +35,7 @@ Der Inhalt wurde daher entsprechend der getroffenen Moderationsmaßnahme eingesc
         contentEn: `After reviewing the reported public content, there are sufficient indications that the content violates applicable law or incites legal violations.
 Such content is not permitted under Section 10 of the Terms of Use.
 The content was therefore restricted or removed from public visibility in line with the moderation measure taken. The decision was documented; where provided for by law, an internal complaint may be submitted.`,
+        decisionOutcomes: ['RESTRICT'],
         sortOrder: 20,
         isActive: 1
     },
@@ -50,6 +52,7 @@ Zum Schutz der betroffenen Person und zur Einhaltung unserer Regeln wurde der In
         contentEn: `The reported content makes personal or private information publicly available.
 Under Sections 9 and 10 of the Terms of Use, the public disclosure or other unauthorized distribution of personal data is prohibited.
 To protect the affected person and to enforce our rules, the content was restricted or removed from public visibility in line with the moderation measure taken.`,
+        decisionOutcomes: ['RESTRICT'],
         sortOrder: 30,
         isActive: 1
     },
@@ -66,6 +69,7 @@ Zur Wahrung der Rechte betroffener Dritter wurde der Inhalt entsprechend der get
         contentEn: `According to our review, the reported content infringes the rights of third parties, in particular personal rights, copyrights, trademark rights, or data protection rights.
 Such content is not permitted under Section 10 of the Terms of Use.
 To protect the rights of affected third parties, the content was restricted or removed from public visibility in line with the moderation measure taken.`,
+        decisionOutcomes: ['RESTRICT'],
         sortOrder: 40,
         isActive: 1
     },
@@ -82,6 +86,7 @@ Zum Schutz anderer Nutzer und Dritter wurde der Inhalt entsprechend der getroffe
         contentEn: `According to our review, the reported content contains insults, threats, targeted harassment, hate speech, glorification of violence, or comparable inhuman content.
 Such content is prohibited under Section 10 of the Terms of Use.
 To protect other users and third parties, the content was restricted or removed from public visibility in line with the moderation measure taken.`,
+        decisionOutcomes: ['RESTRICT'],
         sortOrder: 50,
         isActive: 1
     },
@@ -98,6 +103,7 @@ Zum Schutz insbesondere Minderjähriger und anderer Nutzer wurde der Inhalt ents
         contentEn: `According to our review, the reported content contains pornographic, sexually explicit, or youth-endangering material.
 Such content is prohibited under Section 10 of the Terms of Use.
 To protect users, especially minors, the content was restricted or removed from public visibility in line with the moderation measure taken.`,
+        decisionOutcomes: ['RESTRICT'],
         sortOrder: 60,
         isActive: 1
     },
@@ -114,6 +120,7 @@ Der Inhalt wurde daher entsprechend der getroffenen Moderationsmaßnahme unverz�
         contentEn: `According to our review, the reported content contains sexual references to minors.
 Such content is strictly prohibited under Section 10 of the Terms of Use and may also be relevant for reporting to authorities.
 The content was therefore immediately restricted or removed from public visibility in line with the moderation measure taken; where necessary, further legal steps will be reviewed.`,
+        decisionOutcomes: ['RESTRICT', 'FORWARD_TO_AUTHORITY'],
         sortOrder: 70,
         isActive: 1
     },
@@ -130,6 +137,7 @@ Um Missbrauch des Dienstes zu verhindern und andere Nutzer zu schützen, wurde d
         contentEn: `According to our review, the reported content is misleading, fraudulent, manipulative, spam-like, or falsely suggests another identity or official representation.
 Such content is not permitted under Section 10 of the Terms of Use.
 To prevent misuse of the service and protect other users, the content was restricted or removed from public visibility in line with the moderation measure taken.`,
+        decisionOutcomes: ['RESTRICT'],
         sortOrder: 80,
         isActive: 1
     },
@@ -146,6 +154,7 @@ Zum Schutz des Dienstes und seiner Nutzer wurde der Inhalt entsprechend der getr
         contentEn: `According to our review, the reported content is connected to malware, malicious code, attacks on the security, stability, or availability of the service, or to instructions for circumventing protective measures.
 Such content is prohibited under Section 10 of the Terms of Use.
 To protect the service and its users, the content was restricted or removed from public visibility in line with the moderation measure taken.`,
+        decisionOutcomes: ['RESTRICT', 'FORWARD_TO_AUTHORITY'],
         sortOrder: 90,
         isActive: 1
     },
@@ -162,6 +171,7 @@ Diese vorläufige Maßnahme erfolgt auf Grundlage von Abschnitt 11.2 der Nutzung
         contentEn: `There are indications that the reported content may be illegal or may violate the Terms of Use.
 Pending completion of the further review, the public visibility of the content has been restricted as a precaution.
 This temporary measure is based on Section 11.2 of the Terms of Use. Once the further review is complete, the decision may be confirmed, changed, or lifted.`,
+        decisionOutcomes: ['RESTRICT'],
         sortOrder: 100,
         isActive: 1
     },
@@ -178,6 +188,7 @@ Bis zur weiteren Klärung kann die öffentliche Sichtbarkeit des Inhalts eingesc
         contentEn: `According to our review, there are sufficient indications that the reported content may involve a legal violation relevant to the competent authority.
 Based on Section 11.2 of the Terms of Use, the case was forwarded to the competent authority or body.
 Pending further clarification, the public visibility of the content may remain restricted. The decision and the underlying information have been documented.`,
+        decisionOutcomes: ['FORWARD_TO_AUTHORITY'],
         sortOrder: 110,
         isActive: 1
     },

@@ -1366,5 +1366,9 @@
   "EN": "EN",
   "This version is legally authoritative and should always be maintained first.": "Diese Fassung ist rechtlich maßgeblich und sollte immer zuerst gepflegt werden.",
   "This version is optional, non-binding, and can be generated from the German source.": "Diese Fassung ist optional, unverbindlich und kann aus der deutschen Quelle erzeugt werden.",
-  "Only inactive": "Nur inaktive"
+  "Only inactive": "Nur inaktive",
+  "Restrict visibility": "Sichtbarkeit einschränken",
+  "Applicable outcomes": "Passende Ergebnisse",
+  "Choose one or more outcomes that should offer this reasoning template.": "Wähle ein oder mehrere Ergebnisse aus, für die diese Begründungsvorlage angeboten werden soll.",
+  "No reasoning templates are assigned to the selected outcome yet.": "Dem ausgewählten Ergebnis sind noch keine Begründungsvorlagen zugewiesen."
 }

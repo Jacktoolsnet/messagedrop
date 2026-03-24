@@ -13,6 +13,7 @@ const columns = {
     descriptionEn: 'descriptionEn',
     contentDe: 'contentDe',
     contentEn: 'contentEn',
+    decisionOutcomes: 'decisionOutcomes',
     sortOrder: 'sortOrder',
     isActive: 'isActive',
     translatedAt: 'translatedAt',
@@ -32,6 +33,7 @@ function init(db) {
         ${columns.descriptionEn} TEXT NOT NULL DEFAULT '',
         ${columns.contentDe} TEXT NOT NULL DEFAULT '',
         ${columns.contentEn} TEXT NOT NULL DEFAULT '',
+        ${columns.decisionOutcomes} TEXT NOT NULL DEFAULT '[]',
         ${columns.sortOrder} INTEGER NOT NULL DEFAULT 0,
         ${columns.isActive} INTEGER NOT NULL DEFAULT 1,
         ${columns.translatedAt} INTEGER DEFAULT NULL,
@@ -61,6 +63,9 @@ function init(db) {
         }
 
         const knownColumns = new Set(rows.map((row) => row?.name));
+        if (!knownColumns.has(columns.decisionOutcomes)) {
+            db.run(`ALTER TABLE ${tableName} ADD COLUMN ${columns.decisionOutcomes} TEXT NOT NULL DEFAULT '[]'`, []);
+        }
         if (!knownColumns.has(columns.translatedAt)) {
             db.run(`ALTER TABLE ${tableName} ADD COLUMN ${columns.translatedAt} INTEGER DEFAULT NULL`, []);
         }
@@ -90,6 +95,7 @@ function seedDefaults(db) {
                 entry.descriptionEn || '',
                 entry.contentDe || '',
                 entry.contentEn || '',
+                JSON.stringify(Array.isArray(entry.decisionOutcomes) ? entry.decisionOutcomes : []),
                 Number.isFinite(entry.sortOrder) ? entry.sortOrder : 0,
                 entry.isActive ? 1 : 0,
                 now,
@@ -107,12 +113,13 @@ function seedDefaults(db) {
                 ${columns.descriptionEn},
                 ${columns.contentDe},
                 ${columns.contentEn},
+                ${columns.decisionOutcomes},
                 ${columns.sortOrder},
                 ${columns.isActive},
                 ${columns.translatedAt},
                 ${columns.createdAt},
                 ${columns.updatedAt}
-              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `, params, () => { });
         });
     });
@@ -131,6 +138,7 @@ function create(db, payload, callback) {
         payload?.descriptionEn ?? '',
         payload?.contentDe ?? '',
         payload?.contentEn ?? '',
+        JSON.stringify(Array.isArray(payload?.decisionOutcomes) ? payload.decisionOutcomes : []),
         Number.isFinite(payload?.sortOrder) ? payload.sortOrder : 0,
         payload?.isActive ? 1 : 0,
         Number.isFinite(payload?.translatedAt) ? payload.translatedAt : null,
@@ -149,12 +157,13 @@ function create(db, payload, callback) {
         ${columns.descriptionEn},
         ${columns.contentDe},
         ${columns.contentEn},
+        ${columns.decisionOutcomes},
         ${columns.sortOrder},
         ${columns.isActive},
         ${columns.translatedAt},
         ${columns.createdAt},
         ${columns.updatedAt}
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `, params, function (err) {
         if (err) {
             return callback(err);
@@ -235,6 +244,7 @@ function update(db, id, fields, callback) {
         columns.descriptionEn,
         columns.contentDe,
         columns.contentEn,
+        columns.decisionOutcomes,
         columns.sortOrder,
         columns.isActive,
         columns.translatedAt

@@ -82,6 +82,14 @@
             </span>
           </div>
 
+          @if (row.type === 'reasoning_template' && row.decisionOutcomes.length > 0) {
+            <div class="chip-row">
+              @for (outcome of row.decisionOutcomes; track outcome) {
+                <span class="chip chip-outline">{{ outcomeLabel(outcome) }}</span>
+              }
+            </div>
+          }
+
           @if (row.descriptionDe || row.descriptionEn) {
             <div class="desc-grid">
               @if (row.descriptionDe) {

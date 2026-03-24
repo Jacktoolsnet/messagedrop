@@ -37,7 +37,7 @@
             <mat-label>{{ i18n.t('Reasoning template') }}</mat-label>
             <mat-select [(value)]="selectedTemplate" (selectionChange)="onTemplateChange($event.value)">
               <mat-option [value]="''">{{ i18n.t('None') }}</mat-option>
-              @for (t of reasoningTemplates; track t.id) {
+              @for (t of filteredReasoningTemplates(); track t.id) {
                 <mat-option [value]="t.id">
                   <div class="opt-line">
                     <span class="opt-label">{{ localizedLabel(t) }}</span>
@@ -48,6 +48,9 @@
                 </mat-option>
               }
             </mat-select>
+            @if (filteredReasoningTemplates().length === 0) {
+              <mat-hint>{{ i18n.t('No reasoning templates are assigned to the selected outcome yet.') }}</mat-hint>
+            }
           </mat-form-field>
         </section>
 

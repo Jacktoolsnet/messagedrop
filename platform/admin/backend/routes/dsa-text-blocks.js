@@ -8,6 +8,8 @@ const { translateFieldsWithFallback } = require('../utils/deeplTranslator');
 const router = express.Router();
 router.use(requireAdminJwt, requireRole('moderator', 'legal', 'admin', 'root'));
 
+const VALID_DECISION_OUTCOMES = ['NO_ACTION', 'REMOVE_CONTENT', 'RESTRICT', 'FORWARD_TO_AUTHORITY'];
+
 function db(req) {
     return req.database?.db;
 }
@@ -47,6 +49,15 @@ function isValidType(value) {
     return Object.values(tableDsaTextBlock.textBlockTypes).includes(value);
 }
 
+function normalizeDecisionOutcomes(value) {
+    if (!Array.isArray(value)) {
+        return [];
+    }
+    return value
+        .map((entry) => normalizeString(entry))
+        .filter((entry, index, arr) => !!entry && VALID_DECISION_OUTCOMES.includes(entry) && arr.indexOf(entry) === index);
+}
+
 function validatePayload(body, { partial = false } = {}) {
     const type = normalizeString(body?.type);
     const labelDe = normalizeString(body?.labelDe);
@@ -55,6 +66,7 @@ function validatePayload(body, { partial = false } = {}) {
     const descriptionEn = normalizeString(body?.descriptionEn);
     const contentDe = typeof body?.contentDe === 'string' ? body.contentDe.trim() : '';
     const contentEn = typeof body?.contentEn === 'string' ? body.contentEn.trim() : '';
+    const decisionOutcomes = normalizeDecisionOutcomes(body?.decisionOutcomes);
     const sortOrder = normalizeInteger(body?.sortOrder, 0);
     const isActive = normalizeBoolean(body?.isActive, true);
     const translatedAt = body?.translatedAt === null || body?.translatedAt === undefined
@@ -80,6 +92,12 @@ function validatePayload(body, { partial = false } = {}) {
         throw apiError.badRequest('content_de_required');
     }
 
+    if ((!partial || Object.prototype.hasOwnProperty.call(body || {}, 'decisionOutcomes'))
+        && effectiveType === tableDsaTextBlock.textBlockTypes.REASONING_TEMPLATE
+        && decisionOutcomes.length === 0) {
+        throw apiError.badRequest('decision_outcomes_required');
+    }
+
     const rawKey = normalizeString(body?.key);
 
     return {
@@ -91,6 +109,7 @@ function validatePayload(body, { partial = false } = {}) {
         descriptionEn,
         contentDe,
         contentEn,
+        decisionOutcomes,
         sortOrder,
         isActive,
         translatedAt
@@ -100,6 +119,18 @@ function validatePayload(body, { partial = false } = {}) {
 function toDto(row) {
     if (!row) {
         return null;
+    }
+
+    let decisionOutcomes = [];
+    try {
+        const parsed = JSON.parse(row.decisionOutcomes || '[]');
+        decisionOutcomes = normalizeDecisionOutcomes(parsed);
+    } catch (_error) {
+        decisionOutcomes = [];
+    }
+
+    if (row.type === tableDsaTextBlock.textBlockTypes.REASONING_TEMPLATE && decisionOutcomes.length === 0) {
+        decisionOutcomes = [...VALID_DECISION_OUTCOMES];
     }
 
     return {
@@ -112,6 +143,7 @@ function toDto(row) {
         descriptionEn: row.descriptionEn || '',
         contentDe: row.contentDe || '',
         contentEn: row.contentEn || '',
+        decisionOutcomes,
         sortOrder: Number(row.sortOrder || 0),
         isActive: !!row.isActive,
         translatedAt: row.translatedAt == null ? null : Number(row.translatedAt),
