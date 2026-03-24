@@ -82,25 +82,6 @@
                 <span>{{ dec.decidedBy || '—' }}</span>
               </div>
             </div>
-            <section class="language-notice decision-hero" [attr.aria-label]="i18n.t('Decision language notice')">
-              <div class="decision-hero-copy">
-                <span class="eyebrow">{{ i18n.t('Decision language notice') }}</span>
-                <h3>{{ i18n.t('The German version is authoritative. The English version is included only as a non-binding service translation.') }}</h3>
-              </div>
-              <div class="decision-language-badges" aria-hidden="true">
-                <span class="language-badge binding">{{ i18n.t('DE') }}</span>
-                <span class="language-badge service">{{ i18n.t('EN') }}</span>
-              </div>
-            </section>
-            <section class="decision-language-compare">
-              <header class="decision-language-compare-header">
-                <div>
-                  <span class="eyebrow">{{ i18n.t('Decision') }}</span>
-                  <h3>{{ i18n.t('Bilingual decision text') }}</h3>
-                </div>
-                <p>{{ i18n.t('Compare the binding German version with the English service translation below.') }}</p>
-              </header>
-            </section>
             <div class="decision-language-grid">
               <section class="decision-language-panel binding">
                 <header class="decision-language-header">
@@ -142,8 +123,8 @@
                   <div class="decision-language-title">
                     <mat-icon>translate</mat-icon>
                     <div>
-                      <h3>{{ i18n.t('English service translation') }}</h3>
-                      <p>{{ i18n.t('This version is optional, non-binding, and can be generated from the German source.') }}</p>
+                      <h3>English service translation</h3>
+                      <p>This English translation is provided for convenience only and is not legally binding. The legally binding version is exclusively the current complete German version of this decision.</p>
                     </div>
                   </div>
                   <mat-chip selected>{{ i18n.t('EN') }}</mat-chip>
