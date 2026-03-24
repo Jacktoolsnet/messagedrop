@@ -94,8 +94,9 @@ export class DecisionTextBlocksComponent {
 
   openCreateDialog(): void {
     this.dialog.open(DecisionTextBlockEditorDialogComponent, {
-      width: 'min(92vw, 900px)',
-      maxWidth: '95vw',
+      width: '1100px',
+      maxWidth: '96vw',
+      maxHeight: '95vh',
       data: { block: null }
     }).afterClosed()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -108,8 +109,9 @@ export class DecisionTextBlocksComponent {
 
   openEditDialog(row: DsaTextBlock): void {
     this.dialog.open(DecisionTextBlockEditorDialogComponent, {
-      width: 'min(92vw, 900px)',
-      maxWidth: '95vw',
+      width: '1100px',
+      maxWidth: '96vw',
+      maxHeight: '95vh',
       data: { block: row }
     }).afterClosed()
       .pipe(takeUntilDestroyed(this.destroyRef))
