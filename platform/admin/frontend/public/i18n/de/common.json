@@ -1365,5 +1365,6 @@
   "DE": "DE",
   "EN": "EN",
   "This version is legally authoritative and should always be maintained first.": "Diese Fassung ist rechtlich maßgeblich und sollte immer zuerst gepflegt werden.",
-  "This version is optional, non-binding, and can be generated from the German source.": "Diese Fassung ist optional, unverbindlich und kann aus der deutschen Quelle erzeugt werden."
+  "This version is optional, non-binding, and can be generated from the German source.": "Diese Fassung ist optional, unverbindlich und kann aus der deutschen Quelle erzeugt werden.",
+  "Only inactive": "Nur inaktive"
 }

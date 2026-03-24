@@ -9,8 +9,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
@@ -18,6 +18,8 @@ import { DsaTextBlock, DsaTextBlockType } from '../../../interfaces/dsa-text-blo
 import { DsaService } from '../../../services/dsa/dsa/dsa.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { DecisionTextBlockEditorDialogComponent } from './decision-text-block-editor-dialog/decision-text-block-editor-dialog.component';
+
+type ActiveFilter = 'all' | 'active' | 'inactive';
 
 @Component({
   selector: 'app-decision-text-blocks',
@@ -33,7 +35,7 @@ import { DecisionTextBlockEditorDialogComponent } from './decision-text-block-ed
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatSlideToggleModule
+    MatTooltipModule
   ],
   templateUrl: './decision-text-blocks.component.html',
   styleUrls: ['./decision-text-blocks.component.css'],
@@ -52,7 +54,7 @@ export class DecisionTextBlocksComponent {
   readonly filterForm = this.fb.nonNullable.group({
     type: this.fb.nonNullable.control<DsaTextBlockType | ''>(''),
     q: this.fb.nonNullable.control(''),
-    activeOnly: this.fb.nonNullable.control(true)
+    activeFilter: this.fb.nonNullable.control<ActiveFilter>('active')
   });
 
   readonly activeCount = computed(() => this.rows().filter((row) => row.isActive).length);
@@ -61,6 +63,11 @@ export class DecisionTextBlocksComponent {
     { value: 'reasoning_template', label: 'Reasoning templates' },
     { value: 'legal_basis', label: 'Legal bases' },
     { value: 'tos_clause', label: 'Terms of Use clauses' }
+  ];
+  readonly activeFilterOptions: { value: ActiveFilter; label: string }[] = [
+    { value: 'active', label: 'Only active' },
+    { value: 'inactive', label: 'Only inactive' },
+    { value: 'all', label: 'All' }
   ];
 
   constructor() {
@@ -79,7 +86,9 @@ export class DecisionTextBlocksComponent {
     this.dsa.listDecisionTextBlocks({
       type: raw.type || undefined,
       q: raw.q || undefined,
-      activeOnly: raw.activeOnly
+      activeOnly: raw.activeFilter === 'all'
+        ? undefined
+        : raw.activeFilter === 'active'
     }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (rows) => {
         this.rows.set(rows || []);

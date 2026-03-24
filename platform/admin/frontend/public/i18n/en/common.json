@@ -1,4 +1,8 @@
 {
   "This version is legally authoritative and should always be maintained first.": "This version is legally authoritative and should always be maintained first.",
-  "This version is optional, non-binding, and can be generated from the German source.": "This version is optional, non-binding, and can be generated from the German source."
+  "This version is optional, non-binding, and can be generated from the German source.": "This version is optional, non-binding, and can be generated from the German source.",
+  "Status": "Status",
+  "Only active": "Only active",
+  "Only inactive": "Only inactive",
+  "All": "All"
 }

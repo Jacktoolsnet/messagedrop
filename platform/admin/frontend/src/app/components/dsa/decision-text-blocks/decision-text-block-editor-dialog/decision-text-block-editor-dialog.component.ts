@@ -10,6 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { merge } from 'rxjs';
 import { DsaTextBlock, DsaTextBlockSavePayload, DsaTextBlockType } from '../../../../interfaces/dsa-text-block.interface';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
@@ -31,7 +32,8 @@ export interface DecisionTextBlockEditorDialogData {
     MatButtonModule,
     MatIconModule,
     MatSelectModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    MatTooltipModule
   ],
   templateUrl: './decision-text-block-editor-dialog.component.html',
   styleUrls: ['./decision-text-block-editor-dialog.component.css'],

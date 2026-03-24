@@ -63,9 +63,19 @@
               <h3>{{ i18n.t('English service translation') }}</h3>
               <p>{{ i18n.t('This version is optional, non-binding, and can be generated from the German source.') }}</p>
             </div>
-            <button mat-stroked-button type="button" (click)="translateToEnglish()" [disabled]="translating()">
-              <mat-icon>translate</mat-icon>
-              {{ i18n.t('Translate with DeepL') }}
+            <button
+              mat-icon-button
+              type="button"
+              class="action-icon-button action-secondary"
+              (click)="translateToEnglish()"
+              [disabled]="translating()"
+              [matTooltip]="i18n.t('Translate')"
+              [attr.aria-label]="i18n.t('Translate')">
+              @if (translating()) {
+                <mat-icon class="spin">autorenew</mat-icon>
+              } @else {
+                <mat-icon>translate</mat-icon>
+              }
             </button>
           </div>
 
@@ -96,10 +106,15 @@
     </div>
 
     <div class="dialog-actions">
-      <button mat-stroked-button type="button" (click)="close()">{{ i18n.t('Cancel') }}</button>
+      <button mat-stroked-button type="button" (click)="close()">
+        <mat-icon>close</mat-icon>
+        {{ i18n.t('Cancel') }}
+      </button>
       <button mat-raised-button color="primary" type="submit" [disabled]="saving()">
         @if (saving()) {
           <mat-icon class="spin">autorenew</mat-icon>
+        } @else {
+          <mat-icon>save</mat-icon>
         }
         {{ i18n.t('Save') }}
       </button>

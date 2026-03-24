@@ -51,9 +51,14 @@
           <input matInput formControlName="q" [placeholder]="i18n.t('Label, description, text or key')" />
         </mat-form-field>
 
-        <mat-slide-toggle formControlName="activeOnly">
-          {{ i18n.t('Only active') }}
-        </mat-slide-toggle>
+        <mat-form-field appearance="outline">
+          <mat-label>{{ i18n.t('Status') }}</mat-label>
+          <mat-select formControlName="activeFilter">
+            @for (option of activeFilterOptions; track option.value) {
+              <mat-option [value]="option.value">{{ i18n.t(option.label) }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
       </div>
     </mat-card-content>
   </mat-card>
@@ -103,15 +108,27 @@
           </div>
         </mat-card-content>
 
-        <mat-card-actions align="end">
-          <button mat-stroked-button type="button" (click)="openEditDialog(row)">
-            <mat-icon>edit</mat-icon>
-            {{ i18n.t('Edit') }}
-          </button>
-          <button mat-stroked-button color="warn" type="button" (click)="confirmDelete(row)">
-            <mat-icon>delete</mat-icon>
-            {{ i18n.t('Delete') }}
-          </button>
+        <mat-card-actions align="end" class="card-actions">
+          <div class="card-action-bar">
+            <button
+              mat-icon-button
+              type="button"
+              class="card-action-button action-neutral"
+              (click)="openEditDialog(row)"
+              [matTooltip]="i18n.t('Edit')"
+              [attr.aria-label]="i18n.t('Edit')">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              type="button"
+              class="card-action-button action-danger"
+              (click)="confirmDelete(row)"
+              [matTooltip]="i18n.t('Delete')"
+              [attr.aria-label]="i18n.t('Delete')">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
         </mat-card-actions>
       </mat-card>
     }
