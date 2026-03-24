@@ -1,0 +1,140 @@
+:host {
+  display: block;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1rem;
+}
+
+.toolbar-title {
+  font-weight: 600;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.hero-card,
+.text-block-card {
+  border-radius: 22px;
+  overflow: hidden;
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.avatar-accent {
+  background: color-mix(in srgb, var(--mat-sys-primary) 14%, transparent);
+}
+
+.avatar-neutral {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.stats-row {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.stats-row > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.filter-row {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+}
+
+.grow {
+  width: 100%;
+}
+
+.list-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1rem;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.3rem 0.75rem;
+  background: rgba(0, 0, 0, 0.06);
+  font-size: 0.85rem;
+}
+
+.chip-accent {
+  background: color-mix(in srgb, var(--mat-sys-primary) 16%, white);
+}
+
+.chip-warn {
+  background: color-mix(in srgb, #f57c00 18%, white);
+}
+
+.desc-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.desc-grid p,
+.preview-text {
+  margin: 0.25rem 0 0;
+  white-space: pre-wrap;
+}
+
+.preview-text {
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.03);
+  min-height: 72px;
+}
+
+.meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  margin-top: 0.9rem;
+  color: rgba(0, 0, 0, 0.72);
+  font-size: 0.9rem;
+}
+
+.empty-state {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  padding: 2.5rem 1rem;
+  color: rgba(0, 0, 0, 0.68);
+  text-align: center;
+}
+
+@media (max-width: 840px) {
+  .filter-row {
+    grid-template-columns: 1fr;
+  }
+
+  .desc-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -11,6 +11,7 @@ const { notifyContentOwner } = require('../utils/notifyContentOwner');
 const { notifyReporter } = require('../utils/notifyReporter');
 const { signServiceJwt } = require('../utils/serviceJwt');
 const { apiError } = require('../middleware/api-error');
+const { translateFieldsWithFallback } = require('../utils/deeplTranslator');
 
 const tableSignal = require('../db/tableDsaSignal');
 const tableNotice = require('../db/tableDsaNotice');
@@ -718,8 +719,116 @@ router.post('/publicmessage/visibility', async (req, res, next) => {
     }
 });
 
-function buildDecisionNotification({ notice, noticeId, outcome, automatedUsed }) {
-    const verdict = outcome.replace(/_/g, ' ').toLowerCase();
+
+function formatDecisionOutcomeLabelEn(outcome) {
+    if (!outcome) return 'pending';
+    switch (String(outcome).toUpperCase()) {
+        case 'NO_ACTION':
+            return 'no action';
+        case 'RESTRICT':
+            return 'restricted';
+        case 'FORWARD_TO_AUTHORITY':
+            return 'forwarded to the competent authority';
+        case 'REMOVE_CONTENT':
+            return 'content removed';
+        default:
+            return String(outcome).replace(/_/g, ' ').toLowerCase();
+    }
+}
+
+function formatDecisionOutcomeLabelDe(outcome) {
+    if (!outcome) return 'ausstehend';
+    switch (String(outcome).toUpperCase()) {
+        case 'NO_ACTION':
+            return 'kein Handlungsbedarf';
+        case 'RESTRICT':
+            return 'eingeschränkt';
+        case 'FORWARD_TO_AUTHORITY':
+            return 'an die zuständige Behörde weitergeleitet';
+        case 'REMOVE_CONTENT':
+            return 'Inhalt entfernt';
+        default:
+            return String(outcome).replace(/_/g, ' ').toLowerCase();
+    }
+}
+
+async function ensureDecisionTextVariants(input) {
+    const base = {
+        legalBasis: asString(input?.legalBasis),
+        legalBasisEn: asString(input?.legalBasisEn),
+        tosBasis: asString(input?.tosBasis),
+        tosBasisEn: asString(input?.tosBasisEn),
+        statement: asString(input?.statement),
+        statementEn: asString(input?.statementEn)
+    };
+
+    const missingTranslations = {};
+    if (base.legalBasis && !base.legalBasisEn) missingTranslations.legalBasisEn = base.legalBasis;
+    if (base.tosBasis && !base.tosBasisEn) missingTranslations.tosBasisEn = base.tosBasis;
+    if (base.statement && !base.statementEn) missingTranslations.statementEn = base.statement;
+
+    if (Object.keys(missingTranslations).length === 0) {
+        return {
+            ...base,
+            usedTranslationFallback: false
+        };
+    }
+
+    const { translated, usedFallback } = await translateFieldsWithFallback(missingTranslations, 'EN');
+    return {
+        legalBasis: base.legalBasis,
+        legalBasisEn: base.legalBasisEn || translated.legalBasisEn || base.legalBasis,
+        tosBasis: base.tosBasis,
+        tosBasisEn: base.tosBasisEn || translated.tosBasisEn || base.tosBasis,
+        statement: base.statement,
+        statementEn: base.statementEn || translated.statementEn || base.statement,
+        usedTranslationFallback: usedFallback
+    };
+}
+
+function buildDecisionDispatchContent({ noticeId, outcome, automatedUsed, legalBasis, legalBasisEn, tosBasis, tosBasisEn, statement, statementEn }) {
+    const processDe = automatedUsed ? 'automatisiert unterstützt' : 'manuell';
+    const processEn = automatedUsed ? 'automation-assisted' : 'manual';
+
+    const germanLines = [
+        `Wir haben die Prüfung für den DSA-Fall #${noticeId} abgeschlossen.`,
+        `Ergebnis: ${formatDecisionOutcomeLabelDe(outcome)}.`,
+        `Prüfungsart: ${processDe}.`
+    ];
+    if (legalBasis) germanLines.push(`Rechtsgrundlage: ${legalBasis}`);
+    if (tosBasis) germanLines.push(`AGB-/ToS-Grundlage: ${tosBasis}`);
+    if (statement) germanLines.push(`Begründung: ${statement}`);
+    germanLines.push('Maßgeblich und rechtlich verbindlich ist ausschließlich die deutsche Fassung.');
+
+    const englishLines = [
+        'English service translation (non-binding):',
+        `We completed the review for DSA case #${noticeId}.`,
+        `Outcome: ${formatDecisionOutcomeLabelEn(outcome)}.`,
+        `Process type: ${processEn}.`
+    ];
+    if (legalBasisEn) englishLines.push(`Legal basis: ${legalBasisEn}`);
+    if (tosBasisEn) englishLines.push(`Terms of Use basis: ${tosBasisEn}`);
+    if (statementEn) englishLines.push(`Reasoning: ${statementEn}`);
+    englishLines.push('The English version is provided for convenience only. In case of discrepancies, the German version is binding.');
+
+    return {
+        title: 'DSA-Entscheidung verfügbar / DSA decision available',
+        body: [germanLines.join('\n'), englishLines.join('\n')].join('\n\n')
+    };
+}
+
+function buildDecisionNotification({ notice, noticeId, outcome, automatedUsed, legalBasis, legalBasisEn, tosBasis, tosBasisEn, statement, statementEn }) {
+    const dispatch = buildDecisionDispatchContent({
+        noticeId,
+        outcome,
+        automatedUsed,
+        legalBasis,
+        legalBasisEn,
+        tosBasis,
+        tosBasisEn,
+        statement,
+        statementEn
+    });
     return {
         type: 'notice',
         event: 'notice_decided',
@@ -730,12 +839,8 @@ function buildDecisionNotification({ notice, noticeId, outcome, automatedUsed })
         caseId: noticeId,
         statusUrl: buildStatusUrl(notice?.publicToken),
         includeExcerpt: true,
-        title: 'DSA decision available',
-        bodySegments: [
-            `We completed the review for DSA case #${noticeId}.`,
-            `Outcome: ${verdict}.`,
-            `Process type: ${automatedUsed ? 'automated' : 'manual'}.`
-        ]
+        title: dispatch.title,
+        body: dispatch.body
     };
 }
 
@@ -986,16 +1091,24 @@ router.get('/notices/:id/decision', (req, res, next) => {
 });
 
 /* ---------------------------- Decisions ---------------------------- */
-router.post('/notices/:id/decision', (req, res, next) => {
+router.post('/notices/:id/decision', async (req, res, next) => {
     const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
 
     const id = crypto.randomUUID();
     const decidedAt = Date.now();
     const outcome = String(req.body?.outcome || 'NO_ACTION');
-    const legalBasis = asString(req.body?.legalBasis);
-    const tosBasis = asString(req.body?.tosBasis);
     const automatedUsed = req.body?.automatedUsed ? 1 : 0;
-    const statement = asString(req.body?.statement);
+
+    let decisionTexts;
+    try {
+        decisionTexts = await ensureDecisionTextVariants(req.body);
+    } catch (error) {
+        const apiErr = error?.status ? error : apiError.internal('translate_failed');
+        if (!apiErr.detail) {
+            apiErr.detail = error?.message || error;
+        }
+        return next(apiErr);
+    }
 
     tableNotice.getById(_db, req.params.id, (lookupErr, noticeRow) => {
         if (lookupErr) {
@@ -1010,96 +1123,128 @@ router.post('/notices/:id/decision', (req, res, next) => {
             // ignore prevErr; just means no previous decision
 
             tableDecision.create(
-            _db, id, req.params.id, outcome, legalBasis, tosBasis, automatedUsed,
-            `admin:${req.admin?.sub || 'unknown'}`, decidedAt, statement,
-            (err, row) => {
-                if (err) {
-                    const apiErr = apiError.internal('db_error');
-                    apiErr.detail = err.message;
-                    return next(apiErr);
-                }
+                _db,
+                id,
+                req.params.id,
+                outcome,
+                decisionTexts.legalBasis,
+                decisionTexts.legalBasisEn,
+                decisionTexts.tosBasis,
+                decisionTexts.tosBasisEn,
+                automatedUsed,
+                `admin:${req.admin?.sub || 'unknown'}`,
+                decidedAt,
+                decisionTexts.statement,
+                decisionTexts.statementEn,
+                (err, row) => {
+                    if (err) {
+                        const apiErr = apiError.internal('db_error');
+                        apiErr.detail = err.message;
+                        return next(apiErr);
+                    }
 
-                // Status -> DECIDED
-                tableNotice.updateStatus(_db, req.params.id, 'DECIDED', decidedAt, () => { });
+                    // Status -> DECIDED
+                    tableNotice.updateStatus(_db, req.params.id, 'DECIDED', decidedAt, () => { });
 
-                if (outcome === 'NO_ACTION' && noticeRow?.contentId) {
-                    void setPublicMessageVisibility(String(noticeRow.contentId), true).catch((error) => {
-                        req.logger?.warn?.('Automatic notice visibility sync failed', {
-                            noticeId: req.params.id,
-                            contentId: noticeRow.contentId,
-                            error: error?.message || error,
-                            detail: error?.detail,
-                            upstreamStatus: error?.status,
-                            messageUuid: error?.messageUuid
+                    if (outcome === 'NO_ACTION' && noticeRow?.contentId) {
+                        void setPublicMessageVisibility(String(noticeRow.contentId), true).catch((error) => {
+                            req.logger?.warn?.('Automatic notice visibility sync failed', {
+                                noticeId: req.params.id,
+                                contentId: noticeRow.contentId,
+                                error: error?.message || error,
+                                detail: error?.detail,
+                                upstreamStatus: error?.status,
+                                messageUuid: error?.messageUuid
+                            });
                         });
-                    });
-                }
+                    }
 
-                // Audit
-                const auditId = crypto.randomUUID();
-                tableAudit.create(
-                    _db, auditId, 'decision', id, 'create',
-                    `admin:${req.admin?.sub || 'unknown'}`, decidedAt,
-                    JSON.stringify({ noticeId: req.params.id, outcome }),
-                    () => { }
-                );
+                    // Audit
+                    const auditId = crypto.randomUUID();
+                    tableAudit.create(
+                        _db, auditId, 'decision', id, 'create',
+                        `admin:${req.admin?.sub || 'unknown'}`,
+                        decidedAt,
+                        JSON.stringify({
+                            noticeId: req.params.id,
+                            outcome,
+                            usedTranslationFallback: decisionTexts.usedTranslationFallback === true
+                        }),
+                        () => { }
+                    );
 
-                // Create a NOTICE-level audit entry so public status timeline reflects decision creation/changes
-                const noticeAuditAction = prevDecisionRow ? 'decision_change' : 'decision_create';
-                const noticeAuditDetails = {
-                    decisionId: id,
-                    outcome,
-                    previousOutcome: prevDecisionRow ? prevDecisionRow.outcome : null
-                };
-                tableAudit.create(
-                    _db,
-                    crypto.randomUUID(),
-                    'notice',
-                    req.params.id,
-                    noticeAuditAction,
-                    `admin:${req.admin?.sub || 'unknown'}`,
-                    decidedAt,
-                    JSON.stringify(noticeAuditDetails),
-                    () => { }
-                );
-
-                if (noticeRow.status !== 'DECIDED') {
+                    // Create a NOTICE-level audit entry so public status timeline reflects decision creation/changes
+                    const noticeAuditAction = prevDecisionRow ? 'decision_change' : 'decision_create';
+                    const noticeAuditDetails = {
+                        decisionId: id,
+                        outcome,
+                        previousOutcome: prevDecisionRow ? prevDecisionRow.outcome : null
+                    };
                     tableAudit.create(
                         _db,
                         crypto.randomUUID(),
                         'notice',
                         req.params.id,
-                        'status_change',
+                        noticeAuditAction,
                         `admin:${req.admin?.sub || 'unknown'}`,
                         decidedAt,
-                        JSON.stringify({
-                            status: 'DECIDED',
-                            previousStatus: noticeRow.status
-                        }),
+                        JSON.stringify(noticeAuditDetails),
                         () => { }
                     );
-                }
 
-                void notifyContentOwner(req, buildDecisionNotification({
-                    notice: noticeRow,
-                    noticeId: req.params.id,
-                    outcome,
-                    automatedUsed
-                }));
-
-                void notifyReporter(req, {
-                    event: 'notice_decided',
-                    notice: buildReporterNotice(noticeRow),
-                    statusUrl: buildStatusUrl(noticeRow.publicToken),
-                    extras: {
-                        decisionOutcome: outcome,
-                        statement
+                    if (noticeRow.status !== 'DECIDED') {
+                        tableAudit.create(
+                            _db,
+                            crypto.randomUUID(),
+                            'notice',
+                            req.params.id,
+                            'status_change',
+                            `admin:${req.admin?.sub || 'unknown'}`,
+                            decidedAt,
+                            JSON.stringify({
+                                status: 'DECIDED',
+                                previousStatus: noticeRow.status
+                            }),
+                            () => { }
+                        );
                     }
-                });
 
-                res.status(201).json(row); // { id }
-            }
-        );
+                    void notifyContentOwner(req, buildDecisionNotification({
+                        notice: noticeRow,
+                        noticeId: req.params.id,
+                        outcome,
+                        automatedUsed,
+                        legalBasis: decisionTexts.legalBasis,
+                        legalBasisEn: decisionTexts.legalBasisEn,
+                        tosBasis: decisionTexts.tosBasis,
+                        tosBasisEn: decisionTexts.tosBasisEn,
+                        statement: decisionTexts.statement,
+                        statementEn: decisionTexts.statementEn
+                    }));
+
+                    void notifyReporter(req, {
+                        event: 'notice_decided',
+                        notice: buildReporterNotice(noticeRow),
+                        statusUrl: buildStatusUrl(noticeRow.publicToken),
+                        extras: {
+                            decisionOutcome: outcome,
+                            statement: decisionTexts.statement,
+                            statementDe: decisionTexts.statement,
+                            statementEn: decisionTexts.statementEn,
+                            legalBasisDe: decisionTexts.legalBasis,
+                            legalBasisEn: decisionTexts.legalBasisEn,
+                            tosBasisDe: decisionTexts.tosBasis,
+                            tosBasisEn: decisionTexts.tosBasisEn,
+                            automatedUsed: automatedUsed === 1
+                        }
+                    });
+
+                    res.status(201).json({
+                        ...row,
+                        decisionTexts
+                    });
+                }
+            );
         });
     });
 });

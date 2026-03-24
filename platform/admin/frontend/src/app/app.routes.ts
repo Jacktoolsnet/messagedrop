@@ -5,6 +5,7 @@ import { UserDashboardComponent } from './components/dashboards/user-dashboard/u
 import { AppealsComponent } from './components/dsa/appeals/appeals.component';
 import { AuditsComponent } from './components/dsa/audits/audits.component';
 import { DecisionsComponent } from './components/dsa/decisions/decisions/decisions.component';
+import { DecisionTextBlocksComponent } from './components/dsa/decision-text-blocks/decision-text-blocks.component';
 import { EvidencesComponent } from './components/dsa/evidences/evidences.component';
 import { NoticesComponent } from './components/dsa/notice/notices/notices.component';
 import { NotificationsComponent } from './components/dsa/notifications/notifications.component';
@@ -120,6 +121,12 @@ export const routes: Routes = [
     {
         path: 'dashboard/dsa/decisions',
         component: DecisionsComponent,
+        canActivate: [authGuard],
+        data: { allowedRoles: DSA_MODULE_ROLES }
+    },
+    {
+        path: 'dashboard/dsa/text-blocks',
+        component: DecisionTextBlocksComponent,
         canActivate: [authGuard],
         data: { allowedRoles: DSA_MODULE_ROLES }
     },

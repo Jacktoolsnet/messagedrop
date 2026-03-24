@@ -20,6 +20,7 @@ const translate = require('./routes/translate');
 const clientConnect = require('./routes/client-connect');
 const dsaFrontend = require('./routes/dsa-frontend');
 const dsaBackend = require('./routes/dsa-backend');
+const dsaTextBlocks = require('./routes/dsa-text-blocks');
 const user = require('./routes/user');
 const publicStatus = require('./routes/public-status');
 const maintenance = require('./routes/maintenance');
@@ -407,6 +408,7 @@ app.use('/maintenance', adminUserLimit, maintenance);
 
 // DSA
 app.use('/dsa/frontend', adminDsaLimit, dsaFrontend);
+app.use('/dsa/backend/text-blocks', adminDsaLimit, dsaTextBlocks);
 app.use('/dsa/backend', adminDsaLimit, dsaBackend);
 
 // Public status endpoints

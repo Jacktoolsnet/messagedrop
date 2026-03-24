@@ -1,0 +1,92 @@
+<h2 mat-dialog-title>{{ title() }}</h2>
+
+<form [formGroup]="form" class="dialog-content" (ngSubmit)="save()">
+  <div class="language-note">
+    <mat-icon>gavel</mat-icon>
+    <span>{{ i18n.t('The German version is authoritative. The English version is included only as a non-binding service translation.') }}</span>
+  </div>
+
+  <div class="grid two-col">
+    <mat-form-field appearance="outline">
+      <mat-label>{{ i18n.t('Type') }}</mat-label>
+      <mat-select formControlName="type">
+        @for (option of typeOptions; track option.value) {
+          <mat-option [value]="option.value">{{ i18n.t(option.label) }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>{{ i18n.t('Sort order') }}</mat-label>
+      <input matInput type="number" formControlName="sortOrder" />
+    </mat-form-field>
+  </div>
+
+  <mat-slide-toggle formControlName="isActive">
+    {{ i18n.t('Active and available in the decision dialog') }}
+  </mat-slide-toggle>
+
+  <section class="language-section">
+    <h3>{{ i18n.t('German source') }}</h3>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ i18n.t('Label (DE)') }}</mat-label>
+      <input matInput formControlName="labelDe" [placeholder]="i18n.t('Visible title in German')" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ i18n.t('Description (DE)') }}</mat-label>
+      <textarea matInput rows="3" formControlName="descriptionDe" [placeholder]="i18n.t('Short explanatory text in German')"></textarea>
+    </mat-form-field>
+
+    @if (requiresContent()) {
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ i18n.t('Text block (DE)') }}</mat-label>
+        <textarea matInput rows="8" formControlName="contentDe" [placeholder]="i18n.t('Authoritative German decision text')"></textarea>
+      </mat-form-field>
+    }
+  </section>
+
+  <section class="language-section">
+    <div class="section-header">
+      <h3>{{ i18n.t('English service translation') }}</h3>
+      <button mat-stroked-button type="button" (click)="translateToEnglish()" [disabled]="translating()">
+        <mat-icon>translate</mat-icon>
+        {{ i18n.t('Translate with DeepL') }}
+      </button>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ i18n.t('Label (EN)') }}</mat-label>
+      <input matInput formControlName="labelEn" [placeholder]="i18n.t('English service label')" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ i18n.t('Description (EN)') }}</mat-label>
+      <textarea matInput rows="3" formControlName="descriptionEn" [placeholder]="i18n.t('English service description')"></textarea>
+    </mat-form-field>
+
+    @if (requiresContent()) {
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ i18n.t('Text block (EN)') }}</mat-label>
+        <textarea matInput rows="8" formControlName="contentEn" [placeholder]="i18n.t('English service translation')"></textarea>
+      </mat-form-field>
+    }
+
+    @if (translatedAt()) {
+      <p class="translated-meta">{{ i18n.t('Last translation update:') }} {{ translatedAt() | date:'medium' }}</p>
+    } @else {
+      <p class="translated-meta warn">{{ i18n.t('English translation needs review or has not been generated yet.') }}</p>
+    }
+  </section>
+
+  <div class="dialog-actions">
+    <button mat-stroked-button type="button" (click)="close()">{{ i18n.t('Cancel') }}</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="saving()">
+      @if (saving()) {
+        <mat-icon class="spin">autorenew</mat-icon>
+      }
+      {{ i18n.t('Save') }}
+    </button>
+  </div>
+</form>

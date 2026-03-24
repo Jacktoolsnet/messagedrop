@@ -21,20 +21,36 @@
         <div class="k">{{ i18n.t('Decided by') }}</div>
         <div class="v mono">{{ d.decidedBy || i18n.t('—') }}</div>
 
-        <div class="k">{{ i18n.t('Legal basis') }}</div>
+        <div class="k">{{ i18n.t('Legal basis (DE)') }}</div>
         <div class="v">{{ d.legalBasis || i18n.t('—') }}</div>
 
-        <div class="k">{{ i18n.t('ToS basis') }}</div>
+        <div class="k">{{ i18n.t('Legal basis (EN)') }}</div>
+        <div class="v">{{ d.legalBasisEn || i18n.t('—') }}</div>
+
+        <div class="k">{{ i18n.t('ToS basis (DE)') }}</div>
         <div class="v">{{ d.tosBasis || i18n.t('—') }}</div>
+
+        <div class="k">{{ i18n.t('ToS basis (EN)') }}</div>
+        <div class="v">{{ d.tosBasisEn || i18n.t('—') }}</div>
     </div>
 
     @if (d.statement) {
     <div class="section">
         <div class="section-title">
             <mat-icon>notes</mat-icon>
-            <span>{{ i18n.t('Reasoning') }}</span>
+            <span>{{ i18n.t('Reasoning (DE)') }}</span>
         </div>
         <div class="statement">{{ d.statement }}</div>
+    </div>
+    }
+
+    @if (d.statementEn) {
+    <div class="section">
+        <div class="section-title">
+            <mat-icon>translate</mat-icon>
+            <span>{{ i18n.t('Reasoning (EN service translation)') }}</span>
+        </div>
+        <div class="statement">{{ d.statementEn }}</div>
     </div>
     }
     } @else if (!loading()) {

@@ -23,6 +23,7 @@ import { TransparencyReport } from '../../../interfaces/transparency-report.inte
 import { DsaAppeal } from '../../../interfaces/dsa-appeal.interface';
 import { ListAppealsParams } from '../../../interfaces/list-appeals-params.interface';
 import { DsaNotification, ListNotificationsParams, NotificationMeta, NotificationPayload } from '../../../interfaces/dsa-notification.interface';
+import { DsaTextBlock, DsaTextBlockFilters, DsaTextBlockSavePayload, DsaTextBlockTranslationPreview } from '../../../interfaces/dsa-text-block.interface';
 import { PlatformUserModerationOpenAppealsResponse, PlatformUserModerationResponse, PlatformUserModerationAppeal } from '../../../interfaces/platform-user-moderation.interface';
 import { TranslationHelperService } from '../../translation-helper.service';
 
@@ -414,9 +415,12 @@ export class DsaService {
     payload: {
       outcome: 'REMOVE_CONTENT' | 'RESTRICT' | 'NO_ACTION' | 'FORWARD_TO_AUTHORITY';
       legalBasis: string | null;
+      legalBasisEn?: string | null;
       tosBasis: string | null;
+      tosBasisEn?: string | null;
       automatedUsed: boolean;
       statement: string | null;
+      statementEn?: string | null;
     }
   ) {
     return this.http.post<{ id: string }>(`${this.baseUrl}/notices/${noticeId}/decision`, payload)
@@ -426,6 +430,57 @@ export class DsaService {
           throw err;
         })
       );
+  }
+
+
+  listDecisionTextBlocks(filters: DsaTextBlockFilters = {}): Observable<DsaTextBlock[]> {
+    let params = new HttpParams();
+    if (filters.type) params = params.set('type', filters.type);
+    if (filters.q?.trim()) params = params.set('q', filters.q.trim());
+    if (typeof filters.activeOnly === 'boolean') params = params.set('activeOnly', String(filters.activeOnly));
+
+    return this.http.get<DsaTextBlock[]>(`${this.baseUrl}/text-blocks`, { params }).pipe(
+      catchError(() => {
+        this.openSnack('Could not load DSA text blocks.', 3000);
+        return of([]);
+      })
+    );
+  }
+
+  createDecisionTextBlock(payload: DsaTextBlockSavePayload): Observable<DsaTextBlock> {
+    return this.http.post<DsaTextBlock>(`${this.baseUrl}/text-blocks`, payload).pipe(
+      catchError(err => {
+        this.openSnack('Could not create DSA text block.', 3000);
+        throw err;
+      })
+    );
+  }
+
+  updateDecisionTextBlock(id: string, payload: Partial<DsaTextBlockSavePayload>): Observable<DsaTextBlock> {
+    return this.http.patch<DsaTextBlock>(`${this.baseUrl}/text-blocks/${encodeURIComponent(id)}`, payload).pipe(
+      catchError(err => {
+        this.openSnack('Could not save DSA text block.', 3000);
+        throw err;
+      })
+    );
+  }
+
+  deleteDecisionTextBlock(id: string): Observable<{ deleted: boolean }> {
+    return this.http.delete<{ deleted: boolean }>(`${this.baseUrl}/text-blocks/${encodeURIComponent(id)}`).pipe(
+      catchError(err => {
+        this.openSnack('Could not delete DSA text block.', 3000);
+        throw err;
+      })
+    );
+  }
+
+  translateDecisionTextBlockPreview(payload: Pick<DsaTextBlockSavePayload, 'labelDe' | 'descriptionDe' | 'contentDe'>): Observable<DsaTextBlockTranslationPreview> {
+    return this.http.post<DsaTextBlockTranslationPreview>(`${this.baseUrl}/text-blocks/translate-preview`, payload).pipe(
+      catchError(err => {
+        this.openSnack('Could not translate DSA text block.', 3000);
+        throw err;
+      })
+    );
   }
 
   setPublicMessageVisibility(contentId: string, visible: boolean) {

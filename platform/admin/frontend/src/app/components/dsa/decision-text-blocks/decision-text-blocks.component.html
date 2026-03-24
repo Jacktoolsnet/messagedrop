@@ -1,0 +1,127 @@
+<mat-toolbar>
+  <button mat-icon-button routerLink="/dashboard/dsa" [attr.aria-label]="i18n.t('Back to DSA dashboard')">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <span class="toolbar-title">{{ i18n.t('DSA text blocks') }}</span>
+  <span class="spacer"></span>
+  <button mat-stroked-button type="button" (click)="load()">
+    <mat-icon>refresh</mat-icon>
+    {{ i18n.t('Refresh') }}
+  </button>
+  <button mat-raised-button color="primary" type="button" (click)="openCreateDialog()">
+    <mat-icon>add</mat-icon>
+    {{ i18n.t('New text block') }}
+  </button>
+</mat-toolbar>
+
+<div class="page">
+  <mat-card class="hero-card">
+    <mat-card-header>
+      <div mat-card-avatar class="avatar avatar-accent">
+        <mat-icon>translate</mat-icon>
+      </div>
+      <mat-card-title>{{ i18n.t('Manage bilingual decision text blocks') }}</mat-card-title>
+      <mat-card-subtitle>{{ i18n.t('Maintain German source text, create the English service translation with DeepL, and control what appears in the decision dialog.') }}</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="stats-row">
+        <div>
+          <strong>{{ rows().length }}</strong>
+          <span>{{ i18n.t('total text blocks') }}</span>
+        </div>
+        <div>
+          <strong>{{ activeCount() }}</strong>
+          <span>{{ i18n.t('active') }}</span>
+        </div>
+      </div>
+
+      <div class="filter-row" [formGroup]="filterForm">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ i18n.t('Type') }}</mat-label>
+          <mat-select formControlName="type">
+            @for (option of typeOptions; track option.value) {
+              <mat-option [value]="option.value">{{ i18n.t(option.label) }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field class="grow" appearance="outline">
+          <mat-label>{{ i18n.t('Search') }}</mat-label>
+          <input matInput formControlName="q" [placeholder]="i18n.t('Label, description, text or key')" />
+        </mat-form-field>
+
+        <mat-slide-toggle formControlName="activeOnly">
+          {{ i18n.t('Only active') }}
+        </mat-slide-toggle>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <div class="list-grid">
+    @for (row of rows(); track trackById($index, row)) {
+      <mat-card class="text-block-card">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-neutral">
+            <mat-icon>{{ typeIcon(row.type) }}</mat-icon>
+          </div>
+          <mat-card-title>{{ row.labelDe }}</mat-card-title>
+          <mat-card-subtitle>{{ displayEnglishLabel(row) }}</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div class="chip-row">
+            <span class="chip">{{ typeLabel(row.type) }}</span>
+            <span class="chip" [class.chip-warn]="!row.isActive">{{ row.isActive ? i18n.t('Active') : i18n.t('Inactive') }}</span>
+            <span class="chip" [class.chip-accent]="translationState(row) === i18n.t('Translation up to date')" [class.chip-warn]="translationState(row) !== i18n.t('Translation up to date')">
+              {{ translationState(row) }}
+            </span>
+          </div>
+
+          @if (row.descriptionDe || row.descriptionEn) {
+            <div class="desc-grid">
+              @if (row.descriptionDe) {
+                <div>
+                  <strong>{{ i18n.t('DE') }}</strong>
+                  <p>{{ row.descriptionDe }}</p>
+                </div>
+              }
+              @if (row.descriptionEn) {
+                <div>
+                  <strong>{{ i18n.t('EN') }}</strong>
+                  <p>{{ row.descriptionEn }}</p>
+                </div>
+              }
+            </div>
+          }
+
+          <p class="preview-text">{{ previewText(row) }}</p>
+
+          <div class="meta-row">
+            <span>{{ i18n.t('Key: {{key}}', { key: row.key }) }}</span>
+            <span>{{ i18n.t('Order: {{order}}', { order: row.sortOrder }) }}</span>
+            <span>{{ i18n.t('Updated') }}: {{ row.updatedAt | date:'medium' }}</span>
+          </div>
+        </mat-card-content>
+
+        <mat-card-actions align="end">
+          <button mat-stroked-button type="button" (click)="openEditDialog(row)">
+            <mat-icon>edit</mat-icon>
+            {{ i18n.t('Edit') }}
+          </button>
+          <button mat-stroked-button color="warn" type="button" (click)="confirmDelete(row)">
+            <mat-icon>delete</mat-icon>
+            {{ i18n.t('Delete') }}
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    }
+  </div>
+
+  @if (!loading() && rows().length === 0) {
+    <div class="empty-state">
+      <mat-icon>library_add</mat-icon>
+      <div>{{ i18n.t('No DSA text blocks found for the current filters.') }}</div>
+    </div>
+  }
+</div>

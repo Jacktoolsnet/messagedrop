@@ -4,6 +4,10 @@
     </button>
     <span class="toolbar-title">{{ i18n.t('Decisions') }}</span>
     <span class="spacer"></span>
+    <button mat-stroked-button routerLink="/dashboard/dsa/text-blocks">
+        <mat-icon>translate</mat-icon>
+        {{ i18n.t('Text blocks') }}
+    </button>
     <button mat-stroked-button (click)="reload()">
         <mat-icon>refresh</mat-icon>
         {{ i18n.t('Refresh') }}

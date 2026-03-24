@@ -22,7 +22,8 @@ type TileKey =
   | 'appeals'
   | 'audit'
   | 'transparency'
-  | 'userModeration';
+  | 'userModeration'
+  | 'textBlocks';
 
 interface DsaTile {
   key: TileKey;
@@ -81,7 +82,8 @@ export class DsaDashboardComponent {
     { key: 'appeals', title: this.i18n.t('Appeals'), subtitle: this.i18n.t('Handle appeals'), icon: 'feedback', route: '/dashboard/dsa/appeals' },
     { key: 'audit', title: this.i18n.t('Audit Log'), subtitle: this.i18n.t('Trace all actions'), icon: 'history', route: '/dashboard/dsa/audits' },
     { key: 'transparency', title: this.i18n.t('Transparency'), subtitle: this.i18n.t('Public stats & reports'), icon: 'insights', route: '/dashboard/dsa/transparency' },
-    { key: 'userModeration', title: this.i18n.t('User Moderation'), subtitle: this.i18n.t('Block / unblock users'), icon: 'gpp_bad', route: '/dashboard/dsa/user-moderation' }
+    { key: 'userModeration', title: this.i18n.t('User Moderation'), subtitle: this.i18n.t('Block / unblock users'), icon: 'gpp_bad', route: '/dashboard/dsa/user-moderation' },
+    { key: 'textBlocks', title: this.i18n.t('Text blocks'), subtitle: this.i18n.t('Manage decision wording'), icon: 'translate', route: '/dashboard/dsa/text-blocks' }
   ];
 
   // Badge-Logik pro Tile
@@ -128,6 +130,7 @@ export class DsaDashboardComponent {
         return 'avatar avatar-warn';
       case 'decisions':
       case 'transparency':
+      case 'textBlocks':
         return 'avatar avatar-success';
       case 'evidence':
       case 'audit':

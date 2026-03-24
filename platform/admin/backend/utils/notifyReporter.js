@@ -13,6 +13,22 @@ function formatDecisionOutcome(outcome) {
     return String(outcome).replace(/_/g, ' ').toLowerCase();
 }
 
+function formatDecisionOutcomeDe(outcome) {
+    if (!outcome) return 'ausstehend';
+    switch (String(outcome).toUpperCase()) {
+        case 'NO_ACTION':
+            return 'kein Handlungsbedarf';
+        case 'RESTRICT':
+            return 'eingeschränkt';
+        case 'FORWARD_TO_AUTHORITY':
+            return 'an die zuständige Behörde weitergeleitet';
+        case 'REMOVE_CONTENT':
+            return 'Inhalt entfernt';
+        default:
+            return String(outcome).replace(/_/g, ' ').toLowerCase();
+    }
+}
+
 function formatAppealOutcome(outcome) {
     if (!outcome) return 'pending';
     switch (String(outcome).toUpperCase()) {
@@ -50,6 +66,52 @@ function resolveStatusUrl(notice, statusUrl) {
     return `${base}/${encodeURIComponent(notice.publicToken)}`;
 }
 
+function buildBilingualDecisionEmail({ greetingName, noticeId, statusUrl, extras }) {
+    const outcomeDe = formatDecisionOutcomeDe(extras?.decisionOutcome);
+    const outcomeEn = formatDecisionOutcome(extras?.decisionOutcome);
+    const processDe = extras?.automatedUsed ? 'automatisiert unterstützt' : 'manuell';
+    const processEn = extras?.automatedUsed ? 'automation-assisted' : 'manual';
+
+    const subject = noticeId
+        ? `DSA-Entscheidung zu Ihrem Hinweis / DSA decision on your notice (Case #${noticeId})`
+        : 'DSA-Entscheidung / DSA decision';
+
+    const germanLines = [];
+    if (greetingName) {
+        germanLines.push(`Hallo ${greetingName},`, '');
+    }
+    germanLines.push(
+        noticeId ? `wir haben die Prüfung Ihres DSA-Hinweises (Fall #${noticeId}) abgeschlossen.` : 'wir haben die Prüfung Ihres DSA-Hinweises abgeschlossen.',
+        `Ergebnis: ${outcomeDe}.`,
+        `Prüfungsart: ${processDe}.`
+    );
+    if (extras?.legalBasisDe) germanLines.push(`Rechtsgrundlage: ${extras.legalBasisDe}`);
+    if (extras?.tosBasisDe) germanLines.push(`AGB-/ToS-Grundlage: ${extras.tosBasisDe}`);
+    if (extras?.statementDe) germanLines.push(`Begründung: ${extras.statementDe}`);
+    if (statusUrl) germanLines.push('', `Live-Status: ${statusUrl}`);
+    germanLines.push('', 'Maßgeblich und rechtlich verbindlich ist ausschließlich die deutsche Fassung.', 'Diese Nachricht wurde automatisch versendet. Bitte nicht antworten.');
+
+    const englishLines = ['English service translation (non-binding):', ''];
+    if (greetingName) {
+        englishLines.push(`Hello ${greetingName},`, '');
+    }
+    englishLines.push(
+        noticeId ? `we completed the review of your DSA notice (Case #${noticeId}).` : 'we completed the review of your DSA notice.',
+        `Outcome: ${outcomeEn}.`,
+        `Process type: ${processEn}.`
+    );
+    if (extras?.legalBasisEn) englishLines.push(`Legal basis: ${extras.legalBasisEn}`);
+    if (extras?.tosBasisEn) englishLines.push(`Terms of Use basis: ${extras.tosBasisEn}`);
+    if (extras?.statementEn) englishLines.push(`Reasoning: ${extras.statementEn}`);
+    if (statusUrl) englishLines.push('', `Live status: ${statusUrl}`);
+    englishLines.push('', 'The English version is provided for convenience only. In case of discrepancies, the German version is binding.', 'This message was sent automatically. Please do not reply.');
+
+    return {
+        subject,
+        text: [...germanLines, '', '---', '', ...englishLines].join('\n')
+    };
+}
+
 function buildEmail({ event, notice, statusUrl, extras }) {
     const noticeId = notice?.id ?? notice?.noticeId;
     const greetingName = notice?.reporterName ? notice.reporterName.trim() : null;
@@ -79,6 +141,9 @@ function buildEmail({ event, notice, statusUrl, extras }) {
         }
         case 'notice_decided': {
             if (!noticeId) return null;
+            if (extras?.statementDe || extras?.statementEn || extras?.legalBasisDe || extras?.legalBasisEn || extras?.tosBasisDe || extras?.tosBasisEn) {
+                return buildBilingualDecisionEmail({ greetingName, noticeId, statusUrl, extras });
+            }
             const outcome = formatDecisionOutcome(extras?.decisionOutcome);
             const subject = `Outcome of your DSA notice ${refLine}`;
             const paragraphs = [
