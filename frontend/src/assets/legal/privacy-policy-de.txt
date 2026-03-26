@@ -436,7 +436,7 @@ Systemmeldungen sind stets aktiv und können nicht abbestellt werden.
 Im Rahmen der Systemmeldungen verarbeiten wir insbesondere:
 - User-ID,
 - Inhalt der Mitteilung,
-- Zeitpunkte,
+- Zeitpunkte der Erstellung, Bereitstellung und Zustellung der Mitteilung,
 - Zustell- und Lesestatus (soweit technisch umgesetzt).
 
 Nutzer können Systemmeldungen im Frontend löschen. Das Löschen betrifft ausschließlich die Anzeige bzw. lokale Verfügbarkeit im Nutzer-Frontend. Gesetzlich erforderliche oder dokumentationspflichtige Nachweise (z. B. im Rahmen von DSA-Verfahren) können hiervon unberührt bleiben.
@@ -493,7 +493,7 @@ Dabei verarbeiten wir insbesondere:
 - User-ID (soweit vorhanden),
 - Angaben zur meldenden Person, soweit diese freiwillig angegeben werden (z. B. E-Mail-Adresse),
 - Angaben zum gemeldeten Inhalt,
-- Zeitpunkte,
+- Verfahrenszeitpunkte (z. B. Eingang der Meldung, Bearbeitung, Entscheidung, Benachrichtigung und Abschluss des Verfahrens),
 - Status des Verfahrens,
 - getroffene Entscheidungen und Begründungen,
 - Angaben aus internen Beschwerden gegen Moderationsentscheidungen (soweit gesetzlich vorgesehen).
@@ -506,9 +506,9 @@ Datei-Uploads werden auf unseren Servern gespeichert. Externe Links werden in un
 
 Im Rahmen von Moderationsentscheidungen verarbeiten wir zudem Daten zur Benachrichtigung betroffener Nutzer (z. B. über den Verfahrensstand, getroffene Maßnahmen, wesentliche Gründe der Entscheidung und ggf. die Beteiligung automatisierter Verfahren, soweit rechtlich zulässig und technisch möglich).
 
-Rechtsgrundlage ist Art. 6 Abs. 1 lit. c DSGVO (rechtliche Verpflichtung) sowie Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an Rechtsdurchsetzung, Missbrauchsprävention und Nachweisführung).
-
 Daten zu offensichtlich missbräuchlichen Meldungen oder Beschwerden (z. B. Serienmeldungen ohne sachlichen Bezug) können zur Missbrauchsprävention verarbeitet werden.
+
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. c DSGVO (rechtliche Verpflichtung) sowie Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an Rechtsdurchsetzung, Missbrauchsprävention und Nachweisführung).
 
 ###
 4.2 Öffentliche Fallseite
@@ -541,6 +541,10 @@ Belege (Dateien und externe Links), die im Rahmen eines DSA-Verfahrens freiwilli
 Wird im Zusammenhang mit einem DSA-Verfahren ein behördliches oder gerichtliches Verfahren eingeleitet oder ist ein solches absehbar, können die betroffenen Daten für die Dauer dieses Verfahrens sowie darüber hinaus im gesetzlich zulässigen Rahmen gespeichert werden (sog. Legal Hold). In diesem Fall erfolgt die Löschung unverzüglich nach Wegfall des Aufbewahrungsgrundes.
 
 Eine Weitergabe an zuständige Behörden, Gerichte oder sonstige hierzu befugte Stellen erfolgt ausschließlich im rechtlich erforderlichen und zulässigen Rahmen.
+
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. c DSGVO (Erfüllung gesetzlicher Dokumentations-, Nachweis-, Transparenz- und Weitergabepflichten) sowie Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an Nachweisführung sowie an der Geltendmachung, Ausübung oder Verteidigung von Rechtsansprüchen), soweit eine Speicherung oder Weitergabe über die unmittelbare gesetzliche Pflicht hinaus erforderlich ist.
+
+Soweit im Einzelfall im Rahmen eines DSA-Verfahrens besondere Kategorien personenbezogener Daten im Sinne des Art. 9 DSGVO oder personenbezogene Daten über strafrechtliche Verurteilungen und Straftaten im Sinne des Art. 10 DSGVO enthalten sind, erfolgt deren Verarbeitung ausschließlich, soweit dies gesetzlich zulässig und für die Durchführung, Dokumentation oder Weitergabe des Verfahrens erforderlich ist.
 
 ###
 5. Speicherdauer
