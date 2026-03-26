@@ -7,7 +7,6 @@ const frontendRoot = path.resolve(__dirname, '..');
 const publicRoot = path.join(frontendRoot, 'public');
 const baseUrl = 'https://messagedrop.net';
 const appName = 'MessageDrop';
-const appTagline = 'Digital graffiti for the world map.';
 const appClaim = 'A global map where people can leave messages in real-world locations.';
 
 const marketingPages = [
@@ -20,8 +19,6 @@ const marketingPages = [
     description:
       'MessageDrop is a global map where people can leave messages in real-world locations — digital graffiti for the world map.',
     heroIcon: 'globe_location_pin',
-    eyebrowIcon: 'question_mark',
-    eyebrow: 'What is MessageDrop?',
     heroTitle: 'Place messages. Follow places. Communicate securely.',
     heroTitleClass: 'hero-title-compact',
     showLegalCta: false,
@@ -164,11 +161,7 @@ const marketingPages = [
     description:
       'See how MessageDrop turns locations into entry points for public messages, local context, private notes, and private chats.',
     heroIcon: 'alt_route',
-    eyebrowIcon: 'alt_route',
-    eyebrow: 'How it works',
     heroTitle: 'Open the app. Pick a place. Leave a message.',
-    heroText:
-      'Communication can be this simple.',
     showLegalCta: false,
     showPrimaryCta: false,
     heroAsideTitle: 'If things get a little tricky',
@@ -178,14 +171,12 @@ const marketingPages = [
       {
         title: 'Video guides',
         icon: 'smart_display',
-        intro: 'Short walkthroughs for the most important flows in MessageDrop.',
         videos: [
           {
             icon: 'rocket_launch',
             title: 'Open the app and get started',
             body:
               'See how MessageDrop starts, how the consent screen works, and how to get oriented after the first launch.',
-            meta: 'Guide 1',
             ctaLabel: 'Video coming soon',
           },
           {
@@ -193,7 +184,6 @@ const marketingPages = [
             title: 'Create your account and fill your profile',
             body:
               'Learn how to create an account with a PIN and complete your user profile with name, avatar, and personal details.',
-            meta: 'Guide 2',
             ctaLabel: 'Video coming soon',
           },
           {
@@ -201,7 +191,6 @@ const marketingPages = [
             title: 'Create messages and manage local profiles',
             body:
               'Watch how to create your own messages and give other users local names and avatars that are only visible to you.',
-            meta: 'Guide 3',
             ctaLabel: 'Video coming soon',
           },
           {
@@ -209,23 +198,20 @@ const marketingPages = [
             title: 'Create places and maintain place profiles',
             body:
               'See how to create places, keep place profiles up to date, and use tiles to surface useful information at a location.',
-            meta: 'Guide 4',
             ctaLabel: 'Video coming soon',
           },
           {
             icon: 'forum',
             title: 'Connect with users and use the chatroom',
             body:
-              'Learn how to connect with other users and use the chatroom for direct conversations around the people you know.',
-            meta: 'Guide 5',
+              'Learn how to connect with other users and exchange private messages.',
             ctaLabel: 'Video coming soon',
           },
           {
             icon: 'travel_explore',
             title: 'Explore experiences',
             body:
-              'See how to search for experiences, discover activities around a place, and use MessageDrop as a starting point for exploring the real world.',
-            meta: 'Guide 6',
+              'See how to search for experiences, discover activities around a place, and plan your next vacation with MessageDrop.',
             ctaLabel: 'Video coming soon',
           },
         ],
@@ -398,8 +384,6 @@ const germanMarketingPages = [
     description:
       'MessageDrop ist eine globale Karte, auf der Menschen Nachrichten an realen Orten hinterlassen können — digitales Graffiti für die Weltkarte.',
     heroIcon: 'globe_location_pin',
-    eyebrowIcon: 'question_mark',
-    eyebrow: 'Was ist MessageDrop?',
     heroTitle: 'Platziere Nachrichten. Folge Orten. Kommuniziere sicher.',
     heroTitleClass: 'hero-title-compact',
     showLegalCta: false,
@@ -542,11 +526,7 @@ const germanMarketingPages = [
     description:
       'Sieh Dir an, wie MessageDrop Orte zu Einstiegspunkten für öffentliche Nachrichten, lokalen Kontext, private Notizen und private Chats macht.',
     heroIcon: 'alt_route',
-    eyebrowIcon: 'alt_route',
-    eyebrow: 'So funktioniert es',
     heroTitle: 'App öffnen. Ort wählen. Nachricht hinterlassen.',
-    heroText:
-      'So einfach kann Kommunikation sein.',
     showLegalCta: false,
     showPrimaryCta: false,
     heroAsideTitle: 'Wenn es doch mal klemmt!',
@@ -556,14 +536,12 @@ const germanMarketingPages = [
       {
         title: 'Video-Guides',
         icon: 'smart_display',
-        intro: 'Kurze Walkthroughs für die wichtigsten Abläufe in MessageDrop.',
         videos: [
           {
             icon: 'rocket_launch',
             title: 'App öffnen und erste Schritte',
             body:
               'So startest Du MessageDrop, gehst durch den Consent-Screen und findest Dich nach dem ersten Öffnen schnell zurecht.',
-            meta: 'Guide 1',
             ctaLabel: 'Video folgt',
           },
           {
@@ -571,7 +549,6 @@ const germanMarketingPages = [
             title: 'Nutzerkonto anlegen und Profil ausfüllen',
             body:
               'Erfahre, wie Du mit einem PIN ein Nutzerkonto anlegst und Dein Profil mit Namen, Avatar und weiteren Angaben vervollständigst.',
-            meta: 'Guide 2',
             ctaLabel: 'Video folgt',
           },
           {
@@ -579,31 +556,27 @@ const germanMarketingPages = [
             title: 'Nachrichten erstellen und lokale Profile pflegen',
             body:
               'Sieh, wie Du eigene Nachrichten erstellst und anderen Nutzern lokal Namen und Avatare gibst, die nur für Dich sichtbar sind.',
-            meta: 'Guide 3',
             ctaLabel: 'Video folgt',
           },
           {
             icon: 'place',
             title: 'Orte anlegen und Ortsprofile pflegen',
             body:
-              'So legst Du neue Orte an, pflegst Ortsprofile und nutzt Tiles, um Informationen an einem Ort sichtbar zu machen.',
-            meta: 'Guide 4',
+              'So legst Du neue Orte an, pflegst Ortsprofile und nutzt Kacheln, um Informationen an einem Ort sichtbar zu machen.',
             ctaLabel: 'Video folgt',
           },
           {
             icon: 'forum',
             title: 'Kontakte aufnehmen und Chatroom nutzen',
             body:
-              'Lerne, wie Du Kontakt mit anderen Nutzern aufnimmst und den Chatroom für direkte Gespräche rund um Menschen nutzt, die Du kennst.',
-            meta: 'Guide 5',
+              'Lerne, wie Du Kontakt mit anderen Nutzern aufnimmst und persönliche Nachrichten austauschst.',
             ctaLabel: 'Video folgt',
           },
           {
             icon: 'travel_explore',
             title: 'Erlebnisse suchen',
             body:
-              'Sieh, wie Du nach Erlebnissen suchst, Aktivitäten rund um einen Ort entdeckst und MessageDrop als Ausgangspunkt für die echte Welt nutzt.',
-            meta: 'Guide 6',
+              'Sieh, wie Du nach Erlebnissen suchst, Aktivitäten rund um einen Ort entdeckst und mit MessageDrop Deinen nächsten Urlaub planst.',
             ctaLabel: 'Video folgt',
           },
         ],
@@ -760,11 +733,6 @@ const germanLegalPages = [
 
 const supportedLocales = ['de', 'en'];
 
-const appTaglineByLocale = {
-  de: 'Digitales Graffiti für die Weltkarte.',
-  en: appTagline,
-};
-
 const appClaimByLocale = {
   de: 'Eine globale Karte, auf der Menschen Nachrichten an realen Orten hinterlassen können.',
   en: appClaim,
@@ -782,7 +750,8 @@ const uiByLocale = {
     footerWhat: 'Was ist MessageDrop?',
     footerHow: 'So funktioniert MessageDrop',
     footerLegal: 'Rechtliches',
-    footerCreditPrefix: 'Mit',
+    footerCreditPrefix: 'Für Dich mit',
+    footerCreditAnd: 'und',
     footerCreditSuffix: 'entwickelt von',
     redirectTitle: 'Sprache wird gewählt',
     redirectText: 'Mit JavaScript wird automatisch die passende Sprachversion geöffnet. Ohne JavaScript kannst Du die gewünschte Version hier direkt auswählen.',
@@ -801,7 +770,8 @@ const uiByLocale = {
     footerWhat: 'What is MessageDrop?',
     footerHow: 'How MessageDrop works',
     footerLegal: 'Legal',
-    footerCreditPrefix: 'Built with',
+    footerCreditPrefix: 'Built for you with',
+    footerCreditAnd: 'and',
     footerCreditSuffix: 'by',
     redirectTitle: 'Choosing language',
     redirectText: 'With JavaScript enabled, the matching language version opens automatically. Without JavaScript, you can choose the version directly below.',
@@ -1057,7 +1027,6 @@ function renderHeader(currentRoute, lang = 'en') {
         </span>
         <span class="brand-copy">
           <strong>${appName}</strong>
-          <span>${appTaglineByLocale[lang] ?? appTagline}</span>
         </span>
       </a>
       <button class="site-menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav"
@@ -1094,6 +1063,7 @@ function renderFooter(lang = 'en') {
         <span class="footer-icon footer-icon--coffee" aria-hidden="true">
           <span class="material-symbols-outlined">local_cafe</span>
         </span>
+        ${escapeHtml(ui.footerCreditAnd)}
         <span class="footer-icon footer-icon--chocolate" aria-hidden="true">🍫</span>
         ${escapeHtml(ui.footerCreditSuffix)}
         <strong>JackTools.Net</strong>
@@ -1182,7 +1152,7 @@ function renderHero(page) {
   return `
     <section class="hero${hasAside ? '' : ' hero--single'}">
       <div class="hero-copy">
-        <span class="eyebrow">${page.eyebrowIcon ? `<span class="material-symbols-outlined eyebrow-icon" aria-hidden="true">${escapeHtml(page.eyebrowIcon)}</span>` : ''}${escapeHtml(page.eyebrow)}</span>
+        ${page.eyebrow ? `<span class="eyebrow">${page.eyebrowIcon ? `<span class="material-symbols-outlined eyebrow-icon" aria-hidden="true">${escapeHtml(page.eyebrowIcon)}</span>` : ''}${escapeHtml(page.eyebrow)}</span>` : ''}
         <h1 class="${titleClass.trim()}">${escapeHtml(page.heroTitle)}</h1>
         ${page.heroText ? `<p class="hero-text">${escapeHtml(page.heroText)}</p>` : ''}
         ${(showPrimaryCta || showLegalCta)
@@ -1261,7 +1231,6 @@ function renderVideoGrid(videos) {
               <span class="material-symbols-outlined">${escapeHtml(video.icon)}</span>
             </div>
             <div class="video-card-body">
-              <div class="video-card-meta">${escapeHtml(video.meta)}</div>
               <h3>${escapeHtml(video.title)}</h3>
               <p>${escapeHtml(video.body)}</p>
             </div>
@@ -2151,12 +2120,7 @@ img {
 }
 
 .brand-copy strong {
-  font-size: 1rem;
-}
-
-.brand-copy span:last-child {
-  color: var(--site-muted);
-  font-size: 0.92rem;
+  font-size: 1.15rem;
 }
 
 .site-nav {
@@ -2545,7 +2509,7 @@ img {
 
 .section-heading-title {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.8rem;
 }
 
@@ -2698,21 +2662,6 @@ img {
   margin: 0;
   color: var(--site-muted);
   line-height: 1.65;
-}
-
-.video-card-meta {
-  display: inline-flex;
-  width: fit-content;
-  align-items: center;
-  min-height: 1.85rem;
-  padding: 0 0.65rem;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--site-secondary) 10%, #fff);
-  color: #1d4ed8;
-  font-size: 0.76rem;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
 }
 
 .video-card-footer {
@@ -3054,10 +3003,6 @@ img {
     flex: 1 1 auto;
   }
 
-  .brand-copy span:last-child {
-    line-height: 1.45;
-  }
-
   .site-nav a {
     width: 100%;
     padding-inline: 0.95rem;
@@ -3214,8 +3159,7 @@ img {
     page-break-inside: auto;
   }
 
-  .video-thumb,
-  .video-card-meta {
+  .video-thumb {
     display: none !important;
   }
 
