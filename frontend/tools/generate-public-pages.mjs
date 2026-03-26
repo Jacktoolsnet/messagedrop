@@ -22,9 +22,7 @@ const marketingPages = [
     heroIcon: 'globe_location_pin',
     eyebrowIcon: 'question_mark',
     eyebrow: 'What is MessageDrop?',
-    heroTitle: 'Communicate directly and securely — and share messages in real-world places.',
-    heroText:
-      'With MessageDrop, you can place messages exactly where they matter.',
+    heroTitle: 'Place messages. Follow places. Communicate securely.',
     heroTitleClass: 'hero-title-compact',
     showLegalCta: false,
     showPrimaryCta: false,
@@ -35,7 +33,7 @@ const marketingPages = [
       'MessageDrop forgets. Deleting really means deleting.',
       'No algorithm decides what you see. We always show you the newest messages first.',
       'No doomscrolling. We limit the number of messages we show you.',
-      'You follow places, not people. If you want to connect with other users, you need to already know them.',
+      'You follow places, not people. Connect with people you know.',
     ],
     sections: [
       {
@@ -52,11 +50,11 @@ const marketingPages = [
             icon: 'filter_alt_off',
             title: 'No profiling. No algorithm.',
             body:
-              'We do not want to know who you are. We do not care what you like. You see the content that is there — no more and no less.',
+              'We do not want to know who you are. We do not care what you like. You see the content that is current — no more and no less.',
           },
           {
             icon: 'pin_drop',
-            title: 'All messages get the same chance',
+            title: 'All public messages get the same chance',
             body:
               'Views, comments, and likes do not make a message more visible in MessageDrop. Visibility is not driven by popularity, but by the place and its context.',
           },
@@ -93,23 +91,23 @@ const marketingPages = [
         ],
       },
       {
-        title: 'MessageDrop is made for...',
+        title: 'MessageDrop is made for you',
         icon: 'groups',
         className: 'audience-section',
         cards: [
           {
-            icon: 'palette',
-            title: 'You and your creativity',
-            body: 'Less reach pressure. More room for the content you actually want to share.',
-          },
-          {
             icon: 'group',
-            title: 'You and your friends',
+            title: '… and your friends',
             body: 'For private communication with people you really know.',
           },
           {
+            icon: 'palette',
+            title: '… and your creativity',
+            body: 'Less reach pressure. More room for the content you actually want to share.',
+          },
+          {
             icon: 'place',
-            title: 'You and your places',
+            title: '… and your places',
             body: 'For the places that matter to you and the context around them.',
           },
         ],
@@ -117,7 +115,6 @@ const marketingPages = [
       {
         title: 'What comes next',
         icon: 'route',
-        intro: 'MessageDrop is still at an early stage. We have many ideas and want to keep improving it step by step.',
         tiles: [
           {
             icon: 'explore',
@@ -133,14 +130,14 @@ const marketingPages = [
           },
           {
             icon: 'autorenew',
-            title: 'Continuous development',
+            title: 'What ideas do you have?',
             body:
-              '“Those who only follow paths others have already taken will only ever arrive where others have already been.” That mindset should shape MessageDrop too: continuous improvement, new ideas, and the courage to build things differently.',
+              'Drop your idea directly in MessageDrop: leave a message with the hashtag #feature.',
           },
         ],
       },
       {
-        title: 'Support JackTools.Net',
+        title: 'Support us',
         icon: 'local_cafe',
         className: 'support-section',
         tiles: [
@@ -150,7 +147,7 @@ const marketingPages = [
             body:
               'If you like MessageDrop and the ideas behind it, you can support JackTools.Net directly. Every contribution helps us with development, operations, and new features — whether it pays for coffee, chocolate, or the next good idea.',
             href: 'https://buymeacoffee.com/jacktoolsnet',
-            ctaLabel: 'Buy me a coffee',
+            ctaLabel: 'Buy us a coffee',
             ctaIcon: 'local_cafe',
             external: true,
           },
@@ -403,9 +400,7 @@ const germanMarketingPages = [
     heroIcon: 'globe_location_pin',
     eyebrowIcon: 'question_mark',
     eyebrow: 'Was ist MessageDrop?',
-    heroTitle: 'Kommuniziere direkt und sicher – und teile Nachrichten an echten Orten.',
-    heroText:
-      'Mit MessageDrop kannst Du Nachrichten genau dort platzieren, wo sie relevant sind.',
+    heroTitle: 'Platziere Nachrichten. Folge Orten. Kommuniziere sicher.',
     heroTitleClass: 'hero-title-compact',
     showLegalCta: false,
     showPrimaryCta: false,
@@ -416,7 +411,7 @@ const germanMarketingPages = [
       'MessageDrop vergisst. Löschen bedeutet wirklich löschen.',
       'Kein Algorithmus entscheidet, was Du siehst. Wir zeigen Dir immer die neuesten Nachrichten zuerst.',
       'Kein Doomscrolling. Wir begrenzen die Anzahl der Nachrichten, die wir Dir zeigen.',
-      'Du folgst Orten statt Personen. Wenn Du Dich mit anderen Nutzern verbinden möchtest, musst Du sie bereits kennen.',
+      'Du folgst Orten statt Personen. Verbinde Dich mit Menschen die Du kennst.',
     ],
     sections: [
       {
@@ -433,11 +428,11 @@ const germanMarketingPages = [
             icon: 'filter_alt_off',
             title: 'Kein Profiling. Kein Algorithmus.',
             body:
-              'Wir wollen nicht wissen, wer Du bist. Uns ist egal, was Dir gefällt. Du siehst den Inhalt, der da ist – nicht mehr und nicht weniger.',
+              'Wir wollen nicht wissen, wer Du bist. Uns ist egal, was Dir gefällt. Du siehst den Inhalt, der aktuell ist – nicht mehr und nicht weniger.',
           },
           {
             icon: 'pin_drop',
-            title: 'Alle Nachrichten haben die gleiche Chance',
+            title: 'Alle öffentlichen Nachrichten haben die gleiche Chance',
             body:
               'Views, Kommentare und Likes machen eine Nachricht in MessageDrop nicht sichtbarer. Sichtbarkeit entsteht nicht durch Popularität, sondern durch den Ort und seinen Kontext.',
           },
@@ -474,23 +469,23 @@ const germanMarketingPages = [
         ],
       },
       {
-        title: 'MessageDrop ist gemacht für...',
+        title: 'MessageDrop ist gemacht für Dich',
         icon: 'groups',
         className: 'audience-section',
         cards: [
           {
-            icon: 'palette',
-            title: 'Dich und Deine Kreativität',
-            body: 'Weniger Reichweitendruck. Mehr Raum für den Content, den Du wirklich teilen willst.',
-          },
-          {
             icon: 'group',
-            title: 'Dich und Deine Freunde',
+            title: '… und Deine Freunde',
             body: 'Für private Kommunikation mit Personen, die Du wirklich kennst.',
           },
           {
+            icon: 'palette',
+            title: '… und Deine Kreativität',
+            body: 'Weniger Reichweitendruck. Mehr Raum für den Content, den Du wirklich teilen willst.',
+          },
+          {
             icon: 'place',
-            title: 'Dich und Deine Orte',
+            title: '… und Deine Orte',
             body: 'Für Orte, die Dir wichtig sind, und den Kontext rund um sie.',
           },
         ],
@@ -498,7 +493,6 @@ const germanMarketingPages = [
       {
         title: 'Wie es weitergeht',
         icon: 'route',
-        intro: 'MessageDrop steht noch am Anfang. Wir haben viele Ideen und wollen die App Schritt für Schritt weiterentwickeln.',
         tiles: [
           {
             icon: 'explore',
@@ -514,14 +508,14 @@ const germanMarketingPages = [
           },
           {
             icon: 'autorenew',
-            title: 'Kontinuierliche Weiterentwicklung',
+            title: 'Welche Ideen hast Du?',
             body:
-              '„Wer immer nur Wege geht, die andere gegangen sind, kommt immer nur dorthin, wo andere schon waren.“ Dieses Denken soll auch MessageDrop prägen: kontinuierliche Weiterentwicklung, neue Ideen und der Mut, Dinge anders zu bauen.',
+              'Droppe Deine Idee direkt in MessageDrop: Hinterlasse eine Nachricht mit dem Hashtag #feature.',
           },
         ],
       },
       {
-        title: 'Unterstütze JackTools.Net',
+        title: 'Unterstütze uns',
         icon: 'local_cafe',
         className: 'support-section',
         tiles: [
@@ -531,7 +525,7 @@ const germanMarketingPages = [
             body:
               'Wenn Dir MessageDrop und die Ideen dahinter gefallen, kannst Du JackTools.Net direkt unterstützen. Jeder Beitrag hilft uns bei Entwicklung, Betrieb und neuen Funktionen — ob für Kaffee, Schokolade oder die nächste gute Idee.',
             href: 'https://buymeacoffee.com/jacktoolsnet',
-            ctaLabel: 'Buy me a coffee',
+            ctaLabel: 'Buy us a coffee',
             ctaIcon: 'local_cafe',
             external: true,
           },
@@ -1190,7 +1184,7 @@ function renderHero(page) {
       <div class="hero-copy">
         <span class="eyebrow">${page.eyebrowIcon ? `<span class="material-symbols-outlined eyebrow-icon" aria-hidden="true">${escapeHtml(page.eyebrowIcon)}</span>` : ''}${escapeHtml(page.eyebrow)}</span>
         <h1 class="${titleClass.trim()}">${escapeHtml(page.heroTitle)}</h1>
-        <p class="hero-text">${escapeHtml(page.heroText)}</p>
+        ${page.heroText ? `<p class="hero-text">${escapeHtml(page.heroText)}</p>` : ''}
         ${(showPrimaryCta || showLegalCta)
           ? `<div class="cta-row">
               ${showPrimaryCta ? `<a class="button button-primary" href="/">${escapeHtml(ui.openApp)}</a>` : ''}
