@@ -458,7 +458,7 @@ const germanMarketingPages = [
             icon: 'contacts',
             title: 'Tritt in Kontakt',
             body:
-              'Am einfachsten verbindest Du Dich mit anderen Nutzern im echten Leben, zum Beispiel bei einem Kaffee, indem ihr den Connect-QR-Code scannt. Es geht auch online, aber ihr solltet euch bereits kennen. Private Kommunikation wird verschlüsselt und signiert übertragen. Die Schlüssel werden auf Deinem Gerät erzeugt, und die privaten Schlüssel verlassen es nicht.',
+              'Am einfachsten verbindest Du Dich mit anderen Nutzern im echten Leben, zum Beispiel bei einem Kaffee, indem Ihr den Connect-QR-Code scannt. Es geht auch online, aber Ihr solltet Euch bereits kennen. Private Kommunikation wird verschlüsselt und signiert übertragen. Die Schlüssel werden auf Deinem Gerät erzeugt, und die privaten Schlüssel verlassen es nicht.',
           },
           {
             icon: 'person_search',
@@ -540,7 +540,7 @@ const germanMarketingPages = [
     lang: 'de',
     title: 'Wie MessageDrop funktioniert',
     description:
-      'Sieh dir an, wie MessageDrop Orte zu Einstiegspunkten für öffentliche Nachrichten, lokalen Kontext, private Notizen und private Chats macht.',
+      'Sieh Dir an, wie MessageDrop Orte zu Einstiegspunkten für öffentliche Nachrichten, lokalen Kontext, private Notizen und private Chats macht.',
     heroIcon: 'alt_route',
     eyebrowIcon: 'alt_route',
     eyebrow: 'So funktioniert es',
@@ -562,7 +562,7 @@ const germanMarketingPages = [
             icon: 'rocket_launch',
             title: 'App öffnen und erste Schritte',
             body:
-              'So startest du MessageDrop, gehst durch den Consent-Screen und findest dich nach dem ersten Öffnen schnell zurecht.',
+              'So startest Du MessageDrop, gehst durch den Consent-Screen und findest Dich nach dem ersten Öffnen schnell zurecht.',
             meta: 'Guide 1',
             ctaLabel: 'Video folgt',
           },
@@ -570,7 +570,7 @@ const germanMarketingPages = [
             icon: 'account_circle',
             title: 'Nutzerkonto anlegen und Profil ausfüllen',
             body:
-              'Erfahre, wie du mit einem PIN ein Nutzerkonto anlegst und dein Profil mit Namen, Avatar und weiteren Angaben vervollständigst.',
+              'Erfahre, wie Du mit einem PIN ein Nutzerkonto anlegst und Dein Profil mit Namen, Avatar und weiteren Angaben vervollständigst.',
             meta: 'Guide 2',
             ctaLabel: 'Video folgt',
           },
@@ -578,7 +578,7 @@ const germanMarketingPages = [
             icon: 'edit_square',
             title: 'Nachrichten erstellen und lokale Profile pflegen',
             body:
-              'Sieh, wie du eigene Nachrichten erstellst und anderen Nutzern lokal Namen und Avatare gibst, die nur für dich sichtbar sind.',
+              'Sieh, wie Du eigene Nachrichten erstellst und anderen Nutzern lokal Namen und Avatare gibst, die nur für Dich sichtbar sind.',
             meta: 'Guide 3',
             ctaLabel: 'Video folgt',
           },
@@ -586,7 +586,7 @@ const germanMarketingPages = [
             icon: 'place',
             title: 'Orte anlegen und Ortsprofile pflegen',
             body:
-              'So legst du neue Orte an, pflegst Ortsprofile und nutzt Tiles, um Informationen an einem Ort sichtbar zu machen.',
+              'So legst Du neue Orte an, pflegst Ortsprofile und nutzt Tiles, um Informationen an einem Ort sichtbar zu machen.',
             meta: 'Guide 4',
             ctaLabel: 'Video folgt',
           },
@@ -594,7 +594,7 @@ const germanMarketingPages = [
             icon: 'forum',
             title: 'Kontakte aufnehmen und Chatroom nutzen',
             body:
-              'Lerne, wie du Kontakt mit anderen Nutzern aufnimmst und den Chatroom für direkte Gespräche rund um Menschen nutzt, die du kennst.',
+              'Lerne, wie Du Kontakt mit anderen Nutzern aufnimmst und den Chatroom für direkte Gespräche rund um Menschen nutzt, die Du kennst.',
             meta: 'Guide 5',
             ctaLabel: 'Video folgt',
           },
@@ -602,7 +602,7 @@ const germanMarketingPages = [
             icon: 'travel_explore',
             title: 'Erlebnisse suchen',
             body:
-              'Sieh, wie du nach Erlebnissen suchst, Aktivitäten rund um einen Ort entdeckst und MessageDrop als Ausgangspunkt für die echte Welt nutzt.',
+              'Sieh, wie Du nach Erlebnissen suchst, Aktivitäten rund um einen Ort entdeckst und MessageDrop als Ausgangspunkt für die echte Welt nutzt.',
             meta: 'Guide 6',
             ctaLabel: 'Video folgt',
           },
@@ -623,7 +623,7 @@ const germanMarketingPages = [
     eyebrow: 'Rechtliches',
     heroTitle: 'Alle rechtlichen Informationen an einem Ort.',
     heroText:
-      'Hier findest du Datenschutzerklärung, Nutzungsbedingungen, Impressum und Haftungshinweis gebündelt an einem Ort.',
+      'Hier findest Du Datenschutzerklärung, Nutzungsbedingungen, Impressum und Haftungshinweis gebündelt an einem Ort.',
     showLegalCta: false,
     showPrimaryCta: false,
     heroAsideTitle: 'Dokument direkt öffnen',
@@ -785,7 +785,7 @@ const uiByLocale = {
     footerCreditPrefix: 'Mit',
     footerCreditSuffix: 'entwickelt von',
     redirectTitle: 'Sprache wird gewählt',
-    redirectText: 'Mit JavaScript wird automatisch die passende Sprachversion geöffnet. Ohne JavaScript kannst du die gewünschte Version hier direkt auswählen.',
+    redirectText: 'Mit JavaScript wird automatisch die passende Sprachversion geöffnet. Ohne JavaScript kannst Du die gewünschte Version hier direkt auswählen.',
     openGerman: 'Deutsch öffnen',
     openEnglish: 'Englisch öffnen',
     openAppLegal: 'App öffnen',
