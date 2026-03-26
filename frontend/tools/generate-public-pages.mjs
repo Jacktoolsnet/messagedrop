@@ -228,10 +228,9 @@ const marketingPages = [
       'Central legal hub for MessageDrop with privacy policy, terms of service, legal notice, and disclaimer.',
     heroIcon: 'gavel',
     eyebrowIcon: 'gavel',
-    eyebrow: 'Legal',
+    eyebrow: '',
     heroTitle: 'All legal information in one place.',
-    heroText:
-      'Here you can find the privacy policy, terms of service, legal notice, and disclaimer in one place.',
+    heroText: '',
     showLegalCta: false,
     showPrimaryCta: false,
     heroAsideTitle: 'Open a legal document',
@@ -593,10 +592,9 @@ const germanMarketingPages = [
       'Zentrale Rechtsübersicht für MessageDrop mit Datenschutzerklärung, Nutzungsbedingungen, Impressum und Haftungshinweis.',
     heroIcon: 'gavel',
     eyebrowIcon: 'gavel',
-    eyebrow: 'Rechtliches',
+    eyebrow: '',
     heroTitle: 'Alle rechtlichen Informationen an einem Ort.',
-    heroText:
-      'Hier findest Du Datenschutzerklärung, Nutzungsbedingungen, Impressum und Haftungshinweis gebündelt an einem Ort.',
+    heroText: '',
     showLegalCta: false,
     showPrimaryCta: false,
     heroAsideTitle: 'Dokument direkt öffnen',
@@ -1463,9 +1461,9 @@ function renderLegalPage(page) {
       <main class="site-main legal-main">
         <section class="hero legal-hero">
           <div class="hero-copy">
-            <span class="eyebrow">${escapeHtml(page.eyebrow)}</span>
+            ${page.eyebrow ? `<span class="eyebrow">${escapeHtml(page.eyebrow)}</span>` : ''}
             <h1>${escapeHtml(page.heroTitle)}</h1>
-            <p class="hero-text">${escapeHtml(page.heroText)}</p>
+            ${page.heroText ? `<p class="hero-text">${escapeHtml(page.heroText)}</p>` : ''}
             <div class="cta-row">
               ${page.downloads
                 .map((download) => `<a class="button button-secondary" href="${download.href}">${escapeHtml(download.label)}</a>`)
