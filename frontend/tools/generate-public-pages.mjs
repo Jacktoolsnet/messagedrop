@@ -17,7 +17,7 @@ const marketingPages = [
     lang: 'en',
     title: 'What is MessageDrop?',
     description:
-      'MessageDrop is a global map where people can leave messages in real-world locations — digital graffiti for the world map.',
+      'MessageDrop is a global map where people can leave messages in real-world locations, follow places, and communicate securely.',
     heroIcon: 'globe_location_pin',
     heroTitle: 'Place messages. Follow places. Communicate securely.',
     heroTitleClass: 'hero-title-compact',
@@ -382,7 +382,7 @@ const germanMarketingPages = [
     lang: 'de',
     title: 'Was ist MessageDrop?',
     description:
-      'MessageDrop ist eine globale Karte, auf der Menschen Nachrichten an realen Orten hinterlassen können — digitales Graffiti für die Weltkarte.',
+      'MessageDrop ist eine globale Karte, auf der Menschen Nachrichten an realen Orten hinterlassen, Orten folgen und sicher kommunizieren können.',
     heroIcon: 'globe_location_pin',
     heroTitle: 'Platziere Nachrichten. Folge Orten. Kommuniziere sicher.',
     heroTitleClass: 'hero-title-compact',
