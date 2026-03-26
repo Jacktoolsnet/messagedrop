@@ -38,7 +38,7 @@ Erteilte Einwilligungen für externe Inhalte können jederzeit mit Wirkung für 
 
 Systemmeldungen (z. B. Hinweise zu DSA-Verfahren oder geplante Wartungsarbeiten) werden ausschließlich durch autorisierte administrative Systeme erzeugt und im Frontend des Nutzers angezeigt. Systemmeldungen sind stets aktiv; Nutzer können sie im Frontend löschen, ohne dass dadurch zwingend interne Nachweise entfallen.
 
-Profile (Name/Avatar) können lokal zur besseren Zuordnung genutzt werden. Bei Kontaktaufnahme kann ein Nutzer optional eine Profilfreigabe anfordern; der andere Nutzer muss aktiv zustimmen. Nach Zustimmung werden Name und Avatar auf dem Endgerät des Kontakts lokal gespeichert.
+Profile (Name/Avatar) können lokal zur besseren Zuordnung genutzt werden. Bei Kontaktaufnahme kann ein Nutzer optional eine Profilfreigabe anfragen; der andere Nutzer muss aktiv zustimmen. Nach Zustimmung werden Name und Avatar auf dem Endgerät des Kontakts lokal gespeichert.
 
 Plätzen kann gefolgt werden; soweit technisch möglich und vom Endgerät unterstützt, kann der Nutzer Push-Benachrichtigungen erhalten, wenn an einem gefolgten Platz neue öffentliche Inhalte erscheinen. Technisch erforderliche Push-Token werden nur für die Zustellung verarbeitet. Ein Anspruch auf Zustellung von Push-Benachrichtigungen besteht nicht.
 
@@ -378,7 +378,7 @@ Die Speicherung erfolgt je nach Plattform insbesondere über Browser-IndexedDB, 
 
 Lokal gespeicherte Daten werden nicht automatisch mit anderen Geräten oder einer Cloud synchronisiert.
 
-Die Kontrolle über lokal gespeicherte Daten liegt beim Nutzer. Der Nutzer kann diese Daten jederzeit selbst löschen, insbesondere durch entsprechende Funktionen innerhalb der App, das Löschen von App- oder Browserdaten, die Deinstallation der App oder PWA oder das Zurücksetzen des Browsers oder Endgeräts.
+Die Kontrolle über lokal gespeicherte Daten liegt beim Nutzer. Der Nutzer kann diese Daten jederzeit selbst löschen, insbesondere durch entsprechende Funktionen innerhalb der App, das Löschen von App- oder Browserdaten, die Deinstallation der App oder der installierten Web-App oder das Zurücksetzen des Browsers oder Endgeräts.
 
 Wir haben ohne Mitwirkung des Nutzers keinen Zugriff auf lokal gespeicherte Daten und keine Möglichkeit, diese lokal gespeicherten Daten einzusehen, zu sichern oder nachträglich wiederherzustellen.
 
@@ -410,15 +410,15 @@ Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Bereitstellung und Nutzung der B
 
 Der Nutzer kann für sein eigenes Nutzerkonto ein lokales Profil (z. B. Name und Avatar) anlegen. Dieses Profil wird grundsätzlich ausschließlich lokal auf dem Endgerät gespeichert.
 
-Im Rahmen der Kontaktfunktion kann ein Nutzer aktiv eine Profilfreigabe an einen Kontakt anfordern. Der Kontakt muss die Profilfreigabe aktiv bestätigen (z. B. per Popup), bevor eine Übertragung erfolgt.
+Im Rahmen der Kontaktfunktion kann ein Nutzer aktiv eine Profilfreigabe an einen Kontakt anfragen. Der Kontakt muss die Profilfreigabe aktiv bestätigen (z. B. per Popup), bevor eine Übertragung erfolgt.
 
-Nach erfolter Zustimmung werden Profilname und Avatar auf das Endgerät des Kontakts übertragen und dort lokal gespeichert. Eine zentrale Speicherung dieser Profilinformationen durch uns erfolgt nicht.
+Nach erfolgter Zustimmung werden Profilname und Avatar auf das Endgerät des Kontakts übertragen und dort lokal gespeichert. Eine zentrale Speicherung dieser Profilinformationen durch uns erfolgt nicht.
 
-Hinweis: Nach der Übertragung besteht keine technische Möglichkeit, die bereits übertragenen Profilinformationen auf dem Endgerät des Kontakts zurückzuholen oder dort zu löschen. Der Kontakt kann die lokal gespeicherten Daten jedoch auf seinem Endgerät löschen.
+Hinweis: Nach der Übertragung besteht keine technische Möglichkeit, die bereits übertragenen Profilinformationen auf dem Endgerät des Kontakts zurückzuholen oder dort zu löschen. Die lokal gespeicherten Daten können nur vom empfangenden Kontakt auf dessen Endgerät gelöscht werden.
 
 Zusätzlich kann jeder Nutzer unabhängig davon eigene lokale Profileinträge für Kontakte festlegen (z. B. eigener Anzeigename, eigener Avatar). Diese Informationen sind nur lokal sichtbar.
 
-Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Bereitstellung der Kontaktfunktion) sowie Art. 6 Abs. 1 lit. a DSGVO, soweit die Profilfreigabe als freiwillige Zustimmung (Opt-in) ausgestaltet ist.
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Bereitstellung der Kontaktfunktion) sowie – soweit die Profilfreigabe auf einer freiwilligen, aktiven Zustimmung beruht – Art. 6 Abs. 1 lit. a DSGVO (Einwilligung der betroffenen Person in die Verarbeitung der sie betreffenden personenbezogenen Daten).
 
 ###
 3.8 Systemmeldungen
@@ -441,7 +441,7 @@ Im Rahmen der Systemmeldungen verarbeiten wir insbesondere:
 
 Nutzer können Systemmeldungen im Frontend löschen. Das Löschen betrifft ausschließlich die Anzeige bzw. lokale Verfügbarkeit im Nutzer-Frontend. Gesetzlich erforderliche oder dokumentationspflichtige Nachweise (z. B. im Rahmen von DSA-Verfahren) können hiervon unberührt bleiben.
 
-Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO sowie Art. 6 Abs. 1 lit. c DSGVO, soweit Systemmeldungen zur Erfüllung gesetzlicher Pflichten erforderlich sind (z. B. DSA).
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Bereitstellung von Systemmeldungen im Rahmen der Nutzung des Dienstes) sowie Art. 6 Abs. 1 lit. c DSGVO (Erfüllung gesetzlicher Pflichten), soweit Systemmeldungen hierzu erforderlich sind (z. B. DSA).
 
 ###
 3.9 Plätzen folgen und Push-Benachrichtigungen
@@ -455,7 +455,7 @@ Für Push-Benachrichtigungen werden je nach Plattform technisch erforderliche To
 
 Push-Benachrichtigungen können aus technischen, systembedingten oder nutzerspezifischen Gründen verzögert, eingeschränkt oder nicht zugestellt werden; ein Anspruch auf Zustellung besteht nicht.
 
-Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Funktion „Folgen“) sowie Art. 6 Abs. 1 lit. a DSGVO, sofern die Push-Nutzung als einwilligungsbasiert ausgestaltet ist bzw. eine systemseitige Berechtigung des Endgeräts erforderlich ist.
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Funktion „Folgen“) sowie Art. 6 Abs. 1 lit. a DSGVO (Einwilligung der betroffenen Person in die Verarbeitung der sie betreffenden personenbezogenen Daten), sofern die Push-Nutzung als einwilligungsbasiert ausgestaltet ist bzw. eine systemseitige Berechtigung des Endgeräts erforderlich ist.
 
 ###
 3.10 Nutzungszeit-Schutz (Selbstbeschränkung / Elternmodus)
