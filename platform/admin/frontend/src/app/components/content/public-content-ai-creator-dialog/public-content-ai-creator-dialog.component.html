@@ -1,194 +1,210 @@
 <div class="dialog-header">
   <div class="dialog-copy">
     <h2>{{ i18n.t('AI Content Creator') }}</h2>
-    <p>{{ i18n.t('Create publishable draft ideas from prompt, links and optional multimedia.') }}</p>
   </div>
-
-  <button mat-icon-button type="button" (click)="close()" [attr.aria-label]="i18n.t('Close AI dialog')">
-    <mat-icon>close</mat-icon>
-  </button>
 </div>
 
 <mat-dialog-content class="dialog-content">
-  <div class="dialog-meta">
-    <span class="dialog-meta-chip">
-      <mat-icon>smart_toy</mat-icon>
-      {{ data.model }}
-    </span>
-
-    @if (selectedProfile(); as profile) {
-      <span class="dialog-meta-chip">
-        <mat-icon>groups</mat-icon>
-        {{ profile.name }}
-      </span>
-    }
-
-    <span class="dialog-meta-chip">
-      <mat-icon>category</mat-icon>
-      {{ messageTypeLabel(previewMessageType()) }}
-    </span>
-
-    <span class="dialog-meta-chip">
-      <mat-icon>tag</mat-icon>
-      {{ hashtagStyleLabel(previewHashtagStyle()) }}
-    </span>
-  </div>
-
-  <mat-card class="options-card">
-    <mat-card-content class="options-grid">
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>{{ i18n.t('Public profile') }}</mat-label>
-        <mat-select [formControl]="form.controls.publicProfileId">
-          @for (profile of data.publicProfiles; track profileTrackBy($index, profile)) {
-            <mat-option [value]="profile.id">{{ profile.name }}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>{{ i18n.t('Task / prompt') }}</mat-label>
-        <textarea
-          matInput
-          rows="5"
-          [formControl]="form.controls.prompt"
-          [placeholder]="i18n.t('Describe what kind of public messages should be created and what the focus should be.')"></textarea>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>{{ i18n.t('Style') }}</mat-label>
-        <mat-select [formControl]="form.controls.creatorStyle">
-          @for (option of creatorStyleOptions; track styleTrackBy($index, option)) {
-            <mat-option [value]="option.value">{{ i18n.t(option.label) }}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>{{ i18n.t('Message type') }}</mat-label>
-        <mat-select [formControl]="form.controls.creatorMessageType">
-          @for (option of creatorMessageTypeOptions; track messageTypeTrackBy($index, option)) {
-            <mat-option [value]="option.value">{{ i18n.t(option.label) }}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>{{ i18n.t('Hashtag style') }}</mat-label>
-        <mat-select [formControl]="form.controls.creatorHashtagStyle">
-          @for (option of creatorHashtagStyleOptions; track hashtagStyleTrackBy($index, option)) {
-            <mat-option [value]="option.value">{{ i18n.t(option.label) }}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>{{ i18n.t('Draft count') }}</mat-label>
-        <mat-select [formControl]="form.controls.suggestionCount">
-          @for (count of suggestionCountOptions; track count) {
-            <mat-option [value]="count">{{ count }}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>{{ i18n.t('Multimedia URL') }}</mat-label>
-        <input
-          matInput
-          [formControl]="form.controls.multimediaUrl"
-          [placeholder]="i18n.t('Optional YouTube, Spotify, Pinterest or TikTok URL')" />
-      </mat-form-field>
-
-      @if (multimediaProvider(); as mediaType) {
-        <div class="inline-info">
-          <mat-icon>perm_media</mat-icon>
-          <span>{{ i18n.t('Recognized multimedia source') }}: {{ mediaTypeLabel(mediaType) }}</span>
+  <div class="creator-grid">
+    <mat-card class="tile-card tile-card-prompt">
+      <mat-card-header class="tile-header">
+        <div mat-card-avatar class="avatar avatar-accent">
+          <mat-icon>edit_note</mat-icon>
         </div>
-      } @else if (hasUnsupportedMultimediaUrl()) {
-        <div class="inline-warning">
-          <mat-icon>info</mat-icon>
-          <span>{{ i18n.t('Supported multimedia platforms: YouTube, Spotify, Pinterest and TikTok.') }}</span>
-        </div>
-      }
+        <mat-card-title>{{ i18n.t('Prompt and profile') }}</mat-card-title>
+        <mat-card-subtitle>{{ i18n.t('Define the task, target profile and the editorial direction for the AI.') }}</mat-card-subtitle>
+      </mat-card-header>
 
-      @if (multimediaPreviewLoading()) {
-        <div class="inline-info">
-          <mat-icon>hourglass_top</mat-icon>
-          <span>{{ i18n.t('Checking multimedia preview...') }}</span>
-        </div>
-      } @else if (multimediaPreview(); as multimediaPreview) {
-        <div class="multimedia-preview">
-          <div class="multimedia-preview-head">
-            <span class="dialog-meta-chip">
-              <mat-icon>preview</mat-icon>
-              {{ i18n.t('Multimedia preview') }}
-            </span>
-          </div>
+      <mat-card-content class="tile-body">
 
-          <div class="multimedia-preview-body">
-            <strong>{{ multimediaPreview.title || (multimediaPreview.sourceUrl || multimediaPreview.url) }}</strong>
-            @if (multimediaPreview.description) {
-              <p>{{ multimediaPreview.description }}</p>
-            }
-            <span class="multimedia-preview-url">{{ multimediaPreview.sourceUrl || multimediaPreview.url }}</span>
-          </div>
-        </div>
-      } @else if (hasSupportedMultimediaPreviewFailure()) {
-        <div class="inline-warning">
-          <mat-icon>warning</mat-icon>
-          <span>{{ i18n.t('The multimedia URL looks valid but could not be resolved as embeddable media.') }}</span>
-        </div>
-      }
-
-      <div class="content-url-row">
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>{{ i18n.t('Content URL') }}</mat-label>
-          <input
-            matInput
-            [formControl]="form.controls.contentUrlInput"
-            [placeholder]="i18n.t('Add a source link and confirm with the plus button')"
-            (keydown.enter)="addContentUrlOnEnter($event)" />
+          <mat-label>{{ i18n.t('Public profile') }}</mat-label>
+          <mat-select [formControl]="form.controls.publicProfileId">
+            @for (profile of data.publicProfiles; track profileTrackBy($index, profile)) {
+              <mat-option [value]="profile.id">{{ profile.name }}</mat-option>
+            }
+          </mat-select>
         </mat-form-field>
 
-        <button mat-mini-fab color="primary" type="button" (click)="addContentUrl()" [attr.aria-label]="i18n.t('Add URL')">
-          <mat-icon>add</mat-icon>
-        </button>
-      </div>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>{{ i18n.t('Task / prompt') }}</mat-label>
+          <textarea
+            matInput
+            rows="6"
+            [formControl]="form.controls.prompt"
+            [placeholder]="i18n.t('Describe what kind of public messages should be created and what the focus should be.')"></textarea>
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
 
-      @if (hasPendingContentUrl()) {
-        <div class="inline-info">
-          <mat-icon>link</mat-icon>
-          <span>{{ i18n.t('Current source URL will be added automatically when drafts are generated.') }}</span>
+    <mat-card class="tile-card tile-card-settings">
+      <mat-card-header class="tile-header">
+        <div mat-card-avatar class="avatar avatar-neutral">
+          <mat-icon>tune</mat-icon>
         </div>
-      }
+        <mat-card-title>{{ i18n.t('Generation settings') }}</mat-card-title>
+        <mat-card-subtitle>{{ i18n.t('Choose tone, type, hashtags and the number of drafts.') }}</mat-card-subtitle>
+      </mat-card-header>
 
-      @if (sourceUrlsForRun().length > 0) {
-        <div class="inline-info">
-          <mat-icon>library_books</mat-icon>
-          <span>{{ i18n.t('Source links ready: {{count}}', { count: sourceUrlsForRun().length }) }}</span>
+      <mat-card-content class="tile-body">
+
+        <div class="tile-form-grid">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ i18n.t('Style') }}</mat-label>
+            <mat-select [formControl]="form.controls.creatorStyle">
+              @for (option of creatorStyleOptions; track styleTrackBy($index, option)) {
+                <mat-option [value]="option.value">{{ i18n.t(option.label) }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ i18n.t('Message type') }}</mat-label>
+            <mat-select [formControl]="form.controls.creatorMessageType">
+              @for (option of creatorMessageTypeOptions; track messageTypeTrackBy($index, option)) {
+                <mat-option [value]="option.value">{{ i18n.t(option.label) }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ i18n.t('Hashtag style') }}</mat-label>
+            <mat-select [formControl]="form.controls.creatorHashtagStyle">
+              @for (option of creatorHashtagStyleOptions; track hashtagStyleTrackBy($index, option)) {
+                <mat-option [value]="option.value">{{ i18n.t(option.label) }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ i18n.t('Draft count') }}</mat-label>
+            <mat-select [formControl]="form.controls.suggestionCount">
+              @for (count of suggestionCountOptions; track count) {
+                <mat-option [value]="count">{{ count }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
         </div>
-      }
+      </mat-card-content>
+    </mat-card>
 
-      @if (contentUrls().length > 0) {
-        <div class="url-list">
-          @for (url of contentUrls(); track url) {
-            <div class="url-list-item">
-              <span>{{ url }}</span>
-              <button mat-icon-button type="button" (click)="removeContentUrl(url)" [attr.aria-label]="i18n.t('Remove URL')">
-                <mat-icon>delete</mat-icon>
-              </button>
+    <mat-card class="tile-card tile-card-media">
+      <mat-card-header class="tile-header">
+        <div mat-card-avatar class="avatar avatar-accent">
+          <mat-icon>perm_media</mat-icon>
+        </div>
+        <mat-card-title>{{ i18n.t('Multimedia candidate') }}</mat-card-title>
+        <mat-card-subtitle>{{ i18n.t('Optional dedicated media for multimedia posts including preview and validation.') }}</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content class="tile-body">
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>{{ i18n.t('Multimedia URL') }}</mat-label>
+          <input
+            matInput
+            [formControl]="form.controls.multimediaUrl"
+            [placeholder]="i18n.t('Optional YouTube, Spotify, Pinterest or TikTok URL')" />
+        </mat-form-field>
+
+        @if (multimediaProvider(); as mediaType) {
+          <div class="inline-info">
+            <mat-icon>perm_media</mat-icon>
+            <span>{{ i18n.t('Recognized multimedia source') }}: {{ mediaTypeLabel(mediaType) }}</span>
+          </div>
+        } @else if (hasUnsupportedMultimediaUrl()) {
+          <div class="inline-warning">
+            <mat-icon>info</mat-icon>
+            <span>{{ i18n.t('Supported multimedia platforms: YouTube, Spotify, Pinterest and TikTok.') }}</span>
+          </div>
+        }
+
+        @if (multimediaPreviewLoading()) {
+          <div class="inline-info">
+            <mat-icon>hourglass_top</mat-icon>
+            <span>{{ i18n.t('Checking multimedia preview...') }}</span>
+          </div>
+        } @else if (multimediaPreview(); as multimediaPreview) {
+          <div class="multimedia-preview">
+            <div class="multimedia-preview-head">
+              <span class="dialog-meta-chip">
+                <mat-icon>preview</mat-icon>
+                {{ i18n.t('Multimedia preview') }}
+              </span>
             </div>
-          }
-        </div>
-      }
 
-      <div class="run-row">
-        <button mat-flat-button color="primary" type="button" (click)="run()" [disabled]="!canRun()">
-          <mat-icon>auto_awesome</mat-icon>
-          {{ i18n.t('Generate drafts') }}
-        </button>
-      </div>
-    </mat-card-content>
-  </mat-card>
+            <div class="multimedia-preview-body">
+              <strong>{{ multimediaPreview.title || (multimediaPreview.sourceUrl || multimediaPreview.url) }}</strong>
+              @if (multimediaPreview.description) {
+                <p>{{ multimediaPreview.description }}</p>
+              }
+              <span class="multimedia-preview-url">{{ multimediaPreview.sourceUrl || multimediaPreview.url }}</span>
+            </div>
+          </div>
+        } @else if (hasSupportedMultimediaPreviewFailure()) {
+          <div class="inline-warning">
+            <mat-icon>warning</mat-icon>
+            <span>{{ i18n.t('The multimedia URL looks valid but could not be resolved as embeddable media.') }}</span>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="tile-card tile-card-sources">
+      <mat-card-header class="tile-header">
+        <div mat-card-avatar class="avatar avatar-success">
+          <mat-icon>library_books</mat-icon>
+        </div>
+        <mat-card-title>{{ i18n.t('Source links') }}</mat-card-title>
+        <mat-card-subtitle>{{ i18n.t('Add one or more links that the AI can use as the factual basis for the draft suggestions.') }}</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content class="tile-body">
+
+        <div class="content-url-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ i18n.t('Content URL') }}</mat-label>
+            <input
+              matInput
+              [formControl]="form.controls.contentUrlInput"
+              [placeholder]="i18n.t('Add a source link and confirm with the plus button')"
+              (keydown.enter)="addContentUrlOnEnter($event)" />
+          </mat-form-field>
+
+          <button mat-mini-fab color="primary" type="button" (click)="addContentUrl()" [attr.aria-label]="i18n.t('Add URL')">
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
+
+        @if (hasPendingContentUrl()) {
+          <div class="inline-info">
+            <mat-icon>link</mat-icon>
+            <span>{{ i18n.t('Current source URL will be added automatically when drafts are generated.') }}</span>
+          </div>
+        }
+
+        @if (sourceUrlsForRun().length > 0) {
+          <div class="inline-info">
+            <mat-icon>library_books</mat-icon>
+            <span>{{ i18n.t('Source links ready: {{count}}', { count: sourceUrlsForRun().length }) }}</span>
+          </div>
+        }
+
+        @if (contentUrls().length > 0) {
+          <div class="url-list">
+            @for (url of contentUrls(); track url) {
+              <div class="url-list-item">
+                <span>{{ url }}</span>
+                <button mat-icon-button type="button" (click)="removeContentUrl(url)" [attr.aria-label]="i18n.t('Remove URL')">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+  </div>
 
   @if (loading() || importing()) {
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
@@ -424,10 +440,37 @@
   }
 </mat-dialog-content>
 
-<mat-dialog-actions align="end" class="dialog-actions">
-  <button mat-button type="button" (click)="close()">{{ i18n.t('Close') }}</button>
-  <button mat-flat-button color="primary" type="button" (click)="importSelectedSuggestions()" [disabled]="!canImport()">
+<mat-dialog-actions class="dialog-actions">
+  <button
+    mat-icon-button
+    type="button"
+    class="toolbar-action avatar avatar-neutral"
+    (click)="close()"
+    [matTooltip]="i18n.t('Close')"
+    [attr.aria-label]="i18n.t('Close')">
+    <mat-icon>close</mat-icon>
+  </button>
+  <span class="dialog-actions-spacer"></span>
+
+  <button
+    mat-icon-button
+    type="button"
+    class="toolbar-action avatar avatar-accent"
+    (click)="run()"
+    [disabled]="!canRun()"
+    [matTooltip]="i18n.t('Generate drafts')"
+    [attr.aria-label]="i18n.t('Generate drafts')">
+    <mat-icon>auto_awesome</mat-icon>
+  </button>
+
+  <button
+    mat-icon-button
+    type="button"
+    class="toolbar-action avatar avatar-success"
+    (click)="importSelectedSuggestions()"
+    [disabled]="!canImport()"
+    [matTooltip]="i18n.t('Import selected drafts')"
+    [attr.aria-label]="i18n.t('Import selected drafts')">
     <mat-icon>download_done</mat-icon>
-    {{ i18n.t('Import selected drafts') }}
   </button>
 </mat-dialog-actions>

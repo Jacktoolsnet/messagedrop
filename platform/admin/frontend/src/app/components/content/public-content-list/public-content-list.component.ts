@@ -135,9 +135,10 @@ export class PublicContentListComponent {
     this.dialog.open<PublicContentAiCreatorDialogComponent, unknown, PublicContentAiCreatorDialogResult>(
       PublicContentAiCreatorDialogComponent,
       {
-        width: 'min(94vw, 980px)',
-        maxWidth: '94vw',
-        maxHeight: '92vh',
+        width: '95vw',
+        height: '95vh',
+        maxWidth: '95vw',
+        maxHeight: '95vh',
         autoFocus: false,
         panelClass: 'mdp-dialog-xl',
         data: {
