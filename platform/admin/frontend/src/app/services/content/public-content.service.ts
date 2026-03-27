@@ -157,6 +157,15 @@ export class PublicContentService {
     );
   }
 
+  previewOembed(url: string): Observable<Multimedia | null> {
+    return this.http.get<{ status: number; multimedia: Multimedia }>(`${this.baseUrl}/media/oembed`, {
+      params: new HttpParams().set('url', url)
+    }).pipe(
+      map((response) => response.multimedia ?? null),
+      catchError(() => of(null))
+    );
+  }
+
   private buildListParams(filters: PublicContentFilters): HttpParams {
     let params = new HttpParams();
 

@@ -107,6 +107,63 @@
   gap: 0.75rem;
 }
 
+.inline-info,
+.inline-warning {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.9rem;
+}
+
+.inline-info {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.inline-warning {
+  background: rgba(255, 193, 7, 0.12);
+  color: rgba(255, 236, 179, 0.96);
+}
+
+.inline-info mat-icon,
+.inline-warning mat-icon {
+  width: 1rem;
+  height: 1rem;
+  font-size: 1rem;
+  margin-top: 0.05rem;
+}
+
+.multimedia-preview {
+  padding: 0.9rem 1rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.multimedia-preview-head {
+  margin-bottom: 0.75rem;
+}
+
+.multimedia-preview-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.multimedia-preview-body strong {
+  font-size: 0.96rem;
+}
+
+.multimedia-preview-body p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.multimedia-preview-url {
+  color: rgba(255, 255, 255, 0.68);
+  overflow-wrap: anywhere;
+}
+
 .suggestion-list {
   display: flex;
   flex-direction: column;

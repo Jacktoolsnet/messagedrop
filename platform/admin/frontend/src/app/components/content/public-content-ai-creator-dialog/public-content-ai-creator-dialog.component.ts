@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -13,7 +13,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { finalize, firstValueFrom } from 'rxjs';
+import { debounceTime, distinctUntilChanged, finalize, firstValueFrom, map, of, startWith, switchMap } from 'rxjs';
 import { AiToolRequest } from '../../../interfaces/ai-tool-request.interface';
 import { AiContentCreatorSuggestion } from '../../../interfaces/ai-tool-result.interface';
 import { Multimedia } from '../../../interfaces/multimedia.interface';
@@ -36,6 +36,16 @@ const EMPTY_MULTIMEDIA: Multimedia = {
   contentId: '',
   oembed: null
 };
+
+const DEFAULT_CONTENT_CREATOR_COUNT = 4;
+const SUGGESTION_COUNT_OPTIONS = [2, 3, 4, 5, 6];
+
+interface MultimediaPreviewState {
+  url: string;
+  supported: boolean;
+  loading: boolean;
+  multimedia: Multimedia | null;
+}
 
 export interface PublicContentAiCreatorDialogData {
   model: string;
@@ -86,16 +96,96 @@ export class PublicContentAiCreatorDialogComponent {
   readonly contentUrls = signal<string[]>([]);
   readonly suggestions = signal<AiContentCreatorSuggestion[]>([]);
   readonly selectedSuggestionIndices = signal<number[]>([]);
+  readonly suggestionCountOptions = SUGGESTION_COUNT_OPTIONS;
 
   readonly form = this.fb.nonNullable.group({
     publicProfileId: this.fb.nonNullable.control(this.resolveInitialProfileId()),
     prompt: this.fb.nonNullable.control(''),
+    suggestionCount: this.fb.nonNullable.control(DEFAULT_CONTENT_CREATOR_COUNT),
     multimediaUrl: this.fb.nonNullable.control(''),
     contentUrlInput: this.fb.nonNullable.control('')
   });
+  private readonly formValue = toSignal(
+    this.form.valueChanges.pipe(startWith(this.form.getRawValue())),
+    { initialValue: this.form.getRawValue() }
+  );
+  private readonly multimediaPreviewState = toSignal(
+    this.form.controls.multimediaUrl.valueChanges.pipe(
+      startWith(this.form.controls.multimediaUrl.value),
+      map((value) => this.normalizeHttpUrl(value)),
+      debounceTime(250),
+      distinctUntilChanged(),
+      switchMap((url) => {
+        const provider = this.detectSupportedMultimediaProvider(url);
+        if (!url) {
+          return of<MultimediaPreviewState>({
+            url: '',
+            supported: false,
+            loading: false,
+            multimedia: null
+          });
+        }
+
+        if (!provider) {
+          return of<MultimediaPreviewState>({
+            url,
+            supported: false,
+            loading: false,
+            multimedia: null
+          });
+        }
+
+        return this.publicContentService.previewOembed(url).pipe(
+          map((multimedia) => ({
+            url,
+            supported: true,
+            loading: false,
+            multimedia
+          })),
+          startWith({
+            url,
+            supported: true,
+            loading: true,
+            multimedia: null
+          })
+        );
+      })
+    ),
+    {
+      initialValue: {
+        url: '',
+        supported: false,
+        loading: false,
+        multimedia: null
+      }
+    }
+  );
+
+  readonly normalizedMultimediaUrl = computed(() => this.normalizeHttpUrl(this.formValue().multimediaUrl ?? ''));
+  readonly multimediaProvider = computed(() => this.detectSupportedMultimediaProvider(this.normalizedMultimediaUrl()));
+  readonly pendingContentUrl = computed(() => this.normalizeHttpUrl(this.formValue().contentUrlInput ?? ''));
+  readonly sourceUrlsForRun = computed(() => {
+    const unique = new Set(this.contentUrls());
+    const pending = this.pendingContentUrl();
+    if (pending) {
+      unique.add(pending);
+    }
+    return Array.from(unique);
+  });
+  readonly hasPendingContentUrl = computed(() => {
+    const pending = this.pendingContentUrl();
+    return !!pending && !this.contentUrls().includes(pending);
+  });
+  readonly multimediaPreview = computed(() => this.multimediaPreviewState().multimedia);
+  readonly multimediaPreviewLoading = computed(() => this.multimediaPreviewState().loading);
+  readonly hasUnsupportedMultimediaUrl = computed(() => !!this.normalizedMultimediaUrl() && !this.multimediaProvider());
+  readonly hasSupportedMultimediaPreviewFailure = computed(() => {
+    const state = this.multimediaPreviewState();
+    return !!state.url && state.supported && !state.loading && !state.multimedia;
+  });
 
   readonly selectedProfile = computed(() => {
-    const selectedId = this.form.controls.publicProfileId.value;
+    const selectedId = this.formValue().publicProfileId ?? '';
     return this.data.publicProfiles.find((profile) => profile.id === selectedId) ?? null;
   });
 
@@ -103,14 +193,15 @@ export class PublicContentAiCreatorDialogComponent {
     if (this.loading() || this.importing()) {
       return false;
     }
-    return !!this.form.controls.publicProfileId.value && !!this.form.controls.prompt.value.trim();
+    const formValue = this.formValue();
+    return !!formValue.publicProfileId && !!(formValue.prompt ?? '').trim();
   });
 
   readonly canImport = computed(() => (
     !this.loading()
     && !this.importing()
     && this.selectedSuggestionIndices().length > 0
-    && !!this.form.controls.publicProfileId.value
+    && !!(this.formValue().publicProfileId ?? '')
   ));
 
   close(): void {
@@ -147,11 +238,19 @@ export class PublicContentAiCreatorDialogComponent {
       return;
     }
 
+    const contentUrlInputValue = this.form.controls.contentUrlInput.value.trim();
+    if (contentUrlInputValue && !this.pendingContentUrl()) {
+      this.showMessage('Please enter a valid URL starting with http:// or https://.');
+      return;
+    }
+
     const multimediaUrlValue = this.form.controls.multimediaUrl.value.trim();
     if (multimediaUrlValue && !this.normalizeHttpUrl(multimediaUrlValue)) {
       this.showMessage('Please enter a valid URL starting with http:// or https://.');
       return;
     }
+
+    this.commitPendingContentUrl();
 
     this.loading.set(true);
     this.suggestions.set([]);
@@ -251,18 +350,7 @@ export class PublicContentAiCreatorDialogComponent {
 
   suggestionMediaLabel(suggestion: AiContentCreatorSuggestion): string {
     if (suggestion.multimedia?.type && suggestion.multimedia.type !== 'undefined') {
-      switch (suggestion.multimedia.type) {
-        case 'youtube':
-          return 'YouTube';
-        case 'spotify':
-          return 'Spotify';
-        case 'pinterest':
-          return 'Pinterest';
-        case 'tiktok':
-          return 'TikTok';
-        default:
-          return suggestion.multimedia.type;
-      }
+      return this.mediaTypeLabel(suggestion.multimedia.type);
     }
 
     if (suggestion.tenorQuery.trim()) {
@@ -282,10 +370,10 @@ export class PublicContentAiCreatorDialogComponent {
       publicProfileName: this.selectedProfile()?.name ?? '',
       parentLabel: '',
       existingHashtags: [],
-      contentUrls: this.contentUrls(),
+      contentUrls: this.sourceUrlsForRun(),
       multimediaUrl: this.normalizeHttpUrl(this.form.controls.multimediaUrl.value),
       responseLanguage: this.i18n.lang() === 'de' ? 'German' : 'English',
-      suggestionCount: 4,
+      suggestionCount: this.form.controls.suggestionCount.value,
       multimedia: {
         type: '',
         title: '',
@@ -317,6 +405,64 @@ export class PublicContentAiCreatorDialogComponent {
       return parsed.toString();
     } catch {
       return '';
+    }
+  }
+
+  private commitPendingContentUrl(): void {
+    const pending = this.pendingContentUrl();
+    if (!pending || this.contentUrls().includes(pending)) {
+      return;
+    }
+
+    this.contentUrls.update((current) => [...current, pending]);
+    this.form.controls.contentUrlInput.setValue('');
+  }
+
+  private detectSupportedMultimediaProvider(url: string): string {
+    if (!url) {
+      return '';
+    }
+
+    try {
+      const hostname = new URL(url).hostname.toLowerCase();
+      if (hostname === 'youtu.be' || hostname === 'youtube.com' || hostname === 'www.youtube.com' || hostname.endsWith('.youtube.com')) {
+        return 'youtube';
+      }
+      if (hostname === 'open.spotify.com' || hostname.endsWith('.spotify.com')) {
+        return 'spotify';
+      }
+      if (hostname === 'pinterest.com' || hostname === 'www.pinterest.com' || hostname.endsWith('.pinterest.com') || hostname === 'pin.it') {
+        return 'pinterest';
+      }
+      if (hostname === 'tiktok.com' || hostname === 'www.tiktok.com' || hostname.endsWith('.tiktok.com') || hostname === 'vm.tiktok.com') {
+        return 'tiktok';
+      }
+    } catch {
+      return '';
+    }
+
+    return '';
+  }
+
+  mediaTypeLabel(type: string | null | undefined): string {
+    switch ((type ?? '').toLowerCase()) {
+      case 'youtube':
+        return 'YouTube';
+      case 'spotify':
+        return 'Spotify';
+      case 'pinterest':
+        return 'Pinterest';
+      case 'tiktok':
+        return 'TikTok';
+      case 'tenor':
+        return this.i18n.t('Tenor GIF');
+      case 'image':
+        return this.i18n.t('Image');
+      case 'undefined':
+      case '':
+        return this.i18n.t('No media');
+      default:
+        return type ?? this.i18n.t('Media');
     }
   }
 

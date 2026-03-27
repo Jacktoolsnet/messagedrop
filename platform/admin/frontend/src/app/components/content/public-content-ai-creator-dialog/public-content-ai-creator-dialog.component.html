@@ -45,12 +45,62 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ i18n.t('Draft count') }}</mat-label>
+        <mat-select [formControl]="form.controls.suggestionCount">
+          @for (count of suggestionCountOptions; track count) {
+            <mat-option [value]="count">{{ count }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
         <mat-label>{{ i18n.t('Multimedia URL') }}</mat-label>
         <input
           matInput
           [formControl]="form.controls.multimediaUrl"
           [placeholder]="i18n.t('Optional YouTube, Spotify, Pinterest or TikTok URL')" />
       </mat-form-field>
+
+      @if (multimediaProvider(); as mediaType) {
+        <div class="inline-info">
+          <mat-icon>perm_media</mat-icon>
+          <span>{{ i18n.t('Recognized multimedia source') }}: {{ mediaTypeLabel(mediaType) }}</span>
+        </div>
+      } @else if (hasUnsupportedMultimediaUrl()) {
+        <div class="inline-warning">
+          <mat-icon>info</mat-icon>
+          <span>{{ i18n.t('Supported multimedia platforms: YouTube, Spotify, Pinterest and TikTok.') }}</span>
+        </div>
+      }
+
+      @if (multimediaPreviewLoading()) {
+        <div class="inline-info">
+          <mat-icon>hourglass_top</mat-icon>
+          <span>{{ i18n.t('Checking multimedia preview...') }}</span>
+        </div>
+      } @else if (multimediaPreview(); as multimediaPreview) {
+        <div class="multimedia-preview">
+          <div class="multimedia-preview-head">
+            <span class="dialog-meta-chip">
+              <mat-icon>preview</mat-icon>
+              {{ i18n.t('Multimedia preview') }}
+            </span>
+          </div>
+
+          <div class="multimedia-preview-body">
+            <strong>{{ multimediaPreview.title || (multimediaPreview.sourceUrl || multimediaPreview.url) }}</strong>
+            @if (multimediaPreview.description) {
+              <p>{{ multimediaPreview.description }}</p>
+            }
+            <span class="multimedia-preview-url">{{ multimediaPreview.sourceUrl || multimediaPreview.url }}</span>
+          </div>
+        </div>
+      } @else if (hasSupportedMultimediaPreviewFailure()) {
+        <div class="inline-warning">
+          <mat-icon>warning</mat-icon>
+          <span>{{ i18n.t('The multimedia URL looks valid but could not be resolved as embeddable media.') }}</span>
+        </div>
+      }
 
       <div class="content-url-row">
         <mat-form-field appearance="outline" class="full-width">
@@ -66,6 +116,20 @@
           <mat-icon>add</mat-icon>
         </button>
       </div>
+
+      @if (hasPendingContentUrl()) {
+        <div class="inline-info">
+          <mat-icon>link</mat-icon>
+          <span>{{ i18n.t('Current source URL will be added automatically when drafts are generated.') }}</span>
+        </div>
+      }
+
+      @if (sourceUrlsForRun().length > 0) {
+        <div class="inline-info">
+          <mat-icon>library_books</mat-icon>
+          <span>{{ i18n.t('Source links ready: {{count}}', { count: sourceUrlsForRun().length }) }}</span>
+        </div>
+      }
 
       @if (contentUrls().length > 0) {
         <div class="url-list">
