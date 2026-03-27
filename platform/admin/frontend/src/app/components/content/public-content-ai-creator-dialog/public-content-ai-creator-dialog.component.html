@@ -249,12 +249,6 @@
       @for (suggestion of suggestions(); track suggestionTrackBy($index); let suggestionIndex = $index) {
         <div class="suggestion-card" [class.suggestion-card-selected]="isSuggestionSelected(suggestionIndex)">
           <div class="suggestion-head">
-            <mat-checkbox
-              [checked]="isSuggestionSelected(suggestionIndex)"
-              (change)="toggleSuggestionSelection(suggestionIndex, $event)">
-              {{ i18n.t('Use suggestion') }}
-            </mat-checkbox>
-
             @if (suggestionMediaLabel(suggestion); as mediaLabel) {
               <span class="dialog-meta-chip">
                 <mat-icon>{{ suggestion.multimedia ? 'perm_media' : 'gif' }}</mat-icon>
@@ -335,8 +329,16 @@
               </mat-card-content>
 
               <mat-card-actions class="preview-buttonbar">
-                <button mat-mini-fab type="button" tabindex="-1">
-                  <mat-icon>delete_forever</mat-icon>
+                <button
+                  mat-mini-fab
+                  type="button"
+                  class="preview-selection-button"
+                  [class.is-selected]="isSuggestionSelected(suggestionIndex)"
+                  (click)="toggleSuggestionSelection(suggestionIndex); $event.stopPropagation()"
+                  [matTooltip]="isSuggestionSelected(suggestionIndex) ? i18n.t('Deselect suggestion') : i18n.t('Select suggestion')"
+                  [attr.aria-pressed]="isSuggestionSelected(suggestionIndex)"
+                  [attr.aria-label]="isSuggestionSelected(suggestionIndex) ? i18n.t('Deselect suggestion') : i18n.t('Select suggestion')">
+                  <mat-icon>{{ isSuggestionSelected(suggestionIndex) ? 'check_circle' : 'add_task' }}</mat-icon>
                 </button>
 
                 <div class="preview-button-group">
