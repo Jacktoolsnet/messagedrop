@@ -5,4 +5,5 @@ export type AiTool =
   | 'hashtags'
   | 'emoji'
   | 'thread'
-  | 'quality_check';
+  | 'quality_check'
+  | 'content_creator';

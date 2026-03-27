@@ -1,21 +1,31 @@
+const axios = require('axios');
 const express = require('express');
+const dns = require('node:dns').promises;
+const net = require('node:net');
 const OpenAI = require('openai');
 
 const tableAiSettings = require('../db/tableAiSettings');
 const tableAiUsageEvent = require('../db/tableAiUsageEvent');
 const { requireAdminJwt, requireRole } = require('../middleware/security');
 const { apiError } = require('../middleware/api-error');
+const { resolveBaseUrl } = require('../utils/adminLogForwarder');
 
 const router = express.Router();
 
 const AI_ROLES = ['author', 'editor', 'admin', 'root'];
 const DEFAULT_ADMIN_MODEL = 'gpt-5.4';
 const DEFAULT_HASHTAG_COUNT = 8;
+const DEFAULT_CONTENT_CREATOR_COUNT = 4;
+const MAX_CONTENT_CREATOR_COUNT = 6;
+const MAX_CONTENT_CREATOR_URLS = 12;
 const MAX_TEXT_LENGTH = 12_000;
+const MAX_URL_LENGTH = 1500;
+const MAX_FETCHED_METADATA_BYTES = 200_000;
+const URL_FETCH_TIMEOUT_MS = 5000;
 const MODEL_CACHE_TTL_MS = 5 * 60 * 1000;
 const DAY_IN_SECONDS = 24 * 60 * 60;
 const DAY_IN_MS = DAY_IN_SECONDS * 1000;
-const TOOL_TYPES = new Set(['proofread', 'rewrite', 'translate', 'hashtags', 'emoji', 'thread', 'quality_check']);
+const TOOL_TYPES = new Set(['proofread', 'rewrite', 'translate', 'hashtags', 'emoji', 'thread', 'quality_check', 'content_creator']);
 const REWRITE_GOALS = new Set(['clearer', 'friendlier', 'shorter', 'more_formal', 'more_engaging']);
 
 let modelCache = {
@@ -181,6 +191,220 @@ function resolveDefaultModel() {
 
 function resolveEffectiveModel(selectedModel) {
   return normalizeModelId(selectedModel) || resolveDefaultModel();
+}
+
+function resolvePublicBackendBase() {
+  return resolveBaseUrl(process.env.BASE_URL, process.env.PORT);
+}
+
+async function callPublicBackendPublic(method, endpoint, payload) {
+  const baseUrl = resolvePublicBackendBase();
+  if (!baseUrl) {
+    throw apiError.badGateway('backend_unavailable');
+  }
+
+  return axios.request({
+    method,
+    url: `${baseUrl}${endpoint}`,
+    data: payload,
+    timeout: URL_FETCH_TIMEOUT_MS,
+    headers: {
+      Accept: 'application/json'
+    },
+    validateStatus: () => true
+  });
+}
+
+function normalizeHostname(hostname) {
+  if (typeof hostname !== 'string') {
+    return '';
+  }
+  return hostname.trim().replace(/^\[|\]$/g, '').toLowerCase();
+}
+
+function isPrivateOrReservedIpv4(ip) {
+  const parts = ip.split('.').map((part) => Number.parseInt(part, 10));
+  if (parts.length !== 4 || parts.some((part) => !Number.isInteger(part) || part < 0 || part > 255)) {
+    return true;
+  }
+  const [a, b] = parts;
+  if (a === 10 || a === 127 || a === 0) return true;
+  if (a === 169 && b === 254) return true;
+  if (a === 172 && b >= 16 && b <= 31) return true;
+  if (a === 192 && b === 168) return true;
+  if (a === 100 && b >= 64 && b <= 127) return true;
+  if (a === 198 && (b === 18 || b === 19)) return true;
+  if (a >= 224) return true;
+  return false;
+}
+
+function isPrivateOrReservedIpv6(ip) {
+  const normalized = ip.toLowerCase();
+  if (normalized === '::' || normalized === '::1') return true;
+  if (normalized.startsWith('fc') || normalized.startsWith('fd')) return true;
+  if (normalized.startsWith('fe8') || normalized.startsWith('fe9') || normalized.startsWith('fea') || normalized.startsWith('feb')) {
+    return true;
+  }
+  const mapped = normalized.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/);
+  if (mapped) {
+    return isPrivateOrReservedIpv4(mapped[1]);
+  }
+  return false;
+}
+
+function isPrivateOrReservedIp(ip) {
+  const family = net.isIP(ip);
+  if (family === 4) return isPrivateOrReservedIpv4(ip);
+  if (family === 6) return isPrivateOrReservedIpv6(ip);
+  return true;
+}
+
+function hasAllowedHttpPort(parsedTarget) {
+  if (!parsedTarget.port) {
+    return true;
+  }
+  const port = Number.parseInt(parsedTarget.port, 10);
+  if (!Number.isFinite(port)) {
+    return false;
+  }
+  if (parsedTarget.protocol === 'https:') {
+    return port === 443;
+  }
+  if (parsedTarget.protocol === 'http:') {
+    return port === 80;
+  }
+  return false;
+}
+
+async function isPublicHttpTarget(hostname) {
+  const normalizedHost = normalizeHostname(hostname);
+  if (!normalizedHost) {
+    return false;
+  }
+  if (
+    normalizedHost === 'localhost'
+    || normalizedHost.endsWith('.localhost')
+    || normalizedHost.endsWith('.local')
+    || normalizedHost.endsWith('.internal')
+    || normalizedHost.endsWith('.home')
+    || normalizedHost.endsWith('.lan')
+  ) {
+    return false;
+  }
+
+  if (net.isIP(normalizedHost)) {
+    return !isPrivateOrReservedIp(normalizedHost);
+  }
+
+  let addresses;
+  try {
+    addresses = await dns.lookup(normalizedHost, { all: true, verbatim: true });
+  } catch {
+    return false;
+  }
+
+  if (!Array.isArray(addresses) || addresses.length === 0) {
+    return false;
+  }
+
+  return addresses.every((entry) => entry?.address && !isPrivateOrReservedIp(entry.address));
+}
+
+async function isSafePublicUrl(rawUrl) {
+  let parsed;
+  try {
+    parsed = new URL(String(rawUrl || '').trim());
+  } catch {
+    return false;
+  }
+
+  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+    return false;
+  }
+  if (parsed.username || parsed.password) {
+    return false;
+  }
+  if (!hasAllowedHttpPort(parsed)) {
+    return false;
+  }
+
+  return isPublicHttpTarget(parsed.hostname);
+}
+
+function inferMediaProvider(url) {
+  let parsed;
+  try {
+    parsed = new URL(String(url || '').trim());
+  } catch {
+    return null;
+  }
+
+  const host = parsed.hostname.toLowerCase();
+  if (host === 'youtu.be' || host.endsWith('.youtube.com') || host === 'youtube.com') {
+    return {
+      type: 'youtube',
+      providerUrl: 'https://www.youtube.com/oembed',
+      platformName: 'YouTube'
+    };
+  }
+  if (host === 'open.spotify.com' || host.endsWith('.spotify.com') || host.endsWith('.spotify.link') || host === 'spoti.fi') {
+    return {
+      type: 'spotify',
+      providerUrl: 'https://open.spotify.com/oembed',
+      platformName: 'Spotify'
+    };
+  }
+  if (host === 'pin.it' || host === 'pinterest.com' || host.endsWith('.pinterest.com')) {
+    return {
+      type: 'pinterest',
+      providerUrl: 'https://www.pinterest.com/oembed.json',
+      platformName: 'Pinterest'
+    };
+  }
+  if (host === 'tiktok.com' || host.endsWith('.tiktok.com') || host === 'vm.tiktok.com') {
+    return {
+      type: 'tiktok',
+      providerUrl: 'https://www.tiktok.com/oembed',
+      platformName: 'TikTok'
+    };
+  }
+  return null;
+}
+
+async function fetchOembedResult(url, provider) {
+  const response = await callPublicBackendPublic(
+    'get',
+    `/utils/oembed?provider=${encodeURIComponent(provider.providerUrl)}&url=${encodeURIComponent(url)}`
+  );
+
+  if (response.status !== 200 || !response.data?.result) {
+    return null;
+  }
+
+  return response.data.result;
+}
+
+function normalizeUrl(value) {
+  if (typeof value !== 'string') {
+    return '';
+  }
+
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return '';
+  }
+
+  const shortened = trimmed.slice(0, MAX_URL_LENGTH);
+  try {
+    const parsed = new URL(shortened);
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+      return '';
+    }
+    parsed.hash = '';
+    return parsed.toString();
+  } catch {
+    return '';
+  }
 }
 
 function normalizeModelId(value) {
@@ -798,18 +1022,22 @@ function normalizeToolPayload(value) {
   }
 
   const text = normalizeText(value.text);
+  const prompt = normalizeText(value.prompt);
   const locationLabel = normalizeShortText(value.locationLabel, 200);
   const publicProfileName = normalizeShortText(value.publicProfileName, 120);
   const parentLabel = normalizeShortText(value.parentLabel, 200);
   const existingHashtags = normalizeHashtagList(value.existingHashtags);
   const contentType = String(value.contentType || 'public').trim() === 'comment' ? 'comment' : 'public';
+  const contentUrls = normalizeUrlList(value.contentUrls);
+  const multimediaUrl = normalizeOptionalCreatorUrl(value.multimediaUrl);
   const targetLanguage = normalizeShortText(value.targetLanguage, 60) || 'English';
   const responseLanguage = normalizeShortText(value.responseLanguage, 60);
   const rewriteGoal = normalizeRewriteGoal(value.rewriteGoal);
   const hashtagCount = normalizeHashtagCount(value.hashtagCount);
+  const suggestionCount = normalizeSuggestionCount(value.suggestionCount);
   const multimedia = normalizeMultimediaSummary(value.multimedia);
 
-  if (tool !== 'hashtags' && !text) {
+  if (tool !== 'hashtags' && tool !== 'content_creator' && !text) {
     throw apiError.unprocessableEntity('text_required_for_ai_tool');
   }
 
@@ -817,18 +1045,26 @@ function normalizeToolPayload(value) {
     throw apiError.unprocessableEntity('not_enough_context_for_hashtags');
   }
 
+  if (tool === 'content_creator' && !prompt) {
+    throw apiError.unprocessableEntity('prompt_required_for_content_creator');
+  }
+
   return {
     tool,
     text,
+    prompt,
     locationLabel,
     publicProfileName,
     parentLabel,
     existingHashtags,
     contentType,
+    contentUrls,
+    multimediaUrl,
     targetLanguage,
     responseLanguage,
     rewriteGoal,
     hashtagCount,
+    suggestionCount,
     multimedia
   };
 }
@@ -864,6 +1100,14 @@ function normalizeHashtagCount(value) {
   return Math.max(3, Math.min(DEFAULT_HASHTAG_COUNT, Math.floor(parsed)));
 }
 
+function normalizeSuggestionCount(value) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) {
+    return DEFAULT_CONTENT_CREATOR_COUNT;
+  }
+  return Math.max(2, Math.min(MAX_CONTENT_CREATOR_COUNT, Math.floor(parsed)));
+}
+
 function normalizeHashtagList(input) {
   if (!Array.isArray(input)) {
     return [];
@@ -880,6 +1124,41 @@ function normalizeHashtagList(input) {
     result.push(normalized);
   }
   return result.slice(0, DEFAULT_HASHTAG_COUNT);
+}
+
+function normalizeOptionalCreatorUrl(value) {
+  if (value === undefined || value === null || value === '') {
+    return '';
+  }
+
+  const normalized = normalizeUrl(value);
+  if (!normalized) {
+    throw apiError.badRequest('invalid_multimedia_url');
+  }
+
+  return normalized;
+}
+
+function normalizeUrlList(input) {
+  if (!Array.isArray(input)) {
+    return [];
+  }
+
+  const seen = new Set();
+  const result = [];
+  for (const entry of input) {
+    const normalized = normalizeUrl(entry);
+    if (!normalized || seen.has(normalized)) {
+      continue;
+    }
+    seen.add(normalized);
+    result.push(normalized);
+    if (result.length >= MAX_CONTENT_CREATOR_URLS) {
+      break;
+    }
+  }
+
+  return result;
 }
 
 function normalizeHashtagToken(value) {
@@ -915,6 +1194,271 @@ function normalizeMultimediaSummary(value) {
   };
 }
 
+function decodeHtmlEntities(value) {
+  if (typeof value !== 'string' || !value) {
+    return '';
+  }
+
+  return value
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, '\'')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&#(\d+);/g, (_match, digits) => {
+      const code = Number.parseInt(digits, 10);
+      return Number.isFinite(code) ? String.fromCharCode(code) : '';
+    });
+}
+
+function extractHtmlMetadata(html) {
+  const source = typeof html === 'string' ? html : '';
+  if (!source) {
+    return {
+      title: '',
+      description: ''
+    };
+  }
+
+  const titleMatch = source.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+  const metaMatches = Array.from(source.matchAll(/<meta\b[^>]*>/gi));
+  const metaEntries = metaMatches.map((match) => {
+    const tag = match[0];
+    const attributes = {};
+    const attrMatches = tag.matchAll(/([a-zA-Z_:.-]+)\s*=\s*(['"])([\s\S]*?)\2/g);
+    for (const attr of attrMatches) {
+      attributes[String(attr[1] || '').toLowerCase()] = String(attr[3] || '');
+    }
+    return attributes;
+  });
+
+  const findMeta = (keys) => {
+    for (const entry of metaEntries) {
+      const identifier = String(entry.property || entry.name || '').toLowerCase();
+      if (!keys.includes(identifier)) {
+        continue;
+      }
+      const content = decodeHtmlEntities(String(entry.content || '').trim());
+      if (content) {
+        return content;
+      }
+    }
+    return '';
+  };
+
+  return {
+    title: normalizeShortText(
+      decodeHtmlEntities(
+        findMeta(['og:title', 'twitter:title'])
+        || (titleMatch?.[1] ? titleMatch[1].replace(/\s+/g, ' ').trim() : '')
+      ),
+      240
+    ),
+    description: normalizeShortText(
+      decodeHtmlEntities(findMeta(['description', 'og:description', 'twitter:description'])),
+      500
+    )
+  };
+}
+
+async function fetchUrlMetadata(url) {
+  const safe = await isSafePublicUrl(url);
+  if (!safe) {
+    return {
+      url,
+      host: (() => {
+        try {
+          return new URL(url).hostname;
+        } catch {
+          return '';
+        }
+      })(),
+      title: '',
+      description: '',
+      provider: '',
+      metadataAvailable: false
+    };
+  }
+
+  const provider = inferMediaProvider(url);
+  if (provider) {
+    try {
+      const oembed = await fetchOembedResult(url, provider);
+      return {
+        url,
+        host: new URL(url).hostname,
+        title: normalizeShortText(oembed?.title, 240),
+        description: normalizeShortText(oembed?.author_name || oembed?.provider_name || '', 500),
+        provider: provider.platformName,
+        metadataAvailable: true
+      };
+    } catch {
+      // fall through to generic html metadata fetch
+    }
+  }
+
+  try {
+    const response = await axios.get(url, {
+      timeout: URL_FETCH_TIMEOUT_MS,
+      maxRedirects: 5,
+      responseType: 'text',
+      validateStatus: (status) => status >= 200 && status < 400,
+      maxContentLength: MAX_FETCHED_METADATA_BYTES,
+      headers: {
+        Accept: 'text/html,application/xhtml+xml'
+      }
+    });
+
+    const contentType = String(response.headers?.['content-type'] || '').toLowerCase();
+    if (!contentType.includes('html') && !contentType.includes('text')) {
+      return {
+        url,
+        host: new URL(url).hostname,
+        title: '',
+        description: '',
+        provider: provider?.platformName || '',
+        metadataAvailable: false
+      };
+    }
+
+    const metadata = extractHtmlMetadata(typeof response.data === 'string' ? response.data.slice(0, MAX_FETCHED_METADATA_BYTES) : '');
+    return {
+      url,
+      host: new URL(url).hostname,
+      title: metadata.title,
+      description: metadata.description,
+      provider: provider?.platformName || '',
+      metadataAvailable: !!(metadata.title || metadata.description)
+    };
+  } catch {
+    return {
+      url,
+      host: new URL(url).hostname,
+      title: '',
+      description: '',
+      provider: provider?.platformName || '',
+      metadataAvailable: false
+    };
+  }
+}
+
+async function resolveCreatorMultimedia(url) {
+  if (!url) {
+    return null;
+  }
+
+  const provider = inferMediaProvider(url);
+  if (!provider) {
+    return null;
+  }
+
+  let oembed = null;
+  try {
+    oembed = await fetchOembedResult(url, provider);
+  } catch {
+    oembed = null;
+  }
+
+  return {
+    type: provider.type,
+    url: '',
+    sourceUrl: url,
+    attribution: `Powered by ${provider.platformName}`,
+    title: normalizeShortText(oembed?.title, 240),
+    description: normalizeShortText(oembed?.author_name || oembed?.provider_name || '', 500),
+    contentId: '',
+    oembed
+  };
+}
+
+async function resolveContentCreatorContext(payload) {
+  const [contentSources, multimedia] = await Promise.all([
+    Promise.all((payload.contentUrls || []).map((url) => fetchUrlMetadata(url))),
+    resolveCreatorMultimedia(payload.multimediaUrl)
+  ]);
+
+  return {
+    contentSources: contentSources.filter(Boolean),
+    multimedia
+  };
+}
+
+function buildContentCreatorInput(payload, context) {
+  const lines = [
+    `Task: ${payload.prompt}`,
+    payload.responseLanguage ? `Preferred response language: ${payload.responseLanguage}` : '',
+    payload.publicProfileName ? `Preferred public profile: ${payload.publicProfileName}` : '',
+    '',
+    context.multimedia
+      ? `Dedicated multimedia candidate: ${context.multimedia.type} | ${context.multimedia.title || context.multimedia.sourceUrl || payload.multimediaUrl}`
+      : 'Dedicated multimedia candidate: none',
+    context.multimedia?.description ? `Multimedia details: ${context.multimedia.description}` : ''
+  ];
+
+  if (context.contentSources.length > 0) {
+    lines.push('', 'Source links:');
+    context.contentSources.forEach((source, index) => {
+      lines.push(`${index + 1}. URL: ${source.url}`);
+      if (source.provider) {
+        lines.push(`   Platform: ${source.provider}`);
+      }
+      if (source.title) {
+        lines.push(`   Title: ${source.title}`);
+      }
+      if (source.description) {
+        lines.push(`   Description: ${source.description}`);
+      }
+      if (!source.metadataAvailable) {
+        lines.push('   Note: Only limited metadata was available for this link.');
+      }
+    });
+  } else {
+    lines.push('', 'Source links: none provided');
+  }
+
+  return lines.filter(Boolean).join('\n');
+}
+
+function parseJsonArray(outputText) {
+  const raw = String(outputText || '').trim();
+  if (!raw) {
+    return null;
+  }
+
+  const fencedMatch = raw.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  const candidate = fencedMatch?.[1]?.trim() || raw;
+
+  try {
+    const parsed = JSON.parse(candidate);
+    return Array.isArray(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function normalizeContentCreatorSuggestion(value, context) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null;
+  }
+
+  const message = normalizeText(value.message);
+  const locationQuery = normalizeShortText(value.locationQuery, 180);
+  if (!message || !locationQuery) {
+    return null;
+  }
+
+  const useMultimedia = value.useMultimedia === true || String(value.useMultimedia || '').trim().toLowerCase() === 'true';
+
+  return {
+    message,
+    hashtags: normalizeHashtagList(value.hashtags),
+    locationQuery,
+    multimedia: useMultimedia && context.multimedia ? context.multimedia : null,
+    tenorQuery: useMultimedia ? '' : normalizeShortText(value.tenorQuery, 160)
+  };
+}
+
 async function runAiTool(client, model, payload, db) {
   switch (payload.tool) {
     case 'proofread':
@@ -931,6 +1475,8 @@ async function runAiTool(client, model, payload, db) {
       return runThreadSuggestions(client, model, payload, db);
     case 'quality_check':
       return runQualityCheck(client, model, payload, db);
+    case 'content_creator':
+      return runContentCreator(client, model, payload, db);
     default:
       throw apiError.badRequest('unsupported_ai_tool');
   }
@@ -1139,6 +1685,58 @@ async function runQualityCheck(client, model, payload, db) {
       recommendations: normalizeStringArray(result.recommendations, 4, 180),
       improvedText: normalizeText(result.improvedText)
     }
+  };
+}
+
+async function runContentCreator(client, model, payload, db) {
+  const context = await resolveContentCreatorContext(payload);
+  const responseLanguageInstruction = payload.responseLanguage
+    ? `Write all message suggestions and location queries in ${payload.responseLanguage}.`
+    : 'Write all message suggestions and location queries in the same language as the user task.';
+
+  const response = await client.responses.create({
+    model,
+    instructions: [
+      'You are an editorial social content creator for short public messages.',
+      responseLanguageInstruction,
+      'Use the user task and provided link summaries as your only factual basis.',
+      'Do not invent unsupported facts, names, claims or event details.',
+      `Create exactly ${payload.suggestionCount} distinct public message suggestions.`,
+      'Each suggestion must be publication-ready, concise, and may include fitting emojis.',
+      'Do not place hashtags inside the message text.',
+      'Return only a JSON array.',
+      'Each array item must be an object with exactly these keys:',
+      'message, hashtags, locationQuery, useMultimedia, tenorQuery.',
+      'hashtags must be an array of 3 to 8 lowercase tokens without the leading #.',
+      'locationQuery must be a concrete place suggestion that can be searched by a map or geocoding service.',
+      'Set useMultimedia to true only when the dedicated multimedia candidate should be used for that suggestion.',
+      'If useMultimedia is true, tenorQuery must be an empty string.',
+      'If no dedicated multimedia should be used but a visual would help, tenorQuery may contain a short Tenor search query.',
+      'If no visual is needed, tenorQuery must be an empty string.',
+      'Do not include markdown fences or extra commentary.'
+    ].join(' '),
+    input: buildContentCreatorInput(payload, context)
+  });
+  await recordResponseUsage(db, 'content_creator', model, response);
+
+  const parsed = parseJsonArray(response.output_text);
+  if (!parsed) {
+    throw apiError.badGateway('ai_empty_response');
+  }
+
+  const contentSuggestions = parsed
+    .map((entry) => normalizeContentCreatorSuggestion(entry, context))
+    .filter(Boolean)
+    .slice(0, payload.suggestionCount);
+
+  if (contentSuggestions.length === 0) {
+    throw apiError.badGateway('ai_empty_response');
+  }
+
+  return {
+    tool: 'content_creator',
+    model,
+    contentSuggestions
   };
 }
 

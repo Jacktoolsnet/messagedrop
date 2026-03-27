@@ -11,6 +11,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -21,10 +22,12 @@ import { PublicContentType } from '../../../interfaces/public-content-type.type'
 import { PublicContent } from '../../../interfaces/public-content.interface';
 import { PublicProfile } from '../../../interfaces/public-profile.interface';
 import { AuthService } from '../../../services/auth/auth.service';
+import { AiService } from '../../../services/content/ai.service';
 import { PublicContentService } from '../../../services/content/public-content.service';
 import { PublicProfileService } from '../../../services/content/public-profile.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
+import { PublicContentAiCreatorDialogComponent, PublicContentAiCreatorDialogResult } from '../public-content-ai-creator-dialog/public-content-ai-creator-dialog.component';
 
 @Component({
   selector: 'app-public-content-list',
@@ -54,7 +57,9 @@ export class PublicContentListComponent {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
+  private readonly snackBar = inject(MatSnackBar);
   private readonly authService = inject(AuthService);
+  private readonly aiService = inject(AiService);
   private readonly publicContentService = inject(PublicContentService);
   private readonly publicProfileService = inject(PublicProfileService);
 
@@ -63,6 +68,12 @@ export class PublicContentListComponent {
   readonly rows = this.publicContentService.rows;
   readonly loading = this.publicContentService.loading;
   readonly profiles = this.publicProfileService.rows;
+  readonly aiSettings = this.aiService.settings;
+  readonly aiModelLabel = computed(() => (
+    this.aiSettings()?.selectedModel
+    || this.aiSettings()?.defaultModel
+    || 'gpt-5.4'
+  ));
   readonly canPublish = computed(() => ['editor', 'admin', 'root'].includes(this.role() ?? ''));
   readonly canAccess = computed(() => ['author', 'editor', 'admin', 'root'].includes(this.role() ?? ''));
   readonly selectedProfile = computed(() => {
@@ -83,6 +94,7 @@ export class PublicContentListComponent {
 
   constructor() {
     this.publicProfileService.loadProfiles();
+    this.aiService.loadSettings();
     this.load();
 
     this.filterForm.valueChanges.pipe(
@@ -110,6 +122,64 @@ export class PublicContentListComponent {
 
   createContent(): void {
     this.router.navigate(['/dashboard/content/create']);
+  }
+
+  openAiCreator(): void {
+    const profiles = this.profiles();
+    if (profiles.length === 0) {
+      this.showMessage('Please create a public profile first.');
+      return;
+    }
+
+    const defaultPublicProfileId = this.filterForm.controls.publicProfileId.value || profiles[0].id;
+    this.dialog.open<PublicContentAiCreatorDialogComponent, unknown, PublicContentAiCreatorDialogResult>(
+      PublicContentAiCreatorDialogComponent,
+      {
+        width: 'min(94vw, 980px)',
+        maxWidth: '94vw',
+        maxHeight: '92vh',
+        autoFocus: false,
+        panelClass: 'mdp-dialog-xl',
+        data: {
+          model: this.aiModelLabel(),
+          publicProfiles: profiles,
+          defaultPublicProfileId
+        }
+      }
+    ).afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((result) => {
+        if (!result || result.importedCount <= 0) {
+          return;
+        }
+
+        const currentProfileId = this.filterForm.controls.publicProfileId.value;
+        const currentStatus = this.filterForm.controls.status.value;
+        const currentQuery = this.filterForm.controls.q.value;
+        const willChangeFilters = currentProfileId !== result.publicProfileId
+          || currentStatus !== 'draft'
+          || !!currentQuery;
+
+        this.filterForm.patchValue({
+          publicProfileId: result.publicProfileId,
+          status: 'draft',
+          q: ''
+        });
+
+        if (!willChangeFilters) {
+          this.load();
+        }
+
+        this.showMessage(
+          result.failedCount > 0
+            ? '{{count}} AI drafts imported. {{failed}} suggestions could not be imported.'
+            : '{{count}} AI drafts imported.',
+          {
+            count: result.importedCount,
+            failed: result.failedCount
+          }
+        );
+      });
   }
 
   openProfiles(): void {
@@ -200,6 +270,10 @@ export class PublicContentListComponent {
     const name = this.filterProfileName(profile);
     const parts = name.split(/\s+/).filter(Boolean).slice(0, 2);
     return parts.map((part) => part.charAt(0).toUpperCase()).join('') || 'P';
+  }
+
+  private showMessage(message: string, params?: Record<string, unknown>): void {
+    this.snackBar.open(this.i18n.t(message, params), this.i18n.t('OK'), { duration: 2800 });
   }
 
   tilePreview(row: PublicContent): string {

@@ -95,6 +95,8 @@ export class PublicContentAiDialogComponent {
         return this.i18n.t('Thread suggestions');
       case 'quality_check':
         return this.i18n.t('Quality check');
+      case 'content_creator':
+        return this.i18n.t('AI Content Creator');
     }
   });
 
@@ -114,6 +116,8 @@ export class PublicContentAiDialogComponent {
         return this.i18n.t('Generate short follow-up comments or replies for the current thread.');
       case 'quality_check':
         return this.i18n.t('Review clarity, tone and publication readiness and suggest improvements.');
+      case 'content_creator':
+        return this.i18n.t('Create publishable draft ideas from prompt, links and optional multimedia.');
     }
   });
 

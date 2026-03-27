@@ -1,4 +1,5 @@
 import { AiTool } from './ai-tool.type';
+import { Multimedia } from './multimedia.interface';
 
 export interface AiQualityCheckResult {
   verdict: string;
@@ -7,6 +8,14 @@ export interface AiQualityCheckResult {
   risks: string[];
   recommendations: string[];
   improvedText: string;
+}
+
+export interface AiContentCreatorSuggestion {
+  message: string;
+  hashtags: string[];
+  locationQuery: string;
+  multimedia: Multimedia | null;
+  tenorQuery: string;
 }
 
 export interface AiToolResult {
@@ -19,4 +28,5 @@ export interface AiToolResult {
   hashtags?: string[];
   emojiSuggestions?: string[];
   qualityCheck?: AiQualityCheckResult | null;
+  contentSuggestions?: AiContentCreatorSuggestion[] | null;
 }
