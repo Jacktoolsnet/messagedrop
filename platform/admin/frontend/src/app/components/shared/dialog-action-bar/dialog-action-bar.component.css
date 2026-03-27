@@ -21,6 +21,10 @@ app-dialog-action-bar {
   flex-wrap: wrap;
 }
 
+.dialog-action-bar.dialog-action-bar-static {
+  position: static;
+}
+
 .dialog-action-bar[align="start"] {
   justify-content: flex-start;
 }
@@ -29,9 +33,11 @@ app-dialog-action-bar {
   justify-content: center;
 }
 
-.dialog-action-bar .action-close {
-  margin-right: auto;
-  margin-inline-end: auto;
+.dialog-action-bar .action-close,
+.dialog-action-bar .toolbar-action.action-close {
+  order: -1;
+  margin-right: auto !important;
+  margin-inline-end: auto !important;
 }
 
 .dialog-action-bar button {

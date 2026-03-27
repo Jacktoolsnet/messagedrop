@@ -1,3 +1,6 @@
-<mat-dialog-actions class="dialog-action-bar" [align]="align()">
+<mat-dialog-actions
+  class="dialog-action-bar"
+  [class.dialog-action-bar-static]="!sticky()"
+  [align]="align()">
   <ng-content />
 </mat-dialog-actions>

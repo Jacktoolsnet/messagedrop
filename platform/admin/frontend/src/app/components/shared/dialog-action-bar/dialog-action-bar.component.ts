@@ -14,4 +14,5 @@ type DialogActionAlignment = 'start' | 'center' | 'end';
 })
 export class DialogActionBarComponent {
   readonly align = input<DialogActionAlignment>('end');
+  readonly sticky = input(true);
 }

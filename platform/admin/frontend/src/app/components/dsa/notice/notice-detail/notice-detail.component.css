@@ -1,4 +1,7 @@
 :host {
+    display: block;
+    width: 100%;
+    max-width: 100%;
     color-scheme: light;
     /* immer hell */
     --primary: #05a51d;
@@ -17,10 +20,11 @@
 
 /* Dialog Rahmen */
 .dialog-shell {
-    width: min(95vw, 1680px);
-    max-width: 95vw;
+    width: 100%;
+    max-width: 100%;
     min-width: 0;
     max-height: 95vh;
+    box-sizing: border-box;
     display: grid;
     grid-template-rows: auto 1px 1fr auto;
     background: var(--card);
