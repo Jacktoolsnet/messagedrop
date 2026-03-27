@@ -39,12 +39,48 @@ const EMPTY_MULTIMEDIA: Multimedia = {
 
 const DEFAULT_CONTENT_CREATOR_COUNT = 4;
 const SUGGESTION_COUNT_OPTIONS = [2, 3, 4, 5, 6];
+const CONTENT_CREATOR_STYLE_OPTIONS = [
+  { value: 'auto', label: 'Automatic' },
+  { value: 'factual', label: 'Factual' },
+  { value: 'emotional', label: 'Emotional' },
+  { value: 'bold', label: 'Bold' },
+  { value: 'short', label: 'Short' }
+] as const;
+const CONTENT_CREATOR_MESSAGE_TYPE_OPTIONS = [
+  { value: 'auto', label: 'Automatic' },
+  { value: 'event', label: 'Event' },
+  { value: 'info', label: 'Info' },
+  { value: 'reminder', label: 'Reminder' },
+  { value: 'call_to_action', label: 'Call to Action' }
+] as const;
+const CONTENT_CREATOR_HASHTAG_STYLE_OPTIONS = [
+  { value: 'auto', label: 'Automatic' },
+  { value: 'minimal', label: 'Minimal' },
+  { value: 'local', label: 'Local' },
+  { value: 'campaign', label: 'Campaign' },
+  { value: 'discoverable', label: 'Discoverable' }
+] as const;
 
 interface MultimediaPreviewState {
   url: string;
   supported: boolean;
   loading: boolean;
   multimedia: Multimedia | null;
+}
+
+type ContentCreatorStyle = typeof CONTENT_CREATOR_STYLE_OPTIONS[number]['value'];
+type ContentCreatorMessageType = typeof CONTENT_CREATOR_MESSAGE_TYPE_OPTIONS[number]['value'];
+type ContentCreatorHashtagStyle = typeof CONTENT_CREATOR_HASHTAG_STYLE_OPTIONS[number]['value'];
+
+interface EditableContentCreatorSuggestion extends AiContentCreatorSuggestion {
+  locationInput: string;
+  selectedPlace: NominatimPlace | null;
+  locationCandidates: NominatimPlace[];
+  locationLoading: boolean;
+  tenorInput: string;
+  tenorResults: TenorResult[];
+  tenorLoading: boolean;
+  selectedTenor: Multimedia | null;
 }
 
 export interface PublicContentAiCreatorDialogData {
@@ -94,13 +130,19 @@ export class PublicContentAiCreatorDialogComponent {
   readonly loading = signal(false);
   readonly importing = signal(false);
   readonly contentUrls = signal<string[]>([]);
-  readonly suggestions = signal<AiContentCreatorSuggestion[]>([]);
+  readonly suggestions = signal<EditableContentCreatorSuggestion[]>([]);
   readonly selectedSuggestionIndices = signal<number[]>([]);
   readonly suggestionCountOptions = SUGGESTION_COUNT_OPTIONS;
+  readonly creatorStyleOptions = CONTENT_CREATOR_STYLE_OPTIONS;
+  readonly creatorMessageTypeOptions = CONTENT_CREATOR_MESSAGE_TYPE_OPTIONS;
+  readonly creatorHashtagStyleOptions = CONTENT_CREATOR_HASHTAG_STYLE_OPTIONS;
 
   readonly form = this.fb.nonNullable.group({
     publicProfileId: this.fb.nonNullable.control(this.resolveInitialProfileId()),
     prompt: this.fb.nonNullable.control(''),
+    creatorStyle: this.fb.nonNullable.control<ContentCreatorStyle>('auto'),
+    creatorMessageType: this.fb.nonNullable.control<ContentCreatorMessageType>('auto'),
+    creatorHashtagStyle: this.fb.nonNullable.control<ContentCreatorHashtagStyle>('auto'),
     suggestionCount: this.fb.nonNullable.control(DEFAULT_CONTENT_CREATOR_COUNT),
     multimediaUrl: this.fb.nonNullable.control(''),
     contentUrlInput: this.fb.nonNullable.control('')
@@ -183,6 +225,8 @@ export class PublicContentAiCreatorDialogComponent {
     const state = this.multimediaPreviewState();
     return !!state.url && state.supported && !state.loading && !state.multimedia;
   });
+  readonly previewMessageType = computed(() => this.formValue().creatorMessageType ?? 'auto');
+  readonly previewHashtagStyle = computed(() => this.formValue().creatorHashtagStyle ?? 'auto');
 
   readonly selectedProfile = computed(() => {
     const selectedId = this.formValue().publicProfileId ?? '';
@@ -263,11 +307,18 @@ export class PublicContentAiCreatorDialogComponent {
       )
       .subscribe({
         next: (result) => {
-          const suggestions = result.contentSuggestions ?? [];
+          const suggestions = (result.contentSuggestions ?? []).map((entry) => this.toEditableSuggestion(entry));
           this.suggestions.set(suggestions);
           if (suggestions.length === 0) {
             this.showMessage('No AI draft suggestions were returned.');
+            return;
           }
+
+          suggestions.forEach((suggestion, index) => {
+            if (suggestion.tenorInput.trim() && !suggestion.multimedia) {
+              void this.loadSuggestionTenor(index, false);
+            }
+          });
         }
       });
   }
@@ -278,6 +329,26 @@ export class PublicContentAiCreatorDialogComponent {
 
   profileTrackBy(_index: number, profile: PublicProfile): string {
     return profile.id;
+  }
+
+  styleTrackBy(_index: number, option: typeof CONTENT_CREATOR_STYLE_OPTIONS[number]): string {
+    return option.value;
+  }
+
+  messageTypeTrackBy(_index: number, option: typeof CONTENT_CREATOR_MESSAGE_TYPE_OPTIONS[number]): string {
+    return option.value;
+  }
+
+  hashtagStyleTrackBy(_index: number, option: typeof CONTENT_CREATOR_HASHTAG_STYLE_OPTIONS[number]): string {
+    return option.value;
+  }
+
+  locationCandidateTrackBy(_index: number, place: NominatimPlace): number {
+    return place.place_id;
+  }
+
+  tenorResultTrackBy(_index: number, result: TenorResult): string {
+    return result.id;
   }
 
   isSuggestionSelected(index: number): boolean {
@@ -310,7 +381,7 @@ export class PublicContentAiCreatorDialogComponent {
     const selectedProfileId = this.form.controls.publicProfileId.value;
     const selectedSuggestions = this.selectedSuggestionIndices()
       .map((index) => this.suggestions()[index] ?? null)
-      .filter((entry): entry is AiContentCreatorSuggestion => entry !== null);
+      .filter((entry): entry is EditableContentCreatorSuggestion => entry !== null);
 
     if (selectedSuggestions.length === 0) {
       return;
@@ -348,16 +419,97 @@ export class PublicContentAiCreatorDialogComponent {
     });
   }
 
-  suggestionMediaLabel(suggestion: AiContentCreatorSuggestion): string {
+  suggestionMediaLabel(suggestion: EditableContentCreatorSuggestion): string {
     if (suggestion.multimedia?.type && suggestion.multimedia.type !== 'undefined') {
       return this.mediaTypeLabel(suggestion.multimedia.type);
     }
 
-    if (suggestion.tenorQuery.trim()) {
+    if (suggestion.selectedTenor?.type === 'tenor' || suggestion.tenorInput.trim() || suggestion.tenorQuery.trim()) {
       return this.i18n.t('Tenor GIF');
     }
 
     return '';
+  }
+
+  selectedProfileAvatar(): string {
+    return this.selectedProfile()?.avatarImage || '';
+  }
+
+  selectedProfileInitials(): string {
+    const label = this.selectedProfile()?.name?.trim() || this.i18n.t('Profile');
+    return label
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part.charAt(0).toUpperCase())
+      .join('') || 'P';
+  }
+
+  previewLocationLabel(suggestion: EditableContentCreatorSuggestion): string {
+    return suggestion.selectedPlace?.display_name
+      || suggestion.selectedPlace?.name
+      || suggestion.locationInput.trim()
+      || suggestion.locationQuery;
+  }
+
+  previewMultimedia(suggestion: EditableContentCreatorSuggestion): Multimedia | null {
+    if (suggestion.multimedia?.type && suggestion.multimedia.type !== 'undefined') {
+      return suggestion.multimedia;
+    }
+    if (suggestion.selectedTenor?.type === 'tenor' && suggestion.selectedTenor.url) {
+      return suggestion.selectedTenor;
+    }
+    return null;
+  }
+
+  hasImageMultimedia(multimedia: Multimedia | null | undefined): boolean {
+    if (!multimedia) {
+      return false;
+    }
+    if (multimedia.type === 'tenor' || multimedia.type === 'image') {
+      return !!multimedia.url;
+    }
+    return /\.(png|jpe?g|gif|webp|bmp|svg)(\?.*)?$/i.test(multimedia.url || '');
+  }
+
+  messageTypeLabel(value: ContentCreatorMessageType | string | null | undefined): string {
+    switch (value) {
+      case 'event':
+        return this.i18n.t('Event');
+      case 'info':
+        return this.i18n.t('Info');
+      case 'reminder':
+        return this.i18n.t('Reminder');
+      case 'call_to_action':
+        return this.i18n.t('Call to Action');
+      case 'auto':
+      case '':
+      case null:
+      case undefined:
+        return this.i18n.t('Automatic');
+      default:
+        return String(value);
+    }
+  }
+
+  hashtagStyleLabel(value: ContentCreatorHashtagStyle | string | null | undefined): string {
+    switch (value) {
+      case 'minimal':
+        return this.i18n.t('Minimal');
+      case 'local':
+        return this.i18n.t('Local');
+      case 'campaign':
+        return this.i18n.t('Campaign');
+      case 'discoverable':
+        return this.i18n.t('Discoverable');
+      case 'auto':
+      case '':
+      case null:
+      case undefined:
+        return this.i18n.t('Automatic');
+      default:
+        return String(value);
+    }
   }
 
   private buildRequest(): AiToolRequest {
@@ -365,6 +517,9 @@ export class PublicContentAiCreatorDialogComponent {
       tool: 'content_creator',
       text: '',
       prompt: this.form.controls.prompt.value.trim(),
+      creatorStyle: this.form.controls.creatorStyle.value,
+      creatorMessageType: this.form.controls.creatorMessageType.value,
+      creatorHashtagStyle: this.form.controls.creatorHashtagStyle.value,
       contentType: 'public',
       locationLabel: '',
       publicProfileName: this.selectedProfile()?.name ?? '',
@@ -380,6 +535,146 @@ export class PublicContentAiCreatorDialogComponent {
         description: ''
       }
     };
+  }
+
+  onSuggestionLocationInput(index: number, event: Event): void {
+    const nextValue = this.readEventInputValue(event);
+    this.updateSuggestion(index, (suggestion) => ({
+      ...suggestion,
+      locationInput: nextValue,
+      selectedPlace: null,
+      locationCandidates: []
+    }));
+  }
+
+  onSuggestionTenorInput(index: number, event: Event): void {
+    const nextValue = this.readEventInputValue(event);
+    this.updateSuggestion(index, (suggestion) => ({
+      ...suggestion,
+      tenorInput: nextValue,
+      tenorResults: [],
+      selectedTenor: null
+    }));
+  }
+
+  searchSuggestionLocationsOnEnter(index: number, event: Event): void {
+    event.preventDefault();
+    void this.searchSuggestionLocations(index);
+  }
+
+  searchSuggestionTenorOnEnter(index: number, event: Event): void {
+    event.preventDefault();
+    void this.loadSuggestionTenor(index);
+  }
+
+  async searchSuggestionLocations(index: number): Promise<void> {
+    const suggestion = this.suggestions()[index];
+    if (!suggestion) {
+      return;
+    }
+
+    const query = suggestion.locationInput.trim();
+    if (!query) {
+      this.showMessage('Please enter a location query first.');
+      return;
+    }
+
+    this.updateSuggestion(index, (current) => ({
+      ...current,
+      locationLoading: true,
+      selectedPlace: null,
+      locationCandidates: []
+    }));
+
+    try {
+      const candidates = await firstValueFrom(this.nominatimService.searchPlaces(query, 5));
+      this.updateSuggestion(index, (current) => ({
+        ...current,
+        locationLoading: false,
+        locationCandidates: candidates
+      }));
+
+      if (candidates.length === 0) {
+        this.showMessage('No matching places found.');
+      }
+    } catch {
+      this.updateSuggestion(index, (current) => ({
+        ...current,
+        locationLoading: false,
+        locationCandidates: []
+      }));
+    }
+  }
+
+  selectSuggestionLocationCandidate(index: number, place: NominatimPlace): void {
+    this.updateSuggestion(index, (suggestion) => ({
+      ...suggestion,
+      locationInput: place.display_name || place.name || suggestion.locationInput,
+      selectedPlace: place,
+      locationCandidates: []
+    }));
+  }
+
+  clearSuggestionLocationSelection(index: number): void {
+    this.updateSuggestion(index, (suggestion) => ({
+      ...suggestion,
+      selectedPlace: null,
+      locationCandidates: []
+    }));
+  }
+
+  async loadSuggestionTenor(index: number, showEmptyMessage = true): Promise<void> {
+    const suggestion = this.suggestions()[index];
+    if (!suggestion || suggestion.multimedia) {
+      return;
+    }
+
+    const term = suggestion.tenorInput.trim();
+    this.updateSuggestion(index, (current) => ({
+      ...current,
+      tenorLoading: true
+    }));
+
+    try {
+      const response = term
+        ? await firstValueFrom(this.publicContentService.searchTenor(term))
+        : await firstValueFrom(this.publicContentService.getFeaturedTenor());
+      const results = response.data?.results ?? [];
+
+      this.updateSuggestion(index, (current) => ({
+        ...current,
+        tenorLoading: false,
+        tenorResults: results
+      }));
+
+      if (showEmptyMessage && results.length === 0) {
+        this.showMessage('No Tenor results were found.');
+      }
+    } catch {
+      this.updateSuggestion(index, (current) => ({
+        ...current,
+        tenorLoading: false,
+        tenorResults: []
+      }));
+    }
+  }
+
+  selectSuggestionTenorResult(index: number, result: TenorResult): void {
+    this.updateSuggestion(index, (suggestion) => ({
+      ...suggestion,
+      selectedTenor: this.toTenorMultimedia(result)
+    }));
+  }
+
+  clearSuggestionTenorSelection(index: number): void {
+    this.updateSuggestion(index, (suggestion) => ({
+      ...suggestion,
+      selectedTenor: null
+    }));
+  }
+
+  isTenorResultSelected(suggestion: EditableContentCreatorSuggestion, result: TenorResult): boolean {
+    return suggestion.selectedTenor?.url === result.media_formats.gif.url;
   }
 
   private resolveInitialProfileId(): string {
@@ -466,13 +761,29 @@ export class PublicContentAiCreatorDialogComponent {
     }
   }
 
+  private toEditableSuggestion(suggestion: AiContentCreatorSuggestion): EditableContentCreatorSuggestion {
+    return {
+      ...suggestion,
+      locationInput: suggestion.locationQuery,
+      selectedPlace: null,
+      locationCandidates: [],
+      locationLoading: false,
+      tenorInput: suggestion.tenorQuery,
+      tenorResults: [],
+      tenorLoading: false,
+      selectedTenor: null
+    };
+  }
+
   private async buildDraftPayload(
-    suggestion: AiContentCreatorSuggestion,
+    suggestion: EditableContentCreatorSuggestion,
     publicProfileId: string,
     locationCache: Map<string, PublicContentSavePayload['location']>,
     tenorCache: Map<string, Multimedia>
   ): Promise<PublicContentSavePayload> {
-    const location = await this.resolveLocation(suggestion.locationQuery, locationCache);
+    const location = suggestion.selectedPlace
+      ? this.toDraftLocation(suggestion.selectedPlace)
+      : await this.resolveLocation(suggestion.locationInput, locationCache);
     const multimedia = await this.resolveSuggestedMultimedia(suggestion, tenorCache);
 
     return {
@@ -520,14 +831,18 @@ export class PublicContentAiCreatorDialogComponent {
   }
 
   private async resolveSuggestedMultimedia(
-    suggestion: AiContentCreatorSuggestion,
+    suggestion: EditableContentCreatorSuggestion,
     cache: Map<string, Multimedia>
   ): Promise<Multimedia> {
     if (suggestion.multimedia?.type && suggestion.multimedia.type !== 'undefined') {
       return suggestion.multimedia;
     }
 
-    const normalizedTenorQuery = suggestion.tenorQuery.trim();
+    if (suggestion.selectedTenor?.type === 'tenor' && suggestion.selectedTenor.url) {
+      return suggestion.selectedTenor;
+    }
+
+    const normalizedTenorQuery = suggestion.tenorInput.trim() || suggestion.tenorQuery.trim();
     if (!normalizedTenorQuery) {
       return { ...EMPTY_MULTIMEDIA };
     }
@@ -563,6 +878,20 @@ export class PublicContentAiCreatorDialogComponent {
       contentId: '',
       oembed: null
     };
+  }
+
+  private updateSuggestion(
+    index: number,
+    updater: (suggestion: EditableContentCreatorSuggestion) => EditableContentCreatorSuggestion
+  ): void {
+    this.suggestions.update((current) => current.map((suggestion, currentIndex) => (
+      currentIndex === index ? updater(suggestion) : suggestion
+    )));
+  }
+
+  private readEventInputValue(event: Event): string {
+    const target = event.target;
+    return target instanceof HTMLInputElement ? target.value : '';
   }
 
   private showMessage(message: string, params?: Record<string, unknown>): void {

@@ -27,6 +27,9 @@ const DAY_IN_SECONDS = 24 * 60 * 60;
 const DAY_IN_MS = DAY_IN_SECONDS * 1000;
 const TOOL_TYPES = new Set(['proofread', 'rewrite', 'translate', 'hashtags', 'emoji', 'thread', 'quality_check', 'content_creator']);
 const REWRITE_GOALS = new Set(['clearer', 'friendlier', 'shorter', 'more_formal', 'more_engaging']);
+const CONTENT_CREATOR_STYLES = new Set(['auto', 'factual', 'emotional', 'bold', 'short']);
+const CONTENT_CREATOR_MESSAGE_TYPES = new Set(['auto', 'event', 'info', 'reminder', 'call_to_action']);
+const CONTENT_CREATOR_HASHTAG_STYLES = new Set(['auto', 'minimal', 'local', 'campaign', 'discoverable']);
 
 let modelCache = {
   expiresAt: 0,
@@ -1033,6 +1036,9 @@ function normalizeToolPayload(value) {
   const targetLanguage = normalizeShortText(value.targetLanguage, 60) || 'English';
   const responseLanguage = normalizeShortText(value.responseLanguage, 60);
   const rewriteGoal = normalizeRewriteGoal(value.rewriteGoal);
+  const creatorStyle = normalizeContentCreatorStyle(value.creatorStyle);
+  const creatorMessageType = normalizeContentCreatorMessageType(value.creatorMessageType);
+  const creatorHashtagStyle = normalizeContentCreatorHashtagStyle(value.creatorHashtagStyle);
   const hashtagCount = normalizeHashtagCount(value.hashtagCount);
   const suggestionCount = normalizeSuggestionCount(value.suggestionCount);
   const multimedia = normalizeMultimediaSummary(value.multimedia);
@@ -1063,6 +1069,9 @@ function normalizeToolPayload(value) {
     targetLanguage,
     responseLanguage,
     rewriteGoal,
+    creatorStyle,
+    creatorMessageType,
+    creatorHashtagStyle,
     hashtagCount,
     suggestionCount,
     multimedia
@@ -1090,6 +1099,21 @@ function normalizeShortText(value, maxLength) {
 function normalizeRewriteGoal(value) {
   const normalized = normalizeShortText(value, 40) || 'clearer';
   return REWRITE_GOALS.has(normalized) ? normalized : 'clearer';
+}
+
+function normalizeContentCreatorStyle(value) {
+  const normalized = normalizeShortText(value, 40) || 'auto';
+  return CONTENT_CREATOR_STYLES.has(normalized) ? normalized : 'auto';
+}
+
+function normalizeContentCreatorMessageType(value) {
+  const normalized = normalizeShortText(value, 40) || 'auto';
+  return CONTENT_CREATOR_MESSAGE_TYPES.has(normalized) ? normalized : 'auto';
+}
+
+function normalizeContentCreatorHashtagStyle(value) {
+  const normalized = normalizeShortText(value, 40) || 'auto';
+  return CONTENT_CREATOR_HASHTAG_STYLES.has(normalized) ? normalized : 'auto';
 }
 
 function normalizeHashtagCount(value) {
@@ -1388,6 +1412,9 @@ function buildContentCreatorInput(payload, context) {
   const lines = [
     `Task: ${payload.prompt}`,
     payload.responseLanguage ? `Preferred response language: ${payload.responseLanguage}` : '',
+    payload.creatorStyle ? `Preferred style: ${payload.creatorStyle}` : '',
+    payload.creatorMessageType ? `Preferred message type: ${payload.creatorMessageType}` : '',
+    payload.creatorHashtagStyle ? `Preferred hashtag style: ${payload.creatorHashtagStyle}` : '',
     payload.publicProfileName ? `Preferred public profile: ${payload.publicProfileName}` : '',
     '',
     context.multimedia
@@ -1693,12 +1720,18 @@ async function runContentCreator(client, model, payload, db) {
   const responseLanguageInstruction = payload.responseLanguage
     ? `Write all message suggestions and location queries in ${payload.responseLanguage}.`
     : 'Write all message suggestions and location queries in the same language as the user task.';
+  const styleInstruction = buildContentCreatorStyleInstruction(payload.creatorStyle);
+  const messageTypeInstruction = buildContentCreatorMessageTypeInstruction(payload.creatorMessageType);
+  const hashtagStyleInstruction = buildContentCreatorHashtagStyleInstruction(payload.creatorHashtagStyle);
 
   const response = await client.responses.create({
     model,
     instructions: [
       'You are an editorial social content creator for short public messages.',
       responseLanguageInstruction,
+      styleInstruction,
+      messageTypeInstruction,
+      hashtagStyleInstruction,
       'Use the user task and provided link summaries as your only factual basis.',
       'Do not invent unsupported facts, names, claims or event details.',
       `Create exactly ${payload.suggestionCount} distinct public message suggestions.`,
@@ -1738,6 +1771,54 @@ async function runContentCreator(client, model, payload, db) {
     model,
     contentSuggestions
   };
+}
+
+function buildContentCreatorStyleInstruction(style) {
+  switch (style) {
+    case 'factual':
+      return 'Use a factual, clear and trustworthy tone. Avoid hype, exaggeration and emotional overstatement.';
+    case 'emotional':
+      return 'Use a warm, emotional and inviting tone while staying specific, credible and publication-ready.';
+    case 'bold':
+      return 'Use an attention-grabbing, energetic tone that feels bold but still credible and professional.';
+    case 'short':
+      return 'Keep every suggestion especially short, punchy and easy to scan.';
+    case 'auto':
+    default:
+      return 'Choose the most fitting tone based on the user task and source material.';
+  }
+}
+
+function buildContentCreatorMessageTypeInstruction(messageType) {
+  switch (messageType) {
+    case 'event':
+      return 'Frame each suggestion as an event-oriented public post: concrete, inviting and event-aware.';
+    case 'info':
+      return 'Frame each suggestion as an informational update: clear, useful and straightforward.';
+    case 'reminder':
+      return 'Frame each suggestion as a reminder: timely, clear and gently action-oriented.';
+    case 'call_to_action':
+      return 'Frame each suggestion as a call to action with a clear next step or invitation.';
+    case 'auto':
+    default:
+      return 'Choose the most fitting message type based on the task and sources.';
+  }
+}
+
+function buildContentCreatorHashtagStyleInstruction(hashtagStyle) {
+  switch (hashtagStyle) {
+    case 'minimal':
+      return 'Keep hashtags restrained and specific. Prefer fewer, sharper tags within the allowed range.';
+    case 'local':
+      return 'Favor local, regional and community-relevant hashtags when the sources support them.';
+    case 'campaign':
+      return 'Favor campaign, initiative, theme and participation hashtags that fit the task.';
+    case 'discoverable':
+      return 'Favor discoverability: combine specific tags with broader relevant topical hashtags, but avoid spammy tags.';
+    case 'auto':
+    default:
+      return 'Choose the most fitting hashtag style based on the task and sources.';
+  }
 }
 
 function buildEditorialInput(payload, options = {}) {

@@ -15,6 +15,9 @@ export interface AiToolRequest {
   targetLanguage?: string;
   responseLanguage?: string;
   rewriteGoal?: string;
+  creatorStyle?: string;
+  creatorMessageType?: string;
+  creatorHashtagStyle?: string;
   hashtagCount?: number;
   suggestionCount?: number;
   multimedia: {
