@@ -19,8 +19,38 @@
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>{{ i18n.t('Public profile') }}</mat-label>
           <mat-select [formControl]="form.controls.publicProfileId">
+            <mat-select-trigger>
+              @if (selectedProfile()) {
+                <div class="profile-select-trigger">
+                  <div class="profile-option-avatar">
+                    @if (selectedProfileAvatar()) {
+                      <img [src]="selectedProfileAvatar()" [alt]="selectedProfile()?.name || i18n.t('Profile')" />
+                    } @else {
+                      <span>{{ selectedProfileInitials() }}</span>
+                    }
+                  </div>
+                  <span class="profile-select-trigger-name">{{ selectedProfile()?.name }}</span>
+                </div>
+              } @else {
+                <span class="style-select-placeholder">{{ i18n.t('Choose a public profile') }}</span>
+              }
+            </mat-select-trigger>
+
             @for (profile of data.publicProfiles; track profileTrackBy($index, profile)) {
-              <mat-option [value]="profile.id">{{ profile.name }}</mat-option>
+              <mat-option [value]="profile.id">
+                <div class="profile-option-row">
+                  <div class="profile-option-avatar">
+                    @if (profile.avatarImage) {
+                      <img [src]="profile.avatarImage" [alt]="profile.name" />
+                    } @else {
+                      <span>{{ profile.name.charAt(0).toUpperCase() }}</span>
+                    }
+                  </div>
+                  <div class="profile-option-copy">
+                    <span class="profile-option-name">{{ profile.name }}</span>
+                  </div>
+                </div>
+              </mat-option>
             }
           </mat-select>
         </mat-form-field>
@@ -217,229 +247,132 @@
 
     <div class="suggestion-list">
       @for (suggestion of suggestions(); track suggestionTrackBy($index); let suggestionIndex = $index) {
-        <mat-card class="suggestion-card">
-          <mat-card-content>
-            <div class="suggestion-head">
-              <mat-checkbox
-                [checked]="isSuggestionSelected(suggestionIndex)"
-                (change)="toggleSuggestionSelection(suggestionIndex, $event)">
-                {{ i18n.t('Use suggestion') }}
-              </mat-checkbox>
+        <div class="suggestion-card" [class.suggestion-card-selected]="isSuggestionSelected(suggestionIndex)">
+          <div class="suggestion-head">
+            <mat-checkbox
+              [checked]="isSuggestionSelected(suggestionIndex)"
+              (change)="toggleSuggestionSelection(suggestionIndex, $event)">
+              {{ i18n.t('Use suggestion') }}
+            </mat-checkbox>
 
-              @if (suggestionMediaLabel(suggestion); as mediaLabel) {
-                <span class="dialog-meta-chip">
-                  <mat-icon>{{ suggestion.multimedia ? 'perm_media' : 'gif' }}</mat-icon>
-                  {{ mediaLabel }}
-                </span>
-              }
-            </div>
-
-            <pre>{{ suggestion.message }}</pre>
-
-            @if (suggestion.hashtags.length > 0) {
-              <div class="hashtag-list">
-                @for (tag of suggestion.hashtags; track tag) {
-                  <mat-chip>#{{ tag }}</mat-chip>
-                }
-              </div>
+            @if (suggestionMediaLabel(suggestion); as mediaLabel) {
+              <span class="dialog-meta-chip">
+                <mat-icon>{{ suggestion.multimedia ? 'perm_media' : 'gif' }}</mat-icon>
+                {{ mediaLabel }}
+              </span>
             }
+          </div>
 
-            <div class="draft-preview">
-              <div class="draft-preview-head">
-                <div class="draft-preview-profile">
-                  <span class="draft-preview-avatar" aria-hidden="true">
-                    @if (selectedProfileAvatar()) {
-                      <img [src]="selectedProfileAvatar()" [alt]="selectedProfile()?.name || i18n.t('Profile')" />
-                    } @else {
-                      <span>{{ selectedProfileInitials() }}</span>
-                    }
-                  </span>
-
-                  <div class="draft-preview-profile-copy">
-                    <strong>{{ selectedProfile()?.name || i18n.t('Public profile') }}</strong>
-                    <span>{{ i18n.t('Draft preview') }}</span>
-                  </div>
+          <div class="preview-canvas">
+            <mat-card class="preview-item has-badge">
+              <div class="preview-avatar-box">
+                <div class="preview-avatar-icon" aria-hidden="true">
+                  @if (selectedProfileAvatar()) {
+                    <img [src]="selectedProfileAvatar()" [alt]="selectedProfile()?.name || i18n.t('Profile')" />
+                  } @else {
+                    <span>{{ selectedProfileInitials() }}</span>
+                  }
                 </div>
-
-                <span class="draft-preview-status">{{ i18n.t('Draft') }}</span>
+                <div class="preview-avatar-text">
+                  <span class="preview-name">{{ selectedProfile()?.name || i18n.t('Public profile') }}</span>
+                  <span class="preview-timestamp">{{ previewCreatedAt | date:'medium' }}</span>
+                </div>
               </div>
 
-              <div class="draft-preview-body">
-                @if (previewMultimedia(suggestion); as previewMultimedia) {
-                  @if (hasImageMultimedia(previewMultimedia)) {
-                    <div class="draft-preview-media">
-                      <img [src]="previewMultimedia.url" [alt]="previewMultimedia.title || i18n.t('Selected multimedia preview')" />
-                    </div>
-                  } @else if (previewMultimedia.title || previewMultimedia.description) {
-                    <div class="draft-preview-media-summary">
-                      <span class="draft-preview-media-type">{{ mediaTypeLabel(previewMultimedia.type) }}</span>
-                      @if (previewMultimedia.title) {
-                        <strong>{{ previewMultimedia.title }}</strong>
-                      }
-                      @if (previewMultimedia.description) {
-                        <span>{{ previewMultimedia.description }}</span>
-                      }
-                    </div>
-                  }
-                }
-
-                <div class="draft-preview-message-shell">
-                  <p class="draft-preview-message">{{ suggestion.message }}</p>
-                </div>
-
-                @if (suggestion.hashtags.length > 0) {
-                  <div class="draft-preview-hashtags">
-                    @for (tag of suggestion.hashtags; track tag) {
-                      <span class="draft-preview-hashtag">#{{ tag }}</span>
-                    }
-                  </div>
-                }
-
-                <div class="draft-preview-meta">
-                  <span class="draft-preview-meta-chip">
-                    <mat-icon>category</mat-icon>
-                    {{ messageTypeLabel(previewMessageType()) }}
-                  </span>
-
-                  <span class="draft-preview-meta-chip">
-                    <mat-icon>location_on</mat-icon>
-                    {{ previewLocationLabel(suggestion) }}
-                  </span>
-
-                  <span class="draft-preview-meta-chip draft-preview-meta-chip-muted">
-                    <mat-icon>tag</mat-icon>
-                    {{ hashtagStyleLabel(previewHashtagStyle()) }}
-                  </span>
-
+              <mat-card-content>
+                <div class="preview-message-content">
                   @if (previewMultimedia(suggestion); as previewMultimedia) {
-                    <span class="draft-preview-meta-chip draft-preview-meta-chip-muted">
-                      <mat-icon>perm_media</mat-icon>
-                      {{ mediaTypeLabel(previewMultimedia.type) }}
-                    </span>
+                    <div class="preview-media">
+                      @if (hasImageMultimedia(previewMultimedia)) {
+                        <img [src]="previewMultimedia.url" [alt]="previewMultimedia.title || i18n.t('Selected multimedia preview')" />
+                      } @else if (suggestionTikTokEmbedUrl(suggestion); as tiktokUrl) {
+                        <div class="preview-oembed preview-oembed-tiktok">
+                          <iframe [src]="tiktokUrl" [title]="i18n.t('TikTok preview')" loading="lazy" allowfullscreen></iframe>
+                        </div>
+                      } @else if (safeSuggestionOembedHtml(suggestion); as safeOembedHtml) {
+                        <div
+                          class="preview-oembed"
+                          [class.preview-oembed-youtube]="previewMultimedia.type === 'youtube'"
+                          [class.preview-oembed-spotify]="previewMultimedia.type === 'spotify'"
+                          [class.preview-oembed-tiktok]="previewMultimedia.type === 'tiktok'"
+                          [class.preview-oembed-pinterest]="previewMultimedia.type === 'pinterest'"
+                          [innerHTML]="safeOembedHtml"></div>
+                      } @else {
+                        <div class="preview-media-summary">
+                          <span class="preview-media-type">{{ mediaTypeLabel(previewMultimedia.type) }}</span>
+                          @if (previewMultimedia.title) {
+                            <strong>{{ previewMultimedia.title }}</strong>
+                          }
+                          @if (previewMultimedia.description) {
+                            <span>{{ previewMultimedia.description }}</span>
+                          }
+                        </div>
+                      }
+                    </div>
                   }
+
+                  @if (suggestion.message) {
+                    <div class="preview-message-shell" [style]="previewDisplayStyle()">
+                      <p class="preview-message-text">{{ suggestion.message }}</p>
+                    </div>
+                  }
+
+                  @if (suggestion.hashtags.length > 0) {
+                    <div class="preview-hashtag-chip-list" [attr.aria-label]="i18n.t('Selected hashtags preview')">
+                      @for (tag of suggestion.hashtags; track tag) {
+                        <span class="preview-hashtag-chip">#{{ tag }}</span>
+                      }
+                    </div>
+                  }
+
+                  <div class="preview-meta">
+                    <span class="preview-meta-chip" [class.is-missing]="!previewLocationLabel(suggestion)">
+                      <mat-icon aria-hidden="true">location_on</mat-icon>
+                      {{ previewLocationLabel(suggestion) || i18n.t('No location selected') }}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </div>
+              </mat-card-content>
 
-            <div class="suggestion-editor-grid">
-              <div class="suggestion-editor-section">
-                <div class="suggestion-section-head">
-                  <span class="dialog-meta-chip">
-                    <mat-icon>location_on</mat-icon>
-                    {{ i18n.t('Location') }}
-                  </span>
-                </div>
+              <mat-card-actions class="preview-buttonbar">
+                <button mat-mini-fab type="button" tabindex="-1">
+                  <mat-icon>delete_forever</mat-icon>
+                </button>
 
-                <div class="suggestion-inline-form">
-                  <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>{{ i18n.t('Location query') }}</mat-label>
-                    <input
-                      matInput
-                      [value]="suggestion.locationInput"
-                      [placeholder]="i18n.t('Searchable place, district or venue')"
-                      (input)="onSuggestionLocationInput(suggestionIndex, $event)"
-                      (keydown.enter)="searchSuggestionLocationsOnEnter(suggestionIndex, $event)" />
-                  </mat-form-field>
-
-                  <button mat-stroked-button type="button" (click)="searchSuggestionLocations(suggestionIndex)" [disabled]="suggestion.locationLoading">
-                    <mat-icon>search</mat-icon>
-                    {{ i18n.t('Check location') }}
+                <div class="preview-button-group">
+                  <button mat-mini-fab type="button" tabindex="-1">
+                    <mat-icon>forum</mat-icon>
+                  </button>
+                  <button mat-mini-fab type="button" tabindex="-1">
+                    <mat-icon>thumb_up</mat-icon>
+                  </button>
+                  <button mat-mini-fab type="button" tabindex="-1">
+                    <mat-icon>thumb_down</mat-icon>
+                  </button>
+                  <button mat-mini-fab type="button" tabindex="-1">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-mini-fab type="button" tabindex="-1">
+                    <mat-icon>more_horiz</mat-icon>
                   </button>
                 </div>
+              </mat-card-actions>
+            </mat-card>
+          </div>
 
-                @if (suggestion.selectedPlace) {
-                  <div class="inline-info">
-                    <mat-icon>check_circle</mat-icon>
-                    <span>{{ i18n.t('Selected location') }}: {{ suggestion.selectedPlace.display_name || suggestion.selectedPlace.name }}</span>
-                    <button mat-button type="button" (click)="clearSuggestionLocationSelection(suggestionIndex)">{{ i18n.t('Reset') }}</button>
-                  </div>
-                }
-
-                @if (suggestion.locationCandidates.length > 0) {
-                  <div class="location-candidate-list">
-                    @for (candidate of suggestion.locationCandidates; track locationCandidateTrackBy($index, candidate)) {
-                      <button mat-stroked-button type="button" class="location-candidate" (click)="selectSuggestionLocationCandidate(suggestionIndex, candidate)">
-                        {{ candidate.display_name || candidate.name }}
-                      </button>
-                    }
-                  </div>
-                }
-              </div>
-
-              @if (!suggestion.multimedia) {
-                <div class="suggestion-editor-section">
-                  <div class="suggestion-section-head">
-                    <span class="dialog-meta-chip">
-                      <mat-icon>gif</mat-icon>
-                      {{ i18n.t('Tenor GIF') }}
-                    </span>
-                  </div>
-
-                  @if (suggestion.tenorQuery.trim()) {
-                    <div class="tenor-hint">
-                      <mat-icon>lightbulb</mat-icon>
-                      <span>{{ i18n.t('Suggested Tenor search') }}: {{ suggestion.tenorQuery }}</span>
-                    </div>
-                  }
-
-                  <div class="suggestion-inline-form">
-                    <mat-form-field appearance="outline" class="full-width">
-                      <mat-label>{{ i18n.t('Tenor search') }}</mat-label>
-                      <input
-                        matInput
-                        [value]="suggestion.tenorInput"
-                        [placeholder]="i18n.t('Search GIFs')"
-                        (input)="onSuggestionTenorInput(suggestionIndex, $event)"
-                        (keydown.enter)="searchSuggestionTenorOnEnter(suggestionIndex, $event)" />
-                    </mat-form-field>
-
-                    <button mat-stroked-button type="button" (click)="loadSuggestionTenor(suggestionIndex)" [disabled]="suggestion.tenorLoading">
-                      <mat-icon>search</mat-icon>
-                      {{ i18n.t('Search') }}
-                    </button>
-                  </div>
-
-                  @if (suggestion.selectedTenor) {
-                    <div class="selected-tenor">
-                      <div class="selected-tenor-head">
-                        <span>{{ i18n.t('Selected GIF') }}</span>
-                        <button mat-button type="button" (click)="clearSuggestionTenorSelection(suggestionIndex)">{{ i18n.t('Reset') }}</button>
-                      </div>
-                      <img [src]="suggestion.selectedTenor.url" [alt]="suggestion.selectedTenor.title || i18n.t('Selected GIF')" />
-                    </div>
-                  }
-
-                  @if (suggestion.tenorResults.length > 0) {
-                    <div class="tenor-grid">
-                      @for (result of suggestion.tenorResults; track tenorResultTrackBy($index, result)) {
-                        <button
-                          type="button"
-                          class="tenor-result"
-                          [class.tenor-result-selected]="isTenorResultSelected(suggestion, result)"
-                          (click)="selectSuggestionTenorResult(suggestionIndex, result)">
-                          <img [src]="result.media_formats.gif.url" [alt]="result.title || i18n.t('Tenor GIF')" />
-                        </button>
-                      }
-                    </div>
-                  }
-                </div>
-              }
+          @if (suggestion.tenorLoading) {
+            <div class="inline-info">
+              <mat-icon>hourglass_top</mat-icon>
+              <span>{{ i18n.t('Loading suggestions...') }}</span>
             </div>
-
-            @if (suggestion.locationLoading || suggestion.tenorLoading) {
-              <div class="inline-info">
-                <mat-icon>hourglass_top</mat-icon>
-                <span>{{ i18n.t('Loading suggestions...') }}</span>
-              </div>
-            }
-          </mat-card-content>
-        </mat-card>
+          }
+        </div>
       }
     </div>
   }
 </mat-dialog-content>
 
-<app-dialog-action-bar [sticky]="false">
+<app-dialog-action-bar>
   <button
     mat-icon-button
     type="button"

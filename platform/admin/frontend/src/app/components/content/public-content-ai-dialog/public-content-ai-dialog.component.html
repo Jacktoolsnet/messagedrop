@@ -32,47 +32,49 @@
     </mat-card-content>
   </mat-card>
 
-  <mat-card class="options-card">
-    <mat-card-content class="options-grid">
-      @if (tool === 'translate') {
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>{{ i18n.t('Target language') }}</mat-label>
-          <mat-select [formControl]="form.controls.targetLanguage">
-            @for (option of deeplTargetLanguageOptions; track deeplLanguageTrackBy($index, option)) {
-              <mat-option [value]="option.value">
-                {{ i18n.t(option.label) }} ({{ option.value }})
-              </mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-      }
+  @if (tool === 'translate' || tool === 'rewrite' || tool === 'hashtags') {
+    <mat-card class="options-card">
+      <mat-card-content class="options-grid">
+        @if (tool === 'translate') {
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ i18n.t('Target language') }}</mat-label>
+            <mat-select [formControl]="form.controls.targetLanguage">
+              @for (option of deeplTargetLanguageOptions; track deeplLanguageTrackBy($index, option)) {
+                <mat-option [value]="option.value">
+                  {{ i18n.t(option.label) }} ({{ option.value }})
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        }
 
-      @if (tool === 'rewrite') {
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>{{ i18n.t('Rewrite goal') }}</mat-label>
-          <mat-select [formControl]="form.controls.rewriteGoal">
-            <mat-option value="clearer">{{ i18n.t('Clearer') }}</mat-option>
-            <mat-option value="friendlier">{{ i18n.t('Friendlier') }}</mat-option>
-            <mat-option value="shorter">{{ i18n.t('Shorter') }}</mat-option>
-            <mat-option value="more_formal">{{ i18n.t('More formal') }}</mat-option>
-            <mat-option value="more_engaging">{{ i18n.t('More engaging') }}</mat-option>
-          </mat-select>
-        </mat-form-field>
-      }
+        @if (tool === 'rewrite') {
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ i18n.t('Rewrite goal') }}</mat-label>
+            <mat-select [formControl]="form.controls.rewriteGoal">
+              <mat-option value="clearer">{{ i18n.t('Clearer') }}</mat-option>
+              <mat-option value="friendlier">{{ i18n.t('Friendlier') }}</mat-option>
+              <mat-option value="shorter">{{ i18n.t('Shorter') }}</mat-option>
+              <mat-option value="more_formal">{{ i18n.t('More formal') }}</mat-option>
+              <mat-option value="more_engaging">{{ i18n.t('More engaging') }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        }
 
-      @if (tool === 'hashtags') {
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>{{ i18n.t('Hashtag count') }}</mat-label>
-          <mat-select [formControl]="form.controls.hashtagCount">
-            <mat-option [value]="4">4</mat-option>
-            <mat-option [value]="6">6</mat-option>
-            <mat-option [value]="8">8</mat-option>
-          </mat-select>
-        </mat-form-field>
-      }
+        @if (tool === 'hashtags') {
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ i18n.t('Hashtag count') }}</mat-label>
+            <mat-select [formControl]="form.controls.hashtagCount">
+              <mat-option [value]="4">4</mat-option>
+              <mat-option [value]="6">6</mat-option>
+              <mat-option [value]="8">8</mat-option>
+            </mat-select>
+          </mat-form-field>
+        }
 
-    </mat-card-content>
-  </mat-card>
+      </mat-card-content>
+    </mat-card>
+  }
 
   @if (loading()) {
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>

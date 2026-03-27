@@ -6,7 +6,6 @@ import { MAT_DIALOG_DATA, MatDialogContent, MatDialogRef } from '@angular/materi
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
-import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -14,6 +13,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
 import { debounceTime, distinctUntilChanged, finalize, firstValueFrom, map, of, startWith, switchMap } from 'rxjs';
 import { AiToolRequest } from '../../../interfaces/ai-tool-request.interface';
 import { AiContentCreatorSuggestion } from '../../../interfaces/ai-tool-result.interface';
@@ -24,6 +24,7 @@ import { PublicProfile } from '../../../interfaces/public-profile.interface';
 import { TenorResult } from '../../../interfaces/tenor-response.interface';
 import { AiService } from '../../../services/content/ai.service';
 import { PublicContentService } from '../../../services/content/public-content.service';
+import { ContentStyleService } from '../../../services/content/content-style.service';
 import { NominatimService } from '../../../services/location/nominatim.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { DialogActionBarComponent } from '../../shared/dialog-action-bar/dialog-action-bar.component';
@@ -107,7 +108,6 @@ export interface PublicContentAiCreatorDialogResult {
     MatButtonModule,
     MatCardModule,
     MatCheckboxModule,
-    MatChipsModule,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
@@ -129,6 +129,8 @@ export class PublicContentAiCreatorDialogComponent {
   private readonly snackBar = inject(MatSnackBar);
   private readonly aiService = inject(AiService);
   private readonly publicContentService = inject(PublicContentService);
+  private readonly sanitizer = inject(DomSanitizer);
+  private readonly styleService = inject(ContentStyleService);
   private readonly nominatimService = inject(NominatimService);
   readonly i18n = inject(TranslationHelperService);
 
@@ -141,6 +143,7 @@ export class PublicContentAiCreatorDialogComponent {
   readonly creatorStyleOptions = CONTENT_CREATOR_STYLE_OPTIONS;
   readonly creatorMessageTypeOptions = CONTENT_CREATOR_MESSAGE_TYPE_OPTIONS;
   readonly creatorHashtagStyleOptions = CONTENT_CREATOR_HASHTAG_STYLE_OPTIONS;
+  readonly previewCreatedAt = Date.now();
 
   readonly form = this.fb.nonNullable.group({
     publicProfileId: this.fb.nonNullable.control(this.resolveInitialProfileId()),
@@ -237,6 +240,8 @@ export class PublicContentAiCreatorDialogComponent {
     const selectedId = this.formValue().publicProfileId ?? '';
     return this.data.publicProfiles.find((profile) => profile.id === selectedId) ?? null;
   });
+  readonly selectedProfileDefaultStyle = computed(() => this.styleService.normalizeStyle(this.selectedProfile()?.defaultStyle));
+  readonly previewDisplayStyle = computed(() => this.selectedProfileDefaultStyle());
 
   readonly canRun = computed(() => {
     if (this.loading() || this.importing()) {
@@ -467,6 +472,25 @@ export class PublicContentAiCreatorDialogComponent {
     return null;
   }
 
+  safeSuggestionOembedHtml(suggestion: EditableContentCreatorSuggestion): SafeHtml | null {
+    const html = this.previewMultimedia(suggestion)?.oembed?.html;
+    return html ? this.sanitizer.bypassSecurityTrustHtml(html) : null;
+  }
+
+  suggestionTikTokEmbedUrl(suggestion: EditableContentCreatorSuggestion): SafeResourceUrl | null {
+    const multimedia = this.previewMultimedia(suggestion);
+    if (!multimedia || (multimedia.type || '').toLowerCase() !== 'tiktok') {
+      return null;
+    }
+
+    const id = this.getTikTokId(multimedia);
+    if (!id) {
+      return null;
+    }
+
+    return this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.tiktok.com/embed/v2/${id}`);
+  }
+
   hasImageMultimedia(multimedia: Multimedia | null | undefined): boolean {
     if (!multimedia) {
       return false;
@@ -649,7 +673,8 @@ export class PublicContentAiCreatorDialogComponent {
       this.updateSuggestion(index, (current) => ({
         ...current,
         tenorLoading: false,
-        tenorResults: results
+        tenorResults: results,
+        selectedTenor: current.selectedTenor ?? (results[0] ? this.toTenorMultimedia(results[0]) : null)
       }));
 
       if (showEmptyMessage && results.length === 0) {
@@ -883,6 +908,40 @@ export class PublicContentAiCreatorDialogComponent {
       contentId: '',
       oembed: null
     };
+  }
+
+  private getTikTokId(multimedia: Multimedia): string | null {
+    const sourceUrl = String(multimedia.sourceUrl || multimedia.url || '').trim();
+    if (sourceUrl) {
+      try {
+        const parsed = new URL(sourceUrl);
+        const normalizedHost = parsed.hostname.toLowerCase();
+        const isTikTokHost = normalizedHost === 'tiktok.com'
+          || normalizedHost === 'www.tiktok.com'
+          || normalizedHost.endsWith('.tiktok.com')
+          || normalizedHost === 'vm.tiktok.com';
+
+        if (isTikTokHost) {
+          const match = parsed.pathname.match(/\/@[^/]+\/video\/(\d+)/);
+          const safeMatch = this.sanitizeTikTokId(match?.[1] || null);
+          if (safeMatch) {
+            return safeMatch;
+          }
+        }
+      } catch {
+        // ignore
+      }
+    }
+
+    return this.sanitizeTikTokId(multimedia.contentId || null);
+  }
+
+  private sanitizeTikTokId(value: string | null | undefined): string | null {
+    const normalized = String(value || '').trim();
+    if (!normalized || !/^\d+$/.test(normalized)) {
+      return null;
+    }
+    return normalized;
   }
 
   private updateSuggestion(
