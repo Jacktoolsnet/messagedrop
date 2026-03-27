@@ -1,0 +1,51 @@
+:host {
+  color: var(--mat-app-text-color);
+}
+
+.dialog-container {
+  text-align: center;
+  padding: 2rem;
+  max-width: 420px;
+}
+
+.dialog-container h2 {
+  margin-top: 1rem;
+  font-size: 1.5rem;
+}
+
+.dialog-container p {
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.display-message-image {
+  max-width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding-bottom: 1rem;
+}
+
+.display-message-icon {
+  font-size: 4rem;
+  width: 4rem;
+  height: 4rem;
+}
+
+.multiline-text {
+  white-space: pre-line;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}

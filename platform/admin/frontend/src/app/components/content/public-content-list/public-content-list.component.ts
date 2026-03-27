@@ -21,12 +21,14 @@ import { PublicContentStatus } from '../../../interfaces/public-content-status.t
 import { PublicContentType } from '../../../interfaces/public-content-type.type';
 import { PublicContent } from '../../../interfaces/public-content.interface';
 import { PublicProfile } from '../../../interfaces/public-profile.interface';
+import { DisplayMessageConfig } from '../../../interfaces/display-message-config.interface';
 import { AuthService } from '../../../services/auth/auth.service';
 import { AiService } from '../../../services/content/ai.service';
 import { PublicContentService } from '../../../services/content/public-content.service';
 import { PublicProfileService } from '../../../services/content/public-profile.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
+import { DisplayMessageComponent } from '../../shared/display-message/display-message.component';
 import { PublicContentAiCreatorDialogComponent, PublicContentAiCreatorDialogResult } from '../public-content-ai-creator-dialog/public-content-ai-creator-dialog.component';
 
 @Component({
@@ -171,15 +173,7 @@ export class PublicContentListComponent {
           this.load();
         }
 
-        this.showMessage(
-          result.failedCount > 0
-            ? '{{count}} AI drafts imported. {{failed}} suggestions could not be imported.'
-            : '{{count}} AI drafts imported.',
-          {
-            count: result.importedCount,
-            failed: result.failedCount
-          }
-        );
+        this.openImportResultMessage(result);
       });
   }
 
@@ -275,6 +269,36 @@ export class PublicContentListComponent {
 
   private showMessage(message: string, params?: Record<string, unknown>): void {
     this.snackBar.open(this.i18n.t(message, params), this.i18n.t('OK'), { duration: 2800 });
+  }
+
+  private openImportResultMessage(result: PublicContentAiCreatorDialogResult): void {
+    const hasFailures = result.failedCount > 0;
+    const config: DisplayMessageConfig = {
+      showAlways: true,
+      title: hasFailures
+        ? this.i18n.t('AI draft import completed with notes')
+        : this.i18n.t('AI drafts imported'),
+      image: '',
+      icon: hasFailures ? 'warning_amber' : 'task_alt',
+      message: hasFailures
+        ? this.i18n.t('{{count}} AI drafts imported. {{failed}} suggestions could not be imported.', {
+          count: result.importedCount,
+          failed: result.failedCount
+        }) + '\n\n' + this.i18n.t('You can now refine the imported drafts in edit mode.')
+        : this.i18n.t('{{count}} AI drafts imported.', {
+          count: result.importedCount
+        }) + '\n\n' + this.i18n.t('You can now refine the imported drafts in edit mode.'),
+      button: this.i18n.t('OK'),
+      delay: 0,
+      showSpinner: false,
+      autoclose: false
+    };
+
+    this.dialog.open(DisplayMessageComponent, {
+      data: config,
+      autoFocus: false,
+      maxWidth: '92vw'
+    });
   }
 
   tilePreview(row: PublicContent): string {

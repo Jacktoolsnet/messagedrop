@@ -2,14 +2,13 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -17,6 +16,7 @@ import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-brows
 import { debounceTime, distinctUntilChanged, finalize, firstValueFrom, map, of, startWith, switchMap } from 'rxjs';
 import { AiToolRequest } from '../../../interfaces/ai-tool-request.interface';
 import { AiContentCreatorSuggestion } from '../../../interfaces/ai-tool-result.interface';
+import { DisplayMessageConfig } from '../../../interfaces/display-message-config.interface';
 import { Multimedia } from '../../../interfaces/multimedia.interface';
 import { NominatimPlace } from '../../../interfaces/nominatim-place.interface';
 import { PublicContentSavePayload } from '../../../interfaces/public-content-save-payload.interface';
@@ -28,6 +28,7 @@ import { ContentStyleService } from '../../../services/content/content-style.ser
 import { NominatimService } from '../../../services/location/nominatim.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { DialogActionBarComponent } from '../../shared/dialog-action-bar/dialog-action-bar.component';
+import { DisplayMessageComponent } from '../../shared/display-message/display-message.component';
 import { DialogHeaderComponent } from '../../shared/dialog-header/dialog-header.component';
 
 const EMPTY_MULTIMEDIA: Multimedia = {
@@ -110,7 +111,6 @@ export interface PublicContentAiCreatorDialogResult {
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
-    MatProgressBarModule,
     MatSelectModule,
     MatTooltipModule,
     DialogHeaderComponent,
@@ -122,6 +122,7 @@ export interface PublicContentAiCreatorDialogResult {
 })
 export class PublicContentAiCreatorDialogComponent {
   private readonly dialogRef = inject(MatDialogRef<PublicContentAiCreatorDialogComponent, PublicContentAiCreatorDialogResult>);
+  private readonly dialog = inject(MatDialog);
   readonly data = inject<PublicContentAiCreatorDialogData>(MAT_DIALOG_DATA);
   private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder);
@@ -132,6 +133,7 @@ export class PublicContentAiCreatorDialogComponent {
   private readonly styleService = inject(ContentStyleService);
   private readonly nominatimService = inject(NominatimService);
   readonly i18n = inject(TranslationHelperService);
+  private loadingDialogRef: MatDialogRef<DisplayMessageComponent> | null = null;
 
   readonly loading = signal(false);
   readonly importing = signal(false);
@@ -258,6 +260,7 @@ export class PublicContentAiCreatorDialogComponent {
   ));
 
   close(): void {
+    this.closeLoadingDialog();
     this.dialogRef.close();
   }
 
@@ -305,13 +308,20 @@ export class PublicContentAiCreatorDialogComponent {
 
     this.commitPendingContentUrl();
 
+    this.openLoadingDialog(
+      this.i18n.t('Generating AI drafts...'),
+      this.i18n.t('Please wait while the AI creates new draft suggestions.')
+    );
     this.loading.set(true);
     this.suggestions.set([]);
     this.selectedSuggestionIndices.set([]);
 
     this.aiService.applyTool(this.buildRequest())
       .pipe(
-        finalize(() => this.loading.set(false)),
+        finalize(() => {
+          this.loading.set(false);
+          this.closeLoadingDialog();
+        }),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({
@@ -401,6 +411,10 @@ export class PublicContentAiCreatorDialogComponent {
     let importedCount = 0;
     let failedCount = 0;
 
+    this.openLoadingDialog(
+      this.i18n.t('Importing AI drafts...'),
+      this.i18n.t('Please wait while the selected drafts are added.')
+    );
     this.importing.set(true);
     try {
       for (const suggestion of selectedSuggestions) {
@@ -414,6 +428,7 @@ export class PublicContentAiCreatorDialogComponent {
       }
     } finally {
       this.importing.set(false);
+      this.closeLoadingDialog();
     }
 
     if (importedCount === 0) {
@@ -964,5 +979,34 @@ export class PublicContentAiCreatorDialogComponent {
       horizontalPosition: 'center',
       verticalPosition: 'top'
     });
+  }
+
+  private openLoadingDialog(title: string, message: string): void {
+    this.closeLoadingDialog();
+
+    const config: DisplayMessageConfig = {
+      showAlways: true,
+      title,
+      image: '',
+      icon: 'hourglass_top',
+      message,
+      button: '',
+      delay: 0,
+      showSpinner: true,
+      autoclose: false
+    };
+
+    this.loadingDialogRef = this.dialog.open(DisplayMessageComponent, {
+      data: config,
+      disableClose: true,
+      autoFocus: false,
+      restoreFocus: false,
+      maxWidth: '92vw'
+    });
+  }
+
+  private closeLoadingDialog(): void {
+    this.loadingDialogRef?.close();
+    this.loadingDialogRef = null;
   }
 }

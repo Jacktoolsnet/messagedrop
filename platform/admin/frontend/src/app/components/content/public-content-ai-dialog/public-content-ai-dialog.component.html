@@ -76,10 +76,6 @@
     </mat-card>
   }
 
-  @if (loading()) {
-    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-  }
-
   @if (result(); as result) {
     <mat-card class="result-card">
       <mat-card-header>

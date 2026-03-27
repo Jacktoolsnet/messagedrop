@@ -235,10 +235,6 @@
     </mat-card>
   </div>
 
-  @if (loading() || importing()) {
-    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-  }
-
   @if (suggestions().length > 0) {
     <div class="selection-toolbar">
       <button mat-button type="button" (click)="selectAllSuggestions()">{{ i18n.t('Select all') }}</button>

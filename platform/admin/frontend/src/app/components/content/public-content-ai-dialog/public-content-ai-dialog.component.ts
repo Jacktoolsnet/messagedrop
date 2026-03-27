@@ -2,22 +2,23 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { finalize } from 'rxjs';
 import { AiToolRequest } from '../../../interfaces/ai-tool-request.interface';
 import { AiToolResult } from '../../../interfaces/ai-tool-result.interface';
 import { AiTool } from '../../../interfaces/ai-tool.type';
+import { DisplayMessageConfig } from '../../../interfaces/display-message-config.interface';
 import { AiService } from '../../../services/content/ai.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
+import { DisplayMessageComponent } from '../../shared/display-message/display-message.component';
 import { DialogActionBarComponent } from '../../shared/dialog-action-bar/dialog-action-bar.component';
 import { DialogHeaderComponent } from '../../shared/dialog-header/dialog-header.component';
 
@@ -93,7 +94,6 @@ export interface PublicContentAiDialogResult {
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
-    MatProgressBarModule,
     MatSelectModule,
     MatTooltipModule,
     DialogHeaderComponent,
@@ -105,11 +105,13 @@ export interface PublicContentAiDialogResult {
 })
 export class PublicContentAiDialogComponent {
   private readonly dialogRef = inject(MatDialogRef<PublicContentAiDialogComponent, PublicContentAiDialogResult>);
+  private readonly dialog = inject(MatDialog);
   readonly data = inject<PublicContentAiDialogData>(MAT_DIALOG_DATA);
   private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder);
   private readonly aiService = inject(AiService);
   readonly i18n = inject(TranslationHelperService);
+  private loadingDialogRef: MatDialogRef<DisplayMessageComponent> | null = null;
 
   readonly loading = signal(false);
   readonly result = signal<AiToolResult | null>(null);
@@ -168,6 +170,7 @@ export class PublicContentAiDialogComponent {
   readonly preferredResponseLanguage = this.resolvePreferredResponseLanguage();
 
   close(): void {
+    this.closeLoadingDialog();
     this.dialogRef.close();
   }
 
@@ -176,11 +179,18 @@ export class PublicContentAiDialogComponent {
       return;
     }
 
+    this.openLoadingDialog(
+      this.i18n.t('Running AI tool...'),
+      this.i18n.t('Please wait while the AI processes your request.')
+    );
     this.loading.set(true);
     this.result.set(null);
     this.aiService.applyTool(this.buildRequest())
       .pipe(
-        finalize(() => this.loading.set(false)),
+        finalize(() => {
+          this.loading.set(false);
+          this.closeLoadingDialog();
+        }),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({
@@ -278,5 +288,34 @@ export class PublicContentAiDialogComponent {
 
   private resolvePreferredResponseLanguage(): string {
     return this.i18n.lang() === 'de' ? 'German' : 'English';
+  }
+
+  private openLoadingDialog(title: string, message: string): void {
+    this.closeLoadingDialog();
+
+    const config: DisplayMessageConfig = {
+      showAlways: true,
+      title,
+      image: '',
+      icon: 'hourglass_top',
+      message,
+      button: '',
+      delay: 0,
+      showSpinner: true,
+      autoclose: false
+    };
+
+    this.loadingDialogRef = this.dialog.open(DisplayMessageComponent, {
+      data: config,
+      disableClose: true,
+      autoFocus: false,
+      restoreFocus: false,
+      maxWidth: '92vw'
+    });
+  }
+
+  private closeLoadingDialog(): void {
+    this.loadingDialogRef?.close();
+    this.loadingDialogRef = null;
   }
 }
