@@ -140,32 +140,17 @@
           </div>
         }
 
-        @if (tool === 'emoji' && emojiSuggestions().length > 0) {
-          <div class="emoji-result">
-            <div class="emoji-result-list">
-              @for (emoji of emojiSuggestions(); track hashtagTrackBy($index, emoji)) {
-                <button
-                  mat-stroked-button
-                  type="button"
-                  class="emoji-pill-button"
-                  [class.emoji-pill-button-selected]="isEmojiSelected(emoji)"
-                  (click)="toggleEmojiSelection(emoji)">
-                  {{ emoji }}
+        @if (tool === 'emoji' && emojiTextSuggestions().length > 0) {
+          <div class="rewrite-suggestion-list">
+            @for (suggestion of emojiTextSuggestions(); track suggestionTrackBy($index)) {
+              <div class="rewrite-suggestion">
+                <pre>{{ suggestion }}</pre>
+                <button mat-stroked-button type="button" (click)="useText(suggestion)">
+                  <mat-icon>emoji_emotions</mat-icon>
+                  {{ i18n.t('Use suggestion') }}
                 </button>
-              }
-            </div>
-
-            <div class="result-actions-inline">
-              <button mat-stroked-button type="button" (click)="appendSelectedEmojis()" [disabled]="!hasSelectedEmojis()">
-                <mat-icon>add</mat-icon>
-                {{ i18n.t('Add selected') }}
-              </button>
-
-              <button mat-stroked-button type="button" (click)="appendText(emojiSuggestions().join(' '))">
-                <mat-icon>add_reaction</mat-icon>
-                {{ i18n.t('Add all') }}
-              </button>
-            </div>
+              </div>
+            }
           </div>
         }
 
@@ -210,7 +195,7 @@
             <div class="quality-check-summary">
               <span class="dialog-meta-chip">
                 <mat-icon>fact_check</mat-icon>
-                {{ review.verdict }}
+                {{ qualityVerdictLabel(review.verdict) }}
               </span>
               @if (review.summary) {
                 <p>{{ review.summary }}</p>

@@ -10,6 +10,7 @@ export interface AiToolRequest {
   parentLabel: string;
   existingHashtags: string[];
   targetLanguage?: string;
+  responseLanguage?: string;
   rewriteGoal?: string;
   hashtagCount?: number;
   multimedia: {

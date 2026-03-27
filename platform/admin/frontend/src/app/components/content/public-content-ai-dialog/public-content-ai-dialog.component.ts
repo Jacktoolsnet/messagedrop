@@ -71,7 +71,6 @@ export class PublicContentAiDialogComponent {
 
   readonly loading = signal(false);
   readonly result = signal<AiToolResult | null>(null);
-  readonly selectedEmojis = signal<string[]>([]);
 
   readonly tool = this.data.tool;
   readonly form = this.fb.nonNullable.group({
@@ -110,7 +109,7 @@ export class PublicContentAiDialogComponent {
       case 'hashtags':
         return this.i18n.t('Suggest editorial hashtags based on text, location and media context.');
       case 'emoji':
-        return this.i18n.t('Suggest fitting emojis that can be added to the current message.');
+        return this.i18n.t('Generate ready-to-use text variants with fitting emojis placed naturally.');
       case 'thread':
         return this.i18n.t('Generate short follow-up comments or replies for the current thread.');
       case 'quality_check':
@@ -138,9 +137,9 @@ export class PublicContentAiDialogComponent {
   readonly resultText = computed(() => this.result()?.text?.trim() || '');
   readonly rewriteSuggestions = computed(() => this.result()?.suggestions ?? []);
   readonly generatedHashtags = computed(() => this.result()?.hashtags ?? []);
-  readonly emojiSuggestions = computed(() => this.result()?.emojiSuggestions ?? []);
-  readonly hasSelectedEmojis = computed(() => this.selectedEmojis().length > 0);
+  readonly emojiTextSuggestions = computed(() => this.result()?.suggestions ?? this.result()?.emojiSuggestions ?? []);
   readonly qualityCheck = computed(() => this.result()?.qualityCheck ?? null);
+  readonly preferredResponseLanguage = this.resolvePreferredResponseLanguage();
 
   close(): void {
     this.dialogRef.close();
@@ -153,7 +152,6 @@ export class PublicContentAiDialogComponent {
 
     this.loading.set(true);
     this.result.set(null);
-    this.selectedEmojis.set([]);
     this.aiService.applyTool(this.buildRequest())
       .pipe(
         finalize(() => this.loading.set(false)),
@@ -186,26 +184,6 @@ export class PublicContentAiDialogComponent {
     });
   }
 
-  toggleEmojiSelection(emoji: string): void {
-    this.selectedEmojis.update((current) => (
-      current.includes(emoji)
-        ? current.filter((entry) => entry !== emoji)
-        : [...current, emoji]
-    ));
-  }
-
-  isEmojiSelected(emoji: string): boolean {
-    return this.selectedEmojis().includes(emoji);
-  }
-
-  appendSelectedEmojis(): void {
-    const selected = this.selectedEmojis();
-    if (selected.length === 0) {
-      return;
-    }
-    this.appendText(selected.join(' '));
-  }
-
   replaceHashtags(): void {
     const hashtags = this.generatedHashtags();
     if (hashtags.length === 0) {
@@ -236,6 +214,17 @@ export class PublicContentAiDialogComponent {
     return row;
   }
 
+  qualityVerdictLabel(verdict: string): string {
+    switch (verdict) {
+      case 'ready':
+        return this.i18n.t('Ready to publish');
+      case 'good_with_minor_edits':
+        return this.i18n.t('Good with minor edits');
+      default:
+        return this.i18n.t('Needs more work');
+    }
+  }
+
   private buildRequest(): AiToolRequest {
     return {
       tool: this.tool,
@@ -246,6 +235,7 @@ export class PublicContentAiDialogComponent {
       parentLabel: this.data.parentLabel,
       existingHashtags: this.data.existingHashtags,
       targetLanguage: this.form.controls.targetLanguage.value,
+      responseLanguage: this.preferredResponseLanguage,
       rewriteGoal: this.form.controls.rewriteGoal.value,
       hashtagCount: Number(this.form.controls.hashtagCount.value) || 8,
       multimedia: {
@@ -254,5 +244,9 @@ export class PublicContentAiDialogComponent {
         description: this.data.multimedia.description
       }
     };
+  }
+
+  private resolvePreferredResponseLanguage(): string {
+    return this.i18n.lang() === 'de' ? 'German' : 'English';
   }
 }

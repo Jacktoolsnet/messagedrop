@@ -804,6 +804,7 @@ function normalizeToolPayload(value) {
   const existingHashtags = normalizeHashtagList(value.existingHashtags);
   const contentType = String(value.contentType || 'public').trim() === 'comment' ? 'comment' : 'public';
   const targetLanguage = normalizeShortText(value.targetLanguage, 60) || 'English';
+  const responseLanguage = normalizeShortText(value.responseLanguage, 60);
   const rewriteGoal = normalizeRewriteGoal(value.rewriteGoal);
   const hashtagCount = normalizeHashtagCount(value.hashtagCount);
   const multimedia = normalizeMultimediaSummary(value.multimedia);
@@ -825,6 +826,7 @@ function normalizeToolPayload(value) {
     existingHashtags,
     contentType,
     targetLanguage,
+    responseLanguage,
     rewriteGoal,
     hashtagCount,
     multimedia
@@ -1047,19 +1049,21 @@ async function runEmojiSuggestions(client, model, payload, db) {
   const response = await client.responses.create({
     model,
     instructions: [
-      'Suggest exactly 6 emoji candidates for the provided short public message or comment.',
-      'Return only a JSON array of short strings.',
-      'Each array item must contain 1 to 3 emojis and nothing else.',
-      'Avoid duplicates and keep the suggestions publication-friendly.'
+      `Create exactly 4 distinct ready-to-use versions of the provided short public ${payload.contentType === 'comment' ? 'comment' : 'message'}.`,
+      'Add fitting emojis directly into the text at natural positions.',
+      'Keep the original meaning and language.',
+      'Preserve hashtags, usernames, URLs and line breaks when possible.',
+      'Do not overload the text; use only a few fitting emojis per suggestion.',
+      'Return only a JSON array with exactly 4 strings and no surrounding explanation.'
     ].join(' '),
     input: buildEditorialInput(payload)
   });
   await recordResponseUsage(db, 'emoji', model, response);
 
-  const emojiSuggestions = parseStringArray(response.output_text, 6)
-    .map((entry) => normalizeEmojiSuggestion(entry))
+  const suggestions = parseStringArray(response.output_text, 4)
+    .map((entry) => normalizeText(entry))
     .filter(Boolean);
-  const unique = Array.from(new Set(emojiSuggestions)).slice(0, 6);
+  const unique = Array.from(new Set(suggestions)).slice(0, 4);
 
   if (unique.length === 0) {
     throw apiError.badGateway('ai_empty_response');
@@ -1068,7 +1072,7 @@ async function runEmojiSuggestions(client, model, payload, db) {
   return {
     tool: 'emoji',
     model,
-    emojiSuggestions: unique
+    suggestions: unique
   };
 }
 
@@ -1098,11 +1102,16 @@ async function runThreadSuggestions(client, model, payload, db) {
 }
 
 async function runQualityCheck(client, model, payload, db) {
+  const responseLanguageInstruction = payload.responseLanguage
+    ? `Write summary, strengths, risks and recommendations in ${payload.responseLanguage}.`
+    : 'Write summary, strengths, risks and recommendations in the same language as the original text.';
   const response = await client.responses.create({
     model,
     instructions: [
       'You are an editorial quality reviewer for short public posts.',
       'Evaluate the message for clarity, tone, structure and publication readiness.',
+      responseLanguageInstruction,
+      'Keep improvedText in the same language as the original text unless the user explicitly asked for a translation.',
       'Return only a JSON object with these keys:',
       'verdict, summary, strengths, risks, recommendations, improvedText.',
       'verdict must be one of: ready, good_with_minor_edits, needs_work.',
