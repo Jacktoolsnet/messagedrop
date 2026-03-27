@@ -1,5 +1,8 @@
 <div class="dialog-shell">
-  <h2 mat-dialog-title class="dialog-title">{{ title() }}</h2>
+  <app-dialog-header
+    icon="article"
+    [title]="title()">
+  </app-dialog-header>
 
   <form [formGroup]="form" class="dialog-form" (ngSubmit)="save()">
     <div class="dialog-scroll">
@@ -117,8 +120,8 @@
       </div>
     </div>
 
-    <div class="dialog-actions">
-      <button mat-stroked-button type="button" (click)="close()">
+    <app-dialog-action-bar>
+      <button mat-stroked-button type="button" class="action-close" (click)="close()">
         <mat-icon>close</mat-icon>
         {{ i18n.t('Cancel') }}
       </button>
@@ -130,6 +133,6 @@
         }
         {{ i18n.t('Save') }}
       </button>
-    </div>
+    </app-dialog-action-bar>
   </form>
 </div>

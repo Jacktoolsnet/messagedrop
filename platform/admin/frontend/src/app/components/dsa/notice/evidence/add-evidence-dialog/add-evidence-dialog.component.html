@@ -1,4 +1,7 @@
-<h2 mat-dialog-title>{{ i18n.t('Add evidence') }}</h2>
+<app-dialog-header
+    icon="upload_file"
+    [title]="i18n.t('Add evidence')">
+</app-dialog-header>
 
 <div mat-dialog-content class="content">
     <form (ngSubmit)="submit()" [formGroup]="form" class="form">
@@ -55,10 +58,10 @@
     </form>
 </div>
 
-<div mat-dialog-actions align="end">
-    <button mat-stroked-button (click)="close()" [disabled]="saving()">{{ i18n.t('Cancel') }}</button>
+<app-dialog-action-bar>
+    <button mat-stroked-button class="action-close" (click)="close()" [disabled]="saving()">{{ i18n.t('Cancel') }}</button>
     <button mat-raised-button color="primary" type="button" (click)="submit()" [disabled]="saving()">
         <mat-icon>save</mat-icon>
         {{ i18n.t('Save') }}
     </button>
-</div>
+</app-dialog-action-bar>

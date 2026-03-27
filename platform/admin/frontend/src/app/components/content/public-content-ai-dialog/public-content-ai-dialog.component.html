@@ -1,8 +1,7 @@
-<div class="dialog-header">
-  <div class="dialog-copy">
-    <h2>{{ title() }}</h2>
-  </div>
-</div>
+<app-dialog-header
+  icon="auto_awesome"
+  [title]="title()">
+</app-dialog-header>
 
 <mat-dialog-content class="dialog-content">
   <mat-card class="source-card">
@@ -229,17 +228,16 @@
   }
 </mat-dialog-content>
 
-<mat-dialog-actions class="dialog-actions">
+<app-dialog-action-bar>
   <button
     mat-icon-button
     type="button"
-    class="toolbar-action avatar avatar-neutral"
+    class="toolbar-action avatar avatar-neutral action-close"
     (click)="close()"
     [matTooltip]="i18n.t('Close')"
     [attr.aria-label]="i18n.t('Close')">
     <mat-icon>close</mat-icon>
   </button>
-  <span class="dialog-actions-spacer"></span>
   <button
     mat-icon-button
     type="button"
@@ -250,4 +248,4 @@
     [attr.aria-label]="i18n.t('Run AI tool')">
     <mat-icon>auto_awesome</mat-icon>
   </button>
-</mat-dialog-actions>
+</app-dialog-action-bar>

@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
@@ -26,6 +26,8 @@ import { AiService } from '../../../services/content/ai.service';
 import { PublicContentService } from '../../../services/content/public-content.service';
 import { NominatimService } from '../../../services/location/nominatim.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
+import { DialogActionBarComponent } from '../../shared/dialog-action-bar/dialog-action-bar.component';
+import { DialogHeaderComponent } from '../../shared/dialog-header/dialog-header.component';
 
 const EMPTY_MULTIMEDIA: Multimedia = {
   type: 'undefined',
@@ -102,7 +104,6 @@ export interface PublicContentAiCreatorDialogResult {
     CommonModule,
     ReactiveFormsModule,
     MatDialogContent,
-    MatDialogActions,
     MatButtonModule,
     MatCardModule,
     MatCheckboxModule,
@@ -112,7 +113,9 @@ export interface PublicContentAiCreatorDialogResult {
     MatInputModule,
     MatProgressBarModule,
     MatSelectModule,
-    MatTooltipModule
+    MatTooltipModule,
+    DialogHeaderComponent,
+    DialogActionBarComponent
   ],
   templateUrl: './public-content-ai-creator-dialog.component.html',
   styleUrl: './public-content-ai-creator-dialog.component.css',

@@ -11,6 +11,8 @@ import { MatCardModule } from '@angular/material/card';
 import { StatisticSettingsService } from '../../../services/statistic/statistic-settings.service';
 import { StatisticService } from '../../../services/statistic/statistic.service';
 import { StatisticKeySetting } from '../../../interfaces/statistic-key-setting.interface';
+import { DialogActionBarComponent } from '../../shared/dialog-action-bar/dialog-action-bar.component';
+import { DialogHeaderComponent } from '../../shared/dialog-header/dialog-header.component';
 
 interface Row {
   metricKey: string;
@@ -31,8 +33,10 @@ interface Row {
     MatFormFieldModule,
     MatInputModule,
     MatCardModule,
-    DragDropModule
-],
+    DragDropModule,
+    DialogHeaderComponent,
+    DialogActionBarComponent
+  ],
   templateUrl: './statistic-settings.component.html',
   styleUrls: ['./statistic-settings.component.css']
 })

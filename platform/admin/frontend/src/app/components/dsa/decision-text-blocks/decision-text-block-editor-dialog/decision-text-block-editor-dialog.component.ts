@@ -15,6 +15,8 @@ import { merge } from 'rxjs';
 import { DsaDecisionOutcome, DsaTextBlock, DsaTextBlockSavePayload, DsaTextBlockType } from '../../../../interfaces/dsa-text-block.interface';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
+import { DialogActionBarComponent } from '../../../shared/dialog-action-bar/dialog-action-bar.component';
+import { DialogHeaderComponent } from '../../../shared/dialog-header/dialog-header.component';
 
 export interface DecisionTextBlockEditorDialogData {
   block?: DsaTextBlock | null;
@@ -33,7 +35,9 @@ export interface DecisionTextBlockEditorDialogData {
     MatIconModule,
     MatSelectModule,
     MatSlideToggleModule,
-    MatTooltipModule
+    MatTooltipModule,
+    DialogHeaderComponent,
+    DialogActionBarComponent
   ],
   templateUrl: './decision-text-block-editor-dialog.component.html',
   styleUrls: ['./decision-text-block-editor-dialog.component.css'],

@@ -2,13 +2,16 @@ import { CommonModule } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, ElementRef, NgZone, OnDestroy, computed, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { finalize } from 'rxjs';
 import * as leaflet from 'leaflet';
 import { NominatimPlace } from '../../../interfaces/nominatim-place.interface';
 import { NominatimService } from '../../../services/location/nominatim.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
+import { DialogActionBarComponent } from '../../shared/dialog-action-bar/dialog-action-bar.component';
+import { DialogHeaderComponent } from '../../shared/dialog-header/dialog-header.component';
 
 export interface PublicContentLocationMapDialogData {
   latitude: number;
@@ -26,12 +29,12 @@ export interface PublicContentLocationMapDialogResult {
   selector: 'app-public-content-location-map-dialog',
   imports: [
     CommonModule,
-    MatDialogTitle,
     MatDialogContent,
-    MatDialogActions,
     MatButtonModule,
     MatIconModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    DialogHeaderComponent,
+    DialogActionBarComponent
   ],
   templateUrl: './public-content-location-map-dialog.component.html',
   styleUrl: './public-content-location-map-dialog.component.css',
@@ -43,12 +46,15 @@ export class PublicContentLocationMapDialogComponent implements AfterViewInit, O
   private readonly destroyRef = inject(DestroyRef);
   private readonly zone = inject(NgZone);
   private readonly nominatimService = inject(NominatimService);
+  readonly i18n = inject(TranslationHelperService);
 
   readonly mapElement = viewChild<ElementRef<HTMLDivElement>>('mapElement');
   readonly selectedLatitude = signal(this.data.latitude);
   readonly selectedLongitude = signal(this.data.longitude);
   readonly selectedLabel = signal(this.data.label.trim() || this.formatCoordinates(this.data.latitude, this.data.longitude));
   readonly reverseLookupPending = signal(false);
+  readonly title = this.i18n.t('Adjust location on map');
+  readonly subtitle = this.i18n.t('Tap the map to refine the selected location. The address is resolved automatically.');
   readonly selectedCoordinatesText = computed(() => (
     `${this.selectedLatitude().toFixed(5)}, ${this.selectedLongitude().toFixed(5)}`
   ));

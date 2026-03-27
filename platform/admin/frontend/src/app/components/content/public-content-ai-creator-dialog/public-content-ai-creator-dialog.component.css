@@ -5,26 +5,6 @@
   min-height: 0;
 }
 
-.dialog-header {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1.25rem 1.25rem 0;
-}
-
-.dialog-copy h2 {
-  margin: 0 0 0.35rem;
-  font-size: 1.35rem;
-  font-weight: 700;
-}
-
-.dialog-copy p {
-  margin: 0;
-  color: rgba(255, 255, 255, 0.72);
-}
-
 .dialog-content {
   flex: 1 1 auto;
   min-height: 0;
@@ -552,22 +532,6 @@ pre {
   color: rgba(255, 255, 255, 0.72);
 }
 
-.dialog-actions {
-  flex: 0 0 auto;
-  margin-top: auto;
-  padding: 0 1.5rem 1.25rem;
-  position: sticky;
-  bottom: 0;
-  z-index: 5;
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(10px);
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.dialog-actions-spacer {
-  flex: 1 1 auto;
-}
-
 .toolbar-action.avatar {
   width: 44px;
   height: 44px;
@@ -593,10 +557,6 @@ pre {
 }
 
 @media (max-width: 720px) {
-  .dialog-header {
-    padding-inline: 1rem;
-  }
-
   .creator-grid {
     grid-template-columns: 1fr;
   }
@@ -635,10 +595,5 @@ pre {
 
   .suggestion-list {
     grid-template-columns: 1fr;
-  }
-
-  .dialog-actions {
-    padding-inline: 1rem;
-    padding-bottom: 1rem;
   }
 }

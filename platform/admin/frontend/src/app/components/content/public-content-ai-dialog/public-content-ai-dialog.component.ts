@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
@@ -18,6 +18,8 @@ import { AiToolResult } from '../../../interfaces/ai-tool-result.interface';
 import { AiTool } from '../../../interfaces/ai-tool.type';
 import { AiService } from '../../../services/content/ai.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
+import { DialogActionBarComponent } from '../../shared/dialog-action-bar/dialog-action-bar.component';
+import { DialogHeaderComponent } from '../../shared/dialog-header/dialog-header.component';
 
 const DEEPL_TARGET_LANGUAGE_OPTIONS = [
   { value: 'AR', label: 'Arabic' },
@@ -85,7 +87,6 @@ export interface PublicContentAiDialogResult {
     CommonModule,
     ReactiveFormsModule,
     MatDialogContent,
-    MatDialogActions,
     MatButtonModule,
     MatCardModule,
     MatChipsModule,
@@ -94,7 +95,9 @@ export interface PublicContentAiDialogResult {
     MatInputModule,
     MatProgressBarModule,
     MatSelectModule,
-    MatTooltipModule
+    MatTooltipModule,
+    DialogHeaderComponent,
+    DialogActionBarComponent
   ],
   templateUrl: './public-content-ai-dialog.component.html',
   styleUrl: './public-content-ai-dialog.component.css',

@@ -56,11 +56,3 @@
   block-size: 3rem;
   cursor: pointer;
 }
-
-.actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: .75rem;
-  padding: .75rem 1rem;
-  border-top: 1px solid var(--border);
-}

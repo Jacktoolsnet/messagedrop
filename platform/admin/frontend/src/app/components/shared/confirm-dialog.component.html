@@ -1,20 +1,17 @@
-<div class="confirm-wrap" [class.warn]="data.warn">
-  <div class="head">
-    <div class="avatar" [class.avatar-warn]="data.warn" [class.avatar-neutral]="!data.warn">
-      <mat-icon>{{ data.warn ? 'warning' : 'help' }}</mat-icon>
-    </div>
-    <div class="titles">
-      <h3>{{ i18n.t(data.title || 'Are you sure?') }}</h3>
-      <p>{{ i18n.t(data.message || 'Please confirm this action.') }}</p>
-    </div>
-  </div>
+<app-dialog-header
+  [icon]="data.warn ? 'warning' : 'help'"
+  [title]="i18n.t(data.title || 'Are you sure?')">
+</app-dialog-header>
 
-  <div class="actions">
-    <button mat-stroked-button type="button" (click)="cancel()">
-      {{ i18n.t(data.cancelText || 'Cancel') }}
-    </button>
-    <button mat-raised-button [color]="data.warn ? 'warn' : 'primary'" type="button" (click)="confirm()">
-      {{ i18n.t(data.confirmText || 'Confirm') }}
-    </button>
-  </div>
-</div>
+<mat-dialog-content class="confirm-content">
+  <div class="confirm-box">{{ i18n.t(data.message || 'Please confirm this action.') }}</div>
+</mat-dialog-content>
+
+<app-dialog-action-bar>
+  <button mat-stroked-button type="button" class="action-close" (click)="cancel()">
+    {{ i18n.t(data.cancelText || 'Cancel') }}
+  </button>
+  <button mat-raised-button [color]="data.warn ? 'warn' : 'primary'" type="button" (click)="confirm()">
+    {{ i18n.t(data.confirmText || 'Confirm') }}
+  </button>
+</app-dialog-action-bar>

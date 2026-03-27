@@ -11,6 +11,8 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
+import { DialogActionBarComponent } from '../../../shared/dialog-action-bar/dialog-action-bar.component';
+import { DialogHeaderComponent } from '../../../shared/dialog-header/dialog-header.component';
 
 @Component({
   selector: 'app-notify-dialog',
@@ -23,8 +25,10 @@ import { TranslationHelperService } from '../../../../services/translation-helpe
     MatSelectModule,
     MatButtonModule,
     MatSlideToggleModule,
-    MatIcon
-],
+    MatIcon,
+    DialogHeaderComponent,
+    DialogActionBarComponent
+  ],
   templateUrl: './notify-dialog.component.html',
   styleUrls: ['./notify-dialog.component.css']
 })

@@ -1,7 +1,7 @@
-<h2 mat-dialog-title>
-    <mat-icon>notifications_active</mat-icon>
-    {{ i18n.t('Send Notification') }}
-</h2>
+<app-dialog-header
+    icon="notifications_active"
+    [title]="i18n.t('Send Notification')">
+</app-dialog-header>
 
 <mat-dialog-content class="content">
     <form [formGroup]="form">
@@ -32,10 +32,10 @@
     </form>
 </mat-dialog-content>
 
-<mat-dialog-actions align="end">
-    <button mat-stroked-button (click)="close()">{{ i18n.t('Cancel') }}</button>
+<app-dialog-action-bar>
+    <button mat-stroked-button class="action-close" (click)="close()">{{ i18n.t('Cancel') }}</button>
     <button mat-flat-button color="primary" (click)="send()" [disabled]="sending()">
         <mat-icon>send</mat-icon>
         {{ i18n.t('Send') }}
     </button>
-</mat-dialog-actions>
+</app-dialog-action-bar>

@@ -1,13 +1,8 @@
-<div class="dialog-header">
-  <div class="dialog-copy">
-    <h2 mat-dialog-title>Adjust location on map</h2>
-    <p>Tap the map to refine the selected location. The address is resolved automatically.</p>
-  </div>
-
-  <button mat-icon-button type="button" (click)="close()" aria-label="Close location map dialog">
-    <mat-icon>close</mat-icon>
-  </button>
-</div>
+<app-dialog-header
+  icon="location_on"
+  [title]="title"
+  [subtitle]="subtitle">
+</app-dialog-header>
 
 <mat-dialog-content class="dialog-content">
   <section class="selection-summary">
@@ -30,7 +25,7 @@
   <div #mapElement class="map-container" aria-label="Location picker map"></div>
 </mat-dialog-content>
 
-<mat-dialog-actions align="end" class="dialog-actions">
-  <button mat-button type="button" (click)="close()">Cancel</button>
-  <button mat-flat-button color="primary" type="button" (click)="apply()">Use location</button>
-</mat-dialog-actions>
+<app-dialog-action-bar>
+  <button mat-button type="button" class="action-close" (click)="close()">{{ i18n.t('Cancel') }}</button>
+  <button mat-flat-button color="primary" type="button" (click)="apply()">{{ i18n.t('Use location') }}</button>
+</app-dialog-action-bar>

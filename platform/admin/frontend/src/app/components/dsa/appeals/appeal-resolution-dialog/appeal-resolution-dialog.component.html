@@ -1,4 +1,7 @@
-<h2 mat-dialog-title>{{ i18n.t('Resolve appeal') }}</h2>
+<app-dialog-header
+  icon="rule"
+  [title]="i18n.t('Resolve appeal')">
+</app-dialog-header>
 
 <mat-dialog-content>
   <form [formGroup]="form" class="resolution-form" (ngSubmit)="submit()">
@@ -47,7 +50,7 @@
   </form>
 </mat-dialog-content>
 
-<mat-dialog-actions align="end">
-  <button mat-button type="button" (click)="cancel()">{{ i18n.t('Cancel') }}</button>
+<app-dialog-action-bar>
+  <button mat-button type="button" class="action-close" (click)="cancel()">{{ i18n.t('Cancel') }}</button>
   <button mat-flat-button color="primary" type="submit" (click)="submit()">{{ i18n.t('Save') }}</button>
-</mat-dialog-actions>
+</app-dialog-action-bar>

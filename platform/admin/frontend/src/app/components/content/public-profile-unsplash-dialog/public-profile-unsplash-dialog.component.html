@@ -1,4 +1,8 @@
-<h2 mat-dialog-title>{{ title() }}</h2>
+<app-dialog-header
+  icon="image_search"
+  [title]="title()"
+  [subtitle]="subtitle()">
+</app-dialog-header>
 
 @if (loading()) {
   <mat-progress-bar mode="indeterminate"></mat-progress-bar>
@@ -43,13 +47,13 @@
   }
 </mat-dialog-content>
 
-<mat-dialog-actions align="end">
+<app-dialog-action-bar>
   @if (hasMoreSearch()) {
     <button mat-stroked-button type="button" (click)="loadMore()">
       <mat-icon>expand_more</mat-icon>
-      More
+      {{ i18n.t('More') }}
     </button>
   }
 
-  <button mat-button mat-dialog-close type="button">Close</button>
-</mat-dialog-actions>
+  <button mat-button mat-dialog-close type="button" class="action-close">{{ i18n.t('Close') }}</button>
+</app-dialog-action-bar>

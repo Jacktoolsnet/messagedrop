@@ -15,6 +15,8 @@ import { map, startWith, Subject, takeUntil } from 'rxjs';
 import { DsaDecisionOutcome, DsaTextBlock } from '../../../../interfaces/dsa-text-block.interface';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
+import { DialogActionBarComponent } from '../../../shared/dialog-action-bar/dialog-action-bar.component';
+import { DialogHeaderComponent } from '../../../shared/dialog-header/dialog-header.component';
 
 export type DecisionOutcome = DsaDecisionOutcome;
 export interface DecisionDialogResult {
@@ -28,7 +30,8 @@ export interface DecisionDialogResult {
   imports: [
     CommonModule, ReactiveFormsModule, MatDialogModule,
     MatFormFieldModule, MatInputModule, MatSelectModule, MatSlideToggleModule,
-    MatButtonModule, MatIconModule, MatAutocompleteModule, MatTooltipModule
+    MatButtonModule, MatIconModule, MatAutocompleteModule, MatTooltipModule,
+    DialogHeaderComponent, DialogActionBarComponent
   ],
   templateUrl: './decision-dialog.component.html',
   styleUrls: ['./decision-dialog.component.css']

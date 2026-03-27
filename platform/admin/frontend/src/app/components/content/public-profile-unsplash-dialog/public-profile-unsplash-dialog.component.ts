@@ -9,6 +9,9 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { finalize } from 'rxjs';
 import { UnsplashPhoto } from '../../../interfaces/unsplash-response.interface';
 import { PublicProfileUnsplashService } from '../../../services/content/public-profile-unsplash.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
+import { DialogActionBarComponent } from '../../shared/dialog-action-bar/dialog-action-bar.component';
+import { DialogHeaderComponent } from '../../shared/dialog-header/dialog-header.component';
 
 @Component({
   selector: 'app-public-profile-unsplash-dialog',
@@ -18,7 +21,9 @@ import { PublicProfileUnsplashService } from '../../../services/content/public-p
     MatButtonModule,
     MatIconModule,
     MatInputModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    DialogHeaderComponent,
+    DialogActionBarComponent
   ],
   templateUrl: './public-profile-unsplash-dialog.component.html',
   styleUrls: ['./public-profile-unsplash-dialog.component.css'],
@@ -28,6 +33,7 @@ export class PublicProfileUnsplashDialogComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly dialogRef = inject(MatDialogRef<PublicProfileUnsplashDialogComponent>);
   private readonly unsplashService = inject(PublicProfileUnsplashService);
+  readonly i18n = inject(TranslationHelperService);
 
   readonly searchControl = new FormControl('', { nonNullable: true });
   readonly loading = signal(false);
@@ -36,7 +42,10 @@ export class PublicProfileUnsplashDialogComponent {
   readonly hasMoreSearch = signal(false);
   readonly lastSearchTerm = signal('');
   readonly mode = signal<'featured' | 'search'>('featured');
-  readonly title = computed(() => this.mode() === 'search' ? 'Unsplash search' : 'Featured Unsplash photos');
+  readonly title = computed(() => this.i18n.t(this.mode() === 'search' ? 'Unsplash search' : 'Featured Unsplash photos'));
+  readonly subtitle = computed(() => this.i18n.t(this.mode() === 'search'
+    ? 'Search and select a profile photo from Unsplash.'
+    : 'Choose one of the current featured Unsplash photos.'));
 
   constructor() {
     this.loadFeatured();

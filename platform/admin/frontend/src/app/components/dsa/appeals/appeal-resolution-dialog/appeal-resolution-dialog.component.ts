@@ -11,6 +11,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { DecisionOutcome } from '../../decisions/decision-dialog/decision-dialog.component';
+import { DialogActionBarComponent } from '../../../shared/dialog-action-bar/dialog-action-bar.component';
+import { DialogHeaderComponent } from '../../../shared/dialog-header/dialog-header.component';
 
 export interface AppealResolutionData {
   outcome: string | null;
@@ -37,8 +39,10 @@ export interface AppealResolutionDialogData {
     MatSelectModule,
     MatInputModule,
     MatSlideToggleModule,
-    ReactiveFormsModule
-],
+    ReactiveFormsModule,
+    DialogHeaderComponent,
+    DialogActionBarComponent
+  ],
   templateUrl: './appeal-resolution-dialog.component.html',
   styleUrls: ['./appeal-resolution-dialog.component.css']
 })

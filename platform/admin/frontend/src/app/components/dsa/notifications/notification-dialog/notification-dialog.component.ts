@@ -11,6 +11,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { DsaNotice } from '../../../../interfaces/dsa-notice.interface';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
+import { DialogActionBarComponent } from '../../../shared/dialog-action-bar/dialog-action-bar.component';
+import { DialogHeaderComponent } from '../../../shared/dialog-header/dialog-header.component';
 
 export interface NotificationDialogData {
   notice: DsaNotice;
@@ -26,8 +28,10 @@ export interface NotificationDialogData {
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
-    MatIconModule
-],
+    MatIconModule,
+    DialogHeaderComponent,
+    DialogActionBarComponent
+  ],
   templateUrl: './notification-dialog.component.html',
   styleUrls: ['./notification-dialog.component.css']
 })

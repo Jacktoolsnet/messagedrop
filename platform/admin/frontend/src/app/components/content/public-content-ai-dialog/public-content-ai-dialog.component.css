@@ -5,19 +5,6 @@
   color: #1f2937;
 }
 
-.dialog-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  padding: 1.25rem 1.25rem 0;
-}
-
-.dialog-copy h2 {
-  margin: 0 0 .35rem;
-  font-size: 1.35rem;
-  font-weight: 700;
-}
-
 .dialog-content {
   display: grid;
   gap: 1rem;
@@ -191,29 +178,8 @@
   gap: .4rem;
 }
 
-.dialog-actions {
-  justify-content: flex-start;
-  gap: .65rem;
-  margin-top: 1rem;
-  padding: 1rem 1.8rem 1.4rem;
-}
-
-.dialog-actions-spacer {
-  flex: 1 1 auto;
-}
-
 @media (max-width: 720px) {
   :host {
     width: min(96vw, 880px);
-  }
-
-  .dialog-header {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-
-  .dialog-actions {
-    padding-left: 1.2rem;
-    padding-right: 1.2rem;
   }
 }

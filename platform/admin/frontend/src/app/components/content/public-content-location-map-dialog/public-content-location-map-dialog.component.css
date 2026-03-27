@@ -5,29 +5,6 @@
   color: #1f2937;
 }
 
-.dialog-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  padding: 1rem 1rem 0;
-}
-
-.dialog-copy {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.dialog-copy h2 {
-  margin: 0;
-  font-size: 1.2rem;
-  font-weight: 700;
-}
-
-.dialog-copy p {
-  margin: .35rem 0 0;
-  color: #64748b;
-}
-
 .dialog-content {
   display: flex;
   flex-direction: column;
@@ -93,14 +70,8 @@
   box-shadow: 0 20px 48px rgba(15, 23, 42, 0.12);
 }
 
-.dialog-actions {
-  padding: 0 1rem 1rem;
-}
-
 @media (max-width: 720px) {
-  .dialog-header,
-  .dialog-content,
-  .dialog-actions {
+  .dialog-content {
     padding-left: .85rem;
     padding-right: .85rem;
   }

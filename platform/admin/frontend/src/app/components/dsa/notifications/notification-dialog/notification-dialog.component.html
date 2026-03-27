@@ -1,7 +1,7 @@
-<h2 mat-dialog-title>
-  <mat-icon aria-hidden="true">add_alert</mat-icon>
-  {{ i18n.t('Add Notification') }}
-</h2>
+<app-dialog-header
+  icon="add_alert"
+  [title]="i18n.t('Add Notification')">
+</app-dialog-header>
 
 <form [formGroup]="form" class="dialog-content" (ngSubmit)="submit()">
   <mat-form-field appearance="outline">
@@ -38,8 +38,8 @@
     <input matInput formControlName="event" [placeholder]="i18n.t('Custom event identifier')" />
   </mat-form-field>
 
-  <div class="dialog-actions">
-    <button mat-button type="button" (click)="cancel()">{{ i18n.t('Cancel') }}</button>
+  <app-dialog-action-bar>
+    <button mat-button type="button" class="action-close" (click)="cancel()">{{ i18n.t('Cancel') }}</button>
     <button mat-flat-button color="primary" type="submit">{{ i18n.t('Create') }}</button>
-  </div>
+  </app-dialog-action-bar>
 </form>

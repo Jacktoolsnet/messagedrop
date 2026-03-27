@@ -11,13 +11,16 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { DsaService } from '../../../../../services/dsa/dsa/dsa.service';
 import { TranslationHelperService } from '../../../../../services/translation-helper.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DialogActionBarComponent } from '../../../../shared/dialog-action-bar/dialog-action-bar.component';
+import { DialogHeaderComponent } from '../../../../shared/dialog-header/dialog-header.component';
 
 @Component({
   selector: 'app-add-evidence-dialog',
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule, MatDialogModule,
-    MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, MatIconModule
+    MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, MatIconModule,
+    DialogHeaderComponent, DialogActionBarComponent
   ],
   templateUrl: './add-evidence-dialog.component.html',
   styleUrls: ['./add-evidence-dialog.component.css']
