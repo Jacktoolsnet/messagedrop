@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
@@ -11,12 +11,51 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { finalize } from 'rxjs';
 import { AiToolRequest } from '../../../interfaces/ai-tool-request.interface';
 import { AiToolResult } from '../../../interfaces/ai-tool-result.interface';
 import { AiTool } from '../../../interfaces/ai-tool.type';
 import { AiService } from '../../../services/content/ai.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
+
+const DEEPL_TARGET_LANGUAGE_OPTIONS = [
+  { value: 'AR', label: 'Arabic' },
+  { value: 'BG', label: 'Bulgarian' },
+  { value: 'CS', label: 'Czech' },
+  { value: 'DA', label: 'Danish' },
+  { value: 'DE', label: 'German' },
+  { value: 'EL', label: 'Greek' },
+  { value: 'EN-GB', label: 'English (British)' },
+  { value: 'EN-US', label: 'English (American)' },
+  { value: 'ES', label: 'Spanish' },
+  { value: 'ES-419', label: 'Spanish (Latin America)' },
+  { value: 'ET', label: 'Estonian' },
+  { value: 'FI', label: 'Finnish' },
+  { value: 'FR', label: 'French' },
+  { value: 'HU', label: 'Hungarian' },
+  { value: 'ID', label: 'Indonesian' },
+  { value: 'IT', label: 'Italian' },
+  { value: 'JA', label: 'Japanese' },
+  { value: 'KO', label: 'Korean' },
+  { value: 'LT', label: 'Lithuanian' },
+  { value: 'LV', label: 'Latvian' },
+  { value: 'NB', label: 'Norwegian (Bokmål)' },
+  { value: 'NL', label: 'Dutch' },
+  { value: 'PL', label: 'Polish' },
+  { value: 'PT-BR', label: 'Portuguese (Brazil)' },
+  { value: 'PT-PT', label: 'Portuguese (Portugal)' },
+  { value: 'RO', label: 'Romanian' },
+  { value: 'RU', label: 'Russian' },
+  { value: 'SK', label: 'Slovak' },
+  { value: 'SL', label: 'Slovenian' },
+  { value: 'SV', label: 'Swedish' },
+  { value: 'TR', label: 'Turkish' },
+  { value: 'UK', label: 'Ukrainian' },
+  { value: 'ZH', label: 'Chinese' },
+  { value: 'ZH-HANS', label: 'Chinese (Simplified)' },
+  { value: 'ZH-HANT', label: 'Chinese (Traditional)' }
+] as const;
 
 export interface PublicContentAiDialogData {
   tool: AiTool;
@@ -45,7 +84,6 @@ export interface PublicContentAiDialogResult {
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatDialogTitle,
     MatDialogContent,
     MatDialogActions,
     MatButtonModule,
@@ -55,7 +93,8 @@ export interface PublicContentAiDialogResult {
     MatIconModule,
     MatInputModule,
     MatProgressBarModule,
-    MatSelectModule
+    MatSelectModule,
+    MatTooltipModule
   ],
   templateUrl: './public-content-ai-dialog.component.html',
   styleUrl: './public-content-ai-dialog.component.css',
@@ -73,8 +112,9 @@ export class PublicContentAiDialogComponent {
   readonly result = signal<AiToolResult | null>(null);
 
   readonly tool = this.data.tool;
+  readonly deeplTargetLanguageOptions = DEEPL_TARGET_LANGUAGE_OPTIONS;
   readonly form = this.fb.nonNullable.group({
-    targetLanguage: this.fb.nonNullable.control('English'),
+    targetLanguage: this.fb.nonNullable.control('EN-US'),
     rewriteGoal: this.fb.nonNullable.control('clearer'),
     hashtagCount: this.fb.nonNullable.control(8)
   });
@@ -97,27 +137,6 @@ export class PublicContentAiDialogComponent {
         return this.i18n.t('Quality check');
       case 'content_creator':
         return this.i18n.t('AI Content Creator');
-    }
-  });
-
-  readonly subtitle = computed(() => {
-    switch (this.tool) {
-      case 'proofread':
-        return this.i18n.t('Correct spelling, grammar and punctuation while keeping the original tone.');
-      case 'rewrite':
-        return this.i18n.t('Generate alternative formulations for this message or comment.');
-      case 'translate':
-        return this.i18n.t('Translate the current text into another language.');
-      case 'hashtags':
-        return this.i18n.t('Suggest editorial hashtags based on text, location and media context.');
-      case 'emoji':
-        return this.i18n.t('Generate ready-to-use text variants with fitting emojis placed naturally.');
-      case 'thread':
-        return this.i18n.t('Generate short follow-up comments or replies for the current thread.');
-      case 'quality_check':
-        return this.i18n.t('Review clarity, tone and publication readiness and suggest improvements.');
-      case 'content_creator':
-        return this.i18n.t('Create publishable draft ideas from prompt, links and optional multimedia.');
     }
   });
 
@@ -216,6 +235,10 @@ export class PublicContentAiDialogComponent {
 
   hashtagTrackBy(_index: number, row: string): string {
     return row;
+  }
+
+  deeplLanguageTrackBy(_index: number, option: typeof DEEPL_TARGET_LANGUAGE_OPTIONS[number]): string {
+    return option.value;
   }
 
   qualityVerdictLabel(verdict: string): string {

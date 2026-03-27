@@ -1,34 +1,10 @@
 <div class="dialog-header">
   <div class="dialog-copy">
-    <h2 mat-dialog-title>{{ title() }}</h2>
-    <p>{{ subtitle() }}</p>
+    <h2>{{ title() }}</h2>
   </div>
-
-  <button mat-icon-button type="button" (click)="close()" [attr.aria-label]="i18n.t('Close AI dialog')">
-    <mat-icon>close</mat-icon>
-  </button>
 </div>
 
 <mat-dialog-content class="dialog-content">
-  <div class="dialog-meta">
-    <span class="dialog-meta-chip">
-      <mat-icon>smart_toy</mat-icon>
-      {{ data.model }}
-    </span>
-
-    <span class="dialog-meta-chip">
-      <mat-icon>{{ data.contentType === 'comment' ? 'forum' : 'campaign' }}</mat-icon>
-      {{ data.contentType === 'comment' ? i18n.t('Comment') : i18n.t('Message') }}
-    </span>
-
-    @if (data.locationLabel) {
-      <span class="dialog-meta-chip">
-        <mat-icon>location_on</mat-icon>
-        {{ data.locationLabel }}
-      </span>
-    }
-  </div>
-
   <mat-card class="source-card">
     <mat-card-header>
       <div mat-card-avatar class="avatar avatar-neutral">
@@ -62,7 +38,13 @@
       @if (tool === 'translate') {
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>{{ i18n.t('Target language') }}</mat-label>
-          <input matInput [formControl]="form.controls.targetLanguage" [placeholder]="i18n.t('English')" />
+          <mat-select [formControl]="form.controls.targetLanguage">
+            @for (option of deeplTargetLanguageOptions; track deeplLanguageTrackBy($index, option)) {
+              <mat-option [value]="option.value">
+                {{ i18n.t(option.label) }} ({{ option.value }})
+              </mat-option>
+            }
+          </mat-select>
         </mat-form-field>
       }
 
@@ -90,12 +72,6 @@
         </mat-form-field>
       }
 
-      <div class="run-row">
-        <button mat-flat-button color="primary" type="button" (click)="run()" [disabled]="!canGenerate()">
-          <mat-icon>auto_awesome</mat-icon>
-          {{ i18n.t('Run AI tool') }}
-        </button>
-      </div>
     </mat-card-content>
   </mat-card>
 
@@ -253,6 +229,25 @@
   }
 </mat-dialog-content>
 
-<mat-dialog-actions align="end" class="dialog-actions">
-  <button mat-button type="button" (click)="close()">{{ i18n.t('Close') }}</button>
+<mat-dialog-actions class="dialog-actions">
+  <button
+    mat-icon-button
+    type="button"
+    class="toolbar-action avatar avatar-neutral"
+    (click)="close()"
+    [matTooltip]="i18n.t('Close')"
+    [attr.aria-label]="i18n.t('Close')">
+    <mat-icon>close</mat-icon>
+  </button>
+  <span class="dialog-actions-spacer"></span>
+  <button
+    mat-icon-button
+    type="button"
+    class="toolbar-action avatar avatar-accent"
+    (click)="run()"
+    [disabled]="!canGenerate()"
+    [matTooltip]="i18n.t('Run AI tool')"
+    [attr.aria-label]="i18n.t('Run AI tool')">
+    <mat-icon>auto_awesome</mat-icon>
+  </button>
 </mat-dialog-actions>

@@ -8,19 +8,14 @@
 .dialog-header {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
   gap: 1rem;
-  padding: 1.2rem 1.4rem 0;
+  padding: 1.25rem 1.25rem 0;
 }
 
 .dialog-copy h2 {
-  margin: 0;
-}
-
-.dialog-copy p {
-  margin: .35rem 0 0;
-  color: #6b7280;
-  line-height: 1.45;
+  margin: 0 0 .35rem;
+  font-size: 1.35rem;
+  font-weight: 700;
 }
 
 .dialog-content {
@@ -71,6 +66,30 @@
 
 .avatar-accent {
   background: linear-gradient(135deg, #2563eb, #38bdf8);
+}
+
+.toolbar-action.avatar {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  padding: 0;
+  margin-right: 0;
+  color: #fff !important;
+  transition: transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+}
+
+.toolbar-action.avatar:not([disabled]):hover {
+  transform: translateY(-1px);
+}
+
+.toolbar-action.avatar[disabled] {
+  opacity: .56;
+  box-shadow: none !important;
+}
+
+.toolbar-action.avatar mat-icon {
+  margin: 0;
+  color: currentColor !important;
 }
 
 .source-content,
@@ -173,7 +192,14 @@
 }
 
 .dialog-actions {
-  padding: 0 1.4rem 1.2rem;
+  justify-content: flex-start;
+  gap: .65rem;
+  margin-top: 1rem;
+  padding: 1rem 1.8rem 1.4rem;
+}
+
+.dialog-actions-spacer {
+  flex: 1 1 auto;
 }
 
 @media (max-width: 720px) {
@@ -187,7 +213,7 @@
   }
 
   .dialog-actions {
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding-left: 1.2rem;
+    padding-right: 1.2rem;
   }
 }
