@@ -191,7 +191,7 @@
       <mat-card-content class="tile-body">
 
         <div class="content-url-row">
-          <mat-form-field appearance="outline" class="full-width">
+          <mat-form-field appearance="outline" class="full-width" subscriptSizing="dynamic">
             <mat-label>{{ i18n.t('Content URL') }}</mat-label>
             <input
               matInput
@@ -204,20 +204,6 @@
             <mat-icon>add</mat-icon>
           </button>
         </div>
-
-        @if (hasPendingContentUrl()) {
-          <div class="inline-info">
-            <mat-icon>link</mat-icon>
-            <span>{{ i18n.t('Current source URL will be added automatically when drafts are generated.') }}</span>
-          </div>
-        }
-
-        @if (sourceUrlsForRun().length > 0) {
-          <div class="inline-info">
-            <mat-icon>library_books</mat-icon>
-            <span>{{ i18n.t('Source links ready: {{count}}', { count: sourceUrlsForRun().length }) }}</span>
-          </div>
-        }
 
         @if (contentUrls().length > 0) {
           <div class="url-list">
