@@ -1,6 +1,5 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { io, Socket } from 'socket.io-client';
 import { environment } from '../../environments/environment';
 import { ProfileConfirmRequestComponent } from '../components/user/profile-confirm-request/profile-confirm-request.component';
@@ -12,6 +11,7 @@ import { CryptoService } from './crypto.service';
 import { SystemNotificationService } from './system-notification.service';
 import { TranslationHelperService } from './translation-helper.service';
 import { UserService } from './user.service';
+import { DisplayMessageService } from './display-message.service';
 
 interface UserRoomPayload {
   status: number;
@@ -36,7 +36,7 @@ interface ProfileRequestPayload {
 
 export class SocketioService {
   private readonly dialog = inject(MatDialog);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly userService = inject(UserService);
   private readonly contactService = inject(ContactService);
   private readonly avatarStorage = inject(AvatarStorageService);

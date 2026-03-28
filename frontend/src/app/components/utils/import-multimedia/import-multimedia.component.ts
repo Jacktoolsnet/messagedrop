@@ -6,7 +6,6 @@ import { MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialo
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { EXTERNAL_CONTENT_SETTINGS_KEYS, ExternalContentPlatform } from '../../../interfaces/external-content-platform';
@@ -16,6 +15,7 @@ import { OembedService } from '../../../services/oembed.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { ExternalContentComponent } from '../../legal/external-content/external-content.component';
 import { HelpDialogService } from '../help-dialog/help-dialog.service';
+import { DisplayMessageService } from '../../../services/display-message.service';
 
 type SupportedUrlPlatform = Extract<ExternalContentPlatform, 'youtube' | 'spotify' | 'tiktok' | 'pinterest'>;
 
@@ -53,7 +53,7 @@ export class ImportMultimediaComponent {
   private readonly sanitizer = inject(DomSanitizer);
   private readonly appService = inject(AppService);
   private readonly translation = inject(TranslationHelperService);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   readonly help = inject(HelpDialogService);
   private readonly youtubeHosts = ['youtube.com', 'youtu.be'];
   private readonly spotifyHosts = ['open.spotify.com'];

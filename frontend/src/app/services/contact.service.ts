@@ -1,7 +1,6 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, finalize, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { DisplayMessage } from '../components/utils/display-message/display-message.component';
@@ -17,6 +16,7 @@ import { NetworkService } from './network.service';
 import { SocketioService } from './socketio.service';
 import { TranslationHelperService } from './translation-helper.service';
 import { UserService } from './user.service';
+import { DisplayMessageService } from './display-message.service';
 
 @Injectable({
   providedIn: 'root'
@@ -43,7 +43,7 @@ export class ContactService {
   private readonly userService = inject(UserService);
   private readonly indexedDbService = inject(IndexedDbService);
   private readonly dialog = inject(MatDialog);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly networkService = inject(NetworkService);
   private readonly avatarStorage = inject(AvatarStorageService);
   private readonly i18n = inject(TranslationHelperService);

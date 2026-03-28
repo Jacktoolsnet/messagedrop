@@ -1,13 +1,13 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MessageService } from './message.service';
 import { GeolocationService } from './geolocation.service';
 import { IndexedDbService } from './indexed-db.service';
 import { MapService } from './map.service';
 import { NetworkService } from './network.service';
 import { TranslationHelperService } from './translation-helper.service';
+import { DisplayMessageService } from './display-message.service';
 
 describe('MessageService', () => {
   let service: MessageService;
@@ -16,7 +16,7 @@ describe('MessageService', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
-        { provide: MatSnackBar, useValue: { open: jasmine.createSpy('open') } },
+        { provide: DisplayMessageService, useValue: { open: jasmine.createSpy('open') } },
         { provide: MatDialog, useValue: { open: jasmine.createSpy('open') } },
         { provide: MapService, useValue: {} },
         { provide: GeolocationService, useValue: {} },

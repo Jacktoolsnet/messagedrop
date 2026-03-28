@@ -7,7 +7,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar, MatSnackBarRef } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Meta, Title } from '@angular/platform-browser';
 import { RouterOutlet } from '@angular/router';
@@ -103,6 +102,7 @@ import { UsageProtectionService } from './services/usage-protection.service';
 import { WeatherService } from './services/weather.service';
 import { DiagnosticLoggerService } from './services/diagnostic-logger.service';
 import { isQuotaExceededError } from './utils/storage-error.util';
+import { DisplayMessageRef, DisplayMessageService } from './services/display-message.service';
 
 @Component({
   selector: 'app-root',
@@ -129,7 +129,7 @@ export class AppComponent implements OnInit {
   locationReady = false;
   public myHistory: string[] = [];
   public markerLocations = new Map<string, MarkerLocation>();
-  private snackBarRef?: MatSnackBarRef<unknown>;
+  private snackBarRef?: DisplayMessageRef;
   isUserLocation = false;
   initWatchingPosition = false;
   public mode: typeof Mode = Mode;
@@ -169,7 +169,7 @@ export class AppComponent implements OnInit {
   private readonly weatherService = inject(WeatherService);
   private readonly geoStatisticService = inject(GeoStatisticService);
   private readonly diagnosticLogger = inject(DiagnosticLoggerService);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly dialog = inject(MatDialog);
   private readonly platformLocation = inject(PlatformLocation);
   private readonly translation = inject(TranslationHelperService);

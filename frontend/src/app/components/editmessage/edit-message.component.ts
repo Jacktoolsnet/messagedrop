@@ -9,7 +9,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 import { Location } from '../../interfaces/location';
@@ -33,6 +32,7 @@ import { TextComponent } from '../utils/text/text.component';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { DisplayMessage } from '../utils/display-message/display-message.component';
 import { MAX_PUBLIC_HASHTAGS, normalizeHashtags } from '../../utils/hashtag.util';
+import { DisplayMessageService } from '../../services/display-message.service';
 
 interface TextDialogResult {
   text: string;
@@ -72,7 +72,7 @@ export class EditMessageComponent implements OnInit {
   private readonly userService = inject(UserService);
   private readonly sharedContentService = inject(SharedContentService);
   private readonly oembedService = inject(OembedService);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly matDialog = inject(MatDialog);
   private readonly translation = inject(TranslationHelperService);
   private readonly messageService = inject(MessageService);

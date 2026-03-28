@@ -9,7 +9,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 import { Location } from '../../interfaces/location';
@@ -39,6 +38,7 @@ import { AppService } from '../../services/app.service';
 import { DisplayMessage } from '../utils/display-message/display-message.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
+import { DisplayMessageService } from '../../services/display-message.service';
 
 type ResolvedDsaStatus = 'RECEIVED' | 'UNDER_REVIEW' | 'DECIDED' | 'UNKNOWN';
 type ModerationStatus = 'published' | 'review' | 'hidden';
@@ -119,7 +119,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
   private readonly matDialog = inject(MatDialog);
   public readonly messageDialog = this.matDialog;
   public readonly dialog = this.matDialog;
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly translation = inject(TranslationHelperService);
   readonly help = inject(HelpDialogService);
   private readonly dsaStatusService = inject(DsaStatusService);

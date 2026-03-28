@@ -1,7 +1,6 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { CheckPinComponent } from '../components/pin/check-pin/check-pin.component';
@@ -18,6 +17,7 @@ import { MessageService } from './message.service';
 import { NetworkService } from './network.service';
 import { TranslationHelperService } from './translation-helper.service';
 import { UserService } from './user.service';
+import { DisplayMessageService } from './display-message.service';
 
 type FilePickerWindow = typeof window & {
   showOpenFilePicker?: (options?: {
@@ -51,7 +51,7 @@ export class RestoreService {
 
   private readonly http = inject(HttpClient);
   private readonly dialog = inject(MatDialog);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly userService = inject(UserService);
   private readonly avatarStorage = inject(AvatarStorageService);
   private readonly indexedDbService = inject(IndexedDbService);

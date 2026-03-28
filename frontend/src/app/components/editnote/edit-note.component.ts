@@ -9,7 +9,6 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Location } from '../../interfaces/location';
 import { Mode } from '../../interfaces/mode';
@@ -33,6 +32,7 @@ import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { LocationPickerTileComponent } from '../utils/location-picker/location-picker-tile.component';
 import { TextComponent } from '../utils/text/text.component';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
+import { DisplayMessageService } from '../../services/display-message.service';
 
 interface TextDialogResult {
   text: string;
@@ -73,7 +73,7 @@ export class EditNoteComponent implements OnInit, OnDestroy {
   private readonly oembedService = inject(OembedService);
   private readonly speechService = inject(SpeechService);
   private readonly matDialog = inject(MatDialog);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly translation = inject(TranslationHelperService);
   private readonly hashtagSuggestionService = inject(HashtagSuggestionService);
   readonly help = inject(HelpDialogService);

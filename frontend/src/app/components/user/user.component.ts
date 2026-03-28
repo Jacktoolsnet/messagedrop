@@ -8,7 +8,6 @@ import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatSnackBar, MatSnackBarRef, SimpleSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { moderationReasonTranslationKey } from '../../constants/user-moderation-reasons';
 import { UserModerationAppeal, UserModerationAppealStatus, UserModerationTarget } from '../../interfaces/user-moderation-response.interface';
@@ -16,6 +15,7 @@ import { TranslationHelperService } from '../../services/translation-helper.serv
 import { UserService } from '../../services/user.service';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
+import { DisplayMessageRef, DisplayMessageService } from '../../services/display-message.service';
 
 @Component({
   selector: 'app-user',
@@ -37,12 +37,12 @@ import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.comp
   styleUrl: './user.component.css'
 })
 export class UserComponent implements OnInit {
-  private snackBarRef?: MatSnackBarRef<SimpleSnackBar>;
+  private snackBarRef?: DisplayMessageRef;
   public connectHint = '';
   readonly userService = inject(UserService);
   readonly help = inject(HelpDialogService);
   private readonly dialogRef = inject(MatDialogRef<UserComponent>);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly translation = inject(TranslationHelperService);
   private readonly fb = inject(FormBuilder);
 

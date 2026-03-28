@@ -1,7 +1,6 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable, signal, WritableSignal } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, firstValueFrom, forkJoin, map, Observable, of, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { DisplayMessage } from '../components/utils/display-message/display-message.component';
@@ -18,6 +17,7 @@ import { IndexedDbService } from './indexed-db.service';
 import { MapService } from './map.service';
 import { NetworkService } from './network.service';
 import { TranslationHelperService } from './translation-helper.service';
+import { DisplayMessageService } from './display-message.service';
 import {
   MAX_PUBLIC_HASHTAGS,
   normalizeHashtags,
@@ -54,7 +54,7 @@ export class MessageService {
     })
   };
 
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly dialog = inject(MatDialog);
   private readonly http = inject(HttpClient);
   private readonly mapService = inject(MapService);

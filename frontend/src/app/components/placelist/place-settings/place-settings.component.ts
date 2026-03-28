@@ -8,7 +8,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSliderModule } from '@angular/material/slider';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 import { AvatarAttribution } from '../../../interfaces/avatar-attribution';
@@ -25,6 +24,7 @@ import { AvatarSourceChoice, AvatarSourceDialogComponent } from '../../utils/ava
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 import { UnsplashComponent } from '../../utils/unsplash/unsplash.component';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
+import { DisplayMessageService } from '../../../services/display-message.service';
 
 @Component({
   selector: 'app-place',
@@ -68,7 +68,7 @@ export class PlaceProfileComponent {
   private oriAvatarAttribution: AvatarAttribution | undefined = undefined;
 
   readonly dialogRef = inject(MatDialogRef<PlaceProfileComponent>);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly translation = inject(TranslationHelperService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly ngZone = inject(NgZone);

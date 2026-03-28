@@ -10,7 +10,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatSnackBar, MatSnackBarRef, SimpleSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { GetNominatimAddressResponse } from '../../interfaces/get-nominatim-address-response copy';
 import { Location } from '../../interfaces/location';
@@ -32,6 +31,7 @@ import { PlaceProfileComponent } from './place-settings/place-settings.component
 import { PlaceSortDialogComponent } from './place-sort-dialog/place-sort-dialog.component';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { DisplayMessage } from '../utils/display-message/display-message.component';
+import { DisplayMessageRef, DisplayMessageService } from '../../services/display-message.service';
 
 interface TimezoneResponse { status: number; timezone: string }
 
@@ -64,7 +64,7 @@ export class PlacelistComponent {
   readonly userService = inject(UserService);
   readonly dialogRef = inject(MatDialogRef<PlacelistComponent>);
   private readonly matDialog = inject(MatDialog);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly translation = inject(TranslationHelperService);
   readonly help = inject(HelpDialogService);
   private readonly dialogData = inject<unknown>(MAT_DIALOG_DATA);
@@ -73,7 +73,7 @@ export class PlacelistComponent {
   readonly hasPlaces = computed(() => this.placesSignal().length > 0);
   private placeToDelete?: Place;
   public mode: typeof Mode = Mode;
-  private snackBarRef?: MatSnackBarRef<SimpleSnackBar>;
+  private snackBarRef?: DisplayMessageRef;
   public subscriptionError = false;
 
   constructor() {

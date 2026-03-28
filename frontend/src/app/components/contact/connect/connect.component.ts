@@ -6,13 +6,13 @@ import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, Ma
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Contact } from '../../../interfaces/contact';
 import { Mode } from '../../../interfaces/mode';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
+import { DisplayMessageService } from '../../../services/display-message.service';
 
 @Component({
   selector: 'app-contact',
@@ -34,7 +34,7 @@ import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.c
 })
 export class ConnectComponent {
   @ViewChild('connectIdInput') connectIdInput?: ElementRef<HTMLInputElement>;
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly translation = inject(TranslationHelperService);
   private readonly dialogRef = inject(MatDialogRef<ConnectComponent>);
   readonly help = inject(HelpDialogService);

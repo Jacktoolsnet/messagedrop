@@ -8,7 +8,6 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDial
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { TileFileEntry, TileSetting } from '../../../../interfaces/tile-settings';
 import { TileFileService } from '../../../../services/tile-file.service';
@@ -17,6 +16,7 @@ import { getFileIcon } from '../../../../utils/file-icon.util';
 import { isQuotaExceededError } from '../../../../utils/storage-error.util';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
+import { DisplayMessageService } from '../../../../services/display-message.service';
 import {
   TileDisplaySettingsDialogComponent,
   TileDisplaySettingsDialogData,
@@ -57,7 +57,7 @@ export class FileTileEditComponent {
   private readonly dialog = inject(MatDialog);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly fileTileService = inject(TileFileService);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly translation = inject(TranslationHelperService);
   readonly help = inject(HelpDialogService);
   readonly data = inject<FileTileDialogData>(MAT_DIALOG_DATA);

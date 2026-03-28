@@ -7,7 +7,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Contact } from '../../../interfaces/contact';
 import { Mode } from '../../../interfaces/mode';
@@ -23,6 +22,7 @@ import { ShowmultimediaComponent } from "../../multimedia/showmultimedia/showmul
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 import { TenorSearchComponent } from '../../utils/tenor-search/tenor-search.component';
 import { TextComponent } from '../../utils/text/text.component';
+import { DisplayMessageService } from '../../../services/display-message.service';
 
 interface TenorDialogResult {
   title?: string;
@@ -56,7 +56,7 @@ interface TextDialogResult {
 export class ContactEditMessageComponent implements OnInit {
   readonly userService = inject(UserService);
   private readonly oembedService = inject(OembedService);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly matDialog = inject(MatDialog);
   readonly help = inject(HelpDialogService);
   readonly dialogRef = inject(MatDialogRef<ContactEditMessageComponent>);

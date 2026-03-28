@@ -4,7 +4,6 @@ import { Component, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Mode } from '../../../interfaces/mode';
 import { Place } from '../../../interfaces/place';
@@ -13,6 +12,7 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 import { PlaceProfileComponent } from '../place-settings/place-settings.component';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
+import { DisplayMessageService } from '../../../services/display-message.service';
 
 interface PlaceSortDialogData {
   places: Place[];
@@ -43,7 +43,7 @@ export class PlaceSortDialogComponent {
   private readonly dialogRef = inject(MatDialogRef<PlaceSortDialogComponent>);
   private readonly dialog = inject(MatDialog);
   private readonly placeService = inject(PlaceService);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly translation = inject(TranslationHelperService);
   readonly help = inject(HelpDialogService);
   private readonly data = inject<PlaceSortDialogData>(MAT_DIALOG_DATA);

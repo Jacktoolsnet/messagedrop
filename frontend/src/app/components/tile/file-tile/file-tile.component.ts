@@ -3,7 +3,6 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges
 
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Contact } from '../../../interfaces/contact';
 import { Place } from '../../../interfaces/place';
@@ -14,6 +13,7 @@ import { TileFileService } from '../../../services/tile-file.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { getFileIcon } from '../../../utils/file-icon.util';
 import { FileTileEditComponent } from './file-tile-edit/file-tile-edit.component';
+import { DisplayMessageService } from '../../../services/display-message.service';
 
 @Component({
   selector: 'app-file-tile',
@@ -32,7 +32,7 @@ export class FileTileComponent implements OnChanges {
   private readonly placeService = inject(PlaceService);
   private readonly contactService = inject(ContactService);
   private readonly fileTileService = inject(TileFileService);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly translation = inject(TranslationHelperService);
 

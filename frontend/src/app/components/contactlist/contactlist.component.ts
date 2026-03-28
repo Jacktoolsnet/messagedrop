@@ -6,7 +6,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatSnackBar, MatSnackBarRef, SimpleSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Connect } from '../../interfaces/connect';
 import { Contact } from '../../interfaces/contact';
@@ -31,6 +30,7 @@ import { QrcodeComponent } from '../utils/qrcode/qrcode.component';
 import { ScannerComponent } from '../utils/scanner/scanner.component';
 import { ContactSortDialogComponent } from './contact-sort-dialog/contact-sort-dialog.component';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
+import { DisplayMessageRef, DisplayMessageService } from '../../services/display-message.service';
 
 interface ConnectDialogResult {
   connectId?: string;
@@ -54,7 +54,7 @@ interface ConnectDialogResult {
   styleUrl: './contactlist.component.css'
 })
 export class ContactlistComponent {
-  private snackBarRef?: MatSnackBarRef<SimpleSnackBar>;
+  private snackBarRef?: DisplayMessageRef;
   public readonly userService = inject(UserService);
   public readonly socketioService = inject(SocketioService);
   public readonly contactService = inject(ContactService);
@@ -63,7 +63,7 @@ export class ContactlistComponent {
   private readonly oembedService = inject(OembedService);
   private readonly sharedContentService = inject(SharedContentService);
   private readonly style = inject(StyleService);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly matDialog = inject(MatDialog);
   private readonly contactMessageService = inject(ContactMessageService);
   private readonly translation = inject(TranslationHelperService);

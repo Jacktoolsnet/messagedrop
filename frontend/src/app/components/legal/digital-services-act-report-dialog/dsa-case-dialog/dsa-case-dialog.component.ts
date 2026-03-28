@@ -10,7 +10,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { firstValueFrom } from 'rxjs';
@@ -25,6 +24,7 @@ import { DsaStatusService } from '../../../../services/dsa-status.service';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
+import { DisplayMessageService } from '../../../../services/display-message.service';
 
 @Component({
   selector: 'app-dsa-case-dialog',
@@ -46,7 +46,6 @@ import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-heade
     MatTooltipModule,
     EvidenceInputComponent,
     DatePipe,
-    MatSnackBarModule,
     TranslocoPipe
   ],
   templateUrl: './dsa-case-dialog.component.html',
@@ -132,7 +131,7 @@ export class DsaCaseDialogComponent implements OnInit {
 
   private readonly service = inject(DsaStatusService);
   private readonly fb = inject(FormBuilder);
-  private readonly snack = inject(MatSnackBar);
+  private readonly snack = inject(DisplayMessageService);
   private readonly translation = inject(TranslationHelperService);
   private readonly dialogRef = inject(MatDialogRef<DsaCaseDialogComponent>);
   private readonly dialogData = inject<{ token: string; message: Message }>(MAT_DIALOG_DATA);

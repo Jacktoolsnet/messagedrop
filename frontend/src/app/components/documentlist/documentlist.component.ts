@@ -4,7 +4,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { BoundingBox } from '../../interfaces/bounding-box';
 import { LocalDocument } from '../../interfaces/local-document';
@@ -20,6 +19,7 @@ import { isQuotaExceededError } from '../../utils/storage-error.util';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { DeleteDocumentComponent } from './delete-document/delete-document.component';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
+import { DisplayMessageService } from '../../services/display-message.service';
 
 interface DocumentDialogData {
   location: Location;
@@ -44,7 +44,7 @@ interface DocumentDialogData {
   standalone: true
 })
 export class DocumentlistComponent implements OnInit {
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly dialogData = inject<DocumentDialogData>(MAT_DIALOG_DATA);
   public readonly userService = inject(UserService);
   private readonly localDocumentService = inject(LocalDocumentService);

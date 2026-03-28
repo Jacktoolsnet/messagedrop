@@ -1,6 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Buffer } from 'buffer';
 import { catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -14,6 +13,7 @@ import { CryptoService } from './crypto.service';
 import { NetworkService } from './network.service';
 import { SocketioService } from './socketio.service';
 import { TranslationHelperService } from './translation-helper.service';
+import { DisplayMessageService } from './display-message.service';
 
 @Injectable({
   providedIn: 'root'
@@ -29,7 +29,7 @@ export class ConnectService {
   private readonly contactService = inject(ContactService);
   private readonly cryptoService = inject(CryptoService);
   private readonly http = inject(HttpClient);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly networkService = inject(NetworkService);
   private readonly i18n = inject(TranslationHelperService);
 

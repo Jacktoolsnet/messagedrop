@@ -1,7 +1,6 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { CreatePinComponent } from '../components/pin/create-pin/create-pin.component';
@@ -14,6 +13,7 @@ import { IndexedDbService } from './indexed-db.service';
 import { NetworkService } from './network.service';
 import { TranslationHelperService } from './translation-helper.service';
 import { UserService } from './user.service';
+import { DisplayMessageService } from './display-message.service';
 
 type DirectoryPickerWindow = typeof window & {
   showDirectoryPicker?: () => Promise<FileSystemDirectoryHandle>;
@@ -29,7 +29,7 @@ type DirectoryPickerWindow = typeof window & {
 export class BackupService {
   private readonly http = inject(HttpClient);
   private readonly dialog = inject(MatDialog);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly networkService = inject(NetworkService);
   private readonly userService = inject(UserService);
   private readonly indexedDbService = inject(IndexedDbService);

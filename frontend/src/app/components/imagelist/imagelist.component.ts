@@ -9,7 +9,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 import { BoundingBox } from '../../interfaces/bounding-box';
@@ -28,6 +27,7 @@ import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { DeleteImageComponent } from './delete-image/delete-image.component';
 import { OverrideExifDataComponent } from './override-exif-data/override-exif-data.component';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
+import { DisplayMessageService } from '../../services/display-message.service';
 
 interface ImageDialogData {
   location: Location;
@@ -58,7 +58,7 @@ interface ImageDialogData {
   standalone: true
 })
 export class ImagelistComponent implements OnInit, OnDestroy {
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly indexedDbService = inject(IndexedDbService);
   private readonly dialogData = inject<ImageDialogData>(MAT_DIALOG_DATA);
   public readonly userService = inject(UserService);

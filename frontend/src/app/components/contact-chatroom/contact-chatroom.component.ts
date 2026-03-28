@@ -5,7 +5,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 import { Contact } from '../../interfaces/contact';
@@ -36,6 +35,7 @@ import { LocationPreviewComponent } from '../utils/location-preview/location-pre
 import { ExperienceSearchComponent } from '../utils/experience-search/experience-search.component';
 import { ExperienceSearchDetailDialogComponent } from '../utils/experience-search/detail-dialog/experience-search-detail-dialog.component';
 import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
+import { DisplayMessageService } from '../../services/display-message.service';
 
 interface ChatroomMessage {
   id: string;
@@ -89,7 +89,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   private readonly dialogRef = inject(MatDialogRef<ContactChatroomComponent>);
   private readonly contactId = inject<string>(MAT_DIALOG_DATA);
   private readonly translateService = inject(TranslateService);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly translation = inject(TranslationHelperService);
   private readonly languageService = inject(LanguageService);
 

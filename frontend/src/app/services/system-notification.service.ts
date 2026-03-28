@@ -1,6 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { NotificationCountResponse } from '../interfaces/notification-count-response';
@@ -9,6 +8,7 @@ import { SystemNotification, SystemNotificationFilter } from '../interfaces/syst
 import { NetworkService } from './network.service';
 import { TranslationHelperService } from './translation-helper.service';
 import { UserService } from './user.service';
+import { DisplayMessageService } from './display-message.service';
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +30,7 @@ export class SystemNotificationService {
   private readonly http = inject(HttpClient);
   private readonly userService = inject(UserService);
   private readonly networkService = inject(NetworkService);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly i18n = inject(TranslationHelperService);
 
   getNotificationsSignal() {
