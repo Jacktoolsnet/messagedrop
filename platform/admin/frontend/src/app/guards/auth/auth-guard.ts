@@ -6,15 +6,13 @@ import { hasAllowedRole } from '../../utils/admin-role-access';
 export const authGuard: CanActivateFn = (route) => {
   const auth = inject(AuthService);
   const router = inject(Router);
-  if (!auth.isLoggedIn()) {
-    router.navigate(['/login']);
-    return false;
+  if (!auth.hasValidSession()) {
+    return router.createUrlTree(['/login']);
   }
 
   const allowedRoles = route.data?.['allowedRoles'];
   if (Array.isArray(allowedRoles) && allowedRoles.length > 0 && !hasAllowedRole(auth.role(), allowedRoles)) {
-    router.navigate(['/dashboard']);
-    return false;
+    return router.createUrlTree(['/dashboard']);
   }
 
   return true;

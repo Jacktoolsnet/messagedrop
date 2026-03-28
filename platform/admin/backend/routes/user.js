@@ -23,6 +23,7 @@ const { resolveBaseUrl } = require('../utils/adminLogForwarder');
 const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET;
 const ADMIN_ISS = process.env.ADMIN_ISS || 'https://admin-auth.messagedrop.app/';
 const ADMIN_AUD = process.env.ADMIN_AUD || 'messagedrop-admin';
+const ADMIN_JWT_TTL = process.env.ADMIN_JWT_TTL || '8h';
 const OTP_TTL_MS = Number(process.env.ADMIN_OTP_TTL_MS || 5 * 60 * 1000);
 const OTP_LENGTH = 6;
 const ADMIN_ROOT_EMAIL = process.env.ADMIN_ROOT_EMAIL || process.env.MAIL_ADDRESS || process.env.MAIL_USER || '';
@@ -602,7 +603,7 @@ router.post('/login/verify', [verifyLimiter, verifySlowdown], async (req, res, n
             const token = jwt.sign(
                 payload,
                 ADMIN_JWT_SECRET,
-                { expiresIn: '2h', issuer: ADMIN_ISS, audience: ADMIN_AUD }
+                { expiresIn: ADMIN_JWT_TTL, issuer: ADMIN_ISS, audience: ADMIN_AUD }
             );
             res.json({ token });
         });

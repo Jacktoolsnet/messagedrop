@@ -35,6 +35,7 @@ export const routes: Routes = [
     { path: 'transparency', component: TransparencyComponent },
     { path: 'public-statistics', component: PublicOverviewComponent },
     { path: '', component: LoginComponent },
+    { path: 'login', component: LoginComponent },
     {
         path: 'dashboard',
         component: AdminDashboardComponent,

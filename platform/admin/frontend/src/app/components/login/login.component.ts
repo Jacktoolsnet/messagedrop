@@ -1,11 +1,11 @@
-import { ChangeDetectorRef, Component, ElementRef, ViewChild, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { APP_VERSION_INFO } from '../../../environments/version';
 import { AuthService } from '../../services/auth/auth.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
@@ -26,7 +26,7 @@ import { DisplayMessageService } from '../../services/display-message.service';
     RouterLink
   ]
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   @ViewChild('otpInput') private otpInput?: ElementRef<HTMLInputElement>;
 
   readonly appVersion = APP_VERSION_INFO;
@@ -42,6 +42,13 @@ export class LoginComponent {
   private readonly authService = inject(AuthService);
   private readonly snackBar = inject(DisplayMessageService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly router = inject(Router);
+
+  ngOnInit(): void {
+    if (this.authService.hasValidSession()) {
+      void this.router.navigate(['/dashboard']);
+    }
+  }
 
   private runAsync(update: () => void) {
     queueMicrotask(() => {

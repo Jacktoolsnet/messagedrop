@@ -6,7 +6,5 @@ import { appConfig } from './app/app.config';
 
 registerLocaleData(localeDe);
 
-localStorage.removeItem('admin_token');
-
 bootstrapApplication(App, appConfig)
   .catch((err) => console.error(err));
