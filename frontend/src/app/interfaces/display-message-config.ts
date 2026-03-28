@@ -8,5 +8,6 @@ export interface DisplayMessageConfig {
     secondaryButton?: string,
     delay: number,
     showSpinner: boolean,
-    autoclose: boolean
+    autoclose: boolean,
+    layout?: 'dialog' | 'toast'
 }
