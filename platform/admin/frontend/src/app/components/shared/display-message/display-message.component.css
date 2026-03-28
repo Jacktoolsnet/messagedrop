@@ -167,9 +167,7 @@
       color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 12%, transparent) 100%
     );
   border: 0;
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 18%, transparent),
-    0 10px 22px color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 14%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 18%, transparent);
   transition:
     background-color 140ms ease,
     box-shadow 140ms ease,
@@ -191,9 +189,7 @@
       color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 22%, white) 0%,
       color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 16%, transparent) 100%
     );
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 22%, transparent),
-    0 12px 26px color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 18%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 22%, transparent);
 }
 
 .toast-dismiss:focus-visible {
