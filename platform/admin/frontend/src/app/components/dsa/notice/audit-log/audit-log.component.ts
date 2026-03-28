@@ -3,11 +3,11 @@ import { Component, Input, OnChanges, SimpleChanges, inject, signal } from '@ang
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { DsaAuditEntry } from '../../../../interfaces/dsa-audit-entry.interface';
 import { DsaNoticeStatus, isDsaNoticeStatus } from '../../../../interfaces/dsa-notice-status.type';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
+import { DisplayMessageService } from '../../../../services/display-message.service';
 
 type KnownAction =
   | 'status_change'
@@ -34,7 +34,7 @@ export class AuditLogComponent implements OnChanges {
   @Input() noticeId: string | null = null;
 
   private dsa = inject(DsaService);
-  private snack = inject(MatSnackBar);
+  private snack = inject(DisplayMessageService);
   readonly i18n = inject(TranslationHelperService);
 
   loading = signal(false);

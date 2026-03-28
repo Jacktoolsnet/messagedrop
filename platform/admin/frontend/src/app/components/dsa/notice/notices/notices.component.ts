@@ -11,7 +11,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
@@ -30,6 +29,7 @@ import { TranslationHelperService } from '../../../../services/translation-helpe
 import { DecisionDialogComponent } from '../../decisions/decision-dialog/decision-dialog.component';
 import { NoticeDetailComponent } from '../notice-detail/notice-detail.component';
 import { NotifyDialogComponent } from '../notify-dialog/notify-dialog.component';
+import { DisplayMessageService } from '../../../../services/display-message.service';
 
 type NoticePreviewContent = ReportedContentPayload;
 
@@ -60,7 +60,7 @@ type NoticePreviewContent = ReportedContentPayload;
 export class NoticesComponent implements OnInit, OnDestroy {
 
   private dsa = inject(DsaService);
-  private snack = inject(MatSnackBar);
+  private snack = inject(DisplayMessageService);
   private fb = inject(FormBuilder);
   private dialog = inject(MatDialog);
   readonly i18n = inject(TranslationHelperService);

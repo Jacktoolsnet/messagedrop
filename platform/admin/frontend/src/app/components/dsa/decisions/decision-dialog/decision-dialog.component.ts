@@ -9,7 +9,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { map, startWith, Subject, takeUntil } from 'rxjs';
 import { DsaDecisionOutcome, DsaTextBlock } from '../../../../interfaces/dsa-text-block.interface';
@@ -17,6 +16,7 @@ import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { DialogActionBarComponent } from '../../../shared/dialog-action-bar/dialog-action-bar.component';
 import { DialogHeaderComponent } from '../../../shared/dialog-header/dialog-header.component';
+import { DisplayMessageService } from '../../../../services/display-message.service';
 
 export type DecisionOutcome = DsaDecisionOutcome;
 export interface DecisionDialogResult {
@@ -39,7 +39,7 @@ export interface DecisionDialogResult {
 export class DecisionDialogComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private dsa = inject(DsaService);
-  private snack = inject(MatSnackBar);
+  private snack = inject(DisplayMessageService);
   private ref = inject(MatDialogRef<DecisionDialogComponent, DecisionDialogResult | false>);
   readonly i18n = inject(TranslationHelperService);
   data = inject<{ noticeId: string }>(MAT_DIALOG_DATA);

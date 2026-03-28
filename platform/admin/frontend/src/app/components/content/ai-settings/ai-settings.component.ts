@@ -10,13 +10,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { finalize, startWith } from 'rxjs';
 import { AiModel } from '../../../interfaces/ai-model.interface';
 import { AiService } from '../../../services/content/ai.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
+import { DisplayMessageService } from '../../../services/display-message.service';
 
 @Component({
   selector: 'app-ai-settings',
@@ -43,7 +43,7 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
 export class AiSettingsComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly aiService = inject(AiService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);

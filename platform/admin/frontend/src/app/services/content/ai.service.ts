@@ -1,6 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, finalize, map, Observable, of, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AiModel } from '../../interfaces/ai-model.interface';
@@ -9,6 +8,7 @@ import { AiToolRequest } from '../../interfaces/ai-tool-request.interface';
 import { AiToolResult } from '../../interfaces/ai-tool-result.interface';
 import { AiUsage } from '../../interfaces/ai-usage.interface';
 import { TranslationHelperService } from '../translation-helper.service';
+import { DisplayMessageService } from '../display-message.service';
 
 interface AiSettingsResponse {
   status: number;
@@ -38,7 +38,7 @@ interface AiUsageResponse {
 })
 export class AiService {
   private readonly http = inject(HttpClient);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly i18n = inject(TranslationHelperService);
   private readonly baseUrl = `${environment.apiUrl}/ai`;
 

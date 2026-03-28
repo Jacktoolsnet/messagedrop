@@ -13,7 +13,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterLink } from '@angular/router';
@@ -28,6 +27,7 @@ import { DsaService } from '../../../services/dsa/dsa/dsa.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { NoticeDetailComponent } from '../notice/notice-detail/notice-detail.component';
 import { NotificationDialogComponent } from './notification-dialog/notification-dialog.component';
+import { DisplayMessageService } from '../../../services/display-message.service';
 
 interface NoticeStatusMeta {
   label: string;
@@ -65,7 +65,6 @@ type NoticeContentPreview = ReportedContentPayload;
     MatProgressBarModule,
     MatCardModule,
     MatChipsModule,
-    MatSnackBarModule,
     MatDialogModule,
     MatTooltipModule,
     MatButtonToggleModule
@@ -76,7 +75,7 @@ type NoticeContentPreview = ReportedContentPayload;
 export class NotificationsComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly dsa = inject(DsaService);
-  private readonly snack = inject(MatSnackBar);
+  private readonly snack = inject(DisplayMessageService);
   private readonly dialog = inject(MatDialog);
   readonly i18n = inject(TranslationHelperService);
 

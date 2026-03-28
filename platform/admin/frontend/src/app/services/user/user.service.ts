@@ -1,12 +1,12 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, of, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { CreateUserPayload } from '../../interfaces/create-user-payload.interface';
 import { UpdateUserPayload } from '../../interfaces/update-user-payload.interface';
 import { User } from '../../interfaces/user.interface';
 import { TranslationHelperService } from '../translation-helper.service';
+import { DisplayMessageService } from '../display-message.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +17,7 @@ export class UserService {
 
   private readonly baseUrl = `${environment.apiUrl}/user`;
   private readonly http = inject(HttpClient);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly i18n = inject(TranslationHelperService);
 
   private handleError = (error: unknown) => {

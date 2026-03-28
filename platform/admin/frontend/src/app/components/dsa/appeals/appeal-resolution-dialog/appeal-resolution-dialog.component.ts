@@ -7,12 +7,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { DecisionOutcome } from '../../decisions/decision-dialog/decision-dialog.component';
 import { DialogActionBarComponent } from '../../../shared/dialog-action-bar/dialog-action-bar.component';
 import { DialogHeaderComponent } from '../../../shared/dialog-header/dialog-header.component';
+import { DisplayMessageService } from '../../../../services/display-message.service';
 
 export interface AppealResolutionData {
   outcome: string | null;
@@ -48,7 +48,7 @@ export interface AppealResolutionDialogData {
 })
 export class AppealResolutionDialogComponent {
   private readonly fb = inject(FormBuilder);
-  private readonly snack = inject(MatSnackBar);
+  private readonly snack = inject(DisplayMessageService);
   private readonly dsa = inject(DsaService);
   private readonly dialogRef = inject(MatDialogRef<AppealResolutionDialogComponent, AppealResolutionData | null>);
   readonly i18n = inject(TranslationHelperService);

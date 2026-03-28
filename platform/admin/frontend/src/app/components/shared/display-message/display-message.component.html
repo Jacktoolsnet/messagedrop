@@ -1,41 +1,75 @@
-<div class="dialog-container">
-  @if (data.image) {
-    <img [src]="data.image" alt="Display message" class="display-message-image" />
-  }
+@if (data.layout === 'toast') {
+  <div class="toast-container">
+    @if (data.icon) {
+      <mat-icon aria-hidden="true" class="toast-icon">{{ data.icon }}</mat-icon>
+    }
 
-  @if (data.icon) {
-    <div class="center">
-      <mat-icon aria-hidden="true" class="display-message-icon">{{ data.icon }}</mat-icon>
-    </div>
-  }
-
-  @if (data.title) {
-    <h2>{{ data.title }}</h2>
-  }
-
-  @if (data.message) {
-    <p class="multiline-text">{{ data.message }}</p>
-  }
-
-  @if (data.showSpinner) {
-    <div class="center">
-      <mat-spinner></mat-spinner>
-    </div>
-  }
-
-  @if (showOk && (data.button || data.secondaryButton)) {
-    <div class="dialog-actions">
-      @if (data.secondaryButton) {
-        <button mat-stroked-button color="primary" type="button" (click)="onSecondaryClick()">
-          {{ data.secondaryButton }}
-        </button>
+    <div class="toast-content">
+      @if (data.title) {
+        <h2>{{ data.title }}</h2>
       }
 
-      @if (data.button) {
-        <button mat-raised-button color="primary" type="button" (click)="onPrimaryClick()">
-          {{ data.button }}
-        </button>
+      @if (data.message) {
+        <p class="multiline-text">{{ data.message }}</p>
+      }
+
+      @if (showOk() && (data.button || data.secondaryButton)) {
+        <div class="toast-actions">
+          @if (data.secondaryButton) {
+            <button mat-stroked-button color="primary" type="button" (click)="onSecondaryClick()">
+              {{ data.secondaryButton }}
+            </button>
+          }
+
+          @if (data.button) {
+            <button mat-button color="primary" type="button" (click)="onPrimaryClick()">
+              {{ data.button }}
+            </button>
+          }
+        </div>
       }
     </div>
-  }
-</div>
+  </div>
+} @else {
+  <div class="dialog-container">
+    @if (data.image) {
+      <img [src]="data.image" alt="Display message" class="display-message-image" />
+    }
+
+    @if (data.icon) {
+      <div class="center">
+        <mat-icon aria-hidden="true" class="display-message-icon">{{ data.icon }}</mat-icon>
+      </div>
+    }
+
+    @if (data.title) {
+      <h2>{{ data.title }}</h2>
+    }
+
+    @if (data.message) {
+      <p class="multiline-text">{{ data.message }}</p>
+    }
+
+    @if (data.showSpinner) {
+      <div class="center">
+        <mat-spinner></mat-spinner>
+      </div>
+    }
+
+    @if (showOk() && (data.button || data.secondaryButton)) {
+      <div class="dialog-actions">
+        @if (data.secondaryButton) {
+          <button mat-stroked-button color="primary" type="button" (click)="onSecondaryClick()">
+            {{ data.secondaryButton }}
+          </button>
+        }
+
+        @if (data.button) {
+          <button mat-raised-button color="primary" type="button" (click)="onPrimaryClick()">
+            {{ data.button }}
+          </button>
+        }
+      </div>
+    }
+  </div>
+}

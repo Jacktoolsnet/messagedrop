@@ -7,7 +7,6 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angu
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { environment } from '../../../../../environments/environment';
 import { USER_ACCOUNT_BLOCK_REASONS, USER_POSTING_BLOCK_REASONS, findModerationReasonLabel } from '../../../../constants/user-moderation-reasons';
@@ -22,6 +21,7 @@ import { NoticeAppealsComponent } from '../appeals/notice-appeals.component';
 import { EvidenceListComponent } from "../evidence/evidence-list/evidence-list.component";
 import { ReportedContentPayload, ReportedMultimedia } from '../../../../interfaces/reported-content.interface';
 import { parseReportedContentPayload } from '../../../../utils/reported-content.util';
+import { DisplayMessageService } from '../../../../services/display-message.service';
 
 // Optional: wenn du die vorhandene PublicMessageDetailComponent nutzen willst
 // import { PublicMessageDetailComponent } from '../../../shared/public-message-detail/public-message-detail.component';
@@ -57,7 +57,7 @@ export class NoticeDetailComponent implements OnInit {
   private dsa = inject(DsaService);
   private http = inject(HttpClient);
   private dialog = inject(MatDialog);
-  private snack = inject(MatSnackBar);
+  private snack = inject(DisplayMessageService);
   private sanitizer = inject(DomSanitizer);
   readonly i18n = inject(TranslationHelperService);
   makingScreenshot = signal(false);

@@ -8,11 +8,11 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { DialogActionBarComponent } from '../../../shared/dialog-action-bar/dialog-action-bar.component';
 import { DialogHeaderComponent } from '../../../shared/dialog-header/dialog-header.component';
+import { DisplayMessageService } from '../../../../services/display-message.service';
 
 @Component({
   selector: 'app-notify-dialog',
@@ -34,7 +34,7 @@ import { DialogHeaderComponent } from '../../../shared/dialog-header/dialog-head
 })
 export class NotifyDialogComponent {
   private fb = inject(FormBuilder);
-  private snack = inject(MatSnackBar);
+  private snack = inject(DisplayMessageService);
   private dsa = inject(DsaService);
   private ref = inject(MatDialogRef<NotifyDialogComponent>);
   readonly i18n = inject(TranslationHelperService);

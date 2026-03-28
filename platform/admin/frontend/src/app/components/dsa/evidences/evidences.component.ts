@@ -10,7 +10,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
@@ -24,6 +23,7 @@ import { DsaService } from '../../../services/dsa/dsa/dsa.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { EvidenceListComponent } from '../notice/evidence/evidence-list/evidence-list.component';
 import { NoticeDetailComponent } from '../notice/notice-detail/notice-detail.component';
+import { DisplayMessageService } from '../../../services/display-message.service';
 
 interface NoticeStatusMeta {
   label: string;
@@ -58,7 +58,7 @@ interface NoticeStatusMeta {
 export class EvidencesComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly dsa = inject(DsaService);
-  private readonly snack = inject(MatSnackBar);
+  private readonly snack = inject(DisplayMessageService);
   private readonly dialog = inject(MatDialog);
   readonly i18n = inject(TranslationHelperService);
 

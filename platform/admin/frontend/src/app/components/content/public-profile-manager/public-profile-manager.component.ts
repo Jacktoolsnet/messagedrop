@@ -12,7 +12,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelect } from '@angular/material/select';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { finalize, startWith } from 'rxjs';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
@@ -23,6 +22,7 @@ import { UnsplashPhoto } from '../../../interfaces/unsplash-response.interface';
 import { ContentStyleOption, ContentStyleService } from '../../../services/content/content-style.service';
 import { PublicProfileService } from '../../../services/content/public-profile.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
+import { DisplayMessageService } from '../../../services/display-message.service';
 
 @Component({
   selector: 'app-public-profile-manager',
@@ -50,7 +50,7 @@ export class PublicProfileManagerComponent {
   private readonly fb = inject(FormBuilder);
   private readonly dialog = inject(MatDialog);
   private readonly router = inject(Router);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly publicProfileService = inject(PublicProfileService);
   private readonly styleService = inject(ContentStyleService);
   readonly i18n = inject(TranslationHelperService);

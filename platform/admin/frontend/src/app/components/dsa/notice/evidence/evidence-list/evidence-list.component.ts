@@ -5,12 +5,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { DsaEvidence } from '../../../../../interfaces/dsa-evidence.interface';
 import { DsaService } from '../../../../../services/dsa/dsa/dsa.service';
 import { TranslationHelperService } from '../../../../../services/translation-helper.service';
 import { AddEvidenceDialogComponent } from '../add-evidence-dialog/add-evidence-dialog.component';
 import { HttpResponse } from '@angular/common/http';
+import { DisplayMessageService } from '../../../../../services/display-message.service';
 
 @Component({
   selector: 'app-evidence-list',
@@ -23,7 +23,7 @@ export class EvidenceListComponent implements OnInit, OnChanges {
   @Input({ required: true }) noticeId!: string;
 
   private dsa = inject(DsaService);
-  private snack = inject(MatSnackBar);
+  private snack = inject(DisplayMessageService);
   private dialog = inject(MatDialog);
   private clipboard = inject(Clipboard);
   readonly i18n = inject(TranslationHelperService);

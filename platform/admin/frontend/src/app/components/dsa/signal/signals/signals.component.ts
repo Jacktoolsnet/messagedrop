@@ -16,7 +16,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { DsaSignal } from '../../../../interfaces/dsa-signal.interface';
 import { AuthService } from '../../../../services/auth/auth.service';
@@ -26,6 +25,7 @@ import { TranslateService } from '../../../../services/translate-service/transla
 import { debounceTime, distinctUntilChanged, map, Subscription } from 'rxjs';
 import { ConfirmDialogComponent } from '../../../shared/confirm-dialog.component';
 import { SignalDetailComponent } from '../signal-detail/signal-detail.component';
+import { DisplayMessageService } from '../../../../services/display-message.service';
 
 type SignalStatusFilter = 'open' | 'dismissed';
 type SignalRangeFilter = '24h' | '7d' | '30d' | 'all';
@@ -59,7 +59,7 @@ export class SignalsComponent implements OnInit, OnDestroy {
   private auth = inject(AuthService);
   private dsa = inject(DsaService);
   private fb = inject(FormBuilder);
-  private snack = inject(MatSnackBar);
+  private snack = inject(DisplayMessageService);
   private dialog = inject(MatDialog);
   private translate = inject(TranslateService);
   readonly i18n = inject(TranslationHelperService);

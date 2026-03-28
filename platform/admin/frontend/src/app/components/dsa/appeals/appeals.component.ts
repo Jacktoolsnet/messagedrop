@@ -7,7 +7,6 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -25,6 +24,7 @@ import { NoticeAppealsComponent } from '../notice/appeals/notice-appeals.compone
 import { AppealResolutionData, AppealResolutionDialogComponent } from './appeal-resolution-dialog/appeal-resolution-dialog.component';
 import { DecisionDialogComponent, DecisionDialogResult } from '../decisions/decision-dialog/decision-dialog.component';
 import { ReportedContentPayload, ReportedMultimedia } from '../../../interfaces/reported-content.interface';
+import { DisplayMessageService } from '../../../services/display-message.service';
 
 type AppealStatusFilter = 'open' | 'resolved' | 'all';
 
@@ -54,7 +54,7 @@ type AppealStatusFilter = 'open' | 'resolved' | 'all';
 })
 export class AppealsComponent implements OnInit {
   private readonly dsa = inject(DsaService);
-  private readonly snack = inject(MatSnackBar);
+  private readonly snack = inject(DisplayMessageService);
   private readonly dialog = inject(MatDialog);
   private readonly auth = inject(AuthService);
   readonly i18n = inject(TranslationHelperService);

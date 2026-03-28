@@ -1,6 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -9,6 +8,7 @@ import { LoginResponse } from '../../interfaces/login-response.interface';
 import { LoginOtpResponse } from '../../interfaces/login-otp-response.interface';
 import { VerifyOtpRequest } from '../../interfaces/verify-otp-request.interface';
 import { TranslationHelperService } from '../translation-helper.service';
+import { DisplayMessageService } from '../display-message.service';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +23,7 @@ export class AuthService {
   private readonly baseUrl = `${environment.apiUrl}/user`;
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly i18n = inject(TranslationHelperService);
 
   private get token() {

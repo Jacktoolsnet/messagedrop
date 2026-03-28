@@ -1,6 +1,5 @@
 import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, forkJoin, map, Observable, of, throwError } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 
@@ -26,6 +25,7 @@ import { DsaNotification, ListNotificationsParams, NotificationMeta, Notificatio
 import { DsaTextBlock, DsaTextBlockFilters, DsaTextBlockSavePayload, DsaTextBlockTranslationPreview } from '../../../interfaces/dsa-text-block.interface';
 import { PlatformUserModerationOpenAppealsResponse, PlatformUserModerationResponse, PlatformUserModerationAppeal } from '../../../interfaces/platform-user-moderation.interface';
 import { TranslationHelperService } from '../../translation-helper.service';
+import { DisplayMessageService } from '../../display-message.service';
 
 @Injectable({ providedIn: 'root' })
 export class DsaService {
@@ -41,7 +41,7 @@ export class DsaService {
   readonly openUserModerationAppeals = signal<PlatformUserModerationAppeal[]>([]);
   readonly openUserModerationAppealsCount = signal(0);
   private readonly http = inject(HttpClient);
-  private readonly snack = inject(MatSnackBar);
+  private readonly snack = inject(DisplayMessageService);
   private readonly i18n = inject(TranslationHelperService);
 
   private openSnack(message: string, duration = 3000): void {

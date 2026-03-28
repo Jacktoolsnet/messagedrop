@@ -7,7 +7,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatChipListboxChange, MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatMenuModule } from '@angular/material/menu';
 import { RouterLink } from '@angular/router';
@@ -19,6 +18,7 @@ import { TransparencyStats } from '../../../interfaces/transparency-stats.interf
 import { AuthService } from '../../../services/auth/auth.service';
 import { DsaService } from '../../../services/dsa/dsa/dsa.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
+import { DisplayMessageService } from '../../../services/display-message.service';
 
 Chart.register(...registerables, annotationPlugin);
 
@@ -49,7 +49,7 @@ interface RangeOption {
 export class TransparencyComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly dsa = inject(DsaService);
-  private readonly snack = inject(MatSnackBar);
+  private readonly snack = inject(DisplayMessageService);
   private readonly auth = inject(AuthService);
   readonly i18n = inject(TranslationHelperService);
 

@@ -10,7 +10,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
 import { debounceTime, distinctUntilChanged, finalize, firstValueFrom, map, of, startWith, switchMap } from 'rxjs';
@@ -30,6 +29,7 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
 import { DialogActionBarComponent } from '../../shared/dialog-action-bar/dialog-action-bar.component';
 import { DisplayMessageComponent } from '../../shared/display-message/display-message.component';
 import { DialogHeaderComponent } from '../../shared/dialog-header/dialog-header.component';
+import { DisplayMessageService } from '../../../services/display-message.service';
 
 const EMPTY_MULTIMEDIA: Multimedia = {
   type: 'undefined',
@@ -126,7 +126,7 @@ export class PublicContentAiCreatorDialogComponent {
   readonly data = inject<PublicContentAiCreatorDialogData>(MAT_DIALOG_DATA);
   private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly aiService = inject(AiService);
   private readonly publicContentService = inject(PublicContentService);
   private readonly sanitizer = inject(DomSanitizer);

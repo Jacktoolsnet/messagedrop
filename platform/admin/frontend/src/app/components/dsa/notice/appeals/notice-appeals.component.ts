@@ -3,11 +3,11 @@ import { Component, Input, OnChanges, SimpleChanges, inject, signal } from '@ang
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { DsaAppeal } from '../../../../interfaces/dsa-appeal.interface';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
+import { DisplayMessageService } from '../../../../services/display-message.service';
 
 @Component({
   selector: 'app-notice-appeals',
@@ -20,7 +20,7 @@ export class NoticeAppealsComponent implements OnChanges {
   @Input({ required: true }) noticeId!: string;
 
   private readonly dsa = inject(DsaService);
-  private readonly snack = inject(MatSnackBar);
+  private readonly snack = inject(DisplayMessageService);
   readonly i18n = inject(TranslationHelperService);
 
   readonly loading = signal(false);

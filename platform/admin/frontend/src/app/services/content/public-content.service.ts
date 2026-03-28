@@ -1,6 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, finalize, map, Observable, of, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ExternalPublicContent } from '../../interfaces/external-public-content.interface';
@@ -10,6 +9,7 @@ import { PublicContentSavePayload } from '../../interfaces/public-content-save-p
 import { PublicContent } from '../../interfaces/public-content.interface';
 import { TenorApiResponse } from '../../interfaces/tenor-response.interface';
 import { TranslationHelperService } from '../translation-helper.service';
+import { DisplayMessageService } from '../display-message.service';
 
 interface PublicContentListResponse {
   status: number;
@@ -36,7 +36,7 @@ interface ExternalPublicContentRowResponse {
 })
 export class PublicContentService {
   private readonly http = inject(HttpClient);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly i18n = inject(TranslationHelperService);
   private readonly baseUrl = `${environment.apiUrl}/content`;
 

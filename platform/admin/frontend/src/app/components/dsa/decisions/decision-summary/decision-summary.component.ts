@@ -2,10 +2,10 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, OnChanges, SimpleChanges, inject, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { DsaDecision } from '../../../../interfaces/dsa-decision.interface';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
+import { DisplayMessageService } from '../../../../services/display-message.service';
 
 @Component({
   selector: 'app-decision-summary',
@@ -18,7 +18,7 @@ export class DecisionSummaryComponent implements OnChanges {
   @Input() noticeId: string | null = null;
 
   private dsa = inject(DsaService);
-  private snack = inject(MatSnackBar);
+  private snack = inject(DisplayMessageService);
   readonly i18n = inject(TranslationHelperService);
 
   loading = signal(false);

@@ -11,7 +11,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -30,6 +29,7 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
 import { DisplayMessageComponent } from '../../shared/display-message/display-message.component';
 import { PublicContentAiCreatorDialogComponent, PublicContentAiCreatorDialogResult } from '../public-content-ai-creator-dialog/public-content-ai-creator-dialog.component';
+import { DisplayMessageService } from '../../../services/display-message.service';
 
 @Component({
   selector: 'app-public-content-list',
@@ -59,7 +59,7 @@ export class PublicContentListComponent {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly authService = inject(AuthService);
   private readonly aiService = inject(AiService);
   private readonly publicContentService = inject(PublicContentService);

@@ -9,7 +9,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged, map, Subscription } from 'rxjs';
@@ -20,6 +19,7 @@ import { DsaNotice } from '../../../../interfaces/dsa-notice.interface';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { NoticeDetailComponent } from '../../notice/notice-detail/notice-detail.component';
+import { DisplayMessageService } from '../../../../services/display-message.service';
 
 @Component({
   selector: 'app-decisions',
@@ -36,7 +36,7 @@ import { NoticeDetailComponent } from '../../notice/notice-detail/notice-detail.
 export class DecisionsComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private dsa = inject(DsaService);
-  private snack = inject(MatSnackBar);
+  private snack = inject(DisplayMessageService);
   private dialog = inject(MatDialog);
   readonly i18n = inject(TranslationHelperService);
 

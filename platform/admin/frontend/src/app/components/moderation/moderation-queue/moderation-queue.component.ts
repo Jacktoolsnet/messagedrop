@@ -8,13 +8,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterLink } from '@angular/router';
 import { ModerationRequest } from '../../../interfaces/moderation-request.interface';
 import { ModerationService } from '../../../services/moderation.service';
 import { TranslateService } from '../../../services/translate-service/translate-service.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
+import { DisplayMessageService } from '../../../services/display-message.service';
 
 @Component({
   selector: 'app-moderation-queue',
@@ -37,7 +37,7 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
 })
 export class ModerationQueueComponent implements OnInit {
   private readonly moderationService = inject(ModerationService);
-  private readonly snack = inject(MatSnackBar);
+  private readonly snack = inject(DisplayMessageService);
   private readonly translator = inject(TranslateService);
   readonly i18n = inject(TranslationHelperService);
 

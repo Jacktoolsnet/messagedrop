@@ -5,11 +5,11 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { RouterLink } from '@angular/router';
 import { APP_VERSION_INFO } from '../../../environments/version';
 import { AuthService } from '../../services/auth/auth.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
+import { DisplayMessageService } from '../../services/display-message.service';
 
 @Component({
   selector: 'app-login',
@@ -23,7 +23,6 @@ import { TranslationHelperService } from '../../services/translation-helper.serv
     MatButtonModule,
     FormsModule,
     MatIconModule,
-    MatSnackBarModule,
     RouterLink
   ]
 })
@@ -41,7 +40,7 @@ export class LoginComponent {
   loading = false;
 
   private readonly authService = inject(AuthService);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly cdr = inject(ChangeDetectorRef);
 
   private runAsync(update: () => void) {

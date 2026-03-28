@@ -1,11 +1,11 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, finalize, map, Observable, of, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { PublicProfileSavePayload } from '../../interfaces/public-profile-save-payload.interface';
 import { PublicProfile } from '../../interfaces/public-profile.interface';
 import { TranslationHelperService } from '../translation-helper.service';
+import { DisplayMessageService } from '../display-message.service';
 
 interface PublicProfileListResponse {
   status: number;
@@ -22,7 +22,7 @@ interface PublicProfileRowResponse {
 })
 export class PublicProfileService {
   private readonly http = inject(HttpClient);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly i18n = inject(TranslationHelperService);
   private readonly baseUrl = `${environment.apiUrl}/content/public-profiles`;
 

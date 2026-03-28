@@ -9,7 +9,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { merge } from 'rxjs';
 import { DsaDecisionOutcome, DsaTextBlock, DsaTextBlockSavePayload, DsaTextBlockType } from '../../../../interfaces/dsa-text-block.interface';
@@ -17,6 +16,7 @@ import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { DialogActionBarComponent } from '../../../shared/dialog-action-bar/dialog-action-bar.component';
 import { DialogHeaderComponent } from '../../../shared/dialog-header/dialog-header.component';
+import { DisplayMessageService } from '../../../../services/display-message.service';
 
 export interface DecisionTextBlockEditorDialogData {
   block?: DsaTextBlock | null;
@@ -46,7 +46,7 @@ export interface DecisionTextBlockEditorDialogData {
 export class DecisionTextBlockEditorDialogComponent {
   private readonly fb = inject(FormBuilder);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly snack = inject(MatSnackBar);
+  private readonly snack = inject(DisplayMessageService);
   private readonly dsa = inject(DsaService);
   private readonly dialogRef = inject(MatDialogRef<DecisionTextBlockEditorDialogComponent, boolean>);
   readonly i18n = inject(TranslationHelperService);

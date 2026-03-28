@@ -9,4 +9,5 @@ export interface DisplayMessageConfig {
   delay: number;
   showSpinner: boolean;
   autoclose: boolean;
+  layout?: 'dialog' | 'toast';
 }

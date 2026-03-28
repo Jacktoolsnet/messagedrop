@@ -10,13 +10,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterLink } from '@angular/router';
 import { ErrorLogEntry } from '../../../interfaces/error-log-entry';
 import { LogService } from '../../../services/log.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
+import { DisplayMessageService } from '../../../services/display-message.service';
 
 @Component({
   selector: 'app-error-logs',
@@ -42,7 +42,7 @@ import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
 export class ErrorLogsComponent implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly logService = inject(LogService);
-  private readonly snack = inject(MatSnackBar);
+  private readonly snack = inject(DisplayMessageService);
   readonly i18n = inject(TranslationHelperService);
 
   readonly loading = signal(false);

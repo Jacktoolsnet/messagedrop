@@ -7,12 +7,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { DsaNotice } from '../../../../interfaces/dsa-notice.interface';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { DialogActionBarComponent } from '../../../shared/dialog-action-bar/dialog-action-bar.component';
 import { DialogHeaderComponent } from '../../../shared/dialog-header/dialog-header.component';
+import { DisplayMessageService } from '../../../../services/display-message.service';
 
 export interface NotificationDialogData {
   notice: DsaNotice;
@@ -38,7 +38,7 @@ export interface NotificationDialogData {
 export class NotificationDialogComponent {
   private readonly fb = inject(FormBuilder);
   private readonly dialogRef = inject(MatDialogRef<NotificationDialogComponent>);
-  private readonly snack = inject(MatSnackBar);
+  private readonly snack = inject(DisplayMessageService);
   readonly i18n = inject(TranslationHelperService);
   readonly data = inject<NotificationDialogData>(MAT_DIALOG_DATA);
 

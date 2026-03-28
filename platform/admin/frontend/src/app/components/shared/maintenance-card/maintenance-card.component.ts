@@ -9,7 +9,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTimepickerModule } from '@angular/material/timepicker';
 import {
   LastRestoreInfo,
@@ -22,6 +21,7 @@ import {
 } from '../../../interfaces/maintenance.interface';
 import { MaintenanceService } from '../../../services/maintenance.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
+import { DisplayMessageService } from '../../../services/display-message.service';
 
 @Component({
   selector: 'app-maintenance-card',
@@ -35,7 +35,6 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
     MatSlideToggleModule,
     MatButtonModule,
     MatIconModule,
-    MatSnackBarModule
   ],
   templateUrl: './maintenance-card.component.html',
   styleUrl: './maintenance-card.component.css',
@@ -43,7 +42,7 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
 })
 export class MaintenanceCardComponent {
   private readonly maintenanceService = inject(MaintenanceService);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly destroyRef = inject(DestroyRef);
   readonly i18n = inject(TranslationHelperService);
 

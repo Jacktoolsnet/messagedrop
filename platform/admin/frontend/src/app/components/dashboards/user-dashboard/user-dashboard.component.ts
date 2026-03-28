@@ -4,7 +4,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterLink } from '@angular/router';
 import { User } from '../../../interfaces/user.interface';
@@ -14,6 +13,7 @@ import { UserService } from '../../../services/user/user.service';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
 import { CreateUserComponent } from '../../user/create-user/create-user.component';
 import { EditUserComponent, EditUserData } from '../../user/edit-user/edit-user.component';
+import { DisplayMessageService } from '../../../services/display-message.service';
 
 @Component({
   selector: 'app-user-dashboard',
@@ -32,7 +32,7 @@ import { EditUserComponent, EditUserData } from '../../user/edit-user/edit-user.
 })
 export class UserDashboardComponent {
   private dialog = inject(MatDialog);
-  private snack = inject(MatSnackBar);
+  private snack = inject(DisplayMessageService);
   private userService = inject(UserService);
   private authService = inject(AuthService);
   readonly i18n = inject(TranslationHelperService);

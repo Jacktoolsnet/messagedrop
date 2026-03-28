@@ -15,7 +15,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelect, MatSelectModule } from '@angular/material/select';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { combineLatest, finalize, startWith } from 'rxjs';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
@@ -38,6 +37,7 @@ import { PublicProfileService } from '../../../services/content/public-profile.s
 import { NominatimService } from '../../../services/location/nominatim.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { MAX_PUBLIC_HASHTAGS, normalizeHashtags } from '../../../utils/hashtag.util';
+import { DisplayMessageService } from '../../../services/display-message.service';
 
 const EMPTY_MULTIMEDIA: Multimedia = {
   type: 'undefined',
@@ -81,7 +81,7 @@ export class PublicContentEditorComponent {
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
   private readonly dialog = inject(MatDialog);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly sanitizer = inject(DomSanitizer);
   private readonly authService = inject(AuthService);
   private readonly aiService = inject(AiService);

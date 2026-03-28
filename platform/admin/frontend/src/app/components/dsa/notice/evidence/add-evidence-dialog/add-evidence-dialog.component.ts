@@ -7,12 +7,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { DsaService } from '../../../../../services/dsa/dsa/dsa.service';
 import { TranslationHelperService } from '../../../../../services/translation-helper.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DialogActionBarComponent } from '../../../../shared/dialog-action-bar/dialog-action-bar.component';
 import { DialogHeaderComponent } from '../../../../shared/dialog-header/dialog-header.component';
+import { DisplayMessageService } from '../../../../../services/display-message.service';
 
 @Component({
   selector: 'app-add-evidence-dialog',
@@ -28,7 +28,7 @@ import { DialogHeaderComponent } from '../../../../shared/dialog-header/dialog-h
 export class AddEvidenceDialogComponent {
   private fb = inject(FormBuilder);
   private dsa = inject(DsaService);
-  private snack = inject(MatSnackBar);
+  private snack = inject(DisplayMessageService);
   private ref = inject(MatDialogRef<AddEvidenceDialogComponent, boolean>);
   readonly i18n = inject(TranslationHelperService);
   data = inject<{ noticeId: string }>(MAT_DIALOG_DATA);

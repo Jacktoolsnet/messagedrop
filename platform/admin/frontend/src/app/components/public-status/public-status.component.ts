@@ -8,11 +8,11 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute } from '@angular/router';
 import { PublicStatusAppeal, PublicStatusAuditEntry, PublicStatusEvidence, PublicStatusResponse, PublicStatusService } from '../../services/public-status.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
+import { DisplayMessageService } from '../../services/display-message.service';
 
 interface MappedAuditEntry extends PublicStatusAuditEntry {
   detailsObj: Record<string, unknown> | null;
@@ -33,7 +33,6 @@ interface MappedAuditEntry extends PublicStatusAuditEntry {
     MatListModule,
     MatDividerModule,
     MatTooltipModule,
-    MatSnackBarModule
   ],
   templateUrl: './public-status.component.html',
   styleUrl: './public-status.component.css'
@@ -41,7 +40,7 @@ interface MappedAuditEntry extends PublicStatusAuditEntry {
 export class PublicStatusComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly service = inject(PublicStatusService);
-  private readonly snack = inject(MatSnackBar);
+  private readonly snack = inject(DisplayMessageService);
   private readonly destroyRef = inject(DestroyRef);
   readonly i18n = inject(TranslationHelperService);
 

@@ -7,7 +7,6 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angu
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { USER_ACCOUNT_BLOCK_REASONS, USER_POSTING_BLOCK_REASONS, findModerationReasonLabel } from '../../../../constants/user-moderation-reasons';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -20,6 +19,7 @@ import { TranslationHelperService } from '../../../../services/translation-helpe
 import { TranslateService } from '../../../../services/translate-service/translate-service.service';
 import { parsePublicMessageDetailContent } from '../../../../utils/reported-content.util';
 import { ConfirmDialogComponent } from '../../../shared/confirm-dialog.component';
+import { DisplayMessageService } from '../../../../services/display-message.service';
 
 @Component({
   selector: 'app-signal-detail',
@@ -36,7 +36,7 @@ import { ConfirmDialogComponent } from '../../../shared/confirm-dialog.component
 export class SignalDetailComponent implements OnInit {
   private ref = inject(MatDialogRef<SignalDetailComponent>);
   private dialog = inject(MatDialog);
-  private snack = inject(MatSnackBar);
+  private snack = inject(DisplayMessageService);
   private sanitizer = inject(DomSanitizer);
   private translator = inject(TranslateService);
   private dsa = inject(DsaService);

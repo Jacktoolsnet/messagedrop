@@ -10,7 +10,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTimepickerModule } from '@angular/material/timepicker';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterLink } from '@angular/router';
@@ -29,6 +28,7 @@ import {
 } from '../../../interfaces/platform-user-moderation.interface';
 import { DsaService } from '../../../services/dsa/dsa/dsa.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
+import { DisplayMessageService } from '../../../services/display-message.service';
 
 @Component({
   selector: 'app-user-moderation',
@@ -48,7 +48,6 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
     MatDatepickerModule,
     MatTimepickerModule,
     MatSelectModule,
-    MatSnackBarModule
   ],
   templateUrl: './user-moderation.component.html',
   styleUrls: ['./user-moderation.component.css']
@@ -56,7 +55,7 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
 export class UserModerationComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly dsa = inject(DsaService);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(DisplayMessageService);
   private readonly destroyRef = inject(DestroyRef);
   readonly i18n = inject(TranslationHelperService);
 
