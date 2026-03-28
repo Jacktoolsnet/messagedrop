@@ -203,14 +203,16 @@ body {
   border: 1px solid color-mix(in srgb, var(--display-message-accent, #38bdf8) 22%, transparent);
   box-shadow: 0 18px 38px rgba(15, 23, 42, 0.18);
   overflow: hidden;
+  background: transparent;
+  backdrop-filter: blur(10px);
 }
 
 .display-message-toast.toast-success {
-  --display-message-accent: #22c55e;
+  --display-message-accent: #16a34a;
 }
 
 .display-message-toast.toast-error {
-  --display-message-accent: #ef4444;
+  --display-message-accent: #dc2626;
 }
 
 .display-message-toast.toast-warning {
@@ -218,5 +220,5 @@ body {
 }
 
 .display-message-toast.toast-info {
-  --display-message-accent: #38bdf8;
+  --display-message-accent: #2563eb;
 }

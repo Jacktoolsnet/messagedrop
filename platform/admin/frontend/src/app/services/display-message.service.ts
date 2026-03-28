@@ -54,8 +54,9 @@ export class DisplayMessageService {
     this.activeToastRef?.close();
 
     const toneClass = this.resolveToneClass(config.panelClass);
+    const normalizedAction = this.normalizeAction(action);
     const toastRef = this.dialog.open(DisplayMessageComponent, {
-      data: this.buildDialogData(message, action, toneClass, config.duration),
+      data: this.buildDialogData(message, normalizedAction, toneClass, config.duration),
       autoFocus: false,
       restoreFocus: false,
       hasBackdrop: false,
@@ -71,7 +72,7 @@ export class DisplayMessageService {
       }
     });
 
-    return new DisplayMessageRef(toastRef, !!action);
+    return new DisplayMessageRef(toastRef, !!normalizedAction);
   }
 
   private buildDialogData(
@@ -92,6 +93,20 @@ export class DisplayMessageService {
       autoclose: (duration ?? 3000) > 0,
       layout: 'toast'
     };
+  }
+
+  private normalizeAction(action?: string): string {
+    const trimmed = action?.trim() ?? '';
+    if (!trimmed) {
+      return '';
+    }
+
+    const normalized = trimmed.replace(/[.!?]/g, '').trim().toUpperCase();
+    if (normalized === 'OK' || normalized === 'OKAY' || normalized === 'CLOSE' || normalized === 'SCHLIESSEN') {
+      return '';
+    }
+
+    return trimmed;
   }
 
   private resolveToneClass(panelClass?: string | string[]): string {

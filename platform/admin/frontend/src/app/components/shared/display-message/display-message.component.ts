@@ -4,6 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { DisplayMessageConfig } from '../../../interfaces/display-message-config.interface';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 
 @Component({
   selector: 'app-display-message',
@@ -18,21 +19,29 @@ import { DisplayMessageConfig } from '../../../interfaces/display-message-config
 })
 export class DisplayMessageComponent implements OnInit, OnDestroy {
   readonly showOk = signal(false);
+  readonly closing = signal(false);
 
   readonly dialogRef = inject(MatDialogRef<DisplayMessageComponent>);
   readonly data = inject<DisplayMessageConfig>(MAT_DIALOG_DATA);
+  readonly i18n = inject(TranslationHelperService);
+  readonly hasActions = !!this.data.button || !!this.data.secondaryButton;
+  readonly toastRole = this.hasActions ? 'dialog' : 'status';
+  readonly toastLive = this.hasActions ? 'polite' : 'assertive';
+
+  private readonly closeAnimationMs = 180;
   private showButtonTimeoutId: ReturnType<typeof setTimeout> | null = null;
   private closeTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  private finalizeCloseTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   ngOnInit(): void {
     const delay = Math.max(0, this.data.delay ?? 0);
     if (this.data.autoclose) {
       this.closeTimeoutId = setTimeout(() => {
-        this.dialogRef.close();
+        this.close();
       }, delay);
     }
 
-    if (!this.data.button && !this.data.secondaryButton) {
+    if (!this.hasActions) {
       return;
     }
 
@@ -47,11 +56,31 @@ export class DisplayMessageComponent implements OnInit, OnDestroy {
   }
 
   onPrimaryClick(): void {
-    this.dialogRef.close(true);
+    this.close(true);
   }
 
   onSecondaryClick(): void {
-    this.dialogRef.close('secondary');
+    this.close('secondary');
+  }
+
+  onDismiss(): void {
+    this.close();
+  }
+
+  private close(result?: boolean | 'secondary'): void {
+    if (this.closing()) {
+      return;
+    }
+
+    if (this.closeTimeoutId) {
+      clearTimeout(this.closeTimeoutId);
+      this.closeTimeoutId = null;
+    }
+
+    this.closing.set(true);
+    this.finalizeCloseTimeoutId = setTimeout(() => {
+      this.dialogRef.close(result);
+    }, this.closeAnimationMs);
   }
 
   ngOnDestroy(): void {
@@ -60,6 +89,9 @@ export class DisplayMessageComponent implements OnInit, OnDestroy {
     }
     if (this.closeTimeoutId) {
       clearTimeout(this.closeTimeoutId);
+    }
+    if (this.finalizeCloseTimeoutId) {
+      clearTimeout(this.finalizeCloseTimeoutId);
     }
   }
 }

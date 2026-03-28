@@ -1,34 +1,64 @@
 @if (data.layout === 'toast') {
-  <div class="toast-container">
-    @if (data.icon) {
-      <mat-icon aria-hidden="true" class="toast-icon">{{ data.icon }}</mat-icon>
-    }
-
-    <div class="toast-content">
-      @if (data.title) {
-        <h2>{{ data.title }}</h2>
-      }
-
-      @if (data.message) {
-        <p class="multiline-text">{{ data.message }}</p>
-      }
-
-      @if (showOk() && (data.button || data.secondaryButton)) {
-        <div class="toast-actions">
-          @if (data.secondaryButton) {
-            <button mat-stroked-button color="primary" type="button" (click)="onSecondaryClick()">
-              {{ data.secondaryButton }}
-            </button>
-          }
-
-          @if (data.button) {
-            <button mat-button color="primary" type="button" (click)="onPrimaryClick()">
-              {{ data.button }}
-            </button>
-          }
+  <div
+    class="toast-shell"
+    [class.is-closing]="closing()"
+    [attr.role]="toastRole"
+    [attr.aria-live]="toastLive"
+    aria-atomic="true"
+  >
+    <div class="toast-container">
+      @if (data.icon) {
+        <div class="toast-icon-wrap" aria-hidden="true">
+          <mat-icon class="toast-icon">{{ data.icon }}</mat-icon>
         </div>
       }
+
+      <div class="toast-content">
+        @if (data.title) {
+          <h2>{{ data.title }}</h2>
+        }
+
+        @if (data.message) {
+          <p class="multiline-text">{{ data.message }}</p>
+        }
+
+        @if (data.showSpinner) {
+          <div class="toast-spinner-row">
+            <mat-spinner diameter="18" strokeWidth="3"></mat-spinner>
+          </div>
+        }
+
+        @if (showOk() && (data.button || data.secondaryButton)) {
+          <div class="toast-actions">
+            @if (data.secondaryButton) {
+              <button mat-stroked-button color="primary" type="button" (click)="onSecondaryClick()">
+                {{ data.secondaryButton }}
+              </button>
+            }
+
+            @if (data.button) {
+              <button mat-button color="primary" type="button" (click)="onPrimaryClick()">
+                {{ data.button }}
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      <button
+        mat-icon-button
+        class="toast-dismiss"
+        type="button"
+        (click)="onDismiss()"
+        [attr.aria-label]="i18n.t('Close')"
+      >
+        <mat-icon aria-hidden="true">close</mat-icon>
+      </button>
     </div>
+
+    @if (data.autoclose && data.delay > 0) {
+      <div class="toast-progress" [style.animation-duration.ms]="data.delay" aria-hidden="true"></div>
+    }
   </div>
 } @else {
   <div class="dialog-container">
