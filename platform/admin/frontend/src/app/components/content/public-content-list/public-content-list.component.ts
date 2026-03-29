@@ -6,7 +6,7 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -67,6 +67,7 @@ export class PublicContentListComponent {
   private readonly aiService = inject(AiService);
   private readonly publicContentService = inject(PublicContentService);
   private readonly publicProfileService = inject(PublicProfileService);
+  private loadingDialogRef: MatDialogRef<DisplayMessageComponent> | null = null;
 
   readonly i18n = inject(TranslationHelperService);
   readonly role = this.authService.role;
@@ -323,6 +324,35 @@ export class PublicContentListComponent {
     });
   }
 
+  private openPublishingDialog(): void {
+    this.closeLoadingDialog();
+
+    const config: DisplayMessageConfig = {
+      showAlways: true,
+      title: this.i18n.t('Publishing content...'),
+      image: '',
+      icon: 'publish',
+      message: this.i18n.t('Please wait while the content is published.'),
+      button: '',
+      delay: 0,
+      showSpinner: true,
+      autoclose: false
+    };
+
+    this.loadingDialogRef = this.dialog.open(DisplayMessageComponent, {
+      data: config,
+      disableClose: true,
+      autoFocus: false,
+      restoreFocus: false,
+      maxWidth: '92vw'
+    });
+  }
+
+  private closeLoadingDialog(): void {
+    this.loadingDialogRef?.close();
+    this.loadingDialogRef = null;
+  }
+
   tilePreview(row: PublicContent): string {
     const message = row.message?.trim();
     if (message) {
@@ -517,9 +547,13 @@ export class PublicContentListComponent {
           return;
         }
 
+        this.openPublishingDialog();
         this.publicContentService.publishPublicContent(row.id)
           .pipe(
-            finalize(() => this.load()),
+            finalize(() => {
+              this.closeLoadingDialog();
+              this.load();
+            }),
             takeUntilDestroyed(this.destroyRef)
           )
           .subscribe({ error: () => undefined });

@@ -17,10 +17,12 @@
   "Selected multimedia preview": "Selected multimedia preview",
   "TikTok preview": "TikTok preview",
   "Profile and optional focus": "Profile and optional focus",
+  "Publishing content...": "Publishing content...",
   "Choose the target profile and optionally define an editorial focus for the AI.": "Choose the target profile and optionally define an editorial focus for the AI.",
   "Task / optional focus": "Task / optional focus",
   "Optional: describe what kind of public messages should be created or which extra focus the AI should follow.": "Optional: describe what kind of public messages should be created or which extra focus the AI should follow.",
   "Optional. Use this to give the AI an extra focus such as event announcement, beginner-friendly tone or call to action.": "Optional. Use this to give the AI an extra focus such as event announcement, beginner-friendly tone or call to action.",
+  "Please wait while the content is published.": "Please wait while the content is published.",
   "Please add a task, a source link, profile guidance or multimedia context before generating drafts.": "Please add a task, a source link, profile guidance or multimedia context before generating drafts.",
   "This content could not be published because public content must not contain private contact details, links or similar personal data.": "This content could not be published because public content must not contain private contact details, links or similar personal data.",
   "This content could not be published because it was rejected by automated moderation.": "This content could not be published because it was rejected by automated moderation."

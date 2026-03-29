@@ -8,7 +8,7 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -21,6 +21,7 @@ import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
 import { PublicContentAiDialogComponent, PublicContentAiDialogResult } from '../public-content-ai-dialog/public-content-ai-dialog.component';
 import { PublicContentLocationMapDialogComponent, PublicContentLocationMapDialogResult } from '../public-content-location-map-dialog/public-content-location-map-dialog.component';
 import { AiTool } from '../../../interfaces/ai-tool.type';
+import { DisplayMessageConfig } from '../../../interfaces/display-message-config.interface';
 import { Multimedia } from '../../../interfaces/multimedia.interface';
 import { NominatimPlace } from '../../../interfaces/nominatim-place.interface';
 import { PublicContentSavePayload } from '../../../interfaces/public-content-save-payload.interface';
@@ -38,6 +39,7 @@ import { NominatimService } from '../../../services/location/nominatim.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { MAX_PUBLIC_HASHTAGS, normalizeHashtags } from '../../../utils/hashtag.util';
 import { DisplayMessageService } from '../../../services/display-message.service';
+import { DisplayMessageComponent } from '../../shared/display-message/display-message.component';
 
 const EMPTY_MULTIMEDIA: Multimedia = {
   type: 'undefined',
@@ -89,6 +91,7 @@ export class PublicContentEditorComponent {
   private readonly publicProfileService = inject(PublicProfileService);
   private readonly styleService = inject(ContentStyleService);
   private readonly nominatimService = inject(NominatimService);
+  private loadingDialogRef: MatDialogRef<DisplayMessageComponent> | null = null;
   readonly i18n = inject(TranslationHelperService);
 
   readonly role = this.authService.role;
@@ -1163,9 +1166,13 @@ export class PublicContentEditorComponent {
   }
 
   private publishSavedContent(id: string): void {
+    this.openPublishingDialog();
     this.publicContentService.publishPublicContent(id)
       .pipe(
-        finalize(() => this.saving.set(false)),
+        finalize(() => {
+          this.closeLoadingDialog();
+          this.saving.set(false);
+        }),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({
@@ -1301,6 +1308,35 @@ export class PublicContentEditorComponent {
 
   private showMessage(message: string, params?: Record<string, unknown>): void {
     this.snackBar.open(this.i18n.t(message, params), this.i18n.t('OK'), { duration: 2800 });
+  }
+
+  private openPublishingDialog(): void {
+    this.closeLoadingDialog();
+
+    const config: DisplayMessageConfig = {
+      showAlways: true,
+      title: this.i18n.t('Publishing content...'),
+      image: '',
+      icon: 'publish',
+      message: this.i18n.t('Please wait while the content is published.'),
+      button: '',
+      delay: 0,
+      showSpinner: true,
+      autoclose: false
+    };
+
+    this.loadingDialogRef = this.dialog.open(DisplayMessageComponent, {
+      data: config,
+      disableClose: true,
+      autoFocus: false,
+      restoreFocus: false,
+      maxWidth: '92vw'
+    });
+  }
+
+  private closeLoadingDialog(): void {
+    this.loadingDialogRef?.close();
+    this.loadingDialogRef = null;
   }
 
   private applyAiDialogResult(result: PublicContentAiDialogResult): void {
