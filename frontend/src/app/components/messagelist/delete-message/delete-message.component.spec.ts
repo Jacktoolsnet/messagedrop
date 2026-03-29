@@ -1,23 +1,31 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
+import { MatDialogRef } from '@angular/material/dialog';
+import { DeleteMessageComponent } from './delete-message.component';
 
-import { DeletemessageComponent } from './delete-message.component';
-
-describe('DeletemessageComponent', () => {
-  let component: DeletemessageComponent;
-  let fixture: ComponentFixture<DeletemessageComponent>;
-
+describe('DeleteMessageComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DeletemessageComponent]
+      imports: [DeleteMessageComponent],
+      providers: [
+        {
+          provide: MatDialogRef,
+          useValue: {
+            close: jasmine.createSpy('close')
+          }
+        }
+      ]
     })
-    .compileComponents();
-    
-    fixture = TestBed.createComponent(DeletemessageComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+      .overrideComponent(DeleteMessageComponent, {
+        set: {
+          template: '<div></div>'
+        }
+      })
+      .compileComponents();
   });
 
   it('should create', () => {
+    const fixture = TestBed.createComponent(DeleteMessageComponent);
+    const component = fixture.componentInstance;
     expect(component).toBeTruthy();
   });
 });

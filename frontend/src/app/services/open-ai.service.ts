@@ -46,7 +46,8 @@ export class OpenAiService {
       message: this.i18n.t('common.moderation.message'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
     const body = {
       'message': message.message

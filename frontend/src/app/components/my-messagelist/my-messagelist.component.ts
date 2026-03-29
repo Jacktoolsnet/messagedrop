@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, inject, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, computed, effect, inject, OnDestroy, OnInit, signal, untracked, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -265,7 +265,8 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       return false;
     }
 
-    if (serviceMessages.length === 0 && this.messagesSignal().length > 0 && !this.allowEmptyServiceSync) {
+    const hasLocalMessages = untracked(() => this.messagesSignal().length > 0);
+    if (serviceMessages.length === 0 && hasLocalMessages && !this.allowEmptyServiceSync) {
       return false;
     }
 
