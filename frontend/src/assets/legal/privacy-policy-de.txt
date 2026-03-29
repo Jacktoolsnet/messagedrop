@@ -158,7 +158,7 @@ Externe Inhalte sind standardmäßig deaktiviert. Statt der externen Inhalte wir
 
 Eine pauschale Zustimmung für alle externen Anbieter ist nicht vorgesehen; die Entscheidung erfolgt getrennt je Anbieter.
 
-Diese anbieterbezogene Entscheidung betrifft Einbettungen externer Inhalte. Externe Funktionsdienste (z. B. Open-Meteo, Nominatim / OpenStreetMap, DeepL, Viator) werden in Abschnitt 2.5 beschrieben.
+Diese anbieterbezogene Entscheidung betrifft Einbettungen externer Inhalte. Externe Funktionsdienste (z. B. Open-Meteo, Nominatim / OpenStreetMap, DeepL, Viator) werden in Abschnitt 2.6 beschrieben.
 
 Erst nach einer bewussten und freiwilligen Aktivierung durch den Nutzer werden externe Inhalte technisch eingebunden.
 
@@ -298,7 +298,7 @@ Anschließend fordert das Endgerät beim Server eine einmalige Prüfanforderung 
 
 Der PIN und der entschlüsselte Nutzerdatensatz werden nicht an den Server übertragen.
 
-Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO.
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Durchführung des Login- und Authentifizierungsvorgangs).
 
 ###
 3.2.1 Sicherheits-Reset (Schlüssel-Neuerzeugung)
@@ -324,7 +324,7 @@ Die Löschung ist endgültig, sofern kein zuvor erstelltes Backup des Nutzers vo
 
 Unabhängig davon kann der Nutzer sein Nutzerkonto jederzeit selbstständig über die App löschen. In diesem Fall erfolgt die sofortige und endgültige Löschung aller serverseitigen und lokalen Datensätze, vorbehaltlich gesetzlicher Aufbewahrungs- oder Nachweispflichten (z. B. im Zusammenhang mit DSA-Verfahren).
 
-Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO sowie Art. 6 Abs. 1 lit. c DSGVO, soweit gesetzliche Pflichten eine weitere Verarbeitung erfordern.
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Bereitstellung, Verwaltung und Löschung des Nutzerkontos) sowie Art. 6 Abs. 1 lit. c DSGVO (Erfüllung gesetzlicher Pflichten), soweit gesetzliche Pflichten eine weitere Verarbeitung erfordern.
 
 ###
 3.4 Öffentliche Inhalte und Kommentare
@@ -346,7 +346,7 @@ Zur Unterstützung der Moderation können Inhalte (einschließlich Hashtags) aut
 
 Öffentliche Inhalte können bewertet werden (z. B. Like / Dislike). Ein Anspruch auf bestimmte Reichweite, Sichtbarkeit oder Bewertungsergebnisse besteht nicht.
 
-Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO sowie Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an Betrieb, Sicherheit und Missbrauchsprävention) sowie Art. 6 Abs. 1 lit. c DSGVO, soweit gesetzliche Pflichten einschlägig sind.
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Bereitstellung und Verarbeitung öffentlicher Inhalte und Kommentare) sowie Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an Betrieb, Sicherheit und Missbrauchsprävention) sowie Art. 6 Abs. 1 lit. c DSGVO, soweit gesetzliche Pflichten einschlägig sind.
 
 ###
 3.5 Private Kommunikation
@@ -358,7 +358,7 @@ Gelesene private Nachrichten werden in der Regel nach 7 Tagen automatisch gelös
 
 Für Inhalte privater Kommunikation sind ausschließlich die beteiligten Nutzer verantwortlich. Eine inhaltliche Vorabprüfung oder laufende Überwachung findet nicht statt. Verfahrensbezogene Maßnahmen (z. B. Sperrung/Entfernung) können sich jedoch aus gesetzlichen Pflichten ergeben, soweit dies im Einzelfall erforderlich ist.
 
-Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO sowie – soweit verfahrensbezogene Maßnahmen zur Erfüllung gesetzlicher Pflichten erforderlich sind – Art. 6 Abs. 1 lit. c DSGVO.
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Bereitstellung und Durchführung privater Kommunikation) sowie – soweit verfahrensbezogene Maßnahmen zur Erfüllung gesetzlicher Pflichten erforderlich sind – Art. 6 Abs. 1 lit. c DSGVO (Erfüllung gesetzlicher Pflichten).
 
 ###
 3.6 Lokale Datenspeicherung auf dem Endgerät
