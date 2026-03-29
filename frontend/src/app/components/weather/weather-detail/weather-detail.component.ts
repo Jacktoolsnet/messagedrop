@@ -98,8 +98,8 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
           pointBackgroundColor: temps.map(t => this.getTemperatureColor(t)),
           segment: {
             borderColor: ctx => this.mixColors(
-              this.getTemperatureColor(ctx.p0.parsed.y),
-              this.getTemperatureColor(ctx.p1.parsed.y)
+              this.getTemperatureColor(this.toChartNumber(ctx.p0.parsed.y)),
+              this.getTemperatureColor(this.toChartNumber(ctx.p1.parsed.y))
             )
           },
           backgroundColor: (ctx: ScriptableContext<'line'>) => {
@@ -124,8 +124,8 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
           pointBackgroundColor: uvs.map(v => this.getUvColor(v)),
           segment: {
             borderColor: ctx => this.mixColors(
-              this.getUvColor(ctx.p0.parsed.y),
-              this.getUvColor(ctx.p1.parsed.y)
+              this.getUvColor(this.toChartNumber(ctx.p0.parsed.y)),
+              this.getUvColor(this.toChartNumber(ctx.p1.parsed.y))
             )
           },
           backgroundColor: (ctx: ScriptableContext<'line'>) => {
@@ -495,5 +495,9 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
     const g = (bigint >> 8) & 255;
     const b = bigint & 255;
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+
+  private toChartNumber(value: number | null | undefined, fallback = 0): number {
+    return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
   }
 }
