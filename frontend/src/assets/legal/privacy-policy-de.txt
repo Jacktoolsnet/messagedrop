@@ -218,7 +218,7 @@ Im Rahmen der Nutzung ohne Nutzerkonto kann der Nutzer optional lokale Profile z
 
 Diese Profile werden ausschließlich lokal auf dem Endgerät gespeichert und sind nur für den jeweiligen Nutzer sichtbar. Eine Übertragung an unsere Server oder eine Veröffentlichung für andere Nutzer findet nicht statt.
 
-Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an nutzerfreundlicher Darstellung) bzw. Art. 6 Abs. 1 lit. b DSGVO, soweit die Verarbeitung zur Bereitstellung einer vom Nutzer genutzten Funktion erforderlich ist.
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an nutzerfreundlicher Darstellung) bzw. Art. 6 Abs. 1 lit. b DSGVO (Bereitstellung der vom Nutzer genutzten Funktion), soweit die Verarbeitung zur Bereitstellung einer vom Nutzer genutzten Funktion erforderlich ist.
 
 ###
 2.5 Vorlesefunktion / Sprachsynthese
@@ -346,7 +346,7 @@ Zur Unterstützung der Moderation können Inhalte (einschließlich Hashtags) aut
 
 Öffentliche Inhalte können bewertet werden (z. B. Like / Dislike). Ein Anspruch auf bestimmte Reichweite, Sichtbarkeit oder Bewertungsergebnisse besteht nicht.
 
-Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Bereitstellung und Verarbeitung öffentlicher Inhalte und Kommentare) sowie Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an Betrieb, Sicherheit und Missbrauchsprävention) sowie Art. 6 Abs. 1 lit. c DSGVO, soweit gesetzliche Pflichten einschlägig sind.
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Bereitstellung und Verarbeitung öffentlicher Inhalte und Kommentare) sowie Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an Betrieb, Sicherheit und Missbrauchsprävention) sowie Art. 6 Abs. 1 lit. c DSGVO (Erfüllung gesetzlicher Pflichten), soweit gesetzliche Pflichten einschlägig sind.
 
 ###
 3.5 Private Kommunikation
@@ -555,7 +555,7 @@ Personenbezogene Daten werden nur so lange gespeichert, wie dies für den jeweil
 Davon ausgenommen sind DSA-Verfahrensdaten (einschließlich erforderlicher Nachweise/Belege), die gesetzlichen Aufbewahrungspflichten oder dokumentationsbezogenen Erfordernissen unterliegen können.
 
 Im Übrigen gelten insbesondere folgende Grundsätze:
-- Besucher-/Server-Logs: Speicherung nach Erforderlichkeit für Sicherheit und Betrieb (Art. 6 Abs. 1 lit. f DSGVO),
+- Besucher-/Server-Logs: Speicherung nach Erforderlichkeit für Sicherheit und Betrieb (Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an Sicherheit und Betrieb)),
 - Nutzerkonto-Metadaten (User-ID, Status, letzter Login): bis zur Löschung des Nutzerkontos, vorbehaltlich gesetzlicher Pflichten,
 - Nutzungszeit-Schutz (Einstellungen/Status, inkl. Eltern-PIN-Hash): bis zur Änderung/Löschung durch den Nutzer bzw. bis zur Löschung des Nutzerkontos,
 - öffentliche Inhalte: Löschung nach 30 Tagen,
