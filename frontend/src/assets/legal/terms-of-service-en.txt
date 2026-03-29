@@ -1,5 +1,5 @@
 TERMS OF USE
-As of April 12, 2026
+Version: April 12, 2026
 
 IMPORTANT NOTE ON LANGUAGE
 This English translation is provided for convenience only and is not legally binding. The legally binding version is exclusively the current complete German version of these Terms of Use.
@@ -16,15 +16,15 @@ Summary (simplified, not legally binding)
 - You are responsible for the content you publish or send.
 - Prohibited content (e.g., illegal content, hate speech, violence, personal information) is not allowed.
 - We may moderate, restrict, hide, or remove content.
-- Reports and procedures under the Digital Services Act (DSA) may be carried out for public content.
-- A public status page may be provided for DSA procedures (with anonymized or non-personal procedural information).
+- Reports and proceedings under the Digital Services Act (DSA) may be conducted for public content.
+- A public status page may be provided for DSA proceedings (with anonymized or non-personal procedural information).
 - Illegal public content can be reported using the reporting function in the service or via the contact point specified in the legal notice.
 - Affected users can submit an internal complaint regarding moderation decisions, where provided for by law.
 - You can follow contacts and places. Notifications are voluntary additional technical features; we are not obligated to deliver them.
 - Private chats are intended as confidential communication. Nevertheless, you must also comply with the law there.
 - Much data is stored locally on your device. This data can be lost. Without your own backup, recovery is not possible.
 - The optional read-aloud function uses the speech synthesis of your browser or operating system. Availability, voice selection, and quality depend on the device, browser, operating system, and selected voice.
-- The optional usage time protection (self-restriction/parental mode with parental PIN) can be circumvented technically; an absolute block is not guaranteed.
+- The optional Usage Time Protection (self-restriction/parental mode with parental PIN) can be technically circumvented; absolute blocking is not guaranteed.
 - External content from third-party providers is only loaded after you have given your provider-specific consent. You can withdraw this consent at any time.
 - External services (e.g., YouTube, OpenStreetMap, DeepL, Unsplash, Viator) have their own terms of use and privacy policies.
 - MessageDrop is not an emergency service.
@@ -32,7 +32,7 @@ Summary (simplified, not legally binding)
 Only the complete version below is authoritative.
 
 ###
-Full version
+Complete Version
 ###
 
 ###
@@ -51,7 +51,7 @@ Managing Director: Christian Wagner, Dipl.-Inform. (FH)
 Email: jacktoolsnet@gmail.com  
 Phone: +49 (0) 176 / 41 23 57 74
 
-(hereinafter referred to as “we,” “us,” or “provider”)
+(hereinafter “we,” “us,” or “Provider”)
 
 ###
 2. Who these terms apply to
@@ -69,7 +69,7 @@ Use is only permitted for persons who have reached the age of 16.
 - If you are 16 years of age or older but under 18 years of age: Use is only permitted with the consent of your parents or legal guardians.
 - Persons who have reached the age of 18: full legal capacity; use is permitted at their own discretion.
 
-Declarations with further legal binding force (i.e., beyond normal use) may only be made by persons with full legal capacity.
+Declarations with more extensive legal effect (i.e. beyond normal use) may only be made by persons with full legal capacity.
 
 ###
 4. What MessageDrop is
@@ -86,7 +86,7 @@ Data protection and data minimization are central principles of MessageDrop. Whe
 
 Where technically possible and reasonable, data is protected by cryptography. This includes, in particular, PIN-based local security for user accounts, encrypted storage of sensitive local data, and client-side encryption of private chat content. Your PIN is processed locally only and is not transmitted to the server.
 
-Where technically available, MessageDrop may provide an optional read-aloud function. This function is intended solely for convenience and accessibility. Which voices are available and whether speech synthesis takes place locally on the end device or via components of the browser or platform provider depends on the browser, operating system, end device, and voice selected.
+Where technically available, MessageDrop may provide an optional read-aloud function. This function is intended solely for convenience and accessibility. Which voices are available and whether speech synthesis takes place locally on the device or via components of the browser or platform provider depends on the browser, operating system, device, and selected voice.
 
 We may modify, expand, restrict, or remove functions at any time.
 
@@ -109,7 +109,7 @@ If you create a user account:
 
 - you are responsible for the secure use of your device and your PIN,
 - you must prevent misuse by third parties as far as possible,
-- you are responsible for activities via your account, to the extent permitted by law.
+- you are responsible for activities carried out through your account, to the extent permitted by law.
 
 If the PIN is lost and no backup is available, access to your previous local account cannot be restored.
 
@@ -143,7 +143,7 @@ Notifications and other push or real-time functions are voluntary additional tec
 
 Notifications may therefore be delayed, incomplete, repeated, or not delivered at all.
 
-We are not obligated to deliver notifications. There is no entitlement to delivery, whether partial, complete, immediate, or error-free.
+We do not owe the delivery of notifications. There is no entitlement to delivery. This also applies to partial, complete, immediate, or error-free delivery.
 
 ###
 9. Public content and your responsibility
@@ -174,11 +174,11 @@ You may not misuse MessageDrop.
 
 The following are prohibited in particular:
 
-- Content or actions that violate applicable law or incite legal violations,
+- Content or actions that violate applicable law or call for violations of law,
 - Content that infringes the rights of third parties (e.g., personal rights, copyrights, trademark rights, or data protection rights),
 - Criminal content or incitement to criminal acts,
 - Insults, threats, targeted harassment, bullying, or stalking,
-- Hate speech, glorification of violence, extremist or inhuman content,
+- Hate speech, glorification of violence, extremist or inhumane content,
 - Pornographic, sexually explicit, or youth-endangering content,
 - Content with sexual references to minors,
 - Public disclosure or other unauthorized distribution of personal information (personal data), regardless of whether it concerns you or other persons.
@@ -196,7 +196,7 @@ The following are also prohibited:
 - Spam, chain messages, abusive mass distribution, or harmful automation,
 - Malware, malicious code, or instructions for circumventing security mechanisms,
 - Attacks on the security, stability, or availability of the service,
-- Circumvention of usage restrictions, including abusive circumvention of usage time protection or parental PINs,
+- Circumvention of usage restrictions, including abusive circumvention of Usage Time Protection or parental PINs,
 - Falsification of identity, partnership, or official representation.
 
 The prohibition on the public disclosure of personal information applies without exception. It also applies if such information is already available elsewhere on the internet, originates from the person concerned, or the person concerned has consented to its publication.
@@ -204,18 +204,18 @@ The prohibition on the public disclosure of personal information applies without
 This list is not exhaustive.
 
 ###
-11. Moderation, reports, and DSA procedures
+11. Moderation, reports, and DSA proceedings
 ###
 
 Insofar as the legal requirements of the Digital Services Act (DSA) apply to MessageDrop, the following rules apply in addition.
 
 ###
-11.1 Reporting potentially illegal content (notice)
+11.1 Reporting potentially illegal content (Notice)
 ###
 
 Potentially illegal public content can be reported:
 
-- using the reporting function provided for this purpose in the service (DSA report), or
+- using the reporting function provided for this purpose in the service (DSA notice), or
 - via the DSA contact point specified in the legal notice.
 
 To enable verification, reports should be as specific as possible, e.g., including:
@@ -228,7 +228,7 @@ To enable verification, reports should be as specific as possible, e.g., includi
 11.2 Review and possible measures
 ###
 
-We may review, moderate, restrict, hide, or remove reported or conspicuous content.
+We may review, moderate, restrict, hide, or remove reported or otherwise conspicuous content.
 
 Manual and automated processes (including AI-supported assistance) may be used for this purpose.
 
@@ -236,11 +236,11 @@ During ongoing reviews, content may be temporarily hidden from public view.
 
 Depending on the outcome, the following measures in particular may be taken:
 
-- No action (content remains visible)
-- Temporary restriction or hiding
-- Permanent removal
-- Reporting to the relevant authorities, insofar as we are legally obliged or entitled to do so
-- Additional measures against accounts involved in violations
+- no action (content remains visible),
+- temporary restriction or hiding,
+- permanent removal,
+- reporting to the relevant authorities, insofar as we are legally obliged or entitled to do so,
+- additional measures against accounts involved in violations.
 
 ###
 11.3 Information and justification
@@ -256,7 +256,7 @@ This information may include, in particular:
 - whether automated processes were involved in the decision.
 
 ###
-11.4 Internal complaints and further legal remedies (appeals)
+11.4 Internal complaints and further legal remedies (Appeal)
 ###
 
 Affected users may lodge an internal complaint against moderation decisions, insofar as this is provided for by law.
@@ -273,7 +273,7 @@ Abusive reports or complaints (e.g., obviously unfounded serial reports) may be 
 11.5 Public status page (DSA case page)
 ###
 
-A publicly accessible status page may be provided for DSA-relevant processes.
+A publicly accessible status page may be provided for DSA-relevant matters.
 
 This status page serves the purpose of transparency and may contain, in particular:
 
@@ -288,12 +288,12 @@ Only anonymized or non-personal information is displayed on the public status pa
 12. System messages
 ###
 
-We may display system messages to you (e.g., regarding DSA procedures, security, maintenance).
+We may display system messages to you (e.g., regarding DSA proceedings, security, or maintenance).
 
 System messages:
 
 - are only generated by authorized systems,
-- can be deleted in the front end without necessarily eliminating internal evidence.
+- can be deleted in the frontend without this necessarily affecting internal records.
 
 ###
 13. External content and third-party providers
@@ -301,7 +301,7 @@ System messages:
 
 The terms of use and privacy policies of the respective providers apply to external services.
 We have no influence on their data processing.
-The respective providers are solely responsible for the content and information provided by external providers.
+The respective providers are solely responsible for their content and information.
 To the extent permitted by law, we assume no warranty or liability for their accuracy, completeness, timeliness, or availability.
 MessageDrop uses external services in two groups:
 
@@ -320,7 +320,7 @@ The following providers require provider-specific consent or activation within t
 
 External content is disabled by default.
 
-It is only loaded once you actively consent to each provider (e.g., via a toggle or notice in the app).
+It is loaded only once you have actively consented to the respective provider (e.g. via a toggle or notice in the app).
 
 You do not have to consent to all providers. Without consent, the respective provider remains deactivated and its content is not loaded.
 
@@ -345,56 +345,56 @@ These services are used when you actively use the respective function (e.g., wea
 
 When you select Unsplash images (e.g., for avatars or backgrounds), image files are loaded from Unsplash and downloaded to your device or stored locally.
 
-In addition, technical download verification may be transmitted to Unsplash.
+In addition, technical proof of download may be transmitted to Unsplash.
 
 ###
-14. Usage time protection (self-restriction / parental mode)
+14. Usage Time Protection (self-restriction / parental mode)
 ###
 
-MessageDrop can offer optional usage time protection:
+MessageDrop can offer optional Usage Time Protection:
 
 - Self-restriction (e.g., daily limit, time window),
 - Parental mode with parental PIN.
 
 In parental mode, the parental PIN is only processed as a hash (not stored as plain text).
 
-Important: Protection is based on the technical specifications of the device and local data. Complete protection against circumvention cannot be guaranteed.
+Important: This protection is based on the technical conditions of the device and local data. Complete protection against circumvention cannot be guaranteed.
 
 ###
 15. Local storage, backup, and data loss
 ###
 
-A lot of data is stored locally on your device (e.g., browser/app storage).
+Much data is stored locally on your device (e.g. browser/app storage).
 
 This means that:
 
-- Data can be lost (e.g., through deletion, device change, browser change, updates).
-- You are responsible for backups yourself.
-- Recovery is not possible without your own previously created backup.
+- data can be lost (e.g. through deletion, device changes, browser changes, or updates),
+- you are responsible for creating backups yourself,
+- recovery is not possible without your own previously created backup.
 
-If a backup/restore function is offered, its use is at your own risk.
+If a backup/restore function is offered, its use is at your own responsibility.
 
 ###
 16. Availability and maintenance
 ###
 
-We strive to ensure stable operation, but cannot guarantee uninterrupted availability.
+We strive for stable operation, but do not guarantee uninterrupted availability.
 
 Outages or restrictions may occur, e.g., due to:
 
-- Maintenance,
-- Technical malfunctions,
-- Outages of external services,
-- Overloading due to abusive use,
-- Force majeure.
+- maintenance,
+- technical malfunctions,
+- outages of external services,
+- overload caused by abusive use,
+- force majeure.
 
 ###
 17. No emergency services
 ###
 
-MessageDrop does not provide access to the police, fire department, ambulance service, or other emergency services.
+MessageDrop does not provide access to the police, fire brigade, emergency medical services, or other emergency services.
 
-In emergencies, always use the official emergency call channels.
+In emergencies, always use the official emergency channels.
 
 ###
 18. Rights to content and app
@@ -402,7 +402,7 @@ In emergencies, always use the official emergency call channels.
 
 Your content remains your content.
 
-In order for us to operate the service, you grant us the necessary rights of use (e.g., storage, display, technical processing, moderation) to the extent necessary for operation.
+In order for us to operate the service, you grant us the rights necessary to use your content (e.g. storage, display, technical processing, moderation), to the extent required for operation.
 
 All rights to the app itself (software, design, trademarks) are held by us or our licensors.
 
@@ -410,14 +410,14 @@ All rights to the app itself (software, design, trademarks) are held by us or ou
 19. Liability
 ###
 
-In addition, the provisions of the disclaimer apply to liability and warranty.
+In addition, the provisions of the Liability Notice (Disclaimer) apply to liability and warranty.
 
-To the extent permitted by law, our liability for simple negligence is excluded, unless it involves the breach of essential contractual obligations (cardinal obligations). In this case, liability is limited to the damage typical for this type of contract and foreseeable at the time the contract was concluded.
+To the extent permitted by law, our liability for ordinary negligence is excluded, unless this involves the breach of essential contractual obligations (cardinal obligations). In this case, liability is limited to the foreseeable damage typical for the contract at the time the contract was concluded.
 
-We shall only be liable without limitation in cases of:
+We are liable without limitation only in cases of:
 - intent,
 - gross negligence,
-- injury to life, limb, or health,
+- injury to life, body, or health,
 - fraudulent concealment of a defect,
 - assumption of a guarantee,
 - liability under the Product Liability Act,
@@ -433,7 +433,7 @@ You use MessageDrop within the scope of the legal requirements and at your own r
 
 You can terminate your use at any time.
 
-You can also delete your user account yourself at any time via the app. In this case, the user account and all associated server-side and local data will be deleted immediately and permanently, subject to statutory retention or documentation obligations.
+You can also delete your user account yourself at any time via the app. In this case, the user account and all associated server-side and local data will be deleted immediately and permanently, subject to statutory retention or evidentiary obligations.
 
 User accounts with no login activity for a period of 90 days will be automatically deleted from the server without warning.
 
@@ -460,7 +460,7 @@ We may amend these Terms of Use if necessary (e.g., in the event of new features
 
 The current version will be published in the service. Changes will take effect upon publication of the updated version, unless a later date is specified.
 
-In the event of significant changes, we will provide appropriate notification within the service before they take effect, insofar as this is legally and technically possible.
+In the event of significant changes, we will provide appropriate notice within the service before they take effect, insofar as this is legally and technically possible.
 
 In the event of significant changes, renewed consent is required for further use. Without this consent, further use is not possible from the time the changes take effect.
 
@@ -470,9 +470,9 @@ In the event of significant changes, renewed consent is required for further use
 
 German law applies.
 
-If you are a consumer, mandatory consumer protection regulations in your country of residence remain unaffected.
+If you are a consumer, mandatory consumer protection provisions of your country of residence remain unaffected.
 
-For merchants or legal entities, our registered office is the place of jurisdiction, to the extent permitted.
+For merchants or legal persons, our registered office is the place of jurisdiction, to the extent permitted.
 
 ###
 23. Severability clause

@@ -1,12 +1,9 @@
 IMPRESSUM
+Stand: 12. April 2026
 
 (Anbieterkennzeichnung gemäß § 5 Digitale-Dienste-Gesetz – DDG)
 
-Stand: 12. April 2026
-
-
 ###
-
 Diensteanbieter
 
 JackTools.Net UG (haftungsbeschränkt)
@@ -17,33 +14,25 @@ Deutschland
 Telefon: +49 (0) 176 / 41 23 57 74
 E-Mail: jacktoolsnet@gmail.com
 
-
 ###
-
 Vertretungsberechtigter Geschäftsführer
 
 Christian Wagner, Dipl.-Inform. (FH)
 
-
 ###
-
 Handelsregister
 
 Registergericht: Ingolstadt
 Registernummer: HRB 5933
 
-
 ###
-
 Umsatzsteuer-Identifikationsnummer
 
 gemäß § 27a Umsatzsteuergesetz (UStG)
 
 DE277133529
 
-
 ###
-
 Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV
 
 Christian Wagner
@@ -51,16 +40,12 @@ Im Kirchfeld 27
 38304 Wolfenbüttel
 Deutschland
 
-
 ###
-
 Verbraucherstreitbeilegung
 
 Wir sind weder verpflichtet noch bereit, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.
 
-
 ###
-
 Digital Services Act (DSA) – Zentrale Kontaktstelle
 
 Gemäß Art. 11 und Art. 12 Digital Services Act (DSA):
