@@ -5,4 +5,5 @@ export interface PublicProfileSavePayload {
   avatarImage: string;
   avatarAttribution: PublicProfileAvatarAttribution | null;
   defaultStyle: string;
+  aiGuidance: string;
 }

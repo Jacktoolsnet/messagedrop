@@ -6,6 +6,7 @@ export interface PublicProfileSummary {
   avatarImage: string;
   avatarAttribution: PublicProfileAvatarAttribution | null;
   defaultStyle: string;
+  aiGuidance: string;
 }
 
 export interface PublicProfile extends PublicProfileSummary {

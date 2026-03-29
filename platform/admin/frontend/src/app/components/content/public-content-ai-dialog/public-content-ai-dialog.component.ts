@@ -67,6 +67,7 @@ export interface PublicContentAiDialogData {
   contentType: 'public' | 'comment';
   locationLabel: string;
   publicProfileName: string;
+  publicProfileGuidance?: string;
   parentLabel: string;
   existingHashtags: string[];
   multimedia: {
@@ -272,6 +273,7 @@ export class PublicContentAiDialogComponent {
       contentType: this.data.contentType,
       locationLabel: this.data.locationLabel,
       publicProfileName: this.data.publicProfileName,
+      publicProfileGuidance: this.data.publicProfileGuidance ?? '',
       parentLabel: this.data.parentLabel,
       existingHashtags: this.data.existingHashtags,
       targetLanguage: this.form.controls.targetLanguage.value,

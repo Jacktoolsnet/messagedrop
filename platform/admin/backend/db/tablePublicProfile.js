@@ -11,6 +11,7 @@ const columns = {
   avatarAuthorUrl: 'avatarAuthorUrl',
   avatarUnsplashUrl: 'avatarUnsplashUrl',
   defaultStyle: 'defaultStyle',
+  aiGuidance: 'aiGuidance',
   publicBackendUserId: 'publicBackendUserId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -26,6 +27,7 @@ function init(db) {
       ${columns.avatarAuthorUrl} TEXT NOT NULL DEFAULT '',
       ${columns.avatarUnsplashUrl} TEXT NOT NULL DEFAULT '',
       ${columns.defaultStyle} TEXT NOT NULL DEFAULT '',
+      ${columns.aiGuidance} TEXT NOT NULL DEFAULT '',
       ${columns.publicBackendUserId} TEXT DEFAULT NULL,
       ${columns.createdAt} INTEGER NOT NULL,
       ${columns.updatedAt} INTEGER NOT NULL
@@ -61,6 +63,12 @@ function init(db) {
       db.run(`
         ALTER TABLE ${tableName}
         ADD COLUMN ${columns.defaultStyle} TEXT NOT NULL DEFAULT ''
+      `, []);
+    }
+    if (!knownColumns.has(columns.aiGuidance)) {
+      db.run(`
+        ALTER TABLE ${tableName}
+        ADD COLUMN ${columns.aiGuidance} TEXT NOT NULL DEFAULT ''
       `, []);
     }
     if (!knownColumns.has(columns.avatarAuthorName)) {
@@ -108,10 +116,11 @@ function create(db, payload, callback) {
       ${columns.avatarAuthorUrl},
       ${columns.avatarUnsplashUrl},
       ${columns.defaultStyle},
+      ${columns.aiGuidance},
       ${columns.publicBackendUserId},
       ${columns.createdAt},
       ${columns.updatedAt}
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
   const params = [
     id,
@@ -121,6 +130,7 @@ function create(db, payload, callback) {
     payload?.avatarAuthorUrl ?? '',
     payload?.avatarUnsplashUrl ?? '',
     payload?.defaultStyle ?? '',
+    payload?.aiGuidance ?? '',
     payload?.publicBackendUserId ?? null,
     now,
     Number.isFinite(payload?.updatedAt) ? payload.updatedAt : now
@@ -214,6 +224,7 @@ function update(db, id, fields, callback) {
     columns.avatarAuthorUrl,
     columns.avatarUnsplashUrl,
     columns.defaultStyle,
+    columns.aiGuidance,
     columns.publicBackendUserId
   ];
 

@@ -1013,6 +1013,7 @@ export class PublicContentEditorComponent {
           contentType: this.contentType(),
           locationLabel: this.activeLocationLabel(),
           publicProfileName: this.profileName(),
+          publicProfileGuidance: this.selectedProfile()?.aiGuidance ?? '',
           parentLabel: this.aiParentContextLabel(),
           existingHashtags: this.hashtags(),
           multimedia: {

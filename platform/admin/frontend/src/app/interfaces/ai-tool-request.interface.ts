@@ -8,6 +8,7 @@ export interface AiToolRequest {
   contentType: PublicContentType;
   locationLabel: string;
   publicProfileName: string;
+  publicProfileGuidance?: string;
   parentLabel: string;
   existingHashtags: string[];
   contentUrls?: string[];

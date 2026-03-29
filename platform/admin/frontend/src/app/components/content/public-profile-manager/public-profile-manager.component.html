@@ -104,7 +104,7 @@
             <mat-icon>{{ selectedProfile() ? 'edit' : 'add_circle' }}</mat-icon>
           </div>
           <mat-card-title>{{ selectedProfile() ? i18n.t('Edit profile') : i18n.t('Create profile') }}</mat-card-title>
-          <mat-card-subtitle>{{ i18n.t('Avatar, display name and default text style for public publishing.') }}</mat-card-subtitle>
+          <mat-card-subtitle>{{ i18n.t('Avatar, display name, default text style and AI guidance for public publishing.') }}</mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content>
@@ -186,6 +186,17 @@
                 }
               </mat-select>
               <mat-hint>{{ i18n.t('The profile default font is used in the content editor unless a message overrides it.') }}</mat-hint>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width" subscriptSizing="dynamic">
+              <mat-label>{{ i18n.t('AI profile guidance') }}</mat-label>
+              <textarea
+                matInput
+                formControlName="aiGuidance"
+                rows="5"
+                maxlength="2000"
+                [placeholder]="i18n.t('Describe tone, audience, typical wording and what the AI should avoid for this profile.')"></textarea>
+              <mat-hint>{{ i18n.t('This text is sent to the AI Creator as editorial guidance for the selected public profile.') }}</mat-hint>
             </mat-form-field>
 
             @if (selectedStyleOption(); as option) {

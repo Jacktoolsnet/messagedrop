@@ -394,7 +394,8 @@ function normalizePublicProfilePayload(body) {
     name: normalizeString(body?.name),
     avatarImage: normalizeAvatarImage(body?.avatarImage),
     ...avatarAttribution,
-    defaultStyle: normalizeString(body?.defaultStyle)
+    defaultStyle: normalizeString(body?.defaultStyle),
+    aiGuidance: normalizeString(body?.aiGuidance).slice(0, 2000)
   };
 }
 
@@ -832,6 +833,7 @@ function toPublicProfileDto(row) {
       }
       : null,
     defaultStyle: row.defaultStyle || '',
+    aiGuidance: row.aiGuidance || '',
     publicBackendUserId: row.publicBackendUserId || null,
     contentCount: Number(row.contentCount ?? 0),
     createdAt: Number(row.createdAt || 0),
@@ -919,6 +921,7 @@ router.put('/public-profiles/:id', [requireRole(...CONTENT_ROLES), express.json(
       [tablePublicProfile.columns.avatarAuthorUrl]: payload.avatarAuthorUrl,
       [tablePublicProfile.columns.avatarUnsplashUrl]: payload.avatarUnsplashUrl,
       [tablePublicProfile.columns.defaultStyle]: payload.defaultStyle,
+      [tablePublicProfile.columns.aiGuidance]: payload.aiGuidance,
       updatedAt: Date.now()
     }, (err, ok) => {
       if (err) {

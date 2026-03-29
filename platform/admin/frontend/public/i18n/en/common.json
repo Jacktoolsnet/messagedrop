@@ -9,5 +9,9 @@
   "Applicable outcomes": "Applicable outcomes",
   "Choose one or more outcomes that should offer this reasoning template.": "Choose one or more outcomes that should offer this reasoning template.",
   "No reasoning templates are assigned to the selected outcome yet.": "No reasoning templates are assigned to the selected outcome yet.",
-  "Remove content": "Remove content"
+  "Remove content": "Remove content",
+  "Avatar, display name, default text style and AI guidance for public publishing.": "Avatar, display name, default text style and AI guidance for public publishing.",
+  "AI profile guidance": "AI profile guidance",
+  "Describe tone, audience, typical wording and what the AI should avoid for this profile.": "Describe tone, audience, typical wording and what the AI should avoid for this profile.",
+  "This text is sent to the AI Creator as editorial guidance for the selected public profile.": "This text is sent to the AI Creator as editorial guidance for the selected public profile."
 }

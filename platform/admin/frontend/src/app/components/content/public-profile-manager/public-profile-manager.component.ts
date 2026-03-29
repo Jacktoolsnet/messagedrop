@@ -66,7 +66,8 @@ export class PublicProfileManagerComponent {
   readonly form = this.fb.nonNullable.group({
     name: this.fb.nonNullable.control('', { validators: [Validators.required] }),
     avatarImage: this.fb.nonNullable.control(''),
-    defaultStyle: this.fb.nonNullable.control(this.styleOptions[0]?.style ?? '', { validators: [Validators.required] })
+    defaultStyle: this.fb.nonNullable.control(this.styleOptions[0]?.style ?? '', { validators: [Validators.required] }),
+    aiGuidance: this.fb.nonNullable.control('', { validators: [Validators.maxLength(2000)] })
   });
   readonly formValue = toSignal(
     this.form.valueChanges.pipe(startWith(this.form.getRawValue())),
@@ -165,7 +166,8 @@ export class PublicProfileManagerComponent {
     this.form.reset({
       name: '',
       avatarImage: '',
-      defaultStyle: this.styleOptions[0]?.style ?? ''
+      defaultStyle: this.styleOptions[0]?.style ?? '',
+      aiGuidance: ''
     });
     this.avatarAttribution.set(null);
     this.form.markAsPristine();
@@ -178,7 +180,8 @@ export class PublicProfileManagerComponent {
     this.form.setValue({
       name: row.name ?? '',
       avatarImage: row.avatarImage ?? '',
-      defaultStyle: this.styleService.normalizeStyle(row.defaultStyle) || (this.styleOptions[0]?.style ?? '')
+      defaultStyle: this.styleService.normalizeStyle(row.defaultStyle) || (this.styleOptions[0]?.style ?? ''),
+      aiGuidance: row.aiGuidance ?? ''
     });
     this.avatarAttribution.set(row.avatarAttribution ?? null);
     this.form.markAsPristine();
@@ -200,7 +203,8 @@ export class PublicProfileManagerComponent {
       name: raw.name.trim(),
       avatarImage: raw.avatarImage.trim(),
       avatarAttribution: this.avatarAttribution(),
-      defaultStyle: this.styleService.normalizeStyle(raw.defaultStyle)
+      defaultStyle: this.styleService.normalizeStyle(raw.defaultStyle),
+      aiGuidance: raw.aiGuidance.trim()
     };
 
     if (!payload.name || !payload.defaultStyle) {

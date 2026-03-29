@@ -566,6 +566,7 @@ export class PublicContentAiCreatorDialogComponent {
       contentType: 'public',
       locationLabel: '',
       publicProfileName: this.selectedProfile()?.name ?? '',
+      publicProfileGuidance: this.selectedProfile()?.aiGuidance ?? '',
       parentLabel: '',
       existingHashtags: [],
       contentUrls: this.sourceUrlsForRun(),
