@@ -1,32 +1,35 @@
 @if (data.layout === 'toast') {
 <div
     class="toast-shell"
+    [class.toast-shell-simple]="!hasActions"
     [class.is-closing]="closing()"
     [attr.role]="toastRole"
     [attr.aria-live]="toastLive"
     aria-atomic="true"
 >
-    <div class="toast-container">
+    <div class="toast-container" [class.toast-container-simple]="!hasActions">
         @if (data.icon) {
         <div class="toast-icon-wrap" aria-hidden="true">
             <mat-icon class="toast-icon">{{ data.icon }}</mat-icon>
         </div>
         }
 
-        <div class="toast-content">
-            @if (data.title) {
-            <h2>{{ data.title }}</h2>
-            }
+        <div class="toast-content" [class.toast-content-simple]="!hasActions">
+            <div class="toast-copy">
+                @if (data.title) {
+                <h2>{{ data.title }}</h2>
+                }
 
-            @if (data.message) {
-            <p class="multiline-text">{{ data.message }}</p>
-            }
+                @if (data.message) {
+                <p class="multiline-text">{{ data.message }}</p>
+                }
 
-            @if (data.showSpinner) {
-            <div class="toast-spinner-row">
-                <mat-spinner diameter="18" strokeWidth="3"></mat-spinner>
+                @if (data.showSpinner) {
+                <div class="toast-spinner-row">
+                    <mat-spinner diameter="18" strokeWidth="3"></mat-spinner>
+                </div>
+                }
             </div>
-            }
 
             @if (showOk() && (data.button || data.secondaryButton)) {
             <div class="toast-actions">

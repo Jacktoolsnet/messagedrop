@@ -87,6 +87,10 @@
     box-sizing: border-box;
 }
 
+.toast-container-simple {
+    align-items: center;
+}
+
 .toast-icon-wrap {
     display: grid;
     place-items: center;
@@ -112,6 +116,24 @@
 .toast-content {
     min-width: 0;
     flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.toast-copy {
+    min-width: 0;
+}
+
+.toast-content-simple {
+    justify-content: center;
+}
+
+.toast-content-simple .toast-copy {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }
 
 .toast-content h2 {
@@ -133,6 +155,10 @@
     display: flex;
     align-items: center;
     margin-top: 0.8rem;
+}
+
+.toast-content-simple .toast-spinner-row {
+    justify-content: center;
 }
 
 .toast-actions {
