@@ -13,5 +13,13 @@
   "Avatar, display name, default text style and AI guidance for public publishing.": "Avatar, display name, default text style and AI guidance for public publishing.",
   "AI profile guidance": "AI profile guidance",
   "Describe tone, audience, typical wording and what the AI should avoid for this profile.": "Describe tone, audience, typical wording and what the AI should avoid for this profile.",
-  "This text is sent to the AI Creator as editorial guidance for the selected public profile.": "This text is sent to the AI Creator as editorial guidance for the selected public profile."
+  "This text is sent to the AI Creator as editorial guidance for the selected public profile.": "This text is sent to the AI Creator as editorial guidance for the selected public profile.",
+  "Selected multimedia preview": "Selected multimedia preview",
+  "TikTok preview": "TikTok preview",
+  "Profile and optional focus": "Profile and optional focus",
+  "Choose the target profile and optionally define an editorial focus for the AI.": "Choose the target profile and optionally define an editorial focus for the AI.",
+  "Task / optional focus": "Task / optional focus",
+  "Optional: describe what kind of public messages should be created or which extra focus the AI should follow.": "Optional: describe what kind of public messages should be created or which extra focus the AI should follow.",
+  "Optional. Use this to give the AI an extra focus such as event announcement, beginner-friendly tone or call to action.": "Optional. Use this to give the AI an extra focus such as event announcement, beginner-friendly tone or call to action.",
+  "Please add a task, a source link, profile guidance or multimedia context before generating drafts.": "Please add a task, a source link, profile guidance or multimedia context before generating drafts."
 }

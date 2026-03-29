@@ -14,8 +14,10 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
 import { Router, RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged, finalize, map } from 'rxjs';
+import { Multimedia } from '../../../interfaces/multimedia.interface';
 import { PublicContentStatus } from '../../../interfaces/public-content-status.type';
 import { PublicContentType } from '../../../interfaces/public-content-type.type';
 import { PublicContent } from '../../../interfaces/public-content.interface';
@@ -60,6 +62,7 @@ export class PublicContentListComponent {
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(DisplayMessageService);
+  private readonly sanitizer = inject(DomSanitizer);
   private readonly authService = inject(AuthService);
   private readonly aiService = inject(AiService);
   private readonly publicContentService = inject(PublicContentService);
@@ -233,6 +236,25 @@ export class PublicContentListComponent {
     }
 
     return /\.(png|jpe?g|gif|webp|bmp|svg)(\?.*)?$/i.test(multimedia.url);
+  }
+
+  safeMultimediaOembedHtml(row: PublicContent): SafeHtml | null {
+    const html = row.multimedia?.oembed?.html;
+    return html ? this.sanitizer.bypassSecurityTrustHtml(html) : null;
+  }
+
+  multimediaTikTokEmbedUrl(row: PublicContent): SafeResourceUrl | null {
+    const multimedia = row.multimedia;
+    if (!multimedia || (multimedia.type || '').toLowerCase() !== 'tiktok') {
+      return null;
+    }
+
+    const id = this.getTikTokId(multimedia);
+    if (!id) {
+      return null;
+    }
+
+    return this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.tiktok.com/embed/v2/${id}`);
   }
 
   resolvedStyle(row: PublicContent): string {
@@ -443,6 +465,40 @@ export class PublicContentListComponent {
 
     const firstSegment = normalized.split(',')[0]?.trim();
     return firstSegment || normalized;
+  }
+
+  private getTikTokId(multimedia: Multimedia): string | null {
+    const sourceUrl = String(multimedia.sourceUrl || multimedia.url || '').trim();
+    if (sourceUrl) {
+      try {
+        const parsed = new URL(sourceUrl);
+        const normalizedHost = parsed.hostname.toLowerCase();
+        const isTikTokHost = normalizedHost === 'tiktok.com'
+          || normalizedHost === 'www.tiktok.com'
+          || normalizedHost.endsWith('.tiktok.com')
+          || normalizedHost === 'vm.tiktok.com';
+
+        if (isTikTokHost) {
+          const match = parsed.pathname.match(/\/@[^/]+\/video\/(\d+)/);
+          const safeMatch = this.sanitizeTikTokId(match?.[1] || null);
+          if (safeMatch) {
+            return safeMatch;
+          }
+        }
+      } catch {
+        // ignore malformed URLs
+      }
+    }
+
+    return this.sanitizeTikTokId(multimedia.contentId || null);
+  }
+
+  private sanitizeTikTokId(value: string | null | undefined): string | null {
+    const normalized = String(value || '').trim();
+    if (!normalized || !/^\d+$/.test(normalized)) {
+      return null;
+    }
+    return normalized;
   }
 
   confirmPublish(row: PublicContent, event?: Event): void {

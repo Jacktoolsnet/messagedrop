@@ -169,7 +169,7 @@ export class AiService {
     if (error instanceof HttpErrorResponse) {
       const message = error.error?.message || error.error?.error || error.message;
       if (typeof message === 'string' && message.trim()) {
-        return message.trim();
+        return this.i18n.t(message.trim());
       }
     }
     return this.i18n.t(fallbackMessage);

@@ -273,11 +273,33 @@ app-dialog-action-bar {
 .multimedia-preview {
   padding: 0.9rem 1rem;
   border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(255, 255, 255, 0.94);
+  color: rgba(31, 41, 55, 0.92);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
 }
 
 .multimedia-preview-head {
   margin-bottom: 0.75rem;
+}
+
+.multimedia-preview .dialog-meta-chip {
+  background: rgba(37, 99, 235, 0.1);
+  color: #1d4ed8;
+}
+
+.multimedia-preview-media {
+  margin-bottom: 0.9rem;
+}
+
+.multimedia-preview-media img,
+.multimedia-preview-media iframe {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  border: 0;
+  border-radius: 0.85rem;
 }
 
 .multimedia-preview-body {
@@ -288,16 +310,21 @@ app-dialog-action-bar {
 
 .multimedia-preview-body strong {
   font-size: 0.96rem;
+  color: #0f172a;
 }
 
 .multimedia-preview-body p {
   margin: 0;
-  color: rgba(255, 255, 255, 0.82);
+  color: rgba(51, 65, 85, 0.9);
 }
 
 .multimedia-preview-url {
-  color: rgba(255, 255, 255, 0.68);
+  color: rgba(71, 85, 105, 0.92);
   overflow-wrap: anywhere;
+}
+
+.multimedia-preview-summary {
+  background: rgba(15, 23, 42, 0.05);
 }
 
 .suggestion-list {

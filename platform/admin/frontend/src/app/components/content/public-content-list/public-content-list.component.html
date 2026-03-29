@@ -130,6 +130,22 @@
               <div class="content-preview-media">
                 <img [src]="row.multimedia.url" [alt]="row.multimedia.title || i18n.t('Selected multimedia preview')" />
               </div>
+            } @else if (multimediaTikTokEmbedUrl(row); as tiktokUrl) {
+              <div class="content-preview-media">
+                <div class="content-preview-oembed content-preview-oembed-tiktok">
+                  <iframe [src]="tiktokUrl" [title]="i18n.t('TikTok preview')" loading="lazy" allowfullscreen></iframe>
+                </div>
+              </div>
+            } @else if (safeMultimediaOembedHtml(row); as safeOembedHtml) {
+              <div class="content-preview-media">
+                <div
+                  class="content-preview-oembed"
+                  [class.content-preview-oembed-youtube]="row.multimedia.type === 'youtube'"
+                  [class.content-preview-oembed-spotify]="row.multimedia.type === 'spotify'"
+                  [class.content-preview-oembed-tiktok]="row.multimedia.type === 'tiktok'"
+                  [class.content-preview-oembed-pinterest]="row.multimedia.type === 'pinterest'"
+                  [innerHTML]="safeOembedHtml"></div>
+              </div>
             } @else if (row.multimedia.type !== 'undefined' && (row.multimedia.title || row.multimedia.description)) {
               <div class="content-preview-media-summary">
                 <span class="content-preview-media-type">{{ mediaTypeLabel(row.multimedia.type) }}</span>

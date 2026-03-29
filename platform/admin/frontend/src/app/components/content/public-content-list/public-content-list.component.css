@@ -273,6 +273,61 @@ mat-toolbar {
   border: 0;
 }
 
+.content-preview-media iframe {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  border: 0;
+  border-radius: .75rem;
+}
+
+.content-preview-oembed {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: auto;
+}
+
+:host ::ng-deep .content-preview-oembed iframe {
+  width: 100% !important;
+  max-width: 100% !important;
+  display: block;
+  margin: 0 auto;
+  border: 0;
+  border-radius: .75rem;
+  background-color: transparent;
+}
+
+:host ::ng-deep .content-preview-oembed.content-preview-oembed-youtube iframe {
+  width: min(100%, 100%) !important;
+  aspect-ratio: 16 / 9;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+}
+
+:host ::ng-deep .content-preview-oembed.content-preview-oembed-spotify iframe {
+  min-height: clamp(152px, 22vw, 352px);
+}
+
+:host ::ng-deep .content-preview-oembed.content-preview-oembed-tiktok iframe {
+  max-width: min(100%, 28rem) !important;
+  min-height: clamp(360px, 58vw, 640px);
+  aspect-ratio: 9 / 16;
+}
+
+:host ::ng-deep .content-preview-oembed.content-preview-oembed-pinterest iframe {
+  max-width: min(100%, 28rem) !important;
+  width: 100% !important;
+  height: clamp(320px, 44vw, 480px) !important;
+  min-height: 0 !important;
+  max-height: 480px !important;
+  aspect-ratio: auto !important;
+}
+
 .content-preview-media-summary {
   display: grid;
   gap: .2rem;

@@ -234,6 +234,23 @@ export class PublicContentAiCreatorDialogComponent {
     const state = this.multimediaPreviewState();
     return !!state.url && state.supported && !state.loading && !state.multimedia;
   });
+  readonly currentMultimediaPreviewOembedHtml = computed<SafeHtml | null>(() => {
+    const html = this.multimediaPreview()?.oembed?.html;
+    return html ? this.sanitizer.bypassSecurityTrustHtml(html) : null;
+  });
+  readonly currentMultimediaTikTokEmbedUrl = computed<SafeResourceUrl | null>(() => {
+    const multimedia = this.multimediaPreview();
+    if (!multimedia || (multimedia.type || '').toLowerCase() !== 'tiktok') {
+      return null;
+    }
+
+    const id = this.getTikTokId(multimedia);
+    if (!id) {
+      return null;
+    }
+
+    return this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.tiktok.com/embed/v2/${id}`);
+  });
   readonly previewMessageType = computed(() => this.formValue().creatorMessageType ?? 'auto');
   readonly previewHashtagStyle = computed(() => this.formValue().creatorHashtagStyle ?? 'auto');
 
@@ -243,13 +260,21 @@ export class PublicContentAiCreatorDialogComponent {
   });
   readonly selectedProfileDefaultStyle = computed(() => this.styleService.normalizeStyle(this.selectedProfile()?.defaultStyle));
   readonly previewDisplayStyle = computed(() => this.selectedProfileDefaultStyle());
+  readonly hasContextForGeneration = computed(() => {
+    const formValue = this.formValue();
+    const prompt = (formValue.prompt ?? '').trim();
+    const profileGuidance = (this.selectedProfile()?.aiGuidance ?? '').trim();
+    const hasSourceLinks = this.sourceUrlsForRun().length > 0;
+    const hasMultimediaContext = !!this.normalizeHttpUrl(formValue.multimediaUrl ?? '');
+    return !!prompt || hasSourceLinks || !!profileGuidance || hasMultimediaContext;
+  });
 
   readonly canRun = computed(() => {
     if (this.loading() || this.importing()) {
       return false;
     }
     const formValue = this.formValue();
-    return !!formValue.publicProfileId && !!(formValue.prompt ?? '').trim();
+    return !!formValue.publicProfileId && this.hasContextForGeneration();
   });
 
   readonly canImport = computed(() => (

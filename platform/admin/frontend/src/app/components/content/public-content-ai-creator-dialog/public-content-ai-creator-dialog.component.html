@@ -10,8 +10,8 @@
         <div mat-card-avatar class="avatar avatar-accent">
           <mat-icon>edit_note</mat-icon>
         </div>
-        <mat-card-title>{{ i18n.t('Prompt and profile') }}</mat-card-title>
-        <mat-card-subtitle>{{ i18n.t('Define the task, target profile and the editorial direction for the AI.') }}</mat-card-subtitle>
+        <mat-card-title>{{ i18n.t('Profile and optional focus') }}</mat-card-title>
+        <mat-card-subtitle>{{ i18n.t('Choose the target profile and optionally define an editorial focus for the AI.') }}</mat-card-subtitle>
       </mat-card-header>
 
       <mat-card-content class="tile-body">
@@ -56,12 +56,13 @@
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>{{ i18n.t('Task / prompt') }}</mat-label>
+          <mat-label>{{ i18n.t('Task / optional focus') }}</mat-label>
           <textarea
             matInput
             rows="6"
             [formControl]="form.controls.prompt"
-            [placeholder]="i18n.t('Describe what kind of public messages should be created and what the focus should be.')"></textarea>
+            [placeholder]="i18n.t('Optional: describe what kind of public messages should be created or which extra focus the AI should follow.')"></textarea>
+          <mat-hint>{{ i18n.t('Optional. Use this to give the AI an extra focus such as event announcement, beginner-friendly tone or call to action.') }}</mat-hint>
         </mat-form-field>
       </mat-card-content>
     </mat-card>
@@ -136,12 +137,7 @@
             [placeholder]="i18n.t('Optional YouTube, Spotify, Pinterest or TikTok URL')" />
         </mat-form-field>
 
-        @if (multimediaProvider(); as mediaType) {
-          <div class="inline-info">
-            <mat-icon>perm_media</mat-icon>
-            <span>{{ i18n.t('Recognized multimedia source') }}: {{ mediaTypeLabel(mediaType) }}</span>
-          </div>
-        } @else if (hasUnsupportedMultimediaUrl()) {
+        @if (hasUnsupportedMultimediaUrl()) {
           <div class="inline-warning">
             <mat-icon>info</mat-icon>
             <span>{{ i18n.t('Supported multimedia platforms: YouTube, Spotify, Pinterest and TikTok.') }}</span>
@@ -160,6 +156,34 @@
                 <mat-icon>preview</mat-icon>
                 {{ i18n.t('Multimedia preview') }}
               </span>
+            </div>
+
+            <div class="multimedia-preview-media">
+              @if (hasImageMultimedia(multimediaPreview)) {
+                <img [src]="multimediaPreview.url" [alt]="multimediaPreview.title || i18n.t('Selected multimedia preview')" />
+              } @else if (currentMultimediaTikTokEmbedUrl(); as tiktokUrl) {
+                <div class="preview-oembed preview-oembed-tiktok">
+                  <iframe [src]="tiktokUrl" [title]="i18n.t('TikTok preview')" loading="lazy" allowfullscreen></iframe>
+                </div>
+              } @else if (currentMultimediaPreviewOembedHtml(); as safeOembedHtml) {
+                <div
+                  class="preview-oembed"
+                  [class.preview-oembed-youtube]="multimediaPreview.type === 'youtube'"
+                  [class.preview-oembed-spotify]="multimediaPreview.type === 'spotify'"
+                  [class.preview-oembed-tiktok]="multimediaPreview.type === 'tiktok'"
+                  [class.preview-oembed-pinterest]="multimediaPreview.type === 'pinterest'"
+                  [innerHTML]="safeOembedHtml"></div>
+              } @else {
+                <div class="preview-media-summary multimedia-preview-summary">
+                  <span class="preview-media-type">{{ mediaTypeLabel(multimediaPreview.type) }}</span>
+                  @if (multimediaPreview.title) {
+                    <strong>{{ multimediaPreview.title }}</strong>
+                  }
+                  @if (multimediaPreview.description) {
+                    <span>{{ multimediaPreview.description }}</span>
+                  }
+                </div>
+              }
             </div>
 
             <div class="multimedia-preview-body">
