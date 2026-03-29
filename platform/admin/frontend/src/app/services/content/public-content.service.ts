@@ -208,7 +208,7 @@ export class PublicContentService {
     if (error instanceof HttpErrorResponse) {
       const backendMessage = error.error?.message || error.error?.error || error.message;
       if (typeof backendMessage === 'string' && backendMessage.trim()) {
-        return backendMessage.trim();
+        return this.i18n.t(backendMessage.trim());
       }
     }
     return this.i18n.t(fallbackMessage);

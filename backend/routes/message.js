@@ -67,7 +67,21 @@ function normalizeInternalMultimedia(multimedia) {
   return '';
 }
 
-function updateInternalManagedMessage(db, messageUuid, payload, callback) {
+function updateInternalManagedMessage(db, messageUuid, payload, options, callback) {
+  const moderation = options?.moderation || {};
+  const aiModeration = moderation?.aiModeration ?? null;
+  const aiModerationScore = Number.isFinite(moderation?.aiScore) ? moderation.aiScore : null;
+  const aiModerationFlagged = moderation?.aiFlagged === undefined || moderation?.aiFlagged === null
+    ? null
+    : (moderation.aiFlagged ? 1 : 0);
+  const aiModerationDecision = moderation?.aiDecision ?? null;
+  const aiModerationAt = Number.isFinite(moderation?.aiCheckedAt) ? moderation.aiCheckedAt : null;
+  const patternMatch = moderation?.patternMatch === undefined || moderation?.patternMatch === null
+    ? null
+    : (moderation.patternMatch ? 1 : 0);
+  const patternMatchAt = Number.isFinite(moderation?.patternMatchAt) ? moderation.patternMatchAt : null;
+  const nextStatus = options?.status || tableMessage.messageStatus.ENABLED;
+
   const sql = `
     UPDATE tableMessage
     SET message = ?,
@@ -79,17 +93,17 @@ function updateInternalManagedMessage(db, messageUuid, payload, callback) {
         markerType = ?,
         hashtags = ?,
         userId = ?,
-        status = '${tableMessage.messageStatus.ENABLED}',
+        status = ?,
         deleteDateTime = strftime('%s','now','+30 days'),
         dsaStatusToken = NULL,
         dsaStatusTokenCreatedAt = NULL,
-        aiModeration = NULL,
-        aiModerationScore = NULL,
-        aiModerationFlagged = NULL,
-        aiModerationDecision = NULL,
-        aiModerationAt = NULL,
-        patternMatch = NULL,
-        patternMatchAt = NULL,
+        aiModeration = ?,
+        aiModerationScore = ?,
+        aiModerationFlagged = ?,
+        aiModerationDecision = ?,
+        aiModerationAt = ?,
+        patternMatch = ?,
+        patternMatchAt = ?,
         manualModerationDecision = NULL,
         manualModerationReason = NULL,
         manualModerationAt = NULL,
@@ -107,6 +121,14 @@ function updateInternalManagedMessage(db, messageUuid, payload, callback) {
     payload.markerType,
     payload.hashtags,
     payload.messageUserId,
+    nextStatus,
+    aiModeration,
+    aiModerationScore,
+    aiModerationFlagged,
+    aiModerationDecision,
+    aiModerationAt,
+    patternMatch,
+    patternMatchAt,
     messageUuid
   ], function (err) {
     callback(err, { affected: this?.changes ?? 0 });
@@ -297,6 +319,7 @@ function normalizeInternalPublishPayload(body) {
       latitude: Number.isFinite(Number(body?.latitude)) ? Number(body.latitude) : 0,
       longitude: Number.isFinite(Number(body?.longitude)) ? Number(body.longitude) : 0,
       plusCode: String(body?.plusCode || '').trim(),
+      rawMessage: String(body?.message || ''),
       message: sanitizeSingleQuotes(String(body?.message || '')),
       markerType: String(body?.markerType || 'default').trim() || 'default',
       style: typeof body?.style === 'string' ? body.style : '',
@@ -338,6 +361,71 @@ function isPostingBlocked(userRow) {
     return false;
   }
   return true;
+}
+
+function moderationPublishErrorMessage(reason) {
+  if (reason === 'pattern') {
+    return 'This content could not be published because public content must not contain private contact details, links or similar personal data.';
+  }
+  if (reason === 'ai') {
+    return 'This content could not be published because it was rejected by automated moderation.';
+  }
+  return 'This content could not be published because it was rejected by automated moderation.';
+}
+
+async function runAutomatedPublicContentModeration(rawMessage, hashtags) {
+  const moderationInput = [String(rawMessage ?? ''), formatHashtagsForModeration(hashtags)].filter(Boolean).join(' ').trim();
+  const moderation = {};
+  let status = tableMessage.messageStatus.ENABLED;
+  let moderationDecision = null;
+  let moderationScore = null;
+  let moderationFlagged = null;
+  let moderationReason = null;
+
+  moderation.patternMatch = detectPersonalInformation(moderationInput);
+  moderation.patternMatchAt = Date.now();
+
+  if (moderation.patternMatch) {
+    moderationScore = null;
+    moderationFlagged = true;
+    moderationDecision = 'rejected';
+    moderationReason = 'pattern';
+    status = tableMessage.messageStatus.DISABLED;
+  }
+
+  if (!moderation.patternMatch) {
+    try {
+      const moderationResult = await openai.moderations.create({
+        model: moderationModel,
+        input: moderationInput
+      });
+      moderationScore = extractModerationScore(moderationResult);
+      moderationFlagged = moderationResult?.results?.[0]?.flagged ?? false;
+      moderationDecision = decideModeration(moderationScore, moderationFlagged);
+      if (moderationDecision === 'rejected') {
+        moderationReason = 'ai';
+        status = tableMessage.messageStatus.DISABLED;
+      }
+      moderation.aiModeration = JSON.stringify(moderationResult);
+      moderation.aiScore = moderationScore;
+      moderation.aiFlagged = moderationFlagged;
+      moderation.aiDecision = moderationDecision;
+      moderation.aiCheckedAt = Date.now();
+    } catch (err) {
+      const apiErr = apiError.internal('openai_failed');
+      apiErr.detail = err?.message || err;
+      throw apiErr;
+    }
+  }
+
+  return {
+    moderation,
+    status,
+    moderationDecision,
+    moderationScore,
+    moderationFlagged,
+    moderationReason
+  };
 }
 
 function isMessageLockedByModeration(messageRow) {
@@ -660,81 +748,127 @@ router.post('/internal/publish',
         }
       }
 
-      const existing = await getMessageByUuid(req.database.db, payload.uuid);
-      if (existing) {
-        updateInternalManagedMessage(req.database.db, payload.uuid, payload, (updateErr, result) => {
-          if (updateErr) {
-            return next(apiError.internal('db_error'));
-          }
-          if (payload.messageTyp === tableMessage.messageType.PUBLIC) {
-            notify.placeSubscriptions(
-              req.logger,
-              req.database.db,
-              payload.latitude,
-              payload.longitude,
-              payload.messageUserId,
-              payload.message,
-              {
-                messageUuid: payload.uuid,
-                messagePlusCode: payload.plusCode
-              }
-            );
-          }
-          return res.status(200).json({
-            status: 200,
-            messageId: existing.id ?? null,
-            messageUuid: payload.uuid,
-            updated: (result?.affected ?? 0) > 0
-          });
-        });
-        return;
+      const requiresModeration = [
+        tableMessage.messageType.PUBLIC,
+        tableMessage.messageType.COMMENT
+      ].includes(payload.messageTyp);
+      const moderationResult = requiresModeration
+        ? await runAutomatedPublicContentModeration(payload.rawMessage, payload.hashtags)
+        : null;
+
+      if (requiresModeration && moderationResult?.moderationDecision === 'rejected') {
+        return next(apiError.unprocessableEntity(moderationPublishErrorMessage(moderationResult.moderationReason)));
       }
 
-      tableMessage.create(
-        req.database.db,
-        payload.uuid,
-        payload.parentUuid,
-        payload.messageTyp,
-        payload.latitude,
-        payload.longitude,
-        payload.plusCode,
-        payload.message,
-        payload.markerType,
-        payload.style,
-        payload.messageUserId,
-        payload.multimedia,
-        {
-          status: tableMessage.messageStatus.ENABLED,
-          hashtags: payload.encodedHashtags
-        },
-        function (err, result) {
-          if (err) {
-            return next(apiError.internal('db_error'));
-          }
+      const existing = await getMessageByUuid(req.database.db, payload.uuid);
+      let messageId = existing?.id ?? null;
+      let created = false;
+      let updated = false;
 
-          if (payload.messageTyp === tableMessage.messageType.PUBLIC) {
-            notify.placeSubscriptions(
-              req.logger,
-              req.database.db,
-              payload.latitude,
-              payload.longitude,
-              payload.messageUserId,
-              payload.message,
-              {
-                messageUuid: payload.uuid,
-                messagePlusCode: payload.plusCode
-              }
-            );
-          }
-
-          return res.status(200).json({
-            status: 200,
-            messageId: result?.id ?? null,
-            messageUuid: payload.uuid,
-            created: true
+      if (existing) {
+        const result = await new Promise((resolve, reject) => {
+          updateInternalManagedMessage(req.database.db, payload.uuid, payload, {
+            moderation: moderationResult?.moderation,
+            status: moderationResult?.status || tableMessage.messageStatus.ENABLED
+          }, (updateErr, value) => {
+            if (updateErr) {
+              return reject(updateErr);
+            }
+            resolve(value || null);
           });
-        }
-      );
+        });
+        updated = (result?.affected ?? 0) > 0;
+      } else {
+        const createResult = await new Promise((resolve, reject) => {
+          tableMessage.create(
+            req.database.db,
+            payload.uuid,
+            payload.parentUuid,
+            payload.messageTyp,
+            payload.latitude,
+            payload.longitude,
+            payload.plusCode,
+            payload.message,
+            payload.markerType,
+            payload.style,
+            payload.messageUserId,
+            payload.multimedia,
+            {
+              status: moderationResult?.status || tableMessage.messageStatus.ENABLED,
+              moderation: moderationResult?.moderation,
+              hashtags: payload.encodedHashtags
+            },
+            function (err, result) {
+              if (err) {
+                return reject(err);
+              }
+              resolve(result || null);
+            }
+          );
+        });
+        messageId = createResult?.id ?? null;
+        created = true;
+      }
+
+      let moderationRequestSent = false;
+      let moderationRequestId = null;
+      if (requiresModeration && moderationResult?.moderationDecision === 'review') {
+        const moderationPayload = {
+          messageId,
+          messageUuid: payload.uuid,
+          messageUserId: payload.messageUserId,
+          messageText: payload.rawMessage,
+          messageType: payload.messageTyp,
+          messageCreatedAt: Number(existing?.createDateTime) || Date.now(),
+          latitude: payload.latitude,
+          longitude: payload.longitude,
+          plusCode: payload.plusCode,
+          markerType: payload.markerType,
+          style: payload.style,
+          hashtags: payload.hashtags,
+          aiScore: moderationResult.moderationScore,
+          aiFlagged: moderationResult.moderationFlagged,
+          aiDecision: moderationResult.moderationDecision,
+          aiResponse: moderationResult.moderation.aiModeration,
+          patternMatch: moderationResult.moderation.patternMatch ?? null,
+          patternMatchAt: moderationResult.moderation.patternMatchAt ?? null
+        };
+        const forward = await forwardModerationRequest(moderationPayload, req.logger);
+        moderationRequestSent = forward.sent;
+        moderationRequestId = forward.id ?? null;
+      }
+
+      if (payload.messageTyp === tableMessage.messageType.PUBLIC) {
+        notify.placeSubscriptions(
+          req.logger,
+          req.database.db,
+          payload.latitude,
+          payload.longitude,
+          payload.messageUserId,
+          payload.message,
+          {
+            messageUuid: payload.uuid,
+            messagePlusCode: payload.plusCode
+          }
+        );
+      }
+
+      return res.status(200).json({
+        status: 200,
+        messageId,
+        messageUuid: payload.uuid,
+        created,
+        updated,
+        moderation: requiresModeration ? {
+          decision: moderationResult?.moderationDecision ?? null,
+          reason: moderationResult?.moderationReason ?? null,
+          score: moderationResult?.moderationScore ?? null,
+          flagged: moderationResult?.moderationFlagged ?? null,
+          patternMatch: moderationResult?.moderation?.patternMatch ?? null,
+          requestSent: moderationRequestSent,
+          requestId: moderationRequestId
+        } : null
+      });
     } catch (error) {
       return next(error?.status ? error : apiError.internal('db_error'));
     }

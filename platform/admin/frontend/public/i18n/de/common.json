@@ -912,6 +912,8 @@
   "Public DSA statistics": "Öffentliche DSA-Statistik",
   "Public message": "Öffentliche Nachricht",
   "Public message published.": "Öffentliche Nachricht veröffentlicht.",
+  "This content could not be published because public content must not contain private contact details, links or similar personal data.": "Dieser Inhalt konnte nicht veröffentlicht werden, weil öffentliche Inhalte keine privaten Kontaktdaten, Links oder ähnliche personenbezogene Angaben enthalten dürfen.",
+  "This content could not be published because it was rejected by automated moderation.": "Dieser Inhalt konnte nicht veröffentlicht werden, weil er von der automatisierten Moderation abgelehnt wurde.",
   "Public message withdrawn.": "Öffentliche Nachricht zurückgezogen.",
   "Public messages": "Öffentliche Nachrichten",
   "Public metric overview": "Überblick öffentlicher Kennzahlen",

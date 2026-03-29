@@ -1384,8 +1384,14 @@ router.post('/public-messages/:id/publish', requireRole(...PUBLISH_ROLES), async
     });
 
     if (publishResponse.status !== 200 || !publishResponse.data?.messageUuid) {
+      const upstreamMessage = publishResponse.data?.error || publishResponse.data?.message || publishResponse.statusText || 'publish_failed';
+      if (publishResponse.status >= 400 && publishResponse.status < 500) {
+        const err = apiError.fromStatus(publishResponse.status, upstreamMessage);
+        err.detail = upstreamMessage;
+        return next(err);
+      }
       const err = apiError.badGateway('backend_request_failed');
-      err.detail = publishResponse.data?.error || publishResponse.data?.message || publishResponse.statusText || 'publish_failed';
+      err.detail = upstreamMessage;
       return next(err);
     }
 
