@@ -17,6 +17,8 @@ Use of MessageDrop is permitted only after reaching the age of 16. Persons who h
 
 A large portion of the data is intentionally stored primarily locally on the user’s device (e.g., in the browser or app storage) to ensure data minimization and a high standard of data protection. Control over this locally stored data generally lies with the user. Loss or deletion of local data is possible at any time.
 
+For the translation function, the user may optionally store their own DeepL API key in the encrypted local user record on the device. When the translation function or the key validation function is used, the key is transmitted for the respective request to our backend and for use with DeepL, but is not stored permanently on the server.
+
 The optional read-aloud feature uses the browser’s or operating system’s speech synthesis. For this purpose, the text selected by the user is passed to the speech component of the device or platform. Depending on the browser, operating system, device, and selected voice, processing may take place locally on the device or via components of the platform provider.
 
 Without a previously created backup, it is not possible to restore locally deleted data.
@@ -254,6 +256,8 @@ For certain functions, MessageDrop uses external information and API services th
 
 When using these functions, depending on the specific use case, search terms, language and country settings, destination/location parameters, date and price filters, technical connection data, and, where applicable, reference URLs may be processed. Communication with third-party providers takes place, where technically implemented, via our servers or directly from the device.
 
+For the translation function, the user may choose either the DeepL access provided by us or their own DeepL API key. A user-provided DeepL API key is stored locally in the encrypted user record on the device. When the user performs a translation or validates the key, that key is transmitted to our backend for processing of the respective request and used with DeepL. According to the current technical design, a user-provided DeepL API key is not stored permanently on the server.
+
 There is no separate external content toggle for these functional services. They are only used when the user actively uses the respective function.
 
 If the user has activated the provider Unsplash in accordance with Section 2.3, depending on the function, image files may be downloaded in addition to retrieving metadata (e.g., for avatar/background images). In this process, image files may be downloaded to the device and stored locally. In addition, technical proof of download may be transmitted to Unsplash.
@@ -288,6 +292,8 @@ The following are stored on the server:
 - the date of the last login, as well as technically necessary status or metadata.
 
 All other user data is stored exclusively in encrypted form locally on the device.
+
+This may also include a user’s voluntarily stored personal DeepL API key for the translation function.
 
 The legal basis is Art. 6(1)(b) GDPR (performance of a contract or implementation of pre-contractual measures at the user’s request).
 
@@ -372,6 +378,7 @@ MessageDrop follows a privacy-oriented approach in which the majority of data is
 This includes, in particular:
 - local user data,
 - settings and preferences,
+- optionally stored third-party access credentials for individual functions (e.g., a personal DeepL API key for translations),
 - contacts and links,
 - locally cached content,
 - cryptographic keys,

@@ -21,6 +21,7 @@ Kurzfassung (vereinfacht, nicht rechtsverbindlich)
 - Private Chats sind als vertrauliche Kommunikation gedacht. Trotzdem musst Du auch dort die Gesetze einhalten.
 - Viele Daten werden lokal auf Deinem Gerät gespeichert. Diese Daten können verloren gehen. Ohne eigenes Backup ist eine Wiederherstellung nicht möglich.
 - Die optionale Vorlesefunktion nutzt die Sprachsynthese Deines Browsers bzw. Betriebssystems. Verfügbarkeit, Stimmenauswahl und Qualität hängen von Endgerät, Browser, Betriebssystem und gewählter Stimme ab.
+- Für Übersetzungen kannst Du optional Deinen eigenen DeepL-API-Key verwenden. Für Beschaffung, Geheimhaltung, Gültigkeit, Abrechnung, Quoten und die Einhaltung der Bedingungen von DeepL bist Du selbst verantwortlich.
 - Der optionale Nutzungszeit-Schutz (Selbstbeschränkung/Elternmodus mit Eltern-PIN) kann technisch umgangen werden; eine absolute Sperre ist nicht garantiert.
 - Externe Inhalte von Drittanbietern werden erst nach Deiner anbieterbezogenen Zustimmung geladen. Diese Zustimmung kannst Du jederzeit wieder zurücknehmen.
 - Externe Dienste (z. B. YouTube, OpenStreetMap, DeepL, Unsplash, Viator) haben eigene Nutzungs- und Datenschutzbedingungen.
@@ -335,6 +336,16 @@ Folgende externe Funktions- und Informationsdienste werden nicht über den „Ex
 - Viator
 
 Diese Dienste werden genutzt, wenn Du die jeweilige Funktion aktiv verwendest (z. B. Wetterabfrage, Karten-/Ortsbezug, Übersetzung oder Erlebnissuche).
+
+Für die Übersetzungsfunktion kannst Du nach eigener Wahl statt des von uns bereitgestellten Zugangs auch einen eigenen DeepL-API-Key hinterlegen und verwenden. Dieser Key wird nach dem aktuellen technischen Stand lokal auf Deinem Endgerät gespeichert und für die jeweilige Übersetzungs- oder Prüf-Anfrage verwendet.
+
+Wenn Du einen eigenen DeepL-API-Key nutzt, bist Du selbst verantwortlich für:
+- die rechtmäßige Beschaffung und Nutzung des Keys,
+- die Geheimhaltung des Keys,
+- die Verfügbarkeit, Gültigkeit und ausreichende Quotierung des Keys,
+- die Einhaltung der Nutzungs-, Vertrags- und Datenschutzbedingungen von DeepL.
+
+Wir übernehmen keine Gewähr dafür, dass ein von Dir bereitgestellter eigener DeepL-API-Key dauerhaft nutzbar ist oder dass hierfür bestimmte Quoten, Funktionen oder Vertragsbedingungen bei DeepL bestehen.
 
 ###
 13.3 Besonderheit Unsplash (Bilddownload)

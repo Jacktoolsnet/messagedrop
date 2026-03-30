@@ -24,6 +24,7 @@ Summary (simplified, not legally binding)
 - Private chats are intended as confidential communication. Nevertheless, you must also comply with the law there.
 - Much data is stored locally on your device. This data can be lost. Without your own backup, recovery is not possible.
 - The optional read-aloud function uses the speech synthesis of your browser or operating system. Availability, voice selection, and quality depend on the device, browser, operating system, and selected voice.
+- For translations, you may optionally use your own DeepL API key. You are yourself responsible for obtaining, keeping confidential, maintaining validity, billing, quotas, and complying with DeepL’s terms.
 - The optional Usage Time Protection (self-restriction/parental mode with parental PIN) can be technically circumvented; absolute blocking is not guaranteed.
 - External content from third-party providers is only loaded after you have given your provider-specific consent. You can withdraw this consent at any time.
 - External services (e.g., YouTube, OpenStreetMap, DeepL, Unsplash, Viator) have their own terms of use and privacy policies.
@@ -338,6 +339,16 @@ The following external functional and information services are not activated via
 - Viator
 
 These services are used when you actively use the respective function (e.g., weather query, map/location reference, translation, or experience search).
+
+For the translation function, you may choose to store and use your own DeepL API key instead of the access provided by us. According to the current technical design, this key is stored locally on your device and used for the respective translation or key-validation request.
+
+If you use your own DeepL API key, you are responsible for:
+- obtaining and using the key lawfully,
+- keeping the key confidential,
+- the key’s availability, validity, and sufficient quota,
+- compliance with DeepL’s terms of use, contractual terms, and privacy requirements.
+
+We do not guarantee that a personal DeepL API key provided by you will remain usable on a permanent basis or that specific quotas, functions, or contractual conditions will be available from DeepL for that key.
 
 ###
 13.3 Special feature Unsplash (image download)
