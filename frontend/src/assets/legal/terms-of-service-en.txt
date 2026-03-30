@@ -131,7 +131,7 @@ Illegal content, harassment, threats, hate speech, or the disclosure of third-pa
 You can follow or unfollow contacts. Section 8 applies to notifications when following contacts and places.
 
 4) Profile sharing with contacts  
-Profile information (e.g., name/avatar) is only shared with active consent. Once transferred to a contact's device, it is not technically possible to automatically “retrieve” it.
+Profile information (e.g., name/avatar) is only shared with active consent. For technical delivery of the profile sharing function, requests and response status may be stored temporarily on our server; shared profile name/avatar is stored there only in encrypted form and only until delivery or expiry. Once transferred to a contact's device, it is not technically possible to automatically “retrieve” it.
 
 ###
 8. Following contacts and places; notifications

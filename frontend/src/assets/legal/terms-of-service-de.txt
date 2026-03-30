@@ -128,7 +128,7 @@ Auch in privaten Chats sind rechtswidrige Inhalte, Belästigung, Bedrohungen, Ha
 Du kannst Kontakten folgen oder das Folgen beenden. Für Benachrichtigungen beim Folgen von Kontakten und Plätzen gilt Abschnitt 8.
 
 4) Profilfreigabe bei Kontakten  
-Eine Freigabe von Profilinfos (z. B. Name/Avatar) erfolgt nur nach aktiver Zustimmung. Nach der Übertragung auf das Endgerät eines Kontakts ist ein automatisches „Zurückholen“ technisch nicht möglich.
+Eine Freigabe von Profilinfos (z. B. Name/Avatar) erfolgt nur nach aktiver Zustimmung. Für die technische Zustellung der Profilfreigabefunktion können Anfragen und Antwortstatus vorübergehend auf unserem Server gespeichert werden; freigegebene Profilangaben werden dort ausschließlich verschlüsselt und nur bis zur Zustellung oder bis zum Fristablauf gespeichert. Nach der Übertragung auf das Endgerät eines Kontakts ist ein automatisches „Zurückholen“ technisch nicht möglich.
 
 ###
 8. Kontakten und Plätzen folgen und Benachrichtigungen

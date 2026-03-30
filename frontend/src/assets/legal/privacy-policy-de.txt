@@ -38,7 +38,7 @@ Erteilte Einwilligungen für externe Inhalte können jederzeit mit Wirkung für 
 
 Systemmeldungen (z. B. Hinweise zu DSA-Verfahren oder geplante Wartungsarbeiten) werden ausschließlich durch autorisierte administrative Systeme erzeugt und im Frontend des Nutzers angezeigt. Systemmeldungen sind stets aktiv; Nutzer können sie im Frontend löschen, ohne dass dadurch zwingend interne Nachweise entfallen.
 
-Profile (Name/Avatar) können lokal zur besseren Zuordnung genutzt werden. Bei Kontaktaufnahme kann ein Nutzer optional eine Profilfreigabe anfragen; der andere Nutzer muss aktiv zustimmen. Nach Zustimmung werden Name und Avatar auf dem Endgerät des Kontakts lokal gespeichert.
+Profile (Name/Avatar) können lokal zur besseren Zuordnung genutzt werden. Bei Kontaktaufnahme kann ein Nutzer optional eine Profilfreigabe anfragen; der andere Nutzer muss aktiv zustimmen. Für die technische Zustellung der Profilfreigabefunktion werden Anfragen und Antwortstatus vorübergehend auf unserem Server gespeichert; im Fall einer Zustimmung werden der freigegebene Profilname und Avatar dort ausschließlich verschlüsselt zur Zustellung gespeichert. Nach Zustellung oder Fristablauf werden diese temporären Datensätze gelöscht. Nach erfolgreicher Zustellung werden Name und Avatar auf dem Endgerät des Kontakts lokal gespeichert.
 
 Plätzen kann gefolgt werden; soweit technisch möglich und vom Endgerät unterstützt, kann der Nutzer Push-Benachrichtigungen erhalten, wenn an einem gefolgten Platz neue öffentliche Inhalte erscheinen. Technisch erforderliche Push-Token werden nur für die Zustellung verarbeitet. Ein Anspruch auf Zustellung von Push-Benachrichtigungen besteht nicht.
 
@@ -412,7 +412,11 @@ Der Nutzer kann für sein eigenes Nutzerkonto ein lokales Profil (z. B. Name und
 
 Im Rahmen der Kontaktfunktion kann ein Nutzer aktiv eine Profilfreigabe an einen Kontakt anfragen. Der Kontakt muss die Profilfreigabe aktiv bestätigen (z. B. per Popup), bevor eine Übertragung erfolgt.
 
-Nach erfolgter Zustimmung werden Profilname und Avatar auf das Endgerät des Kontakts übertragen und dort lokal gespeichert. Eine zentrale Speicherung dieser Profilinformationen durch uns erfolgt nicht.
+Für die technische Zustellung der Profilfreigabefunktion, auch wenn eine Partei vorübergehend offline ist, werden die Anfragedaten und der Antwortstatus vorübergehend auf unserem Server gespeichert. Im Fall einer Zustimmung werden der freigegebene Profilname und Avatar dort ausschließlich verschlüsselt zur Zustellung an den anfragenden Kontakt gespeichert.
+
+Diese temporären Datensätze werden nach erfolgreicher Zustellung/Verarbeitung durch den anfragenden Kontakt oder bei Fristablauf gelöscht, falls eine Zustellung nicht rechtzeitig erfolgt.
+
+Nach erfolgreicher Zustellung werden Profilname und Avatar auf das Endgerät des Kontakts übertragen und dort lokal gespeichert.
 
 Hinweis: Nach der Übertragung besteht keine technische Möglichkeit, die bereits übertragenen Profilinformationen auf dem Endgerät des Kontakts zurückzuholen oder dort zu löschen. Die lokal gespeicherten Daten können nur vom empfangenden Kontakt auf dessen Endgerät gelöscht werden.
 
