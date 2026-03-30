@@ -1,10 +1,12 @@
 @if (locationName$ | async; as locationName) {
   <app-dialog-header
-    [title]="'weather.airQuality.headerFor' | transloco:{ category: getCategoryLabel(selectedCategory), location: locationName }">
+    [title]="'weather.airQuality.headerFor' | transloco:{ category: getCategoryLabel(selectedCategory), location: locationName }"
+    [subtitle]="'weather.airQuality.dataSourceFull' | transloco">
   </app-dialog-header>
 } @else {
   <app-dialog-header
-    [title]="'weather.airQuality.header' | transloco:{ category: getCategoryLabel(selectedCategory) }">
+    [title]="'weather.airQuality.header' | transloco:{ category: getCategoryLabel(selectedCategory) }"
+    [subtitle]="'weather.airQuality.dataSourceFull' | transloco">
   </app-dialog-header>
 }
 
@@ -48,24 +50,15 @@
         }
     </div>
 
-    <div class="hour-slider">
-        <mat-slider min="0" max="23" step="1" thumbLabel tickInterval="1" (input)="onHourChange()">
-            <input matSliderThumb [(ngModel)]="selectedHour">
-        </mat-slider>
-        @if (!selectedTile) {
-        <div class="selected-hour">{{ 'weather.airQuality.selectedHour' | transloco:{ hour: selectedHour } }}</div>
-        }
-    </div>
-
     @if (selectedTile) {
     <div class="tile-nav-buttons">
-        <button mat-mini-fab (click)="selectPreviousTile()" [disabled]="tileIndex === 0">
+        <button mat-mini-fab color="accent" (click)="selectPreviousTile()" [disabled]="tileIndex === 0">
             <mat-icon>chevron_left</mat-icon>
         </button>
-        <button mat-mini-fab (click)="clearSelectedTile()">
+        <button mat-mini-fab color="primary" (click)="clearSelectedTile()">
             <mat-icon>close</mat-icon>
         </button>
-        <button mat-mini-fab (click)="selectNextTile()" [disabled]="tileIndex === allKeys().length - 1">
+        <button mat-mini-fab color="accent" (click)="selectNextTile()" [disabled]="tileIndex === allKeys().length - 1">
             <mat-icon>chevron_right</mat-icon>
         </button>
     </div>
@@ -86,21 +79,34 @@
     </mat-button-toggle-group>
     }
     }
-
-    <div class="data-source">
-        {{ 'weather.airQuality.dataSource' | transloco }}
-        <a href="https://open-meteo.com/" target="_blank" rel="noopener">open-meteo.com</a>.
-    </div>
     </div>
 </mat-dialog-content>
 
-<mat-dialog-actions class="sticky-actions" align="end">
-    <button mat-dialog-close mat-icon-button class="action-close" cdkFocusInitial
-        [attr.aria-label]="'common.actions.close' | transloco">
-        <mat-icon>close</mat-icon>
-    </button>
-    <button mat-icon-button type="button" (click)="help.open('airQuality')"
-        [attr.aria-label]="'common.actions.help' | transloco">
-        <mat-icon>help</mat-icon>
-    </button>
+<mat-dialog-actions class="sticky-actions">
+    <div class="action-close-button">
+        <button mat-dialog-close mat-icon-button class="action-close" cdkFocusInitial
+            [attr.aria-label]="'common.actions.close' | transloco">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    @if (airQualitySig()) {
+        <div class="hour-slider action-slider">
+            <mat-slider
+                class="hour-range-slider"
+                min="0"
+                max="23"
+                step="1"
+                discrete
+                [displayWith]="formatHourSliderLabel"
+                (input)="onHourChange()">
+                <input matSliderThumb [(ngModel)]="selectedHour">
+            </mat-slider>
+        </div>
+    }
+    <div class="action-help-button">
+        <button mat-icon-button type="button" (click)="help.open('airQuality')"
+            [attr.aria-label]="'common.actions.help' | transloco">
+            <mat-icon>help</mat-icon>
+        </button>
+    </div>
 </mat-dialog-actions>

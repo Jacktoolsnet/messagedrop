@@ -41,6 +41,8 @@ import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.comp
   styleUrls: ['./air-quality.component.css']
 })
 export class AirQualityComponent implements OnInit {
+  readonly formatHourSliderLabel = (value: number): string => String(value);
+
   private readonly nominatimService = inject(NominatimService);
   private readonly dialogData = inject<{ airQuality?: AirQualityData; selectedKey?: AirQualityMetricKey; place?: Place; location?: Location }>(MAT_DIALOG_DATA);
   private readonly refreshService = inject(OpenMeteoRefreshService);

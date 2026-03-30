@@ -1577,6 +1577,7 @@
       "title": "Luftqualität",
       "header": "{{ category }}",
       "headerFor": "{{ category }} für {{ location }}",
+      "dataSourceFull": "Luftqualitätsdaten bereitgestellt von open-meteo.com.",
       "selectedHour": "Ausgewählte Stunde: {{ hour }}:00",
       "dataSource": "Luftqualitätsdaten bereitgestellt von",
       "noDescription": "Keine Beschreibung verfügbar.",
