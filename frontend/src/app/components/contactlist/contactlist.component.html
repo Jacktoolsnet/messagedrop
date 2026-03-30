@@ -29,6 +29,19 @@
                         </span>
                         <span class="name">{{ contact.name || ('common.contact.list.nameFallback' | transloco) }}</span>
                     </div>
+                    @if (getLatestMessagePreview(contact); as preview) {
+                    <div class="latest-message" [attr.aria-label]="preview.text">
+                        <div class="latest-message__meta">
+                            <mat-icon>{{ preview.icon }}</mat-icon>
+                            @if (preview.outgoing) {
+                            <span>{{ 'common.contact.chatroom.meLabel' | transloco }}</span>
+                            <span aria-hidden="true">•</span>
+                            }
+                            <span>{{ preview.createdAt | date:'shortTime' }}</span>
+                        </div>
+                        <span class="latest-message__text" [attr.title]="preview.text">{{ preview.text }}</span>
+                    </div>
+                    }
                     @if (contact.avatarAttribution?.source === 'unsplash' && contact.chatBackgroundAttribution?.source
                     === 'unsplash') {
                     <div class="unsplash-badge">

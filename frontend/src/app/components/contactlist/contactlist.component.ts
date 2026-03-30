@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Signal, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Signal, effect, inject, signal } from '@angular/core';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -7,9 +7,12 @@ import { MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@an
 import { MatIcon } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { firstValueFrom } from 'rxjs';
 import { Connect } from '../../interfaces/connect';
 import { Contact } from '../../interfaces/contact';
+import { ContactMessage } from '../../interfaces/contact-message';
 import { Mode } from '../../interfaces/mode';
+import { ShortMessage } from '../../interfaces/short-message';
 import { ConnectService } from '../../services/connect.service';
 import { ContactMessageService } from '../../services/contact-message.service';
 import { ContactService } from '../../services/contact.service';
@@ -36,6 +39,14 @@ interface ConnectDialogResult {
   connectId?: string;
 }
 
+interface ContactMessagePreview {
+  messageId: string;
+  createdAt: string;
+  icon: string;
+  text: string;
+  outgoing: boolean;
+}
+
 @Component({
   selector: 'app-contactlist',
   imports: [
@@ -51,7 +62,8 @@ interface ConnectDialogResult {
     TranslocoPipe
   ],
   templateUrl: './contactlist.component.html',
-  styleUrl: './contactlist.component.css'
+  styleUrl: './contactlist.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ContactlistComponent {
   private snackBarRef?: DisplayMessageRef;
@@ -71,7 +83,9 @@ export class ContactlistComponent {
   readonly dialogRef = inject(MatDialogRef<ContactlistComponent>);
   readonly contactsSignal: Signal<Contact[]> = this.contactService.sortedContactsSignal;
   readonly unreadCounts = signal<Record<string, number>>({});
+  readonly latestMessagePreviews = signal<Record<string, ContactMessagePreview | null>>({});
   private readonly unreadLoaded = new Set<string>();
+  private readonly previewRequestKeys = new Map<string, string>();
 
   private contactToDelete?: Contact;
   public mode: typeof Mode = Mode;
@@ -120,6 +134,59 @@ export class ContactlistComponent {
         this.contactMessageService.unreadCountUpdate.set(null);
       }
     });
+
+    effect(() => {
+      this.userService.userSet();
+      const contacts = this.contactsSignal();
+      const hasJwt = this.userService.hasJwt();
+      const activeContactIds = new Set(contacts.map((contact) => contact.id));
+
+      for (const contactId of Array.from(this.previewRequestKeys.keys())) {
+        if (!activeContactIds.has(contactId)) {
+          this.previewRequestKeys.delete(contactId);
+        }
+      }
+
+      this.latestMessagePreviews.update((current) => {
+        const nextEntries = Object.entries(current).filter(([contactId]) => activeContactIds.has(contactId));
+        return nextEntries.length === Object.keys(current).length ? current : Object.fromEntries(nextEntries);
+      });
+
+      if (!hasJwt) {
+        this.previewRequestKeys.clear();
+        this.latestMessagePreviews.set({});
+        return;
+      }
+
+      contacts.forEach((contact) => {
+        const requestKey = `${contact.id}:${contact.lastMessageAt ?? ''}`;
+        if (this.previewRequestKeys.get(contact.id) === requestKey) {
+          return;
+        }
+
+        this.previewRequestKeys.set(contact.id, requestKey);
+        if (!contact.lastMessageAt) {
+          this.setLatestMessagePreview(contact.id, null);
+          return;
+        }
+
+        void this.loadLatestMessagePreview(contact, requestKey);
+      });
+    });
+
+    effect(() => {
+      const incoming = this.contactMessageService.liveMessages();
+      if (!incoming) {
+        return;
+      }
+
+      const contact = this.contactsSignal().find((entry) => entry.id === incoming.contactId);
+      if (!contact) {
+        return;
+      }
+
+      void this.applyIncomingLatestMessagePreview(contact, incoming);
+    });
   }
 
   getUnreadBadge(contactId: string): string {
@@ -138,6 +205,10 @@ export class ContactlistComponent {
     const transparency = contact.chatBackgroundTransparency ?? 40;
     const clamped = Math.min(Math.max(transparency, 0), 100);
     return 1 - clamped / 100;
+  }
+
+  getLatestMessagePreview(contact: Contact): ContactMessagePreview | null {
+    return this.latestMessagePreviews()[contact.id] ?? null;
   }
 
   openConnectDialog(): void {
@@ -353,6 +424,7 @@ export class ContactlistComponent {
           contact.unreadCount = res.unread ?? 0;
         }
       });
+      this.reloadLatestMessagePreview(contact);
     });
   }
 
@@ -464,4 +536,148 @@ export class ContactlistComponent {
       });
   }
 
+  private reloadLatestMessagePreview(contact: Contact): void {
+    if (!this.userService.hasJwt()) {
+      this.setLatestMessagePreview(contact.id, null);
+      this.previewRequestKeys.delete(contact.id);
+      return;
+    }
+
+    const requestKey = `${contact.id}:${contact.lastMessageAt ?? ''}`;
+    this.previewRequestKeys.delete(contact.id);
+    this.previewRequestKeys.set(contact.id, requestKey);
+    void this.loadLatestMessagePreview(contact, requestKey);
+  }
+
+  private async loadLatestMessagePreview(contact: Contact, requestKey: string): Promise<void> {
+    try {
+      const response = await firstValueFrom(this.contactMessageService.list(contact.id, { limit: 1 }));
+      if (this.previewRequestKeys.get(contact.id) !== requestKey) {
+        return;
+      }
+
+      const latestMessage = (response.rows ?? [])
+        .slice()
+        .sort((left, right) => right.createdAt.localeCompare(left.createdAt))[0];
+
+      if (!latestMessage) {
+        this.setLatestMessagePreview(contact.id, null);
+        return;
+      }
+
+      const payload = await this.resolvePreviewPayload(contact, latestMessage);
+      if (this.previewRequestKeys.get(contact.id) !== requestKey) {
+        return;
+      }
+
+      this.setLatestMessagePreview(contact.id, this.buildLatestMessagePreview(latestMessage, payload));
+    } catch {
+      if (this.previewRequestKeys.get(contact.id) === requestKey) {
+        this.setLatestMessagePreview(contact.id, null);
+      }
+    }
+  }
+
+  private async applyIncomingLatestMessagePreview(contact: Contact, message: ContactMessage): Promise<void> {
+    const payload = await this.resolvePreviewPayload(contact, message);
+    this.previewRequestKeys.set(contact.id, `${contact.id}:${message.createdAt}`);
+    this.setLatestMessagePreview(contact.id, this.buildLatestMessagePreview(message, payload));
+  }
+
+  private async resolvePreviewPayload(contact: Contact, message: ContactMessage): Promise<ShortMessage | null> {
+    if (message.message?.trim()) {
+      const decrypted = await this.contactMessageService.decryptAndVerify(contact, message);
+      if (decrypted) {
+        return decrypted;
+      }
+    }
+
+    return await this.contactMessageService.getLocalPayload(message.messageId);
+  }
+
+  private buildLatestMessagePreview(message: ContactMessage, payload: ShortMessage | null): ContactMessagePreview {
+    return {
+      messageId: message.messageId,
+      createdAt: message.createdAt,
+      icon: this.resolvePreviewIcon(message, payload),
+      text: this.resolvePreviewText(message, payload),
+      outgoing: message.direction === 'user'
+    };
+  }
+
+  private resolvePreviewIcon(message: ContactMessage, payload: ShortMessage | null): string {
+    if (message.status === 'deleted') {
+      return 'delete';
+    }
+    if (payload?.audio) {
+      return 'mic';
+    }
+    if (payload?.location) {
+      return 'location_on';
+    }
+    if (payload?.experience) {
+      return 'local_activity';
+    }
+    if (payload?.multimedia?.type && payload.multimedia.type !== 'undefined') {
+      return 'perm_media';
+    }
+    return 'chat';
+  }
+
+  private resolvePreviewText(message: ContactMessage, payload: ShortMessage | null): string {
+    if (message.status === 'deleted') {
+      return this.translation.t('common.contact.list.previewDeleted');
+    }
+    if (!payload) {
+      return this.translation.t('common.contact.chatroom.messageUnreadable');
+    }
+
+    const translatedText = payload.translatedMessage?.trim();
+    if (translatedText) {
+      return this.normalizePreviewText(translatedText);
+    }
+
+    const plainText = payload.message?.trim();
+    if (plainText) {
+      return this.normalizePreviewText(plainText);
+    }
+
+    if (payload.audio) {
+      return this.translation.t('common.contact.list.previewAudio');
+    }
+
+    if (payload.experience) {
+      return this.normalizePreviewText(
+        payload.experience.title?.trim()
+        || payload.experience.productCode?.trim()
+        || this.translation.t('common.contact.list.previewExperience')
+      );
+    }
+
+    if (payload.location) {
+      return this.normalizePreviewText(
+        payload.location.plusCode?.trim()
+        || this.translation.t('common.contact.list.previewLocation')
+      );
+    }
+
+    const multimediaTitle = payload.multimedia?.title?.trim() || payload.multimedia?.description?.trim();
+    if (multimediaTitle) {
+      return this.normalizePreviewText(multimediaTitle);
+    }
+
+    if (payload.multimedia?.type && payload.multimedia.type !== 'undefined') {
+      return this.translation.t('common.contact.list.previewMedia');
+    }
+
+    return this.translation.t('common.contact.chatroom.messageUnreadable');
+  }
+
+  private normalizePreviewText(value: string): string {
+    return value.replace(/\s+/g, ' ').trim();
+  }
+
+  private setLatestMessagePreview(contactId: string, preview: ContactMessagePreview | null): void {
+    this.latestMessagePreviews.update((current) => ({ ...current, [contactId]: preview }));
+  }
 }
