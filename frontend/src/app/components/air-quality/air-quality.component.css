@@ -312,7 +312,7 @@ app-air-quality-detail {
     min-height: 2rem;
     display: flex;
     justify-content: space-between;
-    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
     box-sizing: border-box;
 
     ::ng-deep .mat-button-toggle {
