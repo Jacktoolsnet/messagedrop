@@ -67,7 +67,8 @@
         <span class="day-separator__line"></span>
       </div>
       }
-      <div class="message" #messageRow [attr.data-message-id]="msg.messageId" [class.message--unread]="isUnread(msg)">
+      <div class="message" #messageRow [attr.data-message-id]="msg.messageId" [class.message--unread]="isUnread(msg)"
+        tabindex="-1">
         @if (msg.direction === 'user') {
         <div class="bubble-row me">
           <button type="button" class="avatar-me" (click)="openUserProfile()" (keyup.enter)="openUserProfile()"

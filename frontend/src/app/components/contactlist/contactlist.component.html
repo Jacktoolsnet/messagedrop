@@ -14,7 +14,8 @@
             @for (contact of contactsSignal(); track contact.id){
             <mat-card class="contact-tile">
                 <div class="tile-header" [style.--contact-header-bg-image]="getContactHeaderBackgroundImage(contact)"
-                    [style.--contact-header-bg-opacity]="getContactHeaderBackgroundOpacity(contact)">
+                    [style.--contact-header-bg-opacity]="getContactHeaderBackgroundOpacity(contact)"
+                    [class.tile-header--with-unsplash-badge]="hasUnsplashBadge(contact)">
                     <div class="identity-badge" role="button" tabindex="0" (click)="editContact(contact)"
                         (keyup.enter)="editContact(contact)" (keyup.space)="editContact(contact)">
                         <span class="avatar-badge" [matBadge]="getUnreadBadge(contact.id)"
@@ -29,17 +30,29 @@
                         </span>
                         <span class="name">{{ contact.name || ('common.contact.list.nameFallback' | transloco) }}</span>
                     </div>
-                    @if (getLatestMessagePreview(contact); as preview) {
-                    <div class="latest-message" [attr.aria-label]="preview.text">
-                        <div class="latest-message__meta">
-                            <mat-icon>{{ preview.icon }}</mat-icon>
-                            @if (preview.outgoing) {
-                            <span>{{ 'common.contact.chatroom.meLabel' | transloco }}</span>
-                            <span aria-hidden="true">•</span>
-                            }
-                            <span>{{ preview.createdAt | date:'shortTime' }}</span>
+                    @if (getLatestMessagePreviews(contact).length > 0) {
+                    <div class="chat-preview-stack">
+                        @for (preview of getLatestMessagePreviews(contact); track preview.messageId) {
+                        <div class="chat-preview-row" [class.chat-preview-row--me]="preview.outgoing"
+                            [class.chat-preview-row--them]="!preview.outgoing" [attr.aria-label]="preview.text"
+                            role="button" tabindex="0" (click)="openContactChatroom(contact, preview.messageId)"
+                            (keyup.enter)="openContactChatroom(contact, preview.messageId)"
+                            (keyup.space)="openContactChatroom(contact, preview.messageId); $event.preventDefault()">
+                            <div class="chat-preview-bubble">
+                                <div class="chat-preview-bubble__text" [attr.title]="preview.text">{{ preview.text }}</div>
+                                <div class="chat-preview-bubble__meta"
+                                    [attr.title]="preview.createdAt | date:'medium'">
+                                    <span>
+                                        @if (isPreviewFromToday(preview.createdAt)) {
+                                        {{ preview.createdAt | date:'shortTime' }}
+                                        } @else {
+                                        {{ preview.createdAt | date:'short' }}
+                                        }
+                                    </span>
+                                </div>
+                            </div>
                         </div>
-                        <span class="latest-message__text" [attr.title]="preview.text">{{ preview.text }}</span>
+                        }
                     </div>
                     }
                     @if (contact.avatarAttribution?.source === 'unsplash' && contact.chatBackgroundAttribution?.source

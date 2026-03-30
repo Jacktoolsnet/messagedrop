@@ -17,10 +17,7 @@ import { ConnectService } from '../../services/connect.service';
 import { ContactMessageService } from '../../services/contact-message.service';
 import { ContactService } from '../../services/contact.service';
 import { CryptoService } from '../../services/crypto.service';
-import { OembedService } from '../../services/oembed.service';
-import { SharedContentService } from '../../services/shared-content.service';
 import { SocketioService } from '../../services/socketio.service';
-import { StyleService } from '../../services/style.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
 import { ContactChatroomComponent } from '../contact-chatroom/contact-chatroom.component';
@@ -42,9 +39,10 @@ interface ConnectDialogResult {
 interface ContactMessagePreview {
   messageId: string;
   createdAt: string;
-  icon: string;
   text: string;
   outgoing: boolean;
+  status: ContactMessage['status'];
+  payload: ShortMessage | null;
 }
 
 @Component({
@@ -72,9 +70,6 @@ export class ContactlistComponent {
   public readonly contactService = inject(ContactService);
   private readonly connectService = inject(ConnectService);
   private readonly cryptoService = inject(CryptoService);
-  private readonly oembedService = inject(OembedService);
-  private readonly sharedContentService = inject(SharedContentService);
-  private readonly style = inject(StyleService);
   private readonly snackBar = inject(DisplayMessageService);
   private readonly matDialog = inject(MatDialog);
   private readonly contactMessageService = inject(ContactMessageService);
@@ -83,7 +78,7 @@ export class ContactlistComponent {
   readonly dialogRef = inject(MatDialogRef<ContactlistComponent>);
   readonly contactsSignal: Signal<Contact[]> = this.contactService.sortedContactsSignal;
   readonly unreadCounts = signal<Record<string, number>>({});
-  readonly latestMessagePreviews = signal<Record<string, ContactMessagePreview | null>>({});
+  readonly latestMessagePreviews = signal<Record<string, ContactMessagePreview[]>>({});
   private readonly unreadLoaded = new Set<string>();
   private readonly previewRequestKeys = new Map<string, string>();
 
@@ -165,11 +160,6 @@ export class ContactlistComponent {
         }
 
         this.previewRequestKeys.set(contact.id, requestKey);
-        if (!contact.lastMessageAt) {
-          this.setLatestMessagePreview(contact.id, null);
-          return;
-        }
-
         void this.loadLatestMessagePreview(contact, requestKey);
       });
     });
@@ -207,8 +197,25 @@ export class ContactlistComponent {
     return 1 - clamped / 100;
   }
 
-  getLatestMessagePreview(contact: Contact): ContactMessagePreview | null {
-    return this.latestMessagePreviews()[contact.id] ?? null;
+  getLatestMessagePreviews(contact: Contact): ContactMessagePreview[] {
+    return this.latestMessagePreviews()[contact.id] ?? [];
+  }
+
+  hasUnsplashBadge(contact: Contact): boolean {
+    return contact.avatarAttribution?.source === 'unsplash'
+      || contact.chatBackgroundAttribution?.source === 'unsplash';
+  }
+
+  isPreviewFromToday(createdAt: string): boolean {
+    const createdDate = new Date(createdAt);
+    if (Number.isNaN(createdDate.getTime())) {
+      return true;
+    }
+
+    const now = new Date();
+    return createdDate.getFullYear() === now.getFullYear()
+      && createdDate.getMonth() === now.getMonth()
+      && createdDate.getDate() === now.getDate();
   }
 
   openConnectDialog(): void {
@@ -395,13 +402,16 @@ export class ContactlistComponent {
     });
   }
 
-  openContactChatroom(contact: Contact): void {
+  openContactChatroom(contact: Contact, focusMessageId?: string): void {
     if (!this.userService.hasJwt()) {
       return;
     }
     const dialogRef = this.matDialog.open(ContactChatroomComponent, {
       closeOnNavigation: true,
-      data: contact.id,
+      data: {
+        contactId: contact.id,
+        focusMessageId
+      },
       minWidth: 'min(600px, 95vw)',
       maxWidth: '95vw',
       width: 'max(600px, 95vw)',
@@ -538,7 +548,7 @@ export class ContactlistComponent {
 
   private reloadLatestMessagePreview(contact: Contact): void {
     if (!this.userService.hasJwt()) {
-      this.setLatestMessagePreview(contact.id, null);
+      this.setLatestMessagePreviews(contact.id, []);
       this.previewRequestKeys.delete(contact.id);
       return;
     }
@@ -551,29 +561,34 @@ export class ContactlistComponent {
 
   private async loadLatestMessagePreview(contact: Contact, requestKey: string): Promise<void> {
     try {
-      const response = await firstValueFrom(this.contactMessageService.list(contact.id, { limit: 1 }));
+      const response = await firstValueFrom(this.contactMessageService.list(contact.id, { limit: 2 }));
       if (this.previewRequestKeys.get(contact.id) !== requestKey) {
         return;
       }
 
-      const latestMessage = (response.rows ?? [])
+      const latestMessages = (response.rows ?? [])
         .slice()
-        .sort((left, right) => right.createdAt.localeCompare(left.createdAt))[0];
+        .sort((left, right) => right.createdAt.localeCompare(left.createdAt))
+        .slice(0, 2);
 
-      if (!latestMessage) {
-        this.setLatestMessagePreview(contact.id, null);
+      if (latestMessages.length === 0) {
+        this.setLatestMessagePreviews(contact.id, []);
         return;
       }
 
-      const payload = await this.resolvePreviewPayload(contact, latestMessage);
-      if (this.previewRequestKeys.get(contact.id) !== requestKey) {
-        return;
+      const previews: ContactMessagePreview[] = [];
+      for (const latestMessage of latestMessages) {
+        const payload = await this.resolvePreviewPayload(contact, latestMessage);
+        if (this.previewRequestKeys.get(contact.id) !== requestKey) {
+          return;
+        }
+        previews.push(this.buildLatestMessagePreview(latestMessage, payload));
       }
 
-      this.setLatestMessagePreview(contact.id, this.buildLatestMessagePreview(latestMessage, payload));
+      this.setLatestMessagePreviews(contact.id, previews);
     } catch {
       if (this.previewRequestKeys.get(contact.id) === requestKey) {
-        this.setLatestMessagePreview(contact.id, null);
+        this.setLatestMessagePreviews(contact.id, []);
       }
     }
   }
@@ -581,7 +596,14 @@ export class ContactlistComponent {
   private async applyIncomingLatestMessagePreview(contact: Contact, message: ContactMessage): Promise<void> {
     const payload = await this.resolvePreviewPayload(contact, message);
     this.previewRequestKeys.set(contact.id, `${contact.id}:${message.createdAt}`);
-    this.setLatestMessagePreview(contact.id, this.buildLatestMessagePreview(message, payload));
+    const nextPreview = this.buildLatestMessagePreview(message, payload);
+    this.latestMessagePreviews.update((current) => {
+      const existing = current[contact.id] ?? [];
+      const merged = [...existing.filter((entry) => entry.messageId !== nextPreview.messageId), nextPreview]
+        .sort((left, right) => right.createdAt.localeCompare(left.createdAt))
+        .slice(0, 2);
+      return { ...current, [contact.id]: merged };
+    });
   }
 
   private async resolvePreviewPayload(contact: Contact, message: ContactMessage): Promise<ShortMessage | null> {
@@ -599,29 +621,11 @@ export class ContactlistComponent {
     return {
       messageId: message.messageId,
       createdAt: message.createdAt,
-      icon: this.resolvePreviewIcon(message, payload),
       text: this.resolvePreviewText(message, payload),
-      outgoing: message.direction === 'user'
+      outgoing: message.direction === 'user',
+      status: message.status,
+      payload
     };
-  }
-
-  private resolvePreviewIcon(message: ContactMessage, payload: ShortMessage | null): string {
-    if (message.status === 'deleted') {
-      return 'delete';
-    }
-    if (payload?.audio) {
-      return 'mic';
-    }
-    if (payload?.location) {
-      return 'location_on';
-    }
-    if (payload?.experience) {
-      return 'local_activity';
-    }
-    if (payload?.multimedia?.type && payload.multimedia.type !== 'undefined') {
-      return 'perm_media';
-    }
-    return 'chat';
   }
 
   private resolvePreviewText(message: ContactMessage, payload: ShortMessage | null): string {
@@ -677,7 +681,7 @@ export class ContactlistComponent {
     return value.replace(/\s+/g, ' ').trim();
   }
 
-  private setLatestMessagePreview(contactId: string, preview: ContactMessagePreview | null): void {
-    this.latestMessagePreviews.update((current) => ({ ...current, [contactId]: preview }));
+  private setLatestMessagePreviews(contactId: string, previews: ContactMessagePreview[]): void {
+    this.latestMessagePreviews.update((current) => ({ ...current, [contactId]: previews }));
   }
 }

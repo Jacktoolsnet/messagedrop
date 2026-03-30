@@ -59,6 +59,11 @@ interface PersistedPayloadEntry {
   payload: ShortMessage;
 }
 
+interface ContactChatroomDialogData {
+  contactId: string;
+  focusMessageId?: string;
+}
+
 @Component({
   selector: 'app-contact-chatroom',
   imports: [
@@ -87,11 +92,13 @@ export class ContactChatroomComponent implements AfterViewInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly matDialog = inject(MatDialog);
   private readonly dialogRef = inject(MatDialogRef<ContactChatroomComponent>);
-  private readonly contactId = inject<string>(MAT_DIALOG_DATA);
+  private readonly dialogData = inject<string | ContactChatroomDialogData>(MAT_DIALOG_DATA);
   private readonly translateService = inject(TranslateService);
   private readonly snackBar = inject(DisplayMessageService);
   private readonly translation = inject(TranslationHelperService);
   private readonly languageService = inject(LanguageService);
+  private readonly contactId = typeof this.dialogData === 'string' ? this.dialogData : this.dialogData.contactId;
+  private readonly focusMessageId = typeof this.dialogData === 'string' ? undefined : this.dialogData.focusMessageId;
 
   @ViewChild('messageScroll') private messageScroll?: ElementRef<HTMLElement>;
   @ViewChildren('messageRow') private messageRows?: QueryList<ElementRef<HTMLElement>>;
@@ -118,6 +125,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   private currentContactId?: string;
   private lastLiveMessageId?: string;
   private lastResetToken?: number;
+  private initialFocusHandled = false;
   private readonly audioUrlCache = new Map<string, string>();
   private readonly audioDurationCache = new Map<string, number>();
   private readonly audioDurationPending = new Set<string>();
@@ -335,7 +343,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         if (!this.scrolledToFirstUnread && this.loaded()) {
-          setTimeout(() => this.scrollToFirstUnread(), 0);
+          setTimeout(() => this.scrollToInitialTarget(), 0);
           return;
         }
         if (this.readTrackingEnabled) {
@@ -1001,6 +1009,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       this.readTrackingEnabled = false;
       this.lastLiveMessageId = undefined;
       this.loaded.set(false);
+      this.initialFocusHandled = false;
     }
     this.loading.set(true);
     this.contactMessageService.list(contact.id, { limit: 200 })
@@ -1038,7 +1047,7 @@ export class ContactChatroomComponent implements AfterViewInit {
           }
           this.loading.set(false);
           this.loaded.set(true);
-          setTimeout(() => this.scrollToFirstUnread(), 0);
+          setTimeout(() => this.scrollToInitialTarget(), 0);
         },
         error: () => {
           this.loading.set(false);
@@ -1176,6 +1185,43 @@ export class ContactChatroomComponent implements AfterViewInit {
     this.scrolledToFirstUnread = true;
     this.readTrackingEnabled = true;
     this.observeUnread();
+  }
+
+  private scrollToInitialTarget(): void {
+    if (this.initialFocusHandled) {
+      if (!this.scrolledToFirstUnread) {
+        this.scrollToFirstUnread();
+      }
+      return;
+    }
+
+    this.initialFocusHandled = true;
+    if (this.focusMessageId && this.scrollToMessage(this.focusMessageId)) {
+      this.scrolledToFirstUnread = true;
+      this.readTrackingEnabled = true;
+      this.observeUnread();
+      return;
+    }
+
+    this.scrollToFirstUnread();
+  }
+
+  private scrollToMessage(messageId: string): boolean {
+    if (!messageId) {
+      return false;
+    }
+
+    const rows = this.messageRows?.toArray() ?? [];
+    const target = rows.find((row) => row.nativeElement.dataset['messageId'] === messageId);
+    const container = this.messageScroll?.nativeElement;
+    if (!target?.nativeElement || !container) {
+      return false;
+    }
+
+    const top = target.nativeElement.offsetTop - container.offsetTop;
+    container.scrollTop = Math.max(0, top - 12);
+    target.nativeElement.focus?.({ preventScroll: true });
+    return true;
   }
 
   private observeUnread(): void {
