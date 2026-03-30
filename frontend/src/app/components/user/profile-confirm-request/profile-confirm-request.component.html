@@ -2,7 +2,7 @@
   [title]="'common.user.profileShare.title' | transloco">
 </app-dialog-header>
 <mat-dialog-content class="confirm-content">
-  <div class="confirm-box">{{ 'common.user.profileShare.body' | transloco: { userId: contact.userId } }}</div>
+  <div class="confirm-box">{{ 'common.user.profileShare.body' | transloco: { userId: requesterUserId } }}</div>
 </mat-dialog-content>
 <mat-dialog-actions class="sticky-actions" align="end">
   <button mat-dialog-close cdkFocusInitial [mat-dialog-close]="false" mat-icon-button [attr.aria-label]="'common.actions.no' | transloco" class="action-close"><mat-icon>close</mat-icon></button>

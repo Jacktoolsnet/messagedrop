@@ -11,6 +11,7 @@ import { AppService } from './services/app.service';
 import { BackupService } from './services/backup.service';
 import { BackupStateService } from './services/backup-state.service';
 import { ContactMessageService } from './services/contact-message.service';
+import { ContactProfileExchangeService } from './services/contact-profile-exchange.service';
 import { ContactService } from './services/contact.service';
 import { DiagnosticLoggerService } from './services/diagnostic-logger.service';
 import { DisplayMessageService } from './services/display-message.service';
@@ -94,6 +95,7 @@ describe('AppComponent', () => {
         { provide: PlaceService, useValue: { isReady: () => false, initPlaces: jasmine.createSpy('initPlaces'), logout: jasmine.createSpy('logout') } },
         { provide: ContactService, useValue: { initContacts: jasmine.createSpy('initContacts'), contactsSet: () => 0, logout: jasmine.createSpy('logout') } },
         { provide: ContactMessageService, useValue: { initLiveReceive: jasmine.createSpy('initLiveReceive'), unreadCountUpdate: () => null } },
+        { provide: ContactProfileExchangeService, useValue: {} },
         { provide: SystemNotificationService, useValue: { refreshUnreadCount: jasmine.createSpy('refreshUnreadCount').and.resolveTo(), reset: jasmine.createSpy('reset'), getUnreadCountSignal: () => signal(0) } },
         { provide: GeolocationService, useValue: {} },
         { provide: LocalImageService, useValue: {} },

@@ -13,6 +13,7 @@ import { AvatarAttribution } from '../../../interfaces/avatar-attribution';
 import { Contact } from '../../../interfaces/contact';
 import { UnsplashPhoto } from '../../../interfaces/unsplash-response';
 import { AvatarStorageService } from '../../../services/avatar-storage.service';
+import { ContactProfileExchangeService } from '../../../services/contact-profile-exchange.service';
 import { LanguageService } from '../../../services/language.service';
 import { SocketioService } from '../../../services/socketio.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
@@ -26,7 +27,6 @@ import { DisplayMessageService } from '../../../services/display-message.service
 
 @Component({
   selector: 'app-profile',
-  standalone: true,
   imports: [
     DialogHeaderComponent,
     FormsModule,
@@ -44,6 +44,7 @@ import { DisplayMessageService } from '../../../services/display-message.service
   styleUrl: './contact-settings.component.css'
 })
 export class ContactSettingsComponent {
+  private readonly contactProfileExchangeService = inject(ContactProfileExchangeService);
   private readonly socketioService = inject(SocketioService);
   private readonly snackBar = inject(DisplayMessageService);
   private readonly translation = inject(TranslationHelperService);
@@ -558,15 +559,8 @@ export class ContactSettingsComponent {
     if (!this.joinedUserRoom()) {
       this.socketioService.initUserSocketEvents();
     }
-    this.socketioService.receiveProfileForContactEvent(contact);
-    this.socketioService.getSocket().emit('contact:requestProfile', contact);
+    void this.contactProfileExchangeService.requestProfile(contact);
     this.dialogRef.close();
-
-    this.snackBar.open(this.translation.t('common.contact.profile.requestSent'), '', {
-      duration: 1500,
-      horizontalPosition: 'center',
-      verticalPosition: 'top'
-    });
   }
 
   async onAbortClick() {

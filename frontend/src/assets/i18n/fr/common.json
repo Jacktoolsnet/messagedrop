@@ -235,8 +235,12 @@
         "tileSettings": "Paramètres des tuiles",
         "tileSettingsAria": "Ouvrir les paramètres des tuiles pour {{ name }}",
         "nameFallback": "contact",
-        "policy": "L'ID du profil du contact et l'abonnement sont stockés sur le serveur. Le nom et l'avatar restent locaux.",
+        "policy": "Les demandes de profil et les réponses de profil chiffrées sont stockées temporairement sur notre serveur jusqu'à leur remise. Le nom et l'avatar n'y sont conservés que sous forme chiffrée pour le transfert.",
         "requestSent": "Demande de profil envoyée.",
+        "requestFailed": "La demande de profil n'a pas pu être envoyée.",
+        "responseFailed": "Votre réponse de partage de profil n'a pas pu être enregistrée.",
+        "received": "Le profil du contact a été reçu.",
+        "receivedInvalid": "Le profil de contact reçu n'a pas pu être appliqué.",
         "imageInvalid": "Veuillez sélectionner un fichier image valide.",
         "imageTooLarge": "L'image est trop grande. Taille maximale autorisée : {{ maxMb }} Mo.",
         "fileReadError": "Erreur lors de la lecture du fichier."

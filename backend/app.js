@@ -16,6 +16,7 @@ const user = require('./routes/user');
 const connect = require('./routes/connect');
 const contact = require('./routes/contact');
 const contactMessage = require('./routes/contactMessage');
+const contactProfile = require('./routes/contactProfile');
 const message = require('./routes/message');
 const moderation = require('./routes/moderation');
 const place = require('./routes/place');
@@ -49,6 +50,7 @@ const tableUser = require('./db/tableUser');
 const tableConnect = require('./db/tableConnect');
 const tableMessage = require('./db/tableMessage')
 const tableContactMessage = require('./db/tableContactMessage');
+const tableContactProfileExchange = require('./db/tableContactProfileExchange');
 const tableGeoStatistic = require('./db/tableGeoStatistic');
 const tableWeatherHistory = require('./db/tableWeatherHistory');
 
@@ -449,6 +451,7 @@ app.use('/clientconnect', connectLimit, clientConnect);
 app.use('/connect', connectLimit, connect);
 app.use('/contact', contactLimit, contact);
 app.use('/contactMessage', contactMessageLimit, contactMessage);
+app.use('/contactProfile', contactLimit, contactProfile);
 app.use('/digitalserviceact', digitalServiceAct);
 app.use('/dsa', dsaStatusLimit, dsaStatus);
 app.use('/geostatistic', geoStatisticLimit, geoStatistic);
@@ -552,6 +555,12 @@ cron.schedule('5 0 * * *', () => {
   });
 
   tableContactMessage.cleanupDeletedEvents(database.db, CONTACT_MESSAGE_TOMBSTONE_RETENTION_DAYS, function (err) {
+    if (err) {
+      logger.error(err);
+    }
+  });
+
+  tableContactProfileExchange.cleanExpired(database.db, function (err) {
     if (err) {
       logger.error(err);
     }

@@ -1908,6 +1908,7 @@ router.post('/reset-keys',
         [userId]
       );
       await runQuery(req.database.db, 'DELETE FROM tableConnect WHERE userId = ?;', [userId]);
+      await runQuery(req.database.db, 'DELETE FROM tableContactProfileExchange WHERE requesterUserId = ? OR recipientUserId = ?;', [userId, userId]);
       await runQuery(req.database.db, 'COMMIT');
 
       emitKeyUpdate(contactUserIds, {

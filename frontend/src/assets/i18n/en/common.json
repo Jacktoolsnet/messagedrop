@@ -235,8 +235,12 @@
         "tileSettings": "Tile settings",
         "tileSettingsAria": "Open tile settings for {{ name }}",
         "nameFallback": "contact",
-        "policy": "The contact profile ID and subscription are stored on the server. Name and avatar remain local.",
+        "policy": "Profile requests and encrypted profile replies are stored temporarily on our server until delivered. Name and avatar are stored there only in encrypted form for transfer.",
         "requestSent": "Profile request sent.",
+        "requestFailed": "The profile request could not be sent.",
+        "responseFailed": "Your profile sharing answer could not be saved.",
+        "received": "The contact profile was received.",
+        "receivedInvalid": "The received contact profile could not be applied.",
         "imageInvalid": "Please select a valid image file.",
         "imageTooLarge": "The image is too large. Maximum allowed size is {{ maxMb }} MB.",
         "fileReadError": "Error reading the file."

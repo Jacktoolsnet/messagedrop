@@ -235,8 +235,12 @@
         "tileSettings": "Ajustes de tiles",
         "tileSettingsAria": "Abrir ajustes de tiles para {{ name }}",
         "nameFallback": "contacto",
-        "policy": "El ID del perfil del contacto y la suscripción se almacenan en el servidor. El nombre y el avatar permanecen locales.",
+        "policy": "Las solicitudes de perfil y las respuestas de perfil cifradas se almacenan temporalmente en nuestro servidor hasta su entrega. El nombre y el avatar solo se guardan allí cifrados para la transferencia.",
         "requestSent": "Solicitud de perfil enviada.",
+        "requestFailed": "No se pudo enviar la solicitud de perfil.",
+        "responseFailed": "No se pudo guardar tu respuesta para compartir el perfil.",
+        "received": "Se recibió el perfil del contacto.",
+        "receivedInvalid": "No se pudo aplicar el perfil del contacto recibido.",
         "imageInvalid": "Por favor selecciona un archivo de imagen válido.",
         "imageTooLarge": "La imagen es demasiado grande. El tamaño máximo permitido es {{ maxMb }} MB.",
         "fileReadError": "Error al leer el archivo."

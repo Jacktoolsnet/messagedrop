@@ -76,6 +76,7 @@ import { AppService } from './services/app.service';
 import { BackupStateService } from './services/backup-state.service';
 import { BackupService } from './services/backup.service';
 import { ContactMessageService } from './services/contact-message.service';
+import { ContactProfileExchangeService } from './services/contact-profile-exchange.service';
 import { ContactService } from './services/contact.service';
 import { ExperienceMapService } from './services/experience-map.service';
 import { GeoStatisticService } from './services/geo-statistic.service';
@@ -158,6 +159,7 @@ export class AppComponent implements OnInit {
   readonly placeService = inject(PlaceService);
   readonly contactService = inject(ContactService);
   private readonly contactMessageService = inject(ContactMessageService);
+  private readonly contactProfileExchangeService = inject(ContactProfileExchangeService);
   readonly systemNotificationService = inject(SystemNotificationService);
   private readonly geolocationService = inject(GeolocationService);
   private readonly localImageService = inject(LocalImageService);

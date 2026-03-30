@@ -235,8 +235,12 @@
         "tileSettings": "Kachel-Einstellungen",
         "tileSettingsAria": "Kachel-Einstellungen für {{ name }} öffnen",
         "nameFallback": "Kontakt",
-        "policy": "Kontakt-Profil-ID und Abo-Status werden auf dem Server gespeichert. Name und Avatar bleiben lokal.",
+        "policy": "Profilanfragen und verschlüsselte Profilantworten werden bis zur Zustellung vorübergehend auf unserem Server gespeichert. Name und Avatar liegen dort nur verschlüsselt für die Übertragung vor.",
         "requestSent": "Profilanfrage gesendet.",
+        "requestFailed": "Die Profilanfrage konnte nicht gesendet werden.",
+        "responseFailed": "Deine Antwort zur Profilfreigabe konnte nicht gespeichert werden.",
+        "received": "Das Kontaktprofil wurde empfangen.",
+        "receivedInvalid": "Das empfangene Kontaktprofil konnte nicht übernommen werden.",
         "imageInvalid": "Bitte wähle eine gültige Bilddatei aus.",
         "imageTooLarge": "Das Bild ist zu groß. Maximale Größe: {{ maxMb }} MB.",
         "fileReadError": "Fehler beim Lesen der Datei."

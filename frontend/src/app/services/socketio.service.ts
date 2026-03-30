@@ -63,6 +63,8 @@ export class SocketioService {
   private userRoomEventName?: string;
   private readonly _joinedUserRoom = signal(false);
   readonly joinedUserRoom = this._joinedUserRoom.asReadonly();
+  private readonly _contactProfileExchangeUpdateToken = signal(0);
+  readonly contactProfileExchangeUpdateToken = this._contactProfileExchangeUpdateToken.asReadonly();
 
   constructor() {
     this.socket = io(environment.socketIoUrl, this.ioOptions);
@@ -213,6 +215,9 @@ export class SocketioService {
         }
         case 'security_reset':
           this.contactService.emitContactResetAll();
+          break;
+        case 'contact_profile_exchange_updated':
+          this._contactProfileExchangeUpdateToken.update((token) => token + 1);
           break;
       }
     });
