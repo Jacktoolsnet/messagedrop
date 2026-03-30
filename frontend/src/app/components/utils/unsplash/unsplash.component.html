@@ -27,7 +27,14 @@
         @for (result of results; track result.id) {
         <div>
             <button type="button" class="photo-button" (click)="onApplyClick(result)" aria-label="Select photo">
-                <img [src]="result.urls.small" [attr.alt]="result.alt_description || 'Photo result'" />
+                <img [src]="getPreviewUrl(result)"
+                    [attr.srcset]="getPreviewSrcSet(result)"
+                    [attr.alt]="result.alt_description || result.description || 'Photo result'"
+                    [attr.width]="result.width"
+                    [attr.height]="result.height"
+                    loading="lazy"
+                    decoding="async"
+                    fetchpriority="low" />
             </button>
         </div>
         }

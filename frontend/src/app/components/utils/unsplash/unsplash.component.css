@@ -20,6 +20,8 @@
 
 .gallery img {
     width: 100%;
+    height: auto;
+    max-width: 100%;
     margin-bottom: 10px;
     display: block;
     border-radius: 1rem;

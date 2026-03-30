@@ -190,6 +190,17 @@ export class UnsplashComponent implements OnInit {
     this.dialogRef.close(multimedia);
   }
 
+  getPreviewUrl(result: UnsplashPhoto): string {
+    return result.urls.thumb || result.urls.small || result.urls.regular;
+  }
+
+  getPreviewSrcSet(result: UnsplashPhoto): string | null {
+    if (result.urls.small) {
+      return `${result.urls.small} 2x`;
+    }
+    return null;
+  }
+
   onEnabledChange(enabled: boolean): void {
     const current = this.appService.getAppSettings();
     const updated: AppSettings = { ...current, enableUnsplashContent: enabled };
