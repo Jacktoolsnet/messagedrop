@@ -1500,6 +1500,7 @@
     "title": "Wetter",
     "titleForLocation": "Wetter für {{ location }}",
     "selectedHour": "Ausgewählte Stunde: {{ hour }}:00",
+    "dataSourceFull": "Wetterdaten bereitgestellt von open-meteo.com.",
     "dataSource": "Wetterdaten bereitgestellt von",
     "location": {
       "unknown": "Unbekannter Ort"

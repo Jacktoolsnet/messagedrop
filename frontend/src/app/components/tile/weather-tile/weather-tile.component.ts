@@ -97,8 +97,6 @@ export class WeatherTileComponent {
       minWidth: '90vw',
       width: '90vw',
       maxWidth: '90vw',
-      minHeight: '90vh',
-      height: '90vh',
       maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',

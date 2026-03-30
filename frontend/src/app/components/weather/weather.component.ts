@@ -42,6 +42,7 @@ import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.comp
   styleUrls: ['./weather.component.css']
 })
 export class WeatherComponent implements OnInit {
+  readonly formatHourSliderLabel = (value: number): string => String(value);
 
   private readonly dialogData = inject<{ weather?: Weather; location: Location; place?: Place }>(MAT_DIALOG_DATA);
   private readonly refreshService = inject(OpenMeteoRefreshService);

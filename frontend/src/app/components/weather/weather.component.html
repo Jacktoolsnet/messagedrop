@@ -1,10 +1,12 @@
 @if (locationName$ | async; as locationName) {
   <app-dialog-header
-    [title]="'weather.titleForLocation' | transloco: { location: locationName }">
+    [title]="'weather.titleForLocation' | transloco: { location: locationName }"
+    [subtitle]="'weather.dataSourceFull' | transloco">
   </app-dialog-header>
 } @else {
   <app-dialog-header
-    [title]="'weather.title' | transloco">
+    [title]="'weather.title' | transloco"
+    [subtitle]="'weather.dataSourceFull' | transloco">
   </app-dialog-header>
 }
 
@@ -51,17 +53,6 @@
         </app-weather-detail>
       }
     </div>
-
-    <!-- SLIDER -->
-    <div class="hour-slider">
-      <mat-slider min="0" max="23" step="1" thumbLabel tickInterval="1" (input)="onHourChange()">
-        <input matSliderThumb [(ngModel)]="selectedHour" />
-      </mat-slider>
-      @if (!selectedTile) {
-        <div class="selected-hour">{{ 'weather.selectedHour' | transloco: { hour: selectedHour } }}</div>
-      }
-    </div>
-
     <!-- TILE NAVIGATION BUTTONS -->
     @if (selectedTile) {
       <div class="tile-nav-buttons">
@@ -77,22 +68,34 @@
       </div>
     }
   }
-
-  <!-- DATA SOURCE -->
-  <div class="data-source">
-    {{ 'weather.dataSource' | transloco }}
-    <a href="https://open-meteo.com/" target="_blank" rel="noopener">open-meteo.com</a>.
-  </div>
   </div>
 </mat-dialog-content>
 
-<mat-dialog-actions class="sticky-actions" align="end">
-  <button mat-dialog-close mat-icon-button class="action-close" cdkFocusInitial
-    [attr.aria-label]="'common.actions.close' | transloco">
-    <mat-icon>close</mat-icon>
-  </button>
-  <button mat-icon-button type="button" (click)="help.open('weather')"
-    [attr.aria-label]="'common.actions.help' | transloco">
-    <mat-icon>help</mat-icon>
-  </button>
+<mat-dialog-actions class="sticky-actions">
+  <div class="action-close-button">
+    <button mat-dialog-close mat-icon-button class="action-close" cdkFocusInitial
+      [attr.aria-label]="'common.actions.close' | transloco">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  @if (weatherSig()) {
+    <div class="hour-slider action-slider">
+      <mat-slider
+        class="hour-range-slider"
+        min="0"
+        max="23"
+        step="1"
+        discrete
+        [displayWith]="formatHourSliderLabel"
+        (input)="onHourChange()">
+        <input matSliderThumb [(ngModel)]="selectedHour" />
+      </mat-slider>
+    </div>
+  }
+  <div class="action-help-button">
+    <button mat-icon-button type="button" (click)="help.open('weather')"
+      [attr.aria-label]="'common.actions.help' | transloco">
+      <mat-icon>help</mat-icon>
+    </button>
+  </div>
 </mat-dialog-actions>

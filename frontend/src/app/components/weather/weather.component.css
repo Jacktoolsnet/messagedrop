@@ -13,7 +13,7 @@
 :host ::ng-deep .mat-mdc-dialog-surface {
     display: flex;
     flex-direction: column;
-    height: 90vh;
+    height: auto;
     max-height: 90vh;
     padding-top: 0;
 }
@@ -23,6 +23,7 @@
     flex-direction: column;
     overflow: hidden;
     flex: 1 1 auto;
+    max-height: none;
     min-height: 0;
     width: 100%;
     box-sizing: border-box;
@@ -38,7 +39,7 @@
 .weather-scroll {
     flex: 1 1 auto;
     overflow: hidden;
-    padding: 1rem 1rem 1rem;
+    padding: 1rem 1rem 0;
     min-height: 0;
     display: flex;
     flex-direction: column;
@@ -61,6 +62,29 @@
 
 .sticky-actions {
     margin-top: auto;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: "close slider help";
+    align-items: center;
+    gap: 0.75rem;
+    padding-inline: 1rem;
+}
+
+.action-close-button {
+    grid-area: close;
+    justify-self: start;
+}
+
+.action-slider {
+    grid-area: slider;
+    justify-self: center;
+    width: 100%;
+    max-width: 420px;
+}
+
+.action-help-button {
+    grid-area: help;
+    justify-self: end;
 }
 
 @media (min-width: 1024px) {
@@ -69,11 +93,6 @@
     }
 
     .tile-scroll {
-        flex: 0 1 auto;
-        max-height: 60vh;
-    }
-
-    .tile-scroll.detail-open {
         flex: 1 1 auto;
         max-height: none;
     }
@@ -100,13 +119,13 @@
     color: var(--mat-card-subtitle-text-color);
     background-color: var(--mat-card-filled-container-color);
     box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
-    padding: 1rem;
+    padding: 1.15rem;
     text-align: center;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 0.25rem;
-    min-height: 140px;
+    gap: 0.35rem;
+    min-height: 164px;
     height: auto;
     border: none;
     cursor: pointer;
@@ -125,33 +144,33 @@
 
 .tile-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(208px, 1fr));
     gap: 1rem;
     width: 100%;
 }
 
-@media (max-width: 320px) {
+@media (max-width: 700px) {
     .tile-grid {
         grid-template-columns: 1fr;
+        justify-items: center;
     }
-}
 
-@media (min-width: 321px) and (max-width: 500px) {
-    .tile-grid {
-        grid-template-columns: repeat(2, 1fr);
+    .tile {
+        width: 100%;
+        max-width: 85%;
     }
 }
 
 .tile-title {
     font-weight: 500;
-    font-size: 1rem;
+    font-size: 1.05rem;
     white-space: normal;
     overflow-wrap: anywhere;
     overflow: hidden;
 }
 
 .tile-icon {
-    font-size: 3rem;
+    font-size: 3.35rem;
     width: 100%;
     line-height: 1;
     display: inline-block;
@@ -160,18 +179,18 @@
 }
 
 .tile-value {
-    font-size: 1.5rem;
+    font-size: 1.7rem;
     font-weight: 500;
 }
 
 .tile-level {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     font-weight: 500;
     opacity: 0.9;
 }
 
 .tile-minmax {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     font-weight: 500;
     opacity: 0.9;
 }
@@ -199,14 +218,15 @@
     justify-content: space-around;
 }
 
-.selected-hour {
-    text-align: center;
-    font-size: 0.9rem;
-    margin-top: 0.5rem;
-}
-
 mat-slider {
     width: 100%;
+}
+
+@media (max-width: 700px) {
+    .sticky-actions {
+        gap: 0.5rem;
+        padding-inline: 0.75rem;
+    }
 }
 
 .category-switch {
@@ -224,22 +244,6 @@ mat-slider {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.data-source {
-    margin-top: auto;
-    font-size: 0.8rem;
-    text-align: center;
-}
-
-.data-source a {
-    margin-top: auto;
-    color: inherit;
-    text-decoration: underline;
-}
-
-.data-source a:hover {
-    text-decoration: none;
 }
 
 .tile-detail-button {
