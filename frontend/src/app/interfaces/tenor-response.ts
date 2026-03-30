@@ -4,6 +4,7 @@ export interface TenorGifFormat {
 
 export interface TenorMediaFormats {
   gif: TenorGifFormat;
+  tinygif?: TenorGifFormat;
 }
 
 export interface TenorResult {

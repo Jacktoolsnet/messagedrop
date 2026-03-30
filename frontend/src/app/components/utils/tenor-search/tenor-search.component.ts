@@ -109,6 +109,10 @@ export class TenorSearchComponent implements OnInit {
     this.dialogRef.close(multimedia);
   }
 
+  getPreviewUrl(result: TenorResult): string {
+    return result.media_formats.tinygif?.url || result.media_formats.gif.url;
+  }
+
   onEnabledChange(enabled: boolean): void {
     const current = this.appService.getAppSettings();
     const updated: AppSettings = { ...current, enableTenorContent: enabled };

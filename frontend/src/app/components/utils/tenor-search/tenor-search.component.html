@@ -23,7 +23,10 @@
         @for (result of results; track result.id) {
         <div>
             <button type="button" class="gif-button" (click)="onApplyClick(result)" aria-label="Select GIF">
-                <img [src]="result.media_formats.gif.url" alt="Gif result" />
+                <img [src]="getPreviewUrl(result)"
+                    [alt]="result.content_description || result.title || 'Gif result'"
+                    loading="lazy"
+                    decoding="async" />
             </button>
         </div>
         }

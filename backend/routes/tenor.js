@@ -20,7 +20,7 @@ router.get('/featured/:country/:locale',
         const params = new URLSearchParams();
         params.set('key', process.env.TENOR_API_KEY);
         params.set('client_key', process.env.TENOR_CLIENT_KEY);
-        params.set('media_filter', 'gif');
+        params.set('media_filter', 'gif,tinygif');
         params.set('ar_range', 'standard');
         params.set('contentfilter', 'low');
         params.set('limit', '30');
@@ -53,7 +53,7 @@ router.get('/featured/:country/:locale/:next',
         const params = new URLSearchParams();
         params.set('key', process.env.TENOR_API_KEY);
         params.set('client_key', process.env.TENOR_CLIENT_KEY);
-        params.set('media_filter', 'gif');
+        params.set('media_filter', 'gif,tinygif');
         params.set('ar_range', 'standard');
         params.set('contentfilter', 'low');
         params.set('limit', '30');
@@ -86,7 +86,7 @@ router.get('/search/:country/:locale/:searchTerm',
         const params = new URLSearchParams();
         params.set('key', process.env.TENOR_API_KEY);
         params.set('client_key', process.env.TENOR_CLIENT_KEY);
-        params.set('media_filter', 'gif');
+        params.set('media_filter', 'gif,tinygif');
         params.set('ar_range', 'standard');
         params.set('contentfilter', 'low');
         params.set('limit', '30');
@@ -119,7 +119,7 @@ router.get('/search/:country/:locale/:searchTerm/:next',
         const params = new URLSearchParams();
         params.set('key', process.env.TENOR_API_KEY);
         params.set('client_key', process.env.TENOR_CLIENT_KEY);
-        params.set('media_filter', 'gif');
+        params.set('media_filter', 'gif,tinygif');
         params.set('ar_range', 'standard');
         params.set('contentfilter', 'low');
         params.set('limit', '30');
