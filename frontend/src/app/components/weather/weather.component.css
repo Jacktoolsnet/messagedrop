@@ -52,6 +52,8 @@
     overflow-y: auto;
     overflow-x: hidden;
     padding-right: 0.5rem;
+    padding-bottom: 1.5rem;
+    scroll-padding-bottom: 1.5rem;
 }
 
 .tile-scroll.detail-open {
@@ -216,6 +218,7 @@
 .tile-nav-buttons {
     display: flex;
     justify-content: space-around;
+    padding-bottom: 1.5rem;
 }
 
 mat-slider {
