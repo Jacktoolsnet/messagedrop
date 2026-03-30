@@ -13,6 +13,16 @@
         <mat-form-field appearance="outline" class="full">
             <mat-label>{{ i18n.t('Username') }}</mat-label>
             <input matInput formControlName="username" required />
+            <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                (click)="generateUsername()"
+                [attr.aria-label]="i18n.t('Generate random username')"
+                [attr.title]="i18n.t('Generate random username')">
+                <mat-icon>shuffle</mat-icon>
+            </button>
+            <mat-hint>{{ i18n.t('Generate an 8-character username with lowercase letters and numbers.') }}</mat-hint>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full">

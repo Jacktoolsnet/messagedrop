@@ -24,6 +24,8 @@
   "Optional. Use this to give the AI an extra focus such as event announcement, beginner-friendly tone or call to action.": "Optional. Use this to give the AI an extra focus such as event announcement, beginner-friendly tone or call to action.",
   "Please wait while the content is published.": "Please wait while the content is published.",
   "Please add a task, a source link, profile guidance or multimedia context before generating drafts.": "Please add a task, a source link, profile guidance or multimedia context before generating drafts.",
+  "Generate random username": "Generate random username",
+  "Generate an 8-character username with lowercase letters and numbers.": "Generate an 8-character username with lowercase letters and numbers.",
   "This content could not be published because public content must not contain private contact details, links or similar personal data.": "This content could not be published because public content must not contain private contact details, links or similar personal data.",
   "This content could not be published because it was rejected by automated moderation.": "This content could not be published because it was rejected by automated moderation."
 }

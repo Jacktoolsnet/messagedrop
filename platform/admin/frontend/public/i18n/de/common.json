@@ -1508,6 +1508,8 @@
   "Import selected drafts": "Ausgewählte Entwürfe importieren",
   "Please enter a valid URL starting with http:// or https://.": "Bitte eine gültige URL mit http:// oder https:// eingeben.",
   "Please create a public profile first.": "Bitte erst ein öffentliches Profil anlegen.",
+  "Generate random username": "Zufälligen Benutzernamen erzeugen",
+  "Generate an 8-character username with lowercase letters and numbers.": "Erzeuge einen 8-stelligen Benutzernamen mit kleinen Buchstaben und Zahlen.",
   "No AI draft suggestions were returned.": "Es wurden keine KI-Entwurfsvorschläge zurückgegeben.",
   "No AI drafts could be imported.": "Keine KI-Entwürfe konnten importiert werden.",
   "{{count}} AI drafts imported.": "{{count}} KI-Entwürfe importiert.",
