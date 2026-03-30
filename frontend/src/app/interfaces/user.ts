@@ -10,6 +10,7 @@ export interface User {
   locale: string;
   language: string;
   subscription: string;
+  deeplApiKey?: string;
   cryptoKeyPair: Keypair;
   signingKeyPair: Keypair;
   type: UserType;

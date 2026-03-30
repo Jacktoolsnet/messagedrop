@@ -166,6 +166,82 @@
       </mat-card-content>
     </mat-card>
 
+    <mat-card class="tile tile-translation">
+      <mat-card-content>
+        <div class="tile-header">
+          <mat-icon>translate</mat-icon>
+          <span class="tile-title">{{ 'common.user.translationSettings.title' | transloco }}</span>
+        </div>
+        <div class="tile-body translation-settings">
+          <p>{{ 'common.user.translationSettings.description' | transloco }}</p>
+          <p
+            class="translation-status"
+            [class.translation-status--custom]="hasStoredDeeplApiKey()"
+            [class.translation-status--default]="!hasStoredDeeplApiKey()">
+            {{
+              (hasStoredDeeplApiKey()
+                ? 'common.user.translationSettings.statusCustom'
+                : 'common.user.translationSettings.statusDefault') | transloco
+            }}
+          </p>
+
+          <mat-form-field appearance="outline" class="translation-field" subscriptSizing="dynamic">
+            <mat-label>{{ 'common.user.translationSettings.inputLabel' | transloco }}</mat-label>
+            <input
+              matInput
+              autocomplete="off"
+              autocapitalize="none"
+              spellcheck="false"
+              [type]="revealDeeplApiKey() ? 'text' : 'password'"
+              [formControl]="translationSettingsForm.controls.deeplApiKey" />
+            <button
+              mat-icon-button
+              matSuffix
+              type="button"
+              (click)="toggleDeeplApiKeyVisibility()"
+              [attr.aria-label]="(
+                revealDeeplApiKey()
+                  ? 'common.user.translationSettings.hideKey'
+                  : 'common.user.translationSettings.showKey'
+              ) | transloco">
+              <mat-icon>{{ revealDeeplApiKey() ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            @if (translationSettingsForm.controls.deeplApiKey.hasError('maxlength')) {
+            <mat-error>{{ 'common.user.translationSettings.maxLength' | transloco }}</mat-error>
+            }
+          </mat-form-field>
+
+          <div class="translation-actions">
+            <button
+              mat-stroked-button
+              type="button"
+              (click)="testDeeplApiKey()"
+              [disabled]="savingDeeplApiKey() || testingDeeplApiKey() || translationSettingsForm.invalid">
+              <mat-icon>fact_check</mat-icon>
+              {{ 'common.user.translationSettings.test' | transloco }}
+            </button>
+            <button
+              mat-stroked-button
+              type="button"
+              (click)="clearDeeplApiKey()"
+              [disabled]="savingDeeplApiKey() || testingDeeplApiKey() || (!hasStoredDeeplApiKey() && !translationKeyChanged())">
+              <mat-icon>delete</mat-icon>
+              {{ 'common.user.translationSettings.clear' | transloco }}
+            </button>
+            <button
+              mat-flat-button
+              color="primary"
+              type="button"
+              (click)="saveDeeplApiKey()"
+              [disabled]="savingDeeplApiKey() || testingDeeplApiKey() || translationSettingsForm.invalid || !translationKeyChanged()">
+              <mat-icon>save</mat-icon>
+              {{ 'common.user.translationSettings.save' | transloco }}
+            </button>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
     <mat-card class="tile tile-action" role="button" tabindex="0"
       (click)="triggerAction('backup')" (keyup.enter)="triggerAction('backup')" (keyup.space)="triggerAction('backup')">
       <mat-card-content>

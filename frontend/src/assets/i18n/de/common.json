@@ -154,7 +154,10 @@
     },
     "translate": {
       "title": "Übersetzungsservice",
-      "message": "Nachricht wird übersetzt"
+      "message": "Nachricht wird übersetzt",
+      "userApiKeyInvalid": "Dein persönlicher DeepL-API-Key ist ungültig oder nicht mehr aktiv.",
+      "userApiKeyQuotaExceeded": "Dein persönlicher DeepL-API-Key hat sein Kontingent erreicht.",
+      "emptyText": "Es gibt keinen Text zum Übersetzen."
     },
     "connect": {
       "title": "Connect-Dienst",
@@ -1169,6 +1172,28 @@
         "changePin": "PIN ändern",
         "resetKeys": "Sicherheits-Reset",
         "delete": "Meinen Benutzer löschen"
+      },
+      "translationSettings": {
+        "title": "Übersetzung",
+        "description": "Verwende auf diesem Gerät deinen eigenen DeepL-API-Key für Übersetzungen.",
+        "statusDefault": "Der Standard-Übersetzungsschlüssel von MessageDrop ist aktiv.",
+        "statusCustom": "Dein eigener DeepL-API-Key ist auf diesem Gerät aktiv.",
+        "inputLabel": "DeepL-API-Key",
+        "showKey": "DeepL-API-Key anzeigen",
+        "hideKey": "DeepL-API-Key ausblenden",
+        "localOnlyHint": "Wird nur auf diesem Gerät in deinen verschlüsselten Benutzerdaten gespeichert. Der Schlüssel wird nicht auf dem Server gespeichert.",
+        "fallbackHint": "Lass das Feld leer, um den Standard-Übersetzungsschlüssel von MessageDrop zu verwenden.",
+        "test": "Key testen",
+        "testEmpty": "Bitte zuerst einen DeepL-API-Key eingeben.",
+        "testSuccess": "Der DeepL-API-Key ist gültig.",
+        "testSuccessQuotaReached": "Der DeepL-API-Key ist gültig, aber sein Übersetzungskontingent ist bereits aufgebraucht.",
+        "testError": "Der DeepL-API-Key konnte nicht geprüft werden.",
+        "save": "Key speichern",
+        "clear": "Key entfernen",
+        "saveSuccess": "DeepL-API-Key gespeichert.",
+        "clearSuccess": "Persönlicher DeepL-API-Key entfernt. MessageDrop verwendet wieder den Standardschlüssel.",
+        "saveError": "Der DeepL-API-Key konnte nicht gespeichert werden.",
+        "maxLength": "Der DeepL-API-Key ist zu lang."
       },
       "deleteDialog": {
         "title": "Benutzer löschen",

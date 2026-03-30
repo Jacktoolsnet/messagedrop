@@ -40,7 +40,8 @@
 }
 
 .tile-blocked,
-.tile-posting-blocked {
+.tile-posting-blocked,
+.tile-translation {
   grid-column: 1 / -1;
 }
 
@@ -125,6 +126,55 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 0.9rem;
   opacity: 0.9;
+}
+
+.tile-info {
+  grid-column: span 2;
+}
+
+.translation-settings {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.translation-settings p {
+  margin: 0;
+}
+
+.translation-field {
+  width: 100%;
+}
+
+.translation-status {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 1.9rem;
+  padding: 0 0.75rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.translation-status--custom {
+  background-color: color-mix(in srgb,
+      var(--mat-sys-primary-container, var(--mat-card-filled-container-color)) 88%,
+      transparent);
+  color: var(--mat-sys-on-primary-container, var(--mat-app-text-color));
+}
+
+.translation-status--default {
+  background-color: color-mix(in srgb,
+      var(--mat-sys-tertiary-container, var(--mat-card-filled-container-color)) 88%,
+      transparent);
+  color: var(--mat-sys-on-tertiary-container, var(--mat-app-text-color));
+}
+
+.translation-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .tile-danger {
@@ -252,6 +302,10 @@
 }
 
 @media (max-width: 640px) {
+  .tile-info {
+    grid-column: 1 / -1;
+  }
+
   .appeal-entry-header {
     align-items: flex-start;
     flex-direction: column;

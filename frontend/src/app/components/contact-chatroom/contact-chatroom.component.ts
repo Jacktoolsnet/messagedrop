@@ -771,7 +771,8 @@ export class ContactChatroomComponent implements AfterViewInit {
         void this.persistTranslation(message.messageId, translated);
       },
       error: (err) => {
-        const errorMessage = err?.error?.error ?? this.translation.t('common.contact.chatroom.translateFailed');
+        const errorMessage = this.translateService.getErrorMessage(err)
+          ?? this.translation.t('common.contact.chatroom.translateFailed');
         this.snackBar.open(errorMessage, '', { duration: 3000 });
       }
     });

@@ -427,6 +427,25 @@ export class UserService {
     return this.user;
   }
 
+  getDeeplApiKey(): string {
+    return typeof this.user.deeplApiKey === 'string' ? this.user.deeplApiKey.trim() : '';
+  }
+
+  hasCustomDeeplApiKey(): boolean {
+    return this.getDeeplApiKey().length > 0;
+  }
+
+  async setDeeplApiKey(deeplApiKey: string | null | undefined): Promise<void> {
+    const normalized = typeof deeplApiKey === 'string' ? deeplApiKey.trim() : '';
+    if (normalized) {
+      this.user.deeplApiKey = normalized;
+    } else {
+      delete this.user.deeplApiKey;
+    }
+    await this.saveUser();
+    this._userSet.update((trigger) => trigger + 1);
+  }
+
   getProfile(): Profile {
     if (this.profile) {
       return this.profile;

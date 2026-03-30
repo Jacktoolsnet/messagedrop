@@ -154,7 +154,10 @@
     },
     "translate": {
       "title": "Translate service",
-      "message": "Translating message"
+      "message": "Translating message",
+      "userApiKeyInvalid": "Your personal DeepL API key is invalid or no longer active.",
+      "userApiKeyQuotaExceeded": "Your personal DeepL API key has reached its quota.",
+      "emptyText": "There is no text to translate."
     },
     "connect": {
       "title": "Connect service",
@@ -1169,6 +1172,28 @@
         "changePin": "Change PIN",
         "resetKeys": "Security reset",
         "delete": "Delete my user"
+      },
+      "translationSettings": {
+        "title": "Translation",
+        "description": "Use your own DeepL API key for translations on this device.",
+        "statusDefault": "MessageDrop default translation key is active.",
+        "statusCustom": "Your own DeepL API key is active on this device.",
+        "inputLabel": "DeepL API key",
+        "showKey": "Show DeepL API key",
+        "hideKey": "Hide DeepL API key",
+        "localOnlyHint": "Stored only on this device in your encrypted user data. It is not stored on the server.",
+        "fallbackHint": "Leave the field empty to use the default MessageDrop translation key.",
+        "test": "Test key",
+        "testEmpty": "Please enter a DeepL API key first.",
+        "testSuccess": "DeepL API key is valid.",
+        "testSuccessQuotaReached": "DeepL API key is valid, but its translation quota is already exhausted.",
+        "testError": "The DeepL API key could not be verified.",
+        "save": "Save key",
+        "clear": "Remove key",
+        "saveSuccess": "DeepL API key saved.",
+        "clearSuccess": "Personal DeepL API key removed. MessageDrop will use the default key again.",
+        "saveError": "The DeepL API key could not be saved.",
+        "maxLength": "The DeepL API key is too long."
       },
       "deleteDialog": {
         "title": "Delete user",

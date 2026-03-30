@@ -104,6 +104,10 @@
         "title": "Change PIN",
         "desc": "Sets a new PIN for this user on this device. The PIN protects local access to the account."
       },
+      "translation": {
+        "title": "Translation settings",
+        "desc": "Here you can optionally store your own DeepL API key for this device. The key is saved only in your encrypted local user data, can be tested before saving, and if the field stays empty MessageDrop continues to use the default translation key."
+      },
       "resetKeys": {
         "title": "Reset security keys",
         "desc": "Generates new cryptographic keys for private communication. Existing private messages can no longer be decrypted afterwards."
@@ -122,7 +126,7 @@
       },
       "privacy": {
         "title": "Privacy and storage",
-        "desc": "Frontend: user data is stored locally in IndexedDB and additionally protected by PIN. Backend: only operational metadata is stored (for example user ID, public keys, status data). Private content is transferred end-to-end encrypted and stored encrypted wherever technically possible."
+        "desc": "Frontend: user data is stored locally in IndexedDB and additionally protected by PIN. An optional personal DeepL API key is also kept only there in encrypted form. Backend: only operational metadata is stored (for example user ID, public keys, status data). Private content is transferred end-to-end encrypted and stored encrypted wherever technically possible."
       }
     }
   },

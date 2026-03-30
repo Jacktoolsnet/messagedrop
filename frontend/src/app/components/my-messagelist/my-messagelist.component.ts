@@ -1147,7 +1147,8 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
         }
       },
       error: err => {
-        const errorMessage = err?.error?.error ?? this.translation.t('common.messageList.translateFailed');
+        const errorMessage = this.translateService.getErrorMessage(err)
+          ?? this.translation.t('common.messageList.translateFailed');
         this.snackBar.open(errorMessage, '', { duration: 3000 });
       }
     });

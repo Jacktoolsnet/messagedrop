@@ -687,6 +687,11 @@ const HELP_TOPICS = {
         icon: 'lock_reset',
         titleKey: 'user.items.changePin.title',
         descriptionKey: 'user.items.changePin.desc'
+      },
+      {
+        icon: 'translate',
+        titleKey: 'user.items.translation.title',
+        descriptionKey: 'user.items.translation.desc'
       }
     ];
 

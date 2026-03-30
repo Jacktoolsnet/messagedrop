@@ -154,7 +154,10 @@
     },
     "translate": {
       "title": "Service de traduction",
-      "message": "Traduction du message"
+      "message": "Traduction du message",
+      "userApiKeyInvalid": "Votre clé API DeepL personnelle est invalide ou n'est plus active.",
+      "userApiKeyQuotaExceeded": "Votre clé API DeepL personnelle a atteint son quota.",
+      "emptyText": "Il n'y a pas de texte à traduire."
     },
     "connect": {
       "title": "Service de connexion",
@@ -1169,6 +1172,28 @@
         "changePin": "Modifier le PIN",
         "resetKeys": "Réinitialisation de sécurité",
         "delete": "Supprimer mon utilisateur"
+      },
+      "translationSettings": {
+        "title": "Traduction",
+        "description": "Utilisez votre propre clé API DeepL pour les traductions sur cet appareil.",
+        "statusDefault": "La clé de traduction par défaut de MessageDrop est active.",
+        "statusCustom": "Votre propre clé API DeepL est active sur cet appareil.",
+        "inputLabel": "Clé API DeepL",
+        "showKey": "Afficher la clé API DeepL",
+        "hideKey": "Masquer la clé API DeepL",
+        "localOnlyHint": "Stockée uniquement sur cet appareil dans vos données utilisateur chiffrées. Elle n'est pas enregistrée sur le serveur.",
+        "fallbackHint": "Laissez le champ vide pour utiliser la clé de traduction par défaut de MessageDrop.",
+        "test": "Tester la clé",
+        "testEmpty": "Veuillez d'abord saisir une clé API DeepL.",
+        "testSuccess": "La clé API DeepL est valide.",
+        "testSuccessQuotaReached": "La clé API DeepL est valide, mais son quota de traduction est déjà épuisé.",
+        "testError": "La clé API DeepL n'a pas pu être vérifiée.",
+        "save": "Enregistrer la clé",
+        "clear": "Supprimer la clé",
+        "saveSuccess": "Clé API DeepL enregistrée.",
+        "clearSuccess": "La clé API DeepL personnelle a été supprimée. MessageDrop utilisera de nouveau la clé par défaut.",
+        "saveError": "La clé API DeepL n'a pas pu être enregistrée.",
+        "maxLength": "La clé API DeepL est trop longue."
       },
       "deleteDialog": {
         "title": "Supprimer l'utilisateur",

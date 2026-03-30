@@ -104,6 +104,10 @@
         "title": "Cambiar PIN",
         "desc": "Define un nuevo PIN para este usuario en este dispositivo. El PIN protege el acceso local al usuario."
       },
+      "translation": {
+        "title": "Configuración de traducción",
+        "desc": "Aquí puedes guardar opcionalmente tu propia clave de la API de DeepL para este dispositivo. La clave se almacena solo en tus datos de usuario locales cifrados, puede probarse antes de guardarla y, si el campo queda vacío, MessageDrop seguirá usando la clave de traducción predeterminada."
+      },
       "resetKeys": {
         "title": "Restablecer claves de seguridad",
         "desc": "Genera nuevas claves criptográficas para la comunicación privada. Los mensajes privados anteriores ya no podrán descifrarse después."
@@ -122,7 +126,7 @@
       },
       "privacy": {
         "title": "Privacidad y almacenamiento",
-        "desc": "Frontend: los datos del usuario se guardan localmente en IndexedDB y además se protegen con PIN. Backend: solo se guardan metadatos necesarios para operar (por ejemplo ID de usuario, claves públicas, estado). El contenido privado se transmite con cifrado de extremo a extremo y se guarda cifrado siempre que sea técnicamente posible."
+        "desc": "Frontend: los datos del usuario se guardan localmente en IndexedDB y además se protegen con PIN. Una clave personal opcional de la API de DeepL también se guarda solo allí de forma cifrada. Backend: solo se guardan metadatos necesarios para operar (por ejemplo ID de usuario, claves públicas, estado). El contenido privado se transmite con cifrado de extremo a extremo y se guarda cifrado siempre que sea técnicamente posible."
       }
     }
   },

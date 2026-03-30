@@ -154,7 +154,10 @@
     },
     "translate": {
       "title": "Servicio de traducción",
-      "message": "Traduciendo mensaje"
+      "message": "Traduciendo mensaje",
+      "userApiKeyInvalid": "Tu clave personal de la API de DeepL no es válida o ya no está activa.",
+      "userApiKeyQuotaExceeded": "Tu clave personal de la API de DeepL ha alcanzado su cuota.",
+      "emptyText": "No hay texto para traducir."
     },
     "connect": {
       "title": "Servicio Connect",
@@ -1169,6 +1172,28 @@
         "changePin": "Cambiar PIN",
         "resetKeys": "Restablecimiento de seguridad",
         "delete": "Eliminar mi usuario"
+      },
+      "translationSettings": {
+        "title": "Traducción",
+        "description": "Usa tu propia clave de la API de DeepL para las traducciones en este dispositivo.",
+        "statusDefault": "La clave de traducción predeterminada de MessageDrop está activa.",
+        "statusCustom": "Tu propia clave de la API de DeepL está activa en este dispositivo.",
+        "inputLabel": "Clave de la API de DeepL",
+        "showKey": "Mostrar clave de la API de DeepL",
+        "hideKey": "Ocultar clave de la API de DeepL",
+        "localOnlyHint": "Se guarda solo en este dispositivo dentro de tus datos de usuario cifrados. No se almacena en el servidor.",
+        "fallbackHint": "Deja el campo vacío para usar la clave de traducción predeterminada de MessageDrop.",
+        "test": "Probar clave",
+        "testEmpty": "Introduce primero una clave de la API de DeepL.",
+        "testSuccess": "La clave de la API de DeepL es válida.",
+        "testSuccessQuotaReached": "La clave de la API de DeepL es válida, pero su cuota de traducción ya está agotada.",
+        "testError": "No se pudo verificar la clave de la API de DeepL.",
+        "save": "Guardar clave",
+        "clear": "Eliminar clave",
+        "saveSuccess": "Clave de la API de DeepL guardada.",
+        "clearSuccess": "Se eliminó la clave personal de la API de DeepL. MessageDrop volverá a usar la clave predeterminada.",
+        "saveError": "No se pudo guardar la clave de la API de DeepL.",
+        "maxLength": "La clave de la API de DeepL es demasiado larga."
       },
       "deleteDialog": {
         "title": "Eliminar usuario",
