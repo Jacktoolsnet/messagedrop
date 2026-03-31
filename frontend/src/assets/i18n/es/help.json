@@ -2446,7 +2446,30 @@
     }
   },
   "textDialog": {
-    "title": "Texto"
+    "title": "Texto",
+    "intro": "Este diálogo te permite escribir o editar texto para mensajes, comentarios o notas e insertar emojis directamente.",
+    "items": {
+      "text": {
+        "title": "Campo de texto",
+        "desc": "Aquí escribes tu texto o editas el contenido existente."
+      },
+      "emoji": {
+        "title": "Selector de emojis",
+        "desc": "Abre un selector de emojis independiente como una pequeña superposición con muchos emojis. El emoji elegido se inserta en el texto en la posición actual del cursor."
+      },
+      "apply": {
+        "title": "Aplicar",
+        "desc": "Guarda el texto actual y lo aplica a la vista anterior."
+      },
+      "close": {
+        "title": "Cerrar",
+        "desc": "Cierra el diálogo sin aplicar los cambios."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Abre esta vista de ayuda."
+      }
+    }
   },
   "experienceSearchDetail": {
     "title": "Detalles de la experiencia",

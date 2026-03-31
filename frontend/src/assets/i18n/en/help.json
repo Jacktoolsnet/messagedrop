@@ -2446,7 +2446,30 @@
     }
   },
   "textDialog": {
-    "title": "Text"
+    "title": "Text",
+    "intro": "This dialog lets you write or edit text for messages, comments, or notes and insert emojis directly into it.",
+    "items": {
+      "text": {
+        "title": "Text field",
+        "desc": "Write your text here or edit the existing content."
+      },
+      "emoji": {
+        "title": "Emoji picker",
+        "desc": "Opens a separate emoji picker as a small overlay with many emojis. The selected emoji is inserted into the text at the current cursor position."
+      },
+      "apply": {
+        "title": "Apply",
+        "desc": "Saves the current text and applies it to the previous view."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "Closes the dialog without applying the changes."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "Opens this help view."
+      }
+    }
   },
   "experienceSearchDetail": {
     "title": "Experience details",

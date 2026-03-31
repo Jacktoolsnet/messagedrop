@@ -2446,7 +2446,30 @@
     }
   },
   "textDialog": {
-    "title": "Texte"
+    "title": "Texte",
+    "intro": "Cette boîte de dialogue permet d’écrire ou de modifier le texte des messages, commentaires ou notes et d’y insérer directement des emojis.",
+    "items": {
+      "text": {
+        "title": "Champ de texte",
+        "desc": "Saisissez votre texte ici ou modifiez le contenu existant."
+      },
+      "emoji": {
+        "title": "Sélecteur d’emojis",
+        "desc": "Ouvre un sélecteur d’emojis séparé sous forme de petite surcouche avec de nombreux emojis. L’emoji choisi est inséré dans le texte à la position actuelle du curseur."
+      },
+      "apply": {
+        "title": "Appliquer",
+        "desc": "Enregistre le texte actuel et l’applique à la vue précédente."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Ferme la boîte de dialogue sans appliquer les modifications."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Ouvre cette vue d’aide."
+      }
+    }
   },
   "experienceSearchDetail": {
     "title": "Détails de l’expérience",

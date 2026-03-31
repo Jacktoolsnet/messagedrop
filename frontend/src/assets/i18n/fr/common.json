@@ -344,7 +344,9 @@
       "policy": "Ces informations sont stockées sur votre appareil et ne sont visibles que par vous."
     },
     "textDialog": {
-      "editTitle": "Modifier le texte"
+      "editTitle": "Modifier le texte",
+      "emojiPickerAria": "Ouvrir le sélecteur d’emojis",
+      "insertEmojiAria": "Insérer l’emoji {{ emoji }}"
     },
     "images": {
       "imported": "Image(s) importée(s) localement.",

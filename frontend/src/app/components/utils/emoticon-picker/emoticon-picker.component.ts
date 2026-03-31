@@ -71,6 +71,7 @@ export class EmoticonPickerComponent {
   readonly dialogRef = inject(MatDialogRef<EmoticonPickerComponent, string | null>);
   readonly data = inject<EmoticonPickerData>(MAT_DIALOG_DATA);
   readonly help = inject(HelpDialogService);
+  readonly allowRemove = this.data.allowRemove !== false;
 
   pick(reaction: string | null): void {
     this.dialogRef.close(reaction);

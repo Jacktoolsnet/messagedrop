@@ -2446,7 +2446,30 @@
     }
   },
   "textDialog": {
-    "title": "Text"
+    "title": "Text",
+    "intro": "In diesem Dialog schreibst oder bearbeitest du den Text für Nachrichten, Kommentare oder Notizen und kannst Emojis direkt einfügen.",
+    "items": {
+      "text": {
+        "title": "Textfeld",
+        "desc": "Hier gibst du deinen Text ein oder bearbeitest ihn."
+      },
+      "emoji": {
+        "title": "Emoji-Auswahl",
+        "desc": "Öffnet einen separaten Emoji-Picker als kleines Overlay mit vielen Emojis. Das ausgewählte Emoji wird an der aktuellen Cursorposition in den Text eingefügt."
+      },
+      "apply": {
+        "title": "Übernehmen",
+        "desc": "Speichert den aktuell eingegebenen Text und übernimmt ihn in die vorherige Ansicht."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Schließt den Dialog ohne die Änderungen zu übernehmen."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Öffnet diese Hilfeansicht."
+      }
+    }
   },
   "experienceSearchDetail": {
     "title": "Erlebnisdetails",

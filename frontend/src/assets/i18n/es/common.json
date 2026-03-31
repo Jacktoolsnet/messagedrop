@@ -344,7 +344,9 @@
       "policy": "Esta información se almacena en tu dispositivo y solo es visible para ti."
     },
     "textDialog": {
-      "editTitle": "Editar texto"
+      "editTitle": "Editar texto",
+      "emojiPickerAria": "Abrir selector de emojis",
+      "insertEmojiAria": "Insertar emoji {{ emoji }}"
     },
     "images": {
       "imported": "Imagen(es) importadas localmente.",

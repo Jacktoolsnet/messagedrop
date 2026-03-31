@@ -17,7 +17,9 @@
     [attr.aria-label]="'common.actions.help' | transloco">
     <mat-icon>help</mat-icon>
   </button>
+  @if (allowRemove) {
   <button mat-icon-button color="warn" (click)="pick(null)" aria-label="Remove reaction">
     <mat-icon>delete</mat-icon>
   </button>
+  }
 </mat-dialog-actions>

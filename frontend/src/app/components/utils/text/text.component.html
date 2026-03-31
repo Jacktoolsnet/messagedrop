@@ -5,7 +5,9 @@
 
 <mat-dialog-content>
     <div class="textarea_container">
-        <textarea cdkFocusInitial maxlength="512" type="text" [(ngModel)]="data.text" matInput>
+        <textarea #textArea cdkFocusInitial maxlength="512" type="text" [(ngModel)]="data.text" matInput
+            (click)="rememberSelection()" (keyup)="rememberSelection()" (select)="rememberSelection()"
+            (input)="rememberSelection()">
         </textarea>
     </div>
 </mat-dialog-content>
@@ -17,6 +19,10 @@
     <button mat-icon-button type="button" (click)="help.open('textDialog')"
         [attr.aria-label]="'common.actions.help' | transloco">
         <mat-icon>help</mat-icon>
+    </button>
+    <button mat-icon-button type="button" (click)="openEmojiPicker()"
+        [attr.aria-label]="'common.textDialog.emojiPickerAria' | transloco">
+        <mat-icon>mood</mat-icon>
     </button>
     <button color="primary" [attr.aria-label]="'common.actions.apply' | transloco" (click)="onApplyClick()"
         mat-icon-button>

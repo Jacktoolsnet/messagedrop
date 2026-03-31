@@ -3162,8 +3162,34 @@ const HELP_TOPICS = {
   },
   textDialog: {
     titleKey: 'textDialog.title',
-    introKey: 'common.intros.info',
-    items: ITEMS.info
+    introKey: 'textDialog.intro',
+    items: [
+      {
+        icon: 'edit',
+        titleKey: 'textDialog.items.text.title',
+        descriptionKey: 'textDialog.items.text.desc'
+      },
+      {
+        icon: 'mood',
+        titleKey: 'textDialog.items.emoji.title',
+        descriptionKey: 'textDialog.items.emoji.desc'
+      },
+      {
+        icon: 'check',
+        titleKey: 'textDialog.items.apply.title',
+        descriptionKey: 'textDialog.items.apply.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'textDialog.items.close.title',
+        descriptionKey: 'textDialog.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'textDialog.items.help.title',
+        descriptionKey: 'textDialog.items.help.desc'
+      }
+    ]
   }
 } as const satisfies Record<string, HelpTopicDefinition>;
 
