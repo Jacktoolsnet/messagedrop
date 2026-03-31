@@ -84,6 +84,7 @@
   padding: 10px 12px;
   border: 1px solid var(--mat-sys-outline-variant, #494a4b);
   border-radius: 12px;
+  min-width: 0;
 }
 
 .drag-handle {
@@ -110,22 +111,68 @@
 }
 
 .tile-label {
-  flex: 1;
+  flex: 1 1 auto;
   min-width: 0;
+  overflow: hidden;
 }
 
 .tile-name {
   font-weight: 600;
   color: inherit;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tile-helper {
   font-size: 0.82rem;
 }
 
+.tile-controls {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.tile-controls--desktop {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.tile-controls--mobile {
+  display: none;
+  margin-left: auto;
+}
+
 .tile-actions {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin-right: 6px;
+}
+
+.tile-visibility {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 720px) {
+  .tile-row {
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .tile-controls--desktop {
+    display: none;
+  }
+
+  .tile-controls--mobile {
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
+:host ::ng-deep .accent-menu .mat-mdc-menu-item,
+:host ::ng-deep .accent-menu .mat-mdc-menu-item .mdc-list-item__primary-text,
+:host ::ng-deep .accent-menu .mat-mdc-menu-item mat-icon {
+  color: var(--mat-select-focused-arrow-color);
 }

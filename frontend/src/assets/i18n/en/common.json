@@ -587,8 +587,11 @@
       "reorderAria": "Reorder {{ label }}",
       "editAria": "Edit tile",
       "deleteAria": "Delete tile",
+      "actionsMenuAria": "Actions for {{ label }}",
       "toggleAria": "Toggle {{ label }}",
       "visible": "Visible",
+      "show": "Show",
+      "hide": "Hide",
       "editLabelPrompt": "Edit tile label"
     },
     "tileTypes": {

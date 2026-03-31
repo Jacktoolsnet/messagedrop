@@ -587,8 +587,11 @@
       "reorderAria": "{{ label }} neu anordnen",
       "editAria": "Kachel bearbeiten",
       "deleteAria": "Kachel löschen",
+      "actionsMenuAria": "Aktionen für {{ label }}",
       "toggleAria": "{{ label }} umschalten",
       "visible": "Sichtbar",
+      "show": "Einblenden",
+      "hide": "Ausblenden",
       "editLabelPrompt": "Kachel-Label bearbeiten"
     },
     "tileTypes": {

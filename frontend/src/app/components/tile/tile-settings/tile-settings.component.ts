@@ -116,6 +116,24 @@ export class TileSettingsComponent {
     this.tileSettings.set(updated);
   }
 
+  toggleTileFromMenu(tile: TileSetting) {
+    this.toggleTile(tile, !tile.enabled);
+  }
+
+  canEditTile(tile: TileSetting): boolean {
+    return (Boolean(tile.custom) && tile.type !== 'custom-migraine')
+      || tile.type === 'custom-migraine'
+      || tile.type === 'custom-pollution';
+  }
+
+  canDeleteTile(tile: TileSetting): boolean {
+    return Boolean(tile.custom) && tile.type !== 'custom-migraine' && tile.type !== 'custom-pollution';
+  }
+
+  getTileMenuAria(tile: TileSetting): string {
+    return this.translation.t('common.tileSettings.actionsMenuAria', { label: this.getTileLabel(tile) });
+  }
+
   addTile(tileToAdd: { type: TileSetting['type']; labelKey: string }) {
     const label = this.translation.t(tileToAdd.labelKey);
     const updated = [...this.tileSettings()];

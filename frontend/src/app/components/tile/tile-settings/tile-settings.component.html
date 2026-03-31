@@ -29,29 +29,53 @@
       </button>
 
       <div class="tile-label">
-        <div class="tile-name">{{ getTileLabel(tile) }}</div>
+        <div class="tile-name" [attr.title]="getTileLabel(tile)">{{ getTileLabel(tile) }}</div>
       </div>
 
-      @if ( (tile.custom && tile.type !== 'custom-migraine') || tile.type === 'custom-migraine' || tile.type ===
-      'custom-pollution') {
-      <div class="tile-actions">
-        <button mat-icon-button color="primary" type="button" (click)="editTile(tile)"
-          [attr.aria-label]="'common.tileSettings.editAria' | transloco">
-          <mat-icon>edit</mat-icon>
-        </button>
-        @if (tile.custom && tile.type !== 'custom-migraine' && tile.type !== 'custom-pollution') {
-        <button mat-icon-button color="warn" type="button" (click)="deleteTile(tile)"
-          [attr.aria-label]="'common.tileSettings.deleteAria' | transloco">
-          <mat-icon>delete</mat-icon>
-        </button>
+      <div class="tile-controls tile-controls--desktop">
+        @if (canEditTile(tile)) {
+        <div class="tile-actions">
+          <button mat-icon-button color="primary" type="button" (click)="editTile(tile)"
+            [attr.aria-label]="'common.tileSettings.editAria' | transloco">
+            <mat-icon>edit</mat-icon>
+          </button>
+          @if (canDeleteTile(tile)) {
+          <button mat-icon-button color="warn" type="button" (click)="deleteTile(tile)"
+            [attr.aria-label]="'common.tileSettings.deleteAria' | transloco">
+            <mat-icon>delete</mat-icon>
+          </button>
+          }
+        </div>
         }
+        <mat-slide-toggle class="tile-visibility" [checked]="tile.enabled" (change)="toggleTile(tile, $event.checked)"
+          [attr.aria-label]="'common.tileSettings.toggleAria' | transloco:{ label: getTileLabel(tile) }">
+          {{ 'common.tileSettings.visible' | transloco }}
+        </mat-slide-toggle>
       </div>
-      }
 
-      <mat-slide-toggle [checked]="tile.enabled" (change)="toggleTile(tile, $event.checked)"
-        [attr.aria-label]="'common.tileSettings.toggleAria' | transloco:{ label: getTileLabel(tile) }">
-        {{ 'common.tileSettings.visible' | transloco }}
-      </mat-slide-toggle>
+      <div class="tile-controls tile-controls--mobile">
+        <button mat-icon-button type="button" [matMenuTriggerFor]="tileMenu" [attr.aria-label]="getTileMenuAria(tile)">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #tileMenu="matMenu" panelClass="accent-menu">
+          @if (canEditTile(tile)) {
+          <button mat-menu-item (click)="editTile(tile)">
+            <mat-icon>edit</mat-icon>
+            <span>{{ 'common.tileSettings.editAria' | transloco }}</span>
+          </button>
+          }
+          @if (canDeleteTile(tile)) {
+          <button mat-menu-item (click)="deleteTile(tile)">
+            <mat-icon>delete</mat-icon>
+            <span>{{ 'common.tileSettings.deleteAria' | transloco }}</span>
+          </button>
+          }
+          <button mat-menu-item (click)="toggleTileFromMenu(tile)">
+            <mat-icon>{{ tile.enabled ? 'visibility_off' : 'visibility' }}</mat-icon>
+            <span>{{ (tile.enabled ? 'common.tileSettings.hide' : 'common.tileSettings.show') | transloco }}</span>
+          </button>
+        </mat-menu>
+      </div>
     </div>
     }
   </div>

@@ -587,8 +587,11 @@
       "reorderAria": "Réorganiser {{ label }}",
       "editAria": "Modifier la tuile",
       "deleteAria": "Supprimer la tuile",
+      "actionsMenuAria": "Actions pour {{ label }}",
       "toggleAria": "Afficher/masquer {{ label }}",
       "visible": "Visible",
+      "show": "Afficher",
+      "hide": "Masquer",
       "editLabelPrompt": "Modifier le libellé de la tuile"
     },
     "tileTypes": {
