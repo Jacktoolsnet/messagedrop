@@ -6,9 +6,9 @@
 <mat-dialog-content class="edit-content">
   <div class="files-header">
     <div class="files-title">{{ 'common.tiles.files.header' | transloco }}</div>
-    <button mat-stroked-button color="primary" type="button" cdkFocusInitial (click)="addFiles()">
+    <button mat-icon-button color="primary" type="button" cdkFocusInitial (click)="addFiles()"
+      [attr.aria-label]="'common.tiles.files.add' | transloco">
       <mat-icon>add</mat-icon>
-      {{ 'common.tiles.files.add' | transloco }}
     </button>
   </div>
 
