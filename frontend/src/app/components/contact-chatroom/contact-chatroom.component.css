@@ -79,9 +79,9 @@
 
 
 .unsplash-badge--chatroom {
-  left: 50%;
+  left: 0.75rem;
   right: auto;
-  transform: translateX(-50%);
+  transform: none;
 }
 
 .chatroom-card__content {
