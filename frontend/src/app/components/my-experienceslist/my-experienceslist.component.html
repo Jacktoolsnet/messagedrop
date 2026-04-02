@@ -51,6 +51,17 @@
             </mat-card-content>
             <mat-card-actions class="tile-actions">
               <div class="tile-actions__left">
+                <button mat-raised-button color="primary" class="open-viator-button" type="button"
+                  (click)="onOpen(bookmark.snapshot); $event.stopPropagation()"
+                  [disabled]="!bookmark.snapshot.productUrl"
+                  [attr.aria-label]="'common.experiences.openOn' | transloco : { provider: 'Viator' }">
+                  <mat-icon>shopping_cart</mat-icon>
+                  <span class="open-viator-label">
+                    {{ getPriceLabel(bookmark.snapshot) || ('common.experiences.openOn' | transloco : { provider: 'Viator' }) }}
+                  </span>
+                </button>
+              </div>
+              <div class="tile-actions__right">
                 <button mat-mini-fab color="primary" type="button"
                   (click)="openDetails(bookmark.snapshot); $event.stopPropagation()"
                   [attr.aria-label]="'common.experiences.showMore' | transloco">
@@ -62,7 +73,8 @@
                     : ('common.experiences.saveTitle' | transloco)">
                   <mat-icon>{{ isBookmarked(bookmark.snapshot) ? 'bookmark_remove' : 'bookmark_add' }}</mat-icon>
                 </button>
-                <button mat-mini-fab color="primary" type="button" (click)="showOnMap(bookmark.snapshot); $event.stopPropagation()"
+                <button mat-mini-fab color="primary" type="button" class="map-action map-action--desktop"
+                  (click)="showOnMap(bookmark.snapshot); $event.stopPropagation()"
                   [disabled]="!hasDestination(bookmark.snapshot)"
                   [attr.aria-label]="'common.experiences.showOnMap' | transloco">
                   <mat-icon>place</mat-icon>
@@ -71,22 +83,29 @@
                   [attr.aria-label]="tileListAriaLabel(bookmark.snapshot)">
                   <mat-icon>dashboard</mat-icon>
                 </button>
-              </div>
-              <div class="tile-actions__right">
-                <button mat-mini-fab color="primary" type="button" (click)="openInMaps(bookmark.snapshot); $event.stopPropagation()"
+                <button mat-mini-fab color="primary" type="button" class="map-action map-action--desktop"
+                  (click)="openInMaps(bookmark.snapshot); $event.stopPropagation()"
                   [disabled]="!hasDestination(bookmark.snapshot)"
                   [attr.aria-label]="'common.experiences.openInMaps' | transloco">
                   <mat-icon>map</mat-icon>
                 </button>
-                <button mat-raised-button color="primary" class="open-viator-button" type="button"
-                  (click)="onOpen(bookmark.snapshot); $event.stopPropagation()"
-                  [disabled]="!bookmark.snapshot.productUrl"
-                  [attr.aria-label]="'common.experiences.openOn' | transloco : { provider: 'Viator' }">
-                  <mat-icon>shopping_cart</mat-icon>
-                  <span class="open-viator-label">
-                    {{ getPriceLabel(bookmark.snapshot) || ('common.experiences.openOn' | transloco : { provider: 'Viator' }) }}
-                  </span>
+                <button mat-mini-fab color="primary" type="button" class="map-action map-action--mobile"
+                  [matMenuTriggerFor]="experienceMapMenu"
+                  (click)="$event.stopPropagation()"
+                  [disabled]="!hasDestination(bookmark.snapshot)"
+                  [attr.aria-label]="experienceMenuAriaLabel(bookmark.snapshot)">
+                  <mat-icon>more_vert</mat-icon>
                 </button>
+                <mat-menu #experienceMapMenu="matMenu" panelClass="accent-menu">
+                  <button mat-menu-item type="button" (click)="showOnMap(bookmark.snapshot)">
+                    <mat-icon>place</mat-icon>
+                    <span>{{ 'common.experiences.showOnMap' | transloco }}</span>
+                  </button>
+                  <button mat-menu-item type="button" (click)="openInMaps(bookmark.snapshot)">
+                    <mat-icon>map</mat-icon>
+                    <span>{{ 'common.experiences.openInMaps' | transloco }}</span>
+                  </button>
+                </mat-menu>
               </div>
             </mat-card-actions>
           </mat-card>

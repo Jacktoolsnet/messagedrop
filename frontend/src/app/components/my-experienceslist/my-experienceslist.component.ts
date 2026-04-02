@@ -3,6 +3,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
@@ -33,6 +34,7 @@ import { MyExperienceSortDialogComponent } from './my-experience-sort-dialog/my-
     MatButtonModule,
     MatCardModule,
     MatIcon,
+    MatMenuModule,
     TranslocoPipe
   ],
   templateUrl: './my-experienceslist.component.html',
@@ -114,6 +116,11 @@ export class MyExperienceslistComponent implements OnInit {
   tileListAriaLabel(result: ExperienceResult): string {
     const name = result.title || result.productCode || this.transloco.translate('common.experiences.title');
     return this.transloco.translate('common.tileList.openAria', { name });
+  }
+
+  experienceMenuAriaLabel(result: ExperienceResult): string {
+    const name = result.title || result.productCode || this.transloco.translate('common.experiences.title');
+    return this.transloco.translate('common.tileSettings.actionsMenuAria', { label: name });
   }
 
   onOpen(result: ExperienceResult): void {

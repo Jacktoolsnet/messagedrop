@@ -225,6 +225,10 @@
   gap: 0.5rem;
 }
 
+.map-action--mobile {
+  display: none;
+}
+
 .tile-actions__left .mat-mdc-mini-fab,
 .tile-actions__right .mat-mdc-raised-button,
 .tile-actions__right .mat-mdc-mini-fab {
@@ -232,11 +236,54 @@
 }
 
 .open-viator-button {
-  gap: 0.35rem;
+  gap: 0.2rem;
+}
+
+.open-viator-button mat-icon {
+  margin: 0;
 }
 
 .open-viator-label {
   font-weight: 600;
+}
+
+@media (max-width: 720px) {
+  .tile-actions {
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .tile-actions__left {
+    flex: 0 0 auto;
+    gap: 0.35rem;
+  }
+
+  .tile-actions__right {
+    flex: 1 1 auto;
+    min-width: 0;
+    justify-content: flex-end;
+    gap: 0.35rem;
+  }
+
+  .map-action--desktop {
+    display: none;
+  }
+
+  .map-action--mobile {
+    display: inline-flex;
+  }
+
+  .open-viator-button {
+    min-width: 0;
+    max-width: 100%;
+    padding-inline: 0.75rem;
+  }
+
+  .open-viator-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 
 .empty-state {
@@ -269,4 +316,10 @@
 .action-close {
   margin-right: auto;
   margin-inline-end: auto;
+}
+
+:host ::ng-deep .accent-menu .mat-mdc-menu-item,
+:host ::ng-deep .accent-menu .mat-mdc-menu-item .mdc-list-item__primary-text,
+:host ::ng-deep .accent-menu .mat-mdc-menu-item mat-icon {
+  color: var(--mat-select-focused-arrow-color);
 }
