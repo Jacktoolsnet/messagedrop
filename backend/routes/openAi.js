@@ -3,8 +3,9 @@ const router = express.Router();
 const security = require('../middleware/security');
 const OpenAI = require('openai')
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY_MODERATION });
+const moderationModel = process.env.OPENAI_MODERATION_MODEL || 'omni-moderation-latest';
 const metric = require('../middleware/metric');
-const { apiError } = require('../middleware/api-error');
+const { createOpenAiApiError } = require('../utils/openai-error');
 
 router.post('/moderate',
   [
@@ -14,14 +15,16 @@ router.post('/moderate',
   ]
   , function (req, res, next) {
     openai.moderations.create({
-      model: "omni-moderation-latest",
+      model: moderationModel,
       input: req.body.message.replace(/'/g, "''"),
     }).then(moderation => {
       res.status(200).json(moderation);
     }).catch(err => {
-      const apiErr = apiError.internal('openai_failed');
-      apiErr.detail = err?.message || err;
-      next(apiErr);
+      next(createOpenAiApiError(err, {
+        message: 'openai_failed',
+        operation: 'moderations.create',
+        model: moderationModel
+      }));
     });
   });
 

@@ -14,6 +14,7 @@ const OpenAI = require('openai');
 const { signServiceJwt } = require('../utils/serviceJwt');
 const { apiError } = require('../middleware/api-error');
 const { resolveBaseUrl } = require('../utils/adminLogForwarder');
+const { createOpenAiApiError } = require('../utils/openai-error');
 const {
   MAX_PUBLIC_HASHTAGS,
   normalizeHashtags,
@@ -412,9 +413,11 @@ async function runAutomatedPublicContentModeration(rawMessage, hashtags) {
       moderation.aiDecision = moderationDecision;
       moderation.aiCheckedAt = Date.now();
     } catch (err) {
-      const apiErr = apiError.internal('openai_failed');
-      apiErr.detail = err?.message || err;
-      throw apiErr;
+      throw createOpenAiApiError(err, {
+        message: 'openai_failed',
+        operation: 'moderations.create',
+        model: moderationModel
+      });
     }
   }
 
@@ -485,6 +488,15 @@ const messageCreateLimiter = rateLimit({
   limit: 3,
   standardHeaders: true,
   legacyHeaders: false,
+  keyGenerator: (req) => {
+    const userId = getAuthUserId(req);
+    if (userId) {
+      return `user:${userId}`;
+    }
+
+    const ip = req.ip || req.socket?.remoteAddress || 'unknown';
+    return `ip:${rateLimit.ipKeyGenerator(ip)}`;
+  },
   message: {
     errorCode: 'RATE_LIMIT',
     message: 'Too many message create requests, please try again later.',
@@ -698,9 +710,11 @@ router.post('/moderate/hashtags',
         moderation.aiCheckedAt = Date.now();
       }
     } catch (err) {
-      const apiErr = apiError.internal('openai_failed');
-      apiErr.detail = err?.message || err;
-      return next(apiErr);
+      return next(createOpenAiApiError(err, {
+        message: 'openai_failed',
+        operation: 'moderations.create',
+        model: moderationModel
+      }));
     }
 
     res.status(200).json({
@@ -904,8 +918,8 @@ router.post('/internal/delete',
 
 router.post('/create',
   [
-    messageCreateLimiter,
     security.authenticate,
+    messageCreateLimiter,
     express.json({ type: 'application/json' }),
     metric.count('message.create', { when: 'always', timezone: 'utc', amount: 1 })
   ]
@@ -1011,9 +1025,11 @@ router.post('/create',
           }
         }
       } catch (err) {
-        const apiErr = apiError.internal('openai_failed');
-        apiErr.detail = err?.message || err;
-        return next(apiErr);
+        return next(createOpenAiApiError(err, {
+          message: 'openai_failed',
+          operation: 'moderations.create',
+          model: moderationModel
+        }));
       }
     }
 
@@ -1210,9 +1226,11 @@ router.post('/update',
           }
         }
       } catch (err) {
-        const apiErr = apiError.internal('openai_failed');
-        apiErr.detail = err?.message || err;
-        return next(apiErr);
+        return next(createOpenAiApiError(err, {
+          message: 'openai_failed',
+          operation: 'moderations.create',
+          model: moderationModel
+        }));
       }
 
       tableMessage.updateWithModeration(

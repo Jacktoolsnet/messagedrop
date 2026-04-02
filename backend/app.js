@@ -64,6 +64,28 @@ const CONTACT_MESSAGE_TOMBSTONE_RETENTION_DAYS = (() => {
 const express = require('express');
 const app = express();
 
+function resolveTrustProxySetting(rawValue) {
+  const raw = typeof rawValue === 'string' ? rawValue.trim() : '';
+  if (!raw) {
+    return 'loopback, linklocal, uniquelocal';
+  }
+
+  const normalized = raw.toLowerCase();
+  if (normalized === 'true') {
+    return true;
+  }
+  if (normalized === 'false') {
+    return false;
+  }
+  if (/^\d+$/.test(raw)) {
+    return Number.parseInt(raw, 10);
+  }
+
+  return raw;
+}
+
+app.set('trust proxy', resolveTrustProxySetting(process.env.TRUST_PROXY));
+
 // Compress
 
 app.use(compression({
