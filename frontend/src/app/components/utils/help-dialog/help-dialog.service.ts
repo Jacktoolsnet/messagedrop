@@ -838,6 +838,11 @@ const HELP_TOPICS = {
         descriptionKey: 'myContactChatroom.items.translate.desc'
       },
       {
+        icon: 'volume_up',
+        titleKey: 'myContactChatroom.items.readAloud.title',
+        descriptionKey: 'myContactChatroom.items.readAloud.desc'
+      },
+      {
         icon: 'map',
         titleKey: 'myContactChatroom.items.map.title',
         descriptionKey: 'myContactChatroom.items.map.desc'

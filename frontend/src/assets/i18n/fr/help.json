@@ -599,6 +599,10 @@
         "title": "Traduire un message",
         "desc": "Cette fonction traduit le texte entrant et permet de revenir à l'original."
       },
+      "readAloud": {
+        "title": "Lire à voix haute",
+        "desc": "Cette fonction lit le texte du message à voix haute ou arrête la lecture en cours."
+      },
       "map": {
         "title": "Ouvrir les actions de carte",
         "desc": "Cette fonction centre des lieux partagés sur la carte de l'application ou ouvre des cartes externes."

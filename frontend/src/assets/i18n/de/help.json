@@ -599,6 +599,10 @@
         "title": "Nachricht übersetzen",
         "desc": "Mit dieser Funktion übersetzt du eingehende Texte und kannst auf den Originaltext zurückschalten."
       },
+      "readAloud": {
+        "title": "Vorlesen",
+        "desc": "Mit dieser Funktion wird der Nachrichtentext vorgelesen oder die aktuelle Wiedergabe gestoppt."
+      },
       "map": {
         "title": "Kartenaktionen öffnen",
         "desc": "Mit dieser Funktion springst du zu geteilten Orten auf der App-Karte oder öffnest externe Karten."

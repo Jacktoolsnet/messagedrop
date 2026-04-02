@@ -16,6 +16,8 @@ import { ShortMessage } from '../../interfaces/short-message';
 import { ExperienceResult } from '../../interfaces/viator';
 import { ContactMessageService } from '../../services/contact-message.service';
 import { ContactService } from '../../services/contact.service';
+import { AppService } from '../../services/app.service';
+import { SpeechService } from '../../services/speech.service';
 import { LanguageService } from '../../services/language.service';
 import { MapService } from '../../services/map.service';
 import { SocketioService } from '../../services/socketio.service';
@@ -34,6 +36,7 @@ import { LocationPickerDialogComponent } from '../utils/location-picker-dialog/l
 import { LocationPreviewComponent } from '../utils/location-preview/location-preview.component';
 import { ExperienceSearchComponent } from '../utils/experience-search/experience-search.component';
 import { ExperienceSearchDetailDialogComponent } from '../utils/experience-search/detail-dialog/experience-search-detail-dialog.component';
+import { DisplayMessage } from '../utils/display-message/display-message.component';
 import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
 import { DisplayMessageService } from '../../services/display-message.service';
 
@@ -83,6 +86,7 @@ interface ContactChatroomDialogData {
 })
 export class ContactChatroomComponent implements AfterViewInit {
   readonly Math = Math;
+  private readonly appService = inject(AppService);
   private readonly userService = inject(UserService);
   private readonly socketioService = inject(SocketioService);
   private readonly contactService = inject(ContactService);
@@ -95,6 +99,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   private readonly dialogData = inject<string | ContactChatroomDialogData>(MAT_DIALOG_DATA);
   private readonly translateService = inject(TranslateService);
   private readonly snackBar = inject(DisplayMessageService);
+  private readonly speechService = inject(SpeechService);
   private readonly translation = inject(TranslationHelperService);
   private readonly languageService = inject(LanguageService);
   private readonly contactId = typeof this.dialogData === 'string' ? this.dialogData : this.dialogData.contactId;
@@ -783,6 +788,86 @@ export class ContactChatroomComponent implements AfterViewInit {
           ?? this.translation.t('common.contact.chatroom.translateFailed');
         this.snackBar.open(errorMessage, '', { duration: 3000 });
       }
+    });
+  }
+
+  toggleReadAloud(message: ChatroomMessage): void {
+    if (!this.speechService.supported()) {
+      this.showReadAloudHint('common.speech.unsupported');
+      return;
+    }
+
+    if (!this.appService.getAppSettings().speech?.enabled) {
+      this.showReadAloudHint('common.speech.disabled');
+      return;
+    }
+
+    const text = this.getSpeechText(message);
+    if (!text) {
+      return;
+    }
+
+    this.speechService.toggle({
+      targetId: this.getSpeechTargetId(message),
+      text,
+      lang: this.shouldPreferTranslatedSpeech(message) ? this.languageService.effectiveLanguage() : undefined
+    });
+  }
+
+  isReadAloudActive(message: ChatroomMessage): boolean {
+    return this.speechService.isActive(this.getSpeechTargetId(message));
+  }
+
+  getReadAloudIcon(message: ChatroomMessage): string {
+    return this.isReadAloudActive(message) ? 'stop' : 'volume_up';
+  }
+
+  getReadAloudLabel(message: ChatroomMessage): string {
+    return this.translation.t(
+      this.isReadAloudActive(message)
+        ? 'common.actions.stopReadAloud'
+        : 'common.actions.readAloud'
+    );
+  }
+
+  private getSpeechTargetId(message: ChatroomMessage): string {
+    return `contact-chatroom:${message.messageId}`;
+  }
+
+  private shouldPreferTranslatedSpeech(message: ChatroomMessage): boolean {
+    return message.direction === 'contactUser'
+      && this.appService.getAppSettings().speech?.preferTranslatedText !== false
+      && !!message.payload?.translatedMessage
+      && !message.showOriginal;
+  }
+
+  private getSpeechText(message: ChatroomMessage): string {
+    if (this.shouldPreferTranslatedSpeech(message)) {
+      return (message.payload?.translatedMessage ?? '').trim();
+    }
+    return (message.payload?.message ?? '').trim();
+  }
+
+  private showReadAloudHint(messageKey: string): void {
+    this.matDialog.open(DisplayMessage, {
+      closeOnNavigation: false,
+      data: {
+        showAlways: true,
+        title: this.translation.t('common.actions.readAloud'),
+        image: '',
+        icon: 'record_voice_over',
+        message: this.translation.t(messageKey),
+        button: this.translation.t('common.actions.ok'),
+        delay: 0,
+        showSpinner: false,
+        autoclose: false
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
     });
   }
 

@@ -180,6 +180,12 @@
                 <mat-icon>map</mat-icon>
               </button>
               }
+              @if (msg.payload?.message?.trim() !== '') {
+              <button mat-mini-fab color="primary" [attr.aria-label]="getReadAloudLabel(msg)"
+                (click)="toggleReadAloud(msg)">
+                <mat-icon>{{ getReadAloudIcon(msg) }}</mat-icon>
+              </button>
+              }
               @if (msg.payload) {
               <button mat-mini-fab color="primary" [attr.aria-label]="'common.contact.chatroom.editAria' | transloco"
                 (click)="editMessage(msg)">
@@ -306,6 +312,10 @@
               </button>
               }
               @if (msg.payload?.message?.trim() !== '') {
+              <button mat-mini-fab color="primary" [attr.aria-label]="getReadAloudLabel(msg)"
+                (click)="toggleReadAloud(msg)">
+                <mat-icon>{{ getReadAloudIcon(msg) }}</mat-icon>
+              </button>
               @if (msg.payload?.translatedMessage && !msg.showOriginal) {
               <button mat-mini-fab color="primary" [attr.aria-label]="'common.contact.chatroom.showOriginalAria' | transloco"
                 (click)="showOriginalMessage(msg)">

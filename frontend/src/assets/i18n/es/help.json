@@ -599,6 +599,10 @@
         "title": "Traducir mensaje",
         "desc": "Con esta función traduces texto entrante y puedes volver al original."
       },
+      "readAloud": {
+        "title": "Leer en voz alta",
+        "desc": "Con esta función se lee en voz alta el texto del mensaje o se detiene la reproducción actual."
+      },
       "map": {
         "title": "Abrir acciones de mapa",
         "desc": "Con esta función saltas a ubicaciones compartidas en el mapa de la app o abres mapas externos."

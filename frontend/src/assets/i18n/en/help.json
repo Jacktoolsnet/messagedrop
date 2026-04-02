@@ -599,6 +599,10 @@
         "title": "Translate message",
         "desc": "This action translates incoming text and can switch back to the original."
       },
+      "readAloud": {
+        "title": "Read aloud",
+        "desc": "This action reads the message text aloud or stops the current playback."
+      },
       "map": {
         "title": "Open map actions",
         "desc": "This action jumps to shared locations on the app map or opens external maps."
