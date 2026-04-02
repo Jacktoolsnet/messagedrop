@@ -516,57 +516,11 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const publishState = this.resolvePublishState(message);
-    if (publishState === 'server_missing' || publishState === 'local_only' || publishState === 'draft') {
-      this.messageService.publishMissingMessage(message, this.userService.getUser()).subscribe({
-        next: (res) => {
-          const moderationPatch = this.messageService.getModerationPatch(res?.moderation);
-          const decision = res?.moderation?.decision ?? 'approved';
-          if (decision === 'rejected') {
-            this.patchMessageLocally(message, {
-              id: res?.messageId ?? message.id,
-              uuid: res?.messageUuid ?? message.uuid,
-              status: 'disabled',
-              publishState: 'unpublished',
-              ...moderationPatch
-            });
-            void this.refreshMessagesFromBackend();
-            return;
-          }
-          this.patchMessageLocally(message, {
-            id: res?.messageId ?? message.id,
-            uuid: res?.messageUuid ?? message.uuid,
-            status: 'enabled',
-            publishState: 'published',
-            ...moderationPatch
-          });
-          void this.refreshMessagesFromBackend();
-        },
-        error: (error) => {
-          if (this.messageService.isParentMissingError(error)) {
-            this.patchMessageLocally(message, {
-              publishState: 'parent_missing'
-            });
-            this.snackBar.open(
-              this.translation.t('common.messageList.publishState.parentMissing'),
-              undefined,
-              { duration: 3000, horizontalPosition: 'center', verticalPosition: 'top' }
-            );
-          }
-        }
-      });
-      return;
-    }
-
-    this.messageService.setMessagePublished(message, true).subscribe({
+    this.messageService.publishMessage(message, this.userService.getUser()).subscribe({
       next: (response) => {
         if (response?.status !== 200) {
           return;
         }
-        this.patchMessageLocally(message, {
-          status: 'enabled',
-          publishState: 'published'
-        });
         void this.refreshMessagesFromBackend();
       },
       error: (error) => {
@@ -574,6 +528,11 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
           this.patchMessageLocally(message, {
             publishState: 'parent_missing'
           });
+          this.snackBar.open(
+            this.translation.t('common.messageList.publishState.parentMissing'),
+            undefined,
+            { duration: 3000, horizontalPosition: 'center', verticalPosition: 'top' }
+          );
         }
       }
     });
@@ -1103,7 +1062,14 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
               this.messageService.showDraftSavedMessage();
               return;
             }
-            this.messageService.createMessage(result.message, this.userService.getUser());
+            this.messageService.publishMessage(result.message, this.userService.getUser(), {
+              persistDraft: true
+            }).subscribe({
+              next: () => {
+                void this.refreshMessagesFromBackend();
+              },
+              error: () => {}
+            });
             return;
           }
           this.messageService.updateMessage(result.message);
@@ -1289,7 +1255,14 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
           this.messageService.showDraftSavedMessage();
           return;
         }
-        this.messageService.createMessage(result.message, this.userService.getUser());
+        this.messageService.publishMessage(result.message, this.userService.getUser(), {
+          persistDraft: true
+        }).subscribe({
+          next: () => {
+            void this.refreshMessagesFromBackend();
+          },
+          error: () => {}
+        });
       }
     });
   }
@@ -1394,9 +1367,23 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       autoFocus: false
     });
 
-    dialogRef.afterClosed().subscribe((result?: { mode: Mode; message: Message }) => {
+    dialogRef.afterClosed().subscribe((result?: { mode: Mode; message: Message; action?: 'publish' | 'draft' }) => {
       if (result?.message) {
-        this.messageService.createComment(result.message, this.userService.getUser(), false, true);
+        if (result.action === 'draft') {
+          void this.messageService.saveDraftMessage(result.message, this.userService.getUser())
+            .then(() => this.refreshMessagesFromBackend());
+          this.messageService.showDraftSavedMessage();
+          return;
+        }
+        this.messageService.publishMessage(result.message, this.userService.getUser(), {
+          persistDraft: true,
+          includeInRootList: true
+        }).subscribe({
+          next: () => {
+            void this.refreshMessagesFromBackend();
+          },
+          error: () => {}
+        });
       }
     });
   }

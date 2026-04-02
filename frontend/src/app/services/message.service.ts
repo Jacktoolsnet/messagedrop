@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable, signal, WritableSignal } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { catchError, firstValueFrom, forkJoin, map, Observable, of, throwError } from 'rxjs';
+import { catchError, firstValueFrom, forkJoin, from, map, Observable, of, switchMap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { DisplayMessage } from '../components/utils/display-message/display-message.component';
 import { BoundingBox } from '../interfaces/bounding-box';
@@ -23,6 +23,21 @@ import {
   normalizeHashtags,
   parseHashtagStorageValue
 } from '../utils/hashtag.util';
+
+type PublishMessageOptions = {
+  showAlways?: boolean;
+  includeInRootList?: boolean;
+  persistDraft?: boolean;
+};
+
+type PublishMessageResult = {
+  status: number;
+  via: 'create' | 'enable';
+  moderation: MessageCreateResponse['moderation'] | null;
+  messageId: number | null;
+  messageUuid: string | null;
+  published: boolean;
+};
 
 @Injectable({
   providedIn: 'root'
@@ -93,7 +108,7 @@ export class MessageService {
     return num < 1_000_000_000_000 ? num * 1000 : num;
   }
 
-  private normalizePublishState(message: Partial<Message>): Message['publishState'] {
+  private normalizePublishState(message: Partial<Message>): NonNullable<Message['publishState']> {
     if (message.manualModerationDecision === 'rejected') {
       return 'dsa_locked';
     }
@@ -160,6 +175,222 @@ export class MessageService {
 
   public getModerationPatch(moderation?: MessageCreateResponse['moderation'] | null): Partial<Message> {
     return this.buildModerationPatch(moderation);
+  }
+
+  private configureCreateMessageRequest(showAlways: boolean): string {
+    const url = `${environment.apiUrl}/message/create`;
+    this.networkService.setNetworkMessageConfig(url, {
+      showAlways,
+      title: this.i18n.t('common.message.title'),
+      image: '',
+      icon: '',
+      message: this.i18n.t('common.message.creating'),
+      button: '',
+      delay: 0,
+      showSpinner: true,
+      autoclose: false
+    });
+    return url;
+  }
+
+  private buildCreateMessageBody(message: Message, user: User) {
+    return {
+      uuid: message.uuid,
+      parentMessageId: message.parentId,
+      parentUuid: message.parentUuid,
+      messageTyp: message.typ,
+      latitude: message.location.latitude,
+      longitude: message.location.longitude,
+      plusCode: message.location.plusCode,
+      message: message.message,
+      markerType: message.markerType,
+      style: message.style,
+      hashtags: normalizeHashtags(message.hashtags ?? [], MAX_PUBLIC_HASHTAGS).tags,
+      messageUserId: user.id,
+      multimedia: JSON.stringify(message.multimedia)
+    };
+  }
+
+  private createMessageRequest(message: Message, user: User, showAlways = false): Observable<MessageCreateResponse> {
+    const url = this.configureCreateMessageRequest(showAlways);
+    const body = this.buildCreateMessageBody(message, user);
+    return this.http.post<MessageCreateResponse>(url, body, this.httpOptions).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  private shouldPublishViaCreate(message: Message, publishState: NonNullable<Message['publishState']>): boolean {
+    if (!Number.isFinite(message.id) || message.id <= 0) {
+      return true;
+    }
+
+    return publishState === 'server_missing'
+      || publishState === 'local_only'
+      || publishState === 'draft'
+      || publishState === 'parent_missing';
+  }
+
+  private upsertRootMessageInSignals(nextMessage: Message): void {
+    this.messagesSignal.update((messages) => {
+      const index = messages.findIndex((item) => item.uuid === nextMessage.uuid);
+      if (index >= 0) {
+        const next = [...messages];
+        next[index] = { ...next[index], ...nextMessage };
+        return next;
+      }
+      return [nextMessage, ...messages];
+    });
+  }
+
+  private upsertCommentInSignals(nextMessage: Message, includeInRootList = false): void {
+    const parentUuid = nextMessage.parentUuid;
+    if (!parentUuid) {
+      return;
+    }
+
+    const commentsSignal = this.getCommentsSignalForMessage(parentUuid);
+    let wasInserted = false;
+    commentsSignal.update((comments) => {
+      const index = comments.findIndex((item) => item.uuid === nextMessage.uuid);
+      if (index >= 0) {
+        const next = [...comments];
+        next[index] = { ...next[index], ...nextMessage };
+        return next;
+      }
+      wasInserted = true;
+      return [...comments, nextMessage];
+    });
+
+    if (wasInserted) {
+      const nextCount = (this.commentCounts[parentUuid] ?? 0) + 1;
+      this.commentCounts[parentUuid] = nextCount;
+      this.commentCountsSignal.update((counts) => ({
+        ...counts,
+        [parentUuid]: nextCount
+      }));
+    }
+
+    if (includeInRootList) {
+      this.messagesSignal.update((messages) =>
+        messages.some((item) => item.uuid === nextMessage.uuid)
+          ? messages.map((item) => item.uuid === nextMessage.uuid ? { ...item, ...nextMessage } : item)
+          : [nextMessage, ...messages]
+      );
+    }
+  }
+
+  private async upsertOwnPublicMessage(userId: string, message: Message): Promise<void> {
+    const normalizedUserId = typeof userId === 'string' ? userId.trim() : '';
+    const uuid = typeof message.uuid === 'string' ? message.uuid.trim() : '';
+    if (!normalizedUserId || !uuid) {
+      return;
+    }
+
+    const existing = await this.loadOwnPublicMessages(normalizedUserId);
+    const nextMessages = [
+      {
+        ...message,
+        userId: normalizedUserId,
+        publishState: message.publishState ?? this.normalizePublishState(message)
+      },
+      ...existing.filter((entry) => entry.uuid !== uuid)
+    ];
+    await this.saveOwnPublicMessages(normalizedUserId, nextMessages);
+  }
+
+  private syncOwnPublicMessage(user: User, message: Message): void {
+    const userId = typeof user?.id === 'string' ? user.id.trim() : '';
+    if (!userId) {
+      return;
+    }
+    void this.upsertOwnPublicMessage(userId, {
+      ...message,
+      userId
+    });
+  }
+
+  private applyCreatePublishSuccess(
+    message: Message,
+    user: User,
+    response: MessageCreateResponse,
+    includeInRootList = false
+  ): PublishMessageResult {
+    const decision = response?.moderation?.decision ?? 'approved';
+    const moderationPatch = this.buildModerationPatch(response?.moderation);
+    const createdId = response?.messageId ?? null;
+    const createdUuid = response?.messageUuid ?? null;
+    const nextMessage: Message = {
+      ...message,
+      ...moderationPatch,
+      id: createdId ?? message.id,
+      uuid: createdUuid ?? message.uuid,
+      userId: typeof user?.id === 'string' && user.id.trim() ? user.id.trim() : message.userId,
+      status: decision === 'rejected' ? 'disabled' : 'enabled',
+      publishState: decision === 'rejected'
+        ? 'unpublished'
+        : this.normalizePublishState({
+          status: 'enabled',
+          dsaStatusToken: message.dsaStatusToken
+        })
+    };
+
+    if (decision === 'rejected') {
+      this.patchMessageSnapshotSmart(message, nextMessage);
+      this.syncOwnPublicMessage(user, nextMessage);
+      this.showModerationRejected(this.getModerationRejectedMessage(response?.moderation?.reason ?? null));
+      return {
+        status: response?.status ?? 200,
+        via: 'create',
+        moderation: response?.moderation ?? null,
+        messageId: createdId,
+        messageUuid: createdUuid,
+        published: false
+      };
+    }
+
+    if (nextMessage.parentUuid) {
+      this.upsertCommentInSignals(nextMessage, includeInRootList);
+    } else {
+      this.upsertRootMessageInSignals(nextMessage);
+    }
+
+    this.syncOwnPublicMessage(user, nextMessage);
+
+    if (decision === 'review') {
+      this.showModerationReviewMessage(this.i18n.t('common.message.moderationReview'));
+    } else {
+      this.showPublishedMessage(this.i18n.t(nextMessage.parentUuid ? 'common.comment.created' : 'common.message.created'));
+    }
+
+    return {
+      status: response?.status ?? 200,
+      via: 'create',
+      moderation: response?.moderation ?? null,
+      messageId: createdId,
+      messageUuid: createdUuid,
+      published: true
+    };
+  }
+
+  private applyEnablePublishSuccess(message: Message, user: User): PublishMessageResult {
+    const nextMessage: Message = {
+      ...message,
+      userId: typeof user?.id === 'string' && user.id.trim() ? user.id.trim() : message.userId,
+      status: 'enabled',
+      publishState: 'published'
+    };
+
+    this.patchMessageSnapshotSmart(message, nextMessage);
+    this.syncOwnPublicMessage(user, nextMessage);
+
+    return {
+      status: 200,
+      via: 'enable',
+      moderation: null,
+      messageId: Number.isFinite(nextMessage.id) ? nextMessage.id : null,
+      messageUuid: nextMessage.uuid ?? null,
+      published: true
+    };
   }
 
   public isRejectedByAutomatedModeration(message: Partial<Message> | null | undefined): boolean {
@@ -695,157 +926,22 @@ export class MessageService {
   }
 
   createMessage(message: Message, user: User, showAlways = false) {
-    const url = `${environment.apiUrl}/message/create`;
-    this.networkService.setNetworkMessageConfig(url, {
-      showAlways: showAlways,
-      title: this.i18n.t('common.message.title'),
-      image: '',
-      icon: '',
-      message: this.i18n.t('common.message.creating'),
-      button: '',
-      delay: 0,
-      showSpinner: true,
-      autoclose: false
+    this.publishMessage(message, user, {
+      showAlways,
+      persistDraft: true
+    }).subscribe({
+      error: () => {}
     });
-    const body = {
-      uuid: message.uuid,
-      parentMessageId: message.parentId,
-      parentUuid: message.parentUuid,
-      messageTyp: message.typ,
-      latitude: message.location.latitude,
-      longitude: message.location.longitude,
-      plusCode: message.location.plusCode,
-      message: message.message,
-      markerType: message.markerType,
-      style: message.style,
-      hashtags: normalizeHashtags(message.hashtags ?? [], MAX_PUBLIC_HASHTAGS).tags,
-      messageUserId: user.id,
-      multimedia: JSON.stringify(message.multimedia)
-    };
-    this.http.post<MessageCreateResponse>(url, body, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      )
-      .subscribe({
-        next: (res) => {
-          const decision = res?.moderation?.decision ?? 'approved';
-          const moderationPatch = this.buildModerationPatch(res?.moderation);
-          if (decision === 'rejected') {
-            this.showModerationRejected(this.getModerationRejectedMessage(res?.moderation?.reason ?? null));
-            return;
-          }
-          const createdId = res?.messageId ?? null;
-          const createdUuid = res?.messageUuid ?? null;
-          const nextMessage: Message = {
-            ...message,
-            ...moderationPatch,
-            id: createdId ?? message.id,
-            uuid: createdUuid ?? message.uuid,
-            status: 'enabled',
-            publishState: this.normalizePublishState({
-              status: 'enabled',
-              dsaStatusToken: message.dsaStatusToken
-            })
-          };
-          this.messagesSignal.update(messages => {
-            const index = messages.findIndex(item => item.uuid === nextMessage.uuid);
-            if (index >= 0) {
-              const next = [...messages];
-              next[index] = { ...next[index], ...nextMessage };
-              return next;
-            }
-            return [nextMessage, ...messages];
-          });
-          if (decision === 'review') {
-            this.showModerationReviewMessage(this.i18n.t('common.message.moderationReview'));
-          } else {
-            this.showPublishedMessage(this.i18n.t('common.message.created'));
-          }
-        },
-        error: () => {}
-      });
   }
 
   public createComment(message: Message, user: User, showAlways = false, includeInRootList = false) {
-    const url = `${environment.apiUrl}/message/create`;
-    this.networkService.setNetworkMessageConfig(url, {
+    this.publishMessage(message, user, {
       showAlways,
-      title: this.i18n.t('common.message.title'),
-      image: '',
-      icon: '',
-      message: this.i18n.t('common.message.creating'),
-      button: '',
-      delay: 0,
-      showSpinner: true,
-      autoclose: false
+      includeInRootList,
+      persistDraft: true
+    }).subscribe({
+      error: () => {}
     });
-
-    const body = {
-      uuid: message.uuid,
-      parentMessageId: message.parentId,
-      parentUuid: message.parentUuid,
-      messageTyp: message.typ,
-      latitude: message.location.latitude,
-      longitude: message.location.longitude,
-      plusCode: message.location.plusCode,
-      message: message.message,
-      markerType: message.markerType,
-      style: message.style,
-      hashtags: normalizeHashtags(message.hashtags ?? [], MAX_PUBLIC_HASHTAGS).tags,
-      messageUserId: user.id,
-      multimedia: JSON.stringify(message.multimedia)
-    };
-
-    this.http.post<MessageCreateResponse>(url, body, this.httpOptions)
-      .pipe(catchError(this.handleError))
-      .subscribe({
-        next: (res) => {
-          const decision = res?.moderation?.decision ?? 'approved';
-          const moderationPatch = this.buildModerationPatch(res?.moderation);
-          if (decision === 'rejected') {
-            this.showModerationRejected(this.getModerationRejectedMessage(res?.moderation?.reason ?? null));
-            return;
-          }
-
-          const parentUuid = message.parentUuid!;
-          const commentsSignal = this.getCommentsSignalForMessage(parentUuid);
-          const createdId = res?.messageId ?? null;
-          const createdUuid = res?.messageUuid ?? null;
-          const nextMessage: Message = {
-            ...message,
-            ...moderationPatch,
-            id: createdId ?? message.id,
-            uuid: createdUuid ?? message.uuid,
-            status: 'enabled',
-            publishState: this.normalizePublishState({
-              status: 'enabled',
-              dsaStatusToken: message.dsaStatusToken
-            })
-          };
-          const nextComments = [...commentsSignal(), nextMessage];
-          commentsSignal.set(nextComments);
-          const nextCount = (this.commentCounts[parentUuid] ?? 0) + 1;
-          this.commentCounts[parentUuid] = nextCount;
-          this.commentCountsSignal.update(counts => ({
-            ...counts,
-            [parentUuid]: nextCount
-          }));
-          if (includeInRootList) {
-            this.messagesSignal.update(messages =>
-              messages.some(item => item.uuid === nextMessage.uuid)
-                ? messages
-                : [nextMessage, ...messages]
-            );
-          }
-
-          if (decision === 'review') {
-            this.showModerationReviewMessage(this.i18n.t('common.message.moderationReview'));
-          } else {
-            this.showPublishedMessage(this.i18n.t('common.comment.created'));
-          }
-        },
-        error: () => {}
-      });
   }
 
   updateMessage(message: Message, showAlways = false) {
@@ -940,37 +1036,57 @@ export class MessageService {
     );
   }
 
-  publishMissingMessage(message: Message, user: User, showAlways = false): Observable<MessageCreateResponse> {
-    const url = `${environment.apiUrl}/message/create`;
-    this.networkService.setNetworkMessageConfig(url, {
-      showAlways,
-      title: this.i18n.t('common.message.title'),
-      image: '',
-      icon: '',
-      message: this.i18n.t('common.message.creating'),
-      button: '',
-      delay: 0,
-      showSpinner: true,
-      autoclose: false
-    });
-    const body = {
-      uuid: message.uuid,
-      parentMessageId: message.parentId,
-      parentUuid: message.parentUuid,
-      messageTyp: message.typ,
-      latitude: message.location.latitude,
-      longitude: message.location.longitude,
-      plusCode: message.location.plusCode,
-      message: message.message,
-      markerType: message.markerType,
-      style: message.style,
-      hashtags: normalizeHashtags(message.hashtags ?? [], MAX_PUBLIC_HASHTAGS).tags,
-      messageUserId: user.id,
-      multimedia: JSON.stringify(message.multimedia)
-    };
-    return this.http.post<MessageCreateResponse>(url, body, this.httpOptions).pipe(
-      catchError(this.handleError)
+  publishMessage(message: Message, user: User, options: PublishMessageOptions = {}): Observable<PublishMessageResult> {
+    const {
+      showAlways = false,
+      includeInRootList = false,
+      persistDraft = false
+    } = options;
+
+    const preparedMessage$ = persistDraft
+      ? from(this.saveDraftMessage(message, user))
+      : of(message);
+
+    return preparedMessage$.pipe(
+      switchMap((preparedMessage) => {
+        const publishState = preparedMessage.publishState ?? this.normalizePublishState(preparedMessage);
+        if (this.shouldPublishViaCreate(preparedMessage, publishState)) {
+          return this.createMessageRequest(preparedMessage, user, showAlways).pipe(
+            map((response) => this.applyCreatePublishSuccess(preparedMessage, user, response, includeInRootList))
+          );
+        }
+
+        return this.setMessagePublished(preparedMessage, true, showAlways).pipe(
+          map((response) => {
+            if (response?.status !== 200) {
+              return {
+                status: response?.status ?? 0,
+                via: 'enable' as const,
+                moderation: null,
+                messageId: Number.isFinite(preparedMessage.id) ? preparedMessage.id : null,
+                messageUuid: preparedMessage.uuid ?? null,
+                published: false
+              };
+            }
+
+            return this.applyEnablePublishSuccess(preparedMessage, user);
+          })
+        );
+      })
     );
+  }
+
+  publishMissingMessage(
+    message: Message,
+    user: User,
+    showAlways = false,
+    includeInRootList = false
+  ): Observable<PublishMessageResult> {
+    return this.publishMessage(message, user, {
+      showAlways,
+      includeInRootList,
+      persistDraft: false
+    });
   }
 
   private patchMessageSnapshotSmart(target: Message, patch: Partial<Message>) {
