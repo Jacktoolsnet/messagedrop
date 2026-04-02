@@ -1,0 +1,37 @@
+.gallery-content {
+  max-height: min(80vh, 900px);
+  width: min(90vw, 720px);
+  min-height: 0;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+.gallery-item {
+  overflow: hidden;
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--mat-card-filled-container-color) 88%, transparent);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+}
+
+.gallery-item img {
+  display: block;
+  width: 100%;
+  max-height: min(65vh, 720px);
+  object-fit: contain;
+  background: color-mix(in srgb, var(--mat-card-filled-container-color) 92%, black 8%);
+}
+
+.text-muted {
+  margin: 0;
+  font-style: italic;
+}
+
+.sticky-actions {
+  position: sticky;
+  bottom: 0;
+  background-color: var(--mat-card-filled-container-color);
+}

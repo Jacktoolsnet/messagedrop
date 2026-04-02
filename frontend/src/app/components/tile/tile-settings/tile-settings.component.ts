@@ -17,6 +17,7 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 import { AnniversaryTileEditComponent } from '../anniversary-tile/anniversary-tile-edit/anniversary-tile-edit.component';
 import { FileTileEditComponent } from '../file-tile/file-tile-edit/file-tile-edit.component';
+import { ImageTileEditComponent } from '../image-tile/image-tile-edit/image-tile-edit.component';
 import { MigraineTileEditComponent } from '../migraine-tile/migraine-tile-edit/migraine-tile-edit.component';
 import { MultitextTileEditComponent } from '../multitext-tile/multitext-tile-edit/multitext-tile-edit.component';
 import { PollutionTileEditComponent } from '../pollution-tile/pollution-tile-edit/pollution-tile-edit.component';
@@ -71,14 +72,20 @@ export class TileSettingsComponent {
     { type: 'custom-date', labelKey: 'common.tileTypes.anniversary', icon: 'event' },
     { type: 'custom-todo', labelKey: 'common.tileTypes.todo', icon: 'check_circle' },
     { type: 'custom-quickaction', labelKey: 'common.tileTypes.quickActions', icon: 'bolt' },
-    { type: 'custom-file', labelKey: 'common.tileTypes.files', icon: 'attach_file' }
+    { type: 'custom-file', labelKey: 'common.tileTypes.files', icon: 'attach_file' },
+    { type: 'image', labelKey: 'common.tileTypes.image', icon: 'photo_library' }
   ];
 
   get addableTiles(): { type: TileSetting['type']; labelKey: string; icon: string }[] {
-    const tiles = [...this.baseAddableTiles];
+    let tiles = [...this.baseAddableTiles];
     if (this.isExperienceContext) {
-      return tiles.filter(tile => tile.type !== 'custom-date');
+      tiles = tiles.filter(tile => tile.type !== 'custom-date');
     }
+
+    if (this.tileSettings().some(tile => tile.type === 'image')) {
+      tiles = tiles.filter(tile => tile.type !== 'image');
+    }
+
     return tiles;
   }
 
@@ -121,6 +128,9 @@ export class TileSettingsComponent {
   }
 
   canEditTile(tile: TileSetting): boolean {
+    if (tile.type === 'image') {
+      return true;
+    }
     return (Boolean(tile.custom) && tile.type !== 'custom-migraine')
       || tile.type === 'custom-migraine'
       || tile.type === 'custom-pollution';
@@ -182,6 +192,14 @@ export class TileSettingsComponent {
         title: label,
         icon: 'attach_file',
         files: []
+      };
+    }
+
+    if (tileToAdd.type === 'image') {
+      baseTile.payload = {
+        title: label,
+        icon: 'photo_library',
+        images: []
       };
     }
 
@@ -292,6 +310,23 @@ export class TileSettingsComponent {
 
     if (tile.type === 'custom-file') {
       const ref = this.dialog.open(FileTileEditComponent, {
+        width: '560px',
+        maxWidth: '95vw',
+        maxHeight: '98vh',
+        data: { tile },
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop',
+        disableClose: false,
+      });
+      ref.afterClosed().subscribe((updated?: TileSetting) => {
+        if (!updated) return;
+        this.tileSettings.set(this.tileSettings().map(t => t.id === updated.id ? updated : t));
+      });
+      return;
+    }
+
+    if (tile.type === 'image') {
+      const ref = this.dialog.open(ImageTileEditComponent, {
         width: '560px',
         maxWidth: '95vw',
         maxHeight: '98vh',

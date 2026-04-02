@@ -1,0 +1,66 @@
+<app-dialog-header
+  [icon]="headerIcon"
+  [title]="headerTitle">
+</app-dialog-header>
+
+<mat-dialog-content class="edit-content">
+  <div class="images-header">
+    <div class="images-title">{{ 'common.tiles.images.header' | transloco }}</div>
+    <button mat-stroked-button color="primary" type="button" cdkFocusInitial (click)="addImages()">
+      <mat-icon>add</mat-icon>
+      {{ 'common.tiles.images.add' | transloco }}
+    </button>
+  </div>
+
+  @if (hasImages) {
+    <div cdkDropList class="image-list" (cdkDropListDropped)="drop($event)">
+      @for (item of previewItems; track item.image.id) {
+        <div class="image-row" cdkDrag>
+          <button type="button" class="drag-handle" cdkDragHandle
+            [attr.aria-label]="'common.tiles.images.reorderAria' | transloco">
+            <mat-icon>drag_indicator</mat-icon>
+          </button>
+          <div class="image-info">
+            @if (item.src && item.src !== 'NOT_FOUND') {
+              <button type="button" class="preview-button" (click)="openImage()"
+                [attr.aria-label]="item.image.fileName || ('common.tiles.images.openAria' | transloco)">
+                <img class="image-preview" [src]="item.src"
+                  [alt]="item.image.fileName || ('common.tiles.images.previewAlt' | transloco)"
+                  loading="lazy" decoding="async" (error)="handleImageError(item.image)" />
+              </button>
+            } @else {
+              <div class="preview-missing">
+                <mat-icon>broken_image</mat-icon>
+              </div>
+            }
+            <div class="image-text">
+              <div class="image-label">{{ item.image.fileName }}</div>
+              <div class="image-meta">{{ (item.image.exifCaptureDate || item.image.timestamp) | date: 'mediumDate' }}</div>
+            </div>
+          </div>
+          <div class="image-buttons">
+            <button mat-icon-button color="primary" type="button" (click)="openImage()"
+              [attr.aria-label]="'common.tiles.images.openAria' | transloco">
+              <mat-icon>open_in_new</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" type="button" (click)="deleteImage(item.image)"
+              [attr.aria-label]="'common.tiles.images.removeAria' | transloco">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <p class="text-muted">{{ 'common.tiles.images.emptyEditor' | transloco }}</p>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button type="button" (click)="cancel()" mat-icon-button [attr.aria-label]="'common.cancel' | transloco" class="action-close"><mat-icon>close</mat-icon></button>
+  <button mat-icon-button type="button" (click)="openDisplaySettings()"
+    [attr.aria-label]="'common.tileSettings.title' | transloco">
+    <mat-icon>settings</mat-icon>
+  </button>
+  <button color="primary" type="button" (click)="save()" mat-icon-button [attr.aria-label]="'common.save' | transloco"><mat-icon>save</mat-icon></button>
+</mat-dialog-actions>

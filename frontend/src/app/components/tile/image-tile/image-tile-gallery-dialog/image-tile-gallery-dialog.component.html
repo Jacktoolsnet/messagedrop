@@ -1,0 +1,25 @@
+<app-dialog-header
+  icon="photo_library"
+  [title]="data.title">
+</app-dialog-header>
+
+<mat-dialog-content class="gallery-content">
+  @if (data.images.length > 0) {
+    <div class="gallery-grid">
+      @for (image of data.images; track image.id) {
+        <div class="gallery-item">
+          <img [src]="image.src" [alt]="image.alt" loading="lazy" decoding="async" />
+        </div>
+      }
+    </div>
+  } @else {
+    <p class="text-muted">{{ 'common.tiles.images.empty' | transloco }}</p>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-icon-button class="action-close" type="button" (click)="close()"
+    [attr.aria-label]="'common.actions.close' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+</mat-dialog-actions>

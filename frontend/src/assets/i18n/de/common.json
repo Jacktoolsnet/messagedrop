@@ -631,9 +631,15 @@
       "dataExpiredCached": "Daten abgelaufen – zeige zwischengespeicherte Werte",
       "images": {
         "title": "Private Bilder",
+        "header": "Bilder",
+        "add": "Bilder hinzufügen",
+        "reorderAria": "Bild neu anordnen",
+        "openAria": "Bild öffnen",
+        "removeAria": "Bild entfernen",
         "notFound": "Nicht gefunden",
         "previewAlt": "Bildvorschau",
-        "empty": "Keine Bilder gefunden."
+        "empty": "Keine Bilder vorhanden.",
+        "emptyEditor": "Noch keine Bilder. Füge oben welche hinzu."
       },
       "experiences": {
         "title": "Erlebnisse",

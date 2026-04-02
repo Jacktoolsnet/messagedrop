@@ -1,0 +1,128 @@
+.edit-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  height: auto;
+  max-height: calc(98vh - 200px);
+  overflow: hidden;
+  min-height: 0;
+  padding-bottom: 16px;
+}
+
+.images-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.images-title {
+  font-weight: 600;
+}
+
+.image-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  min-height: 0;
+  padding-right: 4px;
+}
+
+.image-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  background: var(--mat-card-filled-container-color);
+  box-shadow: 0 2px 8px var(--mat-card-outlined-outline-color);
+}
+
+.drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: grab;
+  flex: 0 0 auto;
+}
+
+.image-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.preview-button,
+.preview-missing {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.85rem;
+  flex: 0 0 3rem;
+}
+
+.preview-button {
+  padding: 0;
+  border: none;
+  background: transparent;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.preview-button:focus-visible {
+  outline: 2px solid var(--mat-card-outlined-outline-color);
+  outline-offset: 2px;
+}
+
+.image-preview {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.preview-missing {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.image-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.image-label {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.image-meta {
+  font-size: 0.85rem;
+  opacity: 0.7;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.image-buttons {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+}
+
+.text-muted {
+  margin: 0;
+  font-style: italic;
+}

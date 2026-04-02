@@ -360,6 +360,19 @@ export class LocalImageService {
     return localImageEntry;
   }
 
+  async getImagesByIds(ids: string[]): Promise<LocalImage[]> {
+    if (!ids.length) {
+      return [];
+    }
+
+    const allImages = await this.indexedDbService.getAllImages();
+    const imageMap = new Map(allImages.map((image) => [image.id, image]));
+
+    return ids
+      .map((id) => imageMap.get(id))
+      .filter((image): image is LocalImage => Boolean(image));
+  }
+
   clearImages(): void {
     this.imagesSignal.set([]);
   }

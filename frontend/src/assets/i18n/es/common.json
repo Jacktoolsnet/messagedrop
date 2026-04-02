@@ -631,9 +631,15 @@
       "dataExpiredCached": "Datos caducados: mostrando valores en caché",
       "images": {
         "title": "Imágenes privadas",
+        "header": "Imágenes",
+        "add": "Añadir imágenes",
+        "reorderAria": "Reordenar imagen",
+        "openAria": "Abrir imagen",
+        "removeAria": "Quitar imagen",
         "notFound": "No encontrado",
         "previewAlt": "Vista previa de la imagen",
-        "empty": "No se encontraron imágenes."
+        "empty": "Todavía no hay imágenes.",
+        "emptyEditor": "Todavía no hay imágenes. Añade algunas arriba."
       },
       "experiences": {
         "title": "Experiencias",

@@ -39,6 +39,17 @@ export interface TileFileEntry {
   order: number;
 }
 
+export interface TileImageEntry {
+  id: string;
+  fileName: string;
+  mimeType?: string;
+  width?: number;
+  height?: number;
+  exifCaptureDate?: string;
+  addedAt: number;
+  order: number;
+}
+
 export interface TileSetting {
   id: string;
   type: TileType;
@@ -56,6 +67,7 @@ export interface TileSetting {
     todos?: TileTodoItem[];
     actions?: TileQuickAction[];
     files?: TileFileEntry[];
+    images?: TileImageEntry[];
     migraine?: {
       tempWarn1: number;
       tempWarn2: number;
@@ -92,7 +104,6 @@ const placeDefaultTileTypeOrder: DefaultTileType[] = [
   'message',
   'hashtags',
   'placeContacts',
-  'image',
   'custom-experience'
 ];
 const contactDefaultTileTypeOrder: DefaultTileType[] = ['contactPlaces', 'hashtags'];
@@ -138,7 +149,7 @@ export function normalizeTileSettings(
   });
 
   const customTiles = incoming
-    .filter(setting => !defaultTypes.has(setting.type) && (setting.custom || setting.type.startsWith('custom-')))
+    .filter(setting => !defaultTypes.has(setting.type) && (setting.custom || setting.type.startsWith('custom-') || setting.type === 'image'))
     .map((setting, index) => ({
       ...setting,
       id: setting.id ?? `custom-${setting.type}-${index}`,

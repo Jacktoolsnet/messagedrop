@@ -631,9 +631,15 @@
       "dataExpiredCached": "Données expirées — affichage des valeurs en cache",
       "images": {
         "title": "Images privées",
+        "header": "Images",
+        "add": "Ajouter des images",
+        "reorderAria": "Réorganiser l'image",
+        "openAria": "Ouvrir l'image",
+        "removeAria": "Retirer l'image",
         "notFound": "Introuvable",
         "previewAlt": "Aperçu de l'image",
-        "empty": "Aucune image trouvée."
+        "empty": "Aucune image pour le moment.",
+        "emptyEditor": "Aucune image pour le moment. Ajoutez-en ci-dessus."
       },
       "experiences": {
         "title": "Expériences",

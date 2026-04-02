@@ -1,30 +1,41 @@
-<div class="tile" role="button" tabindex="0" (click)="openImageDialog()"
-  (keyup.enter)="openImageDialog()" (keyup.space)="openImageDialog()">
-  <div class="tile-header">
-    <mat-icon class="tile-icon">photo_library</mat-icon>
-    <span class="tile-title">{{ 'common.tiles.images.title' | transloco }}</span>
+<div class="image-tile"
+     role="button"
+     tabindex="0"
+     (click)="openEditor()"
+     (keyup.enter)="openEditor()"
+     (keyup.space)="openEditor()">
+  <div class="image-tile__header">
+    <div class="image-tile__icon">
+      <mat-icon>{{ icon }}</mat-icon>
+    </div>
+    <div class="image-tile__title">{{ title }}</div>
   </div>
 
-  @if (previewImages().length > 0) {
-  <div class="grid">
-    @for (image of previewImages(); track image.id; let idx = $index) {
-      @if (previewUrls()[idx] === 'NOT_FOUND') {
-        <div class="missing">
-          <mat-icon aria-hidden="true">broken_image</mat-icon>
-          <div>{{ 'common.tiles.images.notFound' | transloco }}</div>
-        </div>
-      } @else {
-        <img
-          [src]="previewUrls()[idx]"
-          [alt]="image.fileName || ('common.tiles.images.previewAlt' | transloco)"
-          loading="lazy"
-          decoding="async"
-          (error)="handleImageError(image, idx)"
-        />
-      }
+  <div class="image-tile__body">
+    @if (hasImages) {
+      <div class="image-grid">
+        @for (item of previewItems; track item.entry.id) {
+          @if (item.missing) {
+            <div class="missing">
+              <mat-icon aria-hidden="true">broken_image</mat-icon>
+              <div>{{ 'common.tiles.images.notFound' | transloco }}</div>
+            </div>
+          } @else {
+            <button type="button" class="image-button" (click)="openGallery($event)"
+              [attr.aria-label]="getImageAria(item)" [attr.title]="item.entry.fileName">
+              <img
+                [src]="item.src"
+                [alt]="getImageAria(item)"
+                loading="lazy"
+                decoding="async"
+                (error)="item.image && handleImageError(item.image, $event)"
+              />
+            </button>
+          }
+        }
+      </div>
+    } @else {
+      <p class="text-muted">{{ 'common.tiles.images.empty' | transloco }}</p>
     }
   </div>
-  } @else {
-  <div class="empty">{{ 'common.tiles.images.empty' | transloco }}</div>
-  }
 </div>

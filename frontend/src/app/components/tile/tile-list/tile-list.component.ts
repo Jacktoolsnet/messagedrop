@@ -68,6 +68,7 @@ export class TileListComponent {
     'custom-pollution'
   ]);
   private readonly experienceRenderableTypes = new Set<TileSetting['type']>([
+    'image',
     'hashtags',
     'custom-text',
     'custom-multitext',

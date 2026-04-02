@@ -631,9 +631,15 @@
       "dataExpiredCached": "Data expired - showing cached values",
       "images": {
         "title": "Private images",
+        "header": "Images",
+        "add": "Add images",
+        "reorderAria": "Reorder image",
+        "openAria": "Open image",
+        "removeAria": "Remove image",
         "notFound": "Not found",
         "previewAlt": "Image preview",
-        "empty": "No images found."
+        "empty": "No images yet.",
+        "emptyEditor": "No images yet. Add some above."
       },
       "experiences": {
         "title": "Experiences",

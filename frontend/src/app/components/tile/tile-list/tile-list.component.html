@@ -30,7 +30,7 @@
           <app-relation-tile class="tile" [contact]="resolvedContact!" [tile]="tile"></app-relation-tile>
         }
         @case ('image') {
-          <app-image-tile class="tile" [place]="resolvedPlace!"></app-image-tile>
+          <app-image-tile class="tile" [tile]="tile" [place]="resolvedPlace" [contact]="resolvedContact" [experience]="resolvedExperience"></app-image-tile>
         }
         @case ('custom-experience') {
           <app-experience-tile class="tile" [place]="resolvedPlace!"></app-experience-tile>

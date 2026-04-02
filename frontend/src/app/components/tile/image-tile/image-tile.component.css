@@ -1,29 +1,32 @@
-.tile {
+.image-tile {
   position: relative;
   border-radius: 1rem;
   color: var(--mat-card-subtitle-text-color);
   background-color: var(--mat-card-filled-container-color);
   box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
   padding: 1rem;
+  text-align: left;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  height: auto;
+  cursor: pointer;
 }
 
-.tile:hover {
+.image-tile:hover {
   transform: scale(1.02);
   transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
-.tile-header {
+.image-tile__header {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: bold;
 }
 
-.tile-icon {
+.image-tile__icon {
   width: 1.5rem;
   height: 1.5rem;
   display: inline-flex;
@@ -33,40 +36,55 @@
   font-size: 1.5rem;
 }
 
-.preview-box {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0.75rem;
-  align-items: center;
+.image-tile__title {
+  flex: 1;
 }
 
-.grid {
+.image-tile__body {
+  font-size: 0.95rem;
+}
+
+.image-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.5rem;
 }
 
-.grid img {
+.image-button {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 0.85rem;
+  overflow: hidden;
+}
+
+.image-button img {
+  display: block;
   width: 100%;
   aspect-ratio: 1 / 1;
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: 0.85rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
 }
 
-.empty {
-  font-style: italic;
-  color: var(--mat-card-subtitle-text-color);
+.image-button:focus-visible {
+  outline: 2px solid var(--mat-card-outlined-outline-color);
+  outline-offset: 2px;
 }
 
 .missing {
   display: grid;
   place-items: center;
+  min-height: 7rem;
   color: var(--mat-card-subtitle-text-color);
   font-weight: 600;
   padding: 0.5rem 0.25rem;
   border-radius: 10px;
   background: rgba(0, 0, 0, 0.04);
+  text-align: center;
 }
 
 .missing mat-icon {
@@ -77,4 +95,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+.text-muted {
+  margin: 0;
+  font-style: italic;
 }
