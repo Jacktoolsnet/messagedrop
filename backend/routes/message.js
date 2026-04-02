@@ -14,7 +14,7 @@ const OpenAI = require('openai');
 const { signServiceJwt } = require('../utils/serviceJwt');
 const { apiError } = require('../middleware/api-error');
 const { resolveBaseUrl } = require('../utils/adminLogForwarder');
-const { createOpenAiApiError } = require('../utils/openai-error');
+const { buildOpenAiErrorDetail } = require('../utils/openai-error');
 const {
   MAX_PUBLIC_HASHTAGS,
   normalizeHashtags,
@@ -374,8 +374,34 @@ function moderationPublishErrorMessage(reason) {
   return 'This content could not be published because it was rejected by automated moderation.';
 }
 
-async function runAutomatedPublicContentModeration(rawMessage, hashtags) {
-  const moderationInput = [String(rawMessage ?? ''), formatHashtagsForModeration(hashtags)].filter(Boolean).join(' ').trim();
+function applyOpenAiModerationFallback(error, moderation, logger) {
+  const detail = buildOpenAiErrorDetail(error, {
+    operation: 'moderations.create',
+    model: moderationModel
+  });
+
+  logger?.warn?.('OpenAI moderation unavailable, falling back to manual review', detail);
+
+  moderation.aiModeration = JSON.stringify({
+    provider: 'openai',
+    fallback: 'manual_review',
+    detail
+  });
+  moderation.aiScore = null;
+  moderation.aiFlagged = null;
+  moderation.aiDecision = 'review';
+  moderation.aiCheckedAt = Date.now();
+
+  return {
+    moderationDecision: 'review',
+    moderationScore: null,
+    moderationFlagged: null,
+    moderationReason: 'openai_unavailable',
+    status: tableMessage.messageStatus.ENABLED
+  };
+}
+
+async function moderatePublicContentInput(moderationInput, logger) {
   const moderation = {};
   let status = tableMessage.messageStatus.ENABLED;
   let moderationDecision = null;
@@ -413,11 +439,12 @@ async function runAutomatedPublicContentModeration(rawMessage, hashtags) {
       moderation.aiDecision = moderationDecision;
       moderation.aiCheckedAt = Date.now();
     } catch (err) {
-      throw createOpenAiApiError(err, {
-        message: 'openai_failed',
-        operation: 'moderations.create',
-        model: moderationModel
-      });
+      const fallback = applyOpenAiModerationFallback(err, moderation, logger);
+      moderationDecision = fallback.moderationDecision;
+      moderationScore = fallback.moderationScore;
+      moderationFlagged = fallback.moderationFlagged;
+      moderationReason = fallback.moderationReason;
+      status = fallback.status;
     }
   }
 
@@ -429,6 +456,11 @@ async function runAutomatedPublicContentModeration(rawMessage, hashtags) {
     moderationFlagged,
     moderationReason
   };
+}
+
+async function runAutomatedPublicContentModeration(rawMessage, hashtags, logger) {
+  const moderationInput = [String(rawMessage ?? ''), formatHashtagsForModeration(hashtags)].filter(Boolean).join(' ').trim();
+  return moderatePublicContentInput(moderationInput, logger);
 }
 
 function isMessageLockedByModeration(messageRow) {
@@ -675,56 +707,19 @@ router.post('/moderate/hashtags',
       return next(apiError.badRequest('invalid_hashtags'));
     }
 
-    const moderationInput = formatHashtagsForModeration(hashtags);
-    const moderation = {};
-    let moderationDecision = 'approved';
-    let moderationScore = null;
-    let moderationFlagged = null;
-    let moderationReason = null;
-
-    moderation.patternMatch = detectPersonalInformation(moderationInput);
-    moderation.patternMatchAt = Date.now();
-
-    if (moderation.patternMatch) {
-      moderationDecision = 'rejected';
-      moderationReason = 'pattern';
-      moderationFlagged = true;
-    }
-
-    try {
-      if (!moderation.patternMatch) {
-        const moderationResult = await openai.moderations.create({
-          model: moderationModel,
-          input: moderationInput
-        });
-        moderationScore = extractModerationScore(moderationResult);
-        moderationFlagged = moderationResult?.results?.[0]?.flagged ?? false;
-        moderationDecision = decideModeration(moderationScore, moderationFlagged);
-        if (moderationDecision === 'rejected') {
-          moderationReason = 'ai';
-        }
-        moderation.aiModeration = JSON.stringify(moderationResult);
-        moderation.aiScore = moderationScore;
-        moderation.aiFlagged = moderationFlagged;
-        moderation.aiDecision = moderationDecision;
-        moderation.aiCheckedAt = Date.now();
-      }
-    } catch (err) {
-      return next(createOpenAiApiError(err, {
-        message: 'openai_failed',
-        operation: 'moderations.create',
-        model: moderationModel
-      }));
-    }
+    const moderationResult = await moderatePublicContentInput(
+      formatHashtagsForModeration(hashtags),
+      req.logger
+    );
 
     res.status(200).json({
       status: 200,
       moderation: {
-        decision: moderationDecision,
-        reason: moderationReason,
-        score: moderationScore,
-        flagged: moderationFlagged,
-        patternMatch: moderation.patternMatch ?? null
+        decision: moderationResult.moderationDecision,
+        reason: moderationResult.moderationReason,
+        score: moderationResult.moderationScore,
+        flagged: moderationResult.moderationFlagged,
+        patternMatch: moderationResult.moderation.patternMatch ?? null
       }
     });
   });
@@ -767,7 +762,7 @@ router.post('/internal/publish',
         tableMessage.messageType.COMMENT
       ].includes(payload.messageTyp);
       const moderationResult = requiresModeration
-        ? await runAutomatedPublicContentModeration(payload.rawMessage, payload.hashtags)
+        ? await runAutomatedPublicContentModeration(payload.rawMessage, payload.hashtags, req.logger)
         : null;
 
       if (requiresModeration && moderationResult?.moderationDecision === 'rejected') {
@@ -990,47 +985,13 @@ router.post('/create',
     ].includes(req.body.messageTyp);
 
     if (requiresModeration) {
-      const patternMatch = detectPersonalInformation(moderationInput);
-      const patternMatchAt = Date.now();
-      moderation.patternMatch = patternMatch;
-      moderation.patternMatchAt = patternMatchAt;
-
-      if (patternMatch) {
-        moderationScore = null;
-        moderationFlagged = true;
-        moderationDecision = 'rejected';
-        moderationReason = 'pattern';
-        status = tableMessage.messageStatus.DISABLED;
-      }
-
-      try {
-        if (!patternMatch) {
-          const moderationResult = await openai.moderations.create({
-            model: moderationModel,
-            input: moderationInput
-          });
-          moderationScore = extractModerationScore(moderationResult);
-          moderationFlagged = moderationResult?.results?.[0]?.flagged ?? false;
-          moderationDecision = decideModeration(moderationScore, moderationFlagged);
-          if (moderationDecision === 'rejected') {
-            moderationReason = 'ai';
-          }
-          moderation.aiModeration = JSON.stringify(moderationResult);
-          moderation.aiScore = moderationScore;
-          moderation.aiFlagged = moderationFlagged;
-          moderation.aiDecision = moderationDecision;
-          moderation.aiCheckedAt = Date.now();
-          if (moderationDecision === 'rejected') {
-            status = tableMessage.messageStatus.DISABLED;
-          }
-        }
-      } catch (err) {
-        return next(createOpenAiApiError(err, {
-          message: 'openai_failed',
-          operation: 'moderations.create',
-          model: moderationModel
-        }));
-      }
+      const moderationResult = await moderatePublicContentInput(moderationInput, req.logger);
+      Object.assign(moderation, moderationResult.moderation);
+      status = moderationResult.status;
+      moderationDecision = moderationResult.moderationDecision;
+      moderationScore = moderationResult.moderationScore;
+      moderationFlagged = moderationResult.moderationFlagged;
+      moderationReason = moderationResult.moderationReason;
     }
 
     const createResult = await new Promise((resolve, reject) => {
@@ -1193,45 +1154,13 @@ router.post('/update',
       let moderationRequestSent = false;
       let moderationRequestId = null;
 
-      moderation.patternMatch = detectPersonalInformation(moderationInput);
-      moderation.patternMatchAt = Date.now();
-
-      if (moderation.patternMatch) {
-        moderationScore = null;
-        moderationFlagged = true;
-        moderationDecision = 'rejected';
-        moderationReason = 'pattern';
-        status = tableMessage.messageStatus.DISABLED;
-      }
-
-      try {
-        if (!moderation.patternMatch) {
-          const moderationResult = await openai.moderations.create({
-            model: moderationModel,
-            input: moderationInput
-          });
-          moderationScore = extractModerationScore(moderationResult);
-          moderationFlagged = moderationResult?.results?.[0]?.flagged ?? false;
-          moderationDecision = decideModeration(moderationScore, moderationFlagged);
-          if (moderationDecision === 'rejected') {
-            moderationReason = 'ai';
-          }
-          moderation.aiModeration = JSON.stringify(moderationResult);
-          moderation.aiScore = moderationScore;
-          moderation.aiFlagged = moderationFlagged;
-          moderation.aiDecision = moderationDecision;
-          moderation.aiCheckedAt = Date.now();
-          if (moderationDecision === 'rejected') {
-            status = tableMessage.messageStatus.DISABLED;
-          }
-        }
-      } catch (err) {
-        return next(createOpenAiApiError(err, {
-          message: 'openai_failed',
-          operation: 'moderations.create',
-          model: moderationModel
-        }));
-      }
+      const moderationResult = await moderatePublicContentInput(moderationInput, req.logger);
+      Object.assign(moderation, moderationResult.moderation);
+      status = moderationResult.status;
+      moderationDecision = moderationResult.moderationDecision;
+      moderationScore = moderationResult.moderationScore;
+      moderationFlagged = moderationResult.moderationFlagged;
+      moderationReason = moderationResult.moderationReason;
 
       tableMessage.updateWithModeration(
         req.database.db,
