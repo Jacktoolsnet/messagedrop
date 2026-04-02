@@ -581,7 +581,7 @@
       },
       "experience": {
         "title": "Añadir experiencia",
-        "desc": "Con esta función añades a tu mensaje una tarjeta de experiencia desde la búsqueda de experiencias."
+        "desc": "Con esta función se abre primero un pequeño menú. Allí puedes elegir una experiencia guardada o buscar experiencias nuevas y adjuntar la tarjeta de experiencia a tu mensaje."
       },
       "location": {
         "title": "Enviar mensaje de ubicación",

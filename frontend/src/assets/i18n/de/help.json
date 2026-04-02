@@ -581,7 +581,7 @@
       },
       "experience": {
         "title": "Erlebnis hinzufügen",
-        "desc": "Mit dieser Funktion fügst du deiner Nachricht eine Erlebnis-Karte aus der Erlebnissuche hinzu."
+        "desc": "Mit dieser Funktion öffnest du zuerst ein kleines Menü. Dort kannst du ein gespeichertes Erlebnis auswählen oder nach neuen Erlebnissen suchen und die Erlebnis-Karte an deine Nachricht anhängen."
       },
       "location": {
         "title": "Ortsnachricht senden",

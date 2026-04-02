@@ -581,7 +581,7 @@
       },
       "experience": {
         "title": "Add experience",
-        "desc": "This action adds an experience card from experience search to your message."
+        "desc": "This action first opens a small menu. There you can pick one of your saved experiences or search for new ones and attach the experience card to your message."
       },
       "location": {
         "title": "Send location message",

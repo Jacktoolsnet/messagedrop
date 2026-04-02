@@ -1,0 +1,39 @@
+<app-dialog-header
+  icon="bookmark_star"
+  [title]="'common.contact.chatroom.experienceSourceMyExperiences' | transloco">
+</app-dialog-header>
+
+<mat-dialog-content class="experience-select-content">
+  @if (!hasExperiences()) {
+  <div class="experience-select-empty">
+    {{ 'common.contact.chatroom.noSavedExperiences' | transloco }}
+  </div>
+  } @else {
+  <mat-action-list class="experience-select-list" role="list"
+    [attr.aria-label]="'common.contact.chatroom.experienceSourceMyExperiences' | transloco">
+    @for (bookmark of experiences(); track bookmark.productCode) {
+    <button mat-list-item type="button" class="experience-select-option" (click)="select(bookmark)">
+      @if (getExperienceImage(bookmark); as imageUrl) {
+      <img matListItemAvatar class="experience-select-option__avatar" [src]="imageUrl"
+        [attr.alt]="getExperienceTitle(bookmark)" />
+      } @else {
+      <span matListItemAvatar class="experience-select-option__avatar experience-select-option__avatar--fallback" aria-hidden="true">
+        <mat-icon>local_activity</mat-icon>
+      </span>
+      }
+      <span matListItemTitle class="experience-select-option__title">
+        {{ getExperienceTitle(bookmark) }}
+      </span>
+      <span matListItemMeta class="experience-select-option__chevron" aria-hidden="true"></span>
+    </button>
+    }
+  </mat-action-list>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-icon-button class="action-close" type="button" (click)="close()"
+    [attr.aria-label]="'common.actions.close' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+</mat-dialog-actions>

@@ -18,6 +18,7 @@ import { ExperienceResult } from '../../interfaces/viator';
 import { ContactMessageService } from '../../services/contact-message.service';
 import { ContactService } from '../../services/contact.service';
 import { AppService } from '../../services/app.service';
+import { ExperienceBookmarkService } from '../../services/experience-bookmark.service';
 import { PlaceService } from '../../services/place.service';
 import { SpeechService } from '../../services/speech.service';
 import { LanguageService } from '../../services/language.service';
@@ -39,6 +40,7 @@ import { LocationPreviewComponent } from '../utils/location-preview/location-pre
 import { ExperienceSearchComponent } from '../utils/experience-search/experience-search.component';
 import { ExperienceSearchDetailDialogComponent } from '../utils/experience-search/detail-dialog/experience-search-detail-dialog.component';
 import { DisplayMessage } from '../utils/display-message/display-message.component';
+import { ContactChatroomExperienceSelectDialogComponent } from './experience-select-dialog/contact-chatroom-experience-select-dialog.component';
 import { ContactChatroomPlaceSelectDialogComponent } from './place-select-dialog/contact-chatroom-place-select-dialog.component';
 import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
 import { DisplayMessageService } from '../../services/display-message.service';
@@ -94,6 +96,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   private readonly userService = inject(UserService);
   private readonly socketioService = inject(SocketioService);
   private readonly contactService = inject(ContactService);
+  private readonly experienceBookmarkService = inject(ExperienceBookmarkService);
   private readonly placeService = inject(PlaceService);
   private readonly mapService = inject(MapService);
   readonly help = inject(HelpDialogService);
@@ -124,12 +127,14 @@ export class ContactChatroomComponent implements AfterViewInit {
   readonly messages = signal<ChatroomMessage[]>([]);
   readonly loading = signal<boolean>(false);
   readonly loaded = signal<boolean>(false);
+  readonly hasSavedExperiences = computed(() => this.experienceBookmarkService.bookmarksSignal().length > 0);
   readonly hasSavedPlaces = computed(() => this.placeService.sortedPlacesSignal().length > 0);
   readonly translationTargetLabel = computed(() =>
     this.translation.t(`common.languageNames.${this.languageService.effectiveLanguage()}`)
   );
   private readonly messageKeys = new Set<string>();
   private readonly payloadSyncInFlightContacts = new Set<string>();
+  private readonly experienceEditTarget = signal<ChatroomMessage | null>(null);
   private readonly locationEditTarget = signal<ChatroomMessage | null>(null);
   private scrolledToFirstUnread = false;
   private readTrackingEnabled = false;
@@ -198,6 +203,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   });
 
   constructor() {
+    void this.experienceBookmarkService.ensureLoaded().catch(() => undefined);
     this.destroyRef.onDestroy(() => {
       this.audioUrlCache.forEach((url) => URL.revokeObjectURL(url));
       this.audioUrlCache.clear();
@@ -433,9 +439,21 @@ export class ContactChatroomComponent implements AfterViewInit {
     });
   }
 
-  openExperienceSearch(): void {
+  openExperienceSearch(message?: ChatroomMessage): void {
+    const contact = this.contact();
+    if (!contact) {
+      return;
+    }
+    const initialTerm = message?.payload?.experience
+      ? (message.payload.experienceSearchTerm
+        || message.payload.experience.title
+        || message.payload.experience.productCode
+        || '')
+      : '';
     const dialogRef = this.matDialog.open(ExperienceSearchComponent, {
-      data: { source: 'chat' },
+      data: message?.payload?.experience
+        ? { source: 'chat', initialTerm, autoSearch: true }
+        : { source: 'chat' },
       panelClass: '',
       closeOnNavigation: true,
       minWidth: 'min(450px, 95vw)',
@@ -450,17 +468,67 @@ export class ContactChatroomComponent implements AfterViewInit {
     });
 
     const subscription = dialogRef.componentInstance.selected.subscribe((result) => {
-      const contact = this.contact();
-      if (contact) {
-        const payload = this.createEmptyMessage();
-        payload.experience = result;
-        payload.experienceSearchTerm = dialogRef.componentInstance.getChatSearchTerm();
-        void this.sendAsNewMessage(contact, payload);
+      const searchTerm = dialogRef.componentInstance.getChatSearchTerm();
+      if (message) {
+        this.sendEditedExperienceMessage(contact, message, result, searchTerm);
+      } else {
+        this.sendExperienceMessage(contact, result, searchTerm);
       }
       dialogRef.close(result);
     });
 
     dialogRef.afterClosed().subscribe(() => subscription.unsubscribe());
+  }
+
+  openSavedExperiencePicker(message?: ChatroomMessage): void {
+    const contact = this.contact();
+    if (!contact) {
+      return;
+    }
+    const dialogRef = this.matDialog.open(ContactChatroomExperienceSelectDialogComponent, {
+      width: 'min(420px, 92vw)',
+      maxWidth: '92vw',
+      maxHeight: '80vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((experience?: ExperienceResult) => {
+      if (!experience) {
+        return;
+      }
+      if (message) {
+        this.sendEditedExperienceMessage(contact, message, experience);
+        return;
+      }
+      this.sendExperienceMessage(contact, experience);
+    });
+  }
+
+  prepareExperienceEdit(message: ChatroomMessage): void {
+    this.experienceEditTarget.set(message);
+  }
+
+  clearExperienceEditTarget(): void {
+    this.experienceEditTarget.set(null);
+  }
+
+  editSelectedExperienceFromSaved(): void {
+    const message = this.experienceEditTarget();
+    if (!message) {
+      return;
+    }
+    this.openSavedExperiencePicker(message);
+  }
+
+  editSelectedExperienceSearch(): void {
+    const message = this.experienceEditTarget();
+    if (!message) {
+      return;
+    }
+    this.openExperienceSearch(message);
   }
 
   openLocationSearch(message?: ChatroomMessage): void {
@@ -552,12 +620,39 @@ export class ContactChatroomComponent implements AfterViewInit {
     void this.sendAsNewMessage(contact, payload);
   }
 
+  private sendExperienceMessage(contact: Contact, experience: ExperienceResult, experienceSearchTerm?: string | null): void {
+    const payload = this.createEmptyMessage();
+    payload.experience = experience;
+    payload.experienceSearchTerm = experienceSearchTerm ?? null;
+    void this.sendAsNewMessage(contact, payload);
+  }
+
   private sendEditedLocationMessage(contact: Contact, message: ChatroomMessage, location: Location): void {
     const payload: ShortMessage = message.payload
       ? { ...message.payload, location: { ...location } }
       : {
         ...this.createEmptyMessage(),
         location: { ...location }
+      };
+    void this.sendAsNewMessage(contact, payload);
+  }
+
+  private sendEditedExperienceMessage(
+    contact: Contact,
+    message: ChatroomMessage,
+    experience: ExperienceResult,
+    experienceSearchTerm?: string | null
+  ): void {
+    const payload: ShortMessage = message.payload
+      ? {
+        ...message.payload,
+        experience,
+        experienceSearchTerm: experienceSearchTerm ?? null
+      }
+      : {
+        ...this.createEmptyMessage(),
+        experience,
+        experienceSearchTerm: experienceSearchTerm ?? null
       };
     void this.sendAsNewMessage(contact, payload);
   }
@@ -1009,34 +1104,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       return;
     }
     if (message.payload?.experience) {
-      const initialTerm = message.payload.experienceSearchTerm
-        || message.payload.experience.title
-        || message.payload.experience.productCode
-        || '';
-      const dialogRef = this.matDialog.open(ExperienceSearchComponent, {
-        data: { source: 'chat', initialTerm, autoSearch: true },
-        panelClass: '',
-        closeOnNavigation: true,
-        minWidth: 'min(450px, 95vw)',
-        width: '90vw',
-        maxWidth: '90vw',
-        height: '90vh',
-        maxHeight: '90vh',
-        hasBackdrop: true,
-        backdropClass: 'dialog-backdrop',
-        disableClose: false,
-        autoFocus: false
-      });
-
-      const subscription = dialogRef.componentInstance.selected.subscribe((result) => {
-        const payload = this.createEmptyMessage();
-        payload.experience = result;
-        payload.experienceSearchTerm = dialogRef.componentInstance.getChatSearchTerm();
-        void this.sendAsNewMessage(contact, payload);
-        dialogRef.close(result);
-      });
-
-      dialogRef.afterClosed().subscribe(() => subscription.unsubscribe());
+      this.openExperienceSearch(message);
       return;
     }
     if (message.payload?.location) {

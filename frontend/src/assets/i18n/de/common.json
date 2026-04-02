@@ -258,6 +258,8 @@
         "composeAria": "Nachricht schreiben",
         "addVoiceAria": "Neue Sprachnachricht",
         "addExperienceAria": "Erlebnis-Nachricht hinzufügen",
+        "experienceSourceMyExperiences": "Aus meinen Erlebnissen",
+        "noSavedExperiences": "Du hast noch keine Erlebnisse gespeichert.",
         "addLocationAria": "Ortsnachricht hinzufügen",
         "locationSourceMyPlaces": "Aus meinen Orten",
         "noSavedPlaces": "Du hast noch keine Orte gespeichert.",

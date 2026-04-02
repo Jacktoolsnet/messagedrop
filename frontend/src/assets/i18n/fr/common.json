@@ -258,6 +258,8 @@
         "composeAria": "Rédiger un message",
         "addVoiceAria": "Nouveau message vocal",
         "addExperienceAria": "Ajouter un message d’expérience",
+        "experienceSourceMyExperiences": "Depuis mes expériences",
+        "noSavedExperiences": "Vous n’avez encore enregistré aucune expérience.",
         "addLocationAria": "Ajouter un message de localisation",
         "locationSourceMyPlaces": "Depuis mes lieux",
         "noSavedPlaces": "Vous n’avez encore enregistré aucun lieu.",

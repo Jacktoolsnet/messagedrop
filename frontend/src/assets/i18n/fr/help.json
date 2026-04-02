@@ -581,7 +581,7 @@
       },
       "experience": {
         "title": "Ajouter une expérience",
-        "desc": "Cette fonction ajoute à votre message une carte d'expérience depuis la recherche d'expériences."
+        "desc": "Cette fonction ouvre d'abord un petit menu. Vous pouvez y choisir l'une de vos expériences enregistrées ou rechercher de nouvelles expériences, puis joindre la carte d'expérience à votre message."
       },
       "location": {
         "title": "Envoyer un message de lieu",

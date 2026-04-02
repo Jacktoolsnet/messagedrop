@@ -186,7 +186,12 @@
                 <mat-icon>{{ getReadAloudIcon(msg) }}</mat-icon>
               </button>
               }
-              @if (msg.payload?.location) {
+              @if (msg.payload?.experience) {
+              <button mat-mini-fab color="primary" [attr.aria-label]="'common.contact.chatroom.editAria' | transloco"
+                [matMenuTriggerFor]="experienceEditMenu" (click)="prepareExperienceEdit(msg)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              } @else if (msg.payload?.location) {
               <button mat-mini-fab color="primary" [attr.aria-label]="'common.contact.chatroom.editAria' | transloco"
                 [matMenuTriggerFor]="locationEditMenu" (click)="prepareLocationEdit(msg)">
                 <mat-icon>edit</mat-icon>
@@ -369,9 +374,25 @@
     <mat-icon>help</mat-icon>
   </button>
   <button mat-icon-button type="button" [attr.aria-label]="'common.contact.chatroom.addExperienceAria' | transloco"
-    (click)="openExperienceSearch()">
+    [matMenuTriggerFor]="experienceMenu">
     <mat-icon>bookmark_add</mat-icon>
   </button>
+  <mat-menu #experienceMenu="matMenu" panelClass="accent-menu">
+    <button mat-menu-item type="button" (click)="openSavedExperiencePicker()" [disabled]="!hasSavedExperiences()">
+      <mat-icon>bookmark_star</mat-icon>
+      <span>{{ 'common.contact.chatroom.experienceSourceMyExperiences' | transloco }}</span>
+    </button>
+    <button mat-menu-item type="button" (click)="openExperienceSearch()">
+      <mat-icon>search</mat-icon>
+      <span>{{ 'common.menu.searchExperiences' | transloco }}</span>
+    </button>
+    @if (!hasSavedExperiences()) {
+    <button mat-menu-item type="button" disabled>
+      <mat-icon>info</mat-icon>
+      <span>{{ 'common.contact.chatroom.noSavedExperiences' | transloco }}</span>
+    </button>
+    }
+  </mat-menu>
   <button mat-icon-button type="button" [attr.aria-label]="'common.contact.chatroom.addLocationAria' | transloco"
     [matMenuTriggerFor]="locationMenu">
     <mat-icon>add_location_alt</mat-icon>
@@ -389,6 +410,22 @@
     <button mat-menu-item type="button" disabled>
       <mat-icon>info</mat-icon>
       <span>{{ 'common.contact.chatroom.noSavedPlaces' | transloco }}</span>
+    </button>
+    }
+  </mat-menu>
+  <mat-menu #experienceEditMenu="matMenu" panelClass="accent-menu" (closed)="clearExperienceEditTarget()">
+    <button mat-menu-item type="button" (click)="editSelectedExperienceFromSaved()" [disabled]="!hasSavedExperiences()">
+      <mat-icon>bookmark_star</mat-icon>
+      <span>{{ 'common.contact.chatroom.experienceSourceMyExperiences' | transloco }}</span>
+    </button>
+    <button mat-menu-item type="button" (click)="editSelectedExperienceSearch()">
+      <mat-icon>search</mat-icon>
+      <span>{{ 'common.menu.searchExperiences' | transloco }}</span>
+    </button>
+    @if (!hasSavedExperiences()) {
+    <button mat-menu-item type="button" disabled>
+      <mat-icon>info</mat-icon>
+      <span>{{ 'common.contact.chatroom.noSavedExperiences' | transloco }}</span>
     </button>
     }
   </mat-menu>
