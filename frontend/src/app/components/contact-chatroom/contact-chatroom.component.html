@@ -186,7 +186,12 @@
                 <mat-icon>{{ getReadAloudIcon(msg) }}</mat-icon>
               </button>
               }
-              @if (msg.payload) {
+              @if (msg.payload?.location) {
+              <button mat-mini-fab color="primary" [attr.aria-label]="'common.contact.chatroom.editAria' | transloco"
+                [matMenuTriggerFor]="locationEditMenu" (click)="prepareLocationEdit(msg)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              } @else if (msg.payload) {
               <button mat-mini-fab color="primary" [attr.aria-label]="'common.contact.chatroom.editAria' | transloco"
                 (click)="editMessage(msg)">
                 <mat-icon>edit</mat-icon>
@@ -368,9 +373,41 @@
     <mat-icon>bookmark_add</mat-icon>
   </button>
   <button mat-icon-button type="button" [attr.aria-label]="'common.contact.chatroom.addLocationAria' | transloco"
-    (click)="openLocationPicker()">
+    [matMenuTriggerFor]="locationMenu">
     <mat-icon>add_location_alt</mat-icon>
   </button>
+  <mat-menu #locationMenu="matMenu" panelClass="accent-menu">
+    <button mat-menu-item type="button" (click)="openSavedPlacePicker()" [disabled]="!hasSavedPlaces()">
+      <mat-icon>place</mat-icon>
+      <span>{{ 'common.contact.chatroom.locationSourceMyPlaces' | transloco }}</span>
+    </button>
+    <button mat-menu-item type="button" (click)="openLocationSearch()">
+      <mat-icon>search</mat-icon>
+      <span>{{ 'common.menu.searchPlace' | transloco }}</span>
+    </button>
+    @if (!hasSavedPlaces()) {
+    <button mat-menu-item type="button" disabled>
+      <mat-icon>info</mat-icon>
+      <span>{{ 'common.contact.chatroom.noSavedPlaces' | transloco }}</span>
+    </button>
+    }
+  </mat-menu>
+  <mat-menu #locationEditMenu="matMenu" panelClass="accent-menu" (closed)="clearLocationEditTarget()">
+    <button mat-menu-item type="button" (click)="editSelectedLocationFromSavedPlaces()" [disabled]="!hasSavedPlaces()">
+      <mat-icon>place</mat-icon>
+      <span>{{ 'common.contact.chatroom.locationSourceMyPlaces' | transloco }}</span>
+    </button>
+    <button mat-menu-item type="button" (click)="editSelectedLocationSearch()">
+      <mat-icon>search</mat-icon>
+      <span>{{ 'common.menu.searchPlace' | transloco }}</span>
+    </button>
+    @if (!hasSavedPlaces()) {
+    <button mat-menu-item type="button" disabled>
+      <mat-icon>info</mat-icon>
+      <span>{{ 'common.contact.chatroom.noSavedPlaces' | transloco }}</span>
+    </button>
+    }
+  </mat-menu>
   <button mat-icon-button type="button" [attr.aria-label]="'common.contact.chatroom.addVoiceAria' | transloco"
     (click)="openAudioRecorder()" [disabled]="audioLimitReached()">
     <mat-icon>mic</mat-icon>

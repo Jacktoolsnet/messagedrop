@@ -585,7 +585,7 @@
       },
       "location": {
         "title": "Enviar mensaje de ubicación",
-        "desc": "El icono de ubicación envía un mensaje de ubicación independiente. Ese mensaje incluye botones para verlo en el mapa de la app o abrirlo en Google Maps."
+        "desc": "El icono de ubicación abre primero un pequeño menú. Allí puedes enviar uno de tus lugares guardados o buscar un lugar nuevo. El mensaje de ubicación incluye después botones para verlo en el mapa de la app o abrirlo en Google Maps."
       },
       "audio": {
         "title": "Grabar mensaje de voz",

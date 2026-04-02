@@ -585,7 +585,7 @@
       },
       "location": {
         "title": "Envoyer un message de lieu",
-        "desc": "L'icône de lieu envoie un message de lieu distinct. Ce message inclut des boutons pour l'afficher sur la carte de l'application ou l'ouvrir dans Google Maps."
+        "desc": "L'icône de lieu ouvre d'abord un petit menu. Vous pouvez y envoyer l'un de vos lieux enregistrés ou rechercher un nouveau lieu. Le message de lieu inclut ensuite des boutons pour l'afficher sur la carte de l'application ou l'ouvrir dans Google Maps."
       },
       "audio": {
         "title": "Enregistrer un message vocal",

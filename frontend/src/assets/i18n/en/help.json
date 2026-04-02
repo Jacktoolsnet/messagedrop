@@ -585,7 +585,7 @@
       },
       "location": {
         "title": "Send location message",
-        "desc": "The location icon sends a dedicated location message. That message includes buttons to show it on the app map or open it in Google Maps."
+        "desc": "The location icon first opens a small menu. There you can send one of your saved places or search for a new place. The location message then includes buttons to show it on the app map or open it in Google Maps."
       },
       "audio": {
         "title": "Record voice message",

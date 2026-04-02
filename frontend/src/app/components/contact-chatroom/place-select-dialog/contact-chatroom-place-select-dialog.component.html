@@ -1,0 +1,38 @@
+<app-dialog-header
+  icon="place"
+  [title]="'common.contact.chatroom.locationSourceMyPlaces' | transloco">
+</app-dialog-header>
+
+<mat-dialog-content class="place-select-content">
+  @if (!hasPlaces()) {
+  <div class="place-select-empty">
+    {{ 'common.contact.chatroom.noSavedPlaces' | transloco }}
+  </div>
+  } @else {
+  <mat-action-list class="place-select-list" role="list" [attr.aria-label]="'common.contact.chatroom.locationSourceMyPlaces' | transloco">
+    @for (place of places(); track place.id) {
+    <button mat-list-item type="button" class="place-select-option" (click)="select(place)">
+      @if (place.base64Avatar) {
+      <img matListItemAvatar class="place-select-option__avatar" [src]="place.base64Avatar"
+        [attr.alt]="place.name ? ('common.placeList.avatarAltName' | transloco:{ name: place.name }) : ('common.placeList.avatarAltFallback' | transloco)" />
+      } @else {
+      <span matListItemAvatar class="place-select-option__avatar place-select-option__avatar--fallback" aria-hidden="true">
+        <mat-icon>{{ place.icon || 'place' }}</mat-icon>
+      </span>
+      }
+      <span matListItemTitle class="place-select-option__title">
+        {{ place.name || ('common.placeList.nameFallback' | transloco) }}
+      </span>
+      <span matListItemMeta class="place-select-option__chevron" aria-hidden="true"></span>
+    </button>
+    }
+  </mat-action-list>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-icon-button class="action-close" type="button" (click)="close()"
+    [attr.aria-label]="'common.actions.close' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+</mat-dialog-actions>

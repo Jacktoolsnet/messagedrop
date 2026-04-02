@@ -259,6 +259,8 @@
         "addVoiceAria": "Nuevo mensaje de voz",
         "addExperienceAria": "Agregar mensaje de experiencia",
         "addLocationAria": "Agregar mensaje de ubicación",
+        "locationSourceMyPlaces": "Desde mis lugares",
+        "noSavedPlaces": "Todavía no has guardado ningún lugar.",
         "avatarAltName": "Avatar de {{ name }}",
         "avatarAltMe": "Mi avatar",
         "meLabel": "Yo",

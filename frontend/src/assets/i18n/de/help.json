@@ -585,7 +585,7 @@
       },
       "location": {
         "title": "Ortsnachricht senden",
-        "desc": "Mit dem Orti-Symbol sendest du eine eigene Ortsnachricht. Diese Nachricht bietet Buttons für App-Karte und Google Maps."
+        "desc": "Mit dem Orti-Symbol öffnest du zuerst ein kleines Menü. Dort kannst du einen Ort aus deinen gespeicherten Orten senden oder nach einem neuen Ort suchen. Die Ortsnachricht bietet anschließend Buttons für App-Karte und Google Maps."
       },
       "audio": {
         "title": "Sprachnachricht aufnehmen",
