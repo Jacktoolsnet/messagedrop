@@ -89,9 +89,14 @@ export class QuickActionTileComponent implements OnChanges {
     window.open(href, '_blank');
   }
 
-  getActionLabel(action: TileQuickAction): string {
-    const fallback = this.translation.t('common.tiles.quickActions.actionFallback');
-    return action.label?.trim() || action.value || fallback;
+  getActionValue(action: TileQuickAction): string {
+    return action.value?.trim() || this.translation.t(`common.tileLinkTypes.${action.type ?? 'web'}`);
+  }
+
+  getActionButtonAria(action: TileQuickAction): string {
+    const typeLabel = this.translation.t(`common.tileLinkTypes.${action.type ?? 'web'}`);
+    const value = action.value?.trim();
+    return value ? `${typeLabel}: ${value}` : typeLabel;
   }
 
   getActionIcon(action: TileQuickAction): string {

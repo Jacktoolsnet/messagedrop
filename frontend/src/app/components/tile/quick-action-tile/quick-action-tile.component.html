@@ -15,9 +15,10 @@
     @if (actions.length > 0) {
       <div class="action-grid">
         @for (action of actions; track action.id) {
-          <button type="button" class="action-button" (click)="triggerAction(action, $event)" [attr.aria-label]="getActionLabel(action)">
+          <button type="button" class="action-button" (click)="triggerAction(action, $event)"
+            [attr.aria-label]="getActionButtonAria(action)" [attr.title]="getActionValue(action)">
             <mat-icon class="action-icon">{{ getActionIcon(action) }}</mat-icon>
-            <span class="action-label">{{ getActionLabel(action) }}</span>
+            <span class="action-label">{{ getActionValue(action) }}</span>
           </button>
         }
       </div>

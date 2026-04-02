@@ -6,9 +6,9 @@
 <mat-dialog-content class="edit-content">
   <div class="actions-header">
     <div class="actions-title">{{ 'common.tiles.quickActions.title' | transloco }}</div>
-    <button mat-stroked-button color="primary" type="button" cdkFocusInitial (click)="addAction()">
+    <button mat-icon-button color="primary" type="button" cdkFocusInitial (click)="addAction()"
+      [attr.aria-label]="'common.tiles.quickActions.addAction' | transloco">
       <mat-icon>add</mat-icon>
-      {{ 'common.tiles.quickActions.addAction' | transloco }}
     </button>
   </div>
 
@@ -27,7 +27,7 @@
               <div class="action-meta">{{ getActionMeta(action) }}</div>
             </div>
           </div>
-          <div class="action-buttons">
+          <div class="action-buttons action-buttons--desktop">
             <button mat-icon-button color="primary" type="button" (click)="editAction(action)"
               [attr.aria-label]="'common.tiles.quickActions.editAria' | transloco">
               <mat-icon>edit</mat-icon>
@@ -36,6 +36,22 @@
               [attr.aria-label]="'common.tiles.quickActions.deleteAria' | transloco">
               <mat-icon>delete</mat-icon>
             </button>
+          </div>
+          <div class="action-buttons action-buttons--mobile">
+            <button mat-icon-button type="button" [matMenuTriggerFor]="actionMenu"
+              [attr.aria-label]="getActionMenuAria(action)">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #actionMenu="matMenu" panelClass="accent-menu">
+              <button mat-menu-item type="button" (click)="editAction(action)">
+                <mat-icon>edit</mat-icon>
+                <span>{{ 'common.tiles.quickActions.editAria' | transloco }}</span>
+              </button>
+              <button mat-menu-item type="button" (click)="deleteAction(action)">
+                <mat-icon>delete</mat-icon>
+                <span>{{ 'common.tiles.quickActions.deleteAria' | transloco }}</span>
+              </button>
+            </mat-menu>
           </div>
         </div>
       }

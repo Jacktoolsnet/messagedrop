@@ -57,6 +57,7 @@
   border-radius: 0.75rem;
   background: var(--mat-card-filled-container-color);
   box-shadow: 0 2px 8px var(--mat-card-outlined-outline-color);
+  min-width: 0;
 }
 
 .drag-handle {
@@ -66,6 +67,7 @@
   border: none;
   background: transparent;
   cursor: grab;
+  flex: 0 0 auto;
 }
 
 .action-info {
@@ -80,32 +82,71 @@
   font-size: 1.2rem;
   width: 1.2rem;
   height: 1.2rem;
+  flex: 0 0 1.2rem;
+  overflow: visible;
 }
 
 .action-text {
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
   min-width: 0;
+  overflow: hidden;
 }
 
 .action-label {
   font-weight: 600;
-  word-break: break-word;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .action-meta {
   font-size: 0.85rem;
   opacity: 0.7;
-  word-break: break-word;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .action-buttons {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  flex: 0 0 auto;
+}
+
+.action-buttons--mobile {
+  display: none;
 }
 
 .text-muted {
   margin: 0;
   font-style: italic;
+}
+
+@media (max-width: 720px) {
+  .actions-header {
+    flex-wrap: wrap;
+  }
+
+  .action-row {
+    gap: 6px;
+    padding: 0.5rem;
+  }
+
+  .action-buttons--desktop {
+    display: none;
+  }
+
+  .action-buttons--mobile {
+    display: inline-flex;
+    margin-left: auto;
+  }
+}
+
+:host ::ng-deep .accent-menu .mat-mdc-menu-item,
+:host ::ng-deep .accent-menu .mat-mdc-menu-item .mdc-list-item__primary-text,
+:host ::ng-deep .accent-menu .mat-mdc-menu-item mat-icon {
+  color: var(--mat-select-focused-arrow-color);
 }

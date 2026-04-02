@@ -8,6 +8,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDial
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatMenuModule } from '@angular/material/menu';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { TileQuickAction, TileSetting } from '../../../../interfaces/tile-settings';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
@@ -36,6 +37,7 @@ interface QuickActionTileDialogData {
     MatDialogActions,
     MatFormFieldModule,
     MatInputModule,
+    MatMenuModule,
     MatButtonModule,
     MatIcon,
     A11yModule,
@@ -142,8 +144,7 @@ export class QuickActionTileEditComponent {
   }
 
   getActionLabel(action: TileQuickAction): string {
-    const fallback = this.translation.t('common.tiles.quickActions.actionFallback');
-    return action.label?.trim() || action.value || fallback;
+    return this.translation.t(`common.tileLinkTypes.${action.type ?? 'web'}`);
   }
 
   getActionIcon(action: TileQuickAction): string {
@@ -151,9 +152,13 @@ export class QuickActionTileEditComponent {
   }
 
   getActionMeta(action: TileQuickAction): string {
-    const typeLabel = this.translation.t(`common.tileLinkTypes.${action.type}`);
-    if (!action.value) return typeLabel;
-    return `${typeLabel} · ${action.value}`;
+    return action.value?.trim() || '';
+  }
+
+  getActionMenuAria(action: TileQuickAction): string {
+    return this.translation.t('common.tileSettings.actionsMenuAria', {
+      label: this.getActionLabel(action)
+    });
   }
 
   private openActionEditor(action: TileQuickAction, isNew: boolean): void {
