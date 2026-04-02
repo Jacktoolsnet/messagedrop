@@ -357,7 +357,7 @@ export class MessageService {
     this.syncOwnPublicMessage(user, nextMessage);
 
     if (decision === 'review') {
-      this.showModerationReviewMessage(this.i18n.t('common.message.moderationReview'));
+      this.showModerationReviewMessage(this.getModerationReviewMessage(response?.moderation));
     } else {
       this.showPublishedMessage(this.i18n.t(nextMessage.parentUuid ? 'common.comment.created' : 'common.message.created'));
     }
@@ -442,6 +442,17 @@ export class MessageService {
       return this.i18n.t('common.message.moderationRejectedAi');
     }
     return this.i18n.t('common.message.moderationRejected');
+  }
+
+  private getModerationReviewMessage(moderation?: MessageCreateResponse['moderation'] | null): string {
+    if (moderation?.reason === 'openai_unavailable') {
+      if (moderation.requestSent === false) {
+        return this.i18n.t('common.message.moderationReviewFallbackPending');
+      }
+      return this.i18n.t('common.message.moderationReviewFallback');
+    }
+
+    return this.i18n.t('common.message.moderationReview');
   }
 
   private showPublishedMessage(message: string): void {
@@ -1003,7 +1014,7 @@ export class MessageService {
             ...moderationPatch
           });
           if (decision === 'review') {
-            this.showModerationReviewMessage(this.i18n.t('common.message.moderationReview'));
+            this.showModerationReviewMessage(this.getModerationReviewMessage(res?.moderation));
           } else if (wasDisabled) {
             this.showPublishedMessage(this.i18n.t('common.message.republished'));
           }

@@ -320,6 +320,8 @@
       "moderationRejectedPattern": "Le message ne sera pas publié car il pourrait contenir des données privées.",
       "moderationRejectedAi": "Le contenu ne sera pas publié car il enfreint les conditions d'utilisation.",
       "moderationReview": "Le contenu est publié, mais marqué pour un examen manuel.",
+      "moderationReviewFallback": "Publié. La modération automatique était temporairement indisponible, le message a donc aussi été transmis à un examen manuel.",
+      "moderationReviewFallbackPending": "Publié. La modération automatique était temporairement indisponible. L’examen manuel n’a pas pu être mis en file d’attente pour le moment.",
       "moderationFailed": "La modération a échoué. Veuillez réessayer plus tard.",
       "creating": "Création du message",
       "created": "Message publié avec succès.",

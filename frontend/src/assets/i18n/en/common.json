@@ -320,6 +320,8 @@
       "moderationRejectedPattern": "The message will not be published because it may contain private data.",
       "moderationRejectedAi": "The content will not be published because it violates the terms of use.",
       "moderationReview": "Content is published but requires manual review.",
+      "moderationReviewFallback": "Published. Automated moderation was temporarily unavailable, so the message was additionally queued for manual review.",
+      "moderationReviewFallbackPending": "Published. Automated moderation was temporarily unavailable. Manual review could not be queued right now.",
       "moderationFailed": "Moderation failed. Please try again later.",
       "creating": "Creating message",
       "created": "Message successfully dropped.",

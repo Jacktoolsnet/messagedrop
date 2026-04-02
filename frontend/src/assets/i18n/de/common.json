@@ -320,6 +320,8 @@
       "moderationRejectedPattern": "Der Inhalt wird nicht veröffentlicht, weil öffentliche Inhalte keine privaten Daten enthalten dürfen.",
       "moderationRejectedAi": "Der Inhalt wird nicht veröffentlicht, weil er gegen die Nutzungsbedingungen verstößt.",
       "moderationReview": "Inhalt wird veröffentlicht, aber für eine manuelle Prüfung markiert.",
+      "moderationReviewFallback": "Veröffentlicht. Die automatische Moderation war vorübergehend nicht verfügbar, daher wurde die Nachricht zusätzlich zur manuellen Prüfung vorgemerkt.",
+      "moderationReviewFallbackPending": "Veröffentlicht. Die automatische Moderation war vorübergehend nicht verfügbar. Die manuelle Prüfung konnte gerade nicht vorgemerkt werden.",
       "moderationFailed": "Moderation fehlgeschlagen. Bitte später erneut versuchen.",
       "creating": "Nachricht wird erstellt",
       "created": "Nachricht erfolgreich gesendet.",

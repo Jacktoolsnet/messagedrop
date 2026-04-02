@@ -1,6 +1,6 @@
 export interface MessageModerationResult {
     decision?: 'approved' | 'review' | 'rejected' | null;
-    reason?: 'pattern' | 'ai' | null;
+    reason?: 'pattern' | 'ai' | 'openai_unavailable' | null;
     score?: number | null;
     flagged?: boolean | null;
     patternMatch?: boolean | null;
