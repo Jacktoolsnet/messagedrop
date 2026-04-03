@@ -71,7 +71,7 @@ export class StickerService {
     );
   }
 
-  getRenderUrl(stickerId: string, variant: 'preview' | 'chat' = 'chat'): string {
+  getRenderUrl(stickerId: string, variant: 'preview' | 'chat' = 'preview'): string {
     return `${this.baseUrl}/render/${encodeURIComponent(stickerId)}?variant=${encodeURIComponent(variant)}`;
   }
 
@@ -95,7 +95,7 @@ export class StickerService {
   }
 
   createStickerMultimedia(sticker: Sticker): Multimedia {
-    const renderUrl = this.getRenderUrl(sticker.id, 'chat');
+    const renderUrl = this.getRenderUrl(sticker.id, 'preview');
     return {
       type: MultimediaType.STICKER,
       url: renderUrl,

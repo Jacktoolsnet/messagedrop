@@ -102,7 +102,8 @@ export class ShowmultimediaComponent implements OnChanges {
       return '';
     }
     if (this.multimedia.type === MultimediaType.STICKER && this.multimedia.contentId) {
-      return `${environment.apiUrl}/stickers/render/${encodeURIComponent(this.multimedia.contentId)}?variant=chat`;
+      return this.multimedia.url
+        || `${environment.apiUrl}/stickers/render/${encodeURIComponent(this.multimedia.contentId)}?variant=preview`;
     }
     return this.multimedia.url || '';
   }

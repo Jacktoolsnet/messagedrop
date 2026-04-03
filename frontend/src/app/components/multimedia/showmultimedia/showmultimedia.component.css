@@ -14,8 +14,12 @@
 }
 
 .multimedia_image--sticker {
+    width: min(100%, 15rem);
+    height: min(100%, 15rem);
     max-width: min(100%, 15rem);
     max-height: 15rem;
+    object-fit: contain;
+    background-color: transparent;
 }
 
 .oembed_container {

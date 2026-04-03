@@ -889,7 +889,7 @@ router.get('/packs/:id/license', requireIssuer(READER_ISSUERS), async (req, res,
       throw buildError(404, 'pack_license_not_found');
     }
 
-    res.setHeader('Cache-Control', 'private, no-store, max-age=0');
+    res.setHeader('Cache-Control', 'private, max-age=300, stale-while-revalidate=60');
     res.setHeader('Content-Type', pack.licenseFileMimeType || 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${pack.licenseFileName || path.basename(relativePath)}"`);
     res.setHeader('X-Content-Type-Options', 'nosniff');
