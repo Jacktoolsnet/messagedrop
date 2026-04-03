@@ -96,6 +96,11 @@
     <mat-icon>close</mat-icon>
   </button>
 
+  <button mat-icon-button type="button" (click)="help.open('stickerPicker')"
+    [attr.aria-label]="'common.actions.help' | transloco">
+    <mat-icon>help</mat-icon>
+  </button>
+
   @if (selectedPack()) {
   <button mat-icon-button type="button" class="action-back" (click)="goBackToPacks()"
     [attr.aria-label]="'common.stickerPicker.backToPacks' | transloco">

@@ -24,7 +24,7 @@ export interface HelpDialogData {
 }
 
 const GENERIC_READ_ALOUD_ITEM: HelpItem = {
-  icon: 'record_voice_over',
+  icon: 'volume_up',
   titleKey: 'common.items.readAloud.title',
   descriptionKey: 'common.items.readAloud.desc'
 };

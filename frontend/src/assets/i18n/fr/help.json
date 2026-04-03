@@ -2419,6 +2419,40 @@
       }
     }
   },
+  "stickerPicker": {
+    "title": "Sélecteur de stickers",
+    "intro": "Cette boîte de dialogue permet de changer de catégorie de stickers, d’ouvrir des packs et d’appliquer le sticker sélectionné à votre note ou message.",
+    "items": {
+      "category": {
+        "title": "Choisir une catégorie",
+        "desc": "Utilisez les onglets en haut pour passer d’une catégorie de stickers à l’autre."
+      },
+      "pack": {
+        "title": "Ouvrir un pack",
+        "desc": "Touchez un aperçu de pack pour ouvrir les stickers de ce pack."
+      },
+      "sticker": {
+        "title": "Sélectionner un sticker",
+        "desc": "Touchez un sticker pour l’appliquer directement à la boîte de dialogue précédente."
+      },
+      "back": {
+        "title": "Retour",
+        "desc": "Utilisez cette action pour revenir de la vue des stickers à l’aperçu des packs."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Cette action ferme la boîte de dialogue sans sélectionner de sticker."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette action ouvre cette vue d’aide."
+      },
+      "license": {
+        "title": "Mention de licence",
+        "desc": "Ces stickers sont licenciés sous la licence Premium Flaticon pour JackTools.Net. Ils ne peuvent être utilisés qu’à l’intérieur de l’application et ne doivent pas être réutilisés en dehors de celle-ci."
+      }
+    }
+  },
   "hashtagSearch": {
     "title": "Recherche par hashtag",
     "intro": "Recherchez un hashtag et ouvrez les résultats correspondants provenant de sources publiques et locales.",

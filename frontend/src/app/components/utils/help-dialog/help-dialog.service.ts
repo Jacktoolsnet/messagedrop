@@ -1179,7 +1179,7 @@ const HELP_TOPICS = {
         descriptionKey: 'editNote.items.text.desc'
       },
       {
-        icon: 'record_voice_over',
+        icon: 'volume_up',
         titleKey: 'editNote.items.readAloud.title',
         descriptionKey: 'editNote.items.readAloud.desc'
       },
@@ -1260,7 +1260,7 @@ const HELP_TOPICS = {
         descriptionKey: 'legalDisclaimer.items.content.desc'
       },
       {
-        icon: 'record_voice_over',
+        icon: 'volume_up',
         titleKey: 'legalDisclaimer.items.readAloud.title',
         descriptionKey: 'legalDisclaimer.items.readAloud.desc'
       },
@@ -1357,7 +1357,7 @@ const HELP_TOPICS = {
         descriptionKey: 'legalNotice.items.content.desc'
       },
       {
-        icon: 'record_voice_over',
+        icon: 'volume_up',
         titleKey: 'legalNotice.items.readAloud.title',
         descriptionKey: 'legalNotice.items.readAloud.desc'
       },
@@ -1408,7 +1408,7 @@ const HELP_TOPICS = {
         descriptionKey: 'privacyPolicy.items.content.desc'
       },
       {
-        icon: 'record_voice_over',
+        icon: 'volume_up',
         titleKey: 'privacyPolicy.items.readAloud.title',
         descriptionKey: 'privacyPolicy.items.readAloud.desc'
       },
@@ -1464,7 +1464,7 @@ const HELP_TOPICS = {
         descriptionKey: 'termsOfService.items.content.desc'
       },
       {
-        icon: 'record_voice_over',
+        icon: 'volume_up',
         titleKey: 'termsOfService.items.readAloud.title',
         descriptionKey: 'termsOfService.items.readAloud.desc'
       },
@@ -1692,7 +1692,7 @@ const HELP_TOPICS = {
         descriptionKey: 'noteList.items.edit.desc'
       },
       {
-        icon: 'record_voice_over',
+        icon: 'volume_up',
         titleKey: 'noteList.items.readAloud.title',
         descriptionKey: 'noteList.items.readAloud.desc'
       },
@@ -2837,7 +2837,7 @@ const HELP_TOPICS = {
         descriptionKey: 'experienceSearchDetail.items.map.desc'
       },
       {
-        icon: 'record_voice_over',
+        icon: 'volume_up',
         titleKey: 'experienceSearchDetail.items.readAloud.title',
         descriptionKey: 'experienceSearchDetail.items.readAloud.desc'
       },
@@ -3126,6 +3126,47 @@ const HELP_TOPICS = {
         icon: 'privacy_tip',
         titleKey: 'tenorSearch.items.privacy.title',
         descriptionKey: 'tenorSearch.items.privacy.desc'
+      }
+    ]
+  },
+  stickerPicker: {
+    titleKey: 'stickerPicker.title',
+    introKey: 'stickerPicker.intro',
+    items: [
+      {
+        icon: 'tab',
+        titleKey: 'stickerPicker.items.category.title',
+        descriptionKey: 'stickerPicker.items.category.desc'
+      },
+      {
+        icon: 'dashboard',
+        titleKey: 'stickerPicker.items.pack.title',
+        descriptionKey: 'stickerPicker.items.pack.desc'
+      },
+      {
+        icon: 'image',
+        titleKey: 'stickerPicker.items.sticker.title',
+        descriptionKey: 'stickerPicker.items.sticker.desc'
+      },
+      {
+        icon: 'arrow_back',
+        titleKey: 'stickerPicker.items.back.title',
+        descriptionKey: 'stickerPicker.items.back.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'stickerPicker.items.close.title',
+        descriptionKey: 'stickerPicker.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'stickerPicker.items.help.title',
+        descriptionKey: 'stickerPicker.items.help.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'stickerPicker.items.license.title',
+        descriptionKey: 'stickerPicker.items.license.desc'
       }
     ]
   },

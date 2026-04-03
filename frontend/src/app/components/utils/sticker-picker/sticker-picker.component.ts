@@ -11,6 +11,7 @@ import { StickerCategory } from '../../../interfaces/sticker-category.interface'
 import { StickerPack } from '../../../interfaces/sticker-pack.interface';
 import { Sticker } from '../../../interfaces/sticker.interface';
 import { StickerService } from '../../../services/sticker.service';
+import { HelpDialogService } from '../help-dialog/help-dialog.service';
 
 @Component({
   selector: 'app-sticker-picker',
@@ -31,6 +32,7 @@ import { StickerService } from '../../../services/sticker.service';
 export class StickerPickerComponent implements OnInit {
   readonly dialogRef = inject(MatDialogRef<StickerPickerComponent, Multimedia | null>);
   private readonly stickerService = inject(StickerService);
+  readonly help = inject(HelpDialogService);
 
   readonly categories = signal<StickerCategory[]>([]);
   readonly packs = signal<StickerPack[]>([]);

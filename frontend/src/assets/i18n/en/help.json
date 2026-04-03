@@ -2419,6 +2419,40 @@
       }
     }
   },
+  "stickerPicker": {
+    "title": "Sticker picker",
+    "intro": "This dialog lets you browse sticker categories, open sticker packs, and apply a selected sticker to your note or message.",
+    "items": {
+      "category": {
+        "title": "Choose category",
+        "desc": "Use the tabs at the top to switch between sticker categories."
+      },
+      "pack": {
+        "title": "Open pack",
+        "desc": "Tap a pack preview to open the stickers inside that pack."
+      },
+      "sticker": {
+        "title": "Select sticker",
+        "desc": "Tap a sticker to apply it directly to the previous dialog."
+      },
+      "back": {
+        "title": "Back",
+        "desc": "Use this action to return from the sticker view to the pack overview."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "This action closes the dialog without selecting a sticker."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "license": {
+        "title": "License notice",
+        "desc": "These stickers are licensed under the Flaticon Premium License for JackTools.Net. They may only be used inside the app and must not be reused outside of it."
+      }
+    }
+  },
   "hashtagSearch": {
     "title": "Hashtag search",
     "intro": "Search by one hashtag and open matching entries from public and local sources.",

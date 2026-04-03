@@ -412,7 +412,7 @@ const unsplashLimit = rateLimit({
 
 const stickerLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
-  limit: 1200,
+  limit: 10000,
   ...rateLimitDefaults,
   message: rateLimitMessage('Too many sticker requests, please try again later.')
 });

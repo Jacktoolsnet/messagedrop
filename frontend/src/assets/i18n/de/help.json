@@ -2419,6 +2419,40 @@
       }
     }
   },
+  "stickerPicker": {
+    "title": "Sticker-Auswahl",
+    "intro": "In diesem Dialog wechselst du zwischen Sticker-Kategorien, öffnest Packs und übernimmst einen ausgewählten Sticker in deine Notiz oder Nachricht.",
+    "items": {
+      "category": {
+        "title": "Kategorie wählen",
+        "desc": "Über die Tabs oben wechselst du zwischen den Sticker-Kategorien."
+      },
+      "pack": {
+        "title": "Pack öffnen",
+        "desc": "Tippe auf eine Pack-Vorschau, um die Sticker in diesem Pack zu öffnen."
+      },
+      "sticker": {
+        "title": "Sticker auswählen",
+        "desc": "Tippe auf einen Sticker, um ihn direkt in den vorherigen Dialog zu übernehmen."
+      },
+      "back": {
+        "title": "Zurück",
+        "desc": "Mit dieser Aktion wechselst du von der Sticker-Ansicht zurück zur Pack-Übersicht."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Mit dieser Aktion schließt du den Dialog ohne Auswahl."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Aktion öffnest du diese Hilfeansicht."
+      },
+      "license": {
+        "title": "Lizenzhinweis",
+        "desc": "Diese Sticker sind unter der Flaticon-Premium-Lizenz für JackTools.Net lizenziert. Sie dürfen nur innerhalb der App verwendet und nicht außerhalb weiterverwendet werden."
+      }
+    }
+  },
   "hashtagSearch": {
     "title": "Hashtag-Suche",
     "intro": "Suche mit einem Hashtag und öffne passende Treffer aus öffentlichen und lokalen Quellen.",
