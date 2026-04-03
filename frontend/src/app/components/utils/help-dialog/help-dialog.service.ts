@@ -2513,8 +2513,24 @@ const HELP_TOPICS = {
   },
   emoticonPicker: {
     titleKey: 'emoticonPicker.title',
-    introKey: 'common.intros.picker',
-    items: ITEMS.picker
+    introKey: 'emoticonPicker.intro',
+    items: [
+      {
+        icon: 'touch_app',
+        titleKey: 'emoticonPicker.items.selection.title',
+        descriptionKey: 'emoticonPicker.items.selection.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'emoticonPicker.items.close.title',
+        descriptionKey: 'emoticonPicker.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'emoticonPicker.items.help.title',
+        descriptionKey: 'emoticonPicker.items.help.desc'
+      }
+    ]
   },
   locationPicker: {
     titleKey: 'locationPicker.title',

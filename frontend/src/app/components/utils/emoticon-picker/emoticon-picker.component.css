@@ -63,3 +63,7 @@ mat-tab-group ::ng-deep .mat-mdc-tab-body-content {
 mat-tab-group ::ng-deep .mat-mdc-tab-body-content>* {
   width: 100%;
 }
+
+.action-close {
+  margin-inline-end: auto;
+}

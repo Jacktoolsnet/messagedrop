@@ -1961,7 +1961,22 @@
     "title": "Source de l'avatar"
   },
   "emoticonPicker": {
-    "title": "Emojis"
+    "title": "Emojis",
+    "intro": "Cette boîte de dialogue permet de choisir un emoji ou de refermer le sélecteur.",
+    "items": {
+      "selection": {
+        "title": "Sélectionner un emoji",
+        "desc": "Touchez un emoji pour l’appliquer directement."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Utilisez le X à gauche de la barre d’actions pour fermer la boîte de dialogue sans faire de sélection."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Cette action ouvre l’aide du sélecteur d’emojis."
+      }
+    }
   },
   "locationPicker": {
     "title": "Sélectionner un lieu",

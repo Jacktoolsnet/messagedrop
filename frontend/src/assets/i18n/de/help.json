@@ -1961,7 +1961,22 @@
     "title": "Avatar-Quelle"
   },
   "emoticonPicker": {
-    "title": "Emojis"
+    "title": "Emojis",
+    "intro": "In diesem Dialog wählst du ein Emoji aus oder schließt die Auswahl wieder.",
+    "items": {
+      "selection": {
+        "title": "Emoji auswählen",
+        "desc": "Tippe auf ein Emoji, um es direkt zu übernehmen."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Mit dem X links in der Aktionsleiste schließt du den Dialog ohne Auswahl."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Diese Aktion öffnet die Hilfe zum Emoji-Picker."
+      }
+    }
   },
   "locationPicker": {
     "title": "Ort auswählen",

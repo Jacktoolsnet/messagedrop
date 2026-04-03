@@ -1961,7 +1961,22 @@
     "title": "Avatar source"
   },
   "emoticonPicker": {
-    "title": "Emojis"
+    "title": "Emojis",
+    "intro": "Use this dialog to choose an emoji or close the picker again.",
+    "items": {
+      "selection": {
+        "title": "Select emoji",
+        "desc": "Tap an emoji to apply it directly."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "Use the X on the left side of the action bar to close the dialog without making a selection."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "This action opens the help for the emoji picker."
+      }
+    }
   },
   "locationPicker": {
     "title": "Location picker",

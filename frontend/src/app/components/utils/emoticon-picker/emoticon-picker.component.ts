@@ -73,6 +73,10 @@ export class EmoticonPickerComponent {
   readonly help = inject(HelpDialogService);
   readonly allowRemove = this.data.allowRemove !== false;
 
+  close(): void {
+    this.dialogRef.close();
+  }
+
   pick(reaction: string | null): void {
     this.dialogRef.close(reaction);
   }

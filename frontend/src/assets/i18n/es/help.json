@@ -1961,7 +1961,22 @@
     "title": "Origen del avatar"
   },
   "emoticonPicker": {
-    "title": "Emojis"
+    "title": "Emojis",
+    "intro": "En este diálogo puedes elegir un emoji o volver a cerrar el selector.",
+    "items": {
+      "selection": {
+        "title": "Seleccionar emoji",
+        "desc": "Toca un emoji para aplicarlo directamente."
+      },
+      "close": {
+        "title": "Cerrar",
+        "desc": "Usa la X en el lado izquierdo de la barra de acciones para cerrar el diálogo sin hacer una selección."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Esta acción abre la ayuda del selector de emojis."
+      }
+    }
   },
   "locationPicker": {
     "title": "Seleccionar ubicación",
