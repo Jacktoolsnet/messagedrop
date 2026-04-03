@@ -261,26 +261,18 @@ async function ensureDirectory(dirPath) {
   await fs.promises.mkdir(dirPath, { recursive: true });
 }
 
-async function writeStickerSvgFiles(packId, normalizedFileName, sanitizedSvg) {
-  const baseDir = path.join('packs', packId);
-  const originalRelativePath = path.posix.join('original', baseDir, normalizedFileName);
-  const previewRelativePath = path.posix.join('preview', baseDir, normalizedFileName);
-  const chatRelativePath = path.posix.join('chat', baseDir, normalizedFileName);
-  const targets = [originalRelativePath, previewRelativePath, chatRelativePath];
+async function writeStickerSvgFile(packId, normalizedFileName, sanitizedSvg) {
+  const relativePath = path.posix.join('packs', packId, normalizedFileName);
+  const absolutePath = resolveStorageFile(relativePath);
+  if (!absolutePath) {
+    throw buildError(500, 'storage_path_resolution_failed');
+  }
 
-  await Promise.all(targets.map(async (relativePath) => {
-    const absolutePath = resolveStorageFile(relativePath);
-    if (!absolutePath) {
-      throw buildError(500, 'storage_path_resolution_failed');
-    }
-    await ensureDirectory(path.dirname(absolutePath));
-    await fs.promises.writeFile(absolutePath, sanitizedSvg, 'utf8');
-  }));
+  await ensureDirectory(path.dirname(absolutePath));
+  await fs.promises.writeFile(absolutePath, sanitizedSvg, 'utf8');
 
   return {
-    originalPath: originalRelativePath,
-    previewPath: previewRelativePath,
-    chatPath: chatRelativePath
+    assetPath: relativePath
   };
 }
 
@@ -368,12 +360,8 @@ function toStickerDto(row) {
     name: row.name,
     slug: row.slug,
     keywords: safeParseJsonArray(row.keywords),
-    previewPath: row.previewPath || '',
-    previewMimeType: row.previewMimeType || '',
-    chatPath: row.chatPath || '',
-    chatMimeType: row.chatMimeType || '',
-    originalPath: row.originalPath || '',
-    originalMimeType: row.originalMimeType || '',
+    assetPath: row.assetPath || '',
+    mimeType: row.mimeType || '',
     width: row.width ?? null,
     height: row.height ?? null,
     searchVisible: Boolean(row.searchVisible),
@@ -441,21 +429,9 @@ function chooseVariantPath(sticker, variant) {
   if (!sticker) {
     return { relativePath: '', mimeType: '' };
   }
-  if (variant === 'original') {
-    return {
-      relativePath: sticker.originalPath || sticker.chatPath || sticker.previewPath || '',
-      mimeType: sticker.originalMimeType || sticker.chatMimeType || sticker.previewMimeType || ''
-    };
-  }
-  if (variant === 'preview') {
-    return {
-      relativePath: sticker.previewPath || sticker.chatPath || sticker.originalPath || '',
-      mimeType: sticker.previewMimeType || sticker.chatMimeType || sticker.originalMimeType || ''
-    };
-  }
   return {
-    relativePath: sticker.chatPath || sticker.previewPath || sticker.originalPath || '',
-    mimeType: sticker.chatMimeType || sticker.previewMimeType || sticker.originalMimeType || ''
+    relativePath: sticker.assetPath || '',
+    mimeType: sticker.mimeType || ''
   };
 }
 
@@ -581,12 +557,8 @@ async function createStickerPayload(db, body, { existing, forcedPackId } = {}) {
     name,
     slug: normalizeSlug(hasOwn(body, 'slug') ? body?.slug : existing?.slug, name),
     keywords: JSON.stringify(normalizeKeywords(hasOwn(body, 'keywords') ? body?.keywords : safeParseJsonArray(existing?.keywords))),
-    previewPath: normalizeRelativeAssetPath(hasOwn(body, 'previewPath') ? body?.previewPath : existing?.previewPath),
-    previewMimeType: normalizeMimeType(hasOwn(body, 'previewMimeType') ? body?.previewMimeType : existing?.previewMimeType),
-    chatPath: normalizeRelativeAssetPath(hasOwn(body, 'chatPath') ? body?.chatPath : existing?.chatPath),
-    chatMimeType: normalizeMimeType(hasOwn(body, 'chatMimeType') ? body?.chatMimeType : existing?.chatMimeType),
-    originalPath: normalizeRelativeAssetPath(hasOwn(body, 'originalPath') ? body?.originalPath : existing?.originalPath),
-    originalMimeType: normalizeMimeType(hasOwn(body, 'originalMimeType') ? body?.originalMimeType : existing?.originalMimeType),
+    assetPath: normalizeRelativeAssetPath(hasOwn(body, 'assetPath') ? body?.assetPath : existing?.assetPath),
+    mimeType: normalizeMimeType(hasOwn(body, 'mimeType') ? body?.mimeType : existing?.mimeType),
     width: normalizeOptionalInteger(hasOwn(body, 'width') ? body?.width : existing?.width),
     height: normalizeOptionalInteger(hasOwn(body, 'height') ? body?.height : existing?.height),
     searchVisible: parseBoolean(hasOwn(body, 'searchVisible') ? body?.searchVisible : existing?.searchVisible, existing ? Boolean(existing.searchVisible) : true),
@@ -940,7 +912,7 @@ router.post('/admin/packs/:packId/import-svg', requireIssuer(ADMIN_ISSUERS), asy
       }
 
       const sanitizedSvg = sanitizeSvgMarkup(decodeBase64Utf8(input.contentBase64));
-      const storedPaths = await writeStickerSvgFiles(pack.id, fileName, sanitizedSvg);
+      const storedPaths = await writeStickerSvgFile(pack.id, fileName, sanitizedSvg);
       const existing = await toPromise(tableSticker.getByPackAndSlug, db, pack.id, slug);
 
       const payload = await createStickerPayload(db, {
@@ -948,12 +920,8 @@ router.post('/admin/packs/:packId/import-svg', requireIssuer(ADMIN_ISSUERS), asy
         name: displayName,
         slug,
         keywords: Array.isArray(input.keywords) ? input.keywords : slugSource.split(/\s+/).filter(Boolean),
-        previewPath: storedPaths.previewPath,
-        previewMimeType: 'image/svg+xml',
-        chatPath: storedPaths.chatPath,
-        chatMimeType: 'image/svg+xml',
-        originalPath: storedPaths.originalPath,
-        originalMimeType: 'image/svg+xml',
+        assetPath: storedPaths.assetPath,
+        mimeType: 'image/svg+xml',
         width: input.width,
         height: input.height,
         searchVisible: input.searchVisible ?? true,

@@ -9,12 +9,8 @@ export interface Sticker {
   name: string;
   slug: string;
   keywords: string[];
-  previewPath: string;
-  previewMimeType: string;
-  chatPath: string;
-  chatMimeType: string;
-  originalPath: string;
-  originalMimeType: string;
+  assetPath: string;
+  mimeType: string;
   width: number | null;
   height: number | null;
   searchVisible: boolean;

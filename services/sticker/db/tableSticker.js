@@ -15,12 +15,8 @@ const columns = {
   name: 'name',
   slug: 'slug',
   keywords: 'keywords',
-  previewPath: 'previewPath',
-  previewMimeType: 'previewMimeType',
-  chatPath: 'chatPath',
-  chatMimeType: 'chatMimeType',
-  originalPath: 'originalPath',
-  originalMimeType: 'originalMimeType',
+  assetPath: 'assetPath',
+  mimeType: 'mimeType',
   width: 'width',
   height: 'height',
   searchVisible: 'searchVisible',
@@ -39,12 +35,8 @@ function init(db) {
       ${columns.name} TEXT NOT NULL,
       ${columns.slug} TEXT NOT NULL,
       ${columns.keywords} TEXT NOT NULL DEFAULT '[]',
-      ${columns.previewPath} TEXT NOT NULL DEFAULT '',
-      ${columns.previewMimeType} TEXT NOT NULL DEFAULT '',
-      ${columns.chatPath} TEXT NOT NULL DEFAULT '',
-      ${columns.chatMimeType} TEXT NOT NULL DEFAULT '',
-      ${columns.originalPath} TEXT NOT NULL DEFAULT '',
-      ${columns.originalMimeType} TEXT NOT NULL DEFAULT '',
+      ${columns.assetPath} TEXT NOT NULL DEFAULT '',
+      ${columns.mimeType} TEXT NOT NULL DEFAULT '',
       ${columns.width} INTEGER DEFAULT NULL,
       ${columns.height} INTEGER DEFAULT NULL,
       ${columns.searchVisible} INTEGER NOT NULL DEFAULT 1,
@@ -71,6 +63,22 @@ function init(db) {
       throw err;
     }
   });
+
+  db.exec(`
+    ALTER TABLE ${tableName} ADD COLUMN ${columns.assetPath} TEXT NOT NULL DEFAULT '';
+  `, (err) => {
+    if (err && !String(err.message || err).includes('duplicate column name')) {
+      throw err;
+    }
+  });
+
+  db.exec(`
+    ALTER TABLE ${tableName} ADD COLUMN ${columns.mimeType} TEXT NOT NULL DEFAULT '';
+  `, (err) => {
+    if (err && !String(err.message || err).includes('duplicate column name')) {
+      throw err;
+    }
+  });
 }
 
 function create(db, payload, callback) {
@@ -83,12 +91,8 @@ function create(db, payload, callback) {
       ${columns.name},
       ${columns.slug},
       ${columns.keywords},
-      ${columns.previewPath},
-      ${columns.previewMimeType},
-      ${columns.chatPath},
-      ${columns.chatMimeType},
-      ${columns.originalPath},
-      ${columns.originalMimeType},
+      ${columns.assetPath},
+      ${columns.mimeType},
       ${columns.width},
       ${columns.height},
       ${columns.searchVisible},
@@ -97,7 +101,7 @@ function create(db, payload, callback) {
       ${columns.createdAt},
       ${columns.updatedAt},
       ${columns.deletedAt}
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   db.run(sql, [
@@ -106,12 +110,8 @@ function create(db, payload, callback) {
     payload?.name ?? '',
     payload?.slug ?? '',
     payload?.keywords ?? '[]',
-    payload?.previewPath ?? '',
-    payload?.previewMimeType ?? '',
-    payload?.chatPath ?? '',
-    payload?.chatMimeType ?? '',
-    payload?.originalPath ?? '',
-    payload?.originalMimeType ?? '',
+    payload?.assetPath ?? '',
+    payload?.mimeType ?? '',
     payload?.width ?? null,
     payload?.height ?? null,
     payload?.searchVisible ? 1 : 0,
@@ -259,12 +259,8 @@ function update(db, id, fields, callback) {
     columns.name,
     columns.slug,
     columns.keywords,
-    columns.previewPath,
-    columns.previewMimeType,
-    columns.chatPath,
-    columns.chatMimeType,
-    columns.originalPath,
-    columns.originalMimeType,
+    columns.assetPath,
+    columns.mimeType,
     columns.width,
     columns.height,
     columns.searchVisible,
