@@ -154,6 +154,10 @@ function relayBinaryResponse(req, res, response, fallbackErrorCode) {
 
 router.use(metric.count('sticker.proxy', { when: 'always', timezone: 'utc', amount: 1 }));
 router.use(express.json({ limit: '256kb' }));
+router.use('/render', (_req, res, next) => {
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  next();
+});
 
 router.get('/bootstrap', security.authenticate, async (req, res, next) => {
   try {

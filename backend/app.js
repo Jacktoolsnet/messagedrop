@@ -327,6 +327,10 @@ function shouldSkipServiceRateLimit(req) {
 }
 
 function shouldSkipAuthenticatedStickerRateLimit(req) {
+  if (typeof req?.path === 'string' && req.path.startsWith('/render/')) {
+    return true;
+  }
+
   const authHeader = req.headers?.authorization;
   if (typeof authHeader !== 'string' || !authHeader.trim()) {
     return false;
@@ -485,6 +489,13 @@ const connectLimit = rateLimit({
   message: rateLimitMessage('Too many connection requests, please try again later.')
 });
 
+const clientConnectLimit = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  limit: 10000,
+  ...rateLimitDefaults,
+  message: rateLimitMessage('Too many client connect requests, please try again later.')
+});
+
 const utilsLimit = rateLimit({
   windowMs: 5 * 60 * 1000,
   limit: 300,
@@ -510,7 +521,7 @@ const frontendErrorLogLimit = rateLimit({
 app.use('/', basicLimit, root);
 app.use('/airquality', airQualtiyLimit, airQualtiy);
 app.use('/check', basicLimit, check);
-app.use('/clientconnect', connectLimit, clientConnect);
+app.use('/clientconnect', clientConnectLimit, clientConnect);
 app.use('/connect', connectLimit, connect);
 app.use('/contact', contactLimit, contact);
 app.use('/contactMessage', contactMessageLimit, contactMessage);

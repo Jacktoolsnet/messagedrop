@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
-import { Observable, catchError, take, throwError } from 'rxjs';
+import { Observable, catchError, shareReplay, take, tap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { GetClientConnect } from '../interfaces/get-client-connect';
 import { NetworkService } from './network.service';
@@ -19,6 +19,7 @@ export class ServerService {
   private failed = false;
   private cryptoPublicKey: JsonWebKey | undefined;
   private signingPublicKey: JsonWebKey | undefined;
+  private connectRequest?: Observable<GetClientConnect>;
 
   httpOptions = {
     headers: new HttpHeaders({
@@ -38,6 +39,10 @@ export class ServerService {
   }
 
   init() {
+    if (this.ready) {
+      return;
+    }
+
     this.transloco.selectTranslation().pipe(take(1)).subscribe({
       next: () => {
         this.connect().subscribe({
@@ -79,6 +84,10 @@ export class ServerService {
   }
 
   connect(): Observable<GetClientConnect> {
+    if (this.connectRequest) {
+      return this.connectRequest;
+    }
+
     const url = `${environment.apiUrl}/clientconnect`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: false,
@@ -91,10 +100,17 @@ export class ServerService {
       showSpinner: true,
       autoclose: false
     });
-    return this.http.get<GetClientConnect>(url, this.httpOptions)
+    this.connectRequest = this.http.get<GetClientConnect>(url, this.httpOptions)
       .pipe(
+        tap({
+          error: () => {
+            this.connectRequest = undefined;
+          }
+        }),
+        shareReplay(1),
         catchError(this.handleError)
       );
+    return this.connectRequest;
   }
 
   isReady(): boolean {
