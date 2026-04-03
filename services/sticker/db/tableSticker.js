@@ -278,6 +278,10 @@ function update(db, id, fields, callback) {
       continue;
     }
     updates.push(`${key} = ?`);
+    if (key === columns.searchVisible) {
+      params.push(fields[key] ? 1 : 0);
+      continue;
+    }
     params.push(fields[key]);
   }
 

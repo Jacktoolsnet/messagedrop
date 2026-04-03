@@ -1,45 +1,36 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatSelectModule } from '@angular/material/select';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { finalize, forkJoin } from 'rxjs';
 import { StickerCategory } from '../../../interfaces/sticker-category.interface';
 import { StickerPack } from '../../../interfaces/sticker-pack.interface';
-import { StickerSourceMetadata } from '../../../interfaces/sticker-source-metadata.interface';
-import { StickerCategoryNameDialogComponent } from './sticker-category-name-dialog/sticker-category-name-dialog.component';
 import { StickerAdminService } from '../../../services/content/sticker-admin.service';
 import { DisplayMessageService } from '../../../services/display-message.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
+import { StickerCategoryNameDialogComponent } from './sticker-category-name-dialog/sticker-category-name-dialog.component';
+import { StickerPackDialogComponent, StickerPackDialogResult } from './sticker-pack-dialog/sticker-pack-dialog.component';
 
 @Component({
   selector: 'app-sticker-manager',
   imports: [
     CommonModule,
     RouterLink,
-    ReactiveFormsModule,
+    DragDropModule,
     MatToolbarModule,
     MatIconModule,
     MatButtonModule,
-    DragDropModule,
     MatCardModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
     MatMenuModule,
-    MatSelectModule,
     MatProgressBarModule,
     MatTooltipModule
   ],
@@ -49,9 +40,7 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
 })
 export class StickerManagerComponent {
   private readonly destroyRef = inject(DestroyRef);
-  private readonly fb = inject(FormBuilder);
   private readonly dialog = inject(MatDialog);
-  private readonly router = inject(Router);
   private readonly snackBar = inject(DisplayMessageService);
   private readonly stickerService = inject(StickerAdminService);
 
@@ -64,25 +53,16 @@ export class StickerManagerComponent {
   readonly loadingStickers = this.stickerService.loadingStickers;
 
   readonly categoryRows = signal<StickerCategory[]>([]);
+  readonly packRows = signal<StickerPack[]>([]);
   readonly selectedCategoryId = signal<string | null>(null);
   readonly selectedPackId = signal<string | null>(null);
-  readonly isCreatingPack = signal(false);
   readonly savingCategory = signal(false);
   readonly savingPack = signal(false);
-  readonly loadingMetadata = signal(false);
   readonly importingSvg = signal(false);
   readonly selectedSvgFiles = signal<File[]>([]);
-  readonly resolvedMetadata = signal<StickerSourceMetadata | null>(null);
   readonly categoryStatuses = ['active', 'hidden', 'blocked', 'deleted'] as const;
-
-  readonly packForm = this.fb.nonNullable.group({
-    name: this.fb.nonNullable.control('', { validators: [Validators.required] }),
-    status: this.fb.nonNullable.control('active', { validators: [Validators.required] }),
-    searchVisible: this.fb.nonNullable.control(true),
-    sortOrder: this.fb.nonNullable.control(0),
-    sourceReference: this.fb.nonNullable.control(''),
-    licenseNote: this.fb.nonNullable.control('')
-  });
+  readonly packStatuses = ['active', 'hidden', 'blocked', 'deleted'] as const;
+  readonly packVisibilityOptions = [true, false] as const;
 
   readonly selectedCategory = computed(() => {
     const id = this.selectedCategoryId();
@@ -91,7 +71,7 @@ export class StickerManagerComponent {
 
   readonly selectedPack = computed(() => {
     const id = this.selectedPackId();
-    return this.packs().find((row) => row.id === id) ?? null;
+    return this.packRows().find((row) => row.id === id) ?? null;
   });
 
   readonly pageBusy = computed(() => (
@@ -100,17 +80,12 @@ export class StickerManagerComponent {
     || this.loadingStickers()
     || this.savingCategory()
     || this.savingPack()
-    || this.loadingMetadata()
     || this.importingSvg()
   ));
 
-  readonly metadataTags = computed(() => (this.resolvedMetadata()?.tags ?? []).join(', '));
-  readonly metadataFormats = computed(() => (this.resolvedMetadata()?.downloadFormats ?? []).join(', ').toUpperCase());
-
   constructor() {
     effect(() => {
-      const rows = this.sortCategories(this.categories());
-      this.categoryRows.set(rows);
+      this.categoryRows.set(this.sortCategories(this.categories()));
     }, { allowSignalWrites: true });
 
     effect(() => {
@@ -120,7 +95,10 @@ export class StickerManagerComponent {
       }
       if (rows.length === 0) {
         this.selectedCategoryId.set(null);
-        this.startNewPack(false);
+        this.selectedPackId.set(null);
+        this.selectedSvgFiles.set([]);
+        this.stickerService.loadPacks('');
+        this.stickerService.loadStickers('');
         return;
       }
       const selectedId = this.selectedCategoryId();
@@ -131,20 +109,24 @@ export class StickerManagerComponent {
     }, { allowSignalWrites: true });
 
     effect(() => {
-      const rows = this.packs();
+      this.packRows.set(this.sortPacks(this.packs()));
+    }, { allowSignalWrites: true });
+
+    effect(() => {
+      const rows = this.packRows();
       if (this.loadingPacks()) {
         return;
       }
       if (!this.selectedCategoryId()) {
+        this.selectedPackId.set(null);
+        this.selectedSvgFiles.set([]);
+        this.stickerService.loadStickers('');
         return;
       }
       if (rows.length === 0) {
-        if (!this.isCreatingPack()) {
-          this.startNewPack(false);
-        }
-        return;
-      }
-      if (this.isCreatingPack()) {
+        this.selectedPackId.set(null);
+        this.selectedSvgFiles.set([]);
+        this.stickerService.loadStickers('');
         return;
       }
       const selectedId = this.selectedPackId();
@@ -161,10 +143,6 @@ export class StickerManagerComponent {
     return row.id;
   }
 
-  goBack(): void {
-    void this.router.navigate(['/dashboard/content']);
-  }
-
   refresh(): void {
     this.stickerService.loadCategories();
     if (this.selectedCategoryId()) {
@@ -177,10 +155,14 @@ export class StickerManagerComponent {
 
   selectCategory(row: StickerCategory): void {
     this.selectedCategoryId.set(row.id);
-    this.stickerService.loadPacks(row.id);
     this.selectedPackId.set(null);
-    this.resolvedMetadata.set(null);
     this.selectedSvgFiles.set([]);
+    this.stickerService.loadPacks(row.id);
+    this.stickerService.loadStickers('');
+  }
+
+  setSelectedCategory(row: StickerCategory): void {
+    this.selectCategory(row);
   }
 
   openCreateCategoryDialog(): void {
@@ -191,35 +173,31 @@ export class StickerManagerComponent {
     this.dialog.open(StickerCategoryNameDialogComponent, {
       width: '420px',
       autoFocus: false,
-      data: {
-        title: 'Create category'
-      }
+      data: { title: 'Create category' }
     }).afterClosed().pipe(
       takeUntilDestroyed(this.destroyRef)
-    ).subscribe({
-      next: (name) => {
-        if (!name) {
-          return;
-        }
-        this.savingCategory.set(true);
-        this.stickerService.createCategory({
-          name,
-          status: 'active',
-          sortOrder: this.getNextCategorySortOrder()
-        }).pipe(
-          finalize(() => this.savingCategory.set(false)),
-          takeUntilDestroyed(this.destroyRef)
-        ).subscribe({
-          next: (row) => {
-            this.upsertCategoryRow(row);
-            this.selectCategory(row);
-            this.stickerService.loadCategories();
-            this.showMessage('Sticker category created.');
-          },
-          error: () => undefined
-        });
-      },
-      error: () => undefined
+    ).subscribe((name) => {
+      if (!name) {
+        return;
+      }
+
+      this.savingCategory.set(true);
+      this.stickerService.createCategory({
+        name,
+        status: 'active',
+        sortOrder: this.getNextCategorySortOrder()
+      }).pipe(
+        finalize(() => this.savingCategory.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      ).subscribe({
+        next: (row) => {
+          this.upsertCategoryRow(row);
+          this.selectCategory(row);
+          this.stickerService.loadCategories();
+          this.showMessage('Sticker category created.');
+        },
+        error: () => undefined
+      });
     });
   }
 
@@ -237,34 +215,28 @@ export class StickerManagerComponent {
       }
     }).afterClosed().pipe(
       takeUntilDestroyed(this.destroyRef)
-    ).subscribe({
-      next: (name) => {
-        if (!name || name === row.name) {
-          return;
-        }
-        this.savingCategory.set(true);
-        this.stickerService.updateCategory(row.id, {
-          name,
-          status: row.status,
-          sortOrder: row.sortOrder
-        }).pipe(
-          finalize(() => this.savingCategory.set(false)),
-          takeUntilDestroyed(this.destroyRef)
-        ).subscribe({
-          next: (updatedRow) => {
-            this.upsertCategoryRow(updatedRow);
-            this.stickerService.loadCategories();
-            this.showMessage('Sticker category saved.');
-          },
-          error: () => undefined
-        });
-      },
-      error: () => undefined
-    });
-  }
+    ).subscribe((name) => {
+      if (!name || name === row.name) {
+        return;
+      }
 
-  setSelectedCategory(row: StickerCategory): void {
-    this.selectCategory(row);
+      this.savingCategory.set(true);
+      this.stickerService.updateCategory(row.id, {
+        name,
+        status: row.status,
+        sortOrder: row.sortOrder
+      }).pipe(
+        finalize(() => this.savingCategory.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      ).subscribe({
+        next: (updatedRow) => {
+          this.upsertCategoryRow(updatedRow);
+          this.stickerService.loadCategories();
+          this.showMessage('Sticker category saved.');
+        },
+        error: () => undefined
+      });
+    });
   }
 
   updateCategoryStatus(row: StickerCategory, status: StickerCategory['status']): void {
@@ -333,147 +305,123 @@ export class StickerManagerComponent {
     });
   }
 
-  startNewPack(markCreating = true): void {
-    this.isCreatingPack.set(markCreating);
-    this.selectedPackId.set(null);
-    this.packForm.reset({
-      name: '',
-      status: 'active',
-      searchVisible: true,
-      sortOrder: 0,
-      sourceReference: '',
-      licenseNote: ''
-    });
-    this.resolvedMetadata.set(null);
-    this.selectedSvgFiles.set([]);
-    this.stickerService.loadStickers('');
-    this.packForm.markAsPristine();
-    this.packForm.markAsUntouched();
-  }
-
-  resetPackForm(): void {
-    const pack = this.selectedPack();
-    if (pack && !this.isCreatingPack()) {
-      this.selectPack(pack);
-      return;
-    }
-    this.startNewPack(true);
-  }
-
   selectPack(row: StickerPack): void {
-    this.isCreatingPack.set(false);
     this.selectedPackId.set(row.id);
-    this.packForm.setValue({
-      name: row.name ?? '',
-      status: row.status ?? 'active',
-      searchVisible: Boolean(row.searchVisible),
-      sortOrder: Number(row.sortOrder ?? 0),
-      sourceReference: row.sourceReference ?? '',
-      licenseNote: row.licenseNote ?? ''
-    });
-    this.packForm.markAsPristine();
-    this.packForm.markAsUntouched();
-    this.resolvedMetadata.set(row.sourceMetadata ?? null);
     this.selectedSvgFiles.set([]);
     this.stickerService.loadStickers(row.id);
   }
 
-  savePack(): void {
-    if (this.savingPack()) {
-      return;
-    }
+  setSelectedPack(row: StickerPack): void {
+    this.selectPack(row);
+  }
+
+  openCreatePackDialog(): void {
     const category = this.selectedCategory();
     if (!category) {
       this.showMessage('Please create or select a sticker category first.', true);
       return;
     }
-    if (this.packForm.invalid) {
-      this.packForm.markAllAsTouched();
+    if (this.savingPack()) {
       return;
     }
 
-    const raw = this.packForm.getRawValue();
-    const payload = {
-      categoryId: category.id,
-      name: raw.name.trim(),
-      status: raw.status,
-      searchVisible: Boolean(raw.searchVisible),
-      sortOrder: Number(raw.sortOrder || 0),
-      sourceProvider: this.resolvedMetadata()?.provider || 'flaticon',
-      sourceReference: raw.sourceReference.trim(),
-      sourceMetadata: this.resolvedMetadata(),
-      licenseNote: raw.licenseNote.trim()
-    };
-
-    if (!payload.name) {
-      this.packForm.controls.name.markAsTouched();
-      return;
-    }
-
-    const isNew = this.isCreatingPack() || !this.selectedPackId();
-    const request$ = isNew
-      ? this.stickerService.createPack(payload)
-      : this.stickerService.updatePack(this.selectedPackId()!, payload);
-
-    this.savingPack.set(true);
-    request$.pipe(
-      finalize(() => this.savingPack.set(false)),
+    this.dialog.open(StickerPackDialogComponent, {
+      width: '480px',
+      autoFocus: false,
+      data: { title: 'Create pack' }
+    }).afterClosed().pipe(
       takeUntilDestroyed(this.destroyRef)
-    ).subscribe({
-      next: (row) => {
-        this.isCreatingPack.set(false);
-        this.selectedPackId.set(row.id);
-        this.stickerService.loadPacks(category.id);
-        this.stickerService.loadStickers(row.id);
-        this.showMessage(isNew ? 'Sticker pack created.' : 'Sticker pack saved.');
-      },
-      error: () => undefined
+    ).subscribe((result) => {
+      if (!result) {
+        return;
+      }
+      this.createPack(category, result);
     });
   }
 
-  deleteSelectedPack(): void {
+  openEditPackDialog(row: StickerPack): void {
+    if (this.savingPack()) {
+      return;
+    }
+
+    this.dialog.open(StickerPackDialogComponent, {
+      width: '480px',
+      autoFocus: false,
+      data: {
+        title: 'Edit pack',
+        initialName: row.name,
+        initialSourceReference: row.sourceReference,
+        initialLicenseNote: row.licenseNote,
+        initialSourceProvider: row.sourceProvider,
+        initialSourceMetadata: row.sourceMetadata
+      }
+    }).afterClosed().pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe((result) => {
+      if (!result) {
+        return;
+      }
+      this.savePackRow(row, result);
+    });
+  }
+
+  updatePackStatus(row: StickerPack, status: StickerPack['status']): void {
+    if (this.savingPack() || row.status === status) {
+      return;
+    }
+
+    this.persistPackUpdate(row, {
+      status
+    }, 'Pack status updated.');
+  }
+
+  updatePackVisibility(row: StickerPack, searchVisible: boolean): void {
+    if (this.savingPack() || row.searchVisible === searchVisible) {
+      return;
+    }
+
+    this.persistPackUpdate(row, {
+      searchVisible
+    }, 'Pack visibility updated.');
+  }
+
+  dropPack(event: CdkDragDrop<StickerPack[]>): void {
     const category = this.selectedCategory();
-    const pack = this.selectedPack();
-    if (!category || !pack || this.savingPack()) {
+    if (!category || this.savingPack() || event.previousIndex === event.currentIndex) {
+      return;
+    }
+
+    const previousRows = this.packRows();
+    const reorderedRows = [...previousRows];
+    moveItemInArray(reorderedRows, event.previousIndex, event.currentIndex);
+
+    const updatedRows = reorderedRows.map((row, index) => ({
+      ...row,
+      sortOrder: index
+    }));
+
+    this.packRows.set(updatedRows);
+
+    const changedRows = updatedRows.filter((row) => (
+      previousRows.find((previousRow) => previousRow.id === row.id)?.sortOrder !== row.sortOrder
+    ));
+
+    if (changedRows.length === 0) {
       return;
     }
 
     this.savingPack.set(true);
-    this.stickerService.deletePack(pack.id).pipe(
+    forkJoin(changedRows.map((row) => this.stickerService.updatePack(row.id, this.buildPackPayload(row)))).pipe(
       finalize(() => this.savingPack.set(false)),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: () => {
-        this.startNewPack(false);
         this.stickerService.loadPacks(category.id);
-        this.showMessage('Sticker pack deleted.');
+        this.showMessage('Pack order saved.');
       },
-      error: () => undefined
-    });
-  }
-
-  resolveMetadata(): void {
-    const sourceUrl = this.packForm.controls.sourceReference.value.trim();
-    if (!sourceUrl) {
-      this.showMessage('Please enter a Flaticon sticker pack URL first.', true);
-      return;
-    }
-
-    this.loadingMetadata.set(true);
-    this.stickerService.resolveFlaticonMetadata(sourceUrl).pipe(
-      finalize(() => this.loadingMetadata.set(false)),
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe({
-      next: (response) => {
-        this.resolvedMetadata.set(response.metadata);
-        this.packForm.patchValue({
-          name: response.suggested.name || this.packForm.controls.name.value,
-          sourceReference: response.suggested.sourceReference || sourceUrl,
-          licenseNote: response.suggested.licenseNote || this.packForm.controls.licenseNote.value
-        });
-        this.showMessage('Sticker metadata loaded.');
-      },
-      error: () => undefined
+      error: () => {
+        this.stickerService.loadPacks(category.id);
+      }
     });
   }
 
@@ -544,11 +492,103 @@ export class StickerManagerComponent {
     }
   }
 
-  private isSvgFile(file: File): boolean {
-    return file.type === 'image/svg+xml' || file.name.toLowerCase().endsWith('.svg');
+  visibilityLabel(searchVisible: boolean): string {
+    return this.i18n.t(searchVisible ? 'Visible in search' : 'Hidden in search');
+  }
+
+  private createPack(category: StickerCategory, result: StickerPackDialogResult): void {
+    this.savingPack.set(true);
+      this.stickerService.createPack({
+        categoryId: category.id,
+        name: result.name,
+        sourceProvider: result.sourceProvider || 'flaticon',
+        sourceReference: result.sourceReference,
+        sourceMetadata: result.sourceMetadata,
+        licenseNote: result.licenseNote,
+        status: 'active',
+        searchVisible: true,
+      sortOrder: this.getNextPackSortOrder()
+    }).pipe(
+      finalize(() => this.savingPack.set(false)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: (row) => {
+        this.upsertPackRow(row);
+        this.selectPack(row);
+        this.stickerService.loadPacks(category.id);
+        this.showMessage('Sticker pack created.');
+      },
+      error: () => undefined
+    });
+  }
+
+  private savePackRow(row: StickerPack, result: StickerPackDialogResult): void {
+    this.persistPackUpdate(row, {
+      name: result.name,
+      sourceProvider: result.sourceProvider,
+      sourceReference: result.sourceReference,
+      sourceMetadata: result.sourceMetadata,
+      licenseNote: result.licenseNote
+    }, 'Sticker pack saved.');
+  }
+
+  private persistPackUpdate(
+    row: StickerPack,
+    patch: Partial<StickerPack>,
+    successMessage: string,
+    reloadAfterSave = true
+  ): void {
+    const category = this.selectedCategory();
+    if (!category) {
+      return;
+    }
+
+    this.savingPack.set(true);
+    const updatedRow: StickerPack = {
+      ...row,
+      ...patch
+    };
+
+    this.stickerService.updatePack(row.id, this.buildPackPayload(updatedRow)).pipe(
+      finalize(() => this.savingPack.set(false)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: (savedRow) => {
+        this.upsertPackRow(savedRow);
+        if (savedRow.id === this.selectedPackId()) {
+          this.selectPack(savedRow);
+        }
+        if (reloadAfterSave) {
+          this.stickerService.loadPacks(category.id);
+        }
+        this.showMessage(successMessage);
+      },
+      error: () => undefined
+    });
+  }
+
+  private buildPackPayload(row: StickerPack): Partial<StickerPack> {
+    return {
+      categoryId: row.categoryId,
+      name: row.name,
+      status: row.status,
+      searchVisible: row.searchVisible,
+      sortOrder: row.sortOrder,
+      sourceProvider: row.sourceProvider || 'flaticon',
+      sourceReference: row.sourceReference,
+      sourceMetadata: row.sourceMetadata,
+      licenseNote: row.licenseNote
+    };
   }
 
   private sortCategories(rows: StickerCategory[]): StickerCategory[] {
+    return [...rows].sort((a, b) => (
+      Number(a.sortOrder ?? 0) - Number(b.sortOrder ?? 0)
+      || a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
+    ));
+  }
+
+  private sortPacks(rows: StickerPack[]): StickerPack[] {
     return [...rows].sort((a, b) => (
       Number(a.sortOrder ?? 0) - Number(b.sortOrder ?? 0)
       || a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
@@ -566,8 +606,27 @@ export class StickerManagerComponent {
     this.categoryRows.set(this.sortCategories(rows));
   }
 
+  private upsertPackRow(row: StickerPack): void {
+    const rows = [...this.packRows()];
+    const index = rows.findIndex((currentRow) => currentRow.id === row.id);
+    if (index >= 0) {
+      rows[index] = row;
+    } else {
+      rows.push(row);
+    }
+    this.packRows.set(this.sortPacks(rows));
+  }
+
   private getNextCategorySortOrder(): number {
     return this.categoryRows().reduce((maxValue, row) => Math.max(maxValue, Number(row.sortOrder ?? 0)), -1) + 1;
+  }
+
+  private getNextPackSortOrder(): number {
+    return this.packRows().reduce((maxValue, row) => Math.max(maxValue, Number(row.sortOrder ?? 0)), -1) + 1;
+  }
+
+  private isSvgFile(file: File): boolean {
+    return file.type === 'image/svg+xml' || file.name.toLowerCase().endsWith('.svg');
   }
 
   private showMessage(message: string, isError = false, params?: Record<string, unknown>): void {

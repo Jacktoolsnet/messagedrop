@@ -142,68 +142,98 @@
               <mat-icon>subdirectory_arrow_right</mat-icon>
               <span>{{ i18n.t('Please create or select a sticker category first.') }}</span>
             </div>
-          } @else if (packs().length === 0 && !loadingPacks()) {
+          } @else if (packRows().length === 0 && !loadingPacks()) {
             <div class="empty-state">
               <mat-icon>inventory_2</mat-icon>
               <span>{{ i18n.t('No sticker packs in this category yet.') }}</span>
             </div>
           } @else {
-            <div class="selection-list">
-              @for (row of packs(); track trackById($index, row)) {
-                <button
-                  type="button"
-                  class="selection-item"
-                  [class.active]="row.id === selectedPackId() && !isCreatingPack()"
-                  (click)="selectPack(row)">
-                  <div class="selection-copy">
-                    <strong>{{ row.name }}</strong>
-                    <span>{{ row.stickerCount }} {{ i18n.t('stickers') }}</span>
-                  </div>
-                  <span class="status-pill" [class]="'status-pill status-' + row.status">{{ statusLabel(row.status) }}</span>
-                </button>
+            <div
+              class="selection-list category-selection-list"
+              cdkDropList
+              [cdkDropListData]="packRows()"
+              (cdkDropListDropped)="dropPack($event)">
+              @for (row of packRows(); track trackById($index, row)) {
+                <div class="selection-item category-item" [class.active]="row.id === selectedPackId()" cdkDrag>
+                  <button
+                    mat-icon-button
+                    type="button"
+                    class="drag-handle-button"
+                    cdkDragHandle
+                    [matTooltip]="i18n.t('Move pack')"
+                    [attr.aria-label]="i18n.t('Move pack')">
+                    <mat-icon>drag_indicator</mat-icon>
+                  </button>
+
+                  <button
+                    type="button"
+                    class="selection-main"
+                    [attr.aria-label]="row.name"
+                    (click)="setSelectedPack(row)">
+                    <div class="selection-copy">
+                      <strong>{{ row.name }}</strong>
+                      <span>{{ row.stickerCount }} {{ i18n.t('stickers') }}</span>
+                    </div>
+                    <div class="selection-tags">
+                      <span class="status-pill" [class]="'status-pill status-' + row.status">{{ statusLabel(row.status) }}</span>
+                      <span class="status-pill status-search">{{ visibilityLabel(row.searchVisible) }}</span>
+                    </div>
+                  </button>
+
+                  @if (row.id === selectedPackId()) {
+                    <mat-icon class="selected-indicator" [matTooltip]="i18n.t('Selected')">check_circle</mat-icon>
+                  }
+
+                  <button
+                    mat-icon-button
+                    type="button"
+                    class="menu-button"
+                    [matMenuTriggerFor]="packMenu"
+                    [matTooltip]="i18n.t('Pack actions')"
+                    [attr.aria-label]="i18n.t('Pack actions')"
+                    (click)="$event.stopPropagation()">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+
+                  <mat-menu #packMenu="matMenu">
+                    <button mat-menu-item type="button" (click)="setSelectedPack(row)" [disabled]="row.id === selectedPackId()">
+                      <mat-icon>{{ row.id === selectedPackId() ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+                      <span>{{ i18n.t('Select pack') }}</span>
+                    </button>
+
+                    <button mat-menu-item type="button" (click)="openEditPackDialog(row)">
+                      <mat-icon>edit</mat-icon>
+                      <span>{{ i18n.t('Edit') }}</span>
+                    </button>
+
+                    <button mat-menu-item disabled>
+                      <mat-icon>tune</mat-icon>
+                      <span>{{ i18n.t('Status') }}</span>
+                    </button>
+
+                    @for (status of packStatuses; track status) {
+                      <button mat-menu-item type="button" (click)="updatePackStatus(row, status)">
+                        <mat-icon>{{ row.status === status ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
+                        <span>{{ statusLabel(status) }}</span>
+                      </button>
+                    }
+
+                    <button mat-menu-item disabled>
+                      <mat-icon>visibility</mat-icon>
+                      <span>{{ i18n.t('Search visibility') }}</span>
+                    </button>
+
+                    @for (searchVisible of packVisibilityOptions; track searchVisible) {
+                      <button mat-menu-item type="button" (click)="updatePackVisibility(row, searchVisible)">
+                        <mat-icon>{{ row.searchVisible === searchVisible ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
+                        <span>{{ visibilityLabel(searchVisible) }}</span>
+                      </button>
+                    }
+                  </mat-menu>
+                </div>
               }
             </div>
           }
-
-          <form [formGroup]="packForm" class="form-grid">
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>{{ i18n.t('Pack name') }}</mat-label>
-              <input matInput formControlName="name" [placeholder]="i18n.t('Panda reactions')" />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>{{ i18n.t('External source URL') }}</mat-label>
-              <input matInput formControlName="sourceReference" [placeholder]="i18n.t('https://www.flaticon.com/stickers-pack/...')" />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>{{ i18n.t('Status') }}</mat-label>
-              <mat-select formControlName="status">
-                <mat-option value="active">{{ i18n.t('Active') }}</mat-option>
-                <mat-option value="hidden">{{ i18n.t('Hidden') }}</mat-option>
-                <mat-option value="blocked">{{ i18n.t('Blocked') }}</mat-option>
-                <mat-option value="deleted">{{ i18n.t('Deleted') }}</mat-option>
-              </mat-select>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>{{ i18n.t('Search visibility') }}</mat-label>
-              <mat-select formControlName="searchVisible">
-                <mat-option [value]="true">{{ i18n.t('Visible in search') }}</mat-option>
-                <mat-option [value]="false">{{ i18n.t('Hidden in search') }}</mat-option>
-              </mat-select>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>{{ i18n.t('Sort order') }}</mat-label>
-              <input matInput type="number" formControlName="sortOrder" />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>{{ i18n.t('License note') }}</mat-label>
-              <textarea matInput rows="3" formControlName="licenseNote" [placeholder]="i18n.t('Premium Flaticon License')"></textarea>
-            </mat-form-field>
-          </form>
         </mat-card-content>
 
         <mat-card-actions class="card-actions">
@@ -214,121 +244,14 @@
             [matTooltip]="i18n.t('Create pack')"
             [attr.aria-label]="i18n.t('Create pack')"
             [disabled]="!selectedCategory()"
-            (click)="startNewPack()">
+            (click)="openCreatePackDialog()">
             <mat-icon>add</mat-icon>
-          </button>
-          <button
-            mat-icon-button
-            type="button"
-            class="action-button"
-            [matTooltip]="i18n.t('Detect metadata')"
-            [attr.aria-label]="i18n.t('Detect metadata')"
-            (click)="resolveMetadata()"
-            [disabled]="loadingMetadata()">
-            <mat-icon>travel_explore</mat-icon>
-          </button>
-          <button
-            mat-icon-button
-            type="button"
-            class="action-button"
-            [matTooltip]="i18n.t('Reset')"
-            [attr.aria-label]="i18n.t('Reset')"
-            (click)="resetPackForm()"
-            [disabled]="!selectedCategory()">
-            <mat-icon>restart_alt</mat-icon>
-          </button>
-          <span class="spacer"></span>
-          @if (selectedPack() && !isCreatingPack()) {
-            <button
-              mat-icon-button
-              type="button"
-              class="action-button action-warn"
-              [matTooltip]="i18n.t('Delete')"
-              [attr.aria-label]="i18n.t('Delete')"
-              (click)="deleteSelectedPack()">
-              <mat-icon>delete</mat-icon>
-            </button>
-          }
-          <button
-            mat-icon-button
-            type="button"
-            class="action-button action-primary"
-            [matTooltip]="i18n.t('Save')"
-            [attr.aria-label]="i18n.t('Save')"
-            (click)="savePack()">
-            <mat-icon>save</mat-icon>
           </button>
         </mat-card-actions>
       </mat-card>
     </div>
 
     <div class="column">
-      <mat-card class="section-card">
-        <mat-card-header>
-          <div mat-card-avatar class="avatar avatar-success">
-            <mat-icon>info</mat-icon>
-          </div>
-          <mat-card-title>{{ i18n.t('Loaded metadata') }}</mat-card-title>
-        </mat-card-header>
-
-        <mat-card-content>
-          @if (resolvedMetadata(); as metadata) {
-            <div class="metadata-grid">
-              <div class="metadata-item">
-                <span class="metadata-label">{{ i18n.t('Metadata source') }}</span>
-                <strong>{{ metadata.provider || 'flaticon' }}</strong>
-              </div>
-
-              <div class="metadata-item">
-                <span class="metadata-label">{{ i18n.t('Author') }}</span>
-                @if (metadata.authorUrl) {
-                  <a [href]="metadata.authorUrl" target="_blank" rel="noopener">{{ metadata.authorName || metadata.authorUrl }}</a>
-                } @else {
-                  <strong>{{ metadata.authorName || '—' }}</strong>
-                }
-              </div>
-
-              <div class="metadata-item">
-                <span class="metadata-label">{{ i18n.t('Style') }}</span>
-                <strong>{{ metadata.styleName || '—' }}</strong>
-              </div>
-
-              <div class="metadata-item">
-                <span class="metadata-label">{{ i18n.t('Sticker count') }}</span>
-                <strong>{{ metadata.stickerCount ?? '—' }}</strong>
-              </div>
-
-              <div class="metadata-item">
-                <span class="metadata-label">{{ i18n.t('License') }}</span>
-                <strong>{{ metadata.license?.label || '—' }}</strong>
-              </div>
-
-              <div class="metadata-item">
-                <span class="metadata-label">{{ i18n.t('Download formats') }}</span>
-                <strong>{{ metadataFormats() || '—' }}</strong>
-              </div>
-
-              <div class="metadata-item full-width">
-                <span class="metadata-label">{{ i18n.t('Source URL') }}</span>
-                <a [href]="metadata.sourceUrl" target="_blank" rel="noopener">{{ metadata.sourceUrl }}</a>
-              </div>
-
-              @if (metadataTags()) {
-                <div class="metadata-item full-width">
-                  <span class="metadata-label">{{ i18n.t('Tags') }}</span>
-                  <span>{{ metadataTags() }}</span>
-                </div>
-              }
-            </div>
-          } @else {
-            <div class="empty-state">
-              <mat-icon>info_outline</mat-icon>
-              <span>{{ i18n.t('No source metadata loaded yet.') }}</span>
-            </div>
-          }
-        </mat-card-content>
-      </mat-card>
-
       <mat-card class="section-card">
         <mat-card-header>
           <div mat-card-avatar class="avatar avatar-neutral">
@@ -341,7 +264,12 @@
         <mat-card-content>
           <input #svgInput type="file" multiple accept=".svg,image/svg+xml" hidden (change)="handleSvgSelection($event)" />
 
-          @if (selectedSvgFiles().length === 0) {
+          @if (!selectedPack()) {
+            <div class="empty-state compact">
+              <mat-icon>subdirectory_arrow_right</mat-icon>
+              <span>{{ i18n.t('Please create or select a sticker pack first.') }}</span>
+            </div>
+          } @else if (selectedSvgFiles().length === 0) {
             <div class="empty-state compact">
               <mat-icon>description</mat-icon>
               <span>{{ i18n.t('No SVG files selected yet.') }}</span>

@@ -227,6 +227,15 @@ function update(db, id, fields, callback) {
       continue;
     }
     updates.push(`${key} = ?`);
+    if (key === columns.searchVisible) {
+      params.push(fields[key] ? 1 : 0);
+      continue;
+    }
+    if (key === columns.sourceMetadataJson) {
+      const value = fields[key];
+      params.push(value && typeof value === 'object' ? JSON.stringify(value) : (value ?? ''));
+      continue;
+    }
     params.push(fields[key]);
   }
 

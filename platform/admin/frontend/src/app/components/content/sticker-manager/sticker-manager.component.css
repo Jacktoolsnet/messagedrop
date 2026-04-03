@@ -198,6 +198,7 @@ mat-toolbar {
 .selection-main {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 0.75rem;
   flex: 1 1 auto;
   min-width: 0;
@@ -207,6 +208,15 @@ mat-toolbar {
   background: transparent;
   color: inherit;
   text-align: left;
+}
+
+.selection-tags {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
 }
 
 .drag-handle-button,
@@ -338,6 +348,11 @@ mat-toolbar {
 .status-hidden {
   background: rgba(255, 193, 7, 0.18);
   color: #b45309;
+}
+
+.status-search {
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
 }
 
 .status-blocked,

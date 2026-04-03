@@ -1,0 +1,86 @@
+<app-dialog-header
+  icon="collections"
+  [title]="i18n.t(data.title)">
+</app-dialog-header>
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+  @if (loadingMetadata()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  <mat-dialog-content class="content">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ i18n.t('External source URL') }}</mat-label>
+      <input matInput formControlName="sourceReference" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ i18n.t('Pack name') }}</mat-label>
+      <input matInput formControlName="name" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ i18n.t('License note') }}</mat-label>
+      <textarea matInput rows="3" formControlName="licenseNote"></textarea>
+    </mat-form-field>
+
+    @if (resolvedMetadata(); as metadata) {
+      <div class="metadata-box">
+        <div class="metadata-row">
+          <span class="metadata-label">{{ i18n.t('Author') }}</span>
+          <strong>{{ metadata.authorName || '—' }}</strong>
+        </div>
+        <div class="metadata-row">
+          <span class="metadata-label">{{ i18n.t('Style') }}</span>
+          <strong>{{ metadata.styleName || '—' }}</strong>
+        </div>
+        <div class="metadata-row">
+          <span class="metadata-label">{{ i18n.t('Sticker count') }}</span>
+          <strong>{{ metadata.stickerCount ?? '—' }}</strong>
+        </div>
+        <div class="metadata-row">
+          <span class="metadata-label">{{ i18n.t('Download formats') }}</span>
+          <strong>{{ metadataFormats() || '—' }}</strong>
+        </div>
+        @if (metadataTags()) {
+          <div class="metadata-row metadata-row-full">
+            <span class="metadata-label">{{ i18n.t('Tags') }}</span>
+            <span>{{ metadataTags() }}</span>
+          </div>
+        }
+      </div>
+    }
+  </mat-dialog-content>
+
+  <app-dialog-action-bar>
+    <button
+      mat-icon-button
+      type="button"
+      class="action-close"
+      [matTooltip]="i18n.t('Close')"
+      [attr.aria-label]="i18n.t('Close')"
+      (click)="close()">
+      <mat-icon>close</mat-icon>
+    </button>
+
+    <button
+      mat-icon-button
+      type="button"
+      [matTooltip]="i18n.t('Detect metadata')"
+      [attr.aria-label]="i18n.t('Detect metadata')"
+      (click)="detectMetadata()"
+      [disabled]="loadingMetadata() || !form.controls.sourceReference.value.trim()">
+      <mat-icon>travel_explore</mat-icon>
+    </button>
+
+    <button
+      mat-icon-button
+      type="submit"
+      color="primary"
+      [matTooltip]="i18n.t('Apply')"
+      [attr.aria-label]="i18n.t('Apply')"
+      [disabled]="form.invalid">
+      <mat-icon>check</mat-icon>
+    </button>
+  </app-dialog-action-bar>
+</form>
