@@ -14,7 +14,6 @@ import { RouterLink } from '@angular/router';
 import { finalize, forkJoin } from 'rxjs';
 import { StickerCategory } from '../../../interfaces/sticker-category.interface';
 import { StickerPack } from '../../../interfaces/sticker-pack.interface';
-import { Sticker } from '../../../interfaces/sticker.interface';
 import { StickerAdminService } from '../../../services/content/sticker-admin.service';
 import { DisplayMessageService } from '../../../services/display-message.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
@@ -511,13 +510,6 @@ export class StickerManagerComponent {
 
   stickerPreviewUrl(stickerId: string): string {
     return this.stickerPreviewUrls()[stickerId] || '';
-  }
-
-  stickerFileName(row: Sticker): string {
-    const sourcePath = row.originalPath || row.previewPath || row.chatPath || row.name;
-    const normalized = String(sourcePath || '').replace(/\\/g, '/');
-    const segments = normalized.split('/').filter(Boolean);
-    return segments[segments.length - 1] || row.name;
   }
 
   loadStickerPreviews(): void {

@@ -223,18 +223,6 @@ mat-toolbar {
   color: #0f766e;
 }
 
-.imported-sticker-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  min-width: 0;
-}
-
-.imported-sticker-meta span {
-  word-break: break-word;
-  font-size: 0.82rem;
-}
-
 .selected-file-summary {
   display: flex;
   align-items: center;
