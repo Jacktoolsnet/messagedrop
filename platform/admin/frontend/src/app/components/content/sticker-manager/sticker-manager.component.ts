@@ -62,6 +62,7 @@ export class StickerManagerComponent {
   readonly importingSvg = signal(false);
   readonly loadingStickerPreviews = signal(false);
   readonly pendingPreviewPackId = signal<string | null>(null);
+  readonly pendingLicenseUploadPackId = signal<string | null>(null);
   readonly selectedSvgFiles = signal<File[]>([]);
   readonly stickerPreviewUrls = signal<Record<string, string>>({});
   readonly categoryStatuses = ['active', 'hidden', 'blocked', 'deleted'] as const;
@@ -514,6 +515,75 @@ export class StickerManagerComponent {
     });
   }
 
+  triggerPackLicensePicker(row: StickerPack, input: HTMLInputElement): void {
+    if (this.savingPack()) {
+      return;
+    }
+    this.pendingLicenseUploadPackId.set(row.id);
+    input.value = '';
+    input.click();
+  }
+
+  handleLicensePdfSelection(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const packId = this.pendingLicenseUploadPackId();
+    const file = input.files?.[0] ?? null;
+    this.pendingLicenseUploadPackId.set(null);
+
+    if (!packId || !file) {
+      input.value = '';
+      return;
+    }
+
+    if (!this.isPdfFile(file)) {
+      this.showMessage('Please select a PDF file.', true);
+      input.value = '';
+      return;
+    }
+
+    this.savingPack.set(true);
+    this.stickerService.uploadPackLicenseFile(packId, file).pipe(
+      finalize(() => {
+        this.savingPack.set(false);
+        input.value = '';
+      }),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: (row) => {
+        this.upsertPackRow(row);
+        this.showMessage('License PDF uploaded.');
+      },
+      error: () => undefined
+    });
+  }
+
+  async showPackLicensePdf(row: StickerPack): Promise<void> {
+    if (!row.licenseFilePath) {
+      this.showMessage('No license PDF uploaded yet.', true);
+      return;
+    }
+
+    const licenseTab = window.open('', '_blank');
+    if (!licenseTab) {
+      this.showMessage('Could not display sticker pack license.', true);
+      return;
+    }
+
+    const objectUrl = await this.stickerService.fetchPackLicenseUrl(row.id);
+    if (!objectUrl) {
+      licenseTab.close();
+      this.showMessage('Could not display sticker pack license.', true);
+      return;
+    }
+
+    licenseTab.location.replace(objectUrl);
+    licenseTab.focus();
+
+    window.setTimeout(() => {
+      window.URL.revokeObjectURL(objectUrl);
+    }, 60000);
+  }
+
   statusLabel(status: string | null | undefined): string {
     const normalized = String(status || '').toLowerCase();
     switch (normalized) {
@@ -797,6 +867,10 @@ export class StickerManagerComponent {
 
   private isSvgFile(file: File): boolean {
     return file.type === 'image/svg+xml' || file.name.toLowerCase().endsWith('.svg');
+  }
+
+  private isPdfFile(file: File): boolean {
+    return file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
   }
 
   private showMessage(message: string, isError = false, params?: Record<string, unknown>): void {

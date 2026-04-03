@@ -14,6 +14,7 @@ const DEFAULT_PROXY_TIMEOUT_MS = 15000;
 const stickerAudience = process.env.SERVICE_JWT_AUDIENCE_STICKER || 'service.sticker';
 const maxStickerSvgFiles = Math.max(1, Number(process.env.STICKER_IMPORT_MAX_FILES || 500));
 const maxStickerSvgFileBytes = Math.max(1, Number(process.env.STICKER_IMPORT_MAX_FILE_MB || 4)) * 1024 * 1024;
+const maxStickerLicenseFileBytes = Math.max(1, Number(process.env.STICKER_LICENSE_MAX_FILE_MB || 10)) * 1024 * 1024;
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -27,6 +28,21 @@ const upload = multer({
       return cb(null, true);
     }
     return cb(apiError.unsupportedMediaType('svg_only_upload'));
+  }
+});
+
+const uploadLicense = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: maxStickerLicenseFileBytes,
+    files: 1
+  },
+  fileFilter: (_req, file, cb) => {
+    const lowerName = String(file.originalname || '').toLowerCase();
+    if (file.mimetype === 'application/pdf' || lowerName.endsWith('.pdf')) {
+      return cb(null, true);
+    }
+    return cb(apiError.unsupportedMediaType('pdf_only_upload'));
   }
 });
 
@@ -289,6 +305,41 @@ router.get('/packs/:id', async (req, res, next) => {
   }
 });
 
+router.get('/packs/:id/license', async (req, res, next) => {
+  try {
+    const response = await requestStickerService(req, {
+      method: 'get',
+      path: `/packs/${encodeURIComponent(req.params.id)}/license`,
+      responseType: 'arraybuffer',
+      headers: {
+        Accept: req.get('accept') || '*/*'
+      }
+    });
+
+    const contentType = String(response.headers?.['content-type'] || '').toLowerCase();
+    if (response.status >= 400 || contentType.includes('application/json')) {
+      const payload = parseJsonBuffer(response.data) || { status: response.status, error: 'pack_license_download_failed' };
+      return res.status(response.status).json(payload);
+    }
+
+    const allowedHeaders = [
+      'cache-control',
+      'content-type',
+      'content-disposition',
+      'x-content-type-options'
+    ];
+    for (const headerName of allowedHeaders) {
+      const value = response.headers?.[headerName];
+      if (value !== undefined) {
+        res.setHeader(headerName, value);
+      }
+    }
+    return res.status(response.status).send(Buffer.from(response.data));
+  } catch (error) {
+    return next(axios.isAxiosError(error) ? buildAxiosError(error) : error);
+  }
+});
+
 router.get('/packs/:id/stickers', async (req, res, next) => {
   try {
     const response = await requestStickerService(req, {
@@ -308,6 +359,28 @@ router.put('/packs/:id', async (req, res, next) => {
       method: 'put',
       path: `/admin/packs/${encodeURIComponent(req.params.id)}`,
       data: req.body
+    });
+    return relayJsonResponse(res, response);
+  } catch (error) {
+    return next(axios.isAxiosError(error) ? buildAxiosError(error) : error);
+  }
+});
+
+router.post('/packs/:packId/license', uploadLicense.single('file'), async (req, res, next) => {
+  try {
+    const file = req.file;
+    if (!file) {
+      throw apiError.badRequest('license_pdf_required');
+    }
+    const payload = {
+      fileName: file.originalname,
+      mimeType: file.mimetype,
+      contentBase64: Buffer.from(file.buffer).toString('base64')
+    };
+    const response = await requestStickerService(req, {
+      method: 'post',
+      path: `/admin/packs/${encodeURIComponent(req.params.packId)}/license`,
+      data: payload
     });
     return relayJsonResponse(res, response);
   } catch (error) {

@@ -19,6 +19,9 @@ const columns = {
   sourceReference: 'sourceReference',
   sourceMetadataJson: 'sourceMetadataJson',
   licenseNote: 'licenseNote',
+  licenseFilePath: 'licenseFilePath',
+  licenseFileName: 'licenseFileName',
+  licenseFileMimeType: 'licenseFileMimeType',
   searchVisible: 'searchVisible',
   status: 'status',
   sortOrder: 'sortOrder',
@@ -39,6 +42,9 @@ function init(db) {
       ${columns.sourceReference} TEXT NOT NULL DEFAULT '',
       ${columns.sourceMetadataJson} TEXT NOT NULL DEFAULT '',
       ${columns.licenseNote} TEXT NOT NULL DEFAULT '',
+      ${columns.licenseFilePath} TEXT NOT NULL DEFAULT '',
+      ${columns.licenseFileName} TEXT NOT NULL DEFAULT '',
+      ${columns.licenseFileMimeType} TEXT NOT NULL DEFAULT '',
       ${columns.searchVisible} INTEGER NOT NULL DEFAULT 1,
       ${columns.status} TEXT NOT NULL DEFAULT '${packStatus.ACTIVE}',
       ${columns.sortOrder} INTEGER NOT NULL DEFAULT 0,
@@ -69,6 +75,18 @@ function init(db) {
       throw err;
     }
   });
+
+  for (const statement of [
+    `ALTER TABLE ${tableName} ADD COLUMN ${columns.licenseFilePath} TEXT NOT NULL DEFAULT '';`,
+    `ALTER TABLE ${tableName} ADD COLUMN ${columns.licenseFileName} TEXT NOT NULL DEFAULT '';`,
+    `ALTER TABLE ${tableName} ADD COLUMN ${columns.licenseFileMimeType} TEXT NOT NULL DEFAULT '';`
+  ]) {
+    db.exec(statement, (err) => {
+      if (err && !String(err.message || err).includes('duplicate column name')) {
+        throw err;
+      }
+    });
+  }
 }
 
 function create(db, payload, callback) {
@@ -85,13 +103,16 @@ function create(db, payload, callback) {
       ${columns.sourceReference},
       ${columns.sourceMetadataJson},
       ${columns.licenseNote},
+      ${columns.licenseFilePath},
+      ${columns.licenseFileName},
+      ${columns.licenseFileMimeType},
       ${columns.searchVisible},
       ${columns.status},
       ${columns.sortOrder},
       ${columns.createdAt},
       ${columns.updatedAt},
       ${columns.deletedAt}
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   db.run(sql, [
@@ -104,6 +125,9 @@ function create(db, payload, callback) {
     payload?.sourceReference ?? '',
     payload?.sourceMetadataJson ?? '',
     payload?.licenseNote ?? '',
+    payload?.licenseFilePath ?? '',
+    payload?.licenseFileName ?? '',
+    payload?.licenseFileMimeType ?? '',
     payload?.searchVisible ? 1 : 0,
     payload?.status ?? packStatus.ACTIVE,
     Number(payload?.sortOrder ?? 0),
@@ -216,6 +240,9 @@ function update(db, id, fields, callback) {
     columns.sourceReference,
     columns.sourceMetadataJson,
     columns.licenseNote,
+    columns.licenseFilePath,
+    columns.licenseFileName,
+    columns.licenseFileMimeType,
     columns.searchVisible,
     columns.status,
     columns.sortOrder,

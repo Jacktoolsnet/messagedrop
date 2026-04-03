@@ -137,6 +137,8 @@
         </mat-card-header>
 
         <mat-card-content>
+          <input #licensePdfInput type="file" accept=".pdf,application/pdf" hidden (change)="handleLicensePdfSelection($event)" />
+
           @if (!selectedCategory()) {
             <div class="empty-state">
               <mat-icon>subdirectory_arrow_right</mat-icon>
@@ -204,6 +206,16 @@
                     <button mat-menu-item type="button" (click)="openEditPackDialog(row)">
                       <mat-icon>edit</mat-icon>
                       <span>{{ i18n.t('Edit') }}</span>
+                    </button>
+
+                    <button mat-menu-item type="button" (click)="triggerPackLicensePicker(row, licensePdfInput)">
+                      <mat-icon>picture_as_pdf</mat-icon>
+                      <span>{{ i18n.t('Upload license PDF') }}</span>
+                    </button>
+
+                    <button mat-menu-item type="button" (click)="showPackLicensePdf(row)" [disabled]="!row.licenseFilePath">
+                      <mat-icon>visibility</mat-icon>
+                      <span>{{ i18n.t('Show license PDF') }}</span>
                     </button>
 
                     <button mat-menu-item type="button" (click)="loadStickerPreviewsForPack(row)" [disabled]="loadingStickerPreviews()">

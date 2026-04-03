@@ -12,6 +12,9 @@ export interface StickerPack {
   sourceReference: string;
   sourceMetadata: StickerSourceMetadata | null;
   licenseNote: string;
+  licenseFilePath: string;
+  licenseFileName: string;
+  licenseFileMimeType: string;
   searchVisible: boolean;
   status: string;
   sortOrder: number;

@@ -183,6 +183,15 @@ export class StickerAdminService {
     );
   }
 
+  uploadPackLicenseFile(packId: string, file: File): Observable<StickerPack> {
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+    return this.http.post<RowResponse<StickerPack>>(`${this.baseUrl}/packs/${encodeURIComponent(packId)}/license`, formData).pipe(
+      map((response) => response.row),
+      catchError((error) => this.handleError(error, 'Could not upload sticker pack license.'))
+    );
+  }
+
   async fetchStickerPreviewUrl(stickerId: string, abortSignal?: AbortSignal): Promise<string> {
     const token = getValidStoredAdminToken();
     if (!token) {
@@ -192,6 +201,28 @@ export class StickerAdminService {
     const response = await fetch(`${this.baseUrl}/render/${encodeURIComponent(stickerId)}?variant=preview`, {
       headers: {
         Authorization: `Bearer ${token}`
+      },
+      signal: abortSignal
+    });
+
+    if (!response.ok) {
+      return '';
+    }
+
+    const blob = await response.blob();
+    return URL.createObjectURL(blob);
+  }
+
+  async fetchPackLicenseUrl(packId: string, abortSignal?: AbortSignal): Promise<string> {
+    const token = getValidStoredAdminToken();
+    if (!token) {
+      return '';
+    }
+
+    const response = await fetch(`${this.baseUrl}/packs/${encodeURIComponent(packId)}/license`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/pdf'
       },
       signal: abortSignal
     });

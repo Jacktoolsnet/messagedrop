@@ -225,6 +225,14 @@ function decodeBase64Utf8(value) {
   }
 }
 
+function decodeBase64Buffer(value) {
+  try {
+    return Buffer.from(String(value || ''), 'base64');
+  } catch {
+    throw buildError(400, 'invalid_file_payload');
+  }
+}
+
 function sanitizeSvgMarkup(svgMarkup) {
   const normalized = String(svgMarkup || '')
     .replace(/^\uFEFF/, '')
@@ -257,6 +265,30 @@ function sanitizeSvgMarkup(svgMarkup) {
   return sanitized;
 }
 
+function normalizePdfFileName(value) {
+  const raw = normalizeString(value, { maxLength: 240, allowEmpty: true });
+  const segments = raw.split(/[\\/]/).filter(Boolean);
+  const fileName = segments[segments.length - 1] || '';
+  const replaced = fileName
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9._-]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  const ensuredPdf = replaced.toLowerCase().endsWith('.pdf') ? replaced : `${replaced || 'license'}.pdf`;
+  return ensuredPdf.slice(0, 180);
+}
+
+function validatePdfBuffer(pdfBuffer) {
+  if (!Buffer.isBuffer(pdfBuffer) || pdfBuffer.length < 5) {
+    throw buildError(400, 'invalid_pdf_file');
+  }
+  const header = pdfBuffer.subarray(0, 5).toString('ascii');
+  if (header !== '%PDF-') {
+    throw buildError(400, 'invalid_pdf_file');
+  }
+}
+
 async function ensureDirectory(dirPath) {
   await fs.promises.mkdir(dirPath, { recursive: true });
 }
@@ -273,6 +305,23 @@ async function writeStickerSvgFile(packId, normalizedFileName, sanitizedSvg) {
 
   return {
     assetPath: relativePath
+  };
+}
+
+async function writePackLicensePdfFile(packId, normalizedFileName, pdfBuffer) {
+  const relativePath = path.posix.join('packs', packId, normalizedFileName);
+  const absolutePath = resolveStorageFile(relativePath);
+  if (!absolutePath) {
+    throw buildError(500, 'storage_path_resolution_failed');
+  }
+
+  await ensureDirectory(path.dirname(absolutePath));
+  await fs.promises.writeFile(absolutePath, pdfBuffer);
+
+  return {
+    licenseFilePath: relativePath,
+    licenseFileName: normalizedFileName,
+    licenseFileMimeType: 'application/pdf'
   };
 }
 
@@ -335,6 +384,9 @@ function toPackDto(row) {
     sourceReference: row.sourceReference || '',
     sourceMetadata: safeParseJsonObject(row.sourceMetadataJson),
     licenseNote: row.licenseNote || '',
+    licenseFilePath: row.licenseFilePath || '',
+    licenseFileName: row.licenseFileName || '',
+    licenseFileMimeType: row.licenseFileMimeType || '',
     searchVisible: Boolean(row.searchVisible),
     status: row.status,
     sortOrder: Number(row.sortOrder ?? 0),
@@ -528,6 +580,9 @@ async function createPackPayload(db, body, { existing } = {}) {
     sourceReference: normalizeString(hasOwn(body, 'sourceReference') ? body?.sourceReference : existing?.sourceReference, { maxLength: 1000, allowEmpty: true }),
     sourceMetadataJson,
     licenseNote: normalizeString(hasOwn(body, 'licenseNote') ? body?.licenseNote : existing?.licenseNote, { maxLength: 4000, allowEmpty: true }),
+    licenseFilePath: normalizeRelativeAssetPath(hasOwn(body, 'licenseFilePath') ? body?.licenseFilePath : existing?.licenseFilePath),
+    licenseFileName: normalizeString(hasOwn(body, 'licenseFileName') ? body?.licenseFileName : existing?.licenseFileName, { maxLength: 240, allowEmpty: true }),
+    licenseFileMimeType: normalizeMimeType(hasOwn(body, 'licenseFileMimeType') ? body?.licenseFileMimeType : existing?.licenseFileMimeType),
     searchVisible: parseBoolean(hasOwn(body, 'searchVisible') ? body?.searchVisible : existing?.searchVisible, existing ? Boolean(existing.searchVisible) : true),
     status: normalizeStatus(hasOwn(body, 'status') ? body?.status : existing?.status, existing?.status || 'active'),
     sortOrder: parseInteger(hasOwn(body, 'sortOrder') ? body?.sortOrder : existing?.sortOrder, Number(existing?.sortOrder ?? 0), { min: -100000, max: 100000 })
@@ -631,6 +686,30 @@ router.get('/packs/:id', requireIssuer(READER_ISSUERS), async (req, res, next) =
     const db = getDatabase(req);
     const row = await getPackOrThrow(db, req.params.id);
     res.status(200).json({ status: 200, row: toPackDto(row) });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/packs/:id/license', requireIssuer(READER_ISSUERS), async (req, res, next) => {
+  try {
+    const db = getDatabase(req);
+    const pack = await getPackOrThrow(db, req.params.id);
+    const relativePath = normalizeRelativeAssetPath(pack.licenseFilePath || '');
+    if (!relativePath) {
+      throw buildError(404, 'pack_license_not_found');
+    }
+
+    const filePath = resolveStorageFile(relativePath);
+    if (!filePath || !fs.existsSync(filePath)) {
+      throw buildError(404, 'pack_license_not_found');
+    }
+
+    res.setHeader('Cache-Control', 'private, no-store, max-age=0');
+    res.setHeader('Content-Type', pack.licenseFileMimeType || 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${pack.licenseFileName || path.basename(relativePath)}"`);
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.sendFile(filePath);
   } catch (err) {
     next(err);
   }
@@ -795,6 +874,28 @@ router.put('/admin/packs/:id', requireIssuer(ADMIN_ISSUERS), async (req, res, ne
     const payload = await createPackPayload(db, req.body, { existing });
     await toPromise(tableStickerPack.update, db, existing.id, payload);
     const row = await getPackOrThrow(db, existing.id);
+    res.status(200).json({ status: 200, row: toPackDto(row) });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/admin/packs/:packId/license', requireIssuer(ADMIN_ISSUERS), async (req, res, next) => {
+  try {
+    const db = getDatabase(req);
+    const pack = await getPackOrThrow(db, req.params.packId);
+    const fileName = normalizePdfFileName(req.body?.fileName || req.body?.name);
+    const mimeType = normalizeMimeType(req.body?.mimeType || '');
+    if (mimeType && mimeType !== 'application/pdf') {
+      throw buildError(400, 'invalid_pdf_file');
+    }
+
+    const pdfBuffer = decodeBase64Buffer(req.body?.contentBase64);
+    validatePdfBuffer(pdfBuffer);
+    const filePayload = await writePackLicensePdfFile(pack.id, fileName, pdfBuffer);
+
+    await toPromise(tableStickerPack.update, db, pack.id, filePayload);
+    const row = await getPackOrThrow(db, pack.id);
     res.status(200).json({ status: 200, row: toPackDto(row) });
   } catch (err) {
     next(err);
