@@ -347,6 +347,39 @@ async function writePackLicensePdfFile(packId, normalizedFileName, pdfBuffer) {
   };
 }
 
+async function writeSettingsNotFoundSvgFile(normalizedFileName, sanitizedSvg) {
+  const relativePath = path.posix.join('settings', 'not-found', normalizedFileName);
+  const absolutePath = resolveStorageFile(relativePath);
+  if (!absolutePath) {
+    throw buildError(500, 'storage_path_resolution_failed');
+  }
+
+  await ensureDirectory(path.dirname(absolutePath));
+  await fs.promises.writeFile(absolutePath, sanitizedSvg, 'utf8');
+
+  return {
+    notFoundAssetPath: relativePath,
+    notFoundAssetMimeType: 'image/svg+xml'
+  };
+}
+
+async function writeSettingsNotFoundLicensePdfFile(normalizedFileName, pdfBuffer) {
+  const relativePath = path.posix.join('settings', 'not-found', normalizedFileName);
+  const absolutePath = resolveStorageFile(relativePath);
+  if (!absolutePath) {
+    throw buildError(500, 'storage_path_resolution_failed');
+  }
+
+  await ensureDirectory(path.dirname(absolutePath));
+  await fs.promises.writeFile(absolutePath, pdfBuffer);
+
+  return {
+    notFoundLicenseFilePath: relativePath,
+    notFoundLicenseFileName: normalizedFileName,
+    notFoundLicenseFileMimeType: 'application/pdf'
+  };
+}
+
 function safeParseJsonArray(value) {
   if (!value) {
     return [];
@@ -453,8 +486,30 @@ function toSettingsDto(row) {
   }
   return {
     notFoundStickerId: row.notFoundStickerId || null,
+    notFoundAssetPath: row.notFoundAssetPath || '',
+    notFoundAssetMimeType: row.notFoundAssetMimeType || '',
+    notFoundLicenseFilePath: row.notFoundLicenseFilePath || '',
+    notFoundLicenseFileName: row.notFoundLicenseFileName || '',
+    notFoundLicenseFileMimeType: row.notFoundLicenseFileMimeType || '',
     createdAt: Number(row.createdAt ?? 0),
     updatedAt: Number(row.updatedAt ?? 0)
+  };
+}
+
+function resolveSettingsAsset(relativePath, mimeType, disposition = 'inline') {
+  const normalizedPath = normalizeRelativeAssetPath(relativePath || '');
+  if (!normalizedPath) {
+    return null;
+  }
+  const filePath = resolveStorageFile(normalizedPath);
+  if (!filePath || !fs.existsSync(filePath)) {
+    return null;
+  }
+  return {
+    relativePath: normalizedPath,
+    filePath,
+    mimeType: mimeType || 'application/octet-stream',
+    disposition
   };
 }
 
@@ -524,6 +579,16 @@ async function resolveRenderableStickerAsset(db, stickerId, variant, visited = n
     || !isRenderableStatus(sticker.packStatus)
     || !isRenderableStatus(sticker.categoryStatus)
   ) {
+    const settingsAsset = resolveSettingsAsset(settings?.notFoundAssetPath, settings?.notFoundAssetMimeType, 'inline');
+    if (settingsAsset) {
+      return {
+        sticker: null,
+        relativePath: settingsAsset.relativePath,
+        filePath: settingsAsset.filePath,
+        mimeType: settingsAsset.mimeType,
+        isFallback: true
+      };
+    }
     const fallbackId = normalizeString(settings?.notFoundStickerId, { maxLength: 120, allowEmpty: true });
     if (!fallbackId || fallbackId === normalizedStickerId) {
       return null;
@@ -544,6 +609,16 @@ async function resolveRenderableStickerAsset(db, stickerId, variant, visited = n
   }
 
   const fallbackId = normalizeString(settings?.notFoundStickerId, { maxLength: 120, allowEmpty: true });
+  const settingsAsset = resolveSettingsAsset(settings?.notFoundAssetPath, settings?.notFoundAssetMimeType, 'inline');
+  if (settingsAsset) {
+    return {
+      sticker: null,
+      relativePath: settingsAsset.relativePath,
+      filePath: settingsAsset.filePath,
+      mimeType: settingsAsset.mimeType,
+      isFallback: true
+    };
+  }
   if (!fallbackId || fallbackId === normalizedStickerId) {
     return null;
   }
@@ -825,6 +900,44 @@ router.get('/settings', requireIssuer(READER_ISSUERS), async (req, res, next) =>
   }
 });
 
+router.get('/settings/not-found-asset', requireIssuer(READER_ISSUERS), async (req, res, next) => {
+  try {
+    const db = getDatabase(req);
+    const settings = await toPromise(tableStickerSettings.get, db);
+    const resolved = resolveSettingsAsset(settings?.notFoundAssetPath, settings?.notFoundAssetMimeType, 'inline');
+    if (!resolved) {
+      throw buildError(404, 'not_found_asset_not_found');
+    }
+
+    res.setHeader('Cache-Control', 'private, no-store, max-age=0');
+    res.setHeader('Content-Type', resolved.mimeType || 'application/octet-stream');
+    res.setHeader('Content-Disposition', `inline; filename="${path.basename(resolved.relativePath)}"`);
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.sendFile(resolved.filePath);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/settings/not-found-license', requireIssuer(READER_ISSUERS), async (req, res, next) => {
+  try {
+    const db = getDatabase(req);
+    const settings = await toPromise(tableStickerSettings.get, db);
+    const resolved = resolveSettingsAsset(settings?.notFoundLicenseFilePath, settings?.notFoundLicenseFileMimeType, 'inline');
+    if (!resolved) {
+      throw buildError(404, 'not_found_license_not_found');
+    }
+
+    res.setHeader('Cache-Control', 'private, no-store, max-age=0');
+    res.setHeader('Content-Type', resolved.mimeType || 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename="${settings?.notFoundLicenseFileName || path.basename(resolved.relativePath)}"`);
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.sendFile(resolved.filePath);
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.get('/render/:stickerId', requireIssuer(READER_ISSUERS), async (req, res, next) => {
   try {
     const db = getDatabase(req);
@@ -842,7 +955,9 @@ router.get('/render/:stickerId', requireIssuer(READER_ISSUERS), async (req, res,
     res.setHeader('Content-Type', resolved.mimeType || 'application/octet-stream');
     res.setHeader('Content-Disposition', `inline; filename="${path.basename(resolved.relativePath)}"`);
     res.setHeader('X-Content-Type-Options', 'nosniff');
-    res.setHeader('X-Resolved-Sticker-Id', resolved.sticker.id);
+    if (resolved.sticker?.id) {
+      res.setHeader('X-Resolved-Sticker-Id', resolved.sticker.id);
+    }
     res.setHeader('X-Sticker-Fallback', resolved.isFallback ? '1' : '0');
     res.sendFile(resolved.filePath);
   } catch (err) {
@@ -1120,6 +1235,53 @@ router.put('/admin/settings', requireIssuer(ADMIN_ISSUERS), async (req, res, nex
     }
     await toPromise(tableStickerSettings.update, db, {
       notFoundStickerId,
+      updatedAt: Date.now()
+    });
+    const row = await toPromise(tableStickerSettings.get, db);
+    res.status(200).json({ status: 200, row: toSettingsDto(row) });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/admin/settings/not-found-asset', requireIssuer(ADMIN_ISSUERS), async (req, res, next) => {
+  try {
+    const db = getDatabase(req);
+    const fileName = normalizeSvgFileName(req.body?.fileName || req.body?.name);
+    const mimeType = normalizeMimeType(req.body?.mimeType || 'image/svg+xml') || 'image/svg+xml';
+    if (!/image\/svg\+xml/i.test(mimeType) && !/\.svg$/i.test(fileName)) {
+      throw buildError(400, 'invalid_svg_file');
+    }
+
+    const sanitizedSvg = sanitizeSvgMarkup(decodeBase64Utf8(req.body?.contentBase64));
+    const filePayload = await writeSettingsNotFoundSvgFile(fileName, sanitizedSvg);
+
+    await toPromise(tableStickerSettings.update, db, {
+      ...filePayload,
+      updatedAt: Date.now()
+    });
+    const row = await toPromise(tableStickerSettings.get, db);
+    res.status(200).json({ status: 200, row: toSettingsDto(row) });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/admin/settings/not-found-license', requireIssuer(ADMIN_ISSUERS), async (req, res, next) => {
+  try {
+    const db = getDatabase(req);
+    const fileName = normalizePdfFileName(req.body?.fileName || req.body?.name);
+    const mimeType = normalizeMimeType(req.body?.mimeType || '');
+    if (mimeType && mimeType !== 'application/pdf') {
+      throw buildError(400, 'invalid_pdf_file');
+    }
+
+    const pdfBuffer = decodeBase64Buffer(req.body?.contentBase64);
+    validatePdfBuffer(pdfBuffer);
+    const filePayload = await writeSettingsNotFoundLicensePdfFile(fileName, pdfBuffer);
+
+    await toPromise(tableStickerSettings.update, db, {
+      ...filePayload,
       updatedAt: Date.now()
     });
     const row = await toPromise(tableStickerSettings.get, db);

@@ -178,6 +178,110 @@ router.put('/settings', async (req, res, next) => {
   }
 });
 
+router.get('/settings/not-found-asset', async (req, res, next) => {
+  try {
+    const response = await requestStickerService(req, {
+      method: 'get',
+      path: '/settings/not-found-asset',
+      responseType: 'arraybuffer',
+      headers: {
+        Accept: req.get('accept') || '*/*'
+      }
+    });
+
+    const contentType = String(response.headers?.['content-type'] || '').toLowerCase();
+    if (response.status >= 400 || contentType.includes('application/json')) {
+      const payload = parseJsonBuffer(response.data) || { status: response.status, error: 'not_found_asset_fetch_failed' };
+      return res.status(response.status).json(payload);
+    }
+
+    const allowedHeaders = ['cache-control', 'content-type', 'content-disposition', 'x-content-type-options'];
+    for (const headerName of allowedHeaders) {
+      const value = response.headers?.[headerName];
+      if (value !== undefined) {
+        res.setHeader(headerName, value);
+      }
+    }
+    return res.status(response.status).send(Buffer.from(response.data));
+  } catch (error) {
+    return next(axios.isAxiosError(error) ? buildAxiosError(error) : error);
+  }
+});
+
+router.get('/settings/not-found-license', async (req, res, next) => {
+  try {
+    const response = await requestStickerService(req, {
+      method: 'get',
+      path: '/settings/not-found-license',
+      responseType: 'arraybuffer',
+      headers: {
+        Accept: req.get('accept') || '*/*'
+      }
+    });
+
+    const contentType = String(response.headers?.['content-type'] || '').toLowerCase();
+    if (response.status >= 400 || contentType.includes('application/json')) {
+      const payload = parseJsonBuffer(response.data) || { status: response.status, error: 'not_found_license_fetch_failed' };
+      return res.status(response.status).json(payload);
+    }
+
+    const allowedHeaders = ['cache-control', 'content-type', 'content-disposition', 'x-content-type-options'];
+    for (const headerName of allowedHeaders) {
+      const value = response.headers?.[headerName];
+      if (value !== undefined) {
+        res.setHeader(headerName, value);
+      }
+    }
+    return res.status(response.status).send(Buffer.from(response.data));
+  } catch (error) {
+    return next(axios.isAxiosError(error) ? buildAxiosError(error) : error);
+  }
+});
+
+router.post('/settings/not-found-asset', upload.single('file'), async (req, res, next) => {
+  try {
+    const file = req.file;
+    if (!file) {
+      throw apiError.badRequest('not_found_svg_required');
+    }
+    const payload = {
+      fileName: file.originalname,
+      mimeType: file.mimetype,
+      contentBase64: Buffer.from(file.buffer).toString('base64')
+    };
+    const response = await requestStickerService(req, {
+      method: 'post',
+      path: '/admin/settings/not-found-asset',
+      data: payload
+    });
+    return relayJsonResponse(res, response);
+  } catch (error) {
+    return next(axios.isAxiosError(error) ? buildAxiosError(error) : error);
+  }
+});
+
+router.post('/settings/not-found-license', uploadLicense.single('file'), async (req, res, next) => {
+  try {
+    const file = req.file;
+    if (!file) {
+      throw apiError.badRequest('not_found_license_required');
+    }
+    const payload = {
+      fileName: file.originalname,
+      mimeType: file.mimetype,
+      contentBase64: Buffer.from(file.buffer).toString('base64')
+    };
+    const response = await requestStickerService(req, {
+      method: 'post',
+      path: '/admin/settings/not-found-license',
+      data: payload
+    });
+    return relayJsonResponse(res, response);
+  } catch (error) {
+    return next(axios.isAxiosError(error) ? buildAxiosError(error) : error);
+  }
+});
+
 router.get('/categories', async (req, res, next) => {
   try {
     const response = await requestStickerService(req, {

@@ -6,6 +6,10 @@
   <span class="toolbar-title">{{ i18n.t('Stickers') }}</span>
   <span class="spacer"></span>
 
+  <button mat-icon-button type="button" (click)="openNotFoundSettingsDialog()" [attr.aria-label]="i18n.t('Open sticker settings')">
+    <mat-icon>settings</mat-icon>
+  </button>
+
   <button mat-icon-button type="button" (click)="refresh()" [attr.aria-label]="i18n.t('Refresh sticker manager')">
     <mat-icon>refresh</mat-icon>
   </button>

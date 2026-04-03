@@ -125,6 +125,30 @@ export class StickerAdminService {
     });
   }
 
+  uploadNotFoundAsset(file: File): Observable<StickerSettings> {
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+    return this.http.post<RowResponse<StickerSettings>>(`${this.baseUrl}/settings/not-found-asset`, formData).pipe(
+      map((response) => {
+        this._settings.set(response.row);
+        return response.row;
+      }),
+      catchError((error) => this.handleError(error, 'Could not upload not-found sticker SVG.'))
+    );
+  }
+
+  uploadNotFoundLicense(file: File): Observable<StickerSettings> {
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+    return this.http.post<RowResponse<StickerSettings>>(`${this.baseUrl}/settings/not-found-license`, formData).pipe(
+      map((response) => {
+        this._settings.set(response.row);
+        return response.row;
+      }),
+      catchError((error) => this.handleError(error, 'Could not upload not-found sticker license.'))
+    );
+  }
+
   createCategory(payload: Partial<StickerCategory>): Observable<StickerCategory> {
     return this.http.post<RowResponse<StickerCategory>>(`${this.baseUrl}/categories`, payload).pipe(
       map((response) => response.row),
@@ -227,6 +251,50 @@ export class StickerAdminService {
     }
 
     const response = await fetch(`${this.baseUrl}/packs/${encodeURIComponent(packId)}/license`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/pdf'
+      },
+      signal: abortSignal
+    });
+
+    if (!response.ok) {
+      return '';
+    }
+
+    const blob = await response.blob();
+    return URL.createObjectURL(blob);
+  }
+
+  async fetchNotFoundAssetUrl(abortSignal?: AbortSignal): Promise<string> {
+    const token = getValidStoredAdminToken();
+    if (!token) {
+      return '';
+    }
+
+    const response = await fetch(`${this.baseUrl}/settings/not-found-asset`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'image/svg+xml'
+      },
+      signal: abortSignal
+    });
+
+    if (!response.ok) {
+      return '';
+    }
+
+    const blob = await response.blob();
+    return URL.createObjectURL(blob);
+  }
+
+  async fetchNotFoundLicenseUrl(abortSignal?: AbortSignal): Promise<string> {
+    const token = getValidStoredAdminToken();
+    if (!token) {
+      return '';
+    }
+
+    const response = await fetch(`${this.baseUrl}/settings/not-found-license`, {
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: 'application/pdf'

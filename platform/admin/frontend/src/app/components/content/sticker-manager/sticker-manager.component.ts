@@ -19,6 +19,7 @@ import { StickerAdminService } from '../../../services/content/sticker-admin.ser
 import { DisplayMessageService } from '../../../services/display-message.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { StickerCategoryNameDialogComponent } from './sticker-category-name-dialog/sticker-category-name-dialog.component';
+import { StickerNotFoundSettingsDialogComponent } from './sticker-not-found-settings-dialog/sticker-not-found-settings-dialog.component';
 import { StickerPackDialogComponent, StickerPackDialogResult } from './sticker-pack-dialog/sticker-pack-dialog.component';
 
 @Component({
@@ -169,6 +170,7 @@ export class StickerManagerComponent {
     });
 
     this.stickerService.loadCategories();
+    this.stickerService.loadSettings();
   }
 
   trackById(_index: number, row: { id: string }): string {
@@ -177,6 +179,7 @@ export class StickerManagerComponent {
 
   refresh(): void {
     this.stickerService.loadCategories();
+    this.stickerService.loadSettings();
     if (this.selectedCategoryId()) {
       this.stickerService.loadPacks(this.selectedCategoryId()!);
     }
@@ -198,6 +201,14 @@ export class StickerManagerComponent {
 
   setSelectedCategory(row: StickerCategory): void {
     this.selectCategory(row);
+  }
+
+  openNotFoundSettingsDialog(): void {
+    this.dialog.open(StickerNotFoundSettingsDialogComponent, {
+      width: '760px',
+      maxWidth: 'calc(100vw - 2rem)',
+      autoFocus: false
+    });
   }
 
   openCreateCategoryDialog(): void {

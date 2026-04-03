@@ -1,0 +1,79 @@
+<h2 mat-dialog-title class="dialog-title-row">
+  <button mat-icon-button type="button" (click)="close()" [attr.aria-label]="i18n.t('Close dialog')">
+    <mat-icon>close</mat-icon>
+  </button>
+  <span>{{ i18n.t('Not-found sticker settings') }}</span>
+</h2>
+
+@if (loadingPreview() || uploadingAsset() || uploadingLicense()) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+<mat-dialog-content>
+  <input #assetInput type="file" accept=".svg,image/svg+xml" hidden (change)="handleAssetSelection($event)" />
+  <input #licenseInput type="file" accept=".pdf,application/pdf" hidden (change)="handleLicenseSelection($event)" />
+
+  <div class="dialog-grid">
+    <section class="surface-card">
+      <header class="surface-card-header">
+        <mat-icon>image</mat-icon>
+        <div>
+          <strong>{{ i18n.t('Not-found sticker SVG') }}</strong>
+          <span>{{ i18n.t('Upload the SVG that should be shown as fallback sticker.') }}</span>
+        </div>
+      </header>
+
+      <div class="preview-surface">
+        @if (previewUrl()) {
+          <img [src]="previewUrl()" [alt]="i18n.t('Not-found sticker preview')" />
+        } @else {
+          <div class="empty-preview">
+            <mat-icon>mood_bad</mat-icon>
+            <span>{{ i18n.t('No not-found sticker uploaded yet.') }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="inline-actions">
+        <button mat-stroked-button type="button" (click)="triggerAssetPicker(assetInput)">
+          <mat-icon>upload_file</mat-icon>
+          <span>{{ i18n.t('Upload SVG') }}</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="surface-card">
+      <header class="surface-card-header">
+        <mat-icon>picture_as_pdf</mat-icon>
+        <div>
+          <strong>{{ i18n.t('Not-found license PDF') }}</strong>
+          <span>{{ i18n.t('Upload the license PDF for the fallback sticker.') }}</span>
+        </div>
+      </header>
+
+      <div class="license-copy">
+        @if (settings()?.notFoundLicenseFileName) {
+          <strong>{{ settings()?.notFoundLicenseFileName }}</strong>
+        } @else {
+          <strong>{{ i18n.t('No not-found license uploaded yet.') }}</strong>
+        }
+      </div>
+
+      <div class="inline-actions">
+        <button mat-stroked-button type="button" (click)="triggerLicensePicker(licenseInput)">
+          <mat-icon>upload_file</mat-icon>
+          <span>{{ i18n.t('Upload PDF') }}</span>
+        </button>
+
+        <button mat-stroked-button type="button" [disabled]="!settings()?.notFoundLicenseFilePath" (click)="openLicenseInNewTab()">
+          <mat-icon>open_in_new</mat-icon>
+          <span>{{ i18n.t('Open license PDF') }}</span>
+        </button>
+      </div>
+    </section>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="close()">{{ i18n.t('Close') }}</button>
+</mat-dialog-actions>
