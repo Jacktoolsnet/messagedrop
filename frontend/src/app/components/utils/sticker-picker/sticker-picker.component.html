@@ -28,10 +28,6 @@
       <div class="sticker-picker__body">
         @if (selectedPack(); as pack) {
         <div class="sticker-picker__toolbar">
-          <button mat-stroked-button type="button" (click)="goBackToPacks()">
-            <mat-icon>arrow_back</mat-icon>
-            <span>{{ 'common.stickerPicker.backToPacks' | transloco }}</span>
-          </button>
           <span class="sticker-picker__title">{{ pack.name }}</span>
         </div>
 
@@ -77,7 +73,6 @@
               <mat-icon>imagesmode</mat-icon>
               }
             </div>
-            <span class="pack-tile__label">{{ pack.name }}</span>
           </button>
           }
         </div>
@@ -100,4 +95,11 @@
     [attr.aria-label]="'common.actions.close' | transloco">
     <mat-icon>close</mat-icon>
   </button>
+
+  @if (selectedPack()) {
+  <button mat-icon-button type="button" class="action-back" (click)="goBackToPacks()"
+    [attr.aria-label]="'common.stickerPicker.backToPacks' | transloco">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  }
 </mat-dialog-actions>

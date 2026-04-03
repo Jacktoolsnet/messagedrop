@@ -15,9 +15,8 @@
 .sticker-picker__toolbar {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
   margin-bottom: 1rem;
-  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .sticker-picker__title {
@@ -66,7 +65,8 @@
 }
 
 .pack-grid {
-  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(6.5rem, 8rem));
+  justify-content: center;
 }
 
 .sticker-grid {
@@ -94,8 +94,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.85rem;
+  padding: 0.55rem;
 }
 
 .pack-tile__media {
@@ -114,13 +113,6 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
-}
-
-.pack-tile__label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-align: center;
-  line-height: 1.2;
 }
 
 .sticker-tile {
@@ -158,9 +150,14 @@ mat-tab-group ::ng-deep .mat-mdc-tab-body-content {
   border-top: 1px solid color-mix(in srgb, var(--mat-app-text-color) 10%, transparent);
   padding: 0.35rem 1rem;
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .action-close {
+  margin-inline-end: auto;
+}
+
+.action-back {
   margin-inline-start: auto;
 }

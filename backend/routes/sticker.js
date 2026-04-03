@@ -142,6 +142,8 @@ function relayBinaryResponse(req, res, response, fallbackErrorCode) {
     }
   }
 
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+
   req.logger?.debug?.('relaying sticker asset', {
     status: response.status,
     contentType: response.headers?.['content-type']
