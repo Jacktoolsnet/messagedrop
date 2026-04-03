@@ -69,6 +69,10 @@ interface RestoreSummaryResponse extends SimpleStatusResponse {
   };
 }
 
+interface AccountStatusRefreshOptions {
+  force?: boolean;
+}
+
 interface ServerRestoreMessageRow {
   id: null;
   uuid: string;
@@ -154,6 +158,8 @@ export class UserService {
 
   private tokenRenewalTimeout: ReturnType<typeof setTimeout> | null = null;
   private accountStatusRefreshPromise?: Promise<void>;
+  private lastAccountStatusRefreshAt = 0;
+  private readonly accountStatusRefreshCooldownMs = 60_000;
   private pinKey: CryptoKey | null = null;
   private pinSalt: Uint8Array<ArrayBuffer> | null = null;
   private pinIterations = 250000;
@@ -219,6 +225,7 @@ export class UserService {
     this.ready = false;
     this.blocked = false;
     this.accountStatusRefreshPromise = undefined;
+    this.lastAccountStatusRefreshAt = 0;
     this.clearAccountBlockedState();
     this.pinKey = null;
     this.indexedDbService.setAtRestEncryptionKey(null);
@@ -239,7 +246,6 @@ export class UserService {
     this.ready = true;
     this._userSet.update(trigger => trigger + 1);
     this.blocked = false;
-    void this.refreshAccountStatus();
     void this.injector.get(MessageService).syncOwnPublicMessages(this.user).catch(() => undefined);
   }
 
@@ -676,7 +682,6 @@ export class UserService {
   private applyModerationStateFromAuthError(error: unknown): boolean {
     if (this.hasApiMessage(error, 'user_account_blocked')) {
       this.markAccountBlockedWithoutDetails();
-      void this.refreshAccountStatus();
       return true;
     }
 
@@ -751,7 +756,7 @@ export class UserService {
     );
   }
 
-  public async refreshAccountStatus(): Promise<void> {
+  public async refreshAccountStatus(options?: AccountStatusRefreshOptions): Promise<void> {
     if (!this.user?.id) {
       this.clearAccountBlockedState();
       return;
@@ -761,9 +766,18 @@ export class UserService {
       return;
     }
 
+    const force = options?.force === true;
+    const now = Date.now();
+
     if (this.accountStatusRefreshPromise) {
       return this.accountStatusRefreshPromise;
     }
+
+    if (!force && this.lastAccountStatusRefreshAt > 0 && now - this.lastAccountStatusRefreshAt < this.accountStatusRefreshCooldownMs) {
+      return;
+    }
+
+    this.lastAccountStatusRefreshAt = now;
 
     this.accountStatusRefreshPromise = (async () => {
       const requestedUserId = this.user.id;
@@ -890,7 +904,6 @@ export class UserService {
           const payload = jwtDecode<JwtPayload>(res.token);
           this.user.jwtExpiresAt = payload.exp! * 1000;
           this.startJwtRenewal();
-          void this.refreshAccountStatus();
         } else {
           this.logout();
           const dialogRef = this.displayMessage.open(DisplayMessage, {

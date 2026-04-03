@@ -117,6 +117,8 @@ function relayJsonResponse(res, response) {
 }
 
 function relayBinaryResponse(req, res, response, fallbackErrorCode) {
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+
   const contentType = String(response.headers?.['content-type'] || '').toLowerCase();
   if (response.status >= 400 || contentType.includes('application/json')) {
     const payload = parseJsonBuffer(response.data) || {
@@ -141,8 +143,6 @@ function relayBinaryResponse(req, res, response, fallbackErrorCode) {
       res.setHeader(headerName, value);
     }
   }
-
-  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
 
   req.logger?.debug?.('relaying sticker asset', {
     status: response.status,

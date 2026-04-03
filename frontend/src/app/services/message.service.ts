@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { inject, Injectable, signal, WritableSignal } from '@angular/core';
+import { inject, Injectable, Injector, signal, WritableSignal } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { catchError, firstValueFrom, forkJoin, from, map, Observable, of, switchMap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -17,6 +17,7 @@ import { IndexedDbService } from './indexed-db.service';
 import { MapService } from './map.service';
 import { NetworkService } from './network.service';
 import { TranslationHelperService } from './translation-helper.service';
+import { UserService } from './user.service';
 import { DisplayMessageService } from './display-message.service';
 import {
   MAX_PUBLIC_HASHTAGS,
@@ -72,6 +73,7 @@ export class MessageService {
   private readonly snackBar = inject(DisplayMessageService);
   private readonly dialog = inject(MatDialog);
   private readonly http = inject(HttpClient);
+  private readonly injector = inject(Injector);
   private readonly mapService = inject(MapService);
   private readonly geolocationService = inject(GeolocationService);
   private readonly networkService = inject(NetworkService);
@@ -1059,6 +1061,11 @@ export class MessageService {
       : of(message);
 
     return preparedMessage$.pipe(
+      switchMap((preparedMessage) =>
+        from(this.injector.get(UserService).refreshAccountStatus({ force: true })).pipe(
+          map(() => preparedMessage)
+        )
+      ),
       switchMap((preparedMessage) => {
         const publishState = preparedMessage.publishState ?? this.normalizePublishState(preparedMessage);
         if (this.shouldPublishViaCreate(preparedMessage, publishState)) {

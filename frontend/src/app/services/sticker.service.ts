@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { map, Observable, shareReplay, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Multimedia } from '../interfaces/multimedia';
 import { MultimediaType } from '../interfaces/multimedia-type';
@@ -19,27 +19,69 @@ interface RowsResponse<T> {
 export class StickerService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/stickers`;
+  private categoriesRequest?: Observable<StickerCategory[]>;
+  private readonly packsRequests = new Map<string, Observable<StickerPack[]>>();
+  private readonly stickersRequests = new Map<string, Observable<Sticker[]>>();
 
   getCategories(): Observable<StickerCategory[]> {
-    return this.http.get<RowsResponse<StickerCategory>>(`${this.baseUrl}/categories`).pipe(
-      map((response) => Array.isArray(response.rows) ? response.rows : [])
-    );
+    if (!this.categoriesRequest) {
+      this.categoriesRequest = this.http.get<RowsResponse<StickerCategory>>(`${this.baseUrl}/categories`).pipe(
+        map((response) => Array.isArray(response.rows) ? response.rows : []),
+        tap({
+          error: () => {
+            this.categoriesRequest = undefined;
+          }
+        }),
+        shareReplay(1)
+      );
+    }
+    return this.categoriesRequest;
   }
 
   getPacks(categoryId: string): Observable<StickerPack[]> {
-    return this.http.get<RowsResponse<StickerPack>>(
+    const cacheKey = String(categoryId);
+    const cached = this.packsRequests.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    const request$ = this.http.get<RowsResponse<StickerPack>>(
       `${this.baseUrl}/categories/${encodeURIComponent(categoryId)}/packs`
     ).pipe(
-      map((response) => Array.isArray(response.rows) ? response.rows : [])
+      map((response) => Array.isArray(response.rows) ? response.rows : []),
+      tap({
+        error: () => {
+          this.packsRequests.delete(cacheKey);
+        }
+      }),
+      shareReplay(1)
     );
+
+    this.packsRequests.set(cacheKey, request$);
+    return request$;
   }
 
   getStickers(packId: string): Observable<Sticker[]> {
-    return this.http.get<RowsResponse<Sticker>>(
+    const cacheKey = String(packId);
+    const cached = this.stickersRequests.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    const request$ = this.http.get<RowsResponse<Sticker>>(
       `${this.baseUrl}/packs/${encodeURIComponent(packId)}/stickers`
     ).pipe(
-      map((response) => Array.isArray(response.rows) ? response.rows : [])
+      map((response) => Array.isArray(response.rows) ? response.rows : []),
+      tap({
+        error: () => {
+          this.stickersRequests.delete(cacheKey);
+        }
+      }),
+      shareReplay(1)
     );
+
+    this.stickersRequests.set(cacheKey, request$);
+    return request$;
   }
 
   getRenderUrl(stickerId: string, variant: 'preview' | 'chat' = 'chat'): string {

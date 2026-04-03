@@ -350,7 +350,6 @@ export class AppComponent implements OnInit {
       const onVisibilityChange = () => {
         if (document.visibilityState === 'visible') {
           this.flushPendingSharedContent();
-          void this.userService.refreshAccountStatus();
         }
       };
       document.addEventListener('visibilitychange', onVisibilityChange);
@@ -360,7 +359,6 @@ export class AppComponent implements OnInit {
     if (typeof window !== 'undefined') {
       const onWindowFocus = () => {
         this.flushPendingSharedContent();
-        void this.userService.refreshAccountStatus();
       };
       window.addEventListener('focus', onWindowFocus);
       this.destroyRef.onDestroy(() => window.removeEventListener('focus', onWindowFocus));
@@ -1929,7 +1927,6 @@ export class AppComponent implements OnInit {
   }
 
   public showUser() {
-    void this.userService.refreshAccountStatus();
     const dialogRef = this.dialog.open(UserComponent, {
       data: {},
       closeOnNavigation: true,
@@ -1958,11 +1955,11 @@ export class AppComponent implements OnInit {
   }
 
   public refreshUserMenuState(): void {
-    void this.userService.refreshAccountStatus();
+    // Intentionally left blank. User moderation status is only refreshed when
+    // it is explicitly needed, such as publishing content or opening the user dialog itself.
   }
 
   private async ensureUserMenuActionAllowed(): Promise<boolean> {
-    await this.userService.refreshAccountStatus();
     if (this.userService.isAccountBlocked()) {
       this.showUser();
       return false;

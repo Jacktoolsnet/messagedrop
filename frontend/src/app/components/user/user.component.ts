@@ -63,7 +63,7 @@ export class UserComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    void this.userService.refreshAccountStatus();
+    void this.userService.refreshAccountStatus({ force: true });
     this.resetTranslationSettingsForm();
   }
 

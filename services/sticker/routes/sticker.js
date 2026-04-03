@@ -909,7 +909,7 @@ router.get('/settings/not-found-asset', requireIssuer(READER_ISSUERS), async (re
       throw buildError(404, 'not_found_asset_not_found');
     }
 
-    res.setHeader('Cache-Control', 'private, no-store, max-age=0');
+    res.setHeader('Cache-Control', 'private, max-age=300, stale-while-revalidate=60');
     res.setHeader('Content-Type', resolved.mimeType || 'application/octet-stream');
     res.setHeader('Content-Disposition', `inline; filename="${path.basename(resolved.relativePath)}"`);
     res.setHeader('X-Content-Type-Options', 'nosniff');

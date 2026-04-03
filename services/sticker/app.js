@@ -18,6 +18,7 @@ const check = require('./routes/check');
 const sticker = require('./routes/sticker');
 const { generateOrLoadKeypairs } = require('./utils/keyStore');
 const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
+const { verifyServiceJwt } = require('./utils/serviceJwt');
 const { normalizeErrorResponses, notFoundHandler, errorHandler } = require('./middleware/api-error');
 
 const database = new Database();
@@ -132,9 +133,34 @@ app.use(loggerMw(logger));
 app.use(headerMW());
 app.use(normalizeErrorResponses);
 
+function shouldSkipStickerRateLimit(req) {
+  const authHeader = req.headers?.authorization;
+  if (typeof authHeader !== 'string' || !authHeader.trim()) {
+    return false;
+  }
+
+  const token = authHeader.startsWith('Bearer ')
+    ? authHeader.slice(7).trim()
+    : authHeader.trim();
+
+  if (!token) {
+    return false;
+  }
+
+  try {
+    verifyServiceJwt(token, {
+      audience: process.env.SERVICE_JWT_AUDIENCE_STICKER || process.env.SERVICE_JWT_AUDIENCE || 'service.sticker'
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 const stickerLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
-  limit: 240,
+  limit: 20000,
+  skip: shouldSkipStickerRateLimit,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
