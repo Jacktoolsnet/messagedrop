@@ -518,7 +518,7 @@ const frontendErrorLogLimit = rateLimit({
 });
 
 // ROUTES
-app.use('/', basicLimit, root);
+app.get('/', basicLimit, root);
 app.use('/airquality', airQualtiyLimit, airQualtiy);
 app.use('/check', basicLimit, check);
 app.use('/clientconnect', clientConnectLimit, clientConnect);
