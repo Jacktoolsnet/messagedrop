@@ -85,10 +85,15 @@ export const routes: Routes = [
         data: { allowedRoles: CONTENT_MODULE_ROLES }
     },
     {
-        path: 'dashboard/content/stickers',
+        path: 'dashboard/stickers',
         component: StickerManagerComponent,
         canActivate: [authGuard],
         data: { allowedRoles: CONTENT_MODULE_ROLES }
+    },
+    {
+        path: 'dashboard/content/stickers',
+        redirectTo: 'dashboard/stickers',
+        pathMatch: 'full'
     },
     {
         path: 'dashboard/content/ai',

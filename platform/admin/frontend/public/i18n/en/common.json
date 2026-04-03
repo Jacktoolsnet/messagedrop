@@ -81,6 +81,7 @@
   "Select SVG files": "Select SVG files",
   "Import selected SVG files": "Import selected SVG files",
   "No SVG files selected yet.": "No SVG files selected yet.",
+  "SVG files selected": "SVG files selected",
   "Imported stickers": "Imported stickers",
   "No stickers imported yet.": "No stickers imported yet.",
   "Manage stickers": "Manage stickers",
@@ -117,5 +118,6 @@
   "Hidden": "Hidden",
   "Blocked": "Blocked",
   "Deleted": "Deleted",
-  "Author": "Author"
+  "Author": "Author",
+  "Load more stickers": "Load more stickers"
 }
