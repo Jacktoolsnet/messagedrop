@@ -115,6 +115,20 @@
             "type": "node"
         },
         {
+            "name": "Sticker-Service",
+            "program": "${workspaceFolder}/services/sticker/app.js",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "env": {
+                "SERVICE_JWT_ISSUER": "service.sticker",
+                "SERVICE_JWT_AUDIENCE": "service.sticker",
+                "SERVICE_JWT_TRUSTED_JWKS_PATH": "${workspaceFolder}/services/sticker/config/service-jwks.json"
+            },
+            "type": "node"
+        },
+        {
             "name": "Generate Service (T) JWKs",
             "type": "node",
             "request": "launch",

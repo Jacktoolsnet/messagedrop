@@ -9,7 +9,8 @@ const SERVICES = [
   { name: 'openMeteo', issuer: 'service.openmeteo', dir: 'openMeteo' },
   { name: 'nominatim', issuer: 'service.nominatim', dir: 'nominatim' },
   { name: 'socketio', issuer: 'service.socketio', dir: 'socketio' },
-  { name: 'viator', issuer: 'service.viator', dir: 'viator' }
+  { name: 'viator', issuer: 'service.viator', dir: 'viator' },
+  { name: 'sticker', issuer: 'service.sticker', dir: 'sticker' }
 ];
 
 function getArgValue(flag) {
