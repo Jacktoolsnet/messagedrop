@@ -13,6 +13,11 @@
     margin: 0 auto;
 }
 
+.multimedia_image--sticker {
+    max-width: min(100%, 15rem);
+    max-height: 15rem;
+}
+
 .oembed_container {
     width: 100%;
     display: flex;

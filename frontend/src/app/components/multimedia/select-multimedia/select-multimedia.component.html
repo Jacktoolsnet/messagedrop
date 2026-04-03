@@ -1,4 +1,9 @@
 <div class="button_container">
+    <button (click)="openStickerDialog()" mat-flat-button class="button_default" color="primary"
+        [attr.aria-label]="'common.multimedia.addSticker' | transloco">
+        <span>{{ 'common.multimedia.addSticker' | transloco }}</span>
+    </button>
+
     <button (click)="openTenorDialog()" mat-flat-button class="button_default" color="primary"
         [attr.aria-label]="'common.multimedia.addFromTenor' | transloco">
         <span>{{ 'common.multimedia.addFromTenor' | transloco }}</span>

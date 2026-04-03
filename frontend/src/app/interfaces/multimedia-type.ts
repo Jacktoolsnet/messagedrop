@@ -1,5 +1,6 @@
 export enum MultimediaType {
     UNDEFINED = 'undefined',
+    STICKER = 'sticker',
     TENOR = 'tenor',
     UNSPLASH = 'unsplash',
     GIPHY = 'giphy',

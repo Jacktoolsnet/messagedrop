@@ -1,9 +1,9 @@
 <!-- Show existing content when the platform is enabled. -->
 @if (isPlatformEnabled) {
-@if (multimedia?.type === 'tenor' || multimedia?.type === 'unsplash') {
+@if (multimedia?.type === 'tenor' || multimedia?.type === 'unsplash' || multimedia?.type === 'sticker') {
 <div class="media_block">
     <div class="multimedia_container">
-        <img class="multimedia_image" [src]="multimedia!.url"
+        <img class="multimedia_image" [class.multimedia_image--sticker]="multimedia?.type === 'sticker'" [src]="getRenderableImageUrl()"
             [attr.alt]="multimedia?.title || ('common.multimedia.embeddedAlt' | transloco)" />
     </div>
     @if (multimedia?.attribution !== '') {

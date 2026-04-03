@@ -500,6 +500,7 @@
     },
     "multimedia": {
       "embeddedAlt": "Eingebettete Medien",
+      "addSticker": "Sticker hinzufügen",
       "addFromTenor": "Von Tenor hinzufügen",
       "addContent": "Multimedia-Inhalt hinzufügen",
       "importUrlPlaceholder": "Multimedia-URL eingeben",
@@ -507,6 +508,20 @@
       "platformDisabled": "{{ platform }} ist derzeit deaktiviert. Aktiviere es in den Einstellungen für externe Inhalte, um fortzufahren.",
       "openExternalContentSettings": "Einstellungen für externe Inhalte öffnen",
       "urlNotAllowed": "Diese URL ist zum Einbetten nicht erlaubt."
+    },
+    "stickerPicker": {
+      "loadingCategories": "Sticker-Kategorien werden geladen…",
+      "loadingPacks": "Sticker-Packs werden geladen…",
+      "loadingStickers": "Sticker werden geladen…",
+      "noCategories": "Derzeit sind keine Sticker-Kategorien verfügbar.",
+      "noPacks": "In dieser Kategorie sind keine Sticker-Packs verfügbar.",
+      "noStickers": "In diesem Pack sind keine Sticker verfügbar.",
+      "backToPacks": "Zurück",
+      "openPackAria": "Sticker-Pack {{ name }} öffnen",
+      "selectStickerAria": "Sticker {{ name }} verwenden",
+      "categoryPreviewAlt": "Vorschaubild für Kategorie {{ name }}",
+      "packPreviewAlt": "Vorschaubild für Pack {{ name }}",
+      "stickerPreviewAlt": "Sticker {{ name }}"
     },
     "noteList": {
       "addFirstNote": "Erste private Notiz hinzufügen",

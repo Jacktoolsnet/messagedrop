@@ -1,0 +1,103 @@
+<mat-dialog-content class="sticker-picker">
+  @if (loadingCategories()) {
+  <div class="sticker-picker__state">
+    <mat-spinner diameter="36"></mat-spinner>
+    <span>{{ 'common.stickerPicker.loadingCategories' | transloco }}</span>
+  </div>
+  } @else if (!categories().length) {
+  <div class="sticker-picker__state">
+    <mat-icon>sentiment_dissatisfied</mat-icon>
+    <span>{{ 'common.stickerPicker.noCategories' | transloco }}</span>
+  </div>
+  } @else {
+  <mat-tab-group [selectedIndex]="selectedCategoryIndex()" (selectedIndexChange)="onCategorySelectionChange($event)">
+    @for (category of categories(); track category.id) {
+    <mat-tab>
+      <ng-template mat-tab-label>
+        @if (category.previewStickerId) {
+        <img class="sticker-picker__tab-image" [src]="getStickerPreviewUrl(category.previewStickerId)"
+          [attr.alt]="'common.stickerPicker.categoryPreviewAlt' | transloco: { name: category.name }"
+          [attr.title]="category.name" />
+        } @else {
+        <span class="sticker-picker__tab-fallback" [attr.title]="category.name">
+          {{ category.name.slice(0, 1) }}
+        </span>
+        }
+      </ng-template>
+
+      <div class="sticker-picker__body">
+        @if (selectedPack(); as pack) {
+        <div class="sticker-picker__toolbar">
+          <button mat-stroked-button type="button" (click)="goBackToPacks()">
+            <mat-icon>arrow_back</mat-icon>
+            <span>{{ 'common.stickerPicker.backToPacks' | transloco }}</span>
+          </button>
+          <span class="sticker-picker__title">{{ pack.name }}</span>
+        </div>
+
+        @if (loadingStickers()) {
+        <div class="sticker-picker__state">
+          <mat-spinner diameter="36"></mat-spinner>
+          <span>{{ 'common.stickerPicker.loadingStickers' | transloco }}</span>
+        </div>
+        } @else if (stickers().length) {
+        <div class="sticker-grid">
+          @for (sticker of stickers(); track sticker.id) {
+          <button type="button" class="sticker-tile" (click)="pickSticker(sticker)"
+            [attr.aria-label]="'common.stickerPicker.selectStickerAria' | transloco: { name: sticker.name || sticker.slug }">
+            <img [src]="getStickerPreviewUrl(sticker.id)"
+              [attr.alt]="'common.stickerPicker.stickerPreviewAlt' | transloco: { name: sticker.name || sticker.slug }"
+              loading="lazy" decoding="async" />
+          </button>
+          }
+        </div>
+        } @else {
+        <div class="sticker-picker__state">
+          <mat-icon>hide_image</mat-icon>
+          <span>{{ 'common.stickerPicker.noStickers' | transloco }}</span>
+        </div>
+        }
+        } @else {
+        @if (loadingPacks()) {
+        <div class="sticker-picker__state">
+          <mat-spinner diameter="36"></mat-spinner>
+          <span>{{ 'common.stickerPicker.loadingPacks' | transloco }}</span>
+        </div>
+        } @else if (packs().length) {
+        <div class="pack-grid">
+          @for (pack of packs(); track pack.id) {
+          <button type="button" class="pack-tile" (click)="openPack(pack)"
+            [attr.aria-label]="'common.stickerPicker.openPackAria' | transloco: { name: pack.name }">
+            <div class="pack-tile__media">
+              @if (pack.previewStickerId) {
+              <img [src]="getStickerPreviewUrl(pack.previewStickerId)"
+                [attr.alt]="'common.stickerPicker.packPreviewAlt' | transloco: { name: pack.name }" loading="lazy"
+                decoding="async" />
+              } @else {
+              <mat-icon>imagesmode</mat-icon>
+              }
+            </div>
+            <span class="pack-tile__label">{{ pack.name }}</span>
+          </button>
+          }
+        </div>
+        } @else {
+        <div class="sticker-picker__state">
+          <mat-icon>inventory_2</mat-icon>
+          <span>{{ 'common.stickerPicker.noPacks' | transloco }}</span>
+        </div>
+        }
+        }
+      </div>
+    </mat-tab>
+    }
+  </mat-tab-group>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-icon-button type="button" class="action-close" (click)="close()"
+    [attr.aria-label]="'common.actions.close' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+</mat-dialog-actions>

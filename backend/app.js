@@ -29,6 +29,7 @@ const nominatim = require('./routes/nominatim');
 const viator = require('./routes/viator');
 const tenor = require('./routes/tenor');
 const unsplash = require('./routes/unsplash');
+const sticker = require('./routes/sticker');
 const digitalServiceAct = require('./routes/digital-service-act');
 const dsaStatus = require('./routes/dsa-status');
 const notification = require('./routes/notification');
@@ -409,6 +410,13 @@ const unsplashLimit = rateLimit({
   message: rateLimitMessage('Too many unsplash requests, please try again later.')
 });
 
+const stickerLimit = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 1200,
+  ...rateLimitDefaults,
+  message: rateLimitMessage('Too many sticker requests, please try again later.')
+});
+
 const messageLimit = rateLimit({
   windowMs: 5 * 60 * 1000,
   limit: 300,
@@ -485,6 +493,7 @@ app.use('/viator', viatorLimit, viator);
 app.use('/openai', openAiLimit, openAi);
 app.use('/place', placeLimit, place);
 app.use('/tenor', tenorLimit, tenor);
+app.use('/stickers', stickerLimit, sticker);
 app.use('/unsplash', unsplashLimit, unsplash);
 app.use('/translate', translateLimit, translate);
 app.use('/user', userLimit, user);

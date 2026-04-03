@@ -4,8 +4,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { environment } from '../../../../environments/environment';
 import { EXTERNAL_CONTENT_SETTINGS_KEYS, ExternalContentPlatform, isExternalContentPlatform } from '../../../interfaces/external-content-platform';
 import { Multimedia } from '../../../interfaces/multimedia';
+import { MultimediaType } from '../../../interfaces/multimedia-type';
 import { AppService } from '../../../services/app.service';
 import { OembedService } from '../../../services/oembed.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
@@ -93,6 +95,16 @@ export class ShowmultimediaComponent implements OnChanges {
     dialogRef.afterClosed().subscribe(() => {
       this.updateFromMultimedia();
     });
+  }
+
+  getRenderableImageUrl(): string {
+    if (!this.multimedia) {
+      return '';
+    }
+    if (this.multimedia.type === MultimediaType.STICKER && this.multimedia.contentId) {
+      return `${environment.apiUrl}/stickers/render/${encodeURIComponent(this.multimedia.contentId)}?variant=chat`;
+    }
+    return this.multimedia.url || '';
   }
 
   private isOembedAllowed(): boolean {

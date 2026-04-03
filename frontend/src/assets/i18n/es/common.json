@@ -500,6 +500,7 @@
     },
     "multimedia": {
       "embeddedAlt": "Contenido multimedia incrustado",
+      "addSticker": "Añadir sticker",
       "addFromTenor": "Añadir desde Tenor",
       "addContent": "Añadir contenido multimedia",
       "importUrlPlaceholder": "Introduce la URL multimedia",
@@ -507,6 +508,20 @@
       "platformDisabled": "{{ platform }} está deshabilitado actualmente. Actívalo en los ajustes de contenido externo para continuar.",
       "openExternalContentSettings": "Abrir ajustes de contenido externo",
       "urlNotAllowed": "Esta URL no está permitida para incrustar."
+    },
+    "stickerPicker": {
+      "loadingCategories": "Cargando categorías de stickers…",
+      "loadingPacks": "Cargando paquetes de stickers…",
+      "loadingStickers": "Cargando stickers…",
+      "noCategories": "No hay categorías de stickers disponibles ahora mismo.",
+      "noPacks": "No hay paquetes de stickers disponibles en esta categoría.",
+      "noStickers": "No hay stickers disponibles en este paquete.",
+      "backToPacks": "Volver",
+      "openPackAria": "Abrir paquete de stickers {{ name }}",
+      "selectStickerAria": "Usar sticker {{ name }}",
+      "categoryPreviewAlt": "Imagen de vista previa para la categoría {{ name }}",
+      "packPreviewAlt": "Imagen de vista previa para el paquete {{ name }}",
+      "stickerPreviewAlt": "Sticker {{ name }}"
     },
     "noteList": {
       "addFirstNote": "Añadir mi primera nota privada",
