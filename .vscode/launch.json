@@ -118,6 +118,7 @@
             "name": "Sticker-Service",
             "program": "${workspaceFolder}/services/sticker/app.js",
             "request": "launch",
+            "cwd": "${workspaceFolder}",
             "skipFiles": [
                 "<node_internals>/**"
             ],

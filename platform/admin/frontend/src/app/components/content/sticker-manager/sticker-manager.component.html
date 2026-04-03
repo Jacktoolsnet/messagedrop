@@ -1,5 +1,5 @@
 <mat-toolbar color="primary">
-  <button mat-icon-button routerLink="/dashboard/content" [attr.aria-label]="i18n.t('Back to public content')">
+  <button mat-icon-button routerLink="/dashboard" [attr.aria-label]="i18n.t('Back to dashboard')">
     <mat-icon>arrow_back</mat-icon>
   </button>
 
@@ -31,17 +31,9 @@
             <mat-icon>folder</mat-icon>
           </div>
           <mat-card-title>{{ i18n.t('Sticker categories') }}</mat-card-title>
-          <mat-card-subtitle>{{ i18n.t('Create categories such as Animals, Reactions or Holidays.') }}</mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content>
-          <div class="list-actions">
-            <button mat-stroked-button type="button" (click)="startNewCategory()">
-              <mat-icon>add</mat-icon>
-              {{ i18n.t('Create category') }}
-            </button>
-          </div>
-
           @if (categories().length === 0 && !loadingCategories()) {
             <div class="empty-state">
               <mat-icon>folder_open</mat-icon>
@@ -89,20 +81,44 @@
         </mat-card-content>
 
         <mat-card-actions class="card-actions">
-          <button mat-stroked-button type="button" (click)="startNewCategory()">
+          <button
+            mat-icon-button
+            type="button"
+            class="action-button"
+            [matTooltip]="i18n.t('Create category')"
+            [attr.aria-label]="i18n.t('Create category')"
+            (click)="startNewCategory()">
+            <mat-icon>add</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            type="button"
+            class="action-button"
+            [matTooltip]="i18n.t('Reset')"
+            [attr.aria-label]="i18n.t('Reset')"
+            (click)="startNewCategory()">
             <mat-icon>restart_alt</mat-icon>
-            {{ i18n.t('Reset') }}
           </button>
           <span class="spacer"></span>
           @if (selectedCategory() && !isCreatingCategory()) {
-            <button mat-stroked-button type="button" color="warn" (click)="deleteSelectedCategory()">
+            <button
+              mat-icon-button
+              type="button"
+              class="action-button action-warn"
+              [matTooltip]="i18n.t('Delete')"
+              [attr.aria-label]="i18n.t('Delete')"
+              (click)="deleteSelectedCategory()">
               <mat-icon>delete</mat-icon>
-              {{ i18n.t('Delete') }}
             </button>
           }
-          <button mat-raised-button color="primary" type="button" (click)="saveCategory()">
+          <button
+            mat-icon-button
+            type="button"
+            class="action-button action-primary"
+            [matTooltip]="i18n.t('Save')"
+            [attr.aria-label]="i18n.t('Save')"
+            (click)="saveCategory()">
             <mat-icon>save</mat-icon>
-            {{ i18n.t('Save') }}
           </button>
         </mat-card-actions>
       </mat-card>
@@ -115,17 +131,9 @@
             <mat-icon>collections</mat-icon>
           </div>
           <mat-card-title>{{ i18n.t('Sticker packs') }}</mat-card-title>
-          <mat-card-subtitle>{{ i18n.t('Each pack can load Flaticon metadata and receive imported SVG files.') }}</mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content>
-          <div class="list-actions">
-            <button mat-stroked-button type="button" (click)="startNewPack()" [disabled]="!selectedCategory()">
-              <mat-icon>add</mat-icon>
-              {{ i18n.t('Create pack') }}
-            </button>
-          </div>
-
           @if (!selectedCategory()) {
             <div class="empty-state">
               <mat-icon>subdirectory_arrow_right</mat-icon>
@@ -163,7 +171,6 @@
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>{{ i18n.t('External source URL') }}</mat-label>
               <input matInput formControlName="sourceReference" [placeholder]="i18n.t('https://www.flaticon.com/stickers-pack/...')" />
-              <mat-hint>{{ i18n.t('Paste the Flaticon sticker pack URL here and load the metadata in the next step.') }}</mat-hint>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
@@ -197,24 +204,56 @@
         </mat-card-content>
 
         <mat-card-actions class="card-actions">
-          <button mat-stroked-button type="button" (click)="resolveMetadata()" [disabled]="loadingMetadata()">
-            <mat-icon>travel_explore</mat-icon>
-            {{ i18n.t('Detect metadata') }}
+          <button
+            mat-icon-button
+            type="button"
+            class="action-button"
+            [matTooltip]="i18n.t('Create pack')"
+            [attr.aria-label]="i18n.t('Create pack')"
+            [disabled]="!selectedCategory()"
+            (click)="startNewPack()">
+            <mat-icon>add</mat-icon>
           </button>
-          <button mat-stroked-button type="button" (click)="startNewPack()" [disabled]="!selectedCategory()">
+          <button
+            mat-icon-button
+            type="button"
+            class="action-button"
+            [matTooltip]="i18n.t('Detect metadata')"
+            [attr.aria-label]="i18n.t('Detect metadata')"
+            (click)="resolveMetadata()"
+            [disabled]="loadingMetadata()">
+            <mat-icon>travel_explore</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            type="button"
+            class="action-button"
+            [matTooltip]="i18n.t('Reset')"
+            [attr.aria-label]="i18n.t('Reset')"
+            (click)="startNewPack()"
+            [disabled]="!selectedCategory()">
             <mat-icon>restart_alt</mat-icon>
-            {{ i18n.t('Reset') }}
           </button>
           <span class="spacer"></span>
           @if (selectedPack() && !isCreatingPack()) {
-            <button mat-stroked-button type="button" color="warn" (click)="deleteSelectedPack()">
+            <button
+              mat-icon-button
+              type="button"
+              class="action-button action-warn"
+              [matTooltip]="i18n.t('Delete')"
+              [attr.aria-label]="i18n.t('Delete')"
+              (click)="deleteSelectedPack()">
               <mat-icon>delete</mat-icon>
-              {{ i18n.t('Delete') }}
             </button>
           }
-          <button mat-raised-button color="primary" type="button" (click)="savePack()">
+          <button
+            mat-icon-button
+            type="button"
+            class="action-button action-primary"
+            [matTooltip]="i18n.t('Save')"
+            [attr.aria-label]="i18n.t('Save')"
+            (click)="savePack()">
             <mat-icon>save</mat-icon>
-            {{ i18n.t('Save') }}
           </button>
         </mat-card-actions>
       </mat-card>
@@ -227,7 +266,6 @@
             <mat-icon>info</mat-icon>
           </div>
           <mat-card-title>{{ i18n.t('Loaded metadata') }}</mat-card-title>
-          <mat-card-subtitle>{{ i18n.t('The metadata is stored with the pack, but image URLs are intentionally ignored.') }}</mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content>
@@ -300,18 +338,6 @@
         <mat-card-content>
           <input #svgInput type="file" multiple accept=".svg,image/svg+xml" hidden (change)="handleSvgSelection($event)" />
 
-          <div class="upload-actions">
-            <button mat-stroked-button type="button" (click)="triggerSvgPicker(svgInput)" [disabled]="!selectedPack()">
-              <mat-icon>folder_open</mat-icon>
-              {{ i18n.t('Select SVG files') }}
-            </button>
-
-            <button mat-raised-button color="primary" type="button" (click)="importSelectedSvgFiles(svgInput)" [disabled]="!selectedPack() || selectedSvgFiles().length === 0">
-              <mat-icon>upload</mat-icon>
-              {{ i18n.t('Import selected SVG files') }}
-            </button>
-          </div>
-
           @if (selectedSvgFiles().length === 0) {
             <div class="empty-state compact">
               <mat-icon>description</mat-icon>
@@ -347,6 +373,30 @@
             }
           </div>
         </mat-card-content>
+
+        <mat-card-actions class="card-actions">
+          <button
+            mat-icon-button
+            type="button"
+            class="action-button"
+            [matTooltip]="i18n.t('Select SVG files')"
+            [attr.aria-label]="i18n.t('Select SVG files')"
+            (click)="triggerSvgPicker(svgInput)"
+            [disabled]="!selectedPack()">
+            <mat-icon>folder_open</mat-icon>
+          </button>
+          <span class="spacer"></span>
+          <button
+            mat-icon-button
+            type="button"
+            class="action-button action-primary"
+            [matTooltip]="i18n.t('Import selected SVG files')"
+            [attr.aria-label]="i18n.t('Import selected SVG files')"
+            (click)="importSelectedSvgFiles(svgInput)"
+            [disabled]="!selectedPack() || selectedSvgFiles().length === 0">
+            <mat-icon>upload</mat-icon>
+          </button>
+        </mat-card-actions>
       </mat-card>
     </div>
   </div>

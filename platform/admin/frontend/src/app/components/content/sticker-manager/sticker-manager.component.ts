@@ -10,6 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { StickerCategory } from '../../../interfaces/sticker-category.interface';
@@ -32,7 +33,8 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatTooltipModule
   ],
   templateUrl: './sticker-manager.component.html',
   styleUrls: ['./sticker-manager.component.css'],

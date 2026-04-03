@@ -181,8 +181,9 @@ mat-toolbar {
     /* feste Kachelbreite */
     justify-content: center;
     /* zentriere Spalten */
-    gap: 1.25rem;
-    align-items: stretch;
+    column-gap: 1.5rem;
+    row-gap: 1.75rem;
+    align-items: start;
 }
 
 /* ==== Tile / Card ==== */
@@ -191,6 +192,7 @@ mat-toolbar {
     display: grid;
     grid-template-rows: auto 1fr auto;
     /* Header / Body / Actions */
+    margin: 0;
     border-radius: 16px;
     background: var(--card);
     border: 1px solid var(--border);
@@ -198,7 +200,7 @@ mat-toolbar {
     overflow: hidden;
 
     /* Micro-Interaction */
-    transform: translateY(6px);
+    transform: translateY(0);
     opacity: 0;
     animation: fadeUp .48s ease forwards;
     transition:
@@ -208,7 +210,7 @@ mat-toolbar {
         background .18s ease;
 
     &:hover {
-        transform: translateY(0) scale(1.01);
+        transform: translateY(-2px) scale(1.01);
         box-shadow: 0 16px 36px rgba(2, 8, 20, 0.12);
         border-color: color-mix(in srgb, var(--primary) 22%, var(--border));
     }
@@ -221,7 +223,7 @@ mat-toolbar {
 
     /* „Pressed“ Feeling */
     &:active {
-        transform: translateY(2px) scale(0.998);
+        transform: translateY(0) scale(0.998);
     }
 }
 
@@ -281,6 +283,26 @@ mat-card-header {
     box-shadow: 0 2px 8px rgba(2, 8, 20, 0.10);
 }
 
+.avatar-neutral {
+    background: linear-gradient(135deg, #64748b, #475569);
+    border-color: rgba(71, 85, 105, 0.26);
+}
+
+.avatar-accent {
+    background: linear-gradient(135deg, #2563eb, #38bdf8);
+    border-color: rgba(37, 99, 235, 0.24);
+}
+
+.avatar-success {
+    background: linear-gradient(135deg, #0f766e, #10b981);
+    border-color: rgba(15, 118, 110, 0.24);
+}
+
+.avatar-warn {
+    background: linear-gradient(135deg, #dc2626, #fb7185);
+    border-color: rgba(220, 38, 38, 0.24);
+}
+
 .avatar.badge span {
     position: absolute;
     top: -8px;
@@ -298,6 +320,13 @@ mat-card-header {
     line-height: 28px;
     font-size: 28px;
     color: var(--primary);
+}
+
+.avatar-neutral mat-icon,
+.avatar-accent mat-icon,
+.avatar-success mat-icon,
+.avatar-warn mat-icon {
+    color: #fff;
 }
 
 /* Titel/Untertitel */
@@ -435,7 +464,7 @@ button:focus-visible {
     }
 
     to {
-        transform: translateY(6px);
+        transform: translateY(0);
         opacity: 1;
     }
 }
