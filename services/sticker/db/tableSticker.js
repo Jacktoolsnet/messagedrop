@@ -219,6 +219,26 @@ function existsById(db, id, callback) {
   });
 }
 
+function getByPackAndSlug(db, packId, slug, callback) {
+  db.get(`
+    SELECT
+      s.*,
+      p.name AS packName,
+      p.slug AS packSlug,
+      p.categoryId,
+      c.name AS categoryName,
+      c.slug AS categorySlug
+    FROM ${tableName} s
+    INNER JOIN tableStickerPack p ON p.id = s.${columns.packId}
+    INNER JOIN tableStickerCategory c ON c.id = p.categoryId
+    WHERE s.${columns.packId} = ?
+      AND s.${columns.slug} = ?
+    LIMIT 1
+  `, [packId, slug], (err, row) => {
+    callback(err, row || null);
+  });
+}
+
 function getRenderableById(db, id, callback) {
   db.get(`
     SELECT *
@@ -333,6 +353,7 @@ module.exports = {
   list,
   getById,
   existsById,
+  getByPackAndSlug,
   getRenderableById,
   update,
   markDeleted,

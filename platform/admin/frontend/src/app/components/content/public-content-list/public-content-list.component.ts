@@ -185,6 +185,10 @@ export class PublicContentListComponent {
     this.router.navigate(['/dashboard/content/profiles']);
   }
 
+  openStickers(): void {
+    this.router.navigate(['/dashboard/content/stickers']);
+  }
+
   openAiSettings(): void {
     this.router.navigate(['/dashboard/content/ai'], {
       queryParams: {

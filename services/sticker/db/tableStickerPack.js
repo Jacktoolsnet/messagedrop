@@ -17,6 +17,7 @@ const columns = {
   previewStickerId: 'previewStickerId',
   sourceProvider: 'sourceProvider',
   sourceReference: 'sourceReference',
+  sourceMetadataJson: 'sourceMetadataJson',
   licenseNote: 'licenseNote',
   searchVisible: 'searchVisible',
   status: 'status',
@@ -36,6 +37,7 @@ function init(db) {
       ${columns.previewStickerId} TEXT DEFAULT NULL,
       ${columns.sourceProvider} TEXT NOT NULL DEFAULT 'manual',
       ${columns.sourceReference} TEXT NOT NULL DEFAULT '',
+      ${columns.sourceMetadataJson} TEXT NOT NULL DEFAULT '',
       ${columns.licenseNote} TEXT NOT NULL DEFAULT '',
       ${columns.searchVisible} INTEGER NOT NULL DEFAULT 1,
       ${columns.status} TEXT NOT NULL DEFAULT '${packStatus.ACTIVE}',
@@ -59,6 +61,14 @@ function init(db) {
       throw err;
     }
   });
+
+  db.exec(`
+    ALTER TABLE ${tableName} ADD COLUMN ${columns.sourceMetadataJson} TEXT NOT NULL DEFAULT '';
+  `, (err) => {
+    if (err && !String(err.message || err).includes('duplicate column name')) {
+      throw err;
+    }
+  });
 }
 
 function create(db, payload, callback) {
@@ -73,6 +83,7 @@ function create(db, payload, callback) {
       ${columns.previewStickerId},
       ${columns.sourceProvider},
       ${columns.sourceReference},
+      ${columns.sourceMetadataJson},
       ${columns.licenseNote},
       ${columns.searchVisible},
       ${columns.status},
@@ -80,7 +91,7 @@ function create(db, payload, callback) {
       ${columns.createdAt},
       ${columns.updatedAt},
       ${columns.deletedAt}
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   db.run(sql, [
@@ -91,6 +102,7 @@ function create(db, payload, callback) {
     payload?.previewStickerId ?? null,
     payload?.sourceProvider ?? 'manual',
     payload?.sourceReference ?? '',
+    payload?.sourceMetadataJson ?? '',
     payload?.licenseNote ?? '',
     payload?.searchVisible ? 1 : 0,
     payload?.status ?? packStatus.ACTIVE,
@@ -202,6 +214,7 @@ function update(db, id, fields, callback) {
     columns.previewStickerId,
     columns.sourceProvider,
     columns.sourceReference,
+    columns.sourceMetadataJson,
     columns.licenseNote,
     columns.searchVisible,
     columns.status,

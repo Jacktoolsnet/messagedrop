@@ -1,0 +1,353 @@
+<mat-toolbar color="primary">
+  <button mat-icon-button routerLink="/dashboard/content" [attr.aria-label]="i18n.t('Back to public content')">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+
+  <span class="toolbar-title">{{ i18n.t('Stickers') }}</span>
+  <span class="spacer"></span>
+
+  <button mat-icon-button type="button" (click)="refresh()" [attr.aria-label]="i18n.t('Refresh sticker manager')">
+    <mat-icon>refresh</mat-icon>
+  </button>
+</mat-toolbar>
+
+@if (pageBusy()) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+<div class="page">
+  <div class="header-row">
+    <div>
+      <h2>{{ i18n.t('Sticker management') }}</h2>
+      <p>{{ i18n.t('Manage sticker categories, packs and imported SVG files.') }}</p>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="column">
+      <mat-card class="section-card">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-neutral">
+            <mat-icon>folder</mat-icon>
+          </div>
+          <mat-card-title>{{ i18n.t('Sticker categories') }}</mat-card-title>
+          <mat-card-subtitle>{{ i18n.t('Create categories such as Animals, Reactions or Holidays.') }}</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div class="list-actions">
+            <button mat-stroked-button type="button" (click)="startNewCategory()">
+              <mat-icon>add</mat-icon>
+              {{ i18n.t('Create category') }}
+            </button>
+          </div>
+
+          @if (categories().length === 0 && !loadingCategories()) {
+            <div class="empty-state">
+              <mat-icon>folder_open</mat-icon>
+              <span>{{ i18n.t('No sticker categories yet.') }}</span>
+            </div>
+          } @else {
+            <div class="selection-list">
+              @for (row of categories(); track trackById($index, row)) {
+                <button
+                  type="button"
+                  class="selection-item"
+                  [class.active]="row.id === selectedCategoryId() && !isCreatingCategory()"
+                  (click)="selectCategory(row)">
+                  <div class="selection-copy">
+                    <strong>{{ row.name }}</strong>
+                    <span>{{ row.packCount }} {{ i18n.t('packs') }} · {{ row.stickerCount }} {{ i18n.t('stickers') }}</span>
+                  </div>
+                  <span class="status-pill" [class]="'status-pill status-' + row.status">{{ statusLabel(row.status) }}</span>
+                </button>
+              }
+            </div>
+          }
+
+          <form [formGroup]="categoryForm" class="form-grid">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{ i18n.t('Category name') }}</mat-label>
+              <input matInput formControlName="name" [placeholder]="i18n.t('Animals')" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>{{ i18n.t('Status') }}</mat-label>
+              <mat-select formControlName="status">
+                <mat-option value="active">{{ i18n.t('Active') }}</mat-option>
+                <mat-option value="hidden">{{ i18n.t('Hidden') }}</mat-option>
+                <mat-option value="blocked">{{ i18n.t('Blocked') }}</mat-option>
+                <mat-option value="deleted">{{ i18n.t('Deleted') }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>{{ i18n.t('Sort order') }}</mat-label>
+              <input matInput type="number" formControlName="sortOrder" />
+            </mat-form-field>
+          </form>
+        </mat-card-content>
+
+        <mat-card-actions class="card-actions">
+          <button mat-stroked-button type="button" (click)="startNewCategory()">
+            <mat-icon>restart_alt</mat-icon>
+            {{ i18n.t('Reset') }}
+          </button>
+          <span class="spacer"></span>
+          @if (selectedCategory() && !isCreatingCategory()) {
+            <button mat-stroked-button type="button" color="warn" (click)="deleteSelectedCategory()">
+              <mat-icon>delete</mat-icon>
+              {{ i18n.t('Delete') }}
+            </button>
+          }
+          <button mat-raised-button color="primary" type="button" (click)="saveCategory()">
+            <mat-icon>save</mat-icon>
+            {{ i18n.t('Save') }}
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+
+    <div class="column">
+      <mat-card class="section-card">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-accent">
+            <mat-icon>collections</mat-icon>
+          </div>
+          <mat-card-title>{{ i18n.t('Sticker packs') }}</mat-card-title>
+          <mat-card-subtitle>{{ i18n.t('Each pack can load Flaticon metadata and receive imported SVG files.') }}</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div class="list-actions">
+            <button mat-stroked-button type="button" (click)="startNewPack()" [disabled]="!selectedCategory()">
+              <mat-icon>add</mat-icon>
+              {{ i18n.t('Create pack') }}
+            </button>
+          </div>
+
+          @if (!selectedCategory()) {
+            <div class="empty-state">
+              <mat-icon>subdirectory_arrow_right</mat-icon>
+              <span>{{ i18n.t('Please create or select a sticker category first.') }}</span>
+            </div>
+          } @else if (packs().length === 0 && !loadingPacks()) {
+            <div class="empty-state">
+              <mat-icon>inventory_2</mat-icon>
+              <span>{{ i18n.t('No sticker packs in this category yet.') }}</span>
+            </div>
+          } @else {
+            <div class="selection-list">
+              @for (row of packs(); track trackById($index, row)) {
+                <button
+                  type="button"
+                  class="selection-item"
+                  [class.active]="row.id === selectedPackId() && !isCreatingPack()"
+                  (click)="selectPack(row)">
+                  <div class="selection-copy">
+                    <strong>{{ row.name }}</strong>
+                    <span>{{ row.stickerCount }} {{ i18n.t('stickers') }}</span>
+                  </div>
+                  <span class="status-pill" [class]="'status-pill status-' + row.status">{{ statusLabel(row.status) }}</span>
+                </button>
+              }
+            </div>
+          }
+
+          <form [formGroup]="packForm" class="form-grid">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{ i18n.t('Pack name') }}</mat-label>
+              <input matInput formControlName="name" [placeholder]="i18n.t('Panda reactions')" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{ i18n.t('External source URL') }}</mat-label>
+              <input matInput formControlName="sourceReference" [placeholder]="i18n.t('https://www.flaticon.com/stickers-pack/...')" />
+              <mat-hint>{{ i18n.t('Paste the Flaticon sticker pack URL here and load the metadata in the next step.') }}</mat-hint>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>{{ i18n.t('Status') }}</mat-label>
+              <mat-select formControlName="status">
+                <mat-option value="active">{{ i18n.t('Active') }}</mat-option>
+                <mat-option value="hidden">{{ i18n.t('Hidden') }}</mat-option>
+                <mat-option value="blocked">{{ i18n.t('Blocked') }}</mat-option>
+                <mat-option value="deleted">{{ i18n.t('Deleted') }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>{{ i18n.t('Search visibility') }}</mat-label>
+              <mat-select formControlName="searchVisible">
+                <mat-option [value]="true">{{ i18n.t('Visible in search') }}</mat-option>
+                <mat-option [value]="false">{{ i18n.t('Hidden in search') }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>{{ i18n.t('Sort order') }}</mat-label>
+              <input matInput type="number" formControlName="sortOrder" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{ i18n.t('License note') }}</mat-label>
+              <textarea matInput rows="3" formControlName="licenseNote" [placeholder]="i18n.t('Premium Flaticon License')"></textarea>
+            </mat-form-field>
+          </form>
+        </mat-card-content>
+
+        <mat-card-actions class="card-actions">
+          <button mat-stroked-button type="button" (click)="resolveMetadata()" [disabled]="loadingMetadata()">
+            <mat-icon>travel_explore</mat-icon>
+            {{ i18n.t('Detect metadata') }}
+          </button>
+          <button mat-stroked-button type="button" (click)="startNewPack()" [disabled]="!selectedCategory()">
+            <mat-icon>restart_alt</mat-icon>
+            {{ i18n.t('Reset') }}
+          </button>
+          <span class="spacer"></span>
+          @if (selectedPack() && !isCreatingPack()) {
+            <button mat-stroked-button type="button" color="warn" (click)="deleteSelectedPack()">
+              <mat-icon>delete</mat-icon>
+              {{ i18n.t('Delete') }}
+            </button>
+          }
+          <button mat-raised-button color="primary" type="button" (click)="savePack()">
+            <mat-icon>save</mat-icon>
+            {{ i18n.t('Save') }}
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+
+    <div class="column">
+      <mat-card class="section-card">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-success">
+            <mat-icon>info</mat-icon>
+          </div>
+          <mat-card-title>{{ i18n.t('Loaded metadata') }}</mat-card-title>
+          <mat-card-subtitle>{{ i18n.t('The metadata is stored with the pack, but image URLs are intentionally ignored.') }}</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          @if (resolvedMetadata(); as metadata) {
+            <div class="metadata-grid">
+              <div class="metadata-item">
+                <span class="metadata-label">{{ i18n.t('Metadata source') }}</span>
+                <strong>{{ metadata.provider || 'flaticon' }}</strong>
+              </div>
+
+              <div class="metadata-item">
+                <span class="metadata-label">{{ i18n.t('Author') }}</span>
+                @if (metadata.authorUrl) {
+                  <a [href]="metadata.authorUrl" target="_blank" rel="noopener">{{ metadata.authorName || metadata.authorUrl }}</a>
+                } @else {
+                  <strong>{{ metadata.authorName || '—' }}</strong>
+                }
+              </div>
+
+              <div class="metadata-item">
+                <span class="metadata-label">{{ i18n.t('Style') }}</span>
+                <strong>{{ metadata.styleName || '—' }}</strong>
+              </div>
+
+              <div class="metadata-item">
+                <span class="metadata-label">{{ i18n.t('Sticker count') }}</span>
+                <strong>{{ metadata.stickerCount ?? '—' }}</strong>
+              </div>
+
+              <div class="metadata-item">
+                <span class="metadata-label">{{ i18n.t('License') }}</span>
+                <strong>{{ metadata.license?.label || '—' }}</strong>
+              </div>
+
+              <div class="metadata-item">
+                <span class="metadata-label">{{ i18n.t('Download formats') }}</span>
+                <strong>{{ metadataFormats() || '—' }}</strong>
+              </div>
+
+              <div class="metadata-item full-width">
+                <span class="metadata-label">{{ i18n.t('Source URL') }}</span>
+                <a [href]="metadata.sourceUrl" target="_blank" rel="noopener">{{ metadata.sourceUrl }}</a>
+              </div>
+
+              @if (metadataTags()) {
+                <div class="metadata-item full-width">
+                  <span class="metadata-label">{{ i18n.t('Tags') }}</span>
+                  <span>{{ metadataTags() }}</span>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="empty-state">
+              <mat-icon>info_outline</mat-icon>
+              <span>{{ i18n.t('No source metadata loaded yet.') }}</span>
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="section-card">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-neutral">
+            <mat-icon>upload_file</mat-icon>
+          </div>
+          <mat-card-title>{{ i18n.t('SVG import') }}</mat-card-title>
+          <mat-card-subtitle>{{ i18n.t('Upload the SVG files that should become stickers for the selected pack.') }}</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <input #svgInput type="file" multiple accept=".svg,image/svg+xml" hidden (change)="handleSvgSelection($event)" />
+
+          <div class="upload-actions">
+            <button mat-stroked-button type="button" (click)="triggerSvgPicker(svgInput)" [disabled]="!selectedPack()">
+              <mat-icon>folder_open</mat-icon>
+              {{ i18n.t('Select SVG files') }}
+            </button>
+
+            <button mat-raised-button color="primary" type="button" (click)="importSelectedSvgFiles(svgInput)" [disabled]="!selectedPack() || selectedSvgFiles().length === 0">
+              <mat-icon>upload</mat-icon>
+              {{ i18n.t('Import selected SVG files') }}
+            </button>
+          </div>
+
+          @if (selectedSvgFiles().length === 0) {
+            <div class="empty-state compact">
+              <mat-icon>description</mat-icon>
+              <span>{{ i18n.t('No SVG files selected yet.') }}</span>
+            </div>
+          } @else {
+            <div class="file-list">
+              @for (file of selectedSvgFiles(); track file.name) {
+                <div class="file-list-item">
+                  <mat-icon>description</mat-icon>
+                  <span>{{ file.name }}</span>
+                </div>
+              }
+            </div>
+          }
+
+          <div class="imported-section">
+            <h3>{{ i18n.t('Imported stickers') }}</h3>
+            @if (stickers().length === 0 && !loadingStickers()) {
+              <div class="empty-state compact">
+                <mat-icon>mood</mat-icon>
+                <span>{{ i18n.t('No stickers imported yet.') }}</span>
+              </div>
+            } @else {
+              <div class="file-list">
+                @for (row of stickers(); track trackById($index, row)) {
+                  <div class="file-list-item">
+                    <mat-icon>mood</mat-icon>
+                    <span>{{ row.name }}</span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

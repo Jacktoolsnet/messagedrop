@@ -41,6 +41,12 @@ const DATABASE_DEFINITIONS = [
     label: 'Viator service',
     relativeSourcePath: 'services/viator/db/viator.db',
     fileName: 'viator.db'
+  },
+  {
+    key: 'sticker-service',
+    label: 'Sticker service',
+    relativeSourcePath: 'services/sticker/db/sticker.db',
+    fileName: 'sticker.db'
   }
 ];
 
