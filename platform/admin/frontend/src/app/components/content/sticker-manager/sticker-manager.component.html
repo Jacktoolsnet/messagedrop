@@ -343,12 +343,25 @@
                 <div
                   class="imported-sticker-tile"
                   [class.is-preview]="isPreviewSticker(row.id)"
+                  [class.is-category-preview]="isCategoryPreviewSticker(row.id)"
                   role="button"
                   tabindex="0"
                   [attr.aria-label]="i18n.t('Set as pack preview')"
                   (click)="setSelectedPackPreviewSticker(row.id)"
                   (keydown.enter)="setSelectedPackPreviewSticker(row.id)"
                   (keydown.space)="setSelectedPackPreviewSticker(row.id); $event.preventDefault()">
+                  <button
+                    mat-icon-button
+                    type="button"
+                    class="preview-category-button"
+                    [class.is-preview]="isCategoryPreviewSticker(row.id)"
+                    [matTooltip]="i18n.t('Set as category preview')"
+                    [attr.aria-label]="i18n.t('Set as category preview')"
+                    [disabled]="savingCategory()"
+                    (click)="setSelectedCategoryPreviewSticker(row.id); $event.stopPropagation()">
+                    <mat-icon>{{ isCategoryPreviewSticker(row.id) ? 'tab' : 'tab_unselected' }}</mat-icon>
+                  </button>
+
                   <button
                     mat-icon-button
                     type="button"

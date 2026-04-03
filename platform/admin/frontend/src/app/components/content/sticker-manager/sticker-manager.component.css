@@ -213,6 +213,27 @@ mat-toolbar {
   box-shadow: 0 16px 34px rgba(250, 204, 21, 0.18);
 }
 
+.imported-sticker-tile.is-category-preview:not(.is-preview) {
+  border-color: rgba(37, 99, 235, 0.35);
+  box-shadow: 0 16px 34px rgba(37, 99, 235, 0.12);
+}
+
+.preview-category-button {
+  position: absolute;
+  top: 0.65rem;
+  left: 0.65rem;
+  z-index: 1;
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.preview-category-button.is-preview {
+  color: #2563eb;
+  background: rgba(219, 234, 254, 0.96);
+  border-color: rgba(37, 99, 235, 0.28);
+}
+
 .preview-star-button {
   position: absolute;
   top: 0.65rem;

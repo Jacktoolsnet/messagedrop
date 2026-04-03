@@ -253,7 +253,8 @@ export class StickerManagerComponent {
       this.stickerService.updateCategory(row.id, {
         name,
         status: row.status,
-        sortOrder: row.sortOrder
+        sortOrder: row.sortOrder,
+        previewStickerId: row.previewStickerId
       }).pipe(
         finalize(() => this.savingCategory.set(false)),
         takeUntilDestroyed(this.destroyRef)
@@ -277,7 +278,8 @@ export class StickerManagerComponent {
     this.stickerService.updateCategory(row.id, {
       name: row.name,
       status,
-      sortOrder: row.sortOrder
+      sortOrder: row.sortOrder,
+      previewStickerId: row.previewStickerId
     }).pipe(
       finalize(() => this.savingCategory.set(false)),
       takeUntilDestroyed(this.destroyRef)
@@ -319,7 +321,8 @@ export class StickerManagerComponent {
     forkJoin(changedRows.map((row) => this.stickerService.updateCategory(row.id, {
       name: row.name,
       status: row.status,
-      sortOrder: row.sortOrder
+      sortOrder: row.sortOrder,
+      previewStickerId: row.previewStickerId
     }))).pipe(
       finalize(() => this.savingCategory.set(false)),
       takeUntilDestroyed(this.destroyRef)
@@ -538,6 +541,10 @@ export class StickerManagerComponent {
     return this.selectedPack()?.previewStickerId === stickerId;
   }
 
+  isCategoryPreviewSticker(stickerId: string): boolean {
+    return this.selectedCategory()?.previewStickerId === stickerId;
+  }
+
   loadStickerPreviews(): void {
     if (this.loadingStickerPreviews() || !this.selectedPack() || this.stickers().length === 0) {
       return;
@@ -554,6 +561,30 @@ export class StickerManagerComponent {
     this.persistPackUpdate(pack, {
       previewStickerId: stickerId
     }, 'Pack preview saved.', false);
+  }
+
+  setSelectedCategoryPreviewSticker(stickerId: string): void {
+    const category = this.selectedCategory();
+    if (!category || this.savingCategory() || category.previewStickerId === stickerId) {
+      return;
+    }
+
+    this.savingCategory.set(true);
+    this.stickerService.updateCategory(category.id, {
+      name: category.name,
+      status: category.status,
+      sortOrder: category.sortOrder,
+      previewStickerId: stickerId
+    }).pipe(
+      finalize(() => this.savingCategory.set(false)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: (updatedRow) => {
+        this.upsertCategoryRow(updatedRow);
+        this.showMessage('Category preview saved.');
+      },
+      error: () => undefined
+    });
   }
 
   loadStickerPreviewsForPack(row: StickerPack): void {
