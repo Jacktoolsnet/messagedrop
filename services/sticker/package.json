@@ -4,7 +4,7 @@
   "description": "Internal backend service for Messagedrop sticker catalogs, settings, and asset delivery.",
   "main": "app.js",
   "scripts": {
-    "start": "node --experimental-sqlite app.js",
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

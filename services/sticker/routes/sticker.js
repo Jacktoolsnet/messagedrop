@@ -515,6 +515,23 @@ router.get('/categories/:id', requireIssuer(READER_ISSUERS), async (req, res, ne
   }
 });
 
+router.get('/categories/:id/packs', requireIssuer(READER_ISSUERS), async (req, res, next) => {
+  try {
+    const db = getDatabase(req);
+    await getCategoryOrThrow(db, req.params.id);
+    const rows = await toPromise(tableStickerPack.list, db, {
+      includeDeleted: parseBoolean(req.query.includeDeleted, false),
+      categoryId: req.params.id,
+      status: normalizeString(req.query.status, { maxLength: 32, allowEmpty: true }),
+      searchVisible: req.query.searchVisible === undefined ? undefined : parseBoolean(req.query.searchVisible, true),
+      query: normalizeString(req.query.q, { maxLength: 120, allowEmpty: true })
+    });
+    res.status(200).json({ status: 200, rows: rows.map(toPackDto) });
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.get('/packs', requireIssuer(READER_ISSUERS), async (req, res, next) => {
   try {
     const db = getDatabase(req);
@@ -536,6 +553,25 @@ router.get('/packs/:id', requireIssuer(READER_ISSUERS), async (req, res, next) =
     const db = getDatabase(req);
     const row = await getPackOrThrow(db, req.params.id);
     res.status(200).json({ status: 200, row: toPackDto(row) });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/packs/:id/stickers', requireIssuer(READER_ISSUERS), async (req, res, next) => {
+  try {
+    const db = getDatabase(req);
+    await getPackOrThrow(db, req.params.id);
+    const rows = await toPromise(tableSticker.list, db, {
+      includeDeleted: parseBoolean(req.query.includeDeleted, false),
+      packId: req.params.id,
+      status: normalizeString(req.query.status, { maxLength: 32, allowEmpty: true }),
+      searchVisible: req.query.searchVisible === undefined ? undefined : parseBoolean(req.query.searchVisible, true),
+      query: normalizeString(req.query.q, { maxLength: 120, allowEmpty: true }),
+      limit: parseInteger(req.query.limit, 200, { min: 1, max: 500 }),
+      offset: parseInteger(req.query.offset, 0, { min: 0, max: 100000 })
+    });
+    res.status(200).json({ status: 200, rows: rows.map(toStickerDto) });
   } catch (err) {
     next(err);
   }
