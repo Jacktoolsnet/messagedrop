@@ -226,10 +226,14 @@ function decodeBase64Utf8(value) {
 }
 
 function sanitizeSvgMarkup(svgMarkup) {
-  const trimmed = String(svgMarkup || '').trim();
-  if (!trimmed || !/^<svg[\s>]/i.test(trimmed)) {
-    throw buildError(400, 'invalid_svg_file');
-  }
+  const normalized = String(svgMarkup || '')
+    .replace(/^\uFEFF/, '')
+    .trim();
+
+  const sanitized = normalized
+    .replace(/<\?xml[\s\S]*?\?>/gi, '')
+    .replace(/<!--([\s\S]*?)-->/g, '')
+    .trim();
 
   const forbiddenPatterns = [
     /<script\b/i,
@@ -242,14 +246,15 @@ function sanitizeSvgMarkup(svgMarkup) {
     /\son[a-z]+\s*=/i,
     /javascript:/i
   ];
-  if (forbiddenPatterns.some((pattern) => pattern.test(trimmed))) {
+  if (forbiddenPatterns.some((pattern) => pattern.test(sanitized))) {
     throw buildError(400, 'unsafe_svg_file');
   }
 
-  return trimmed
-    .replace(/<\?xml[\s\S]*?\?>/gi, '')
-    .replace(/<!--([\s\S]*?)-->/g, '')
-    .trim();
+  if (!sanitized || !/^<svg[\s>]/i.test(sanitized)) {
+    throw buildError(400, 'invalid_svg_file');
+  }
+
+  return sanitized;
 }
 
 async function ensureDirectory(dirPath) {
