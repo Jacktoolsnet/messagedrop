@@ -275,13 +275,12 @@
               <span>{{ i18n.t('No SVG files selected yet.') }}</span>
             </div>
           } @else {
-            <div class="file-list">
-              @for (file of selectedSvgFiles(); track file.name) {
-                <div class="file-list-item">
-                  <mat-icon>description</mat-icon>
-                  <span>{{ file.name }}</span>
-                </div>
-              }
+            <div class="selected-file-summary">
+              <mat-icon>description</mat-icon>
+              <div class="selected-file-summary-copy">
+                <strong>{{ selectedSvgFiles().length }}</strong>
+                <span>{{ i18n.t('SVG files selected') }}</span>
+              </div>
             </div>
           }
 
