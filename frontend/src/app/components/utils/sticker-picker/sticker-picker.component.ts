@@ -91,6 +91,28 @@ export class StickerPickerComponent implements OnInit {
     this.stickers.set([]);
   }
 
+  async openLicenseInNewTab(): Promise<void> {
+    const pack = this.selectedPack();
+    if (!pack?.licenseFilePath) {
+      return;
+    }
+
+    const licenseTab = window.open('', '_blank');
+    if (!licenseTab) {
+      return;
+    }
+
+    const objectUrl = await this.stickerService.fetchPackLicenseUrl(pack.id);
+    if (!objectUrl) {
+      licenseTab.close();
+      return;
+    }
+
+    licenseTab.location.replace(objectUrl);
+    licenseTab.focus();
+    window.setTimeout(() => window.URL.revokeObjectURL(objectUrl), 60000);
+  }
+
   pickSticker(sticker: Sticker): void {
     this.dialogRef.close(this.stickerService.createStickerMultimedia(sticker));
   }

@@ -27,10 +27,6 @@
 
       <div class="sticker-picker__body">
         @if (selectedPack(); as pack) {
-        <div class="sticker-picker__toolbar">
-          <span class="sticker-picker__title">{{ pack.name }}</span>
-        </div>
-
         @if (loadingStickers()) {
         <div class="sticker-picker__state">
           <mat-spinner diameter="36"></mat-spinner>
@@ -101,7 +97,12 @@
     <mat-icon>help</mat-icon>
   </button>
 
-  @if (selectedPack()) {
+  @if (selectedPack(); as pack) {
+  <button mat-icon-button type="button" (click)="openLicenseInNewTab()" [disabled]="!pack.licenseFilePath"
+    [attr.aria-label]="'common.stickerPicker.openLicenseAria' | transloco">
+    <mat-icon>receipt_long</mat-icon>
+  </button>
+
   <button mat-icon-button type="button" class="action-back" (click)="goBackToPacks()"
     [attr.aria-label]="'common.stickerPicker.backToPacks' | transloco">
     <mat-icon>arrow_back</mat-icon>

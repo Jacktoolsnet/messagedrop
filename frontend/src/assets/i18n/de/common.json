@@ -517,6 +517,7 @@
       "noPacks": "In dieser Kategorie sind keine Sticker-Packs verfügbar.",
       "noStickers": "In diesem Pack sind keine Sticker verfügbar.",
       "backToPacks": "Zurück",
+      "openLicenseAria": "Lizenz-PDF des Packs in neuem Tab öffnen",
       "openPackAria": "Sticker-Pack {{ name }} öffnen",
       "selectStickerAria": "Sticker {{ name }} verwenden",
       "categoryPreviewAlt": "Vorschaubild für Kategorie {{ name }}",

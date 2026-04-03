@@ -50,6 +50,26 @@ export class StickerService {
     return `${this.baseUrl}/packs/${encodeURIComponent(packId)}/license`;
   }
 
+  async fetchPackLicenseUrl(packId: string): Promise<string | null> {
+    try {
+      const response = await fetch(this.getPackLicenseUrl(packId), {
+        credentials: 'same-origin'
+      });
+      if (!response.ok) {
+        return null;
+      }
+
+      const blob = await response.blob();
+      if (!blob.size) {
+        return null;
+      }
+
+      return window.URL.createObjectURL(blob);
+    } catch {
+      return null;
+    }
+  }
+
   createStickerMultimedia(sticker: Sticker): Multimedia {
     const renderUrl = this.getRenderUrl(sticker.id, 'chat');
     return {

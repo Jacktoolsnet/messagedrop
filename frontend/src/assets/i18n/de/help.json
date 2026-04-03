@@ -2443,15 +2443,19 @@
         "title": "Schließen",
         "desc": "Mit dieser Aktion schließt du den Dialog ohne Auswahl."
       },
-      "help": {
-        "title": "Hilfe",
-        "desc": "Mit dieser Aktion öffnest du diese Hilfeansicht."
-      },
-      "license": {
-        "title": "Lizenzhinweis",
-        "desc": "Diese Sticker sind unter der Flaticon-Premium-Lizenz für JackTools.Net lizenziert. Sie dürfen nur innerhalb der App verwendet und nicht außerhalb weiterverwendet werden."
-      }
+    "help": {
+      "title": "Hilfe",
+      "desc": "Mit dieser Aktion öffnest du diese Hilfeansicht."
+    },
+    "licenseFile": {
+      "title": "Lizenz-PDF öffnen",
+      "desc": "Wenn ein Sticker-Pack geöffnet ist, öffnet diese Aktion die Lizenz-PDF dieses Packs in einem neuen Browser-Tab."
+    },
+    "license": {
+      "title": "Lizenzhinweis",
+      "desc": "Diese Sticker sind unter der Flaticon-Premium-Lizenz für JackTools.Net lizenziert. Sie dürfen nur innerhalb der App verwendet und nicht außerhalb weiterverwendet werden."
     }
+  }
   },
   "hashtagSearch": {
     "title": "Hashtag-Suche",

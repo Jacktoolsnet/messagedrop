@@ -3164,6 +3164,11 @@ const HELP_TOPICS = {
         descriptionKey: 'stickerPicker.items.help.desc'
       },
       {
+        icon: 'receipt_long',
+        titleKey: 'stickerPicker.items.licenseFile.title',
+        descriptionKey: 'stickerPicker.items.licenseFile.desc'
+      },
+      {
         icon: 'privacy_tip',
         titleKey: 'stickerPicker.items.license.title',
         descriptionKey: 'stickerPicker.items.license.desc'

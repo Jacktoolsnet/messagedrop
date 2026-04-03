@@ -2443,15 +2443,19 @@
         "title": "Close",
         "desc": "This action closes the dialog without selecting a sticker."
       },
-      "help": {
-        "title": "Help",
-        "desc": "This action opens this help view."
-      },
-      "license": {
-        "title": "License notice",
-        "desc": "These stickers are licensed under the Flaticon Premium License for JackTools.Net. They may only be used inside the app and must not be reused outside of it."
-      }
+    "help": {
+      "title": "Help",
+      "desc": "This action opens this help view."
+    },
+    "licenseFile": {
+      "title": "Open license PDF",
+      "desc": "When a sticker pack is open, this action opens the license PDF for that pack in a new browser tab."
+    },
+    "license": {
+      "title": "License notice",
+      "desc": "These stickers are licensed under the Flaticon Premium License for JackTools.Net. They may only be used inside the app and must not be reused outside of it."
     }
+  }
   },
   "hashtagSearch": {
     "title": "Hashtag search",

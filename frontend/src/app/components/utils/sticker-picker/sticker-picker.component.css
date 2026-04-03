@@ -12,18 +12,6 @@
   padding: 0.75rem;
 }
 
-.sticker-picker__toolbar {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1rem;
-  justify-content: center;
-}
-
-.sticker-picker__title {
-  font-weight: 600;
-  font-size: 1rem;
-}
-
 .sticker-picker__state {
   display: flex;
   flex-direction: column;
