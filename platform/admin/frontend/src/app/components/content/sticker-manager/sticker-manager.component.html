@@ -340,7 +340,27 @@
           } @else {
             <div class="imported-sticker-grid">
               @for (row of stickers(); track trackById($index, row)) {
-                <div class="imported-sticker-tile">
+                <div
+                  class="imported-sticker-tile"
+                  [class.is-preview]="isPreviewSticker(row.id)"
+                  role="button"
+                  tabindex="0"
+                  [attr.aria-label]="i18n.t('Set as pack preview')"
+                  (click)="setSelectedPackPreviewSticker(row.id)"
+                  (keydown.enter)="setSelectedPackPreviewSticker(row.id)"
+                  (keydown.space)="setSelectedPackPreviewSticker(row.id); $event.preventDefault()">
+                  <button
+                    mat-icon-button
+                    type="button"
+                    class="preview-star-button"
+                    [class.is-preview]="isPreviewSticker(row.id)"
+                    [matTooltip]="i18n.t('Set as pack preview')"
+                    [attr.aria-label]="i18n.t('Set as pack preview')"
+                    [disabled]="savingPack()"
+                    (click)="setSelectedPackPreviewSticker(row.id); $event.stopPropagation()">
+                    <mat-icon>{{ isPreviewSticker(row.id) ? 'star' : 'star_outline' }}</mat-icon>
+                  </button>
+
                   <div class="imported-sticker-preview">
                     @if (stickerPreviewUrl(row.id)) {
                       <img [src]="stickerPreviewUrl(row.id)" [alt]="row.name" />

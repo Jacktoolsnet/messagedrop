@@ -534,11 +534,26 @@ export class StickerManagerComponent {
     return this.stickerPreviewUrls()[stickerId] || '';
   }
 
+  isPreviewSticker(stickerId: string): boolean {
+    return this.selectedPack()?.previewStickerId === stickerId;
+  }
+
   loadStickerPreviews(): void {
     if (this.loadingStickerPreviews() || !this.selectedPack() || this.stickers().length === 0) {
       return;
     }
     void this.loadStickerPreviewsAsync();
+  }
+
+  setSelectedPackPreviewSticker(stickerId: string): void {
+    const pack = this.selectedPack();
+    if (!pack || this.savingPack() || pack.previewStickerId === stickerId) {
+      return;
+    }
+
+    this.persistPackUpdate(pack, {
+      previewStickerId: stickerId
+    }, 'Pack preview saved.', false);
   }
 
   loadStickerPreviewsForPack(row: StickerPack): void {
@@ -621,9 +636,6 @@ export class StickerManagerComponent {
     ).subscribe({
       next: (savedRow) => {
         this.upsertPackRow(savedRow);
-        if (savedRow.id === this.selectedPackId()) {
-          this.selectPack(savedRow);
-        }
         if (reloadAfterSave) {
           this.stickerService.loadPacks(category.id);
         }
@@ -640,6 +652,7 @@ export class StickerManagerComponent {
       status: row.status,
       searchVisible: row.searchVisible,
       sortOrder: row.sortOrder,
+      previewStickerId: row.previewStickerId,
       sourceProvider: row.sourceProvider || 'flaticon',
       sourceReference: row.sourceReference,
       sourceMetadata: row.sourceMetadata,

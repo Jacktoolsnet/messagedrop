@@ -186,6 +186,7 @@ mat-toolbar {
 }
 
 .imported-sticker-tile {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -195,6 +196,37 @@ mat-toolbar {
   border-radius: 22px;
   background: rgba(255, 255, 255, 0.84);
   box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.imported-sticker-tile:hover,
+.imported-sticker-tile:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(37, 99, 235, 0.24);
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.1);
+  outline: none;
+}
+
+.imported-sticker-tile.is-preview {
+  border-color: rgba(250, 204, 21, 0.62);
+  box-shadow: 0 16px 34px rgba(250, 204, 21, 0.18);
+}
+
+.preview-star-button {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  z-index: 1;
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.preview-star-button.is-preview {
+  color: #eab308;
+  background: rgba(254, 249, 195, 0.96);
+  border-color: rgba(250, 204, 21, 0.28);
 }
 
 .imported-sticker-preview {
