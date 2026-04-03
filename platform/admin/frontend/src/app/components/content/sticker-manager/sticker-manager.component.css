@@ -250,6 +250,16 @@ mat-toolbar {
   border-color: rgba(250, 204, 21, 0.28);
 }
 
+.sticker-menu-button {
+  position: absolute;
+  right: 0.65rem;
+  bottom: 0.65rem;
+  z-index: 1;
+  color: #64748b;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+}
+
 .imported-sticker-preview {
   display: flex;
   align-items: center;

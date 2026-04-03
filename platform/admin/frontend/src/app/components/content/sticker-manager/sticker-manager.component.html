@@ -386,6 +386,48 @@
                     <mat-icon>{{ isPreviewSticker(row.id) ? 'star' : 'star_outline' }}</mat-icon>
                   </button>
 
+                  <button
+                    mat-icon-button
+                    type="button"
+                    class="sticker-menu-button"
+                    [matMenuTriggerFor]="stickerMenu"
+                    [matTooltip]="i18n.t('Sticker actions')"
+                    [attr.aria-label]="i18n.t('Sticker actions')"
+                    (click)="$event.stopPropagation()">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+
+                  <mat-menu #stickerMenu="matMenu">
+                    <button mat-menu-item disabled>
+                      <mat-icon>tune</mat-icon>
+                      <span>{{ i18n.t('Status') }}</span>
+                    </button>
+
+                    @for (status of stickerStatuses; track status) {
+                      <button mat-menu-item type="button" (click)="updateStickerStatus(row, status)">
+                        <mat-icon>{{ row.status === status ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
+                        <span>{{ statusLabel(status) }}</span>
+                      </button>
+                    }
+
+                    <button mat-menu-item disabled>
+                      <mat-icon>visibility</mat-icon>
+                      <span>{{ i18n.t('Search visibility') }}</span>
+                    </button>
+
+                    @for (searchVisible of stickerVisibilityOptions; track searchVisible) {
+                      <button mat-menu-item type="button" (click)="updateStickerVisibility(row, searchVisible)">
+                        <mat-icon>{{ row.searchVisible === searchVisible ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
+                        <span>{{ visibilityLabel(searchVisible) }}</span>
+                      </button>
+                    }
+
+                    <button mat-menu-item type="button" (click)="deleteStickerRow(row)">
+                      <mat-icon>delete</mat-icon>
+                      <span>{{ i18n.t('Delete sticker') }}</span>
+                    </button>
+                  </mat-menu>
+
                   <div class="imported-sticker-preview">
                     @if (stickerPreviewUrl(row.id)) {
                       <img [src]="stickerPreviewUrl(row.id)" [alt]="row.name" />

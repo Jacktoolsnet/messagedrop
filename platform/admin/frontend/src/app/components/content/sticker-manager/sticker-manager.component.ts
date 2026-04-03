@@ -14,6 +14,7 @@ import { RouterLink } from '@angular/router';
 import { finalize, forkJoin } from 'rxjs';
 import { StickerCategory } from '../../../interfaces/sticker-category.interface';
 import { StickerPack } from '../../../interfaces/sticker-pack.interface';
+import { Sticker } from '../../../interfaces/sticker.interface';
 import { StickerAdminService } from '../../../services/content/sticker-admin.service';
 import { DisplayMessageService } from '../../../services/display-message.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
@@ -59,6 +60,7 @@ export class StickerManagerComponent {
   readonly selectedPackId = signal<string | null>(null);
   readonly savingCategory = signal(false);
   readonly savingPack = signal(false);
+  readonly savingSticker = signal(false);
   readonly importingSvg = signal(false);
   readonly loadingStickerPreviews = signal(false);
   readonly pendingPreviewPackId = signal<string | null>(null);
@@ -68,6 +70,8 @@ export class StickerManagerComponent {
   readonly categoryStatuses = ['active', 'hidden', 'blocked', 'deleted'] as const;
   readonly packStatuses = ['active', 'hidden', 'blocked', 'deleted'] as const;
   readonly packVisibilityOptions = [true, false] as const;
+  readonly stickerStatuses = ['active', 'hidden', 'blocked', 'deleted'] as const;
+  readonly stickerVisibilityOptions = [true, false] as const;
 
   readonly selectedCategory = computed(() => {
     const id = this.selectedCategoryId();
@@ -85,6 +89,7 @@ export class StickerManagerComponent {
     || this.loadingStickers()
     || this.savingCategory()
     || this.savingPack()
+    || this.savingSticker()
     || this.importingSvg()
   ));
 
@@ -615,6 +620,46 @@ export class StickerManagerComponent {
     return this.selectedCategory()?.previewStickerId === stickerId;
   }
 
+  updateStickerStatus(row: Sticker, status: Sticker['status']): void {
+    if (this.savingSticker() || row.status === status) {
+      return;
+    }
+
+    this.persistStickerUpdate(row, {
+      status
+    }, 'Sticker status updated.');
+  }
+
+  updateStickerVisibility(row: Sticker, searchVisible: boolean): void {
+    if (this.savingSticker() || row.searchVisible === searchVisible) {
+      return;
+    }
+
+    this.persistStickerUpdate(row, {
+      searchVisible
+    }, 'Sticker visibility updated.');
+  }
+
+  deleteStickerRow(row: Sticker): void {
+    if (this.savingSticker()) {
+      return;
+    }
+
+    this.savingSticker.set(true);
+    this.stickerService.deleteSticker(row.id).pipe(
+      finalize(() => this.savingSticker.set(false)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: () => {
+        if (this.selectedPackId() === row.packId) {
+          this.stickerService.loadStickers(row.packId);
+        }
+        this.showMessage('Sticker deleted.');
+      },
+      error: () => undefined
+    });
+  }
+
   loadStickerPreviews(): void {
     if (this.loadingStickerPreviews() || !this.selectedPack() || this.stickers().length === 0) {
       return;
@@ -761,6 +806,47 @@ export class StickerManagerComponent {
     };
   }
 
+  private persistStickerUpdate(
+    row: Sticker,
+    patch: Partial<Sticker>,
+    successMessage: string
+  ): void {
+    this.savingSticker.set(true);
+    const updatedRow = {
+      ...row,
+      ...patch
+    };
+
+    this.stickerService.updateSticker(row.id, this.buildStickerPayload(updatedRow)).pipe(
+      finalize(() => this.savingSticker.set(false)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: () => {
+        if (this.selectedPackId() === row.packId) {
+          this.stickerService.loadStickers(row.packId);
+        }
+        this.showMessage(successMessage);
+      },
+      error: () => undefined
+    });
+  }
+
+  private buildStickerPayload(row: Sticker): Partial<Sticker> {
+    return {
+      packId: row.packId,
+      name: row.name,
+      slug: row.slug,
+      keywords: row.keywords,
+      assetPath: row.assetPath,
+      mimeType: row.mimeType,
+      width: row.width,
+      height: row.height,
+      searchVisible: row.searchVisible,
+      status: row.status,
+      sortOrder: row.sortOrder
+    };
+  }
+
   private sortCategories(rows: StickerCategory[]): StickerCategory[] {
     return [...rows].sort((a, b) => (
       Number(a.sortOrder ?? 0) - Number(b.sortOrder ?? 0)
@@ -796,6 +882,7 @@ export class StickerManagerComponent {
     }
     this.packRows.set(this.sortPacks(rows));
   }
+
 
   private getNextCategorySortOrder(): number {
     return this.categoryRows().reduce((maxValue, row) => Math.max(maxValue, Number(row.sortOrder ?? 0)), -1) + 1;
