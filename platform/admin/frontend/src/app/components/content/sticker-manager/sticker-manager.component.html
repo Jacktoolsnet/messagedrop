@@ -34,50 +34,83 @@
         </mat-card-header>
 
         <mat-card-content>
-          @if (categories().length === 0 && !loadingCategories()) {
+          @if (categoryRows().length === 0 && !loadingCategories()) {
             <div class="empty-state">
               <mat-icon>folder_open</mat-icon>
               <span>{{ i18n.t('No sticker categories yet.') }}</span>
             </div>
           } @else {
-            <div class="selection-list">
-              @for (row of categories(); track trackById($index, row)) {
-                <button
-                  type="button"
-                  class="selection-item"
-                  [class.active]="row.id === selectedCategoryId() && !isCreatingCategory()"
-                  (click)="selectCategory(row)">
-                  <div class="selection-copy">
-                    <strong>{{ row.name }}</strong>
-                    <span>{{ row.packCount }} {{ i18n.t('packs') }} · {{ row.stickerCount }} {{ i18n.t('stickers') }}</span>
-                  </div>
-                  <span class="status-pill" [class]="'status-pill status-' + row.status">{{ statusLabel(row.status) }}</span>
-                </button>
+            <div
+              class="selection-list category-selection-list"
+              cdkDropList
+              [cdkDropListData]="categoryRows()"
+              (cdkDropListDropped)="dropCategory($event)">
+              @for (row of categoryRows(); track trackById($index, row)) {
+                <div class="selection-item category-item" [class.active]="row.id === selectedCategoryId()" cdkDrag>
+                  <button
+                    mat-icon-button
+                    type="button"
+                    class="drag-handle-button"
+                    cdkDragHandle
+                    [matTooltip]="i18n.t('Move category')"
+                    [attr.aria-label]="i18n.t('Move category')">
+                    <mat-icon>drag_indicator</mat-icon>
+                  </button>
+
+                  <button
+                    type="button"
+                    class="selection-main"
+                    [attr.aria-label]="row.name"
+                    (click)="setSelectedCategory(row)">
+                    <div class="selection-copy">
+                      <strong>{{ row.name }}</strong>
+                      <span>{{ row.packCount }} {{ i18n.t('packs') }} · {{ row.stickerCount }} {{ i18n.t('stickers') }}</span>
+                    </div>
+                    <span class="status-pill" [class]="'status-pill status-' + row.status">{{ statusLabel(row.status) }}</span>
+                  </button>
+
+                  @if (row.id === selectedCategoryId()) {
+                    <mat-icon class="selected-indicator" [matTooltip]="i18n.t('Selected')">check_circle</mat-icon>
+                  }
+
+                  <button
+                    mat-icon-button
+                    type="button"
+                    class="menu-button"
+                    [matMenuTriggerFor]="categoryMenu"
+                    [matTooltip]="i18n.t('Category actions')"
+                    [attr.aria-label]="i18n.t('Category actions')"
+                    (click)="$event.stopPropagation()">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+
+                  <mat-menu #categoryMenu="matMenu">
+                    <button mat-menu-item type="button" (click)="setSelectedCategory(row)" [disabled]="row.id === selectedCategoryId()">
+                      <mat-icon>{{ row.id === selectedCategoryId() ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+                      <span>{{ i18n.t('Select category') }}</span>
+                    </button>
+
+                    <button mat-menu-item type="button" (click)="openEditCategoryDialog(row)">
+                      <mat-icon>edit</mat-icon>
+                      <span>{{ i18n.t('Edit') }}</span>
+                    </button>
+
+                    <button mat-menu-item disabled>
+                      <mat-icon>tune</mat-icon>
+                      <span>{{ i18n.t('Status') }}</span>
+                    </button>
+
+                    @for (status of categoryStatuses; track status) {
+                      <button mat-menu-item type="button" (click)="updateCategoryStatus(row, status)">
+                        <mat-icon>{{ row.status === status ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
+                        <span>{{ statusLabel(status) }}</span>
+                      </button>
+                    }
+                  </mat-menu>
+                </div>
               }
             </div>
           }
-
-          <form [formGroup]="categoryForm" class="form-grid">
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>{{ i18n.t('Category name') }}</mat-label>
-              <input matInput formControlName="name" [placeholder]="i18n.t('Animals')" />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>{{ i18n.t('Status') }}</mat-label>
-              <mat-select formControlName="status">
-                <mat-option value="active">{{ i18n.t('Active') }}</mat-option>
-                <mat-option value="hidden">{{ i18n.t('Hidden') }}</mat-option>
-                <mat-option value="blocked">{{ i18n.t('Blocked') }}</mat-option>
-                <mat-option value="deleted">{{ i18n.t('Deleted') }}</mat-option>
-              </mat-select>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>{{ i18n.t('Sort order') }}</mat-label>
-              <input matInput type="number" formControlName="sortOrder" />
-            </mat-form-field>
-          </form>
         </mat-card-content>
 
         <mat-card-actions class="card-actions">
@@ -87,38 +120,8 @@
             class="action-button"
             [matTooltip]="i18n.t('Create category')"
             [attr.aria-label]="i18n.t('Create category')"
-            (click)="startNewCategory()">
+            (click)="openCreateCategoryDialog()">
             <mat-icon>add</mat-icon>
-          </button>
-          <button
-            mat-icon-button
-            type="button"
-            class="action-button"
-            [matTooltip]="i18n.t('Reset')"
-            [attr.aria-label]="i18n.t('Reset')"
-            (click)="startNewCategory()">
-            <mat-icon>restart_alt</mat-icon>
-          </button>
-          <span class="spacer"></span>
-          @if (selectedCategory() && !isCreatingCategory()) {
-            <button
-              mat-icon-button
-              type="button"
-              class="action-button action-warn"
-              [matTooltip]="i18n.t('Delete')"
-              [attr.aria-label]="i18n.t('Delete')"
-              (click)="deleteSelectedCategory()">
-              <mat-icon>delete</mat-icon>
-            </button>
-          }
-          <button
-            mat-icon-button
-            type="button"
-            class="action-button action-primary"
-            [matTooltip]="i18n.t('Save')"
-            [attr.aria-label]="i18n.t('Save')"
-            (click)="saveCategory()">
-            <mat-icon>save</mat-icon>
           </button>
         </mat-card-actions>
       </mat-card>
@@ -230,7 +233,7 @@
             class="action-button"
             [matTooltip]="i18n.t('Reset')"
             [attr.aria-label]="i18n.t('Reset')"
-            (click)="startNewPack()"
+            (click)="resetPackForm()"
             [disabled]="!selectedCategory()">
             <mat-icon>restart_alt</mat-icon>
           </button>

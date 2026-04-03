@@ -1,0 +1,35 @@
+<app-dialog-header
+  icon="folder"
+  [title]="i18n.t(data.title)">
+</app-dialog-header>
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <mat-dialog-content class="content">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ i18n.t('Category name') }}</mat-label>
+      <input matInput formControlName="name" autofocus />
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <app-dialog-action-bar>
+    <button
+      mat-icon-button
+      type="button"
+      class="action-close"
+      [matTooltip]="i18n.t('Close')"
+      [attr.aria-label]="i18n.t('Close')"
+      (click)="close()">
+      <mat-icon>close</mat-icon>
+    </button>
+
+    <button
+      mat-icon-button
+      type="submit"
+      color="primary"
+      [matTooltip]="i18n.t('Apply')"
+      [attr.aria-label]="i18n.t('Apply')"
+      [disabled]="form.invalid">
+      <mat-icon>check</mat-icon>
+    </button>
+  </app-dialog-action-bar>
+</form>

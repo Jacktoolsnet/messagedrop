@@ -1,0 +1,8 @@
+.content {
+  min-width: min(82vw, 360px);
+  padding-top: 0.5rem;
+}
+
+.full-width {
+  width: 100%;
+}
