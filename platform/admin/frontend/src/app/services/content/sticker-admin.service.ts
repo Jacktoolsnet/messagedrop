@@ -174,13 +174,6 @@ export class StickerAdminService {
     );
   }
 
-  deleteSticker(id: string): Observable<boolean> {
-    return this.http.delete<RowResponse<Sticker>>(`${this.baseUrl}/stickers/${encodeURIComponent(id)}`).pipe(
-      map((response) => response.deleted === true),
-      catchError((error) => this.handleError(error, 'Could not delete sticker.'))
-    );
-  }
-
   resolveFlaticonMetadata(sourceUrl: string): Observable<FlaticonResolveResponse> {
     return this.http.post<FlaticonResolveResponse>(`${this.baseUrl}/flaticon/resolve`, { sourceUrl }).pipe(
       catchError((error) => this.handleError(error, 'Could not resolve Flaticon metadata.'))

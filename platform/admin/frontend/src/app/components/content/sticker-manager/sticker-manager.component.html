@@ -178,7 +178,7 @@
                     </div>
                     <div class="selection-tags">
                       <span class="status-pill" [class]="'status-pill status-' + row.status">{{ statusLabel(row.status) }}</span>
-                      <span class="status-pill status-search">{{ visibilityLabel(row.searchVisible) }}</span>
+                      <span class="status-pill status-search">{{ visibilityChipLabel(row.searchVisible) }}</span>
                     </div>
                   </button>
 
@@ -421,11 +421,6 @@
                         <span>{{ visibilityLabel(searchVisible) }}</span>
                       </button>
                     }
-
-                    <button mat-menu-item type="button" (click)="deleteStickerRow(row)">
-                      <mat-icon>delete</mat-icon>
-                      <span>{{ i18n.t('Delete sticker') }}</span>
-                    </button>
                   </mat-menu>
 
                   <div class="imported-sticker-preview">
@@ -434,6 +429,13 @@
                     } @else {
                       <mat-icon>mood</mat-icon>
                     }
+                  </div>
+
+                  <div class="imported-sticker-meta">
+                    <div class="selection-tags">
+                      <span class="status-pill" [class]="'status-pill status-' + row.status">{{ statusLabel(row.status) }}</span>
+                      <span class="status-pill status-search">{{ visibilityChipLabel(row.searchVisible) }}</span>
+                    </div>
                   </div>
                 </div>
               }

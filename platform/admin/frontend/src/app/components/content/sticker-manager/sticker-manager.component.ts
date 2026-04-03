@@ -68,9 +68,9 @@ export class StickerManagerComponent {
   readonly selectedSvgFiles = signal<File[]>([]);
   readonly stickerPreviewUrls = signal<Record<string, string>>({});
   readonly categoryStatuses = ['active', 'hidden', 'blocked', 'deleted'] as const;
-  readonly packStatuses = ['active', 'hidden', 'blocked', 'deleted'] as const;
+  readonly packStatuses = ['active', 'blocked'] as const;
   readonly packVisibilityOptions = [true, false] as const;
-  readonly stickerStatuses = ['active', 'hidden', 'blocked', 'deleted'] as const;
+  readonly stickerStatuses = ['active', 'blocked'] as const;
   readonly stickerVisibilityOptions = [true, false] as const;
 
   readonly selectedCategory = computed(() => {
@@ -608,6 +608,10 @@ export class StickerManagerComponent {
     return this.i18n.t(searchVisible ? 'Visible in search' : 'Hidden in search');
   }
 
+  visibilityChipLabel(searchVisible: boolean): string {
+    return this.i18n.t(searchVisible ? 'Visible' : 'Hidden');
+  }
+
   stickerPreviewUrl(stickerId: string): string {
     return this.stickerPreviewUrls()[stickerId] || '';
   }
@@ -638,26 +642,6 @@ export class StickerManagerComponent {
     this.persistStickerUpdate(row, {
       searchVisible
     }, 'Sticker visibility updated.');
-  }
-
-  deleteStickerRow(row: Sticker): void {
-    if (this.savingSticker()) {
-      return;
-    }
-
-    this.savingSticker.set(true);
-    this.stickerService.deleteSticker(row.id).pipe(
-      finalize(() => this.savingSticker.set(false)),
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe({
-      next: () => {
-        if (this.selectedPackId() === row.packId) {
-          this.stickerService.loadStickers(row.packId);
-        }
-        this.showMessage('Sticker deleted.');
-      },
-      error: () => undefined
-    });
   }
 
   loadStickerPreviews(): void {

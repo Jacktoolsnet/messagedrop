@@ -168,9 +168,12 @@ function buildListSql(filters = {}) {
       s.*,
       p.name AS packName,
       p.slug AS packSlug,
+      p.status AS packStatus,
+      p.searchVisible AS packSearchVisible,
       p.categoryId,
       c.name AS categoryName,
-      c.slug AS categorySlug
+      c.slug AS categorySlug,
+      c.status AS categoryStatus
     FROM ${tableName} s
     INNER JOIN tableStickerPack p ON p.id = s.${columns.packId}
     INNER JOIN tableStickerCategory c ON c.id = p.categoryId
@@ -200,9 +203,12 @@ function getById(db, id, callback) {
       s.*,
       p.name AS packName,
       p.slug AS packSlug,
+      p.status AS packStatus,
+      p.searchVisible AS packSearchVisible,
       p.categoryId,
       c.name AS categoryName,
-      c.slug AS categorySlug
+      c.slug AS categorySlug,
+      c.status AS categoryStatus
     FROM ${tableName} s
     INNER JOIN tableStickerPack p ON p.id = s.${columns.packId}
     INNER JOIN tableStickerCategory c ON c.id = p.categoryId
@@ -225,9 +231,12 @@ function getByPackAndSlug(db, packId, slug, callback) {
       s.*,
       p.name AS packName,
       p.slug AS packSlug,
+      p.status AS packStatus,
+      p.searchVisible AS packSearchVisible,
       p.categoryId,
       c.name AS categoryName,
-      c.slug AS categorySlug
+      c.slug AS categorySlug,
+      c.status AS categoryStatus
     FROM ${tableName} s
     INNER JOIN tableStickerPack p ON p.id = s.${columns.packId}
     INNER JOIN tableStickerCategory c ON c.id = p.categoryId

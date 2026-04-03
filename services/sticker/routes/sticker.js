@@ -15,7 +15,9 @@ const router = express.Router();
 const STORAGE_ROOT = path.join(__dirname, '..', 'storage');
 const READER_ISSUERS = new Set(['service.backend', 'service.admin-backend']);
 const ADMIN_ISSUERS = new Set(['service.admin-backend']);
-const VALID_STATUSES = new Set(['active', 'hidden', 'blocked', 'deleted']);
+const CATEGORY_STATUSES = new Set(['active', 'hidden', 'blocked', 'deleted']);
+const PACK_STATUSES = new Set(['active', 'blocked', 'deleted']);
+const STICKER_STATUSES = new Set(['active', 'blocked', 'deleted']);
 const RENDERABLE_STATUSES = new Set(['active', 'hidden']);
 const VALID_VARIANTS = new Set(['preview', 'chat', 'original']);
 
@@ -124,12 +126,32 @@ function normalizeSlug(value, fallbackSource) {
   return slug;
 }
 
-function normalizeStatus(value, fallback = 'active') {
-  const normalized = normalizeString(value, { maxLength: 32, allowEmpty: true, fallback: fallback }).toLowerCase();
-  if (!VALID_STATUSES.has(normalized)) {
+function normalizeCategoryStatus(value, fallback = 'active') {
+  const normalized = normalizeString(value, { maxLength: 32, allowEmpty: true, fallback }).toLowerCase();
+  if (!CATEGORY_STATUSES.has(normalized)) {
     throw buildError(400, 'invalid_status');
   }
   return normalized;
+}
+
+function normalizePackOrStickerStatus(value, fallback = 'active') {
+  const normalized = normalizeString(value, { maxLength: 32, allowEmpty: true, fallback }).toLowerCase();
+  if (normalized === 'hidden') {
+    return 'active';
+  }
+  if (!PACK_STATUSES.has(normalized)) {
+    throw buildError(400, 'invalid_status');
+  }
+  return normalized;
+}
+
+function normalizePackOrStickerStatusForDto(value) {
+  const normalized = normalizeString(value, { maxLength: 32, allowEmpty: true, fallback: 'active' }).toLowerCase();
+  return normalized === 'hidden' ? 'active' : normalized;
+}
+
+function isRenderableStatus(value) {
+  return RENDERABLE_STATUSES.has(normalizeString(value, { maxLength: 32, allowEmpty: true, fallback: 'active' }).toLowerCase());
 }
 
 function normalizeKeywords(value) {
@@ -388,7 +410,7 @@ function toPackDto(row) {
     licenseFileName: row.licenseFileName || '',
     licenseFileMimeType: row.licenseFileMimeType || '',
     searchVisible: Boolean(row.searchVisible),
-    status: row.status,
+    status: normalizePackOrStickerStatusForDto(row.status),
     sortOrder: Number(row.sortOrder ?? 0),
     stickerCount: Number(row.stickerCount ?? 0),
     createdAt: Number(row.createdAt ?? 0),
@@ -417,7 +439,7 @@ function toStickerDto(row) {
     width: row.width ?? null,
     height: row.height ?? null,
     searchVisible: Boolean(row.searchVisible),
-    status: row.status,
+    status: normalizePackOrStickerStatusForDto(row.status),
     sortOrder: Number(row.sortOrder ?? 0),
     createdAt: Number(row.createdAt ?? 0),
     updatedAt: Number(row.updatedAt ?? 0),
@@ -496,7 +518,12 @@ async function resolveRenderableStickerAsset(db, stickerId, variant, visited = n
 
   const settings = await toPromise(tableStickerSettings.get, db);
   const sticker = await toPromise(tableSticker.getById, db, normalizedStickerId);
-  if (!sticker || !RENDERABLE_STATUSES.has(String(sticker.status || '').toLowerCase())) {
+  if (
+    !sticker
+    || !isRenderableStatus(sticker.status)
+    || !isRenderableStatus(sticker.packStatus)
+    || !isRenderableStatus(sticker.categoryStatus)
+  ) {
     const fallbackId = normalizeString(settings?.notFoundStickerId, { maxLength: 120, allowEmpty: true });
     if (!fallbackId || fallbackId === normalizedStickerId) {
       return null;
@@ -539,7 +566,7 @@ async function createCategoryPayload(db, body, { existing } = {}) {
     name,
     slug: normalizeSlug(hasOwn(body, 'slug') ? body?.slug : existing?.slug, name),
     previewStickerId,
-    status: normalizeStatus(hasOwn(body, 'status') ? body?.status : existing?.status, existing?.status || 'active'),
+    status: normalizeCategoryStatus(hasOwn(body, 'status') ? body?.status : existing?.status, existing?.status || 'active'),
     sortOrder: parseInteger(hasOwn(body, 'sortOrder') ? body?.sortOrder : existing?.sortOrder, Number(existing?.sortOrder ?? 0), { min: -100000, max: 100000 })
   };
 }
@@ -584,7 +611,7 @@ async function createPackPayload(db, body, { existing } = {}) {
     licenseFileName: normalizeString(hasOwn(body, 'licenseFileName') ? body?.licenseFileName : existing?.licenseFileName, { maxLength: 240, allowEmpty: true }),
     licenseFileMimeType: normalizeMimeType(hasOwn(body, 'licenseFileMimeType') ? body?.licenseFileMimeType : existing?.licenseFileMimeType),
     searchVisible: parseBoolean(hasOwn(body, 'searchVisible') ? body?.searchVisible : existing?.searchVisible, existing ? Boolean(existing.searchVisible) : true),
-    status: normalizeStatus(hasOwn(body, 'status') ? body?.status : existing?.status, existing?.status || 'active'),
+    status: normalizePackOrStickerStatus(hasOwn(body, 'status') ? body?.status : existing?.status, existing?.status || 'active'),
     sortOrder: parseInteger(hasOwn(body, 'sortOrder') ? body?.sortOrder : existing?.sortOrder, Number(existing?.sortOrder ?? 0), { min: -100000, max: 100000 })
   };
 }
@@ -617,7 +644,7 @@ async function createStickerPayload(db, body, { existing, forcedPackId } = {}) {
     width: normalizeOptionalInteger(hasOwn(body, 'width') ? body?.width : existing?.width),
     height: normalizeOptionalInteger(hasOwn(body, 'height') ? body?.height : existing?.height),
     searchVisible: parseBoolean(hasOwn(body, 'searchVisible') ? body?.searchVisible : existing?.searchVisible, existing ? Boolean(existing.searchVisible) : true),
-    status: normalizeStatus(hasOwn(body, 'status') ? body?.status : existing?.status, existing?.status || 'active'),
+    status: normalizePackOrStickerStatus(hasOwn(body, 'status') ? body?.status : existing?.status, existing?.status || 'active'),
     sortOrder: parseInteger(hasOwn(body, 'sortOrder') ? body?.sortOrder : existing?.sortOrder, Number(existing?.sortOrder ?? 0), { min: -100000, max: 100000 })
   };
 }
@@ -775,7 +802,14 @@ router.get('/search', requireIssuer(READER_ISSUERS), async (req, res, next) => {
       limit: parseInteger(req.query.limit, 100, { min: 1, max: 200 }),
       offset: 0
     });
-    res.status(200).json({ status: 200, rows: rows.map(toStickerDto) });
+    const filteredRows = rows.filter((row) => (
+      normalizePackOrStickerStatusForDto(row.status) === 'active'
+      && normalizePackOrStickerStatusForDto(row.packStatus) === 'active'
+      && Boolean(row.searchVisible)
+      && Boolean(row.packSearchVisible)
+      && isRenderableStatus(row.categoryStatus)
+    ));
+    res.status(200).json({ status: 200, rows: filteredRows.map(toStickerDto) });
   } catch (err) {
     next(err);
   }
