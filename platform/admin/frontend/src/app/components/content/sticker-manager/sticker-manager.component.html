@@ -206,6 +206,11 @@
                       <span>{{ i18n.t('Edit') }}</span>
                     </button>
 
+                    <button mat-menu-item type="button" (click)="loadStickerPreviewsForPack(row)" [disabled]="loadingStickerPreviews()">
+                      <mat-icon>imagesmode</mat-icon>
+                      <span>{{ i18n.t('Load sticker previews') }}</span>
+                    </button>
+
                     <button mat-menu-item disabled>
                       <mat-icon>tune</mat-icon>
                       <span>{{ i18n.t('Status') }}</span>
@@ -348,19 +353,6 @@
             </div>
           }
         </mat-card-content>
-
-        <mat-card-actions class="card-actions">
-          <button
-            mat-icon-button
-            type="button"
-            class="action-button"
-            [matTooltip]="i18n.t('Load sticker previews')"
-            [attr.aria-label]="i18n.t('Load sticker previews')"
-            [disabled]="!selectedPack() || stickers().length === 0 || loadingStickerPreviews()"
-            (click)="loadStickerPreviews()">
-            <mat-icon>imagesmode</mat-icon>
-          </button>
-        </mat-card-actions>
       </mat-card>
     </div>
   </div>

@@ -340,6 +340,7 @@ const adminDefaultLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
   limit: 600,
   ...rateLimitDefaults,
+  skip: (req) => req.path === '/stickers' || req.path.startsWith('/stickers/'),
   message: rateLimitMessage('Too many requests, please slow down.')
 });
 
@@ -378,6 +379,13 @@ const adminUserLimit = rateLimit({
   message: rateLimitMessage('Too many user requests, please try again later.')
 });
 
+const adminStickerLimit = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 5000,
+  ...rateLimitDefaults,
+  message: rateLimitMessage('Too many sticker requests, please try again later.')
+});
+
 const adminLogLimit = rateLimit({
   windowMs: 5 * 60 * 1000,
   limit: 300,
@@ -395,7 +403,7 @@ app.use('/user', adminUserLimit, user);
 app.use('/translate', adminTranslateLimit, translate);
 app.use('/ai', adminAiLimit, ai);
 app.use('/nominatim', adminUserLimit, nominatim);
-app.use('/stickers', adminUserLimit, sticker);
+app.use('/stickers', adminStickerLimit, sticker);
 app.use('/statistic', statistic);
 app.use('/error-log', adminLogLimit, errorLog);
 app.use('/info-log', adminLogLimit, infoLog);

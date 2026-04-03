@@ -61,6 +61,7 @@ export class StickerManagerComponent {
   readonly savingPack = signal(false);
   readonly importingSvg = signal(false);
   readonly loadingStickerPreviews = signal(false);
+  readonly pendingPreviewPackId = signal<string | null>(null);
   readonly selectedSvgFiles = signal<File[]>([]);
   readonly stickerPreviewUrls = signal<Record<string, string>>({});
   readonly categoryStatuses = ['active', 'hidden', 'blocked', 'deleted'] as const;
@@ -139,6 +140,23 @@ export class StickerManagerComponent {
       this.selectPack(rows[0]);
     });
 
+    effect(() => {
+      const pendingPackId = this.pendingPreviewPackId();
+      if (!pendingPackId || this.loadingStickers() || this.loadingStickerPreviews()) {
+        return;
+      }
+      if (this.selectedPackId() !== pendingPackId) {
+        return;
+      }
+
+      this.pendingPreviewPackId.set(null);
+      if (this.stickers().length === 0) {
+        return;
+      }
+
+      void this.loadStickerPreviewsAsync();
+    });
+
     this.destroyRef.onDestroy(() => {
       this.cancelStickerPreviewLoading();
       this.revokeStickerPreviewUrls();
@@ -164,6 +182,7 @@ export class StickerManagerComponent {
   selectCategory(row: StickerCategory): void {
     this.selectedCategoryId.set(row.id);
     this.selectedPackId.set(null);
+    this.pendingPreviewPackId.set(null);
     this.selectedSvgFiles.set([]);
     this.cancelStickerPreviewLoading();
     this.revokeStickerPreviewUrls();
@@ -315,8 +334,11 @@ export class StickerManagerComponent {
     });
   }
 
-  selectPack(row: StickerPack): void {
+  selectPack(row: StickerPack, preservePendingPreview = false): void {
     this.selectedPackId.set(row.id);
+    if (!preservePendingPreview) {
+      this.pendingPreviewPackId.set(null);
+    }
     this.selectedSvgFiles.set([]);
     this.cancelStickerPreviewLoading();
     this.revokeStickerPreviewUrls();
@@ -517,6 +539,27 @@ export class StickerManagerComponent {
       return;
     }
     void this.loadStickerPreviewsAsync();
+  }
+
+  loadStickerPreviewsForPack(row: StickerPack): void {
+    if (this.loadingStickerPreviews()) {
+      return;
+    }
+
+    if (row.id === this.selectedPackId()) {
+      if (this.loadingStickers()) {
+        this.pendingPreviewPackId.set(row.id);
+        return;
+      }
+      if (this.stickers().length === 0) {
+        return;
+      }
+      void this.loadStickerPreviewsAsync();
+      return;
+    }
+
+    this.pendingPreviewPackId.set(row.id);
+    this.selectPack(row, true);
   }
 
   private createPack(category: StickerCategory, result: StickerPackDialogResult): void {
