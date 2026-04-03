@@ -73,6 +73,10 @@ mat-toolbar {
   gap: var(--layout-gap);
 }
 
+.column-full {
+  grid-column: 1 / -1;
+}
+
 .section-card {
   border-radius: 24px;
   border: 1px solid var(--border);
@@ -172,6 +176,35 @@ mat-toolbar {
   color: inherit;
   padding: 0.85rem 0.95rem;
   text-align: left;
+}
+
+.imported-sticker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.9rem;
+  margin-top: 0.75rem;
+}
+
+.imported-sticker-tile {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.imported-sticker-tile mat-icon {
+  color: #0f766e;
+  flex: 0 0 auto;
+}
+
+.imported-sticker-tile span {
+  min-width: 0;
+  word-break: break-word;
 }
 
 .selected-file-summary {
@@ -349,15 +382,6 @@ mat-toolbar {
 .metadata-label {
   opacity: 0.7;
   font-size: 0.85rem;
-}
-
-.imported-section {
-  margin-top: 1rem;
-}
-
-.imported-section h3 {
-  margin: 0 0 0.5rem;
-  font-size: 1rem;
 }
 
 .status-pill {

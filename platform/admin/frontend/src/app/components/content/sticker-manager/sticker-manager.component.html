@@ -284,24 +284,6 @@
             </div>
           }
 
-          <div class="imported-section">
-            <h3>{{ i18n.t('Imported stickers') }}</h3>
-            @if (stickers().length === 0 && !loadingStickers()) {
-              <div class="empty-state compact">
-                <mat-icon>mood</mat-icon>
-                <span>{{ i18n.t('No stickers imported yet.') }}</span>
-              </div>
-            } @else {
-              <div class="file-list">
-                @for (row of stickers(); track trackById($index, row)) {
-                  <div class="file-list-item">
-                    <mat-icon>mood</mat-icon>
-                    <span>{{ row.name }}</span>
-                  </div>
-                }
-              </div>
-            }
-          </div>
         </mat-card-content>
 
         <mat-card-actions class="card-actions">
@@ -327,6 +309,40 @@
             <mat-icon>upload</mat-icon>
           </button>
         </mat-card-actions>
+      </mat-card>
+    </div>
+
+    <div class="column column-full">
+      <mat-card class="section-card">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-success">
+            <mat-icon>mood</mat-icon>
+          </div>
+          <mat-card-title>{{ i18n.t('Imported stickers') }}</mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          @if (!selectedPack()) {
+            <div class="empty-state compact">
+              <mat-icon>subdirectory_arrow_right</mat-icon>
+              <span>{{ i18n.t('Please create or select a sticker pack first.') }}</span>
+            </div>
+          } @else if (stickers().length === 0 && !loadingStickers()) {
+            <div class="empty-state compact">
+              <mat-icon>mood</mat-icon>
+              <span>{{ i18n.t('No stickers imported yet.') }}</span>
+            </div>
+          } @else {
+            <div class="imported-sticker-grid">
+              @for (row of stickers(); track trackById($index, row)) {
+                <div class="imported-sticker-tile">
+                  <mat-icon>mood</mat-icon>
+                  <span>{{ row.name }}</span>
+                </div>
+              }
+            </div>
+          }
+        </mat-card-content>
       </mat-card>
     </div>
   </div>
