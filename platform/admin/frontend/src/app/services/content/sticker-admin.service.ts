@@ -8,6 +8,7 @@ import { StickerPack } from '../../interfaces/sticker-pack.interface';
 import { StickerSettings } from '../../interfaces/sticker-settings.interface';
 import { Sticker } from '../../interfaces/sticker.interface';
 import { StickerSourceMetadata } from '../../interfaces/sticker-source-metadata.interface';
+import { getValidStoredAdminToken } from '../../utils/admin-token.util';
 import { DisplayMessageService } from '../display-message.service';
 import { TranslationHelperService } from '../translation-helper.service';
 
@@ -180,6 +181,27 @@ export class StickerAdminService {
     return this.http.post<StickerImportResult>(`${this.baseUrl}/packs/${encodeURIComponent(packId)}/import-svg`, formData).pipe(
       catchError((error) => this.handleError(error, 'Could not import SVG files.'))
     );
+  }
+
+  async fetchStickerPreviewUrl(stickerId: string, abortSignal?: AbortSignal): Promise<string> {
+    const token = getValidStoredAdminToken();
+    if (!token) {
+      return '';
+    }
+
+    const response = await fetch(`${this.baseUrl}/render/${encodeURIComponent(stickerId)}?variant=preview`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      signal: abortSignal
+    });
+
+    if (!response.ok) {
+      return '';
+    }
+
+    const blob = await response.blob();
+    return URL.createObjectURL(blob);
   }
 
   private handleError(error: unknown, fallbackMessage: string) {

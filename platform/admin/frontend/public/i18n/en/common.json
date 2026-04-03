@@ -80,6 +80,7 @@
   "Upload the SVG files that should become stickers for the selected pack.": "Upload the SVG files that should become stickers for the selected pack.",
   "Select SVG files": "Select SVG files",
   "Import selected SVG files": "Import selected SVG files",
+  "Load sticker previews": "Load sticker previews",
   "No SVG files selected yet.": "No SVG files selected yet.",
   "SVG files selected": "SVG files selected",
   "Imported stickers": "Imported stickers",

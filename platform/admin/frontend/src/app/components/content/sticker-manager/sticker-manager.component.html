@@ -336,13 +336,35 @@
             <div class="imported-sticker-grid">
               @for (row of stickers(); track trackById($index, row)) {
                 <div class="imported-sticker-tile">
-                  <mat-icon>mood</mat-icon>
-                  <span>{{ row.name }}</span>
+                  <div class="imported-sticker-preview">
+                    @if (stickerPreviewUrl(row.id)) {
+                      <img [src]="stickerPreviewUrl(row.id)" [alt]="row.name" />
+                    } @else {
+                      <mat-icon>mood</mat-icon>
+                    }
+                  </div>
+
+                  <div class="imported-sticker-meta">
+                    <span>{{ stickerFileName(row) }}</span>
+                  </div>
                 </div>
               }
             </div>
           }
         </mat-card-content>
+
+        <mat-card-actions class="card-actions">
+          <button
+            mat-icon-button
+            type="button"
+            class="action-button"
+            [matTooltip]="i18n.t('Load sticker previews')"
+            [attr.aria-label]="i18n.t('Load sticker previews')"
+            [disabled]="!selectedPack() || stickers().length === 0 || loadingStickerPreviews()"
+            (click)="loadStickerPreviews()">
+            <mat-icon>imagesmode</mat-icon>
+          </button>
+        </mat-card-actions>
       </mat-card>
     </div>
   </div>

@@ -226,6 +226,7 @@
   "Upload the SVG files that should become stickers for the selected pack.": "Lade die SVG-Dateien hoch, die für das ausgewählte Pack zu Stickern werden sollen.",
   "Select SVG files": "SVG-Dateien auswählen",
   "Import selected SVG files": "Ausgewählte SVG-Dateien importieren",
+  "Load sticker previews": "Sticker-Vorschaubilder laden",
   "No SVG files selected yet.": "Es wurden noch keine SVG-Dateien ausgewählt.",
   "SVG files selected": "SVG-Dateien ausgewählt",
   "Imported stickers": "Importierte Sticker",

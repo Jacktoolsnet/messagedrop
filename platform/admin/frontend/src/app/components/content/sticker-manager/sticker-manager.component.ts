@@ -14,6 +14,7 @@ import { RouterLink } from '@angular/router';
 import { finalize, forkJoin } from 'rxjs';
 import { StickerCategory } from '../../../interfaces/sticker-category.interface';
 import { StickerPack } from '../../../interfaces/sticker-pack.interface';
+import { Sticker } from '../../../interfaces/sticker.interface';
 import { StickerAdminService } from '../../../services/content/sticker-admin.service';
 import { DisplayMessageService } from '../../../services/display-message.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
@@ -39,6 +40,7 @@ import { StickerPackDialogComponent, StickerPackDialogResult } from './sticker-p
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StickerManagerComponent {
+  private stickerPreviewAbortController: AbortController | null = null;
   private readonly destroyRef = inject(DestroyRef);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(DisplayMessageService);
@@ -59,7 +61,9 @@ export class StickerManagerComponent {
   readonly savingCategory = signal(false);
   readonly savingPack = signal(false);
   readonly importingSvg = signal(false);
+  readonly loadingStickerPreviews = signal(false);
   readonly selectedSvgFiles = signal<File[]>([]);
+  readonly stickerPreviewUrls = signal<Record<string, string>>({});
   readonly categoryStatuses = ['active', 'hidden', 'blocked', 'deleted'] as const;
   readonly packStatuses = ['active', 'hidden', 'blocked', 'deleted'] as const;
   readonly packVisibilityOptions = [true, false] as const;
@@ -86,7 +90,7 @@ export class StickerManagerComponent {
   constructor() {
     effect(() => {
       this.categoryRows.set(this.sortCategories(this.categories()));
-    }, { allowSignalWrites: true });
+    });
 
     effect(() => {
       const rows = this.categoryRows();
@@ -106,11 +110,11 @@ export class StickerManagerComponent {
         return;
       }
       this.selectCategory(rows[0]);
-    }, { allowSignalWrites: true });
+    });
 
     effect(() => {
       this.packRows.set(this.sortPacks(this.packs()));
-    }, { allowSignalWrites: true });
+    });
 
     effect(() => {
       const rows = this.packRows();
@@ -134,7 +138,12 @@ export class StickerManagerComponent {
         return;
       }
       this.selectPack(rows[0]);
-    }, { allowSignalWrites: true });
+    });
+
+    this.destroyRef.onDestroy(() => {
+      this.cancelStickerPreviewLoading();
+      this.revokeStickerPreviewUrls();
+    });
 
     this.stickerService.loadCategories();
   }
@@ -157,6 +166,8 @@ export class StickerManagerComponent {
     this.selectedCategoryId.set(row.id);
     this.selectedPackId.set(null);
     this.selectedSvgFiles.set([]);
+    this.cancelStickerPreviewLoading();
+    this.revokeStickerPreviewUrls();
     this.stickerService.loadPacks(row.id);
     this.stickerService.loadStickers('');
   }
@@ -308,6 +319,8 @@ export class StickerManagerComponent {
   selectPack(row: StickerPack): void {
     this.selectedPackId.set(row.id);
     this.selectedSvgFiles.set([]);
+    this.cancelStickerPreviewLoading();
+    this.revokeStickerPreviewUrls();
     this.stickerService.loadStickers(row.id);
   }
 
@@ -496,6 +509,24 @@ export class StickerManagerComponent {
     return this.i18n.t(searchVisible ? 'Visible in search' : 'Hidden in search');
   }
 
+  stickerPreviewUrl(stickerId: string): string {
+    return this.stickerPreviewUrls()[stickerId] || '';
+  }
+
+  stickerFileName(row: Sticker): string {
+    const sourcePath = row.originalPath || row.previewPath || row.chatPath || row.name;
+    const normalized = String(sourcePath || '').replace(/\\/g, '/');
+    const segments = normalized.split('/').filter(Boolean);
+    return segments[segments.length - 1] || row.name;
+  }
+
+  loadStickerPreviews(): void {
+    if (this.loadingStickerPreviews() || !this.selectedPack() || this.stickers().length === 0) {
+      return;
+    }
+    void this.loadStickerPreviewsAsync();
+  }
+
   private createPack(category: StickerCategory, result: StickerPackDialogResult): void {
     this.savingPack.set(true);
       this.stickerService.createPack({
@@ -623,6 +654,66 @@ export class StickerManagerComponent {
 
   private getNextPackSortOrder(): number {
     return this.packRows().reduce((maxValue, row) => Math.max(maxValue, Number(row.sortOrder ?? 0)), -1) + 1;
+  }
+
+  private async loadStickerPreviewsAsync(): Promise<void> {
+    this.cancelStickerPreviewLoading();
+    this.revokeStickerPreviewUrls();
+
+    const stickers = this.stickers();
+    if (stickers.length === 0) {
+      return;
+    }
+
+    const abortController = new AbortController();
+    this.stickerPreviewAbortController = abortController;
+    this.loadingStickerPreviews.set(true);
+    const nextUrls: Record<string, string> = {};
+
+    try {
+      for (const row of stickers) {
+        if (abortController.signal.aborted) {
+          return;
+        }
+
+        const url = await this.stickerService.fetchStickerPreviewUrl(row.id, abortController.signal);
+        if (url) {
+          nextUrls[row.id] = url;
+        }
+      }
+
+      if (abortController.signal.aborted) {
+        for (const value of Object.values(nextUrls)) {
+          if (value) {
+            window.URL.revokeObjectURL(value);
+          }
+        }
+        return;
+      }
+
+      this.stickerPreviewUrls.set(nextUrls);
+    } finally {
+      if (this.stickerPreviewAbortController === abortController) {
+        this.stickerPreviewAbortController = null;
+      }
+      this.loadingStickerPreviews.set(false);
+    }
+  }
+
+  private revokeStickerPreviewUrls(): void {
+    const current = this.stickerPreviewUrls();
+    for (const value of Object.values(current)) {
+      if (value) {
+        window.URL.revokeObjectURL(value);
+      }
+    }
+    this.stickerPreviewUrls.set({});
+  }
+
+  private cancelStickerPreviewLoading(): void {
+    this.stickerPreviewAbortController?.abort();
+    this.stickerPreviewAbortController = null;
+    this.loadingStickerPreviews.set(false);
   }
 
   private isSvgFile(file: File): boolean {
