@@ -480,6 +480,57 @@ function toStickerDto(row) {
   };
 }
 
+function buildBootstrapRows(categoryRows, packRows, stickerRows) {
+  const stickerDtosByPackId = new Map();
+  for (const row of stickerRows || []) {
+    const dto = toStickerDto(row);
+    if (!dto) {
+      continue;
+    }
+
+    const existing = stickerDtosByPackId.get(dto.packId);
+    if (existing) {
+      existing.push(dto);
+    } else {
+      stickerDtosByPackId.set(dto.packId, [dto]);
+    }
+  }
+
+  const packDtosByCategoryId = new Map();
+  for (const row of packRows || []) {
+    const dto = toPackDto(row);
+    if (!dto) {
+      continue;
+    }
+
+    const stickers = stickerDtosByPackId.get(dto.id) || [];
+    const packWithStickers = {
+      ...dto,
+      stickerCount: stickers.length,
+      stickers
+    };
+
+    const existing = packDtosByCategoryId.get(dto.categoryId);
+    if (existing) {
+      existing.push(packWithStickers);
+    } else {
+      packDtosByCategoryId.set(dto.categoryId, [packWithStickers]);
+    }
+  }
+
+  return (categoryRows || []).map((row) => {
+    const dto = toCategoryDto(row);
+    const packs = packDtosByCategoryId.get(dto?.id) || [];
+    const stickerCount = packs.reduce((sum, pack) => sum + pack.stickers.length, 0);
+    return {
+      ...dto,
+      packCount: packs.length,
+      stickerCount,
+      packs
+    };
+  });
+}
+
 function toSettingsDto(row) {
   if (!row) {
     return null;
@@ -725,6 +776,37 @@ async function createStickerPayload(db, body, { existing, forcedPackId } = {}) {
 }
 
 router.use(security.checkToken);
+
+router.get('/bootstrap', requireIssuer(READER_ISSUERS), async (req, res, next) => {
+  try {
+    const db = getDatabase(req);
+    const [categoryRows, packRows, stickerRows] = await Promise.all([
+      toPromise(tableStickerCategory.list, db, {
+        includeDeleted: false,
+        status: 'active'
+      }),
+      toPromise(tableStickerPack.list, db, {
+        includeDeleted: false,
+        status: 'active',
+        searchVisible: true
+      }),
+      toPromise(tableSticker.list, db, {
+        includeDeleted: false,
+        status: 'active',
+        searchVisible: true,
+        limit: 100000,
+        offset: 0
+      })
+    ]);
+
+    res.status(200).json({
+      status: 200,
+      rows: buildBootstrapRows(categoryRows, packRows, stickerRows)
+    });
+  } catch (err) {
+    next(err);
+  }
+});
 
 router.get('/categories', requireIssuer(READER_ISSUERS), async (req, res, next) => {
   try {

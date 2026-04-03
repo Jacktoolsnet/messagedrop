@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { map, Observable, shareReplay, tap } from 'rxjs';
+import { firstValueFrom, map, Observable, shareReplay, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Multimedia } from '../interfaces/multimedia';
 import { MultimediaType } from '../interfaces/multimedia-type';
+import { StickerBootstrapCategory } from '../interfaces/sticker-bootstrap.interface';
 import { StickerCategory } from '../interfaces/sticker-category.interface';
 import { StickerPack } from '../interfaces/sticker-pack.interface';
 import { Sticker } from '../interfaces/sticker.interface';
@@ -19,69 +20,55 @@ interface RowsResponse<T> {
 export class StickerService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/stickers`;
-  private categoriesRequest?: Observable<StickerCategory[]>;
-  private readonly packsRequests = new Map<string, Observable<StickerPack[]>>();
-  private readonly stickersRequests = new Map<string, Observable<Sticker[]>>();
+  private bootstrapRequest?: Observable<StickerBootstrapCategory[]>;
 
-  getCategories(): Observable<StickerCategory[]> {
-    if (!this.categoriesRequest) {
-      this.categoriesRequest = this.http.get<RowsResponse<StickerCategory>>(`${this.baseUrl}/categories`).pipe(
+  getBootstrap(): Observable<StickerBootstrapCategory[]> {
+    if (!this.bootstrapRequest) {
+      this.bootstrapRequest = this.http.get<RowsResponse<StickerBootstrapCategory>>(`${this.baseUrl}/bootstrap`).pipe(
         map((response) => Array.isArray(response.rows) ? response.rows : []),
         tap({
           error: () => {
-            this.categoriesRequest = undefined;
+            this.bootstrapRequest = undefined;
           }
         }),
         shareReplay(1)
       );
     }
-    return this.categoriesRequest;
+    return this.bootstrapRequest;
+  }
+
+  getCategories(): Observable<StickerCategory[]> {
+    return this.getBootstrap().pipe(
+      map((categories) => categories.map(({ packs: _packs, ...category }) => category))
+    );
   }
 
   getPacks(categoryId: string): Observable<StickerPack[]> {
-    const cacheKey = String(categoryId);
-    const cached = this.packsRequests.get(cacheKey);
-    if (cached) {
-      return cached;
-    }
-
-    const request$ = this.http.get<RowsResponse<StickerPack>>(
-      `${this.baseUrl}/categories/${encodeURIComponent(categoryId)}/packs`
-    ).pipe(
-      map((response) => Array.isArray(response.rows) ? response.rows : []),
-      tap({
-        error: () => {
-          this.packsRequests.delete(cacheKey);
+    return this.getBootstrap().pipe(
+      map((categories) => {
+        const category = categories.find((entry) => entry.id === categoryId);
+        if (!category) {
+          return [];
         }
-      }),
-      shareReplay(1)
-    );
 
-    this.packsRequests.set(cacheKey, request$);
-    return request$;
+        return category.packs.map(({ stickers: _stickers, ...pack }) => pack);
+      })
+    );
   }
 
   getStickers(packId: string): Observable<Sticker[]> {
-    const cacheKey = String(packId);
-    const cached = this.stickersRequests.get(cacheKey);
-    if (cached) {
-      return cached;
-    }
-
-    const request$ = this.http.get<RowsResponse<Sticker>>(
-      `${this.baseUrl}/packs/${encodeURIComponent(packId)}/stickers`
-    ).pipe(
-      map((response) => Array.isArray(response.rows) ? response.rows : []),
-      tap({
-        error: () => {
-          this.stickersRequests.delete(cacheKey);
+    return this.getBootstrap().pipe(
+      map((categories) => {
+        for (const category of categories) {
+          const pack = category.packs.find((entry) => entry.id === packId);
+          if (pack) {
+            return pack.stickers;
+          }
         }
-      }),
-      shareReplay(1)
-    );
 
-    this.stickersRequests.set(cacheKey, request$);
-    return request$;
+        return [];
+      })
+    );
   }
 
   getRenderUrl(stickerId: string, variant: 'preview' | 'chat' = 'chat'): string {
@@ -94,14 +81,9 @@ export class StickerService {
 
   async fetchPackLicenseUrl(packId: string): Promise<string | null> {
     try {
-      const response = await fetch(this.getPackLicenseUrl(packId), {
-        credentials: 'same-origin'
-      });
-      if (!response.ok) {
-        return null;
-      }
-
-      const blob = await response.blob();
+      const blob = await firstValueFrom(this.http.get(this.getPackLicenseUrl(packId), {
+        responseType: 'blob'
+      }));
       if (!blob.size) {
         return null;
       }

@@ -40,6 +40,7 @@ const helmet = require('helmet');
 const cron = require('node-cron');
 const winston = require('winston');
 const rateLimit = require('express-rate-limit');
+const jwt = require('jsonwebtoken');
 const { generateOrLoadKeypairs, generateOrLoadVapidKeys } = require('./utils/keyStore');
 const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
 const { normalizeErrorResponses, notFoundHandler, errorHandler } = require('./middleware/api-error');
@@ -325,6 +326,37 @@ function shouldSkipServiceRateLimit(req) {
   }
 }
 
+function shouldSkipAuthenticatedStickerRateLimit(req) {
+  const authHeader = req.headers?.authorization;
+  if (typeof authHeader !== 'string' || !authHeader.trim()) {
+    return false;
+  }
+
+  const token = authHeader.startsWith('Bearer ')
+    ? authHeader.slice(7).trim()
+    : authHeader.trim();
+
+  if (!token) {
+    return false;
+  }
+
+  try {
+    verifyServiceJwt(token, {
+      audience: process.env.SERVICE_JWT_AUDIENCE_BACKEND || process.env.SERVICE_JWT_AUDIENCE || 'service.backend'
+    });
+    return true;
+  } catch {
+    // ignore and try user JWT below
+  }
+
+  try {
+    jwt.verify(token, process.env.JWT_SECRET);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 const basicLimit = rateLimit({
   windowMs: 5 * 60 * 1000,
   limit: 120,
@@ -413,6 +445,7 @@ const unsplashLimit = rateLimit({
 const stickerLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
   limit: 100000,
+  skip: shouldSkipAuthenticatedStickerRateLimit,
   ...rateLimitDefaults,
   message: rateLimitMessage('Too many sticker requests, please try again later.')
 });

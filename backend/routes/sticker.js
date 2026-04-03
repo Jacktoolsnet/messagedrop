@@ -153,10 +153,21 @@ function relayBinaryResponse(req, res, response, fallbackErrorCode) {
 }
 
 router.use(metric.count('sticker.proxy', { when: 'always', timezone: 'utc', amount: 1 }));
-router.use(security.authenticateOptional);
 router.use(express.json({ limit: '256kb' }));
 
-router.get('/categories', async (req, res, next) => {
+router.get('/bootstrap', security.authenticate, async (req, res, next) => {
+  try {
+    const response = await requestStickerService(req, {
+      method: 'get',
+      path: '/bootstrap'
+    });
+    return relayJsonResponse(res, response);
+  } catch (error) {
+    return next(axios.isAxiosError(error) ? buildAxiosError(error) : error);
+  }
+});
+
+router.get('/categories', security.authenticate, async (req, res, next) => {
   try {
     const response = await requestStickerService(req, {
       method: 'get',
@@ -171,7 +182,7 @@ router.get('/categories', async (req, res, next) => {
   }
 });
 
-router.get('/categories/:id/packs', async (req, res, next) => {
+router.get('/categories/:id/packs', security.authenticate, async (req, res, next) => {
   try {
     const response = await requestStickerService(req, {
       method: 'get',
@@ -187,7 +198,7 @@ router.get('/categories/:id/packs', async (req, res, next) => {
   }
 });
 
-router.get('/packs/:id/stickers', async (req, res, next) => {
+router.get('/packs/:id/stickers', security.authenticate, async (req, res, next) => {
   try {
     const response = await requestStickerService(req, {
       method: 'get',
@@ -205,7 +216,7 @@ router.get('/packs/:id/stickers', async (req, res, next) => {
   }
 });
 
-router.get('/packs/:id/license', async (req, res, next) => {
+router.get('/packs/:id/license', security.authenticate, async (req, res, next) => {
   try {
     const response = await requestStickerService(req, {
       method: 'get',
