@@ -11,15 +11,28 @@ const services = [
   { issuer: 'service.sticker', keyStore: '../services/sticker/utils/keyStore' }
 ];
 
-async function run() {
-  const jwks = {};
-
-  for (const svc of services) {
-    const ks = require(path.join(__dirname, svc.keyStore));
-    await ks.generateOrLoadKeypairs();
-    const jwk = await ks.getSigningPublicJwk();
-    jwks[svc.issuer] = jwk;
+function readJsonFile(filePath) {
+  if (!fs.existsSync(filePath)) {
+    return {};
   }
+  try {
+    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  } catch {
+    return {};
+  }
+}
+
+function collectExistingJwks(outputDirs) {
+  const merged = {};
+  for (const dir of outputDirs) {
+    const outPath = path.join(dir, 'service-jwks.json');
+    Object.assign(merged, readJsonFile(outPath));
+  }
+  return merged;
+}
+
+async function run() {
+  const generatedJwks = {};
 
   const outDir = path.join(process.cwd(), 'config');
   const outputDirs = [
@@ -32,6 +45,16 @@ async function run() {
     path.join(process.cwd(), 'services', 'viator', 'config'),
     path.join(process.cwd(), 'services', 'sticker', 'config')
   ];
+
+  for (const svc of services) {
+    const ks = require(path.join(__dirname, svc.keyStore));
+    await ks.generateOrLoadKeypairs();
+    const jwk = await ks.getSigningPublicJwk();
+    generatedJwks[svc.issuer] = jwk;
+  }
+
+  const existingJwks = collectExistingJwks(outputDirs);
+  const jwks = { ...existingJwks, ...generatedJwks };
 
   for (const dir of outputDirs) {
     if (!fs.existsSync(dir)) {

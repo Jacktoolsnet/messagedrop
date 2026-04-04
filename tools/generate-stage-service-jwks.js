@@ -66,6 +66,39 @@ function readJsonFile(filePath) {
   }
 }
 
+function getServicePaths(baseDir, service) {
+  const serviceDir = path.join(baseDir, service.dir);
+  return {
+    serviceDir,
+    signingKeyPath: path.join(serviceDir, 'signing.key.enc'),
+    bundlePath: path.join(serviceDir, 'service-jwks.json')
+  };
+}
+
+function collectExistingStageJwks(stageDir) {
+  const merged = {};
+  const sources = [];
+
+  for (const svc of SERVICES) {
+    const { bundlePath } = getServicePaths(stageDir, svc);
+    const existing = readJsonFile(bundlePath);
+    const keys = Object.keys(existing);
+    if (keys.length > 0) {
+      Object.assign(merged, existing);
+      sources.push(`${svc.name}(${keys.length})`);
+    }
+  }
+
+  return { jwks: merged, sources };
+}
+
+function resolveTargetServices(stageDir) {
+  return SERVICES.filter((svc) => {
+    const { serviceDir, signingKeyPath, bundlePath } = getServicePaths(stageDir, svc);
+    return fileExists(serviceDir) || fileExists(signingKeyPath) || fileExists(bundlePath);
+  });
+}
+
 function createInterface() {
   return readline.createInterface({
     input: process.stdin,
@@ -115,14 +148,13 @@ async function run() {
       throw new Error(`Stage keys directory not found: ${stageDir}`);
     }
 
-    const availableServices = SERVICES.filter((svc) => {
-      const signingKeyPath = path.join(stageDir, svc.dir, 'signing.key.enc');
-      return fileExists(signingKeyPath);
-    });
+    const availableServices = SERVICES.filter((svc) => fileExists(getServicePaths(stageDir, svc).signingKeyPath));
     const skippedServices = SERVICES.filter((svc) => !availableServices.includes(svc));
+    const targetServices = resolveTargetServices(stageDir);
+    const existingStage = collectExistingStageJwks(stageDir);
 
-    if (availableServices.length === 0) {
-      throw new Error(`No signing.key.enc files found in ${stageDir}`);
+    if (availableServices.length === 0 && targetServices.length === 0) {
+      throw new Error(`No signing.key.enc or service-jwks.json files found in ${stageDir}`);
     }
 
     if (skippedServices.length > 0) {
@@ -131,44 +163,54 @@ async function run() {
       );
     }
 
-    const useSame = await promptYesNo(
-      rl,
-      'Use same SIGNING_KEY_PASSWORD for all services? (y/N): '
-    );
+    if (existingStage.sources.length > 0) {
+      console.log(
+        `Loaded existing JWK entries from: ${existingStage.sources.join(', ')}`
+      );
+    }
+
     const passwords = new Map();
-    if (useSame) {
-      const password = await promptPassword(rl, 'SIGNING_KEY_PASSWORD: ');
-      for (const svc of availableServices) {
-        passwords.set(svc.name, password);
-      }
-    } else {
-      for (const svc of availableServices) {
-        const password = await promptPassword(
-          rl,
-          `SIGNING_KEY_PASSWORD for ${svc.name}: `
-        );
-        passwords.set(svc.name, password);
+    if (availableServices.length > 0) {
+      const useSame = await promptYesNo(
+        rl,
+        'Use same SIGNING_KEY_PASSWORD for all services with signing.key.enc? (y/N): '
+      );
+      if (useSame) {
+        const password = await promptPassword(rl, 'SIGNING_KEY_PASSWORD: ');
+        for (const svc of availableServices) {
+          passwords.set(svc.name, password);
+        }
+      } else {
+        for (const svc of availableServices) {
+          const password = await promptPassword(
+            rl,
+            `SIGNING_KEY_PASSWORD for ${svc.name}: `
+          );
+          passwords.set(svc.name, password);
+        }
       }
     }
 
-    const jwks = {};
+    const generatedJwks = {};
     for (const svc of availableServices) {
-      const keyDir = path.join(stageDir, svc.dir);
-      const signingKeyPath = path.join(keyDir, 'signing.key.enc');
+      const { signingKeyPath } = getServicePaths(stageDir, svc);
       const password = passwords.get(svc.name);
-      jwks[svc.issuer] = loadSigningPublicJwk(signingKeyPath, password, svc.name);
+      generatedJwks[svc.issuer] = loadSigningPublicJwk(signingKeyPath, password, svc.name);
     }
 
-    for (const svc of availableServices) {
-      const outDir = path.join(stageDir, svc.dir);
+    const jwks = { ...existingStage.jwks, ...generatedJwks };
+    const jwkCount = Object.keys(jwks).length;
+    if (jwkCount === 0) {
+      throw new Error(`No JWK entries could be assembled for stage ${stage}`);
+    }
+
+    for (const svc of targetServices) {
+      const { serviceDir: outDir, bundlePath: outPath } = getServicePaths(stageDir, svc);
       if (!fs.existsSync(outDir)) {
         fs.mkdirSync(outDir, { recursive: true });
       }
-      const outPath = path.join(outDir, 'service-jwks.json');
-      const existing = readJsonFile(outPath);
-      const merged = { ...existing, ...jwks };
-      fs.writeFileSync(outPath, JSON.stringify(merged, null, 2));
-      console.log(`Wrote ${outPath}`);
+      fs.writeFileSync(outPath, JSON.stringify(jwks, null, 2));
+      console.log(`Wrote ${outPath} (${jwkCount} issuers)`);
     }
   } finally {
     rl.close();
