@@ -1245,6 +1245,10 @@
         "title": "Start navigation",
         "desc": "This action opens external navigation to the message location."
       },
+      "share": {
+        "title": "Share public message",
+        "desc": "This action shares a public message directly with the visible share button, for example by copying the link or using your device's share sheet."
+      },
       "profile": {
         "title": "Open message profile",
         "desc": "This action opens the public message profile of the author for messages from other users."

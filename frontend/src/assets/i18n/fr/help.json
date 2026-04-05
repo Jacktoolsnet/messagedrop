@@ -1245,6 +1245,10 @@
         "title": "Démarrer la navigation",
         "desc": "Cette fonction ouvre une navigation externe vers la position du message."
       },
+      "share": {
+        "title": "Partager le message public",
+        "desc": "Cette fonction permet de partager un message public directement avec le bouton de partage visible, par exemple en copiant le lien ou en utilisant la fonction de partage de votre appareil."
+      },
       "profile": {
         "title": "Ouvrir le profil de messages",
         "desc": "Cette fonction ouvre le profil public de messages de l'auteur quand la publication ne vous appartient pas."

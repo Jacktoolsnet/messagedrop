@@ -1245,6 +1245,10 @@
         "title": "Iniciar navegación",
         "desc": "Con esta función abres una navegación externa hacia la ubicación del mensaje."
       },
+      "share": {
+        "title": "Compartir mensaje público",
+        "desc": "Con esta función compartes un mensaje público directamente con el botón visible de compartir, por ejemplo copiando el enlace o usando la función de compartir de tu dispositivo."
+      },
       "profile": {
         "title": "Abrir perfil de mensajes",
         "desc": "Con esta función abres el perfil público de mensajes de la persona autora cuando la publicación no es tuya."

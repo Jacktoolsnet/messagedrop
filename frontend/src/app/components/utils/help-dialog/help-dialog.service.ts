@@ -1641,6 +1641,11 @@ const HELP_TOPICS = {
         descriptionKey: 'myMessageList.items.navigate.desc'
       },
       {
+        icon: 'share',
+        titleKey: 'myMessageList.items.share.title',
+        descriptionKey: 'myMessageList.items.share.desc'
+      },
+      {
         icon: 'person',
         titleKey: 'myMessageList.items.profile.title',
         descriptionKey: 'myMessageList.items.profile.desc'

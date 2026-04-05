@@ -1245,6 +1245,10 @@
         "title": "Navigation starten",
         "desc": "Mit dieser Funktion öffnest du externe Navigation zur Position des Beitrags."
       },
+      "share": {
+        "title": "Öffentliche Nachricht teilen",
+        "desc": "Mit dieser Funktion teilst du eine öffentliche Nachricht direkt über den sichtbaren Teilen-Button, zum Beispiel per Link kopieren oder über die Teilen-Funktion deines Geräts."
+      },
       "profile": {
         "title": "Nachrichtenprofil öffnen",
         "desc": "Mit dieser Funktion öffnest du bei fremden Beiträgen das öffentliche Nachrichtenprofil der verfassenden Person."
