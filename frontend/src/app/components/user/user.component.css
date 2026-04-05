@@ -177,6 +177,10 @@
   flex-wrap: wrap;
 }
 
+.translation-actions__menu-trigger {
+  display: none;
+}
+
 .tile-danger {
   border: 1px solid color-mix(in srgb, var(--mat-sys-error, currentColor) 30%, transparent);
 }
@@ -309,5 +313,20 @@
   .appeal-entry-header {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .translation-actions {
+    flex-wrap: nowrap;
+  }
+
+  .translation-actions__secondary {
+    display: none;
+  }
+
+  .translation-actions__menu-trigger,
+  .translation-actions__save {
+    display: inline-flex;
+    flex: 1 1 0;
+    justify-content: center;
   }
 }

@@ -8,6 +8,7 @@ import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatMenuModule } from '@angular/material/menu';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { moderationReasonTranslationKey } from '../../constants/user-moderation-reasons';
 import { UserModerationAppeal, UserModerationAppealStatus, UserModerationTarget } from '../../interfaces/user-moderation-response.interface';
@@ -31,6 +32,7 @@ import { DisplayMessageRef, DisplayMessageService } from '../../services/display
     MatDialogClose,
     MatFormFieldModule,
     MatInputModule,
+    MatMenuModule,
     MatIcon,
     TranslocoPipe
   ],

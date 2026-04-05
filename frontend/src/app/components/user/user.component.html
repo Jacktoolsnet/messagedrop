@@ -213,6 +213,7 @@
 
           <div class="translation-actions">
             <button
+              class="translation-actions__secondary"
               mat-stroked-button
               type="button"
               (click)="testDeeplApiKey()"
@@ -221,6 +222,7 @@
               {{ 'common.user.translationSettings.test' | transloco }}
             </button>
             <button
+              class="translation-actions__secondary"
               mat-stroked-button
               type="button"
               (click)="clearDeeplApiKey()"
@@ -229,6 +231,17 @@
               {{ 'common.user.translationSettings.clear' | transloco }}
             </button>
             <button
+              class="translation-actions__menu-trigger"
+              mat-stroked-button
+              type="button"
+              [matMenuTriggerFor]="translationActionsMenu"
+              [attr.aria-label]="'common.actions.more' | transloco"
+              [disabled]="savingDeeplApiKey() || testingDeeplApiKey() || (translationSettingsForm.invalid && (!hasStoredDeeplApiKey() && !translationKeyChanged()))">
+              <mat-icon>more_horiz</mat-icon>
+              {{ 'common.actions.more' | transloco }}
+            </button>
+            <button
+              class="translation-actions__save"
               mat-flat-button
               color="primary"
               type="button"
@@ -238,6 +251,24 @@
               {{ 'common.user.translationSettings.save' | transloco }}
             </button>
           </div>
+          <mat-menu #translationActionsMenu="matMenu">
+            <button
+              mat-menu-item
+              type="button"
+              (click)="testDeeplApiKey()"
+              [disabled]="savingDeeplApiKey() || testingDeeplApiKey() || translationSettingsForm.invalid">
+              <mat-icon>fact_check</mat-icon>
+              <span>{{ 'common.user.translationSettings.test' | transloco }}</span>
+            </button>
+            <button
+              mat-menu-item
+              type="button"
+              (click)="clearDeeplApiKey()"
+              [disabled]="savingDeeplApiKey() || testingDeeplApiKey() || (!hasStoredDeeplApiKey() && !translationKeyChanged())">
+              <mat-icon>delete</mat-icon>
+              <span>{{ 'common.user.translationSettings.clear' | transloco }}</span>
+            </button>
+          </mat-menu>
         </div>
       </mat-card-content>
     </mat-card>

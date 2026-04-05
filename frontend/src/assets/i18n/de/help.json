@@ -97,7 +97,7 @@
     "intro": "In diesem Bereich verwaltest du deinen lokalen Benutzer auf diesem Gerät: Backup erstellen, PIN ändern, Sicherheitsfunktionen steuern und den Benutzer löschen.",
     "items": {
       "backup": {
-        "title": "Daten sichern",
+        "title": "Backup erstellen",
         "desc": "Erstellt ein verschlüsseltes Backup deiner lokalen Daten. Du wählst den Speicherort und vergibst dafür eine eigene Backup-PIN."
       },
       "changePin": {
