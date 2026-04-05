@@ -464,10 +464,18 @@
   }
 
   function resolveLocale() {
-    const preferred = (navigator.language || 'en').toLowerCase();
-    if (preferred.startsWith('de')) return 'de';
-    if (preferred.startsWith('es')) return 'es';
-    if (preferred.startsWith('fr')) return 'fr';
+    const preferences = Array.isArray(navigator.languages) && navigator.languages.length
+      ? navigator.languages
+      : [navigator.language || 'en'];
+
+    for (const entry of preferences) {
+      const preferred = String(entry || '').toLowerCase();
+      if (preferred.startsWith('de')) return 'de';
+      if (preferred.startsWith('es')) return 'es';
+      if (preferred.startsWith('fr')) return 'fr';
+      if (preferred.startsWith('en')) return 'en';
+    }
+
     return 'en';
   }
 
