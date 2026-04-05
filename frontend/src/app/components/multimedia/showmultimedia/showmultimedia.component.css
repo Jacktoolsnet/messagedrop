@@ -5,6 +5,16 @@
     width: 100%;
 }
 
+.multimedia_container {
+    position: relative;
+}
+
+.multimedia_container--sticker {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .multimedia_image {
     max-width: 95%;
     object-fit: contain;
@@ -20,6 +30,23 @@
     max-height: 15rem;
     object-fit: contain;
     background-color: transparent;
+}
+
+.multimedia_image--protected {
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.multimedia_protect_overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    object-fit: fill;
+    user-select: none;
+    -webkit-user-drag: none;
 }
 
 .oembed_container {

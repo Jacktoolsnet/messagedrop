@@ -29,6 +29,7 @@ import { HelpDialogService } from '../help-dialog/help-dialog.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StickerPickerComponent implements OnInit {
+  readonly stickerProtectionOverlayUrl = 'assets/images/sticker-protection-overlay.svg';
   readonly dialogRef = inject(MatDialogRef<StickerPickerComponent, Multimedia | null>);
   private readonly stickerService = inject(StickerService);
   readonly help = inject(HelpDialogService);

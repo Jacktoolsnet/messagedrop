@@ -2,9 +2,15 @@
 @if (isPlatformEnabled) {
 @if (multimedia?.type === 'tenor' || multimedia?.type === 'unsplash' || multimedia?.type === 'sticker') {
 <div class="media_block">
-    <div class="multimedia_container">
-        <img class="multimedia_image" [class.multimedia_image--sticker]="multimedia?.type === 'sticker'" [src]="getRenderableImageUrl()"
-            [attr.alt]="multimedia?.title || ('common.multimedia.embeddedAlt' | transloco)" />
+    <div class="multimedia_container" [class.multimedia_container--sticker]="multimedia?.type === 'sticker'">
+        <img class="multimedia_image" [class.multimedia_image--sticker]="multimedia?.type === 'sticker'"
+            [class.multimedia_image--protected]="multimedia?.type === 'sticker'" [src]="getRenderableImageUrl()"
+            [attr.alt]="multimedia?.title || ('common.multimedia.embeddedAlt' | transloco)"
+            [attr.draggable]="multimedia?.type === 'sticker' ? 'false' : null" />
+        @if (multimedia?.type === 'sticker') {
+        <img class="multimedia_protect_overlay" [src]="stickerProtectionOverlayUrl" alt="" aria-hidden="true"
+            draggable="false" />
+        }
     </div>
     @if (multimedia?.attribution !== '') {
     <a class="attribution-link" [class.attribution-link--compact]="multimedia?.type === 'pinterest'"

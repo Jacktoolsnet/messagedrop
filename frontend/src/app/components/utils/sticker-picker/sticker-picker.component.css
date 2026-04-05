@@ -30,7 +30,8 @@
 }
 
 .sticker-picker__tab-image,
-.sticker-picker__tab-fallback {
+.sticker-picker__tab-fallback,
+.sticker-picker__protected-media--tab {
   width: 2.4rem;
   height: 2.4rem;
   border-radius: 0.75rem;
@@ -42,6 +43,11 @@
 
 .sticker-picker__tab-image {
   background: transparent;
+}
+
+.sticker-picker__protected-media {
+  position: relative;
+  overflow: hidden;
 }
 
 .sticker-picker__tab-fallback {
@@ -127,8 +133,15 @@
   transform: scale(1);
 }
 
+.sticker-picker__protected-image {
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
 .sticker-picker__image-spinner,
-.sticker-picker__image-fallback {
+.sticker-picker__image-fallback,
+.sticker-picker__protect-overlay {
   position: absolute;
   inset: 0;
   display: flex;
@@ -144,6 +157,15 @@
 .sticker-picker__image-fallback {
   color: color-mix(in srgb, var(--mat-app-text-color) 45%, transparent);
   background: color-mix(in srgb, var(--mat-app-background-color) 90%, white);
+}
+
+.sticker-picker__protect-overlay {
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .sticker-tile {

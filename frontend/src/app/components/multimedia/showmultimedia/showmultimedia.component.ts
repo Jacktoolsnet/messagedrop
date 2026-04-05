@@ -24,6 +24,7 @@ import { ExternalContentComponent } from '../../legal/external-content/external-
 })
 export class ShowmultimediaComponent implements OnChanges {
   @Input() multimedia: Multimedia | undefined;
+  readonly stickerProtectionOverlayUrl = 'assets/images/sticker-protection-overlay.svg';
 
   termsLinks?: { terms: string; privacy: string };
 

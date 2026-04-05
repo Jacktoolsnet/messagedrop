@@ -15,9 +15,19 @@
     <mat-tab>
       <ng-template mat-tab-label>
         @if (category.previewStickerId) {
-        <img class="sticker-picker__tab-image" [src]="getStickerPreviewUrl(category.previewStickerId)"
-          [attr.alt]="'common.stickerPicker.categoryPreviewAlt' | transloco: { name: category.name }"
-          [attr.title]="category.name" />
+        <span class="sticker-picker__protected-media sticker-picker__protected-media--tab" [attr.title]="category.name">
+          <img
+            class="sticker-picker__tab-image sticker-picker__protected-image"
+            [src]="getStickerPreviewUrl(category.previewStickerId)"
+            [attr.alt]="'common.stickerPicker.categoryPreviewAlt' | transloco: { name: category.name }"
+            draggable="false" />
+          <img
+            class="sticker-picker__protect-overlay"
+            [src]="stickerProtectionOverlayUrl"
+            alt=""
+            aria-hidden="true"
+            draggable="false" />
+        </span>
         } @else {
         <span class="sticker-picker__tab-fallback" [attr.title]="category.name">
           {{ category.name.slice(0, 1) }}
@@ -50,14 +60,21 @@
               </span>
               }
               <img
-                class="sticker-picker__preview-image"
+                class="sticker-picker__preview-image sticker-picker__protected-image"
                 [class.sticker-picker__preview-image--loaded]="isPreviewLoaded(previewUrl)"
                 [src]="previewUrl"
                 [attr.alt]="'common.stickerPicker.stickerPreviewAlt' | transloco: { name: sticker.name || sticker.slug }"
                 loading="lazy"
                 decoding="async"
+                draggable="false"
                 (load)="markPreviewLoaded(previewUrl)"
                 (error)="markPreviewError(previewUrl)" />
+              <img
+                class="sticker-picker__protect-overlay"
+                [src]="stickerProtectionOverlayUrl"
+                alt=""
+                aria-hidden="true"
+                draggable="false" />
             </span>
           </button>
           }
@@ -93,14 +110,21 @@
               </span>
               }
               <img
-                class="sticker-picker__preview-image"
+                class="sticker-picker__preview-image sticker-picker__protected-image"
                 [class.sticker-picker__preview-image--loaded]="isPreviewLoaded(previewUrl)"
                 [src]="previewUrl"
                 [attr.alt]="'common.stickerPicker.packPreviewAlt' | transloco: { name: pack.name }"
                 loading="lazy"
                 decoding="async"
+                draggable="false"
                 (load)="markPreviewLoaded(previewUrl)"
                 (error)="markPreviewError(previewUrl)" />
+              <img
+                class="sticker-picker__protect-overlay"
+                [src]="stickerProtectionOverlayUrl"
+                alt=""
+                aria-hidden="true"
+                draggable="false" />
               } @else {
               <mat-icon>imagesmode</mat-icon>
               }
