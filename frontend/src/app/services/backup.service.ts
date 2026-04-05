@@ -156,7 +156,10 @@ export class BackupService {
     const dialogRef = this.dialog.open(CreatePinComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: {},
+      data: {
+        createHintKey: 'common.backup.pinCreateHint',
+        confirmHintKey: 'common.backup.pinConfirmHint'
+      },
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
       disableClose: false,

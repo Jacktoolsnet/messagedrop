@@ -1,13 +1,18 @@
 import { CommonModule } from '@angular/common';
 import { Component, HostListener, OnDestroy, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog } from '@angular/material/dialog';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { DisplayMessage } from '../../utils/display-message/display-message.component';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
+
+interface CreatePinDialogData {
+  titleKey?: string;
+  createHintKey?: string;
+  confirmHintKey?: string;
+}
 
 @Component({
   selector: 'app-createpin',
@@ -30,6 +35,8 @@ export class CreatePinComponent implements OnDestroy {
   isConfirming = false;
   private dialogClosed = false;
 
+  readonly data = inject<CreatePinDialogData | null>(MAT_DIALOG_DATA, { optional: true }) ?? {};
+
   private readonly dialogRef = inject(MatDialogRef<CreatePinComponent>);
   private readonly dialog = inject(MatDialog);
   private readonly translation = inject(TranslationHelperService);
@@ -51,6 +58,17 @@ export class CreatePinComponent implements OnDestroy {
 
   get currentPinIndex(): number {
     return this.isConfirming ? this.confirmPin.length : this.pin.length;
+  }
+
+  get titleKey(): string {
+    return this.data.titleKey?.trim() || 'common.pin.title';
+  }
+
+  get currentHintKey(): string {
+    if (this.isConfirming) {
+      return this.data.confirmHintKey?.trim() || 'common.pin.confirmHint';
+    }
+    return this.data.createHintKey?.trim() || 'common.pin.createHint';
   }
 
   addDigit(digit: string): void {

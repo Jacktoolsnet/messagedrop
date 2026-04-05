@@ -1,6 +1,6 @@
-<h3 mat-dialog-title class="dialog-title">{{ 'common.pin.title' | transloco }}</h3>
+<h3 mat-dialog-title class="dialog-title">{{ titleKey | transloco }}</h3>
 <p class="dialog-hint">
-    {{ isConfirming ? ('common.pin.confirmHint' | transloco) : ('common.pin.createHint' | transloco) }}
+    {{ currentHintKey | transloco }}
 </p>
 
 <div class="pin-display">

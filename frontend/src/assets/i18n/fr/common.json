@@ -1081,6 +1081,8 @@
     "backup": {
       "title": "Sauvegarde",
       "signInRequired": "Veuillez vous connecter avant de créer une sauvegarde.",
+      "pinCreateHint": "Créer le PIN pour la sauvegarde.",
+      "pinConfirmHint": "Répétez le PIN pour la sauvegarde.",
       "createdSuccess": "Sauvegarde créée avec succès.",
       "failed": "Échec de la sauvegarde. Veuillez réessayer.",
       "folderSelectionFailed": "Échec de la sélection du dossier.",

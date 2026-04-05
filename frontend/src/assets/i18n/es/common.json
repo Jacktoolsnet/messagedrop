@@ -1081,6 +1081,8 @@
     "backup": {
       "title": "Copia de seguridad",
       "signInRequired": "Por favor inicia sesión antes de crear una copia de seguridad.",
+      "pinCreateHint": "Crear PIN para la copia de seguridad.",
+      "pinConfirmHint": "Repite el PIN para la copia de seguridad.",
       "createdSuccess": "Copia de seguridad creada correctamente.",
       "failed": "La copia de seguridad falló. Inténtalo de nuevo.",
       "folderSelectionFailed": "Falló la selección de carpeta.",

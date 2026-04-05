@@ -1081,6 +1081,8 @@
     "backup": {
       "title": "Backup",
       "signInRequired": "Please sign in before creating a backup.",
+      "pinCreateHint": "Create PIN for backup.",
+      "pinConfirmHint": "Repeat PIN for backup.",
       "createdSuccess": "Backup created successfully.",
       "failed": "Backup failed. Please try again.",
       "folderSelectionFailed": "Folder selection failed.",
