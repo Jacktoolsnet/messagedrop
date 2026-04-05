@@ -428,8 +428,20 @@
                   </mat-menu>
 
                   <div class="imported-sticker-preview">
-                    @if (stickerPreviewUrl(row.id)) {
-                      <img [src]="stickerPreviewUrl(row.id)" [alt]="row.name" />
+                    @if (isStickerPreviewLoading(row.id)) {
+                      <span class="imported-sticker-preview__spinner" aria-hidden="true">
+                        <mat-spinner diameter="32" strokeWidth="3"></mat-spinner>
+                      </span>
+                    }
+                    @if (stickerPreviewUrl(row.id) && !isStickerPreviewError(row.id)) {
+                      <img
+                        [class.is-loaded]="isStickerPreviewLoaded(row.id)"
+                        [src]="stickerPreviewUrl(row.id)"
+                        [alt]="row.name"
+                        (load)="markStickerPreviewLoaded(row.id)"
+                        (error)="markStickerPreviewError(row.id)" />
+                    } @else if (isStickerPreviewError(row.id)) {
+                      <mat-icon>broken_image</mat-icon>
                     } @else {
                       <mat-icon>mood</mat-icon>
                     }

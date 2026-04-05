@@ -8,6 +8,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterLink } from '@angular/router';
@@ -34,6 +35,7 @@ import { StickerPackDialogComponent, StickerPackDialogResult } from './sticker-p
     MatCardModule,
     MatMenuModule,
     MatProgressBarModule,
+    MatProgressSpinnerModule,
     MatTooltipModule
   ],
   templateUrl: './sticker-manager.component.html',
@@ -68,6 +70,7 @@ export class StickerManagerComponent {
   readonly pendingLicenseUploadPackId = signal<string | null>(null);
   readonly selectedSvgFiles = signal<File[]>([]);
   readonly stickerPreviewUrls = signal<Record<string, string>>({});
+  readonly stickerPreviewImageStatus = signal<Record<string, 'loaded' | 'error'>>({});
   readonly categoryStatuses = ['active', 'hidden', 'blocked', 'deleted'] as const;
   readonly packStatuses = ['active', 'blocked'] as const;
   readonly packVisibilityOptions = [true, false] as const;
@@ -627,6 +630,38 @@ export class StickerManagerComponent {
     return this.stickerPreviewUrls()[stickerId] || '';
   }
 
+  isStickerPreviewLoading(stickerId: string): boolean {
+    const url = this.stickerPreviewUrl(stickerId);
+    const status = this.stickerPreviewImageStatus()[stickerId];
+    return (!!url && !status) || (this.loadingStickerPreviews() && !url);
+  }
+
+  isStickerPreviewLoaded(stickerId: string): boolean {
+    return this.stickerPreviewImageStatus()[stickerId] === 'loaded';
+  }
+
+  isStickerPreviewError(stickerId: string): boolean {
+    return this.stickerPreviewImageStatus()[stickerId] === 'error';
+  }
+
+  markStickerPreviewLoaded(stickerId: string): void {
+    if (!stickerId) {
+      return;
+    }
+    this.stickerPreviewImageStatus.update((current) => current[stickerId] === 'loaded'
+      ? current
+      : { ...current, [stickerId]: 'loaded' });
+  }
+
+  markStickerPreviewError(stickerId: string): void {
+    if (!stickerId) {
+      return;
+    }
+    this.stickerPreviewImageStatus.update((current) => current[stickerId] === 'error'
+      ? current
+      : { ...current, [stickerId]: 'error' });
+  }
+
   isPreviewSticker(stickerId: string): boolean {
     return this.selectedPack()?.previewStickerId === stickerId;
   }
@@ -890,6 +925,7 @@ export class StickerManagerComponent {
   private async loadStickerPreviewsAsync(): Promise<void> {
     this.cancelStickerPreviewLoading();
     this.revokeStickerPreviewUrls();
+    this.stickerPreviewImageStatus.set({});
 
     const stickers = this.stickers();
     if (stickers.length === 0) {
@@ -910,6 +946,7 @@ export class StickerManagerComponent {
         const url = await this.stickerService.fetchStickerPreviewUrl(row.id, abortController.signal);
         if (url) {
           nextUrls[row.id] = url;
+          this.stickerPreviewUrls.update((current) => ({ ...current, [row.id]: url }));
         }
       }
 
@@ -939,6 +976,7 @@ export class StickerManagerComponent {
       }
     }
     this.stickerPreviewUrls.set({});
+    this.stickerPreviewImageStatus.set({});
   }
 
   private cancelStickerPreviewLoading(): void {
