@@ -65,6 +65,7 @@ const STRINGS = {
 
 let publicMessageTemplateCache = null;
 const embeddedFontCssCache = new Map();
+let appIconDataUriCache;
 
 router.get('/assets/public-message.css', function (req, res, next) {
   sendStaticFile(res, getFrontendPath('public', 'site-assets', 'public-message.css'), 'text/css; charset=utf-8', next);
@@ -389,28 +390,35 @@ async function buildPublicMessageOgSvg(model) {
   const message = model.message && typeof model.message === 'object' ? model.message : null;
   const multimedia = parseMultimedia(message?.multimedia);
   const messageText = typeof message?.message === 'string' ? message.message.trim() : '';
+  const hasText = Boolean(messageText);
   const fontFamily = extractAllowedFontFamily(message?.style);
   const embeddedFontCss = fontFamily ? loadEmbeddedFontCss(fontFamily) : '';
+  const appIconDataUri = loadAppIconDataUri();
   const mediaVisual = await resolveOgMediaVisual(multimedia, strings);
   const hasVisualMedia = mediaVisual.kind !== 'none';
-  const headerTitle = strings.heroTitle || 'Public message';
+  const isTextOnlyMessage = Boolean(message && hasText && !hasVisualMedia);
   const fallbackText = message
     ? (normalizeMediaTitle(multimedia) || strings.pageDescription)
     : strings.unavailableTitle;
   const displayText = messageText || fallbackText;
-  const contentAreaHeight = hasVisualMedia ? 170 : 320;
   const textLines = wrapTextLines(displayText, hasVisualMedia ? 34 : 28, hasVisualMedia ? 5 : 6);
   const textFontSize = hasVisualMedia
     ? (textLines.length <= 2 ? 42 : textLines.length <= 4 ? 36 : 31)
     : (textLines.length <= 2 ? 54 : textLines.length <= 4 ? 46 : 38);
   const lineHeight = Math.round(textFontSize * 1.28);
-  const textBlockY = hasVisualMedia ? 445 : 300 - Math.max(0, ((textLines.length - 1) * lineHeight) / 2);
+  const textBlockY = hasVisualMedia
+    ? 458
+    : 342 - Math.max(0, ((textLines.length - 1) * lineHeight) / 2);
   const textColor = '#0f172a';
   const bodyFont = fontFamily
     ? `"${fontFamily}", Inter, Roboto, Arial, sans-serif`
     : 'Inter, Roboto, Arial, sans-serif';
   const mediaMarkup = renderOgMediaMarkup(mediaVisual, strings);
-  const textMarkup = renderWrappedSvgText({
+  const contentIconsMarkup = isTextOnlyMessage ? '' : renderContentIconsMarkup({
+    hasText,
+    mediaVisual
+  });
+  const textMarkup = isTextOnlyMessage ? '' : renderWrappedSvgText({
     lines: textLines,
     x: 600,
     y: textBlockY,
@@ -420,41 +428,79 @@ async function buildPublicMessageOgSvg(model) {
     fontFamily: bodyFont,
     fontWeight: 600
   });
+  const lowerTileFill = isTextOnlyMessage ? 'url(#textOnlyTileGradient)' : '#ffffff';
+  const lowerTileStroke = isTextOnlyMessage ? 'rgba(255,255,255,0.16)' : 'rgba(15,23,42,0.08)';
+  const textOnlyTileOverlayMarkup = isTextOnlyMessage
+    ? '  <rect x="60" y="176" width="1080" height="394" rx="34" fill="url(#textOnlyTileGlow)" opacity="0.92" />'
+    : '';
+  const largeTextOnlyIconMarkup = isTextOnlyMessage
+    ? renderLargeContentSymbol({
+      type: resolvePrimaryContentIconType({ hasText, mediaVisual }) || 'text',
+      centerX: 600,
+      centerY: 373,
+      size: 252,
+      color: '#ffffff'
+    })
+    : '';
   const subtitleMarkup = messageText && hasVisualMedia
     ? ''
     : '';
-  const safeHeaderTitle = escapeHtml(headerTitle);
   const safeBrand = escapeHtml('MessageDrop');
 
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${OG_IMAGE_WIDTH}" height="${OG_IMAGE_HEIGHT}" viewBox="0 0 ${OG_IMAGE_WIDTH} ${OG_IMAGE_HEIGHT}" role="img" aria-label="${escapeAttribute(strings.previewImageAlt)}">`,
     '  <defs>',
     '    <linearGradient id="bgGradient" x1="0" y1="0" x2="1" y2="1">',
-    '      <stop offset="0%" stop-color="#f8fbff" />',
-    '      <stop offset="100%" stop-color="#eef4ff" />',
+    '      <stop offset="0%" stop-color="#f4f7fb" />',
+    '      <stop offset="100%" stop-color="#eef3fb" />',
     '    </linearGradient>',
+    '    <radialGradient id="pageGlow" cx="50%" cy="0%" r="58%">',
+    '      <stop offset="0%" stop-color="rgba(37,99,235,0.18)" />',
+    '      <stop offset="34%" stop-color="rgba(37,99,235,0.08)" />',
+    '      <stop offset="62%" stop-color="rgba(37,99,235,0.03)" />',
+    '      <stop offset="100%" stop-color="rgba(37,99,235,0)" />',
+    '    </radialGradient>',
     '    <linearGradient id="accentGradient" x1="0" y1="0" x2="1" y2="1">',
-    '      <stop offset="0%" stop-color="#2563eb" />',
-    '      <stop offset="100%" stop-color="#4f46e5" />',
+      '      <stop offset="0%" stop-color="#2563eb" />',
+      '      <stop offset="100%" stop-color="#4f46e5" />',
     '    </linearGradient>',
+    '    <linearGradient id="textOnlyTileGradient" x1="0" y1="0" x2="1" y2="1">',
+    '      <stop offset="0%" stop-color="#2563eb" />',
+    '      <stop offset="100%" stop-color="#38bdf8" />',
+    '    </linearGradient>',
+    '    <radialGradient id="textOnlyTileGlow" cx="18%" cy="8%" r="90%">',
+    '      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.28" />',
+    '      <stop offset="55%" stop-color="#ffffff" stop-opacity="0.08" />',
+    '      <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />',
+    '    </radialGradient>',
     '    <filter id="cardShadow" x="-20%" y="-20%" width="140%" height="160%">',
     '      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#0f172a" flood-opacity="0.12" />',
     '    </filter>',
     '    <clipPath id="ogMediaClip">',
-    '      <rect x="120" y="210" width="960" height="190" rx="28" ry="28" />',
+    '      <rect x="120" y="222" width="960" height="180" rx="28" ry="28" />',
+    '    </clipPath>',
+    '    <clipPath id="ogHeaderAvatarClip">',
+    '      <rect x="94" y="68" width="56" height="56" rx="16" ry="16" />',
     '    </clipPath>',
     embeddedFontCss ? `    <style>${embeddedFontCss}</style>` : '',
     '  </defs>',
     '  <rect width="1200" height="630" fill="url(#bgGradient)" />',
-    '  <circle cx="1080" cy="30" r="180" fill="rgba(37,99,235,0.10)" />',
+    '  <rect width="1200" height="630" fill="url(#pageGlow)" />',
     '  <rect x="60" y="40" width="1080" height="112" rx="30" fill="#ffffff" stroke="rgba(15,23,42,0.08)" filter="url(#cardShadow)" />',
-    `  <text x="100" y="82" fill="#64748b" font-family="Inter, Roboto, Arial, sans-serif" font-size="24" font-weight="700" letter-spacing="2.5">${safeBrand}</text>`,
-    `  <text x="100" y="124" fill="#0f172a" font-family="Inter, Roboto, Arial, sans-serif" font-size="46" font-weight="800">${safeHeaderTitle}</text>`,
-    '  <rect x="90" y="176" width="1020" height="394" rx="34" fill="#ffffff" stroke="rgba(15,23,42,0.08)" filter="url(#cardShadow)" />',
+    '  <rect x="88" y="62" width="68" height="68" rx="22" fill="url(#accentGradient)" opacity="0.15" />',
+    '  <rect x="92" y="66" width="60" height="60" rx="18" fill="#ffffff" stroke="rgba(15,23,42,0.08)" />',
+    appIconDataUri
+      ? `  <image href="${escapeAttribute(appIconDataUri)}" x="94" y="68" width="56" height="56" preserveAspectRatio="xMidYMid slice" clip-path="url(#ogHeaderAvatarClip)" />`
+      : '  <text x="122" y="105" text-anchor="middle" fill="#2563eb" font-family="Inter, Roboto, Arial, sans-serif" font-size="32" font-weight="800">M</text>',
+    `  <text x="180" y="107" fill="#0f172a" font-family="Inter, Roboto, Arial, sans-serif" font-size="38" font-weight="800">${safeBrand}</text>`,
+    `  <rect x="60" y="176" width="1080" height="394" rx="34" fill="${lowerTileFill}" stroke="${lowerTileStroke}" filter="url(#cardShadow)" />`,
+    textOnlyTileOverlayMarkup,
+    contentIconsMarkup,
     mediaMarkup,
+    largeTextOnlyIconMarkup,
     textMarkup,
     subtitleMarkup,
-    '  <rect x="90" y="176" width="1020" height="394" rx="34" fill="none" stroke="rgba(15,23,42,0.06)" />',
+    '  <rect x="60" y="176" width="1080" height="394" rx="34" fill="none" stroke="rgba(15,23,42,0.06)" />',
     '</svg>'
   ].filter(Boolean).join('\n');
 }
@@ -469,9 +515,9 @@ function renderOgMediaMarkup(mediaVisual, strings) {
 
   if (mediaVisual.kind === 'image' && mediaVisual.dataUri) {
     return [
-      '  <rect x="120" y="210" width="960" height="190" rx="28" fill="#e2e8f0" />',
-      `  <image href="${escapeAttribute(mediaVisual.dataUri)}" x="120" y="210" width="960" height="190" preserveAspectRatio="xMidYMid slice" clip-path="url(#ogMediaClip)" />`,
-      '  <rect x="120" y="210" width="960" height="190" rx="28" fill="none" stroke="rgba(15,23,42,0.08)" />'
+      '  <rect x="120" y="222" width="960" height="180" rx="28" fill="#e2e8f0" />',
+      `  <image href="${escapeAttribute(mediaVisual.dataUri)}" x="120" y="222" width="960" height="180" preserveAspectRatio="xMidYMid slice" clip-path="url(#ogMediaClip)" />`,
+      '  <rect x="120" y="222" width="960" height="180" rx="28" fill="none" stroke="rgba(15,23,42,0.08)" />'
     ].join('\n');
   }
 
@@ -486,17 +532,174 @@ function renderOgMediaMarkup(mediaVisual, strings) {
     `      <stop offset="100%" stop-color="${accentEnd}" stop-opacity="0.22" />`,
     '    </linearGradient>',
     '  </defs>',
-    '  <rect x="120" y="210" width="960" height="190" rx="28" fill="url(#ogMediaPanelGradient)" stroke="rgba(15,23,42,0.08)" />',
-    '  <circle cx="240" cy="305" r="48" fill="#ffffff" stroke="rgba(15,23,42,0.08)" />',
-    `  <text x="240" y="321" text-anchor="middle" fill="#0f172a" font-family="Inter, Roboto, Arial, sans-serif" font-size="38" font-weight="800">${escapeHtml(icon)}</text>`,
-    `  <text x="330" y="286" fill="#0f172a" font-family="Inter, Roboto, Arial, sans-serif" font-size="22" font-weight="700">${label}</text>`,
+    '  <rect x="120" y="222" width="960" height="180" rx="28" fill="url(#ogMediaPanelGradient)" stroke="rgba(15,23,42,0.08)" />',
+    '  <circle cx="240" cy="312" r="48" fill="#ffffff" stroke="rgba(15,23,42,0.08)" />',
+    `  <text x="240" y="328" text-anchor="middle" fill="#0f172a" font-family="Inter, Roboto, Arial, sans-serif" font-size="38" font-weight="800">${escapeHtml(icon)}</text>`,
+    `  <text x="330" y="294" fill="#0f172a" font-family="Inter, Roboto, Arial, sans-serif" font-size="22" font-weight="700">${label}</text>`,
     title
-      ? `  <text x="330" y="326" fill="#334155" font-family="Inter, Roboto, Arial, sans-serif" font-size="30" font-weight="700">${title}</text>`
+      ? `  <text x="330" y="334" fill="#334155" font-family="Inter, Roboto, Arial, sans-serif" font-size="30" font-weight="700">${title}</text>`
       : '',
     title
       ? ''
-      : `  <text x="330" y="326" fill="#334155" font-family="Inter, Roboto, Arial, sans-serif" font-size="30" font-weight="700">${escapeHtml(strings.pageDescription)}</text>`
+      : `  <text x="330" y="334" fill="#334155" font-family="Inter, Roboto, Arial, sans-serif" font-size="30" font-weight="700">${escapeHtml(strings.pageDescription)}</text>`
   ].filter(Boolean).join('\n');
+}
+
+function renderContentIconsMarkup({ hasText, mediaVisual }) {
+  const iconType = resolvePrimaryContentIconType({ hasText, mediaVisual });
+  if (!iconType) {
+    return '';
+  }
+
+  const size = 46;
+  const startY = 194;
+  const startX = 1140 - 28 - size;
+
+  return renderContentIconChip({
+    type: iconType,
+    x: startX,
+    y: startY,
+    size
+  });
+}
+
+function resolvePrimaryContentIconType({ hasText, mediaVisual }) {
+  const mediaIconType = resolveContentIconType(mediaVisual);
+  if (mediaIconType) {
+    return mediaIconType;
+  }
+
+  return hasText ? 'text' : '';
+}
+
+function resolveContentIconType(mediaVisual) {
+  if (!mediaVisual || mediaVisual.kind === 'none') {
+    return '';
+  }
+
+  if (mediaVisual.kind === 'sticker') {
+    return 'sticker';
+  }
+
+  if (mediaVisual.kind === 'image' || mediaVisual.kind === 'placeholder') {
+    return 'image';
+  }
+
+  return 'media';
+}
+
+function renderContentIconChip({ type, x, y, size }) {
+  const style = resolveContentIconStyle(type);
+  const iconElements = renderContentIconGlyph(type, x, y, size, style.iconColor);
+
+  return [
+    '  <defs>',
+    `    <linearGradient id="ogContentIconGradient-${type}" x1="0" y1="0" x2="1" y2="1">`,
+    `      <stop offset="0%" stop-color="${style.gradientStart}" />`,
+    `      <stop offset="100%" stop-color="${style.gradientEnd}" />`,
+    '    </linearGradient>',
+    '  </defs>',
+    `<circle cx="${x + size / 2}" cy="${y + size / 2}" r="${size / 2}" fill="${style.haloColor}" opacity="0.9" />`,
+    `<circle cx="${x + size / 2}" cy="${y + size / 2}" r="${(size / 2) - 1}" fill="url(#ogContentIconGradient-${type})" stroke="${style.borderColor}" stroke-width="1.2" />`,
+    iconElements
+  ].join('\n');
+}
+
+function renderContentIconGlyph(type, x, y, size, stroke) {
+  if (type === 'text') {
+    return [
+      `<rect x="${x + 11}" y="${y + 14}" width="${size - 22}" height="3.6" rx="1.8" fill="${stroke}" />`,
+      `<rect x="${x + 11}" y="${y + 21}" width="${size - 16}" height="3.6" rx="1.8" fill="${stroke}" opacity="0.96" />`,
+      `<rect x="${x + 11}" y="${y + 28}" width="${size - 24}" height="3.6" rx="1.8" fill="${stroke}" opacity="0.88" />`
+    ].join('\n');
+  }
+
+  if (type === 'image') {
+    return [
+      `<rect x="${x + 10.5}" y="${y + 11}" width="${size - 21}" height="${size - 22}" rx="7" fill="none" stroke="${stroke}" stroke-width="2.5" />`,
+      `<circle cx="${x + size - 15.5}" cy="${y + 17}" r="2.7" fill="${stroke}" />`,
+      `<path d="M${x + 14} ${y + size - 14} L${x + 21} ${y + size - 23} L${x + 28} ${y + size - 16} L${x + 34} ${y + size - 24} L${x + size - 11} ${y + size - 14}" fill="none" stroke="${stroke}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />`
+    ].join('\n');
+  }
+
+  if (type === 'sticker') {
+    return [
+      `<path d="M${x + 11.5} ${y + 11} h${size - 23} a7 7 0 0 1 7 7 v${size - 23} a7 7 0 0 1 -7 7 h-${size - 23} a7 7 0 0 1 -7 -7 v-${size - 23} a7 7 0 0 1 7 -7 z" fill="none" stroke="${stroke}" stroke-width="2.3" />`,
+      `<path d="M${x + size - 18.5} ${y + 11} v8.5 a8.5 8.5 0 0 0 8.5 -8.5" fill="rgba(255,255,255,0.24)" stroke="${stroke}" stroke-width="1.9" stroke-linejoin="round" />`,
+      `<circle cx="${x + 18}" cy="${y + 21}" r="1.8" fill="${stroke}" />`,
+      `<circle cx="${x + 28}" cy="${y + 21}" r="1.8" fill="${stroke}" />`,
+      `<path d="M${x + 17} ${y + 28} Q${x + 23} ${y + 33} ${x + 29} ${y + 28}" fill="none" stroke="${stroke}" stroke-width="2.1" stroke-linecap="round" />`
+    ].join('\n');
+  }
+
+  return [
+    `<rect x="${x + 11}" y="${y + 11}" width="${size - 22}" height="${size - 22}" rx="8" fill="none" stroke="${stroke}" stroke-width="2.4" />`,
+    `<path d="M${x + 20} ${y + 16.5} L${x + 31.5} ${y + 23} L${x + 20} ${y + 29.5} Z" fill="${stroke}" />`
+  ].join('\n');
+}
+
+function renderLargeContentSymbol({ type, centerX, centerY, size, color }) {
+  const x = centerX - (size / 2);
+  const y = centerY - (size / 2);
+
+  if (type === 'text') {
+    const lineHeight = Math.max(14, Math.round(size * 0.09));
+    const firstWidth = Math.round(size * 0.56);
+    const secondWidth = Math.round(size * 0.68);
+    const thirdWidth = Math.round(size * 0.48);
+    const startX = centerX - (secondWidth / 2);
+    const firstY = y + Math.round(size * 0.32);
+    const secondY = firstY + Math.round(size * 0.16);
+    const thirdY = secondY + Math.round(size * 0.16);
+
+    return [
+      `<rect x="${centerX - (firstWidth / 2)}" y="${firstY}" width="${firstWidth}" height="${lineHeight}" rx="${lineHeight / 2}" fill="${color}" />`,
+      `<rect x="${startX}" y="${secondY}" width="${secondWidth}" height="${lineHeight}" rx="${lineHeight / 2}" fill="${color}" opacity="0.96" />`,
+      `<rect x="${centerX - (thirdWidth / 2)}" y="${thirdY}" width="${thirdWidth}" height="${lineHeight}" rx="${lineHeight / 2}" fill="${color}" opacity="0.88" />`
+    ].join('\n');
+  }
+
+  return renderContentIconGlyph(type, x, y, size, color);
+}
+
+function resolveContentIconStyle(type) {
+  if (type === 'sticker') {
+    return {
+      gradientStart: '#f59e0b',
+      gradientEnd: '#ec4899',
+      haloColor: 'rgba(245,158,11,0.16)',
+      borderColor: 'rgba(236,72,153,0.26)',
+      iconColor: '#ffffff'
+    };
+  }
+
+  if (type === 'image') {
+    return {
+      gradientStart: '#2563eb',
+      gradientEnd: '#38bdf8',
+      haloColor: 'rgba(37,99,235,0.14)',
+      borderColor: 'rgba(37,99,235,0.24)',
+      iconColor: '#ffffff'
+    };
+  }
+
+  if (type === 'media') {
+    return {
+      gradientStart: '#4f46e5',
+      gradientEnd: '#8b5cf6',
+      haloColor: 'rgba(99,102,241,0.15)',
+      borderColor: 'rgba(79,70,229,0.24)',
+      iconColor: '#ffffff'
+    };
+  }
+
+  return {
+    gradientStart: '#2563eb',
+    gradientEnd: '#38bdf8',
+    haloColor: 'rgba(37,99,235,0.14)',
+    borderColor: 'rgba(37,99,235,0.24)',
+    iconColor: '#ffffff'
+  };
 }
 
 function renderWrappedSvgText({ lines, x, y, fontSize, lineHeight, fill, fontFamily, fontWeight }) {
@@ -570,6 +773,22 @@ function loadEmbeddedFontCss(fontFamily) {
     return css;
   } catch {
     embeddedFontCssCache.set(fontFamily, '');
+    return '';
+  }
+}
+
+function loadAppIconDataUri() {
+  if (appIconDataUriCache !== undefined) {
+    return appIconDataUriCache;
+  }
+
+  try {
+    const iconPath = getFrontendPath('public', 'icons', 'icon-192x192.png');
+    const iconBuffer = fs.readFileSync(iconPath);
+    appIconDataUriCache = `data:image/png;base64,${iconBuffer.toString('base64')}`;
+    return appIconDataUriCache;
+  } catch {
+    appIconDataUriCache = '';
     return '';
   }
 }
