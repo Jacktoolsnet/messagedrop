@@ -35,11 +35,30 @@
         } @else if (stickers().length) {
         <div class="sticker-grid">
           @for (sticker of stickers(); track sticker.id) {
+          @let previewUrl = getStickerPreviewUrl(sticker.id);
           <button type="button" class="sticker-tile" (click)="pickSticker(sticker)"
             [attr.aria-label]="'common.stickerPicker.selectStickerAria' | transloco: { name: sticker.name || sticker.slug }">
-            <img [src]="getStickerPreviewUrl(sticker.id)"
-              [attr.alt]="'common.stickerPicker.stickerPreviewAlt' | transloco: { name: sticker.name || sticker.slug }"
-              loading="lazy" decoding="async" />
+            <span class="sticker-tile__media">
+              @if (isPreviewLoading(previewUrl)) {
+              <span class="sticker-picker__image-spinner" aria-hidden="true">
+                <mat-spinner diameter="28" strokeWidth="3"></mat-spinner>
+              </span>
+              }
+              @if (isPreviewError(previewUrl)) {
+              <span class="sticker-picker__image-fallback" aria-hidden="true">
+                <mat-icon>broken_image</mat-icon>
+              </span>
+              }
+              <img
+                class="sticker-picker__preview-image"
+                [class.sticker-picker__preview-image--loaded]="isPreviewLoaded(previewUrl)"
+                [src]="previewUrl"
+                [attr.alt]="'common.stickerPicker.stickerPreviewAlt' | transloco: { name: sticker.name || sticker.slug }"
+                loading="lazy"
+                decoding="async"
+                (load)="markPreviewLoaded(previewUrl)"
+                (error)="markPreviewError(previewUrl)" />
+            </span>
           </button>
           }
         </div>
@@ -62,9 +81,26 @@
             [attr.aria-label]="'common.stickerPicker.openPackAria' | transloco: { name: pack.name }">
             <div class="pack-tile__media">
               @if (pack.previewStickerId) {
-              <img [src]="getStickerPreviewUrl(pack.previewStickerId)"
-                [attr.alt]="'common.stickerPicker.packPreviewAlt' | transloco: { name: pack.name }" loading="lazy"
-                decoding="async" />
+              @let previewUrl = getStickerPreviewUrl(pack.previewStickerId);
+              @if (isPreviewLoading(previewUrl)) {
+              <span class="sticker-picker__image-spinner" aria-hidden="true">
+                <mat-spinner diameter="28" strokeWidth="3"></mat-spinner>
+              </span>
+              }
+              @if (isPreviewError(previewUrl)) {
+              <span class="sticker-picker__image-fallback" aria-hidden="true">
+                <mat-icon>broken_image</mat-icon>
+              </span>
+              }
+              <img
+                class="sticker-picker__preview-image"
+                [class.sticker-picker__preview-image--loaded]="isPreviewLoaded(previewUrl)"
+                [src]="previewUrl"
+                [attr.alt]="'common.stickerPicker.packPreviewAlt' | transloco: { name: pack.name }"
+                loading="lazy"
+                decoding="async"
+                (load)="markPreviewLoaded(previewUrl)"
+                (error)="markPreviewError(previewUrl)" />
               } @else {
               <mat-icon>imagesmode</mat-icon>
               }

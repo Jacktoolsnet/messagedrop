@@ -92,19 +92,58 @@
 .pack-tile__media {
   width: 100%;
   aspect-ratio: 1;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 0.9rem;
-  background: transparent;
+  background: color-mix(in srgb, var(--mat-app-background-color) 88%, white);
   overflow: hidden;
 }
 
-.pack-tile__media img,
-.sticker-tile img {
+.sticker-tile__media {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.8rem;
+  background: color-mix(in srgb, var(--mat-app-background-color) 88%, white);
+  overflow: hidden;
+}
+
+.sticker-picker__preview-image {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  opacity: 0;
+  transform: scale(0.98);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.sticker-picker__preview-image--loaded {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.sticker-picker__image-spinner,
+.sticker-picker__image-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: inherit;
+}
+
+.sticker-picker__image-spinner {
+  background: color-mix(in srgb, var(--mat-app-background-color) 90%, white);
+}
+
+.sticker-picker__image-fallback {
+  color: color-mix(in srgb, var(--mat-app-text-color) 45%, transparent);
+  background: color-mix(in srgb, var(--mat-app-background-color) 90%, white);
 }
 
 .sticker-tile {
@@ -113,11 +152,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.sticker-tile img {
-  max-width: 100%;
-  max-height: 100%;
 }
 
 mat-tab-group {

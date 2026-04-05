@@ -15,7 +15,6 @@ import { HelpDialogService } from '../help-dialog/help-dialog.service';
 
 @Component({
   selector: 'app-sticker-picker',
-  standalone: true,
   imports: [
     MatButtonModule,
     MatDialogActions,
@@ -41,6 +40,7 @@ export class StickerPickerComponent implements OnInit {
   readonly loadingCategories = signal(false);
   readonly loadingPacks = signal(false);
   readonly loadingStickers = signal(false);
+  readonly previewStatus = signal<Record<string, 'loaded' | 'error'>>({});
 
   readonly selectedCategoryId = signal<string | null>(null);
   readonly selectedPack = signal<StickerPack | null>(null);
@@ -126,6 +126,36 @@ export class StickerPickerComponent implements OnInit {
       return '';
     }
     return this.stickerService.getRenderUrl(stickerId, 'preview');
+  }
+
+  isPreviewLoading(url: string): boolean {
+    return !!url && !this.previewStatus()[url];
+  }
+
+  isPreviewLoaded(url: string): boolean {
+    return this.previewStatus()[url] === 'loaded';
+  }
+
+  isPreviewError(url: string): boolean {
+    return this.previewStatus()[url] === 'error';
+  }
+
+  markPreviewLoaded(url: string): void {
+    if (!url) {
+      return;
+    }
+    this.previewStatus.update((current) => current[url] === 'loaded'
+      ? current
+      : { ...current, [url]: 'loaded' });
+  }
+
+  markPreviewError(url: string): void {
+    if (!url) {
+      return;
+    }
+    this.previewStatus.update((current) => current[url] === 'error'
+      ? current
+      : { ...current, [url]: 'error' });
   }
 
   private async loadCategoriesAsync(): Promise<void> {
