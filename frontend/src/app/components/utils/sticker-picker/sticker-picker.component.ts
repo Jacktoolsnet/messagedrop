@@ -34,6 +34,7 @@ export class StickerPickerComponent implements OnInit, OnDestroy {
   private readonly stickerService = inject(StickerService);
   readonly help = inject(HelpDialogService);
   private readonly previewRequests = new Map<string, AbortController>();
+  private readonly revokedPreviewKeys = new Set<string>();
 
   readonly categories = signal<StickerCategory[]>([]);
   readonly packs = signal<StickerPack[]>([]);
@@ -79,6 +80,7 @@ export class StickerPickerComponent implements OnInit, OnDestroy {
     this.selectedCategoryId.set(category.id);
     this.selectedPack.set(null);
     this.stickers.set([]);
+    this.primePreviewUrls(this.categories().map((entry) => entry.previewStickerId));
     await this.loadPacksAsync(category.id);
   }
 
@@ -101,6 +103,7 @@ export class StickerPickerComponent implements OnInit, OnDestroy {
   goBackToPacks(): void {
     this.selectedPack.set(null);
     this.stickers.set([]);
+    this.primePreviewUrls(this.packs().map((pack) => pack.previewStickerId));
   }
 
   async openLicenseInNewTab(): Promise<void> {
@@ -169,6 +172,7 @@ export class StickerPickerComponent implements OnInit, OnDestroy {
     this.previewStatus.update((current) => current[previewKey] === 'loaded'
       ? current
       : { ...current, [previewKey]: 'loaded' });
+    this.revokePreviewObjectUrl(previewKey);
   }
 
   markPreviewError(stickerId: string | null | undefined): void {
@@ -234,7 +238,8 @@ export class StickerPickerComponent implements OnInit, OnDestroy {
 
   private async ensurePreviewUrl(stickerId: string): Promise<void> {
     const previewKey = this.getPreviewKey(stickerId);
-    if (!previewKey || this.previewRequests.has(previewKey) || this.previewUrls()[previewKey]) {
+    const hasActiveUrl = !!this.previewUrls()[previewKey] && !this.revokedPreviewKeys.has(previewKey);
+    if (!previewKey || this.previewRequests.has(previewKey) || hasActiveUrl) {
       return;
     }
 
@@ -261,6 +266,7 @@ export class StickerPickerComponent implements OnInit, OnDestroy {
         ...current,
         [previewKey]: objectUrl
       }));
+      this.revokedPreviewKeys.delete(previewKey);
     } catch {
       if (!controller.signal.aborted) {
         this.previewStatus.update((current) => ({
@@ -285,6 +291,7 @@ export class StickerPickerComponent implements OnInit, OnDestroy {
     if (currentUrl) {
       window.URL.revokeObjectURL(currentUrl);
     }
+    this.revokedPreviewKeys.delete(previewKey);
 
     this.previewUrls.update((current) => {
       if (!current[previewKey]) {
@@ -301,7 +308,22 @@ export class StickerPickerComponent implements OnInit, OnDestroy {
     for (const url of Object.values(previewUrls)) {
       window.URL.revokeObjectURL(url);
     }
+    this.revokedPreviewKeys.clear();
     this.previewUrls.set({});
     this.previewStatus.set({});
+  }
+
+  private revokePreviewObjectUrl(previewKey: string): void {
+    if (!previewKey || this.revokedPreviewKeys.has(previewKey)) {
+      return;
+    }
+
+    const objectUrl = this.previewUrls()[previewKey];
+    if (!objectUrl) {
+      return;
+    }
+
+    window.URL.revokeObjectURL(objectUrl);
+    this.revokedPreviewKeys.add(previewKey);
   }
 }

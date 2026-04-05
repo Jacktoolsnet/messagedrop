@@ -123,6 +123,7 @@ export class ShowmultimediaComponent implements OnChanges, OnDestroy {
 
   onStickerImageLoaded(): void {
     this.stickerImageLoading = false;
+    this.revokeStickerObjectUrl();
   }
 
   onStickerImageError(): void {
@@ -216,6 +217,15 @@ export class ShowmultimediaComponent implements OnChanges, OnDestroy {
   }
 
   private clearStickerObjectUrl(): void {
+    if (!this.stickerObjectUrl) {
+      return;
+    }
+
+    window.URL.revokeObjectURL(this.stickerObjectUrl);
+    this.stickerObjectUrl = null;
+  }
+
+  private revokeStickerObjectUrl(): void {
     if (!this.stickerObjectUrl) {
       return;
     }
