@@ -120,6 +120,13 @@
                         </button>
                         }
                         }
+                        @if (canShareMessage(message)) {
+                        <button mat-mini-fab color="secondary"
+                            [attr.aria-label]="'common.messageList.shareAria' | transloco"
+                            (click)="shareMessage(message)">
+                            <mat-icon aria-hidden="false">share</mat-icon>
+                        </button>
+                        }
                         <button mat-mini-fab color="secondary" [matMenuTriggerFor]="messageMenu"
                             [attr.aria-label]="'common.actions.more' | transloco">
                             <mat-icon aria-hidden="false">more_horiz</mat-icon>
@@ -146,12 +153,6 @@
                                 <mat-icon aria-hidden="true">assistant_direction</mat-icon>
                                 <span>{{ 'common.messageList.navigateAria' | transloco }}</span>
                             </button>
-                            @if (canShareMessage(message)) {
-                            <button mat-menu-item (click)="shareMessage(message)">
-                                <mat-icon aria-hidden="true">share</mat-icon>
-                                <span>{{ 'common.messageList.shareAria' | transloco }}</span>
-                            </button>
-                            }
                             @if (this.userService.getUser().id !== message.userId) {
                             <button mat-menu-item (click)="editMessageUserProfile(message)">
                                 <mat-icon aria-hidden="true">settings_account_box</mat-icon>
@@ -302,6 +303,13 @@
                         </button>
                         }
                         }
+                        @if (canShareMessage(message)) {
+                        <button mat-mini-fab color="secondary"
+                            [attr.aria-label]="'common.messageList.shareAria' | transloco"
+                            (click)="shareMessage(message)">
+                            <mat-icon aria-hidden="false">share</mat-icon>
+                        </button>
+                        }
                         <button mat-mini-fab color="secondary" [matMenuTriggerFor]="commentMenu"
                             [attr.aria-label]="'common.actions.more' | transloco">
                             <mat-icon aria-hidden="false">more_horiz</mat-icon>
@@ -328,12 +336,6 @@
                                 <mat-icon aria-hidden="true">assistant_direction</mat-icon>
                                 <span>{{ 'common.messageList.navigateAria' | transloco }}</span>
                             </button>
-                            @if (canShareMessage(message)) {
-                            <button mat-menu-item (click)="shareMessage(message)">
-                                <mat-icon aria-hidden="true">share</mat-icon>
-                                <span>{{ 'common.messageList.shareAria' | transloco }}</span>
-                            </button>
-                            }
                             @if (this.userService.getUser().id !== message.userId) {
                             <button mat-menu-item (click)="editMessageUserProfile(message)">
                                 <mat-icon aria-hidden="true">settings_account_box</mat-icon>
