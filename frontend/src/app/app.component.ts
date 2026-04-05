@@ -206,7 +206,9 @@ export class AppComponent implements OnInit {
   private pendingSharedContent?: SharedContent;
   private lastSharedContentTimestamp?: string;
   private sharedContentDialogOpen = false;
+  private readonly pendingPublicMessageUuid = signal<string | null>(this.readPendingPublicMessageUuid());
   private initialPublicMessagesRequested = false;
+  private openingPublicMessage = false;
   usageProtectionUnlockBusy = false;
 
   private markerMessageListOpen = false;
@@ -344,6 +346,20 @@ export class AppComponent implements OnInit {
         return;
       }
       void this.handleSharedContent(content);
+    });
+
+    effect(() => {
+      this.appService.settingsSet();
+      const mapSetTrigger = this.mapService.mapSet();
+      const messageUuid = this.pendingPublicMessageUuid();
+      if (!messageUuid || !this.appService.isConsentCompleted() || mapSetTrigger < 2 || this.openingPublicMessage) {
+        return;
+      }
+
+      this.openingPublicMessage = true;
+      void this.handlePublicMessageLink(messageUuid).finally(() => {
+        this.openingPublicMessage = false;
+      });
     });
 
     if (typeof document !== 'undefined') {
@@ -783,6 +799,36 @@ export class AppComponent implements OnInit {
     this.openMarkerMessageListDialog([message]);
   }
 
+  private async handlePublicMessageLink(messageUuid: string): Promise<void> {
+    const message = await firstValueFrom(this.messageService.getByUuid(messageUuid));
+    this.pendingPublicMessageUuid.set(null);
+    this.clearPendingPublicMessageUuidFromUrl();
+
+    if (!message || message.status !== 'enabled') {
+      this.snackBar.open(
+        this.translation.t('common.share.messageUnavailable'),
+        undefined,
+        {
+          duration: 3600,
+          verticalPosition: 'top',
+          panelClass: 'snack-warning'
+        }
+      );
+      return;
+    }
+
+    await this.waitForMapReady();
+    this.mapService.flyToWithZoom(message.location, 18);
+
+    const existingMessages = this.messageService.messagesSignal();
+    if (!existingMessages.some((entry) => entry.uuid === message.uuid)) {
+      this.messageService.setMessages([...existingMessages, message]);
+      this.createMarkerLocations();
+    }
+
+    this.openMarkerMessageListDialog([message]);
+  }
+
   private async handlePlaceNotification(action: NotificationAction): Promise<void> {
     const placeId = typeof action.id === 'string' ? action.id.trim() : '';
     const place = placeId
@@ -804,6 +850,38 @@ export class AppComponent implements OnInit {
     const timeoutAt = Date.now() + timeoutMs;
     while (!this.mapService.isReady() && Date.now() < timeoutAt) {
       await new Promise((resolve) => setTimeout(resolve, stepMs));
+    }
+  }
+
+  private readPendingPublicMessageUuid(): string | null {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+
+    try {
+      const url = new URL(window.location.href);
+      const messageUuid = url.searchParams.get('publicMessage')?.trim() ?? '';
+      return messageUuid || null;
+    } catch {
+      return null;
+    }
+  }
+
+  private clearPendingPublicMessageUuidFromUrl(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    try {
+      const url = new URL(window.location.href);
+      if (!url.searchParams.has('publicMessage')) {
+        return;
+      }
+      url.searchParams.delete('publicMessage');
+      const nextUrl = `${url.pathname}${url.search}${url.hash}`;
+      window.history.replaceState(this.myHistory, '', nextUrl || '/');
+    } catch {
+      // ignore malformed URL state
     }
   }
 

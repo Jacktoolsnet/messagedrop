@@ -26,6 +26,7 @@
       "openInNewTab": "Open in new tab",
       "download": "Download",
       "copy": "Copy",
+      "share": "Share",
       "more": "More",
       "close": "Close",
       "edit": "Edit",
@@ -64,6 +65,13 @@
       "pasteLabel": "Paste from clipboard",
       "unavailable": "Clipboard access is not available in this browser.",
       "readFailed": "Could not read clipboard content."
+    },
+    "share": {
+      "publicMessageTitle": "Public message on MessageDrop",
+      "publicMessageText": "{{ message }}",
+      "copySuccess": "Link copied.",
+      "copyFailed": "Could not copy link.",
+      "messageUnavailable": "This public message is not available."
     },
     "aria": {
       "wait": "Wait",
@@ -433,6 +441,7 @@
       "readAloudDisabled": "Enable read aloud first in app settings.",
       "flyToAria": "Fly to message",
       "navigateAria": "Navigate to message location",
+      "shareAria": "Share message",
       "editProfileAria": "Edit profile",
       "editAria": "Edit message",
       "editCommentAria": "Edit comment",

@@ -560,12 +560,17 @@ router.get('/get/id/:messageId', function (req, res, next) {
   });
 });
 
-router.get('/get/uuid/:messageUuid', function (req, res, next) {
+router.get('/get/uuid/:messageUuid', security.authenticateOptional, function (req, res, next) {
   tableMessage.getByUuid(req.database.db, req.params.messageUuid, function (err, row) {
     if (err) {
       return next(apiError.internal('db_error'));
     }
     if (!row) {
+      return next(apiError.notFound('not_found'));
+    }
+    const authUserId = getAuthUserId(req);
+    const isOwnMessage = authUserId && String(authUserId) === String(row.userId);
+    if (row.status !== tableMessage.messageStatus.ENABLED && !isOwnMessage) {
       return next(apiError.notFound('not_found'));
     }
     res.status(200).json({ status: 200, message: row });

@@ -26,6 +26,7 @@
       "openInNewTab": "Abrir en una nueva pestaña",
       "download": "Descargar",
       "copy": "Copiar",
+      "share": "Compartir",
       "more": "Más",
       "close": "Cerrar",
       "edit": "Editar",
@@ -64,6 +65,13 @@
       "pasteLabel": "Pegar desde el portapapeles",
       "unavailable": "El acceso al portapapeles no está disponible en este navegador.",
       "readFailed": "No se pudo leer el contenido del portapapeles."
+    },
+    "share": {
+      "publicMessageTitle": "Mensaje público en MessageDrop",
+      "publicMessageText": "{{ message }}",
+      "copySuccess": "Enlace copiado.",
+      "copyFailed": "No se pudo copiar el enlace.",
+      "messageUnavailable": "Este mensaje público no está disponible."
     },
     "aria": {
       "wait": "Esperar",
@@ -433,6 +441,7 @@
       "readAloudDisabled": "Activa primero la lectura en voz alta en los ajustes de la app.",
       "flyToAria": "Ir al mensaje",
       "navigateAria": "Navegar a la ubicación del mensaje",
+      "shareAria": "Compartir mensaje",
       "editProfileAria": "Editar perfil",
       "editAria": "Editar mensaje",
       "editCommentAria": "Editar comentario",

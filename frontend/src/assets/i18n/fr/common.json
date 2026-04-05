@@ -26,6 +26,7 @@
       "openInNewTab": "Ouvrir dans un nouvel onglet",
       "download": "Télécharger",
       "copy": "Copier",
+      "share": "Partager",
       "more": "Plus",
       "close": "Fermer",
       "edit": "Modifier",
@@ -64,6 +65,13 @@
       "pasteLabel": "Coller depuis le presse-papiers",
       "unavailable": "L'accès au presse-papiers n'est pas disponible dans ce navigateur.",
       "readFailed": "Impossible de lire le contenu du presse-papiers."
+    },
+    "share": {
+      "publicMessageTitle": "Message public sur MessageDrop",
+      "publicMessageText": "{{ message }}",
+      "copySuccess": "Lien copié.",
+      "copyFailed": "Impossible de copier le lien.",
+      "messageUnavailable": "Ce message public n’est pas disponible."
     },
     "aria": {
       "wait": "Attendre",
@@ -433,6 +441,7 @@
       "readAloudDisabled": "Activez d'abord la lecture à voix haute dans les réglages de l'application.",
       "flyToAria": "Aller au message",
       "navigateAria": "Naviguer vers l'emplacement du message",
+      "shareAria": "Partager le message",
       "editProfileAria": "Modifier le profil",
       "editAria": "Modifier le message",
       "editCommentAria": "Modifier le commentaire",

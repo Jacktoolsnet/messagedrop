@@ -22,6 +22,7 @@ import { LanguageService } from '../../services/language.service';
 import { MapService } from '../../services/map.service';
 import { MessageService } from '../../services/message.service';
 import { ProfileService } from '../../services/profile.service';
+import { PublicMessageShareService } from '../../services/public-message-share.service';
 import { SharedContentService } from '../../services/shared-content.service';
 import { SpeechService } from '../../services/speech.service';
 import { TranslateService } from '../../services/translate.service';
@@ -94,6 +95,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
   private readonly translateService = inject(TranslateService);
   private readonly mapService = inject(MapService);
   public readonly profileService = inject(ProfileService);
+  private readonly publicMessageShare = inject(PublicMessageShareService);
   private readonly sharedContentService = inject(SharedContentService);
   readonly speechService = inject(SpeechService);
   public readonly dialogRef = inject(MatDialogRef<MessagelistComponent>);
@@ -301,6 +303,14 @@ export class MessagelistComponent implements OnInit, OnDestroy {
 
   public navigateToMessageLocation(message: Message) {
     this.messageService.navigateToMessageLocation(message);
+  }
+
+  public canShareMessage(message: Message): boolean {
+    return this.publicMessageShare.canShare(message);
+  }
+
+  public shareMessage(message: Message): void {
+    void this.publicMessageShare.share(message);
   }
 
   public onMessageCardActivate(message: Message): void {

@@ -26,6 +26,7 @@
       "openInNewTab": "In neuem Tab öffnen",
       "download": "Herunterladen",
       "copy": "Kopieren",
+      "share": "Teilen",
       "more": "Mehr",
       "close": "Schließen",
       "edit": "Bearbeiten",
@@ -64,6 +65,13 @@
       "pasteLabel": "Aus Zwischenablage einfügen",
       "unavailable": "Zwischenablage ist in diesem Browser nicht verfügbar.",
       "readFailed": "Zwischenablage konnte nicht gelesen werden."
+    },
+    "share": {
+      "publicMessageTitle": "Öffentliche Nachricht auf MessageDrop",
+      "publicMessageText": "{{ message }}",
+      "copySuccess": "Link kopiert.",
+      "copyFailed": "Link konnte nicht kopiert werden.",
+      "messageUnavailable": "Diese öffentliche Nachricht ist nicht verfügbar."
     },
     "aria": {
       "wait": "Warten",
@@ -433,6 +441,7 @@
       "readAloudDisabled": "Aktiviere Vorlesen zuerst in den App-Einstellungen.",
       "flyToAria": "Zur Nachricht springen",
       "navigateAria": "Zur Nachrichtenposition navigieren",
+      "shareAria": "Nachricht teilen",
       "editProfileAria": "Profil bearbeiten",
       "editAria": "Nachricht bearbeiten",
       "editCommentAria": "Kommentar bearbeiten",

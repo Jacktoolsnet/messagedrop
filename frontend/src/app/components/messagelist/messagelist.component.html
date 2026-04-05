@@ -146,6 +146,12 @@
                                 <mat-icon aria-hidden="true">assistant_direction</mat-icon>
                                 <span>{{ 'common.messageList.navigateAria' | transloco }}</span>
                             </button>
+                            @if (canShareMessage(message)) {
+                            <button mat-menu-item (click)="shareMessage(message)">
+                                <mat-icon aria-hidden="true">share</mat-icon>
+                                <span>{{ 'common.messageList.shareAria' | transloco }}</span>
+                            </button>
+                            }
                             @if (this.userService.getUser().id !== message.userId) {
                             <button mat-menu-item (click)="editMessageUserProfile(message)">
                                 <mat-icon aria-hidden="true">settings_account_box</mat-icon>
@@ -322,6 +328,12 @@
                                 <mat-icon aria-hidden="true">assistant_direction</mat-icon>
                                 <span>{{ 'common.messageList.navigateAria' | transloco }}</span>
                             </button>
+                            @if (canShareMessage(message)) {
+                            <button mat-menu-item (click)="shareMessage(message)">
+                                <mat-icon aria-hidden="true">share</mat-icon>
+                                <span>{{ 'common.messageList.shareAria' | transloco }}</span>
+                            </button>
+                            }
                             @if (this.userService.getUser().id !== message.userId) {
                             <button mat-menu-item (click)="editMessageUserProfile(message)">
                                 <mat-icon aria-hidden="true">settings_account_box</mat-icon>

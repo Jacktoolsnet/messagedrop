@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const frontendRoot = path.resolve(__dirname, '..');
 const publicRoot = path.join(frontendRoot, 'public');
-const baseUrl = 'https://messagedrop.net';
+const baseUrl = 'https://messagedrop.de';
 const appName = 'MessageDrop';
 const appClaim = 'A global map where people can leave messages in real-world locations.';
 
