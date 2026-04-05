@@ -104,8 +104,12 @@
 
   const locale = resolveLocale();
   const strings = STRINGS[locale];
+  const bootstrap = resolveBootstrap();
   const apiBaseUrl = resolveApiBaseUrl();
-  const messageUuid = getMessageUuid();
+  const appBaseUrl = bootstrap.appBaseUrl || resolveAppBaseUrl();
+  const assetBaseUrl = bootstrap.assetBaseUrl || resolveAssetBaseUrl();
+  const publicMessageBaseUrl = bootstrap.shareBaseUrl || resolvePublicMessageBaseUrl();
+  const messageUuid = bootstrap.messageUuid || getMessageUuid();
 
   const pageTitle = document.getElementById('page-title');
   const pageDescription = document.getElementById('page-description');
@@ -137,21 +141,22 @@
   openAppLabel.textContent = strings.openApp;
   copyLinkLabel.textContent = strings.copyLink;
   setStatus(strings.loadState);
-  setActionTargets(messageUuid ? `${window.location.origin}/?publicMessage=${encodeURIComponent(messageUuid)}` : `${window.location.origin}/`);
+  setActionTargets(messageUuid ? `${appBaseUrl}/?publicMessage=${encodeURIComponent(messageUuid)}` : `${appBaseUrl}/`);
   window.addEventListener('pagehide', revokeStickerObjectUrl);
 
   copyLinkButton.addEventListener('click', async () => {
-    const copied = await copyText(window.location.href);
+    const shareUrl = messageUuid ? resolvePublicMessageUrl(messageUuid) : window.location.href;
+    const copied = await copyText(shareUrl);
     setStatus(copied ? strings.copySuccess : strings.copyFailed, !copied);
   });
 
   if (messageUuid) {
-    const appMessageUrl = `${window.location.origin}/?publicMessage=${encodeURIComponent(messageUuid)}`;
+    const appMessageUrl = `${appBaseUrl}/?publicMessage=${encodeURIComponent(messageUuid)}`;
     openAppLink.setAttribute('href', appMessageUrl);
-    updateCanonical(`${window.location.origin}/m/?id=${encodeURIComponent(messageUuid)}`);
+    updateCanonical(resolvePublicMessageUrl(messageUuid));
     void loadMessage(messageUuid);
   } else {
-    openAppLink.setAttribute('href', `${window.location.origin}/`);
+    openAppLink.setAttribute('href', `${appBaseUrl}/`);
     renderUnavailable(strings.missingTitle, strings.missingBody);
   }
 
@@ -187,7 +192,7 @@
     const resolvedMessageUuid = typeof message.uuid === 'string' && message.uuid.trim() ? message.uuid.trim() : messageUuid;
     const description = text || normalizeMediaTitle(message.multimedia) || strings.pageDescription;
     const headline = text || normalizeMediaTitle(message.multimedia) || strings.pageTitle;
-    const appMessageUrl = `${window.location.origin}/?publicMessage=${encodeURIComponent(resolvedMessageUuid)}`;
+    const appMessageUrl = `${appBaseUrl}/?publicMessage=${encodeURIComponent(resolvedMessageUuid)}`;
 
     setActionTargets(appMessageUrl);
     pageTitle.textContent = strings.heroTitle;
@@ -199,7 +204,7 @@
     updateMeta('property', 'og:description', description);
     updateMeta('name', 'twitter:title', document.title);
     updateMeta('name', 'twitter:description', description);
-    updateCanonical(`${window.location.origin}/m/?id=${encodeURIComponent(resolvedMessageUuid)}`);
+    updateCanonical(resolvePublicMessageUrl(resolvedMessageUuid));
     messageText.textContent = text;
     applyMessageTextStyle(message.style);
     messageTextShell.hidden = !text;
@@ -346,6 +351,11 @@
       return;
     }
 
+    const fontUrl = resolveFontUrl(fontFamily);
+    if (!fontUrl) {
+      return;
+    }
+
     const styleId = `public-message-font-${fontFamily}`;
     if (document.getElementById(styleId)) {
       loadedFontFamilies.add(fontFamily);
@@ -357,12 +367,30 @@
     styleElement.textContent = `
       @font-face {
         font-family: "${fontFamily}";
-        src: url("/assets/fonts/${fontFamily}.ttf") format("truetype");
+        src: url("${fontUrl}") format("truetype");
+        font-style: normal;
+        font-weight: 400;
         font-display: swap;
       }
     `;
     document.head.appendChild(styleElement);
     loadedFontFamilies.add(fontFamily);
+  }
+
+  function resolveFontUrl(fontFamily) {
+    const safeFontFamily = typeof fontFamily === 'string'
+      ? fontFamily.trim().replace(/[^A-Za-z0-9_-]/g, '')
+      : '';
+
+    if (!safeFontFamily) {
+      return '';
+    }
+
+    if (bootstrap.assetBaseUrl) {
+      return `${assetBaseUrl}/fonts/${safeFontFamily}.ttf`;
+    }
+
+    return `/assets/fonts/${safeFontFamily}.ttf`;
   }
 
   function clearMediaPresentation() {
@@ -487,10 +515,87 @@
     return 'https://q.backend.messagedrop.de';
   }
 
+  function resolveAppBaseUrl() {
+    const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return 'http://localhost:4200';
+    }
+    return 'https://messagedrop.de';
+  }
+
+  function resolveAssetBaseUrl() {
+    const pathname = String(window.location.pathname || '');
+    if (/^\/m\/assets(?:\/|$)/i.test(pathname) || /^\/m\/[^/?#]+/i.test(pathname)) {
+      return `${window.location.origin}/m/assets`;
+    }
+
+    if (/^\/share(?:\/|$)/i.test(pathname)) {
+      return `${window.location.origin}/share/assets`;
+    }
+
+    return `${window.location.origin}/assets`;
+  }
+
+  function resolvePublicMessageBaseUrl() {
+    const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return 'http://localhost:3000/m';
+    }
+
+    return 'https://messagedrop.de/m';
+  }
+
+  function resolvePublicMessageUrl(uuid) {
+    const normalizedUuid = typeof uuid === 'string' ? uuid.trim() : '';
+    if (!normalizedUuid) {
+      return `${publicMessageBaseUrl}/`;
+    }
+
+    return `${publicMessageBaseUrl}/${encodeURIComponent(normalizedUuid)}`;
+  }
+
   function getMessageUuid() {
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
-    return typeof id === 'string' && id.trim() ? id.trim() : '';
+    if (typeof id === 'string' && id.trim()) {
+      return id.trim();
+    }
+
+    const pathname = String(window.location.pathname || '');
+    const publicRouteMatch = pathname.match(/\/m\/([^/?#]+)/i);
+    if (publicRouteMatch?.[1]) {
+      return decodeURIComponent(publicRouteMatch[1]);
+    }
+
+    const match = pathname.match(/\/share\/message\/([^/]+)/i);
+    return match?.[1] ? decodeURIComponent(match[1]) : '';
+  }
+
+  function resolveBootstrap() {
+    const metaElement = document.querySelector('meta[name="public-message-bootstrap"]');
+    let value = window.__PUBLIC_MESSAGE_BOOTSTRAP__;
+
+    if ((!value || typeof value !== 'object') && metaElement) {
+      const rawContent = metaElement.getAttribute('content');
+      if (typeof rawContent === 'string' && rawContent.trim()) {
+        try {
+          value = JSON.parse(rawContent);
+        } catch {
+          value = null;
+        }
+      }
+    }
+
+    if (!value || typeof value !== 'object') {
+      return {};
+    }
+
+    return {
+      messageUuid: typeof value.messageUuid === 'string' ? value.messageUuid.trim() : '',
+      appBaseUrl: typeof value.appBaseUrl === 'string' ? value.appBaseUrl.trim().replace(/\/+$/, '') : '',
+      shareBaseUrl: typeof value.shareBaseUrl === 'string' ? value.shareBaseUrl.trim().replace(/\/+$/, '') : '',
+      assetBaseUrl: typeof value.assetBaseUrl === 'string' ? value.assetBaseUrl.trim().replace(/\/+$/, '') : ''
+    };
   }
 
   function normalizePublicMessage(rawMessage) {

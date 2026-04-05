@@ -18,7 +18,7 @@ export class PublicMessageShareService {
 
   buildPublicMessageUrl(messageUuid: string): string {
     const trimmedUuid = typeof messageUuid === 'string' ? messageUuid.trim() : '';
-    return `${environment.appUrl}/m/?id=${encodeURIComponent(trimmedUuid)}`;
+    return `${environment.publicShareUrl}/${encodeURIComponent(trimmedUuid)}`;
   }
 
   buildAppMessageUrl(messageUuid: string): string {
