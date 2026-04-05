@@ -7,6 +7,7 @@ import { DEFAULT_SPEECH_SETTINGS } from '../../../interfaces/speech-settings';
 import { DEFAULT_USAGE_PROTECTION_SETTINGS } from '../../../interfaces/usage-protection-settings';
 import { AppService } from '../../../services/app.service';
 import { OembedService } from '../../../services/oembed.service';
+import { StickerService } from '../../../services/sticker.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { ShowmultimediaComponent } from './showmultimedia.component';
 
@@ -67,6 +68,13 @@ describe('ShowmultimediaComponent', () => {
           provide: TranslationHelperService,
           useValue: {
             t: (_key: string, params?: { platform?: string }) => params?.platform ?? ''
+          }
+        },
+        {
+          provide: StickerService,
+          useValue: {
+            fetchRenderObjectUrl: async () => '',
+            resolveStickerId: () => null
           }
         }
       ]

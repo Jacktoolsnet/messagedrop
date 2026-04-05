@@ -1,16 +1,38 @@
 <!-- Show existing content when the platform is enabled. -->
 @if (isPlatformEnabled) {
-@if (multimedia?.type === 'tenor' || multimedia?.type === 'unsplash' || multimedia?.type === 'sticker') {
+@if (multimedia?.type === 'sticker') {
 <div class="media_block">
-    <div class="multimedia_container" [class.multimedia_container--sticker]="multimedia?.type === 'sticker'">
-        <img class="multimedia_image" [class.multimedia_image--sticker]="multimedia?.type === 'sticker'"
-            [class.multimedia_image--protected]="multimedia?.type === 'sticker'" [src]="getRenderableImageUrl()"
-            [attr.alt]="multimedia?.title || ('common.multimedia.embeddedAlt' | transloco)"
-            [attr.draggable]="multimedia?.type === 'sticker' ? 'false' : null" />
-        @if (multimedia?.type === 'sticker') {
+    <div class="multimedia_container multimedia_container--sticker">
+        @if (stickerImageLoading) {
+        <span class="multimedia_loading" aria-hidden="true">
+            <mat-spinner diameter="32" strokeWidth="3"></mat-spinner>
+        </span>
+        }
+        @if (stickerImageError) {
+        <span class="multimedia_error" aria-hidden="true">
+            <mat-icon>broken_image</mat-icon>
+        </span>
+        }
+        @if (getRenderableImageUrl()) {
+        <img class="multimedia_image multimedia_image--sticker multimedia_image--protected" [src]="getRenderableImageUrl()"
+            [attr.alt]="multimedia?.title || ('common.multimedia.embeddedAlt' | transloco)" draggable="false"
+            (load)="onStickerImageLoaded()" (error)="onStickerImageError()" />
         <img class="multimedia_protect_overlay" [src]="stickerProtectionOverlayUrl" alt="" aria-hidden="true"
             draggable="false" />
         }
+    </div>
+    @if (multimedia?.attribution !== '') {
+    <a class="attribution-link" [class.attribution-link--compact]="multimedia?.type === 'pinterest'"
+        [href]="multimedia?.sourceUrl" target="_blank" rel="noopener noreferrer">
+        {{ multimedia?.attribution }}
+    </a>
+    }
+</div>
+} @else if (multimedia?.type === 'tenor' || multimedia?.type === 'unsplash') {
+<div class="media_block">
+    <div class="multimedia_container">
+        <img class="multimedia_image" [src]="getRenderableImageUrl()"
+            [attr.alt]="multimedia?.title || ('common.multimedia.embeddedAlt' | transloco)" />
     </div>
     @if (multimedia?.attribution !== '') {
     <a class="attribution-link" [class.attribution-link--compact]="multimedia?.type === 'pinterest'"

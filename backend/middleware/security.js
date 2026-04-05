@@ -15,6 +15,11 @@ function extractBearerFromHeader(req) {
   return token || null;
 }
 
+function verifyUserJwtToken(token) {
+  const secret = process.env.JWT_SECRET;
+  return jwt.verify(token, secret);
+}
+
 function authenticate(req, res, next) {
   const bearerToken = extractBearerFromHeader(req);
   if (!bearerToken) {
@@ -24,8 +29,7 @@ function authenticate(req, res, next) {
       error: 'missing_token'
     });
   }
-  const secret = process.env.JWT_SECRET;
-  jwt.verify(bearerToken, secret, (err, jwtUser) => {
+  jwt.verify(bearerToken, process.env.JWT_SECRET, (err, jwtUser) => {
     if (err) {
       return res.status(403).json({
         errorCode: 'UNAUTHORIZED',
@@ -43,8 +47,7 @@ function authenticateOptional(req, _res, next) {
   if (!bearerToken) {
     return next();
   }
-  const secret = process.env.JWT_SECRET;
-  jwt.verify(bearerToken, secret, (err, jwtUser) => {
+  jwt.verify(bearerToken, process.env.JWT_SECRET, (err, jwtUser) => {
     if (!err) {
       req.jwtUser = jwtUser;
     }
@@ -55,5 +58,7 @@ function authenticateOptional(req, _res, next) {
 module.exports = {
   authenticate,
   authenticateOptional,
-  checkToken: requireServiceJwt
+  checkToken: requireServiceJwt,
+  extractBearerFromHeader,
+  verifyUserJwtToken
 }
