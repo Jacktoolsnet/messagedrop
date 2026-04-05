@@ -417,6 +417,14 @@ In order for us to operate the service, you grant us the rights necessary to use
 
 All rights to the app itself (software, design, trademarks) are held by us or our licensors.
 
+Some of the stickers and comparable graphic elements provided in MessageDrop come from third-party providers and are licensed for MessageDrop, in particular from Flaticon / Freepik Company S.L.U.
+
+These stickers may only be used inside MessageDrop within the intended app functions.
+
+In particular, it is not permitted to extract, download, permanently store, copy, reproduce, make available to the public, share, sell, rent, sublicense, or otherwise reuse such stickers or derived files outside MessageDrop as standalone files or assets, unless this is mandatorily permitted by law or expressly authorized by us or the respective rights holder.
+
+Technically necessary temporary caching for the use of the app remains unaffected. All rights to these stickers remain with the respective rights holders and licensors.
+
 ###
 19. Liability
 ###

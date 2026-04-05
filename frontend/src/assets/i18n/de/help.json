@@ -2464,11 +2464,11 @@
     },
     "licenseFile": {
       "title": "Lizenz-PDF öffnen",
-      "desc": "Wenn ein Sticker-Pack geöffnet ist, öffnet diese Aktion die Lizenz-PDF dieses Packs in einem neuen Browser-Tab."
+      "desc": "Wenn ein Sticker-Pack geöffnet ist, öffnet diese Aktion die zugehörige Lizenz-PDF in einem neuen Browser-Tab."
     },
     "license": {
       "title": "Lizenzhinweis",
-      "desc": "Diese Sticker sind unter der Flaticon-Premium-Lizenz für JackTools.Net lizenziert. Sie dürfen nur innerhalb der App verwendet und nicht außerhalb weiterverwendet werden."
+      "desc": "Diese Sticker sind für MessageDrop unter einer Flaticon-Premium-Lizenz lizenziert. Sie dürfen nur in der App verwendet werden; ein Extrahieren, Herunterladen, Kopieren oder Weiterverwenden außerhalb der App ist nicht erlaubt."
     }
   }
   },

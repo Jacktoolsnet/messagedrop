@@ -414,6 +414,14 @@ Damit wir den Dienst betreiben können, räumst Du uns die nötigen Nutzungsrech
 
 Alle Rechte an der App selbst (Software, Design, Marken) liegen bei uns oder unseren Lizenzgebern.
 
+Ein Teil der in MessageDrop bereitgestellten Sticker und vergleichbaren grafischen Elemente stammt von Drittanbietern und ist für MessageDrop lizenziert, insbesondere von Flaticon / Freepik Company S.L.U.
+
+Diese Sticker dürfen ausschließlich innerhalb von MessageDrop im Rahmen der dafür vorgesehenen Funktionen verwendet werden.
+
+Nicht gestattet ist insbesondere, solche Sticker oder daraus abgeleitete Dateien außerhalb von MessageDrop als eigenständige Dateien oder Assets zu extrahieren, herunterzuladen, dauerhaft zu speichern, zu kopieren, zu vervielfältigen, öffentlich zugänglich zu machen, weiterzugeben, zu verkaufen, zu vermieten, unterzulizenzieren oder anderweitig weiterzuverwenden, soweit dies nicht gesetzlich zwingend erlaubt oder von uns bzw. dem jeweiligen Rechteinhaber ausdrücklich gestattet ist.
+
+Technisch notwendige, vorübergehende Zwischenspeicherungen zur Nutzung der App bleiben unberührt. Alle Rechte an diesen Stickern verbleiben bei den jeweiligen Rechteinhabern bzw. Lizenzgebern.
+
 ###
 19. Haftung
 ###

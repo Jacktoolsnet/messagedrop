@@ -2464,11 +2464,11 @@
     },
     "licenseFile": {
       "title": "Open license PDF",
-      "desc": "When a sticker pack is open, this action opens the license PDF for that pack in a new browser tab."
+      "desc": "When a sticker pack is open, this action opens the corresponding license PDF in a new browser tab."
     },
     "license": {
       "title": "License notice",
-      "desc": "These stickers are licensed under the Flaticon Premium License for JackTools.Net. They may only be used inside the app and must not be reused outside of it."
+      "desc": "These stickers are licensed for MessageDrop under a Flaticon Premium license. They may only be used inside the app; extracting, downloading, copying, or reusing them outside the app is not allowed."
     }
   }
   },
