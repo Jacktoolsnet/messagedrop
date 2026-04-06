@@ -17,6 +17,14 @@ const { apiError } = require('../middleware/api-error');
 const { resolveBaseUrl } = require('../utils/adminLogForwarder');
 const { buildOpenAiErrorDetail } = require('../utils/openai-error');
 const {
+  toPublicMessageDto,
+  toPublicMessageDtos,
+  toOwnerMessageDto,
+  toOwnerMessageDtos,
+  toInternalMessageDto,
+  toInternalMessageDtos
+} = require('../presentation/message-dto');
+const {
   MAX_PUBLIC_HASHTAGS,
   normalizeHashtags,
   encodeHashtags,
@@ -78,65 +86,6 @@ function attachOptionalServiceIdentity(req) {
 
 function hasServiceAccess(req) {
   return Boolean(attachOptionalServiceIdentity(req));
-}
-
-function normalizePublicMultimedia(multimedia) {
-  if (typeof multimedia === 'string') {
-    const trimmed = multimedia.trim();
-    return trimmed ? trimmed : 'null';
-  }
-  if (multimedia === null || multimedia === undefined) {
-    return 'null';
-  }
-  try {
-    return JSON.stringify(multimedia);
-  } catch {
-    return 'null';
-  }
-}
-
-function toPublicGuestMessageRow(row) {
-  if (!row || typeof row !== 'object') {
-    return null;
-  }
-
-  const toFiniteNumber = (value, fallback = 0) => {
-    const num = Number(value);
-    return Number.isFinite(num) ? num : fallback;
-  };
-
-  return {
-    id: toFiniteNumber(row.id, 0),
-    uuid: String(row.uuid ?? '').trim(),
-    parentUuid: typeof row.parentUuid === 'string' ? row.parentUuid : null,
-    typ: typeof row.typ === 'string' && row.typ.trim()
-      ? row.typ
-      : tableMessage.messageType.PUBLIC,
-    createDateTime: Number.isFinite(Number(row.createDateTime)) ? Number(row.createDateTime) : null,
-    deleteDateTime: null,
-    latitude: Number.isFinite(Number(row.latitude)) ? Number(row.latitude) : null,
-    longitude: Number.isFinite(Number(row.longitude)) ? Number(row.longitude) : null,
-    plusCode: typeof row.plusCode === 'string' ? row.plusCode : '',
-    message: typeof row.message === 'string' ? row.message : '',
-    markerType: typeof row.markerType === 'string' && row.markerType.trim()
-      ? row.markerType
-      : 'default',
-    style: typeof row.style === 'string' ? row.style : '',
-    hashtags: row.hashtags ?? '',
-    views: Math.max(0, toFiniteNumber(row.views, 0)),
-    likes: Math.max(0, toFiniteNumber(row.likes, 0)),
-    dislikes: Math.max(0, toFiniteNumber(row.dislikes, 0)),
-    commentsNumber: Math.max(0, toFiniteNumber(row.commentsNumber, 0)),
-    status: typeof row.status === 'string' && row.status.trim()
-      ? row.status
-      : tableMessage.messageStatus.ENABLED,
-    userId: typeof row.userId === 'string' ? row.userId : '',
-    multimedia: normalizePublicMultimedia(row.multimedia)
-  };
-}
-
-function toPublicGuestMessageRows(rows) {
-  return (rows || []).map((row) => toPublicGuestMessageRow(row)).filter(Boolean);
 }
 
 function normalizeInternalMultimedia(multimedia) {
@@ -617,11 +566,7 @@ const messageCreateLimiter = rateLimit({
   }
 });
 
-router.get('/get',
-  [
-    security.checkToken
-  ],
-  function (req, res, next) {
+function sendInternalAllMessages(req, res, next) {
   tableMessage.getAll(req.database.db, function (err, rows) {
     if (err) {
       return next(apiError.internal('db_error'));
@@ -629,15 +574,11 @@ router.get('/get',
     if (!rows || rows.length === 0) {
       return next(apiError.notFound('not_found'));
     }
-    res.status(200).json({ status: 200, rows });
+    return res.status(200).json({ status: 200, rows: toInternalMessageDtos(rows) });
   });
-});
+}
 
-router.get('/get/id/:messageId',
-  [
-    security.checkToken
-  ],
-  function (req, res, next) {
+function sendInternalMessageById(req, res, next) {
   tableMessage.getById(req.database.db, req.params.messageId, function (err, row) {
     if (err) {
       return next(apiError.internal('db_error'));
@@ -645,11 +586,162 @@ router.get('/get/id/:messageId',
     if (!row) {
       return next(apiError.notFound('not_found'));
     }
-    res.status(200).json({ status: 200, message: row });
+    return res.status(200).json({ status: 200, message: toInternalMessageDto(row) });
   });
-});
+}
 
-router.get('/get/uuid/:messageUuid', security.authenticateOptional, function (req, res, next) {
+function sendInternalMessageByUuid(req, res, next) {
+  tableMessage.getByUuid(req.database.db, req.params.messageUuid, function (err, row) {
+    if (err) {
+      return next(apiError.internal('db_error'));
+    }
+    if (!row) {
+      return next(apiError.notFound('not_found'));
+    }
+    return res.status(200).json({ status: 200, message: toInternalMessageDto(row) });
+  });
+}
+
+function sendInternalCommentsByParentUuid(req, res, next) {
+  tableMessage.getByParentUuid(req.database.db, req.params.parentUuid, function (err, rows) {
+    if (err) {
+      return next(apiError.internal('db_error'));
+    }
+    return res.status(200).json({ status: 200, rows: toInternalMessageDtos(rows) });
+  });
+}
+
+function sendOwnMessageByUuid(req, res, next) {
+  const authUserId = getAuthUserId(req);
+  if (!authUserId) {
+    return next(apiError.unauthorized('unauthorized'));
+  }
+
+  tableMessage.getByUuid(req.database.db, req.params.messageUuid, function (err, row) {
+    if (err) {
+      return next(apiError.internal('db_error'));
+    }
+    if (!row) {
+      return next(apiError.notFound('not_found'));
+    }
+    if (String(row.userId) !== String(authUserId)) {
+      return next(apiError.notFound('not_found'));
+    }
+    return res.status(200).json({ status: 200, message: toOwnerMessageDto(row) });
+  });
+}
+
+function sendOwnMessagesByUserId(req, res, next) {
+  if (!ensureSameUser(req, res, req.params.userId, next)) {
+    return;
+  }
+
+  tableMessage.getByUserId(req.database.db, req.params.userId, function (err, rows) {
+    if (err) {
+      return next(apiError.internal('db_error'));
+    }
+    return res.status(200).json({ status: 200, rows: toOwnerMessageDtos(rows) });
+  });
+}
+
+function sendPublicMessageByUuid(req, res, next) {
+  tableMessage.getByUuid(req.database.db, req.params.messageUuid, function (err, row) {
+    if (err) {
+      return next(apiError.internal('db_error'));
+    }
+    if (!row || row.status !== tableMessage.messageStatus.ENABLED) {
+      return next(apiError.notFound('not_found'));
+    }
+    return res.status(200).json({ status: 200, message: toPublicMessageDto(row) });
+  });
+}
+
+function sendPublicCommentsByParentUuid(req, res, next) {
+  tableMessage.getByParentUuid(req.database.db, req.params.parentUuid, function (err, rows) {
+    if (err) {
+      return next(apiError.internal('db_error'));
+    }
+    return res.status(200).json({ status: 200, rows: toPublicMessageDtos(rows) });
+  });
+}
+
+function sendPublicMessagesByHashtag(req, res, next) {
+  const tags = parsePublicHashtags([req.params.tag]);
+  if (!tags || tags.length === 0) {
+    return next(apiError.badRequest('invalid_hashtags'));
+  }
+
+  tableMessage.getByHashtag(req.database.db, tags[0], function (err, rows) {
+    if (err) {
+      return next(apiError.internal('db_error'));
+    }
+    return res.status(200).json({ status: 200, rows: toPublicMessageDtos(rows) });
+  });
+}
+
+function sendPublicMessagesByPlusCode(req, res, next) {
+  const response = { status: 0, rows: [] };
+  if (req.params.plusCode.length < 2 || req.params.plusCode.length > 11) {
+    return next(apiError.badRequest('invalid_pluscode'));
+  }
+
+  let plusCode = req.params.plusCode;
+  if (plusCode.length > 1 && plusCode.length < 11) {
+    plusCode = `${plusCode}%`;
+  }
+
+  tableMessage.getByPlusCode(req.database.db, plusCode, function (err, rows) {
+    if (err) {
+      return next(apiError.internal('db_error'));
+    }
+    if (!rows || rows.length === 0) {
+      return next(apiError.notFound('not_found'));
+    }
+    response.rows = toPublicMessageDtos(rows);
+    response.status = 200;
+    return res.status(200).json(response);
+  });
+}
+
+function sendPublicMessagesByBoundingBox(req, res, next) {
+  const response = { status: 0, rows: [] };
+
+  const latMinRaw = parseFloat(req.params.latMin);
+  const lonMinRaw = parseFloat(req.params.lonMin);
+  const latMaxRaw = parseFloat(req.params.latMax);
+  const lonMaxRaw = parseFloat(req.params.lonMax);
+
+  const latMin = latMinRaw;
+  const latMax = latMaxRaw;
+  const lonMin = normalizeLon(lonMinRaw);
+  const lonMax = normalizeLon(lonMaxRaw);
+
+  const isValidLat = (lat) => !isNaN(lat) && lat >= -90 && lat <= 90;
+  const isValidLon = (lon) => !isNaN(lon) && lon >= -180 && lon <= 180;
+
+  if (
+    !isValidLat(latMin) || !isValidLat(latMax) ||
+    !isValidLon(lonMin) || !isValidLon(lonMax) ||
+    latMin === latMax || lonMin === lonMax
+  ) {
+    return next(apiError.badRequest('invalid_bounding_box'));
+  }
+
+  tableMessage.getByBoundingBox(
+    req.database.db,
+    latMin, lonMin, latMax, lonMax,
+    (err, rows) => {
+      if (err) {
+        return next(apiError.internal('db_error'));
+      }
+      response.rows = toPublicMessageDtos(rows);
+      response.status = 200;
+      return res.status(200).json(response);
+    }
+  );
+}
+
+function sendLegacyMessageByUuid(req, res, next) {
   tableMessage.getByUuid(req.database.db, req.params.messageUuid, function (err, row) {
     if (err) {
       return next(apiError.internal('db_error'));
@@ -658,36 +750,187 @@ router.get('/get/uuid/:messageUuid', security.authenticateOptional, function (re
       return next(apiError.notFound('not_found'));
     }
     if (hasServiceAccess(req)) {
-      return res.status(200).json({ status: 200, message: row });
+      return res.status(200).json({ status: 200, message: toInternalMessageDto(row) });
     }
     const authUserId = getAuthUserId(req);
     const isOwnMessage = authUserId && String(authUserId) === String(row.userId);
-    if (row.status !== tableMessage.messageStatus.ENABLED && !isOwnMessage) {
+    if (isOwnMessage) {
+      return res.status(200).json({ status: 200, message: toOwnerMessageDto(row) });
+    }
+    if (row.status !== tableMessage.messageStatus.ENABLED) {
       return next(apiError.notFound('not_found'));
     }
-    const publicRow = isOwnMessage ? row : toPublicGuestMessageRow(row);
-    res.status(200).json({ status: 200, message: publicRow });
+    return res.status(200).json({ status: 200, message: toPublicMessageDto(row) });
   });
-});
+}
+
+function sendLegacyCommentsByParentUuid(req, res, next) {
+  tableMessage.getByParentUuid(req.database.db, req.params.parentUuid, function (err, rows) {
+    if (err) {
+      return next(apiError.internal('db_error'));
+    }
+    const payloadRows = hasServiceAccess(req) ? toInternalMessageDtos(rows) : toPublicMessageDtos(rows);
+    return res.status(200).json({ status: 200, rows: payloadRows });
+  });
+}
+
+function sendLegacyMessagesByHashtag(req, res, next) {
+  const tags = parsePublicHashtags([req.params.tag]);
+  if (!tags || tags.length === 0) {
+    return next(apiError.badRequest('invalid_hashtags'));
+  }
+  tableMessage.getByHashtag(req.database.db, tags[0], function (err, rows) {
+    if (err) {
+      return next(apiError.internal('db_error'));
+    }
+    const payloadRows = hasServiceAccess(req) ? toInternalMessageDtos(rows) : toPublicMessageDtos(rows);
+    return res.status(200).json({ status: 200, rows: payloadRows });
+  });
+}
+
+function sendLegacyMessagesByPlusCode(req, res, next) {
+  const response = { status: 0, rows: [] };
+  if (req.params.plusCode.length < 2 || req.params.plusCode.length > 11) {
+    return next(apiError.badRequest('invalid_pluscode'));
+  }
+
+  let plusCode = req.params.plusCode;
+  if (plusCode.length > 1 && plusCode.length < 11) {
+    plusCode = `${plusCode}%`;
+  }
+
+  tableMessage.getByPlusCode(req.database.db, plusCode, function (err, rows) {
+    if (err) {
+      return next(apiError.internal('db_error'));
+    }
+    if (!rows || rows.length === 0) {
+      return next(apiError.notFound('not_found'));
+    }
+    response.rows = hasServiceAccess(req) ? toInternalMessageDtos(rows) : toPublicMessageDtos(rows);
+    response.status = 200;
+    return res.status(200).json(response);
+  });
+}
+
+function sendLegacyMessagesByBoundingBox(req, res, next) {
+  const response = { status: 0, rows: [] };
+
+  const latMinRaw = parseFloat(req.params.latMin);
+  const lonMinRaw = parseFloat(req.params.lonMin);
+  const latMaxRaw = parseFloat(req.params.latMax);
+  const lonMaxRaw = parseFloat(req.params.lonMax);
+
+  const latMin = latMinRaw;
+  const latMax = latMaxRaw;
+  const lonMin = normalizeLon(lonMinRaw);
+  const lonMax = normalizeLon(lonMaxRaw);
+
+  const isValidLat = (lat) => !isNaN(lat) && lat >= -90 && lat <= 90;
+  const isValidLon = (lon) => !isNaN(lon) && lon >= -180 && lon <= 180;
+
+  if (
+    !isValidLat(latMin) || !isValidLat(latMax) ||
+    !isValidLon(lonMin) || !isValidLon(lonMax) ||
+    latMin === latMax || lonMin === lonMax
+  ) {
+    return next(apiError.badRequest('invalid_bounding_box'));
+  }
+
+  tableMessage.getByBoundingBox(
+    req.database.db,
+    latMin, lonMin, latMax, lonMax,
+    (err, rows) => {
+      if (err) {
+        return next(apiError.internal('db_error'));
+      }
+      response.rows = hasServiceAccess(req) ? toInternalMessageDtos(rows) : toPublicMessageDtos(rows);
+      response.status = 200;
+      return res.status(200).json(response);
+    }
+  );
+}
+
+router.get('/public/uuid/:messageUuid', sendPublicMessageByUuid);
+
+router.get('/public/comment/:parentUuid', sendPublicCommentsByParentUuid);
+
+router.get('/public/hashtag/:tag', sendPublicMessagesByHashtag);
+
+router.get('/public/pluscode/:plusCode', sendPublicMessagesByPlusCode);
+
+router.get('/public/boundingbox/:latMin/:lonMin/:latMax/:lonMax',
+  [
+    metric.count('message.search', { when: 'always', timezone: 'utc', amount: 1 })
+  ],
+  sendPublicMessagesByBoundingBox
+);
+
+router.get('/me/uuid/:messageUuid',
+  [
+    security.authenticate
+  ],
+  sendOwnMessageByUuid
+);
+
+router.get('/me/userId/:userId',
+  [
+    security.authenticate
+  ],
+  sendOwnMessagesByUserId
+);
+
+router.get('/internal',
+  [
+    security.checkToken
+  ],
+  sendInternalAllMessages
+);
+
+router.get('/internal/id/:messageId',
+  [
+    security.checkToken
+  ],
+  sendInternalMessageById
+);
+
+router.get('/internal/uuid/:messageUuid',
+  [
+    security.checkToken
+  ],
+  sendInternalMessageByUuid
+);
+
+router.get('/internal/comment/:parentUuid',
+  [
+    security.checkToken
+  ],
+  sendInternalCommentsByParentUuid
+);
+
+// Legacy aliases retained for compatibility while callers migrate to explicit
+// /public, /me and /internal routes.
+router.get('/get',
+  [
+    security.checkToken
+  ],
+  sendInternalAllMessages
+);
+
+router.get('/get/id/:messageId',
+  [
+    security.checkToken
+  ],
+  sendInternalMessageById
+);
+
+router.get('/get/uuid/:messageUuid', security.authenticateOptional, sendLegacyMessageByUuid);
 
 router.get('/get/userId/:userId',
   [
     security.authenticate
   ],
-  function (req, res, next) {
-  if (!ensureSameUser(req, res, req.params.userId, next)) {
-    return;
-  }
-  tableMessage.getByUserId(req.database.db, req.params.userId, function (err, rows) {
-    if (err) {
-      return next(apiError.internal('db_error'));
-    }
-    if (!rows || rows.length === 0) {
-      return res.status(200).json({ status: 200, rows: [] });
-    }
-    res.status(200).json({ status: 200, rows });
-  });
-});
+  sendOwnMessagesByUserId
+);
 
 router.post('/recount-comments/:userId',
   [
@@ -705,98 +948,19 @@ router.post('/recount-comments/:userId',
     });
   });
 
-router.get('/get/comment/:parentUuid', security.authenticateOptional, function (req, res, next) {
-  tableMessage.getByParentUuid(req.database.db, req.params.parentUuid, function (err, rows) {
-    if (err) {
-      return next(apiError.internal('db_error'));
-    }
-    const payloadRows = hasServiceAccess(req) ? (rows || []) : toPublicGuestMessageRows(rows);
-    res.status(200).json({ status: 200, rows: payloadRows });
-  });
-});
+router.get('/get/comment/:parentUuid', security.authenticateOptional, sendLegacyCommentsByParentUuid);
 
-router.get('/get/hashtag/:tag', security.authenticateOptional, function (req, res, next) {
-  const tags = parsePublicHashtags([req.params.tag]);
-  if (!tags || tags.length === 0) {
-    return next(apiError.badRequest('invalid_hashtags'));
-  }
-  tableMessage.getByHashtag(req.database.db, tags[0], function (err, rows) {
-    if (err) {
-      return next(apiError.internal('db_error'));
-    }
-    const payloadRows = hasServiceAccess(req) ? (rows || []) : toPublicGuestMessageRows(rows);
-    res.status(200).json({ status: 200, rows: payloadRows });
-  });
-});
+router.get('/get/hashtag/:tag', security.authenticateOptional, sendLegacyMessagesByHashtag);
 
-router.get('/get/pluscode/:plusCode', security.authenticateOptional, function (req, res, next) {
-  let response = { 'status': 0, 'rows': [] };
-  // It is not allowed to get all messages with this route.
-  if (req.params.plusCode.length < 2 || req.params.plusCode.length > 11) {
-    return next(apiError.badRequest('invalid_pluscode'));
-  } else {
-    if (req.params.plusCode.length > 1 && req.params.plusCode.length < 11) {
-      req.params.plusCode = `${req.params.plusCode}%`
-    }
-    tableMessage.getByPlusCode(req.database.db, req.params.plusCode, function (err, rows) {
-      if (err) {
-        return next(apiError.internal('db_error'));
-      }
-      if (!rows || rows.length === 0) {
-        return next(apiError.notFound('not_found'));
-      }
-      const payloadRows = hasServiceAccess(req) ? (rows || []) : toPublicGuestMessageRows(rows);
-      payloadRows.forEach((row) => {
-        response.rows.push(row);
-      });
-      response.status = 200;
-      res.status(200).json(response);
-    });
-  }
-});
+router.get('/get/pluscode/:plusCode', security.authenticateOptional, sendLegacyMessagesByPlusCode);
 
 router.get('/get/boundingbox/:latMin/:lonMin/:latMax/:lonMax',
   [
     security.authenticateOptional,
     metric.count('message.search', { when: 'always', timezone: 'utc', amount: 1 })
-  ], (req, res, next) => {
-    const response = { status: 0, rows: [] };
-
-    // Parse + normalize
-    const latMinRaw = parseFloat(req.params.latMin);
-    const lonMinRaw = parseFloat(req.params.lonMin);
-    const latMaxRaw = parseFloat(req.params.latMax);
-    const lonMaxRaw = parseFloat(req.params.lonMax);
-
-    const latMin = latMinRaw;
-    const latMax = latMaxRaw;
-    const lonMin = normalizeLon(lonMinRaw);
-    const lonMax = normalizeLon(lonMaxRaw);
-
-    const isValidLat = (lat) => !isNaN(lat) && lat >= -90 && lat <= 90;
-    const isValidLon = (lon) => !isNaN(lon) && lon >= -180 && lon <= 180;
-
-    if (
-      !isValidLat(latMin) || !isValidLat(latMax) ||
-      !isValidLon(lonMin) || !isValidLon(lonMax) ||
-      latMin === latMax || lonMin === lonMax
-    ) {
-      return next(apiError.badRequest('invalid_bounding_box'));
-    }
-
-    tableMessage.getByBoundingBox(
-      req.database.db,
-      latMin, lonMin, latMax, lonMax,
-      (err, rows) => {
-        if (err) {
-          return next(apiError.internal('db_error'));
-        }
-        response.rows = hasServiceAccess(req) ? (rows || []) : toPublicGuestMessageRows(rows);
-        response.status = 200;
-        res.status(200).json(response);
-      }
-    );
-  });
+  ],
+  sendLegacyMessagesByBoundingBox
+);
 
 router.post('/moderate/hashtags',
   [

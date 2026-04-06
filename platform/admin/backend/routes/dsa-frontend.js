@@ -127,8 +127,8 @@ async function ensureContentExists(contentId, next) {
 
     const isNumeric = /^\d+$/.test(raw);
     const path = isNumeric
-        ? `/message/get/id/${encodeURIComponent(raw)}`
-        : `/message/get/uuid/${encodeURIComponent(raw)}`;
+        ? `/message/internal/id/${encodeURIComponent(raw)}`
+        : `/message/internal/uuid/${encodeURIComponent(raw)}`;
 
     try {
         const backendAudience = process.env.SERVICE_JWT_AUDIENCE_BACKEND || 'service.backend';

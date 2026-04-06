@@ -234,8 +234,8 @@ async function fetchMessageByContentId(contentId, options = {}) {
 
     const isNumeric = /^\d+$/.test(raw);
     const path = isNumeric
-        ? `/message/get/id/${encodeURIComponent(raw)}`
-        : `/message/get/uuid/${encodeURIComponent(raw)}`;
+        ? `/message/internal/id/${encodeURIComponent(raw)}`
+        : `/message/internal/uuid/${encodeURIComponent(raw)}`;
 
     try {
         const resp = await axios.get(`${base}${path}`, {

@@ -31,7 +31,7 @@ async function notifyContentOwner(req, notification) {
             Accept: 'application/json'
         };
         const messageResp = await axios.get(
-            `${baseUrl}/message/get/uuid/${encodeURIComponent(contentId)}`,
+            `${baseUrl}/message/internal/uuid/${encodeURIComponent(contentId)}`,
             {
                 headers,
                 timeout: 5000,

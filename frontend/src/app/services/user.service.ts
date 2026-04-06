@@ -981,7 +981,7 @@ export class UserService {
   }
 
   getUserMessages(user: User, showAlways = false): Observable<GetMessageResponse> {
-    const url = `${environment.apiUrl}/message/get/userId/${user.id}`;
+    const url = `${environment.apiUrl}/message/me/userId/${user.id}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: this.i18n.t('auth.serviceTitle'),

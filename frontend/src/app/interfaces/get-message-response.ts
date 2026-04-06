@@ -1,7 +1,6 @@
-import { RawMessage } from "./raw-message";
+import { MessageRow } from './message-row';
 
-export interface GetMessageResponse {
+export interface GetMessageResponse<T extends MessageRow = MessageRow> {
     status: number,
-    rows: RawMessage[]
+    rows: T[]
 }
-

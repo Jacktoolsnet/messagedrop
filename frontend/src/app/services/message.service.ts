@@ -7,8 +7,12 @@ import { DisplayMessage } from '../components/utils/display-message/display-mess
 import { BoundingBox } from '../interfaces/bounding-box';
 import { GetMessageResponse } from '../interfaces/get-message-response';
 import { Message } from '../interfaces/message';
+import { MessageRow } from '../interfaces/message-row';
 import { MessageCreateResponse } from '../interfaces/message-create-response';
-import { RawMessage } from '../interfaces/raw-message';
+import { Multimedia } from '../interfaces/multimedia';
+import { MultimediaType } from '../interfaces/multimedia-type';
+import { OwnerMessageRow } from '../interfaces/owner-message-row';
+import { PublicMessageRow } from '../interfaces/public-message-row';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { ToggleResponse } from '../interfaces/toggle-response';
 import { User } from '../interfaces/user';
@@ -108,6 +112,60 @@ export class MessageService {
     const num = this.toNullableNumber(value);
     if (num === null) return null;
     return num < 1_000_000_000_000 ? num * 1000 : num;
+  }
+
+  private createEmptyMultimedia(): Multimedia {
+    return {
+      type: MultimediaType.UNDEFINED,
+      url: '',
+      contentId: '',
+      sourceUrl: '',
+      attribution: '',
+      title: '',
+      description: ''
+    };
+  }
+
+  private parseMessageMultimedia(value: unknown): Multimedia {
+    if (typeof value !== 'string' || !value.trim()) {
+      return this.createEmptyMultimedia();
+    }
+
+    try {
+      const parsed = JSON.parse(value) as Partial<Multimedia> | null;
+      if (!parsed || typeof parsed !== 'object') {
+        return this.createEmptyMultimedia();
+      }
+      return {
+        ...this.createEmptyMultimedia(),
+        ...parsed,
+        type: typeof parsed.type === 'string' && parsed.type.trim()
+          ? parsed.type as MultimediaType
+          : MultimediaType.UNDEFINED
+      };
+    } catch {
+      return this.createEmptyMultimedia();
+    }
+  }
+
+  private getUserService(): UserService {
+    return this.injector.get(UserService);
+  }
+
+  private hasAuthenticatedUser(): boolean {
+    try {
+      return this.getUserService().hasJwt();
+    } catch {
+      return false;
+    }
+  }
+
+  private buildPublicMessageUrl(path: string): string {
+    return `${environment.apiUrl}/message/public/${path}`;
+  }
+
+  private buildOwnMessageUrl(path: string): string {
+    return `${environment.apiUrl}/message/me/${path}`;
   }
 
   private normalizePublishState(message: Partial<Message>): NonNullable<Message['publishState']> {
@@ -856,8 +914,8 @@ export class MessageService {
     let serverSyncAvailable = false;
     try {
       await firstValueFrom(this.recountOwnCommentCounts(user.id));
-      const response = await firstValueFrom(this.http.get<GetMessageResponse>(
-        `${environment.apiUrl}/message/get/userId/${encodeURIComponent(user.id)}`,
+      const response = await firstValueFrom(this.http.get<GetMessageResponse<OwnerMessageRow>>(
+        this.buildOwnMessageUrl(`userId/${encodeURIComponent(user.id)}`),
         this.httpOptions
       ));
       serverMessages = this.mapRawMessages(response?.rows ?? [])
@@ -887,24 +945,24 @@ export class MessageService {
     return this.commentsSignals.get(parentUuid)!;
   }
 
-  public mapRawMessages(rawMessages: RawMessage[]): Message[] {
+  public mapRawMessages(rawMessages: MessageRow[]): Message[] {
     const messages: Message[] = [];
     rawMessages.forEach(rawMessage => messages.push(this.mapRawMessage(rawMessage)));
     return messages;
   }
 
-  private mapRawMessage(raw: RawMessage): Message {
+  private mapRawMessage(raw: MessageRow): Message {
     return {
       id: raw.id,
       uuid: raw.uuid,
-      parentId: raw.parentId,
-      parentUuid: raw.parentUuid,
+      parentId: typeof raw.parentId === 'number' ? raw.parentId : 0,
+      parentUuid: raw.parentUuid ?? '',
       typ: raw.typ,
       createDateTime: this.toEpochMs(raw.createDateTime),
-      deleteDateTime: this.toEpochMs(raw.deleteDateTime),
+      deleteDateTime: this.toEpochMs('deleteDateTime' in raw ? raw.deleteDateTime : null),
       location: {
-        latitude: raw.latitude,
-        longitude: raw.longitude,
+        latitude: typeof raw.latitude === 'number' ? raw.latitude : 0,
+        longitude: typeof raw.longitude === 'number' ? raw.longitude : 0,
         plusCode: raw.plusCode,
       },
       message: raw.message,
@@ -917,24 +975,24 @@ export class MessageService {
       comments: [],
       commentsNumber: raw.commentsNumber,
       status: raw.status,
-      aiModerationDecision: raw.aiModerationDecision ?? null,
-      aiModerationScore: this.toNullableNumber(raw.aiModerationScore),
-      aiModerationFlagged: this.toNullableBool(raw.aiModerationFlagged),
-      aiModerationAt: this.toNullableNumber(raw.aiModerationAt),
-      patternMatch: this.toNullableBool(raw.patternMatch),
-      patternMatchAt: this.toNullableNumber(raw.patternMatchAt),
-      manualModerationDecision: raw.manualModerationDecision ?? null,
-      manualModerationReason: raw.manualModerationReason ?? null,
-      manualModerationAt: this.toNullableNumber(raw.manualModerationAt),
-      manualModerationBy: raw.manualModerationBy ?? null,
-      dsaStatusToken: raw.dsaStatusToken,
+      aiModerationDecision: 'aiModerationDecision' in raw ? raw.aiModerationDecision ?? null : null,
+      aiModerationScore: 'aiModerationScore' in raw ? this.toNullableNumber(raw.aiModerationScore) : null,
+      aiModerationFlagged: 'aiModerationFlagged' in raw ? this.toNullableBool(raw.aiModerationFlagged) : null,
+      aiModerationAt: 'aiModerationAt' in raw ? this.toNullableNumber(raw.aiModerationAt) : null,
+      patternMatch: 'patternMatch' in raw ? this.toNullableBool(raw.patternMatch) : null,
+      patternMatchAt: 'patternMatchAt' in raw ? this.toNullableNumber(raw.patternMatchAt) : null,
+      manualModerationDecision: 'manualModerationDecision' in raw ? raw.manualModerationDecision ?? null : null,
+      manualModerationReason: 'manualModerationReason' in raw ? raw.manualModerationReason ?? null : null,
+      manualModerationAt: 'manualModerationAt' in raw ? this.toNullableNumber(raw.manualModerationAt) : null,
+      manualModerationBy: 'manualModerationBy' in raw ? raw.manualModerationBy ?? null : null,
+      dsaStatusToken: 'dsaStatusToken' in raw ? raw.dsaStatusToken ?? undefined : undefined,
       publishState: this.normalizePublishState({
         status: raw.status,
-        dsaStatusToken: raw.dsaStatusToken,
-        manualModerationDecision: raw.manualModerationDecision ?? null
+        dsaStatusToken: 'dsaStatusToken' in raw ? raw.dsaStatusToken ?? undefined : undefined,
+        manualModerationDecision: 'manualModerationDecision' in raw ? raw.manualModerationDecision ?? null : null
       }),
       userId: raw.userId,
-      multimedia: JSON.parse(raw.multimedia)
+      multimedia: this.parseMessageMultimedia(raw.multimedia)
     };
   }
 
@@ -1213,7 +1271,7 @@ export class MessageService {
           return;
         }
 
-        const uniqueMessages = new Map<number, RawMessage>();
+        const uniqueMessages = new Map<number, PublicMessageRow>();
         successfulResponses.forEach(response => {
           (response.rows ?? []).forEach(raw => {
             uniqueMessages.set(raw.id, raw);
@@ -1239,72 +1297,32 @@ export class MessageService {
   }
 
 
-  getByBoundingBox(boundingBox: BoundingBox, showAlways = false): Observable<GetMessageResponse> {
-    const url = `${environment.apiUrl}/message/get/boundingbox/${boundingBox.latMin}/${boundingBox.lonMin}/${boundingBox.latMax}/${boundingBox.lonMax}`;
-
-    this.networkService.setNetworkMessageConfig(url, {
-      showAlways,
-      title: this.i18n.t('common.message.title'),
-      image: '',
-      icon: '',
-      message: this.i18n.t('common.message.loading'),
-      button: '',
-      delay: 0,
-      showSpinner: true,
-      autoclose: false
-    });
-
-    return this.http.get<GetMessageResponse>(url, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      );
-  }
-
-  getByUuid(messageUuid: string, showAlways = false): Observable<Message | null> {
-    const trimmedUuid = typeof messageUuid === 'string' ? messageUuid.trim() : '';
-    if (!trimmedUuid) {
-      return of(null);
-    }
-
-    const url = `${environment.apiUrl}/message/get/uuid/${encodeURIComponent(trimmedUuid)}`;
-
-    this.networkService.setNetworkMessageConfig(url, {
-      showAlways,
-      title: this.i18n.t('common.message.title'),
-      image: '',
-      icon: '',
-      message: this.i18n.t('common.message.loading'),
-      button: '',
-      delay: 0,
-      showSpinner: true,
-      autoclose: false
-    });
-
-    return this.http.get<{ status: number; message?: RawMessage }>(url, this.httpOptions).pipe(
-      map((response) => {
-        if (!response?.message) {
-          return null;
-        }
-        return this.mapRawMessage(response.message);
-      }),
+  private fetchMessageByUrl<T extends MessageRow>(url: string, headers = this.httpOptions.headers): Observable<Message | null> {
+    return this.http.get<{ status: number; message?: T }>(url, { ...this.httpOptions, headers }).pipe(
+      map((response) => response?.message ? this.mapRawMessage(response.message) : null),
       catchError(() => of(null))
     );
   }
 
-  verifyMessageExistsByUuid(messageUuid: string): Observable<{ exists: boolean; status: number | null; published: boolean; messageStatus: string | null }> {
-    const trimmedUuid = typeof messageUuid === 'string' ? messageUuid.trim() : '';
-    if (!trimmedUuid) {
-      return of({ exists: false, status: 400, published: false, messageStatus: null });
-    }
+  private lookupPublicMessageByUuid(messageUuid: string, headers = this.httpOptions.headers): Observable<Message | null> {
+    return this.fetchMessageByUrl<PublicMessageRow>(
+      this.buildPublicMessageUrl(`uuid/${encodeURIComponent(messageUuid)}`),
+      headers
+    );
+  }
 
-    const headers = this.httpOptions.headers
-      .set('x-skip-ui', 'true')
-      .set('x-skip-backend-status', 'true');
+  private lookupOwnMessageByUuid(messageUuid: string, headers = this.httpOptions.headers): Observable<Message | null> {
+    return this.fetchMessageByUrl<OwnerMessageRow>(
+      this.buildOwnMessageUrl(`uuid/${encodeURIComponent(messageUuid)}`),
+      headers
+    );
+  }
 
-    return this.http.get<{ status: number; message?: RawMessage }>(
-      `${environment.apiUrl}/message/get/uuid/${encodeURIComponent(trimmedUuid)}`,
-      { ...this.httpOptions, headers }
-    ).pipe(
+  private verifyMessageAtUrl<T extends MessageRow>(
+    url: string,
+    headers = this.httpOptions.headers
+  ): Observable<{ exists: boolean; status: number | null; published: boolean; messageStatus: string | null }> {
+    return this.http.get<{ status: number; message?: T }>(url, { ...this.httpOptions, headers }).pipe(
       map((response) => {
         const messageStatus = typeof response?.message?.status === 'string'
           ? response.message.status
@@ -1322,6 +1340,99 @@ export class MessageService {
         published: false,
         messageStatus: null
       }))
+    );
+  }
+
+  getByBoundingBox(boundingBox: BoundingBox, showAlways = false): Observable<GetMessageResponse<PublicMessageRow>> {
+    const url = this.buildPublicMessageUrl(
+      `boundingbox/${boundingBox.latMin}/${boundingBox.lonMin}/${boundingBox.latMax}/${boundingBox.lonMax}`
+    );
+
+    this.networkService.setNetworkMessageConfig(url, {
+      showAlways,
+      title: this.i18n.t('common.message.title'),
+      image: '',
+      icon: '',
+      message: this.i18n.t('common.message.loading'),
+      button: '',
+      delay: 0,
+      showSpinner: true,
+      autoclose: false
+    });
+
+    return this.http.get<GetMessageResponse<PublicMessageRow>>(url, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  getByUuid(messageUuid: string, showAlways = false): Observable<Message | null> {
+    const trimmedUuid = typeof messageUuid === 'string' ? messageUuid.trim() : '';
+    if (!trimmedUuid) {
+      return of(null);
+    }
+
+    const publicUrl = this.buildPublicMessageUrl(`uuid/${encodeURIComponent(trimmedUuid)}`);
+    const ownUrl = this.buildOwnMessageUrl(`uuid/${encodeURIComponent(trimmedUuid)}`);
+    this.networkService.setNetworkMessageConfig(publicUrl, {
+      showAlways,
+      title: this.i18n.t('common.message.title'),
+      image: '',
+      icon: '',
+      message: this.i18n.t('common.message.loading'),
+      button: '',
+      delay: 0,
+      showSpinner: true,
+      autoclose: false
+    });
+    this.networkService.setNetworkMessageConfig(ownUrl, {
+      showAlways,
+      title: this.i18n.t('common.message.title'),
+      image: '',
+      icon: '',
+      message: this.i18n.t('common.message.loading'),
+      button: '',
+      delay: 0,
+      showSpinner: true,
+      autoclose: false
+    });
+
+    if (!this.hasAuthenticatedUser()) {
+      return this.lookupPublicMessageByUuid(trimmedUuid);
+    }
+
+    return this.lookupOwnMessageByUuid(trimmedUuid).pipe(
+      switchMap((ownMessage) => ownMessage ? of(ownMessage) : this.lookupPublicMessageByUuid(trimmedUuid))
+    );
+  }
+
+  verifyMessageExistsByUuid(messageUuid: string): Observable<{ exists: boolean; status: number | null; published: boolean; messageStatus: string | null }> {
+    const trimmedUuid = typeof messageUuid === 'string' ? messageUuid.trim() : '';
+    if (!trimmedUuid) {
+      return of({ exists: false, status: 400, published: false, messageStatus: null });
+    }
+
+    const headers = this.httpOptions.headers
+      .set('x-skip-ui', 'true')
+      .set('x-skip-backend-status', 'true');
+
+    if (!this.hasAuthenticatedUser()) {
+      return this.verifyMessageAtUrl<PublicMessageRow>(
+        this.buildPublicMessageUrl(`uuid/${encodeURIComponent(trimmedUuid)}`),
+        headers
+      );
+    }
+
+    return this.verifyMessageAtUrl<OwnerMessageRow>(
+      this.buildOwnMessageUrl(`uuid/${encodeURIComponent(trimmedUuid)}`),
+      headers
+    ).pipe(
+      switchMap((result) => result.exists || result.status === 200
+        ? of(result)
+        : this.verifyMessageAtUrl<PublicMessageRow>(
+          this.buildPublicMessageUrl(`uuid/${encodeURIComponent(trimmedUuid)}`),
+          headers
+        ))
     );
   }
 
@@ -1434,10 +1545,10 @@ export class MessageService {
     );
   }
 
-  searchByHashtag(tag: string, showAlways = false): Observable<GetMessageResponse> {
+  searchByHashtag(tag: string, showAlways = false): Observable<GetMessageResponse<PublicMessageRow>> {
     const normalized = normalizeHashtags([tag], 1).tags[0];
     const encoded = encodeURIComponent(normalized ?? '');
-    const url = `${environment.apiUrl}/message/get/hashtag/${encoded}`;
+    const url = this.buildPublicMessageUrl(`hashtag/${encoded}`);
 
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
@@ -1451,7 +1562,7 @@ export class MessageService {
       autoclose: false
     });
 
-    return this.http.get<GetMessageResponse>(url, this.httpOptions).pipe(
+    return this.http.get<GetMessageResponse<PublicMessageRow>>(url, this.httpOptions).pipe(
       catchError(this.handleError)
     );
   }
@@ -1572,7 +1683,7 @@ export class MessageService {
   }
 
   public async loadCommentsForParentMessage(message: Message, showAlways = false): Promise<Message[]> {
-    const url = `${environment.apiUrl}/message/get/comment/${message.uuid}`;
+    const url = this.buildPublicMessageUrl(`comment/${message.uuid}`);
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
       title: this.i18n.t('common.message.title'),
@@ -1588,9 +1699,9 @@ export class MessageService {
     const commentsSignal = this.getCommentsSignalForMessage(message.uuid);
     try {
       const getMessageResponse = await firstValueFrom(
-        this.http.get<GetMessageResponse>(url, this.httpOptions).pipe(catchError(this.handleError))
+        this.http.get<GetMessageResponse<PublicMessageRow>>(url, this.httpOptions).pipe(catchError(this.handleError))
       );
-      const comments = (getMessageResponse.rows ?? []).map((rawMessage: RawMessage) => this.mapRawMessage(rawMessage));
+      const comments = (getMessageResponse.rows ?? []).map((rawMessage: PublicMessageRow) => this.mapRawMessage(rawMessage));
       commentsSignal.set(comments);
 
       const nextParentCount = Math.max(

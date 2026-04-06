@@ -517,7 +517,7 @@ async function getExternalPublicContentByUuid(messageUuid) {
     return null;
   }
 
-  const response = await callPublicBackend('get', `/message/get/uuid/${encodeURIComponent(normalizedUuid)}`);
+  const response = await callPublicBackend('get', `/message/internal/uuid/${encodeURIComponent(normalizedUuid)}`);
   if (response.status === 404) {
     return null;
   }
@@ -1054,7 +1054,7 @@ router.get('/public-messages/:id/external-comments', requireRole(...CONTENT_ROLE
       });
     }
 
-    const response = await callPublicBackend('get', `/message/get/comment/${encodeURIComponent(row.publishedMessageUuid)}`);
+    const response = await callPublicBackend('get', `/message/internal/comment/${encodeURIComponent(row.publishedMessageUuid)}`);
     if (response.status !== 200) {
       const err = apiError.badGateway('backend_request_failed');
       err.detail = response.data?.error || response.data?.message || response.statusText || 'public_comments_lookup_failed';
