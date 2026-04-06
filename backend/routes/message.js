@@ -12,6 +12,7 @@ const rateLimit = require('express-rate-limit');
 const axios = require('axios');
 const OpenAI = require('openai');
 const { signServiceJwt } = require('../utils/serviceJwt');
+const { verifyServiceJwt } = require('../utils/serviceJwt');
 const { apiError } = require('../middleware/api-error');
 const { resolveBaseUrl } = require('../utils/adminLogForwarder');
 const { buildOpenAiErrorDetail } = require('../utils/openai-error');
@@ -23,6 +24,7 @@ const {
   formatHashtagsForModeration
 } = require('../utils/hashtags');
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const serviceBackendAudience = process.env.SERVICE_JWT_AUDIENCE_BACKEND || process.env.SERVICE_JWT_AUDIENCE || 'service.backend';
 
 function getAuthUserId(req) {
   return req.jwtUser?.userId ?? req.jwtUser?.id ?? null;
@@ -56,6 +58,85 @@ function findMessageByIdOrUuid(db, messageId, callback) {
     return tableMessage.getById(db, raw, callback);
   }
   return tableMessage.getByUuid(db, raw, callback);
+}
+
+function attachOptionalServiceIdentity(req) {
+  if (req?.service) {
+    return req.service;
+  }
+  const bearerToken = security.extractBearerFromHeader(req);
+  if (!bearerToken) {
+    return null;
+  }
+  try {
+    req.service = verifyServiceJwt(bearerToken, { audience: serviceBackendAudience });
+    return req.service;
+  } catch {
+    return null;
+  }
+}
+
+function hasServiceAccess(req) {
+  return Boolean(attachOptionalServiceIdentity(req));
+}
+
+function normalizePublicMultimedia(multimedia) {
+  if (typeof multimedia === 'string') {
+    const trimmed = multimedia.trim();
+    return trimmed ? trimmed : 'null';
+  }
+  if (multimedia === null || multimedia === undefined) {
+    return 'null';
+  }
+  try {
+    return JSON.stringify(multimedia);
+  } catch {
+    return 'null';
+  }
+}
+
+function toPublicGuestMessageRow(row) {
+  if (!row || typeof row !== 'object') {
+    return null;
+  }
+
+  const toFiniteNumber = (value, fallback = 0) => {
+    const num = Number(value);
+    return Number.isFinite(num) ? num : fallback;
+  };
+
+  return {
+    id: toFiniteNumber(row.id, 0),
+    uuid: String(row.uuid ?? '').trim(),
+    parentUuid: typeof row.parentUuid === 'string' ? row.parentUuid : null,
+    typ: typeof row.typ === 'string' && row.typ.trim()
+      ? row.typ
+      : tableMessage.messageType.PUBLIC,
+    createDateTime: Number.isFinite(Number(row.createDateTime)) ? Number(row.createDateTime) : null,
+    deleteDateTime: null,
+    latitude: Number.isFinite(Number(row.latitude)) ? Number(row.latitude) : null,
+    longitude: Number.isFinite(Number(row.longitude)) ? Number(row.longitude) : null,
+    plusCode: typeof row.plusCode === 'string' ? row.plusCode : '',
+    message: typeof row.message === 'string' ? row.message : '',
+    markerType: typeof row.markerType === 'string' && row.markerType.trim()
+      ? row.markerType
+      : 'default',
+    style: typeof row.style === 'string' ? row.style : '',
+    hashtags: row.hashtags ?? '',
+    views: Math.max(0, toFiniteNumber(row.views, 0)),
+    likes: Math.max(0, toFiniteNumber(row.likes, 0)),
+    dislikes: Math.max(0, toFiniteNumber(row.dislikes, 0)),
+    commentsNumber: Math.max(0, toFiniteNumber(row.commentsNumber, 0)),
+    status: typeof row.status === 'string' && row.status.trim()
+      ? row.status
+      : tableMessage.messageStatus.ENABLED,
+    userId: typeof row.userId === 'string' ? row.userId : '',
+    multimedia: normalizePublicMultimedia(row.multimedia)
+  };
+}
+
+function toPublicGuestMessageRows(rows) {
+  return (rows || []).map((row) => toPublicGuestMessageRow(row)).filter(Boolean);
 }
 
 function normalizeInternalMultimedia(multimedia) {
@@ -536,7 +617,11 @@ const messageCreateLimiter = rateLimit({
   }
 });
 
-router.get('/get', function (req, res, next) {
+router.get('/get',
+  [
+    security.checkToken
+  ],
+  function (req, res, next) {
   tableMessage.getAll(req.database.db, function (err, rows) {
     if (err) {
       return next(apiError.internal('db_error'));
@@ -548,7 +633,11 @@ router.get('/get', function (req, res, next) {
   });
 });
 
-router.get('/get/id/:messageId', function (req, res, next) {
+router.get('/get/id/:messageId',
+  [
+    security.checkToken
+  ],
+  function (req, res, next) {
   tableMessage.getById(req.database.db, req.params.messageId, function (err, row) {
     if (err) {
       return next(apiError.internal('db_error'));
@@ -568,12 +657,16 @@ router.get('/get/uuid/:messageUuid', security.authenticateOptional, function (re
     if (!row) {
       return next(apiError.notFound('not_found'));
     }
+    if (hasServiceAccess(req)) {
+      return res.status(200).json({ status: 200, message: row });
+    }
     const authUserId = getAuthUserId(req);
     const isOwnMessage = authUserId && String(authUserId) === String(row.userId);
     if (row.status !== tableMessage.messageStatus.ENABLED && !isOwnMessage) {
       return next(apiError.notFound('not_found'));
     }
-    res.status(200).json({ status: 200, message: row });
+    const publicRow = isOwnMessage ? row : toPublicGuestMessageRow(row);
+    res.status(200).json({ status: 200, message: publicRow });
   });
 });
 
@@ -612,16 +705,17 @@ router.post('/recount-comments/:userId',
     });
   });
 
-router.get('/get/comment/:parentUuid', function (req, res, next) {
+router.get('/get/comment/:parentUuid', security.authenticateOptional, function (req, res, next) {
   tableMessage.getByParentUuid(req.database.db, req.params.parentUuid, function (err, rows) {
     if (err) {
       return next(apiError.internal('db_error'));
     }
-    res.status(200).json({ status: 200, rows: rows || [] });
+    const payloadRows = hasServiceAccess(req) ? (rows || []) : toPublicGuestMessageRows(rows);
+    res.status(200).json({ status: 200, rows: payloadRows });
   });
 });
 
-router.get('/get/hashtag/:tag', function (req, res, next) {
+router.get('/get/hashtag/:tag', security.authenticateOptional, function (req, res, next) {
   const tags = parsePublicHashtags([req.params.tag]);
   if (!tags || tags.length === 0) {
     return next(apiError.badRequest('invalid_hashtags'));
@@ -630,11 +724,12 @@ router.get('/get/hashtag/:tag', function (req, res, next) {
     if (err) {
       return next(apiError.internal('db_error'));
     }
-    res.status(200).json({ status: 200, rows: rows || [] });
+    const payloadRows = hasServiceAccess(req) ? (rows || []) : toPublicGuestMessageRows(rows);
+    res.status(200).json({ status: 200, rows: payloadRows });
   });
 });
 
-router.get('/get/pluscode/:plusCode', function (req, res, next) {
+router.get('/get/pluscode/:plusCode', security.authenticateOptional, function (req, res, next) {
   let response = { 'status': 0, 'rows': [] };
   // It is not allowed to get all messages with this route.
   if (req.params.plusCode.length < 2 || req.params.plusCode.length > 11) {
@@ -650,7 +745,8 @@ router.get('/get/pluscode/:plusCode', function (req, res, next) {
       if (!rows || rows.length === 0) {
         return next(apiError.notFound('not_found'));
       }
-      rows.forEach((row) => {
+      const payloadRows = hasServiceAccess(req) ? (rows || []) : toPublicGuestMessageRows(rows);
+      payloadRows.forEach((row) => {
         response.rows.push(row);
       });
       response.status = 200;
@@ -661,6 +757,7 @@ router.get('/get/pluscode/:plusCode', function (req, res, next) {
 
 router.get('/get/boundingbox/:latMin/:lonMin/:latMax/:lonMax',
   [
+    security.authenticateOptional,
     metric.count('message.search', { when: 'always', timezone: 'utc', amount: 1 })
   ], (req, res, next) => {
     const response = { status: 0, rows: [] };
@@ -694,7 +791,7 @@ router.get('/get/boundingbox/:latMin/:lonMin/:latMax/:lonMax',
         if (err) {
           return next(apiError.internal('db_error'));
         }
-        response.rows = rows || [];
+        response.rows = hasServiceAccess(req) ? (rows || []) : toPublicGuestMessageRows(rows);
         response.status = 200;
         res.status(200).json(response);
       }
