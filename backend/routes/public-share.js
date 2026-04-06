@@ -238,25 +238,35 @@ router.get('/:messageUuid', function (req, res) {
       });
     }
 
-    const messageText = typeof row.message === 'string' ? row.message.trim() : '';
-    const multimedia = parseMultimedia(row.multimedia);
-    const description = buildDescription(messageText)
-      || (hasMultimedia(multimedia) ? strings.mediaOnlyDescription : strings.pageDescription);
-    const title = messageText
-      ? `MessageDrop | ${truncate(singleLine(messageText), 72)}`
-      : strings.pageTitle;
+    const meta = buildPublicShareMeta(row, strings);
 
     return renderShareShell(res, {
       locale,
       strings,
       status: 200,
       messageUuid,
-      title,
-      description,
+      title: meta.title,
+      description: meta.description,
       message: row
     });
   });
 });
+
+function buildPublicShareMeta(message, strings) {
+  const normalizedMessage = normalizePublicMessage(message);
+  const messageText = typeof normalizedMessage?.message === 'string' ? normalizedMessage.message.trim() : '';
+  const mediaTitle = normalizeMediaTitle(normalizedMessage?.multimedia);
+  const titleSource = messageText || mediaTitle;
+
+  return {
+    title: titleSource
+      ? `MessageDrop | ${truncate(singleLine(titleSource), 72)}`
+      : strings.pageTitle,
+    description: buildDescription(messageText)
+      || buildDescription(mediaTitle)
+      || (hasMultimedia(normalizedMessage?.multimedia) ? strings.mediaOnlyDescription : strings.pageDescription)
+  };
+}
 
 function renderShareShell(res, model) {
   const appBaseUrl = resolvePublicAppBaseUrl(res.req);
@@ -296,10 +306,12 @@ function renderShareShell(res, model) {
 
   res.status(model.status || 200);
   res.set('Content-Type', 'text/html; charset=utf-8');
-  res.set('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=60');
+  res.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
+  res.set('Content-Language', model.locale);
   res.set('Content-Security-Policy', buildPublicMessageContentSecurityPolicy());
-  res.set('X-Robots-Tag', 'noindex, nofollow');
-  res.set('Vary', 'Accept-Language');
+  res.set('Referrer-Policy', 'no-referrer');
+  res.set('X-Robots-Tag', 'noindex');
+  res.set('Vary', 'Accept-Language, User-Agent');
   res.send(html);
 }
 
@@ -310,10 +322,6 @@ function buildShareHtml(model) {
   const absoluteIconUrl = `${model.assetBaseUrl}/icon-192x192.png`;
   const absoluteOverlayUrl = `${model.assetBaseUrl}/sticker-protection-overlay.svg`;
   const initialPageState = buildInitialPageState(model);
-  const initialDataJson = escapeJsonForScriptTag(JSON.stringify({
-    initialMessage: model.message || null,
-    initialError: model.initialError || null
-  }));
   const structuredDataJson = escapeJsonForScriptTag(JSON.stringify(buildPublicMessageStructuredData(model)));
   const inlineFontCss = buildInlineFontCss(model.message, model.assetBaseUrl);
 
@@ -381,13 +389,12 @@ function buildShareHtml(model) {
   html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_CONTEXT_BODY__', escapeHtml(model.strings.contextBody));
   html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_CONTEXT_LINK_HREF__', escapeAttribute(resolveWhatIsPageUrl(model.appBaseUrl, model.locale)));
   html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_CONTEXT_LINK_LABEL__', escapeHtml(model.strings.moreInfo));
-  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_INITIAL_DATA__', initialDataJson);
   if (inlineFontCss) {
     html = html.replace(/<\/head>/i, `  <style id="public-message-inline-font">${inlineFontCss}</style>\n</head>`);
   }
   html = html.replace(
-    /<script id="public-message-initial-data" type="application\/json">[\s\S]*?<\/script>\s*<script src="\/site-assets\/public-message\.js" defer><\/script>/i,
-    `<meta name="public-message-bootstrap" content="${escapeAttribute(JSON.stringify(model.bootstrap))}">\n  <script id="public-message-initial-data" type="application/json">${initialDataJson}</script>\n  <script src="${escapeAttribute(absoluteJsUrl)}" defer></script>`
+    /<script src="\/site-assets\/public-message\.js" defer><\/script>/i,
+    `<meta name="public-message-bootstrap" content="${escapeAttribute(JSON.stringify(model.bootstrap))}">\n  <script src="${escapeAttribute(absoluteJsUrl)}" defer></script>`
   );
   return html;
 }
@@ -402,7 +409,7 @@ function buildInitialPageState(model) {
   const mediaSummary = buildServerMediaSummary(multimedia, strings);
   const hashtags = Array.isArray(message?.hashtags) ? message.hashtags : [];
   const text = typeof message?.message === 'string' ? message.message.trim() : '';
-  const fontFamily = extractAllowedFontFamily(message?.style);
+  const fontFamily = extractAllowedFontFamily(message?.fontFamily || message?.style);
 
   return {
     descriptionText: message ? '' : (model.initialError?.body || model.description || strings.unavailableDescription),
@@ -438,11 +445,55 @@ function normalizePublicMessage(rawMessage) {
     return null;
   }
 
+  const multimedia = sanitizePublicMultimedia(parseMultimedia(rawMessage.multimedia));
+  const hashtags = parseHashtagStorageValue(rawMessage.hashtags);
+  const fontFamily = extractAllowedFontFamily(rawMessage.fontFamily || rawMessage.style);
+  const messageUuid = typeof rawMessage.uuid === 'string' ? rawMessage.uuid.trim() : '';
+  const messageText = typeof rawMessage.message === 'string' ? rawMessage.message.trim() : '';
+
   return {
-    ...rawMessage,
-    multimedia: parseMultimedia(rawMessage.multimedia),
-    hashtags: parseHashtagStorageValue(rawMessage.hashtags)
+    uuid: messageUuid,
+    message: messageText,
+    fontFamily: fontFamily || '',
+    hashtags,
+    multimedia
   };
+}
+
+function sanitizePublicMultimedia(multimedia) {
+  const media = multimedia && typeof multimedia === 'object' ? multimedia : null;
+  if (!media || !hasMultimedia(media)) {
+    return null;
+  }
+
+  const type = normalizePublicMediaType(media);
+  if (!type) {
+    return null;
+  }
+
+  const title = normalizeMediaTitle(media);
+  return {
+    type,
+    title: title || ''
+  };
+}
+
+function normalizePublicMediaType(multimedia) {
+  const mediaType = typeof multimedia?.type === 'string'
+    ? multimedia.type.trim().toLowerCase()
+    : '';
+  const imageUrl = typeof multimedia?.url === 'string' ? multimedia.url.trim() : '';
+
+  if (mediaType === 'sticker') return 'sticker';
+  if (mediaType === 'youtube') return 'youtube';
+  if (mediaType === 'spotify') return 'spotify';
+  if (mediaType === 'soundcloud') return 'soundcloud';
+  if (mediaType === 'tiktok') return 'tiktok';
+  if (mediaType === 'pinterest') return 'pinterest';
+  if (mediaType === 'tenor') return 'tenor';
+  if (mediaType === 'image' || isDirectImageMedia(mediaType, imageUrl)) return 'image';
+  if (mediaType && mediaType !== 'undefined') return 'media';
+  return 'media';
 }
 
 function buildHashtagsHtml(hashtags) {
@@ -479,14 +530,10 @@ function buildServerMediaSummary(multimedia, strings) {
   const iconType = resolveOgMediaIconType(mediaType, media);
   const label = mediaType === 'sticker'
     ? strings.stickerLabel
-    : isDirectImageMedia(mediaType, media.url)
+    : mediaType === 'image' || isDirectImageMedia(mediaType, media.url)
       ? strings.imageLabel
       : resolveMediaPlatformLabel(mediaType, media, strings);
   const title = truncate(singleLine(normalizeMediaTitle(media)), 120);
-  const attributionText = typeof media.attribution === 'string' ? media.attribution.trim() : '';
-  const attributionHref = typeof media.sourceUrl === 'string' && isHttpUrl(media.sourceUrl)
-    ? media.sourceUrl.trim()
-    : '';
 
   return {
     visible: true,
@@ -501,8 +548,8 @@ function buildServerMediaSummary(multimedia, strings) {
       '  </span>',
       '</div>'
     ].filter(Boolean).join('\n'),
-    attributionText,
-    attributionHref
+    attributionText: '',
+    attributionHref: ''
   };
 }
 
@@ -531,7 +578,6 @@ function renderServerMediaIconSvg(type) {
 
 function buildPublicMessageStructuredData(model) {
   const strings = model.strings || STRINGS[model.locale] || STRINGS.en;
-  const message = normalizePublicMessage(model.message);
   const canonicalUrl = model.canonicalUrl;
   const appUrl = normalizeAbsoluteUrl(model.appBaseUrl) || 'https://messagedrop.de';
   const publisher = {
@@ -560,42 +606,9 @@ function buildPublicMessageStructuredData(model) {
     inLanguage: model.locale
   };
 
-  const graph = [website, webpage];
-
-  if (message) {
-    const text = typeof message.message === 'string' ? message.message.trim() : '';
-    const multimedia = parseMultimedia(message.multimedia);
-    const hashtags = Array.isArray(message.hashtags) ? message.hashtags : [];
-    const titleSource = text || normalizeMediaTitle(multimedia) || strings.heroTitle;
-    const posting = {
-      '@type': 'SocialMediaPosting',
-      '@id': `${canonicalUrl}#posting`,
-      url: canonicalUrl,
-      headline: truncate(singleLine(titleSource), 110),
-      description: model.description,
-      articleBody: text || undefined,
-      isPartOf: {
-        '@id': `${appUrl}/#website`
-      },
-      publisher,
-      inLanguage: model.locale,
-      keywords: hashtags.length ? hashtags.join(', ') : undefined
-    };
-
-    if (Number.isFinite(Number(message.createDateTime))) {
-      posting.datePublished = new Date(Number(message.createDateTime) * 1000).toISOString();
-    }
-
-    if (model.imageUrl) {
-      posting.image = model.imageUrl;
-    }
-
-    graph.push(posting);
-  }
-
   return {
     '@context': 'https://schema.org',
-    '@graph': graph
+    '@graph': [website, webpage]
   };
 }
 
@@ -611,7 +624,7 @@ function resolveWhatIsPageUrl(appBaseUrl, locale) {
 }
 
 function buildInlineFontCss(message, assetBaseUrl) {
-  const fontFamily = extractAllowedFontFamily(message?.style);
+  const fontFamily = extractAllowedFontFamily(message?.fontFamily || message?.style);
   if (!fontFamily || !assetBaseUrl) {
     return '';
   }
@@ -638,9 +651,11 @@ async function renderOgImage(res, model) {
     const svg = await buildPublicMessageOgSvg(model);
     res.status(model.status === 500 ? 500 : 200);
     res.set('Content-Type', `${OG_IMAGE_TYPE_SVG}; charset=utf-8`);
-    res.set('Cache-Control', 'public, max-age=300, s-maxage=900, stale-while-revalidate=300');
-    res.set('X-Robots-Tag', 'noindex, nofollow');
-    res.set('Vary', 'Accept-Language');
+    res.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
+    res.set('Content-Language', model.locale);
+    res.set('Referrer-Policy', 'no-referrer');
+    res.set('X-Robots-Tag', 'noindex');
+    res.set('Vary', 'Accept-Language, User-Agent');
     res.send(svg);
   } catch {
     const fallbackStrings = model.strings || STRINGS[model.locale] || STRINGS.en;
@@ -651,9 +666,11 @@ async function renderOgImage(res, model) {
     });
     res.status(200);
     res.set('Content-Type', `${OG_IMAGE_TYPE_SVG}; charset=utf-8`);
-    res.set('Cache-Control', 'public, max-age=300, s-maxage=900, stale-while-revalidate=300');
-    res.set('X-Robots-Tag', 'noindex, nofollow');
-    res.set('Vary', 'Accept-Language');
+    res.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
+    res.set('Content-Language', model.locale);
+    res.set('Referrer-Policy', 'no-referrer');
+    res.set('X-Robots-Tag', 'noindex');
+    res.set('Vary', 'Accept-Language, User-Agent');
     res.send(fallbackSvg);
   }
 }
@@ -663,9 +680,11 @@ async function renderOgPngImage(res, model) {
     const pngBuffer = await buildPublicMessageOgPng(model);
     res.status(model.status === 500 ? 500 : 200);
     res.set('Content-Type', OG_IMAGE_TYPE_PNG);
-    res.set('Cache-Control', 'public, max-age=300, s-maxage=900, stale-while-revalidate=300');
-    res.set('X-Robots-Tag', 'noindex, nofollow');
-    res.set('Vary', 'Accept-Language');
+    res.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
+    res.set('Content-Language', model.locale);
+    res.set('Referrer-Policy', 'no-referrer');
+    res.set('X-Robots-Tag', 'noindex');
+    res.set('Vary', 'Accept-Language, User-Agent');
     res.send(pngBuffer);
   } catch {
     try {
@@ -677,9 +696,11 @@ async function renderOgPngImage(res, model) {
       });
       res.status(200);
       res.set('Content-Type', OG_IMAGE_TYPE_PNG);
-      res.set('Cache-Control', 'public, max-age=300, s-maxage=900, stale-while-revalidate=300');
-      res.set('X-Robots-Tag', 'noindex, nofollow');
-      res.set('Vary', 'Accept-Language');
+      res.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
+      res.set('Content-Language', model.locale);
+      res.set('Referrer-Policy', 'no-referrer');
+      res.set('X-Robots-Tag', 'noindex');
+      res.set('Vary', 'Accept-Language, User-Agent');
       res.send(pngBuffer);
       return;
     } catch {
@@ -782,28 +803,17 @@ function replaceCanonicalLink(html, href) {
 function buildPublicMessageContentSecurityPolicy() {
   return [
     "default-src 'self'",
-    "base-uri 'self'",
-    "font-src 'self' https: data:",
-    "form-action 'self'",
-    "frame-ancestors 'self'",
-    "img-src 'self' data: blob: https: http:",
+    "base-uri 'none'",
+    "font-src 'self' data:",
+    "form-action 'none'",
+    "frame-ancestors 'none'",
+    "img-src 'self' data:",
     "object-src 'none'",
     "script-src 'self'",
     "script-src-attr 'none'",
-    "style-src 'self' https: 'unsafe-inline'",
-    "connect-src 'self' https: http:",
-    [
-      "frame-src 'self'",
-      'https://www.youtube.com',
-      'https://youtube.com',
-      'https://www.youtube-nocookie.com',
-      'https://youtube-nocookie.com',
-      'https://open.spotify.com',
-      'https://w.soundcloud.com',
-      'https://www.tiktok.com',
-      'https://tiktok.com',
-      'https://assets.pinterest.com'
-    ].join(' ')
+    "style-src 'self' 'unsafe-inline'",
+    "connect-src 'self'",
+    "frame-src 'none'"
   ].join('; ');
 }
 
@@ -813,7 +823,7 @@ async function buildPublicMessageOgSvg(model) {
   const multimedia = parseMultimedia(message?.multimedia);
   const messageText = typeof message?.message === 'string' ? message.message.trim() : '';
   const hasText = Boolean(messageText);
-  const fontFamily = extractAllowedFontFamily(message?.style);
+  const fontFamily = extractAllowedFontFamily(message?.fontFamily || message?.style);
   const embeddedFontCss = fontFamily ? loadEmbeddedFontCss(fontFamily) : '';
   const appIconDataUri = loadAppIconDataUri();
   const mediaVisual = await resolveOgMediaVisual(multimedia, strings);
@@ -1456,7 +1466,13 @@ function extractAllowedFontFamily(styleValue) {
     return '';
   }
 
-  const match = styleValue.match(/font-family\s*:\s*([^;]+)/i);
+  const trimmedValue = styleValue.trim();
+  const directFamily = trimmedValue.replace(/^['"]+|['"]+$/g, '');
+  if (/^[A-Za-z0-9]+$/.test(directFamily)) {
+    return directFamily;
+  }
+
+  const match = trimmedValue.match(/font-family\s*:\s*([^;]+)/i);
   if (!match?.[1]) {
     return '';
   }
@@ -1500,6 +1516,7 @@ function resolveOgMediaIconType(mediaType, multimedia) {
   const normalizedType = String(mediaType || '').trim().toLowerCase();
   const host = resolveUrlHost(multimedia?.sourceUrl || multimedia?.url || extractIframeSrc(multimedia?.oembed?.html || ''));
 
+  if (normalizedType === 'image') return 'image';
   if (normalizedType === 'sticker') return 'sticker';
   if (normalizedType === 'youtube' || host.includes('youtube')) return 'youtube';
   if (normalizedType === 'tenor' || host.includes('tenor')) return 'tenor';
@@ -1648,6 +1665,10 @@ function escapeForRegex(value) {
 }
 
 function resolveLocale(req) {
+  if (isPreviewBotRequest(req)) {
+    return 'en';
+  }
+
   const header = String(req.headers['accept-language'] || '').trim();
   if (!header) {
     return 'en';
@@ -1676,6 +1697,31 @@ function resolveLocale(req) {
   }
 
   return 'en';
+}
+
+function isPreviewBotRequest(req) {
+  const userAgent = String(req.get?.('user-agent') || req.headers['user-agent'] || '').toLowerCase();
+  if (!userAgent) {
+    return false;
+  }
+
+  return [
+    'facebookexternalhit',
+    'facebot',
+    'linkedinbot',
+    'slackbot',
+    'discordbot',
+    'telegrambot',
+    'twitterbot',
+    'skypeuripreview',
+    'embedly',
+    'googlebot',
+    'bingbot',
+    'duckduckbot',
+    'crawler',
+    'spider',
+    'preview'
+  ].some((token) => userAgent.includes(token));
 }
 
 function resolvePublicAppBaseUrl(req) {
