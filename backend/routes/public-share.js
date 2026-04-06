@@ -411,9 +411,7 @@ async function buildPublicMessageOgSvg(model) {
     ? `"${fontFamily}", Inter, Roboto, Arial, sans-serif`
     : 'Inter, Roboto, Arial, sans-serif';
   const primaryStyle = resolveContentIconStyle(primaryIconType || 'text');
-  const lowerTileDefsMarkup = renderPrimarySymbolTile
-    ? renderLowerTileDefs(primaryIconType, primaryStyle)
-    : '';
+  const lowerTileDefsMarkup = '';
   const mediaMarkup = '';
   const contentIconsMarkup = renderPrimarySymbolTile ? '' : renderContentIconsMarkup({
     hasText,
@@ -422,16 +420,15 @@ async function buildPublicMessageOgSvg(model) {
   const headerTileDefsMarkup = renderPrimarySymbolTile
     ? renderHeaderTileDefs(primaryIconType, primaryStyle)
     : '';
-  const headerTileFill = renderPrimarySymbolTile ? `url(#ogHeaderTileGradient-${primaryIconType})` : '#ffffff';
-  const headerTileStroke = renderPrimarySymbolTile ? 'rgba(255,255,255,0.18)' : 'rgba(15,23,42,0.08)';
-  const headerTileOverlayMarkup = renderPrimarySymbolTile
-    ? `  <rect x="60" y="40" width="1080" height="112" rx="30" fill="url(#ogHeaderTileGlow-${primaryIconType})" opacity="0.88" />`
-    : '';
-  const headerTextColor = renderPrimarySymbolTile ? '#ffffff' : '#0f172a';
-  const headerLogoShellFill = renderPrimarySymbolTile ? 'rgba(255,255,255,0.16)' : 'url(#accentGradient)';
-  const headerLogoTileFill = renderPrimarySymbolTile ? 'rgba(255,255,255,0.12)' : '#ffffff';
-  const headerLogoTileStroke = renderPrimarySymbolTile ? 'rgba(255,255,255,0.18)' : 'rgba(15,23,42,0.08)';
-  const headerFallbackColor = renderPrimarySymbolTile ? '#ffffff' : '#2563eb';
+  const headerTileFill = '#ffffff';
+  const headerTileStroke = 'rgba(15,23,42,0.08)';
+  const headerTileOverlayMarkup = '';
+  const headerTextColor = '#0f172a';
+  const headerEyebrowColor = '#475569';
+  const headerLogoShellFill = 'url(#headerLogoShellGradient)';
+  const headerLogoTileFill = '#ffffff';
+  const headerLogoTileStroke = '#dbeafe';
+  const headerFallbackColor = '#2563eb';
   const textMarkup = renderPrimarySymbolTile ? '' : renderWrappedSvgText({
     lines: textLines,
     x: 600,
@@ -442,24 +439,23 @@ async function buildPublicMessageOgSvg(model) {
     fontFamily: bodyFont,
     fontWeight: 600
   });
-  const lowerTileFill = renderPrimarySymbolTile ? `url(#ogLowerTileGradient-${primaryIconType})` : '#ffffff';
-  const lowerTileStroke = renderPrimarySymbolTile ? 'rgba(255,255,255,0.16)' : 'rgba(15,23,42,0.08)';
-  const lowerTileOverlayMarkup = renderPrimarySymbolTile
-    ? `  <rect x="60" y="176" width="1080" height="394" rx="34" fill="url(#ogLowerTileGlow-${primaryIconType})" opacity="0.92" />`
-    : '';
+  const lowerTileFill = '#ffffff';
+  const lowerTileStroke = 'rgba(15,23,42,0.08)';
+  const lowerTileOverlayMarkup = '';
   const largePrimarySymbolMarkup = renderPrimarySymbolTile
     ? renderLargeContentSymbol({
       type: primaryIconType,
       centerX: 600,
       centerY: 373,
       size: 252,
-      color: primaryStyle.iconColor
+      color: '#cbd5e1'
     })
     : '';
   const subtitleMarkup = messageText && hasVisualMedia
     ? ''
     : '';
   const safeBrand = escapeHtml('MessageDrop');
+  const safeHeroTitle = escapeHtml(strings.heroTitle);
 
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${OG_IMAGE_WIDTH}" height="${OG_IMAGE_HEIGHT}" viewBox="0 0 ${OG_IMAGE_WIDTH} ${OG_IMAGE_HEIGHT}" role="img" aria-label="${escapeAttribute(strings.previewImageAlt)}">`,
@@ -478,6 +474,10 @@ async function buildPublicMessageOgSvg(model) {
       '      <stop offset="0%" stop-color="#2563eb" />',
       '      <stop offset="100%" stop-color="#4f46e5" />',
     '    </linearGradient>',
+    '    <linearGradient id="headerLogoShellGradient" x1="0" y1="0" x2="1" y2="1">',
+    '      <stop offset="0%" stop-color="#2563eb" stop-opacity="0.18" />',
+    '      <stop offset="100%" stop-color="#4f46e5" stop-opacity="0.16" />',
+    '    </linearGradient>',
     headerTileDefsMarkup,
     lowerTileDefsMarkup,
     '    <filter id="cardShadow" x="-20%" y="-20%" width="140%" height="160%">',
@@ -495,12 +495,13 @@ async function buildPublicMessageOgSvg(model) {
     '  <rect width="1200" height="630" fill="url(#pageGlow)" />',
     `  <rect x="60" y="40" width="1080" height="112" rx="30" fill="${headerTileFill}" stroke="${headerTileStroke}" filter="url(#cardShadow)" />`,
     headerTileOverlayMarkup,
-    `  <rect x="88" y="62" width="68" height="68" rx="22" fill="${headerLogoShellFill}" opacity="0.92" />`,
+    `  <rect x="88" y="62" width="68" height="68" rx="22" fill="${headerLogoShellFill}" />`,
     `  <rect x="92" y="66" width="60" height="60" rx="18" fill="${headerLogoTileFill}" stroke="${headerLogoTileStroke}" />`,
     appIconDataUri
       ? `  <image href="${escapeAttribute(appIconDataUri)}" x="94" y="68" width="56" height="56" preserveAspectRatio="xMidYMid slice" clip-path="url(#ogHeaderAvatarClip)" />`
       : `  <text x="122" y="105" text-anchor="middle" fill="${headerFallbackColor}" font-family="Inter, Roboto, Arial, sans-serif" font-size="32" font-weight="800">M</text>`,
-    `  <text x="180" y="107" fill="${headerTextColor}" font-family="Inter, Roboto, Arial, sans-serif" font-size="38" font-weight="800">${safeBrand}</text>`,
+    `  <text x="180" y="86" fill="${headerEyebrowColor}" font-family="Inter, Roboto, Arial, sans-serif" font-size="18" font-weight="700" letter-spacing="1.4">${safeBrand}</text>`,
+    `  <text x="180" y="123" fill="${headerTextColor}" font-family="Inter, Roboto, Arial, sans-serif" font-size="34" font-weight="800">${safeHeroTitle}</text>`,
     `  <rect x="60" y="176" width="1080" height="394" rx="34" fill="${lowerTileFill}" stroke="${lowerTileStroke}" filter="url(#cardShadow)" />`,
     lowerTileOverlayMarkup,
     contentIconsMarkup,

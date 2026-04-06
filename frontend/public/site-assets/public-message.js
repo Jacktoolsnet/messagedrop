@@ -113,6 +113,8 @@
 
   const pageTitle = document.getElementById('page-title');
   const pageDescription = document.getElementById('page-description');
+  const heroLogoImage = document.getElementById('hero-logo-image');
+  const heroLogoFallback = document.getElementById('hero-logo-fallback');
   const statusCard = document.getElementById('status-card');
   const messageCard = document.getElementById('message-card');
   const openAppLink = document.getElementById('open-app-link');
@@ -135,6 +137,7 @@
 
   document.documentElement.lang = locale;
   document.title = strings.pageTitle;
+  initializeHeroLogo();
   pageTitle.textContent = strings.heroTitle;
   pageDescription.textContent = strings.loadingBody;
   pageDescription.hidden = false;
@@ -534,6 +537,40 @@
     }
 
     return `${window.location.origin}/assets`;
+  }
+
+  function initializeHeroLogo() {
+    if (!(heroLogoImage instanceof HTMLImageElement)) {
+      return;
+    }
+
+    const showLogoImage = () => {
+      heroLogoImage.hidden = false;
+      if (heroLogoFallback) {
+        heroLogoFallback.hidden = true;
+      }
+    };
+
+    const showLogoFallback = () => {
+      heroLogoImage.hidden = true;
+      if (heroLogoFallback) {
+        heroLogoFallback.hidden = false;
+      }
+    };
+
+    heroLogoImage.addEventListener('load', showLogoImage, { once: true });
+    heroLogoImage.addEventListener('error', showLogoFallback, { once: true });
+
+    heroLogoImage.alt = 'MessageDrop';
+    heroLogoImage.src = `${assetBaseUrl}/icon-192x192.png`;
+
+    if (heroLogoImage.complete) {
+      if (heroLogoImage.naturalWidth > 0) {
+        showLogoImage();
+      } else {
+        showLogoFallback();
+      }
+    }
   }
 
   function resolvePublicMessageBaseUrl() {
