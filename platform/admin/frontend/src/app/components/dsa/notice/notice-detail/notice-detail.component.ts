@@ -22,6 +22,7 @@ import { EvidenceListComponent } from "../evidence/evidence-list/evidence-list.c
 import { ReportedContentPayload, ReportedMultimedia } from '../../../../interfaces/reported-content.interface';
 import { parseReportedContentPayload } from '../../../../utils/reported-content.util';
 import { DisplayMessageService } from '../../../../services/display-message.service';
+import { StickerPreviewComponent } from '../../../shared/sticker-preview/sticker-preview.component';
 
 // Optional: wenn du die vorhandene PublicMessageDetailComponent nutzen willst
 // import { PublicMessageDetailComponent } from '../../../shared/public-message-detail/public-message-detail.component';
@@ -46,7 +47,8 @@ interface TranslationState {
     MatMenuModule,
     EvidenceListComponent,
     DecisionSummaryComponent,
-    NoticeAppealsComponent
+    NoticeAppealsComponent,
+    StickerPreviewComponent
   ],
   templateUrl: './notice-detail.component.html',
   styleUrls: ['./notice-detail.component.css']
@@ -72,7 +74,7 @@ export class NoticeDetailComponent implements OnInit {
   notice = signal<DsaNotice>(this.data);
   status = signal<DsaNoticeStatus>(this.data.status as DsaNoticeStatus);
   private autoStatusApplied = false;
-  mediaKind = signal<'iframe' | 'image' | 'none'>('none');
+  mediaKind = signal<'iframe' | 'image' | 'sticker' | 'none'>('none');
   embedUrl = signal<SafeResourceUrl | null>(null);
   imageUrl = signal<string | null>(null);
 
@@ -447,6 +449,11 @@ export class NoticeDetailComponent implements OnInit {
           this.mediaKind.set('iframe');
         }
       }
+      return;
+    }
+
+    if (type === 'sticker') {
+      this.mediaKind.set('sticker');
       return;
     }
 

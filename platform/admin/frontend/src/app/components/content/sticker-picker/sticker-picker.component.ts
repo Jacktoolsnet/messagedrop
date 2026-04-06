@@ -5,15 +5,12 @@ import { MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/mater
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTabsModule } from '@angular/material/tabs';
-import { TranslocoPipe } from '@jsverse/transloco';
-import { Multimedia } from '../../../interfaces/multimedia';
+import { Multimedia } from '../../../interfaces/multimedia.interface';
 import { StickerCategory } from '../../../interfaces/sticker-category.interface';
 import { StickerPack } from '../../../interfaces/sticker-pack.interface';
 import { Sticker } from '../../../interfaces/sticker.interface';
-import { StickerService } from '../../../services/sticker.service';
-import { HelpDialogService } from '../help-dialog/help-dialog.service';
-
-type PreviewScope = 'category' | 'pack' | 'sticker';
+import { StickerAdminService } from '../../../services/content/sticker-admin.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 
 @Component({
   selector: 'app-sticker-picker',
@@ -23,20 +20,19 @@ type PreviewScope = 'category' | 'pack' | 'sticker';
     MatDialogContent,
     MatIconModule,
     MatProgressSpinnerModule,
-    MatTabsModule,
-    TranslocoPipe
+    MatTabsModule
   ],
   templateUrl: './sticker-picker.component.html',
   styleUrl: './sticker-picker.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StickerPickerComponent implements OnInit, OnDestroy {
-  readonly stickerProtectionOverlayUrl = 'assets/images/sticker-protection-overlay.svg';
+  readonly stickerProtectionOverlayUrl = 'images/sticker-protection-overlay.svg';
   readonly dialogRef = inject(MatDialogRef<StickerPickerComponent, Multimedia | null>);
-  private readonly stickerService = inject(StickerService);
-  readonly help = inject(HelpDialogService);
+  readonly i18n = inject(TranslationHelperService);
+
+  private readonly stickerService = inject(StickerAdminService);
   private readonly previewRequests = new Map<string, AbortController>();
-  private readonly revokedPreviewKeys = new Set<string>();
 
   readonly categories = signal<StickerCategory[]>([]);
   readonly packs = signal<StickerPack[]>([]);
@@ -56,10 +52,6 @@ export class StickerPickerComponent implements OnInit, OnDestroy {
     const index = this.categories().findIndex((category) => category.id === categoryId);
     return index >= 0 ? index : 0;
   });
-
-  readonly activeCategory = computed(() =>
-    this.categories().find((category) => category.id === this.selectedCategoryId()) ?? null
-  );
 
   async ngOnInit(): Promise<void> {
     await this.loadCategoriesAsync();
@@ -82,11 +74,7 @@ export class StickerPickerComponent implements OnInit, OnDestroy {
     this.selectedCategoryId.set(category.id);
     this.selectedPack.set(null);
     this.stickers.set([]);
-    this.primePreviewUrls(this.categories().map((entry) => ({
-      stickerId: entry.previewStickerId,
-      scope: 'category' as const,
-      ownerId: entry.id
-    })));
+    this.primePreviewUrls(this.categories().map((entry) => entry.previewStickerId));
     await this.loadPacksAsync(category.id);
   }
 
@@ -98,11 +86,7 @@ export class StickerPickerComponent implements OnInit, OnDestroy {
     try {
       const stickers = await firstValueFrom(this.stickerService.getStickers(pack.id));
       this.stickers.set(stickers);
-      this.primePreviewUrls(stickers.map((sticker) => ({
-        stickerId: sticker.id,
-        scope: 'sticker' as const,
-        ownerId: sticker.id
-      })));
+      this.primePreviewUrls(stickers.map((sticker) => sticker.id));
     } catch {
       this.stickers.set([]);
     } finally {
@@ -113,11 +97,7 @@ export class StickerPickerComponent implements OnInit, OnDestroy {
   goBackToPacks(): void {
     this.selectedPack.set(null);
     this.stickers.set([]);
-    this.primePreviewUrls(this.packs().map((pack) => ({
-      stickerId: pack.previewStickerId,
-      scope: 'pack' as const,
-      ownerId: pack.id
-    })));
+    this.primePreviewUrls(this.packs().map((pack) => pack.previewStickerId));
   }
 
   async openLicenseInNewTab(): Promise<void> {
@@ -150,75 +130,46 @@ export class StickerPickerComponent implements OnInit, OnDestroy {
     this.dialogRef.close(null);
   }
 
-  getStickerPreviewUrl(
-    stickerId: string | null | undefined,
-    scope: PreviewScope,
-    ownerId: string | null | undefined
-  ): string {
-    const previewKey = this.getPreviewKey(stickerId, scope, ownerId);
-    if (!previewKey) {
+  getStickerPreviewUrl(stickerId: string | null | undefined): string {
+    if (!stickerId) {
       return '';
     }
-    return this.previewUrls()[previewKey] ?? '';
+    return this.previewUrls()[this.getPreviewKey(stickerId)] ?? '';
   }
 
-  isPreviewLoading(
-    stickerId: string | null | undefined,
-    scope: PreviewScope,
-    ownerId: string | null | undefined
-  ): boolean {
-    const previewKey = this.getPreviewKey(stickerId, scope, ownerId);
-    if (!previewKey) {
+  isPreviewLoading(stickerId: string | null | undefined): boolean {
+    if (!stickerId) {
       return false;
     }
-    return this.previewStatus()[previewKey] === 'loading';
+    return this.previewStatus()[this.getPreviewKey(stickerId)] === 'loading';
   }
 
-  isPreviewLoaded(
-    stickerId: string | null | undefined,
-    scope: PreviewScope,
-    ownerId: string | null | undefined
-  ): boolean {
-    const previewKey = this.getPreviewKey(stickerId, scope, ownerId);
-    if (!previewKey) {
+  isPreviewLoaded(stickerId: string | null | undefined): boolean {
+    if (!stickerId) {
       return false;
     }
-    return this.previewStatus()[previewKey] === 'loaded';
+    return this.previewStatus()[this.getPreviewKey(stickerId)] === 'loaded';
   }
 
-  isPreviewError(
-    stickerId: string | null | undefined,
-    scope: PreviewScope,
-    ownerId: string | null | undefined
-  ): boolean {
-    const previewKey = this.getPreviewKey(stickerId, scope, ownerId);
-    if (!previewKey) {
+  isPreviewError(stickerId: string | null | undefined): boolean {
+    if (!stickerId) {
       return false;
     }
-    return this.previewStatus()[previewKey] === 'error';
+    return this.previewStatus()[this.getPreviewKey(stickerId)] === 'error';
   }
 
-  markPreviewLoaded(
-    stickerId: string | null | undefined,
-    scope: PreviewScope,
-    ownerId: string | null | undefined
-  ): void {
-    const previewKey = this.getPreviewKey(stickerId, scope, ownerId);
+  markPreviewLoaded(stickerId: string | null | undefined): void {
+    const previewKey = this.getPreviewKey(stickerId);
     if (!previewKey) {
       return;
     }
     this.previewStatus.update((current) => current[previewKey] === 'loaded'
       ? current
       : { ...current, [previewKey]: 'loaded' });
-    this.revokePreviewObjectUrl(previewKey);
   }
 
-  markPreviewError(
-    stickerId: string | null | undefined,
-    scope: PreviewScope,
-    ownerId: string | null | undefined
-  ): void {
-    const previewKey = this.getPreviewKey(stickerId, scope, ownerId);
+  markPreviewError(stickerId: string | null | undefined): void {
+    const previewKey = this.getPreviewKey(stickerId);
     if (!previewKey) {
       return;
     }
@@ -236,11 +187,7 @@ export class StickerPickerComponent implements OnInit, OnDestroy {
     try {
       const categories = await firstValueFrom(this.stickerService.getCategories());
       this.categories.set(categories);
-      this.primePreviewUrls(categories.map((category) => ({
-        stickerId: category.previewStickerId,
-        scope: 'category' as const,
-        ownerId: category.id
-      })));
+      this.primePreviewUrls(categories.map((category) => category.previewStickerId));
 
       const firstCategoryId = categories[0]?.id ?? null;
       this.selectedCategoryId.set(firstCategoryId);
@@ -265,11 +212,7 @@ export class StickerPickerComponent implements OnInit, OnDestroy {
     try {
       const packs = await firstValueFrom(this.stickerService.getPacks(categoryId));
       this.packs.set(packs);
-      this.primePreviewUrls(packs.map((pack) => ({
-        stickerId: pack.previewStickerId,
-        scope: 'pack' as const,
-        ownerId: pack.id
-      })));
+      this.primePreviewUrls(packs.map((pack) => pack.previewStickerId));
     } catch {
       this.packs.set([]);
     } finally {
@@ -277,40 +220,20 @@ export class StickerPickerComponent implements OnInit, OnDestroy {
     }
   }
 
-  private primePreviewUrls(entries: Array<{
-    stickerId: string | null | undefined;
-    scope: PreviewScope;
-    ownerId: string | null | undefined;
-  }>): void {
-    for (const entry of entries) {
-      if (!entry.stickerId) {
+  private primePreviewUrls(stickerIds: Array<string | null | undefined>): void {
+    for (const stickerId of stickerIds) {
+      if (!stickerId) {
         continue;
       }
-      void this.ensurePreviewUrl(entry.stickerId, entry.scope, entry.ownerId);
+      void this.ensurePreviewUrl(stickerId);
     }
   }
 
-  private async ensurePreviewUrl(
-    stickerId: string,
-    scope: PreviewScope,
-    ownerId: string | null | undefined
-  ): Promise<void> {
-    const previewKey = this.getPreviewKey(stickerId, scope, ownerId);
-    const hasRevokedUrl = this.revokedPreviewKeys.has(previewKey);
-    const hasActiveUrl = !!this.previewUrls()[previewKey] && !this.revokedPreviewKeys.has(previewKey);
+  private async ensurePreviewUrl(stickerId: string): Promise<void> {
+    const previewKey = this.getPreviewKey(stickerId);
+    const hasActiveUrl = !!this.previewUrls()[previewKey];
     if (!previewKey || this.previewRequests.has(previewKey) || hasActiveUrl) {
       return;
-    }
-
-    if (hasRevokedUrl) {
-      this.previewUrls.update((current) => {
-        if (!current[previewKey]) {
-          return current;
-        }
-        const next = { ...current };
-        delete next[previewKey];
-        return next;
-      });
     }
 
     const controller = new AbortController();
@@ -321,7 +244,7 @@ export class StickerPickerComponent implements OnInit, OnDestroy {
     }));
 
     try {
-      const objectUrl = await this.stickerService.fetchRenderObjectUrl(stickerId, 'preview', controller.signal);
+      const objectUrl = await this.stickerService.fetchRenderObjectUrl(stickerId, controller.signal);
       if (controller.signal.aborted || !objectUrl) {
         if (!controller.signal.aborted) {
           this.previewStatus.update((current) => ({
@@ -336,7 +259,6 @@ export class StickerPickerComponent implements OnInit, OnDestroy {
         ...current,
         [previewKey]: objectUrl
       }));
-      this.revokedPreviewKeys.delete(previewKey);
     } catch {
       if (!controller.signal.aborted) {
         this.previewStatus.update((current) => ({
@@ -349,15 +271,11 @@ export class StickerPickerComponent implements OnInit, OnDestroy {
     }
   }
 
-  private getPreviewKey(
-    stickerId: string | null | undefined,
-    scope: PreviewScope,
-    ownerId: string | null | undefined
-  ): string {
-    if (!stickerId || !ownerId) {
+  private getPreviewKey(stickerId: string | null | undefined): string {
+    if (!stickerId) {
       return '';
     }
-    return `${scope}:${ownerId}:${stickerId}`;
+    return `preview:${stickerId}`;
   }
 
   private revokePreviewUrl(previewKey: string): void {
@@ -365,7 +283,6 @@ export class StickerPickerComponent implements OnInit, OnDestroy {
     if (currentUrl) {
       window.URL.revokeObjectURL(currentUrl);
     }
-    this.revokedPreviewKeys.delete(previewKey);
 
     this.previewUrls.update((current) => {
       if (!current[previewKey]) {
@@ -382,22 +299,7 @@ export class StickerPickerComponent implements OnInit, OnDestroy {
     for (const url of Object.values(previewUrls)) {
       window.URL.revokeObjectURL(url);
     }
-    this.revokedPreviewKeys.clear();
     this.previewUrls.set({});
     this.previewStatus.set({});
-  }
-
-  private revokePreviewObjectUrl(previewKey: string): void {
-    if (!previewKey || this.revokedPreviewKeys.has(previewKey)) {
-      return;
-    }
-
-    const objectUrl = this.previewUrls()[previewKey];
-    if (!objectUrl) {
-      return;
-    }
-
-    window.URL.revokeObjectURL(objectUrl);
-    this.revokedPreviewKeys.add(previewKey);
   }
 }

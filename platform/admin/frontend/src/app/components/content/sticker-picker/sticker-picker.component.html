@@ -2,12 +2,12 @@
   @if (loadingCategories()) {
   <div class="sticker-picker__state">
     <mat-spinner diameter="36"></mat-spinner>
-    <span>{{ 'common.stickerPicker.loadingCategories' | transloco }}</span>
+    <span>{{ i18n.t('Loading sticker categories...') }}</span>
   </div>
   } @else if (!categories().length) {
   <div class="sticker-picker__state">
     <mat-icon>sentiment_dissatisfied</mat-icon>
-    <span>{{ 'common.stickerPicker.noCategories' | transloco }}</span>
+    <span>{{ i18n.t('No sticker categories available.') }}</span>
   </div>
   } @else {
   <mat-tab-group [selectedIndex]="selectedCategoryIndex()" (selectedIndexChange)="onCategorySelectionChange($event)">
@@ -15,17 +15,17 @@
     <mat-tab>
       <ng-template mat-tab-label>
         @if (category.previewStickerId) {
-        @let categoryPreviewUrl = getStickerPreviewUrl(category.previewStickerId, 'category', category.id);
+        @let categoryPreviewUrl = getStickerPreviewUrl(category.previewStickerId);
         @if (categoryPreviewUrl) {
         <span class="sticker-picker__protected-media sticker-picker__protected-media--tab" [attr.title]="category.name">
           <img
             class="sticker-picker__tab-image sticker-picker__protected-image"
-            [class.sticker-picker__tab-image--loaded]="isPreviewLoaded(category.previewStickerId, 'category', category.id)"
+            [class.sticker-picker__tab-image--loaded]="isPreviewLoaded(category.previewStickerId)"
             [src]="categoryPreviewUrl"
-            [attr.alt]="'common.stickerPicker.categoryPreviewAlt' | transloco: { name: category.name }"
+            [attr.alt]="i18n.t('Category preview: {{name}}', { name: category.name })"
             draggable="false"
-            (load)="markPreviewLoaded(category.previewStickerId, 'category', category.id)"
-            (error)="markPreviewError(category.previewStickerId, 'category', category.id)" />
+            (load)="markPreviewLoaded(category.previewStickerId)"
+            (error)="markPreviewError(category.previewStickerId)" />
           <img
             class="sticker-picker__protect-overlay"
             [src]="stickerProtectionOverlayUrl"
@@ -33,7 +33,7 @@
             aria-hidden="true"
             draggable="false" />
         </span>
-        } @else if (isPreviewLoading(category.previewStickerId, 'category', category.id)) {
+        } @else if (isPreviewLoading(category.previewStickerId)) {
         <span class="sticker-picker__tab-loading" [attr.title]="category.name" aria-hidden="true">
           <mat-spinner diameter="18" strokeWidth="3"></mat-spinner>
         </span>
@@ -54,21 +54,21 @@
         @if (loadingStickers()) {
         <div class="sticker-picker__state">
           <mat-spinner diameter="36"></mat-spinner>
-          <span>{{ 'common.stickerPicker.loadingStickers' | transloco }}</span>
+          <span>{{ i18n.t('Loading stickers...') }}</span>
         </div>
         } @else if (stickers().length) {
         <div class="sticker-grid">
           @for (sticker of stickers(); track sticker.id) {
-          @let previewUrl = getStickerPreviewUrl(sticker.id, 'sticker', sticker.id);
+          @let previewUrl = getStickerPreviewUrl(sticker.id);
           <button type="button" class="sticker-tile" (click)="pickSticker(sticker)"
-            [attr.aria-label]="'common.stickerPicker.selectStickerAria' | transloco: { name: sticker.name || sticker.slug }">
+            [attr.aria-label]="i18n.t('Select sticker {{name}}', { name: sticker.name || sticker.slug })">
             <span class="sticker-tile__media">
-              @if (isPreviewLoading(sticker.id, 'sticker', sticker.id)) {
+              @if (isPreviewLoading(sticker.id)) {
               <span class="sticker-picker__image-spinner" aria-hidden="true">
                 <mat-spinner diameter="28" strokeWidth="3"></mat-spinner>
               </span>
               }
-              @if (isPreviewError(sticker.id, 'sticker', sticker.id)) {
+              @if (isPreviewError(sticker.id)) {
               <span class="sticker-picker__image-fallback" aria-hidden="true">
                 <mat-icon>broken_image</mat-icon>
               </span>
@@ -76,14 +76,14 @@
               @if (previewUrl) {
               <img
                 class="sticker-picker__preview-image sticker-picker__protected-image"
-                [class.sticker-picker__preview-image--loaded]="isPreviewLoaded(sticker.id, 'sticker', sticker.id)"
+                [class.sticker-picker__preview-image--loaded]="isPreviewLoaded(sticker.id)"
                 [src]="previewUrl"
-                [attr.alt]="'common.stickerPicker.stickerPreviewAlt' | transloco: { name: sticker.name || sticker.slug }"
+                [attr.alt]="i18n.t('Sticker preview: {{name}}', { name: sticker.name || sticker.slug })"
                 loading="lazy"
                 decoding="async"
                 draggable="false"
-                (load)="markPreviewLoaded(sticker.id, 'sticker', sticker.id)"
-                (error)="markPreviewError(sticker.id, 'sticker', sticker.id)" />
+                (load)="markPreviewLoaded(sticker.id)"
+                (error)="markPreviewError(sticker.id)" />
               <img
                 class="sticker-picker__protect-overlay"
                 [src]="stickerProtectionOverlayUrl"
@@ -98,29 +98,29 @@
         } @else {
         <div class="sticker-picker__state">
           <mat-icon>hide_image</mat-icon>
-          <span>{{ 'common.stickerPicker.noStickers' | transloco }}</span>
+          <span>{{ i18n.t('No stickers available in this pack.') }}</span>
         </div>
         }
         } @else {
         @if (loadingPacks()) {
         <div class="sticker-picker__state">
           <mat-spinner diameter="36"></mat-spinner>
-          <span>{{ 'common.stickerPicker.loadingPacks' | transloco }}</span>
+          <span>{{ i18n.t('Loading sticker packs...') }}</span>
         </div>
         } @else if (packs().length) {
         <div class="pack-grid">
           @for (pack of packs(); track pack.id) {
-          @let previewUrl = getStickerPreviewUrl(pack.previewStickerId, 'pack', pack.id);
+          @let previewUrl = getStickerPreviewUrl(pack.previewStickerId);
           <button type="button" class="pack-tile" (click)="openPack(pack)"
-            [attr.aria-label]="'common.stickerPicker.openPackAria' | transloco: { name: pack.name }">
+            [attr.aria-label]="i18n.t('Open sticker pack {{name}}', { name: pack.name })">
             <div class="pack-tile__media">
               @if (pack.previewStickerId) {
-              @if (isPreviewLoading(pack.previewStickerId, 'pack', pack.id)) {
+              @if (isPreviewLoading(pack.previewStickerId)) {
               <span class="sticker-picker__image-spinner" aria-hidden="true">
                 <mat-spinner diameter="28" strokeWidth="3"></mat-spinner>
               </span>
               }
-              @if (isPreviewError(pack.previewStickerId, 'pack', pack.id)) {
+              @if (isPreviewError(pack.previewStickerId)) {
               <span class="sticker-picker__image-fallback" aria-hidden="true">
                 <mat-icon>broken_image</mat-icon>
               </span>
@@ -128,14 +128,14 @@
               @if (previewUrl) {
               <img
                 class="sticker-picker__preview-image sticker-picker__protected-image"
-                [class.sticker-picker__preview-image--loaded]="isPreviewLoaded(pack.previewStickerId, 'pack', pack.id)"
+                [class.sticker-picker__preview-image--loaded]="isPreviewLoaded(pack.previewStickerId)"
                 [src]="previewUrl"
-                [attr.alt]="'common.stickerPicker.packPreviewAlt' | transloco: { name: pack.name }"
+                [attr.alt]="i18n.t('Pack preview: {{name}}', { name: pack.name })"
                 loading="lazy"
                 decoding="async"
                 draggable="false"
-                (load)="markPreviewLoaded(pack.previewStickerId, 'pack', pack.id)"
-                (error)="markPreviewError(pack.previewStickerId, 'pack', pack.id)" />
+                (load)="markPreviewLoaded(pack.previewStickerId)"
+                (error)="markPreviewError(pack.previewStickerId)" />
               <img
                 class="sticker-picker__protect-overlay"
                 [src]="stickerProtectionOverlayUrl"
@@ -153,7 +153,7 @@
         } @else {
         <div class="sticker-picker__state">
           <mat-icon>inventory_2</mat-icon>
-          <span>{{ 'common.stickerPicker.noPacks' | transloco }}</span>
+          <span>{{ i18n.t('No sticker packs available in this category.') }}</span>
         </div>
         }
         }
@@ -166,23 +166,18 @@
 
 <mat-dialog-actions class="sticky-actions" align="end">
   <button mat-icon-button type="button" class="action-close" (click)="close()"
-    [attr.aria-label]="'common.actions.close' | transloco">
+    [attr.aria-label]="i18n.t('Close dialog')">
     <mat-icon>close</mat-icon>
-  </button>
-
-  <button mat-icon-button type="button" (click)="help.open('stickerPicker')"
-    [attr.aria-label]="'common.actions.help' | transloco">
-    <mat-icon>help</mat-icon>
   </button>
 
   @if (selectedPack(); as pack) {
   <button mat-icon-button type="button" (click)="openLicenseInNewTab()" [disabled]="!pack.licenseFilePath"
-    [attr.aria-label]="'common.stickerPicker.openLicenseAria' | transloco">
+    [attr.aria-label]="i18n.t('Open pack license PDF in a new tab')">
     <mat-icon>receipt_long</mat-icon>
   </button>
 
   <button mat-icon-button type="button" class="action-back" (click)="goBackToPacks()"
-    [attr.aria-label]="'common.stickerPicker.backToPacks' | transloco">
+    [attr.aria-label]="i18n.t('Back to packs')">
     <mat-icon>arrow_back</mat-icon>
   </button>
   }

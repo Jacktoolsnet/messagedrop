@@ -32,6 +32,7 @@ import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
 import { DisplayMessageComponent } from '../../shared/display-message/display-message.component';
 import { PublicContentAiCreatorDialogComponent, PublicContentAiCreatorDialogResult } from '../public-content-ai-creator-dialog/public-content-ai-creator-dialog.component';
 import { DisplayMessageService } from '../../../services/display-message.service';
+import { StickerPreviewComponent } from '../../shared/sticker-preview/sticker-preview.component';
 
 @Component({
   selector: 'app-public-content-list',
@@ -50,7 +51,8 @@ import { DisplayMessageService } from '../../../services/display-message.service
     MatSelectModule,
     MatProgressBarModule,
     MatChipsModule,
-    MatTooltipModule
+    MatTooltipModule,
+    StickerPreviewComponent
   ],
   templateUrl: './public-content-list.component.html',
   styleUrls: ['./public-content-list.component.css'],
@@ -239,6 +241,10 @@ export class PublicContentListComponent {
     return /\.(png|jpe?g|gif|webp|bmp|svg)(\?.*)?$/i.test(multimedia.url);
   }
 
+  hasStickerMultimedia(row: PublicContent): boolean {
+    return (row.multimedia?.type || '').toLowerCase() === 'sticker';
+  }
+
   safeMultimediaOembedHtml(row: PublicContent): SafeHtml | null {
     const html = row.multimedia?.oembed?.html;
     return html ? this.sanitizer.bypassSecurityTrustHtml(html) : null;
@@ -423,6 +429,8 @@ export class PublicContentListComponent {
         return 'TikTok';
       case 'tenor':
         return this.i18n.t('Tenor GIF');
+      case 'sticker':
+        return this.i18n.t('Sticker');
       case 'image':
         return this.i18n.t('Image');
       case 'undefined':

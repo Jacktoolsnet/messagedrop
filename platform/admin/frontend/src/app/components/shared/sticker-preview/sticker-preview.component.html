@@ -1,0 +1,29 @@
+<div class="sticker-preview">
+  @if (loading()) {
+  <span class="sticker-preview__state" aria-hidden="true">
+    <mat-spinner diameter="28" strokeWidth="3"></mat-spinner>
+  </span>
+  }
+
+  @if (error()) {
+  <span class="sticker-preview__state sticker-preview__state--error" aria-hidden="true">
+    <mat-icon>broken_image</mat-icon>
+  </span>
+  }
+
+  @if (renderableImageUrl()) {
+  <img
+    class="sticker-preview__image"
+    [src]="renderableImageUrl()"
+    [attr.alt]="imageAlt()"
+    draggable="false"
+    (load)="markLoaded()"
+    (error)="markError()" />
+  <img
+    class="sticker-preview__overlay"
+    [src]="stickerProtectionOverlayUrl"
+    alt=""
+    aria-hidden="true"
+    draggable="false" />
+  }
+</div>

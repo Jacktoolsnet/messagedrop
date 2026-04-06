@@ -1,0 +1,229 @@
+.sticker-picker {
+  display: flex;
+  flex-direction: column;
+  padding: 0 !important;
+  min-height: min(70vh, 40rem);
+  max-height: 90vh;
+  min-width: min(92vw, 56rem);
+  max-width: 92vw;
+}
+
+.sticker-picker__body {
+  padding: 0.75rem;
+}
+
+.sticker-picker__state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 16rem;
+  color: rgba(51, 65, 85, 0.92);
+  text-align: center;
+  opacity: 0.88;
+  padding: 1rem;
+}
+
+.sticker-picker__state mat-icon {
+  transform: scale(1.25);
+}
+
+.sticker-picker__tab-image,
+.sticker-picker__tab-fallback,
+.sticker-picker__protected-media--tab {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  object-fit: contain;
+}
+
+.sticker-picker__tab-image {
+  background: transparent;
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.sticker-picker__tab-image--loaded {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.sticker-picker__protected-media {
+  position: relative;
+  overflow: hidden;
+}
+
+.sticker-picker__tab-loading {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.sticker-picker__tab-fallback {
+  font-weight: 700;
+  font-size: 1rem;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.pack-grid,
+.sticker-grid {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.pack-grid {
+  grid-template-columns: repeat(auto-fit, minmax(6.5rem, 8rem));
+  justify-content: center;
+}
+
+.sticker-grid {
+  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+}
+
+.pack-tile,
+.sticker-tile {
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.88);
+  transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+}
+
+.pack-tile:hover,
+.pack-tile:focus-visible,
+.sticker-tile:hover,
+.sticker-tile:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(37, 99, 235, 0.3);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+}
+
+.pack-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.55rem;
+}
+
+.pack-tile__media {
+  width: 100%;
+  aspect-ratio: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.9rem;
+  background: rgba(255, 255, 255, 0.94);
+  overflow: hidden;
+}
+
+.sticker-tile__media {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.8rem;
+  background: rgba(255, 255, 255, 0.94);
+  overflow: hidden;
+}
+
+.sticker-picker__preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transform: scale(0.98);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.sticker-picker__preview-image--loaded {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.sticker-picker__protected-image {
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.sticker-picker__image-spinner,
+.sticker-picker__image-fallback,
+.sticker-picker__protect-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: inherit;
+}
+
+.sticker-picker__image-spinner {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.sticker-picker__image-fallback {
+  color: rgba(71, 85, 105, 0.8);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.sticker-picker__protect-overlay {
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.sticker-tile {
+  padding: 0.5rem;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+mat-tab-group {
+  display: flex;
+  flex-direction: column;
+  min-height: min(70vh, 40rem);
+}
+
+mat-tab-group ::ng-deep .mat-mdc-tab-body-wrapper {
+  flex: 1 1 auto;
+}
+
+mat-tab-group ::ng-deep .mat-mdc-tab-body-content {
+  overflow: auto;
+}
+
+.sticky-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  background-color: #fff;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+  padding: 0.35rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.action-close {
+  margin-inline-end: auto;
+}
+
+.action-back {
+  margin-inline-start: auto;
+}

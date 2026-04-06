@@ -40,6 +40,14 @@
                     <img [src]="imageUrl()!" alt="media">
                 </div>
                 }
+                @if (mediaKind() === 'sticker') {
+                @if (msg()?.multimedia; as multimedia) {
+                <div class="image-outer" [matTooltip]="i18n.t('Sticker')">
+                    <app-sticker-preview [multimedia]="multimedia"
+                        [alt]="multimedia.title || i18n.t('Selected multimedia preview')"></app-sticker-preview>
+                </div>
+                }
+                }
 
                 @if (msg()?.message) {
                 <div class="snippet-text" [attr.style]="msg()?.style || null">

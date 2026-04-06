@@ -126,7 +126,11 @@
           </div>
 
           <mat-card-content class="tile-content content-preview-body">
-            @if (hasImageMultimedia(row)) {
+            @if (hasStickerMultimedia(row)) {
+              <div class="content-preview-media">
+                <app-sticker-preview [multimedia]="row.multimedia" [alt]="row.multimedia.title || i18n.t('Selected multimedia preview')"></app-sticker-preview>
+              </div>
+            } @else if (hasImageMultimedia(row)) {
               <div class="content-preview-media">
                 <img [src]="row.multimedia.url" [alt]="row.multimedia.title || i18n.t('Selected multimedia preview')" />
               </div>

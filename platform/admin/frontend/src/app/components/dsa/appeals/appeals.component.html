@@ -211,6 +211,15 @@
               </div>
               }
 
+              @if (mediaKind() === 'sticker') {
+              @if (contentObj()?.multimedia; as multimedia) {
+              <div class="tenor-wrap">
+                <app-sticker-preview [multimedia]="multimedia"
+                  [alt]="multimedia.title || i18n.t('Selected multimedia preview')"></app-sticker-preview>
+              </div>
+              }
+              }
+
               @if (hasExternalLink()) {
               <div class="block-actions">
                 <a mat-stroked-button class="external" [href]="externalLink()!" target="_blank" rel="noopener">

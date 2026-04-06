@@ -1,0 +1,52 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.sticker-preview {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: .9rem;
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.sticker-preview__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.sticker-preview__state,
+.sticker-preview__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sticker-preview__state {
+  min-height: 120px;
+  background: rgba(255, 255, 255, 0.78);
+  color: rgba(71, 85, 105, 0.9);
+}
+
+.sticker-preview__state--error {
+  font-size: 1.75rem;
+}
+
+.sticker-preview__overlay {
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  object-fit: fill;
+}
+
+.sticker-preview__image,
+.sticker-preview__overlay {
+  user-select: none;
+  -webkit-user-drag: none;
+}

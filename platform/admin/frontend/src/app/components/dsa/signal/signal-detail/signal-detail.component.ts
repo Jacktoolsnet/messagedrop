@@ -20,6 +20,7 @@ import { TranslateService } from '../../../../services/translate-service/transla
 import { parsePublicMessageDetailContent } from '../../../../utils/reported-content.util';
 import { ConfirmDialogComponent } from '../../../shared/confirm-dialog.component';
 import { DisplayMessageService } from '../../../../services/display-message.service';
+import { StickerPreviewComponent } from '../../../shared/sticker-preview/sticker-preview.component';
 
 @Component({
   selector: 'app-signal-detail',
@@ -27,7 +28,8 @@ import { DisplayMessageService } from '../../../../services/display-message.serv
   imports: [
     CommonModule, DatePipe,
     MatDialogModule, MatIconModule, MatButtonModule,
-    MatChipsModule, MatDividerModule, MatTooltipModule, MatCardModule, MatMenuModule
+    MatChipsModule, MatDividerModule, MatTooltipModule, MatCardModule, MatMenuModule,
+    StickerPreviewComponent
   ],
   templateUrl: './signal-detail.component.html',
   styleUrls: ['./signal-detail.component.css']
@@ -47,7 +49,7 @@ export class SignalDetailComponent implements OnInit {
   msg = signal<PublicMessage | null>(null);
   providerIcon = signal<string>('article');
   providerLabel = signal<string>('Text');
-  mediaKind = signal<'iframe' | 'image' | 'none'>('none');
+  mediaKind = signal<'iframe' | 'image' | 'sticker' | 'none'>('none');
   embedUrl = signal<SafeResourceUrl | null>(null);
   imageUrl = signal<string | null>(null);
 
@@ -147,6 +149,9 @@ export class SignalDetailComponent implements OnInit {
         }
         break;
       }
+      case 'sticker':
+        this.mediaKind.set('sticker');
+        break;
       default:
         this.mediaKind.set('none');
     }
@@ -423,6 +428,7 @@ export class SignalDetailComponent implements OnInit {
       case 'spotify': return 'music_note';
       case 'tiktok': return 'movie';
       case 'tenor': return 'gif';
+      case 'sticker': return 'add_reaction';
       case 'image': return 'image';
       default: return 'article';
     }
@@ -433,6 +439,7 @@ export class SignalDetailComponent implements OnInit {
       case 'spotify': return 'Spotify';
       case 'tiktok': return 'TikTok';
       case 'tenor': return this.i18n.t('Tenor GIF');
+      case 'sticker': return this.i18n.t('Sticker');
       case 'image': return this.i18n.t('Image');
       default: return this.i18n.t('Text');
     }

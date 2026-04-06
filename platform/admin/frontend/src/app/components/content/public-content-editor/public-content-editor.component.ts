@@ -40,6 +40,8 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
 import { MAX_PUBLIC_HASHTAGS, normalizeHashtags } from '../../../utils/hashtag.util';
 import { DisplayMessageService } from '../../../services/display-message.service';
 import { DisplayMessageComponent } from '../../shared/display-message/display-message.component';
+import { StickerPreviewComponent } from '../../shared/sticker-preview/sticker-preview.component';
+import { StickerPickerComponent } from '../sticker-picker/sticker-picker.component';
 
 const EMPTY_MULTIMEDIA: Multimedia = {
   type: 'undefined',
@@ -69,7 +71,8 @@ const EMPTY_MULTIMEDIA: Multimedia = {
     MatInputModule,
     MatSelectModule,
     MatChipsModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    StickerPreviewComponent
   ],
   templateUrl: './public-content-editor.component.html',
   styleUrls: ['./public-content-editor.component.css'],
@@ -452,6 +455,10 @@ export class PublicContentEditorComponent {
     return /\.(png|jpe?g|gif|webp|bmp|svg)(\?.*)?$/i.test(multimedia.url);
   }
 
+  isStickerMultimedia(multimedia: Multimedia | null | undefined): boolean {
+    return (multimedia?.type || '').toLowerCase() === 'sticker';
+  }
+
   searchLocations(): void {
     const searchTerm = this.locationSearchControl.value.trim();
     if (!searchTerm) {
@@ -811,6 +818,8 @@ export class PublicContentEditorComponent {
         return 'TikTok';
       case 'tenor':
         return this.i18n.t('Tenor GIF');
+      case 'sticker':
+        return this.i18n.t('Sticker');
       case 'image':
         return this.i18n.t('Image');
       case 'undefined':
@@ -873,6 +882,29 @@ export class PublicContentEditorComponent {
 
   removeMultimedia(): void {
     this.multimedia.set({ ...EMPTY_MULTIMEDIA });
+  }
+
+  openStickerPicker(): void {
+    if (this.form.disabled) {
+      return;
+    }
+
+    this.dialog.open<StickerPickerComponent, unknown, Multimedia | null>(StickerPickerComponent, {
+      width: 'min(92vw, 960px)',
+      maxWidth: '92vw',
+      maxHeight: '92vh',
+      autoFocus: false,
+      panelClass: 'mdp-dialog-xl'
+    }).afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((multimedia) => {
+        if (!multimedia) {
+          return;
+        }
+
+        this.multimedia.set(multimedia);
+        this.showMessage('Sticker selected.');
+      });
   }
 
   importExternalMultimedia(): void {

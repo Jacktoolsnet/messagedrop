@@ -2,6 +2,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { catchError, finalize, map, Observable, of, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { Multimedia } from '../../interfaces/multimedia.interface';
 import { StickerCategory } from '../../interfaces/sticker-category.interface';
 import { StickerImportResult } from '../../interfaces/sticker-import-result.interface';
 import { StickerPack } from '../../interfaces/sticker-pack.interface';
@@ -65,16 +66,42 @@ export class StickerAdminService {
   private readonly _loadingStickers = signal(false);
   readonly loadingStickers = this._loadingStickers.asReadonly();
 
+  getCategories(): Observable<StickerCategory[]> {
+    return this.http.get<RowsResponse<StickerCategory>>(`${this.baseUrl}/categories`).pipe(
+      map((response) => Array.isArray(response.rows) ? response.rows : []),
+      catchError((error) => this.handleError(error, 'Could not load sticker categories.'))
+    );
+  }
+
+  getPacks(categoryId: string): Observable<StickerPack[]> {
+    if (!categoryId) {
+      return of([]);
+    }
+
+    return this.http.get<RowsResponse<StickerPack>>(`${this.baseUrl}/categories/${encodeURIComponent(categoryId)}/packs`).pipe(
+      map((response) => Array.isArray(response.rows) ? response.rows : []),
+      catchError((error) => this.handleError(error, 'Could not load sticker packs.'))
+    );
+  }
+
+  getStickers(packId: string): Observable<Sticker[]> {
+    if (!packId) {
+      return of([]);
+    }
+
+    return this.http.get<RowsResponse<Sticker>>(`${this.baseUrl}/packs/${encodeURIComponent(packId)}/stickers`).pipe(
+      map((response) => Array.isArray(response.rows) ? response.rows : []),
+      catchError((error) => this.handleError(error, 'Could not load stickers.'))
+    );
+  }
+
   loadCategories(): void {
     this._loadingCategories.set(true);
-    this.http.get<RowsResponse<StickerCategory>>(`${this.baseUrl}/categories`).pipe(
-      catchError((error) => {
-        this.handleError(error, 'Could not load sticker categories.');
-        return of({ status: 0, rows: [] as StickerCategory[] });
-      }),
+    this.getCategories().pipe(
+      catchError(() => of([] as StickerCategory[])),
       finalize(() => this._loadingCategories.set(false))
-    ).subscribe((response) => {
-      this._categories.set(Array.isArray(response.rows) ? response.rows : []);
+    ).subscribe((rows) => {
+      this._categories.set(Array.isArray(rows) ? rows : []);
     });
   }
 
@@ -85,14 +112,11 @@ export class StickerAdminService {
     }
 
     this._loadingPacks.set(true);
-    this.http.get<RowsResponse<StickerPack>>(`${this.baseUrl}/categories/${encodeURIComponent(categoryId)}/packs`).pipe(
-      catchError((error) => {
-        this.handleError(error, 'Could not load sticker packs.');
-        return of({ status: 0, rows: [] as StickerPack[] });
-      }),
+    this.getPacks(categoryId).pipe(
+      catchError(() => of([] as StickerPack[])),
       finalize(() => this._loadingPacks.set(false))
-    ).subscribe((response) => {
-      this._packs.set(Array.isArray(response.rows) ? response.rows : []);
+    ).subscribe((rows) => {
+      this._packs.set(Array.isArray(rows) ? rows : []);
     });
   }
 
@@ -103,14 +127,11 @@ export class StickerAdminService {
     }
 
     this._loadingStickers.set(true);
-    this.http.get<RowsResponse<Sticker>>(`${this.baseUrl}/packs/${encodeURIComponent(packId)}/stickers`).pipe(
-      catchError((error) => {
-        this.handleError(error, 'Could not load stickers.');
-        return of({ status: 0, rows: [] as Sticker[] });
-      }),
+    this.getStickers(packId).pipe(
+      catchError(() => of([] as Sticker[])),
       finalize(() => this._loadingStickers.set(false))
-    ).subscribe((response) => {
-      this._stickers.set(Array.isArray(response.rows) ? response.rows : []);
+    ).subscribe((rows) => {
+      this._stickers.set(Array.isArray(rows) ? rows : []);
     });
   }
 
@@ -242,6 +263,58 @@ export class StickerAdminService {
 
     const blob = await response.blob();
     return URL.createObjectURL(blob);
+  }
+
+  getRenderUrl(stickerId: string): string {
+    return `${this.baseUrl}/render/${encodeURIComponent(stickerId)}?variant=preview`;
+  }
+
+  resolveStickerId(multimedia: {
+    type?: string | null;
+    contentId?: string | null;
+    url?: string | null;
+    sourceUrl?: string | null;
+  } | null | undefined): string | null {
+    const type = String(multimedia?.type || '').trim().toLowerCase();
+    if (type !== 'sticker') {
+      return null;
+    }
+
+    const contentId = String(multimedia?.contentId || '').trim();
+    if (contentId) {
+      return contentId;
+    }
+
+    const rawUrl = String(multimedia?.url || multimedia?.sourceUrl || '').trim();
+    if (!rawUrl) {
+      return null;
+    }
+
+    try {
+      const parsedUrl = new URL(rawUrl, window.location.origin);
+      const match = parsedUrl.pathname.match(/\/stickers\/render\/([^/]+)/i);
+      return match?.[1] ? decodeURIComponent(match[1]) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  createStickerMultimedia(sticker: Sticker): Multimedia {
+    const renderUrl = this.getRenderUrl(sticker.id);
+    return {
+      type: 'sticker',
+      url: renderUrl,
+      sourceUrl: renderUrl,
+      attribution: '',
+      title: sticker.name || '',
+      description: '',
+      contentId: sticker.id,
+      oembed: null
+    };
+  }
+
+  async fetchRenderObjectUrl(stickerId: string, abortSignal?: AbortSignal): Promise<string> {
+    return this.fetchStickerPreviewUrl(stickerId, abortSignal);
   }
 
   async fetchPackLicenseUrl(packId: string, abortSignal?: AbortSignal): Promise<string> {

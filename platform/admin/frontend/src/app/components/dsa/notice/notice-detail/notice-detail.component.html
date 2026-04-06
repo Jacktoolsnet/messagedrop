@@ -135,6 +135,13 @@
                         </div>
                         } @else if (mediaKind() === 'image' && imageUrl()) {
                         <div class="tenor-wrap"><img [src]="imageUrl()!" alt="media" /></div>
+                        } @else if (mediaKind() === 'sticker') {
+                        @if (contentObj()?.multimedia; as multimedia) {
+                        <div class="tenor-wrap">
+                            <app-sticker-preview [multimedia]="multimedia"
+                                [alt]="multimedia.title || i18n.t('Selected multimedia preview')"></app-sticker-preview>
+                        </div>
+                        }
                         }
 
                         <!-- Open original + Add to evidence (screenshot) -->

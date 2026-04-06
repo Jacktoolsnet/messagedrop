@@ -440,7 +440,7 @@
             <mat-icon>perm_media</mat-icon>
           </div>
           <mat-card-title>{{ i18n.t('Multimedia') }}</mat-card-title>
-          <mat-card-subtitle>{{ i18n.t('External embeds and Tenor GIFs') }}</mat-card-subtitle>
+          <mat-card-subtitle>{{ i18n.t('External embeds, stickers and Tenor GIFs') }}</mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content>
@@ -456,6 +456,10 @@
                   [disabled]="mediaLoading() || mediaUrlControl.disabled">
                   <mat-icon>download</mat-icon>
                   {{ i18n.t('Import media') }}
+                </button>
+                <button mat-stroked-button type="button" (click)="openStickerPicker()" [disabled]="form.disabled">
+                  <mat-icon>add_reaction</mat-icon>
+                  {{ i18n.t('Choose sticker') }}
                 </button>
               </div>
 
@@ -519,11 +523,14 @@
                 @if (multimedia().description) {
                 <p class="media-description">{{ multimedia().description }}</p>
                 }
-                @if (multimedia().sourceUrl) {
+                @if (multimedia().sourceUrl && !isStickerMultimedia(multimedia())) {
                 <a [href]="multimedia().sourceUrl" target="_blank" rel="noopener">{{ i18n.t('Open original source') }}</a>
                 }
 
-                @if (multimedia().type === 'tenor' && multimedia().url) {
+                @if (isStickerMultimedia(multimedia())) {
+                <app-sticker-preview [multimedia]="multimedia()"
+                  [alt]="multimedia().title || i18n.t('Selected multimedia preview')"></app-sticker-preview>
+                } @else if (multimedia().type === 'tenor' && multimedia().url) {
                 <img class="tenor-preview" [src]="multimedia().url" [alt]="multimedia().title || i18n.t('Selected GIF')" />
                 } @else if (tiktokEmbedUrl(); as tiktokUrl) {
                 <div class="oembed-preview oembed-preview-tiktok">
@@ -536,7 +543,7 @@
               } @else {
               <div class="selected-media selected-media-empty">
                 <h3>{{ i18n.t('No media selected') }}</h3>
-                <p>{{ i18n.t('Import an external URL or pick a Tenor GIF to see the selected media here.') }}</p>
+                <p>{{ i18n.t('Import an external URL, choose a sticker or pick a Tenor GIF to see the selected media here.') }}</p>
               </div>
               }
             </div>
@@ -622,7 +629,10 @@
                 <div class="preview-message-content">
                   @if (hasMedia()) {
                   <div class="preview-media">
-                    @if (isImageMultimedia(multimedia())) {
+                    @if (isStickerMultimedia(multimedia())) {
+                    <app-sticker-preview [multimedia]="multimedia()"
+                      [alt]="multimedia().title || i18n.t('Selected multimedia preview')"></app-sticker-preview>
+                    } @else if (isImageMultimedia(multimedia())) {
                     <img [src]="multimedia().url" [alt]="multimedia().title || i18n.t('Selected multimedia preview')" />
                     } @else if (tiktokEmbedUrl(); as tiktokUrl) {
                     <div class="preview-oembed preview-oembed-tiktok">
@@ -832,7 +842,12 @@
           </div>
 
           <mat-card-content class="tile-content content-preview-body">
-            @if (childHasImageMultimedia(row)) {
+            @if (isStickerMultimedia(row.multimedia)) {
+            <div class="content-preview-media">
+              <app-sticker-preview [multimedia]="row.multimedia"
+                [alt]="row.multimedia.title || i18n.t('Selected multimedia preview')"></app-sticker-preview>
+            </div>
+            } @else if (childHasImageMultimedia(row)) {
             <div class="content-preview-media">
               <img [src]="row.multimedia.url" [alt]="row.multimedia.title || i18n.t('Selected multimedia preview')" />
             </div>
@@ -958,7 +973,12 @@
           </div>
 
           <mat-card-content class="tile-content content-preview-body">
-            @if (externalHasImageMultimedia(row)) {
+            @if (isStickerMultimedia(row.multimedia)) {
+            <div class="content-preview-media">
+              <app-sticker-preview [multimedia]="row.multimedia"
+                [alt]="row.multimedia.title || i18n.t('Selected multimedia preview')"></app-sticker-preview>
+            </div>
+            } @else if (externalHasImageMultimedia(row)) {
             <div class="content-preview-media">
               <img [src]="row.multimedia.url" [alt]="row.multimedia.title || i18n.t('Selected multimedia preview')" />
             </div>

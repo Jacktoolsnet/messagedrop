@@ -25,6 +25,7 @@ import { AppealResolutionData, AppealResolutionDialogComponent } from './appeal-
 import { DecisionDialogComponent, DecisionDialogResult } from '../decisions/decision-dialog/decision-dialog.component';
 import { ReportedContentPayload, ReportedMultimedia } from '../../../interfaces/reported-content.interface';
 import { DisplayMessageService } from '../../../services/display-message.service';
+import { StickerPreviewComponent } from '../../shared/sticker-preview/sticker-preview.component';
 
 type AppealStatusFilter = 'open' | 'resolved' | 'all';
 
@@ -47,7 +48,8 @@ type AppealStatusFilter = 'open' | 'resolved' | 'all';
     MatDividerModule,
     EvidenceListComponent,
     DecisionSummaryComponent,
-    NoticeAppealsComponent
+    NoticeAppealsComponent,
+    StickerPreviewComponent
   ],
   templateUrl: './appeals.component.html',
   styleUrls: ['./appeals.component.css']
@@ -69,7 +71,7 @@ export class AppealsComponent implements OnInit {
 
   // Parsed content of selected notice
   contentObj = signal<ReportedContentPayload | null>(null);
-  mediaKind = signal<'iframe' | 'image' | 'none'>('none');
+  mediaKind = signal<'iframe' | 'image' | 'sticker' | 'none'>('none');
   embedUrl = signal<string | null>(null);
   imageUrl = signal<string | null>(null);
 
@@ -288,6 +290,11 @@ export class AppealsComponent implements OnInit {
         this.embedUrl.set(`https://www.tiktok.com/embed/v2/${id}`);
         this.mediaKind.set('iframe');
       }
+      return;
+    }
+
+    if (type === 'sticker') {
+      this.mediaKind.set('sticker');
       return;
     }
 
