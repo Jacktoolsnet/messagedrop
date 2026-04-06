@@ -68,7 +68,7 @@
     },
     "share": {
       "publicMessageTitle": "Mensaje público en MessageDrop",
-      "publicMessageText": "{{ message }}",
+      "publicMessageText": "Mira este mensaje en MessageDrop.",
       "copySuccess": "Enlace copiado.",
       "copyFailed": "No se pudo copiar el enlace.",
       "messageUnavailable": "Este mensaje público no está disponible."

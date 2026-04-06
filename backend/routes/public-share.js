@@ -8,14 +8,16 @@ const tableMessage = require('../db/tableMessage');
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const OG_IMAGE_WIDTH = 1200;
 const OG_IMAGE_HEIGHT = 630;
+const OG_IMAGE_TYPE_PNG = 'image/png';
+const OG_IMAGE_TYPE_SVG = 'image/svg+xml';
 const STRINGS = {
   de: {
     heroTitle: 'Öffentliche Nachricht',
     unavailableTitle: 'Nachricht nicht verfügbar',
     unavailableDescription: 'Diese öffentliche Nachricht ist nicht verfügbar.',
     pageTitle: 'MessageDrop | Öffentliche Nachricht',
-    pageDescription: 'Öffentliche Nachricht auf MessageDrop',
-    mediaOnlyDescription: 'Diese öffentliche Nachricht enthält Medien auf MessageDrop.',
+    pageDescription: 'Schau dir diese Nachricht auf MessageDrop an.',
+    mediaOnlyDescription: 'Schau dir diese Nachricht auf MessageDrop an.',
     previewImageAlt: 'Vorschaubild einer öffentlichen Nachricht auf MessageDrop',
     stickerLabel: 'Sticker',
     imageLabel: 'Bild',
@@ -26,8 +28,8 @@ const STRINGS = {
     unavailableTitle: 'Message unavailable',
     unavailableDescription: 'This public message is not available.',
     pageTitle: 'MessageDrop | Public message',
-    pageDescription: 'Public message on MessageDrop',
-    mediaOnlyDescription: 'This public message contains media on MessageDrop.',
+    pageDescription: 'Take a look at this message on MessageDrop.',
+    mediaOnlyDescription: 'Take a look at this message on MessageDrop.',
     previewImageAlt: 'Preview image for a public message on MessageDrop',
     stickerLabel: 'Sticker',
     imageLabel: 'Image',
@@ -38,8 +40,8 @@ const STRINGS = {
     unavailableTitle: 'Mensaje no disponible',
     unavailableDescription: 'Este mensaje público no está disponible.',
     pageTitle: 'MessageDrop | Mensaje público',
-    pageDescription: 'Mensaje público en MessageDrop',
-    mediaOnlyDescription: 'Este mensaje público contiene contenido multimedia en MessageDrop.',
+    pageDescription: 'Mira este mensaje en MessageDrop.',
+    mediaOnlyDescription: 'Mira este mensaje en MessageDrop.',
     previewImageAlt: 'Imagen de vista previa de un mensaje público en MessageDrop',
     stickerLabel: 'Sticker',
     imageLabel: 'Imagen',
@@ -50,8 +52,8 @@ const STRINGS = {
     unavailableTitle: 'Message indisponible',
     unavailableDescription: 'Ce message public n’est pas disponible.',
     pageTitle: 'MessageDrop | Message public',
-    pageDescription: 'Message public sur MessageDrop',
-    mediaOnlyDescription: 'Ce message public contient des médias sur MessageDrop.',
+    pageDescription: 'Regarde ce message sur MessageDrop.',
+    mediaOnlyDescription: 'Regarde ce message sur MessageDrop.',
     previewImageAlt: 'Image d’aperçu d’un message public sur MessageDrop',
     stickerLabel: 'Sticker',
     imageLabel: 'Image',
@@ -62,6 +64,8 @@ const STRINGS = {
 let publicMessageTemplateCache = null;
 const embeddedFontCssCache = new Map();
 let appIconDataUriCache;
+let resvgConstructorCache;
+let resvgLoadAttempted = false;
 
 router.get('/assets/public-message.css', function (req, res, next) {
   sendStaticFile(res, getFrontendPath('public', 'site-assets', 'public-message.css'), 'text/css; charset=utf-8', next);
@@ -120,6 +124,52 @@ router.get('/:messageUuid/og-image.svg', function (req, res) {
       : null;
 
     return renderOgImage(res, {
+      locale,
+      strings,
+      status: message ? 200 : 404,
+      messageUuid,
+      message
+    });
+  });
+});
+
+router.get('/:messageUuid/og-image.png', function (req, res) {
+  const Resvg = getResvgConstructor();
+  if (!Resvg) {
+    res.redirect(307, req.originalUrl.replace(/\.png(?:\?.*)?$/i, '.svg'));
+    return;
+  }
+
+  const messageUuid = typeof req.params?.messageUuid === 'string' ? req.params.messageUuid.trim() : '';
+  const locale = resolveLocale(req);
+  const strings = STRINGS[locale];
+
+  if (!UUID_REGEX.test(messageUuid)) {
+    return renderOgPngImage(res, {
+      locale,
+      strings,
+      status: 404,
+      messageUuid,
+      message: null
+    });
+  }
+
+  tableMessage.getByUuid(req.database.db, messageUuid, function (err, row) {
+    if (err) {
+      return renderOgPngImage(res, {
+        locale,
+        strings,
+        status: 500,
+        messageUuid,
+        message: null
+      });
+    }
+
+    const message = row && String(row.status || '').toLowerCase() === tableMessage.messageStatus.ENABLED
+      ? row
+      : null;
+
+    return renderOgPngImage(res, {
       locale,
       strings,
       status: message ? 200 : 404,
@@ -192,9 +242,8 @@ function renderShareShell(res, model) {
   const publicMessageBaseUrl = resolvePublicMessageBaseUrl(res.req);
   const canonicalUrl = `${publicMessageBaseUrl}/${encodeURIComponent(model.messageUuid || '')}`;
   const assetBaseUrl = `${publicMessageBaseUrl}/assets`;
-  const imageUrl = model.messageUuid
-    ? `${canonicalUrl}/og-image.svg`
-    : '';
+  const imageUrl = model.messageUuid ? resolveOgImageUrl(canonicalUrl) : '';
+  const imageType = imageUrl.endsWith('.png') ? OG_IMAGE_TYPE_PNG : OG_IMAGE_TYPE_SVG;
   const bootstrap = {
     messageUuid: model.messageUuid || '',
     appBaseUrl,
@@ -207,6 +256,7 @@ function renderShareShell(res, model) {
     description: model.description || model.strings.pageDescription,
     canonicalUrl,
     imageUrl,
+    imageType,
     imageAlt: model.strings.previewImageAlt,
     assetBaseUrl,
     bootstrap
@@ -242,7 +292,7 @@ function buildShareHtml(model) {
     ? upsertMetaTag(html, 'property', 'og:image', model.imageUrl)
     : removeMetaTag(html, 'property', 'og:image');
   html = model.imageUrl
-    ? upsertMetaTag(html, 'property', 'og:image:type', 'image/svg+xml')
+    ? upsertMetaTag(html, 'property', 'og:image:type', model.imageType || OG_IMAGE_TYPE_SVG)
     : removeMetaTag(html, 'property', 'og:image:type');
   html = model.imageUrl
     ? upsertMetaTag(html, 'property', 'og:image:width', String(OG_IMAGE_WIDTH))
@@ -274,7 +324,7 @@ async function renderOgImage(res, model) {
   try {
     const svg = await buildPublicMessageOgSvg(model);
     res.status(model.status === 500 ? 500 : 200);
-    res.set('Content-Type', 'image/svg+xml; charset=utf-8');
+    res.set('Content-Type', `${OG_IMAGE_TYPE_SVG}; charset=utf-8`);
     res.set('Cache-Control', 'public, max-age=300, s-maxage=900, stale-while-revalidate=300');
     res.set('X-Robots-Tag', 'noindex, nofollow');
     res.set('Vary', 'Accept-Language');
@@ -287,12 +337,75 @@ async function renderOgImage(res, model) {
       strings: fallbackStrings
     });
     res.status(200);
-    res.set('Content-Type', 'image/svg+xml; charset=utf-8');
+    res.set('Content-Type', `${OG_IMAGE_TYPE_SVG}; charset=utf-8`);
     res.set('Cache-Control', 'public, max-age=300, s-maxage=900, stale-while-revalidate=300');
     res.set('X-Robots-Tag', 'noindex, nofollow');
     res.set('Vary', 'Accept-Language');
     res.send(fallbackSvg);
   }
+}
+
+async function renderOgPngImage(res, model) {
+  try {
+    const pngBuffer = await buildPublicMessageOgPng(model);
+    res.status(model.status === 500 ? 500 : 200);
+    res.set('Content-Type', OG_IMAGE_TYPE_PNG);
+    res.set('Cache-Control', 'public, max-age=300, s-maxage=900, stale-while-revalidate=300');
+    res.set('X-Robots-Tag', 'noindex, nofollow');
+    res.set('Vary', 'Accept-Language');
+    res.send(pngBuffer);
+  } catch {
+    try {
+      const fallbackStrings = model.strings || STRINGS[model.locale] || STRINGS.en;
+      const pngBuffer = await buildPublicMessageOgPng({
+        ...model,
+        message: null,
+        strings: fallbackStrings
+      });
+      res.status(200);
+      res.set('Content-Type', OG_IMAGE_TYPE_PNG);
+      res.set('Cache-Control', 'public, max-age=300, s-maxage=900, stale-while-revalidate=300');
+      res.set('X-Robots-Tag', 'noindex, nofollow');
+      res.set('Vary', 'Accept-Language');
+      res.send(pngBuffer);
+      return;
+    } catch {
+      res.redirect(307, reqSvgFallbackUrl(res.req));
+    }
+  }
+}
+
+function resolveOgImageUrl(canonicalUrl) {
+  return supportsPngOgImages()
+    ? `${canonicalUrl}/og-image.png`
+    : `${canonicalUrl}/og-image.svg`;
+}
+
+function supportsPngOgImages() {
+  return Boolean(getResvgConstructor());
+}
+
+function getResvgConstructor() {
+  if (resvgLoadAttempted) {
+    return resvgConstructorCache || null;
+  }
+
+  resvgLoadAttempted = true;
+  try {
+    const mod = require('@resvg/resvg-js');
+    resvgConstructorCache = mod?.Resvg || null;
+  } catch {
+    resvgConstructorCache = null;
+  }
+
+  return resvgConstructorCache;
+}
+
+function reqSvgFallbackUrl(req) {
+  const originalUrl = typeof req?.originalUrl === 'string' ? req.originalUrl : '';
+  const [pathname, search = ''] = originalUrl.split('?');
+  const svgPath = pathname.replace(/\.png$/i, '.svg');
+  return search ? `${svgPath}?${search}` : svgPath;
 }
 
 function loadPublicMessageTemplate() {
@@ -512,6 +625,23 @@ async function buildPublicMessageOgSvg(model) {
     '  <rect x="60" y="176" width="1080" height="394" rx="34" fill="none" stroke="rgba(15,23,42,0.06)" />',
     '</svg>'
   ].filter(Boolean).join('\n');
+}
+
+async function buildPublicMessageOgPng(model) {
+  const Resvg = getResvgConstructor();
+  if (!Resvg) {
+    throw new Error('resvg-js not available');
+  }
+
+  const svg = await buildPublicMessageOgSvg(model);
+  const renderer = new Resvg(svg, {
+    fitTo: {
+      mode: 'width',
+      value: OG_IMAGE_WIDTH
+    }
+  });
+
+  return renderer.render().asPng();
 }
 
 function renderOgMediaMarkup(mediaVisual, strings) {

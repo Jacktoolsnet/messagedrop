@@ -62,17 +62,8 @@ export class PublicMessageShareService {
   }
 
   private buildShareText(message: Pick<Message, 'message' | 'translatedMessage'>): string {
-    const source = typeof message.translatedMessage === 'string' && message.translatedMessage.trim()
-      ? message.translatedMessage
-      : message.message;
-    const normalized = source.replace(/\s+/g, ' ').trim();
-    const excerpt = normalized.length > 140
-      ? `${normalized.slice(0, 137).trimEnd()}…`
-      : normalized;
-
-    return excerpt
-      ? this.translation.t('common.share.publicMessageText', { message: excerpt })
-      : this.translation.t('common.share.publicMessageTitle');
+    void message;
+    return this.translation.t('common.share.publicMessageText');
   }
 
   private async copyToClipboard(text: string): Promise<boolean> {
