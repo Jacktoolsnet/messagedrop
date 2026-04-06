@@ -49,7 +49,8 @@ body {
 
 .hero-card,
 .status-card,
-.message-card {
+.message-card,
+.context-card {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: 1.5rem;
@@ -58,7 +59,8 @@ body {
 }
 
 .hero-card,
-.message-card {
+.message-card,
+.context-card {
   padding: clamp(1.1rem, 2vw, 1.6rem);
 }
 
@@ -156,6 +158,28 @@ body {
   margin: 0;
   color: var(--text-secondary);
   line-height: 1.55;
+}
+
+.context-card {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.context-title {
+  margin: 0;
+  font-size: clamp(1.05rem, 1rem + 0.2vw, 1.2rem);
+  line-height: 1.25;
+}
+
+.context-copy {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.context-actions {
+  display: flex;
+  justify-content: flex-start;
 }
 
 .button {
@@ -486,7 +510,8 @@ body {
   }
 
   .hero-card,
-  .message-card {
+  .message-card,
+  .context-card {
     padding: 1rem;
     border-radius: 1.2rem;
   }

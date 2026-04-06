@@ -21,6 +21,9 @@ const STRINGS = {
     previewImageAlt: 'Vorschaubild einer öffentlichen Nachricht auf MessageDrop',
     openApp: 'In MessageDrop öffnen',
     copyLink: 'Link kopieren',
+    contextTitle: 'Was ist MessageDrop?',
+    contextBody: 'MessageDrop ist eine globale Karte, auf der Menschen Nachrichten an realen Orten hinterlassen, Orten folgen und sicher kommunizieren können.',
+    moreInfo: 'Mehr Infos',
     stickerLabel: 'Sticker',
     imageLabel: 'Bild',
     mediaLabel: 'Medien'
@@ -35,6 +38,9 @@ const STRINGS = {
     previewImageAlt: 'Preview image for a public message on MessageDrop',
     openApp: 'Open in MessageDrop',
     copyLink: 'Copy link',
+    contextTitle: 'What is MessageDrop?',
+    contextBody: 'MessageDrop is a global map where people can leave messages in real-world locations, follow places, and communicate securely.',
+    moreInfo: 'More info',
     stickerLabel: 'Sticker',
     imageLabel: 'Image',
     mediaLabel: 'Media'
@@ -49,6 +55,9 @@ const STRINGS = {
     previewImageAlt: 'Imagen de vista previa de un mensaje público en MessageDrop',
     openApp: 'Abrir en MessageDrop',
     copyLink: 'Copiar enlace',
+    contextTitle: '¿Qué es MessageDrop?',
+    contextBody: 'MessageDrop es un mapa global donde las personas pueden dejar mensajes en lugares reales, seguir lugares y comunicarse de forma segura.',
+    moreInfo: 'Más información',
     stickerLabel: 'Sticker',
     imageLabel: 'Imagen',
     mediaLabel: 'Contenido multimedia'
@@ -63,6 +72,9 @@ const STRINGS = {
     previewImageAlt: 'Image d’aperçu d’un message public sur MessageDrop',
     openApp: 'Ouvrir dans MessageDrop',
     copyLink: 'Copier le lien',
+    contextTitle: 'Qu’est-ce que MessageDrop ?',
+    contextBody: 'MessageDrop est une carte mondiale où les gens peuvent laisser des messages dans des lieux réels, suivre des lieux et communiquer en toute sécurité.',
+    moreInfo: 'Plus d’informations',
     stickerLabel: 'Sticker',
     imageLabel: 'Image',
     mediaLabel: 'Médias'
@@ -302,6 +314,7 @@ function buildShareHtml(model) {
     initialMessage: model.message || null,
     initialError: model.initialError || null
   }));
+  const structuredDataJson = escapeJsonForScriptTag(JSON.stringify(buildPublicMessageStructuredData(model)));
   const inlineFontCss = buildInlineFontCss(model.message, model.assetBaseUrl);
 
   let html = template;
@@ -314,6 +327,7 @@ function buildShareHtml(model) {
   html = replaceMetaTag(html, 'name', 'twitter:card', model.imageUrl ? 'summary_large_image' : 'summary');
   html = replaceMetaTag(html, 'name', 'twitter:title', model.title);
   html = replaceMetaTag(html, 'name', 'twitter:description', model.description);
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_STRUCTURED_DATA__', structuredDataJson);
   html = model.imageUrl
     ? upsertMetaTag(html, 'property', 'og:image', model.imageUrl)
     : removeMetaTag(html, 'property', 'og:image');
@@ -363,6 +377,10 @@ function buildShareHtml(model) {
   html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_OPEN_APP_HREF__', escapeAttribute(initialPageState.openAppHref));
   html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_OPEN_APP_LABEL__', escapeHtml(initialPageState.openAppLabel));
   html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_COPY_LINK_LABEL__', escapeHtml(initialPageState.copyLinkLabel));
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_CONTEXT_TITLE__', escapeHtml(model.strings.contextTitle));
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_CONTEXT_BODY__', escapeHtml(model.strings.contextBody));
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_CONTEXT_LINK_HREF__', escapeAttribute(resolveWhatIsPageUrl(model.appBaseUrl, model.locale)));
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_CONTEXT_LINK_LABEL__', escapeHtml(model.strings.moreInfo));
   html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_INITIAL_DATA__', initialDataJson);
   if (inlineFontCss) {
     html = html.replace(/<\/head>/i, `  <style id="public-message-inline-font">${inlineFontCss}</style>\n</head>`);
@@ -509,6 +527,87 @@ function renderServerMediaIconSvg(type) {
   default:
     return '<svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M6 5.75A2.75 2.75 0 0 1 8.75 3h6.5A2.75 2.75 0 0 1 18 5.75v12.5A2.75 2.75 0 0 1 15.25 21h-6.5A2.75 2.75 0 0 1 6 18.25V5.75Zm5 3.56v5.38l4.5-2.69L11 9.3Z" fill="currentColor"/></svg>';
   }
+}
+
+function buildPublicMessageStructuredData(model) {
+  const strings = model.strings || STRINGS[model.locale] || STRINGS.en;
+  const message = normalizePublicMessage(model.message);
+  const canonicalUrl = model.canonicalUrl;
+  const appUrl = normalizeAbsoluteUrl(model.appBaseUrl) || 'https://messagedrop.de';
+  const publisher = {
+    '@type': 'Organization',
+    name: 'JackTools.Net UG (limited liability)',
+    url: appUrl
+  };
+  const website = {
+    '@type': 'WebSite',
+    '@id': `${appUrl}/#website`,
+    name: 'MessageDrop',
+    url: appUrl,
+    description: strings.contextBody,
+    inLanguage: model.locale,
+    publisher
+  };
+  const webpage = {
+    '@type': 'WebPage',
+    '@id': `${canonicalUrl}#webpage`,
+    url: canonicalUrl,
+    name: model.title,
+    description: model.description,
+    isPartOf: {
+      '@id': `${appUrl}/#website`
+    },
+    inLanguage: model.locale
+  };
+
+  const graph = [website, webpage];
+
+  if (message) {
+    const text = typeof message.message === 'string' ? message.message.trim() : '';
+    const multimedia = parseMultimedia(message.multimedia);
+    const hashtags = Array.isArray(message.hashtags) ? message.hashtags : [];
+    const titleSource = text || normalizeMediaTitle(multimedia) || strings.heroTitle;
+    const posting = {
+      '@type': 'SocialMediaPosting',
+      '@id': `${canonicalUrl}#posting`,
+      url: canonicalUrl,
+      headline: truncate(singleLine(titleSource), 110),
+      description: model.description,
+      articleBody: text || undefined,
+      isPartOf: {
+        '@id': `${appUrl}/#website`
+      },
+      publisher,
+      inLanguage: model.locale,
+      keywords: hashtags.length ? hashtags.join(', ') : undefined
+    };
+
+    if (Number.isFinite(Number(message.createDateTime))) {
+      posting.datePublished = new Date(Number(message.createDateTime) * 1000).toISOString();
+    }
+
+    if (model.imageUrl) {
+      posting.image = model.imageUrl;
+    }
+
+    graph.push(posting);
+  }
+
+  return {
+    '@context': 'https://schema.org',
+    '@graph': graph
+  };
+}
+
+function resolveWhatIsPageUrl(appBaseUrl, locale) {
+  const baseUrl = normalizeAbsoluteUrl(appBaseUrl) || 'https://messagedrop.de';
+  if (locale === 'de') {
+    return `${baseUrl}/de/was-ist-messagedrop/`;
+  }
+  if (locale === 'en') {
+    return `${baseUrl}/en/what-is-messagedrop/`;
+  }
+  return `${baseUrl}/what-is-messagedrop/`;
 }
 
 function buildInlineFontCss(message, assetBaseUrl) {
