@@ -537,7 +537,12 @@
   }
 
   function resolvePublicMessageBaseUrl() {
+    const pathname = String(window.location.pathname || '');
     const hostname = window.location.hostname;
+    if (/^\/m(?:\/|$)/i.test(pathname)) {
+      return `${window.location.origin}/m`;
+    }
+
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
       return 'http://localhost:3000/m';
     }

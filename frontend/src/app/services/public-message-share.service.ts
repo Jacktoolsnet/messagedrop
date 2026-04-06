@@ -10,6 +10,7 @@ import { TranslationHelperService } from './translation-helper.service';
 export class PublicMessageShareService {
   private readonly snackBar = inject(DisplayMessageService);
   private readonly translation = inject(TranslationHelperService);
+  private readonly publicShareBaseUrl = this.resolvePublicShareBaseUrl();
 
   canShare(message: Pick<Message, 'uuid' | 'status'> | null | undefined): boolean {
     const uuid = typeof message?.uuid === 'string' ? message.uuid.trim() : '';
@@ -18,7 +19,7 @@ export class PublicMessageShareService {
 
   buildPublicMessageUrl(messageUuid: string): string {
     const trimmedUuid = typeof messageUuid === 'string' ? messageUuid.trim() : '';
-    return `${environment.publicShareUrl}/${encodeURIComponent(trimmedUuid)}`;
+    return `${this.publicShareBaseUrl}/${encodeURIComponent(trimmedUuid)}`;
   }
 
   buildAppMessageUrl(messageUuid: string): string {
@@ -113,5 +114,18 @@ export class PublicMessageShareService {
 
   private isAbortError(error: unknown): boolean {
     return error instanceof DOMException && error.name === 'AbortError';
+  }
+
+  private resolvePublicShareBaseUrl(): string {
+    const configured = typeof environment.publicShareUrl === 'string'
+      ? environment.publicShareUrl.trim().replace(/\/+$/, '')
+      : '';
+
+    if (configured) {
+      return configured;
+    }
+
+    const apiBaseUrl = String(environment.apiUrl || '').trim().replace(/\/+$/, '');
+    return apiBaseUrl ? `${apiBaseUrl}/m` : '/m';
   }
 }
