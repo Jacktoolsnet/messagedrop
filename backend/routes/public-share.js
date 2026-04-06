@@ -19,6 +19,8 @@ const STRINGS = {
     pageDescription: 'Schau dir diese Nachricht auf MessageDrop an.',
     mediaOnlyDescription: 'Schau dir diese Nachricht auf MessageDrop an.',
     previewImageAlt: 'Vorschaubild einer öffentlichen Nachricht auf MessageDrop',
+    openApp: 'In MessageDrop öffnen',
+    copyLink: 'Link kopieren',
     stickerLabel: 'Sticker',
     imageLabel: 'Bild',
     mediaLabel: 'Medien'
@@ -31,6 +33,8 @@ const STRINGS = {
     pageDescription: 'Take a look at this message on MessageDrop.',
     mediaOnlyDescription: 'Take a look at this message on MessageDrop.',
     previewImageAlt: 'Preview image for a public message on MessageDrop',
+    openApp: 'Open in MessageDrop',
+    copyLink: 'Copy link',
     stickerLabel: 'Sticker',
     imageLabel: 'Image',
     mediaLabel: 'Media'
@@ -43,6 +47,8 @@ const STRINGS = {
     pageDescription: 'Mira este mensaje en MessageDrop.',
     mediaOnlyDescription: 'Mira este mensaje en MessageDrop.',
     previewImageAlt: 'Imagen de vista previa de un mensaje público en MessageDrop',
+    openApp: 'Abrir en MessageDrop',
+    copyLink: 'Copiar enlace',
     stickerLabel: 'Sticker',
     imageLabel: 'Imagen',
     mediaLabel: 'Contenido multimedia'
@@ -55,6 +61,8 @@ const STRINGS = {
     pageDescription: 'Regarde ce message sur MessageDrop.',
     mediaOnlyDescription: 'Regarde ce message sur MessageDrop.',
     previewImageAlt: 'Image d’aperçu d’un message public sur MessageDrop',
+    openApp: 'Ouvrir dans MessageDrop',
+    copyLink: 'Copier le lien',
     stickerLabel: 'Sticker',
     imageLabel: 'Image',
     mediaLabel: 'Médias'
@@ -232,7 +240,8 @@ router.get('/:messageUuid', function (req, res) {
       status: 200,
       messageUuid,
       title,
-      description
+      description,
+      message: row
     });
   });
 });
@@ -242,8 +251,15 @@ function renderShareShell(res, model) {
   const publicMessageBaseUrl = resolvePublicMessageBaseUrl(res.req);
   const canonicalUrl = `${publicMessageBaseUrl}/${encodeURIComponent(model.messageUuid || '')}`;
   const assetBaseUrl = `${publicMessageBaseUrl}/assets`;
+  const normalizedMessage = normalizePublicMessage(model.message);
   const imageUrl = model.messageUuid ? resolveOgImageUrl(canonicalUrl) : '';
   const imageType = imageUrl.endsWith('.png') ? OG_IMAGE_TYPE_PNG : OG_IMAGE_TYPE_SVG;
+  const initialError = normalizedMessage
+    ? null
+    : {
+      title: model.title || model.strings.unavailableTitle,
+      body: model.description || model.strings.unavailableDescription
+    };
   const bootstrap = {
     messageUuid: model.messageUuid || '',
     appBaseUrl,
@@ -259,7 +275,11 @@ function renderShareShell(res, model) {
     imageType,
     imageAlt: model.strings.previewImageAlt,
     assetBaseUrl,
-    bootstrap
+    bootstrap,
+    appBaseUrl,
+    strings: model.strings,
+    message: normalizedMessage,
+    initialError
   });
 
   res.status(model.status || 200);
@@ -277,6 +297,12 @@ function buildShareHtml(model) {
   const absoluteJsUrl = `${model.assetBaseUrl}/public-message.js`;
   const absoluteIconUrl = `${model.assetBaseUrl}/icon-192x192.png`;
   const absoluteOverlayUrl = `${model.assetBaseUrl}/sticker-protection-overlay.svg`;
+  const initialPageState = buildInitialPageState(model);
+  const initialDataJson = escapeJsonForScriptTag(JSON.stringify({
+    initialMessage: model.message || null,
+    initialError: model.initialError || null
+  }));
+  const inlineFontCss = buildInlineFontCss(model.message, model.assetBaseUrl);
 
   let html = template;
   html = html.replace(/<html lang="[^"]*">/i, `<html lang="${escapeAttribute(model.locale)}">`);
@@ -313,11 +339,199 @@ function buildShareHtml(model) {
   html = html.replace(/href="\/icons\/icon-192x192\.png"/i, `href="${escapeAttribute(absoluteIconUrl)}"`);
   html = html.replace(/href="\/site-assets\/public-message\.css"/i, `href="${escapeAttribute(absoluteCssUrl)}"`);
   html = html.replace(/src="\/assets\/images\/sticker-protection-overlay\.svg"/i, `src="${escapeAttribute(absoluteOverlayUrl)}"`);
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_HERO_TITLE__', escapeHtml(model.strings.heroTitle));
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_DESCRIPTION__', escapeHtml(initialPageState.descriptionText));
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_DESCRIPTION_HIDDEN__', initialPageState.descriptionHidden ? 'hidden' : '');
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_STATUS__', escapeHtml(initialPageState.statusText));
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_STATUS_HIDDEN__', initialPageState.statusHidden ? 'hidden' : '');
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_CARD_CLASS_SUFFIX__', initialPageState.messageCardClassSuffix);
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_CARD_HIDDEN__', initialPageState.messageCardHidden ? 'hidden' : '');
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_MEDIA_VISIBLE_CLASS__', initialPageState.mediaVisibleClass);
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_MEDIA_HIDDEN__', initialPageState.mediaHidden ? 'hidden' : '');
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_MEDIA_FRAME_SUFFIX__', initialPageState.mediaFrameClassSuffix);
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_EMBED_CLASS_SUFFIX__', initialPageState.embedClassSuffix);
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_EMBED_HIDDEN__', initialPageState.embedHidden ? 'hidden' : '');
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_EMBED_HTML__', initialPageState.embedHtml);
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_ATTRIBUTION__', escapeHtml(initialPageState.attributionText));
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_ATTRIBUTION_HREF__', escapeAttribute(initialPageState.attributionHref || '#'));
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_ATTRIBUTION_HIDDEN__', initialPageState.attributionHidden ? 'hidden' : '');
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_TEXT_HIDDEN__', initialPageState.textHidden ? 'hidden' : '');
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_TEXT_STYLE__', initialPageState.textStyleAttribute);
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_TEXT__', escapeHtml(initialPageState.text));
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_HASHTAGS__', initialPageState.hashtagsHtml);
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_HASHTAGS_HIDDEN__', initialPageState.hashtagsHidden ? 'hidden' : '');
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_OPEN_APP_HREF__', escapeAttribute(initialPageState.openAppHref));
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_OPEN_APP_LABEL__', escapeHtml(initialPageState.openAppLabel));
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_COPY_LINK_LABEL__', escapeHtml(initialPageState.copyLinkLabel));
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_INITIAL_DATA__', initialDataJson);
+  if (inlineFontCss) {
+    html = html.replace(/<\/head>/i, `  <style id="public-message-inline-font">${inlineFontCss}</style>\n</head>`);
+  }
   html = html.replace(
-    /<script src="\/site-assets\/public-message\.js" defer><\/script>/i,
-    `<meta name="public-message-bootstrap" content="${escapeAttribute(JSON.stringify(model.bootstrap))}">\n  <script src="${escapeAttribute(absoluteJsUrl)}" defer></script>`
+    /<script id="public-message-initial-data" type="application\/json">[\s\S]*?<\/script>\s*<script src="\/site-assets\/public-message\.js" defer><\/script>/i,
+    `<meta name="public-message-bootstrap" content="${escapeAttribute(JSON.stringify(model.bootstrap))}">\n  <script id="public-message-initial-data" type="application/json">${initialDataJson}</script>\n  <script src="${escapeAttribute(absoluteJsUrl)}" defer></script>`
   );
   return html;
+}
+
+function buildInitialPageState(model) {
+  const strings = model.strings || STRINGS[model.locale] || STRINGS.en;
+  const message = normalizePublicMessage(model.message);
+  const appMessageHref = model.messageUuid
+    ? `${model.appBaseUrl}/?publicMessage=${encodeURIComponent(model.messageUuid)}`
+    : `${model.appBaseUrl}/`;
+  const multimedia = parseMultimedia(message?.multimedia);
+  const mediaSummary = buildServerMediaSummary(multimedia, strings);
+  const hashtags = Array.isArray(message?.hashtags) ? message.hashtags : [];
+  const text = typeof message?.message === 'string' ? message.message.trim() : '';
+  const fontFamily = extractAllowedFontFamily(message?.style);
+
+  return {
+    descriptionText: message ? '' : (model.initialError?.body || model.description || strings.unavailableDescription),
+    descriptionHidden: Boolean(message),
+    statusText: '',
+    statusHidden: true,
+    messageCardClassSuffix: !mediaSummary.visible ? ' message-card--without-media' : '',
+    messageCardHidden: !message,
+    mediaVisibleClass: mediaSummary.visible ? ' is-visible' : '',
+    mediaHidden: !mediaSummary.visible,
+    mediaFrameClassSuffix: mediaSummary.frameClassSuffix,
+    embedClassSuffix: mediaSummary.embedClassSuffix,
+    embedHidden: !mediaSummary.visible,
+    embedHtml: mediaSummary.embedHtml,
+    attributionText: mediaSummary.attributionText,
+    attributionHref: mediaSummary.attributionHref,
+    attributionHidden: !mediaSummary.attributionText || !mediaSummary.attributionHref,
+    textHidden: !text,
+    textStyleAttribute: fontFamily
+      ? ` style="font-family: &quot;${escapeAttribute(fontFamily)}&quot;, Roboto, &quot;Helvetica Neue&quot;, Arial, sans-serif;"`
+      : '',
+    text,
+    hashtagsHtml: buildHashtagsHtml(hashtags),
+    hashtagsHidden: hashtags.length === 0,
+    openAppHref: appMessageHref,
+    openAppLabel: strings.openApp || STRINGS.en.openApp,
+    copyLinkLabel: strings.copyLink || STRINGS.en.copyLink
+  };
+}
+
+function normalizePublicMessage(rawMessage) {
+  if (!rawMessage || typeof rawMessage !== 'object') {
+    return null;
+  }
+
+  return {
+    ...rawMessage,
+    multimedia: parseMultimedia(rawMessage.multimedia),
+    hashtags: parseHashtagStorageValue(rawMessage.hashtags)
+  };
+}
+
+function buildHashtagsHtml(hashtags) {
+  if (!Array.isArray(hashtags) || !hashtags.length) {
+    return '';
+  }
+
+  return hashtags
+    .map((tag) => {
+      const normalized = String(tag || '').trim().replace(/^#+/, '');
+      if (!normalized) {
+        return '';
+      }
+      return `<span class="hashtag-chip">#${escapeHtml(normalized)}</span>`;
+    })
+    .filter(Boolean)
+    .join('');
+}
+
+function buildServerMediaSummary(multimedia, strings) {
+  const media = multimedia && typeof multimedia === 'object' ? multimedia : null;
+  if (!media || !hasMultimedia(media)) {
+    return {
+      visible: false,
+      frameClassSuffix: '',
+      embedClassSuffix: '',
+      embedHtml: '',
+      attributionText: '',
+      attributionHref: ''
+    };
+  }
+
+  const mediaType = String(media.type || '').trim().toLowerCase();
+  const iconType = resolveOgMediaIconType(mediaType, media);
+  const label = mediaType === 'sticker'
+    ? strings.stickerLabel
+    : isDirectImageMedia(mediaType, media.url)
+      ? strings.imageLabel
+      : resolveMediaPlatformLabel(mediaType, media, strings);
+  const title = truncate(singleLine(normalizeMediaTitle(media)), 120);
+  const attributionText = typeof media.attribution === 'string' ? media.attribution.trim() : '';
+  const attributionHref = typeof media.sourceUrl === 'string' && isHttpUrl(media.sourceUrl)
+    ? media.sourceUrl.trim()
+    : '';
+
+  return {
+    visible: true,
+    frameClassSuffix: '',
+    embedClassSuffix: ' message-embed--summary',
+    embedHtml: [
+      '<div class="message-media-summary">',
+      `  <span class="message-media-summary-icon" aria-hidden="true">${renderServerMediaIconSvg(iconType)}</span>`,
+      '  <span class="message-media-summary-copy">',
+      `    <span class="message-media-summary-label">${escapeHtml(label)}</span>`,
+      title ? `    <span class="message-media-summary-title">${escapeHtml(title)}</span>` : '',
+      '  </span>',
+      '</div>'
+    ].filter(Boolean).join('\n'),
+    attributionText,
+    attributionHref
+  };
+}
+
+function renderServerMediaIconSvg(type) {
+  switch (type) {
+  case 'image':
+    return '<svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M5 5.5A1.5 1.5 0 0 1 6.5 4h11A1.5 1.5 0 0 1 19 5.5v13a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 18.5v-13Zm2 11.88 3.15-3.66a1 1 0 0 1 1.53.01l2.24 2.64 1.9-2.14a1 1 0 0 1 1.51 0L17 14.5V6H7v11.38ZM15.75 9.5a1.25 1.25 0 1 0 0-2.5 1.25 1.25 0 0 0 0 2.5Z" fill="currentColor"/></svg>';
+  case 'sticker':
+    return '<svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M7 3h7.5A4.5 4.5 0 0 1 19 7.5V15a6 6 0 0 1-6 6H7A4 4 0 0 1 3 17V7a4 4 0 0 1 4-4Zm0 2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h6a4 4 0 0 0 4-4V8.83A3.02 3.02 0 0 1 14.17 11H13a1 1 0 1 1 0-2h1.17c.46 0 .83-.37.83-.83V7.5A2.5 2.5 0 0 0 14.5 5H7Zm1.75 6.75a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm6.5 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2ZM8.9 15.56a1 1 0 0 1 1.41 0 2.39 2.39 0 0 0 3.38 0 1 1 0 0 1 1.42 1.4 4.39 4.39 0 0 1-6.22 0 1 1 0 0 1 0-1.4Z" fill="currentColor"/></svg>';
+  case 'youtube':
+    return '<svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M21.58 7.19A2.92 2.92 0 0 0 19.53 5.1C17.75 4.63 12 4.63 12 4.63s-5.75 0-7.53.47A2.92 2.92 0 0 0 2.42 7.2 30.7 30.7 0 0 0 2 12a30.7 30.7 0 0 0 .42 4.81 2.92 2.92 0 0 0 2.05 2.09c1.78.47 7.53.47 7.53.47s5.75 0 7.53-.47a2.92 2.92 0 0 0 2.05-2.09A30.7 30.7 0 0 0 22 12a30.7 30.7 0 0 0-.42-4.81ZM10 15.5v-7l6 3.5-6 3.5Z" fill="currentColor"/></svg>';
+  case 'spotify':
+    return '<svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm4.46 14.45a.93.93 0 0 1-1.28.3 9.84 9.84 0 0 0-5.49-1.37.93.93 0 1 1-.12-1.86 11.66 11.66 0 0 1 6.54 1.68.93.93 0 0 1 .35 1.25Zm1.82-2.7a1.17 1.17 0 0 1-1.61.39 12.63 12.63 0 0 0-6.74-1.7 1.17 1.17 0 1 1-.1-2.34 14.47 14.47 0 0 1 7.96 2 1.17 1.17 0 0 1 .49 1.65Zm.16-2.82A15.17 15.17 0 0 0 9.77 8.8a1.4 1.4 0 1 1-.14-2.8 17.86 17.86 0 0 1 10.16 2.4 1.4 1.4 0 1 1-1.35 2.53Z" fill="currentColor"/></svg>';
+  case 'pinterest':
+    return '<svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.64 19.32 9.2 9.2 0 0 1 .08-2.63l.92-3.9s-.23-.47-.23-1.16c0-1.08.62-1.89 1.4-1.89.66 0 .98.5.98 1.09 0 .67-.42 1.66-.64 2.58-.18.77.38 1.4 1.13 1.4 1.36 0 2.4-1.43 2.4-3.5 0-1.83-1.31-3.1-3.18-3.1-2.17 0-3.45 1.63-3.45 3.31 0 .66.25 1.36.58 1.74a.23.23 0 0 1 .05.22l-.23.93c-.04.14-.12.17-.28.1-1.04-.48-1.69-1.98-1.69-3.18 0-2.59 1.88-4.97 5.42-4.97 2.84 0 5.05 2.03 5.05 4.75 0 2.83-1.79 5.12-4.27 5.12-.83 0-1.61-.43-1.88-.94l-.51 1.94c-.18.72-.67 1.61-1 2.15A10 10 0 1 0 12 2Z" fill="currentColor"/></svg>';
+  case 'tiktok':
+    return '<svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M14 3c.18 1.5 1.3 3 3 3.41V9.1c-1.3 0-2.55-.42-3.57-1.2v5.78A4.68 4.68 0 1 1 8.75 9v2.77a1.92 1.92 0 1 0 1.93 1.91V3H14Z" fill="currentColor"/></svg>';
+  case 'tenor':
+    return '<svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M6 4h12v3h-4.5V20h-3V7H6V4Z" fill="currentColor"/></svg>';
+  case 'soundcloud':
+    return '<svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M10.5 9.25A5.25 5.25 0 0 1 15.67 13H17a3 3 0 1 1 0 6H7.25A2.75 2.75 0 0 1 6 13.83 4.5 4.5 0 0 1 10.5 9.25Zm-4.75 2.5h1v7h-1v-7Zm-2 1.75h1v5.25h-1V13.5Zm14.5 1.25h1v4h-1v-4Zm-2 0h1v4h-1v-4Zm-2 0h1v4h-1v-4Zm-2 0h1v4h-1v-4Z" fill="currentColor"/></svg>';
+  default:
+    return '<svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M6 5.75A2.75 2.75 0 0 1 8.75 3h6.5A2.75 2.75 0 0 1 18 5.75v12.5A2.75 2.75 0 0 1 15.25 21h-6.5A2.75 2.75 0 0 1 6 18.25V5.75Zm5 3.56v5.38l4.5-2.69L11 9.3Z" fill="currentColor"/></svg>';
+  }
+}
+
+function buildInlineFontCss(message, assetBaseUrl) {
+  const fontFamily = extractAllowedFontFamily(message?.style);
+  if (!fontFamily || !assetBaseUrl) {
+    return '';
+  }
+
+  const fontUrl = `${assetBaseUrl}/fonts/${encodeURIComponent(fontFamily)}.ttf`;
+  return `@font-face{font-family:"${fontFamily}";src:url("${fontUrl}") format("truetype");font-style:normal;font-weight:400;font-display:swap;}`;
+}
+
+function replaceTemplatePlaceholder(html, placeholder, value) {
+  return html.split(placeholder).join(value ?? '');
+}
+
+function escapeJsonForScriptTag(value) {
+  return String(value ?? '')
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029');
 }
 
 async function renderOgImage(res, model) {
@@ -1432,6 +1646,62 @@ function parseMultimedia(value) {
   } catch {
     return null;
   }
+}
+
+function parseHashtagStorageValue(value) {
+  if (Array.isArray(value)) {
+    return value
+      .map((entry) => normalizeHashtagToken(entry))
+      .filter(Boolean);
+  }
+
+  if (typeof value !== 'string') {
+    return [];
+  }
+
+  const raw = value.trim();
+  if (!raw) {
+    return [];
+  }
+
+  if (raw.startsWith('|') && raw.endsWith('|')) {
+    return raw
+      .slice(1, -1)
+      .split('|')
+      .map((entry) => normalizeHashtagToken(entry))
+      .filter(Boolean);
+  }
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      return parsed
+        .map((entry) => normalizeHashtagToken(entry))
+        .filter(Boolean);
+    }
+  } catch {
+    // ignore malformed legacy payload
+  }
+
+  return raw
+    .split(/[\s,;]+/g)
+    .map((entry) => normalizeHashtagToken(entry))
+    .filter(Boolean);
+}
+
+function normalizeHashtagToken(value) {
+  if (value === undefined || value === null) {
+    return '';
+  }
+
+  const normalized = String(value)
+    .trim()
+    .replace(/^#+/, '')
+    .normalize('NFKC')
+    .trim()
+    .toLowerCase();
+
+  return /^[\p{L}\p{N}_]{2,32}$/u.test(normalized) ? normalized : '';
 }
 
 function hasMultimedia(multimedia) {

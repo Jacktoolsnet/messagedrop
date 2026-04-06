@@ -105,6 +105,7 @@
   const locale = resolveLocale();
   const strings = STRINGS[locale];
   const bootstrap = resolveBootstrap();
+  const initialData = resolveInitialData();
   const apiBaseUrl = resolveApiBaseUrl();
   const appBaseUrl = bootstrap.appBaseUrl || resolveAppBaseUrl();
   const assetBaseUrl = bootstrap.assetBaseUrl || resolveAssetBaseUrl();
@@ -138,12 +139,8 @@
   document.documentElement.lang = locale;
   document.title = strings.pageTitle;
   initializeHeroLogo();
-  pageTitle.textContent = strings.heroTitle;
-  pageDescription.textContent = strings.loadingBody;
-  pageDescription.hidden = false;
   openAppLabel.textContent = strings.openApp;
   copyLinkLabel.textContent = strings.copyLink;
-  setStatus(strings.loadState);
   setActionTargets(messageUuid ? `${appBaseUrl}/?publicMessage=${encodeURIComponent(messageUuid)}` : `${appBaseUrl}/`);
   window.addEventListener('pagehide', revokeStickerObjectUrl);
 
@@ -157,7 +154,18 @@
     const appMessageUrl = `${appBaseUrl}/?publicMessage=${encodeURIComponent(messageUuid)}`;
     openAppLink.setAttribute('href', appMessageUrl);
     updateCanonical(resolvePublicMessageUrl(messageUuid));
-    void loadMessage(messageUuid);
+
+    if (initialData.initialMessage) {
+      void renderMessage(initialData.initialMessage);
+    } else if (initialData.initialError) {
+      renderUnavailable(initialData.initialError.title || strings.unavailableTitle, initialData.initialError.body || strings.unavailableBody);
+    } else {
+      pageTitle.textContent = strings.heroTitle;
+      pageDescription.textContent = strings.loadingBody;
+      pageDescription.hidden = false;
+      setStatus(strings.loadState);
+      void loadMessage(messageUuid);
+    }
   } else {
     openAppLink.setAttribute('href', `${appBaseUrl}/`);
     renderUnavailable(strings.missingTitle, strings.missingBody);
@@ -638,6 +646,34 @@
       shareBaseUrl: typeof value.shareBaseUrl === 'string' ? value.shareBaseUrl.trim().replace(/\/+$/, '') : '',
       assetBaseUrl: typeof value.assetBaseUrl === 'string' ? value.assetBaseUrl.trim().replace(/\/+$/, '') : ''
     };
+  }
+
+  function resolveInitialData() {
+    const element = document.getElementById('public-message-initial-data');
+    if (!element) {
+      return {
+        initialMessage: null,
+        initialError: null
+      };
+    }
+
+    try {
+      const parsed = JSON.parse(element.textContent || '{}');
+      return {
+        initialMessage: normalizePublicMessage(parsed?.initialMessage),
+        initialError: parsed?.initialError && typeof parsed.initialError === 'object'
+          ? {
+            title: typeof parsed.initialError.title === 'string' ? parsed.initialError.title.trim() : '',
+            body: typeof parsed.initialError.body === 'string' ? parsed.initialError.body.trim() : ''
+          }
+          : null
+      };
+    } catch {
+      return {
+        initialMessage: null,
+        initialError: null
+      };
+    }
   }
 
   function normalizePublicMessage(rawMessage) {

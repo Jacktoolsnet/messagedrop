@@ -291,6 +291,59 @@ body {
   place-items: center;
 }
 
+.message-embed--summary {
+  min-height: 0;
+}
+
+.message-media-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.95rem 1.05rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  color: var(--text-primary);
+  text-align: left;
+  max-width: min(100%, 34rem);
+}
+
+.message-media-summary-icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.95rem;
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.message-media-summary-icon svg {
+  width: 1.6rem;
+  height: 1.6rem;
+  display: block;
+}
+
+.message-media-summary-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.16rem;
+}
+
+.message-media-summary-label {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.message-media-summary-title {
+  color: var(--text-secondary);
+  line-height: 1.45;
+  word-break: break-word;
+}
+
 .message-embed iframe {
   display: block;
   width: 100%;

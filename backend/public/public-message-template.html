@@ -30,41 +30,41 @@
         </div>
         <div class="hero-brand-copy">
           <p class="eyebrow hero-brand-label">MessageDrop</p>
-          <h1 id="page-title">Loading public message…</h1>
+          <h1 id="page-title">__PUBLIC_MESSAGE_HERO_TITLE__</h1>
         </div>
       </div>
-      <p id="page-description" class="hero-copy">This message is currently loading.</p>
+      <p id="page-description" class="hero-copy" __PUBLIC_MESSAGE_DESCRIPTION_HIDDEN__>__PUBLIC_MESSAGE_DESCRIPTION__</p>
     </section>
 
-    <section id="status-card" class="status-card" aria-live="polite"></section>
+    <section id="status-card" class="status-card" aria-live="polite" __PUBLIC_MESSAGE_STATUS_HIDDEN__>__PUBLIC_MESSAGE_STATUS__</section>
 
-    <article id="message-card" class="message-card" hidden>
+    <article id="message-card" class="message-card__PUBLIC_MESSAGE_CARD_CLASS_SUFFIX__" __PUBLIC_MESSAGE_CARD_HIDDEN__>
       <div class="message-preview">
-        <div id="message-media-shell" class="message-media-shell" hidden>
-          <div id="message-media-frame" class="message-media-frame">
+        <div id="message-media-shell" class="message-media-shell__PUBLIC_MESSAGE_MEDIA_VISIBLE_CLASS__" __PUBLIC_MESSAGE_MEDIA_HIDDEN__>
+          <div id="message-media-frame" class="message-media-frame__PUBLIC_MESSAGE_MEDIA_FRAME_SUFFIX__">
             <img id="message-image" class="message-image" src="" alt="" hidden>
             <img id="message-image-overlay" class="message-image-overlay" src="/assets/images/sticker-protection-overlay.svg" alt="" aria-hidden="true" hidden>
-            <div id="message-embed" class="message-embed" hidden></div>
+            <div id="message-embed" class="message-embed__PUBLIC_MESSAGE_EMBED_CLASS_SUFFIX__" __PUBLIC_MESSAGE_EMBED_HIDDEN__>__PUBLIC_MESSAGE_EMBED_HTML__</div>
           </div>
 
-          <a id="media-attribution-link" class="inline-link media-attribution" href="#" target="_blank" rel="noopener noreferrer" hidden></a>
+          <a id="media-attribution-link" class="inline-link media-attribution" href="__PUBLIC_MESSAGE_ATTRIBUTION_HREF__" target="_blank" rel="noopener noreferrer" __PUBLIC_MESSAGE_ATTRIBUTION_HIDDEN__>__PUBLIC_MESSAGE_ATTRIBUTION__</a>
         </div>
 
-        <div id="message-text-shell" class="message-shell">
-          <p id="message-text" class="message-text"></p>
+        <div id="message-text-shell" class="message-shell" __PUBLIC_MESSAGE_TEXT_HIDDEN__>
+          <p id="message-text" class="message-text"__PUBLIC_MESSAGE_TEXT_STYLE__>__PUBLIC_MESSAGE_TEXT__</p>
         </div>
 
-        <div id="hashtag-list" class="hashtag-chip-list" hidden></div>
+        <div id="hashtag-list" class="hashtag-chip-list" __PUBLIC_MESSAGE_HASHTAGS_HIDDEN__>__PUBLIC_MESSAGE_HASHTAGS__</div>
 
         <div class="message-actions">
           <div class="message-link-actions">
-            <a id="open-app-link" class="button button-primary button-inline button-with-icon" href="/">
+            <a id="open-app-link" class="button button-primary button-inline button-with-icon" href="__PUBLIC_MESSAGE_OPEN_APP_HREF__">
               <span class="button-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
                   <path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42 9.3-9.29H14V3Zm5 16V12h2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5c0-1.1.9-2 2-2h7v2H5v14h14Z" fill="currentColor"/>
                 </svg>
               </span>
-              <span id="open-app-label">Open in MessageDrop</span>
+              <span id="open-app-label">__PUBLIC_MESSAGE_OPEN_APP_LABEL__</span>
             </a>
             <button id="copy-link-button" class="button button-secondary button-inline button-with-icon" type="button">
               <span class="button-icon" aria-hidden="true">
@@ -72,7 +72,7 @@
                   <path d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z" fill="currentColor"/>
                 </svg>
               </span>
-              <span id="copy-link-label">Copy link</span>
+              <span id="copy-link-label">__PUBLIC_MESSAGE_COPY_LINK_LABEL__</span>
             </button>
           </div>
         </div>
@@ -80,6 +80,7 @@
     </article>
   </main>
 
+  <script id="public-message-initial-data" type="application/json">__PUBLIC_MESSAGE_INITIAL_DATA__</script>
   <script src="/site-assets/public-message.js" defer></script>
 </body>
 </html>
