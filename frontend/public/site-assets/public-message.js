@@ -41,6 +41,7 @@
   const openAppLabel = document.getElementById('open-app-label');
   const copyLinkButton = document.getElementById('copy-link-button');
   const copyLinkLabel = document.getElementById('copy-link-label');
+  const messageText = document.getElementById('message-text');
 
   const initialStatus = {
     text: typeof statusCard?.textContent === 'string' ? statusCard.textContent : '',
@@ -49,6 +50,7 @@
   };
 
   initializeHeroLogo();
+  void ensureMessageFontReady();
   configureActionTargets();
   configureCopyButton();
 
@@ -141,6 +143,31 @@
     }
   }
 
+  async function ensureMessageFontReady() {
+    const fontFamily = typeof bootstrap.fontFamily === 'string' ? bootstrap.fontFamily.trim() : '';
+    if (!fontFamily || !(messageText instanceof HTMLElement)) {
+      return;
+    }
+
+    if (!document.fonts || typeof document.fonts.load !== 'function') {
+      return;
+    }
+
+    const previousVisibility = messageText.style.visibility;
+    messageText.style.visibility = 'hidden';
+
+    try {
+      await Promise.race([
+        document.fonts.load(`1em "${fontFamily}"`),
+        new Promise((resolve) => window.setTimeout(resolve, 1800))
+      ]);
+    } catch {
+      // fall back to showing text even if the load hint fails
+    } finally {
+      messageText.style.visibility = previousVisibility;
+    }
+  }
+
   function resolveLocale() {
     const preferences = Array.isArray(navigator.languages) && navigator.languages.length
       ? navigator.languages
@@ -226,7 +253,8 @@
       messageUuid: typeof value.messageUuid === 'string' ? value.messageUuid.trim() : '',
       appBaseUrl: typeof value.appBaseUrl === 'string' ? value.appBaseUrl.trim().replace(/\/+$/, '') : '',
       shareBaseUrl: typeof value.shareBaseUrl === 'string' ? value.shareBaseUrl.trim().replace(/\/+$/, '') : '',
-      assetBaseUrl: typeof value.assetBaseUrl === 'string' ? value.assetBaseUrl.trim().replace(/\/+$/, '') : ''
+      assetBaseUrl: typeof value.assetBaseUrl === 'string' ? value.assetBaseUrl.trim().replace(/\/+$/, '') : '',
+      fontFamily: typeof value.fontFamily === 'string' ? value.fontFamily.trim() : ''
     };
   }
 

@@ -83,6 +83,7 @@ const STRINGS = {
 
 let publicMessageTemplateCache = null;
 const embeddedFontCssCache = new Map();
+let supportedFrontendFontsCache = null;
 let appIconDataUriCache;
 let resvgConstructorCache;
 let resvgLoadAttempted = false;
@@ -106,6 +107,13 @@ router.get('/assets/icon-192x192.png', function (req, res, next) {
 router.get('/assets/fonts/:fontFile', function (req, res, next) {
   const fontFile = typeof req.params?.fontFile === 'string' ? req.params.fontFile.trim() : '';
   if (!/^[A-Za-z0-9_-]+\.ttf$/i.test(fontFile)) {
+    res.status(404).end();
+    return;
+  }
+
+  const requestedFamily = path.basename(fontFile, path.extname(fontFile));
+  const resolvedFamily = resolveSupportedFontFamily(requestedFamily);
+  if (!resolvedFamily || `${resolvedFamily}.ttf` !== fontFile) {
     res.status(404).end();
     return;
   }
@@ -286,7 +294,8 @@ function renderShareShell(res, model) {
     messageUuid: model.messageUuid || '',
     appBaseUrl,
     shareBaseUrl: publicMessageBaseUrl,
-    assetBaseUrl
+    assetBaseUrl,
+    fontFamily: normalizedMessage?.fontFamily || ''
   };
   const html = buildShareHtml({
     locale: model.locale,
@@ -625,12 +634,18 @@ function resolveWhatIsPageUrl(appBaseUrl, locale) {
 
 function buildInlineFontCss(message, assetBaseUrl) {
   const fontFamily = extractAllowedFontFamily(message?.fontFamily || message?.style);
-  if (!fontFamily || !assetBaseUrl) {
+  if (!fontFamily) {
     return '';
   }
 
-  const fontUrl = `${assetBaseUrl}/fonts/${encodeURIComponent(fontFamily)}.ttf`;
-  return `@font-face{font-family:"${fontFamily}";src:url("${fontUrl}") format("truetype");font-style:normal;font-weight:400;font-display:swap;}`;
+  const externalFontUrl = assetBaseUrl
+    ? `${assetBaseUrl}/fonts/${encodeURIComponent(fontFamily)}.ttf`
+    : '';
+
+  return [
+    loadEmbeddedFontCss(fontFamily, { fontDisplay: 'block', externalUrl: externalFontUrl }),
+    `#message-text{font-family:"${escapeCssString(fontFamily)}",Roboto,"Helvetica Neue",Arial,sans-serif!important;}`
+  ].join('');
 }
 
 function replaceTemplatePlaceholder(html, placeholder, value) {
@@ -1423,26 +1438,83 @@ async function resolveOgMediaVisual(multimedia, strings) {
   };
 }
 
-function loadEmbeddedFontCss(fontFamily) {
+function loadEmbeddedFontCss(fontFamily, { fontDisplay = 'swap', externalUrl = '' } = {}) {
   if (!fontFamily) {
     return '';
   }
 
-  if (embeddedFontCssCache.has(fontFamily)) {
-    return embeddedFontCssCache.get(fontFamily) || '';
+  const cacheKey = `${fontFamily}::${fontDisplay}::${externalUrl}`;
+  if (embeddedFontCssCache.has(cacheKey)) {
+    return embeddedFontCssCache.get(cacheKey) || '';
   }
 
   try {
     const fontPath = getFrontendPath('src', 'assets', 'fonts', `${fontFamily}.ttf`);
     const fontBuffer = fs.readFileSync(fontPath);
     const dataUri = `data:font/ttf;base64,${fontBuffer.toString('base64')}`;
-    const css = `@font-face{font-family:"${fontFamily}";src:url("${dataUri}") format("truetype");font-style:normal;font-weight:400;font-display:swap;}`;
-    embeddedFontCssCache.set(fontFamily, css);
+    const srcEntries = [
+      `local("${escapeCssString(fontFamily)}")`
+    ];
+    if (externalUrl) {
+      srcEntries.push(`url("${externalUrl}") format("truetype")`);
+    }
+    srcEntries.push(`url("${dataUri}") format("truetype")`);
+    const css = `@font-face{font-family:"${fontFamily}";src:${srcEntries.join(',')};font-style:normal;font-weight:400;font-display:${escapeCssIdentifier(fontDisplay)};}`;
+    embeddedFontCssCache.set(cacheKey, css);
     return css;
   } catch {
-    embeddedFontCssCache.set(fontFamily, '');
+    embeddedFontCssCache.set(cacheKey, '');
     return '';
   }
+}
+
+function getSupportedFrontendFonts() {
+  if (supportedFrontendFontsCache) {
+    return supportedFrontendFontsCache;
+  }
+
+  const supportedFonts = new Map();
+
+  try {
+    const fontsDir = getFrontendPath('src', 'assets', 'fonts');
+    const entries = fs.readdirSync(fontsDir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (!entry?.isFile?.() || !/\.ttf$/i.test(entry.name)) {
+        continue;
+      }
+
+      const family = path.basename(entry.name, path.extname(entry.name)).trim();
+      const normalized = normalizeFontToken(family);
+      if (!family || !normalized) {
+        continue;
+      }
+
+      supportedFonts.set(normalized, family);
+    }
+  } catch {
+    // Ignore directory read failures and fall back to no custom-font support.
+  }
+
+  supportedFrontendFontsCache = supportedFonts;
+  return supportedFrontendFontsCache;
+}
+
+function normalizeFontToken(value) {
+  return String(value ?? '')
+    .trim()
+    .replace(/^['"]+|['"]+$/g, '')
+    .replace(/\s*!important\s*$/i, '')
+    .replace(/[^A-Za-z0-9]+/g, '')
+    .toLowerCase();
+}
+
+function resolveSupportedFontFamily(value) {
+  const normalizedToken = normalizeFontToken(value);
+  if (!normalizedToken) {
+    return '';
+  }
+
+  return getSupportedFrontendFonts().get(normalizedToken) || '';
 }
 
 function loadAppIconDataUri() {
@@ -1468,8 +1540,9 @@ function extractAllowedFontFamily(styleValue) {
 
   const trimmedValue = styleValue.trim();
   const directFamily = trimmedValue.replace(/^['"]+|['"]+$/g, '');
-  if (/^[A-Za-z0-9]+$/.test(directFamily)) {
-    return directFamily;
+  const directResolvedFamily = resolveSupportedFontFamily(directFamily);
+  if (directResolvedFamily) {
+    return directResolvedFamily;
   }
 
   const match = trimmedValue.match(/font-family\s*:\s*([^;]+)/i);
@@ -1480,9 +1553,23 @@ function extractAllowedFontFamily(styleValue) {
   const rawFamily = match[1]
     .split(',')[0]
     .trim()
+    .replace(/\s*!important\s*$/i, '')
     .replace(/^['"]+|['"]+$/g, '');
 
-  return /^[A-Za-z0-9]+$/.test(rawFamily) ? rawFamily : '';
+  return resolveSupportedFontFamily(rawFamily);
+}
+
+function escapeCssIdentifier(value) {
+  return String(value ?? '')
+    .trim()
+    .replace(/[^A-Za-z-]+/g, '')
+    .toLowerCase() || 'swap';
+}
+
+function escapeCssString(value) {
+  return String(value ?? '')
+    .replace(/\\/g, '\\\\')
+    .replace(/"/g, '\\"');
 }
 
 function normalizeMediaTitle(multimedia) {
