@@ -1103,6 +1103,7 @@
     },
     "restore": {
       "title": "Restauration",
+      "pinEnterHint": "Veuillez saisir le PIN de sauvegarde.",
       "versionUnsupported": "Cette version de sauvegarde n'est pas prise en charge.",
       "missingData": "Le fichier de sauvegarde ne contient pas toutes les données.",
       "completed": "Restauration terminée. Veuillez vous connecter avec votre PIN.",

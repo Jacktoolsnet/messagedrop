@@ -1103,6 +1103,7 @@
     },
     "restore": {
       "title": "Restaurar",
+      "pinEnterHint": "Introduce el PIN de la copia de seguridad.",
       "versionUnsupported": "Esta versión de copia de seguridad no es compatible.",
       "missingData": "Faltan datos en el archivo de copia de seguridad.",
       "completed": "Restauración completada. Por favor inicia sesión con tu PIN.",

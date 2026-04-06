@@ -1,10 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, HostListener, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { TranslocoPipe } from '@jsverse/transloco';
+
+interface CheckPinDialogData {
+  enterHintI18nKey?: string;
+}
 
 @Component({
   selector: 'app-check-pin',
@@ -24,8 +28,12 @@ export class CheckPinComponent {
   pinLength = 6;
   pinDisplay: string[] = ['', '', '', '', '', ''];
 
-  private readonly resetDialog = inject(MatDialog);
+  private readonly dialogData = inject<CheckPinDialogData | null>(MAT_DIALOG_DATA, { optional: true });
   private readonly dialogRef = inject(MatDialogRef<CheckPinComponent>);
+
+  get enterHintI18nKey(): string {
+    return this.dialogData?.enterHintI18nKey ?? 'common.pin.enterHint';
+  }
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardInput(event: KeyboardEvent): void {

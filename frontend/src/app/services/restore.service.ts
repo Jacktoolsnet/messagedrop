@@ -246,7 +246,9 @@ export class RestoreService {
     const dialogRef = this.dialog.open(CheckPinComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: {},
+      data: {
+        enterHintI18nKey: 'common.restore.pinEnterHint'
+      },
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
       disableClose: false,

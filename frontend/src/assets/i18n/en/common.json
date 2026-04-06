@@ -1103,6 +1103,7 @@
     },
     "restore": {
       "title": "Restore",
+      "pinEnterHint": "Please enter the backup PIN.",
       "versionUnsupported": "This backup version is not supported.",
       "missingData": "Backup file is missing data.",
       "completed": "Restore completed. Please log in with your PIN.",

@@ -1103,6 +1103,7 @@
     },
     "restore": {
       "title": "Wiederherstellen",
+      "pinEnterHint": "Bitte Backup Pin eingeben",
       "versionUnsupported": "Diese Backup-Version wird nicht unterstützt.",
       "missingData": "Backup-Datei enthält keine vollständigen Daten.",
       "completed": "Wiederherstellung abgeschlossen. Bitte mit deiner PIN anmelden.",
