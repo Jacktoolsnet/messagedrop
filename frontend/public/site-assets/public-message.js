@@ -53,6 +53,7 @@
   void ensureMessageFontReady();
   configureActionTargets();
   configureCopyButton();
+  scheduleAutoOpenInApp();
 
   function configureActionTargets() {
     if (openAppLabel) {
@@ -87,6 +88,23 @@
       showStatus(copied ? strings.copySuccess : strings.copyFailed, !copied);
       window.setTimeout(restoreInitialStatus, 2400);
     });
+  }
+
+  function scheduleAutoOpenInApp() {
+    if (!shouldAutoOpenInApp()) {
+      return;
+    }
+
+    const href = messageUuid
+      ? `${appBaseUrl}/?publicMessage=${encodeURIComponent(messageUuid)}`
+      : `${appBaseUrl}/`;
+
+    window.setTimeout(function () {
+      if (window.location.href === href) {
+        return;
+      }
+      window.location.replace(href);
+    }, 80);
   }
 
   function showStatus(text, isError) {
@@ -189,6 +207,9 @@
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
       return 'http://localhost:4200';
     }
+    if (isQStageHostname(hostname)) {
+      return 'https://q.frontend.messagedrop.de';
+    }
     return 'https://messagedrop.de';
   }
 
@@ -214,6 +235,23 @@
     return 'https://messagedrop.de/m';
   }
 
+  function isQStageHostname(hostname) {
+    const normalized = String(hostname || '').trim().toLowerCase();
+    if (!normalized) {
+      return false;
+    }
+
+    return (
+      normalized === 'q.frontend.messagedrop.de'
+      || normalized.startsWith('q.')
+      || normalized.includes('.q.')
+      || normalized.includes('-q.')
+      || normalized.includes('.q-')
+      || normalized.includes('q-stage')
+      || normalized.includes('staging')
+    );
+  }
+
   function getMessageUuid() {
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
@@ -228,6 +266,28 @@
     }
 
     return '';
+  }
+
+  function shouldAutoOpenInApp() {
+    const pathname = String(window.location.pathname || '');
+    if (!/^\/m(?:\/|$)/i.test(pathname)) {
+      return false;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const previewFlag = String(
+      params.get('preview')
+      || params.get('render')
+      || params.get('stay')
+      || params.get('noRedirect')
+      || ''
+    ).trim().toLowerCase();
+
+    if (previewFlag === '1' || previewFlag === 'true' || previewFlag === 'yes') {
+      return false;
+    }
+
+    return Boolean(appBaseUrl);
   }
 
   function resolveBootstrap() {

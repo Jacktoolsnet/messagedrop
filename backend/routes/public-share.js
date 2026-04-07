@@ -10,14 +10,17 @@ const OG_IMAGE_WIDTH = 1200;
 const OG_IMAGE_HEIGHT = 630;
 const OG_IMAGE_TYPE_PNG = 'image/png';
 const OG_IMAGE_TYPE_SVG = 'image/svg+xml';
+const LOCAL_PUBLIC_APP_URL = 'http://localhost:4200';
+const PRODUCTION_PUBLIC_APP_URL = 'https://messagedrop.de';
+const Q_STAGE_PUBLIC_APP_URL = 'https://q.frontend.messagedrop.de';
 const STRINGS = {
   de: {
     heroTitle: 'Öffentliche Nachricht',
     unavailableTitle: 'Nachricht nicht verfügbar',
     unavailableDescription: 'Diese öffentliche Nachricht ist nicht verfügbar.',
-    pageTitle: 'MessageDrop | Öffentliche Nachricht',
-    pageDescription: 'Schau dir diese Nachricht auf MessageDrop an.',
-    mediaOnlyDescription: 'Schau dir diese Nachricht auf MessageDrop an.',
+    pageTitle: 'Schau dir diese Nachricht auf MessageDrop an',
+    pageDescription: 'Öffne diese Nachricht direkt in MessageDrop.',
+    mediaOnlyDescription: 'Öffne diese Nachricht direkt in MessageDrop.',
     previewImageAlt: 'Vorschaubild einer öffentlichen Nachricht auf MessageDrop',
     openApp: 'In MessageDrop öffnen',
     copyLink: 'Link kopieren',
@@ -32,9 +35,9 @@ const STRINGS = {
     heroTitle: 'Public message',
     unavailableTitle: 'Message unavailable',
     unavailableDescription: 'This public message is not available.',
-    pageTitle: 'MessageDrop | Public message',
-    pageDescription: 'Take a look at this message on MessageDrop.',
-    mediaOnlyDescription: 'Take a look at this message on MessageDrop.',
+    pageTitle: 'Take a look at this message on MessageDrop',
+    pageDescription: 'Open this message directly in MessageDrop.',
+    mediaOnlyDescription: 'Open this message directly in MessageDrop.',
     previewImageAlt: 'Preview image for a public message on MessageDrop',
     openApp: 'Open in MessageDrop',
     copyLink: 'Copy link',
@@ -49,9 +52,9 @@ const STRINGS = {
     heroTitle: 'Mensaje público',
     unavailableTitle: 'Mensaje no disponible',
     unavailableDescription: 'Este mensaje público no está disponible.',
-    pageTitle: 'MessageDrop | Mensaje público',
-    pageDescription: 'Mira este mensaje en MessageDrop.',
-    mediaOnlyDescription: 'Mira este mensaje en MessageDrop.',
+    pageTitle: 'Mira este mensaje en MessageDrop',
+    pageDescription: 'Abre este mensaje directamente en MessageDrop.',
+    mediaOnlyDescription: 'Abre este mensaje directamente en MessageDrop.',
     previewImageAlt: 'Imagen de vista previa de un mensaje público en MessageDrop',
     openApp: 'Abrir en MessageDrop',
     copyLink: 'Copiar enlace',
@@ -66,9 +69,9 @@ const STRINGS = {
     heroTitle: 'Message public',
     unavailableTitle: 'Message indisponible',
     unavailableDescription: 'Ce message public n’est pas disponible.',
-    pageTitle: 'MessageDrop | Message public',
-    pageDescription: 'Regarde ce message sur MessageDrop.',
-    mediaOnlyDescription: 'Regarde ce message sur MessageDrop.',
+    pageTitle: 'Regarde ce message sur MessageDrop',
+    pageDescription: 'Ouvre ce message directement dans MessageDrop.',
+    mediaOnlyDescription: 'Ouvre ce message directement dans MessageDrop.',
     previewImageAlt: 'Image d’aperçu d’un message public sur MessageDrop',
     openApp: 'Ouvrir dans MessageDrop',
     copyLink: 'Copier le lien',
@@ -1812,17 +1815,26 @@ function isPreviewBotRequest(req) {
 }
 
 function resolvePublicAppBaseUrl(req) {
+  const requestStage = resolvePublicRequestStage(req);
+  const stageConfigured = resolveStageSpecificPublicAppUrl(requestStage);
+  if (stageConfigured) {
+    return stageConfigured;
+  }
+
   const configured = normalizeAbsoluteUrl(process.env.PUBLIC_APP_URL || process.env.APP_URL);
-  if (configured) {
+  if (requestStage !== 'q' && configured) {
     return configured;
   }
 
-  const host = String(req.hostname || req.get?.('host') || '').toLowerCase();
-  if (host === 'localhost' || host === '127.0.0.1' || host.startsWith('localhost:') || host.startsWith('127.0.0.1:')) {
-    return 'http://localhost:4200';
+  if (requestStage === 'local') {
+    return LOCAL_PUBLIC_APP_URL;
   }
 
-  return 'https://messagedrop.de';
+  if (requestStage === 'q') {
+    return Q_STAGE_PUBLIC_APP_URL;
+  }
+
+  return configured || PRODUCTION_PUBLIC_APP_URL;
 }
 
 function resolvePublicMessageBaseUrl(req) {
@@ -1856,6 +1868,104 @@ function normalizeAbsoluteUrl(value) {
   }
 
   return '';
+}
+
+function resolveStageSpecificPublicAppUrl(stage) {
+  if (stage === 'q') {
+    return normalizeAbsoluteUrl(
+      process.env.Q_PUBLIC_APP_URL
+      || process.env.PUBLIC_APP_URL_Q
+      || process.env.PUBLIC_APP_URL_Q_STAGE
+      || process.env.Q_FRONTEND_URL
+      || process.env.FRONTEND_URL_Q
+    );
+  }
+
+  if (stage === 'local') {
+    return normalizeAbsoluteUrl(process.env.LOCAL_PUBLIC_APP_URL);
+  }
+
+  return '';
+}
+
+function resolvePublicRequestStage(req) {
+  const configuredStage = normalizeStageName(
+    process.env.PUBLIC_STAGE
+    || process.env.APP_STAGE
+    || process.env.DEPLOYMENT_STAGE
+    || process.env.STAGE
+  );
+  if (configuredStage === 'q' || configuredStage === 'local') {
+    return configuredStage;
+  }
+
+  const host = getRequestHostname(req);
+  if (!host) {
+    return '';
+  }
+
+  if (host === 'localhost' || host === '127.0.0.1') {
+    return 'local';
+  }
+
+  if (isQStageHostname(host)) {
+    return 'q';
+  }
+
+  return '';
+}
+
+function getRequestHostname(req) {
+  const forwardedHost = typeof req.get === 'function'
+    ? req.get('x-forwarded-host')
+    : req?.headers?.['x-forwarded-host'];
+  const hostHeader = forwardedHost || (typeof req.get === 'function' ? req.get('host') : req?.headers?.host) || req?.hostname || '';
+  return String(hostHeader || '')
+    .split(',')[0]
+    .trim()
+    .toLowerCase()
+    .replace(/:\d+$/, '');
+}
+
+function normalizeStageName(value) {
+  const normalized = String(value || '').trim().toLowerCase();
+  if (!normalized) {
+    return '';
+  }
+
+  if (normalized === 'local' || normalized === 'localhost' || normalized === 'development' || normalized === 'dev') {
+    return 'local';
+  }
+
+  if (
+    normalized === 'q'
+    || normalized === 'qa'
+    || normalized === 'test'
+    || normalized === 'stage'
+    || normalized === 'staging'
+    || normalized === 'q-stage'
+  ) {
+    return 'q';
+  }
+
+  return normalized;
+}
+
+function isQStageHostname(hostname) {
+  const normalized = String(hostname || '').trim().toLowerCase();
+  if (!normalized) {
+    return false;
+  }
+
+  return (
+    normalized === 'q.frontend.messagedrop.de'
+    || normalized.startsWith('q.')
+    || normalized.includes('.q.')
+    || normalized.includes('-q.')
+    || normalized.includes('.q-')
+    || normalized.includes('q-stage')
+    || normalized.includes('staging')
+  );
 }
 
 function parseMultimedia(value) {
