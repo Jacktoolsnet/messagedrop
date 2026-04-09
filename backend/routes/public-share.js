@@ -977,8 +977,10 @@ function isPreviewBotRequest(req) {
   }
 
   return [
+    'whatsapp',
     'facebookexternalhit',
     'facebot',
+    'meta-externalagent',
     'linkedinbot',
     'slackbot',
     'discordbot',
