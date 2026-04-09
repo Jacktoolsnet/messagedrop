@@ -53,6 +53,7 @@
   void ensureMessageFontReady();
   configureActionTargets();
   configureCopyButton();
+  scheduleAutoOpenInApp();
 
   function configureActionTargets() {
     if (openAppLabel) {
@@ -87,6 +88,23 @@
       showStatus(copied ? strings.copySuccess : strings.copyFailed, !copied);
       window.setTimeout(restoreInitialStatus, 2400);
     });
+  }
+
+  function scheduleAutoOpenInApp() {
+    if (!shouldAutoOpenInApp()) {
+      return;
+    }
+
+    const href = messageUuid
+      ? `${appBaseUrl}/?publicMessage=${encodeURIComponent(messageUuid)}`
+      : `${appBaseUrl}/`;
+
+    window.setTimeout(function () {
+      if (window.location.href === href) {
+        return;
+      }
+      window.location.replace(href);
+    }, 80);
   }
 
   function showStatus(text, isError) {
@@ -248,6 +266,28 @@
     }
 
     return '';
+  }
+
+  function shouldAutoOpenInApp() {
+    const pathname = String(window.location.pathname || '');
+    if (!/^\/p(?:\/|$)/i.test(pathname)) {
+      return false;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const previewFlag = String(
+      params.get('preview')
+      || params.get('render')
+      || params.get('stay')
+      || params.get('noRedirect')
+      || ''
+    ).trim().toLowerCase();
+
+    if (previewFlag === '1' || previewFlag === 'true' || previewFlag === 'yes') {
+      return false;
+    }
+
+    return Boolean(appBaseUrl && messageUuid);
   }
 
   function resolveBootstrap() {

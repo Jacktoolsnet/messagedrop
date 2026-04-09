@@ -20,7 +20,7 @@ const STRINGS = {
     heroTitle: 'Öffentliche Nachricht',
     unavailableTitle: 'Nachricht nicht verfügbar',
     unavailableDescription: 'Diese öffentliche Nachricht ist nicht verfügbar.',
-    pageTitle: 'Schau dir diese Nachricht auf MessageDrop an',
+    pageTitle: 'MessageDrop',
     pageDescription: 'Öffne diese Nachricht direkt in MessageDrop.',
     mediaOnlyDescription: 'Öffne diese Nachricht direkt in MessageDrop.',
     previewImageAlt: 'Vorschaubild einer öffentlichen Nachricht auf MessageDrop',
@@ -37,7 +37,7 @@ const STRINGS = {
     heroTitle: 'Public message',
     unavailableTitle: 'Message unavailable',
     unavailableDescription: 'This public message is not available.',
-    pageTitle: 'Take a look at this message on MessageDrop',
+    pageTitle: 'MessageDrop',
     pageDescription: 'Open this message directly in MessageDrop.',
     mediaOnlyDescription: 'Open this message directly in MessageDrop.',
     previewImageAlt: 'Preview image for a public message on MessageDrop',
@@ -54,7 +54,7 @@ const STRINGS = {
     heroTitle: 'Mensaje público',
     unavailableTitle: 'Mensaje no disponible',
     unavailableDescription: 'Este mensaje público no está disponible.',
-    pageTitle: 'Mira este mensaje en MessageDrop',
+    pageTitle: 'MessageDrop',
     pageDescription: 'Abre este mensaje directamente en MessageDrop.',
     mediaOnlyDescription: 'Abre este mensaje directamente en MessageDrop.',
     previewImageAlt: 'Imagen de vista previa de un mensaje público en MessageDrop',
@@ -71,7 +71,7 @@ const STRINGS = {
     heroTitle: 'Message public',
     unavailableTitle: 'Message indisponible',
     unavailableDescription: 'Ce message public n’est pas disponible.',
-    pageTitle: 'Regarde ce message sur MessageDrop',
+    pageTitle: 'MessageDrop',
     pageDescription: 'Ouvre ce message directement dans MessageDrop.',
     mediaOnlyDescription: 'Ouvre ce message directement dans MessageDrop.',
     previewImageAlt: 'Image d’aperçu d’un message public sur MessageDrop',
@@ -188,12 +188,9 @@ function buildPublicShareMeta(message, strings) {
   const normalizedMessage = normalizePublicMessage(message);
   const messageText = typeof normalizedMessage?.message === 'string' ? normalizedMessage.message.trim() : '';
   const mediaTitle = normalizeMediaTitle(normalizedMessage?.multimedia);
-  const titleSource = messageText || mediaTitle;
 
   return {
-    title: titleSource
-      ? `MessageDrop | ${truncate(singleLine(titleSource), 72)}`
-      : strings.pageTitle,
+    title: strings.pageTitle,
     description: buildDescription(messageText)
       || buildDescription(mediaTitle)
       || (hasMultimedia(normalizedMessage?.multimedia) ? strings.mediaOnlyDescription : strings.pageDescription)
