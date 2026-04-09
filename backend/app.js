@@ -537,7 +537,7 @@ app.use('/nominatim', nominatimLimit, nominatim);
 app.use('/viator', viatorLimit, viator);
 app.use('/openai', openAiLimit, openAi);
 app.use('/place', placeLimit, place);
-app.use('/m', basicLimit, publicShare);
+app.use('/p', basicLimit, publicShare);
 app.use('/tenor', tenorLimit, tenor);
 app.use('/stickers', stickerLimit, sticker);
 app.use('/unsplash', unsplashLimit, unsplash);

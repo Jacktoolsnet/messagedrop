@@ -24,7 +24,7 @@ export class PublicMessageShareService {
 
   buildAppMessageUrl(messageUuid: string): string {
     const trimmedUuid = typeof messageUuid === 'string' ? messageUuid.trim() : '';
-    return `${environment.appUrl}/?publicMessage=${encodeURIComponent(trimmedUuid)}`;
+    return `${this.resolveAppBaseUrl()}/?publicMessage=${encodeURIComponent(trimmedUuid)}`;
   }
 
   async share(message: Pick<Message, 'uuid' | 'status' | 'message' | 'translatedMessage'>): Promise<void> {
@@ -108,15 +108,34 @@ export class PublicMessageShareService {
   }
 
   private resolvePublicShareBaseUrl(): string {
-    const configured = typeof environment.publicShareUrl === 'string'
-      ? environment.publicShareUrl.trim().replace(/\/+$/, '')
-      : '';
+    const browserOrigin = this.resolveBrowserOrigin();
+    if (browserOrigin) {
+      return `${browserOrigin}/p`;
+    }
 
-    if (configured) {
-      return configured;
+    const appBaseUrl = this.resolveAppBaseUrl();
+    if (appBaseUrl) {
+      return `${appBaseUrl}/p`;
     }
 
     const apiBaseUrl = String(environment.apiUrl || '').trim().replace(/\/+$/, '');
-    return apiBaseUrl ? `${apiBaseUrl}/m` : '/m';
+    return apiBaseUrl ? `${apiBaseUrl}/p` : '/p';
+  }
+
+  private resolveAppBaseUrl(): string {
+    const browserOrigin = this.resolveBrowserOrigin();
+    if (browserOrigin) {
+      return browserOrigin;
+    }
+
+    return String(environment.appUrl || '').trim().replace(/\/+$/, '');
+  }
+
+  private resolveBrowserOrigin(): string {
+    if (typeof window === 'undefined' || !window.location?.origin) {
+      return '';
+    }
+
+    return String(window.location.origin).trim().replace(/\/+$/, '');
   }
 }

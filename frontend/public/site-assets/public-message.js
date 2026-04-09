@@ -53,7 +53,6 @@
   void ensureMessageFontReady();
   configureActionTargets();
   configureCopyButton();
-  scheduleAutoOpenInApp();
 
   function configureActionTargets() {
     if (openAppLabel) {
@@ -88,23 +87,6 @@
       showStatus(copied ? strings.copySuccess : strings.copyFailed, !copied);
       window.setTimeout(restoreInitialStatus, 2400);
     });
-  }
-
-  function scheduleAutoOpenInApp() {
-    if (!shouldAutoOpenInApp()) {
-      return;
-    }
-
-    const href = messageUuid
-      ? `${appBaseUrl}/?publicMessage=${encodeURIComponent(messageUuid)}`
-      : `${appBaseUrl}/`;
-
-    window.setTimeout(function () {
-      if (window.location.href === href) {
-        return;
-      }
-      window.location.replace(href);
-    }, 80);
   }
 
   function showStatus(text, isError) {
@@ -215,8 +197,8 @@
 
   function resolveAssetBaseUrl() {
     const pathname = String(window.location.pathname || '');
-    if (/^\/m(?:\/|$)/i.test(pathname)) {
-      return `${window.location.origin}/m/assets`;
+    if (/^\/p(?:\/|$)/i.test(pathname)) {
+      return `${window.location.origin}/p/assets`;
     }
     return `${window.location.origin}/assets`;
   }
@@ -224,15 +206,15 @@
   function resolvePublicMessageBaseUrl() {
     const pathname = String(window.location.pathname || '');
     const hostname = window.location.hostname;
-    if (/^\/m(?:\/|$)/i.test(pathname)) {
-      return `${window.location.origin}/m`;
+    if (/^\/p(?:\/|$)/i.test(pathname)) {
+      return `${window.location.origin}/p`;
     }
 
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
-      return 'http://localhost:3000/m';
+      return 'http://localhost:3000/p';
     }
 
-    return 'https://messagedrop.de/m';
+    return `${resolveAppBaseUrl()}/p`;
   }
 
   function isQStageHostname(hostname) {
@@ -260,34 +242,12 @@
     }
 
     const pathname = String(window.location.pathname || '');
-    const publicRouteMatch = pathname.match(/\/m\/([^/?#]+)/i);
+    const publicRouteMatch = pathname.match(/\/p\/([^/?#]+)/i);
     if (publicRouteMatch?.[1]) {
       return decodeURIComponent(publicRouteMatch[1]);
     }
 
     return '';
-  }
-
-  function shouldAutoOpenInApp() {
-    const pathname = String(window.location.pathname || '');
-    if (!/^\/m(?:\/|$)/i.test(pathname)) {
-      return false;
-    }
-
-    const params = new URLSearchParams(window.location.search);
-    const previewFlag = String(
-      params.get('preview')
-      || params.get('render')
-      || params.get('stay')
-      || params.get('noRedirect')
-      || ''
-    ).trim().toLowerCase();
-
-    if (previewFlag === '1' || previewFlag === 'true' || previewFlag === 'yes') {
-      return false;
-    }
-
-    return Boolean(appBaseUrl);
   }
 
   function resolveBootstrap() {
