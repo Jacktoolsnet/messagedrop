@@ -31,7 +31,13 @@ const STRINGS = {
     moreInfo: 'Mehr Infos',
     stickerLabel: 'Sticker',
     imageLabel: 'Bild',
-    mediaLabel: 'Medien'
+    mediaLabel: 'Medien',
+    youtubeVideoLabel: 'YouTube-Video',
+    tenorGifLabel: 'Tenor-GIF',
+    pinterestPinLabel: 'Pinterest-Pin',
+    tiktokVideoLabel: 'TikTok-Video',
+    spotifyLabel: 'Spotify',
+    soundcloudLabel: 'SoundCloud'
   },
   en: {
     heroTitle: 'Public message',
@@ -48,7 +54,13 @@ const STRINGS = {
     moreInfo: 'More info',
     stickerLabel: 'Sticker',
     imageLabel: 'Image',
-    mediaLabel: 'Media'
+    mediaLabel: 'Media',
+    youtubeVideoLabel: 'YouTube video',
+    tenorGifLabel: 'Tenor GIF',
+    pinterestPinLabel: 'Pinterest pin',
+    tiktokVideoLabel: 'TikTok video',
+    spotifyLabel: 'Spotify',
+    soundcloudLabel: 'SoundCloud'
   },
   es: {
     heroTitle: 'Mensaje público',
@@ -65,7 +77,13 @@ const STRINGS = {
     moreInfo: 'Más información',
     stickerLabel: 'Sticker',
     imageLabel: 'Imagen',
-    mediaLabel: 'Contenido multimedia'
+    mediaLabel: 'Contenido multimedia',
+    youtubeVideoLabel: 'Vídeo de YouTube',
+    tenorGifLabel: 'GIF de Tenor',
+    pinterestPinLabel: 'Pin de Pinterest',
+    tiktokVideoLabel: 'Vídeo de TikTok',
+    spotifyLabel: 'Spotify',
+    soundcloudLabel: 'SoundCloud'
   },
   fr: {
     heroTitle: 'Message public',
@@ -82,7 +100,13 @@ const STRINGS = {
     moreInfo: 'Plus d’informations',
     stickerLabel: 'Sticker',
     imageLabel: 'Image',
-    mediaLabel: 'Médias'
+    mediaLabel: 'Médias',
+    youtubeVideoLabel: 'Vidéo YouTube',
+    tenorGifLabel: 'GIF Tenor',
+    pinterestPinLabel: 'Épingle Pinterest',
+    tiktokVideoLabel: 'Vidéo TikTok',
+    spotifyLabel: 'Spotify',
+    soundcloudLabel: 'SoundCloud'
   }
 };
 
@@ -188,11 +212,13 @@ function buildPublicShareMeta(message, strings) {
   const normalizedMessage = normalizePublicMessage(message);
   const messageText = typeof normalizedMessage?.message === 'string' ? normalizedMessage.message.trim() : '';
   const mediaTitle = normalizeMediaTitle(normalizedMessage?.multimedia);
+  const mediaDescription = buildMediaPreviewDescription(normalizedMessage?.multimedia, strings);
 
   return {
     title: strings.pageTitle,
     description: buildDescription(messageText)
       || buildDescription(mediaTitle)
+      || buildDescription(mediaDescription)
       || (hasMultimedia(normalizedMessage?.multimedia) ? strings.mediaOnlyDescription : strings.pageDescription)
   };
 }
@@ -824,24 +850,44 @@ function resolveOgMediaIconType(mediaType, multimedia) {
 function resolveMediaPlatformLabel(mediaType, multimedia, strings) {
   const host = resolveUrlHost(multimedia?.sourceUrl || multimedia?.url || extractIframeSrc(multimedia?.oembed?.html || ''));
   const map = {
-    youtube: 'YouTube',
-    spotify: 'Spotify',
-    soundcloud: 'SoundCloud',
-    tiktok: 'TikTok',
-    pinterest: 'Pinterest'
+    youtube: strings.youtubeVideoLabel || 'YouTube video',
+    tenor: strings.tenorGifLabel || 'Tenor GIF',
+    spotify: strings.spotifyLabel || 'Spotify',
+    soundcloud: strings.soundcloudLabel || 'SoundCloud',
+    tiktok: strings.tiktokVideoLabel || 'TikTok video',
+    pinterest: strings.pinterestPinLabel || 'Pinterest pin'
   };
 
   if (map[mediaType]) {
     return map[mediaType];
   }
 
-  if (host.includes('youtube')) return 'YouTube';
-  if (host.includes('spotify')) return 'Spotify';
-  if (host.includes('soundcloud')) return 'SoundCloud';
-  if (host.includes('tiktok')) return 'TikTok';
-  if (host.includes('pinterest')) return 'Pinterest';
+  if (host.includes('youtube')) return strings.youtubeVideoLabel || 'YouTube video';
+  if (host.includes('tenor')) return strings.tenorGifLabel || 'Tenor GIF';
+  if (host.includes('spotify')) return strings.spotifyLabel || 'Spotify';
+  if (host.includes('soundcloud')) return strings.soundcloudLabel || 'SoundCloud';
+  if (host.includes('tiktok')) return strings.tiktokVideoLabel || 'TikTok video';
+  if (host.includes('pinterest')) return strings.pinterestPinLabel || 'Pinterest pin';
 
   return strings.mediaLabel;
+}
+
+function buildMediaPreviewDescription(multimedia, strings) {
+  const media = multimedia && typeof multimedia === 'object' ? multimedia : null;
+  if (!media || !hasMultimedia(media)) {
+    return '';
+  }
+
+  const mediaType = String(media.type || '').trim().toLowerCase();
+  if (mediaType === 'sticker') {
+    return strings.stickerLabel;
+  }
+
+  if (mediaType === 'image' || isDirectImageMedia(mediaType, media.url)) {
+    return strings.imageLabel;
+  }
+
+  return resolveMediaPlatformLabel(mediaType, media, strings) || strings.mediaLabel;
 }
 
 function resolveUrlHost(value) {
