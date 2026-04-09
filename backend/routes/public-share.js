@@ -195,6 +195,13 @@ router.get('/:messageUuid', function (req, res) {
     }
 
     const meta = buildPublicShareMeta(row, strings);
+    const appRedirectUrl = buildPublicAppMessageUrl(req, messageUuid);
+
+    if (shouldServerRedirectToApp(req, appRedirectUrl)) {
+      res.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
+      res.set('Vary', 'User-Agent');
+      return res.redirect(307, appRedirectUrl);
+    }
 
     return renderShareShell(res, {
       locale,
@@ -986,6 +993,40 @@ function isPreviewBotRequest(req) {
     'spider',
     'preview'
   ].some((token) => userAgent.includes(token));
+}
+
+function shouldServerRedirectToApp(req, targetUrl) {
+  if (!targetUrl || isPreviewBotRequest(req)) {
+    return false;
+  }
+
+  const params = new URLSearchParams(String(req.url || '').split('?')[1] || '');
+  const previewFlag = String(
+    params.get('preview')
+    || params.get('render')
+    || params.get('stay')
+    || params.get('noRedirect')
+    || ''
+  ).trim().toLowerCase();
+
+  if (previewFlag === '1' || previewFlag === 'true' || previewFlag === 'yes') {
+    return false;
+  }
+
+  return true;
+}
+
+function buildPublicAppMessageUrl(req, messageUuid) {
+  const appBaseUrl = resolvePublicAppBaseUrl(req);
+  if (!appBaseUrl) {
+    return '';
+  }
+
+  if (!messageUuid) {
+    return `${appBaseUrl}/`;
+  }
+
+  return `${appBaseUrl}/?publicMessage=${encodeURIComponent(messageUuid)}`;
 }
 
 function resolvePublicAppBaseUrl(req) {
