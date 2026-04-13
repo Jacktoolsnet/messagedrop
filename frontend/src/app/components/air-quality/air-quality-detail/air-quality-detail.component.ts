@@ -20,6 +20,7 @@ import { AirQualityTileValue } from '../../../interfaces/air-quality-tile-value'
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 
 const RADAR_CHART_BREAKPOINT_PX = 700;
+const RADAR_POINT_LABEL_PADDING_PX = 2;
 
 @Component({
   selector: 'app-air-quality-detail',
@@ -289,6 +290,9 @@ export class AirQualityDetailComponent implements OnChanges, AfterViewInit, OnDe
     this.chartOptions = {
       responsive: true,
       maintainAspectRatio: false,
+      layout: {
+        padding: 0
+      },
       plugins: {
         tooltip: {
           callbacks: {
@@ -306,8 +310,8 @@ export class AirQualityDetailComponent implements OnChanges, AfterViewInit, OnDe
             weight: 'bold'
           },
           padding: {
-            top: 10,
-            bottom: 20
+            top: 6,
+            bottom: 12
           }
         },
         annotation: {
@@ -323,8 +327,9 @@ export class AirQualityDetailComponent implements OnChanges, AfterViewInit, OnDe
           angleLines: { color: gridColor },
           pointLabels: {
             color: textColor,
+            padding: RADAR_POINT_LABEL_PADDING_PX,
             font: {
-              size: 11,
+              size: 10,
               weight: 600
             }
           },
@@ -490,7 +495,7 @@ export class AirQualityDetailComponent implements OnChanges, AfterViewInit, OnDe
   }
 
   private getRadarLabels(labels: string[]): string[] {
-    return labels.map((label, index) => index % 6 === 0 ? label : '');
+    return labels.map((_label, index) => index % 6 === 0 ? `${index}` : '');
   }
 
   private getFullHourLabel(index: number): string {

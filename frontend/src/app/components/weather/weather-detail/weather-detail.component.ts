@@ -20,8 +20,10 @@ import { Weather } from '../../../interfaces/weather';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { getWeatherBaseColor } from '../../../utils/weather-level.util';
 import { WeatherTile } from '../weather-tile.interface';
+import { selectedPointLabelPlugin } from '../../../utils/chart-selected-point-label.plugin';
 
 const RADAR_CHART_BREAKPOINT_PX = 700;
+const RADAR_POINT_LABEL_PADDING_PX = 2;
 
 @Component({
   selector: 'app-weather-detail',
@@ -68,7 +70,8 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit, OnDestr
       Title,
       Tooltip,
       Filler,
-      annotationPlugin
+      annotationPlugin,
+      selectedPointLabelPlugin
     );
   }
 
@@ -366,6 +369,9 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit, OnDestr
   ): void {
     const radialLabels = this.getRadarLabels(fullLabels);
     const selectedValue = this.getSelectedChartValue(dayHourly[selectedIndex] ?? dayHourly[0]);
+    const selectedHourLabel = fullLabels[selectedIndex] ?? this.formatHour(selectedIndex);
+    const selectedPointLabel = `${selectedHourLabel}: ${selectedValue}${this.getSelectedChartUnit()}`;
+    const selectedPointColor = getWeatherBaseColor(this.tile.type, selectedValue);
     const isDark = document.body.classList.contains('dark');
     const textColor = isDark ? '#ffffff' : '#000000';
     const gridColor = isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)';
@@ -374,23 +380,23 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit, OnDestr
     this.chartOptions = {
       responsive: true,
       maintainAspectRatio: false,
+      layout: {
+        padding: 0
+      },
       plugins: {
         legend: { display: false },
         annotation: { annotations: {} },
         title: {
           display: true,
-          text: [
-            this.tile.label,
-            `${fullLabels[selectedIndex] ?? this.formatHour(selectedIndex)}: ${selectedValue}${this.getSelectedChartUnit()}`
-          ],
+          text: this.tile.label,
           color: textColor,
           font: {
             size: 18,
             weight: 'bold'
           },
           padding: {
-            top: 10,
-            bottom: 20
+            top: 6,
+            bottom: 12
           }
         },
         tooltip: {
@@ -398,6 +404,13 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit, OnDestr
             title: (items: any[]) => this.getFullHourLabel(items[0]?.dataIndex ?? 0),
             label: (ctx: any) => `${ctx.formattedValue}${this.getSelectedChartUnit()}`
           }
+        },
+        selectedPointLabel: {
+          display: true,
+          pointIndex: selectedIndex,
+          text: selectedPointLabel,
+          backgroundColor: selectedPointColor,
+          textColor: '#000000'
         }
       },
       scales: {
@@ -409,8 +422,9 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit, OnDestr
           angleLines: { color: gridColor },
           pointLabels: {
             color: textColor,
+            padding: RADAR_POINT_LABEL_PADDING_PX,
             font: {
-              size: 11,
+              size: 10,
               weight: 600
             }
           },
@@ -679,12 +693,21 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit, OnDestr
     dataset.pointBorderWidth = pointBorderWidth;
     dataset.pointBorderColor = pointBorderColor;
 
-    if (this.chart.options.plugins?.title) {
-      this.chart.options.plugins.title.text = [
-        this.tile.label,
-        `${this.getFullHourLabel(selectedIndex)}: ${selectedValue}${this.getSelectedChartUnit()}`
-      ];
+    const selectedPointLabel = `${this.getFullHourLabel(selectedIndex)}: ${selectedValue}${this.getSelectedChartUnit()}`;
+    const selectedPointColor = getWeatherBaseColor(this.tile.type, selectedValue);
+    const plugins = (this.chart.options.plugins ??= {}) as any;
+
+    if (plugins.title) {
+      plugins.title.text = this.tile.label;
     }
+
+    plugins.selectedPointLabel = {
+      display: true,
+      pointIndex: selectedIndex,
+      text: selectedPointLabel,
+      backgroundColor: selectedPointColor,
+      textColor: '#000000'
+    };
 
     this.chart.update('none');
   }
@@ -727,7 +750,7 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit, OnDestr
   }
 
   private getRadarLabels(labels: string[]): string[] {
-    return labels.map((label, index) => index % 6 === 0 ? label : '');
+    return labels.map((_label, index) => index % 6 === 0 ? `${index}` : '');
   }
 
   private getFullHourLabel(index: number): string {
