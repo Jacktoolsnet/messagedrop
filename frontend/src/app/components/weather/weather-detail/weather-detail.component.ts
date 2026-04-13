@@ -754,15 +754,13 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit, OnDestr
     const minValue = Math.min(...values);
     const maxValue = Math.max(...values);
 
-    let minY = forceZeroMin ? 0 : minValue;
+    const minY = forceZeroMin || minValue >= 0 ? 0 : minValue;
     let maxY = maxValue;
 
-    if (maxY === minY) {
-      if (forceZeroMin) {
-        maxY = maxY === 0 ? 1 : maxY;
-      } else {
-        minY = minY - Math.max(Math.abs(maxY) * 0.1, 0.5);
-      }
+    if (maxY <= minY) {
+      maxY = minY === 0
+        ? 1
+        : minY + Math.max(Math.abs(minY) * 0.1, 0.5);
     }
 
     return { minY, maxY };
