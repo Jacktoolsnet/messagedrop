@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnDestroy, SimpleChanges, effect, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, NgZone, OnChanges, OnDestroy, SimpleChanges, effect, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -47,6 +47,8 @@ export class ShowmultimediaComponent implements OnChanges, OnDestroy {
   private readonly oembedService = inject(OembedService);
   private readonly stickerService = inject(StickerService);
   private readonly translation = inject(TranslationHelperService);
+  private readonly ngZone = inject(NgZone);
+  private readonly changeDetectorRef = inject(ChangeDetectorRef);
   private stickerRequestToken = 0;
   private currentStickerRenderKey = '';
   private stickerObjectUrl: string | null = null;
@@ -122,16 +124,21 @@ export class ShowmultimediaComponent implements OnChanges, OnDestroy {
   }
 
   onStickerImageLoaded(): void {
-    this.stickerImageLoading = false;
-    this.revokeStickerObjectUrl();
+    this.runInAngular(() => {
+      this.stickerImageLoading = false;
+      this.stickerImageError = false;
+      this.revokeStickerObjectUrl();
+    });
   }
 
   onStickerImageError(): void {
-    this.stickerImageLoading = false;
-    this.stickerImageError = true;
-    this.currentStickerRenderKey = '';
-    this.renderableImageUrl = '';
-    this.clearStickerObjectUrl();
+    this.runInAngular(() => {
+      this.stickerImageLoading = false;
+      this.stickerImageError = true;
+      this.currentStickerRenderKey = '';
+      this.renderableImageUrl = '';
+      this.clearStickerObjectUrl();
+    });
   }
 
   private isOembedAllowed(): boolean {
@@ -196,6 +203,7 @@ export class ShowmultimediaComponent implements OnChanges, OnDestroy {
     this.stickerImageError = false;
     this.clearStickerObjectUrl();
     this.renderableImageUrl = '';
+    this.changeDetectorRef.markForCheck();
 
     const objectUrl = await this.stickerService.fetchRenderObjectUrl(stickerId, 'preview');
     if (requestToken !== this.stickerRequestToken) {
@@ -206,14 +214,18 @@ export class ShowmultimediaComponent implements OnChanges, OnDestroy {
     }
 
     if (!objectUrl) {
-      this.stickerImageLoading = false;
-      this.stickerImageError = true;
-      this.currentStickerRenderKey = '';
+      this.runInAngular(() => {
+        this.stickerImageLoading = false;
+        this.stickerImageError = true;
+        this.currentStickerRenderKey = '';
+      });
       return;
     }
 
-    this.stickerObjectUrl = objectUrl;
-    this.renderableImageUrl = objectUrl;
+    this.runInAngular(() => {
+      this.stickerObjectUrl = objectUrl;
+      this.renderableImageUrl = objectUrl;
+    });
   }
 
   private clearStickerObjectUrl(): void {
@@ -234,4 +246,16 @@ export class ShowmultimediaComponent implements OnChanges, OnDestroy {
     this.stickerObjectUrl = null;
   }
 
+  private runInAngular(work: () => void): void {
+    if (NgZone.isInAngularZone()) {
+      work();
+      this.changeDetectorRef.detectChanges();
+      return;
+    }
+
+    this.ngZone.run(() => {
+      work();
+      this.changeDetectorRef.detectChanges();
+    });
+  }
 }

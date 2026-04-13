@@ -1,4 +1,4 @@
-import { signal, SimpleChange } from '@angular/core';
+import { NgZone, signal, SimpleChange } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { of } from 'rxjs';
@@ -15,12 +15,29 @@ describe('ShowmultimediaComponent', () => {
   let component: ShowmultimediaComponent;
   let fixture: ComponentFixture<ShowmultimediaComponent>;
   let dialog: jasmine.SpyObj<MatDialog>;
+  let stickerService: jasmine.SpyObj<Pick<StickerService, 'fetchRenderObjectUrl' | 'resolveStickerId'>>;
+
+  function createDeferred<T>() {
+    let resolve!: (value: T | PromiseLike<T>) => void;
+    let reject!: (reason?: unknown) => void;
+    const promise = new Promise<T>((res, rej) => {
+      resolve = res;
+      reject = rej;
+    });
+    return { promise, resolve, reject };
+  }
 
   beforeEach(async () => {
     dialog = jasmine.createSpyObj<MatDialog>('MatDialog', ['open']);
     dialog.open.and.returnValue({
       afterClosed: () => of(undefined)
     } as never);
+    stickerService = jasmine.createSpyObj<Pick<StickerService, 'fetchRenderObjectUrl' | 'resolveStickerId'>>(
+      'StickerService',
+      ['fetchRenderObjectUrl', 'resolveStickerId']
+    );
+    stickerService.fetchRenderObjectUrl.and.resolveTo('');
+    stickerService.resolveStickerId.and.returnValue(null);
 
     await TestBed.configureTestingModule({
       imports: [ShowmultimediaComponent],
@@ -72,10 +89,7 @@ describe('ShowmultimediaComponent', () => {
         },
         {
           provide: StickerService,
-          useValue: {
-            fetchRenderObjectUrl: async () => '',
-            resolveStickerId: () => null
-          }
+          useValue: stickerService
         }
       ]
     })
@@ -117,5 +131,90 @@ describe('ShowmultimediaComponent', () => {
     };
 
     expect(dialogConfig.data.visiblePlatforms).toEqual(['youtube']);
+  });
+
+  it('loads sticker render URLs via the sticker service', async () => {
+    const deferred = createDeferred<string>();
+    stickerService.resolveStickerId.and.returnValue('sticker-123');
+    stickerService.fetchRenderObjectUrl.and.returnValue(deferred.promise);
+
+    component.multimedia = {
+      type: MultimediaType.STICKER,
+      sourceUrl: 'https://example.com/sticker',
+      url: 'https://example.com/sticker',
+      contentId: 'sticker-123',
+      title: 'Sticker',
+      attribution: '',
+      description: ''
+    };
+    component.ngOnChanges({
+      multimedia: new SimpleChange(undefined, component.multimedia, true)
+    });
+
+    expect(component.stickerImageLoading).toBeTrue();
+    expect(stickerService.fetchRenderObjectUrl).toHaveBeenCalledOnceWith('sticker-123', 'preview');
+
+    deferred.resolve('blob:sticker-123');
+    await deferred.promise;
+    await fixture.whenStable();
+
+    expect(component.getRenderableImageUrl()).toBe('blob:sticker-123');
+    expect(component.stickerImageError).toBeFalse();
+  });
+
+  it('re-enters Angular zone when the sticker fetch resolves', async () => {
+    const deferred = createDeferred<string>();
+    const ngZone = TestBed.inject(NgZone);
+    const runSpy = spyOn(ngZone, 'run').and.callFake(<T>(fn: (...args: unknown[]) => T) => fn());
+    stickerService.resolveStickerId.and.returnValue('sticker-123');
+    stickerService.fetchRenderObjectUrl.and.returnValue(deferred.promise);
+
+    component.multimedia = {
+      type: MultimediaType.STICKER,
+      sourceUrl: 'https://example.com/sticker',
+      url: 'https://example.com/sticker',
+      contentId: 'sticker-123',
+      title: 'Sticker',
+      attribution: '',
+      description: ''
+    };
+    component.ngOnChanges({
+      multimedia: new SimpleChange(undefined, component.multimedia, true)
+    });
+
+    deferred.resolve('blob:sticker-123');
+    await deferred.promise;
+    await fixture.whenStable();
+
+    expect(runSpy).toHaveBeenCalled();
+  });
+
+  it('revokes the sticker object URL immediately after load', async () => {
+    const revokeSpy = spyOn(URL, 'revokeObjectURL');
+    stickerService.resolveStickerId.and.returnValue('sticker-123');
+    stickerService.fetchRenderObjectUrl.and.resolveTo('blob:sticker-123');
+
+    component.multimedia = {
+      type: MultimediaType.STICKER,
+      sourceUrl: 'https://example.com/sticker',
+      url: 'https://example.com/sticker',
+      contentId: 'sticker-123',
+      title: 'Sticker',
+      attribution: '',
+      description: ''
+    };
+    component.ngOnChanges({
+      multimedia: new SimpleChange(undefined, component.multimedia, true)
+    });
+
+    await fixture.whenStable();
+
+    component.onStickerImageLoaded();
+    expect(component.stickerImageLoading).toBeFalse();
+    expect(revokeSpy).toHaveBeenCalledTimes(1);
+    expect(revokeSpy).toHaveBeenCalledWith('blob:sticker-123');
+
+    component.ngOnDestroy();
+    expect(revokeSpy).toHaveBeenCalledTimes(1);
   });
 });

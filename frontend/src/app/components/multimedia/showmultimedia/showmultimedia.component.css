@@ -1,3 +1,8 @@
+:host {
+    display: block;
+    width: 100%;
+}
+
 .media_block {
     display: flex;
     flex-direction: column;
@@ -13,6 +18,12 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    width: min(15rem, 70vw);
+    max-width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-radius: 0.75rem;
+    background: color-mix(in srgb, var(--mat-app-background-color) 88%, white);
 }
 
 .multimedia_image {
@@ -24,10 +35,10 @@
 }
 
 .multimedia_image--sticker {
-    width: min(100%, 15rem);
-    height: min(100%, 15rem);
-    max-width: min(100%, 15rem);
-    max-height: 15rem;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
     object-fit: contain;
     background-color: transparent;
 }

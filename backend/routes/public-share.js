@@ -977,15 +977,26 @@ function isPreviewBotRequest(req) {
   }
 
   return [
-    'whatsapp',
+    // Officially documented Meta crawlers:
+    // https://developers.facebook.com/docs/sharing/webmasters/web-crawlers
     'facebookexternalhit',
-    'facebot',
+    'facebookcatalog',
     'meta-externalagent',
-    'linkedinbot',
+    'meta-externalfetcher',
+    // Officially documented Slack preview fetchers:
+    // https://api.slack.com/robots
+    'slackbot-linkexpanding',
+    'slack-imgproxy',
     'slackbot',
+    // Officially documented X/Twitter card crawler:
+    // https://developer.x.com/cards/getting-started
+    'twitterbot',
+    // Heuristic social / preview / sharing fetchers
+    'whatsapp',
+    'facebot',
+    'linkedinbot',
     'discordbot',
     'telegrambot',
-    'twitterbot',
     'skypeuripreview',
     'embedly',
     'googlebot',
@@ -998,7 +1009,7 @@ function isPreviewBotRequest(req) {
 }
 
 function shouldServerRedirectToApp(req, targetUrl) {
-  if (!targetUrl || isPreviewBotRequest(req)) {
+  if (!targetUrl || isPreviewBotRequest(req) || isPreviewRangeRequest(req)) {
     return false;
   }
 
@@ -1016,6 +1027,15 @@ function shouldServerRedirectToApp(req, targetUrl) {
   }
 
   return true;
+}
+
+function isPreviewRangeRequest(req) {
+  const rangeHeader = String(req.get?.('range') || req.headers['range'] || '').trim().toLowerCase();
+  if (!rangeHeader) {
+    return false;
+  }
+
+  return /^bytes=/.test(rangeHeader);
 }
 
 function buildPublicAppMessageUrl(req, messageUuid) {
