@@ -20,6 +20,7 @@ import { DecisionSummaryComponent } from '../../decisions/decision-summary/decis
 import { NoticeAppealsComponent } from '../appeals/notice-appeals.component';
 import { EvidenceListComponent } from "../evidence/evidence-list/evidence-list.component";
 import { ReportedContentPayload, ReportedMultimedia } from '../../../../interfaces/reported-content.interface';
+import { DsaAiAssessmentClauseMatch, DsaAiAssessmentRecord, DsaAiSuggestedDecisionOutcome, DsaAiWorkflowRecommendation } from '../../../../interfaces/dsa-ai-assessment.interface';
 import { parseReportedContentPayload } from '../../../../utils/reported-content.util';
 import { DisplayMessageService } from '../../../../services/display-message.service';
 import { StickerPreviewComponent } from '../../../shared/sticker-preview/sticker-preview.component';
@@ -121,6 +122,9 @@ export class NoticeDetailComponent implements OnInit {
   readonly accountReasonOptions = USER_ACCOUNT_BLOCK_REASONS;
   readonly postingReason = signal(USER_POSTING_BLOCK_REASONS[0]?.code ?? '');
   readonly accountReason = signal(USER_ACCOUNT_BLOCK_REASONS[0]?.code ?? '');
+  readonly assessment = signal<DsaAiAssessmentRecord | null>(null);
+  readonly assessmentLoading = signal(false);
+  readonly assessmentRunning = signal(false);
 
   close(ok = false) {
     this.ref.close(ok || this.dirty);
@@ -176,6 +180,7 @@ export class NoticeDetailComponent implements OnInit {
   ngOnInit(): void {
     this.updateMediaFromContent();
     this.ensureUnderReview();
+    this.loadLatestAiAssessment();
     const userId = this.platformUserId();
     if (userId) {
       this.loadPlatformUserModeration(userId);
@@ -248,6 +253,28 @@ export class NoticeDetailComponent implements OnInit {
         },
         error: () => this.makingScreenshot.set(false)
       });
+  }
+
+  loadLatestAiAssessment(): void {
+    this.assessmentLoading.set(true);
+    this.dsa.getLatestNoticeAiAssessment(this.notice().id).subscribe({
+      next: (assessment) => this.assessment.set(assessment ?? null),
+      error: () => undefined,
+      complete: () => this.assessmentLoading.set(false)
+    });
+  }
+
+  runAiAssessment(): void {
+    if (this.assessmentRunning()) return;
+    this.assessmentRunning.set(true);
+    this.dsa.runNoticeAiAssessment(this.notice().id).subscribe({
+      next: (assessment) => {
+        this.assessment.set(assessment);
+        this.snack.open(this.i18n.t('AI preassessment updated.'), this.i18n.t('OK'), { duration: 2500 });
+      },
+      error: () => undefined,
+      complete: () => this.assessmentRunning.set(false)
+    });
   }
 
   loadPlatformUserModeration(userId: string) {
@@ -338,6 +365,102 @@ export class NoticeDetailComponent implements OnInit {
 
   formatReason(reason: string | null | undefined, target: 'posting' | 'account'): string {
     return findModerationReasonLabel(reason, target === 'posting' ? this.postingReasonOptions : this.accountReasonOptions);
+  }
+
+  localizedText(deValue?: string | null, enValue?: string | null): string {
+    return this.i18n.lang() === 'de'
+      ? (deValue?.trim() || enValue?.trim() || this.i18n.t('—'))
+      : (enValue?.trim() || deValue?.trim() || this.i18n.t('—'));
+  }
+
+  localizedList(deValues?: string[] | null, enValues?: string[] | null): string[] {
+    const primary = this.i18n.lang() === 'de'
+      ? (Array.isArray(deValues) ? deValues : [])
+      : (Array.isArray(enValues) ? enValues : []);
+    const fallback = this.i18n.lang() === 'de'
+      ? (Array.isArray(enValues) ? enValues : [])
+      : (Array.isArray(deValues) ? deValues : []);
+    return (primary.length ? primary : fallback).filter((entry) => typeof entry === 'string' && entry.trim().length > 0);
+  }
+
+  formatAssessmentConfidence(value: number | null | undefined): string {
+    if (!Number.isFinite(value)) return this.i18n.t('—');
+    return `${Math.round(Number(value) * 100)}%`;
+  }
+
+  workflowRecommendationLabel(value: DsaAiWorkflowRecommendation | string | null | undefined): string {
+    switch (value) {
+      case 'dismiss_signal':
+        return this.i18n.t('Dismiss signal');
+      case 'request_more_evidence':
+        return this.i18n.t('Ask for more evidence');
+      case 'promote_to_notice':
+        return this.i18n.t('Promote to notice');
+      case 'keep_under_review':
+        return this.i18n.t('Keep under review');
+      case 'no_action':
+        return this.i18n.t('No action');
+      case 'restrict_content':
+        return this.i18n.t('Restrict content');
+      case 'remove_content':
+        return this.i18n.t('Remove content');
+      case 'forward_to_legal_review':
+        return this.i18n.t('Forward to legal review');
+      case 'forward_to_authority':
+        return this.i18n.t('Forward to authority');
+      default:
+        return this.i18n.t('—');
+    }
+  }
+
+  decisionOutcomeLabel(value: DsaAiSuggestedDecisionOutcome | string | null | undefined): string {
+    switch (value) {
+      case 'NO_ACTION':
+        return this.i18n.t('No action');
+      case 'RESTRICT':
+        return this.i18n.t('Restrict content');
+      case 'REMOVE_CONTENT':
+        return this.i18n.t('Remove content');
+      case 'FORWARD_TO_AUTHORITY':
+        return this.i18n.t('Forward to authority');
+      case 'UNDECIDED':
+        return this.i18n.t('Undecided');
+      default:
+        return this.i18n.t('—');
+    }
+  }
+
+  riskLevelLabel(value: string | null | undefined): string {
+    switch (String(value || '').toLowerCase()) {
+      case 'low':
+        return this.i18n.t('Low');
+      case 'medium':
+        return this.i18n.t('Medium');
+      case 'high':
+        return this.i18n.t('High');
+      default:
+        return this.i18n.t('—');
+    }
+  }
+
+  illegalityLabel(value: string | null | undefined): string {
+    switch (String(value || '').toLowerCase()) {
+      case 'low':
+        return this.i18n.t('Low');
+      case 'medium':
+        return this.i18n.t('Medium');
+      case 'high':
+        return this.i18n.t('High');
+      case 'unclear':
+        return this.i18n.t('Unclear');
+      default:
+        return this.i18n.t('—');
+    }
+  }
+
+  clauseLabel(match: DsaAiAssessmentClauseMatch | null | undefined): string {
+    if (!match) return this.i18n.t('—');
+    return this.localizedText(match.labelDe, match.labelEn);
   }
 
   private parseBlockedUntil(): number | null {

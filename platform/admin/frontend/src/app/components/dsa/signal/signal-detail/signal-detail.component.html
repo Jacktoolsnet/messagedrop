@@ -207,6 +207,147 @@
             <section class="detail-tile">
                 <div class="tile-header">
                     <div class="tile-title">
+                        <mat-icon>smart_toy</mat-icon>
+                        <span>{{ i18n.t('AI preassessment') }}</span>
+                    </div>
+                    <button mat-stroked-button color="primary" type="button" (click)="runAiAssessment()" [disabled]="assessmentRunning() || data.source !== 'signal'">
+                        <mat-icon>{{ assessmentRunning() ? 'hourglass_top' : 'smart_toy' }}</mat-icon>
+                        {{ assessment() ? i18n.t('Re-run AI preassessment') : i18n.t('Run AI preassessment') }}
+                    </button>
+                </div>
+
+                @if (assessmentLoading() && !assessment()) {
+                <div class="placeholder">
+                    <mat-icon>hourglass_top</mat-icon>
+                    {{ i18n.t('Loading latest AI preassessment...') }}
+                </div>
+                } @else if (assessment(); as current) {
+                <div class="meta-grid assessment-meta-grid">
+                    <div class="kv">
+                        <mat-icon>warning</mat-icon>
+                        <span><strong>{{ i18n.t('Risk level:') }}</strong> {{ riskLevelLabel(current.result.riskLevel) }}</span>
+                    </div>
+                    <div class="kv">
+                        <mat-icon>balance</mat-icon>
+                        <span><strong>{{ i18n.t('Potential illegality:') }}</strong> {{ illegalityLabel(current.result.illegalityLikelihood) }}</span>
+                    </div>
+                    <div class="kv">
+                        <mat-icon>route</mat-icon>
+                        <span><strong>{{ i18n.t('Recommended workflow:') }}</strong> {{ workflowRecommendationLabel(current.result.workflowRecommendation) }}</span>
+                    </div>
+                    <div class="kv">
+                        <mat-icon>gavel</mat-icon>
+                        <span><strong>{{ i18n.t('Suggested decision outcome:') }}</strong> {{ decisionOutcomeLabel(current.result.suggestedDecisionOutcome) }}</span>
+                    </div>
+                    <div class="kv">
+                        <mat-icon>description</mat-icon>
+                        <span><strong>{{ i18n.t('Terms version:') }}</strong> {{ current.tosVersion || i18n.t('—') }}</span>
+                    </div>
+                    <div class="kv">
+                        <mat-icon>fingerprint</mat-icon>
+                        <span><strong>{{ i18n.t('Terms hash:') }}</strong> <span class="mono">{{ current.tosHash || i18n.t('—') }}</span></span>
+                    </div>
+                    <div class="kv">
+                        <mat-icon>memory</mat-icon>
+                        <span><strong>{{ i18n.t('Model:') }}</strong> <span class="mono">{{ current.model || i18n.t('—') }}</span></span>
+                    </div>
+                    <div class="kv">
+                        <mat-icon>schedule</mat-icon>
+                        <span><strong>{{ i18n.t('Created:') }}</strong> {{ current.createdAt | date:'medium' }}</span>
+                    </div>
+                </div>
+
+                <div class="snippet-text assessment-bubble">
+                    <strong>{{ i18n.t('Assessment summary') }}:</strong><br />
+                    {{ localizedText(current.result.summaryDe, current.result.summaryEn) }}
+                </div>
+
+                <div class="snippet-text assessment-bubble">
+                    <strong>{{ i18n.t('Recommended action') }}:</strong><br />
+                    {{ localizedText(current.result.actionJustificationDe, current.result.actionJustificationEn) }}
+                </div>
+
+                <div class="assessment-section">
+                    <strong>{{ i18n.t('Terms matches') }}</strong>
+                    @if (current.result.tosMatches.length > 0) {
+                    <div class="assessment-matches">
+                        @for (match of current.result.tosMatches; track match.key) {
+                        <div class="assessment-match">
+                            <div class="assessment-match__head">
+                                <strong>{{ clauseLabel(match) }}</strong>
+                                <span class="assessment-confidence">{{ formatAssessmentConfidence(match.confidence) }}</span>
+                            </div>
+                            <div class="assessment-match__reason">{{ localizedText(match.reasonDe, match.reasonEn) }}</div>
+                        </div>
+                        }
+                    </div>
+                    } @else {
+                    <div class="placeholder"><mat-icon>info</mat-icon> {{ i18n.t('No clause match was returned.') }}</div>
+                    }
+                </div>
+
+                <div class="assessment-section">
+                    <strong>{{ i18n.t('Observed signals') }}</strong>
+                    @if (localizedList(current.result.observedSignalsDe, current.result.observedSignalsEn).length > 0) {
+                    <ul class="assessment-list">
+                        @for (item of localizedList(current.result.observedSignalsDe, current.result.observedSignalsEn); track item) {
+                        <li>{{ item }}</li>
+                        }
+                    </ul>
+                    } @else {
+                    <div class="placeholder"><mat-icon>info</mat-icon> {{ i18n.t('No observed signals were returned.') }}</div>
+                    }
+                </div>
+
+                <div class="assessment-section">
+                    <strong>{{ i18n.t('Evidence gaps') }}</strong>
+                    @if (localizedList(current.result.evidenceGapsDe, current.result.evidenceGapsEn).length > 0) {
+                    <ul class="assessment-list">
+                        @for (item of localizedList(current.result.evidenceGapsDe, current.result.evidenceGapsEn); track item) {
+                        <li>{{ item }}</li>
+                        }
+                    </ul>
+                    } @else {
+                    <div class="placeholder"><mat-icon>check_circle</mat-icon> {{ i18n.t('No immediate evidence gaps were identified.') }}</div>
+                    }
+                </div>
+
+                <div class="assessment-section">
+                    <strong>{{ i18n.t('Uncertainties') }}</strong>
+                    @if (localizedList(current.result.uncertaintiesDe, current.result.uncertaintiesEn).length > 0) {
+                    <ul class="assessment-list">
+                        @for (item of localizedList(current.result.uncertaintiesDe, current.result.uncertaintiesEn); track item) {
+                        <li>{{ item }}</li>
+                        }
+                    </ul>
+                    } @else {
+                    <div class="placeholder"><mat-icon>check_circle</mat-icon> {{ i18n.t('No major uncertainties were returned.') }}</div>
+                    }
+                </div>
+
+                <div class="assessment-section">
+                    <strong>{{ i18n.t('Next steps') }}</strong>
+                    @if (localizedList(current.result.recommendedNextStepsDe, current.result.recommendedNextStepsEn).length > 0) {
+                    <ul class="assessment-list">
+                        @for (item of localizedList(current.result.recommendedNextStepsDe, current.result.recommendedNextStepsEn); track item) {
+                        <li>{{ item }}</li>
+                        }
+                    </ul>
+                    } @else {
+                    <div class="placeholder"><mat-icon>info</mat-icon> {{ i18n.t('No next steps were returned.') }}</div>
+                    }
+                </div>
+                } @else {
+                <div class="placeholder">
+                    <mat-icon>smart_toy</mat-icon>
+                    {{ i18n.t('No AI preassessment has been generated yet.') }}
+                </div>
+                }
+            </section>
+
+            <section class="detail-tile">
+                <div class="tile-header">
+                    <div class="tile-title">
                         <mat-icon>gpp_bad</mat-icon>
                         <span>{{ i18n.t('User moderation') }}</span>
                     </div>

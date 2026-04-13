@@ -230,6 +230,73 @@ mat-chip.status {
     vertical-align: bottom;
 }
 
+.mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.assessment-meta-grid {
+    gap: 10px;
+}
+
+.assessment-bubble {
+    padding: .75rem .85rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--primary) 8%, transparent);
+}
+
+.assessment-section {
+    display: grid;
+    gap: .45rem;
+    color: var(--text);
+}
+
+.assessment-matches {
+    display: grid;
+    gap: .65rem;
+}
+
+.assessment-match {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--primary) 5%, transparent);
+    padding: .75rem .85rem;
+}
+
+.assessment-match__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+}
+
+.assessment-match__reason {
+    margin-top: .4rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+.assessment-confidence {
+    display: inline-flex;
+    align-items: center;
+    padding: .16rem .5rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    font-size: .82rem;
+    line-height: 1.2;
+}
+
+.assessment-list {
+    margin: 0;
+    padding-left: 1.15rem;
+    display: grid;
+    gap: .35rem;
+}
+
 .counters {
     display: flex;
     flex-wrap: wrap;

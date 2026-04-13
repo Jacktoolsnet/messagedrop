@@ -6,6 +6,7 @@ const dns = require('dns').promises;
 const net = require('net');
 const multer = require('multer');
 const axios = require('axios');
+const OpenAI = require('openai');
 const { requireAdminJwt, requireRole } = require('../middleware/security');
 const { notifyContentOwner } = require('../utils/notifyContentOwner');
 const { notifyReporter } = require('../utils/notifyReporter');
@@ -20,6 +21,11 @@ const tableAppeal = require('../db/tableDsaAppeal');
 const tableEvidence = require('../db/tableDsaEvidence');
 const tableNotification = require('../db/tableDsaNotification');
 const tableAudit = require('../db/tableDsaAuditLog');
+const tableAiSettings = require('../db/tableAiSettings');
+const tableAiUsageEvent = require('../db/tableAiUsageEvent');
+const tableDsaTextBlock = require('../db/tableDsaTextBlock');
+const tableDsaAiAssessment = require('../db/tableDsaAiAssessment');
+const { TEXT_BLOCK_TYPES } = require('../db/dsaTextBlockDefaults');
 const { recordNotification } = require('../utils/recordNotification');
 const { sendMail } = require('../utils/mailer');
 
@@ -31,6 +37,23 @@ fs.mkdirSync(evidenceUploadDir, { recursive: true });
 const maxEvidenceFiles = Math.max(1, Number(process.env.DSA_EVIDENCE_MAX_FILES || 4));
 const maxEvidenceFileBytes = Math.max(1, Number(process.env.DSA_EVIDENCE_MAX_FILE_MB || 1)) * 1024 * 1024;
 const minFreeStorageMb = Math.max(0, Number(process.env.DSA_EVIDENCE_MIN_FREE_MB || 1000));
+const DEFAULT_ADMIN_MODEL = 'gpt-5.4';
+const DSA_AI_ASSESSMENT_TOOL = 'dsa_preassessment';
+const DSA_AI_TERMS_PATH = path.resolve(__dirname, '..', '..', '..', '..', 'frontend', 'src', 'assets', 'legal', 'terms-of-service-de.txt');
+
+const DSA_AI_RISK_LEVELS = new Set(['low', 'medium', 'high']);
+const DSA_AI_ILLEGALITY_LEVELS = new Set(['low', 'medium', 'high', 'unclear']);
+const DSA_AI_SIGNAL_RECOMMENDATIONS = new Set(['dismiss_signal', 'request_more_evidence', 'promote_to_notice']);
+const DSA_AI_NOTICE_RECOMMENDATIONS = new Set([
+    'request_more_evidence',
+    'keep_under_review',
+    'no_action',
+    'restrict_content',
+    'remove_content',
+    'forward_to_legal_review',
+    'forward_to_authority'
+]);
+const DSA_AI_DECISION_OUTCOMES = new Set(['UNDECIDED', 'NO_ACTION', 'RESTRICT', 'REMOVE_CONTENT', 'FORWARD_TO_AUTHORITY']);
 
 const allowedMime = new Set([
     'application/pdf',
@@ -351,6 +374,492 @@ async function enrichRowsWithModeration(rows) {
     if (!Array.isArray(rows) || rows.length === 0) return rows;
     const cache = new Map();
     return Promise.all(rows.map(row => enrichRowWithModeration(row, cache)));
+}
+
+function toPromise(fn, ...args) {
+    return new Promise((resolve, reject) => {
+        fn(...args, (err, value) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            resolve(value ?? null);
+        });
+    });
+}
+
+function normalizeModelId(value) {
+    if (typeof value !== 'string') {
+        return '';
+    }
+    return value.trim().slice(0, 120);
+}
+
+function resolveDefaultAiModel() {
+    return normalizeModelId(process.env.OPENAI_ADMIN_MODEL) || DEFAULT_ADMIN_MODEL;
+}
+
+function getDsaAiApiKey() {
+    const preferred = typeof process.env.OPENAI_API_KEY_CONTENT_CREATION === 'string'
+        ? process.env.OPENAI_API_KEY_CONTENT_CREATION.trim()
+        : '';
+    if (preferred) {
+        return preferred;
+    }
+
+    const fallback = typeof process.env.OPENAI_API_KEY === 'string'
+        ? process.env.OPENAI_API_KEY.trim()
+        : '';
+    return fallback || '';
+}
+
+function createDsaAiClient() {
+    const apiKey = getDsaAiApiKey();
+    if (!apiKey) {
+        throw apiError.serviceUnavailable('openai_not_configured');
+    }
+
+    return new OpenAI({
+        apiKey,
+        organization: process.env.OPENAI_ORG_ID || undefined,
+        project: process.env.OPENAI_PROJECT_ID || undefined
+    });
+}
+
+async function resolveDsaAiModel(dbInstance) {
+    const row = await toPromise(tableAiSettings.get, dbInstance).catch(() => null);
+    return normalizeModelId(row?.selectedModel) || resolveDefaultAiModel();
+}
+
+function normalizeOpenAiError(error) {
+    if (!error || typeof error !== 'object') {
+        return error;
+    }
+
+    if (error.status === 429) {
+        return apiError.rateLimit(error.message || 'openai_rate_limit');
+    }
+
+    if (error.status === 401 || error.status === 403) {
+        return apiError.serviceUnavailable(error.message || 'openai_auth_failed');
+    }
+
+    if (error.status === 400 || error.status === 404 || error.status === 422) {
+        return apiError.badRequest(error.message || 'openai_request_failed');
+    }
+
+    if (error.status >= 500 && error.status < 600) {
+        return apiError.badGateway(error.message || 'openai_upstream_failed');
+    }
+
+    return error;
+}
+
+function parseJsonObject(outputText) {
+    const raw = String(outputText || '').trim();
+    if (!raw) {
+        return null;
+    }
+
+    const fencedMatch = raw.match(/```(?:json)?\s*([\s\S]*?)```/i);
+    const candidate = fencedMatch?.[1]?.trim() || raw;
+
+    try {
+        const parsed = JSON.parse(candidate);
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+            return parsed;
+        }
+    } catch {
+        return null;
+    }
+
+    return null;
+}
+
+function normalizeShortText(value, maxLength) {
+    if (typeof value !== 'string') {
+        return '';
+    }
+    return value.trim().slice(0, maxLength);
+}
+
+function normalizeStringArray(value, limit, maxLength) {
+    if (!Array.isArray(value)) {
+        return [];
+    }
+
+    return value
+        .map((entry) => normalizeShortText(entry, maxLength))
+        .filter(Boolean)
+        .slice(0, limit);
+}
+
+function normalizeConfidence(value) {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+        return null;
+    }
+    return Math.min(1, Math.max(0, Math.round(parsed * 100) / 100));
+}
+
+function toPositiveNumber(value) {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed) || parsed < 0) {
+        return 0;
+    }
+    return Math.floor(parsed);
+}
+
+async function recordDsaAiUsage(dbInstance, model, response) {
+    const usage = response?.usage;
+    if (!dbInstance || !usage) {
+        return;
+    }
+
+    await toPromise(tableAiUsageEvent.insert, dbInstance, {
+        createdAt: Date.now(),
+        tool: DSA_AI_ASSESSMENT_TOOL,
+        model,
+        inputTokens: toPositiveNumber(usage?.input_tokens),
+        outputTokens: toPositiveNumber(usage?.output_tokens),
+        totalTokens: toPositiveNumber(usage?.total_tokens),
+        cachedInputTokens: toPositiveNumber(usage?.input_tokens_details?.cached_tokens),
+        reasoningTokens: toPositiveNumber(usage?.output_tokens_details?.reasoning_tokens)
+    }).catch(() => null);
+}
+
+function getCurrentTermsOfService() {
+    try {
+        const text = fs.readFileSync(DSA_AI_TERMS_PATH, 'utf8');
+        const version = normalizeShortText(text.match(/^Stand:\s*(.+)$/m)?.[1] || '', 120) || 'unknown';
+        const hash = crypto.createHash('sha256').update(text).digest('hex').slice(0, 16);
+        return { version, hash, text };
+    } catch (error) {
+        const apiErr = apiError.internal('terms_of_service_unavailable');
+        apiErr.detail = error?.message || error;
+        throw apiErr;
+    }
+}
+
+async function listActiveTosClauses(dbInstance) {
+    const rows = await toPromise(tableDsaTextBlock.list, dbInstance, {
+        type: TEXT_BLOCK_TYPES.TOS_CLAUSE,
+        activeOnly: true
+    });
+    return Array.isArray(rows)
+        ? rows
+            .filter((row) => Number(row?.isActive ?? 1) !== 0)
+            .map((row) => ({
+                key: normalizeShortText(row?.key, 120),
+                labelDe: normalizeShortText(row?.labelDe, 220),
+                labelEn: normalizeShortText(row?.labelEn, 220),
+                descriptionDe: normalizeShortText(row?.descriptionDe, 400),
+                descriptionEn: normalizeShortText(row?.descriptionEn, 400),
+                sortOrder: Number.isFinite(Number(row?.sortOrder)) ? Number(row.sortOrder) : 0
+            }))
+            .filter((row) => row.key)
+        : [];
+}
+
+function sanitizeMessageForAssessment(message) {
+    if (!message || typeof message !== 'object') {
+        return null;
+    }
+
+    return {
+        id: message.id ?? null,
+        uuid: message.uuid ?? null,
+        userId: message.userId ?? null,
+        status: message.status ?? null,
+        createDateTime: message.createDateTime ?? null,
+        deleteDateTime: message.deleteDateTime ?? null,
+        message: message.message ?? null,
+        hashtags: Array.isArray(message.hashtags) ? message.hashtags.slice(0, 20) : [],
+        markerType: message.markerType ?? null,
+        style: message.style ?? null,
+        views: message.views ?? null,
+        likes: message.likes ?? null,
+        dislikes: message.dislikes ?? null,
+        commentsNumber: message.commentsNumber ?? null,
+        aiModerationDecision: message.aiModerationDecision ?? null,
+        aiModerationScore: message.aiModerationScore ?? null,
+        aiModerationFlagged: message.aiModerationFlagged ?? null,
+        aiModerationAt: message.aiModerationAt ?? null,
+        patternMatch: message.patternMatch ?? null,
+        patternMatchAt: message.patternMatchAt ?? null,
+        manualModerationDecision: message.manualModerationDecision ?? null,
+        manualModerationReason: message.manualModerationReason ?? null,
+        manualModerationAt: message.manualModerationAt ?? null,
+        manualModerationBy: message.manualModerationBy ?? null,
+        location: message.location ?? null,
+        multimedia: message.multimedia ?? null
+    };
+}
+
+function sanitizeEvidenceForAssessment(row) {
+    if (!row || typeof row !== 'object') {
+        return null;
+    }
+
+    return {
+        id: row.id ?? null,
+        type: row.type ?? null,
+        url: row.url ?? null,
+        hash: row.hash ?? null,
+        fileName: row.fileName ?? null,
+        addedAt: row.addedAt ?? null
+    };
+}
+
+function buildDsaAiAssessmentSnapshot({ entityType, row, message, evidence, decision }) {
+    return {
+        entityType,
+        entityId: row?.id ?? null,
+        caseData: {
+            id: row?.id ?? null,
+            contentId: row?.contentId ?? null,
+            contentUrl: row?.contentUrl ?? null,
+            category: row?.category ?? null,
+            reasonText: row?.reasonText ?? null,
+            reportedContentType: row?.reportedContentType ?? null,
+            status: row?.status ?? null,
+            createdAt: row?.createdAt ?? null,
+            updatedAt: row?.updatedAt ?? null,
+            reporterName: row?.reporterName ?? null,
+            reporterEmail: row?.reporterEmail ?? null,
+            truthAffirmation: row?.truthAffirmation ?? null
+        },
+        reportedContent: parseJsonField(row?.reportedContent),
+        currentMessage: sanitizeMessageForAssessment(message),
+        noticeDecision: decision ? {
+            id: decision.id ?? null,
+            outcome: decision.outcome ?? null,
+            legalBasis: decision.legalBasis ?? null,
+            tosBasis: decision.tosBasis ?? null,
+            automatedUsed: decision.automatedUsed ?? null,
+            statement: decision.statement ?? null,
+            decidedAt: decision.decidedAt ?? null
+        } : null,
+        evidence: Array.isArray(evidence)
+            ? evidence.map((entry) => sanitizeEvidenceForAssessment(entry)).filter(Boolean)
+            : []
+    };
+}
+
+function buildDsaAiAssessmentPrompt({ entityType, snapshot, tos, clauses }) {
+    const workflowCodes = entityType === 'signal'
+        ? Array.from(DSA_AI_SIGNAL_RECOMMENDATIONS)
+        : Array.from(DSA_AI_NOTICE_RECOMMENDATIONS);
+
+    return [
+        'You are assisting MessageDrop moderators with an internal, non-binding AI preassessment.',
+        'Important: MessageDrop has not launched publicly yet. This is an internal review aid only, never a final decision.',
+        'Evaluate the case against the CURRENT authoritative German Terms of Use supplied below.',
+        'Distinguish clearly between: (1) reporter allegations, (2) observable content, and (3) uncertainty or missing evidence.',
+        'Be conservative. If evidence is insufficient, prefer lower confidence and request more evidence instead of overclaiming.',
+        'Consider both likely Terms-of-Use issues and possible illegality, but do not invent legal conclusions.',
+        'Return ONLY one JSON object without markdown fences or commentary.',
+        `Entity type: ${entityType}`,
+        `Allowed workflowRecommendation codes: ${workflowCodes.join(', ')}`,
+        `Allowed riskLevel codes: ${Array.from(DSA_AI_RISK_LEVELS).join(', ')}`,
+        `Allowed illegalityLikelihood codes: ${Array.from(DSA_AI_ILLEGALITY_LEVELS).join(', ')}`,
+        `Allowed suggestedDecisionOutcome codes: ${Array.from(DSA_AI_DECISION_OUTCOMES).join(', ')}`,
+        'Use at most 4 tosMatches items. Every tosMatches item must contain: key, confidence, reasonDe, reasonEn.',
+        'Only use clause keys from the supplied clause catalog. Do not invent new keys.',
+        'Use concise but useful text. Arrays should contain short actionable bullet items.',
+        '',
+        'Return exactly these top-level JSON keys:',
+        'riskLevel, illegalityLikelihood, workflowRecommendation, suggestedDecisionOutcome, summaryDe, summaryEn, actionJustificationDe, actionJustificationEn, tosMatches, observedSignalsDe, observedSignalsEn, evidenceGapsDe, evidenceGapsEn, uncertaintiesDe, uncertaintiesEn, recommendedNextStepsDe, recommendedNextStepsEn.',
+        '',
+        `Current German Terms of Use version: ${tos.version}`,
+        `Current German Terms of Use hash: ${tos.hash}`,
+        '',
+        'Active Terms-of-Use clause catalog:',
+        JSON.stringify(clauses, null, 2),
+        '',
+        'Authoritative German Terms of Use text:',
+        tos.text,
+        '',
+        'Case snapshot:',
+        JSON.stringify(snapshot, null, 2)
+    ].join('\n');
+}
+
+function normalizeWorkflowRecommendation(value, entityType) {
+    const normalized = normalizeShortText(value, 80).toLowerCase();
+    if (entityType === 'signal') {
+        return DSA_AI_SIGNAL_RECOMMENDATIONS.has(normalized) ? normalized : 'request_more_evidence';
+    }
+    return DSA_AI_NOTICE_RECOMMENDATIONS.has(normalized) ? normalized : 'keep_under_review';
+}
+
+function normalizeRiskLevel(value) {
+    const normalized = normalizeShortText(value, 20).toLowerCase();
+    return DSA_AI_RISK_LEVELS.has(normalized) ? normalized : 'medium';
+}
+
+function normalizeIllegalityLevel(value) {
+    const normalized = normalizeShortText(value, 20).toLowerCase();
+    return DSA_AI_ILLEGALITY_LEVELS.has(normalized) ? normalized : 'unclear';
+}
+
+function normalizeDecisionOutcome(value, entityType) {
+    const normalized = normalizeShortText(value, 40).toUpperCase();
+    if (entityType === 'signal') {
+        return 'UNDECIDED';
+    }
+    return DSA_AI_DECISION_OUTCOMES.has(normalized) ? normalized : 'UNDECIDED';
+}
+
+function normalizeDsaAiAssessmentResult(value, entityType, clauseMap) {
+    const object = value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+    const tosMatches = Array.isArray(object.tosMatches)
+        ? object.tosMatches
+            .map((entry) => {
+                if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+                    return null;
+                }
+                const key = normalizeShortText(entry.key, 120);
+                const clause = clauseMap.get(key);
+                if (!clause) {
+                    return null;
+                }
+                return {
+                    key,
+                    labelDe: clause.labelDe,
+                    labelEn: clause.labelEn,
+                    confidence: normalizeConfidence(entry.confidence),
+                    reasonDe: normalizeShortText(entry.reasonDe, 320),
+                    reasonEn: normalizeShortText(entry.reasonEn, 320)
+                };
+            })
+            .filter(Boolean)
+            .slice(0, 4)
+        : [];
+
+    const summaryDe = normalizeShortText(object.summaryDe, 700);
+    const summaryEn = normalizeShortText(object.summaryEn, 700);
+    const actionJustificationDe = normalizeShortText(object.actionJustificationDe, 700);
+    const actionJustificationEn = normalizeShortText(object.actionJustificationEn, 700);
+
+    return {
+        riskLevel: normalizeRiskLevel(object.riskLevel),
+        illegalityLikelihood: normalizeIllegalityLevel(object.illegalityLikelihood),
+        workflowRecommendation: normalizeWorkflowRecommendation(object.workflowRecommendation, entityType),
+        suggestedDecisionOutcome: normalizeDecisionOutcome(object.suggestedDecisionOutcome, entityType),
+        summaryDe: summaryDe || 'Keine belastbare KI-Zusammenfassung verfügbar.',
+        summaryEn: summaryEn || 'No reliable AI summary available.',
+        actionJustificationDe: actionJustificationDe || 'Die KI konnte keine belastbare Handlungsempfehlung formulieren.',
+        actionJustificationEn: actionJustificationEn || 'The AI could not formulate a reliable action recommendation.',
+        tosMatches,
+        observedSignalsDe: normalizeStringArray(object.observedSignalsDe, 6, 220),
+        observedSignalsEn: normalizeStringArray(object.observedSignalsEn, 6, 220),
+        evidenceGapsDe: normalizeStringArray(object.evidenceGapsDe, 6, 220),
+        evidenceGapsEn: normalizeStringArray(object.evidenceGapsEn, 6, 220),
+        uncertaintiesDe: normalizeStringArray(object.uncertaintiesDe, 6, 220),
+        uncertaintiesEn: normalizeStringArray(object.uncertaintiesEn, 6, 220),
+        recommendedNextStepsDe: normalizeStringArray(object.recommendedNextStepsDe, 6, 220),
+        recommendedNextStepsEn: normalizeStringArray(object.recommendedNextStepsEn, 6, 220)
+    };
+}
+
+function mapDsaAiAssessmentRow(row) {
+    if (!row) {
+        return null;
+    }
+
+    const result = parseJsonField(row.resultJson);
+    if (!result || typeof result !== 'object' || Array.isArray(result)) {
+        return null;
+    }
+
+    return {
+        id: row.id,
+        entityType: row.entityType,
+        entityId: row.entityId,
+        createdAt: Number(row.createdAt || 0),
+        createdBy: row.createdBy || '',
+        model: row.model || '',
+        tosVersion: row.tosVersion || '',
+        tosHash: row.tosHash || '',
+        result
+    };
+}
+
+async function generateDsaAiAssessment({ dbInstance, entityType, entityId, row, message, evidence = [], decision = null, actor }) {
+    const client = createDsaAiClient();
+    const model = await resolveDsaAiModel(dbInstance);
+    const tos = getCurrentTermsOfService();
+    const clauses = await listActiveTosClauses(dbInstance);
+    if (clauses.length === 0) {
+        throw apiError.internal('dsa_tos_clauses_unavailable');
+    }
+
+    const snapshot = buildDsaAiAssessmentSnapshot({
+        entityType,
+        row,
+        message,
+        evidence,
+        decision
+    });
+
+    const response = await client.responses.create({
+        model,
+        instructions: [
+            'You are a careful moderation analyst.',
+            'Your task is to provide an internal preassessment, not a final moderation decision.',
+            'Ground your assessment in the supplied Terms of Use and the supplied case snapshot only.',
+            'Be explicit about missing evidence and uncertainty.',
+            'Return valid JSON only.'
+        ].join(' '),
+        input: buildDsaAiAssessmentPrompt({ entityType, snapshot, tos, clauses })
+    });
+
+    await recordDsaAiUsage(dbInstance, model, response);
+
+    const parsed = parseJsonObject(response.output_text);
+    if (!parsed) {
+        throw apiError.badGateway('ai_empty_response');
+    }
+
+    const clauseMap = new Map(clauses.map((entry) => [entry.key, entry]));
+    const normalizedResult = normalizeDsaAiAssessmentResult(parsed, entityType, clauseMap);
+    const createdAt = Date.now();
+    const assessmentId = crypto.randomUUID();
+    const record = {
+        id: assessmentId,
+        entityType,
+        entityId,
+        createdAt,
+        createdBy: actor,
+        model,
+        tosVersion: tos.version,
+        tosHash: tos.hash,
+        inputSnapshotJson: JSON.stringify(snapshot),
+        resultJson: JSON.stringify(normalizedResult)
+    };
+
+    await toPromise(tableDsaAiAssessment.create, dbInstance, record);
+
+    tableAudit.create(
+        dbInstance,
+        crypto.randomUUID(),
+        entityType,
+        entityId,
+        'ai_preassessment_create',
+        actor,
+        createdAt,
+        JSON.stringify({
+            assessmentId,
+            model,
+            tosVersion: tos.version,
+            workflowRecommendation: normalizedResult.workflowRecommendation,
+            riskLevel: normalizedResult.riskLevel
+        }),
+        () => { }
+    );
+
+    return mapDsaAiAssessmentRow(record);
 }
 
 async function hasStorageCapacity() {
@@ -998,6 +1507,53 @@ router.get('/notices/:id/status-url', (req, res, next) => {
         if (!statusUrl) return next(apiError.notFound('status_unavailable'));
         res.json({ statusUrl });
     });
+});
+
+router.get('/notices/:id/ai-preassessment/latest', async (req, res, next) => {
+    const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
+
+    try {
+        const row = await toPromise(tableDsaAiAssessment.getLatestByEntity, _db, 'notice', String(req.params.id));
+        res.json(mapDsaAiAssessmentRow(row));
+    } catch (error) {
+        next(apiError.internal('db_error'));
+    }
+});
+
+router.post('/notices/:id/ai-preassessment', async (req, res, next) => {
+    const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
+
+    try {
+        const noticeId = String(req.params.id);
+        const noticeRow = await toPromise(tableNotice.getById, _db, noticeId);
+        if (!noticeRow) return next(apiError.notFound('not_found'));
+
+        const enrichedNotice = await enrichRowWithModeration(noticeRow, new Map());
+        const message = enrichedNotice?.contentId
+            ? await fetchMessageByContentId(enrichedNotice.contentId).catch(() => null)
+            : null;
+        const evidence = await toPromise(tableEvidence.listByNotice, _db, {
+            noticeId,
+            limit: 50,
+            offset: 0
+        }).catch(() => []);
+        const decision = await toPromise(tableDecision.getByNoticeId, _db, noticeId).catch(() => null);
+
+        const assessment = await generateDsaAiAssessment({
+            dbInstance: _db,
+            entityType: 'notice',
+            entityId: noticeId,
+            row: enrichedNotice,
+            message,
+            evidence,
+            decision,
+            actor: `admin:${req.admin?.sub || 'unknown'}`
+        });
+
+        res.status(201).json(assessment);
+    } catch (error) {
+        next(normalizeOpenAiError(error));
+    }
 });
 
 router.patch('/notices/:id/status', (req, res, next) => {
@@ -2330,6 +2886,45 @@ router.get('/signals/:id/status-url', (req, res, next) => {
         if (!statusUrl) return next(apiError.notFound('status_unavailable'));
         res.json({ statusUrl });
     });
+});
+
+router.get('/signals/:id/ai-preassessment/latest', async (req, res, next) => {
+    const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
+
+    try {
+        const row = await toPromise(tableDsaAiAssessment.getLatestByEntity, _db, 'signal', String(req.params.id));
+        res.json(mapDsaAiAssessmentRow(row));
+    } catch (error) {
+        next(apiError.internal('db_error'));
+    }
+});
+
+router.post('/signals/:id/ai-preassessment', async (req, res, next) => {
+    const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
+
+    try {
+        const signalId = String(req.params.id);
+        const signalRow = await toPromise(tableSignal.getById, _db, signalId);
+        if (!signalRow) return next(apiError.notFound('not_found'));
+
+        const enrichedSignal = await enrichRowWithModeration(signalRow, new Map());
+        const message = enrichedSignal?.contentId
+            ? await fetchMessageByContentId(enrichedSignal.contentId).catch(() => null)
+            : null;
+
+        const assessment = await generateDsaAiAssessment({
+            dbInstance: _db,
+            entityType: 'signal',
+            entityId: signalId,
+            row: enrichedSignal,
+            message,
+            actor: `admin:${req.admin?.sub || 'unknown'}`
+        });
+
+        res.status(201).json(assessment);
+    } catch (error) {
+        next(normalizeOpenAiError(error));
+    }
 });
 
 /**

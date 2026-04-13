@@ -23,6 +23,7 @@ import { DsaAppeal } from '../../../interfaces/dsa-appeal.interface';
 import { ListAppealsParams } from '../../../interfaces/list-appeals-params.interface';
 import { DsaNotification, ListNotificationsParams, NotificationMeta, NotificationPayload } from '../../../interfaces/dsa-notification.interface';
 import { DsaTextBlock, DsaTextBlockFilters, DsaTextBlockSavePayload, DsaTextBlockTranslationPreview } from '../../../interfaces/dsa-text-block.interface';
+import { DsaAiAssessmentRecord } from '../../../interfaces/dsa-ai-assessment.interface';
 import { PlatformUserModerationOpenAppealsResponse, PlatformUserModerationResponse, PlatformUserModerationAppeal } from '../../../interfaces/platform-user-moderation.interface';
 import { TranslationHelperService } from '../../translation-helper.service';
 import { DisplayMessageService } from '../../display-message.service';
@@ -587,6 +588,42 @@ export class DsaService {
     return this.http.get<{ statusUrl: string }>(`${this.baseUrl}/signals/${signalId}/status-url`).pipe(
       catchError(err => {
         this.openSnack('Status page not available.', 2000);
+        throw err;
+      })
+    );
+  }
+
+  getLatestNoticeAiAssessment(noticeId: string): Observable<DsaAiAssessmentRecord | null> {
+    return this.http.get<DsaAiAssessmentRecord | null>(`${this.baseUrl}/notices/${encodeURIComponent(noticeId)}/ai-preassessment/latest`).pipe(
+      catchError(err => {
+        this.openSnack('Could not load AI preassessment.', 3000);
+        throw err;
+      })
+    );
+  }
+
+  runNoticeAiAssessment(noticeId: string): Observable<DsaAiAssessmentRecord> {
+    return this.http.post<DsaAiAssessmentRecord>(`${this.baseUrl}/notices/${encodeURIComponent(noticeId)}/ai-preassessment`, {}).pipe(
+      catchError(err => {
+        this.openSnack('Could not run AI preassessment.', 3000);
+        throw err;
+      })
+    );
+  }
+
+  getLatestSignalAiAssessment(signalId: string): Observable<DsaAiAssessmentRecord | null> {
+    return this.http.get<DsaAiAssessmentRecord | null>(`${this.baseUrl}/signals/${encodeURIComponent(signalId)}/ai-preassessment/latest`).pipe(
+      catchError(err => {
+        this.openSnack('Could not load AI preassessment.', 3000);
+        throw err;
+      })
+    );
+  }
+
+  runSignalAiAssessment(signalId: string): Observable<DsaAiAssessmentRecord> {
+    return this.http.post<DsaAiAssessmentRecord>(`${this.baseUrl}/signals/${encodeURIComponent(signalId)}/ai-preassessment`, {}).pipe(
+      catchError(err => {
+        this.openSnack('Could not run AI preassessment.', 3000);
         throw err;
       })
     );

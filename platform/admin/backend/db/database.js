@@ -9,6 +9,7 @@ const tableDsaAppeal = require('./tableDsaAppeal');
 const tableDsaNotification = require('./tableDsaNotification');
 const tableDsaTextBlock = require('./tableDsaTextBlock');
 const tableDsaAuditLog = require('./tableDsaAuditLog');
+const tableDsaAiAssessment = require('./tableDsaAiAssessment');
 const tableStatistic = require('./tableStatistic');
 const tableStatisticSettings = require('./tableStatisticSettings');
 const tableAiSettings = require('./tableAiSettings');
@@ -259,6 +260,7 @@ class Database {
       tableDsaNotification.init(this.db);
       tableDsaTextBlock.init(this.db);
       tableDsaAuditLog.init(this.db);
+      tableDsaAiAssessment.init(this.db);
       tableStatistic.init(this.db);
       tableStatisticSettings.init(this.db);
       tableAiSettings.init(this.db);
