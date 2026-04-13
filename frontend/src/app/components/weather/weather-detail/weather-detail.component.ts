@@ -1,12 +1,27 @@
-
-import { AfterViewInit, Component, ElementRef, inject, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
-import { CategoryScale, Chart, ChartConfiguration, ChartDataset, Filler, LinearScale, LineController, LineElement, PointElement, ScriptableContext, Title, Tooltip } from 'chart.js';
+import { AfterViewInit, Component, ElementRef, inject, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
+import {
+  CategoryScale,
+  Chart,
+  ChartType,
+  Filler,
+  LinearScale,
+  LineController,
+  LineElement,
+  PointElement,
+  RadarController,
+  RadialLinearScale,
+  ScriptableContext,
+  Title,
+  Tooltip
+} from 'chart.js';
 import annotationPlugin, { AnnotationOptions } from 'chartjs-plugin-annotation';
 import { HourlyWeather } from '../../../interfaces/hourly-weather';
 import { Weather } from '../../../interfaces/weather';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
-import { WeatherTile } from '../weather-tile.interface';
 import { getWeatherBaseColor } from '../../../utils/weather-level.util';
+import { WeatherTile } from '../weather-tile.interface';
+
+const RADAR_CHART_BREAKPOINT_PX = 700;
 
 @Component({
   selector: 'app-weather-detail',
@@ -14,31 +29,59 @@ import { getWeatherBaseColor } from '../../../utils/weather-level.util';
   templateUrl: './weather-detail.component.html',
   styleUrl: './weather-detail.component.css'
 })
-export class WeatherDetailComponent implements OnChanges, AfterViewInit {
+export class WeatherDetailComponent implements OnChanges, AfterViewInit, OnDestroy {
   @Input() tile!: WeatherTile;
   @Input() weather: Weather | null = null;
   @Input() selectedDayIndex = 0;
   @Input() selectedHour = 0;
   @ViewChild('chartCanvas', { static: true }) chartCanvas!: ElementRef<HTMLCanvasElement>;
 
-  private chart: Chart<'line'> | null = null;
+  private chart: Chart | null = null;
   private readonly translation = inject(TranslationHelperService);
+  private readonly radarMediaQuery = typeof window !== 'undefined'
+    ? window.matchMedia(`(max-width: ${RADAR_CHART_BREAKPOINT_PX}px)`)
+    : null;
+  private useRadarMode = this.radarMediaQuery?.matches ?? false;
+  private readonly radarMediaQueryListener = (event: MediaQueryListEvent) => {
+    this.useRadarMode = event.matches;
+    this.updateChart(true);
+  };
+  private fullHourLabels: string[] = [];
+  private currentChartType: ChartType | null = null;
 
-  readonly lineChartType = 'line' as const;
-  chartOptions: ChartConfiguration<'line'>['options'] = {};
-  chartData: ChartConfiguration<'line'>['data'] = { labels: [], datasets: [] };
+  chartOptions: any = {};
+  chartData: any = { labels: [], datasets: [] };
+
+  get useRadarChart(): boolean {
+    return this.useRadarMode;
+  }
 
   constructor() {
-    Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale, Title, Tooltip, Filler, annotationPlugin);
+    Chart.register(
+      LineController,
+      RadarController,
+      LineElement,
+      PointElement,
+      LinearScale,
+      CategoryScale,
+      RadialLinearScale,
+      Title,
+      Tooltip,
+      Filler,
+      annotationPlugin
+    );
   }
 
   ngAfterViewInit(): void {
-    this.chart = new Chart(this.chartCanvas.nativeElement, {
-      type: this.lineChartType,
-      data: this.chartData,
-      options: this.chartOptions
-    });
-    this.updateChart();
+    this.radarMediaQuery?.addEventListener('change', this.radarMediaQueryListener);
+    this.updateChart(true);
+  }
+
+  ngOnDestroy(): void {
+    this.radarMediaQuery?.removeEventListener('change', this.radarMediaQueryListener);
+    this.chart?.destroy();
+    this.chart = null;
+    this.currentChartType = null;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -51,7 +94,7 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
     }
   }
 
-  private updateChart(): void {
+  private updateChart(forceRecreate = false): void {
     if (!this.weather || !this.tile) {
       return;
     }
@@ -61,12 +104,30 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
       return;
     }
 
-    const dayHourly = this.weather.hourly.filter(h => h.time.startsWith(selectedDate));
-    const labels = dayHourly.map(h => h.time.split('T')[1].slice(0, 5));
-    const selectedHourStr = this.selectedHour.toString().padStart(2, '0');
-    const selectedIndex = dayHourly.findIndex(h => h.time.includes(`T${selectedHourStr}:`));
+    const dayHourly = this.weather.hourly.filter((hour) => hour.time.startsWith(selectedDate));
+    if (!dayHourly.length) {
+      return;
+    }
 
-    let dataset: ChartDataset<'line', number[]> = {
+    const fullLabels = dayHourly.map((hour) => hour.time.split('T')[1].slice(0, 5));
+    this.fullHourLabels = fullLabels;
+    const selectedIndex = this.getSelectedIndex(dayHourly.length);
+
+    if (this.useRadarChart) {
+      this.updateRadarChart(dayHourly, fullLabels, selectedIndex, forceRecreate);
+      return;
+    }
+
+    this.updateLineChart(dayHourly, fullLabels, selectedIndex, forceRecreate);
+  }
+
+  private updateLineChart(
+    dayHourly: HourlyWeather[],
+    fullLabels: string[],
+    selectedIndex: number,
+    forceRecreate: boolean
+  ): void {
+    let dataset: any = {
       data: [],
       label: '',
       borderColor: '',
@@ -80,10 +141,9 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
     let minY: number | undefined;
     let maxY: number | undefined;
 
-    // === Prepare datasets ===
     switch (this.tile.type) {
       case 'temperature': {
-        const temps = dayHourly.map(h => h.temperature);
+        const temps = dayHourly.map((hour) => hour.temperature);
         const minTemp = Math.min(...temps);
         const maxTemp = Math.max(...temps);
         const { min, max } = this.getHourlyMinMax('temperature');
@@ -95,17 +155,19 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
           ...dataset,
           data: temps,
           label: this.translation.t('weather.chart.temperature'),
-          pointBackgroundColor: temps.map(t => this.getTemperatureColor(t)),
+          pointBackgroundColor: temps.map((temp) => this.getTemperatureColor(temp)),
           segment: {
-            borderColor: ctx => this.mixColors(
+            borderColor: (ctx: any) => this.mixColors(
               this.getTemperatureColor(this.toChartNumber(ctx.p0.parsed.y)),
               this.getTemperatureColor(this.toChartNumber(ctx.p1.parsed.y))
             )
           },
           backgroundColor: (ctx: ScriptableContext<'line'>) => {
-            const chart = ctx.chart;
-            const { ctx: canvasCtx, chartArea } = chart;
-            const gradient = canvasCtx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+            const chartArea = ctx.chart.chartArea;
+            if (!chartArea) {
+              return this.toAlpha(this.getTemperatureColor(maxTemp), 0.24);
+            }
+            const gradient = ctx.chart.ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
             gradient.addColorStop(0, this.getTemperatureColor(minTemp));
             gradient.addColorStop(1, this.getTemperatureColor(maxTemp));
             return gradient;
@@ -114,129 +176,105 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
         break;
       }
       case 'uvIndex': {
-        const uvs = dayHourly.map(h => h.uvIndex);
+        const uvs = dayHourly.map((hour) => hour.uvIndex);
         const minUv = Math.min(...uvs);
         const maxUv = Math.max(...uvs);
+        minY = 0;
+        maxY = 11;
         dataset = {
           ...dataset,
           data: uvs,
           label: this.translation.t('weather.chart.uvIndex'),
-          pointBackgroundColor: uvs.map(v => this.getUvColor(v)),
+          pointBackgroundColor: uvs.map((value) => this.getUvColor(value)),
           segment: {
-            borderColor: ctx => this.mixColors(
+            borderColor: (ctx: any) => this.mixColors(
               this.getUvColor(this.toChartNumber(ctx.p0.parsed.y)),
               this.getUvColor(this.toChartNumber(ctx.p1.parsed.y))
             )
           },
           backgroundColor: (ctx: ScriptableContext<'line'>) => {
-            const chart = ctx.chart;
-            const { ctx: canvasCtx, chartArea } = chart;
-            const gradient = canvasCtx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+            const chartArea = ctx.chart.chartArea;
+            if (!chartArea) {
+              return this.toAlpha(this.getUvColor(maxUv), 0.24);
+            }
+            const gradient = ctx.chart.ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
             gradient.addColorStop(0, this.getUvColor(minUv));
             gradient.addColorStop(1, this.getUvColor(maxUv));
             return gradient;
           }
         };
-        minY = 0;
-        maxY = 11;
         break;
       }
       case 'precipitationprobability': {
-        const precipitationProbability = dayHourly.map(h => h.precipitationProbability);
+        const precipitationProbability = dayHourly.map((hour) => hour.precipitationProbability);
+        const baseColor = this.getBaseColorForSelectedValue(precipitationProbability, selectedIndex);
+        minY = 0;
+        maxY = 100;
         dataset = {
           ...dataset,
           data: precipitationProbability,
           label: this.translation.t('weather.chart.precipitationProbability'),
-          borderColor: this.getBaseColorForSelectedValue(precipitationProbability, selectedIndex),
-          backgroundColor: this.toAlpha(this.getBaseColorForSelectedValue(precipitationProbability, selectedIndex), 0.2),
-          pointBackgroundColor: this.getBaseColorForSelectedValue(precipitationProbability, selectedIndex)
+          borderColor: baseColor,
+          backgroundColor: this.toAlpha(baseColor, 0.2),
+          pointBackgroundColor: baseColor
         };
-        minY = 0;
-        maxY = 100;
         break;
       }
       case 'precipitation': {
-        const precipitation = dayHourly.map(h => h.precipitation);
+        const precipitation = dayHourly.map((hour) => hour.precipitation);
         const { max } = this.getHourlyMinMax('precipitation');
+        const baseColor = this.getBaseColorForSelectedValue(precipitation, selectedIndex);
         minY = 0;
         maxY = max + max * 0.1;
         dataset = {
           ...dataset,
           data: precipitation,
           label: this.translation.t('weather.chart.precipitation'),
-          borderColor: this.getBaseColorForSelectedValue(precipitation, selectedIndex),
-          backgroundColor: this.toAlpha(this.getBaseColorForSelectedValue(precipitation, selectedIndex), 0.2),
-          pointBackgroundColor: this.getBaseColorForSelectedValue(precipitation, selectedIndex)
+          borderColor: baseColor,
+          backgroundColor: this.toAlpha(baseColor, 0.2),
+          pointBackgroundColor: baseColor
         };
         break;
       }
       case 'wind': {
-        const winds = dayHourly.map(h => h.wind);
+        const winds = dayHourly.map((hour) => hour.wind);
         const { min, max } = this.getHourlyMinMax('wind');
+        const baseColor = this.getBaseColorForSelectedValue(winds, selectedIndex);
         minY = Math.max(min - min * 0.1, 0);
         maxY = max + max * 0.1;
         dataset = {
           ...dataset,
           data: winds,
           label: this.translation.t('weather.chart.wind'),
-          borderColor: this.getBaseColorForSelectedValue(winds, selectedIndex),
-          backgroundColor: this.toAlpha(this.getBaseColorForSelectedValue(winds, selectedIndex), 0.2),
-          pointBackgroundColor: this.getBaseColorForSelectedValue(winds, selectedIndex)
+          borderColor: baseColor,
+          backgroundColor: this.toAlpha(baseColor, 0.2),
+          pointBackgroundColor: baseColor
         };
         break;
       }
       case 'pressure': {
-        const pressures = dayHourly.map(h => h.pressure);
+        const pressures = dayHourly.map((hour) => hour.pressure);
         const { min, max } = this.getHourlyMinMax('pressure');
+        const baseColor = this.getBaseColorForSelectedValue(pressures, selectedIndex);
         minY = min - 0.1;
         maxY = max + 0.1;
         dataset = {
           ...dataset,
           data: pressures,
           label: this.translation.t('weather.chart.pressure'),
-          borderColor: this.getBaseColorForSelectedValue(pressures, selectedIndex),
-          backgroundColor: this.toAlpha(this.getBaseColorForSelectedValue(pressures, selectedIndex), 0.2),
-          pointBackgroundColor: this.getBaseColorForSelectedValue(pressures, selectedIndex)
+          borderColor: baseColor,
+          backgroundColor: this.toAlpha(baseColor, 0.2),
+          pointBackgroundColor: baseColor
         };
         break;
       }
     }
 
-    // === Annotations ===
-    const annotations: Record<string, Partial<AnnotationOptions<'line'>>> = {
-      /*sunrise: {
-        type: 'line',
-        xMin: this.getHourIndex(this.weather.daily[this.selectedDayIndex].sunrise),
-        xMax: this.getHourIndex(this.weather.daily[this.selectedDayIndex].sunrise),
-        borderColor: '#FFD700',
-        borderWidth: 1,
-        /*label: {
-          backgroundColor: '#FFD700',
-          content: 'Sunrise',
-          display: true,
-          color: '#333333',
-          position: 'end'
-        }
-      },
-      sunset: {
-        type: 'line',
-        xMin: this.getHourIndex(this.weather.daily[this.selectedDayIndex].sunset),
-        xMax: this.getHourIndex(this.weather.daily[this.selectedDayIndex].sunset),
-        borderColor: '#FF4500',
-        borderWidth: 1,
-        /*label: {
-          backgroundColor: '#FF4500',
-          content: 'Sunset',
-          display: true,
-          color: '#ffffff',
-          position: 'start'
-        }
-      }*/
-    };
+    const annotations: Record<string, Partial<AnnotationOptions<'line'>>> = {};
 
     if (selectedIndex !== -1) {
       const value = this.getSelectedChartValue(dayHourly[selectedIndex]);
-      const label = labels[selectedIndex];
+      const label = fullLabels[selectedIndex];
       const color = getWeatherBaseColor(this.tile.type, value);
       annotations['selectedHour'] = {
         type: 'line',
@@ -260,7 +298,6 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
     const textColor = isDark ? '#ffffff' : '#000000';
     const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)';
 
-    // === Set chart options and data ===
     this.chartOptions = {
       responsive: true,
       maintainAspectRatio: false,
@@ -311,11 +348,250 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
       }
     };
 
-    this.chartData = { labels, datasets: [dataset] };
-    if (this.chart) {
-      this.chart.data = this.chartData; // keep chart data in sync
-      this.chart.options = this.chartOptions;
-      this.chart.update();
+    this.chartData = { labels: fullLabels, datasets: [dataset] };
+    this.ensureChart('line', forceRecreate);
+    if (!this.chart) {
+      return;
+    }
+    this.chart.data = this.chartData as any;
+    this.chart.options = (this.chartOptions ?? {}) as any;
+    this.chart.update();
+  }
+
+  private updateRadarChart(
+    dayHourly: HourlyWeather[],
+    fullLabels: string[],
+    selectedIndex: number,
+    forceRecreate: boolean
+  ): void {
+    const radialLabels = this.getRadarLabels(fullLabels);
+    const selectedValue = this.getSelectedChartValue(dayHourly[selectedIndex] ?? dayHourly[0]);
+    const isDark = document.body.classList.contains('dark');
+    const textColor = isDark ? '#ffffff' : '#000000';
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)';
+    const { dataset, minY, maxY } = this.buildRadarDataset(dayHourly, selectedIndex);
+
+    this.chartOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        annotation: { annotations: {} },
+        title: {
+          display: true,
+          text: [
+            this.tile.label,
+            `${fullLabels[selectedIndex] ?? this.formatHour(selectedIndex)}: ${selectedValue}${this.getSelectedChartUnit()}`
+          ],
+          color: textColor,
+          font: {
+            size: 18,
+            weight: 'bold'
+          },
+          padding: {
+            top: 10,
+            bottom: 20
+          }
+        },
+        tooltip: {
+          callbacks: {
+            title: (items: any[]) => this.getFullHourLabel(items[0]?.dataIndex ?? 0),
+            label: (ctx: any) => `${ctx.formattedValue}${this.getSelectedChartUnit()}`
+          }
+        }
+      },
+      scales: {
+        r: {
+          min: minY,
+          max: maxY,
+          beginAtZero: minY === 0,
+          grid: { color: gridColor },
+          angleLines: { color: gridColor },
+          pointLabels: {
+            color: textColor,
+            font: {
+              size: 11,
+              weight: 600
+            }
+          },
+          ticks: {
+            color: textColor,
+            backdropColor: 'transparent',
+            showLabelBackdrop: false,
+            maxTicksLimit: 4
+          }
+        }
+      },
+      elements: {
+        line: {
+          borderWidth: 2.5
+        }
+      }
+    };
+
+    this.chartData = {
+      labels: radialLabels,
+      datasets: [dataset]
+    };
+
+    this.ensureChart('radar', forceRecreate);
+    if (!this.chart) {
+      return;
+    }
+    this.chart.data = this.chartData as any;
+    this.chart.options = (this.chartOptions ?? {}) as any;
+    this.chart.update();
+  }
+
+  private buildRadarDataset(
+    dayHourly: HourlyWeather[],
+    selectedIndex: number
+  ): { dataset: any; minY: number; maxY: number } {
+    const values = dayHourly.map((hour) => this.getSelectedChartValue(hour));
+    const pointRadius = values.map((_value, index) => index === selectedIndex ? 6 : 3);
+    const pointBorderWidth = values.map((_value, index) => index === selectedIndex ? 3 : 1);
+    const pointBorderColor = values.map((_value, index) => index === selectedIndex ? '#ffffff' : 'rgba(255,255,255,0.35)');
+    const baseColor = this.getBaseColorForSelectedValue(values, selectedIndex);
+
+    switch (this.tile.type) {
+      case 'temperature': {
+        const minTemp = Math.min(...values);
+        const maxTemp = Math.max(...values);
+        const { min, max } = this.getHourlyMinMax('temperature');
+        const minPadding = Math.max(Math.abs(min) * 0.1, 0.5);
+        const maxPadding = Math.max(Math.abs(max) * 0.1, 0.5);
+        return {
+          minY: min - minPadding,
+          maxY: max + maxPadding,
+          dataset: {
+            data: values,
+            label: this.translation.t('weather.chart.temperature'),
+            fill: true,
+            tension: 0.25,
+            pointRadius,
+            pointBorderWidth,
+            pointBorderColor,
+            pointBackgroundColor: values.map((value) => this.getTemperatureColor(value)),
+            segment: {
+              borderColor: (ctx: any) => this.mixColors(
+                this.getTemperatureColor(this.toChartNumber(ctx.p0.parsed.y)),
+                this.getTemperatureColor(this.toChartNumber(ctx.p1.parsed.y))
+              )
+            },
+            borderColor: this.mixColors(this.getTemperatureColor(minTemp), this.getTemperatureColor(maxTemp)),
+            backgroundColor: (ctx: ScriptableContext<'radar'>) => this.createRadarGradient(
+              ctx,
+              this.getTemperatureColor(minTemp),
+              this.getTemperatureColor(maxTemp)
+            )
+          }
+        };
+      }
+      case 'uvIndex': {
+        const minUv = Math.min(...values);
+        const maxUv = Math.max(...values);
+        return {
+          minY: 0,
+          maxY: 11,
+          dataset: {
+            data: values,
+            label: this.translation.t('weather.chart.uvIndex'),
+            fill: true,
+            tension: 0.25,
+            pointRadius,
+            pointBorderWidth,
+            pointBorderColor,
+            pointBackgroundColor: values.map((value) => this.getUvColor(value)),
+            segment: {
+              borderColor: (ctx: any) => this.mixColors(
+                this.getUvColor(this.toChartNumber(ctx.p0.parsed.y)),
+                this.getUvColor(this.toChartNumber(ctx.p1.parsed.y))
+              )
+            },
+            borderColor: this.mixColors(this.getUvColor(minUv), this.getUvColor(maxUv)),
+            backgroundColor: (ctx: ScriptableContext<'radar'>) => this.createRadarGradient(
+              ctx,
+              this.getUvColor(minUv),
+              this.getUvColor(maxUv)
+            )
+          }
+        };
+      }
+      case 'precipitationprobability':
+        return {
+          minY: 0,
+          maxY: 100,
+          dataset: {
+            data: values,
+            label: this.translation.t('weather.chart.precipitationProbability'),
+            fill: true,
+            tension: 0.25,
+            pointRadius,
+            pointBorderWidth,
+            pointBorderColor,
+            pointBackgroundColor: values.map((value) => getWeatherBaseColor(this.tile.type, value)),
+            borderColor: baseColor,
+            backgroundColor: this.toAlpha(baseColor, 0.2)
+          }
+        };
+      case 'precipitation': {
+        const { max } = this.getHourlyMinMax('precipitation');
+        return {
+          minY: 0,
+          maxY: max + max * 0.1,
+          dataset: {
+            data: values,
+            label: this.translation.t('weather.chart.precipitation'),
+            fill: true,
+            tension: 0.25,
+            pointRadius,
+            pointBorderWidth,
+            pointBorderColor,
+            pointBackgroundColor: values.map((value) => getWeatherBaseColor(this.tile.type, value)),
+            borderColor: baseColor,
+            backgroundColor: this.toAlpha(baseColor, 0.2)
+          }
+        };
+      }
+      case 'wind': {
+        const { min, max } = this.getHourlyMinMax('wind');
+        return {
+          minY: Math.max(min - min * 0.1, 0),
+          maxY: max + max * 0.1,
+          dataset: {
+            data: values,
+            label: this.translation.t('weather.chart.wind'),
+            fill: true,
+            tension: 0.25,
+            pointRadius,
+            pointBorderWidth,
+            pointBorderColor,
+            pointBackgroundColor: values.map((value) => getWeatherBaseColor(this.tile.type, value)),
+            borderColor: baseColor,
+            backgroundColor: this.toAlpha(baseColor, 0.2)
+          }
+        };
+      }
+      case 'pressure':
+      default: {
+        const { min, max } = this.getHourlyMinMax('pressure');
+        return {
+          minY: min - 0.1,
+          maxY: max + 0.1,
+          dataset: {
+            data: values,
+            label: this.translation.t('weather.chart.pressure'),
+            fill: true,
+            tension: 0.25,
+            pointRadius,
+            pointBorderWidth,
+            pointBorderColor,
+            pointBackgroundColor: values.map((value) => getWeatherBaseColor(this.tile.type, value)),
+            borderColor: baseColor,
+            backgroundColor: this.toAlpha(baseColor, 0.2)
+          }
+        };
+      }
     }
   }
 
@@ -324,21 +600,19 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
       return;
     }
 
+    if (this.useRadarChart) {
+      this.updateRadarSelection();
+      return;
+    }
+
     const labels = Array.isArray(this.chartData.labels) ? this.chartData.labels : [];
     if (!labels.length) {
       return;
     }
 
-    const selectedHourStr = this.selectedHour.toString().padStart(2, '0');
-    let selectedIndex = labels.findIndex((label) => {
-      return typeof label === 'string' && label.startsWith(`${selectedHourStr}:`);
-    });
-    if (selectedIndex === -1) {
-      selectedIndex = Math.min(this.selectedHour, labels.length - 1);
-    }
-
+    const selectedIndex = this.getSelectedIndex(labels.length);
     const labelValue = labels[selectedIndex];
-    const label = (typeof labelValue === 'string' ? labelValue : `${selectedHourStr}:00`).toString();
+    const label = (typeof labelValue === 'string' ? labelValue : this.formatHour(selectedIndex)).toString();
     const rawValue = this.chartData.datasets?.[0]?.data?.[selectedIndex];
     const numericValue = typeof rawValue === 'number' ? rawValue : Number(rawValue ?? 0);
     const color = getWeatherBaseColor(this.tile.type, numericValue);
@@ -383,6 +657,38 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
     this.chart.update('none');
   }
 
+  private updateRadarSelection(): void {
+    if (!this.chart || !this.tile || this.currentChartType !== 'radar') {
+      return;
+    }
+
+    const data = this.chart.data.datasets?.[0]?.data ?? [];
+    if (!data.length) {
+      return;
+    }
+
+    const selectedIndex = this.getSelectedIndex(data.length);
+    const pointRadius = data.map((_value, index) => index === selectedIndex ? 6 : 3);
+    const pointBorderWidth = data.map((_value, index) => index === selectedIndex ? 3 : 1);
+    const pointBorderColor = data.map((_value, index) => index === selectedIndex ? '#ffffff' : 'rgba(255,255,255,0.35)');
+    const dataset = this.chart.data.datasets[0] as any;
+    const selectedValueRaw = data[selectedIndex];
+    const selectedValue = typeof selectedValueRaw === 'number' ? selectedValueRaw : Number(selectedValueRaw ?? 0);
+
+    dataset.pointRadius = pointRadius;
+    dataset.pointBorderWidth = pointBorderWidth;
+    dataset.pointBorderColor = pointBorderColor;
+
+    if (this.chart.options.plugins?.title) {
+      this.chart.options.plugins.title.text = [
+        this.tile.label,
+        `${this.getFullHourLabel(selectedIndex)}: ${selectedValue}${this.getSelectedChartUnit()}`
+      ];
+    }
+
+    this.chart.update('none');
+  }
+
   private ensureAnnotationConfig(): Record<string, AnnotationOptions<'line'>> {
     if (!this.chart) {
       return {};
@@ -395,12 +701,61 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
     return annotationOptions.annotations as Record<string, AnnotationOptions<'line'>>;
   }
 
-  /*private getHourIndex(time: string): number {
-    const hour = +time.split('T')[1].split(':')[0];
-    return this.weather?.hourly.findIndex(h =>
-      h.time.includes(`T${hour.toString().padStart(2, '0')}:`)
-    ) ?? -1;
-  }*/
+  private ensureChart(chartType: ChartType, forceRecreate = false): void {
+    if (!this.chartCanvas?.nativeElement) {
+      return;
+    }
+
+    if (!forceRecreate && this.chart && this.currentChartType === chartType) {
+      return;
+    }
+
+    this.chart?.destroy();
+    this.chart = new Chart(this.chartCanvas.nativeElement, {
+      type: chartType,
+      data: this.chartData,
+      options: this.chartOptions
+    });
+    this.currentChartType = chartType;
+  }
+
+  private getSelectedIndex(length: number): number {
+    if (length <= 0) {
+      return 0;
+    }
+    return Math.max(0, Math.min(this.selectedHour, length - 1));
+  }
+
+  private getRadarLabels(labels: string[]): string[] {
+    return labels.map((label, index) => index % 6 === 0 ? label : '');
+  }
+
+  private getFullHourLabel(index: number): string {
+    return this.fullHourLabels[index] ?? this.formatHour(index);
+  }
+
+  private formatHour(index: number): string {
+    return `${index.toString().padStart(2, '0')}:00`;
+  }
+
+  private createRadarGradient(
+    ctx: ScriptableContext<'radar'>,
+    innerColor: string,
+    outerColor: string
+  ): CanvasGradient | string {
+    const chartArea = ctx.chart.chartArea;
+    if (!chartArea) {
+      return this.toAlpha(outerColor, 0.24);
+    }
+
+    const centerX = (chartArea.left + chartArea.right) / 2;
+    const centerY = (chartArea.top + chartArea.bottom) / 2;
+    const radius = Math.min(chartArea.right - chartArea.left, chartArea.bottom - chartArea.top) / 2;
+    const gradient = ctx.chart.ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+    gradient.addColorStop(0, this.toAlpha(innerColor, 0.12));
+    gradient.addColorStop(1, this.toAlpha(outerColor, 0.28));
+    return gradient;
+  }
 
   private getSelectedChartValue(hourData: HourlyWeather): number {
     switch (this.tile.type) {
@@ -441,9 +796,9 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
     const rgbToHex = (r: number, g: number, b: number) =>
       '#' +
       [r, g, b]
-        .map(x => {
-          const hex = x.toString(16);
-          return hex.length === 1 ? '0' + hex : hex;
+        .map((value) => {
+          const hex = value.toString(16);
+          return hex.length === 1 ? `0${hex}` : hex;
         })
         .join('');
 
@@ -471,8 +826,8 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
     if (!this.weather || !this.weather.hourly) return { min: 0, max: 0 };
 
     const values = this.weather.hourly
-      .map(h => h[field])
-      .filter(v => typeof v === 'number');
+      .map((hour) => hour[field])
+      .filter((value) => typeof value === 'number');
 
     if (values.length === 0) return { min: 0, max: 0 };
 
