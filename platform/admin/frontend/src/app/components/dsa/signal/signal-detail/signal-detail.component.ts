@@ -22,6 +22,7 @@ import { parsePublicMessageDetailContent } from '../../../../utils/reported-cont
 import { ConfirmDialogComponent } from '../../../shared/confirm-dialog.component';
 import { DisplayMessageService } from '../../../../services/display-message.service';
 import { StickerPreviewComponent } from '../../../shared/sticker-preview/sticker-preview.component';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-signal-detail',
@@ -247,15 +248,42 @@ export class SignalDetailComponent implements OnInit {
     if (this.data.source !== 'signal' || !this.data.signalId || this.assessmentRunning()) {
       return;
     }
+
+    const loadingRef = this.snack.open(
+      this.i18n.t('Please wait while the AI processes your request.'),
+      undefined,
+      {
+        title: this.i18n.t('AI preassessment'),
+        icon: 'hourglass_top',
+        showSpinner: true,
+        layout: 'dialog',
+        duration: 0,
+        autoclose: false,
+        disableClose: true,
+        hasBackdrop: true
+      }
+    );
+
     this.assessmentRunning.set(true);
-    this.dsa.runSignalAiAssessment(this.data.signalId).subscribe({
-      next: (assessment) => {
-        this.assessment.set(assessment);
-        this.snack.open(this.i18n.t('AI preassessment updated.'), this.i18n.t('OK'), { duration: 2500 });
-      },
-      error: () => undefined,
-      complete: () => this.assessmentRunning.set(false)
-    });
+    this.dsa.runSignalAiAssessment(this.data.signalId)
+      .pipe(
+        finalize(() => {
+          this.assessmentRunning.set(false);
+          loadingRef.dismiss();
+        })
+      )
+      .subscribe({
+        next: (assessment) => {
+          this.assessment.set(assessment);
+          this.snack.open(this.i18n.t('AI preassessment updated.'), this.i18n.t('OK'), { duration: 2500 });
+        },
+        error: () => {
+          this.snack.open(this.i18n.t('Could not run AI preassessment.'), this.i18n.t('OK'), {
+            duration: 3000,
+            panelClass: 'snack-error'
+          });
+        }
+      });
   }
 
   loadPlatformUserModeration(userId: string) {

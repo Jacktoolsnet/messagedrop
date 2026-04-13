@@ -13,6 +13,14 @@ export interface DisplayMessageOpenConfig {
   horizontalPosition?: SnackbarHorizontalPosition;
   verticalPosition?: SnackbarVerticalPosition;
   panelClass?: string | string[];
+  title?: string;
+  icon?: string;
+  showSpinner?: boolean;
+  autoclose?: boolean;
+  layout?: 'dialog' | 'toast';
+  disableClose?: boolean;
+  hasBackdrop?: boolean;
+  maxWidth?: string;
 }
 
 export class DisplayMessageRef {
@@ -48,27 +56,30 @@ export class DisplayMessageRef {
 })
 export class DisplayMessageService {
   private readonly dialog = inject(MatDialog);
-  private activeToastRef: MatDialogRef<DisplayMessageComponent, DisplayMessageCloseResult> | null = null;
+  private activeMessageRef: MatDialogRef<DisplayMessageComponent, DisplayMessageCloseResult> | null = null;
 
   open(message: string, action?: string, config: DisplayMessageOpenConfig = {}): DisplayMessageRef {
-    this.activeToastRef?.close();
+    this.activeMessageRef?.close();
 
     const toneClass = this.resolveToneClass(config.panelClass);
     const normalizedAction = this.normalizeAction(action);
+    const layout = config.layout ?? 'toast';
+    const isToast = layout === 'toast';
     const toastRef = this.dialog.open(DisplayMessageComponent, {
-      data: this.buildDialogData(message, normalizedAction, toneClass, config.duration),
+      data: this.buildDialogData(message, normalizedAction, toneClass, config),
       autoFocus: false,
       restoreFocus: false,
-      hasBackdrop: false,
-      panelClass: ['display-message-toast', toneClass],
-      position: this.resolvePosition(config),
-      maxWidth: 'min(420px, calc(100vw - 32px))'
+      disableClose: config.disableClose ?? false,
+      hasBackdrop: config.hasBackdrop ?? !isToast,
+      panelClass: isToast ? ['display-message-toast', toneClass] : undefined,
+      position: isToast ? this.resolvePosition(config) : undefined,
+      maxWidth: config.maxWidth ?? (isToast ? 'min(420px, calc(100vw - 32px))' : '92vw')
     });
 
-    this.activeToastRef = toastRef;
+    this.activeMessageRef = toastRef;
     toastRef.afterClosed().subscribe(() => {
-      if (this.activeToastRef === toastRef) {
-        this.activeToastRef = null;
+      if (this.activeMessageRef === toastRef) {
+        this.activeMessageRef = null;
       }
     });
 
@@ -79,19 +90,22 @@ export class DisplayMessageService {
     message: string,
     action: string | undefined,
     toneClass: string,
-    duration?: number
+    config: DisplayMessageOpenConfig
   ): DisplayMessageConfig {
+    const layout = config.layout ?? 'toast';
+    const normalizedDelay = Math.max(0, config.duration ?? (layout === 'toast' ? 3000 : 0));
+
     return {
       showAlways: true,
-      title: '',
+      title: config.title ?? '',
       image: '',
-      icon: this.resolveIcon(toneClass),
+      icon: config.icon ?? this.resolveIcon(toneClass),
       message,
       button: action ?? '',
-      delay: Math.max(0, duration ?? 3000),
-      showSpinner: false,
-      autoclose: (duration ?? 3000) > 0,
-      layout: 'toast'
+      delay: normalizedDelay,
+      showSpinner: config.showSpinner ?? false,
+      autoclose: config.autoclose ?? (layout === 'toast' && normalizedDelay > 0),
+      layout
     };
   }
 

@@ -24,6 +24,7 @@ import { DsaAiAssessmentClauseMatch, DsaAiAssessmentRecord, DsaAiSuggestedDecisi
 import { parseReportedContentPayload } from '../../../../utils/reported-content.util';
 import { DisplayMessageService } from '../../../../services/display-message.service';
 import { StickerPreviewComponent } from '../../../shared/sticker-preview/sticker-preview.component';
+import { finalize } from 'rxjs';
 
 // Optional: wenn du die vorhandene PublicMessageDetailComponent nutzen willst
 // import { PublicMessageDetailComponent } from '../../../shared/public-message-detail/public-message-detail.component';
@@ -266,15 +267,42 @@ export class NoticeDetailComponent implements OnInit {
 
   runAiAssessment(): void {
     if (this.assessmentRunning()) return;
+
+    const loadingRef = this.snack.open(
+      this.i18n.t('Please wait while the AI processes your request.'),
+      undefined,
+      {
+        title: this.i18n.t('AI preassessment'),
+        icon: 'hourglass_top',
+        showSpinner: true,
+        layout: 'dialog',
+        duration: 0,
+        autoclose: false,
+        disableClose: true,
+        hasBackdrop: true
+      }
+    );
+
     this.assessmentRunning.set(true);
-    this.dsa.runNoticeAiAssessment(this.notice().id).subscribe({
-      next: (assessment) => {
-        this.assessment.set(assessment);
-        this.snack.open(this.i18n.t('AI preassessment updated.'), this.i18n.t('OK'), { duration: 2500 });
-      },
-      error: () => undefined,
-      complete: () => this.assessmentRunning.set(false)
-    });
+    this.dsa.runNoticeAiAssessment(this.notice().id)
+      .pipe(
+        finalize(() => {
+          this.assessmentRunning.set(false);
+          loadingRef.dismiss();
+        })
+      )
+      .subscribe({
+        next: (assessment) => {
+          this.assessment.set(assessment);
+          this.snack.open(this.i18n.t('AI preassessment updated.'), this.i18n.t('OK'), { duration: 2500 });
+        },
+        error: () => {
+          this.snack.open(this.i18n.t('Could not run AI preassessment.'), this.i18n.t('OK'), {
+            duration: 3000,
+            panelClass: 'snack-error'
+          });
+        }
+      });
   }
 
   loadPlatformUserModeration(userId: string) {
