@@ -36,10 +36,15 @@ const evidenceUploadDir = path.join(__dirname, '..', 'uploads', 'evidence');
 fs.mkdirSync(evidenceUploadDir, { recursive: true });
 const maxEvidenceFiles = Math.max(1, Number(process.env.DSA_EVIDENCE_MAX_FILES || 4));
 const maxEvidenceFileBytes = Math.max(1, Number(process.env.DSA_EVIDENCE_MAX_FILE_MB || 1)) * 1024 * 1024;
+const maxEvidenceScreenshotBytes = Math.max(
+    maxEvidenceFileBytes,
+    Math.max(1, Number(process.env.DSA_EVIDENCE_SCREENSHOT_MAX_FILE_MB || 4)) * 1024 * 1024
+);
 const minFreeStorageMb = Math.max(0, Number(process.env.DSA_EVIDENCE_MIN_FREE_MB || 1000));
 const DEFAULT_ADMIN_MODEL = 'gpt-5.4';
 const DSA_AI_ASSESSMENT_TOOL = 'dsa_preassessment';
 const DSA_AI_TERMS_PATH = path.resolve(__dirname, '..', '..', '..', '..', 'frontend', 'src', 'assets', 'legal', 'terms-of-service-de.txt');
+const SCREENSHOT_QUALITY_STEPS = [82, 72, 62];
 
 const DSA_AI_RISK_LEVELS = new Set(['low', 'medium', 'high']);
 const DSA_AI_ILLEGALITY_LEVELS = new Set(['low', 'medium', 'high', 'unclear']);
@@ -871,6 +876,48 @@ async function hasStorageCapacity() {
     } catch {
         return true;
     }
+}
+
+async function captureEvidenceScreenshot(page, outPath, { fullPage, elementSelector, maxBytes }) {
+    let lastSize = 0;
+
+    for (const quality of SCREENSHOT_QUALITY_STEPS) {
+        await fs.promises.unlink(outPath).catch(() => { });
+
+        const screenshotOptions = {
+            path: outPath,
+            fullPage,
+            type: 'jpeg',
+            quality,
+            scale: 'css',
+            animations: 'disabled',
+            caret: 'hide'
+        };
+
+        if (elementSelector) {
+            try {
+                const el = page.locator(elementSelector).first();
+                await el.waitFor({ timeout: 5000 }).catch(() => { });
+                await el.screenshot(screenshotOptions);
+            } catch {
+                await page.screenshot(screenshotOptions);
+            }
+        } else {
+            await page.screenshot(screenshotOptions);
+        }
+
+        const stat = await fs.promises.stat(outPath);
+        lastSize = stat.size;
+        if (stat.size <= maxBytes) {
+            return { size: stat.size, quality };
+        }
+    }
+
+    await fs.promises.unlink(outPath).catch(() => { });
+    const apiErr = apiError.payloadTooLarge('file_too_large');
+    apiErr.maxBytes = maxBytes;
+    apiErr.actualBytes = lastSize;
+    throw apiErr;
 }
 
 async function countFileEvidence(dbInstance, noticeId) {
@@ -2139,7 +2186,7 @@ router.post('/notices/:id/evidence/screenshot', async (req, res, next) => {
 
     const now = Date.now();
     const id = crypto.randomUUID();
-    const storedName = `${now}-${id}.png`;
+    const storedName = `${now}-${id}.jpg`;
     const outPath = path.join(evidenceUploadDir, storedName);
 
     let browser;
@@ -2232,30 +2279,11 @@ router.post('/notices/:id/evidence/screenshot', async (req, res, next) => {
             await page.waitForTimeout(delayMs);
         }
 
-        if (elementSelector) {
-            try {
-                const el = page.locator(elementSelector).first();
-                await el.waitFor({ timeout: 5000 }).catch(() => { });
-                await el.screenshot({ path: outPath });
-            } catch {
-                await page.screenshot({ path: outPath, fullPage });
-            }
-        } else {
-            await page.screenshot({ path: outPath, fullPage });
-        }
-        try {
-            const stat = await fs.promises.stat(outPath);
-            if (stat.size > maxEvidenceFileBytes) {
-                await fs.promises.unlink(outPath).catch(() => { });
-                const apiErr = apiError.payloadTooLarge('file_too_large');
-                apiErr.maxBytes = maxEvidenceFileBytes;
-                return next(apiErr);
-            }
-        } catch {
-            await fs.promises.unlink(outPath).catch(() => { });
-            const apiErr = apiError.internal('file_access_failed');
-            return next(apiErr);
-        }
+        await captureEvidenceScreenshot(page, outPath, {
+            fullPage,
+            elementSelector,
+            maxBytes: maxEvidenceScreenshotBytes
+        });
         await context.close();
     } catch (err) {
         if (browser) {
@@ -2264,6 +2292,9 @@ router.post('/notices/:id/evidence/screenshot', async (req, res, next) => {
             } catch (closeError) {
                 req.logger?.warn('playwright close failed', { error: closeError?.message });
             }
+        }
+        if (err?.status || err?.statusCode) {
+            return next(err);
         }
         // cleanup any partial file
         fs.promises.unlink(outPath).catch(() => { });
@@ -2279,7 +2310,7 @@ router.post('/notices/:id/evidence/screenshot', async (req, res, next) => {
     }
 
     // Store as file evidence
-    const fileName = `screenshot-${u.hostname}.png`;
+    const fileName = `screenshot-${u.hostname}.jpg`;
     const addedAt = now;
     tableEvidence.create(
         _db,

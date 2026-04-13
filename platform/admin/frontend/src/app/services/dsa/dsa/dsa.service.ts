@@ -49,6 +49,16 @@ export class DsaService {
     this.snack.open(this.i18n.t(message), this.i18n.t('OK'), { duration });
   }
 
+  private formatMaxFileSizeMb(maxBytes?: number): string {
+    const bytes = Number(maxBytes);
+    if (!Number.isFinite(bytes) || bytes <= 0) {
+      return '1';
+    }
+
+    const mb = bytes / (1024 * 1024);
+    return mb >= 10 ? String(Math.round(mb)) : mb.toFixed(1).replace(/\.0$/, '');
+  }
+
   /* =======================
    *  NOTICES (new / ergänzt)
    * ======================= */
@@ -564,8 +574,13 @@ export class DsaService {
         catchError(err => {
           const msg = err?.error?.error === 'screenshot_unavailable'
             ? 'Screenshot service not available on server.'
-            : 'Could not create screenshot evidence.';
-          this.openSnack(msg);
+            : err?.error?.error === 'file_too_large'
+              ? this.i18n.t('Screenshot evidence is too large. Maximum allowed size: {{size}} MB.', {
+                size: this.formatMaxFileSizeMb(err?.error?.maxBytes)
+              })
+              : 'Could not create screenshot evidence.';
+
+          this.snack.open(typeof msg === 'string' ? msg : this.i18n.t('Could not create screenshot evidence.'), this.i18n.t('OK'), { duration: 4000 });
           throw err;
         })
       );
