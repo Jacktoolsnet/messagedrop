@@ -471,12 +471,10 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit, OnDestr
       case 'temperature': {
         const minTemp = Math.min(...values);
         const maxTemp = Math.max(...values);
-        const { min, max } = this.getHourlyMinMax('temperature');
-        const minPadding = Math.max(Math.abs(min) * 0.1, 0.5);
-        const maxPadding = Math.max(Math.abs(max) * 0.1, 0.5);
+        const { minY, maxY } = this.getRadarScaleBounds(values);
         return {
-          minY: min - minPadding,
-          maxY: max + maxPadding,
+          minY,
+          maxY,
           dataset: {
             data: values,
             label: this.translation.t('weather.chart.temperature'),
@@ -504,9 +502,10 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit, OnDestr
       case 'uvIndex': {
         const minUv = Math.min(...values);
         const maxUv = Math.max(...values);
+        const { minY, maxY } = this.getRadarScaleBounds(values, true);
         return {
-          minY: 0,
-          maxY: 11,
+          minY,
+          maxY,
           dataset: {
             data: values,
             label: this.translation.t('weather.chart.uvIndex'),
@@ -531,10 +530,11 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit, OnDestr
           }
         };
       }
-      case 'precipitationprobability':
+      case 'precipitationprobability': {
+        const { minY, maxY } = this.getRadarScaleBounds(values, true);
         return {
-          minY: 0,
-          maxY: 100,
+          minY,
+          maxY,
           dataset: {
             data: values,
             label: this.translation.t('weather.chart.precipitationProbability'),
@@ -548,11 +548,12 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit, OnDestr
             backgroundColor: this.toAlpha(baseColor, 0.2)
           }
         };
+      }
       case 'precipitation': {
-        const { max } = this.getHourlyMinMax('precipitation');
+        const { minY, maxY } = this.getRadarScaleBounds(values, true);
         return {
-          minY: 0,
-          maxY: max + max * 0.1,
+          minY,
+          maxY,
           dataset: {
             data: values,
             label: this.translation.t('weather.chart.precipitation'),
@@ -568,10 +569,10 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit, OnDestr
         };
       }
       case 'wind': {
-        const { min, max } = this.getHourlyMinMax('wind');
+        const { minY, maxY } = this.getRadarScaleBounds(values, true);
         return {
-          minY: Math.max(min - min * 0.1, 0),
-          maxY: max + max * 0.1,
+          minY,
+          maxY,
           dataset: {
             data: values,
             label: this.translation.t('weather.chart.wind'),
@@ -588,10 +589,10 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit, OnDestr
       }
       case 'pressure':
       default: {
-        const { min, max } = this.getHourlyMinMax('pressure');
+        const { minY, maxY } = this.getRadarScaleBounds(values);
         return {
-          minY: min - 0.1,
-          maxY: max + 0.1,
+          minY,
+          maxY,
           dataset: {
             data: values,
             label: this.translation.t('weather.chart.pressure'),
@@ -747,6 +748,24 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit, OnDestr
       return 0;
     }
     return Math.max(0, Math.min(this.selectedHour, length - 1));
+  }
+
+  private getRadarScaleBounds(values: number[], forceZeroMin = false): { minY: number; maxY: number } {
+    const minValue = Math.min(...values);
+    const maxValue = Math.max(...values);
+
+    let minY = forceZeroMin ? 0 : minValue;
+    let maxY = maxValue;
+
+    if (maxY === minY) {
+      if (forceZeroMin) {
+        maxY = maxY === 0 ? 1 : maxY;
+      } else {
+        minY = minY - Math.max(Math.abs(maxY) * 0.1, 0.5);
+      }
+    }
+
+    return { minY, maxY };
   }
 
   private getRadarLabels(labels: string[]): string[] {

@@ -265,8 +265,7 @@ export class AirQualityDetailComponent implements OnChanges, AfterViewInit, OnDe
 
     const selectedIndex = this.getSelectedIndex(dayValues.length);
     const selectedValue = dayValues[selectedIndex] ?? 0;
-    const globalMin = Math.min(...tile.values);
-    const globalMax = Math.max(...tile.values);
+    const { minY, maxY } = this.getRadarScaleBounds(dayValues);
     const isDark = document.body.classList.contains('dark');
     const textColor = isDark ? '#ffffff' : '#000000';
     const gridColor = isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)';
@@ -320,9 +319,9 @@ export class AirQualityDetailComponent implements OnChanges, AfterViewInit, OnDe
       },
       scales: {
         r: {
-          beginAtZero: true,
-          min: globalMin,
-          max: globalMax,
+          beginAtZero: minY === 0,
+          min: minY,
+          max: maxY,
           grid: { color: gridColor },
           angleLines: { color: gridColor },
           pointLabels: {
@@ -492,6 +491,16 @@ export class AirQualityDetailComponent implements OnChanges, AfterViewInit, OnDe
       return 0;
     }
     return Math.max(0, Math.min(this.selectedHour, length - 1));
+  }
+
+  private getRadarScaleBounds(values: number[]): { minY: number; maxY: number } {
+    const minValue = Math.min(...values);
+    const maxValue = Math.max(...values);
+
+    return {
+      minY: 0,
+      maxY: maxValue === 0 ? 1 : maxValue
+    };
   }
 
   private getRadarLabels(labels: string[]): string[] {
