@@ -29,6 +29,7 @@ const STRINGS = {
     contextTitle: 'Was ist MessageDrop?',
     contextBody: 'Platziere Nachrichten. Folge Orten. Kommuniziere sicher.',
     moreInfo: 'Mehr Infos',
+    mediaFromSourceTemplate: 'Inhalt von {{source}}',
     stickerLabel: 'Sticker',
     imageLabel: 'Bild',
     mediaLabel: 'Medien',
@@ -36,8 +37,7 @@ const STRINGS = {
     tenorGifLabel: 'Tenor-GIF',
     pinterestPinLabel: 'Pinterest-Pin',
     tiktokVideoLabel: 'TikTok-Video',
-    spotifyLabel: 'Spotify',
-    soundcloudLabel: 'SoundCloud'
+    spotifyLabel: 'Spotify'
   },
   en: {
     heroTitle: 'Public message',
@@ -52,6 +52,7 @@ const STRINGS = {
     contextTitle: 'What is MessageDrop?',
     contextBody: 'Place messages. Follow places. Communicate securely.',
     moreInfo: 'More info',
+    mediaFromSourceTemplate: 'Content from {{source}}',
     stickerLabel: 'Sticker',
     imageLabel: 'Image',
     mediaLabel: 'Media',
@@ -59,8 +60,7 @@ const STRINGS = {
     tenorGifLabel: 'Tenor GIF',
     pinterestPinLabel: 'Pinterest pin',
     tiktokVideoLabel: 'TikTok video',
-    spotifyLabel: 'Spotify',
-    soundcloudLabel: 'SoundCloud'
+    spotifyLabel: 'Spotify'
   },
   es: {
     heroTitle: 'Mensaje público',
@@ -75,6 +75,7 @@ const STRINGS = {
     contextTitle: '¿Qué es MessageDrop?',
     contextBody: 'Coloca mensajes. Sigue lugares. Comunícate de forma segura.',
     moreInfo: 'Más información',
+    mediaFromSourceTemplate: 'Contenido de {{source}}',
     stickerLabel: 'Sticker',
     imageLabel: 'Imagen',
     mediaLabel: 'Contenido multimedia',
@@ -82,8 +83,7 @@ const STRINGS = {
     tenorGifLabel: 'GIF de Tenor',
     pinterestPinLabel: 'Pin de Pinterest',
     tiktokVideoLabel: 'Vídeo de TikTok',
-    spotifyLabel: 'Spotify',
-    soundcloudLabel: 'SoundCloud'
+    spotifyLabel: 'Spotify'
   },
   fr: {
     heroTitle: 'Message public',
@@ -98,6 +98,7 @@ const STRINGS = {
     contextTitle: 'Qu’est-ce que MessageDrop ?',
     contextBody: 'Place des messages. Suis des lieux. Communique en toute sécurité.',
     moreInfo: 'Plus d’informations',
+    mediaFromSourceTemplate: 'Contenu de {{source}}',
     stickerLabel: 'Sticker',
     imageLabel: 'Image',
     mediaLabel: 'Médias',
@@ -105,8 +106,7 @@ const STRINGS = {
     tenorGifLabel: 'GIF Tenor',
     pinterestPinLabel: 'Épingle Pinterest',
     tiktokVideoLabel: 'Vidéo TikTok',
-    spotifyLabel: 'Spotify',
-    soundcloudLabel: 'SoundCloud'
+    spotifyLabel: 'Spotify'
   }
 };
 
@@ -449,7 +449,6 @@ function normalizePublicMediaType(multimedia) {
   if (mediaType === 'sticker') return 'sticker';
   if (mediaType === 'youtube') return 'youtube';
   if (mediaType === 'spotify') return 'spotify';
-  if (mediaType === 'soundcloud') return 'soundcloud';
   if (mediaType === 'tiktok') return 'tiktok';
   if (mediaType === 'pinterest') return 'pinterest';
   if (mediaType === 'tenor') return 'tenor';
@@ -531,8 +530,6 @@ function renderServerMediaIconSvg(type) {
     return '<svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M14 3c.18 1.5 1.3 3 3 3.41V9.1c-1.3 0-2.55-.42-3.57-1.2v5.78A4.68 4.68 0 1 1 8.75 9v2.77a1.92 1.92 0 1 0 1.93 1.91V3H14Z" fill="currentColor"/></svg>';
   case 'tenor':
     return '<svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M6 4h12v3h-4.5V20h-3V7H6V4Z" fill="currentColor"/></svg>';
-  case 'soundcloud':
-    return '<svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M10.5 9.25A5.25 5.25 0 0 1 15.67 13H17a3 3 0 1 1 0 6H7.25A2.75 2.75 0 0 1 6 13.83 4.5 4.5 0 0 1 10.5 9.25Zm-4.75 2.5h1v7h-1v-7Zm-2 1.75h1v5.25h-1V13.5Zm14.5 1.25h1v4h-1v-4Zm-2 0h1v4h-1v-4Zm-2 0h1v4h-1v-4Zm-2 0h1v4h-1v-4Z" fill="currentColor"/></svg>';
   default:
     return '<svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M6 5.75A2.75 2.75 0 0 1 8.75 3h6.5A2.75 2.75 0 0 1 18 5.75v12.5A2.75 2.75 0 0 1 15.25 21h-6.5A2.75 2.75 0 0 1 6 18.25V5.75Zm5 3.56v5.38l4.5-2.69L11 9.3Z" fill="currentColor"/></svg>';
   }
@@ -849,7 +846,6 @@ function resolveOgMediaIconType(mediaType, multimedia) {
   if (normalizedType === 'pinterest' || host.includes('pinterest')) return 'pinterest';
   if (normalizedType === 'tiktok' || host.includes('tiktok')) return 'tiktok';
   if (normalizedType === 'spotify' || host.includes('spotify')) return 'spotify';
-  if (normalizedType === 'soundcloud' || host.includes('soundcloud')) return 'soundcloud';
   if (isDirectImageMedia(normalizedType, multimedia?.url)) return 'image';
   return 'media';
 }
@@ -860,7 +856,6 @@ function resolveMediaPlatformLabel(mediaType, multimedia, strings) {
     youtube: strings.youtubeVideoLabel || 'YouTube video',
     tenor: strings.tenorGifLabel || 'Tenor GIF',
     spotify: strings.spotifyLabel || 'Spotify',
-    soundcloud: strings.soundcloudLabel || 'SoundCloud',
     tiktok: strings.tiktokVideoLabel || 'TikTok video',
     pinterest: strings.pinterestPinLabel || 'Pinterest pin'
   };
@@ -872,7 +867,6 @@ function resolveMediaPlatformLabel(mediaType, multimedia, strings) {
   if (host.includes('youtube')) return strings.youtubeVideoLabel || 'YouTube video';
   if (host.includes('tenor')) return strings.tenorGifLabel || 'Tenor GIF';
   if (host.includes('spotify')) return strings.spotifyLabel || 'Spotify';
-  if (host.includes('soundcloud')) return strings.soundcloudLabel || 'SoundCloud';
   if (host.includes('tiktok')) return strings.tiktokVideoLabel || 'TikTok video';
   if (host.includes('pinterest')) return strings.pinterestPinLabel || 'Pinterest pin';
 
@@ -894,7 +888,22 @@ function buildMediaPreviewDescription(multimedia, strings) {
     return strings.imageLabel;
   }
 
-  return resolveMediaPlatformLabel(mediaType, media, strings) || strings.mediaLabel;
+  const platformLabel = resolveMediaPlatformLabel(mediaType, media, strings);
+  return buildMediaSourceDescription(platformLabel, strings) || strings.mediaLabel;
+}
+
+function buildMediaSourceDescription(sourceLabel, strings) {
+  const normalizedSourceLabel = String(sourceLabel || '').trim();
+  if (!normalizedSourceLabel) {
+    return '';
+  }
+
+  const template = String(strings?.mediaFromSourceTemplate || '').trim();
+  if (!template.includes('{{source}}')) {
+    return normalizedSourceLabel;
+  }
+
+  return template.replace('{{source}}', normalizedSourceLabel);
 }
 
 function resolveUrlHost(value) {
