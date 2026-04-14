@@ -224,8 +224,8 @@ function buildPublicShareMeta(message, strings) {
   return {
     title: strings.pageTitle,
     description: buildDescription(messageText)
-      || buildDescription(mediaTitle)
       || buildDescription(mediaDescription)
+      || buildDescription(mediaTitle)
       || (hasMultimedia(normalizedMessage?.multimedia) ? strings.mediaOnlyDescription : strings.pageDescription)
   };
 }
