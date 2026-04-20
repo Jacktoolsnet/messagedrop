@@ -133,6 +133,62 @@ export class SharedContentService {
     return segments.join('\n').trim();
   }
 
+  private normalizeComparableValue(value?: string | null): string {
+    return typeof value === 'string' ? value.trim() : '';
+  }
+
+  private isSameMultimedia(
+    candidate: Pick<Multimedia, 'type' | 'url' | 'sourceUrl' | 'contentId'>,
+    shared: Multimedia
+  ): boolean {
+    if (candidate.type !== shared.type || candidate.type === MultimediaType.UNDEFINED) {
+      return false;
+    }
+
+    const candidateContentId = this.normalizeComparableValue(candidate.contentId);
+    const sharedContentId = this.normalizeComparableValue(shared.contentId);
+    if (candidateContentId && sharedContentId && candidateContentId === sharedContentId) {
+      return true;
+    }
+
+    const candidateUrls = new Set(
+      [candidate.url, candidate.sourceUrl]
+        .map((value) => this.normalizeComparableValue(value))
+        .filter(Boolean)
+    );
+    const sharedUrls = [shared.url, shared.sourceUrl]
+      .map((value) => this.normalizeComparableValue(value))
+      .filter(Boolean);
+
+    return sharedUrls.some((value) => candidateUrls.has(value));
+  }
+
+  public async discardSharedMultimediaIfUsed(
+    multimedia?: Pick<Multimedia, 'type' | 'url' | 'sourceUrl' | 'contentId'> | null
+  ): Promise<boolean> {
+    if (!multimedia || multimedia.type === MultimediaType.UNDEFINED) {
+      return false;
+    }
+
+    let sharedMultimedia: Multimedia | undefined;
+    try {
+      sharedMultimedia = await this.resolveSharedMultimedia();
+    } catch {
+      return false;
+    }
+
+    if (!sharedMultimedia || !this.isSameMultimedia(multimedia, sharedMultimedia)) {
+      return false;
+    }
+
+    await Promise.all([
+      this.deleteSharedContent(this.lastKey),
+      this.deleteSharedContent('lastMultimedia')
+    ]);
+
+    return true;
+  }
+
   public async addSharedContentToMessage(message: Message): Promise<void> {
     const multimedia = await this.resolveSharedMultimedia();
     if (multimedia) {

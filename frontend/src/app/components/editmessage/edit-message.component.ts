@@ -125,6 +125,7 @@ export class EditMessageComponent implements OnInit {
     if (!(await this.prepareMessageForClose('publish'))) {
       return;
     }
+    await this.sharedContentService.discardSharedMultimediaIfUsed(this.data.message.multimedia);
     this.dialogRef.close({
       ...this.data,
       action: 'publish' as const
@@ -135,6 +136,7 @@ export class EditMessageComponent implements OnInit {
     if (!(await this.prepareMessageForClose('draft'))) {
       return;
     }
+    await this.sharedContentService.discardSharedMultimediaIfUsed(this.data.message.multimedia);
     this.dialogRef.close({
       ...this.data,
       action: 'draft' as const

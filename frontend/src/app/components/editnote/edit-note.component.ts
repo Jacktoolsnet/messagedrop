@@ -126,7 +126,7 @@ export class EditNoteComponent implements OnInit, OnDestroy {
     }
   }
 
-  onApplyClick(): void {
+  async onApplyClick(): Promise<void> {
     this.stopReadAloud();
     if (!this.addHashtagsFromInput(true)) {
       return;
@@ -140,6 +140,7 @@ export class EditNoteComponent implements OnInit, OnDestroy {
     this.hashtagTags = [...parsed.tags];
     this.hashtagSuggestionService.remember(this.hashtagTags);
     this.clearHashtagInput();
+    await this.sharedContentService.discardSharedMultimediaIfUsed(this.data.note.multimedia);
     this.dialogRef.close(this.data);
   }
 
