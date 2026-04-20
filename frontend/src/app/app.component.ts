@@ -204,7 +204,8 @@ export class AppComponent implements OnInit {
       && this.usageProtectionService.isLocked();
   });
   private pendingSharedContent?: SharedContent;
-  private lastSharedContentTimestamp?: string;
+  private lastSharedContentNoticeTimestamp?: string;
+  private sharedContentNoticeOpen = false;
   private sharedContentDialogOpen = false;
   private readonly pendingPublicMessageUuid = signal<string | null>(this.readPendingPublicMessageUuid());
   private initialPublicMessagesRequested = false;
@@ -345,7 +346,7 @@ export class AppComponent implements OnInit {
       if (!this.appService.isConsentCompleted() || !this.isAppVisible()) {
         return;
       }
-      void this.handleSharedContent(content);
+      this.flushPendingSharedContent();
     });
 
     effect(() => {
@@ -359,6 +360,7 @@ export class AppComponent implements OnInit {
       this.openingPublicMessage = true;
       void this.handlePublicMessageLink(messageUuid).finally(() => {
         this.openingPublicMessage = false;
+        this.flushPendingSharedContent();
       });
     });
 
@@ -625,17 +627,62 @@ export class AppComponent implements OnInit {
     return total > 99 ? '99+' : `${total}`;
   }
 
-  private async handleSharedContent(content: SharedContent) {
+  private showSharedContentNotice(content: SharedContent): void {
+    if (this.sharedContentNoticeOpen || this.sharedContentDialogOpen) {
+      this.pendingSharedContent = content;
+      return;
+    }
+
+    this.sharedContentNoticeOpen = true;
+    this.lastSharedContentNoticeTimestamp = content.timestamp;
+
+    const autoCloseSharedMultimediaNotice = content.type === 'multimedia';
+    const dialogRef = this.dialog.open(DisplayMessage, {
+      closeOnNavigation: false,
+      data: {
+        showAlways: true,
+        title: this.translation.t('common.sharedContent.title'),
+        image: '',
+        icon: this.getSharedContentNoticeIcon(content),
+        message: this.translation.t(this.getSharedContentNoticeMessageKey(content)),
+        button: this.translation.t('common.actions.view'),
+        secondaryButton: this.translation.t('common.actions.discard'),
+        delay: autoCloseSharedMultimediaNotice ? 3000 : 0,
+        showSpinner: false,
+        autoclose: autoCloseSharedMultimediaNotice,
+        layout: 'toast'
+      },
+      autoFocus: false,
+      restoreFocus: false,
+      hasBackdrop: false,
+      panelClass: ['display-message-toast', 'toast-info'],
+      position: { top: '16px' },
+      maxWidth: 'min(420px, calc(100vw - 32px))'
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      this.sharedContentNoticeOpen = false;
+
+      if (result === true) {
+        void this.openSharedContentDialog(content);
+        return;
+      }
+
+      if (result === 'secondary') {
+        this.deleteSharedContentEntries(content.type);
+      }
+
+      this.flushPendingSharedContent();
+    });
+  }
+
+  private async openSharedContentDialog(content: SharedContent) {
     if (!this.isAppVisible()) {
       this.pendingSharedContent = content;
       return;
     }
     if (this.sharedContentDialogOpen) {
       this.pendingSharedContent = content;
-      return;
-    }
-    if (this.lastSharedContentTimestamp === content.timestamp) {
-      this.pendingSharedContent = undefined;
       return;
     }
     let multimedia: Multimedia | undefined = undefined;
@@ -660,12 +707,11 @@ export class AppComponent implements OnInit {
     const expectsResolvedContent = content.type === 'multimedia' || content.type === 'location';
     const loadFailed = !!normalizedUrl && expectsResolvedContent && !multimedia && !location;
     if (loadFailed) {
-      this.clearFailedSharedContent(content.type);
+      this.deleteSharedContentEntries(content.type);
       this.logSharedContentResolveFailure(normalizedUrl, content.type, resolveError);
     }
 
     this.sharedContentDialogOpen = true;
-    this.lastSharedContentTimestamp = content.timestamp;
     const sharedDialogWidth = this.getSharedContentDialogWidth(multimedia, location);
     const dialogRef = this.dialog.open(SharedContentComponent, {
       data: {
@@ -712,7 +758,7 @@ export class AppComponent implements OnInit {
     return 'min(450px, 95vw)';
   }
 
-  private clearFailedSharedContent(type?: SharedContent['type']): void {
+  private deleteSharedContentEntries(type?: SharedContent['type']): void {
     const keys = new Set<string>(['last']);
     if (type === 'multimedia') {
       keys.add('lastMultimedia');
@@ -738,17 +784,50 @@ export class AppComponent implements OnInit {
     return typeof document === 'undefined' || document.visibilityState === 'visible';
   }
 
+  private isHigherPriorityStartupFlowActive(): boolean {
+    return !!this.pendingPublicMessageUuid() || this.openingPublicMessage || this.markerMessageListOpen;
+  }
+
+  private getSharedContentNoticeMessageKey(content: SharedContent): string {
+    switch (content.type) {
+      case 'multimedia':
+        return 'common.sharedContent.multimediaHint';
+      case 'location':
+        return 'common.sharedContent.locationHint';
+      default:
+        return 'common.sharedContent.genericHint';
+    }
+  }
+
+  private getSharedContentNoticeIcon(content: SharedContent): string {
+    switch (content.type) {
+      case 'multimedia':
+        return 'play_circle';
+      case 'location':
+        return 'place';
+      default:
+        return 'share';
+    }
+  }
+
   private flushPendingSharedContent(): void {
-    if (!this.pendingSharedContent || !this.appService.isConsentCompleted() || this.sharedContentDialogOpen || !this.isAppVisible()) {
+    if (
+      !this.pendingSharedContent
+      || !this.appService.isConsentCompleted()
+      || this.sharedContentNoticeOpen
+      || this.sharedContentDialogOpen
+      || !this.isAppVisible()
+      || this.isHigherPriorityStartupFlowActive()
+    ) {
       return;
     }
-    if (this.pendingSharedContent.timestamp === this.lastSharedContentTimestamp) {
+    if (this.pendingSharedContent.timestamp === this.lastSharedContentNoticeTimestamp) {
       this.pendingSharedContent = undefined;
       return;
     }
     const pending = this.pendingSharedContent;
     this.pendingSharedContent = undefined;
-    void this.handleSharedContent(pending);
+    this.showSharedContentNotice(pending);
   }
 
   private async handleNotification(notificationAction: NotificationAction): Promise<void> {
@@ -1707,6 +1786,7 @@ export class AppComponent implements OnInit {
       this.markerMessageListOpen = false;
       this.messageService.clearSelectedMessages();
       this.createMarkerLocations();
+      this.flushPendingSharedContent();
     });
   }
 

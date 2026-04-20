@@ -56,6 +56,62 @@
     }
 }
 
+.display-action-button {
+    --mdc-filled-button-container-shape: 999px;
+    --mdc-outlined-button-container-shape: 999px;
+    --mdc-text-button-container-shape: 999px;
+    min-height: 2.75rem;
+    padding-inline: 1.05rem;
+    font-weight: 650;
+    letter-spacing: 0.01em;
+    backdrop-filter: blur(10px);
+    transition:
+        transform 150ms ease,
+        box-shadow 150ms ease,
+        border-color 150ms ease,
+        background-color 150ms ease,
+        color 150ms ease;
+}
+
+.display-action-button:hover {
+    transform: translateY(-1px);
+}
+
+.display-action-button:active {
+    transform: translateY(0);
+}
+
+.display-action-button:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 55%, white);
+    outline-offset: 2px;
+}
+
+.display-action-button--primary {
+    box-shadow:
+        0 12px 26px color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 28%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.display-action-button--secondary {
+    color: color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 78%, var(--mat-sys-on-surface));
+    background:
+        linear-gradient(180deg,
+            color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 10%, white) 0%,
+            color-mix(in srgb, var(--mat-sys-surface-container-high) 92%, white) 100%);
+    border-color: color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 20%, transparent);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.45),
+        0 10px 22px rgba(15, 23, 42, 0.08);
+}
+
+.display-action-button--secondary:hover {
+    border-color: color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 30%, transparent);
+    background:
+        linear-gradient(180deg,
+            color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 14%, white) 0%,
+            color-mix(in srgb, var(--mat-sys-surface-container-high) 86%, white) 100%);
+}
+
 .toast-shell {
     --toast-side-size: 2.6rem;
     position: relative;
@@ -171,8 +227,8 @@
     border-top: 1px solid color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 10%, transparent);
 }
 
-.toast-actions button {
-    border-radius: 999px;
+.toast-actions .display-action-button {
+    min-width: 7rem;
 }
 
 .toast-dismiss {
@@ -279,5 +335,18 @@
     .toast-shell.is-closing,
     .toast-progress {
         animation: none;
+    }
+}
+
+@media (max-width: 520px) {
+    .toast-actions,
+    .dialog-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .toast-actions .display-action-button,
+    .dialog-actions .display-action-button {
+        width: 100%;
     }
 }

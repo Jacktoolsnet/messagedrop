@@ -34,13 +34,25 @@
             @if (showOk() && (data.button || data.secondaryButton)) {
             <div class="toast-actions">
                 @if (data.secondaryButton) {
-                <button mat-stroked-button color="primary" type="button" (click)="onSecondaryClick()">
+                <button
+                    mat-stroked-button
+                    color="primary"
+                    type="button"
+                    class="display-action-button display-action-button--secondary"
+                    (click)="onSecondaryClick()"
+                >
                     {{ data.secondaryButton }}
                 </button>
                 }
 
                 @if (data.button) {
-                <button mat-button color="primary" type="button" (click)="onPrimaryClick()">
+                <button
+                    mat-flat-button
+                    color="primary"
+                    type="button"
+                    class="display-action-button display-action-button--primary"
+                    (click)="onPrimaryClick()"
+                >
                     {{ data.button }}
                 </button>
                 }
@@ -92,12 +104,24 @@
     @if (showOk() && (data.button || data.secondaryButton)) {
     <div class="dialog-actions">
         @if (data.secondaryButton) {
-        <button mat-stroked-button color="primary" type="button" (click)="onSecondaryClick()">
+        <button
+            mat-stroked-button
+            color="primary"
+            type="button"
+            class="display-action-button display-action-button--secondary"
+            (click)="onSecondaryClick()"
+        >
             {{ data.secondaryButton }}
         </button>
         }
         @if (data.button) {
-        <button mat-raised-button color="primary" type="button" (click)="onPrimaryClick()">
+        <button
+            mat-flat-button
+            color="primary"
+            type="button"
+            class="display-action-button display-action-button--primary"
+            (click)="onPrimaryClick()"
+        >
             {{ data.button }}
         </button>
         }
