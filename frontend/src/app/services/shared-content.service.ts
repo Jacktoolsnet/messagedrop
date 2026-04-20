@@ -2,6 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { Message } from '../interfaces/message';
 import { Multimedia } from '../interfaces/multimedia';
 import { Note } from '../interfaces/note';
+import { ShortMessage } from '../interfaces/short-message';
 import { SharedContent } from '../interfaces/shared-content';
 import { MultimediaType } from '../interfaces/multimedia-type';
 import { OembedService } from './oembed.service';
@@ -215,6 +216,21 @@ export class SharedContentService {
       const fallbackText = await this.resolveSharedText();
       if (fallbackText) {
         note.note = fallbackText;
+      }
+    }
+  }
+
+  public async addSharedContentToShortMessage(shortMessage: ShortMessage): Promise<void> {
+    const multimedia = await this.resolveSharedMultimedia();
+    if (multimedia) {
+      shortMessage.multimedia = multimedia;
+      return;
+    }
+
+    if (shortMessage.multimedia.type === MultimediaType.UNDEFINED && !shortMessage.message?.trim()) {
+      const fallbackText = await this.resolveSharedText();
+      if (fallbackText) {
+        shortMessage.message = fallbackText;
       }
     }
   }

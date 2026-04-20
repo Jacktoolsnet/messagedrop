@@ -24,6 +24,7 @@ import { SpeechService } from '../../services/speech.service';
 import { LanguageService } from '../../services/language.service';
 import { MapService } from '../../services/map.service';
 import { SocketioService } from '../../services/socketio.service';
+import { SharedContentService } from '../../services/shared-content.service';
 import { TranslateService } from '../../services/translate.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
@@ -110,6 +111,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   private readonly speechService = inject(SpeechService);
   private readonly translation = inject(TranslationHelperService);
   private readonly languageService = inject(LanguageService);
+  private readonly sharedContentService = inject(SharedContentService);
   private readonly contactId = typeof this.dialogData === 'string' ? this.dialogData : this.dialogData.contactId;
   private readonly focusMessageId = typeof this.dialogData === 'string' ? undefined : this.dialogData.focusMessageId;
 
@@ -413,15 +415,18 @@ export class ContactChatroomComponent implements AfterViewInit {
     });
   }
 
-  requestCompose(): void {
+  async requestCompose(): Promise<void> {
     const currentContact = this.contact();
     if (!currentContact) {
       return;
     }
+    const shortMessage = this.createEmptyMessage();
+    await this.sharedContentService.addSharedContentToShortMessage(shortMessage);
+
     const dialogRef = this.matDialog.open(ContactEditMessageComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: { mode: Mode.ADD_SHORT_MESSAGE, contact: currentContact, shortMessage: { ...this.createEmptyMessage() } },
+      data: { mode: Mode.ADD_SHORT_MESSAGE, contact: currentContact, shortMessage },
       minWidth: '20vw',
       maxWidth: '90vw',
       maxHeight: '90vh',

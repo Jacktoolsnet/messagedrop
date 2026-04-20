@@ -15,6 +15,7 @@ import { MultimediaType } from '../../../interfaces/multimedia-type';
 import { ShortMessage } from '../../../interfaces/short-message';
 import { OembedService } from '../../../services/oembed.service';
 import { StyleService } from '../../../services/style.service';
+import { SharedContentService } from '../../../services/shared-content.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { UserService } from '../../../services/user.service';
 import { SelectMultimediaComponent } from '../../multimedia/select-multimedia/select-multimedia.component';
@@ -61,6 +62,7 @@ export class ContactEditMessageComponent implements OnInit {
   readonly help = inject(HelpDialogService);
   readonly dialogRef = inject(MatDialogRef<ContactEditMessageComponent>);
   private readonly style = inject(StyleService);
+  private readonly sharedContentService = inject(SharedContentService);
   private readonly translation = inject(TranslationHelperService);
   readonly data = inject<{ mode: Mode; contact: Contact; shortMessage: ShortMessage }>(MAT_DIALOG_DATA);
 
@@ -76,7 +78,8 @@ export class ContactEditMessageComponent implements OnInit {
     this.data.shortMessage.style = this.userService.getProfile().defaultStyle ?? this.data.shortMessage.style;
   }
 
-  onApplyClick(): void {
+  async onApplyClick(): Promise<void> {
+    await this.sharedContentService.discardSharedMultimediaIfUsed(this.data.shortMessage.multimedia);
     this.dialogRef.close(this.data);
   }
 
