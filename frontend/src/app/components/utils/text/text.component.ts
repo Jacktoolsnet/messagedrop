@@ -74,7 +74,8 @@ export class TextComponent {
       data: {
         reactions: [],
         current: null,
-        allowRemove: false
+        allowRemove: false,
+        multiSelect: true
       },
       maxWidth: '95vw',
       autoFocus: false

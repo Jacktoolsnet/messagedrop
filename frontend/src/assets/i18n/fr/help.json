@@ -1966,11 +1966,23 @@
   },
   "emoticonPicker": {
     "title": "Emojis",
-    "intro": "Cette boîte de dialogue permet de choisir un emoji ou de refermer le sélecteur.",
+    "intro": "Cette boîte de dialogue permet de choisir des emojis. Selon le contexte, un emoji est appliqué immédiatement ou plusieurs emojis peuvent être regroupés puis insérés ensemble.",
     "items": {
       "selection": {
         "title": "Sélectionner un emoji",
-        "desc": "Touchez un emoji pour l’appliquer directement."
+        "desc": "Touchez un emoji pour l’appliquer directement ou l’ajouter à la sélection en cours."
+      },
+      "compose": {
+        "title": "Composer une sélection d’emojis",
+        "desc": "En mode multi-sélection, les emojis choisis sont regroupés en bas. Vous pouvez y retirer le dernier ou tout vider. Utilisez la coche dans la barre d’actions pour insérer toute la sélection d’un coup."
+      },
+      "removeLast": {
+        "title": "Retirer le dernier emoji",
+        "desc": "Utilisez l’action retour arrière dans la barre d’actions du tile de sélection pour retirer l’emoji ajouté en dernier."
+      },
+      "clear": {
+        "title": "Vider la sélection",
+        "desc": "Utilisez l’action corbeille dans la barre d’actions du tile de sélection pour supprimer tous les emojis actuellement regroupés."
       },
       "close": {
         "title": "Fermer",
@@ -2516,7 +2528,7 @@
       },
       "emoji": {
         "title": "Sélecteur d’emojis",
-        "desc": "Ouvre un sélecteur d’emojis séparé sous forme de petite surcouche avec de nombreux emojis. L’emoji choisi est inséré dans le texte à la position actuelle du curseur."
+        "desc": "Ouvre un sélecteur d’emojis séparé sous forme de petite surcouche avec de nombreux emojis. Vous pouvez y choisir un ou plusieurs emojis et les insérer ensemble à la position actuelle du curseur."
       },
       "apply": {
         "title": "Appliquer",

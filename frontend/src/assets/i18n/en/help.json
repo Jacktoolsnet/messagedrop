@@ -1966,11 +1966,23 @@
   },
   "emoticonPicker": {
     "title": "Emojis",
-    "intro": "Use this dialog to choose an emoji or close the picker again.",
+    "intro": "Use this dialog to choose emojis. Depending on the context, an emoji is applied directly or several emojis can be collected and inserted together.",
     "items": {
       "selection": {
         "title": "Select emoji",
-        "desc": "Tap an emoji to apply it directly."
+        "desc": "Tap an emoji to apply it directly or add it to the current selection."
+      },
+      "compose": {
+        "title": "Collect emoji selection",
+        "desc": "In multi-select mode, the selected emojis are collected below. There you can remove the last emoji or clear everything. Use the checkmark in the action bar to insert the whole selection at once."
+      },
+      "removeLast": {
+        "title": "Remove last emoji",
+        "desc": "Use the backspace action in the selection tile action bar to remove the most recently added emoji."
+      },
+      "clear": {
+        "title": "Clear selection",
+        "desc": "Use the trash action in the selection tile action bar to remove all currently collected emojis."
       },
       "close": {
         "title": "Close",
@@ -2516,7 +2528,7 @@
       },
       "emoji": {
         "title": "Emoji picker",
-        "desc": "Opens a separate emoji picker as a small overlay with many emojis. The selected emoji is inserted into the text at the current cursor position."
+        "desc": "Opens a separate emoji picker as a small overlay with many emojis. You can select one or more emojis there and insert them together at the current cursor position."
       },
       "apply": {
         "title": "Apply",

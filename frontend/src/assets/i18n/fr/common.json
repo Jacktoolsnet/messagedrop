@@ -20,7 +20,9 @@
       "no": "Non",
       "yes": "Oui",
       "apply": "Appliquer",
+      "insert": "Insérer",
       "abort": "Annuler",
+      "clear": "Vider",
       "randomizeStyle": "Style aléatoire",
       "delete": "Supprimer",
       "discard": "Ignorer",
@@ -363,6 +365,11 @@
       "editTitle": "Modifier le texte",
       "emojiPickerAria": "Ouvrir le sélecteur d’emojis",
       "insertEmojiAria": "Insérer l’emoji {{ emoji }}"
+    },
+    "emoticonPicker": {
+      "selectionLabel": "Emojis sélectionnés",
+      "emptySelection": "Touchez des emojis pour les regrouper ici.",
+      "removeLast": "Retirer le dernier"
     },
     "images": {
       "imported": "Image(s) importée(s) localement.",

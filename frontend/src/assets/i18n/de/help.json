@@ -1966,11 +1966,23 @@
   },
   "emoticonPicker": {
     "title": "Emojis",
-    "intro": "In diesem Dialog wählst du ein Emoji aus oder schließt die Auswahl wieder.",
+    "intro": "In diesem Dialog wählst du Emojis aus. Je nach Kontext wird ein Emoji direkt übernommen oder du sammelst mehrere Emojis und fügst sie gemeinsam ein.",
     "items": {
       "selection": {
         "title": "Emoji auswählen",
-        "desc": "Tippe auf ein Emoji, um es direkt zu übernehmen."
+        "desc": "Tippe auf ein Emoji, um es direkt zu übernehmen oder zur aktuellen Auswahl hinzuzufügen."
+      },
+      "compose": {
+        "title": "Emoji-Auswahl sammeln",
+        "desc": "Im Mehrfachmodus werden die ausgewählten Emojis unten gesammelt. Dort kannst du das letzte Emoji entfernen oder alles leeren. Mit dem Haken in der Aktionsleiste fügst du die gesamte Auswahl auf einmal ein."
+      },
+      "removeLast": {
+        "title": "Letztes Emoji entfernen",
+        "desc": "Mit der Backspace-Aktion in der Aktionsleiste des Auswahl-Tiles entfernst du das zuletzt hinzugefügte Emoji."
+      },
+      "clear": {
+        "title": "Auswahl leeren",
+        "desc": "Mit der Papierkorb-Aktion in der Aktionsleiste des Auswahl-Tiles entfernst du alle aktuell gesammelten Emojis."
       },
       "close": {
         "title": "Schließen",
@@ -2516,7 +2528,7 @@
       },
       "emoji": {
         "title": "Emoji-Auswahl",
-        "desc": "Öffnet einen separaten Emoji-Picker als kleines Overlay mit vielen Emojis. Das ausgewählte Emoji wird an der aktuellen Cursorposition in den Text eingefügt."
+        "desc": "Öffnet einen separaten Emoji-Picker als kleines Overlay mit vielen Emojis. Du kannst dort ein oder mehrere Emojis auswählen und gemeinsam an der aktuellen Cursorposition einfügen."
       },
       "apply": {
         "title": "Übernehmen",

@@ -2526,6 +2526,26 @@ const HELP_TOPICS = {
         descriptionKey: 'emoticonPicker.items.selection.desc'
       },
       {
+        icon: 'mood',
+        titleKey: 'emoticonPicker.items.compose.title',
+        descriptionKey: 'emoticonPicker.items.compose.desc'
+      },
+      {
+        icon: 'backspace',
+        titleKey: 'emoticonPicker.items.removeLast.title',
+        descriptionKey: 'emoticonPicker.items.removeLast.desc'
+      },
+      {
+        icon: 'delete',
+        titleKey: 'emoticonPicker.items.clear.title',
+        descriptionKey: 'emoticonPicker.items.clear.desc'
+      },
+      {
+        icon: 'check',
+        titleKey: 'common.items.apply.title',
+        descriptionKey: 'common.items.apply.desc'
+      },
+      {
         icon: 'close',
         titleKey: 'emoticonPicker.items.close.title',
         descriptionKey: 'emoticonPicker.items.close.desc'

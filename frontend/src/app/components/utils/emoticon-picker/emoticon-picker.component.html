@@ -5,12 +5,48 @@
       <ng-template mat-tab-label>{{ cat.icon }}</ng-template>
       <div class="emoticon-grid">
         @for (r of cat.items; track r) {
-        <button type="button" (click)="pick(r)">{{ r }}</button>
+        <button type="button" [class.emoticon-grid__button--active]="isEmojiActive(r)" (click)="pick(r)">{{ r }}</button>
         }
       </div>
     </mat-tab>
     }
   </mat-tab-group>
+
+  @if (multiSelect) {
+  <div class="selection-panel">
+    <div class="selection-panel__preview" [class.selection-panel__preview--empty]="selectedEmojis.length === 0">
+      <div class="selection-panel__toolbar">
+        <div class="selection-panel__title">{{ 'common.emoticonPicker.selectionLabel' | transloco }}</div>
+        <div class="selection-panel__tile-actions">
+          <button
+            mat-icon-button
+            type="button"
+            (click)="removeLast()"
+            [disabled]="selectedEmojis.length === 0"
+            [attr.aria-label]="'common.emoticonPicker.removeLast' | transloco"
+          >
+            <mat-icon>backspace</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            color="warn"
+            type="button"
+            (click)="clearSelection()"
+            [disabled]="selectedEmojis.length === 0"
+            [attr.aria-label]="'common.actions.clear' | transloco"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+      @if (selectedEmojis.length > 0) {
+      <div class="selection-panel__content">{{ selectedEmojis.join('') }}</div>
+      } @else {
+      <div class="selection-panel__empty-text">{{ 'common.emoticonPicker.emptySelection' | transloco }}</div>
+      }
+    </div>
+  </div>
+  }
 </mat-dialog-content>
 <mat-dialog-actions class="sticky-actions" align="end">
   <button mat-icon-button type="button" class="action-close" (click)="close()"
@@ -22,7 +58,14 @@
     [attr.aria-label]="'common.actions.help' | transloco">
     <mat-icon>help</mat-icon>
   </button>
-  @if (allowRemove) {
+  @if (multiSelect) {
+  <button mat-icon-button color="primary" type="button" (click)="applySelection()"
+    [disabled]="selectedEmojis.length === 0"
+    [attr.aria-label]="'common.actions.insert' | transloco">
+    <mat-icon>check</mat-icon>
+  </button>
+  }
+  @if (allowRemove && !multiSelect) {
   <button mat-icon-button color="warn" (click)="pick(null)" aria-label="Remove reaction">
     <mat-icon>delete</mat-icon>
   </button>
