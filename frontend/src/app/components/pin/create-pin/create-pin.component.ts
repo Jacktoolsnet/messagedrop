@@ -116,7 +116,7 @@ export class CreatePinComponent implements OnDestroy {
               this.dialogClosed = true;
               this.dialogRef.close(this.pin);
             } else {
-              this.reset();
+              this.reset(false);
               this.showPinMismatchMessage();
             }
           }, this.digitVisibilityDurationMs);
@@ -158,7 +158,8 @@ export class CreatePinComponent implements OnDestroy {
     }
   }
 
-  reset(): void {
+  reset(withFeedback = true): void {
+    const hadInput = this.pin.length > 0 || this.confirmPin.length > 0;
     this.clearTransitionTimeout();
     this.clearAllSlotTimers();
     this.pin = '';
@@ -168,6 +169,9 @@ export class CreatePinComponent implements OnDestroy {
     this.pinPulseStates = [false, false, false, false, false, false];
     this.confirmPinPulseStates = [false, false, false, false, false, false];
     this.isConfirming = false;
+    if (withFeedback && hadInput) {
+      void this.pinFeedback.notifyResetAction();
+    }
   }
 
   cancel(): void {

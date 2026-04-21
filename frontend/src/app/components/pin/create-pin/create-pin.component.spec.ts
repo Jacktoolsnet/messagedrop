@@ -19,8 +19,9 @@ describe('CreatepinComponent', () => {
     dialogSpy = jasmine.createSpyObj<MatDialog>('MatDialog', ['open']);
     translationSpy = jasmine.createSpyObj<TranslationHelperService>('TranslationHelperService', ['t']);
     translationSpy.t.and.callFake((key: string) => key);
-    feedbackSpy = jasmine.createSpyObj<PinInputFeedbackService>('PinInputFeedbackService', ['notifyAcceptedInput']);
+    feedbackSpy = jasmine.createSpyObj<PinInputFeedbackService>('PinInputFeedbackService', ['notifyAcceptedInput', 'notifyResetAction']);
     feedbackSpy.notifyAcceptedInput.and.resolveTo();
+    feedbackSpy.notifyResetAction.and.resolveTo();
 
     await TestBed.configureTestingModule({
       imports: [CreatePinComponent],
@@ -59,4 +60,20 @@ describe('CreatepinComponent', () => {
     tick(1);
     expect(component.pinDisplay[0]).toBe('•');
   }));
+
+  it('should trigger reset feedback only for user-initiated reset', () => {
+    component.pin = '123';
+    component.pinDisplay = ['•', '•', '•', '', '', ''];
+
+    component.reset();
+
+    expect(component.pin).toBe('');
+    expect(component.confirmPin).toBe('');
+    expect(feedbackSpy.notifyResetAction).toHaveBeenCalledTimes(1);
+
+    component.pin = '456';
+    component.reset(false);
+
+    expect(feedbackSpy.notifyResetAction).toHaveBeenCalledTimes(1);
+  });
 });

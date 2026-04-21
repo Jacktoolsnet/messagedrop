@@ -7,7 +7,7 @@ export class PinInputFeedbackService {
   private audioContext: AudioContext | null = null;
 
   async notifyAcceptedInput(): Promise<void> {
-    const vibrated = this.tryVibrate();
+    const vibrated = this.tryVibrate(this.getAcceptedVibrationPattern());
     if (vibrated && !this.shouldPlayBeepAlongsideVibration()) {
       return;
     }
@@ -15,37 +15,32 @@ export class PinInputFeedbackService {
     await this.playSubtleBeep();
   }
 
-  private tryVibrate(): boolean {
+  async notifyResetAction(): Promise<void> {
+    const vibrated = this.tryVibrate(this.getResetVibrationPattern());
+    if (vibrated && !this.shouldPlayBeepAlongsideVibration()) {
+      return;
+    }
+
+    await this.playResetBeep();
+  }
+
+  private tryVibrate(pattern: number | number[]): boolean {
     if (typeof navigator === 'undefined' || typeof navigator.vibrate !== 'function') {
       return false;
     }
 
     try {
-      return navigator.vibrate(18);
+      return navigator.vibrate(pattern);
     } catch {
       return false;
     }
   }
 
   private async playSubtleBeep(): Promise<void> {
-    const AudioContextCtor = this.getAudioContextConstructor();
-    if (!AudioContextCtor) {
+    const context = await this.getReadyAudioContext();
+    if (!context) {
       return;
     }
-
-    if (!this.audioContext || this.audioContext.state === 'closed') {
-      this.audioContext = new AudioContextCtor();
-    }
-
-    if (this.audioContext.state === 'suspended') {
-      try {
-        await this.audioContext.resume();
-      } catch {
-        return;
-      }
-    }
-
-    const context = this.audioContext;
     const now = context.currentTime;
     const fundamental = context.createOscillator();
     const undertone = context.createOscillator();
@@ -97,6 +92,65 @@ export class PinInputFeedbackService {
     }, { once: true });
   }
 
+  private async playResetBeep(): Promise<void> {
+    const context = await this.getReadyAudioContext();
+    if (!context) {
+      return;
+    }
+
+    const now = context.currentTime;
+    const fundamental = context.createOscillator();
+    const undertone = context.createOscillator();
+    const pulseGain = context.createGain();
+    const bodyGain = context.createGain();
+    const filter = context.createBiquadFilter();
+    const masterGain = context.createGain();
+
+    fundamental.type = 'sine';
+    fundamental.frequency.setValueAtTime(420, now);
+    fundamental.frequency.exponentialRampToValueAtTime(320, now + 0.22);
+
+    undertone.type = 'triangle';
+    undertone.frequency.setValueAtTime(210, now);
+    undertone.frequency.exponentialRampToValueAtTime(160, now + 0.24);
+
+    pulseGain.gain.setValueAtTime(0.0001, now);
+    pulseGain.gain.linearRampToValueAtTime(0.028, now + 0.014);
+    pulseGain.gain.exponentialRampToValueAtTime(0.005, now + 0.10);
+    pulseGain.gain.linearRampToValueAtTime(0.024, now + 0.145);
+    pulseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.26);
+
+    bodyGain.gain.setValueAtTime(0.0001, now);
+    bodyGain.gain.linearRampToValueAtTime(0.016, now + 0.02);
+    bodyGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.28);
+
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(720, now);
+    filter.Q.setValueAtTime(0.55, now);
+
+    masterGain.gain.setValueAtTime(0.95, now);
+
+    fundamental.connect(pulseGain);
+    undertone.connect(bodyGain);
+    pulseGain.connect(filter);
+    bodyGain.connect(filter);
+    filter.connect(masterGain);
+    masterGain.connect(context.destination);
+
+    fundamental.start(now);
+    undertone.start(now);
+    fundamental.stop(now + 0.28);
+    undertone.stop(now + 0.28);
+    fundamental.addEventListener('ended', () => {
+      fundamental.disconnect();
+      undertone.disconnect();
+      pulseGain.disconnect();
+      bodyGain.disconnect();
+      filter.disconnect();
+      masterGain.disconnect();
+    }, { once: true });
+  }
+
   private getAudioContextConstructor(): typeof AudioContext | undefined {
     if (typeof window === 'undefined') {
       return undefined;
@@ -111,5 +165,42 @@ export class PinInputFeedbackService {
     }
 
     return /Android|CrOS/i.test(navigator.userAgent);
+  }
+
+  private async getReadyAudioContext(): Promise<AudioContext | null> {
+    const AudioContextCtor = this.getAudioContextConstructor();
+    if (!AudioContextCtor) {
+      return null;
+    }
+
+    if (!this.audioContext || this.audioContext.state === 'closed') {
+      this.audioContext = new AudioContextCtor();
+    }
+
+    if (this.audioContext.state === 'suspended') {
+      try {
+        await this.audioContext.resume();
+      } catch {
+        return null;
+      }
+    }
+
+    return this.audioContext;
+  }
+
+  private getAcceptedVibrationPattern(): number | number[] {
+    if (typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent)) {
+      return [24, 14, 18];
+    }
+
+    return 18;
+  }
+
+  private getResetVibrationPattern(): number | number[] {
+    if (typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent)) {
+      return [38, 24, 34];
+    }
+
+    return [26, 18, 24];
   }
 }

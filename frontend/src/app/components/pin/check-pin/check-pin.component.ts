@@ -94,11 +94,15 @@ export class CheckPinComponent implements OnDestroy {
   }
 
   reset(): void {
+    const hadInput = this.pin.length > 0;
     this.clearConfirmTimeout();
     this.clearAllSlotTimers();
     this.pin = '';
     this.pinDisplay = ['', '', '', '', '', ''];
     this.pinPulseStates = [false, false, false, false, false, false];
+    if (hadInput) {
+      void this.pinFeedback.notifyResetAction();
+    }
   }
 
   confirm(): void {

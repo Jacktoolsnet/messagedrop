@@ -13,8 +13,9 @@ describe('CheckPinComponent', () => {
 
   beforeEach(async () => {
     dialogRefSpy = jasmine.createSpyObj<MatDialogRef<CheckPinComponent>>('MatDialogRef', ['close']);
-    feedbackSpy = jasmine.createSpyObj<PinInputFeedbackService>('PinInputFeedbackService', ['notifyAcceptedInput']);
+    feedbackSpy = jasmine.createSpyObj<PinInputFeedbackService>('PinInputFeedbackService', ['notifyAcceptedInput', 'notifyResetAction']);
     feedbackSpy.notifyAcceptedInput.and.resolveTo();
+    feedbackSpy.notifyResetAction.and.resolveTo();
 
     await TestBed.configureTestingModule({
       imports: [CheckPinComponent],
@@ -51,4 +52,15 @@ describe('CheckPinComponent', () => {
     tick(1);
     expect(component.pinDisplay[0]).toBe('•');
   }));
+
+  it('should trigger stronger feedback when resetting entered digits', () => {
+    component.pin = '12';
+    component.pinDisplay = ['•', '•', '', '', '', ''];
+
+    component.reset();
+
+    expect(component.pin).toBe('');
+    expect(component.pinDisplay).toEqual(['', '', '', '', '', '']);
+    expect(feedbackSpy.notifyResetAction).toHaveBeenCalled();
+  });
 });
