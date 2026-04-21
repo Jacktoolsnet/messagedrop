@@ -496,6 +496,10 @@
         "title": "Lectura en voz alta",
         "desc": "Activa la voz del navegador, permite preferir texto traducido, configurar voz y velocidad, y reproducir una muestra."
       },
+      "pinFeedback": {
+        "title": "Retroalimentación del PIN",
+        "desc": "Permite activar o desactivar por separado la respuesta háptica y sonora para la entrada del PIN y la señal de advertencia reforzada al restablecer."
+      },
       "usageProtection": {
         "title": "Protección de uso",
         "desc": "Configura límite diario, franjas horarias permitidas y modo de desbloqueo (autogestión o PIN parental)."

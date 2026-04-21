@@ -360,6 +360,12 @@ h4 {
     color: var(--mat-card-subtitle-text-color);
 }
 
+.pin-feedback-settings-warning {
+    margin: -0.25rem 0 0;
+    font-size: 0.85rem;
+    color: var(--mat-sys-color-error, #b3261e);
+}
+
 .speech-settings-warning {
     margin: 0;
     color: var(--mat-sys-color-error, #b3261e);

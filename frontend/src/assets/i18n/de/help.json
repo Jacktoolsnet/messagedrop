@@ -496,6 +496,10 @@
         "title": "Vorlesen",
         "desc": "Aktiviert die Browser-Sprachausgabe, bevorzugt bei Bedarf übersetzten Text, konfiguriert Stimme und Sprechgeschwindigkeit und bietet eine Beispielwiedergabe."
       },
+      "pinFeedback": {
+        "title": "PIN-Feedback",
+        "desc": "Schaltet haptisches und akustisches Feedback für die PIN-Eingabe sowie das stärkere Warnsignal beim Zurücksetzen getrennt ein oder aus."
+      },
       "usageProtection": {
         "title": "Nutzungszeit-Schutz",
         "desc": "Konfiguriert Tageslimit, erlaubte Zeitfenster und den Entsperrmodus (selbst oder Eltern-PIN)."

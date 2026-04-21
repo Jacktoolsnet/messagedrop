@@ -79,6 +79,7 @@ export class AppSettingsComponent implements OnInit {
   public storagePersistenceBusy = false;
   public storagePersistenceWarning = '';
   public storageQuotaWarning = '';
+  public pinFeedbackHapticSupported = typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function';
   private readonly storageWarningThreshold = 0.9;
 
   ngOnInit(): void {
@@ -90,6 +91,16 @@ export class AppSettingsComponent implements OnInit {
     if (initialLanguage !== this.appSettings.languageMode) {
       this.appSettings = { ...this.appSettings, languageMode: initialLanguage };
       this.baselineSettings = { ...this.baselineSettings, languageMode: initialLanguage };
+    }
+
+    if (!this.pinFeedbackHapticSupported && this.appSettings.pinInputFeedback.hapticEnabled) {
+      this.appSettings = {
+        ...this.appSettings,
+        pinInputFeedback: {
+          ...this.appSettings.pinInputFeedback,
+          hapticEnabled: false
+        }
+      };
     }
 
     if ('permissions' in navigator && navigator.permissions?.query) {

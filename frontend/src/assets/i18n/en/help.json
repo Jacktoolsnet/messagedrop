@@ -496,6 +496,10 @@
         "title": "Read aloud",
         "desc": "Enables browser speech output, lets you prefer translated text, configure voice and speed, and play a sample preview."
       },
+      "pinFeedback": {
+        "title": "PIN feedback",
+        "desc": "Lets you enable or disable haptic and audio feedback separately for PIN entry and the stronger warning signal on reset."
+      },
       "usageProtection": {
         "title": "Usage protection",
         "desc": "Configures daily limits, allowed time windows, and unlock mode (self or parental PIN)."

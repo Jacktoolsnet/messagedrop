@@ -558,6 +558,11 @@ const HELP_TOPICS = {
         descriptionKey: 'appSettings.items.speech.desc'
       },
       {
+        icon: 'dialpad',
+        titleKey: 'appSettings.items.pinFeedback.title',
+        descriptionKey: 'appSettings.items.pinFeedback.desc'
+      },
+      {
         icon: 'bug_report',
         titleKey: 'appSettings.items.logging.title',
         descriptionKey: 'appSettings.items.logging.desc'

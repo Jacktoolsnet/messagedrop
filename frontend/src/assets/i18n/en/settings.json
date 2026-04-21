@@ -62,7 +62,8 @@
     "description": "Controls vibration and sound during PIN entry.",
     "note": "Applies to the PIN keypad and the stronger warning feedback when resetting.",
     "hapticToggle": "Enable haptic feedback",
-    "audioToggle": "Enable sound feedback"
+    "audioToggle": "Enable sound feedback",
+    "hapticUnsupported": "Haptic feedback is not supported on this device or in this browser."
   },
   "usageProtection": {
     "title": "Usage protection",

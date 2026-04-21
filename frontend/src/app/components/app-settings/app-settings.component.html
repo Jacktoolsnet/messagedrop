@@ -170,10 +170,18 @@
         {{ 'settings.pinFeedback.note' | transloco }}
       </p>
 
-      <mat-slide-toggle color="primary" [checked]="appSettings.pinInputFeedback.hapticEnabled"
+      <mat-slide-toggle color="primary"
+        [checked]="pinFeedbackHapticSupported ? appSettings.pinInputFeedback.hapticEnabled : false"
+        [disabled]="!pinFeedbackHapticSupported"
         (change)="setPinFeedbackHapticEnabled($event.checked)">
         {{ 'settings.pinFeedback.hapticToggle' | transloco }}
       </mat-slide-toggle>
+
+      @if (!pinFeedbackHapticSupported) {
+        <p class="pin-feedback-settings-warning">
+          {{ 'settings.pinFeedback.hapticUnsupported' | transloco }}
+        </p>
+      }
 
       <mat-slide-toggle color="primary" [checked]="appSettings.pinInputFeedback.audioEnabled"
         (change)="setPinFeedbackAudioEnabled($event.checked)">

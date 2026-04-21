@@ -62,7 +62,8 @@
     "description": "Contrôle la vibration et le son lors de la saisie du PIN.",
     "note": "S'applique au clavier PIN et au signal d'avertissement renforcé lors de la réinitialisation.",
     "hapticToggle": "Activer le retour haptique",
-    "audioToggle": "Activer le retour sonore"
+    "audioToggle": "Activer le retour sonore",
+    "hapticUnsupported": "Le retour haptique n'est pas pris en charge sur cet appareil ou dans ce navigateur."
   },
   "usageProtection": {
     "title": "Protection d'usage",

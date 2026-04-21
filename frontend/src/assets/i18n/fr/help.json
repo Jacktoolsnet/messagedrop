@@ -496,6 +496,10 @@
         "title": "Lecture à voix haute",
         "desc": "Active la voix du navigateur, permet de préférer le texte traduit, de régler la voix et la vitesse, et de lire un exemple."
       },
+      "pinFeedback": {
+        "title": "Retour PIN",
+        "desc": "Permet d’activer ou de désactiver séparément le retour haptique et sonore pour la saisie du PIN ainsi que le signal d’avertissement renforcé lors de la réinitialisation."
+      },
       "usageProtection": {
         "title": "Protection d'usage",
         "desc": "Configure la limite quotidienne, les plages horaires autorisées et le mode de déverrouillage (autogéré ou PIN parental)."
