@@ -22,26 +22,33 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #e0e0e0;
+  border: 1px solid color-mix(in srgb,
+      var(--mat-sys-outline-variant, var(--mat-card-outlined-outline-color, currentColor)) 82%,
+      transparent);
   border-radius: 12px;
-  background: #f9fafb;
+  background: transparent;
+  color: inherit;
   transition: all 140ms ease;
   font-size: 1.9rem;
 }
 
 .emoticon-grid button:hover {
-  border-color: #cfd8dc;
-  background: #eef3f7;
+  border-color: color-mix(in srgb,
+      var(--mat-sys-primary, var(--mat-sys-color-primary, currentColor)) 24%,
+      var(--mat-sys-outline-variant, var(--mat-card-outlined-outline-color, currentColor)));
+  background: color-mix(in srgb,
+      var(--mat-sys-on-surface, var(--mat-sys-color-on-surface, currentColor)) 6%,
+      transparent);
 }
 
 .emoticon-grid__button--active {
-  border-color: color-mix(in srgb, var(--mat-sys-primary) 45%, transparent) !important;
-  background: color-mix(in srgb, var(--mat-sys-primary) 12%, white) !important;
-  box-shadow: 0 8px 18px color-mix(in srgb, var(--mat-sys-primary) 18%, transparent);
+  border-color: color-mix(in srgb, var(--mat-sys-primary) 38%, transparent) !important;
+  background: color-mix(in srgb, var(--mat-sys-primary) 16%, transparent) !important;
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--mat-sys-primary) 14%, transparent);
 }
 
 .emoticon-grid button:focus-visible {
-  outline: 2px solid #1976d2;
+  outline: 2px solid color-mix(in srgb, var(--mat-sys-primary) 56%, transparent);
   outline-offset: 2px;
 }
 
@@ -100,39 +107,90 @@
   flex: 0 0 auto;
 }
 
-.selection-panel__tile-actions button {
+.selection-panel__tile-actions .mat-mdc-icon-button {
+  --emoji-action-accent: var(--mat-sys-primary, var(--mat-sys-color-primary, #6750a4));
+  --emoji-action-surface: var(--mat-sys-surface-container, var(--mat-sys-color-surface-container, #f3edf7));
+  --emoji-action-surface-strong: var(--mat-sys-surface-container-high, var(--mat-sys-color-surface-container-high, #ece6f0));
+  --emoji-action-on-surface: var(--mat-sys-on-surface, var(--mat-sys-color-on-surface, currentColor));
+  --emoji-action-outline: var(--mat-sys-outline-variant, var(--mat-card-outlined-outline-color, rgba(0, 0, 0, 0.12)));
   width: 2.25rem;
   height: 2.25rem;
+  min-width: 2.25rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 12px;
-  background: color-mix(in srgb, var(--mat-sys-primary) 8%, white);
-  border: 1px solid color-mix(in srgb, var(--mat-sys-primary) 12%, transparent);
-  color: color-mix(in srgb, var(--mat-sys-on-surface) 72%, var(--mat-sys-primary));
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--emoji-action-accent) 10%, var(--emoji-action-surface-strong)) 0%,
+      color-mix(in srgb, var(--emoji-action-accent) 4%, var(--emoji-action-surface)) 100%);
+  border: 1px solid color-mix(in srgb, var(--emoji-action-accent) 18%, var(--emoji-action-outline));
+  color: color-mix(in srgb, var(--emoji-action-on-surface) 68%, var(--emoji-action-accent));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--emoji-action-on-surface) 10%, transparent),
+    0 6px 14px color-mix(in srgb, var(--emoji-action-accent) 10%, transparent);
   transition:
     transform 140ms ease,
     background-color 140ms ease,
     border-color 140ms ease,
-    color 140ms ease;
+    color 140ms ease,
+    box-shadow 140ms ease;
 }
 
-.selection-panel__tile-actions button:hover:not([disabled]) {
+.selection-panel__tile-actions .mat-mdc-icon-button .mat-mdc-button-persistent-ripple,
+.selection-panel__tile-actions .mat-mdc-icon-button .mat-mdc-button-touch-target {
+  border-radius: inherit;
+}
+
+.selection-panel__tile-actions .mat-mdc-icon-button:hover:not([disabled]) {
   transform: translateY(-1px);
-  background: color-mix(in srgb, var(--mat-sys-primary) 13%, white);
-  border-color: color-mix(in srgb, var(--mat-sys-primary) 20%, transparent);
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--emoji-action-accent) 14%, var(--emoji-action-surface-strong)) 0%,
+      color-mix(in srgb, var(--emoji-action-accent) 8%, var(--emoji-action-surface)) 100%);
+  border-color: color-mix(in srgb, var(--emoji-action-accent) 24%, var(--emoji-action-outline));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--emoji-action-on-surface) 12%, transparent),
+    0 10px 20px color-mix(in srgb, var(--emoji-action-accent) 14%, transparent);
 }
 
-.selection-panel__tile-actions button[color="warn"] {
-  color: color-mix(in srgb, var(--mat-sys-error) 78%, var(--mat-sys-on-surface));
-  background: color-mix(in srgb, var(--mat-sys-error) 8%, white);
-  border-color: color-mix(in srgb, var(--mat-sys-error) 14%, transparent);
+.selection-panel__tile-actions .mat-mdc-icon-button:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--emoji-action-accent) 54%, var(--emoji-action-surface-strong));
+  outline-offset: 2px;
 }
 
-.selection-panel__tile-actions button[color="warn"]:hover:not([disabled]) {
-  background: color-mix(in srgb, var(--mat-sys-error) 12%, white);
-  border-color: color-mix(in srgb, var(--mat-sys-error) 20%, transparent);
+.selection-panel__tile-actions .mat-mdc-icon-button[color="warn"] {
+  --emoji-action-accent: var(--mat-sys-error, var(--mat-sys-color-error, #b3261e));
 }
 
-.selection-panel__tile-actions button[disabled] {
+.selection-panel__tile-actions .mat-mdc-icon-button:active:not([disabled]) {
+  transform: translateY(0);
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--emoji-action-accent) 16%, var(--emoji-action-surface-strong)) 0%,
+      color-mix(in srgb, var(--emoji-action-accent) 10%, var(--emoji-action-surface)) 100%);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--emoji-action-on-surface) 10%, transparent),
+    0 4px 10px color-mix(in srgb, var(--emoji-action-accent) 10%, transparent);
+}
+
+.selection-panel__tile-actions .mat-mdc-icon-button[disabled] {
   opacity: 0.5;
+  background: color-mix(in srgb, var(--emoji-action-surface-strong) 92%, transparent);
+  border-color: color-mix(in srgb, var(--emoji-action-outline) 78%, transparent);
+  box-shadow: none;
+}
+
+.selection-panel__tile-actions .mat-mdc-icon-button mat-icon {
+  margin: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  font-size: 1.25rem;
+  line-height: 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .selection-panel__content {

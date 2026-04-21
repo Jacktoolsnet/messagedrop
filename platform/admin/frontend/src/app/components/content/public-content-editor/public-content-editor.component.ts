@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, ViewChild, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, ViewChild, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -22,6 +22,7 @@ import { PublicContentAiDialogComponent, PublicContentAiDialogResult } from '../
 import { PublicContentLocationMapDialogComponent, PublicContentLocationMapDialogResult } from '../public-content-location-map-dialog/public-content-location-map-dialog.component';
 import { AiTool } from '../../../interfaces/ai-tool.type';
 import { DisplayMessageConfig } from '../../../interfaces/display-message-config.interface';
+import { EmoticonPickerData } from '../../../interfaces/emoticon-picker-data.interface';
 import { Multimedia } from '../../../interfaces/multimedia.interface';
 import { NominatimPlace } from '../../../interfaces/nominatim-place.interface';
 import { PublicContentSavePayload } from '../../../interfaces/public-content-save-payload.interface';
@@ -40,6 +41,7 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
 import { MAX_PUBLIC_HASHTAGS, normalizeHashtags } from '../../../utils/hashtag.util';
 import { DisplayMessageService } from '../../../services/display-message.service';
 import { DisplayMessageComponent } from '../../shared/display-message/display-message.component';
+import { EmoticonPickerComponent } from '../../shared/emoticon-picker/emoticon-picker.component';
 import { StickerPreviewComponent } from '../../shared/sticker-preview/sticker-preview.component';
 import { StickerPickerComponent } from '../sticker-picker/sticker-picker.component';
 
@@ -80,6 +82,7 @@ const EMPTY_MULTIMEDIA: Multimedia = {
 })
 export class PublicContentEditorComponent {
   @ViewChild('styleSelect') private styleSelect?: MatSelect;
+  @ViewChild('messageTextarea') private messageTextarea?: ElementRef<HTMLTextAreaElement>;
 
   private readonly destroyRef = inject(DestroyRef);
   private readonly route = inject(ActivatedRoute);
@@ -95,6 +98,8 @@ export class PublicContentEditorComponent {
   private readonly styleService = inject(ContentStyleService);
   private readonly nominatimService = inject(NominatimService);
   private loadingDialogRef: MatDialogRef<DisplayMessageComponent> | null = null;
+  private messageSelectionStart = 0;
+  private messageSelectionEnd = 0;
   readonly i18n = inject(TranslationHelperService);
 
   readonly role = this.authService.role;
@@ -846,6 +851,47 @@ export class PublicContentEditorComponent {
     this.form.controls.style.setValue('');
   }
 
+  rememberMessageSelection(): void {
+    const textarea = this.messageTextarea?.nativeElement;
+    if (!textarea) {
+      const textLength = this.form.controls.message.value?.length ?? 0;
+      this.messageSelectionStart = textLength;
+      this.messageSelectionEnd = textLength;
+      return;
+    }
+
+    this.messageSelectionStart = textarea.selectionStart ?? (this.form.controls.message.value?.length ?? 0);
+    this.messageSelectionEnd = textarea.selectionEnd ?? this.messageSelectionStart;
+  }
+
+  openEmojiPicker(): void {
+    if (this.form.disabled) {
+      return;
+    }
+
+    this.rememberMessageSelection();
+    this.dialog.open<EmoticonPickerComponent, EmoticonPickerData, string | null>(EmoticonPickerComponent, {
+      width: 'min(92vw, 720px)',
+      maxWidth: '92vw',
+      maxHeight: '92vh',
+      autoFocus: false,
+      data: {
+        reactions: [],
+        current: null,
+        allowRemove: false,
+        multiSelect: true
+      }
+    }).afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((result) => {
+        if (!result) {
+          return;
+        }
+
+        this.insertSelectedEmojis(result);
+      });
+  }
+
   addHashtagsFromInput(candidate?: string): void {
     const rawCandidate = candidate ?? this.hashtagControl.value;
     const trimmedCandidate = rawCandidate.trim();
@@ -1342,6 +1388,31 @@ export class PublicContentEditorComponent {
     this.snackBar.open(this.i18n.t(message, params), this.i18n.t('OK'), { duration: 2800 });
   }
 
+  private insertSelectedEmojis(emojis: string): void {
+    const currentText = this.form.controls.message.value ?? '';
+    const start = Math.max(0, Math.min(this.messageSelectionStart, currentText.length));
+    const end = Math.max(start, Math.min(this.messageSelectionEnd, currentText.length));
+    const nextText = `${currentText.slice(0, start)}${emojis}${currentText.slice(end)}`;
+
+    this.form.controls.message.setValue(nextText);
+    this.form.controls.message.markAsDirty();
+    this.form.controls.message.markAsTouched();
+
+    const nextCursor = start + emojis.length;
+    this.messageSelectionStart = nextCursor;
+    this.messageSelectionEnd = nextCursor;
+
+    queueMicrotask(() => {
+      const textarea = this.messageTextarea?.nativeElement;
+      if (!textarea) {
+        return;
+      }
+
+      textarea.focus();
+      textarea.setSelectionRange(nextCursor, nextCursor);
+    });
+  }
+
   private openPublishingDialog(): void {
     this.closeLoadingDialog();
 
@@ -1523,7 +1594,7 @@ export class PublicContentEditorComponent {
         longitude: 0,
         plusCode: ''
       }
-    }, { emitEvent: false });
+    });
 
     this.hashtagControl.setValue('', { emitEvent: false });
     this.mediaUrlControl.setValue('', { emitEvent: false });
@@ -1533,7 +1604,7 @@ export class PublicContentEditorComponent {
     this.updateFormState();
 
     if (requestedType === 'comment' && parentId) {
-      this.form.controls.parentContentId.setValue(parentId, { emitEvent: false });
+      this.form.controls.parentContentId.setValue(parentId);
       this.loadParentContent(parentId);
     }
     if (requestedType === 'comment' && externalParentUuid) {

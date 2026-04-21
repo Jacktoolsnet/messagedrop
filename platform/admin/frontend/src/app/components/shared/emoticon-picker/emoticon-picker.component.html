@@ -1,0 +1,92 @@
+<mat-dialog-content class="emoticon-picker">
+  <mat-tab-group>
+    @for (category of categories; track category.name) {
+    <mat-tab>
+      <ng-template mat-tab-label>{{ category.icon }}</ng-template>
+
+      <div class="emoticon-grid">
+        @for (emoji of category.items; track emoji) {
+        <button
+          type="button"
+          [class.emoticon-grid__button--active]="isEmojiActive(emoji)"
+          [attr.aria-label]="emoji"
+          (click)="pick(emoji)">
+          {{ emoji }}
+        </button>
+        }
+      </div>
+    </mat-tab>
+    }
+  </mat-tab-group>
+
+  @if (multiSelect) {
+  <div class="emoji-selection">
+    <div class="emoji-selection__preview" [class.emoji-selection__preview--empty]="selectedEmojis().length === 0">
+      <div class="emoji-selection__toolbar">
+        <div class="emoji-selection__title">{{ i18n.t('Selected emojis') }}</div>
+
+        <div class="emoji-selection__actions">
+          <button
+            mat-icon-button
+            type="button"
+            [disabled]="selectedEmojis().length === 0"
+            [attr.aria-label]="i18n.t('Remove last emoji')"
+            (click)="removeLast()">
+            <mat-icon>backspace</mat-icon>
+          </button>
+
+          <button
+            mat-icon-button
+            color="warn"
+            type="button"
+            [disabled]="selectedEmojis().length === 0"
+            [attr.aria-label]="i18n.t('Clear emoji selection')"
+            (click)="clearSelection()">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      @if (selectedEmojis().length > 0) {
+      <div class="emoji-selection__content">{{ selectedEmojis().join('') }}</div>
+      } @else {
+      <div class="emoji-selection__empty-text">{{ i18n.t('No emojis selected yet.') }}</div>
+      }
+    </div>
+  </div>
+  }
+</mat-dialog-content>
+
+<app-dialog-action-bar>
+  <button
+    mat-icon-button
+    type="button"
+    class="action-close"
+    [attr.aria-label]="i18n.t('Close dialog')"
+    (click)="close()">
+    <mat-icon>close</mat-icon>
+  </button>
+
+  @if (multiSelect) {
+  <button
+    mat-icon-button
+    color="primary"
+    type="button"
+    [disabled]="selectedEmojis().length === 0"
+    [attr.aria-label]="i18n.t('Insert selected emojis')"
+    (click)="applySelection()">
+    <mat-icon>check</mat-icon>
+  </button>
+  }
+
+  @if (allowRemove && !multiSelect) {
+  <button
+    mat-icon-button
+    color="warn"
+    type="button"
+    [attr.aria-label]="i18n.t('Remove emoji')"
+    (click)="pick(null)">
+    <mat-icon>delete</mat-icon>
+  </button>
+  }
+</app-dialog-action-bar>

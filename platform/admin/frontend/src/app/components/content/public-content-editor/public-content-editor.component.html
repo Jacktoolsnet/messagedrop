@@ -285,11 +285,21 @@
           <form [formGroup]="form" class="form-grid">
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>{{ i18n.t('Message text') }}</mat-label>
-              <textarea matInput rows="8" formControlName="message"
+              <textarea #messageTextarea matInput rows="8" formControlName="message"
+                (click)="rememberMessageSelection()"
+                (focus)="rememberMessageSelection()"
+                (keyup)="rememberMessageSelection()"
+                (mouseup)="rememberMessageSelection()"
+                (select)="rememberMessageSelection()"
                 [placeholder]="i18n.t('Write the public message here')"></textarea>
             </mat-form-field>
 
             <div class="style-actions">
+              <button mat-stroked-button type="button" (click)="openEmojiPicker()" [disabled]="form.disabled"
+                [attr.aria-label]="i18n.t('Open emoji picker')">
+                <mat-icon>sentiment_satisfied</mat-icon>
+                {{ i18n.t('Choose emojis') }}
+              </button>
               <button mat-stroked-button type="button" (click)="randomizeStyle()" [disabled]="form.disabled">
                 <mat-icon>shuffle</mat-icon>
                 {{ i18n.t('Random font') }}

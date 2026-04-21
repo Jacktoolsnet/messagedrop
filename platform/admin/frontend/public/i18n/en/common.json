@@ -219,5 +219,13 @@
   "Low": "Low",
   "Medium": "Medium",
   "High": "High",
-  "Unclear": "Unclear"
+  "Unclear": "Unclear",
+  "Choose emojis": "Choose emojis",
+  "Clear emoji selection": "Clear emoji selection",
+  "Insert selected emojis": "Insert selected emojis",
+  "No emojis selected yet.": "No emojis selected yet.",
+  "Open emoji picker": "Open emoji picker",
+  "Remove emoji": "Remove emoji",
+  "Remove last emoji": "Remove last emoji",
+  "Selected emojis": "Selected emojis"
 }

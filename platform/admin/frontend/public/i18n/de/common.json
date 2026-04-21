@@ -1687,5 +1687,13 @@
   "Low": "Niedrig",
   "Medium": "Mittel",
   "High": "Hoch",
-  "Unclear": "Unklar"
+  "Unclear": "Unklar",
+  "Choose emojis": "Emojis auswählen",
+  "Clear emoji selection": "Emoji-Auswahl leeren",
+  "Insert selected emojis": "Ausgewählte Emojis einfügen",
+  "No emojis selected yet.": "Es wurden noch keine Emojis ausgewählt.",
+  "Open emoji picker": "Emoji-Picker öffnen",
+  "Remove emoji": "Emoji entfernen",
+  "Remove last emoji": "Letztes Emoji entfernen",
+  "Selected emojis": "Ausgewählte Emojis"
 }
