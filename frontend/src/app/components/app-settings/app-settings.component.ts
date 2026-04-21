@@ -11,6 +11,7 @@ import { MatSlideToggleChange, MatSlideToggleModule } from '@angular/material/sl
 import { provideTranslocoScope, TranslocoPipe } from '@jsverse/transloco';
 import { APP_VERSION_INFO } from '../../../environments/version';
 import { AppSettings } from '../../interfaces/app-settings';
+import { PinInputFeedbackHapticStrength } from '../../interfaces/pin-input-feedback-settings';
 import { SpeechVoiceMode } from '../../interfaces/speech-settings';
 import { AppService } from '../../services/app.service';
 import { LanguageMode, LanguageService } from '../../services/language.service';
@@ -76,6 +77,7 @@ export class AppSettingsComponent implements OnInit {
   readonly pinFeedbackAudioLevelMin = 0.4;
   readonly pinFeedbackAudioLevelMax = 1.6;
   readonly pinFeedbackAudioLevelStep = 0.1;
+  readonly pinFeedbackHapticStrengthLevels: PinInputFeedbackHapticStrength[] = ['soft', 'normal', 'strong'];
   private readonly speechPreviewTargetId = 'settings:speech-preview';
   public showDetectLocationOnStart = false;
   public storagePersistenceSupported = this.appService.isStoragePersistenceSupported();
@@ -183,6 +185,16 @@ export class AppSettingsComponent implements OnInit {
       pinInputFeedback: {
         ...this.appSettings.pinInputFeedback,
         hapticEnabled: enabled
+      }
+    };
+  }
+
+  setPinFeedbackHapticStrength(hapticStrength: PinInputFeedbackHapticStrength): void {
+    this.appSettings = {
+      ...this.appSettings,
+      pinInputFeedback: {
+        ...this.appSettings.pinInputFeedback,
+        hapticStrength
       }
     };
   }

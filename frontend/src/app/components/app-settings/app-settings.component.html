@@ -166,16 +166,30 @@
         </div>
       </div>
 
-      <p class="pin-feedback-settings-note">
-        {{ 'settings.pinFeedback.note' | transloco }}
-      </p>
-
       <mat-slide-toggle color="primary"
         [checked]="pinFeedbackHapticSupported ? appSettings.pinInputFeedback.hapticEnabled : false"
         [disabled]="!pinFeedbackHapticSupported"
         (change)="setPinFeedbackHapticEnabled($event.checked)">
         {{ 'settings.pinFeedback.hapticToggle' | transloco }}
       </mat-slide-toggle>
+
+      <section class="pin-feedback-strength-block">
+        <div class="pin-feedback-slider-header">
+          <p class="pin-feedback-slider-label">{{ 'settings.pinFeedback.hapticStrengthLabel' | transloco }}</p>
+        </div>
+        <mat-button-toggle-group [hideSingleSelectionIndicator]="true"
+          [value]="appSettings.pinInputFeedback.hapticStrength"
+          (change)="setPinFeedbackHapticStrength($event.value)"
+          class="pin-feedback-toggle-group"
+          [disabled]="!pinFeedbackHapticSupported || !appSettings.pinInputFeedback.hapticEnabled"
+          [attr.aria-label]="'settings.pinFeedback.hapticStrengthLabel' | transloco">
+          @for (strength of pinFeedbackHapticStrengthLevels; track strength) {
+            <mat-button-toggle [value]="strength">
+              {{ ('settings.pinFeedback.hapticStrengthOptions.' + strength) | transloco }}
+            </mat-button-toggle>
+          }
+        </mat-button-toggle-group>
+      </section>
 
       @if (!pinFeedbackHapticSupported) {
         <p class="pin-feedback-settings-warning">
@@ -200,7 +214,6 @@
             [disabled]="!appSettings.pinInputFeedback.audioEnabled"
             (valueChange)="setPinFeedbackAudioLevel($event)">
         </mat-slider>
-        <p class="pin-feedback-slider-note">{{ 'settings.pinFeedback.audioLevelHint' | transloco }}</p>
       </section>
     </div>
 

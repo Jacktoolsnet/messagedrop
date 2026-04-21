@@ -62,6 +62,13 @@
     "description": "Controla la vibración y el sonido durante la entrada del PIN.",
     "note": "Se aplica al teclado PIN y a la señal de advertencia más intensa al restablecer.",
     "hapticToggle": "Activar respuesta háptica",
+    "hapticStrengthLabel": "Nivel de vibración",
+    "hapticStrengthHint": "Ajusta la vibración mediante la duración y el patrón de pulsos. El efecto real depende del dispositivo.",
+    "hapticStrengthOptions": {
+      "soft": "Suave",
+      "normal": "Normal",
+      "strong": "Fuerte"
+    },
     "audioToggle": "Activar respuesta sonora",
     "audioLevelLabel": "Volumen de la señal",
     "audioLevelHint": "Ajusta el volumen del tono PIN dentro de la app. El volumen del dispositivo sigue aplicándose.",

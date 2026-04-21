@@ -62,6 +62,13 @@
     "description": "Steuert Vibration und Ton bei der PIN-Eingabe.",
     "note": "Gilt für die Eingabe auf dem PIN-Feld und für das stärkere Warnsignal beim Zurücksetzen.",
     "hapticToggle": "Haptisches Feedback aktivieren",
+    "hapticStrengthLabel": "Vibrationsstufe",
+    "hapticStrengthHint": "Passt die Vibration über Dauer und Muster an. Die tatsächliche Wirkung hängt vom Gerät ab.",
+    "hapticStrengthOptions": {
+      "soft": "Sanft",
+      "normal": "Normal",
+      "strong": "Stark"
+    },
     "audioToggle": "Akustisches Feedback aktivieren",
     "audioLevelLabel": "Signal-Lautstärke",
     "audioLevelHint": "Regelt die Lautstärke des PIN-Tons innerhalb der App. Die Geräte-Lautstärke gilt weiterhin.",

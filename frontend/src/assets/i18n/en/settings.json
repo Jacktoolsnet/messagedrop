@@ -62,6 +62,13 @@
     "description": "Controls vibration and sound during PIN entry.",
     "note": "Applies to the PIN keypad and the stronger warning feedback when resetting.",
     "hapticToggle": "Enable haptic feedback",
+    "hapticStrengthLabel": "Vibration level",
+    "hapticStrengthHint": "Adjusts vibration using shorter or longer pulse patterns. The actual feel depends on your device.",
+    "hapticStrengthOptions": {
+      "soft": "Soft",
+      "normal": "Normal",
+      "strong": "Strong"
+    },
     "audioToggle": "Enable sound feedback",
     "audioLevelLabel": "Signal volume",
     "audioLevelHint": "Adjusts the PIN tone volume inside the app. Your device volume still applies.",

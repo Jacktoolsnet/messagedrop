@@ -2,7 +2,11 @@ import { Injectable, inject, signal } from '@angular/core';
 import { AppSettings } from '../interfaces/app-settings';
 import { ConsentSettings } from '../interfaces/consent-settings.interface';
 import { NotificationAction } from '../interfaces/notification-action';
-import { DEFAULT_PIN_INPUT_FEEDBACK_SETTINGS, PinInputFeedbackSettings } from '../interfaces/pin-input-feedback-settings';
+import {
+  DEFAULT_PIN_INPUT_FEEDBACK_SETTINGS,
+  PinInputFeedbackHapticStrength,
+  PinInputFeedbackSettings
+} from '../interfaces/pin-input-feedback-settings';
 import { DEFAULT_SPEECH_SETTINGS, SpeechSettings } from '../interfaces/speech-settings';
 import { DEFAULT_USAGE_PROTECTION_SETTINGS } from '../interfaces/usage-protection-settings';
 import { IndexedDbService } from './indexed-db.service';
@@ -200,8 +204,12 @@ export class AppService {
     const audioLevel = typeof raw.audioLevel === 'number' && Number.isFinite(raw.audioLevel)
       ? Math.min(1.6, Math.max(0.4, raw.audioLevel))
       : DEFAULT_PIN_INPUT_FEEDBACK_SETTINGS.audioLevel;
+    const hapticStrength: PinInputFeedbackHapticStrength = raw.hapticStrength === 'normal' || raw.hapticStrength === 'strong'
+      ? raw.hapticStrength
+      : DEFAULT_PIN_INPUT_FEEDBACK_SETTINGS.hapticStrength;
     return {
       hapticEnabled: raw.hapticEnabled !== false,
+      hapticStrength,
       audioEnabled: raw.audioEnabled !== false,
       audioLevel
     };

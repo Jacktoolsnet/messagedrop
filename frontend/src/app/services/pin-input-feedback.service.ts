@@ -1,4 +1,5 @@
 import { Injectable, inject } from '@angular/core';
+import { PinInputFeedbackHapticStrength } from '../interfaces/pin-input-feedback-settings';
 import { AppService } from './app.service';
 
 @Injectable({
@@ -15,7 +16,7 @@ export class PinInputFeedbackService {
     }
 
     const vibrated = feedbackSettings.hapticEnabled
-      ? this.tryVibrate(this.getAcceptedVibrationPattern())
+      ? this.tryVibrate(this.getAcceptedVibrationPattern(feedbackSettings.hapticStrength))
       : false;
 
     if (!feedbackSettings.audioEnabled) {
@@ -36,7 +37,7 @@ export class PinInputFeedbackService {
     }
 
     const vibrated = feedbackSettings.hapticEnabled
-      ? this.tryVibrate(this.getResetVibrationPattern())
+      ? this.tryVibrate(this.getResetVibrationPattern(feedbackSettings.hapticStrength))
       : false;
 
     if (!feedbackSettings.audioEnabled) {
@@ -246,20 +247,52 @@ export class PinInputFeedbackService {
     return this.audioContext;
   }
 
-  private getAcceptedVibrationPattern(): number | number[] {
-    if (typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent)) {
-      return [24, 14, 18];
+  private getAcceptedVibrationPattern(strength: PinInputFeedbackHapticStrength | undefined): number | number[] {
+    const normalizedStrength = this.getConfiguredHapticStrength(strength);
+    const isAndroid = typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent);
+    if (isAndroid) {
+      switch (normalizedStrength) {
+        case 'soft':
+          return [14, 10, 10];
+        case 'normal':
+          return [20, 12, 14];
+        case 'strong':
+          return [24, 14, 18];
+      }
     }
 
-    return 18;
+    switch (normalizedStrength) {
+      case 'soft':
+        return 12;
+      case 'normal':
+        return 15;
+      case 'strong':
+        return 18;
+    }
   }
 
-  private getResetVibrationPattern(): number | number[] {
-    if (typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent)) {
-      return [38, 24, 34];
+  private getResetVibrationPattern(strength: PinInputFeedbackHapticStrength | undefined): number | number[] {
+    const normalizedStrength = this.getConfiguredHapticStrength(strength);
+    const isAndroid = typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent);
+    if (isAndroid) {
+      switch (normalizedStrength) {
+        case 'soft':
+          return [24, 16, 20];
+        case 'normal':
+          return [32, 20, 28];
+        case 'strong':
+          return [38, 24, 34];
+      }
     }
 
-    return [26, 18, 24];
+    switch (normalizedStrength) {
+      case 'soft':
+        return [18, 12, 16];
+      case 'normal':
+        return [22, 14, 20];
+      case 'strong':
+        return [26, 18, 24];
+    }
   }
 
   private getConfiguredAudioLevel(level: number | undefined): number {
@@ -268,5 +301,9 @@ export class PinInputFeedbackService {
     }
 
     return Math.min(1.6, Math.max(0.4, level));
+  }
+
+  private getConfiguredHapticStrength(strength: PinInputFeedbackHapticStrength | undefined): PinInputFeedbackHapticStrength {
+    return strength === 'normal' || strength === 'strong' ? strength : 'soft';
   }
 }
