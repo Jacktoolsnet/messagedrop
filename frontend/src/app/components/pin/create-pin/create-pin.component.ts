@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { DisplayMessage } from '../../utils/display-message/display-message.component';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
+import { PinInputFeedbackService } from '../../../services/pin-input-feedback.service';
 
 interface CreatePinDialogData {
   titleKey?: string;
@@ -32,17 +33,29 @@ export class CreatePinComponent implements OnDestroy {
   confirmPin = '';
   pinDisplay: string[] = ['', '', '', '', '', ''];
   confirmPinDisplay: string[] = ['', '', '', '', '', ''];
+  pinPulseStates: boolean[] = [false, false, false, false, false, false];
+  confirmPinPulseStates: boolean[] = [false, false, false, false, false, false];
   isConfirming = false;
+  readonly digitVisibilityDurationMs = 550;
+  readonly slotPulseDurationMs = 240;
   private dialogClosed = false;
+  private readonly pinMaskTimeouts: Array<number | undefined> = new Array<number | undefined>(this.pinLength).fill(undefined);
+  private readonly confirmPinMaskTimeouts: Array<number | undefined> = new Array<number | undefined>(this.pinLength).fill(undefined);
+  private readonly pinPulseTimeouts: Array<number | undefined> = new Array<number | undefined>(this.pinLength).fill(undefined);
+  private readonly confirmPinPulseTimeouts: Array<number | undefined> = new Array<number | undefined>(this.pinLength).fill(undefined);
+  private transitionTimeoutId?: number;
 
   readonly data = inject<CreatePinDialogData | null>(MAT_DIALOG_DATA, { optional: true }) ?? {};
 
   private readonly dialogRef = inject(MatDialogRef<CreatePinComponent>);
   private readonly dialog = inject(MatDialog);
   private readonly translation = inject(TranslationHelperService);
+  private readonly pinFeedback = inject(PinInputFeedbackService);
 
   ngOnDestroy(): void {
     this.dialogClosed = true;
+    this.clearTransitionTimeout();
+    this.clearAllSlotTimers();
   }
 
   @HostListener('document:keydown', ['$event'])
@@ -74,23 +87,31 @@ export class CreatePinComponent implements OnDestroy {
   addDigit(digit: string): void {
     if (!this.isConfirming) {
       if (this.pin.length < this.pinLength) {
+        const index = this.pin.length;
         this.pin += digit;
-        this.showDigitTemporarily(this.pin.length - 1);
+        this.showDigitTemporarily(index);
+        this.pulseSlot(index);
+        void this.pinFeedback.notifyAcceptedInput();
 
         if (this.pin.length === this.pinLength) {
-          setTimeout(() => {
+          this.clearTransitionTimeout();
+          this.transitionTimeoutId = window.setTimeout(() => {
             this.isConfirming = true;
-          }, 250);
+          }, this.digitVisibilityDurationMs);
         }
       }
     } else {
       if (this.confirmPin.length < this.pinLength) {
+        const index = this.confirmPin.length;
         this.confirmPin += digit;
-        this.showDigitTemporarily(this.confirmPin.length - 1, true);
+        this.showDigitTemporarily(index, true);
+        this.pulseSlot(index, true);
+        void this.pinFeedback.notifyAcceptedInput();
 
         if (this.confirmPin.length === this.pinLength) {
           // Auto-check and close if it matches.
-          setTimeout(() => {
+          this.clearTransitionTimeout();
+          this.transitionTimeoutId = window.setTimeout(() => {
             if (this.confirmPin === this.pin && !this.dialogClosed) {
               this.dialogClosed = true;
               this.dialogRef.close(this.pin);
@@ -98,7 +119,7 @@ export class CreatePinComponent implements OnDestroy {
               this.reset();
               this.showPinMismatchMessage();
             }
-          }, 250);
+          }, this.digitVisibilityDurationMs);
         }
       }
     }
@@ -106,36 +127,99 @@ export class CreatePinComponent implements OnDestroy {
 
   showDigitTemporarily(index: number, isConfirming = false): void {
     const displayArray = isConfirming ? this.confirmPinDisplay : this.pinDisplay;
-    const pin = isConfirming ? this.confirmPin : this.pin;
-    displayArray[index] = pin[index];
-    setTimeout(() => {
-      displayArray[index] = '•';
-    }, 250);
+    const timeoutArray = isConfirming ? this.confirmPinMaskTimeouts : this.pinMaskTimeouts;
+    this.clearMaskTimeout(index, isConfirming);
+    displayArray[index] = (isConfirming ? this.confirmPin : this.pin)[index];
+    timeoutArray[index] = window.setTimeout(() => {
+      if ((isConfirming ? this.confirmPin : this.pin).length > index) {
+        displayArray[index] = '•';
+      }
+      timeoutArray[index] = undefined;
+    }, this.digitVisibilityDurationMs);
   }
 
   removeDigit(): void {
     if (!this.isConfirming && this.pin.length > 0) {
+      this.clearTransitionTimeout();
       const index = this.pin.length - 1;
+      this.clearMaskTimeout(index);
+      this.clearPulseTimeout(index);
       this.pin = this.pin.slice(0, -1);
       this.pinDisplay[index] = '';
+      this.pinPulseStates[index] = false;
     } else if (this.isConfirming && this.confirmPin.length > 0) {
+      this.clearTransitionTimeout();
       const index = this.confirmPin.length - 1;
+      this.clearMaskTimeout(index, true);
+      this.clearPulseTimeout(index, true);
       this.confirmPin = this.confirmPin.slice(0, -1);
       this.confirmPinDisplay[index] = '';
+      this.confirmPinPulseStates[index] = false;
     }
   }
 
   reset(): void {
+    this.clearTransitionTimeout();
+    this.clearAllSlotTimers();
     this.pin = '';
     this.confirmPin = '';
     this.pinDisplay = ['', '', '', '', '', ''];
     this.confirmPinDisplay = ['', '', '', '', '', ''];
+    this.pinPulseStates = [false, false, false, false, false, false];
+    this.confirmPinPulseStates = [false, false, false, false, false, false];
     this.isConfirming = false;
   }
 
   cancel(): void {
     this.dialogClosed = true;
+    this.clearTransitionTimeout();
+    this.clearAllSlotTimers();
     this.dialogRef.close();
+  }
+
+  private pulseSlot(index: number, isConfirming = false): void {
+    const pulseStates = isConfirming ? this.confirmPinPulseStates : this.pinPulseStates;
+    const timeoutArray = isConfirming ? this.confirmPinPulseTimeouts : this.pinPulseTimeouts;
+    this.clearPulseTimeout(index, isConfirming);
+    pulseStates[index] = true;
+    timeoutArray[index] = window.setTimeout(() => {
+      pulseStates[index] = false;
+      timeoutArray[index] = undefined;
+    }, this.slotPulseDurationMs);
+  }
+
+  private clearAllSlotTimers(): void {
+    for (let index = 0; index < this.pinLength; index += 1) {
+      this.clearMaskTimeout(index);
+      this.clearMaskTimeout(index, true);
+      this.clearPulseTimeout(index);
+      this.clearPulseTimeout(index, true);
+    }
+  }
+
+  private clearMaskTimeout(index: number, isConfirming = false): void {
+    const timeoutArray = isConfirming ? this.confirmPinMaskTimeouts : this.pinMaskTimeouts;
+    const timeoutId = timeoutArray[index];
+    if (timeoutId !== undefined) {
+      window.clearTimeout(timeoutId);
+      timeoutArray[index] = undefined;
+    }
+  }
+
+  private clearPulseTimeout(index: number, isConfirming = false): void {
+    const timeoutArray = isConfirming ? this.confirmPinPulseTimeouts : this.pinPulseTimeouts;
+    const timeoutId = timeoutArray[index];
+    if (timeoutId !== undefined) {
+      window.clearTimeout(timeoutId);
+      timeoutArray[index] = undefined;
+    }
+  }
+
+  private clearTransitionTimeout(): void {
+    if (this.transitionTimeoutId !== undefined) {
+      window.clearTimeout(this.transitionTimeoutId);
+      this.transitionTimeoutId = undefined;
+    }
   }
 
   private showPinMismatchMessage(): void {

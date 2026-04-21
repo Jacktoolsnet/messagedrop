@@ -5,7 +5,7 @@
 
 <div class="pin-display">
     @for (digit of isConfirming ? confirmPinDisplay : pinDisplay; track $index) {
-    <div [ngClass]="{ 'pin-dot': true, 'active': $index === currentPinIndex }">
+    <div [ngClass]="{ 'pin-dot': true, 'active': $index === currentPinIndex, 'pulse': (isConfirming ? confirmPinPulseStates : pinPulseStates)[$index] }">
         {{ digit || '•' }}
     </div>
     }

@@ -32,6 +32,9 @@
     width: 100%;
 
     .pin-dot {
+        display: flex;
+        align-items: center;
+        justify-content: center;
         flex: 1;
         max-width: 24px;
         height: 32px;
@@ -39,11 +42,18 @@
         text-align: center;
         margin: 0 8px;
         font-size: 24px;
-        transition: border-color 0.3s;
+        border-radius: 8px 8px 0 0;
+        transform-origin: center bottom;
+        transition: border-color 0.3s, color 0.3s;
+        will-change: transform;
     }
 
     .pin-dot.active {
         border-color: var(--mat-fab-small-foreground-color);
+    }
+
+    .pin-dot.pulse {
+        animation: pin-slot-pulse 240ms ease-out;
     }
 }
 
@@ -64,5 +74,21 @@
         mat-icon {
             font-size: 24px;
         }
+    }
+}
+
+@keyframes pin-slot-pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    40% {
+        transform: scale(1.16);
+        border-bottom-color: var(--mat-fab-small-foreground-color);
+        color: var(--mat-fab-small-foreground-color);
+    }
+
+    100% {
+        transform: scale(1);
     }
 }
