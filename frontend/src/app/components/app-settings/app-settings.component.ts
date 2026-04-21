@@ -391,9 +391,8 @@ export class AppSettingsComponent implements OnInit {
     return `${Math.round(level * 100)}%`;
   }
 
-  formatPinFeedbackAudioLevelSlider(value: number): string {
-    return this.formatPinFeedbackAudioLevel(value);
-  }
+  readonly formatPinFeedbackAudioLevelSlider = (value: number): string =>
+    this.formatPinFeedbackAudioLevel(value);
 
   getResolvedSpeechVoiceUri(): string {
     return this.appSettings.speech.voiceUri || this.getRecommendedSpeechVoiceUri();
