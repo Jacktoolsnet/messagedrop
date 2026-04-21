@@ -7,7 +7,8 @@ export class PinInputFeedbackService {
   private audioContext: AudioContext | null = null;
 
   async notifyAcceptedInput(): Promise<void> {
-    if (this.tryVibrate()) {
+    const vibrated = this.tryVibrate();
+    if (vibrated && !this.shouldAlsoPlayBeep()) {
       return;
     }
 
@@ -46,24 +47,53 @@ export class PinInputFeedbackService {
 
     const context = this.audioContext;
     const now = context.currentTime;
-    const oscillator = context.createOscillator();
-    const gainNode = context.createGain();
+    const fundamental = context.createOscillator();
+    const undertone = context.createOscillator();
+    const fundamentalGain = context.createGain();
+    const undertoneGain = context.createGain();
+    const filter = context.createBiquadFilter();
+    const masterGain = context.createGain();
 
-    oscillator.type = 'triangle';
-    oscillator.frequency.setValueAtTime(740, now);
+    fundamental.type = 'sine';
+    fundamental.frequency.setValueAtTime(520, now);
+    fundamental.frequency.exponentialRampToValueAtTime(440, now + 0.14);
 
-    gainNode.gain.setValueAtTime(0.0001, now);
-    gainNode.gain.linearRampToValueAtTime(0.012, now + 0.01);
-    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
+    undertone.type = 'triangle';
+    undertone.frequency.setValueAtTime(260, now);
+    undertone.frequency.exponentialRampToValueAtTime(220, now + 0.14);
 
-    oscillator.connect(gainNode);
-    gainNode.connect(context.destination);
+    fundamentalGain.gain.setValueAtTime(0.0001, now);
+    fundamentalGain.gain.linearRampToValueAtTime(0.018, now + 0.012);
+    fundamentalGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
 
-    oscillator.start(now);
-    oscillator.stop(now + 0.085);
-    oscillator.addEventListener('ended', () => {
-      oscillator.disconnect();
-      gainNode.disconnect();
+    undertoneGain.gain.setValueAtTime(0.0001, now);
+    undertoneGain.gain.linearRampToValueAtTime(0.010, now + 0.018);
+    undertoneGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
+
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(900, now);
+    filter.Q.setValueAtTime(0.4, now);
+
+    masterGain.gain.setValueAtTime(0.85, now);
+
+    fundamental.connect(fundamentalGain);
+    undertone.connect(undertoneGain);
+    fundamentalGain.connect(filter);
+    undertoneGain.connect(filter);
+    filter.connect(masterGain);
+    masterGain.connect(context.destination);
+
+    fundamental.start(now);
+    undertone.start(now);
+    fundamental.stop(now + 0.16);
+    undertone.stop(now + 0.16);
+    fundamental.addEventListener('ended', () => {
+      fundamental.disconnect();
+      undertone.disconnect();
+      fundamentalGain.disconnect();
+      undertoneGain.disconnect();
+      filter.disconnect();
+      masterGain.disconnect();
     }, { once: true });
   }
 
@@ -73,5 +103,13 @@ export class PinInputFeedbackService {
     }
 
     return window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  }
+
+  private shouldAlsoPlayBeep(): boolean {
+    if (typeof navigator === 'undefined') {
+      return false;
+    }
+
+    return /CrOS/i.test(navigator.userAgent);
   }
 }
