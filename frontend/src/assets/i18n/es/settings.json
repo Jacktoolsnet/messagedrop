@@ -57,6 +57,13 @@
     "stopPreviewAction": "Detener muestra",
     "unsupported": "La lectura en voz alta no es compatible con este navegador."
   },
+  "pinFeedback": {
+    "title": "Retroalimentación del PIN",
+    "description": "Controla la vibración y el sonido durante la entrada del PIN.",
+    "note": "Se aplica al teclado PIN y a la señal de advertencia más intensa al restablecer.",
+    "hapticToggle": "Activar respuesta háptica",
+    "audioToggle": "Activar respuesta sonora"
+  },
   "usageProtection": {
     "title": "Protección de uso",
     "description": "Define límites diarios y franjas horarias permitidas.",

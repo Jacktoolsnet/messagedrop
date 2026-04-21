@@ -320,6 +320,46 @@ h4 {
     width: 100%;
 }
 
+.platform-tile.pin-feedback-settings-tile {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.pin-feedback-settings-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.pin-feedback-settings-header mat-icon {
+    font-size: 1.75rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    flex: 0 0 auto;
+}
+
+.pin-feedback-settings-header>div {
+    min-width: 0;
+    flex: 1 1 0;
+}
+
+.pin-feedback-settings-header h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--mat-app-text-color);
+}
+
+.pin-feedback-settings-subtitle,
+.pin-feedback-settings-note {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--mat-card-subtitle-text-color);
+}
+
 .speech-settings-warning {
     margin: 0;
     color: var(--mat-sys-color-error, #b3261e);

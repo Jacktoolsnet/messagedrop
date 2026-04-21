@@ -57,6 +57,13 @@
     "stopPreviewAction": "Stop sample",
     "unsupported": "Read aloud is not supported in this browser."
   },
+  "pinFeedback": {
+    "title": "PIN feedback",
+    "description": "Controls vibration and sound during PIN entry.",
+    "note": "Applies to the PIN keypad and the stronger warning feedback when resetting.",
+    "hapticToggle": "Enable haptic feedback",
+    "audioToggle": "Enable sound feedback"
+  },
   "usageProtection": {
     "title": "Usage protection",
     "description": "Set daily limits and time windows for app usage.",

@@ -2,6 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { AppSettings } from '../interfaces/app-settings';
 import { ConsentSettings } from '../interfaces/consent-settings.interface';
 import { NotificationAction } from '../interfaces/notification-action';
+import { DEFAULT_PIN_INPUT_FEEDBACK_SETTINGS, PinInputFeedbackSettings } from '../interfaces/pin-input-feedback-settings';
 import { DEFAULT_SPEECH_SETTINGS, SpeechSettings } from '../interfaces/speech-settings';
 import { DEFAULT_USAGE_PROTECTION_SETTINGS } from '../interfaces/usage-protection-settings';
 import { IndexedDbService } from './indexed-db.service';
@@ -40,6 +41,7 @@ export class AppService {
     enableUnsplashContent: false,
     diagnosticLogging: false,
     backupOnExit: false,
+    pinInputFeedback: { ...DEFAULT_PIN_INPUT_FEEDBACK_SETTINGS },
     speech: { ...DEFAULT_SPEECH_SETTINGS },
     usageProtection: { ...DEFAULT_USAGE_PROTECTION_SETTINGS },
     consentSettings: {
@@ -71,6 +73,10 @@ export class AppService {
       ...this.defaultAppSettings,
       ...current,
       ...newAppSettings,
+      pinInputFeedback: this.normalizePinInputFeedbackSettings({
+        ...current.pinInputFeedback,
+        ...newAppSettings.pinInputFeedback
+      }),
       speech: this.normalizeSpeechSettings({
         ...current.speech,
         ...newAppSettings.speech
@@ -116,6 +122,7 @@ export class AppService {
       this.appSettings = {
         ...this.defaultAppSettings,
         ...(parsed ?? {}),
+        pinInputFeedback: this.normalizePinInputFeedbackSettings(parsed?.pinInputFeedback),
         speech: this.normalizeSpeechSettings(parsed?.speech),
         usageProtection: {
           ...this.defaultAppSettings.usageProtection,
@@ -185,6 +192,14 @@ export class AppService {
       voiceMode: raw.voiceMode === 'custom' ? 'custom' : 'system',
       voiceUri: typeof raw.voiceUri === 'string' ? raw.voiceUri : '',
       rate: typeof raw.rate === 'number' && Number.isFinite(raw.rate) ? raw.rate : DEFAULT_SPEECH_SETTINGS.rate
+    };
+  }
+
+  private normalizePinInputFeedbackSettings(input: Partial<PinInputFeedbackSettings> | undefined): PinInputFeedbackSettings {
+    const raw = input ?? {};
+    return {
+      hapticEnabled: raw.hapticEnabled !== false,
+      audioEnabled: raw.audioEnabled !== false
     };
   }
 

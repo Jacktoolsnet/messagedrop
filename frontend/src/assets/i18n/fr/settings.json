@@ -57,6 +57,13 @@
     "stopPreviewAction": "Arrêter l'exemple",
     "unsupported": "La lecture à voix haute n'est pas prise en charge dans ce navigateur."
   },
+  "pinFeedback": {
+    "title": "Retour PIN",
+    "description": "Contrôle la vibration et le son lors de la saisie du PIN.",
+    "note": "S'applique au clavier PIN et au signal d'avertissement renforcé lors de la réinitialisation.",
+    "hapticToggle": "Activer le retour haptique",
+    "audioToggle": "Activer le retour sonore"
+  },
   "usageProtection": {
     "title": "Protection d'usage",
     "description": "Définissez des limites quotidiennes et des plages horaires autorisées.",

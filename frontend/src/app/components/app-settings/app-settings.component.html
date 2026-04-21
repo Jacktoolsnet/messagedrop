@@ -157,6 +157,30 @@
       }
     </div>
 
+    <div class="platform-tile pin-feedback-settings-tile">
+      <div class="pin-feedback-settings-header">
+        <mat-icon>dialpad</mat-icon>
+        <div>
+          <h3>{{ 'settings.pinFeedback.title' | transloco }}</h3>
+          <p class="pin-feedback-settings-subtitle">{{ 'settings.pinFeedback.description' | transloco }}</p>
+        </div>
+      </div>
+
+      <p class="pin-feedback-settings-note">
+        {{ 'settings.pinFeedback.note' | transloco }}
+      </p>
+
+      <mat-slide-toggle color="primary" [checked]="appSettings.pinInputFeedback.hapticEnabled"
+        (change)="setPinFeedbackHapticEnabled($event.checked)">
+        {{ 'settings.pinFeedback.hapticToggle' | transloco }}
+      </mat-slide-toggle>
+
+      <mat-slide-toggle color="primary" [checked]="appSettings.pinInputFeedback.audioEnabled"
+        (change)="setPinFeedbackAudioEnabled($event.checked)">
+        {{ 'settings.pinFeedback.audioToggle' | transloco }}
+      </mat-slide-toggle>
+    </div>
+
     @if(showDetectLocationOnStart){
       <div class="platform-tile">
         <app-enable-location [checkedOverride]="appSettings.detectLocationOnStart" [persistOnToggle]="false"

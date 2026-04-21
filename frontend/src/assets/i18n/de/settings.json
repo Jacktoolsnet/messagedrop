@@ -57,6 +57,13 @@
     "stopPreviewAction": "Beispiel stoppen",
     "unsupported": "Vorlesen wird in diesem Browser nicht unterstützt."
   },
+  "pinFeedback": {
+    "title": "PIN-Feedback",
+    "description": "Steuert Vibration und Ton bei der PIN-Eingabe.",
+    "note": "Gilt für die Eingabe auf dem PIN-Feld und für das stärkere Warnsignal beim Zurücksetzen.",
+    "hapticToggle": "Haptisches Feedback aktivieren",
+    "audioToggle": "Akustisches Feedback aktivieren"
+  },
   "usageProtection": {
     "title": "Nutzungszeit-Schutz",
     "description": "Lege tägliche Limits und erlaubte Zeitfenster fest.",

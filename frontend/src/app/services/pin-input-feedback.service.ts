@@ -1,13 +1,27 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { AppService } from './app.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PinInputFeedbackService {
   private audioContext: AudioContext | null = null;
+  private readonly appService = inject(AppService);
 
   async notifyAcceptedInput(): Promise<void> {
-    const vibrated = this.tryVibrate(this.getAcceptedVibrationPattern());
+    const feedbackSettings = this.appService.getAppSettings().pinInputFeedback;
+    if (!feedbackSettings.hapticEnabled && !feedbackSettings.audioEnabled) {
+      return;
+    }
+
+    const vibrated = feedbackSettings.hapticEnabled
+      ? this.tryVibrate(this.getAcceptedVibrationPattern())
+      : false;
+
+    if (!feedbackSettings.audioEnabled) {
+      return;
+    }
+
     if (vibrated && !this.shouldPlayBeepAlongsideVibration()) {
       return;
     }
@@ -16,7 +30,19 @@ export class PinInputFeedbackService {
   }
 
   async notifyResetAction(): Promise<void> {
-    const vibrated = this.tryVibrate(this.getResetVibrationPattern());
+    const feedbackSettings = this.appService.getAppSettings().pinInputFeedback;
+    if (!feedbackSettings.hapticEnabled && !feedbackSettings.audioEnabled) {
+      return;
+    }
+
+    const vibrated = feedbackSettings.hapticEnabled
+      ? this.tryVibrate(this.getResetVibrationPattern())
+      : false;
+
+    if (!feedbackSettings.audioEnabled) {
+      return;
+    }
+
     if (vibrated && !this.shouldPlayBeepAlongsideVibration()) {
       return;
     }

@@ -163,6 +163,26 @@ export class AppSettingsComponent implements OnInit {
     this.appSettings = { ...this.appSettings, backupOnExit: enabled };
   }
 
+  setPinFeedbackHapticEnabled(enabled: boolean): void {
+    this.appSettings = {
+      ...this.appSettings,
+      pinInputFeedback: {
+        ...this.appSettings.pinInputFeedback,
+        hapticEnabled: enabled
+      }
+    };
+  }
+
+  setPinFeedbackAudioEnabled(enabled: boolean): void {
+    this.appSettings = {
+      ...this.appSettings,
+      pinInputFeedback: {
+        ...this.appSettings.pinInputFeedback,
+        audioEnabled: enabled
+      }
+    };
+  }
+
   setSpeechEnabled(enabled: boolean): void {
     this.appSettings = {
       ...this.appSettings,
