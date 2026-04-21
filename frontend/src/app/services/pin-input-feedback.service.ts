@@ -8,7 +8,7 @@ export class PinInputFeedbackService {
 
   async notifyAcceptedInput(): Promise<void> {
     const vibrated = this.tryVibrate();
-    if (vibrated && !this.shouldAlsoPlayBeep()) {
+    if (vibrated && !this.shouldPlayBeepAlongsideVibration()) {
       return;
     }
 
@@ -21,7 +21,7 @@ export class PinInputFeedbackService {
     }
 
     try {
-      return navigator.vibrate(12);
+      return navigator.vibrate(18);
     } catch {
       return false;
     }
@@ -105,11 +105,11 @@ export class PinInputFeedbackService {
     return window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
   }
 
-  private shouldAlsoPlayBeep(): boolean {
+  private shouldPlayBeepAlongsideVibration(): boolean {
     if (typeof navigator === 'undefined') {
       return false;
     }
 
-    return /CrOS/i.test(navigator.userAgent);
+    return /Android|CrOS/i.test(navigator.userAgent);
   }
 }
