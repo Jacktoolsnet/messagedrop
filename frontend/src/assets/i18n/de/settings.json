@@ -63,6 +63,8 @@
     "note": "Gilt für die Eingabe auf dem PIN-Feld und für das stärkere Warnsignal beim Zurücksetzen.",
     "hapticToggle": "Haptisches Feedback aktivieren",
     "audioToggle": "Akustisches Feedback aktivieren",
+    "audioLevelLabel": "Signal-Lautstärke",
+    "audioLevelHint": "Regelt die Lautstärke des PIN-Tons innerhalb der App. Die Geräte-Lautstärke gilt weiterhin.",
     "hapticUnsupported": "Haptisches Feedback wird auf diesem Gerät oder in diesem Browser nicht unterstützt."
   },
   "usageProtection": {

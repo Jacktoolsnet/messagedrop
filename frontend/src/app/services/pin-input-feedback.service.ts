@@ -26,7 +26,7 @@ export class PinInputFeedbackService {
       return;
     }
 
-    await this.playSubtleBeep();
+    await this.playSubtleBeep(this.getConfiguredAudioLevel(feedbackSettings.audioLevel));
   }
 
   async notifyResetAction(): Promise<void> {
@@ -47,7 +47,7 @@ export class PinInputFeedbackService {
       return;
     }
 
-    await this.playResetBeep();
+    await this.playResetBeep(this.getConfiguredAudioLevel(feedbackSettings.audioLevel));
   }
 
   private tryVibrate(pattern: number | number[]): boolean {
@@ -62,7 +62,7 @@ export class PinInputFeedbackService {
     }
   }
 
-  private async playSubtleBeep(): Promise<void> {
+  private async playSubtleBeep(audioLevel: number): Promise<void> {
     const context = await this.getReadyAudioContext();
     if (!context) {
       return;
@@ -70,55 +70,71 @@ export class PinInputFeedbackService {
     const now = context.currentTime;
     const fundamental = context.createOscillator();
     const undertone = context.createOscillator();
+    const presence = context.createOscillator();
     const fundamentalGain = context.createGain();
     const undertoneGain = context.createGain();
+    const presenceGain = context.createGain();
     const filter = context.createBiquadFilter();
     const masterGain = context.createGain();
 
     fundamental.type = 'sine';
-    fundamental.frequency.setValueAtTime(520, now);
-    fundamental.frequency.exponentialRampToValueAtTime(440, now + 0.14);
+    fundamental.frequency.setValueAtTime(560, now);
+    fundamental.frequency.exponentialRampToValueAtTime(470, now + 0.14);
 
     undertone.type = 'triangle';
-    undertone.frequency.setValueAtTime(260, now);
-    undertone.frequency.exponentialRampToValueAtTime(220, now + 0.14);
+    undertone.frequency.setValueAtTime(280, now);
+    undertone.frequency.exponentialRampToValueAtTime(235, now + 0.14);
+
+    presence.type = 'sine';
+    presence.frequency.setValueAtTime(760, now);
+    presence.frequency.exponentialRampToValueAtTime(620, now + 0.14);
 
     fundamentalGain.gain.setValueAtTime(0.0001, now);
-    fundamentalGain.gain.linearRampToValueAtTime(0.018, now + 0.012);
+    fundamentalGain.gain.linearRampToValueAtTime(0.024, now + 0.012);
     fundamentalGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
 
     undertoneGain.gain.setValueAtTime(0.0001, now);
-    undertoneGain.gain.linearRampToValueAtTime(0.010, now + 0.018);
+    undertoneGain.gain.linearRampToValueAtTime(0.013, now + 0.018);
     undertoneGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
 
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(900, now);
-    filter.Q.setValueAtTime(0.4, now);
+    presenceGain.gain.setValueAtTime(0.0001, now);
+    presenceGain.gain.linearRampToValueAtTime(0.006, now + 0.01);
+    presenceGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
 
-    masterGain.gain.setValueAtTime(0.85, now);
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(1200, now);
+    filter.Q.setValueAtTime(0.45, now);
+
+    masterGain.gain.setValueAtTime(0.95 * audioLevel, now);
 
     fundamental.connect(fundamentalGain);
     undertone.connect(undertoneGain);
+    presence.connect(presenceGain);
     fundamentalGain.connect(filter);
     undertoneGain.connect(filter);
+    presenceGain.connect(filter);
     filter.connect(masterGain);
     masterGain.connect(context.destination);
 
     fundamental.start(now);
     undertone.start(now);
+    presence.start(now);
     fundamental.stop(now + 0.16);
     undertone.stop(now + 0.16);
+    presence.stop(now + 0.14);
     fundamental.addEventListener('ended', () => {
       fundamental.disconnect();
       undertone.disconnect();
+      presence.disconnect();
       fundamentalGain.disconnect();
       undertoneGain.disconnect();
+      presenceGain.disconnect();
       filter.disconnect();
       masterGain.disconnect();
     }, { once: true });
   }
 
-  private async playResetBeep(): Promise<void> {
+  private async playResetBeep(audioLevel: number): Promise<void> {
     const context = await this.getReadyAudioContext();
     if (!context) {
       return;
@@ -127,51 +143,67 @@ export class PinInputFeedbackService {
     const now = context.currentTime;
     const fundamental = context.createOscillator();
     const undertone = context.createOscillator();
+    const presence = context.createOscillator();
     const pulseGain = context.createGain();
     const bodyGain = context.createGain();
+    const presenceGain = context.createGain();
     const filter = context.createBiquadFilter();
     const masterGain = context.createGain();
 
     fundamental.type = 'sine';
-    fundamental.frequency.setValueAtTime(420, now);
-    fundamental.frequency.exponentialRampToValueAtTime(320, now + 0.22);
+    fundamental.frequency.setValueAtTime(460, now);
+    fundamental.frequency.exponentialRampToValueAtTime(350, now + 0.22);
 
     undertone.type = 'triangle';
-    undertone.frequency.setValueAtTime(210, now);
-    undertone.frequency.exponentialRampToValueAtTime(160, now + 0.24);
+    undertone.frequency.setValueAtTime(230, now);
+    undertone.frequency.exponentialRampToValueAtTime(175, now + 0.24);
+
+    presence.type = 'sine';
+    presence.frequency.setValueAtTime(680, now);
+    presence.frequency.exponentialRampToValueAtTime(540, now + 0.22);
 
     pulseGain.gain.setValueAtTime(0.0001, now);
-    pulseGain.gain.linearRampToValueAtTime(0.028, now + 0.014);
-    pulseGain.gain.exponentialRampToValueAtTime(0.005, now + 0.10);
-    pulseGain.gain.linearRampToValueAtTime(0.024, now + 0.145);
+    pulseGain.gain.linearRampToValueAtTime(0.034, now + 0.014);
+    pulseGain.gain.exponentialRampToValueAtTime(0.006, now + 0.10);
+    pulseGain.gain.linearRampToValueAtTime(0.028, now + 0.145);
     pulseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.26);
 
     bodyGain.gain.setValueAtTime(0.0001, now);
-    bodyGain.gain.linearRampToValueAtTime(0.016, now + 0.02);
+    bodyGain.gain.linearRampToValueAtTime(0.019, now + 0.02);
     bodyGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.28);
 
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(720, now);
-    filter.Q.setValueAtTime(0.55, now);
+    presenceGain.gain.setValueAtTime(0.0001, now);
+    presenceGain.gain.linearRampToValueAtTime(0.007, now + 0.012);
+    presenceGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.24);
 
-    masterGain.gain.setValueAtTime(0.95, now);
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(960, now);
+    filter.Q.setValueAtTime(0.5, now);
+
+    masterGain.gain.setValueAtTime(1.0 * audioLevel, now);
 
     fundamental.connect(pulseGain);
     undertone.connect(bodyGain);
+    presence.connect(presenceGain);
     pulseGain.connect(filter);
     bodyGain.connect(filter);
+    presenceGain.connect(filter);
     filter.connect(masterGain);
     masterGain.connect(context.destination);
 
     fundamental.start(now);
     undertone.start(now);
+    presence.start(now);
     fundamental.stop(now + 0.28);
     undertone.stop(now + 0.28);
+    presence.stop(now + 0.24);
     fundamental.addEventListener('ended', () => {
       fundamental.disconnect();
       undertone.disconnect();
+      presence.disconnect();
       pulseGain.disconnect();
       bodyGain.disconnect();
+      presenceGain.disconnect();
       filter.disconnect();
       masterGain.disconnect();
     }, { once: true });
@@ -228,5 +260,13 @@ export class PinInputFeedbackService {
     }
 
     return [26, 18, 24];
+  }
+
+  private getConfiguredAudioLevel(level: number | undefined): number {
+    if (typeof level !== 'number' || !Number.isFinite(level)) {
+      return 1;
+    }
+
+    return Math.min(1.6, Math.max(0.4, level));
   }
 }

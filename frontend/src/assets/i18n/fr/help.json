@@ -498,7 +498,7 @@
       },
       "pinFeedback": {
         "title": "Retour PIN",
-        "desc": "Permet d’activer ou de désactiver séparément le retour haptique et sonore pour la saisie du PIN ainsi que le signal d’avertissement renforcé lors de la réinitialisation."
+        "desc": "Permet d’activer ou de désactiver séparément le retour haptique et sonore pour la saisie du PIN ainsi que le signal d’avertissement renforcé lors de la réinitialisation. Vous pouvez aussi ajuster le volume du son PIN."
       },
       "usageProtection": {
         "title": "Protection d'usage",

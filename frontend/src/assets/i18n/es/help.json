@@ -498,7 +498,7 @@
       },
       "pinFeedback": {
         "title": "Retroalimentación del PIN",
-        "desc": "Permite activar o desactivar por separado la respuesta háptica y sonora para la entrada del PIN y la señal de advertencia reforzada al restablecer."
+        "desc": "Permite activar o desactivar por separado la respuesta háptica y sonora para la entrada del PIN y la señal de advertencia reforzada al restablecer. También puedes ajustar el volumen del tono PIN."
       },
       "usageProtection": {
         "title": "Protección de uso",

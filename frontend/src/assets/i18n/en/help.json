@@ -498,7 +498,7 @@
       },
       "pinFeedback": {
         "title": "PIN feedback",
-        "desc": "Lets you enable or disable haptic and audio feedback separately for PIN entry and the stronger warning signal on reset."
+        "desc": "Lets you enable or disable haptic and audio feedback separately for PIN entry and the stronger warning signal on reset. You can also adjust the PIN tone volume."
       },
       "usageProtection": {
         "title": "Usage protection",

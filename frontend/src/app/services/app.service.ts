@@ -197,9 +197,13 @@ export class AppService {
 
   private normalizePinInputFeedbackSettings(input: Partial<PinInputFeedbackSettings> | undefined): PinInputFeedbackSettings {
     const raw = input ?? {};
+    const audioLevel = typeof raw.audioLevel === 'number' && Number.isFinite(raw.audioLevel)
+      ? Math.min(1.6, Math.max(0.4, raw.audioLevel))
+      : DEFAULT_PIN_INPUT_FEEDBACK_SETTINGS.audioLevel;
     return {
       hapticEnabled: raw.hapticEnabled !== false,
-      audioEnabled: raw.audioEnabled !== false
+      audioEnabled: raw.audioEnabled !== false,
+      audioLevel
     };
   }
 

@@ -498,7 +498,7 @@
       },
       "pinFeedback": {
         "title": "PIN-Feedback",
-        "desc": "Schaltet haptisches und akustisches Feedback für die PIN-Eingabe sowie das stärkere Warnsignal beim Zurücksetzen getrennt ein oder aus."
+        "desc": "Schaltet haptisches und akustisches Feedback für die PIN-Eingabe sowie das stärkere Warnsignal beim Zurücksetzen getrennt ein oder aus. Die Lautstärke des PIN-Tons kann zusätzlich angepasst werden."
       },
       "usageProtection": {
         "title": "Nutzungszeit-Schutz",

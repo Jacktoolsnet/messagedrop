@@ -73,6 +73,9 @@ export class AppSettingsComponent implements OnInit {
   readonly speechRateMin = 0.6;
   readonly speechRateMax = 1.6;
   readonly speechRateStep = 0.1;
+  readonly pinFeedbackAudioLevelMin = 0.4;
+  readonly pinFeedbackAudioLevelMax = 1.6;
+  readonly pinFeedbackAudioLevelStep = 0.1;
   private readonly speechPreviewTargetId = 'settings:speech-preview';
   public showDetectLocationOnStart = false;
   public storagePersistenceSupported = this.appService.isStoragePersistenceSupported();
@@ -190,6 +193,16 @@ export class AppSettingsComponent implements OnInit {
       pinInputFeedback: {
         ...this.appSettings.pinInputFeedback,
         audioEnabled: enabled
+      }
+    };
+  }
+
+  setPinFeedbackAudioLevel(level: number): void {
+    this.appSettings = {
+      ...this.appSettings,
+      pinInputFeedback: {
+        ...this.appSettings.pinInputFeedback,
+        audioLevel: Math.min(this.pinFeedbackAudioLevelMax, Math.max(this.pinFeedbackAudioLevelMin, level))
       }
     };
   }
@@ -372,6 +385,14 @@ export class AppSettingsComponent implements OnInit {
 
   formatSpeechRate(rate: number): string {
     return `${rate.toFixed(1)}×`;
+  }
+
+  formatPinFeedbackAudioLevel(level: number): string {
+    return `${Math.round(level * 100)}%`;
+  }
+
+  formatPinFeedbackAudioLevelSlider(value: number): string {
+    return this.formatPinFeedbackAudioLevel(value);
   }
 
   getResolvedSpeechVoiceUri(): string {

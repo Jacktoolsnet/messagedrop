@@ -187,6 +187,21 @@
         (change)="setPinFeedbackAudioEnabled($event.checked)">
         {{ 'settings.pinFeedback.audioToggle' | transloco }}
       </mat-slide-toggle>
+
+      <section class="pin-feedback-slider-block">
+        <div class="pin-feedback-slider-header">
+          <p class="pin-feedback-slider-label">{{ 'settings.pinFeedback.audioLevelLabel' | transloco }}</p>
+          <span class="pin-feedback-slider-value">{{ formatPinFeedbackAudioLevel(appSettings.pinInputFeedback.audioLevel) }}</span>
+        </div>
+        <mat-slider [min]="pinFeedbackAudioLevelMin" [max]="pinFeedbackAudioLevelMax" [step]="pinFeedbackAudioLevelStep"
+          discrete [displayWith]="formatPinFeedbackAudioLevelSlider"
+          [disabled]="!appSettings.pinInputFeedback.audioEnabled">
+          <input matSliderThumb [value]="appSettings.pinInputFeedback.audioLevel"
+            [disabled]="!appSettings.pinInputFeedback.audioEnabled"
+            (valueChange)="setPinFeedbackAudioLevel($event)">
+        </mat-slider>
+        <p class="pin-feedback-slider-note">{{ 'settings.pinFeedback.audioLevelHint' | transloco }}</p>
+      </section>
     </div>
 
     @if(showDetectLocationOnStart){

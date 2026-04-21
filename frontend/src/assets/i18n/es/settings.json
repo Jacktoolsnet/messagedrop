@@ -63,6 +63,8 @@
     "note": "Se aplica al teclado PIN y a la señal de advertencia más intensa al restablecer.",
     "hapticToggle": "Activar respuesta háptica",
     "audioToggle": "Activar respuesta sonora",
+    "audioLevelLabel": "Volumen de la señal",
+    "audioLevelHint": "Ajusta el volumen del tono PIN dentro de la app. El volumen del dispositivo sigue aplicándose.",
     "hapticUnsupported": "La respuesta háptica no es compatible con este dispositivo o navegador."
   },
   "usageProtection": {

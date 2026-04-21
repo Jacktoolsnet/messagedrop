@@ -63,6 +63,8 @@
     "note": "Applies to the PIN keypad and the stronger warning feedback when resetting.",
     "hapticToggle": "Enable haptic feedback",
     "audioToggle": "Enable sound feedback",
+    "audioLevelLabel": "Signal volume",
+    "audioLevelHint": "Adjusts the PIN tone volume inside the app. Your device volume still applies.",
     "hapticUnsupported": "Haptic feedback is not supported on this device or in this browser."
   },
   "usageProtection": {
