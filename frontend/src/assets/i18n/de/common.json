@@ -1135,7 +1135,7 @@
       "imageRestoreSkipped": "Bild-Wiederherstellung wurde übersprungen."
     },
     "serverDown": {
-      "title": "Ups! Unser Server macht eine Kaffeepause...",
+      "title": "Server vorübergehend nicht erreichbar",
       "message": "Offenbar brauchte unser Backend kurz eine Pause.\n\nKeine Sorge: Offline-Funktionen (Kontakte, private Notizen usw.) bleiben verfügbar."
     },
     "maintenance": {
@@ -1326,7 +1326,7 @@
     "rateLimit": "Zu viele Anfragen. Bitte warte kurz und versuche es erneut.",
     "maintenance": "Der Dienst befindet sich im Wartungsmodus.",
     "offline": {
-      "title": "Ups! Du bist offline.",
+      "title": "Keine Internetverbindung",
       "message": "Offenbar brauchte dein Netzwerk kurz eine Pause."
     },
     "http": {

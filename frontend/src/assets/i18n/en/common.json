@@ -1135,7 +1135,7 @@
       "imageRestoreSkipped": "Image restore was skipped."
     },
     "serverDown": {
-      "title": "Oops! Our server went on a coffee break...",
+      "title": "Server temporarily unavailable",
       "message": "Apparently, our backend needed some \"me time\".\n\nNo worries: offline features (contacts, private notes, etc.) are still available."
     },
     "maintenance": {
@@ -1326,7 +1326,7 @@
     "rateLimit": "Too many requests. Please wait and try again.",
     "maintenance": "The service is in maintenance mode.",
     "offline": {
-      "title": "Oops! You're offline.",
+      "title": "No internet connection",
       "message": "Apparently, your network needed some \"me time\"."
     },
     "http": {

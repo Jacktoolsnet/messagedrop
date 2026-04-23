@@ -1135,7 +1135,7 @@
       "imageRestoreSkipped": "La restauration des images a été ignorée."
     },
     "serverDown": {
-      "title": "Oups ! Notre serveur est parti prendre un café...",
+      "title": "Serveur temporairement indisponible",
       "message": "Apparemment, notre backend avait besoin d'un peu de « temps pour lui ».\n\nPas d'inquiétude : les fonctions hors ligne (contacts, notes privées, etc.) restent disponibles."
     },
     "maintenance": {
@@ -1326,7 +1326,7 @@
     "rateLimit": "Trop de requêtes. Veuillez patienter puis réessayer.",
     "maintenance": "Le service est en mode maintenance.",
     "offline": {
-      "title": "Oups ! Vous êtes hors ligne.",
+      "title": "Pas de connexion Internet",
       "message": "Apparemment, votre réseau avait besoin d'un peu de « temps pour lui »."
     },
     "http": {
