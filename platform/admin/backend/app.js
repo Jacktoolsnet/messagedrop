@@ -24,6 +24,7 @@ const dsaTextBlocks = require('./routes/dsa-text-blocks');
 const user = require('./routes/user');
 const publicStatus = require('./routes/public-status');
 const maintenance = require('./routes/maintenance');
+const certificateHealth = require('./routes/certificate-health');
 const statistic = require('./routes/statistic');
 const nominatim = require('./routes/nominatim');
 const ai = require('./routes/ai');
@@ -48,6 +49,7 @@ const { normalizeErrorResponses, notFoundHandler, errorHandler } = require('./mi
 const { cleanupClosedDsaCases } = require('./utils/dsaCleanup');
 const { parseRetentionMs, DAY_MS } = require('./utils/logRetention');
 const { performPendingRestore } = require('./utils/maintenanceBackup');
+const { runCertificateHealthCheck } = require('./utils/certificateHealth');
 
 // ExpressJs
 const { createServer } = require('node:http');
@@ -414,6 +416,7 @@ app.use('/pow-log', adminLogLimit, powLog);
 app.use('/moderation', adminLogLimit, moderation);
 app.use('/content', adminUserLimit, content);
 app.use('/maintenance', adminUserLimit, maintenance);
+app.use('/certificate-health', adminUserLimit, certificateHealth);
 
 
 // DSA
@@ -437,6 +440,13 @@ app.use(errorHandler);
       const port = typeof address === 'string' ? address : address.port;
       logger.info(`Server läuft auf Port ${port}`);
       database.init(logger);
+      void runCertificateHealthCheck({
+        db: database.db,
+        logger,
+        reason: 'startup'
+      }).catch((error) => {
+        logger.warn('Initial certificate health check failed', { error: error?.message || error });
+      });
     });
   } catch (err) {
     logger.error('Fehler beim Initialisieren des Keystores:', err);
@@ -513,6 +523,18 @@ cron.schedule('23 0 * * *', () => {
     if (err) {
       logger.error('PoW log cleanup failed', { error: err?.message });
     }
+  });
+});
+
+const certificateHealthCron = process.env.CERT_MONITOR_CRON || '40 0 * * *';
+
+cron.schedule(certificateHealthCron, () => {
+  void runCertificateHealthCheck({
+    db: database.db,
+    logger,
+    reason: 'daily-cron'
+  }).catch((error) => {
+    logger.error('Certificate health check failed', { error: error?.message || error });
   });
 });
 

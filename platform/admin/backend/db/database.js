@@ -23,6 +23,7 @@ const tablePowLog = require('./tablePowLog');
 const tableModerationRequest = require('./tableModerationRequest');
 const tablePublicProfile = require('./tablePublicProfile');
 const tablePublicContent = require('./tablePublicContent');
+const tableCertificateHealth = require('./tableCertificateHealth');
 
 
 class SqliteCompat {
@@ -274,6 +275,7 @@ class Database {
       tableModerationRequest.init(this.db);
       tablePublicProfile.init(this.db);
       tablePublicContent.init(this.db);
+      tableCertificateHealth.init(this.db);
 
       // Trigger initialisieren
       this.initTriggers();

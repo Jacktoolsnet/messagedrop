@@ -1,0 +1,126 @@
+<mat-card class="certificate-card">
+  <mat-card-header>
+    <div
+      mat-card-avatar
+      class="certificate-avatar"
+      [class.attention]="isAttentionStatus(summary()?.worstStatus ?? 'none')"
+    >
+      <mat-icon>{{ statusIcon() }}</mat-icon>
+    </div>
+    <mat-card-title>{{ i18n.t('Certificate monitoring') }}</mat-card-title>
+    <mat-card-subtitle>{{ statusLabel() }}</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    @if (loading()) {
+      <div class="empty-state">{{ i18n.t('Loading certificate status...') }}</div>
+    } @else if (!(summary()?.enabled ?? false)) {
+      <div class="empty-panel">
+        <div class="empty-title">{{ i18n.t('No HTTPS targets configured') }}</div>
+        <div class="empty-copy">
+          {{ i18n.t('The monitor automatically uses HTTPS base URLs from the environment. You can also add extra hosts via CERT_MONITOR_DOMAINS.') }}
+        </div>
+      </div>
+    } @else {
+      <div class="summary-grid">
+        <div class="summary-item">
+          <span class="summary-label">{{ i18n.t('Configured targets') }}</span>
+          <strong>{{ summary()?.configuredTargets ?? 0 }}</strong>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">{{ i18n.t('Last check') }}</span>
+          <strong>{{ formatDateTime(summary()?.lastCheckedAt) }}</strong>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">{{ i18n.t('Current status') }}</span>
+          <span class="status-badge" [class]="resolveStatusClass(summary()?.worstStatus ?? 'none')">
+            <mat-icon>{{ badgeIcon(summary()?.worstStatus ?? 'none') }}</mat-icon>
+            {{ badgeLabel(summary()?.worstStatus ?? 'none') }}
+          </span>
+        </div>
+      </div>
+
+      <div class="count-grid">
+        <div class="count-chip status-ok">
+          <span>{{ i18n.t('OK') }}</span>
+          <strong>{{ summary()?.ok ?? 0 }}</strong>
+        </div>
+        <div class="count-chip status-warning">
+          <span>{{ i18n.t('Warning') }}</span>
+          <strong>{{ summary()?.warning ?? 0 }}</strong>
+        </div>
+        <div class="count-chip status-critical">
+          <span>{{ i18n.t('Critical') }}</span>
+          <strong>{{ summary()?.critical ?? 0 }}</strong>
+        </div>
+        <div class="count-chip status-expired">
+          <span>{{ i18n.t('Expired') }}</span>
+          <strong>{{ summary()?.expired ?? 0 }}</strong>
+        </div>
+        <div class="count-chip status-error">
+          <span>{{ i18n.t('Error') }}</span>
+          <strong>{{ summary()?.error ?? 0 }}</strong>
+        </div>
+      </div>
+
+      @if (hasTargets()) {
+        <div class="target-list">
+          @for (target of targets(); track trackByTargetKey($index, target)) {
+            <article class="target-row">
+              <div class="target-header">
+                <div class="target-copy">
+                  <div class="target-origin">{{ target.origin }}</div>
+                  <div class="target-label">{{ target.label }}</div>
+                </div>
+                <span class="status-badge" [class]="resolveStatusClass(target.status)">
+                  <mat-icon>{{ badgeIcon(target.status) }}</mat-icon>
+                  {{ badgeLabel(target.status) }}
+                </span>
+              </div>
+
+              <div class="target-message">{{ target.statusMessage || '—' }}</div>
+
+              <div class="meta-grid">
+                <div class="meta-item">
+                  <span class="meta-label">{{ i18n.t('Valid until') }}</span>
+                  <strong>{{ formatDate(target.validTo) }}</strong>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">{{ i18n.t('Days left') }}</span>
+                  <strong>{{ formatDaysRemaining(target.daysRemaining) }}</strong>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">{{ i18n.t('Issuer') }}</span>
+                  <strong>{{ target.issuer || '—' }}</strong>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">{{ i18n.t('Checked') }}</span>
+                  <strong>{{ formatDateTime(target.lastCheckedAt) }}</strong>
+                </div>
+              </div>
+
+              @if (target.authorizationError) {
+                <div class="warning-note">
+                  <mat-icon>warning</mat-icon>
+                  <span>{{ target.authorizationError }}</span>
+                </div>
+              }
+            </article>
+          }
+        </div>
+      } @else {
+        <div class="empty-state">{{ i18n.t('No certificate data available yet.') }}</div>
+      }
+    }
+  </mat-card-content>
+
+  <mat-card-actions class="card-actions">
+    <button mat-stroked-button type="button" (click)="refresh()" [disabled]="loading() || checking()">
+      {{ i18n.t('Refresh') }}
+    </button>
+    <button mat-raised-button color="primary" type="button" (click)="runCheck()" [disabled]="checking()">
+      <mat-icon>fact_check</mat-icon>
+      {{ checking() ? i18n.t('Checking...') : i18n.t('Check now') }}
+    </button>
+  </mat-card-actions>
+</mat-card>

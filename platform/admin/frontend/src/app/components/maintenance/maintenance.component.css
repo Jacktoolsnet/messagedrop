@@ -44,7 +44,7 @@ mat-toolbar {
 
 /* ==== Page Container ==== */
 .page {
-  max-width: 900px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 1.5rem 1rem 2.5rem;
   display: grid;
