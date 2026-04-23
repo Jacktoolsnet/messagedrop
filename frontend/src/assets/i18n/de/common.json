@@ -1343,9 +1343,9 @@
         "unprocessableEntity": "Nicht verarbeitbare Anfrage",
         "tooManyRequests": "Zu viele Anfragen",
         "serverError": "Serverfehler",
-        "badGateway": "Ungültiges Gateway",
-        "serviceUnavailable": "Dienst nicht verfügbar",
-        "gatewayTimeout": "Gateway-Zeitüberschreitung",
+        "badGateway": "Ungültige Serverantwort",
+        "serviceUnavailable": "Vorübergehend nicht verfügbar",
+        "gatewayTimeout": "Server antwortet nicht rechtzeitig",
         "unexpected": "Unerwarteter Fehler"
       },
       "message": {
@@ -1363,7 +1363,7 @@
         "serverError": "Ein unerwarteter Serverfehler ist aufgetreten.",
         "badGateway": "Der Server hat eine ungültige Antwort erhalten.",
         "serviceUnavailable": "Der Dienst ist vorübergehend nicht verfügbar.",
-        "gatewayTimeout": "Der Server hat zu lange geantwortet.",
+        "gatewayTimeout": "Der Server hat nicht rechtzeitig geantwortet.",
         "unexpected": "Es ist ein Fehler aufgetreten. Bitte später erneut versuchen."
       }
     }

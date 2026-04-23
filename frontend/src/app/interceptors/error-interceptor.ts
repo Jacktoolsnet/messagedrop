@@ -85,13 +85,13 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         }
       }
 
+      const repeatedBackendStatusError = status === 0 || status === 502 || status === 503 || status === 504;
       const browserOfflineAlreadyVisible = !networkService.isOnline();
       const backendStatusAlreadyVisible = backendRequest
         && !skipBackendStatus
         && (maintenanceInfo?.enabled || networkService.maintenanceInfo()?.enabled || !networkService.backendOnline());
-      const repeatedBackendStatusError = status === 0 || status === 502 || status === 503 || status === 504;
 
-      if (browserOfflineAlreadyVisible && status === 0) {
+      if (browserOfflineAlreadyVisible && repeatedBackendStatusError) {
         return throwError(() => error);
       }
 

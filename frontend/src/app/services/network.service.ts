@@ -388,6 +388,9 @@ export class NetworkService {
   }
 
   getErrorTitle(status: number): string {
+    if (this.isBrowserOfflineKnown()) {
+      return this.i18n.t('errors.offline.title');
+    }
     if (status === 0 && this.isBrowserOnline()) {
       return this.i18n.t('common.serverDown.title');
     }
@@ -396,6 +399,9 @@ export class NetworkService {
   }
 
   getErrorIcon(status: number): string {
+    if (this.isBrowserOfflineKnown()) {
+      return 'wifi_off';
+    }
     if (status === 0 && this.isBrowserOnline()) {
       return 'cloud_off';
     }
@@ -416,11 +422,18 @@ export class NetworkService {
   }
 
   getErrorMessage(status: number): string {
+    if (this.isBrowserOfflineKnown()) {
+      return this.i18n.t('errors.offline.message');
+    }
     if (status === 0 && this.isBrowserOnline()) {
       return this.i18n.t('common.serverDown.message');
     }
     const key = this.errorMessageKeyMap[status] ?? 'errors.http.message.unexpected';
     return this.i18n.t(key);
+  }
+
+  private isBrowserOfflineKnown(): boolean {
+    return !this.browserOnlineSig() || !this.isBrowserOnline();
   }
 
   private isBrowserOnline(): boolean {

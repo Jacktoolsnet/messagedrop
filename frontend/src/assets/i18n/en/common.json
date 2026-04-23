@@ -1343,9 +1343,9 @@
         "unprocessableEntity": "Unprocessable Entity",
         "tooManyRequests": "Too Many Requests",
         "serverError": "Server Error",
-        "badGateway": "Bad Gateway",
-        "serviceUnavailable": "Service Unavailable",
-        "gatewayTimeout": "Gateway Timeout",
+        "badGateway": "Invalid server response",
+        "serviceUnavailable": "Temporarily unavailable",
+        "gatewayTimeout": "Server did not respond in time",
         "unexpected": "Unexpected Error"
       },
       "message": {
@@ -1363,7 +1363,7 @@
         "serverError": "An unexpected server error occurred.",
         "badGateway": "The server received an invalid response.",
         "serviceUnavailable": "The service is temporarily unavailable.",
-        "gatewayTimeout": "The server took too long to respond.",
+        "gatewayTimeout": "The server did not respond in time.",
         "unexpected": "Something went wrong. Please try again later."
       }
     }

@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { AppSettings } from '../../../interfaces/app-settings';
+import { DEFAULT_PIN_INPUT_FEEDBACK_SETTINGS } from '../../../interfaces/pin-input-feedback-settings';
 import { DEFAULT_SPEECH_SETTINGS } from '../../../interfaces/speech-settings';
 import { DEFAULT_USAGE_PROTECTION_SETTINGS } from '../../../interfaces/usage-protection-settings';
 import { AppService } from '../../../services/app.service';
@@ -27,6 +28,7 @@ describe('ExternalContentComponent', () => {
     enableYoutubeContent: false,
     diagnosticLogging: false,
     backupOnExit: false,
+    pinInputFeedback: { ...DEFAULT_PIN_INPUT_FEEDBACK_SETTINGS },
     speech: { ...DEFAULT_SPEECH_SETTINGS },
     usageProtection: { ...DEFAULT_USAGE_PROTECTION_SETTINGS },
     consentSettings: {

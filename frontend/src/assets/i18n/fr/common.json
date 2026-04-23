@@ -1343,9 +1343,9 @@
         "unprocessableEntity": "Entité non traitable",
         "tooManyRequests": "Trop de requêtes",
         "serverError": "Erreur serveur",
-        "badGateway": "Passerelle incorrecte",
-        "serviceUnavailable": "Service indisponible",
-        "gatewayTimeout": "Délai de la passerelle dépassé",
+        "badGateway": "Réponse du serveur invalide",
+        "serviceUnavailable": "Temporairement indisponible",
+        "gatewayTimeout": "Le serveur n'a pas répondu à temps",
         "unexpected": "Erreur inattendue"
       },
       "message": {
@@ -1363,7 +1363,7 @@
         "serverError": "Une erreur serveur inattendue s'est produite.",
         "badGateway": "Le serveur a reçu une réponse invalide.",
         "serviceUnavailable": "Le service est temporairement indisponible.",
-        "gatewayTimeout": "Le serveur a mis trop de temps à répondre.",
+        "gatewayTimeout": "Le serveur n'a pas répondu à temps.",
         "unexpected": "Une erreur est survenue. Veuillez réessayer plus tard."
       }
     }

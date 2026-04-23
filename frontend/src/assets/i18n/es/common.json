@@ -1343,9 +1343,9 @@
         "unprocessableEntity": "Entidad no procesable",
         "tooManyRequests": "Demasiadas solicitudes",
         "serverError": "Error del servidor",
-        "badGateway": "Puerta de enlace incorrecta",
-        "serviceUnavailable": "Servicio no disponible",
-        "gatewayTimeout": "Tiempo de espera de la puerta de enlace agotado",
+        "badGateway": "Respuesta del servidor no válida",
+        "serviceUnavailable": "No disponible temporalmente",
+        "gatewayTimeout": "El servidor no respondió a tiempo",
         "unexpected": "Error inesperado"
       },
       "message": {
@@ -1363,7 +1363,7 @@
         "serverError": "Ocurrió un error inesperado del servidor.",
         "badGateway": "El servidor recibió una respuesta no válida.",
         "serviceUnavailable": "El servicio no está disponible temporalmente.",
-        "gatewayTimeout": "El servidor tardó demasiado en responder.",
+        "gatewayTimeout": "El servidor no respondió a tiempo.",
         "unexpected": "Algo salió mal. Inténtalo de nuevo más tarde."
       }
     }
