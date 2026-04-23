@@ -1,5 +1,6 @@
 const tls = require('node:tls');
 const tableCertificateHealth = require('../db/tableCertificateHealth');
+const { sendMail } = require('./mailer');
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const DEFAULT_TIMEOUT_MS = 8000;
@@ -28,12 +29,32 @@ const STATUS_RANK = {
   none: 5
 };
 
+let activeCheckPromise = null;
+
 function asPositiveInt(value, fallback) {
   const num = Number(value);
   if (!Number.isFinite(num) || num <= 0) {
     return fallback;
   }
   return Math.trunc(num);
+}
+
+function asBool(value, fallback = false) {
+  if (value === undefined || value === null || value === '') {
+    return fallback;
+  }
+  if (typeof value === 'boolean') {
+    return value;
+  }
+
+  const normalized = String(value).trim().toLowerCase();
+  if (['1', 'true', 'yes', 'on'].includes(normalized)) {
+    return true;
+  }
+  if (['0', 'false', 'no', 'off'].includes(normalized)) {
+    return false;
+  }
+  return fallback;
 }
 
 function getWarningDays() {
@@ -47,6 +68,22 @@ function getCriticalDays() {
 
 function getTimeoutMs() {
   return asPositiveInt(process.env.CERT_MONITOR_TIMEOUT_MS, DEFAULT_TIMEOUT_MS);
+}
+
+function shouldNotifyRecovery() {
+  return asBool(process.env.CERT_MONITOR_NOTIFY_RECOVERY, true);
+}
+
+function getNotificationRecipient() {
+  const candidates = [
+    process.env.CERT_MONITOR_NOTIFY_EMAIL,
+    process.env.ADMIN_ROOT_EMAIL,
+    process.env.MAIL_ADDRESS,
+    process.env.MAIL_USER
+  ];
+
+  const recipient = candidates.find((value) => typeof value === 'string' && value.trim().length > 0);
+  return recipient ? recipient.trim() : null;
 }
 
 function splitDistinct(values) {
@@ -276,7 +313,7 @@ function buildStatusMessage(status, { validTo, daysRemaining, errorMessage, auth
     : 'Certificate is valid.';
 }
 
-function determineStatus({ validTo, authorizationError, daysRemaining, warningDays, criticalDays }) {
+function determineStatus({ validTo, authorizationError, daysRemaining, warningDays, criticalDays, now }) {
   if (!Number.isFinite(validTo)) {
     return 'error';
   }
@@ -285,7 +322,7 @@ function determineStatus({ validTo, authorizationError, daysRemaining, warningDa
     return 'expired';
   }
 
-  if (Number(validTo) <= Date.now()) {
+  if (Number(validTo) <= now) {
     return 'expired';
   }
 
@@ -368,7 +405,8 @@ function inspectCertificate(target, options = {}) {
           authorizationError,
           daysRemaining,
           warningDays,
-          criticalDays
+          criticalDays,
+          now
         });
 
         finish({
@@ -446,6 +484,17 @@ function deleteExcept(db, targetKeys) {
   });
 }
 
+function sortRows(rows) {
+  return (Array.isArray(rows) ? rows.slice() : []).sort((a, b) => {
+    const aRank = STATUS_RANK[a?.status] ?? STATUS_RANK.none;
+    const bRank = STATUS_RANK[b?.status] ?? STATUS_RANK.none;
+    if (aRank !== bRank) {
+      return aRank - bRank;
+    }
+    return String(a?.origin || '').localeCompare(String(b?.origin || ''));
+  });
+}
+
 function buildSummary(rows, configuredTargets) {
   const list = Array.isArray(rows) ? rows : [];
   const counts = {
@@ -488,6 +537,241 @@ function buildSummary(rows, configuredTargets) {
   };
 }
 
+function formatStatusLabel(status) {
+  switch (status) {
+    case 'ok':
+      return 'OK';
+    case 'warning':
+      return 'Warning';
+    case 'critical':
+      return 'Critical';
+    case 'expired':
+      return 'Expired';
+    case 'error':
+      return 'Error';
+    default:
+      return 'Unknown';
+  }
+}
+
+function formatNotificationTimestamp(value) {
+  return Number.isFinite(Number(value)) ? new Date(Number(value)).toISOString() : '—';
+}
+
+function formatNotificationDays(value) {
+  if (!Number.isFinite(Number(value))) {
+    return 'unknown';
+  }
+
+  const days = Number(value);
+  if (days < 0) {
+    return `expired ${Math.abs(days)} day(s) ago`;
+  }
+  if (days === 0) {
+    return 'expires today';
+  }
+  if (days === 1) {
+    return '1 day';
+  }
+  return `${days} day(s)`;
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function collectStatusChanges(previousRows, nextRows) {
+  const previousByKey = new Map((Array.isArray(previousRows) ? previousRows : []).map((row) => [row.targetKey, row]));
+  const changes = [];
+  const notifyRecovery = shouldNotifyRecovery();
+
+  for (const row of Array.isArray(nextRows) ? nextRows : []) {
+    const previous = previousByKey.get(row.targetKey) || null;
+    const previousStatus = previous?.status || null;
+    const currentStatus = row.status;
+
+    if (previousStatus === currentStatus) {
+      continue;
+    }
+
+    if (currentStatus === 'ok') {
+      if (!previousStatus || previousStatus === 'ok' || !notifyRecovery) {
+        continue;
+      }
+
+      changes.push({
+        type: 'recovery',
+        previous,
+        current: row
+      });
+      continue;
+    }
+
+    if (!previousStatus || previousStatus !== currentStatus) {
+      changes.push({
+        type: 'alert',
+        previous,
+        current: row
+      });
+    }
+  }
+
+  return changes;
+}
+
+function buildNotificationSubject(changes) {
+  const alertCount = changes.filter((change) => change.type === 'alert').length;
+  const recoveryCount = changes.filter((change) => change.type === 'recovery').length;
+  const parts = [];
+
+  if (alertCount > 0) {
+    parts.push(`${alertCount} alert${alertCount === 1 ? '' : 's'}`);
+  }
+  if (recoveryCount > 0) {
+    parts.push(`${recoveryCount} recover${recoveryCount === 1 ? 'y' : 'ies'}`);
+  }
+
+  return `[MessageDrop] Certificate monitor: ${parts.join(', ') || 'status update'}`;
+}
+
+function buildNotificationText(changes, reason) {
+  const lines = [
+    'MessageDrop certificate monitor detected status changes.',
+    `Check reason: ${reason}`,
+    `Detected at: ${new Date().toISOString()}`,
+    ''
+  ];
+
+  const alerts = changes.filter((change) => change.type === 'alert');
+  const recoveries = changes.filter((change) => change.type === 'recovery');
+
+  if (alerts.length > 0) {
+    lines.push('Alerts:');
+    for (const change of alerts) {
+      const previousLabel = change.previous ? formatStatusLabel(change.previous.status) : 'Not monitored before';
+      lines.push(`- ${change.current.origin} (${change.current.label})`);
+      lines.push(`  Previous: ${previousLabel}`);
+      lines.push(`  Current: ${formatStatusLabel(change.current.status)}`);
+      lines.push(`  Message: ${change.current.statusMessage || '—'}`);
+      lines.push(`  Valid until: ${formatNotificationTimestamp(change.current.validTo)}`);
+      lines.push(`  Days remaining: ${formatNotificationDays(change.current.daysRemaining)}`);
+      lines.push(`  Checked at: ${formatNotificationTimestamp(change.current.lastCheckedAt)}`);
+      lines.push('');
+    }
+  }
+
+  if (recoveries.length > 0) {
+    lines.push('Recoveries:');
+    for (const change of recoveries) {
+      lines.push(`- ${change.current.origin} (${change.current.label})`);
+      lines.push(`  Previous: ${formatStatusLabel(change.previous?.status)}`);
+      lines.push(`  Current: ${formatStatusLabel(change.current.status)}`);
+      lines.push(`  Message: ${change.current.statusMessage || '—'}`);
+      lines.push(`  Valid until: ${formatNotificationTimestamp(change.current.validTo)}`);
+      lines.push(`  Days remaining: ${formatNotificationDays(change.current.daysRemaining)}`);
+      lines.push(`  Checked at: ${formatNotificationTimestamp(change.current.lastCheckedAt)}`);
+      lines.push('');
+    }
+  }
+
+  return lines.join('\n').trim();
+}
+
+function renderNotificationItems(changes) {
+  return changes.map((change) => {
+    const previousLabel = change.previous ? formatStatusLabel(change.previous.status) : 'Not monitored before';
+    return `
+      <li style="margin-bottom:16px;">
+        <div style="font-weight:700;">${escapeHtml(change.current.origin)}</div>
+        <div style="color:#475569; margin-top:4px;">${escapeHtml(change.current.label || 'Certificate target')}</div>
+        <div style="margin-top:8px;"><strong>Previous:</strong> ${escapeHtml(previousLabel)}</div>
+        <div><strong>Current:</strong> ${escapeHtml(formatStatusLabel(change.current.status))}</div>
+        <div><strong>Message:</strong> ${escapeHtml(change.current.statusMessage || '—')}</div>
+        <div><strong>Valid until:</strong> ${escapeHtml(formatNotificationTimestamp(change.current.validTo))}</div>
+        <div><strong>Days remaining:</strong> ${escapeHtml(formatNotificationDays(change.current.daysRemaining))}</div>
+        <div><strong>Checked at:</strong> ${escapeHtml(formatNotificationTimestamp(change.current.lastCheckedAt))}</div>
+      </li>
+    `;
+  }).join('');
+}
+
+function buildNotificationHtml(changes, reason) {
+  const alerts = changes.filter((change) => change.type === 'alert');
+  const recoveries = changes.filter((change) => change.type === 'recovery');
+  const sections = [];
+
+  if (alerts.length > 0) {
+    sections.push(`
+      <h2 style="font-size:18px; margin:20px 0 10px;">Alerts</h2>
+      <ul style="padding-left:20px;">${renderNotificationItems(alerts)}</ul>
+    `);
+  }
+
+  if (recoveries.length > 0) {
+    sections.push(`
+      <h2 style="font-size:18px; margin:20px 0 10px;">Recoveries</h2>
+      <ul style="padding-left:20px;">${renderNotificationItems(recoveries)}</ul>
+    `);
+  }
+
+  return `
+    <div style="font-family:Arial,Helvetica,sans-serif; color:#0f172a; line-height:1.5;">
+      <h1 style="font-size:22px; margin:0 0 12px;">MessageDrop certificate monitor</h1>
+      <p style="margin:0 0 6px;">Status changes were detected during the latest certificate check.</p>
+      <p style="margin:0 0 6px;"><strong>Check reason:</strong> ${escapeHtml(reason)}</p>
+      <p style="margin:0 0 20px;"><strong>Detected at:</strong> ${escapeHtml(new Date().toISOString())}</p>
+      ${sections.join('')}
+    </div>
+  `.trim();
+}
+
+async function sendStatusChangeNotifications(changes, { logger, reason }) {
+  if (!Array.isArray(changes) || changes.length === 0) {
+    return false;
+  }
+
+  const recipient = getNotificationRecipient();
+  if (!recipient) {
+    logger?.info?.('Certificate health changes detected, but no notification recipient is configured.', {
+      changes: changes.length,
+      reason
+    });
+    return false;
+  }
+
+  const subject = buildNotificationSubject(changes);
+  const text = buildNotificationText(changes, reason);
+  const html = buildNotificationHtml(changes, reason);
+  const result = await sendMail({
+    to: recipient,
+    subject,
+    text,
+    html,
+    logger
+  });
+
+  if (result?.success) {
+    logger?.info?.('Certificate health notification sent', {
+      recipient,
+      changes: changes.length,
+      reason
+    });
+    return true;
+  }
+
+  logger?.warn?.('Certificate health notification could not be sent', {
+    recipient,
+    changes: changes.length,
+    reason
+  });
+  return false;
+}
+
 async function getCertificateHealthOverview(db, { logger, autoCheckIfEmpty = false } = {}) {
   const configuredTargets = resolveConfiguredTargets();
   const rows = await listStoredRows(db);
@@ -498,16 +782,18 @@ async function getCertificateHealthOverview(db, { logger, autoCheckIfEmpty = fal
 
   return {
     summary: buildSummary(rows, configuredTargets.length),
-    targets: rows
+    targets: sortRows(rows)
   };
 }
 
-async function runCertificateHealthCheck({ db, logger, reason = 'manual' } = {}) {
+async function runCertificateHealthCheckInternal({ db, logger, reason = 'manual' } = {}) {
   if (!db) {
     throw new Error('database_unavailable');
   }
 
   const targets = resolveConfiguredTargets();
+  const previousRows = await listStoredRows(db);
+
   logger?.info?.('Certificate health check started', {
     reason,
     targets: targets.length
@@ -528,16 +814,23 @@ async function runCertificateHealthCheck({ db, logger, reason = 'manual' } = {})
 
   await deleteExcept(db, results.map((row) => row.targetKey));
 
+  const sortedResults = sortRows(results);
+  const statusChanges = collectStatusChanges(previousRows, sortedResults);
+  if (statusChanges.length > 0) {
+    try {
+      await sendStatusChangeNotifications(statusChanges, { logger, reason });
+    } catch (error) {
+      logger?.warn?.('Certificate health notification failed', {
+        error: error?.message || error,
+        changes: statusChanges.length,
+        reason
+      });
+    }
+  }
+
   const overview = {
-    summary: buildSummary(results, targets.length),
-    targets: results.slice().sort((a, b) => {
-      const aRank = STATUS_RANK[a.status] ?? STATUS_RANK.none;
-      const bRank = STATUS_RANK[b.status] ?? STATUS_RANK.none;
-      if (aRank !== bRank) {
-        return aRank - bRank;
-      }
-      return a.origin.localeCompare(b.origin);
-    })
+    summary: buildSummary(sortedResults, targets.length),
+    targets: sortedResults
   };
 
   logger?.info?.('Certificate health check finished', {
@@ -548,10 +841,27 @@ async function runCertificateHealthCheck({ db, logger, reason = 'manual' } = {})
     warning: overview.summary.warning,
     critical: overview.summary.critical,
     expired: overview.summary.expired,
-    error: overview.summary.error
+    error: overview.summary.error,
+    notifications: statusChanges.length
   });
 
   return overview;
+}
+
+async function runCertificateHealthCheck(options = {}) {
+  if (activeCheckPromise) {
+    options?.logger?.info?.('Certificate health check already running; reusing active run.', {
+      reason: options?.reason || 'manual'
+    });
+    return activeCheckPromise;
+  }
+
+  activeCheckPromise = runCertificateHealthCheckInternal(options)
+    .finally(() => {
+      activeCheckPromise = null;
+    });
+
+  return activeCheckPromise;
 }
 
 module.exports = {
