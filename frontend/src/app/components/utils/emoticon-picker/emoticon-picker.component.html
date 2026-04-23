@@ -19,7 +19,8 @@
         <div class="selection-panel__title">{{ 'common.emoticonPicker.selectionLabel' | transloco }}</div>
         <div class="selection-panel__tile-actions">
           <button
-            mat-icon-button
+            mat-mini-fab
+            color="secondary"
             type="button"
             (click)="removeLast()"
             [disabled]="selectedEmojis.length === 0"
@@ -28,8 +29,8 @@
             <mat-icon>backspace</mat-icon>
           </button>
           <button
-            mat-icon-button
-            color="warn"
+            mat-mini-fab
+            color="secondary"
             type="button"
             (click)="clearSelection()"
             [disabled]="selectedEmojis.length === 0"
