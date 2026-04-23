@@ -32,7 +32,8 @@ export class NetworkService {
   private readonly http = inject(HttpClient);
   private readonly i18n = inject(TranslationHelperService);
 
-  online = true;
+  private readonly browserOnlineSig = signal(true);
+  readonly browserOnline = this.browserOnlineSig.asReadonly();
   private readonly backendOnlineSig = signal(true);
   readonly backendOnline = this.backendOnlineSig.asReadonly();
   private readonly maintenanceInfoSig = signal<MaintenanceInfo | null>(null);
@@ -85,23 +86,24 @@ export class NetworkService {
     }
 
     this.initialized = true;
-    this.online = this.isBrowserOnline();
+    this.browserOnlineSig.set(this.isBrowserOnline());
 
     if (typeof window !== 'undefined') {
       window.addEventListener('online', () => {
-        this.online = true;
+        this.browserOnlineSig.set(true);
         this.networkDialogRef?.close();
+        this.networkDialogRef = undefined;
         this.requestBackendCheck(true);
       });
 
       window.addEventListener('offline', () => {
-        this.online = false;
+        this.browserOnlineSig.set(false);
         this.stopBackendMonitoring();
         this.openBrowserOfflineDialog();
       });
     }
 
-    if (!this.online) {
+    if (!this.browserOnlineSig()) {
       this.openBrowserOfflineDialog();
       return;
     }
@@ -156,7 +158,7 @@ export class NetworkService {
   }
 
   isOnline(): boolean {
-    return this.online;
+    return this.browserOnlineSig();
   }
 
   setMaintenanceInfo(info: MaintenanceInfo | null): void {
@@ -364,11 +366,12 @@ export class NetworkService {
         showAlways: true,
         title: this.i18n.t('errors.offline.title'),
         image: '',
-        icon: '',
+        icon: 'wifi_off',
         message: this.i18n.t('errors.offline.message'),
-        button: '',
-        delay: 0,
-        showSpinner: false
+        button: this.i18n.t('common.actions.ok'),
+        delay: 4000,
+        showSpinner: false,
+        autoclose: true
       },
       maxWidth: '90vw',
       maxHeight: '90vh',
@@ -376,6 +379,11 @@ export class NetworkService {
       backdropClass: 'dialog-backdrop',
       disableClose: false,
       autoFocus: false
+    });
+    this.networkDialogRef?.afterClosed().subscribe(() => {
+      if (this.networkDialogRef) {
+        this.networkDialogRef = undefined;
+      }
     });
   }
 

@@ -1009,6 +1009,30 @@ export class AppComponent implements OnInit {
   }
 
   public showBackendOfflineInfo(): void {
+    if (!this.networkService.isOnline()) {
+      this.dialog.open(DisplayMessage, {
+        panelClass: '',
+        closeOnNavigation: false,
+        data: {
+          showAlways: true,
+          title: this.translation.t('errors.offline.title'),
+          image: '',
+          icon: 'wifi_off',
+          message: this.translation.t('errors.offline.message'),
+          button: this.translation.t('common.actions.ok'),
+          delay: 0,
+          showSpinner: false
+        },
+        maxWidth: '90vw',
+        maxHeight: '90vh',
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop',
+        disableClose: false,
+        autoFocus: false
+      });
+      return;
+    }
+
     const maintenance = this.networkService.maintenanceInfo();
     if (maintenance?.enabled) {
       this.dialog.open(DisplayMessage, {

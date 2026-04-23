@@ -50,10 +50,10 @@
 </div>
 }
 
-@if (!networkService.backendOnline() || maintenanceActive()) {
+@if (!networkService.browserOnline() || !networkService.backendOnline() || maintenanceActive()) {
 <button mat-fab class="button_backend_status" (click)="showBackendOfflineInfo()"
-    [attr.aria-label]="maintenanceActive() ? ('common.maintenance.title' | transloco) : ('common.serverDown.title' | transloco)">
-    <mat-icon aria-hidden="false">{{ maintenanceActive() ? 'construction' : 'cloud_off' }}</mat-icon>
+    [attr.aria-label]="!networkService.browserOnline() ? ('errors.offline.title' | transloco) : (maintenanceActive() ? ('common.maintenance.title' | transloco) : ('common.serverDown.title' | transloco))">
+    <mat-icon aria-hidden="false">{{ !networkService.browserOnline() ? 'wifi_off' : (maintenanceActive() ? 'construction' : 'cloud_off') }}</mat-icon>
 </button>
 }
 
@@ -103,7 +103,7 @@
     }
 
     @if (userService.isReady()) {
-    @if (!userService.hasJwt() && networkService.backendOnline() && !maintenanceActive() && !userService.isAccountBlocked()) {
+    @if (!userService.hasJwt() && networkService.browserOnline() && networkService.backendOnline() && !maintenanceActive() && !userService.isAccountBlocked()) {
     <button mat-menu-item (click)="connectToBackend()" [disabled]="userService.isConnectingToBackend()">
         <mat-icon>cloud_sync</mat-icon>
         <span>{{ 'common.menu.connectBackend' | transloco }}</span>
@@ -285,7 +285,7 @@
     </button-->
     }
 
-    @if (networkService.backendOnline() && !maintenanceActive()) {
+    @if (networkService.browserOnline() && networkService.backendOnline() && !maintenanceActive()) {
     <button mat-menu-item (click)="showWeather()">
         <mat-icon>weather_mix</mat-icon>
         <span>{{ 'common.menu.weather' | transloco }}</span>
