@@ -503,7 +503,7 @@ export class AirQualityComponent implements OnInit {
   };
 
   onTileClick(tile: AirQualityTileValue): void {
-    if (tile.minMax.min === 0 && tile.minMax.max === 0) {
+    if (!this.hasDataForSelectedDay(tile.key)) {
       return;
     }
     const allTileValues = this.getAllTileValues();
@@ -592,5 +592,19 @@ export class AirQualityComponent implements OnInit {
 
   private getHourlyValues(key: AirQualityMetricKey): number[] | undefined {
     return this.airQuality?.hourly[key];
+  }
+
+  private hasDataForSelectedDay(key: AirQualityMetricKey): boolean {
+    const values = this.getHourlyValues(key);
+    const timeIndices = this.getDayTimeIndices(this.selectedDayIndex);
+
+    if (!values?.length || !timeIndices.length) {
+      return false;
+    }
+
+    return timeIndices.some((index) => {
+      const value = values[index];
+      return typeof value === 'number' && !Number.isNaN(value);
+    });
   }
 }

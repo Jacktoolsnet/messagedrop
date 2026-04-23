@@ -103,7 +103,7 @@ export class WeatherComponent implements OnInit {
 
   onTileClick(tile: WeatherTile): void {
     const numericValue = this.getTileNumericValue(tile.type);
-    if (numericValue == null || numericValue === 0) return;
+    if (numericValue == null) return;
     this.selectedTile = tile;
     this.tileIndex = this.tiles().findIndex(t => t.type === tile.type);
   }
