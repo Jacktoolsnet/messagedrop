@@ -1136,7 +1136,7 @@
     },
     "serverDown": {
       "title": "Server temporarily unavailable",
-      "message": "Apparently, our backend needed some \"me time\".\n\nNo worries: offline features (contacts, private notes, etc.) are still available."
+      "message": "Our backend is currently unavailable.\n\nOffline features (contacts, private notes, etc.) are still available."
     },
     "maintenance": {
       "title": "Maintenance mode",
@@ -1327,7 +1327,7 @@
     "maintenance": "The service is in maintenance mode.",
     "offline": {
       "title": "No internet connection",
-      "message": "Apparently, your network needed some \"me time\"."
+      "message": "Please check your internet connection."
     },
     "http": {
       "title": {

@@ -1136,7 +1136,7 @@
     },
     "serverDown": {
       "title": "Server vorübergehend nicht erreichbar",
-      "message": "Offenbar brauchte unser Backend kurz eine Pause.\n\nKeine Sorge: Offline-Funktionen (Kontakte, private Notizen usw.) bleiben verfügbar."
+      "message": "Unser Backend ist derzeit nicht erreichbar.\n\nOffline-Funktionen (Kontakte, private Notizen usw.) bleiben weiterhin verfügbar."
     },
     "maintenance": {
       "title": "Im Wartungsmodus",
@@ -1327,7 +1327,7 @@
     "maintenance": "Der Dienst befindet sich im Wartungsmodus.",
     "offline": {
       "title": "Keine Internetverbindung",
-      "message": "Offenbar brauchte dein Netzwerk kurz eine Pause."
+      "message": "Bitte überprüfe deine Internetverbindung."
     },
     "http": {
       "title": {

@@ -1136,7 +1136,7 @@
     },
     "serverDown": {
       "title": "Servidor no disponible temporalmente",
-      "message": "Parece que nuestro backend necesitaba un poco de \"tiempo para sí\".\n\nNo te preocupes: las funciones sin conexión (contactos, notas privadas, etc.) siguen disponibles."
+      "message": "Nuestro backend no está disponible en este momento.\n\nLas funciones sin conexión (contactos, notas privadas, etc.) siguen disponibles."
     },
     "maintenance": {
       "title": "Modo de mantenimiento",
@@ -1327,7 +1327,7 @@
     "maintenance": "El servicio está en modo de mantenimiento.",
     "offline": {
       "title": "Sin conexión a internet",
-      "message": "Al parecer, tu red necesitaba un poco de \"tiempo para sí\"."
+      "message": "Por favor, comprueba tu conexión a internet."
     },
     "http": {
       "title": {
