@@ -11,7 +11,6 @@ import { NetworkService } from '../services/network.service';
 import { TranslationHelperService } from '../services/translation-helper.service';
 
 let errorDialogRef: MatDialogRef<DisplayMessage> | null = null;
-const backendOfflineStatuses = new Set([0, 502, 503, 504]);
 
 const isBackendRequest = (url: string): boolean => {
   if (!environment.apiUrl) {
@@ -61,26 +60,29 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const backendRequest = isBackendRequest(req.url);
   const skipUi = req.headers.has('x-skip-ui');
   const skipBackendStatus = req.headers.has('x-skip-backend-status');
+  const skipDiagnostics = req.headers.has('x-skip-diagnostics');
 
   return next(req).pipe(
     tap((event) => {
       if (backendRequest && !skipBackendStatus && event instanceof HttpResponse) {
-        networkService.setBackendOnline(true);
+        networkService.recordBackendReachable();
       }
     }),
     catchError((error: unknown) => {
-      diagnosticLogger.logHttpError(req, error);
+      if (!skipDiagnostics) {
+        diagnosticLogger.logHttpError(req, error);
+      }
       const status = error instanceof HttpErrorResponse ? error.status : -1;
       const maintenanceInfo = backendRequest ? parseMaintenanceInfo(error) : null;
       const message = apiErrorService.getErrorMessage(error) ?? networkService.getErrorMessage(status);
       if (backendRequest && !skipBackendStatus) {
-        if (backendOfflineStatuses.has(status)) {
-          networkService.setBackendOnline(false);
-          networkService.setMaintenanceInfo(maintenanceInfo);
-          return throwError(() => error);
+        if (maintenanceInfo?.enabled) {
+          networkService.recordBackendMaintenance(maintenanceInfo);
+        } else if (status === 0 || status >= 500) {
+          networkService.requestBackendCheck(true);
+        } else {
+          networkService.recordBackendReachable();
         }
-        networkService.setBackendOnline(true);
-        networkService.clearMaintenanceInfo();
       }
       if (skipUi) {
         return throwError(() => error);

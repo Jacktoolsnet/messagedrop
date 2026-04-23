@@ -14,6 +14,7 @@ import { traceIdInterceptor } from './interceptors/trace-id-interceptor';
 import { LanguageService } from './services/language.service';
 import { DiagnosticLoggerService } from './services/diagnostic-logger.service';
 import { GlobalErrorHandler } from './services/global-error-handler';
+import { NetworkService } from './services/network.service';
 import { TranslocoHttpLoader } from '../transloco-loader';
 
 export const appConfig: ApplicationConfig = {
@@ -21,6 +22,7 @@ export const appConfig: ApplicationConfig = {
     provideAppInitializer(() => {
       inject(LanguageService);
       inject(DiagnosticLoggerService).initGlobalHandlers();
+      inject(NetworkService).init();
     }),
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
     { provide: LOCALE_ID, useFactory: () => inject(LanguageService).effectiveLanguage() },

@@ -38,13 +38,18 @@ function isServiceRequest(req) {
   }
 }
 
+function isBypassedPath(req) {
+  const path = typeof req?.path === 'string' ? req.path : '';
+  return path === '/health' || path === '/health/';
+}
+
 module.exports = function maintenance() {
   return function (req, res, next) {
     const db = req.database?.db;
     if (!db) {
       return next();
     }
-    if (isServiceRequest(req)) {
+    if (isServiceRequest(req) || isBypassedPath(req)) {
       return next();
     }
     tableMaintenance.get(db, (err, row) => {

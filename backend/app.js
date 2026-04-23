@@ -9,6 +9,7 @@ const headerMW = require('./middleware/header')
 const Database = require('./db/database');
 const database = new Database();
 const root = require('./routes/root');
+const health = require('./routes/health');
 const check = require('./routes/check');
 const clientConnect = require('./routes/client-connect');
 const openAi = require('./routes/openAi');
@@ -520,6 +521,7 @@ const frontendErrorLogLimit = rateLimit({
 
 // ROUTES
 app.get('/', basicLimit, root);
+app.use('/health', basicLimit, health);
 app.use('/airquality', airQualtiyLimit, airQualtiy);
 app.use('/check', basicLimit, check);
 app.use('/clientconnect', clientConnectLimit, clientConnect);

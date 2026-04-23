@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { environment } from '../../environments/environment';
@@ -12,12 +12,21 @@ interface LiteNetworkInformation {
   saveData?: boolean;
 }
 
+interface BackendHealthResponse {
+  status?: number;
+  online?: boolean;
+  maintenance?: MaintenanceInfo | null;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class NetworkService {
+  private readonly backendHealthyPollMs = 60_000;
+  private readonly backendTransportFailureThreshold = 2;
 
   private networkDialogRef: MatDialogRef<DisplayMessage> | undefined;
+  private initialized = false;
 
   private readonly displayMessage = inject(MatDialog);
   private readonly http = inject(HttpClient);
@@ -29,8 +38,10 @@ export class NetworkService {
   private readonly maintenanceInfoSig = signal<MaintenanceInfo | null>(null);
   readonly maintenanceInfo = this.maintenanceInfoSig.asReadonly();
   private backendCheckTimer?: ReturnType<typeof setTimeout>;
+  private backendCheckDueAt = 0;
   private backendCheckAttempts = 0;
   private backendCheckInFlight = false;
+  private backendTransportFailureCount = 0;
   private networkMessageMap = new Map<string, DisplayMessageConfig>();
   private readonly errorTitleKeyMap: Record<number, string> = {
     0: 'errors.http.title.noConnection',
@@ -69,33 +80,33 @@ export class NetworkService {
   };
 
   init() {
-    window.addEventListener('online', () => {
-      this.online = true;
-      this.networkDialogRef?.close();
-    });
-    window.addEventListener('offline', () => {
-      this.online = false;
-      this.networkDialogRef = this.displayMessage?.open(DisplayMessage, {
-        panelClass: '',
-        closeOnNavigation: false,
-        data: {
-          showAlways: true,
-          title: this.i18n.t('errors.offline.title'),
-          image: '',
-          icon: '',
-          message: this.i18n.t('errors.offline.message'),
-          button: '',
-          delay: 0,
-          showSpinner: false
-        },
-        maxWidth: '90vw',
-        maxHeight: '90vh',
-        hasBackdrop: true,
-        backdropClass: 'dialog-backdrop',
-        disableClose: false,
-        autoFocus: false
+    if (this.initialized) {
+      return;
+    }
+
+    this.initialized = true;
+    this.online = this.isBrowserOnline();
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('online', () => {
+        this.online = true;
+        this.networkDialogRef?.close();
+        this.requestBackendCheck(true);
       });
-    });
+
+      window.addEventListener('offline', () => {
+        this.online = false;
+        this.stopBackendMonitoring();
+        this.openBrowserOfflineDialog();
+      });
+    }
+
+    if (!this.online) {
+      this.openBrowserOfflineDialog();
+      return;
+    }
+
+    this.requestBackendCheck(true);
   }
 
   isSlowConnection(): boolean {
@@ -148,19 +159,6 @@ export class NetworkService {
     return this.online;
   }
 
-  setBackendOnline(online: boolean): void {
-    if (this.backendOnlineSig() === online) {
-      return;
-    }
-    this.backendOnlineSig.set(online);
-    if (online) {
-      this.clearMaintenanceInfo();
-      this.stopBackendMonitoring();
-    } else {
-      this.scheduleBackendCheck();
-    }
-  }
-
   setMaintenanceInfo(info: MaintenanceInfo | null): void {
     this.maintenanceInfoSig.set(info);
   }
@@ -169,16 +167,63 @@ export class NetworkService {
     this.maintenanceInfoSig.set(null);
   }
 
-  private scheduleBackendCheck(): void {
-    if (this.backendCheckTimer || this.backendCheckInFlight) {
+  recordBackendReachable(): void {
+    this.backendTransportFailureCount = 0;
+    this.backendCheckAttempts = 0;
+    this.clearMaintenanceInfo();
+    this.updateBackendOnlineState(true);
+    this.scheduleBackendCheckWithDelay(this.backendHealthyPollMs);
+  }
+
+  recordBackendMaintenance(info: MaintenanceInfo): void {
+    this.backendTransportFailureCount = 0;
+    this.backendCheckAttempts = 0;
+    this.setMaintenanceInfo(info);
+    this.updateBackendOnlineState(true);
+    this.scheduleBackendCheckWithDelay(this.backendHealthyPollMs);
+  }
+
+  requestBackendCheck(immediate = false): void {
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
       return;
     }
-    if (this.backendOnlineSig()) {
+    const delay = immediate ? 0 : (this.backendOnlineSig() ? this.backendHealthyPollMs : this.getBackendRetryDelay());
+    this.scheduleBackendCheckWithDelay(delay);
+  }
+
+  private updateBackendOnlineState(online: boolean): void {
+    if (this.backendOnlineSig() === online) {
       return;
     }
-    const delay = this.getBackendRetryDelay();
+    this.backendOnlineSig.set(online);
+    if (!online) {
+      this.clearMaintenanceInfo();
+    }
+  }
+
+  private scheduleBackendCheckWithDelay(delayMs: number): void {
+    if (this.backendCheckInFlight) {
+      return;
+    }
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      return;
+    }
+
+    const delay = Math.max(0, delayMs);
+    const dueAt = Date.now() + delay;
+
+    if (this.backendCheckTimer && this.backendCheckDueAt && this.backendCheckDueAt <= dueAt) {
+      return;
+    }
+
+    if (this.backendCheckTimer) {
+      clearTimeout(this.backendCheckTimer);
+    }
+
+    this.backendCheckDueAt = dueAt;
     this.backendCheckTimer = setTimeout(() => {
       this.backendCheckTimer = undefined;
+      this.backendCheckDueAt = 0;
       this.checkBackendOnline();
     }, delay);
   }
@@ -188,46 +233,149 @@ export class NetworkService {
       clearTimeout(this.backendCheckTimer);
       this.backendCheckTimer = undefined;
     }
+    this.backendCheckDueAt = 0;
     this.backendCheckAttempts = 0;
+    this.backendTransportFailureCount = 0;
     this.backendCheckInFlight = false;
   }
 
   private getBackendRetryDelay(): number {
+    if (this.backendCheckAttempts < 1) {
+      return 3_000;
+    }
+    if (this.backendCheckAttempts < 3) {
+      return 5_000;
+    }
     if (this.backendCheckAttempts < 6) {
-      return 30_000;
+      return 10_000;
     }
     if (this.backendCheckAttempts < 12) {
-      return 60_000;
+      return 30_000;
     }
-    if (this.backendCheckAttempts < 24) {
-      return 300_000;
-    }
-    return 600_000;
+    return 60_000;
   }
 
   private checkBackendOnline(): void {
-    if (this.backendCheckInFlight || this.backendOnlineSig()) {
+    if (this.backendCheckInFlight) {
       return;
     }
     if (typeof navigator !== 'undefined' && navigator.onLine === false) {
-      this.scheduleBackendCheck();
+      this.scheduleBackendCheckWithDelay(this.getBackendRetryDelay());
       return;
     }
+
     this.backendCheckInFlight = true;
-    this.backendCheckAttempts += 1;
-    const url = `${environment.apiUrl}/clientconnect`;
-    const headers = new HttpHeaders({ 'x-skip-ui': 'true' });
-    this.http.get(url, { headers, withCredentials: true }).subscribe({
-      next: () => {
+    const url = `${environment.apiUrl}/health`;
+    const headers = new HttpHeaders({
+      'x-skip-ui': 'true',
+      'x-skip-backend-status': 'true',
+      'x-skip-diagnostics': 'true'
+    });
+
+    this.http.get<BackendHealthResponse>(url, { headers, withCredentials: true }).subscribe({
+      next: (response) => {
         this.backendCheckInFlight = false;
-        this.setBackendOnline(true);
+        this.handleBackendHealthResponse(response);
       },
-      error: () => {
+      error: (error: HttpErrorResponse) => {
         this.backendCheckInFlight = false;
-        if (!this.backendOnlineSig()) {
-          this.scheduleBackendCheck();
-        }
+        this.handleBackendHealthTransportError(error);
       }
+    });
+  }
+
+  private handleBackendHealthResponse(response: BackendHealthResponse | null | undefined): void {
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      return;
+    }
+
+    const maintenance = this.normalizeMaintenanceInfo(response?.maintenance);
+    this.backendTransportFailureCount = 0;
+
+    if (response?.online === false) {
+      this.backendCheckAttempts += 1;
+      this.updateBackendOnlineState(false);
+      if (maintenance?.enabled) {
+        this.setMaintenanceInfo(maintenance);
+      }
+      this.scheduleBackendCheckWithDelay(this.getBackendRetryDelay());
+      return;
+    }
+
+    this.backendCheckAttempts = 0;
+    this.updateBackendOnlineState(true);
+    if (maintenance?.enabled) {
+      this.setMaintenanceInfo(maintenance);
+    } else {
+      this.clearMaintenanceInfo();
+    }
+    this.scheduleBackendCheckWithDelay(this.backendHealthyPollMs);
+  }
+
+  private handleBackendHealthTransportError(_error: HttpErrorResponse): void {
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      return;
+    }
+
+    this.backendTransportFailureCount += 1;
+    this.backendCheckAttempts += 1;
+
+    if (this.backendTransportFailureCount >= this.backendTransportFailureThreshold || !this.backendOnlineSig()) {
+      this.updateBackendOnlineState(false);
+    }
+
+    this.scheduleBackendCheckWithDelay(this.getBackendRetryDelay());
+  }
+
+  private normalizeMaintenanceInfo(value: MaintenanceInfo | null | undefined): MaintenanceInfo | null {
+    if (!value || typeof value !== 'object') {
+      return null;
+    }
+
+    return {
+      enabled: Boolean(value.enabled),
+      startsAt: this.normalizeNumber(value.startsAt),
+      endsAt: this.normalizeNumber(value.endsAt),
+      reason: this.normalizeText(value.reason),
+      reasonEn: this.normalizeText(value.reasonEn),
+      reasonEs: this.normalizeText(value.reasonEs),
+      reasonFr: this.normalizeText(value.reasonFr),
+      updatedAt: this.normalizeNumber(value.updatedAt)
+    };
+  }
+
+  private normalizeNumber(value: unknown): number | null {
+    const num = Number(value);
+    return Number.isFinite(num) ? num : null;
+  }
+
+  private normalizeText(value: unknown): string | null {
+    if (typeof value !== 'string') return null;
+    const trimmed = value.trim();
+    return trimmed ? trimmed : null;
+  }
+
+  private openBrowserOfflineDialog(): void {
+    this.networkDialogRef?.close();
+    this.networkDialogRef = this.displayMessage?.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: {
+        showAlways: true,
+        title: this.i18n.t('errors.offline.title'),
+        image: '',
+        icon: '',
+        message: this.i18n.t('errors.offline.message'),
+        button: '',
+        delay: 0,
+        showSpinner: false
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
     });
   }
 
@@ -273,5 +421,4 @@ export class NetworkService {
     }
     return navigator.onLine;
   }
-
 }
