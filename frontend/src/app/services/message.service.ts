@@ -1347,6 +1347,7 @@ export class MessageService {
     const url = this.buildPublicMessageUrl(
       `boundingbox/${boundingBox.latMin}/${boundingBox.lonMin}/${boundingBox.latMax}/${boundingBox.lonMax}`
     );
+    const headers = this.httpOptions.headers.set('x-skip-ui', 'true');
 
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
@@ -1360,7 +1361,10 @@ export class MessageService {
       autoclose: false
     });
 
-    return this.http.get<GetMessageResponse<PublicMessageRow>>(url, this.httpOptions)
+    return this.http.get<GetMessageResponse<PublicMessageRow>>(url, {
+      ...this.httpOptions,
+      headers
+    })
       .pipe(
         catchError(this.handleError)
       );

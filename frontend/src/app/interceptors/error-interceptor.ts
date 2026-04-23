@@ -84,6 +84,16 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
           networkService.recordBackendReachable();
         }
       }
+
+      const backendStatusAlreadyVisible = backendRequest
+        && !skipBackendStatus
+        && (maintenanceInfo?.enabled || networkService.maintenanceInfo()?.enabled || !networkService.backendOnline());
+      const repeatedBackendStatusError = status === 0 || status === 502 || status === 503 || status === 504;
+
+      if (backendStatusAlreadyVisible && repeatedBackendStatusError) {
+        return throwError(() => error);
+      }
+
       if (skipUi) {
         return throwError(() => error);
       }
