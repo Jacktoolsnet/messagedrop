@@ -6,6 +6,11 @@ import { PlatformLocation } from '@angular/common';
 import { TranslocoService } from '@jsverse/transloco';
 import { of } from 'rxjs';
 import { AppComponent } from './app.component';
+import { MyExperienceslistComponent } from './components/my-experienceslist/my-experienceslist.component';
+import { Location } from './interfaces/location';
+import { MarkerLocation } from './interfaces/marker-location';
+import { MarkerType } from './interfaces/marker-type';
+import { ExperienceResult } from './interfaces/viator';
 import { AirQualityService } from './services/air-quality.service';
 import { AppService } from './services/app.service';
 import { BackupService } from './services/backup.service';
@@ -137,5 +142,42 @@ describe('AppComponent', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
     expect(app).toBeTruthy();
+  });
+
+  it('should open my experience marker dialog with 95vw width', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+    const dialog = TestBed.inject(MatDialog);
+    const openSpy = dialog.open as unknown as jasmine.Spy;
+    const location: Location = { latitude: 52.52, longitude: 13.405, plusCode: '9F4MGC2F+H4' };
+    const experiences: ExperienceResult[] = [
+      {
+        provider: 'viator',
+        trackId: 'track-1',
+        productCode: 'product-1',
+        raw: {}
+      }
+    ];
+    const marker: MarkerLocation = {
+      location,
+      messages: [],
+      notes: [],
+      images: [],
+      documents: [],
+      myExperiences: experiences,
+      type: MarkerType.MY_EXPERIENCE
+    };
+
+    app.handleMarkerClickEvent(marker);
+
+    expect(openSpy).toHaveBeenCalled();
+    const [component, config] = openSpy.calls.mostRecent().args;
+    expect(component).toBe(MyExperienceslistComponent);
+    expect(config.data).toEqual({ experiences });
+    expect(config.minWidth).toBe('min(360px, 95vw)');
+    expect(config.maxWidth).toBe('95vw');
+    expect(config.width).toBe('min(900px, 95vw)');
+    expect(config.maxHeight).toBe('95vh');
+    expect(config.height).toBe('auto');
   });
 });

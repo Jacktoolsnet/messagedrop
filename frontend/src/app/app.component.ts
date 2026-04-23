@@ -1712,8 +1712,13 @@ export class AppComponent implements OnInit {
       panelClass: 'pin-dialog',
       backdropClass: 'dialog-backdrop',
       closeOnNavigation: false,
-      maxWidth: '80vw',
-      maxHeight: '75vh',
+      minWidth: 'min(360px, 95vw)',
+      maxWidth: '95vw',
+      width: 'min(900px, 95vw)',
+      maxHeight: '95vh',
+      height: 'auto',
+      hasBackdrop: true,
+      disableClose: false,
       autoFocus: false
     });
   }
