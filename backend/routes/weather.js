@@ -4,14 +4,16 @@ const router = express.Router();
 const axios = require('axios');
 const { signServiceJwt } = require('../utils/serviceJwt');
 const { resolveBaseUrl } = require('../utils/adminLogForwarder');
+const { resolveOpenMeteoProxyTimeoutMs } = require('../utils/openmeteo-timeout');
 const metric = require('../middleware/metric');
 const { apiError } = require('../middleware/api-error');
 
 // Axios-Client für Upstream
 const openMeteoBase = resolveBaseUrl(process.env.OPENMETEO_BASE_URL, process.env.OPENMETEO_PORT);
+const openMeteoProxyTimeoutMs = resolveOpenMeteoProxyTimeoutMs();
 const client = axios.create({
     baseURL: `${openMeteoBase}/weather`,
-    timeout: 5000,
+    timeout: openMeteoProxyTimeoutMs,
     validateStatus: () => true, // wir geben Statuscodes transparent weiter
     headers: {
         'content-type': 'application/json'
@@ -19,10 +21,25 @@ const client = axios.create({
 });
 
 function buildUpstreamError(err) {
-    const status = err?.response?.status || 502;
+    const status = err?.response?.status || (isTimeoutError(err) ? 504 : 502);
     const apiErr = apiError.fromStatus(status);
     apiErr.detail = err?.response?.data || err?.message || null;
     return apiErr;
+}
+
+function isTimeoutError(err) {
+    return err?.code === 'ECONNABORTED'
+        || String(err?.message || '').toLowerCase().includes('timeout');
+}
+
+function buildForwardHeaders(req, token) {
+    return {
+        Authorization: `Bearer ${token}`,
+        'x-forwarded-host': req.get('host'),
+        'x-forwarded-proto': req.protocol,
+        'x-trace-id': req.traceId,
+        'x-request-id': req.traceId,
+    };
 }
 
 // GET /weather/:locale/:pluscode/:latitude/:longitude/:days
@@ -40,11 +57,7 @@ router.get('/:locale/:pluscode/:latitude/:longitude/:days', [
         });
         const upstream = await client.get(url, {
             params: req.query, // Querystrings mit durchreichen (z. B. flags)
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'x-forwarded-host': req.get('host'),
-                'x-forwarded-proto': req.protocol,
-            },
+            headers: buildForwardHeaders(req, token),
         });
 
         res.status(upstream.status).json(upstream.data);
@@ -53,8 +66,10 @@ router.get('/:locale/:pluscode/:latitude/:longitude/:days', [
             message: err?.message || null,
             code: err?.code || null,
             status: err?.response?.status || null,
+            timeout: isTimeoutError(err),
             url: err?.config?.url || null,
-            baseURL: err?.config?.baseURL || null
+            baseURL: err?.config?.baseURL || null,
+            timeoutMs: openMeteoProxyTimeoutMs
         });
         return next(buildUpstreamError(err));
     }
@@ -74,11 +89,7 @@ router.get('/history/:pluscode/:latitude/:longitude/:years', [
         });
         const upstream = await client.get(url, {
             params: req.query,
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'x-forwarded-host': req.get('host'),
-                'x-forwarded-proto': req.protocol,
-            },
+            headers: buildForwardHeaders(req, token),
         });
 
         res.status(upstream.status).json(upstream.data);
@@ -87,8 +98,10 @@ router.get('/history/:pluscode/:latitude/:longitude/:years', [
             message: err?.message || null,
             code: err?.code || null,
             status: err?.response?.status || null,
+            timeout: isTimeoutError(err),
             url: err?.config?.url || null,
-            baseURL: err?.config?.baseURL || null
+            baseURL: err?.config?.baseURL || null,
+            timeoutMs: openMeteoProxyTimeoutMs
         });
         return next(buildUpstreamError(err));
     }

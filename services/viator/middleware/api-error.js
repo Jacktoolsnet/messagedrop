@@ -155,7 +155,7 @@ function errorHandler(err, req, res, next) {
   sanitizeErrorPayload(payload);
 
   if (status >= 500) {
-    req?.logger?.error?.('Unhandled error', { ...logContext, message: err?.message, stack: err?.stack });
+    req?.logger?.error?.('Request failed with server error', { ...logContext, message: err?.message, stack: err?.stack });
   } else {
     req?.logger?.warn?.('Request error', { ...logContext, message: err?.message || payload.message });
   }
