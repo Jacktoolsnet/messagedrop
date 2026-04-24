@@ -105,6 +105,9 @@ import { DiagnosticLoggerService } from './services/diagnostic-logger.service';
 import { isQuotaExceededError } from './utils/storage-error.util';
 import { DisplayMessageRef, DisplayMessageService } from './services/display-message.service';
 
+const PRODUCTION_APP_URL = 'https://app.messagedrop.de/';
+const Q_STAGE_WARNING_SESSION_KEY = 'messagedrop.qStageWarningSeen';
+
 @Component({
   selector: 'app-root',
   imports: [
@@ -417,6 +420,7 @@ export class AppComponent implements OnInit {
         this.metaService.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
         this.metaService.updateTag({ name: 'twitter:title', content: meta.twitterTitle ?? '' });
         this.metaService.updateTag({ name: 'twitter:description', content: meta.twitterDescription ?? '' });
+        this.showQStageWarningIfNeeded();
       });
     // Handle back button
     this.platformLocation.onPopState(() => {
@@ -428,6 +432,75 @@ export class AppComponent implements OnInit {
       }
     });
     window.history.pushState(this.myHistory, '', '');
+  }
+
+  private showQStageWarningIfNeeded(): void {
+    if (!this.isQStageHost() || this.wasQStageWarningShown()) {
+      return;
+    }
+
+    this.markQStageWarningShown();
+    const dialogRef = this.dialog.open(DisplayMessage, {
+      data: {
+        showAlways: true,
+        title: this.translation.t('common.qStageWarning.title'),
+        image: '',
+        icon: 'warning_amber',
+        message: this.translation.t('common.qStageWarning.message'),
+        button: this.translation.t('common.qStageWarning.continue'),
+        secondaryButton: this.translation.t('common.qStageWarning.openProduction'),
+        delay: 0,
+        showSpinner: false,
+        autoclose: false,
+        layout: 'dialog'
+      },
+      autoFocus: false,
+      restoreFocus: false,
+      closeOnNavigation: true,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      maxWidth: 'min(440px, calc(100vw - 32px))'
+    });
+
+    dialogRef.afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((result) => {
+        if (result === 'secondary') {
+          window.location.assign(PRODUCTION_APP_URL);
+        }
+      });
+  }
+
+  private isQStageHost(): boolean {
+    if (typeof window === 'undefined') {
+      return false;
+    }
+
+    const hostname = window.location.hostname.trim().toLowerCase();
+    return hostname === 'q.frontend.messagedrop.de'
+      || hostname === 'messagedrop.jacktools.net'
+      || hostname.startsWith('q.')
+      || hostname.includes('.q.')
+      || hostname.includes('-q.')
+      || hostname.includes('.q-')
+      || hostname.includes('q-stage')
+      || hostname.includes('staging');
+  }
+
+  private wasQStageWarningShown(): boolean {
+    try {
+      return window.sessionStorage.getItem(Q_STAGE_WARNING_SESSION_KEY) === '1';
+    } catch {
+      return false;
+    }
+  }
+
+  private markQStageWarningShown(): void {
+    try {
+      window.sessionStorage.setItem(Q_STAGE_WARNING_SESSION_KEY, '1');
+    } catch {
+      // Ignore unavailable session storage. The warning is non-critical.
+    }
   }
 
   public logout() {

@@ -228,18 +228,18 @@
         "sortTitle": "Ordenar contactos",
         "reorderAria": "Reordenar {{ name }}",
         "openChatroomAria": "Abrir chat",
-      "editAria": "Editar contacto",
-      "subscribeAria": "Suscribirse al contacto",
-      "unsubscribeAria": "Cancelar suscripción al contacto",
-      "subscriptionSaved": "Se guardó la configuración de suscripción del contacto.",
-      "subscribeFailed": "No se pudo suscribir al contacto.",
-      "unsubscribeFailed": "No se pudo cancelar la suscripción al contacto.",
-      "previewDeleted": "Mensaje eliminado",
-      "previewAudio": "Mensaje de voz",
-      "previewLocation": "Mensaje de ubicación",
-      "previewExperience": "Experiencia",
-      "previewMedia": "Mensaje multimedia"
-    },
+        "editAria": "Editar contacto",
+        "subscribeAria": "Suscribirse al contacto",
+        "unsubscribeAria": "Cancelar suscripción al contacto",
+        "subscriptionSaved": "Se guardó la configuración de suscripción del contacto.",
+        "subscribeFailed": "No se pudo suscribir al contacto.",
+        "unsubscribeFailed": "No se pudo cancelar la suscripción al contacto.",
+        "previewDeleted": "Mensaje eliminado",
+        "previewAudio": "Mensaje de voz",
+        "previewLocation": "Mensaje de ubicación",
+        "previewExperience": "Experiencia",
+        "previewMedia": "Mensaje multimedia"
+      },
       "profile": {
         "title": "Perfil del contacto",
         "nameLabel": "Nombre del contacto",
@@ -1317,6 +1317,12 @@
     "speech": {
       "unsupported": "La lectura en voz alta no es compatible con este navegador.",
       "disabled": "Activa primero la lectura en voz alta en los ajustes de la app."
+    },
+    "qStageWarning": {
+      "title": "Atención: entorno Q",
+      "message": "Estás usando el entorno Q de MessageDrop. Este entorno es para pruebas y puede contener funciones sin terminar, datos de prueba o cambios temporales. Si quieres usar MessageDrop normalmente, abre la aplicación de producción.",
+      "continue": "Continuar",
+      "openProduction": "Abrir MessageDrop"
     }
   },
   "errors": {

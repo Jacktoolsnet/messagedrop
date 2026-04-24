@@ -228,18 +228,18 @@
         "sortTitle": "Sort contacts",
         "reorderAria": "Reorder {{ name }}",
         "openChatroomAria": "Open chatroom",
-      "editAria": "Edit contact",
-      "subscribeAria": "Subscribe to contact",
-      "unsubscribeAria": "Unsubscribe from contact",
-      "subscriptionSaved": "The contact subscription setting was saved.",
-      "subscribeFailed": "Could not subscribe to the contact.",
-      "unsubscribeFailed": "Could not unsubscribe from the contact.",
-      "previewDeleted": "Message deleted",
-      "previewAudio": "Voice message",
-      "previewLocation": "Location message",
-      "previewExperience": "Experience",
-      "previewMedia": "Media message"
-    },
+        "editAria": "Edit contact",
+        "subscribeAria": "Subscribe to contact",
+        "unsubscribeAria": "Unsubscribe from contact",
+        "subscriptionSaved": "The contact subscription setting was saved.",
+        "subscribeFailed": "Could not subscribe to the contact.",
+        "unsubscribeFailed": "Could not unsubscribe from the contact.",
+        "previewDeleted": "Message deleted",
+        "previewAudio": "Voice message",
+        "previewLocation": "Location message",
+        "previewExperience": "Experience",
+        "previewMedia": "Media message"
+      },
       "profile": {
         "title": "Contact profile",
         "nameLabel": "Contact name",
@@ -1317,6 +1317,12 @@
     "speech": {
       "unsupported": "Read aloud is not supported in this browser.",
       "disabled": "Enable read aloud first in app settings."
+    },
+    "qStageWarning": {
+      "title": "Careful: Q stage",
+      "message": "You are currently using the MessageDrop Q stage. This environment is for testing and may contain unfinished features, test data, or short-term changes. If you want to use MessageDrop normally, please open the production app.",
+      "continue": "Continue",
+      "openProduction": "Open MessageDrop"
     }
   },
   "errors": {

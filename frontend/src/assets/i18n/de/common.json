@@ -228,18 +228,18 @@
         "sortTitle": "Kontakte sortieren",
         "reorderAria": "Kontakt {{ name }} verschieben",
         "openChatroomAria": "Chatraum öffnen",
-      "editAria": "Kontakt bearbeiten",
-      "subscribeAria": "Kontakt abonnieren",
-      "unsubscribeAria": "Kontakt-Abo beenden",
-      "subscriptionSaved": "Abo-Einstellung für den Kontakt gespeichert.",
-      "subscribeFailed": "Kontakt konnte nicht abonniert werden.",
-      "unsubscribeFailed": "Kontakt-Abo konnte nicht beendet werden.",
-      "previewDeleted": "Nachricht gelöscht",
-      "previewAudio": "Sprachnachricht",
-      "previewLocation": "Standortnachricht",
-      "previewExperience": "Erlebnis",
-      "previewMedia": "Mediennachricht"
-    },
+        "editAria": "Kontakt bearbeiten",
+        "subscribeAria": "Kontakt abonnieren",
+        "unsubscribeAria": "Kontakt-Abo beenden",
+        "subscriptionSaved": "Abo-Einstellung für den Kontakt gespeichert.",
+        "subscribeFailed": "Kontakt konnte nicht abonniert werden.",
+        "unsubscribeFailed": "Kontakt-Abo konnte nicht beendet werden.",
+        "previewDeleted": "Nachricht gelöscht",
+        "previewAudio": "Sprachnachricht",
+        "previewLocation": "Standortnachricht",
+        "previewExperience": "Erlebnis",
+        "previewMedia": "Mediennachricht"
+      },
       "profile": {
         "title": "Kontaktprofil",
         "nameLabel": "Kontaktname",
@@ -1317,6 +1317,12 @@
     "speech": {
       "unsupported": "Vorlesen wird in diesem Browser nicht unterstützt.",
       "disabled": "Aktiviere Vorlesen zuerst in den App-Einstellungen."
+    },
+    "qStageWarning": {
+      "title": "Achtung: Q-Stage",
+      "message": "Du nutzt gerade die Q-Stage von MessageDrop. Diese Umgebung dient Tests und kann unfertige Funktionen, Testdaten oder kurzfristige Änderungen enthalten. Wenn du MessageDrop normal nutzen möchtest, öffne bitte die produktive App.",
+      "continue": "Weiter",
+      "openProduction": "MessageDrop öffnen"
     }
   },
   "errors": {
