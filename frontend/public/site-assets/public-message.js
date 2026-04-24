@@ -210,7 +210,7 @@
     if (isQStageHostname(hostname)) {
       return 'https://q.frontend.messagedrop.de';
     }
-    return 'https://messagedrop.de';
+    return 'https://app.messagedrop.de';
   }
 
   function resolveAssetBaseUrl() {
@@ -232,7 +232,7 @@
       return 'http://localhost:3000/p';
     }
 
-    return `${resolveAppBaseUrl()}/p`;
+    return 'https://messagedrop.de/p';
   }
 
   function isQStageHostname(hostname) {

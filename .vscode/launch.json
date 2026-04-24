@@ -188,6 +188,19 @@
             "internalConsoleOptions": "neverOpen"
         },
         {
+            "name": "Build Messagedrop Static",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/platform/messagedrop",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run",
+                "build"
+            ],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
+        },
+        {
             "name": "Build AdminFrontend",
             "type": "node",
             "request": "launch",

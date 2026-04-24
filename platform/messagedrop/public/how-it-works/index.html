@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>MessageDrop | How MessageDrop works</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex,follow">
+  <meta name="theme-color" content="#05a51d">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/site-assets/public-pages.css">
+  <link rel="alternate" hreflang="de" href="https://messagedrop.de/de/so-funktioniert-messagedrop/">
+  <link rel="alternate" hreflang="en" href="https://messagedrop.de/en/how-it-works/">
+  <link rel="alternate" hreflang="x-default" href="https://messagedrop.de/how-it-works/">
+  <script>
+    (function () {
+      const language = ((navigator.languages && navigator.languages[0]) || navigator.language || 'en').toLowerCase();
+      const target = language.startsWith('de') ? '/de/so-funktioniert-messagedrop/' : '/en/how-it-works/';
+      window.location.replace(target + window.location.search + window.location.hash);
+    })();
+  </script>
+</head>
+<body>
+  <div class="page-shell redirect-shell">
+    <section class="content-section">
+      <div class="section-heading">
+        <h1>Choosing language</h1>
+        <p>With JavaScript enabled, the matching language version opens automatically. Without JavaScript, you can choose the version directly below.</p>
+        <p>Mit JavaScript wird automatisch die passende Sprachversion geöffnet. Ohne JavaScript kannst Du die gewünschte Version hier direkt auswählen.</p>
+      </div>
+      <div class="cta-row">
+        <a class="button button-secondary" href="/de/so-funktioniert-messagedrop/">Deutsch öffnen</a>
+        <a class="button button-secondary" href="/en/how-it-works/">Open English</a>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

@@ -10,11 +10,13 @@ const OG_IMAGE_WIDTH = 1024;
 const OG_IMAGE_HEIGHT = 1024;
 const OG_IMAGE_TYPE_PNG = 'image/png';
 const LOCAL_PUBLIC_APP_URL = 'http://localhost:4200';
-const PRODUCTION_PUBLIC_APP_URL = 'https://messagedrop.de';
+const PRODUCTION_PUBLIC_APP_URL = 'https://app.messagedrop.de';
+const PRODUCTION_PUBLIC_SITE_URL = 'https://messagedrop.de';
 const Q_STAGE_PUBLIC_APP_URL = 'https://q.frontend.messagedrop.de';
+const Q_STAGE_PUBLIC_SITE_URL = 'https://q.frontend.messagedrop.de';
 const LOCAL_PUBLIC_SHARE_URL = 'http://localhost:3000/p';
-const PRODUCTION_PUBLIC_SHARE_URL = `${PRODUCTION_PUBLIC_APP_URL}/p`;
-const Q_STAGE_PUBLIC_SHARE_URL = `${Q_STAGE_PUBLIC_APP_URL}/p`;
+const PRODUCTION_PUBLIC_SHARE_URL = `${PRODUCTION_PUBLIC_SITE_URL}/p`;
+const Q_STAGE_PUBLIC_SHARE_URL = `${Q_STAGE_PUBLIC_SITE_URL}/p`;
 const STRINGS = {
   de: {
     heroTitle: 'Öffentliche Nachricht',
@@ -349,7 +351,7 @@ function buildShareHtml(model) {
   html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_COPY_LINK_LABEL__', escapeHtml(initialPageState.copyLinkLabel));
   html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_CONTEXT_TITLE__', escapeHtml(model.strings.contextTitle));
   html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_CONTEXT_BODY__', escapeHtml(model.strings.contextBody));
-  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_CONTEXT_LINK_HREF__', escapeAttribute(resolveWhatIsPageUrl(model.appBaseUrl, model.locale)));
+  html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_CONTEXT_LINK_HREF__', escapeAttribute(resolveWhatIsPageUrl(resolvePublicSiteBaseUrl(), model.locale)));
   html = replaceTemplatePlaceholder(html, '__PUBLIC_MESSAGE_CONTEXT_LINK_LABEL__', escapeHtml(model.strings.moreInfo));
   if (inlineFontCss) {
     html = html.replace(/<\/head>/i, `  <style id="public-message-inline-font">${inlineFontCss}</style>\n</head>`);
@@ -538,7 +540,7 @@ function renderServerMediaIconSvg(type) {
 function buildPublicMessageStructuredData(model) {
   const strings = model.strings || STRINGS[model.locale] || STRINGS.en;
   const canonicalUrl = model.canonicalUrl;
-  const appUrl = normalizeAbsoluteUrl(model.appBaseUrl) || 'https://messagedrop.de';
+  const appUrl = normalizeAbsoluteUrl(model.appBaseUrl) || PRODUCTION_PUBLIC_APP_URL;
   const publisher = {
     '@type': 'Organization',
     name: 'JackTools.Net UG (limited liability)',
@@ -571,8 +573,8 @@ function buildPublicMessageStructuredData(model) {
   };
 }
 
-function resolveWhatIsPageUrl(appBaseUrl, locale) {
-  const baseUrl = normalizeAbsoluteUrl(appBaseUrl) || 'https://messagedrop.de';
+function resolveWhatIsPageUrl(siteBaseUrl, locale) {
+  const baseUrl = normalizeAbsoluteUrl(siteBaseUrl) || PRODUCTION_PUBLIC_SITE_URL;
   if (locale === 'de') {
     return `${baseUrl}/de/was-ist-messagedrop/`;
   }
@@ -1058,6 +1060,10 @@ function buildPublicAppMessageUrl(req, messageUuid) {
   }
 
   return `${appBaseUrl}/?publicMessage=${encodeURIComponent(messageUuid)}`;
+}
+
+function resolvePublicSiteBaseUrl() {
+  return normalizeAbsoluteUrl(process.env.PUBLIC_SITE_URL || process.env.SITE_URL) || PRODUCTION_PUBLIC_SITE_URL;
 }
 
 function resolvePublicAppBaseUrl(req) {

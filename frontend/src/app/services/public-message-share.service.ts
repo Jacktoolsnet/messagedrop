@@ -108,14 +108,14 @@ export class PublicMessageShareService {
   }
 
   private resolvePublicShareBaseUrl(): string {
-    const browserOrigin = this.resolveBrowserOrigin();
-    if (browserOrigin) {
-      return `${browserOrigin}/p`;
+    const configuredShareBaseUrl = String(environment.publicShareBaseUrl || '').trim().replace(/\/+$/, '');
+    if (configuredShareBaseUrl) {
+      return configuredShareBaseUrl;
     }
 
-    const appBaseUrl = this.resolveAppBaseUrl();
-    if (appBaseUrl) {
-      return `${appBaseUrl}/p`;
+    const publicSiteUrl = String(environment.publicSiteUrl || '').trim().replace(/\/+$/, '');
+    if (publicSiteUrl) {
+      return `${publicSiteUrl}/p`;
     }
 
     const apiBaseUrl = String(environment.apiUrl || '').trim().replace(/\/+$/, '');

@@ -4,8 +4,13 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const frontendRoot = path.resolve(__dirname, '..');
-const publicRoot = path.join(frontendRoot, 'public');
+const repoRoot = path.resolve(frontendRoot, '..');
+const platformRoot = path.join(repoRoot, 'platform', 'messagedrop');
+const publicRoot = path.join(platformRoot, 'public');
+const frontendPublicRoot = path.join(frontendRoot, 'public');
+const frontendAssetsRoot = path.join(frontendRoot, 'src', 'assets');
 const baseUrl = 'https://messagedrop.de';
+const appBaseUrl = 'https://app.messagedrop.de';
 const appName = 'MessageDrop';
 const appClaim = 'A global map where people can leave messages in real-world locations.';
 
@@ -802,14 +807,24 @@ function getLocalizedMarketingRoute(locale, pageKey) {
   return page ? localeRoute(locale, page.route) : '/';
 }
 
-const redirectPages = marketingPages.map((page) => ({
-  route: page.route,
-  pageKey: page.pageKey,
-  englishTitle: page.title,
-  germanTitle: germanMarketingByKey.get(page.pageKey)?.title ?? page.title,
-  deHref: getLocalizedMarketingRoute('de', page.pageKey),
-  enHref: getLocalizedMarketingRoute('en', page.pageKey),
-}));
+const redirectPages = [
+  {
+    route: '/',
+    pageKey: 'what-is-messagedrop',
+    englishTitle: appName,
+    germanTitle: appName,
+    deHref: getLocalizedMarketingRoute('de', 'what-is-messagedrop'),
+    enHref: getLocalizedMarketingRoute('en', 'what-is-messagedrop'),
+  },
+  ...marketingPages.map((page) => ({
+    route: page.route,
+    pageKey: page.pageKey,
+    englishTitle: page.title,
+    germanTitle: germanMarketingByKey.get(page.pageKey)?.title ?? page.title,
+    deHref: getLocalizedMarketingRoute('de', page.pageKey),
+    enHref: getLocalizedMarketingRoute('en', page.pageKey),
+  })),
+];
 
 const legacyGermanRedirectPages = marketingPages
   .map((page) => ({
@@ -1035,7 +1050,7 @@ function renderHeader(currentRoute, lang = 'en') {
       <nav class="site-nav" id="site-nav" aria-label="${escapeHtml(ui.primaryNav)}">
         ${renderNav(currentRoute, lang)}
       </nav>
-      <a class="button button-primary button-small site-header-cta" href="/">${escapeHtml(ui.openApp)}</a>
+      <a class="button button-primary button-small site-header-cta" href="${appBaseUrl}/">${escapeHtml(ui.openApp)}</a>
     </header>
   `;
 }
@@ -1155,7 +1170,7 @@ function renderHero(page) {
         ${page.heroText ? `<p class="hero-text">${escapeHtml(page.heroText)}</p>` : ''}
         ${(showPrimaryCta || showLegalCta)
           ? `<div class="cta-row">
-              ${showPrimaryCta ? `<a class="button button-primary" href="/">${escapeHtml(ui.openApp)}</a>` : ''}
+              ${showPrimaryCta ? `<a class="button button-primary" href="${appBaseUrl}/">${escapeHtml(ui.openApp)}</a>` : ''}
               ${showLegalCta ? `<a class="button button-secondary" href="/legal/">${escapeHtml(ui.legalPages)}</a>` : ''}
             </div>`
           : ''}
@@ -3195,7 +3210,44 @@ async function writeRoute(route, html) {
   await fs.writeFile(path.join(outDir, 'index.html'), html, 'utf8');
 }
 
+async function pathExists(filePath) {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function copyRecursive(source, destination) {
+  if (!(await pathExists(source))) {
+    return;
+  }
+
+  const stat = await fs.stat(source);
+  if (stat.isDirectory()) {
+    await ensureDir(destination);
+    const entries = await fs.readdir(source, { withFileTypes: true });
+    for (const entry of entries) {
+      await copyRecursive(path.join(source, entry.name), path.join(destination, entry.name));
+    }
+    return;
+  }
+
+  await ensureDir(path.dirname(destination));
+  await fs.copyFile(source, destination);
+}
+
+async function copyStaticAssets() {
+  await copyRecursive(path.join(frontendPublicRoot, 'favicon.ico'), path.join(publicRoot, 'favicon.ico'));
+  await copyRecursive(path.join(frontendPublicRoot, 'icons'), path.join(publicRoot, 'icons'));
+  await copyRecursive(path.join(frontendAssetsRoot, 'legal'), path.join(publicRoot, 'assets', 'legal'));
+  await copyRecursive(path.join(frontendAssetsRoot, 'fonts'), path.join(publicRoot, 'assets', 'fonts'));
+}
+
 async function writeStaticFiles() {
+  await ensureDir(publicRoot);
+  await copyStaticAssets();
   await ensureDir(path.join(publicRoot, 'site-assets'));
   await fs.writeFile(path.join(publicRoot, 'site-assets', 'public-pages.css'), renderCss(), 'utf8');
   await fs.writeFile(path.join(publicRoot, 'site-assets', 'public-pages.js'), renderPublicUiScript(), 'utf8');
