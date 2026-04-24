@@ -334,18 +334,23 @@ export class AirQualityComponent implements OnInit {
       this.locationName$ = of(this.translation.t('weather.airQuality.title'));
       return;
     }
+    const fallbackPlace = this.getFallbackLocationName(location, 'common.unknown');
     this.locationName$ = this.nominatimService
       .getNominatimPlaceByLocation(location)
       .pipe(
         map(res => {
           const addr = res.nominatimPlace.address;
-          const place = addr?.city || addr?.town || addr?.village || addr?.hamlet || this.translation.t('common.unknown');
+          const place = addr?.city || addr?.town || addr?.village || addr?.hamlet || fallbackPlace;
           const country = addr?.country || '';
           this.locationName = `${place}${country ? ', ' + country : ''}`;
           return this.locationName;
         }),
-        catchError(() => of(this.translation.t('weather.airQuality.title')))
+        catchError(() => of(fallbackPlace))
       );
+  }
+
+  private getFallbackLocationName(location: Location | undefined, translationKey: string): string {
+    return location?.plusCode?.trim() || this.translation.t(translationKey);
   }
 
   getWeatherIcon(key: AirQualityMetricKey): string {

@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { AirQualityData } from '../../interfaces/air-quality-data';
 import { AirQualityTileValue } from '../../interfaces/air-quality-tile-value';
 import { Location } from '../../interfaces/location';
@@ -11,6 +11,7 @@ import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { AirQualityComponent } from './air-quality.component';
 
 describe('AirQualityComponent', () => {
+  let nominatimResult$: Observable<{ nominatimPlace: { address: { city?: string; country?: string } } }>;
   const location: Location = {
     latitude: 52.52,
     longitude: 13.405,
@@ -58,6 +59,15 @@ describe('AirQualityComponent', () => {
   };
 
   beforeEach(async () => {
+    nominatimResult$ = of({
+      nominatimPlace: {
+        address: {
+          city: 'Berlin',
+          country: 'Germany'
+        }
+      }
+    });
+
     await TestBed.configureTestingModule({
       imports: [AirQualityComponent],
       providers: [
@@ -71,14 +81,7 @@ describe('AirQualityComponent', () => {
         {
           provide: NominatimService,
           useValue: {
-            getNominatimPlaceByLocation: () => of({
-              nominatimPlace: {
-                address: {
-                  city: 'Berlin',
-                  country: 'Germany'
-                }
-              }
-            })
+            getNominatimPlaceByLocation: () => nominatimResult$
           }
         },
         {
@@ -106,6 +109,22 @@ describe('AirQualityComponent', () => {
     fixture.detectChanges();
 
     expect(component).toBeTruthy();
+  });
+
+  it('should use the plus code when Nominatim returns no place name', (done) => {
+    nominatimResult$ = of({
+      nominatimPlace: {
+        address: {}
+      }
+    });
+    const fixture = TestBed.createComponent(AirQualityComponent);
+    const component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    component.locationName$?.subscribe((locationName) => {
+      expect(locationName).toBe(location.plusCode);
+      done();
+    });
   });
 
   it('should open the detail view for a zero-valued tile when data exists', () => {

@@ -145,18 +145,22 @@ export class WeatherComponent implements OnInit {
   }
 
   getLocationName(): void {
-    const unknownPlace = this.translation.t('weather.location.unknown');
+    const fallbackPlace = this.getFallbackLocationName(this.location, 'weather.location.unknown');
     this.locationName$ = this.nomatinService
       .getNominatimPlaceByLocation(this.location)
       .pipe(
         map((res: GetNominatimAddressResponse) => {
           const addr = res.nominatimPlace.address;
-          const place = addr?.city || addr?.town || addr?.village || addr?.hamlet || unknownPlace;
+          const place = addr?.city || addr?.town || addr?.village || addr?.hamlet || fallbackPlace;
           const country = addr?.country || '';
           return `${place}${country ? ', ' + country : ''}`;
         }),
-        catchError(() => of(''))
+        catchError(() => of(fallbackPlace))
       );
+  }
+
+  private getFallbackLocationName(location: Location | undefined, translationKey: string): string {
+    return location?.plusCode?.trim() || this.translation.t(translationKey);
   }
 
   private updateTiles(init = false): void {
