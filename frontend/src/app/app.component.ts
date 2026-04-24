@@ -210,6 +210,7 @@ export class AppComponent implements OnInit {
   private lastSharedContentNoticeTimestamp?: string;
   private sharedContentNoticeOpen = false;
   private sharedContentDialogOpen = false;
+  private qStageWarningDialogOpen = false;
   private readonly pendingPublicMessageUuid = signal<string | null>(this.readPendingPublicMessageUuid());
   private initialPublicMessagesRequested = false;
   private openingPublicMessage = false;
@@ -401,6 +402,7 @@ export class AppComponent implements OnInit {
       .subscribe((translation) => {
         const meta = translation?.['common']?.['meta'];
         if (!meta) {
+          this.showQStageWarningIfNeeded();
           return;
         }
 
@@ -432,14 +434,15 @@ export class AppComponent implements OnInit {
       }
     });
     window.history.pushState(this.myHistory, '', '');
+    window.setTimeout(() => this.showQStageWarningIfNeeded(), 800);
   }
 
   private showQStageWarningIfNeeded(): void {
-    if (!this.isQStageHost() || this.wasQStageWarningShown()) {
+    if (!this.isQStageHost() || this.wasQStageWarningShown() || this.qStageWarningDialogOpen) {
       return;
     }
 
-    this.markQStageWarningShown();
+    this.qStageWarningDialogOpen = true;
     const dialogRef = this.dialog.open(DisplayMessage, {
       data: {
         showAlways: true,
@@ -465,6 +468,8 @@ export class AppComponent implements OnInit {
     dialogRef.afterClosed()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((result) => {
+        this.qStageWarningDialogOpen = false;
+        this.markQStageWarningShown();
         if (result === 'secondary') {
           window.location.assign(PRODUCTION_APP_URL);
         }
