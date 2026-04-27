@@ -33,6 +33,90 @@ const {
 } = require('../utils/hashtags');
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const serviceBackendAudience = process.env.SERVICE_JWT_AUDIENCE_BACKEND || process.env.SERVICE_JWT_AUDIENCE || 'service.backend';
+const PUBLIC_MESSAGE_SEARCH_CACHE_TTL_MS = Math.max(
+  0,
+  Number.parseInt(process.env.PUBLIC_MESSAGE_SEARCH_CACHE_TTL_MS || '10000', 10) || 0
+);
+const PUBLIC_MESSAGE_SEARCH_CACHE_MAX = Math.max(
+  0,
+  Number.parseInt(process.env.PUBLIC_MESSAGE_SEARCH_CACHE_MAX || '500', 10) || 0
+);
+const publicMessageSearchCache = new Map();
+
+function isPublicMessageSearchCacheEnabled() {
+  return PUBLIC_MESSAGE_SEARCH_CACHE_TTL_MS > 0 && PUBLIC_MESSAGE_SEARCH_CACHE_MAX > 0;
+}
+
+function buildBoundingBoxCacheKey(latMin, lonMin, latMax, lonMax, dtoMode) {
+  return [
+    dtoMode,
+    latMin,
+    lonMin,
+    latMax,
+    lonMax
+  ].join('|');
+}
+
+function getPublicMessageSearchCache(key) {
+  if (!isPublicMessageSearchCacheEnabled()) {
+    return null;
+  }
+
+  const entry = publicMessageSearchCache.get(key);
+  if (!entry) {
+    return null;
+  }
+
+  if (entry.expiresAt <= Date.now()) {
+    publicMessageSearchCache.delete(key);
+    return null;
+  }
+
+  return entry.payload;
+}
+
+function prunePublicMessageSearchCache(now = Date.now()) {
+  for (const [key, entry] of publicMessageSearchCache.entries()) {
+    if (!entry || entry.expiresAt <= now) {
+      publicMessageSearchCache.delete(key);
+    }
+  }
+}
+
+function setPublicMessageSearchCache(key, payload) {
+  if (!isPublicMessageSearchCacheEnabled()) {
+    return;
+  }
+
+  const now = Date.now();
+  prunePublicMessageSearchCache(now);
+
+  while (publicMessageSearchCache.size >= PUBLIC_MESSAGE_SEARCH_CACHE_MAX) {
+    const oldestKey = publicMessageSearchCache.keys().next().value;
+    if (!oldestKey) {
+      break;
+    }
+    publicMessageSearchCache.delete(oldestKey);
+  }
+
+  publicMessageSearchCache.set(key, {
+    expiresAt: now + PUBLIC_MESSAGE_SEARCH_CACHE_TTL_MS,
+    payload
+  });
+}
+
+function clearPublicMessageSearchCache() {
+  publicMessageSearchCache.clear();
+}
+
+function shouldInvalidatePublicMessageSearchCache(req) {
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+    return true;
+  }
+
+  const path = String(req.path || '');
+  return /^\/(disable|enable|delete|like|dislike)\//.test(path);
+}
 
 function getAuthUserId(req) {
   return req.jwtUser?.userId ?? req.jwtUser?.id ?? null;
@@ -191,7 +275,7 @@ function detectPersonalInformation(text) {
     'se', 'no', 'dk', 'fi', 'pl', 'cz', 'sk', 'hu', 'ro', 'bg', 'hr', 'si', 'gr', 'tr', 'ru', 'ua'
   ]);
   const containsUuidLikeValue = (value) =>
-    /(^|[^0-9a-f])(?:[0-9a-f]{8}[\s\u200B-\u200D\uFEFF._:,;/\\|()\[\]{}#*+=~"'`-]*[0-9a-f]{4}[\s\u200B-\u200D\uFEFF._:,;/\\|()\[\]{}#*+=~"'`-]*[1-8][0-9a-f]{3}[\s\u200B-\u200D\uFEFF._:,;/\\|()\[\]{}#*+=~"'`-]*[89ab][0-9a-f]{3}[\s\u200B-\u200D\uFEFF._:,;/\\|()\[\]{}#*+=~"'`-]*[0-9a-f]{12})([^0-9a-f]|$)/i
+    /(^|[^0-9a-f])(?:[0-9a-f]{8}[\s\u200B-\u200D\uFEFF._:,;/\\|()[\]{}#*+=~"'`-]*[0-9a-f]{4}[\s\u200B-\u200D\uFEFF._:,;/\\|()[\]{}#*+=~"'`-]*[1-8][0-9a-f]{3}[\s\u200B-\u200D\uFEFF._:,;/\\|()[\]{}#*+=~"'`-]*[89ab][0-9a-f]{3}[\s\u200B-\u200D\uFEFF._:,;/\\|()[\]{}#*+=~"'`-]*[0-9a-f]{12})([^0-9a-f]|$)/i
       .test(value);
   const normalizedTokenText = String(text ?? '')
     .toLowerCase()
@@ -202,9 +286,9 @@ function detectPersonalInformation(text) {
 
   const normalizedObfuscatedText = String(text ?? '')
     .toLowerCase()
-    .replace(/[\(\[\{]\s*at\s*[\)\]\}]/g, ' @ ')
+    .replace(/[([{]\s*at\s*[)\]}]/g, ' @ ')
     .replace(/\bat\b/g, ' @ ')
-    .replace(/[\(\[\{]\s*(dot|punkt)\s*[\)\]\}]/g, ' . ')
+    .replace(/[([{]\s*(dot|punkt)\s*[)\]}]/g, ' . ')
     .replace(/\b(dot|punkt)\b/g, ' . ')
     .replace(/[#]+/g, ' ')
     .replace(/[()[\]{};,]+/g, ' ')
@@ -744,6 +828,13 @@ function sendPublicMessagesByBoundingBox(req, res, next) {
   }
 
   const isRequestFinished = createRequestAbortGuard(req, res);
+  const cacheKey = buildBoundingBoxCacheKey(latMin, lonMin, latMax, lonMax, 'public');
+  const cachedPayload = getPublicMessageSearchCache(cacheKey);
+  if (cachedPayload) {
+    res.set('X-Message-Search-Cache', 'HIT');
+    return res.status(200).json(cachedPayload);
+  }
+  res.set('X-Message-Search-Cache', 'MISS');
 
   tableMessage.getByBoundingBox(
     req.database.db,
@@ -757,6 +848,7 @@ function sendPublicMessagesByBoundingBox(req, res, next) {
       }
       response.rows = toPublicMessageDtos(rows);
       response.status = 200;
+      setPublicMessageSearchCache(cacheKey, response);
       return res.status(200).json(response);
     }
   );
@@ -858,6 +950,14 @@ function sendLegacyMessagesByBoundingBox(req, res, next) {
   }
 
   const isRequestFinished = createRequestAbortGuard(req, res);
+  const dtoMode = hasServiceAccess(req) ? 'internal' : 'public';
+  const cacheKey = buildBoundingBoxCacheKey(latMin, lonMin, latMax, lonMax, dtoMode);
+  const cachedPayload = getPublicMessageSearchCache(cacheKey);
+  if (cachedPayload) {
+    res.set('X-Message-Search-Cache', 'HIT');
+    return res.status(200).json(cachedPayload);
+  }
+  res.set('X-Message-Search-Cache', 'MISS');
 
   tableMessage.getByBoundingBox(
     req.database.db,
@@ -871,10 +971,24 @@ function sendLegacyMessagesByBoundingBox(req, res, next) {
       }
       response.rows = hasServiceAccess(req) ? toInternalMessageDtos(rows) : toPublicMessageDtos(rows);
       response.status = 200;
+      setPublicMessageSearchCache(cacheKey, response);
       return res.status(200).json(response);
     }
   );
 }
+
+router.use((req, res, next) => {
+  if (!shouldInvalidatePublicMessageSearchCache(req)) {
+    return next();
+  }
+
+  res.once('finish', () => {
+    if (res.statusCode < 400) {
+      clearPublicMessageSearchCache();
+    }
+  });
+  return next();
+});
 
 router.get('/public/uuid/:messageUuid', sendPublicMessageByUuid);
 
