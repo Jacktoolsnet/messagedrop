@@ -4,6 +4,7 @@ const compression = require('compression');
 const bearerToken = require('express-bearer-token');
 const databaseMw = require('./middleware/database');
 const loggerMw = require('./middleware/logger');
+const slowRequestMw = require('./middleware/slow-request');
 const traceId = require('./middleware/trace-id');
 const headerMW = require('./middleware/header')
 const Database = require('./db/database');
@@ -288,6 +289,7 @@ app.use(cors(corsOptions))
 
 app.use(databaseMw(database));
 app.use(loggerMw(logger));
+app.use(slowRequestMw());
 app.use(headerMW())
 app.use(normalizeErrorResponses);
 app.use(maintenanceMode());
