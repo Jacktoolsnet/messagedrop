@@ -703,6 +703,22 @@ function sendPublicMessagesByPlusCode(req, res, next) {
   });
 }
 
+function createRequestAbortGuard(req, res) {
+  let aborted = false;
+  const markAborted = () => {
+    aborted = true;
+  };
+
+  req.once('aborted', markAborted);
+  res.once('close', () => {
+    if (!res.writableEnded) {
+      markAborted();
+    }
+  });
+
+  return () => aborted || Boolean(req.aborted) || res.destroyed || res.writableEnded;
+}
+
 function sendPublicMessagesByBoundingBox(req, res, next) {
   const response = { status: 0, rows: [] };
 
@@ -727,10 +743,15 @@ function sendPublicMessagesByBoundingBox(req, res, next) {
     return next(apiError.badRequest('invalid_bounding_box'));
   }
 
+  const isRequestFinished = createRequestAbortGuard(req, res);
+
   tableMessage.getByBoundingBox(
     req.database.db,
     latMin, lonMin, latMax, lonMax,
     (err, rows) => {
+      if (isRequestFinished()) {
+        return;
+      }
       if (err) {
         return next(apiError.internal('db_error'));
       }
@@ -836,10 +857,15 @@ function sendLegacyMessagesByBoundingBox(req, res, next) {
     return next(apiError.badRequest('invalid_bounding_box'));
   }
 
+  const isRequestFinished = createRequestAbortGuard(req, res);
+
   tableMessage.getByBoundingBox(
     req.database.db,
     latMin, lonMin, latMax, lonMax,
     (err, rows) => {
+      if (isRequestFinished()) {
+        return;
+      }
       if (err) {
         return next(apiError.internal('db_error'));
       }

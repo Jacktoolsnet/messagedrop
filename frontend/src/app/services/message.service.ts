@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable, Injector, signal, WritableSignal } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { catchError, firstValueFrom, forkJoin, from, map, Observable, of, switchMap, throwError } from 'rxjs';
+import { catchError, firstValueFrom, forkJoin, from, map, Observable, of, Subscription, switchMap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { DisplayMessage } from '../components/utils/display-message/display-message.component';
 import { BoundingBox } from '../interfaces/bounding-box';
@@ -64,6 +64,7 @@ export class MessageService {
 
   private commentCounts: Record<string, number> = {};
   private publicMessageFetchToken = 0;
+  private publicMessageSearchSubscription?: Subscription;
 
   private lastSearchedLocation = '';
 
@@ -1237,6 +1238,9 @@ export class MessageService {
 
   getByVisibleMapBoundingBox(showAlways = false) {
     const fetchToken = ++this.publicMessageFetchToken;
+    this.publicMessageSearchSubscription?.unsubscribe();
+    this.publicMessageSearchSubscription = undefined;
+
     const boundingBoxes = this.mapService.getVisibleMapBoundingBoxes();
     if (boundingBoxes.length === 0) {
       if (fetchToken !== this.publicMessageFetchToken) {
@@ -1253,7 +1257,7 @@ export class MessageService {
       )
     );
 
-    forkJoin(requests).subscribe({
+    const searchSubscription = forkJoin(requests).subscribe({
       next: (responses) => {
         if (fetchToken !== this.publicMessageFetchToken) {
           return;
@@ -1292,6 +1296,12 @@ export class MessageService {
         );
         this.setMessages([]);
         this._messageSet.update(trigger => trigger + 1);
+      }
+    });
+    this.publicMessageSearchSubscription = searchSubscription;
+    searchSubscription.add(() => {
+      if (this.publicMessageSearchSubscription === searchSubscription) {
+        this.publicMessageSearchSubscription = undefined;
       }
     });
   }
