@@ -1331,6 +1331,7 @@
     "unauthorized": "Vous devez vous connecter pour continuer.",
     "rateLimit": "Trop de requêtes. Veuillez patienter puis réessayer.",
     "maintenance": "Le service est en mode maintenance.",
+    "databaseBusy": "Le serveur est momentanément très sollicité. Veuillez patienter un instant puis réessayer.",
     "offline": {
       "title": "Pas de connexion Internet",
       "message": "Veuillez vérifier votre connexion Internet."

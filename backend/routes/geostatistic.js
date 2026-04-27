@@ -8,9 +8,14 @@ const tableWeatherHistory = require('../db/tableWeatherHistory');
 const metric = require('../middleware/metric');
 const { apiError } = require('../middleware/api-error');
 
+const EXTERNAL_TIMEOUT_MS = Number.parseInt(process.env.GEOSTATISTIC_EXTERNAL_TIMEOUT_MS || '5000', 10);
+const externalClient = axios.create({
+    timeout: Number.isFinite(EXTERNAL_TIMEOUT_MS) && EXTERNAL_TIMEOUT_MS > 0 ? EXTERNAL_TIMEOUT_MS : 5000
+});
+
 async function getWorldBankIndicator(countryAlpha3, indicator, years) {
     const url = `http://api.worldbank.org/v2/country/${countryAlpha3}/indicator/${indicator}?format=json&per_page=${years}`;
-    const response = await axios.get(url);
+    const response = await externalClient.get(url);
     const dataArray = response.data[1];
     if (!Array.isArray(dataArray)) return [];
     return dataArray
@@ -54,7 +59,7 @@ router.get('/:pluscode/:latitude/:longitude/:years',
             }
 
             if (!countryData || !worldBankData) {
-                const restCountriesResponse = await axios.get(`https://restcountries.com/v3.1/alpha/${countryAlpha2}`);
+                const restCountriesResponse = await externalClient.get(`https://restcountries.com/v3.1/alpha/${countryAlpha2}`);
                 countryData = restCountriesResponse.data[0];
                 const countryAlpha3 = countryData.cca3;
                 if (!countryAlpha3) throw new Error('Alpha-3 country code not found');
@@ -170,7 +175,7 @@ router.get('/:pluscode/:latitude/:longitude/:years',
                 const endDate = new Date();
                 const startDate = new Date();
                 startDate.setFullYear(endDate.getFullYear() - years);
-                const weatherRes = await axios.get('https://archive-api.open-meteo.com/v1/archive', {
+                const weatherRes = await externalClient.get('https://archive-api.open-meteo.com/v1/archive', {
                     params: {
                         latitude,
                         longitude,

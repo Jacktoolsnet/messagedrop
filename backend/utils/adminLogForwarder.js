@@ -62,9 +62,15 @@ function formatDetail(meta) {
 }
 
 function createForwarder({ baseUrl, token, audience, source }) {
-  if (!baseUrl) {
+  if (!baseUrl || process.env.FORWARD_BACKEND_LOGS === 'false') {
     return () => { /* disabled */ };
   }
+
+  const maxQueueSize = Math.max(0, Number.parseInt(process.env.LOG_FORWARD_MAX_QUEUE || '200', 10) || 200);
+  const maxConcurrency = Math.max(1, Number.parseInt(process.env.LOG_FORWARD_CONCURRENCY || '2', 10) || 2);
+  const queue = [];
+  let active = 0;
+
   const post = async (path, payload) => {
     try {
       let authHeader = null;
@@ -84,23 +90,49 @@ function createForwarder({ baseUrl, token, audience, source }) {
     }
   };
 
+  const drainQueue = () => {
+    while (active < maxConcurrency && queue.length) {
+      const job = queue.shift();
+      active += 1;
+      setImmediate(async () => {
+        try {
+          await job();
+        } finally {
+          active -= 1;
+          drainQueue();
+        }
+      });
+    }
+  };
+
+  const enqueue = (job) => {
+    if (queue.length >= maxQueueSize) {
+      return false;
+    }
+    queue.push(job);
+    drainQueue();
+    return true;
+  };
+
   return (level, message, meta) => {
-    const file = getCallerFile();
-    const detail = formatDetail(meta);
-    const body = {
-      source: source || 'backend',
-      file,
-      message: typeof message === 'string' ? message : safeStringify(message),
-      detail,
-      createdAt: Date.now()
-    };
-    if (level === 'error') {
-      return post('/error-log', body);
-    }
-    if (level === 'warn') {
-      return post('/warn-log', body);
-    }
-    return post('/info-log', body);
+    enqueue(async () => {
+      const file = getCallerFile();
+      const detail = formatDetail(meta);
+      const body = {
+        source: source || 'backend',
+        file,
+        message: typeof message === 'string' ? message : safeStringify(message),
+        detail,
+        createdAt: Date.now()
+      };
+      if (level === 'error') {
+        return post('/error-log', body);
+      }
+      if (level === 'warn') {
+        return post('/warn-log', body);
+      }
+      return post('/info-log', body);
+    });
   };
 }
 

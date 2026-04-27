@@ -1331,6 +1331,7 @@
     "unauthorized": "Necesitas iniciar sesión para continuar.",
     "rateLimit": "Demasiadas solicitudes. Por favor espera e inténtalo de nuevo.",
     "maintenance": "El servicio está en modo de mantenimiento.",
+    "databaseBusy": "El servidor está muy ocupado en este momento. Espera un momento e inténtalo de nuevo.",
     "offline": {
       "title": "Sin conexión a internet",
       "message": "Por favor, comprueba tu conexión a internet."

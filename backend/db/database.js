@@ -17,12 +17,33 @@ const tableMaintenance = require('./tableMaintenance');
 const tableUsageProtection = require('./tableUsageProtection');
 const tableUserModerationAppeal = require('./tableUserModerationAppeal');
 
+const DEFAULT_MAX_PENDING_REQUESTS = 1000;
+
+function resolveMaxPendingRequests(rawValue) {
+  const parsed = Number.parseInt(String(rawValue ?? ''), 10);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return DEFAULT_MAX_PENDING_REQUESTS;
+  }
+  return parsed;
+}
+
+function createQueueOverloadedError(pendingCount, maxPendingRequests) {
+  const error = new Error('Database queue overloaded');
+  error.code = 'DB_QUEUE_OVERLOADED';
+  error.status = 503;
+  error.statusCode = 503;
+  error.errorCode = 'SERVICE_UNAVAILABLE';
+  error.detail = { pendingCount, maxPendingRequests };
+  return error;
+}
+
 class SqliteCompat {
   constructor(filePath, logger = console) {
     this._logger = logger ?? console;
     this._requestId = 0;
     this._pending = new Map();
     this._closed = false;
+    this._maxPendingRequests = resolveMaxPendingRequests(process.env.DB_MAX_PENDING_REQUESTS);
 
     this._worker = new Worker(path.join(__dirname, 'sqlite-worker.js'), {
       workerData: { filePath }
@@ -123,6 +144,14 @@ class SqliteCompat {
       return;
     }
 
+    if (action !== 'close' && this.isOverloaded()) {
+      this._safeInvokeCallback(
+        callback,
+        createQueueOverloadedError(this._pending.size, this._maxPendingRequests)
+      );
+      return;
+    }
+
     const id = ++this._requestId;
     this._pending.set(id, { action, callback });
     try {
@@ -192,6 +221,18 @@ class SqliteCompat {
         this._safeInvokeCallback(callback, null);
       }
     };
+  }
+
+  pendingCount() {
+    return this._pending.size;
+  }
+
+  maxPendingRequests() {
+    return this._maxPendingRequests;
+  }
+
+  isOverloaded() {
+    return this._pending.size >= this._maxPendingRequests;
   }
 
   serialize(fn) {
@@ -295,6 +336,20 @@ class Database {
       this.logger?.error?.(err?.message || err);
     }
   };
+
+  pendingCount() {
+    return typeof this.db?.pendingCount === 'function' ? this.db.pendingCount() : 0;
+  }
+
+  maxPendingRequests() {
+    return typeof this.db?.maxPendingRequests === 'function'
+      ? this.db.maxPendingRequests()
+      : DEFAULT_MAX_PENDING_REQUESTS;
+  }
+
+  isOverloaded() {
+    return typeof this.db?.isOverloaded === 'function' ? this.db.isOverloaded() : false;
+  }
 
   initTriggers(logger = this.logger) {
     const triggers = `

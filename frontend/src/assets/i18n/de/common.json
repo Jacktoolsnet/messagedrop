@@ -1331,6 +1331,7 @@
     "unauthorized": "Bitte melde dich an, um fortzufahren.",
     "rateLimit": "Zu viele Anfragen. Bitte warte kurz und versuche es erneut.",
     "maintenance": "Der Dienst befindet sich im Wartungsmodus.",
+    "databaseBusy": "Der Server ist gerade stark ausgelastet. Bitte warte einen Moment und versuche es erneut.",
     "offline": {
       "title": "Keine Internetverbindung",
       "message": "Bitte überprüfe deine Internetverbindung."

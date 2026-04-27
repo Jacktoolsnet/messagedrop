@@ -26,7 +26,8 @@ const ERROR_MESSAGE_TO_KEY: Record<string, string> = {
   user_blocked_for_posting: 'common.message.postingBlocked',
   user_account_blocked: 'common.user.blocked.message',
   message_locked_by_moderation: 'common.message.moderationRejected',
-  message_rejected_by_moderation: 'common.message.moderationRejected'
+  message_rejected_by_moderation: 'common.message.moderationRejected',
+  database_busy: 'errors.databaseBusy'
 };
 
 @Injectable({ providedIn: 'root' })
