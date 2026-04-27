@@ -1450,9 +1450,7 @@ export class MessageService {
       return of({ exists: false, status: 400, published: false, messageStatus: null });
     }
 
-    const headers = this.httpOptions.headers
-      .set('x-skip-ui', 'true')
-      .set('x-skip-backend-status', 'true');
+    const headers = this.buildQuietLookupHeaders();
 
     if (!this.hasAuthenticatedUser()) {
       return this.verifyMessageAtUrl<PublicMessageRow>(
