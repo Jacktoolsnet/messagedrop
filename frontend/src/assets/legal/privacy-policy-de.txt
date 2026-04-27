@@ -32,7 +32,7 @@ Private Chatnachrichten werden Ende-zu-Ende-verschlüsselt übertragen und sind 
 
 Externe Einbettungen (z. B. YouTube, TikTok, Pinterest, Spotify, Tenor, Unsplash) werden nur nach aktiver, anbieterbezogener Entscheidung des Nutzers geladen. Eine pauschale Zustimmung für alle Anbieter ist nicht vorgesehen.
 
-Davon zu unterscheiden sind externe Funktionsdienste (z. B. Open-Meteo, OpenStreetMap/Nominatim, DeepL, Viator), die bei aktiver Nutzung der jeweiligen Funktion verwendet werden und nicht über den Externe-Inhalte-Toggle freigeschaltet werden.
+Davon zu unterscheiden sind externe Funktionsdienste sowie Lizenz- und Asset-Anbieter (z. B. Open-Meteo, OpenStreetMap/Nominatim, DeepL, Viator, Flaticon / Freepik), die bei aktiver Nutzung der jeweiligen Funktion oder zur Bereitstellung lizenzierter Inhalte verwendet werden und nicht über den Externe-Inhalte-Toggle freigeschaltet werden.
 
 Wenn Unsplash-Bilder ausgewählt werden, können Bilddateien geladen, auf das Endgerät heruntergeladen und lokal gespeichert werden.
 
@@ -249,13 +249,16 @@ Für einzelne Funktionen nutzt MessageDrop externe Informations- und API-Dienste
 - Open-Meteo (Wetter- und Luftqualitätsdaten),
 - DeepL (Übersetzungen),
 - Nominatim / OpenStreetMap (Suche, Geokodierung, Kartenbezug),
-- Viator (Erlebnis-/Aktivitätsdaten).
+- Viator (Erlebnis-/Aktivitätsdaten),
+- Flaticon / Freepik Company S.L.U. (lizenzierte Sticker und vergleichbare grafische Elemente).
 
 Bei Nutzung dieser Funktionen können – abhängig vom jeweiligen Anwendungsfall – insbesondere Suchbegriffe, Sprach- und Ländereinstellungen, Ziel-/Ort-Parameter, Datums- und Preisfilter, technische Verbindungsdaten sowie ggf. Referenz-URLs verarbeitet werden. Die Kommunikation mit Drittanbietern erfolgt, soweit technisch vorgesehen, über unsere Server oder direkt aus dem Endgerät.
 
 Für die Übersetzungsfunktion kann der Nutzer nach eigener Wahl entweder den von uns bereitgestellten DeepL-Zugang oder einen eigenen DeepL-API-Key verwenden. Ein vom Nutzer hinterlegter eigener DeepL-API-Key wird lokal im verschlüsselten Nutzerdatensatz auf dem Endgerät gespeichert. Wenn der Nutzer eine Übersetzung ausführt oder den Key prüft, wird dieser Key für die Bearbeitung der jeweiligen Anfrage an unser Backend übermittelt und gegenüber DeepL verwendet. Eine dauerhafte serverseitige Speicherung eines vom Nutzer bereitgestellten DeepL-API-Keys erfolgt nach dem aktuellen technischen Stand nicht.
 
 Für diese Funktionsdienste besteht kein separater Externe-Inhalte-Toggle. Sie werden nur genutzt, wenn der Nutzer die jeweilige Funktion aktiv verwendet.
+
+Sticker und vergleichbare grafische Elemente von Flaticon / Freepik werden nach aktuellem technischen Stand nicht als externe Einbettung von Flaticon im Endgerät des Nutzers geladen, sondern über die von MessageDrop bereitgestellte Sticker-Funktion bzw. unsere Systeme ausgeliefert. Dabei werden die für die Nutzung erforderlichen technischen Daten gegenüber MessageDrop verarbeitet. Soweit im Einzelfall Flaticon-/Freepik-Quellen, Lizenzinformationen oder externe Links aufgerufen werden, kann eine Datenverarbeitung durch Flaticon / Freepik in eigener Verantwortung erfolgen.
 
 Wenn der Nutzer den Anbieter Unsplash gemäß Abschnitt 2.3 aktiviert hat, kann – je nach Funktion – zusätzlich zum Abruf von Metadaten auch ein Download von Bilddateien erfolgen (z. B. für Avatar-/Hintergrundbilder). Dabei können Bilddateien auf das Endgerät heruntergeladen und lokal gespeichert werden. Zusätzlich kann ein technischer Download-Nachweis an Unsplash übermittelt werden.
 
@@ -265,6 +268,9 @@ Weiterführende Informationen zu den Anbietern sind über deren jeweilige Websit
 - OpenStreetMap / Nominatim: https://www.openstreetmap.org/
 - Viator: https://www.viator.com/
 - Unsplash: https://unsplash.com/
+- Flaticon: https://www.flaticon.com/
+- Flaticon Nutzungsbedingungen: https://www.flaticon.com/legal
+- Freepik / Flaticon Datenschutzerklärung: https://www.freepik.com/legal/privacy/
 
 Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Bereitstellung der vom Nutzer angeforderten Funktion) sowie Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an nutzerfreundlicher, funktionsfähiger Bereitstellung).
 

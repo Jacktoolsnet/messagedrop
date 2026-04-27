@@ -252,13 +252,16 @@ For certain functions, MessageDrop uses external information and API services th
 - Open-Meteo (weather and air quality data),
 - DeepL (translations),
 - Nominatim / OpenStreetMap (search, geocoding, map reference),
-- Viator (experience and activity data).
+- Viator (experience and activity data),
+- Flaticon / Freepik Company S.L.U. (licensed stickers and comparable graphic elements).
 
 When using these functions, depending on the specific use case, search terms, language and country settings, destination/location parameters, date and price filters, technical connection data, and, where applicable, reference URLs may be processed. Communication with third-party providers takes place, where technically implemented, via our servers or directly from the device.
 
 For the translation function, the user may choose either the DeepL access provided by us or their own DeepL API key. A user-provided DeepL API key is stored locally in the encrypted user record on the device. When the user performs a translation or validates the key, that key is transmitted to our backend for processing of the respective request and used with DeepL. According to the current technical design, a user-provided DeepL API key is not stored permanently on the server.
 
 There is no separate external content toggle for these functional services. They are only used when the user actively uses the respective function.
+
+According to the current technical design, stickers and comparable graphic elements from Flaticon / Freepik are not loaded as external Flaticon embeds on the user’s device, but are delivered via the MessageDrop sticker function and our systems. The technical data required for use is processed by MessageDrop. If Flaticon / Freepik source pages, license information, or external links are accessed in an individual case, Flaticon / Freepik may process data under its own responsibility.
 
 If the user has activated the provider Unsplash in accordance with Section 2.3, depending on the function, image files may be downloaded in addition to retrieving metadata (e.g., for avatar/background images). In this process, image files may be downloaded to the device and stored locally. In addition, technical proof of download may be transmitted to Unsplash.
 
@@ -268,6 +271,9 @@ Further information about the providers is available on their respective website
 - OpenStreetMap / Nominatim: https://www.openstreetmap.org/
 - Viator: https://www.viator.com/
 - Unsplash: https://unsplash.com/
+- Flaticon: https://www.flaticon.com/
+- Flaticon Terms of Use: https://www.flaticon.com/legal
+- Freepik / Flaticon Privacy Policy: https://www.freepik.com/legal/privacy/
 
 The legal basis is Art. 6(1)(b) GDPR (provision of the function requested by the user) and Art. 6(1)(f) GDPR (legitimate interest in user-friendly, functional provision).
 

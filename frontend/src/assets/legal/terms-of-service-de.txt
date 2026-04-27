@@ -24,7 +24,7 @@ Kurzfassung (vereinfacht, nicht rechtsverbindlich)
 - Für Übersetzungen kannst Du optional Deinen eigenen DeepL-API-Key verwenden. Für Beschaffung, Geheimhaltung, Gültigkeit, Abrechnung, Quoten und die Einhaltung der Bedingungen von DeepL bist Du selbst verantwortlich.
 - Der optionale Nutzungszeit-Schutz (Selbstbeschränkung/Elternmodus mit Eltern-PIN) kann technisch umgangen werden; eine absolute Sperre ist nicht garantiert.
 - Externe Inhalte von Drittanbietern werden erst nach Deiner anbieterbezogenen Zustimmung geladen. Diese Zustimmung kannst Du jederzeit wieder zurücknehmen.
-- Externe Dienste (z. B. YouTube, OpenStreetMap, DeepL, Unsplash, Viator) haben eigene Nutzungs- und Datenschutzbedingungen.
+- Externe Dienste und Lizenzanbieter (z. B. YouTube, OpenStreetMap, DeepL, Unsplash, Viator, Flaticon / Freepik) haben eigene Nutzungs- und Datenschutzbedingungen.
 - MessageDrop ist kein Notfalldienst.
 
 Maßgeblich ist nur die vollständige Fassung unten.
@@ -334,8 +334,9 @@ Folgende externe Funktions- und Informationsdienste werden nicht über den „Ex
 - OpenStreetMap / Nominatim
 - DeepL
 - Viator
+- Flaticon / Freepik Company S.L.U. (Sticker-/Asset- und Lizenzanbieter)
 
-Diese Dienste werden genutzt, wenn Du die jeweilige Funktion aktiv verwendest (z. B. Wetterabfrage, Karten-/Ortsbezug, Übersetzung oder Erlebnissuche).
+Diese Dienste werden genutzt, wenn Du die jeweilige Funktion aktiv verwendest (z. B. Wetterabfrage, Karten-/Ortsbezug, Übersetzung, Erlebnissuche oder Sticker-Nutzung) oder soweit dies zur Bereitstellung lizenzierter Inhalte erforderlich ist.
 
 Für die Übersetzungsfunktion kannst Du nach eigener Wahl statt des von uns bereitgestellten Zugangs auch einen eigenen DeepL-API-Key hinterlegen und verwenden. Dieser Key wird nach dem aktuellen technischen Stand lokal auf Deinem Endgerät gespeichert und für die jeweilige Übersetzungs- oder Prüf-Anfrage verwendet.
 
@@ -414,7 +415,7 @@ Damit wir den Dienst betreiben können, räumst Du uns die nötigen Nutzungsrech
 
 Alle Rechte an der App selbst (Software, Design, Marken) liegen bei uns oder unseren Lizenzgebern.
 
-Ein Teil der in MessageDrop bereitgestellten Sticker und vergleichbaren grafischen Elemente stammt von Drittanbietern und ist für MessageDrop lizenziert, insbesondere von Flaticon / Freepik Company S.L.U.
+Ein Teil der in MessageDrop bereitgestellten Sticker und vergleichbaren grafischen Elemente stammt von Drittanbietern und ist für MessageDrop lizenziert, insbesondere von Flaticon / Freepik Company S.L.U. Für Flaticon / Freepik gelten ergänzend die jeweils aktuellen Bedingungen und Datenschutzinformationen des Anbieters, abrufbar unter https://www.flaticon.com/legal und https://www.freepik.com/legal/privacy/.
 
 Diese Sticker dürfen ausschließlich innerhalb von MessageDrop im Rahmen der dafür vorgesehenen Funktionen verwendet werden.
 
