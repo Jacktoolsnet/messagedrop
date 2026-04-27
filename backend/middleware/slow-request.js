@@ -60,12 +60,15 @@ function createSlowRequestMiddleware(options = {}) {
     options.maxPerMinute ?? process.env.SLOW_REQUEST_LOG_MAX_PER_MINUTE,
     60
   );
+  const category = typeof options.category === 'string' ? options.category.trim() : '';
+  const upstream = typeof options.upstream === 'string' ? options.upstream.trim() : '';
   const limiter = createMinuteLimiter(maxPerMinute);
 
   return function slowRequestMiddleware(req, res, next) {
-    if (!enabled) {
+    if (!enabled || req.slowRequestMiddlewareAttached) {
       return next();
     }
+    req.slowRequestMiddlewareAttached = true;
 
     const startedAt = process.hrtime.bigint();
     let logged = false;
@@ -90,7 +93,7 @@ function createSlowRequestMiddleware(options = {}) {
       const userId = req.jwtUser?.userId ?? req.jwtUser?.id;
       const cacheHeader = res.getHeader('X-Message-Search-Cache');
       const route = getRoutePattern(req);
-      const path = req.path || req.originalUrl || req.url;
+      const path = req.path || req.originalUrl || req.url || '';
       const message = `Slow request ${req.method} ${route || path || ''} ${durationMs}ms`.trim();
       req.logger?.warn?.(message, {
         traceId: req.traceId || res.locals?.traceId,
@@ -100,6 +103,8 @@ function createSlowRequestMiddleware(options = {}) {
         status: aborted ? 499 : res.statusCode,
         durationMs,
         thresholdMs,
+        slowRequestCategory: category || undefined,
+        upstream: upstream || undefined,
         aborted,
         userId: userId || undefined,
         messageSearchCache: typeof cacheHeader === 'string' ? cacheHeader : undefined,

@@ -289,7 +289,6 @@ app.use(cors(corsOptions))
 
 app.use(databaseMw(database));
 app.use(loggerMw(logger));
-app.use(slowRequestMw());
 app.use(headerMW())
 app.use(normalizeErrorResponses);
 app.use(maintenanceMode());
@@ -521,36 +520,49 @@ const frontendErrorLogLimit = rateLimit({
   message: rateLimitMessage('Too many log requests, please slow down.')
 });
 
+const slowRequestDefault = slowRequestMw();
+const slowRequestOpenAiModeration = slowRequestMw({
+  thresholdMs: process.env.SLOW_REQUEST_MESSAGE_CREATE_THRESHOLD_MS || 3000,
+  category: 'external-api',
+  upstream: 'openai-moderation'
+});
+const slowRequestNominatim = slowRequestMw({
+  thresholdMs: process.env.SLOW_REQUEST_NOMINATIM_THRESHOLD_MS || 3000,
+  category: 'external-api',
+  upstream: 'nominatim'
+});
+
 // ROUTES
-app.get('/', basicLimit, root);
-app.use('/health', basicLimit, health);
-app.use('/airquality', airQualtiyLimit, airQualtiy);
-app.use('/check', basicLimit, check);
-app.use('/clientconnect', clientConnectLimit, clientConnect);
-app.use('/connect', connectLimit, connect);
-app.use('/contact', contactLimit, contact);
-app.use('/contactMessage', contactMessageLimit, contactMessage);
-app.use('/contactProfile', contactLimit, contactProfile);
-app.use('/digitalserviceact', digitalServiceAct);
-app.use('/dsa', dsaStatusLimit, dsaStatus);
-app.use('/geostatistic', geoStatisticLimit, geoStatistic);
-app.use('/message', messageLimit, message);
-app.use('/moderation', basicLimit, moderation);
-app.use('/notification', notificationLimit, notification);
-app.use('/nominatim', nominatimLimit, nominatim);
-app.use('/viator', viatorLimit, viator);
-app.use('/openai', openAiLimit, openAi);
-app.use('/place', placeLimit, place);
-app.use('/p', basicLimit, publicShare);
-app.use('/tenor', tenorLimit, tenor);
-app.use('/stickers', stickerLimit, sticker);
-app.use('/unsplash', unsplashLimit, unsplash);
-app.use('/translate', translateLimit, translate);
-app.use('/user', userLimit, user);
-app.use('/utils', utilsLimit, utils);
-app.use('/weather', weatherLimit, weather);
-app.use('/frontend-error-log', frontendErrorLogLimit, frontendErrorLog);
-app.use('/maintenance', basicLimit, maintenance);
+app.get('/', basicLimit, slowRequestDefault, root);
+app.use('/health', basicLimit, slowRequestDefault, health);
+app.use('/airquality', airQualtiyLimit, slowRequestDefault, airQualtiy);
+app.use('/check', basicLimit, slowRequestDefault, check);
+app.use('/clientconnect', clientConnectLimit, slowRequestDefault, clientConnect);
+app.use('/connect', connectLimit, slowRequestDefault, connect);
+app.use('/contact', contactLimit, slowRequestDefault, contact);
+app.use('/contactMessage', contactMessageLimit, slowRequestDefault, contactMessage);
+app.use('/contactProfile', contactLimit, slowRequestDefault, contactProfile);
+app.use('/digitalserviceact', slowRequestDefault, digitalServiceAct);
+app.use('/dsa', dsaStatusLimit, slowRequestDefault, dsaStatus);
+app.use('/geostatistic', geoStatisticLimit, slowRequestDefault, geoStatistic);
+app.use('/message/create', slowRequestOpenAiModeration);
+app.use('/message', messageLimit, slowRequestDefault, message);
+app.use('/moderation', basicLimit, slowRequestDefault, moderation);
+app.use('/notification', notificationLimit, slowRequestDefault, notification);
+app.use('/nominatim', nominatimLimit, slowRequestNominatim, nominatim);
+app.use('/viator', viatorLimit, slowRequestDefault, viator);
+app.use('/openai', openAiLimit, slowRequestDefault, openAi);
+app.use('/place', placeLimit, slowRequestDefault, place);
+app.use('/p', basicLimit, slowRequestDefault, publicShare);
+app.use('/tenor', tenorLimit, slowRequestDefault, tenor);
+app.use('/stickers', stickerLimit, slowRequestDefault, sticker);
+app.use('/unsplash', unsplashLimit, slowRequestDefault, unsplash);
+app.use('/translate', translateLimit, slowRequestDefault, translate);
+app.use('/user', userLimit, slowRequestDefault, user);
+app.use('/utils', utilsLimit, slowRequestDefault, utils);
+app.use('/weather', weatherLimit, slowRequestDefault, weather);
+app.use('/frontend-error-log', frontendErrorLogLimit, slowRequestDefault, frontendErrorLog);
+app.use('/maintenance', basicLimit, slowRequestDefault, maintenance);
 
 // 404 + Error handler (letzte Middleware)
 app.use(notFoundHandler);
