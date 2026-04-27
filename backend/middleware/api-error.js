@@ -112,6 +112,13 @@ function sanitizeErrorPayload(payload) {
   }
 }
 
+function buildRequestLogMessage(prefix, req, status, message) {
+  const method = req?.method || 'REQUEST';
+  const path = req?.originalUrl || req?.url || '';
+  const suffix = message ? `: ${message}` : '';
+  return `${prefix} ${status} ${method}${path ? ` ${path}` : ''}${suffix}`;
+}
+
 function buildLogContext(req, payload, status, err) {
   const context = {
     traceId: payload?.traceId,
@@ -164,10 +171,17 @@ function errorHandler(err, req, res, next) {
   const logContext = buildLogContext(req, payload, status, err);
   sanitizeErrorPayload(payload);
 
+  const logMessage = err?.message || payload.message;
   if (status >= 500) {
-    req?.logger?.error?.('Request failed with server error', { ...logContext, message: err?.message, stack: err?.stack });
+    req?.logger?.error?.(
+      buildRequestLogMessage('Request failed with server error', req, status, logMessage),
+      { ...logContext, message: logMessage, stack: err?.stack }
+    );
   } else {
-    req?.logger?.warn?.('Request error', { ...logContext, message: err?.message || payload.message });
+    req?.logger?.warn?.(
+      buildRequestLogMessage('Request error', req, status, logMessage),
+      { ...logContext, message: logMessage }
+    );
   }
 
   res.status(status).json(payload);

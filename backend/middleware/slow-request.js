@@ -89,11 +89,14 @@ function createSlowRequestMiddleware(options = {}) {
 
       const userId = req.jwtUser?.userId ?? req.jwtUser?.id;
       const cacheHeader = res.getHeader('X-Message-Search-Cache');
-      req.logger?.warn?.('Slow request', {
+      const route = getRoutePattern(req);
+      const path = req.path || req.originalUrl || req.url;
+      const message = `Slow request ${req.method} ${route || path || ''} ${durationMs}ms`.trim();
+      req.logger?.warn?.(message, {
         traceId: req.traceId || res.locals?.traceId,
         method: req.method,
-        route: getRoutePattern(req),
-        path: req.path || req.originalUrl || req.url,
+        route,
+        path,
         status: aborted ? 499 : res.statusCode,
         durationMs,
         thresholdMs,

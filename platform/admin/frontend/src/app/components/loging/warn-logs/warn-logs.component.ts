@@ -96,17 +96,33 @@ export class WarnLogsComponent implements OnInit {
   copySelected() {
     const sel = this.selected();
     if (!sel) return;
-    const text = [
+    const lines = [
       `Source: ${sel.source}`,
       `File: ${sel.file}`,
       `Timestamp: ${this.formatLocal(sel.createdAt)} (${sel.createdAt})`,
       `Message: ${sel.message}`
-    ].join('\n');
+    ];
+    const detail = this.formatDetail(sel.detail);
+    if (detail) {
+      lines.push(`Detail: ${detail}`);
+    }
+    const text = lines.join('\n');
     try {
       navigator.clipboard.writeText(text);
       this.snack.open(this.i18n.t('Copied to clipboard.'), undefined, { duration: 2000 });
     } catch {
       this.snack.open(this.i18n.t('Could not copy.'), this.i18n.t('OK'), { duration: 3000 });
+    }
+  }
+
+  formatDetail(detail: string | null | undefined): string | null {
+    if (!detail) return null;
+    const trimmed = detail.trim();
+    if (!trimmed) return null;
+    try {
+      return JSON.stringify(JSON.parse(trimmed), null, 2);
+    } catch {
+      return trimmed;
     }
   }
 

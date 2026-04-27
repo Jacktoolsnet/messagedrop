@@ -90,6 +90,10 @@
                         <span class="v">{{ sel.file }}</span>
                         <span class="k">{{ i18n.t('Message') }}</span>
                         <span class="v message">{{ sel.message }}</span>
+                        @if (formatDetail(sel.detail); as detail) {
+                        <span class="k">{{ i18n.t('Details') }}</span>
+                        <pre class="v detail">{{ detail }}</pre>
+                        }
                     </div>
                 </mat-card-content>
                 <mat-card-actions>
