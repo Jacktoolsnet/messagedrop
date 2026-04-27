@@ -536,6 +536,14 @@ class Database {
       ON tableMessage(latitude, longitude, createDateTime DESC)
       WHERE status='enabled' AND parentUuid IS NULL;
 
+    -- 2b) Neueste aktive Root-Messages:
+    --     Unterstützt große Karten-Ausschnitte, bei denen "die neuesten 256"
+    --     entscheidend sind. id DESC macht die Sortierung deterministisch, wenn
+    --     mehrere Messages in derselben Sekunde erstellt wurden.
+    CREATE INDEX IF NOT EXISTS idx_msg_enabled_root_createdesc_iddesc
+      ON tableMessage(createDateTime DESC, id DESC)
+      WHERE status='enabled' AND parentUuid IS NULL;
+
     -- 3) Allgemeiner Sortierindex:
     --    Falls andere Abfragen stark auf createDateTime sortieren, kann das helfen.
     CREATE INDEX IF NOT EXISTS idx_msg_created_desc

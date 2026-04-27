@@ -420,7 +420,7 @@ const getByBoundingBox = function (db, latMin, lonMin, latMax, lonMax, callback)
                 : `${columnLongitude} BETWEEN ? AND ?`
             }
             )
-            ORDER BY ${columnMessageCreateDateTime} DESC
+            ORDER BY ${columnMessageCreateDateTime} DESC, ${columnMessageId} DESC
             LIMIT 256;
             `;
 
