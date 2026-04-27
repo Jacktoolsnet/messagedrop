@@ -957,7 +957,7 @@ export class AppComponent implements OnInit {
   }
 
   private async handlePublicMessageLink(messageUuid: string): Promise<void> {
-    const message = await firstValueFrom(this.messageService.getByUuid(messageUuid));
+    const message = await firstValueFrom(this.messageService.getByUuid(messageUuid, false, 'publicFirst'));
     this.pendingPublicMessageUuid.set(null);
     this.clearPendingPublicMessageUuidFromUrl();
 

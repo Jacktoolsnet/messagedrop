@@ -161,6 +161,10 @@ function notFoundHandler(_req, res) {
   res.status(404).json({ error: 'not_found' });
 }
 
+function shouldSkipRequestErrorLog(req, status) {
+  return status < 500 && String(req?.headers?.['x-skip-request-error-log'] || '').toLowerCase() === 'true';
+}
+
 function errorHandler(err, req, res, next) {
   if (res.headersSent) {
     return next(err);
@@ -172,6 +176,10 @@ function errorHandler(err, req, res, next) {
   sanitizeErrorPayload(payload);
 
   const logMessage = err?.message || payload.message;
+  if (shouldSkipRequestErrorLog(req, status)) {
+    return res.status(status).json(payload);
+  }
+
   if (status >= 500) {
     req?.logger?.error?.(
       buildRequestLogMessage('Request failed with server error', req, status, logMessage),

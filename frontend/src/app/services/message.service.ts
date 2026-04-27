@@ -44,6 +44,8 @@ type PublishMessageResult = {
   published: boolean;
 };
 
+type MessageLookupMode = 'ownFirst' | 'publicFirst';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -167,6 +169,14 @@ export class MessageService {
 
   private buildOwnMessageUrl(path: string): string {
     return `${environment.apiUrl}/message/me/${path}`;
+  }
+
+  private buildQuietLookupHeaders(headers = this.httpOptions.headers): HttpHeaders {
+    return headers
+      .set('x-skip-ui', 'true')
+      .set('x-skip-diagnostics', 'true')
+      .set('x-skip-backend-status', 'true')
+      .set('x-skip-request-error-log', 'true');
   }
 
   private normalizePublishState(message: Partial<Message>): NonNullable<Message['publishState']> {
@@ -1380,7 +1390,11 @@ export class MessageService {
       );
   }
 
-  getByUuid(messageUuid: string, showAlways = false): Observable<Message | null> {
+  getByUuid(
+    messageUuid: string,
+    showAlways = false,
+    lookupMode: MessageLookupMode = 'ownFirst'
+  ): Observable<Message | null> {
     const trimmedUuid = typeof messageUuid === 'string' ? messageUuid.trim() : '';
     if (!trimmedUuid) {
       return of(null);
@@ -1411,12 +1425,22 @@ export class MessageService {
       autoclose: false
     });
 
+    const lookupHeaders = this.buildQuietLookupHeaders();
+    const publicLookup = () => this.lookupPublicMessageByUuid(trimmedUuid, lookupHeaders);
+    const ownLookup = () => this.lookupOwnMessageByUuid(trimmedUuid, lookupHeaders);
+
     if (!this.hasAuthenticatedUser()) {
-      return this.lookupPublicMessageByUuid(trimmedUuid);
+      return publicLookup();
     }
 
-    return this.lookupOwnMessageByUuid(trimmedUuid).pipe(
-      switchMap((ownMessage) => ownMessage ? of(ownMessage) : this.lookupPublicMessageByUuid(trimmedUuid))
+    if (lookupMode === 'publicFirst') {
+      return publicLookup().pipe(
+        switchMap((publicMessage) => publicMessage ? of(publicMessage) : ownLookup())
+      );
+    }
+
+    return ownLookup().pipe(
+      switchMap((ownMessage) => ownMessage ? of(ownMessage) : publicLookup())
     );
   }
 
