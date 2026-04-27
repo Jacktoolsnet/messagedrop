@@ -467,7 +467,7 @@ Soweit angemessen, können Maßnahmen abgestuft erfolgen, z. B.:
 - zeitweise Sperrung,
 - dauerhafte Sperrung bei schweren oder wiederholten Verstößen.
 
-Bei schweren Verstößen (z. B. strafbaren Inhalten oder gravierendem Sicherheitsmissbrauch) kann eine sofortige Sperrung ohne vorherige Verwarnung erfolgen.
+Bei schweren Verstößen (z. B. strafbaren Inhalten oder gravierendem Sicherheitsmissbrauch) kann eine sofortige Sperrung ohne vorherige Verwarnung erfolgen. Außerdem behalten wir uns in solchen Fällen weitere rechtlich zulässige Maßnahmen vor.
 
 ###
 21. Änderungen dieser Nutzungsbedingungen

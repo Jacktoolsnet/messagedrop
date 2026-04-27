@@ -470,7 +470,7 @@ Where appropriate, measures may be taken in stages, e.g.:
 - Temporary blocking,
 - Permanent blocking in the event of serious or repeated violations.
 
-In the event of serious violations (e.g., criminal content or serious security abuse), immediate blocking may occur without prior warning.
+In the event of serious violations (e.g., criminal content or serious security abuse), immediate blocking may occur without prior warning. In such cases, we also reserve the right to take further legally permissible measures.
 
 ###
 21. Changes to these Terms of Use
