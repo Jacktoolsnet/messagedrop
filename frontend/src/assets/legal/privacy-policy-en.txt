@@ -10,7 +10,7 @@ Summary (not legally binding)
 
 MessageDrop is a privacy-focused web app for publishing user-generated content, private communication, and location-based organization of information.
 
-The service can be used without a user account. Certain features require the voluntary creation of a user account.
+The service can be used without a user account. Certain features require the creation of a user account.
 Login is performed locally via a PIN; the PIN is not transmitted to the server. Only the pseudonymous user ID, public keys, and status data are stored on the server in the user account.
 
 Use of MessageDrop is permitted only after reaching the age of 16. Persons who have reached the age of 16 but have not yet reached the age of 18 may use the service only with the consent of their parents or legal guardians. Legally binding declarations that go beyond the ordinary use of the service are generally only possible upon reaching the age of 18.
