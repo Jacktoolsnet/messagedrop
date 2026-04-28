@@ -40,7 +40,7 @@ Erteilte Einwilligungen für externe Inhalte können jederzeit mit Wirkung für 
 
 Systemmeldungen (z. B. Hinweise zu DSA-Verfahren oder geplante Wartungsarbeiten) werden ausschließlich durch autorisierte administrative Systeme erzeugt und im Frontend des Nutzers angezeigt. Systemmeldungen sind stets aktiv; Nutzer können sie im Frontend löschen, ohne dass dadurch zwingend interne Nachweise entfallen.
 
-Profile (Name/Avatar) können lokal zur besseren Zuordnung genutzt werden. Bei Kontaktaufnahme kann ein Nutzer optional eine Profilfreigabe anfragen; der andere Nutzer muss aktiv zustimmen. Für die technische Zustellung der Profilfreigabefunktion werden Anfragen und Antwortstatus vorübergehend auf unserem Server gespeichert; im Fall einer Zustimmung werden der freigegebene Profilname und Avatar dort ausschließlich verschlüsselt zur Zustellung gespeichert. Nach Zustellung oder Fristablauf werden diese temporären Datensätze gelöscht. Nach erfolgreicher Zustellung werden Name und Avatar auf dem Endgerät des Kontakts lokal gespeichert.
+Profile (Name/Avatar) können lokal zur besseren Zuordnung genutzt werden. Bei Kontaktaufnahme kann ein Nutzer optional eine Profilfreigabe anfragen; der andere Nutzer muss aktiv zustimmen. Für die technische Zustellung der Profilfreigabefunktion werden Anfragen und Antwortstatus vorübergehend auf unserem Server gespeichert; im Fall einer Zustimmung werden der freigegebene Profilname und Avatar dort ausschließlich verschlüsselt zur Zustellung gespeichert. Nach Zustellung oder Fristablauf werden diese temporären Datensätze gelöscht; die Frist beträgt derzeit 7 Tage. Nach erfolgreicher Zustellung werden Name und Avatar auf dem Endgerät des Kontakts lokal gespeichert.
 
 Plätzen kann gefolgt werden; soweit technisch möglich und vom Endgerät unterstützt, kann der Nutzer Push-Benachrichtigungen erhalten, wenn an einem gefolgten Platz neue öffentliche Inhalte erscheinen. Technisch erforderliche Push-Token werden nur für die Zustellung verarbeitet. Ein Anspruch auf Zustellung von Push-Benachrichtigungen besteht nicht.
 
@@ -427,7 +427,7 @@ Im Rahmen der Kontaktfunktion kann ein Nutzer aktiv eine Profilfreigabe an einen
 
 Für die technische Zustellung der Profilfreigabefunktion, auch wenn eine Partei vorübergehend offline ist, werden die Anfragedaten und der Antwortstatus vorübergehend auf unserem Server gespeichert. Im Fall einer Zustimmung werden der freigegebene Profilname und Avatar dort ausschließlich verschlüsselt zur Zustellung an den anfragenden Kontakt gespeichert.
 
-Diese temporären Datensätze werden nach erfolgreicher Zustellung/Verarbeitung durch den anfragenden Kontakt oder bei Fristablauf gelöscht, falls eine Zustellung nicht rechtzeitig erfolgt.
+Diese temporären Datensätze werden nach erfolgreicher Zustellung/Verarbeitung durch den anfragenden Kontakt oder bei Fristablauf gelöscht, falls eine Zustellung nicht rechtzeitig erfolgt. Die Frist beträgt derzeit 7 Tage. Aus technischen oder betrieblichen Gründen kann sich die Löschung im Einzelfall verzögern, sodass freigegebene Profilangaben ausnahmsweise auch länger abrufbar sein können.
 
 Nach erfolgreicher Zustellung werden Profilname und Avatar auf das Endgerät des Kontakts übertragen und dort lokal gespeichert.
 
@@ -577,6 +577,7 @@ Im Übrigen gelten insbesondere folgende Grundsätze:
 - Nutzungszeit-Schutz (Einstellungen/Status, inkl. Eltern-PIN-Hash): bis zur Änderung/Löschung durch den Nutzer bzw. bis zur Löschung des Nutzerkontos,
 - öffentliche Inhalte: Löschung nach 30 Tagen,
 - gelesene private Nachrichten: Löschung nach 7 Tagen,
+- temporäre Datensätze zur Profilfreigabe bei Kontakten: Löschung nach Zustellung/Verarbeitung oder spätestens nach Fristablauf; die Frist beträgt derzeit 7 Tage,
 - lokal gespeicherte Daten: Löschung durch den Nutzer bzw. durch technische Umstände möglich.
 
 ###

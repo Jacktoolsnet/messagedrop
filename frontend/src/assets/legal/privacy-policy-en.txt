@@ -43,7 +43,7 @@ Consent granted for external content may be revoked at any time with future effe
 
 System messages (e.g., notices regarding DSA proceedings or scheduled maintenance) are generated exclusively by authorized administrative systems and displayed in the user’s frontend. System messages are always active; users can delete them in the frontend without this necessarily affecting internal records.
 
-Profiles (name/avatar) can be used locally for easier identification. When initiating contact, a user may optionally request profile sharing; the other user must actively consent. For technical delivery of the profile sharing function, requests and response status are stored temporarily on our server; if consent is granted, the shared profile name and avatar are stored there only in encrypted form for delivery. After delivery or expiry, these temporary records are deleted. Once delivered, the name and avatar are stored locally on the contact’s device.
+Profiles (name/avatar) can be used locally for easier identification. When initiating contact, a user may optionally request profile sharing; the other user must actively consent. For technical delivery of the profile sharing function, requests and response status are stored temporarily on our server; if consent is granted, the shared profile name and avatar are stored there only in encrypted form for delivery. After delivery or expiry, these temporary records are deleted; the current period is 7 days. Once delivered, the name and avatar are stored locally on the contact’s device.
 
 Places can be followed; where technically possible and supported by the device, the user may receive push notifications when new public content appears at a followed place. Technically required push tokens are processed solely for delivery. There is no entitlement to the delivery of push notifications.
 
@@ -430,7 +430,7 @@ Within the context of the contact function, a user can actively request profile 
 
 For technical delivery of the profile sharing function, including cases where one party is temporarily offline, the request data and the response status are stored temporarily on our server. If consent is granted, the shared profile name and avatar are stored there only in encrypted form for delivery to the requesting contact.
 
-These temporary records are deleted after successful delivery/processing by the requesting contact or upon expiry if delivery does not occur in time.
+These temporary records are deleted after successful delivery/processing by the requesting contact or upon expiry if delivery does not occur in time. The current period is 7 days. For technical or operational reasons, deletion may be delayed in individual cases, so shared profile information may exceptionally remain retrievable for longer.
 
 Once delivered, the profile name and avatar are transferred to the contact’s device and stored locally there.
 
@@ -580,6 +580,7 @@ In particular, the following principles apply:
 - Usage Time Protection (settings/status, including parent PIN hash): until modified/deleted by the user or until the user account is deleted,
 - public content: deletion after 30 days,
 - read private messages: deletion after 7 days,
+- temporary records for profile sharing with contacts: deletion after delivery/processing or, at the latest, upon expiry; the current period is 7 days,
 - locally stored data: deletion by the user or due to technical circumstances is possible.
 
 ###
