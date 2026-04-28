@@ -399,7 +399,7 @@
         "desc": "Affiche les informations sur l'éditeur et les coordonnées."
       },
       "licenses": {
-        "title": "Licences tierces",
+        "title": "Licences open source",
         "desc": "Affiche les licences open source et tierces utilisées dans l'app."
       },
       "menuHelp": {
@@ -1141,7 +1141,7 @@
     }
   },
   "thirdPartyLicenses": {
-    "title": "Licences tierces",
+    "title": "Licences open source",
     "intro": "Ici, vous consultez les textes de licence des bibliothèques tierces utilisées par l'app et pouvez les ouvrir ou les télécharger.",
     "items": {
       "content": {

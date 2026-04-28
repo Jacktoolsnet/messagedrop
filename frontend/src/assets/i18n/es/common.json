@@ -104,7 +104,7 @@
       "privacyPolicy": "Política de privacidad",
       "disclaimer": "Aviso legal",
       "imprintLegalNotice": "Aviso legal (imprint)",
-      "thirdPartyLicenses": "Licencias de terceros",
+      "thirdPartyLicenses": "Licencias de código abierto",
       "locateMe": "Localizarme",
       "publicMessage": "Mensaje público",
       "privateNote": "Nota privada",
@@ -914,10 +914,10 @@
         "acceptText": "He leído y acepto esta Política de Privacidad."
       },
       "thirdParty": {
-        "title": "Licencias de terceros",
+        "title": "Licencias de código abierto",
         "loading": "Cargando licencias...",
         "loadFailed": "No se pudo cargar el archivo de licencias.",
-        "ariaLabel": "Licencias de terceros"
+        "ariaLabel": "Licencias de código abierto"
       },
       "externalContent": {
         "title": "Ajustes de contenido externo",

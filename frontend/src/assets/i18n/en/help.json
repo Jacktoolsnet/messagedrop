@@ -399,7 +399,7 @@
         "desc": "Shows provider and contact information."
       },
       "licenses": {
-        "title": "Third-party licenses",
+        "title": "Open-source licenses",
         "desc": "Shows open-source and third-party licenses used by the app."
       },
       "menuHelp": {
@@ -1141,7 +1141,7 @@
     }
   },
   "thirdPartyLicenses": {
-    "title": "Third-party licenses",
+    "title": "Open-source licenses",
     "intro": "Here you can view license texts of third-party libraries used in the app and open or download them.",
     "items": {
       "content": {

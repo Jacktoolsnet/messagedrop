@@ -104,7 +104,7 @@
       "privacyPolicy": "Datenschutz",
       "disclaimer": "Haftungsausschluss",
       "imprintLegalNotice": "Impressum (rechtlicher Hinweis)",
-      "thirdPartyLicenses": "Lizenzen von Drittanbietern",
+      "thirdPartyLicenses": "Open-Source-Lizenzen",
       "locateMe": "Standort bestimmen",
       "publicMessage": "Öffentliche Nachricht",
       "privateNote": "Private Notiz",
@@ -914,10 +914,10 @@
         "acceptText": "Ich habe die Datenschutzerklärung gelesen und akzeptiere sie."
       },
       "thirdParty": {
-        "title": "Lizenzen von Drittanbietern",
+        "title": "Open-Source-Lizenzen",
         "loading": "Lizenzen werden geladen...",
         "loadFailed": "Die Lizenzdatei konnte nicht geladen werden.",
-        "ariaLabel": "Lizenzen von Drittanbietern"
+        "ariaLabel": "Open-Source-Lizenzen"
       },
       "externalContent": {
         "title": "Einstellungen für externe Inhalte",

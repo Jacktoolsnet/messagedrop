@@ -399,7 +399,7 @@
         "desc": "Zeigt Anbieter- und Kontaktinformationen."
       },
       "licenses": {
-        "title": "Drittanbieter-Lizenzen",
+        "title": "Open-Source-Lizenzen",
         "desc": "Zeigt die verwendeten Open-Source- und Drittanbieter-Lizenzen."
       },
       "menuHelp": {
@@ -1141,7 +1141,7 @@
     }
   },
   "thirdPartyLicenses": {
-    "title": "Drittanbieter-Lizenzen",
+    "title": "Open-Source-Lizenzen",
     "intro": "Hier siehst du die Lizenztexte verwendeter Drittanbieter-Bibliotheken und kannst sie öffnen oder herunterladen.",
     "items": {
       "content": {
