@@ -23,7 +23,6 @@ import { EditNoteComponent } from './components/editnote/edit-note.component';
 import { GeoStatisticComponent } from './components/geo-statistic/geo-statistic.component';
 import { ImagelistComponent } from './components/imagelist/imagelist.component';
 import { OverrideExifDataComponent } from './components/imagelist/override-exif-data/override-exif-data.component';
-import { CheckPinComponent } from './components/pin/check-pin/check-pin.component';
 import { ConsentGateComponent } from './components/legal/consent-gate/consent-gate.component';
 import { DisclaimerComponent } from './components/legal/disclaimer/disclaimer.component';
 import { ExternalContentComponent } from './components/legal/external-content/external-content.component';
@@ -34,10 +33,11 @@ import { ThirdPartyLicensesComponent } from './components/legal/third-party-lice
 import { MapComponent } from './components/map/map.component';
 import { MultiMarkerComponent } from './components/map/multi-marker/multi-marker.component';
 import { MessagelistComponent } from './components/messagelist/messagelist.component';
+import { MyExperienceslistComponent } from './components/my-experienceslist/my-experienceslist.component';
 import { MyMessagelistComponent } from './components/my-messagelist/my-messagelist.component';
 import { NotelistComponent } from './components/notelist/notelist.component';
+import { CheckPinComponent } from './components/pin/check-pin/check-pin.component';
 import { PlacelistComponent } from './components/placelist/placelist.component';
-import { MyExperienceslistComponent } from './components/my-experienceslist/my-experienceslist.component';
 import { SharedContentComponent } from './components/shared-content/shared-content.component';
 import { SystemMessageDialogComponent } from './components/system-messages/system-message-dialog/system-message-dialog.component';
 import { DeleteUserComponent } from './components/user/delete-user/delete-user.component';
@@ -45,8 +45,8 @@ import { UserProfileComponent } from './components/user/user-profile/user-profil
 import { UserComponent } from './components/user/user.component';
 import { DisplayMessage } from './components/utils/display-message/display-message.component';
 import { ExperienceSearchComponent } from './components/utils/experience-search/experience-search.component';
-import { HelpDialogService } from './components/utils/help-dialog/help-dialog.service';
 import { HashtagSearchComponent, HashtagSearchResult } from './components/utils/hashtag-search/hashtag-search.component';
+import { HelpDialogService } from './components/utils/help-dialog/help-dialog.service';
 import { NominatimSearchComponent } from './components/utils/nominatim-search/nominatim-search.component';
 import { SearchSettingsComponent } from './components/utils/search-settings/search-settings.component';
 import { WeatherComponent } from './components/weather/weather.component';
@@ -67,7 +67,6 @@ import { NotificationAction } from './interfaces/notification-action';
 import { Place } from './interfaces/place';
 import { PlusCodeArea } from './interfaces/plus-code-area';
 import { DEFAULT_SEARCH_SETTINGS, SearchSettings } from './interfaces/search-settings';
-import { ExperienceBookmarkService } from './services/experience-bookmark.service';
 import { SharedContent } from './interfaces/shared-content';
 import { ExperienceResult, ViatorDestinationLookup } from './interfaces/viator';
 import { ShortNumberPipe } from './pipes/short-number.pipe';
@@ -78,6 +77,9 @@ import { BackupService } from './services/backup.service';
 import { ContactMessageService } from './services/contact-message.service';
 import { ContactProfileExchangeService } from './services/contact-profile-exchange.service';
 import { ContactService } from './services/contact.service';
+import { DiagnosticLoggerService } from './services/diagnostic-logger.service';
+import { DisplayMessageRef, DisplayMessageService } from './services/display-message.service';
+import { ExperienceBookmarkService } from './services/experience-bookmark.service';
 import { ExperienceMapService } from './services/experience-map.service';
 import { GeoStatisticService } from './services/geo-statistic.service';
 import { GeolocationService } from './services/geolocation.service';
@@ -98,12 +100,10 @@ import { ServerService } from './services/server.service';
 import { SharedContentService } from './services/shared-content.service';
 import { SystemNotificationService } from './services/system-notification.service';
 import { TranslationHelperService } from './services/translation-helper.service';
-import { UserService } from './services/user.service';
 import { UsageProtectionService } from './services/usage-protection.service';
+import { UserService } from './services/user.service';
 import { WeatherService } from './services/weather.service';
-import { DiagnosticLoggerService } from './services/diagnostic-logger.service';
 import { isQuotaExceededError } from './utils/storage-error.util';
-import { DisplayMessageRef, DisplayMessageService } from './services/display-message.service';
 
 const PRODUCTION_APP_URL = 'https://app.messagedrop.de/';
 const Q_STAGE_WARNING_SESSION_KEY = 'messagedrop.qStageWarningSeen';
@@ -1631,7 +1631,7 @@ export class AppComponent implements OnInit {
       data: { location: this.mapService.getMapLocation() },
       minWidth: 'min(450px, 95vw)',
       maxWidth: '95vw',
-      width: 'auto',
+      width: 'min(900px, 95vw)',
       maxHeight: '95vh',
       height: 'auto',
       hasBackdrop: true,
@@ -1864,12 +1864,12 @@ export class AppComponent implements OnInit {
   private openMarkerExperienceListDialog(destinations: ViatorDestinationLookup[]): void {
     const ids = Array.isArray(destinations)
       ? Array.from(
-          new Set(
-            destinations
-              .map((dest) => Number(dest.destinationId))
-              .filter((id) => Number.isFinite(id) && id > 0)
-          )
+        new Set(
+          destinations
+            .map((dest) => Number(dest.destinationId))
+            .filter((id) => Number.isFinite(id) && id > 0)
         )
+      )
       : [];
     if (!ids.length) {
       return;
@@ -1978,7 +1978,7 @@ export class AppComponent implements OnInit {
       },
       minWidth: 'min(450px, 95vw)',
       maxWidth: '95vw',
-      width: 'auto',
+      width: '95vw',
       maxHeight: 'none',
       height: 'auto',
       hasBackdrop: true,
@@ -2011,7 +2011,7 @@ export class AppComponent implements OnInit {
       },
       minWidth: 'min(450px, 95vw)',
       maxWidth: '95vw',
-      width: 'auto',
+      width: 'min(900px, 95vw)',
       maxHeight: 'none',
       height: 'auto',
       hasBackdrop: true,

@@ -57,40 +57,41 @@ h2[mat-dialog-title].dialog-title {
   font-size: 0.95rem;
 }
 
-/* === Masonry-like column layout (CSS-only, no JS) === */
+/* === Responsive grid layout for document cards === */
 .content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  align-items: start;
+  gap: 1.5rem;
   width: 100%;
   max-width: 100%;
   padding-top: 1rem;
   padding-right: 0;
-
-  column-width: 420px;
-  column-gap: 1.5rem;
+  padding-bottom: 1rem;
   white-space: normal;
+
 }
 
 .item {
   position: relative;
-  display: inline-block;
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  margin: 0 0 1.5rem;
+  min-width: 0;
+  margin: 0;
   border-radius: 0.75rem;
   color: var(--mat-card-subtitle-text-color);
   background-color: var(--mat-card-filled-container-color);
   box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
-  break-inside: avoid-column;
-  -webkit-column-break-inside: avoid;
-  page-break-inside: avoid;
-}
-
-.item:last-child {
-  margin-bottom: 0;
 }
 
 @media (max-width: 700px) {
+  .document-scroll {
+    padding-bottom: 1rem;
+  }
+
   .content {
-    column-count: 1;
-    column-width: auto;
+    grid-template-columns: 1fr;
   }
 }
 
