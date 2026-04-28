@@ -915,7 +915,22 @@
     "title": "Images"
   },
   "imageExif": {
-    "title": "Modifier les données EXIF"
+    "title": "Choisir la position de l’image",
+    "intro": "Décidez si l’image doit utiliser la position actuelle de la carte ou la position EXIF enregistrée dans l’image.",
+    "items": {
+      "location": {
+        "title": "Choisir la position",
+        "desc": "Choisissez de conserver la position de la carte ou d’utiliser la position enregistrée dans l’image."
+      },
+      "remember": {
+        "title": "Mémoriser le choix",
+        "desc": "Applique cette décision aux autres images contenant des données de position dans cette sélection."
+      },
+      "confirm": {
+        "title": "Confirmer",
+        "desc": "Confirme le choix et applique la position sélectionnée à l’image."
+      }
+    }
   },
   "dsaReport": {
     "title": "Signaler un contenu"
@@ -2478,19 +2493,19 @@
         "title": "Fermer",
         "desc": "Cette action ferme la boîte de dialogue sans sélectionner de sticker."
       },
-    "help": {
-      "title": "Aide",
-      "desc": "Cette action ouvre cette vue d’aide."
-    },
-    "licenseFile": {
-      "title": "Ouvrir le PDF de licence",
-      "desc": "Affiche les informations de licence du pack de stickers sélectionné."
-    },
-    "license": {
-      "title": "Mention de licence",
-      "desc": "Ces stickers sont concédés sous licence pour MessageDrop via une licence Premium Flaticon. Ils ne peuvent être utilisés que dans l’application ; il n’est pas permis de les extraire, de les télécharger, de les copier ou de les réutiliser en dehors de l’app."
+      "help": {
+        "title": "Aide",
+        "desc": "Cette action ouvre cette vue d’aide."
+      },
+      "licenseFile": {
+        "title": "Ouvrir le PDF de licence",
+        "desc": "Affiche les informations de licence du pack de stickers sélectionné."
+      },
+      "license": {
+        "title": "Mention de licence",
+        "desc": "Ces stickers sont concédés sous licence pour MessageDrop via une licence Premium Flaticon. Ils ne peuvent être utilisés que dans l’application ; il n’est pas permis de les extraire, de les télécharger, de les copier ou de les réutiliser en dehors de l’app."
+      }
     }
-  }
   },
   "hashtagSearch": {
     "title": "Recherche par hashtag",

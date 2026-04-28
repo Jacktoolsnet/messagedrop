@@ -915,7 +915,22 @@
     "title": "Bilder"
   },
   "imageExif": {
-    "title": "EXIF-Daten bearbeiten"
+    "title": "Bildposition auswählen",
+    "intro": "Lege fest, ob für das Bild die aktuelle Kartenposition oder die im Bild gespeicherte EXIF-Position verwendet werden soll.",
+    "items": {
+      "location": {
+        "title": "Position wählen",
+        "desc": "Wähle, ob die Kartenposition behalten oder die im Bild gespeicherte Position verwendet wird."
+      },
+      "remember": {
+        "title": "Auswahl merken",
+        "desc": "Übernimmt diese Entscheidung für weitere Bilder mit Standortdaten in dieser Auswahl."
+      },
+      "confirm": {
+        "title": "Bestätigen",
+        "desc": "Bestätigt die Auswahl und übernimmt die gewählte Position für das Bild."
+      }
+    }
   },
   "dsaReport": {
     "title": "Inhalt melden"
@@ -2478,19 +2493,19 @@
         "title": "Schließen",
         "desc": "Mit dieser Aktion schließt du den Dialog ohne Auswahl."
       },
-    "help": {
-      "title": "Hilfe",
-      "desc": "Mit dieser Aktion öffnest du diese Hilfeansicht."
-    },
-    "licenseFile": {
-      "title": "Lizenz-PDF öffnen",
-      "desc": "Zeigt die Lizenzinformationen für das ausgewählte Sticker-Pack."
-    },
-    "license": {
-      "title": "Lizenzhinweis",
-      "desc": "Diese Sticker sind für MessageDrop unter einer Flaticon-Premium-Lizenz lizenziert. Sie dürfen nur in der App verwendet werden; ein Extrahieren, Herunterladen, Kopieren oder Weiterverwenden außerhalb der App ist nicht erlaubt."
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Aktion öffnest du diese Hilfeansicht."
+      },
+      "licenseFile": {
+        "title": "Lizenz-PDF öffnen",
+        "desc": "Zeigt die Lizenzinformationen für das ausgewählte Sticker-Pack."
+      },
+      "license": {
+        "title": "Lizenzhinweis",
+        "desc": "Diese Sticker sind für MessageDrop unter einer Flaticon-Premium-Lizenz lizenziert. Sie dürfen nur in der App verwendet werden; ein Extrahieren, Herunterladen, Kopieren oder Weiterverwenden außerhalb der App ist nicht erlaubt."
+      }
     }
-  }
   },
   "hashtagSearch": {
     "title": "Hashtag-Suche",

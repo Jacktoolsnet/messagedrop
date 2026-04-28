@@ -915,7 +915,22 @@
     "title": "Images"
   },
   "imageExif": {
-    "title": "Edit EXIF data"
+    "title": "Choose image location",
+    "intro": "Decide whether the image should use the current map location or the EXIF location stored in the image.",
+    "items": {
+      "location": {
+        "title": "Choose location",
+        "desc": "Choose whether to keep the map location or use the location stored in the image."
+      },
+      "remember": {
+        "title": "Remember choice",
+        "desc": "Applies this decision to additional images with location data in this selection."
+      },
+      "confirm": {
+        "title": "Confirm",
+        "desc": "Confirms the choice and applies the selected location to the image."
+      }
+    }
   },
   "dsaReport": {
     "title": "Report content"
@@ -2478,19 +2493,19 @@
         "title": "Close",
         "desc": "This action closes the dialog without selecting a sticker."
       },
-    "help": {
-      "title": "Help",
-      "desc": "This action opens this help view."
-    },
-    "licenseFile": {
-      "title": "Open license PDF",
-      "desc": "Shows the license information for the selected sticker pack."
-    },
-    "license": {
-      "title": "License notice",
-      "desc": "These stickers are licensed for MessageDrop under a Flaticon Premium license. They may only be used inside the app; extracting, downloading, copying, or reusing them outside the app is not allowed."
+      "help": {
+        "title": "Help",
+        "desc": "This action opens this help view."
+      },
+      "licenseFile": {
+        "title": "Open license PDF",
+        "desc": "Shows the license information for the selected sticker pack."
+      },
+      "license": {
+        "title": "License notice",
+        "desc": "These stickers are licensed for MessageDrop under a Flaticon Premium license. They may only be used inside the app; extracting, downloading, copying, or reusing them outside the app is not allowed."
+      }
     }
-  }
   },
   "hashtagSearch": {
     "title": "Hashtag search",

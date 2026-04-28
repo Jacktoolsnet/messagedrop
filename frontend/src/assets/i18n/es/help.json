@@ -915,7 +915,22 @@
     "title": "Imágenes"
   },
   "imageExif": {
-    "title": "Editar datos EXIF"
+    "title": "Elegir ubicación de la imagen",
+    "intro": "Decide si la imagen debe usar la ubicación actual del mapa o la ubicación EXIF guardada en la imagen.",
+    "items": {
+      "location": {
+        "title": "Elegir ubicación",
+        "desc": "Elige si mantener la ubicación del mapa o usar la ubicación guardada en la imagen."
+      },
+      "remember": {
+        "title": "Recordar elección",
+        "desc": "Aplica esta decisión a otras imágenes con datos de ubicación en esta selección."
+      },
+      "confirm": {
+        "title": "Confirmar",
+        "desc": "Confirma la elección y aplica la ubicación seleccionada a la imagen."
+      }
+    }
   },
   "dsaReport": {
     "title": "Denunciar contenido"
@@ -2478,19 +2493,19 @@
         "title": "Cerrar",
         "desc": "Esta acción cierra el diálogo sin seleccionar un sticker."
       },
-    "help": {
-      "title": "Ayuda",
-      "desc": "Esta acción abre esta vista de ayuda."
-    },
-    "licenseFile": {
-      "title": "Abrir PDF de licencia",
-      "desc": "Muestra la información de licencia del pack de stickers seleccionado."
-    },
-    "license": {
-      "title": "Aviso de licencia",
-      "desc": "Estos stickers están licenciados para MessageDrop bajo una licencia Premium de Flaticon. Solo pueden usarse dentro de la aplicación; no está permitido extraerlos, descargarlos, copiarlos ni reutilizarlos fuera de la app."
+      "help": {
+        "title": "Ayuda",
+        "desc": "Esta acción abre esta vista de ayuda."
+      },
+      "licenseFile": {
+        "title": "Abrir PDF de licencia",
+        "desc": "Muestra la información de licencia del pack de stickers seleccionado."
+      },
+      "license": {
+        "title": "Aviso de licencia",
+        "desc": "Estos stickers están licenciados para MessageDrop bajo una licencia Premium de Flaticon. Solo pueden usarse dentro de la aplicación; no está permitido extraerlos, descargarlos, copiarlos ni reutilizarlos fuera de la app."
+      }
     }
-  }
   },
   "hashtagSearch": {
     "title": "Búsqueda por hashtag",
