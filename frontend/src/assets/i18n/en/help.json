@@ -304,7 +304,7 @@
   },
   "appMenu": {
     "title": "MessageDrop help",
-    "intro": "MessageDrop is an app for sharing public messages, private chats, and location-based content such as weather and experiences.",
+    "intro": "With MessageDrop, you can share public messages, chat privately, and access information about places — such as weather, air quality, or local experiences.",
     "items": {
       "overview": {
         "title": "Core functionality",
