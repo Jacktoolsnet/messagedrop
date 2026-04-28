@@ -137,7 +137,7 @@ If a backup/restore function is offered, its use is at the user’s own responsi
 6. Third-Party Content, Services, and Integrations
 ###
 
-MessageDrop may integrate third-party content or functions (e.g. media embeds and external functional services such as map, weather, translation, or experience services).
+MessageDrop may integrate or provide third-party content, licensed assets, or functions (e.g. media embeds, stickers and comparable graphic elements, and external functional services such as map, weather, translation, or experience services).
 
 The respective third-party provider is solely responsible for the content, availability, lawfulness, security, licensing situation, privacy practices, and technical design of such third-party offerings.
 

@@ -134,7 +134,7 @@ Soweit eine Backup-/Restore-Funktion angeboten wird, erfolgt deren Nutzung auf e
 6. Inhalte, Dienste und Einbindungen Dritter
 ###
 
-MessageDrop kann Inhalte oder Funktionen Dritter einbinden (z. B. Medieneinbettungen sowie externe Funktionsdienste wie Karten-, Wetter-, Übersetzungs- oder Erlebnisdienste).
+MessageDrop kann Inhalte, lizenzierte Assets oder Funktionen Dritter einbinden bzw. bereitstellen (z. B. Medieneinbettungen, Sticker und vergleichbare grafische Elemente sowie externe Funktionsdienste wie Karten-, Wetter-, Übersetzungs- oder Erlebnisdienste).
 
 Für Inhalte, Verfügbarkeit, Rechtmäßigkeit, Sicherheit, Lizenzlage, Datenschutzpraxis und technische Ausgestaltung dieser Drittangebote ist ausschließlich der jeweilige Drittanbieter verantwortlich.
 
