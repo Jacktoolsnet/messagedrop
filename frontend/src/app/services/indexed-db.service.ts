@@ -135,14 +135,14 @@ export class IndexedDbService {
     return bytes;
   }
 
-  private async encryptForStore(storeName: string, plaintext: string): Promise<string> {
-    if (!this.atRestEncryptionKey) {
+  private async encryptForStore(storeName: string, plaintext: string, key = this.atRestEncryptionKey): Promise<string> {
+    if (!key) {
       throw new Error(`Missing IndexedDB encryption key for store "${storeName}"`);
     }
     const iv = this.createRandomBytes(12);
     const encrypted = await crypto.subtle.encrypt(
       { name: 'AES-GCM', iv },
-      this.atRestEncryptionKey,
+      key,
       new TextEncoder().encode(plaintext)
     );
     const envelope: EncryptedStoreEnvelope = {
@@ -156,8 +156,8 @@ export class IndexedDbService {
     return JSON.stringify(envelope);
   }
 
-  private async decryptForStore(storeName: string, encryptedPayload: string): Promise<string | undefined> {
-    if (!this.atRestEncryptionKey) {
+  private async decryptForStore(storeName: string, encryptedPayload: string, key = this.atRestEncryptionKey): Promise<string | undefined> {
+    if (!key) {
       return undefined;
     }
 
@@ -182,7 +182,7 @@ export class IndexedDbService {
     try {
       const decrypted = await crypto.subtle.decrypt(
         { name: 'AES-GCM', iv: this.base64ToBytes(envelope.iv) },
-        this.atRestEncryptionKey,
+        key,
         this.base64ToBytes(envelope.payload)
       );
       return new TextDecoder().decode(decrypted);
@@ -192,7 +192,7 @@ export class IndexedDbService {
     }
   }
 
-  private async encodeValue<T>(storeName: string, value: T): Promise<string> {
+  private async encodeValue<T>(storeName: string, value: T, key = this.atRestEncryptionKey): Promise<string> {
     const json = JSON.stringify(value);
     if (!environment.production) {
       return json;
@@ -202,11 +202,11 @@ export class IndexedDbService {
       return compressToUTF16(json);
     }
 
-    const encrypted = await this.encryptForStore(storeName, json);
+    const encrypted = await this.encryptForStore(storeName, json, key);
     return compressToUTF16(encrypted);
   }
 
-  private async decodeValue<T>(storeName: string, data: unknown): Promise<T | undefined> {
+  private async decodeValue<T>(storeName: string, data: unknown, key = this.atRestEncryptionKey): Promise<T | undefined> {
     if (typeof data !== 'string') {
       return undefined;
     }
@@ -232,7 +232,7 @@ export class IndexedDbService {
       }
     }
 
-    const decrypted = await this.decryptForStore(storeName, decompressed);
+    const decrypted = await this.decryptForStore(storeName, decompressed, key);
     if (!decrypted) {
       return undefined;
     }
@@ -242,6 +242,78 @@ export class IndexedDbService {
     } catch {
       return undefined;
     }
+  }
+
+  async reencryptEncryptedStores(newKey: CryptoKey): Promise<void> {
+    if (!environment.production) {
+      this.setAtRestEncryptionKey(newKey);
+      return;
+    }
+
+    const oldKey = this.atRestEncryptionKey;
+    if (!oldKey) {
+      throw new Error('Missing current IndexedDB encryption key.');
+    }
+
+    const db = await this.openDB();
+    for (const storeName of this.encryptedStores) {
+      if (!db.objectStoreNames.contains(storeName)) {
+        continue;
+      }
+      const entries = await this.getRawStoreEntries(db, storeName);
+      const migratedEntries: { key: IDBValidKey; value: unknown }[] = [];
+      for (const entry of entries) {
+        if (typeof entry.value !== 'string') {
+          migratedEntries.push(entry);
+          continue;
+        }
+        const decoded = await this.decodeValue<unknown>(storeName, entry.value, oldKey);
+        if (decoded === undefined) {
+          throw new Error(`Unable to decrypt IndexedDB store "${storeName}" during PIN change.`);
+        }
+        migratedEntries.push({
+          key: entry.key,
+          value: await this.encodeValue(storeName, decoded, newKey)
+        });
+      }
+      await this.putRawStoreEntries(db, storeName, migratedEntries);
+    }
+
+    this.setAtRestEncryptionKey(newKey);
+  }
+
+  private async getRawStoreEntries(db: IDBDatabase, storeName: string): Promise<{ key: IDBValidKey; value: unknown }[]> {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(storeName, 'readonly');
+      const store = tx.objectStore(storeName);
+      const valuesRequest = store.getAll();
+      const keysRequest = store.getAllKeys();
+      tx.oncomplete = () => {
+        const values = (valuesRequest.result as unknown[]) ?? [];
+        const keys = (keysRequest.result as IDBValidKey[]) ?? [];
+        resolve(values.map((value, index) => ({ key: keys[index], value })));
+      };
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+
+  private async putRawStoreEntries(
+    db: IDBDatabase,
+    storeName: string,
+    entries: { key: IDBValidKey; value: unknown }[]
+  ): Promise<void> {
+    if (!entries.length) {
+      return;
+    }
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(storeName, 'readwrite');
+      const store = tx.objectStore(storeName);
+      for (const entry of entries) {
+        store.put(entry.value, entry.key);
+      }
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
   }
 
   /**

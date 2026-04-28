@@ -1863,7 +1863,8 @@ export class UserService {
     if (!cryptedUser) {
       return;
     }
-    if (!await this.cryptoService.decryptWithPin(currentPin, cryptedUser.cryptedUser)) {
+    const currentPinData = await this.cryptoService.decryptWithPin(currentPin, cryptedUser.cryptedUser);
+    if (!currentPinData) {
       const wrongPinDialog = this.displayMessage.open(DisplayMessage, {
         panelClass: '',
         closeOnNavigation: false,
@@ -1887,6 +1888,10 @@ export class UserService {
       await firstValueFrom(wrongPinDialog.afterClosed());
       return;
     }
+    this.pinKey = currentPinData.key;
+    this.indexedDbService.setAtRestEncryptionKey(currentPinData.key);
+    this.pinSalt = currentPinData.salt;
+    this.pinIterations = currentPinData.iterations;
 
     const dialogRef = this.createPinDialog.open(CreatePinComponent, {
       panelClass: '',
@@ -1904,16 +1909,16 @@ export class UserService {
 
     try {
       const encrypted = await this.cryptoService.encryptWithPin(pin, JSON.stringify(this.user), this.pinIterations);
-      this.pinKey = encrypted.key;
-      this.indexedDbService.setAtRestEncryptionKey(this.pinKey);
-      this.pinSalt = encrypted.salt;
-      this.pinIterations = encrypted.iterations;
+      await this.indexedDbService.reencryptEncryptedStores(encrypted.key);
 
       const cryptedUser: CryptedUser = {
         id: this.user.id,
         cryptedUser: encrypted.envelope
       };
       await this.indexedDbService.setUser(cryptedUser);
+      this.pinKey = encrypted.key;
+      this.pinSalt = encrypted.salt;
+      this.pinIterations = encrypted.iterations;
 
       const infoDialog = this.displayMessage.open(DisplayMessage, {
         panelClass: '',
@@ -1940,6 +1945,10 @@ export class UserService {
       this.logout();
     } catch (err) {
       console.error('Change PIN failed', err);
+      this.pinKey = currentPinData.key;
+      this.indexedDbService.setAtRestEncryptionKey(currentPinData.key);
+      this.pinSalt = currentPinData.salt;
+      this.pinIterations = currentPinData.iterations;
       const errorDialog = this.displayMessage.open(DisplayMessage, {
         panelClass: '',
         closeOnNavigation: false,
