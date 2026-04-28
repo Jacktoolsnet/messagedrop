@@ -2484,7 +2484,7 @@
     },
     "licenseFile": {
       "title": "Ouvrir le PDF de licence",
-      "desc": "Lorsqu’un pack de stickers est ouvert, cette action ouvre le PDF de licence correspondant dans un nouvel onglet du navigateur."
+      "desc": "Affiche les informations de licence du pack de stickers sélectionné."
     },
     "license": {
       "title": "Mention de licence",

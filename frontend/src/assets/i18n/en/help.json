@@ -2484,7 +2484,7 @@
     },
     "licenseFile": {
       "title": "Open license PDF",
-      "desc": "When a sticker pack is open, this action opens the corresponding license PDF in a new browser tab."
+      "desc": "Shows the license information for the selected sticker pack."
     },
     "license": {
       "title": "License notice",

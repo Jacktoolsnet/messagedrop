@@ -2484,7 +2484,7 @@
     },
     "licenseFile": {
       "title": "Lizenz-PDF öffnen",
-      "desc": "Wenn ein Sticker-Pack geöffnet ist, öffnet diese Aktion die zugehörige Lizenz-PDF in einem neuen Browser-Tab."
+      "desc": "Zeigt die Lizenzinformationen für das ausgewählte Sticker-Pack."
     },
     "license": {
       "title": "Lizenzhinweis",
