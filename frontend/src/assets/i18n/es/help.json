@@ -400,7 +400,7 @@
       },
       "licenses": {
         "title": "Licencias de código abierto",
-        "desc": "Muestra las licencias de código abierto y de terceros usadas en la app."
+        "desc": "Muestra las licencias de código abierto usadas en la app."
       },
       "menuHelp": {
         "title": "Ayuda",

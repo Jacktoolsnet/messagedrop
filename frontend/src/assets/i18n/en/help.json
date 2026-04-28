@@ -400,7 +400,7 @@
       },
       "licenses": {
         "title": "Open-source licenses",
-        "desc": "Shows open-source and third-party licenses used by the app."
+        "desc": "Shows the open-source licenses used by the app."
       },
       "menuHelp": {
         "title": "Help",
