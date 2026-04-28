@@ -152,6 +152,14 @@ export class MessagelistComponent implements OnInit, OnDestroy {
   public dislikeButtonColor = 'secondary';
   public mode: typeof Mode = Mode;
 
+  private resolveEditMode(message: Message): Mode {
+    return this.isCommentMessage(message) ? Mode.EDIT_COMMENT : Mode.EDIT_PUBLIC_MESSAGE;
+  }
+
+  private isCommentMessage(message: Message): boolean {
+    return !!message.parentUuid || (typeof message.parentId === 'number' && message.parentId > 0);
+  }
+
   constructor() {
     this.userProfile = this.userService.getProfile();
     const initialScopedMessageUuids = this.normalizeMessageUuids(this.data.messageUuids);
@@ -966,7 +974,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
 
       const dialogRef = this.messageDialog.open(EditMessageComponent, {
         panelClass: '',
-        data: { mode: this.clickedMessage.parentId == null ? this.mode.EDIT_PUBLIC_MESSAGE : this.mode.EDIT_COMMENT, message: this.clickedMessage },
+        data: { mode: this.resolveEditMode(this.clickedMessage), message: this.clickedMessage },
         closeOnNavigation: true,
         minWidth: '20vw',
         maxWidth: '90vw',
