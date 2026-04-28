@@ -26,7 +26,7 @@ We do not guarantee ongoing compatibility with all future device, operating syst
 
 Much of the data is stored locally on the device. Local data may be lost. Without your own backup, restoration will generally not be possible.
 
-The optional read-aloud function depends on the browser, operating system, device, installed language packs, and selected voice. We do not guarantee the availability of particular voices, local processing, any particular pronunciation quality, or freedom from errors.
+The optional read-aloud function depends on the browser, operating system, device, installed language packs, and selected voice. We do not guarantee the availability or functionality of the read-aloud function itself, nor the availability of particular voices, local processing, any particular pronunciation quality, or freedom from errors.
 
 External content, services, and linked websites are the responsibility of the respective third-party providers.
 
@@ -100,7 +100,7 @@ Use of the service requires a suitable device, a supported operating system, and
 
 With outdated, unsupported, or unsuitable devices, operating systems, or browsers, functions may be limited, may malfunction, or may not be available.
 
-This also applies to the optional read-aloud function. Whether speech synthesis takes place locally on the device or uses components of the browser, operating system, or platform provider depends on the specific technical environment and the selected voice. We assume no warranty for the availability, selection, quality, pronunciation, uninterrupted operation, or compatibility of individual voices or language packs.
+This also applies to the optional read-aloud function. Whether speech synthesis takes place locally on the device or uses components of the browser, operating system, or platform provider depends on the specific technical environment and the selected voice. We assume no warranty that the read-aloud function will be available or work at all; likewise, we assume no warranty for the availability, selection, quality, pronunciation, uninterrupted operation, or compatibility of individual voices or language packs.
 
 The security of the device used, the installed software, and user access (in particular regular security updates, device lock, protection against malware, and confidential storage of access credentials/PINs) is the user’s responsibility.
 
