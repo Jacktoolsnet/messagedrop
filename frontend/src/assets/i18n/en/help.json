@@ -853,7 +853,7 @@
       },
       "draft": {
         "title": "Save as draft",
-        "desc": "This action stores the public message locally as a draft only. It appears in “My Public Messages” and is checked only when you publish it later."
+        "desc": "This action saves the public message as a local draft. To publish it, go to “My public messages”, open the draft, and select “Publish message”."
       },
       "apply": {
         "title": "Send",

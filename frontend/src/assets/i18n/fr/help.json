@@ -853,7 +853,7 @@
       },
       "draft": {
         "title": "Enregistrer comme brouillon",
-        "desc": "Cette fonction enregistre le message public uniquement localement comme brouillon. Il apparaît dans « Mes messages publics » et n’est vérifié qu’au moment de sa publication."
+        "desc": "Cette fonction enregistre le message public comme brouillon local. Pour le publier, allez dans « Mes messages publics », ouvrez le brouillon, puis sélectionnez « Publier le message »."
       },
       "apply": {
         "title": "Envoyer",

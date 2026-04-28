@@ -853,7 +853,7 @@
       },
       "draft": {
         "title": "Als Entwurf speichern",
-        "desc": "Mit dieser Funktion speicherst du die öffentliche Nachricht nur lokal als Entwurf. Sie erscheint in „Meine öffentlichen Nachrichten“ und wird erst beim späteren Veröffentlichen geprüft."
+        "desc": "Mit dieser Funktion legst du die öffentliche Nachricht als lokalen Entwurf ab. Um sie zu veröffentlichen, gehe zu „Meine öffentlichen Nachrichten“, öffne den Entwurf und wähle dort „Nachricht veröffentlichen“."
       },
       "apply": {
         "title": "Senden",

@@ -853,7 +853,7 @@
       },
       "draft": {
         "title": "Guardar como borrador",
-        "desc": "Con esta función guardas el mensaje público solo localmente como borrador. Aparece en «Mis mensajes públicos» y solo se revisa cuando lo publiques más tarde."
+        "desc": "Con esta función guardas el mensaje público como borrador local. Para publicarlo, ve a «Mis mensajes públicos», abre el borrador y selecciona «Publicar mensaje»."
       },
       "apply": {
         "title": "Enviar",
