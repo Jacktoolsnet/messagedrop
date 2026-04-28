@@ -916,19 +916,23 @@
   },
   "imageExif": {
     "title": "Choose image location",
-    "intro": "Decide whether the image should use the current map location or the EXIF location stored in the image.",
+    "intro": "The image contains stored location data. Decide whether MessageDrop should use this image location or the current map location for the private image pin.",
     "items": {
-      "location": {
-        "title": "Choose location",
-        "desc": "Choose whether to keep the map location or use the location stored in the image."
+      "imageLocation": {
+        "title": "Use image location",
+        "desc": "Uses the EXIF location stored in the image. The pin appears where the image data says the photo was taken."
+      },
+      "mapLocation": {
+        "title": "Keep map location",
+        "desc": "Ignores the EXIF location and uses the current map location for the image pin instead."
       },
       "remember": {
         "title": "Remember choice",
-        "desc": "Applies this decision to additional images with location data in this selection."
+        "desc": "Applies your decision to additional selected images with location data without asking again."
       },
-      "confirm": {
-        "title": "Confirm",
-        "desc": "Confirms the choice and applies the selected location to the image."
+      "help": {
+        "title": "Help",
+        "desc": "Opens this explanation of image location, map location, and remembering the choice."
       }
     }
   },

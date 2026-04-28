@@ -389,7 +389,7 @@
       },
       "exif": {
         "title": "Utiliser la position de l'image ?",
-        "body": "Cette image contient des données de localisation. Utiliser cette position à la place de celle de la carte ?",
+        "body": "Cette image contient des données de position enregistrées. Le pin doit-il être placé à cette position de l’image ou à la position actuelle de la carte ?",
         "remember": "Se souvenir de mon choix",
         "keep": "Conserver la position de la carte",
         "useMap": "Utiliser la position de l'image",

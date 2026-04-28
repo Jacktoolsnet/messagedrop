@@ -12,8 +12,7 @@ import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
   selector: 'app-override-exif-data',
   imports: [FormsModule, MatButtonModule, MatSlideToggleModule, MatDialogActions, MatDialogClose, MatDialogContent, MatIcon, TranslocoPipe],
   templateUrl: './override-exif-data.component.html',
-  styleUrl: './override-exif-data.component.css',
-  standalone: true
+  styleUrl: './override-exif-data.component.css'
 })
 export class OverrideExifDataComponent {
   readonly dialogRef = inject(MatDialogRef<OverrideExifDataComponent>);

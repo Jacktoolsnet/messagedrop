@@ -389,7 +389,7 @@
       },
       "exif": {
         "title": "¿Usar la ubicación de la imagen?",
-        "body": "Esta imagen contiene datos de ubicación. ¿Usar esa ubicación en lugar de la del mapa?",
+        "body": "Esta imagen contiene datos de ubicación guardados. ¿El pin debe colocarse en esta ubicación de la imagen o en la ubicación actual del mapa?",
         "remember": "Recordar mi elección",
         "keep": "Mantener ubicación del mapa",
         "useMap": "Usar ubicación de la imagen",

@@ -16,6 +16,7 @@
 .body {
   display: grid;
   gap: 10px;
+  padding-bottom: 0.85rem;
 }
 
 .headline {

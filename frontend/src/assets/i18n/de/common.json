@@ -389,7 +389,7 @@
       },
       "exif": {
         "title": "Bildposition verwenden?",
-        "body": "Dieses Bild enthält Standortdaten. Soll diese Position statt der Kartenposition genutzt werden?",
+        "body": "Im Bild sind Standortdaten gespeichert. Soll der Pin an dieser Bildposition oder an der aktuellen Kartenposition gesetzt werden?",
         "remember": "Auswahl merken",
         "keep": "Kartenposition behalten",
         "useMap": "Bildposition verwenden",

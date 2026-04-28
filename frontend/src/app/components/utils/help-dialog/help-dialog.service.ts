@@ -196,16 +196,25 @@ const ITEMS = {
   ],
   exif: [
     {
-      icon: 'edit',
-      titleKey: 'common.items.content.title',
-      descriptionKey: 'common.items.content.desc'
+      icon: 'image',
+      titleKey: 'imageExif.items.imageLocation.title',
+      descriptionKey: 'imageExif.items.imageLocation.desc'
     },
     {
-      icon: 'tune',
-      titleKey: 'common.items.options.title',
-      descriptionKey: 'common.items.options.desc'
+      icon: 'map',
+      titleKey: 'imageExif.items.mapLocation.title',
+      descriptionKey: 'imageExif.items.mapLocation.desc'
     },
-    ...STANDARD_ACTIONS
+    {
+      icon: 'toggle_on',
+      titleKey: 'imageExif.items.remember.title',
+      descriptionKey: 'imageExif.items.remember.desc'
+    },
+    {
+      icon: 'help',
+      titleKey: 'imageExif.items.help.title',
+      descriptionKey: 'imageExif.items.help.desc'
+    }
   ]
 } as const satisfies Record<string, HelpItem[]>;
 
@@ -1232,7 +1241,7 @@ const HELP_TOPICS = {
   },
   imageExif: {
     titleKey: 'imageExif.title',
-    introKey: 'common.intros.editor',
+    introKey: 'imageExif.intro',
     items: ITEMS.exif
   },
   dsaReport: {
