@@ -1,5 +1,5 @@
 import { formatDate, PlatformLocation } from '@angular/common';
-import { Component, computed, DestroyRef, effect, inject, LOCALE_ID, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, LOCALE_ID, OnInit, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -283,9 +283,19 @@ export class AppComponent implements OnInit {
           }
         } else {
           this.systemNotificationService.reset();
+          untracked(() => {
+            this.noteService.logout();
+            this.clearPrivateLocalMapState();
+            this.createMarkerLocations();
+          });
         }
       } else {
         this.systemNotificationService.reset();
+        untracked(() => {
+          this.noteService.logout();
+          this.clearPrivateLocalMapState();
+          this.createMarkerLocations();
+        });
       }
     });
 
@@ -513,7 +523,15 @@ export class AppComponent implements OnInit {
     this.placeService.logout();
     this.contactService.logout();
     this.noteService.logout();
+    this.clearPrivateLocalMapState();
     this.systemNotificationService.reset();
+    this.createMarkerLocations();
+  }
+
+  private clearPrivateLocalMapState(): void {
+    this.localImageService.logout();
+    this.localDocumentService.logout();
+    this.myExperienceLocationsInView = [];
   }
 
   public async connectToBackend(): Promise<void> {
@@ -1308,26 +1326,27 @@ export class AppComponent implements OnInit {
   }
 
   public handleMarkerClickEvent(event: MarkerLocation) {
+    const canOpenPrivateContent = this.userService.isReady();
     switch (event.type) {
       case MarkerType.PUBLIC_MESSAGE:
         this.openMarkerMessageListDialog(event.messages);
         break;
       case MarkerType.PRIVATE_NOTE:
-        if (this.userService.isReady()) {
+        if (canOpenPrivateContent) {
           this.noteService.getNotesInBoundingBox(this.mapService.getVisibleMapBoundingBox()).then(() => {
             this.openMarkerNoteListDialog(event.notes);
           });
         }
         break;
       case MarkerType.PRIVATE_IMAGE:
-        if (this.userService.isReady()) {
+        if (canOpenPrivateContent) {
           this.localImageService.getImagesInBoundingBox(this.mapService.getVisibleMapBoundingBox()).then(() => {
             this.openMarkerImageListDialog(event.images);
           });
         }
         break;
       case MarkerType.PRIVATE_DOCUMENT:
-        if (this.userService.isReady()) {
+        if (canOpenPrivateContent) {
           this.localDocumentService.getDocumentsInBoundingBox(this.mapService.getVisibleMapBoundingBox()).then(() => {
             this.openMarkerDocumentListDialog(event.documents);
           });
@@ -1337,16 +1356,25 @@ export class AppComponent implements OnInit {
         this.openMarkerExperienceListDialog(event.experiences ?? []);
         break;
       case MarkerType.MY_EXPERIENCE:
-        this.openMarkerMyExperienceListDialog(event.myExperiences ?? []);
+        if (canOpenPrivateContent) {
+          this.openMarkerMyExperienceListDialog(event.myExperiences ?? []);
+        }
         break;
       case MarkerType.MULTI:
+        if (
+          !canOpenPrivateContent
+          && !event.messages.length
+          && !(event.experiences?.length)
+        ) {
+          return;
+        }
         this.openMarkerMultiDialog(
           event.messages,
-          event.notes,
-          event.images,
-          event.documents,
+          canOpenPrivateContent ? event.notes : [],
+          canOpenPrivateContent ? event.images : [],
+          canOpenPrivateContent ? event.documents : [],
           event.experiences ?? [],
-          event.myExperiences ?? []
+          canOpenPrivateContent ? (event.myExperiences ?? []) : []
         );
         break;
     }
@@ -1786,19 +1814,27 @@ export class AppComponent implements OnInit {
             this.openMarkerMessageListDialog(result.messages);
             break
           case 'private_note':
-            this.openMarkerNoteListDialog(result.notes);
+            if (this.userService.isReady()) {
+              this.openMarkerNoteListDialog(result.notes);
+            }
             break
           case 'private_image':
-            this.openMarkerImageListDialog(result.images);
+            if (this.userService.isReady()) {
+              this.openMarkerImageListDialog(result.images);
+            }
             break
           case 'private_document':
-            this.openMarkerDocumentListDialog(result.documents);
+            if (this.userService.isReady()) {
+              this.openMarkerDocumentListDialog(result.documents);
+            }
             break
           case 'experience':
             this.openMarkerExperienceListDialog(result.experiences ?? []);
             break
           case 'my_experience':
-            this.openMarkerMyExperienceListDialog(result.experiences ?? []);
+            if (this.userService.isReady()) {
+              this.openMarkerMyExperienceListDialog(result.experiences ?? []);
+            }
             break
         }
       }
@@ -1806,7 +1842,7 @@ export class AppComponent implements OnInit {
   }
 
   private openMarkerMyExperienceListDialog(experiences: ExperienceResult[]): void {
-    if (!experiences.length) {
+    if (!this.userService.isReady() || !experiences.length) {
       return;
     }
     this.dialog.open(MyExperienceslistComponent, {
@@ -1898,6 +1934,9 @@ export class AppComponent implements OnInit {
   }
 
   public openMarkerNoteListDialog(notes: Note[]) {
+    if (!this.userService.isReady() || !notes.length) {
+      return;
+    }
     const notesSignal = signal<Note[]>(notes);
     const dialogRef = this.dialog.open(NotelistComponent, {
       panelClass: 'MessageListDialog',
@@ -1925,6 +1964,9 @@ export class AppComponent implements OnInit {
   }
 
   public openMarkerImageListDialog(images: LocalImage[]) {
+    if (!this.userService.isReady() || !images.length) {
+      return;
+    }
     const imagesSignal = signal<LocalImage[]>(images);
     const dialogRef = this.dialog.open(ImagelistComponent, {
       panelClass: 'ImageListDialog',
@@ -1956,6 +1998,9 @@ export class AppComponent implements OnInit {
   }
 
   public openMarkerDocumentListDialog(documents: LocalDocument[]) {
+    if (!this.userService.isReady() || !documents.length) {
+      return;
+    }
     const documentsSignal = signal<LocalDocument[]>(documents);
     const dialogRef = this.dialog.open(DocumentlistComponent, {
       panelClass: 'DocumentListDialog',
@@ -2210,13 +2255,23 @@ export class AppComponent implements OnInit {
           this.backupService.startBackup();
           break;
         case "changePin":
-          this.userService.changePin();
+          void this.changePin();
           break;
         case "resetKeys":
           this.userService.resetKeys();
           break;
       }
     });
+  }
+
+  private async changePin(): Promise<void> {
+    await this.userService.changePin();
+    if (!this.userService.isReady()) {
+      this.noteService.logout();
+      this.clearPrivateLocalMapState();
+      this.systemNotificationService.reset();
+      this.createMarkerLocations();
+    }
   }
 
   public refreshUserMenuState(): void {
@@ -2501,6 +2556,7 @@ export class AppComponent implements OnInit {
   private createMarkerLocations() {
     this.markerLocations.clear();
     let center: Location | undefined = undefined;
+    const canShowPrivateContent = this.userService.isReady();
     // Process messages
     const messages = this.messageService.messagesSignal().filter((message) => message.status === 'enabled');
     messages.forEach((message) => {
@@ -2532,7 +2588,7 @@ export class AppComponent implements OnInit {
       }
     });
     // Process notes
-    const notes = this.noteService.getNotesSignal()();
+    const notes = canShowPrivateContent ? this.noteService.getNotesSignal()() : [];
     notes.forEach((note) => {
       const noteLocation: Location = {
         latitude: note.location.latitude,
@@ -2568,7 +2624,7 @@ export class AppComponent implements OnInit {
     });
 
     // Process images
-    const images = this.localImageService.getImagesSignal()();
+    const images = canShowPrivateContent ? this.localImageService.getImagesSignal()() : [];
     images.forEach((image) => {
       const imageLocation: Location = {
         latitude: image.location.latitude,
@@ -2604,7 +2660,7 @@ export class AppComponent implements OnInit {
     });
 
     // Process documents
-    const documents = this.localDocumentService.getDocumentsSignal()();
+    const documents = canShowPrivateContent ? this.localDocumentService.getDocumentsSignal()() : [];
     documents.forEach((document) => {
       const documentLocation: Location = {
         latitude: document.location.latitude,
@@ -2688,7 +2744,8 @@ export class AppComponent implements OnInit {
     });
 
     // Process my experiences
-    this.myExperienceLocationsInView.forEach(({ result, location }) => {
+    const myExperienceLocations = canShowPrivateContent ? this.myExperienceLocationsInView : [];
+    myExperienceLocations.forEach(({ result, location }) => {
       if (this.mapService.getMapZoom() > 17) {
         center = location;
       } else {

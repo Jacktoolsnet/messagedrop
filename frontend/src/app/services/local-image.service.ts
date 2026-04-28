@@ -377,6 +377,12 @@ export class LocalImageService {
     this.imagesSignal.set([]);
   }
 
+  logout(): void {
+    this.revokeAllImageUrls();
+    this.clearImages();
+    this.lastErrorSignal.set(null);
+  }
+
   async deleteImage(image: LocalImage): Promise<void> {
     await this.indexedDbService.deleteImage(image.id);
     await this.fileCacheService.deleteImageFile(image.id, image.fileName, image.mimeType);

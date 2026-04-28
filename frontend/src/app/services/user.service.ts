@@ -232,6 +232,7 @@ export class UserService {
     this.pinSalt = null;
     this.backupState.clearDirty();
     this.initUserId();
+    this._userSet.update(trigger => trigger + 1);
   }
 
   setUser(user: User, jwt: string) {
@@ -1935,9 +1936,8 @@ export class UserService {
         autoFocus: false
       });
 
-      infoDialog.afterClosed().subscribe(() => {
-        this.logout();
-      });
+      await firstValueFrom(infoDialog.afterClosed());
+      this.logout();
     } catch (err) {
       console.error('Change PIN failed', err);
       const errorDialog = this.displayMessage.open(DisplayMessage, {
