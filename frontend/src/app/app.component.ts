@@ -1513,7 +1513,8 @@ export class AppComponent implements OnInit {
 
       await Promise.all(resolvedEntries.map(entry => this.indexedDbService.saveImage(entry)));
       this.snackBar.open(this.translation.t('common.images.imported'), undefined, { duration: 3000 });
-      this.updateDataForLocation();
+      await this.updateDataForLocation();
+      this.openMarkerImageListDialog(resolvedEntries);
     } catch (error) {
       console.error('Failed to add image', error);
       this.snackBar.open(this.translation.t('common.images.importFailed'), undefined, { duration: 4000 });
@@ -1535,7 +1536,8 @@ export class AppComponent implements OnInit {
 
       await Promise.all(entries.map(entry => this.localDocumentService.saveDocument(entry)));
       this.snackBar.open(this.translation.t('common.documents.imported'), undefined, { duration: 3000 });
-      this.updateDataForLocation();
+      await this.updateDataForLocation();
+      this.openMarkerDocumentListDialog(entries);
     } catch (error) {
       console.error('Failed to add document', error);
       const message = isQuotaExceededError(error)
