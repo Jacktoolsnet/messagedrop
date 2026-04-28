@@ -24,7 +24,7 @@ The security of the device and of access credentials (in particular the PIN) is 
 
 We do not guarantee ongoing compatibility with all future device, operating system, or browser versions.
 
-Much of the data is stored locally on the device. Local data may be lost. Without your own backup, restoration will generally not be possible.
+Much of the data is stored locally on the device. Local data may be lost. Without your own backup, restoration will not be possible.
 
 The optional read-aloud function depends on the browser, operating system, device, installed language packs, and selected voice. We do not guarantee the availability or functionality of the read-aloud function itself, nor the availability of particular voices, local processing, any particular pronunciation quality, or freedom from errors.
 
@@ -131,7 +131,7 @@ Local data may be lost as a result of user actions or technical circumstances (e
 
 To the extent permitted by law, we are not liable for the loss, damage, or unavailability of locally stored data.
 
-If a backup/restore function is offered, its use is at the user’s own responsibility. Without a previously created and functioning backup, restoration will generally not be possible.
+If a backup/restore function is offered, its use is at the user’s own responsibility. Without a previously created and functioning backup, restoration will not be possible.
 
 ###
 6. Third-Party Content, Services, and Integrations

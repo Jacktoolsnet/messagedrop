@@ -21,7 +21,7 @@ Die Sicherheit des Endgeräts und der Zugangsdaten (insbesondere PIN) liegt im V
 
 Wir übernehmen keine Gewähr für die dauerhafte Kompatibilität mit allen künftigen Geräte-, Betriebssystem- oder Browserversionen.
 
-Viele Daten werden lokal auf dem Endgerät gespeichert. Lokale Daten können verloren gehen. Ohne eigenes Backup ist eine Wiederherstellung regelmäßig nicht möglich.
+Viele Daten werden lokal auf dem Endgerät gespeichert. Lokale Daten können verloren gehen. Ohne eigenes Backup ist eine Wiederherstellung nicht möglich.
 
 Die optionale Vorlesefunktion hängt von Browser, Betriebssystem, Endgerät, installierten Sprachpaketen und gewählter Stimme ab. Wir garantieren weder die Verfügbarkeit oder Funktionsfähigkeit der Vorlesefunktion selbst noch die Verfügbarkeit bestimmter Stimmen, eine lokale Verarbeitung, eine bestimmte Aussprachequalität oder Fehlerfreiheit.
 
@@ -128,7 +128,7 @@ Lokale Daten können durch Nutzerhandlungen oder technische Umstände verloren g
 
 Soweit gesetzlich zulässig, haften wir nicht für Verlust, Beschädigung oder Nichtverfügbarkeit lokal gespeicherter Daten.
 
-Soweit eine Backup-/Restore-Funktion angeboten wird, erfolgt deren Nutzung auf eigene Verantwortung des Nutzers. Ohne ein zuvor erstelltes und funktionsfähiges Backup ist eine Wiederherstellung regelmäßig nicht möglich.
+Soweit eine Backup-/Restore-Funktion angeboten wird, erfolgt deren Nutzung auf eigene Verantwortung des Nutzers. Ohne ein zuvor erstelltes und funktionsfähiges Backup ist eine Wiederherstellung nicht möglich.
 
 ###
 6. Inhalte, Dienste und Einbindungen Dritter
