@@ -650,18 +650,6 @@ const messageCreateLimiter = rateLimit({
   }
 });
 
-function sendInternalAllMessages(req, res, next) {
-  tableMessage.getAll(req.database.db, function (err, rows) {
-    if (err) {
-      return next(apiError.internal('db_error'));
-    }
-    if (!rows || rows.length === 0) {
-      return next(apiError.notFound('not_found'));
-    }
-    return res.status(200).json({ status: 200, rows: toInternalMessageDtos(rows) });
-  });
-}
-
 function sendInternalMessageById(req, res, next) {
   tableMessage.getById(req.database.db, req.params.messageId, function (err, row) {
     if (err) {
@@ -1019,13 +1007,6 @@ router.get('/me/userId/:userId',
   sendOwnMessagesByUserId
 );
 
-router.get('/internal',
-  [
-    security.checkToken
-  ],
-  sendInternalAllMessages
-);
-
 router.get('/internal/id/:messageId',
   [
     security.checkToken
@@ -1049,13 +1030,6 @@ router.get('/internal/comment/:parentUuid',
 
 // Legacy aliases retained for compatibility while callers migrate to explicit
 // /public, /me and /internal routes.
-router.get('/get',
-  [
-    security.checkToken
-  ],
-  sendInternalAllMessages
-);
-
 router.get('/get/id/:messageId',
   [
     security.checkToken
