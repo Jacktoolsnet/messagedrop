@@ -20,6 +20,7 @@ import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { DeleteDocumentComponent } from './delete-document/delete-document.component';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { DisplayMessageService } from '../../services/display-message.service';
+import { LocationPickerDialogComponent } from '../utils/location-picker-dialog/location-picker-dialog.component';
 
 interface DocumentDialogData {
   location: Location;
@@ -97,6 +98,34 @@ export class DocumentlistComponent implements OnInit {
 
   navigateToDocumentLocation(document: LocalDocument) {
     this.localDocumentService.navigateToDocumentLocation(this.userService.getUser(), document);
+  }
+
+  editLocation(document: LocalDocument): void {
+    const dialogRef = this.dialog.open(LocationPickerDialogComponent, {
+      data: { location: document.location, markerType: 'note' },
+      maxWidth: '95vw',
+      maxHeight: '95vh',
+      width: '95vw',
+      height: '95vh',
+      autoFocus: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false
+    });
+
+    dialogRef.afterClosed().subscribe(async (location?: Location) => {
+      if (!location) {
+        return;
+      }
+      const updatedDocument: LocalDocument = {
+        ...document,
+        location: { ...location }
+      };
+      await this.localDocumentService.saveDocument(updatedDocument);
+      this.documentsSignal.update(documents =>
+        documents.map(item => item.id === document.id ? updatedDocument : item)
+      );
+    });
   }
 
   async openDocument(document: LocalDocument): Promise<void> {

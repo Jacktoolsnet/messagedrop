@@ -813,7 +813,46 @@
     }
   },
   "documentList": {
-    "title": "Documentos"
+    "title": "Documentos",
+    "intro": "En esta lista gestionas los documentos guardados localmente para el lugar seleccionado. Puedes abrir archivos, corregir su ubicación, saltar a ellos en el mapa, iniciar la navegación o añadir más documentos.",
+    "items": {
+      "open": {
+        "title": "Abrir documento",
+        "desc": "Abre el archivo seleccionado en la aplicación adecuada o en el navegador. Es posible que el navegador vuelva a pedir permiso de lectura."
+      },
+      "delete": {
+        "title": "Eliminar documento",
+        "desc": "Elimina de forma permanente el documento seleccionado del almacenamiento local de MessageDrop."
+      },
+      "editLocation": {
+        "title": "Editar ubicación",
+        "desc": "Abre el selector del mapa para asignar el documento a otro lugar."
+      },
+      "flyTo": {
+        "title": "Ir al mapa",
+        "desc": "Centra el mapa de la app en la ubicación guardada del documento y cierra la lista."
+      },
+      "navigate": {
+        "title": "Iniciar navegación",
+        "desc": "Abre una navegación externa hasta la ubicación del documento. Se envían la posición inicial y el destino al servicio de mapas."
+      },
+      "close": {
+        "title": "Cerrar",
+        "desc": "Cierra la lista de documentos sin más cambios."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Abre esta ayuda sobre la lista de documentos."
+      },
+      "add": {
+        "title": "Añadir documentos",
+        "desc": "Abre el selector de archivos. Los archivos seleccionados se asignan al lugar actual y se guardan localmente."
+      },
+      "privacy": {
+        "title": "Privacidad y almacenamiento",
+        "desc": "Los documentos y metadatos se guardan localmente en el almacenamiento de la app. El contenido no se sube al backend para la lista de documentos. La navegación externa envía datos de ubicación al servicio de mapas; al abrir un archivo también se aplican las reglas de la app o del navegador utilizado."
+      }
+    }
   },
   "editMessage": {
     "title": "Crear o editar mensaje",
@@ -912,7 +951,46 @@
     }
   },
   "imageList": {
-    "title": "Imágenes"
+    "title": "Imágenes",
+    "intro": "En esta lista gestionas tus imágenes guardadas localmente para el lugar seleccionado. Puedes ver vistas previas, ajustar ubicaciones, saltar al mapa, navegar o añadir más imágenes.",
+    "items": {
+      "preview": {
+        "title": "Ver vista previa",
+        "desc": "Muestra cada imagen guardada como vista previa. Si el archivo ya no se puede leer, aparece un aviso con un icono de imagen rota."
+      },
+      "delete": {
+        "title": "Eliminar imagen",
+        "desc": "Elimina de forma permanente la imagen seleccionada del almacenamiento local de MessageDrop."
+      },
+      "editLocation": {
+        "title": "Editar ubicación",
+        "desc": "Abre el selector del mapa para asignar la imagen a otro lugar."
+      },
+      "flyTo": {
+        "title": "Ir al mapa",
+        "desc": "Centra el mapa de la app en la ubicación guardada de la imagen y cierra la lista."
+      },
+      "navigate": {
+        "title": "Iniciar navegación",
+        "desc": "Abre una navegación externa hasta la ubicación de la imagen. Se envían la posición inicial y el destino al servicio de mapas."
+      },
+      "close": {
+        "title": "Cerrar",
+        "desc": "Cierra la lista de imágenes sin más cambios."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Abre esta ayuda sobre la lista de imágenes."
+      },
+      "add": {
+        "title": "Añadir imágenes",
+        "desc": "Abre el selector de imágenes. Las imágenes con metadatos de ubicación pueden usar su posición EXIF; si no, se usa el lugar actual."
+      },
+      "privacy": {
+        "title": "Privacidad y almacenamiento",
+        "desc": "Las imágenes, los datos de vista previa y las ubicaciones se guardan localmente en el almacenamiento de la app. El contenido no se sube al backend para la lista de imágenes. Los datos de ubicación EXIF pueden usarse si lo confirmas al añadir imágenes. La navegación externa envía datos de ubicación al servicio de mapas."
+      }
+    }
   },
   "imageExif": {
     "title": "Elegir ubicación de la imagen",

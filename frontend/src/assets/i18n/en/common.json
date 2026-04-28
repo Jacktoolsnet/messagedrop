@@ -394,7 +394,8 @@
         "keep": "Keep map location",
         "useMap": "Use image location",
         "previewAlt": "Image preview"
-      }
+      },
+      "editLocationAria": "Edit image location"
     },
     "documents": {
       "title": "Private documents",
@@ -414,7 +415,8 @@
       "delete": {
         "title": "Delete document",
         "confirm": "The document will be permanently deleted. Are you sure?"
-      }
+      },
+      "editLocationAria": "Edit document location"
     },
     "map": {
       "multiMarker": {

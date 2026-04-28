@@ -813,7 +813,46 @@
     }
   },
   "documentList": {
-    "title": "Documents"
+    "title": "Documents",
+    "intro": "Cette liste permet de gérer les documents enregistrés localement pour le lieu sélectionné. Vous pouvez ouvrir des fichiers, corriger leur position, les afficher sur la carte, lancer un itinéraire ou ajouter d’autres documents.",
+    "items": {
+      "open": {
+        "title": "Ouvrir le document",
+        "desc": "Ouvre le fichier sélectionné dans l’application adaptée ou dans le navigateur. Le navigateur peut redemander une autorisation de lecture."
+      },
+      "delete": {
+        "title": "Supprimer le document",
+        "desc": "Supprime définitivement le document sélectionné du stockage local de MessageDrop."
+      },
+      "editLocation": {
+        "title": "Modifier la position",
+        "desc": "Ouvre le sélecteur de carte afin d’associer le document à un autre lieu."
+      },
+      "flyTo": {
+        "title": "Afficher sur la carte",
+        "desc": "Centre la carte de l’app sur la position enregistrée du document et ferme la liste."
+      },
+      "navigate": {
+        "title": "Démarrer l’itinéraire",
+        "desc": "Ouvre un itinéraire externe vers la position du document. Les positions de départ et d’arrivée sont transmises au service de cartographie."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Ferme la liste des documents sans autre modification."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Ouvre cette aide pour la liste des documents."
+      },
+      "add": {
+        "title": "Ajouter des documents",
+        "desc": "Ouvre le sélecteur de fichiers. Les fichiers sélectionnés sont associés au lieu actuel et enregistrés localement."
+      },
+      "privacy": {
+        "title": "Confidentialité et stockage",
+        "desc": "Les documents et leurs métadonnées sont enregistrés localement dans le stockage de l’app. Le contenu n’est pas téléversé vers le backend pour la liste des documents. Un itinéraire externe transmet des données de position au service de cartographie ; l’ouverture d’un fichier dépend aussi des règles de l’application ou du navigateur utilisé."
+      }
+    }
   },
   "editMessage": {
     "title": "Créer ou modifier un message",
@@ -912,7 +951,46 @@
     }
   },
   "imageList": {
-    "title": "Images"
+    "title": "Images",
+    "intro": "Cette liste permet de gérer vos images enregistrées localement pour le lieu sélectionné. Vous pouvez voir les aperçus, ajuster les positions, afficher la carte, lancer un itinéraire ou ajouter d’autres images.",
+    "items": {
+      "preview": {
+        "title": "Voir l’aperçu",
+        "desc": "Affiche chaque image enregistrée sous forme d’aperçu. Si le fichier ne peut plus être lu, un message avec une icône d’image manquante s’affiche."
+      },
+      "delete": {
+        "title": "Supprimer l’image",
+        "desc": "Supprime définitivement l’image sélectionnée du stockage local de MessageDrop."
+      },
+      "editLocation": {
+        "title": "Modifier la position",
+        "desc": "Ouvre le sélecteur de carte afin d’associer l’image à un autre lieu."
+      },
+      "flyTo": {
+        "title": "Afficher sur la carte",
+        "desc": "Centre la carte de l’app sur la position enregistrée de l’image et ferme la liste."
+      },
+      "navigate": {
+        "title": "Démarrer l’itinéraire",
+        "desc": "Ouvre un itinéraire externe vers la position de l’image. Les positions de départ et d’arrivée sont transmises au service de cartographie."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Ferme la liste des images sans autre modification."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Ouvre cette aide pour la liste des images."
+      },
+      "add": {
+        "title": "Ajouter des images",
+        "desc": "Ouvre le sélecteur d’images. Les images contenant une position peuvent utiliser leurs données EXIF ; sinon, le lieu actuel est utilisé."
+      },
+      "privacy": {
+        "title": "Confidentialité et stockage",
+        "desc": "Les images, les données d’aperçu et les positions sont enregistrées localement dans le stockage de l’app. Le contenu n’est pas téléversé vers le backend pour la liste des images. Les données de position EXIF peuvent être utilisées si vous le confirmez lors de l’ajout. Un itinéraire externe transmet des données de position au service de cartographie."
+      }
+    }
   },
   "imageExif": {
     "title": "Choisir la position de l’image",

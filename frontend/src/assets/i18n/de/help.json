@@ -813,7 +813,46 @@
     }
   },
   "documentList": {
-    "title": "Dokumente"
+    "title": "Dokumente",
+    "intro": "In dieser Liste verwaltest du die lokal gespeicherten Dokumente am ausgewählten Ort. Du kannst Dateien öffnen, ihre Position korrigieren, zur Stelle auf der Karte springen, die Navigation starten oder neue Dokumente hinzufügen.",
+    "items": {
+      "open": {
+        "title": "Dokument öffnen",
+        "desc": "Öffnet die ausgewählte Datei mit der passenden App oder im Browser. Falls nötig, fragt dein Browser erneut nach Leserechten."
+      },
+      "delete": {
+        "title": "Dokument löschen",
+        "desc": "Entfernt das ausgewählte Dokument dauerhaft aus der lokalen MessageDrop-Ablage."
+      },
+      "editLocation": {
+        "title": "Position bearbeiten",
+        "desc": "Öffnet die Karte zur Positionsauswahl, damit du das Dokument einem anderen Ort zuordnen kannst."
+      },
+      "flyTo": {
+        "title": "Auf Karte anspringen",
+        "desc": "Zentriert die App-Karte auf die gespeicherte Position des Dokuments und schließt die Liste."
+      },
+      "navigate": {
+        "title": "Navigation starten",
+        "desc": "Öffnet eine externe Navigation zur Dokumentposition. Dabei werden Start- und Zielposition an den Kartendienst übergeben."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Schließt die Dokumentliste ohne weitere Änderungen."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Öffnet diese Hilfeansicht zur Dokumentliste."
+      },
+      "add": {
+        "title": "Dokumente hinzufügen",
+        "desc": "Öffnet die Dateiauswahl. Ausgewählte Dateien werden dem aktuellen Ort zugeordnet und lokal gespeichert."
+      },
+      "privacy": {
+        "title": "Datenschutz und Speicherung",
+        "desc": "Dokumente und Metadaten werden lokal in der App-Ablage gespeichert. Inhalte werden nicht für die Dokumentliste auf das Backend hochgeladen. Bei externer Navigation werden Positionsdaten an den Kartendienst übergeben; beim Öffnen einer Datei gelten zusätzlich die Regeln der verwendeten App oder des Browsers."
+      }
+    }
   },
   "editMessage": {
     "title": "Nachricht erstellen oder bearbeiten",
@@ -912,7 +951,46 @@
     }
   },
   "imageList": {
-    "title": "Bilder"
+    "title": "Bilder",
+    "intro": "In dieser Liste verwaltest du deine lokal gespeicherten Bilder am ausgewählten Ort. Du siehst Vorschaubilder, kannst Positionen anpassen, zur Karte springen, navigieren oder weitere Bilder hinzufügen.",
+    "items": {
+      "preview": {
+        "title": "Bildvorschau ansehen",
+        "desc": "Zeigt jedes gespeicherte Bild als Vorschau. Wenn die Datei nicht mehr gelesen werden kann, erscheint ein Hinweis mit defektem Bildsymbol."
+      },
+      "delete": {
+        "title": "Bild löschen",
+        "desc": "Entfernt das ausgewählte Bild dauerhaft aus der lokalen MessageDrop-Ablage."
+      },
+      "editLocation": {
+        "title": "Position bearbeiten",
+        "desc": "Öffnet die Karte zur Positionsauswahl, damit du das Bild einem anderen Ort zuordnen kannst."
+      },
+      "flyTo": {
+        "title": "Auf Karte anspringen",
+        "desc": "Zentriert die App-Karte auf die gespeicherte Position des Bildes und schließt die Liste."
+      },
+      "navigate": {
+        "title": "Navigation starten",
+        "desc": "Öffnet eine externe Navigation zur Bildposition. Dabei werden Start- und Zielposition an den Kartendienst übergeben."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Schließt die Bilderliste ohne weitere Änderungen."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Öffnet diese Hilfeansicht zur Bilderliste."
+      },
+      "add": {
+        "title": "Bilder hinzufügen",
+        "desc": "Öffnet die Bildauswahl. Bilder mit Standortdaten können ihre EXIF-Position verwenden; sonst wird der aktuelle Ort genutzt."
+      },
+      "privacy": {
+        "title": "Datenschutz und Speicherung",
+        "desc": "Bilder, Vorschaudaten und Positionsangaben werden lokal in der App-Ablage gespeichert. Inhalte werden nicht für die Bilderliste auf das Backend hochgeladen. Standortdaten aus EXIF-Metadaten können übernommen werden, wenn du dies beim Hinzufügen bestätigst. Bei externer Navigation werden Positionsdaten an den Kartendienst übergeben."
+      }
+    }
   },
   "imageExif": {
     "title": "Bildposition auswählen",

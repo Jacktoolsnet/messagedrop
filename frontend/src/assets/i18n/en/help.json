@@ -813,7 +813,46 @@
     }
   },
   "documentList": {
-    "title": "Documents"
+    "title": "Documents",
+    "intro": "Use this list to manage locally stored documents for the selected place. You can open files, correct their location, jump to them on the map, start navigation, or add more documents.",
+    "items": {
+      "open": {
+        "title": "Open document",
+        "desc": "Opens the selected file in the matching app or in the browser. Your browser may ask again for read permission."
+      },
+      "delete": {
+        "title": "Delete document",
+        "desc": "Permanently removes the selected document from the local MessageDrop storage."
+      },
+      "editLocation": {
+        "title": "Edit location",
+        "desc": "Opens the map picker so you can assign the document to a different place."
+      },
+      "flyTo": {
+        "title": "Jump to map",
+        "desc": "Centers the app map on the saved document location and closes the list."
+      },
+      "navigate": {
+        "title": "Start navigation",
+        "desc": "Opens external navigation to the document location. Start and destination positions are passed to the map service."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "Closes the document list without further changes."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "Opens this help view for the document list."
+      },
+      "add": {
+        "title": "Add documents",
+        "desc": "Opens the file picker. Selected files are assigned to the current place and stored locally."
+      },
+      "privacy": {
+        "title": "Privacy and storage",
+        "desc": "Documents and metadata are stored locally in the app storage. Contents are not uploaded to the backend for the document list. External navigation passes location data to the map service; opening a file is also subject to the rules of the app or browser you use."
+      }
+    }
   },
   "editMessage": {
     "title": "Create or edit message",
@@ -912,7 +951,46 @@
     }
   },
   "imageList": {
-    "title": "Images"
+    "title": "Images",
+    "intro": "Use this list to manage your locally stored images for the selected place. You can view previews, adjust locations, jump to the map, navigate, or add more images.",
+    "items": {
+      "preview": {
+        "title": "View image preview",
+        "desc": "Shows each saved image as a preview. If the file can no longer be read, a broken-image notice is shown."
+      },
+      "delete": {
+        "title": "Delete image",
+        "desc": "Permanently removes the selected image from the local MessageDrop storage."
+      },
+      "editLocation": {
+        "title": "Edit location",
+        "desc": "Opens the map picker so you can assign the image to a different place."
+      },
+      "flyTo": {
+        "title": "Jump to map",
+        "desc": "Centers the app map on the saved image location and closes the list."
+      },
+      "navigate": {
+        "title": "Start navigation",
+        "desc": "Opens external navigation to the image location. Start and destination positions are passed to the map service."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "Closes the image list without further changes."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "Opens this help view for the image list."
+      },
+      "add": {
+        "title": "Add images",
+        "desc": "Opens the image picker. Images with location metadata can use their EXIF position; otherwise the current place is used."
+      },
+      "privacy": {
+        "title": "Privacy and storage",
+        "desc": "Images, preview data and locations are stored locally in the app storage. Contents are not uploaded to the backend for the image list. EXIF location data can be used when you confirm it while adding images. External navigation passes location data to the map service."
+      }
+    }
   },
   "imageExif": {
     "title": "Choose image location",

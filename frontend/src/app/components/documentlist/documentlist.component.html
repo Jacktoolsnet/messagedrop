@@ -37,6 +37,10 @@
             (click)="openDocument(document)">
             <mat-icon>open_in_new</mat-icon>
           </button>
+          <button mat-mini-fab color="secondary" [attr.aria-label]="'common.documents.editLocationAria' | transloco"
+            (click)="editLocation(document)">
+            <mat-icon>edit_location_alt</mat-icon>
+          </button>
           <button mat-mini-fab color="secondary" [attr.aria-label]="'common.documents.flyToAria' | transloco"
             (click)="flyTo(document)">
             <mat-icon>place</mat-icon>

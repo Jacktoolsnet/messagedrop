@@ -1114,8 +1114,54 @@ const HELP_TOPICS = {
   },
   documentList: {
     titleKey: 'documentList.title',
-    introKey: 'common.intros.list',
-    items: ITEMS.listBasic
+    introKey: 'documentList.intro',
+    items: [
+      {
+        icon: 'description',
+        titleKey: 'documentList.items.open.title',
+        descriptionKey: 'documentList.items.open.desc'
+      },
+      {
+        icon: 'delete_forever',
+        titleKey: 'documentList.items.delete.title',
+        descriptionKey: 'documentList.items.delete.desc'
+      },
+      {
+        icon: 'edit_location_alt',
+        titleKey: 'documentList.items.editLocation.title',
+        descriptionKey: 'documentList.items.editLocation.desc'
+      },
+      {
+        icon: 'place',
+        titleKey: 'documentList.items.flyTo.title',
+        descriptionKey: 'documentList.items.flyTo.desc'
+      },
+      {
+        icon: 'assistant_direction',
+        titleKey: 'documentList.items.navigate.title',
+        descriptionKey: 'documentList.items.navigate.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'documentList.items.close.title',
+        descriptionKey: 'documentList.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'documentList.items.help.title',
+        descriptionKey: 'documentList.items.help.desc'
+      },
+      {
+        icon: 'upload_file',
+        titleKey: 'documentList.items.add.title',
+        descriptionKey: 'documentList.items.add.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'documentList.items.privacy.title',
+        descriptionKey: 'documentList.items.privacy.desc'
+      }
+    ]
   },
   editMessage: {
     titleKey: 'editMessage.title',
@@ -1236,8 +1282,54 @@ const HELP_TOPICS = {
   },
   imageList: {
     titleKey: 'imageList.title',
-    introKey: 'common.intros.list',
-    items: ITEMS.listBasic
+    introKey: 'imageList.intro',
+    items: [
+      {
+        icon: 'image',
+        titleKey: 'imageList.items.preview.title',
+        descriptionKey: 'imageList.items.preview.desc'
+      },
+      {
+        icon: 'delete_forever',
+        titleKey: 'imageList.items.delete.title',
+        descriptionKey: 'imageList.items.delete.desc'
+      },
+      {
+        icon: 'edit_location_alt',
+        titleKey: 'imageList.items.editLocation.title',
+        descriptionKey: 'imageList.items.editLocation.desc'
+      },
+      {
+        icon: 'place',
+        titleKey: 'imageList.items.flyTo.title',
+        descriptionKey: 'imageList.items.flyTo.desc'
+      },
+      {
+        icon: 'assistant_direction',
+        titleKey: 'imageList.items.navigate.title',
+        descriptionKey: 'imageList.items.navigate.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'imageList.items.close.title',
+        descriptionKey: 'imageList.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'imageList.items.help.title',
+        descriptionKey: 'imageList.items.help.desc'
+      },
+      {
+        icon: 'image_search',
+        titleKey: 'imageList.items.add.title',
+        descriptionKey: 'imageList.items.add.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'imageList.items.privacy.title',
+        descriptionKey: 'imageList.items.privacy.desc'
+      }
+    ]
   },
   imageExif: {
     titleKey: 'imageExif.title',

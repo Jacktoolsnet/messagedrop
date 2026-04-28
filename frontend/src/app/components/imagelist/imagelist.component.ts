@@ -28,6 +28,7 @@ import { DeleteImageComponent } from './delete-image/delete-image.component';
 import { OverrideExifDataComponent } from './override-exif-data/override-exif-data.component';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { DisplayMessageService } from '../../services/display-message.service';
+import { LocationPickerDialogComponent } from '../utils/location-picker-dialog/location-picker-dialog.component';
 
 interface ImageDialogData {
   location: Location;
@@ -142,6 +143,35 @@ export class ImagelistComponent implements OnInit, OnDestroy {
 
   navigateToNoteLocation(localImage: LocalImage) {
     this.localImageService.navigateToNoteLocation(this.userService.getUser(), localImage);
+  }
+
+  editLocation(image: LocalImage): void {
+    const dialogRef = this.dialog.open(LocationPickerDialogComponent, {
+      data: { location: image.location, markerType: 'note' },
+      maxWidth: '95vw',
+      maxHeight: '95vh',
+      width: '95vw',
+      height: '95vh',
+      autoFocus: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false
+    });
+
+    dialogRef.afterClosed().subscribe(async (location?: Location) => {
+      if (!location) {
+        return;
+      }
+      const updatedImage: LocalImage = {
+        ...image,
+        location: { ...location },
+        hasExifLocation: false
+      };
+      await this.indexedDbService.saveImage(updatedImage);
+      this.imagesSignal.update(images =>
+        images.map(item => item.id === image.id ? updatedImage : item)
+      );
+    });
   }
 
   deleteImage(image: LocalImage) {

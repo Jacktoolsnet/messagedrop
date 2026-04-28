@@ -394,7 +394,8 @@
         "keep": "Conserver la position de la carte",
         "useMap": "Utiliser la position de l'image",
         "previewAlt": "Aperçu de l'image"
-      }
+      },
+      "editLocationAria": "Modifier la position de l’image"
     },
     "documents": {
       "title": "Documents privés",
@@ -414,7 +415,8 @@
       "delete": {
         "title": "Supprimer le document",
         "confirm": "Le document sera supprimé définitivement. Voulez-vous continuer ?"
-      }
+      },
+      "editLocationAria": "Modifier la position du document"
     },
     "map": {
       "multiMarker": {

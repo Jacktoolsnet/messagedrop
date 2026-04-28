@@ -394,7 +394,8 @@
         "keep": "Kartenposition behalten",
         "useMap": "Bildposition verwenden",
         "previewAlt": "Bildvorschau"
-      }
+      },
+      "editLocationAria": "Bildposition bearbeiten"
     },
     "documents": {
       "title": "Private Dokumente",
@@ -414,7 +415,8 @@
       "delete": {
         "title": "Dokument löschen",
         "confirm": "Das Dokument wird dauerhaft gelöscht. Bist du sicher?"
-      }
+      },
+      "editLocationAria": "Dokumentenposition bearbeiten"
     },
     "map": {
       "multiMarker": {
