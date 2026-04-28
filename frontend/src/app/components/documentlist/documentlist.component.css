@@ -40,7 +40,7 @@ h2[mat-dialog-title].dialog-title {
 .document-scroll {
   flex: 1 1 auto;
   overflow-y: auto;
-  padding: 0 1rem 1rem;
+  padding: 0 1rem 0.25rem;
   min-height: 0;
 }
 
@@ -61,7 +61,7 @@ h2[mat-dialog-title].dialog-title {
 .content {
   width: 100%;
   max-width: 100%;
-  padding-top: 0;
+  padding-top: 1rem;
   padding-right: 0;
 
   column-width: 420px;
@@ -81,6 +81,10 @@ h2[mat-dialog-title].dialog-title {
   break-inside: avoid-column;
   -webkit-column-break-inside: avoid;
   page-break-inside: avoid;
+}
+
+.item:last-child {
+  margin-bottom: 0;
 }
 
 @media (max-width: 700px) {
