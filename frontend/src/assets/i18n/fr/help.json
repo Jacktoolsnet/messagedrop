@@ -465,6 +465,10 @@
       "privacy": {
         "title": "Confidentialité prioritaire",
         "desc": "La confidentialité est particulièrement importante pour nous : les données sont traitées localement et chiffrées lorsque c'est possible. Les transferts externes n'ont lieu que s'ils sont techniquement nécessaires ou après votre choix explicite."
+      },
+      "myPrivateContents": {
+        "title": "Mes contenus privés",
+        "desc": "Ouvre le sous-menu de vos notes, images et documents privés. Les listes affichent les contenus enregistrés localement pour tous les lieux."
       }
     }
   },

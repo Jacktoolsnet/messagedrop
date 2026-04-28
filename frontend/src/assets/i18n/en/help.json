@@ -465,6 +465,10 @@
       "privacy": {
         "title": "Privacy first",
         "desc": "Privacy is especially important to us: data is processed locally and encrypted where possible. External transfers happen only when technically required or after your active choice."
+      },
+      "myPrivateContents": {
+        "title": "My private content",
+        "desc": "Opens the submenu for your private notes, images and documents. The lists show locally stored content across all places."
       }
     }
   },

@@ -1684,6 +1684,75 @@ export class AppComponent implements OnInit {
     });
   }
 
+  public async openImageListDialog(): Promise<void> {
+    if (!await this.ensureUserMenuActionAllowed()) {
+      return;
+    }
+    this.localImageService.loadImages().then(() => {
+      const dialogRef = this.dialog.open(ImagelistComponent, {
+        panelClass: 'ImageListDialog',
+        closeOnNavigation: true,
+        data: {
+          location: this.mapService.getMapLocation(),
+          imagesSignal: this.localImageService.getImagesWritableSignal(),
+          skipExifOverride: false
+        },
+        minWidth: 'min(450px, 95vw)',
+        maxWidth: '95vw',
+        width: '95vw',
+        maxHeight: 'none',
+        height: 'auto',
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop',
+        disableClose: false,
+        autoFocus: false
+      });
+
+      dialogRef.afterOpened().subscribe(() => {
+        this.myHistory.push("userImageList");
+        window.history.replaceState(this.myHistory, '', '');
+      });
+
+      dialogRef.afterClosed().subscribe(() => {
+        this.updateDataForLocation();
+      });
+    });
+  }
+
+  public async openDocumentListDialog(): Promise<void> {
+    if (!await this.ensureUserMenuActionAllowed()) {
+      return;
+    }
+    this.localDocumentService.loadDocuments().then(() => {
+      const dialogRef = this.dialog.open(DocumentlistComponent, {
+        panelClass: 'DocumentListDialog',
+        closeOnNavigation: true,
+        data: {
+          location: this.mapService.getMapLocation(),
+          documentsSignal: this.localDocumentService.getDocumentsWritableSignal()
+        },
+        minWidth: 'min(450px, 95vw)',
+        maxWidth: '95vw',
+        width: 'min(900px, 95vw)',
+        maxHeight: 'none',
+        height: 'auto',
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop',
+        disableClose: false,
+        autoFocus: false
+      });
+
+      dialogRef.afterOpened().subscribe(() => {
+        this.myHistory.push("userDocumentList");
+        window.history.replaceState(this.myHistory, '', '');
+      });
+
+      dialogRef.afterClosed().subscribe(() => {
+        this.updateDataForLocation();
+      });
+    });
+  }
+
   public async openPlaceListDialog(): Promise<void> {
     if (!await this.ensureUserMenuActionAllowed()) {
       return;

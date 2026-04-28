@@ -465,6 +465,10 @@
       "privacy": {
         "title": "Privacidad como prioridad",
         "desc": "La privacidad es especialmente importante para nosotros: los datos se procesan localmente y cifrados siempre que sea posible. Las transferencias externas solo ocurren cuando son técnicamente necesarias o tras tu decisión activa."
+      },
+      "myPrivateContents": {
+        "title": "Mi contenido privado",
+        "desc": "Abre el submenú de tus notas, imágenes y documentos privados. Las listas muestran el contenido guardado localmente en todos los lugares."
       }
     }
   },

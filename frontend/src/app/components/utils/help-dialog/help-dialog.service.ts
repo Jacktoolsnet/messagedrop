@@ -376,9 +376,9 @@ const HELP_TOPICS = {
         descriptionKey: 'appMenu.items.myPublicMessages.desc'
       },
       {
-        icon: 'clinical_notes',
-        titleKey: 'appMenu.items.myPrivateNotes.title',
-        descriptionKey: 'appMenu.items.myPrivateNotes.desc'
+        icon: 'folder_special',
+        titleKey: 'appMenu.items.myPrivateContents.title',
+        descriptionKey: 'appMenu.items.myPrivateContents.desc'
       },
       {
         icon: 'personal_places',

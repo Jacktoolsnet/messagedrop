@@ -17,6 +17,11 @@ export class LocalDocumentService {
     return this.documentsSignal.asReadonly();
   }
 
+  /** Writable signal for dialogs that update the document list. */
+  getDocumentsWritableSignal() {
+    return this.documentsSignal;
+  }
+
   private readonly indexedDbService = inject(IndexedDbService);
   private readonly tileFileService = inject(TileFileService);
   private readonly fileCacheService = inject(FileCacheService);
@@ -81,6 +86,12 @@ export class LocalDocumentService {
 
   async getDocumentsInBoundingBox(boundingBox: BoundingBox): Promise<LocalDocument[]> {
     const docs = await this.indexedDbService.getDocumentsInBoundingBox(boundingBox);
+    this.documentsSignal.set(docs);
+    return docs;
+  }
+
+  async loadDocuments(): Promise<LocalDocument[]> {
+    const docs = await this.indexedDbService.getAllDocuments();
     this.documentsSignal.set(docs);
     return docs;
   }

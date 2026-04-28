@@ -27,6 +27,11 @@ export class LocalImageService {
     return this.imagesSignal.asReadonly();
   }
 
+  /** Writable signal for dialogs that update the image list. */
+  getImagesWritableSignal() {
+    return this.imagesSignal;
+  }
+
   private readonly indexedDbService = inject(IndexedDbService);
   private readonly geoLocationService = inject(GeolocationService);
   private readonly fileCacheService = inject(FileCacheService);
@@ -358,6 +363,12 @@ export class LocalImageService {
     const localImageEntry = await this.indexedDbService.getImagesInBoundingBox(boundingBox);
     this.imagesSignal.set(localImageEntry);
     return localImageEntry;
+  }
+
+  async loadImages(): Promise<LocalImage[]> {
+    const images = await this.indexedDbService.getAllImages();
+    this.imagesSignal.set(images);
+    return images;
   }
 
   async getImagesByIds(ids: string[]): Promise<LocalImage[]> {

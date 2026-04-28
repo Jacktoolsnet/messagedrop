@@ -465,6 +465,10 @@
       "privacy": {
         "title": "Datenschutz hat Priorität",
         "desc": "Datenschutz ist uns besonders wichtig: Daten werden soweit möglich lokal und verschlüsselt verarbeitet. Externe Übertragungen erfolgen nur technisch notwendig oder nach deiner aktiven Entscheidung."
+      },
+      "myPrivateContents": {
+        "title": "Meine privaten Inhalte",
+        "desc": "Öffnet das Untermenü für deine privaten Notizen, Bilder und Dokumente. Die Listen zeigen die lokal gespeicherten Inhalte über alle Orte hinweg."
       }
     }
   },
