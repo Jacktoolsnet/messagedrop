@@ -721,7 +721,8 @@
         "emptyFiltered": "No se encontraron entradas coincidentes.",
         "filterContactsPlaceholder": "Filtrar contactos",
         "filterPlacesPlaceholder": "Filtrar lugares",
-        "toggleAria": "Asignar {{ name }}"
+        "toggleAria": "Asignar {{ name }}",
+        "editProfileAria": "Editar perfil de {{ name }}"
       },
       "text": {
         "empty": "Aún no hay texto. Toca para añadir uno."

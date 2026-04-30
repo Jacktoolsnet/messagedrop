@@ -10,6 +10,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { GetNominatimAddressResponse } from '../../../../interfaces/get-nominatim-address-response copy';
 import { ConnectComponent } from '../../../contact/connect/connect.component';
+import { ContactSettingsComponent } from '../../../contact/contact-setting/contact-settings.component';
 import { Contact } from '../../../../interfaces/contact';
 import { Location } from '../../../../interfaces/location';
 import { Mode } from '../../../../interfaces/mode';
@@ -29,6 +30,7 @@ import { UserService } from '../../../../services/user.service';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 import { LocationPickerDialogComponent } from '../../../utils/location-picker-dialog/location-picker-dialog.component';
+import { PlaceProfileComponent } from '../../../placelist/place-settings/place-settings.component';
 import { ScannerComponent } from '../../../utils/scanner/scanner.component';
 import {
   TileDisplaySettingsDialogComponent,
@@ -162,6 +164,72 @@ export class RelationTileEditComponent {
       next.delete(id);
     }
     this.selectedIds.set(next);
+  }
+
+  editItem(item: RelationDialogItem, event?: Event): void {
+    event?.preventDefault();
+    event?.stopPropagation();
+
+    if (this.mode === 'placeContacts') {
+      this.editContact(item.id);
+    } else {
+      this.editPlace(item.id);
+    }
+  }
+
+  private editContact(contactId: string): void {
+    const contact = this.contactService.contactsSignal().find((entry) => entry.id === contactId);
+    if (!contact) {
+      return;
+    }
+
+    const dialogRef = this.dialog.open(ContactSettingsComponent, {
+      data: { contact },
+      closeOnNavigation: true,
+      maxHeight: '90vh',
+      maxWidth: '90vw',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      this.contactService.updateContactName(contact);
+      void this.contactService.saveAditionalContactInfos();
+      this.refreshItem(contact.id, this.contactToDialogItem(contact));
+    });
+  }
+
+  private editPlace(placeId: string): void {
+    const place = this.placeService.getPlaces().find((entry) => entry.id === placeId);
+    if (!place) {
+      return;
+    }
+
+    const dialogRef = this.dialog.open(PlaceProfileComponent, {
+      panelClass: '',
+      data: { mode: Mode.EDIT_PLACE, place },
+      closeOnNavigation: true,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      this.placeService.updatePlace(place).subscribe({
+        next: (response) => {
+          if (response.status === 200) {
+            void this.placeService.saveAdditionalPlaceInfos(place);
+            this.refreshItem(place.id, this.placeToDialogItem(place));
+          }
+        },
+        error: (err) => {
+          this.snackBar.open(err?.message ?? this.translation.t('common.actions.ok'), this.translation.t('common.actions.ok'));
+        }
+      });
+    });
   }
 
   openDisplaySettings(): void {
@@ -339,6 +407,10 @@ export class RelationTileEditComponent {
         fallbackIcon: entry.icon || 'place'
       };
     });
+  }
+
+  private refreshItem(itemId: string, item: RelationDialogItem): void {
+    this.items.update((items) => items.map((entry) => entry.id === itemId ? item : entry));
   }
 
   private buildNewContact(): Contact {

@@ -1852,6 +1852,10 @@
         "title": "Alternar asignación",
         "desc": "Con esta función asignas o quitas asignaciones con el control deslizante."
       },
+      "editProfile": {
+        "title": "Editar perfil",
+        "desc": "Con esta función abres el perfil del contacto o los ajustes del lugar desde el campo de avatar/icono de la entrada."
+      },
       "addPlace": {
         "title": "Añadir lugar",
         "desc": "Con esta función creas un nuevo lugar mediante el selector del mapa. El nuevo lugar se añade a la lista y queda seleccionado directamente."

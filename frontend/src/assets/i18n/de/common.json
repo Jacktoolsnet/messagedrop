@@ -721,7 +721,8 @@
         "emptyFiltered": "Keine passenden Einträge gefunden.",
         "filterContactsPlaceholder": "Kontakte filtern",
         "filterPlacesPlaceholder": "Orte filtern",
-        "toggleAria": "{{ name }} zuordnen"
+        "toggleAria": "{{ name }} zuordnen",
+        "editProfileAria": "Profil von {{ name }} bearbeiten"
       },
       "text": {
         "empty": "Noch kein Text. Tippe, um einen hinzuzufügen."

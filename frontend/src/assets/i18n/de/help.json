@@ -1852,6 +1852,10 @@
         "title": "Zuordnung umschalten",
         "desc": "Mit dieser Funktion ordnest du Einträge per Schieberegler zu oder entfernst die Zuordnung."
       },
+      "editProfile": {
+        "title": "Profil bearbeiten",
+        "desc": "Mit dieser Funktion öffnest du über das Avatar-/Icon-Feld die Profil- bzw. Ortseinstellungen des jeweiligen Eintrags."
+      },
       "addPlace": {
         "title": "Ort hinzufügen",
         "desc": "Mit dieser Funktion erstellst du einen neuen Ort über die Kartenauswahl. Der neue Ort wird direkt in die Liste übernommen und ausgewählt."

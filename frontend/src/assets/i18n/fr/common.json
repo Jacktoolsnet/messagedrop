@@ -721,7 +721,8 @@
         "emptyFiltered": "Aucun élément correspondant trouvé.",
         "filterContactsPlaceholder": "Filtrer les contacts",
         "filterPlacesPlaceholder": "Filtrer les lieux",
-        "toggleAria": "Associer {{ name }}"
+        "toggleAria": "Associer {{ name }}",
+        "editProfileAria": "Modifier le profil de {{ name }}"
       },
       "text": {
         "empty": "Pas encore de texte. Appuyez pour en ajouter."

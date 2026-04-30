@@ -721,7 +721,8 @@
         "emptyFiltered": "No matching entries found.",
         "filterContactsPlaceholder": "Filter contacts",
         "filterPlacesPlaceholder": "Filter places",
-        "toggleAria": "Assign {{ name }}"
+        "toggleAria": "Assign {{ name }}",
+        "editProfileAria": "Edit profile of {{ name }}"
       },
       "text": {
         "empty": "No text yet. Tap to add one."

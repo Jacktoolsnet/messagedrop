@@ -1852,6 +1852,10 @@
         "title": "Basculer l'association",
         "desc": "Cette fonction associe ou retire des éléments via l'interrupteur."
       },
+      "editProfile": {
+        "title": "Modifier le profil",
+        "desc": "Cette fonction ouvre le profil du contact ou les paramètres du lieu depuis la zone avatar/icône de l’entrée."
+      },
       "addPlace": {
         "title": "Ajouter un lieu",
         "desc": "Cette fonction crée un nouveau lieu avec le sélecteur de carte. Le nouveau lieu est ajouté à la liste et sélectionné immédiatement."

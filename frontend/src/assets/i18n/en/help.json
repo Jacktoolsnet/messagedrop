@@ -1852,6 +1852,10 @@
         "title": "Toggle assignment",
         "desc": "This action links or unlinks entries using the slide toggle."
       },
+      "editProfile": {
+        "title": "Edit profile",
+        "desc": "This action opens the contact profile or place settings from the avatar/icon field of the selected entry."
+      },
       "addPlace": {
         "title": "Add place",
         "desc": "This action creates a new place using the map picker. The new place is added to the list and selected immediately."
