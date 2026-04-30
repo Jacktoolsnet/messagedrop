@@ -392,12 +392,17 @@
         "confirm": "L'image sera supprimée définitivement. Voulez-vous continuer ?"
       },
       "exif": {
-        "title": "Utiliser la position de l'image ?",
+        "title": "Cette image contient des données de position",
         "body": "Cette image contient des données de position enregistrées. Le pin doit-il être placé à cette position de l’image ou à la position actuelle de la carte ?",
+        "useImageLocationAria": "Utiliser les données de position de l'image",
+        "useMapLocationAria": "Utiliser la position actuelle de la carte",
         "remember": "Se souvenir de mon choix",
         "keep": "Conserver la position de la carte",
         "useMap": "Utiliser la position de l'image",
-        "previewAlt": "Aperçu de l'image"
+        "previewAlt": "Aperçu de l'image",
+        "bodyShort": "Cette image contient des données de position.",
+        "useImageLocation": "Utiliser les données de position de l'image",
+        "useMapLocation": "Utiliser la position actuelle de la carte"
       },
       "editLocationAria": "Modifier la position de l’image"
     },

@@ -392,12 +392,17 @@
         "confirm": "Das Bild wird dauerhaft gelöscht. Bist du sicher?"
       },
       "exif": {
-        "title": "Bildposition verwenden?",
+        "title": "Das Bild enthält Standortdaten",
         "body": "Im Bild sind Standortdaten gespeichert. Soll der Pin an dieser Bildposition oder an der aktuellen Kartenposition gesetzt werden?",
+        "useImageLocationAria": "Standortdaten des Bildes verwenden",
+        "useMapLocationAria": "Aktuelle Kartenposition verwenden",
         "remember": "Auswahl merken",
         "keep": "Kartenposition behalten",
         "useMap": "Bildposition verwenden",
-        "previewAlt": "Bildvorschau"
+        "previewAlt": "Bildvorschau",
+        "bodyShort": "Das Bild enthält Standortdaten.",
+        "useImageLocation": "Standortdaten des Bildes verwenden",
+        "useMapLocation": "Aktuelle Kartenposition verwenden"
       },
       "editLocationAria": "Bildposition bearbeiten"
     },

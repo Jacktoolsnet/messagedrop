@@ -392,12 +392,17 @@
         "confirm": "The image will be permanently deleted. Are you sure?"
       },
       "exif": {
-        "title": "Use image location?",
+        "title": "This image contains location data",
         "body": "This image contains stored location data. Should the pin be placed at this image location or at the current map location?",
+        "useImageLocationAria": "Use the image location data",
+        "useMapLocationAria": "Use current map location",
         "remember": "Remember my choice",
         "keep": "Keep map location",
         "useMap": "Use image location",
-        "previewAlt": "Image preview"
+        "previewAlt": "Image preview",
+        "bodyShort": "This image contains location data.",
+        "useImageLocation": "Use the image location data",
+        "useMapLocation": "Use current map location"
       },
       "editLocationAria": "Edit image location"
     },

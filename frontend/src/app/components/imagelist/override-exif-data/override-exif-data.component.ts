@@ -6,11 +6,12 @@ import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, Ma
 import { MatIcon } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 
 @Component({
   selector: 'app-override-exif-data',
-  imports: [FormsModule, MatButtonModule, MatSlideToggleModule, MatDialogActions, MatDialogClose, MatDialogContent, MatIcon, TranslocoPipe],
+  imports: [FormsModule, DialogHeaderComponent, MatButtonModule, MatSlideToggleModule, MatDialogActions, MatDialogClose, MatDialogContent, MatIcon, TranslocoPipe],
   templateUrl: './override-exif-data.component.html',
   styleUrl: './override-exif-data.component.css'
 })
