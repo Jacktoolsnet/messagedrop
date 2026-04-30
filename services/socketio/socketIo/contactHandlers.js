@@ -63,6 +63,36 @@ module.exports = (io, socket) => {
     sendAck(ack, { status });
   };
 
+
+  const contactsUpdated = (payload, ack) => {
+    if (!payload?.userId || !payload?.contactUserId) {
+      emitError('contact:contactsUpdated', payload, 'missing userId or contactUserId', ack);
+      return;
+    }
+    if (!ensureAuth('contact:contactsUpdated', payload, payload.userId, ack)) {
+      return;
+    }
+
+    const updatePayload = {
+      status: 200,
+      type: 'contacts_updated',
+      content: {
+        userId: payload.contactUserId,
+        contactUserId: payload.userId
+      }
+    };
+    const recipientRoom = toRoom(payload.contactUserId);
+    io.to(recipientRoom).emit('contacts_updated', updatePayload);
+    io.to(recipientRoom).emit(`contactsUpdatedForUser:${recipientRoom}`, updatePayload);
+    io.to(recipientRoom).emit(recipientRoom, updatePayload);
+    socket.logger.info('contact:contactsUpdated forwarded', {
+      fromUserId: payload.userId,
+      toUserId: payload.contactUserId,
+      recipientRoom
+    });
+    sendAck(ack, { status: 200 });
+  };
+
   const newContactMessage = (envelope, ack) => {
     const requiredFields = ['contactId', 'userId', 'contactUserId', 'messageSignature', 'userEncryptedMessage', 'contactUserEncryptedMessage'];
     const missing = requiredFields.filter((key) => envelope?.[key] === undefined || envelope?.[key] === null);
@@ -197,6 +227,7 @@ module.exports = (io, socket) => {
 
   socket.on('contact:requestProfile', (contact, ack) => requestProfile(contact, ack));
   socket.on('contact:provideUserProfile', (contact, ack) => provideUserProfile(contact, ack));
+  socket.on('contact:contactsUpdated', (payload, ack) => contactsUpdated(payload, ack));
   socket.on('contact:newContactMessage', (envelope, ack) => newContactMessage(envelope, ack));
   socket.on('contact:updateContactMessage', (payload, ack) => updateContactMessage(payload, ack));
   socket.on('contact:deleteContactMessage', (payload, ack) => deleteContactMessage(payload, ack));

@@ -57,22 +57,44 @@ async function emitContactsUpdated(userId) {
 
   try {
     const token = await signServiceJwt({ audience: SOCKET_AUDIENCE });
-    await axios.post(`${baseUrl}/emit/user`, {
-      userId,
-      event: String(userId),
-      payload: {
-        status: 200,
-        type: 'contacts_updated',
-        content: { userId }
-      }
-    }, {
-      headers: {
-        'content-type': 'application/json',
-        Authorization: `Bearer ${token}`
-      },
-      timeout: 3000,
-      validateStatus: () => true
-    });
+    const payload = {
+      status: 200,
+      type: 'contacts_updated',
+      content: { userId }
+    };
+    const headers = {
+      'content-type': 'application/json',
+      Authorization: `Bearer ${token}`
+    };
+    await Promise.all([
+      axios.post(`${baseUrl}/emit/user`, {
+        userId,
+        event: String(userId),
+        payload
+      }, {
+        headers,
+        timeout: 3000,
+        validateStatus: () => true
+      }),
+      axios.post(`${baseUrl}/emit/user`, {
+        userId,
+        event: 'contacts_updated',
+        payload
+      }, {
+        headers,
+        timeout: 3000,
+        validateStatus: () => true
+      }),
+      axios.post(`${baseUrl}/emit/user`, {
+        userId,
+        event: `contactsUpdatedForUser:${userId}`,
+        payload
+      }, {
+        headers,
+        timeout: 3000,
+        validateStatus: () => true
+      })
+    ]);
   } catch {
     // best-effort only
   }

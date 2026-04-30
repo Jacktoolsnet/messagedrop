@@ -153,8 +153,7 @@ export class ConnectService {
         .then((valid: boolean) => {
           if (valid) {
             this.contactService.addOrUpdateContact(contact);
-            socketioService.receiveProfileForContactEvent(contact);
-            socketioService.sendProfileRequestForContact(contact);
+            socketioService.sendContactsUpdated(contact);
             this.snackBar.open(this.i18n.t('common.contact.created'), '', { duration: 1000 });
           } else {
             this.snackBar.open(this.i18n.t('common.connect.invalidData'), this.i18n.t('common.actions.ok'));

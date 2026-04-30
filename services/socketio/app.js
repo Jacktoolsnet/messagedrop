@@ -59,6 +59,7 @@ const knownSocketEvents = new Set([
   'user:joinUserRoom',
   'contact:requestProfile',
   'contact:provideUserProfile',
+  'contact:contactsUpdated',
   'contact:newContactMessage',
   'contact:updateContactMessage',
   'contact:deleteContactMessage',

@@ -180,6 +180,11 @@ export class SocketioService {
     }
     this.userRoomEventName = userId;
     const eventName = `${userId}`;
+    const contactsUpdatedEventName = `contactsUpdatedForUser:${userId}`;
+    this.socket.off('contacts_updated');
+    this.socket.on('contacts_updated', (payload) => this.refreshContactsAfterSocketUpdate('contacts_updated', payload));
+    this.socket.off(contactsUpdatedEventName);
+    this.socket.on(contactsUpdatedEventName, (payload) => this.refreshContactsAfterSocketUpdate(contactsUpdatedEventName, payload));
     this.socket.off(eventName);
     this.socket.on(eventName, (payload: UserRoomPayload) => {
       switch (payload.type) {
@@ -220,12 +225,20 @@ export class SocketioService {
           this._contactProfileExchangeUpdateToken.update((token) => token + 1);
           break;
         case 'contacts_updated':
-          this.contactService.initContacts(true);
+          this.refreshContactsAfterSocketUpdate(eventName, payload);
           break;
       }
     });
     this.updateAuthAndConnect(userId, user.jwt);
     this.maybeJoinUserRoom();
+  }
+
+  private refreshContactsAfterSocketUpdate(source = 'unknown', payload?: unknown): void {
+    console.info('contacts_updated received', { source, payload });
+    this.contactService.initContacts(true);
+    window.setTimeout(() => this.contactService.initContacts(true), 300);
+    window.setTimeout(() => this.contactService.initContacts(true), 1200);
+    window.setTimeout(() => this.contactService.initContacts(true), 3000);
   }
 
   private async notifyViaServiceWorker(content: unknown): Promise<void> {
@@ -305,6 +318,16 @@ export class SocketioService {
 
   public sendProfileRequestForContact(contact: Contact): void {
     this.socket.emit('contact:requestProfile', contact);
+  }
+
+  public sendContactsUpdated(contact: Contact): void {
+    if (!contact.userId || !contact.contactUserId) {
+      return;
+    }
+    this.socket.emit('contact:contactsUpdated', {
+      userId: contact.userId,
+      contactUserId: contact.contactUserId
+    });
   }
 
   public receiveProfileForContactEvent(contact: Contact): void {
