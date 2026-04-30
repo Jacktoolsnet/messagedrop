@@ -1290,6 +1290,11 @@ const HELP_TOPICS = {
         descriptionKey: 'imageList.items.preview.desc'
       },
       {
+        icon: 'fullscreen',
+        titleKey: 'imageList.items.gallery.title',
+        descriptionKey: 'imageList.items.gallery.desc'
+      },
+      {
         icon: 'delete_forever',
         titleKey: 'imageList.items.delete.title',
         descriptionKey: 'imageList.items.delete.desc'

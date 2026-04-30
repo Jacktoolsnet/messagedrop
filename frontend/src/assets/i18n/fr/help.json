@@ -955,12 +955,16 @@
     }
   },
   "imageList": {
-    "title": "Images",
-    "intro": "Cette liste permet de gérer vos images enregistrées localement pour le lieu sélectionné. Vous pouvez voir les aperçus, ajuster les positions, afficher la carte, lancer un itinéraire ou ajouter d’autres images.",
+    "title": "Images privées",
+    "intro": "Cette liste permet de gérer vos images privées enregistrées localement pour le lieu sélectionné. Les images sont triées par date de prise de vue ou d’importation. Vous pouvez ouvrir la galerie, ajuster les positions, afficher la carte, lancer un itinéraire ou ajouter d’autres images.",
     "items": {
       "preview": {
-        "title": "Voir l’aperçu",
-        "desc": "Affiche chaque image enregistrée sous forme d’aperçu. Si le fichier ne peut plus être lu, un message avec une icône d’image manquante s’affiche."
+        "title": "Aperçu dans la liste",
+        "desc": "Affiche chaque image enregistrée sous forme de petit aperçu. Si le fichier ne peut plus être lu ou si l’autorisation de lecture manque, un message avec une icône d’image manquante s’affiche."
+      },
+      "gallery": {
+        "title": "Ouvrir la galerie",
+        "desc": "Ouvre l’image sélectionnée en grand dans la galerie. S’il y a plusieurs images, vous pouvez passer de l’une à l’autre avec les flèches ou le clavier."
       },
       "delete": {
         "title": "Supprimer l’image",
@@ -968,7 +972,7 @@
       },
       "editLocation": {
         "title": "Modifier la position",
-        "desc": "Ouvre le sélecteur de carte afin d’associer l’image à un autre lieu."
+        "desc": "Ouvre le sélecteur de carte afin d’associer l’image à un autre lieu. Ensuite, la position EXIF n’est plus utilisée pour cette image."
       },
       "flyTo": {
         "title": "Afficher sur la carte",
@@ -988,11 +992,11 @@
       },
       "add": {
         "title": "Ajouter des images",
-        "desc": "Ouvre le sélecteur d’images. Les images contenant une position peuvent utiliser leurs données EXIF ; sinon, le lieu actuel est utilisé."
+        "desc": "Ouvre le sélecteur pour choisir plusieurs images. Les images contenant une position peuvent utiliser leurs données EXIF ; sinon, le lieu actuel est utilisé."
       },
       "privacy": {
         "title": "Confidentialité et stockage",
-        "desc": "Les images, les données d’aperçu et les positions sont enregistrées localement dans le stockage de l’app. Le contenu n’est pas téléversé vers le backend pour la liste des images. Les données de position EXIF peuvent être utilisées si vous le confirmez lors de l’ajout. Un itinéraire externe transmet des données de position au service de cartographie."
+        "desc": "Les images et positions restent localement sur cet appareil. Les fichiers image sont enregistrés dans le stockage local de l’app lorsque le navigateur le permet ; les métadonnées sont enregistrées dans IndexedDB. Le contenu n’est pas téléversé vers le backend pour la liste des images. Les données de position EXIF peuvent être appliquées lors de l’ajout. Un itinéraire externe transmet des données de position au service de cartographie."
       }
     }
   },

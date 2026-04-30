@@ -955,12 +955,16 @@
     }
   },
   "imageList": {
-    "title": "Bilder",
-    "intro": "In dieser Liste verwaltest du deine lokal gespeicherten Bilder am ausgewählten Ort. Du siehst Vorschaubilder, kannst Positionen anpassen, zur Karte springen, navigieren oder weitere Bilder hinzufügen.",
+    "title": "Private Bilder",
+    "intro": "In dieser Liste verwaltest du deine lokal gespeicherten privaten Bilder am ausgewählten Ort. Die Bilder sind nach Aufnahme- bzw. Importzeit sortiert. Du kannst die Galerie öffnen, Positionen anpassen, zur Karte springen, navigieren oder weitere Bilder hinzufügen.",
     "items": {
       "preview": {
-        "title": "Bildvorschau ansehen",
-        "desc": "Zeigt jedes gespeicherte Bild als Vorschau. Wenn die Datei nicht mehr gelesen werden kann, erscheint ein Hinweis mit defektem Bildsymbol."
+        "title": "Vorschau in der Liste",
+        "desc": "Zeigt jedes gespeicherte Bild als kleine Vorschau. Wenn die Datei nicht mehr gelesen werden kann oder keine Leseberechtigung vorliegt, erscheint ein Hinweis mit defektem Bildsymbol."
+      },
+      "gallery": {
+        "title": "Galerie öffnen",
+        "desc": "Öffnet das ausgewählte Bild groß in der Galerie. Bei mehreren Bildern kannst du mit den Pfeilen oder der Tastatur zwischen den Bildern wechseln."
       },
       "delete": {
         "title": "Bild löschen",
@@ -968,7 +972,7 @@
       },
       "editLocation": {
         "title": "Position bearbeiten",
-        "desc": "Öffnet die Karte zur Positionsauswahl, damit du das Bild einem anderen Ort zuordnen kannst."
+        "desc": "Öffnet die Karte zur Positionsauswahl, damit du das Bild einem anderen Ort zuordnen kannst. Danach wird die EXIF-Position für dieses Bild nicht mehr verwendet."
       },
       "flyTo": {
         "title": "Auf Karte anspringen",
@@ -988,11 +992,11 @@
       },
       "add": {
         "title": "Bilder hinzufügen",
-        "desc": "Öffnet die Bildauswahl. Bilder mit Standortdaten können ihre EXIF-Position verwenden; sonst wird der aktuelle Ort genutzt."
+        "desc": "Öffnet die Bildauswahl für mehrere Bilder. Bilder mit Standortdaten können ihre EXIF-Position verwenden; sonst wird der aktuelle Ort genutzt."
       },
       "privacy": {
         "title": "Datenschutz und Speicherung",
-        "desc": "Bilder, Vorschaudaten und Positionsangaben werden lokal in der App-Ablage gespeichert. Inhalte werden nicht für die Bilderliste auf das Backend hochgeladen. Standortdaten aus EXIF-Metadaten können übernommen werden, wenn du dies beim Hinzufügen bestätigst. Bei externer Navigation werden Positionsdaten an den Kartendienst übergeben."
+        "desc": "Bilder und Positionsangaben bleiben lokal auf diesem Gerät. Die Bilddateien werden – sofern vom Browser unterstützt – in der lokalen App-Ablage gespeichert; Metadaten liegen in IndexedDB. Inhalte werden für die Bilderliste nicht auf das Backend hochgeladen. Standortdaten aus EXIF-Metadaten können beim Hinzufügen übernommen werden. Bei externer Navigation werden Positionsdaten an den Kartendienst übergeben."
       }
     }
   },

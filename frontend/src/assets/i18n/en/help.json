@@ -955,12 +955,16 @@
     }
   },
   "imageList": {
-    "title": "Images",
-    "intro": "Use this list to manage your locally stored images for the selected place. You can view previews, adjust locations, jump to the map, navigate, or add more images.",
+    "title": "Private images",
+    "intro": "Use this list to manage your locally stored private images for the selected place. Images are sorted by capture or import time. You can open the gallery, adjust locations, jump to the map, navigate, or add more images.",
     "items": {
       "preview": {
-        "title": "View image preview",
-        "desc": "Shows each saved image as a preview. If the file can no longer be read, a broken-image notice is shown."
+        "title": "Preview in the list",
+        "desc": "Shows each saved image as a small preview. If the file can no longer be read or read permission is missing, a broken-image notice is shown."
+      },
+      "gallery": {
+        "title": "Open gallery",
+        "desc": "Opens the selected image in a large gallery view. When multiple images are available, use the arrow buttons or keyboard to move between them."
       },
       "delete": {
         "title": "Delete image",
@@ -968,7 +972,7 @@
       },
       "editLocation": {
         "title": "Edit location",
-        "desc": "Opens the map picker so you can assign the image to a different place."
+        "desc": "Opens the map picker so you can assign the image to a different place. After that, the EXIF location is no longer used for this image."
       },
       "flyTo": {
         "title": "Jump to map",
@@ -988,11 +992,11 @@
       },
       "add": {
         "title": "Add images",
-        "desc": "Opens the image picker. Images with location metadata can use their EXIF position; otherwise the current place is used."
+        "desc": "Opens the image picker for multiple images. Images with location metadata can use their EXIF position; otherwise the current place is used."
       },
       "privacy": {
         "title": "Privacy and storage",
-        "desc": "Images, preview data and locations are stored locally in the app storage. Contents are not uploaded to the backend for the image list. EXIF location data can be used when you confirm it while adding images. External navigation passes location data to the map service."
+        "desc": "Images and locations stay local on this device. Image files are stored in the local app storage when supported by the browser; metadata is stored in IndexedDB. Contents are not uploaded to the backend for the image list. EXIF location data can be applied when adding images. External navigation passes location data to the map service."
       }
     }
   },

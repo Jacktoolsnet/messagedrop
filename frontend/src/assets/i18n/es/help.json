@@ -955,12 +955,16 @@
     }
   },
   "imageList": {
-    "title": "Imágenes",
-    "intro": "En esta lista gestionas tus imágenes guardadas localmente para el lugar seleccionado. Puedes ver vistas previas, ajustar ubicaciones, saltar al mapa, navegar o añadir más imágenes.",
+    "title": "Imágenes privadas",
+    "intro": "En esta lista gestionas tus imágenes privadas guardadas localmente para el lugar seleccionado. Las imágenes se ordenan por fecha de captura o de importación. Puedes abrir la galería, ajustar ubicaciones, saltar al mapa, navegar o añadir más imágenes.",
     "items": {
       "preview": {
-        "title": "Ver vista previa",
-        "desc": "Muestra cada imagen guardada como vista previa. Si el archivo ya no se puede leer, aparece un aviso con un icono de imagen rota."
+        "title": "Vista previa en la lista",
+        "desc": "Muestra cada imagen guardada como una vista previa pequeña. Si el archivo ya no se puede leer o falta permiso de lectura, aparece un aviso con un icono de imagen rota."
+      },
+      "gallery": {
+        "title": "Abrir galería",
+        "desc": "Abre la imagen seleccionada en una vista de galería grande. Si hay varias imágenes, puedes cambiar entre ellas con las flechas o el teclado."
       },
       "delete": {
         "title": "Eliminar imagen",
@@ -968,7 +972,7 @@
       },
       "editLocation": {
         "title": "Editar ubicación",
-        "desc": "Abre el selector del mapa para asignar la imagen a otro lugar."
+        "desc": "Abre el selector del mapa para asignar la imagen a otro lugar. Después ya no se usa la ubicación EXIF para esta imagen."
       },
       "flyTo": {
         "title": "Ir al mapa",
@@ -988,11 +992,11 @@
       },
       "add": {
         "title": "Añadir imágenes",
-        "desc": "Abre el selector de imágenes. Las imágenes con metadatos de ubicación pueden usar su posición EXIF; si no, se usa el lugar actual."
+        "desc": "Abre el selector para elegir varias imágenes. Las imágenes con metadatos de ubicación pueden usar su posición EXIF; si no, se usa el lugar actual."
       },
       "privacy": {
         "title": "Privacidad y almacenamiento",
-        "desc": "Las imágenes, los datos de vista previa y las ubicaciones se guardan localmente en el almacenamiento de la app. El contenido no se sube al backend para la lista de imágenes. Los datos de ubicación EXIF pueden usarse si lo confirmas al añadir imágenes. La navegación externa envía datos de ubicación al servicio de mapas."
+        "desc": "Las imágenes y ubicaciones permanecen localmente en este dispositivo. Los archivos de imagen se guardan en el almacenamiento local de la app si el navegador lo permite; los metadatos se guardan en IndexedDB. El contenido no se sube al backend para la lista de imágenes. Los datos de ubicación EXIF pueden aplicarse al añadir imágenes. La navegación externa envía datos de ubicación al servicio de mapas."
       }
     }
   },
