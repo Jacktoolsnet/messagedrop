@@ -1838,7 +1838,7 @@
   },
   "tileEditRelations": {
     "title": "Verknüpfungs-Kachel",
-    "intro": "In diesem Dialog verknüpfst du Kontakte und Orte miteinander, kannst bei Kontakte-Orte-Kacheln neue Orte hinzufügen und die Kachel-Darstellung anpassen.",
+    "intro": "In diesem Dialog verknüpfst du Kontakte und Orte miteinander, kannst bei Kontakte-Orte-Kacheln neue Orte und bei Orte-Kontakte-Kacheln neue Kontakte hinzufügen und die Kachel-Darstellung anpassen.",
     "items": {
       "displaySettings": {
         "title": "Darstellung öffnen",
@@ -1855,6 +1855,14 @@
       "addPlace": {
         "title": "Ort hinzufügen",
         "desc": "Mit dieser Funktion erstellst du einen neuen Ort über die Kartenauswahl. Der neue Ort wird direkt in die Liste übernommen und ausgewählt."
+      },
+      "addContactId": {
+        "title": "Kontakt per Connect-ID hinzufügen",
+        "desc": "Mit dieser Funktion importierst du einen neuen Kontakt über eine Connect-ID. Der neue Kontakt wird direkt in die Liste übernommen und ausgewählt."
+      },
+      "scanContactQr": {
+        "title": "Kontakt per QR-Code hinzufügen",
+        "desc": "Mit dieser Funktion scannst du eine Connect-ID als QR-Code. Der neue Kontakt wird direkt in die Liste übernommen und ausgewählt."
       },
       "close": {
         "title": "Abbrechen",

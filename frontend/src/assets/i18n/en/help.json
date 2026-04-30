@@ -1838,7 +1838,7 @@
   },
   "tileEditRelations": {
     "title": "Relation tile",
-    "intro": "This dialog links contacts and places, lets you add new places for contact-place tiles, and lets you adjust tile display settings.",
+    "intro": "This dialog links contacts and places, lets you add new places for contact-place tiles or new contacts for place-contact tiles, and lets you adjust tile display settings.",
     "items": {
       "displaySettings": {
         "title": "Open display settings",
@@ -1855,6 +1855,14 @@
       "addPlace": {
         "title": "Add place",
         "desc": "This action creates a new place using the map picker. The new place is added to the list and selected immediately."
+      },
+      "addContactId": {
+        "title": "Add contact by Connect ID",
+        "desc": "This action imports a new contact using a Connect ID. The new contact is added to the list and selected immediately."
+      },
+      "scanContactQr": {
+        "title": "Add contact by QR code",
+        "desc": "This action scans a Connect ID as a QR code. The new contact is added to the list and selected immediately."
       },
       "close": {
         "title": "Cancel",

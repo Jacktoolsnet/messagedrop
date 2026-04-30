@@ -11,6 +11,17 @@
       <span>{{ 'common.placeList.addPlaceAria' | transloco }}</span>
     </button>
   </div>
+  } @else if (canCreateFirstContact) {
+  <div class="create-first-place create-first-contact">
+    <button mat-stroked-button color="primary" type="button" (click)="openConnectDialog()">
+      <mat-icon>link</mat-icon>
+      <span>{{ 'common.contact.connect.menuConnectWithId' | transloco }}</span>
+    </button>
+    <button mat-stroked-button color="primary" type="button" (click)="openScannerDialog()">
+      <mat-icon>qr_code_scanner</mat-icon>
+      <span>{{ 'common.contact.connect.menuConnectQr' | transloco }}</span>
+    </button>
+  </div>
   } @else {
   <div class="filter-row">
     <mat-form-field appearance="outline" class="full-width" subscriptSizing="dynamic">
@@ -73,6 +84,12 @@
     <mat-icon>add_location</mat-icon>
   </button>
   }
+  @if (canAddContactFromActionBar) {
+  <button mat-icon-button type="button" color="primary" [matMenuTriggerFor]="addContactMenu"
+    [attr.aria-label]="'common.contact.connect.addAria' | transloco">
+    <mat-icon>connect_without_contact</mat-icon>
+  </button>
+  }
   <button mat-icon-button type="button" (click)="openDisplaySettings()"
     [attr.aria-label]="'common.tileSettings.title' | transloco">
     <mat-icon>settings</mat-icon>
@@ -81,3 +98,14 @@
     <mat-icon>save</mat-icon>
   </button>
 </mat-dialog-actions>
+
+<mat-menu #addContactMenu="matMenu" panelClass="accent-menu">
+  <button mat-menu-item (click)="openConnectDialog()">
+    <mat-icon>link</mat-icon>
+    <span>{{ 'common.contact.connect.menuConnectWithId' | transloco }}</span>
+  </button>
+  <button mat-menu-item (click)="openScannerDialog()">
+    <mat-icon>qr_code_scanner</mat-icon>
+    <span>{{ 'common.contact.connect.menuConnectQr' | transloco }}</span>
+  </button>
+</mat-menu>

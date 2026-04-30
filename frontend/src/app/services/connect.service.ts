@@ -65,7 +65,13 @@ export class ConnectService {
       );
   }
 
-  getById(connectId: string, contact: Contact, socketioService: SocketioService, showAlways = false) {
+  getById(
+    connectId: string,
+    contact: Contact,
+    socketioService: SocketioService,
+    showAlways = false,
+    onContactCreated?: (contact: Contact) => void
+  ) {
     const url = `${environment.apiUrl}/connect/consume/${connectId}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
@@ -94,7 +100,7 @@ export class ConnectService {
           .subscribe({
             next: consumeConnectResponse => {
               if (consumeConnectResponse.status === 200) {
-                this.createLocalContactFromConnectResponse(consumeConnectResponse, contact, socketioService);
+                this.createLocalContactFromConnectResponse(consumeConnectResponse, contact, socketioService, onContactCreated);
               }
             },
             error: (error) => {
@@ -134,7 +140,8 @@ export class ConnectService {
   private createLocalContactFromConnectResponse(
     consumeConnectResponse: ConsumeConnectResponse,
     contact: Contact,
-    socketioService: SocketioService
+    socketioService: SocketioService,
+    onContactCreated?: (contact: Contact) => void
   ): void {
     const buffer = Buffer.from(JSON.parse(consumeConnectResponse.connect.signature));
     const signature = buffer.buffer.slice(
@@ -154,6 +161,7 @@ export class ConnectService {
           if (valid) {
             this.contactService.addOrUpdateContact(contact);
             socketioService.sendContactsUpdated(contact);
+            onContactCreated?.(contact);
             this.snackBar.open(this.i18n.t('common.contact.created'), '', { duration: 1000 });
           } else {
             this.snackBar.open(this.i18n.t('common.connect.invalidData'), this.i18n.t('common.actions.ok'));

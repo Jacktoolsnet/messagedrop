@@ -1838,7 +1838,7 @@
   },
   "tileEditRelations": {
     "title": "Tarjeta de relaciones",
-    "intro": "En este diálogo vinculas contactos y lugares, puedes añadir nuevos lugares para las tarjetas de contactos-lugares y ajustar la presentación de la tarjeta.",
+    "intro": "En este diálogo vinculas contactos y lugares, puedes añadir nuevos lugares para tarjetas de contactos-lugares o nuevos contactos para tarjetas de lugares-contactos, y ajustar la presentación de la tarjeta.",
     "items": {
       "displaySettings": {
         "title": "Abrir ajustes visuales",
@@ -1855,6 +1855,14 @@
       "addPlace": {
         "title": "Añadir lugar",
         "desc": "Con esta función creas un nuevo lugar mediante el selector del mapa. El nuevo lugar se añade a la lista y queda seleccionado directamente."
+      },
+      "addContactId": {
+        "title": "Añadir contacto con Connect-ID",
+        "desc": "Con esta función importas un nuevo contacto mediante una Connect-ID. El nuevo contacto se añade a la lista y queda seleccionado directamente."
+      },
+      "scanContactQr": {
+        "title": "Añadir contacto con QR",
+        "desc": "Con esta función escaneas una Connect-ID como código QR. El nuevo contacto se añade a la lista y queda seleccionado directamente."
       },
       "close": {
         "title": "Cancelar",

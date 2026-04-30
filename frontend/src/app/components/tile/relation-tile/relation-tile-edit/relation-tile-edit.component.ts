@@ -5,25 +5,31 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDial
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { GetNominatimAddressResponse } from '../../../../interfaces/get-nominatim-address-response copy';
+import { ConnectComponent } from '../../../contact/connect/connect.component';
 import { Contact } from '../../../../interfaces/contact';
 import { Location } from '../../../../interfaces/location';
+import { Mode } from '../../../../interfaces/mode';
 import { NominatimPlace } from '../../../../interfaces/nominatim-place';
 import { Place } from '../../../../interfaces/place';
 import { TileSetting, createDefaultTileSettings } from '../../../../interfaces/tile-settings';
+import { ConnectService } from '../../../../services/connect.service';
 import { ContactService } from '../../../../services/contact.service';
 import { DisplayMessageService } from '../../../../services/display-message.service';
 import { GeolocationService } from '../../../../services/geolocation.service';
 import { MapService } from '../../../../services/map.service';
 import { NominatimService } from '../../../../services/nominatim.service';
 import { PlaceService } from '../../../../services/place.service';
+import { SocketioService } from '../../../../services/socketio.service';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { UserService } from '../../../../services/user.service';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 import { LocationPickerDialogComponent } from '../../../utils/location-picker-dialog/location-picker-dialog.component';
+import { ScannerComponent } from '../../../utils/scanner/scanner.component';
 import {
   TileDisplaySettingsDialogComponent,
   TileDisplaySettingsDialogData,
@@ -42,6 +48,10 @@ interface RelationDialogItem {
 
 interface TimezoneResponse { status: number; timezone: string }
 
+interface ConnectDialogResult {
+  connectId?: string;
+}
+
 export interface RelationTileEditDialogData {
   tile: TileSetting;
   place?: Place;
@@ -59,6 +69,7 @@ export interface RelationTileEditDialogData {
     MatDialogActions,
     MatFormFieldModule,
     MatInputModule,
+    MatMenuModule,
     MatButtonModule,
     MatIcon,
     MatSlideToggleModule,
@@ -71,6 +82,7 @@ export interface RelationTileEditDialogData {
 export class RelationTileEditComponent {
   private readonly dialogRef = inject(MatDialogRef<RelationTileEditComponent>);
   private readonly dialog = inject(MatDialog);
+  private readonly connectService = inject(ConnectService);
   private readonly contactService = inject(ContactService);
   private readonly placeService = inject(PlaceService);
   private readonly userService = inject(UserService);
@@ -78,6 +90,7 @@ export class RelationTileEditComponent {
   private readonly geolocationService = inject(GeolocationService);
   private readonly nominatimService = inject(NominatimService);
   private readonly snackBar = inject(DisplayMessageService);
+  private readonly socketioService = inject(SocketioService);
   private readonly translation = inject(TranslationHelperService);
   readonly help = inject(HelpDialogService);
   readonly data = inject<RelationTileEditDialogData>(MAT_DIALOG_DATA);
@@ -120,8 +133,16 @@ export class RelationTileEditComponent {
     return this.mode === 'contactPlaces' && this.items().length === 0 && this.userService.hasJwt();
   }
 
+  get canCreateFirstContact(): boolean {
+    return this.mode === 'placeContacts' && this.items().length === 0 && this.userService.hasJwt();
+  }
+
   get canAddPlaceFromActionBar(): boolean {
     return this.mode === 'contactPlaces' && this.items().length > 0 && this.userService.hasJwt();
+  }
+
+  get canAddContactFromActionBar(): boolean {
+    return this.mode === 'placeContacts' && this.items().length > 0 && this.userService.hasJwt();
   }
 
   onFilterInput(event: Event): void {
@@ -205,6 +226,68 @@ export class RelationTileEditComponent {
     });
   }
 
+  openConnectDialog(): void {
+    if (!this.userService.hasJwt()) {
+      return;
+    }
+
+    const contact = this.buildNewContact();
+    const dialogRef = this.dialog.open(ConnectComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: { mode: Mode.ADD_CONNECT, contact, connectId: '' },
+      minWidth: '60vw',
+      maxWidth: '90vw',
+      height: 'auto',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((result?: ConnectDialogResult) => {
+      if (result?.connectId) {
+        this.connectService.getById(
+          result.connectId,
+          contact,
+          this.socketioService,
+          false,
+          (createdContact) => this.addCreatedContactToSelection(createdContact)
+        );
+      }
+    });
+  }
+
+  openScannerDialog(): void {
+    if (!this.userService.hasJwt()) {
+      return;
+    }
+
+    const contact = this.buildNewContact();
+    const dialogRef = this.dialog.open(ScannerComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: { mode: Mode.ADD_CONNECT, connectId: '' },
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((result?: ConnectDialogResult) => {
+      if (result?.connectId) {
+        this.connectService.getById(
+          result.connectId,
+          contact,
+          this.socketioService,
+          false,
+          (createdContact) => this.addCreatedContactToSelection(createdContact)
+        );
+      }
+    });
+  }
+
   trackByItem = (_: number, item: RelationDialogItem) => item.id;
 
   private resolveMode(): RelationMode {
@@ -256,6 +339,40 @@ export class RelationTileEditComponent {
         fallbackIcon: entry.icon || 'place'
       };
     });
+  }
+
+  private buildNewContact(): Contact {
+    return {
+      id: '',
+      userId: this.userService.getUser().id,
+      contactUserId: '',
+      name: '',
+      subscribed: false,
+      pinned: false,
+      provided: false,
+      lastMessageFrom: '',
+      lastMessageAt: null
+    };
+  }
+
+  private addCreatedContactToSelection(contact: Contact): void {
+    const item = this.contactToDialogItem(contact);
+    this.items.update((items) => items.some(existing => existing.id === item.id) ? items : [...items, item]);
+    this.selectedIds.update((ids) => new Set([...ids, contact.id]));
+    this.filterValue.set('');
+  }
+
+  private contactToDialogItem(contact: Contact): RelationDialogItem {
+    const name = contact.name?.trim() || this.translation.t('common.contact.list.nameFallback');
+    return {
+      id: contact.id,
+      name,
+      avatarUrl: contact.base64Avatar,
+      avatarAlt: contact.name
+        ? this.translation.t('common.contact.profile.avatarAltName', { name: contact.name })
+        : this.translation.t('common.contact.profile.avatarAlt'),
+      fallbackIcon: 'person'
+    };
   }
 
   private async createPlaceFromLocation(location: Location): Promise<void> {

@@ -1838,7 +1838,7 @@
   },
   "tileEditRelations": {
     "title": "Tuile de relations",
-    "intro": "Dans cette boîte de dialogue, vous liez contacts et lieux, pouvez ajouter de nouveaux lieux pour les tuiles contacts-lieux et ajuster l’affichage de la tuile.",
+    "intro": "Dans cette boîte de dialogue, vous liez contacts et lieux, pouvez ajouter de nouveaux lieux pour les tuiles contacts-lieux ou de nouveaux contacts pour les tuiles lieux-contacts, et ajuster l’affichage de la tuile.",
     "items": {
       "displaySettings": {
         "title": "Ouvrir l'affichage",
@@ -1855,6 +1855,14 @@
       "addPlace": {
         "title": "Ajouter un lieu",
         "desc": "Cette fonction crée un nouveau lieu avec le sélecteur de carte. Le nouveau lieu est ajouté à la liste et sélectionné immédiatement."
+      },
+      "addContactId": {
+        "title": "Ajouter un contact par Connect-ID",
+        "desc": "Cette fonction importe un nouveau contact avec une Connect-ID. Le nouveau contact est ajouté à la liste et sélectionné immédiatement."
+      },
+      "scanContactQr": {
+        "title": "Ajouter un contact par QR code",
+        "desc": "Cette fonction scanne une Connect-ID sous forme de QR code. Le nouveau contact est ajouté à la liste et sélectionné immédiatement."
       },
       "close": {
         "title": "Annuler",

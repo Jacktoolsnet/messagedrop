@@ -2365,6 +2365,16 @@ const HELP_TOPICS = {
         descriptionKey: 'tileEditRelations.items.addPlace.desc'
       },
       {
+        icon: 'link',
+        titleKey: 'tileEditRelations.items.addContactId.title',
+        descriptionKey: 'tileEditRelations.items.addContactId.desc'
+      },
+      {
+        icon: 'qr_code_scanner',
+        titleKey: 'tileEditRelations.items.scanContactQr.title',
+        descriptionKey: 'tileEditRelations.items.scanContactQr.desc'
+      },
+      {
         icon: 'close',
         titleKey: 'tileEditRelations.items.close.title',
         descriptionKey: 'tileEditRelations.items.close.desc'
