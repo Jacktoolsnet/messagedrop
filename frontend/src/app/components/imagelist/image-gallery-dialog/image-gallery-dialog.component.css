@@ -64,12 +64,38 @@
   box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.5);
 }
 
+.gallery-preload {
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+  inset: -10px auto auto -10px;
+}
+
+.gallery-loading {
+  display: grid;
+  place-items: center;
+  width: min(18rem, 60vw);
+  height: min(18rem, 45vh);
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.gallery-loading mat-icon {
+  font-size: 4rem;
+  width: 4rem;
+  height: 4rem;
+}
+
 .gallery-nav {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 3.25rem;
-  height: 3.25rem;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+.gallery-close {
   background: rgba(255, 255, 255, 0.14);
   color: #fff;
 }

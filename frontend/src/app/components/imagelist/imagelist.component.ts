@@ -192,12 +192,12 @@ export class ImagelistComponent implements OnInit, OnDestroy {
 
   openGallery(image: LocalImage): void {
     const galleryImages: ImageGalleryItem[] = this.sortedImages()
+      .filter(item => this.getImageUrl(item.id) !== 'NOT_FOUND')
       .map(item => ({
         id: item.id,
         fileName: item.fileName,
-        url: this.getImageUrl(item.id)
-      }))
-      .filter((item): item is ImageGalleryItem => !!item.url && item.url !== 'NOT_FOUND');
+        image: item
+      }));
 
     const initialIndex = galleryImages.findIndex(item => item.id === image.id);
     if (initialIndex < 0) {

@@ -166,13 +166,35 @@ export class LocalImageService {
       return cached;
     }
 
+    try {
+      const file = await this.getImageFile(entry, true);
+      const objectUrl = URL.createObjectURL(file);
+      this.objectUrlCache.set(entry.id, objectUrl);
+      return objectUrl;
+    } catch (error) {
+      console.error('Failed to create object URL for image', error);
+      this.lastErrorSignal.set('Unable to read the image file.');
+      return Promise.reject(
+        error instanceof Error ? error : new Error('Unable to read the image file.'),
+      );
+    }
+  }
+
+  async createTemporaryImageUrl(entry: LocalImage): Promise<string> {
+    const file = await this.getImageFile(entry, false);
+    return URL.createObjectURL(file);
+  }
+
+  private async getImageFile(entry: LocalImage, persistCachedHandle: boolean): Promise<File> {
     const cachedHandle = await this.fileCacheService.getImageHandle(entry.id, entry.fileName, entry.mimeType);
     if (cachedHandle && entry.handle !== cachedHandle) {
       entry.handle = cachedHandle;
-      try {
-        await this.indexedDbService.saveImage(entry);
-      } catch (error) {
-        console.warn('Failed to persist cached image handle', error);
+      if (persistCachedHandle) {
+        try {
+          await this.indexedDbService.saveImage(entry);
+        } catch (error) {
+          console.warn('Failed to persist cached image handle', error);
+        }
       }
     }
 
@@ -189,29 +211,20 @@ export class LocalImageService {
       }
     }
 
-    try {
-      const file = await resolvedHandle.getFile();
-      const objectUrl = URL.createObjectURL(file);
-      this.objectUrlCache.set(entry.id, objectUrl);
-      if (!cachedHandle) {
-        const updatedHandle = await this.fileCacheService.writeImageFile(entry.id, file, entry.fileName, entry.mimeType);
-        if (updatedHandle) {
-          entry.handle = updatedHandle;
-          try {
-            await this.indexedDbService.saveImage(entry);
-          } catch (error) {
-            console.warn('Failed to persist cached image handle', error);
-          }
+    const file = await resolvedHandle.getFile();
+    if (persistCachedHandle && !cachedHandle) {
+      const updatedHandle = await this.fileCacheService.writeImageFile(entry.id, file, entry.fileName, entry.mimeType);
+      if (updatedHandle) {
+        entry.handle = updatedHandle;
+        try {
+          await this.indexedDbService.saveImage(entry);
+        } catch (error) {
+          console.warn('Failed to persist cached image handle', error);
         }
       }
-      return objectUrl;
-    } catch (error) {
-      console.error('Failed to create object URL for image', error);
-      this.lastErrorSignal.set('Unable to read the image file.');
-      return Promise.reject(
-        error instanceof Error ? error : new Error('Unable to read the image file.'),
-      );
     }
+
+    return file;
   }
 
   revokeImageUrl(entry: LocalImage): void {
