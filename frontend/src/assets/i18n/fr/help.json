@@ -1854,7 +1854,7 @@
       },
       "editProfile": {
         "title": "Modifier le profil",
-        "desc": "Cette fonction ouvre le profil du contact ou les paramètres du lieu depuis la zone avatar/icône de l’entrée."
+        "desc": "Cette fonction ouvre le profil du contact ou les paramètres du lieu avec le bouton des paramètres de l’entrée."
       },
       "addPlace": {
         "title": "Ajouter un lieu",

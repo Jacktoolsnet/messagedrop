@@ -45,8 +45,7 @@
   <div class="relations-list">
     @for (item of filteredItems; track trackByItem($index, item)) {
     <div class="relation-row">
-      <button mat-icon-button type="button" class="relation-edit" (click)="editItem(item, $event)"
-        [attr.aria-label]="'common.tiles.relations.editProfileAria' | transloco : { name: item.name }">
+      <div class="relation-identity">
         <span class="relation-avatar">
           @if (item.avatarUrl) {
           <img [src]="item.avatarUrl" [attr.alt]="item.avatarAlt" />
@@ -54,10 +53,13 @@
           <mat-icon>{{ item.fallbackIcon }}</mat-icon>
           }
         </span>
-      </button>
-      <div class="relation-identity">
         <span class="relation-name">{{ item.name }}</span>
       </div>
+
+      <button mat-icon-button type="button" class="relation-edit" (click)="editItem(item, $event)"
+        [attr.aria-label]="'common.tiles.relations.editProfileAria' | transloco : { name: item.name }">
+        <mat-icon>settings_account_box</mat-icon>
+      </button>
 
       <mat-slide-toggle
         [checked]="selectedIds().has(item.id)"

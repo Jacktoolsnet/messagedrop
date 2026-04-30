@@ -2360,7 +2360,7 @@ const HELP_TOPICS = {
         descriptionKey: 'tileEditRelations.items.toggle.desc'
       },
       {
-        icon: 'manage_accounts',
+        icon: 'settings_account_box',
         titleKey: 'tileEditRelations.items.editProfile.title',
         descriptionKey: 'tileEditRelations.items.editProfile.desc'
       },

@@ -1854,7 +1854,7 @@
       },
       "editProfile": {
         "title": "Edit profile",
-        "desc": "This action opens the contact profile or place settings from the avatar/icon field of the selected entry."
+        "desc": "This action opens the contact profile or place settings using the settings button of the selected entry."
       },
       "addPlace": {
         "title": "Add place",

@@ -1854,7 +1854,7 @@
       },
       "editProfile": {
         "title": "Editar perfil",
-        "desc": "Con esta función abres el perfil del contacto o los ajustes del lugar desde el campo de avatar/icono de la entrada."
+        "desc": "Con esta función abres el perfil del contacto o los ajustes del lugar mediante el botón de ajustes de la entrada."
       },
       "addPlace": {
         "title": "Añadir lugar",

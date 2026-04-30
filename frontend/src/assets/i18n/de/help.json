@@ -1854,7 +1854,7 @@
       },
       "editProfile": {
         "title": "Profil bearbeiten",
-        "desc": "Mit dieser Funktion öffnest du über das Avatar-/Icon-Feld die Profil- bzw. Ortseinstellungen des jeweiligen Eintrags."
+        "desc": "Mit dieser Funktion öffnest du über den Zahnrad-Button die Profil- bzw. Ortseinstellungen des jeweiligen Eintrags."
       },
       "addPlace": {
         "title": "Ort hinzufügen",
