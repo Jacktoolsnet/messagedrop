@@ -1,4 +1,4 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable, NgZone, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { io, Socket } from 'socket.io-client';
 import { environment } from '../../environments/environment';
@@ -39,6 +39,7 @@ export class SocketioService {
   private readonly snackBar = inject(DisplayMessageService);
   private readonly userService = inject(UserService);
   private readonly contactService = inject(ContactService);
+  private readonly ngZone = inject(NgZone);
   private readonly avatarStorage = inject(AvatarStorageService);
   private readonly cryptoService = inject(CryptoService);
   private readonly systemNotificationService = inject(SystemNotificationService);
@@ -235,10 +236,7 @@ export class SocketioService {
 
   private refreshContactsAfterSocketUpdate(source = 'unknown', payload?: unknown): void {
     console.info('contacts_updated received', { source, payload });
-    this.contactService.initContacts(true);
-    window.setTimeout(() => this.contactService.initContacts(true), 300);
-    window.setTimeout(() => this.contactService.initContacts(true), 1200);
-    window.setTimeout(() => this.contactService.initContacts(true), 3000);
+    this.ngZone.run(() => this.contactService.refreshContactsFromServer());
   }
 
   private async notifyViaServiceWorker(content: unknown): Promise<void> {

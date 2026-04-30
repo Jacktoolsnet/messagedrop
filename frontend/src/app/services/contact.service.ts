@@ -29,6 +29,7 @@ export class ContactService {
   readonly contactReset = this._contactReset.asReadonly();
   private ready = false;
   private initInProgress = false;
+  private pendingForcedInit = false;
   private lastInitUserId: string | null = null;
   private lastInitHadJwt: boolean | null = null;
 
@@ -54,6 +55,32 @@ export class ContactService {
     return throwError(() => error);
   }
 
+  refreshContactsFromServer(): void {
+    const userId = this.userService.getUser().id;
+    if (!this.userService.isReady() || !userId || !this.userService.hasJwt()) {
+      return;
+    }
+
+    this.getByUserId(userId).subscribe({
+      next: async (getContactsResponse: GetContactsResponse) => {
+        const contacts = (getContactsResponse.rows || []).map(raw => this.mapRawContact(raw));
+        await this.storeContactAvatarsFromServer(contacts);
+        this._contacts.set(contacts);
+        await this.updateContactProfile();
+        this.persistContacts(false);
+        this.ready = true;
+        this._contactsSet.update(trigger => trigger + 1);
+      },
+      error: (err) => {
+        if (err.status === 404) {
+          this._contacts.set([]);
+          this.ready = true;
+          this._contactsSet.update(trigger => trigger + 1);
+        }
+      }
+    });
+  }
+
   initContacts(force = false) {
     const userId = this.userService.getUser().id;
     if (!this.userService.isReady() || !userId) {
@@ -67,6 +94,7 @@ export class ContactService {
       return;
     }
     if (this.initInProgress) {
+      this.pendingForcedInit = this.pendingForcedInit || force;
       return;
     }
     this.lastInitUserId = userId;
@@ -79,6 +107,10 @@ export class ContactService {
     this.getByUserId(userId)
       .pipe(finalize(() => {
         this.initInProgress = false;
+        if (this.pendingForcedInit) {
+          this.pendingForcedInit = false;
+          queueMicrotask(() => this.initContacts(true));
+        }
       }))
       .subscribe({
         next: async (getContactsResponse: GetContactsResponse) => {
