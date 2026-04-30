@@ -1417,7 +1417,7 @@
     "pinForgotMessage": "Without the PIN we cannot unlock your data on this device.\n\nYou can restore from a backup if you have one, or create a new user.",
     "pinForgotRestore": "Restore backup",
     "pinForgotNewUser": "Create new user",
-    "pinChangedMessage": "PIN updated. Please log in again with your new PIN.",
+    "pinChangedMessage": "PIN updated. You stay signed in and can use the new PIN from now on.",
     "resetKeysTitle": "Security reset",
     "resetKeysMessage": "Your security keys will be regenerated. This will delete your chat history, but keep your contacts. Do you want to continue?",
     "resetKeysAction": "Run reset",

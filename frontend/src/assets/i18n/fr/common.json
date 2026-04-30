@@ -1417,7 +1417,7 @@
     "pinForgotMessage": "Sans le PIN, nous ne pouvons pas déverrouiller vos données sur cet appareil.\n\nVous pouvez restaurer depuis une sauvegarde si vous en avez une, ou créer un nouvel utilisateur.",
     "pinForgotRestore": "Restaurer la sauvegarde",
     "pinForgotNewUser": "Créer un nouvel utilisateur",
-    "pinChangedMessage": "Le PIN a été mis à jour. Veuillez vous reconnecter avec le nouveau PIN.",
+    "pinChangedMessage": "Le PIN a été mis à jour. Vous restez connecté et pouvez utiliser le nouveau PIN dès maintenant.",
     "resetKeysTitle": "Réinitialisation de sécurité",
     "resetKeysMessage": "Vos clés de sécurité vont être régénérées. Cela supprimera l'historique des discussions, mais conservera vos contacts. Voulez-vous continuer ?",
     "resetKeysAction": "Lancer la réinitialisation",

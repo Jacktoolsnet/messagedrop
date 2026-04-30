@@ -1417,7 +1417,7 @@
     "pinForgotMessage": "Sin el PIN no podemos desbloquear tus datos en este dispositivo.\n\nPuedes restaurar desde un backup si tienes uno, o crear un nuevo usuario.",
     "pinForgotRestore": "Restaurar backup",
     "pinForgotNewUser": "Crear nuevo usuario",
-    "pinChangedMessage": "El PIN se actualizó. Inicia sesión de nuevo con el nuevo PIN.",
+    "pinChangedMessage": "El PIN se actualizó. Mantienes la sesión iniciada y puedes usar el nuevo PIN a partir de ahora.",
     "resetKeysTitle": "Restablecimiento de seguridad",
     "resetKeysMessage": "Se regenerarán tus claves de seguridad. Esto eliminará el historial de chat, pero mantendrá tus contactos. ¿Deseas continuar?",
     "resetKeysAction": "Ejecutar restablecimiento",

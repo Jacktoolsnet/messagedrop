@@ -1943,7 +1943,7 @@ export class UserService {
       });
 
       await firstValueFrom(infoDialog.afterClosed());
-      this.logout();
+      this.blocked = false;
     } catch (err) {
       console.error('Change PIN failed', err);
       this.pinKey = currentPinData.key;

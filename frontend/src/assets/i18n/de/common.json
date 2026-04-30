@@ -1417,7 +1417,7 @@
     "pinForgotMessage": "Ohne die PIN können wir deine Daten auf diesem Gerät nicht entsperren.\n\nWähle „Backup einspielen“, wenn du ein Backup hast, oder „Neuen Benutzer erstellen“, um neu zu starten.",
     "pinForgotRestore": "Backup einspielen",
     "pinForgotNewUser": "Neuen Benutzer erstellen",
-    "pinChangedMessage": "PIN wurde aktualisiert. Bitte melde dich mit der neuen PIN erneut an.",
+    "pinChangedMessage": "PIN wurde aktualisiert. Du bleibst angemeldet und kannst ab jetzt die neue PIN verwenden.",
     "resetKeysTitle": "Sicherheits-Reset",
     "resetKeysMessage": "Deine Sicherheitsschlüssel werden neu erzeugt. Dabei wird der Chatverlauf gelöscht, Kontakte bleiben erhalten. Möchtest du fortfahren?",
     "resetKeysAction": "Reset ausführen",
