@@ -115,7 +115,11 @@ router.post('/send',
     const mirrorMessageId = crypto.randomUUID();
 
     // Store message for sender's contact
-    withContactOwnership(req, res, contactId, () => {
+    withContactOwnership(req, res, contactId, (contactRow) => {
+      if ((contactRow.status || 'active') !== 'active') {
+        return next(apiError.forbidden('contact_removed'));
+      }
+
       tableContactMessage.createMessage(req.database.db, {
         id: recordId,
         messageId: sharedMessageId,
@@ -131,7 +135,7 @@ router.post('/send',
         }
         // Try to find reciprocal contact and store mirrored message for recipient
         tableContact.getByUserAndContactUser(req.database.db, contactUserId, userId, (lookupErr, reciprocal) => {
-          if (!lookupErr && reciprocal?.id) {
+          if (!lookupErr && reciprocal?.id && (reciprocal.status || 'active') === 'active') {
             tableContactMessage.createMessage(req.database.db, {
               id: mirrorMessageId,
               messageId: sharedMessageId,
@@ -186,7 +190,11 @@ router.post('/update',
       return;
     }
 
-    withContactOwnership(req, res, contactId, () => {
+    withContactOwnership(req, res, contactId, (contactRow) => {
+      if ((contactRow.status || 'active') !== 'active') {
+        return next(apiError.forbidden('contact_removed'));
+      }
+
       tableContactMessage.updateMessageForContact(req.database.db, contactId, messageId, {
         message: encryptedMessageForUser,
         signature,
@@ -197,7 +205,7 @@ router.post('/update',
         }
 
         tableContact.getByUserAndContactUser(req.database.db, contactUserId, userId, (lookupErr, reciprocal) => {
-          if (!lookupErr && reciprocal?.id) {
+          if (!lookupErr && reciprocal?.id && (reciprocal.status || 'active') === 'active') {
             tableContactMessage.updateMessageForContact(req.database.db, reciprocal.id, messageId, {
               message: encryptedMessageForContact,
               signature,

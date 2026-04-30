@@ -1,4 +1,5 @@
 const express = require('express');
+const axios = require('axios');
 const { getEncryptionPublicKey } = require('../utils/keyStore');
 const cryptoUtil = require('../utils/cryptoUtils');
 const router = express.Router();
@@ -7,6 +8,41 @@ const security = require('../middleware/security');
 const tableContact = require('../db/tableContact');
 const metric = require('../middleware/metric');
 const { apiError } = require('../middleware/api-error');
+const { signServiceJwt } = require('../utils/serviceJwt');
+const { resolveBaseUrl } = require('../utils/adminLogForwarder');
+const SOCKET_AUDIENCE = process.env.SERVICE_JWT_AUDIENCE_SOCKET || 'service.socketio';
+
+
+function resolveSocketIoBaseUrl() {
+  return resolveBaseUrl(process.env.SOCKETIO_BASE_URL || process.env.BASE_URL, process.env.SOCKETIO_PORT);
+}
+
+async function emitContactsUpdated(userId) {
+  const baseUrl = resolveSocketIoBaseUrl();
+  if (!baseUrl || !userId) {
+    return;
+  }
+
+  try {
+    const token = await signServiceJwt({ audience: SOCKET_AUDIENCE });
+    const payload = {
+      status: 200,
+      type: 'contacts_updated',
+      content: { userId }
+    };
+    const headers = {
+      'content-type': 'application/json',
+      Authorization: `Bearer ${token}`
+    };
+    await Promise.all([
+      axios.post(`${baseUrl}/emit/user`, { userId, event: String(userId), payload }, { headers, timeout: 3000, validateStatus: () => true }),
+      axios.post(`${baseUrl}/emit/user`, { userId, event: 'contacts_updated', payload }, { headers, timeout: 3000, validateStatus: () => true }),
+      axios.post(`${baseUrl}/emit/user`, { userId, event: `contactsUpdatedForUser:${userId}`, payload }, { headers, timeout: 3000, validateStatus: () => true })
+    ]);
+  } catch {
+    // best-effort only
+  }
+}
 
 function getAuthUserId(req) {
   return req.jwtUser?.userId ?? req.jwtUser?.id ?? null;
@@ -144,7 +180,9 @@ router.get('/get/userId/:userId',
           'hint': row.hint == null ? '' : row.hint,
           'name': row.name == null ? '' : row.name,
           'base64Avatar': row.base64Avatar,
-          'lastMessageFrom': row.lastMessageFrom
+          'lastMessageFrom': row.lastMessageFrom,
+          'lastMessageAt': row.lastMessageAt ?? null,
+          'status': row.status || 'active'
         });
       });
       res.status(200).json(response);
@@ -192,14 +230,31 @@ router.get('/delete/:contactId',
   ]
   , function (req, res, next) {
     let response = { 'status': 0 };
-    withContactOwnership(req, res, req.params.contactId, () => {
+    withContactOwnership(req, res, req.params.contactId, (contactRow) => {
       tableContact.deleteById(req.database.db, req.params.contactId, function (err) {
         if (err) {
           return next(apiError.internal('db_error'));
         }
-        response.status = 200;
-        res.setHeader('Content-Type', 'application/json');
-        res.status(200).json(response);
+
+        tableContact.getByUserAndContactUser(req.database.db, contactRow.contactUserId, contactRow.userId, (lookupErr, reciprocal) => {
+          const finish = () => {
+            response.status = 200;
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200).json(response);
+          };
+
+          if (lookupErr || !reciprocal?.id) {
+            finish();
+            return;
+          }
+
+          tableContact.setStatus(req.database.db, reciprocal.id, 'removed_by_contact', (statusErr) => {
+            if (!statusErr) {
+              void emitContactsUpdated(contactRow.contactUserId);
+            }
+            finish();
+          });
+        });
       });
     }, next);
   });

@@ -201,6 +201,7 @@ export class UserService {
   }
 
   public logout() {
+    this.displayMessage.closeAll();
     this.clearJwtRenewal();
     this.user = {
       id: '',

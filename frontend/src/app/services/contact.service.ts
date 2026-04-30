@@ -65,6 +65,7 @@ export class ContactService {
       next: async (getContactsResponse: GetContactsResponse) => {
         const contacts = (getContactsResponse.rows || []).map(raw => this.mapRawContact(raw));
         await this.storeContactAvatarsFromServer(contacts);
+        this.preserveLocalContactDetails(contacts);
         this._contacts.set(contacts);
         await this.updateContactProfile();
         this.persistContacts(false);
@@ -116,6 +117,7 @@ export class ContactService {
         next: async (getContactsResponse: GetContactsResponse) => {
           const contacts = (getContactsResponse.rows || []).map(raw => this.mapRawContact(raw));
           await this.storeContactAvatarsFromServer(contacts);
+          this.preserveLocalContactDetails(contacts);
           this._contacts.set(contacts);
           await this.updateContactProfile();
           this.persistContacts(false);
@@ -154,7 +156,8 @@ export class ContactService {
       base64Avatar: raw.base64Avatar ?? '',
       provided: raw.provided ?? false,
       lastMessageFrom: raw.lastMessageFrom ?? '',
-      lastMessageAt: raw.lastMessageAt ?? null
+      lastMessageAt: raw.lastMessageAt ?? null,
+      status: raw.status ?? 'active'
     };
   }
 
@@ -174,6 +177,30 @@ export class ContactService {
         contact.base64Avatar = '';
       }
     }));
+  }
+
+  private preserveLocalContactDetails(contacts: Contact[]): void {
+    const currentById = new Map(this._contacts().map(contact => [contact.id, contact]));
+    contacts.forEach(contact => {
+      const current = currentById.get(contact.id);
+      if (!current) {
+        return;
+      }
+      contact.name = contact.name?.trim() ? contact.name : current.name;
+      contact.base64Avatar = contact.base64Avatar || current.base64Avatar;
+      contact.avatarFileId = contact.avatarFileId ?? current.avatarFileId;
+      contact.avatarOriginalFileId = contact.avatarOriginalFileId ?? current.avatarOriginalFileId;
+      contact.avatarAttribution = contact.avatarAttribution ?? current.avatarAttribution;
+      contact.chatBackgroundImage = contact.chatBackgroundImage || current.chatBackgroundImage;
+      contact.chatBackgroundFileId = contact.chatBackgroundFileId ?? current.chatBackgroundFileId;
+      contact.chatBackgroundOriginalFileId = contact.chatBackgroundOriginalFileId ?? current.chatBackgroundOriginalFileId;
+      contact.chatBackgroundAttribution = contact.chatBackgroundAttribution ?? current.chatBackgroundAttribution;
+      contact.chatBackgroundTransparency = contact.chatBackgroundTransparency ?? current.chatBackgroundTransparency;
+      contact.hashtags = contact.hashtags?.length ? contact.hashtags : current.hashtags;
+      contact.pinned = current.pinned ?? contact.pinned;
+      contact.sortOrder = contact.sortOrder ?? current.sortOrder;
+      contact.tileSettings = contact.tileSettings ?? current.tileSettings;
+    });
   }
 
   private sanitizeContactName(name?: string | null): string {
@@ -201,7 +228,7 @@ export class ContactService {
   private async updateContactProfile() {
     await Promise.all(this._contacts().map(async contact => {
       const profile = await this.indexedDbService.getContactProfile(contact.id);
-      contact.name = this.sanitizeContactName(profile?.name ?? contact.name);
+      contact.name = this.sanitizeContactName(profile?.name?.trim() ? profile.name : contact.name);
       contact.avatarFileId = profile?.avatarFileId ?? contact.avatarFileId;
       contact.avatarOriginalFileId = profile?.avatarOriginalFileId ?? contact.avatarOriginalFileId;
       contact.avatarAttribution = profile?.avatarAttribution ?? contact.avatarAttribution;

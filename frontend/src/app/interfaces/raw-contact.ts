@@ -16,4 +16,5 @@ export interface RawContact {
   hint?: string;
   lastMessageFrom: string;
   lastMessageAt?: string | null;
+  status?: 'active' | 'removed_by_contact';
 }

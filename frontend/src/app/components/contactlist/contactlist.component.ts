@@ -197,6 +197,12 @@ export class ContactlistComponent {
     return 1 - clamped / 100;
   }
 
+  getContactDisplayName(contact: Contact): string {
+    return contact.name?.trim()
+      || contact.avatarAttribution?.authorName?.trim()
+      || this.translation.t('common.contact.list.nameFallback');
+  }
+
   getLatestMessagePreviews(contact: Contact): ContactMessagePreview[] {
     return this.latestMessagePreviews()[contact.id] ?? [];
   }

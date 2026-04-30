@@ -1,5 +1,7 @@
 import { AvatarAttribution } from './avatar-attribution';
 
+export type ContactStatus = 'active' | 'removed_by_contact';
+
 export interface Contact {
     id: string,
     userId: string,
@@ -33,7 +35,8 @@ export interface Contact {
     sortOrder?: number,
     provided: boolean,
     lastMessageFrom: string,
-    lastMessageAt?: string | null
+    lastMessageAt?: string | null,
+    status?: ContactStatus,
     unreadCount?: number,
     tileSettings?: import('./tile-settings').TileSetting[]
 }

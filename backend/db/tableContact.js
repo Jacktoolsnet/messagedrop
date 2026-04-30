@@ -10,6 +10,7 @@ const columnHint = 'hint';
 const columnName = 'name';
 const columnLastMessageFrom = 'lastMessageFrom';
 const columnLastMessageAt = 'lastMessageAt';
+const columnStatus = 'status';
 
 const init = function (db) {
     try {
@@ -25,6 +26,7 @@ const init = function (db) {
             ${columnName} TEXT DEFAULT NULL,
             ${columnLastMessageFrom} TEXT DEFAULT '',
             ${columnLastMessageAt} TEXT DEFAULT NULL,
+            ${columnStatus} TEXT NOT NULL DEFAULT 'active',
             CONSTRAINT SECONDARY_KEY UNIQUE (${columnUserId}, ${columnContactUserId}),
             CONSTRAINT FK_USER_ID FOREIGN KEY (${columnUserId}) 
             REFERENCES tableUser (id) 
@@ -34,6 +36,15 @@ const init = function (db) {
         db.run(sql, (err) => {
             if (err) {
                 throw err;
+            }
+        });
+
+        db.all(`PRAGMA table_info(${tableName});`, (infoErr, columns) => {
+            if (infoErr || !Array.isArray(columns)) {
+                return;
+            }
+            if (!columns.some((column) => column.name === columnStatus)) {
+                db.run(`ALTER TABLE ${tableName} ADD COLUMN ${columnStatus} TEXT NOT NULL DEFAULT 'active';`);
             }
         });
 
@@ -59,6 +70,7 @@ const init = function (db) {
                 ${columnName} TEXT DEFAULT NULL,
                 ${columnLastMessageFrom} TEXT DEFAULT '',
                 ${columnLastMessageAt} TEXT DEFAULT NULL,
+                ${columnStatus} TEXT NOT NULL DEFAULT 'active',
                 CONSTRAINT SECONDARY_KEY UNIQUE (${columnUserId}, ${columnContactUserId}),
                 CONSTRAINT FK_USER_ID FOREIGN KEY (${columnUserId}) 
                 REFERENCES tableUser (id) 
@@ -206,6 +218,22 @@ const getByUserId = function (db, userId, callback) {
     }
 };
 
+
+const setStatus = function (db, contactId, status, callback) {
+    try {
+        const sql = `
+        UPDATE ${tableName}
+        SET ${columnStatus} = ?
+        WHERE ${columnContactId} = ?;`;
+
+        db.run(sql, [status, contactId], (err) => {
+            callback(err);
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
 const deleteById = function (db, contactId, callback) {
     try {
         let sql = `
@@ -246,5 +274,6 @@ module.exports = {
     getById,
     getByUserId,
     deleteById,
+    setStatus,
     getByUserAndContactUser
 }

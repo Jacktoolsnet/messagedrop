@@ -241,6 +241,7 @@
         "previewAudio": "Voice message",
         "previewLocation": "Location message",
         "previewExperience": "Experience",
+        "removedByContact": "Ended",
         "previewMedia": "Media message"
       },
       "profile": {
@@ -295,6 +296,8 @@
         "translateFailed": "Translation failed.",
         "sendFailed": "Message could not be sent.",
         "messageTooLarge": "Message is too large to send.",
+        "contactRemovedNotice": "This contact ended the connection. You can no longer send new messages.",
+        "contactRemovedSendBlocked": "This contact is no longer active. New messages are disabled.",
         "audioLimitReached": "You can only send up to 5 voice messages in this chat.",
         "storeTranslationFailed": "Translated message could not be stored.",
         "openInMaps": "Open in Google Maps",

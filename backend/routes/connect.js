@@ -137,6 +137,11 @@ async function getOrCreateContact(db, { userId, contactUserId, hint, signingPubl
     [userId, contactUserId]
   );
   if (existing?.id) {
+    await runQuery(
+      db,
+      "UPDATE tableContact SET status = 'active' WHERE id = ?;",
+      [existing.id]
+    );
     return { id: existing.id, created: false };
   }
 

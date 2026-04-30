@@ -121,6 +121,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   readonly contact = computed(() =>
     this.contactService.sortedContactsSignal().find(contact => contact.id === this.contactId)
   );
+  readonly contactRemoved = computed(() => this.contact()?.status === 'removed_by_contact');
   readonly profile = computed(() => {
     this.userService.profileVersion();
     return this.userService.getProfile();
@@ -1630,6 +1631,11 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   private async sendAsNewMessage(contact: Contact, payload: ShortMessage): Promise<void> {
+    if (contact.status === 'removed_by_contact') {
+      this.snackBar.open(this.translation.t('common.contact.chatroom.contactRemovedSendBlocked'), '', { duration: 4000 });
+      return;
+    }
+
     let encryptedMessageForUser = '';
     let encryptedMessageForContact = '';
     let signature = '';

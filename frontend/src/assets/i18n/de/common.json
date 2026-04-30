@@ -241,6 +241,7 @@
         "previewAudio": "Sprachnachricht",
         "previewLocation": "Standortnachricht",
         "previewExperience": "Erlebnis",
+        "removedByContact": "Beendet",
         "previewMedia": "Mediennachricht"
       },
       "profile": {
@@ -295,6 +296,8 @@
         "translateFailed": "Übersetzung fehlgeschlagen.",
         "sendFailed": "Nachricht konnte nicht gesendet werden.",
         "messageTooLarge": "Die Nachricht ist zu groß zum Senden.",
+        "contactRemovedNotice": "Der Kontakt hat die Verbindung beendet. Du kannst keine neuen Nachrichten mehr senden.",
+        "contactRemovedSendBlocked": "Dieser Kontakt ist nicht mehr aktiv. Neue Nachrichten sind deaktiviert.",
         "audioLimitReached": "Du kannst in diesem Chat maximal 5 Sprachnachrichten senden.",
         "storeTranslationFailed": "Übersetzte Nachricht konnte nicht gespeichert werden.",
         "openInMaps": "In Google Maps öffnen",
