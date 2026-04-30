@@ -519,7 +519,8 @@ export class AppComponent implements OnInit {
   }
 
   public logout() {
-    this.userService.logout()
+    this.dialog.closeAll();
+    this.userService.logout();
     this.placeService.logout();
     this.contactService.logout();
     this.noteService.logout();

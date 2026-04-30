@@ -132,8 +132,11 @@ export class ContactlistComponent {
 
     effect(() => {
       this.userService.userSet();
-      const contacts = this.contactsSignal();
       const hasJwt = this.userService.hasJwt();
+      if (!hasJwt) {
+        this.dialogRef.close();
+      }
+      const contacts = this.contactsSignal();
       const activeContactIds = new Set(contacts.map((contact) => contact.id));
 
       for (const contactId of Array.from(this.previewRequestKeys.keys())) {
