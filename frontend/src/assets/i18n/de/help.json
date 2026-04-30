@@ -1838,7 +1838,7 @@
   },
   "tileEditRelations": {
     "title": "Verknüpfungs-Kachel",
-    "intro": "In diesem Dialog verknüpfst du Kontakte und Orte miteinander und kannst die Kachel-Darstellung anpassen.",
+    "intro": "In diesem Dialog verknüpfst du Kontakte und Orte miteinander, kannst bei Kontakte-Orte-Kacheln neue Orte hinzufügen und die Kachel-Darstellung anpassen.",
     "items": {
       "displaySettings": {
         "title": "Darstellung öffnen",
@@ -1851,6 +1851,10 @@
       "toggle": {
         "title": "Zuordnung umschalten",
         "desc": "Mit dieser Funktion ordnest du Einträge per Schieberegler zu oder entfernst die Zuordnung."
+      },
+      "addPlace": {
+        "title": "Ort hinzufügen",
+        "desc": "Mit dieser Funktion erstellst du einen neuen Ort über die Kartenauswahl. Der neue Ort wird direkt in die Liste übernommen und ausgewählt."
       },
       "close": {
         "title": "Abbrechen",

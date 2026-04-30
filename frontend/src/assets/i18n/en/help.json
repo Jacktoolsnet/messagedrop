@@ -1838,7 +1838,7 @@
   },
   "tileEditRelations": {
     "title": "Relation tile",
-    "intro": "This dialog links contacts and places and lets you adjust tile display settings.",
+    "intro": "This dialog links contacts and places, lets you add new places for contact-place tiles, and lets you adjust tile display settings.",
     "items": {
       "displaySettings": {
         "title": "Open display settings",
@@ -1851,6 +1851,10 @@
       "toggle": {
         "title": "Toggle assignment",
         "desc": "This action links or unlinks entries using the slide toggle."
+      },
+      "addPlace": {
+        "title": "Add place",
+        "desc": "This action creates a new place using the map picker. The new place is added to the list and selected immediately."
       },
       "close": {
         "title": "Cancel",

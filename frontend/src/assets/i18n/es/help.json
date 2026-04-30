@@ -1838,7 +1838,7 @@
   },
   "tileEditRelations": {
     "title": "Tarjeta de relaciones",
-    "intro": "En este diálogo vinculas contactos y lugares entre sí y puedes ajustar la visualización de la tarjeta.",
+    "intro": "En este diálogo vinculas contactos y lugares, puedes añadir nuevos lugares para las tarjetas de contactos-lugares y ajustar la presentación de la tarjeta.",
     "items": {
       "displaySettings": {
         "title": "Abrir ajustes visuales",
@@ -1851,6 +1851,10 @@
       "toggle": {
         "title": "Alternar asignación",
         "desc": "Con esta función asignas o quitas asignaciones con el control deslizante."
+      },
+      "addPlace": {
+        "title": "Añadir lugar",
+        "desc": "Con esta función creas un nuevo lugar mediante el selector del mapa. El nuevo lugar se añade a la lista y queda seleccionado directamente."
       },
       "close": {
         "title": "Cancelar",

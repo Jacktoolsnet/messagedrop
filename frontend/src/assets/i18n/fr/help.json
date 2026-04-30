@@ -1838,7 +1838,7 @@
   },
   "tileEditRelations": {
     "title": "Tuile de relations",
-    "intro": "Cette boîte de dialogue permet de lier des contacts et des lieux, et d'ajuster l'affichage de la tuile.",
+    "intro": "Dans cette boîte de dialogue, vous liez contacts et lieux, pouvez ajouter de nouveaux lieux pour les tuiles contacts-lieux et ajuster l’affichage de la tuile.",
     "items": {
       "displaySettings": {
         "title": "Ouvrir l'affichage",
@@ -1851,6 +1851,10 @@
       "toggle": {
         "title": "Basculer l'association",
         "desc": "Cette fonction associe ou retire des éléments via l'interrupteur."
+      },
+      "addPlace": {
+        "title": "Ajouter un lieu",
+        "desc": "Cette fonction crée un nouveau lieu avec le sélecteur de carte. Le nouveau lieu est ajouté à la liste et sélectionné immédiatement."
       },
       "close": {
         "title": "Annuler",

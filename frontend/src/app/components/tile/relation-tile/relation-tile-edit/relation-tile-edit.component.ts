@@ -120,6 +120,10 @@ export class RelationTileEditComponent {
     return this.mode === 'contactPlaces' && this.items().length === 0 && this.userService.hasJwt();
   }
 
+  get canAddPlaceFromActionBar(): boolean {
+    return this.mode === 'contactPlaces' && this.items().length > 0 && this.userService.hasJwt();
+  }
+
   onFilterInput(event: Event): void {
     const value = (event.target as HTMLInputElement).value;
     this.filterValue.set(value);

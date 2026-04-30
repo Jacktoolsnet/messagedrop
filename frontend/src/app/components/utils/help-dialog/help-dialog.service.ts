@@ -2360,6 +2360,11 @@ const HELP_TOPICS = {
         descriptionKey: 'tileEditRelations.items.toggle.desc'
       },
       {
+        icon: 'add_location',
+        titleKey: 'tileEditRelations.items.addPlace.title',
+        descriptionKey: 'tileEditRelations.items.addPlace.desc'
+      },
+      {
         icon: 'close',
         titleKey: 'tileEditRelations.items.close.title',
         descriptionKey: 'tileEditRelations.items.close.desc'
