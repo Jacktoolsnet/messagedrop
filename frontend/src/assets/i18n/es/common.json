@@ -343,6 +343,7 @@
       "moderationReviewFallbackPending": "Publicado. La moderación automática no estaba disponible temporalmente. La revisión manual no pudo registrarse en este momento.",
       "moderationFailed": "La moderación falló. Inténtalo de nuevo más tarde.",
       "creating": "Creando mensaje",
+      "publishing": "Publicando…",
       "created": "Mensaje publicado correctamente.",
       "draftSaved": "Borrador guardado.",
       "postingBlocked": "Actualmente no puedes publicar.",

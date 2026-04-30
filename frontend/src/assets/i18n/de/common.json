@@ -343,6 +343,7 @@
       "moderationReviewFallbackPending": "Veröffentlicht. Die automatische Moderation war vorübergehend nicht verfügbar. Die manuelle Prüfung konnte gerade nicht vorgemerkt werden.",
       "moderationFailed": "Moderation fehlgeschlagen. Bitte später erneut versuchen.",
       "creating": "Nachricht wird erstellt",
+      "publishing": "Veröffentlichung läuft…",
       "created": "Nachricht erfolgreich gesendet.",
       "draftSaved": "Entwurf gespeichert.",
       "postingBlocked": "Du bist derzeit für das Veröffentlichen gesperrt.",

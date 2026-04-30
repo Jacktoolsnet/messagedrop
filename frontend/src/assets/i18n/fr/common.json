@@ -343,6 +343,7 @@
       "moderationReviewFallbackPending": "Publié. La modération automatique était temporairement indisponible. L’examen manuel n’a pas pu être mis en file d’attente pour le moment.",
       "moderationFailed": "La modération a échoué. Veuillez réessayer plus tard.",
       "creating": "Création du message",
+      "publishing": "Publication en cours…",
       "created": "Message publié avec succès.",
       "draftSaved": "Brouillon enregistré.",
       "postingBlocked": "Vous ne pouvez actuellement pas publier.",

@@ -248,14 +248,14 @@ export class MessageService {
     return this.buildModerationPatch(moderation);
   }
 
-  private configureCreateMessageRequest(showAlways: boolean): string {
+  private configureCreateMessageRequest(): string {
     const url = `${environment.apiUrl}/message/create`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways,
+      showAlways: true,
       title: this.i18n.t('common.message.title'),
       image: '',
       icon: '',
-      message: this.i18n.t('common.message.creating'),
+      message: this.i18n.t('common.message.publishing'),
       button: '',
       delay: 0,
       showSpinner: true,
@@ -282,8 +282,8 @@ export class MessageService {
     };
   }
 
-  private createMessageRequest(message: Message, user: User, showAlways = false): Observable<MessageCreateResponse> {
-    const url = this.configureCreateMessageRequest(showAlways);
+  private createMessageRequest(message: Message, user: User): Observable<MessageCreateResponse> {
+    const url = this.configureCreateMessageRequest();
     const body = this.buildCreateMessageBody(message, user);
     return this.http.post<MessageCreateResponse>(url, body, this.httpOptions).pipe(
       catchError(this.handleError)
@@ -1102,11 +1102,11 @@ export class MessageService {
     const action = published ? 'enable' : 'disable';
     const url = `${environment.apiUrl}/message/${action}/${encodeURIComponent(String(idOrUuid))}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways,
+      showAlways: published ? true : showAlways,
       title: this.i18n.t('common.message.title'),
       image: '',
       icon: '',
-      message: published ? this.i18n.t('common.message.updating') : this.i18n.t('common.message.disabling'),
+      message: published ? this.i18n.t('common.message.publishing') : this.i18n.t('common.message.disabling'),
       button: '',
       delay: 0,
       showSpinner: true,
@@ -1138,7 +1138,7 @@ export class MessageService {
       switchMap((preparedMessage) => {
         const publishState = preparedMessage.publishState ?? this.normalizePublishState(preparedMessage);
         if (this.shouldPublishViaCreate(preparedMessage, publishState)) {
-          return this.createMessageRequest(preparedMessage, user, showAlways).pipe(
+          return this.createMessageRequest(preparedMessage, user).pipe(
             map((response) => this.applyCreatePublishSuccess(preparedMessage, user, response, includeInRootList))
           );
         }

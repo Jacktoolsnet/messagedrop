@@ -343,6 +343,7 @@
       "moderationReviewFallbackPending": "Published. Automated moderation was temporarily unavailable. Manual review could not be queued right now.",
       "moderationFailed": "Moderation failed. Please try again later.",
       "creating": "Creating message",
+      "publishing": "Publishing…",
       "created": "Message successfully dropped.",
       "draftSaved": "Draft saved.",
       "postingBlocked": "You are currently blocked from publishing.",
