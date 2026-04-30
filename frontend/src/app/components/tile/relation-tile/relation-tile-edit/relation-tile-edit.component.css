@@ -86,3 +86,15 @@
   padding: 0.35rem 0;
   font-style: italic;
 }
+
+.create-first-place {
+  display: flex;
+  justify-content: center;
+  padding: 1.25rem 0.5rem;
+}
+
+.create-first-place button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}

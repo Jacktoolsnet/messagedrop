@@ -4,6 +4,14 @@
 </app-dialog-header>
 
 <mat-dialog-content class="edit-content">
+  @if (canCreateFirstPlace) {
+  <div class="create-first-place">
+    <button mat-stroked-button color="primary" type="button" (click)="addPlace()" [disabled]="creatingPlace()">
+      <mat-icon>add_location</mat-icon>
+      <span>{{ 'common.placeList.addPlaceAria' | transloco }}</span>
+    </button>
+  </div>
+  } @else {
   <div class="filter-row">
     <mat-form-field appearance="outline" class="full-width" subscriptSizing="dynamic">
       <mat-label>{{ 'common.tileFields.filter' | transloco }}</mat-label>
@@ -47,6 +55,7 @@
   </div>
   } @else {
   <p class="text-muted">{{ 'common.tiles.relations.emptyFiltered' | transloco }}</p>
+  }
   }
 </mat-dialog-content>
 
