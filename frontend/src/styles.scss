@@ -105,6 +105,13 @@ h2[mat-dialog-title].dialog-title {
   backdrop-filter: blur(6px);
 }
 
+.image-gallery-dialog-panel .mat-mdc-dialog-surface {
+  padding: 0;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: transparent;
+}
+
 .unsplash-badge__link {
   color: inherit;
   text-decoration: underline;

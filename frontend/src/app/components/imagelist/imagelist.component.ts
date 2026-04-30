@@ -29,6 +29,7 @@ import { OverrideExifDataComponent } from './override-exif-data/override-exif-da
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { DisplayMessageService } from '../../services/display-message.service';
 import { LocationPickerDialogComponent } from '../utils/location-picker-dialog/location-picker-dialog.component';
+import { ImageGalleryDialogComponent, type ImageGalleryItem } from './image-gallery-dialog/image-gallery-dialog.component';
 
 interface ImageDialogData {
   location: Location;
@@ -186,6 +187,34 @@ export class ImagelistComponent implements OnInit, OnDestroy {
         const updatedNotes = this.imagesSignal().filter(n => n.id !== image.id);
         this.imagesSignal.set(updatedNotes);
       }
+    });
+  }
+
+  openGallery(image: LocalImage): void {
+    const galleryImages: ImageGalleryItem[] = this.sortedImages()
+      .map(item => ({
+        id: item.id,
+        fileName: item.fileName,
+        url: this.getImageUrl(item.id)
+      }))
+      .filter((item): item is ImageGalleryItem => !!item.url && item.url !== 'NOT_FOUND');
+
+    const initialIndex = galleryImages.findIndex(item => item.id === image.id);
+    if (initialIndex < 0) {
+      return;
+    }
+
+    this.dialog.open(ImageGalleryDialogComponent, {
+      data: { images: galleryImages, initialIndex },
+      width: '95vw',
+      height: '95vh',
+      maxWidth: '95vw',
+      maxHeight: '95vh',
+      panelClass: 'image-gallery-dialog-panel',
+      autoFocus: 'dialog',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false
     });
   }
 

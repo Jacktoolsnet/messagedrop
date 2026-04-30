@@ -1,0 +1,32 @@
+<div class="gallery" tabindex="0" (keydown)="onKeydown($event)">
+  <div class="gallery-toolbar">
+    <div class="gallery-title">
+      <span class="gallery-file-name">{{ currentImage().fileName }}</span>
+      @if (hasMultipleImages()) {
+      <span class="gallery-position">{{ positionText() }}</span>
+      }
+    </div>
+    <button mat-icon-button type="button" class="gallery-close" (click)="close()"
+      [attr.aria-label]="'common.actions.close' | transloco">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="gallery-stage">
+    @if (hasMultipleImages()) {
+    <button mat-icon-button type="button" class="gallery-nav gallery-nav--previous" (click)="previous()"
+      [attr.aria-label]="'common.images.galleryPreviousAria' | transloco">
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+    }
+
+    <img class="gallery-image" [src]="currentImage().url" [alt]="currentImage().fileName" />
+
+    @if (hasMultipleImages()) {
+    <button mat-icon-button type="button" class="gallery-nav gallery-nav--next" (click)="next()"
+      [attr.aria-label]="'common.images.galleryNextAria' | transloco">
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+    }
+  </div>
+</div>

@@ -1,0 +1,124 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.92);
+  color: #fff;
+}
+
+.gallery {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  width: 100%;
+  height: 100%;
+  outline: none;
+}
+
+.gallery-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-height: 3.25rem;
+  padding: 0.35rem 0.6rem 0.35rem 1rem;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.gallery-title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.gallery-file-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.gallery-position {
+  flex: 0 0 auto;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.9rem;
+}
+
+.gallery-close {
+  flex: 0 0 auto;
+}
+
+.gallery-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  padding: 1rem 4.5rem;
+}
+
+.gallery-image {
+  display: block;
+  max-width: 100%;
+  max-height: calc(95vh - 5.25rem);
+  object-fit: contain;
+  box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.5);
+}
+
+.gallery-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3.25rem;
+  height: 3.25rem;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+.gallery-nav:hover,
+.gallery-nav:focus-visible,
+.gallery-close:hover,
+.gallery-close:focus-visible {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.gallery-nav mat-icon {
+  font-size: 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.gallery-nav--previous {
+  left: 0.75rem;
+}
+
+.gallery-nav--next {
+  right: 0.75rem;
+}
+
+@media (max-width: 700px) {
+  .gallery-toolbar {
+    padding-left: 0.75rem;
+  }
+
+  .gallery-stage {
+    padding: 0.75rem 0.75rem 4.5rem;
+  }
+
+  .gallery-nav {
+    top: auto;
+    bottom: 0.75rem;
+    transform: none;
+  }
+
+  .gallery-nav--previous {
+    left: calc(50% - 4rem);
+  }
+
+  .gallery-nav--next {
+    right: calc(50% - 4rem);
+  }
+
+  .gallery-image {
+    max-height: calc(95vh - 8rem);
+  }
+}

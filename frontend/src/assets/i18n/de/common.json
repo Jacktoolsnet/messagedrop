@@ -404,7 +404,10 @@
         "useImageLocation": "Standortdaten des Bildes verwenden",
         "useMapLocation": "Aktuelle Kartenposition verwenden"
       },
-      "editLocationAria": "Bildposition bearbeiten"
+      "editLocationAria": "Bildposition bearbeiten",
+      "openGalleryAria": "Bild groß anzeigen",
+      "galleryPreviousAria": "Vorheriges Bild anzeigen",
+      "galleryNextAria": "Nächstes Bild anzeigen"
     },
     "documents": {
       "title": "Private Dokumente",

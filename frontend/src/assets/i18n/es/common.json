@@ -404,7 +404,10 @@
         "useImageLocation": "Usar los datos de ubicación de la imagen",
         "useMapLocation": "Usar la ubicación actual del mapa"
       },
-      "editLocationAria": "Editar ubicación de la imagen"
+      "editLocationAria": "Editar ubicación de la imagen",
+      "openGalleryAria": "Ver imagen ampliada",
+      "galleryPreviousAria": "Mostrar imagen anterior",
+      "galleryNextAria": "Mostrar imagen siguiente"
     },
     "documents": {
       "title": "Documentos privados",

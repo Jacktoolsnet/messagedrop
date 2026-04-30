@@ -31,6 +31,10 @@
                     [attr.aria-label]="'common.images.deleteAria' | transloco" (click)="deleteImage(image)">
                     <mat-icon>delete_forever</mat-icon>
                 </button>
+                <button mat-mini-fab color="secondary" [attr.aria-label]="'common.images.openGalleryAria' | transloco"
+                    (click)="openGallery(image)">
+                    <mat-icon>fullscreen</mat-icon>
+                </button>
                 <button mat-mini-fab color="secondary" [attr.aria-label]="'common.images.editLocationAria' | transloco"
                     (click)="editLocation(image)">
                     <mat-icon>edit_location_alt</mat-icon>

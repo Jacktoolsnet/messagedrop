@@ -404,7 +404,10 @@
         "useImageLocation": "Use the image location data",
         "useMapLocation": "Use current map location"
       },
-      "editLocationAria": "Edit image location"
+      "editLocationAria": "Edit image location",
+      "openGalleryAria": "View image larger",
+      "galleryPreviousAria": "Show previous image",
+      "galleryNextAria": "Show next image"
     },
     "documents": {
       "title": "Private documents",
