@@ -2121,7 +2121,7 @@
       },
       "viewList": {
         "title": "Open list view",
-        "desc": "Use the list icon to switch back to the results list."
+        "desc": "Use the list icon to switch to the results list."
       },
       "navigate": {
         "title": "Open external navigation",
