@@ -45,7 +45,8 @@ const placeSubscriptions = function (logger, db, lat, lon, userId, messageText, 
                             "primaryKey": { "type": "place", "id": row.id },
                             "onActionClick": {
                                 "default": {
-                                    "operation": "focusLastFocusedOrOpen"
+                                    "operation": messageUuid ? "navigateLastFocusedOrOpen" : "focusLastFocusedOrOpen",
+                                    ...(messageUuid ? { "url": `/?publicMessage=${encodeURIComponent(messageUuid)}` } : {})
                                 }
                             }
                         };
