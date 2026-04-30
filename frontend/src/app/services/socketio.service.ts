@@ -183,9 +183,9 @@ export class SocketioService {
     const eventName = `${userId}`;
     const contactsUpdatedEventName = `contactsUpdatedForUser:${userId}`;
     this.socket.off('contacts_updated');
-    this.socket.on('contacts_updated', (payload) => this.refreshContactsAfterSocketUpdate('contacts_updated', payload));
+    this.socket.on('contacts_updated', () => this.refreshContactsAfterSocketUpdate());
     this.socket.off(contactsUpdatedEventName);
-    this.socket.on(contactsUpdatedEventName, (payload) => this.refreshContactsAfterSocketUpdate(contactsUpdatedEventName, payload));
+    this.socket.on(contactsUpdatedEventName, () => this.refreshContactsAfterSocketUpdate());
     this.socket.off(eventName);
     this.socket.on(eventName, (payload: UserRoomPayload) => {
       switch (payload.type) {
@@ -226,7 +226,7 @@ export class SocketioService {
           this._contactProfileExchangeUpdateToken.update((token) => token + 1);
           break;
         case 'contacts_updated':
-          this.refreshContactsAfterSocketUpdate(eventName, payload);
+          this.refreshContactsAfterSocketUpdate();
           break;
       }
     });
@@ -234,8 +234,7 @@ export class SocketioService {
     this.maybeJoinUserRoom();
   }
 
-  private refreshContactsAfterSocketUpdate(source = 'unknown', payload?: unknown): void {
-    console.info('contacts_updated received', { source, payload });
+  private refreshContactsAfterSocketUpdate(): void {
     this.ngZone.run(() => this.contactService.refreshContactsFromServer());
   }
 
