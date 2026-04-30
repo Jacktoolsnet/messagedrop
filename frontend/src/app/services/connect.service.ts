@@ -6,7 +6,7 @@ import { environment } from '../../environments/environment';
 import { Connect } from '../interfaces/connect';
 import { Contact } from '../interfaces/contact';
 import { CreateConnectResponse } from '../interfaces/create-connect-response';
-import { GetConnectResponse } from '../interfaces/get-connect-response';
+import { ConsumeConnectResponse } from '../interfaces/consume-connect-response';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { ContactService } from './contact.service';
 import { CryptoService } from './crypto.service';
@@ -14,6 +14,7 @@ import { NetworkService } from './network.service';
 import { SocketioService } from './socketio.service';
 import { TranslationHelperService } from './translation-helper.service';
 import { DisplayMessageService } from './display-message.service';
+import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root'
@@ -32,6 +33,7 @@ export class ConnectService {
   private readonly snackBar = inject(DisplayMessageService);
   private readonly networkService = inject(NetworkService);
   private readonly i18n = inject(TranslationHelperService);
+  private readonly userService = inject(UserService);
 
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error);
@@ -76,49 +78,91 @@ export class ConnectService {
       showSpinner: true,
       autoclose: false
     });
-    this.http.get<GetConnectResponse>(url, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      )
-      .subscribe({
-        next: getConnectResponse => {
-          if (getConnectResponse.status === 200) {
-            const buffer = Buffer.from(JSON.parse(getConnectResponse.connect.signature));
-            const signature = buffer.buffer.slice(
-              buffer.byteOffset, buffer.byteOffset + buffer.byteLength
-            );
-            // Informations from connect record.
-            contact.contactUserId = getConnectResponse.connect.userId;
-            contact.hint = getConnectResponse.connect.hint;
-            contact.contactUserEncryptionPublicKey = JSON.parse(getConnectResponse.connect.encryptionPublicKey);
-            contact.contactUserSigningPublicKey = JSON.parse(getConnectResponse.connect.signingPublicKey);
-            contact.contactSignature = signature;
-            // For Development check equal. Change to not equal for production.
-            if (contact.contactUserId !== contact.userId && contact.contactUserSigningPublicKey) {
-              // Verify data
-              this.cryptoService.verifySignature(contact.contactUserSigningPublicKey, contact.contactUserId, contact.contactSignature!)
-                .then((valid: boolean) => {
-                  if (valid) {
-                    // Generate Id
-                    this.contactService.createContact(contact, socketioService);
-                    this.snackBar.open(this.i18n.t('common.contact.created'), '', { duration: 1000 });
-                  } else {
-                    this.snackBar.open(this.i18n.t('common.connect.invalidData'), this.i18n.t('common.actions.ok'));
-                  }
-                });
-            } else {
-              this.snackBar.open(this.i18n.t('common.connect.selfAddBlocked'), this.i18n.t('common.actions.ok'));
+
+    this.buildOwnConnectPayload()
+      .then((ownConnect) => {
+        const body = {
+          userId: ownConnect.userId,
+          hint: ownConnect.hint,
+          signature: ownConnect.signature,
+          encryptionPublicKey: ownConnect.encryptionPublicKey,
+          signingPublicKey: ownConnect.signingPublicKey
+        };
+
+        this.http.post<ConsumeConnectResponse>(url, body, this.httpOptions)
+          .pipe(catchError(this.handleError))
+          .subscribe({
+            next: consumeConnectResponse => {
+              if (consumeConnectResponse.status === 200) {
+                this.createLocalContactFromConnectResponse(consumeConnectResponse, contact, socketioService);
+              }
+            },
+            error: (error) => {
+              console.error('Failed to consume connect record', error);
+              const messageKey = error?.status === 404
+                ? 'common.connect.consumedOrExpired'
+                : error?.status === 400
+                  ? 'common.connect.invalidData'
+                  : 'common.connect.notFound';
+              this.snackBar.open(this.i18n.t(messageKey), this.i18n.t('common.actions.ok'));
             }
-          }
-        },
-        error: (error) => {
-          console.error('Failed to load connect record', error);
-          const messageKey = error?.status === 404
-            ? 'common.connect.consumedOrExpired'
-            : 'common.connect.notFound';
-          this.snackBar.open(this.i18n.t(messageKey), this.i18n.t('common.actions.ok'));
-        }
+          });
+      })
+      .catch((error) => {
+        console.error('Failed to build own connect payload', error);
+        this.snackBar.open(this.i18n.t('common.connect.invalidData'), this.i18n.t('common.actions.ok'));
       });
+  }
+
+  private async buildOwnConnectPayload(): Promise<Connect> {
+    const user = this.userService.getUser();
+    const encryptionPublicKey = user.cryptoKeyPair?.publicKey ? JSON.stringify(user.cryptoKeyPair.publicKey) : '';
+    const signingPublicKey = user.signingKeyPair?.publicKey ? JSON.stringify(user.signingKeyPair.publicKey) : '';
+    const signature = await this.cryptoService.createSignature(user.signingKeyPair.privateKey, user.id);
+    const hint = await this.cryptoService.encrypt(user.cryptoKeyPair.publicKey, 'No hint');
+
+    return {
+      id: '',
+      userId: user.id,
+      hint,
+      signature,
+      encryptionPublicKey,
+      signingPublicKey
+    };
+  }
+
+  private createLocalContactFromConnectResponse(
+    consumeConnectResponse: ConsumeConnectResponse,
+    contact: Contact,
+    socketioService: SocketioService
+  ): void {
+    const buffer = Buffer.from(JSON.parse(consumeConnectResponse.connect.signature));
+    const signature = buffer.buffer.slice(
+      buffer.byteOffset, buffer.byteOffset + buffer.byteLength
+    );
+
+    contact.id = consumeConnectResponse.contactId;
+    contact.contactUserId = consumeConnectResponse.connect.userId;
+    contact.hint = consumeConnectResponse.connect.hint;
+    contact.contactUserEncryptionPublicKey = JSON.parse(consumeConnectResponse.connect.encryptionPublicKey);
+    contact.contactUserSigningPublicKey = JSON.parse(consumeConnectResponse.connect.signingPublicKey);
+    contact.contactSignature = signature;
+
+    if (contact.contactUserId !== contact.userId && contact.contactUserSigningPublicKey) {
+      this.cryptoService.verifySignature(contact.contactUserSigningPublicKey, contact.contactUserId, contact.contactSignature!)
+        .then((valid: boolean) => {
+          if (valid) {
+            this.contactService.addOrUpdateContact(contact);
+            socketioService.receiveProfileForContactEvent(contact);
+            socketioService.sendProfileRequestForContact(contact);
+            this.snackBar.open(this.i18n.t('common.contact.created'), '', { duration: 1000 });
+          } else {
+            this.snackBar.open(this.i18n.t('common.connect.invalidData'), this.i18n.t('common.actions.ok'));
+          }
+        });
+    } else {
+      this.snackBar.open(this.i18n.t('common.connect.selfAddBlocked'), this.i18n.t('common.actions.ok'));
+    }
   }
 
   deleteConnect(connect: Connect, showAlways = false) {

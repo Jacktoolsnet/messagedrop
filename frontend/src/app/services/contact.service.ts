@@ -351,6 +351,27 @@ export class ContactService {
     }
   }
 
+  addOrUpdateContact(contact: Contact): void {
+    if (typeof contact.sortOrder !== 'number') {
+      contact.sortOrder = this.getNextSortOrder();
+    }
+
+    this._contacts.update(contacts => {
+      const index = contacts.findIndex(existing =>
+        existing.id === contact.id ||
+        (existing.userId === contact.userId && existing.contactUserId === contact.contactUserId)
+      );
+      if (index < 0) {
+        return [...contacts, contact];
+      }
+      const next = contacts.slice();
+      next[index] = { ...next[index], ...contact };
+      return next;
+    });
+    this.persistContacts();
+    void this.saveAditionalContactInfos();
+  }
+
   createContact(contact: Contact, socketioService: SocketioService, showAlways = false) {
     const url = `${environment.apiUrl}/contact/create`;
     this.networkService.setNetworkMessageConfig(url, {

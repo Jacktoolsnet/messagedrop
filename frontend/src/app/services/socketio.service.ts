@@ -219,6 +219,9 @@ export class SocketioService {
         case 'contact_profile_exchange_updated':
           this._contactProfileExchangeUpdateToken.update((token) => token + 1);
           break;
+        case 'contacts_updated':
+          this.contactService.initContacts(true);
+          break;
       }
     });
     this.updateAuthAndConnect(userId, user.jwt);
@@ -298,6 +301,10 @@ export class SocketioService {
           });
         });
     });
+  }
+
+  public sendProfileRequestForContact(contact: Contact): void {
+    this.socket.emit('contact:requestProfile', contact);
   }
 
   public receiveProfileForContactEvent(contact: Contact): void {

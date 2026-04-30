@@ -1,10 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
+const axios = require('axios');
 const security = require('../middleware/security');
 const tableConnect = require('../db/tableConnect');
+const { signServiceJwt } = require('../utils/serviceJwt');
+const { resolveBaseUrl } = require('../utils/adminLogForwarder');
 const metric = require('../middleware/metric');
 const { apiError } = require('../middleware/api-error');
+const SOCKET_AUDIENCE = process.env.SERVICE_JWT_AUDIENCE_SOCKET || 'service.socketio';
+
 const CONNECT_ID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function getAuthUserId(req) {
@@ -40,6 +45,45 @@ function normalizeConnectId(connectId) {
   return normalizedConnectId;
 }
 
+function resolveSocketIoBaseUrl() {
+  return resolveBaseUrl(process.env.SOCKETIO_BASE_URL || process.env.BASE_URL, process.env.SOCKETIO_PORT);
+}
+
+async function emitContactsUpdated(userId) {
+  const baseUrl = resolveSocketIoBaseUrl();
+  if (!baseUrl || !userId) {
+    return;
+  }
+
+  try {
+    const token = await signServiceJwt({ audience: SOCKET_AUDIENCE });
+    await axios.post(`${baseUrl}/emit/user`, {
+      userId,
+      event: String(userId),
+      payload: {
+        status: 200,
+        type: 'contacts_updated',
+        content: { userId }
+      }
+    }, {
+      headers: {
+        'content-type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      timeout: 3000,
+      validateStatus: () => true
+    });
+  } catch {
+    // best-effort only
+  }
+}
+
+function validateConnectPayload(body) {
+  const required = ['userId', 'hint', 'signature', 'encryptionPublicKey', 'signingPublicKey'];
+  const missing = required.filter((key) => body?.[key] === undefined || body?.[key] === null || body?.[key] === '');
+  return missing.length ? `missing_${missing.join('_')}` : null;
+}
+
 function queryGet(db, sql, params = []) {
   return new Promise((resolve, reject) => {
     db.get(sql, params, (err, row) => {
@@ -62,6 +106,76 @@ function runQuery(db, sql, params = []) {
       resolve(this);
     });
   });
+}
+
+async function getOrCreateContact(db, { userId, contactUserId, hint, signingPublicKey, encryptionPublicKey }) {
+  const existing = await queryGet(
+    db,
+    'SELECT * FROM tableContact WHERE userId = ? AND contactUserId = ?;',
+    [userId, contactUserId]
+  );
+  if (existing?.id) {
+    return { id: existing.id, created: false };
+  }
+
+  const contactId = crypto.randomUUID();
+  await runQuery(
+    db,
+    `INSERT INTO tableContact (
+      id,
+      userId,
+      contactUserId,
+      contactUserSigningPublicKey,
+      contactUserEncryptionPublicKey,
+      hint
+    ) VALUES (?, ?, ?, ?, ?, ?);`,
+    [contactId, userId, contactUserId, signingPublicKey, encryptionPublicKey, hint ?? null]
+  );
+  return { id: contactId, created: true };
+}
+
+async function consumeConnectAndCreateContacts(db, connectId, requester) {
+  await runQuery(db, 'BEGIN IMMEDIATE');
+  try {
+    const row = await queryGet(db, 'SELECT * FROM tableConnect WHERE id = ?;', [connectId]);
+    if (!row) {
+      await runQuery(db, 'ROLLBACK');
+      return null;
+    }
+
+    if (String(row.userId) === String(requester.userId)) {
+      await runQuery(db, 'ROLLBACK');
+      return { self: true };
+    }
+
+    await runQuery(db, 'DELETE FROM tableConnect WHERE id = ?;', [connectId]);
+
+    const requesterContact = await getOrCreateContact(db, {
+      userId: requester.userId,
+      contactUserId: row.userId,
+      hint: row.hint,
+      signingPublicKey: row.signingPublicKey,
+      encryptionPublicKey: row.encryptionPublicKey
+    });
+
+    const ownerContact = await getOrCreateContact(db, {
+      userId: row.userId,
+      contactUserId: requester.userId,
+      hint: requester.hint,
+      signingPublicKey: requester.signingPublicKey,
+      encryptionPublicKey: requester.encryptionPublicKey
+    });
+
+    await runQuery(db, 'COMMIT');
+    return { connect: row, contactId: requesterContact.id, reciprocalContactId: ownerContact.id };
+  } catch (err) {
+    try {
+      await runQuery(db, 'ROLLBACK');
+    } catch {
+      // ignore rollback errors
+    }
+    throw err;
+  }
 }
 
 async function consumeConnectRecord(db, connectId) {
@@ -137,6 +251,50 @@ router.get('/get/:connectId',
       response.connect = row;
       res.status(response.status).json(response);
     }, next);
+  });
+
+
+router.post('/consume/:connectId',
+  [
+    security.authenticate,
+    express.json({ type: 'application/json' }),
+    metric.count('connect.consume', { when: 'always', timezone: 'utc', amount: 1 })
+  ],
+  async function (req, res, next) {
+    const normalizedConnectId = normalizeConnectId(req.params.connectId);
+    if (!normalizedConnectId) {
+      return next(apiError.badRequest('invalid_connect_id'));
+    }
+
+    const validationError = validateConnectPayload(req.body);
+    if (validationError) {
+      return next(apiError.badRequest(validationError));
+    }
+
+    if (!ensureSameUser(req, res, req.body.userId, next)) {
+      return;
+    }
+
+    try {
+      const result = await consumeConnectAndCreateContacts(req.database.db, normalizedConnectId, req.body);
+      if (!result) {
+        return next(apiError.notFound('not_found'));
+      }
+      if (result.self) {
+        return next(apiError.badRequest('self_add_blocked'));
+      }
+
+      void emitContactsUpdated(result.connect.userId);
+
+      return res.status(200).json({
+        status: 200,
+        connect: result.connect,
+        contactId: result.contactId,
+        reciprocalContactId: result.reciprocalContactId
+      });
+    } catch {
+      return next(apiError.internal('db_error'));
+    }
   });
 
 router.get('/consume/:connectId',
