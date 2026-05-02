@@ -405,7 +405,8 @@
         "previewAlt": "Aperçu de l'image",
         "bodyShort": "Cette image contient des données de position.",
         "useImageLocation": "Utiliser les données de position de l'image",
-        "useMapLocation": "Utiliser la position actuelle de la carte"
+        "useMapLocation": "Utiliser la position actuelle de la carte",
+        "mapPreviewAria": "Aperçu de la carte avec la position de l'image et la position actuelle de la carte"
       },
       "editLocationAria": "Modifier la position de l’image",
       "openGalleryAria": "Afficher l'image en grand",

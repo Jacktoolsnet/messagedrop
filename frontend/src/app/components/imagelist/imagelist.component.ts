@@ -281,7 +281,12 @@ export class ImagelistComponent implements OnInit, OnDestroy {
         const previewUrl = await this.localImageService.getImageUrl(entry).catch(() => undefined);
         const dialogResult = await firstValueFrom(
           this.dialog.open(OverrideExifDataComponent, {
-            data: { fileName: entry.fileName, previewUrl },
+            data: {
+              fileName: entry.fileName,
+              previewUrl,
+              imageLocation: entry.location,
+              mapLocation: this.mapService.getMapLocation()
+            },
             autoFocus: false,
             hasBackdrop: true,
             backdropClass: 'dialog-backdrop',

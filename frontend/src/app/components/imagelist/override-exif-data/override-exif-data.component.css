@@ -1,5 +1,10 @@
 .dialog-content {
   display: grid;
+  gap: 12px;
+}
+
+.preview-row {
+  display: grid;
   grid-template-columns: auto 1fr;
   gap: 10px 12px;
   align-items: start;
@@ -10,15 +15,9 @@
   height: 56px;
   object-fit: cover;
   border-radius: 10px;
-  grid-column: 1;
-  grid-row: 1;
   align-self: center;
   transform: translateY(-8px);
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
-}
-
-.body {
-  display: contents;
 }
 
 .copy {
@@ -28,24 +27,57 @@
 }
 
 .choice-actions {
-  grid-column: 2;
-  grid-row: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
   margin-top: 0;
-  margin-bottom: 12px;
 }
 
 .choice-button {
   width: 95%;
-  min-height: 42px;
+  min-height: 56px;
   justify-content: flex-start;
+  align-items: center;
+  padding-left: 8px;
+  padding-right: 12px;
+  white-space: normal;
+  line-height: 1.25;
 }
 
-.choice-button mat-icon {
-  margin-right: 8px;
+.choice-button-content {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+}
+
+.choice-marker {
+  width: 24px;
+  height: 30px;
+  justify-self: center;
+}
+
+.choice-button-text {
+  display: block;
+  max-width: 12.5rem;
+  line-height: 1.2;
+  white-space: normal;
+}
+
+.map-preview-wrap {
+  display: block;
+  margin-bottom: 12px;
+}
+
+.map-preview {
+  width: 100%;
+  min-height: 180px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--mat-card-outlined-outline-color);
 }
 
 .actions {
@@ -60,22 +92,16 @@
 }
 
 @media (max-width: 480px) {
-  .dialog-content {
+  .preview-row {
     grid-template-columns: 1fr;
   }
 
-  .choice-actions,
   .preview {
-    grid-column: 1;
-  }
-
-  .preview {
-    grid-row: 1;
     justify-self: center;
     transform: none;
   }
 
-  .choice-actions {
-    grid-row: 2;
+  .map-preview {
+    min-height: 160px;
   }
 }
