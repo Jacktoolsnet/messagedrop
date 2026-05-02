@@ -405,8 +405,7 @@
         "previewAlt": "Image preview",
         "bodyShort": "This image contains location data.",
         "useImageLocation": "Use the image location data",
-        "useMapLocation": "Use current map location",
-        "mapPreviewAria": "Map preview with image location and current map location"
+        "useMapLocation": "Use current map location"
       },
       "editLocationAria": "Edit image location",
       "openGalleryAria": "View image larger",

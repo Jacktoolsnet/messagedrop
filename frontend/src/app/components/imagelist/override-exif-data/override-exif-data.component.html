@@ -4,40 +4,33 @@
 </app-dialog-header>
 
 <mat-dialog-content class="dialog-content">
-  <div class="preview-row">
-    @if (data.previewUrl) {
-    <img [src]="data.previewUrl"
-      [alt]="data.fileName || ('common.images.exif.previewAlt' | transloco)" class="preview" />
-    }
-    <div class="choice-actions">
-      <button mat-stroked-button color="primary" class="choice-button" type="button" cdkFocusInitial
-        [mat-dialog-close]="{ useMap: false, applyToAll }"
-        [attr.aria-label]="'common.images.exif.useImageLocationAria' | transloco">
-        <span class="choice-button-content">
-          <img src="assets/markers/image-marker.svg" alt="" class="choice-marker" />
-          <span class="choice-button-text">{{ 'common.images.exif.useImageLocation' | transloco }}</span>
-        </span>
-      </button>
-      <button mat-stroked-button class="choice-button" type="button"
-        [mat-dialog-close]="{ useMap: true, applyToAll }"
-        [attr.aria-label]="'common.images.exif.useMapLocationAria' | transloco">
-        <span class="choice-button-content">
-          <img src="assets/markers/empty-marker.svg" alt="" class="choice-marker" />
-          <span class="choice-button-text">{{ 'common.images.exif.useMapLocation' | transloco }}</span>
-        </span>
-      </button>
-    </div>
-  </div>
-
-  @if (data.imageLocation && data.mapLocation) {
-  <div class="map-preview-wrap">
-    <div
-      [id]="mapId"
-      class="map-preview"
-      role="img"
-      [attr.aria-label]="'common.images.exif.mapPreviewAria' | transloco"></div>
-  </div>
+  @if (data.previewUrl) {
+  <img [src]="data.previewUrl"
+    [alt]="data.fileName || ('common.images.exif.previewAlt' | transloco)" class="preview" />
   }
+
+  <div class="choice-actions">
+    <button mat-stroked-button color="primary" class="choice-button" type="button" cdkFocusInitial
+      [mat-dialog-close]="{ useMap: false, applyToAll }"
+      [attr.aria-label]="'common.images.exif.useImageLocationAria' | transloco">
+      <span class="choice-button-content">
+        @if (data.imageLocation) {
+        <span [id]="imageMapId" class="choice-map" aria-hidden="true"></span>
+        }
+        <span class="choice-button-text">{{ 'common.images.exif.useImageLocation' | transloco }}</span>
+      </span>
+    </button>
+    <button mat-stroked-button class="choice-button" type="button"
+      [mat-dialog-close]="{ useMap: true, applyToAll }"
+      [attr.aria-label]="'common.images.exif.useMapLocationAria' | transloco">
+      <span class="choice-button-content">
+        @if (data.mapLocation) {
+        <span [id]="mapLocationMapId" class="choice-map" aria-hidden="true"></span>
+        }
+        <span class="choice-button-text">{{ 'common.images.exif.useMapLocation' | transloco }}</span>
+      </span>
+    </button>
+  </div>
 </mat-dialog-content>
 <mat-dialog-actions class="actions sticky-actions">
   <button mat-icon-button type="button" (click)="help.open('imageExif')"

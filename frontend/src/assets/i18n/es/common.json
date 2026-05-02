@@ -405,8 +405,7 @@
         "previewAlt": "Vista previa de la imagen",
         "bodyShort": "Esta imagen contiene datos de ubicación.",
         "useImageLocation": "Usar los datos de ubicación de la imagen",
-        "useMapLocation": "Usar la ubicación actual del mapa",
-        "mapPreviewAria": "Vista previa del mapa con la ubicación de la imagen y la ubicación actual del mapa"
+        "useMapLocation": "Usar la ubicación actual del mapa"
       },
       "editLocationAria": "Editar ubicación de la imagen",
       "openGalleryAria": "Ver imagen ampliada",

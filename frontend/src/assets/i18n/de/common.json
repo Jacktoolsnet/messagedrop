@@ -405,8 +405,7 @@
         "previewAlt": "Bildvorschau",
         "bodyShort": "Das Bild enthält Standortdaten.",
         "useImageLocation": "Standortdaten des Bildes verwenden",
-        "useMapLocation": "Aktuelle Kartenposition verwenden",
-        "mapPreviewAria": "Kartenvorschau mit Bildposition und aktueller Kartenposition"
+        "useMapLocation": "Aktuelle Kartenposition verwenden"
       },
       "editLocationAria": "Bildposition bearbeiten",
       "openGalleryAria": "Bild groß anzeigen",

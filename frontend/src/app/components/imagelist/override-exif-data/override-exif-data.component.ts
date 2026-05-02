@@ -39,24 +39,29 @@ export class OverrideExifDataComponent implements AfterViewInit, OnDestroy {
   readonly dialogRef = inject(MatDialogRef<OverrideExifDataComponent>);
   readonly data = inject<OverrideExifDataDialogData>(MAT_DIALOG_DATA);
   readonly help = inject(HelpDialogService);
-  readonly mapId = `override-exif-map-${Math.random().toString(36).slice(2)}`;
+  readonly imageMapId = `override-exif-image-map-${Math.random().toString(36).slice(2)}`;
+  readonly mapLocationMapId = `override-exif-current-map-${Math.random().toString(36).slice(2)}`;
 
   applyToAll = true;
 
-  private map?: leaflet.Map;
-  private mapInitialized = false;
+  private maps: leaflet.Map[] = [];
+  private readonly mapMarkerLocations = new Map<leaflet.Map, leaflet.LatLng>();
+  private mapsInitialized = false;
 
   ngAfterViewInit(): void {
-    this.dialogRef.afterOpened().subscribe(() => this.initPreviewMap());
-    setTimeout(() => this.initPreviewMap(), 250);
+    this.dialogRef.afterOpened().subscribe(() => this.initChoiceMaps());
+    setTimeout(() => this.initChoiceMaps(), 250);
   }
 
   ngOnDestroy(): void {
-    this.map?.remove();
+    for (const map of this.maps) {
+      map.remove();
+    }
+    this.maps = [];
   }
 
-  private initPreviewMap(): void {
-    if (this.mapInitialized) {
+  private initChoiceMaps(): void {
+    if (this.mapsInitialized) {
       return;
     }
 
@@ -67,12 +72,24 @@ export class OverrideExifDataComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
-    this.mapInitialized = true;
-    this.map = leaflet.map(this.mapId, {
-      center: [imageLocation.latitude, imageLocation.longitude],
-      zoom: 3,
+    this.mapsInitialized = true;
+    this.maps = [
+      this.createMiniMap(this.imageMapId, imageLocation, imageLocationMarker),
+      this.createMiniMap(this.mapLocationMapId, mapLocation, mapLocationMarker)
+    ];
+
+    setTimeout(() => this.refreshChoiceMaps(), 0);
+    setTimeout(() => this.refreshChoiceMaps(), 350);
+  }
+
+  private createMiniMap(containerId: string, location: Location, icon: leaflet.Icon): leaflet.Map {
+    const latLng = leaflet.latLng(location.latitude, location.longitude);
+    const map = leaflet.map(containerId, {
+      center: latLng,
+      zoom: 15,
       worldCopyJump: true,
       zoomControl: false,
+      attributionControl: false,
       dragging: false,
       scrollWheelZoom: false,
       doubleClickZoom: false,
@@ -81,66 +98,34 @@ export class OverrideExifDataComponent implements AfterViewInit, OnDestroy {
       touchZoom: false
     });
 
-    this.map.setMaxBounds([[-90, -180], [90, 180]]);
+    map.setMaxBounds([[-90, -180], [90, 180]]);
 
-    const tiles = leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       minZoom: 3,
       noWrap: true,
       attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(this.map);
+    }).addTo(map);
 
-    const imageLatLng = leaflet.latLng(imageLocation.latitude, imageLocation.longitude);
-    const mapLatLng = leaflet.latLng(mapLocation.latitude, mapLocation.longitude);
+    leaflet.marker(latLng, { icon, zIndexOffset: 20 }).addTo(map);
+    this.mapMarkerLocations.set(map, latLng);
+    this.centerMiniMapOnMarker(map, latLng);
 
-    leaflet.marker(imageLatLng, { icon: imageLocationMarker, zIndexOffset: 20 }).addTo(this.map);
-    leaflet.marker(mapLatLng, { icon: mapLocationMarker, zIndexOffset: 10 }).addTo(this.map);
-
-    const fitLocations = () => {
-      if (!this.map) {
-        return;
-      }
-
-      const bounds = leaflet.latLngBounds([imageLatLng, mapLatLng]);
-      const center = this.getCenterLocation(imageLatLng, mapLatLng);
-
-      if (imageLatLng.equals(mapLatLng)) {
-        this.map.setView(center, 13, { animate: false });
-        return;
-      }
-
-      const zoom = this.getZoomForBounds(bounds);
-      this.map.setView(center, zoom, { animate: false });
-    };
-
-    fitLocations();
-    tiles.once('load', fitLocations);
-    setTimeout(() => {
-      this.map?.invalidateSize();
-      fitLocations();
-    }, 0);
-    setTimeout(() => {
-      this.map?.invalidateSize();
-      fitLocations();
-    }, 350);
+    return map;
   }
 
-  private getCenterLocation(first: leaflet.LatLng, second: leaflet.LatLng): leaflet.LatLng {
-    return leaflet.latLng(
-      (first.lat + second.lat) / 2,
-      (first.lng + second.lng) / 2
-    );
-  }
-
-  private getZoomForBounds(bounds: leaflet.LatLngBounds): number {
-    if (!this.map) {
-      return 3;
+  private refreshChoiceMaps(): void {
+    for (const map of this.maps) {
+      map.invalidateSize();
+      const markerLocation = this.mapMarkerLocations.get(map);
+      if (markerLocation) {
+        this.centerMiniMapOnMarker(map, markerLocation);
+      }
     }
+  }
 
-    const boundsZoom = this.map.getBoundsZoom(bounds, false, leaflet.point(64, 76));
-    const fallbackZoom = 3;
-    const zoom = Number.isFinite(boundsZoom) ? boundsZoom : fallbackZoom;
-
-    return Math.max(3, Math.min(13, zoom));
+  private centerMiniMapOnMarker(map: leaflet.Map, markerLocation: leaflet.LatLng): void {
+    map.setView(markerLocation, 15, { animate: false });
+    map.panBy([0, -Math.round(map.getSize().y * 0.25)], { animate: false });
   }
 }
