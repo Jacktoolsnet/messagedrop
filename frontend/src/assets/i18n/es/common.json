@@ -393,7 +393,7 @@
       "notFound": "Imagen no encontrada.",
       "delete": {
         "title": "Eliminar imagen",
-        "confirm": "La imagen se eliminará permanentemente. ¿Estás seguro?"
+        "confirm": "Esta imagen solo se eliminará de MessageDrop. El archivo original no se eliminará. ¿Quieres continuar?"
       },
       "exif": {
         "title": "Esta imagen contiene datos de ubicación",
@@ -430,7 +430,7 @@
       "openFailed": "No se pudo abrir el documento.",
       "delete": {
         "title": "Eliminar documento",
-        "confirm": "El documento se eliminará permanentemente. ¿Estás seguro?"
+        "confirm": "Este documento solo se eliminará de MessageDrop. El archivo original no se eliminará. ¿Quieres continuar?"
       },
       "editLocationAria": "Editar ubicación del documento"
     },

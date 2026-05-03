@@ -393,7 +393,7 @@
       "notFound": "Image introuvable.",
       "delete": {
         "title": "Supprimer l'image",
-        "confirm": "L'image sera supprimée définitivement. Voulez-vous continuer ?"
+        "confirm": "Cette image sera uniquement retirée de MessageDrop. Le fichier original ne sera pas supprimé. Voulez-vous continuer ?"
       },
       "exif": {
         "title": "Cette image contient des données de position",
@@ -430,7 +430,7 @@
       "openFailed": "Impossible d'ouvrir le document.",
       "delete": {
         "title": "Supprimer le document",
-        "confirm": "Le document sera supprimé définitivement. Voulez-vous continuer ?"
+        "confirm": "Ce document sera uniquement retiré de MessageDrop. Le fichier original ne sera pas supprimé. Voulez-vous continuer ?"
       },
       "editLocationAria": "Modifier la position du document"
     },

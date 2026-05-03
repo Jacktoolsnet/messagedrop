@@ -41,6 +41,18 @@ mat-toolbar button {
   flex: 0 0 auto;
 }
 
+.toolbar-action.avatar {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  padding: 0;
+  border-radius: 14px;
+}
+
+.toolbar-action.avatar mat-icon {
+  margin: 0;
+}
+
 .spacer {
   flex: 0 0 auto;
 }

@@ -393,7 +393,7 @@
       "notFound": "Bild nicht gefunden.",
       "delete": {
         "title": "Bild löschen",
-        "confirm": "Das Bild wird dauerhaft gelöscht. Bist du sicher?"
+        "confirm": "Dieses Bild wird nur aus MessageDrop entfernt. Die Originaldatei wird nicht gelöscht. Möchtest du fortfahren?"
       },
       "exif": {
         "title": "Das Bild enthält Standortdaten",
@@ -430,7 +430,7 @@
       "openFailed": "Dokument konnte nicht geöffnet werden.",
       "delete": {
         "title": "Dokument löschen",
-        "confirm": "Das Dokument wird dauerhaft gelöscht. Bist du sicher?"
+        "confirm": "Dieses Dokument wird nur aus MessageDrop entfernt. Die Originaldatei wird nicht gelöscht. Möchtest du fortfahren?"
       },
       "editLocationAria": "Dokumentenposition bearbeiten"
     },
