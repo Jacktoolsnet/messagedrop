@@ -105,6 +105,20 @@ import { UserService } from './services/user.service';
 import { WeatherService } from './services/weather.service';
 import { isQuotaExceededError } from './utils/storage-error.util';
 
+type ExifLocationChoice = 'image' | 'map' | 'custom';
+
+interface ExifLocationDialogResult {
+  choice?: ExifLocationChoice;
+  useMap?: boolean;
+  applyToAll?: boolean;
+  customLocation?: Location;
+}
+
+interface RememberedExifLocationChoice {
+  choice: ExifLocationChoice;
+  customLocation?: Location;
+}
+
 const PRODUCTION_APP_URL = 'https://app.messagedrop.de/';
 const Q_STAGE_WARNING_SESSION_KEY = 'messagedrop.qStageWarningSeen';
 
@@ -1549,46 +1563,65 @@ export class AppComponent implements OnInit {
   }
 
   private async resolveExifOverrides(entries: LocalImage[]): Promise<LocalImage[]> {
-    let rememberedChoice: boolean | null = null; // null = ask; true = use map; false = keep exif
-
+    let rememberedChoice: RememberedExifLocationChoice | null = null;
     const result: LocalImage[] = [];
 
     for (const entry of entries) {
-      if (entry.hasExifLocation && entry.location && rememberedChoice === null) {
-        const previewUrl = await this.localImageService.getImageUrl(entry).catch(() => undefined);
-        const dialogResult = await firstValueFrom(
-          this.dialog.open(OverrideExifDataComponent, {
-            data: {
-              fileName: entry.fileName,
-              previewUrl,
-              imageLocation: entry.location,
-              mapLocation: this.mapService.getMapLocation()
-            },
-            autoFocus: false,
-            hasBackdrop: true,
-            backdropClass: 'dialog-backdrop',
-            disableClose: false,
-          }).afterClosed()
-        );
+      if (entry.hasExifLocation && entry.location) {
+        if (!rememberedChoice) {
+          const previewUrl = await this.localImageService.getImageUrl(entry).catch(() => undefined);
+          const dialogResult = await firstValueFrom(
+            this.dialog.open<OverrideExifDataComponent, unknown, ExifLocationDialogResult | undefined>(OverrideExifDataComponent, {
+              data: {
+                fileName: entry.fileName,
+                previewUrl,
+                imageLocation: entry.location,
+                mapLocation: this.mapService.getMapLocation()
+              },
+              autoFocus: false,
+              hasBackdrop: true,
+              backdropClass: 'dialog-backdrop',
+              disableClose: false,
+            }).afterClosed()
+          );
 
-        const useMap = dialogResult?.useMap === true;
-        if (dialogResult?.applyToAll) {
-          rememberedChoice = useMap;
-        }
+          const choice = this.resolveExifLocationChoice(dialogResult);
+          const customLocation = choice === 'custom' ? dialogResult?.customLocation : undefined;
 
-        if (useMap) {
-          entry.location = this.mapService.getMapLocation();
-          entry.hasExifLocation = false;
+          if (dialogResult?.applyToAll && (choice !== 'custom' || customLocation)) {
+            rememberedChoice = { choice, customLocation };
+          }
+
+          this.applyExifLocationChoice(entry, choice, customLocation);
+        } else {
+          this.applyExifLocationChoice(entry, rememberedChoice.choice, rememberedChoice.customLocation);
         }
-      } else if (entry.hasExifLocation && entry.location && rememberedChoice === true) {
-        entry.location = this.mapService.getMapLocation();
-        entry.hasExifLocation = false;
       }
 
       result.push(entry);
     }
 
     return result;
+  }
+
+  private resolveExifLocationChoice(dialogResult: ExifLocationDialogResult | undefined): ExifLocationChoice {
+    if (dialogResult?.choice) {
+      return dialogResult.choice;
+    }
+    return dialogResult?.useMap === true ? 'map' : 'image';
+  }
+
+  private applyExifLocationChoice(entry: LocalImage, choice: ExifLocationChoice, customLocation?: Location): void {
+    if (choice === 'map') {
+      entry.location = this.mapService.getMapLocation();
+      entry.hasExifLocation = false;
+      return;
+    }
+
+    if (choice === 'custom' && customLocation) {
+      entry.location = { ...customLocation };
+      entry.hasExifLocation = false;
+    }
   }
 
 

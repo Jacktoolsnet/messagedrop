@@ -25,6 +25,10 @@
         }
         }
 
+        @if (usageProtectionService.lockReason() === 'time_tampered') {
+        <p>{{ 'common.usageProtection.timeTampered' | transloco }}</p>
+        }
+
         @if (usageProtectionService.canUseSelfExtension()) {
         <button mat-raised-button color="primary" type="button" (click)="applyUsageProtectionSelfExtension()">
             {{ 'common.usageProtection.selfExtensionAction' | transloco }}

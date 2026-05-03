@@ -8,6 +8,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialog
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTimepickerModule } from '@angular/material/timepicker';
@@ -16,6 +17,8 @@ import { firstValueFrom } from 'rxjs';
 import { AppSettings } from '../../../interfaces/app-settings';
 import {
   createDefaultUsageProtectionDailyWindows,
+  DEFAULT_USAGE_PROTECTION_TIMEZONE,
+  getDeviceUsageProtectionTimezone,
   USAGE_PROTECTION_DAY_KEYS,
   UsageProtectionDailyWindows,
   UsageProtectionDayKey,
@@ -55,6 +58,7 @@ type UsageTimePickerModel = Record<UsageProtectionDayKey, { start: Date; end: Da
     MatDialogClose,
     MatIconModule,
     MatButtonToggleModule,
+    MatSelectModule,
     MatSliderModule,
     MatSlideToggleModule,
     MatTimepickerModule,
@@ -93,6 +97,7 @@ export class UsageProtectionComponent implements OnInit {
   readonly usageParentalExtensionCountMax = 20;
   readonly usageParentalExtensionCountStep = 1;
   readonly usageScheduleDays = [...USAGE_PROTECTION_DAY_KEYS];
+  readonly timezoneOptions = this.createTimezoneOptions();
   private readonly defaultDailyWindows = createDefaultUsageProtectionDailyWindows();
   usageTimePickerModel: UsageTimePickerModel = this.createUsageTimePickerModel(this.defaultDailyWindows);
 
@@ -111,7 +116,8 @@ export class UsageProtectionComponent implements OnInit {
       ...this.appSettings,
       usageProtection: {
         ...this.appSettings.usageProtection,
-        dailyWindows: normalizedDailyWindows
+        dailyWindows: normalizedDailyWindows,
+        timezone: this.normalizeTimezone(this.appSettings.usageProtection.timezone)
       }
     };
     if (this.hasParentPinConfigured(this.appSettings.usageProtection)
@@ -247,6 +253,33 @@ export class UsageProtectionComponent implements OnInit {
     };
     await this.persistUsageProtectionPinSettings({ mode: 'parental', parentPinHash: hashed });
     this.usageProtectionUnlocked = true;
+  }
+
+  setUsageTimezone(timezone: string): void {
+    if (!this.canEditUsageProtectionValues()) {
+      return;
+    }
+    this.appSettings = {
+      ...this.appSettings,
+      usageProtection: {
+        ...this.appSettings.usageProtection,
+        timezone: this.normalizeTimezone(timezone)
+      }
+    };
+  }
+
+  formatTimezoneOption(timezone: string): string {
+    try {
+      const now = new Date();
+      const time = new Intl.DateTimeFormat(this.languageService.effectiveLanguage() || 'en', {
+        timeZone: timezone,
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(now);
+      return `${timezone} (${time})`;
+    } catch {
+      return timezone;
+    }
   }
 
   setUsageScheduleEnabled(enabled: boolean): void {
@@ -498,7 +531,8 @@ export class UsageProtectionComponent implements OnInit {
       selfExtensionMaxCount: this.clampInteger(settings.selfExtensionMaxCount, 0, 20, 1),
       parentalExtensionMinutes: this.clampInteger(settings.parentalExtensionMinutes, 1, 240, 5),
       parentalExtensionMaxCount: this.clampInteger(settings.parentalExtensionMaxCount, 0, 20, 20),
-      dailyWindows: this.normalizeDailyWindows(settings.dailyWindows, settings)
+      dailyWindows: this.normalizeDailyWindows(settings.dailyWindows, settings),
+      timezone: this.normalizeTimezone(settings.timezone)
     };
 
     if (normalized.mode !== 'parental') {
@@ -515,6 +549,46 @@ export class UsageProtectionComponent implements OnInit {
     }
 
     return normalized;
+  }
+
+
+  private createTimezoneOptions(): string[] {
+    const deviceTimezone = getDeviceUsageProtectionTimezone();
+    const fallbackTimezones = [
+      deviceTimezone,
+      'UTC',
+      'Europe/Berlin',
+      'Europe/Vienna',
+      'Europe/Zurich',
+      'Europe/London',
+      'America/New_York',
+      'America/Chicago',
+      'America/Denver',
+      'America/Los_Angeles',
+      'Asia/Tokyo',
+      'Australia/Sydney'
+    ];
+    const intlWithTimezones = Intl as unknown as { supportedValuesOf?: (key: 'timeZone') => string[] };
+    const supportedTimezones = typeof intlWithTimezones.supportedValuesOf === 'function'
+      ? intlWithTimezones.supportedValuesOf('timeZone')
+      : fallbackTimezones;
+    return Array.from(new Set([deviceTimezone, ...supportedTimezones, DEFAULT_USAGE_PROTECTION_TIMEZONE]))
+      .filter(timezone => this.isValidTimezone(timezone))
+      .sort((a, b) => a.localeCompare(b));
+  }
+
+  private normalizeTimezone(timezone: unknown): string {
+    const candidate = typeof timezone === 'string' && timezone.trim() ? timezone.trim() : getDeviceUsageProtectionTimezone();
+    return this.isValidTimezone(candidate) ? candidate : DEFAULT_USAGE_PROTECTION_TIMEZONE;
+  }
+
+  private isValidTimezone(timezone: string): boolean {
+    try {
+      new Intl.DateTimeFormat('en-US', { timeZone: timezone }).format(new Date());
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   private updateUsageTimeField(day: UsageProtectionDayKey, bound: 'start' | 'end', value: unknown): void {

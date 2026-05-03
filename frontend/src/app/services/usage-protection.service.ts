@@ -7,6 +7,8 @@ import {
   createDefaultUsageProtectionDailyWindows,
   createDefaultUsageProtectionState,
   DEFAULT_USAGE_PROTECTION_SETTINGS,
+  DEFAULT_USAGE_PROTECTION_TIMEZONE,
+  getDeviceUsageProtectionTimezone,
   getLocalDateKey,
   UsageProtectionDayKey,
   UsageProtectionDayWindow,
@@ -21,11 +23,22 @@ import { AppService } from './app.service';
 import { IndexedDbService } from './indexed-db.service';
 import { UserService } from './user.service';
 
-type UsageLockReason = 'daily_limit' | 'schedule' | null;
+type UsageLockReason = 'daily_limit' | 'schedule' | 'time_tampered' | null;
 
 interface UsageProtectionGetResponse {
   status: number;
   usageProtection?: UsageProtectionServerPayload | null;
+  serverNowUtc?: string;
+}
+
+interface UsageProtectionPostResponse extends SimpleStatusResponse {
+  serverNowUtc?: string;
+}
+
+interface TrustedTimeAnchor {
+  serverNowUtcMs: number;
+  clientPerfNowMs: number;
+  syncedAtClientWallMs: number;
 }
 
 @Injectable({
@@ -50,6 +63,8 @@ export class UsageProtectionService {
   private pendingPersistTicks = 0;
   private serverLoadInProgress = false;
   private lastSyncedAt = 0;
+  private trustedTimeAnchor?: TrustedTimeAnchor;
+  private wallClockTampered = false;
   private lastLoadedUserId = '';
   private readonly defaultDailyWindows = createDefaultUsageProtectionDailyWindows();
 
@@ -63,9 +78,16 @@ export class UsageProtectionService {
       return null;
     }
 
-    const now = new Date(this.nowSignal());
-    const state = this.getStateForDate(this.stateSignal(), getLocalDateKey(now));
-    const schedule = this.evaluateScheduleLock(settings, now);
+    this.nowSignal();
+
+    if (this.isTimeTampered()) {
+      return 'time_tampered';
+    }
+
+    const nowUtcMs = this.trustedNowUtcMs();
+    const timezone = this.normalizeTimezone(settings.timezone);
+    const state = this.getStateForDate(this.stateSignal(), this.getDateKeyInTimezone(nowUtcMs, timezone));
+    const schedule = this.evaluateScheduleLock(settings, nowUtcMs, timezone);
     if (schedule.locked) {
       return 'schedule';
     }
@@ -85,7 +107,7 @@ export class UsageProtectionService {
     if (settings.mode !== 'self' || this.lockReason() !== 'daily_limit') {
       return false;
     }
-    const state = this.getStateForDate(this.stateSignal(), getLocalDateKey(new Date(this.nowSignal())));
+    const state = this.getStateForCurrentTrustedDay(this.stateSignal(), settings.timezone);
     return settings.selfExtensionMinutes > 0
       && settings.selfExtensionMaxCount > 0
       && state.selfExtensionsUsed < settings.selfExtensionMaxCount;
@@ -96,7 +118,7 @@ export class UsageProtectionService {
     if (settings.mode !== 'parental' || this.lockReason() !== 'daily_limit' || !settings.parentPinHash) {
       return false;
     }
-    const state = this.getStateForDate(this.stateSignal(), getLocalDateKey(new Date(this.nowSignal())));
+    const state = this.getStateForCurrentTrustedDay(this.stateSignal(), settings.timezone);
     return settings.parentalExtensionMinutes > 0
       && settings.parentalExtensionMaxCount > 0
       && state.parentalExtensionsUsed < settings.parentalExtensionMaxCount;
@@ -107,7 +129,7 @@ export class UsageProtectionService {
     if (settings.mode === 'off') {
       return null;
     }
-    const state = this.getStateForDate(this.stateSignal(), getLocalDateKey(new Date(this.nowSignal())));
+    const state = this.getStateForCurrentTrustedDay(this.stateSignal(), settings.timezone);
     const limitSeconds = this.getDailyLimitSeconds(settings, state);
     return Math.max(0, limitSeconds - state.consumedSeconds);
   });
@@ -116,8 +138,7 @@ export class UsageProtectionService {
     if (this.lockReason() !== 'schedule') {
       return null;
     }
-    const now = new Date(this.nowSignal());
-    return this.findNextWindowStart(now, this.settingsSignal());
+    return this.findNextWindowStart(this.trustedNowUtcMs(), this.settingsSignal());
   });
 
   constructor() {
@@ -126,7 +147,7 @@ export class UsageProtectionService {
       const appSettings = this.appService.getAppSettings();
       const normalized = this.normalizeSettings(appSettings.usageProtection);
       this.settingsSignal.set(normalized);
-      this.stateSignal.update((state) => this.getStateForDate(state, getLocalDateKey(new Date(this.nowSignal()))));
+      this.stateSignal.update((state) => this.getStateForCurrentTrustedDay(state, normalized.timezone));
       this.ensureTickerState();
     });
 
@@ -152,7 +173,7 @@ export class UsageProtectionService {
     this.initialized = true;
     const raw = await this.indexedDb.getSetting<string>(UsageProtectionService.stateStorageKey);
     this.stateSignal.set(this.normalizeState(raw));
-    this.stateSignal.update((state) => this.getStateForDate(state, getLocalDateKey(new Date(this.nowSignal()))));
+    this.stateSignal.update((state) => this.getStateForCurrentTrustedDay(state, this.settingsSignal().timezone));
     if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', () => {
         this.nowSignal.set(Date.now());
@@ -182,7 +203,7 @@ export class UsageProtectionService {
     if (!this.canUseSelfExtension()) {
       return false;
     }
-    const today = getLocalDateKey(new Date(this.nowSignal()));
+    const today = this.getCurrentTrustedDateKey(this.settingsSignal().timezone);
     this.stateSignal.update((state) => {
       const current = this.getStateForDate(state, today);
       return {
@@ -200,7 +221,7 @@ export class UsageProtectionService {
     if (settings.mode !== 'parental' || !settings.parentPinHash) {
       return false;
     }
-    const today = getLocalDateKey(new Date(this.nowSignal()));
+    const today = this.getCurrentTrustedDateKey(settings.timezone);
     const state = this.getStateForDate(this.stateSignal(), today);
     if (settings.parentalExtensionMinutes <= 0
       || settings.parentalExtensionMaxCount <= 0
@@ -245,6 +266,7 @@ export class UsageProtectionService {
       return '';
     }
     return new Intl.DateTimeFormat(locale || 'en', {
+      timeZone: this.normalizeTimezone(this.settingsSignal().timezone),
       hour: '2-digit',
       minute: '2-digit'
     }).format(new Date(next));
@@ -266,11 +288,15 @@ export class UsageProtectionService {
   }
 
   private tick(): void {
-    this.nowSignal.set(Date.now());
-    const dateKey = getLocalDateKey(new Date(this.nowSignal()));
+    this.nowSignal.set(this.trustedNowUtcMs());
+    const dateKey = this.getCurrentTrustedDateKey(this.settingsSignal().timezone);
     let nextState = this.getStateForDate(this.stateSignal(), dateKey);
     const current = this.stateSignal();
     const changedByDate = current.dateKey !== nextState.dateKey;
+
+    if (this.lockReason() === 'time_tampered') {
+      void this.syncToServer();
+    }
 
     if (!this.isLocked()) {
       nextState = { ...nextState, consumedSeconds: nextState.consumedSeconds + 1 };
@@ -308,13 +334,14 @@ export class UsageProtectionService {
     try {
       const url = `${environment.apiUrl}/user/usage-protection/${userId}`;
       const response = await firstValueFrom(this.http.get<UsageProtectionGetResponse>(url));
+      this.updateTrustedTimeAnchor(response.serverNowUtc);
       if (response.status !== 200 || !response.usageProtection) {
         return;
       }
 
       const localSettings = this.normalizeSettings(this.appService.getAppSettings().usageProtection);
       const remoteState = this.normalizeState(response.usageProtection.state);
-      const today = getLocalDateKey(new Date(this.nowSignal()));
+      const today = this.getCurrentTrustedDateKey(localSettings.timezone);
       const localStateForToday = this.getStateForDate(this.stateSignal(), today);
       const remoteStateForToday = this.getStateForDate(remoteState, today);
 
@@ -334,7 +361,7 @@ export class UsageProtectionService {
     if (!this.userService.hasJwt()) {
       return;
     }
-    const now = Date.now();
+    const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
     if (now - this.lastSyncedAt < 15000) {
       return;
     }
@@ -349,7 +376,8 @@ export class UsageProtectionService {
         settings: this.settingsSignal(),
         state: this.stateSignal()
       };
-      await firstValueFrom(this.http.post<SimpleStatusResponse>(url, payload));
+      const response = await firstValueFrom(this.http.post<UsageProtectionPostResponse>(url, payload));
+      this.updateTrustedTimeAnchor(response.serverNowUtc);
     } catch {
       // best effort only
     }
@@ -365,6 +393,7 @@ export class UsageProtectionService {
     const parentalExtensionMaxCount = this.clampInt(raw?.['parentalExtensionMaxCount'], 0, 20, DEFAULT_USAGE_PROTECTION_SETTINGS.parentalExtensionMaxCount);
     const scheduleEnabled = Boolean(raw?.['scheduleEnabled']);
     const dailyWindows = this.normalizeDailyWindows(raw);
+    const timezone = this.normalizeTimezone(raw?.['timezone']);
     const parentPinHash = typeof raw?.['parentPinHash'] === 'string' ? raw['parentPinHash'] : undefined;
     return {
       mode,
@@ -375,6 +404,7 @@ export class UsageProtectionService {
       parentalExtensionMaxCount,
       scheduleEnabled,
       dailyWindows,
+      timezone,
       parentPinHash
     };
   }
@@ -423,6 +453,14 @@ export class UsageProtectionService {
     };
   }
 
+  private getStateForCurrentTrustedDay(state: UsageProtectionState, timezone: unknown): UsageProtectionState {
+    return this.getStateForDate(state, this.getCurrentTrustedDateKey(timezone));
+  }
+
+  private getCurrentTrustedDateKey(timezone: unknown): string {
+    return this.getDateKeyInTimezone(this.trustedNowUtcMs(), this.normalizeTimezone(timezone));
+  }
+
   private getDailyLimitSeconds(settings: UsageProtectionSettings, state: UsageProtectionState): number {
     const base = settings.dailyLimitMinutes * 60;
     if (settings.mode === 'self') {
@@ -442,12 +480,12 @@ export class UsageProtectionService {
     return base;
   }
 
-  private evaluateScheduleLock(settings: UsageProtectionSettings, now: Date): { locked: boolean } {
+  private evaluateScheduleLock(settings: UsageProtectionSettings, nowUtcMs: number, timezone: string): { locked: boolean } {
     if (!settings.scheduleEnabled) {
       return { locked: false };
     }
-    const currentMinutes = now.getHours() * 60 + now.getMinutes();
-    const window = this.getWindowForDay(settings, now.getDay());
+    const currentMinutes = this.getMinutesInTimezone(nowUtcMs, timezone);
+    const window = this.getWindowForDay(settings, this.getDayKeyInTimezone(nowUtcMs, timezone));
     const start = this.timeToMinutes(window.start);
     const end = this.timeToMinutes(window.end);
     if (start === null || end === null) {
@@ -463,24 +501,20 @@ export class UsageProtectionService {
     return { locked: !(currentMinutes >= start || currentMinutes < end) };
   }
 
-  private findNextWindowStart(now: Date, settings: UsageProtectionSettings): number | null {
+  private findNextWindowStart(nowUtcMs: number, settings: UsageProtectionSettings): number | null {
     if (!settings.scheduleEnabled) {
       return null;
     }
 
-    for (let dayOffset = 0; dayOffset <= 7; dayOffset += 1) {
-      const candidate = new Date(now);
-      candidate.setDate(now.getDate() + dayOffset);
-      const window = this.getWindowForDay(settings, candidate.getDay());
-      const startMinutes = this.timeToMinutes(window.start);
-      const endMinutes = this.timeToMinutes(window.end);
-      if (startMinutes === null || endMinutes === null || startMinutes === endMinutes) {
-        continue;
+    const timezone = this.normalizeTimezone(settings.timezone);
+    let wasLocked = this.evaluateScheduleLock(settings, nowUtcMs, timezone).locked;
+    for (let offsetMs = 60_000; offsetMs <= 8 * 24 * 60 * 60 * 1000; offsetMs += 60_000) {
+      const candidateUtcMs = nowUtcMs + offsetMs;
+      const locked = this.evaluateScheduleLock(settings, candidateUtcMs, timezone).locked;
+      if (wasLocked && !locked) {
+        return candidateUtcMs;
       }
-      candidate.setHours(Math.floor(startMinutes / 60), startMinutes % 60, 0, 0);
-      if (candidate.getTime() > now.getTime()) {
-        return candidate.getTime();
-      }
+      wasLocked = locked;
     }
     return null;
   }
@@ -524,8 +558,7 @@ export class UsageProtectionService {
     };
   }
 
-  private getWindowForDay(settings: UsageProtectionSettings, jsDay: number): UsageProtectionDayWindow {
-    const dayKey = this.resolveDayKey(jsDay);
+  private getWindowForDay(settings: UsageProtectionSettings, dayKey: UsageProtectionDayKey): UsageProtectionDayWindow {
     const fallback = this.defaultDailyWindows[dayKey];
     const source = settings.dailyWindows?.[dayKey];
     if (!source) {
@@ -537,25 +570,88 @@ export class UsageProtectionService {
     };
   }
 
-  private resolveDayKey(jsDay: number): UsageProtectionDayKey {
-    switch (jsDay) {
-      case 0:
-        return 'sunday';
-      case 1:
-        return 'monday';
-      case 2:
-        return 'tuesday';
-      case 3:
-        return 'wednesday';
-      case 4:
-        return 'thursday';
-      case 5:
-        return 'friday';
-      case 6:
-        return 'saturday';
-      default:
-        return 'monday';
+
+  private trustedNowUtcMs(): number {
+    if (!this.trustedTimeAnchor) {
+      return Date.now();
     }
+    const elapsedMs = (typeof performance !== 'undefined' ? performance.now() : Date.now()) - this.trustedTimeAnchor.clientPerfNowMs;
+    return this.trustedTimeAnchor.serverNowUtcMs + Math.max(0, elapsedMs);
+  }
+
+  private updateTrustedTimeAnchor(serverNowUtc: unknown): void {
+    if (typeof serverNowUtc !== 'string') {
+      return;
+    }
+    const serverNowUtcMs = Date.parse(serverNowUtc);
+    if (!Number.isFinite(serverNowUtcMs)) {
+      return;
+    }
+    const clientWallNowMs = Date.now();
+    this.wallClockTampered = Math.abs(clientWallNowMs - serverNowUtcMs) > 5 * 60 * 1000;
+    this.trustedTimeAnchor = {
+      serverNowUtcMs,
+      clientPerfNowMs: typeof performance !== 'undefined' ? performance.now() : clientWallNowMs,
+      syncedAtClientWallMs: clientWallNowMs
+    };
+    this.nowSignal.set(serverNowUtcMs);
+  }
+
+  private isTimeTampered(maxDriftMs = 5 * 60 * 1000): boolean {
+    if (this.wallClockTampered) {
+      return true;
+    }
+    if (!this.trustedTimeAnchor) {
+      return false;
+    }
+    const elapsedMs = (typeof performance !== 'undefined' ? performance.now() : Date.now()) - this.trustedTimeAnchor.clientPerfNowMs;
+    const expectedWallNow = this.trustedTimeAnchor.syncedAtClientWallMs + elapsedMs;
+    return Math.abs(Date.now() - expectedWallNow) > maxDriftMs;
+  }
+
+  private normalizeTimezone(value: unknown): string {
+    const candidate = typeof value === 'string' && value.trim() ? value.trim() : getDeviceUsageProtectionTimezone();
+    try {
+      new Intl.DateTimeFormat('en-US', { timeZone: candidate }).format(new Date());
+      return candidate;
+    } catch {
+      return DEFAULT_USAGE_PROTECTION_TIMEZONE;
+    }
+  }
+
+  private getDateKeyInTimezone(utcMs: number, timezone: string): string {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: timezone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).formatToParts(new Date(utcMs));
+    const year = parts.find(part => part.type === 'year')?.value ?? '1970';
+    const month = parts.find(part => part.type === 'month')?.value ?? '01';
+    const day = parts.find(part => part.type === 'day')?.value ?? '01';
+    return `${year}-${month}-${day}`;
+  }
+
+  private getMinutesInTimezone(utcMs: number, timezone: string): number {
+    const parts = new Intl.DateTimeFormat('en-GB', {
+      timeZone: timezone,
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    }).formatToParts(new Date(utcMs));
+    const hour = Number.parseInt(parts.find(part => part.type === 'hour')?.value ?? '0', 10);
+    const minute = Number.parseInt(parts.find(part => part.type === 'minute')?.value ?? '0', 10);
+    return hour * 60 + minute;
+  }
+
+  private getDayKeyInTimezone(utcMs: number, timezone: string): UsageProtectionDayKey {
+    const weekday = new Intl.DateTimeFormat('en-US', { timeZone: timezone, weekday: 'long' })
+      .format(new Date(utcMs))
+      .toLowerCase();
+    if (USAGE_PROTECTION_DAY_KEYS.includes(weekday as UsageProtectionDayKey)) {
+      return weekday as UsageProtectionDayKey;
+    }
+    return 'monday';
   }
 
   private normalizeTime(value: unknown, fallback: string): string {

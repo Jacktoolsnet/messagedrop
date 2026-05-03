@@ -25,6 +25,17 @@ export interface UsageProtectionDayWindow {
 
 export type UsageProtectionDailyWindows = Record<UsageProtectionDayKey, UsageProtectionDayWindow>;
 
+export const DEFAULT_USAGE_PROTECTION_TIMEZONE = 'UTC';
+
+export function getDeviceUsageProtectionTimezone(): string {
+  try {
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return typeof timezone === 'string' && timezone.trim() ? timezone : DEFAULT_USAGE_PROTECTION_TIMEZONE;
+  } catch {
+    return DEFAULT_USAGE_PROTECTION_TIMEZONE;
+  }
+}
+
 export interface UsageProtectionSettings {
   mode: UsageProtectionMode;
   dailyLimitMinutes: number;
@@ -34,6 +45,7 @@ export interface UsageProtectionSettings {
   parentalExtensionMaxCount: number;
   scheduleEnabled: boolean;
   dailyWindows: UsageProtectionDailyWindows;
+  timezone: string;
   // Legacy fields for migration of older persisted/server payloads.
   weekdayStart?: string;
   weekdayEnd?: string;
@@ -76,7 +88,8 @@ export const DEFAULT_USAGE_PROTECTION_SETTINGS: UsageProtectionSettings = {
   parentalExtensionMinutes: 5,
   parentalExtensionMaxCount: 20,
   scheduleEnabled: false,
-  dailyWindows: createDefaultUsageProtectionDailyWindows()
+  dailyWindows: createDefaultUsageProtectionDailyWindows(),
+  timezone: getDeviceUsageProtectionTimezone()
 };
 
 export function createDefaultUsageProtectionState(dateKey = getLocalDateKey()): UsageProtectionState {

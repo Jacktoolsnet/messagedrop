@@ -1180,7 +1180,8 @@
       "unlockAction": "Déverrouiller avec le PIN parental",
       "invalidPin": "Saisissez un PIN valide de 4 à 12 chiffres.",
       "unlockFailed": "La vérification du PIN a échoué.",
-      "selfExtensionUnavailable": "L'extension autonome n'est pas disponible actuellement ou le quota du jour est déjà atteint."
+      "selfExtensionUnavailable": "L'extension autonome n'est pas disponible actuellement ou le quota du jour est déjà atteint.",
+      "timeTampered": "L’heure de l’appareil semble avoir été modifiée. Connectez-vous à Internet et synchronisez l’application pour réautoriser l’utilisation."
     },
     "location": {
       "locatingTitle": "Localisation en cours",

@@ -178,6 +178,10 @@ function parseJsonObject(value) {
   return parsed;
 }
 
+function getServerNowUtc() {
+  return new Date().toISOString();
+}
+
 function normalizeUsageProtectionPayload(payload) {
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
     return null;
@@ -1685,16 +1689,17 @@ router.get('/usage-protection/:userId',
         return next(apiError.internal('db_error'));
       }
       if (!row) {
-        return res.status(200).json({ status: 200, usageProtection: null });
+        return res.status(200).json({ status: 200, serverNowUtc: getServerNowUtc(), usageProtection: null });
       }
 
       const settings = parseJsonObject(row.settings);
       const state = parseJsonObject(row.state);
       if (!settings || !state) {
-        return res.status(200).json({ status: 200, usageProtection: null });
+        return res.status(200).json({ status: 200, serverNowUtc: getServerNowUtc(), usageProtection: null });
       }
       return res.status(200).json({
         status: 200,
+        serverNowUtc: getServerNowUtc(),
         usageProtection: {
           settings,
           state
@@ -1732,7 +1737,7 @@ router.post('/usage-protection/:userId',
       if (err) {
         return next(apiError.internal('db_error'));
       }
-      return res.status(200).json({ status: 200 });
+      return res.status(200).json({ status: 200, serverNowUtc: getServerNowUtc() });
     });
   });
 

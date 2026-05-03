@@ -135,6 +135,20 @@
           </section>
         }
 
+        <section class="usage-slider-block usage-timezone-tile">
+          <mat-form-field appearance="fill" class="usage-timezone-field">
+            <mat-label>{{ 'settings.usageProtection.timezoneLabel' | transloco }}</mat-label>
+            <mat-select [value]="appSettings.usageProtection.timezone"
+              [disabled]="isParentalModeWithoutPin()"
+              (selectionChange)="setUsageTimezone($event.value)">
+              @for (timezone of timezoneOptions; track timezone) {
+                <mat-option [value]="timezone">{{ formatTimezoneOption(timezone) }}</mat-option>
+              }
+            </mat-select>
+            <mat-hint>{{ 'settings.usageProtection.timezoneHint' | transloco }}</mat-hint>
+          </mat-form-field>
+        </section>
+
         <section class="usage-slider-block usage-schedule-toggle-tile">
           <mat-slide-toggle color="primary" [checked]="appSettings.usageProtection.scheduleEnabled"
             [disabled]="isParentalModeWithoutPin()"

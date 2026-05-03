@@ -1180,7 +1180,8 @@
       "unlockAction": "Unlock with parent PIN",
       "invalidPin": "Enter a valid PIN with 4 to 12 digits.",
       "unlockFailed": "PIN verification failed.",
-      "selfExtensionUnavailable": "Self extension is currently not available or no extensions remain for today."
+      "selfExtensionUnavailable": "Self extension is currently not available or no extensions remain for today.",
+      "timeTampered": "The device time appears to have been changed. Please connect to the internet and sync the app to allow usage again."
     },
     "location": {
       "locatingTitle": "Locating you",

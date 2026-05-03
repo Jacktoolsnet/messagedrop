@@ -1180,7 +1180,8 @@
       "unlockAction": "Desbloquear con PIN parental",
       "invalidPin": "Introduce un PIN válido de 4 a 12 dígitos.",
       "unlockFailed": "La verificación del PIN falló.",
-      "selfExtensionUnavailable": "La ampliación propia no está disponible actualmente o ya no quedan ampliaciones para hoy."
+      "selfExtensionUnavailable": "La ampliación propia no está disponible actualmente o ya no quedan ampliaciones para hoy.",
+      "timeTampered": "Parece que se ha cambiado la hora del dispositivo. Conéctate a internet y sincroniza la app para volver a permitir el uso."
     },
     "location": {
       "locatingTitle": "Localizándote",

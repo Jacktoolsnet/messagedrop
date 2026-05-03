@@ -120,7 +120,9 @@
     "pinFormat": "Le PIN doit contenir de 4 à 12 chiffres.",
     "pinCurrentMismatch": "Le PIN parental actuel n'est pas correct.",
     "pinMismatch": "Le PIN et la confirmation ne correspondent pas.",
-    "pinHashFailed": "Le PIN n'a pas pu être sécurisé. Veuillez réessayer."
+    "pinHashFailed": "Le PIN n'a pas pu être sécurisé. Veuillez réessayer.",
+    "timezoneLabel": "Fuseau horaire",
+    "timezoneHint": "Présélectionné une fois depuis l’appareil, puis utilisé pour les limites quotidiennes et les plages horaires."
   },
   "backup": {
     "title": "Rappel de sauvegarde",

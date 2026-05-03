@@ -1180,7 +1180,8 @@
       "unlockAction": "Mit Eltern-PIN entsperren",
       "invalidPin": "Bitte gib eine gültige PIN mit 4 bis 12 Ziffern ein.",
       "unlockFailed": "PIN-Prüfung fehlgeschlagen.",
-      "selfExtensionUnavailable": "Die Selbstverlängerung ist aktuell nicht verfügbar oder für heute bereits ausgeschöpft."
+      "selfExtensionUnavailable": "Die Selbstverlängerung ist aktuell nicht verfügbar oder für heute bereits ausgeschöpft.",
+      "timeTampered": "Die Gerätezeit scheint verändert worden zu sein. Bitte stelle eine Internetverbindung her und synchronisiere die App, um die Nutzung wieder freizugeben."
     },
     "location": {
       "locatingTitle": "Standort wird ermittelt",
