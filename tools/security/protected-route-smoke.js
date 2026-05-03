@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const http = require('node:http');
 const https = require('node:https');
 const path = require('node:path');
+const crypto = require('node:crypto');
 
 function loadDotEnv(filePath) {
   if (!fs.existsSync(filePath)) {
@@ -45,8 +46,85 @@ const bases = {
 };
 
 const EXPECT_AUTH_BLOCKED = new Set([401, 403]);
+const EXPECT_OK = new Set([200]);
+const EVIL_ORIGIN = process.env.SECURITY_EVIL_ORIGIN || 'https://evil.example.com';
+const backendAllowedOrigin = firstCsvValue(process.env.ORIGIN);
+const adminAllowedOrigin = firstCsvValue(process.env.ADMIN_ORIGIN);
+
+function firstCsvValue(value) {
+  return String(value || '')
+    .split(',')
+    .map((entry) => entry.trim())
+    .filter(Boolean)[0] || null;
+}
+
+function base64url(input) {
+  return Buffer.from(input)
+    .toString('base64')
+    .replace(/=/g, '')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_');
+}
+
+function signHs256(payload, secret, header = {}) {
+  const encodedHeader = base64url(JSON.stringify({ alg: 'HS256', typ: 'JWT', ...header }));
+  const encodedPayload = base64url(JSON.stringify(payload));
+  const signingInput = `${encodedHeader}.${encodedPayload}`;
+  const signature = crypto
+    .createHmac('sha256', secret)
+    .update(signingInput)
+    .digest('base64')
+    .replace(/=/g, '')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_');
+  return `${signingInput}.${signature}`;
+}
+
+function makeUserJwt(overrides = {}, secret = process.env.JWT_SECRET || 'security-smoke-wrong-secret') {
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  return signHs256({
+    userId: 'security-smoke-user',
+    iat: nowSeconds,
+    exp: nowSeconds + 3600,
+    aud: process.env.JWT_AUD || 'messagedrop-frontend',
+    iss: process.env.JWT_ISS || 'https://auth.messagedrop.app/',
+    ...overrides
+  }, secret);
+}
+
+function makeAdminJwt(overrides = {}, secret = process.env.ADMIN_JWT_SECRET || 'security-smoke-wrong-admin-secret') {
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  return signHs256({
+    sub: 'security-smoke-admin',
+    roles: ['admin'],
+    iat: nowSeconds,
+    exp: nowSeconds + 3600,
+    aud: process.env.ADMIN_AUD || 'messagedrop-admin',
+    iss: process.env.ADMIN_ISS || 'https://admin-auth.messagedrop.app/',
+    ...overrides
+  }, secret);
+}
+
+const userTokenWithoutAudIss = signHs256({
+  userId: 'security-smoke-user',
+  iat: Math.floor(Date.now() / 1000),
+  exp: Math.floor(Date.now() / 1000) + 3600
+}, process.env.JWT_SECRET || 'security-smoke-secret');
+
+const userTokenWrongAudience = makeUserJwt({ aud: 'wrong-audience' });
+const userTokenWrongIssuer = makeUserJwt({ iss: 'https://wrong-issuer.example/' });
+const expiredUserToken = makeUserJwt({ exp: Math.floor(Date.now() / 1000) - 60 });
+const userTokenWrongSecret = makeUserJwt({}, 'security-smoke-wrong-secret');
+const adminTokenWrongAudience = makeAdminJwt({ aud: 'wrong-admin-audience' });
+const adminTokenWrongIssuer = makeAdminJwt({ iss: 'https://wrong-admin-issuer.example/' });
+const expiredAdminToken = makeAdminJwt({ exp: Math.floor(Date.now() / 1000) - 60 });
 
 const tests = [
+  { group: 'auth', name: 'backend /user/renewjwt blocks token without aud/iss', method: 'GET', url: `${bases.backend}/user/renewjwt`, rawToken: userTokenWithoutAudIss, expect: EXPECT_AUTH_BLOCKED },
+  { group: 'auth', name: 'backend /user/renewjwt blocks token with wrong audience', method: 'GET', url: `${bases.backend}/user/renewjwt`, rawToken: userTokenWrongAudience, expect: EXPECT_AUTH_BLOCKED },
+  { group: 'auth', name: 'backend /user/renewjwt blocks token with wrong issuer', method: 'GET', url: `${bases.backend}/user/renewjwt`, rawToken: userTokenWrongIssuer, expect: EXPECT_AUTH_BLOCKED },
+  { group: 'auth', name: 'backend /user/renewjwt blocks expired token', method: 'GET', url: `${bases.backend}/user/renewjwt`, rawToken: expiredUserToken, expect: EXPECT_AUTH_BLOCKED },
+  { group: 'auth', name: 'backend /user/renewjwt blocks token with wrong secret', method: 'GET', url: `${bases.backend}/user/renewjwt`, rawToken: userTokenWrongSecret, expect: EXPECT_AUTH_BLOCKED },
   { name: 'backend /user/renewjwt blocks missing token', method: 'GET', url: `${bases.backend}/user/renewjwt`, expect: EXPECT_AUTH_BLOCKED },
   { name: 'backend /user/renewjwt blocks invalid token', method: 'GET', url: `${bases.backend}/user/renewjwt`, token: 'invalid-token', expect: EXPECT_AUTH_BLOCKED },
   { name: 'backend /user/get/:id blocks missing token', method: 'GET', url: `${bases.backend}/user/get/security-smoke-user`, expect: EXPECT_AUTH_BLOCKED },
@@ -55,28 +133,143 @@ const tests = [
   { name: 'backend /utils/resolve blocks missing token', method: 'GET', url: `${bases.backend}/utils/resolve/${encodeURIComponent('https://example.com')}`, expect: EXPECT_AUTH_BLOCKED },
 
   { name: 'admin /user/me blocks missing token', method: 'GET', url: `${bases.admin}/user/me`, expect: EXPECT_AUTH_BLOCKED },
+  { name: 'admin /user/me blocks public user JWT', method: 'GET', url: `${bases.admin}/user/me`, rawToken: makeUserJwt(), expect: EXPECT_AUTH_BLOCKED },
+  { name: 'admin /user/me blocks wrong admin audience', method: 'GET', url: `${bases.admin}/user/me`, rawToken: adminTokenWrongAudience, expect: EXPECT_AUTH_BLOCKED },
+  { name: 'admin /user/me blocks wrong admin issuer', method: 'GET', url: `${bases.admin}/user/me`, rawToken: adminTokenWrongIssuer, expect: EXPECT_AUTH_BLOCKED },
+  { name: 'admin /user/me blocks expired admin token', method: 'GET', url: `${bases.admin}/user/me`, rawToken: expiredAdminToken, expect: EXPECT_AUTH_BLOCKED },
   { name: 'admin /ai/settings blocks missing token', method: 'GET', url: `${bases.admin}/ai/settings`, expect: EXPECT_AUTH_BLOCKED },
   { name: 'admin /maintenance blocks missing token', method: 'GET', url: `${bases.admin}/maintenance`, expect: EXPECT_AUTH_BLOCKED },
 
   { name: 'openMeteo /check blocks missing service token', method: 'POST', url: `${bases.openMeteo}/check`, expect: EXPECT_AUTH_BLOCKED },
+  { name: 'openMeteo /check blocks public user JWT', method: 'POST', url: `${bases.openMeteo}/check`, rawToken: makeUserJwt(), expect: EXPECT_AUTH_BLOCKED },
   { name: 'nominatim /check blocks missing service token', method: 'POST', url: `${bases.nominatim}/check`, expect: EXPECT_AUTH_BLOCKED },
+  { name: 'nominatim /check blocks public user JWT', method: 'POST', url: `${bases.nominatim}/check`, rawToken: makeUserJwt(), expect: EXPECT_AUTH_BLOCKED },
   { name: 'socketio /emit/user blocks missing service token', method: 'POST', url: `${bases.socketio}/emit/user`, body: { userId: 'security-smoke-user', event: 'security-smoke', payload: {} }, expect: EXPECT_AUTH_BLOCKED },
   { name: 'viator non-public route blocks missing service token', method: 'GET', url: `${bases.viator}/viator/internal/security-smoke`, expect: EXPECT_AUTH_BLOCKED },
   { name: 'sticker /check blocks missing service token', method: 'POST', url: `${bases.sticker}/check`, expect: EXPECT_AUTH_BLOCKED },
   { name: 'sticker /sticker/bootstrap blocks missing service token', method: 'GET', url: `${bases.sticker}/sticker/bootstrap`, expect: EXPECT_AUTH_BLOCKED }
 ];
 
-function request({ method, url, token, body, timeoutMs = 5000 }) {
+const robotsSitemapTargets = [
+  ['backend', bases.backend],
+  ['admin', bases.admin],
+  ['openMeteo', bases.openMeteo],
+  ['nominatim', bases.nominatim],
+  ['socketio', bases.socketio],
+  ['viator', bases.viator],
+  ['sticker', bases.sticker]
+];
+
+for (const [name, base] of robotsSitemapTargets) {
+  tests.push(
+    {
+      name: `${name} /robots.txt returns disallow-all`,
+      method: 'GET',
+      url: `${base}/robots.txt`,
+      expect: EXPECT_OK,
+      assert: (res) => res.body.includes('Disallow: /')
+    },
+    {
+      name: `${name} /sitemap.xml returns empty sitemap`,
+      method: 'GET',
+      url: `${base}/sitemap.xml`,
+      expect: EXPECT_OK,
+      assert: (res) => res.body.includes('<urlset') && res.body.includes('sitemaps.org/schemas/sitemap')
+    }
+  );
+}
+
+const headerTargets = [
+  ['backend', bases.backend],
+  ['admin', bases.admin],
+  ['openMeteo', bases.openMeteo],
+  ['nominatim', bases.nominatim],
+  ['socketio', bases.socketio],
+  ['viator', bases.viator],
+  ['sticker', bases.sticker]
+];
+
+for (const [name, base] of headerTargets) {
+  tests.push({
+    name: `${name} exposes basic helmet security headers on /robots.txt`,
+    method: 'GET',
+    url: `${base}/robots.txt`,
+    expect: EXPECT_OK,
+    assert: (res) => {
+      const poweredBy = res.headers['x-powered-by'];
+      return !poweredBy
+        && String(res.headers['x-content-type-options'] || '').toLowerCase() === 'nosniff'
+        && String(res.headers['cross-origin-embedder-policy'] || '').toLowerCase() === 'require-corp'
+        && String(res.headers['cache-control'] || '').toLowerCase().includes('no-store')
+        && String(res.headers.pragma || '').toLowerCase() === 'no-cache'
+        && String(res.headers.expires || '') === '0'
+        && Boolean(res.headers['content-security-policy']);
+    }
+  });
+}
+
+tests.push(
+  {
+    name: 'backend CORS rejects untrusted origin',
+    method: 'GET',
+    url: `${bases.backend}/robots.txt`,
+    headers: { origin: EVIL_ORIGIN },
+    expect: EXPECT_OK,
+    assert: (res) => !res.headers['access-control-allow-origin']
+  },
+  {
+    name: 'admin CORS rejects untrusted origin',
+    method: 'GET',
+    url: `${bases.admin}/robots.txt`,
+    headers: { origin: EVIL_ORIGIN },
+    expect: EXPECT_OK,
+    assert: (res) => !res.headers['access-control-allow-origin']
+  },
+  {
+    name: 'socketio CORS rejects untrusted origin',
+    method: 'GET',
+    url: `${bases.socketio}/robots.txt`,
+    headers: { origin: EVIL_ORIGIN },
+    expect: EXPECT_OK,
+    assert: (res) => !res.headers['access-control-allow-origin']
+  }
+);
+
+if (backendAllowedOrigin) {
+  tests.push({
+    name: 'backend CORS allows configured ORIGIN',
+    method: 'GET',
+    url: `${bases.backend}/robots.txt`,
+    headers: { origin: backendAllowedOrigin },
+    expect: EXPECT_OK,
+    assert: (res) => res.headers['access-control-allow-origin'] === backendAllowedOrigin
+      && String(res.headers['access-control-allow-credentials'] || '').toLowerCase() === 'true'
+  });
+}
+
+if (adminAllowedOrigin) {
+  tests.push({
+    name: 'admin CORS allows configured ADMIN_ORIGIN',
+    method: 'GET',
+    url: `${bases.admin}/robots.txt`,
+    headers: { origin: adminAllowedOrigin },
+    expect: EXPECT_OK,
+    assert: (res) => res.headers['access-control-allow-origin'] === adminAllowedOrigin
+      && String(res.headers['access-control-allow-credentials'] || '').toLowerCase() === 'true'
+  });
+}
+
+function request({ method, url, token, rawToken, headers = {}, body, timeoutMs = 5000 }) {
   return new Promise((resolve, reject) => {
     const parsed = new URL(url);
     const payload = body === undefined ? null : Buffer.from(JSON.stringify(body));
-    const headers = {};
+    const requestHeaders = { ...headers };
     if (payload) {
-      headers['content-type'] = 'application/json';
-      headers['content-length'] = String(payload.length);
+      requestHeaders['content-type'] = 'application/json';
+      requestHeaders['content-length'] = String(payload.length);
     }
-    if (token) {
-      headers.authorization = `Bearer ${token}`;
+    if (rawToken || token) {
+      requestHeaders.authorization = `Bearer ${rawToken || token}`;
     }
 
     const client = parsed.protocol === 'https:' ? https : http;
@@ -86,7 +279,7 @@ function request({ method, url, token, body, timeoutMs = 5000 }) {
       hostname: parsed.hostname,
       port: parsed.port,
       path: `${parsed.pathname}${parsed.search}`,
-      headers,
+      headers: requestHeaders,
       timeout: timeoutMs
     }, (res) => {
       const chunks = [];
@@ -94,6 +287,7 @@ function request({ method, url, token, body, timeoutMs = 5000 }) {
       res.on('end', () => {
         resolve({
           statusCode: res.statusCode,
+          headers: res.headers,
           body: Buffer.concat(chunks).toString('utf8').slice(0, 500)
         });
       });
@@ -116,9 +310,10 @@ function request({ method, url, token, body, timeoutMs = 5000 }) {
     try {
       const response = await request(test);
       const ok = test.expect.has(response.statusCode);
-      const marker = ok ? 'PASS' : 'FAIL';
+      const assertionOk = ok && (typeof test.assert !== 'function' || test.assert(response));
+      const marker = assertionOk ? 'PASS' : 'FAIL';
       console.log(`${marker} ${test.name} -> ${response.statusCode}`);
-      if (!ok) {
+      if (!assertionOk) {
         failures.push({ test, response });
       }
     } catch (error) {

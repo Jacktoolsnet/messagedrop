@@ -383,7 +383,6 @@ app.use(helmet({
   }
 })); // Add security headers.
 
-app.use(robotsSitemap());
 app.use(traceId());
 
 /*
@@ -407,6 +406,7 @@ const corsOptions = {
   optionsSuccessStatus: 200
 }
 app.use(cors(corsOptions))
+app.use(robotsSitemap());
 
 app.use(express.json({ limit: '5mb' }));
 app.use(databaseMw(database));

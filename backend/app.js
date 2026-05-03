@@ -264,7 +264,6 @@ attachForwarding(logger, {
 - xssFilter sets X-XSS-Protection headers to enable XSS (cross-site scripting) filters in most current web browsers.
 */
 app.use(helmet()); // Add security headers.
-app.use(robotsSitemap());
 
 app.use(traceId());
 
@@ -286,6 +285,7 @@ const corsOptions = {
   optionsSuccessStatus: 200
 }
 app.use(cors(corsOptions))
+app.use(robotsSitemap());
 
 app.use(databaseMw(database));
 app.use(loggerMw(logger));

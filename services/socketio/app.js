@@ -22,7 +22,12 @@ const userHandlers = require('./socketIo/userHandlers');
 const app = express();
 
 app.use(helmet());
-app.use(robotsSitemap());
+app.use((_req, res, next) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, private');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  next();
+});
 app.use(express.json({ limit: '1mb' }));
 app.use(traceId());
 app.use(normalizeErrorResponses);
@@ -128,11 +133,12 @@ app.use(cors({
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(null, false);
     }
   },
   credentials: true
 }));
+app.use(robotsSitemap());
 
 app.get('/health', healthLimiter, (_, res) => res.json({ status: 'ok' }));
 
