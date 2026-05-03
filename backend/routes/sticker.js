@@ -190,6 +190,7 @@ function issueStickerRenderToken(req) {
     },
     secret,
     {
+      algorithm: 'HS256',
       audience: stickerRenderAudience,
       issuer: stickerRenderIssuer,
       subject,
@@ -210,6 +211,7 @@ function verifyStickerRenderToken(token) {
   }
 
   const payload = jwt.verify(token, secret, {
+    algorithms: ['HS256'],
     audience: stickerRenderAudience,
     issuer: stickerRenderIssuer
   });

@@ -1,7 +1,6 @@
 require('dotenv').config()
 require('winston-daily-rotate-file');
 const compression = require('compression');
-const bearerToken = require('express-bearer-token');
 const databaseMw = require('./middleware/database');
 const loggerMw = require('./middleware/logger');
 const slowRequestMw = require('./middleware/slow-request');
@@ -43,11 +42,11 @@ const helmet = require('helmet');
 const cron = require('node-cron');
 const winston = require('winston');
 const rateLimit = require('express-rate-limit');
-const jwt = require('jsonwebtoken');
 const { generateOrLoadKeypairs, generateOrLoadVapidKeys } = require('./utils/keyStore');
 const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
 const { normalizeErrorResponses, notFoundHandler, errorHandler } = require('./middleware/api-error');
 const maintenanceMode = require('./middleware/maintenance');
+const security = require('./middleware/security');
 const { verifyServiceJwt } = require('./utils/serviceJwt');
 
 // Tables for cronjobs
@@ -200,6 +199,15 @@ if (process.env.NODE_ENV !== 'production') {
   }));
 }
 
+function validateSecurityConfig() {
+  if (!process.env.JWT_SECRET) {
+    logger.error('Missing required security configuration', { missing: 'JWT_SECRET' });
+    process.exit(1);
+  }
+}
+
+validateSecurityConfig();
+
 function registerProcessHandlers() {
   const exitOnUnhandled = process.env.EXIT_ON_UNHANDLED === 'true';
   const logProcessError = (label, err) => {
@@ -256,16 +264,6 @@ attachForwarding(logger, {
 */
 app.use(helmet()); // Add security headers.
 
-/*
-Per RFC6750 this module will attempt to extract a bearer token from a request from these locations:
-
-The key access_token in the request body.
-The key access_token in the request params.
-The value from the header Authorization: Bearer <token>.
-(Optional) Get a token from cookies header with key access_token.
-If a token is found, it will be stored on req.token. If one has been provided in more than one location, this will abort the request immediately by sending code 400 (per RFC6750).
-*/
-app.use(bearerToken());
 app.use(traceId());
 
 /*
@@ -357,7 +355,7 @@ function shouldSkipAuthenticatedStickerRateLimit(req) {
   }
 
   try {
-    jwt.verify(token, process.env.JWT_SECRET);
+    security.verifyUserJwtToken(token);
     return true;
   } catch {
     return false;

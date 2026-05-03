@@ -4,7 +4,6 @@ const cryptoUtil = require('../utils/cryptoUtils');
 const crypto = require('crypto');
 const { webcrypto } = crypto;
 const { subtle } = webcrypto;
-const jwt = require('jsonwebtoken');
 const express = require('express');
 const axios = require('axios');
 const router = express.Router();
@@ -1986,7 +1985,6 @@ router.post('/login',
     metric.count('user.login', { when: 'always', timezone: 'utc', amount: 1 })
   ]
   , async function (req, res, next) {
-    const secret = process.env.JWT_SECRET;
     const { userId, challenge, signature } = req.body ?? {};
 
     if (!userId || !challenge || !signature) {
@@ -2033,11 +2031,7 @@ router.post('/login',
 
       await runQuery(req.database.db, `UPDATE tableUser SET lastSignOfLife = strftime('%s','now') WHERE id = ?;`, [userId]);
 
-      const token = jwt.sign(
-        { userId },
-        secret,
-        { expiresIn: '1h' }
-      );
+      const token = security.signUserJwt({ userId }, { expiresIn: '1h' });
 
       res.status(200).json({ status: 200, jwt: token });
     } catch {
@@ -2176,16 +2170,11 @@ router.get('/renewjwt',
     security.authenticate
   ]
   , (req, res, next) => {
-    const secret = process.env.JWT_SECRET;
     const userId = req.jwtUser?.userId ?? req.jwtUser?.id;
     if (!userId) {
       return next(apiError.unauthorized('unauthorized'));
     }
-    const token = jwt.sign(
-      { userId },
-      secret,
-      { expiresIn: '1h' }
-    );
+    const token = security.signUserJwt({ userId }, { expiresIn: '1h' });
 
     res.json({ status: 200, token });
   });

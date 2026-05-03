@@ -3,6 +3,19 @@ const { verifyServiceJwt } = require('../utils/serviceJwt');
 
 const DEFAULT_AUDIENCE = process.env.SERVICE_JWT_AUDIENCE || 'service.backend';
 
+function extractBearerFromHeader(req) {
+  const auth = req.headers?.authorization;
+  if (typeof auth !== 'string') {
+    return null;
+  }
+  const match = auth.match(/^Bearer\s+(.+)$/i);
+  if (!match) {
+    return null;
+  }
+  const token = match[1]?.trim();
+  return token || null;
+}
+
 function normalizeNumber(value) {
   const num = Number(value);
   return Number.isFinite(num) ? num : null;
@@ -29,9 +42,10 @@ function formatMaintenance(row) {
 }
 
 function isServiceRequest(req) {
-  if (!req.token) return false;
+  const token = extractBearerFromHeader(req);
+  if (!token) return false;
   try {
-    verifyServiceJwt(req.token, { audience: DEFAULT_AUDIENCE });
+    verifyServiceJwt(token, { audience: DEFAULT_AUDIENCE });
     return true;
   } catch {
     return false;

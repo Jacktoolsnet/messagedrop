@@ -181,6 +181,33 @@ const { Server } = require('socket.io');
 const contactHandlers = require("./socketIo/contactHandlers");
 const userHandlers = require('./socketIo/userHandlers');
 const server = createServer(app);
+
+function parsePositiveInt(value, fallback) {
+  const parsed = Number.parseInt(String(value ?? ''), 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function estimateSocketPayloadBytes(payload) {
+  if (payload === undefined || payload === null) {
+    return 0;
+  }
+  try {
+    return Buffer.byteLength(JSON.stringify(payload), 'utf8');
+  } catch {
+    return Number.POSITIVE_INFINITY;
+  }
+}
+
+const adminSocketEventWindowMs = parsePositiveInt(process.env.ADMIN_SOCKETIO_EVENT_WINDOW_MS, 10 * 1000);
+const adminSocketEventLimit = parsePositiveInt(process.env.ADMIN_SOCKETIO_EVENT_MAX, 300);
+const adminSocketEventPayloadMaxBytes = parsePositiveInt(process.env.ADMIN_SOCKETIO_EVENT_MAX_PAYLOAD_BYTES, 1024 * 1024);
+const knownAdminSocketEvents = new Set([
+  'user:joinUserRoom',
+  'contact:requestProfile',
+  'contact:provideUserProfile',
+  'contact:newShortMessage'
+]);
+
 const io = new Server(server, {
   maxHttpBufferSize: 5.5 * 1024 * 1024,
   pingInterval: 20000,
@@ -220,6 +247,64 @@ io.use((socket, next) => {
 const onConnection = (socket) => {
   // Logger an den Socket hängen
   socket.logger = logger.child({ socketId: socket.id });
+  socket.data.eventRate = {
+    start: Date.now(),
+    count: 0,
+    dropped: 0
+  };
+
+  socket.use((packet, next) => {
+    const eventName = packet?.[0];
+    const payload = packet?.[1];
+
+    if (typeof eventName !== 'string') {
+      return next(new Error('invalid_event'));
+    }
+
+    if (!knownAdminSocketEvents.has(eventName)) {
+      socket.logger.warn('admin socket event rejected', { event: eventName, reason: 'unknown_event' });
+      socket.emit(`${eventName}:error`, { status: 400, reason: 'unknown_event' });
+      return next(new Error('unknown_event'));
+    }
+
+    const rate = socket.data.eventRate || { start: Date.now(), count: 0, dropped: 0 };
+    const now = Date.now();
+    if (now - rate.start >= adminSocketEventWindowMs) {
+      rate.start = now;
+      rate.count = 0;
+      rate.dropped = 0;
+    }
+
+    rate.count += 1;
+    socket.data.eventRate = rate;
+
+    if (rate.count > adminSocketEventLimit) {
+      rate.dropped += 1;
+      if (rate.dropped === 1 || rate.dropped % 20 === 0) {
+        socket.logger.warn('admin socket event rate limited', {
+          event: eventName,
+          count: rate.count,
+          windowMs: adminSocketEventWindowMs,
+          limit: adminSocketEventLimit
+        });
+      }
+      socket.emit(`${eventName}:error`, { status: 429, reason: 'rate_limit' });
+      return next(new Error('rate_limit'));
+    }
+
+    const payloadBytes = estimateSocketPayloadBytes(payload);
+    if (payloadBytes > adminSocketEventPayloadMaxBytes) {
+      socket.logger.warn('admin socket payload too large', {
+        event: eventName,
+        payloadBytes,
+        maxPayloadBytes: adminSocketEventPayloadMaxBytes
+      });
+      socket.emit(`${eventName}:error`, { status: 413, reason: 'payload_too_large' });
+      return next(new Error('payload_too_large'));
+    }
+
+    return next();
+  });
 
   // socket.logger.info(`Verbindung aufgebaut`);
 
