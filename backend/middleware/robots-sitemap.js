@@ -4,9 +4,7 @@ const SITEMAP_XML = '<?xml version="1.0" encoding="UTF-8"?>\n'
 
 function setRobotsSitemapHeaders(res) {
   res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
-  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, private');
-  res.setHeader('Pragma', 'no-cache');
-  res.setHeader('Expires', '0');
+  res.setHeader('Cache-Control', 'public, max-age=3600');
 }
 
 function robotsSitemapMiddleware() {

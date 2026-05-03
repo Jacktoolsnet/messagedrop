@@ -47,6 +47,8 @@ const bases = {
 
 const EXPECT_AUTH_BLOCKED = new Set([401, 403]);
 const EXPECT_OK = new Set([200]);
+const EXPECT_NOT_FOUND_OR_METHOD_BLOCKED = new Set([404, 405]);
+const EXPECT_CORS_REJECTED = new Set([200, 204, 401, 403, 404, 405]);
 const EVIL_ORIGIN = process.env.SECURITY_EVIL_ORIGIN || 'https://evil.example.com';
 const backendAllowedOrigin = firstCsvValue(process.env.ORIGIN);
 const adminAllowedOrigin = firstCsvValue(process.env.ADMIN_ORIGIN);
@@ -150,6 +152,36 @@ const tests = [
   { name: 'sticker /sticker/bootstrap blocks missing service token', method: 'GET', url: `${bases.sticker}/sticker/bootstrap`, expect: EXPECT_AUTH_BLOCKED }
 ];
 
+function hasNoStoreHeaders(res) {
+  return String(res.headers['cache-control'] || '').toLowerCase().includes('no-store')
+    && String(res.headers.pragma || '').toLowerCase() === 'no-cache'
+    && String(res.headers.expires || '') === '0';
+}
+
+function hasPublicShortCacheHeaders(res) {
+  const cacheControl = String(res.headers['cache-control'] || '').toLowerCase();
+  return cacheControl.includes('public')
+    && cacheControl.includes('max-age=3600')
+    && !cacheControl.includes('no-store')
+    && !cacheControl.includes('private');
+}
+
+function isJsonResponse(res) {
+  return String(res.headers['content-type'] || '').toLowerCase().includes('application/json');
+}
+
+function authErrorDoesNotLeakDetails(res) {
+  const body = String(res.body || '');
+  return isJsonResponse(res)
+    && !/<html/i.test(body)
+    && !/stack/i.test(body)
+    && !/jwt_secret/i.test(body)
+    && !/admin_jwt_secret/i.test(body)
+    && !/sqlite/i.test(body)
+    && !/select\\s/i.test(body)
+    && !/\/home\//i.test(body);
+}
+
 const robotsSitemapTargets = [
   ['backend', bases.backend],
   ['admin', bases.admin],
@@ -167,14 +199,16 @@ for (const [name, base] of robotsSitemapTargets) {
       method: 'GET',
       url: `${base}/robots.txt`,
       expect: EXPECT_OK,
-      assert: (res) => res.body.includes('Disallow: /')
+      assert: (res) => res.body.includes('Disallow: /') && hasPublicShortCacheHeaders(res)
     },
     {
       name: `${name} /sitemap.xml returns empty sitemap`,
       method: 'GET',
       url: `${base}/sitemap.xml`,
       expect: EXPECT_OK,
-      assert: (res) => res.body.includes('<urlset') && res.body.includes('sitemaps.org/schemas/sitemap')
+      assert: (res) => res.body.includes('<urlset')
+        && res.body.includes('sitemaps.org/schemas/sitemap')
+        && hasPublicShortCacheHeaders(res)
     }
   );
 }
@@ -200,11 +234,19 @@ for (const [name, base] of headerTargets) {
       return !poweredBy
         && String(res.headers['x-content-type-options'] || '').toLowerCase() === 'nosniff'
         && String(res.headers['cross-origin-embedder-policy'] || '').toLowerCase() === 'require-corp'
-        && String(res.headers['cache-control'] || '').toLowerCase().includes('no-store')
-        && String(res.headers.pragma || '').toLowerCase() === 'no-cache'
-        && String(res.headers.expires || '') === '0'
+        && hasPublicShortCacheHeaders(res)
         && Boolean(res.headers['content-security-policy']);
     }
+  });
+}
+
+for (const [name, base] of headerTargets) {
+  tests.push({
+    name: `${name} root response has no-store cache headers`,
+    method: 'GET',
+    url: `${base}/`,
+    expect: EXPECT_OK,
+    assert: hasNoStoreHeaders
   });
 }
 
@@ -237,6 +279,67 @@ tests.push(
 
 if (backendAllowedOrigin) {
   tests.push({
+    name: 'backend CORS preflight allows configured ORIGIN',
+    method: 'OPTIONS',
+    url: `${bases.backend}/user/renewjwt`,
+    headers: {
+      origin: backendAllowedOrigin,
+      'access-control-request-method': 'GET',
+      'access-control-request-headers': 'Authorization, Content-Type'
+    },
+    expect: EXPECT_OK,
+    assert: (res) => res.headers['access-control-allow-origin'] === backendAllowedOrigin
+      && String(res.headers['access-control-allow-credentials'] || '').toLowerCase() === 'true'
+      && String(res.headers['access-control-allow-methods'] || '').includes('GET')
+  });
+}
+
+if (adminAllowedOrigin) {
+  tests.push({
+    name: 'admin CORS preflight allows configured ADMIN_ORIGIN',
+    method: 'OPTIONS',
+    url: `${bases.admin}/user/me`,
+    headers: {
+      origin: adminAllowedOrigin,
+      'access-control-request-method': 'GET',
+      'access-control-request-headers': 'Authorization, Content-Type'
+    },
+    expect: EXPECT_OK,
+    assert: (res) => res.headers['access-control-allow-origin'] === adminAllowedOrigin
+      && String(res.headers['access-control-allow-credentials'] || '').toLowerCase() === 'true'
+      && String(res.headers['access-control-allow-methods'] || '').includes('GET')
+  });
+}
+
+tests.push(
+  {
+    name: 'backend CORS preflight rejects untrusted origin',
+    method: 'OPTIONS',
+    url: `${bases.backend}/user/renewjwt`,
+    headers: {
+      origin: EVIL_ORIGIN,
+      'access-control-request-method': 'GET',
+      'access-control-request-headers': 'Authorization, Content-Type'
+    },
+    expect: EXPECT_CORS_REJECTED,
+    assert: (res) => !res.headers['access-control-allow-origin']
+  },
+  {
+    name: 'admin CORS preflight rejects untrusted origin',
+    method: 'OPTIONS',
+    url: `${bases.admin}/user/me`,
+    headers: {
+      origin: EVIL_ORIGIN,
+      'access-control-request-method': 'GET',
+      'access-control-request-headers': 'Authorization, Content-Type'
+    },
+    expect: EXPECT_CORS_REJECTED,
+    assert: (res) => !res.headers['access-control-allow-origin']
+  }
+);
+
+if (backendAllowedOrigin) {
+  tests.push({
     name: 'backend CORS allows configured ORIGIN',
     method: 'GET',
     url: `${bases.backend}/robots.txt`,
@@ -256,6 +359,48 @@ if (adminAllowedOrigin) {
     expect: EXPECT_OK,
     assert: (res) => res.headers['access-control-allow-origin'] === adminAllowedOrigin
       && String(res.headers['access-control-allow-credentials'] || '').toLowerCase() === 'true'
+  });
+}
+
+const traceTargets = [
+  ['backend', bases.backend],
+  ['admin', bases.admin],
+  ['openMeteo', bases.openMeteo],
+  ['nominatim', bases.nominatim],
+  ['socketio', bases.socketio],
+  ['viator', bases.viator],
+  ['sticker', bases.sticker]
+];
+
+for (const [name, base] of traceTargets) {
+  tests.push({
+    name: `${name} TRACE is not handled as success`,
+    method: 'TRACE',
+    url: `${base}/`,
+    expect: EXPECT_NOT_FOUND_OR_METHOD_BLOCKED
+  });
+}
+
+const authErrorTargets = [
+  ['backend user auth error', `${bases.backend}/user/renewjwt`, 'GET', undefined],
+  ['backend invalid user token auth error', `${bases.backend}/user/renewjwt`, 'GET', 'invalid-token'],
+  ['admin auth error', `${bases.admin}/user/me`, 'GET', undefined],
+  ['admin invalid token auth error', `${bases.admin}/user/me`, 'GET', 'invalid-token'],
+  ['openMeteo service auth error', `${bases.openMeteo}/check`, 'POST', undefined],
+  ['nominatim service auth error', `${bases.nominatim}/check`, 'POST', undefined],
+  ['socketio service auth error', `${bases.socketio}/emit/user`, 'POST', undefined, { userId: 'security-smoke-user', event: 'security-smoke', payload: {} }],
+  ['sticker service auth error', `${bases.sticker}/check`, 'POST', undefined]
+];
+
+for (const [name, url, method, token, body] of authErrorTargets) {
+  tests.push({
+    name: `${name} is JSON, no-store and does not leak internals`,
+    method,
+    url,
+    token,
+    body,
+    expect: EXPECT_AUTH_BLOCKED,
+    assert: (res) => hasNoStoreHeaders(res) && authErrorDoesNotLeakDetails(res)
   });
 }
 
