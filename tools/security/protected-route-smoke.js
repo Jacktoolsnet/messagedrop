@@ -50,6 +50,7 @@ const EXPECT_OK = new Set([200]);
 const EXPECT_NOT_FOUND_OR_METHOD_BLOCKED = new Set([404, 405]);
 const EXPECT_CORS_REJECTED = new Set([200, 204, 401, 403, 404, 405]);
 const EXPECT_BAD_REQUEST = new Set([400]);
+const EXPECT_METHOD_NOT_SUCCESS = new Set([400, 401, 403, 404, 405]);
 const EVIL_ORIGIN = process.env.SECURITY_EVIL_ORIGIN || 'https://evil.example.com';
 const backendAllowedOrigin = firstCsvValue(process.env.ORIGIN);
 const adminAllowedOrigin = firstCsvValue(process.env.ADMIN_ORIGIN);
@@ -121,8 +122,28 @@ const userTokenWrongSecret = makeUserJwt({}, 'security-smoke-wrong-secret');
 const adminTokenWrongAudience = makeAdminJwt({ aud: 'wrong-admin-audience' });
 const adminTokenWrongIssuer = makeAdminJwt({ iss: 'https://wrong-admin-issuer.example/' });
 const expiredAdminToken = makeAdminJwt({ exp: Math.floor(Date.now() / 1000) - 60 });
+const validUserToken = makeUserJwt();
 
 const tests = [
+  {
+    name: 'backend /user/renewjwt accepts valid user JWT and returns a token',
+    method: 'GET',
+    url: `${bases.backend}/user/renewjwt`,
+    rawToken: validUserToken,
+    expect: EXPECT_OK,
+    assert: (res) => {
+      if (!isJsonResponse(res) || !hasNoStoreHeaders(res) || !responseDoesNotLeakDetails(res)) {
+        return false;
+      }
+      try {
+        const parsed = JSON.parse(res.body);
+        return typeof (parsed.token || parsed.jwt) === 'string'
+          && (parsed.token || parsed.jwt).split('.').length === 3;
+      } catch {
+        return false;
+      }
+    }
+  },
   { group: 'auth', name: 'backend /user/renewjwt blocks token without aud/iss', method: 'GET', url: `${bases.backend}/user/renewjwt`, rawToken: userTokenWithoutAudIss, expect: EXPECT_AUTH_BLOCKED },
   { group: 'auth', name: 'backend /user/renewjwt blocks token with wrong audience', method: 'GET', url: `${bases.backend}/user/renewjwt`, rawToken: userTokenWrongAudience, expect: EXPECT_AUTH_BLOCKED },
   { group: 'auth', name: 'backend /user/renewjwt blocks token with wrong issuer', method: 'GET', url: `${bases.backend}/user/renewjwt`, rawToken: userTokenWrongIssuer, expect: EXPECT_AUTH_BLOCKED },
@@ -192,6 +213,16 @@ function responseDoesNotLeakDetails(res) {
     && !/sqlite/i.test(body)
     && !/select\\s/i.test(body)
     && !/\/home\//i.test(body);
+}
+
+function responseDoesNotLeakSensitiveRootDetails(res) {
+  const body = String(res.body || '');
+  return responseDoesNotLeakDetails(res)
+    && !/secret/i.test(body)
+    && !/api[_-]?key/i.test(body)
+    && !/token/i.test(body)
+    && !/password/i.test(body)
+    && !/private[_-]?key/i.test(body);
 }
 
 const robotsSitemapTargets = [
@@ -286,6 +317,30 @@ tests.push(
     headers: { origin: EVIL_ORIGIN },
     expect: EXPECT_OK,
     assert: (res) => !res.headers['access-control-allow-origin']
+  },
+  {
+    name: 'backend CORS never returns wildcard origin',
+    method: 'GET',
+    url: `${bases.backend}/robots.txt`,
+    headers: { origin: backendAllowedOrigin || EVIL_ORIGIN },
+    expect: EXPECT_OK,
+    assert: (res) => res.headers['access-control-allow-origin'] !== '*'
+  },
+  {
+    name: 'admin CORS never returns wildcard origin',
+    method: 'GET',
+    url: `${bases.admin}/robots.txt`,
+    headers: { origin: adminAllowedOrigin || EVIL_ORIGIN },
+    expect: EXPECT_OK,
+    assert: (res) => res.headers['access-control-allow-origin'] !== '*'
+  },
+  {
+    name: 'socketio CORS never returns wildcard origin',
+    method: 'GET',
+    url: `${bases.socketio}/robots.txt`,
+    headers: { origin: backendAllowedOrigin || EVIL_ORIGIN },
+    expect: EXPECT_OK,
+    assert: (res) => res.headers['access-control-allow-origin'] !== '*'
   }
 );
 
@@ -384,12 +439,47 @@ const traceTargets = [
   ['sticker', bases.sticker]
 ];
 
+const notFoundTargets = [
+  ['backend', bases.backend],
+  ['admin', bases.admin],
+  ['openMeteo', bases.openMeteo],
+  ['nominatim', bases.nominatim],
+  ['socketio', bases.socketio],
+  ['viator', bases.viator],
+  ['sticker', bases.sticker]
+];
+
 for (const [name, base] of traceTargets) {
   tests.push({
     name: `${name} TRACE is not handled as success`,
     method: 'TRACE',
     url: `${base}/`,
     expect: EXPECT_NOT_FOUND_OR_METHOD_BLOCKED
+  });
+  tests.push({
+    name: `${name} TRACK is not handled as success`,
+    method: 'TRACK',
+    url: `${base}/`,
+    expect: EXPECT_METHOD_NOT_SUCCESS
+  });
+  tests.push({
+    name: `${name} CONNECT is not handled as success`,
+    method: 'CONNECT',
+    url: `${base}/`,
+    expect: EXPECT_METHOD_NOT_SUCCESS,
+    allowNetworkError: /socket hang up|ECONNRESET/i
+  });
+}
+
+for (const [name, base] of notFoundTargets) {
+  tests.push({
+    name: `${name} root response does not leak sensitive details`,
+    method: 'GET',
+    url: `${base}/`,
+    expect: EXPECT_OK,
+    assert: (res) => isJsonResponse(res)
+      && hasNoStoreHeaders(res)
+      && responseDoesNotLeakSensitiveRootDetails(res)
   });
 }
 
@@ -415,16 +505,6 @@ for (const [name, url, method, token, body] of authErrorTargets) {
     assert: (res) => hasNoStoreHeaders(res) && authErrorDoesNotLeakDetails(res)
   });
 }
-
-const notFoundTargets = [
-  ['backend', bases.backend],
-  ['admin', bases.admin],
-  ['openMeteo', bases.openMeteo],
-  ['nominatim', bases.nominatim],
-  ['socketio', bases.socketio],
-  ['viator', bases.viator],
-  ['sticker', bases.sticker]
-];
 
 for (const [name, base] of notFoundTargets) {
   tests.push({
@@ -527,8 +607,13 @@ function request({ method, url, token, rawToken, headers = {}, body, rawBody, ti
         failures.push({ test, response });
       }
     } catch (error) {
-      console.log(`FAIL ${test.name} -> ${error.message}`);
-      failures.push({ test, error });
+      const networkErrorAllowed = test.allowNetworkError instanceof RegExp
+        && test.allowNetworkError.test(String(error?.message || ''));
+      const marker = networkErrorAllowed ? 'PASS' : 'FAIL';
+      console.log(`${marker} ${test.name} -> ${error.message}`);
+      if (!networkErrorAllowed) {
+        failures.push({ test, error });
+      }
     }
   }
 
