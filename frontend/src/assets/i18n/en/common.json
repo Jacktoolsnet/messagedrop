@@ -312,7 +312,8 @@
         "dropNewAria": "Drop a new message",
         "applyAria": "Drop your message",
         "policy": "This information is stored on our server and is visible to everyone."
-      }
+      },
+      "alreadyConnected": "You are already connected as contacts."
     },
     "audioRecorder": {
       "title": "Voice message",

@@ -28,12 +28,21 @@ mat-toolbar {
 }
 
 .toolbar-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 1.2rem;
   font-weight: 600;
 }
 
+mat-toolbar button {
+  flex: 0 0 auto;
+}
+
 .spacer {
-  flex: 1 1 auto;
+  flex: 0 0 auto;
 }
 
 mat-progress-bar {

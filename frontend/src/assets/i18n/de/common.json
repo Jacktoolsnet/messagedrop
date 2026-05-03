@@ -312,7 +312,8 @@
         "dropNewAria": "Neue Nachricht senden",
         "applyAria": "Nachricht senden",
         "policy": "Diese Information wird auf unserem Server gespeichert und ist für alle sichtbar."
-      }
+      },
+      "alreadyConnected": "Ihr seid bereits als Kontakte verbunden."
     },
     "audioRecorder": {
       "title": "Sprachnachricht",

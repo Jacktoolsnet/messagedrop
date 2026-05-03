@@ -194,7 +194,14 @@ async function consumeConnectAndCreateContacts(db, connectId, requester) {
     });
 
     await runQuery(db, 'COMMIT');
-    return { connect: row, contactId: requesterContact.id, reciprocalContactId: ownerContact.id };
+    return {
+      connect: row,
+      contactId: requesterContact.id,
+      reciprocalContactId: ownerContact.id,
+      contactCreated: requesterContact.created,
+      reciprocalContactCreated: ownerContact.created,
+      alreadyConnected: !requesterContact.created
+    };
   } catch (err) {
     try {
       await runQuery(db, 'ROLLBACK');
@@ -317,7 +324,10 @@ router.post('/consume/:connectId',
         status: 200,
         connect: result.connect,
         contactId: result.contactId,
-        reciprocalContactId: result.reciprocalContactId
+        reciprocalContactId: result.reciprocalContactId,
+        contactCreated: result.contactCreated,
+        reciprocalContactCreated: result.reciprocalContactCreated,
+        alreadyConnected: result.alreadyConnected
       });
     } catch {
       return next(apiError.internal('db_error'));

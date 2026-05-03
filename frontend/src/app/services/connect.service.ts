@@ -159,10 +159,14 @@ export class ConnectService {
       this.cryptoService.verifySignature(contact.contactUserSigningPublicKey, contact.contactUserId, contact.contactSignature!)
         .then((valid: boolean) => {
           if (valid) {
-            this.contactService.addOrUpdateContact(contact);
-            socketioService.sendContactsUpdated(contact);
-            onContactCreated?.(contact);
-            this.snackBar.open(this.i18n.t('common.contact.created'), '', { duration: 1000 });
+            const contactToStore = this.mergeExistingContactDetails(contact);
+            this.contactService.addOrUpdateContact(contactToStore);
+            socketioService.sendContactsUpdated(contactToStore);
+            onContactCreated?.(contactToStore);
+            const messageKey = consumeConnectResponse.alreadyConnected
+              ? 'common.contact.alreadyConnected'
+              : 'common.contact.created';
+            this.snackBar.open(this.i18n.t(messageKey), '', { duration: 2000 });
           } else {
             this.snackBar.open(this.i18n.t('common.connect.invalidData'), this.i18n.t('common.actions.ok'));
           }
@@ -170,6 +174,28 @@ export class ConnectService {
     } else {
       this.snackBar.open(this.i18n.t('common.connect.selfAddBlocked'), this.i18n.t('common.actions.ok'));
     }
+  }
+
+  private mergeExistingContactDetails(contact: Contact): Contact {
+    const existingContact = this.contactService.contactsSignal().find((entry) =>
+      entry.id === contact.id ||
+      (entry.userId === contact.userId && entry.contactUserId === contact.contactUserId)
+    );
+    if (!existingContact) {
+      return contact;
+    }
+
+    return {
+      ...contact,
+      ...existingContact,
+      id: contact.id,
+      userId: contact.userId,
+      contactUserId: contact.contactUserId,
+      hint: contact.hint,
+      contactUserEncryptionPublicKey: contact.contactUserEncryptionPublicKey,
+      contactUserSigningPublicKey: contact.contactUserSigningPublicKey,
+      contactSignature: contact.contactSignature
+    };
   }
 
   deleteConnect(connect: Connect, showAlways = false) {

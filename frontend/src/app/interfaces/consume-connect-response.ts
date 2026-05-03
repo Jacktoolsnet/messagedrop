@@ -5,4 +5,7 @@ export interface ConsumeConnectResponse {
   connect: Connect;
   contactId: string;
   reciprocalContactId?: string;
+  contactCreated?: boolean;
+  reciprocalContactCreated?: boolean;
+  alreadyConnected?: boolean;
 }

@@ -23,6 +23,7 @@
     </button>
   </div>
   } @else {
+  @if (showFilter()) {
   <div class="filter-row">
     <mat-form-field appearance="outline" class="full-width" subscriptSizing="dynamic">
       <mat-label>{{ 'common.tileFields.filter' | transloco }}</mat-label>
@@ -40,6 +41,7 @@
       }
     </mat-form-field>
   </div>
+  }
 
   @if (filteredItems.length) {
   <div class="relations-list">

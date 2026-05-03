@@ -312,7 +312,8 @@
         "dropNewAria": "Publicar un mensaje nuevo",
         "applyAria": "Publicar tu mensaje",
         "policy": "Esta información se almacena en nuestro servidor y es visible para todo el mundo."
-      }
+      },
+      "alreadyConnected": "Ya estáis conectados como contactos."
     },
     "audioRecorder": {
       "title": "Mensaje de voz",

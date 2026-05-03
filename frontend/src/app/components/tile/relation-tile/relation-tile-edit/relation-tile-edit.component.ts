@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -104,8 +104,10 @@ export class RelationTileEditComponent {
   );
   readonly icon = signal<string | undefined>(this.data.tile.payload?.icon ?? (this.mode === 'placeContacts' ? 'group' : 'place'));
   readonly filterValue = signal('');
-  readonly selectedIds = signal<Set<string>>(new Set(this.initialSelectedIds()));
   readonly items = signal<RelationDialogItem[]>(this.buildItems());
+  private readonly filterVisibilityThreshold = 20;
+  readonly showFilter = computed(() => this.items().length >= this.filterVisibilityThreshold);
+  readonly selectedIds = signal<Set<string>>(new Set(this.initialSelectedIds()));
   readonly creatingPlace = signal(false);
 
   get headerTitle(): string {
@@ -124,7 +126,7 @@ export class RelationTileEditComponent {
 
   get filteredItems(): RelationDialogItem[] {
     const items = this.items();
-    const filter = this.filterValue().trim().toLocaleLowerCase();
+    const filter = this.showFilter() ? this.filterValue().trim().toLocaleLowerCase() : '';
     if (!filter) {
       return items;
     }
