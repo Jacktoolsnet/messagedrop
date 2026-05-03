@@ -37,6 +37,7 @@ interface ExifLocationDialogResult {
   choice?: ExifLocationChoice;
   useMap?: boolean;
   applyToAll?: boolean;
+  customLocation?: Location;
 }
 
 interface RememberedExifLocationChoice {
@@ -310,7 +311,7 @@ export class ImagelistComponent implements OnInit, OnDestroy {
 
           const choice = this.resolveExifLocationChoice(dialogResult);
           const customLocation = choice === 'custom'
-            ? await this.pickCustomExifLocation(entry.location)
+            ? dialogResult?.customLocation ?? await this.pickCustomExifLocation(entry.location)
             : undefined;
 
           if (dialogResult?.applyToAll && (choice !== 'custom' || customLocation)) {

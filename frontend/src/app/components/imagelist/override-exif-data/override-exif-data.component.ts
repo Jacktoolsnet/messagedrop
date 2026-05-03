@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, inject, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -9,6 +9,7 @@ import * as leaflet from 'leaflet';
 import { Location } from '../../../interfaces/location';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
+import { LocationPickerDialogComponent } from '../../utils/location-picker-dialog/location-picker-dialog.component';
 
 const imageLocationMarker = leaflet.icon({
   iconUrl: 'assets/markers/image-marker.svg',
@@ -21,6 +22,8 @@ const mapLocationMarker = leaflet.icon({
   iconSize: [32, 40],
   iconAnchor: [16, 40]
 });
+
+type ExifLocationChoice = 'image' | 'map' | 'custom';
 
 interface OverrideExifDataDialogData {
   previewUrl?: string;
@@ -36,6 +39,7 @@ interface OverrideExifDataDialogData {
   styleUrl: './override-exif-data.component.css'
 })
 export class OverrideExifDataComponent implements AfterViewInit, OnDestroy {
+  private readonly dialog = inject(MatDialog);
   readonly dialogRef = inject(MatDialogRef<OverrideExifDataComponent>);
   readonly data = inject<OverrideExifDataDialogData>(MAT_DIALOG_DATA);
   readonly help = inject(HelpDialogService);
@@ -58,6 +62,36 @@ export class OverrideExifDataComponent implements AfterViewInit, OnDestroy {
       map.remove();
     }
     this.maps = [];
+  }
+
+  pickCustomLocation(): void {
+    const fallbackLocation = this.data.imageLocation ?? this.data.mapLocation;
+    if (!fallbackLocation) {
+      return;
+    }
+
+    const ref = this.dialog.open<LocationPickerDialogComponent, unknown, Location | undefined>(LocationPickerDialogComponent, {
+      data: { location: fallbackLocation, markerType: 'note' },
+      maxWidth: '95vw',
+      maxHeight: '95vh',
+      width: '95vw',
+      height: '95vh',
+      autoFocus: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false
+    });
+
+    ref.afterClosed().subscribe((location) => {
+      if (!location) {
+        return;
+      }
+      this.dialogRef.close({
+        choice: 'custom' satisfies ExifLocationChoice,
+        applyToAll: this.applyToAll,
+        customLocation: location
+      });
+    });
   }
 
   private initChoiceMaps(): void {

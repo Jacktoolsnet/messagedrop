@@ -31,7 +31,7 @@
       </span>
     </button>
     <button mat-stroked-button class="choice-button" type="button"
-      [mat-dialog-close]="{ choice: 'custom', applyToAll }"
+      (click)="pickCustomLocation()"
       [attr.aria-label]="'common.images.exif.useCustomLocationAria' | transloco">
       <span class="choice-button-content">
         <span class="choice-icon" aria-hidden="true">
