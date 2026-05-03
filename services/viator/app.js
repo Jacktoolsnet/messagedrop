@@ -18,6 +18,7 @@ const viator = require('./routes/viator');
 const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
 const { normalizeErrorResponses, notFoundHandler, errorHandler } = require('./middleware/api-error');
 const { syncDestinations } = require('./utils/viatorDestinationsSync');
+const robotsSitemap = require('./middleware/robots-sitemap');
 
 // Tables für Cron-Jobs
 const tableViatorCache = require('./db/tableViatorCache');
@@ -158,6 +159,7 @@ attachForwarding(logger, {
 - xssFilter sets X-XSS-Protection headers to enable XSS (cross-site scripting) filters in most current web browsers.
 */
 app.use(helmet()); // Add security headers.
+app.use(robotsSitemap());
 app.use(traceId());
 
 app.use(express.json({ limit: '1mb' }));

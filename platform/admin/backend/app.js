@@ -50,6 +50,7 @@ const { cleanupClosedDsaCases } = require('./utils/dsaCleanup');
 const { parseRetentionMs, DAY_MS } = require('./utils/logRetention');
 const { performPendingRestore } = require('./utils/maintenanceBackup');
 const { runCertificateHealthCheck } = require('./utils/certificateHealth');
+const robotsSitemap = require('./middleware/robots-sitemap');
 
 // ExpressJs
 const { createServer } = require('node:http');
@@ -382,6 +383,7 @@ app.use(helmet({
   }
 })); // Add security headers.
 
+app.use(robotsSitemap());
 app.use(traceId());
 
 /*

@@ -166,3 +166,6 @@ documents/
 
 # backups
 backups/
+
+# local security scan reports
+tools/security/reports/

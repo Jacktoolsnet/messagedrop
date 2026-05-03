@@ -17,6 +17,7 @@ const { generateOrLoadKeypairs } = require('./utils/keyStore');
 const nominatim = require('./routes/nominatim');
 const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
 const { normalizeErrorResponses, notFoundHandler, errorHandler } = require('./middleware/api-error');
+const robotsSitemap = require('./middleware/robots-sitemap');
 
 // Tables für Cron-Jobs
 const tableNominatimCache = require('./db/tableNominatimCache.js');
@@ -158,6 +159,7 @@ attachForwarding(logger, {
 - xssFilter sets X-XSS-Protection headers to enable XSS (cross-site scripting) filters in most current web browsers.
 */
 app.use(helmet()); // Add security headers.
+app.use(robotsSitemap());
 app.use(traceId());
 
 app.use(express.json({ limit: '1mb' }));

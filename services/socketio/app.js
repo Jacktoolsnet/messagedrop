@@ -14,6 +14,7 @@ const jwt = require('jsonwebtoken');
 const { generateOrLoadKeypairs } = require('./utils/keyStore');
 const { normalizeErrorResponses, notFoundHandler, errorHandler } = require('./middleware/api-error');
 const traceId = require('./middleware/trace-id');
+const robotsSitemap = require('./middleware/robots-sitemap');
 
 const contactHandlers = require('./socketIo/contactHandlers');
 const userHandlers = require('./socketIo/userHandlers');
@@ -21,6 +22,7 @@ const userHandlers = require('./socketIo/userHandlers');
 const app = express();
 
 app.use(helmet());
+app.use(robotsSitemap());
 app.use(express.json({ limit: '1mb' }));
 app.use(traceId());
 app.use(normalizeErrorResponses);

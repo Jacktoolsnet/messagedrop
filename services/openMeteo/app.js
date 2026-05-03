@@ -18,6 +18,7 @@ const rateLimit = require('express-rate-limit');
 const { generateOrLoadKeypairs } = require('./utils/keyStore');
 const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
 const { normalizeErrorResponses, notFoundHandler, errorHandler } = require('./middleware/api-error');
+const robotsSitemap = require('./middleware/robots-sitemap');
 
 // Table for crone jobs
 const tableAirQuality = require('./db/tableAirQuality');
@@ -161,6 +162,7 @@ attachForwarding(logger, {
 - xssFilter sets X-XSS-Protection headers to enable XSS (cross-site scripting) filters in most current web browsers.
 */
 app.use(helmet()); // Add security headers.
+app.use(robotsSitemap());
 app.use(traceId());
 
 app.use(express.json({ limit: '1mb' }));

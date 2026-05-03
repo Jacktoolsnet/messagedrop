@@ -48,6 +48,7 @@ const { normalizeErrorResponses, notFoundHandler, errorHandler } = require('./mi
 const maintenanceMode = require('./middleware/maintenance');
 const security = require('./middleware/security');
 const { verifyServiceJwt } = require('./utils/serviceJwt');
+const robotsSitemap = require('./middleware/robots-sitemap');
 
 // Tables for cronjobs
 const tableUser = require('./db/tableUser');
@@ -263,6 +264,7 @@ attachForwarding(logger, {
 - xssFilter sets X-XSS-Protection headers to enable XSS (cross-site scripting) filters in most current web browsers.
 */
 app.use(helmet()); // Add security headers.
+app.use(robotsSitemap());
 
 app.use(traceId());
 

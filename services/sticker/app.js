@@ -20,6 +20,7 @@ const { generateOrLoadKeypairs } = require('./utils/keyStore');
 const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
 const { verifyServiceJwt } = require('./utils/serviceJwt');
 const { normalizeErrorResponses, notFoundHandler, errorHandler } = require('./middleware/api-error');
+const robotsSitemap = require('./middleware/robots-sitemap');
 
 const database = new Database();
 const app = require('express')();
@@ -126,6 +127,7 @@ attachForwarding(logger, {
 });
 
 app.use(helmet());
+app.use(robotsSitemap());
 app.use(traceId());
 app.use(require('express').json({ limit: '1mb' }));
 app.use(databaseMw(database));
