@@ -232,7 +232,7 @@
       return 'http://localhost:3000/p';
     }
 
-    return 'https://messagedrop.de/p';
+    return 'https://app.messagedrop.de/p';
   }
 
   function isQStageHostname(hostname) {
@@ -243,6 +243,8 @@
 
     return (
       normalized === 'q.frontend.messagedrop.de'
+      || normalized === 'frontend.messagedrop.jacktools.net'
+      || normalized === 'messagedrop.jacktools.net'
       || normalized.startsWith('q.')
       || normalized.includes('.q.')
       || normalized.includes('-q.')

@@ -108,18 +108,32 @@ export class PublicMessageShareService {
   }
 
   private resolvePublicShareBaseUrl(): string {
+    const browserOrigin = this.resolveBrowserOrigin();
+    if (browserOrigin && !this.isLocalhostOrigin(browserOrigin)) {
+      return `${browserOrigin}/p`;
+    }
+
     const configuredShareBaseUrl = String(environment.publicShareBaseUrl || '').trim().replace(/\/+$/, '');
     if (configuredShareBaseUrl) {
       return configuredShareBaseUrl;
     }
 
-    const publicSiteUrl = String(environment.publicSiteUrl || '').trim().replace(/\/+$/, '');
-    if (publicSiteUrl) {
-      return `${publicSiteUrl}/p`;
+    const appUrl = String(environment.appUrl || '').trim().replace(/\/+$/, '');
+    if (appUrl) {
+      return `${appUrl}/p`;
     }
 
     const apiBaseUrl = String(environment.apiUrl || '').trim().replace(/\/+$/, '');
     return apiBaseUrl ? `${apiBaseUrl}/p` : '/p';
+  }
+
+  private isLocalhostOrigin(origin: string): boolean {
+    try {
+      const hostname = new URL(origin).hostname.trim().toLowerCase();
+      return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]';
+    } catch {
+      return false;
+    }
   }
 
   private resolveAppBaseUrl(): string {

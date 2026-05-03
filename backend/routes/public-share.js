@@ -15,7 +15,7 @@ const PRODUCTION_PUBLIC_SITE_URL = 'https://messagedrop.de';
 const Q_STAGE_PUBLIC_APP_URL = 'https://q.frontend.messagedrop.de';
 const Q_STAGE_PUBLIC_SITE_URL = 'https://q.frontend.messagedrop.de';
 const LOCAL_PUBLIC_SHARE_URL = 'http://localhost:3000/p';
-const PRODUCTION_PUBLIC_SHARE_URL = `${PRODUCTION_PUBLIC_SITE_URL}/p`;
+const PRODUCTION_PUBLIC_SHARE_URL = `${PRODUCTION_PUBLIC_APP_URL}/p`;
 const Q_STAGE_PUBLIC_SHARE_URL = `${Q_STAGE_PUBLIC_SITE_URL}/p`;
 const STRINGS = {
   de: {
@@ -1147,6 +1147,7 @@ function resolveStageSpecificPublicAppUrl(stage) {
       || process.env.PUBLIC_APP_URL_Q_STAGE
       || process.env.Q_FRONTEND_URL
       || process.env.FRONTEND_URL_Q
+      || process.env.Q_PUBLIC_FRONTEND_URL
     );
   }
 
@@ -1257,6 +1258,8 @@ function isQStageHostname(hostname) {
 
   return (
     normalized === 'q.frontend.messagedrop.de'
+    || normalized === 'frontend.messagedrop.jacktools.net'
+    || normalized === 'messagedrop.jacktools.net'
     || normalized.startsWith('q.')
     || normalized.includes('.q.')
     || normalized.includes('-q.')

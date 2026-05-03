@@ -507,6 +507,7 @@ export class AppComponent implements OnInit {
 
     const hostname = window.location.hostname.trim().toLowerCase();
     return hostname === 'q.frontend.messagedrop.de'
+      || hostname === 'frontend.messagedrop.jacktools.net'
       || hostname === 'messagedrop.jacktools.net'
       || hostname.startsWith('q.')
       || hostname.includes('.q.')
