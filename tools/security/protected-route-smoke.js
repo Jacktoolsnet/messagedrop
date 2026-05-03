@@ -49,6 +49,7 @@ const EXPECT_AUTH_BLOCKED = new Set([401, 403]);
 const EXPECT_OK = new Set([200]);
 const EXPECT_NOT_FOUND_OR_METHOD_BLOCKED = new Set([404, 405]);
 const EXPECT_CORS_REJECTED = new Set([200, 204, 401, 403, 404, 405]);
+const EXPECT_BAD_REQUEST = new Set([400]);
 const EVIL_ORIGIN = process.env.SECURITY_EVIL_ORIGIN || 'https://evil.example.com';
 const backendAllowedOrigin = firstCsvValue(process.env.ORIGIN);
 const adminAllowedOrigin = firstCsvValue(process.env.ADMIN_ORIGIN);
@@ -174,6 +175,17 @@ function authErrorDoesNotLeakDetails(res) {
   const body = String(res.body || '');
   return isJsonResponse(res)
     && !/<html/i.test(body)
+    && !/stack/i.test(body)
+    && !/jwt_secret/i.test(body)
+    && !/admin_jwt_secret/i.test(body)
+    && !/sqlite/i.test(body)
+    && !/select\\s/i.test(body)
+    && !/\/home\//i.test(body);
+}
+
+function responseDoesNotLeakDetails(res) {
+  const body = String(res.body || '');
+  return !/<html/i.test(body)
     && !/stack/i.test(body)
     && !/jwt_secret/i.test(body)
     && !/admin_jwt_secret/i.test(body)
@@ -404,13 +416,66 @@ for (const [name, url, method, token, body] of authErrorTargets) {
   });
 }
 
-function request({ method, url, token, rawToken, headers = {}, body, timeoutMs = 5000 }) {
+const notFoundTargets = [
+  ['backend', bases.backend],
+  ['admin', bases.admin],
+  ['openMeteo', bases.openMeteo],
+  ['nominatim', bases.nominatim],
+  ['socketio', bases.socketio],
+  ['viator', bases.viator],
+  ['sticker', bases.sticker]
+];
+
+for (const [name, base] of notFoundTargets) {
+  tests.push({
+    name: `${name} 404 response is JSON/no-store and does not leak internals`,
+    method: 'GET',
+    url: `${base}/security-smoke-definitely-not-existing`,
+    expect: new Set([404]),
+    assert: (res) => isJsonResponse(res) && hasNoStoreHeaders(res) && responseDoesNotLeakDetails(res)
+  });
+}
+
+tests.push({
+  name: 'backend invalid JSON returns 400 without stacktrace',
+  method: 'POST',
+  url: `${bases.backend}/openai/moderate`,
+  rawToken: makeUserJwt(),
+  rawBody: '{invalid',
+  headers: { 'content-type': 'application/json' },
+  expect: EXPECT_BAD_REQUEST,
+  assert: (res) => isJsonResponse(res) && hasNoStoreHeaders(res) && responseDoesNotLeakDetails(res)
+});
+
+const concreteServiceRouteTargets = [
+  ['openMeteo weather route blocks missing service token', `${bases.openMeteo}/weather/en/TESTPLUS/52.52/13.405/1`],
+  ['openMeteo airquality route blocks missing service token', `${bases.openMeteo}/airquality/TESTPLUS/52.52/13.405/1`],
+  ['nominatim search route blocks missing service token', `${bases.nominatim}/nominatim/search/Berlin/1`],
+  ['sticker categories route blocks missing service token', `${bases.sticker}/sticker/categories`],
+  ['sticker search route blocks missing service token', `${bases.sticker}/sticker/search?q=cat`]
+];
+
+for (const [name, url] of concreteServiceRouteTargets) {
+  tests.push({
+    name,
+    method: 'GET',
+    url,
+    expect: EXPECT_AUTH_BLOCKED,
+    assert: (res) => hasNoStoreHeaders(res) && authErrorDoesNotLeakDetails(res)
+  });
+}
+
+function request({ method, url, token, rawToken, headers = {}, body, rawBody, timeoutMs = 5000 }) {
   return new Promise((resolve, reject) => {
     const parsed = new URL(url);
-    const payload = body === undefined ? null : Buffer.from(JSON.stringify(body));
+    const payload = rawBody !== undefined
+      ? Buffer.from(String(rawBody))
+      : (body === undefined ? null : Buffer.from(JSON.stringify(body)));
     const requestHeaders = { ...headers };
-    if (payload) {
+    if (payload && !requestHeaders['content-type'] && !requestHeaders['Content-Type']) {
       requestHeaders['content-type'] = 'application/json';
+    }
+    if (payload) {
       requestHeaders['content-length'] = String(payload.length);
     }
     if (rawToken || token) {
