@@ -397,7 +397,7 @@
       },
       "exif": {
         "title": "Cette image contient des données de position",
-        "body": "Cette image contient des données de position enregistrées. Le pin doit-il être placé à cette position de l’image ou à la position actuelle de la carte ?",
+        "body": "Cette image contient des données de position enregistrées. Le repère doit-il être placé à cette position de l’image, à la position actuelle de la carte ou à une position personnalisée ?",
         "useImageLocationAria": "Utiliser les données de position de l'image",
         "useMapLocationAria": "Utiliser la position actuelle de la carte",
         "remember": "Se souvenir de mon choix",
@@ -406,7 +406,9 @@
         "previewAlt": "Aperçu de l'image",
         "bodyShort": "Cette image contient des données de position.",
         "useImageLocation": "Utiliser les données de position de l'image",
-        "useMapLocation": "Utiliser la position actuelle de la carte"
+        "useMapLocation": "Utiliser la position actuelle de la carte",
+        "useCustomLocationAria": "Utiliser une position personnalisée",
+        "useCustomLocation": "Utiliser une position personnalisée"
       },
       "editLocationAria": "Modifier la position de l’image",
       "openGalleryAria": "Afficher l'image en grand",

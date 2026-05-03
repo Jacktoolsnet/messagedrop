@@ -206,6 +206,11 @@ const ITEMS = {
       descriptionKey: 'imageExif.items.mapLocation.desc'
     },
     {
+      icon: 'edit_location_alt',
+      titleKey: 'imageExif.items.customLocation.title',
+      descriptionKey: 'imageExif.items.customLocation.desc'
+    },
+    {
       icon: 'toggle_on',
       titleKey: 'imageExif.items.remember.title',
       descriptionKey: 'imageExif.items.remember.desc'

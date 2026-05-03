@@ -1002,7 +1002,7 @@
   },
   "imageExif": {
     "title": "Elegir ubicación de la imagen",
-    "intro": "La imagen contiene datos de ubicación guardados. Decide si MessageDrop debe usar esa ubicación de la imagen o la ubicación actual del mapa para el pin privado de la imagen.",
+    "intro": "La imagen contiene datos de ubicación guardados. Decide si MessageDrop debe usar esta ubicación de la imagen, la ubicación actual del mapa o una ubicación personalizada para el pin privado de la imagen.",
     "items": {
       "imageLocation": {
         "title": "Usar ubicación de la imagen",
@@ -1012,13 +1012,17 @@
         "title": "Mantener ubicación del mapa",
         "desc": "Ignora la ubicación EXIF y usa en su lugar la ubicación actual del mapa para el pin de la imagen."
       },
+      "customLocation": {
+        "title": "Usar ubicación personalizada",
+        "desc": "Abre el selector de ubicación para colocar el pin de la imagen en una ubicación personalizada."
+      },
       "remember": {
         "title": "Recordar elección",
         "desc": "Aplica tu decisión a otras imágenes seleccionadas con datos de ubicación sin volver a preguntar."
       },
       "help": {
         "title": "Ayuda",
-        "desc": "Abre esta explicación sobre la ubicación de la imagen, la ubicación del mapa y recordar la elección."
+        "desc": "Abre esta explicación sobre ubicación de la imagen, ubicación del mapa, ubicación personalizada y recordar la elección."
       }
     }
   },

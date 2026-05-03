@@ -397,7 +397,7 @@
       },
       "exif": {
         "title": "Das Bild enthält Standortdaten",
-        "body": "Im Bild sind Standortdaten gespeichert. Soll der Pin an dieser Bildposition oder an der aktuellen Kartenposition gesetzt werden?",
+        "body": "Im Bild sind Standortdaten gespeichert. Soll der Pin an dieser Bildposition, an der aktuellen Kartenposition oder an einem benutzerdefinierten Ort gesetzt werden?",
         "useImageLocationAria": "Standortdaten des Bildes verwenden",
         "useMapLocationAria": "Aktuelle Kartenposition verwenden",
         "remember": "Auswahl merken",
@@ -406,7 +406,9 @@
         "previewAlt": "Bildvorschau",
         "bodyShort": "Das Bild enthält Standortdaten.",
         "useImageLocation": "Standortdaten des Bildes verwenden",
-        "useMapLocation": "Aktuelle Kartenposition verwenden"
+        "useMapLocation": "Aktuelle Kartenposition verwenden",
+        "useCustomLocationAria": "Benutzerdefinierten Ort verwenden",
+        "useCustomLocation": "Benutzerdefinierten Ort verwenden"
       },
       "editLocationAria": "Bildposition bearbeiten",
       "openGalleryAria": "Bild groß anzeigen",

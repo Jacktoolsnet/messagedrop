@@ -397,7 +397,7 @@
       },
       "exif": {
         "title": "Esta imagen contiene datos de ubicación",
-        "body": "Esta imagen contiene datos de ubicación guardados. ¿El pin debe colocarse en esta ubicación de la imagen o en la ubicación actual del mapa?",
+        "body": "Esta imagen contiene datos de ubicación guardados. ¿El pin debe colocarse en esta ubicación de la imagen, en la ubicación actual del mapa o en una ubicación personalizada?",
         "useImageLocationAria": "Usar los datos de ubicación de la imagen",
         "useMapLocationAria": "Usar la ubicación actual del mapa",
         "remember": "Recordar mi elección",
@@ -406,7 +406,9 @@
         "previewAlt": "Vista previa de la imagen",
         "bodyShort": "Esta imagen contiene datos de ubicación.",
         "useImageLocation": "Usar los datos de ubicación de la imagen",
-        "useMapLocation": "Usar la ubicación actual del mapa"
+        "useMapLocation": "Usar la ubicación actual del mapa",
+        "useCustomLocationAria": "Usar ubicación personalizada",
+        "useCustomLocation": "Usar ubicación personalizada"
       },
       "editLocationAria": "Editar ubicación de la imagen",
       "openGalleryAria": "Ver imagen ampliada",

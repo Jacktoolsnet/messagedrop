@@ -55,6 +55,23 @@
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
 }
 
+.choice-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 68px;
+  height: 68px;
+  border-radius: 10px;
+  border: 1px solid var(--mat-card-outlined-outline-color);
+  background: var(--mat-card-filled-container-color);
+}
+
+.choice-icon mat-icon {
+  width: 32px;
+  height: 32px;
+  font-size: 32px;
+}
+
 .choice-button-text {
   display: block;
   line-height: 1.2;
@@ -83,7 +100,8 @@
     gap: 10px;
   }
 
-  .choice-map {
+  .choice-map,
+  .choice-icon {
     width: 60px;
     height: 60px;
   }

@@ -11,7 +11,7 @@
 
   <div class="choice-actions">
     <button mat-stroked-button color="primary" class="choice-button" type="button" cdkFocusInitial
-      [mat-dialog-close]="{ useMap: false, applyToAll }"
+      [mat-dialog-close]="{ choice: 'image', applyToAll }"
       [attr.aria-label]="'common.images.exif.useImageLocationAria' | transloco">
       <span class="choice-button-content">
         @if (data.imageLocation) {
@@ -21,13 +21,23 @@
       </span>
     </button>
     <button mat-stroked-button class="choice-button" type="button"
-      [mat-dialog-close]="{ useMap: true, applyToAll }"
+      [mat-dialog-close]="{ choice: 'map', applyToAll }"
       [attr.aria-label]="'common.images.exif.useMapLocationAria' | transloco">
       <span class="choice-button-content">
         @if (data.mapLocation) {
         <span [id]="mapLocationMapId" class="choice-map" aria-hidden="true"></span>
         }
         <span class="choice-button-text">{{ 'common.images.exif.useMapLocation' | transloco }}</span>
+      </span>
+    </button>
+    <button mat-stroked-button class="choice-button" type="button"
+      [mat-dialog-close]="{ choice: 'custom', applyToAll }"
+      [attr.aria-label]="'common.images.exif.useCustomLocationAria' | transloco">
+      <span class="choice-button-content">
+        <span class="choice-icon" aria-hidden="true">
+          <mat-icon>edit_location_alt</mat-icon>
+        </span>
+        <span class="choice-button-text">{{ 'common.images.exif.useCustomLocation' | transloco }}</span>
       </span>
     </button>
   </div>

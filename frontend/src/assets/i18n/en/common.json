@@ -397,7 +397,7 @@
       },
       "exif": {
         "title": "This image contains location data",
-        "body": "This image contains stored location data. Should the pin be placed at this image location or at the current map location?",
+        "body": "This image contains saved location data. Should the pin be placed at this image location, at the current map location, or at a custom location?",
         "useImageLocationAria": "Use the image location data",
         "useMapLocationAria": "Use current map location",
         "remember": "Remember my choice",
@@ -406,7 +406,9 @@
         "previewAlt": "Image preview",
         "bodyShort": "This image contains location data.",
         "useImageLocation": "Use the image location data",
-        "useMapLocation": "Use current map location"
+        "useMapLocation": "Use current map location",
+        "useCustomLocationAria": "Use custom location",
+        "useCustomLocation": "Use custom location"
       },
       "editLocationAria": "Edit image location",
       "openGalleryAria": "View image larger",

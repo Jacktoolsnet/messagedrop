@@ -1002,7 +1002,7 @@
   },
   "imageExif": {
     "title": "Choisir la position de l’image",
-    "intro": "L’image contient des données de position enregistrées. Décidez si MessageDrop doit utiliser cette position de l’image ou la position actuelle de la carte pour le pin privé de l’image.",
+    "intro": "L’image contient des données de position enregistrées. Décidez si MessageDrop doit utiliser cette position de l’image, la position actuelle de la carte ou une position personnalisée pour le repère privé de l’image.",
     "items": {
       "imageLocation": {
         "title": "Utiliser la position de l’image",
@@ -1012,13 +1012,17 @@
         "title": "Conserver la position de la carte",
         "desc": "Ignore la position EXIF et utilise à la place la position actuelle de la carte pour le pin de l’image."
       },
+      "customLocation": {
+        "title": "Utiliser une position personnalisée",
+        "desc": "Ouvre le sélecteur de position afin de placer le repère de l’image à une position personnalisée."
+      },
       "remember": {
         "title": "Mémoriser le choix",
         "desc": "Applique votre décision aux autres images sélectionnées contenant des données de position, sans redemander."
       },
       "help": {
         "title": "Aide",
-        "desc": "Ouvre cette explication sur la position de l’image, la position de la carte et la mémorisation du choix."
+        "desc": "Ouvre cette explication sur la position de l’image, la position de la carte, la position personnalisée et la mémorisation du choix."
       }
     }
   },

@@ -1002,7 +1002,7 @@
   },
   "imageExif": {
     "title": "Bildposition auswählen",
-    "intro": "Das Bild enthält gespeicherte Standortdaten. Entscheide, ob MessageDrop diese Bildposition oder die aktuelle Kartenposition für den privaten Bild-Pin verwenden soll.",
+    "intro": "Das Bild enthält gespeicherte Standortdaten. Entscheide, ob MessageDrop diese Bildposition, die aktuelle Kartenposition oder einen benutzerdefinierten Ort für den privaten Bild-Pin verwenden soll.",
     "items": {
       "imageLocation": {
         "title": "Bildposition verwenden",
@@ -1012,13 +1012,17 @@
         "title": "Kartenposition behalten",
         "desc": "Ignoriert die EXIF-Position und verwendet stattdessen die aktuelle Position der Karte für den Bild-Pin."
       },
+      "customLocation": {
+        "title": "Benutzerdefinierten Ort verwenden",
+        "desc": "Öffnet die Ortsauswahl, damit du den Bild-Pin an einem selbst gewählten Ort setzen kannst."
+      },
       "remember": {
         "title": "Auswahl merken",
         "desc": "Wendet deine Entscheidung auf weitere ausgewählte Bilder mit Standortdaten an, ohne erneut nachzufragen."
       },
       "help": {
         "title": "Hilfe",
-        "desc": "Öffnet diese Erklärung zu Bildposition, Kartenposition und Auswahl merken."
+        "desc": "Öffnet diese Erklärung zu Bildposition, Kartenposition, benutzerdefiniertem Ort und Auswahl merken."
       }
     }
   },
