@@ -159,9 +159,9 @@ const getActiveByContact = function (db, contactId, limit = 100, offset = 0, bef
     WHERE ${columnContactId} = ?
       AND (
         ${columnReadAt} IS NULL
-        OR ${columnReadAt} > datetime('now','-7 days')
+        OR ${columnReadAt} > to_char((CURRENT_TIMESTAMP - INTERVAL '7 days') AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS')
       )
-      AND (${columnCreatedAt} < COALESCE(?, datetime('now','+1 day')))
+      AND (${columnCreatedAt} < COALESCE(?, to_char((CURRENT_TIMESTAMP + INTERVAL '1 day') AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS')))
     ORDER BY ${columnCreatedAt} DESC
     LIMIT ? OFFSET ?;
   `;
@@ -185,7 +185,7 @@ const cleanupReadMessages = function (db, callback) {
     const sql = `
     DELETE FROM ${tableName}
     WHERE ${columnReadAt} IS NOT NULL
-      AND ${columnReadAt} <= datetime('now','-7 days');
+      AND ${columnReadAt} <= to_char((CURRENT_TIMESTAMP - INTERVAL '7 days') AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS');
   `;
     db.run(sql, [], (err) => callback(err));
 };
@@ -338,9 +338,9 @@ const cleanupDeletedEvents = function (db, retentionDays = 30, callback) {
         : 30;
     const sql = `
     DELETE FROM ${deletedEventTableName}
-    WHERE ${deletedEventColumnDeletedAt} <= datetime('now', ?);
+    WHERE ${deletedEventColumnDeletedAt} <= to_char((CURRENT_TIMESTAMP - ($1::BIGINT * INTERVAL '1 day')) AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS');
   `;
-    db.run(sql, [`-${normalizedDays} days`], (err) => callback(err));
+    db.run(sql, [normalizedDays], (err) => callback(err));
 };
 
 module.exports = {
