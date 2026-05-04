@@ -4,7 +4,7 @@ const init = function (db) {
   const sql = `
     CREATE TABLE IF NOT EXISTS ${tableName} (
       destinationId INTEGER PRIMARY KEY,
-      uuid TEXT NOT NULL DEFAULT (lower(hex(randomblob(16)))),
+      uuid UUID NOT NULL DEFAULT gen_random_uuid(),
       name TEXT,
       type TEXT,
       parentDestinationId INTEGER,
@@ -19,7 +19,7 @@ const init = function (db) {
       centerLng REAL,
       plusCode TEXT,
       syncRunId TEXT,
-      updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+      updatedAt TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
     );
   `;
   db.exec(sql);
@@ -43,7 +43,7 @@ const upsertSql = `
     plusCode,
     syncRunId,
     updatedAt
-  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
   ON CONFLICT(destinationId) DO UPDATE SET
     name = excluded.name,
     type = excluded.type,
@@ -59,7 +59,7 @@ const upsertSql = `
     centerLng = excluded.centerLng,
     plusCode = excluded.plusCode,
     syncRunId = excluded.syncRunId,
-    updatedAt = datetime('now');
+    updatedAt = CURRENT_TIMESTAMP;
 `;
 
 const countAll = function (db, callback = () => { }) {

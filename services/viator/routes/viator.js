@@ -498,11 +498,16 @@ router.use(async (req, res, next) => {
       });
     }
     if (upstream.status >= 400) {
+      const shouldLogRequestBody = process.env.VIATOR_LOG_UPSTREAM_REQUEST_BODY === 'true'
+        || (process.env.NODE_ENV !== 'production' && process.env.VIATOR_LOG_UPSTREAM_REQUEST_BODY !== 'false');
       req.logger?.warn?.('Viator upstream error response', {
         method: req.method,
         path: req.path,
         status: upstream.status,
-        data: upstream.data
+        data: upstream.data,
+        request: shouldLogRequestBody
+          ? { query: sanitizedQuery, body: sanitizedBody }
+          : undefined
       });
     }
     logTiming(req.logger, {

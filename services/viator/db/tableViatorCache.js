@@ -13,8 +13,8 @@ const init = function (db) {
       ${columnPayload} TEXT,
       ${columnStatus} INTEGER,
       ${columnHeaders} TEXT,
-      ${columnExpiresAt} DATETIME,
-      ${columnLastUpdate} DATETIME DEFAULT CURRENT_TIMESTAMP
+      ${columnExpiresAt} TIMESTAMPTZ,
+      ${columnLastUpdate} TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
     );
   `;
   db.exec(sql);
@@ -23,9 +23,15 @@ const init = function (db) {
 const setCache = function (db, cacheKey, payload, status, headers, ttlSeconds, callback) {
   const expiresAt = new Date(Date.now() + ttlSeconds * 1000).toISOString();
   const sql = `
-    INSERT OR REPLACE INTO ${tableName}
+    INSERT INTO ${tableName}
     (${columnCacheKey}, ${columnPayload}, ${columnStatus}, ${columnHeaders}, ${columnExpiresAt}, ${columnLastUpdate})
-    VALUES (?, ?, ?, ?, ?, datetime('now'));
+    VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    ON CONFLICT (${columnCacheKey}) DO UPDATE SET
+      ${columnPayload} = EXCLUDED.${columnPayload},
+      ${columnStatus} = EXCLUDED.${columnStatus},
+      ${columnHeaders} = EXCLUDED.${columnHeaders},
+      ${columnExpiresAt} = EXCLUDED.${columnExpiresAt},
+      ${columnLastUpdate} = CURRENT_TIMESTAMP;
   `;
   db.run(sql, [cacheKey, payload, status, headers, expiresAt], (err) => {
     if (callback) callback(err || null);
@@ -36,7 +42,7 @@ const getCache = function (db, cacheKey, callback) {
   const sql = `
     SELECT * FROM ${tableName}
     WHERE ${columnCacheKey} = ?
-      AND DATETIME(${columnExpiresAt}) > DATETIME('now');
+      AND ${columnExpiresAt} > CURRENT_TIMESTAMP;
   `;
   db.get(sql, [cacheKey], (err, row) => {
     if (err) return callback(err);
@@ -48,7 +54,7 @@ const getCache = function (db, cacheKey, callback) {
 const cleanExpired = function (db, callback) {
   const sql = `
     DELETE FROM ${tableName}
-    WHERE DATETIME(${columnExpiresAt}) <= DATETIME('now');
+    WHERE ${columnExpiresAt} <= CURRENT_TIMESTAMP;
   `;
   db.run(sql, [], (err) => {
     if (callback) callback(err || null);
