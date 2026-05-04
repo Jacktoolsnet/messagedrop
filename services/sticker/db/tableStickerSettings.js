@@ -22,8 +22,8 @@ function init(db) {
       ${columns.notFoundLicenseFilePath} TEXT NOT NULL DEFAULT '',
       ${columns.notFoundLicenseFileName} TEXT NOT NULL DEFAULT '',
       ${columns.notFoundLicenseFileMimeType} TEXT NOT NULL DEFAULT '',
-      ${columns.createdAt} INTEGER NOT NULL,
-      ${columns.updatedAt} INTEGER NOT NULL
+      ${columns.createdAt} BIGINT NOT NULL,
+      ${columns.updatedAt} BIGINT NOT NULL
     );
   `;
 

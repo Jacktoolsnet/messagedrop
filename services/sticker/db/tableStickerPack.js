@@ -48,9 +48,9 @@ function init(db) {
       ${columns.searchVisible} INTEGER NOT NULL DEFAULT 1,
       ${columns.status} TEXT NOT NULL DEFAULT '${packStatus.ACTIVE}',
       ${columns.sortOrder} INTEGER NOT NULL DEFAULT 0,
-      ${columns.createdAt} INTEGER NOT NULL,
-      ${columns.updatedAt} INTEGER NOT NULL,
-      ${columns.deletedAt} INTEGER DEFAULT NULL,
+      ${columns.createdAt} BIGINT NOT NULL,
+      ${columns.updatedAt} BIGINT NOT NULL,
+      ${columns.deletedAt} BIGINT DEFAULT NULL,
       CONSTRAINT fk_sticker_pack_category
         FOREIGN KEY (${columns.categoryId}) REFERENCES tableStickerCategory(id)
         ON UPDATE CASCADE ON DELETE RESTRICT

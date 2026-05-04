@@ -1,4 +1,5 @@
-require('dotenv').config();
+const { loadEnv } = require('./utils/loadEnv');
+loadEnv();
 require('winston-daily-rotate-file');
 
 const fs = require('fs');
