@@ -1206,7 +1206,6 @@ async function restoreUserBackup(db, backup) {
   ];
 
   const messageColumns = [
-    'id',
     'uuid',
     'parentUuid',
     'typ',
