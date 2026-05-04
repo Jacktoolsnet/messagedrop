@@ -12,32 +12,6 @@
             "cwd": "${workspaceFolder}"
         },
         {
-            "name": "Messagedrop-App",
-            "type": "node",
-            "request": "launch",
-            "cwd": "${workspaceFolder}/frontend",
-            "runtimeExecutable": "npm",
-            "runtimeArgs": [
-                "run",
-                "start"
-            ],
-            "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen"
-        },
-        {
-            "name": "ADMIN-App",
-            "type": "node",
-            "request": "launch",
-            "cwd": "${workspaceFolder}/platform/admin/frontend",
-            "runtimeExecutable": "npm",
-            "runtimeArgs": [
-                "run",
-                "start"
-            ],
-            "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen"
-        },
-        {
             "name": "Admin-Service",
             "program": "${workspaceFolder}/platform/admin/backend/app.js",
             "request": "launch",
@@ -135,6 +109,32 @@
                 "SERVICE_JWT_TRUSTED_JWKS_PATH": "${workspaceFolder}/services/sticker/config/service-jwks.json"
             },
             "type": "node"
+        },
+        {
+            "name": "Messagedrop-App",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/frontend",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run",
+                "start"
+            ],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
+        },
+        {
+            "name": "ADMIN-App",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/platform/admin/frontend",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run",
+                "start"
+            ],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
         },
         {
             "name": "Generate Service (T) JWKs",
@@ -285,6 +285,48 @@
             "skipFiles": [
                 "<node_internals>/**"
             ]
+        },
+        {
+            "name": "DBeaver Messagedrop Backend",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "node tools/db/open-dbeaver.js BACKEND",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "DBeaver Admin Backend",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "node tools/db/open-dbeaver.js ADMIN",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "DBeaver Sticker Service",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "node tools/db/open-dbeaver.js STICKER",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "DBeaver Viator Service",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "node tools/db/open-dbeaver.js VIATOR",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "DBeaver OpenMeteo Service",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "node tools/db/open-dbeaver.js OPENMETEO",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "DBeaver Nominatim Service",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "node tools/db/open-dbeaver.js NOMINATIM",
+            "cwd": "${workspaceFolder}"
         }
     ]
 }
