@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Start PostgreSQL",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "sudo service postgresql start && pg_isready",
+            "cwd": "${workspaceFolder}"
+        },
+        {
             "name": "Messagedrop-App",
             "type": "node",
             "request": "launch",
