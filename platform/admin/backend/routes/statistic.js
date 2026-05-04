@@ -51,7 +51,10 @@ router.post('/count', [security.checkToken], (req, res, next) => {
     const safeAmount = Number.isFinite(Number(amount)) ? Number(amount) : 1;
 
     statistic.count(db, key, { dateStr: safeDate, amount: safeAmount }, (err) => {
-        if (err) return next(apiError.internal('db_error'));
+        if (err) {
+            req.logger?.error('Statistic count failed', { error: err?.message || err });
+            return next(apiError.internal('db_error'));
+        }
         // Kein Payload nötig, das ist nur ein Increment
         return res.sendStatus(204);
     });

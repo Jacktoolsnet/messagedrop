@@ -121,7 +121,8 @@ function createDbConfigFromEnv() {
 
 class PostgresCompat {
   constructor(config, logger = console) {
-    const { Pool } = require('pg');
+    const { Pool, types } = require('pg');
+    types.setTypeParser(20, (value) => Number(value));
     this._pool = new Pool(config);
     this._logger = logger ?? console;
     this._closed = false;

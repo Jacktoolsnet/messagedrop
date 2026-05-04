@@ -2,7 +2,7 @@ const tableName = 'tableStatistic';
 
 const columnKey = 'metricKey';
 const columnDate = 'metricDate';
-const columnValue = 'value';
+const columnValue = '"value"';
 
 const init = function (db) {
   const sql = `
@@ -27,7 +27,7 @@ const count = function (db, key, { dateStr, amount = 1 } = {}, callback = () => 
     INSERT INTO ${tableName} (${columnKey}, ${columnDate}, ${columnValue})
     VALUES (?, ?, ?)
     ON CONFLICT(${columnKey}, ${columnDate})
-      DO UPDATE SET ${columnValue} = ${columnValue} + excluded.${columnValue};
+      DO UPDATE SET ${columnValue} = ${tableName}.${columnValue} + EXCLUDED."value";
   `;
   db.run(sql, [key, dateStr, Number(amount) || 1], (err) => callback(err || null));
 };
