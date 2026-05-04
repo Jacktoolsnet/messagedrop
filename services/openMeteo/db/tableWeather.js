@@ -8,15 +8,18 @@ const init = function (db) {
         CREATE TABLE IF NOT EXISTS ${tableName} (
             ${columnCacheKey} TEXT PRIMARY KEY,
             ${columnWeatherData} TEXT,
-            ${columnLastUpdate} DATETIME DEFAULT CURRENT_TIMESTAMP
+            ${columnLastUpdate} TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
         );`;
     db.exec(sql);
 };
 
 const setWeatherData = function (db, cacheKey, weatherData, callback) {
     const sql = `
-        INSERT OR REPLACE INTO ${tableName} (${columnCacheKey}, ${columnWeatherData}, ${columnLastUpdate})
-        VALUES (?, ?, datetime('now'));`;
+        INSERT INTO ${tableName} (${columnCacheKey}, ${columnWeatherData}, ${columnLastUpdate})
+        VALUES (?, ?, CURRENT_TIMESTAMP)
+        ON CONFLICT (${columnCacheKey}) DO UPDATE SET
+            ${columnWeatherData} = EXCLUDED.${columnWeatherData},
+            ${columnLastUpdate} = CURRENT_TIMESTAMP;`;
     db.run(sql, [cacheKey, weatherData], (err) => {
         if (callback) callback(err || null);
     });
@@ -34,7 +37,7 @@ const getWeatherData = function (db, cacheKey, callback) {
 const cleanExpired = function (db, callback) {
     const sql = `
         DELETE FROM ${tableName}
-        WHERE DATETIME(${columnLastUpdate}) < DATETIME('now', '-1 hour');
+        WHERE ${columnLastUpdate} < CURRENT_TIMESTAMP - INTERVAL '1 hour';
     `;
     db.run(sql, [], (err) => {
         if (callback) callback(err || null);
