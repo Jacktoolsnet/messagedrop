@@ -1,5 +1,5 @@
+const fs = require('fs');
 const path = require('path');
-const { Worker } = require('worker_threads');
 const tableUser = require('./tableUser');
 const tableConnect = require('./tableConnect');
 const tableContact = require('./tableContact');
@@ -16,6 +16,7 @@ const tableGeoStatistic = require('./tableGeoStatistic');
 const tableMaintenance = require('./tableMaintenance');
 const tableUsageProtection = require('./tableUsageProtection');
 const tableUserModerationAppeal = require('./tableUserModerationAppeal');
+
 
 const DEFAULT_MAX_PENDING_REQUESTS = 1000;
 
@@ -37,35 +38,163 @@ function createQueueOverloadedError(pendingCount, maxPendingRequests) {
   return error;
 }
 
-class SqliteCompat {
-  constructor(filePath, logger = console) {
+function buildIdentifierMap() {
+  const map = new Map();
+  const add = (identifier) => {
+    if (typeof identifier !== 'string' || !/[A-Z]/.test(identifier)) return;
+    if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(identifier)) return;
+    map.set(identifier.toLowerCase(), identifier);
+  };
+
+  try {
+    for (const entry of fs.readdirSync(__dirname)) {
+      if (!/^table.*\.js$/.test(entry)) continue;
+      const content = fs.readFileSync(path.join(__dirname, entry), 'utf8');
+      for (const match of content.matchAll(/['`]([A-Za-z][A-Za-z0-9_]*[A-Z][A-Za-z0-9_]*)['`]/g)) {
+        add(match[1]);
+      }
+      for (const match of content.matchAll(/\bAS\s+([A-Za-z][A-Za-z0-9_]*[A-Z][A-Za-z0-9_]*)/g)) {
+        add(match[1]);
+      }
+    }
+  } catch {
+    // Best-effort only.
+  }
+
+  return map;
+}
+
+const IDENTIFIER_MAP = buildIdentifierMap();
+
+function normalizeRow(row) {
+  if (!row || typeof row !== 'object') return row;
+  const normalized = {};
+  for (const [key, value] of Object.entries(row)) {
+    normalized[IDENTIFIER_MAP.get(String(key).toLowerCase()) || key] = value;
+  }
+  return normalized;
+}
+
+function splitSqlStatements(sql) {
+  const source = String(sql || '');
+  const statements = [];
+  let current = '';
+  let inSingle = false;
+  let inDouble = false;
+  let dollarTag = null;
+  for (let i = 0; i < source.length; i += 1) {
+    const ch = source[i];
+    const next = source[i + 1];
+    if (!inSingle && !inDouble && !dollarTag && ch === '-' && next === '-') {
+      while (i < source.length && source[i] !== '\n') i += 1;
+      continue;
+    }
+    if (!inDouble && !dollarTag && ch === "'" && source[i - 1] !== '\\') inSingle = !inSingle;
+    if (!inSingle && !dollarTag && ch === '"' && source[i - 1] !== '\\') inDouble = !inDouble;
+    if (!inSingle && !inDouble && ch === '$') {
+      const rest = source.slice(i);
+      const match = rest.match(/^\$[A-Za-z_][A-Za-z0-9_]*\$|^\$\$/);
+      if (match) {
+        if (dollarTag === match[0]) dollarTag = null;
+        else if (!dollarTag) dollarTag = match[0];
+        current += match[0];
+        i += match[0].length - 1;
+        continue;
+      }
+    }
+    if (ch === ';' && !inSingle && !inDouble && !dollarTag) {
+      if (current.trim()) statements.push(current.trim());
+      current = '';
+      continue;
+    }
+    current += ch;
+  }
+  if (current.trim()) statements.push(current.trim());
+  return statements;
+}
+
+function replaceSqlitePlaceholders(sql) {
+  let index = 0;
+  return String(sql || '').replace(/\?/g, () => `$${++index}`);
+}
+
+function preparePostgresSql(sql) {
+  let prepared = String(sql || '').trim();
+  if (!prepared) return prepared;
+  if (/^PRAGMA\b/i.test(prepared)) return '';
+  if (/^CREATE\s+TRIGGER\b/i.test(prepared)) return '';
+
+  prepared = prepared.replace(/\s+COLLATE\s+NOCASE\b/gi, '');
+  prepared = prepared.replace(/\bINTEGER\s+PRIMARY\s+KEY\s+AUTOINCREMENT\b/gi, 'BIGSERIAL PRIMARY KEY');
+  prepared = prepared.replace(/\bDATETIME\b/gi, 'TIMESTAMPTZ');
+  prepared = prepared.replace(/\bNUMBER\b/gi, 'REAL');
+  prepared = prepared.replace(/\bINTEGER\b/g, 'BIGINT');
+  prepared = prepared.replace(/INSERT\s+OR\s+IGNORE\s+INTO/gi, 'INSERT INTO');
+  prepared = prepared.replace(/INSERT\s+OR\s+REPLACE\s+INTO/gi, 'INSERT INTO');
+  prepared = prepared.replace(/strftime\('\%s','now','\+30 days'\)/gi, "EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP + INTERVAL '30 days'))::BIGINT");
+  prepared = prepared.replace(/strftime\('\%s','now'\)/gi, 'EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)::BIGINT');
+  prepared = prepared.replace(/CONSTRAINT\s+SECONDARY_KEY\s+UNIQUE/gi, 'UNIQUE');
+  prepared = prepared.replace(/strftime\('\%Y-\%m-\%dT\%H:\%M:\%S','now'\)/gi, `to_char(CURRENT_TIMESTAMP AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS')`);
+  prepared = prepared.replace(/datetime\('now','-90 days'\)/gi, "CURRENT_TIMESTAMP - INTERVAL '90 days'");
+  prepared = prepared.replace(/datetime\('now', '-1 month'\)/gi, "CURRENT_TIMESTAMP - INTERVAL '1 month'");
+  prepared = prepared.replace(/datetime\('now'\)/gi, 'CURRENT_TIMESTAMP');
+  prepared = prepared.replace(/DATE\('now', '-1 month'\)/gi, "CURRENT_DATE - INTERVAL '1 month'");
+  prepared = prepared.replace(/DATETIME\(([^)]+)\)/gi, '$1');
+  prepared = prepared.replace(/\bMAX\(([^,()]+)\s*,\s*0\)/gi, 'GREATEST($1, 0)');
+  prepared = prepared.replace(/DATE\(([^)]+)\)/gi, '$1::date');
+
+  if (/^INSERT\s+INTO\b/i.test(prepared) && /\bOR\s+IGNORE\b/i.test(String(sql || '')) && !/\bON\s+CONFLICT\b/i.test(prepared)) {
+    prepared = `${prepared.replace(/;\s*$/, '')} ON CONFLICT DO NOTHING`;
+  }
+
+  return replaceSqlitePlaceholders(prepared);
+}
+
+function createDbConfigFromEnv() {
+  const connectionString = process.env.BACKEND_DATABASE_URL || process.env.DATABASE_URL;
+  const sslEnabled = String(process.env.BACKEND_DB_SSL || process.env.DB_SSL || '').toLowerCase() === 'true';
+  const max = Number(process.env.BACKEND_DB_POOL_MAX || process.env.DB_POOL_MAX || 10);
+  if (connectionString) {
+    return {
+      connectionString,
+      max: Number.isFinite(max) && max > 0 ? max : 10,
+      ssl: sslEnabled ? { rejectUnauthorized: false } : undefined
+    };
+  }
+  return {
+    host: process.env.BACKEND_DB_HOST || process.env.DB_HOST || 'localhost',
+    port: Number(process.env.BACKEND_DB_PORT || process.env.DB_PORT || 5432),
+    database: process.env.BACKEND_DB_NAME || process.env.DB_NAME || 'messagedrop_backend',
+    user: process.env.BACKEND_DB_USER || process.env.DB_USER || 'messagedrop',
+    password: process.env.BACKEND_DB_PASSWORD || process.env.DB_PASSWORD || undefined,
+    max: Number.isFinite(max) && max > 0 ? max : 10,
+    ssl: sslEnabled ? { rejectUnauthorized: false } : undefined
+  };
+}
+
+class PostgresCompat {
+  constructor(config, logger = console) {
+    const { Pool, types } = require('pg');
+    types.setTypeParser(20, (value) => Number(value));
+    this._pool = new Pool(config);
     this._logger = logger ?? console;
-    this._requestId = 0;
-    this._pending = new Map();
     this._closed = false;
+    this._chain = Promise.resolve();
+    this._pendingCount = 0;
     this._maxPendingRequests = resolveMaxPendingRequests(process.env.DB_MAX_PENDING_REQUESTS);
+  }
 
-    this._worker = new Worker(path.join(__dirname, 'sqlite-worker.js'), {
-      workerData: { filePath }
-    });
-
-    this._worker.on('message', (message) => this._handleWorkerMessage(message));
-    this._worker.on('error', (error) => this._handleWorkerFailure(error));
-    this._worker.on('exit', (code) => {
-      if (this._closed) {
-        return;
-      }
-      if (code !== 0) {
-        this._handleWorkerFailure(new Error(`SQLite worker exited with code ${code}`));
-      }
-    });
+  _normalizeError(error) {
+    if (error?.code === '42701' && !String(error.message || '').includes('duplicate column name')) {
+      error.message = `duplicate column name: ${error.message}`;
+    }
+    return error;
   }
 
   _safeInvokeCallback(callback, error, value, context = null) {
+    error = error ? this._normalizeError(error) : error;
     if (typeof callback !== 'function') {
-      if (error) {
-        this._logger?.error?.(error?.message || error);
-      }
+      if (error) this._logger?.error?.(error?.message || error);
       return;
     }
     try {
@@ -75,132 +204,100 @@ class SqliteCompat {
       }
       callback(error || null, value);
     } catch (callbackError) {
-      this._logger?.error?.('SQLite callback failed', callbackError);
+      this._logger?.error?.('PostgreSQL callback failed', callbackError);
     }
-  }
-
-  _createError(errorPayload) {
-    const error = new Error(errorPayload?.message || 'SQLite worker error');
-    if (errorPayload?.name) {
-      error.name = errorPayload.name;
-    }
-    if (errorPayload?.code) {
-      error.code = errorPayload.code;
-    }
-    if (errorPayload?.stack) {
-      error.stack = errorPayload.stack;
-    }
-    return error;
-  }
-
-  _handleWorkerFailure(error) {
-    const pending = Array.from(this._pending.values());
-    this._pending.clear();
-    pending.forEach(({ callback }) => {
-      this._safeInvokeCallback(callback, error);
-    });
-  }
-
-  _handleWorkerMessage(message) {
-    const { id, ok, result, error } = message || {};
-    if (typeof id !== 'number') {
-      return;
-    }
-
-    const pending = this._pending.get(id);
-    if (!pending) {
-      return;
-    }
-    this._pending.delete(id);
-
-    const { action, callback } = pending;
-    if (!ok) {
-      this._safeInvokeCallback(callback, this._createError(error));
-      return;
-    }
-
-    if (action === 'run') {
-      const context = {
-        changes: Number(result?.changes ?? 0),
-        lastID: result?.lastID ?? null
-      };
-      this._safeInvokeCallback(callback, null, undefined, context);
-      return;
-    }
-    if (action === 'get') {
-      this._safeInvokeCallback(callback, null, result ?? null);
-      return;
-    }
-    if (action === 'all') {
-      this._safeInvokeCallback(callback, null, Array.isArray(result) ? result : []);
-      return;
-    }
-    this._safeInvokeCallback(callback, null, result);
-  }
-
-  _dispatch(action, payload, callback) {
-    if (this._closed && action !== 'close') {
-      this._safeInvokeCallback(callback, new Error('Database connection is closed'));
-      return;
-    }
-
-    if (action !== 'close' && this.isOverloaded()) {
-      this._safeInvokeCallback(
-        callback,
-        createQueueOverloadedError(this._pending.size, this._maxPendingRequests)
-      );
-      return;
-    }
-
-    const id = ++this._requestId;
-    this._pending.set(id, { action, callback });
-    try {
-      this._worker.postMessage({ id, action, ...payload });
-    } catch (error) {
-      this._pending.delete(id);
-      this._safeInvokeCallback(callback, error);
-    }
-  }
-
-  exec(sql, callback) {
-    this._dispatch('exec', { sql }, callback);
   }
 
   _normalizeParams(params, callback) {
-    if (typeof params === 'function') {
-      return { params: undefined, callback: params };
-    }
-    return { params, callback };
+    if (typeof params === 'function') return { params: [], callback: params };
+    return { params: Array.isArray(params) ? params : (params === undefined ? [] : [params]), callback };
   }
 
   _normalizeStatementArgs(args) {
     const values = Array.from(args ?? []);
     let callback;
-    if (values.length && typeof values[values.length - 1] === 'function') {
-      callback = values.pop();
-    }
-    if (values.length === 0) {
-      return { params: undefined, callback };
-    }
-    if (values.length === 1) {
-      return { params: values[0], callback };
-    }
+    if (values.length && typeof values[values.length - 1] === 'function') callback = values.pop();
+    if (values.length === 0) return { params: [], callback };
+    if (values.length === 1 && Array.isArray(values[0])) return { params: values[0], callback };
     return { params: values, callback };
+  }
+
+  _enqueue(task) {
+    if (this.isOverloaded()) {
+      return Promise.reject(createQueueOverloadedError(this._pendingCount, this._maxPendingRequests));
+    }
+    this._pendingCount += 1;
+    const run = this._chain.then(task, task).finally(() => {
+      this._pendingCount = Math.max(0, this._pendingCount - 1);
+    });
+    this._chain = run.catch(() => {});
+    return run;
+  }
+
+  async _tableInfo(sql) {
+    const match = String(sql || '').match(/^PRAGMA\s+table_info\(([^)]+)\)/i);
+    if (!match) return null;
+    const rawName = match[1].trim().replace(/^[`'\"]|[`'\"]$/g, '');
+    const result = await this._pool.query(`
+      SELECT column_name AS name
+      FROM information_schema.columns
+      WHERE table_schema = current_schema()
+        AND table_name = $1
+      ORDER BY ordinal_position
+    `, [rawName.toLowerCase()]);
+    return result.rows.map((row) => ({ name: IDENTIFIER_MAP.get(String(row.name).toLowerCase()) || row.name }));
+  }
+
+  async _foreignKeyList() {
+    return [];
+  }
+
+  async _queryNow(sql, params = []) {
+    if (this._closed) throw new Error('Database connection is closed');
+    const tableInfo = await this._tableInfo(sql);
+    if (tableInfo) return { rows: tableInfo, rowCount: tableInfo.length };
+    if (/^PRAGMA\s+foreign_key_list\b/i.test(String(sql || '').trim())) return { rows: await this._foreignKeyList(), rowCount: 0 };
+    const prepared = preparePostgresSql(sql);
+    if (!prepared) return { rows: [], rowCount: 0 };
+    return this._pool.query(prepared, params);
+  }
+
+  _query(sql, params = []) {
+    return this._enqueue(() => this._queryNow(sql, params));
+  }
+
+  exec(sql, callback) {
+    this._enqueue(async () => {
+      for (const statement of splitSqlStatements(sql)) {
+        await this._queryNow(statement, []);
+      }
+    })
+      .then(() => this._safeInvokeCallback(callback, null))
+      .catch((err) => this._safeInvokeCallback(callback, err));
   }
 
   run(sql, params, callback) {
     const normalized = this._normalizeParams(params, callback);
-    this._dispatch('run', { sql, params: normalized.params }, normalized.callback);
+    this._query(sql, normalized.params)
+      .then((result) => this._safeInvokeCallback(normalized.callback, null, undefined, {
+        changes: Number(result?.rowCount ?? 0),
+        lastID: result?.rows?.[0]?.id ?? null
+      }))
+      .catch((err) => this._safeInvokeCallback(normalized.callback, err));
   }
 
   get(sql, params, callback) {
     const normalized = this._normalizeParams(params, callback);
-    this._dispatch('get', { sql, params: normalized.params }, normalized.callback);
+    this._query(sql, normalized.params)
+      .then((result) => this._safeInvokeCallback(normalized.callback, null, normalizeRow(result?.rows?.[0]) || null))
+      .catch((err) => this._safeInvokeCallback(normalized.callback, err));
   }
 
   all(sql, params, callback) {
     const normalized = this._normalizeParams(params, callback);
-    this._dispatch('all', { sql, params: normalized.params }, normalized.callback);
+    this._query(sql, normalized.params)
+      .then((result) => this._safeInvokeCallback(normalized.callback, null, (result?.rows || []).map(normalizeRow)))
+      .catch((err) => this._safeInvokeCallback(normalized.callback, err));
   }
 
   prepare(sql) {
@@ -217,27 +314,14 @@ class SqliteCompat {
         const { params, callback } = this._normalizeStatementArgs(args);
         this.all(sql, params, callback);
       },
-      finalize: (callback) => {
-        this._safeInvokeCallback(callback, null);
-      }
+      finalize: (callback) => this._safeInvokeCallback(callback, null)
     };
   }
 
-  pendingCount() {
-    return this._pending.size;
-  }
-
-  maxPendingRequests() {
-    return this._maxPendingRequests;
-  }
-
-  isOverloaded() {
-    return this._pending.size >= this._maxPendingRequests;
-  }
-
-  serialize(fn) {
-    if (typeof fn === 'function') fn();
-  }
+  pendingCount() { return this._pendingCount; }
+  maxPendingRequests() { return this._maxPendingRequests; }
+  isOverloaded() { return this._pendingCount >= this._maxPendingRequests; }
+  serialize(fn) { if (typeof fn === 'function') fn(); }
 
   close(callback) {
     if (this._closed) {
@@ -245,20 +329,14 @@ class SqliteCompat {
       return;
     }
     this._closed = true;
-    this._dispatch('close', {}, (err) => {
-      if (err) {
-        this._safeInvokeCallback(callback, err);
-        return;
-      }
-      this._worker.terminate()
-        .then(() => this._safeInvokeCallback(callback, null))
-        .catch((terminateError) => this._safeInvokeCallback(callback, terminateError));
-    });
+    this._chain
+      .then(() => this._pool.end())
+      .then(() => this._safeInvokeCallback(callback, null))
+      .catch((err) => this._safeInvokeCallback(callback, err));
   }
 }
 
 class Database {
-
   constructor() {
     this.db = null;
     this.logger = console;
@@ -268,24 +346,8 @@ class Database {
     this.logger = logger ?? this.logger;
     return new Promise((resolve, reject) => {
       try {
-        this.db = new SqliteCompat(path.join(path.dirname(__filename), 'messagedrop.db'), this.logger);
-        this.db.exec(`
-          PRAGMA journal_mode = WAL;
-          PRAGMA synchronous = NORMAL;
-          PRAGMA busy_timeout = 5000;
-          PRAGMA temp_store = MEMORY;
-          PRAGMA wal_autocheckpoint = 1000;
-        `, (pragmaErr) => {
-          if (pragmaErr) {
-            this.logger.error(pragmaErr.message);
-          }
-        });
+        this.db = new PostgresCompat(createDbConfigFromEnv(), this.logger);
         this.db.serialize(() => {
-          this.db.run('PRAGMA foreign_keys = ON;', [], (pragmaErr) => {
-            if (pragmaErr) {
-              this.logger.error(pragmaErr.message);
-            }
-          });
           tableUser.init(this.db);
           tableConnect.init(this.db);
           tableContact.init(this.db);
@@ -302,40 +364,34 @@ class Database {
           tableMaintenance.init(this.db);
           tableUsageProtection.init(this.db);
           tableUserModerationAppeal.init(this.db);
-
-          // Trigger initialisieren
           this.initTriggers(this.logger);
-
           this.initIndexes(this.logger);
-
           this.db.get('SELECT 1;', (readyErr) => {
             if (readyErr) {
               reject(readyErr);
               return;
             }
-            this.logger.info('Connected to the messagedrop SQlite database.');
+            this.logger.info('Connected to the messagedrop PostgreSQL database.');
             resolve();
           });
         });
       } catch (err) {
-        this.logger.error('Failed to open SQLite database.', err);
+        this.logger.error('Failed to open PostgreSQL database.', err);
         reject(err);
       }
     });
-  };
+  }
 
   close() {
     try {
       this.db?.close((err) => {
-        if (err) {
-          return;
-        }
+        if (err) return;
         this.logger?.info('Close the database connection.');
       });
     } catch (err) {
       this.logger?.error?.(err?.message || err);
     }
-  };
+  }
 
   pendingCount() {
     return typeof this.db?.pendingCount === 'function' ? this.db.pendingCount() : 0;
@@ -565,7 +621,6 @@ class Database {
       }
     });
   }
-
 }
 
-module.exports = Database
+module.exports = Database;

@@ -28,7 +28,7 @@ const init = function (db) {
       ${columnSignature} TEXT NOT NULL,
       ${columnTranslatedMessage} TEXT DEFAULT NULL,
       ${columnStatus} TEXT NOT NULL DEFAULT 'sent' CHECK (${columnStatus} IN ('sent','delivered','read','deleted')),
-      ${columnCreatedAt} TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
+      ${columnCreatedAt} TEXT NOT NULL DEFAULT (to_char(CURRENT_TIMESTAMP AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS')),
       ${columnReadAt} TEXT DEFAULT NULL,
       ${columnReaction} TEXT DEFAULT NULL,
       FOREIGN KEY (${columnContactId})
@@ -55,7 +55,7 @@ const init = function (db) {
       ${deletedEventColumnId} INTEGER PRIMARY KEY AUTOINCREMENT,
       ${deletedEventColumnContactId} TEXT NOT NULL,
       ${deletedEventColumnMessageId} TEXT NOT NULL,
-      ${deletedEventColumnDeletedAt} TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now'))
+      ${deletedEventColumnDeletedAt} TEXT NOT NULL DEFAULT (to_char(CURRENT_TIMESTAMP AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS'))
     );
 
     CREATE INDEX IF NOT EXISTS idx_msg_deleted_event_contact_id
@@ -95,7 +95,7 @@ const init = function (db) {
     BEGIN
       INSERT INTO ${deletedEventTableName}
       (${deletedEventColumnContactId}, ${deletedEventColumnMessageId}, ${deletedEventColumnDeletedAt})
-      VALUES (OLD.${columnContactId}, OLD.${columnMessageId}, strftime('%Y-%m-%dT%H:%M:%S','now'));
+      VALUES (OLD.${columnContactId}, OLD.${columnMessageId}, to_char(CURRENT_TIMESTAMP AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS'));
     END;
   `;
     db.exec(deleteTrig, (err) => { if (err) throw err; });
@@ -120,7 +120,7 @@ const createMessage = function (db, {
     INSERT INTO ${tableName}
       (${columnId}, ${columnContactId}, ${columnMessageId}, ${columnDirection},
        ${columnMessage}, ${columnSignature}, ${columnStatus}, ${columnCreatedAt}, ${columnReadAt}, ${columnReaction})
-    VALUES (?, ?, ?, ?, ?, ?, ?, COALESCE(?, strftime('%Y-%m-%dT%H:%M:%S','now')), ?, ?);
+    VALUES (?, ?, ?, ?, ?, ?, ?, COALESCE(?, to_char(CURRENT_TIMESTAMP AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS')), ?, ?);
   `;
     const params = [id, contactId, messageId, direction, message, signature, status, createdAt ?? null, normalizedReadAt, reaction ?? null];
     db.run(sql, params, (err) => callback(err));
@@ -130,7 +130,7 @@ const createMessage = function (db, {
 const markAsRead = function (db, messageId, callback) {
     const sql = `
     UPDATE ${tableName}
-    SET ${columnReadAt} = COALESCE(${columnReadAt}, strftime('%Y-%m-%dT%H:%M:%S','now')),
+    SET ${columnReadAt} = COALESCE(${columnReadAt}, to_char(CURRENT_TIMESTAMP AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS')),
         ${columnStatus} = 'read'
     WHERE ${columnId} = ?;
   `;
@@ -140,11 +140,11 @@ const markAsRead = function (db, messageId, callback) {
 const markManyAsReadByContact = function (db, contactId, beforeIso, callback) {
     const sql = `
     UPDATE ${tableName}
-    SET ${columnReadAt} = COALESCE(${columnReadAt}, strftime('%Y-%m-%dT%H:%M:%S','now')),
+    SET ${columnReadAt} = COALESCE(${columnReadAt}, to_char(CURRENT_TIMESTAMP AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS')),
         ${columnStatus} = 'read'
     WHERE ${columnContactId} = ?
       AND ${columnReadAt} IS NULL
-      AND ${columnCreatedAt} <= COALESCE(?, strftime('%Y-%m-%dT%H:%M:%S','now'));
+      AND ${columnCreatedAt} <= COALESCE(?, to_char(CURRENT_TIMESTAMP AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS'));
   `;
     db.run(sql, [contactId, beforeIso ?? null], (err) => callback(err));
 };
@@ -255,7 +255,7 @@ const deleteByContactAndMessageId = function (db, contactId, messageId, callback
 const markAsReadByContactAndMessageId = function (db, contactId, messageId, callback) {
     const sql = `
     UPDATE ${tableName}
-    SET ${columnReadAt} = COALESCE(${columnReadAt}, strftime('%Y-%m-%dT%H:%M:%S','now')),
+    SET ${columnReadAt} = COALESCE(${columnReadAt}, to_char(CURRENT_TIMESTAMP AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS')),
         ${columnStatus} = 'read'
     WHERE ${columnContactId} = ?
       AND ${columnMessageId} = ?;

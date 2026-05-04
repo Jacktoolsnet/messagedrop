@@ -1312,7 +1312,7 @@ async function restoreUserBackup(db, backup) {
   const likeColumns = ['likeMessageUuid', 'likeUserId'];
   const dislikeColumns = ['dislikeMessageUuid', 'dislikeUserId'];
 
-  await runQuery(db, 'BEGIN IMMEDIATE');
+  await runQuery(db, 'BEGIN');
 
   try {
     await insertRows(db, 'tableUser', userColumns, tables.tableUser);
@@ -1666,6 +1666,7 @@ router.post('/restore',
       const restoreSummary = await restoreUserBackup(req.database.db, sanitizedBackup);
       res.status(200).json({ status: 200, restoreSummary });
     } catch (err) {
+      req.logger?.error('User restore failed', { error: err?.message || err });
       if (err?.code === 'INVALID_BACKUP') {
         return next(apiError.badRequest('invalid_backup'));
       }

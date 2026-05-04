@@ -30,7 +30,7 @@ const init = function (db) {
  */
 const toggleLike = function (db, messageUuid, userId, callback) {
     db.serialize(() => {
-        db.run('BEGIN IMMEDIATE', (bErr) => {
+        db.run('BEGIN', (bErr) => {
             if (bErr) return callback(bErr);
 
             const delSql = `

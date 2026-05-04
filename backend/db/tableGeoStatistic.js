@@ -12,7 +12,7 @@ const init = function (db) {
             ${columnCountryCode} TEXT PRIMARY KEY, 
             ${columnCountryData} TEXT, 
             ${columnWorldbankData} TEXT,
-            ${columnLastUpdate} DATETIME DEFAULT CURRENT_TIMESTAMP
+            ${columnLastUpdate} TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
         );`;
 
         db.run(sql, (err) => {
@@ -28,8 +28,12 @@ const init = function (db) {
 const setCountryData = function (db, countryCode, countryData, worldBankData, callback) {
     try {
         let sql = `
-        INSERT OR REPLACE INTO ${tableName} (${columnCountryCode}, ${columnCountryData}, ${columnWorldbankData}, ${columnLastUpdate})
-        VALUES (?, ?, ?, datetime('now'));`;
+        INSERT INTO ${tableName} (${columnCountryCode}, ${columnCountryData}, ${columnWorldbankData}, ${columnLastUpdate})
+        VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+        ON CONFLICT (${columnCountryCode}) DO UPDATE SET
+            ${columnCountryData} = EXCLUDED.${columnCountryData},
+            ${columnWorldbankData} = EXCLUDED.${columnWorldbankData},
+            ${columnLastUpdate} = CURRENT_TIMESTAMP;`;
 
         db.run(sql, [
             countryCode,
@@ -58,7 +62,7 @@ const getCountryData = function (db, countryCode, callback) {
 const cleanExpired = function (db, callback) {
     const sql = `
         DELETE FROM ${tableName}
-        WHERE DATETIME(${columnLastUpdate}) < DATETIME('now', '-1 month');
+        WHERE ${columnLastUpdate} < CURRENT_TIMESTAMP - INTERVAL '1 month';
     `;
     db.run(sql, callback);
 };

@@ -156,7 +156,7 @@ const clean = function (db, callback) {
     try {
         let sql = `
         DELETE FROM ${tableName}
-        WHERE DATETIME(${columnLastSignOfLife}) < DATETIME('now','-90 days');`;
+        WHERE ${columnLastSignOfLife} < EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP - INTERVAL '90 days'))::BIGINT;`;
 
         db.run(sql, (err) => {
             callback(err)

@@ -640,7 +640,7 @@ const cleanPublic = function (db, callback) {
             SELECT ${columnParentUuid} AS parentUuid, COUNT(*) AS count
             FROM ${tableName}
             WHERE ${columnMessageType} = '${messageType.PUBLIC}'
-            AND DATETIME(${columnMessageDeleteDateTime}) < DATETIME('now')
+            AND ${columnMessageDeleteDateTime} < EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)::BIGINT
             AND ${columnParentUuid} IS NOT NULL
             GROUP BY ${columnParentUuid};
         `;
@@ -653,7 +653,7 @@ const cleanPublic = function (db, callback) {
                 return new Promise((resolve, reject) => {
                     const updateSql = `
                         UPDATE ${tableName}
-                        SET ${columnCommentsNumber} = MAX(${columnCommentsNumber} - ?, 0)
+                        SET ${columnCommentsNumber} = GREATEST(${columnCommentsNumber} - ?, 0)
                         WHERE ${columnUuid} = ?;
                     `;
                     db.run(updateSql, [row.count, row.parentUuid], function (updateErr) {
@@ -668,7 +668,7 @@ const cleanPublic = function (db, callback) {
                     const deleteSql = `
                         DELETE FROM ${tableName}
                         WHERE ${columnMessageType} = '${messageType.PUBLIC}'
-                        AND DATETIME(${columnMessageDeleteDateTime}) < DATETIME('now');
+                        AND ${columnMessageDeleteDateTime} < EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)::BIGINT;
                     `;
                     db.run(deleteSql, (deleteErr) => {
                         if (deleteErr) {
