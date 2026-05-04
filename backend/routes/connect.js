@@ -162,7 +162,7 @@ async function getOrCreateContact(db, { userId, contactUserId, hint, signingPubl
 }
 
 async function consumeConnectAndCreateContacts(db, connectId, requester) {
-  await runQuery(db, 'BEGIN IMMEDIATE');
+  await runQuery(db, 'BEGIN');
   try {
     const row = await queryGet(db, 'SELECT * FROM tableConnect WHERE id = ?;', [connectId]);
     if (!row) {
@@ -213,7 +213,7 @@ async function consumeConnectAndCreateContacts(db, connectId, requester) {
 }
 
 async function consumeConnectRecord(db, connectId) {
-  await runQuery(db, 'BEGIN IMMEDIATE');
+  await runQuery(db, 'BEGIN');
   try {
     const row = await queryGet(db, 'SELECT * FROM tableConnect WHERE id = ?;', [connectId]);
     if (!row) {
@@ -329,7 +329,12 @@ router.post('/consume/:connectId',
         reciprocalContactCreated: result.reciprocalContactCreated,
         alreadyConnected: result.alreadyConnected
       });
-    } catch {
+    } catch (err) {
+      req.logger?.error?.('Connect consume failed', {
+        error: err?.message || err,
+        connectId: normalizedConnectId,
+        userId: req.body?.userId
+      });
       return next(apiError.internal('db_error'));
     }
   });

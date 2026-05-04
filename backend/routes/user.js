@@ -1873,7 +1873,7 @@ router.post('/reset-keys',
       );
       const contactUserIds = contactRows.map((row) => row.userId).filter(Boolean);
 
-      await runQuery(req.database.db, 'BEGIN IMMEDIATE');
+      await runQuery(req.database.db, 'BEGIN');
       await runQuery(
         req.database.db,
         'UPDATE tableUser SET signingPublicKey = ?, cryptoPublicKey = ? WHERE id = ?;',

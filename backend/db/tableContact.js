@@ -93,7 +93,7 @@ const init = function (db) {
             const copySql = `INSERT INTO ${newTable} (${columnList}) SELECT ${columnList} FROM ${tableName};`;
 
             db.serialize(() => {
-                db.run('BEGIN IMMEDIATE');
+                db.run('BEGIN');
                 db.run(`DROP TABLE IF EXISTS ${newTable};`);
                 db.run(createNew);
                 db.run(copySql);
