@@ -98,6 +98,22 @@ const init = function (db) {
             }
         });
 
+        db.exec(`
+            CREATE SEQUENCE IF NOT EXISTS tablemessage_id_seq;
+            ALTER SEQUENCE tablemessage_id_seq OWNED BY ${tableName}.${columnMessageId};
+            SELECT setval(
+                'tablemessage_id_seq',
+                COALESCE((SELECT MAX(${columnMessageId}) FROM ${tableName}), 0) + 1,
+                false
+            );
+            ALTER TABLE ${tableName}
+                ALTER COLUMN ${columnMessageId} SET DEFAULT nextval('tablemessage_id_seq');
+        `, (err) => {
+            if (err) {
+                throw err;
+            }
+        });
+
         db.all(`PRAGMA table_info(${tableName});`, (err, rows) => {
             if (err || !rows) {
                 return;

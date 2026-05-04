@@ -118,14 +118,29 @@ function replaceSqlitePlaceholders(sql) {
   return String(sql || '').replace(/\?/g, () => `$${++index}`);
 }
 
+
+function stripLeadingSqlComments(sql) {
+  let prepared = String(sql || '').trim();
+  let previous;
+  do {
+    previous = prepared;
+    prepared = prepared.replace(/^--[^\n]*(?:\n|$)/, '').trimStart();
+    prepared = prepared.replace(/^\/\*[\s\S]*?\*\//, '').trimStart();
+  } while (prepared !== previous);
+  return prepared;
+}
+
 function preparePostgresSql(sql) {
   let prepared = String(sql || '').trim();
   if (!prepared) return prepared;
-  if (/^PRAGMA\b/i.test(prepared)) return '';
-  if (/^CREATE\s+TRIGGER\b/i.test(prepared)) return '';
+  const executable = stripLeadingSqlComments(prepared);
+  if (/^PRAGMA\b/i.test(executable)) return '';
+  if (/^CREATE\s+TRIGGER\b/i.test(executable) && /\bBEGIN\b/i.test(executable)) return '';
 
   prepared = prepared.replace(/\s+COLLATE\s+NOCASE\b/gi, '');
   prepared = prepared.replace(/\bINTEGER\s+PRIMARY\s+KEY\s+AUTOINCREMENT\b/gi, 'BIGSERIAL PRIMARY KEY');
+  prepared = prepared.replace(/\bid\s+INTEGER\s+PRIMARY\s+KEY\s+NOT\s+NULL\b/gi, 'id BIGSERIAL PRIMARY KEY');
+  prepared = prepared.replace(/\bid\s+INTEGER\s+PRIMARY\s+KEY\b/gi, 'id BIGSERIAL PRIMARY KEY');
   prepared = prepared.replace(/\bDATETIME\b/gi, 'TIMESTAMPTZ');
   prepared = prepared.replace(/\bNUMBER\b/gi, 'REAL');
   prepared = prepared.replace(/\bINTEGER\b/g, 'BIGINT');
@@ -145,6 +160,14 @@ function preparePostgresSql(sql) {
 
   if (/^INSERT\s+INTO\b/i.test(prepared) && /\bOR\s+IGNORE\b/i.test(String(sql || '')) && !/\bON\s+CONFLICT\b/i.test(prepared)) {
     prepared = `${prepared.replace(/;\s*$/, '')} ON CONFLICT DO NOTHING`;
+  }
+
+  if (
+    /^INSERT\s+INTO\s+tableMessage\b/i.test(prepared)
+    && !/\bON\s+CONFLICT\b/i.test(prepared)
+    && !/\bRETURNING\b/i.test(prepared)
+  ) {
+    prepared = `${prepared.replace(/;\s*$/, '')} RETURNING id`;
   }
 
   return replaceSqlitePlaceholders(prepared);
@@ -409,138 +432,189 @@ class Database {
 
   initTriggers(logger = this.logger) {
     const triggers = `
-    /* =======================
-       LIKE / DISLIKE 
-       ======================= */
-       
-    -- Likes inkrementieren
-    CREATE TRIGGER IF NOT EXISTS trg_like_after_insert
-    AFTER INSERT ON tableLike
+    CREATE OR REPLACE FUNCTION md_like_after_insert()
+    RETURNS trigger LANGUAGE plpgsql AS $$
     BEGIN
       UPDATE tableMessage
       SET likes = likes + 1
       WHERE uuid = NEW.likeMessageUuid;
+      RETURN NEW;
     END;
+    $$;
 
-    -- Likes dekrementieren
-    CREATE TRIGGER IF NOT EXISTS trg_like_after_delete
-    AFTER DELETE ON tableLike
+    DROP TRIGGER IF EXISTS trg_like_after_insert ON tableLike;
+    CREATE TRIGGER trg_like_after_insert
+    AFTER INSERT ON tableLike
+    FOR EACH ROW EXECUTE FUNCTION md_like_after_insert();
+
+    CREATE OR REPLACE FUNCTION md_like_after_delete()
+    RETURNS trigger LANGUAGE plpgsql AS $$
     BEGIN
       UPDATE tableMessage
-      SET likes = CASE WHEN likes > 0 THEN likes - 1 ELSE 0 END
+      SET likes = GREATEST(likes - 1, 0)
       WHERE uuid = OLD.likeMessageUuid;
+      RETURN OLD;
     END;
+    $$;
 
-    -- Dislikes inkrementieren
-    CREATE TRIGGER IF NOT EXISTS trg_dislike_after_insert
-    AFTER INSERT ON tableDislike
+    DROP TRIGGER IF EXISTS trg_like_after_delete ON tableLike;
+    CREATE TRIGGER trg_like_after_delete
+    AFTER DELETE ON tableLike
+    FOR EACH ROW EXECUTE FUNCTION md_like_after_delete();
+
+    CREATE OR REPLACE FUNCTION md_dislike_after_insert()
+    RETURNS trigger LANGUAGE plpgsql AS $$
     BEGIN
       UPDATE tableMessage
       SET dislikes = dislikes + 1
       WHERE uuid = NEW.dislikeMessageUuid;
+      RETURN NEW;
     END;
+    $$;
 
-    -- Dislikes dekrementieren
-    CREATE TRIGGER IF NOT EXISTS trg_dislike_after_delete
-    AFTER DELETE ON tableDislike
+    DROP TRIGGER IF EXISTS trg_dislike_after_insert ON tableDislike;
+    CREATE TRIGGER trg_dislike_after_insert
+    AFTER INSERT ON tableDislike
+    FOR EACH ROW EXECUTE FUNCTION md_dislike_after_insert();
+
+    CREATE OR REPLACE FUNCTION md_dislike_after_delete()
+    RETURNS trigger LANGUAGE plpgsql AS $$
     BEGIN
       UPDATE tableMessage
-      SET dislikes = CASE WHEN dislikes > 0 THEN dislikes - 1 ELSE 0 END
+      SET dislikes = GREATEST(dislikes - 1, 0)
       WHERE uuid = OLD.dislikeMessageUuid;
+      RETURN OLD;
     END;
+    $$;
 
-    /* ===== XOR: Like vs. Dislike ===== */
+    DROP TRIGGER IF EXISTS trg_dislike_after_delete ON tableDislike;
+    CREATE TRIGGER trg_dislike_after_delete
+    AFTER DELETE ON tableDislike
+    FOR EACH ROW EXECUTE FUNCTION md_dislike_after_delete();
 
-    /* Wenn ein Like gesetzt wird, lösche ggf. das Dislike des gleichen Users/Message */
-    CREATE TRIGGER IF NOT EXISTS trg_like_xor_dislike
-    AFTER INSERT ON tableLike
+    CREATE OR REPLACE FUNCTION md_like_xor_dislike()
+    RETURNS trigger LANGUAGE plpgsql AS $$
     BEGIN
       DELETE FROM tableDislike
       WHERE dislikeMessageUuid = NEW.likeMessageUuid
-        AND dislikeUserId    = NEW.likeUserId;
+        AND dislikeUserId = NEW.likeUserId;
+      RETURN NEW;
     END;
+    $$;
 
-    /* Wenn ein Dislike gesetzt wird, lösche ggf. das Like des gleichen Users/Message */
-    CREATE TRIGGER IF NOT EXISTS trg_dislike_xor_like
-    AFTER INSERT ON tableDislike
+    DROP TRIGGER IF EXISTS trg_like_xor_dislike ON tableLike;
+    CREATE TRIGGER trg_like_xor_dislike
+    AFTER INSERT ON tableLike
+    FOR EACH ROW EXECUTE FUNCTION md_like_xor_dislike();
+
+    CREATE OR REPLACE FUNCTION md_dislike_xor_like()
+    RETURNS trigger LANGUAGE plpgsql AS $$
     BEGIN
       DELETE FROM tableLike
       WHERE likeMessageUuid = NEW.dislikeMessageUuid
-        AND likeUserId    = NEW.dislikeUserId;
+        AND likeUserId = NEW.dislikeUserId;
+      RETURN NEW;
     END;
+    $$;
 
-    /* =======================
-       COMMENTS COUNTER
-       ======================= */
+    DROP TRIGGER IF EXISTS trg_dislike_xor_like ON tableDislike;
+    CREATE TRIGGER trg_dislike_xor_like
+    AFTER INSERT ON tableDislike
+    FOR EACH ROW EXECUTE FUNCTION md_dislike_xor_like();
 
-    -- 1) Neuer Kommentar: Parent-Zähler ++ (nur wenn der Kommentar enabled ist)
-    CREATE TRIGGER IF NOT EXISTS trg_msg_comment_after_insert
+    CREATE OR REPLACE FUNCTION md_comment_after_insert()
+    RETURNS trigger LANGUAGE plpgsql AS $$
+    BEGIN
+      UPDATE tableMessage
+      SET commentsNumber = commentsNumber + 1
+      WHERE uuid = NEW.parentUuid;
+      RETURN NEW;
+    END;
+    $$;
+
+    DROP TRIGGER IF EXISTS trg_msg_comment_after_insert ON tableMessage;
+    CREATE TRIGGER trg_msg_comment_after_insert
     AFTER INSERT ON tableMessage
-    WHEN NEW.parentUuid IS NOT NULL AND NEW.status = 'enabled'
-    BEGIN
-      UPDATE tableMessage
-      SET commentsNumber = commentsNumber + 1
-      WHERE uuid = NEW.parentUuid;
-    END;
+    FOR EACH ROW
+    WHEN (NEW.parentUuid IS NOT NULL AND NEW.status = 'enabled')
+    EXECUTE FUNCTION md_comment_after_insert();
 
-    -- 2) Kommentar gelöscht: Parent-Zähler -- (nur wenn der Kommentar enabled war)
-    CREATE TRIGGER IF NOT EXISTS trg_msg_comment_after_delete
-    AFTER DELETE ON tableMessage
-    WHEN OLD.parentUuid IS NOT NULL AND OLD.status = 'enabled'
+    CREATE OR REPLACE FUNCTION md_comment_after_delete()
+    RETURNS trigger LANGUAGE plpgsql AS $$
     BEGIN
       UPDATE tableMessage
-      SET commentsNumber = CASE
-        WHEN commentsNumber > 0 THEN commentsNumber - 1
-        ELSE 0
-      END
+      SET commentsNumber = GREATEST(commentsNumber - 1, 0)
       WHERE uuid = OLD.parentUuid;
+      RETURN OLD;
     END;
+    $$;
 
-    -- 3) Kommentar-Status geändert: disabled -> enabled  => ++
-    CREATE TRIGGER IF NOT EXISTS trg_msg_comment_after_update_status_enable
-    AFTER UPDATE OF status ON tableMessage
-    WHEN NEW.parentUuid IS NOT NULL
-         AND OLD.status <> 'enabled'
-         AND NEW.status = 'enabled'
+    DROP TRIGGER IF EXISTS trg_msg_comment_after_delete ON tableMessage;
+    CREATE TRIGGER trg_msg_comment_after_delete
+    AFTER DELETE ON tableMessage
+    FOR EACH ROW
+    WHEN (OLD.parentUuid IS NOT NULL AND OLD.status = 'enabled')
+    EXECUTE FUNCTION md_comment_after_delete();
+
+    CREATE OR REPLACE FUNCTION md_comment_after_status_enable()
+    RETURNS trigger LANGUAGE plpgsql AS $$
     BEGIN
       UPDATE tableMessage
       SET commentsNumber = commentsNumber + 1
       WHERE uuid = NEW.parentUuid;
+      RETURN NEW;
     END;
+    $$;
 
-    -- 4) Kommentar-Status geändert: enabled -> disabled  => --
-    CREATE TRIGGER IF NOT EXISTS trg_msg_comment_after_update_status_disable
+    DROP TRIGGER IF EXISTS trg_msg_comment_after_update_status_enable ON tableMessage;
+    CREATE TRIGGER trg_msg_comment_after_update_status_enable
     AFTER UPDATE OF status ON tableMessage
-    WHEN NEW.parentUuid IS NOT NULL
-         AND OLD.status = 'enabled'
-         AND NEW.status <> 'enabled'
+    FOR EACH ROW
+    WHEN (NEW.parentUuid IS NOT NULL AND OLD.status <> 'enabled' AND NEW.status = 'enabled')
+    EXECUTE FUNCTION md_comment_after_status_enable();
+
+    CREATE OR REPLACE FUNCTION md_comment_after_status_disable()
+    RETURNS trigger LANGUAGE plpgsql AS $$
     BEGIN
       UPDATE tableMessage
-      SET commentsNumber = CASE
-        WHEN commentsNumber > 0 THEN commentsNumber - 1
-        ELSE 0
-      END
+      SET commentsNumber = GREATEST(commentsNumber - 1, 0)
       WHERE uuid = NEW.parentUuid;
+      RETURN NEW;
     END;
+    $$;
 
-    -- 5) Kommentar wird umgehängt (Parentwechsel): alter-- / neuer++
-    CREATE TRIGGER IF NOT EXISTS trg_msg_comment_after_update_parent
+    DROP TRIGGER IF EXISTS trg_msg_comment_after_update_status_disable ON tableMessage;
+    CREATE TRIGGER trg_msg_comment_after_update_status_disable
+    AFTER UPDATE OF status ON tableMessage
+    FOR EACH ROW
+    WHEN (NEW.parentUuid IS NOT NULL AND OLD.status = 'enabled' AND NEW.status <> 'enabled')
+    EXECUTE FUNCTION md_comment_after_status_disable();
+
+    CREATE OR REPLACE FUNCTION md_comment_after_parent_update()
+    RETURNS trigger LANGUAGE plpgsql AS $$
+    BEGIN
+      IF OLD.parentUuid IS NOT NULL THEN
+        UPDATE tableMessage
+        SET commentsNumber = GREATEST(commentsNumber - 1, 0)
+        WHERE uuid = OLD.parentUuid;
+      END IF;
+
+      IF NEW.parentUuid IS NOT NULL THEN
+        UPDATE tableMessage
+        SET commentsNumber = commentsNumber + 1
+        WHERE uuid = NEW.parentUuid;
+      END IF;
+
+      RETURN NEW;
+    END;
+    $$;
+
+    DROP TRIGGER IF EXISTS trg_msg_comment_after_update_parent ON tableMessage;
+    CREATE TRIGGER trg_msg_comment_after_update_parent
     AFTER UPDATE OF parentUuid ON tableMessage
-    WHEN (OLD.parentUuid IS NOT NEW.parentUuid) AND NEW.status = 'enabled'
-    BEGIN
-      -- beim alten Parent dekrementieren (wenn vorhanden)
-      UPDATE tableMessage
-      SET commentsNumber = CASE
-        WHEN commentsNumber > 0 THEN commentsNumber - 1
-        ELSE 0
-      END
-      WHERE uuid = OLD.parentUuid AND OLD.parentUuid IS NOT NULL;
-
-      -- beim neuen Parent inkrementieren (wenn vorhanden)
-      UPDATE tableMessage
-      SET commentsNumber = commentsNumber + 1
-      WHERE uuid = NEW.parentUuid AND NEW.parentUuid IS NOT NULL;
-    END;
+    FOR EACH ROW
+    WHEN (OLD.parentUuid IS DISTINCT FROM NEW.parentUuid AND NEW.status = 'enabled')
+    EXECUTE FUNCTION md_comment_after_parent_update();
   `;
 
     this.db.exec(triggers, (err) => {
