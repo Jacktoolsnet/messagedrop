@@ -24,7 +24,7 @@ const placeSubscriptions = function (logger, db, lat, lon, userId, messageText, 
         INNER JOIN tableUser ON tablePlace.userId = tableUser.id
         WHERE ? BETWEEN tablePlace.latMin AND tablePlace.latMax
         AND ? BETWEEN tablePlace.lonMin AND tablePlace.lonMax
-        AND tablePlace.subscribed = 1
+        AND tablePlace.subscribed = true
         AND tablePlace.userId <> ?;`;
         db.all(sql, [latValue, lonValue, String(userId ?? '')], (err, rows) => {
             if (err) {
@@ -99,7 +99,7 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
         INNER JOIN tableUser ON tableContact.userId = tableUser.id
         WHERE contactUserId = ?
         AND userId = ?
-        AND subscribed = 1;`;
+        AND tableContact.subscribed = true;`;
         db.all(sql, [String(userId ?? ''), String(contactUserId ?? '')], (err, rows) => {
             if (err) {
                 logger.error('contactSubscriptions query failed', {

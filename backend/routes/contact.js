@@ -12,6 +12,9 @@ const { signServiceJwt } = require('../utils/serviceJwt');
 const { resolveBaseUrl } = require('../utils/adminLogForwarder');
 const SOCKET_AUDIENCE = process.env.SERVICE_JWT_AUDIENCE_SOCKET || 'service.socketio';
 
+function toBoolean(value) {
+  return value === true || value === 1 || value === '1';
+}
 
 function resolveSocketIoBaseUrl() {
   return resolveBaseUrl(process.env.SOCKETIO_BASE_URL || process.env.BASE_URL, process.env.SOCKETIO_PORT);
@@ -176,7 +179,7 @@ router.get('/get/userId/:userId',
           'contactUserEncryptionPublicKey': row.contactUserEncryptionPublicKey,
           'contactUserEncryptedMessage': row.contactUserEncryptedMessage,
           'contactUserSignature': row.contactUserSignature,
-          'subscribed': row.subscribed === 0 ? false : true,
+          'subscribed': toBoolean(row.subscribed),
           'hint': row.hint == null ? '' : row.hint,
           'name': row.name == null ? '' : row.name,
           'base64Avatar': row.base64Avatar,

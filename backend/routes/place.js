@@ -13,6 +13,10 @@ function getAuthUserId(req) {
   return req.jwtUser?.userId ?? req.jwtUser?.id ?? null;
 }
 
+function toBoolean(value) {
+  return value === true || value === 1 || value === '1';
+}
+
 function ensureSameUser(req, res, userId, next) {
   const authUserId = getAuthUserId(req);
   if (!authUserId) {
@@ -151,8 +155,8 @@ router.get('/get/userId/:userId',
           'id': row.id,
           'userId': row.userId,
           'name': row.name,
-          'subscribed': row.subscribed === 0 ? false : true,
-          'pinned': row.pinned === 0 ? false : true,
+          'subscribed': toBoolean(row.subscribed),
+          'pinned': toBoolean(row.pinned),
           'plusCodes': row.plusCodes
         });
       });
