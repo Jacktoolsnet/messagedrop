@@ -3,13 +3,12 @@ const columnNormalizedQuery = 'normalizedQuery';
 const columnGeoData = 'geoData';
 const columnLastUpdate = 'lastUpdate';
 
-
 const init = function (db) {
     const sql = `
         CREATE TABLE IF NOT EXISTS ${tableName} (
             ${columnNormalizedQuery} TEXT PRIMARY KEY,
             ${columnGeoData} TEXT,
-            ${columnLastUpdate} DATETIME DEFAULT CURRENT_TIMESTAMP
+            ${columnLastUpdate} TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
         );
     `;
     db.exec(sql);
@@ -29,15 +28,17 @@ function normalizeQuery(query) {
 const setGeoSearchResult = function (db, rawQuery, geoData, callback) {
     const normalized = normalizeQuery(rawQuery);
     const sql = `
-        INSERT OR REPLACE INTO ${tableName} 
+        INSERT INTO ${tableName}
         (${columnNormalizedQuery}, ${columnGeoData}, ${columnLastUpdate})
-        VALUES (?, ?, datetime('now'));
+        VALUES (?, ?, CURRENT_TIMESTAMP)
+        ON CONFLICT (${columnNormalizedQuery}) DO UPDATE SET
+            ${columnGeoData} = EXCLUDED.${columnGeoData},
+            ${columnLastUpdate} = CURRENT_TIMESTAMP;
     `;
-    db.run(sql, [normalized, JSON.stringify(geoData)], (err) => {
+    db.run(sql, [normalized, typeof geoData === 'string' ? geoData : JSON.stringify(geoData)], (err) => {
         if (callback) callback(err || null);
     });
 };
-
 
 const getGeoSearchResult = function (db, rawQuery, callback) {
     const normalized = normalizeQuery(rawQuery);
@@ -63,7 +64,7 @@ const getGeoSearchResult = function (db, rawQuery, callback) {
 const cleanExpired = function (db, callback) {
     const sql = `
         DELETE FROM ${tableName}
-        WHERE DATETIME(${columnLastUpdate}) < DATETIME('now', '-1 month');
+        WHERE ${columnLastUpdate} < CURRENT_TIMESTAMP - INTERVAL '1 month';
     `;
     db.run(sql, [], (err) => {
         if (callback) callback(err || null);

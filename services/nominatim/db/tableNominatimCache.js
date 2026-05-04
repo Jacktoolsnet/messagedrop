@@ -8,16 +8,19 @@ const init = function (db) {
         CREATE TABLE IF NOT EXISTS ${tableName} (
             ${columnCacheKey} TEXT PRIMARY KEY,
             ${columnNominatimPlace} TEXT,
-            ${columnLastUpdate} DATETIME DEFAULT CURRENT_TIMESTAMP
+            ${columnLastUpdate} TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
         );`;
     db.exec(sql);
 };
 
 const setNominatimCache = function (db, cacheKey, nominatimPlaceJson, callback) {
     const sql = `
-        INSERT OR REPLACE INTO ${tableName}
+        INSERT INTO ${tableName}
         (${columnCacheKey}, ${columnNominatimPlace}, ${columnLastUpdate})
-        VALUES (?, ?, datetime('now'));`;
+        VALUES (?, ?, CURRENT_TIMESTAMP)
+        ON CONFLICT (${columnCacheKey}) DO UPDATE SET
+            ${columnNominatimPlace} = EXCLUDED.${columnNominatimPlace},
+            ${columnLastUpdate} = CURRENT_TIMESTAMP;`;
     db.run(sql, [cacheKey, nominatimPlaceJson], (error) => {
         if (callback) callback(error || null);
     });
@@ -41,7 +44,7 @@ const getNominatimCache = function (db, cacheKey, callback) {
 const cleanExpired = function (db, callback) {
     const sql = `
         DELETE FROM ${tableName}
-        WHERE DATETIME(${columnLastUpdate}) < DATETIME('now', '-3 month');
+        WHERE ${columnLastUpdate} < CURRENT_TIMESTAMP - INTERVAL '3 months';
     `;
     db.run(sql, [], (error) => {
         if (callback) callback(error || null);
