@@ -1,5 +1,6 @@
 require('dotenv').config();
 require('winston-daily-rotate-file');
+const path = require('path');
 
 const { createServer } = require('node:http');
 const express = require('express');
@@ -171,6 +172,7 @@ const logFormat = winston.format.combine(
   )
 );
 
+const LOG_DIR = path.join(__dirname, 'logs');
 const LOG_RETENTION_INFO = process.env.LOG_RETENTION_INFO || '2d';
 const LOG_RETENTION_WARN = process.env.LOG_RETENTION_WARN || LOG_RETENTION_INFO;
 const LOG_RETENTION_ERROR = process.env.LOG_RETENTION_ERROR || '2d';
@@ -183,21 +185,21 @@ const logger = winston.createLogger({
   format: logFormat,
   transports: [
     new winston.transports.DailyRotateFile({
-      filename: 'logs/socketio-info-%DATE%.log',
+      filename: path.join(LOG_DIR, 'socketio-info-%DATE%.log'),
       datePattern: 'YYYY-MM-DD',
       maxFiles: LOG_RETENTION_INFO,
       level: 'info',
       format: winston.format.combine(infoOnlyFilter(), logFormat)
     }),
     new winston.transports.DailyRotateFile({
-      filename: 'logs/socketio-warn-%DATE%.log',
+      filename: path.join(LOG_DIR, 'socketio-warn-%DATE%.log'),
       datePattern: 'YYYY-MM-DD',
       maxFiles: LOG_RETENTION_WARN,
       level: 'warn',
       format: winston.format.combine(warnOnlyFilter(), logFormat)
     }),
     new winston.transports.DailyRotateFile({
-      filename: 'logs/socketio-error-%DATE%.log',
+      filename: path.join(LOG_DIR, 'socketio-error-%DATE%.log'),
       datePattern: 'YYYY-MM-DD',
       maxFiles: LOG_RETENTION_ERROR,
       level: 'error'

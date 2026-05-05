@@ -44,6 +44,7 @@ const logFormat = winston.format.combine(
   ))
 );
 
+const LOG_DIR = path.join(__dirname, 'logs');
 const LOG_RETENTION_INFO = process.env.LOG_RETENTION_INFO || '2d';
 const LOG_RETENTION_WARN = process.env.LOG_RETENTION_WARN || LOG_RETENTION_INFO;
 const LOG_RETENTION_ERROR = process.env.LOG_RETENTION_ERROR || '2d';
@@ -56,7 +57,7 @@ const logger = winston.createLogger({
   format: logFormat,
   transports: [
     new winston.transports.DailyRotateFile({
-      filename: 'logs/sticker-info-%DATE%.log',
+      filename: path.join(LOG_DIR, 'sticker-info-%DATE%.log'),
       datePattern: 'YYYY-MM-DD',
       zippedArchive: false,
       maxFiles: LOG_RETENTION_INFO,
@@ -64,7 +65,7 @@ const logger = winston.createLogger({
       format: winston.format.combine(infoOnlyFilter(), logFormat)
     }),
     new winston.transports.DailyRotateFile({
-      filename: 'logs/sticker-warn-%DATE%.log',
+      filename: path.join(LOG_DIR, 'sticker-warn-%DATE%.log'),
       datePattern: 'YYYY-MM-DD',
       zippedArchive: false,
       maxFiles: LOG_RETENTION_WARN,
@@ -72,7 +73,7 @@ const logger = winston.createLogger({
       format: winston.format.combine(warnOnlyFilter(), logFormat)
     }),
     new winston.transports.DailyRotateFile({
-      filename: 'logs/sticker-error-%DATE%.log',
+      filename: path.join(LOG_DIR, 'sticker-error-%DATE%.log'),
       datePattern: 'YYYY-MM-DD',
       zippedArchive: false,
       maxFiles: LOG_RETENTION_ERROR,

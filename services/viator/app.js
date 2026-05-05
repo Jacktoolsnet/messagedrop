@@ -1,5 +1,6 @@
 require('dotenv').config()
 require('winston-daily-rotate-file');
+const path = require('path');
 const compression = require('compression');
 const databaseMw = require('./middleware/database');
 const loggerMw = require('./middleware/logger');
@@ -48,6 +49,7 @@ const logFormat = winston.format.combine(
   })
 );
 
+const LOG_DIR = path.join(__dirname, 'logs');
 const LOG_RETENTION_INFO = process.env.LOG_RETENTION_INFO || '2d';
 const LOG_RETENTION_WARN = process.env.LOG_RETENTION_WARN || LOG_RETENTION_INFO;
 const LOG_RETENTION_ERROR = process.env.LOG_RETENTION_ERROR || '2d';
@@ -57,7 +59,7 @@ const warnOnlyFilter = winston.format((info) => (info.level === 'warn' ? info : 
 
 // Transport für Info-Logs
 const infoTransport = new winston.transports.DailyRotateFile({
-  filename: 'logs/viator-info-%DATE%.log',
+  filename: path.join(LOG_DIR, 'viator-info-%DATE%.log'),
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxFiles: LOG_RETENTION_INFO,
@@ -67,7 +69,7 @@ const infoTransport = new winston.transports.DailyRotateFile({
 
 // Transport für Warn-Logs
 const warnTransport = new winston.transports.DailyRotateFile({
-  filename: 'logs/viator-warn-%DATE%.log',
+  filename: path.join(LOG_DIR, 'viator-warn-%DATE%.log'),
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxFiles: LOG_RETENTION_WARN,
@@ -77,7 +79,7 @@ const warnTransport = new winston.transports.DailyRotateFile({
 
 // Transport für Error-Logs
 const errorTransport = new winston.transports.DailyRotateFile({
-  filename: 'logs/viator-error-%DATE%.log',
+  filename: path.join(LOG_DIR, 'viator-error-%DATE%.log'),
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxFiles: LOG_RETENTION_ERROR,

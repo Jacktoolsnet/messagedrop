@@ -1,6 +1,7 @@
 const { loadEnv } = require('./utils/loadEnv');
 loadEnv();
 require('winston-daily-rotate-file');
+const path = require('path');
 const compression = require('compression');
 const databaseMw = require('./middleware/database');
 const loggerMw = require('./middleware/logger');
@@ -78,6 +79,7 @@ const logFormat = winston.format.combine(
   })
 );
 
+const LOG_DIR = path.join(__dirname, 'logs');
 const LOG_RETENTION_INFO = process.env.LOG_RETENTION_INFO || '2d';
 const LOG_RETENTION_WARN = process.env.LOG_RETENTION_WARN || LOG_RETENTION_INFO;
 const LOG_RETENTION_ERROR = process.env.LOG_RETENTION_ERROR || '2d';
@@ -87,7 +89,7 @@ const warnOnlyFilter = winston.format((info) => (info.level === 'warn' ? info : 
 
 // Transport für Info-Logs
 const infoTransport = new winston.transports.DailyRotateFile({
-  filename: 'logs/admin-info-%DATE%.log',
+  filename: path.join(LOG_DIR, 'admin-info-%DATE%.log'),
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxFiles: LOG_RETENTION_INFO,
@@ -97,7 +99,7 @@ const infoTransport = new winston.transports.DailyRotateFile({
 
 // Transport für Warn-Logs
 const warnTransport = new winston.transports.DailyRotateFile({
-  filename: 'logs/admin-warn-%DATE%.log',
+  filename: path.join(LOG_DIR, 'admin-warn-%DATE%.log'),
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxFiles: LOG_RETENTION_WARN,
@@ -107,7 +109,7 @@ const warnTransport = new winston.transports.DailyRotateFile({
 
 // Transport für Error-Logs
 const errorTransport = new winston.transports.DailyRotateFile({
-  filename: 'logs/admin-error-%DATE%.log',
+  filename: path.join(LOG_DIR, 'admin-error-%DATE%.log'),
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxFiles: LOG_RETENTION_ERROR,
