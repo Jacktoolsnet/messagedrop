@@ -1,6 +1,62 @@
-require('dotenv').config()
-require('winston-daily-rotate-file');
 const path = require('path');
+const dotenvResult = require('dotenv').config();
+
+function startupConsole(level, message, meta) {
+  const timestamp = new Date().toISOString();
+  const suffix = meta ? ` ${JSON.stringify(meta)}` : '';
+  const line = `${timestamp} [backend-startup] ${message}${suffix}`;
+  if (level === 'error') {
+    console.error(line);
+    return;
+  }
+  if (level === 'warn') {
+    console.warn(line);
+    return;
+  }
+  console.log(line);
+}
+
+function isEnvSet(name) {
+  return typeof process.env[name] === 'string' && process.env[name].trim() !== '';
+}
+
+startupConsole('info', 'Bootstrap started', {
+  cwd: process.cwd(),
+  appDir: __dirname,
+  nodeVersion: process.version,
+  platform: process.platform,
+  envFileLookedUpByDotenv: path.resolve(process.cwd(), '.env'),
+  dotenv: dotenvResult.error
+    ? { loaded: false, error: dotenvResult.error.message }
+    : { loaded: true, injectedKeys: Object.keys(dotenvResult.parsed || {}).length },
+  env: {
+    NODE_ENV: process.env.NODE_ENV || null,
+    PORT: process.env.PORT || null,
+    JWT_SECRET: isEnvSet('JWT_SECRET'),
+    ENCRYPTION_KEY_PASSWORD: isEnvSet('ENCRYPTION_KEY_PASSWORD'),
+    SIGNING_KEY_PASSWORD: isEnvSet('SIGNING_KEY_PASSWORD'),
+    VAPID_KEY_PASSWORD: isEnvSet('VAPID_KEY_PASSWORD'),
+    OPENAI_API_KEY_MODERATION: isEnvSet('OPENAI_API_KEY_MODERATION'),
+    BACKEND_DATABASE_URL: isEnvSet('BACKEND_DATABASE_URL'),
+    BACKEND_DB_HOST: process.env.BACKEND_DB_HOST || null,
+    BACKEND_DB_PORT: process.env.BACKEND_DB_PORT || null,
+    BACKEND_DB_NAME: process.env.BACKEND_DB_NAME || null,
+    BACKEND_DB_USER: process.env.BACKEND_DB_USER || null,
+    BACKEND_DB_PASSWORD: isEnvSet('BACKEND_DB_PASSWORD'),
+    BACKEND_DB_SSL: process.env.BACKEND_DB_SSL || null,
+    BACKEND_DB_POOL_MAX: process.env.BACKEND_DB_POOL_MAX || null
+  }
+});
+
+process.on('uncaughtExceptionMonitor', (err) => {
+  startupConsole('error', 'Uncaught exception monitor', {
+    name: err?.name,
+    message: err?.message,
+    stack: err?.stack
+  });
+});
+
+require('winston-daily-rotate-file');
 const compression = require('compression');
 const databaseMw = require('./middleware/database');
 const loggerMw = require('./middleware/logger');
@@ -202,11 +258,38 @@ if (process.env.NODE_ENV !== 'production') {
   }));
 }
 
+function logStartupStep(message, meta) {
+  startupConsole('info', message, meta);
+  logger.info(`[startup] ${message}`, meta || {});
+}
+
+function logStartupWarn(message, meta) {
+  startupConsole('warn', message, meta);
+  logger.warn(`[startup] ${message}`, meta || {});
+}
+
+function logStartupError(message, err, meta) {
+  const error = err instanceof Error ? err : new Error(typeof err === 'string' ? err : safeStringify(err));
+  const payload = {
+    ...(meta || {}),
+    name: error.name,
+    message: error.message,
+    stack: error.stack
+  };
+  startupConsole('error', message, payload);
+  logger.error(`[startup] ${message}`, payload);
+}
+
 function validateSecurityConfig() {
   if (!process.env.JWT_SECRET) {
+    startupConsole('error', 'Missing required security configuration', { missing: 'JWT_SECRET' });
     logger.error('Missing required security configuration', { missing: 'JWT_SECRET' });
     process.exit(1);
   }
+  logStartupStep('Security configuration checked', {
+    JWT_SECRET: true,
+    EXIT_ON_UNHANDLED: process.env.EXIT_ON_UNHANDLED || null
+  });
 }
 
 validateSecurityConfig();
@@ -216,6 +299,12 @@ function registerProcessHandlers() {
   const logProcessError = (label, err) => {
     const error = err instanceof Error ? err : new Error(typeof err === 'string' ? err : safeStringify(err));
     const traceId = err?.traceId;
+    startupConsole('error', label, {
+      service: 'backend',
+      traceId,
+      message: error.message,
+      stack: error.stack
+    });
     logger.error(label, {
       service: 'backend',
       traceId,
@@ -239,7 +328,7 @@ function registerProcessHandlers() {
   });
 
   if (!exitOnUnhandled) {
-    logger.warn('Unhandled errors will not terminate the process. Set EXIT_ON_UNHANDLED=true to restore fail-fast.');
+    logStartupWarn('Unhandled errors will not terminate the process. Set EXIT_ON_UNHANDLED=true to restore fail-fast.');
   }
 }
 
@@ -572,18 +661,50 @@ app.use(errorHandler);
 
 (async () => {
   try {
+    logStartupStep('Runtime initialization started');
+    logStartupStep('Generating/loading encryption and signing keypairs', {
+      keysDir: path.join(__dirname, 'keys'),
+      ENCRYPTION_KEY_PASSWORD: isEnvSet('ENCRYPTION_KEY_PASSWORD'),
+      SIGNING_KEY_PASSWORD: isEnvSet('SIGNING_KEY_PASSWORD')
+    });
     await generateOrLoadKeypairs();
+    logStartupStep('Encryption and signing keypairs ready');
+
+    logStartupStep('Generating/loading VAPID keys', {
+      VAPID_KEY_PASSWORD: isEnvSet('VAPID_KEY_PASSWORD'),
+      ENCRYPTION_KEY_PASSWORD_FALLBACK: isEnvSet('ENCRYPTION_KEY_PASSWORD')
+    });
     await generateOrLoadVapidKeys();
+    logStartupStep('VAPID keys ready');
+
+    logStartupStep('Initializing PostgreSQL database', {
+      BACKEND_DATABASE_URL: isEnvSet('BACKEND_DATABASE_URL'),
+      BACKEND_DB_HOST: process.env.BACKEND_DB_HOST || process.env.DB_HOST || 'localhost',
+      BACKEND_DB_PORT: process.env.BACKEND_DB_PORT || process.env.DB_PORT || '5432',
+      BACKEND_DB_NAME: process.env.BACKEND_DB_NAME || process.env.DB_NAME || 'messagedrop_backend',
+      BACKEND_DB_USER: process.env.BACKEND_DB_USER || process.env.DB_USER || 'messagedrop',
+      BACKEND_DB_PASSWORD: isEnvSet('BACKEND_DB_PASSWORD') || isEnvSet('DB_PASSWORD'),
+      BACKEND_DB_SSL: process.env.BACKEND_DB_SSL || process.env.DB_SSL || null,
+      BACKEND_DB_POOL_MAX: process.env.BACKEND_DB_POOL_MAX || process.env.DB_POOL_MAX || '10'
+    });
     await database.init(logger);
+    logStartupStep('PostgreSQL database initialized');
+
     const port = Number(process.env.PORT);
+    if (!Number.isFinite(port) || port <= 0) {
+      throw new Error(`Invalid PORT environment variable: ${process.env.PORT ?? '<not set>'}`);
+    }
+    logStartupStep('Starting HTTP server', { port });
     const server = app.listen(port, () => {
+      startupConsole('info', `Server listening`, { port });
       logger.info(`Server läuft auf Port ${port}`);
     });
     server.on('error', (err) => {
+      logStartupError('HTTP server error', err, { port });
       logger.error('Server-Fehler', err);
     });
   } catch (err) {
-    logger.error('Fehler beim Initialisieren des Keystores:', err);
+    logStartupError('Backend startup failed', err);
     process.exit(1);
   }
 })();
