@@ -10,7 +10,7 @@ const { apiError } = require('../middleware/api-error');
 const { signServiceJwt } = require('../utils/serviceJwt');
 const { resolveBaseUrl } = require('../utils/adminLogForwarder');
 const { encodePlusCode } = require('../utils/plusCode');
-const { decodeHashtags } = require('../../../../backend/utils/hashtags');
+const { decodeHashtags } = require('../utils/hashtags');
 
 const router = express.Router();
 
