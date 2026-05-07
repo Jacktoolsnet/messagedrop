@@ -2,6 +2,9 @@ const path = require('path');
 const dotenvResult = require('dotenv').config();
 
 function startupConsole(level, message, meta) {
+  if (level !== 'error' && process.env.STARTUP_DEBUG !== 'true') {
+    return;
+  }
   const timestamp = new Date().toISOString();
   const suffix = meta ? ` ${JSON.stringify(meta)}` : '';
   const line = `${timestamp} [backend-startup] ${message}${suffix}`;
@@ -31,6 +34,7 @@ startupConsole('info', 'Bootstrap started', {
     : { loaded: true, injectedKeys: Object.keys(dotenvResult.parsed || {}).length },
   env: {
     NODE_ENV: process.env.NODE_ENV || null,
+    STARTUP_DEBUG: process.env.STARTUP_DEBUG || null,
     PORT: process.env.PORT || null,
     JWT_SECRET: isEnvSet('JWT_SECRET'),
     ENCRYPTION_KEY_PASSWORD: isEnvSet('ENCRYPTION_KEY_PASSWORD'),

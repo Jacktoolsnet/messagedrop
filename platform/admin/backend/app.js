@@ -1,7 +1,61 @@
+const path = require('path');
 const { loadEnv } = require('./utils/loadEnv');
 loadEnv();
+
+function startupConsole(level, message, meta) {
+  if (level !== 'error' && process.env.STARTUP_DEBUG !== 'true') {
+    return;
+  }
+  const timestamp = new Date().toISOString();
+  const suffix = meta ? ` ${JSON.stringify(meta)}` : '';
+  const line = `${timestamp} [backend-startup] ${message}${suffix}`;
+  if (level === 'error') {
+    console.error(line);
+    return;
+  }
+  if (level === 'warn') {
+    console.warn(line);
+    return;
+  }
+  console.log(line);
+}
+
+function isEnvSet(name) {
+  return typeof process.env[name] === 'string' && process.env[name].trim() !== '';
+}
+
+function buildStartupEnv(valueNames, secretNames) {
+  const env = {};
+  for (const name of valueNames) {
+    env[name] = process.env[name] || null;
+  }
+  for (const name of secretNames) {
+    env[name] = isEnvSet(name);
+  }
+  return env;
+}
+
+startupConsole('info', 'Bootstrap started', {
+  service: 'admin-backend',
+  cwd: process.cwd(),
+  appDir: __dirname,
+  nodeVersion: process.version,
+  platform: process.platform,
+  envFileLookedUpByDotenv: path.resolve(process.cwd(), '.env'),
+  envLoader: { type: 'loadEnv', candidates: [path.resolve(__dirname, '.env'), path.resolve(__dirname, '../../../.env')] },
+  env: buildStartupEnv(['NODE_ENV', 'STARTUP_DEBUG', 'ADMIN_PORT', 'ADMIN_BASE_URL', 'ADMIN_ORIGIN', 'BASE_URL', 'PORT', 'ADMIN_DATABASE_URL', 'ADMIN_DB_HOST', 'ADMIN_DB_PORT', 'ADMIN_DB_NAME', 'ADMIN_DB_USER', 'ADMIN_DB_SSL', 'ADMIN_DB_POOL_MAX', 'STICKER_BASE_URL', 'STICKER_PORT'], ['ADMIN_JWT_SECRET', 'ADMIN_OTP_SECRET', 'ADMIN_ROOT_PASSWORD', 'PUBLIC_JWT_SECRET', 'JWT_SECRET', 'ENCRYPTION_KEY_PASSWORD', 'SIGNING_KEY_PASSWORD', 'ADMIN_DB_PASSWORD', 'DEEPL_API_KEY', 'MAKE_API_KEY', 'MAIL_PASSWORD', 'FLATICON_API_KEY'])
+});
+
+process.on('uncaughtExceptionMonitor', (err) => {
+  startupConsole('error', 'Uncaught exception monitor', {
+    service: 'admin-backend',
+    name: err?.name,
+    message: err?.message,
+    stack: err?.stack
+  });
+});
+
 require('winston-daily-rotate-file');
-const path = require('path');
 const compression = require('compression');
 const databaseMw = require('./middleware/database');
 const loggerMw = require('./middleware/logger');
@@ -134,11 +188,44 @@ if (process.env.NODE_ENV !== 'production') {
   }));
 }
 
+function normalizeStartupError(err) {
+  if (err instanceof Error) return err;
+  try {
+    return new Error(typeof err === 'string' ? err : JSON.stringify(err));
+  } catch {
+    return new Error(String(err));
+  }
+}
+
+function logStartupStep(message, meta) {
+  startupConsole('info', message, meta);
+  logger.info(`[startup] ${message}`, meta || {});
+}
+
+function logStartupWarn(message, meta) {
+  startupConsole('warn', message, meta);
+  logger.warn(`[startup] ${message}`, meta || {});
+}
+
+function logStartupError(message, err, meta) {
+  const error = normalizeStartupError(err);
+  const payload = {
+    ...(meta || {}),
+    service: 'admin-backend',
+    name: error.name,
+    message: error.message,
+    stack: error.stack
+  };
+  startupConsole('error', message, payload);
+  logger.error(`[startup] ${message}`, payload);
+}
+
 function registerProcessHandlers() {
   const exitOnUnhandled = process.env.EXIT_ON_UNHANDLED === 'true';
   const logProcessError = (label, err) => {
     const error = err instanceof Error ? err : new Error(typeof err === 'string' ? err : JSON.stringify(err));
     const traceId = err?.traceId;
+    startupConsole('error', label, { service: 'admin-backend', message: error.message, stack: error.stack, traceId: err?.traceId });
     logger.error(label, {
       service: 'admin-backend',
       traceId,
@@ -162,7 +249,7 @@ function registerProcessHandlers() {
   });
 
   if (!exitOnUnhandled) {
-    logger.warn('Unhandled errors will not terminate the process. Set EXIT_ON_UNHANDLED=true to restore fail-fast.');
+    logStartupWarn('Unhandled errors will not terminate the process. Set EXIT_ON_UNHANDLED=true to restore fail-fast.');
   }
 }
 
@@ -522,23 +609,57 @@ app.use(errorHandler);
 
 (async () => {
   try {
+    logStartupStep('Runtime initialization started');
+    logStartupStep('Generating/loading admin keypairs', {
+      keysDir: path.join(__dirname, 'keys'),
+      ENCRYPTION_KEY_PASSWORD: isEnvSet('ENCRYPTION_KEY_PASSWORD'),
+      SIGNING_KEY_PASSWORD: isEnvSet('SIGNING_KEY_PASSWORD')
+    });
     await generateOrLoadKeypairs();
+    logStartupStep('Admin keypairs ready');
+
+    logStartupStep('Checking for pending maintenance restore');
     await performPendingRestore(logger);
-    server.listen(process.env.ADMIN_PORT, () => {
+    logStartupStep('Pending maintenance restore check finished');
+
+    const configuredPort = Number(process.env.ADMIN_PORT);
+    if (!Number.isFinite(configuredPort) || configuredPort <= 0) {
+      throw new Error(`Invalid ADMIN_PORT environment variable: ${process.env.ADMIN_PORT ?? '<not set>'}`);
+    }
+
+    logStartupStep('Starting HTTP server', { port: configuredPort });
+    server.listen(configuredPort, () => {
       const address = server.address();
       const port = typeof address === 'string' ? address : address.port;
+      startupConsole('info', 'Server listening', { service: 'admin-backend', port });
       logger.info(`Server läuft auf Port ${port}`);
+
+      logStartupStep('Initializing PostgreSQL database', {
+        ADMIN_DATABASE_URL: isEnvSet('ADMIN_DATABASE_URL'),
+        ADMIN_DB_HOST: process.env.ADMIN_DB_HOST || process.env.DB_HOST || 'localhost',
+        ADMIN_DB_PORT: process.env.ADMIN_DB_PORT || process.env.DB_PORT || '5432',
+        ADMIN_DB_NAME: process.env.ADMIN_DB_NAME || process.env.DB_NAME || 'messagedrop_admin',
+        ADMIN_DB_USER: process.env.ADMIN_DB_USER || process.env.DB_USER || 'messagedrop',
+        ADMIN_DB_PASSWORD: isEnvSet('ADMIN_DB_PASSWORD') || isEnvSet('DB_PASSWORD'),
+        ADMIN_DB_SSL: process.env.ADMIN_DB_SSL || process.env.DB_SSL || null,
+        ADMIN_DB_POOL_MAX: process.env.ADMIN_DB_POOL_MAX || process.env.DB_POOL_MAX || '10'
+      });
       database.init(logger);
+      logStartupStep('PostgreSQL database initialization triggered');
+
       void runCertificateHealthCheck({
         db: database.db,
         logger,
         reason: 'startup'
       }).catch((error) => {
-        logger.warn('Initial certificate health check failed', { error: error?.message || error });
+        logStartupError('Initial certificate health check failed', error);
       });
     });
+    server.on('error', (err) => {
+      logStartupError('HTTP server error', err, { port: configuredPort });
+    });
   } catch (err) {
-    logger.error('Fehler beim Initialisieren des Keystores:', err);
+    logStartupError('Admin backend startup failed', err);
     process.exit(1);
   }
 })();

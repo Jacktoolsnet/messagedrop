@@ -1,9 +1,63 @@
+const path = require('path');
 const { loadEnv } = require('./utils/loadEnv');
 loadEnv();
+
+function startupConsole(level, message, meta) {
+  if (level !== 'error' && process.env.STARTUP_DEBUG !== 'true') {
+    return;
+  }
+  const timestamp = new Date().toISOString();
+  const suffix = meta ? ` ${JSON.stringify(meta)}` : '';
+  const line = `${timestamp} [backend-startup] ${message}${suffix}`;
+  if (level === 'error') {
+    console.error(line);
+    return;
+  }
+  if (level === 'warn') {
+    console.warn(line);
+    return;
+  }
+  console.log(line);
+}
+
+function isEnvSet(name) {
+  return typeof process.env[name] === 'string' && process.env[name].trim() !== '';
+}
+
+function buildStartupEnv(valueNames, secretNames) {
+  const env = {};
+  for (const name of valueNames) {
+    env[name] = process.env[name] || null;
+  }
+  for (const name of secretNames) {
+    env[name] = isEnvSet(name);
+  }
+  return env;
+}
+
+startupConsole('info', 'Bootstrap started', {
+  service: 'sticker-service',
+  cwd: process.cwd(),
+  appDir: __dirname,
+  nodeVersion: process.version,
+  platform: process.platform,
+  envFileLookedUpByDotenv: path.resolve(process.cwd(), '.env'),
+  envLoader: { type: 'loadEnv', candidates: [path.resolve(__dirname, '.env'), path.resolve(__dirname, '../../.env')] },
+  env: buildStartupEnv(['NODE_ENV', 'STARTUP_DEBUG', 'STICKER_PORT', 'PORT', 'STICKER_DATABASE_URL', 'STICKER_DB_HOST', 'STICKER_DB_PORT', 'STICKER_DB_NAME', 'STICKER_DB_USER', 'STICKER_DB_SSL', 'STICKER_DB_POOL_MAX', 'FLATICON_HTTP_TIMEOUT_MS', 'ADMIN_BASE_URL', 'ADMIN_PORT'], ['ENCRYPTION_KEY_PASSWORD', 'SIGNING_KEY_PASSWORD', 'STICKER_DB_PASSWORD', 'FLATICON_API_KEY'])
+});
+
+process.on('uncaughtExceptionMonitor', (err) => {
+  startupConsole('error', 'Uncaught exception monitor', {
+    service: 'sticker-service',
+    name: err?.name,
+    message: err?.message,
+    stack: err?.stack
+  });
+});
+
 require('winston-daily-rotate-file');
 
 const fs = require('fs');
-const path = require('path');
 const compression = require('compression');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
@@ -88,10 +142,43 @@ if (process.env.NODE_ENV !== 'production') {
   }));
 }
 
+function normalizeStartupError(err) {
+  if (err instanceof Error) return err;
+  try {
+    return new Error(typeof err === 'string' ? err : JSON.stringify(err));
+  } catch {
+    return new Error(String(err));
+  }
+}
+
+function logStartupStep(message, meta) {
+  startupConsole('info', message, meta);
+  logger.info(`[startup] ${message}`, meta || {});
+}
+
+function logStartupWarn(message, meta) {
+  startupConsole('warn', message, meta);
+  logger.warn(`[startup] ${message}`, meta || {});
+}
+
+function logStartupError(message, err, meta) {
+  const error = normalizeStartupError(err);
+  const payload = {
+    ...(meta || {}),
+    service: 'sticker-service',
+    name: error.name,
+    message: error.message,
+    stack: error.stack
+  };
+  startupConsole('error', message, payload);
+  logger.error(`[startup] ${message}`, payload);
+}
+
 function registerProcessHandlers() {
   const exitOnUnhandled = process.env.EXIT_ON_UNHANDLED === 'true';
   const logProcessError = (label, err) => {
     const error = err instanceof Error ? err : new Error(typeof err === 'string' ? err : JSON.stringify(err));
+    startupConsole('error', label, { service: 'sticker-service', message: error.message, stack: error.stack, traceId: err?.traceId });
     logger.error(label, {
       service: 'sticker-service',
       traceId: err?.traceId,
@@ -115,7 +202,7 @@ function registerProcessHandlers() {
   });
 
   if (!exitOnUnhandled) {
-    logger.warn('Unhandled errors will not terminate the process. Set EXIT_ON_UNHANDLED=true to restore fail-fast.');
+    logStartupWarn('Unhandled errors will not terminate the process. Set EXIT_ON_UNHANDLED=true to restore fail-fast.');
   }
 }
 
@@ -182,22 +269,48 @@ app.use(errorHandler);
 
 (async () => {
   try {
+    logStartupStep('Runtime initialization started');
+    logStartupStep('Ensuring storage directory exists', { storageRoot: STORAGE_ROOT });
     fs.mkdirSync(STORAGE_ROOT, { recursive: true });
+
+    logStartupStep('Generating/loading service keypairs', {
+      keysDir: path.join(__dirname, 'keys'),
+      ENCRYPTION_KEY_PASSWORD: isEnvSet('ENCRYPTION_KEY_PASSWORD'),
+      SIGNING_KEY_PASSWORD: isEnvSet('SIGNING_KEY_PASSWORD')
+    });
     await generateOrLoadKeypairs();
+    logStartupStep('Service keypairs ready');
 
     const configuredPort = Number(process.env.STICKER_PORT || process.env.PORT || 3600);
     if (!Number.isFinite(configuredPort) || configuredPort <= 0) {
       throw new Error('Invalid STICKER_PORT/PORT configuration');
     }
 
+    logStartupStep('Starting HTTP server', { port: configuredPort });
     const server = app.listen(configuredPort, () => {
       const address = server.address();
       const port = typeof address === 'string' ? address : (address?.port || configuredPort);
+      startupConsole('info', 'Server listening', { service: 'sticker-service', port });
       logger.info(`Server läuft auf Port ${port}`);
+
+      logStartupStep('Initializing PostgreSQL database', {
+        STICKER_DATABASE_URL: isEnvSet('STICKER_DATABASE_URL'),
+        STICKER_DB_HOST: process.env.STICKER_DB_HOST || process.env.DB_HOST || 'localhost',
+        STICKER_DB_PORT: process.env.STICKER_DB_PORT || process.env.DB_PORT || '5432',
+        STICKER_DB_NAME: process.env.STICKER_DB_NAME || process.env.DB_NAME || 'messagedrop_sticker',
+        STICKER_DB_USER: process.env.STICKER_DB_USER || process.env.DB_USER || 'messagedrop',
+        STICKER_DB_PASSWORD: isEnvSet('STICKER_DB_PASSWORD') || isEnvSet('DB_PASSWORD'),
+        STICKER_DB_SSL: process.env.STICKER_DB_SSL || process.env.DB_SSL || null,
+        STICKER_DB_POOL_MAX: process.env.STICKER_DB_POOL_MAX || process.env.DB_POOL_MAX || '10'
+      });
       database.init(logger);
+      logStartupStep('PostgreSQL database initialization triggered');
+    });
+    server.on('error', (err) => {
+      logStartupError('HTTP server error', err, { port: configuredPort });
     });
   } catch (err) {
-    logger.error('Fehler beim Initialisieren des Sticker-Services:', err);
+    logStartupError('Sticker service startup failed', err);
     process.exit(1);
   }
 })();

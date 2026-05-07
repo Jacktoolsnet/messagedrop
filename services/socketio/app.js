@@ -1,6 +1,62 @@
-require('dotenv').config();
-require('winston-daily-rotate-file');
 const path = require('path');
+const dotenvResult = require('dotenv').config();
+
+function startupConsole(level, message, meta) {
+  if (level !== 'error' && process.env.STARTUP_DEBUG !== 'true') {
+    return;
+  }
+  const timestamp = new Date().toISOString();
+  const suffix = meta ? ` ${JSON.stringify(meta)}` : '';
+  const line = `${timestamp} [backend-startup] ${message}${suffix}`;
+  if (level === 'error') {
+    console.error(line);
+    return;
+  }
+  if (level === 'warn') {
+    console.warn(line);
+    return;
+  }
+  console.log(line);
+}
+
+function isEnvSet(name) {
+  return typeof process.env[name] === 'string' && process.env[name].trim() !== '';
+}
+
+function buildStartupEnv(valueNames, secretNames) {
+  const env = {};
+  for (const name of valueNames) {
+    env[name] = process.env[name] || null;
+  }
+  for (const name of secretNames) {
+    env[name] = isEnvSet(name);
+  }
+  return env;
+}
+
+startupConsole('info', 'Bootstrap started', {
+  service: 'socketio-service',
+  cwd: process.cwd(),
+  appDir: __dirname,
+  nodeVersion: process.version,
+  platform: process.platform,
+  envFileLookedUpByDotenv: path.resolve(process.cwd(), '.env'),
+  dotenv: dotenvResult.error
+    ? { loaded: false, error: dotenvResult.error.message }
+    : { loaded: true, injectedKeys: Object.keys(dotenvResult.parsed || {}).length },
+  env: buildStartupEnv(['NODE_ENV', 'STARTUP_DEBUG', 'SOCKETIO_PORT', 'ORIGIN', 'SOCKETIO_LOG_CONNECTIONS', 'SOCKETIO_HANDSHAKE_WINDOW_MS', 'SOCKETIO_HANDSHAKE_MAX', 'SOCKETIO_EVENT_WINDOW_MS', 'SOCKETIO_EVENT_MAX', 'SOCKETIO_EVENT_MAX_PAYLOAD_BYTES', 'ADMIN_BASE_URL', 'ADMIN_PORT'], ['JWT_SECRET', 'ENCRYPTION_KEY_PASSWORD', 'SIGNING_KEY_PASSWORD'])
+});
+
+process.on('uncaughtExceptionMonitor', (err) => {
+  startupConsole('error', 'Uncaught exception monitor', {
+    service: 'socketio-service',
+    name: err?.name,
+    message: err?.message,
+    stack: err?.stack
+  });
+});
+
+require('winston-daily-rotate-file');
 
 const { createServer } = require('node:http');
 const express = require('express');
@@ -211,6 +267,38 @@ if (process.env.NODE_ENV !== 'production') {
   logger.add(new winston.transports.Console({ format: winston.format.simple() }));
 }
 
+function normalizeStartupError(err) {
+  if (err instanceof Error) return err;
+  try {
+    return new Error(typeof err === 'string' ? err : JSON.stringify(err));
+  } catch {
+    return new Error(String(err));
+  }
+}
+
+function logStartupStep(message, meta) {
+  startupConsole('info', message, meta);
+  logger.info(`[startup] ${message}`, meta || {});
+}
+
+function logStartupWarn(message, meta) {
+  startupConsole('warn', message, meta);
+  logger.warn(`[startup] ${message}`, meta || {});
+}
+
+function logStartupError(message, err, meta) {
+  const error = normalizeStartupError(err);
+  const payload = {
+    ...(meta || {}),
+    service: 'socketio-service',
+    name: error.name,
+    message: error.message,
+    stack: error.stack
+  };
+  startupConsole('error', message, payload);
+  logger.error(`[startup] ${message}`, payload);
+}
+
 const logSocketConnections = process.env.SOCKETIO_LOG_CONNECTIONS === 'true';
 
 function registerProcessHandlers() {
@@ -218,6 +306,7 @@ function registerProcessHandlers() {
   const logProcessError = (label, err) => {
     const error = err instanceof Error ? err : new Error(typeof err === 'string' ? err : JSON.stringify(err));
     const traceId = err?.traceId;
+    startupConsole('error', label, { service: 'socketio-service', message: error.message, stack: error.stack, traceId: err?.traceId });
     logger.error(label, {
       service: 'socketio-service',
       traceId,
@@ -241,7 +330,7 @@ function registerProcessHandlers() {
   });
 
   if (!exitOnUnhandled) {
-    logger.warn('Unhandled errors will not terminate the process. Set EXIT_ON_UNHANDLED=true to restore fail-fast.');
+    logStartupWarn('Unhandled errors will not terminate the process. Set EXIT_ON_UNHANDLED=true to restore fail-fast.');
   }
 }
 
@@ -403,12 +492,29 @@ io.engine.on('connection_error', (err) => {
 const port = Number(process.env.SOCKETIO_PORT);
 (async () => {
   try {
+    logStartupStep('Runtime initialization started');
+    logStartupStep('Generating/loading service keypairs', {
+      keysDir: path.join(__dirname, 'keys'),
+      ENCRYPTION_KEY_PASSWORD: isEnvSet('ENCRYPTION_KEY_PASSWORD'),
+      SIGNING_KEY_PASSWORD: isEnvSet('SIGNING_KEY_PASSWORD')
+    });
     await generateOrLoadKeypairs();
+    logStartupStep('Service keypairs ready');
+
+    if (!Number.isFinite(port) || port <= 0) {
+      throw new Error(`Invalid SOCKETIO_PORT environment variable: ${process.env.SOCKETIO_PORT ?? '<not set>'}`);
+    }
+
+    logStartupStep('Starting Socket.IO server', { port });
     server.listen(port, () => {
+      startupConsole('info', 'Socket.IO server listening', { service: 'socketio-service', port });
       logger.info(`Socket service listening on port ${port}`);
     });
+    server.on('error', (err) => {
+      logStartupError('Socket.IO server error', err, { port });
+    });
   } catch (err) {
-    logger.error('Failed to initialize signing keys', { error: err?.message });
+    logStartupError('Socket.IO service startup failed', err);
     process.exit(1);
   }
 })();
