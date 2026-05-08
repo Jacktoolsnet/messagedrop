@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Signal, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Signal, computed, effect, inject, signal } from '@angular/core';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -31,6 +31,7 @@ import { ScannerComponent } from '../utils/scanner/scanner.component';
 import { ContactSortDialogComponent } from './contact-sort-dialog/contact-sort-dialog.component';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { DisplayMessageRef, DisplayMessageService } from '../../services/display-message.service';
+import { NetworkService } from '../../services/network.service';
 
 interface ConnectDialogResult {
   connectId?: string;
@@ -73,12 +74,16 @@ export class ContactlistComponent {
   private readonly snackBar = inject(DisplayMessageService);
   private readonly matDialog = inject(MatDialog);
   private readonly contactMessageService = inject(ContactMessageService);
+  private readonly networkService = inject(NetworkService);
   private readonly translation = inject(TranslationHelperService);
   readonly help = inject(HelpDialogService);
   readonly dialogRef = inject(MatDialogRef<ContactlistComponent>);
   readonly contactsSignal: Signal<Contact[]> = this.contactService.sortedContactsSignal;
   readonly unreadCounts = signal<Record<string, number>>({});
   readonly latestMessagePreviews = signal<Record<string, ContactMessagePreview[]>>({});
+  readonly backendActionsAvailable = computed(() =>
+    this.userService.hasJwt() && this.networkService.browserOnline() && this.networkService.backendOnline()
+  );
   private readonly unreadLoaded = new Set<string>();
   private readonly previewRequestKeys = new Map<string, string>();
 
@@ -95,7 +100,7 @@ export class ContactlistComponent {
 
     effect(() => {
       this.contactService.contactsSet();
-      if (!this.userService.hasJwt()) {
+      if (!this.backendActionsAvailable()) {
         this.unreadLoaded.clear();
         this.unreadCounts.set({});
         return;
@@ -117,7 +122,7 @@ export class ContactlistComponent {
 
     effect(() => {
       const update = this.contactMessageService.unreadCountUpdate();
-      if (!this.userService.hasJwt()) {
+      if (!this.backendActionsAvailable()) {
         return;
       }
       if (update) {
@@ -132,10 +137,7 @@ export class ContactlistComponent {
 
     effect(() => {
       this.userService.userSet();
-      const hasJwt = this.userService.hasJwt();
-      if (!hasJwt) {
-        this.dialogRef.close();
-      }
+      const hasJwt = this.backendActionsAvailable();
       const contacts = this.contactsSignal();
       const activeContactIds = new Set(contacts.map((contact) => contact.id));
 
@@ -228,7 +230,7 @@ export class ContactlistComponent {
   }
 
   openConnectDialog(): void {
-    if (!this.userService.hasJwt()) {
+    if (!this.backendActionsAvailable()) {
       return;
     }
     const contact: Contact = {
@@ -264,7 +266,7 @@ export class ContactlistComponent {
   }
 
   openScannerDialog(): void {
-    if (!this.userService.hasJwt()) {
+    if (!this.backendActionsAvailable()) {
       return;
     }
     const contact: Contact = {
@@ -296,7 +298,7 @@ export class ContactlistComponent {
   }
 
   public deleteContact(contact: Contact) {
-    if (!this.userService.hasJwt()) {
+    if (!this.backendActionsAvailable()) {
       return;
     }
     this.contactToDelete = contact;
@@ -372,7 +374,7 @@ export class ContactlistComponent {
   }
 
   public subscribe(contact: Contact) {
-    if (!this.userService.hasJwt()) {
+    if (!this.backendActionsAvailable()) {
       return;
     }
     if (Notification.permission !== "granted") {
@@ -388,7 +390,7 @@ export class ContactlistComponent {
   }
 
   openSortDialog(): void {
-    if (!this.userService.hasJwt()) {
+    if (!this.backendActionsAvailable()) {
       return;
     }
     const dialogRef = this.matDialog.open(ContactSortDialogComponent, {
@@ -412,7 +414,7 @@ export class ContactlistComponent {
   }
 
   openContactChatroom(contact: Contact, focusMessageId?: string): void {
-    if (!this.userService.hasJwt()) {
+    if (!this.backendActionsAvailable()) {
       return;
     }
     const dialogRef = this.matDialog.open(ContactChatroomComponent, {
@@ -433,7 +435,7 @@ export class ContactlistComponent {
     });
 
     dialogRef.afterClosed().subscribe(() => {
-      if (!this.userService.hasJwt()) {
+      if (!this.backendActionsAvailable()) {
         return;
       }
       // Nach dem Schließen neu laden, damit Badge/Unread stimmen (MarkRead passiert im Chatroom)
@@ -448,7 +450,7 @@ export class ContactlistComponent {
   }
 
   public shareConnectId(): void {
-    if (!this.userService.hasJwt()) {
+    if (!this.backendActionsAvailable()) {
       return;
     }
     const user = this.userService.getUser();
@@ -512,7 +514,7 @@ export class ContactlistComponent {
   }
 
   public openQrDialog() {
-    if (!this.userService.hasJwt()) {
+    if (!this.backendActionsAvailable()) {
       return;
     }
     const user = this.userService.getUser();
@@ -556,7 +558,7 @@ export class ContactlistComponent {
   }
 
   private reloadLatestMessagePreview(contact: Contact): void {
-    if (!this.userService.hasJwt()) {
+    if (!this.backendActionsAvailable()) {
       this.setLatestMessagePreviews(contact.id, []);
       this.previewRequestKeys.delete(contact.id);
       return;

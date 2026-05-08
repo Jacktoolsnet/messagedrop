@@ -21,6 +21,7 @@ import { TileListDialogComponent } from '../tile/tile-list-dialog/tile-list-dial
 import { DisplayMessageConfig } from '../../interfaces/display-message-config';
 import { DisplayMessage } from '../utils/display-message/display-message.component';
 import { UserService } from '../../services/user.service';
+import { NetworkService } from '../../services/network.service';
 import { MyExperienceSortDialogComponent } from './my-experience-sort-dialog/my-experience-sort-dialog.component';
 
 @Component({
@@ -49,6 +50,7 @@ export class MyExperienceslistComponent implements OnInit {
   private readonly geolocationService = inject(GeolocationService);
   private readonly transloco = inject(TranslocoService);
   readonly userService = inject(UserService);
+  private readonly networkService = inject(NetworkService);
   private readonly dialog = inject(MatDialog);
   private readonly dialogRef = inject(MatDialogRef<MyExperienceslistComponent>);
   private readonly dialogData = inject<{ experiences?: ExperienceResult[] } | null>(MAT_DIALOG_DATA, { optional: true });
@@ -68,11 +70,16 @@ export class MyExperienceslistComponent implements OnInit {
     return all.filter((bookmark) => this.filterCodes.has(bookmark.productCode));
   });
   readonly hasBookmarks = computed(() => this.visibleBookmarks().length > 0);
+  readonly backendActionsAvailable = computed(() =>
+    this.userService.hasJwt() && this.networkService.browserOnline() && this.networkService.backendOnline()
+  );
   private readonly destinationCache = new Map<number, ViatorDestinationLookup>();
 
   async ngOnInit(): Promise<void> {
     await this.bookmarkService.ensureLoaded();
-    await this.refreshSnapshots();
+    if (this.backendActionsAvailable()) {
+      await this.refreshSnapshots();
+    }
     this.loading.set(false);
   }
 
@@ -130,10 +137,6 @@ export class MyExperienceslistComponent implements OnInit {
   }
 
   openSortDialog(): void {
-    if (!this.userService.hasJwt()) {
-      return;
-    }
-
     const dialogRef = this.dialog.open(MyExperienceSortDialogComponent, {
       data: { bookmarks: this.visibleBookmarks() },
       minWidth: 'min(520px, 95vw)',
@@ -175,6 +178,10 @@ export class MyExperienceslistComponent implements OnInit {
     return Array.isArray(result.destinationIds) && result.destinationIds.length > 0;
   }
 
+  canResolveDestination(result: ExperienceResult): boolean {
+    return this.backendActionsAvailable() && this.hasDestination(result);
+  }
+
   getExperienceHeaderBackgroundImage(result: ExperienceResult): string {
     return result.imageUrl ? `url("${result.imageUrl}")` : 'none';
   }
@@ -206,7 +213,6 @@ export class MyExperienceslistComponent implements OnInit {
   }
 
   isBookmarked(result: ExperienceResult): boolean {
-    if (!this.userService.hasJwt()) return false;
     const productCode = result.productCode;
     if (!productCode) return false;
     return this.bookmarkService.bookmarksSignal().some((bookmark) => bookmark.productCode === productCode);
@@ -226,25 +232,15 @@ export class MyExperienceslistComponent implements OnInit {
 
     this.bookmarkService.hasBookmark(productCode)
       .then((exists) => {
-        if (!this.userService.hasJwt()) {
-          this.userService.loginWithBackend(() => {
-            if (exists) {
-              this.showConfirmMessage(
-                'common.experiences.saveExistsTitle',
-                'common.experiences.saveExistsPrompt',
-                () => removeBookmark().catch(() => {
-                  this.showDisplayMessage('common.experiences.saveFailedTitle', 'common.experiences.saveFailedMessage', 'error', false);
-                })
-              );
-            }
-          });
-          return;
-        }
-
         if (exists) {
           removeBookmark().catch(() => {
             this.showDisplayMessage('common.experiences.saveFailedTitle', 'common.experiences.saveFailedMessage', 'error', false);
           });
+          return;
+        }
+
+        if (this.backendActionsAvailable()) {
+          this.userService.loginWithBackend(() => undefined);
         }
       })
       .catch(() => {
@@ -253,6 +249,9 @@ export class MyExperienceslistComponent implements OnInit {
   }
 
   private async refreshSnapshots(): Promise<void> {
+    if (!this.backendActionsAvailable()) {
+      return;
+    }
     const bookmarks = this.bookmarks();
     for (const bookmark of bookmarks) {
       if (!bookmark.productCode) continue;
@@ -297,6 +296,9 @@ export class MyExperienceslistComponent implements OnInit {
   }
 
   private async getPrimaryDestination(result: ExperienceResult): Promise<ViatorDestinationLookup | undefined> {
+    if (!this.backendActionsAvailable()) {
+      return undefined;
+    }
     const destinationId = Array.isArray(result.destinationIds) ? result.destinationIds[0] : undefined;
     if (!destinationId) return undefined;
     const cached = this.destinationCache.get(destinationId);

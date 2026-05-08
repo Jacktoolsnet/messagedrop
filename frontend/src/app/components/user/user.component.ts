@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -15,6 +15,7 @@ import { UserModerationAppeal, UserModerationAppealStatus, UserModerationTarget 
 import { TranslateService } from '../../services/translate.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
+import { NetworkService } from '../../services/network.service';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { DisplayMessageRef, DisplayMessageService } from '../../services/display-message.service';
@@ -45,6 +46,7 @@ export class UserComponent implements OnInit {
   public connectHint = '';
   private storedDeeplApiKey = '';
   readonly userService = inject(UserService);
+  private readonly networkService = inject(NetworkService);
   readonly help = inject(HelpDialogService);
   private readonly dialogRef = inject(MatDialogRef<UserComponent>);
   private readonly snackBar = inject(DisplayMessageService);
@@ -55,6 +57,9 @@ export class UserComponent implements OnInit {
   readonly submittingTarget = signal<UserModerationTarget | null>(null);
   readonly savingDeeplApiKey = signal(false);
   readonly testingDeeplApiKey = signal(false);
+  readonly backendActionsAvailable = computed(() =>
+    this.userService.hasJwt() && this.networkService.browserOnline() && this.networkService.backendOnline()
+  );
   readonly revealDeeplApiKey = signal(false);
   readonly appealForm = this.fb.group({
     accountMessage: this.fb.nonNullable.control('', { validators: [Validators.required, Validators.maxLength(4000)] }),

@@ -37,7 +37,7 @@
                             }
                         </span>
                     </div>
-                    @if (getLatestMessagePreviews(contact).length > 0) {
+                    @if (backendActionsAvailable() && getLatestMessagePreviews(contact).length > 0) {
                     <div class="chat-preview-stack">
                         @for (preview of getLatestMessagePreviews(contact); track preview.messageId) {
                         <div class="chat-preview-row" [class.chat-preview-row--me]="preview.outgoing"
@@ -101,7 +101,7 @@
                 </div>
                 <mat-card-actions class="tile-actions">
                     <div class="tile-actions__left">
-                        @if (userService.hasJwt()) {
+                        @if (backendActionsAvailable()) {
                         <button mat-mini-fab color="secondary"
                             [attr.aria-label]="'common.contact.delete.title' | transloco"
                             (click)="deleteContact(contact)">
@@ -110,7 +110,7 @@
                         }
                     </div>
                     <div class="tile-actions__right">
-                        @if (userService.hasJwt()) {
+                        @if (backendActionsAvailable()) {
                         <button mat-mini-fab color="'active-button'"
                             [attr.aria-label]="'common.contact.list.openChatroomAria' | transloco"
                             [matBadge]="getUnreadBadge(contact.id)" [matBadgeHidden]="getUnreadBadge(contact.id) === ''"
@@ -131,7 +131,7 @@
                                 <mat-icon>settings_account_box</mat-icon>
                                 <span>{{ 'common.contact.list.editAria' | transloco }}</span>
                             </button>
-                            @if (!subscriptionError && userService.hasJwt()) {
+                            @if (!subscriptionError && backendActionsAvailable()) {
                             @if (contact.subscribed) {
                             <button mat-menu-item (click)="subscribe(contact)">
                                 <mat-icon>bookmark_remove</mat-icon>
@@ -163,7 +163,7 @@
         [attr.aria-label]="'common.actions.help' | transloco">
         <mat-icon>help</mat-icon>
     </button>
-    @if (userService.hasJwt()) {
+    @if (backendActionsAvailable()) {
     @if (contactsSignal().length > 1) {
     <button mat-icon-button color="primary" [attr.aria-label]="'common.contact.list.sortAria' | transloco"
         (click)="openSortDialog()">

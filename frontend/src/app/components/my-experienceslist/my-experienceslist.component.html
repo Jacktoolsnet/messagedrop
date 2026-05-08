@@ -75,7 +75,7 @@
                 </button>
                 <button mat-mini-fab color="primary" type="button" class="map-action map-action--desktop"
                   (click)="showOnMap(bookmark.snapshot); $event.stopPropagation()"
-                  [disabled]="!hasDestination(bookmark.snapshot)"
+                  [disabled]="!canResolveDestination(bookmark.snapshot)"
                   [attr.aria-label]="'common.experiences.showOnMap' | transloco">
                   <mat-icon>place</mat-icon>
                 </button>
@@ -85,14 +85,14 @@
                 </button>
                 <button mat-mini-fab color="primary" type="button" class="map-action map-action--desktop"
                   (click)="openInMaps(bookmark.snapshot); $event.stopPropagation()"
-                  [disabled]="!hasDestination(bookmark.snapshot)"
+                  [disabled]="!canResolveDestination(bookmark.snapshot)"
                   [attr.aria-label]="'common.experiences.openInMaps' | transloco">
                   <mat-icon>map</mat-icon>
                 </button>
                 <button mat-mini-fab color="primary" type="button" class="map-action map-action--mobile"
                   [matMenuTriggerFor]="experienceMapMenu"
                   (click)="$event.stopPropagation()"
-                  [disabled]="!hasDestination(bookmark.snapshot)"
+                  [disabled]="!canResolveDestination(bookmark.snapshot)"
                   [attr.aria-label]="experienceMenuAriaLabel(bookmark.snapshot)">
                   <mat-icon>more_vert</mat-icon>
                 </button>
@@ -123,12 +123,10 @@
     [attr.aria-label]="'common.actions.help' | transloco">
     <mat-icon>help</mat-icon>
   </button>
-  @if (userService.hasJwt()) {
   @if (visibleBookmarks().length > 1) {
   <button mat-icon-button color="primary" (click)="openSortDialog()"
     [attr.aria-label]="'common.experiences.sortAria' | transloco">
     <mat-icon>swap_vert</mat-icon>
   </button>
-  }
   }
 </mat-dialog-actions>

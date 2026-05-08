@@ -162,6 +162,9 @@ export class AppComponent implements OnInit {
   private readonly metaService = inject(Meta);
   readonly appService = inject(AppService);
   readonly networkService = inject(NetworkService);
+  readonly restoreBackupAvailable = computed(() =>
+    this.networkService.browserOnline() && this.networkService.backendOnline()
+  );
   private readonly sharedContentService = inject(SharedContentService);
   private readonly indexedDbService = inject(IndexedDbService);
   private readonly backupService = inject(BackupService);

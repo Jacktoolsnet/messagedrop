@@ -217,10 +217,12 @@
         <mat-icon>public</mat-icon>
         <span>{{ 'common.menu.externalContentSettings' | transloco }}</span>
     </button>
+    @if (restoreBackupAvailable()) {
     <button mat-menu-item (click)="startRestore()">
         <mat-icon>restore</mat-icon>
         <span>{{ 'common.menu.restoreBackup' | transloco }}</span>
     </button>
+    }
     }
     <button mat-menu-item (click)="showTermsOfService()">
         <mat-icon>rule</mat-icon>
