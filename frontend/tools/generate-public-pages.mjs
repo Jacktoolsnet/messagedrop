@@ -2988,9 +2988,16 @@ img {
     margin-left: auto;
   }
 
-  .site-nav,
   .site-header-cta {
+    display: inline-flex;
+    justify-content: center;
+    order: 2;
+    width: 100%;
+  }
+
+  .site-nav {
     display: none;
+    order: 3;
     width: 100%;
   }
 
@@ -3002,17 +3009,12 @@ img {
     gap: 0.45rem;
   }
 
-  .site-header.menu-open .site-header-cta {
-    display: inline-flex;
-    justify-content: center;
-  }
-
   .button-small {
     width: 100%;
   }
 
   .brand {
-    align-items: flex-start;
+    align-items: center;
     flex: 1 1 auto;
   }
 
