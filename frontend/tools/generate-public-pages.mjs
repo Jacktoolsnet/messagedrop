@@ -746,7 +746,7 @@ const uiByLocale = {
     navWhat: 'Was ist MessageDrop?',
     navHow: 'So funktioniert MessageDrop',
     navLegal: 'Rechtliches',
-    openApp: 'App öffnen',
+    openApp: 'MessageDrop App öffnen',
     brandHome: 'MessageDrop-App öffnen',
     primaryNav: 'Hauptnavigation',
     legalPages: 'Rechtsseiten',
@@ -766,7 +766,7 @@ const uiByLocale = {
     navWhat: 'What is MessageDrop?',
     navHow: 'How MessageDrop works',
     navLegal: 'Legal',
-    openApp: 'Open app',
+    openApp: 'Open MessageDrop app',
     brandHome: 'Open MessageDrop app',
     primaryNav: 'Primary navigation',
     legalPages: 'Legal pages',
@@ -1039,7 +1039,6 @@ function renderHeader(currentRoute, lang = 'en') {
           <img src="/icons/icon-192x192.png" alt="MessageDrop logo" width="64" height="64">
         </span>
         <span class="brand-copy">
-          <strong>${appName}</strong>
           <span class="button button-primary button-small brand-cta">${escapeHtml(ui.openApp)}</span>
         </span>
       </a>
