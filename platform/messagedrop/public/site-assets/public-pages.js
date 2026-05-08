@@ -22,20 +22,11 @@ document.querySelectorAll('.site-menu-toggle').forEach((button) => {
     sync();
   });
 
-  header.querySelectorAll('.site-nav a, .site-header-cta').forEach((link) => {
+  header.querySelectorAll('.site-nav a').forEach((link) => {
     link.addEventListener('click', () => {
-      if (window.matchMedia('(max-width: 760px)').matches) {
-        header.classList.remove('menu-open');
-        sync();
-      }
-    });
-  });
-
-  window.addEventListener('resize', () => {
-    if (!window.matchMedia('(max-width: 760px)').matches) {
       header.classList.remove('menu-open');
       sync();
-    }
+    });
   });
 
   sync();

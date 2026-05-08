@@ -1034,12 +1034,13 @@ function renderHeader(currentRoute, lang = 'en') {
   const closeLabel = lang === 'de' ? 'Navigation schließen' : 'Close navigation';
   return `
     <header class="site-header">
-      <a class="brand" href="/" aria-label="${escapeHtml(ui.brandHome)}">
+      <a class="brand" href="${appBaseUrl}/" aria-label="${escapeHtml(ui.brandHome)}">
         <span class="brand-avatar">
           <img src="/icons/icon-192x192.png" alt="MessageDrop logo" width="64" height="64">
         </span>
         <span class="brand-copy">
           <strong>${appName}</strong>
+          <span class="button button-primary button-small brand-cta">${escapeHtml(ui.openApp)}</span>
         </span>
       </a>
       <button class="site-menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav"
@@ -1050,7 +1051,6 @@ function renderHeader(currentRoute, lang = 'en') {
       <nav class="site-nav" id="site-nav" aria-label="${escapeHtml(ui.primaryNav)}">
         ${renderNav(currentRoute, lang)}
       </nav>
-      <a class="button button-primary button-small site-header-cta" href="${appBaseUrl}/">${escapeHtml(ui.openApp)}</a>
     </header>
   `;
 }
@@ -1607,20 +1607,11 @@ function renderPublicUiScript() {
     sync();
   });
 
-  header.querySelectorAll('.site-nav a, .site-header-cta').forEach((link) => {
+  header.querySelectorAll('.site-nav a').forEach((link) => {
     link.addEventListener('click', () => {
-      if (window.matchMedia('(max-width: 760px)').matches) {
-        header.classList.remove('menu-open');
-        sync();
-      }
-    });
-  });
-
-  window.addEventListener('resize', () => {
-    if (!window.matchMedia('(max-width: 760px)').matches) {
       header.classList.remove('menu-open');
       sync();
-    }
+    });
   });
 
   sync();
@@ -2137,20 +2128,29 @@ img {
 }
 
 .site-nav {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  gap: 0.4rem;
-  flex-wrap: wrap;
+  display: none;
+  order: 3;
+  width: 100%;
 }
 
-.site-header-cta {
-  flex-shrink: 0;
+.site-header.menu-open .site-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 0.45rem;
+}
+
+.brand-cta {
+  width: max-content;
+  min-height: 2.25rem;
+  padding: 0.55rem 0.8rem;
+  font-size: 0.9rem;
+  pointer-events: none;
 }
 
 .site-menu-toggle {
-  display: none;
+  display: inline-grid;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
@@ -2984,33 +2984,15 @@ img {
   }
 
   .site-menu-toggle {
-    display: inline-grid;
     margin-left: auto;
-  }
-
-  .site-header-cta {
-    display: inline-flex;
-    justify-content: center;
-    order: 2;
-    width: 100%;
-  }
-
-  .site-nav {
-    display: none;
-    order: 3;
-    width: 100%;
-  }
-
-  .site-header.menu-open .site-nav {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    justify-content: flex-start;
-    gap: 0.45rem;
   }
 
   .button-small {
     width: 100%;
+  }
+
+  .brand-cta {
+    width: max-content;
   }
 
   .brand {
@@ -3105,7 +3087,7 @@ img {
   }
 
   .site-nav,
-  .site-header-cta,
+  .brand-cta,
   .site-menu-toggle,
   .cta-row,
   .tile-actions,
