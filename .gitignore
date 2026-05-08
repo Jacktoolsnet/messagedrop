@@ -169,3 +169,6 @@ backups/
 
 # local security scan reports
 tools/security/reports/
+
+# archives
+*.zip
