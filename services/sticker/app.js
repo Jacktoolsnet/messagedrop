@@ -319,7 +319,9 @@ app.use(errorHandler);
         STICKER_DB_USER: process.env.STICKER_DB_USER || process.env.DB_USER || 'messagedrop',
         STICKER_DB_PASSWORD: isEnvSet('STICKER_DB_PASSWORD') || isEnvSet('DB_PASSWORD'),
         STICKER_DB_SSL: process.env.STICKER_DB_SSL || process.env.DB_SSL || null,
-        STICKER_DB_POOL_MAX: process.env.STICKER_DB_POOL_MAX || process.env.DB_POOL_MAX || '10'
+        STICKER_DB_POOL_MAX: process.env.STICKER_DB_POOL_MAX || process.env.DB_POOL_MAX || '10',
+        STICKER_DB_MAX_PENDING_REQUESTS: process.env.STICKER_DB_MAX_PENDING_REQUESTS || process.env.DB_MAX_PENDING_REQUESTS || '1000',
+        STICKER_DB_OVERLOAD_RETRY_AFTER_SECONDS: process.env.STICKER_DB_OVERLOAD_RETRY_AFTER_SECONDS || process.env.DB_OVERLOAD_RETRY_AFTER_SECONDS || '2'
       });
       database.init(logger);
       logStartupStep('PostgreSQL database initialization triggered');

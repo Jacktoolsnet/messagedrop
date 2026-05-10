@@ -112,18 +112,6 @@ function normalizeAcceptLanguage(rawValue) {
   return /^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})?$/.test(first) ? first : null;
 }
 
-function execQuery(db, sql) {
-  return new Promise((resolve, reject) => {
-    db.exec(sql, (err) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-      resolve();
-    });
-  });
-}
-
 function countDestinations(db) {
   return new Promise((resolve, reject) => {
     tableViatorDestinations.countAll(db, (err, total) => {
@@ -220,17 +208,18 @@ async function syncDestinations({ db, logger, force = false } = {}) {
     const syncRunId = randomUUID();
 
     logger?.info?.(`Destination import started (${destinations.length} rows).`);
-    await execQuery(db, 'BEGIN');
-    let written = 0;
-    for (const entry of destinations) {
-      const normalized = normalizeDestination(entry);
-      if (!normalized || !Number.isFinite(normalized.destinationId)) {
-        continue;
+    const written = await db.transaction(async (tx) => {
+      let count = 0;
+      for (const entry of destinations) {
+        const normalized = normalizeDestination(entry);
+        if (!normalized || !Number.isFinite(normalized.destinationId)) {
+          continue;
+        }
+        await upsertDestination(tx, normalized, syncRunId);
+        count += 1;
       }
-      await upsertDestination(db, normalized, syncRunId);
-      written += 1;
-    }
-    await execQuery(db, 'COMMIT');
+      return count;
+    });
 
     const deleted = await deleteDestinationsNotInRun(db, syncRunId);
     logger?.info?.(`Destination cleanup completed (${deleted} rows removed).`);
@@ -238,11 +227,6 @@ async function syncDestinations({ db, logger, force = false } = {}) {
     logger?.info?.(`Destination sync completed (${written} rows).`);
     return { ok: true, count: written };
   } catch (err) {
-    try {
-      await execQuery(db, 'ROLLBACK');
-    } catch {
-      // ignore rollback errors
-    }
     logger?.error?.('Destination sync failed', { error: err?.message || err });
     return { ok: false, error: err?.message || err };
   } finally {

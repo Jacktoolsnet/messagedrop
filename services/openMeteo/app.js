@@ -44,7 +44,7 @@ startupConsole('info', 'Bootstrap started', {
   dotenv: dotenvResult.error
     ? { loaded: false, error: dotenvResult.error.message }
     : { loaded: true, injectedKeys: Object.keys(dotenvResult.parsed || {}).length },
-  env: buildStartupEnv(['NODE_ENV', 'STARTUP_DEBUG', 'OPENMETEO_PORT', 'OPENMETEO_UPSTREAM_TIMEOUT_MS', 'OPENMETEO_DATABASE_URL', 'OPENMETEO_DB_HOST', 'OPENMETEO_DB_PORT', 'OPENMETEO_DB_NAME', 'OPENMETEO_DB_USER', 'OPENMETEO_DB_SSL', 'OPENMETEO_DB_POOL_MAX', 'ADMIN_BASE_URL', 'ADMIN_PORT'], ['ENCRYPTION_KEY_PASSWORD', 'SIGNING_KEY_PASSWORD', 'OPENMETEO_DB_PASSWORD'])
+  env: buildStartupEnv(['NODE_ENV', 'STARTUP_DEBUG', 'OPENMETEO_PORT', 'OPENMETEO_UPSTREAM_TIMEOUT_MS', 'OPENMETEO_DATABASE_URL', 'OPENMETEO_DB_HOST', 'OPENMETEO_DB_PORT', 'OPENMETEO_DB_NAME', 'OPENMETEO_DB_USER', 'OPENMETEO_DB_SSL', 'OPENMETEO_DB_POOL_MAX', 'OPENMETEO_DB_MAX_PENDING_REQUESTS', 'OPENMETEO_DB_OVERLOAD_RETRY_AFTER_SECONDS', 'ADMIN_BASE_URL', 'ADMIN_PORT'], ['ENCRYPTION_KEY_PASSWORD', 'SIGNING_KEY_PASSWORD', 'OPENMETEO_DB_PASSWORD'])
 });
 
 process.on('uncaughtExceptionMonitor', (err) => {
@@ -328,7 +328,9 @@ app.use(errorHandler);
         OPENMETEO_DB_USER: process.env.OPENMETEO_DB_USER || process.env.DB_USER || 'messagedrop',
         OPENMETEO_DB_PASSWORD: isEnvSet('OPENMETEO_DB_PASSWORD') || isEnvSet('DB_PASSWORD'),
         OPENMETEO_DB_SSL: process.env.OPENMETEO_DB_SSL || process.env.DB_SSL || null,
-        OPENMETEO_DB_POOL_MAX: process.env.OPENMETEO_DB_POOL_MAX || process.env.DB_POOL_MAX || '10'
+        OPENMETEO_DB_POOL_MAX: process.env.OPENMETEO_DB_POOL_MAX || process.env.DB_POOL_MAX || '10',
+        OPENMETEO_DB_MAX_PENDING_REQUESTS: process.env.OPENMETEO_DB_MAX_PENDING_REQUESTS || process.env.DB_MAX_PENDING_REQUESTS || '1000',
+        OPENMETEO_DB_OVERLOAD_RETRY_AFTER_SECONDS: process.env.OPENMETEO_DB_OVERLOAD_RETRY_AFTER_SECONDS || process.env.DB_OVERLOAD_RETRY_AFTER_SECONDS || '2'
       });
       database.init(logger);
       logStartupStep('PostgreSQL database initialization triggered');

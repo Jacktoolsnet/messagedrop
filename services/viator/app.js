@@ -44,7 +44,7 @@ startupConsole('info', 'Bootstrap started', {
   dotenv: dotenvResult.error
     ? { loaded: false, error: dotenvResult.error.message }
     : { loaded: true, injectedKeys: Object.keys(dotenvResult.parsed || {}).length },
-  env: buildStartupEnv(['NODE_ENV', 'STARTUP_DEBUG', 'VIATOR_PORT', 'PORT', 'TZ', 'VIATOR_API_BASE_URL', 'VIATOR_API_TIMEOUT_MS', 'VIATOR_ACCEPT_LANGUAGE', 'VIATOR_DATABASE_URL', 'VIATOR_DB_HOST', 'VIATOR_DB_PORT', 'VIATOR_DB_NAME', 'VIATOR_DB_USER', 'VIATOR_DB_SSL', 'VIATOR_DB_POOL_MAX', 'ADMIN_BASE_URL', 'ADMIN_PORT'], ['ENCRYPTION_KEY_PASSWORD', 'SIGNING_KEY_PASSWORD', 'VIATOR_DB_PASSWORD', 'VIATOR_API_KEY'])
+  env: buildStartupEnv(['NODE_ENV', 'STARTUP_DEBUG', 'VIATOR_PORT', 'PORT', 'TZ', 'VIATOR_API_BASE_URL', 'VIATOR_API_TIMEOUT_MS', 'VIATOR_ACCEPT_LANGUAGE', 'VIATOR_DATABASE_URL', 'VIATOR_DB_HOST', 'VIATOR_DB_PORT', 'VIATOR_DB_NAME', 'VIATOR_DB_USER', 'VIATOR_DB_SSL', 'VIATOR_DB_POOL_MAX', 'VIATOR_DB_MAX_PENDING_REQUESTS', 'VIATOR_DB_OVERLOAD_RETRY_AFTER_SECONDS', 'ADMIN_BASE_URL', 'ADMIN_PORT'], ['ENCRYPTION_KEY_PASSWORD', 'SIGNING_KEY_PASSWORD', 'VIATOR_DB_PASSWORD', 'VIATOR_API_KEY'])
 });
 
 process.on('uncaughtExceptionMonitor', (err) => {
@@ -316,7 +316,9 @@ app.use(errorHandler);
         VIATOR_DB_USER: process.env.VIATOR_DB_USER || process.env.DB_USER || 'messagedrop',
         VIATOR_DB_PASSWORD: isEnvSet('VIATOR_DB_PASSWORD') || isEnvSet('DB_PASSWORD'),
         VIATOR_DB_SSL: process.env.VIATOR_DB_SSL || process.env.DB_SSL || null,
-        VIATOR_DB_POOL_MAX: process.env.VIATOR_DB_POOL_MAX || process.env.DB_POOL_MAX || '10'
+        VIATOR_DB_POOL_MAX: process.env.VIATOR_DB_POOL_MAX || process.env.DB_POOL_MAX || '10',
+        VIATOR_DB_MAX_PENDING_REQUESTS: process.env.VIATOR_DB_MAX_PENDING_REQUESTS || process.env.DB_MAX_PENDING_REQUESTS || '1000',
+        VIATOR_DB_OVERLOAD_RETRY_AFTER_SECONDS: process.env.VIATOR_DB_OVERLOAD_RETRY_AFTER_SECONDS || process.env.DB_OVERLOAD_RETRY_AFTER_SECONDS || '2'
       });
       database.init(logger);
       logStartupStep('PostgreSQL database initialization triggered');

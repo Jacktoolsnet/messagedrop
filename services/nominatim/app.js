@@ -44,7 +44,7 @@ startupConsole('info', 'Bootstrap started', {
   dotenv: dotenvResult.error
     ? { loaded: false, error: dotenvResult.error.message }
     : { loaded: true, injectedKeys: Object.keys(dotenvResult.parsed || {}).length },
-  env: buildStartupEnv(['NODE_ENV', 'STARTUP_DEBUG', 'NOMINATIM_PORT', 'NOMINATIM_USER_AGENT', 'NOMINATIM_DATABASE_URL', 'NOMINATIM_DB_HOST', 'NOMINATIM_DB_PORT', 'NOMINATIM_DB_NAME', 'NOMINATIM_DB_USER', 'NOMINATIM_DB_SSL', 'NOMINATIM_DB_POOL_MAX', 'ADMIN_BASE_URL', 'ADMIN_PORT'], ['ENCRYPTION_KEY_PASSWORD', 'SIGNING_KEY_PASSWORD', 'NOMINATIM_DB_PASSWORD'])
+  env: buildStartupEnv(['NODE_ENV', 'STARTUP_DEBUG', 'NOMINATIM_PORT', 'NOMINATIM_USER_AGENT', 'NOMINATIM_DATABASE_URL', 'NOMINATIM_DB_HOST', 'NOMINATIM_DB_PORT', 'NOMINATIM_DB_NAME', 'NOMINATIM_DB_USER', 'NOMINATIM_DB_SSL', 'NOMINATIM_DB_POOL_MAX', 'NOMINATIM_DB_MAX_PENDING_REQUESTS', 'NOMINATIM_DB_OVERLOAD_RETRY_AFTER_SECONDS', 'ADMIN_BASE_URL', 'ADMIN_PORT'], ['ENCRYPTION_KEY_PASSWORD', 'SIGNING_KEY_PASSWORD', 'NOMINATIM_DB_PASSWORD'])
 });
 
 process.on('uncaughtExceptionMonitor', (err) => {
@@ -317,7 +317,9 @@ app.use(errorHandler);
         NOMINATIM_DB_USER: process.env.NOMINATIM_DB_USER || process.env.DB_USER || 'messagedrop',
         NOMINATIM_DB_PASSWORD: isEnvSet('NOMINATIM_DB_PASSWORD') || isEnvSet('DB_PASSWORD'),
         NOMINATIM_DB_SSL: process.env.NOMINATIM_DB_SSL || process.env.DB_SSL || null,
-        NOMINATIM_DB_POOL_MAX: process.env.NOMINATIM_DB_POOL_MAX || process.env.DB_POOL_MAX || '10'
+        NOMINATIM_DB_POOL_MAX: process.env.NOMINATIM_DB_POOL_MAX || process.env.DB_POOL_MAX || '10',
+        NOMINATIM_DB_MAX_PENDING_REQUESTS: process.env.NOMINATIM_DB_MAX_PENDING_REQUESTS || process.env.DB_MAX_PENDING_REQUESTS || '1000',
+        NOMINATIM_DB_OVERLOAD_RETRY_AFTER_SECONDS: process.env.NOMINATIM_DB_OVERLOAD_RETRY_AFTER_SECONDS || process.env.DB_OVERLOAD_RETRY_AFTER_SECONDS || '2'
       });
       database.init(logger);
       logStartupStep('PostgreSQL database initialization triggered');

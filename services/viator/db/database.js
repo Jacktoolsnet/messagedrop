@@ -1,6 +1,27 @@
 const tableViatorCache = require('./tableViatorCache');
 const tableViatorDestinations = require('./tableViatorDestinations');
 
+
+const DEFAULT_MAX_PENDING_REQUESTS = 1000;
+
+function resolveMaxPendingRequests(rawValue) {
+  const parsed = Number.parseInt(String(rawValue ?? ''), 10);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return DEFAULT_MAX_PENDING_REQUESTS;
+  }
+  return parsed;
+}
+
+function createQueueOverloadedError(pendingCount, maxPendingRequests) {
+  const error = new Error('Viator database queue overloaded');
+  error.code = 'DB_QUEUE_OVERLOADED';
+  error.status = 503;
+  error.statusCode = 503;
+  error.errorCode = 'SERVICE_UNAVAILABLE';
+  error.detail = { pendingCount, maxPendingRequests };
+  return error;
+}
+
 const ROW_KEY_MAP = new Map(Object.entries({
   cachekey: 'cacheKey',
   expiresat: 'expiresAt',
@@ -84,6 +105,11 @@ class PostgresCompat {
     this._pool = new Pool(config);
     this._logger = logger ?? console;
     this._closed = false;
+    this._activeTasks = new Set();
+    this._pendingCount = 0;
+    this._maxPendingRequests = resolveMaxPendingRequests(
+      process.env.VIATOR_DB_MAX_PENDING_REQUESTS || process.env.DB_MAX_PENDING_REQUESTS
+    );
   }
 
   _normalizeError(error) {
@@ -135,14 +161,16 @@ class PostgresCompat {
   }
 
   async _query(sql, params = []) {
-    if (this._closed) {
-      throw new Error('Database connection is closed');
-    }
-    const prepared = preparePostgresSql(sql);
-    if (!prepared) {
-      return { rows: [], rowCount: 0 };
-    }
-    return this._pool.query(prepared, params);
+    return this._trackTask(async () => {
+      if (this._closed) {
+        throw new Error('Database connection is closed');
+      }
+      const prepared = preparePostgresSql(sql);
+      if (!prepared) {
+        return { rows: [], rowCount: 0 };
+      }
+      return this._pool.query(prepared, params);
+    });
   }
 
   exec(sql, callback) {
@@ -201,6 +229,99 @@ class PostgresCompat {
     };
   }
 
+
+  _trackTask(task) {
+    if (this.isOverloaded()) {
+      return Promise.reject(createQueueOverloadedError(this._pendingCount, this._maxPendingRequests));
+    }
+    this._pendingCount += 1;
+    const run = Promise.resolve()
+      .then(task)
+      .finally(() => {
+        this._pendingCount = Math.max(0, this._pendingCount - 1);
+        this._activeTasks.delete(run);
+      });
+    this._activeTasks.add(run);
+    return run;
+  }
+
+  _createClientCompat(client) {
+    const queryClient = async (sql, params = []) => {
+      const prepared = preparePostgresSql(sql);
+      if (!prepared) {
+        return { rows: [], rowCount: 0 };
+      }
+      return client.query(prepared, params);
+    };
+
+    return {
+      run: (sql, params, callback) => {
+        const normalized = this._normalizeParams(params, callback);
+        queryClient(sql, normalized.params)
+          .then((result) => {
+            this._safeInvokeCallback(normalized.callback, null, undefined, {
+              changes: Number(result?.rowCount ?? 0),
+              lastID: null
+            });
+          })
+          .catch((err) => this._safeInvokeCallback(normalized.callback, err));
+      },
+      get: (sql, params, callback) => {
+        const normalized = this._normalizeParams(params, callback);
+        queryClient(sql, normalized.params)
+          .then((result) => this._safeInvokeCallback(normalized.callback, null, normalizeRow(result?.rows?.[0]) || null))
+          .catch((err) => this._safeInvokeCallback(normalized.callback, err));
+      },
+      all: (sql, params, callback) => {
+        const normalized = this._normalizeParams(params, callback);
+        queryClient(sql, normalized.params)
+          .then((result) => this._safeInvokeCallback(normalized.callback, null, (result?.rows || []).map(normalizeRow)))
+          .catch((err) => this._safeInvokeCallback(normalized.callback, err));
+      },
+      exec: (sql, callback) => {
+        (async () => {
+          for (const statement of splitSqlStatements(sql)) {
+            await queryClient(statement, []);
+          }
+        })()
+          .then(() => this._safeInvokeCallback(callback, null))
+          .catch((err) => this._safeInvokeCallback(callback, err));
+      }
+    };
+  }
+
+  transaction(callback) {
+    if (typeof callback !== 'function') {
+      return Promise.reject(new Error('Transaction callback is required'));
+    }
+
+    return this._trackTask(async () => {
+      if (this._closed) {
+        throw new Error('Database connection is closed');
+      }
+      const client = await this._pool.connect();
+      try {
+        await client.query('BEGIN');
+        const result = await callback(this._createClientCompat(client));
+        await client.query('COMMIT');
+        return result;
+      } catch (err) {
+        try {
+          await client.query('ROLLBACK');
+        } catch (rollbackErr) {
+          this._logger?.warn?.('Viator PostgreSQL rollback failed', rollbackErr?.message || rollbackErr);
+        }
+        throw err;
+      } finally {
+        client.release();
+      }
+    });
+  }
+
+  pendingCount() { return this._pendingCount; }
+  maxPendingRequests() { return this._maxPendingRequests; }
+  isOverloaded() { return this._pendingCount >= this._maxPendingRequests; }
+
   serialize(fn) {
     if (typeof fn === 'function') fn();
   }
@@ -211,7 +332,8 @@ class PostgresCompat {
       return;
     }
     this._closed = true;
-    this._pool.end()
+    Promise.allSettled(Array.from(this._activeTasks))
+      .then(() => this._pool.end())
       .then(() => this._safeInvokeCallback(callback, null))
       .catch((err) => this._safeInvokeCallback(callback, err));
   }
@@ -252,6 +374,21 @@ class Database {
     } catch (err) {
       this.logger.error(err?.message || err);
     }
+  }
+
+
+  pendingCount() {
+    return typeof this.db?.pendingCount === 'function' ? this.db.pendingCount() : 0;
+  }
+
+  maxPendingRequests() {
+    return typeof this.db?.maxPendingRequests === 'function'
+      ? this.db.maxPendingRequests()
+      : DEFAULT_MAX_PENDING_REQUESTS;
+  }
+
+  isOverloaded() {
+    return typeof this.db?.isOverloaded === 'function' ? this.db.isOverloaded() : false;
   }
 
   initTriggers() {
