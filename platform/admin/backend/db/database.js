@@ -26,6 +26,26 @@ const tablePublicContent = require('./tablePublicContent');
 const tableCertificateHealth = require('./tableCertificateHealth');
 
 
+const DEFAULT_MAX_PENDING_REQUESTS = 1000;
+
+function resolveMaxPendingRequests(rawValue) {
+  const parsed = Number.parseInt(String(rawValue ?? ''), 10);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return DEFAULT_MAX_PENDING_REQUESTS;
+  }
+  return parsed;
+}
+
+function createQueueOverloadedError(pendingCount, maxPendingRequests) {
+  const error = new Error('Admin database queue overloaded');
+  error.code = 'DB_QUEUE_OVERLOADED';
+  error.status = 503;
+  error.statusCode = 503;
+  error.errorCode = 'SERVICE_UNAVAILABLE';
+  error.detail = { pendingCount, maxPendingRequests };
+  return error;
+}
+
 
 function buildIdentifierMap() {
   const map = new Map();
@@ -126,7 +146,13 @@ class PostgresCompat {
     this._pool = new Pool(config);
     this._logger = logger ?? console;
     this._closed = false;
-    this._chain = Promise.resolve();
+    this._serialChain = Promise.resolve();
+    this._serialMode = false;
+    this._activeTasks = new Set();
+    this._pendingCount = 0;
+    this._maxPendingRequests = resolveMaxPendingRequests(
+      process.env.ADMIN_DB_MAX_PENDING_REQUESTS || process.env.DB_MAX_PENDING_REQUESTS
+    );
   }
 
   _normalizeError(error) {
@@ -168,9 +194,82 @@ class PostgresCompat {
   }
 
   _enqueue(task) {
-    const run = this._chain.then(task, task);
-    this._chain = run.catch(() => {});
+    if (this.isOverloaded()) {
+      return Promise.reject(createQueueOverloadedError(this._pendingCount, this._maxPendingRequests));
+    }
+    this._pendingCount += 1;
+    const run = (this._serialMode
+      ? this._serialChain.then(task, task)
+      : Promise.resolve().then(task)
+    ).finally(() => {
+      this._pendingCount = Math.max(0, this._pendingCount - 1);
+      this._activeTasks.delete(run);
+    });
+    this._activeTasks.add(run);
+    if (this._serialMode) {
+      this._serialChain = run.catch(() => {});
+    }
     return run;
+  }
+
+  _createClientCompat(client) {
+    const queryClient = async (sql, params = []) => {
+      const tableInfo = await this._tableInfo(sql);
+      if (tableInfo) return { rows: tableInfo, rowCount: tableInfo.length };
+      const prepared = preparePostgresSql(sql);
+      if (!prepared) return { rows: [], rowCount: 0 };
+      return client.query(prepared, params);
+    };
+
+    return {
+      run: (sql, params, callback) => {
+        const normalized = this._normalizeParams(params, callback);
+        queryClient(sql, normalized.params)
+          .then((result) => this._safeInvokeCallback(normalized.callback, null, undefined, {
+            changes: Number(result?.rowCount ?? 0),
+            lastID: result?.rows?.[0]?.id ?? null
+          }))
+          .catch((err) => this._safeInvokeCallback(normalized.callback, err));
+      },
+      get: (sql, params, callback) => {
+        const normalized = this._normalizeParams(params, callback);
+        queryClient(sql, normalized.params)
+          .then((result) => this._safeInvokeCallback(normalized.callback, null, normalizeRow(result?.rows?.[0]) || null))
+          .catch((err) => this._safeInvokeCallback(normalized.callback, err));
+      },
+      all: (sql, params, callback) => {
+        const normalized = this._normalizeParams(params, callback);
+        queryClient(sql, normalized.params)
+          .then((result) => this._safeInvokeCallback(normalized.callback, null, (result?.rows || []).map(normalizeRow)))
+          .catch((err) => this._safeInvokeCallback(normalized.callback, err));
+      }
+    };
+  }
+
+  transaction(callback) {
+    if (typeof callback !== 'function') {
+      return Promise.reject(new Error('Transaction callback is required'));
+    }
+
+    return this._enqueue(async () => {
+      if (this._closed) throw new Error('Database connection is closed');
+      const client = await this._pool.connect();
+      try {
+        await client.query('BEGIN');
+        const result = await callback(this._createClientCompat(client));
+        await client.query('COMMIT');
+        return result;
+      } catch (err) {
+        try {
+          await client.query('ROLLBACK');
+        } catch (rollbackErr) {
+          this._logger?.warn?.('Admin PostgreSQL rollback failed', rollbackErr?.message || rollbackErr);
+        }
+        throw err;
+      } finally {
+        client.release();
+      }
+    });
   }
 
   async _tableInfo(sql) {
@@ -255,8 +354,27 @@ class PostgresCompat {
   }
 
   serialize(fn) {
-    if (typeof fn === 'function') fn();
+    if (typeof fn !== 'function') return;
+    const previous = this._serialMode;
+    this._serialMode = true;
+    try {
+      fn();
+    } finally {
+      this._serialMode = previous;
+    }
   }
+
+  beginSerialExecution() {
+    this._serialMode = true;
+  }
+
+  endSerialExecution() {
+    this._serialMode = false;
+  }
+
+  pendingCount() { return this._pendingCount; }
+  maxPendingRequests() { return this._maxPendingRequests; }
+  isOverloaded() { return this._pendingCount >= this._maxPendingRequests; }
 
   close(callback) {
     if (this._closed) {
@@ -264,7 +382,8 @@ class PostgresCompat {
       return;
     }
     this._closed = true;
-    this._chain
+    Promise.allSettled(Array.from(this._activeTasks))
+      .then(() => this._serialChain)
       .then(() => this._pool.end())
       .then(() => this._safeInvokeCallback(callback, null))
       .catch((err) => this._safeInvokeCallback(callback, err));
@@ -281,6 +400,7 @@ class Database {
     this.logger = logger ?? console;
     try {
       this.db = new PostgresCompat(createDbConfigFromEnv(), this.logger);
+      this.db.beginSerialExecution();
       tableUser.init(this.db);
       tableDsaSignal.init(this.db);
       tableDsaNotice.init(this.db);
@@ -307,11 +427,33 @@ class Database {
       tableCertificateHealth.init(this.db);
       this.initTriggers();
       this.initIndexes();
+      this.db.get('SELECT 1;', (readyErr) => {
+        this.db.endSerialExecution();
+        if (readyErr) {
+          this.logger.error(readyErr?.message || readyErr);
+          return;
+        }
+        this.logger.info('Connected to the messagedrop Admin PostgreSQL database.');
+      });
 
-      this.logger.info('Connected to the messagedrop Admin PostgreSQL database.');
     } catch (err) {
+      this.db?.endSerialExecution?.();
       this.logger.error(err?.message || err);
     }
+  }
+
+  pendingCount() {
+    return typeof this.db?.pendingCount === 'function' ? this.db.pendingCount() : 0;
+  }
+
+  maxPendingRequests() {
+    return typeof this.db?.maxPendingRequests === 'function'
+      ? this.db.maxPendingRequests()
+      : DEFAULT_MAX_PENDING_REQUESTS;
+  }
+
+  isOverloaded() {
+    return typeof this.db?.isOverloaded === 'function' ? this.db.isOverloaded() : false;
   }
 
   close() {

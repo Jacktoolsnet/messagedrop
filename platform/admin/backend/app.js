@@ -43,7 +43,7 @@ startupConsole('info', 'Bootstrap started', {
   platform: process.platform,
   envFileLookedUpByDotenv: path.resolve(process.cwd(), '.env'),
   envLoader: { type: 'loadEnv', candidates: [path.resolve(__dirname, '.env'), path.resolve(__dirname, '../../../.env')] },
-  env: buildStartupEnv(['NODE_ENV', 'STARTUP_DEBUG', 'ADMIN_PORT', 'ADMIN_BASE_URL', 'ADMIN_ORIGIN', 'BASE_URL', 'PORT', 'ADMIN_DATABASE_URL', 'ADMIN_DB_HOST', 'ADMIN_DB_PORT', 'ADMIN_DB_NAME', 'ADMIN_DB_USER', 'ADMIN_DB_SSL', 'ADMIN_DB_POOL_MAX', 'STICKER_BASE_URL', 'STICKER_PORT'], ['ADMIN_JWT_SECRET', 'ADMIN_OTP_SECRET', 'ADMIN_ROOT_PASSWORD', 'PUBLIC_JWT_SECRET', 'JWT_SECRET', 'ENCRYPTION_KEY_PASSWORD', 'SIGNING_KEY_PASSWORD', 'ADMIN_DB_PASSWORD', 'DEEPL_API_KEY', 'MAKE_API_KEY', 'MAIL_PASSWORD', 'FLATICON_API_KEY'])
+  env: buildStartupEnv(['NODE_ENV', 'STARTUP_DEBUG', 'ADMIN_PORT', 'ADMIN_BASE_URL', 'ADMIN_ORIGIN', 'BASE_URL', 'PORT', 'ADMIN_DATABASE_URL', 'ADMIN_DB_HOST', 'ADMIN_DB_PORT', 'ADMIN_DB_NAME', 'ADMIN_DB_USER', 'ADMIN_DB_SSL', 'ADMIN_DB_POOL_MAX', 'ADMIN_DB_MAX_PENDING_REQUESTS', 'ADMIN_DB_OVERLOAD_RETRY_AFTER_SECONDS', 'STICKER_BASE_URL', 'STICKER_PORT'], ['ADMIN_JWT_SECRET', 'ADMIN_OTP_SECRET', 'ADMIN_ROOT_PASSWORD', 'PUBLIC_JWT_SECRET', 'JWT_SECRET', 'ENCRYPTION_KEY_PASSWORD', 'SIGNING_KEY_PASSWORD', 'ADMIN_DB_PASSWORD', 'DEEPL_API_KEY', 'MAKE_API_KEY', 'MAIL_PASSWORD', 'FLATICON_API_KEY'])
 });
 
 process.on('uncaughtExceptionMonitor', (err) => {
@@ -637,7 +637,9 @@ app.use(errorHandler);
         ADMIN_DB_USER: process.env.ADMIN_DB_USER || process.env.DB_USER || 'messagedrop',
         ADMIN_DB_PASSWORD: isEnvSet('ADMIN_DB_PASSWORD') || isEnvSet('DB_PASSWORD'),
         ADMIN_DB_SSL: process.env.ADMIN_DB_SSL || process.env.DB_SSL || null,
-        ADMIN_DB_POOL_MAX: process.env.ADMIN_DB_POOL_MAX || process.env.DB_POOL_MAX || '10'
+        ADMIN_DB_POOL_MAX: process.env.ADMIN_DB_POOL_MAX || process.env.DB_POOL_MAX || '10',
+        ADMIN_DB_MAX_PENDING_REQUESTS: process.env.ADMIN_DB_MAX_PENDING_REQUESTS || process.env.DB_MAX_PENDING_REQUESTS || '1000',
+        ADMIN_DB_OVERLOAD_RETRY_AFTER_SECONDS: process.env.ADMIN_DB_OVERLOAD_RETRY_AFTER_SECONDS || process.env.DB_OVERLOAD_RETRY_AFTER_SECONDS || '2'
       });
       database.init(logger);
       logStartupStep('PostgreSQL database initialization triggered');
