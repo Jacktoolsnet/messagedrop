@@ -1643,45 +1643,45 @@
     },
     "level": {
       "temperature": {
-        "freezing": "Bajo cero",
+        "freezing": "Bajo 0 °C",
         "cold": "Frío",
-        "cool": "Fresco",
+        "cool": "Templado",
         "warm": "Cálido",
         "hot": "Caluroso",
-        "extremeHeat": "Calor extremo"
+        "extremeHeat": "Muy caluroso"
       },
       "uvIndex": {
         "low": "Bajo",
-        "moderate": "Moderado",
+        "moderate": "Medio",
         "high": "Alto",
         "veryHigh": "Muy alto",
-        "extreme": "Extremo"
+        "extreme": "Muy intenso"
       },
       "precipitationProbability": {
-        "unlikely": "Poco probable",
-        "possible": "Posible",
-        "likely": "Probable",
-        "veryLikely": "Muy probable"
+        "unlikely": "Baja",
+        "possible": "Media",
+        "likely": "Alta",
+        "veryLikely": "Muy alta"
       },
       "precipitation": {
-        "dry": "Seco",
-        "lightRain": "Lluvia ligera",
-        "rain": "Lluvia",
-        "heavyRain": "Lluvia fuerte",
-        "downpour": "Aguacero"
+        "dry": "Sin precipitación",
+        "lightRain": "Ligera",
+        "rain": "Media",
+        "heavyRain": "Fuerte",
+        "downpour": "Muy fuerte"
       },
       "wind": {
-        "calm": "Calma",
-        "breezy": "Brisa",
-        "windy": "Ventoso",
-        "strongWind": "Viento fuerte",
-        "storm": "Tormenta"
+        "calm": "Muy débil",
+        "breezy": "Débil",
+        "windy": "Moderado",
+        "strongWind": "Fuerte",
+        "storm": "Muy fuerte"
       },
       "pressure": {
         "low": "Baja",
-        "moderate": "Moderada",
-        "high": "Alta",
-        "veryHigh": "Muy alta"
+        "moderate": "Normal",
+        "high": "Elevada",
+        "veryHigh": "Alta"
       }
     },
     "airQuality": {

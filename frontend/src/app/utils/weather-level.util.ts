@@ -11,7 +11,7 @@ export function getWeatherBaseColor(type: WeatherTileType, value: number): strin
       if (value < 0) return '#1565C0';
       if (value < 10) return '#42A5F5';
       if (value < 20) return '#66BB6A';
-      if (value < 28) return '#FFA726';
+      if (value < 30) return '#FFA726';
       if (value < 35) return '#EF5350';
       return '#B71C1C';
     case 'uvIndex':
@@ -32,15 +32,15 @@ export function getWeatherBaseColor(type: WeatherTileType, value: number): strin
       if (value < 10.0) return '#4fc3f7';
       return '#0288d1';
     case 'wind':
-      if (value < 5) return '#c8e6c9';
-      if (value < 15) return '#aed581';
-      if (value < 30) return '#fbc02d';
-      if (value < 50) return '#fb8c00';
+      if (value < 6) return '#c8e6c9';
+      if (value < 20) return '#aed581';
+      if (value < 39) return '#fbc02d';
+      if (value < 62) return '#fb8c00';
       return '#e64a19';
     case 'pressure':
-      if (value < 980) return '#81d4fa';
+      if (value < 990) return '#81d4fa';
       if (value < 1010) return '#c8e6c9';
-      if (value < 1030) return '#ffcc80';
+      if (value < 1025) return '#ffcc80';
       return '#ffb74d';
     default:
       return '#ffffff';
@@ -60,7 +60,7 @@ export function getWeatherLevelLabel(type: WeatherTileType, value: number): stri
       if (value < 0) return 'weather.level.temperature.freezing';
       if (value < 10) return 'weather.level.temperature.cold';
       if (value < 20) return 'weather.level.temperature.cool';
-      if (value < 28) return 'weather.level.temperature.warm';
+      if (value < 30) return 'weather.level.temperature.warm';
       if (value < 35) return 'weather.level.temperature.hot';
       return 'weather.level.temperature.extremeHeat';
     case 'uvIndex':
@@ -81,15 +81,15 @@ export function getWeatherLevelLabel(type: WeatherTileType, value: number): stri
       if (value < 10.0) return 'weather.level.precipitation.heavyRain';
       return 'weather.level.precipitation.downpour';
     case 'wind':
-      if (value < 5) return 'weather.level.wind.calm';
-      if (value < 15) return 'weather.level.wind.breezy';
-      if (value < 30) return 'weather.level.wind.windy';
-      if (value < 50) return 'weather.level.wind.strongWind';
+      if (value < 6) return 'weather.level.wind.calm';
+      if (value < 20) return 'weather.level.wind.breezy';
+      if (value < 39) return 'weather.level.wind.windy';
+      if (value < 62) return 'weather.level.wind.strongWind';
       return 'weather.level.wind.storm';
     case 'pressure':
-      if (value < 980) return 'weather.level.pressure.low';
+      if (value < 990) return 'weather.level.pressure.low';
       if (value < 1010) return 'weather.level.pressure.moderate';
-      if (value < 1030) return 'weather.level.pressure.high';
+      if (value < 1025) return 'weather.level.pressure.high';
       return 'weather.level.pressure.veryHigh';
     default:
       return '';
