@@ -103,7 +103,6 @@ const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder'
 const { normalizeErrorResponses, notFoundHandler, errorHandler } = require('./middleware/api-error');
 const { cleanupClosedDsaCases } = require('./utils/dsaCleanup');
 const { parseRetentionMs, DAY_MS } = require('./utils/logRetention');
-const { performPendingRestore } = require('./utils/maintenanceBackup');
 const { runCertificateHealthCheck } = require('./utils/certificateHealth');
 const robotsSitemap = require('./middleware/robots-sitemap');
 
@@ -617,10 +616,6 @@ app.use(errorHandler);
     });
     await generateOrLoadKeypairs();
     logStartupStep('Admin keypairs ready');
-
-    logStartupStep('Checking for pending maintenance restore');
-    await performPendingRestore(logger);
-    logStartupStep('Pending maintenance restore check finished');
 
     const configuredPort = Number(process.env.ADMIN_PORT);
     if (!Number.isFinite(configuredPort) || configuredPort <= 0) {
