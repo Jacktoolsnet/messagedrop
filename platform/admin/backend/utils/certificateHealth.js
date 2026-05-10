@@ -1,3 +1,4 @@
+const fs = require('node:fs');
 const tls = require('node:tls');
 const tableCertificateHealth = require('../db/tableCertificateHealth');
 const { sendMail } = require('./mailer');
@@ -158,7 +159,7 @@ function splitNamedTarget(entry) {
   return { label: null, targetText: trimmed };
 }
 
-function parseManualTarget(rawValue, fallbackLabel) {
+function parseManualTarget(rawValue, fallbackLabel, source = 'CERT_MONITOR_DOMAINS') {
   const named = splitNamedTarget(rawValue);
   if (!named?.targetText) {
     return null;
@@ -167,7 +168,7 @@ function parseManualTarget(rawValue, fallbackLabel) {
   const label = named.label || fallbackLabel || 'Manual target';
   const targetText = named.targetText;
   if (/^https?:\/\//i.test(targetText)) {
-    return parseUrlTarget(targetText, label, 'CERT_MONITOR_DOMAINS');
+    return parseUrlTarget(targetText, label, source);
   }
 
   const hostPortMatch = targetText.match(/^([^:\s/]+)(?::(\d+))?$/);
@@ -187,7 +188,7 @@ function parseManualTarget(rawValue, fallbackLabel) {
     port,
     origin: normalizeOrigin(host, port),
     labels: splitDistinct([label]),
-    sources: ['CERT_MONITOR_DOMAINS']
+    sources: [source]
   };
 }
 
@@ -201,6 +202,41 @@ function mergeTarget(existing, incoming) {
   return existing;
 }
 
+function splitManualEntries(rawValue) {
+  return String(rawValue || '')
+    .split(/[\n,;]/)
+    .map((value) => value.trim())
+    .filter(Boolean);
+}
+
+function getManualDomainSources() {
+  const sources = [];
+  const addSource = (source, value) => {
+    const entries = splitManualEntries(value);
+    if (entries.length > 0) {
+      sources.push({ source, entries });
+    }
+  };
+
+  addSource('CERT_MONITOR_DOMAINS', process.env.CERT_MONITOR_DOMAINS);
+
+  Object.keys(process.env)
+    .filter((key) => key !== 'CERT_MONITOR_DOMAINS_FILE' && /^CERT_MONITOR_DOMAINS_[A-Z0-9_]+$/i.test(key))
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }))
+    .forEach((key) => addSource(key, process.env[key]));
+
+  const domainsFile = process.env.CERT_MONITOR_DOMAINS_FILE;
+  if (typeof domainsFile === 'string' && domainsFile.trim()) {
+    try {
+      addSource('CERT_MONITOR_DOMAINS_FILE', fs.readFileSync(domainsFile.trim(), 'utf8'));
+    } catch {
+      // Ignore unreadable files here. The monitor still uses all other configured targets.
+    }
+  }
+
+  return sources;
+}
+
 function resolveConfiguredTargets() {
   const targets = new Map();
 
@@ -212,17 +248,14 @@ function resolveConfiguredTargets() {
     targets.set(parsed.targetKey, mergeTarget(targets.get(parsed.targetKey), parsed));
   }
 
-  const manualEntries = String(process.env.CERT_MONITOR_DOMAINS || '')
-    .split(/[\n,;]/)
-    .map((value) => value.trim())
-    .filter(Boolean);
-
-  for (const entry of manualEntries) {
-    const parsed = parseManualTarget(entry, 'Certificate target');
-    if (!parsed) {
-      continue;
+  for (const { source, entries } of getManualDomainSources()) {
+    for (const entry of entries) {
+      const parsed = parseManualTarget(entry, 'Certificate target', source);
+      if (!parsed) {
+        continue;
+      }
+      targets.set(parsed.targetKey, mergeTarget(targets.get(parsed.targetKey), parsed));
     }
-    targets.set(parsed.targetKey, mergeTarget(targets.get(parsed.targetKey), parsed));
   }
 
   return Array.from(targets.values())
