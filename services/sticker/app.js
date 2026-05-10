@@ -43,7 +43,7 @@ startupConsole('info', 'Bootstrap started', {
   platform: process.platform,
   envFileLookedUpByDotenv: path.resolve(process.cwd(), '.env'),
   envLoader: { type: 'loadEnv', candidates: [path.resolve(__dirname, '.env'), path.resolve(__dirname, '../../.env')] },
-  env: buildStartupEnv(['NODE_ENV', 'STARTUP_DEBUG', 'STICKER_PORT', 'PORT', 'STICKER_DATABASE_URL', 'STICKER_DB_HOST', 'STICKER_DB_PORT', 'STICKER_DB_NAME', 'STICKER_DB_USER', 'STICKER_DB_SSL', 'STICKER_DB_POOL_MAX', 'FLATICON_HTTP_TIMEOUT_MS', 'ADMIN_BASE_URL', 'ADMIN_PORT'], ['ENCRYPTION_KEY_PASSWORD', 'SIGNING_KEY_PASSWORD', 'STICKER_DB_PASSWORD', 'FLATICON_API_KEY'])
+  env: buildStartupEnv(['NODE_ENV', 'STARTUP_DEBUG', 'STICKER_PORT', 'PORT', 'STICKER_JSON_BODY_LIMIT', 'STICKER_JSON_BODY_LIMIT_MB', 'STICKER_DATABASE_URL', 'STICKER_DB_HOST', 'STICKER_DB_PORT', 'STICKER_DB_NAME', 'STICKER_DB_USER', 'STICKER_DB_SSL', 'STICKER_DB_POOL_MAX', 'FLATICON_HTTP_TIMEOUT_MS', 'ADMIN_BASE_URL', 'ADMIN_PORT'], ['ENCRYPTION_KEY_PASSWORD', 'SIGNING_KEY_PASSWORD', 'STICKER_DB_PASSWORD', 'FLATICON_API_KEY'])
 });
 
 process.on('uncaughtExceptionMonitor', (err) => {
@@ -174,6 +174,22 @@ function logStartupError(message, err, meta) {
   logger.error(`[startup] ${message}`, payload);
 }
 
+function resolveStickerJsonBodyLimit() {
+  const explicitLimit = String(process.env.STICKER_JSON_BODY_LIMIT || '').trim();
+  if (explicitLimit) {
+    return explicitLimit;
+  }
+
+  const limitMb = Number(process.env.STICKER_JSON_BODY_LIMIT_MB || 1);
+  if (Number.isFinite(limitMb) && limitMb > 0) {
+    return `${limitMb}mb`;
+  }
+
+  return '1mb';
+}
+
+const stickerJsonBodyLimit = resolveStickerJsonBodyLimit();
+
 function registerProcessHandlers() {
   const exitOnUnhandled = process.env.EXIT_ON_UNHANDLED === 'true';
   const logProcessError = (label, err) => {
@@ -215,10 +231,12 @@ attachForwarding(logger, {
   source: 'sticker-service'
 });
 
+logStartupStep('Configured JSON body limit', { limit: stickerJsonBodyLimit });
+
 app.use(helmet());
 app.use(robotsSitemap());
 app.use(traceId());
-app.use(require('express').json({ limit: '1mb' }));
+app.use(require('express').json({ limit: stickerJsonBodyLimit }));
 app.use(databaseMw(database));
 app.use(loggerMw(logger));
 app.use(headerMW());
