@@ -1719,30 +1719,20 @@
       },
       "description": {
         "pollen": {
-          "none": "No pollen exposure expected.",
+          "none": "No pollen concentration in the current forecast.",
           "low": "Low pollen concentration.",
-          "moderate": "Moderate pollen concentration.",
+          "moderate": "Medium pollen concentration.",
           "high": "High pollen concentration.",
-          "veryHigh": "Very high pollen concentration."
+          "veryHigh": "Very high pollen concentration.",
+          "medium": "Medium pollen concentration."
         },
-        "pm10": {
-          "low": "Low PM10 level. Air quality is good.",
-          "moderate": "Moderate PM10 level.",
-          "sensitive": "Unhealthy for sensitive groups.",
-          "high": "High PM10 level. Consider limiting outdoor activity."
-        },
-        "pm2_5": {
-          "low": "Low PM2.5 level. Air is clean.",
-          "moderate": "Moderate PM2.5 level.",
-          "high": "High PM2.5. Avoid prolonged exposure.",
-          "veryHigh": "Very high PM2.5. Unhealthy air quality."
-        },
-        "pollutants": {
-          "default": "Air pollutant level.",
-          "carbonMonoxide": "Carbon monoxide (CO) - a colorless, odorless gas harmful in high concentrations.",
-          "nitrogenDioxide": "Nitrogen dioxide (NO2) - a pollutant from traffic and combustion.",
-          "sulphurDioxide": "Sulphur dioxide (SO2) - can irritate airways and affect lung function.",
-          "ozone": "Ozone (O3) - high levels can lead to respiratory problems."
+        "measurements": {
+          "pm10": "PM10 concentration for the selected hour.",
+          "pm2_5": "PM2.5 concentration for the selected hour.",
+          "carbonMonoxide": "Carbon monoxide concentration for the selected hour. No neutral scale is applied for this value.",
+          "nitrogenDioxide": "Nitrogen dioxide concentration for the selected hour.",
+          "sulphurDioxide": "Sulphur dioxide concentration for the selected hour.",
+          "ozone": "Ozone concentration for the selected hour."
         }
       },
       "tooltips": {
@@ -1752,32 +1742,29 @@
         "mugwortPollen": "Mugwort pollen is active late summer and may trigger asthma.",
         "olivePollen": "Olive pollen is common in Mediterranean areas.",
         "ragweedPollen": "Ragweed pollen is highly allergenic and spreads easily.",
-        "pm10": "PM10 refers to coarse particles that can enter the lungs and cause respiratory issues.",
-        "pm2_5": "PM2.5 are fine particles that penetrate deep into the lungs and bloodstream.",
-        "carbonMonoxide": "CO is a toxic gas that can impair oxygen transport in the body.",
-        "nitrogenDioxide": "NO2 is produced by traffic emissions and affects lung function.",
-        "sulphurDioxide": "SO2 can cause respiratory symptoms and aggravate asthma.",
-        "ozone": "O3 is a reactive gas that can cause airway inflammation and breathing issues."
+        "pm10": "PM10 is coarse particulate matter reported as concentration in air.",
+        "pm2_5": "PM2.5 is fine particulate matter reported as concentration in air.",
+        "carbonMonoxide": "Carbon monoxide (CO) concentration in air.",
+        "nitrogenDioxide": "Nitrogen dioxide (NO₂) concentration in air.",
+        "sulphurDioxide": "Sulphur dioxide (SO₂) concentration in air.",
+        "ozone": "Ozone (O₃) concentration in air."
       },
       "pollen": {
         "none": "None",
         "low": "Low",
-        "moderate": "Moderate",
+        "moderate": "Medium",
         "high": "High",
-        "veryHigh": "Very high"
+        "veryHigh": "Very high",
+        "medium": "Medium"
       },
-      "particulateMatter": {
-        "good": "Good",
-        "moderate": "Moderate",
-        "unhealthySensitive": "Unhealthy for sensitive",
-        "unhealthy": "Unhealthy",
-        "veryUnhealthy": "Very unhealthy"
-      },
-      "pollutants": {
-        "good": "Good",
-        "moderate": "Moderate",
-        "unhealthy": "Unhealthy",
-        "veryUnhealthy": "Very unhealthy"
+      "level": {
+        "veryLow": "Very low",
+        "low": "Low",
+        "medium": "Medium",
+        "elevated": "Elevated",
+        "high": "High",
+        "veryHigh": "Very high",
+        "measured": "Measured value"
       }
     }
   }

@@ -11,7 +11,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { Observable, catchError, map, of } from 'rxjs';
 import { AirQualityData } from '../../interfaces/air-quality-data';
 import { AirQualityCategory, AirQualityMetricKey, AirQualityTileValue } from '../../interfaces/air-quality-tile-value';
-import { getAirQualityLevelInfo } from '../../utils/air-quality-level.util';
+import { getAirQualityCategoryForKey, getAirQualityLevelInfo } from '../../utils/air-quality-level.util';
 import { NominatimService } from '../../services/nominatim.service';
 import { Location } from '../../interfaces/location';
 import { Place } from '../../interfaces/place';
@@ -372,27 +372,13 @@ export class AirQualityComponent implements OnInit {
   }
 
   getLevelTextForCategoryValue(category: AirQualityCategory, value: number): string {
-    switch (category) {
-      case 'pollen':
-        if (value === 0) return this.translation.t('weather.airQuality.pollen.none');
-        if (value <= 10) return this.translation.t('weather.airQuality.pollen.low');
-        if (value <= 30) return this.translation.t('weather.airQuality.pollen.moderate');
-        if (value <= 50) return this.translation.t('weather.airQuality.pollen.high');
-        return this.translation.t('weather.airQuality.pollen.veryHigh');
-      case 'particulateMatter':
-        if (value <= 20) return this.translation.t('weather.airQuality.particulateMatter.good');
-        if (value <= 40) return this.translation.t('weather.airQuality.particulateMatter.moderate');
-        if (value <= 60) return this.translation.t('weather.airQuality.particulateMatter.unhealthySensitive');
-        if (value <= 100) return this.translation.t('weather.airQuality.particulateMatter.unhealthy');
-        return this.translation.t('weather.airQuality.particulateMatter.veryUnhealthy');
-      case 'pollutants':
-        if (value <= 40) return this.translation.t('weather.airQuality.pollutants.good');
-        if (value <= 100) return this.translation.t('weather.airQuality.pollutants.moderate');
-        if (value <= 200) return this.translation.t('weather.airQuality.pollutants.unhealthy');
-        return this.translation.t('weather.airQuality.pollutants.veryUnhealthy');
-      default:
-        return this.translation.t('common.unknown');
-    }
+    const fallbackKey: AirQualityMetricKey = category === 'pollen'
+      ? 'grass_pollen'
+      : category === 'particulateMatter'
+        ? 'pm10'
+        : 'nitrogen_dioxide';
+    const levelInfo = getAirQualityLevelInfo(fallbackKey, value, document.body.classList.contains('dark'));
+    return this.translation.t(levelInfo.labelKey);
   }
 
   getLevelClass(value: number): string {
@@ -418,8 +404,7 @@ export class AirQualityComponent implements OnInit {
   getUnitForKey(key: AirQualityMetricKey): string {
     if (key.endsWith('_pollen')) return '';
     if (key === 'pm10' || key === 'pm2_5') return 'µg/m³';
-    if (key === 'carbon_monoxide') return 'ppm';
-    if (key === 'nitrogen_dioxide' || key === 'sulphur_dioxide' || key === 'ozone') return 'ppb';
+    if (key === 'carbon_monoxide' || key === 'nitrogen_dioxide' || key === 'sulphur_dioxide' || key === 'ozone') return 'µg/m³';
     return '';
   }
 
@@ -444,7 +429,7 @@ export class AirQualityComponent implements OnInit {
   getSeverityLabel(value: number): string {
     if (value === 0) return this.translation.t('weather.airQuality.pollen.none');
     if (value <= 10) return this.translation.t('weather.airQuality.pollen.low');
-    if (value <= 30) return this.translation.t('weather.airQuality.pollen.moderate');
+    if (value <= 30) return this.translation.t('weather.airQuality.pollen.medium');
     if (value <= 50) return this.translation.t('weather.airQuality.pollen.high');
     return this.translation.t('weather.airQuality.pollen.veryHigh');
   }
@@ -455,41 +440,24 @@ export class AirQualityComponent implements OnInit {
   }
 
   getValueDescription(value: number, key: AirQualityMetricKey): string {
-    if (this.selectedCategory === 'pollen') {
+    const category = getAirQualityCategoryForKey(key);
+    if (category === 'pollen') {
       if (value === 0) return this.translation.t('weather.airQuality.description.pollen.none');
       if (value <= 10) return this.translation.t('weather.airQuality.description.pollen.low');
-      if (value <= 30) return this.translation.t('weather.airQuality.description.pollen.moderate');
+      if (value <= 30) return this.translation.t('weather.airQuality.description.pollen.medium');
       if (value <= 50) return this.translation.t('weather.airQuality.description.pollen.high');
       return this.translation.t('weather.airQuality.description.pollen.veryHigh');
     }
 
-    if (this.selectedCategory === 'particulateMatter') {
-      if (key === 'pm10') {
-        if (value <= 20) return this.translation.t('weather.airQuality.description.pm10.low');
-        if (value <= 40) return this.translation.t('weather.airQuality.description.pm10.moderate');
-        if (value <= 60) return this.translation.t('weather.airQuality.description.pm10.sensitive');
-        return this.translation.t('weather.airQuality.description.pm10.high');
-      }
-      if (key === 'pm2_5') {
-        if (value <= 10) return this.translation.t('weather.airQuality.description.pm2_5.low');
-        if (value <= 25) return this.translation.t('weather.airQuality.description.pm2_5.moderate');
-        if (value <= 50) return this.translation.t('weather.airQuality.description.pm2_5.high');
-        return this.translation.t('weather.airQuality.description.pm2_5.veryHigh');
-      }
-    }
-
-    if (this.selectedCategory === 'pollutants') {
-      const pollutantsInfo: Partial<Record<AirQualityMetricKey, string>> = {
-        carbon_monoxide: 'weather.airQuality.description.pollutants.carbonMonoxide',
-        nitrogen_dioxide: 'weather.airQuality.description.pollutants.nitrogenDioxide',
-        sulphur_dioxide: 'weather.airQuality.description.pollutants.sulphurDioxide',
-        ozone: 'weather.airQuality.description.pollutants.ozone'
-      };
-      const descriptionKey = pollutantsInfo[key] ?? 'weather.airQuality.description.pollutants.default';
-      return this.translation.t(descriptionKey);
-    }
-
-    return this.translation.t('weather.airQuality.noDescription');
+    const descriptionKeyMap: Partial<Record<AirQualityMetricKey, string>> = {
+      pm10: 'weather.airQuality.description.measurements.pm10',
+      pm2_5: 'weather.airQuality.description.measurements.pm2_5',
+      carbon_monoxide: 'weather.airQuality.description.measurements.carbonMonoxide',
+      nitrogen_dioxide: 'weather.airQuality.description.measurements.nitrogenDioxide',
+      sulphur_dioxide: 'weather.airQuality.description.measurements.sulphurDioxide',
+      ozone: 'weather.airQuality.description.measurements.ozone'
+    };
+    return this.translation.t(descriptionKeyMap[key] ?? 'weather.airQuality.noDescription');
   }
 
   private readonly infoTooltipKeys: Partial<Record<AirQualityMetricKey, string>> = {

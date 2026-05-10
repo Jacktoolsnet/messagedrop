@@ -36,10 +36,10 @@ describe('AirQualityComponent', () => {
       ragweed_pollen: '',
       pm10: 'µg/m³',
       pm2_5: 'µg/m³',
-      carbon_monoxide: 'ppm',
-      nitrogen_dioxide: 'ppb',
-      sulphur_dioxide: 'ppb',
-      ozone: 'ppb'
+      carbon_monoxide: 'µg/m³',
+      nitrogen_dioxide: 'µg/m³',
+      sulphur_dioxide: 'µg/m³',
+      ozone: 'µg/m³'
     },
     hourly: {
       time: ['2026-04-23T00:00'],

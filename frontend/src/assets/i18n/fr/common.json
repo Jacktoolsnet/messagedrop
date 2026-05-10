@@ -1719,30 +1719,20 @@
       },
       "description": {
         "pollen": {
-          "none": "Aucune exposition au pollen attendue.",
+          "none": "Aucune concentration de pollen dans la prévision actuelle.",
           "low": "Faible concentration de pollen.",
-          "moderate": "Concentration modérée de pollen.",
+          "moderate": "Concentration moyenne de pollen.",
           "high": "Forte concentration de pollen.",
-          "veryHigh": "Très forte concentration de pollen."
+          "veryHigh": "Très forte concentration de pollen.",
+          "medium": "Concentration moyenne de pollen."
         },
-        "pm10": {
-          "low": "Faible niveau de PM10. La qualité de l'air est bonne.",
-          "moderate": "Niveau modéré de PM10.",
-          "sensitive": "Nocif pour les personnes sensibles.",
-          "high": "Niveau élevé de PM10. Envisagez de limiter les activités extérieures."
-        },
-        "pm2_5": {
-          "low": "Faible niveau de PM2.5. L'air est propre.",
-          "moderate": "Niveau modéré de PM2.5.",
-          "high": "PM2.5 élevé. Évitez une exposition prolongée.",
-          "veryHigh": "PM2.5 très élevé. Qualité de l'air malsaine."
-        },
-        "pollutants": {
-          "default": "Niveau de polluants atmosphériques.",
-          "carbonMonoxide": "Monoxyde de carbone (CO) — gaz incolore et inodore, dangereux à fortes concentrations.",
-          "nitrogenDioxide": "Dioxyde d'azote (NO2) — polluant issu du trafic et de la combustion.",
-          "sulphurDioxide": "Dioxyde de soufre (SO2) — peut irriter les voies respiratoires et affecter la fonction pulmonaire.",
-          "ozone": "Ozone (O3) — des niveaux élevés peuvent entraîner des problèmes respiratoires."
+        "measurements": {
+          "pm10": "Concentration de PM10 pour l’heure sélectionnée.",
+          "pm2_5": "Concentration de PM2.5 pour l’heure sélectionnée.",
+          "carbonMonoxide": "Concentration de monoxyde de carbone pour l’heure sélectionnée. Aucune échelle neutre n’est appliquée à cette valeur.",
+          "nitrogenDioxide": "Concentration de dioxyde d’azote pour l’heure sélectionnée.",
+          "sulphurDioxide": "Concentration de dioxyde de soufre pour l’heure sélectionnée.",
+          "ozone": "Concentration d’ozone pour l’heure sélectionnée."
         }
       },
       "tooltips": {
@@ -1752,32 +1742,29 @@
         "mugwortPollen": "Le pollen d'armoise est actif en fin d'été et peut déclencher de l'asthme.",
         "olivePollen": "Le pollen d'olivier est fréquent dans les régions méditerranéennes.",
         "ragweedPollen": "Le pollen d'ambroisie est très allergène et se propage facilement.",
-        "pm10": "PM10 désigne des particules grossières pouvant pénétrer dans les poumons et causer des problèmes respiratoires.",
-        "pm2_5": "Les PM2.5 sont des particules fines qui pénètrent profondément dans les poumons et la circulation sanguine.",
-        "carbonMonoxide": "Le CO est un gaz toxique pouvant perturber le transport de l'oxygène dans l'organisme.",
-        "nitrogenDioxide": "Le NO2 est produit par les émissions du trafic et affecte la fonction pulmonaire.",
-        "sulphurDioxide": "Le SO2 peut provoquer des symptômes respiratoires et aggraver l'asthme.",
-        "ozone": "L'O3 est un gaz réactif pouvant provoquer une inflammation des voies respiratoires."
+        "pm10": "Les PM10 sont des particules grossières indiquées comme concentration dans l’air.",
+        "pm2_5": "Les PM2.5 sont des particules fines indiquées comme concentration dans l’air.",
+        "carbonMonoxide": "Concentration de monoxyde de carbone (CO) dans l’air.",
+        "nitrogenDioxide": "Concentration de dioxyde d’azote (NO₂) dans l’air.",
+        "sulphurDioxide": "Concentration de dioxyde de soufre (SO₂) dans l’air.",
+        "ozone": "Concentration d’ozone (O₃) dans l’air."
       },
       "pollen": {
         "none": "Aucun",
         "low": "Faible",
-        "moderate": "Modéré",
-        "high": "Élevé",
-        "veryHigh": "Très élevé"
+        "moderate": "Moyen",
+        "high": "Haut",
+        "veryHigh": "Très haut",
+        "medium": "Moyen"
       },
-      "particulateMatter": {
-        "good": "Bon",
-        "moderate": "Modéré",
-        "unhealthySensitive": "Malsain pour les personnes sensibles",
-        "unhealthy": "Malsain",
-        "veryUnhealthy": "Très malsain"
-      },
-      "pollutants": {
-        "good": "Bon",
-        "moderate": "Modéré",
-        "unhealthy": "Malsain",
-        "veryUnhealthy": "Très malsain"
+      "level": {
+        "veryLow": "Très faible",
+        "low": "Faible",
+        "medium": "Moyen",
+        "elevated": "Élevé",
+        "high": "Haut",
+        "veryHigh": "Très haut",
+        "measured": "Valeur mesurée"
       }
     }
   }

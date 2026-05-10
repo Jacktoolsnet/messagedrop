@@ -1719,30 +1719,20 @@
       },
       "description": {
         "pollen": {
-          "none": "No se espera exposición al polen.",
-          "low": "Baja concentración de polen.",
-          "moderate": "Concentración moderada de polen.",
-          "high": "Alta concentración de polen.",
-          "veryHigh": "Concentración muy alta de polen."
+          "none": "No hay concentración de polen en la previsión actual.",
+          "low": "Concentración baja de polen.",
+          "moderate": "Concentración media de polen.",
+          "high": "Concentración alta de polen.",
+          "veryHigh": "Concentración muy alta de polen.",
+          "medium": "Concentración media de polen."
         },
-        "pm10": {
-          "low": "Nivel bajo de PM10. La calidad del aire es buena.",
-          "moderate": "Nivel moderado de PM10.",
-          "sensitive": "No saludable para grupos sensibles.",
-          "high": "Nivel alto de PM10. Considera limitar la actividad al aire libre."
-        },
-        "pm2_5": {
-          "low": "Nivel bajo de PM2.5. El aire está limpio.",
-          "moderate": "Nivel moderado de PM2.5.",
-          "high": "PM2.5 alto. Evita exposiciones prolongadas.",
-          "veryHigh": "PM2.5 muy alto. Calidad del aire no saludable."
-        },
-        "pollutants": {
-          "default": "Nivel de contaminantes del aire.",
-          "carbonMonoxide": "Monóxido de carbono (CO): gas incoloro e inodoro, dañino en altas concentraciones.",
-          "nitrogenDioxide": "Dióxido de nitrógeno (NO2): contaminante del tráfico y la combustión.",
-          "sulphurDioxide": "Dióxido de azufre (SO2): puede irritar las vías respiratorias y afectar la función pulmonar.",
-          "ozone": "Ozono (O3): niveles altos pueden causar problemas respiratorios."
+        "measurements": {
+          "pm10": "Concentración de PM10 para la hora seleccionada.",
+          "pm2_5": "Concentración de PM2.5 para la hora seleccionada.",
+          "carbonMonoxide": "Concentración de monóxido de carbono para la hora seleccionada. No se aplica una escala neutral a este valor.",
+          "nitrogenDioxide": "Concentración de dióxido de nitrógeno para la hora seleccionada.",
+          "sulphurDioxide": "Concentración de dióxido de azufre para la hora seleccionada.",
+          "ozone": "Concentración de ozono para la hora seleccionada."
         }
       },
       "tooltips": {
@@ -1752,32 +1742,29 @@
         "mugwortPollen": "El polen de artemisa está activo a finales de verano y puede desencadenar asma.",
         "olivePollen": "El polen de olivo es común en áreas mediterráneas.",
         "ragweedPollen": "El polen de ambrosía es altamente alergénico y se propaga fácilmente.",
-        "pm10": "PM10 se refiere a partículas gruesas que pueden entrar en los pulmones y causar problemas respiratorios.",
-        "pm2_5": "PM2.5 son partículas finas que penetran profundamente en los pulmones y el torrente sanguíneo.",
-        "carbonMonoxide": "El CO es un gas tóxico que puede afectar el transporte de oxígeno en el cuerpo.",
-        "nitrogenDioxide": "El NO2 se produce por emisiones del tráfico y afecta la función pulmonar.",
-        "sulphurDioxide": "El SO2 puede causar síntomas respiratorios y agravar el asma.",
-        "ozone": "El O3 es un gas reactivo que puede causar inflamación de las vías respiratorias y problemas de respiración."
+        "pm10": "PM10 son partículas gruesas indicadas como concentración en el aire.",
+        "pm2_5": "PM2.5 son partículas finas indicadas como concentración en el aire.",
+        "carbonMonoxide": "Concentración de monóxido de carbono (CO) en el aire.",
+        "nitrogenDioxide": "Concentración de dióxido de nitrógeno (NO₂) en el aire.",
+        "sulphurDioxide": "Concentración de dióxido de azufre (SO₂) en el aire.",
+        "ozone": "Concentración de ozono (O₃) en el aire."
       },
       "pollen": {
         "none": "Ninguno",
         "low": "Bajo",
-        "moderate": "Moderado",
+        "moderate": "Medio",
         "high": "Alto",
-        "veryHigh": "Muy alto"
+        "veryHigh": "Muy alto",
+        "medium": "Medio"
       },
-      "particulateMatter": {
-        "good": "Buena",
-        "moderate": "Moderada",
-        "unhealthySensitive": "No saludable para sensibles",
-        "unhealthy": "No saludable",
-        "veryUnhealthy": "Muy no saludable"
-      },
-      "pollutants": {
-        "good": "Buena",
-        "moderate": "Moderada",
-        "unhealthy": "No saludable",
-        "veryUnhealthy": "Muy no saludable"
+      "level": {
+        "veryLow": "Muy bajo",
+        "low": "Bajo",
+        "medium": "Medio",
+        "elevated": "Elevado",
+        "high": "Alto",
+        "veryHigh": "Muy alto",
+        "measured": "Valor medido"
       }
     }
   }

@@ -136,18 +136,20 @@ export class AirQualityTileComponent {
     return ''; // Fallback: nichts vorhanden
   }
 
-  /** Liefert den Key mit größtem Tages-Max aus der gegebenen Liste oder '' wenn alles leer. */
+  /** Liefert den Key mit der höchsten neutralen Belastungsstufe oder '' wenn alles leer. */
   private getBestOfKeys(keys: readonly AirQualityMetricKey[]): AirQualityMetricKey | '' {
     let bestKey: AirQualityMetricKey | '' = '';
+    let bestLevel = -Infinity;
     let bestValue = -Infinity;
 
     for (const key of keys) {
       const mm = this.getHourlyMinMax(key);
-      // Wenn Min/Max beides 0 und auch keine realen Werte vorhanden, ignorieren:
       const hasAnyValue = this.hasAnyTodayValue(key);
-      if (!hasAnyValue) continue;
+      if (!hasAnyValue || !mm) continue;
 
-      if (mm && mm.max > bestValue) {
+      const levelInfo = getAirQualityLevelInfo(key, mm.max, document.body.classList.contains('dark'));
+      if (levelInfo.levelIndex > bestLevel || (levelInfo.levelIndex === bestLevel && mm.max > bestValue)) {
+        bestLevel = levelInfo.levelIndex;
         bestValue = mm.max;
         bestKey = key;
       }
@@ -223,29 +225,6 @@ export class AirQualityTileComponent {
     return this.translation.t(labelKey);
   }
 
-  /**
-   * Sehr einfache Level-Heuristik:
-   * - Für Pollen: wie gehabt.
-   * - Für Schadstoffe: grobe Stufen (Good/Moderate/Unhealthy/Very High) rein nach Rohwert.
-   *   (Kann ich dir gern mit offiziellen AQI-Schwellen je Stoff verfeinern.)
-   */
-  private getLevelTextForCategoryValue(key: string, value: number): string {
-    if (!value || value <= 0) return 'none';
-
-    const isPollen = (this.pollenKeys as readonly string[]).includes(key);
-    if (isPollen) {
-      if (value <= 10) return 'low';
-      if (value <= 30) return 'moderate';
-      if (value <= 50) return 'high';
-      return 'very high';
-    }
-
-    // Grobe Default-Schwellen für Schadstoffe (unit: µg/m³; CO hier als µg/m³ aus Open-Meteo)
-    if (value <= 20) return 'good';
-    if (value <= 50) return 'moderate';
-    if (value <= 100) return 'unhealthy';
-    return 'very high';
-  }
 
   // --- Dialog ---
   public openAirQualityDetails(selectedKey?: AirQualityMetricKey): void {
