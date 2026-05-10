@@ -22,7 +22,8 @@ interface BackendHealthResponse {
   providedIn: 'root'
 })
 export class NetworkService {
-  private readonly backendHealthyPollMs = 60_000;
+  private readonly backendRecoveryPollMs = 60_000;
+  private readonly backendRetryJitterMaxMs = 30_000;
   private readonly backendTransportFailureThreshold = 2;
 
   private networkDialogRef: MatDialogRef<DisplayMessage> | undefined;
@@ -93,7 +94,9 @@ export class NetworkService {
         this.browserOnlineSig.set(true);
         this.networkDialogRef?.close();
         this.networkDialogRef = undefined;
-        this.requestBackendCheck(true);
+        if (!this.backendOnlineSig() || this.maintenanceInfoSig()?.enabled) {
+          this.requestBackendCheck(true);
+        }
       });
 
       window.addEventListener('offline', () => {
@@ -101,14 +104,21 @@ export class NetworkService {
         this.stopBackendMonitoring();
         this.openBrowserOfflineDialog();
       });
+
+      window.document?.addEventListener('visibilitychange', () => {
+        if (this.isDocumentHidden()) {
+          this.clearBackendCheckTimer();
+          return;
+        }
+        if (this.browserOnlineSig() && (!this.backendOnlineSig() || this.maintenanceInfoSig()?.enabled)) {
+          this.requestBackendCheck(true);
+        }
+      });
     }
 
     if (!this.browserOnlineSig()) {
       this.openBrowserOfflineDialog();
-      return;
     }
-
-    this.requestBackendCheck(true);
   }
 
   isSlowConnection(): boolean {
@@ -174,7 +184,7 @@ export class NetworkService {
     this.backendCheckAttempts = 0;
     this.clearMaintenanceInfo();
     this.updateBackendOnlineState(true);
-    this.scheduleBackendCheckWithDelay(this.backendHealthyPollMs);
+    this.clearBackendCheckTimer();
   }
 
   recordBackendMaintenance(info: MaintenanceInfo): void {
@@ -182,14 +192,22 @@ export class NetworkService {
     this.backendCheckAttempts = 0;
     this.setMaintenanceInfo(info);
     this.updateBackendOnlineState(true);
-    this.scheduleBackendCheckWithDelay(this.backendHealthyPollMs);
+    this.scheduleBackendCheckWithDelay(this.withBackendJitter(this.backendRecoveryPollMs));
   }
 
   requestBackendCheck(immediate = false): void {
     if (typeof navigator !== 'undefined' && navigator.onLine === false) {
       return;
     }
-    const delay = immediate ? 0 : (this.backendOnlineSig() ? this.backendHealthyPollMs : this.getBackendRetryDelay());
+    if (this.isDocumentHidden()) {
+      return;
+    }
+
+    if (!immediate && this.backendOnlineSig() && !this.maintenanceInfoSig()?.enabled) {
+      return;
+    }
+
+    const delay = immediate ? 0 : this.getBackendRetryDelay();
     this.scheduleBackendCheckWithDelay(delay);
   }
 
@@ -208,6 +226,9 @@ export class NetworkService {
       return;
     }
     if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      return;
+    }
+    if (this.isDocumentHidden()) {
       return;
     }
 
@@ -230,31 +251,43 @@ export class NetworkService {
     }, delay);
   }
 
-  private stopBackendMonitoring(): void {
+  private clearBackendCheckTimer(): void {
     if (this.backendCheckTimer) {
       clearTimeout(this.backendCheckTimer);
       this.backendCheckTimer = undefined;
     }
     this.backendCheckDueAt = 0;
+  }
+
+  private stopBackendMonitoring(): void {
+    this.clearBackendCheckTimer();
     this.backendCheckAttempts = 0;
     this.backendTransportFailureCount = 0;
     this.backendCheckInFlight = false;
   }
 
   private getBackendRetryDelay(): number {
+    let delay: number;
     if (this.backendCheckAttempts < 1) {
-      return 3_000;
+      delay = 3_000;
+    } else if (this.backendCheckAttempts < 3) {
+      delay = 5_000;
+    } else if (this.backendCheckAttempts < 6) {
+      delay = 10_000;
+    } else if (this.backendCheckAttempts < 12) {
+      delay = 30_000;
+    } else {
+      delay = 60_000;
     }
-    if (this.backendCheckAttempts < 3) {
-      return 5_000;
+    return this.withBackendJitter(delay);
+  }
+
+  private withBackendJitter(delayMs: number): number {
+    if (delayMs <= 0) {
+      return 0;
     }
-    if (this.backendCheckAttempts < 6) {
-      return 10_000;
-    }
-    if (this.backendCheckAttempts < 12) {
-      return 30_000;
-    }
-    return 60_000;
+    const jitter = Math.floor(Math.random() * Math.min(delayMs, this.backendRetryJitterMaxMs));
+    return delayMs + jitter;
   }
 
   private checkBackendOnline(): void {
@@ -263,6 +296,9 @@ export class NetworkService {
     }
     if (typeof navigator !== 'undefined' && navigator.onLine === false) {
       this.scheduleBackendCheckWithDelay(this.getBackendRetryDelay());
+      return;
+    }
+    if (this.isDocumentHidden()) {
       return;
     }
 
@@ -308,10 +344,11 @@ export class NetworkService {
     this.updateBackendOnlineState(true);
     if (maintenance?.enabled) {
       this.setMaintenanceInfo(maintenance);
+      this.scheduleBackendCheckWithDelay(this.withBackendJitter(this.backendRecoveryPollMs));
     } else {
       this.clearMaintenanceInfo();
+      this.clearBackendCheckTimer();
     }
-    this.scheduleBackendCheckWithDelay(this.backendHealthyPollMs);
   }
 
   private handleBackendHealthTransportError(_error: HttpErrorResponse): void {
@@ -327,6 +364,10 @@ export class NetworkService {
     }
 
     this.scheduleBackendCheckWithDelay(this.getBackendRetryDelay());
+  }
+
+  private isDocumentHidden(): boolean {
+    return typeof document !== 'undefined' && document.hidden;
   }
 
   private normalizeMaintenanceInfo(value: MaintenanceInfo | null | undefined): MaintenanceInfo | null {

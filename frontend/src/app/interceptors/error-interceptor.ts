@@ -75,17 +75,18 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       const status = error instanceof HttpErrorResponse ? error.status : -1;
       const maintenanceInfo = backendRequest ? parseMaintenanceInfo(error) : null;
       const message = apiErrorService.getErrorMessage(error) ?? networkService.getErrorMessage(status);
+      const backendUnavailableStatus = status === 0 || status === 502 || status === 503 || status === 504;
       if (backendRequest && !skipBackendStatus) {
         if (maintenanceInfo?.enabled) {
           networkService.recordBackendMaintenance(maintenanceInfo);
-        } else if (status === 0 || status >= 500) {
+        } else if (backendUnavailableStatus) {
           networkService.requestBackendCheck(true);
         } else {
           networkService.recordBackendReachable();
         }
       }
 
-      const repeatedBackendStatusError = status === 0 || status === 502 || status === 503 || status === 504;
+      const repeatedBackendStatusError = backendUnavailableStatus;
       const browserOfflineAlreadyVisible = !networkService.isOnline();
       const backendStatusAlreadyVisible = backendRequest
         && !skipBackendStatus
