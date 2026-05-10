@@ -22,6 +22,24 @@ const init = function (db) {
     });
 };
 
+function runQuery(db, sql, params = []) {
+    return new Promise((resolve, reject) => {
+        db.run(sql, params, function (err) {
+            if (err) return reject(err);
+            resolve(this);
+        });
+    });
+}
+
+function getQuery(db, sql, params = []) {
+    return new Promise((resolve, reject) => {
+        db.get(sql, params, (err, row) => {
+            if (err) return reject(err);
+            resolve(row || null);
+        });
+    });
+}
+
 /**
  * Toggle Like:
  *  - Wenn Like existiert: löschen (unlike)
@@ -29,70 +47,37 @@ const init = function (db) {
  *  -> Trigger kümmern sich um das Aktualisieren von "likes" in tableMessage
  */
 const toggleLike = function (db, messageUuid, userId, callback) {
-    db.serialize(() => {
-        db.run('BEGIN', (bErr) => {
-            if (bErr) return callback(bErr);
-
-            const delSql = `
+    db.transaction(async (tx) => {
+        const delSql = `
         DELETE FROM ${tableName}
         WHERE ${columnLikeMessageUuid} = ? AND ${columnLikeUserId} = ?;
       `;
-            db.run(delSql, [messageUuid, userId], function (delErr) {
-                if (delErr) {
-                    db.run('ROLLBACK');
-                    return callback(delErr);
-                }
+        const deleteResult = await runQuery(tx, delSql, [messageUuid, userId]);
+        const deleted = deleteResult.changes > 0;
 
-                const deleted = this.changes > 0;
-
-                const insertIfNeeded = (next) => {
-                    if (deleted) return next(null); // war geliked -> jetzt entfernt
-                    const insSql = `
+        if (!deleted) {
+            const insSql = `
             INSERT INTO ${tableName} (${columnLikeMessageUuid}, ${columnLikeUserId})
             VALUES (?, ?)
             ON CONFLICT(${columnLikeMessageUuid}, ${columnLikeUserId}) DO NOTHING;
           `;
-                    db.run(insSql, [messageUuid, userId], (insErr) => {
-                        if (insErr) return next(insErr);
-                        // Hinweis: XOR-Trigger löscht hier ggf. ein vorhandenes Dislike automatisch.
-                        next(null);
-                    });
-                };
+            // Hinweis: XOR-Trigger löscht hier ggf. ein vorhandenes Dislike automatisch.
+            await runQuery(tx, insSql, [messageUuid, userId]);
+        }
 
-                insertIfNeeded((insErr) => {
-                    if (insErr) {
-                        db.run('ROLLBACK');
-                        return callback(insErr);
-                    }
-
-                    // Aktuellen Zustand ermitteln (Likes/Dislikes + Flags)
-                    const stateSql = `
+        // Aktuellen Zustand ermitteln (Likes/Dislikes + Flags)
+        const stateSql = `
             SELECT
               (SELECT COUNT(*) FROM ${tableName} WHERE ${columnLikeMessageUuid} = ?) AS likes,
               (SELECT COUNT(*) FROM tableDislike WHERE dislikeMessageUuid = ?) AS dislikes;`;
-                    const params = [messageUuid, messageUuid];
-
-                    db.get(stateSql, params, (stateErr, row) => {
-                        if (stateErr) {
-                            db.run('ROLLBACK');
-                            return callback(stateErr);
-                        }
-
-                        // Commit und Ergebnis zurückgeben
-                        db.run('COMMIT', (cErr) => {
-                            if (cErr) return callback(cErr);
-                            // liked spiegelt den aktuellen Zustand wider (nicht nur die Aktion)
-                            const result = {
-                                likes: row.likes | 0,
-                                dislikes: row.dislikes | 0
-                            };
-                            callback(null, result);
-                        });
-                    });
-                });
-            });
-        });
-    });
+        const row = await getQuery(tx, stateSql, [messageUuid, messageUuid]);
+        return {
+            likes: row.likes | 0,
+            dislikes: row.dislikes | 0
+        };
+    })
+        .then((result) => callback(null, result))
+        .catch((err) => callback(err));
 };
 
 module.exports = {

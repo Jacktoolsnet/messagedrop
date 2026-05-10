@@ -202,7 +202,9 @@ class PostgresCompat {
     this._pool = new Pool(config);
     this._logger = logger ?? console;
     this._closed = false;
-    this._chain = Promise.resolve();
+    this._serialChain = Promise.resolve();
+    this._serialMode = false;
+    this._activeTasks = new Set();
     this._pendingCount = 0;
     this._maxPendingRequests = resolveMaxPendingRequests(process.env.DB_MAX_PENDING_REQUESTS);
   }
@@ -250,11 +252,79 @@ class PostgresCompat {
       return Promise.reject(createQueueOverloadedError(this._pendingCount, this._maxPendingRequests));
     }
     this._pendingCount += 1;
-    const run = this._chain.then(task, task).finally(() => {
+    const run = (this._serialMode
+      ? this._serialChain.then(task, task)
+      : Promise.resolve().then(task)
+    ).finally(() => {
       this._pendingCount = Math.max(0, this._pendingCount - 1);
+      this._activeTasks.delete(run);
     });
-    this._chain = run.catch(() => {});
+    this._activeTasks.add(run);
+    if (this._serialMode) {
+      this._serialChain = run.catch(() => {});
+    }
     return run;
+  }
+
+  _createClientCompat(client) {
+    const queryClient = async (sql, params = []) => {
+      const tableInfo = await this._tableInfo(sql);
+      if (tableInfo) return { rows: tableInfo, rowCount: tableInfo.length };
+      if (/^PRAGMA\s+foreign_key_list\b/i.test(String(sql || '').trim())) return { rows: await this._foreignKeyList(), rowCount: 0 };
+      const prepared = preparePostgresSql(sql);
+      if (!prepared) return { rows: [], rowCount: 0 };
+      return client.query(prepared, params);
+    };
+
+    return {
+      run: (sql, params, callback) => {
+        const normalized = this._normalizeParams(params, callback);
+        queryClient(sql, normalized.params)
+          .then((result) => this._safeInvokeCallback(normalized.callback, null, undefined, {
+            changes: Number(result?.rowCount ?? 0),
+            lastID: result?.rows?.[0]?.id ?? null
+          }))
+          .catch((err) => this._safeInvokeCallback(normalized.callback, err));
+      },
+      get: (sql, params, callback) => {
+        const normalized = this._normalizeParams(params, callback);
+        queryClient(sql, normalized.params)
+          .then((result) => this._safeInvokeCallback(normalized.callback, null, normalizeRow(result?.rows?.[0]) || null))
+          .catch((err) => this._safeInvokeCallback(normalized.callback, err));
+      },
+      all: (sql, params, callback) => {
+        const normalized = this._normalizeParams(params, callback);
+        queryClient(sql, normalized.params)
+          .then((result) => this._safeInvokeCallback(normalized.callback, null, (result?.rows || []).map(normalizeRow)))
+          .catch((err) => this._safeInvokeCallback(normalized.callback, err));
+      }
+    };
+  }
+
+  transaction(callback) {
+    if (typeof callback !== 'function') {
+      return Promise.reject(new Error('Transaction callback is required'));
+    }
+
+    return this._enqueue(async () => {
+      if (this._closed) throw new Error('Database connection is closed');
+      const client = await this._pool.connect();
+      try {
+        await client.query('BEGIN');
+        const result = await callback(this._createClientCompat(client));
+        await client.query('COMMIT');
+        return result;
+      } catch (err) {
+        try {
+          await client.query('ROLLBACK');
+        } catch (rollbackErr) {
+          this._logger?.warn?.('PostgreSQL rollback failed', rollbackErr?.message || rollbackErr);
+        }
+        throw err;
+      } finally {
+        client.release();
+      }
+    });
   }
 
   async _tableInfo(sql) {
@@ -344,7 +414,24 @@ class PostgresCompat {
   pendingCount() { return this._pendingCount; }
   maxPendingRequests() { return this._maxPendingRequests; }
   isOverloaded() { return this._pendingCount >= this._maxPendingRequests; }
-  serialize(fn) { if (typeof fn === 'function') fn(); }
+  serialize(fn) {
+    if (typeof fn !== 'function') return;
+    const previous = this._serialMode;
+    this._serialMode = true;
+    try {
+      fn();
+    } finally {
+      this._serialMode = previous;
+    }
+  }
+
+  beginSerialExecution() {
+    this._serialMode = true;
+  }
+
+  endSerialExecution() {
+    this._serialMode = false;
+  }
 
   close(callback) {
     if (this._closed) {
@@ -352,7 +439,8 @@ class PostgresCompat {
       return;
     }
     this._closed = true;
-    this._chain
+    Promise.allSettled(Array.from(this._activeTasks))
+      .then(() => this._serialChain)
       .then(() => this._pool.end())
       .then(() => this._safeInvokeCallback(callback, null))
       .catch((err) => this._safeInvokeCallback(callback, err));
@@ -370,6 +458,7 @@ class Database {
     return new Promise((resolve, reject) => {
       try {
         this.db = new PostgresCompat(createDbConfigFromEnv(), this.logger);
+        this.db.beginSerialExecution();
         this.db.serialize(() => {
           tableUser.init(this.db);
           tableConnect.init(this.db);
@@ -390,6 +479,7 @@ class Database {
           this.initTriggers(this.logger);
           this.initIndexes(this.logger);
           this.db.get('SELECT 1;', (readyErr) => {
+            this.db.endSerialExecution();
             if (readyErr) {
               reject(readyErr);
               return;
@@ -399,6 +489,7 @@ class Database {
           });
         });
       } catch (err) {
+        this.db?.endSerialExecution?.();
         this.logger.error('Failed to open PostgreSQL database.', err);
         reject(err);
       }

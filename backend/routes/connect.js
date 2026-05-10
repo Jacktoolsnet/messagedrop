@@ -162,22 +162,19 @@ async function getOrCreateContact(db, { userId, contactUserId, hint, signingPubl
 }
 
 async function consumeConnectAndCreateContacts(db, connectId, requester) {
-  await runQuery(db, 'BEGIN');
-  try {
-    const row = await queryGet(db, 'SELECT * FROM tableConnect WHERE id = ?;', [connectId]);
+  return db.transaction(async (tx) => {
+    const row = await queryGet(tx, 'SELECT * FROM tableConnect WHERE id = ?;', [connectId]);
     if (!row) {
-      await runQuery(db, 'ROLLBACK');
       return null;
     }
 
     if (String(row.userId) === String(requester.userId)) {
-      await runQuery(db, 'ROLLBACK');
       return { self: true };
     }
 
-    await runQuery(db, 'DELETE FROM tableConnect WHERE id = ?;', [connectId]);
+    await runQuery(tx, 'DELETE FROM tableConnect WHERE id = ?;', [connectId]);
 
-    const requesterContact = await getOrCreateContact(db, {
+    const requesterContact = await getOrCreateContact(tx, {
       userId: requester.userId,
       contactUserId: row.userId,
       hint: row.hint,
@@ -185,7 +182,7 @@ async function consumeConnectAndCreateContacts(db, connectId, requester) {
       encryptionPublicKey: row.encryptionPublicKey
     });
 
-    const ownerContact = await getOrCreateContact(db, {
+    const ownerContact = await getOrCreateContact(tx, {
       userId: row.userId,
       contactUserId: requester.userId,
       hint: requester.hint,
@@ -193,7 +190,6 @@ async function consumeConnectAndCreateContacts(db, connectId, requester) {
       encryptionPublicKey: requester.encryptionPublicKey
     });
 
-    await runQuery(db, 'COMMIT');
     return {
       connect: row,
       contactId: requesterContact.id,
@@ -202,35 +198,18 @@ async function consumeConnectAndCreateContacts(db, connectId, requester) {
       reciprocalContactCreated: ownerContact.created,
       alreadyConnected: !requesterContact.created
     };
-  } catch (err) {
-    try {
-      await runQuery(db, 'ROLLBACK');
-    } catch {
-      // ignore rollback errors
-    }
-    throw err;
-  }
+  });
 }
 
 async function consumeConnectRecord(db, connectId) {
-  await runQuery(db, 'BEGIN');
-  try {
-    const row = await queryGet(db, 'SELECT * FROM tableConnect WHERE id = ?;', [connectId]);
+  return db.transaction(async (tx) => {
+    const row = await queryGet(tx, 'SELECT * FROM tableConnect WHERE id = ?;', [connectId]);
     if (!row) {
-      await runQuery(db, 'ROLLBACK');
       return null;
     }
-    await runQuery(db, 'DELETE FROM tableConnect WHERE id = ?;', [connectId]);
-    await runQuery(db, 'COMMIT');
+    await runQuery(tx, 'DELETE FROM tableConnect WHERE id = ?;', [connectId]);
     return row;
-  } catch (err) {
-    try {
-      await runQuery(db, 'ROLLBACK');
-    } catch {
-      // ignore rollback errors
-    }
-    throw err;
-  }
+  });
 }
 
 function fetchConnectRecord(req, res, connectId, handler, next) {

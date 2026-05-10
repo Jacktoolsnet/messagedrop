@@ -1311,10 +1311,8 @@ async function restoreUserBackup(db, backup) {
   const likeColumns = ['likeMessageUuid', 'likeUserId'];
   const dislikeColumns = ['dislikeMessageUuid', 'dislikeUserId'];
 
-  await runQuery(db, 'BEGIN');
-
-  try {
-    await insertRows(db, 'tableUser', userColumns, tables.tableUser);
+  return db.transaction(async (tx) => {
+    await insertRows(tx, 'tableUser', userColumns, tables.tableUser);
 
     const allMessages = normalizeRows(tables.tableMessage);
     const parentMessages = allMessages
@@ -1324,7 +1322,7 @@ async function restoreUserBackup(db, backup) {
       .filter((row) => row?.parentUuid)
       .sort((a, b) => Number(a?.createDateTime || 0) - Number(b?.createDateTime || 0));
 
-    await insertRows(db, 'tableMessage', messageColumns, parentMessages);
+    await insertRows(tx, 'tableMessage', messageColumns, parentMessages);
     let insertedChildMessage = true;
     while (pendingChildMessages.length && insertedChildMessage) {
       insertedChildMessage = false;
@@ -1337,12 +1335,12 @@ async function restoreUserBackup(db, backup) {
           continue;
         }
 
-        const parentExists = await queryGet(db, 'SELECT 1 FROM tableMessage WHERE uuid = ? LIMIT 1;', [row.parentUuid]);
+        const parentExists = await queryGet(tx, 'SELECT 1 FROM tableMessage WHERE uuid = ? LIMIT 1;', [row.parentUuid]);
         if (!parentExists) {
           continue;
         }
 
-        await insertRows(db, 'tableMessage', messageColumns, [row]);
+        await insertRows(tx, 'tableMessage', messageColumns, [row]);
         pendingChildMessages.splice(index, 1);
         insertedChildMessage = true;
         index -= 1;
@@ -1366,27 +1364,27 @@ async function restoreUserBackup(db, backup) {
       if (!row?.contactUserId) {
         continue;
       }
-      const contactUserExists = await queryGet(db, 'SELECT 1 FROM tableUser WHERE id = ? LIMIT 1;', [row.contactUserId]);
+      const contactUserExists = await queryGet(tx, 'SELECT 1 FROM tableUser WHERE id = ? LIMIT 1;', [row.contactUserId]);
       if (!contactUserExists) {
         continue;
       }
-      await insertRows(db, 'tableContact', contactColumns, [row]);
+      await insertRows(tx, 'tableContact', contactColumns, [row]);
     }
-    await insertRows(db, 'tablePlace', placeColumns, tables.tablePlace);
-    await insertRows(db, 'tableNotification', notificationColumns, tables.tableNotification);
-    await insertRows(db, 'tableConnect', connectColumns, tables.tableConnect);
-    await insertRows(db, 'tableUsageProtection', usageProtectionColumns, tables.tableUsageProtection);
+    await insertRows(tx, 'tablePlace', placeColumns, tables.tablePlace);
+    await insertRows(tx, 'tableNotification', notificationColumns, tables.tableNotification);
+    await insertRows(tx, 'tableConnect', connectColumns, tables.tableConnect);
+    await insertRows(tx, 'tableUsageProtection', usageProtectionColumns, tables.tableUsageProtection);
 
     const contactMessages = normalizeRows(tables.tableContactMessage);
     for (const row of contactMessages) {
       if (!row?.contactId) {
         continue;
       }
-      const contactExists = await queryGet(db, 'SELECT 1 FROM tableContact WHERE id = ? LIMIT 1;', [row.contactId]);
+      const contactExists = await queryGet(tx, 'SELECT 1 FROM tableContact WHERE id = ? LIMIT 1;', [row.contactId]);
       if (!contactExists) {
         continue;
       }
-      await insertRows(db, 'tableContactMessage', contactMessageColumns, [row]);
+      await insertRows(tx, 'tableContactMessage', contactMessageColumns, [row]);
     }
 
     const likeRows = normalizeRows(tables.tableLike);
@@ -1394,11 +1392,11 @@ async function restoreUserBackup(db, backup) {
       if (!row?.likeMessageUuid) {
         continue;
       }
-      const messageExists = await queryGet(db, 'SELECT 1 FROM tableMessage WHERE uuid = ? LIMIT 1;', [row.likeMessageUuid]);
+      const messageExists = await queryGet(tx, 'SELECT 1 FROM tableMessage WHERE uuid = ? LIMIT 1;', [row.likeMessageUuid]);
       if (!messageExists) {
         continue;
       }
-      await insertRows(db, 'tableLike', likeColumns, [row]);
+      await insertRows(tx, 'tableLike', likeColumns, [row]);
     }
 
     const dislikeRows = normalizeRows(tables.tableDislike);
@@ -1406,19 +1404,15 @@ async function restoreUserBackup(db, backup) {
       if (!row?.dislikeMessageUuid) {
         continue;
       }
-      const messageExists = await queryGet(db, 'SELECT 1 FROM tableMessage WHERE uuid = ? LIMIT 1;', [row.dislikeMessageUuid]);
+      const messageExists = await queryGet(tx, 'SELECT 1 FROM tableMessage WHERE uuid = ? LIMIT 1;', [row.dislikeMessageUuid]);
       if (!messageExists) {
         continue;
       }
-      await insertRows(db, 'tableDislike', dislikeColumns, [row]);
+      await insertRows(tx, 'tableDislike', dislikeColumns, [row]);
     }
 
-    await runQuery(db, 'COMMIT');
     return restoreSummary;
-  } catch (err) {
-    await runQuery(db, 'ROLLBACK');
-    throw err;
-  }
+  });
 }
 
 const loginChallenges = new Map();
@@ -1873,47 +1867,47 @@ router.post('/reset-keys',
       );
       const contactUserIds = contactRows.map((row) => row.userId).filter(Boolean);
 
-      await runQuery(req.database.db, 'BEGIN');
-      await runQuery(
-        req.database.db,
-        'UPDATE tableUser SET signingPublicKey = ?, cryptoPublicKey = ? WHERE id = ?;',
-        [signingKeyValue, cryptoKeyValue, userId]
-      );
-      await runQuery(
-        req.database.db,
-        'UPDATE tableContact SET contactUserSigningPublicKey = ?, contactUserEncryptionPublicKey = ? WHERE contactUserId = ?;',
-        [signingKeyValue, cryptoKeyValue, userId]
-      );
-      await runQuery(
-        req.database.db,
-        "DELETE FROM tableContactMessage WHERE contactId IN (SELECT id FROM tableContact WHERE userId = ?) AND direction = 'user';",
-        [userId]
-      );
-      await runQuery(
-        req.database.db,
-        `
-        UPDATE tableContact
-        SET lastMessageFrom = COALESCE((
-          SELECT direction
-          FROM tableContactMessage cm
-          WHERE cm.contactId = tableContact.id
-          ORDER BY cm.createdAt DESC
-          LIMIT 1
-        ), ''),
-        lastMessageAt = (
-          SELECT createdAt
-          FROM tableContactMessage cm
-          WHERE cm.contactId = tableContact.id
-          ORDER BY cm.createdAt DESC
-          LIMIT 1
-        )
-        WHERE userId = ?;
-        `,
-        [userId]
-      );
-      await runQuery(req.database.db, 'DELETE FROM tableConnect WHERE userId = ?;', [userId]);
-      await runQuery(req.database.db, 'DELETE FROM tableContactProfileExchange WHERE requesterUserId = ? OR recipientUserId = ?;', [userId, userId]);
-      await runQuery(req.database.db, 'COMMIT');
+      await req.database.db.transaction(async (tx) => {
+        await runQuery(
+          tx,
+          'UPDATE tableUser SET signingPublicKey = ?, cryptoPublicKey = ? WHERE id = ?;',
+          [signingKeyValue, cryptoKeyValue, userId]
+        );
+        await runQuery(
+          tx,
+          'UPDATE tableContact SET contactUserSigningPublicKey = ?, contactUserEncryptionPublicKey = ? WHERE contactUserId = ?;',
+          [signingKeyValue, cryptoKeyValue, userId]
+        );
+        await runQuery(
+          tx,
+          "DELETE FROM tableContactMessage WHERE contactId IN (SELECT id FROM tableContact WHERE userId = ?) AND direction = 'user';",
+          [userId]
+        );
+        await runQuery(
+          tx,
+          `
+          UPDATE tableContact
+          SET lastMessageFrom = COALESCE((
+            SELECT direction
+            FROM tableContactMessage cm
+            WHERE cm.contactId = tableContact.id
+            ORDER BY cm.createdAt DESC
+            LIMIT 1
+          ), ''),
+          lastMessageAt = (
+            SELECT createdAt
+            FROM tableContactMessage cm
+            WHERE cm.contactId = tableContact.id
+            ORDER BY cm.createdAt DESC
+            LIMIT 1
+          )
+          WHERE userId = ?;
+          `,
+          [userId]
+        );
+        await runQuery(tx, 'DELETE FROM tableConnect WHERE userId = ?;', [userId]);
+        await runQuery(tx, 'DELETE FROM tableContactProfileExchange WHERE requesterUserId = ? OR recipientUserId = ?;', [userId, userId]);
+      });
 
       emitKeyUpdate(contactUserIds, {
         status: 200,
@@ -1934,11 +1928,6 @@ router.post('/reset-keys',
 
       res.status(200).json({ status: 200 });
     } catch {
-      try {
-        await runQuery(req.database.db, 'ROLLBACK');
-      } catch {
-        // ignore rollback errors
-      }
       return next(apiError.internal('reset_keys_failed'));
     }
   });

@@ -22,74 +22,61 @@ const init = function (db) {
     });
 };
 
+function runQuery(db, sql, params = []) {
+    return new Promise((resolve, reject) => {
+        db.run(sql, params, function (err) {
+            if (err) return reject(err);
+            resolve(this);
+        });
+    });
+}
+
+function getQuery(db, sql, params = []) {
+    return new Promise((resolve, reject) => {
+        db.get(sql, params, (err, row) => {
+            if (err) return reject(err);
+            resolve(row || null);
+        });
+    });
+}
+
 /**
  * Toggle Dislike:
  * - Wenn Dislike existiert: löschen (Trigger dekrementiert Zähler)
  * - Sonst: einfügen (Trigger inkrementiert Zähler)
  */
 const toggleDislike = function (db, messageUuid, userId, callback) {
-    db.serialize(() => {
-        db.run('BEGIN', (bErr) => {
-            if (bErr) return callback(bErr);
-
-            const delSql = `
+    db.transaction(async (tx) => {
+        const delSql = `
         DELETE FROM ${tableName}
         WHERE ${columnDislikeMessageUuid} = ? AND ${columnDislikeUserId} = ?;
       `;
-            db.run(delSql, [messageUuid, userId], function (delErr) {
-                if (delErr) {
-                    db.run('ROLLBACK');
-                    return callback(delErr);
-                }
+        const deleteResult = await runQuery(tx, delSql, [messageUuid, userId]);
+        const deleted = deleteResult.changes > 0;
 
-                const deleted = this.changes > 0;
-
-                const insertIfNeeded = (next) => {
-                    if (deleted) return next(null); // war disliked -> jetzt entfernt
-                    const insSql = `
+        if (!deleted) {
+            const insSql = `
             INSERT INTO ${tableName} (${columnDislikeMessageUuid}, ${columnDislikeUserId})
             VALUES (?, ?)
             ON CONFLICT(${columnDislikeMessageUuid}, ${columnDislikeUserId}) DO NOTHING;
           `;
-                    db.run(insSql, [messageUuid, userId], (insErr) => {
-                        if (insErr) return next(insErr);
-                        // Hinweis: Dein XOR-Trigger löscht hier ggf. ein vorhandenes Like automatisch.
-                        next(null);
-                    });
-                };
+            // Hinweis: XOR-Trigger löscht hier ggf. ein vorhandenes Like automatisch.
+            await runQuery(tx, insSql, [messageUuid, userId]);
+        }
 
-                insertIfNeeded((insErr) => {
-                    if (insErr) {
-                        db.run('ROLLBACK');
-                        return callback(insErr);
-                    }
-
-                    // finalen Zustand (inkl. XOR-Effekt) ermitteln
-                    const stateSql = `
+        // finalen Zustand (inkl. XOR-Effekt) ermitteln
+        const stateSql = `
             SELECT
               (SELECT COUNT(*) FROM tableLike WHERE likeMessageUuid = ?) AS likes,
               (SELECT COUNT(*) FROM ${tableName} WHERE ${columnDislikeMessageUuid} = ?) AS dislikes;`;
-                    const params = [messageUuid, messageUuid];
-
-                    db.get(stateSql, params, (stateErr, row) => {
-                        if (stateErr) {
-                            db.run('ROLLBACK');
-                            return callback(stateErr);
-                        }
-
-                        db.run('COMMIT', (cErr) => {
-                            if (cErr) return callback(cErr);
-                            const result = {
-                                dislikes: row.dislikes | 0,
-                                likes: row.likes | 0
-                            };
-                            callback(null, result);
-                        });
-                    });
-                });
-            });
-        });
-    });
+        const row = await getQuery(tx, stateSql, [messageUuid, messageUuid]);
+        return {
+            dislikes: row.dislikes | 0,
+            likes: row.likes | 0
+        };
+    })
+        .then((result) => callback(null, result))
+        .catch((err) => callback(err));
 };
 
 module.exports = {
