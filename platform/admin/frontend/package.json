@@ -13,7 +13,9 @@
     "watch": "ng build --watch --configuration development",
     "pretest": "npm run gen:version",
     "test": "ng test",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "build:pstage": "npm run gen:version && ng build --configuration production",
+    "build:qstage": "npm run gen:version && ng build --configuration qstage"
   },
   "prettier": {
     "printWidth": 100,

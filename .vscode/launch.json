@@ -179,17 +179,27 @@
             ]
         },
         {
-            "name": "Build Frontend",
+            "name": "Build Frontend (P-Stage)",
             "type": "node",
             "request": "launch",
             "cwd": "${workspaceFolder}/frontend",
             "runtimeExecutable": "npm",
             "runtimeArgs": [
                 "run",
-                "build",
-                "--",
-                "--configuration",
-                "production"
+                "build:pstage"
+            ],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
+        },
+        {
+            "name": "Build Frontend (Q-Stage)",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/frontend",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run",
+                "build:qstage"
             ],
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen"
@@ -208,17 +218,27 @@
             "internalConsoleOptions": "neverOpen"
         },
         {
-            "name": "Build AdminFrontend",
+            "name": "Build AdminFrontend (P-Stage)",
             "type": "node",
             "request": "launch",
             "cwd": "${workspaceFolder}/platform/admin/frontend",
             "runtimeExecutable": "npm",
             "runtimeArgs": [
                 "run",
-                "build",
-                "--",
-                "--configuration",
-                "production"
+                "build:pstage"
+            ],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
+        },
+        {
+            "name": "Build AdminFrontend (Q-Stage)",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/platform/admin/frontend",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run",
+                "build:qstage"
             ],
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen"

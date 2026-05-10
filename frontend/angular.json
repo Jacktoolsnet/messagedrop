@@ -136,6 +136,28 @@
                   "with": "src/environments/environment.development.ts"
                 }
               ]
+            },
+            "qstage": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "5.6mb",
+                  "maximumError": "6mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "12kb",
+                  "maximumError": "14kb"
+                }
+              ],
+              "outputHashing": "all",
+              "serviceWorker": "ngsw-config.json",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.qstage.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -151,6 +173,9 @@
             },
             "development": {
               "buildTarget": "frontend:build:development"
+            },
+            "qstage": {
+              "buildTarget": "frontend:build:qstage"
             }
           },
           "defaultConfiguration": "development"
