@@ -99,7 +99,9 @@ export class FileTileComponent implements OnChanges {
   }
 
   get files(): TileFileEntry[] {
-    const tileFiles = this.normalizeFileEntries(this.currentTile()?.payload?.files);
+    const tileFiles = this.place
+      ? []
+      : this.normalizeFileEntries(this.currentTile()?.payload?.files);
     const localFiles = this.localPlaceDocuments().map((document, index) => this.localDocumentToTileEntry(document, index));
     return this.mergeFileEntries(tileFiles, localFiles);
   }
