@@ -1,0 +1,39 @@
+<app-dialog-header
+  icon="format_size"
+  [title]="'common.fontPicker.title' | transloco"
+  [subtitle]="'common.fontPicker.subtitle' | transloco">
+</app-dialog-header>
+
+<mat-dialog-content class="font-picker-content">
+  <div class="font-grid" role="listbox" [attr.aria-label]="'common.fontPicker.listAria' | transloco">
+    @for (font of fonts; track font.family) {
+    <button
+      type="button"
+      class="font-tile"
+      role="option"
+      [class.font-tile--selected]="isSelected(font)"
+      [attr.aria-selected]="isSelected(font)"
+      [attr.aria-label]="('common.fontPicker.selectAria' | transloco: { font: font.label })"
+      (click)="selectFont(font)">
+      <span class="font-tile__name" [style]="fontTileStyle(font)">{{ font.label }}</span>
+      @if (isSelected(font)) {
+      <mat-icon class="font-tile__check" aria-hidden="true">check_circle</mat-icon>
+      }
+    </button>
+    }
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions class="font-picker-actions" align="end">
+  <button mat-icon-button class="action-close" cdkFocusInitial [attr.aria-label]="'common.actions.abort' | transloco"
+    (click)="onAbortClick()">
+    <mat-icon>close</mat-icon>
+  </button>
+  <button mat-icon-button type="button" (click)="openHelp()" [attr.aria-label]="'common.actions.help' | transloco">
+    <mat-icon>help</mat-icon>
+  </button>
+  <button mat-icon-button color="primary" [attr.aria-label]="'common.actions.apply' | transloco"
+    (click)="onApplyClick()">
+    <mat-icon>check</mat-icon>
+  </button>
+</mat-dialog-actions>

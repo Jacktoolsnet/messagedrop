@@ -144,7 +144,7 @@
       },
       "style": {
         "title": "Stil wechseln",
-        "desc": "Wechselt den Standardstil, der für deine eigenen Inhalte verwendet wird."
+        "desc": "Öffnet die Schriftartauswahl für den Standardstil, der für deine eigenen Inhalte verwendet wird."
       },
       "close": {
         "title": "Schließen",
@@ -161,6 +161,24 @@
       "privacy": {
         "title": "Datenschutz und Speicherung",
         "desc": "Profilname und Profilbild werden lokal gespeichert. Wenn du dein Profil aktiv mit Kontakten teilst, werden die freigegebenen Profilinformationen Ende-zu-Ende verschlüsselt übertragen."
+      }
+    }
+  },
+  "fontPicker": {
+    "title": "Schriftart auswählen",
+    "intro": "In diesem Dialog siehst du alle verfügbaren Schriftarten als Kacheln. Wähle die Schriftart aus, die dir am besten gefällt, und übernimm sie für dein Profil.",
+    "items": {
+      "tiles": {
+        "title": "Schriftart-Kacheln",
+        "desc": "Jede Kachel zeigt den Namen der Schrift direkt in dieser Schriftart. Tippe eine Kachel an, um sie auszuwählen."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Schließt den Dialog ohne die Schriftart zu ändern."
+      },
+      "apply": {
+        "title": "Übernehmen",
+        "desc": "Speichert die ausgewählte Schriftart als Standardstil für deine eigenen Inhalte."
       }
     }
   },

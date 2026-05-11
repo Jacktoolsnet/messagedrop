@@ -1229,6 +1229,12 @@
     "files": {
       "pickerUnsupported": "File picker is not supported in this browser."
     },
+    "fontPicker": {
+      "title": "Choose font",
+      "subtitle": "Choose the font style for your own content.",
+      "listAria": "Available fonts",
+      "selectAria": "Select {{ font }} font"
+    },
     "user": {
       "deleteSuccess": "User and related data were removed permanently.",
       "serverInfoHint": "User ID, public encryption key, public signing key, number of messages, number of blocked messages, user status, last sign of life, subscription, and connect hint are saved on our server. This information is essential for the application to function.",
@@ -1294,6 +1300,8 @@
         "setAvatar": "Set my profile avatar.",
         "avatarAltName": "{{ name }} avatar",
         "avatarAltFallback": "Profile avatar",
+        "chooseFont": "Choose font",
+        "chooseFontAria": "Choose font",
         "styleSample": "My selected font style",
         "policyHint": "Your profile name and avatar are stored locally on your device.",
         "avatarHint": "Max 10 MB. Images are compressed automatically.",

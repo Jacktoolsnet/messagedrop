@@ -62,8 +62,10 @@
     <div class="sample-style" [style]="userService.getProfile().defaultStyle">
       {{ 'common.user.profile.styleSample' | transloco }}
     </div>
-    <button mat-flat-button aria-hidden="false" class="button-set-avatar" (click)="changeDefaultStyle()">
-      <mat-icon>cycle</mat-icon>
+    <button mat-flat-button aria-hidden="false" class="button-set-avatar" (click)="changeDefaultStyle()"
+      [attr.aria-label]="'common.user.profile.chooseFontAria' | transloco">
+      <mat-icon>format_size</mat-icon>
+      <span>{{ 'common.user.profile.chooseFont' | transloco }}</span>
     </button>
   </div>
 </div>

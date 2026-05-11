@@ -14,12 +14,12 @@ import { Profile } from '../../../interfaces/profile';
 import { UnsplashPhoto } from '../../../interfaces/unsplash-response';
 import { AvatarStorageService } from '../../../services/avatar-storage.service';
 import { LanguageService } from '../../../services/language.service';
-import { StyleService } from '../../../services/style.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { UnsplashService } from '../../../services/unsplash.service';
 import { UserService } from '../../../services/user.service';
 import { AvatarCropperComponent } from '../../utils/avatar-cropper/avatar-cropper.component';
 import { AvatarSourceChoice, AvatarSourceDialogComponent } from '../../utils/avatar-source-dialog/avatar-source-dialog.component';
+import { FontPickerDialogComponent } from '../../utils/font-picker-dialog/font-picker-dialog.component';
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 import { UnsplashComponent } from '../../utils/unsplash/unsplash.component';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
@@ -52,7 +52,6 @@ export class UserProfileComponent {
   private oriProfile: Profile;
 
   readonly userService = inject(UserService);
-  private readonly styleService = inject(StyleService);
   private readonly snackBar = inject(DisplayMessageService);
   private readonly translation = inject(TranslationHelperService);
   private readonly dialog = inject(MatDialog);
@@ -172,8 +171,24 @@ export class UserProfileComponent {
   }
 
   changeDefaultStyle(): void {
-    this.userService.getProfile().defaultStyle = this.styleService.getRandomStyle();
-    this.userService.notifyProfileChanged();
+    const dialogRef = this.dialog.open(FontPickerDialogComponent, {
+      data: { currentStyle: this.userService.getProfile().defaultStyle },
+      maxWidth: '95vw',
+      width: '95vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((style?: string) => {
+      if (!style) {
+        return;
+      }
+      this.userService.getProfile().defaultStyle = style;
+      this.userService.notifyProfileChanged();
+    });
   }
 
   private openUnsplashAvatar(): void {

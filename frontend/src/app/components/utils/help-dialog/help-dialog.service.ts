@@ -669,7 +669,7 @@ const HELP_TOPICS = {
         descriptionKey: 'profile.items.avatarDelete.desc'
       },
       {
-        icon: 'cycle',
+        icon: 'format_size',
         titleKey: 'profile.items.style.title',
         descriptionKey: 'profile.items.style.desc'
       },
@@ -692,6 +692,27 @@ const HELP_TOPICS = {
         icon: 'privacy_tip',
         titleKey: 'profile.items.privacy.title',
         descriptionKey: 'profile.items.privacy.desc'
+      }
+    ]
+  },
+  fontPicker: {
+    titleKey: 'fontPicker.title',
+    introKey: 'fontPicker.intro',
+    items: [
+      {
+        icon: 'format_size',
+        titleKey: 'fontPicker.items.tiles.title',
+        descriptionKey: 'fontPicker.items.tiles.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'fontPicker.items.close.title',
+        descriptionKey: 'fontPicker.items.close.desc'
+      },
+      {
+        icon: 'check',
+        titleKey: 'fontPicker.items.apply.title',
+        descriptionKey: 'fontPicker.items.apply.desc'
       }
     ]
   },

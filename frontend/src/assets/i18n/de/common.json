@@ -1229,6 +1229,12 @@
     "files": {
       "pickerUnsupported": "Dateiauswahl wird in diesem Browser nicht unterstützt."
     },
+    "fontPicker": {
+      "title": "Schriftart auswählen",
+      "subtitle": "Wähle den Schriftstil für deine eigenen Inhalte.",
+      "listAria": "Verfügbare Schriftarten",
+      "selectAria": "Schriftart {{ font }} auswählen"
+    },
     "user": {
       "deleteSuccess": "Benutzer und zugehörige Daten wurden dauerhaft entfernt.",
       "serverInfoHint": "User-ID, öffentlicher Verschlüsselungsschlüssel, öffentlicher Signaturschlüssel, Anzahl der Nachrichten, Anzahl der blockierten Nachrichten, Benutzerstatus, letztes Lebenszeichen, Abonnement und Verbindungshinweis werden auf unserem Server gespeichert. Diese Informationen sind für die Funktion der Anwendung erforderlich.",
@@ -1294,6 +1300,8 @@
         "setAvatar": "Profil-Avatar festlegen.",
         "avatarAltName": "Avatar von {{ name }}",
         "avatarAltFallback": "Profil-Avatar",
+        "chooseFont": "Schriftart auswählen",
+        "chooseFontAria": "Schriftart auswählen",
         "styleSample": "Mein ausgewählter Schriftstil",
         "policyHint": "Dein Profilname und Avatar werden lokal auf deinem Gerät gespeichert.",
         "avatarHint": "Max. 10 MB. Bilder werden automatisch komprimiert.",

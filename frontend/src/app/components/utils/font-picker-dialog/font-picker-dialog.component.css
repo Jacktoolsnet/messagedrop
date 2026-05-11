@@ -1,0 +1,91 @@
+:host {
+  color: var(--mat-app-text-color);
+}
+
+.font-picker-content {
+  max-height: calc(90vh - 9rem);
+  padding: 0.75rem 1rem 1rem;
+}
+
+.font-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(19.5rem, 1fr));
+  gap: 0.75rem;
+}
+
+.font-tile {
+  position: relative;
+  min-height: 4.25rem;
+  border: 1px solid var(--mat-card-outlined-outline-color);
+  border-radius: 1rem;
+  padding: 0.75rem 2.25rem 0.75rem 0.75rem;
+  background: var(--mat-card-filled-container-color);
+  color: var(--mat-app-text-color);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--mat-card-outlined-outline-color) 45%, transparent);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
+}
+
+.font-tile:hover,
+.font-tile:focus-visible {
+  border-color: var(--mat-sys-primary);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--mat-sys-primary) 35%, transparent);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.font-tile--selected {
+  border-color: var(--mat-sys-primary);
+  background: color-mix(in srgb, var(--mat-sys-primary-container) 45%, var(--mat-card-filled-container-color));
+}
+
+.font-tile__name {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 1.15rem;
+  line-height: 1.4;
+}
+
+.font-tile__check {
+  position: absolute;
+  right: 0.65rem;
+  top: 0.65rem;
+  color: var(--mat-sys-primary);
+}
+
+.font-picker-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 -2px 8px var(--mat-card-outlined-outline-color);
+  border-top: 1px solid var(--mat-card-outlined-outline-color);
+  padding: 0.3rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.font-picker-actions .action-close {
+  margin-right: auto;
+  margin-inline-end: auto;
+}
+
+.font-picker-actions button {
+  margin: 0;
+}
+
+@media (max-width: 480px) {
+  .font-picker-content {
+    padding: 0.75rem;
+  }
+
+  .font-grid {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+}

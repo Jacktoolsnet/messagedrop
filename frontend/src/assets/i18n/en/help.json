@@ -144,7 +144,7 @@
       },
       "style": {
         "title": "Change style",
-        "desc": "Cycles the default style used for your own content."
+        "desc": "Opens the font picker for the default style used for your own content."
       },
       "close": {
         "title": "Close",
@@ -161,6 +161,24 @@
       "privacy": {
         "title": "Privacy and storage",
         "desc": "Profile name and avatar are stored locally. If you explicitly share your profile with contacts, shared profile data is transferred end-to-end encrypted."
+      }
+    }
+  },
+  "fontPicker": {
+    "title": "Choose font",
+    "intro": "This dialog shows all available fonts as tiles. Choose the font you like best and apply it to your profile.",
+    "items": {
+      "tiles": {
+        "title": "Font tiles",
+        "desc": "Each tile shows the font name in that font. Tap a tile to select it."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "Closes the dialog without changing the font."
+      },
+      "apply": {
+        "title": "Apply",
+        "desc": "Saves the selected font as the default style for your own content."
       }
     }
   },
