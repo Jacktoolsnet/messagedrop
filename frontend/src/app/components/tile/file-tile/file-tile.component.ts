@@ -112,12 +112,22 @@ export class FileTileComponent implements OnChanges {
     const tile = this.currentTile();
     if (!tile) return;
 
+    const tileForEditor: TileSetting = this.contact
+      ? {
+        ...tile,
+        payload: {
+          ...tile.payload,
+          files: this.files
+        }
+      }
+      : tile;
+
     const dialogRef = this.dialog.open(FileTileEditComponent, {
       width: '560px',
       maxWidth: '95vw',
       maxHeight: '98vh',
       data: {
-        tile,
+        tile: tileForEditor,
         location: this.place?.location,
         onTileCommit: (updated: TileSetting) => this.applyTileUpdate(updated)
       },
