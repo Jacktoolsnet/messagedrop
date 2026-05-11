@@ -112,7 +112,7 @@ export class FileTileComponent implements OnChanges {
     const tile = this.currentTile();
     if (!tile) return;
 
-    const tileForEditor: TileSetting = this.contact
+    const tileForEditor: TileSetting = (this.contact || this.place)
       ? {
         ...tile,
         payload: {
