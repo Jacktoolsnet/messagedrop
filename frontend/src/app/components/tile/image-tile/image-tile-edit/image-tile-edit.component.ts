@@ -16,6 +16,7 @@ import { TranslationHelperService } from '../../../../services/translation-helpe
 import { DisplayMessageService } from '../../../../services/display-message.service';
 import { isQuotaExceededError } from '../../../../utils/storage-error.util';
 import { LocalImage } from '../../../../interfaces/local-image';
+import { Location } from '../../../../interfaces/location';
 import { TileImageEntry, TileSetting } from '../../../../interfaces/tile-settings';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
 import {
@@ -27,6 +28,9 @@ import { ImageTileGalleryDialogComponent, ImageTileGalleryItem } from '../image-
 
 interface ImageTileDialogData {
   tile: TileSetting;
+  location?: Location;
+  initialImages?: LocalImage[];
+  persistAsLocalImages?: boolean;
   onTileCommit?: (updated: TileSetting) => void;
 }
 
@@ -66,8 +70,13 @@ export class ImageTileEditComponent implements OnInit, OnDestroy {
   readonly data = inject<ImageTileDialogData>(MAT_DIALOG_DATA);
 
   private readonly fallbackTitle = this.translation.t('common.tileTypes.image');
-  private readonly initialEntries = this.normalizeImageEntries(this.data.tile.payload?.images);
-  private readonly initialImageIds = new Set(this.initialEntries.map((image) => image.id));
+  private readonly initialEntries = this.data.persistAsLocalImages
+    ? []
+    : this.normalizeImageEntries(this.data.tile.payload?.images);
+  private readonly initialImageIds = new Set([
+    ...this.initialEntries.map((image) => image.id),
+    ...(this.data.initialImages ?? []).map((image) => image.id)
+  ]);
   private readonly imageUrls = signal<Record<string, string>>({});
 
   readonly titleControl = new FormControl(
@@ -101,7 +110,9 @@ export class ImageTileEditComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit(): Promise<void> {
-    const storedImages = await this.localImageService.getImagesByIds(this.initialEntries.map((image) => image.id));
+    const storedImages = this.data.initialImages
+      ? this.normalizeImages(this.data.initialImages)
+      : await this.localImageService.getImagesByIds(this.initialEntries.map((image) => image.id));
     this.initialImages = storedImages;
     this.images.set(storedImages);
     await this.refreshImageUrls(storedImages);
@@ -152,7 +163,7 @@ export class ImageTileEditComponent implements OnInit, OnDestroy {
 
     let picked: LocalImage[] = [];
     try {
-      picked = await this.localImageService.createImageEntries(this.mapService.getMapLocation());
+      picked = await this.localImageService.createImageEntries(this.data.location ?? this.mapService.getMapLocation());
     } catch (error) {
       const message = isQuotaExceededError(error)
         ? this.translation.t('common.images.storageFull')
@@ -231,6 +242,7 @@ export class ImageTileEditComponent implements OnInit, OnDestroy {
     try {
       await Promise.all(images.map((image) => this.indexedDbService.saveImage(image)));
       await Promise.all(removedImages.map((image) => this.localImageService.deleteImage(image)));
+      this.updateImageSignal(images, removedImages);
     } catch (error) {
       console.error('Failed to persist tile images', error);
       const message = isQuotaExceededError(error)
@@ -249,20 +261,38 @@ export class ImageTileEditComponent implements OnInit, OnDestroy {
         ...this.data.tile.payload,
         title,
         icon: this.icon(),
-        images: images.map((image, index) => ({
-          id: image.id,
-          fileName: image.fileName,
-          mimeType: image.mimeType,
-          width: image.width,
-          height: image.height,
-          exifCaptureDate: image.exifCaptureDate,
-          addedAt: image.timestamp,
-          order: index
-        }))
+        images: this.data.persistAsLocalImages
+          ? []
+          : images.map((image, index) => ({
+            id: image.id,
+            fileName: image.fileName,
+            mimeType: image.mimeType,
+            width: image.width,
+            height: image.height,
+            exifCaptureDate: image.exifCaptureDate,
+            addedAt: image.timestamp,
+            order: index
+          }))
       }
     };
 
     this.dialogRef.close(updated);
+  }
+
+
+  private updateImageSignal(images: LocalImage[], removedImages: LocalImage[]): void {
+    const removedIds = new Set(removedImages.map((image) => image.id));
+    const current = this.localImageService.getImagesWritableSignal()().filter((image) => !removedIds.has(image.id));
+    const imageMap = new Map(current.map((image) => [image.id, image]));
+    images.forEach((image) => imageMap.set(image.id, image));
+    this.localImageService.getImagesWritableSignal().set(
+      [...imageMap.values()].sort((a, b) => this.getSortTime(b) - this.getSortTime(a))
+    );
+  }
+
+  private getSortTime(image: LocalImage): number {
+    const parsed = image.exifCaptureDate ? Date.parse(image.exifCaptureDate) : NaN;
+    return Number.isFinite(parsed) ? parsed : image.timestamp;
   }
 
   private async refreshImageUrls(images: LocalImage[]): Promise<void> {

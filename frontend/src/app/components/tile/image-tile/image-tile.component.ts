@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, effect, inject, signal, untracked } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Contact } from '../../../interfaces/contact';
 import { ExperienceTileContext } from '../../../interfaces/experience-tile-context';
+import { BoundingBox } from '../../../interfaces/bounding-box';
 import { LocalImage } from '../../../interfaces/local-image';
 import { Place } from '../../../interfaces/place';
 import { TileImageEntry, TileSetting } from '../../../interfaces/tile-settings';
@@ -45,13 +46,22 @@ export class ImageTileComponent implements OnChanges, OnDestroy {
   private readonly translation = inject(TranslationHelperService);
 
   readonly currentTile = signal<TileSetting | null>(null);
+  readonly localPlaceImages = signal<LocalImage[]>([]);
   readonly resolvedImages = signal<LocalImage[]>([]);
   readonly previewUrls = signal<Record<string, string>>({});
 
   private loadVersion = 0;
 
+  constructor() {
+    effect(() => {
+      this.localImageService.getImagesSignal()();
+      this.refreshLocalPlaceImagesFromSignal();
+    });
+  }
+
   ngOnChanges(): void {
     this.currentTile.set(this.tile);
+    void this.loadLocalPlaceImages();
     void this.loadImages();
   }
 
@@ -71,7 +81,13 @@ export class ImageTileComponent implements OnChanges, OnDestroy {
   }
 
   get imageEntries(): TileImageEntry[] {
-    return this.normalizeImageEntries(this.currentTile()?.payload?.images);
+    const tileEntries = this.place
+      ? []
+      : this.normalizeImageEntries(this.currentTile()?.payload?.images);
+    return this.mergeImageEntries(
+      tileEntries,
+      this.localPlaceImages().map((image, index) => this.localImageToTileEntry(image, index))
+    );
   }
 
   get hasImages(): boolean {
@@ -104,6 +120,9 @@ export class ImageTileComponent implements OnChanges, OnDestroy {
       maxHeight: '98vh',
       data: {
         tile,
+        location: this.place?.location,
+        initialImages: this.place ? this.localPlaceImages() : undefined,
+        persistAsLocalImages: Boolean(this.place),
         onTileCommit: (updated: TileSetting) => this.applyTileUpdate(updated)
       },
       hasBackdrop: true,
@@ -148,6 +167,33 @@ export class ImageTileComponent implements OnChanges, OnDestroy {
     return item.entry.fileName?.trim() || this.translation.t('common.tiles.images.previewAlt');
   }
 
+  private async loadLocalPlaceImages(): Promise<void> {
+    const boundingBox = this.place?.boundingBox;
+    if (!boundingBox) {
+      this.localPlaceImages.set([]);
+      return;
+    }
+
+    const images = await this.localImageService.getImagesInBoundingBox(boundingBox);
+    this.localPlaceImages.set(images);
+    void this.loadImages();
+  }
+
+  private refreshLocalPlaceImagesFromSignal(): void {
+    const boundingBox = this.place?.boundingBox;
+    if (!boundingBox) {
+      this.localPlaceImages.set([]);
+      return;
+    }
+
+    this.localPlaceImages.set(
+      this.localImageService.getImagesSignal()()
+        .filter((image) => this.isInBoundingBox(image.location.latitude, image.location.longitude, boundingBox))
+        .sort((a, b) => this.getSortTime(b) - this.getSortTime(a))
+    );
+    untracked(() => void this.loadImages());
+  }
+
   private async loadImages(): Promise<void> {
     const version = ++this.loadVersion;
     const entries = this.imageEntries;
@@ -159,11 +205,16 @@ export class ImageTileComponent implements OnChanges, OnDestroy {
       return;
     }
 
-    const images = await this.localImageService.getImagesByIds(entries.map((entry) => entry.id));
+    const localImages = this.localPlaceImages();
+    const localImageIds = new Set(localImages.map((image) => image.id));
+    const storedImages = await this.localImageService.getImagesByIds(
+      entries.map((entry) => entry.id).filter((id) => !localImageIds.has(id))
+    );
     if (version !== this.loadVersion) {
       return;
     }
 
+    const images = this.mergeImages(localImages, storedImages);
     this.resolvedImages.set(images);
 
     const urls = await Promise.all(entries.map(async (entry) => {
@@ -254,6 +305,64 @@ export class ImageTileComponent implements OnChanges, OnDestroy {
 
     this.cdr.markForCheck();
     void this.loadImages();
+  }
+
+  private mergeImageEntries(tileEntries: TileImageEntry[], localEntries: TileImageEntry[]): TileImageEntry[] {
+    const seen = new Set<string>();
+    return [...localEntries, ...tileEntries]
+      .filter((entry) => {
+        if (!entry.id || seen.has(entry.id)) {
+          return false;
+        }
+        seen.add(entry.id);
+        return true;
+      })
+      .map((entry, index) => ({ ...entry, order: index }));
+  }
+
+  private localImageToTileEntry(image: LocalImage, index: number): TileImageEntry {
+    return {
+      id: image.id,
+      fileName: image.fileName,
+      mimeType: image.mimeType,
+      width: image.width,
+      height: image.height,
+      exifCaptureDate: image.exifCaptureDate,
+      addedAt: image.timestamp,
+      order: index
+    };
+  }
+
+  private mergeImages(primary: LocalImage[], secondary: LocalImage[]): LocalImage[] {
+    const seen = new Set<string>();
+    return [...primary, ...secondary].filter((image) => {
+      if (seen.has(image.id)) {
+        return false;
+      }
+      seen.add(image.id);
+      return true;
+    });
+  }
+
+  private getSortTime(image: LocalImage): number {
+    const parsed = image.exifCaptureDate ? Date.parse(image.exifCaptureDate) : NaN;
+    return Number.isFinite(parsed) ? parsed : image.timestamp;
+  }
+
+  private isInBoundingBox(latitude: number, longitude: number, boundingBox: BoundingBox): boolean {
+    const latMin = Math.min(boundingBox.latMin, boundingBox.latMax);
+    const latMax = Math.max(boundingBox.latMin, boundingBox.latMax);
+    const lon = this.normalizeLongitude(longitude);
+    const lonMin = this.normalizeLongitude(boundingBox.lonMin);
+    const lonMax = this.normalizeLongitude(boundingBox.lonMax);
+
+    return latitude >= latMin
+      && latitude <= latMax
+      && (lonMin <= lonMax ? lon >= lonMin && lon <= lonMax : lon >= lonMin || lon <= lonMax);
+  }
+
+  private normalizeLongitude(longitude: number): number {
+    return ((longitude + 180) % 360 + 360) % 360 - 180;
   }
 
   private upsertTile(tileSettings: TileSetting[] | undefined, updated: TileSetting): TileSetting[] {

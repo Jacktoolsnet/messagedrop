@@ -96,6 +96,19 @@ export class LocalDocumentService {
     return docs;
   }
 
+  async getDocumentsByIds(ids: string[]): Promise<LocalDocument[]> {
+    if (!ids.length) {
+      return [];
+    }
+
+    const allDocuments = await this.indexedDbService.getAllDocuments();
+    const documentMap = new Map(allDocuments.map((document) => [document.id, document]));
+
+    return ids
+      .map((id) => documentMap.get(id))
+      .filter((document): document is LocalDocument => Boolean(document));
+  }
+
   clearDocuments(): void {
     this.documentsSignal.set([]);
   }
