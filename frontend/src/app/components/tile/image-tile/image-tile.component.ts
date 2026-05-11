@@ -234,19 +234,19 @@ export class ImageTileComponent implements OnChanges, OnDestroy {
 
   private applyTileUpdate(updated: TileSetting): void {
     if (this.place) {
-      const tiles = (this.place.tileSettings ?? []).map((tile) => tile.id === updated.id ? { ...tile, ...updated } : tile);
+      const tiles = this.upsertTile(this.place.tileSettings, updated);
       const updatedPlace = { ...this.place, tileSettings: tiles };
       this.place = updatedPlace;
       this.currentTile.set(updated);
       this.placeService.saveAdditionalPlaceInfos(updatedPlace);
     } else if (this.contact) {
-      const tiles = (this.contact.tileSettings ?? []).map((tile) => tile.id === updated.id ? { ...tile, ...updated } : tile);
+      const tiles = this.upsertTile(this.contact.tileSettings, updated);
       this.contact = { ...this.contact, tileSettings: tiles };
       this.currentTile.set(updated);
       this.contactService.saveContactTileSettings(this.contact);
       this.contactService.refreshContact(this.contact.id);
     } else if (this.experience?.productCode) {
-      const tiles = (this.experience.tileSettings ?? []).map((tile) => tile.id === updated.id ? { ...tile, ...updated } : tile);
+      const tiles = this.upsertTile(this.experience.tileSettings, updated);
       this.experience = { ...this.experience, tileSettings: tiles };
       this.currentTile.set(updated);
       void this.experienceBookmarkService.saveTileSettings(this.experience.productCode, tiles);
@@ -254,5 +254,20 @@ export class ImageTileComponent implements OnChanges, OnDestroy {
 
     this.cdr.markForCheck();
     void this.loadImages();
+  }
+
+  private upsertTile(tileSettings: TileSetting[] | undefined, updated: TileSetting): TileSetting[] {
+    const tiles = tileSettings ?? [];
+    const matchedById = tiles.some((tile) => tile.id === updated.id);
+    if (matchedById) {
+      return tiles.map((tile) => tile.id === updated.id ? { ...tile, ...updated } : tile);
+    }
+
+    const matchedByType = tiles.some((tile) => tile.type === updated.type);
+    if (matchedByType) {
+      return tiles.map((tile) => tile.type === updated.type ? { ...tile, ...updated, id: tile.id } : tile);
+    }
+
+    return [...tiles, updated].map((tile, index) => ({ ...tile, order: Number.isFinite(tile.order) ? tile.order : index }));
   }
 }

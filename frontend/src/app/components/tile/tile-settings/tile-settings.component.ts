@@ -78,6 +78,10 @@ export class TileSettingsComponent {
 
   get addableTiles(): { type: TileSetting['type']; labelKey: string; icon: string }[] {
     let tiles = [...this.baseAddableTiles];
+    if (this.isPlaceContext || this.isContactContext) {
+      tiles = tiles.filter(tile => tile.type !== 'custom-file' && tile.type !== 'image');
+    }
+
     if (this.isExperienceContext) {
       tiles = tiles.filter(tile => tile.type !== 'custom-date');
     }
@@ -128,6 +132,9 @@ export class TileSettingsComponent {
   }
 
   canEditTile(tile: TileSetting): boolean {
+    if ((tile.type === 'image' || tile.type === 'custom-file') && (this.isPlaceContext || this.isContactContext)) {
+      return false;
+    }
     if (tile.type === 'image') {
       return true;
     }
