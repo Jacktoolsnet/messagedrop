@@ -7,6 +7,29 @@ const tableGeoSearch = require('../db/tableGeoSearch');
 
 router.use(security.checkToken);
 
+function parseJsonField(value) {
+    if (typeof value !== 'string') {
+        return value;
+    }
+    return JSON.parse(value);
+}
+
+function sendCachedGeoSearchResult(res, cachedRow) {
+    const result = parseJsonField(cachedRow?.geoData ?? cachedRow);
+    return res.status(200).json({
+        status: 200,
+        result
+    });
+}
+
+function sendCacheReadError(req, res, message, error, meta = {}) {
+    req.logger?.warn(message, { ...meta, error: error?.message || error });
+    return res.status(500).json({
+        status: 500,
+        error: 'Database error'
+    });
+}
+
 router.get('/countryCode/:pluscode/:latitude/:longitude', async (req, res) => {
     let response = { status: 0 };
     const { pluscode, latitude, longitude } = req.params;
@@ -22,9 +45,13 @@ router.get('/countryCode/:pluscode/:latitude/:longitude', async (req, res) => {
             }
 
             if (undefined != cachedRow) {
-                response.status = 200;
-                response.nominatimPlace = JSON.parse(cachedRow.nominatimPlace);
-                return res.status(200).json(response);
+                try {
+                    response.status = 200;
+                    response.nominatimPlace = parseJsonField(cachedRow.nominatimPlace);
+                    return res.status(200).json(response);
+                } catch (parseError) {
+                    return sendCacheReadError(req, res, 'Failed to parse cached nominatim country code', parseError, { pluscode });
+                }
             }
 
             // 2. Fallback: Request an Nominatim
@@ -69,9 +96,11 @@ router.get('/search/:searchTerm/:limit', async (req, res) => {
             }
 
             if (cachedRow) {
-                response.status = 200;
-                response.result = JSON.parse(cachedRow);
-                return res.status(200).json(response);
+                try {
+                    return sendCachedGeoSearchResult(res, cachedRow);
+                } catch (parseError) {
+                    return sendCacheReadError(req, res, 'Failed to parse cached geo search result', parseError, { searchTerm });
+                }
             }
 
             try {
@@ -123,9 +152,11 @@ router.get('/noboundedsearch/:searchTerm/:limit/:viewbox', async (req, res) => {
                 return res.status(500).json(response);
             }
             if (cachedRow) {
-                response.status = 200;
-                response.result = JSON.parse(cachedRow);
-                return res.status(200).json(response);
+                try {
+                    return sendCachedGeoSearchResult(res, cachedRow);
+                } catch (parseError) {
+                    return sendCacheReadError(req, res, 'Failed to parse cached geo search result', parseError, { cacheKey });
+                }
             }
 
             try {
@@ -178,9 +209,11 @@ router.get('/boundedsearch/:searchTerm/:limit/:viewbox', async (req, res) => {
                 return res.status(500).json(response);
             }
             if (cachedRow) {
-                response.status = 200;
-                response.result = JSON.parse(cachedRow);
-                return res.status(200).json(response);
+                try {
+                    return sendCachedGeoSearchResult(res, cachedRow);
+                } catch (parseError) {
+                    return sendCacheReadError(req, res, 'Failed to parse cached geo search result', parseError, { cacheKey });
+                }
             }
 
             try {
