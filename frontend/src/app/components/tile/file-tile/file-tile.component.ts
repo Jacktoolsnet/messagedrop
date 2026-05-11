@@ -43,6 +43,9 @@ export class FileTileComponent implements OnChanges {
   readonly currentTile = signal<TileSetting | null>(null);
   readonly localPlaceDocuments = signal<LocalDocument[]>([]);
 
+  private lastTileStateKey = '';
+  private lastLocalDocumentLoadKey = '';
+
   constructor() {
     effect(() => {
       this.localDocumentService.getDocumentsSignal()();
@@ -51,8 +54,38 @@ export class FileTileComponent implements OnChanges {
   }
 
   ngOnChanges(): void {
-    this.currentTile.set(this.tile);
-    void this.loadLocalPlaceDocuments();
+    const tileStateKey = this.getTileStateKey();
+    if (tileStateKey !== this.lastTileStateKey) {
+      this.lastTileStateKey = tileStateKey;
+      this.currentTile.set(this.tile);
+    }
+
+    const localDocumentLoadKey = this.getLocalDocumentLoadKey();
+    if (localDocumentLoadKey !== this.lastLocalDocumentLoadKey) {
+      this.lastLocalDocumentLoadKey = localDocumentLoadKey;
+      void this.loadLocalPlaceDocuments();
+    }
+  }
+
+  private getTileStateKey(): string {
+    const payload = this.tile?.payload;
+    return JSON.stringify({
+      id: this.tile?.id,
+      type: this.tile?.type,
+      label: this.tile?.label,
+      title: payload?.title,
+      icon: payload?.icon,
+      files: this.place ? [] : payload?.files
+    });
+  }
+
+  private getLocalDocumentLoadKey(): string {
+    const boundingBox = this.place?.boundingBox;
+    if (!boundingBox) {
+      return 'none';
+    }
+
+    return `${this.place?.id ?? ''}:${boundingBox.latMin}:${boundingBox.latMax}:${boundingBox.lonMin}:${boundingBox.lonMax}`;
   }
 
   get title(): string {
