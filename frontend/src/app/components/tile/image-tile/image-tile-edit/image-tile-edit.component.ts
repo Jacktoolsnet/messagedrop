@@ -31,6 +31,7 @@ interface ImageTileDialogData {
   location?: Location;
   initialImages?: LocalImage[];
   persistAsLocalImages?: boolean;
+  showImagesOnMap?: boolean;
   onTileCommit?: (updated: TileSetting) => void;
 }
 
@@ -78,6 +79,7 @@ export class ImageTileEditComponent implements OnInit, OnDestroy {
     ...(this.data.initialImages ?? []).map((image) => image.id)
   ]);
   private readonly imageUrls = signal<Record<string, string>>({});
+  private readonly missingImageIds = new Set<string>();
 
   readonly titleControl = new FormControl(
     this.data.tile.payload?.title ?? this.data.tile.label ?? this.fallbackTitle,
@@ -113,9 +115,12 @@ export class ImageTileEditComponent implements OnInit, OnDestroy {
     const storedImages = this.data.initialImages
       ? this.normalizeImages(this.data.initialImages)
       : await this.localImageService.getImagesByIds(this.initialEntries.map((image) => image.id));
+    const images = this.data.initialImages
+      ? storedImages
+      : this.mergeMissingInitialEntries(storedImages);
     this.initialImages = storedImages;
-    this.images.set(storedImages);
-    await this.refreshImageUrls(storedImages);
+    this.images.set(images);
+    await this.refreshImageUrls(images);
     this.cdr.markForCheck();
   }
 
@@ -237,12 +242,18 @@ export class ImageTileEditComponent implements OnInit, OnDestroy {
   async save(): Promise<void> {
     const title = this.titleControl.value.trim() || this.fallbackTitle;
     const images = this.normalizeImages(this.images());
-    const removedImages = this.initialImages.filter((initial) => !images.some((current) => current.id === initial.id));
+    const imagesToSave = images.map((image) => ({
+      ...image,
+      showOnMap: this.data.showImagesOnMap ?? image.showOnMap ?? true
+    }));
+    const removedImages = this.initialImages.filter((initial) => !imagesToSave.some((current) => current.id === initial.id));
 
     try {
-      await Promise.all(images.map((image) => this.indexedDbService.saveImage(image)));
+      await Promise.all(imagesToSave
+        .filter((image) => !this.missingImageIds.has(image.id))
+        .map((image) => this.indexedDbService.saveImage(image)));
       await Promise.all(removedImages.map((image) => this.localImageService.deleteImage(image)));
-      this.updateImageSignal(images, removedImages);
+      this.updateImageSignal(imagesToSave, removedImages);
     } catch (error) {
       console.error('Failed to persist tile images', error);
       const message = isQuotaExceededError(error)
@@ -263,7 +274,7 @@ export class ImageTileEditComponent implements OnInit, OnDestroy {
         icon: this.icon(),
         images: this.data.persistAsLocalImages
           ? []
-          : images.map((image, index) => ({
+          : imagesToSave.map((image, index) => ({
             id: image.id,
             fileName: image.fileName,
             mimeType: image.mimeType,
@@ -279,6 +290,31 @@ export class ImageTileEditComponent implements OnInit, OnDestroy {
     this.dialogRef.close(updated);
   }
 
+
+  private mergeMissingInitialEntries(storedImages: LocalImage[]): LocalImage[] {
+    const storedImageIds = new Set(storedImages.map((image) => image.id));
+    const missingImages = this.initialEntries
+      .filter((entry) => !storedImageIds.has(entry.id))
+      .map((entry) => this.createMissingImage(entry));
+    missingImages.forEach((image) => this.missingImageIds.add(image.id));
+    return this.normalizeImages([...storedImages, ...missingImages]);
+  }
+
+  private createMissingImage(entry: TileImageEntry): LocalImage {
+    return {
+      id: entry.id,
+      handle: undefined as unknown as FileSystemFileHandle,
+      fileName: entry.fileName || this.translation.t('common.tiles.images.notFound'),
+      mimeType: entry.mimeType ?? 'image/*',
+      width: entry.width ?? 0,
+      height: entry.height ?? 0,
+      exifCaptureDate: entry.exifCaptureDate,
+      hasExifLocation: false,
+      location: this.data.location ?? this.mapService.getMapLocation(),
+      timestamp: entry.addedAt ?? Date.now(),
+      showOnMap: this.data.showImagesOnMap ?? true
+    };
+  }
 
   private updateImageSignal(images: LocalImage[], removedImages: LocalImage[]): void {
     const removedIds = new Set(removedImages.map((image) => image.id));

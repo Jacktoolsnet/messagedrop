@@ -1601,6 +1601,7 @@ export class IndexedDbService {
 
     const result = allImages
       .filter(localImageEntry => {
+        if (localImageEntry.showOnMap === false) return false;
         const lat = localImageEntry.location.latitude;
         const lon = this.normalizeLon(localImageEntry.location.longitude);
 

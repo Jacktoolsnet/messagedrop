@@ -2736,7 +2736,9 @@ export class AppComponent implements OnInit {
     });
 
     // Process images
-    const images = canShowPrivateContent ? this.localImageService.getImagesSignal()() : [];
+    const images = canShowPrivateContent
+      ? this.localImageService.getImagesSignal()().filter((image) => image.showOnMap !== false)
+      : [];
     images.forEach((image) => {
       const imageLocation: Location = {
         latitude: image.location.latitude,

@@ -160,6 +160,7 @@ export class ImageTileComponent implements OnChanges, OnDestroy {
         location: this.place?.location,
         initialImages: this.place ? this.localPlaceImages() : undefined,
         persistAsLocalImages: Boolean(this.place),
+        showImagesOnMap: !this.contact,
         onTileCommit: (updated: TileSetting) => this.applyTileUpdate(updated)
       },
       hasBackdrop: true,

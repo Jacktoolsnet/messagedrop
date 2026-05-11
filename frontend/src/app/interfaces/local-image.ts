@@ -11,4 +11,5 @@ export interface LocalImage {
   hasExifLocation: boolean;
   location: Location;
   timestamp: number;
+  showOnMap?: boolean;
 }
