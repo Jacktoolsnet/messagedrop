@@ -413,6 +413,16 @@ function hasSelectedPublicProfile(payload) {
   return !!normalizeString(payload?.publicProfileId);
 }
 
+function hasPublishableContent(payload) {
+  if (normalizeString(payload?.message)) {
+    return true;
+  }
+  const multimedia = typeof payload?.multimedia === 'string'
+    ? parseJson(payload.multimedia, defaultMultimedia())
+    : normalizeMultimedia(payload?.multimedia);
+  return normalizeString(multimedia?.type, 'undefined') !== 'undefined';
+}
+
 function hasExternalParentSelection(payload) {
   return !!normalizeExternalParentMessageUuid(payload?.externalParentMessageUuid);
 }
@@ -1118,15 +1128,10 @@ router.post('/public-messages', [requireRole(...CONTENT_ROLES), express.json({ l
     const payload = normalizeEditorPayload(req.body);
     const now = Date.now();
 
-    if (!hasSelectedPublicProfile(payload)) {
-      return next(apiError.unprocessableEntity('Please choose a public profile before saving'));
-    }
-    if (!isCommentPayload(payload) && !hasSelectedLocation(payload)) {
-      return next(apiError.unprocessableEntity('Please choose a location before saving'));
-    }
-
-    const publicProfile = await getPublicProfileById(req.database.db, payload.publicProfileId);
-    if (!publicProfile) {
+    const publicProfile = hasSelectedPublicProfile(payload)
+      ? await getPublicProfileById(req.database.db, payload.publicProfileId)
+      : null;
+    if (hasSelectedPublicProfile(payload) && !publicProfile) {
       return next(apiError.notFound('The selected public profile no longer exists'));
     }
 
@@ -1135,9 +1140,6 @@ router.post('/public-messages', [requireRole(...CONTENT_ROLES), express.json({ l
     if (isCommentPayload(payload)) {
       parentContentId = normalizeString(payload.parentContentId) || null;
       externalParentMessageUuid = normalizeExternalParentMessageUuid(payload.externalParentMessageUuid) || null;
-      if (!parentContentId && !externalParentMessageUuid) {
-        return next(apiError.unprocessableEntity('Please choose parent content before saving this comment'));
-      }
       if (parentContentId) {
         await validateCommentParent(req.database.db, parentContentId);
       }
@@ -1151,7 +1153,7 @@ router.post('/public-messages', [requireRole(...CONTENT_ROLES), express.json({ l
       contentType: payload.contentType,
       parentContentId,
       externalParentMessageUuid,
-      publicProfileId: publicProfile.id,
+      publicProfileId: publicProfile?.id ?? null,
       lastEditorAdminUserId: actorId,
       status: tablePublicContent.contentStatus.DRAFT,
       message: payload.message,
@@ -1228,15 +1230,10 @@ router.put('/public-messages/:id', [requireRole(...CONTENT_ROLES), express.json(
     }
 
     const payload = normalizeEditorPayload(req.body);
-    if (!hasSelectedPublicProfile(payload)) {
-      return next(apiError.unprocessableEntity('Please choose a public profile before saving'));
-    }
-    if (!isCommentPayload(payload) && !hasSelectedLocation(payload)) {
-      return next(apiError.unprocessableEntity('Please choose a location before saving'));
-    }
-
-    const publicProfile = await getPublicProfileById(req.database.db, payload.publicProfileId);
-    if (!publicProfile) {
+    const publicProfile = hasSelectedPublicProfile(payload)
+      ? await getPublicProfileById(req.database.db, payload.publicProfileId)
+      : null;
+    if (hasSelectedPublicProfile(payload) && !publicProfile) {
       return next(apiError.notFound('The selected public profile no longer exists'));
     }
 
@@ -1245,9 +1242,6 @@ router.put('/public-messages/:id', [requireRole(...CONTENT_ROLES), express.json(
     if (isCommentPayload(payload)) {
       parentContentId = normalizeString(payload.parentContentId) || null;
       externalParentMessageUuid = normalizeExternalParentMessageUuid(payload.externalParentMessageUuid) || null;
-      if (!parentContentId && !externalParentMessageUuid) {
-        return next(apiError.unprocessableEntity('Please choose parent content before saving this comment'));
-      }
       if (parentContentId) {
         await validateCommentParent(req.database.db, parentContentId, row.id);
       }
@@ -1265,7 +1259,7 @@ router.put('/public-messages/:id', [requireRole(...CONTENT_ROLES), express.json(
         [tablePublicContent.columns.parentContentId]: parentContentId,
         [tablePublicContent.columns.externalParentMessageUuid]: externalParentMessageUuid,
         [tablePublicContent.columns.message]: payload.message,
-        [tablePublicContent.columns.publicProfileId]: publicProfile.id,
+        [tablePublicContent.columns.publicProfileId]: publicProfile?.id ?? null,
         [tablePublicContent.columns.latitude]: isCommentPayload(payload) ? 0 : payload.latitude,
         [tablePublicContent.columns.longitude]: isCommentPayload(payload) ? 0 : payload.longitude,
         [tablePublicContent.columns.plusCode]: isCommentPayload(payload) ? '' : payload.plusCode,
@@ -1334,6 +1328,9 @@ router.post('/public-messages/:id/publish', requireRole(...PUBLISH_ROLES), async
     }
     if (!row.publicProfileId) {
       return next(apiError.unprocessableEntity('Please choose a public profile before publishing'));
+    }
+    if (!hasPublishableContent(row)) {
+      return next(apiError.unprocessableEntity('Please add text or multimedia before publishing'));
     }
     if ((row.contentType || tablePublicContent.contentType.PUBLIC) !== tablePublicContent.contentType.COMMENT && !hasSelectedLocation(row)) {
       return next(apiError.unprocessableEntity('Please choose a location before publishing'));

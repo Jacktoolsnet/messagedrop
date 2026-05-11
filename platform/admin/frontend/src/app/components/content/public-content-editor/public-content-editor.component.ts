@@ -344,11 +344,15 @@ export class PublicContentEditorComponent {
     return parent.isExternal ? this.i18n.t('Selected public comment') : this.i18n.t('Selected parent content');
   });
   readonly canSaveContent = computed(() => {
-    if (this.saving() || !this.hasSelectedPublicProfile()) {
-      return false;
-    }
-    return this.isCommentMode() ? this.hasSelectedParentContent() : this.hasSelectedLocation();
+    return !this.saving();
   });
+  readonly canPublishContent = computed(() => (
+    this.canSaveContent()
+    && this.canPublish()
+    && this.hasPublishableContent()
+    && this.hasSelectedPublicProfile()
+    && (this.isCommentMode() ? this.hasSelectedParentContent() : this.hasSelectedLocation())
+  ));
   readonly selectedLocationCoordinates = computed(() => {
     if (this.isCommentMode()) {
       return null;
@@ -1123,6 +1127,9 @@ export class PublicContentEditorComponent {
       this.showMessage('Only editors can publish public messages.');
       return;
     }
+    if (!this.validatePublishRequirements()) {
+      return;
+    }
 
     this.persist('publish');
   }
@@ -1273,23 +1280,6 @@ export class PublicContentEditorComponent {
     const message = raw.message.trim();
     const multimedia = this.multimedia();
 
-    if (!message && multimedia.type === 'undefined') {
-      this.showMessage('Please add text or multimedia before saving.');
-      return null;
-    }
-    if (!this.hasSelectedPublicProfile()) {
-      this.showMessage('Please select a public profile before saving.');
-      return null;
-    }
-    if (this.isCommentMode() && !this.hasSelectedParentContent()) {
-      this.showMessage('Please select parent content before saving this comment.');
-      return null;
-    }
-    if (!this.isCommentMode() && !this.hasSelectedLocation()) {
-      this.showMessage('Please select a location before saving.');
-      return null;
-    }
-
     return {
       contentType: this.contentType(),
       parentContentId: this.form.controls.parentContentId.value.trim(),
@@ -1309,6 +1299,31 @@ export class PublicContentEditorComponent {
       hashtags: this.hashtags(),
       multimedia
     };
+  }
+
+  private hasPublishableContent(): boolean {
+    const message = (this.formValue().message ?? '').trim();
+    return !!message || this.multimedia().type !== 'undefined';
+  }
+
+  private validatePublishRequirements(): boolean {
+    if (!this.hasPublishableContent()) {
+      this.showMessage('Please add text or multimedia before publishing.');
+      return false;
+    }
+    if (!this.hasSelectedPublicProfile()) {
+      this.showMessage('Please select a public profile before publishing.');
+      return false;
+    }
+    if (this.isCommentMode() && !this.hasSelectedParentContent()) {
+      this.showMessage('Please select parent content before publishing this comment.');
+      return false;
+    }
+    if (!this.isCommentMode() && !this.hasSelectedLocation()) {
+      this.showMessage('Please select a location before publishing.');
+      return false;
+    }
+    return true;
   }
 
   private loadContent(id: string): void {

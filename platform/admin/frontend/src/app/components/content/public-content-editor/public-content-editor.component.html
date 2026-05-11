@@ -16,7 +16,7 @@
 
       @if (canPublish()) {
       <button mat-icon-button type="button" class="toolbar-action avatar avatar-success" (click)="saveAndPublish()"
-        [disabled]="!canSaveContent()" [attr.aria-label]="i18n.t('Publish message')">
+        [disabled]="!canPublishContent()" [attr.aria-label]="i18n.t('Publish message')">
         <mat-icon>publish</mat-icon>
       </button>
       }
@@ -208,7 +208,7 @@
             <mat-icon>person_add</mat-icon>
             <div>
               <strong>{{ i18n.t('No public profiles available.') }}</strong>
-              <p>{{ i18n.t('Create at least one public profile before saving or publishing a public message.') }}</p>
+              <p>{{ i18n.t('Create at least one public profile before publishing a public message.') }}</p>
             </div>
             <button mat-stroked-button type="button" (click)="openPublicProfiles()">
               <mat-icon>open_in_new</mat-icon>
@@ -355,7 +355,7 @@
             <mat-icon>location_on</mat-icon>
           </div>
           <mat-card-title>{{ i18n.t('Location') }}</mat-card-title>
-          <mat-card-subtitle>{{ i18n.t('Search and attach a required place to the public message') }}</mat-card-subtitle>
+          <mat-card-subtitle>{{ i18n.t('Search and attach a place before publishing the public message') }}</mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content>
@@ -396,12 +396,12 @@
 
                 @if (!hasSelectedLocation()) {
                 <p class="location-error">
-                  {{ i18n.t('A location is required. Please search and select a place before saving.') }}
+                  {{ i18n.t('A location is required before publishing. You can still save this as a draft.') }}
                 </p>
                 }
 
                 <p class="location-help">
-                  {{ i18n.t('Use the same place search as in MessageDrop. Public messages must always be saved with a location.') }}
+                  {{ i18n.t('Use the same place search as in MessageDrop. Drafts can be saved without a location.') }}
                 </p>
               </div>
             </div>
