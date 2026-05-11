@@ -72,8 +72,10 @@ export class ImageTileComponent implements OnChanges, OnDestroy {
     const localImageLoadKey = this.getLocalImageLoadKey();
     if (localImageLoadKey !== this.lastLocalImageLoadKey) {
       this.lastLocalImageLoadKey = localImageLoadKey;
-      void this.loadLocalPlaceImages();
-      return;
+      if (this.place?.boundingBox) {
+        void this.loadLocalPlaceImages();
+        return;
+      }
     }
 
     if (tileChanged) {
