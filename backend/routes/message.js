@@ -1149,6 +1149,26 @@ router.get('/internal/comment/:parentUuid',
   sendInternalCommentsByParentUuid
 );
 
+router.get('/internal/moderation-candidates',
+  [
+    security.checkToken
+  ],
+  (req, res, next) => {
+    const since = Number.isFinite(Number(req.query?.since)) ? Number(req.query.since) : 0;
+    const limit = Number.isFinite(Number(req.query?.limit)) ? Number(req.query.limit) : 500;
+    tableMessage.listModerationCandidates(req.database.db, { since, limit }, (err, rows) => {
+      if (err) {
+        return next(apiError.internal('db_error'));
+      }
+      return res.status(200).json({
+        status: 200,
+        since,
+        rows: toInternalMessageDtos(rows)
+      });
+    });
+  }
+);
+
 router.get('/internal/reactions/:messageUuid',
   [
     security.checkToken

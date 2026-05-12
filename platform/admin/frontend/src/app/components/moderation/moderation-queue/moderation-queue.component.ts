@@ -47,6 +47,10 @@ export class ModerationQueueComponent implements OnInit {
   readonly requests = signal<ModerationRequest[]>([]);
   readonly selected = signal<ModerationRequest | null>(null);
   readonly translatedText = signal<string>('');
+  readonly mode = signal<'queue' | 'voluntary'>('queue');
+  readonly voluntaryLastSeenAt = signal(0);
+  readonly voluntaryUpdatedAt = signal(0);
+  readonly voluntaryLoadedMaxTimestamp = signal(0);
 
   rejectionReason = '';
 
@@ -67,17 +71,88 @@ export class ModerationQueueComponent implements OnInit {
 
   load(): void {
     this.loading.set(true);
-    this.moderationService.listRequests('pending', 200, 0).subscribe({
+    const activeMode = this.mode();
+    const request = activeMode === 'queue'
+      ? this.moderationService.listRequests('pending', 200, 0)
+      : this.moderationService.listVoluntary(500);
+
+    request.subscribe({
       next: (res) => {
-        this.requests.set(res.rows ?? []);
-        if (this.requests().length && !this.selected()) {
-          this.select(this.requests()[0]);
+        const rows = (res.rows ?? []).map((row) => ({
+          ...row,
+          source: activeMode
+        } satisfies ModerationRequest));
+        this.requests.set(rows);
+        this.selected.set(null);
+        this.translatedText.set('');
+        this.rejectionReason = '';
+        if (activeMode === 'voluntary') {
+          const state = (res as { state?: { lastSeenAt: number; updatedAt: number } }).state;
+          this.voluntaryLastSeenAt.set(Number(state?.lastSeenAt || 0));
+          this.voluntaryUpdatedAt.set(Number(state?.updatedAt || 0));
+          this.voluntaryLoadedMaxTimestamp.set(this.maxMessageTimestamp(rows));
+        } else {
+          this.voluntaryLoadedMaxTimestamp.set(0);
+        }
+        if (rows.length) {
+          this.select(rows[0]);
         }
       },
       error: () => {
         this.snack.open(this.i18n.t('Could not load moderation requests.'), this.i18n.t('OK'), { duration: 3000 });
       },
       complete: () => this.loading.set(false)
+    });
+  }
+
+  setMode(mode: 'queue' | 'voluntary'): void {
+    if (this.mode() === mode) {
+      return;
+    }
+    this.mode.set(mode);
+    this.requests.set([]);
+    this.selected.set(null);
+    this.voluntaryLoadedMaxTimestamp.set(0);
+    this.load();
+  }
+
+  isQueueMode(): boolean {
+    return this.mode() === 'queue';
+  }
+
+  isVoluntaryMode(): boolean {
+    return this.mode() === 'voluntary';
+  }
+
+  newestLoadedMessageTimestamp(): number {
+    return this.isVoluntaryMode()
+      ? this.voluntaryLoadedMaxTimestamp()
+      : this.maxMessageTimestamp(this.requests());
+  }
+
+  finishVoluntaryMode(): void {
+    const lastSeenAt = this.newestLoadedMessageTimestamp();
+    if (!lastSeenAt) {
+      this.snack.open(this.i18n.t('No loaded messages to mark as reviewed.'), this.i18n.t('OK'), { duration: 3000 });
+      return;
+    }
+
+    this.actionLoading.set(true);
+    this.moderationService.finishVoluntary(lastSeenAt).subscribe({
+      next: (res) => {
+        if (res.finished) {
+          this.voluntaryLastSeenAt.set(Number(res.state?.lastSeenAt || lastSeenAt));
+          this.voluntaryUpdatedAt.set(Number(res.state?.updatedAt || 0));
+          this.requests.set([]);
+          this.selected.set(null);
+          this.snack.open(this.i18n.t('Voluntary moderation checkpoint saved.'), undefined, { duration: 2500 });
+          this.setMode('queue');
+        } else {
+          this.snack.open(this.i18n.t('Could not save voluntary moderation checkpoint.'), this.i18n.t('OK'), { duration: 3000 });
+        }
+      },
+      error: () => this.snack.open(this.i18n.t('Could not save voluntary moderation checkpoint.'), this.i18n.t('OK'), { duration: 3000 }),
+      complete: () => this.actionLoading.set(false)
     });
   }
 
@@ -197,7 +272,10 @@ export class ModerationQueueComponent implements OnInit {
     const current = this.selected();
     if (!current) return;
     this.actionLoading.set(true);
-    this.moderationService.approveRequest(current.id).subscribe({
+    const request = this.isVoluntaryMode()
+      ? this.moderationService.approveMessage(current.messageUuid)
+      : this.moderationService.approveRequest(current.id);
+    request.subscribe({
       next: (res) => {
         if (res.approved) {
           this.removeFromList(current.id);
@@ -219,7 +297,10 @@ export class ModerationQueueComponent implements OnInit {
       return;
     }
     this.actionLoading.set(true);
-    this.moderationService.rejectRequest(current.id, this.rejectionReason).subscribe({
+    const request = this.isVoluntaryMode()
+      ? this.moderationService.rejectMessage(current.messageUuid, this.rejectionReason)
+      : this.moderationService.rejectRequest(current.id, this.rejectionReason);
+    request.subscribe({
       next: (res) => {
         if (res.rejected) {
           this.removeFromList(current.id);
@@ -238,5 +319,9 @@ export class ModerationQueueComponent implements OnInit {
     this.requests.set(updated);
     this.selected.set(updated[0] ?? null);
     this.rejectionReason = '';
+  }
+
+  private maxMessageTimestamp(rows: ModerationRequest[]): number {
+    return Math.max(0, ...rows.map((row) => Number(row.messageCreatedAt || row.createdAt || 0)));
   }
 }

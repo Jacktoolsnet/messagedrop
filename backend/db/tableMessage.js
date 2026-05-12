@@ -344,6 +344,32 @@ const getAll = function (db, callback) {
     }
 };
 
+const listModerationCandidates = function (db, options, callback) {
+    try {
+        const since = Number.isFinite(Number(options?.since)) ? Number(options.since) : 0;
+        const limit = Number.isFinite(Number(options?.limit)) ? Math.max(1, Math.min(1000, Number(options.limit))) : 500;
+        const sql = `
+        SELECT * FROM ${tableName}
+        WHERE ${columnStatus} = ?
+          AND ${columnMessageType} IN (?, ?)
+          AND ${columnMessageCreateDateTime} > ?
+        ORDER BY ${columnMessageCreateDateTime} DESC, ${columnMessageId} DESC
+        LIMIT ?;`;
+
+        db.all(sql, [
+            messageStatus.ENABLED,
+            messageType.PUBLIC,
+            messageType.COMMENT,
+            since,
+            limit
+        ], (err, rows) => {
+            callback(err, rows || []);
+        });
+    } catch (error) {
+        callback(error);
+    }
+};
+
 const getById = function (db, messageId, callback) {
     try {
         let sql = `
@@ -708,6 +734,7 @@ module.exports = {
     disableMessage,
     enableMessage,
     getAll,
+    listModerationCandidates,
     getById,
     getByUuid,
     getByUserId,

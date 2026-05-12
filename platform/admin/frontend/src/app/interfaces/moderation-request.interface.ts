@@ -19,4 +19,5 @@ export interface ModerationRequest {
     patternMatchAt?: number | null;
     status?: string;
     createdAt?: number;
+    source?: 'queue' | 'voluntary';
 }

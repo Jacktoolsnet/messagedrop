@@ -167,6 +167,18 @@ mat-progress-bar {
     flex: 1;
 }
 
+.mode-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    flex-wrap: wrap;
+}
+
+.mode-switch button mat-icon,
+mat-toolbar>button mat-icon {
+    margin-right: .25rem;
+}
+
 .section-divider {
     margin: 1.25rem 0;
 }
@@ -224,6 +236,24 @@ mat-progress-bar {
 }
 
 @media (max-width: 900px) {
+    mat-toolbar {
+        position: static;
+        flex-wrap: wrap;
+        padding-block: .6rem;
+    }
+
+    .toolbar-title {
+        margin-inline: 0;
+    }
+
+    .spacer {
+        display: none;
+    }
+
+    .mode-switch {
+        width: 100%;
+    }
+
     .split {
         grid-template-columns: 1fr;
     }

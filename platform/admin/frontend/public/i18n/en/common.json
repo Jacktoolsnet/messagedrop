@@ -266,5 +266,14 @@
   "Public reaction could not be updated.": "Public reaction could not be updated.",
   "Public reactions could not be loaded.": "Public reactions could not be loaded.",
   "Could not load public reactions.": "Could not load public reactions.",
-  "Could not update public reaction.": "Could not update public reaction."
+  "Could not update public reaction.": "Could not update public reaction.",
+  "Review queue": "Review queue",
+  "Voluntary moderation": "Voluntary moderation",
+  "Finish voluntary mode": "Finish voluntary mode",
+  "No new messages for voluntary moderation.": "No new messages for voluntary moderation.",
+  "Voluntary review": "Voluntary review",
+  "Mark as OK": "Mark as OK",
+  "No loaded messages to mark as reviewed.": "No loaded messages to mark as reviewed.",
+  "Voluntary moderation checkpoint saved.": "Voluntary moderation checkpoint saved.",
+  "Could not save voluntary moderation checkpoint.": "Could not save voluntary moderation checkpoint."
 }

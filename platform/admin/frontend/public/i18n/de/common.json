@@ -1665,5 +1665,14 @@
   "Public reaction could not be updated.": "Die öffentliche Reaktion konnte nicht aktualisiert werden.",
   "Public reactions could not be loaded.": "Die öffentlichen Reaktionen konnten nicht geladen werden.",
   "Could not load public reactions.": "Öffentliche Reaktionen konnten nicht geladen werden.",
-  "Could not update public reaction.": "Öffentliche Reaktion konnte nicht aktualisiert werden."
+  "Could not update public reaction.": "Öffentliche Reaktion konnte nicht aktualisiert werden.",
+  "Review queue": "Prüf-Warteschlange",
+  "Voluntary moderation": "Freiwillige Moderation",
+  "Finish voluntary mode": "Freiwilligen Modus beenden",
+  "No new messages for voluntary moderation.": "Keine neuen Nachrichten für die freiwillige Moderation.",
+  "Voluntary review": "Freiwillige Prüfung",
+  "Mark as OK": "Als OK markieren",
+  "No loaded messages to mark as reviewed.": "Keine geladenen Nachrichten, die als geprüft markiert werden können.",
+  "Voluntary moderation checkpoint saved.": "Prüfstand der freiwilligen Moderation gespeichert.",
+  "Could not save voluntary moderation checkpoint.": "Prüfstand der freiwilligen Moderation konnte nicht gespeichert werden."
 }

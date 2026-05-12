@@ -4,6 +4,25 @@
     </button>
     <span class="toolbar-title">{{ i18n.t('Moderation Queue') }}</span>
     <span class="spacer"></span>
+    <div class="mode-switch">
+        <button mat-stroked-button type="button" [color]="isQueueMode() ? 'primary' : undefined"
+            (click)="setMode('queue')" [disabled]="loading() || actionLoading()">
+            <mat-icon>policy</mat-icon>
+            {{ i18n.t('Review queue') }}
+        </button>
+        <button mat-stroked-button type="button" [color]="isVoluntaryMode() ? 'primary' : undefined"
+            (click)="setMode('voluntary')" [disabled]="loading() || actionLoading()">
+            <mat-icon>volunteer_activism</mat-icon>
+            {{ i18n.t('Voluntary moderation') }}
+        </button>
+    </div>
+    @if (isVoluntaryMode()) {
+    <button mat-stroked-button color="accent" type="button" (click)="finishVoluntaryMode()"
+        [disabled]="loading() || actionLoading() || requests().length === 0">
+        <mat-icon>done_all</mat-icon>
+        {{ i18n.t('Finish voluntary mode') }}
+    </button>
+    }
     <button mat-stroked-button color="primary" (click)="load()" [disabled]="loading()">
         <mat-icon>refresh</mat-icon>
         {{ i18n.t('Refresh') }}
@@ -20,7 +39,13 @@
             @if (!loading() && requests().length === 0) {
             <div class="empty">
                 <mat-icon>inbox</mat-icon>
-                <div>{{ i18n.t('No moderation requests.') }}</div>
+                <div>
+                    @if (isVoluntaryMode()) {
+                    {{ i18n.t('No new messages for voluntary moderation.') }}
+                    } @else {
+                    {{ i18n.t('No moderation requests.') }}
+                    }
+                </div>
             </div>
             }
             @for (req of requests(); track trackById($index, req)) {
@@ -32,7 +57,11 @@
                     <div class="meta">
                         <span class="file">{{ formatLocal(req.createdAt || req.messageCreatedAt) }}</span>
                         <span class="dot">•</span>
+                        @if (isVoluntaryMode()) {
+                        <span class="msg">{{ i18n.t('Voluntary review') }}</span>
+                        } @else {
                         <span class="msg">{{ i18n.t('Score {{score}}', { score: formatScore(req.aiScore) }) }}</span>
+                        }
                     </div>
                 </div>
             </div>
@@ -113,7 +142,11 @@
                 <mat-card-actions align="end">
                     <button mat-stroked-button color="primary" (click)="approveSelected()" [disabled]="actionLoading()">
                         <mat-icon>check_circle</mat-icon>
+                        @if (isVoluntaryMode()) {
+                        {{ i18n.t('Mark as OK') }}
+                        } @else {
                         {{ i18n.t('Approve') }}
+                        }
                     </button>
                     <button mat-stroked-button color="warn" (click)="rejectSelected()"
                         [disabled]="actionLoading() || !rejectionReason">

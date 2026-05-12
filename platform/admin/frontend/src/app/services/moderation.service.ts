@@ -30,4 +30,31 @@ export class ModerationService {
         return this.http.post<{ rejected: boolean }>(`${this.baseUrl}/moderation/requests/${id}/reject`, { reason })
             .pipe(catchError(() => of({ rejected: false })));
     }
+
+    listVoluntary(limit = 500) {
+        return this.http.get<{ rows: ModerationRequest[]; state: { lastSeenAt: number; updatedAt: number; updatedBy: string | null } }>(
+            `${this.baseUrl}/moderation/voluntary?limit=${limit}`
+        ).pipe(catchError(() => of({ rows: [], state: { lastSeenAt: 0, updatedAt: 0, updatedBy: null } })));
+    }
+
+    finishVoluntary(lastSeenAt: number) {
+        return this.http.post<{ finished: boolean; state: { lastSeenAt: number; updatedAt: number; updatedBy: string | null } }>(
+            `${this.baseUrl}/moderation/voluntary/finish`,
+            { lastSeenAt }
+        ).pipe(catchError(() => of({ finished: false, state: { lastSeenAt: 0, updatedAt: 0, updatedBy: null } })));
+    }
+
+    approveMessage(messageUuid: string) {
+        return this.http.post<{ approved: boolean }>(
+            `${this.baseUrl}/moderation/messages/${encodeURIComponent(messageUuid)}/approve`,
+            {}
+        ).pipe(catchError(() => of({ approved: false })));
+    }
+
+    rejectMessage(messageUuid: string, reason: string) {
+        return this.http.post<{ rejected: boolean }>(
+            `${this.baseUrl}/moderation/messages/${encodeURIComponent(messageUuid)}/reject`,
+            { reason }
+        ).pipe(catchError(() => of({ rejected: false })));
+    }
 }
