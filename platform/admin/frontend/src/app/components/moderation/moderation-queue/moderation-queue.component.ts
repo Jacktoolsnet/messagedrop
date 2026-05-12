@@ -3,6 +3,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
 import { MatButtonModule } from '@angular/material/button';
+import { MatBadgeModule } from '@angular/material/badge';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -32,6 +33,7 @@ import { DisplayMessageService } from '../../../services/display-message.service
     RouterLink,
     MatToolbarModule,
     MatIconModule,
+    MatBadgeModule,
     MatButtonModule,
     MatCardModule,
     MatDividerModule,
@@ -265,6 +267,12 @@ export class ModerationQueueComponent implements OnInit {
     return Math.max(0, Number(value || 0));
   }
 
+  previewMessageText(entry: ModerationRequest): string {
+    return this.isSelected(entry) && this.translatedText()
+      ? this.translatedText()
+      : entry.messageText;
+  }
+
   hasLocation(entry: ModerationRequest): boolean {
     return Number.isFinite(Number(entry.latitude)) && Number.isFinite(Number(entry.longitude))
       && (Number(entry.latitude) !== 0 || Number(entry.longitude) !== 0);
@@ -378,6 +386,7 @@ export class ModerationQueueComponent implements OnInit {
 
   translateSelected(): void {
     const current = this.selected();
+    const selectedId = current?.id;
     const text = current?.messageText?.trim() ?? '';
     if (!text) {
       this.snack.open(this.i18n.t('No text to translate.'), this.i18n.t('OK'), { duration: 2000 });
@@ -386,7 +395,9 @@ export class ModerationQueueComponent implements OnInit {
     this.translateLoading.set(true);
     this.translator.translateToGerman(text).subscribe({
       next: (result) => {
-        this.translatedText.set(result || this.i18n.t('Translation failed.'));
+        if (this.selected()?.id === selectedId) {
+          this.translatedText.set(result || this.i18n.t('Translation failed.'));
+        }
       },
       error: () => {
         this.snack.open(this.i18n.t('Translation failed.'), this.i18n.t('OK'), { duration: 3000 });
@@ -498,6 +509,7 @@ export class ModerationQueueComponent implements OnInit {
     const updated = this.requests().filter(item => item.id !== id);
     this.requests.set(updated);
     this.selected.set(updated[0] ?? null);
+    this.translatedText.set('');
     this.rejectionReason = '';
   }
 

@@ -77,98 +77,114 @@
                 </mat-card-header>
                 <mat-card-content>
                     <mat-progress-bar *ngIf="actionLoading()" mode="indeterminate"></mat-progress-bar>
-                    <div class="message-preview">
-                        <div class="preview-head">
-                            <div class="preview-avatar"><mat-icon>public</mat-icon></div>
-                            <div class="preview-title">
-                                <strong>{{ sel.messageType || i18n.t('Public message') }}</strong>
-                                <span>{{ formatLocal(sel.messageCreatedAt || sel.createdAt) }}</span>
+                    <div class="preview-canvas">
+                        <mat-card class="preview-item has-badge">
+                            <div class="preview-avatar-box">
+                                <div class="preview-avatar-icon" aria-hidden="true">
+                                    <mat-icon>public</mat-icon>
+                                </div>
+                                <div class="preview-avatar-text">
+                                    <span class="preview-name">{{ sel.messageType || i18n.t('Public message') }}</span>
+                                    <span class="preview-timestamp">{{ formatLocal(sel.messageCreatedAt || sel.createdAt) }}</span>
+                                </div>
                             </div>
-                            <button mat-stroked-button type="button" (click)="openDetailsDialog(sel)">
-                                <mat-icon>info</mat-icon>
-                                {{ i18n.t('Additional info') }}
-                            </button>
-                        </div>
 
-                        @if (moderationMultimedia(sel); as media) {
-                        @if (media.type !== 'undefined') {
-                        <div class="preview-media">
-                            @if (isStickerMultimedia(media)) {
-                            <app-sticker-preview [multimedia]="media"
-                                [alt]="media.title || i18n.t('Selected multimedia preview')"></app-sticker-preview>
-                            } @else if (isImageMultimedia(media)) {
-                            <img [src]="media.url" [alt]="media.title || i18n.t('Selected multimedia preview')" />
-                            } @else if (tiktokEmbedUrl(sel); as tiktokUrl) {
-                            <div class="preview-oembed preview-oembed-tiktok">
-                                <iframe [src]="tiktokUrl" [title]="i18n.t('TikTok preview')" loading="lazy"
-                                    allowfullscreen></iframe>
-                            </div>
-                            } @else if (safeOembedHtml(sel)) {
-                            <div class="preview-oembed" [class.preview-oembed-youtube]="media.type === 'youtube'"
-                                [class.preview-oembed-spotify]="media.type === 'spotify'"
-                                [class.preview-oembed-tiktok]="media.type === 'tiktok'"
-                                [class.preview-oembed-pinterest]="media.type === 'pinterest'"
-                                [innerHTML]="safeOembedHtml(sel)"></div>
-                            } @else {
-                            <div class="preview-media-summary">
-                                <span>{{ media.type }}</span>
-                                @if (media.title) {
-                                <strong>{{ media.title }}</strong>
-                                }
-                                @if (media.description) {
-                                <small>{{ media.description }}</small>
-                                }
-                                @if (media.url || media.sourceUrl) {
-                                <a [href]="media.sourceUrl || media.url" target="_blank" rel="noopener noreferrer">
-                                    {{ i18n.t('Open media') }}
-                                </a>
-                                }
-                            </div>
-                            }
-                        </div>
-                        }
-                        }
+                            <mat-card-content>
+                                <div class="preview-message-content">
+                                    @if (moderationMultimedia(sel); as media) {
+                                    @if (media.type !== 'undefined') {
+                                    <div class="preview-media">
+                                        @if (isStickerMultimedia(media)) {
+                                        <app-sticker-preview [multimedia]="media"
+                                            [alt]="media.title || i18n.t('Selected multimedia preview')"></app-sticker-preview>
+                                        } @else if (isImageMultimedia(media)) {
+                                        <img [src]="media.url" [alt]="media.title || i18n.t('Selected multimedia preview')" />
+                                        } @else if (tiktokEmbedUrl(sel); as tiktokUrl) {
+                                        <div class="preview-oembed preview-oembed-tiktok">
+                                            <iframe [src]="tiktokUrl" [title]="i18n.t('TikTok preview')" loading="lazy"
+                                                allowfullscreen></iframe>
+                                        </div>
+                                        } @else if (safeOembedHtml(sel)) {
+                                        <div class="preview-oembed" [class.preview-oembed-youtube]="media.type === 'youtube'"
+                                            [class.preview-oembed-spotify]="media.type === 'spotify'"
+                                            [class.preview-oembed-tiktok]="media.type === 'tiktok'"
+                                            [class.preview-oembed-pinterest]="media.type === 'pinterest'"
+                                            [innerHTML]="safeOembedHtml(sel)"></div>
+                                        } @else {
+                                        <div class="preview-media-summary">
+                                            <span>{{ media.type }}</span>
+                                            @if (media.title) {
+                                            <strong>{{ media.title }}</strong>
+                                            }
+                                            @if (media.description) {
+                                            <small>{{ media.description }}</small>
+                                            }
+                                            @if (media.url || media.sourceUrl) {
+                                            <a [href]="media.sourceUrl || media.url" target="_blank" rel="noopener noreferrer">
+                                                {{ i18n.t('Open media') }}
+                                            </a>
+                                            }
+                                        </div>
+                                        }
+                                    </div>
+                                    }
+                                    }
 
-                        <div class="preview-message-shell" [style]="sel.style || ''">
-                            <p>{{ sel.messageText }}</p>
-                        </div>
+                                    <div class="preview-message-shell" [style]="sel.style || ''">
+                                        <p class="preview-message-text">{{ previewMessageText(sel) }}</p>
+                                    </div>
+                                </div>
+                            </mat-card-content>
 
-                        <div class="preview-stats">
-                            <span><mat-icon>forum</mat-icon>{{ reactionCount(sel.commentsNumber) }}</span>
-                            <span><mat-icon>thumb_up</mat-icon>{{ reactionCount(sel.likes) }}</span>
-                            <span><mat-icon>thumb_down</mat-icon>{{ reactionCount(sel.dislikes) }}</span>
-                        </div>
-
-                        @if (mapEmbedUrl(sel); as mapUrl) {
-                        <div class="map-preview">
-                            <iframe [src]="mapUrl" [title]="i18n.t('Message location map')" loading="lazy"></iframe>
-                        </div>
-                        } @else {
-                        <div class="map-empty">
-                            <mat-icon>location_off</mat-icon>
-                            {{ i18n.t('No location available for this message.') }}
-                        </div>
-                        }
+                            <mat-card-actions class="preview-buttonbar">
+                                <div class="preview-button-group">
+                                    <button mat-mini-fab type="button" tabindex="-1">
+                                        <mat-icon [matBadge]="reactionCount(sel.commentsNumber) === 0 ? '' : reactionCount(sel.commentsNumber)"
+                                            matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">forum</mat-icon>
+                                    </button>
+                                    <button mat-mini-fab type="button" tabindex="-1">
+                                        <mat-icon [matBadge]="reactionCount(sel.likes) === 0 ? '' : reactionCount(sel.likes)"
+                                            matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_up</mat-icon>
+                                    </button>
+                                    <button mat-mini-fab type="button" tabindex="-1">
+                                        <mat-icon [matBadge]="reactionCount(sel.dislikes) === 0 ? '' : reactionCount(sel.dislikes)"
+                                            matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_down</mat-icon>
+                                    </button>
+                                </div>
+                            </mat-card-actions>
+                        </mat-card>
                     </div>
+
+                    <mat-divider class="section-divider"></mat-divider>
+
+                    <div class="below-preview-actions">
+                        <button mat-stroked-button type="button" (click)="openDetailsDialog(sel)">
+                            <mat-icon>info</mat-icon>
+                            {{ i18n.t('Additional info') }}
+                        </button>
+                        <button mat-stroked-button color="primary" class="translate-btn" type="button"
+                            (click)="translateSelected()" [disabled]="translateLoading()">
+                            <mat-icon>translate</mat-icon>
+                            {{ i18n.t('Translate to German') }}
+                        </button>
+                    </div>
+
+                    @if (mapEmbedUrl(sel); as mapUrl) {
+                    <div class="map-preview">
+                        <iframe [src]="mapUrl" [title]="i18n.t('Message location map')" loading="lazy"></iframe>
+                    </div>
+                    } @else {
+                    <div class="map-empty">
+                        <mat-icon>location_off</mat-icon>
+                        {{ i18n.t('No location available for this message.') }}
+                    </div>
+                    }
+                    @if (translateLoading()) {
                     <mat-divider class="section-divider"></mat-divider>
                     <div class="block">
-                        <div class="block-header">
-                            <div class="block-title">{{ i18n.t('Message') }}</div>
-                            <button mat-stroked-button color="primary" class="translate-btn"
-                                (click)="translateSelected()" [disabled]="translateLoading()">
-                                <mat-icon>translate</mat-icon>
-                                {{ i18n.t('Translate to German') }}
-                            </button>
-                        </div>
-                        <div class="block-body">{{ sel.messageText }}</div>
-                        @if (translateLoading()) {
                         <div class="translate-loading">{{ i18n.t('Translating...') }}</div>
-                        }
-                        @if (translatedText()) {
-                        <div class="block-title">{{ i18n.t('Translation (DE)') }}</div>
-                        <div class="block-body">{{ translatedText() }}</div>
-                        }
                     </div>
+                    }
                     <div class="block">
                         <div class="block-title">{{ i18n.t('Rejection reason') }}</div>
                         <mat-form-field appearance="fill" class="reason-field">
