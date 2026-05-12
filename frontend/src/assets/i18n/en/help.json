@@ -1765,7 +1765,7 @@
     }
   },
   "tileEditMigraine": {
-    "title": "Migraine tile",
+    "title": "Weather change tile",
     "intro": "This dialog configures warning and alert thresholds for temperature and air pressure, and includes display settings.",
     "items": {
       "displaySettings": {
@@ -1794,7 +1794,7 @@
       },
       "privacy": {
         "title": "Privacy and storage",
-        "desc": "Migraine threshold settings are stored locally and in encrypted form."
+        "desc": "Weather change threshold settings are stored locally and in encrypted form."
       }
     }
   },

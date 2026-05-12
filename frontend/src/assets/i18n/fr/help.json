@@ -1747,7 +1747,7 @@
     }
   },
   "tileEditMigraine": {
-    "title": "Tuile migraine",
+    "title": "Tuile changement météo",
     "intro": "Cette boîte de dialogue configure les seuils d'alerte pour la température et la pression atmosphérique, ainsi que l'affichage.",
     "items": {
       "displaySettings": {
@@ -1776,7 +1776,7 @@
       },
       "privacy": {
         "title": "Confidentialité et stockage",
-        "desc": "Les seuils de migraine sont stockés localement et sous forme chiffrée."
+        "desc": "Les seuils de changement météo sont stockés localement et sous forme chiffrée."
       }
     }
   },

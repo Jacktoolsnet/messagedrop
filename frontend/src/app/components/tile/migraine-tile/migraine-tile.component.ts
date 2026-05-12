@@ -50,7 +50,8 @@ export class MigraineTileComponent {
   get title(): string {
     const tile = this.currentTile();
     const fallback = this.translation.t('common.tileTypes.migraine');
-    return tile?.payload?.title?.trim() || tile?.label || fallback;
+    const configuredTitle = tile?.payload?.title?.trim() || tile?.label?.trim();
+    return configuredTitle && configuredTitle !== 'Migraine' ? configuredTitle : fallback;
   }
 
   get icon(): string {

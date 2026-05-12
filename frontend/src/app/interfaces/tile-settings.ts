@@ -168,12 +168,12 @@ export function normalizeTileSettings(
     systemTiles.push({
       id: 'system-migraine',
       type: 'custom-migraine',
-      label: 'Migraine',
+      label: '',
       enabled: true,
       order: defaultsNormalized.length + customTiles.length,
       custom: false,
       payload: {
-        title: 'Migraine',
+        title: '',
         icon: 'crisis_alert',
         migraine: {
           tempWarn1: 5,

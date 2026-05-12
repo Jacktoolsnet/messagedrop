@@ -53,7 +53,7 @@ export class MigraineTileEditComponent {
   private readonly fallbackTitle = this.translation.t('common.tileTypes.migraine');
 
   readonly titleControl = new FormControl(
-    this.data.tile.payload?.title ?? this.data.tile.label ?? this.fallbackTitle,
+    this.initialTitle(),
     { nonNullable: true }
   );
 
@@ -72,6 +72,11 @@ export class MigraineTileEditComponent {
 
   get headerTitle(): string {
     return this.titleControl.value.trim() || this.fallbackTitle;
+  }
+
+  private initialTitle(): string {
+    const configuredTitle = this.data.tile.payload?.title?.trim() || this.data.tile.label?.trim();
+    return configuredTitle && configuredTitle !== 'Migraine' ? configuredTitle : this.fallbackTitle;
   }
 
   get headerIcon(): string {

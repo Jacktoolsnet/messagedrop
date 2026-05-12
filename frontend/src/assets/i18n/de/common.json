@@ -674,7 +674,7 @@
       "quickActions": "Schnellaktionen",
       "files": "Dateien",
       "experiences": "Erlebnisse",
-      "migraine": "Migräne-Alarm",
+      "migraine": "Wetteränderung",
       "pollution": "Luftverschmutzung"
     },
     "tileDelete": {
@@ -798,7 +798,7 @@
       "quickActionsTitle": "Schnellaktionen bearbeiten",
       "actionTitle": "Aktion bearbeiten",
       "filesTitle": "Dateien bearbeiten",
-      "migraineTitle": "Migräne-Kachel bearbeiten",
+      "migraineTitle": "Wetteränderung bearbeiten",
       "pollutionTitle": "Luftverschmutzungs-Kachel bearbeiten"
     },
     "tileFields": {

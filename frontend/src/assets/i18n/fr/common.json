@@ -674,7 +674,7 @@
       "quickActions": "Actions rapides",
       "files": "Fichiers",
       "experiences": "Expériences",
-      "migraine": "Alerte migraine",
+      "migraine": "Changement météo",
       "pollution": "Pollution"
     },
     "tileDelete": {
@@ -798,7 +798,7 @@
       "quickActionsTitle": "Modifier les actions rapides",
       "actionTitle": "Modifier l'action",
       "filesTitle": "Modifier les fichiers",
-      "migraineTitle": "Modifier la tuile migraine",
+      "migraineTitle": "Modifier le changement météo",
       "pollutionTitle": "Modifier la tuile pollution"
     },
     "tileFields": {

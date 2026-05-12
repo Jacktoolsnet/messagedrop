@@ -1747,7 +1747,7 @@
     }
   },
   "tileEditMigraine": {
-    "title": "Tarjeta de migraña",
+    "title": "Tarjeta de cambio meteorológico",
     "intro": "En este diálogo configuras los umbrales de aviso y alerta para temperatura y presión del aire, y también los ajustes visuales.",
     "items": {
       "displaySettings": {
@@ -1776,7 +1776,7 @@
       },
       "privacy": {
         "title": "Privacidad y almacenamiento",
-        "desc": "Los umbrales de migraña se guardan localmente y en formato cifrado."
+        "desc": "Los umbrales de cambio meteorológico se guardan localmente y en formato cifrado."
       }
     }
   },

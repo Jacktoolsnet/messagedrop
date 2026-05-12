@@ -1765,8 +1765,8 @@
     }
   },
   "tileEditMigraine": {
-    "title": "Migräne-Kachel",
-    "intro": "In diesem Dialog konfigurierst du Warn- und Alarmwerte der Migräne-Kachel für Temperatur und Luftdruck sowie die Darstellung.",
+    "title": "Kachel „Wetteränderung“",
+    "intro": "In diesem Dialog konfigurierst du Warn- und Alarmwerte für Temperatur- und Luftdruckänderungen sowie die Darstellung.",
     "items": {
       "displaySettings": {
         "title": "Darstellung öffnen",
@@ -1794,7 +1794,7 @@
       },
       "privacy": {
         "title": "Datenschutz und Speicherung",
-        "desc": "Die Grenzwerte der Migräne-Kachel werden lokal gespeichert und verschlüsselt abgelegt."
+        "desc": "Die Grenzwerte der Wetteränderungs-Kachel werden lokal gespeichert und verschlüsselt abgelegt."
       }
     }
   },
