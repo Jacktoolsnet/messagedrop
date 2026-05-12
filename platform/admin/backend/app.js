@@ -556,6 +556,13 @@ const adminUserLimit = rateLimit({
   message: rateLimitMessage('Too many user requests, please try again later.')
 });
 
+const adminContentLimit = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 60,
+  ...rateLimitDefaults,
+  message: rateLimitMessage('Too many content requests, please try again later.')
+});
+
 const adminStickerLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
   limit: 5000,
@@ -589,7 +596,7 @@ app.use('/audit-log', adminLogLimit, auditLog);
 app.use('/frontend-error-log', adminLogLimit, frontendErrorLog);
 app.use('/pow-log', adminLogLimit, powLog);
 app.use('/moderation', adminLogLimit, moderation);
-app.use('/content', adminUserLimit, content);
+app.use('/content', adminContentLimit, content);
 app.use('/maintenance', adminUserLimit, maintenance);
 app.use('/certificate-health', adminUserLimit, certificateHealth);
 
