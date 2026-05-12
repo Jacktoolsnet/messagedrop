@@ -77,31 +77,39 @@
                 </mat-card-header>
                 <mat-card-content>
                     <mat-progress-bar *ngIf="actionLoading()" mode="indeterminate"></mat-progress-bar>
-                    <div class="kv">
-                        <span class="k">{{ i18n.t('Message UUID') }}</span>
-                        <span class="v">{{ sel.messageUuid }}</span>
-                        <span class="k">{{ i18n.t('User ID') }}</span>
-                        <span class="v">{{ sel.messageUserId }}</span>
-                        <span class="k">{{ i18n.t('Message Type') }}</span>
-                        <span class="v">{{ sel.messageType || '-' }}</span>
-                        <span class="k">{{ i18n.t('Created') }}</span>
-                        <span class="v">{{ formatLocal(sel.messageCreatedAt) }}</span>
-                        <span class="k">{{ i18n.t('AI Score') }}</span>
-                        <span class="v">{{ formatScore(sel.aiScore) }}</span>
-                        <span class="k">{{ i18n.t('AI Decision') }}</span>
-                        <span class="v">{{ sel.aiDecision || '-' }}</span>
-                        <span class="k">{{ i18n.t('AI Flagged') }}</span>
-                        <span class="v">{{ boolLabel(sel.aiFlagged) }}</span>
-                        <span class="k">{{ i18n.t('Pattern Match') }}</span>
-                        <span class="v">{{ boolLabel(sel.patternMatch) }}</span>
-                        <span class="k">{{ i18n.t('Pattern Checked') }}</span>
-                        <span class="v">{{ formatLocal(sel.patternMatchAt) }}</span>
-                        <span class="k">{{ i18n.t('Coordinates') }}</span>
-                        <span class="v">{{ sel.latitude ?? '-' }}, {{ sel.longitude ?? '-' }}</span>
-                        <span class="k">{{ i18n.t('Plus Code') }}</span>
-                        <span class="v">{{ sel.plusCode || '-' }}</span>
-                        <span class="k">{{ i18n.t('Marker') }}</span>
-                        <span class="v">{{ sel.markerType || '-' }}</span>
+                    <div class="message-preview">
+                        <div class="preview-head">
+                            <div class="preview-avatar"><mat-icon>public</mat-icon></div>
+                            <div class="preview-title">
+                                <strong>{{ sel.messageType || i18n.t('Public message') }}</strong>
+                                <span>{{ formatLocal(sel.messageCreatedAt || sel.createdAt) }}</span>
+                            </div>
+                            <button mat-stroked-button type="button" (click)="openDetailsDialog(sel)">
+                                <mat-icon>info</mat-icon>
+                                {{ i18n.t('Additional info') }}
+                            </button>
+                        </div>
+
+                        <div class="preview-message-shell" [style]="sel.style || ''">
+                            <p>{{ sel.messageText }}</p>
+                        </div>
+
+                        <div class="preview-stats">
+                            <span><mat-icon>forum</mat-icon>{{ reactionCount(sel.commentsNumber) }}</span>
+                            <span><mat-icon>thumb_up</mat-icon>{{ reactionCount(sel.likes) }}</span>
+                            <span><mat-icon>thumb_down</mat-icon>{{ reactionCount(sel.dislikes) }}</span>
+                        </div>
+
+                        @if (mapEmbedUrl(sel); as mapUrl) {
+                        <div class="map-preview">
+                            <iframe [src]="mapUrl" [title]="i18n.t('Message location map')" loading="lazy"></iframe>
+                        </div>
+                        } @else {
+                        <div class="map-empty">
+                            <mat-icon>location_off</mat-icon>
+                            {{ i18n.t('No location available for this message.') }}
+                        </div>
+                        }
                     </div>
                     <mat-divider class="section-divider"></mat-divider>
                     <div class="block">
@@ -121,10 +129,6 @@
                         <div class="block-title">{{ i18n.t('Translation (DE)') }}</div>
                         <div class="block-body">{{ translatedText() }}</div>
                         }
-                    </div>
-                    <div class="block">
-                        <div class="block-title">{{ i18n.t('AI Moderation Response') }}</div>
-                        <pre class="block-pre">{{ formattedAiResponse(sel.aiResponse) }}</pre>
                     </div>
                     <div class="block">
                         <div class="block-title">{{ i18n.t('Rejection reason') }}</div>

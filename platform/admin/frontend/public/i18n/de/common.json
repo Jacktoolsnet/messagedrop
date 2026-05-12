@@ -1679,5 +1679,9 @@
   "Do you want to mark all currently open voluntary moderation messages as OK before finishing?": "Möchtest du alle aktuell offenen Nachrichten der freiwilligen Moderation vor dem Beenden als OK markieren?",
   "Open messages marked as OK and voluntary moderation checkpoint saved.": "Offene Nachrichten wurden als OK markiert und der Prüfstand gespeichert.",
   "Could not finish voluntary moderation.": "Freiwillige Moderation konnte nicht beendet werden.",
-  "Voluntary moderation checkpoint unchanged.": "Prüfstand der freiwilligen Moderation unverändert."
+  "Voluntary moderation checkpoint unchanged.": "Prüfstand der freiwilligen Moderation unverändert.",
+  "Additional moderation information": "Zusätzliche Moderationsinformationen",
+  "Additional info": "Zusätzliche Infos",
+  "Message location map": "Kartenansicht der Nachricht",
+  "No location available for this message.": "Für diese Nachricht ist kein Ort verfügbar."
 }

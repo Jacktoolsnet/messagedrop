@@ -1,0 +1,41 @@
+<app-dialog-header icon="info" [title]="i18n.t('Additional moderation information')"></app-dialog-header>
+
+<mat-dialog-content>
+  <div class="kv">
+    <span class="k">{{ i18n.t('Message UUID') }}</span>
+    <span class="v">{{ request.messageUuid }}</span>
+    <span class="k">{{ i18n.t('User ID') }}</span>
+    <span class="v">{{ request.messageUserId }}</span>
+    <span class="k">{{ i18n.t('Message Type') }}</span>
+    <span class="v">{{ request.messageType || '-' }}</span>
+    <span class="k">{{ i18n.t('Created') }}</span>
+    <span class="v">{{ formatLocal(request.messageCreatedAt) }}</span>
+    <span class="k">{{ i18n.t('AI Score') }}</span>
+    <span class="v">{{ formatScore(request.aiScore) }}</span>
+    <span class="k">{{ i18n.t('AI Decision') }}</span>
+    <span class="v">{{ request.aiDecision || '-' }}</span>
+    <span class="k">{{ i18n.t('AI Flagged') }}</span>
+    <span class="v">{{ boolLabel(request.aiFlagged) }}</span>
+    <span class="k">{{ i18n.t('Pattern Match') }}</span>
+    <span class="v">{{ boolLabel(request.patternMatch) }}</span>
+    <span class="k">{{ i18n.t('Pattern Checked') }}</span>
+    <span class="v">{{ formatLocal(request.patternMatchAt) }}</span>
+    <span class="k">{{ i18n.t('Coordinates') }}</span>
+    <span class="v">{{ request.latitude ?? '-' }}, {{ request.longitude ?? '-' }}</span>
+    <span class="k">{{ i18n.t('Plus Code') }}</span>
+    <span class="v">{{ request.plusCode || '-' }}</span>
+    <span class="k">{{ i18n.t('Marker') }}</span>
+    <span class="v">{{ request.markerType || '-' }}</span>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div class="block">
+    <div class="block-title">{{ i18n.t('AI Moderation Response') }}</div>
+    <pre class="block-pre">{{ formattedAiResponse(request.aiResponse) }}</pre>
+  </div>
+</mat-dialog-content>
+
+<app-dialog-action-bar>
+  <button mat-stroked-button mat-dialog-close type="button">{{ i18n.t('Close') }}</button>
+</app-dialog-action-bar>

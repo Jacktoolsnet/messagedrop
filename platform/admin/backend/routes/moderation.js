@@ -131,6 +131,11 @@ function toVoluntaryModerationRequest(row) {
         plusCode: normalizeString(row?.plusCode),
         markerType: normalizeString(row?.markerType),
         style: normalizeString(row?.style),
+        likes: row?.likes ?? 0,
+        dislikes: row?.dislikes ?? 0,
+        commentsNumber: row?.commentsNumber ?? 0,
+        multimedia: row?.multimedia ?? null,
+        hashtags: row?.hashtags ?? '',
         aiScore: row?.aiModerationScore ?? null,
         aiFlagged: row?.aiModerationFlagged ?? null,
         aiDecision: normalizeString(row?.aiModerationDecision),
@@ -264,12 +269,28 @@ router.get('/requests', (req, res, next) => {
     const limit = Number.isFinite(Number(req.query?.limit)) ? Number(req.query.limit) : 200;
     const offset = Number.isFinite(Number(req.query?.offset)) ? Number(req.query.offset) : 0;
 
-    tableModerationRequest.list(db, { status, limit, offset }, (err, rows) => {
+    tableModerationRequest.list(db, { status, limit, offset }, async (err, rows) => {
         if (err) {
             req.logger?.error?.('Moderation request list failed', { error: err.message });
             return next(apiError.internal('db_error'));
         }
-        res.json({ rows });
+        const enrichedRows = await Promise.all((rows || []).map(async (row) => {
+            try {
+                const message = await fetchPublicMessage(row.messageUuid);
+                return {
+                    ...row,
+                    likes: message?.likes ?? 0,
+                    dislikes: message?.dislikes ?? 0,
+                    commentsNumber: message?.commentsNumber ?? 0,
+                    multimedia: message?.multimedia ?? null,
+                    hashtags: message?.hashtags ?? '',
+                    status: row.status
+                };
+            } catch {
+                return row;
+            }
+        }));
+        res.json({ rows: enrichedRows });
     });
 });
 

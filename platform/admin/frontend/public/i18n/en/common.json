@@ -282,5 +282,10 @@
   "No": "No",
   "Open messages marked as OK and voluntary moderation checkpoint saved.": "Open messages marked as OK and voluntary moderation checkpoint saved.",
   "Could not finish voluntary moderation.": "Could not finish voluntary moderation.",
-  "Voluntary moderation checkpoint unchanged.": "Voluntary moderation checkpoint unchanged."
+  "Voluntary moderation checkpoint unchanged.": "Voluntary moderation checkpoint unchanged.",
+  "Additional moderation information": "Additional moderation information",
+  "Additional info": "Additional info",
+  "Public message": "Public message",
+  "Message location map": "Message location map",
+  "No location available for this message.": "No location available for this message."
 }

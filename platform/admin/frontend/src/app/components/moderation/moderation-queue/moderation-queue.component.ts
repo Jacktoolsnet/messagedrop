@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
@@ -13,6 +14,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterLink } from '@angular/router';
 import { finalize, forkJoin, of, switchMap } from 'rxjs';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
+import { ModerationDetailsDialogComponent } from './moderation-details-dialog.component';
 import { ModerationRequest } from '../../../interfaces/moderation-request.interface';
 import { ModerationService } from '../../../services/moderation.service';
 import { TranslateService } from '../../../services/translate-service/translate-service.service';
@@ -43,6 +45,7 @@ export class ModerationQueueComponent implements OnInit {
   private readonly snack = inject(DisplayMessageService);
   private readonly translator = inject(TranslateService);
   private readonly dialog = inject(MatDialog);
+  private readonly sanitizer = inject(DomSanitizer);
   readonly i18n = inject(TranslationHelperService);
 
   readonly loading = signal(false);
@@ -253,6 +256,43 @@ export class ModerationQueueComponent implements OnInit {
   formatScore(score?: number | null): string {
     if (score === undefined || score === null) return '-';
     return Number(score).toFixed(3);
+  }
+
+  reactionCount(value?: number | null): number {
+    return Math.max(0, Number(value || 0));
+  }
+
+  hasLocation(entry: ModerationRequest): boolean {
+    return Number.isFinite(Number(entry.latitude)) && Number.isFinite(Number(entry.longitude))
+      && (Number(entry.latitude) !== 0 || Number(entry.longitude) !== 0);
+  }
+
+  mapEmbedUrl(entry: ModerationRequest): SafeResourceUrl | null {
+    if (!this.hasLocation(entry)) {
+      return null;
+    }
+    const latitude = Number(entry.latitude);
+    const longitude = Number(entry.longitude);
+    const latitudeDelta = 0.006;
+    const longitudeDelta = Math.max(0.006 / Math.cos((latitude * Math.PI) / 180), 0.006);
+    const bbox = [
+      Math.max(-180, longitude - longitudeDelta),
+      Math.max(-85, latitude - latitudeDelta),
+      Math.min(180, longitude + longitudeDelta),
+      Math.min(85, latitude + latitudeDelta)
+    ].join(',');
+    return this.sanitizer.bypassSecurityTrustResourceUrl(
+      `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bbox)}&layer=mapnik&marker=${encodeURIComponent(`${latitude},${longitude}`)}`
+    );
+  }
+
+  openDetailsDialog(entry: ModerationRequest): void {
+    this.dialog.open(ModerationDetailsDialogComponent, {
+      data: { request: entry },
+      maxWidth: '760px',
+      width: 'min(760px, 94vw)',
+      autoFocus: false
+    });
   }
 
   boolLabel(value?: number | boolean | null): string {

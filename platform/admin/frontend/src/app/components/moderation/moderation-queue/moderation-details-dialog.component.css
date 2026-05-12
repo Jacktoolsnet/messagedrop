@@ -1,0 +1,46 @@
+.kv {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  gap: .5rem;
+  row-gap: .75rem;
+}
+
+.k {
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.v {
+  word-break: break-word;
+}
+
+mat-divider {
+  margin: 1rem 0;
+}
+
+.block {
+  display: grid;
+  gap: .4rem;
+}
+
+.block-title {
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.block-pre {
+  max-height: 40vh;
+  overflow: auto;
+  background: rgba(15, 23, 42, .04);
+  border-radius: 10px;
+  padding: .75rem;
+  font-size: .85rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+@media (max-width: 640px) {
+  .kv {
+    grid-template-columns: 1fr;
+  }
+}

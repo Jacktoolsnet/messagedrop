@@ -11,6 +11,11 @@ export interface ModerationRequest {
     plusCode?: string | null;
     markerType?: string | null;
     style?: string | null;
+    likes?: number | null;
+    dislikes?: number | null;
+    commentsNumber?: number | null;
+    multimedia?: unknown;
+    hashtags?: unknown;
     aiScore?: number | null;
     aiFlagged?: number | boolean | null;
     aiDecision?: string | null;
