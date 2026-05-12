@@ -697,20 +697,14 @@
                   <button mat-mini-fab type="button" tabindex="-1">
                     <mat-icon>forum</mat-icon>
                   </button>
-                  <span class="preview-reaction-badge" [matBadge]="previewLikeCount()"
-                    [matBadgeHidden]="previewLikeCount() === 0" matBadgeColor="primary" matBadgeOverlap="false"
-                    matBadgeSize="small">
-                    <button mat-mini-fab type="button" tabindex="-1">
-                      <mat-icon>thumb_up</mat-icon>
-                    </button>
-                  </span>
-                  <span class="preview-reaction-badge" [matBadge]="previewDislikeCount()"
-                    [matBadgeHidden]="previewDislikeCount() === 0" matBadgeColor="warn" matBadgeOverlap="false"
-                    matBadgeSize="small">
-                    <button mat-mini-fab type="button" tabindex="-1">
-                      <mat-icon>thumb_down</mat-icon>
-                    </button>
-                  </span>
+                  <button mat-mini-fab type="button" tabindex="-1" class="preview-reaction-button">
+                    <mat-icon aria-hidden="false" [matBadge]="previewLikeCount() === 0 ? '' : previewLikeCount()"
+                      matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_up</mat-icon>
+                  </button>
+                  <button mat-mini-fab type="button" tabindex="-1" class="preview-reaction-button">
+                    <mat-icon aria-hidden="false" [matBadge]="previewDislikeCount() === 0 ? '' : previewDislikeCount()"
+                      matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_down</mat-icon>
+                  </button>
                   <button mat-mini-fab type="button" tabindex="-1">
                     <mat-icon>edit</mat-icon>
                   </button>
