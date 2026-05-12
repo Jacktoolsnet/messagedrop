@@ -49,7 +49,7 @@
     },
     "avatarSource": {
       "title": "Choose avatar source",
-      "file": "Upload photo",
+      "file": "Choose image",
       "unsplash": "Use Unsplash"
     },
     "backgroundSource": {

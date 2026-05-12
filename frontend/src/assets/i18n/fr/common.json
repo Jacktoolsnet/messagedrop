@@ -49,7 +49,7 @@
     },
     "avatarSource": {
       "title": "Choisir la source de l'avatar",
-      "file": "Télécharger une photo",
+      "file": "Choisir une image",
       "unsplash": "Utiliser Unsplash"
     },
     "backgroundSource": {
