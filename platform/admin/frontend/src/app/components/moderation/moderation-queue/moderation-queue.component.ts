@@ -6,10 +6,13 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterLink } from '@angular/router';
+import { finalize, forkJoin, of, switchMap } from 'rxjs';
+import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
 import { ModerationRequest } from '../../../interfaces/moderation-request.interface';
 import { ModerationService } from '../../../services/moderation.service';
 import { TranslateService } from '../../../services/translate-service/translate-service.service';
@@ -39,6 +42,7 @@ export class ModerationQueueComponent implements OnInit {
   private readonly moderationService = inject(ModerationService);
   private readonly snack = inject(DisplayMessageService);
   private readonly translator = inject(TranslateService);
+  private readonly dialog = inject(MatDialog);
   readonly i18n = inject(TranslationHelperService);
 
   readonly loading = signal(false);
@@ -51,6 +55,7 @@ export class ModerationQueueComponent implements OnInit {
   readonly voluntaryLastSeenAt = signal(0);
   readonly voluntaryUpdatedAt = signal(0);
   readonly voluntaryLoadedMaxTimestamp = signal(0);
+  readonly voluntaryReviewedMaxTimestamp = signal(0);
 
   rejectionReason = '';
 
@@ -91,8 +96,10 @@ export class ModerationQueueComponent implements OnInit {
           this.voluntaryLastSeenAt.set(Number(state?.lastSeenAt || 0));
           this.voluntaryUpdatedAt.set(Number(state?.updatedAt || 0));
           this.voluntaryLoadedMaxTimestamp.set(this.maxMessageTimestamp(rows));
+          this.voluntaryReviewedMaxTimestamp.set(0);
         } else {
           this.voluntaryLoadedMaxTimestamp.set(0);
+          this.voluntaryReviewedMaxTimestamp.set(0);
         }
         if (rows.length) {
           this.select(rows[0]);
@@ -113,6 +120,7 @@ export class ModerationQueueComponent implements OnInit {
     this.requests.set([]);
     this.selected.set(null);
     this.voluntaryLoadedMaxTimestamp.set(0);
+    this.voluntaryReviewedMaxTimestamp.set(0);
     this.load();
   }
 
@@ -137,23 +145,86 @@ export class ModerationQueueComponent implements OnInit {
       return;
     }
 
+    const openMessages = [...this.requests()];
+    if (openMessages.length > 0) {
+      this.dialog.open(ConfirmDialogComponent, {
+        data: {
+          title: 'Mark remaining messages as OK?',
+          message: 'Do you want to mark all currently open voluntary moderation messages as OK before finishing?',
+          confirmText: 'Yes',
+          cancelText: 'No'
+        },
+        maxWidth: '420px',
+        autoFocus: false
+      }).afterClosed().subscribe((markAllOk) => {
+        this.finishVoluntaryModeAfterConfirmation(
+          this.resolveVoluntaryFinishTimestamp(markAllOk === true, openMessages),
+          markAllOk === true ? openMessages : []
+        );
+      });
+      return;
+    }
+
+    this.finishVoluntaryModeAfterConfirmation(this.voluntaryReviewedMaxTimestamp() || lastSeenAt, []);
+  }
+
+  private finishVoluntaryModeAfterConfirmation(lastSeenAt: number, messagesToApprove: ModerationRequest[]): void {
+    if (!lastSeenAt || lastSeenAt <= this.voluntaryLastSeenAt()) {
+      this.snack.open(this.i18n.t('Voluntary moderation checkpoint unchanged.'), undefined, { duration: 2200 });
+      this.setMode('queue');
+      return;
+    }
+
     this.actionLoading.set(true);
-    this.moderationService.finishVoluntary(lastSeenAt).subscribe({
+    const approveRequests = messagesToApprove.map((message) => this.moderationService.approveMessage(message.messageUuid));
+    const approve$ = approveRequests.length > 0 ? forkJoin(approveRequests) : of([]);
+
+    approve$.pipe(
+      switchMap((approveResults) => {
+        const failed = approveResults.some((result) => !result.approved);
+        if (failed) {
+          throw new Error('bulk_approval_failed');
+        }
+        return this.moderationService.finishVoluntary(lastSeenAt);
+      }),
+      finalize(() => this.actionLoading.set(false))
+    ).subscribe({
       next: (res) => {
         if (res.finished) {
           this.voluntaryLastSeenAt.set(Number(res.state?.lastSeenAt || lastSeenAt));
           this.voluntaryUpdatedAt.set(Number(res.state?.updatedAt || 0));
           this.requests.set([]);
           this.selected.set(null);
-          this.snack.open(this.i18n.t('Voluntary moderation checkpoint saved.'), undefined, { duration: 2500 });
+          const message = messagesToApprove.length > 0
+            ? 'Open messages marked as OK and voluntary moderation checkpoint saved.'
+            : 'Voluntary moderation checkpoint saved.';
+          this.snack.open(this.i18n.t(message), undefined, { duration: 2500 });
           this.setMode('queue');
         } else {
           this.snack.open(this.i18n.t('Could not save voluntary moderation checkpoint.'), this.i18n.t('OK'), { duration: 3000 });
         }
       },
-      error: () => this.snack.open(this.i18n.t('Could not save voluntary moderation checkpoint.'), this.i18n.t('OK'), { duration: 3000 }),
-      complete: () => this.actionLoading.set(false)
+      error: () => this.snack.open(this.i18n.t('Could not finish voluntary moderation.'), this.i18n.t('OK'), { duration: 3000 })
     });
+  }
+
+  private resolveVoluntaryFinishTimestamp(markAllOpenAsOk: boolean, openMessages: ModerationRequest[]): number {
+    if (markAllOpenAsOk) {
+      return this.voluntaryLoadedMaxTimestamp();
+    }
+
+    if (openMessages.length > 0) {
+      const oldestOpenTimestamp = Math.min(
+        ...openMessages
+          .map((row) => Number(row.messageCreatedAt || row.createdAt || 0))
+          .filter((value) => Number.isFinite(value) && value > 0)
+      );
+      if (Number.isFinite(oldestOpenTimestamp) && oldestOpenTimestamp > 0) {
+        return Math.max(this.voluntaryLastSeenAt(), oldestOpenTimestamp - 1);
+      }
+    }
+
+    return this.voluntaryReviewedMaxTimestamp();
   }
 
   select(entry: ModerationRequest): void {
@@ -278,6 +349,7 @@ export class ModerationQueueComponent implements OnInit {
     request.subscribe({
       next: (res) => {
         if (res.approved) {
+          this.recordVoluntaryDecisionTimestamp(current);
           this.removeFromList(current.id);
           this.snack.open(this.i18n.t('Message approved.'), undefined, { duration: 2000 });
         } else {
@@ -303,6 +375,7 @@ export class ModerationQueueComponent implements OnInit {
     request.subscribe({
       next: (res) => {
         if (res.rejected) {
+          this.recordVoluntaryDecisionTimestamp(current);
           this.removeFromList(current.id);
           this.snack.open(this.i18n.t('Message rejected.'), undefined, { duration: 2000 });
         } else {
@@ -323,5 +396,15 @@ export class ModerationQueueComponent implements OnInit {
 
   private maxMessageTimestamp(rows: ModerationRequest[]): number {
     return Math.max(0, ...rows.map((row) => Number(row.messageCreatedAt || row.createdAt || 0)));
+  }
+
+  private recordVoluntaryDecisionTimestamp(row: ModerationRequest): void {
+    if (!this.isVoluntaryMode()) {
+      return;
+    }
+    const timestamp = Number(row.messageCreatedAt || row.createdAt || 0);
+    if (Number.isFinite(timestamp) && timestamp > 0) {
+      this.voluntaryReviewedMaxTimestamp.set(Math.max(this.voluntaryReviewedMaxTimestamp(), timestamp));
+    }
   }
 }

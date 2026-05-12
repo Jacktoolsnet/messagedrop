@@ -353,6 +353,7 @@ const listModerationCandidates = function (db, options, callback) {
         WHERE ${columnStatus} = ?
           AND ${columnMessageType} IN (?, ?)
           AND ${columnMessageCreateDateTime} > ?
+          AND (${columnManualModerationDecision} IS NULL OR ${columnManualModerationDecision} = '')
         ORDER BY ${columnMessageCreateDateTime} DESC, ${columnMessageId} DESC
         LIMIT ?;`;
 

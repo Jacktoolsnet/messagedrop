@@ -18,7 +18,7 @@
     </div>
     @if (isVoluntaryMode()) {
     <button mat-stroked-button color="accent" type="button" (click)="finishVoluntaryMode()"
-        [disabled]="loading() || actionLoading() || requests().length === 0">
+        [disabled]="loading() || actionLoading() || newestLoadedMessageTimestamp() === 0">
         <mat-icon>done_all</mat-icon>
         {{ i18n.t('Finish voluntary mode') }}
     </button>

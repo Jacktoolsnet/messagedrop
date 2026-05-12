@@ -1674,5 +1674,10 @@
   "Mark as OK": "Als OK markieren",
   "No loaded messages to mark as reviewed.": "Keine geladenen Nachrichten, die als geprüft markiert werden können.",
   "Voluntary moderation checkpoint saved.": "Prüfstand der freiwilligen Moderation gespeichert.",
-  "Could not save voluntary moderation checkpoint.": "Prüfstand der freiwilligen Moderation konnte nicht gespeichert werden."
+  "Could not save voluntary moderation checkpoint.": "Prüfstand der freiwilligen Moderation konnte nicht gespeichert werden.",
+  "Mark remaining messages as OK?": "Verbleibende Nachrichten als OK markieren?",
+  "Do you want to mark all currently open voluntary moderation messages as OK before finishing?": "Möchtest du alle aktuell offenen Nachrichten der freiwilligen Moderation vor dem Beenden als OK markieren?",
+  "Open messages marked as OK and voluntary moderation checkpoint saved.": "Offene Nachrichten wurden als OK markiert und der Prüfstand gespeichert.",
+  "Could not finish voluntary moderation.": "Freiwillige Moderation konnte nicht beendet werden.",
+  "Voluntary moderation checkpoint unchanged.": "Prüfstand der freiwilligen Moderation unverändert."
 }

@@ -275,5 +275,12 @@
   "Mark as OK": "Mark as OK",
   "No loaded messages to mark as reviewed.": "No loaded messages to mark as reviewed.",
   "Voluntary moderation checkpoint saved.": "Voluntary moderation checkpoint saved.",
-  "Could not save voluntary moderation checkpoint.": "Could not save voluntary moderation checkpoint."
+  "Could not save voluntary moderation checkpoint.": "Could not save voluntary moderation checkpoint.",
+  "Mark remaining messages as OK?": "Mark remaining messages as OK?",
+  "Do you want to mark all currently open voluntary moderation messages as OK before finishing?": "Do you want to mark all currently open voluntary moderation messages as OK before finishing?",
+  "Yes": "Yes",
+  "No": "No",
+  "Open messages marked as OK and voluntary moderation checkpoint saved.": "Open messages marked as OK and voluntary moderation checkpoint saved.",
+  "Could not finish voluntary moderation.": "Could not finish voluntary moderation.",
+  "Voluntary moderation checkpoint unchanged.": "Voluntary moderation checkpoint unchanged."
 }

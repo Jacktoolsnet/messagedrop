@@ -5,6 +5,7 @@ const { requireAdminJwt, requireRole, requireRoleIfAdmin, requireServiceOrAdminJ
 const { signServiceJwt } = require('../utils/serviceJwt');
 const tableModerationRequest = require('../db/tableModerationRequest');
 const tableModerationState = require('../db/tableModerationState');
+const tableModerationVoluntaryReview = require('../db/tableModerationVoluntaryReview');
 const { formatExcerpt, sendPushbulletNotification } = require('../utils/pushbullet');
 const { apiError } = require('../middleware/api-error');
 
@@ -79,6 +80,33 @@ function saveVoluntaryState(db, lastSeenAt, updatedBy) {
             lastSeenAt,
             updatedAt: Date.now(),
             updatedBy
+        }, (err, row) => {
+            if (err) {
+                return reject(err);
+            }
+            resolve(row);
+        });
+    });
+}
+
+function getReviewedVoluntaryUuidSet(db, uuids) {
+    return new Promise((resolve, reject) => {
+        tableModerationVoluntaryReview.listReviewedUuids(db, uuids, (err, rows) => {
+            if (err) {
+                return reject(err);
+            }
+            resolve(new Set(rows || []));
+        });
+    });
+}
+
+function saveVoluntaryReview(db, messageUuid, decision, reviewedBy) {
+    return new Promise((resolve, reject) => {
+        tableModerationVoluntaryReview.upsert(db, {
+            messageUuid,
+            decision,
+            reviewedAt: Date.now(),
+            reviewedBy
         }, (err, row) => {
             if (err) {
                 return reject(err);
@@ -277,9 +305,12 @@ router.get('/voluntary', async (req, res, next) => {
             throw err;
         }
 
-        const rows = Array.isArray(response.data?.rows)
+        const rawRows = Array.isArray(response.data?.rows)
             ? response.data.rows.map(toVoluntaryModerationRequest).filter((row) => !!row.messageUuid)
             : [];
+        const reviewedUuids = await getReviewedVoluntaryUuidSet(db, rawRows.map((row) => row.messageUuid));
+        const rows = rawRows.filter((row) => !reviewedUuids.has(row.messageUuid));
+
         res.json({
             rows,
             state: {
@@ -324,6 +355,7 @@ router.post('/messages/:messageUuid/approve', requireAdminJwt, requireRole(), as
             return next(apiError.badRequest('message_id_required'));
         }
         await applyMessageDecision(messageUuid, 'approved', null, req.admin?.sub || null);
+        await saveVoluntaryReview(req.database.db, messageUuid, 'approved', req.admin?.sub || null);
         res.json({ approved: true });
     } catch (error) {
         return next(error?.status ? error : apiError.badGateway('moderation_update_failed'));
@@ -346,6 +378,7 @@ router.post('/messages/:messageUuid/reject', requireAdminJwt, requireRole(), asy
             return next(apiError.notFound('message_not_found'));
         }
         await applyMessageDecision(messageUuid, 'rejected', reason, req.admin?.sub || null);
+        await saveVoluntaryReview(req.database.db, messageUuid, 'rejected', req.admin?.sub || null);
         await notifyModerationRejection(message, reason, req.logger);
         res.json({ rejected: true });
     } catch (error) {

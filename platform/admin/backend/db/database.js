@@ -22,6 +22,7 @@ const tableFrontendErrorLog = require('./tableFrontendErrorLog');
 const tablePowLog = require('./tablePowLog');
 const tableModerationRequest = require('./tableModerationRequest');
 const tableModerationState = require('./tableModerationState');
+const tableModerationVoluntaryReview = require('./tableModerationVoluntaryReview');
 const tablePublicProfile = require('./tablePublicProfile');
 const tablePublicContent = require('./tablePublicContent');
 const tableCertificateHealth = require('./tableCertificateHealth');
@@ -424,6 +425,7 @@ class Database {
       tablePowLog.init(this.db);
       tableModerationRequest.init(this.db);
       tableModerationState.init(this.db);
+      tableModerationVoluntaryReview.init(this.db);
       tablePublicProfile.init(this.db);
       tablePublicContent.init(this.db);
       tableCertificateHealth.init(this.db);
