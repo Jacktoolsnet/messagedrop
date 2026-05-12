@@ -128,12 +128,12 @@ router.get('/assets/sticker-protection-overlay.svg', function (req, res, next) {
   sendStaticFile(res, getFrontendPath('src', 'assets', 'images', 'sticker-protection-overlay.svg'), 'image/svg+xml; charset=utf-8', next);
 });
 
-router.get('/assets/icon-192x192.png', function (req, res, next) {
-  sendStaticFile(res, getFrontendPath('public', 'icons', 'icon-192x192.png'), 'image/png', next);
+router.get('/assets/icon-192x192.png', function (req, res) {
+  redirectToPublicAppIcon(req, res, 'icon-192x192.png');
 });
 
-router.get('/assets/share-card.png', function (req, res, next) {
-  sendStaticFile(res, getFrontendPath('public', 'icons', 'icon-1024x1024.png'), OG_IMAGE_TYPE_PNG, next);
+router.get('/assets/share-card.png', function (req, res) {
+  redirectToPublicAppIcon(req, res, 'icon-1024x1024.png');
 });
 
 router.get('/assets/share-card.svg', function (req, res) {
@@ -238,7 +238,7 @@ function renderShareShell(res, model) {
   const canonicalUrl = `${publicMessageBaseUrl}/${encodeURIComponent(model.messageUuid || '')}`;
   const assetBaseUrl = `${publicMessageBaseUrl}/assets`;
   const normalizedMessage = normalizePublicMessage(model.message);
-  const imageUrl = resolveOgImageUrl(assetBaseUrl);
+  const imageUrl = resolveOgImageUrl(appBaseUrl);
   const initialError = normalizedMessage
     ? null
     : {
@@ -613,8 +613,17 @@ function escapeJsonForScriptTag(value) {
     .replace(/\u2029/g, '\\u2029');
 }
 
-function resolveOgImageUrl(assetBaseUrl) {
-  return `${assetBaseUrl}/share-card.png`;
+function resolveOgImageUrl(appBaseUrl) {
+  return buildPublicAppIconUrl(appBaseUrl, 'icon-1024x1024.png');
+}
+
+function buildPublicAppIconUrl(appBaseUrl, iconFile) {
+  const baseUrl = normalizeAbsoluteUrl(appBaseUrl) || PRODUCTION_PUBLIC_APP_URL;
+  return `${baseUrl}/icons/${encodeURIComponent(iconFile)}`;
+}
+
+function redirectToPublicAppIcon(req, res, iconFile) {
+  res.redirect(307, buildPublicAppIconUrl(resolvePublicAppBaseUrl(req), iconFile));
 }
 
 function loadPublicMessageTemplate() {
