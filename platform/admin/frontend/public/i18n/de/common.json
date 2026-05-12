@@ -1655,5 +1655,15 @@
   "Critical": "Kritisch",
   "Expired": "Abgelaufen",
   "Check failed": "Prüfung fehlgeschlagen",
-  "Not configured": "Nicht konfiguriert"
+  "Not configured": "Nicht konfiguriert",
+  "Profile reactions": "Profil-Reaktionen",
+  "Like or dislike this published content as a public profile.": "Like oder dislike diesen veröffentlichten Inhalt als öffentliches Profil.",
+  "Publish this content before profile reactions can be managed.": "Veröffentliche diesen Inhalt, bevor Profil-Reaktionen verwaltet werden können.",
+  "A public user will be created on first reaction.": "Beim ersten Reagieren wird ein öffentlicher Nutzer angelegt.",
+  "Toggle like": "Like umschalten",
+  "Toggle dislike": "Dislike umschalten",
+  "Public reaction could not be updated.": "Die öffentliche Reaktion konnte nicht aktualisiert werden.",
+  "Public reactions could not be loaded.": "Die öffentlichen Reaktionen konnten nicht geladen werden.",
+  "Could not load public reactions.": "Öffentliche Reaktionen konnten nicht geladen werden.",
+  "Could not update public reaction.": "Öffentliche Reaktion konnte nicht aktualisiert werden."
 }

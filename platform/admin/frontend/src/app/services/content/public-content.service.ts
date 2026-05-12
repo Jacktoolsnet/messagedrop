@@ -5,6 +5,7 @@ import { environment } from '../../../environments/environment';
 import { ExternalPublicContent } from '../../interfaces/external-public-content.interface';
 import { Multimedia } from '../../interfaces/multimedia.interface';
 import { PublicContentFilters } from '../../interfaces/public-content-filters.interface';
+import { PublicContentReactionState } from '../../interfaces/public-content-reaction-state.interface';
 import { PublicContentSavePayload } from '../../interfaces/public-content-save-payload.interface';
 import { PublicContent } from '../../interfaces/public-content.interface';
 import { TenorApiResponse } from '../../interfaces/tenor-response.interface';
@@ -19,6 +20,11 @@ interface PublicContentListResponse {
 interface PublicContentRowResponse {
   status: number;
   row: PublicContent;
+}
+
+interface PublicContentReactionStateResponse {
+  status: number;
+  row: PublicContentReactionState;
 }
 
 interface ExternalPublicContentListResponse {
@@ -86,6 +92,23 @@ export class PublicContentService {
     return this.http.get<ExternalPublicContentRowResponse>(`${this.baseUrl}/external-public-content/${encodeURIComponent(messageUuid)}`).pipe(
       map((response) => response.row),
       catchError((error) => this.handleError(error, 'Could not load the public comment.'))
+    );
+  }
+
+  getPublicContentReactions(id: string): Observable<PublicContentReactionState> {
+    return this.http.get<PublicContentReactionStateResponse>(`${this.baseUrl}/public-messages/${encodeURIComponent(id)}/reactions`).pipe(
+      map((response) => response.row),
+      catchError((error) => this.handleError(error, 'Could not load public reactions.'))
+    );
+  }
+
+  togglePublicContentReaction(id: string, publicProfileId: string, reaction: 'like' | 'dislike'): Observable<PublicContentReactionState> {
+    return this.http.post<PublicContentReactionStateResponse>(
+      `${this.baseUrl}/public-messages/${encodeURIComponent(id)}/reactions/${encodeURIComponent(publicProfileId)}/${reaction}`,
+      {}
+    ).pipe(
+      map((response) => response.row),
+      catchError((error) => this.handleError(error, 'Could not update public reaction.'))
     );
   }
 

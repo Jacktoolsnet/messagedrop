@@ -26,6 +26,7 @@ import { EmoticonPickerData } from '../../../interfaces/emoticon-picker-data.int
 import { Multimedia } from '../../../interfaces/multimedia.interface';
 import { NominatimPlace } from '../../../interfaces/nominatim-place.interface';
 import { PublicContentSavePayload } from '../../../interfaces/public-content-save-payload.interface';
+import { PublicContentReactionProfile, PublicContentReactionState } from '../../../interfaces/public-content-reaction-state.interface';
 import { PublicContentType } from '../../../interfaces/public-content-type.type';
 import { PublicContent } from '../../../interfaces/public-content.interface';
 import { ExternalPublicContent } from '../../../interfaces/external-public-content.interface';
@@ -121,6 +122,9 @@ export class PublicContentEditorComponent {
   readonly childComments = signal<PublicContent[]>([]);
   readonly externalCommentsLoading = signal(false);
   readonly externalComments = signal<ExternalPublicContent[]>([]);
+  readonly reactionsLoading = signal(false);
+  readonly reactionUpdatingKey = signal('');
+  readonly reactionState = signal<PublicContentReactionState | null>(null);
   readonly selectedExternalParent = signal<ExternalPublicContent | null>(null);
   readonly selectedExternalParentUuid = signal('');
   readonly multimedia = signal<Multimedia>({ ...EMPTY_MULTIMEDIA });
@@ -387,6 +391,10 @@ export class PublicContentEditorComponent {
       && content.status === 'published'
       && !!content.publishedMessageUuid?.trim();
   });
+  readonly canManageReactions = computed(() => this.canLoadExternalComments());
+  readonly previewLikeCount = computed(() => this.reactionState()?.likes ?? 0);
+  readonly previewDislikeCount = computed(() => this.reactionState()?.dislikes ?? 0);
+  readonly reactionProfiles = computed(() => this.reactionState()?.profiles ?? []);
 
   constructor() {
     this.publicProfileService.loadProfiles();
@@ -427,6 +435,10 @@ export class PublicContentEditorComponent {
     return profile.id;
   }
 
+  trackReactionProfile(_index: number, profile: PublicContentReactionProfile): string {
+    return profile.publicProfileId;
+  }
+
   trackLocationResult(_index: number, place: NominatimPlace): number {
     return place.place_id;
   }
@@ -437,6 +449,29 @@ export class PublicContentEditorComponent {
 
   resetPreviewStyle(): void {
     this.previewStyleOverride.set('');
+  }
+
+  toggleProfileReaction(profile: PublicContentReactionProfile, reaction: 'like' | 'dislike'): void {
+    const content = this.currentContent();
+    if (!content || !this.canManageReactions() || this.reactionUpdatingKey()) {
+      return;
+    }
+
+    const key = `${profile.publicProfileId}:${reaction}`;
+    this.reactionUpdatingKey.set(key);
+    this.publicContentService.togglePublicContentReaction(content.id, profile.publicProfileId, reaction)
+      .pipe(
+        finalize(() => this.reactionUpdatingKey.set('')),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: (state) => this.reactionState.set(state),
+        error: () => this.showMessage('Public reaction could not be updated.')
+      });
+  }
+
+  isReactionUpdating(profile: PublicContentReactionProfile, reaction: 'like' | 'dislike'): boolean {
+    return this.reactionUpdatingKey() === `${profile.publicProfileId}:${reaction}`;
   }
 
   handleStyleSelectOpenedChange(open: boolean): void {
@@ -1365,6 +1400,7 @@ export class PublicContentEditorComponent {
     this.updateFormState();
     this.loadChildComments(content.id);
     this.loadExternalComments(content);
+    this.loadReactions(content);
 
     if (content.externalParentMessageUuid?.trim()) {
       this.loadExternalParentContent(content.externalParentMessageUuid.trim());
@@ -1529,6 +1565,28 @@ export class PublicContentEditorComponent {
       });
   }
 
+  private loadReactions(content: PublicContent | null): void {
+    if (!content || content.status !== 'published' || !content.publishedMessageUuid?.trim()) {
+      this.reactionState.set(null);
+      this.reactionsLoading.set(false);
+      return;
+    }
+
+    this.reactionsLoading.set(true);
+    this.publicContentService.getPublicContentReactions(content.id)
+      .pipe(
+        finalize(() => this.reactionsLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: (state) => this.reactionState.set(state),
+        error: () => {
+          this.reactionState.set(null);
+          this.showMessage('Public reactions could not be loaded.');
+        }
+      });
+  }
+
   private loadParentContent(id: string): void {
     this.loading.set(true);
     this.publicContentService.getPublicContent(id)
@@ -1592,6 +1650,9 @@ export class PublicContentEditorComponent {
     this.childCommentsLoading.set(false);
     this.externalComments.set([]);
     this.externalCommentsLoading.set(false);
+    this.reactionState.set(null);
+    this.reactionsLoading.set(false);
+    this.reactionUpdatingKey.set('');
     this.multimedia.set({ ...EMPTY_MULTIMEDIA });
     this.hashtags.set([]);
     this.selectedLocationLabel.set('');

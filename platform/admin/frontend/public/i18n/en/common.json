@@ -227,8 +227,7 @@
   "Open emoji picker": "Open emoji picker",
   "Remove emoji": "Remove emoji",
   "Remove last emoji": "Remove last emoji",
-  "Selected emojis": "Selected emojis"
-,
+  "Selected emojis": "Selected emojis",
   "Certificate monitoring": "Certificate monitoring",
   "Loading certificate status...": "Loading certificate status...",
   "No HTTPS targets configured": "No HTTPS targets configured",
@@ -256,5 +255,16 @@
   "Critical": "Critical",
   "Expired": "Expired",
   "Check failed": "Check failed",
-  "Not configured": "Not configured"
+  "Not configured": "Not configured",
+  "Profile reactions": "Profile reactions",
+  "Like or dislike this published content as a public profile.": "Like or dislike this published content as a public profile.",
+  "Publish this content before profile reactions can be managed.": "Publish this content before profile reactions can be managed.",
+  "A public user will be created on first reaction.": "A public user will be created on first reaction.",
+  "No public profiles available.": "No public profiles available.",
+  "Toggle like": "Toggle like",
+  "Toggle dislike": "Toggle dislike",
+  "Public reaction could not be updated.": "Public reaction could not be updated.",
+  "Public reactions could not be loaded.": "Public reactions could not be loaded.",
+  "Could not load public reactions.": "Could not load public reactions.",
+  "Could not update public reaction.": "Could not update public reaction."
 }

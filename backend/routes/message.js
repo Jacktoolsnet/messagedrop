@@ -152,6 +152,127 @@ function findMessageByIdOrUuid(db, messageId, callback) {
   return tableMessage.getByUuid(db, raw, callback);
 }
 
+function getDb(db, sql, params = []) {
+  return new Promise((resolve, reject) => {
+    db.get(sql, params, (err, row) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(row || null);
+    });
+  });
+}
+
+function allDb(db, sql, params = []) {
+  return new Promise((resolve, reject) => {
+    db.all(sql, params, (err, rows) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(rows || []);
+    });
+  });
+}
+
+function getMessageByUuid(db, messageUuid) {
+  return new Promise((resolve, reject) => {
+    tableMessage.getByUuid(db, messageUuid, (err, row) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(row || null);
+    });
+  });
+}
+
+async function getReactionState(db, messageUuid, userIds = []) {
+  const message = await getMessageByUuid(db, messageUuid);
+  if (!message) {
+    throw apiError.notFound('message_not_found');
+  }
+
+  const countRow = await getDb(db, `
+    SELECT
+      (SELECT COUNT(*) FROM tableLike WHERE likeMessageUuid = ?) AS likes,
+      (SELECT COUNT(*) FROM tableDislike WHERE dislikeMessageUuid = ?) AS dislikes
+  `, [messageUuid, messageUuid]);
+
+  const normalizedUserIds = Array.from(new Set(
+    (Array.isArray(userIds) ? userIds : [])
+      .map((value) => String(value ?? '').trim())
+      .filter(Boolean)
+  ));
+  const reactions = normalizedUserIds.map((userId) => ({
+    userId,
+    liked: false,
+    disliked: false
+  }));
+
+  if (normalizedUserIds.length > 0) {
+    const placeholders = normalizedUserIds.map(() => '?').join(', ');
+    const likeRows = await allDb(db, `
+      SELECT likeUserId AS userId
+      FROM tableLike
+      WHERE likeMessageUuid = ?
+        AND likeUserId IN (${placeholders})
+    `, [messageUuid, ...normalizedUserIds]);
+    const dislikeRows = await allDb(db, `
+      SELECT dislikeUserId AS userId
+      FROM tableDislike
+      WHERE dislikeMessageUuid = ?
+        AND dislikeUserId IN (${placeholders})
+    `, [messageUuid, ...normalizedUserIds]);
+    const likedIds = new Set(likeRows.map((row) => String(row.userId)));
+    const dislikedIds = new Set(dislikeRows.map((row) => String(row.userId)));
+    for (const reaction of reactions) {
+      reaction.liked = likedIds.has(reaction.userId);
+      reaction.disliked = dislikedIds.has(reaction.userId);
+    }
+  }
+
+  return {
+    messageUuid,
+    likes: Number(countRow?.likes || 0),
+    dislikes: Number(countRow?.dislikes || 0),
+    reactions
+  };
+}
+
+async function toggleReaction(db, messageUuid, userId, reaction) {
+  const normalizedUserId = String(userId ?? '').trim();
+  if (!messageUuid || !normalizedUserId) {
+    throw apiError.badRequest('invalid_message_or_user');
+  }
+
+  const message = await getMessageByUuid(db, messageUuid);
+  if (!message) {
+    throw apiError.notFound('message_not_found');
+  }
+
+  const existingUser = await getDb(db, 'SELECT 1 FROM tableUser WHERE id = ? LIMIT 1', [normalizedUserId]);
+  if (!existingUser) {
+    throw apiError.notFound('user_not_found');
+  }
+
+  await new Promise((resolve, reject) => {
+    const callback = (err, result) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(result);
+    };
+
+    if (reaction === 'like') {
+      tableLike.toggleLike(db, messageUuid, normalizedUserId, callback);
+      return;
+    }
+
+    tableDislike.toggleDislike(db, messageUuid, normalizedUserId, callback);
+  });
+
+  return getReactionState(db, messageUuid, [normalizedUserId]);
+}
+
 function attachOptionalServiceIdentity(req) {
   if (req?.service) {
     return req.service;
@@ -1026,6 +1147,48 @@ router.get('/internal/comment/:parentUuid',
     security.checkToken
   ],
   sendInternalCommentsByParentUuid
+);
+
+router.get('/internal/reactions/:messageUuid',
+  [
+    security.checkToken
+  ],
+  async (req, res, next) => {
+    try {
+      const messageUuid = String(req.params.messageUuid || '').trim();
+      const userIds = String(req.query.userIds || '')
+        .split(',')
+        .map((value) => value.trim())
+        .filter(Boolean);
+      const state = await getReactionState(req.database.db, messageUuid, userIds);
+      return res.status(200).json({ status: 200, ...state });
+    } catch (error) {
+      return next(error?.status ? error : apiError.internal('db_error'));
+    }
+  }
+);
+
+router.post('/internal/reactions/:messageUuid/by/:userId/:reaction',
+  [
+    security.checkToken
+  ],
+  async (req, res, next) => {
+    try {
+      const reaction = String(req.params.reaction || '').trim().toLowerCase();
+      if (reaction !== 'like' && reaction !== 'dislike') {
+        return next(apiError.badRequest('invalid_reaction'));
+      }
+      const state = await toggleReaction(
+        req.database.db,
+        String(req.params.messageUuid || '').trim(),
+        String(req.params.userId || '').trim(),
+        reaction
+      );
+      return res.status(200).json({ status: 200, ...state });
+    } catch (error) {
+      return next(error?.status ? error : apiError.internal('db_error'));
+    }
+  }
 );
 
 // Legacy aliases retained for compatibility while callers migrate to explicit

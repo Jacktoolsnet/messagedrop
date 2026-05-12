@@ -697,12 +697,20 @@
                   <button mat-mini-fab type="button" tabindex="-1">
                     <mat-icon>forum</mat-icon>
                   </button>
-                  <button mat-mini-fab type="button" tabindex="-1">
-                    <mat-icon>thumb_up</mat-icon>
-                  </button>
-                  <button mat-mini-fab type="button" tabindex="-1">
-                    <mat-icon>thumb_down</mat-icon>
-                  </button>
+                  <span class="preview-reaction-badge" [matBadge]="previewLikeCount()"
+                    [matBadgeHidden]="previewLikeCount() === 0" matBadgeColor="primary" matBadgeOverlap="false"
+                    matBadgeSize="small">
+                    <button mat-mini-fab type="button" tabindex="-1">
+                      <mat-icon>thumb_up</mat-icon>
+                    </button>
+                  </span>
+                  <span class="preview-reaction-badge" [matBadge]="previewDislikeCount()"
+                    [matBadgeHidden]="previewDislikeCount() === 0" matBadgeColor="warn" matBadgeOverlap="false"
+                    matBadgeSize="small">
+                    <button mat-mini-fab type="button" tabindex="-1">
+                      <mat-icon>thumb_down</mat-icon>
+                    </button>
+                  </span>
                   <button mat-mini-fab type="button" tabindex="-1">
                     <mat-icon>edit</mat-icon>
                   </button>
@@ -713,6 +721,77 @@
               </mat-card-actions>
             </mat-card>
           </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="reaction-card">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-accent">
+            <mat-icon>how_to_vote</mat-icon>
+          </div>
+          <mat-card-title>{{ i18n.t('Profile reactions') }}</mat-card-title>
+          <mat-card-subtitle>
+            {{ i18n.t('Like or dislike this published content as a public profile.') }}
+          </mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          @if (!canManageReactions()) {
+          <div class="reaction-empty-state">
+            <mat-icon>publish</mat-icon>
+            <span>{{ i18n.t('Publish this content before profile reactions can be managed.') }}</span>
+          </div>
+          } @else {
+          @if (reactionsLoading()) {
+          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+          }
+
+          @if (reactionProfiles().length > 0) {
+          <div class="reaction-profile-grid">
+            @for (profile of reactionProfiles(); track trackReactionProfile($index, profile)) {
+            <div class="reaction-profile-tile">
+              <div class="reaction-profile-avatar" aria-hidden="true">
+                @if (profile.avatarImage) {
+                <img [src]="profile.avatarImage" [alt]="profile.name" />
+                } @else {
+                <span>{{ profile.name.slice(0, 2).toUpperCase() }}</span>
+                }
+              </div>
+
+              <div class="reaction-profile-copy">
+                <strong>{{ profile.name }}</strong>
+                @if (!profile.publicBackendUserId) {
+                <span>{{ i18n.t('A public user will be created on first reaction.') }}</span>
+                }
+              </div>
+
+              <div class="reaction-profile-actions">
+                <button mat-mini-fab type="button" class="reaction-button"
+                  [disabled]="!!reactionUpdatingKey() && !isReactionUpdating(profile, 'like')"
+                  [matBadge]="profile.liked ? 1 : 0" [matBadgeHidden]="!profile.liked" matBadgeColor="primary"
+                  matBadgeOverlap="true" matBadgeSize="small" (click)="toggleProfileReaction(profile, 'like')"
+                  [attr.aria-label]="i18n.t('Toggle like')">
+                  <mat-icon>thumb_up</mat-icon>
+                </button>
+
+                <button mat-mini-fab type="button" class="reaction-button reaction-button-warn"
+                  [disabled]="!!reactionUpdatingKey() && !isReactionUpdating(profile, 'dislike')"
+                  [matBadge]="profile.disliked ? 1 : 0" [matBadgeHidden]="!profile.disliked" matBadgeColor="warn"
+                  matBadgeOverlap="true" matBadgeSize="small" (click)="toggleProfileReaction(profile, 'dislike')"
+                  [attr.aria-label]="i18n.t('Toggle dislike')">
+                  <mat-icon>thumb_down</mat-icon>
+                </button>
+              </div>
+            </div>
+            }
+          </div>
+          } @else if (!reactionsLoading()) {
+          <div class="reaction-empty-state">
+            <mat-icon>person_off</mat-icon>
+            <span>{{ i18n.t('No public profiles available.') }}</span>
+          </div>
+          }
+          }
         </mat-card-content>
       </mat-card>
 

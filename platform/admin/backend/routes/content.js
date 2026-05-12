@@ -521,6 +521,63 @@ function toExternalPublicContentDto(rawMessage, publicProfileLookup = new Map())
   };
 }
 
+function toReactionProfileDto(profile, reactionLookup = new Map()) {
+  const publicBackendUserId = normalizeString(profile?.publicBackendUserId);
+  const reaction = publicBackendUserId ? reactionLookup.get(publicBackendUserId) : null;
+  return {
+    publicProfileId: normalizeString(profile?.id),
+    publicBackendUserId: publicBackendUserId || null,
+    name: normalizeString(profile?.name),
+    avatarImage: normalizeString(profile?.avatarImage),
+    defaultStyle: normalizeString(profile?.defaultStyle),
+    liked: reaction?.liked === true,
+    disliked: reaction?.disliked === true
+  };
+}
+
+async function getPublicReactionStateForContent(db, contentRow) {
+  const messageUuid = normalizeExternalParentMessageUuid(contentRow?.publishedMessageUuid);
+  if (!messageUuid) {
+    return {
+      messageUuid: null,
+      likes: 0,
+      dislikes: 0,
+      profiles: []
+    };
+  }
+
+  const profiles = await listPublicProfiles(db);
+  const userIds = profiles
+    .map((profile) => normalizeString(profile?.publicBackendUserId))
+    .filter(Boolean);
+  const query = userIds.length > 0
+    ? `?userIds=${encodeURIComponent(userIds.join(','))}`
+    : '';
+  const response = await callPublicBackend('get', `/message/internal/reactions/${encodeURIComponent(messageUuid)}${query}`);
+
+  if (response.status !== 200) {
+    const err = apiError.badGateway('backend_request_failed');
+    err.detail = response.data?.error || response.data?.message || response.statusText || 'public_reactions_lookup_failed';
+    throw err;
+  }
+
+  const reactionLookup = new Map(
+    (Array.isArray(response.data?.reactions) ? response.data.reactions : [])
+      .map((reaction) => [normalizeString(reaction?.userId), {
+        liked: reaction?.liked === true,
+        disliked: reaction?.disliked === true
+      }])
+      .filter(([userId]) => !!userId)
+  );
+
+  return {
+    messageUuid,
+    likes: Math.max(0, Number(response.data?.likes || 0)),
+    dislikes: Math.max(0, Number(response.data?.dislikes || 0)),
+    profiles: profiles.map((profile) => toReactionProfileDto(profile, reactionLookup))
+  };
+}
+
 async function getExternalPublicContentByUuid(messageUuid) {
   const normalizedUuid = normalizeExternalParentMessageUuid(messageUuid);
   if (!normalizedUuid) {
@@ -1093,6 +1150,89 @@ router.get('/public-messages/:id/external-comments', requireRole(...CONTENT_ROLE
       return next(error);
     }
     return next(apiError.internal('external_public_comments_failed'));
+  }
+});
+
+router.get('/public-messages/:id/reactions', requireRole(...CONTENT_ROLES), async (req, res, next) => {
+  try {
+    const row = await getPublicContentById(req.database.db, req.params.id);
+    if (!row) {
+      return next(apiError.notFound('not_found'));
+    }
+    if (!ensureManageableContent(req, row)) {
+      return next(apiError.forbidden('insufficient_role'));
+    }
+    if (row.status !== tablePublicContent.contentStatus.PUBLISHED || !normalizeString(row.publishedMessageUuid)) {
+      return res.json({
+        status: 200,
+        row: {
+          messageUuid: null,
+          likes: 0,
+          dislikes: 0,
+          profiles: []
+        }
+      });
+    }
+
+    const state = await getPublicReactionStateForContent(req.database.db, row);
+    return res.json({
+      status: 200,
+      row: state
+    });
+  } catch (error) {
+    if (error?.status) {
+      return next(error);
+    }
+    return next(apiError.internal('public_reactions_failed'));
+  }
+});
+
+router.post('/public-messages/:id/reactions/:profileId/:reaction', requireRole(...CONTENT_ROLES), async (req, res, next) => {
+  try {
+    const reaction = normalizeString(req.params.reaction).toLowerCase();
+    if (reaction !== 'like' && reaction !== 'dislike') {
+      return next(apiError.badRequest('invalid_reaction'));
+    }
+
+    const row = await getPublicContentById(req.database.db, req.params.id);
+    if (!row) {
+      return next(apiError.notFound('not_found'));
+    }
+    if (!ensureManageableContent(req, row)) {
+      return next(apiError.forbidden('insufficient_role'));
+    }
+    if (row.status !== tablePublicContent.contentStatus.PUBLISHED || !normalizeString(row.publishedMessageUuid)) {
+      return next(apiError.conflict('not_published'));
+    }
+
+    const profile = await ensurePublicProfileMapping(req, await getPublicProfileById(req.database.db, req.params.profileId));
+    const publicBackendUserId = normalizeString(profile.publicBackendUserId);
+    if (!publicBackendUserId) {
+      return next(apiError.badGateway('public_profile_backend_user_missing'));
+    }
+
+    const messageUuid = normalizeExternalParentMessageUuid(row.publishedMessageUuid);
+    const response = await callPublicBackend(
+      'post',
+      `/message/internal/reactions/${encodeURIComponent(messageUuid)}/by/${encodeURIComponent(publicBackendUserId)}/${reaction}`
+    );
+
+    if (response.status !== 200) {
+      const err = apiError.badGateway('backend_request_failed');
+      err.detail = response.data?.error || response.data?.message || response.statusText || 'public_reaction_toggle_failed';
+      return next(err);
+    }
+
+    const state = await getPublicReactionStateForContent(req.database.db, row);
+    return res.json({
+      status: 200,
+      row: state
+    });
+  } catch (error) {
+    if (error?.status) {
+      return next(error);
+    }
+    return next(apiError.internal('public_reaction_toggle_failed'));
   }
 });
 
