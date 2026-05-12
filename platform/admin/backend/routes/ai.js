@@ -29,7 +29,23 @@ const MODEL_CACHE_TTL_MS = 5 * 60 * 1000;
 const DAY_IN_SECONDS = 24 * 60 * 60;
 const DAY_IN_MS = DAY_IN_SECONDS * 1000;
 const TOOL_TYPES = new Set(['proofread', 'rewrite', 'translate', 'hashtags', 'emoji', 'thread', 'quality_check', 'content_creator']);
-const REWRITE_GOALS = new Set(['clearer', 'friendlier', 'shorter', 'more_formal', 'more_engaging']);
+const REWRITE_GOALS = new Set([
+  'clearer',
+  'friendlier',
+  'shorter',
+  'more_formal',
+  'more_engaging',
+  'funnier',
+  'more_emotional',
+  'more_direct',
+  'more_objective',
+  'punchier',
+  'more_community_oriented',
+  'stronger_call_to_action',
+  'easier_to_understand',
+  'cheekier',
+  'storytelling'
+]);
 const CONTENT_CREATOR_STYLES = new Set(['auto', 'factual', 'emotional', 'bold', 'short']);
 const CONTENT_CREATOR_MESSAGE_TYPES = new Set(['auto', 'event', 'info', 'reminder', 'call_to_action']);
 const CONTENT_CREATOR_HASHTAG_STYLES = new Set(['auto', 'minimal', 'local', 'campaign', 'discoverable']);
@@ -2250,6 +2266,26 @@ function rewriteGoalLabel(goal) {
       return 'Make it more formal';
     case 'more_engaging':
       return 'Make it more engaging';
+    case 'funnier':
+      return 'Make it funnier, light-hearted and humorous without becoming offensive or silly';
+    case 'more_emotional':
+      return 'Make it more emotional, warm and relatable';
+    case 'more_direct':
+      return 'Make it more direct, pointed and concise';
+    case 'more_objective':
+      return 'Make it more objective, neutral and factual';
+    case 'punchier':
+      return 'Make it shorter and punchier with more impact';
+    case 'more_community_oriented':
+      return 'Make it sound closer to the community and like an authentic social post';
+    case 'stronger_call_to_action':
+      return 'Strengthen the call to action and motivate readers to react, comment or visit';
+    case 'easier_to_understand':
+      return 'Make it easier to understand, low-threshold and less complex';
+    case 'cheekier':
+      return 'Make it cheekier, bolder and more playful without being insulting';
+    case 'storytelling':
+      return 'Make it more narrative and story-driven';
     case 'clearer':
     default:
       return 'Make it clearer';
