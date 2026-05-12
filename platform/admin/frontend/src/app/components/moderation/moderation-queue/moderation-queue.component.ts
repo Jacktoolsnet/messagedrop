@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
@@ -14,8 +14,10 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterLink } from '@angular/router';
 import { finalize, forkJoin, of, switchMap } from 'rxjs';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
+import { StickerPreviewComponent } from '../../shared/sticker-preview/sticker-preview.component';
 import { ModerationDetailsDialogComponent } from './moderation-details-dialog.component';
 import { ModerationRequest } from '../../../interfaces/moderation-request.interface';
+import { Multimedia } from '../../../interfaces/multimedia.interface';
 import { ModerationService } from '../../../services/moderation.service';
 import { TranslateService } from '../../../services/translate-service/translate-service.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
@@ -35,7 +37,8 @@ import { DisplayMessageService } from '../../../services/display-message.service
     MatDividerModule,
     MatProgressBarModule,
     MatFormFieldModule,
-    MatSelectModule
+    MatSelectModule,
+    StickerPreviewComponent
   ],
   templateUrl: './moderation-queue.component.html',
   styleUrls: ['./moderation-queue.component.css']
@@ -286,6 +289,70 @@ export class ModerationQueueComponent implements OnInit {
     );
   }
 
+  moderationMultimedia(entry: ModerationRequest): Multimedia {
+    const fallback: Multimedia = {
+      type: 'undefined',
+      url: '',
+      sourceUrl: '',
+      attribution: '',
+      title: '',
+      description: '',
+      contentId: '',
+      oembed: null
+    };
+    const raw = entry.multimedia;
+    if (!raw) {
+      return fallback;
+    }
+    if (typeof raw === 'string') {
+      const trimmed = raw.trim();
+      if (!trimmed || trimmed === 'null') {
+        return fallback;
+      }
+      try {
+        return { ...fallback, ...JSON.parse(trimmed) };
+      } catch {
+        return { ...fallback, type: 'media', url: trimmed };
+      }
+    }
+    if (typeof raw === 'object' && !Array.isArray(raw)) {
+      return { ...fallback, ...(raw as Partial<Multimedia>) };
+    }
+    return fallback;
+  }
+
+  hasMultimedia(entry: ModerationRequest): boolean {
+    return this.moderationMultimedia(entry).type !== 'undefined';
+  }
+
+  isImageMultimedia(multimedia: Multimedia): boolean {
+    if (!multimedia.url) {
+      return false;
+    }
+    if (multimedia.type === 'image' || multimedia.type === 'tenor') {
+      return true;
+    }
+    return /\.(png|jpe?g|gif|webp|bmp|svg)(\?.*)?$/i.test(multimedia.url);
+  }
+
+  isStickerMultimedia(multimedia: Multimedia): boolean {
+    return (multimedia.type || '').toLowerCase() === 'sticker';
+  }
+
+  safeOembedHtml(entry: ModerationRequest): SafeHtml | null {
+    const html = this.moderationMultimedia(entry).oembed?.html;
+    return html ? this.sanitizer.bypassSecurityTrustHtml(html) : null;
+  }
+
+  tiktokEmbedUrl(entry: ModerationRequest): SafeResourceUrl | null {
+    const multimedia = this.moderationMultimedia(entry);
+    if ((multimedia.type || '').toLowerCase() !== 'tiktok') {
+      return null;
+    }
+    const id = this.getTikTokId(multimedia);
+    return id ? this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.tiktok.com/embed/v2/${id}`) : null;
+  }
+
   openDetailsDialog(entry: ModerationRequest): void {
     this.dialog.open(ModerationDetailsDialogComponent, {
       data: { request: entry },
@@ -436,6 +503,35 @@ export class ModerationQueueComponent implements OnInit {
 
   private maxMessageTimestamp(rows: ModerationRequest[]): number {
     return Math.max(0, ...rows.map((row) => Number(row.messageCreatedAt || row.createdAt || 0)));
+  }
+
+  private getTikTokId(multimedia: Multimedia): string | null {
+    const sourceUrl = String(multimedia.sourceUrl || multimedia.url || '').trim();
+    if (sourceUrl) {
+      try {
+        const parsed = new URL(sourceUrl);
+        const normalizedHost = parsed.hostname.toLowerCase();
+        const isTikTokHost = normalizedHost === 'tiktok.com'
+          || normalizedHost === 'www.tiktok.com'
+          || normalizedHost.endsWith('.tiktok.com')
+          || normalizedHost === 'vm.tiktok.com';
+        if (isTikTokHost) {
+          const match = parsed.pathname.match(/\/@[^/]+\/video\/(\d+)/);
+          const safeMatch = this.sanitizeTikTokId(match?.[1] || null);
+          if (safeMatch) {
+            return safeMatch;
+          }
+        }
+      } catch {
+        // ignore invalid URLs
+      }
+    }
+    return this.sanitizeTikTokId(multimedia.contentId || null);
+  }
+
+  private sanitizeTikTokId(value: string | null | undefined): string | null {
+    const normalized = String(value || '').trim();
+    return normalized && /^\d+$/.test(normalized) ? normalized : null;
   }
 
   private recordVoluntaryDecisionTimestamp(row: ModerationRequest): void {

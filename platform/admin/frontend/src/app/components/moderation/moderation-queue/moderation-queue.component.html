@@ -90,6 +90,45 @@
                             </button>
                         </div>
 
+                        @if (moderationMultimedia(sel); as media) {
+                        @if (media.type !== 'undefined') {
+                        <div class="preview-media">
+                            @if (isStickerMultimedia(media)) {
+                            <app-sticker-preview [multimedia]="media"
+                                [alt]="media.title || i18n.t('Selected multimedia preview')"></app-sticker-preview>
+                            } @else if (isImageMultimedia(media)) {
+                            <img [src]="media.url" [alt]="media.title || i18n.t('Selected multimedia preview')" />
+                            } @else if (tiktokEmbedUrl(sel); as tiktokUrl) {
+                            <div class="preview-oembed preview-oembed-tiktok">
+                                <iframe [src]="tiktokUrl" [title]="i18n.t('TikTok preview')" loading="lazy"
+                                    allowfullscreen></iframe>
+                            </div>
+                            } @else if (safeOembedHtml(sel)) {
+                            <div class="preview-oembed" [class.preview-oembed-youtube]="media.type === 'youtube'"
+                                [class.preview-oembed-spotify]="media.type === 'spotify'"
+                                [class.preview-oembed-tiktok]="media.type === 'tiktok'"
+                                [class.preview-oembed-pinterest]="media.type === 'pinterest'"
+                                [innerHTML]="safeOembedHtml(sel)"></div>
+                            } @else {
+                            <div class="preview-media-summary">
+                                <span>{{ media.type }}</span>
+                                @if (media.title) {
+                                <strong>{{ media.title }}</strong>
+                                }
+                                @if (media.description) {
+                                <small>{{ media.description }}</small>
+                                }
+                                @if (media.url || media.sourceUrl) {
+                                <a [href]="media.sourceUrl || media.url" target="_blank" rel="noopener noreferrer">
+                                    {{ i18n.t('Open media') }}
+                                </a>
+                                }
+                            </div>
+                            }
+                        </div>
+                        }
+                        }
+
                         <div class="preview-message-shell" [style]="sel.style || ''">
                             <p>{{ sel.messageText }}</p>
                         </div>
