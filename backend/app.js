@@ -641,6 +641,7 @@ app.use('/digitalserviceact', slowRequestDefault, digitalServiceAct);
 app.use('/dsa', dsaStatusLimit, slowRequestDefault, dsaStatus);
 app.use('/geostatistic', geoStatisticLimit, slowRequestDefault, geoStatistic);
 app.use('/message/create', slowRequestOpenAiModeration);
+app.use('/message/moderate/hashtags', slowRequestOpenAiModeration);
 app.use('/message', messageLimit, slowRequestDefault, message);
 app.use('/moderation', basicLimit, slowRequestDefault, moderation);
 app.use('/notification', notificationLimit, slowRequestDefault, notification);
