@@ -300,7 +300,7 @@ button,
   flex: 0 0 auto;
 }
 
-.buttonbar .button-delete {
+.buttonbar .button-owner-menu {
   justify-self: start;
 }
 
