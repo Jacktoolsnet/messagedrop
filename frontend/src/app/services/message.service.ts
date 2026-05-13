@@ -1367,7 +1367,9 @@ export class MessageService {
     const url = this.buildPublicMessageUrl(
       `boundingbox/${boundingBox.latMin}/${boundingBox.lonMin}/${boundingBox.latMax}/${boundingBox.lonMax}`
     );
-    const headers = this.httpOptions.headers.set('x-skip-ui', 'true');
+    const headers = this.httpOptions.headers
+      .set('x-skip-ui', 'true')
+      .set('x-skip-diagnostics', 'true');
 
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,

@@ -54,12 +54,16 @@ export class DiagnosticLoggerService {
   logHttpError(req: HttpRequest<unknown>, error: unknown): void {
     const httpError = error instanceof HttpErrorResponse ? error : undefined;
     const status = httpError?.status;
+    const path = this.stripUrl(req.url);
+    if (this.isIgnorableHttpError(path, status)) {
+      return;
+    }
     const details = this.extractErrorDetails(error);
     const payload: FrontendErrorPayload = {
       client: 'web',
       event: 'http_error',
       severity: 'error',
-      path: this.stripUrl(req.url),
+      path,
       status: typeof status === 'number' ? status : undefined,
       errorName: details.errorName ?? this.safeToken(httpError?.name),
       errorMessage: details.errorMessage,
@@ -210,6 +214,21 @@ export class DiagnosticLoggerService {
   private safePath(path?: string): string | undefined {
     if (!path) return undefined;
     return path.split('?')[0].split('#')[0].slice(0, 200);
+  }
+
+  private isIgnorableHttpError(path: string | undefined, status: number | undefined): boolean {
+    if (status === 404 && this.isNominatimSearchPath(path)) {
+      return true;
+    }
+    return false;
+  }
+
+  private isNominatimSearchPath(path: string | undefined): boolean {
+    return !!path && (
+      path.startsWith('/nominatim/search/')
+      || path.startsWith('/nominatim/noboundedsearch/')
+      || path.startsWith('/nominatim/boundedsearch/')
+    );
   }
 
   private safeToken(value?: string, maxLen = 80): string | undefined {
