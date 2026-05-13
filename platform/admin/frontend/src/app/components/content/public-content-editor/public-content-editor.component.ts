@@ -669,6 +669,14 @@ export class PublicContentEditorComponent {
     return this.isImageMultimedia(row.multimedia);
   }
 
+  childSafeMultimediaOembedHtml(row: PublicContent): SafeHtml | null {
+    return this.safeMultimediaOembedHtml(row.multimedia);
+  }
+
+  childMultimediaTikTokEmbedUrl(row: PublicContent): SafeResourceUrl | null {
+    return this.multimediaTikTokEmbedUrl(row.multimedia);
+  }
+
   childResolvedStyle(row: PublicContent): string {
     return row.style || row.publicProfile?.defaultStyle || '';
   }
@@ -793,6 +801,32 @@ export class PublicContentEditorComponent {
 
   externalHasImageMultimedia(row: ExternalPublicContent): boolean {
     return this.isImageMultimedia(row.multimedia);
+  }
+
+  externalSafeMultimediaOembedHtml(row: ExternalPublicContent): SafeHtml | null {
+    return this.safeMultimediaOembedHtml(row.multimedia);
+  }
+
+  externalMultimediaTikTokEmbedUrl(row: ExternalPublicContent): SafeResourceUrl | null {
+    return this.multimediaTikTokEmbedUrl(row.multimedia);
+  }
+
+  private safeMultimediaOembedHtml(multimedia: Multimedia | null | undefined): SafeHtml | null {
+    const html = multimedia?.oembed?.html;
+    return html ? this.sanitizer.bypassSecurityTrustHtml(html) : null;
+  }
+
+  private multimediaTikTokEmbedUrl(multimedia: Multimedia | null | undefined): SafeResourceUrl | null {
+    if (!multimedia || (multimedia.type || '').toLowerCase() !== 'tiktok') {
+      return null;
+    }
+
+    const id = this.getTikTokId(multimedia);
+    if (!id) {
+      return null;
+    }
+
+    return this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.tiktok.com/embed/v2/${id}`);
   }
 
   profileAvatar(): string {
