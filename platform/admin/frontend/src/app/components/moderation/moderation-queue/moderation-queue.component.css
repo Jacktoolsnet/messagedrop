@@ -411,6 +411,16 @@ mat-progress-bar {
     flex: 1;
 }
 
+.desktop-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.mobile-actions {
+    display: none;
+}
+
 .mode-switch {
     display: inline-flex;
     align-items: center;
@@ -419,7 +429,7 @@ mat-progress-bar {
 }
 
 .mode-switch button mat-icon,
-mat-toolbar>button mat-icon {
+.desktop-actions>button mat-icon {
     margin-right: .25rem;
 }
 
@@ -494,8 +504,13 @@ mat-toolbar>button mat-icon {
         display: none;
     }
 
-    .mode-switch {
-        width: 100%;
+    .desktop-actions {
+        display: none;
+    }
+
+    .mobile-actions {
+        display: inline-flex;
+        margin-left: auto;
     }
 
     .split {
