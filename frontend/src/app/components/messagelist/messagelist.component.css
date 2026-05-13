@@ -60,7 +60,8 @@ h2[mat-dialog-title].dialog-title {
 /* === Responsive grid layout for message cards === */
 .content {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 400px));
+  justify-content: center;
   align-items: start;
   gap: 1.5rem;
   width: 100%;
@@ -77,7 +78,10 @@ h2[mat-dialog-title].dialog-title {
   flex-direction: column;
   width: 100%;
   min-width: 0;
+  max-width: 100%;
   margin: 0;
+  overflow: hidden;
+  box-sizing: border-box;
   border-radius: 0.75rem;
   color: var(--mat-card-subtitle-text-color);
   background-color: var(--mat-card-filled-container-color);
@@ -186,6 +190,8 @@ h2[mat-dialog-title].dialog-title {
 /* === Message content inside cards === */
 .message-content {
   font-size: 0.9rem;
+  max-width: 100%;
+  min-width: 0;
   padding-top: 1.5rem;
   margin-top: 1.25rem;
   /* breathing room under the overlapping badge */
@@ -193,6 +199,20 @@ h2[mat-dialog-title].dialog-title {
   white-space: normal;
   overflow-wrap: break-word;
   word-break: break-word;
+}
+
+mat-card-content {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.message-content app-showmultimedia {
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
 }
 
 /* Scale media only inside the message content (do not affect avatar) */

@@ -1,6 +1,9 @@
 :host {
     display: block;
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .media_block {
@@ -8,10 +11,18 @@
     flex-direction: column;
     align-items: center;
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    box-sizing: border-box;
 }
 
 .multimedia_container {
     position: relative;
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    box-sizing: border-box;
 }
 
 .multimedia_container--sticker {
@@ -79,10 +90,14 @@
 
 .oembed_container {
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
+    overflow: hidden;
+    box-sizing: border-box;
     background-color: transparent;
 }
 
