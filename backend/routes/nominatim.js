@@ -121,6 +121,9 @@ router.get('/search/:searchTerm/:limit', [
                 'x-forwarded-proto': req.protocol,
             },
         });
+        if (upstream.status === 404) {
+            return res.status(200).json({ status: 200, result: [] });
+        }
         res.status(upstream.status).json(upstream.data);
     } catch (err) {
         if (axios.isAxiosError(err)) {
