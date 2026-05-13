@@ -72,20 +72,32 @@
                 </mat-card-content>
 
                 <mat-card-actions class="buttonbar">
-                    @if (this.userService.getUser().id === message.userId) {
-                    @if (userService.hasJwt()) {
-                    <button mat-mini-fab color="secondary" class="button-delete"
-                        [attr.aria-label]="'common.messageList.deleteAria' | transloco"
-                        (click)="!userService.isReady() ? deleteMessageAfterLoginClick(message) : deleteMessageClick(message)">
-                        <mat-icon aria-hidden="false">delete_forever</mat-icon>
+                    @if (this.userService.getUser().id === message.userId && userService.hasJwt()) {
+                    <button mat-mini-fab color="secondary" class="button-owner-menu" [matMenuTriggerFor]="ownMessageMenu"
+                        [attr.aria-label]="'common.messageList.ownActionsAria' | transloco">
+                        <mat-icon aria-hidden="false">menu</mat-icon>
                     </button>
-                    @if (canPublishMessage(message) || canUnpublishMessage(message)) {
-                    <button mat-mini-fab color="secondary" [attr.aria-label]="getPublishToggleAriaLabel(message)"
-                        (click)="!userService.isReady() ? togglePublishAfterLoginClick(message) : togglePublishClick(message)">
-                        <mat-icon aria-hidden="false">{{ getPublishToggleIcon(message) }}</mat-icon>
-                    </button>
-                    }
-                    }
+                    <mat-menu #ownMessageMenu="matMenu">
+                        @if (canEditMessage(message)) {
+                        <button mat-menu-item
+                            (click)="!userService.isReady() ? editMessageAfterLoginClick(message) : editMessageClick(message)">
+                            <mat-icon aria-hidden="true">edit</mat-icon>
+                            <span>{{ 'common.messageList.editAria' | transloco }}</span>
+                        </button>
+                        }
+                        @if (canPublishMessage(message) || canUnpublishMessage(message)) {
+                        <button mat-menu-item
+                            (click)="!userService.isReady() ? togglePublishAfterLoginClick(message) : togglePublishClick(message)">
+                            <mat-icon aria-hidden="true">{{ getPublishToggleIcon(message) }}</mat-icon>
+                            <span>{{ getPublishToggleAriaLabel(message) }}</span>
+                        </button>
+                        }
+                        <button mat-menu-item
+                            (click)="!userService.isReady() ? deleteMessageAfterLoginClick(message) : deleteMessageClick(message)">
+                            <mat-icon aria-hidden="true">delete_forever</mat-icon>
+                            <span>{{ 'common.messageList.deleteAria' | transloco }}</span>
+                        </button>
+                    </mat-menu>
                     }
                     <div class="button-group">
                         <button mat-mini-fab color="secondary"
@@ -110,15 +122,6 @@
                                 matBadgePosition="after" matBadgeColor="accent"
                                 matBadgeOverlap="true">thumb_down</mat-icon>
                         </button>
-                        }
-                        @if (this.userService.getUser().id === message.userId) {
-                        @if (canEditMessage(message)) {
-                        <button mat-mini-fab color="secondary"
-                            [attr.aria-label]="'common.messageList.editAria' | transloco"
-                            (click)="!userService.isReady() ? editMessageAfterLoginClick(message) : editMessageClick(message)">
-                            <mat-icon aria-hidden="false">edit</mat-icon>
-                        </button>
-                        }
                         }
                         @if (canShareMessage(message)) {
                         <button mat-mini-fab color="secondary"
@@ -255,20 +258,32 @@
                 </mat-card-content>
 
                 <mat-card-actions class="buttonbar">
-                    @if (this.userService.getUser().id === message.userId) {
-                    @if (userService.hasJwt()) {
-                    <button mat-mini-fab color="secondary" class="button-delete"
-                        [attr.aria-label]="'common.messageList.deleteAria' | transloco"
-                        (click)="!userService.isReady() ? deleteMessageAfterLoginClick(message) : deleteMessageClick(message)">
-                        <mat-icon aria-hidden="false">delete_forever</mat-icon>
+                    @if (this.userService.getUser().id === message.userId && userService.hasJwt()) {
+                    <button mat-mini-fab color="secondary" class="button-owner-menu" [matMenuTriggerFor]="ownCommentMenu"
+                        [attr.aria-label]="'common.messageList.ownActionsAria' | transloco">
+                        <mat-icon aria-hidden="false">menu</mat-icon>
                     </button>
-                    @if (canPublishMessage(message) || canUnpublishMessage(message)) {
-                    <button mat-mini-fab color="secondary" [attr.aria-label]="getPublishToggleAriaLabel(message)"
-                        (click)="!userService.isReady() ? togglePublishAfterLoginClick(message) : togglePublishClick(message)">
-                        <mat-icon aria-hidden="false">{{ getPublishToggleIcon(message) }}</mat-icon>
-                    </button>
-                    }
-                    }
+                    <mat-menu #ownCommentMenu="matMenu">
+                        @if (canEditMessage(message)) {
+                        <button mat-menu-item
+                            (click)="!userService.isReady() ? editMessageAfterLoginClick(message) : editMessageClick(message)">
+                            <mat-icon aria-hidden="true">edit</mat-icon>
+                            <span>{{ 'common.messageList.editAria' | transloco }}</span>
+                        </button>
+                        }
+                        @if (canPublishMessage(message) || canUnpublishMessage(message)) {
+                        <button mat-menu-item
+                            (click)="!userService.isReady() ? togglePublishAfterLoginClick(message) : togglePublishClick(message)">
+                            <mat-icon aria-hidden="true">{{ getPublishToggleIcon(message) }}</mat-icon>
+                            <span>{{ getPublishToggleAriaLabel(message) }}</span>
+                        </button>
+                        }
+                        <button mat-menu-item
+                            (click)="!userService.isReady() ? deleteMessageAfterLoginClick(message) : deleteMessageClick(message)">
+                            <mat-icon aria-hidden="true">delete_forever</mat-icon>
+                            <span>{{ 'common.messageList.deleteAria' | transloco }}</span>
+                        </button>
+                    </mat-menu>
                     }
                     <div class="button-group">
                         <button mat-mini-fab color="secondary"
@@ -293,15 +308,6 @@
                                 matBadgePosition="after" matBadgeColor="accent"
                                 matBadgeOverlap="true">thumb_down</mat-icon>
                         </button>
-                        }
-                        @if (this.userService.getUser().id === message.userId) {
-                        @if (canEditMessage(message)) {
-                        <button mat-mini-fab color="secondary"
-                            [attr.aria-label]="'common.messageList.editAria' | transloco"
-                            (click)="!userService.isReady() ? editMessageAfterLoginClick(message) : editMessageClick(message)">
-                            <mat-icon aria-hidden="false">edit</mat-icon>
-                        </button>
-                        }
                         }
                         @if (canShareMessage(message)) {
                         <button mat-mini-fab color="secondary"

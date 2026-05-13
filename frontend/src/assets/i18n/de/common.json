@@ -477,6 +477,7 @@
       "publishAria": "Nachricht veröffentlichen",
       "unpublishAria": "Nachricht zurücknehmen",
       "deleteAria": "Nachricht löschen",
+      "ownActionsAria": "Eigene Nachrichtenaktionen",
       "blockAria": "Nachricht melden",
       "avatarAltName": "Avatar von {{ name }}",
       "avatarAltFallback": "Profil-Avatar",

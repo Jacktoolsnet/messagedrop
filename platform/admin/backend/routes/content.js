@@ -61,6 +61,81 @@ async function callPublicBackendPublic(method, endpoint, payload) {
   });
 }
 
+async function getAdminContentById(db, id) {
+  return new Promise((resolve, reject) => {
+    tablePublicContent.getById(db, id, (err, value) => {
+      if (err) return reject(err);
+      resolve(value || null);
+    });
+  });
+}
+
+async function updateAdminContent(db, id, fields) {
+  return new Promise((resolve, reject) => {
+    tablePublicContent.update(db, id, fields, (err, ok) => {
+      if (err) return reject(err);
+      if (!ok) return reject(new Error('update_failed'));
+      resolve(ok);
+    });
+  });
+}
+
+async function ensurePlannedPublishedMessageUuid(req, row) {
+  const existing = normalizeExternalParentMessageUuid(row?.publishedMessageUuid);
+  if (existing) {
+    return existing;
+  }
+
+  const planned = crypto.randomUUID();
+  await updateAdminContent(req.database.db, row.id, {
+    [tablePublicContent.columns.publishedMessageUuid]: planned,
+    updatedAt: Date.now()
+  });
+  return planned;
+}
+
+async function findPublicBackendMessageByUuid(messageUuid) {
+  const normalized = normalizeExternalParentMessageUuid(messageUuid);
+  if (!normalized) {
+    return null;
+  }
+
+  const response = await callPublicBackend('get', `/message/internal/uuid/${encodeURIComponent(normalized)}`);
+  if (response.status === 404) {
+    return null;
+  }
+  if (response.status !== 200 || !response.data?.message?.uuid) {
+    const upstreamMessage = response.data?.error || response.data?.message || response.statusText || 'public_message_lookup_failed';
+    const err = response.status >= 400 && response.status < 500
+      ? apiError.fromStatus(response.status, upstreamMessage)
+      : apiError.badGateway('backend_request_failed');
+    err.detail = upstreamMessage;
+    throw err;
+  }
+  return response.data.message;
+}
+
+async function markAdminContentPublishedFromPublicBackend(req, row, publicMessage, publisherAdminUserId, publisherPublicUserId) {
+  const messageUuid = normalizeExternalParentMessageUuid(publicMessage?.uuid || row?.publishedMessageUuid);
+  if (!messageUuid) {
+    throw apiError.badGateway('public_message_uuid_missing');
+  }
+
+  await updateAdminContent(req.database.db, row.id, {
+    [tablePublicContent.columns.publisherAdminUserId]: publisherAdminUserId,
+    [tablePublicContent.columns.publisherPublicUserId]: publisherPublicUserId,
+    [tablePublicContent.columns.publishedMessageId]: Number.isFinite(Number(publicMessage?.id)) ? Number(publicMessage.id) : null,
+    [tablePublicContent.columns.publishedMessageUuid]: messageUuid,
+    [tablePublicContent.columns.status]: tablePublicContent.contentStatus.PUBLISHED,
+    [tablePublicContent.columns.publishedAt]: Date.now(),
+    [tablePublicContent.columns.withdrawnAt]: null,
+    [tablePublicContent.columns.deletedAt]: null,
+    updatedAt: Date.now()
+  });
+
+  return getAdminContentById(req.database.db, row.id);
+}
+
 function getAdminRoles(req) {
   return Array.isArray(req.admin?.roles) ? req.admin.roles : [];
 }
@@ -109,9 +184,6 @@ function canSeeAllContent(roles) {
   return roles.includes('editor') || roles.includes('admin') || roles.includes('root');
 }
 
-function canPublishContent(roles) {
-  return roles.includes('editor') || roles.includes('admin') || roles.includes('root');
-}
 
 function parseJson(value, fallback) {
   if (typeof value !== 'string' || !value.trim()) {
@@ -423,9 +495,6 @@ function hasPublishableContent(payload) {
   return normalizeString(multimedia?.type, 'undefined') !== 'undefined';
 }
 
-function hasExternalParentSelection(payload) {
-  return !!normalizeExternalParentMessageUuid(payload?.externalParentMessageUuid);
-}
 
 function ensureManageableContent(req, row) {
   const roles = getAdminRoles(req);
@@ -1482,7 +1551,7 @@ router.post('/public-messages/:id/publish', requireRole(...PUBLISH_ROLES), async
     if (!publisherPublicUserId) {
       return next(apiError.badGateway('public_profile_backend_user_missing'));
     }
-    const publishedMessageUuid = row.publishedMessageUuid || crypto.randomUUID();
+    const publishedMessageUuid = await ensurePlannedPublishedMessageUuid(req, row);
     const messageType = normalizeContentType(row.contentType);
     let parentPublishedMessageUuid = null;
     if (messageType === tablePublicContent.contentType.COMMENT) {
@@ -1505,22 +1574,68 @@ router.post('/public-messages/:id/publish', requireRole(...PUBLISH_ROLES), async
       }
     }
 
-    const publishResponse = await callPublicBackend('post', '/message/internal/publish', {
-      uuid: publishedMessageUuid,
-      messageTyp: messageType,
-      messageUserId: publisherPublicUserId,
-      latitude: messageType === tablePublicContent.contentType.COMMENT ? 0 : Number(row.latitude || 0),
-      longitude: messageType === tablePublicContent.contentType.COMMENT ? 0 : Number(row.longitude || 0),
-      plusCode: messageType === tablePublicContent.contentType.COMMENT ? '' : (row.plusCode || ''),
-      message: row.message || '',
-      markerType: row.markerType || 'default',
-      style: row.style || publicProfile.defaultStyle || '',
-      hashtags: parseJson(row.hashtags, []),
-      multimedia: row.multimedia || '{}',
-      parentUuid: parentPublishedMessageUuid || undefined
-    });
+    const existingPublicMessageBeforePublish = await findPublicBackendMessageByUuid(publishedMessageUuid);
+
+    let publishResponse;
+    try {
+      publishResponse = await callPublicBackend('post', '/message/internal/publish', {
+        uuid: publishedMessageUuid,
+        messageTyp: messageType,
+        messageUserId: publisherPublicUserId,
+        latitude: messageType === tablePublicContent.contentType.COMMENT ? 0 : Number(row.latitude || 0),
+        longitude: messageType === tablePublicContent.contentType.COMMENT ? 0 : Number(row.longitude || 0),
+        plusCode: messageType === tablePublicContent.contentType.COMMENT ? '' : (row.plusCode || ''),
+        message: row.message || '',
+        markerType: row.markerType || 'default',
+        style: row.style || publicProfile.defaultStyle || '',
+        hashtags: parseJson(row.hashtags, []),
+        multimedia: row.multimedia || '{}',
+        parentUuid: parentPublishedMessageUuid || undefined
+      });
+    } catch (publishError) {
+      const publicMessage = existingPublicMessageBeforePublish || await findPublicBackendMessageByUuid(publishedMessageUuid);
+      if (publicMessage) {
+        const recovered = await markAdminContentPublishedFromPublicBackend(
+          req,
+          row,
+          publicMessage,
+          publisherAdminUserId,
+          publisherPublicUserId
+        );
+        return res.json({
+          status: 200,
+          row: toContentDto(recovered),
+          publish: {
+            messageId: recovered.publishedMessageId,
+            messageUuid: recovered.publishedMessageUuid,
+            recovered: true
+          }
+        });
+      }
+      throw publishError;
+    }
 
     if (publishResponse.status !== 200 || !publishResponse.data?.messageUuid) {
+      const publicMessage = existingPublicMessageBeforePublish || await findPublicBackendMessageByUuid(publishedMessageUuid);
+      if (publicMessage) {
+        const recovered = await markAdminContentPublishedFromPublicBackend(
+          req,
+          row,
+          publicMessage,
+          publisherAdminUserId,
+          publisherPublicUserId
+        );
+        return res.json({
+          status: 200,
+          row: toContentDto(recovered),
+          publish: {
+            messageId: recovered.publishedMessageId,
+            messageUuid: recovered.publishedMessageUuid,
+            recovered: true
+          }
+        });
+      }
+
       const upstreamMessage = publishResponse.data?.error || publishResponse.data?.message || publishResponse.statusText || 'publish_failed';
       if (publishResponse.status >= 400 && publishResponse.status < 500) {
         const err = apiError.fromStatus(publishResponse.status, upstreamMessage);
@@ -1532,30 +1647,16 @@ router.post('/public-messages/:id/publish', requireRole(...PUBLISH_ROLES), async
       return next(err);
     }
 
-    await new Promise((resolve, reject) => {
-      tablePublicContent.update(req.database.db, row.id, {
-        [tablePublicContent.columns.publisherAdminUserId]: publisherAdminUserId,
-        [tablePublicContent.columns.publisherPublicUserId]: publisherPublicUserId,
-        [tablePublicContent.columns.publishedMessageId]: publishResponse.data?.messageId ?? null,
-        [tablePublicContent.columns.publishedMessageUuid]: publishResponse.data?.messageUuid ?? publishedMessageUuid,
-        [tablePublicContent.columns.status]: tablePublicContent.contentStatus.PUBLISHED,
-        [tablePublicContent.columns.publishedAt]: Date.now(),
-        [tablePublicContent.columns.withdrawnAt]: null,
-        [tablePublicContent.columns.deletedAt]: null,
-        updatedAt: Date.now()
-      }, (updateErr, ok) => {
-        if (updateErr) return reject(updateErr);
-        if (!ok) return reject(new Error('update_failed'));
-        resolve(ok);
-      });
-    });
-
-    const updated = await new Promise((resolve, reject) => {
-      tablePublicContent.getById(req.database.db, row.id, (err, value) => {
-        if (err) return reject(err);
-        resolve(value || null);
-      });
-    });
+    const updated = await markAdminContentPublishedFromPublicBackend(
+      req,
+      row,
+      {
+        id: publishResponse.data?.messageId ?? null,
+        uuid: publishResponse.data?.messageUuid ?? publishedMessageUuid
+      },
+      publisherAdminUserId,
+      publisherPublicUserId
+    );
 
     return res.json({
       status: 200,

@@ -477,6 +477,7 @@
       "publishAria": "Publicar mensaje",
       "unpublishAria": "Retirar publicación",
       "deleteAria": "Eliminar mensaje",
+      "ownActionsAria": "Acciones de mi mensaje",
       "blockAria": "Reportar mensaje",
       "avatarAltName": "Avatar de {{ name }}",
       "avatarAltFallback": "Avatar de perfil",
