@@ -435,6 +435,242 @@ const faqPages = [
           },
         ],
       },
+        {
+                "title": "Using MessageDrop with a user account · Account and profile",
+                "intro": "Questions about your user identity, PIN, profile, and using MessageDrop on different devices.",
+                "items": [
+                        {
+                                "slug": "what-changes-when-i-use-a-user-account",
+                                "question": "What changes when I use a user account?",
+                                "answer": "With a user account, you can create and manage your own public messages, use private content features, maintain places, connect with contacts, and use features that need a stable user identity or backend connection."
+                        },
+                        {
+                                "slug": "how-do-i-create-a-user-account",
+                                "question": "How do I create a user account?",
+                                "answer": "You create a user account directly in the app. MessageDrop guides you through the required steps, including creating a PIN and setting up your local user identity."
+                        },
+                        {
+                                "slug": "why-do-i-need-a-pin",
+                                "question": "Why do I need a PIN?",
+                                "answer": "The PIN helps protect your local user identity and sensitive actions on your device. It is part of the security concept for private and account-related features."
+                        },
+                        {
+                                "slug": "what-happens-if-i-forget-my-pin",
+                                "question": "What happens if I forget my PIN?",
+                                "answer": "If you forget your PIN, access to locally protected data can be limited or lost. Because MessageDrop is designed to keep data local where possible, backups are important."
+                        },
+                        {
+                                "slug": "what-information-does-my-profile-contain",
+                                "question": "What information does my profile contain?",
+                                "answer": "Your profile can contain information such as a display name, avatar, and profile details that help you recognize your own account and, where applicable, help others identify you."
+                        },
+                        {
+                                "slug": "can-i-change-my-profile-later",
+                                "question": "Can I change my profile later?",
+                                "answer": "Yes. You can update your profile later in the app. Changes may affect how your profile is shown in places where profile information is used."
+                        },
+                        {
+                                "slug": "is-my-profile-visible-to-others",
+                                "question": "Is my profile visible to others?",
+                                "answer": "Some profile information can be visible to other users in connection with public messages or contacts. Local profiles that you create for other users are only for your own device."
+                        },
+                        {
+                                "slug": "can-i-use-messagedrop-on-multiple-devices",
+                                "question": "Can I use MessageDrop on multiple devices?",
+                                "answer": "Some features can be used on multiple devices when backend connection and synchronization are available. Data that exists only locally on one device may not automatically appear on another device."
+                        }
+                ]
+        },
+        {
+                "title": "Using MessageDrop with a user account · Own public messages",
+                "intro": "Questions about creating, editing, deleting, and moderating your own public messages.",
+                "items": [
+                        {
+                                "slug": "can-i-create-my-own-public-messages",
+                                "question": "Can I create my own public messages?",
+                                "answer": "Yes. With a suitable user identity and backend connection, you can create public messages and place them at real-world locations on the map."
+                        },
+                        {
+                                "slug": "where-do-my-public-messages-appear",
+                                "question": "Where do my public messages appear?",
+                                "answer": "Public messages appear at the location you choose on the map. They can be discovered by other users depending on location, search settings, availability, and moderation status."
+                        },
+                        {
+                                "slug": "can-i-edit-my-public-messages-later",
+                                "question": "Can I edit my public messages later?",
+                                "answer": "Yes. You can edit your own public messages when the app can identify you as the owner and the message is still available for editing."
+                        },
+                        {
+                                "slug": "can-i-delete-my-public-messages",
+                                "question": "Can I delete my public messages?",
+                                "answer": "Yes. You can delete your own public messages. MessageDrop is designed so that deleting really removes data where the system controls that data."
+                        },
+                        {
+                                "slug": "why-can-a-public-message-be-moderated-or-removed",
+                                "question": "Why can a public message be moderated or removed?",
+                                "answer": "Public messages can be moderated or removed if they violate rules, contain illegal content, disclose personal data, are reported, or otherwise conflict with safety and legal requirements."
+                        },
+                        {
+                                "slug": "can-i-embed-external-content-in-public-messages",
+                                "question": "Can I embed external content in public messages?",
+                                "answer": "Yes, where supported. You can link or embed content from supported external platforms. External providers remain separate services with their own terms and privacy practices."
+                        },
+                        {
+                                "slug": "can-i-see-how-others-react-to-my-public-messages",
+                                "question": "Can I see how others react to my public messages?",
+                                "answer": "MessageDrop can show reactions or interaction indicators where such features are available. These indicators do not turn public messages into an algorithmic popularity feed."
+                        }
+                ]
+        },
+        {
+                "title": "Using MessageDrop with a user account · Private content",
+                "intro": "Questions about private notes, images, documents, and local storage.",
+                "items": [
+                        {
+                                "slug": "what-are-private-notes",
+                                "question": "What are private notes?",
+                                "answer": "Private notes are personal notes that you create for yourself. They are intended for your own use and are separate from public messages on the map."
+                        },
+                        {
+                                "slug": "who-can-see-my-private-notes",
+                                "question": "Who can see my private notes?",
+                                "answer": "Private notes are intended to be visible only to you. Access can still depend on your device security, browser storage, backups, and how you handle your device."
+                        },
+                        {
+                                "slug": "can-i-store-private-images",
+                                "question": "Can I store private images?",
+                                "answer": "Yes. MessageDrop includes features for private images so you can keep image-based content for yourself instead of publishing it publicly."
+                        },
+                        {
+                                "slug": "can-i-store-private-documents",
+                                "question": "Can I store private documents?",
+                                "answer": "Yes. You can store private documents where the feature is available. As with other private content, you should keep backups if the data is important."
+                        },
+                        {
+                                "slug": "where-is-private-content-stored",
+                                "question": "Where is private content stored?",
+                                "answer": "Private content is designed to stay local on your device whenever possible. Some features may require backend support, but local-first storage is an important part of MessageDrop."
+                        },
+                        {
+                                "slug": "can-i-delete-private-content-later",
+                                "question": "Can I delete private content later?",
+                                "answer": "Yes. You can delete private content that you manage in the app. If data exists only on your device, deleting or losing local storage can also remove it."
+                        },
+                        {
+                                "slug": "what-happens-to-private-content-when-i-change-devices",
+                                "question": "What happens to private content when I change devices?",
+                                "answer": "Private content that is stored only locally does not automatically move to a new device. Use available backup and restore options before changing devices or clearing browser data."
+                        }
+                ]
+        },
+        {
+                "title": "Using MessageDrop with a user account · Places",
+                "intro": "Questions about creating, editing, following, and maintaining places.",
+                "items": [
+                        {
+                                "slug": "can-i-create-my-own-places",
+                                "question": "Can I create my own places?",
+                                "answer": "Yes. With the required user features, you can create places and connect information to real-world locations."
+                        },
+                        {
+                                "slug": "what-is-a-place-in-messagedrop",
+                                "question": "What is a place in MessageDrop?",
+                                "answer": "A place is a location-based entry on the map. It can collect context such as messages, tiles, weather, air quality, experiences, and other useful information around that location."
+                        },
+                        {
+                                "slug": "can-i-edit-places",
+                                "question": "Can I edit places?",
+                                "answer": "Yes, where you have the required permissions or ownership. Editing helps keep place information useful and up to date."
+                        },
+                        {
+                                "slug": "can-i-follow-places",
+                                "question": "Can I follow places?",
+                                "answer": "Yes. Following places helps you keep track of locations that matter to you, such as your home area, favorite café, workplace, or travel destination."
+                        },
+                        {
+                                "slug": "what-happens-when-new-content-appears-at-a-followed-place",
+                                "question": "What happens when new content appears at a followed place?",
+                                "answer": "When new relevant content appears at a followed place, MessageDrop can surface it in the app or through available notification features, depending on your settings and permissions."
+                        },
+                        {
+                                "slug": "can-i-add-information-to-a-place",
+                                "question": "Can I add information to a place?",
+                                "answer": "Yes. You can add or maintain information around places where the feature is available. This helps make places more useful for you and other users."
+                        }
+                ]
+        },
+        {
+                "title": "Using MessageDrop with a user account · Contacts and private communication",
+                "intro": "Questions about connecting with people and exchanging private messages.",
+                "items": [
+                        {
+                                "slug": "can-i-contact-other-users",
+                                "question": "Can I contact other users?",
+                                "answer": "Yes. MessageDrop includes contact and private communication features for users who connect with each other."
+                        },
+                        {
+                                "slug": "how-do-i-connect-with-other-users",
+                                "question": "How do I connect with other users?",
+                                "answer": "The easiest way is to connect with people you already know, for example by scanning a connect QR code in person. Online connection is possible, but you should know who you are connecting with."
+                        },
+                        {
+                                "slug": "why-should-i-only-connect-with-people-i-know",
+                                "question": "Why should I only connect with people I know?",
+                                "answer": "Private communication works best when you know and trust the other person. Connecting only with known people reduces abuse, spam, and misunderstandings."
+                        },
+                        {
+                                "slug": "are-private-messages-encrypted",
+                                "question": "Are private messages encrypted?",
+                                "answer": "Private communication is designed to be encrypted and signed. The cryptographic keys are generated on your device, and private keys are intended to stay on your device."
+                        },
+                        {
+                                "slug": "can-messagedrop-read-my-private-messages",
+                                "question": "Can MessageDrop read my private messages?",
+                                "answer": "MessageDrop is designed so private communication is technically protected. As a rule, private message contents should not be readable by MessageDrop in plain text."
+                        },
+                        {
+                                "slug": "what-happens-if-i-delete-a-contact",
+                                "question": "What happens if I delete a contact?",
+                                "answer": "Deleting a contact removes that connection from your app context. Depending on local storage and message history, you may also need to manage related local data separately."
+                        }
+                ]
+        },
+        {
+                "title": "Using MessageDrop with a user account · Data, backup, and safety",
+                "intro": "Questions about backups, synchronization, device loss, and account deletion.",
+                "items": [
+                        {
+                                "slug": "why-should-i-create-a-backup",
+                                "question": "Why should I create a backup?",
+                                "answer": "Backups are important because much of MessageDrop is designed to keep data local on your device. If your device or browser data is lost, a backup may be the only way to restore important content."
+                        },
+                        {
+                                "slug": "which-data-is-synchronized",
+                                "question": "Which data is synchronized?",
+                                "answer": "Data that needs backend support, such as published public content or account-related server data, can be synchronized. Purely local private data may remain only on your device unless a backup or restore feature is used."
+                        },
+                        {
+                                "slug": "which-data-stays-only-on-my-device",
+                                "question": "Which data stays only on my device?",
+                                "answer": "Local settings, private content, local profiles, and other device-specific data can stay only on your device. The exact behavior depends on the feature and your app settings."
+                        },
+                        {
+                                "slug": "what-happens-if-i-lose-my-device",
+                                "question": "What happens if I lose my device?",
+                                "answer": "If you lose your device, local data can be lost as well. You should protect your device, keep your PIN safe, and create backups for data that is important to you."
+                        },
+                        {
+                                "slug": "can-i-delete-my-user-account",
+                                "question": "Can I delete my user account?",
+                                "answer": "Yes. You can delete your user account where the app provides the account deletion feature. Make sure you understand what will happen to local and server-side data first."
+                        },
+                        {
+                                "slug": "what-happens-to-my-data-when-i-delete-my-user-account",
+                                "question": "What happens to my data when I delete my user account?",
+                                "answer": "Deleting your account removes account-related data according to the app rules and legal requirements. Some local data on your device may need to be removed separately by clearing app or browser storage."
+                        }
+                ]
+        }
     ],
   },
 ];
@@ -959,6 +1195,242 @@ const germanFaqPages = [
           },
         ],
       },
+        {
+                "title": "Nutzung mit Nutzerkonto · Nutzerkonto & Profil",
+                "intro": "Fragen zu Nutzeridentität, PIN, Profil und der Nutzung auf mehreren Geräten.",
+                "items": [
+                        {
+                                "slug": "was-aendert-sich-wenn-ich-ein-nutzerkonto-verwende",
+                                "question": "Was ändert sich, wenn ich ein Nutzerkonto verwende?",
+                                "answer": "Mit einem Nutzerkonto kannst Du eigene öffentliche Nachrichten erstellen und verwalten, private Inhalte nutzen, Orte pflegen, Kontakte verwenden und Funktionen nutzen, die eine stabile Nutzeridentität oder Backend-Verbindung benötigen."
+                        },
+                        {
+                                "slug": "wie-erstelle-ich-ein-nutzerkonto",
+                                "question": "Wie erstelle ich ein Nutzerkonto?",
+                                "answer": "Du erstellst ein Nutzerkonto direkt in der App. MessageDrop führt Dich durch die nötigen Schritte, einschließlich PIN-Erstellung und Einrichtung Deiner lokalen Nutzeridentität."
+                        },
+                        {
+                                "slug": "warum-brauche-ich-eine-pin",
+                                "question": "Warum brauche ich eine PIN?",
+                                "answer": "Die PIN schützt Deine lokale Nutzeridentität und sensible Aktionen auf Deinem Gerät. Sie ist Teil des Sicherheitskonzepts für private und kontobezogene Funktionen."
+                        },
+                        {
+                                "slug": "was-passiert-wenn-ich-meine-pin-vergesse",
+                                "question": "Was passiert, wenn ich meine PIN vergesse?",
+                                "answer": "Wenn Du Deine PIN vergisst, kann der Zugriff auf lokal geschützte Daten eingeschränkt sein oder verloren gehen. Weil MessageDrop Daten möglichst lokal hält, sind Backups wichtig."
+                        },
+                        {
+                                "slug": "welche-informationen-enthaelt-mein-profil",
+                                "question": "Welche Informationen enthält mein Profil?",
+                                "answer": "Dein Profil kann Informationen wie Anzeigenamen, Avatar und Profildetails enthalten. Sie helfen Dir, Dein Konto wiederzuerkennen, und können anderen Nutzern dort helfen, wo Profilinformationen verwendet werden."
+                        },
+                        {
+                                "slug": "kann-ich-mein-profil-spaeter-aendern",
+                                "question": "Kann ich mein Profil später ändern?",
+                                "answer": "Ja. Du kannst Dein Profil später in der App aktualisieren. Änderungen können beeinflussen, wie Dein Profil an Stellen angezeigt wird, an denen Profilinformationen genutzt werden."
+                        },
+                        {
+                                "slug": "ist-mein-profil-fuer-andere-sichtbar",
+                                "question": "Ist mein Profil für andere sichtbar?",
+                                "answer": "Einige Profilinformationen können in Verbindung mit öffentlichen Nachrichten oder Kontakten für andere Nutzer sichtbar sein. Lokale Profile, die Du für andere Nutzer anlegst, sind nur für Dein eigenes Gerät gedacht."
+                        },
+                        {
+                                "slug": "kann-ich-messagedrop-auf-mehreren-geraeten-nutzen",
+                                "question": "Kann ich MessageDrop auf mehreren Geräten nutzen?",
+                                "answer": "Einige Funktionen können auf mehreren Geräten genutzt werden, wenn Backend-Verbindung und Synchronisierung verfügbar sind. Daten, die nur lokal auf einem Gerät liegen, erscheinen nicht automatisch auf einem anderen Gerät."
+                        }
+                ]
+        },
+        {
+                "title": "Nutzung mit Nutzerkonto · Eigene öffentliche Nachrichten",
+                "intro": "Fragen zum Erstellen, Bearbeiten, Löschen und Moderieren eigener öffentlicher Nachrichten.",
+                "items": [
+                        {
+                                "slug": "kann-ich-eigene-oeffentliche-nachrichten-erstellen",
+                                "question": "Kann ich eigene öffentliche Nachrichten erstellen?",
+                                "answer": "Ja. Mit geeigneter Nutzeridentität und Backend-Verbindung kannst Du öffentliche Nachrichten erstellen und an realen Orten auf der Karte platzieren."
+                        },
+                        {
+                                "slug": "wo-erscheinen-meine-oeffentlichen-nachrichten",
+                                "question": "Wo erscheinen meine öffentlichen Nachrichten?",
+                                "answer": "Öffentliche Nachrichten erscheinen an dem Ort, den Du auf der Karte auswählst. Andere Nutzer können sie abhängig von Standort, Sucheinstellungen, Verfügbarkeit und Moderationsstatus entdecken."
+                        },
+                        {
+                                "slug": "kann-ich-meine-oeffentlichen-nachrichten-spaeter-bearbeiten",
+                                "question": "Kann ich meine öffentlichen Nachrichten später bearbeiten?",
+                                "answer": "Ja. Du kannst eigene öffentliche Nachrichten bearbeiten, wenn die App Dich als Eigentümer erkennt und die Nachricht noch bearbeitet werden kann."
+                        },
+                        {
+                                "slug": "kann-ich-meine-oeffentlichen-nachrichten-loeschen",
+                                "question": "Kann ich meine öffentlichen Nachrichten löschen?",
+                                "answer": "Ja. Du kannst eigene öffentliche Nachrichten löschen. MessageDrop ist so ausgelegt, dass Löschen dort wirklich entfernt, wo das System die Daten kontrolliert."
+                        },
+                        {
+                                "slug": "warum-kann-eine-oeffentliche-nachricht-moderiert-oder-entfernt-werden",
+                                "question": "Warum kann eine öffentliche Nachricht moderiert oder entfernt werden?",
+                                "answer": "Öffentliche Nachrichten können moderiert oder entfernt werden, wenn sie Regeln verletzen, rechtswidrige Inhalte enthalten, personenbezogene Daten offenlegen, gemeldet werden oder Sicherheits- und Rechtsanforderungen widersprechen."
+                        },
+                        {
+                                "slug": "kann-ich-externe-inhalte-in-oeffentliche-nachrichten-einbinden",
+                                "question": "Kann ich externe Inhalte in öffentliche Nachrichten einbinden?",
+                                "answer": "Ja, soweit unterstützt. Du kannst Inhalte von unterstützten externen Plattformen verlinken oder einbinden. Externe Anbieter bleiben eigenständige Dienste mit eigenen Bedingungen und Datenschutzregeln."
+                        },
+                        {
+                                "slug": "kann-ich-sehen-wie-andere-auf-meine-oeffentlichen-nachrichten-reagieren",
+                                "question": "Kann ich sehen, wie andere auf meine öffentlichen Nachrichten reagieren?",
+                                "answer": "MessageDrop kann Reaktionen oder Interaktionshinweise anzeigen, wenn solche Funktionen verfügbar sind. Diese Hinweise machen öffentliche Nachrichten aber nicht zu einem algorithmischen Popularitäts-Feed."
+                        }
+                ]
+        },
+        {
+                "title": "Nutzung mit Nutzerkonto · Private Inhalte",
+                "intro": "Fragen zu privaten Notizen, Bildern, Dokumenten und lokaler Speicherung.",
+                "items": [
+                        {
+                                "slug": "was-sind-private-notizen",
+                                "question": "Was sind private Notizen?",
+                                "answer": "Private Notizen sind persönliche Notizen, die Du für Dich selbst erstellst. Sie sind für Deine eigene Nutzung gedacht und von öffentlichen Nachrichten auf der Karte getrennt."
+                        },
+                        {
+                                "slug": "wer-kann-meine-privaten-notizen-sehen",
+                                "question": "Wer kann meine privaten Notizen sehen?",
+                                "answer": "Private Notizen sind dafür gedacht, nur für Dich sichtbar zu sein. Der Zugriff hängt dennoch von Gerätesicherheit, Browser-Speicher, Backups und Deinem Umgang mit dem Gerät ab."
+                        },
+                        {
+                                "slug": "kann-ich-private-bilder-speichern",
+                                "question": "Kann ich private Bilder speichern?",
+                                "answer": "Ja. MessageDrop enthält Funktionen für private Bilder, damit Du bildbasierte Inhalte für Dich behalten kannst, statt sie öffentlich zu veröffentlichen."
+                        },
+                        {
+                                "slug": "kann-ich-private-dokumente-speichern",
+                                "question": "Kann ich private Dokumente speichern?",
+                                "answer": "Ja. Du kannst private Dokumente speichern, wenn die Funktion verfügbar ist. Wie bei anderen privaten Inhalten solltest Du Backups erstellen, wenn die Daten wichtig sind."
+                        },
+                        {
+                                "slug": "wo-werden-private-inhalte-gespeichert",
+                                "question": "Wo werden private Inhalte gespeichert?",
+                                "answer": "Private Inhalte sollen wann immer möglich lokal auf Deinem Gerät bleiben. Einige Funktionen können Backend-Unterstützung benötigen, aber Local-first-Speicherung ist ein wichtiger Teil von MessageDrop."
+                        },
+                        {
+                                "slug": "kann-ich-private-inhalte-spaeter-loeschen",
+                                "question": "Kann ich private Inhalte später löschen?",
+                                "answer": "Ja. Du kannst private Inhalte löschen, die Du in der App verwaltest. Wenn Daten nur auf Deinem Gerät liegen, kann auch das Löschen oder Verlieren lokaler Speicherbereiche diese Daten entfernen."
+                        },
+                        {
+                                "slug": "was-passiert-mit-privaten-inhalten-wenn-ich-das-geraet-wechsle",
+                                "question": "Was passiert mit privaten Inhalten, wenn ich das Gerät wechsle?",
+                                "answer": "Private Inhalte, die nur lokal gespeichert sind, wechseln nicht automatisch auf ein neues Gerät. Nutze verfügbare Backup- und Wiederherstellungsfunktionen, bevor Du Geräte wechselst oder Browserdaten löschst."
+                        }
+                ]
+        },
+        {
+                "title": "Nutzung mit Nutzerkonto · Orte",
+                "intro": "Fragen zum Erstellen, Bearbeiten, Folgen und Pflegen von Orten.",
+                "items": [
+                        {
+                                "slug": "kann-ich-eigene-orte-erstellen",
+                                "question": "Kann ich eigene Orte erstellen?",
+                                "answer": "Ja. Mit den erforderlichen Nutzerfunktionen kannst Du Orte erstellen und Informationen mit realen Standorten verbinden."
+                        },
+                        {
+                                "slug": "was-ist-ein-ort-in-messagedrop",
+                                "question": "Was ist ein Ort in MessageDrop?",
+                                "answer": "Ein Ort ist ein standortbezogener Eintrag auf der Karte. Dort kann Kontext wie Nachrichten, Kacheln, Wetter, Luftqualität, Erlebnisse und weitere nützliche Informationen rund um diesen Standort gesammelt werden."
+                        },
+                        {
+                                "slug": "kann-ich-orte-bearbeiten",
+                                "question": "Kann ich Orte bearbeiten?",
+                                "answer": "Ja, wenn Du die nötigen Rechte oder die passende Zuständigkeit hast. Bearbeiten hilft dabei, Ortsinformationen nützlich und aktuell zu halten."
+                        },
+                        {
+                                "slug": "kann-ich-orten-folgen",
+                                "question": "Kann ich Orten folgen?",
+                                "answer": "Ja. Orten zu folgen hilft Dir, Standorte im Blick zu behalten, die Dir wichtig sind, zum Beispiel Dein Zuhause, Dein Lieblingscafé, Dein Arbeitsplatz oder ein Reiseziel."
+                        },
+                        {
+                                "slug": "was-passiert-wenn-an-einem-gefolgten-ort-neue-inhalte-erscheinen",
+                                "question": "Was passiert, wenn an einem gefolgten Ort neue Inhalte erscheinen?",
+                                "answer": "Wenn an einem gefolgten Ort neue relevante Inhalte erscheinen, kann MessageDrop sie in der App oder über verfügbare Benachrichtigungsfunktionen anzeigen, abhängig von Deinen Einstellungen und Berechtigungen."
+                        },
+                        {
+                                "slug": "kann-ich-informationen-zu-einem-ort-ergaenzen",
+                                "question": "Kann ich Informationen zu einem Ort ergänzen?",
+                                "answer": "Ja. Du kannst Informationen rund um Orte ergänzen oder pflegen, wenn die Funktion verfügbar ist. Dadurch werden Orte für Dich und andere Nutzer nützlicher."
+                        }
+                ]
+        },
+        {
+                "title": "Nutzung mit Nutzerkonto · Kontakte & private Kommunikation",
+                "intro": "Fragen zum Verbinden mit Menschen und zum Austausch privater Nachrichten.",
+                "items": [
+                        {
+                                "slug": "kann-ich-andere-nutzer-kontaktieren",
+                                "question": "Kann ich andere Nutzer kontaktieren?",
+                                "answer": "Ja. MessageDrop enthält Kontakt- und private Kommunikationsfunktionen für Nutzer, die sich miteinander verbinden."
+                        },
+                        {
+                                "slug": "wie-verbinde-ich-mich-mit-anderen-nutzern",
+                                "question": "Wie verbinde ich mich mit anderen Nutzern?",
+                                "answer": "Am einfachsten verbindest Du Dich mit Menschen, die Du bereits kennst, zum Beispiel indem Ihr persönlich einen Connect-QR-Code scannt. Online-Verbindungen sind möglich, aber Du solltest wissen, mit wem Du Dich verbindest."
+                        },
+                        {
+                                "slug": "warum-sollte-ich-kontakte-nur-mit-personen-erstellen-die-ich-kenne",
+                                "question": "Warum sollte ich Kontakte nur mit Personen erstellen, die ich kenne?",
+                                "answer": "Private Kommunikation funktioniert am besten, wenn Du die andere Person kennst und ihr vertraust. Verbindungen nur mit bekannten Personen reduzieren Missbrauch, Spam und Missverständnisse."
+                        },
+                        {
+                                "slug": "sind-private-nachrichten-verschluesselt",
+                                "question": "Sind private Nachrichten verschlüsselt?",
+                                "answer": "Private Kommunikation ist so angelegt, dass sie verschlüsselt und signiert übertragen wird. Die kryptografischen Schlüssel werden auf Deinem Gerät erzeugt, und private Schlüssel sollen auf Deinem Gerät bleiben."
+                        },
+                        {
+                                "slug": "kann-messagedrop-meine-privaten-nachrichten-lesen",
+                                "question": "Kann MessageDrop meine privaten Nachrichten lesen?",
+                                "answer": "MessageDrop ist so ausgelegt, dass private Kommunikation technisch geschützt ist. Inhalte privater Nachrichten sollen grundsätzlich nicht im Klartext von MessageDrop gelesen werden können."
+                        },
+                        {
+                                "slug": "was-passiert-wenn-ich-einen-kontakt-loesche",
+                                "question": "Was passiert, wenn ich einen Kontakt lösche?",
+                                "answer": "Wenn Du einen Kontakt löschst, entfernst Du diese Verbindung aus Deinem App-Kontext. Je nach lokalem Speicher und Nachrichtenverlauf musst Du zugehörige lokale Daten eventuell zusätzlich verwalten."
+                        }
+                ]
+        },
+        {
+                "title": "Nutzung mit Nutzerkonto · Daten, Backup & Sicherheit",
+                "intro": "Fragen zu Backups, Synchronisierung, Geräteverlust und Kontolöschung.",
+                "items": [
+                        {
+                                "slug": "warum-sollte-ich-ein-backup-erstellen",
+                                "question": "Warum sollte ich ein Backup erstellen?",
+                                "answer": "Backups sind wichtig, weil MessageDrop viele Daten möglichst lokal auf Deinem Gerät hält. Wenn Gerät oder Browserdaten verloren gehen, kann ein Backup die einzige Möglichkeit sein, wichtige Inhalte wiederherzustellen."
+                        },
+                        {
+                                "slug": "welche-daten-werden-synchronisiert",
+                                "question": "Welche Daten werden synchronisiert?",
+                                "answer": "Daten, die Backend-Unterstützung brauchen, zum Beispiel veröffentlichte öffentliche Inhalte oder kontobezogene Serverdaten, können synchronisiert werden. Rein lokale private Daten bleiben möglicherweise nur auf Deinem Gerät, solange kein Backup oder Restore genutzt wird."
+                        },
+                        {
+                                "slug": "welche-daten-bleiben-nur-auf-meinem-geraet",
+                                "question": "Welche Daten bleiben nur auf meinem Gerät?",
+                                "answer": "Lokale Einstellungen, private Inhalte, lokale Profile und andere gerätespezifische Daten können nur auf Deinem Gerät bleiben. Das genaue Verhalten hängt von der jeweiligen Funktion und Deinen App-Einstellungen ab."
+                        },
+                        {
+                                "slug": "was-passiert-wenn-ich-mein-geraet-verliere",
+                                "question": "Was passiert, wenn ich mein Gerät verliere?",
+                                "answer": "Wenn Du Dein Gerät verlierst, können auch lokale Daten verloren gehen. Schütze Dein Gerät, bewahre Deine PIN sicher auf und erstelle Backups für Daten, die Dir wichtig sind."
+                        },
+                        {
+                                "slug": "kann-ich-mein-nutzerkonto-loeschen",
+                                "question": "Kann ich mein Nutzerkonto löschen?",
+                                "answer": "Ja. Du kannst Dein Nutzerkonto löschen, wenn die App die Kontolöschfunktion bereitstellt. Vorher solltest Du verstehen, was mit lokalen und serverseitigen Daten passiert."
+                        },
+                        {
+                                "slug": "was-passiert-mit-meinen-daten-wenn-ich-mein-nutzerkonto-loesche",
+                                "question": "Was passiert mit meinen Daten, wenn ich mein Nutzerkonto lösche?",
+                                "answer": "Beim Löschen Deines Kontos werden kontobezogene Daten nach den App-Regeln und gesetzlichen Anforderungen entfernt. Manche lokalen Daten auf Deinem Gerät musst Du eventuell zusätzlich durch Löschen von App- oder Browser-Speicher entfernen."
+                        }
+                ]
+        }
     ],
   },
 ];
@@ -1967,18 +2439,16 @@ function renderPublicUiScript() {
   sync();
 });
 
-document.querySelectorAll('.faq-list').forEach((list) => {
-  const items = Array.from(list.querySelectorAll('details.faq-item'));
-  items.forEach((item) => {
-    item.addEventListener('toggle', () => {
-      if (!item.open) {
-        return;
+const faqItems = Array.from(document.querySelectorAll('details.faq-item'));
+faqItems.forEach((item) => {
+  item.addEventListener('toggle', () => {
+    if (!item.open) {
+      return;
+    }
+    faqItems.forEach((other) => {
+      if (other !== item && other.getAttribute('name') === item.getAttribute('name')) {
+        other.open = false;
       }
-      items.forEach((other) => {
-        if (other !== item) {
-          other.open = false;
-        }
-      });
     });
   });
 });\n`;

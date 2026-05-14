@@ -32,18 +32,16 @@ document.querySelectorAll('.site-menu-toggle').forEach((button) => {
   sync();
 });
 
-document.querySelectorAll('.faq-list').forEach((list) => {
-  const items = Array.from(list.querySelectorAll('details.faq-item'));
-  items.forEach((item) => {
-    item.addEventListener('toggle', () => {
-      if (!item.open) {
-        return;
+const faqItems = Array.from(document.querySelectorAll('details.faq-item'));
+faqItems.forEach((item) => {
+  item.addEventListener('toggle', () => {
+    if (!item.open) {
+      return;
+    }
+    faqItems.forEach((other) => {
+      if (other !== item && other.getAttribute('name') === item.getAttribute('name')) {
+        other.open = false;
       }
-      items.forEach((other) => {
-        if (other !== item) {
-          other.open = false;
-        }
-      });
     });
   });
 });
