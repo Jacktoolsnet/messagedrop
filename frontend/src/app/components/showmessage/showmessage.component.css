@@ -1,5 +1,13 @@
+:host {
+    display: block;
+    max-width: 100%;
+    min-width: 0;
+}
+
 .message_container {
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -8,9 +16,10 @@
 
 .message {
     max-width: 100%;
+    min-width: 0;
     word-wrap: break-word;
     word-break: break-word;
-    overflow-wrap: break-word;
+    overflow-wrap: anywhere;
     white-space: pre-wrap;
     text-align: center;
     line-height: 1.45;
