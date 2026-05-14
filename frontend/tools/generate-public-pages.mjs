@@ -1557,7 +1557,7 @@ function renderMarketingPage(page) {
           ${page.faqs
             .map(
               (item, index) => `
-              <details class="faq-item" id="${escapeHtml(item.slug ?? `faq-${index + 1}`)}"${index === 0 ? ' open' : ''}>
+              <details class="faq-item" name="faq-${escapeHtml(page.pageKey ?? page.slug ?? page.lang)}" id="${escapeHtml(item.slug ?? `faq-${index + 1}`)}"${index === 0 ? ' open' : ''}>
                 <summary>${escapeHtml(item.question)}</summary>
                 <div class="faq-answer"><p>${escapeHtml(item.answer)}</p></div>
               </details>
