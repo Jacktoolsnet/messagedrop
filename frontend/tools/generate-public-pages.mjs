@@ -279,6 +279,88 @@ const marketingPages = [
   },
 ];
 
+
+const faqPages = [
+  {
+    pageKey: 'faq',
+    route: '/faq/',
+    slug: 'faq',
+    lang: 'en',
+    title: 'Frequently Asked Questions about MessageDrop',
+    description: 'Answers to frequently asked general questions about MessageDrop, registration, costs, age requirements, languages, devices, and the operator.',
+    heroIcon: 'quiz',
+    heroTitle: 'Frequently asked questions about MessageDrop.',
+    heroText: 'Start here if you want a quick overview of what MessageDrop is, who it is for, and how you can use it.',
+    showLegalCta: false,
+    showPrimaryCta: false,
+    heroAsideTitle: 'General questions',
+    heroAsideItems: [
+      'Short answers for a quick first overview.',
+      'Only one answer opens at a time, so the page stays easy to scan.',
+      'We will add more categories later as real user questions come in.',
+    ],
+    faqTitle: 'General',
+    faqIntro: 'These first questions cover the basic ideas behind MessageDrop.',
+    faqs: [
+      {
+        slug: 'what-is-messagedrop',
+        question: 'What is MessageDrop?',
+        answer: 'MessageDrop is a location-based web app. You can leave public messages at real-world places on a map, follow places that matter to you, and use private content and communication features.',
+      },
+      {
+        slug: 'what-can-i-use-messagedrop-for',
+        question: 'What can I use MessageDrop for?',
+        answer: 'You can use MessageDrop to share information connected to places, discover current messages nearby, keep private notes, follow important places, and connect with people you already know.',
+      },
+      {
+        slug: 'do-i-have-to-register',
+        question: 'Do I have to register to use MessageDrop?',
+        answer: 'You can open MessageDrop without a classic email-and-password registration. Some functions need a local user identity or a connection to the backend so that your own content can be assigned and synchronized securely.',
+      },
+      {
+        slug: 'is-messagedrop-free',
+        question: 'Is MessageDrop free?',
+        answer: 'MessageDrop can currently be used without a usage fee. Costs charged by your internet provider, mobile provider, device, app store, or third-party services are not controlled by MessageDrop.',
+      },
+      {
+        slug: 'how-old-do-i-have-to-be',
+        question: 'How old do I have to be to use MessageDrop?',
+        answer: 'You must be at least 16 years old to use MessageDrop. If additional legal requirements apply in your country, you must also follow those requirements.',
+      },
+      {
+        slug: 'is-messagedrop-available-in-multiple-languages',
+        question: 'Is MessageDrop available in multiple languages?',
+        answer: 'Yes. MessageDrop supports multiple languages. German and English are the main languages for the public pages and legal information; the app also contains additional language options.',
+      },
+      {
+        slug: 'who-is-messagedrop-for',
+        question: 'Who is MessageDrop for?',
+        answer: 'MessageDrop is for people who want to connect information with places: private users, friends, local communities, travelers, creators, and anyone who wants a map-based way to share or remember context.',
+      },
+      {
+        slug: 'do-i-need-an-app',
+        question: 'Do I need to install an app to use MessageDrop?',
+        answer: 'No separate app installation is required. MessageDrop runs in the browser and can be opened as a web app. Depending on your device and browser, you may also be able to add it to your home screen.',
+      },
+      {
+        slug: 'does-messagedrop-work-on-mobile-tablet-desktop',
+        question: 'Does MessageDrop work on smartphones, tablets, and desktop computers?',
+        answer: 'Yes. MessageDrop is designed as a responsive web app and can be used on smartphones, tablets, and desktop browsers. Some functions, such as location access, depend on your device and browser permissions.',
+      },
+      {
+        slug: 'who-operates-messagedrop',
+        question: 'Who operates MessageDrop?',
+        answer: 'MessageDrop is operated by JackTools.Net UG (limited liability). You can find the current provider details and contact information in the legal notice.',
+      },
+      {
+        slug: 'is-messagedrop-a-messenger',
+        question: 'Is MessageDrop a messenger?',
+        answer: 'MessageDrop is not a classic messenger or social feed. The core idea is to connect messages and information with places. Private communication exists, but the app is built around places rather than around follower counts or algorithmic feeds.',
+      },
+    ],
+  },
+];
+
 const legalPages = [
   {
     route: '/privacy/',
@@ -643,6 +725,88 @@ const germanMarketingPages = [
   },
 ];
 
+
+const germanFaqPages = [
+  {
+    pageKey: 'faq',
+    route: '/faq/',
+    slug: 'faq',
+    lang: 'de',
+    title: 'Häufige Fragen zu MessageDrop',
+    description: 'Antworten auf häufige allgemeine Fragen zu MessageDrop, Registrierung, Kosten, Mindestalter, Sprachen, Geräten und Betreiber.',
+    heroIcon: 'quiz',
+    heroTitle: 'Häufige Fragen zu MessageDrop.',
+    heroText: 'Starte hier, wenn Du schnell verstehen möchtest, was MessageDrop ist, für wen es gedacht ist und wie Du es nutzen kannst.',
+    showLegalCta: false,
+    showPrimaryCta: false,
+    heroAsideTitle: 'Allgemeine Fragen',
+    heroAsideItems: [
+      'Kurze Antworten für einen schnellen ersten Überblick.',
+      'Es ist immer nur eine Antwort geöffnet, damit die Seite übersichtlich bleibt.',
+      'Weitere Kategorien ergänzen wir später, wenn echte Nutzerfragen dazukommen.',
+    ],
+    faqTitle: 'Allgemein',
+    faqIntro: 'Diese ersten Fragen erklären die Grundidee von MessageDrop.',
+    faqs: [
+      {
+        slug: 'was-ist-messagedrop',
+        question: 'Was ist MessageDrop?',
+        answer: 'MessageDrop ist eine ortsbezogene Web-App. Du kannst öffentliche Nachrichten an realen Orten auf einer Karte hinterlassen, Orten folgen, die Dir wichtig sind, und private Inhalte sowie Kommunikationsfunktionen nutzen.',
+      },
+      {
+        slug: 'wofuer-kann-ich-messagedrop-verwenden',
+        question: 'Wofür kann ich MessageDrop verwenden?',
+        answer: 'Du kannst MessageDrop nutzen, um Informationen mit Orten zu verbinden, aktuelle Nachrichten in Deiner Umgebung zu entdecken, private Notizen zu speichern, wichtigen Orten zu folgen und Dich mit Menschen zu verbinden, die Du bereits kennst.',
+      },
+      {
+        slug: 'muss-ich-mich-registrieren',
+        question: 'Muss ich mich registrieren, um MessageDrop zu nutzen?',
+        answer: 'Du kannst MessageDrop ohne klassische Registrierung mit E-Mail und Passwort öffnen. Einige Funktionen benötigen eine lokale Nutzeridentität oder eine Verbindung zum Backend, damit eigene Inhalte sicher zugeordnet und synchronisiert werden können.',
+      },
+      {
+        slug: 'ist-messagedrop-kostenlos',
+        question: 'Ist MessageDrop kostenlos?',
+        answer: 'MessageDrop kann aktuell ohne Nutzungsgebühr verwendet werden. Kosten Deines Internetanbieters, Mobilfunkanbieters, Geräts, App-Stores oder externer Dienste werden nicht von MessageDrop gesteuert.',
+      },
+      {
+        slug: 'wie-alt-muss-ich-sein',
+        question: 'Wie alt muss ich sein, um MessageDrop zu nutzen?',
+        answer: 'Du musst mindestens 16 Jahre alt sein, um MessageDrop zu nutzen. Wenn in Deinem Land zusätzliche rechtliche Anforderungen gelten, musst Du auch diese Anforderungen beachten.',
+      },
+      {
+        slug: 'gibt-es-messagedrop-in-mehreren-sprachen',
+        question: 'Gibt es MessageDrop in mehreren Sprachen?',
+        answer: 'Ja. MessageDrop unterstützt mehrere Sprachen. Deutsch und Englisch sind die Hauptsprachen für die öffentlichen Seiten und rechtlichen Informationen; in der App gibt es zusätzliche Sprachoptionen.',
+      },
+      {
+        slug: 'fuer-wen-ist-messagedrop-gedacht',
+        question: 'Für wen ist MessageDrop gedacht?',
+        answer: 'MessageDrop ist für Menschen gedacht, die Informationen mit Orten verbinden möchten: private Nutzer, Freunde, lokale Gemeinschaften, Reisende, Kreative und alle, die ortsbezogene Inhalte teilen oder merken wollen.',
+      },
+      {
+        slug: 'brauche-ich-eine-app',
+        question: 'Brauche ich eine App, um MessageDrop zu nutzen?',
+        answer: 'Nein, Du musst keine separate App installieren. MessageDrop läuft im Browser und kann als Web-App geöffnet werden. Je nach Gerät und Browser kannst Du MessageDrop auch zum Startbildschirm hinzufügen.',
+      },
+      {
+        slug: 'funktioniert-messagedrop-auf-smartphone-tablet-desktop',
+        question: 'Funktioniert MessageDrop auf Smartphone, Tablet und Desktop?',
+        answer: 'Ja. MessageDrop ist als responsive Web-App angelegt und kann auf Smartphones, Tablets und Desktop-Browsern genutzt werden. Einige Funktionen, zum Beispiel Standortzugriff, hängen von Deinem Gerät und Deinen Browser-Berechtigungen ab.',
+      },
+      {
+        slug: 'wer-betreibt-messagedrop',
+        question: 'Wer betreibt MessageDrop?',
+        answer: 'MessageDrop wird von der JackTools.Net UG (haftungsbeschränkt) betrieben. Die aktuellen Anbieter- und Kontaktinformationen findest Du im Impressum.',
+      },
+      {
+        slug: 'ist-messagedrop-ein-messenger',
+        question: 'Ist MessageDrop ein Messenger?',
+        answer: 'MessageDrop ist kein klassischer Messenger und kein klassischer Social Feed. Die Grundidee ist, Nachrichten und Informationen mit Orten zu verbinden. Private Kommunikation gibt es, aber die App ist um Orte herum aufgebaut und nicht um Followerzahlen oder algorithmische Feeds.',
+      },
+    ],
+  },
+];
+
 const germanLegalPages = [
   {
     route: '/privacy/',
@@ -746,6 +910,7 @@ const uiByLocale = {
     navWhat: 'Was ist MessageDrop?',
     navHow: 'So funktioniert MessageDrop',
     navLegal: 'Rechtliches',
+    navFaq: 'FAQ',
     openApp: 'MessageDrop App öffnen',
     brandHome: 'MessageDrop-App öffnen',
     primaryNav: 'Hauptnavigation',
@@ -753,6 +918,7 @@ const uiByLocale = {
     footerWhat: 'Was ist MessageDrop?',
     footerHow: 'So funktioniert MessageDrop',
     footerLegal: 'Rechtliches',
+    footerFaq: 'FAQ',
     footerCreditPrefix: 'Für Dich mit',
     footerCreditAnd: 'und',
     footerCreditSuffix: 'entwickelt von',
@@ -766,6 +932,7 @@ const uiByLocale = {
     navWhat: 'What is MessageDrop?',
     navHow: 'How MessageDrop works',
     navLegal: 'Legal',
+    navFaq: 'FAQ',
     openApp: 'Open MessageDrop app',
     brandHome: 'Open MessageDrop app',
     primaryNav: 'Primary navigation',
@@ -773,6 +940,7 @@ const uiByLocale = {
     footerWhat: 'What is MessageDrop?',
     footerHow: 'How MessageDrop works',
     footerLegal: 'Legal',
+    footerFaq: 'FAQ',
     footerCreditPrefix: 'Built for you with',
     footerCreditAnd: 'and',
     footerCreditSuffix: 'by',
@@ -784,11 +952,13 @@ const uiByLocale = {
   },
 };
 
-const englishMarketingByKey = new Map(marketingPages.map((page) => [page.pageKey, page]));
-const germanMarketingByKey = new Map(germanMarketingPages.map((page) => [page.pageKey, page]));
+const allEnglishMarketingPages = [...marketingPages, ...faqPages];
+const allGermanMarketingPages = [...germanMarketingPages, ...germanFaqPages];
+const englishMarketingByKey = new Map(allEnglishMarketingPages.map((page) => [page.pageKey, page]));
+const germanMarketingByKey = new Map(allGermanMarketingPages.map((page) => [page.pageKey, page]));
 
 const localizedMarketingPages = supportedLocales.flatMap((locale) => {
-  const sourcePages = locale === 'de' ? germanMarketingPages : marketingPages;
+  const sourcePages = locale === 'de' ? allGermanMarketingPages : allEnglishMarketingPages;
   return sourcePages.map((page) => ({
     ...page,
     locale,
@@ -816,7 +986,7 @@ const redirectPages = [
     deHref: getLocalizedMarketingRoute('de', 'what-is-messagedrop'),
     enHref: getLocalizedMarketingRoute('en', 'what-is-messagedrop'),
   },
-  ...marketingPages.map((page) => ({
+  ...allEnglishMarketingPages.map((page) => ({
     route: page.route,
     pageKey: page.pageKey,
     englishTitle: page.title,
@@ -826,7 +996,7 @@ const redirectPages = [
   })),
 ];
 
-const legacyGermanRedirectPages = marketingPages
+const legacyGermanRedirectPages = allEnglishMarketingPages
   .map((page) => ({
     route: localeRoute('de', page.route),
     target: getLocalizedMarketingRoute('de', page.pageKey),
@@ -834,11 +1004,14 @@ const legacyGermanRedirectPages = marketingPages
   }))
   .filter((page) => normalizeRoute(page.route) !== normalizeRoute(page.target));
 
-const germanAliasRedirectPages = germanMarketingPages.map((page) => ({
-  route: page.route,
-  target: getLocalizedMarketingRoute('de', page.pageKey),
-  title: page.title,
-}));
+const englishBaseRoutes = new Set(allEnglishMarketingPages.map((page) => normalizeRoute(page.route)));
+const germanAliasRedirectPages = allGermanMarketingPages
+  .map((page) => ({
+    route: page.route,
+    target: getLocalizedMarketingRoute('de', page.pageKey),
+    title: page.title,
+  }))
+  .filter((page) => !englishBaseRoutes.has(normalizeRoute(page.route)));
 
 const allRoutes = ['/', ...localizedMarketingPages.map((page) => page.route), ...localizedLegalPages.map((page) => page.route)];
 
@@ -1016,6 +1189,7 @@ function renderNav(currentRoute, lang = 'en') {
     { href: getLocalizedMarketingRoute(lang, 'what-is-messagedrop'), label: ui.navWhat },
     { href: getLocalizedMarketingRoute(lang, 'how-it-works'), label: ui.navHow },
     { href: getLocalizedMarketingRoute(lang, 'legal'), label: ui.navLegal },
+    { href: getLocalizedMarketingRoute(lang, 'faq'), label: ui.navFaq },
   ];
 
   return navItems
@@ -1060,6 +1234,7 @@ function renderFooter(lang = 'en') {
     { href: getLocalizedMarketingRoute(lang, 'what-is-messagedrop'), label: ui.footerWhat },
     { href: getLocalizedMarketingRoute(lang, 'how-it-works'), label: ui.footerHow },
     { href: getLocalizedMarketingRoute(lang, 'legal'), label: ui.footerLegal },
+    { href: getLocalizedMarketingRoute(lang, 'faq'), label: ui.footerFaq },
   ];
 
   return `
@@ -1375,14 +1550,14 @@ function renderMarketingPage(page) {
     body.push(`
       <section class="content-section">
         <div class="section-heading">
-          <h2>${isGerman ? 'Häufige Fragen' : 'Frequently asked questions'}</h2>
-          <p>${isGerman ? 'Jede Antwort ist bewusst in Klartext formuliert, damit sie leicht indexiert und zitiert werden kann.' : 'Each answer is written in clear text so it can be indexed and cited easily.'}</p>
+          <h2>${escapeHtml(page.faqTitle ?? (isGerman ? 'Häufige Fragen' : 'Frequently asked questions'))}</h2>
+          <p>${escapeHtml(page.faqIntro ?? (isGerman ? 'Jede Antwort ist bewusst in Klartext formuliert, damit sie leicht indexiert und zitiert werden kann.' : 'Each answer is written in clear text so it can be indexed and cited easily.'))}</p>
         </div>
         <div class="faq-list">
           ${page.faqs
             .map(
               (item, index) => `
-              <details class="faq-item"${index === 0 ? ' open' : ''}>
+              <details class="faq-item" id="${escapeHtml(item.slug ?? `faq-${index + 1}`)}"${index === 0 ? ' open' : ''}>
                 <summary>${escapeHtml(item.question)}</summary>
                 <div class="faq-answer"><p>${escapeHtml(item.answer)}</p></div>
               </details>
@@ -1614,6 +1789,22 @@ function renderPublicUiScript() {
   });
 
   sync();
+});
+
+document.querySelectorAll('.faq-list').forEach((list) => {
+  const items = Array.from(list.querySelectorAll('details.faq-item'));
+  items.forEach((item) => {
+    item.addEventListener('toggle', () => {
+      if (!item.open) {
+        return;
+      }
+      items.forEach((other) => {
+        if (other !== item) {
+          other.open = false;
+        }
+      });
+    });
+  });
 });\n`;
 }
 

@@ -2142,6 +2142,11 @@ export class AppComponent implements OnInit {
     });
   }
 
+  public openFaqPage(): void {
+    const lang = this.languageService.effectiveLanguage() === 'de' ? 'de' : 'en';
+    window.open(`https://messagedrop.de/${lang}/faq/`, '_blank', 'noopener');
+  }
+
   public showLegalNotice() {
     this.dialog.open(LegalNoticeComponent, {
       data: {},

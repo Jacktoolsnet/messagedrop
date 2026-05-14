@@ -31,3 +31,19 @@ document.querySelectorAll('.site-menu-toggle').forEach((button) => {
 
   sync();
 });
+
+document.querySelectorAll('.faq-list').forEach((list) => {
+  const items = Array.from(list.querySelectorAll('details.faq-item'));
+  items.forEach((item) => {
+    item.addEventListener('toggle', () => {
+      if (!item.open) {
+        return;
+      }
+      items.forEach((other) => {
+        if (other !== item) {
+          other.open = false;
+        }
+      });
+    });
+  });
+});

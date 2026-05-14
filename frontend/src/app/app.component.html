@@ -224,6 +224,10 @@
     </button>
     }
     }
+    <button mat-menu-item (click)="openFaqPage()">
+        <mat-icon>quiz</mat-icon>
+        <span>{{ 'common.menu.faq' | transloco }}</span>
+    </button>
     <button mat-menu-item (click)="showTermsOfService()">
         <mat-icon>rule</mat-icon>
         <span>{{ 'common.menu.termsOfService' | transloco }}</span>
