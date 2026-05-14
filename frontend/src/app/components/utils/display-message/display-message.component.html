@@ -77,20 +77,25 @@
 </div>
 } @else {
 <div class="dialog-container">
-    @if (data.image) {
-    <img [src]="data.image" alt="Display message" class="backend-error-image" />
-    }
+    @if (data.image || data.icon || data.title) {
+    <div class="dialog-header">
+        @if (data.image) {
+        <img [src]="data.image" alt="Display message" class="backend-error-image" />
+        }
 
-    @if (data.icon) {
-    <div class="center">
-        <mat-icon aria-hidden="true" class="mat_icon">{{ data.icon }}</mat-icon>
+        @if (data.icon) {
+        <div class="center">
+            <mat-icon aria-hidden="true" class="mat_icon">{{ data.icon }}</mat-icon>
+        </div>
+        }
+
+        @if (data.title) {
+        <h2>{{ data.title }}</h2>
+        }
     </div>
     }
 
-    @if (data.title) {
-    <h2>{{ data.title }}</h2>
-    }
-
+    <div class="dialog-body">
     @if (data.message) {
     <p class="multiline-text">{{ data.message }}</p>
     }
@@ -100,6 +105,7 @@
         <mat-spinner></mat-spinner>
     </div>
     }
+    </div>
 
     @if (showOk() && (data.button || data.secondaryButton)) {
     <div class="dialog-actions">

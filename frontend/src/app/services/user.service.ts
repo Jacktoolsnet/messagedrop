@@ -1387,7 +1387,7 @@ export class UserService {
           showSpinner: false
         },
         maxWidth: '90vw',
-        maxHeight: '90vh',
+        maxHeight: '95vh',
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
         disableClose: false,
