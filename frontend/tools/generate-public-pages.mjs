@@ -358,6 +358,84 @@ const faqPages = [
         answer: 'MessageDrop is not a classic messenger or social feed. The core idea is to connect messages and information with places. Private communication exists, but the app is built around places rather than around follower counts or algorithmic feeds.',
       },
     ],
+    additionalFaqCategories: [
+      {
+        title: 'Using MessageDrop as a guest',
+        intro: 'These questions explain what you can do before creating a user account or connecting to the backend.',
+        items: [
+          {
+            slug: 'can-i-use-messagedrop-without-signing-in',
+            question: 'Can I use MessageDrop without signing in?',
+            answer: 'Yes. You can open MessageDrop as a guest and use basic map and discovery features without signing in. Some actions require a local user identity or a backend connection.',
+          },
+          {
+            slug: 'what-can-i-see-as-a-guest',
+            question: 'What can I see as a guest?',
+            answer: 'As a guest, you can explore the map, see public messages that are available for the selected area, search places and hashtags, and open public information around places.',
+          },
+          {
+            slug: 'can-i-read-public-messages-as-a-guest',
+            question: 'Can I read public messages as a guest?',
+            answer: 'Yes. Public messages are meant to be discoverable on the map. Availability can depend on your selected location, search settings, network connection, and moderation status.',
+          },
+          {
+            slug: 'can-i-create-public-messages-as-a-guest',
+            question: 'Can I create public messages as a guest?',
+            answer: 'Creating or publishing public messages requires a user identity and, where needed, a connection to the backend. This helps MessageDrop assign content correctly and apply moderation and safety rules.',
+          },
+          {
+            slug: 'can-i-use-the-map-and-place-search-as-a-guest',
+            question: 'Can I use the map and place search as a guest?',
+            answer: 'Yes. You can use the map and search for places as a guest. Location access is optional and depends on the permission you give in your browser or device settings.',
+          },
+          {
+            slug: 'can-i-see-weather-information-as-a-guest',
+            question: 'Can I see weather information as a guest?',
+            answer: 'Yes. Weather information can be opened for places when the feature is available and your device has an internet connection. The displayed data depends on external weather data sources.',
+          },
+          {
+            slug: 'can-i-see-air-quality-information-as-a-guest',
+            question: 'Can I see air quality information as a guest?',
+            answer: 'Yes. Air quality information can be opened for places when data is available. The values depend on external data sources and should be understood as informational context, not as official safety advice.',
+          },
+          {
+            slug: 'can-i-search-experiences-nearby-as-a-guest',
+            question: 'Can I search for experiences nearby as a guest?',
+            answer: 'Yes. You can search for experiences around a place as a guest when the experience search is available. Results may come from external providers and can depend on location and availability.',
+          },
+          {
+            slug: 'can-i-search-for-hashtags-as-a-guest',
+            question: 'Can I search for hashtags as a guest?',
+            answer: 'Yes. Hashtag search helps you find public messages connected to a topic. As with other public content, results depend on available messages, location context, and moderation status.',
+          },
+          {
+            slug: 'which-features-require-a-user-account',
+            question: 'Which features require a user account?',
+            answer: 'Features that create, publish, synchronize, or privately manage content usually require a user identity or a backend connection. This includes publishing public messages, managing your own content, contacts, and private communication.',
+          },
+          {
+            slug: 'is-data-stored-on-my-device-as-a-guest',
+            question: 'Is data stored on my device as a guest?',
+            answer: 'Yes, some settings and local data can be stored on your device so the app works smoothly. MessageDrop is designed to keep as much data as possible local to your device.',
+          },
+          {
+            slug: 'are-my-settings-kept-as-a-guest',
+            question: 'Are my settings kept as a guest?',
+            answer: 'Usually yes, as long as your browser keeps the local app data. If you clear browser storage, use private browsing, or change devices, local guest settings can be lost.',
+          },
+          {
+            slug: 'can-i-switch-from-guest-mode-to-a-user-account-later',
+            question: 'Can I switch from guest mode to a user account later?',
+            answer: 'Yes. You can start as a guest and later create or connect a user identity when you want to use features that need one. Local data may still depend on the device and browser storage you used before.',
+          },
+          {
+            slug: 'can-i-open-external-content-as-a-guest',
+            question: 'Can I open external content such as YouTube, TikTok, or Pinterest as a guest?',
+            answer: 'Yes, if external content is enabled in your settings. External providers are separate services with their own terms, privacy policies, cookies, and tracking behavior.',
+          },
+        ],
+      },
+    ],
   },
 ];
 
@@ -804,6 +882,84 @@ const germanFaqPages = [
         answer: 'MessageDrop ist kein klassischer Messenger und kein klassischer Social Feed. Die Grundidee ist, Nachrichten und Informationen mit Orten zu verbinden. Private Kommunikation gibt es, aber die App ist um Orte herum aufgebaut und nicht um Followerzahlen oder algorithmische Feeds.',
       },
     ],
+    additionalFaqCategories: [
+      {
+        title: 'Nutzung als Gast',
+        intro: 'Diese Fragen erklären, was Du vor dem Anlegen eines Nutzerkontos oder vor einer Backend-Verbindung nutzen kannst.',
+        items: [
+          {
+            slug: 'kann-ich-messagedrop-ohne-anmeldung-nutzen',
+            question: 'Kann ich MessageDrop ohne Anmeldung nutzen?',
+            answer: 'Ja. Du kannst MessageDrop als Gast öffnen und grundlegende Karten- und Entdeckungsfunktionen ohne Anmeldung nutzen. Einige Aktionen benötigen eine lokale Nutzeridentität oder eine Backend-Verbindung.',
+          },
+          {
+            slug: 'was-kann-ich-als-gast-sehen',
+            question: 'Was kann ich als Gast sehen?',
+            answer: 'Als Gast kannst Du die Karte erkunden, verfügbare öffentliche Nachrichten im gewählten Bereich sehen, Orte und Hashtags suchen und öffentliche Informationen rund um Orte öffnen.',
+          },
+          {
+            slug: 'kann-ich-als-gast-oeffentliche-nachrichten-lesen',
+            question: 'Kann ich als Gast öffentliche Nachrichten lesen?',
+            answer: 'Ja. Öffentliche Nachrichten sollen auf der Karte auffindbar sein. Die Verfügbarkeit kann von Deinem gewählten Standort, den Sucheinstellungen, der Netzwerkverbindung und dem Moderationsstatus abhängen.',
+          },
+          {
+            slug: 'kann-ich-als-gast-oeffentliche-nachrichten-erstellen',
+            question: 'Kann ich als Gast eigene öffentliche Nachrichten erstellen?',
+            answer: 'Für das Erstellen oder Veröffentlichen öffentlicher Nachrichten ist eine Nutzeridentität und bei Bedarf eine Backend-Verbindung erforderlich. So kann MessageDrop Inhalte korrekt zuordnen und Moderations- sowie Sicherheitsregeln anwenden.',
+          },
+          {
+            slug: 'kann-ich-als-gast-karte-und-ortssuche-verwenden',
+            question: 'Kann ich als Gast die Karte und die Ortssuche verwenden?',
+            answer: 'Ja. Du kannst die Karte nutzen und als Gast nach Orten suchen. Standortzugriff ist freiwillig und hängt davon ab, welche Berechtigung Du im Browser oder auf Deinem Gerät erteilst.',
+          },
+          {
+            slug: 'kann-ich-als-gast-wetterinformationen-sehen',
+            question: 'Kann ich als Gast Wetterinformationen sehen?',
+            answer: 'Ja. Wetterinformationen können für Orte geöffnet werden, wenn die Funktion verfügbar ist und Dein Gerät eine Internetverbindung hat. Die angezeigten Daten hängen von externen Wetterdatenquellen ab.',
+          },
+          {
+            slug: 'kann-ich-als-gast-luftqualitaet-sehen',
+            question: 'Kann ich als Gast Informationen zur Luftqualität sehen?',
+            answer: 'Ja. Informationen zur Luftqualität können für Orte geöffnet werden, wenn Daten verfügbar sind. Die Werte hängen von externen Datenquellen ab und dienen als Kontextinformation, nicht als verbindliche Sicherheitsempfehlung.',
+          },
+          {
+            slug: 'kann-ich-als-gast-erlebnisse-in-der-naehe-suchen',
+            question: 'Kann ich als Gast Erlebnisse in der Nähe suchen?',
+            answer: 'Ja. Du kannst als Gast nach Erlebnissen rund um einen Ort suchen, wenn die Erlebnis-Suche verfügbar ist. Ergebnisse können von externen Anbietern stammen und von Standort und Verfügbarkeit abhängen.',
+          },
+          {
+            slug: 'kann-ich-als-gast-nach-hashtags-suchen',
+            question: 'Kann ich als Gast nach Hashtags suchen?',
+            answer: 'Ja. Die Hashtag-Suche hilft Dir, öffentliche Nachrichten zu einem Thema zu finden. Wie bei anderen öffentlichen Inhalten hängen die Ergebnisse von verfügbaren Nachrichten, Ortsbezug und Moderationsstatus ab.',
+          },
+          {
+            slug: 'welche-funktionen-benoetigen-ein-nutzerkonto',
+            question: 'Welche Funktionen benötigen ein Nutzerkonto?',
+            answer: 'Funktionen, die Inhalte erstellen, veröffentlichen, synchronisieren oder privat verwalten, benötigen in der Regel eine Nutzeridentität oder Backend-Verbindung. Dazu gehören das Veröffentlichen öffentlicher Nachrichten, die Verwaltung eigener Inhalte, Kontakte und private Kommunikation.',
+          },
+          {
+            slug: 'werden-als-gast-daten-auf-meinem-geraet-gespeichert',
+            question: 'Werden als Gast Daten auf meinem Gerät gespeichert?',
+            answer: 'Ja, einige Einstellungen und lokale Daten können auf Deinem Gerät gespeichert werden, damit die App gut funktioniert. MessageDrop ist darauf ausgelegt, möglichst viele Daten lokal auf Deinem Gerät zu halten.',
+          },
+          {
+            slug: 'bleiben-meine-einstellungen-als-gast-erhalten',
+            question: 'Bleiben meine Einstellungen als Gast erhalten?',
+            answer: 'In der Regel ja, solange Dein Browser die lokalen App-Daten behält. Wenn Du Browserdaten löschst, im privaten Modus surfst oder das Gerät wechselst, können lokale Gast-Einstellungen verloren gehen.',
+          },
+          {
+            slug: 'kann-ich-spaeter-vom-gastmodus-zu-einem-nutzerkonto-wechseln',
+            question: 'Kann ich später vom Gastmodus zu einem Nutzerkonto wechseln?',
+            answer: 'Ja. Du kannst als Gast starten und später eine Nutzeridentität erstellen oder verbinden, wenn Du Funktionen nutzen möchtest, die eine solche Identität benötigen. Lokale Daten hängen weiterhin vom zuvor verwendeten Gerät und Browser-Speicher ab.',
+          },
+          {
+            slug: 'kann-ich-als-gast-externe-inhalte-oeffnen',
+            question: 'Kann ich als Gast externe Inhalte wie YouTube, TikTok oder Pinterest öffnen?',
+            answer: 'Ja, wenn externe Inhalte in Deinen Einstellungen aktiviert sind. Externe Anbieter sind eigenständige Dienste mit eigenen Nutzungsbedingungen, Datenschutzhinweisen, Cookies und möglichem Tracking.',
+          },
+        ],
+      },
+    ],
   },
 ];
 
@@ -1160,11 +1316,19 @@ function organizationSchema(lang = 'en') {
   };
 }
 
+function getPageFaqs(page) {
+  return [
+    ...(page.faqs ?? []),
+    ...((page.additionalFaqCategories ?? []).flatMap((category) => category.items ?? [])),
+  ];
+}
+
 function faqSchema(page) {
+  const faqs = getPageFaqs(page);
   return {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    mainEntity: page.faqs.map((item) => ({
+    mainEntity: faqs.map((item) => ({
       '@type': 'Question',
       name: item.question,
       acceptedAnswer: {
@@ -1546,27 +1710,39 @@ function renderMarketingPage(page) {
     body.push(...page.sections.map(renderSection));
   }
 
-  if (page.faqs) {
-    body.push(`
+  if (page.faqs || page.additionalFaqCategories?.length) {
+    const faqSections = [
+      ...(page.faqs
+        ? [{
+            title: page.faqTitle ?? (isGerman ? 'Häufige Fragen' : 'Frequently asked questions'),
+            intro: page.faqIntro ?? (isGerman ? 'Jede Antwort ist bewusst in Klartext formuliert, damit sie leicht indexiert und zitiert werden kann.' : 'Each answer is written in clear text so it can be indexed and cited easily.'),
+            items: page.faqs,
+          }]
+        : []),
+      ...(page.additionalFaqCategories ?? []),
+    ];
+    let faqIndex = 0;
+    body.push(...faqSections.map((section) => `
       <section class="content-section">
         <div class="section-heading">
-          <h2>${escapeHtml(page.faqTitle ?? (isGerman ? 'Häufige Fragen' : 'Frequently asked questions'))}</h2>
-          <p>${escapeHtml(page.faqIntro ?? (isGerman ? 'Jede Antwort ist bewusst in Klartext formuliert, damit sie leicht indexiert und zitiert werden kann.' : 'Each answer is written in clear text so it can be indexed and cited easily.'))}</p>
+          <h2>${escapeHtml(section.title)}</h2>
+          ${section.intro ? `<p>${escapeHtml(section.intro)}</p>` : ''}
         </div>
         <div class="faq-list">
-          ${page.faqs
-            .map(
-              (item, index) => `
-              <details class="faq-item" name="faq-${escapeHtml(page.pageKey ?? page.slug ?? page.lang)}" id="${escapeHtml(item.slug ?? `faq-${index + 1}`)}"${index === 0 ? ' open' : ''}>
+          ${(section.items ?? [])
+            .map((item) => {
+              const currentIndex = faqIndex++;
+              return `
+              <details class="faq-item" name="faq-${escapeHtml(page.pageKey ?? page.slug ?? page.lang)}" id="${escapeHtml(item.slug ?? `faq-${currentIndex + 1}`)}"${currentIndex === 0 ? ' open' : ''}>
                 <summary>${escapeHtml(item.question)}</summary>
                 <div class="faq-answer"><p>${escapeHtml(item.answer)}</p></div>
               </details>
-            `,
-            )
+            `;
+            })
             .join('')}
         </div>
       </section>
-    `);
+    `));
   }
 
   if (page.legalHubTitle || page.legalHubIntro || page.heroAsideActions?.length) {
@@ -1576,7 +1752,7 @@ function renderMarketingPage(page) {
   body.push('</main>');
 
   const extraSchemas = [organizationSchema(page.lang)];
-  if (page.faqs) {
+  if (getPageFaqs(page).length) {
     extraSchemas.push(faqSchema(page));
   }
 
