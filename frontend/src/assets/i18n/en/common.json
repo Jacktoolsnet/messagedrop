@@ -547,7 +547,9 @@
       "attributionPoweredBy": "Powered by {{ platform }}",
       "platformDisabled": "{{ platform }} is currently disabled. Enable it in external content settings to continue.",
       "openExternalContentSettings": "Open external content settings",
-      "urlNotAllowed": "This URL is not allowed for embedding."
+      "urlNotAllowed": "This URL is not allowed for embedding.",
+      "supportedServicesTitle": "Supported services",
+      "supportedServicesHint": "Paste a URL from one of these services to load a preview."
     },
     "stickerPicker": {
       "loadingCategories": "Loading sticker categories…",

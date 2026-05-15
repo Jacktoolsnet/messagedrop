@@ -32,6 +32,24 @@
 <mat-dialog-content class="full-width">
     @if (safeHtml !== undefined) {
     <div class="multimedia_container" [innerHTML]="safeHtml"></div>
+    } @else if (!multimediaUrl.trim()) {
+    <section class="supported-services" aria-labelledby="supported-services-title">
+        <h2 id="supported-services-title" class="supported-services__title">
+            {{ 'common.multimedia.supportedServicesTitle' | transloco }}
+        </h2>
+        <p class="supported-services__hint">
+            {{ 'common.multimedia.supportedServicesHint' | transloco }}
+        </p>
+
+        <div class="platform-tile-container" role="list">
+            @for (service of supportedServiceTiles; track service.platform) {
+            <div class="platform-tile" role="listitem">
+                <mat-icon aria-hidden="true">{{ service.icon }}</mat-icon>
+                <span>{{ service.label }}</span>
+            </div>
+            }
+        </div>
+    </section>
     }
 </mat-dialog-content>
 

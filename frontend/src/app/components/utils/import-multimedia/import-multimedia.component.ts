@@ -19,6 +19,12 @@ import { DisplayMessageService } from '../../../services/display-message.service
 
 type SupportedUrlPlatform = Extract<ExternalContentPlatform, 'youtube' | 'spotify' | 'tiktok' | 'pinterest'>;
 
+interface SupportedServiceTile {
+  platform: SupportedUrlPlatform;
+  label: string;
+  icon: string;
+}
+
 @Component({
   selector: 'app-pinterest', // (optional) kannst du umbenennen, z.B. 'app-import-multimedia'
   standalone: true,
@@ -46,6 +52,13 @@ export class ImportMultimediaComponent {
   disabledReason = '';
   showExternalSettingsButton = false;
   isPasting = false;
+
+  readonly supportedServiceTiles: SupportedServiceTile[] = [
+    { platform: 'youtube', label: 'YouTube', icon: 'smart_display' },
+    { platform: 'spotify', label: 'Spotify', icon: 'graphic_eq' },
+    { platform: 'tiktok', label: 'TikTok', icon: 'music_note' },
+    { platform: 'pinterest', label: 'Pinterest', icon: 'push_pin' }
+  ];
 
   readonly dialogRef = inject(MatDialogRef<ImportMultimediaComponent>);
   private readonly dialog = inject(MatDialog);

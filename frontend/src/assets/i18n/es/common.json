@@ -546,7 +546,9 @@
       "attributionPoweredBy": "Con tecnología de {{ platform }}",
       "platformDisabled": "{{ platform }} está deshabilitado actualmente. Actívalo en los ajustes de contenido externo para continuar.",
       "openExternalContentSettings": "Abrir ajustes de contenido externo",
-      "urlNotAllowed": "Esta URL no está permitida para incrustar."
+      "urlNotAllowed": "Esta URL no está permitida para incrustar.",
+      "supportedServicesTitle": "Servicios compatibles",
+      "supportedServicesHint": "Pega una URL de uno de estos servicios para cargar una vista previa."
     },
     "stickerPicker": {
       "loadingCategories": "Cargando categorías de stickers…",
