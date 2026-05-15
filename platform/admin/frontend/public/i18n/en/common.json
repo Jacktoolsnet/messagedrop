@@ -333,5 +333,7 @@
   "No metrics available": "No metrics available",
   "There are currently no configured metrics to display.": "There are currently no configured metrics to display.",
   "Total:": "Total:",
-  "Peak:": "Peak:"
+  "Peak:": "Peak:",
+  "Click the map or search for a place to set the location.": "Click the map or search for a place to set the location.",
+  "Location picker map": "Location picker map"
 }

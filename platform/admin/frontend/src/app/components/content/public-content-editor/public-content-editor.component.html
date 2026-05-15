@@ -407,37 +407,31 @@
             </div>
 
             <div class="location-selection-column">
-              @if (hasSelectedLocation()) {
               <div class="selected-location-panel">
                 <div class="selected-location-panel-head">
-                  <h3>{{ i18n.t('Selected location') }}</h3>
+                  <h3>{{ hasSelectedLocation() ? i18n.t('Selected location') : i18n.t('No location selected') }}</h3>
                   <div class="selected-location-panel-actions">
                     <button mat-icon-button type="button" (click)="openLocationMapDialog()"
-                      [disabled]="locationSearchControl.disabled" [attr.aria-label]="i18n.t('Adjust location on map')">
+                      [disabled]="locationSearchControl.disabled || !hasSelectedLocation()" [attr.aria-label]="i18n.t('Adjust location on map')">
                       <mat-icon>map</mat-icon>
                     </button>
                     <button mat-icon-button type="button" (click)="clearLocation()"
-                      [disabled]="locationSearchControl.disabled" [attr.aria-label]="i18n.t('Clear selected location')">
+                      [disabled]="locationSearchControl.disabled || !hasSelectedLocation()" [attr.aria-label]="i18n.t('Clear selected location')">
                       <mat-icon>delete</mat-icon>
                     </button>
                   </div>
                 </div>
 
-                <p class="selected-location-panel-name">{{ activeLocationLabel() }}</p>
+                <p class="selected-location-panel-name">
+                  {{ hasSelectedLocation() ? activeLocationLabel() : i18n.t('Click the map or search for a place to set the location.') }}
+                </p>
 
-                @if (locationMapEmbedUrl(); as mapUrl) {
-                <div class="location-map">
-                  <iframe [src]="mapUrl" [title]="i18n.t('Selected location map')" loading="lazy"
-                    referrerpolicy="no-referrer-when-downgrade"></iframe>
-                </div>
+                @if (locationMapReverseLookupPending()) {
+                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
                 }
+
+                <div #locationMapElement class="location-map" [attr.aria-label]="i18n.t('Location picker map')"></div>
               </div>
-              } @else {
-              <div class="selected-location-panel selected-location-panel-empty">
-                <h3>{{ i18n.t('No location selected') }}</h3>
-                <p>{{ i18n.t('Search for a place on the left to see the selected location and a small map here.') }}</p>
-              </div>
-              }
             </div>
           </div>
         </mat-card-content>

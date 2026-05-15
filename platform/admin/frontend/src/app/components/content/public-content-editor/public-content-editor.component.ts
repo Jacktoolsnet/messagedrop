@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, ViewChild, computed, effect, inject, signal } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, ElementRef, NgZone, OnDestroy, ViewChild, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -17,6 +17,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelect, MatSelectModule } from '@angular/material/select';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { combineLatest, finalize, startWith } from 'rxjs';
+import * as leaflet from 'leaflet';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
 import { PublicContentAiDialogComponent, PublicContentAiDialogResult } from '../public-content-ai-dialog/public-content-ai-dialog.component';
 import { PublicContentLocationMapDialogComponent, PublicContentLocationMapDialogResult } from '../public-content-location-map-dialog/public-content-location-map-dialog.component';
@@ -45,6 +46,10 @@ import { DisplayMessageComponent } from '../../shared/display-message/display-me
 import { EmoticonPickerComponent } from '../../shared/emoticon-picker/emoticon-picker.component';
 import { StickerPreviewComponent } from '../../shared/sticker-preview/sticker-preview.component';
 import { StickerPickerComponent } from '../sticker-picker/sticker-picker.component';
+
+const DEFAULT_LOCATION_MAP_CENTER = { latitude: 51.1657, longitude: 10.4515 } as const;
+const DEFAULT_LOCATION_MAP_ZOOM = 6;
+const SELECTED_LOCATION_MAP_ZOOM = 15;
 
 const EMPTY_MULTIMEDIA: Multimedia = {
   type: 'undefined',
@@ -81,11 +86,13 @@ const EMPTY_MULTIMEDIA: Multimedia = {
   styleUrls: ['./public-content-editor.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PublicContentEditorComponent {
+export class PublicContentEditorComponent implements AfterViewInit, OnDestroy {
   @ViewChild('styleSelect') private styleSelect?: MatSelect;
   @ViewChild('messageTextarea') private messageTextarea?: ElementRef<HTMLTextAreaElement>;
+  @ViewChild('locationMapElement') private locationMapElement?: ElementRef<HTMLDivElement>;
 
   private readonly destroyRef = inject(DestroyRef);
+  private readonly zone = inject(NgZone);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
@@ -99,6 +106,9 @@ export class PublicContentEditorComponent {
   private readonly styleService = inject(ContentStyleService);
   private readonly nominatimService = inject(NominatimService);
   private loadingDialogRef: MatDialogRef<DisplayMessageComponent> | null = null;
+  private locationMap?: leaflet.Map;
+  private locationMarker?: leaflet.CircleMarker;
+  private locationMapReverseLookupToken = 0;
   private messageSelectionStart = 0;
   private messageSelectionEnd = 0;
   readonly i18n = inject(TranslationHelperService);
@@ -116,6 +126,7 @@ export class PublicContentEditorComponent {
   readonly mediaLoading = signal(false);
   readonly tenorLoading = signal(false);
   readonly locationSearchLoading = signal(false);
+  readonly locationMapReverseLookupPending = signal(false);
   readonly currentContent = signal<PublicContent | null>(null);
   readonly selectedParentContent = signal<PublicContent | null>(null);
   readonly childCommentsLoading = signal(false);
@@ -411,6 +422,21 @@ export class PublicContentEditorComponent {
       this.form.controls.publicProfileId.setValue(publicProfiles[0].id);
     }, { allowSignalWrites: true });
 
+    effect(() => {
+      const coordinates = this.selectedLocationCoordinates();
+      const isCommentMode = this.isCommentMode();
+
+      queueMicrotask(() => {
+        if (isCommentMode) {
+          this.destroyInlineLocationMap();
+          return;
+        }
+
+        this.initInlineLocationMap();
+        this.syncInlineLocationMap(coordinates);
+      });
+    });
+
     combineLatest([this.route.paramMap, this.route.queryParamMap])
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(([paramMap, queryParamMap]) => {
@@ -421,6 +447,15 @@ export class PublicContentEditorComponent {
 
         this.applyRouteState(contentId, requestedType, parentId, externalParentUuid);
       });
+  }
+
+  ngAfterViewInit(): void {
+    this.initInlineLocationMap();
+    this.syncInlineLocationMap(this.selectedLocationCoordinates());
+  }
+
+  ngOnDestroy(): void {
+    this.destroyInlineLocationMap();
   }
 
   trackTenorResult(_index: number, result: TenorResult): string {
@@ -538,17 +573,12 @@ export class PublicContentEditorComponent {
       return;
     }
 
-    const label = this.getLocationLabel(place);
-    this.form.controls.location.setValue({
-      latitude,
-      longitude,
-      plusCode: ''
-    });
-    this.selectedLocationLabel.set(label);
-    this.locationSearchControl.setValue(label);
+    this.setLocationSelection(latitude, longitude, this.getLocationLabel(place));
   }
 
   clearLocation(): void {
+    this.locationMapReverseLookupToken++;
+    this.locationMapReverseLookupPending.set(false);
     this.form.controls.location.setValue({
       latitude: 0,
       longitude: 0,
@@ -557,6 +587,40 @@ export class PublicContentEditorComponent {
     this.selectedLocationLabel.set('');
     this.locationSearchControl.setValue('');
     this.locationSearchResults.set([]);
+  }
+
+  selectLocationFromMap(latitude: number, longitude: number): void {
+    if (this.locationSearchControl.disabled) {
+      return;
+    }
+
+    this.setLocationSelection(latitude, longitude, this.formatCoordinates(latitude, longitude), false);
+    const token = ++this.locationMapReverseLookupToken;
+    this.locationMapReverseLookupPending.set(true);
+    this.nominatimService.reverseGeocode(latitude, longitude)
+      .pipe(
+        finalize(() => {
+          if (token === this.locationMapReverseLookupToken) {
+            this.locationMapReverseLookupPending.set(false);
+          }
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: (place) => {
+          if (token !== this.locationMapReverseLookupToken) {
+            return;
+          }
+          const label = place ? this.getLocationLabel(place) : this.formatCoordinates(latitude, longitude);
+          this.setLocationSelection(latitude, longitude, label, false);
+        },
+        error: () => {
+          if (token !== this.locationMapReverseLookupToken) {
+            return;
+          }
+          this.setLocationSelection(latitude, longitude, this.formatCoordinates(latitude, longitude), false);
+        }
+      });
   }
 
   openLocationMapDialog(): void {
@@ -586,14 +650,7 @@ export class PublicContentEditorComponent {
           return;
         }
 
-        this.form.controls.location.setValue({
-          latitude: Number(result.latitude) || 0,
-          longitude: Number(result.longitude) || 0,
-          plusCode: ''
-        });
-        const normalizedLabel = this.normalizeLocationLabel(result.label);
-        this.selectedLocationLabel.set(normalizedLabel);
-        this.locationSearchControl.setValue(normalizedLabel);
+        this.setLocationSelection(Number(result.latitude) || 0, Number(result.longitude) || 0, result.label);
       });
   }
 
@@ -1776,6 +1833,92 @@ export class PublicContentEditorComponent {
     }
 
     this.previewStyleOption(activeOption.value as string | null | undefined);
+  }
+
+  private setLocationSelection(latitude: number, longitude: number, label: string, clearSearchResults = true): void {
+    const normalizedLatitude = Number(latitude) || 0;
+    const normalizedLongitude = Number(longitude) || 0;
+    const normalizedLabel = this.normalizeLocationLabel(label) || this.formatCoordinates(normalizedLatitude, normalizedLongitude);
+
+    this.form.controls.location.setValue({
+      latitude: normalizedLatitude,
+      longitude: normalizedLongitude,
+      plusCode: ''
+    });
+    this.selectedLocationLabel.set(normalizedLabel);
+    this.locationSearchControl.setValue(normalizedLabel);
+    if (clearSearchResults) {
+      this.locationSearchResults.set([]);
+    }
+  }
+
+  private initInlineLocationMap(): void {
+    const host = this.locationMapElement?.nativeElement;
+    if (!host || this.locationMap) {
+      return;
+    }
+
+    const coordinates = this.selectedLocationCoordinates();
+    const center = coordinates ?? DEFAULT_LOCATION_MAP_CENTER;
+    this.locationMap = leaflet.map(host, {
+      center: [center.latitude, center.longitude],
+      zoom: coordinates ? SELECTED_LOCATION_MAP_ZOOM : DEFAULT_LOCATION_MAP_ZOOM,
+      zoomControl: true,
+      worldCopyJump: true
+    });
+
+    leaflet.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      minZoom: 2,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(this.locationMap);
+
+    this.locationMap.on('click', (event: leaflet.LeafletMouseEvent) => {
+      this.zone.run(() => this.selectLocationFromMap(event.latlng.lat, event.latlng.lng));
+    });
+
+    setTimeout(() => this.locationMap?.invalidateSize(), 0);
+  }
+
+  private syncInlineLocationMap(coordinates: { latitude: number; longitude: number } | null): void {
+    if (!this.locationMap) {
+      return;
+    }
+
+    if (!coordinates) {
+      this.locationMarker?.remove();
+      this.locationMarker = undefined;
+      setTimeout(() => this.locationMap?.invalidateSize(), 0);
+      return;
+    }
+
+    const latLng: leaflet.LatLngExpression = [coordinates.latitude, coordinates.longitude];
+    if (!this.locationMarker) {
+      this.locationMarker = leaflet.circleMarker(latLng, {
+        radius: 9,
+        weight: 3,
+        opacity: 1,
+        color: '#0f766e',
+        fillColor: '#14b8a6',
+        fillOpacity: 0.25
+      }).addTo(this.locationMap);
+    } else {
+      this.locationMarker.setLatLng(latLng);
+    }
+
+    this.locationMap.setView(latLng, Math.max(this.locationMap.getZoom(), SELECTED_LOCATION_MAP_ZOOM), { animate: true });
+    setTimeout(() => this.locationMap?.invalidateSize(), 0);
+  }
+
+  private destroyInlineLocationMap(): void {
+    this.locationMap?.off();
+    this.locationMap?.remove();
+    this.locationMap = undefined;
+    this.locationMarker = undefined;
+  }
+
+  private formatCoordinates(latitude: number, longitude: number): string {
+    return `${this.formatCoordinate(latitude)}, ${this.formatCoordinate(longitude)}`;
   }
 
   private formatCoordinate(value: number): string {

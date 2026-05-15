@@ -1715,5 +1715,7 @@
   "Choose a metric tile to open a focused chart view.": "Wähle eine Metrik-Kachel, um eine fokussierte Diagrammansicht zu öffnen.",
   "No metrics available": "Keine Metriken verfügbar",
   "There are currently no configured metrics to display.": "Derzeit sind keine Metriken zur Anzeige konfiguriert.",
-  "Peak:": "Spitze:"
+  "Peak:": "Spitze:",
+  "Click the map or search for a place to set the location.": "Klicke in die Karte oder suche nach einem Ort, um den Ort festzulegen.",
+  "Location picker map": "Karte zur Ortsauswahl"
 }
