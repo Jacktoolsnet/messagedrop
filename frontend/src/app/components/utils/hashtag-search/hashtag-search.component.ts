@@ -453,6 +453,7 @@ export class HashtagSearchComponent {
     const result = tile.result;
     if (result.type === 'place' && result.place) {
       this.selectPlace(result.place);
+      this.openPlacePreview();
       return;
     }
     if (result.type === 'contact' && result.contact) {
@@ -461,14 +462,17 @@ export class HashtagSearchComponent {
     }
     if (result.type === 'experience' && result.experience) {
       this.selectExperience(result.experience);
+      this.openExperiencePreview(result.experience);
       return;
     }
     if (result.type === 'note' && result.note) {
       this.selectNote(result.note);
+      this.openNotePreview(result.note);
       return;
     }
     if (result.type === 'message' && result.message) {
       this.selectMessage(result.message);
+      this.openMessagePreview(result.message);
     }
   }
 
