@@ -4,6 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { RouterLink } from '@angular/router';
 import { MultiSeriesResponse } from '../../../interfaces/statistic-multi-series-response.interface';
 import { SeriesPoint } from '../../../interfaces/statistic-series-point.interface';
@@ -11,6 +12,8 @@ import { AuthService } from '../../../services/auth/auth.service';
 import { StatisticService } from '../../../services/statistic/statistic.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { StatisticKeyChartComponent } from '../key-chart/statistic-key-chart.component';
+
+type PublicStatisticRange = 1 | 7;
 
 interface PublicMetricTile {
   key: string;
@@ -27,6 +30,7 @@ interface PublicMetricTile {
     MatToolbarModule,
     MatIconModule,
     MatButtonModule,
+    MatButtonToggleModule,
     MatProgressBarModule,
     MatCardModule,
     StatisticKeyChartComponent
@@ -43,13 +47,11 @@ export class PublicOverviewComponent implements OnInit {
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly overview = signal<MultiSeriesResponse | null>(null);
+  readonly selectedDays = signal<PublicStatisticRange>(1);
   readonly backLink = computed(() => this.auth.isLoggedIn() ? '/dashboard/statistic' : '/');
-  readonly totalEvents = computed(() =>
-    this.metrics.reduce((sum, metric) => sum + this.totalFor(metric.key), 0)
-  );
-  readonly peakValue = computed(() =>
-    this.metrics.reduce((max, metric) => Math.max(max, this.maxFor(metric.key)), 0)
-  );
+  readonly chartKind = computed(() => this.selectedDays() === 1 ? 'bar' : 'line');
+  readonly totalLabel = computed(() => this.selectedDays() === 1 ? this.i18n.t('Total today:') : this.i18n.t('Total (7 days):'));
+  readonly peakLabel = computed(() => this.selectedDays() === 1 ? this.i18n.t('Peak today:') : this.i18n.t('Peak/day:'));
 
   readonly metrics: PublicMetricTile[] = [
     { key: 'client.connect', title: this.i18n.t('Page views'), icon: 'visibility', color: '#2563eb' },
@@ -65,7 +67,7 @@ export class PublicOverviewComponent implements OnInit {
   reload(): void {
     this.loading.set(true);
     this.error.set(null);
-    this.statistics.getPublicOverview7d().subscribe({
+    this.statistics.getPublicOverview(this.selectedDays()).subscribe({
       next: (data) => {
         this.overview.set(data);
       },
@@ -76,6 +78,17 @@ export class PublicOverviewComponent implements OnInit {
         this.loading.set(false);
       }
     });
+  }
+
+  setRange(days: PublicStatisticRange): void {
+    if (this.selectedDays() === days) return;
+    this.selectedDays.set(days);
+    this.reload();
+  }
+
+  onRangeChange(days: PublicStatisticRange | null): void {
+    if (!days) return;
+    this.setRange(days);
   }
 
   pointsFor(key: string): SeriesPoint[] {

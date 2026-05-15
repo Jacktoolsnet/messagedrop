@@ -1,63 +1,63 @@
 <mat-toolbar color="primary">
-  <button mat-icon-button routerLink="/dashboard" aria-label="Back to dashboard">
+  <button mat-icon-button routerLink="/dashboard" [attr.aria-label]="i18n.t('Back to dashboard')">
     <mat-icon>arrow_back</mat-icon>
   </button>
-  <span class="toolbar-title">Statistic</span>
+  <span class="toolbar-title">{{ i18n.t('Statistic') }}</span>
   <span class="spacer"></span>
 
   <div class="desktop-controls">
     <mat-button-toggle-group class="status-toggle" [value]="selectedRange()" (valueChange)="onRangeChange($event)">
       @for (r of ranges; track r.value) {
-        <mat-button-toggle [value]="r.value">{{ r.label }}</mat-button-toggle>
+        <mat-button-toggle [value]="r.value">{{ i18n.t(r.label) }}</mat-button-toggle>
       }
     </mat-button-toggle-group>
-    <button mat-stroked-button color="primary" (click)="openSettings()" aria-label="Settings">
+    <button mat-stroked-button color="primary" (click)="openSettings()" [attr.aria-label]="i18n.t('Settings')">
       <mat-icon>settings</mat-icon>
-      Settings
+      {{ i18n.t('Settings') }}
     </button>
     @if (selectedKey()) {
-      <button mat-stroked-button color="primary" (click)="clearSelection()" aria-label="Show all">
+      <button mat-stroked-button color="primary" (click)="clearSelection()" [attr.aria-label]="i18n.t('Show all')">
         <mat-icon>close_fullscreen</mat-icon>
-        Show all
+        {{ i18n.t('Show all') }}
       </button>
     }
-    <button mat-stroked-button color="primary" (click)="reload()" aria-label="Refresh chart">
+    <button mat-stroked-button color="primary" (click)="reload()" [attr.aria-label]="i18n.t('Refresh chart')">
       <mat-icon>refresh</mat-icon>
-      Refresh
+      {{ i18n.t('Refresh') }}
     </button>
   </div>
 
   <div class="mobile-controls">
     @if (selectedKey()) {
-      <button mat-icon-button (click)="clearSelection()" aria-label="Show all">
+      <button mat-icon-button (click)="clearSelection()" [attr.aria-label]="i18n.t('Show all')">
         <mat-icon>close_fullscreen</mat-icon>
       </button>
     }
-    <button mat-icon-button [matMenuTriggerFor]="statMenu" aria-label="Statistic menu">
+    <button mat-icon-button [matMenuTriggerFor]="statMenu" [attr.aria-label]="i18n.t('Statistic menu')">
       <mat-icon>more_vert</mat-icon>
     </button>
     <mat-menu #statMenu="matMenu">
-      <button mat-menu-item disabled>Range</button>
+      <button mat-menu-item disabled>{{ i18n.t('Range') }}</button>
       @for (r of ranges; track r.value) {
         <button mat-menu-item (click)="setRange(r.value)">
           <mat-icon>{{ selectedRange() === r.value ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
-          <span>{{ r.label }}</span>
+          <span>{{ i18n.t(r.label) }}</span>
         </button>
       }
       <mat-divider></mat-divider>
       <button mat-menu-item (click)="openSettings()">
         <mat-icon>settings</mat-icon>
-        <span>Settings</span>
+        <span>{{ i18n.t('Settings') }}</span>
       </button>
       @if (selectedKey()) {
         <button mat-menu-item (click)="clearSelection()">
           <mat-icon>close_fullscreen</mat-icon>
-          <span>Show all</span>
+          <span>{{ i18n.t('Show all') }}</span>
         </button>
       }
       <button mat-menu-item (click)="reload()">
         <mat-icon>refresh</mat-icon>
-        <span>Refresh</span>
+        <span>{{ i18n.t('Refresh') }}</span>
       </button>
     </mat-menu>
   </div>
@@ -75,10 +75,10 @@
       </div>
 
       <div class="hero-copy">
-        <div class="section-eyebrow">Operations analytics</div>
-        <h1 class="hero-title">Internal statistics</h1>
+        <div class="section-eyebrow">{{ i18n.t('Operations analytics') }}</div>
+        <h1 class="hero-title">{{ i18n.t('Internal statistics') }}</h1>
         <p class="hero-subtitle">
-          Explore operational metrics, switch time ranges and focus on a single metric when you need a deeper view.
+          {{ i18n.t('Explore operational metrics, switch time ranges and focus on a single metric when you need a deeper view.') }}
         </p>
       </div>
 
@@ -89,7 +89,7 @@
         </span>
         <span class="hero-pill">
           <mat-icon>insights</mat-icon>
-          {{ orderedKeys().length }} metrics
+          {{ i18n.t('{{count}} metrics', { count: orderedKeys().length }) }}
         </span>
         @if (selectedKey(); as currentKey) {
           <span class="hero-pill">
@@ -109,17 +109,17 @@
         </div>
         <div>
           <h2>{{ titleFor(currentKey) }}</h2>
-          <p>Focused metric view for {{ rangeLabel() }}.</p>
+          <p>{{ i18n.t('Focused metric view for {{range}}.', { range: rangeLabel() }) }}</p>
         </div>
       </div>
 
       <div class="focus-summary">
         <div class="summary-pill">
-          <span class="k">Total</span>
+          <span class="k">{{ i18n.t('Total') }}</span>
           <strong>{{ totalFor(currentKey) }}</strong>
         </div>
         <div class="summary-pill">
-          <span class="k">Peak</span>
+          <span class="k">{{ i18n.t('Peak') }}</span>
           <strong>{{ maxFor(currentKey) }}</strong>
         </div>
       </div>
@@ -142,8 +142,8 @@
           <mat-icon>insights</mat-icon>
         </div>
         <div>
-          <h2>Metric overview</h2>
-          <p>Choose a metric tile to open a focused chart view.</p>
+          <h2>{{ i18n.t('Metric overview') }}</h2>
+          <p>{{ i18n.t('Choose a metric tile to open a focused chart view.') }}</p>
         </div>
       </div>
 
@@ -153,8 +153,8 @@
             <mat-icon aria-hidden="true">insights</mat-icon>
           </div>
           <div>
-            <h3>No metrics available</h3>
-            <p>There are currently no configured metrics to display.</p>
+            <h3>{{ i18n.t('No metrics available') }}</h3>
+            <p>{{ i18n.t('There are currently no configured metrics to display.') }}</p>
           </div>
         </div>
       } @else {
@@ -171,8 +171,8 @@
               </app-statistic-key-chart>
 
               <div class="tile-footer">
-                <span>Total: <strong>{{ totalFor(k) }}</strong></span>
-                <span>Peak: <strong>{{ maxFor(k) }}</strong></span>
+                <span>{{ i18n.t('Total:') }} <strong>{{ totalFor(k) }}</strong></span>
+                <span>{{ i18n.t('Peak:') }} <strong>{{ maxFor(k) }}</strong></span>
               </div>
             </div>
           }

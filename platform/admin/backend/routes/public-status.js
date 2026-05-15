@@ -105,7 +105,7 @@ function getStatisticRangeBetween(dbInstance, key, fromDate, toDate) {
   });
 }
 
-router.get('/statistic/overview-7d', async (req, res, next) => {
+async function sendStatisticOverview(req, res, next, days) {
   const _db = db(req);
   if (!_db) return next(apiError.internal('database_unavailable'));
 
@@ -118,7 +118,7 @@ router.get('/statistic/overview-7d', async (req, res, next) => {
 
   try {
     const to = toDateStrUTC(new Date());
-    const from = addDays(to, -6);
+    const from = addDays(to, -days + 1);
     const series = {};
 
     await Promise.all(metricKeys.map(async (key) => {
@@ -142,6 +142,15 @@ router.get('/statistic/overview-7d', async (req, res, next) => {
     apiErr.detail = err instanceof Error ? err.message : String(err);
     return next(apiErr);
   }
+}
+
+router.get('/statistic/overview', async (req, res, next) => {
+  const days = req.query?.days === '7' ? 7 : 1;
+  return sendStatisticOverview(req, res, next, days);
+});
+
+router.get('/statistic/overview-7d', (req, res, next) => {
+  return sendStatisticOverview(req, res, next, 7);
 });
 
 function toPromise(fn, ...params) {

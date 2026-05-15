@@ -33,4 +33,9 @@ export class StatisticService {
   getPublicOverview7d(): Observable<MultiSeriesResponse> {
     return this.http.get<MultiSeriesResponse>(`${this.publicBaseUrl}/overview-7d`);
   }
+
+  getPublicOverview(days: 1 | 7 = 1): Observable<MultiSeriesResponse> {
+    const params = new HttpParams().set('days', String(days));
+    return this.http.get<MultiSeriesResponse>(`${this.publicBaseUrl}/overview`, { params });
+  }
 }

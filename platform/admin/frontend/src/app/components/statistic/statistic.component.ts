@@ -17,6 +17,7 @@ import { StatisticSettingsComponent } from './settings/statistic-settings.compon
 import { StatisticSettingsService } from '../../services/statistic/statistic-settings.service';
 import { StatisticKeySetting } from '../../interfaces/statistic-key-setting.interface';
 import { SeriesPoint } from '../../interfaces/statistic-series-point.interface';
+import { TranslationHelperService } from '../../services/translation-helper.service';
 
 @Component({
   selector: 'app-statistic',
@@ -43,6 +44,7 @@ export class StatisticComponent {
   private readonly dialog = inject(MatDialog);
   private readonly settingsApi = inject(StatisticSettingsService);
   private readonly stat = inject(StatisticService);
+  readonly i18n = inject(TranslationHelperService);
 
   readonly ranges = [
     { value: '12m', label: 'Last year' },
@@ -53,7 +55,7 @@ export class StatisticComponent {
     { value: '1d', label: 'Today' },
   ] as const;
 
-  readonly selectedRange = signal<StatisticRangePreset>('1w');
+  readonly selectedRange = signal<StatisticRangePreset>('1d');
   readonly keys = signal<string[]>([]);
   readonly loading = signal<boolean>(false);
   readonly hasKeys = computed(() => this.keys().length > 0);
@@ -151,7 +153,8 @@ export class StatisticComponent {
   titleFor(key: string): string { return this.settings()[key]?.displayName?.trim() || key; }
   iconFor(key: string): string { return this.settings()[key]?.iconName?.trim() || 'insights'; }
   rangeLabel(): string {
-    return this.ranges.find((range) => range.value === this.selectedRange())?.label ?? this.selectedRange();
+    const label = this.ranges.find((range) => range.value === this.selectedRange())?.label ?? this.selectedRange();
+    return this.i18n.t(label);
   }
   orderedKeys(): string[] {
     const ks = this.keys();

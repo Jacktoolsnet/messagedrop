@@ -177,6 +177,38 @@ mat-progress-bar {
   font-size: 18px;
 }
 
+.hero-range-toggle {
+  padding: 0.2rem 0.25rem 0.2rem 0.65rem;
+}
+
+.hero-range-toggle mat-button-toggle-group {
+  overflow: hidden;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.hero-range-toggle ::ng-deep .mat-button-toggle {
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+}
+
+.hero-range-toggle ::ng-deep .mat-button-toggle-checked {
+  color: #ffffff;
+  background: #15803d;
+}
+
+.hero-range-toggle ::ng-deep .mat-button-toggle-button {
+  min-height: 28px;
+  padding: 0 0.65rem;
+  font-weight: 700;
+}
+
+.hero-range-toggle ::ng-deep .mat-button-toggle-label-content {
+  line-height: 28px;
+}
+
 .section-panel {
   display: grid;
   gap: 1rem;
@@ -211,6 +243,10 @@ mat-progress-bar {
 }
 
 :host ::ng-deep .tile app-statistic-key-chart .chart-card {
+  border-radius: 20px;
+}
+
+.tile:has(.tile-footer) app-statistic-key-chart .chart-card {
   border-radius: 20px 20px 0 0;
   border-bottom: none;
 }
@@ -273,5 +309,20 @@ mat-progress-bar {
 
   .error-card {
     align-items: flex-start;
+  }
+
+  .hero-range-toggle {
+    width: 95%;
+    justify-content: center;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+
+  .hero-range-toggle mat-button-toggle-group {
+    flex: 1 1 auto;
+  }
+
+  .hero-range-toggle ::ng-deep .mat-button-toggle {
+    flex: 1 1 0;
   }
 }
