@@ -30,7 +30,7 @@
   @if (showFiles()) {
   <div class="file-input">
     <div class="file-upload">
-      <input #fileInput type="file" multiple accept=".pdf,image/*" (change)="onFilesSelected($event)" hidden />
+      <input #fileInput type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.gif,.webp,application/pdf,image/png,image/jpeg,image/gif,image/webp" (change)="onFilesSelected($event)" hidden />
       <button mat-stroked-button color="primary" type="button" (click)="fileInput.click()" [disabled]="disabled()">
         <mat-icon>attach_file</mat-icon>
         {{ 'dsa.report.evidence.filesLabel' | transloco }}

@@ -80,7 +80,7 @@ export class AddEvidenceDialogComponent {
 
   private isAllowedFile(file: File): boolean {
     if (file.type === 'application/pdf') return true;
-    if (file.type.startsWith('image/')) return true;
+    if (['image/png', 'image/jpeg', 'image/gif', 'image/webp'].includes(file.type)) return true;
     const ext = file.name.toLowerCase();
     return ext.endsWith('.pdf') || ext.endsWith('.png') || ext.endsWith('.jpg') || ext.endsWith('.jpeg') || ext.endsWith('.gif') || ext.endsWith('.webp');
   }

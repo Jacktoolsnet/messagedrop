@@ -176,7 +176,8 @@ export class DigitalServicesActReportDialogComponent implements OnDestroy {
       if (currentCount >= this.maxEvidenceFiles) break;
       if (f.size > this.maxEvidenceBytes) { continue; }
       if (currentSize + f.size > this.maxEvidenceTotalBytes) break;
-      const okType = f.type === 'application/pdf' || f.type.startsWith('image/') || /\.(pdf|png|jpe?g|gif|webp)$/i.test(f.name);
+      const okType = ['application/pdf', 'image/png', 'image/jpeg', 'image/gif', 'image/webp'].includes(f.type)
+        || /\.(pdf|png|jpe?g|gif|webp)$/i.test(f.name);
       if (!okType) { continue; }
       items.push({ id: crypto.randomUUID(), type: 'file', file: f });
       currentCount += 1;

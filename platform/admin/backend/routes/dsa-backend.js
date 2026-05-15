@@ -13,6 +13,7 @@ const { notifyReporter } = require('../utils/notifyReporter');
 const { signServiceJwt } = require('../utils/serviceJwt');
 const { apiError } = require('../middleware/api-error');
 const { translateFieldsWithFallback } = require('../utils/deeplTranslator');
+const { isUnsupportedEvidenceFileError, persistEvidenceFile } = require('../utils/evidenceFile');
 
 const tableSignal = require('../db/tableDsaSignal');
 const tableNotice = require('../db/tableDsaNotice');
@@ -60,32 +61,9 @@ const DSA_AI_NOTICE_RECOMMENDATIONS = new Set([
 ]);
 const DSA_AI_DECISION_OUTCOMES = new Set(['UNDECIDED', 'NO_ACTION', 'RESTRICT', 'REMOVE_CONTENT', 'FORWARD_TO_AUTHORITY']);
 
-const allowedMime = new Set([
-    'application/pdf',
-    'image/png',
-    'image/jpeg',
-    'image/gif',
-    'image/webp',
-    'image/svg+xml'
-]);
-
-const storage = multer.diskStorage({
-    destination: (_req, _file, cb) => cb(null, evidenceUploadDir),
-    filename: (_req, file, cb) => {
-        const unique = `${Date.now()}-${crypto.randomUUID()}${path.extname(file.originalname)}`;
-        cb(null, unique);
-    }
-});
-
 const upload = multer({
-    storage,
-    limits: { fileSize: maxEvidenceFileBytes },
-    fileFilter: (_req, file, cb) => {
-        if (file.mimetype.startsWith('image/') || allowedMime.has(file.mimetype)) {
-            return cb(null, true);
-        }
-        cb(new Error('unsupported_file_type'));
-    }
+    storage: multer.memoryStorage(),
+    limits: { fileSize: maxEvidenceFileBytes }
 });
 
 function db(req) { return req.database?.db; }
@@ -2051,20 +2029,18 @@ router.post('/notices/:id/evidence', (req, res, next) => {
             return next(apiError.badRequest('file_required'));
         }
 
-        const fileName = hasFile ? req.file.originalname : null;
-        const storedName = hasFile ? req.file.filename : null;
+        let storedFile = null;
 
         const enforceFileLimits = async () => {
             if (!hasFile) return;
             if (!(await hasStorageCapacity())) {
-                await fs.promises.unlink(path.join(evidenceUploadDir, storedName)).catch(() => { });
                 throw apiError.custom(507, 'INSUFFICIENT_STORAGE', 'insufficient_storage');
             }
             const existingFileCount = await countFileEvidence(_db, req.params.id);
             if (existingFileCount >= maxEvidenceFiles) {
-                await fs.promises.unlink(path.join(evidenceUploadDir, storedName)).catch(() => { });
                 throw apiError.conflict('evidence_limit_reached');
             }
+            storedFile = await persistEvidenceFile(req.file, evidenceUploadDir);
         };
 
         Promise.resolve()
@@ -2077,13 +2053,13 @@ router.post('/notices/:id/evidence', (req, res, next) => {
                     type,
                     url,
                     hash,
-                    fileName,
-                    storedName,
+                    storedFile?.fileName ?? null,
+                    storedFile?.storedName ?? null,
                     addedAt,
                     (err, row) => {
                         if (err) {
-                            if (hasFile) {
-                                fs.promises.unlink(path.join(evidenceUploadDir, storedName)).catch(() => { });
+                            if (storedFile?.storedName) {
+                                fs.promises.unlink(path.join(evidenceUploadDir, storedFile.storedName)).catch(() => { });
                             }
                             const apiErr = apiError.internal('db_error');
                             apiErr.detail = err.message;
@@ -2103,6 +2079,9 @@ router.post('/notices/:id/evidence', (req, res, next) => {
                 );
             })
             .catch((err) => {
+                if (isUnsupportedEvidenceFileError(err)) {
+                    return next(apiError.badRequest('unsupported_file_type'));
+                }
                 if (err?.status || err?.statusCode) {
                     return next(err);
                 }

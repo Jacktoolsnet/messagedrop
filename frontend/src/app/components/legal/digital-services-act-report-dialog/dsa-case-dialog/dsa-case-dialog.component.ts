@@ -60,8 +60,7 @@ export class DsaCaseDialogComponent implements OnInit {
     'image/png',
     'image/jpeg',
     'image/gif',
-    'image/webp',
-    'image/svg+xml'
+    'image/webp'
   ]);
   private static readonly NOTICE_STATUS_LABELS: Record<string, string> = {
     RECEIVED: 'dsa.case.noticeStatus.received',
@@ -370,9 +369,8 @@ export class DsaCaseDialogComponent implements OnInit {
 
   private isAllowedFile(file: File): boolean {
     if (DsaCaseDialogComponent.ALLOWED_TYPES.has(file.type)) return true;
-    if (file.type.startsWith('image/')) return true;
     const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
-    return ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'pdf'].includes(ext);
+    return ['png', 'jpg', 'jpeg', 'gif', 'webp', 'pdf'].includes(ext);
   }
 
   private buildPublicStatusUrl(token: string | null | undefined): string | null {

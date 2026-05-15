@@ -17,6 +17,7 @@ const { notifyReporter } = require('../utils/notifyReporter');
 const { apiError } = require('../middleware/api-error');
 const { createPowGuard } = require('../middleware/pow');
 const { logPowEvent } = require('../utils/powLogger');
+const { isUnsupportedEvidenceFileError, persistEvidenceFile } = require('../utils/evidenceFile');
 
 const evidenceUploadDir = path.join(__dirname, '..', 'uploads', 'evidence');
 
@@ -42,32 +43,9 @@ function buildStatusUrl(token) {
   return `${statusBaseUrl}/${token}`;
 }
 
-const allowedMime = new Set([
-  'application/pdf',
-  'image/png',
-  'image/jpeg',
-  'image/gif',
-  'image/webp',
-  'image/svg+xml'
-]);
-
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, evidenceUploadDir),
-  filename: (_req, file, cb) => {
-    const unique = `${Date.now()}-${crypto.randomUUID()}${path.extname(file.originalname)}`;
-    cb(null, unique);
-  }
-});
-
 const upload = multer({
-  storage,
-  limits: { fileSize: maxEvidenceFileBytes },
-  fileFilter: (_req, file, cb) => {
-    if (file.mimetype.startsWith('image/') || allowedMime.has(file.mimetype)) {
-      return cb(null, true);
-    }
-    cb(new Error('unsupported_file_type'));
-  }
+  storage: multer.memoryStorage(),
+  limits: { fileSize: maxEvidenceFileBytes }
 });
 
 function handlePowRequire(payload, req) {
@@ -740,10 +718,10 @@ router.post('/status/:token/appeals/:appealId/evidence', evidencePow, async (req
 
       const existingFileCount = await countFileEvidence(_db, notice.id);
       if (existingFileCount >= maxEvidenceFiles) {
-        await fs.promises.unlink(path.join(evidenceUploadDir, file.filename)).catch(() => { });
         return next(apiError.conflict('evidence_limit_reached'));
       }
 
+      const storedFile = await persistEvidenceFile(file, evidenceUploadDir);
       const id = crypto.randomUUID();
       const now = Date.now();
 
@@ -754,11 +732,12 @@ router.post('/status/:token/appeals/:appealId/evidence', evidencePow, async (req
         'file',
         null,
         null,
-        file.originalname,
-        file.filename,
+        storedFile.fileName,
+        storedFile.storedName,
         now,
         (err) => {
           if (err) {
+            fs.promises.unlink(path.join(evidenceUploadDir, storedFile.storedName)).catch(() => { });
             const apiErr = apiError.internal('db_error');
             apiErr.detail = err.message;
             return next(apiErr);
@@ -772,7 +751,7 @@ router.post('/status/:token/appeals/:appealId/evidence', evidencePow, async (req
             'appeal_evidence',
             `public:${req.ip || 'unknown'}`,
             now,
-            JSON.stringify({ token, appealId, evidenceId: id, fileName: file.originalname }),
+            JSON.stringify({ token, appealId, evidenceId: id, fileName: storedFile.fileName }),
             () => { }
           );
 
@@ -780,6 +759,9 @@ router.post('/status/:token/appeals/:appealId/evidence', evidencePow, async (req
         }
       );
     } catch (err) {
+      if (isUnsupportedEvidenceFileError(err)) {
+        return next(apiError.badRequest('unsupported_file_type'));
+      }
       const apiErr = apiError.internal('db_error');
       apiErr.detail = err.message;
       return next(apiErr);
@@ -834,20 +816,19 @@ router.post('/status/:token/evidence', evidencePow, (req, res, next) => {
 
       if (hasFile) {
         if (!(await hasStorageCapacity())) {
-          await fs.promises.unlink(path.join(evidenceUploadDir, req.file.filename)).catch(() => { });
           return next(apiError.custom(507, 'INSUFFICIENT_STORAGE', 'insufficient_storage'));
         }
         const existingFileCount = await countFileEvidence(_db, notice.id);
         if (existingFileCount >= maxEvidenceFiles) {
-          await fs.promises.unlink(path.join(evidenceUploadDir, req.file.filename)).catch(() => { });
           return next(apiError.conflict('evidence_limit_reached'));
         }
       }
 
+      const storedFile = hasFile ? await persistEvidenceFile(req.file, evidenceUploadDir) : null;
       const id = crypto.randomUUID();
       const now = Date.now();
-      const fileName = hasFile ? req.file.originalname : null;
-      const storedName = hasFile ? req.file.filename : null;
+      const fileName = storedFile?.fileName ?? null;
+      const storedName = storedFile?.storedName ?? null;
 
       tableEvidence.create(
         _db,
@@ -861,6 +842,9 @@ router.post('/status/:token/evidence', evidencePow, (req, res, next) => {
         now,
         (err) => {
           if (err) {
+            if (storedName) {
+              fs.promises.unlink(path.join(evidenceUploadDir, storedName)).catch(() => { });
+            }
             const apiErr = apiError.internal('db_error');
             apiErr.detail = err.message;
             return next(apiErr);
@@ -882,6 +866,9 @@ router.post('/status/:token/evidence', evidencePow, (req, res, next) => {
         }
       );
     } catch (err) {
+      if (isUnsupportedEvidenceFileError(err)) {
+        return next(apiError.badRequest('unsupported_file_type'));
+      }
       const apiErr = apiError.internal('db_error');
       apiErr.detail = err.message;
       return next(apiErr);

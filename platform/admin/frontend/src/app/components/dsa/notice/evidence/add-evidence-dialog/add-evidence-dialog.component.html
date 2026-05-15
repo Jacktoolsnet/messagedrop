@@ -41,7 +41,7 @@
                 <span>{{ i18n.t('Select file (images or PDF, max. 5 MB)') }}</span>
             </label>
             <input id="evidence-file" type="file" (change)="onFileChange($event)"
-                accept=".pdf,image/*" />
+                accept=".pdf,.png,.jpg,.jpeg,.gif,.webp,application/pdf,image/png,image/jpeg,image/gif,image/webp" />
             @if (selectedFile(); as file) {
             <div class="file-info">
                 <mat-icon>check_circle</mat-icon>
