@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject, signal }
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { DisplayMessageConfig } from '../../../interfaces/display-message-config';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { DialogHeaderComponent } from '../dialog-header/dialog-header.component';
@@ -14,7 +14,7 @@ import { DialogHeaderComponent } from '../dialog-header/dialog-header.component'
     MatButtonModule,
     MatDialogActions,
     MatDialogContent,
-    MatProgressSpinnerModule,
+    MatProgressBarModule,
     MatIcon
   ],
   templateUrl: './display-message.component.html',
