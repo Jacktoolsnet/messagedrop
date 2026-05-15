@@ -8,20 +8,15 @@
 .dialog-container {
     display: flex;
     flex-direction: column;
-    text-align: center;
     width: min(520px, calc(100vw - 2rem));
     max-width: 100%;
     max-height: 95dvh;
     overflow: hidden;
 
-    h2 {
-        margin: 1rem 0 0;
-        font-size: 1.5rem;
-    }
-
     p {
         font-size: 1rem;
         margin: 0;
+        text-align: center;
     }
 
     .backend-error-image {
@@ -52,25 +47,6 @@
     .multiline-text {
         white-space: pre-line;
     }
-
-    .dialog-actions {
-        flex: 0 0 auto;
-        display: flex;
-        justify-content: center;
-        gap: 0.75rem;
-        flex-wrap: wrap;
-        padding: 1rem 2rem 2rem;
-        background-color: var(--mat-dialog-container-color, var(--mat-sys-surface-container-high));
-        box-shadow: 0 -8px 18px color-mix(in srgb, var(--mat-app-text-color) 8%, transparent);
-    }
-}
-
-.dialog-header {
-    flex: 0 0 auto;
-    padding: 2rem 2rem 1rem;
-    background-color: var(--mat-dialog-container-color, var(--mat-sys-surface-container-high));
-    box-shadow: 0 8px 18px color-mix(in srgb, var(--mat-app-text-color) 6%, transparent);
-    z-index: 1;
 }
 
 .dialog-body {
@@ -78,15 +54,21 @@
     min-height: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
-    padding: 0.5rem 2rem 1rem;
+    padding: 0.9rem 1rem 1rem;
+    margin: 0;
+    box-sizing: border-box;
 }
 
-.dialog-header + .dialog-body {
-    padding-top: 0.25rem;
+.dialog-body--without-actions {
+    padding-bottom: 1.25rem;
 }
 
-.dialog-container:not(:has(.dialog-actions)) .dialog-body {
-    padding-bottom: 2rem;
+.dialog-image-container {
+    padding-bottom: 0.75rem;
+}
+
+.display-message-actions {
+    flex: 0 0 auto;
 }
 
 @media (max-width: 600px), (max-height: 620px) {
@@ -94,30 +76,12 @@
         width: min(440px, calc(100vw - 1rem));
     }
 
-    .dialog-header {
-        padding: 1rem 1.25rem 0.75rem;
-    }
-
-    .dialog-container h2 {
-        font-size: 1.25rem;
-    }
-
     .dialog-container .center {
         padding-bottom: 0.5rem;
     }
 
-    .dialog-container .mat_icon {
-        font-size: 3rem;
-        width: 3rem;
-        height: 3rem;
-    }
-
     .dialog-body {
-        padding: 0.25rem 1.25rem 0.75rem;
-    }
-
-    .dialog-container .dialog-actions {
-        padding: 0.75rem 1.25rem 1rem;
+        padding: 0.75rem 1rem;
     }
 }
 
@@ -405,13 +369,13 @@
 
 @media (max-width: 520px) {
     .toast-actions,
-    .dialog-actions {
+    .display-message-actions {
         flex-direction: column-reverse;
         align-items: stretch;
     }
 
     .toast-actions .display-action-button,
-    .dialog-actions .display-action-button {
+    .display-message-actions .display-action-button {
         width: 100%;
     }
 }

@@ -1,15 +1,19 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { DisplayMessageConfig } from '../../../interfaces/display-message-config';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
+import { DialogHeaderComponent } from '../dialog-header/dialog-header.component';
 
 @Component({
   selector: 'app-server-error',
   imports: [
+    DialogHeaderComponent,
     MatButtonModule,
+    MatDialogActions,
+    MatDialogContent,
     MatProgressSpinnerModule,
     MatIcon
   ],
@@ -25,6 +29,7 @@ export class DisplayMessage implements OnInit, OnDestroy {
   readonly data = inject<DisplayMessageConfig>(MAT_DIALOG_DATA);
   readonly i18n = inject(TranslationHelperService);
   readonly hasActions = !!this.data.button || !!this.data.secondaryButton;
+  readonly hasDialogHeader = this.data.layout !== 'toast' && (!!this.data.title || !!this.data.icon);
   readonly toastRole = this.hasActions ? 'dialog' : 'status';
   readonly toastLive = this.hasActions ? 'polite' : 'assertive';
 

@@ -77,25 +77,23 @@
 </div>
 } @else {
 <div class="dialog-container">
-    @if (data.image || data.icon || data.title) {
-    <div class="dialog-header">
-        @if (data.image) {
+    @if (hasDialogHeader) {
+    <app-dialog-header
+        [icon]="data.icon"
+        [title]="data.title"
+    ></app-dialog-header>
+    }
+
+    <mat-dialog-content
+        class="dialog-body"
+        [class.dialog-body--without-actions]="!hasActions"
+    >
+    @if (data.image) {
+    <div class="center dialog-image-container">
         <img [src]="data.image" alt="Display message" class="backend-error-image" />
-        }
-
-        @if (data.icon) {
-        <div class="center">
-            <mat-icon aria-hidden="true" class="mat_icon">{{ data.icon }}</mat-icon>
-        </div>
-        }
-
-        @if (data.title) {
-        <h2>{{ data.title }}</h2>
-        }
     </div>
     }
 
-    <div class="dialog-body">
     @if (data.message) {
     <p class="multiline-text">{{ data.message }}</p>
     }
@@ -105,10 +103,10 @@
         <mat-spinner></mat-spinner>
     </div>
     }
-    </div>
+    </mat-dialog-content>
 
     @if (showOk() && (data.button || data.secondaryButton)) {
-    <div class="dialog-actions">
+    <mat-dialog-actions class="sticky-actions display-message-actions" align="end">
         @if (data.secondaryButton) {
         <button
             mat-stroked-button
@@ -131,7 +129,7 @@
             {{ data.button }}
         </button>
         }
-    </div>
+    </mat-dialog-actions>
     }
 </div>
 }
