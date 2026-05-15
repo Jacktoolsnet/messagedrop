@@ -23,7 +23,7 @@ function resolvePublicBackendBase() {
   return resolveBaseUrl(process.env.BASE_URL, process.env.PORT);
 }
 
-async function callPublicBackend(method, endpoint, payload) {
+async function callPublicBackend(method, endpoint, payload, options = {}) {
   const baseUrl = resolvePublicBackendBase();
   if (!baseUrl) {
     throw apiError.badGateway('backend_unavailable');
@@ -37,7 +37,8 @@ async function callPublicBackend(method, endpoint, payload) {
     timeout: 10000,
     headers: {
       Authorization: `Bearer ${token}`,
-      Accept: 'application/json'
+      Accept: 'application/json',
+      ...(options.headers || {})
     },
     validateStatus: () => true
   });
@@ -100,7 +101,9 @@ async function findPublicBackendMessageByUuid(messageUuid) {
     return null;
   }
 
-  const response = await callPublicBackend('get', `/message/internal/uuid/${encodeURIComponent(normalized)}`);
+  const response = await callPublicBackend('get', `/message/internal/uuid/${encodeURIComponent(normalized)}`, null, {
+    headers: { 'x-skip-request-error-log': 'true' }
+  });
   if (response.status === 404) {
     return null;
   }
@@ -653,7 +656,9 @@ async function getExternalPublicContentByUuid(messageUuid) {
     return null;
   }
 
-  const response = await callPublicBackend('get', `/message/internal/uuid/${encodeURIComponent(normalizedUuid)}`);
+  const response = await callPublicBackend('get', `/message/internal/uuid/${encodeURIComponent(normalizedUuid)}`, null, {
+    headers: { 'x-skip-request-error-log': 'true' }
+  });
   if (response.status === 404) {
     return null;
   }

@@ -621,6 +621,11 @@ const slowRequestOpenAiModeration = slowRequestMw({
   category: 'external-api',
   upstream: 'openai-moderation'
 });
+const slowRequestMessagePublish = slowRequestMw({
+  thresholdMs: process.env.SLOW_REQUEST_MESSAGE_PUBLISH_THRESHOLD_MS || process.env.SLOW_REQUEST_MESSAGE_CREATE_THRESHOLD_MS || 3000,
+  category: 'external-api',
+  upstream: 'openai-moderation'
+});
 const slowRequestNominatim = slowRequestMw({
   thresholdMs: process.env.SLOW_REQUEST_NOMINATIM_THRESHOLD_MS || 3000,
   category: 'external-api',
@@ -642,6 +647,8 @@ app.use('/dsa', dsaStatusLimit, slowRequestDefault, dsaStatus);
 app.use('/geostatistic', geoStatisticLimit, slowRequestDefault, geoStatistic);
 app.use('/message/create', slowRequestOpenAiModeration);
 app.use('/message/moderate/hashtags', slowRequestOpenAiModeration);
+app.use('/message/internal/publish', slowRequestMessagePublish);
+app.use('/message/update', slowRequestMessagePublish);
 app.use('/message', messageLimit, slowRequestDefault, message);
 app.use('/moderation', basicLimit, slowRequestDefault, moderation);
 app.use('/notification', notificationLimit, slowRequestDefault, notification);
