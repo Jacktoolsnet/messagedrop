@@ -14,6 +14,7 @@ export class NominatimResultsListComponent {
   @Input() showAddButton = true;
 
   @Output() add = new EventEmitter<NominatimPlace>();
+  @Output() apply = new EventEmitter<NominatimPlace>();
   @Output() flyTo = new EventEmitter<NominatimPlace>();
   @Output() navigate = new EventEmitter<NominatimPlace>();
 }

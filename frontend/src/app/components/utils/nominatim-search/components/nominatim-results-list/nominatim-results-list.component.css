@@ -1,13 +1,13 @@
 .content {
-    width: auto;
+    width: 100%;
     max-width: none;
-    padding-top: 1rem;
-    padding-right: 1rem;
-    padding-left: 1rem;
-    margin: 0, auto;
+    padding: 0;
+    margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, max-content));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     justify-content: center;
-    gap: 0.5rem;
+    align-items: stretch;
+    gap: 0;
     white-space: normal;
+    box-sizing: border-box;
 }

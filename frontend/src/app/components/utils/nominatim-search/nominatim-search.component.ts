@@ -153,6 +153,10 @@ export class NominatimSearchComponent {
     this.closeWithSelection();
   }
 
+  onApplyPlaceClick(place: NominatimPlace): void {
+    this.closeWithSelection(place);
+  }
+
   private sortByDistance(latitude: number, longitude: number, places: NominatimPlace[]): NominatimPlace[] {
     return places
       .map(place => {

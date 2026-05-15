@@ -16,8 +16,10 @@ import { NominatimService } from '../../../../../services/nominatim.service';
 export class NominatimResultItemComponent {
   @Input({ required: true }) place!: NominatimPlace;
   @Input() showAddButton = true;
+  @Input() showApplyButton = false;
 
   @Output() add = new EventEmitter<NominatimPlace>();
+  @Output() apply = new EventEmitter<NominatimPlace>();
   @Output() flyTo = new EventEmitter<NominatimPlace>();
   @Output() navigate = new EventEmitter<NominatimPlace>();
 

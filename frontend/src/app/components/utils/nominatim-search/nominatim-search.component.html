@@ -10,7 +10,8 @@
 <mat-dialog-content>
     @if (viewMode === 'list') {
     <app-nominatim-results-list [places]="nominatimPlaces" [showAddButton]="showAddButton()"
-        (add)="onAddPlaceClick($event)" (flyTo)="flyTo($event)" (navigate)="nominatimService.navigateToNominatimPlace($event)">
+        (add)="onAddPlaceClick($event)" (apply)="onApplyPlaceClick($event)"
+        (flyTo)="flyTo($event)" (navigate)="nominatimService.navigateToNominatimPlace($event)">
     </app-nominatim-results-list>
     } @else {
     <app-nominatim-results-map [places]="nominatimPlaces" [initialCenter]="mapView.center"

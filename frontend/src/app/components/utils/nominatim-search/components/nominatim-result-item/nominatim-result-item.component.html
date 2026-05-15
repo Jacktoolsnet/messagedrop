@@ -35,5 +35,12 @@
             [attr.aria-label]="'common.location.navigateToPlaceAria' | transloco" (click)="navigate.emit(place)">
             <mat-icon>assistant_direction</mat-icon>
         </button>
+
+        @if (showApplyButton) {
+        <button class="accept-button" [attr.aria-hidden]="false" mat-mini-fab color="primary"
+            [attr.aria-label]="'common.actions.apply' | transloco" (click)="apply.emit(place)">
+            <mat-icon>check</mat-icon>
+        </button>
+        }
     </mat-card-actions>
 </mat-card>
