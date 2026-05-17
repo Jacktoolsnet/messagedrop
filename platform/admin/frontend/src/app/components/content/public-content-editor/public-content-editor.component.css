@@ -1376,6 +1376,35 @@ mat-chip-grid {
   margin-top: .9rem;
 }
 
+.hashtag-chip-label {
+  overflow-wrap: anywhere;
+}
+
+.hashtag-remove-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  margin-left: .35rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  color: inherit;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.hashtag-remove-button:hover,
+.hashtag-remove-button:focus-visible {
+  background: color-mix(in srgb, currentColor 22%, transparent);
+}
+
 .preview-hashtag-chip {
   display: inline-flex;
   align-items: center;

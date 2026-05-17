@@ -582,10 +582,11 @@
           <mat-chip-grid [attr.aria-label]="i18n.t('Selected hashtags')">
             @for (tag of hashtags(); track tag) {
             <mat-chip-row (removed)="removeHashtag(tag)">
-              #{{ tag }}
+              <span class="hashtag-chip-label">#{{ tag }}</span>
               @if (!hashtagControl.disabled) {
-              <button matChipRemove type="button" [attr.aria-label]="i18n.t('Remove hashtag')">
-                <mat-icon>cancel</mat-icon>
+              <button matChipRemove class="hashtag-remove-button" type="button" (click)="removeHashtag(tag)"
+                [attr.aria-label]="i18n.t('Remove hashtag') + ' #' + tag">
+                <span aria-hidden="true">×</span>
               </button>
               }
             </mat-chip-row>
