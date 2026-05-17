@@ -64,6 +64,7 @@ export class ContactService {
     this.getByUserId(userId).subscribe({
       next: async (getContactsResponse: GetContactsResponse) => {
         const contacts = (getContactsResponse.rows || []).map(raw => this.mapRawContact(raw));
+        const contactsWithChangedKeys = this.findContactsWithChangedKeys(contacts);
         await this.storeContactAvatarsFromServer(contacts);
         this.preserveLocalContactDetails(contacts);
         this._contacts.set(contacts);
@@ -71,6 +72,7 @@ export class ContactService {
         this.persistContacts(false);
         this.ready = true;
         this._contactsSet.update(trigger => trigger + 1);
+        this.emitContactResetsForContactUserIds(contactsWithChangedKeys);
       },
       error: (err) => {
         if (err.status === 404) {
@@ -116,6 +118,7 @@ export class ContactService {
       .subscribe({
         next: async (getContactsResponse: GetContactsResponse) => {
           const contacts = (getContactsResponse.rows || []).map(raw => this.mapRawContact(raw));
+          const contactsWithChangedKeys = this.findContactsWithChangedKeys(contacts);
           await this.storeContactAvatarsFromServer(contacts);
           this.preserveLocalContactDetails(contacts);
           this._contacts.set(contacts);
@@ -123,6 +126,7 @@ export class ContactService {
           this.persistContacts(false);
           this.ready = true;
           this._contactsSet.update(trigger => trigger + 1);
+          this.emitContactResetsForContactUserIds(contactsWithChangedKeys);
         },
         error: (err) => {
           if (err.status === 404) {
@@ -223,6 +227,42 @@ export class ContactService {
     }
 
     return name;
+  }
+
+  private findContactsWithChangedKeys(nextContacts: Contact[]): string[] {
+    const currentByContactUserId = new Map(
+      this._contacts()
+        .filter(contact => !!contact.contactUserId)
+        .map(contact => [contact.contactUserId, contact])
+    );
+    const changedContactUserIds = new Set<string>();
+
+    nextContacts.forEach((nextContact) => {
+      if (!nextContact.contactUserId) {
+        return;
+      }
+      const current = currentByContactUserId.get(nextContact.contactUserId);
+      if (!current) {
+        return;
+      }
+      const signingKeyChanged = this.serializeKey(current.contactUserSigningPublicKey)
+        !== this.serializeKey(nextContact.contactUserSigningPublicKey);
+      const encryptionKeyChanged = this.serializeKey(current.contactUserEncryptionPublicKey)
+        !== this.serializeKey(nextContact.contactUserEncryptionPublicKey);
+      if (signingKeyChanged || encryptionKeyChanged) {
+        changedContactUserIds.add(nextContact.contactUserId);
+      }
+    });
+
+    return [...changedContactUserIds];
+  }
+
+  private serializeKey(key?: JsonWebKey): string {
+    return key ? JSON.stringify(key) : '';
+  }
+
+  private emitContactResetsForContactUserIds(contactUserIds: string[]): void {
+    contactUserIds.forEach((contactUserId) => this.emitContactResetForContactUser(contactUserId));
   }
 
   private async updateContactProfile() {

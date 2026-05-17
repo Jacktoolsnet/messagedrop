@@ -50,7 +50,7 @@ function buildIdentifierMap() {
     for (const entry of fs.readdirSync(__dirname)) {
       if (!/^table.*\.js$/.test(entry)) continue;
       const content = fs.readFileSync(path.join(__dirname, entry), 'utf8');
-      for (const match of content.matchAll(/['`]([A-Za-z][A-Za-z0-9_]*[A-Z][A-Za-z0-9_]*)['`]/g)) {
+      for (const match of content.matchAll(/['"`]([A-Za-z][A-Za-z0-9_]*[A-Z][A-Za-z0-9_]*)['"`]/g)) {
         add(match[1]);
       }
       for (const match of content.matchAll(/\bAS\s+([A-Za-z][A-Za-z0-9_]*[A-Z][A-Za-z0-9_]*)/g)) {
