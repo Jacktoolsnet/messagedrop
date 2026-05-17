@@ -709,7 +709,7 @@
         "add": "Add experience"
       },
       "messages": {
-        "title": "Öffentliche Nachrichten",
+        "title": "Public messages",
         "multimediaOnly": "Multimedia message",
         "empty": "No messages found."
       },
