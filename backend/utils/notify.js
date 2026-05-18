@@ -99,7 +99,9 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
         INNER JOIN tableUser ON tableContact.userId = tableUser.id
         WHERE contactUserId = ?
         AND userId = ?
-        AND tableContact.subscribed = true;`;
+        AND tableContact.subscribed = true
+        AND COALESCE(tableContact.status, 'active') = 'active'
+        AND COALESCE(tableUser.subscription, '') <> '';`;
         db.all(sql, [String(userId ?? ''), String(contactUserId ?? '')], (err, rows) => {
             if (err) {
                 logger.error('contactSubscriptions query failed', {

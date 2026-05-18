@@ -6,15 +6,18 @@ const tableContact = require('../db/tableContact');
 const security = require('../middleware/security');
 const metric = require('../middleware/metric');
 const tableContactMessage = require('../db/tableContactMessage');
+const notify = require('../utils/notify');
 const { apiError } = require('../middleware/api-error');
 
 const DEFAULT_MAX_MESSAGE_BYTES = 1_500_000;
+const DEFAULT_CONTACT_PUSH_BODY = 'You have received a new chat message.';
 const MAX_MESSAGE_BYTES = (() => {
   const raw = process.env.CONTACT_MESSAGE_MAX_BYTES;
   if (!raw) return DEFAULT_MAX_MESSAGE_BYTES;
   const parsed = Number.parseInt(raw, 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_MAX_MESSAGE_BYTES;
 })();
+const CONTACT_PUSH_BODY = (process.env.CONTACT_PUSH_BODY || DEFAULT_CONTACT_PUSH_BODY).trim() || DEFAULT_CONTACT_PUSH_BODY;
 
 function getAuthUserId(req) {
   return req.jwtUser?.userId ?? req.jwtUser?.id ?? null;
@@ -145,7 +148,32 @@ router.post('/send',
               signature,
               status: 'delivered',
               createdAt
-            }, () => { /* ignore errors for mirror insert */ });
+            }, (mirrorErr) => {
+              if (mirrorErr) {
+                req.logger?.warn?.('contactMessage.send mirror insert failed; skipping push notification', {
+                  error: mirrorErr?.message,
+                  userId,
+                  contactUserId,
+                  contactId,
+                  reciprocalContactId: reciprocal.id
+                });
+                return;
+              }
+              notify.contactSubscriptions(
+                req.logger,
+                req.database.db,
+                userId,
+                contactUserId,
+                CONTACT_PUSH_BODY
+              );
+            });
+          } else if (lookupErr) {
+            req.logger?.warn?.('contactMessage.send reciprocal lookup failed; skipping push notification', {
+              error: lookupErr?.message,
+              userId,
+              contactUserId,
+              contactId
+            });
           }
           return res.status(200).json({
             status: 200,
