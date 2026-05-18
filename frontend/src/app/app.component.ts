@@ -16,6 +16,7 @@ import { environment } from '../environments/environment';
 import { AirQualityComponent } from './components/air-quality/air-quality.component';
 import { AppSettingsComponent } from './components/app-settings/app-settings.component';
 import { UsageProtectionComponent } from './components/app-settings/usage-protection/usage-protection.component';
+import { ContactChatroomComponent } from './components/contact-chatroom/contact-chatroom.component';
 import { ContactlistComponent } from './components/contactlist/contactlist.component';
 import { DocumentlistComponent } from './components/documentlist/documentlist.component';
 import { EditMessageComponent } from './components/editmessage/edit-message.component';
@@ -50,6 +51,7 @@ import { HelpDialogService } from './components/utils/help-dialog/help-dialog.se
 import { NominatimSearchComponent } from './components/utils/nominatim-search/nominatim-search.component';
 import { SearchSettingsComponent } from './components/utils/search-settings/search-settings.component';
 import { WeatherComponent } from './components/weather/weather.component';
+import { Contact } from './interfaces/contact';
 import { GetGeoStatisticResponse } from './interfaces/get-geo-statistic-response';
 import { LocalDocument } from './interfaces/local-document';
 import { LocalImage } from './interfaces/local-image';
@@ -228,6 +230,8 @@ export class AppComponent implements OnInit {
   private sharedContentNoticeOpen = false;
   private sharedContentDialogOpen = false;
   private qStageWarningDialogOpen = false;
+  private readonly pendingContactNotificationAction = signal<NotificationAction | null>(null);
+  private openingContactNotification = false;
   private readonly pendingPublicMessageUuid = signal<string | null>(this.readPendingPublicMessageUuid());
   private initialPublicMessagesRequested = false;
   private openingPublicMessage = false;
@@ -364,6 +368,16 @@ export class AppComponent implements OnInit {
       }
       this.appService.clearNotificationAction();
       void this.handleNotification(notificationAction);
+    });
+
+    effect(() => {
+      const notificationAction = this.pendingContactNotificationAction();
+      this.userService.userSet();
+      this.contactService.contactsSet();
+      if (!notificationAction) {
+        return;
+      }
+      void this.openPendingContactNotification(notificationAction);
     });
 
     // Shared Content
@@ -955,7 +969,8 @@ export class AppComponent implements OnInit {
     void this.systemNotificationService.refreshUnreadCount();
 
     if (notificationAction.type === 'contact') {
-      this.openContactListDialog();
+      this.pendingContactNotificationAction.set(notificationAction);
+      void this.openPendingContactNotification(notificationAction);
       return;
     }
 
@@ -967,6 +982,83 @@ export class AppComponent implements OnInit {
     if (notificationAction.type === 'place') {
       await this.handlePlaceNotification(notificationAction);
     }
+  }
+
+  private async openPendingContactNotification(action: NotificationAction): Promise<void> {
+    if (this.openingContactNotification) {
+      return;
+    }
+
+    const contactId = typeof action.id === 'string' ? action.id.trim() : '';
+    if (!contactId) {
+      this.pendingContactNotificationAction.set(null);
+      await this.openContactListDialog();
+      return;
+    }
+
+    if (!this.appService.isConsentCompleted() || !this.userService.hasJwt()) {
+      return;
+    }
+
+    if (!this.contactService.isReady()) {
+      this.contactService.initContacts();
+      return;
+    }
+
+    const contact = this.contactService.contactsSignal().find((entry) => entry.id === contactId);
+    if (!contact || (contact.status || 'active') !== 'active') {
+      this.pendingContactNotificationAction.set(null);
+      await this.openContactListDialog();
+      return;
+    }
+
+    this.openingContactNotification = true;
+    try {
+      if (!await this.ensureUserMenuActionAllowed()) {
+        return;
+      }
+      this.pendingContactNotificationAction.set(null);
+      this.openContactChatroomDialog(contact);
+    } finally {
+      this.openingContactNotification = false;
+    }
+  }
+
+  private openContactChatroomDialog(contact: Contact): void {
+    const dialogId = `contactChatroomDialog-${contact.id}`;
+    const existingDialog = this.dialog.getDialogById(dialogId);
+    if (existingDialog) {
+      return;
+    }
+
+    const dialogRef = this.dialog.open(ContactChatroomComponent, {
+      id: dialogId,
+      closeOnNavigation: true,
+      data: {
+        contactId: contact.id
+      },
+      minWidth: 'min(600px, 95vw)',
+      maxWidth: '95vw',
+      width: 'max(600px, 95vw)',
+      maxHeight: '95vh',
+      height: 'auto',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      if (!this.userService.hasJwt()) {
+        return;
+      }
+      this.contactMessageService.unreadCount(contact.id).subscribe({
+        next: (res) => {
+          this.unreadContactCounts.update((map) => ({ ...map, [contact.id]: res.unread ?? 0 }));
+          contact.unreadCount = res.unread ?? 0;
+        }
+      });
+    });
   }
 
   private async handleMessageNotification(action: NotificationAction): Promise<void> {
