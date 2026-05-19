@@ -50,5 +50,8 @@
     "@modelcontextprotocol/sdk": "^1.22.0",
     "eslint": "^9.39.1",
     "globals": "^16.5.0"
+  },
+  "overrides": {
+    "ws": "8.20.1"
   }
 }
