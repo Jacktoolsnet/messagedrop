@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, Signal, computed, effect, inject, s
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -35,6 +35,11 @@ import { NetworkService } from '../../services/network.service';
 
 interface ConnectDialogResult {
   connectId?: string;
+}
+
+interface ContactlistDialogData {
+  autoOpenContactId?: string;
+  autoOpenContactUserId?: string;
 }
 
 interface ContactMessagePreview {
@@ -78,6 +83,7 @@ export class ContactlistComponent {
   private readonly translation = inject(TranslationHelperService);
   readonly help = inject(HelpDialogService);
   readonly dialogRef = inject(MatDialogRef<ContactlistComponent>);
+  private readonly dialogData = inject<ContactlistDialogData | null>(MAT_DIALOG_DATA, { optional: true });
   readonly contactsSignal: Signal<Contact[]> = this.contactService.sortedContactsSignal;
   readonly unreadCounts = signal<Record<string, number>>({});
   readonly latestMessagePreviews = signal<Record<string, ContactMessagePreview[]>>({});
@@ -86,6 +92,7 @@ export class ContactlistComponent {
   );
   private readonly unreadLoaded = new Set<string>();
   private readonly previewRequestKeys = new Map<string, string>();
+  private autoOpenHandled = false;
 
   private contactToDelete?: Contact;
   public mode: typeof Mode = Mode;
@@ -96,6 +103,27 @@ export class ContactlistComponent {
       const count = this.contactsSignal().length;
       const width = count > 1 ? 'min(900px, 95vw)' : 'min(520px, 95vw)';
       this.dialogRef.updateSize(width);
+    });
+
+    effect(() => {
+      if (this.autoOpenHandled || !this.backendActionsAvailable()) {
+        return;
+      }
+      const autoOpenContactId = this.dialogData?.autoOpenContactId?.trim() ?? '';
+      const autoOpenContactUserId = this.dialogData?.autoOpenContactUserId?.trim() ?? '';
+      if (!autoOpenContactId && !autoOpenContactUserId) {
+        this.autoOpenHandled = true;
+        return;
+      }
+      const contacts = this.contactsSignal();
+      const contact = autoOpenContactUserId
+        ? contacts.find((entry) => entry.contactUserId === autoOpenContactUserId)
+        : contacts.find((entry) => autoOpenContactId && (entry.id === autoOpenContactId || entry.contactUserId === autoOpenContactId));
+      if (!contact || (contact.status || 'active') !== 'active') {
+        return;
+      }
+      this.autoOpenHandled = true;
+      queueMicrotask(() => this.openContactChatroom(contact));
     });
 
     effect(() => {

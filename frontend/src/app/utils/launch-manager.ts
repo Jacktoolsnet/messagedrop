@@ -36,6 +36,7 @@ function normalizeNotificationTarget(value: unknown): NotificationAction | undef
     const target = value as {
         type?: unknown;
         id?: unknown;
+        contactUserId?: unknown;
         placeId?: unknown;
         location?: unknown;
     };
@@ -48,6 +49,7 @@ function normalizeNotificationTarget(value: unknown): NotificationAction | undef
     return {
         type: target.type.trim(),
         id,
+        contactUserId: normalizeId(target.contactUserId),
         placeId,
         location
     };

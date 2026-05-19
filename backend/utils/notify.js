@@ -129,6 +129,11 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
                                 "data": {
                                     "dateOfArrival": Date.now(),
                                     "primaryKey": { "type": "contact", "id": row.id },
+                                    "target": {
+                                        "type": "contact",
+                                        "id": row.id,
+                                        "contactUserId": row.contactUserId
+                                    },
                                     "onActionClick": {
                                         "default": {
                                             "operation": "focusLastFocusedOrOpen",

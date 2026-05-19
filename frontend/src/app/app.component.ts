@@ -16,7 +16,6 @@ import { environment } from '../environments/environment';
 import { AirQualityComponent } from './components/air-quality/air-quality.component';
 import { AppSettingsComponent } from './components/app-settings/app-settings.component';
 import { UsageProtectionComponent } from './components/app-settings/usage-protection/usage-protection.component';
-import { ContactChatroomComponent } from './components/contact-chatroom/contact-chatroom.component';
 import { ContactlistComponent } from './components/contactlist/contactlist.component';
 import { DocumentlistComponent } from './components/documentlist/documentlist.component';
 import { EditMessageComponent } from './components/editmessage/edit-message.component';
@@ -51,7 +50,6 @@ import { HelpDialogService } from './components/utils/help-dialog/help-dialog.se
 import { NominatimSearchComponent } from './components/utils/nominatim-search/nominatim-search.component';
 import { SearchSettingsComponent } from './components/utils/search-settings/search-settings.component';
 import { WeatherComponent } from './components/weather/weather.component';
-import { Contact } from './interfaces/contact';
 import { GetGeoStatisticResponse } from './interfaces/get-geo-statistic-response';
 import { LocalDocument } from './interfaces/local-document';
 import { LocalImage } from './interfaces/local-image';
@@ -990,7 +988,8 @@ export class AppComponent implements OnInit {
     }
 
     const contactId = typeof action.id === 'string' ? action.id.trim() : '';
-    if (!contactId) {
+    const contactUserId = typeof action.contactUserId === 'string' ? action.contactUserId.trim() : '';
+    if (!contactId && !contactUserId) {
       this.pendingContactNotificationAction.set(null);
       await this.openContactListDialog();
       return;
@@ -1005,60 +1004,19 @@ export class AppComponent implements OnInit {
       return;
     }
 
-    const contact = this.contactService.contactsSignal().find((entry) => entry.id === contactId);
-    if (!contact || (contact.status || 'active') !== 'active') {
-      this.pendingContactNotificationAction.set(null);
-      await this.openContactListDialog();
-      return;
-    }
-
     this.openingContactNotification = true;
     try {
       if (!await this.ensureUserMenuActionAllowed()) {
         return;
       }
       this.pendingContactNotificationAction.set(null);
-      this.openContactChatroomDialog(contact);
+      await this.openContactListDialog({
+        autoOpenContactId: contactId || undefined,
+        autoOpenContactUserId: contactUserId || undefined
+      });
     } finally {
       this.openingContactNotification = false;
     }
-  }
-
-  private openContactChatroomDialog(contact: Contact): void {
-    const dialogId = `contactChatroomDialog-${contact.id}`;
-    const existingDialog = this.dialog.getDialogById(dialogId);
-    if (existingDialog) {
-      return;
-    }
-
-    const dialogRef = this.dialog.open(ContactChatroomComponent, {
-      id: dialogId,
-      closeOnNavigation: true,
-      data: {
-        contactId: contact.id
-      },
-      minWidth: 'min(600px, 95vw)',
-      maxWidth: '95vw',
-      width: 'max(600px, 95vw)',
-      maxHeight: '95vh',
-      height: 'auto',
-      hasBackdrop: true,
-      backdropClass: 'dialog-backdrop',
-      disableClose: false,
-      autoFocus: false
-    });
-
-    dialogRef.afterClosed().subscribe(() => {
-      if (!this.userService.hasJwt()) {
-        return;
-      }
-      this.contactMessageService.unreadCount(contact.id).subscribe({
-        next: (res) => {
-          this.unreadContactCounts.update((map) => ({ ...map, [contact.id]: res.unread ?? 0 }));
-          contact.unreadCount = res.unread ?? 0;
-        }
-      });
-    });
   }
 
   private async handleMessageNotification(action: NotificationAction): Promise<void> {
@@ -1957,9 +1915,15 @@ export class AppComponent implements OnInit {
     });
   }
 
-  public async openContactListDialog(): Promise<void> {
+  public async openContactListDialog(options: { autoOpenContactId?: string; autoOpenContactUserId?: string } = {}): Promise<void> {
     if (!await this.ensureUserMenuActionAllowed()) {
       return;
+    }
+    const shouldAutoOpenContact = !!(options.autoOpenContactId || options.autoOpenContactUserId);
+    const existingDialog = this.dialog.getDialogById('contactListDialog');
+    if (existingDialog && shouldAutoOpenContact) {
+      existingDialog.close();
+      await firstValueFrom(existingDialog.afterClosed());
     }
     const contactCount = this.contactService.isReady() ? this.contactService.contactsSignal().length : 0;
     const hasContacts = contactCount > 0;
@@ -1968,7 +1932,10 @@ export class AppComponent implements OnInit {
       id: 'contactListDialog',
       panelClass: hasContacts ? 'ContactListDialog' : undefined,
       closeOnNavigation: true,
-      data: {},
+      data: {
+        autoOpenContactId: options.autoOpenContactId,
+        autoOpenContactUserId: options.autoOpenContactUserId
+      },
       minWidth: 'min(360px, 95vw)',
       maxWidth: '95vw',
       width: dialogWidth,
