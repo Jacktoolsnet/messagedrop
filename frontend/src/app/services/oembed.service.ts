@@ -212,41 +212,69 @@ export class OembedService {
   }
 
   private async getTikTokMultimedia(url: string, depth = 0): Promise<Multimedia | undefined> {
-    const tiktokId = this.extractTikTokVideoId(url);
+    const normalizedUrl = url.trim();
+    const tiktokId = this.extractTikTokVideoId(normalizedUrl);
     if (tiktokId) {
-      const oembedHtml = this.getTikTokEmbedCode(tiktokId);
-      return {
-        type: MultimediaType.TIKTOK,
-        url: '',
-        contentId: null != tiktokId ? tiktokId : '',
-        sourceUrl: url,
-        attribution: this.poweredBy('TikTok'),
-        title: '',
-        description: '',
-        oembed: {
-          html: oembedHtml,
-          width: 0,
-          height: 0,
-          provider_name: 'TikTok',
-          provider_url: 'https://www.tiktok.com/',
-          type: 'rich',
-          version: '1.0'
-        }
-      };
+      return this.buildTikTokMultimedia(tiktokId, normalizedUrl);
     }
     if (depth >= 4) {
       return undefined;
     }
+
     try {
-      const response = await firstValueFrom(this.getTikTokVmEmbedCode(url));
+      const response = await firstValueFrom(this.getTikTokVmEmbedCode(normalizedUrl));
       const citeUrl = this.extractCiteUrl(response.result?.html);
-      if (citeUrl && citeUrl !== url) {
+      if (citeUrl && citeUrl !== normalizedUrl) {
         return await this.getTikTokMultimedia(citeUrl, depth + 1);
       }
+      if (response.result?.html?.trim()) {
+        const oembedId = this.extractTikTokVideoId([
+          response.result.url,
+          response.result.author_url,
+          response.result.html
+        ].filter(Boolean).join(' '));
+        return this.buildTikTokMultimedia(oembedId ?? '', normalizedUrl, response.result);
+      }
     } catch (error) {
-      console.error('Failed to resolve TikTok short URL', error);
+      console.error('Failed to load TikTok embed data', error);
+    }
+
+    try {
+      const resolvedUrl = await this.resolveRedirectChain(normalizedUrl, 6);
+      if (resolvedUrl !== normalizedUrl) {
+        return await this.getTikTokMultimedia(resolvedUrl, depth + 1);
+      }
+    } catch (error) {
+      console.error('Failed to resolve TikTok redirect URL', error);
     }
     return undefined;
+  }
+
+  private buildTikTokMultimedia(
+    tiktokId: string,
+    sourceUrl: string,
+    oembed?: GetOembedResponse['result']
+  ): Multimedia {
+    const oembedHtml = tiktokId ? this.getTikTokEmbedCode(tiktokId) : (oembed?.html ?? '');
+    return {
+      type: MultimediaType.TIKTOK,
+      url: '',
+      contentId: tiktokId,
+      sourceUrl,
+      attribution: this.poweredBy('TikTok'),
+      title: oembed?.title ?? '',
+      description: '',
+      oembed: {
+        ...oembed,
+        html: oembedHtml,
+        width: oembed?.width ?? 0,
+        height: oembed?.height ?? 0,
+        provider_name: oembed?.provider_name || 'TikTok',
+        provider_url: oembed?.provider_url || 'https://www.tiktok.com/',
+        type: oembed?.type || 'rich',
+        version: oembed?.version || '1.0'
+      }
+    };
   }
 
   private async getPinterestMultimedia(url: string): Promise<Multimedia | undefined> {
@@ -415,7 +443,7 @@ export class OembedService {
   }
 
   private extractTikTokVideoId(url: string): string | null {
-    const tiktokRegex = /tiktok\.com\/@[\w.-]+\/video\/(\d+)/i;
+    const tiktokRegex = /tiktok\.com\/(?:@[\w.-]+\/(?:video|photo)|(?:embed|player)\/v1|v)\/(\d+)/i;
     const match = url.match(tiktokRegex);
     if (!match || !match[1]) {
       return null;
@@ -462,7 +490,7 @@ export class OembedService {
   }
 
   public getTikTokEmbedCode(videoId: string): string {
-    return `<iframe width= "auto" style="aspect-ratio: 16 / 9; resize: both; border: none;" src="https://www.tiktok.com/player/v1/${videoId}" allow="fullscreen" title="test"></iframe>`
+    return `<iframe width="auto" style="aspect-ratio: 16 / 9; resize: both; border: none;" src="https://www.tiktok.com/player/v1/${videoId}" allow="fullscreen" title="TikTok"></iframe>`
   }
 
   public getTikTokVmEmbedCode(sourceUrl: string): Observable<GetOembedResponse> {

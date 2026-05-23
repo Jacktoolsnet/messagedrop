@@ -58,13 +58,19 @@ function createResolveRequestConfig() {
         maxRedirects: 0,
         validateStatus: null,
         timeout: RESOLVE_REQUEST_TIMEOUT_MS,
-        maxContentLength: 64 * 1024,
-        responseType: 'text'
+        responseType: 'stream'
     };
     if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') {
         config.signal = AbortSignal.timeout(RESOLVE_REQUEST_TIMEOUT_MS + 250);
     }
     return config;
+}
+
+function closeResolveResponseBody(axiosResponse) {
+    const body = axiosResponse && axiosResponse.data;
+    if (body && typeof body.destroy === 'function') {
+        body.destroy();
+    }
 }
 
 function isAllowedHost(host, allowedHosts) {
@@ -199,6 +205,8 @@ async function resolveAllowedRedirectTarget(initialUrl, allowedHosts, maxRedirec
             break;
         }
 
+        closeResolveResponseBody(axiosResponse);
+
         if (!(axiosResponse.status >= 300 && axiosResponse.status < 400) || typeof axiosResponse.headers.location !== 'string') {
             break;
         }
@@ -261,6 +269,8 @@ async function resolvePinterestRedirectTarget(initialUrl, maxRedirects = 5) {
         } catch {
             break;
         }
+
+        closeResolveResponseBody(axiosResponse);
 
         if (!(axiosResponse.status >= 300 && axiosResponse.status < 400) || typeof axiosResponse.headers.location !== 'string') {
             break;
@@ -369,6 +379,8 @@ router.get('/resolve/:url', security.authenticate, async function (req, res, nex
     } catch {
         return next(apiError.badGateway('resolve_failed'));
     }
+
+    closeResolveResponseBody(axiosResponse);
 
     if (axiosResponse.status >= 300 && axiosResponse.status < 400 && typeof axiosResponse.headers.location === 'string') {
         try {
