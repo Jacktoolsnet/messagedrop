@@ -171,3 +171,8 @@
 .usage-timezone-field {
   width: 100%;
 }
+
+.usage-timezone-field mat-hint {
+  white-space: normal;
+  line-height: 1.3;
+}

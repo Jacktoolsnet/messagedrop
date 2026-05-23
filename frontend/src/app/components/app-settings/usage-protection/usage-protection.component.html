@@ -136,7 +136,7 @@
         }
 
         <section class="usage-slider-block usage-timezone-tile">
-          <mat-form-field appearance="fill" class="usage-timezone-field">
+          <mat-form-field appearance="fill" class="usage-timezone-field" subscriptSizing="dynamic">
             <mat-label>{{ 'settings.usageProtection.timezoneLabel' | transloco }}</mat-label>
             <mat-select [value]="appSettings.usageProtection.timezone"
               [disabled]="isParentalModeWithoutPin()"
