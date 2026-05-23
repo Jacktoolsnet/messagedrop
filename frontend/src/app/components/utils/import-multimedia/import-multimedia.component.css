@@ -117,6 +117,13 @@
     margin-inline: auto;
 }
 
+.multimedia_container--youtube {
+    width: min(100%, 56rem);
+    max-width: calc(100vw - 4rem);
+    box-sizing: border-box;
+    margin-inline: auto;
+}
+
 :host ::ng-deep .multimedia_container iframe {
     width: 100% !important;
     max-width: 100% !important;
@@ -124,6 +131,13 @@
     margin: 0 auto;
     border: 0;
     border-radius: 0.75rem;
+}
+
+:host ::ng-deep .multimedia_container--youtube iframe {
+    aspect-ratio: 16 / 9;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
 }
 
 :host ::ng-deep .multimedia_container--pinterest iframe {
