@@ -169,10 +169,23 @@
 }
 
 .usage-timezone-field {
+  display: block;
   width: 100%;
 }
 
 .usage-timezone-field mat-hint {
   white-space: normal;
   line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.usage-timezone-field ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+  height: auto;
+  min-height: 0;
+}
+
+.usage-timezone-field ::ng-deep .mat-mdc-form-field-hint-wrapper {
+  position: static;
+  display: block;
+  padding-top: 0.25rem;
 }
