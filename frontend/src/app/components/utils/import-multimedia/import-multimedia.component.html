@@ -31,7 +31,10 @@
 
 <mat-dialog-content class="full-width">
     @if (safeHtml !== undefined) {
-    <div class="multimedia_container" [innerHTML]="safeHtml"></div>
+    <div class="multimedia_container"
+        [class.multimedia_container--youtube]="multimedia?.type === 'youtube'"
+        [class.multimedia_container--pinterest]="multimedia?.type === 'pinterest'"
+        [innerHTML]="safeHtml"></div>
     } @else if (!multimediaUrl.trim()) {
     <section class="supported-services" aria-labelledby="supported-services-title">
         <h2 id="supported-services-title" class="supported-services__title">

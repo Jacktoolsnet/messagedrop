@@ -133,11 +133,11 @@
 }
 
 :host ::ng-deep .oembed_container.oembed-pinterest iframe {
-    max-width: min(100%, 30rem) !important;
+    max-width: min(100%, 38rem) !important;
     width: 100% !important;
-    height: clamp(320px, 46vw, 520px) !important;
+    height: clamp(360px, 72vh, 760px) !important;
     min-height: 0 !important;
-    max-height: 520px !important;
+    max-height: min(760px, 72vh) !important;
     aspect-ratio: auto !important;
 }
 

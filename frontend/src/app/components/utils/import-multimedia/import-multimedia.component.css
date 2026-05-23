@@ -110,6 +110,29 @@
     border-radius: 1rem;
 }
 
+.multimedia_container--pinterest {
+    width: min(100%, 42rem);
+    max-width: calc(100vw - 4rem);
+    box-sizing: border-box;
+    margin-inline: auto;
+}
+
+:host ::ng-deep .multimedia_container iframe {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: block;
+    margin: 0 auto;
+    border: 0;
+    border-radius: 0.75rem;
+}
+
+:host ::ng-deep .multimedia_container--pinterest iframe {
+    max-width: min(100%, 38rem) !important;
+    height: clamp(360px, 72vh, 760px) !important;
+    max-height: min(760px, calc(90vh - 9rem)) !important;
+    aspect-ratio: auto !important;
+}
+
 .center {
     display: flex;
     justify-content: center;

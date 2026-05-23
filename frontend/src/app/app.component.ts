@@ -874,6 +874,10 @@ export class AppComponent implements OnInit {
       return 'min(960px, 95vw)';
     }
 
+    if (multimedia?.type === MultimediaType.PINTEREST) {
+      return 'min(920px, 95vw)';
+    }
+
     if (multimedia) {
       return 'min(760px, 95vw)';
     }
