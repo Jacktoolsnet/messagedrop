@@ -393,6 +393,42 @@ function inferMediaProvider(url) {
   return null;
 }
 
+function extractTikTokPostId(url) {
+  const match = String(url || '').match(/tiktok\.com\/(?:@[\w.-]+\/(?:video|photo)|(?:embed|player)\/v1|v)\/(\d+)/i);
+  return match?.[1] || '';
+}
+
+function getTikTokPlayerHtml(postId) {
+  return `<iframe width="auto" style="aspect-ratio: 16 / 9; resize: both; border: none;" src="https://www.tiktok.com/player/v1/${postId}" allow="fullscreen" title="TikTok"></iframe>`;
+}
+
+function buildTikTokMultimedia(url, provider, oembed = null) {
+  const postId = extractTikTokPostId(url);
+  if (!postId && !oembed?.html) {
+    return null;
+  }
+
+  return {
+    type: provider.type,
+    url: '',
+    sourceUrl: url,
+    attribution: `Powered by ${provider.platformName}`,
+    title: normalizeShortText(oembed?.title, 240),
+    description: normalizeShortText(oembed?.author_name || oembed?.provider_name || '', 500),
+    contentId: postId,
+    oembed: {
+      ...(oembed || {}),
+      html: postId ? getTikTokPlayerHtml(postId) : oembed.html,
+      width: oembed?.width ?? 0,
+      height: oembed?.height ?? 0,
+      provider_name: oembed?.provider_name || 'TikTok',
+      provider_url: oembed?.provider_url || 'https://www.tiktok.com/',
+      type: oembed?.type || 'rich',
+      version: oembed?.version || '1.0'
+    }
+  };
+}
+
 async function fetchOembedResult(url, provider) {
   const response = await callPublicBackendPublic(
     'get',
@@ -1746,11 +1782,22 @@ async function resolveCreatorMultimedia(url) {
     return null;
   }
 
+  if (provider.type === 'tiktok') {
+    const directTikTokMultimedia = buildTikTokMultimedia(url, provider);
+    if (directTikTokMultimedia) {
+      return directTikTokMultimedia;
+    }
+  }
+
   let oembed = null;
   try {
     oembed = await fetchOembedResult(url, provider);
   } catch {
     oembed = null;
+  }
+
+  if (provider.type === 'tiktok') {
+    return buildTikTokMultimedia(url, provider, oembed);
   }
 
   return {

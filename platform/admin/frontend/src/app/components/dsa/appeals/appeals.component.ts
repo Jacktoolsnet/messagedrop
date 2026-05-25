@@ -410,7 +410,7 @@ export class AppealsComponent implements OnInit {
       try {
         const parsed = new URL(sourceUrl);
         if (this.isAllowedHost(parsed.hostname, ['tiktok.com', 'vm.tiktok.com'])) {
-          const match = parsed.pathname.match(/\/@[^/]+\/video\/(\d+)/);
+          const match = parsed.pathname.match(/\/@[^/]+\/(?:video|photo)\/(\d+)/);
           const safeMatch = this.sanitizeTikTokId(match?.[1] || null);
           if (safeMatch) return safeMatch;
         }

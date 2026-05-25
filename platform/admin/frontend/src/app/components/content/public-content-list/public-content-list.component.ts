@@ -517,7 +517,7 @@ export class PublicContentListComponent {
           || normalizedHost === 'vm.tiktok.com';
 
         if (isTikTokHost) {
-          const match = parsed.pathname.match(/\/@[^/]+\/video\/(\d+)/);
+          const match = parsed.pathname.match(/\/@[^/]+\/(?:video|photo)\/(\d+)/);
           const safeMatch = this.sanitizeTikTokId(match?.[1] || null);
           if (safeMatch) {
             return safeMatch;

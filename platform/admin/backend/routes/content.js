@@ -956,6 +956,42 @@ function inferMediaProvider(url) {
   return null;
 }
 
+function extractTikTokPostId(url) {
+  const match = String(url || '').match(/tiktok\.com\/(?:@[\w.-]+\/(?:video|photo)|(?:embed|player)\/v1|v)\/(\d+)/i);
+  return match?.[1] || '';
+}
+
+function getTikTokPlayerHtml(postId) {
+  return `<iframe width="auto" style="aspect-ratio: 16 / 9; resize: both; border: none;" src="https://www.tiktok.com/player/v1/${postId}" allow="fullscreen" title="TikTok"></iframe>`;
+}
+
+function buildTikTokMultimedia(targetUrl, provider, oembed = null) {
+  const postId = extractTikTokPostId(targetUrl);
+  if (!postId && !oembed?.html) {
+    return null;
+  }
+
+  return {
+    type: provider.type,
+    url: '',
+    sourceUrl: targetUrl,
+    attribution: `Powered by ${provider.platformName}`,
+    title: oembed?.title || '',
+    description: oembed?.author_name || '',
+    contentId: postId,
+    oembed: {
+      ...(oembed || {}),
+      html: postId ? getTikTokPlayerHtml(postId) : oembed.html,
+      width: oembed?.width ?? 0,
+      height: oembed?.height ?? 0,
+      provider_name: oembed?.provider_name || 'TikTok',
+      provider_url: oembed?.provider_url || 'https://www.tiktok.com/',
+      type: oembed?.type || 'rich',
+      version: oembed?.version || '1.0'
+    }
+  };
+}
+
 function toPublicProfileDto(row) {
   if (!row) {
     return null;
@@ -1965,6 +2001,16 @@ router.get('/media/oembed', requireRole(...CONTENT_ROLES), async (req, res, next
     return next(apiError.badRequest('unsupported_provider'));
   }
 
+  if (provider.type === 'tiktok') {
+    const directTikTokMultimedia = buildTikTokMultimedia(targetUrl, provider);
+    if (directTikTokMultimedia) {
+      return res.json({
+        status: 200,
+        multimedia: directTikTokMultimedia
+      });
+    }
+  }
+
   try {
     const endpoint = `/utils/oembed?provider=${encodeURIComponent(provider.providerUrl)}&url=${encodeURIComponent(targetUrl)}`;
     const response = await callPublicBackendPublic('get', endpoint);
@@ -1972,6 +2018,16 @@ router.get('/media/oembed', requireRole(...CONTENT_ROLES), async (req, res, next
       const err = apiError.badGateway('oembed_failed');
       err.detail = response.data?.error || response.data?.message || response.statusText || 'oembed_failed';
       return next(err);
+    }
+
+    if (provider.type === 'tiktok') {
+      const tiktokMultimedia = buildTikTokMultimedia(targetUrl, provider, response.data.result);
+      if (tiktokMultimedia) {
+        return res.json({
+          status: 200,
+          multimedia: tiktokMultimedia
+        });
+      }
     }
 
     return res.json({
