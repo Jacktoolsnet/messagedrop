@@ -36,7 +36,8 @@
       "edit": "Edit",
       "help": "Help",
       "readAloud": "Read aloud",
-      "stopReadAloud": "Stop reading"
+      "stopReadAloud": "Stop reading",
+      "chooseFont": "Choose font"
     },
     "media": {
       "tenorAttribution": "Powered by Tenor"

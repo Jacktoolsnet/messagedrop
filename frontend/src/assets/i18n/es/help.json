@@ -871,8 +871,8 @@
         "desc": "Con esta función abres el diálogo de texto para escribir o cambiar el texto del mensaje."
       },
       "style": {
-        "title": "Cambiar estilo de texto",
-        "desc": "Con esta función aplicas un nuevo estilo para la visualización del texto del mensaje."
+        "title": "Elegir fuente",
+        "desc": "Con esta función abres el selector de fuentes y defines cómo se muestra el texto del mensaje."
       },
       "location": {
         "title": "Elegir ubicación",
@@ -921,8 +921,8 @@
         "desc": "Con esta función abres el diálogo de texto para escribir o cambiar el contenido de la nota."
       },
       "style": {
-        "title": "Cambiar estilo de texto",
-        "desc": "Con esta función aplicas un nuevo estilo para la visualización del texto de la nota."
+        "title": "Elegir fuente",
+        "desc": "Con esta función abres el selector de fuentes y defines cómo se muestra el texto de la nota."
       },
       "location": {
         "title": "Elegir posición",

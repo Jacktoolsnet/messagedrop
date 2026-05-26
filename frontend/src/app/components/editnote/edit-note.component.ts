@@ -20,7 +20,6 @@ import { AppService } from '../../services/app.service';
 import { OembedService } from '../../services/oembed.service';
 import { SharedContentService } from '../../services/shared-content.service';
 import { SpeechService } from '../../services/speech.service';
-import { StyleService } from '../../services/style.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
 import { HashtagSuggestionService } from '../../services/hashtag-suggestion.service';
@@ -33,6 +32,7 @@ import { LocationPickerTileComponent } from '../utils/location-picker/location-p
 import { TextComponent } from '../utils/text/text.component';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { DisplayMessageService } from '../../services/display-message.service';
+import { FontPickerDialogComponent } from '../utils/font-picker-dialog/font-picker-dialog.component';
 
 interface TextDialogResult {
   text: string;
@@ -78,7 +78,6 @@ export class EditNoteComponent implements OnInit, OnDestroy {
   private readonly hashtagSuggestionService = inject(HashtagSuggestionService);
   readonly help = inject(HelpDialogService);
   readonly dialogRef = inject(MatDialogRef<EditNoteComponent>);
-  private readonly style = inject(StyleService);
   readonly data = inject<{ mode?: Mode; note: Note }>(MAT_DIALOG_DATA);
   readonly headerConfig = this.resolveHeaderConfig(this.data.mode, this.data.note);
   readonly mode = Mode;
@@ -253,12 +252,24 @@ export class EditNoteComponent implements OnInit, OnDestroy {
     });
   }
 
-  onNewFontClick(): void {
-    this.getRandomFont();
-  }
+  onFontClick(): void {
+    const dialogRef = this.matDialog.open(FontPickerDialogComponent, {
+      data: { currentStyle: this.data.note.style },
+      maxWidth: '95vw',
+      width: '95vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
 
-  private getRandomFont(): void {
-    this.data.note.style = this.style.getRandomStyle();
+    dialogRef.afterClosed().subscribe((style?: string) => {
+      if (!style) {
+        return;
+      }
+      this.data.note.style = style;
+    });
   }
 
   public showPolicy() {

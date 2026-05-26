@@ -871,8 +871,8 @@
         "desc": "Cette fonction ouvre la boîte de dialogue de texte pour écrire ou modifier le texte du message."
       },
       "style": {
-        "title": "Changer le style du texte",
-        "desc": "Cette fonction applique un nouveau style d'affichage au texte du message."
+        "title": "Choisir la police",
+        "desc": "Cette fonction ouvre le sélecteur de police et définit l’affichage du texte du message."
       },
       "location": {
         "title": "Choisir la position",
@@ -921,8 +921,8 @@
         "desc": "Cette fonction ouvre la boîte de dialogue de texte pour écrire ou modifier le contenu de la note."
       },
       "style": {
-        "title": "Changer le style du texte",
-        "desc": "Cette fonction applique un nouveau style d'affichage au texte de la note."
+        "title": "Choisir la police",
+        "desc": "Cette fonction ouvre le sélecteur de police et définit l’affichage du texte de la note."
       },
       "location": {
         "title": "Choisir la position",

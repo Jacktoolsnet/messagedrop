@@ -669,7 +669,7 @@ const HELP_TOPICS = {
         descriptionKey: 'profile.items.avatarDelete.desc'
       },
       {
-        icon: 'format_size',
+        icon: 'brand_family',
         titleKey: 'profile.items.style.title',
         descriptionKey: 'profile.items.style.desc'
       },
@@ -700,7 +700,7 @@ const HELP_TOPICS = {
     introKey: 'fontPicker.intro',
     items: [
       {
-        icon: 'format_size',
+        icon: 'brand_family',
         titleKey: 'fontPicker.items.tiles.title',
         descriptionKey: 'fontPicker.items.tiles.desc'
       },
@@ -1204,7 +1204,7 @@ const HELP_TOPICS = {
         descriptionKey: 'editMessage.items.text.desc'
       },
       {
-        icon: 'cycle',
+        icon: 'brand_family',
         titleKey: 'editMessage.items.style.title',
         descriptionKey: 'editMessage.items.style.desc'
       },
@@ -1270,7 +1270,7 @@ const HELP_TOPICS = {
         descriptionKey: 'editNote.items.readAloud.desc'
       },
       {
-        icon: 'cycle',
+        icon: 'brand_family',
         titleKey: 'editNote.items.style.title',
         descriptionKey: 'editNote.items.style.desc'
       },

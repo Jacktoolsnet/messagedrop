@@ -166,7 +166,7 @@
   },
   "fontPicker": {
     "title": "Choose font",
-    "intro": "This dialog shows all available fonts as tiles. Choose the font you like best and apply it to your profile.",
+    "intro": "This dialog shows all available fonts as tiles. Choose the font you like best and apply it to the current text or your profile.",
     "items": {
       "tiles": {
         "title": "Font tiles",
@@ -178,7 +178,7 @@
       },
       "apply": {
         "title": "Apply",
-        "desc": "Saves the selected font as the default style for your own content."
+        "desc": "Applies the selected font to the current text or as the default style in your profile."
       }
     }
   },
@@ -889,8 +889,8 @@
         "desc": "This action opens the text dialog to write or update the message text."
       },
       "style": {
-        "title": "Change text style",
-        "desc": "This action applies a new style for how the message text is displayed."
+        "title": "Choose font",
+        "desc": "This action opens the font picker and sets how the message text is displayed."
       },
       "location": {
         "title": "Choose location",
@@ -939,8 +939,8 @@
         "desc": "This action opens the text dialog to write or update the note content."
       },
       "style": {
-        "title": "Change text style",
-        "desc": "This action applies a new style for how the note text is displayed."
+        "title": "Choose font",
+        "desc": "This action opens the font picker and sets how the note text is displayed."
       },
       "location": {
         "title": "Choose position",

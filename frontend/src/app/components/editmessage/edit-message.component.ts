@@ -19,7 +19,6 @@ import { MultimediaType } from '../../interfaces/multimedia-type';
 import { DisplayMessageConfig } from '../../interfaces/display-message-config';
 import { OembedService } from '../../services/oembed.service';
 import { SharedContentService } from '../../services/shared-content.service';
-import { StyleService } from '../../services/style.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
 import { MessageService } from '../../services/message.service';
@@ -31,6 +30,7 @@ import { LocationPickerTileComponent } from '../utils/location-picker/location-p
 import { TextComponent } from '../utils/text/text.component';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { DisplayMessage } from '../utils/display-message/display-message.component';
+import { FontPickerDialogComponent } from '../utils/font-picker-dialog/font-picker-dialog.component';
 import { MAX_PUBLIC_HASHTAGS, normalizeHashtags } from '../../utils/hashtag.util';
 import { DisplayMessageService } from '../../services/display-message.service';
 
@@ -79,7 +79,6 @@ export class EditMessageComponent implements OnInit {
   private readonly hashtagSuggestionService = inject(HashtagSuggestionService);
   readonly help = inject(HelpDialogService);
   readonly dialogRef = inject(MatDialogRef<EditMessageComponent>);
-  private readonly style = inject(StyleService);
   readonly data = inject<{ mode: Mode; message: Message }>(MAT_DIALOG_DATA);
   readonly headerConfig = this.resolveHeaderConfig(this.data.mode);
   readonly mode = Mode;
@@ -313,12 +312,24 @@ export class EditMessageComponent implements OnInit {
     }
   }
 
-  onNewFontClick(): void {
-    this.getRandomFont();
-  }
+  onFontClick(): void {
+    const dialogRef = this.matDialog.open(FontPickerDialogComponent, {
+      data: { currentStyle: this.data.message.style },
+      maxWidth: '95vw',
+      width: '95vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
 
-  private getRandomFont(): void {
-    this.data.message.style = this.style.getRandomStyle();
+    dialogRef.afterClosed().subscribe((style?: string) => {
+      if (!style) {
+        return;
+      }
+      this.data.message.style = style;
+    });
   }
 
   private containsPrivateData(input: string[] | string): boolean {

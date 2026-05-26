@@ -36,7 +36,8 @@
       "edit": "Bearbeiten",
       "help": "Hilfe",
       "readAloud": "Vorlesen",
-      "stopReadAloud": "Vorlesen stoppen"
+      "stopReadAloud": "Vorlesen stoppen",
+      "chooseFont": "Schriftart auswählen"
     },
     "media": {
       "tenorAttribution": "Bereitgestellt von Tenor"
