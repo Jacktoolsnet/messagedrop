@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, inject } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -27,7 +27,10 @@ const markerIcons: Record<MarkerKind, leaflet.Icon> = {
   standalone: true,
   imports: [MatButtonModule, MatIcon, TranslocoPipe],
   templateUrl: './location-picker-tile.component.html',
-  styleUrl: './location-picker-tile.component.css'
+  styleUrl: './location-picker-tile.component.css',
+  host: {
+    class: 'location-picker-tile-host'
+  }
 })
 export class LocationPickerTileComponent implements AfterViewInit, OnChanges, OnDestroy {
   @Input({ required: true }) location!: Location;
@@ -38,11 +41,15 @@ export class LocationPickerTileComponent implements AfterViewInit, OnChanges, On
   private map?: leaflet.Map;
   private marker?: leaflet.Marker;
   private isDialogOpen = false;
+  private resizeObserver?: ResizeObserver;
+  private resizeFrameId?: number;
 
   private readonly dialog = inject(MatDialog);
+  private readonly elementRef = inject(ElementRef<HTMLElement>);
 
   ngAfterViewInit(): void {
     this.initMap();
+    this.observeSizeChanges();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -52,6 +59,10 @@ export class LocationPickerTileComponent implements AfterViewInit, OnChanges, On
   }
 
   ngOnDestroy(): void {
+    this.resizeObserver?.disconnect();
+    if (this.resizeFrameId !== undefined) {
+      cancelAnimationFrame(this.resizeFrameId);
+    }
     this.map?.remove();
   }
 
@@ -109,7 +120,7 @@ export class LocationPickerTileComponent implements AfterViewInit, OnChanges, On
 
     this.map.on('click', () => this.openPicker());
 
-    setTimeout(() => this.map?.invalidateSize(), 0);
+    this.scheduleMapResize();
   }
 
   private updateMap(location: Location): void {
@@ -121,5 +132,20 @@ export class LocationPickerTileComponent implements AfterViewInit, OnChanges, On
       return;
     }
     this.marker = leaflet.marker(latLng, { icon: markerIcons[this.markerType] }).addTo(this.map);
+  }
+
+  private observeSizeChanges(): void {
+    this.resizeObserver = new ResizeObserver(() => this.scheduleMapResize());
+    this.resizeObserver.observe(this.elementRef.nativeElement);
+  }
+
+  private scheduleMapResize(): void {
+    if (this.resizeFrameId !== undefined) {
+      cancelAnimationFrame(this.resizeFrameId);
+    }
+    this.resizeFrameId = requestAnimationFrame(() => {
+      this.resizeFrameId = undefined;
+      this.map?.invalidateSize();
+    });
   }
 }

@@ -1,3 +1,9 @@
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
 .location-tile {
   width: 100%;
   color: var(--mat-card-subtitle-text-color);
