@@ -332,7 +332,7 @@ const faqPages = [
       {
         slug: 'is-messagedrop-available-in-multiple-languages',
         question: 'Is MessageDrop available in multiple languages?',
-        answer: 'Yes. MessageDrop supports multiple languages. German and English are the main languages for the public pages and legal information; the app also contains additional language options.',
+        answer: 'Yes. The MessageDrop app supports German, English, French, and Spanish. The public pages and legal information are currently mainly available in German and English.',
       },
       {
         slug: 'who-is-messagedrop-for',
@@ -1094,7 +1094,7 @@ const germanFaqPages = [
       {
         slug: 'gibt-es-messagedrop-in-mehreren-sprachen',
         question: 'Gibt es MessageDrop in mehreren Sprachen?',
-        answer: 'Ja. MessageDrop unterstützt mehrere Sprachen. Deutsch und Englisch sind die Hauptsprachen für die öffentlichen Seiten und rechtlichen Informationen; in der App gibt es zusätzliche Sprachoptionen.',
+        answer: 'Ja. Die MessageDrop-App unterstützt Deutsch, Englisch, Französisch und Spanisch. Die öffentlichen Seiten und rechtlichen Informationen sind derzeit vor allem auf Deutsch und Englisch verfügbar.',
       },
       {
         slug: 'fuer-wen-ist-messagedrop-gedacht',
