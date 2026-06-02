@@ -373,7 +373,7 @@ const faqPages = [
           {
             slug: 'can-i-create-public-messages-as-a-guest',
             question: 'Can I create public messages as a guest?',
-            answer: 'Creating or publishing public messages requires a user identity and, where needed, a connection to the backend. This helps MessageDrop assign content correctly and apply moderation and safety rules.',
+            answer: 'No. To create or publish public messages, you need a user account.',
           },
           {
             slug: 'can-i-use-the-map-and-place-search-as-a-guest',
@@ -1125,7 +1125,7 @@ const germanFaqPages = [
           {
             slug: 'kann-ich-als-gast-oeffentliche-nachrichten-erstellen',
             question: 'Kann ich als Gast eigene öffentliche Nachrichten erstellen?',
-            answer: 'Für das Erstellen oder Veröffentlichen öffentlicher Nachrichten ist eine Nutzeridentität und bei Bedarf eine Backend-Verbindung erforderlich. So kann MessageDrop Inhalte korrekt zuordnen und Moderations- sowie Sicherheitsregeln anwenden.',
+            answer: 'Nein. Um öffentliche Nachrichten zu erstellen oder zu veröffentlichen, benötigst Du ein Nutzerkonto.',
           },
           {
             slug: 'kann-ich-als-gast-karte-und-ortssuche-verwenden',
