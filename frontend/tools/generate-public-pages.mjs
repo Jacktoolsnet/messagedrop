@@ -403,7 +403,7 @@ const faqPages = [
           {
             slug: 'which-features-require-a-user-account',
             question: 'Which features require a user account?',
-            answer: 'Features that create, publish, synchronize, or privately manage content usually require a user identity or a backend connection. This includes publishing public messages, managing your own content, contacts, and private communication.',
+            answer: 'Creating public messages, private notes, private places, private documents, and private images requires a user account. The chat feature also requires a user account.',
           },
           {
             slug: 'is-data-stored-on-my-device-as-a-guest',
@@ -1155,7 +1155,7 @@ const germanFaqPages = [
           {
             slug: 'welche-funktionen-benoetigen-ein-nutzerkonto',
             question: 'Welche Funktionen benötigen ein Nutzerkonto?',
-            answer: 'Funktionen, die Inhalte erstellen, veröffentlichen, synchronisieren oder privat verwalten, benötigen in der Regel eine Nutzeridentität oder Backend-Verbindung. Dazu gehören das Veröffentlichen öffentlicher Nachrichten, die Verwaltung eigener Inhalte, Kontakte und private Kommunikation.',
+            answer: 'Für das Erstellen öffentlicher Nachrichten, privater Notizen, privater Orte, privater Dokumente und privater Bilder benötigst Du ein Nutzerkonto. Auch die Chat-Funktion benötigt ein Nutzerkonto.',
           },
           {
             slug: 'werden-als-gast-daten-auf-meinem-geraet-gespeichert',
