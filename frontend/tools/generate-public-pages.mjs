@@ -317,12 +317,12 @@ const faqPages = [
       {
         slug: 'do-i-have-to-register',
         question: 'Do I have to register to use MessageDrop?',
-        answer: 'You can open MessageDrop without a classic email-and-password registration. Some functions need a local user identity or a connection to the backend so that your own content can be assigned and synchronized securely.',
+        answer: 'You can use MessageDrop without a user account. However, some functions require a user account.',
       },
       {
         slug: 'is-messagedrop-free',
         question: 'Is MessageDrop free?',
-        answer: 'MessageDrop can currently be used without a usage fee. Costs charged by your internet provider, mobile provider, device, app store, or third-party services are not controlled by MessageDrop.',
+        answer: 'MessageDrop can currently be used without a usage fee. Costs charged by your internet provider, mobile provider, device, or third-party services are not controlled by MessageDrop.',
       },
       {
         slug: 'how-old-do-i-have-to-be',
@@ -1079,12 +1079,12 @@ const germanFaqPages = [
       {
         slug: 'muss-ich-mich-registrieren',
         question: 'Muss ich mich registrieren, um MessageDrop zu nutzen?',
-        answer: 'Du kannst MessageDrop ohne klassische Registrierung mit E-Mail und Passwort öffnen. Einige Funktionen benötigen eine lokale Nutzeridentität oder eine Verbindung zum Backend, damit eigene Inhalte sicher zugeordnet und synchronisiert werden können.',
+        answer: 'Du kannst MessageDrop auch ohne Nutzerkonto verwenden. Für einige Funktionen ist jedoch ein Nutzerkonto erforderlich.',
       },
       {
         slug: 'ist-messagedrop-kostenlos',
         question: 'Ist MessageDrop kostenlos?',
-        answer: 'MessageDrop kann aktuell ohne Nutzungsgebühr verwendet werden. Kosten Deines Internetanbieters, Mobilfunkanbieters, Geräts, App-Stores oder externer Dienste werden nicht von MessageDrop gesteuert.',
+        answer: 'MessageDrop kann aktuell ohne Nutzungsgebühr verwendet werden. Kosten Deines Internetanbieters, Mobilfunkanbieters, Geräts oder externer Dienste werden nicht von MessageDrop gesteuert.',
       },
       {
         slug: 'wie-alt-muss-ich-sein',
