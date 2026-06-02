@@ -182,7 +182,9 @@ const marketingPages = [
             title: 'Open the app and get started',
             body:
               'See how MessageDrop starts, how the consent screen works, and how to get oriented after the first launch.',
-            ctaLabel: 'Video coming soon',
+            youtubeId: 'zW-1hXgqiko',
+            videoUrl: 'https://youtu.be/zW-1hXgqiko',
+            ctaLabel: 'Watch on YouTube',
           },
           {
             icon: 'account_circle',
@@ -942,7 +944,9 @@ const germanMarketingPages = [
             title: 'App öffnen und erste Schritte',
             body:
               'So startest Du MessageDrop, gehst durch den Consent-Screen und findest Dich nach dem ersten Öffnen schnell zurecht.',
-            ctaLabel: 'Video folgt',
+            youtubeId: 'zW-1hXgqiko',
+            videoUrl: 'https://youtu.be/zW-1hXgqiko',
+            ctaLabel: 'Auf YouTube ansehen',
           },
           {
             icon: 'account_circle',
@@ -2047,22 +2051,38 @@ function renderVideoGrid(videos) {
   return `
     <div class="video-grid">
       ${videos
-        .map(
-          (video) => `
-          <article class="video-card">
-            <div class="video-thumb" aria-hidden="true">
+        .map((video) => {
+          const videoTitle = escapeHtml(video.embedTitle ?? video.title);
+          const videoThumb = video.youtubeId
+            ? `<div class="video-embed">
+              <iframe
+                src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(video.youtubeId)}"
+                title="${videoTitle}"
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen
+              ></iframe>
+            </div>`
+            : `<div class="video-thumb" aria-hidden="true">
               <span class="material-symbols-outlined">${escapeHtml(video.icon)}</span>
-            </div>
+            </div>`;
+          const videoCta = video.videoUrl
+            ? `<a class="video-cta" href="${escapeHtml(video.videoUrl)}" target="_blank" rel="noreferrer noopener">${escapeHtml(video.ctaLabel)}</a>`
+            : `<span class="video-cta">${escapeHtml(video.ctaLabel)}</span>`;
+
+          return `
+          <article class="video-card">
+            ${videoThumb}
             <div class="video-card-body">
               <h3>${escapeHtml(video.title)}</h3>
               <p>${escapeHtml(video.body)}</p>
             </div>
             <div class="video-card-footer">
-              <span class="video-cta">${escapeHtml(video.ctaLabel)}</span>
+              ${videoCta}
             </div>
           </article>
-        `,
-        )
+        `;
+        })
         .join('')}
     </div>
   `;
@@ -3491,6 +3511,23 @@ img {
   border: 1px solid var(--site-outline);
 }
 
+.video-embed {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  min-height: 10rem;
+  overflow: hidden;
+  border-radius: var(--site-radius-md);
+  border: 1px solid var(--site-outline);
+  background: #000;
+}
+
+.video-embed iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
 .video-thumb .material-symbols-outlined {
   font-size: 3.2rem;
   color: #1d4ed8;
@@ -3531,6 +3568,7 @@ img {
   color: var(--site-text);
   border: 1px solid var(--site-outline);
   font-weight: 700;
+  text-decoration: none;
 }
 
 .timeline {
@@ -3992,7 +4030,8 @@ img {
     page-break-inside: auto;
   }
 
-  .video-thumb {
+  .video-thumb,
+  .video-embed {
     display: none !important;
   }
 
