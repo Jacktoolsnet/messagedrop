@@ -376,11 +376,6 @@ const faqPages = [
             answer: 'No. To create or publish public messages, you need a user account.',
           },
           {
-            slug: 'can-i-use-the-map-and-place-search-as-a-guest',
-            question: 'Can I use the map and place search as a guest?',
-            answer: 'Yes. You can use the map and search for places as a guest. Location access is optional and depends on the permission you give in your browser or device settings.',
-          },
-          {
             slug: 'can-i-see-weather-information-as-a-guest',
             question: 'Can I see weather information as a guest?',
             answer: 'Yes. Weather information can be opened for places when the feature is available and your device has an internet connection. The displayed data depends on external weather data sources.',
@@ -389,6 +384,11 @@ const faqPages = [
             slug: 'can-i-see-air-quality-information-as-a-guest',
             question: 'Can I see air quality information as a guest?',
             answer: 'Yes. Air quality information can be opened for places when data is available. The values depend on external data sources and should be understood as informational context, not as official safety advice.',
+          },
+          {
+            slug: 'can-i-search-for-places-as-a-guest',
+            question: 'Can I search for places as a guest?',
+            answer: 'Yes. As a guest, you can search for places. Which results are shown depends on your search and the available data.',
           },
           {
             slug: 'can-i-search-experiences-nearby-as-a-guest',
@@ -1128,11 +1128,6 @@ const germanFaqPages = [
             answer: 'Nein. Um öffentliche Nachrichten zu erstellen oder zu veröffentlichen, benötigst Du ein Nutzerkonto.',
           },
           {
-            slug: 'kann-ich-als-gast-karte-und-ortssuche-verwenden',
-            question: 'Kann ich als Gast die Karte und die Ortssuche verwenden?',
-            answer: 'Ja. Du kannst die Karte nutzen und als Gast nach Orten suchen. Standortzugriff ist freiwillig und hängt davon ab, welche Berechtigung Du im Browser oder auf Deinem Gerät erteilst.',
-          },
-          {
             slug: 'kann-ich-als-gast-wetterinformationen-sehen',
             question: 'Kann ich als Gast Wetterinformationen sehen?',
             answer: 'Ja. Wetterinformationen können für Orte geöffnet werden, wenn die Funktion verfügbar ist und Dein Gerät eine Internetverbindung hat. Die angezeigten Daten hängen von externen Wetterdatenquellen ab.',
@@ -1141,6 +1136,11 @@ const germanFaqPages = [
             slug: 'kann-ich-als-gast-luftqualitaet-sehen',
             question: 'Kann ich als Gast Informationen zur Luftqualität sehen?',
             answer: 'Ja. Informationen zur Luftqualität können für Orte geöffnet werden, wenn Daten verfügbar sind. Die Werte hängen von externen Datenquellen ab und dienen als Kontextinformation, nicht als verbindliche Sicherheitsempfehlung.',
+          },
+          {
+            slug: 'kann-ich-als-gast-nach-orten-suchen',
+            question: 'Kann ich als Gast nach Orten suchen?',
+            answer: 'Ja. Als Gast kannst Du nach Orten suchen. Welche Ergebnisse angezeigt werden, hängt von Deiner Suche und den verfügbaren Daten ab.',
           },
           {
             slug: 'kann-ich-als-gast-erlebnisse-in-der-naehe-suchen',
