@@ -366,19 +366,9 @@ const faqPages = [
         intro: 'These questions explain what you can do before creating a user account or connecting to the backend.',
         items: [
           {
-            slug: 'can-i-use-messagedrop-without-signing-in',
-            question: 'Can I use MessageDrop without signing in?',
-            answer: 'Yes. You can open MessageDrop as a guest and use basic map and discovery features without signing in. Some actions require a local user identity or a backend connection.',
-          },
-          {
             slug: 'what-can-i-see-as-a-guest',
             question: 'What can I see as a guest?',
             answer: 'As a guest, you can explore the map, see public messages that are available for the selected area, search places and hashtags, and open public information around places.',
-          },
-          {
-            slug: 'can-i-read-public-messages-as-a-guest',
-            question: 'Can I read public messages as a guest?',
-            answer: 'Yes. Public messages are meant to be discoverable on the map. Availability can depend on your selected location, search settings, network connection, and moderation status.',
           },
           {
             slug: 'can-i-create-public-messages-as-a-guest',
@@ -1128,19 +1118,9 @@ const germanFaqPages = [
         intro: 'Diese Fragen erklären, was Du vor dem Anlegen eines Nutzerkontos oder vor einer Backend-Verbindung nutzen kannst.',
         items: [
           {
-            slug: 'kann-ich-messagedrop-ohne-anmeldung-nutzen',
-            question: 'Kann ich MessageDrop ohne Anmeldung nutzen?',
-            answer: 'Ja. Du kannst MessageDrop als Gast öffnen und grundlegende Karten- und Entdeckungsfunktionen ohne Anmeldung nutzen. Einige Aktionen benötigen eine lokale Nutzeridentität oder eine Backend-Verbindung.',
-          },
-          {
             slug: 'was-kann-ich-als-gast-sehen',
             question: 'Was kann ich als Gast sehen?',
             answer: 'Als Gast kannst Du die Karte erkunden, verfügbare öffentliche Nachrichten im gewählten Bereich sehen, Orte und Hashtags suchen und öffentliche Informationen rund um Orte öffnen.',
-          },
-          {
-            slug: 'kann-ich-als-gast-oeffentliche-nachrichten-lesen',
-            question: 'Kann ich als Gast öffentliche Nachrichten lesen?',
-            answer: 'Ja. Öffentliche Nachrichten sollen auf der Karte auffindbar sein. Die Verfügbarkeit kann von Deinem gewählten Standort, den Sucheinstellungen, der Netzwerkverbindung und dem Moderationsstatus abhängen.',
           },
           {
             slug: 'kann-ich-als-gast-oeffentliche-nachrichten-erstellen',
