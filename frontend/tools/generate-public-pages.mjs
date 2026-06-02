@@ -418,7 +418,7 @@ const faqPages = [
           {
             slug: 'can-i-switch-from-guest-mode-to-a-user-account-later',
             question: 'Can I switch from guest mode to a user account later?',
-            answer: 'Yes. You can start as a guest and later create or connect a user identity when you want to use features that need one. Local data may still depend on the device and browser storage you used before.',
+            answer: 'Yes. You can use MessageDrop as a guest first and create a user account at any time later. If you want, you can delete your user account again and return to guest mode.',
           },
           {
             slug: 'can-i-open-external-content-as-a-guest',
@@ -1170,7 +1170,7 @@ const germanFaqPages = [
           {
             slug: 'kann-ich-spaeter-vom-gastmodus-zu-einem-nutzerkonto-wechseln',
             question: 'Kann ich später vom Gastmodus zu einem Nutzerkonto wechseln?',
-            answer: 'Ja. Du kannst als Gast starten und später eine Nutzeridentität erstellen oder verbinden, wenn Du Funktionen nutzen möchtest, die eine solche Identität benötigen. Lokale Daten hängen weiterhin vom zuvor verwendeten Gerät und Browser-Speicher ab.',
+            answer: 'Ja. Du kannst MessageDrop zunächst als Gast nutzen und später jederzeit ein Nutzerkonto erstellen. Wenn Du möchtest, kannst Du Dein Nutzerkonto wieder löschen und zum Gastmodus zurückkehren.',
           },
           {
             slug: 'kann-ich-als-gast-externe-inhalte-oeffnen',
