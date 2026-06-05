@@ -439,7 +439,7 @@ const faqPages = [
                         {
                                 "slug": "how-do-i-create-a-user-account",
                                 "question": "How do I create a user account?",
-                                "answer": "You create a user account directly in the app. MessageDrop guides you through the required steps, including creating a PIN and setting up your local user identity."
+                                "answer": "You create a user account directly in the app. It exists only on this device and in this browser and is not synchronized between devices or browsers."
                         },
                         {
                                 "slug": "why-do-i-need-a-pin",
@@ -1191,7 +1191,7 @@ const germanFaqPages = [
                         {
                                 "slug": "wie-erstelle-ich-ein-nutzerkonto",
                                 "question": "Wie erstelle ich ein Nutzerkonto?",
-                                "answer": "Du erstellst ein Nutzerkonto direkt in der App. MessageDrop führt Dich durch die nötigen Schritte, einschließlich PIN-Erstellung und Einrichtung Deiner lokalen Nutzeridentität."
+                                "answer": "Du erstellst ein Nutzerkonto direkt in der App. Es existiert nur auf diesem Gerät und in diesem Browser und wird nicht zwischen Geräten oder Browsern synchronisiert."
                         },
                         {
                                 "slug": "warum-brauche-ich-eine-pin",
