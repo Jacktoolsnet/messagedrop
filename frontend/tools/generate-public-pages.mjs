@@ -449,7 +449,7 @@ const faqPages = [
                         {
                                 "slug": "what-happens-if-i-forget-my-pin",
                                 "question": "What happens if I forget my PIN?",
-                                "answer": "If you forget your PIN, access to locally protected data can be limited or lost. Because MessageDrop is designed to keep data local where possible, backups are important."
+                                "answer": "If you forget your PIN, access to this user account is no longer possible. If you have a backup, you can restore it. Otherwise, you need to create a new user account."
                         },
                         {
                                 "slug": "what-information-does-my-profile-contain",
@@ -1201,7 +1201,7 @@ const germanFaqPages = [
                         {
                                 "slug": "was-passiert-wenn-ich-meine-pin-vergesse",
                                 "question": "Was passiert, wenn ich meine PIN vergesse?",
-                                "answer": "Wenn Du Deine PIN vergisst, kann der Zugriff auf lokal geschützte Daten eingeschränkt sein oder verloren gehen. Weil MessageDrop Daten möglichst lokal hält, sind Backups wichtig."
+                                "answer": "Wenn Du Deine PIN vergisst, ist der Zugriff auf dieses Nutzerkonto nicht mehr möglich. Falls Du ein Backup hast, kannst Du es wiederherstellen. Andernfalls musst Du ein neues Nutzerkonto erstellen."
                         },
                         {
                                 "slug": "welche-informationen-enthaelt-mein-profil",
