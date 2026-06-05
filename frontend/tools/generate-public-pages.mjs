@@ -454,17 +454,17 @@ const faqPages = [
                         {
                                 "slug": "what-information-does-my-profile-contain",
                                 "question": "What information does my profile contain?",
-                                "answer": "Your profile can contain information such as a display name, avatar, and profile details that help you recognize your own account and, where applicable, help others identify you."
+                                "answer": "In your profile, you can set a profile name, a profile picture, and a default font."
                         },
                         {
                                 "slug": "can-i-change-my-profile-later",
                                 "question": "Can I change my profile later?",
-                                "answer": "Yes. You can update your profile later in the app. Changes may affect how your profile is shown in places where profile information is used."
+                                "answer": "Yes. You can change your profile name, profile picture, and default font in the app at any time."
                         },
                         {
                                 "slug": "is-my-profile-visible-to-others",
                                 "question": "Is my profile visible to others?",
-                                "answer": "Some profile information can be visible to other users in connection with public messages or contacts. Local profiles that you create for other users are only for your own device."
+                                "answer": "Your profile always remains private and is never publicly visible. If you want, you can share your current profile directly with contacts."
                         },
                         {
                                 "slug": "can-i-use-messagedrop-on-multiple-devices",
@@ -1206,17 +1206,17 @@ const germanFaqPages = [
                         {
                                 "slug": "welche-informationen-enthaelt-mein-profil",
                                 "question": "Welche Informationen enthält mein Profil?",
-                                "answer": "Dein Profil kann Informationen wie Anzeigenamen, Avatar und Profildetails enthalten. Sie helfen Dir, Dein Konto wiederzuerkennen, und können anderen Nutzern dort helfen, wo Profilinformationen verwendet werden."
+                                "answer": "In Deinem Profil kannst Du einen Profilnamen, ein Profilbild und eine Standardschriftart festlegen."
                         },
                         {
                                 "slug": "kann-ich-mein-profil-spaeter-aendern",
                                 "question": "Kann ich mein Profil später ändern?",
-                                "answer": "Ja. Du kannst Dein Profil später in der App aktualisieren. Änderungen können beeinflussen, wie Dein Profil an Stellen angezeigt wird, an denen Profilinformationen genutzt werden."
+                                "answer": "Ja. Profilname, Profilbild und Standardschriftart kannst Du jederzeit in der App ändern."
                         },
                         {
                                 "slug": "ist-mein-profil-fuer-andere-sichtbar",
                                 "question": "Ist mein Profil für andere sichtbar?",
-                                "answer": "Einige Profilinformationen können in Verbindung mit öffentlichen Nachrichten oder Kontakten für andere Nutzer sichtbar sein. Lokale Profile, die Du für andere Nutzer anlegst, sind nur für Dein eigenes Gerät gedacht."
+                                "answer": "Dein Profil bleibt immer privat und ist nie öffentlich sichtbar. Wenn Du möchtest, kannst Du Dein aktuelles Profil gezielt mit Kontakten teilen."
                         },
                         {
                                 "slug": "kann-ich-messagedrop-auf-mehreren-geraeten-nutzen",
