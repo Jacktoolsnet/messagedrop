@@ -478,29 +478,24 @@ const faqPages = [
                 "intro": "Questions about creating, editing, deleting, and moderating your own public messages.",
                 "items": [
                         {
-                                "slug": "can-i-create-my-own-public-messages",
-                                "question": "Can I create my own public messages?",
-                                "answer": "Yes. With a suitable user identity and backend connection, you can create public messages and place them at real-world locations on the map."
-                        },
-                        {
                                 "slug": "where-do-my-public-messages-appear",
                                 "question": "Where do my public messages appear?",
-                                "answer": "Public messages appear at the location you choose on the map. They can be discovered by other users depending on location, search settings, availability, and moderation status."
+                                "answer": "A public message is shown at the place you choose on the map."
                         },
                         {
                                 "slug": "can-i-edit-my-public-messages-later",
                                 "question": "Can I edit my public messages later?",
-                                "answer": "Yes. You can edit your own public messages when the app can identify you as the owner and the message is still available for editing."
+                                "answer": "Yes. You can edit your own public messages at any time."
                         },
                         {
                                 "slug": "can-i-delete-my-public-messages",
                                 "question": "Can I delete my public messages?",
-                                "answer": "Yes. You can delete your own public messages. MessageDrop is designed so that deleting really removes data where the system controls that data."
+                                "answer": "Yes. You can delete your own public messages at any time."
                         },
                         {
                                 "slug": "why-can-a-public-message-be-moderated-or-removed",
                                 "question": "Why can a public message be moderated or removed?",
-                                "answer": "Public messages can be moderated or removed if they violate rules, contain illegal content, disclose personal data, are reported, or otherwise conflict with safety and legal requirements."
+                                "answer": "Public messages can be moderated and set to not visible if they violate the terms of service or legal requirements."
                         },
                         {
                                 "slug": "can-i-embed-external-content-in-public-messages",
@@ -510,7 +505,7 @@ const faqPages = [
                         {
                                 "slug": "can-i-see-how-others-react-to-my-public-messages",
                                 "question": "Can I see how others react to my public messages?",
-                                "answer": "MessageDrop can show reactions or interaction indicators where such features are available. These indicators do not turn public messages into an algorithmic popularity feed."
+                                "answer": "Yes. Other users can react to public messages with like or dislike and write comments."
                         }
                 ]
         },
@@ -526,12 +521,12 @@ const faqPages = [
                         {
                                 "slug": "who-can-see-my-private-notes",
                                 "question": "Who can see my private notes?",
-                                "answer": "Private notes are intended to be visible only to you. Access can still depend on your device security, browser storage, backups, and how you handle your device."
+                                "answer": "Private notes are stored locally on your device and in your browser. They are visible only to you."
                         },
                         {
                                 "slug": "can-i-store-private-images",
                                 "question": "Can I store private images?",
-                                "answer": "Yes. MessageDrop includes features for private images so you can keep image-based content for yourself instead of publishing it publicly."
+                                "answer": "Yes. You can import private images from your device. If they contain location data, MessageDrop can place them automatically on the map. Your images stay local and are not transferred to our servers."
                         },
                         {
                                 "slug": "can-i-store-private-documents",
@@ -1230,29 +1225,24 @@ const germanFaqPages = [
                 "intro": "Fragen zum Erstellen, Bearbeiten, Löschen und Moderieren eigener öffentlicher Nachrichten.",
                 "items": [
                         {
-                                "slug": "kann-ich-eigene-oeffentliche-nachrichten-erstellen",
-                                "question": "Kann ich eigene öffentliche Nachrichten erstellen?",
-                                "answer": "Ja. Mit geeigneter Nutzeridentität und Backend-Verbindung kannst Du öffentliche Nachrichten erstellen und an realen Orten auf der Karte platzieren."
-                        },
-                        {
                                 "slug": "wo-erscheinen-meine-oeffentlichen-nachrichten",
                                 "question": "Wo erscheinen meine öffentlichen Nachrichten?",
-                                "answer": "Öffentliche Nachrichten erscheinen an dem Ort, den Du auf der Karte auswählst. Andere Nutzer können sie abhängig von Standort, Sucheinstellungen, Verfügbarkeit und Moderationsstatus entdecken."
+                                "answer": "Eine öffentliche Nachricht wird an dem Ort angezeigt, den Du auf der Karte auswählst."
                         },
                         {
                                 "slug": "kann-ich-meine-oeffentlichen-nachrichten-spaeter-bearbeiten",
                                 "question": "Kann ich meine öffentlichen Nachrichten später bearbeiten?",
-                                "answer": "Ja. Du kannst eigene öffentliche Nachrichten bearbeiten, wenn die App Dich als Eigentümer erkennt und die Nachricht noch bearbeitet werden kann."
+                                "answer": "Ja. Du kannst eigene öffentliche Nachrichten jederzeit bearbeiten."
                         },
                         {
                                 "slug": "kann-ich-meine-oeffentlichen-nachrichten-loeschen",
                                 "question": "Kann ich meine öffentlichen Nachrichten löschen?",
-                                "answer": "Ja. Du kannst eigene öffentliche Nachrichten löschen. MessageDrop ist so ausgelegt, dass Löschen dort wirklich entfernt, wo das System die Daten kontrolliert."
+                                "answer": "Ja. Du kannst eigene öffentliche Nachrichten jederzeit löschen."
                         },
                         {
                                 "slug": "warum-kann-eine-oeffentliche-nachricht-moderiert-oder-entfernt-werden",
                                 "question": "Warum kann eine öffentliche Nachricht moderiert oder entfernt werden?",
-                                "answer": "Öffentliche Nachrichten können moderiert oder entfernt werden, wenn sie Regeln verletzen, rechtswidrige Inhalte enthalten, personenbezogene Daten offenlegen, gemeldet werden oder Sicherheits- und Rechtsanforderungen widersprechen."
+                                "answer": "Öffentliche Nachrichten können moderiert und auf nicht sichtbar gesetzt werden, wenn sie gegen die Nutzungsbedingungen oder gesetzliche Anforderungen verstoßen."
                         },
                         {
                                 "slug": "kann-ich-externe-inhalte-in-oeffentliche-nachrichten-einbinden",
@@ -1262,7 +1252,7 @@ const germanFaqPages = [
                         {
                                 "slug": "kann-ich-sehen-wie-andere-auf-meine-oeffentlichen-nachrichten-reagieren",
                                 "question": "Kann ich sehen, wie andere auf meine öffentlichen Nachrichten reagieren?",
-                                "answer": "MessageDrop kann Reaktionen oder Interaktionshinweise anzeigen, wenn solche Funktionen verfügbar sind. Diese Hinweise machen öffentliche Nachrichten aber nicht zu einem algorithmischen Popularitäts-Feed."
+                                "answer": "Ja. Andere Nutzer können auf öffentliche Nachrichten mit Like oder Dislike reagieren und Kommentare schreiben."
                         }
                 ]
         },
@@ -1278,12 +1268,12 @@ const germanFaqPages = [
                         {
                                 "slug": "wer-kann-meine-privaten-notizen-sehen",
                                 "question": "Wer kann meine privaten Notizen sehen?",
-                                "answer": "Private Notizen sind dafür gedacht, nur für Dich sichtbar zu sein. Der Zugriff hängt dennoch von Gerätesicherheit, Browser-Speicher, Backups und Deinem Umgang mit dem Gerät ab."
+                                "answer": "Private Notizen werden lokal auf Deinem Gerät und in Deinem Browser gespeichert. Sie sind nur für Dich sichtbar."
                         },
                         {
                                 "slug": "kann-ich-private-bilder-speichern",
                                 "question": "Kann ich private Bilder speichern?",
-                                "answer": "Ja. MessageDrop enthält Funktionen für private Bilder, damit Du bildbasierte Inhalte für Dich behalten kannst, statt sie öffentlich zu veröffentlichen."
+                                "answer": "Ja. Private Bilder kannst Du von Deinem Gerät importieren. Enthalten sie Geodaten, kann MessageDrop sie automatisch auf der Karte platzieren. Deine Bilder bleiben lokal und werden nicht an unsere Server übertragen."
                         },
                         {
                                 "slug": "kann-ich-private-dokumente-speichern",
