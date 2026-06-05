@@ -469,7 +469,7 @@ const faqPages = [
                         {
                                 "slug": "can-i-use-messagedrop-on-multiple-devices",
                                 "question": "Can I use MessageDrop on multiple devices?",
-                                "answer": "Some features can be used on multiple devices when backend connection and synchronization are available. Data that exists only locally on one device may not automatically appear on another device."
+                                "answer": "Yes. You can use MessageDrop on multiple devices and in different browsers. However, user accounts are not synchronized between devices or browsers, so you use a separate user there each time."
                         }
                 ]
         },
@@ -1221,7 +1221,7 @@ const germanFaqPages = [
                         {
                                 "slug": "kann-ich-messagedrop-auf-mehreren-geraeten-nutzen",
                                 "question": "Kann ich MessageDrop auf mehreren Geräten nutzen?",
-                                "answer": "Einige Funktionen können auf mehreren Geräten genutzt werden, wenn Backend-Verbindung und Synchronisierung verfügbar sind. Daten, die nur lokal auf einem Gerät liegen, erscheinen nicht automatisch auf einem anderen Gerät."
+                                "answer": "Ja. Du kannst MessageDrop auf mehreren Geräten und in unterschiedlichen Browsern verwenden. Nutzerkonten werden jedoch nicht zwischen Geräten oder Browsern synchronisiert; dadurch nutzt Du dort jeweils einen eigenen Nutzer."
                         }
                 ]
         },
