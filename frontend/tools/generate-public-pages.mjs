@@ -295,14 +295,14 @@ const faqPages = [
     heroText: 'Start here if you want a quick overview of what MessageDrop is, who it is for, and how you can use it.',
     showLegalCta: false,
     showPrimaryCta: false,
-    heroAsideTitle: 'General questions',
+    heroAsideTitle: 'Frequently asked questions about MessageDrop',
     heroAsideItems: [
-      'Short answers for a quick first overview.',
-      'Only one answer opens at a time, so the page stays easy to scan.',
-      'We will add more categories later as real user questions come in.',
+      'Here we answer the most important questions about MessageDrop.',
+      'You will learn how guest mode, user accounts, public messages, private content, and contacts work.',
+      'The answers are intentionally short so you can quickly find what you are looking for.',
     ],
     faqTitle: 'General',
-    faqIntro: 'These first questions cover the basic ideas behind MessageDrop.',
+    faqIntro: 'General questions about MessageDrop.',
     faqs: [
       {
         slug: 'what-is-messagedrop',
@@ -322,7 +322,7 @@ const faqPages = [
       {
         slug: 'is-messagedrop-free',
         question: 'Is MessageDrop free?',
-        answer: 'MessageDrop can currently be used without a usage fee. Costs charged by your internet provider, mobile provider, device, or third-party services are not controlled by MessageDrop.',
+        answer: 'MessageDrop itself currently does not charge a usage fee. Connection and data charges, for example for mobile data or roaming, may still apply depending on your tariff and provider.',
       },
       {
         slug: 'how-old-do-i-have-to-be',
@@ -332,7 +332,7 @@ const faqPages = [
       {
         slug: 'is-messagedrop-available-in-multiple-languages',
         question: 'Is MessageDrop available in multiple languages?',
-        answer: 'Yes. The MessageDrop app supports German, English, French, and Spanish. The public pages and legal information are currently mainly available in German and English.',
+        answer: 'Yes. The MessageDrop app supports German, English, French, and Spanish. The public pages and legal information are currently available in German and English.',
       },
       {
         slug: 'who-is-messagedrop-for',
@@ -363,7 +363,7 @@ const faqPages = [
     additionalFaqCategories: [
       {
         title: 'Using MessageDrop as a guest',
-        intro: 'These questions explain what you can do before creating a user account or connecting to the backend.',
+        intro: 'Here you can learn which features you can use as a guest.',
         items: [
           {
             slug: 'what-can-i-see-as-a-guest',
@@ -434,7 +434,7 @@ const faqPages = [
                         {
                                 "slug": "what-changes-when-i-use-a-user-account",
                                 "question": "What changes when I use a user account?",
-                                "answer": "With a user account, you can create and manage your own public messages, use private content features, maintain places, connect with contacts, and use features that need a stable user identity or backend connection."
+                                "answer": "With a user account, you can create public messages, use private content, manage your own places, and connect with contacts."
                         },
                         {
                                 "slug": "how-do-i-create-a-user-account",
@@ -526,12 +526,12 @@ const faqPages = [
                         {
                                 "slug": "can-i-store-private-images",
                                 "question": "Can I store private images?",
-                                "answer": "Yes. You can import private images from your device. If they contain location data, MessageDrop can place them automatically on the map. Your images stay local and are not transferred to our servers."
+                                "answer": "Yes. You can select private images from your device and reference them locally. If they contain location data, MessageDrop can place them automatically on the map. Your images stay local and are not transferred to our servers."
                         },
                         {
                                 "slug": "can-i-store-private-documents",
                                 "question": "Can I store private documents?",
-                                "answer": "Yes. You can import private documents from your device. Your documents stay local and are not transferred to our servers."
+                                "answer": "Yes. You can select private documents from your device and reference them locally. Your documents stay local and are not transferred to our servers."
                         },
                         {
                                 "slug": "where-is-private-content-stored",
@@ -547,7 +547,7 @@ const faqPages = [
         },
         {
                 "title": "Using MessageDrop with a user account · Places",
-                "intro": "Questions about creating, editing, following, and maintaining places.",
+                "intro": "Here you can learn how to create, edit, and follow places.",
                 "items": [
                         {
                                 "slug": "can-i-create-my-own-places",
@@ -573,7 +573,7 @@ const faqPages = [
         },
         {
                 "title": "Using MessageDrop with a user account · Contacts and private communication",
-                "intro": "Questions about connecting with people and exchanging private messages.",
+                "intro": "Here you can learn how to connect with other users and exchange private messages.",
                 "items": [
                         {
                                 "slug": "can-i-contact-other-users",
@@ -1007,14 +1007,14 @@ const germanFaqPages = [
     heroText: 'Starte hier, wenn Du schnell verstehen möchtest, was MessageDrop ist, für wen es gedacht ist und wie Du es nutzen kannst.',
     showLegalCta: false,
     showPrimaryCta: false,
-    heroAsideTitle: 'Allgemeine Fragen',
+    heroAsideTitle: 'Häufige Fragen zu MessageDrop',
     heroAsideItems: [
-      'Kurze Antworten für einen schnellen ersten Überblick.',
-      'Es ist immer nur eine Antwort geöffnet, damit die Seite übersichtlich bleibt.',
-      'Weitere Kategorien ergänzen wir später, wenn echte Nutzerfragen dazukommen.',
+      'Hier beantworten wir die wichtigsten Fragen zu MessageDrop.',
+      'Du erfährst, wie Gastmodus, Nutzerkonto, öffentliche Nachrichten, private Inhalte und Kontakte funktionieren.',
+      'Die Antworten sind bewusst kurz gehalten, damit Du schnell findest, was Du suchst.',
     ],
     faqTitle: 'Allgemein',
-    faqIntro: 'Diese ersten Fragen erklären die Grundidee von MessageDrop.',
+    faqIntro: 'Allgemeine Fragen rund um MessageDrop.',
     faqs: [
       {
         slug: 'was-ist-messagedrop',
@@ -1034,7 +1034,7 @@ const germanFaqPages = [
       {
         slug: 'ist-messagedrop-kostenlos',
         question: 'Ist MessageDrop kostenlos?',
-        answer: 'MessageDrop kann aktuell ohne Nutzungsgebühr verwendet werden. Kosten Deines Internetanbieters, Mobilfunkanbieters, Geräts oder externer Dienste werden nicht von MessageDrop gesteuert.',
+        answer: 'Für MessageDrop selbst fällt aktuell keine Nutzungsgebühr an. Verbindungs- und Datenkosten, zum Beispiel für mobile Daten oder Roaming, können je nach Tarif und Anbieter trotzdem entstehen.',
       },
       {
         slug: 'wie-alt-muss-ich-sein',
@@ -1044,7 +1044,7 @@ const germanFaqPages = [
       {
         slug: 'gibt-es-messagedrop-in-mehreren-sprachen',
         question: 'Gibt es MessageDrop in mehreren Sprachen?',
-        answer: 'Ja. Die MessageDrop-App unterstützt Deutsch, Englisch, Französisch und Spanisch. Die öffentlichen Seiten und rechtlichen Informationen sind derzeit vor allem auf Deutsch und Englisch verfügbar.',
+        answer: 'Ja. Die MessageDrop-App unterstützt Deutsch, Englisch, Französisch und Spanisch. Die öffentlichen Seiten und rechtlichen Informationen sind derzeit auf Deutsch und Englisch verfügbar.',
       },
       {
         slug: 'fuer-wen-ist-messagedrop-gedacht',
@@ -1075,7 +1075,7 @@ const germanFaqPages = [
     additionalFaqCategories: [
       {
         title: 'Nutzung als Gast',
-        intro: 'Diese Fragen erklären, was Du vor dem Anlegen eines Nutzerkontos oder vor einer Backend-Verbindung nutzen kannst.',
+        intro: 'Hier erfährst Du, welche Funktionen Du als Gast nutzen kannst.',
         items: [
           {
             slug: 'was-kann-ich-als-gast-sehen',
@@ -1146,7 +1146,7 @@ const germanFaqPages = [
                         {
                                 "slug": "was-aendert-sich-wenn-ich-ein-nutzerkonto-verwende",
                                 "question": "Was ändert sich, wenn ich ein Nutzerkonto verwende?",
-                                "answer": "Mit einem Nutzerkonto kannst Du eigene öffentliche Nachrichten erstellen und verwalten, private Inhalte nutzen, Orte pflegen, Kontakte verwenden und Funktionen nutzen, die eine stabile Nutzeridentität oder Backend-Verbindung benötigen."
+                                "answer": "Mit einem Nutzerkonto kannst Du öffentliche Nachrichten erstellen, private Inhalte nutzen, eigene Orte verwalten und Dich mit Kontakten verbinden."
                         },
                         {
                                 "slug": "wie-erstelle-ich-ein-nutzerkonto",
@@ -1238,12 +1238,12 @@ const germanFaqPages = [
                         {
                                 "slug": "kann-ich-private-bilder-speichern",
                                 "question": "Kann ich private Bilder speichern?",
-                                "answer": "Ja. Private Bilder kannst Du von Deinem Gerät importieren. Enthalten sie Geodaten, kann MessageDrop sie automatisch auf der Karte platzieren. Deine Bilder bleiben lokal und werden nicht an unsere Server übertragen."
+                                "answer": "Ja. Private Bilder kannst Du von Deinem Gerät auswählen und lokal referenzieren. Enthalten sie Geodaten, kann MessageDrop sie automatisch auf der Karte platzieren. Deine Bilder bleiben lokal und werden nicht an unsere Server übertragen."
                         },
                         {
                                 "slug": "kann-ich-private-dokumente-speichern",
                                 "question": "Kann ich private Dokumente speichern?",
-                                "answer": "Ja. Private Dokumente kannst Du von Deinem Gerät importieren. Deine Dokumente bleiben lokal und werden nicht an unsere Server übertragen."
+                                "answer": "Ja. Private Dokumente kannst Du von Deinem Gerät auswählen und lokal referenzieren. Deine Dokumente bleiben lokal und werden nicht an unsere Server übertragen."
                         },
                         {
                                 "slug": "wo-werden-private-inhalte-gespeichert",
@@ -1259,7 +1259,7 @@ const germanFaqPages = [
         },
         {
                 "title": "Nutzung mit Nutzerkonto · Orte",
-                "intro": "Fragen zum Erstellen, Bearbeiten, Folgen und Pflegen von Orten.",
+                "intro": "Hier erfährst Du, wie Du Orte erstellen, bearbeiten und ihnen folgen kannst.",
                 "items": [
                         {
                                 "slug": "kann-ich-eigene-orte-erstellen",
@@ -1285,7 +1285,7 @@ const germanFaqPages = [
         },
         {
                 "title": "Nutzung mit Nutzerkonto · Kontakte & private Kommunikation",
-                "intro": "Fragen zum Verbinden mit Menschen und zum Austausch privater Nachrichten.",
+                "intro": "Hier erfährst Du, wie Du Dich mit anderen Nutzern verbindest und private Nachrichten austauschst.",
                 "items": [
                         {
                                 "slug": "kann-ich-andere-nutzer-kontaktieren",
