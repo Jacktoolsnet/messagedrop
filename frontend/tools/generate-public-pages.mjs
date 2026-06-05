@@ -531,7 +531,7 @@ const faqPages = [
                         {
                                 "slug": "can-i-store-private-documents",
                                 "question": "Can I store private documents?",
-                                "answer": "Yes. You can store private documents where the feature is available. As with other private content, you should keep backups if the data is important."
+                                "answer": "Yes. You can import private documents from your device. Your documents stay local and are not transferred to our servers."
                         },
                         {
                                 "slug": "where-is-private-content-stored",
@@ -1278,7 +1278,7 @@ const germanFaqPages = [
                         {
                                 "slug": "kann-ich-private-dokumente-speichern",
                                 "question": "Kann ich private Dokumente speichern?",
-                                "answer": "Ja. Du kannst private Dokumente speichern, wenn die Funktion verfügbar ist. Wie bei anderen privaten Inhalten solltest Du Backups erstellen, wenn die Daten wichtig sind."
+                                "answer": "Ja. Private Dokumente kannst Du von Deinem Gerät importieren. Deine Dokumente bleiben lokal und werden nicht an unsere Server übertragen."
                         },
                         {
                                 "slug": "wo-werden-private-inhalte-gespeichert",
