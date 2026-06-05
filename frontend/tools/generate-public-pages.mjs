@@ -536,17 +536,12 @@ const faqPages = [
                         {
                                 "slug": "where-is-private-content-stored",
                                 "question": "Where is private content stored?",
-                                "answer": "Private content is designed to stay local on your device whenever possible. Some features may require backend support, but local-first storage is an important part of MessageDrop."
+                                "answer": "Private content stays on your device and in your browser. MessageDrop uses local file references and does not transfer this content to our servers."
                         },
                         {
                                 "slug": "can-i-delete-private-content-later",
                                 "question": "Can I delete private content later?",
-                                "answer": "Yes. You can delete private content that you manage in the app. If data exists only on your device, deleting or losing local storage can also remove it."
-                        },
-                        {
-                                "slug": "what-happens-to-private-content-when-i-change-devices",
-                                "question": "What happens to private content when I change devices?",
-                                "answer": "Private content that is stored only locally does not automatically move to a new device. Use available backup and restore options before changing devices or clearing browser data."
+                                "answer": "You can delete private notes at any time. For private images and documents, MessageDrop removes the local reference to the original file. The original file remains on your device."
                         }
                 ]
         },
@@ -1283,17 +1278,12 @@ const germanFaqPages = [
                         {
                                 "slug": "wo-werden-private-inhalte-gespeichert",
                                 "question": "Wo werden private Inhalte gespeichert?",
-                                "answer": "Private Inhalte sollen wann immer möglich lokal auf Deinem Gerät bleiben. Einige Funktionen können Backend-Unterstützung benötigen, aber Local-first-Speicherung ist ein wichtiger Teil von MessageDrop."
+                                "answer": "Private Inhalte bleiben auf Deinem Gerät und in Deinem Browser. MessageDrop verwendet lokale Dateiverweise und überträgt diese Inhalte nicht auf unsere Server."
                         },
                         {
                                 "slug": "kann-ich-private-inhalte-spaeter-loeschen",
                                 "question": "Kann ich private Inhalte später löschen?",
-                                "answer": "Ja. Du kannst private Inhalte löschen, die Du in der App verwaltest. Wenn Daten nur auf Deinem Gerät liegen, kann auch das Löschen oder Verlieren lokaler Speicherbereiche diese Daten entfernen."
-                        },
-                        {
-                                "slug": "was-passiert-mit-privaten-inhalten-wenn-ich-das-geraet-wechsle",
-                                "question": "Was passiert mit privaten Inhalten, wenn ich das Gerät wechsle?",
-                                "answer": "Private Inhalte, die nur lokal gespeichert sind, wechseln nicht automatisch auf ein neues Gerät. Nutze verfügbare Backup- und Wiederherstellungsfunktionen, bevor Du Geräte wechselst oder Browserdaten löschst."
+                                "answer": "Private Notizen kannst Du jederzeit löschen. Bei privaten Bildern und Dokumenten entfernt MessageDrop den lokalen Verweis auf die Originaldatei. Die Originaldatei bleibt auf Deinem Gerät erhalten."
                         }
                 ]
         },
