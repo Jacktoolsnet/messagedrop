@@ -464,7 +464,7 @@ const faqPages = [
                         {
                                 "slug": "is-my-profile-visible-to-others",
                                 "question": "Is my profile visible to others?",
-                                "answer": "Your profile always remains private and is never publicly visible. If you want, you can share your current profile directly with contacts."
+                                "answer": "Your profile always remains private and is never publicly visible. If a contact requests your profile, you decide whether you want to share your current profile with that contact."
                         },
                         {
                                 "slug": "can-i-use-messagedrop-on-multiple-devices",
@@ -1176,7 +1176,7 @@ const germanFaqPages = [
                         {
                                 "slug": "ist-mein-profil-fuer-andere-sichtbar",
                                 "question": "Ist mein Profil für andere sichtbar?",
-                                "answer": "Dein Profil bleibt immer privat und ist nie öffentlich sichtbar. Wenn Du möchtest, kannst Du Dein aktuelles Profil gezielt mit Kontakten teilen."
+                                "answer": "Dein Profil bleibt immer privat und ist nie öffentlich sichtbar. Wenn ein Kontakt Dein Profil anfragt, entscheidest Du selbst, ob Du Dein aktuelles Profil mit diesem Kontakt teilen möchtest."
                         },
                         {
                                 "slug": "kann-ich-messagedrop-auf-mehreren-geraeten-nutzen",
