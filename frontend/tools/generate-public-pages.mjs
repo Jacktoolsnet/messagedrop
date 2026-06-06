@@ -474,38 +474,38 @@ const faqPages = [
                 ]
         },
         {
-                "title": "Using MessageDrop with a user account · Own public messages",
-                "intro": "Questions about creating, editing, deleting, and moderating your own public messages.",
+                "title": "Using MessageDrop with a user account · Own messages",
+                "intro": "Questions about creating, editing, deleting, and moderating your own messages.",
                 "items": [
                         {
-                                "slug": "where-do-my-public-messages-appear",
-                                "question": "Where do my public messages appear?",
-                                "answer": "A public message is shown at the place you choose on the map."
+                                "slug": "where-do-my-messages-appear",
+                                "question": "Where do my messages appear?",
+                                "answer": "A message is shown at the place you choose on the map."
                         },
                         {
-                                "slug": "can-i-edit-my-public-messages-later",
-                                "question": "Can I edit my public messages later?",
-                                "answer": "Yes. You can edit your own public messages at any time."
+                                "slug": "can-i-edit-my-messages-later",
+                                "question": "Can I edit my messages later?",
+                                "answer": "Yes. You can edit your own messages at any time."
                         },
                         {
-                                "slug": "can-i-delete-my-public-messages",
-                                "question": "Can I delete my public messages?",
-                                "answer": "Yes. You can delete your own public messages at any time."
+                                "slug": "can-i-delete-my-messages",
+                                "question": "Can I delete my messages?",
+                                "answer": "Yes. You can delete your own messages at any time."
                         },
                         {
-                                "slug": "why-can-a-public-message-be-moderated-or-removed",
-                                "question": "Why can a public message be moderated or removed?",
-                                "answer": "Public messages can be moderated and set to not visible if they violate the terms of service or legal requirements."
+                                "slug": "why-can-a-message-be-moderated",
+                                "question": "Why can a message be moderated?",
+                                "answer": "Messages can be moderated and set to not visible if they violate the terms of service or legal requirements."
                         },
                         {
-                                "slug": "can-i-embed-external-content-in-public-messages",
-                                "question": "Can I embed external content in public messages?",
+                                "slug": "can-i-embed-external-content-in-messages",
+                                "question": "Can I embed external content in messages?",
                                 "answer": "Yes, where supported. You can link or embed content from supported external platforms. External providers remain separate services with their own terms and privacy practices."
                         },
                         {
-                                "slug": "can-i-see-how-others-react-to-my-public-messages",
-                                "question": "Can I see how others react to my public messages?",
-                                "answer": "Yes. Other users can react to public messages with like or dislike and write comments."
+                                "slug": "can-i-see-how-others-react-to-my-messages",
+                                "question": "Can I see how others react to my messages?",
+                                "answer": "Yes. Other users can react to messages with like or dislike and write comments."
                         }
                 ]
         },
@@ -1186,38 +1186,38 @@ const germanFaqPages = [
                 ]
         },
         {
-                "title": "Nutzung mit Nutzerkonto · Eigene öffentliche Nachrichten",
-                "intro": "Fragen zum Erstellen, Bearbeiten, Löschen und Moderieren eigener öffentlicher Nachrichten.",
+                "title": "Nutzung mit Nutzerkonto · Eigene Nachrichten",
+                "intro": "Fragen zum Erstellen, Bearbeiten, Löschen und Moderieren eigener Nachrichten.",
                 "items": [
                         {
-                                "slug": "wo-erscheinen-meine-oeffentlichen-nachrichten",
-                                "question": "Wo erscheinen meine öffentlichen Nachrichten?",
-                                "answer": "Eine öffentliche Nachricht wird an dem Ort angezeigt, den Du auf der Karte auswählst."
+                                "slug": "wo-erscheinen-meine-nachrichten",
+                                "question": "Wo erscheinen meine Nachrichten?",
+                                "answer": "Eine Nachricht wird an dem Ort angezeigt, den Du auf der Karte auswählst."
                         },
                         {
-                                "slug": "kann-ich-meine-oeffentlichen-nachrichten-spaeter-bearbeiten",
-                                "question": "Kann ich meine öffentlichen Nachrichten später bearbeiten?",
-                                "answer": "Ja. Du kannst eigene öffentliche Nachrichten jederzeit bearbeiten."
+                                "slug": "kann-ich-meine-nachrichten-spaeter-bearbeiten",
+                                "question": "Kann ich meine Nachrichten später bearbeiten?",
+                                "answer": "Ja. Du kannst eigene Nachrichten jederzeit bearbeiten."
                         },
                         {
-                                "slug": "kann-ich-meine-oeffentlichen-nachrichten-loeschen",
-                                "question": "Kann ich meine öffentlichen Nachrichten löschen?",
-                                "answer": "Ja. Du kannst eigene öffentliche Nachrichten jederzeit löschen."
+                                "slug": "kann-ich-meine-nachrichten-loeschen",
+                                "question": "Kann ich meine Nachrichten löschen?",
+                                "answer": "Ja. Du kannst eigene Nachrichten jederzeit löschen."
                         },
                         {
-                                "slug": "warum-kann-eine-oeffentliche-nachricht-moderiert-oder-entfernt-werden",
-                                "question": "Warum kann eine öffentliche Nachricht moderiert oder entfernt werden?",
-                                "answer": "Öffentliche Nachrichten können moderiert und auf nicht sichtbar gesetzt werden, wenn sie gegen die Nutzungsbedingungen oder gesetzliche Anforderungen verstoßen."
+                                "slug": "warum-kann-eine-nachricht-moderiert-werden",
+                                "question": "Warum kann eine Nachricht moderiert werden?",
+                                "answer": "Nachrichten können moderiert und auf nicht sichtbar gesetzt werden, wenn sie gegen die Nutzungsbedingungen oder gesetzliche Anforderungen verstoßen."
                         },
                         {
-                                "slug": "kann-ich-externe-inhalte-in-oeffentliche-nachrichten-einbinden",
-                                "question": "Kann ich externe Inhalte in öffentliche Nachrichten einbinden?",
+                                "slug": "kann-ich-externe-inhalte-in-nachrichten-einbinden",
+                                "question": "Kann ich externe Inhalte in Nachrichten einbinden?",
                                 "answer": "Ja, soweit unterstützt. Du kannst Inhalte von unterstützten externen Plattformen verlinken oder einbinden. Externe Anbieter bleiben eigenständige Dienste mit eigenen Bedingungen und Datenschutzregeln."
                         },
                         {
-                                "slug": "kann-ich-sehen-wie-andere-auf-meine-oeffentlichen-nachrichten-reagieren",
-                                "question": "Kann ich sehen, wie andere auf meine öffentlichen Nachrichten reagieren?",
-                                "answer": "Ja. Andere Nutzer können auf öffentliche Nachrichten mit Like oder Dislike reagieren und Kommentare schreiben."
+                                "slug": "kann-ich-sehen-wie-andere-auf-meine-nachrichten-reagieren",
+                                "question": "Kann ich sehen, wie andere auf meine Nachrichten reagieren?",
+                                "answer": "Ja. Andere Nutzer können auf Nachrichten mit Like oder Dislike reagieren und Kommentare schreiben."
                         }
                 ]
         },
