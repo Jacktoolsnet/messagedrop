@@ -187,6 +187,15 @@ const marketingPages = [
             ctaLabel: 'Watch on YouTube',
           },
           {
+            icon: 'map',
+            title: 'Use MessageDrop as a guest',
+            body:
+              'Move around the map, open messages, and view weather and air quality data.',
+            youtubeId: 'a16am1j0dm0',
+            videoUrl: 'https://youtu.be/a16am1j0dm0',
+            ctaLabel: 'Watch on YouTube',
+          },
+          {
             icon: 'account_circle',
             title: 'Create your account and fill your profile',
             body:
@@ -896,6 +905,15 @@ const germanMarketingPages = [
               'So startest Du MessageDrop, gehst durch den Consent-Screen und findest Dich nach dem ersten Öffnen schnell zurecht.',
             youtubeId: 'zW-1hXgqiko',
             videoUrl: 'https://youtu.be/zW-1hXgqiko',
+            ctaLabel: 'Auf YouTube ansehen',
+          },
+          {
+            icon: 'map',
+            title: 'MessageDrop als Gast nutzen',
+            body:
+              'Bewege Dich auf der Karte, öffne Nachrichten und sieh Dir Wetter- und Luftqualitätsdaten an.',
+            youtubeId: 'a16am1j0dm0',
+            videoUrl: 'https://youtu.be/a16am1j0dm0',
             ctaLabel: 'Auf YouTube ansehen',
           },
           {
