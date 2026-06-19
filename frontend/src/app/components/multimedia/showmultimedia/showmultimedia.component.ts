@@ -154,6 +154,10 @@ export class ShowmultimediaComponent implements OnChanges, OnDestroy {
     return this.multimedia?.sourceUrl || 'https://klipy.com/';
   }
 
+  isPinterestMultimedia(): boolean {
+    return this.multimedia?.type === MultimediaType.PINTEREST;
+  }
+
   getRenderableImageUrl(): string {
     return this.renderableImageUrl;
   }

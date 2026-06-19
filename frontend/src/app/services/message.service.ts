@@ -29,20 +29,20 @@ import {
   parseHashtagStorageValue
 } from '../utils/hashtag.util';
 
-type PublishMessageOptions = {
+interface PublishMessageOptions {
   showAlways?: boolean;
   includeInRootList?: boolean;
   persistDraft?: boolean;
-};
+}
 
-type PublishMessageResult = {
+interface PublishMessageResult {
   status: number;
   via: 'create' | 'enable';
   moderation: MessageCreateResponse['moderation'] | null;
   messageId: number | null;
   messageUuid: string | null;
   published: boolean;
-};
+}
 
 type MessageLookupMode = 'ownFirst' | 'publicFirst';
 
@@ -1012,7 +1012,7 @@ export class MessageService {
       showAlways,
       persistDraft: true
     }).subscribe({
-      error: () => {}
+      error: (error) => console.error('Message request failed', error)
     });
   }
 
@@ -1022,7 +1022,7 @@ export class MessageService {
       includeInRootList,
       persistDraft: true
     }).subscribe({
-      error: () => {}
+      error: (error) => console.error('Message request failed', error)
     });
   }
 
@@ -1771,7 +1771,7 @@ export class MessageService {
       'se', 'no', 'dk', 'fi', 'pl', 'cz', 'sk', 'hu', 'ro', 'bg', 'hr', 'si', 'gr', 'tr', 'ru', 'ua'
     ]);
     const containsUuidLikeValue = (value: string): boolean =>
-      /(^|[^0-9a-f])(?:[0-9a-f]{8}[\s\u200B-\u200D\uFEFF._:,;/\\|()\[\]{}#*+=~"'`-]*[0-9a-f]{4}[\s\u200B-\u200D\uFEFF._:,;/\\|()\[\]{}#*+=~"'`-]*[1-8][0-9a-f]{3}[\s\u200B-\u200D\uFEFF._:,;/\\|()\[\]{}#*+=~"'`-]*[89ab][0-9a-f]{3}[\s\u200B-\u200D\uFEFF._:,;/\\|()\[\]{}#*+=~"'`-]*[0-9a-f]{12})([^0-9a-f]|$)/i
+      /(^|[^0-9a-f])(?:[0-9a-f]{8}[\s\u200B-\u200D\uFEFF._:,;/\\|()[\]{}#*+=~"'`-]*[0-9a-f]{4}[\s\u200B-\u200D\uFEFF._:,;/\\|()[\]{}#*+=~"'`-]*[1-8][0-9a-f]{3}[\s\u200B-\u200D\uFEFF._:,;/\\|()[\]{}#*+=~"'`-]*[89ab][0-9a-f]{3}[\s\u200B-\u200D\uFEFF._:,;/\\|()[\]{}#*+=~"'`-]*[0-9a-f]{12})([^0-9a-f]|$)/i
         .test(value);
     const normalizedTokenText = String(text ?? '')
       .toLowerCase()

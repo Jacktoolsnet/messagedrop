@@ -137,7 +137,7 @@ export class SearchSettingsComponent {
     return SEARCH_SETTING_MARKER_ICONS[key];
   }
 
-  getPreviewMarkers(key: SearchSettingsKey): Array<{ latitude: number; longitude: number; iconUrl: string }> {
+  getPreviewMarkers(key: SearchSettingsKey): { latitude: number; longitude: number; iconUrl: string }[] {
     return [{
       latitude: this.previewLocation.latitude,
       longitude: this.previewLocation.longitude,

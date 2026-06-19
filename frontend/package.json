@@ -70,7 +70,6 @@
     "typescript-eslint": "8.46.2"
   },
   "overrides": {
-    "ajv": "8.18.0",
     "undici": "7.24.0",
     "ws": "8.20.1",
     "express-rate-limit": "8.5.2",

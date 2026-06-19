@@ -352,7 +352,7 @@ export class SpeechService {
   private findChunkBreak(text: string, maxLength: number): number {
     const minLength = Math.floor(maxLength * 0.5);
 
-    return this.findBoundaryIndex(text, /[\.\!\?]\s+/g, maxLength, minLength)
+    return this.findBoundaryIndex(text, /[.!?]\s+/g, maxLength, minLength)
       ?? this.findBoundaryIndex(text, /[;:]\s+/g, maxLength, minLength)
       ?? this.findBoundaryIndex(text, /,\s+/g, maxLength, minLength)
       ?? this.findBoundaryIndex(text, /\n+/g, maxLength, minLength)

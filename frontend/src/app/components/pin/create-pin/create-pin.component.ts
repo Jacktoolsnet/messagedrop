@@ -39,10 +39,10 @@ export class CreatePinComponent implements OnDestroy {
   readonly digitVisibilityDurationMs = 550;
   readonly slotPulseDurationMs = 240;
   private dialogClosed = false;
-  private readonly pinMaskTimeouts: Array<number | undefined> = new Array<number | undefined>(this.pinLength).fill(undefined);
-  private readonly confirmPinMaskTimeouts: Array<number | undefined> = new Array<number | undefined>(this.pinLength).fill(undefined);
-  private readonly pinPulseTimeouts: Array<number | undefined> = new Array<number | undefined>(this.pinLength).fill(undefined);
-  private readonly confirmPinPulseTimeouts: Array<number | undefined> = new Array<number | undefined>(this.pinLength).fill(undefined);
+  private readonly pinMaskTimeouts: (number | undefined)[] = new Array<number | undefined>(this.pinLength).fill(undefined);
+  private readonly confirmPinMaskTimeouts: (number | undefined)[] = new Array<number | undefined>(this.pinLength).fill(undefined);
+  private readonly pinPulseTimeouts: (number | undefined)[] = new Array<number | undefined>(this.pinLength).fill(undefined);
+  private readonly confirmPinPulseTimeouts: (number | undefined)[] = new Array<number | undefined>(this.pinLength).fill(undefined);
   private transitionTimeoutId?: number;
 
   readonly data = inject<CreatePinDialogData | null>(MAT_DIALOG_DATA, { optional: true }) ?? {};

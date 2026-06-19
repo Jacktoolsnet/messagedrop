@@ -22,7 +22,7 @@
         }
     </div>
     @if (multimedia?.attribution !== '') {
-    <a class="attribution-link" [class.attribution-link--compact]="multimedia?.type === 'pinterest'"
+    <a class="attribution-link" [class.attribution-link--compact]="isPinterestMultimedia()"
         [href]="multimedia?.sourceUrl" target="_blank" rel="noopener noreferrer">
         {{ multimedia?.attribution }}
     </a>
@@ -56,19 +56,19 @@
         <img class="klipy-attribution-logo" [src]="klipyAttributionLogoUrl" alt="Powered by KLIPY" loading="lazy" />
     </a>
     } @else if (multimedia?.attribution !== '') {
-    <a class="attribution-link" [class.attribution-link--compact]="multimedia?.type === 'pinterest'"
+    <a class="attribution-link" [class.attribution-link--compact]="isPinterestMultimedia()"
         [href]="multimedia?.sourceUrl" target="_blank" rel="noopener noreferrer">
         {{ multimedia?.attribution }}
     </a>
     }
 </div>
-} @else if (multimedia?.type !== 'tenor' && multimedia?.type !== 'klipy' && safeHtml) {
+} @else if (safeHtml) {
 <div class="media_block">
     <div class="oembed_container" [class.oembed-youtube]="multimedia?.type === 'youtube'"
         [class.oembed-spotify]="multimedia?.type === 'spotify'" [class.oembed-tiktok]="multimedia?.type === 'tiktok'"
-        [class.oembed-pinterest]="multimedia?.type === 'pinterest'" [innerHTML]="safeHtml"></div>
+        [class.oembed-pinterest]="isPinterestMultimedia()" [innerHTML]="safeHtml"></div>
     @if (multimedia?.attribution !== '') {
-    <a class="attribution-link" [class.attribution-link--compact]="multimedia?.type === 'pinterest'"
+    <a class="attribution-link" [class.attribution-link--compact]="isPinterestMultimedia()"
         [href]="multimedia?.sourceUrl" target="_blank" rel="noopener noreferrer">
         {{ multimedia?.attribution }}
     </a>

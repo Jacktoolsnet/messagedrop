@@ -55,7 +55,19 @@ export class StickerService {
 
   getCategories(): Observable<StickerCategory[]> {
     return this.getBootstrap().pipe(
-      map((categories) => categories.map(({ packs: _packs, ...category }) => category))
+      map((categories) => categories.map((category) => ({
+        id: category.id,
+        name: category.name,
+        slug: category.slug,
+        previewStickerId: category.previewStickerId,
+        status: category.status,
+        sortOrder: category.sortOrder,
+        packCount: category.packCount,
+        stickerCount: category.stickerCount,
+        createdAt: category.createdAt,
+        updatedAt: category.updatedAt,
+        deletedAt: category.deletedAt
+      })))
     );
   }
 
@@ -67,7 +79,26 @@ export class StickerService {
           return [];
         }
 
-        return category.packs.map(({ stickers: _stickers, ...pack }) => pack);
+        return category.packs.map((pack) => ({
+          id: pack.id,
+          categoryId: pack.categoryId,
+          categoryName: pack.categoryName,
+          categorySlug: pack.categorySlug,
+          name: pack.name,
+          slug: pack.slug,
+          previewStickerId: pack.previewStickerId,
+          licenseNote: pack.licenseNote,
+          licenseFilePath: pack.licenseFilePath,
+          licenseFileName: pack.licenseFileName,
+          licenseFileMimeType: pack.licenseFileMimeType,
+          searchVisible: pack.searchVisible,
+          status: pack.status,
+          sortOrder: pack.sortOrder,
+          stickerCount: pack.stickerCount,
+          createdAt: pack.createdAt,
+          updatedAt: pack.updatedAt,
+          deletedAt: pack.deletedAt
+        }));
       })
     );
   }

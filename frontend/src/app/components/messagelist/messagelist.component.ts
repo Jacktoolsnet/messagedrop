@@ -447,7 +447,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
           }
           this.messageService.markMessageTreeUnpublishedLocally(message);
         },
-        error: () => {}
+        error: (error) => console.error('Message request failed', error)
       });
       return;
     }
@@ -996,7 +996,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
             this.messageService.publishMessage(result.message, this.userService.getUser(), {
               persistDraft: true
             }).subscribe({
-              error: () => {}
+              error: (error) => console.error('Message request failed', error)
             });
             return;
           }
@@ -1215,7 +1215,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
         this.messageService.publishMessage(result.message, this.userService.getUser(), {
           persistDraft: true
         }).subscribe({
-          error: () => {}
+          error: (error) => console.error('Message request failed', error)
         });
       }
     });
@@ -1332,7 +1332,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
         this.messageService.publishMessage(result.message, this.userService.getUser(), {
           persistDraft: true
         }).subscribe({
-          error: () => {}
+          error: (error) => console.error('Message request failed', error)
         });
       }
     });

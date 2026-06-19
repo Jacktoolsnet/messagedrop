@@ -31,8 +31,8 @@ export class CheckPinComponent implements OnDestroy {
   pinPulseStates: boolean[] = [false, false, false, false, false, false];
   readonly digitVisibilityDurationMs = 550;
   readonly slotPulseDurationMs = 240;
-  private readonly pinMaskTimeouts: Array<number | undefined> = new Array<number | undefined>(this.pinLength).fill(undefined);
-  private readonly pinPulseTimeouts: Array<number | undefined> = new Array<number | undefined>(this.pinLength).fill(undefined);
+  private readonly pinMaskTimeouts: (number | undefined)[] = new Array<number | undefined>(this.pinLength).fill(undefined);
+  private readonly pinPulseTimeouts: (number | undefined)[] = new Array<number | undefined>(this.pinLength).fill(undefined);
   private confirmTimeoutId?: number;
 
   private readonly dialogData = inject<CheckPinDialogData | null>(MAT_DIALOG_DATA, { optional: true });

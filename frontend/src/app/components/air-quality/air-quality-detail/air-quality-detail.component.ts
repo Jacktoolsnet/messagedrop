@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AfterViewInit, Component, ElementRef, inject, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
 import { MatDialogModule } from '@angular/material/dialog';
 import {
@@ -494,7 +495,6 @@ export class AirQualityDetailComponent implements OnChanges, AfterViewInit, OnDe
   }
 
   private getRadarScaleBounds(values: number[]): { minY: number; maxY: number } {
-    const minValue = Math.min(...values);
     const maxValue = Math.max(...values);
 
     return {

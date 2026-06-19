@@ -351,7 +351,8 @@ export class NetworkService {
     }
   }
 
-  private handleBackendHealthTransportError(_error: HttpErrorResponse): void {
+  private handleBackendHealthTransportError(error: HttpErrorResponse): void {
+    void error;
     if (typeof navigator !== 'undefined' && navigator.onLine === false) {
       return;
     }

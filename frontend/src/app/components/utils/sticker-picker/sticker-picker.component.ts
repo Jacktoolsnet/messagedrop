@@ -277,11 +277,11 @@ export class StickerPickerComponent implements OnInit, OnDestroy {
     }
   }
 
-  private primePreviewUrls(entries: Array<{
+  private primePreviewUrls(entries: {
     stickerId: string | null | undefined;
     scope: PreviewScope;
     ownerId: string | null | undefined;
-  }>): void {
+  }[]): void {
     for (const entry of entries) {
       if (!entry.stickerId) {
         continue;

@@ -517,7 +517,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
           this.messageService.markMessageTreeUnpublishedLocally(message);
           void this.refreshMessagesFromBackend();
         },
-        error: () => {}
+        error: (error) => console.error('Message request failed', error)
       });
       return;
     }
@@ -1086,7 +1086,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
               next: () => {
                 void this.refreshMessagesFromBackend();
               },
-              error: () => {}
+              error: (error) => console.error('Message request failed', error)
             });
             return;
           }
@@ -1279,7 +1279,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
           next: () => {
             void this.refreshMessagesFromBackend();
           },
-          error: () => {}
+          error: (error) => console.error('Message request failed', error)
         });
       }
     });
@@ -1400,7 +1400,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
           next: () => {
             void this.refreshMessagesFromBackend();
           },
-          error: () => {}
+          error: (error) => console.error('Message request failed', error)
         });
       }
     });
