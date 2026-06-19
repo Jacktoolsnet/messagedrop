@@ -507,7 +507,7 @@
               </div>
 
               @if (tenorResults().length > 0) {
-              <div class="tenor-grid">
+              <div class="tenor-grid" [class.tenor-grid-clips]="selectedKlipyKind() === 'clip'">
                 @for (result of tenorResults(); track trackTenorResult($index, result)) {
                 @if (isKlipyClipResult(result)) {
                 <div class="tenor-result tenor-clip-result">

@@ -1614,6 +1614,16 @@ mat-chip-grid {
   gap: .65rem;
 }
 
+.tenor-grid-clips {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+}
+
+@media (min-width: 900px) {
+  .tenor-grid-clips {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .tenor-result {
   border: 0;
   padding: 0;
