@@ -1990,6 +1990,46 @@ router.get('/media/tenor/search', requireRole(...CONTENT_ROLES), async (req, res
   }
 });
 
+router.get('/media/klipy/featured', requireRole(...CONTENT_ROLES), async (req, res, next) => {
+  const nextToken = normalizeString(req.query.next, '');
+  const country = normalizeString(req.query.country, 'DE') || 'DE';
+  const locale = normalizeString(req.query.locale, 'de_DE') || 'de_DE';
+  const endpoint = nextToken
+    ? `/klipy/featured/${encodeURIComponent(country)}/${encodeURIComponent(locale)}/${encodeURIComponent(nextToken)}`
+    : `/klipy/featured/${encodeURIComponent(country)}/${encodeURIComponent(locale)}`;
+
+  try {
+    const response = await callPublicBackendPublic('get', endpoint);
+    return res.status(response.status).json(response.data);
+  } catch (error) {
+    const err = apiError.badGateway('klipy_unavailable');
+    err.detail = error?.message || String(error);
+    return next(err);
+  }
+});
+
+router.get('/media/klipy/search', requireRole(...CONTENT_ROLES), async (req, res, next) => {
+  const term = normalizeString(req.query.term, '');
+  if (!term) {
+    return next(apiError.badRequest('missing_term'));
+  }
+  const nextToken = normalizeString(req.query.next, '');
+  const country = normalizeString(req.query.country, 'DE') || 'DE';
+  const locale = normalizeString(req.query.locale, 'de_DE') || 'de_DE';
+  const endpoint = nextToken
+    ? `/klipy/search/${encodeURIComponent(country)}/${encodeURIComponent(locale)}/${encodeURIComponent(term)}/${encodeURIComponent(nextToken)}`
+    : `/klipy/search/${encodeURIComponent(country)}/${encodeURIComponent(locale)}/${encodeURIComponent(term)}`;
+
+  try {
+    const response = await callPublicBackendPublic('get', endpoint);
+    return res.status(response.status).json(response.data);
+  } catch (error) {
+    const err = apiError.badGateway('klipy_unavailable');
+    err.detail = error?.message || String(error);
+    return next(err);
+  }
+});
+
 router.get('/media/oembed', requireRole(...CONTENT_ROLES), async (req, res, next) => {
   const targetUrl = normalizeString(req.query.url, '');
   if (!targetUrl) {
