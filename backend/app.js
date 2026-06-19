@@ -90,6 +90,7 @@ const airQualtiy = require('./routes/air-quality');
 const nominatim = require('./routes/nominatim');
 const viator = require('./routes/viator');
 const tenor = require('./routes/tenor');
+const klipy = require('./routes/klipy');
 const unsplash = require('./routes/unsplash');
 const sticker = require('./routes/sticker');
 const publicShare = require('./routes/public-share');
@@ -537,6 +538,13 @@ const tenorLimit = rateLimit({
   message: rateLimitMessage('Too many tenor requests, please try again later.')
 });
 
+const klipyLimit = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 60,
+  ...rateLimitDefaults,
+  message: rateLimitMessage('Too many klipy requests, please try again later.')
+});
+
 const unsplashLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
   limit: 60,
@@ -658,6 +666,7 @@ app.use('/openai', openAiLimit, slowRequestDefault, openAi);
 app.use('/place', placeLimit, slowRequestDefault, place);
 app.use('/p', basicLimit, slowRequestDefault, publicShare);
 app.use('/tenor', tenorLimit, slowRequestDefault, tenor);
+app.use('/klipy', klipyLimit, slowRequestDefault, klipy);
 app.use('/stickers', stickerLimit, slowRequestDefault, sticker);
 app.use('/unsplash', unsplashLimit, slowRequestDefault, unsplash);
 app.use('/translate', translateLimit, slowRequestDefault, translate);
