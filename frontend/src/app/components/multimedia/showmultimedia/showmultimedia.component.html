@@ -31,10 +31,18 @@
 } @else if (multimedia?.type === 'tenor' || multimedia?.type === 'klipy' || multimedia?.type === 'unsplash') {
 <div class="media_block">
     <div class="multimedia_container">
+        @if (!providerImageError) {
         <img class="multimedia_image" [src]="getRenderableImageUrl()"
-            [attr.alt]="multimedia?.title || ('common.multimedia.embeddedAlt' | transloco)" />
+            [attr.alt]="multimedia?.title || ('common.multimedia.embeddedAlt' | transloco)"
+            (load)="onProviderImageLoaded()" (error)="onProviderImageError()" />
         @if (isKlipyMultimedia()) {
         <img class="klipy-watermark" [src]="klipyWatermarkUrl" alt="" aria-hidden="true" loading="lazy" />
+        }
+        } @else {
+        <div class="multimedia-unavailable" role="status">
+            <mat-icon>hide_image</mat-icon>
+            <span>{{ getProviderImageUnavailableMessage() }}</span>
+        </div>
         }
     </div>
     @if (isKlipyMultimedia()) {

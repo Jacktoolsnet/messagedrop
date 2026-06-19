@@ -552,7 +552,9 @@
       "urlNotAllowed": "Diese URL ist zum Einbetten nicht erlaubt.",
       "supportedServicesTitle": "Unterstützte Dienste",
       "supportedServicesHint": "Füge eine URL von einem dieser Dienste ein, um eine Vorschau zu laden.",
-      "addGif": "GIF hinzufügen"
+      "addGif": "GIF hinzufügen",
+      "tenorUnavailable": "Tenor hat seinen GIF-Dienst eingestellt. Dieses GIF ist leider nicht mehr verfügbar.",
+      "imageUnavailable": "Dieses Bild konnte nicht geladen werden."
     },
     "stickerPicker": {
       "loadingCategories": "Sticker-Kategorien werden geladen…",

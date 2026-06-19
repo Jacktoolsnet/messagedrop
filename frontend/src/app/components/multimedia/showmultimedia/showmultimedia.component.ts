@@ -35,6 +35,7 @@ export class ShowmultimediaComponent implements OnChanges, OnDestroy {
 
   safeHtml: SafeHtml | undefined;
   renderableImageUrl = '';
+  providerImageError = false;
   stickerImageLoading = false;
   stickerImageError = false;
 
@@ -87,6 +88,7 @@ export class ShowmultimediaComponent implements OnChanges, OnDestroy {
       });
       this.showExternalSettingsButton = true;
       this.safeHtml = undefined;
+      this.providerImageError = false;
       void this.updateStickerImageUrl();
       return;
     }
@@ -95,6 +97,7 @@ export class ShowmultimediaComponent implements OnChanges, OnDestroy {
       ? this.sanitizer.bypassSecurityTrustHtml(this.multimedia?.oembed?.html ?? '')
       : undefined;
 
+    this.providerImageError = false;
     void this.updateStickerImageUrl();
   }
 
@@ -121,6 +124,22 @@ export class ShowmultimediaComponent implements OnChanges, OnDestroy {
     });
   }
 
+
+
+  onProviderImageLoaded(): void {
+    this.providerImageError = false;
+  }
+
+  onProviderImageError(): void {
+    this.providerImageError = true;
+  }
+
+  getProviderImageUnavailableMessage(): string {
+    if (this.multimedia?.type === MultimediaType.TENOR) {
+      return this.translation.t('common.multimedia.tenorUnavailable');
+    }
+    return this.translation.t('common.multimedia.imageUnavailable');
+  }
 
   isKlipyMultimedia(): boolean {
     return this.multimedia?.type === MultimediaType.KLIPY;
@@ -188,6 +207,7 @@ export class ShowmultimediaComponent implements OnChanges, OnDestroy {
     const multimedia = this.multimedia;
     if (multimedia?.type !== MultimediaType.STICKER) {
       this.currentStickerRenderKey = '';
+      this.providerImageError = false;
       this.stickerImageLoading = false;
       this.stickerImageError = false;
       this.clearStickerObjectUrl();
@@ -198,6 +218,7 @@ export class ShowmultimediaComponent implements OnChanges, OnDestroy {
     const stickerId = this.stickerService.resolveStickerId(multimedia);
     if (!stickerId) {
       this.currentStickerRenderKey = '';
+      this.providerImageError = false;
       this.stickerImageLoading = false;
       this.stickerImageError = true;
       this.clearStickerObjectUrl();

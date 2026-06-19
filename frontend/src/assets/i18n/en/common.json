@@ -552,7 +552,9 @@
       "urlNotAllowed": "This URL is not allowed for embedding.",
       "supportedServicesTitle": "Supported services",
       "supportedServicesHint": "Paste a URL from one of these services to load a preview.",
-      "addGif": "Add GIF"
+      "addGif": "Add GIF",
+      "tenorUnavailable": "Tenor has discontinued its GIF service. This GIF is no longer available.",
+      "imageUnavailable": "This image could not be loaded."
     },
     "stickerPicker": {
       "loadingCategories": "Loading sticker categories…",
