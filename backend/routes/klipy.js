@@ -11,8 +11,24 @@ const MIN_PER_PAGE = 8;
 const MAX_PER_PAGE = 50;
 
 const KIND_CONFIG = {
-    gif: { apiPath: 'gifs', slugPath: 'gifs', type: 'gif', formatFilter: true, defaultFormatFilter: 'gif,webp,jpg,mp4,webm' },
-    sticker: { apiPath: 'stickers', slugPath: 'stickers', type: 'sticker', formatFilter: true, defaultFormatFilter: 'gif,webp,png,webm' },
+    gif: {
+        apiPath: 'gifs',
+        slugPath: 'gifs',
+        type: 'gif',
+        formatFilter: true,
+        defaultFormatFilter: 'gif,webp,jpg,mp4,webm',
+        envFormatFilter: 'KLIPY_GIF_FORMAT_FILTER',
+        allowedFormats: ['gif', 'webp', 'jpg', 'mp4', 'webm']
+    },
+    sticker: {
+        apiPath: 'stickers',
+        slugPath: 'stickers',
+        type: 'sticker',
+        formatFilter: true,
+        defaultFormatFilter: 'gif,webp,png,webm',
+        envFormatFilter: 'KLIPY_STICKER_FORMAT_FILTER',
+        allowedFormats: ['gif', 'webp', 'png', 'webm']
+    },
     clip: { apiPath: 'clips', slugPath: 'clips', type: 'clip', formatFilter: false },
     meme: { apiPath: 'static-memes', slugPath: 'memes', type: 'meme', formatFilter: false }
 };
@@ -67,23 +83,20 @@ function normalizeLocale(country) {
 }
 
 function resolveFormatFilter(kind) {
-    const configured = String(process.env.KLIPY_FORMAT_FILTER || '').trim();
+    const config = KIND_CONFIG[kind];
+    const kindSpecific = String(process.env[config.envFormatFilter] || '').trim();
+    const configured = kindSpecific || (kind === 'gif' ? String(process.env.KLIPY_FORMAT_FILTER || '').trim() : '');
     if (!configured) {
-        return KIND_CONFIG[kind].defaultFormatFilter;
-    }
-
-    if (kind !== 'sticker') {
-        return configured;
+        return config.defaultFormatFilter;
     }
 
     const formats = configured
         .split(',')
         .map((format) => format.trim().toLowerCase())
-        .filter(Boolean);
-    if (!formats.includes('png')) {
-        formats.push('png');
-    }
-    return formats.join(',');
+        .filter((format, index, list) => format && list.indexOf(format) === index)
+        .filter((format) => config.allowedFormats.includes(format));
+
+    return formats.length > 0 ? formats.join(',') : config.defaultFormatFilter;
 }
 
 function buildRequestParams(req, kind, page, searchTerm = '') {

@@ -1632,6 +1632,39 @@ mat-chip-grid {
   height: auto;
 }
 
+.tenor-clip-result {
+  position: relative;
+  background: #000;
+}
+
+.tenor-clip-select {
+  position: absolute;
+  top: .45rem;
+  right: .45rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 0;
+  border-radius: 999px;
+  color: #fff;
+  background: rgba(103, 80, 164, .92);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, .28);
+  cursor: pointer;
+}
+
+.tenor-clip-select mat-icon {
+  width: 1.2rem;
+  height: 1.2rem;
+  font-size: 1.2rem;
+}
+
+.tenor-clip-select:disabled {
+  cursor: default;
+  opacity: .45;
+}
+
 .selected-media {
   padding: 1rem;
   border-radius: 18px;

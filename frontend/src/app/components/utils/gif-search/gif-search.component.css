@@ -40,6 +40,47 @@
     outline-offset: 2px;
 }
 
+.clip-result {
+    position: relative;
+    width: 100%;
+    margin-bottom: 10px;
+    border-radius: 1rem;
+    overflow: hidden;
+    background: #000;
+}
+
+.clip-result video {
+    margin-bottom: 0;
+}
+
+.clip-apply-button {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: none;
+    border-radius: 999px;
+    color: var(--mat-fab-small-foreground-color);
+    background-color: var(--mat-fab-small-container-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+    cursor: pointer;
+}
+
+.clip-apply-button mat-icon {
+    font-size: 1.25rem;
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.clip-apply-button:focus-visible {
+    outline: 2px solid var(--mat-fab-small-container-color);
+    outline-offset: 2px;
+}
+
 
 @media (min-width: 768px) {
     .gallery {

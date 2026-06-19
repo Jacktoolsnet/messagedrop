@@ -37,17 +37,23 @@
     <div class="gallery">
         @for (result of results; track result.id) {
         <div>
-            <button type="button" class="gif-button" (click)="onApplyClick(result)" aria-label="Select GIF">
-                @if (isClipResult(result)) {
+            @if (isClipResult(result)) {
+            <div class="clip-result">
                 <video [src]="getPreviewUrl(result)" [attr.aria-label]="result.content_description || result.title || 'Clip result'"
-                    muted loop playsinline preload="metadata"></video>
-                } @else {
+                    controls playsinline preload="metadata"></video>
+                <button type="button" class="clip-apply-button" (click)="onApplyClick(result)"
+                    aria-label="Select Clip">
+                    <mat-icon>check</mat-icon>
+                </button>
+            </div>
+            } @else {
+            <button type="button" class="gif-button" (click)="onApplyClick(result)" aria-label="Select GIF">
                 <img [src]="getPreviewUrl(result)"
                     [alt]="result.content_description || result.title || 'KLIPY media result'"
                     loading="lazy"
                     decoding="async" />
-                }
             </button>
+            }
         </div>
         }
     </div>

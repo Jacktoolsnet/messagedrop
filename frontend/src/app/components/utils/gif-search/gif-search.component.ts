@@ -143,13 +143,19 @@ export class GifSearchComponent implements OnInit {
     if (this.selectedKind === kind) {
       return;
     }
+
+    const currentTerm = this.searchControl.value.trim();
     this.selectedKind = kind;
     this.results = [];
     this.nextFeatured = '';
     this.nextSearch = '';
-    this.lastSearchTerm = '';
-    this.searchControl.setValue('', { emitEvent: false });
-    this.getFeaturedGifs();
+    this.lastSearchTerm = currentTerm;
+
+    if (currentTerm) {
+      this.searchGifs();
+    } else {
+      this.getFeaturedGifs();
+    }
   }
 
   onEnabledChange(enabled: boolean): void {

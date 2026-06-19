@@ -1176,12 +1176,18 @@ export class PublicContentEditorComponent implements AfterViewInit, OnDestroy {
     if (this.selectedKlipyKind() === kind) {
       return;
     }
+
+    const currentTerm = this.tenorControl.value.trim();
     this.selectedKlipyKind.set(kind);
     this.tenorResults.set([]);
     this.tenorNext.set('');
-    this.lastTenorSearch.set('');
-    this.tenorControl.setValue('', { emitEvent: false });
-    this.loadFeaturedTenor();
+    this.lastTenorSearch.set(currentTerm);
+
+    if (currentTerm) {
+      this.searchTenor(true);
+    } else {
+      this.loadFeaturedTenor();
+    }
   }
 
   klipyKindLabel(kind: 'gif' | 'sticker' | 'clip' | 'meme'): string {

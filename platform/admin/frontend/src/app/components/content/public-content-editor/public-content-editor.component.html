@@ -509,14 +509,20 @@
               @if (tenorResults().length > 0) {
               <div class="tenor-grid">
                 @for (result of tenorResults(); track trackTenorResult($index, result)) {
+                @if (isKlipyClipResult(result)) {
+                <div class="tenor-result tenor-clip-result">
+                  <video [src]="getKlipyPreviewUrl(result)" controls playsinline preload="metadata"></video>
+                  <button type="button" class="tenor-clip-select" (click)="selectTenorResult(result)"
+                    [disabled]="form.disabled" [attr.aria-label]="i18n.t('Select clip')">
+                    <mat-icon>check</mat-icon>
+                  </button>
+                </div>
+                } @else {
                 <button type="button" class="tenor-result" (click)="selectTenorResult(result)"
                   [disabled]="form.disabled">
-                  @if (isKlipyClipResult(result)) {
-                  <video [src]="getKlipyPreviewUrl(result)" muted loop playsinline preload="metadata"></video>
-                  } @else {
                   <img [src]="getKlipyPreviewUrl(result)" [alt]="result.title || i18n.t('Klipy GIF')" />
-                  }
                 </button>
+                }
                 }
               </div>
               }
