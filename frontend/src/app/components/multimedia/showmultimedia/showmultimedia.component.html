@@ -1,6 +1,7 @@
 <!-- Show existing content when the platform is enabled. -->
 @if (isPlatformEnabled) {
-@if (multimedia?.type === 'sticker') {
+@if (multimedia; as media) {
+@if (media.type === 'sticker') {
 <div class="media_block">
     <div class="multimedia_container multimedia_container--sticker">
         @if (stickerImageLoading) {
@@ -15,20 +16,20 @@
         }
         @if (getRenderableImageUrl()) {
         <img class="multimedia_image multimedia_image--sticker multimedia_image--protected" [src]="getRenderableImageUrl()"
-            [attr.alt]="multimedia?.title || ('common.multimedia.embeddedAlt' | transloco)" draggable="false"
+            [attr.alt]="media.title || ('common.multimedia.embeddedAlt' | transloco)" draggable="false"
             (load)="onStickerImageLoaded()" (error)="onStickerImageError()" />
         <img class="multimedia_protect_overlay" [src]="stickerProtectionOverlayUrl" alt="" aria-hidden="true"
             draggable="false" />
         }
     </div>
-    @if (multimedia?.attribution !== '') {
+    @if (media.attribution !== '') {
     <a class="attribution-link" [class.attribution-link--compact]="isPinterestMultimedia()"
-        [href]="multimedia?.sourceUrl" target="_blank" rel="noopener noreferrer">
-        {{ multimedia?.attribution }}
+        [href]="media.sourceUrl" target="_blank" rel="noopener noreferrer">
+        {{ media.attribution }}
     </a>
     }
 </div>
-} @else if (multimedia?.type === 'tenor' || multimedia?.type === 'klipy' || multimedia?.type === 'unsplash') {
+} @else if (media.type === 'tenor' || media.type === 'klipy' || media.type === 'unsplash') {
 <div class="media_block">
     <div class="multimedia_container">
         @if (!providerImageError) {
@@ -37,7 +38,7 @@
             (loadeddata)="onProviderImageLoaded()" (error)="onProviderImageError()"></video>
         } @else {
         <img class="multimedia_image" [src]="getRenderableImageUrl()"
-            [attr.alt]="multimedia?.title || ('common.multimedia.embeddedAlt' | transloco)"
+            [attr.alt]="media.title || ('common.multimedia.embeddedAlt' | transloco)"
             (load)="onProviderImageLoaded()" (error)="onProviderImageError()" />
         }
         @if (isKlipyMultimedia()) {
@@ -55,25 +56,26 @@
         rel="noopener noreferrer" aria-label="Powered by KLIPY">
         <img class="klipy-attribution-logo" [src]="klipyAttributionLogoUrl" alt="Powered by KLIPY" loading="lazy" />
     </a>
-    } @else if (multimedia?.attribution !== '') {
+    } @else if (media.attribution !== '') {
     <a class="attribution-link" [class.attribution-link--compact]="isPinterestMultimedia()"
-        [href]="multimedia?.sourceUrl" target="_blank" rel="noopener noreferrer">
-        {{ multimedia?.attribution }}
+        [href]="media.sourceUrl" target="_blank" rel="noopener noreferrer">
+        {{ media.attribution }}
     </a>
     }
 </div>
 } @else if (safeHtml) {
 <div class="media_block">
-    <div class="oembed_container" [class.oembed-youtube]="multimedia?.type === 'youtube'"
-        [class.oembed-spotify]="multimedia?.type === 'spotify'" [class.oembed-tiktok]="multimedia?.type === 'tiktok'"
+    <div class="oembed_container" [class.oembed-youtube]="media.type === 'youtube'"
+        [class.oembed-spotify]="media.type === 'spotify'" [class.oembed-tiktok]="media.type === 'tiktok'"
         [class.oembed-pinterest]="isPinterestMultimedia()" [innerHTML]="safeHtml"></div>
-    @if (multimedia?.attribution !== '') {
+    @if (media.attribution !== '') {
     <a class="attribution-link" [class.attribution-link--compact]="isPinterestMultimedia()"
-        [href]="multimedia?.sourceUrl" target="_blank" rel="noopener noreferrer">
-        {{ multimedia?.attribution }}
+        [href]="media.sourceUrl" target="_blank" rel="noopener noreferrer">
+        {{ media.attribution }}
     </a>
     }
 </div>
+}
 }
 } @else {
 @if (disabledReason !== '') {
