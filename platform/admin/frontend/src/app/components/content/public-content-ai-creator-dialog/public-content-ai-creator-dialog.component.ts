@@ -473,8 +473,13 @@ export class PublicContentAiCreatorDialogComponent {
       return this.mediaTypeLabel(suggestion.multimedia.type);
     }
 
-    if (suggestion.selectedTenor?.type === 'tenor' || suggestion.tenorInput.trim() || suggestion.tenorQuery.trim()) {
-      return this.i18n.t('Tenor GIF');
+    if (
+      suggestion.selectedTenor?.type === 'tenor'
+      || suggestion.selectedTenor?.type === 'klipy'
+      || suggestion.tenorInput.trim()
+      || suggestion.tenorQuery.trim()
+    ) {
+      return this.i18n.t('Klipy GIF');
     }
 
     return '';
@@ -505,7 +510,10 @@ export class PublicContentAiCreatorDialogComponent {
     if (suggestion.multimedia?.type && suggestion.multimedia.type !== 'undefined') {
       return suggestion.multimedia;
     }
-    if (suggestion.selectedTenor?.type === 'tenor' && suggestion.selectedTenor.url) {
+    if (
+      (suggestion.selectedTenor?.type === 'tenor' || suggestion.selectedTenor?.type === 'klipy')
+      && suggestion.selectedTenor.url
+    ) {
       return suggestion.selectedTenor;
     }
     return null;
@@ -534,7 +542,7 @@ export class PublicContentAiCreatorDialogComponent {
     if (!multimedia) {
       return false;
     }
-    if (multimedia.type === 'tenor' || multimedia.type === 'image') {
+    if (multimedia.type === 'tenor' || multimedia.type === 'klipy' || multimedia.type === 'image') {
       return !!multimedia.url;
     }
     return /\.(png|jpe?g|gif|webp|bmp|svg)(\?.*)?$/i.test(multimedia.url || '');
@@ -706,8 +714,8 @@ export class PublicContentAiCreatorDialogComponent {
 
     try {
       const response = term
-        ? await firstValueFrom(this.publicContentService.searchTenor(term))
-        : await firstValueFrom(this.publicContentService.getFeaturedTenor());
+        ? await firstValueFrom(this.publicContentService.searchKlipy(term))
+        : await firstValueFrom(this.publicContentService.getFeaturedKlipy());
       const results = response.data?.results ?? [];
 
       this.updateSuggestion(index, (current) => ({
@@ -718,7 +726,7 @@ export class PublicContentAiCreatorDialogComponent {
       }));
 
       if (showEmptyMessage && results.length === 0) {
-        this.showMessage('No Tenor results were found.');
+        this.showMessage('No Klipy results were found.');
       }
     } catch {
       this.updateSuggestion(index, (current) => ({
@@ -821,6 +829,8 @@ export class PublicContentAiCreatorDialogComponent {
         return 'TikTok';
       case 'tenor':
         return this.i18n.t('Tenor GIF');
+      case 'klipy':
+        return this.i18n.t('Klipy GIF');
       case 'image':
         return this.i18n.t('Image');
       case 'undefined':
@@ -908,7 +918,10 @@ export class PublicContentAiCreatorDialogComponent {
       return suggestion.multimedia;
     }
 
-    if (suggestion.selectedTenor?.type === 'tenor' && suggestion.selectedTenor.url) {
+    if (
+      (suggestion.selectedTenor?.type === 'tenor' || suggestion.selectedTenor?.type === 'klipy')
+      && suggestion.selectedTenor.url
+    ) {
       return suggestion.selectedTenor;
     }
 
@@ -923,7 +936,7 @@ export class PublicContentAiCreatorDialogComponent {
     }
 
     try {
-      const response = await firstValueFrom(this.publicContentService.searchTenor(normalizedTenorQuery));
+      const response = await firstValueFrom(this.publicContentService.searchKlipy(normalizedTenorQuery));
       const match = response.data?.results?.[0];
       if (!match) {
         return { ...EMPTY_MULTIMEDIA };
@@ -939,10 +952,10 @@ export class PublicContentAiCreatorDialogComponent {
 
   private toTenorMultimedia(result: TenorResult): Multimedia {
     return {
-      type: 'tenor',
+      type: 'klipy',
       url: result.media_formats.gif.url,
       sourceUrl: result.itemurl,
-      attribution: 'Powered by Tenor',
+      attribution: 'Powered by Klipy',
       title: result.title,
       description: result.content_description,
       contentId: '',

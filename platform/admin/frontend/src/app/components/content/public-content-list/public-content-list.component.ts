@@ -234,7 +234,7 @@ export class PublicContentListComponent {
       return false;
     }
 
-    if (multimedia.type === 'image' || multimedia.type === 'tenor') {
+    if (multimedia.type === 'image' || multimedia.type === 'tenor' || multimedia.type === 'klipy') {
       return true;
     }
 
@@ -429,6 +429,8 @@ export class PublicContentListComponent {
         return 'TikTok';
       case 'tenor':
         return this.i18n.t('Tenor GIF');
+      case 'klipy':
+        return this.i18n.t('Klipy GIF');
       case 'sticker':
         return this.i18n.t('Sticker');
       case 'image':

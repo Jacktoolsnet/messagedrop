@@ -527,7 +527,7 @@ export class PublicContentEditorComponent implements AfterViewInit, OnDestroy {
       return false;
     }
 
-    if (multimedia.type === 'image' || multimedia.type === 'tenor') {
+    if (multimedia.type === 'image' || multimedia.type === 'tenor' || multimedia.type === 'klipy') {
       return true;
     }
 
@@ -953,6 +953,8 @@ export class PublicContentEditorComponent implements AfterViewInit, OnDestroy {
         return 'TikTok';
       case 'tenor':
         return this.i18n.t('Tenor GIF');
+      case 'klipy':
+        return this.i18n.t('Klipy GIF');
       case 'sticker':
         return this.i18n.t('Sticker');
       case 'image':
@@ -1108,7 +1110,7 @@ export class PublicContentEditorComponent implements AfterViewInit, OnDestroy {
 
   loadFeaturedTenor(): void {
     this.tenorLoading.set(true);
-    this.publicContentService.getFeaturedTenor()
+    this.publicContentService.getFeaturedKlipy()
       .pipe(
         finalize(() => this.tenorLoading.set(false)),
         takeUntilDestroyed(this.destroyRef)
@@ -1130,7 +1132,7 @@ export class PublicContentEditorComponent implements AfterViewInit, OnDestroy {
 
     const next = reset ? '' : this.tenorNext();
     this.tenorLoading.set(true);
-    this.publicContentService.searchTenor(term, next)
+    this.publicContentService.searchKlipy(term, next)
       .pipe(
         finalize(() => this.tenorLoading.set(false)),
         takeUntilDestroyed(this.destroyRef)
@@ -1152,8 +1154,8 @@ export class PublicContentEditorComponent implements AfterViewInit, OnDestroy {
     const term = this.tenorControl.value.trim();
     this.tenorLoading.set(true);
     const request$ = term
-      ? this.publicContentService.searchTenor(term, next)
-      : this.publicContentService.getFeaturedTenor(next);
+      ? this.publicContentService.searchKlipy(term, next)
+      : this.publicContentService.getFeaturedKlipy(next);
 
     request$
       .pipe(
@@ -1170,16 +1172,16 @@ export class PublicContentEditorComponent implements AfterViewInit, OnDestroy {
 
   selectTenorResult(result: TenorResult): void {
     this.multimedia.set({
-      type: 'tenor',
+      type: 'klipy',
       url: result.media_formats.gif.url,
       sourceUrl: result.itemurl,
-      attribution: 'Powered by Tenor',
+      attribution: 'Powered by Klipy',
       title: result.title,
       description: result.content_description,
       contentId: '',
       oembed: null
     });
-    this.showMessage('Tenor GIF selected.');
+    this.showMessage('Klipy GIF selected.');
   }
 
   openAiToolDialog(tool: AiTool): void {

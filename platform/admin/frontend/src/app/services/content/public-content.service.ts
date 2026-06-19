@@ -154,21 +154,29 @@ export class PublicContentService {
     );
   }
 
-  getFeaturedTenor(next = ''): Observable<TenorApiResponse> {
+  getFeaturedKlipy(next = ''): Observable<TenorApiResponse> {
     const params = next ? new HttpParams().set('next', next) : undefined;
-    return this.http.get<TenorApiResponse>(`${this.baseUrl}/media/tenor/featured`, { params }).pipe(
-      catchError((error) => this.handleError(error, 'Could not load Tenor results.'))
+    return this.http.get<TenorApiResponse>(`${this.baseUrl}/media/klipy/featured`, { params }).pipe(
+      catchError((error) => this.handleError(error, 'Could not load Klipy results.'))
     );
   }
 
-  searchTenor(term: string, next = ''): Observable<TenorApiResponse> {
+  searchKlipy(term: string, next = ''): Observable<TenorApiResponse> {
     let params = new HttpParams().set('term', term);
     if (next) {
       params = params.set('next', next);
     }
-    return this.http.get<TenorApiResponse>(`${this.baseUrl}/media/tenor/search`, { params }).pipe(
-      catchError((error) => this.handleError(error, 'Could not search Tenor.'))
+    return this.http.get<TenorApiResponse>(`${this.baseUrl}/media/klipy/search`, { params }).pipe(
+      catchError((error) => this.handleError(error, 'Could not search Klipy.'))
     );
+  }
+
+  getFeaturedTenor(next = ''): Observable<TenorApiResponse> {
+    return this.getFeaturedKlipy(next);
+  }
+
+  searchTenor(term: string, next = ''): Observable<TenorApiResponse> {
+    return this.searchKlipy(term, next);
   }
 
   resolveOembed(url: string): Observable<Multimedia> {

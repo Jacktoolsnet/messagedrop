@@ -298,7 +298,7 @@ export class AppealsComponent implements OnInit {
       return;
     }
 
-    if (type === 'tenor' || type === 'image') {
+    if (type === 'tenor' || type === 'klipy' || type === 'image') {
       const url = this.toSafeHttpUrl(mm?.url || mm?.sourceUrl);
       if (url) {
         this.imageUrl.set(url);

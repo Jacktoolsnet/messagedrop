@@ -585,7 +585,8 @@ export class SignalDetailComponent implements OnInit {
       case 'youtube': return 'smart_display';
       case 'spotify': return 'music_note';
       case 'tiktok': return 'movie';
-      case 'tenor': return 'gif';
+      case 'tenor':
+      case 'klipy': return 'gif';
       case 'sticker': return 'add_reaction';
       case 'image': return 'image';
       default: return 'article';
@@ -597,6 +598,7 @@ export class SignalDetailComponent implements OnInit {
       case 'spotify': return 'Spotify';
       case 'tiktok': return 'TikTok';
       case 'tenor': return this.i18n.t('Tenor GIF');
+      case 'klipy': return this.i18n.t('Klipy GIF');
       case 'sticker': return this.i18n.t('Sticker');
       case 'image': return this.i18n.t('Image');
       default: return this.i18n.t('Text');

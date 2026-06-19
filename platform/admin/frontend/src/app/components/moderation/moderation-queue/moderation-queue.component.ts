@@ -339,7 +339,7 @@ export class ModerationQueueComponent implements OnInit {
     if (!multimedia.url) {
       return false;
     }
-    if (multimedia.type === 'image' || multimedia.type === 'tenor') {
+    if (multimedia.type === 'image' || multimedia.type === 'tenor' || multimedia.type === 'klipy') {
       return true;
     }
     return /\.(png|jpe?g|gif|webp|bmp|svg)(\?.*)?$/i.test(multimedia.url);

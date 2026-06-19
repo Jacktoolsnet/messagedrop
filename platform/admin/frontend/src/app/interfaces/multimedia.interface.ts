@@ -3,7 +3,7 @@ export interface MultimediaOembed {
 }
 
 export interface Multimedia {
-    type: string; // 'youtube'|'tenor'|'spotify'|'tiktok'|'image'|'undefined'|...
+    type: string; // 'youtube'|'tenor'|'klipy'|'spotify'|'tiktok'|'image'|'undefined'|...
     url: string;
     sourceUrl?: string;
     attribution?: string;

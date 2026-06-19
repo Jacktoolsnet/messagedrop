@@ -444,7 +444,7 @@
             <mat-icon>perm_media</mat-icon>
           </div>
           <mat-card-title>{{ i18n.t('Multimedia') }}</mat-card-title>
-          <mat-card-subtitle>{{ i18n.t('External embeds, stickers and Tenor GIFs') }}</mat-card-subtitle>
+          <mat-card-subtitle>{{ i18n.t('External embeds, stickers and Klipy GIFs') }}</mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content>
@@ -471,7 +471,7 @@
 
               <div class="tenor-head">
                 <mat-form-field appearance="outline" class="full-width">
-                  <mat-label>{{ i18n.t('Search Tenor') }}</mat-label>
+                  <mat-label>{{ i18n.t('Search Klipy') }}</mat-label>
                   <input matInput [formControl]="tenorControl" [placeholder]="i18n.t('Search GIFs')"
                     (keydown.enter)="searchTenor()" />
                 </mat-form-field>
@@ -502,7 +502,7 @@
                 @for (result of tenorResults(); track trackTenorResult($index, result)) {
                 <button type="button" class="tenor-result" (click)="selectTenorResult(result)"
                   [disabled]="form.disabled">
-                  <img [src]="result.media_formats.gif.url" [alt]="result.title || i18n.t('Tenor GIF')" />
+                  <img [src]="result.media_formats.gif.url" [alt]="result.title || i18n.t('Klipy GIF')" />
                 </button>
                 }
               </div>
@@ -534,7 +534,7 @@
                 @if (isStickerMultimedia(multimedia())) {
                 <app-sticker-preview [multimedia]="multimedia()"
                   [alt]="multimedia().title || i18n.t('Selected multimedia preview')"></app-sticker-preview>
-                } @else if (multimedia().type === 'tenor' && multimedia().url) {
+                } @else if ((multimedia().type === 'tenor' || multimedia().type === 'klipy') && multimedia().url) {
                 <img class="tenor-preview" [src]="multimedia().url" [alt]="multimedia().title || i18n.t('Selected GIF')" />
                 } @else if (tiktokEmbedUrl(); as tiktokUrl) {
                 <div class="oembed-preview oembed-preview-tiktok">
@@ -547,7 +547,7 @@
               } @else {
               <div class="selected-media selected-media-empty">
                 <h3>{{ i18n.t('No media selected') }}</h3>
-                <p>{{ i18n.t('Import an external URL, choose a sticker or pick a Tenor GIF to see the selected media here.') }}</p>
+                <p>{{ i18n.t('Import an external URL, choose a sticker or pick a Klipy GIF to see the selected media here.') }}</p>
               </div>
               }
             </div>
