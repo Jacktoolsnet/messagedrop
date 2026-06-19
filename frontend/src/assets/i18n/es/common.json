@@ -1363,7 +1363,8 @@
         "sticker": "Stickers",
         "clip": "Clips",
         "meme": "Memes"
-      }
+      },
+      "kindMenuLabel": "Elegir tipo de medio de KLIPY"
     }
   },
   "errors": {

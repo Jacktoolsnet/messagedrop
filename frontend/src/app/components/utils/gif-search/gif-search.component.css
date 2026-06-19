@@ -60,7 +60,7 @@
 .url-container {
     position: sticky;
     z-index: 1000;
-    top: 3.4rem;
+    top: 0rem;
     display: flex;
     background-color: var(--mat-card-filled-container-color);
     box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
@@ -84,7 +84,7 @@
     border-bottom-right-radius: 0;
 }
 
-.url-container button {
+.url-container .search-button {
     margin-right: 1rem;
     color: var(--mat-fab-small-foreground-color);
     background-color: var(--mat-fab-small-container-color);
@@ -92,10 +92,42 @@
     padding: 8px 12px;
     cursor: pointer;
     height: 2.5rem;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    border-top-right-radius: 1rem;
-    border-bottom-right-radius: 1rem;
+    border-radius: 0 1rem 1rem 0;
+}
+
+.kind-menu-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    height: 2.5rem;
+    border: none;
+    border-left: 1px solid color-mix(in srgb, var(--mat-app-text-color) 16%, transparent);
+    border-right: 1px solid color-mix(in srgb, var(--mat-app-text-color) 16%, transparent);
+    border-radius: 0;
+    padding: 0 0.55rem;
+    background-color: color-mix(in srgb, var(--mat-card-filled-container-color) 88%, var(--mat-app-text-color));
+    color: var(--mat-app-text-color);
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.kind-menu-button mat-icon {
+    font-size: 1.1rem;
+    width: 1.1rem;
+    height: 1.1rem;
+}
+
+.klipy-kind-menu-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 11rem;
+    padding: 0.35rem 0.75rem;
+}
+
+.klipy-kind-menu-group mat-radio-button {
+    padding: 0.25rem 0;
 }
 
 .platform-tile-container {
@@ -142,32 +174,3 @@
     white-space: nowrap;
 }
 
-
-.klipy-kind-tabs {
-    position: sticky;
-    top: 0;
-    z-index: 1001;
-    display: flex;
-    gap: 0.4rem;
-    padding: 0.65rem 1rem;
-    overflow-x: auto;
-    background-color: var(--mat-card-filled-container-color);
-    border-bottom: 1px solid var(--mat-card-outlined-outline-color);
-}
-
-.klipy-kind-tabs button {
-    border: 1px solid var(--mat-card-outlined-outline-color);
-    border-radius: 999px;
-    padding: 0.45rem 0.9rem;
-    background: transparent;
-    color: var(--mat-app-text-color);
-    font-weight: 600;
-    cursor: pointer;
-    white-space: nowrap;
-}
-
-.klipy-kind-tabs button.active {
-    color: var(--mat-fab-small-foreground-color);
-    background-color: var(--mat-fab-small-container-color);
-    border-color: var(--mat-fab-small-container-color);
-}

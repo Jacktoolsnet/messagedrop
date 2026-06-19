@@ -1372,7 +1372,8 @@
         "sticker": "Sticker",
         "clip": "Clips",
         "meme": "Memes"
-      }
+      },
+      "kindMenuLabel": "KLIPY-Medienart auswählen"
     }
   },
   "errors": {

@@ -6,6 +6,8 @@ import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatRadioModule } from '@angular/material/radio';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { AppSettings } from '../../../interfaces/app-settings';
 import { Multimedia } from '../../../interfaces/multimedia';
@@ -29,6 +31,8 @@ import { HelpDialogService } from '../help-dialog/help-dialog.service';
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
+    MatMenuModule,
+    MatRadioModule,
     TranslocoPipe,
     EnableExternalContentComponent
   ],
@@ -129,6 +133,10 @@ export class GifSearchComponent implements OnInit {
 
   kindLabel(kind: KlipyMediaKind): string {
     return this.translation.t(`common.klipy.kinds.${kind}`);
+  }
+
+  selectedKindLabel(): string {
+    return this.kindLabel(this.selectedKind);
   }
 
   selectKind(kind: KlipyMediaKind): void {

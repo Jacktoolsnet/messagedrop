@@ -1,18 +1,24 @@
 @if (showGifProvider) {
-<div class="klipy-kind-tabs" role="tablist" aria-label="KLIPY media types">
-    @for (kind of mediaKinds; track kind) {
-    <button type="button" role="tab" [class.active]="selectedKind === kind" [attr.aria-selected]="selectedKind === kind"
-        (click)="selectKind(kind)">
-        {{ kindLabel(kind) }}
-    </button>
-    }
-</div>
-
 <div class="url-container">
     <input #searchInput type="search" enterkeyhint="search" [formControl]="searchControl" (keyup.enter)="search()"
         [placeholder]="'common.klipy.searchPlaceholder' | transloco" />
 
-    <button (click)="search()">
+    <button type="button" class="kind-menu-button" [matMenuTriggerFor]="klipyKindMenu"
+        [attr.aria-label]="'common.klipy.kindMenuLabel' | transloco">
+        <span>{{ selectedKindLabel() }}</span>
+        <mat-icon>expand_more</mat-icon>
+    </button>
+    <mat-menu #klipyKindMenu="matMenu" panelClass="accent-menu">
+        <mat-radio-group class="klipy-kind-menu-group" [value]="selectedKind">
+            @for (kind of mediaKinds; track kind) {
+            <mat-radio-button [value]="kind" (change)="selectKind(kind)">
+                {{ kindLabel(kind) }}
+            </mat-radio-button>
+            }
+        </mat-radio-group>
+    </mat-menu>
+
+    <button class="search-button" (click)="search()">
         @if (
         (nextSearch === '' && searchControl.value !== '') ||
         (searchControl.value !== lastSearchTerm) ||
