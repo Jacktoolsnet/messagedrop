@@ -1,4 +1,13 @@
 @if (showGifProvider) {
+<div class="klipy-kind-tabs" role="tablist" aria-label="KLIPY media types">
+    @for (kind of mediaKinds; track kind) {
+    <button type="button" role="tab" [class.active]="selectedKind === kind" [attr.aria-selected]="selectedKind === kind"
+        (click)="selectKind(kind)">
+        {{ kindLabel(kind) }}
+    </button>
+    }
+</div>
+
 <div class="url-container">
     <input #searchInput type="search" enterkeyhint="search" [formControl]="searchControl" (keyup.enter)="search()"
         [placeholder]="'common.klipy.searchPlaceholder' | transloco" />
@@ -23,10 +32,15 @@
         @for (result of results; track result.id) {
         <div>
             <button type="button" class="gif-button" (click)="onApplyClick(result)" aria-label="Select GIF">
+                @if (isClipResult(result)) {
+                <video [src]="getPreviewUrl(result)" [attr.aria-label]="result.content_description || result.title || 'Clip result'"
+                    muted loop playsinline preload="metadata"></video>
+                } @else {
                 <img [src]="getPreviewUrl(result)"
-                    [alt]="result.content_description || result.title || 'Gif result'"
+                    [alt]="result.content_description || result.title || 'KLIPY media result'"
                     loading="lazy"
                     decoding="async" />
+                }
             </button>
         </div>
         }

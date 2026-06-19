@@ -3,6 +3,7 @@ import { Oembed } from "./oembed";
 
 export interface Multimedia {
     type: MultimediaType,
+    mediaKind?: 'gif' | 'sticker' | 'clip' | 'meme',
     url: string,
     contentId: string,
     sourceUrl: string,

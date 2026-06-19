@@ -1366,7 +1366,13 @@
     "klipy": {
       "title": "KLIPY service",
       "loading": "Loading",
-      "searchPlaceholder": "Search KLIPY"
+      "searchPlaceholder": "Search KLIPY",
+      "kinds": {
+        "gif": "GIFs",
+        "sticker": "Stickers",
+        "clip": "Clips",
+        "meme": "Memes"
+      }
     }
   },
   "errors": {

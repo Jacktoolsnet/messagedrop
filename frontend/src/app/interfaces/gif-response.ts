@@ -5,6 +5,10 @@ export interface GifFormat {
 export interface GifMediaFormats {
   gif: GifFormat;
   tinygif?: GifFormat;
+  mp4?: GifFormat;
+  webm?: GifFormat;
+  jpg?: GifFormat;
+  webp?: GifFormat;
 }
 
 export interface GifResult {
@@ -12,6 +16,7 @@ export interface GifResult {
   itemurl: string;
   title: string;
   content_description: string;
+  media_kind?: 'gif' | 'sticker' | 'clip' | 'meme';
   media_formats: GifMediaFormats;
 }
 

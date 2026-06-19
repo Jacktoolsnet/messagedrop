@@ -141,6 +141,11 @@ export class ShowmultimediaComponent implements OnChanges, OnDestroy {
     return this.translation.t('common.multimedia.imageUnavailable');
   }
 
+
+  isKlipyClipMultimedia(): boolean {
+    return this.multimedia?.type === MultimediaType.KLIPY && this.multimedia?.mediaKind === 'clip';
+  }
+
   isKlipyMultimedia(): boolean {
     return this.multimedia?.type === MultimediaType.KLIPY;
   }

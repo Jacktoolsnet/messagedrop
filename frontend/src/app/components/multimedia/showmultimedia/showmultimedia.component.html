@@ -32,9 +32,14 @@
 <div class="media_block">
     <div class="multimedia_container">
         @if (!providerImageError) {
+        @if (isKlipyClipMultimedia()) {
+        <video class="multimedia_image multimedia_video" [src]="getRenderableImageUrl()" controls playsinline preload="metadata"
+            (loadeddata)="onProviderImageLoaded()" (error)="onProviderImageError()"></video>
+        } @else {
         <img class="multimedia_image" [src]="getRenderableImageUrl()"
             [attr.alt]="multimedia?.title || ('common.multimedia.embeddedAlt' | transloco)"
             (load)="onProviderImageLoaded()" (error)="onProviderImageError()" />
+        }
         @if (isKlipyMultimedia()) {
         <img class="klipy-watermark" [src]="klipyWatermarkUrl" alt="" aria-hidden="true" loading="lazy" />
         }

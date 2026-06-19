@@ -845,7 +845,7 @@ function isDirectImageMedia(mediaType, imageUrl) {
     return false;
   }
 
-  if (['tenor', 'klipy', 'unsplash', 'giphy', 'flickr'].includes(mediaType)) {
+  if (['tenor', 'unsplash', 'giphy', 'flickr'].includes(mediaType)) {
     return true;
   }
 

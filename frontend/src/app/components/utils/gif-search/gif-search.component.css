@@ -19,7 +19,8 @@
     column-gap: 10px;
 }
 
-.gallery img {
+.gallery img,
+.gallery video {
     width: 100%;
     margin-bottom: 10px;
     display: block;
@@ -59,7 +60,7 @@
 .url-container {
     position: sticky;
     z-index: 1000;
-    top: 0rem;
+    top: 3.4rem;
     display: flex;
     background-color: var(--mat-card-filled-container-color);
     box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
@@ -139,4 +140,34 @@
     display: inline-flex;
     align-items: center;
     white-space: nowrap;
+}
+
+
+.klipy-kind-tabs {
+    position: sticky;
+    top: 0;
+    z-index: 1001;
+    display: flex;
+    gap: 0.4rem;
+    padding: 0.65rem 1rem;
+    overflow-x: auto;
+    background-color: var(--mat-card-filled-container-color);
+    border-bottom: 1px solid var(--mat-card-outlined-outline-color);
+}
+
+.klipy-kind-tabs button {
+    border: 1px solid var(--mat-card-outlined-outline-color);
+    border-radius: 999px;
+    padding: 0.45rem 0.9rem;
+    background: transparent;
+    color: var(--mat-app-text-color);
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.klipy-kind-tabs button.active {
+    color: var(--mat-fab-small-foreground-color);
+    background-color: var(--mat-fab-small-container-color);
+    border-color: var(--mat-fab-small-container-color);
 }

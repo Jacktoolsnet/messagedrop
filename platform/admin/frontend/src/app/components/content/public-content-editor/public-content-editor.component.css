@@ -1625,6 +1625,7 @@ mat-chip-grid {
 }
 
 .tenor-result img,
+.tenor-result video,
 .tenor-preview {
   display: block;
   width: 100%;
@@ -1806,4 +1807,16 @@ mat-chip-grid {
   .profile-manage-button {
     justify-self: start;
   }
+}
+
+
+.klipy-kind-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.klipy-kind-tabs button.active {
+  background: var(--mat-sys-primary-container, var(--mat-primary-container-color));
 }

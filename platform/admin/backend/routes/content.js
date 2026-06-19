@@ -1990,13 +1990,20 @@ router.get('/media/tenor/search', requireRole(...CONTENT_ROLES), async (req, res
   }
 });
 
+
+function normalizeKlipyKind(value) {
+  const kind = normalizeString(value, 'gif').toLowerCase();
+  return ['gif', 'sticker', 'clip', 'meme'].includes(kind) ? kind : 'gif';
+}
+
 router.get('/media/klipy/featured', requireRole(...CONTENT_ROLES), async (req, res, next) => {
   const nextToken = normalizeString(req.query.next, '');
+  const kind = normalizeKlipyKind(req.query.kind);
   const country = normalizeString(req.query.country, 'DE') || 'DE';
   const locale = normalizeString(req.query.locale, 'de_DE') || 'de_DE';
   const endpoint = nextToken
-    ? `/klipy/featured/${encodeURIComponent(country)}/${encodeURIComponent(locale)}/${encodeURIComponent(nextToken)}`
-    : `/klipy/featured/${encodeURIComponent(country)}/${encodeURIComponent(locale)}`;
+    ? `/klipy/${encodeURIComponent(kind)}/featured/${encodeURIComponent(country)}/${encodeURIComponent(locale)}/${encodeURIComponent(nextToken)}`
+    : `/klipy/${encodeURIComponent(kind)}/featured/${encodeURIComponent(country)}/${encodeURIComponent(locale)}`;
 
   try {
     const response = await callPublicBackendPublic('get', endpoint);
@@ -2014,11 +2021,12 @@ router.get('/media/klipy/search', requireRole(...CONTENT_ROLES), async (req, res
     return next(apiError.badRequest('missing_term'));
   }
   const nextToken = normalizeString(req.query.next, '');
+  const kind = normalizeKlipyKind(req.query.kind);
   const country = normalizeString(req.query.country, 'DE') || 'DE';
   const locale = normalizeString(req.query.locale, 'de_DE') || 'de_DE';
   const endpoint = nextToken
-    ? `/klipy/search/${encodeURIComponent(country)}/${encodeURIComponent(locale)}/${encodeURIComponent(term)}/${encodeURIComponent(nextToken)}`
-    : `/klipy/search/${encodeURIComponent(country)}/${encodeURIComponent(locale)}/${encodeURIComponent(term)}`;
+    ? `/klipy/${encodeURIComponent(kind)}/search/${encodeURIComponent(country)}/${encodeURIComponent(locale)}/${encodeURIComponent(term)}/${encodeURIComponent(nextToken)}`
+    : `/klipy/${encodeURIComponent(kind)}/search/${encodeURIComponent(country)}/${encodeURIComponent(locale)}/${encodeURIComponent(term)}`;
 
   try {
     const response = await callPublicBackendPublic('get', endpoint);

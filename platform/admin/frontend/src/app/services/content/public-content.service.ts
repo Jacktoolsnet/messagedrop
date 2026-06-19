@@ -154,15 +154,18 @@ export class PublicContentService {
     );
   }
 
-  getFeaturedKlipy(next = ''): Observable<TenorApiResponse> {
-    const params = next ? new HttpParams().set('next', next) : undefined;
+  getFeaturedKlipy(next = '', kind: 'gif' | 'sticker' | 'clip' | 'meme' = 'gif'): Observable<TenorApiResponse> {
+    let params = new HttpParams().set('kind', kind);
+    if (next) {
+      params = params.set('next', next);
+    }
     return this.http.get<TenorApiResponse>(`${this.baseUrl}/media/klipy/featured`, { params }).pipe(
       catchError((error) => this.handleError(error, 'Could not load Klipy results.'))
     );
   }
 
-  searchKlipy(term: string, next = ''): Observable<TenorApiResponse> {
-    let params = new HttpParams().set('term', term);
+  searchKlipy(term: string, next = '', kind: 'gif' | 'sticker' | 'clip' | 'meme' = 'gif'): Observable<TenorApiResponse> {
+    let params = new HttpParams().set('term', term).set('kind', kind);
     if (next) {
       params = params.set('next', next);
     }

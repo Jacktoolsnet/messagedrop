@@ -469,6 +469,15 @@
 
               <mat-divider></mat-divider>
 
+              <div class="klipy-kind-tabs">
+                @for (kind of klipyKinds; track kind) {
+                <button mat-stroked-button type="button" [class.active]="selectedKlipyKind() === kind"
+                  (click)="selectKlipyKind(kind)" [disabled]="tenorControl.disabled || tenorLoading()">
+                  {{ klipyKindLabel(kind) }}
+                </button>
+                }
+              </div>
+
               <div class="tenor-head">
                 <mat-form-field appearance="outline" class="full-width">
                   <mat-label>{{ i18n.t('Search KLIPY') }}</mat-label>
@@ -502,7 +511,11 @@
                 @for (result of tenorResults(); track trackTenorResult($index, result)) {
                 <button type="button" class="tenor-result" (click)="selectTenorResult(result)"
                   [disabled]="form.disabled">
-                  <img [src]="result.media_formats.gif.url" [alt]="result.title || i18n.t('Klipy GIF')" />
+                  @if (isKlipyClipResult(result)) {
+                  <video [src]="getKlipyPreviewUrl(result)" muted loop playsinline preload="metadata"></video>
+                  } @else {
+                  <img [src]="getKlipyPreviewUrl(result)" [alt]="result.title || i18n.t('Klipy GIF')" />
+                  }
                 </button>
                 }
               </div>
@@ -534,8 +547,10 @@
                 @if (isStickerMultimedia(multimedia())) {
                 <app-sticker-preview [multimedia]="multimedia()"
                   [alt]="multimedia().title || i18n.t('Selected multimedia preview')"></app-sticker-preview>
-                } @else if ((multimedia().type === 'tenor' || multimedia().type === 'klipy') && multimedia().url) {
+                } @else if ((multimedia().type === 'tenor' || (multimedia().type === 'klipy' && multimedia().mediaKind !== 'clip')) && multimedia().url) {
                 <img class="tenor-preview" [src]="multimedia().url" [alt]="multimedia().title || i18n.t('Selected GIF')" />
+                } @else if (multimedia().type === 'klipy' && multimedia().mediaKind === 'clip' && multimedia().url) {
+                <video class="tenor-preview" [src]="multimedia().url" controls playsinline preload="metadata"></video>
                 } @else if (tiktokEmbedUrl(); as tiktokUrl) {
                 <div class="oembed-preview oembed-preview-tiktok">
                   <iframe [src]="tiktokUrl" [title]="i18n.t('TikTok preview')" loading="lazy" allowfullscreen></iframe>

@@ -12,7 +12,7 @@ import { Multimedia } from '../../../interfaces/multimedia';
 import { MultimediaType } from '../../../interfaces/multimedia-type';
 import { GifApiResponse, GifResult } from '../../../interfaces/gif-response';
 import { AppService } from '../../../services/app.service';
-import { GifService } from '../../../services/gif.service';
+import { GifService, KlipyMediaKind } from '../../../services/gif.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { EnableExternalContentComponent } from "../enable-external-content/enable-external-content.component";
 import { HelpDialogService } from '../help-dialog/help-dialog.service';
@@ -43,6 +43,8 @@ export class GifSearchComponent implements OnInit {
   lastSearchTerm = '';
   nextFeatured = '';
   nextSearch = '';
+  readonly mediaKinds: KlipyMediaKind[] = ['gif', 'sticker', 'clip', 'meme'];
+  selectedKind: KlipyMediaKind = 'gif';
   results: GifResult[] = [];
   showGifProvider = false;
 
@@ -63,7 +65,7 @@ export class GifSearchComponent implements OnInit {
   }
 
   getFeaturedGifs(): void {
-    this.gifService.getFeaturedGifs(this.nextFeatured).subscribe({
+    this.gifService.getFeaturedGifs(this.nextFeatured, true, this.selectedKind).subscribe({
       next: (gifResponse: GifApiResponse) => this.updateResults(gifResponse, 'featured'),
       error: (error) => this.handleGifError(error)
     });
@@ -76,7 +78,7 @@ export class GifSearchComponent implements OnInit {
       return;
     }
 
-    this.gifService.searchGifs(term, this.nextSearch).subscribe({
+    this.gifService.searchGifs(term, this.nextSearch, true, this.selectedKind).subscribe({
       next: (gifResponse: GifApiResponse) => this.updateResults(gifResponse, 'search'),
       error: (error) => this.handleGifError(error)
     });
@@ -99,7 +101,8 @@ export class GifSearchComponent implements OnInit {
   onApplyClick(result: GifResult): void {
     const multimedia: Multimedia = {
       type: MultimediaType.KLIPY,
-      url: result.media_formats.gif.url,
+      mediaKind: this.resolveResultKind(result),
+      url: this.getResultUrl(result),
       sourceUrl: result.itemurl,
       attribution: this.translation.t('common.multimedia.attributionPoweredBy', { platform: 'KLIPY' }),
       title: result.title,
@@ -110,7 +113,35 @@ export class GifSearchComponent implements OnInit {
   }
 
   getPreviewUrl(result: GifResult): string {
-    return result.media_formats.tinygif?.url || result.media_formats.gif.url;
+    return result.media_formats.tinygif?.url || result.media_formats.jpg?.url || result.media_formats.gif.url;
+  }
+
+  getResultUrl(result: GifResult): string {
+    if (this.resolveResultKind(result) === 'clip') {
+      return result.media_formats.mp4?.url || result.media_formats.webm?.url || result.media_formats.gif.url;
+    }
+    return result.media_formats.gif.url;
+  }
+
+  isClipResult(result: GifResult): boolean {
+    return this.resolveResultKind(result) === 'clip';
+  }
+
+  kindLabel(kind: KlipyMediaKind): string {
+    return this.translation.t(`common.klipy.kinds.${kind}`);
+  }
+
+  selectKind(kind: KlipyMediaKind): void {
+    if (this.selectedKind === kind) {
+      return;
+    }
+    this.selectedKind = kind;
+    this.results = [];
+    this.nextFeatured = '';
+    this.nextSearch = '';
+    this.lastSearchTerm = '';
+    this.searchControl.setValue('', { emitEvent: false });
+    this.getFeaturedGifs();
   }
 
   onEnabledChange(enabled: boolean): void {
@@ -124,6 +155,10 @@ export class GifSearchComponent implements OnInit {
       this.results = [];
       this.cdRef.markForCheck();
     }
+  }
+
+  private resolveResultKind(result: GifResult): KlipyMediaKind {
+    return result.media_kind || this.selectedKind;
   }
 
   private updateResults(response: GifApiResponse, mode: 'featured' | 'search'): void {

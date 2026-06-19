@@ -7,6 +7,8 @@ import { NetworkService } from './network.service';
 import { TranslationHelperService } from './translation-helper.service';
 import { UserService } from './user.service';
 
+export type KlipyMediaKind = 'gif' | 'sticker' | 'clip' | 'meme';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -28,8 +30,8 @@ export class GifService {
     return throwError(() => error);
   }
 
-  getFeaturedGifs(next: string, showAlways = true): Observable<GifApiResponse> {
-    const base = `${environment.apiUrl}/klipy/featured/${this.userService.getUser().language}/${this.userService.getUser().locale.replace('-', '_')}`;
+  getFeaturedGifs(next: string, showAlways = true, kind: KlipyMediaKind = 'gif'): Observable<GifApiResponse> {
+    const base = `${environment.apiUrl}/klipy/${kind}/featured/${this.userService.getUser().language}/${this.userService.getUser().locale.replace('-', '_')}`;
     const url = !!next && next.trim().length > 0 ? `${base}/${encodeURIComponent(next)}` : base;
 
     this.networkService.setNetworkMessageConfig(url, {
@@ -49,8 +51,8 @@ export class GifService {
       )
   }
 
-  searchGifs(searchTerm: string, next: string, showAlways = true): Observable<GifApiResponse> {
-    const base = `${environment.apiUrl}/klipy/search/${this.userService.getUser().language}/${this.userService.getUser().locale.replace('-', '_')}/${encodeURIComponent(searchTerm)}`;
+  searchGifs(searchTerm: string, next: string, showAlways = true, kind: KlipyMediaKind = 'gif'): Observable<GifApiResponse> {
+    const base = `${environment.apiUrl}/klipy/${kind}/search/${this.userService.getUser().language}/${this.userService.getUser().locale.replace('-', '_')}/${encodeURIComponent(searchTerm)}`;
     const url = !!next && next.trim().length > 0 ? `${base}/${encodeURIComponent(next)}` : base;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,

@@ -143,6 +143,8 @@ export class PublicContentEditorComponent implements AfterViewInit, OnDestroy {
   readonly locationSearchResults = signal<NominatimPlace[]>([]);
   readonly selectedLocationLabel = signal('');
   readonly tenorResults = signal<TenorResult[]>([]);
+  readonly klipyKinds: Array<'gif' | 'sticker' | 'clip' | 'meme'> = ['gif', 'sticker', 'clip', 'meme'];
+  readonly selectedKlipyKind = signal<'gif' | 'sticker' | 'clip' | 'meme'>('gif');
   readonly tenorNext = signal('');
   readonly lastTenorSearch = signal('');
 
@@ -1110,7 +1112,7 @@ export class PublicContentEditorComponent implements AfterViewInit, OnDestroy {
 
   loadFeaturedTenor(): void {
     this.tenorLoading.set(true);
-    this.publicContentService.getFeaturedKlipy()
+    this.publicContentService.getFeaturedKlipy('', this.selectedKlipyKind())
       .pipe(
         finalize(() => this.tenorLoading.set(false)),
         takeUntilDestroyed(this.destroyRef)
@@ -1132,7 +1134,7 @@ export class PublicContentEditorComponent implements AfterViewInit, OnDestroy {
 
     const next = reset ? '' : this.tenorNext();
     this.tenorLoading.set(true);
-    this.publicContentService.searchKlipy(term, next)
+    this.publicContentService.searchKlipy(term, next, this.selectedKlipyKind())
       .pipe(
         finalize(() => this.tenorLoading.set(false)),
         takeUntilDestroyed(this.destroyRef)
@@ -1154,8 +1156,8 @@ export class PublicContentEditorComponent implements AfterViewInit, OnDestroy {
     const term = this.tenorControl.value.trim();
     this.tenorLoading.set(true);
     const request$ = term
-      ? this.publicContentService.searchKlipy(term, next)
-      : this.publicContentService.getFeaturedKlipy(next);
+      ? this.publicContentService.searchKlipy(term, next, this.selectedKlipyKind())
+      : this.publicContentService.getFeaturedKlipy(next, this.selectedKlipyKind());
 
     request$
       .pipe(
@@ -1170,10 +1172,43 @@ export class PublicContentEditorComponent implements AfterViewInit, OnDestroy {
       });
   }
 
+  selectKlipyKind(kind: 'gif' | 'sticker' | 'clip' | 'meme'): void {
+    if (this.selectedKlipyKind() === kind) {
+      return;
+    }
+    this.selectedKlipyKind.set(kind);
+    this.tenorResults.set([]);
+    this.tenorNext.set('');
+    this.lastTenorSearch.set('');
+    this.tenorControl.setValue('', { emitEvent: false });
+    this.loadFeaturedTenor();
+  }
+
+  klipyKindLabel(kind: 'gif' | 'sticker' | 'clip' | 'meme'): string {
+    return this.i18n.t(`KLIPY ${kind}`);
+  }
+
+  isKlipyClipResult(result: TenorResult): boolean {
+    return (result.media_kind || this.selectedKlipyKind()) === 'clip';
+  }
+
+  getKlipyPreviewUrl(result: TenorResult): string {
+    return result.media_formats.tinygif?.url || result.media_formats.jpg?.url || result.media_formats.gif.url;
+  }
+
+  getKlipyResultUrl(result: TenorResult): string {
+    if (this.isKlipyClipResult(result)) {
+      return result.media_formats.mp4?.url || result.media_formats.webm?.url || result.media_formats.gif.url;
+    }
+    return result.media_formats.gif.url;
+  }
+
   selectTenorResult(result: TenorResult): void {
+    const mediaKind = result.media_kind || this.selectedKlipyKind();
     this.multimedia.set({
       type: 'klipy',
-      url: result.media_formats.gif.url,
+      mediaKind,
+      url: this.getKlipyResultUrl(result),
       sourceUrl: result.itemurl,
       attribution: 'Powered by KLIPY',
       title: result.title,
@@ -1181,7 +1216,7 @@ export class PublicContentEditorComponent implements AfterViewInit, OnDestroy {
       contentId: '',
       oembed: null
     });
-    this.showMessage('Klipy GIF selected.');
+    this.showMessage('KLIPY media selected.');
   }
 
   openAiToolDialog(tool: AiTool): void {
