@@ -1717,5 +1717,6 @@
   "There are currently no configured metrics to display.": "Derzeit sind keine Metriken zur Anzeige konfiguriert.",
   "Peak:": "Spitze:",
   "Click the map or search for a place to set the location.": "Klicke in die Karte oder suche nach einem Ort, um den Ort festzulegen.",
-  "Location picker map": "Karte zur Ortsauswahl"
+  "Location picker map": "Karte zur Ortsauswahl",
+  "Search KLIPY": "KLIPY durchsuchen"
 }

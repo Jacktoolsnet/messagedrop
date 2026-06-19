@@ -1,7 +1,7 @@
 @if (showGifProvider) {
 <div class="url-container">
     <input #searchInput type="search" enterkeyhint="search" [formControl]="searchControl" (keyup.enter)="search()"
-        placeholder="Search GIFs" />
+        [placeholder]="'common.klipy.searchPlaceholder' | transloco" />
 
     <button (click)="search()">
         @if (

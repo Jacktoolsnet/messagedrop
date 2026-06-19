@@ -41,7 +41,7 @@
     },
     "media": {
       "tenorAttribution": "Con tecnología de Tenor",
-      "klipyAttribution": "Con tecnología de Klipy"
+      "klipyAttribution": "Con tecnología de KLIPY"
     },
     "avatarCropper": {
       "title": "Recortar avatar",
@@ -1353,8 +1353,9 @@
       "openProduction": "Abrir MessageDrop"
     },
     "klipy": {
-      "title": "Servicio Klipy",
-      "loading": "Cargando"
+      "title": "Servicio KLIPY",
+      "loading": "Cargando",
+      "searchPlaceholder": "Buscar en KLIPY"
     }
   },
   "errors": {

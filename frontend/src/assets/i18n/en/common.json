@@ -41,7 +41,7 @@
     },
     "media": {
       "tenorAttribution": "Powered by Tenor",
-      "klipyAttribution": "Powered by Klipy"
+      "klipyAttribution": "Powered by KLIPY"
     },
     "avatarCropper": {
       "title": "Crop avatar",
@@ -1362,8 +1362,9 @@
       "openProduction": "Open MessageDrop"
     },
     "klipy": {
-      "title": "Klipy service",
-      "loading": "Loading"
+      "title": "KLIPY service",
+      "loading": "Loading",
+      "searchPlaceholder": "Search KLIPY"
     }
   },
   "errors": {

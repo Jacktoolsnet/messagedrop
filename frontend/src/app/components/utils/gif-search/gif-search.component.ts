@@ -101,7 +101,7 @@ export class GifSearchComponent implements OnInit {
       type: MultimediaType.KLIPY,
       url: result.media_formats.gif.url,
       sourceUrl: result.itemurl,
-      attribution: this.translation.t('common.multimedia.attributionPoweredBy', { platform: 'Klipy' }),
+      attribution: this.translation.t('common.multimedia.attributionPoweredBy', { platform: 'KLIPY' }),
       title: result.title,
       description: result.content_description,
       contentId: ''

@@ -955,7 +955,7 @@ export class PublicContentAiCreatorDialogComponent {
       type: 'klipy',
       url: result.media_formats.gif.url,
       sourceUrl: result.itemurl,
-      attribution: 'Powered by Klipy',
+      attribution: 'Powered by KLIPY',
       title: result.title,
       description: result.content_description,
       contentId: '',
