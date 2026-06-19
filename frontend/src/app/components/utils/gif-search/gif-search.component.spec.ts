@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TenorSearchComponent } from './tenor-search.component';
+import { GifSearchComponent } from './gif-search.component';
 
 describe('MultimediaComponent', () => {
-  let component: TenorSearchComponent;
-  let fixture: ComponentFixture<TenorSearchComponent>;
+  let component: GifSearchComponent;
+  let fixture: ComponentFixture<GifSearchComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TenorSearchComponent]
+      imports: [GifSearchComponent]
     })
       .compileComponents();
 
-    fixture = TestBed.createComponent(TenorSearchComponent);
+    fixture = TestBed.createComponent(GifSearchComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

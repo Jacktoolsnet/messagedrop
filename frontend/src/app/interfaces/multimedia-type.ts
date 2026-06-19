@@ -2,6 +2,7 @@ export enum MultimediaType {
     UNDEFINED = 'undefined',
     STICKER = 'sticker',
     TENOR = 'tenor',
+    KLIPY = 'klipy',
     UNSPLASH = 'unsplash',
     GIPHY = 'giphy',
     YOUTUBE = 'youtube',

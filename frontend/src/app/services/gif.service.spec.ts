@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { TenorService } from './tenor.service';
+import { GifService } from './gif.service';
 
-describe('TenorService', () => {
-  let service: TenorService;
+describe('GifService', () => {
+  let service: GifService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(TenorService);
+    service = TestBed.inject(GifService);
   });
 
   it('should be created', () => {

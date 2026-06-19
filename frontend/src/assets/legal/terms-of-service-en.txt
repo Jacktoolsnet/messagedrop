@@ -316,6 +316,7 @@ The following providers require provider-specific consent or activation within t
 - TikTok
 - Pinterest
 - Tenor
+- Klipy
 - Spotify
 - Unsplash
 

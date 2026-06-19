@@ -27,6 +27,7 @@ const PLATFORM_META: Record<ExternalContentPlatform, PlatformMeta> = {
     privacy: 'https://policies.google.com/privacy',
     extraTerms: { url: 'https://policies.google.com/terms', labelKey: 'common.legal.externalContent.googleTerms' }
   },
+  klipy: { name: 'Klipy', icon: 'gif_box', settingsKey: EXTERNAL_CONTENT_SETTINGS_KEYS.klipy, terms: 'https://klipy.com/support/terms-services', privacy: 'https://klipy.com/support/privacy-policy' },
   unsplash: { name: 'Unsplash', icon: 'photo', settingsKey: EXTERNAL_CONTENT_SETTINGS_KEYS.unsplash, terms: 'https://unsplash.com/terms', privacy: 'https://unsplash.com/privacy' },
   youtube: { name: 'YouTube', icon: 'smart_display', settingsKey: EXTERNAL_CONTENT_SETTINGS_KEYS.youtube, terms: 'https://www.youtube.com/t/terms', privacy: 'https://www.youtube.com/intl/ALL/howyoutubeworks/privacy/' },
   spotify: { name: 'Spotify', icon: 'graphic_eq', settingsKey: EXTERNAL_CONTENT_SETTINGS_KEYS.spotify, terms: 'https://www.spotify.com/legal/end-user-agreement/', privacy: 'https://www.spotify.com/legal/privacy-policy/' },

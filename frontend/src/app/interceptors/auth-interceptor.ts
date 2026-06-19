@@ -5,7 +5,7 @@ import { UserService } from '../services/user.service';
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const userService = inject(UserService);
 
-    if (req.url.includes('tenor')) {
+    if (req.url.includes('tenor') || req.url.includes('klipy')) {
         return next(req);
     }
 

@@ -30,7 +30,7 @@ MessageDrop verwendet kein personalisiertes Empfehlungs- oder Ranking-System. Ö
 
 Private Chatnachrichten werden Ende-zu-Ende-verschlüsselt übertragen und sind für uns grundsätzlich nicht im Klartext einsehbar.
 
-Externe Einbettungen (z. B. YouTube, TikTok, Pinterest, Spotify, Tenor, Unsplash) werden nur nach aktiver, anbieterbezogener Entscheidung des Nutzers geladen. Eine pauschale Zustimmung für alle Anbieter ist nicht vorgesehen.
+Externe Einbettungen (z. B. YouTube, TikTok, Pinterest, Spotify, Tenor, Klipy, Unsplash) werden nur nach aktiver, anbieterbezogener Entscheidung des Nutzers geladen. Eine pauschale Zustimmung für alle Anbieter ist nicht vorgesehen.
 
 Davon zu unterscheiden sind externe Funktionsdienste sowie Lizenz- und Asset-Anbieter (z. B. Open-Meteo, OpenStreetMap/Nominatim, DeepL, Viator, Flaticon / Freepik), die bei aktiver Nutzung der jeweiligen Funktion oder zur Bereitstellung lizenzierter Inhalte verwendet werden und nicht über den Externe-Inhalte-Toggle freigeschaltet werden.
 
@@ -201,6 +201,11 @@ Impressum: https://www.spotify.com/de/legal/imprint/
 Tenor (Google Ireland Limited)
 Datenschutzerklärung: https://policies.google.com/privacy
 Impressum / Kontakt: https://www.google.com/about/company/
+
+Klipy / KLIPY.COM (KIKLIKO, Inc.)
+Datenschutzerklärung: https://klipy.com/support/privacy-policy
+Nutzungsbedingungen: https://klipy.com/support/terms-services
+Kontakt: KIKLIKO, Inc., 505 Montgomery St. Ste 1100, San Francisco, CA, 94111, USA
 
 Unsplash (Unsplash B.V.)
 Datenschutzerklärung: https://unsplash.com/privacy

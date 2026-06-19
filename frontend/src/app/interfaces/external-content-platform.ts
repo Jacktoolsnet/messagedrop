@@ -4,6 +4,7 @@ export const EXTERNAL_CONTENT_PLATFORMS = [
   'pinterest',
   'spotify',
   'tenor',
+  'klipy',
   'unsplash',
   'tiktok',
   'youtube'
@@ -16,6 +17,7 @@ export const EXTERNAL_CONTENT_SETTINGS_KEYS: Record<ExternalContentPlatform, key
   | 'enablePinterestContent'
   | 'enableSpotifyContent'
   | 'enableTenorContent'
+  | 'enableKlipyContent'
   | 'enableUnsplashContent'
   | 'enableTikTokContent'
   | 'enableYoutubeContent'
@@ -23,6 +25,7 @@ export const EXTERNAL_CONTENT_SETTINGS_KEYS: Record<ExternalContentPlatform, key
   pinterest: 'enablePinterestContent',
   spotify: 'enableSpotifyContent',
   tenor: 'enableTenorContent',
+  klipy: 'enableKlipyContent',
   unsplash: 'enableUnsplashContent',
   tiktok: 'enableTikTokContent',
   youtube: 'enableYoutubeContent'

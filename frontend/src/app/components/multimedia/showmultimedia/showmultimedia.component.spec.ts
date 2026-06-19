@@ -57,6 +57,7 @@ describe('ShowmultimediaComponent', () => {
               enablePinterestContent: false,
               enableSpotifyContent: false,
               enableTenorContent: false,
+              enableKlipyContent: false,
               enableUnsplashContent: false,
               enableTikTokContent: false,
               enableYoutubeContent: false,

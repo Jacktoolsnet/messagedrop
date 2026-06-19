@@ -28,7 +28,7 @@
     </a>
     }
 </div>
-} @else if (multimedia?.type === 'tenor' || multimedia?.type === 'unsplash') {
+} @else if (multimedia?.type === 'tenor' || multimedia?.type === 'klipy' || multimedia?.type === 'unsplash') {
 <div class="media_block">
     <div class="multimedia_container">
         <img class="multimedia_image" [src]="getRenderableImageUrl()"
@@ -41,7 +41,7 @@
     </a>
     }
 </div>
-} @else if (multimedia?.type !== 'tenor' && safeHtml) {
+} @else if (multimedia?.type !== 'tenor' && multimedia?.type !== 'klipy' && safeHtml) {
 <div class="media_block">
     <div class="oembed_container" [class.oembed-youtube]="multimedia?.type === 'youtube'"
         [class.oembed-spotify]="multimedia?.type === 'spotify'" [class.oembed-tiktok]="multimedia?.type === 'tiktok'"

@@ -1,7 +1,7 @@
-@if (showTenor) {
+@if (showGifProvider) {
 <div class="url-container">
     <input #searchInput type="search" enterkeyhint="search" [formControl]="searchControl" (keyup.enter)="search()"
-        placeholder="Search in Tenor" />
+        placeholder="Search GIFs" />
 
     <button (click)="search()">
         @if (
@@ -36,7 +36,7 @@
 } @else {
 <div class="platform-tile-container">
     <div class="platform-tile">
-        <app-enable-external-content [platform]="'tenor'" (enabledChange)="onEnabledChange($event)">
+        <app-enable-external-content [platform]="'klipy'" (enabledChange)="onEnabledChange($event)">
         </app-enable-external-content>
     </div>
 </div>
@@ -46,7 +46,7 @@
     <button mat-dialog-close mat-icon-button class="action-close" [attr.aria-label]="'common.actions.close' | transloco">
         <mat-icon>close</mat-icon>
     </button>
-    <button mat-icon-button type="button" (click)="help.open('tenorSearch')"
+    <button mat-icon-button type="button" (click)="help.open('gifSearch')"
         [attr.aria-label]="'common.actions.help' | transloco">
         <mat-icon>help</mat-icon>
     </button>

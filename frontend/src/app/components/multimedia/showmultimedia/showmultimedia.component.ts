@@ -164,6 +164,8 @@ export class ShowmultimediaComponent implements OnChanges, OnDestroy {
         return 'Pinterest';
       case 'tenor':
         return 'Tenor';
+      case 'klipy':
+        return 'Klipy';
       case 'unsplash':
         return 'Unsplash';
       default:

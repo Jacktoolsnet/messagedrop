@@ -40,7 +40,8 @@
       "chooseFont": "Schriftart auswählen"
     },
     "media": {
-      "tenorAttribution": "Bereitgestellt von Tenor"
+      "tenorAttribution": "Bereitgestellt von Tenor",
+      "klipyAttribution": "Bereitgestellt von Klipy"
     },
     "avatarCropper": {
       "title": "Avatar zuschneiden",
@@ -550,7 +551,8 @@
       "openExternalContentSettings": "Einstellungen für externe Inhalte öffnen",
       "urlNotAllowed": "Diese URL ist zum Einbetten nicht erlaubt.",
       "supportedServicesTitle": "Unterstützte Dienste",
-      "supportedServicesHint": "Füge eine URL von einem dieser Dienste ein, um eine Vorschau zu laden."
+      "supportedServicesHint": "Füge eine URL von einem dieser Dienste ein, um eine Vorschau zu laden.",
+      "addGif": "GIF hinzufügen"
     },
     "stickerPicker": {
       "loadingCategories": "Sticker-Kategorien werden geladen…",
@@ -1358,6 +1360,10 @@
       "message": "Du nutzt gerade die Q-Stage von MessageDrop. Diese Umgebung dient Tests und kann unfertige Funktionen, Testdaten oder kurzfristige Änderungen enthalten. Wenn du MessageDrop normal nutzen möchtest, öffne bitte die produktive App.",
       "continue": "Weiter",
       "openProduction": "MessageDrop öffnen"
+    },
+    "klipy": {
+      "title": "Klipy-Dienst",
+      "loading": "Laden"
     }
   },
   "errors": {

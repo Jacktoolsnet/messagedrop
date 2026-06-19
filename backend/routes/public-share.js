@@ -37,6 +37,7 @@ const STRINGS = {
     mediaLabel: 'Medien',
     youtubeVideoLabel: 'YouTube-Video',
     tenorGifLabel: 'Tenor-GIF',
+    klipyGifLabel: 'Klipy-GIF',
     pinterestPinLabel: 'Pinterest-Pin',
     tiktokVideoLabel: 'TikTok-Video',
     spotifyLabel: 'Spotify'
@@ -60,6 +61,7 @@ const STRINGS = {
     mediaLabel: 'Media',
     youtubeVideoLabel: 'YouTube video',
     tenorGifLabel: 'Tenor GIF',
+    klipyGifLabel: 'Klipy GIF',
     pinterestPinLabel: 'Pinterest pin',
     tiktokVideoLabel: 'TikTok video',
     spotifyLabel: 'Spotify'
@@ -83,6 +85,7 @@ const STRINGS = {
     mediaLabel: 'Contenido multimedia',
     youtubeVideoLabel: 'Vídeo de YouTube',
     tenorGifLabel: 'GIF de Tenor',
+    klipyGifLabel: 'GIF de Klipy',
     pinterestPinLabel: 'Pin de Pinterest',
     tiktokVideoLabel: 'Vídeo de TikTok',
     spotifyLabel: 'Spotify'
@@ -106,6 +109,7 @@ const STRINGS = {
     mediaLabel: 'Médias',
     youtubeVideoLabel: 'Vidéo YouTube',
     tenorGifLabel: 'GIF Tenor',
+    klipyGifLabel: 'GIF Klipy',
     pinterestPinLabel: 'Épingle Pinterest',
     tiktokVideoLabel: 'Vidéo TikTok',
     spotifyLabel: 'Spotify'
@@ -454,6 +458,7 @@ function normalizePublicMediaType(multimedia) {
   if (mediaType === 'tiktok') return 'tiktok';
   if (mediaType === 'pinterest') return 'pinterest';
   if (mediaType === 'tenor') return 'tenor';
+  if (mediaType === 'klipy') return 'klipy';
   if (mediaType === 'image' || isDirectImageMedia(mediaType, imageUrl)) return 'image';
   if (mediaType && mediaType !== 'undefined') return 'media';
   return 'media';
@@ -531,6 +536,7 @@ function renderServerMediaIconSvg(type) {
   case 'tiktok':
     return '<svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M14 3c.18 1.5 1.3 3 3 3.41V9.1c-1.3 0-2.55-.42-3.57-1.2v5.78A4.68 4.68 0 1 1 8.75 9v2.77a1.92 1.92 0 1 0 1.93 1.91V3H14Z" fill="currentColor"/></svg>';
   case 'tenor':
+  case 'klipy':
     return '<svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M6 4h12v3h-4.5V20h-3V7H6V4Z" fill="currentColor"/></svg>';
   default:
     return '<svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M6 5.75A2.75 2.75 0 0 1 8.75 3h6.5A2.75 2.75 0 0 1 18 5.75v12.5A2.75 2.75 0 0 1 15.25 21h-6.5A2.75 2.75 0 0 1 6 18.25V5.75Zm5 3.56v5.38l4.5-2.69L11 9.3Z" fill="currentColor"/></svg>';
@@ -839,7 +845,7 @@ function isDirectImageMedia(mediaType, imageUrl) {
     return false;
   }
 
-  if (['tenor', 'unsplash', 'giphy', 'flickr'].includes(mediaType)) {
+  if (['tenor', 'klipy', 'unsplash', 'giphy', 'flickr'].includes(mediaType)) {
     return true;
   }
 
@@ -854,6 +860,7 @@ function resolveOgMediaIconType(mediaType, multimedia) {
   if (normalizedType === 'sticker') return 'sticker';
   if (normalizedType === 'youtube' || host.includes('youtube')) return 'youtube';
   if (normalizedType === 'tenor' || host.includes('tenor')) return 'tenor';
+  if (normalizedType === 'klipy' || host.includes('klipy')) return 'klipy';
   if (normalizedType === 'pinterest' || host.includes('pinterest')) return 'pinterest';
   if (normalizedType === 'tiktok' || host.includes('tiktok')) return 'tiktok';
   if (normalizedType === 'spotify' || host.includes('spotify')) return 'spotify';
@@ -866,6 +873,7 @@ function resolveMediaPlatformLabel(mediaType, multimedia, strings) {
   const map = {
     youtube: strings.youtubeVideoLabel || 'YouTube video',
     tenor: strings.tenorGifLabel || 'Tenor GIF',
+    klipy: strings.klipyGifLabel || 'Klipy GIF',
     spotify: strings.spotifyLabel || 'Spotify',
     tiktok: strings.tiktokVideoLabel || 'TikTok video',
     pinterest: strings.pinterestPinLabel || 'Pinterest pin'
@@ -877,6 +885,7 @@ function resolveMediaPlatformLabel(mediaType, multimedia, strings) {
 
   if (host.includes('youtube')) return strings.youtubeVideoLabel || 'YouTube video';
   if (host.includes('tenor')) return strings.tenorGifLabel || 'Tenor GIF';
+  if (host.includes('klipy')) return strings.klipyGifLabel || 'Klipy GIF';
   if (host.includes('spotify')) return strings.spotifyLabel || 'Spotify';
   if (host.includes('tiktok')) return strings.tiktokVideoLabel || 'TikTok video';
   if (host.includes('pinterest')) return strings.pinterestPinLabel || 'Pinterest pin';

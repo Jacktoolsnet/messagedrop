@@ -10,9 +10,9 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { AppSettings } from '../../../interfaces/app-settings';
 import { Multimedia } from '../../../interfaces/multimedia';
 import { MultimediaType } from '../../../interfaces/multimedia-type';
-import { TenorApiResponse, TenorResult } from '../../../interfaces/tenor-response';
+import { GifApiResponse, GifResult } from '../../../interfaces/gif-response';
 import { AppService } from '../../../services/app.service';
-import { TenorService } from '../../../services/tenor.service';
+import { GifService } from '../../../services/gif.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { EnableExternalContentComponent } from "../enable-external-content/enable-external-content.component";
 import { HelpDialogService } from '../help-dialog/help-dialog.service';
@@ -32,53 +32,53 @@ import { HelpDialogService } from '../help-dialog/help-dialog.service';
     TranslocoPipe,
     EnableExternalContentComponent
   ],
-  templateUrl: './tenor-search.component.html',
-  styleUrl: './tenor-search.component.css',
+  templateUrl: './gif-search.component.html',
+  styleUrl: './gif-search.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TenorSearchComponent implements OnInit {
+export class GifSearchComponent implements OnInit {
   @ViewChild('searchInput') private searchInput?: ElementRef<HTMLInputElement>;
 
   readonly searchControl = new FormControl('', { nonNullable: true });
   lastSearchTerm = '';
   nextFeatured = '';
   nextSearch = '';
-  results: TenorResult[] = [];
-  showTenor = false;
+  results: GifResult[] = [];
+  showGifProvider = false;
 
   private readonly appService = inject(AppService);
-  private readonly dialogRef = inject(MatDialogRef<TenorSearchComponent>);
-  private readonly tenorService = inject(TenorService);
+  private readonly dialogRef = inject(MatDialogRef<GifSearchComponent>);
+  private readonly gifService = inject(GifService);
   private readonly translation = inject(TranslationHelperService);
   private readonly cdRef = inject(ChangeDetectorRef);
   readonly help = inject(HelpDialogService);
 
   ngOnInit(): void {
-    this.showTenor = this.appService.getAppSettings().enableTenorContent;
-    if (this.showTenor) {
-      this.tensorGetFeaturedGifs();
+    this.showGifProvider = this.appService.getAppSettings().enableKlipyContent;
+    if (this.showGifProvider) {
+      this.getFeaturedGifs();
     } else {
       this.results = [];
     }
   }
 
-  tensorGetFeaturedGifs(): void {
-    this.tenorService.getFeaturedGifs(this.nextFeatured).subscribe({
-      next: (tensorResponse: TenorApiResponse) => this.updateResults(tensorResponse, 'featured'),
-      error: (error) => this.handleTenorError(error)
+  getFeaturedGifs(): void {
+    this.gifService.getFeaturedGifs(this.nextFeatured).subscribe({
+      next: (gifResponse: GifApiResponse) => this.updateResults(gifResponse, 'featured'),
+      error: (error) => this.handleGifError(error)
     });
   }
 
-  tensorSearchGifs(): void {
+  searchGifs(): void {
     const term = this.searchControl.value.trim();
     if (!term) {
-      this.tensorGetFeaturedGifs();
+      this.getFeaturedGifs();
       return;
     }
 
-    this.tenorService.searchGifs(term, this.nextSearch).subscribe({
-      next: (tensorResponse: TenorApiResponse) => this.updateResults(tensorResponse, 'search'),
-      error: (error) => this.handleTenorError(error)
+    this.gifService.searchGifs(term, this.nextSearch).subscribe({
+      next: (gifResponse: GifApiResponse) => this.updateResults(gifResponse, 'search'),
+      error: (error) => this.handleGifError(error)
     });
   }
 
@@ -86,22 +86,22 @@ export class TenorSearchComponent implements OnInit {
     this.searchInput?.nativeElement.blur();
     const currentTerm = this.searchControl.value.trim();
     if (!currentTerm) {
-      this.tensorGetFeaturedGifs();
+      this.getFeaturedGifs();
     } else {
       if (currentTerm !== this.lastSearchTerm) {
         this.lastSearchTerm = currentTerm;
         this.nextSearch = '';
       }
-      this.tensorSearchGifs();
+      this.searchGifs();
     }
   }
 
-  onApplyClick(result: TenorResult): void {
+  onApplyClick(result: GifResult): void {
     const multimedia: Multimedia = {
-      type: MultimediaType.TENOR,
+      type: MultimediaType.KLIPY,
       url: result.media_formats.gif.url,
       sourceUrl: result.itemurl,
-      attribution: this.translation.t('common.multimedia.attributionPoweredBy', { platform: 'Tenor' }),
+      attribution: this.translation.t('common.multimedia.attributionPoweredBy', { platform: 'Klipy' }),
       title: result.title,
       description: result.content_description,
       contentId: ''
@@ -109,24 +109,24 @@ export class TenorSearchComponent implements OnInit {
     this.dialogRef.close(multimedia);
   }
 
-  getPreviewUrl(result: TenorResult): string {
+  getPreviewUrl(result: GifResult): string {
     return result.media_formats.tinygif?.url || result.media_formats.gif.url;
   }
 
   onEnabledChange(enabled: boolean): void {
     const current = this.appService.getAppSettings();
-    const updated: AppSettings = { ...current, enableTenorContent: enabled };
+    const updated: AppSettings = { ...current, enableKlipyContent: enabled };
     this.appService.setAppSettings(updated);
-    this.showTenor = enabled;
-    if (this.showTenor) {
-      this.tensorGetFeaturedGifs();
+    this.showGifProvider = enabled;
+    if (this.showGifProvider) {
+      this.getFeaturedGifs();
     } else {
       this.results = [];
       this.cdRef.markForCheck();
     }
   }
 
-  private updateResults(response: TenorApiResponse, mode: 'featured' | 'search'): void {
+  private updateResults(response: GifApiResponse, mode: 'featured' | 'search'): void {
     this.results = response.data.results;
     if (mode === 'featured') {
       this.nextFeatured = response.data.next;
@@ -138,8 +138,8 @@ export class TenorSearchComponent implements OnInit {
     this.cdRef.markForCheck();
   }
 
-  private handleTenorError(error: unknown): void {
-    console.error('Tenor request failed', error);
+  private handleGifError(error: unknown): void {
+    console.error('Klipy request failed', error);
     this.results = [];
     this.cdRef.markForCheck();
   }

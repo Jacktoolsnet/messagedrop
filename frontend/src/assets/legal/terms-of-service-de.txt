@@ -313,6 +313,7 @@ Für folgende Anbieter gilt eine anbieterbezogene Einwilligungs- bzw. Freigabeen
 - TikTok
 - Pinterest
 - Tenor
+- Klipy
 - Spotify
 - Unsplash
 

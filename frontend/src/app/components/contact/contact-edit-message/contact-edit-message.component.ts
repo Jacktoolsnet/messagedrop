@@ -21,16 +21,9 @@ import { UserService } from '../../../services/user.service';
 import { SelectMultimediaComponent } from '../../multimedia/select-multimedia/select-multimedia.component';
 import { ShowmultimediaComponent } from "../../multimedia/showmultimedia/showmultimedia.component";
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
-import { TenorSearchComponent } from '../../utils/tenor-search/tenor-search.component';
+import { GifSearchComponent } from '../../utils/gif-search/gif-search.component';
 import { TextComponent } from '../../utils/text/text.component';
 import { DisplayMessageService } from '../../../services/display-message.service';
-
-interface TenorDialogResult {
-  title?: string;
-  content_description?: string;
-  media_formats?: { gif?: { url: string } };
-  itemurl?: string;
-}
 
 interface TextDialogResult {
   text: string;
@@ -73,7 +66,7 @@ export class ContactEditMessageComponent implements OnInit {
     const multimedia = this.data.shortMessage.multimedia;
     if (multimedia) {
       this.updateSafeHtml();
-      this.showSaveHtml = multimedia.type !== MultimediaType.TENOR;
+      this.showSaveHtml = !this.isProviderImageMultimedia(multimedia);
     }
     this.data.shortMessage.style = this.userService.getProfile().defaultStyle ?? this.data.shortMessage.style;
   }
@@ -103,8 +96,8 @@ export class ContactEditMessageComponent implements OnInit {
     );
   }
 
-  public openTenorDialog(): void {
-    const tenorDialogRef = this.matDialog.open(TenorSearchComponent, {
+  public openGifDialog(): void {
+    const gifDialogRef = this.matDialog.open(GifSearchComponent, {
       panelClass: '',
       closeOnNavigation: true,
       data: {},
@@ -117,29 +110,20 @@ export class ContactEditMessageComponent implements OnInit {
       autoFocus: false
     });
 
-    tenorDialogRef.afterClosed().subscribe((result?: TenorDialogResult) => {
+    gifDialogRef.afterClosed().subscribe((result?: Multimedia) => {
       if (!result) {
         return;
       }
-      const multimedia = this.data.shortMessage.multimedia;
-      if (!multimedia) {
-        return;
-      }
-      multimedia.type = MultimediaType.TENOR;
-      multimedia.attribution = this.translation.t('common.media.tenorAttribution');
-      multimedia.title = result.title ?? '';
-      multimedia.description = result.content_description ?? '';
-      multimedia.url = result.media_formats?.gif?.url ?? '';
-      multimedia.sourceUrl = result.itemurl ?? '';
+      this.data.shortMessage.multimedia = result;
       this.updateSafeHtml();
-      this.showSaveHtml = false;
+      this.showSaveHtml = !this.isProviderImageMultimedia(result);
     });
   }
 
   applyNewMultimedia(newMultimedia: Multimedia) {
     this.data.shortMessage.multimedia = newMultimedia;
     this.updateSafeHtml();
-    this.showSaveHtml = newMultimedia.type !== MultimediaType.TENOR;
+    this.showSaveHtml = !this.isProviderImageMultimedia(newMultimedia);
   }
 
   public removeMultimedia(): void {
@@ -155,6 +139,11 @@ export class ContactEditMessageComponent implements OnInit {
     multimedia.sourceUrl = '';
     this.showSaveHtml = false;
     this.safeHtml = undefined;
+  }
+
+
+  private isProviderImageMultimedia(multimedia: Multimedia | undefined): boolean {
+    return multimedia?.type === MultimediaType.TENOR || multimedia?.type === MultimediaType.KLIPY;
   }
 
   public openTextDialog(): void {

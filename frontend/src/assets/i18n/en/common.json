@@ -40,7 +40,8 @@
       "chooseFont": "Choose font"
     },
     "media": {
-      "tenorAttribution": "Powered by Tenor"
+      "tenorAttribution": "Powered by Tenor",
+      "klipyAttribution": "Powered by Klipy"
     },
     "avatarCropper": {
       "title": "Crop avatar",
@@ -550,7 +551,8 @@
       "openExternalContentSettings": "Open external content settings",
       "urlNotAllowed": "This URL is not allowed for embedding.",
       "supportedServicesTitle": "Supported services",
-      "supportedServicesHint": "Paste a URL from one of these services to load a preview."
+      "supportedServicesHint": "Paste a URL from one of these services to load a preview.",
+      "addGif": "Add GIF"
     },
     "stickerPicker": {
       "loadingCategories": "Loading sticker categories…",
@@ -1358,6 +1360,10 @@
       "message": "You are currently using the MessageDrop Q stage. This environment is for testing and may contain unfinished features, test data, or short-term changes. If you want to use MessageDrop normally, please open the production app.",
       "continue": "Continue",
       "openProduction": "Open MessageDrop"
+    },
+    "klipy": {
+      "title": "Klipy service",
+      "loading": "Loading"
     }
   },
   "errors": {

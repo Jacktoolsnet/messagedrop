@@ -23,7 +23,7 @@ export class AppService {
   private readonly _notificationAction = signal<NotificationAction | null>(null);
   readonly notificationAction = this._notificationAction.asReadonly();
 
-  private readonly legalVersion = 1;
+  private readonly legalVersion = 2;
 
   private themeListener: ((e: MediaQueryListEvent) => void) | null = null;
   private appSettings: AppSettings | undefined;
@@ -42,6 +42,7 @@ export class AppService {
     enableSpotifyContent: false,
     enableTikTokContent: false,
     enableTenorContent: false,
+    enableKlipyContent: false,
     enableUnsplashContent: false,
     diagnosticLogging: false,
     backupOnExit: false,

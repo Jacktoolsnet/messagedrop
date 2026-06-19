@@ -15,7 +15,7 @@ function generateTraceId(): string {
 }
 
 export const traceIdInterceptor: HttpInterceptorFn = (req, next) => {
-  if (req.url.includes('tenor') || req.headers.has(TRACE_HEADER)) {
+  if (req.url.includes('tenor') || req.url.includes('klipy') || req.headers.has(TRACE_HEADER)) {
     return next(req);
   }
 

@@ -1105,7 +1105,7 @@
     "items": {
       "providers": {
         "title": "Anbieter auswählen",
-        "desc": "Für jeden unterstützten Anbieter gibt es eine eigene Einstellungskachel (z. B. YouTube, Spotify, Tenor, Unsplash)."
+        "desc": "Für jeden unterstützten Anbieter gibt es eine eigene Einstellungskachel (z. B. YouTube, Spotify, Tenor, Klipy, Unsplash)."
       },
       "toggle": {
         "title": "Inhalte erlauben oder sperren",
@@ -2563,40 +2563,6 @@
       }
     }
   },
-  "tenorSearch": {
-    "title": "GIF-Suche",
-    "intro": "In diesem Dialog suchst du GIFs über Tenor und übernimmst ein ausgewähltes Ergebnis in deine Notiz oder Nachricht.",
-    "items": {
-      "search": {
-        "title": "GIFs suchen",
-        "desc": "Mit dieser Funktion suchst du nach einem Begriff oder lädst ohne Suchbegriff empfohlene GIFs."
-      },
-      "select": {
-        "title": "GIF auswählen",
-        "desc": "Mit dieser Funktion übernimmst du ein Ergebnis direkt in den vorherigen Dialog."
-      },
-      "more": {
-        "title": "Weitere Treffer laden",
-        "desc": "Mit dieser Funktion lädst du weitere Ergebnisse zur aktuellen Suche."
-      },
-      "enable": {
-        "title": "Externe Inhalte aktivieren",
-        "desc": "Mit dieser Funktion erlaubst du die Anzeige von Tenor-Inhalten, falls sie aktuell deaktiviert sind."
-      },
-      "close": {
-        "title": "Schließen",
-        "desc": "Mit dieser Funktion schließt du den Dialog ohne Auswahl."
-      },
-      "help": {
-        "title": "Hilfe",
-        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
-      },
-      "privacy": {
-        "title": "Datenschutz und Verarbeitung",
-        "desc": "Bei der GIF-Suche werden Anfragen an Tenor/Google gesendet. In der App wird nur das von dir ausgewählte GIF als Referenzdaten (z. B. URL, Quelle, Titel) gespeichert; private Notiz- oder Nachrichtentexte werden dadurch nicht an Tenor übertragen."
-      }
-    }
-  },
   "stickerPicker": {
     "title": "Sticker-Auswahl",
     "intro": "In diesem Dialog wechselst du zwischen Sticker-Kategorien, öffnest Packs und übernimmst einen ausgewählten Sticker in deine Notiz oder Nachricht.",
@@ -2734,6 +2700,40 @@
       "privacy": {
         "title": "Datenschutz und Verarbeitung",
         "desc": "Detailabfragen werden an den Erlebnisanbieter übermittelt. Beim Öffnen externer Links gelten die Datenschutzbestimmungen des Anbieters und von Kartenanbietern."
+      }
+    }
+  },
+  "gifSearch": {
+    "title": "GIF-Suche",
+    "intro": "In diesem Dialog suchst du GIFs über Klipy und übernimmst ein ausgewähltes Ergebnis in deine Notiz oder Nachricht.",
+    "items": {
+      "search": {
+        "title": "GIFs suchen",
+        "desc": "Mit dieser Funktion suchst du nach einem Begriff oder lädst ohne Suchbegriff empfohlene GIFs."
+      },
+      "select": {
+        "title": "GIF auswählen",
+        "desc": "Mit dieser Funktion übernimmst du ein Ergebnis direkt in den vorherigen Dialog."
+      },
+      "more": {
+        "title": "Weitere Treffer laden",
+        "desc": "Mit dieser Funktion lädst du weitere Ergebnisse zur aktuellen Suche."
+      },
+      "enable": {
+        "title": "Externe Inhalte aktivieren",
+        "desc": "Mit dieser Funktion erlaubst du die Anzeige von Klipy-Inhalten, falls sie aktuell deaktiviert sind."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Mit dieser Funktion schließt du den Dialog ohne Auswahl."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Mit dieser Funktion öffnest du diese Hilfeansicht."
+      },
+      "privacy": {
+        "title": "Datenschutz und Verarbeitung",
+        "desc": "Bei der GIF-Suche werden Anfragen an Klipy gesendet. In der App wird nur das von dir ausgewählte GIF als Referenzdaten (z. B. URL, Quelle, Titel) gespeichert; private Notiz- oder Nachrichtentexte werden dadurch nicht an Klipy übertragen."
       }
     }
   }

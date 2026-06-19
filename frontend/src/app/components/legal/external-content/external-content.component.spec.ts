@@ -23,6 +23,7 @@ describe('ExternalContentComponent', () => {
     enablePinterestContent: false,
     enableSpotifyContent: false,
     enableTenorContent: false,
+              enableKlipyContent: false,
     enableUnsplashContent: false,
     enableTikTokContent: false,
     enableYoutubeContent: false,

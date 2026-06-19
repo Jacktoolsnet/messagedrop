@@ -3286,44 +3286,44 @@ const HELP_TOPICS = {
       }
     ]
   },
-  tenorSearch: {
-    titleKey: 'tenorSearch.title',
-    introKey: 'tenorSearch.intro',
+  gifSearch: {
+    titleKey: 'gifSearch.title',
+    introKey: 'gifSearch.intro',
     items: [
       {
         icon: 'search',
-        titleKey: 'tenorSearch.items.search.title',
-        descriptionKey: 'tenorSearch.items.search.desc'
+        titleKey: 'gifSearch.items.search.title',
+        descriptionKey: 'gifSearch.items.search.desc'
       },
       {
         icon: 'photo_library',
-        titleKey: 'tenorSearch.items.select.title',
-        descriptionKey: 'tenorSearch.items.select.desc'
+        titleKey: 'gifSearch.items.select.title',
+        descriptionKey: 'gifSearch.items.select.desc'
       },
       {
         icon: 'arrow_circle_right',
-        titleKey: 'tenorSearch.items.more.title',
-        descriptionKey: 'tenorSearch.items.more.desc'
+        titleKey: 'gifSearch.items.more.title',
+        descriptionKey: 'gifSearch.items.more.desc'
       },
       {
         icon: 'toggle_on',
-        titleKey: 'tenorSearch.items.enable.title',
-        descriptionKey: 'tenorSearch.items.enable.desc'
+        titleKey: 'gifSearch.items.enable.title',
+        descriptionKey: 'gifSearch.items.enable.desc'
       },
       {
         icon: 'close',
-        titleKey: 'tenorSearch.items.close.title',
-        descriptionKey: 'tenorSearch.items.close.desc'
+        titleKey: 'gifSearch.items.close.title',
+        descriptionKey: 'gifSearch.items.close.desc'
       },
       {
         icon: 'help',
-        titleKey: 'tenorSearch.items.help.title',
-        descriptionKey: 'tenorSearch.items.help.desc'
+        titleKey: 'gifSearch.items.help.title',
+        descriptionKey: 'gifSearch.items.help.desc'
       },
       {
         icon: 'privacy_tip',
-        titleKey: 'tenorSearch.items.privacy.title',
-        descriptionKey: 'tenorSearch.items.privacy.desc'
+        titleKey: 'gifSearch.items.privacy.title',
+        descriptionKey: 'gifSearch.items.privacy.desc'
       }
     ]
   },

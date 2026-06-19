@@ -5,7 +5,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { Multimedia } from '../../../interfaces/multimedia';
 import { ImportMultimediaComponent } from '../../utils/import-multimedia/import-multimedia.component';
 import { StickerPickerComponent } from '../../utils/sticker-picker/sticker-picker.component';
-import { TenorSearchComponent } from '../../utils/tenor-search/tenor-search.component';
+import { GifSearchComponent } from '../../utils/gif-search/gif-search.component';
 
 @Component({
   selector: 'app-select-multimedia',
@@ -44,8 +44,8 @@ export class SelectMultimediaComponent {
     });
   }
 
-  public openTenorDialog(): void {
-    const dialogRef = this.matDialog.open(TenorSearchComponent, {
+  public openGifDialog(): void {
+    const dialogRef = this.matDialog.open(GifSearchComponent, {
       panelClass: '',
       closeOnNavigation: true,
       data: {},

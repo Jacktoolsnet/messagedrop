@@ -40,7 +40,8 @@
       "chooseFont": "Choisir la police"
     },
     "media": {
-      "tenorAttribution": "Propulsé par Tenor"
+      "tenorAttribution": "Propulsé par Tenor",
+      "klipyAttribution": "Propulsé par Klipy"
     },
     "avatarCropper": {
       "title": "Recadrer l'avatar",
@@ -549,7 +550,8 @@
       "openExternalContentSettings": "Ouvrir les paramètres de contenu externe",
       "urlNotAllowed": "Cette URL n'est pas autorisée pour l'intégration.",
       "supportedServicesTitle": "Services pris en charge",
-      "supportedServicesHint": "Collez une URL de l’un de ces services pour charger un aperçu."
+      "supportedServicesHint": "Collez une URL de l’un de ces services pour charger un aperçu.",
+      "addGif": "Ajouter un GIF"
     },
     "stickerPicker": {
       "loadingCategories": "Chargement des catégories de stickers…",
@@ -1349,6 +1351,10 @@
       "message": "Vous utilisez actuellement l’environnement Q de MessageDrop. Cet environnement sert aux tests et peut contenir des fonctionnalités inachevées, des données de test ou des changements temporaires. Pour utiliser MessageDrop normalement, ouvrez l’application de production.",
       "continue": "Continuer",
       "openProduction": "Ouvrir MessageDrop"
+    },
+    "klipy": {
+      "title": "Service Klipy",
+      "loading": "Chargement"
     }
   },
   "errors": {
