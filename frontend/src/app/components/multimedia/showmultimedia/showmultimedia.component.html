@@ -34,7 +34,12 @@
         <img class="multimedia_image" [src]="getRenderableImageUrl()"
             [attr.alt]="multimedia?.title || ('common.multimedia.embeddedAlt' | transloco)" />
     </div>
-    @if (multimedia?.attribution !== '') {
+    @if (isKlipyMultimedia()) {
+    <a class="attribution-link attribution-link--logo" [href]="getKlipyAttributionHref()" target="_blank"
+        rel="noopener noreferrer" aria-label="Powered by KLIPY">
+        <img class="klipy-attribution-logo" [src]="klipyAttributionLogoUrl" alt="Powered by KLIPY" loading="lazy" />
+    </a>
+    } @else if (multimedia?.attribution !== '') {
     <a class="attribution-link" [class.attribution-link--compact]="multimedia?.type === 'pinterest'"
         [href]="multimedia?.sourceUrl" target="_blank" rel="noopener noreferrer">
         {{ multimedia?.attribution }}

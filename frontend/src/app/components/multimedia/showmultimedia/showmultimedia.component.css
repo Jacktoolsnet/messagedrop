@@ -191,3 +191,30 @@
     justify-content: center;
     padding: 0 0 0.75rem;
 }
+
+
+.attribution-link--logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    max-width: min(220px, 70%);
+    margin-top: 0.35rem;
+    margin-bottom: 1rem;
+    text-decoration: none;
+}
+
+.attribution-link--logo:hover,
+.attribution-link--logo:focus,
+.attribution-link--logo:active,
+.attribution-link--logo:visited,
+.attribution-link--logo:focus-visible {
+    text-decoration: none;
+}
+
+.klipy-attribution-logo {
+    display: block;
+    width: 100%;
+    max-height: 34px;
+    object-fit: contain;
+}

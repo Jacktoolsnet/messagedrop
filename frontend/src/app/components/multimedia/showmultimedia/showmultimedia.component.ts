@@ -28,6 +28,7 @@ import { ExternalContentComponent } from '../../legal/external-content/external-
 export class ShowmultimediaComponent implements OnChanges, OnDestroy {
   @Input() multimedia: Multimedia | undefined;
   readonly stickerProtectionOverlayUrl = 'assets/images/sticker-protection-overlay.svg';
+  readonly klipyAttributionLogoUrl = 'assets/klipy/Logos/SVG Files/Powered by KLIPY  - gray.svg';
 
   termsLinks?: { terms: string; privacy: string };
 
@@ -117,6 +118,15 @@ export class ShowmultimediaComponent implements OnChanges, OnDestroy {
     dialogRef.afterClosed().subscribe(() => {
       this.updateFromMultimedia();
     });
+  }
+
+
+  isKlipyMultimedia(): boolean {
+    return this.multimedia?.type === MultimediaType.KLIPY;
+  }
+
+  getKlipyAttributionHref(): string {
+    return this.multimedia?.sourceUrl || 'https://klipy.com/';
   }
 
   getRenderableImageUrl(): string {
