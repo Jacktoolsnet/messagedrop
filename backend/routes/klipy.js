@@ -11,8 +11,8 @@ const MIN_PER_PAGE = 8;
 const MAX_PER_PAGE = 50;
 
 const KIND_CONFIG = {
-    gif: { apiPath: 'gifs', slugPath: 'gifs', type: 'gif', formatFilter: true },
-    sticker: { apiPath: 'stickers', slugPath: 'stickers', type: 'sticker', formatFilter: true },
+    gif: { apiPath: 'gifs', slugPath: 'gifs', type: 'gif', formatFilter: true, defaultFormatFilter: 'gif,webp,jpg,mp4,webm' },
+    sticker: { apiPath: 'stickers', slugPath: 'stickers', type: 'sticker', formatFilter: true, defaultFormatFilter: 'gif,webp,png,webm' },
     clip: { apiPath: 'clips', slugPath: 'clips', type: 'clip', formatFilter: false },
     meme: { apiPath: 'static-memes', slugPath: 'memes', type: 'meme', formatFilter: false }
 };
@@ -66,6 +66,26 @@ function normalizeLocale(country) {
     return String(country || '').trim().toLowerCase() || 'us';
 }
 
+function resolveFormatFilter(kind) {
+    const configured = String(process.env.KLIPY_FORMAT_FILTER || '').trim();
+    if (!configured) {
+        return KIND_CONFIG[kind].defaultFormatFilter;
+    }
+
+    if (kind !== 'sticker') {
+        return configured;
+    }
+
+    const formats = configured
+        .split(',')
+        .map((format) => format.trim().toLowerCase())
+        .filter(Boolean);
+    if (!formats.includes('png')) {
+        formats.push('png');
+    }
+    return formats.join(',');
+}
+
 function buildRequestParams(req, kind, page, searchTerm = '') {
     const params = new URLSearchParams();
     params.set('page', String(page));
@@ -73,7 +93,7 @@ function buildRequestParams(req, kind, page, searchTerm = '') {
     params.set('locale', normalizeLocale(req.params.country));
     params.set('content_filter', process.env.KLIPY_CONTENT_FILTER || 'low');
     if (KIND_CONFIG[kind].formatFilter) {
-        params.set('format_filter', process.env.KLIPY_FORMAT_FILTER || 'gif,webp,jpg,mp4,webm');
+        params.set('format_filter', resolveFormatFilter(kind));
     }
     if (searchTerm && searchTerm.trim()) {
         params.set('q', searchTerm.trim());
@@ -81,10 +101,21 @@ function buildRequestParams(req, kind, page, searchTerm = '') {
     return params;
 }
 
+function asFormat(value) {
+    if (typeof value === 'string' && value.trim()) {
+        return { url: value.trim() };
+    }
+    if (value?.url) {
+        return value;
+    }
+    return undefined;
+}
+
 function firstFormat(...formats) {
     for (const format of formats) {
-        if (format?.url) {
-            return format;
+        const normalized = asFormat(format);
+        if (normalized?.url) {
+            return normalized;
         }
     }
     return undefined;
@@ -100,32 +131,35 @@ function buildItemUrl(item, kind) {
 
 function pickPrimaryImage(file) {
     return firstFormat(
-        file.md?.gif, file.md?.webp, file.md?.jpg,
-        file.hd?.gif, file.hd?.webp, file.hd?.jpg,
-        file.sm?.gif, file.sm?.webp, file.sm?.jpg,
-        file.xs?.gif, file.xs?.webp, file.xs?.jpg
+        file.md?.gif, file.md?.webp, file.md?.jpg, file.md?.png,
+        file.hd?.gif, file.hd?.webp, file.hd?.jpg, file.hd?.png,
+        file.sm?.gif, file.sm?.webp, file.sm?.jpg, file.sm?.png,
+        file.xs?.gif, file.xs?.webp, file.xs?.jpg, file.xs?.png,
+        file.gif, file.webp, file.jpg, file.png
     );
 }
 
 function pickPreviewImage(file) {
     return firstFormat(
-        file.xs?.webp, file.xs?.gif, file.xs?.jpg,
-        file.sm?.webp, file.sm?.gif, file.sm?.jpg,
-        file.md?.webp, file.md?.gif, file.md?.jpg
+        file.xs?.webp, file.xs?.gif, file.xs?.jpg, file.xs?.png,
+        file.sm?.webp, file.sm?.gif, file.sm?.jpg, file.sm?.png,
+        file.md?.webp, file.md?.gif, file.md?.jpg, file.md?.png,
+        file.webp, file.gif, file.jpg, file.png
     );
 }
 
 function pickPrimaryVideo(file) {
     return firstFormat(
         file.md?.mp4, file.hd?.mp4, file.sm?.mp4, file.xs?.mp4,
-        file.md?.webm, file.hd?.webm, file.sm?.webm, file.xs?.webm
+        file.md?.webm, file.hd?.webm, file.sm?.webm, file.xs?.webm,
+        file.mp4, file.webm
     );
 }
 
 function pickPreviewVideo(file) {
     return firstFormat(
         file.xs?.mp4, file.sm?.mp4, file.xs?.webm, file.sm?.webm,
-        file.md?.mp4, file.md?.webm
+        file.md?.mp4, file.md?.webm, file.mp4, file.webm
     );
 }
 
@@ -146,10 +180,10 @@ function normalizeKlipyItem(item, kind) {
         media_formats: {
             gif: { url: fallbackUrl },
             tinygif: { url: preview?.url || fallbackUrl },
-            mp4: { url: firstFormat(file.md?.mp4, file.hd?.mp4, file.sm?.mp4, file.xs?.mp4)?.url || '' },
-            webm: { url: firstFormat(file.md?.webm, file.hd?.webm, file.sm?.webm, file.xs?.webm)?.url || '' },
+            mp4: { url: firstFormat(file.md?.mp4, file.hd?.mp4, file.sm?.mp4, file.xs?.mp4, file.mp4)?.url || '' },
+            webm: { url: firstFormat(file.md?.webm, file.hd?.webm, file.sm?.webm, file.xs?.webm, file.webm)?.url || '' },
             jpg: { url: poster?.url || '' },
-            webp: { url: firstFormat(file.md?.webp, file.hd?.webp, file.sm?.webp, file.xs?.webp)?.url || '' }
+            webp: { url: firstFormat(file.md?.webp, file.hd?.webp, file.sm?.webp, file.xs?.webp, file.webp)?.url || '' }
         },
         klipy: {
             slug: item?.slug || '',
