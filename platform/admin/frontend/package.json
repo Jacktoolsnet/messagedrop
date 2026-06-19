@@ -31,15 +31,15 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/cdk": "21.2.4",
-    "@angular/common": "21.2.4",
-    "@angular/compiler": "21.2.4",
-    "@angular/core": "21.2.4",
-    "@angular/forms": "21.2.4",
-    "@angular/material": "21.2.4",
-    "@angular/platform-browser": "21.2.4",
-    "@angular/router": "21.2.4",
-    "@angular/service-worker": "21.2.4",
+    "@angular/cdk": "22.0.2",
+    "@angular/common": "22.0.2",
+    "@angular/compiler": "22.0.2",
+    "@angular/core": "22.0.2",
+    "@angular/forms": "22.0.2",
+    "@angular/material": "22.0.2",
+    "@angular/platform-browser": "22.0.2",
+    "@angular/router": "22.0.2",
+    "@angular/service-worker": "22.0.2",
     "chart.js": "^4.5.0",
     "chartjs-plugin-annotation": "^3.1.0",
     "leaflet": "^1.9.4",
@@ -47,26 +47,25 @@
     "tslib": "^2.3.0"
   },
   "devDependencies": {
-    "@angular/build": "^21.2.9",
-    "@angular/cli": "21.2.5",
-    "@angular/compiler-cli": "21.2.4",
+    "@angular/build": "^22.0.3",
+    "@angular/cli": "22.0.3",
+    "@angular/compiler-cli": "22.0.2",
     "@types/jasmine": "~5.1.0",
     "@types/leaflet": "^1.9.20",
-    "angular-eslint": "20.5.1",
+    "angular-eslint": "^22.0.0",
     "baseline-browser-mapping": "^2.9.5",
-    "eslint": "^9.38.0",
+    "eslint": "^10.5.0",
+    "istanbul-lib-instrument": "^6.0.3",
     "jasmine-core": "~5.9.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.9.2",
-    "typescript-eslint": "8.46.2"
+    "typescript": "6.0.3",
+    "typescript-eslint": "^8.61.1"
   },
   "overrides": {
-    "ajv": "8.18.0",
-    "undici": "7.24.0",
-    "ws": "8.20.1"
+    "undici": "7.24.0"
   }
 }

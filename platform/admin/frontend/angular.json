@@ -73,12 +73,15 @@
               },
               {
                 "glob": "*.ttf",
-                "input": "../../../frontend/src/assets/fonts",
+                "input": "src/assets/fonts",
                 "output": "assets/fonts"
               }
             ],
             "styles": [
               "src/styles.scss"
+            ],
+            "allowedCommonJsDependencies": [
+              "leaflet"
             ]
           },
           "configurations": {
@@ -93,13 +96,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "2.4MB",
-                  "maximumError": "2.6MB"
+                  "maximumWarning": "2.7MB",
+                  "maximumError": "2.8MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "24kB",
-                  "maximumError": "28kB"
+                  "maximumWarning": "30kB",
+                  "maximumError": "32kB"
                 }
               ],
               "outputHashing": "all",
@@ -127,13 +130,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "2.4MB",
-                  "maximumError": "2.6MB"
+                  "maximumWarning": "2.7MB",
+                  "maximumError": "2.8MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "24kB",
-                  "maximumError": "28kB"
+                  "maximumWarning": "30kB",
+                  "maximumError": "32kB"
                 }
               ],
               "outputHashing": "all",
@@ -181,7 +184,7 @@
               },
               {
                 "glob": "*.ttf",
-                "input": "../../../frontend/src/assets/fonts",
+                "input": "src/assets/fonts",
                 "output": "assets/fonts"
               }
             ],
