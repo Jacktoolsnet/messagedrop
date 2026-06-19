@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, Signal } from '@angular/core';
+import { Component, computed, effect, inject, Signal, ChangeDetectionStrategy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 
 import { CommonModule } from '@angular/common';
@@ -54,6 +54,7 @@ interface TimezoneResponse { status: number; timezone: string }
     TranslocoPipe
   ],
   templateUrl: './placelist.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './placelist.component.css'
 })
 export class PlacelistComponent {

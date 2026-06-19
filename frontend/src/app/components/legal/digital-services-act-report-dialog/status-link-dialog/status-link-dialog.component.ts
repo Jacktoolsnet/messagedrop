@@ -1,5 +1,5 @@
 
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -25,6 +25,7 @@ export interface DsaStatusLinkDialogData {
   imports: [
     DialogHeaderComponent,MatDialogModule, MatButtonModule, MatIconModule, MatTooltipModule, TranslocoPipe],
   templateUrl: './status-link-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './status-link-dialog.component.css'
 })
 export class DsaStatusLinkDialogComponent {

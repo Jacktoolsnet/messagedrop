@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+import { Component, DestroyRef, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogActions, MatDialogContent, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -36,6 +36,7 @@ const DEFAULT_MAX_BASE64_BYTES = 1_500_000;
     TranslocoPipe
   ],
   templateUrl: './audio-recorder.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './audio-recorder.component.css'
 })
 export class AudioRecorderComponent {

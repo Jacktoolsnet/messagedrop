@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, OnDestroy, signal } from '@angular/core';
+import { Component, computed, effect, inject, OnDestroy, signal, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -22,6 +22,7 @@ export interface ImageGalleryDialogData {
   imports: [MatButtonModule, MatIcon, TranslocoPipe],
   templateUrl: './image-gallery-dialog.component.html',
   styleUrl: './image-gallery-dialog.component.css',
+  changeDetection: ChangeDetectionStrategy.Eager,
   host: {
     '(document:keydown)': 'onDocumentKeydown($event)'
   }

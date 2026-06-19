@@ -29,12 +29,12 @@
       <p class="unsplash-badge">
         <span>{{ 'common.avatarAttribution.photoBy' | transloco }}</span>
         <a class="unsplash-badge__link"
-          [href]="contact.avatarAttribution?.authorUrl" target="_blank"
+          [href]="$safeNavigationMigration(contact.avatarAttribution?.authorUrl)" target="_blank"
           rel="noopener">
           {{ contact.avatarAttribution?.authorName }}
         </a>
         <span>{{ 'common.avatarAttribution.onUnsplash' | transloco }}</span>
-        <a class="unsplash-badge__link" [href]="contact.avatarAttribution?.unsplashUrl"
+        <a class="unsplash-badge__link" [href]="$safeNavigationMigration(contact.avatarAttribution?.unsplashUrl)"
           target="_blank" rel="noopener">
           Unsplash
         </a>
@@ -74,12 +74,12 @@
       <p class="unsplash-badge">
         <span>{{ 'common.avatarAttribution.photoBy' | transloco }}</span>
         <a class="unsplash-badge__link"
-          [href]="contact.chatBackgroundAttribution?.authorUrl"
+          [href]="$safeNavigationMigration(contact.chatBackgroundAttribution?.authorUrl)"
           target="_blank" rel="noopener">
           {{ contact.chatBackgroundAttribution?.authorName }}
         </a>
         <span>{{ 'common.avatarAttribution.onUnsplash' | transloco }}</span>
-        <a class="unsplash-badge__link" [href]="contact.chatBackgroundAttribution?.unsplashUrl"
+        <a class="unsplash-badge__link" [href]="$safeNavigationMigration(contact.chatBackgroundAttribution?.unsplashUrl)"
           target="_blank" rel="noopener">
           Unsplash
         </a>

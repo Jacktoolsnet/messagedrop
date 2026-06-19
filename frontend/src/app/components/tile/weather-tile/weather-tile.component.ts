@@ -1,4 +1,4 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, Input, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -14,6 +14,7 @@ import { WeatherComponent } from '../../weather/weather.component';
   selector: 'app-weather-tile',
   imports: [MatIcon, TranslocoPipe],
   templateUrl: './weather-tile.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './weather-tile.component.css'
 })
 export class WeatherTileComponent {

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogActions, MatDialogContent, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -30,6 +30,7 @@ export interface ExperienceTileDetailData {
     TranslocoPipe
   ],
   templateUrl: './experience-tile-detail.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './experience-tile-detail.component.css'
 })
 export class ExperienceTileDetailComponent implements OnInit {

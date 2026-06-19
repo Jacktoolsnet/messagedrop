@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, inject, Injector, OnInit, runInInjectionContext, signal } from '@angular/core';
+import { Component, effect, inject, Injector, OnInit, runInInjectionContext, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -39,6 +39,7 @@ import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.comp
     TranslocoPipe
   ],
   templateUrl: './weather.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./weather.component.css']
 })
 export class WeatherComponent implements OnInit {

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, OnDestroy, inject } from '@angular/core';
+import { Component, HostListener, OnDestroy, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -21,6 +21,7 @@ interface CheckPinDialogData {
     TranslocoPipe
   ],
   templateUrl: './check-pin.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './check-pin.component.css'
 })
 

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AfterViewInit, Component, ElementRef, inject, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, inject, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import {
   CategoryScale,
   Chart,
@@ -30,6 +30,7 @@ const RADAR_POINT_LABEL_PADDING_PX = 2;
   selector: 'app-weather-detail',
   imports: [],
   templateUrl: './weather-detail.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './weather-detail.component.css'
 })
 export class WeatherDetailComponent implements OnChanges, AfterViewInit, OnDestroy {

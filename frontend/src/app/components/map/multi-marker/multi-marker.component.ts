@@ -1,5 +1,5 @@
 
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -30,6 +30,7 @@ import { ShortNumberPipe } from '../../../pipes/short-number.pipe';
     TranslocoPipe
 ],
     templateUrl: './multi-marker.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './multi-marker.component.css'
 })
 export class MultiMarkerComponent {

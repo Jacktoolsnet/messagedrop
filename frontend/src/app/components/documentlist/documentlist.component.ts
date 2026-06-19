@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, computed, effect, inject, OnInit, WritableSignal } from '@angular/core';
+import { Component, computed, effect, inject, OnInit, WritableSignal, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
@@ -42,6 +42,7 @@ interface DocumentDialogData {
   ],
   templateUrl: './documentlist.component.html',
   styleUrl: './documentlist.component.css',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true
 })
 export class DocumentlistComponent implements OnInit {

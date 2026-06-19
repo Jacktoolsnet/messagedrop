@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
@@ -41,6 +41,7 @@ import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.comp
     EnableLocationComponent
   ],
   templateUrl: './app-settings.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './app-settings.component.css'
 })
 export class AppSettingsComponent implements OnInit {

@@ -31,12 +31,12 @@
     <p class="unsplash-badge">
       <span>{{ 'common.avatarAttribution.photoBy' | transloco }}</span>
       <a class="unsplash-badge__link"
-        [href]="profile.avatarAttribution?.authorUrl" target="_blank"
+        [href]="$safeNavigationMigration(profile.avatarAttribution?.authorUrl)" target="_blank"
         rel="noopener">
         {{ profile.avatarAttribution?.authorName }}
       </a>
       <span>{{ 'common.avatarAttribution.onUnsplash' | transloco }}</span>
-      <a class="unsplash-badge__link" [href]="profile.avatarAttribution?.unsplashUrl"
+      <a class="unsplash-badge__link" [href]="$safeNavigationMigration(profile.avatarAttribution?.unsplashUrl)"
         target="_blank" rel="noopener">
         Unsplash
       </a>

@@ -66,12 +66,12 @@
                     === 'unsplash') {
                     <div class="unsplash-badge">
                         <span class="unsplash-badge__text">{{ 'common.avatarAttribution.photosBy' | transloco }}</span>
-                        <a class="unsplash-badge__link" [href]="contact.avatarAttribution?.authorUrl" target="_blank"
+                        <a class="unsplash-badge__link" [href]="$safeNavigationMigration(contact.avatarAttribution?.authorUrl)" target="_blank"
                             rel="noopener">
                             {{ contact.avatarAttribution?.authorName }}
                         </a>
                         <span class="unsplash-badge__text">{{ 'common.avatarAttribution.and' | transloco }}</span>
-                        <a class="unsplash-badge__link" [href]="contact.chatBackgroundAttribution?.authorUrl"
+                        <a class="unsplash-badge__link" [href]="$safeNavigationMigration(contact.chatBackgroundAttribution?.authorUrl)"
                             target="_blank" rel="noopener">
                             {{ contact.chatBackgroundAttribution?.authorName }}
                         </a>

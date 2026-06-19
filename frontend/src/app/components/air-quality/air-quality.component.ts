@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Injector, OnInit, computed, effect, inject, runInInjectionContext, signal } from '@angular/core';
+import { Component, Injector, OnInit, computed, effect, inject, runInInjectionContext, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -38,6 +38,7 @@ import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.comp
     TranslocoPipe
   ],
   templateUrl: './air-quality.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./air-quality.component.css']
 })
 export class AirQualityComponent implements OnInit {

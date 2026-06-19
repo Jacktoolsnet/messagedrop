@@ -1,5 +1,5 @@
 
-import { Component, ElementRef, ViewChild, inject } from '@angular/core';
+import { Component, ElementRef, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
@@ -30,6 +30,7 @@ import { DisplayMessageService } from '../../../services/display-message.service
     TranslocoPipe
 ],
   templateUrl: './connect.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './connect.component.css'
 })
 export class ConnectComponent {

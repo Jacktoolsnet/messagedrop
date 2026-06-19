@@ -1,6 +1,6 @@
 
 import { HttpClient } from '@angular/common/http';
-import { Component, OnDestroy, computed, inject, signal } from '@angular/core';
+import { Component, OnDestroy, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogActions, MatDialogContent, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -26,6 +26,7 @@ import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.c
     TranslocoPipe
   ],
   templateUrl: './legal-notice.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./legal-notice.component.css']
 })
 export class LegalNoticeComponent implements OnDestroy {

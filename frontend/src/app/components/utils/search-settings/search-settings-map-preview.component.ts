@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import * as leaflet from 'leaflet';
 import { Location } from '../../../interfaces/location';
 
@@ -16,6 +16,7 @@ const DEFAULT_MARKER_ICON_URL = 'assets/markers/location-marker.svg';
   selector: 'app-search-settings-map-preview',
   standalone: true,
   templateUrl: './search-settings-map-preview.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './search-settings-map-preview.component.css'
 })
 export class SearchSettingsMapPreviewComponent implements AfterViewInit, OnChanges, OnDestroy {

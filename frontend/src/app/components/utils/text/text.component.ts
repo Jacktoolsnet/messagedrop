@@ -1,5 +1,5 @@
 
-import { Component, ElementRef, ViewChild, inject } from '@angular/core';
+import { Component, ElementRef, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
@@ -31,6 +31,7 @@ interface TextDialogData {
     TranslocoPipe
   ],
   templateUrl: './text.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './text.component.css'
 })
 export class TextComponent {

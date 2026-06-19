@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, OnDestroy, inject } from '@angular/core';
+import { Component, HostListener, OnDestroy, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -25,6 +25,7 @@ interface CreatePinDialogData {
     TranslocoPipe
   ],
   templateUrl: './create-pin.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './create-pin.component.css'
 })
 export class CreatePinComponent implements OnDestroy {

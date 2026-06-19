@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -49,6 +49,7 @@ import { DisplayMessageService } from '../../../../services/display-message.serv
     TranslocoPipe
   ],
   templateUrl: './dsa-case-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './dsa-case-dialog.component.css'
 })
 export class DsaCaseDialogComponent implements OnInit {

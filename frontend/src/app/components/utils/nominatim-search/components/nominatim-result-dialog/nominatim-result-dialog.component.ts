@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -33,6 +33,7 @@ interface NominatimResultDialogData {
     NominatimResultItemComponent
   ],
   templateUrl: './nominatim-result-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './nominatim-result-dialog.component.css'
 })
 export class NominatimResultDialogComponent {

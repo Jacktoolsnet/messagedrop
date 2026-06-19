@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import * as leaflet from 'leaflet';
 import { BoundingBox } from '../../../../../interfaces/bounding-box';
 import { Location } from '../../../../../interfaces/location';
@@ -52,6 +52,7 @@ const selectedMarkerIcon = leaflet.icon({
   selector: 'app-hashtag-results-map',
   standalone: true,
   templateUrl: './hashtag-results-map.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './hashtag-results-map.component.css'
 })
 export class HashtagResultsMapComponent implements AfterViewInit, OnChanges, OnDestroy {

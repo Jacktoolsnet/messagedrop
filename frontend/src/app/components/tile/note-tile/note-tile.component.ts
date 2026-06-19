@@ -1,5 +1,5 @@
 
-import { Component, computed, inject, Input, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, computed, inject, Input, OnInit, signal, WritableSignal, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -19,6 +19,7 @@ import { NotelistComponent } from '../../notelist/notelist.component';
     TranslocoPipe
   ],
   templateUrl: './note-tile.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './note-tile.component.css'
 })
 export class NoteTileComponent implements OnInit {

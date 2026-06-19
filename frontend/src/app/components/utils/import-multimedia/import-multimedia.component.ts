@@ -1,5 +1,5 @@
 
-import { Component, ElementRef, ViewChild, effect, inject } from '@angular/core';
+import { Component, ElementRef, ViewChild, effect, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
@@ -40,6 +40,7 @@ interface SupportedServiceTile {
     TranslocoPipe
   ],
   templateUrl: './import-multimedia.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './import-multimedia.component.css'
 })
 export class ImportMultimediaComponent {

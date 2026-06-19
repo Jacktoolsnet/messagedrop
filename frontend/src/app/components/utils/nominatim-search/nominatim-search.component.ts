@@ -1,5 +1,5 @@
 
-import { Component, ElementRef, ViewChild, inject } from '@angular/core';
+import { Component, ElementRef, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
@@ -55,6 +55,7 @@ type TimezoneResponse = SimpleStatusResponse & { timezone?: string };
     NominatimResultsMapComponent
   ],
   templateUrl: './nominatim-search.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './nominatim-search.component.css'
 })
 export class NominatimSearchComponent {

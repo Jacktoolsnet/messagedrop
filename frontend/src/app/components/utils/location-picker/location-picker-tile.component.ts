@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, inject } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -28,6 +28,7 @@ const markerIcons: Record<MarkerKind, leaflet.Icon> = {
   imports: [MatButtonModule, MatIcon, TranslocoPipe],
   templateUrl: './location-picker-tile.component.html',
   styleUrl: './location-picker-tile.component.css',
+  changeDetection: ChangeDetectionStrategy.Eager,
   host: {
     class: 'location-picker-tile-host'
   }

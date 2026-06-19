@@ -1,5 +1,5 @@
 
-import { Component, computed, inject, Input, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, computed, inject, Input, OnDestroy, OnInit, signal, WritableSignal, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -20,6 +20,7 @@ import { MessagelistComponent } from '../../messagelist/messagelist.component';
     TranslocoPipe
   ],
   templateUrl: './messagetile.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './messagetile.component.css'
 })
 

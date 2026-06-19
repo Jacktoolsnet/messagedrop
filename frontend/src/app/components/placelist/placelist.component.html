@@ -33,12 +33,12 @@
                     @if (place.avatarAttribution?.source === 'unsplash' && place.placeBackgroundAttribution?.source === 'unsplash') {
                     <div class="unsplash-badge">
                         <span class="unsplash-badge__text">{{ 'common.avatarAttribution.photosBy' | transloco }}</span>
-                        <a class="unsplash-badge__link" [href]="place.avatarAttribution?.authorUrl" target="_blank"
+                        <a class="unsplash-badge__link" [href]="$safeNavigationMigration(place.avatarAttribution?.authorUrl)" target="_blank"
                             rel="noopener">
                             {{ place.avatarAttribution?.authorName }}
                         </a>
                         <span class="unsplash-badge__text">{{ 'common.avatarAttribution.and' | transloco }}</span>
-                        <a class="unsplash-badge__link" [href]="place.placeBackgroundAttribution?.authorUrl"
+                        <a class="unsplash-badge__link" [href]="$safeNavigationMigration(place.placeBackgroundAttribution?.authorUrl)"
                             target="_blank" rel="noopener">
                             {{ place.placeBackgroundAttribution?.authorName }}
                         </a>

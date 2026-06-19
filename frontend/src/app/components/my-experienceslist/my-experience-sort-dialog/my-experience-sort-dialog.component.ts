@@ -1,6 +1,6 @@
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -33,6 +33,7 @@ interface MyExperienceSortDialogResult {
     TranslocoPipe
   ],
   templateUrl: './my-experience-sort-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './my-experience-sort-dialog.component.css'
 })
 export class MyExperienceSortDialogComponent {

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, inject } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from "@angular/material/icon";
@@ -21,6 +21,7 @@ import { DialogHeaderComponent } from '../dialog-header/dialog-header.component'
     MatIcon
   ],
   templateUrl: './scanner.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './scanner.component.css'
 })
 export class ScannerComponent implements AfterViewInit, OnDestroy {

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, effect, inject } from '@angular/core';
+import { Component, OnInit, effect, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -65,6 +65,7 @@ type UsageTimePickerModel = Record<UsageProtectionDayKey, { start: Date; end: Da
     TranslocoPipe
   ],
   templateUrl: './usage-protection.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './usage-protection.component.css'
 })
 export class UsageProtectionComponent implements OnInit {

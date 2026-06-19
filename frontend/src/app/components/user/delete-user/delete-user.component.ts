@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from "@angular/material/icon";
@@ -17,6 +17,7 @@ export interface ConfirmDialogData {
   imports: [
     DialogHeaderComponent,MatButtonModule, MatDialogActions, MatDialogClose, MatDialogContent, TranslocoPipe, MatIcon],
   templateUrl: './delete-user.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './delete-user.component.css'
 })
 export class DeleteUserComponent {

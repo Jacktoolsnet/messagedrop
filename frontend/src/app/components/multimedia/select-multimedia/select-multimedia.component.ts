@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Output, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -14,6 +14,7 @@ import { GifSearchComponent } from '../../utils/gif-search/gif-search.component'
     TranslocoPipe
   ],
   templateUrl: './select-multimedia.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './select-multimedia.component.css'
 })
 export class SelectMultimediaComponent {

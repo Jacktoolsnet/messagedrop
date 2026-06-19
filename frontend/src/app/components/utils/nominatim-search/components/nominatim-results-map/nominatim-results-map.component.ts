@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import * as leaflet from 'leaflet';
 import { BoundingBox } from '../../../../../interfaces/bounding-box';
 import { Location } from '../../../../../interfaces/location';
@@ -20,6 +20,7 @@ const selectedMarkerIcon = leaflet.icon({
   selector: 'app-nominatim-results-map',
   standalone: true,
   templateUrl: './nominatim-results-map.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './nominatim-results-map.component.css'
 })
 export class NominatimResultsMapComponent implements AfterViewInit, OnChanges, OnDestroy {

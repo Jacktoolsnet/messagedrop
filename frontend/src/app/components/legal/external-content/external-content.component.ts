@@ -1,5 +1,5 @@
 
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -33,6 +33,7 @@ interface ExternalContentDialogData {
     TranslocoPipe
   ],
   templateUrl: './external-content.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './external-content.component.css'
 })
 export class ExternalContentComponent {

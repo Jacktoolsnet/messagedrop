@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -11,6 +11,7 @@ import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.c
   imports: [
     DialogHeaderComponent,MatButtonModule, MatDialogContent, MatDialogActions, MatDialogClose, MatIcon, TranslocoPipe],
   templateUrl: './delete-all-system-notification.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './delete-all-system-notification.component.css'
 })
 export class DeleteAllSystemNotificationComponent {

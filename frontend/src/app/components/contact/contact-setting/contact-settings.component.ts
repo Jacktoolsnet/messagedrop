@@ -1,5 +1,5 @@
 
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
@@ -41,6 +41,7 @@ import { DisplayMessageService } from '../../../services/display-message.service
     TranslocoPipe
   ],
   templateUrl: './contact-settings.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './contact-settings.component.css'
 })
 export class ContactSettingsComponent {

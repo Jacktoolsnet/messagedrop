@@ -80,10 +80,10 @@
               </div>
               <div class="detail-subtile__body">
                 @if (supplierInfo()?.contact?.email) {
-                  <a class="detail-link" [href]="'mailto:' + supplierInfo()?.contact?.email">{{ supplierInfo()?.contact?.email }}</a>
+                  <a class="detail-link" [href]="'mailto:' + $safeNavigationMigration(supplierInfo()?.contact?.email)">{{ supplierInfo()?.contact?.email }}</a>
                 }
                 @if (supplierInfo()?.contact?.phone) {
-                  <a class="detail-link" [href]="'tel:' + supplierInfo()?.contact?.phone">{{ supplierInfo()?.contact?.phone }}</a>
+                  <a class="detail-link" [href]="'tel:' + $safeNavigationMigration(supplierInfo()?.contact?.phone)">{{ supplierInfo()?.contact?.phone }}</a>
                 }
               </div>
             </div>

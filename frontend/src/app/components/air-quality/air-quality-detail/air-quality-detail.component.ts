@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AfterViewInit, Component, ElementRef, inject, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, inject, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialogModule } from '@angular/material/dialog';
 import {
   CategoryScale,
@@ -28,6 +28,7 @@ const RADAR_POINT_LABEL_PADDING_PX = 2;
   standalone: true,
   imports: [MatDialogModule],
   templateUrl: './air-quality-detail.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './air-quality-detail.component.css'
 })
 export class AirQualityDetailComponent implements OnChanges, AfterViewInit, OnDestroy {

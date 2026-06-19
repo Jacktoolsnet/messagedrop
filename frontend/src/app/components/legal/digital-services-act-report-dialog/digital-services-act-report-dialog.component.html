@@ -91,7 +91,7 @@
             <mat-hint align="start">
               {{
               (formalForm.get('reporterEmail')?.value || '').trim()
-              ? ('dsa.report.fields.emailHintProvided' | transloco:{ email: formalForm.get('reporterEmail')?.value })
+              ? ('dsa.report.fields.emailHintProvided' | transloco:{ email: $safeNavigationMigration(formalForm.get('reporterEmail')?.value) })
               : ('dsa.report.fields.emailHintMissing' | transloco)
               }}
             </mat-hint>

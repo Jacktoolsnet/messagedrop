@@ -1,4 +1,4 @@
-import { DestroyRef, Component, computed, effect, inject, signal } from '@angular/core';
+import { DestroyRef, Component, computed, effect, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -76,6 +76,7 @@ interface HashtagSearchListTile {
     TranslocoPipe
   ],
   templateUrl: './hashtag-search.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './hashtag-search.component.css'
 })
 export class HashtagSearchComponent {

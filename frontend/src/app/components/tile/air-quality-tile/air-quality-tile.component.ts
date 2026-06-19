@@ -1,4 +1,4 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, Input, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -15,6 +15,7 @@ import { AirQualityComponent } from '../../air-quality/air-quality.component';
   selector: 'app-air-quality-tile',
   imports: [MatIcon, MatButtonModule, TranslocoPipe],
   templateUrl: './air-quality-tile.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './air-quality-tile.component.css'
 })
 export class AirQualityTileComponent {

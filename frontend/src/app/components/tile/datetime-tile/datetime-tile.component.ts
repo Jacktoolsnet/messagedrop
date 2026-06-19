@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { PlaceService } from '../../../services/place.service';
@@ -7,6 +7,7 @@ import { PlaceService } from '../../../services/place.service';
   selector: 'app-datetime-tile',
   imports: [MatIcon, TranslocoPipe],
   templateUrl: './datetime-tile.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './datetime-tile.component.css'
 })
 export class DateTimeTileComponent implements OnInit, OnDestroy {

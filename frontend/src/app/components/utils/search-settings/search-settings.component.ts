@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
@@ -75,6 +75,7 @@ interface SearchSettingsDialogData {
     SearchSettingsMapPreviewComponent
   ],
   templateUrl: './search-settings.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './search-settings.component.css'
 })
 export class SearchSettingsComponent {

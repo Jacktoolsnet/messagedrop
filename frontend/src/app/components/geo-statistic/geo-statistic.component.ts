@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, inject } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -35,6 +35,7 @@ interface CategoryColor { border: string; background: string; point: string }
     TranslocoPipe
   ],
   templateUrl: './geo-statistic.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './geo-statistic.component.css'
 })
 export class GeoStatisticComponent implements AfterViewInit, OnDestroy {

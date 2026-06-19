@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Input, NgZone, OnChanges, OnDestroy, SimpleChanges, effect, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, NgZone, OnChanges, OnDestroy, SimpleChanges, effect, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -23,6 +23,7 @@ import { ExternalContentComponent } from '../../legal/external-content/external-
     TranslocoPipe
   ],
   templateUrl: './showmultimedia.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './showmultimedia.component.css'
 })
 export class ShowmultimediaComponent implements OnChanges, OnDestroy {

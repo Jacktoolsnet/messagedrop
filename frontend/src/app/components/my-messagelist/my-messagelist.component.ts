@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, inject, OnDestroy, OnInit, signal, untracked, WritableSignal } from '@angular/core';
+import { Component, computed, effect, inject, OnDestroy, OnInit, signal, untracked, WritableSignal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -66,6 +66,7 @@ type PublishFilter = 'all' | 'published' | 'unpublished' | 'missing_online' | 'd
     TranslocoPipe
   ],
   templateUrl: './my-messagelist.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './my-messagelist.component.css'
 })
 export class MyMessagelistComponent implements OnInit, OnDestroy {

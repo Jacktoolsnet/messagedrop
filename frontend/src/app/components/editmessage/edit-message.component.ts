@@ -1,5 +1,5 @@
 
-import { Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatAutocompleteModule, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
@@ -66,6 +66,7 @@ type EditMessageAction = 'publish' | 'draft';
     TranslocoPipe
   ],
   templateUrl: './edit-message.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './edit-message.component.css'
 })
 export class EditMessageComponent implements OnInit {

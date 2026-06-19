@@ -1,6 +1,6 @@
 
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, computed, effect, inject, WritableSignal } from '@angular/core';
+import { Component, OnDestroy, computed, effect, inject, WritableSignal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -54,6 +54,7 @@ import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.comp
   ],
   templateUrl: './notelist.component.html',
   styleUrl: './notelist.component.css',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true
 })
 export class NotelistComponent implements OnDestroy {

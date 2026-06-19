@@ -1,5 +1,5 @@
 import { formatDate, PlatformLocation } from '@angular/common';
-import { Component, computed, DestroyRef, effect, inject, LOCALE_ID, OnInit, signal, untracked } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, LOCALE_ID, OnInit, signal, untracked, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -138,6 +138,7 @@ const Q_STAGE_WARNING_SESSION_KEY = 'messagedrop.qStageWarningSeen';
     MatProgressSpinnerModule
   ],
   templateUrl: './app.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './app.component.css'
 })
 

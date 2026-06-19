@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, DestroyRef, OnDestroy, computed, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, OnDestroy, computed, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
@@ -41,6 +41,7 @@ const GENERIC_READ_ALOUD_ITEM: HelpItem = {
     TranslocoPipe
   ],
   templateUrl: './help-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './help-dialog.component.css'
 })
 export class HelpDialogComponent implements OnDestroy {

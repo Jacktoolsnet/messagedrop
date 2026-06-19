@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, inject, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component, inject, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
@@ -62,6 +62,7 @@ const selectedSearchMarkerIcon = leaflet.icon({
     NominatimResultsListComponent
   ],
   templateUrl: './location-picker-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './location-picker-dialog.component.css'
 })
 export class LocationPickerDialogComponent implements AfterViewInit, OnDestroy {

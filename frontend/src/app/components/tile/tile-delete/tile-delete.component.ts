@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -11,6 +11,7 @@ import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.c
   imports: [
     DialogHeaderComponent,MatButtonModule, MatDialogActions, MatDialogClose, MatDialogContent, MatIcon, TranslocoPipe],
   templateUrl: './tile-delete.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './tile-delete.component.css'
 })
 export class TileDeleteComponent {

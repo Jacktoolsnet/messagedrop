@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
+import { AfterViewInit, Component, Input, OnChanges, OnDestroy, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import * as leaflet from 'leaflet';
 import { Location } from '../../../interfaces/location';
 
@@ -21,6 +21,7 @@ const markerIcons: Record<MarkerKind, leaflet.Icon> = {
   selector: 'app-location-preview',
   standalone: true,
   templateUrl: './location-preview.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './location-preview.component.css'
 })
 export class LocationPreviewComponent implements AfterViewInit, OnChanges, OnDestroy {

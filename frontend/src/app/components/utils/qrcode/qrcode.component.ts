@@ -1,5 +1,5 @@
 
-import { Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent } from '@angular/material/dialog';
 import { MatIcon } from "@angular/material/icon";
@@ -20,6 +20,7 @@ import { DialogHeaderComponent } from '../dialog-header/dialog-header.component'
     MatIcon
   ],
   templateUrl: './qrcode.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './qrcode.component.css'
 })
 export class QrcodeComponent implements OnInit {

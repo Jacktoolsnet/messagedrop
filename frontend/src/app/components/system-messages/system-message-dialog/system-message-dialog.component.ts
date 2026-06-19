@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, inject, OnInit, signal } from '@angular/core';
+import { Component, effect, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleChange, MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
@@ -33,6 +33,7 @@ import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.c
     TranslocoPipe
   ],
   templateUrl: './system-message-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './system-message-dialog.component.css'
 })
 export class SystemMessageDialogComponent implements OnInit {

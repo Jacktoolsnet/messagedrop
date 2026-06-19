@@ -1,5 +1,5 @@
 
-import { Component, computed, effect, inject, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, computed, effect, inject, OnDestroy, OnInit, signal, WritableSignal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -71,6 +71,7 @@ interface ImageDialogData {
   ],
   templateUrl: './imagelist.component.html',
   styleUrl: './imagelist.component.css',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true
 })
 export class ImagelistComponent implements OnInit, OnDestroy {

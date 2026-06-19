@@ -1,6 +1,6 @@
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -35,6 +35,7 @@ interface ContactSortDialogResult {
     TranslocoPipe
   ],
   templateUrl: './contact-sort-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './contact-sort-dialog.component.css'
 })
 export class ContactSortDialogComponent {

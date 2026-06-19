@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, inject, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component, inject, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
@@ -36,6 +36,7 @@ interface OverrideExifDataDialogData {
   selector: 'app-override-exif-data',
   imports: [FormsModule, DialogHeaderComponent, MatButtonModule, MatSlideToggleModule, MatDialogActions, MatDialogClose, MatDialogContent, MatIcon, TranslocoPipe],
   templateUrl: './override-exif-data.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './override-exif-data.component.css'
 })
 export class OverrideExifDataComponent implements AfterViewInit, OnDestroy {

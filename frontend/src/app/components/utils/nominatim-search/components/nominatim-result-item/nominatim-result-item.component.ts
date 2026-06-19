@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
@@ -11,6 +11,7 @@ import { NominatimService } from '../../../../../services/nominatim.service';
   standalone: true,
   imports: [MatButtonModule, MatCardModule, MatIcon, TranslocoPipe],
   templateUrl: './nominatim-result-item.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './nominatim-result-item.component.css'
 })
 export class NominatimResultItemComponent {

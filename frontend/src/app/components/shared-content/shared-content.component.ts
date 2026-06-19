@@ -1,5 +1,5 @@
 
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -35,6 +35,7 @@ interface SharedContentDialogData {
     TranslocoPipe
 ],
   templateUrl: './shared-content.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './shared-content.component.css'
 })
 

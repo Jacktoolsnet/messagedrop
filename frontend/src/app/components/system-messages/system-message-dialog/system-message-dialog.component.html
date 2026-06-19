@@ -43,7 +43,7 @@
           <div class="detail-actions" role="group" [attr.aria-label]="'common.systemMessages.caseActionsAria' | transloco">
             @if (detail.metadata?.dsa?.statusUrl) {
             <button mat-icon-button color="primary" [matTooltip]="'common.systemMessages.openCaseDetails' | transloco"
-              (click)="openStatusLink(detail.metadata?.dsa?.statusUrl, $event)"
+              (click)="openStatusLink($safeNavigationMigration(detail.metadata?.dsa?.statusUrl), $event)"
               [attr.aria-label]="'common.systemMessages.openCaseDetails' | transloco">
               <mat-icon>open_in_new</mat-icon>
             </button>
@@ -120,7 +120,7 @@
         <div matListItemMeta class="notification-item__actions">
           @if (notification.metadata?.dsa?.statusUrl) {
           <button mat-icon-button color="primary" [matTooltip]="'common.systemMessages.openCaseDetails' | transloco"
-            (click)="openStatusLink(notification.metadata?.dsa?.statusUrl, $event)"
+            (click)="openStatusLink($safeNavigationMigration(notification.metadata?.dsa?.statusUrl), $event)"
             [attr.aria-label]="'common.systemMessages.openCaseDetails' | transloco">
             <mat-icon>open_in_new</mat-icon>
           </button>

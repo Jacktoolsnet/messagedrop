@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { NominatimPlace } from '../../../../../interfaces/nominatim-place';
 import { NominatimResultItemComponent } from '../nominatim-result-item/nominatim-result-item.component';
 
@@ -7,6 +7,7 @@ import { NominatimResultItemComponent } from '../nominatim-result-item/nominatim
   standalone: true,
   imports: [NominatimResultItemComponent],
   templateUrl: './nominatim-results-list.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './nominatim-results-list.component.css'
 })
 export class NominatimResultsListComponent {

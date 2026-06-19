@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 
 
@@ -45,6 +45,7 @@ interface TextDialogResult {
     TranslocoPipe
   ],
   templateUrl: './contact-edit-message.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './contact-edit-message.component.css'
 })
 export class ContactEditMessageComponent implements OnInit {

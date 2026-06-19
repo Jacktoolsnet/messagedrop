@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, inject } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Location } from '../../interfaces/location';
 import { MarkerLocation } from '../../interfaces/marker-location';
 import { MapService } from '../../services/map.service';
@@ -9,6 +9,7 @@ import { UserService } from '../../services/user.service';
   selector: 'app-map',
   imports: [],
   templateUrl: './map.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './map.component.css'
 })
 export class MapComponent implements AfterViewInit, OnChanges, OnDestroy {

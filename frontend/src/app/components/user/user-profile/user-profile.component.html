@@ -33,13 +33,13 @@
       <p class="unsplash-badge">
         <span>{{ 'common.avatarAttribution.photoBy' | transloco }}</span>
         <a class="unsplash-badge__link"
-          [href]="userService.getProfile().avatarAttribution?.authorUrl"
+          [href]="$safeNavigationMigration(userService.getProfile().avatarAttribution?.authorUrl)"
           target="_blank" rel="noopener">
           {{ userService.getProfile().avatarAttribution?.authorName }}
         </a>
         <span>{{ 'common.avatarAttribution.onUnsplash' | transloco }}</span>
         <a class="unsplash-badge__link"
-          [href]="userService.getProfile().avatarAttribution?.unsplashUrl"
+          [href]="$safeNavigationMigration(userService.getProfile().avatarAttribution?.unsplashUrl)"
           target="_blank" rel="noopener">
           Unsplash
         </a>

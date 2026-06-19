@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -9,6 +9,7 @@ import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.c
   imports: [
     DialogHeaderComponent,MatButtonModule, MatDialogActions, MatDialogClose, MatDialogContent, TranslocoPipe],
   templateUrl: './block-message.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './block-message.component.css'
 })
 export class BlockMessageComponent {

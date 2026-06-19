@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 
 
@@ -63,6 +63,7 @@ interface DialogHeaderConfig {
     TranslocoPipe
   ],
   templateUrl: './edit-note.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './edit-note.component.css'
 })
 export class EditNoteComponent implements OnInit, OnDestroy {

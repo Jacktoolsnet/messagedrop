@@ -1,5 +1,5 @@
 
-import { Component, Input, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
@@ -27,6 +27,7 @@ import { TermsOfServiceComponent } from '../terms-of-service/terms-of-service.co
     TranslocoPipe
   ],
   templateUrl: './consent-gate.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './consent-gate.component.css'
 })
 export class ConsentGateComponent implements OnInit, OnDestroy {

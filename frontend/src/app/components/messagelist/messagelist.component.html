@@ -37,8 +37,8 @@
                     (keyup.enter)="!userService.isReady() ? editMessageUserProfileAfterLogin(message) : editMessageUserProfile(message)"
                     (keyup.space)="!userService.isReady() ? editMessageUserProfileAfterLogin(message) : editMessageUserProfile(message)">
                     @if (profileService.getProfile(message.userId)?.base64Avatar) {
-                    <img class="avatar" [src]="profileService.getProfile(message.userId)?.base64Avatar"
-                        [attr.alt]="profileService.getProfile(message.userId)?.name ? ('common.messageList.avatarAltName' | transloco:{ name: profileService.getProfile(message.userId)?.name }) : ('common.messageList.avatarAltFallback' | transloco)">
+                    <img class="avatar" [src]="$safeNavigationMigration(profileService.getProfile(message.userId)?.base64Avatar)"
+                        [attr.alt]="profileService.getProfile(message.userId)?.name ? ('common.messageList.avatarAltName' | transloco:{ name: $safeNavigationMigration(profileService.getProfile(message.userId)?.name) }) : ('common.messageList.avatarAltFallback' | transloco)">
                     } @else {
                     <mat-icon>person</mat-icon>
                     }
@@ -223,8 +223,8 @@
                     (keyup.enter)="!userService.isReady() ? editMessageUserProfileAfterLogin(message) : editMessageUserProfile(message)"
                     (keyup.space)="!userService.isReady() ? editMessageUserProfileAfterLogin(message) : editMessageUserProfile(message)">
                     @if (profileService.getProfile(message.userId)?.base64Avatar) {
-                    <img class="avatar" [src]="profileService.getProfile(message.userId)?.base64Avatar"
-                        [attr.alt]="profileService.getProfile(message.userId)?.name ? ('common.messageList.avatarAltName' | transloco:{ name: profileService.getProfile(message.userId)?.name }) : ('common.messageList.avatarAltFallback' | transloco)">
+                    <img class="avatar" [src]="$safeNavigationMigration(profileService.getProfile(message.userId)?.base64Avatar)"
+                        [attr.alt]="profileService.getProfile(message.userId)?.name ? ('common.messageList.avatarAltName' | transloco:{ name: $safeNavigationMigration(profileService.getProfile(message.userId)?.name) }) : ('common.messageList.avatarAltFallback' | transloco)">
                     } @else {
                     <mat-icon>person</mat-icon>
                     }

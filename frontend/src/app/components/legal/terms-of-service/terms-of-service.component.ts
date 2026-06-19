@@ -1,6 +1,6 @@
 
 import { HttpClient } from '@angular/common/http';
-import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -27,6 +27,7 @@ import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.c
     TranslocoPipe
   ],
   templateUrl: './terms-of-service.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./terms-of-service.component.css']
 })
 export class TermsOfServiceComponent implements OnInit, OnDestroy {

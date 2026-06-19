@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, inject, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, computed, effect, inject, OnDestroy, OnInit, signal, WritableSignal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -66,6 +66,7 @@ type ModerationStatus = 'published' | 'review' | 'hidden';
     TranslocoPipe
   ],
   templateUrl: './messagelist.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './messagelist.component.css'
 })
 export class MessagelistComponent implements OnInit, OnDestroy {
