@@ -33,6 +33,9 @@
     <div class="multimedia_container">
         <img class="multimedia_image" [src]="getRenderableImageUrl()"
             [attr.alt]="multimedia?.title || ('common.multimedia.embeddedAlt' | transloco)" />
+        @if (isKlipyMultimedia()) {
+        <img class="klipy-watermark" [src]="klipyWatermarkUrl" alt="" aria-hidden="true" loading="lazy" />
+        }
     </div>
     @if (isKlipyMultimedia()) {
     <a class="attribution-link attribution-link--logo" [href]="getKlipyAttributionHref()" target="_blank"

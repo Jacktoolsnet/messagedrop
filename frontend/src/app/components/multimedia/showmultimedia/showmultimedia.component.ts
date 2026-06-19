@@ -29,6 +29,7 @@ export class ShowmultimediaComponent implements OnChanges, OnDestroy {
   @Input() multimedia: Multimedia | undefined;
   readonly stickerProtectionOverlayUrl = 'assets/images/sticker-protection-overlay.svg';
   readonly klipyAttributionLogoUrl = 'assets/klipy/Logos/SVG Files/Powered by KLIPY  - gray.svg';
+  readonly klipyWatermarkUrl = 'assets/klipy/Watermark/SVG Files/KLIPY Light with logo.svg';
 
   termsLinks?: { terms: string; privacy: string };
 
