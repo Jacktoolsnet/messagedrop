@@ -5,12 +5,12 @@
 - Always run frontend Node/Angular commands like this:
 
 ```bash
-bash -lc 'export NVM_DIR="$HOME/.config/nvm"; . "$NVM_DIR/nvm.sh"; nvm use 22.12.0 >/dev/null; <command>'
+bash -lc 'export NVM_DIR="$HOME/.config/nvm"; . "$NVM_DIR/nvm.sh"; nvm use 24.17.0 >/dev/null; <command>'
 ```
 
-- Prefer Node `v22.12.0` for this repo's Angular frontend builds.
+- Prefer Node `v24.17.0` for this repo's Angular frontend builds.
 - Example:
 
 ```bash
-bash -lc 'export NVM_DIR="$HOME/.config/nvm"; . "$NVM_DIR/nvm.sh"; nvm use 22.12.0 >/dev/null; npm run build'
+bash -lc 'export NVM_DIR="$HOME/.config/nvm"; . "$NVM_DIR/nvm.sh"; nvm use 24.17.0 >/dev/null; npm run build'
 ```

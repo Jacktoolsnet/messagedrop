@@ -76,7 +76,7 @@
         </div>
 
         @if (isLocationEditable) {
-        <app-location-picker-tile [location]="data.message.location" markerType="message"
+        <app-location-picker-tile [location]="data.message.location" markerType="message" [zoom]="12"
             (locationChange)="updateLocation($event)"></app-location-picker-tile>
         }
 

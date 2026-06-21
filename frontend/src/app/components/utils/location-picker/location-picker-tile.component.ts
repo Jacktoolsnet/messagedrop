@@ -36,6 +36,7 @@ const markerIcons: Record<MarkerKind, leaflet.Icon> = {
 export class LocationPickerTileComponent implements AfterViewInit, OnChanges, OnDestroy {
   @Input({ required: true }) location!: Location;
   @Input() markerType: MarkerKind = 'message';
+  @Input() zoom = 13;
   @Output() locationChange = new EventEmitter<Location>();
 
   readonly mapId = `location-preview-map-${Math.random().toString(36).slice(2)}`;
@@ -95,7 +96,7 @@ export class LocationPickerTileComponent implements AfterViewInit, OnChanges, On
     const { latitude, longitude } = this.location;
     this.map = leaflet.map(this.mapId, {
       center: [latitude, longitude],
-      zoom: 13,
+      zoom: this.zoom,
       worldCopyJump: true,
       zoomControl: false,
       dragging: false,
