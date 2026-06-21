@@ -37,14 +37,14 @@
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
     "node-cron": "^4.2.1",
-    "nodemailer": "^8.0.4",
+    "nodemailer": "9.0.1",
     "openai": "^6.7.0",
+    "pg": "^8.13.1",
     "playwright-chromium": "^1.56.1",
     "socket.io": "^4.8.1",
     "web-push": "^3.6.7",
     "winston": "^3.18.3",
-    "winston-daily-rotate-file": "^5.0.0",
-    "pg": "^8.13.1"
+    "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
     "@modelcontextprotocol/sdk": "^1.22.0",
@@ -52,6 +52,6 @@
     "globals": "^16.5.0"
   },
   "overrides": {
-    "ws": "8.20.1"
+    "ws": "8.21.0"
   }
 }
