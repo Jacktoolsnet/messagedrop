@@ -2637,6 +2637,43 @@ const HELP_TOPICS = {
       }
     ]
   },
+  tileEditShopping: {
+    titleKey: 'tileEditShopping.title',
+    introKey: 'tileEditShopping.intro',
+    items: [
+      {
+        icon: 'category',
+        titleKey: 'tileEditShopping.items.categories.title',
+        descriptionKey: 'tileEditShopping.items.categories.desc'
+      },
+      {
+        icon: 'add_shopping_cart',
+        titleKey: 'tileEditShopping.items.products.title',
+        descriptionKey: 'tileEditShopping.items.products.desc'
+      },
+      {
+        icon: 'drag_indicator',
+        titleKey: 'tileEditShopping.items.reorder.title',
+        descriptionKey: 'tileEditShopping.items.reorder.desc'
+      },
+      {
+        icon: 'shopping_cart_checkout',
+        titleKey: 'tileEditShopping.items.selection.title',
+        descriptionKey: 'tileEditShopping.items.selection.desc'
+      },
+      {
+        icon: 'payments',
+        titleKey: 'tileEditShopping.items.price.title',
+        descriptionKey: 'tileEditShopping.items.price.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'tileEditShopping.items.privacy.title',
+        descriptionKey: 'tileEditShopping.items.privacy.desc'
+      },
+      ...STANDARD_ACTIONS
+    ]
+  },
   avatarCropper: {
     titleKey: 'avatarCropper.title',
     introKey: 'avatarCropper.intro',

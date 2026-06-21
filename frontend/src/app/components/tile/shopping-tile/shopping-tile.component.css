@@ -1,0 +1,105 @@
+.shopping-tile {
+  position: relative;
+  border-radius: 1rem;
+  color: var(--mat-card-subtitle-text-color);
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.shopping-tile:hover {
+  transform: scale(1.02);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.shopping-header,
+.shopping-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.shopping-title {
+  flex: 1;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.shopping-count {
+  opacity: 0.7;
+}
+
+.shopping-summary {
+  justify-content: space-between;
+}
+
+.progress-track {
+  height: 0.4rem;
+  overflow: hidden;
+  border-radius: 1rem;
+  background: var(--mat-card-outlined-outline-color);
+}
+
+.progress-track span {
+  display: block;
+  height: 100%;
+  background: var(--mat-sys-primary);
+  transition: width 220ms ease;
+}
+
+.category-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-height: 18rem;
+  overflow: auto;
+}
+
+.category-preview h4 {
+  margin: 0 0 0.25rem;
+  font-size: 0.85rem;
+  opacity: 0.72;
+}
+
+.product {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 0;
+  border-radius: 0.6rem;
+  padding: 0.45rem;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.product:hover {
+  background: var(--mat-sys-surface-container-high);
+}
+
+.product mat-icon {
+  flex: 0 0 auto;
+}
+
+.product--done span {
+  text-decoration: line-through;
+  opacity: 0.62;
+}
+
+.start-button {
+  width: 100%;
+}
+
+.empty-state {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  opacity: 0.72;
+  font-style: italic;
+}

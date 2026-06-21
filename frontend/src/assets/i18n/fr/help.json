@@ -2064,6 +2064,18 @@
       }
     }
   },
+  "tileEditShopping": {
+    "title": "Tuile de liste de courses",
+    "intro": "Créez ici votre catalogue permanent et sélectionnez ce qu'il faut pour les prochaines courses.",
+    "items": {
+      "categories": { "title": "Gérer les catégories", "desc": "Créez des catégories, renommez-les ou supprimez-les." },
+      "products": { "title": "Gérer les produits", "desc": "Ajoutez des produits avec une quantité, une unité traduite et un prix prévu." },
+      "reorder": { "title": "Définir l'ordre", "desc": "Réorganisez les catégories et produits par glisser-déposer selon votre parcours dans le magasin." },
+      "selection": { "title": "Sélectionner pour les courses", "desc": "Utilisez l'icône du panier pour choisir les produits nécessaires lors des prochaines courses." },
+      "price": { "title": "Estimer les coûts", "desc": "Les prix enregistrés sont additionnés pour estimer le total des produits sélectionnés." },
+      "privacy": { "title": "Confidentialité et stockage", "desc": "Les catégories, produits et prix restent sur votre appareil et sont stockés chiffrés dans IndexedDB." }
+    }
+  },
   "avatarCropper": {
     "title": "Rogner l'avatar",
     "intro": "Cet écran vous permet d'ajuster la zone visible de votre image de profil avant validation.",

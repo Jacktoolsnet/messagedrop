@@ -1,0 +1,60 @@
+<app-dialog-header icon="shopping_cart_checkout" [title]="'common.tiles.shopping.modeTitle' | transloco"></app-dialog-header>
+
+<mat-dialog-content class="shopping-mode">
+  <div class="category-tabs" role="tablist" [attr.aria-label]="'common.tiles.shopping.categories' | transloco">
+    <button type="button" class="category-tab" [class.category-tab--active]="selectedCategoryId() === null"
+      (click)="selectCategory(null)">{{ 'common.tiles.shopping.allCategories' | transloco }}</button>
+    @for (category of activeCategories(); track category.id) {
+      <button type="button" class="category-tab" [class.category-tab--active]="selectedCategoryId() === category.id"
+        (click)="selectCategory(category.id)">{{ category.name }}</button>
+    }
+  </div>
+
+  @if (current(); as item) {
+    <div class="progress-row">
+      <span>{{ completedCount() }}/{{ entries().length }}</span>
+      <span>{{ formatPrice(estimatedTotal()) }}</span>
+    </div>
+    <div class="progress-track" aria-hidden="true">
+      <span [style.width.%]="entries().length ? completedCount() / entries().length * 100 : 0"></span>
+    </div>
+
+    <section class="product-card" [class.product-card--done]="item.product.done" [class.product-card--celebrate]="celebrating()">
+      <span class="product-category">{{ item.category.name }}</span>
+      <mat-icon class="product-icon">{{ item.product.done ? 'check_circle' : 'shopping_basket' }}</mat-icon>
+      <h2>{{ item.product.name }}</h2>
+      <p class="product-quantity">
+        {{ item.product.quantity }} {{ ('common.tiles.shopping.units.' + item.product.unit) | transloco }}
+      </p>
+      @if (item.product.price !== undefined) {
+        <p class="product-price">{{ formatPrice(item.product.price) }}</p>
+      }
+    </section>
+
+    <div class="navigation">
+      <button mat-fab type="button" (click)="previous()" [attr.aria-label]="'common.tiles.shopping.previous' | transloco">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <span>{{ currentIndex() + 1 }} / {{ entries().length }}</span>
+      <button mat-fab type="button" (click)="next()" [attr.aria-label]="'common.tiles.shopping.next' | transloco">
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+    </div>
+
+    <button mat-flat-button color="primary" type="button" class="done-button" (click)="toggleCurrent()">
+      <mat-icon>{{ item.product.done ? 'undo' : 'done' }}</mat-icon>
+      {{ (item.product.done ? 'common.tiles.shopping.putBack' : 'common.tiles.shopping.putInCart') | transloco }}
+    </button>
+  } @else {
+    <div class="finished">
+      <mat-icon>task_alt</mat-icon>
+      <h2>{{ 'common.tiles.shopping.nothingNeeded' | transloco }}</h2>
+    </div>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-icon-button type="button" (click)="close()" [attr.aria-label]="'common.actions.close' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+</mat-dialog-actions>

@@ -1,0 +1,46 @@
+<div class="shopping-tile" role="button" tabindex="0" (click)="editTile()" (keyup.enter)="editTile()" (keyup.space)="editTile()">
+  <header class="shopping-header">
+    <mat-icon>shopping_cart</mat-icon>
+    <span class="shopping-title">{{ title }}</span>
+    @if (activeProducts.length > 0) {
+      <span class="shopping-count">{{ completedCount }}/{{ activeProducts.length }}</span>
+    }
+  </header>
+
+  @if (activeProducts.length > 0) {
+    <div class="shopping-summary">
+      <span>{{ 'common.tiles.shopping.estimate' | transloco }}</span>
+      <strong>{{ formatPrice(estimatedTotal) }}</strong>
+    </div>
+    <div class="progress-track" aria-hidden="true">
+      <span [style.width.%]="completedCount / activeProducts.length * 100"></span>
+    </div>
+    <div class="category-preview">
+      @for (category of previewCategories; track category.name) {
+        <section>
+          <h4>{{ category.name }}</h4>
+          @for (product of category.products; track product.id) {
+            <button type="button" class="product" [class.product--done]="product.done" (click)="toggleProduct(product, $event)">
+              <mat-icon>{{ product.done ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+              <span>{{ product.quantity }} {{ ('common.tiles.shopping.units.' + product.unit) | transloco }} {{ product.name }}</span>
+            </button>
+          }
+        </section>
+      }
+    </div>
+    <button mat-flat-button color="primary" type="button" class="start-button" (click)="openShoppingMode($event)">
+      <mat-icon>play_arrow</mat-icon>
+      {{ 'common.tiles.shopping.start' | transloco }}
+    </button>
+  } @else if (shopping.categories.length > 0) {
+    <div class="empty-state">
+      <mat-icon>shopping_cart_checkout</mat-icon>
+      <span>{{ 'common.tiles.shopping.selectProducts' | transloco }}</span>
+    </div>
+  } @else {
+    <div class="empty-state">
+      <mat-icon>add_shopping_cart</mat-icon>
+      <span>{{ 'common.tiles.shopping.empty' | transloco }}</span>
+    </div>
+  }
+</div>

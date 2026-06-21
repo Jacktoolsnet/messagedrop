@@ -2082,6 +2082,18 @@
       }
     }
   },
+  "tileEditShopping": {
+    "title": "Einkaufslisten-Kachel",
+    "intro": "Hier baust du deine dauerhafte Produktliste auf und wählst aus, was du beim nächsten Einkauf benötigst.",
+    "items": {
+      "categories": { "title": "Kategorien verwalten", "desc": "Lege Kategorien wie Obst und Gemüse an, benenne sie um oder lösche sie." },
+      "products": { "title": "Produkte verwalten", "desc": "Füge Produkte mit Menge, sprachabhängiger Einheit und erwartetem Preis hinzu." },
+      "reorder": { "title": "Reihenfolge festlegen", "desc": "Sortiere Kategorien und Produkte per Drag-and-Drop passend zu deinem Weg durch den Laden." },
+      "selection": { "title": "Für den Einkauf auswählen", "desc": "Mit dem Einkaufswagen-Symbol legst du fest, welche dauerhaften Produkte du beim nächsten Einkauf benötigst." },
+      "price": { "title": "Kosten schätzen", "desc": "Hinterlegte Preise werden für alle ausgewählten Produkte zu einer Einkaufsschätzung addiert." },
+      "privacy": { "title": "Datenschutz und Speicherung", "desc": "Kategorien, Produkte und Preise bleiben lokal auf deinem Gerät und werden verschlüsselt in IndexedDB gespeichert." }
+    }
+  },
   "avatarCropper": {
     "title": "Avatar zuschneiden",
     "intro": "Hier passt du den sichtbaren Ausschnitt deines Profilbilds an, bevor du ihn übernimmst.",

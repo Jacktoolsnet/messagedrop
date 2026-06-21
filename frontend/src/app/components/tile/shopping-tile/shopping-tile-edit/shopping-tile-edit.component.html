@@ -1,0 +1,133 @@
+<app-dialog-header icon="shopping_cart" [title]="headerTitle"></app-dialog-header>
+
+<mat-dialog-content class="shopping-editor">
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>{{ 'common.tiles.shopping.titleLabel' | transloco }}</mat-label>
+    <input matInput [formControl]="titleControl" />
+  </mat-form-field>
+
+  <section class="editor-section">
+    <h3>{{ 'common.tiles.shopping.categories' | transloco }}</h3>
+    <div class="add-row">
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'common.tiles.shopping.categoryName' | transloco }}</mat-label>
+        <input matInput [formControl]="categoryControl" (keyup.enter)="addCategory()" />
+      </mat-form-field>
+      <button mat-mini-fab color="primary" type="button" (click)="addCategory()"
+        [disabled]="!categoryControl.value.trim()" [attr.aria-label]="'common.tiles.shopping.addCategory' | transloco">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+
+    <div cdkDropList [cdkDropListData]="categories()" class="category-list" (cdkDropListDropped)="dropCategory($event)">
+      @for (category of categories(); track category.id) {
+        <article class="category" cdkDrag>
+          <header class="category-header">
+            <button type="button" class="drag-handle" cdkDragHandle [attr.aria-label]="'common.tiles.shopping.reorderCategory' | transloco">
+              <mat-icon>drag_indicator</mat-icon>
+            </button>
+            <input class="plain-input category-name" [value]="category.name" (change)="renameCategory(category, $event)"
+              [attr.aria-label]="'common.tiles.shopping.categoryName' | transloco" />
+            <span class="category-count">{{ category.products.length }}</span>
+            <button mat-icon-button color="warn" type="button" (click)="deleteCategory(category)"
+              [attr.aria-label]="'common.tiles.shopping.deleteCategory' | transloco">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </header>
+
+          <div cdkDropList [cdkDropListData]="category.products" class="product-list"
+            (cdkDropListDropped)="dropProduct(category, $event)">
+            @for (product of category.products; track product.id) {
+              <div class="product-row" cdkDrag>
+                <button type="button" class="drag-handle" cdkDragHandle [attr.aria-label]="'common.tiles.shopping.reorderProduct' | transloco">
+                  <mat-icon>drag_indicator</mat-icon>
+                </button>
+                <button mat-icon-button type="button" (click)="toggleNeeded(category, product)"
+                  [attr.aria-pressed]="product.needed" [attr.aria-label]="'common.tiles.shopping.toggleNeeded' | transloco:{ name: product.name }">
+                  <mat-icon>{{ product.needed ? 'remove_shopping_cart' : 'add_shopping_cart' }}</mat-icon>
+                </button>
+                <input class="plain-input product-name" [value]="product.name"
+                  (change)="updateProduct(category, product, 'name', $any($event.target).value)"
+                  [attr.aria-label]="'common.tiles.shopping.productName' | transloco" />
+                <input class="plain-input number-input" type="number" min="0.01" step="0.01" [value]="product.quantity"
+                  (change)="updateProduct(category, product, 'quantity', $any($event.target).value)"
+                  [attr.aria-label]="'common.tiles.shopping.quantity' | transloco" />
+                <mat-form-field appearance="outline" class="unit-field" subscriptSizing="dynamic">
+                  <mat-select [value]="product.unit" (selectionChange)="updateProduct(category, product, 'unit', $event.value)"
+                    [attr.aria-label]="'common.tiles.shopping.unit' | transloco">
+                    @for (unit of units; track unit) {
+                      <mat-option [value]="unit">{{ ('common.tiles.shopping.units.' + unit) | transloco }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+                <input class="plain-input number-input" type="number" min="0" step="0.01" [value]="product.price ?? ''"
+                  (change)="updateProduct(category, product, 'price', $any($event.target).value)"
+                  [placeholder]="'common.tiles.shopping.priceShort' | transloco"
+                  [attr.aria-label]="'common.tiles.shopping.price' | transloco" />
+                <button mat-icon-button color="warn" type="button" (click)="deleteProduct(category, product)"
+                  [attr.aria-label]="'common.tiles.shopping.deleteProduct' | transloco">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            }
+          </div>
+        </article>
+      }
+    </div>
+  </section>
+
+  @if (categories().length > 0) {
+    <section class="editor-section">
+      <h3>{{ 'common.tiles.shopping.addProduct' | transloco }}</h3>
+      <div class="product-add-grid">
+        <mat-form-field appearance="outline" class="product-add-name">
+          <mat-label>{{ 'common.tiles.shopping.productName' | transloco }}</mat-label>
+          <input matInput [formControl]="productNameControl" (keyup.enter)="addProduct()" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'common.tiles.shopping.category' | transloco }}</mat-label>
+          <mat-select [value]="selectedCategoryId()" (selectionChange)="selectedCategoryId.set($event.value)">
+            @for (category of categories(); track category.id) {
+              <mat-option [value]="category.id">{{ category.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'common.tiles.shopping.quantity' | transloco }}</mat-label>
+          <input matInput type="number" min="0.01" step="0.01" [formControl]="quantityControl" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'common.tiles.shopping.unit' | transloco }}</mat-label>
+          <mat-select [formControl]="unitControl">
+            @for (unit of units; track unit) {
+              <mat-option [value]="unit">{{ ('common.tiles.shopping.units.' + unit) | transloco }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'common.tiles.shopping.price' | transloco }}</mat-label>
+          <input matInput type="number" min="0" step="0.01" [formControl]="priceControl" />
+        </mat-form-field>
+        <button mat-fab color="primary" type="button" (click)="addProduct()"
+          [disabled]="!productNameControl.value.trim() || !selectedCategoryId()"
+          [attr.aria-label]="'common.tiles.shopping.addProduct' | transloco">
+          <mat-icon>add</mat-icon>
+        </button>
+      </div>
+    </section>
+  } @else {
+    <p class="empty">{{ 'common.tiles.shopping.createCategoryFirst' | transloco }}</p>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button type="button" mat-icon-button class="action-close" (click)="cancel()" [attr.aria-label]="'common.cancel' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+  <button mat-icon-button type="button" (click)="help.open('tileEditShopping')" [attr.aria-label]="'common.actions.help' | transloco">
+    <mat-icon>help</mat-icon>
+  </button>
+  <button color="primary" type="button" mat-icon-button (click)="save()" [attr.aria-label]="'common.save' | transloco">
+    <mat-icon>save</mat-icon>
+  </button>
+</mat-dialog-actions>

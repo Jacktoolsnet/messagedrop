@@ -47,6 +47,9 @@
         @case ('custom-todo') {
           <app-todo-tile class="tile" [place]="resolvedPlace" [contact]="resolvedContact" [tile]="tile"></app-todo-tile>
         }
+        @case ('custom-shopping') {
+          <app-shopping-tile class="tile" [place]="resolvedPlace!" [tile]="tile"></app-shopping-tile>
+        }
         @case ('custom-quickaction') {
           <app-quick-action-tile class="tile" [place]="resolvedPlace" [contact]="resolvedContact" [tile]="tile"></app-quick-action-tile>
         }

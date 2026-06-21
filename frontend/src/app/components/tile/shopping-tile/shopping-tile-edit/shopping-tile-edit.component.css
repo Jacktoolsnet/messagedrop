@@ -1,0 +1,136 @@
+.shopping-editor {
+  width: min(780px, 90vw);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.full-width,
+.add-row mat-form-field {
+  width: 100%;
+}
+
+.editor-section h3 {
+  margin: 0 0 0.75rem;
+}
+
+.add-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.category-list,
+.product-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.category {
+  border: 1px solid var(--mat-card-outlined-outline-color);
+  border-radius: 0.75rem;
+  padding: 0.5rem;
+  background: var(--mat-card-filled-container-color);
+}
+
+.category-header,
+.product-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.category-header {
+  margin-bottom: 0.5rem;
+}
+
+.drag-handle {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: grab;
+  padding: 0.25rem;
+  display: inline-flex;
+}
+
+.plain-input {
+  min-width: 0;
+  border: 1px solid var(--mat-card-outlined-outline-color);
+  border-radius: 0.4rem;
+  padding: 0.55rem;
+  color: inherit;
+  background: transparent;
+  box-sizing: border-box;
+}
+
+.category-name,
+.product-name {
+  flex: 1;
+}
+
+.category-name {
+  font-weight: 600;
+}
+
+.category-count {
+  opacity: 0.65;
+}
+
+.number-input {
+  width: 5.25rem;
+}
+
+.unit-field {
+  width: 8.5rem;
+}
+
+.product-add-grid {
+  display: grid;
+  grid-template-columns: minmax(12rem, 2fr) minmax(10rem, 1fr) 7rem 10rem 8rem auto;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.empty {
+  opacity: 0.7;
+  font-style: italic;
+}
+
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 0.75rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.25;
+}
+
+@media (max-width: 720px) {
+  .shopping-editor {
+    width: auto;
+  }
+
+  .product-row {
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
+  }
+
+  .product-name {
+    grid-column: 3 / 5;
+  }
+
+  .number-input,
+  .unit-field {
+    width: 100%;
+  }
+
+  .product-add-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .product-add-name {
+    grid-column: 1 / -1;
+  }
+}

@@ -2064,6 +2064,18 @@
       }
     }
   },
+  "tileEditShopping": {
+    "title": "Tile de lista de la compra",
+    "intro": "Crea aquí tu catálogo permanente y selecciona lo necesario para la próxima compra.",
+    "items": {
+      "categories": { "title": "Gestionar categorías", "desc": "Crea categorías, cámbiales el nombre o elimínalas." },
+      "products": { "title": "Gestionar productos", "desc": "Añade productos con cantidad, unidad localizada y precio previsto." },
+      "reorder": { "title": "Definir el orden", "desc": "Ordena categorías y productos arrastrándolos según tu recorrido por la tienda." },
+      "selection": { "title": "Seleccionar para comprar", "desc": "Usa el icono del carrito para elegir los productos necesarios para la próxima compra." },
+      "price": { "title": "Estimar costes", "desc": "Los precios guardados se suman para estimar el total de los productos seleccionados." },
+      "privacy": { "title": "Privacidad y almacenamiento", "desc": "Las categorías, productos y precios permanecen en el dispositivo y se guardan cifrados en IndexedDB." }
+    }
+  },
   "avatarCropper": {
     "title": "Recortar avatar",
     "intro": "En esta pantalla ajustas el área visible de tu imagen de perfil antes de aplicarla.",

@@ -71,6 +71,7 @@ export class TileSettingsComponent {
     { type: 'custom-multitext', labelKey: 'common.tileTypes.multitext', icon: 'notes' },
     { type: 'custom-date', labelKey: 'common.tileTypes.anniversary', icon: 'event' },
     { type: 'custom-todo', labelKey: 'common.tileTypes.todo', icon: 'check_circle' },
+    { type: 'custom-shopping', labelKey: 'common.tileTypes.shopping', icon: 'shopping_cart' },
     { type: 'custom-quickaction', labelKey: 'common.tileTypes.quickActions', icon: 'bolt' },
     { type: 'custom-file', labelKey: 'common.tileTypes.files', icon: 'attach_file' },
     { type: 'image', labelKey: 'common.tileTypes.image', icon: 'photo_library' }
@@ -84,6 +85,10 @@ export class TileSettingsComponent {
 
     if (this.isExperienceContext) {
       tiles = tiles.filter(tile => tile.type !== 'custom-date');
+    }
+
+    if (!this.isPlaceContext) {
+      tiles = tiles.filter(tile => tile.type !== 'custom-shopping');
     }
 
     if (this.tileSettings().some(tile => tile.type === 'image')) {
@@ -107,6 +112,7 @@ export class TileSettingsComponent {
     'custom-multitext': 'common.tileTypes.multitext',
     'custom-date': 'common.tileTypes.anniversary',
     'custom-todo': 'common.tileTypes.todo',
+    'custom-shopping': 'common.tileTypes.shopping',
     'custom-quickaction': 'common.tileTypes.quickActions',
     'custom-file': 'common.tileTypes.files',
     'custom-experience': 'common.tileTypes.experiences',
@@ -183,6 +189,17 @@ export class TileSettingsComponent {
         title: label,
         icon: 'list',
         todos: []
+      };
+    }
+
+    if (tileToAdd.type === 'custom-shopping') {
+      baseTile.payload = {
+        title: label,
+        icon: 'shopping_cart',
+        shopping: {
+          categories: [],
+          currency: 'EUR'
+        }
       };
     }
 
@@ -294,6 +311,25 @@ export class TileSettingsComponent {
       ref.afterClosed().subscribe((updated?: TileSetting) => {
         if (!updated) return;
         this.tileSettings.set(this.tileSettings().map(t => t.id === updated.id ? updated : t));
+      });
+      return;
+    }
+
+    if (tile.type === 'custom-shopping') {
+      void import('../shopping-tile/shopping-tile-edit/shopping-tile-edit.component').then(({ ShoppingTileEditComponent }) => {
+        const ref = this.dialog.open(ShoppingTileEditComponent, {
+          width: '820px',
+          maxWidth: '96vw',
+          maxHeight: '96vh',
+          data: { tile },
+          hasBackdrop: true,
+          backdropClass: 'dialog-backdrop',
+          disableClose: false,
+        });
+        ref.afterClosed().subscribe((updated?: TileSetting) => {
+          if (!updated) return;
+          this.tileSettings.set(this.tileSettings().map(t => t.id === updated.id ? updated : t));
+        });
       });
       return;
     }

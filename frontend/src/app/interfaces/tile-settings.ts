@@ -21,6 +21,42 @@ export interface TileTodoItem {
   order: number;
 }
 
+export type ShoppingUnit =
+  | 'piece'
+  | 'package'
+  | 'gram'
+  | 'kilogram'
+  | 'milliliter'
+  | 'liter'
+  | 'bottle'
+  | 'can'
+  | 'jar'
+  | 'bag'
+  | 'bunch';
+
+export interface ShoppingProduct {
+  id: string;
+  name: string;
+  quantity: number;
+  unit: ShoppingUnit;
+  price?: number;
+  needed: boolean;
+  done: boolean;
+  order: number;
+}
+
+export interface ShoppingCategory {
+  id: string;
+  name: string;
+  order: number;
+  products: ShoppingProduct[];
+}
+
+export interface ShoppingList {
+  categories: ShoppingCategory[];
+  currency: string;
+}
+
 export interface TileQuickAction {
   id: string;
   label: string;
@@ -66,6 +102,7 @@ export interface TileSetting {
     linkType?: TileLinkType;
     date?: string;
     todos?: TileTodoItem[];
+    shopping?: ShoppingList;
     actions?: TileQuickAction[];
     files?: TileFileEntry[];
     images?: TileImageEntry[];
