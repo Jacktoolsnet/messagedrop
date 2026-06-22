@@ -1,6 +1,6 @@
 <div class="shopping-tile" role="button" tabindex="0" (click)="editTile()" (keyup.enter)="editTile()" (keyup.space)="editTile()">
   <header class="shopping-header">
-    <mat-icon>shopping_cart</mat-icon>
+    <mat-icon>{{ icon }}</mat-icon>
     <span class="shopping-title">{{ title }}</span>
     @if (activeProducts.length > 0) {
       <span class="shopping-count">{{ completedCount }}/{{ activeProducts.length }}</span>

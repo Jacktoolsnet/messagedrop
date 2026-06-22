@@ -2642,6 +2642,11 @@ const HELP_TOPICS = {
     introKey: 'tileEditShopping.intro',
     items: [
       {
+        icon: 'settings',
+        titleKey: 'tileEditShopping.items.displaySettings.title',
+        descriptionKey: 'tileEditShopping.items.displaySettings.desc'
+      },
+      {
         icon: 'category',
         titleKey: 'tileEditShopping.items.categories.title',
         descriptionKey: 'tileEditShopping.items.categories.desc'

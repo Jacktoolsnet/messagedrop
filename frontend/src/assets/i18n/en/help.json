@@ -2086,6 +2086,7 @@
     "title": "Shopping list tile",
     "intro": "Build your permanent product catalog here and select what you need for the next shopping trip.",
     "items": {
+      "displaySettings": { "title": "Open display settings", "desc": "Open the small settings dialog to change the tile title and icon." },
       "categories": { "title": "Manage categories", "desc": "Create categories such as fruit and vegetables, rename them, or remove them." },
       "products": { "title": "Manage products", "desc": "Add products with a quantity, localized unit, and expected price." },
       "reorder": { "title": "Set the order", "desc": "Drag and drop categories and products to match your route through the store." },

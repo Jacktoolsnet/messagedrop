@@ -1,19 +1,14 @@
-<app-dialog-header icon="shopping_cart" [title]="headerTitle"></app-dialog-header>
+<app-dialog-header [icon]="headerIcon" [title]="headerTitle"></app-dialog-header>
 
 <mat-dialog-content class="shopping-editor">
-  <mat-form-field appearance="outline" class="full-width">
-    <mat-label>{{ 'common.tiles.shopping.titleLabel' | transloco }}</mat-label>
-    <input matInput [formControl]="titleControl" />
-  </mat-form-field>
-
   <section class="editor-section">
     <h3>{{ 'common.tiles.shopping.categories' | transloco }}</h3>
     <div class="add-row">
-      <mat-form-field appearance="outline">
-        <mat-label>{{ 'common.tiles.shopping.categoryName' | transloco }}</mat-label>
+      <mat-form-field appearance="outline" class="category-input">
+        <mat-label>{{ 'common.tiles.shopping.addCategory' | transloco }}</mat-label>
         <input matInput [formControl]="categoryControl" (keyup.enter)="addCategory()" />
       </mat-form-field>
-      <button mat-mini-fab color="primary" type="button" (click)="addCategory()"
+      <button mat-mini-fab class="category-add-button" color="primary" type="button" (click)="addCategory()"
         [disabled]="!categoryControl.value.trim()" [attr.aria-label]="'common.tiles.shopping.addCategory' | transloco">
         <mat-icon>add</mat-icon>
       </button>
@@ -126,6 +121,10 @@
   </button>
   <button mat-icon-button type="button" (click)="help.open('tileEditShopping')" [attr.aria-label]="'common.actions.help' | transloco">
     <mat-icon>help</mat-icon>
+  </button>
+  <button mat-icon-button type="button" (click)="openDisplaySettings()"
+    [attr.aria-label]="'common.tileSettings.title' | transloco">
+    <mat-icon>settings</mat-icon>
   </button>
   <button color="primary" type="button" mat-icon-button (click)="save()" [attr.aria-label]="'common.save' | transloco">
     <mat-icon>save</mat-icon>

@@ -2068,6 +2068,7 @@
     "title": "Tile de lista de la compra",
     "intro": "Crea aquí tu catálogo permanente y selecciona lo necesario para la próxima compra.",
     "items": {
+      "displaySettings": { "title": "Abrir ajustes de visualización", "desc": "Abre el pequeño diálogo de ajustes para cambiar el título y el icono del tile." },
       "categories": { "title": "Gestionar categorías", "desc": "Crea categorías, cámbiales el nombre o elimínalas." },
       "products": { "title": "Gestionar productos", "desc": "Añade productos con cantidad, unidad localizada y precio previsto." },
       "reorder": { "title": "Definir el orden", "desc": "Ordena categorías y productos arrastrándolos según tu recorrido por la tienda." },

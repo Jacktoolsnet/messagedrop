@@ -39,6 +39,10 @@ export class ShoppingTileComponent implements OnChanges {
     return tile?.payload?.title?.trim() || tile?.label || this.translation.t('common.tileTypes.shopping');
   }
 
+  get icon(): string {
+    return this.currentTile()?.payload?.icon || 'shopping_cart';
+  }
+
   get shopping(): ShoppingList {
     return normalizeShoppingList(this.currentTile()?.payload?.shopping);
   }
@@ -69,7 +73,10 @@ export class ShoppingTileComponent implements OnChanges {
       width: '820px',
       maxWidth: '96vw',
       maxHeight: '96vh',
-      data: { tile },
+      data: {
+        tile,
+        onTileCommit: (updated: TileSetting) => this.applyTileUpdate(updated)
+      },
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
       disableClose: false

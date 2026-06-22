@@ -1,8 +1,8 @@
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -17,10 +17,16 @@ import {
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
+import {
+  TileDisplaySettingsDialogComponent,
+  TileDisplaySettingsDialogData,
+  TileDisplaySettingsDialogResult
+} from '../../tile-display-settings-dialog/tile-display-settings-dialog.component';
 import { createShoppingId, normalizeShoppingList, SHOPPING_UNITS } from '../shopping-list.util';
 
 interface ShoppingTileDialogData {
   tile: TileSetting;
+  onTileCommit?: (updated: TileSetting) => void;
 }
 
 @Component({
@@ -47,6 +53,8 @@ interface ShoppingTileDialogData {
 })
 export class ShoppingTileEditComponent {
   private readonly dialogRef = inject(MatDialogRef<ShoppingTileEditComponent>);
+  private readonly dialog = inject(MatDialog);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly translation = inject(TranslationHelperService);
   readonly help = inject(HelpDialogService);
   readonly data = inject<ShoppingTileDialogData>(MAT_DIALOG_DATA);
@@ -57,6 +65,7 @@ export class ShoppingTileEditComponent {
     this.data.tile.payload?.title || this.data.tile.label || this.translation.t('common.tileTypes.shopping'),
     { nonNullable: true }
   );
+  readonly icon = signal<string | undefined>(this.data.tile.payload?.icon);
   readonly categoryControl = new FormControl('', { nonNullable: true });
   readonly productNameControl = new FormControl('', { nonNullable: true });
   readonly quantityControl = new FormControl(1, { nonNullable: true });
@@ -67,6 +76,37 @@ export class ShoppingTileEditComponent {
 
   get headerTitle(): string {
     return this.titleControl.value.trim() || this.translation.t('common.tileTypes.shopping');
+  }
+
+  get headerIcon(): string {
+    return this.icon() || 'shopping_cart';
+  }
+
+  openDisplaySettings(): void {
+    const ref = this.dialog.open<TileDisplaySettingsDialogComponent, TileDisplaySettingsDialogData, TileDisplaySettingsDialogResult | undefined>(
+      TileDisplaySettingsDialogComponent,
+      {
+        width: '460px',
+        maxWidth: '95vw',
+        data: {
+          title: this.headerTitle,
+          icon: this.icon(),
+          fallbackTitle: this.translation.t('common.tileTypes.shopping'),
+          dialogTitleKey: 'common.tileEdit.displaySettingsTitle'
+        },
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop',
+        disableClose: false
+      }
+    );
+
+    ref.afterClosed().subscribe(result => {
+      if (!result) return;
+      this.titleControl.setValue(result.title);
+      this.icon.set(result.icon);
+      this.cdr.markForCheck();
+      this.commitDisplaySettings();
+    });
   }
 
   addCategory(): void {
@@ -177,13 +217,28 @@ export class ShoppingTileEditComponent {
       payload: {
         ...this.data.tile.payload,
         title,
-        icon: 'shopping_cart',
+        icon: this.icon(),
         shopping: normalizeShoppingList({
           categories: this.categories(),
           currency: this.initialList.currency
         })
       }
     } satisfies TileSetting);
+  }
+
+  private commitDisplaySettings(): void {
+    const title = this.headerTitle;
+    const updated: TileSetting = {
+      ...this.data.tile,
+      label: title,
+      payload: {
+        ...this.data.tile.payload,
+        title,
+        icon: this.icon()
+      }
+    };
+    this.data.tile = updated;
+    this.data.onTileCommit?.(updated);
   }
 
   private parsePrice(value: unknown): number | undefined {

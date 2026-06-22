@@ -2068,6 +2068,7 @@
     "title": "Tuile de liste de courses",
     "intro": "Créez ici votre catalogue permanent et sélectionnez ce qu'il faut pour les prochaines courses.",
     "items": {
+      "displaySettings": { "title": "Ouvrir les réglages d’affichage", "desc": "Ouvrez la petite boîte de dialogue pour modifier le titre et l’icône de la tuile." },
       "categories": { "title": "Gérer les catégories", "desc": "Créez des catégories, renommez-les ou supprimez-les." },
       "products": { "title": "Gérer les produits", "desc": "Ajoutez des produits avec une quantité, une unité traduite et un prix prévu." },
       "reorder": { "title": "Définir l'ordre", "desc": "Réorganisez les catégories et produits par glisser-déposer selon votre parcours dans le magasin." },

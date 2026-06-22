@@ -2086,6 +2086,7 @@
     "title": "Einkaufslisten-Kachel",
     "intro": "Hier baust du deine dauerhafte Produktliste auf und wählst aus, was du beim nächsten Einkauf benötigst.",
     "items": {
+      "displaySettings": { "title": "Darstellung öffnen", "desc": "Öffne den kleinen Einstellungsdialog, um Titel und Icon der Kachel zu ändern." },
       "categories": { "title": "Kategorien verwalten", "desc": "Lege Kategorien wie Obst und Gemüse an, benenne sie um oder lösche sie." },
       "products": { "title": "Produkte verwalten", "desc": "Füge Produkte mit Menge, sprachabhängiger Einheit und erwartetem Preis hinzu." },
       "reorder": { "title": "Reihenfolge festlegen", "desc": "Sortiere Kategorien und Produkte per Drag-and-Drop passend zu deinem Weg durch den Laden." },
