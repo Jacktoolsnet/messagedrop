@@ -23,7 +23,7 @@
     </mat-form-field>
   </div>
 </mat-dialog-content>
-<mat-dialog-actions align="end">
+<mat-dialog-actions class="sticky-actions" align="end">
   <button mat-icon-button class="action-close" type="button" (click)="close()" [attr.aria-label]="'common.cancel' | transloco"><mat-icon>close</mat-icon></button>
   <button mat-icon-button color="primary" type="button" (click)="save()" [disabled]="!nameControl.value.trim()" [attr.aria-label]="'common.save' | transloco"><mat-icon>save</mat-icon></button>
 </mat-dialog-actions>
