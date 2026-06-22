@@ -1,3 +1,5 @@
+import { AvatarAttribution } from './avatar-attribution';
+
 export type DefaultTileType =
   | 'datetime'
   | 'weather'
@@ -49,6 +51,10 @@ export interface ShoppingCategory {
   id: string;
   name: string;
   image?: string;
+  imageAttribution?: AvatarAttribution;
+  backgroundImage?: string;
+  backgroundAttribution?: AvatarAttribution;
+  backgroundTransparency?: number;
   order: number;
   products: ShoppingProduct[];
 }

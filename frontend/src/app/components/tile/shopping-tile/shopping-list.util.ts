@@ -32,6 +32,14 @@ export function normalizeShoppingList(value?: ShoppingList): ShoppingList {
       id: category.id || createShoppingId('category'),
       name: (category.name ?? '').trim(),
       image: typeof category.image === 'string' && category.image.startsWith('data:image/') ? category.image : undefined,
+      imageAttribution: category.imageAttribution?.source === 'unsplash' ? category.imageAttribution : undefined,
+      backgroundImage: typeof category.backgroundImage === 'string' && category.backgroundImage.startsWith('data:image/')
+        ? category.backgroundImage
+        : undefined,
+      backgroundAttribution: category.backgroundAttribution?.source === 'unsplash' ? category.backgroundAttribution : undefined,
+      backgroundTransparency: Number.isFinite(category.backgroundTransparency)
+        ? Math.min(100, Math.max(0, category.backgroundTransparency ?? 40))
+        : 40,
       order: Number.isFinite(category.order) ? category.order : categoryIndex,
       products: normalizeProducts(category.products)
     }))

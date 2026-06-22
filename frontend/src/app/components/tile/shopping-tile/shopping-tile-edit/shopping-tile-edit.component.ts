@@ -16,6 +16,7 @@ import {
 import { ShoppingCategoryDeleteComponent } from '../shopping-category-delete/shopping-category-delete.component';
 import { ShoppingCategoryEditComponent } from '../shopping-category-edit/shopping-category-edit.component';
 import { ShoppingCategorySortComponent } from '../shopping-category-sort/shopping-category-sort.component';
+import { ShoppingProductsComponent } from '../shopping-products/shopping-products.component';
 import { normalizeShoppingList } from '../shopping-list.util';
 
 interface ShoppingTileDialogData {
@@ -57,6 +58,14 @@ export class ShoppingTileEditComponent {
 
   outstandingCount(category: ShoppingCategory): number {
     return category.products.filter(product => product.needed && !product.done).length;
+  }
+
+  categoryBackground(category: ShoppingCategory): string {
+    return category.backgroundImage ? `url(${category.backgroundImage})` : 'none';
+  }
+
+  categoryBackgroundOpacity(category: ShoppingCategory): number {
+    return 1 - Math.min(100, Math.max(0, category.backgroundTransparency ?? 40)) / 100;
   }
 
   openDisplaySettings(): void {
@@ -108,6 +117,24 @@ export class ShoppingTileEditComponent {
       maxWidth: '96vw',
       maxHeight: '96vh',
       data: { category },
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false
+    });
+    ref.afterClosed().subscribe((updated?: ShoppingCategory) => {
+      if (!updated) return;
+      this.categories.update(categories => categories.map(item => item.id === updated.id
+        ? { ...updated, order: item.order }
+        : item));
+    });
+  }
+
+  manageProducts(category: ShoppingCategory): void {
+    const ref = this.dialog.open(ShoppingProductsComponent, {
+      width: '860px',
+      maxWidth: '96vw',
+      maxHeight: '96vh',
+      data: { category, currency: this.initialList.currency },
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
       disableClose: false

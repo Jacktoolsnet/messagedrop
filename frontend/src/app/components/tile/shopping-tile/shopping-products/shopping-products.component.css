@@ -1,0 +1,93 @@
+.products-dialog {
+  position: relative;
+  isolation: isolate;
+  width: min(820px, 90vw);
+  min-height: 18rem;
+}
+
+.products-dialog::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--products-bg-image);
+  background-position: center;
+  background-size: cover;
+  opacity: var(--products-bg-opacity);
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 1rem;
+  padding: 0.25rem;
+}
+
+.product-tile {
+  min-width: 0;
+  padding: 1rem 0.75rem 0.35rem;
+  border: 2px solid transparent;
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--mat-card-filled-container-color) 90%, transparent);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+  text-align: center;
+}
+
+.product-tile--needed {
+  border-color: var(--mat-sys-primary);
+}
+
+.product-symbol {
+  width: 2.75rem;
+  height: 2.75rem;
+  font-size: 2.75rem;
+}
+
+.product-tile h3 {
+  margin: 0.5rem 0 0.25rem;
+  overflow-wrap: anywhere;
+}
+
+.product-tile p {
+  margin: 0.25rem 0;
+}
+
+.product-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.attribution {
+  width: fit-content;
+  margin: 0 0 0.75rem;
+  padding: 0.35rem 0.55rem;
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, var(--mat-card-filled-container-color) 88%, transparent);
+  font-size: 0.8rem;
+}
+
+.attribution a {
+  color: inherit;
+}
+
+.empty-state {
+  min-height: 16rem;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  text-align: center;
+}
+
+.empty-state mat-icon {
+  width: 4rem;
+  height: 4rem;
+  font-size: 4rem;
+}
+
+@media (max-width: 600px) {
+  .products-dialog { width: auto; }
+  .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+  .product-tile { padding-inline: 0.35rem; }
+  .product-actions .mat-mdc-icon-button { width: 2.4rem; height: 2.4rem; }
+}

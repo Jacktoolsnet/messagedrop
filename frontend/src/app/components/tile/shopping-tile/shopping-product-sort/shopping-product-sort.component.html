@@ -1,0 +1,15 @@
+<app-dialog-header icon="sort" [title]="'common.tiles.shopping.sortProducts' | transloco"></app-dialog-header>
+<mat-dialog-content>
+  <div cdkDropList [cdkDropListData]="products()" class="sort-list" (cdkDropListDropped)="drop($event)">
+    @for (product of products(); track product.id) {
+      <div class="sort-row" cdkDrag>
+        <button type="button" class="drag-handle" cdkDragHandle [attr.aria-label]="'common.tiles.shopping.reorderProduct' | transloco"><mat-icon>drag_indicator</mat-icon></button>
+        <mat-icon>inventory_2</mat-icon>
+        <span>{{ product.name }}</span>
+      </div>
+    }
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-icon-button color="primary" type="button" (click)="close()" [attr.aria-label]="'common.actions.apply' | transloco"><mat-icon>check</mat-icon></button>
+</mat-dialog-actions>

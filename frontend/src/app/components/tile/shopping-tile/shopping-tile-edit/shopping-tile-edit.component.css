@@ -10,6 +10,8 @@
 }
 
 .category-tile {
+  position: relative;
+  isolation: isolate;
   min-width: 0;
   overflow: hidden;
   border-radius: 1rem;
@@ -17,6 +19,17 @@
   box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
   display: flex;
   flex-direction: column;
+}
+
+.category-tile::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--category-tile-bg);
+  background-position: center;
+  background-size: cover;
+  opacity: var(--category-tile-bg-opacity);
 }
 
 .category-image {
@@ -47,6 +60,9 @@
   flex: 1;
   padding: 0.8rem 0.8rem 0.35rem;
   text-align: center;
+  background: color-mix(in srgb, var(--mat-card-filled-container-color) 82%, transparent);
+  border-radius: 0.6rem;
+  margin: 0 0.5rem;
 }
 
 .category-info h3 {
@@ -63,6 +79,9 @@
   display: flex;
   justify-content: flex-end;
   padding: 0 0.35rem 0.35rem;
+  margin: 0.35rem 0.5rem 0.5rem;
+  border-radius: 0.6rem;
+  background: color-mix(in srgb, var(--mat-card-filled-container-color) 82%, transparent);
 }
 
 .empty-state {

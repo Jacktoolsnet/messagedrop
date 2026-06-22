@@ -4,7 +4,8 @@
   @if (categories().length > 0) {
     <div class="category-grid">
       @for (category of categories(); track category.id) {
-        <article class="category-tile">
+        <article class="category-tile" [style.--category-tile-bg]="categoryBackground(category)"
+          [style.--category-tile-bg-opacity]="categoryBackgroundOpacity(category)">
           <div class="category-image">
             @if (category.image) {
               <img [src]="category.image" [alt]="category.name" />
@@ -19,6 +20,10 @@
           <div class="category-actions">
             <button mat-icon-button color="primary" type="button" (click)="editCategory(category)"
               [attr.aria-label]="'common.tiles.shopping.editCategoryAria' | transloco:{ name: category.name }">
+              <mat-icon>settings</mat-icon>
+            </button>
+            <button mat-icon-button color="primary" type="button" (click)="manageProducts(category)"
+              [attr.aria-label]="'common.tiles.shopping.manageProductsAria' | transloco:{ name: category.name }">
               <mat-icon>edit</mat-icon>
             </button>
             <button mat-icon-button color="warn" type="button" (click)="deleteCategory(category)"
