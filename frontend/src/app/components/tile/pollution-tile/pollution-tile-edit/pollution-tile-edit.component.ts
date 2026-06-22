@@ -9,6 +9,7 @@ import { TileSetting } from '../../../../interfaces/tile-settings';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
+import { saveDialogOnImplicitDismiss } from '../../../utils/dialog-auto-save.util';
 import {
   TileDisplaySettingsDialogData,
   TileDisplaySettingsDialogComponent,
@@ -39,6 +40,10 @@ interface PollutionTileDialogData {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PollutionTileEditComponent {
+  constructor() {
+    saveDialogOnImplicitDismiss(this.dialogRef, () => this.save());
+  }
+
   private readonly dialogRef = inject(MatDialogRef<PollutionTileEditComponent>);
   private readonly dialog = inject(MatDialog);
   private readonly translation = inject(TranslationHelperService);

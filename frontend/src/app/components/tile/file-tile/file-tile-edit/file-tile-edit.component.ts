@@ -19,6 +19,7 @@ import { getFileIcon } from '../../../../utils/file-icon.util';
 import { isQuotaExceededError } from '../../../../utils/storage-error.util';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
+import { saveDialogOnImplicitDismiss } from '../../../utils/dialog-auto-save.util';
 import { DisplayMessageService } from '../../../../services/display-message.service';
 import {
   TileDisplaySettingsDialogComponent,
@@ -57,6 +58,10 @@ interface FileTileDialogData {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FileTileEditComponent implements OnInit {
+  constructor() {
+    saveDialogOnImplicitDismiss(this.dialogRef, () => void this.save());
+  }
+
   private readonly dialogRef = inject(MatDialogRef<FileTileEditComponent>);
   private readonly dialog = inject(MatDialog);
   private readonly cdr = inject(ChangeDetectorRef);

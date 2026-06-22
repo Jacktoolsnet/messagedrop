@@ -19,6 +19,7 @@ import { LocalImage } from '../../../../interfaces/local-image';
 import { Location } from '../../../../interfaces/location';
 import { TileImageEntry, TileSetting } from '../../../../interfaces/tile-settings';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
+import { saveDialogOnImplicitDismiss } from '../../../utils/dialog-auto-save.util';
 import {
   TileDisplaySettingsDialogComponent,
   TileDisplaySettingsDialogData,
@@ -60,6 +61,10 @@ interface ImageTileDialogData {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ImageTileEditComponent implements OnInit, OnDestroy {
+  constructor() {
+    saveDialogOnImplicitDismiss(this.dialogRef, () => void this.save());
+  }
+
   private readonly dialogRef = inject(MatDialogRef<ImageTileEditComponent>);
   private readonly dialog = inject(MatDialog);
   private readonly cdr = inject(ChangeDetectorRef);

@@ -15,6 +15,7 @@ import { ContactService } from '../../../services/contact.service';
 import { ExperienceBookmarkService } from '../../../services/experience-bookmark.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
+import { saveDialogOnImplicitDismiss } from '../../utils/dialog-auto-save.util';
 import { AnniversaryTileEditComponent } from '../anniversary-tile/anniversary-tile-edit/anniversary-tile-edit.component';
 import { FileTileEditComponent } from '../file-tile/file-tile-edit/file-tile-edit.component';
 import { ImageTileEditComponent } from '../image-tile/image-tile-edit/image-tile-edit.component';
@@ -47,6 +48,10 @@ import { TodoTileEditComponent } from '../todo-tile/todo-tile-edit/todo-tile-edi
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TileSettingsComponent {
+  constructor() {
+    saveDialogOnImplicitDismiss(this.dialogRef, () => this.save());
+  }
+
   private readonly dialogRef = inject(MatDialogRef<TileSettingsComponent>);
   private readonly dialog = inject(MatDialog);
   private readonly contactService = inject(ContactService);

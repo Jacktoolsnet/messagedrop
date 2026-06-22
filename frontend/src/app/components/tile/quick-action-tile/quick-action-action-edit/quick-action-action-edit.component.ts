@@ -13,6 +13,7 @@ import { TileLinkType, TileQuickAction } from '../../../../interfaces/tile-setti
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
+import { saveDialogOnImplicitDismiss } from '../../../utils/dialog-auto-save.util';
 import {
   TileDisplaySettingsDialogComponent,
   TileDisplaySettingsDialogData,
@@ -80,6 +81,7 @@ export class QuickActionActionEditComponent {
   }
 
   constructor() {
+    saveDialogOnImplicitDismiss(this.dialogRef, () => this.save());
     this.iconAuto = this.isDefaultIcon(this.icon(), this.typeControl.value);
     this.lastType = this.typeControl.value;
     this.applyValidators(this.typeControl.value);

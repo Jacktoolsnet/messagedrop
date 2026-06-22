@@ -13,6 +13,7 @@ import { TileSetting, TileTodoItem } from '../../../../interfaces/tile-settings'
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
+import { saveDialogOnImplicitDismiss } from '../../../utils/dialog-auto-save.util';
 import {
   TileDisplaySettingsDialogComponent,
   TileDisplaySettingsDialogData,
@@ -48,6 +49,10 @@ interface TodoTileDialogData {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TodoTileEditComponent {
+  constructor() {
+    saveDialogOnImplicitDismiss(this.dialogRef, () => this.save());
+  }
+
   private readonly dialogRef = inject(MatDialogRef<TodoTileEditComponent>);
   private readonly dialog = inject(MatDialog);
   private readonly cdr = inject(ChangeDetectorRef);

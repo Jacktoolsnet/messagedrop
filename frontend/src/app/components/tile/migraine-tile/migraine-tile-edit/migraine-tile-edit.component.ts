@@ -12,6 +12,7 @@ import { TileSetting } from '../../../../interfaces/tile-settings';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
+import { saveDialogOnImplicitDismiss } from '../../../utils/dialog-auto-save.util';
 import {
   TileDisplaySettingsDialogComponent,
   TileDisplaySettingsDialogData,
@@ -44,6 +45,10 @@ interface MigraineTileDialogData {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MigraineTileEditComponent {
+  constructor() {
+    saveDialogOnImplicitDismiss(this.dialogRef, () => this.save());
+  }
+
   private readonly dialogRef = inject(MatDialogRef<MigraineTileEditComponent>);
   private readonly dialog = inject(MatDialog);
   private readonly cdr = inject(ChangeDetectorRef);

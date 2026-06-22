@@ -8,6 +8,7 @@ import { ShoppingCategory, ShoppingList, ShoppingProduct } from '../../../../int
 import { LanguageService } from '../../../../services/language.service';
 import { ShoppingImageStorageService } from '../../../../services/shopping-image-storage.service';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
+import { saveDialogOnImplicitDismiss } from '../../../utils/dialog-auto-save.util';
 import { normalizeShoppingList } from '../shopping-list.util';
 
 interface ShoppingModeData {
@@ -40,6 +41,7 @@ export class ShoppingModeComponent {
   readonly celebrating = signal(false);
 
   constructor() {
+    saveDialogOnImplicitDismiss(this.dialogRef, () => this.save());
     const firstOpenIndex = this.entries().findIndex(entry => !entry.product.done);
     if (firstOpenIndex >= 0) this.currentIndex.set(firstOpenIndex);
     void this.imageStorage.hydrate(this.shopping()).then(list => {
@@ -114,7 +116,7 @@ export class ShoppingModeComponent {
       if (entries.every(entry => entry.product.done)) {
         setTimeout(() => {
           this.resetCompletedProducts();
-          this.close();
+          this.save();
         }, 420);
         return;
       }
@@ -130,7 +132,11 @@ export class ShoppingModeComponent {
     }
   }
 
-  close(): void {
+  cancel(): void {
+    this.dialogRef.close();
+  }
+
+  save(): void {
     this.dialogRef.close(this.imageStorage.stripRuntimeUrls(this.shopping()));
   }
 

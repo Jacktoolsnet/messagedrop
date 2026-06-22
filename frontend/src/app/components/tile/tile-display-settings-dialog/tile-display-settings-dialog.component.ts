@@ -16,7 +16,6 @@ export interface TileDisplaySettingsDialogData {
   icon?: string;
   fallbackTitle: string;
   dialogTitleKey?: string;
-  autoSaveOnDismiss?: boolean;
 }
 
 export interface TileDisplaySettingsDialogResult {
@@ -53,9 +52,7 @@ export class TileDisplaySettingsDialogComponent {
   readonly icon = signal<string | undefined>(this.data.icon);
 
   constructor() {
-    if (this.data.autoSaveOnDismiss) {
-      saveDialogOnImplicitDismiss(this.dialogRef, () => this.save());
-    }
+    saveDialogOnImplicitDismiss(this.dialogRef, () => this.save());
   }
 
   pickIcon(): void {

@@ -15,6 +15,7 @@ import { TileSetting } from '../../../../interfaces/tile-settings';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
+import { saveDialogOnImplicitDismiss } from '../../../utils/dialog-auto-save.util';
 import {
   TileDisplaySettingsDialogComponent,
   TileDisplaySettingsDialogData,
@@ -51,6 +52,10 @@ interface AnniversaryTileDialogData {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AnniversaryTileEditComponent {
+  constructor() {
+    saveDialogOnImplicitDismiss(this.dialogRef, () => this.save());
+  }
+
   @ViewChild(MatCalendar) calendar?: MatCalendar<Date>;
   private readonly dialogRef = inject(MatDialogRef<AnniversaryTileEditComponent>);
   private readonly dialog = inject(MatDialog);

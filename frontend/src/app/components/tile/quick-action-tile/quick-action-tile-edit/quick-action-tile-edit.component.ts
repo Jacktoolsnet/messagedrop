@@ -15,6 +15,7 @@ import { TranslationHelperService } from '../../../../services/translation-helpe
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 import { QuickActionActionEditComponent } from '../quick-action-action-edit/quick-action-action-edit.component';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
+import { saveDialogOnImplicitDismiss } from '../../../utils/dialog-auto-save.util';
 import {
   TileDisplaySettingsDialogComponent,
   TileDisplaySettingsDialogData,
@@ -51,6 +52,10 @@ interface QuickActionTileDialogData {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class QuickActionTileEditComponent {
+  constructor() {
+    saveDialogOnImplicitDismiss(this.dialogRef, () => this.save());
+  }
+
   private readonly dialogRef = inject(MatDialogRef<QuickActionTileEditComponent>);
   private readonly dialog = inject(MatDialog);
   private readonly cdr = inject(ChangeDetectorRef);

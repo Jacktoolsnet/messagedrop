@@ -28,6 +28,7 @@ import { SocketioService } from '../../../../services/socketio.service';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { UserService } from '../../../../services/user.service';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
+import { saveDialogOnImplicitDismiss } from '../../../utils/dialog-auto-save.util';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 import { LocationPickerDialogComponent } from '../../../utils/location-picker-dialog/location-picker-dialog.component';
 import { PlaceProfileComponent } from '../../../placelist/place-settings/place-settings.component';
@@ -82,6 +83,10 @@ export interface RelationTileEditDialogData {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RelationTileEditComponent {
+  constructor() {
+    saveDialogOnImplicitDismiss(this.dialogRef, () => this.save());
+  }
+
   private readonly dialogRef = inject(MatDialogRef<RelationTileEditComponent>);
   private readonly dialog = inject(MatDialog);
   private readonly connectService = inject(ConnectService);
