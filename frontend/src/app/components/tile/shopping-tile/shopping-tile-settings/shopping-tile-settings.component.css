@@ -1,6 +1,8 @@
 :host {
   display: block;
-  width: min(480px, 95vw);
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 .settings-content {
@@ -10,6 +12,8 @@
   box-sizing: border-box;
   width: 100%;
   padding-block: 1rem !important;
+  overflow-x: hidden;
+  scrollbar-gutter: stable both-edges;
 }
 
 .full-width,
@@ -20,6 +24,16 @@
 .icon-pick-button {
   width: 95%;
   align-self: center;
+  flex: 0 0 auto;
+  justify-content: center;
+  gap: 1.75rem;
+  padding: 1.5rem;
+}
+
+.icon-pick-button mat-icon {
+  width: 2rem;
+  height: 2rem;
+  font-size: 2rem;
 }
 
 .template-section,
