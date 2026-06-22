@@ -16,6 +16,7 @@ import { DisplayMessageService } from '../../../../services/display-message.serv
 import { LanguageService } from '../../../../services/language.service';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { UnsplashService } from '../../../../services/unsplash.service';
+import { ShoppingImageStorageService } from '../../../../services/shopping-image-storage.service';
 import { AvatarCropperComponent } from '../../../utils/avatar-cropper/avatar-cropper.component';
 import { AvatarSourceChoice, AvatarSourceDialogComponent } from '../../../utils/avatar-source-dialog/avatar-source-dialog.component';
 import { CameraCaptureDialogComponent } from '../../../utils/camera-capture-dialog/camera-capture-dialog.component';
@@ -38,6 +39,7 @@ export class ShoppingProductEditComponent {
   private readonly language = inject(LanguageService);
   private readonly unsplash = inject(UnsplashService);
   private readonly messages = inject(DisplayMessageService);
+  private readonly imageStorage = inject(ShoppingImageStorageService);
   readonly product = inject<{ product?: ShoppingProduct }>(MAT_DIALOG_DATA).product;
   readonly nameControl = new FormControl(this.product?.name ?? '', { nonNullable: true });
   readonly quantityControl = new FormControl(this.product?.quantity ?? 1, { nonNullable: true });
@@ -45,7 +47,16 @@ export class ShoppingProductEditComponent {
   readonly priceControl = new FormControl<number | null>(this.product?.price ?? null);
   readonly image = signal<string | undefined>(this.product?.image);
   readonly imageAttribution = signal<AvatarAttribution | undefined>(this.product?.imageAttribution);
+  private readonly imageRemoved = signal(false);
   readonly units = SHOPPING_UNITS;
+
+  constructor() {
+    if (this.product) {
+      void this.imageStorage.hydrateProduct(this.product).then(product => {
+        if (!this.image() && !this.imageRemoved()) this.image.set(product.image);
+      });
+    }
+  }
 
   get title(): string {
     return this.translation.t(this.product ? 'common.tiles.shopping.editProduct' : 'common.tiles.shopping.addProduct');
@@ -103,6 +114,7 @@ export class ShoppingProductEditComponent {
   }
 
   removeImage(): void {
+    this.imageRemoved.set(true);
     this.image.set(undefined);
     this.imageAttribution.set(undefined);
   }
@@ -122,6 +134,7 @@ export class ShoppingProductEditComponent {
       id: this.product?.id ?? createShoppingId('product'),
       name,
       image: this.image(),
+      imageFileId: !this.imageRemoved() && !this.image()?.startsWith('data:image/') ? this.product?.imageFileId : undefined,
       imageAttribution: this.imageAttribution(),
       quantity: Math.max(0.01, Number(this.quantityControl.value) || 1),
       unit: this.unitControl.value,
@@ -179,6 +192,7 @@ export class ShoppingProductEditComponent {
     });
     ref.afterClosed().subscribe((image?: string) => {
       if (!image) return;
+      this.imageRemoved.set(false);
       this.image.set(image);
       this.imageAttribution.set(attribution);
     });

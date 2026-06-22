@@ -8,6 +8,7 @@ import { ShoppingList, ShoppingProduct, TileSetting } from '../../../interfaces/
 import { PlaceService } from '../../../services/place.service';
 import { LanguageService } from '../../../services/language.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
+import { ShoppingImageStorageService } from '../../../services/shopping-image-storage.service';
 import { activeShoppingProducts, normalizeShoppingList } from './shopping-list.util';
 
 @Component({
@@ -27,6 +28,7 @@ export class ShoppingTileComponent implements OnChanges {
   private readonly language = inject(LanguageService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly translation = inject(TranslationHelperService);
+  private readonly imageStorage = inject(ShoppingImageStorageService);
 
   readonly currentTile = signal<TileSetting | null>(null);
 
@@ -75,14 +77,14 @@ export class ShoppingTileComponent implements OnChanges {
       maxHeight: '96vh',
       data: {
         tile,
-        onTileCommit: (updated: TileSetting) => this.applyTileUpdate(updated)
+        onTileCommit: (updated: TileSetting) => void this.applyTileUpdate(updated)
       },
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
       disableClose: false
     });
     ref.afterClosed().subscribe((updated?: TileSetting) => {
-      if (updated) this.applyTileUpdate(updated);
+      if (updated) void this.applyTileUpdate(updated);
     });
   }
 
@@ -102,7 +104,7 @@ export class ShoppingTileComponent implements OnChanges {
     ref.afterClosed().subscribe((shopping?: ShoppingList) => {
       const tile = this.currentTile();
       if (!shopping || !tile) return;
-      this.applyTileUpdate({ ...tile, payload: { ...tile.payload, shopping } });
+      void this.applyTileUpdate({ ...tile, payload: { ...tile.payload, shopping } });
     });
   }
 
@@ -121,19 +123,24 @@ export class ShoppingTileComponent implements OnChanges {
     if (!product.done && typeof navigator !== 'undefined' && 'vibrate' in navigator) {
       navigator.vibrate?.(30);
     }
-    this.applyTileUpdate({ ...tile, payload: { ...tile.payload, shopping: updated } });
+    void this.applyTileUpdate({ ...tile, payload: { ...tile.payload, shopping: updated } });
   }
 
   formatPrice(price: number): string {
     return new Intl.NumberFormat(this.language.effectiveLanguage(), { style: 'currency', currency: this.shopping.currency }).format(price);
   }
 
-  private applyTileUpdate(updated: TileSetting): void {
+  private async applyTileUpdate(updated: TileSetting): Promise<void> {
+    const previousShopping = normalizeShoppingList(this.currentTile()?.payload?.shopping);
     const tiles = (this.place.tileSettings ?? []).map(tile => tile.id === updated.id ? updated : tile);
     const updatedPlace = { ...this.place, tileSettings: tiles };
     this.place = updatedPlace;
     this.currentTile.set(updated);
-    void this.placeService.saveAdditionalPlaceInfos(updatedPlace);
+    await this.placeService.saveAdditionalPlaceInfos(updatedPlace);
+    await this.imageStorage.deleteRemovedFiles(
+      previousShopping,
+      normalizeShoppingList(updated.payload?.shopping)
+    );
     this.cdr.markForCheck();
   }
 }

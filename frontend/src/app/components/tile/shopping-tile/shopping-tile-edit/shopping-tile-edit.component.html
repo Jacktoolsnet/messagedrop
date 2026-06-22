@@ -60,7 +60,7 @@
     [attr.aria-label]="'common.tiles.shopping.addCategory' | transloco">
     <mat-icon>add</mat-icon>
   </button>
-  <button color="primary" type="button" mat-icon-button (click)="save()" [attr.aria-label]="'common.save' | transloco">
+  <button color="primary" type="button" mat-icon-button (click)="save()" [disabled]="saving()" [attr.aria-label]="'common.save' | transloco">
     <mat-icon>save</mat-icon>
   </button>
 </mat-dialog-actions>

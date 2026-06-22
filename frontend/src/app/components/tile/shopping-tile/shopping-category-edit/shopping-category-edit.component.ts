@@ -16,12 +16,13 @@ import { DisplayMessageService } from '../../../../services/display-message.serv
 import { LanguageService } from '../../../../services/language.service';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { UnsplashService } from '../../../../services/unsplash.service';
+import { ShoppingImageStorageService } from '../../../../services/shopping-image-storage.service';
 import { AvatarCropperComponent } from '../../../utils/avatar-cropper/avatar-cropper.component';
 import { AvatarSourceChoice, AvatarSourceDialogComponent } from '../../../utils/avatar-source-dialog/avatar-source-dialog.component';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 import { UnsplashComponent } from '../../../utils/unsplash/unsplash.component';
-import { createShoppingId, normalizeShoppingList } from '../shopping-list.util';
+import { createShoppingId } from '../shopping-list.util';
 
 export interface ShoppingCategoryEditData {
   category?: ShoppingCategory;
@@ -57,6 +58,7 @@ export class ShoppingCategoryEditComponent {
   private readonly language = inject(LanguageService);
   private readonly unsplash = inject(UnsplashService);
   private readonly messages = inject(DisplayMessageService);
+  private readonly imageStorage = inject(ShoppingImageStorageService);
   readonly help = inject(HelpDialogService);
   readonly data = inject<ShoppingCategoryEditData>(MAT_DIALOG_DATA);
 
@@ -66,7 +68,18 @@ export class ShoppingCategoryEditComponent {
   readonly imageAttribution = signal<AvatarAttribution | undefined>(this.source?.imageAttribution);
   readonly backgroundImage = signal<string | undefined>(this.source?.backgroundImage);
   readonly backgroundAttribution = signal<AvatarAttribution | undefined>(this.source?.backgroundAttribution);
+  private readonly imageRemoved = signal(false);
+  private readonly backgroundRemoved = signal(false);
   backgroundTransparency = this.source?.backgroundTransparency ?? 40;
+
+  constructor() {
+    if (this.source) {
+      void this.imageStorage.hydrateCategory(this.source).then(category => {
+        if (!this.image() && !this.imageRemoved()) this.image.set(category.image);
+        if (!this.backgroundImage() && !this.backgroundRemoved()) this.backgroundImage.set(category.backgroundImage);
+      });
+    }
+  }
 
   get dialogTitle(): string {
     return this.source
@@ -115,10 +128,12 @@ export class ShoppingCategoryEditComponent {
 
   removeImage(kind: CategoryImageKind): void {
     if (kind === 'avatar') {
+      this.imageRemoved.set(true);
       this.image.set(undefined);
       this.imageAttribution.set(undefined);
       return;
     }
+    this.backgroundRemoved.set(true);
     this.backgroundImage.set(undefined);
     this.backgroundAttribution.set(undefined);
   }
@@ -146,14 +161,18 @@ export class ShoppingCategoryEditComponent {
       id: this.source?.id ?? createShoppingId('category'),
       name,
       image: this.image(),
+      imageFileId: !this.imageRemoved() && !this.image()?.startsWith('data:image/') ? this.source?.imageFileId : undefined,
       imageAttribution: this.imageAttribution(),
       backgroundImage: this.backgroundImage(),
+      backgroundImageFileId: !this.backgroundRemoved() && !this.backgroundImage()?.startsWith('data:image/')
+        ? this.source?.backgroundImageFileId
+        : undefined,
       backgroundAttribution: this.backgroundAttribution(),
       backgroundTransparency: this.backgroundTransparency,
       order: this.source?.order ?? 0,
       products: this.source?.products ?? []
     };
-    this.dialogRef.close(normalizeShoppingList({ categories: [category], currency: 'EUR' }).categories[0]);
+    this.dialogRef.close(category);
   }
 
   private openUnsplash(kind: CategoryImageKind): void {
@@ -205,10 +224,12 @@ export class ShoppingCategoryEditComponent {
     ref.afterClosed().subscribe((cropped?: string) => {
       if (!cropped) return;
       if (background) {
+        this.backgroundRemoved.set(false);
         this.backgroundImage.set(cropped);
         this.backgroundAttribution.set(attribution);
         return;
       }
+      this.imageRemoved.set(false);
       this.image.set(cropped);
       this.imageAttribution.set(attribution);
     });

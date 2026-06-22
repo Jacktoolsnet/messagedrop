@@ -309,6 +309,16 @@ export class BackupService {
       if (place.placeBackgroundOriginalFileId) {
         ids.add(place.placeBackgroundOriginalFileId);
       }
+      for (const tile of place.tileSettings ?? []) {
+        const shopping = tile.payload?.shopping;
+        for (const category of shopping?.categories ?? []) {
+          if (category.imageFileId) ids.add(category.imageFileId);
+          if (category.backgroundImageFileId) ids.add(category.backgroundImageFileId);
+          for (const product of category.products ?? []) {
+            if (product.imageFileId) ids.add(product.imageFileId);
+          }
+        }
+      }
     });
 
     contacts.forEach((contact) => {

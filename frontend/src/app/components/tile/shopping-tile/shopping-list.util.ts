@@ -32,9 +32,13 @@ export function normalizeShoppingList(value?: ShoppingList): ShoppingList {
       id: category.id || createShoppingId('category'),
       name: (category.name ?? '').trim(),
       image: typeof category.image === 'string' && category.image.startsWith('data:image/') ? category.image : undefined,
+      imageFileId: typeof category.imageFileId === 'string' && category.imageFileId.trim() ? category.imageFileId : undefined,
       imageAttribution: category.imageAttribution?.source === 'unsplash' ? category.imageAttribution : undefined,
       backgroundImage: typeof category.backgroundImage === 'string' && category.backgroundImage.startsWith('data:image/')
         ? category.backgroundImage
+        : undefined,
+      backgroundImageFileId: typeof category.backgroundImageFileId === 'string' && category.backgroundImageFileId.trim()
+        ? category.backgroundImageFileId
         : undefined,
       backgroundAttribution: category.backgroundAttribution?.source === 'unsplash' ? category.backgroundAttribution : undefined,
       backgroundTransparency: Number.isFinite(category.backgroundTransparency)
@@ -59,6 +63,7 @@ function normalizeProducts(products?: ShoppingProduct[]): ShoppingProduct[] {
       id: product.id || createShoppingId('product'),
       name: (product.name ?? '').trim(),
       image: typeof product.image === 'string' && product.image.startsWith('data:image/') ? product.image : undefined,
+      imageFileId: typeof product.imageFileId === 'string' && product.imageFileId.trim() ? product.imageFileId : undefined,
       imageAttribution: product.imageAttribution?.source === 'unsplash' ? product.imageAttribution : undefined,
       quantity: Number.isFinite(product.quantity) && product.quantity > 0 ? product.quantity : 1,
       unit: SHOPPING_UNITS.includes(product.unit) ? product.unit : 'piece',

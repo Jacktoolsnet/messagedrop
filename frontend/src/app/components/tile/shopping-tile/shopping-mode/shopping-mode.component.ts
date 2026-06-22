@@ -5,6 +5,7 @@ import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ShoppingCategory, ShoppingList, ShoppingProduct } from '../../../../interfaces/tile-settings';
 import { LanguageService } from '../../../../services/language.service';
+import { ShoppingImageStorageService } from '../../../../services/shopping-image-storage.service';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
 import { normalizeShoppingList } from '../shopping-list.util';
 
@@ -29,11 +30,32 @@ export class ShoppingModeComponent {
   private readonly dialogRef = inject(MatDialogRef<ShoppingModeComponent>);
   private readonly data = inject<ShoppingModeData>(MAT_DIALOG_DATA);
   private readonly language = inject(LanguageService);
+  private readonly imageStorage = inject(ShoppingImageStorageService);
 
   readonly shopping = signal(normalizeShoppingList(this.data.shopping));
   readonly selectedCategoryId = signal<string | null>(null);
   readonly currentIndex = signal(0);
   readonly celebrating = signal(false);
+
+  constructor() {
+    void this.imageStorage.hydrate(this.shopping()).then(list => {
+      this.shopping.update(shopping => ({
+        ...shopping,
+        categories: shopping.categories.map(category => {
+          const hydrated = list.categories.find(item => item.id === category.id);
+          return {
+            ...category,
+            image: category.image ?? hydrated?.image,
+            backgroundImage: category.backgroundImage ?? hydrated?.backgroundImage,
+            products: category.products.map(product => ({
+              ...product,
+              image: product.image ?? hydrated?.products.find(item => item.id === product.id)?.image
+            }))
+          };
+        })
+      }));
+    });
+  }
 
   readonly activeCategories = computed(() => this.shopping().categories
     .filter(category => category.products.some(product => product.needed)));
@@ -101,7 +123,7 @@ export class ShoppingModeComponent {
   }
 
   close(): void {
-    this.dialogRef.close(this.shopping());
+    this.dialogRef.close(this.imageStorage.stripRuntimeUrls(this.shopping()));
   }
 
   formatPrice(price: number): string {

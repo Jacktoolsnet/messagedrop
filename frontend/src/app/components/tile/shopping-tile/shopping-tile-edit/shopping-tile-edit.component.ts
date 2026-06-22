@@ -6,6 +6,8 @@ import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ShoppingCategory, TileSetting } from '../../../../interfaces/tile-settings';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
+import { DisplayMessageService } from '../../../../services/display-message.service';
+import { ShoppingImageStorageService } from '../../../../services/shopping-image-storage.service';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 import {
@@ -37,6 +39,8 @@ export class ShoppingTileEditComponent {
   private readonly dialog = inject(MatDialog);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly translation = inject(TranslationHelperService);
+  private readonly messages = inject(DisplayMessageService);
+  private readonly imageStorage = inject(ShoppingImageStorageService);
   readonly help = inject(HelpDialogService);
   readonly data = inject<ShoppingTileDialogData>(MAT_DIALOG_DATA);
 
@@ -47,6 +51,25 @@ export class ShoppingTileEditComponent {
     { nonNullable: true }
   );
   readonly icon = signal<string | undefined>(this.data.tile.payload?.icon);
+  readonly saving = signal(false);
+
+  constructor() {
+    void this.imageStorage.hydrate(this.initialList).then(list => {
+      this.categories.update(categories => categories.map(category => {
+        const hydrated = list.categories.find(item => item.id === category.id);
+        if (!hydrated) return category;
+        return {
+          ...category,
+          image: category.image ?? hydrated.image,
+          backgroundImage: category.backgroundImage ?? hydrated.backgroundImage,
+          products: category.products.map(product => ({
+            ...product,
+            image: product.image ?? hydrated.products.find(item => item.id === product.id)?.image
+          }))
+        };
+      }));
+    });
+  }
 
   get headerTitle(): string {
     return this.titleControl.value.trim() || this.translation.t('common.tileTypes.shopping');
@@ -183,21 +206,33 @@ export class ShoppingTileEditComponent {
     this.dialogRef.close();
   }
 
-  save(): void {
+  async save(): Promise<void> {
+    if (this.saving()) return;
+    this.saving.set(true);
     const title = this.headerTitle;
-    this.dialogRef.close({
-      ...this.data.tile,
-      label: title,
-      payload: {
-        ...this.data.tile.payload,
-        title,
-        icon: this.icon(),
-        shopping: normalizeShoppingList({
+    try {
+      const shopping = await this.imageStorage.prepareForStorage({
           categories: this.categories(),
           currency: this.initialList.currency
-        })
-      }
-    } satisfies TileSetting);
+      });
+      this.dialogRef.close({
+        ...this.data.tile,
+        label: title,
+        payload: {
+          ...this.data.tile.payload,
+          title,
+          icon: this.icon(),
+          shopping: normalizeShoppingList(shopping)
+        }
+      } satisfies TileSetting);
+    } catch {
+      this.messages.open(
+        this.translation.t('common.tiles.shopping.imageStorageFailed'),
+        this.translation.t('common.actions.ok'),
+        { duration: 3500 }
+      );
+      this.saving.set(false);
+    }
   }
 
   private commitDisplaySettings(): void {

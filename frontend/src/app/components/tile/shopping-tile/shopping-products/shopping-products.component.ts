@@ -5,6 +5,7 @@ import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ShoppingCategory, ShoppingProduct } from '../../../../interfaces/tile-settings';
 import { LanguageService } from '../../../../services/language.service';
+import { ShoppingImageStorageService } from '../../../../services/shopping-image-storage.service';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 import { ShoppingProductEditComponent } from '../shopping-product-edit/shopping-product-edit.component';
@@ -22,9 +23,24 @@ export class ShoppingProductsComponent {
   private readonly dialogRef = inject(MatDialogRef<ShoppingProductsComponent>);
   private readonly dialog = inject(MatDialog);
   private readonly language = inject(LanguageService);
+  private readonly imageStorage = inject(ShoppingImageStorageService);
   readonly help = inject(HelpDialogService);
   readonly data = inject<{ category: ShoppingCategory; currency: string }>(MAT_DIALOG_DATA);
   readonly products = signal(this.data.category.products.map(product => ({ ...product })));
+
+  constructor() {
+    void this.imageStorage.hydrateCategory(this.data.category).then(category => {
+      this.data.category = {
+        ...this.data.category,
+        image: this.data.category.image ?? category.image,
+        backgroundImage: this.data.category.backgroundImage ?? category.backgroundImage
+      };
+      this.products.update(products => products.map(product => ({
+        ...product,
+        image: product.image ?? category.products.find(item => item.id === product.id)?.image
+      })));
+    });
+  }
 
   get backgroundImage(): string {
     return this.data.category.backgroundImage ? `url(${this.data.category.backgroundImage})` : 'none';

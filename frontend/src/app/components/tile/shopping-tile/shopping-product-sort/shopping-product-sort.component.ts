@@ -26,6 +26,10 @@ export class ShoppingProductSortComponent {
   }
 
   close(): void {
+    this.dialogRef.close();
+  }
+
+  apply(): void {
     this.dialogRef.close(this.products());
   }
 }
