@@ -17,16 +17,18 @@
 }
 
 .progress-track {
-  height: 0.45rem;
+  height: 0.7rem;
   overflow: hidden;
   border-radius: 1rem;
-  background: var(--mat-card-outlined-outline-color);
+  background: var(--mat-sys-surface-container-highest);
+  box-shadow: inset 0 1px 3px color-mix(in srgb, var(--mat-sys-on-surface) 18%, transparent);
 }
 
 .progress-track span {
   display: block;
   height: 100%;
-  background: var(--mat-sys-primary);
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--mat-sys-primary), var(--mat-sys-tertiary));
   transition: width 240ms ease;
 }
 

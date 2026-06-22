@@ -846,7 +846,8 @@
         },
         "imageStorageFailed": "L’image n’a pas pu être enregistrée dans le stockage local de fichiers.",
         "noPrice": "Aucun prix",
-        "startCategory": "Commencer les achats pour {{ name }}"
+        "startCategory": "Commencer les achats pour {{ name }}",
+        "progress": "Progression : {{ completed }} sur {{ total }}"
       },
       "quickActions": {
         "empty": "Aucune action pour l'instant. Appuyez pour en ajouter.",

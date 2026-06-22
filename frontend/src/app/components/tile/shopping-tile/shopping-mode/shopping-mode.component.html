@@ -4,11 +4,12 @@
 <mat-dialog-content class="shopping-mode">
   @if (current(); as item) {
     <div class="progress-row">
-      <span>{{ completedCount() }}/{{ entries().length }}</span>
+      <span>{{ 'common.tiles.shopping.progress' | transloco:{ completed: completedCount(), total: entries().length } }}</span>
       <span>{{ formatPrice(estimatedTotal()) }}</span>
     </div>
-    <div class="progress-track" aria-hidden="true">
-      <span [style.width.%]="entries().length ? completedCount() / entries().length * 100 : 0"></span>
+    <div class="progress-track" role="progressbar" [attr.aria-valuenow]="progressPercent()"
+      aria-valuemin="0" aria-valuemax="100">
+      <span [style.width.%]="progressPercent()"></span>
     </div>
 
     <section class="product-card" [class.product-card--done]="item.product.done" [class.product-card--celebrate]="celebrating()">

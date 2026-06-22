@@ -847,7 +847,8 @@
         },
         "imageStorageFailed": "The image could not be saved to local file storage.",
         "noPrice": "No price",
-        "startCategory": "Start shopping for {{ name }}"
+        "startCategory": "Start shopping for {{ name }}",
+        "progress": "Progress: {{ completed }} of {{ total }}"
       },
       "quickActions": {
         "empty": "No actions yet. Tap to add.",

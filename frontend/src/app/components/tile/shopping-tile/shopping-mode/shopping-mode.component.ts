@@ -73,6 +73,9 @@ export class ShoppingModeComponent {
   readonly categoryTitle = computed(() => this.shopping().categories
     .find(category => category.id === this.selectedCategoryId())?.name ?? this.current()?.category.name ?? '');
   readonly completedCount = computed(() => this.entries().filter(entry => entry.product.done).length);
+  readonly progressPercent = computed(() => this.entries().length
+    ? Math.round(this.completedCount() / this.entries().length * 100)
+    : 0);
   readonly estimatedTotal = computed(() => this.entries()
     .reduce((sum, entry) => sum + (entry.product.price ?? 0), 0));
 
