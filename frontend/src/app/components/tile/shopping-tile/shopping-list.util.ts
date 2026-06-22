@@ -31,6 +31,7 @@ export function normalizeShoppingList(value?: ShoppingList): ShoppingList {
     .map((category, categoryIndex): ShoppingCategory => ({
       id: category.id || createShoppingId('category'),
       name: (category.name ?? '').trim(),
+      image: typeof category.image === 'string' && category.image.startsWith('data:image/') ? category.image : undefined,
       order: Number.isFinite(category.order) ? category.order : categoryIndex,
       products: normalizeProducts(category.products)
     }))

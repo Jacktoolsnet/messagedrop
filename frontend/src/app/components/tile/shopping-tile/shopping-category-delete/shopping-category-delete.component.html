@@ -1,0 +1,12 @@
+<app-dialog-header icon="delete" [title]="'common.tiles.shopping.deleteCategory' | transloco"></app-dialog-header>
+<mat-dialog-content>
+  <p>{{ 'common.tiles.shopping.deleteCategoryConfirm' | transloco:{ name: data.name } }}</p>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-dialog-close mat-icon-button class="action-close" [attr.aria-label]="'common.actions.no' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+  <button color="warn" [mat-dialog-close]="true" mat-icon-button [attr.aria-label]="'common.actions.delete' | transloco">
+    <mat-icon>delete</mat-icon>
+  </button>
+</mat-dialog-actions>

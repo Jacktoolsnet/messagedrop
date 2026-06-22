@@ -1,0 +1,25 @@
+<app-dialog-header icon="sort" [title]="'common.tiles.shopping.sortCategories' | transloco"></app-dialog-header>
+
+<mat-dialog-content>
+  <div cdkDropList [cdkDropListData]="categories()" class="sort-list" (cdkDropListDropped)="drop($event)">
+    @for (category of categories(); track category.id) {
+      <div class="sort-row" cdkDrag>
+        <button type="button" class="drag-handle" cdkDragHandle [attr.aria-label]="'common.tiles.shopping.reorderCategory' | transloco">
+          <mat-icon>drag_indicator</mat-icon>
+        </button>
+        @if (category.image) {
+          <img [src]="category.image" [alt]="category.name" />
+        } @else {
+          <span class="image-placeholder"><mat-icon>category</mat-icon></span>
+        }
+        <span>{{ category.name }}</span>
+      </div>
+    }
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-icon-button color="primary" type="button" (click)="close()" [attr.aria-label]="'common.actions.apply' | transloco">
+    <mat-icon>check</mat-icon>
+  </button>
+</mat-dialog-actions>

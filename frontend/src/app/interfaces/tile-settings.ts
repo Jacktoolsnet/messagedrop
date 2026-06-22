@@ -48,6 +48,7 @@ export interface ShoppingProduct {
 export interface ShoppingCategory {
   id: string;
   name: string;
+  image?: string;
   order: number;
   products: ShoppingProduct[];
 }
