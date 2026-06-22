@@ -1,5 +1,5 @@
 <app-dialog-header icon="sort" [title]="'common.tiles.shopping.sortProducts' | transloco"></app-dialog-header>
-<mat-dialog-content>
+<mat-dialog-content class="sort-content">
   <div cdkDropList [cdkDropListData]="products()" class="sort-list" (cdkDropListDropped)="drop($event)">
     @for (product of products(); track product.id) {
       <div class="sort-row" cdkDrag>
