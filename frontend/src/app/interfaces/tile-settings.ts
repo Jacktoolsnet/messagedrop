@@ -38,6 +38,7 @@ export type ShoppingUnit =
 
 export interface ShoppingProduct {
   id: string;
+  templateKey?: string;
   name: string;
   image?: string;
   imageFileId?: string;
@@ -52,6 +53,7 @@ export interface ShoppingProduct {
 
 export interface ShoppingCategory {
   id: string;
+  templateKey?: string;
   name: string;
   image?: string;
   imageFileId?: string;

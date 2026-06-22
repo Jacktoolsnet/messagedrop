@@ -1,0 +1,45 @@
+:host {
+  display: block;
+  width: min(480px, 95vw);
+}
+
+.settings-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-sizing: border-box;
+  width: 100%;
+  padding-block: 1rem !important;
+}
+
+.full-width,
+.template-button {
+  width: 100%;
+}
+
+.icon-pick-button {
+  width: 95%;
+  align-self: center;
+}
+
+.template-section {
+  padding: 1rem;
+  border: 1px solid var(--mat-card-outlined-outline-color);
+  border-radius: 1rem;
+  background: var(--mat-sys-surface-container);
+}
+
+.template-section h3 {
+  margin: 0;
+}
+
+.template-section p {
+  margin: 0.35rem 0 1rem;
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.9rem;
+}
+
+.template-section .template-stats {
+  margin-top: -0.5rem;
+  font-weight: 600;
+}

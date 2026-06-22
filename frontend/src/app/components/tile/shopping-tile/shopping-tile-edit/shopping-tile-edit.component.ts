@@ -4,22 +4,22 @@ import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { ShoppingCategory, TileSetting } from '../../../../interfaces/tile-settings';
+import { ShoppingCategory, ShoppingList, TileSetting } from '../../../../interfaces/tile-settings';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { DisplayMessageService } from '../../../../services/display-message.service';
 import { ShoppingImageStorageService } from '../../../../services/shopping-image-storage.service';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 import { saveDialogOnImplicitDismiss } from '../../../utils/dialog-auto-save.util';
-import {
-  TileDisplaySettingsDialogComponent,
-  TileDisplaySettingsDialogData,
-  TileDisplaySettingsDialogResult
-} from '../../tile-display-settings-dialog/tile-display-settings-dialog.component';
 import { ShoppingCategoryDeleteComponent } from '../shopping-category-delete/shopping-category-delete.component';
 import { ShoppingCategoryEditComponent } from '../shopping-category-edit/shopping-category-edit.component';
 import { ShoppingCategorySortComponent } from '../shopping-category-sort/shopping-category-sort.component';
 import { ShoppingProductsComponent } from '../shopping-products/shopping-products.component';
+import {
+  ShoppingTileSettingsComponent,
+  ShoppingTileSettingsData,
+  ShoppingTileSettingsResult
+} from '../shopping-tile-settings/shopping-tile-settings.component';
 import { normalizeShoppingList } from '../shopping-list.util';
 
 interface ShoppingTileDialogData {
@@ -94,8 +94,8 @@ export class ShoppingTileEditComponent {
   }
 
   openDisplaySettings(): void {
-    const ref = this.dialog.open<TileDisplaySettingsDialogComponent, TileDisplaySettingsDialogData, TileDisplaySettingsDialogResult | undefined>(
-      TileDisplaySettingsDialogComponent,
+    const ref = this.dialog.open<ShoppingTileSettingsComponent, ShoppingTileSettingsData, ShoppingTileSettingsResult | undefined>(
+      ShoppingTileSettingsComponent,
       {
         width: '460px',
         maxWidth: '95vw',
@@ -103,8 +103,7 @@ export class ShoppingTileEditComponent {
           title: this.headerTitle,
           icon: this.icon(),
           fallbackTitle: this.translation.t('common.tileTypes.shopping'),
-          dialogTitleKey: 'common.tileEdit.displaySettingsTitle',
-          autoSaveOnDismiss: true
+          categories: this.categories()
         },
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
@@ -116,8 +115,9 @@ export class ShoppingTileEditComponent {
       if (!result) return;
       this.titleControl.setValue(result.title);
       this.icon.set(result.icon);
+      this.categories.set(result.categories);
       this.cdr.markForCheck();
-      this.commitDisplaySettings();
+      void this.commitDisplaySettings();
     });
   }
 
@@ -238,18 +238,35 @@ export class ShoppingTileEditComponent {
     }
   }
 
-  private commitDisplaySettings(): void {
+  private async commitDisplaySettings(): Promise<void> {
     const title = this.headerTitle;
+    let shopping: ShoppingList;
+    try {
+      shopping = await this.imageStorage.prepareForStorage({
+        categories: this.categories(),
+        currency: this.initialList.currency
+      });
+    } catch {
+      this.messages.open(
+        this.translation.t('common.tiles.shopping.imageStorageFailed'),
+        this.translation.t('common.actions.ok'),
+        { duration: 3500 }
+      );
+      return;
+    }
     const updated: TileSetting = {
       ...this.data.tile,
       label: title,
       payload: {
         ...this.data.tile.payload,
         title,
-        icon: this.icon()
+        icon: this.icon(),
+        shopping: normalizeShoppingList(shopping)
       }
     };
     this.data.tile = updated;
     this.data.onTileCommit?.(updated);
+    const hydrated = await this.imageStorage.hydrate(normalizeShoppingList(shopping));
+    this.categories.set(hydrated.categories);
   }
 }

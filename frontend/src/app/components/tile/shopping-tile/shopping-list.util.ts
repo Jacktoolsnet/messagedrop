@@ -30,6 +30,7 @@ export function normalizeShoppingList(value?: ShoppingList): ShoppingList {
   const categories = (value?.categories ?? [])
     .map((category, categoryIndex): ShoppingCategory => ({
       id: category.id || createShoppingId('category'),
+      templateKey: typeof category.templateKey === 'string' && category.templateKey.trim() ? category.templateKey : undefined,
       name: (category.name ?? '').trim(),
       image: typeof category.image === 'string' && category.image.startsWith('data:image/') ? category.image : undefined,
       imageFileId: typeof category.imageFileId === 'string' && category.imageFileId.trim() ? category.imageFileId : undefined,
@@ -61,6 +62,7 @@ function normalizeProducts(products?: ShoppingProduct[]): ShoppingProduct[] {
   return (products ?? [])
     .map((product, productIndex): ShoppingProduct => ({
       id: product.id || createShoppingId('product'),
+      templateKey: typeof product.templateKey === 'string' && product.templateKey.trim() ? product.templateKey : undefined,
       name: (product.name ?? '').trim(),
       image: typeof product.image === 'string' && product.image.startsWith('data:image/') ? product.image : undefined,
       imageFileId: typeof product.imageFileId === 'string' && product.imageFileId.trim() ? product.imageFileId : undefined,
