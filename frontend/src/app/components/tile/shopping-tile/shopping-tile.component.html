@@ -3,7 +3,7 @@
     <mat-icon>{{ icon }}</mat-icon>
     <span class="shopping-title">{{ title }}</span>
     @if (activeProducts.length > 0) {
-      <span class="shopping-count">{{ completedCount }}/{{ activeProducts.length }}</span>
+      <span class="shopping-count">{{ formatPrice(estimatedTotal) }}</span>
     }
   </header>
 

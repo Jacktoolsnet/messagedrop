@@ -48,8 +48,8 @@ export class ShoppingProductsComponent {
     return this.data.category.backgroundImage ? `url(${this.data.category.backgroundImage})` : 'none';
   }
 
-  get backgroundOpacity(): number {
-    return 1 - Math.min(100, Math.max(0, this.data.category.backgroundTransparency ?? 40)) / 100;
+  get backgroundTransparency(): string {
+    return `${Math.min(100, Math.max(0, this.data.category.backgroundTransparency ?? 40))}%`;
   }
 
   addProduct(): void {

@@ -1,20 +1,24 @@
 .products-dialog {
-  position: relative;
-  isolation: isolate;
+  box-sizing: border-box;
+  width: 100%;
+  background-image:
+    linear-gradient(
+      color-mix(in srgb, var(--mat-dialog-container-color) var(--products-bg-transparency), transparent),
+      color-mix(in srgb, var(--mat-dialog-container-color) var(--products-bg-transparency), transparent)
+    ),
+    var(--products-bg-image);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: scroll;
+}
+
+.products-surface {
+  display: flex;
+  flex-direction: column;
   box-sizing: border-box;
   width: 100%;
   min-height: 18rem;
-}
-
-.products-dialog::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background-image: var(--products-bg-image);
-  background-position: center;
-  background-size: cover;
-  opacity: var(--products-bg-opacity);
 }
 
 .product-grid {
@@ -90,7 +94,7 @@
 
 .attribution {
   width: fit-content;
-  margin: 0 0 0.75rem;
+  margin: 1rem 0 0.75rem;
   padding: 0.35rem 0.55rem;
   border-radius: 0.5rem;
   background: color-mix(in srgb, var(--mat-card-filled-container-color) 88%, transparent);

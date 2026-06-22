@@ -2,57 +2,59 @@
 
 <mat-dialog-content class="products-dialog" [style.--products-bg-image]="backgroundImage"
   [style.--shopping-selection-color]="data.selectionColor"
-  [style.--products-bg-opacity]="backgroundOpacity">
-  @if (data.category.backgroundAttribution; as attribution) {
-    <p class="attribution">
-      {{ 'common.avatarAttribution.photoBy' | transloco }}
-      <a [href]="attribution.authorUrl" target="_blank" rel="noopener">{{ attribution.authorName }}</a>
-      {{ 'common.avatarAttribution.onUnsplash' | transloco }}
-      <a [href]="attribution.unsplashUrl" target="_blank" rel="noopener">Unsplash</a>
-    </p>
-  }
+  [style.--products-bg-transparency]="backgroundTransparency">
+  <div class="products-surface">
+    @if (products().length > 0) {
+      <div class="product-grid">
+        @for (product of products(); track product.id) {
+          <article class="product-tile" [class.product-tile--needed]="product.needed">
+            @if (product.image) {
+              <img class="product-avatar" [src]="product.image" [alt]="product.name" />
+            } @else {
+              <mat-icon class="product-symbol">inventory_2</mat-icon>
+            }
+            <h3>{{ product.name }}</h3>
+            <p>{{ product.quantity }} {{ ('common.tiles.shopping.units.' + product.unit) | transloco }}</p>
+            @if (product.price !== undefined) {
+              <strong>{{ formatPrice(product.price) }}</strong>
+            } @else {
+              <span class="no-price">{{ 'common.tiles.shopping.noPrice' | transloco }}</span>
+            }
+            <mat-icon class="product-note-icon" [class.product-note-icon--filled]="!!product.notes"
+              [attr.aria-label]="product.notes || ('common.tiles.shopping.noProductNotes' | transloco)"
+              [attr.title]="product.notes || ('common.tiles.shopping.noProductNotes' | transloco)">
+              sticky_note_2
+            </mat-icon>
+            <div class="product-actions">
+              <button mat-icon-button type="button" (click)="toggleNeeded(product)"
+                [attr.aria-pressed]="product.needed" [attr.aria-label]="'common.tiles.shopping.toggleNeeded' | transloco:{ name: product.name }">
+                <mat-icon>{{ product.needed ? 'remove_shopping_cart' : 'add_shopping_cart' }}</mat-icon>
+              </button>
+              <button mat-icon-button color="primary" type="button" (click)="editProduct(product)"
+                [attr.aria-label]="'common.tiles.shopping.editProductAria' | transloco:{ name: product.name }">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" type="button" (click)="deleteProduct(product)"
+                [attr.aria-label]="'common.tiles.shopping.deleteProduct' | transloco">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </article>
+        }
+      </div>
+    } @else {
+      <div class="empty-state"><mat-icon>inventory_2</mat-icon><p>{{ 'common.tiles.shopping.noProducts' | transloco }}</p></div>
+    }
 
-  @if (products().length > 0) {
-    <div class="product-grid">
-      @for (product of products(); track product.id) {
-        <article class="product-tile" [class.product-tile--needed]="product.needed">
-          @if (product.image) {
-            <img class="product-avatar" [src]="product.image" [alt]="product.name" />
-          } @else {
-            <mat-icon class="product-symbol">inventory_2</mat-icon>
-          }
-          <h3>{{ product.name }}</h3>
-          <p>{{ product.quantity }} {{ ('common.tiles.shopping.units.' + product.unit) | transloco }}</p>
-          @if (product.price !== undefined) {
-            <strong>{{ formatPrice(product.price) }}</strong>
-          } @else {
-            <span class="no-price">{{ 'common.tiles.shopping.noPrice' | transloco }}</span>
-          }
-          <mat-icon class="product-note-icon" [class.product-note-icon--filled]="!!product.notes"
-            [attr.aria-label]="product.notes || ('common.tiles.shopping.noProductNotes' | transloco)"
-            [attr.title]="product.notes || ('common.tiles.shopping.noProductNotes' | transloco)">
-            sticky_note_2
-          </mat-icon>
-          <div class="product-actions">
-            <button mat-icon-button type="button" (click)="toggleNeeded(product)"
-              [attr.aria-pressed]="product.needed" [attr.aria-label]="'common.tiles.shopping.toggleNeeded' | transloco:{ name: product.name }">
-              <mat-icon>{{ product.needed ? 'remove_shopping_cart' : 'add_shopping_cart' }}</mat-icon>
-            </button>
-            <button mat-icon-button color="primary" type="button" (click)="editProduct(product)"
-              [attr.aria-label]="'common.tiles.shopping.editProductAria' | transloco:{ name: product.name }">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button mat-icon-button color="warn" type="button" (click)="deleteProduct(product)"
-              [attr.aria-label]="'common.tiles.shopping.deleteProduct' | transloco">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
-        </article>
-      }
-    </div>
-  } @else {
-    <div class="empty-state"><mat-icon>inventory_2</mat-icon><p>{{ 'common.tiles.shopping.noProducts' | transloco }}</p></div>
-  }
+    @if (data.category.backgroundAttribution; as attribution) {
+      <p class="attribution">
+        {{ 'common.avatarAttribution.photoBy' | transloco }}
+        <a [href]="attribution.authorUrl" target="_blank" rel="noopener">{{ attribution.authorName }}</a>
+        {{ 'common.avatarAttribution.onUnsplash' | transloco }}
+        <a [href]="attribution.unsplashUrl" target="_blank" rel="noopener">Unsplash</a>
+      </p>
+    }
+  </div>
 </mat-dialog-content>
 
 <mat-dialog-actions class="sticky-actions" align="end">

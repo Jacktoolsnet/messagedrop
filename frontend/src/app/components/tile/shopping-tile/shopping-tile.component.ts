@@ -62,8 +62,8 @@ export class ShoppingTileComponent implements OnChanges {
     return activeShoppingProducts(this.shopping);
   }
 
-  get completedCount(): number {
-    return this.activeProducts.filter(product => product.done).length;
+  get estimatedTotal(): number {
+    return this.activeProducts.reduce((sum, product) => sum + (product.price ?? 0), 0);
   }
 
   get previewCategories(): { category: ShoppingCategory; count: number; price: number }[] {
