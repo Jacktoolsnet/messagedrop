@@ -39,6 +39,8 @@ export type ShoppingUnit =
 export interface ShoppingProduct {
   id: string;
   name: string;
+  image?: string;
+  imageAttribution?: AvatarAttribution;
   quantity: number;
   unit: ShoppingUnit;
   price?: number;

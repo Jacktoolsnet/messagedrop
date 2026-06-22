@@ -52,7 +52,12 @@
     "avatarSource": {
       "title": "Choisir la source de l'avatar",
       "file": "Choisir une image",
-      "unsplash": "Utiliser Unsplash"
+      "unsplash": "Utiliser Unsplash",
+      "camera": "Prendre une photo",
+      "cameraTitle": "Prendre une photo",
+      "cameraHint": "Dirigez la caméra vers le produit et prenez la photo.",
+      "cameraUnavailable": "La caméra n’a pas pu être ouverte. Vérifiez l’autorisation de la caméra dans le navigateur.",
+      "capture": "Prendre une photo"
     },
     "backgroundSource": {
       "title": "Choisir la source du fond"
@@ -792,6 +797,9 @@
         "editProduct": "Modifier le produit",
         "editProductAria": "Modifier le produit {{ name }}",
         "sortProducts": "Trier les produits",
+        "setProductImage": "Définir l’image du produit",
+        "removeProductImage": "Supprimer l’image du produit",
+        "productImageTitle": "Recadrer l’image du produit",
         "noProducts": "Aucun produit dans cette catégorie pour l’instant.",
         "chooseCategoryImage": "Choisir l’image de la catégorie",
         "setCategoryImage": "Définir l’image de la catégorie",

@@ -6,6 +6,50 @@
   width: 100%;
 }
 
+.avatar-area {
+  position: relative;
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+  border-radius: 1rem;
+  background: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+}
+
+.set-image-button {
+  width: 100%;
+}
+
+.avatar-center {
+  display: flex;
+  justify-content: center;
+}
+
+.avatar {
+  width: 7rem;
+  height: 7rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.image-actions {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  transform: translateY(50%);
+  display: flex;
+  gap: 0.5rem;
+}
+
+.attribution {
+  margin: 0.5rem 0 0;
+  text-align: center;
+  font-size: 0.7rem;
+}
+
+.attribution a {
+  color: inherit;
+}
+
 .value-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

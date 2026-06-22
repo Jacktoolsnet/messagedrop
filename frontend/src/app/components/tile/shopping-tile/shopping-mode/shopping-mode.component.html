@@ -21,7 +21,16 @@
 
     <section class="product-card" [class.product-card--done]="item.product.done" [class.product-card--celebrate]="celebrating()">
       <span class="product-category">{{ item.category.name }}</span>
-      <mat-icon class="product-icon">{{ item.product.done ? 'check_circle' : 'shopping_basket' }}</mat-icon>
+      @if (item.product.image) {
+        <div class="product-image-wrap">
+          <img class="product-image" [src]="item.product.image" [alt]="item.product.name" />
+          @if (item.product.done) {
+            <mat-icon class="product-done-badge">check_circle</mat-icon>
+          }
+        </div>
+      } @else {
+        <mat-icon class="product-icon">{{ item.product.done ? 'check_circle' : 'shopping_basket' }}</mat-icon>
+      }
       <h2>{{ item.product.name }}</h2>
       <p class="product-quantity">
         {{ item.product.quantity }} {{ ('common.tiles.shopping.units.' + item.product.unit) | transloco }}

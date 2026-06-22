@@ -9,13 +9,15 @@ import { EnableExternalContentComponent } from '../enable-external-content/enabl
 import { HelpDialogService } from '../help-dialog/help-dialog.service';
 import { DialogHeaderComponent } from '../dialog-header/dialog-header.component';
 
-export type AvatarSourceChoice = 'file' | 'unsplash';
+export type AvatarSourceChoice = 'file' | 'unsplash' | 'camera';
 
 export interface AvatarSourceDialogData {
   titleKey?: string;
   icon?: string;
   fileLabelKey?: string;
   unsplashLabelKey?: string;
+  showCamera?: boolean;
+  cameraLabelKey?: string;
 }
 
 @Component({
@@ -45,6 +47,8 @@ export class AvatarSourceDialogComponent {
   readonly icon = this.data?.icon ?? 'account_circle';
   readonly fileLabelKey = this.data?.fileLabelKey ?? 'common.avatarSource.file';
   readonly unsplashLabelKey = this.data?.unsplashLabelKey ?? 'common.avatarSource.unsplash';
+  readonly cameraLabelKey = this.data?.cameraLabelKey ?? 'common.avatarSource.camera';
+  readonly showCamera = !!this.data?.showCamera && this.hasCameraSupport();
 
   showUnsplash = this.appService.getAppSettings().enableUnsplashContent;
 
@@ -56,10 +60,18 @@ export class AvatarSourceDialogComponent {
     this.dialogRef.close('unsplash');
   }
 
+  chooseCamera(): void {
+    this.dialogRef.close('camera');
+  }
+
   onEnabledChange(enabled: boolean): void {
     const current = this.appService.getAppSettings();
     const updated: AppSettings = { ...current, enableUnsplashContent: enabled };
     this.appService.setAppSettings(updated);
     this.showUnsplash = enabled;
+  }
+
+  private hasCameraSupport(): boolean {
+    return typeof navigator !== 'undefined' && !!navigator.mediaDevices?.getUserMedia;
   }
 }

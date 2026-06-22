@@ -58,6 +58,8 @@ function normalizeProducts(products?: ShoppingProduct[]): ShoppingProduct[] {
     .map((product, productIndex): ShoppingProduct => ({
       id: product.id || createShoppingId('product'),
       name: (product.name ?? '').trim(),
+      image: typeof product.image === 'string' && product.image.startsWith('data:image/') ? product.image : undefined,
+      imageAttribution: product.imageAttribution?.source === 'unsplash' ? product.imageAttribution : undefined,
       quantity: Number.isFinite(product.quantity) && product.quantity > 0 ? product.quantity : 1,
       unit: SHOPPING_UNITS.includes(product.unit) ? product.unit : 'piece',
       price: Number.isFinite(product.price) && (product.price ?? -1) >= 0 ? product.price : undefined,

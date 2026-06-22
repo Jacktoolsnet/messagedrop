@@ -15,7 +15,11 @@
     <div class="product-grid">
       @for (product of products(); track product.id) {
         <article class="product-tile" [class.product-tile--needed]="product.needed">
-          <mat-icon class="product-symbol">inventory_2</mat-icon>
+          @if (product.image) {
+            <img class="product-avatar" [src]="product.image" [alt]="product.name" />
+          } @else {
+            <mat-icon class="product-symbol">inventory_2</mat-icon>
+          }
           <h3>{{ product.name }}</h3>
           <p>{{ product.quantity }} {{ ('common.tiles.shopping.units.' + product.unit) | transloco }}</p>
           @if (product.price !== undefined) {

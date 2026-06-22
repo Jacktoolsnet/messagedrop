@@ -81,6 +81,27 @@
   margin: 1rem 0;
 }
 
+.product-image-wrap {
+  position: relative;
+  margin: 1rem 0;
+}
+
+.product-image {
+  width: 8rem;
+  height: 8rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.product-done-badge {
+  position: absolute;
+  right: -0.3rem;
+  bottom: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 2.5rem;
+}
+
 .product-card h2 {
   margin: 0;
   font-size: clamp(1.8rem, 8vw, 3rem);

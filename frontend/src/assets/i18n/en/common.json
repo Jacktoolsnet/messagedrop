@@ -52,7 +52,12 @@
     "avatarSource": {
       "title": "Choose avatar source",
       "file": "Choose image",
-      "unsplash": "Use Unsplash"
+      "unsplash": "Use Unsplash",
+      "camera": "Take photo",
+      "cameraTitle": "Take photo",
+      "cameraHint": "Point the camera at the product and take the photo.",
+      "cameraUnavailable": "The camera could not be opened. Please check the camera permission in your browser.",
+      "capture": "Take photo"
     },
     "backgroundSource": {
       "title": "Choose background source"
@@ -793,6 +798,9 @@
         "editProduct": "Edit product",
         "editProductAria": "Edit product {{ name }}",
         "sortProducts": "Sort products",
+        "setProductImage": "Set product image",
+        "removeProductImage": "Remove product image",
+        "productImageTitle": "Crop product image",
         "noProducts": "No products in this category yet.",
         "chooseCategoryImage": "Choose category image",
         "setCategoryImage": "Set category image",

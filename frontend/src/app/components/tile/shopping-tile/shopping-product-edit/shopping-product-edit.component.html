@@ -4,6 +4,33 @@
     <mat-label>{{ 'common.tiles.shopping.productName' | transloco }}</mat-label>
     <input matInput cdkFocusInitial [formControl]="nameControl" />
   </mat-form-field>
+
+  <input #fileInput hidden type="file" accept="image/png,image/jpeg,image/webp" (change)="onImageSelected($event)" />
+  @if (!image()) {
+    <div class="avatar-area">
+      <button mat-flat-button color="primary" class="set-image-button" type="button" (click)="openImageSource(fileInput)">
+        <mat-icon>add_photo_alternate</mat-icon>
+        <span>{{ 'common.tiles.shopping.setProductImage' | transloco }}</span>
+      </button>
+    </div>
+  } @else {
+    <div class="avatar-area">
+      <div class="avatar-center"><img class="avatar" [src]="image()" [alt]="nameControl.value" /></div>
+      @if (imageAttribution(); as attribution) {
+        <p class="attribution">
+          {{ 'common.avatarAttribution.photoBy' | transloco }}
+          <a [href]="attribution.authorUrl" target="_blank" rel="noopener">{{ attribution.authorName }}</a>
+          {{ 'common.avatarAttribution.onUnsplash' | transloco }}
+          <a [href]="attribution.unsplashUrl" target="_blank" rel="noopener">Unsplash</a>
+        </p>
+      }
+      <div class="image-actions">
+        <button mat-mini-fab color="primary" type="button" (click)="editImage()" [attr.aria-label]="'common.actions.edit' | transloco"><mat-icon>edit</mat-icon></button>
+        <button mat-mini-fab color="warn" type="button" (click)="removeImage()" [attr.aria-label]="'common.tiles.shopping.removeProductImage' | transloco"><mat-icon>delete</mat-icon></button>
+      </div>
+    </div>
+  }
+
   <div class="value-grid">
     <mat-form-field appearance="outline">
       <mat-label>{{ 'common.tiles.shopping.quantity' | transloco }}</mat-label>

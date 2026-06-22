@@ -1,0 +1,27 @@
+<app-dialog-header icon="photo_camera" [title]="'common.avatarSource.cameraTitle' | transloco"></app-dialog-header>
+
+<mat-dialog-content class="camera-content">
+  <div class="preview">
+    <video #video autoplay muted playsinline></video>
+    @if (failed()) {
+      <div class="camera-error">
+        <mat-icon>no_photography</mat-icon>
+        <p>{{ 'common.avatarSource.cameraUnavailable' | transloco }}</p>
+      </div>
+    }
+  </div>
+  @if (!failed()) {
+    <p class="camera-hint">{{ 'common.avatarSource.cameraHint' | transloco }}</p>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-icon-button class="action-close" type="button" (click)="close()"
+    [attr.aria-label]="'common.actions.close' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+  <button mat-fab color="primary" type="button" (click)="capture()" [disabled]="!ready()"
+    [attr.aria-label]="'common.avatarSource.capture' | transloco">
+    <mat-icon>photo_camera</mat-icon>
+  </button>
+</mat-dialog-actions>

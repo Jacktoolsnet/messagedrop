@@ -10,6 +10,13 @@
       <span>{{ fileLabelKey | transloco }}</span>
     </button>
 
+    @if (showCamera) {
+    <button mat-flat-button color="primary" class="source-button" (click)="chooseCamera()">
+      <mat-icon>photo_camera</mat-icon>
+      <span>{{ cameraLabelKey | transloco }}</span>
+    </button>
+    }
+
     @if (showUnsplash) {
     <button mat-flat-button class="source-button" (click)="chooseUnsplash()">
       <mat-icon>photo_library</mat-icon>

@@ -43,6 +43,13 @@
   font-size: 2.75rem;
 }
 
+.product-avatar {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
 .product-tile h3 {
   margin: 0.5rem 0 0.25rem;
   overflow-wrap: anywhere;
