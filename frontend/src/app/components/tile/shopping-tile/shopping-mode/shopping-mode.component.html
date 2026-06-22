@@ -1,7 +1,7 @@
 <app-dialog-header icon="shopping_cart_checkout"
   [title]="categoryTitle() || ('common.tiles.shopping.modeTitle' | transloco)"></app-dialog-header>
 
-<mat-dialog-content class="shopping-mode">
+<mat-dialog-content class="shopping-mode" [style.--shopping-selection-color]="shopping().selectionColor">
   @if (current(); as item) {
     <div class="progress-row">
       <span>{{ 'common.tiles.shopping.progress' | transloco:{ completed: completedCount(), total: entries().length } }}</span>
