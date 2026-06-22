@@ -845,7 +845,8 @@
           "bag": "bag",
           "bunch": "bunch"
         },
-        "imageStorageFailed": "The image could not be saved to local file storage."
+        "imageStorageFailed": "The image could not be saved to local file storage.",
+        "noPrice": "No price"
       },
       "quickActions": {
         "empty": "No actions yet. Tap to add.",

@@ -845,7 +845,8 @@
           "bag": "Beutel",
           "bunch": "Bund"
         },
-        "imageStorageFailed": "Das Bild konnte nicht im lokalen Dateispeicher gespeichert werden."
+        "imageStorageFailed": "Das Bild konnte nicht im lokalen Dateispeicher gespeichert werden.",
+        "noPrice": "Kein Preis"
       },
       "quickActions": {
         "empty": "Noch keine Aktionen. Tippe, um eine hinzuzufügen.",

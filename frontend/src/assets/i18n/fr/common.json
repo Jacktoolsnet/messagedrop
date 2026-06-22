@@ -844,7 +844,8 @@
           "bag": "sachet",
           "bunch": "botte"
         },
-        "imageStorageFailed": "L’image n’a pas pu être enregistrée dans le stockage local de fichiers."
+        "imageStorageFailed": "L’image n’a pas pu être enregistrée dans le stockage local de fichiers.",
+        "noPrice": "Aucun prix"
       },
       "quickActions": {
         "empty": "Aucune action pour l'instant. Appuyez pour en ajouter.",

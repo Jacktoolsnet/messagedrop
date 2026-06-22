@@ -24,6 +24,8 @@
           <p>{{ product.quantity }} {{ ('common.tiles.shopping.units.' + product.unit) | transloco }}</p>
           @if (product.price !== undefined) {
             <strong>{{ formatPrice(product.price) }}</strong>
+          } @else {
+            <span class="no-price">{{ 'common.tiles.shopping.noPrice' | transloco }}</span>
           }
           <div class="product-actions">
             <button mat-icon-button type="button" (click)="toggleNeeded(product)"
