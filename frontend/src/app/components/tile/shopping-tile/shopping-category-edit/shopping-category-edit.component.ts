@@ -22,6 +22,7 @@ import { AvatarSourceChoice, AvatarSourceDialogComponent } from '../../../utils/
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 import { UnsplashComponent } from '../../../utils/unsplash/unsplash.component';
+import { saveDialogOnImplicitDismiss } from '../../../utils/dialog-auto-save.util';
 import { createShoppingId } from '../shopping-list.util';
 
 export interface ShoppingCategoryEditData {
@@ -73,6 +74,7 @@ export class ShoppingCategoryEditComponent {
   backgroundTransparency = this.source?.backgroundTransparency ?? 40;
 
   constructor() {
+    saveDialogOnImplicitDismiss(this.dialogRef, () => this.save());
     if (this.source) {
       void this.imageStorage.hydrateCategory(this.source).then(category => {
         if (!this.image() && !this.imageRemoved()) this.image.set(category.image);

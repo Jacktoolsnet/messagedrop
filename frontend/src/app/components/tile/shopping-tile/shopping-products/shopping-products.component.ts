@@ -8,6 +8,7 @@ import { LanguageService } from '../../../../services/language.service';
 import { ShoppingImageStorageService } from '../../../../services/shopping-image-storage.service';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
+import { saveDialogOnImplicitDismiss } from '../../../utils/dialog-auto-save.util';
 import { ShoppingProductEditComponent } from '../shopping-product-edit/shopping-product-edit.component';
 import { ShoppingProductSortComponent } from '../shopping-product-sort/shopping-product-sort.component';
 
@@ -29,6 +30,7 @@ export class ShoppingProductsComponent {
   readonly products = signal(this.data.category.products.map(product => ({ ...product })));
 
   constructor() {
+    saveDialogOnImplicitDismiss(this.dialogRef, () => this.save());
     void this.imageStorage.hydrateCategory(this.data.category).then(category => {
       this.data.category = {
         ...this.data.category,
@@ -78,7 +80,7 @@ export class ShoppingProductsComponent {
       data: { products: this.products() },
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: false
+      disableClose: true
     });
     ref.afterClosed().subscribe((products?: ShoppingProduct[]) => {
       if (products) this.products.set(products);
@@ -107,7 +109,7 @@ export class ShoppingProductsComponent {
       data: { product },
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: false
+      disableClose: true
     });
     ref.afterClosed().subscribe((updated?: ShoppingProduct) => {
       if (!updated) return;

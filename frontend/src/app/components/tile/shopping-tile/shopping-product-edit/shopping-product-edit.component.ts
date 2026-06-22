@@ -22,6 +22,7 @@ import { AvatarSourceChoice, AvatarSourceDialogComponent } from '../../../utils/
 import { CameraCaptureDialogComponent } from '../../../utils/camera-capture-dialog/camera-capture-dialog.component';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
 import { UnsplashComponent } from '../../../utils/unsplash/unsplash.component';
+import { saveDialogOnImplicitDismiss } from '../../../utils/dialog-auto-save.util';
 import { createShoppingId, SHOPPING_UNITS } from '../shopping-list.util';
 
 @Component({
@@ -51,6 +52,7 @@ export class ShoppingProductEditComponent {
   readonly units = SHOPPING_UNITS;
 
   constructor() {
+    saveDialogOnImplicitDismiss(this.dialogRef, () => this.save());
     if (this.product) {
       void this.imageStorage.hydrateProduct(this.product).then(product => {
         if (!this.image() && !this.imageRemoved()) this.image.set(product.image);

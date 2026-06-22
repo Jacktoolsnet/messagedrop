@@ -81,7 +81,7 @@ export class ShoppingTileComponent implements OnChanges {
       },
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: false
+      disableClose: true
     });
     ref.afterClosed().subscribe((updated?: TileSetting) => {
       if (updated) void this.applyTileUpdate(updated);

@@ -9,12 +9,14 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { MaticonPickerComponent } from '../../utils/maticon-picker/maticon-picker.component';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
+import { saveDialogOnImplicitDismiss } from '../../utils/dialog-auto-save.util';
 
 export interface TileDisplaySettingsDialogData {
   title: string;
   icon?: string;
   fallbackTitle: string;
   dialogTitleKey?: string;
+  autoSaveOnDismiss?: boolean;
 }
 
 export interface TileDisplaySettingsDialogResult {
@@ -49,6 +51,12 @@ export class TileDisplaySettingsDialogComponent {
 
   readonly titleControl = new FormControl(this.data.title, { nonNullable: true });
   readonly icon = signal<string | undefined>(this.data.icon);
+
+  constructor() {
+    if (this.data.autoSaveOnDismiss) {
+      saveDialogOnImplicitDismiss(this.dialogRef, () => this.save());
+    }
+  }
 
   pickIcon(): void {
     const ref = this.dialog.open(MaticonPickerComponent, {

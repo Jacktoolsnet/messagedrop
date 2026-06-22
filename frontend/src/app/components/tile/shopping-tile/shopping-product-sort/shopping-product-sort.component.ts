@@ -6,6 +6,7 @@ import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ShoppingProduct } from '../../../../interfaces/tile-settings';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
+import { saveDialogOnImplicitDismiss } from '../../../utils/dialog-auto-save.util';
 
 @Component({
   selector: 'app-shopping-product-sort',
@@ -18,6 +19,10 @@ import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-heade
 export class ShoppingProductSortComponent {
   private readonly dialogRef = inject(MatDialogRef<ShoppingProductSortComponent>);
   readonly products = signal(inject<{ products: ShoppingProduct[] }>(MAT_DIALOG_DATA).products.map(product => ({ ...product })));
+
+  constructor() {
+    saveDialogOnImplicitDismiss(this.dialogRef, () => this.apply());
+  }
 
   drop(event: CdkDragDrop<ShoppingProduct[]>): void {
     const products = [...this.products()];

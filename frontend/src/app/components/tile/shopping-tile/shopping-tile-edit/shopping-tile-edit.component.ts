@@ -10,6 +10,7 @@ import { DisplayMessageService } from '../../../../services/display-message.serv
 import { ShoppingImageStorageService } from '../../../../services/shopping-image-storage.service';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
+import { saveDialogOnImplicitDismiss } from '../../../utils/dialog-auto-save.util';
 import {
   TileDisplaySettingsDialogComponent,
   TileDisplaySettingsDialogData,
@@ -54,6 +55,7 @@ export class ShoppingTileEditComponent {
   readonly saving = signal(false);
 
   constructor() {
+    saveDialogOnImplicitDismiss(this.dialogRef, () => void this.save());
     void this.imageStorage.hydrate(this.initialList).then(list => {
       this.categories.update(categories => categories.map(category => {
         const hydrated = list.categories.find(item => item.id === category.id);
@@ -101,11 +103,12 @@ export class ShoppingTileEditComponent {
           title: this.headerTitle,
           icon: this.icon(),
           fallbackTitle: this.translation.t('common.tileTypes.shopping'),
-          dialogTitleKey: 'common.tileEdit.displaySettingsTitle'
+          dialogTitleKey: 'common.tileEdit.displaySettingsTitle',
+          autoSaveOnDismiss: true
         },
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
-        disableClose: false
+        disableClose: true
       }
     );
 
@@ -126,7 +129,7 @@ export class ShoppingTileEditComponent {
       data: {},
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: false
+      disableClose: true
     });
     ref.afterClosed().subscribe((category?: ShoppingCategory) => {
       if (!category) return;
@@ -142,7 +145,7 @@ export class ShoppingTileEditComponent {
       data: { category },
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: false
+      disableClose: true
     });
     ref.afterClosed().subscribe((updated?: ShoppingCategory) => {
       if (!updated) return;
@@ -160,7 +163,7 @@ export class ShoppingTileEditComponent {
       data: { category, currency: this.initialList.currency },
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: false
+      disableClose: true
     });
     ref.afterClosed().subscribe((updated?: ShoppingCategory) => {
       if (!updated) return;
@@ -195,7 +198,7 @@ export class ShoppingTileEditComponent {
       data: { categories: this.categories() },
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: false
+      disableClose: true
     });
     ref.afterClosed().subscribe((categories?: ShoppingCategory[]) => {
       if (categories) this.categories.set(categories);
