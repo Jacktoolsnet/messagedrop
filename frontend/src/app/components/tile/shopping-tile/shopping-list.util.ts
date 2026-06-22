@@ -19,6 +19,8 @@ export const SHOPPING_UNITS: readonly ShoppingUnit[] = [
   'bunch'
 ];
 
+export const DEFAULT_SHOPPING_SELECTION_COLOR = '#4fa1c7';
+
 export function createShoppingId(prefix: 'category' | 'product'): string {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
     return crypto.randomUUID();
@@ -54,7 +56,10 @@ export function normalizeShoppingList(value?: ShoppingList): ShoppingList {
 
   return {
     categories,
-    currency: value?.currency?.trim().toUpperCase() || 'EUR'
+    currency: value?.currency?.trim().toUpperCase() || 'EUR',
+    selectionColor: /^#[0-9a-f]{6}$/i.test(value?.selectionColor ?? '')
+      ? value?.selectionColor
+      : DEFAULT_SHOPPING_SELECTION_COLOR
   };
 }
 
@@ -64,6 +69,7 @@ function normalizeProducts(products?: ShoppingProduct[]): ShoppingProduct[] {
       id: product.id || createShoppingId('product'),
       templateKey: typeof product.templateKey === 'string' && product.templateKey.trim() ? product.templateKey : undefined,
       name: (product.name ?? '').trim(),
+      notes: typeof product.notes === 'string' && product.notes.trim() ? product.notes.trim() : undefined,
       image: typeof product.image === 'string' && product.image.startsWith('data:image/') ? product.image : undefined,
       imageFileId: typeof product.imageFileId === 'string' && product.imageFileId.trim() ? product.imageFileId : undefined,
       imageAttribution: product.imageAttribution?.source === 'unsplash' ? product.imageAttribution : undefined,

@@ -30,6 +30,9 @@
       @if (item.product.price !== undefined) {
         <p class="product-price">{{ formatPrice(item.product.price) }}</p>
       }
+      @if (item.product.notes) {
+        <p class="product-notes">{{ item.product.notes }}</p>
+      }
     </section>
 
     <div class="navigation">

@@ -15,6 +15,22 @@
     <input matInput [formControl]="titleControl" maxlength="64" />
   </mat-form-field>
 
+  <section class="color-section">
+    <h3>{{ 'common.tiles.shopping.selectionColor' | transloco }}</h3>
+    <input #colorInput class="native-color-input" type="color" [formControl]="selectionColorControl"
+      [attr.aria-label]="'common.tiles.shopping.chooseSelectionColor' | transloco" />
+    <div class="color-actions">
+      <button mat-stroked-button type="button" (click)="colorInput.click()">
+        <span class="color-swatch" [style.background-color]="selectionColorControl.value"></span>
+        {{ 'common.tiles.shopping.chooseSelectionColor' | transloco }}
+      </button>
+      <button mat-icon-button type="button" (click)="resetSelectionColor()"
+        [attr.aria-label]="'common.tiles.shopping.resetSelectionColor' | transloco">
+        <mat-icon>restart_alt</mat-icon>
+      </button>
+    </div>
+  </section>
+
   <section class="template-section">
     <h3>{{ 'common.tiles.shopping.templates.sectionTitle' | transloco }}</h3>
     <p>{{ 'common.tiles.shopping.templates.hint' | transloco }}</p>

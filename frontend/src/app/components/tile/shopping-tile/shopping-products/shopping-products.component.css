@@ -1,7 +1,8 @@
 .products-dialog {
   position: relative;
   isolation: isolate;
-  width: min(820px, 90vw);
+  box-sizing: border-box;
+  width: 100%;
   min-height: 18rem;
 }
 
@@ -34,7 +35,14 @@
 }
 
 .product-tile--needed {
-  border-color: var(--mat-sys-primary);
+  border-color: var(--shopping-selection-color, #4fa1c7);
+  background: color-mix(
+    in srgb,
+    var(--shopping-selection-color, #4fa1c7) 18%,
+    var(--mat-card-filled-container-color)
+  );
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--shopping-selection-color, #4fa1c7) 28%, transparent),
+    0 4px 12px var(--mat-card-outlined-outline-color);
 }
 
 .product-symbol {
@@ -62,6 +70,16 @@
 .no-price {
   color: var(--mat-sys-on-surface-variant);
   font-size: 0.9rem;
+}
+
+.product-note-icon {
+  display: block;
+  margin: 0.45rem auto 0;
+  color: #c5c5c5;
+}
+
+.product-note-icon--filled {
+  color: #5f6368;
 }
 
 .product-actions {

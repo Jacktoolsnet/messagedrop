@@ -125,7 +125,11 @@ export class ShoppingTileComponent implements OnChanges {
       width: '860px',
       maxWidth: '96vw',
       maxHeight: '96vh',
-      data: { category, currency: this.shopping.currency },
+      data: {
+        category,
+        currency: this.shopping.currency,
+        selectionColor: this.shopping.selectionColor
+      },
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
       disableClose: true

@@ -972,7 +972,13 @@
             "petBrush": "Tierbürste"
           },
           "contents": "{{ categories }} Kategorien mit {{ products }} Produkten"
-        }
+        },
+        "selectionColor": "Farbe ausgewählter Produkte",
+        "chooseSelectionColor": "Farbe auswählen",
+        "resetSelectionColor": "Standardfarbe wiederherstellen",
+        "productNotes": "Notizen",
+        "hasProductNotes": "Notiz vorhanden",
+        "noProductNotes": "Keine Notiz vorhanden"
       },
       "quickActions": {
         "empty": "Noch keine Aktionen. Tippe, um eine hinzuzufügen.",

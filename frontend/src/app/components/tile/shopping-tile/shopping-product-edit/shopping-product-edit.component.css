@@ -1,5 +1,6 @@
 .product-editor {
-  width: min(520px, 86vw);
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .product-name {
@@ -8,7 +9,7 @@
 
 .avatar-area {
   position: relative;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2.5rem;
   padding: 1.25rem;
   border-radius: 1rem;
   background: var(--mat-card-filled-container-color);
@@ -54,6 +55,10 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.75rem;
+}
+
+.product-notes-field {
+  width: 100%;
 }
 
 @media (max-width: 520px) {

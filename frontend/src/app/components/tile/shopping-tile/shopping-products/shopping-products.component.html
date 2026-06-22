@@ -1,6 +1,7 @@
 <app-dialog-header [icon]="data.category.image ? '' : 'inventory_2'" [title]="data.category.name"></app-dialog-header>
 
 <mat-dialog-content class="products-dialog" [style.--products-bg-image]="backgroundImage"
+  [style.--shopping-selection-color]="data.selectionColor"
   [style.--products-bg-opacity]="backgroundOpacity">
   @if (data.category.backgroundAttribution; as attribution) {
     <p class="attribution">
@@ -27,6 +28,11 @@
           } @else {
             <span class="no-price">{{ 'common.tiles.shopping.noPrice' | transloco }}</span>
           }
+          <mat-icon class="product-note-icon" [class.product-note-icon--filled]="!!product.notes"
+            [attr.aria-label]="product.notes || ('common.tiles.shopping.noProductNotes' | transloco)"
+            [attr.title]="product.notes || ('common.tiles.shopping.noProductNotes' | transloco)">
+            sticky_note_2
+          </mat-icon>
           <div class="product-actions">
             <button mat-icon-button type="button" (click)="toggleNeeded(product)"
               [attr.aria-pressed]="product.needed" [attr.aria-label]="'common.tiles.shopping.toggleNeeded' | transloco:{ name: product.name }">

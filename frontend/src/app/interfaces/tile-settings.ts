@@ -40,6 +40,7 @@ export interface ShoppingProduct {
   id: string;
   templateKey?: string;
   name: string;
+  notes?: string;
   image?: string;
   imageFileId?: string;
   imageAttribution?: AvatarAttribution;
@@ -69,6 +70,7 @@ export interface ShoppingCategory {
 export interface ShoppingList {
   categories: ShoppingCategory[];
   currency: string;
+  selectionColor?: string;
 }
 
 export interface TileQuickAction {

@@ -49,6 +49,11 @@
       <input matInput type="number" min="0" step="0.01" [formControl]="priceControl" />
     </mat-form-field>
   </div>
+
+  <mat-form-field appearance="outline" class="product-notes-field">
+    <mat-label>{{ 'common.tiles.shopping.productNotes' | transloco }}</mat-label>
+    <textarea matInput rows="3" maxlength="1000" [formControl]="notesControl"></textarea>
+  </mat-form-field>
 </mat-dialog-content>
 <mat-dialog-actions class="sticky-actions" align="end">
   <button mat-icon-button class="action-close" type="button" (click)="close()" [attr.aria-label]="'common.cancel' | transloco"><mat-icon>close</mat-icon></button>

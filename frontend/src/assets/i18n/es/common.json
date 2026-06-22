@@ -971,7 +971,13 @@
             "petBrush": "Cepillo para mascotas"
           },
           "contents": "{{ categories }} categorías con {{ products }} productos"
-        }
+        },
+        "selectionColor": "Color de productos seleccionados",
+        "chooseSelectionColor": "Elegir color",
+        "resetSelectionColor": "Restaurar color predeterminado",
+        "productNotes": "Notas",
+        "hasProductNotes": "Hay una nota",
+        "noProductNotes": "No hay ninguna nota"
       },
       "quickActions": {
         "empty": "Aún no hay acciones. Toca para añadir.",

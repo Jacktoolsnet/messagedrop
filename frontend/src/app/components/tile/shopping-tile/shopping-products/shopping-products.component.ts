@@ -26,7 +26,7 @@ export class ShoppingProductsComponent {
   private readonly language = inject(LanguageService);
   private readonly imageStorage = inject(ShoppingImageStorageService);
   readonly help = inject(HelpDialogService);
-  readonly data = inject<{ category: ShoppingCategory; currency: string }>(MAT_DIALOG_DATA);
+  readonly data = inject<{ category: ShoppingCategory; currency: string; selectionColor?: string }>(MAT_DIALOG_DATA);
   readonly products = signal(this.data.category.products.map(product => ({ ...product })));
 
   constructor() {

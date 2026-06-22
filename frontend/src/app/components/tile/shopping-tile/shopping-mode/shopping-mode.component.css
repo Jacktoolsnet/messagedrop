@@ -96,6 +96,18 @@
   font-weight: 700;
 }
 
+.product-notes {
+  display: -webkit-box;
+  overflow: hidden;
+  max-width: 100%;
+  margin: 0.75rem 0 0;
+  color: var(--mat-sys-on-surface-variant);
+  line-height: 1.3;
+  white-space: pre-wrap;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
 .navigation {
   display: flex;
   align-items: center;

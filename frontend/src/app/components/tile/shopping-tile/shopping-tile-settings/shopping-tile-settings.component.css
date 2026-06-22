@@ -22,15 +22,43 @@
   align-self: center;
 }
 
-.template-section {
+.template-section,
+.color-section {
   padding: 1rem;
   border: 1px solid var(--mat-card-outlined-outline-color);
   border-radius: 1rem;
   background: var(--mat-sys-surface-container);
 }
 
-.template-section h3 {
+.template-section h3,
+.color-section h3 {
   margin: 0;
+}
+
+.native-color-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.color-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.color-actions > button:first-of-type {
+  flex: 1;
+}
+
+.color-swatch {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 1px solid var(--mat-card-outlined-outline-color);
+  border-radius: 50%;
 }
 
 .template-section p {

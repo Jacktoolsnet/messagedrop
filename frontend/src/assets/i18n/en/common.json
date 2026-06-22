@@ -972,7 +972,13 @@
             "petBrush": "Pet brush"
           },
           "contents": "{{ categories }} categories with {{ products }} products"
-        }
+        },
+        "selectionColor": "Selected product color",
+        "chooseSelectionColor": "Choose color",
+        "resetSelectionColor": "Restore default color",
+        "productNotes": "Notes",
+        "hasProductNotes": "Note available",
+        "noProductNotes": "No note available"
       },
       "quickActions": {
         "empty": "No actions yet. Tap to add.",

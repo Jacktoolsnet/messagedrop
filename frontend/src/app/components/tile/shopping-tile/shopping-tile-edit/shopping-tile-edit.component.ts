@@ -52,6 +52,7 @@ export class ShoppingTileEditComponent {
     { nonNullable: true }
   );
   readonly icon = signal<string | undefined>(this.data.tile.payload?.icon);
+  readonly selectionColor = signal(this.initialList.selectionColor);
   readonly saving = signal(false);
 
   constructor() {
@@ -103,7 +104,8 @@ export class ShoppingTileEditComponent {
           title: this.headerTitle,
           icon: this.icon(),
           fallbackTitle: this.translation.t('common.tileTypes.shopping'),
-          categories: this.categories()
+          categories: this.categories(),
+          selectionColor: this.selectionColor()
         },
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
@@ -116,6 +118,7 @@ export class ShoppingTileEditComponent {
       this.titleControl.setValue(result.title);
       this.icon.set(result.icon);
       this.categories.set(result.categories);
+      this.selectionColor.set(result.selectionColor);
       this.cdr.markForCheck();
       void this.commitDisplaySettings();
     });
@@ -160,7 +163,7 @@ export class ShoppingTileEditComponent {
       width: '860px',
       maxWidth: '96vw',
       maxHeight: '96vh',
-      data: { category, currency: this.initialList.currency },
+      data: { category, currency: this.initialList.currency, selectionColor: this.selectionColor() },
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
       disableClose: true
@@ -178,7 +181,8 @@ export class ShoppingTileEditComponent {
     const { ShoppingModeComponent } = await import('../shopping-mode/shopping-mode.component');
     const shopping: ShoppingList = {
       categories: this.categories(),
-      currency: this.initialList.currency
+      currency: this.initialList.currency,
+      selectionColor: this.selectionColor()
     };
     const ref = this.dialog.open(ShoppingModeComponent, {
       width: '620px',
@@ -250,7 +254,8 @@ export class ShoppingTileEditComponent {
     try {
       const shopping = await this.imageStorage.prepareForStorage({
           categories: this.categories(),
-          currency: this.initialList.currency
+          currency: this.initialList.currency,
+          selectionColor: this.selectionColor()
       });
       this.dialogRef.close({
         ...this.data.tile,
@@ -278,7 +283,8 @@ export class ShoppingTileEditComponent {
     try {
       shopping = await this.imageStorage.prepareForStorage({
         categories: this.categories(),
-        currency: this.initialList.currency
+        currency: this.initialList.currency,
+        selectionColor: this.selectionColor()
       });
     } catch {
       this.messages.open(

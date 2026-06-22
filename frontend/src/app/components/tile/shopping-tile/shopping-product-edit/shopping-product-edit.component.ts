@@ -43,6 +43,7 @@ export class ShoppingProductEditComponent {
   private readonly imageStorage = inject(ShoppingImageStorageService);
   readonly product = inject<{ product?: ShoppingProduct }>(MAT_DIALOG_DATA).product;
   readonly nameControl = new FormControl(this.product?.name ?? '', { nonNullable: true });
+  readonly notesControl = new FormControl(this.product?.notes ?? '', { nonNullable: true });
   readonly quantityControl = new FormControl(this.product?.quantity ?? 1, { nonNullable: true });
   readonly unitControl = new FormControl<ShoppingUnit>(this.product?.unit ?? 'piece', { nonNullable: true });
   readonly priceControl = new FormControl<number | null>(this.product?.price ?? null);
@@ -135,6 +136,7 @@ export class ShoppingProductEditComponent {
     this.dialogRef.close({
       id: this.product?.id ?? createShoppingId('product'),
       name,
+      notes: this.notesControl.value.trim() || undefined,
       image: this.image(),
       imageFileId: !this.imageRemoved() && !this.image()?.startsWith('data:image/') ? this.product?.imageFileId : undefined,
       imageAttribution: this.imageAttribution(),

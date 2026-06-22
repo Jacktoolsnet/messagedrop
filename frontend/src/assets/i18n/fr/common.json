@@ -971,7 +971,13 @@
             "petBrush": "Brosse pour animaux"
           },
           "contents": "{{ categories }} catégories avec {{ products }} produits"
-        }
+        },
+        "selectionColor": "Couleur des produits sélectionnés",
+        "chooseSelectionColor": "Choisir la couleur",
+        "resetSelectionColor": "Rétablir la couleur par défaut",
+        "productNotes": "Notes",
+        "hasProductNotes": "Note disponible",
+        "noProductNotes": "Aucune note disponible"
       },
       "quickActions": {
         "empty": "Aucune action pour l'instant. Appuyez pour en ajouter.",

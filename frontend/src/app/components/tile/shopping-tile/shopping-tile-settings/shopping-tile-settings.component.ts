@@ -15,18 +15,21 @@ import { saveDialogOnImplicitDismiss } from '../../../utils/dialog-auto-save.uti
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
+import { DEFAULT_SHOPPING_SELECTION_COLOR } from '../shopping-list.util';
 
 export interface ShoppingTileSettingsData {
   title: string;
   icon?: string;
   fallbackTitle: string;
   categories: ShoppingCategory[];
+  selectionColor?: string;
 }
 
 export interface ShoppingTileSettingsResult {
   title: string;
   icon?: string;
   categories: ShoppingCategory[];
+  selectionColor: string;
 }
 
 @Component({
@@ -59,6 +62,10 @@ export class ShoppingTileSettingsComponent {
 
   readonly titleControl = new FormControl(this.data.title, { nonNullable: true });
   readonly templateControl = new FormControl<string | null>(null);
+  readonly selectionColorControl = new FormControl(
+    this.data.selectionColor ?? DEFAULT_SHOPPING_SELECTION_COLOR,
+    { nonNullable: true }
+  );
   readonly icon = signal<string | undefined>(this.data.icon);
   readonly categories = signal(this.data.categories.map(category => ({
     ...category,
@@ -97,6 +104,10 @@ export class ShoppingTileSettingsComponent {
     );
   }
 
+  resetSelectionColor(): void {
+    this.selectionColorControl.setValue(DEFAULT_SHOPPING_SELECTION_COLOR);
+  }
+
   pickIcon(): void {
     const ref = this.dialog.open(MaticonPickerComponent, {
       width: '520px',
@@ -118,7 +129,8 @@ export class ShoppingTileSettingsComponent {
     this.dialogRef.close({
       title: this.titleControl.value.trim() || this.data.fallbackTitle,
       icon: this.icon(),
-      categories: this.categories()
+      categories: this.categories(),
+      selectionColor: this.selectionColorControl.value
     });
   }
 }
