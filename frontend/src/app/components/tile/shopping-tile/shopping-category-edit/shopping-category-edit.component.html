@@ -8,24 +8,28 @@
 
   <input #avatarInput hidden type="file" accept="image/png,image/jpeg,image/webp" (change)="onFileSelected($event, 'avatar')" />
   @if (!image()) {
-    <section class="media-area">
-      <button mat-flat-button color="primary" type="button" (click)="openSourceDialog(avatarInput, 'avatar')">
+    <section class="avatar-area">
+      <button mat-flat-button color="primary" class="button-set-avatar" type="button" (click)="openSourceDialog(avatarInput, 'avatar')">
         <mat-icon>account_circle</mat-icon>
         <span>{{ 'common.tiles.shopping.setCategoryImage' | transloco }}</span>
       </button>
     </section>
   } @else {
-    <section class="media-area">
-      <img class="avatar" [src]="image()" [alt]="nameControl.value" />
+    <section class="avatar-area">
+      <div class="center">
+        <img class="avatar" [src]="image()" [alt]="nameControl.value" />
+      </div>
       @if (imageAttribution(); as attribution) {
-        <p class="attribution">
-          {{ 'common.avatarAttribution.photoBy' | transloco }}
-          <a [href]="attribution.authorUrl" target="_blank" rel="noopener">{{ attribution.authorName }}</a>
-          {{ 'common.avatarAttribution.onUnsplash' | transloco }}
-          <a [href]="attribution.unsplashUrl" target="_blank" rel="noopener">Unsplash</a>
-        </p>
+        <div class="unsplash-badge-wrapper">
+          <p class="unsplash-badge">
+            {{ 'common.avatarAttribution.photoBy' | transloco }}
+            <a class="unsplash-badge__link" [href]="attribution.authorUrl" target="_blank" rel="noopener">{{ attribution.authorName }}</a>
+            {{ 'common.avatarAttribution.onUnsplash' | transloco }}
+            <a class="unsplash-badge__link" [href]="attribution.unsplashUrl" target="_blank" rel="noopener">Unsplash</a>
+          </p>
+        </div>
       }
-      <div class="media-actions">
+      <div class="button-style">
         <button mat-mini-fab color="primary" type="button" (click)="editImage('avatar')" [attr.aria-label]="'common.actions.edit' | transloco">
           <mat-icon>edit</mat-icon>
         </button>
@@ -38,25 +42,27 @@
 
   <input #backgroundInput hidden type="file" accept="image/png,image/jpeg,image/webp" (change)="onFileSelected($event, 'background')" />
   @if (!backgroundImage()) {
-    <section class="media-area">
-      <button mat-flat-button color="primary" type="button" (click)="openSourceDialog(backgroundInput, 'background')">
+    <section class="avatar-area">
+      <button mat-flat-button color="primary" class="button-set-avatar" type="button" (click)="openSourceDialog(backgroundInput, 'background')">
         <mat-icon>wallpaper</mat-icon>
         <span>{{ 'common.tiles.shopping.setCategoryBackground' | transloco }}</span>
       </button>
     </section>
   } @else {
-    <section class="media-area">
+    <section class="avatar-area background-area">
       <div class="background-preview" [style.--category-bg-image]="backgroundPreview()"
         [style.--category-bg-opacity]="backgroundOpacity()"></div>
       @if (backgroundAttribution(); as attribution) {
-        <p class="attribution">
-          {{ 'common.avatarAttribution.photoBy' | transloco }}
-          <a [href]="attribution.authorUrl" target="_blank" rel="noopener">{{ attribution.authorName }}</a>
-          {{ 'common.avatarAttribution.onUnsplash' | transloco }}
-          <a [href]="attribution.unsplashUrl" target="_blank" rel="noopener">Unsplash</a>
-        </p>
+        <div class="unsplash-badge-wrapper">
+          <p class="unsplash-badge">
+            {{ 'common.avatarAttribution.photoBy' | transloco }}
+            <a class="unsplash-badge__link" [href]="attribution.authorUrl" target="_blank" rel="noopener">{{ attribution.authorName }}</a>
+            {{ 'common.avatarAttribution.onUnsplash' | transloco }}
+            <a class="unsplash-badge__link" [href]="attribution.unsplashUrl" target="_blank" rel="noopener">Unsplash</a>
+          </p>
+        </div>
       }
-      <div class="media-actions">
+      <div class="button-style">
         <button mat-mini-fab color="primary" type="button" (click)="editImage('background')" [attr.aria-label]="'common.actions.edit' | transloco">
           <mat-icon>edit</mat-icon>
         </button>
@@ -67,8 +73,8 @@
     </section>
   }
 
-  <section class="transparency">
-    <div><mat-icon>opacity</mat-icon> {{ 'common.tiles.shopping.backgroundTransparency' | transloco }}</div>
+  <section class="background-slider avatar-area">
+    <div class="slider-title"><mat-icon>opacity</mat-icon> {{ 'common.tiles.shopping.backgroundTransparency' | transloco }}</div>
     <mat-slider min="0" max="100" step="5" discrete [displayWith]="formatPercentLabel" [disabled]="!backgroundImage()">
       <input matSliderThumb [(ngModel)]="backgroundTransparency" />
     </mat-slider>

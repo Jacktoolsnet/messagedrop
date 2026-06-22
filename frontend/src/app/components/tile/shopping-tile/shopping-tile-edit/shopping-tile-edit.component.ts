@@ -97,8 +97,8 @@ export class ShoppingTileEditComponent {
 
   addCategory(): void {
     const ref = this.dialog.open(ShoppingCategoryEditComponent, {
-      width: '800px',
-      maxWidth: '96vw',
+      width: 'min(420px, calc(100vw - 2rem))',
+      maxWidth: '95vw',
       maxHeight: '96vh',
       data: {},
       hasBackdrop: true,
@@ -113,8 +113,8 @@ export class ShoppingTileEditComponent {
 
   editCategory(category: ShoppingCategory): void {
     const ref = this.dialog.open(ShoppingCategoryEditComponent, {
-      width: '800px',
-      maxWidth: '96vw',
+      width: 'min(420px, calc(100vw - 2rem))',
+      maxWidth: '95vw',
       maxHeight: '96vh',
       data: { category },
       hasBackdrop: true,
