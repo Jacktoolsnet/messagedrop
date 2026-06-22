@@ -60,9 +60,6 @@ export class ShoppingModeComponent {
     });
   }
 
-  readonly activeCategories = computed(() => this.shopping().categories
-    .filter(category => category.products.some(product => product.needed)));
-
   readonly entries = computed<ShoppingModeEntry[]>(() => {
     const selectedCategoryId = this.selectedCategoryId();
     return this.shopping().categories
@@ -73,14 +70,11 @@ export class ShoppingModeComponent {
   });
 
   readonly current = computed(() => this.entries()[this.currentIndex()] ?? null);
+  readonly categoryTitle = computed(() => this.shopping().categories
+    .find(category => category.id === this.selectedCategoryId())?.name ?? this.current()?.category.name ?? '');
   readonly completedCount = computed(() => this.entries().filter(entry => entry.product.done).length);
   readonly estimatedTotal = computed(() => this.entries()
     .reduce((sum, entry) => sum + (entry.product.price ?? 0), 0));
-
-  selectCategory(categoryId: string | null): void {
-    this.selectedCategoryId.set(categoryId);
-    this.currentIndex.set(0);
-  }
 
   previous(): void {
     const length = this.entries().length;
@@ -113,6 +107,10 @@ export class ShoppingModeComponent {
         navigator.vibrate?.([35, 25, 55]);
       }
       const entries = this.entries();
+      if (entries.every(entry => entry.product.done)) {
+        setTimeout(() => this.close(), 420);
+        return;
+      }
       const currentIndex = this.currentIndex();
       const nextOpenIndex = entries.findIndex((_, offset) => {
         const index = (currentIndex + offset + 1) % entries.length;

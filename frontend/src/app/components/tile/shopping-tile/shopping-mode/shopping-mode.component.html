@@ -1,15 +1,7 @@
-<app-dialog-header icon="shopping_cart_checkout" [title]="'common.tiles.shopping.modeTitle' | transloco"></app-dialog-header>
+<app-dialog-header icon="shopping_cart_checkout"
+  [title]="categoryTitle() || ('common.tiles.shopping.modeTitle' | transloco)"></app-dialog-header>
 
 <mat-dialog-content class="shopping-mode">
-  <div class="category-tabs" role="tablist" [attr.aria-label]="'common.tiles.shopping.categories' | transloco">
-    <button type="button" class="category-tab" [class.category-tab--active]="selectedCategoryId() === null"
-      (click)="selectCategory(null)">{{ 'common.tiles.shopping.allCategories' | transloco }}</button>
-    @for (category of activeCategories(); track category.id) {
-      <button type="button" class="category-tab" [class.category-tab--active]="selectedCategoryId() === category.id"
-        (click)="selectCategory(category.id)">{{ category.name }}</button>
-    }
-  </div>
-
   @if (current(); as item) {
     <div class="progress-row">
       <span>{{ completedCount() }}/{{ entries().length }}</span>
@@ -50,10 +42,6 @@
       </button>
     </div>
 
-    <button mat-flat-button color="primary" type="button" class="done-button" (click)="toggleCurrent()">
-      <mat-icon>{{ item.product.done ? 'undo' : 'done' }}</mat-icon>
-      {{ (item.product.done ? 'common.tiles.shopping.putBack' : 'common.tiles.shopping.putInCart') | transloco }}
-    </button>
   } @else {
     <div class="finished">
       <mat-icon>task_alt</mat-icon>
@@ -62,8 +50,15 @@
   }
 </mat-dialog-content>
 
-<mat-dialog-actions align="end">
-  <button mat-icon-button type="button" (click)="close()" [attr.aria-label]="'common.actions.close' | transloco">
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-icon-button class="action-close" type="button" (click)="close()"
+    [attr.aria-label]="'common.actions.close' | transloco">
     <mat-icon>close</mat-icon>
   </button>
+  @if (current(); as item) {
+    <button mat-flat-button color="primary" type="button" class="done-button" (click)="toggleCurrent()">
+      <mat-icon>{{ item.product.done ? 'undo' : 'done' }}</mat-icon>
+      {{ (item.product.done ? 'common.tiles.shopping.putBack' : 'common.tiles.shopping.putInCart') | transloco }}
+    </button>
+  }
 </mat-dialog-actions>
