@@ -21,11 +21,17 @@
           <h4>{{ item.category.name }}</h4>
           <span>{{ 'common.tiles.shopping.outstandingProducts' | transloco:{ count: item.count } }}</span>
           <strong>{{ formatPrice(item.price) }}</strong>
-          <button mat-mini-fab color="primary" type="button" [disabled]="item.count === 0"
-            (click)="openShoppingMode($event, item.category.id)"
-            [attr.aria-label]="'common.tiles.shopping.startCategory' | transloco:{ name: item.category.name }">
-            <mat-icon>play_arrow</mat-icon>
-          </button>
+          <div class="category-actions">
+            <button mat-mini-fab type="button" (click)="editCategoryProducts($event, item.category)"
+              [attr.aria-label]="'common.tiles.shopping.manageProductsAria' | transloco:{ name: item.category.name }">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-mini-fab color="primary" type="button" [disabled]="item.count === 0"
+              (click)="openShoppingMode($event, item.category.id)"
+              [attr.aria-label]="'common.tiles.shopping.startCategory' | transloco:{ name: item.category.name }">
+              <mat-icon>play_arrow</mat-icon>
+            </button>
+          </div>
         </section>
       }
     </div>

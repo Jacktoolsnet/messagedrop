@@ -9,6 +9,7 @@ import { PlaceService } from '../../../services/place.service';
 import { LanguageService } from '../../../services/language.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { ShoppingImageStorageService } from '../../../services/shopping-image-storage.service';
+import { DisplayMessageService } from '../../../services/display-message.service';
 import { activeShoppingProducts, normalizeShoppingList } from './shopping-list.util';
 
 @Component({
@@ -29,6 +30,7 @@ export class ShoppingTileComponent implements OnChanges {
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly translation = inject(TranslationHelperService);
   private readonly imageStorage = inject(ShoppingImageStorageService);
+  private readonly messages = inject(DisplayMessageService);
 
   readonly currentTile = signal<TileSetting | null>(null);
   readonly categoryImages = signal<Record<string, string>>({});
@@ -116,8 +118,48 @@ export class ShoppingTileComponent implements OnChanges {
     });
   }
 
+  async editCategoryProducts(event: Event, category: ShoppingCategory): Promise<void> {
+    event.stopPropagation();
+    const { ShoppingProductsComponent } = await import('./shopping-products/shopping-products.component');
+    const ref = this.dialog.open(ShoppingProductsComponent, {
+      width: '860px',
+      maxWidth: '96vw',
+      maxHeight: '96vh',
+      data: { category, currency: this.shopping.currency },
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: true
+    });
+    ref.afterClosed().subscribe((updated?: ShoppingCategory) => {
+      if (updated) void this.saveCategoryProducts(updated);
+    });
+  }
+
   formatPrice(price: number): string {
     return new Intl.NumberFormat(this.language.effectiveLanguage(), { style: 'currency', currency: this.shopping.currency }).format(price);
+  }
+
+  private async saveCategoryProducts(updatedCategory: ShoppingCategory): Promise<void> {
+    const tile = this.currentTile();
+    if (!tile) return;
+    try {
+      const shopping = await this.imageStorage.prepareForStorage({
+        ...this.shopping,
+        categories: this.shopping.categories.map(category => category.id === updatedCategory.id
+          ? { ...updatedCategory, order: category.order }
+          : category)
+      });
+      await this.applyTileUpdate({
+        ...tile,
+        payload: { ...tile.payload, shopping: normalizeShoppingList(shopping) }
+      });
+    } catch {
+      this.messages.open(
+        this.translation.t('common.tiles.shopping.imageStorageFailed'),
+        this.translation.t('common.actions.ok'),
+        { duration: 3500 }
+      );
+    }
   }
 
   private async applyTileUpdate(updated: TileSetting): Promise<void> {

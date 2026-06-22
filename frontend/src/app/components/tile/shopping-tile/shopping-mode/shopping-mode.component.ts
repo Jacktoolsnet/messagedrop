@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ShoppingCategory, ShoppingList, ShoppingProduct } from '../../../../interfaces/tile-settings';
 import { LanguageService } from '../../../../services/language.service';
@@ -22,7 +23,7 @@ interface ShoppingModeEntry {
 @Component({
   selector: 'app-shopping-mode',
   standalone: true,
-  imports: [DialogHeaderComponent, MatButtonModule, MatDialogActions, MatDialogContent, MatIcon, TranslocoPipe],
+  imports: [DialogHeaderComponent, MatButtonModule, MatDialogActions, MatDialogContent, MatIcon, MatProgressBarModule, TranslocoPipe],
   templateUrl: './shopping-mode.component.html',
   styleUrl: './shopping-mode.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -111,7 +112,10 @@ export class ShoppingModeComponent {
       }
       const entries = this.entries();
       if (entries.every(entry => entry.product.done)) {
-        setTimeout(() => this.close(), 420);
+        setTimeout(() => {
+          this.resetCompletedProducts();
+          this.close();
+        }, 420);
         return;
       }
       const currentIndex = this.currentIndex();
@@ -132,5 +136,21 @@ export class ShoppingModeComponent {
 
   formatPrice(price: number): string {
     return new Intl.NumberFormat(this.language.effectiveLanguage(), { style: 'currency', currency: this.shopping().currency }).format(price);
+  }
+
+  private resetCompletedProducts(): void {
+    const selectedCategoryId = this.selectedCategoryId();
+    this.shopping.update(list => ({
+      ...list,
+      categories: list.categories.map(category => {
+        if (selectedCategoryId && category.id !== selectedCategoryId) return category;
+        return {
+          ...category,
+          products: category.products.map(product => product.needed && product.done
+            ? { ...product, needed: false, done: false }
+            : product)
+        };
+      })
+    }));
   }
 }
