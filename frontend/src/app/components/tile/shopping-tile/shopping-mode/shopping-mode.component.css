@@ -1,6 +1,6 @@
 .shopping-mode {
   box-sizing: border-box;
-  width: min(560px, 100%);
+  width: 100%;
   height: min(30rem, calc(100dvh - 8rem));
   min-height: 0;
   padding: 1rem !important;

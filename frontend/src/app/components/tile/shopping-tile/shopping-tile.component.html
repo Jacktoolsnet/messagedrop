@@ -7,7 +7,7 @@
     }
   </header>
 
-  @if (shopping.categories.length > 0) {
+  @if (previewCategories.length > 0) {
     <div class="category-preview">
       @for (item of previewCategories; track item.category.id) {
         <section class="category-card">
@@ -26,7 +26,7 @@
               [attr.aria-label]="'common.tiles.shopping.manageProductsAria' | transloco:{ name: item.category.name }">
               <mat-icon>edit</mat-icon>
             </button>
-            <button mat-mini-fab color="primary" type="button" [disabled]="item.count === 0"
+            <button mat-mini-fab color="primary" type="button"
               (click)="openShoppingMode($event, item.category.id)"
               [attr.aria-label]="'common.tiles.shopping.startCategory' | transloco:{ name: item.category.name }">
               <mat-icon>play_arrow</mat-icon>
@@ -34,6 +34,11 @@
           </div>
         </section>
       }
+    </div>
+  } @else if (shopping.categories.length > 0) {
+    <div class="empty-state">
+      <mat-icon>shopping_cart_checkout</mat-icon>
+      <span>{{ 'common.tiles.shopping.selectProducts' | transloco }}</span>
     </div>
   } @else {
     <div class="empty-state">

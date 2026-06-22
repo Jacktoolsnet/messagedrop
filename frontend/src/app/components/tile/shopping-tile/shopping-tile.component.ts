@@ -74,7 +74,7 @@ export class ShoppingTileComponent implements OnChanges {
         count: products.length,
         price: products.reduce((sum, product) => sum + (product.price ?? 0), 0)
       };
-    });
+    }).filter(item => item.count > 0);
   }
 
   async editTile(): Promise<void> {

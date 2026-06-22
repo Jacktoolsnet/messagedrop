@@ -173,6 +173,40 @@ export class ShoppingTileEditComponent {
     });
   }
 
+  async startCategoryShopping(category: ShoppingCategory): Promise<void> {
+    if (!this.outstandingCount(category)) return;
+    const { ShoppingModeComponent } = await import('../shopping-mode/shopping-mode.component');
+    const shopping: ShoppingList = {
+      categories: this.categories(),
+      currency: this.initialList.currency
+    };
+    const ref = this.dialog.open(ShoppingModeComponent, {
+      width: '620px',
+      maxWidth: '96vw',
+      maxHeight: '96vh',
+      data: { shopping, initialCategoryId: category.id },
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false
+    });
+    ref.afterClosed().subscribe((updated?: ShoppingList) => {
+      if (!updated) return;
+      this.categories.update(categories => categories.map(current => {
+        const updatedCategory = updated.categories.find(item => item.id === current.id);
+        if (!updatedCategory) return current;
+        return {
+          ...current,
+          products: current.products.map(product => {
+            const updatedProduct = updatedCategory.products.find(item => item.id === product.id);
+            return updatedProduct
+              ? { ...product, needed: updatedProduct.needed, done: updatedProduct.done }
+              : product;
+          })
+        };
+      }));
+    });
+  }
+
   deleteCategory(category: ShoppingCategory): void {
     const ref = this.dialog.open(ShoppingCategoryDeleteComponent, {
       width: '380px',

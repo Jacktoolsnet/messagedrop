@@ -18,6 +18,11 @@
             <span>{{ 'common.tiles.shopping.outstandingProducts' | transloco:{ count: outstandingCount(category) } }}</span>
           </div>
           <div class="category-actions">
+            <button mat-icon-button color="primary" type="button" (click)="startCategoryShopping(category)"
+              [disabled]="outstandingCount(category) === 0"
+              [attr.aria-label]="'common.tiles.shopping.startCategory' | transloco:{ name: category.name }">
+              <mat-icon>play_arrow</mat-icon>
+            </button>
             <button mat-icon-button color="primary" type="button" (click)="editCategory(category)"
               [attr.aria-label]="'common.tiles.shopping.editCategoryAria' | transloco:{ name: category.name }">
               <mat-icon>settings</mat-icon>
