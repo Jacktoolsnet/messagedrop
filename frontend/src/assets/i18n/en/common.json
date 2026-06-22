@@ -846,7 +846,8 @@
           "bunch": "bunch"
         },
         "imageStorageFailed": "The image could not be saved to local file storage.",
-        "noPrice": "No price"
+        "noPrice": "No price",
+        "startCategory": "Start shopping for {{ name }}"
       },
       "quickActions": {
         "empty": "No actions yet. Tap to add.",

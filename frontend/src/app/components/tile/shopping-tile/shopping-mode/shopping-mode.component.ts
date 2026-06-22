@@ -11,6 +11,7 @@ import { normalizeShoppingList } from '../shopping-list.util';
 
 interface ShoppingModeData {
   shopping: ShoppingList;
+  initialCategoryId?: string;
 }
 
 interface ShoppingModeEntry {
@@ -33,11 +34,13 @@ export class ShoppingModeComponent {
   private readonly imageStorage = inject(ShoppingImageStorageService);
 
   readonly shopping = signal(normalizeShoppingList(this.data.shopping));
-  readonly selectedCategoryId = signal<string | null>(null);
+  readonly selectedCategoryId = signal<string | null>(this.data.initialCategoryId ?? null);
   readonly currentIndex = signal(0);
   readonly celebrating = signal(false);
 
   constructor() {
+    const firstOpenIndex = this.entries().findIndex(entry => !entry.product.done);
+    if (firstOpenIndex >= 0) this.currentIndex.set(firstOpenIndex);
     void this.imageStorage.hydrate(this.shopping()).then(list => {
       this.shopping.update(shopping => ({
         ...shopping,

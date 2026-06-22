@@ -7,35 +7,27 @@
     }
   </header>
 
-  @if (activeProducts.length > 0) {
-    <div class="shopping-summary">
-      <span>{{ 'common.tiles.shopping.estimate' | transloco }}</span>
-      <strong>{{ formatPrice(estimatedTotal) }}</strong>
-    </div>
-    <div class="progress-track" aria-hidden="true">
-      <span [style.width.%]="completedCount / activeProducts.length * 100"></span>
-    </div>
+  @if (shopping.categories.length > 0) {
     <div class="category-preview">
-      @for (category of previewCategories; track category.name) {
-        <section>
-          <h4>{{ category.name }}</h4>
-          @for (product of category.products; track product.id) {
-            <button type="button" class="product" [class.product--done]="product.done" (click)="toggleProduct(product, $event)">
-              <mat-icon>{{ product.done ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
-              <span>{{ product.quantity }} {{ ('common.tiles.shopping.units.' + product.unit) | transloco }} {{ product.name }}</span>
-            </button>
-          }
+      @for (item of previewCategories; track item.category.id) {
+        <section class="category-card">
+          <div class="category-avatar">
+            @if (categoryImages()[item.category.id]; as image) {
+              <img [src]="image" [alt]="item.category.name" />
+            } @else {
+              <mat-icon>category</mat-icon>
+            }
+          </div>
+          <h4>{{ item.category.name }}</h4>
+          <span>{{ 'common.tiles.shopping.outstandingProducts' | transloco:{ count: item.count } }}</span>
+          <strong>{{ formatPrice(item.price) }}</strong>
+          <button mat-mini-fab color="primary" type="button" [disabled]="item.count === 0"
+            (click)="openShoppingMode($event, item.category.id)"
+            [attr.aria-label]="'common.tiles.shopping.startCategory' | transloco:{ name: item.category.name }">
+            <mat-icon>play_arrow</mat-icon>
+          </button>
         </section>
       }
-    </div>
-    <button mat-flat-button color="primary" type="button" class="start-button" (click)="openShoppingMode($event)">
-      <mat-icon>play_arrow</mat-icon>
-      {{ 'common.tiles.shopping.start' | transloco }}
-    </button>
-  } @else if (shopping.categories.length > 0) {
-    <div class="empty-state">
-      <mat-icon>shopping_cart_checkout</mat-icon>
-      <span>{{ 'common.tiles.shopping.selectProducts' | transloco }}</span>
     </div>
   } @else {
     <div class="empty-state">

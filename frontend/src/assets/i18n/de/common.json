@@ -846,7 +846,8 @@
           "bunch": "Bund"
         },
         "imageStorageFailed": "Das Bild konnte nicht im lokalen Dateispeicher gespeichert werden.",
-        "noPrice": "Kein Preis"
+        "noPrice": "Kein Preis",
+        "startCategory": "Einkauf für {{ name }} starten"
       },
       "quickActions": {
         "empty": "Noch keine Aktionen. Tippe, um eine hinzuzufügen.",

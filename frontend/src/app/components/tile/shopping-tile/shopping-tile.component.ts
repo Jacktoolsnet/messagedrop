@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Place } from '../../../interfaces/place';
-import { ShoppingList, ShoppingProduct, TileSetting } from '../../../interfaces/tile-settings';
+import { ShoppingCategory, ShoppingList, ShoppingProduct, TileSetting } from '../../../interfaces/tile-settings';
 import { PlaceService } from '../../../services/place.service';
 import { LanguageService } from '../../../services/language.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
@@ -31,9 +31,16 @@ export class ShoppingTileComponent implements OnChanges {
   private readonly imageStorage = inject(ShoppingImageStorageService);
 
   readonly currentTile = signal<TileSetting | null>(null);
+  readonly categoryImages = signal<Record<string, string>>({});
 
   ngOnChanges(): void {
     this.currentTile.set(this.tile);
+    const shopping = normalizeShoppingList(this.tile.payload?.shopping);
+    void this.imageStorage.hydrate(shopping).then(hydrated => {
+      this.categoryImages.set(Object.fromEntries(hydrated.categories
+        .filter(category => !!category.image)
+        .map(category => [category.id, category.image as string])));
+    });
   }
 
   get title(): string {
@@ -57,14 +64,15 @@ export class ShoppingTileComponent implements OnChanges {
     return this.activeProducts.filter(product => product.done).length;
   }
 
-  get estimatedTotal(): number {
-    return this.activeProducts.reduce((sum, product) => sum + (product.price ?? 0), 0);
-  }
-
-  get previewCategories(): { name: string; products: ShoppingProduct[] }[] {
-    return this.shopping.categories
-      .map(category => ({ name: category.name, products: category.products.filter(product => product.needed) }))
-      .filter(category => category.products.length > 0);
+  get previewCategories(): { category: ShoppingCategory; count: number; price: number }[] {
+    return this.shopping.categories.map(category => {
+      const products = category.products.filter(product => product.needed && !product.done);
+      return {
+        category,
+        count: products.length,
+        price: products.reduce((sum, product) => sum + (product.price ?? 0), 0)
+      };
+    });
   }
 
   async editTile(): Promise<void> {
@@ -88,7 +96,7 @@ export class ShoppingTileComponent implements OnChanges {
     });
   }
 
-  async openShoppingMode(event?: Event): Promise<void> {
+  async openShoppingMode(event?: Event, categoryId?: string): Promise<void> {
     event?.stopPropagation();
     if (!this.activeProducts.length) return;
     const { ShoppingModeComponent } = await import('./shopping-mode/shopping-mode.component');
@@ -96,7 +104,7 @@ export class ShoppingTileComponent implements OnChanges {
       width: '620px',
       maxWidth: '96vw',
       maxHeight: '96vh',
-      data: { shopping: this.shopping },
+      data: { shopping: this.shopping, initialCategoryId: categoryId },
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
       disableClose: false
@@ -106,24 +114,6 @@ export class ShoppingTileComponent implements OnChanges {
       if (!shopping || !tile) return;
       void this.applyTileUpdate({ ...tile, payload: { ...tile.payload, shopping } });
     });
-  }
-
-  toggleProduct(product: ShoppingProduct, event: Event): void {
-    event.stopPropagation();
-    const tile = this.currentTile();
-    if (!tile) return;
-    const shopping = this.shopping;
-    const updated: ShoppingList = {
-      ...shopping,
-      categories: shopping.categories.map(category => ({
-        ...category,
-        products: category.products.map(item => item.id === product.id ? { ...item, done: !item.done } : item)
-      }))
-    };
-    if (!product.done && typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-      navigator.vibrate?.(30);
-    }
-    void this.applyTileUpdate({ ...tile, payload: { ...tile.payload, shopping: updated } });
   }
 
   formatPrice(price: number): string {
