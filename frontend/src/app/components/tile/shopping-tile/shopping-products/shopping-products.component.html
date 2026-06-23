@@ -60,6 +60,7 @@
 <mat-dialog-actions class="sticky-actions" align="end">
   <button mat-icon-button class="action-close" type="button" (click)="cancel()" [attr.aria-label]="'common.cancel' | transloco"><mat-icon>close</mat-icon></button>
   <button mat-icon-button type="button" (click)="help.open('tileEditShopping')" [attr.aria-label]="'common.actions.help' | transloco"><mat-icon>help</mat-icon></button>
+  <button mat-icon-button type="button" (click)="editCategorySettings()" [attr.aria-label]="'common.tiles.shopping.editCategory' | transloco"><mat-icon>settings</mat-icon></button>
   <button mat-icon-button type="button" (click)="sortProducts()" [disabled]="products().length < 2" [attr.aria-label]="'common.tiles.shopping.sortProducts' | transloco"><mat-icon>sort</mat-icon></button>
   <button mat-mini-fab color="primary" type="button" (click)="addProduct()" [attr.aria-label]="'common.tiles.shopping.addProduct' | transloco"><mat-icon>add</mat-icon></button>
   <button mat-icon-button color="primary" type="button" (click)="save()" [attr.aria-label]="'common.save' | transloco"><mat-icon>save</mat-icon></button>

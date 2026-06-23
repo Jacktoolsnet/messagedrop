@@ -219,7 +219,9 @@ export class ShoppingProductEditComponent {
       authorName: photo.user?.name || photo.user?.username || 'Unsplash',
       authorUrl: authorUrl?.toString(),
       unsplashUrl: unsplashUrl.toString(),
-      photoUrl: photoUrl.toString()
+      photoUrl: photoUrl.toString(),
+      imageUrl: photo.urls.regular,
+      downloadLocation: photo.links?.download_location
     };
   }
 

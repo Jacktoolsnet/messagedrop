@@ -1140,7 +1140,10 @@
             "quark": "Quark",
             "gravel": "Aquarienkies"
           },
-          "contents": "{{ categories }} Kategorien mit {{ products }} Produkten"
+          "contents": "{{ categories }} Kategorien mit {{ products }} Produkten",
+          "exportImages": "Bildzuordnungen kopieren",
+          "exportCopied": "Die Bildzuordnungen wurden in die Zwischenablage kopiert.",
+          "exportCopyFailed": "Die Bildzuordnungen konnten nicht automatisch kopiert werden. Der Datensatz wurde in die Browser-Konsole geschrieben."
         },
         "selectionColor": "Farbe ausgewählter Produkte",
         "chooseSelectionColor": "Farbe auswählen",

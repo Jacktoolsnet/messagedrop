@@ -21,6 +21,7 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
 import { UnsplashService } from '../../../services/unsplash.service';
 import { AvatarCropperComponent } from '../../utils/avatar-cropper/avatar-cropper.component';
 import { AvatarSourceChoice, AvatarSourceDialogComponent } from '../../utils/avatar-source-dialog/avatar-source-dialog.component';
+import { CameraCaptureDialogComponent } from '../../utils/camera-capture-dialog/camera-capture-dialog.component';
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 import { UnsplashComponent } from '../../utils/unsplash/unsplash.component';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
@@ -271,12 +272,17 @@ export class PlaceProfileComponent {
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
       disableClose: false,
-      autoFocus: false
+      autoFocus: false,
+      data: { showCamera: true }
     });
 
     dialogRef.afterClosed().subscribe((choice?: AvatarSourceChoice) => {
       if (choice === 'file') {
         fileInput.click();
+        return;
+      }
+      if (choice === 'camera') {
+        this.openCamera('avatar');
         return;
       }
       if (choice === 'unsplash') {
@@ -295,7 +301,8 @@ export class PlaceProfileComponent {
       autoFocus: false,
       data: {
         titleKey: 'common.backgroundSource.title',
-        icon: 'wallpaper'
+        icon: 'wallpaper',
+        showCamera: true
       }
     });
 
@@ -304,9 +311,36 @@ export class PlaceProfileComponent {
         fileInput.click();
         return;
       }
+      if (choice === 'camera') {
+        this.openCamera('background');
+        return;
+      }
       if (choice === 'unsplash') {
         this.openUnsplashBackground();
       }
+    });
+  }
+
+
+  private openCamera(target: 'avatar' | 'background'): void {
+    const dialogRef = this.dialog.open(CameraCaptureDialogComponent, {
+      width: '420px',
+      maxWidth: '95vw',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((file?: File) => {
+      if (!file) {
+        return;
+      }
+      if (target === 'background') {
+        this.openBackgroundCropper(file);
+        return;
+      }
+      this.openAvatarCropper(file);
     });
   }
 

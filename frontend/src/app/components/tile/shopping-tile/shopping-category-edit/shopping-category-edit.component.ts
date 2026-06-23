@@ -19,6 +19,7 @@ import { UnsplashService } from '../../../../services/unsplash.service';
 import { ShoppingImageStorageService } from '../../../../services/shopping-image-storage.service';
 import { AvatarCropperComponent } from '../../../utils/avatar-cropper/avatar-cropper.component';
 import { AvatarSourceChoice, AvatarSourceDialogComponent } from '../../../utils/avatar-source-dialog/avatar-source-dialog.component';
+import { CameraCaptureDialogComponent } from '../../../utils/camera-capture-dialog/camera-capture-dialog.component';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 import { UnsplashComponent } from '../../../utils/unsplash/unsplash.component';
@@ -97,12 +98,29 @@ export class ShoppingCategoryEditComponent {
       disableClose: false,
       data: kind === 'background' ? {
         titleKey: 'common.backgroundSource.title',
-        icon: 'wallpaper'
-      } : undefined
+        icon: 'wallpaper',
+        showCamera: true
+      } : { showCamera: true }
     });
     ref.afterClosed().subscribe((choice?: AvatarSourceChoice) => {
       if (choice === 'file') input.click();
+      if (choice === 'camera') this.openCamera(kind);
       if (choice === 'unsplash') this.openUnsplash(kind);
+    });
+  }
+
+
+  private openCamera(kind: CategoryImageKind): void {
+    const ref = this.dialog.open(CameraCaptureDialogComponent, {
+      width: '420px',
+      maxWidth: '95vw',
+      autoFocus: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false
+    });
+    ref.afterClosed().subscribe((file?: File) => {
+      if (file) this.openCropper(file, kind);
     });
   }
 
@@ -254,7 +272,9 @@ export class ShoppingCategoryEditComponent {
       authorName: photo.user?.name || photo.user?.username || 'Unsplash',
       authorUrl: authorUrl?.toString(),
       unsplashUrl: unsplashUrl.toString(),
-      photoUrl: photoUrl.toString()
+      photoUrl: photoUrl.toString(),
+      imageUrl: photo.urls.regular,
+      downloadLocation: photo.links?.download_location
     };
   }
 

@@ -4,4 +4,7 @@ export interface AvatarAttribution {
   authorUrl?: string;
   unsplashUrl?: string;
   photoUrl: string;
+  imageUrl?: string;
+  downloadLocation?: string;
 }
+

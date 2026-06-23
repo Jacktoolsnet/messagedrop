@@ -9,6 +9,7 @@ import { ShoppingImageStorageService } from '../../../../services/shopping-image
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 import { saveDialogOnImplicitDismiss } from '../../../utils/dialog-auto-save.util';
+import { ShoppingCategoryEditComponent } from '../shopping-category-edit/shopping-category-edit.component';
 import { ShoppingProductEditComponent } from '../shopping-product-edit/shopping-product-edit.component';
 import { ShoppingProductSortComponent } from '../shopping-product-sort/shopping-product-sort.component';
 
@@ -50,6 +51,23 @@ export class ShoppingProductsComponent {
 
   get backgroundTransparency(): string {
     return `${Math.min(100, Math.max(0, this.data.category.backgroundTransparency ?? 40))}%`;
+  }
+
+
+  editCategorySettings(): void {
+    const ref = this.dialog.open(ShoppingCategoryEditComponent, {
+      width: '420px',
+      maxWidth: '95vw',
+      data: { category: { ...this.data.category, products: this.products() } },
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: true,
+      autoFocus: false
+    });
+    ref.afterClosed().subscribe((updated?: ShoppingCategory) => {
+      if (!updated) return;
+      this.data.category = { ...updated, products: this.products() };
+    });
   }
 
   addProduct(): void {

@@ -1140,7 +1140,10 @@
             "quark": "Quark",
             "gravel": "Gravel"
           },
-          "contents": "{{ categories }} categories with {{ products }} products"
+          "contents": "{{ categories }} categories with {{ products }} products",
+          "exportImages": "Copy image mapping",
+          "exportCopied": "The image mapping has been copied to the clipboard.",
+          "exportCopyFailed": "The image mapping could not be copied automatically. The dataset was written to the browser console."
         },
         "selectionColor": "Selected product color",
         "chooseSelectionColor": "Choose color",
