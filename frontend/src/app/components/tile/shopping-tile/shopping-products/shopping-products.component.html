@@ -59,9 +59,26 @@
 
 <mat-dialog-actions class="sticky-actions" align="end">
   <button mat-icon-button class="action-close" type="button" (click)="cancel()" [attr.aria-label]="'common.cancel' | transloco"><mat-icon>close</mat-icon></button>
-  <button mat-icon-button type="button" (click)="help.open('tileEditShopping')" [attr.aria-label]="'common.actions.help' | transloco"><mat-icon>help</mat-icon></button>
-  <button mat-icon-button type="button" (click)="editCategorySettings()" [attr.aria-label]="'common.tiles.shopping.editCategory' | transloco"><mat-icon>settings</mat-icon></button>
-  <button mat-icon-button type="button" (click)="sortProducts()" [disabled]="products().length < 2" [attr.aria-label]="'common.tiles.shopping.sortProducts' | transloco"><mat-icon>sort</mat-icon></button>
-  <button mat-mini-fab color="primary" type="button" (click)="addProduct()" [attr.aria-label]="'common.tiles.shopping.addProduct' | transloco"><mat-icon>add</mat-icon></button>
+  <button mat-icon-button class="action-secondary" type="button" (click)="help.open('tileEditShopping')" [attr.aria-label]="'common.actions.help' | transloco"><mat-icon>help</mat-icon></button>
+  <button mat-icon-button class="action-secondary" type="button" (click)="editCategorySettings()" [attr.aria-label]="'common.tiles.shopping.editCategory' | transloco"><mat-icon>settings</mat-icon></button>
+  <button mat-icon-button color="primary" type="button" (click)="startShopping()" [disabled]="outstandingCount() === 0" [attr.aria-label]="'common.tiles.shopping.startCategory' | transloco:{ name: data.category.name }"><mat-icon>play_arrow</mat-icon></button>
+  <button mat-icon-button class="action-secondary" type="button" (click)="sortProducts()" [disabled]="products().length < 2" [attr.aria-label]="'common.tiles.shopping.sortProducts' | transloco"><mat-icon>sort</mat-icon></button>
+  <button mat-icon-button color="primary" type="button" (click)="addProduct()" [attr.aria-label]="'common.tiles.shopping.addProduct' | transloco"><mat-icon>add</mat-icon></button>
   <button mat-icon-button color="primary" type="button" (click)="save()" [attr.aria-label]="'common.save' | transloco"><mat-icon>save</mat-icon></button>
+  <button mat-icon-button class="action-overflow" type="button" [matMenuTriggerFor]="productActionsMenu" [attr.aria-label]="'common.actions.more' | transloco"><mat-icon>more_vert</mat-icon></button>
 </mat-dialog-actions>
+
+<mat-menu #productActionsMenu="matMenu">
+  <button mat-menu-item type="button" (click)="help.open('tileEditShopping')">
+    <mat-icon>help</mat-icon>
+    <span>{{ 'common.actions.help' | transloco }}</span>
+  </button>
+  <button mat-menu-item type="button" (click)="editCategorySettings()">
+    <mat-icon>settings</mat-icon>
+    <span>{{ 'common.tiles.shopping.editCategory' | transloco }}</span>
+  </button>
+  <button mat-menu-item type="button" (click)="sortProducts()" [disabled]="products().length < 2">
+    <mat-icon>sort</mat-icon>
+    <span>{{ 'common.tiles.shopping.sortProducts' | transloco }}</span>
+  </button>
+</mat-menu>

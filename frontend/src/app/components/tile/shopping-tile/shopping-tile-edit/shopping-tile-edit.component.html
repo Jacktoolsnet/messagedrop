@@ -23,10 +23,6 @@
               [attr.aria-label]="'common.tiles.shopping.startCategory' | transloco:{ name: category.name }">
               <mat-icon>play_arrow</mat-icon>
             </button>
-            <button mat-icon-button color="primary" type="button" (click)="editCategory(category)"
-              [attr.aria-label]="'common.tiles.shopping.editCategoryAria' | transloco:{ name: category.name }">
-              <mat-icon>settings</mat-icon>
-            </button>
             <button mat-icon-button color="primary" type="button" (click)="manageProducts(category)"
               [attr.aria-label]="'common.tiles.shopping.manageProductsAria' | transloco:{ name: category.name }">
               <mat-icon>edit</mat-icon>

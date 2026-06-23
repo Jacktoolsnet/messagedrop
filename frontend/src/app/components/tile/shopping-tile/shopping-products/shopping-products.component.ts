@@ -2,8 +2,9 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { ShoppingCategory, ShoppingProduct } from '../../../../interfaces/tile-settings';
+import { ShoppingCategory, ShoppingList, ShoppingProduct } from '../../../../interfaces/tile-settings';
 import { LanguageService } from '../../../../services/language.service';
 import { ShoppingImageStorageService } from '../../../../services/shopping-image-storage.service';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
@@ -16,7 +17,7 @@ import { ShoppingProductSortComponent } from '../shopping-product-sort/shopping-
 @Component({
   selector: 'app-shopping-products',
   standalone: true,
-  imports: [DialogHeaderComponent, MatButtonModule, MatDialogActions, MatDialogContent, MatIcon, TranslocoPipe],
+  imports: [DialogHeaderComponent, MatButtonModule, MatDialogActions, MatDialogContent, MatIcon, MatMenuModule, TranslocoPipe],
   templateUrl: './shopping-products.component.html',
   styleUrl: './shopping-products.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -67,6 +68,35 @@ export class ShoppingProductsComponent {
     ref.afterClosed().subscribe((updated?: ShoppingCategory) => {
       if (!updated) return;
       this.data.category = { ...updated, products: this.products() };
+    });
+  }
+
+
+  outstandingCount(): number {
+    return this.products().filter(product => product.needed && !product.done).length;
+  }
+
+  async startShopping(): Promise<void> {
+    if (!this.outstandingCount()) return;
+    const { ShoppingModeComponent } = await import('../shopping-mode/shopping-mode.component');
+    const category = { ...this.data.category, products: this.products() };
+    const shopping: ShoppingList = {
+      categories: [category],
+      currency: this.data.currency,
+      selectionColor: this.data.selectionColor
+    };
+    const ref = this.dialog.open(ShoppingModeComponent, {
+      width: '620px',
+      maxWidth: '96vw',
+      maxHeight: '96vh',
+      data: { shopping, initialCategoryId: category.id },
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false
+    });
+    ref.afterClosed().subscribe((updated?: ShoppingList) => {
+      const updatedCategory = updated?.categories.find(item => item.id === category.id);
+      if (updatedCategory) this.products.set(updatedCategory.products);
     });
   }
 
