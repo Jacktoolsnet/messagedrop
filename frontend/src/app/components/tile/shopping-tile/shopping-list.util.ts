@@ -34,12 +34,10 @@ export function normalizeShoppingList(value?: ShoppingList): ShoppingList {
       id: category.id || createShoppingId('category'),
       templateKey: typeof category.templateKey === 'string' && category.templateKey.trim() ? category.templateKey : undefined,
       name: (category.name ?? '').trim(),
-      image: typeof category.image === 'string' && category.image.startsWith('data:image/') ? category.image : undefined,
+      image: normalizeImageUrl(category.image),
       imageFileId: typeof category.imageFileId === 'string' && category.imageFileId.trim() ? category.imageFileId : undefined,
       imageAttribution: category.imageAttribution?.source === 'unsplash' ? category.imageAttribution : undefined,
-      backgroundImage: typeof category.backgroundImage === 'string' && category.backgroundImage.startsWith('data:image/')
-        ? category.backgroundImage
-        : undefined,
+      backgroundImage: normalizeImageUrl(category.backgroundImage),
       backgroundImageFileId: typeof category.backgroundImageFileId === 'string' && category.backgroundImageFileId.trim()
         ? category.backgroundImageFileId
         : undefined,
@@ -63,6 +61,11 @@ export function normalizeShoppingList(value?: ShoppingList): ShoppingList {
   };
 }
 
+
+function normalizeImageUrl(value: string | undefined): string | undefined {
+  return typeof value === 'string' && /^(data:image\/|https?:\/\/)/i.test(value) ? value : undefined;
+}
+
 function normalizeProducts(products?: ShoppingProduct[]): ShoppingProduct[] {
   return (products ?? [])
     .map((product, productIndex): ShoppingProduct => ({
@@ -70,7 +73,7 @@ function normalizeProducts(products?: ShoppingProduct[]): ShoppingProduct[] {
       templateKey: typeof product.templateKey === 'string' && product.templateKey.trim() ? product.templateKey : undefined,
       name: (product.name ?? '').trim(),
       notes: typeof product.notes === 'string' && product.notes.trim() ? product.notes.trim() : undefined,
-      image: typeof product.image === 'string' && product.image.startsWith('data:image/') ? product.image : undefined,
+      image: normalizeImageUrl(product.image),
       imageFileId: typeof product.imageFileId === 'string' && product.imageFileId.trim() ? product.imageFileId : undefined,
       imageAttribution: product.imageAttribution?.source === 'unsplash' ? product.imageAttribution : undefined,
       quantity: Number.isFinite(product.quantity) && product.quantity > 0 ? product.quantity : 1,

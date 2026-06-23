@@ -35,13 +35,25 @@ export class ShoppingTemplateService {
           id: createShoppingId('category'),
           templateKey: categoryKey,
           name: categoryName,
+          image: categoryTemplate.image?.imageUrl,
+          imageAttribution: categoryTemplate.image,
+          backgroundImage: categoryTemplate.backgroundImage?.imageUrl,
+          backgroundAttribution: categoryTemplate.backgroundImage,
           order: merged.length,
           products: []
         };
         merged.push(category);
         addedCategories++;
-      } else if (!category.templateKey) {
-        category.templateKey = categoryKey;
+      } else {
+        category.templateKey ??= categoryKey;
+        if (!category.image && categoryTemplate.image) {
+          category.image = categoryTemplate.image.imageUrl;
+          category.imageAttribution = categoryTemplate.image;
+        }
+        if (!category.backgroundImage && categoryTemplate.backgroundImage) {
+          category.backgroundImage = categoryTemplate.backgroundImage.imageUrl;
+          category.backgroundAttribution = categoryTemplate.backgroundImage;
+        }
       }
 
       for (const productTemplate of categoryTemplate.products) {
@@ -57,6 +69,8 @@ export class ShoppingTemplateService {
           id: createShoppingId('product'),
           templateKey: productKey,
           name: productName,
+          image: productTemplate.image?.imageUrl,
+          imageAttribution: productTemplate.image,
           quantity: productTemplate.quantity,
           unit: productTemplate.unit,
           needed: false,

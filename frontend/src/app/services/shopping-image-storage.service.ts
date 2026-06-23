@@ -29,14 +29,20 @@ export class ShoppingImageStorageService {
   async prepareForStorage(list: ShoppingList): Promise<ShoppingList> {
     const categories = await Promise.all(list.categories.map(async category => ({
       ...category,
-      image: undefined,
-      imageFileId: await this.persistDataUrl('avatar', category.image, category.imageFileId),
-      backgroundImage: undefined,
-      backgroundImageFileId: await this.persistDataUrl('background', category.backgroundImage, category.backgroundImageFileId),
+      image: this.externalImageUrl(category.image),
+      imageFileId: this.externalImageUrl(category.image)
+        ? undefined
+        : await this.persistDataUrl('avatar', category.image, category.imageFileId),
+      backgroundImage: this.externalImageUrl(category.backgroundImage),
+      backgroundImageFileId: this.externalImageUrl(category.backgroundImage)
+        ? undefined
+        : await this.persistDataUrl('background', category.backgroundImage, category.backgroundImageFileId),
       products: await Promise.all(category.products.map(async product => ({
         ...product,
-        image: undefined,
-        imageFileId: await this.persistDataUrl('avatar', product.image, product.imageFileId)
+        image: this.externalImageUrl(product.image),
+        imageFileId: this.externalImageUrl(product.image)
+          ? undefined
+          : await this.persistDataUrl('avatar', product.image, product.imageFileId)
       })))
     })));
     return { ...list, categories };
@@ -47,11 +53,15 @@ export class ShoppingImageStorageService {
       ...list,
       categories: list.categories.map(category => ({
         ...category,
-        image: undefined,
-        backgroundImage: undefined,
-        products: category.products.map(product => ({ ...product, image: undefined }))
+        image: this.externalImageUrl(category.image),
+        backgroundImage: this.externalImageUrl(category.backgroundImage),
+        products: category.products.map(product => ({ ...product, image: this.externalImageUrl(product.image) }))
       }))
     };
+  }
+
+  private externalImageUrl(image: string | undefined): string | undefined {
+    return image && /^https?:\/\//i.test(image) ? image : undefined;
   }
 
   private async resolveUrl(current: string | undefined, id: string | undefined): Promise<string | undefined> {
