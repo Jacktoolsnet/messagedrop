@@ -142,7 +142,7 @@
 .chatroom-title__avatar {
   width: 2.25rem;
   height: 2.25rem;
-  border-radius: 50%;
+  border-radius: 0.6rem;
   object-fit: cover;
 }
 
@@ -623,7 +623,7 @@
   flex: 0 0 2.5rem;
   width: 2.5rem;
   height: 2.5rem;
-  border-radius: 50%;
+  border-radius: 0.65rem;
   object-fit: cover;
 }
 
@@ -635,7 +635,7 @@ avatar-them mat-icon {
   font-size: 2rem;
   display: grid;
   place-items: center;
-  border-radius: 50%;
+  border-radius: 0.65rem;
 }
 
 .avatar-me .name,

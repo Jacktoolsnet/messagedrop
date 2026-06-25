@@ -52,7 +52,7 @@
 .relation-avatar {
   width: 2.1rem;
   height: 2.1rem;
-  border-radius: 50%;
+  border-radius: 0.6rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;

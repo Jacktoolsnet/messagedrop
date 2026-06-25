@@ -144,7 +144,7 @@ h2[mat-dialog-title].dialog-title {
   flex: 0 0 2.5rem;
   width: 2.5rem;
   height: 2.5rem;
-  border-radius: 50%;
+  border-radius: 0.65rem;
   object-fit: cover;
 }
 
@@ -154,7 +154,7 @@ h2[mat-dialog-title].dialog-title {
   width: 2.5rem;
   height: 2.5rem;
   font-size: 2rem;
-  border-radius: 50%;
+  border-radius: 0.65rem;
   display: grid;
   place-items: center;
 }

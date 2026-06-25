@@ -66,7 +66,7 @@
 .place-select-option__avatar {
   width: 2.8rem;
   height: 2.8rem;
-  border-radius: 999px;
+  border-radius: 0.65rem;
   object-fit: cover;
   display: block;
   flex: 0 0 auto;

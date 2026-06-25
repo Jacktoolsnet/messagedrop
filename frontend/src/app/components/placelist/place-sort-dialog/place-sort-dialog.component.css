@@ -74,7 +74,7 @@ h2[mat-dialog-title].dialog-title {
 .avatar {
   width: 2.25rem;
   height: 2.25rem;
-  border-radius: 999px;
+  border-radius: 0.6rem;
   background-color: color-mix(in srgb, var(--mat-card-filled-container-color) 70%, transparent);
   border: 1px solid color-mix(in srgb, var(--mat-card-outlined-outline-color) 60%, transparent);
   display: inline-flex;

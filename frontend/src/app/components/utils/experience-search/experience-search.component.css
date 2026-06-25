@@ -352,7 +352,7 @@
   width: 2.5rem;
   height: 2.5rem;
   font-size: 2rem;
-  border-radius: 50%;
+  border-radius: 0.7rem;
   display: grid;
   place-items: center;
 }
@@ -361,7 +361,7 @@
   flex: 0 0 2.5rem;
   width: 2.5rem;
   height: 2.5rem;
-  border-radius: 50%;
+  border-radius: 0.7rem;
   object-fit: cover;
 }
 

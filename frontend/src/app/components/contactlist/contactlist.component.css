@@ -291,7 +291,7 @@ button,
   width: 2.5rem;
   height: 2.5rem;
   font-size: 2rem;
-  border-radius: 50%;
+  border-radius: 0.65rem;
   display: grid;
   place-items: center;
 }
@@ -299,7 +299,7 @@ button,
 .avatar {
   width: 2.5rem;
   height: 2.5rem;
-  border-radius: 50%;
+  border-radius: 0.65rem;
   object-fit: cover;
 }
 

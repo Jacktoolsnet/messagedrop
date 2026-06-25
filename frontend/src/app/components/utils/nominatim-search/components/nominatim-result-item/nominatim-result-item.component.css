@@ -64,7 +64,7 @@ mat-card-actions.buttonbar {
 .avatar {
     width: 2.5rem;
     height: 2.5rem;
-    border-radius: 50%;
+  border-radius: 0.65rem;
     object-fit: cover;
     flex-shrink: 0;
 }
