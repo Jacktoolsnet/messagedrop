@@ -1,6 +1,7 @@
 import { AvatarAttribution } from '../../../interfaces/avatar-attribution';
 import { ShoppingUnit } from '../../../interfaces/tile-settings';
 import { DRUGSTORE_PRODUCT_IMAGES } from './shopping-drugstore-product-images.data';
+import { HARDWARE_STORE_PRODUCT_IMAGES } from './shopping-hardware-product-images.data';
 
 export interface ShoppingProductTemplate {
   id: string;
@@ -1136,6 +1137,9 @@ const DRUGSTORE_CATEGORY_IMAGES: Record<string, AvatarAttribution> = {
 };
 
 const hardwareStoreCategoryImage = (id: string): AvatarAttribution | undefined => HARDWARE_STORE_CATEGORY_IMAGES[id];
+const hardwareStoreProductImage = (id: string): AvatarAttribution | undefined => HARDWARE_STORE_PRODUCT_IMAGES[id];
+const hardwareStoreProduct = (id: string, unit: ShoppingUnit = 'package', quantity = 1): ShoppingProductTemplate =>
+  product(id, unit, quantity, hardwareStoreProductImage(id));
 
 const HARDWARE_STORE_CATEGORY_IMAGES: Record<string, AvatarAttribution> = {
   safety: {
@@ -1164,6 +1168,15 @@ const HARDWARE_STORE_CATEGORY_IMAGES: Record<string, AvatarAttribution> = {
     photoUrl: 'https://unsplash.com/photos/a-bunch-of-screws-and-screws-on-a-table-yCyPRNLnFMM?utm_source=messagedrop&utm_medium=referral',
     imageUrl: 'https://images.unsplash.com/photo-1641937725629-2adda0f55251?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NTM1MTR8MHwxfHNlYXJjaHwxfHx3aW5rZWwlMjB1bmQlMjBzY2hyYXViZW58ZW58MHx8fHwxNzgyMjE1MjM4fDA&ixlib=rb-4.1.0&q=80&w=1080',
     downloadLocation: 'https://api.unsplash.com/photos/yCyPRNLnFMM/download?ixid=M3w4NTM1MTR8MHwxfHNlYXJjaHwxfHx3aW5rZWwlMjB1bmQlMjBzY2hyYXViZW58ZW58MHx8fHwxNzgyMjE1MjM4fDA'
+  },
+  electrical: {
+    source: 'unsplash',
+    authorName: 'Toolmash Expo',
+    authorUrl: 'https://unsplash.com/de/@toolmash?utm_source=messagedrop&utm_medium=referral',
+    unsplashUrl: 'https://unsplash.com/de/?utm_source=messagedrop&utm_medium=referral',
+    photoUrl: 'https://unsplash.com/photos/electrician-testing-electrical-panel-with-multimeter-PkHf7BUWbtk?utm_source=messagedrop&utm_medium=referral',
+    imageUrl: 'https://images.unsplash.com/photo-1758101755915-462eddc23f57?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NTM1MTR8MHwxfHNlYXJjaHw1fHxFbGVjdHJpY2FsJTIwU3VwcGxpZXN8ZW58MHx8fHwxNzgyMzgwMzUzfDA&ixlib=rb-4.1.0&q=80&w=1080',
+    downloadLocation: 'https://api.unsplash.com/photos/PkHf7BUWbtk/download?ixid=M3w4NTM1MTR8MHwxfHNlYXJjaHw1fHxFbGVjdHJpY2FsJTIwU3VwcGxpZXN8ZW58MHx8fHwxNzgyMzgwMzUzfDA'
   },
   paint: {
     source: 'unsplash',
@@ -1296,14 +1309,14 @@ export const SHOPPING_STORE_TEMPLATES: readonly ShoppingStoreTemplate[] = [
   },
   {
     id: 'hardwareStore', icon: 'hardware', categories: [
-      { id: 'tools', image: hardwareStoreCategoryImage('tools'), products: [product('cordlessDrill', 'piece'), product('hammer', 'piece'), product('level', 'piece'), product('pliers', 'piece'), product('screwdriver', 'piece'), product('tapeMeasure', 'piece'), product('utilityKnife', 'piece'), product('wrench', 'piece')] },
-      { id: 'fasteners', image: hardwareStoreCategoryImage('fasteners'), products: [product('adhesive', 'piece'), product('cableTies'), product('dowels'), product('hooks'), product('nails'), product('nuts'), product('screws'), product('washers')] },
-      { id: 'paint', image: hardwareStoreCategoryImage('paint'), products: [product('brushes', 'piece'), product('filler'), product('maskingTape', 'piece'), product('paintRollers', 'piece'), product('sandpaper'), product('varnish', 'can'), product('wallPaint', 'can')] },
-      { id: 'electrical', products: [product('batteries'), product('cables'), product('extensionCord', 'piece'), product('fuses'), product('lightBulbs'), product('powerStrip', 'piece'), product('sockets'), product('switches')] },
-      { id: 'plumbing', image: hardwareStoreCategoryImage('plumbing'), products: [product('faucet', 'piece'), product('fittings'), product('pipeSealTape', 'piece'), product('pipes'), product('plunger', 'piece'), product('seals')] },
-      { id: 'buildingMaterials', image: hardwareStoreCategoryImage('buildingMaterials'), products: [product('cement', 'bag'), product('drywall'), product('insulation'), product('mortar', 'bag'), product('silicone', 'piece'), product('wood')] },
-      { id: 'garden', image: hardwareStoreCategoryImage('garden'), products: [product('fertilizer'), product('gardenGloves'), product('gardenTools'), product('plantPots', 'piece'), product('pottingSoil', 'bag'), product('seeds'), product('wateringCan', 'piece')] },
-      { id: 'safety', image: hardwareStoreCategoryImage('safety'), products: [product('dustMasks'), product('earProtection'), product('safetyGlasses', 'piece'), product('workGloves'), product('workShoes')] }
+      { id: 'tools', image: hardwareStoreCategoryImage('tools'), products: [hardwareStoreProduct('cordlessDrill', 'piece'), hardwareStoreProduct('hammer', 'piece'), hardwareStoreProduct('level', 'piece'), hardwareStoreProduct('pliers', 'piece'), hardwareStoreProduct('screwdriver', 'piece'), hardwareStoreProduct('tapeMeasure', 'piece'), hardwareStoreProduct('utilityKnife', 'piece'), hardwareStoreProduct('wrench', 'piece')] },
+      { id: 'fasteners', image: hardwareStoreCategoryImage('fasteners'), products: [hardwareStoreProduct('adhesive', 'piece'), hardwareStoreProduct('cableTies'), hardwareStoreProduct('dowels'), hardwareStoreProduct('hooks'), hardwareStoreProduct('nails'), hardwareStoreProduct('nuts'), hardwareStoreProduct('screws'), hardwareStoreProduct('washers')] },
+      { id: 'paint', image: hardwareStoreCategoryImage('paint'), products: [hardwareStoreProduct('brushes', 'piece'), hardwareStoreProduct('filler'), hardwareStoreProduct('maskingTape', 'piece'), hardwareStoreProduct('paintRollers', 'piece'), hardwareStoreProduct('sandpaper'), hardwareStoreProduct('varnish', 'can'), hardwareStoreProduct('wallPaint', 'can')] },
+      { id: 'electrical', image: hardwareStoreCategoryImage('electrical'), products: [hardwareStoreProduct('batteries'), hardwareStoreProduct('cables'), hardwareStoreProduct('extensionCord', 'piece'), hardwareStoreProduct('fuses'), hardwareStoreProduct('lightBulbs'), hardwareStoreProduct('powerStrip', 'piece'), hardwareStoreProduct('sockets'), hardwareStoreProduct('switches')] },
+      { id: 'plumbing', image: hardwareStoreCategoryImage('plumbing'), products: [hardwareStoreProduct('faucet', 'piece'), hardwareStoreProduct('fittings'), hardwareStoreProduct('pipeSealTape', 'piece'), hardwareStoreProduct('pipes'), hardwareStoreProduct('plunger', 'piece'), hardwareStoreProduct('seals')] },
+      { id: 'buildingMaterials', image: hardwareStoreCategoryImage('buildingMaterials'), products: [hardwareStoreProduct('cement', 'bag'), hardwareStoreProduct('drywall'), hardwareStoreProduct('insulation'), hardwareStoreProduct('mortar', 'bag'), hardwareStoreProduct('silicone', 'piece'), hardwareStoreProduct('wood')] },
+      { id: 'garden', image: hardwareStoreCategoryImage('garden'), products: [hardwareStoreProduct('fertilizer'), hardwareStoreProduct('gardenGloves'), hardwareStoreProduct('gardenTools'), hardwareStoreProduct('plantPots', 'piece'), hardwareStoreProduct('pottingSoil', 'bag'), hardwareStoreProduct('seeds'), hardwareStoreProduct('wateringCan', 'piece')] },
+      { id: 'safety', image: hardwareStoreCategoryImage('safety'), products: [hardwareStoreProduct('dustMasks'), hardwareStoreProduct('earProtection'), hardwareStoreProduct('safetyGlasses', 'piece'), hardwareStoreProduct('workGloves'), hardwareStoreProduct('workShoes')] }
     ]
   },
   {
