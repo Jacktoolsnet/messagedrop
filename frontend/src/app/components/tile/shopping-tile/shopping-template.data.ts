@@ -2,6 +2,7 @@ import { AvatarAttribution } from '../../../interfaces/avatar-attribution';
 import { ShoppingUnit } from '../../../interfaces/tile-settings';
 import { DRUGSTORE_PRODUCT_IMAGES } from './shopping-drugstore-product-images.data';
 import { HARDWARE_STORE_PRODUCT_IMAGES } from './shopping-hardware-product-images.data';
+import { PET_STORE_PRODUCT_IMAGES } from './shopping-pet-store-product-images.data';
 
 export interface ShoppingProductTemplate {
   id: string;
@@ -1217,6 +1218,9 @@ const HARDWARE_STORE_CATEGORY_IMAGES: Record<string, AvatarAttribution> = {
 };
 
 const petStoreCategoryImage = (id: string): AvatarAttribution | undefined => PET_STORE_CATEGORY_IMAGES[id];
+const petStoreProductImage = (id: string): AvatarAttribution | undefined => PET_STORE_PRODUCT_IMAGES[id];
+const petStoreProduct = (id: string, unit: ShoppingUnit = 'package', quantity = 1): ShoppingProductTemplate =>
+  product(id, unit, quantity, petStoreProductImage(id));
 
 const PET_STORE_CATEGORY_IMAGES: Record<string, AvatarAttribution> = {
   aquarium: {
@@ -1321,12 +1325,12 @@ export const SHOPPING_STORE_TEMPLATES: readonly ShoppingStoreTemplate[] = [
   },
   {
     id: 'petStore', icon: 'pets', categories: [
-      { id: 'dog', image: petStoreCategoryImage('dog'), products: [product('dogFood', 'bag'), product('dogLeash', 'piece'), product('dogTreats'), product('dogToy', 'piece'), product('foodBowl', 'piece'), product('wasteBags')] },
-      { id: 'cat', image: petStoreCategoryImage('cat'), products: [product('catFood'), product('catLitter', 'bag'), product('catTreats'), product('catToy', 'piece'), product('litterBox', 'piece'), product('scratchingPost', 'piece')] },
-      { id: 'smallAnimals', image: petStoreCategoryImage('smallAnimals'), products: [product('bedding', 'bag'), product('hay', 'bag'), product('smallAnimalFood', 'bag'), product('smallAnimalTreats'), product('waterBottle', 'piece')] },
-      { id: 'birds', image: petStoreCategoryImage('birds'), products: [product('birdFood', 'bag'), product('birdSand', 'bag'), product('birdTreats'), product('cuttlebone', 'piece'), product('perches')] },
-      { id: 'aquarium', image: petStoreCategoryImage('aquarium'), products: [product('aquariumFilter'), product('fishFood'), product('gravel', 'bag'), product('waterConditioner', 'bottle'), product('waterTest')] },
-      { id: 'petCare', image: petStoreCategoryImage('petCare'), products: [product('fleaTreatment'), product('petBrush', 'piece'), product('petShampoo', 'bottle'), product('tickRemover', 'piece'), product('wormingTreatment')] }
+      { id: 'dog', image: petStoreCategoryImage('dog'), products: [petStoreProduct('dogFood', 'bag'), petStoreProduct('dogLeash', 'piece'), petStoreProduct('dogTreats'), petStoreProduct('dogToy', 'piece'), petStoreProduct('foodBowl', 'piece'), petStoreProduct('wasteBags')] },
+      { id: 'cat', image: petStoreCategoryImage('cat'), products: [petStoreProduct('catFood'), petStoreProduct('catLitter', 'bag'), petStoreProduct('catTreats'), petStoreProduct('catToy', 'piece'), petStoreProduct('litterBox', 'piece'), petStoreProduct('scratchingPost', 'piece')] },
+      { id: 'smallAnimals', image: petStoreCategoryImage('smallAnimals'), products: [petStoreProduct('bedding', 'bag'), petStoreProduct('hay', 'bag'), petStoreProduct('smallAnimalFood', 'bag'), petStoreProduct('smallAnimalTreats'), petStoreProduct('waterBottle', 'piece')] },
+      { id: 'birds', image: petStoreCategoryImage('birds'), products: [petStoreProduct('birdFood', 'bag'), petStoreProduct('birdSand', 'bag'), petStoreProduct('birdTreats'), petStoreProduct('cuttlebone', 'piece'), petStoreProduct('perches')] },
+      { id: 'aquarium', image: petStoreCategoryImage('aquarium'), products: [petStoreProduct('aquariumFilter'), petStoreProduct('fishFood'), petStoreProduct('gravel', 'bag'), petStoreProduct('waterConditioner', 'bottle'), petStoreProduct('waterTest')] },
+      { id: 'petCare', image: petStoreCategoryImage('petCare'), products: [petStoreProduct('fleaTreatment'), petStoreProduct('petBrush', 'piece'), petStoreProduct('petShampoo', 'bottle'), petStoreProduct('tickRemover', 'piece'), petStoreProduct('wormingTreatment')] }
     ]
   }
 ];
