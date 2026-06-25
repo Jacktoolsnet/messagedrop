@@ -1,5 +1,6 @@
 import { AvatarAttribution } from '../../../interfaces/avatar-attribution';
 import { ShoppingUnit } from '../../../interfaces/tile-settings';
+import { DRUGSTORE_PRODUCT_IMAGES } from './shopping-drugstore-product-images.data';
 
 export interface ShoppingProductTemplate {
   id: string;
@@ -1046,6 +1047,9 @@ const SUPERMARKET_PRODUCT_IMAGES: Record<string, AvatarAttribution> = {
 };
 
 const drugstoreCategoryImage = (id: string): AvatarAttribution | undefined => DRUGSTORE_CATEGORY_IMAGES[id];
+const drugstoreProductImage = (id: string): AvatarAttribution | undefined => DRUGSTORE_PRODUCT_IMAGES[id];
+const drugstoreProduct = (id: string, unit: ShoppingUnit = 'package', quantity = 1): ShoppingProductTemplate =>
+  product(id, unit, quantity, drugstoreProductImage(id));
 
 const DRUGSTORE_CATEGORY_IMAGES: Record<string, AvatarAttribution> = {
   babyCare: {
@@ -1279,15 +1283,15 @@ export const SHOPPING_STORE_TEMPLATES: readonly ShoppingStoreTemplate[] = [
   },
   {
     id: 'drugstore', icon: 'health_and_beauty', categories: [
-      { id: 'bodyCare', image: drugstoreCategoryImage('bodyCare'), products: [product('bodyLotion', 'bottle'), product('deodorant', 'piece'), product('handCream'), product('razors'), product('shavingFoam', 'can'), product('showerGel', 'bottle'), product('soap', 'piece'), product('sunscreen', 'bottle')] },
-      { id: 'hairCare', image: drugstoreCategoryImage('hairCare'), products: [product('conditioner', 'bottle'), product('hairColor'), product('hairGel'), product('hairSpray', 'can'), product('hairTreatment'), product('shampoo', 'bottle')] },
-      { id: 'dentalCare', image: drugstoreCategoryImage('dentalCare'), products: [product('dentalFloss', 'piece'), product('interdentalBrushes'), product('mouthwash', 'bottle'), product('toothbrush', 'piece'), product('toothpaste', 'piece')] },
-      { id: 'facialCare', image: drugstoreCategoryImage('facialCare'), products: [product('cleansingGel', 'bottle'), product('cottonPads'), product('faceCream'), product('faceMasks'), product('lipCare'), product('makeupRemover', 'bottle')] },
-      { id: 'personalHygiene', image: drugstoreCategoryImage('personalHygiene'), products: [product('condoms'), product('cottonSwabs'), product('incontinenceProducts'), product('sanitaryPads'), product('tampons'), product('wetWipes')] },
-      { id: 'babyCare', image: drugstoreCategoryImage('babyCare'), products: [product('babyFood'), product('babyOil', 'bottle'), product('babyWipes'), product('diapers'), product('nursingPads'), product('rashCream')] },
-      { id: 'cleaning', image: drugstoreCategoryImage('cleaning'), products: [product('allPurposeCleaner', 'bottle'), product('bathroomCleaner', 'bottle'), product('cleaningCloths'), product('dishwasherTablets'), product('glassCleaner', 'bottle'), product('sponges'), product('toiletCleaner', 'bottle')] },
-      { id: 'laundry', image: drugstoreCategoryImage('laundry'), products: [product('fabricSoftener', 'bottle'), product('laundryDetergent'), product('laundryDisinfectant', 'bottle'), product('stainRemover'), product('washingBags')] },
-      { id: 'paperGoods', image: drugstoreCategoryImage('paperGoods'), products: [product('facialTissues'), product('kitchenRoll'), product('napkins'), product('tissues'), product('toiletPaper')] }
+      { id: 'bodyCare', image: drugstoreCategoryImage('bodyCare'), products: [drugstoreProduct('bodyLotion', 'bottle'), drugstoreProduct('deodorant', 'piece'), drugstoreProduct('handCream'), drugstoreProduct('razors'), drugstoreProduct('shavingFoam', 'can'), drugstoreProduct('showerGel', 'bottle'), drugstoreProduct('soap', 'piece'), drugstoreProduct('sunscreen', 'bottle')] },
+      { id: 'hairCare', image: drugstoreCategoryImage('hairCare'), products: [drugstoreProduct('conditioner', 'bottle'), drugstoreProduct('hairColor'), drugstoreProduct('hairGel'), drugstoreProduct('hairSpray', 'can'), drugstoreProduct('hairTreatment'), drugstoreProduct('shampoo', 'bottle')] },
+      { id: 'dentalCare', image: drugstoreCategoryImage('dentalCare'), products: [drugstoreProduct('dentalFloss', 'piece'), drugstoreProduct('interdentalBrushes'), drugstoreProduct('mouthwash', 'bottle'), drugstoreProduct('toothbrush', 'piece'), drugstoreProduct('toothpaste', 'piece')] },
+      { id: 'facialCare', image: drugstoreCategoryImage('facialCare'), products: [drugstoreProduct('cleansingGel', 'bottle'), drugstoreProduct('cottonPads'), drugstoreProduct('faceCream'), drugstoreProduct('faceMasks'), drugstoreProduct('lipCare'), drugstoreProduct('makeupRemover', 'bottle')] },
+      { id: 'personalHygiene', image: drugstoreCategoryImage('personalHygiene'), products: [drugstoreProduct('condoms'), drugstoreProduct('cottonSwabs'), drugstoreProduct('incontinenceProducts'), drugstoreProduct('sanitaryPads'), drugstoreProduct('tampons'), drugstoreProduct('wetWipes')] },
+      { id: 'babyCare', image: drugstoreCategoryImage('babyCare'), products: [drugstoreProduct('babyFood'), drugstoreProduct('babyOil', 'bottle'), drugstoreProduct('babyWipes'), drugstoreProduct('diapers'), drugstoreProduct('nursingPads'), drugstoreProduct('rashCream')] },
+      { id: 'cleaning', image: drugstoreCategoryImage('cleaning'), products: [drugstoreProduct('allPurposeCleaner', 'bottle'), drugstoreProduct('bathroomCleaner', 'bottle'), drugstoreProduct('cleaningCloths'), drugstoreProduct('dishwasherTablets'), drugstoreProduct('glassCleaner', 'bottle'), drugstoreProduct('sponges'), drugstoreProduct('toiletCleaner', 'bottle')] },
+      { id: 'laundry', image: drugstoreCategoryImage('laundry'), products: [drugstoreProduct('fabricSoftener', 'bottle'), drugstoreProduct('laundryDetergent'), drugstoreProduct('laundryDisinfectant', 'bottle'), drugstoreProduct('stainRemover'), drugstoreProduct('washingBags')] },
+      { id: 'paperGoods', image: drugstoreCategoryImage('paperGoods'), products: [drugstoreProduct('facialTissues'), drugstoreProduct('kitchenRoll'), drugstoreProduct('napkins'), drugstoreProduct('tissues'), drugstoreProduct('toiletPaper')] }
     ]
   },
   {
