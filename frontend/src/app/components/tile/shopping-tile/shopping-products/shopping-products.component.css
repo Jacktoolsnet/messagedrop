@@ -58,7 +58,7 @@
 .product-avatar {
   width: 5rem;
   height: 5rem;
-  border-radius: 50%;
+  border-radius: 0.9rem;
   object-fit: cover;
 }
 
@@ -132,4 +132,3 @@
   .sticky-actions .action-secondary { display: none; }
   .sticky-actions .action-overflow { display: inline-flex; }
 }
-

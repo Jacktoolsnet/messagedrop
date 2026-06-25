@@ -85,7 +85,7 @@
 .product-image {
   width: clamp(5rem, 18dvh, 8rem);
   height: clamp(5rem, 18dvh, 8rem);
-  border-radius: 50%;
+  border-radius: 1rem;
   object-fit: cover;
 }
 

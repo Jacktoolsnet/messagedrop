@@ -20,7 +20,7 @@
 .image-placeholder {
   width: 2.75rem;
   height: 2.75rem;
-  border-radius: 50%;
+  border-radius: 0.6rem;
   object-fit: cover;
 }
 

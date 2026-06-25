@@ -2,5 +2,5 @@
 .sort-list { width: min(420px, 82vw); display: flex; flex-direction: column; gap: 0.5rem; }
 .sort-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem; border-radius: 0.75rem; background: var(--mat-card-filled-container-color); box-shadow: 0 2px 8px var(--mat-card-outlined-outline-color); }
 .drag-handle { border: 0; background: transparent; color: inherit; cursor: grab; padding: 0.25rem; display: inline-flex; }
-.product-avatar { width: 2.75rem; height: 2.75rem; border-radius: 50%; object-fit: cover; }
+.product-avatar { width: 2.75rem; height: 2.75rem; border-radius: 0.6rem; object-fit: cover; }
 .cdk-drag-placeholder { opacity: 0.25; }
