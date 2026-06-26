@@ -101,7 +101,7 @@
 <mat-menu #userMenu="matMenu">
     @if (userService.isReady()) {
     <button mat-menu-item (click)="logout()">
-        <mat-icon>lock</mat-icon>
+        <mat-icon>password</mat-icon>
         <span>{{ 'common.menu.logout' | transloco }}</span>
     </button>
     }
@@ -147,7 +147,7 @@
 
     @if (userService.hasJwt() && !userService.isAccountBlocked()) {
     <button mat-menu-item (click)="openMySecretDropListDialog()">
-        <mat-icon>lock</mat-icon>
+        <mat-icon>password</mat-icon>
         <span>{{ 'common.menu.mySecretDrops' | transloco }}</span>
     </button>
     }
@@ -292,7 +292,7 @@
         @if (!userService.isReady()){
         <mat-icon>locked</mat-icon>
         } @else {
-        <mat-icon>lock</mat-icon>
+        <mat-icon>password</mat-icon>
         }
         <span>{{ 'common.menu.secretDrop' | transloco }}</span>
     </button>
@@ -360,7 +360,7 @@
         <span>{{ 'common.menu.searchHashtags' | transloco }}</span>
     </button>
     <button mat-menu-item (click)="showNominatimSearchDialog()">
-        <mat-icon>travel_explore</mat-icon>
+        <mat-icon>password</mat-icon>
         <span>{{ 'common.menu.searchPlace' | transloco }}</span>
     </button>
     <button mat-menu-item (click)="showExperienceSearchDialog()">
