@@ -2146,6 +2146,12 @@
       }
     }
   },
+  "shoppingCategorySort": {
+    "title": "Sort categories"
+  },
+  "shoppingProductSort": {
+    "title": "Sort products"
+  },
   "avatarCropper": {
     "title": "Crop avatar",
     "intro": "This screen lets you adjust the visible area of your profile image before applying it.",

@@ -2128,6 +2128,12 @@
       }
     }
   },
+  "shoppingCategorySort": {
+    "title": "Ordenar categorías"
+  },
+  "shoppingProductSort": {
+    "title": "Ordenar productos"
+  },
   "avatarCropper": {
     "title": "Recortar avatar",
     "intro": "En esta pantalla ajustas el área visible de tu imagen de perfil antes de aplicarla.",

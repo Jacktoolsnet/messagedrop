@@ -6,6 +6,7 @@ import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ShoppingProduct } from '../../../../interfaces/tile-settings';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
+import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 import { saveDialogOnImplicitDismiss } from '../../../utils/dialog-auto-save.util';
 
 @Component({
@@ -18,6 +19,7 @@ import { saveDialogOnImplicitDismiss } from '../../../utils/dialog-auto-save.uti
 })
 export class ShoppingProductSortComponent {
   private readonly dialogRef = inject(MatDialogRef<ShoppingProductSortComponent>);
+  readonly help = inject(HelpDialogService);
   readonly products = signal(inject<{ products: ShoppingProduct[] }>(MAT_DIALOG_DATA).products.map(product => ({ ...product })));
 
   constructor() {

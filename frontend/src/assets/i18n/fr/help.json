@@ -2128,6 +2128,12 @@
       }
     }
   },
+  "shoppingCategorySort": {
+    "title": "Trier les catégories"
+  },
+  "shoppingProductSort": {
+    "title": "Trier les produits"
+  },
   "avatarCropper": {
     "title": "Rogner l'avatar",
     "intro": "Cet écran vous permet d'ajuster la zone visible de votre image de profil avant validation.",

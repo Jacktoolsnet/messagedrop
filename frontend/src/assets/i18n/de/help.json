@@ -2146,6 +2146,12 @@
       }
     }
   },
+  "shoppingCategorySort": {
+    "title": "Kategorien sortieren"
+  },
+  "shoppingProductSort": {
+    "title": "Produkte sortieren"
+  },
   "avatarCropper": {
     "title": "Avatar zuschneiden",
     "intro": "Hier passt du den sichtbaren Ausschnitt deines Profilbilds an, bevor du ihn übernimmst.",

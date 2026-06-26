@@ -62,7 +62,7 @@ const ITEMS = {
   ],
   sortDialog: [
     {
-      icon: 'sort',
+      icon: 'drag_indicator',
       titleKey: 'common.items.sort.title',
       descriptionKey: 'common.items.sort.desc'
     },
@@ -2715,6 +2715,16 @@ const HELP_TOPICS = {
       },
       ...STANDARD_ACTIONS
     ]
+  },
+  shoppingCategorySort: {
+    titleKey: 'shoppingCategorySort.title',
+    introKey: 'common.intros.sort',
+    items: ITEMS.sortDialog
+  },
+  shoppingProductSort: {
+    titleKey: 'shoppingProductSort.title',
+    introKey: 'common.intros.sort',
+    items: ITEMS.sortDialog
   },
   avatarCropper: {
     titleKey: 'avatarCropper.title',
