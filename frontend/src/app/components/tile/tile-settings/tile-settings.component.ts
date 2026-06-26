@@ -252,34 +252,33 @@ export class TileSettingsComponent {
     this.openEditorForTile(tile);
   }
 
+  private applyEditedTile(updated?: TileSetting): void {
+    if (!updated) return;
+    this.tileSettings.set(this.tileSettings().map(t => t.id === updated.id ? updated : t));
+  }
+
   private openEditorForTile(tile: TileSetting) {
     if (tile.type === 'custom-text') {
       const ref = this.dialog.open(TextTileEditComponent, {
         width: '520px',
-        data: { tile },
+        data: { tile, onTileCommit: (updated: TileSetting) => this.applyEditedTile(updated) },
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
         disableClose: false,
       });
-      ref.afterClosed().subscribe((updated?: TileSetting) => {
-        if (!updated) return;
-        this.tileSettings.set(this.tileSettings().map(t => t.id === updated.id ? updated : t));
-      });
+      ref.afterClosed().subscribe((updated?: TileSetting) => this.applyEditedTile(updated));
       return;
     }
 
     if (tile.type === 'custom-multitext') {
       const ref = this.dialog.open(MultitextTileEditComponent, {
         width: '520px',
-        data: { tile },
+        data: { tile, onTileCommit: (updated: TileSetting) => this.applyEditedTile(updated) },
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
         disableClose: false,
       });
-      ref.afterClosed().subscribe((updated?: TileSetting) => {
-        if (!updated) return;
-        this.tileSettings.set(this.tileSettings().map(t => t.id === updated.id ? updated : t));
-      });
+      ref.afterClosed().subscribe((updated?: TileSetting) => this.applyEditedTile(updated));
       return;
     }
 
@@ -291,15 +290,12 @@ export class TileSettingsComponent {
         height: 'auto',
         maxHeight: '95vh',
         autoFocus: false,
-        data: { tile },
+        data: { tile, onTileCommit: (updated: TileSetting) => this.applyEditedTile(updated) },
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
         disableClose: false,
       });
-      ref.afterClosed().subscribe((updated?: TileSetting) => {
-        if (!updated) return;
-        this.tileSettings.set(this.tileSettings().map(t => t.id === updated.id ? updated : t));
-      });
+      ref.afterClosed().subscribe((updated?: TileSetting) => this.applyEditedTile(updated));
       return;
     }
 
@@ -308,15 +304,12 @@ export class TileSettingsComponent {
         width: '560px',
         maxWidth: '95vw',
         maxHeight: '98vh',
-        data: { tile },
+        data: { tile, onTileCommit: (updated: TileSetting) => this.applyEditedTile(updated) },
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
         disableClose: false,
       });
-      ref.afterClosed().subscribe((updated?: TileSetting) => {
-        if (!updated) return;
-        this.tileSettings.set(this.tileSettings().map(t => t.id === updated.id ? updated : t));
-      });
+      ref.afterClosed().subscribe((updated?: TileSetting) => this.applyEditedTile(updated));
       return;
     }
 
@@ -326,15 +319,12 @@ export class TileSettingsComponent {
           width: '820px',
           maxWidth: '96vw',
           maxHeight: '96vh',
-          data: { tile },
+          data: { tile, onTileCommit: (updated: TileSetting) => this.applyEditedTile(updated) },
           hasBackdrop: true,
           backdropClass: 'dialog-backdrop',
           disableClose: false,
         });
-        ref.afterClosed().subscribe((updated?: TileSetting) => {
-          if (!updated) return;
-          this.tileSettings.set(this.tileSettings().map(t => t.id === updated.id ? updated : t));
-        });
+        ref.afterClosed().subscribe((updated?: TileSetting) => this.applyEditedTile(updated));
       });
       return;
     }
@@ -344,15 +334,12 @@ export class TileSettingsComponent {
         width: '560px',
         maxWidth: '95vw',
         maxHeight: '98vh',
-        data: { tile },
+        data: { tile, onTileCommit: (updated: TileSetting) => this.applyEditedTile(updated) },
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
         disableClose: false,
       });
-      ref.afterClosed().subscribe((updated?: TileSetting) => {
-        if (!updated) return;
-        this.tileSettings.set(this.tileSettings().map(t => t.id === updated.id ? updated : t));
-      });
+      ref.afterClosed().subscribe((updated?: TileSetting) => this.applyEditedTile(updated));
       return;
     }
 
@@ -361,15 +348,12 @@ export class TileSettingsComponent {
         width: '560px',
         maxWidth: '95vw',
         maxHeight: '98vh',
-        data: { tile },
+        data: { tile, onTileCommit: (updated: TileSetting) => this.applyEditedTile(updated) },
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
         disableClose: false,
       });
-      ref.afterClosed().subscribe((updated?: TileSetting) => {
-        if (!updated) return;
-        this.tileSettings.set(this.tileSettings().map(t => t.id === updated.id ? updated : t));
-      });
+      ref.afterClosed().subscribe((updated?: TileSetting) => this.applyEditedTile(updated));
       return;
     }
 
@@ -378,15 +362,12 @@ export class TileSettingsComponent {
         width: '560px',
         maxWidth: '95vw',
         maxHeight: '98vh',
-        data: { tile },
+        data: { tile, onTileCommit: (updated: TileSetting) => this.applyEditedTile(updated) },
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
         disableClose: false,
       });
-      ref.afterClosed().subscribe((updated?: TileSetting) => {
-        if (!updated) return;
-        this.tileSettings.set(this.tileSettings().map(t => t.id === updated.id ? updated : t));
-      });
+      ref.afterClosed().subscribe((updated?: TileSetting) => this.applyEditedTile(updated));
       return;
     }
 
@@ -397,30 +378,24 @@ export class TileSettingsComponent {
         maxWidth: '95vw',
         maxHeight: '95vh',
         height: 'auto',
-        data: { tile },
+        data: { tile, onTileCommit: (updated: TileSetting) => this.applyEditedTile(updated) },
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
         disableClose: false,
       });
-      ref.afterClosed().subscribe((updated?: TileSetting) => {
-        if (!updated) return;
-        this.tileSettings.set(this.tileSettings().map(t => t.id === updated.id ? updated : t));
-      });
+      ref.afterClosed().subscribe((updated?: TileSetting) => this.applyEditedTile(updated));
       return;
     }
 
     if (tile.type === 'custom-migraine') {
       const ref = this.dialog.open(MigraineTileEditComponent, {
         width: '520px',
-        data: { tile },
+        data: { tile, onTileCommit: (updated: TileSetting) => this.applyEditedTile(updated) },
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
         disableClose: false,
       });
-      ref.afterClosed().subscribe((updated?: TileSetting) => {
-        if (!updated) return;
-        this.tileSettings.set(this.tileSettings().map(t => t.id === updated.id ? updated : t));
-      });
+      ref.afterClosed().subscribe((updated?: TileSetting) => this.applyEditedTile(updated));
       return;
     }
 
