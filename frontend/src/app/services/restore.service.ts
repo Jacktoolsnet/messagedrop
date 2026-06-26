@@ -15,6 +15,9 @@ import { BackupStateService } from './backup-state.service';
 import { IndexedDbService } from './indexed-db.service';
 import { MessageService } from './message.service';
 import { NetworkService } from './network.service';
+import { ContactService } from './contact.service';
+import { NoteService } from './note.service';
+import { PlaceService } from './place.service';
 import { TranslationHelperService } from './translation-helper.service';
 import { UserService } from './user.service';
 import { DisplayMessageService } from './display-message.service';
@@ -57,6 +60,9 @@ export class RestoreService {
   private readonly indexedDbService = inject(IndexedDbService);
   private readonly messageService = inject(MessageService);
   private readonly networkService = inject(NetworkService);
+  private readonly contactService = inject(ContactService);
+  private readonly noteService = inject(NoteService);
+  private readonly placeService = inject(PlaceService);
   private readonly backupState = inject(BackupStateService);
   private readonly i18n = inject(TranslationHelperService);
 
@@ -150,11 +156,17 @@ export class RestoreService {
         });
       }
       await this.restoreIndexedDb(payload.indexedDb);
+      if (canRestoreServerData && this.userService.getUser().id === payload.userId) {
+        await this.userService.restoreCurrentServerDataFromIndexedDb();
+      }
       await this.applyRestoreSummaryToOwnPublicMessages(payload.userId, restoreSummary);
       await this.restoreLocalImages(payload.localImages || []);
       await this.restoreMediaFiles(payload.mediaFiles || []);
 
       this.backupState.clearDirty();
+      this.placeService.logout();
+      this.contactService.logout();
+      this.noteService.logout();
       this.userService.logout();
       this.snackBar.open(this.i18n.t('common.restore.completed'), undefined, {
         duration: 3500,

@@ -1769,6 +1769,15 @@ export class UserService {
     await this.applyRestoreSummaryToOwnPublicMessages(user.id, response.restoreSummary);
   }
 
+  async restoreCurrentServerDataFromIndexedDb(): Promise<void> {
+    const user = this.getUser();
+    const jwt = user.jwt;
+    if (!user.id || !jwt) {
+      throw new Error('restore_server_data_unavailable');
+    }
+    await this.restoreServerFromIndexedDb(user, jwt);
+  }
+
   private getHttpStatus(err: unknown): number | undefined {
     if (!err || typeof err !== 'object') {
       return undefined;

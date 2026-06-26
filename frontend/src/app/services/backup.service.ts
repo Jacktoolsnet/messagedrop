@@ -4,13 +4,16 @@ import { MatDialog } from '@angular/material/dialog';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { CreatePinComponent } from '../components/pin/create-pin/create-pin.component';
-import { BackupEnvelope, BackupLocalImage, BackupMediaFile, BackupPayload } from '../interfaces/backup';
+import { BackupEnvelope, BackupLocalImage, BackupMediaFile, BackupPayload, UserServerBackup } from '../interfaces/backup';
+import { Place } from '../interfaces/place';
 import { GetUserBackupResponse } from '../interfaces/get-user-backup-response';
 import { LocalImage } from '../interfaces/local-image';
 import { AvatarStorageService } from './avatar-storage.service';
 import { BackupStateService } from './backup-state.service';
+import { CryptoService } from './crypto.service';
 import { IndexedDbService } from './indexed-db.service';
 import { NetworkService } from './network.service';
+import { ServerService } from './server.service';
 import { TranslationHelperService } from './translation-helper.service';
 import { UserService } from './user.service';
 import { DisplayMessageService } from './display-message.service';
@@ -36,6 +39,8 @@ export class BackupService {
   private readonly backupState = inject(BackupStateService);
   private readonly i18n = inject(TranslationHelperService);
   private readonly avatarStorage = inject(AvatarStorageService);
+  private readonly cryptoService = inject(CryptoService);
+  private readonly serverService = inject(ServerService);
 
   private httpOptions = {
     headers: new HttpHeaders({
@@ -170,6 +175,7 @@ export class BackupService {
   private async buildBackupPayload(userId: string): Promise<BackupPayload> {
     const serverBackup = await this.fetchServerBackup(userId);
     const indexedDb = await this.indexedDbService.exportAllData(['imageHandle']);
+    await this.mergeLocalPlacesIntoServerBackup(serverBackup, userId);
     const localImages = await this.exportLocalImages();
     const mediaFiles = await this.exportMediaFiles();
 
@@ -207,6 +213,98 @@ export class BackupService {
       const httpError = error as HttpErrorResponse;
       throw new Error(httpError?.message || 'Server backup failed');
     }
+  }
+
+  private async mergeLocalPlacesIntoServerBackup(serverBackup: UserServerBackup, userId: string): Promise<void> {
+    const localPlaceRows = await this.buildLocalServerPlaceRows(userId);
+    if (!localPlaceRows.length) {
+      return;
+    }
+
+    const currentRows = Array.isArray(serverBackup.tables?.['tablePlace'])
+      ? serverBackup.tables['tablePlace']
+      : [];
+    const rowsById = new Map<string, unknown>();
+    for (const row of currentRows) {
+      const id = this.getRowId(row);
+      if (id) rowsById.set(id, row);
+    }
+    for (const row of localPlaceRows) {
+      rowsById.set(row.id, row);
+    }
+    serverBackup.tables = {
+      ...serverBackup.tables,
+      tablePlace: Array.from(rowsById.values())
+    };
+  }
+
+  private async buildLocalServerPlaceRows(userId: string): Promise<{
+    id: string;
+    userId: string;
+    name: string;
+    subscribed: number;
+    latMin: number;
+    latMax: number;
+    lonMin: number;
+    lonMax: number;
+  }[]> {
+    const places = await this.indexedDbService.getAllPlaces();
+    if (!places.length) {
+      return [];
+    }
+    const cryptoPublicKey = await this.ensureServerCryptoPublicKey();
+    const rows = await Promise.all(places.map(async (place) => this.buildLocalServerPlaceRow(place, userId, cryptoPublicKey)));
+    return rows.filter((row): row is NonNullable<typeof row> => Boolean(row));
+  }
+
+  private async buildLocalServerPlaceRow(place: Place, userId: string, cryptoPublicKey: JsonWebKey): Promise<{
+    id: string;
+    userId: string;
+    name: string;
+    subscribed: number;
+    latMin: number;
+    latMax: number;
+    lonMin: number;
+    lonMax: number;
+  } | null> {
+    if (!place.id || place.userId !== userId || !place.boundingBox) {
+      return null;
+    }
+    const { latMin, latMax, lonMin, lonMax } = place.boundingBox;
+    if (![latMin, latMax, lonMin, lonMax].every(value => Number.isFinite(value))) {
+      return null;
+    }
+    const encryptedName = await this.cryptoService.encrypt(cryptoPublicKey, place.name ?? '');
+    return {
+      id: place.id,
+      userId,
+      name: encryptedName,
+      subscribed: place.subscribed ? 1 : 0,
+      latMin,
+      latMax,
+      lonMin,
+      lonMax
+    };
+  }
+
+  private async ensureServerCryptoPublicKey(): Promise<JsonWebKey> {
+    const existingKey = this.serverService.getCryptoPublicKey();
+    if (existingKey) {
+      return existingKey;
+    }
+    const response = await firstValueFrom(this.serverService.connect());
+    if (response.status === 200 && response.cryptoPublicKey) {
+      return response.cryptoPublicKey;
+    }
+    throw new Error('server_key_unavailable');
+  }
+
+  private getRowId(row: unknown): string | undefined {
+    if (!row || typeof row !== 'object' || !('id' in row)) {
+      return undefined;
+    }
+    const id = String((row as { id?: unknown }).id ?? '').trim();
+    return id || undefined;
   }
 
   private async exportLocalImages(): Promise<BackupLocalImage[]> {
