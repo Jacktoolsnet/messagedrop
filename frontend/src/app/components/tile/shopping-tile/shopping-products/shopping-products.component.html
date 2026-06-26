@@ -14,7 +14,17 @@
               <mat-icon class="product-symbol">inventory_2</mat-icon>
             }
             <h3>{{ product.name }}</h3>
-            <p>{{ product.quantity }} {{ ('common.tiles.shopping.units.' + product.unit) | transloco }}</p>
+            <div class="quantity-actions">
+              <button mat-icon-button type="button" (click)="decreaseQuantity(product)" [disabled]="!canDecreaseQuantity(product)"
+                [attr.aria-label]="'common.tiles.shopping.decreaseQuantity' | transloco:{ name: product.name }">
+                <mat-icon>remove</mat-icon>
+              </button>
+              <p>{{ product.quantity }} {{ ('common.tiles.shopping.units.' + product.unit) | transloco }}</p>
+              <button mat-icon-button type="button" (click)="increaseQuantity(product)"
+                [attr.aria-label]="'common.tiles.shopping.increaseQuantity' | transloco:{ name: product.name }">
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
             @if (product.price !== undefined) {
               <strong>{{ formatPrice(product.price) }}</strong>
             } @else {

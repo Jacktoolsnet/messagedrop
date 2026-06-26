@@ -1,5 +1,5 @@
 import { ShoppingList } from '../../../interfaces/tile-settings';
-import { activeShoppingProducts, normalizeShoppingList } from './shopping-list.util';
+import { activeShoppingProducts, normalizeShoppingList, normalizeShoppingQuantity, shoppingUnitAllowsDecimals } from './shopping-list.util';
 
 describe('shopping list utilities', () => {
   it('normalizes category and product order while preserving the master list', () => {
@@ -55,5 +55,16 @@ describe('shopping list utilities', () => {
     });
 
     expect(activeShoppingProducts(list).map(product => product.id)).toEqual(['milk']);
+  });
+
+  it('normalizes quantities based on the selected unit', () => {
+    expect(shoppingUnitAllowsDecimals('liter')).toBeTrue();
+    expect(shoppingUnitAllowsDecimals('kilogram')).toBeTrue();
+    expect(shoppingUnitAllowsDecimals('bottle')).toBeFalse();
+
+    expect(normalizeShoppingQuantity(1.25, 'liter')).toBe(1.25);
+    expect(normalizeShoppingQuantity(1.234, 'kilogram')).toBe(1.23);
+    expect(normalizeShoppingQuantity(1.05, 'bottle')).toBe(1);
+    expect(normalizeShoppingQuantity(2.6, 'piece')).toBe(3);
   });
 });

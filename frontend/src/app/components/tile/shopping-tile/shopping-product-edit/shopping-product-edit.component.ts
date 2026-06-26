@@ -23,7 +23,7 @@ import { CameraCaptureDialogComponent } from '../../../utils/camera-capture-dial
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
 import { UnsplashComponent } from '../../../utils/unsplash/unsplash.component';
 import { saveDialogOnImplicitDismiss } from '../../../utils/dialog-auto-save.util';
-import { createShoppingId, SHOPPING_UNITS } from '../shopping-list.util';
+import { createShoppingId, normalizeShoppingQuantity, SHOPPING_UNITS, shoppingUnitAllowsDecimals } from '../shopping-list.util';
 
 @Component({
   selector: 'app-shopping-product-edit',
@@ -129,6 +129,7 @@ export class ShoppingProductEditComponent {
   save(): void {
     const name = this.nameControl.value.trim();
     if (!name) return;
+    const unit = this.unitControl.value;
     const priceValue = this.priceControl.value;
     const price = priceValue === null || !Number.isFinite(Number(priceValue)) || Number(priceValue) < 0
       ? undefined
@@ -140,13 +141,25 @@ export class ShoppingProductEditComponent {
       image: this.image(),
       imageFileId: !this.imageRemoved() && !this.image()?.startsWith('data:image/') ? this.product?.imageFileId : undefined,
       imageAttribution: this.imageAttribution(),
-      quantity: Math.max(0.01, Number(this.quantityControl.value) || 1),
-      unit: this.unitControl.value,
+      quantity: normalizeShoppingQuantity(this.quantityControl.value, unit),
+      unit,
       price,
       needed: this.product?.needed ?? false,
       done: this.product?.done ?? false,
       order: this.product?.order ?? 0
     } satisfies ShoppingProduct);
+  }
+
+  get quantityStep(): number {
+    return shoppingUnitAllowsDecimals(this.unitControl.value) ? 0.01 : 1;
+  }
+
+  get quantityMin(): number {
+    return shoppingUnitAllowsDecimals(this.unitControl.value) ? 0.01 : 1;
+  }
+
+  normalizeQuantityInput(): void {
+    this.quantityControl.setValue(normalizeShoppingQuantity(this.quantityControl.value, this.unitControl.value));
   }
 
   private openUnsplash(): void {

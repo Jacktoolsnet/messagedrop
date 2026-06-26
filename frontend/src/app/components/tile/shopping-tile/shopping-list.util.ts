@@ -5,19 +5,26 @@ import {
   ShoppingUnit
 } from '../../../interfaces/tile-settings';
 
-export const SHOPPING_UNITS: readonly ShoppingUnit[] = [
-  'piece',
-  'package',
-  'gram',
-  'kilogram',
-  'milliliter',
-  'liter',
-  'bottle',
-  'can',
-  'jar',
-  'bag',
-  'bunch'
+export interface ShoppingUnitConfig {
+  unit: ShoppingUnit;
+  allowDecimals: boolean;
+}
+
+export const SHOPPING_UNIT_CONFIGS: readonly ShoppingUnitConfig[] = [
+  { unit: 'piece', allowDecimals: false },
+  { unit: 'package', allowDecimals: false },
+  { unit: 'gram', allowDecimals: false },
+  { unit: 'kilogram', allowDecimals: true },
+  { unit: 'milliliter', allowDecimals: false },
+  { unit: 'liter', allowDecimals: true },
+  { unit: 'bottle', allowDecimals: false },
+  { unit: 'can', allowDecimals: false },
+  { unit: 'jar', allowDecimals: false },
+  { unit: 'bag', allowDecimals: false },
+  { unit: 'bunch', allowDecimals: false }
 ];
+
+export const SHOPPING_UNITS: readonly ShoppingUnit[] = SHOPPING_UNIT_CONFIGS.map(config => config.unit);
 
 export const DEFAULT_SHOPPING_SELECTION_COLOR = '#4fa1c7';
 
@@ -61,6 +68,19 @@ export function normalizeShoppingList(value?: ShoppingList): ShoppingList {
   };
 }
 
+export function shoppingUnitAllowsDecimals(unit: ShoppingUnit): boolean {
+  return SHOPPING_UNIT_CONFIGS.find(config => config.unit === unit)?.allowDecimals ?? false;
+}
+
+export function normalizeShoppingQuantity(quantity: number | string | null | undefined, unit: ShoppingUnit): number {
+  const value = Number(quantity);
+  if (!Number.isFinite(value) || value <= 0) return 1;
+  if (shoppingUnitAllowsDecimals(unit)) {
+    return Math.max(0.01, Math.round(value * 100) / 100);
+  }
+  return Math.max(1, Math.round(value));
+}
+
 
 function normalizeImageUrl(value: string | undefined): string | undefined {
   return typeof value === 'string' && /^(data:image\/|https?:\/\/)/i.test(value) ? value : undefined;
@@ -76,8 +96,8 @@ function normalizeProducts(products?: ShoppingProduct[]): ShoppingProduct[] {
       image: normalizeImageUrl(product.image),
       imageFileId: typeof product.imageFileId === 'string' && product.imageFileId.trim() ? product.imageFileId : undefined,
       imageAttribution: product.imageAttribution?.source === 'unsplash' ? product.imageAttribution : undefined,
-      quantity: Number.isFinite(product.quantity) && product.quantity > 0 ? product.quantity : 1,
       unit: SHOPPING_UNITS.includes(product.unit) ? product.unit : 'piece',
+      quantity: normalizeShoppingQuantity(product.quantity, SHOPPING_UNITS.includes(product.unit) ? product.unit : 'piece'),
       price: Number.isFinite(product.price) && (product.price ?? -1) >= 0 ? product.price : undefined,
       needed: !!product.needed,
       done: !!product.needed && !!product.done,

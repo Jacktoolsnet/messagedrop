@@ -11,6 +11,7 @@ import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-heade
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 import { saveDialogOnImplicitDismiss } from '../../../utils/dialog-auto-save.util';
 import { ShoppingCategoryEditComponent } from '../shopping-category-edit/shopping-category-edit.component';
+import { normalizeShoppingQuantity } from '../shopping-list.util';
 import { ShoppingProductEditComponent } from '../shopping-product-edit/shopping-product-edit.component';
 import { ShoppingProductSortComponent } from '../shopping-product-sort/shopping-product-sort.component';
 
@@ -120,6 +121,19 @@ export class ShoppingProductsComponent {
       : item));
   }
 
+  increaseQuantity(product: ShoppingProduct): void {
+    this.changeQuantity(product, 1);
+  }
+
+  decreaseQuantity(product: ShoppingProduct): void {
+    if (!this.canDecreaseQuantity(product)) return;
+    this.changeQuantity(product, -1);
+  }
+
+  canDecreaseQuantity(product: ShoppingProduct): boolean {
+    return product.quantity > 1;
+  }
+
   sortProducts(): void {
     if (this.products().length < 2) return;
     const ref = this.dialog.open(ShoppingProductSortComponent, {
@@ -148,6 +162,12 @@ export class ShoppingProductsComponent {
       style: 'currency',
       currency: this.data.currency
     }).format(price);
+  }
+
+  private changeQuantity(product: ShoppingProduct, delta: 1 | -1): void {
+    this.products.update(products => products.map(item => item.id === product.id
+      ? { ...item, quantity: normalizeShoppingQuantity(Number((item.quantity + delta).toFixed(2)), item.unit) }
+      : item));
   }
 
   private openProductEditor(product?: ShoppingProduct): void {

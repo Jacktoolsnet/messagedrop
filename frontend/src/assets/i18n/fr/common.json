@@ -815,6 +815,8 @@
         "deleteProduct": "Supprimer le produit",
         "reorderProduct": "Réorganiser le produit",
         "toggleNeeded": "Sélectionner {{ name }} pour les courses",
+        "decreaseQuantity": "Diminuer la quantité de {{ name }} de 1",
+        "increaseQuantity": "Augmenter la quantité de {{ name }} de 1",
         "quantity": "Quantité",
         "unit": "Unité",
         "price": "Prix prévu",

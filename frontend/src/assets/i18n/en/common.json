@@ -816,6 +816,8 @@
         "deleteProduct": "Delete product",
         "reorderProduct": "Reorder product",
         "toggleNeeded": "Select {{ name }} for shopping",
+        "decreaseQuantity": "Decrease quantity of {{ name }} by 1",
+        "increaseQuantity": "Increase quantity of {{ name }} by 1",
         "quantity": "Quantity",
         "unit": "Unit",
         "price": "Expected price",
