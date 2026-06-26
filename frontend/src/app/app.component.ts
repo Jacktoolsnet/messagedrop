@@ -95,6 +95,7 @@ import { NoteService } from './services/note.service';
 import { OembedService } from './services/oembed.service';
 import { PlaceService } from './services/place.service';
 import { PowService } from './services/pow.service';
+import { PublicMessageShareService } from './services/public-message-share.service';
 import { RestoreService } from './services/restore.service';
 import { ServerService } from './services/server.service';
 import { SharedContentService } from './services/shared-content.service';
@@ -120,6 +121,8 @@ interface RememberedExifLocationChoice {
 }
 
 const PRODUCTION_APP_URL = 'https://app.messagedrop.de/';
+const SHARED_LOCATION_DEFAULT_ZOOM = 18;
+const SHARED_LOCATION_MESSAGE_RADIUS_METERS = 30;
 const Q_STAGE_WARNING_SESSION_KEY = 'messagedrop.qStageWarningSeen';
 
 @Component({
@@ -201,6 +204,7 @@ export class AppComponent implements OnInit {
   readonly usageProtectionService = inject(UsageProtectionService);
   private readonly locale = inject<string>(LOCALE_ID);
   readonly powService = inject(PowService);
+  private readonly publicMessageShare = inject(PublicMessageShareService);
   private exitBackupPromptPending = false;
   private exitBackupDialogOpen = false;
   private exitBackupPromptTimer?: ReturnType<typeof setTimeout>;
@@ -232,6 +236,7 @@ export class AppComponent implements OnInit {
   private readonly pendingContactNotificationAction = signal<NotificationAction | null>(null);
   private openingContactNotification = false;
   private readonly pendingPublicMessageUuid = signal<string | null>(this.readPendingPublicMessageUuid());
+  private readonly pendingSharedLocation = signal<Location | null>(this.readPendingSharedLocation());
   private initialPublicMessagesRequested = false;
   private openingPublicMessage = false;
   usageProtectionUnlockBusy = false;
@@ -266,7 +271,7 @@ export class AppComponent implements OnInit {
 
     effect(() => {
       const mapSetTrigger = this.mapService.mapSet(); // <-- track changes
-      if (!this.appService.isConsentCompleted() || mapSetTrigger < 2 || this.initialPublicMessagesRequested) {
+      if (!this.appService.isConsentCompleted() || mapSetTrigger < 2 || this.initialPublicMessagesRequested || this.pendingPublicMessageUuid() || this.pendingSharedLocation() || this.openingPublicMessage) {
         return;
       }
       this.initialPublicMessagesRequested = true;
@@ -403,6 +408,21 @@ export class AppComponent implements OnInit {
 
       this.openingPublicMessage = true;
       void this.handlePublicMessageLink(messageUuid).finally(() => {
+        this.openingPublicMessage = false;
+        this.flushPendingSharedContent();
+      });
+    });
+
+    effect(() => {
+      this.appService.settingsSet();
+      const mapSetTrigger = this.mapService.mapSet();
+      const location = this.pendingSharedLocation();
+      if (!location || this.pendingPublicMessageUuid() || !this.appService.isConsentCompleted() || mapSetTrigger < 2 || this.openingPublicMessage) {
+        return;
+      }
+
+      this.openingPublicMessage = true;
+      void this.handleSharedLocationLink(location).finally(() => {
         this.openingPublicMessage = false;
         this.flushPendingSharedContent();
       });
@@ -917,7 +937,7 @@ export class AppComponent implements OnInit {
   }
 
   private isHigherPriorityStartupFlowActive(): boolean {
-    return !!this.pendingPublicMessageUuid() || this.openingPublicMessage || this.markerMessageListOpen;
+    return !!this.pendingPublicMessageUuid() || !!this.pendingSharedLocation() || this.openingPublicMessage || this.markerMessageListOpen;
   }
 
   private getSharedContentNoticeMessageKey(content: SharedContent): string {
@@ -1078,6 +1098,47 @@ export class AppComponent implements OnInit {
     this.openMarkerMessageListDialog([message]);
   }
 
+
+  private async handleSharedLocationLink(location: Location): Promise<void> {
+    this.pendingSharedLocation.set(null);
+    this.clearPendingSharedLocationFromUrl();
+
+    await this.waitForMapReady();
+    this.mapService.flyToWithZoom(location, SHARED_LOCATION_DEFAULT_ZOOM);
+
+    const messageSetBefore = this.messageService.messageSet();
+    await this.updateDataForLocation();
+    await this.waitForMessageSearch(messageSetBefore);
+    this.createMarkerLocations();
+
+    const messagesAtLocation = this.messageService.messagesSignal()
+      .filter((message) => message.status === 'enabled')
+      .filter((message) => this.getDistanceMeters(location, message.location) <= SHARED_LOCATION_MESSAGE_RADIUS_METERS);
+
+    if (messagesAtLocation.length > 0) {
+      this.openMarkerMessageListDialog(messagesAtLocation);
+    }
+  }
+
+  private async waitForMessageSearch(previousMessageSet: number, timeoutMs = 3000, stepMs = 100): Promise<void> {
+    const timeoutAt = Date.now() + timeoutMs;
+    while (this.messageService.messageSet() === previousMessageSet && Date.now() < timeoutAt) {
+      await new Promise((resolve) => setTimeout(resolve, stepMs));
+    }
+  }
+
+  private getDistanceMeters(first: Location, second: Location): number {
+    const earthRadiusMeters = 6371000;
+    const toRadians = (value: number) => value * Math.PI / 180;
+    const dLat = toRadians(second.latitude - first.latitude);
+    const dLon = toRadians(second.longitude - first.longitude);
+    const lat1 = toRadians(first.latitude);
+    const lat2 = toRadians(second.latitude);
+    const a = Math.sin(dLat / 2) ** 2
+      + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+    return 2 * earthRadiusMeters * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
   private async handlePlaceNotification(action: NotificationAction): Promise<void> {
     const placeId = typeof action.id === 'string' ? action.id.trim() : '';
     const place = placeId
@@ -1127,6 +1188,52 @@ export class AppComponent implements OnInit {
         return;
       }
       url.searchParams.delete('publicMessage');
+      const nextUrl = `${url.pathname}${url.search}${url.hash}`;
+      window.history.replaceState(this.myHistory, '', nextUrl || '/');
+    } catch {
+      // ignore malformed URL state
+    }
+  }
+
+
+  private readPendingSharedLocation(): Location | null {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+
+    try {
+      const url = new URL(window.location.href);
+      if (!url.searchParams.has('lat') || !url.searchParams.has('lon')) {
+        return null;
+      }
+      const latitude = Number(url.searchParams.get('lat'));
+      const longitude = Number(url.searchParams.get('lon'));
+      if (!Number.isFinite(latitude) || !Number.isFinite(longitude) || latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+        return null;
+      }
+
+      return {
+        latitude,
+        longitude,
+        plusCode: this.geolocationService.getPlusCode(latitude, longitude)
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  private clearPendingSharedLocationFromUrl(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    try {
+      const url = new URL(window.location.href);
+      if (!url.searchParams.has('lat') && !url.searchParams.has('lon')) {
+        return;
+      }
+      url.searchParams.delete('lat');
+      url.searchParams.delete('lon');
       const nextUrl = `${url.pathname}${url.search}${url.hash}`;
       window.history.replaceState(this.myHistory, '', nextUrl || '/');
     } catch {
@@ -1323,6 +1430,11 @@ export class AppComponent implements OnInit {
     dialogRef.afterClosed().subscribe(() => {
       // Optional: Aktionen nach Schließen
     });
+  }
+
+  public shareSelectedLocation(): void {
+    const location = this.mapService.getMapLocation();
+    void this.publicMessageShare.shareLocation(location);
   }
 
   private async updateDataForLocation() {

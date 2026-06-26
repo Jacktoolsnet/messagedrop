@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { environment } from '../../environments/environment';
+import { Location } from '../interfaces/location';
 import { Message } from '../interfaces/message';
 import { DisplayMessageService } from './display-message.service';
 import { TranslationHelperService } from './translation-helper.service';
@@ -25,6 +26,46 @@ export class PublicMessageShareService {
   buildAppMessageUrl(messageUuid: string): string {
     const trimmedUuid = typeof messageUuid === 'string' ? messageUuid.trim() : '';
     return `${this.resolveAppBaseUrl()}/?publicMessage=${encodeURIComponent(trimmedUuid)}`;
+  }
+
+  buildAppLocationUrl(location: Pick<Location, 'latitude' | 'longitude'>): string {
+    const lat = this.formatCoordinate(location.latitude);
+    const lon = this.formatCoordinate(location.longitude);
+    return `${this.resolveAppBaseUrl()}/?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}`;
+  }
+
+  async shareLocation(location: Pick<Location, 'latitude' | 'longitude'>): Promise<void> {
+    if (!this.isValidCoordinate(location.latitude, location.longitude)) {
+      return;
+    }
+
+    const url = this.buildAppLocationUrl(location);
+    const title = this.translation.t('common.share.locationShareTitle');
+    const text = this.translation.t('common.share.locationShareText');
+
+    if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+      try {
+        await navigator.share({ title, text, url });
+        return;
+      } catch (error) {
+        if (this.isAbortError(error)) {
+          return;
+        }
+      }
+    }
+
+    const copied = await this.copyToClipboard(url);
+    this.snackBar.open(
+      copied
+        ? this.translation.t('common.share.copySuccess')
+        : this.translation.t('common.share.copyFailed'),
+      undefined,
+      {
+        duration: 3200,
+        verticalPosition: 'top',
+        panelClass: copied ? 'snack-success' : 'snack-error'
+      }
+    );
   }
 
   async share(message: Pick<Message, 'uuid' | 'status' | 'message' | 'translatedMessage'>): Promise<void> {
@@ -101,6 +142,19 @@ export class PublicMessageShareService {
     } finally {
       document.body.removeChild(input);
     }
+  }
+
+  private formatCoordinate(value: number): string {
+    return Number(value).toFixed(6).replace(/\.?0+$/, '');
+  }
+
+  private isValidCoordinate(latitude: number, longitude: number): boolean {
+    return Number.isFinite(latitude)
+      && Number.isFinite(longitude)
+      && latitude >= -90
+      && latitude <= 90
+      && longitude >= -180
+      && longitude <= 180;
   }
 
   private isAbortError(error: unknown): boolean {

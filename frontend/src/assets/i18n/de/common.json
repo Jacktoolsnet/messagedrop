@@ -80,6 +80,8 @@
     "share": {
       "publicMessageTitle": "Öffentliche Nachricht auf MessageDrop",
       "publicMessageText": "Schau dir diese Nachricht auf MessageDrop an.",
+      "locationShareTitle": "Ort auf MessageDrop",
+      "locationShareText": "Schau dir diesen Ort auf MessageDrop an.",
       "copySuccess": "Link kopiert.",
       "copyFailed": "Link konnte nicht kopiert werden.",
       "messageUnavailable": "Diese öffentliche Nachricht ist nicht verfügbar."
@@ -117,6 +119,7 @@
       "imprintLegalNotice": "Impressum (rechtlicher Hinweis)",
       "thirdPartyLicenses": "Open-Source-Lizenzen",
       "locateMe": "Standort bestimmen",
+      "shareLocation": "Ort teilen",
       "publicMessage": "Öffentliche Nachricht",
       "privateNote": "Private Notiz",
       "privateImage": "Privates Bild",
