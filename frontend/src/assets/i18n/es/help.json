@@ -2068,13 +2068,64 @@
     "title": "Tile de lista de la compra",
     "intro": "Crea aquí tu catálogo permanente y selecciona lo necesario para la próxima compra.",
     "items": {
-      "displaySettings": { "title": "Abrir ajustes de visualización", "desc": "Abre el pequeño diálogo de ajustes para cambiar el título y el icono del tile." },
-      "categories": { "title": "Gestionar categorías", "desc": "Crea categorías, cámbiales el nombre o elimínalas." },
-      "products": { "title": "Gestionar productos", "desc": "Añade productos con cantidad, unidad localizada y precio previsto." },
-      "reorder": { "title": "Definir el orden", "desc": "Ordena categorías y productos arrastrándolos según tu recorrido por la tienda." },
-      "selection": { "title": "Seleccionar para comprar", "desc": "Usa el icono del carrito para elegir los productos necesarios para la próxima compra." },
-      "price": { "title": "Estimar costes", "desc": "Los precios guardados se suman para estimar el total de los productos seleccionados." },
-      "privacy": { "title": "Privacidad y almacenamiento", "desc": "Las categorías, productos y precios permanecen en el dispositivo y se guardan cifrados en IndexedDB." }
+      "displaySettings": {
+        "title": "Abrir ajustes de visualización",
+        "desc": "Abre el pequeño diálogo de ajustes para cambiar el título y el icono del tile."
+      },
+      "categories": {
+        "title": "Gestionar categorías",
+        "desc": "Crea categorías, cámbiales el nombre o elimínalas."
+      },
+      "products": {
+        "title": "Gestionar productos",
+        "desc": "Añade productos con cantidad, unidad localizada y precio previsto."
+      },
+      "reorder": {
+        "title": "Definir el orden",
+        "desc": "Ordena las categorías arrastrándolas según tu recorrido por la tienda."
+      },
+      "selection": {
+        "title": "Seleccionar para comprar",
+        "desc": "Usa el icono del carrito para elegir los productos necesarios para la próxima compra."
+      },
+      "price": {
+        "title": "Estimar costes",
+        "desc": "Los precios guardados se suman para estimar el total de los productos seleccionados."
+      },
+      "privacy": {
+        "title": "Privacidad y almacenamiento",
+        "desc": "Las categorías, productos y precios permanecen en el dispositivo y se guardan cifrados en IndexedDB."
+      }
+    }
+  },
+  "tileShoppingProducts": {
+    "title": "Productos de una categoría",
+    "intro": "Gestiona los productos de esta categoría y selecciona lo que necesitas para la próxima compra.",
+    "items": {
+      "categorySettings": {
+        "title": "Editar categoría",
+        "desc": "Abre los ajustes de la categoría para cambiar el nombre, la imagen o el fondo."
+      },
+      "products": {
+        "title": "Gestionar productos",
+        "desc": "Añade o edita productos con cantidad, unidad, imagen, nota y precio previsto."
+      },
+      "reorder": {
+        "title": "Definir el orden",
+        "desc": "Ordena los productos arrastrándolos según tu recorrido por la tienda."
+      },
+      "selection": {
+        "title": "Seleccionar para comprar",
+        "desc": "Usa el icono del carrito para elegir los productos necesarios para la próxima compra."
+      },
+      "price": {
+        "title": "Estimar costes",
+        "desc": "Los precios guardados se suman para estimar el total de los productos seleccionados."
+      },
+      "privacy": {
+        "title": "Privacidad y almacenamiento",
+        "desc": "Los productos, precios y notas permanecen en el dispositivo y se guardan cifrados en IndexedDB."
+      }
     }
   },
   "avatarCropper": {

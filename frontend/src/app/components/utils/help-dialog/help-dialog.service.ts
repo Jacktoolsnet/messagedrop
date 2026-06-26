@@ -2657,7 +2657,7 @@ const HELP_TOPICS = {
         descriptionKey: 'tileEditShopping.items.products.desc'
       },
       {
-        icon: 'drag_indicator',
+        icon: 'sort',
         titleKey: 'tileEditShopping.items.reorder.title',
         descriptionKey: 'tileEditShopping.items.reorder.desc'
       },
@@ -2675,6 +2675,43 @@ const HELP_TOPICS = {
         icon: 'privacy_tip',
         titleKey: 'tileEditShopping.items.privacy.title',
         descriptionKey: 'tileEditShopping.items.privacy.desc'
+      },
+      ...STANDARD_ACTIONS
+    ]
+  },
+  tileShoppingProducts: {
+    titleKey: 'tileShoppingProducts.title',
+    introKey: 'tileShoppingProducts.intro',
+    items: [
+      {
+        icon: 'settings',
+        titleKey: 'tileShoppingProducts.items.categorySettings.title',
+        descriptionKey: 'tileShoppingProducts.items.categorySettings.desc'
+      },
+      {
+        icon: 'add_shopping_cart',
+        titleKey: 'tileShoppingProducts.items.products.title',
+        descriptionKey: 'tileShoppingProducts.items.products.desc'
+      },
+      {
+        icon: 'sort',
+        titleKey: 'tileShoppingProducts.items.reorder.title',
+        descriptionKey: 'tileShoppingProducts.items.reorder.desc'
+      },
+      {
+        icon: 'shopping_cart_checkout',
+        titleKey: 'tileShoppingProducts.items.selection.title',
+        descriptionKey: 'tileShoppingProducts.items.selection.desc'
+      },
+      {
+        icon: 'payments',
+        titleKey: 'tileShoppingProducts.items.price.title',
+        descriptionKey: 'tileShoppingProducts.items.price.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'tileShoppingProducts.items.privacy.title',
+        descriptionKey: 'tileShoppingProducts.items.privacy.desc'
       },
       ...STANDARD_ACTIONS
     ]

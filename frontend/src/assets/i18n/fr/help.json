@@ -2068,13 +2068,64 @@
     "title": "Tuile de liste de courses",
     "intro": "Créez ici votre catalogue permanent et sélectionnez ce qu'il faut pour les prochaines courses.",
     "items": {
-      "displaySettings": { "title": "Ouvrir les réglages d’affichage", "desc": "Ouvrez la petite boîte de dialogue pour modifier le titre et l’icône de la tuile." },
-      "categories": { "title": "Gérer les catégories", "desc": "Créez des catégories, renommez-les ou supprimez-les." },
-      "products": { "title": "Gérer les produits", "desc": "Ajoutez des produits avec une quantité, une unité traduite et un prix prévu." },
-      "reorder": { "title": "Définir l'ordre", "desc": "Réorganisez les catégories et produits par glisser-déposer selon votre parcours dans le magasin." },
-      "selection": { "title": "Sélectionner pour les courses", "desc": "Utilisez l'icône du panier pour choisir les produits nécessaires lors des prochaines courses." },
-      "price": { "title": "Estimer les coûts", "desc": "Les prix enregistrés sont additionnés pour estimer le total des produits sélectionnés." },
-      "privacy": { "title": "Confidentialité et stockage", "desc": "Les catégories, produits et prix restent sur votre appareil et sont stockés chiffrés dans IndexedDB." }
+      "displaySettings": {
+        "title": "Ouvrir les réglages d’affichage",
+        "desc": "Ouvrez la petite boîte de dialogue pour modifier le titre et l’icône de la tuile."
+      },
+      "categories": {
+        "title": "Gérer les catégories",
+        "desc": "Créez des catégories, renommez-les ou supprimez-les."
+      },
+      "products": {
+        "title": "Gérer les produits",
+        "desc": "Ajoutez des produits avec une quantité, une unité traduite et un prix prévu."
+      },
+      "reorder": {
+        "title": "Définir l'ordre",
+        "desc": "Réorganisez les catégories par glisser-déposer selon votre parcours dans le magasin."
+      },
+      "selection": {
+        "title": "Sélectionner pour les courses",
+        "desc": "Utilisez l'icône du panier pour choisir les produits nécessaires lors des prochaines courses."
+      },
+      "price": {
+        "title": "Estimer les coûts",
+        "desc": "Les prix enregistrés sont additionnés pour estimer le total des produits sélectionnés."
+      },
+      "privacy": {
+        "title": "Confidentialité et stockage",
+        "desc": "Les catégories, produits et prix restent sur votre appareil et sont stockés chiffrés dans IndexedDB."
+      }
+    }
+  },
+  "tileShoppingProducts": {
+    "title": "Produits d’une catégorie",
+    "intro": "Gérez les produits de cette catégorie et sélectionnez ce dont vous avez besoin pour les prochaines courses.",
+    "items": {
+      "categorySettings": {
+        "title": "Modifier la catégorie",
+        "desc": "Ouvrez les paramètres de la catégorie pour ajuster le nom, l’image ou l’arrière-plan."
+      },
+      "products": {
+        "title": "Gérer les produits",
+        "desc": "Ajoutez ou modifiez des produits avec quantité, unité, image, note et prix prévu."
+      },
+      "reorder": {
+        "title": "Définir l’ordre",
+        "desc": "Réorganisez les produits par glisser-déposer selon votre parcours dans le magasin."
+      },
+      "selection": {
+        "title": "Sélectionner pour les courses",
+        "desc": "Utilisez l’icône du panier pour choisir les produits nécessaires aux prochaines courses."
+      },
+      "price": {
+        "title": "Estimer les coûts",
+        "desc": "Les prix enregistrés sont additionnés pour estimer le total des produits sélectionnés."
+      },
+      "privacy": {
+        "title": "Confidentialité et stockage",
+        "desc": "Les produits, prix et notes restent sur votre appareil et sont stockés chiffrés dans IndexedDB."
+      }
     }
   },
   "avatarCropper": {

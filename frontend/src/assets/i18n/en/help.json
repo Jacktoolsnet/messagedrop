@@ -2086,13 +2086,64 @@
     "title": "Shopping list tile",
     "intro": "Build your permanent product catalog here and select what you need for the next shopping trip.",
     "items": {
-      "displaySettings": { "title": "Open display settings", "desc": "Open the small settings dialog to change the tile title and icon." },
-      "categories": { "title": "Manage categories", "desc": "Create categories such as fruit and vegetables, rename them, or remove them." },
-      "products": { "title": "Manage products", "desc": "Add products with a quantity, localized unit, and expected price." },
-      "reorder": { "title": "Set the order", "desc": "Drag and drop categories and products to match your route through the store." },
-      "selection": { "title": "Select for shopping", "desc": "Use the cart icon to choose which permanent products you need for the next trip." },
-      "price": { "title": "Estimate costs", "desc": "Saved prices are added up for all selected products to estimate the shopping total." },
-      "privacy": { "title": "Privacy and storage", "desc": "Categories, products, and prices remain on your device and are stored encrypted in IndexedDB." }
+      "displaySettings": {
+        "title": "Open display settings",
+        "desc": "Open the small settings dialog to change the tile title and icon."
+      },
+      "categories": {
+        "title": "Manage categories",
+        "desc": "Create categories such as fruit and vegetables, rename them, or remove them."
+      },
+      "products": {
+        "title": "Manage products",
+        "desc": "Add products with a quantity, localized unit, and expected price."
+      },
+      "reorder": {
+        "title": "Set the order",
+        "desc": "Drag and drop categories to match your route through the store."
+      },
+      "selection": {
+        "title": "Select for shopping",
+        "desc": "Use the cart icon to choose which permanent products you need for the next trip."
+      },
+      "price": {
+        "title": "Estimate costs",
+        "desc": "Saved prices are added up for all selected products to estimate the shopping total."
+      },
+      "privacy": {
+        "title": "Privacy and storage",
+        "desc": "Categories, products, and prices remain on your device and are stored encrypted in IndexedDB."
+      }
+    }
+  },
+  "tileShoppingProducts": {
+    "title": "Category products",
+    "intro": "Manage the products in this category and select what you need for the next shopping trip.",
+    "items": {
+      "categorySettings": {
+        "title": "Edit category",
+        "desc": "Open the category settings to adjust the name, image, or background."
+      },
+      "products": {
+        "title": "Manage products",
+        "desc": "Add or edit products with quantity, unit, image, note, and expected price."
+      },
+      "reorder": {
+        "title": "Set the order",
+        "desc": "Drag and drop products to match your route through the store."
+      },
+      "selection": {
+        "title": "Select for shopping",
+        "desc": "Use the cart icon to choose which products you need for the next trip."
+      },
+      "price": {
+        "title": "Estimate costs",
+        "desc": "Saved prices are added up for all selected products to estimate the shopping total."
+      },
+      "privacy": {
+        "title": "Privacy and storage",
+        "desc": "Products, prices, and notes remain on your device and are stored encrypted in IndexedDB."
+      }
     }
   },
   "avatarCropper": {
