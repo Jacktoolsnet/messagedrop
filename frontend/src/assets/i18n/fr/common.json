@@ -1141,10 +1141,7 @@
             "quark": "Quark",
             "gravel": "Gravel"
           },
-          "contents": "{{ categories }} catégories avec {{ products }} produits",
-          "exportImages": "Copier l’association des images",
-          "exportCopied": "L’association des images a été copiée dans le presse-papiers.",
-          "exportCopyFailed": "L’association des images n’a pas pu être copiée automatiquement. Le jeu de données a été écrit dans la console du navigateur."
+          "contents": "{{ categories }} catégories avec {{ products }} produits"
         },
         "selectionColor": "Couleur des produits sélectionnés",
         "chooseSelectionColor": "Choisir la couleur",

@@ -1141,10 +1141,7 @@
             "quark": "Quark",
             "gravel": "Gravel"
           },
-          "contents": "{{ categories }} categorías con {{ products }} productos",
-          "exportImages": "Copiar asignación de imágenes",
-          "exportCopied": "La asignación de imágenes se ha copiado al portapapeles.",
-          "exportCopyFailed": "No se pudo copiar automáticamente la asignación de imágenes. El conjunto de datos se escribió en la consola del navegador."
+          "contents": "{{ categories }} categorías con {{ products }} productos"
         },
         "selectionColor": "Color de productos seleccionados",
         "chooseSelectionColor": "Elegir color",

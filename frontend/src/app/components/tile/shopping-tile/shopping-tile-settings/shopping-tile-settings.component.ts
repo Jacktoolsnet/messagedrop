@@ -7,7 +7,6 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { AvatarAttribution } from '../../../../interfaces/avatar-attribution';
 import { ShoppingCategory } from '../../../../interfaces/tile-settings';
 import { DisplayMessageService } from '../../../../services/display-message.service';
 import { ShoppingTemplateService } from '../../../../services/shopping-template.service';
@@ -18,23 +17,6 @@ import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.servic
 import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
 import { DEFAULT_SHOPPING_SELECTION_COLOR } from '../shopping-list.util';
 
-
-interface ShoppingTemplateImageExportEntry {
-  key: string;
-  name: string;
-  image?: ShoppingTemplateUnsplashExport;
-  backgroundImage?: ShoppingTemplateUnsplashExport;
-  products?: ShoppingTemplateImageExportEntry[];
-}
-
-interface ShoppingTemplateUnsplashExport extends AvatarAttribution {
-  source: 'unsplash';
-}
-
-interface ShoppingTemplateImageExport {
-  exportedAt: string;
-  categories: ShoppingTemplateImageExportEntry[];
-}
 
 export interface ShoppingTileSettingsData {
   title: string;
@@ -123,76 +105,6 @@ export class ShoppingTileSettingsComponent {
     );
   }
 
-
-  async exportTemplateImages(): Promise<void> {
-    const exportData = this.buildTemplateImageExport();
-    const json = JSON.stringify(exportData, null, 2);
-    const copied = await this.copyToClipboard(json);
-    this.messages.open(
-      this.translation.t(copied
-        ? 'common.tiles.shopping.templates.exportCopied'
-        : 'common.tiles.shopping.templates.exportCopyFailed'),
-      this.translation.t('common.actions.ok'),
-      { duration: copied ? 3000 : 6000 }
-    );
-    if (!copied) {
-      // Fallback für Browser ohne Clipboard-API: Der Datensatz steht wenigstens in der Konsole bereit.
-      console.info('Shopping template image export:', json);
-    }
-  }
-
-  private buildTemplateImageExport(): ShoppingTemplateImageExport {
-    return {
-      exportedAt: new Date().toISOString(),
-      categories: this.categories().map(category => {
-        const entry: ShoppingTemplateImageExportEntry = {
-          key: category.templateKey ?? category.id,
-          name: category.name
-        };
-        const image = this.toUnsplashExport(category.imageAttribution);
-        const backgroundImage = this.toUnsplashExport(category.backgroundAttribution);
-        const products: ShoppingTemplateImageExportEntry[] = [];
-        for (const product of category.products) {
-          const productImage = this.toUnsplashExport(product.imageAttribution);
-          if (!productImage) continue;
-          products.push({
-            key: product.templateKey ?? product.id,
-            name: product.name,
-            image: productImage
-          });
-        }
-        if (image) entry.image = image;
-        if (backgroundImage) entry.backgroundImage = backgroundImage;
-        if (products.length) entry.products = products;
-        return entry;
-      }).filter(category => !!category.image || !!category.backgroundImage || !!category.products?.length)
-    };
-  }
-
-  private toUnsplashExport(attribution: AvatarAttribution | undefined): ShoppingTemplateUnsplashExport | undefined {
-    if (attribution?.source !== 'unsplash') return undefined;
-    return {
-      source: 'unsplash',
-      authorName: attribution.authorName,
-      authorUrl: attribution.authorUrl,
-      unsplashUrl: attribution.unsplashUrl,
-      photoUrl: attribution.photoUrl,
-      imageUrl: attribution.imageUrl,
-      downloadLocation: attribution.downloadLocation
-    };
-  }
-
-  private async copyToClipboard(value: string): Promise<boolean> {
-    try {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(value);
-        return true;
-      }
-    } catch {
-      return false;
-    }
-    return false;
-  }
 
   resetSelectionColor(): void {
     this.selectionColorControl.setValue(DEFAULT_SHOPPING_SELECTION_COLOR);
