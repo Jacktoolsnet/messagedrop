@@ -1437,6 +1437,16 @@ export class AppComponent implements OnInit {
     void this.publicMessageShare.shareLocation(location);
   }
 
+  public openSelectedLocationInMaps(): void {
+    const location = this.mapService.getMapLocation();
+    if (!Number.isFinite(location.latitude) || !Number.isFinite(location.longitude)) {
+      return;
+    }
+
+    const query = encodeURIComponent(`${location.latitude},${location.longitude}`);
+    window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank', 'noopener');
+  }
+
   private async updateDataForLocation() {
     const settings = this.normalizeSearchSettings(this.searchSettings);
     const zoom = this.mapService.getMapZoom();

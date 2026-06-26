@@ -120,6 +120,7 @@
       "thirdPartyLicenses": "Open-source licenses",
       "locateMe": "Locate me",
       "shareLocation": "Share location",
+      "openLocationInMaps": "Open in maps app",
       "publicMessage": "Public message",
       "privateNote": "Private note",
       "privateImage": "Private image",
