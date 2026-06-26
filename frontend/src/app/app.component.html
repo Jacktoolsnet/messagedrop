@@ -145,6 +145,13 @@
     </button>
     }
 
+    @if (userService.hasJwt() && !userService.isAccountBlocked()) {
+    <button mat-menu-item (click)="openMySecretDropListDialog()">
+        <mat-icon>lock</mat-icon>
+        <span>{{ 'common.menu.mySecretDrops' | transloco }}</span>
+    </button>
+    }
+
     @if (userService.isReady() && placeService.isReady() && !userService.isAccountBlocked()) {
     <button mat-menu-item (click)="openPlaceListDialog()">
         <mat-icon>personal_places</mat-icon>
@@ -277,6 +284,17 @@
         <mat-icon>send</mat-icon>
         }
         <span>{{ 'common.menu.publicMessage' | transloco }}</span>
+    </button>
+    }
+    @if (!userService.isReady() || userService.hasJwt()) {
+    <button mat-menu-item
+        (click)="!userService.isReady() ? userService.loginWithBackend(openSecretDropDialog.bind(this)) : openSecretDropDialog()">
+        @if (!userService.isReady()){
+        <mat-icon>locked</mat-icon>
+        } @else {
+        <mat-icon>lock</mat-icon>
+        }
+        <span>{{ 'common.menu.secretDrop' | transloco }}</span>
     </button>
     }
     <button mat-menu-item

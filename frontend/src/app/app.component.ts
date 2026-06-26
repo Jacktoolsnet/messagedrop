@@ -19,6 +19,7 @@ import { UsageProtectionComponent } from './components/app-settings/usage-protec
 import { ContactlistComponent } from './components/contactlist/contactlist.component';
 import { DocumentlistComponent } from './components/documentlist/documentlist.component';
 import { EditMessageComponent } from './components/editmessage/edit-message.component';
+import { EditSecretDropComponent } from './components/edit-secret-drop/edit-secret-drop.component';
 import { EditNoteComponent } from './components/editnote/edit-note.component';
 import { GeoStatisticComponent } from './components/geo-statistic/geo-statistic.component';
 import { ImagelistComponent } from './components/imagelist/imagelist.component';
@@ -35,6 +36,7 @@ import { MultiMarkerComponent } from './components/map/multi-marker/multi-marker
 import { MessagelistComponent } from './components/messagelist/messagelist.component';
 import { MyExperienceslistComponent } from './components/my-experienceslist/my-experienceslist.component';
 import { MyMessagelistComponent } from './components/my-messagelist/my-messagelist.component';
+import { MySecretDropListComponent } from './components/my-secret-drop-list/my-secret-drop-list.component';
 import { NotelistComponent } from './components/notelist/notelist.component';
 import { CheckPinComponent } from './components/pin/check-pin/check-pin.component';
 import { PlacelistComponent } from './components/placelist/placelist.component';
@@ -1644,6 +1646,26 @@ export class AppComponent implements OnInit {
     });
   }
 
+  async openSecretDropDialog(): Promise<void> {
+    const dialogRef = this.dialog.open(EditSecretDropComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: { location: this.mapService.getMapLocation() },
+      minWidth: 'min(450px, 95vw)',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    dialogRef.afterOpened().subscribe(() => {
+      this.myHistory.push("secretDropDialog");
+      window.history.replaceState(this.myHistory, '', '');
+    });
+  }
+
   async openNoteDialog(): Promise<void> {
     const note: Note = {
       id: '',
@@ -1970,6 +1992,34 @@ export class AppComponent implements OnInit {
       dialogRef.afterClosed().subscribe(() => {
         this.updateDataForLocation();
       });
+    });
+  }
+
+  public async openMySecretDropListDialog(): Promise<void> {
+    if (!await this.ensureUserMenuActionAllowed()) {
+      return;
+    }
+    if (!this.userService.hasJwt()) {
+      return;
+    }
+    const dialogRef = this.dialog.open(MySecretDropListComponent, {
+      panelClass: 'MessageListDialog',
+      closeOnNavigation: true,
+      data: { location: this.mapService.getMapLocation() },
+      minWidth: 'min(450px, 95vw)',
+      maxWidth: '95vw',
+      width: 'min(900px, 95vw)',
+      maxHeight: '95vh',
+      height: 'auto',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    dialogRef.afterOpened().subscribe(() => {
+      this.myHistory.push("mySecretDropList");
+      window.history.replaceState(this.myHistory, '', '');
     });
   }
 

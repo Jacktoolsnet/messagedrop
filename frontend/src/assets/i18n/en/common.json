@@ -130,7 +130,9 @@
       "airQuality": "Air quality",
       "searchPlace": "Search a place",
       "searchExperiences": "Search experiences",
-      "searchHashtags": "Search hashtags"
+      "searchHashtags": "Search hashtags",
+      "secretDrop": "SecretDrop",
+      "mySecretDrops": "My SecretDrops"
     },
     "hashtags": {
       "label": "Hashtags",
@@ -1756,6 +1758,49 @@
         "meme": "Memes"
       },
       "kindMenuLabel": "Choose KLIPY media type"
+    },
+    "secretDrop": {
+      "createTitle": "Create SecretDrop",
+      "myTitle": "My SecretDrops",
+      "createAction": "Create",
+      "messageLabel": "Secret content",
+      "hintLabel": "Hint / riddle",
+      "hintHelp": "Optional hint to help finders guess the password.",
+      "passwordLabel": "Password",
+      "passwordRepeatLabel": "Repeat password",
+      "oneTimeLabel": "Readable only once",
+      "useValidFrom": "Set start time",
+      "useValidUntil": "Set expiry time",
+      "validFrom": "Valid from",
+      "validUntil": "Valid until",
+      "encryptionHint": "The content is encrypted in your browser. MessageDrop cannot read or recover it without the password.",
+      "messageRequired": "Please enter secret content.",
+      "passwordTooShort": "The password must be at least 6 characters long.",
+      "passwordMismatch": "The passwords do not match.",
+      "validFromInvalid": "The start time is invalid.",
+      "validUntilInvalid": "The expiry time is invalid.",
+      "validityInvalid": "The start time must be before the expiry time.",
+      "createSuccess": "SecretDrop created.",
+      "createFailed": "Could not create SecretDrop.",
+      "emptyMine": "You have not created any SecretDrops yet.",
+      "activeCount": "Active SecretDrops: {{ count }}",
+      "noHint": "No hint",
+      "unlocks": "Unlocks",
+      "likes": "Likes / dislikes",
+      "comments": "Comments",
+      "createdAt": "Created",
+      "deleteConfirm": "Really delete this SecretDrop?",
+      "deleteSuccess": "SecretDrop deleted.",
+      "deleteFailed": "Could not delete SecretDrop.",
+      "loading": "Loading SecretDrops...",
+      "status": {
+        "active": "Active",
+        "pending": "Not valid yet",
+        "expired": "Expired",
+        "consumed": "Consumed",
+        "deleted": "Deleted",
+        "disabled": "Disabled"
+      }
     }
   },
   "errors": {

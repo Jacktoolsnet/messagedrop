@@ -129,7 +129,9 @@
       "airQuality": "Calidad del aire",
       "searchPlace": "Buscar un lugar",
       "searchExperiences": "Buscar experiencias",
-      "searchHashtags": "Buscar hashtags"
+      "searchHashtags": "Buscar hashtags",
+      "secretDrop": "SecretDrop",
+      "mySecretDrops": "Mis SecretDrops"
     },
     "hashtags": {
       "label": "Hashtags",
@@ -1747,6 +1749,49 @@
         "meme": "Memes"
       },
       "kindMenuLabel": "Elegir tipo de medio de KLIPY"
+    },
+    "secretDrop": {
+      "createTitle": "Crear SecretDrop",
+      "myTitle": "Mis SecretDrops",
+      "createAction": "Crear",
+      "messageLabel": "Contenido secreto",
+      "hintLabel": "Pista / acertijo",
+      "hintHelp": "Pista opcional para ayudar a adivinar la contraseña.",
+      "passwordLabel": "Contraseña",
+      "passwordRepeatLabel": "Repetir contraseña",
+      "oneTimeLabel": "Leer solo una vez",
+      "useValidFrom": "Definir inicio",
+      "useValidUntil": "Definir caducidad",
+      "validFrom": "Válido desde",
+      "validUntil": "Válido hasta",
+      "encryptionHint": "El contenido se cifra en tu navegador. MessageDrop no puede leerlo ni recuperarlo sin la contraseña.",
+      "messageRequired": "Introduce el contenido secreto.",
+      "passwordTooShort": "La contraseña debe tener al menos 6 caracteres.",
+      "passwordMismatch": "Las contraseñas no coinciden.",
+      "validFromInvalid": "La hora de inicio no es válida.",
+      "validUntilInvalid": "La hora de caducidad no es válida.",
+      "validityInvalid": "La hora de inicio debe ser anterior a la caducidad.",
+      "createSuccess": "SecretDrop creado.",
+      "createFailed": "No se pudo crear el SecretDrop.",
+      "emptyMine": "Aún no has creado SecretDrops.",
+      "activeCount": "SecretDrops activos: {{ count }}",
+      "noHint": "Sin pista",
+      "unlocks": "Aperturas",
+      "likes": "Me gusta / No me gusta",
+      "comments": "Comentarios",
+      "createdAt": "Creado",
+      "deleteConfirm": "¿Eliminar este SecretDrop?",
+      "deleteSuccess": "SecretDrop eliminado.",
+      "deleteFailed": "No se pudo eliminar el SecretDrop.",
+      "loading": "Cargando SecretDrops...",
+      "status": {
+        "active": "Activo",
+        "pending": "Aún no válido",
+        "expired": "Caducado",
+        "consumed": "Consumido",
+        "deleted": "Eliminado",
+        "disabled": "Desactivado"
+      }
     }
   },
   "errors": {

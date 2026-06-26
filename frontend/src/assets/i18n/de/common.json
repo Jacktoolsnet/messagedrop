@@ -130,7 +130,9 @@
       "airQuality": "Luftqualität",
       "searchPlace": "Ort suchen",
       "searchExperiences": "Erlebnisse suchen",
-      "searchHashtags": "Hashtags suchen"
+      "searchHashtags": "Hashtags suchen",
+      "secretDrop": "GeheimnisDrop",
+      "mySecretDrops": "Meine GeheimnisDrops"
     },
     "hashtags": {
       "label": "Hashtags",
@@ -1756,6 +1758,49 @@
         "meme": "Memes"
       },
       "kindMenuLabel": "KLIPY-Medienart auswählen"
+    },
+    "secretDrop": {
+      "createTitle": "GeheimnisDrop erstellen",
+      "myTitle": "Meine GeheimnisDrops",
+      "createAction": "Erstellen",
+      "messageLabel": "Geheimer Inhalt",
+      "hintLabel": "Hinweis / Rätsel",
+      "hintHelp": "Optionaler Hinweis, damit Finder das Passwort erraten können.",
+      "passwordLabel": "Passwort",
+      "passwordRepeatLabel": "Passwort wiederholen",
+      "oneTimeLabel": "Nur einmal lesbar",
+      "useValidFrom": "Startzeit festlegen",
+      "useValidUntil": "Ablaufzeit festlegen",
+      "validFrom": "Gültig ab",
+      "validUntil": "Gültig bis",
+      "encryptionHint": "Der Inhalt wird im Browser verschlüsselt. MessageDrop kann ihn ohne Passwort nicht lesen oder wiederherstellen.",
+      "messageRequired": "Bitte gib einen geheimen Inhalt ein.",
+      "passwordTooShort": "Das Passwort muss mindestens 6 Zeichen lang sein.",
+      "passwordMismatch": "Die Passwörter stimmen nicht überein.",
+      "validFromInvalid": "Der Startzeitpunkt ist ungültig.",
+      "validUntilInvalid": "Der Ablaufzeitpunkt ist ungültig.",
+      "validityInvalid": "Der Startzeitpunkt muss vor dem Ablaufzeitpunkt liegen.",
+      "createSuccess": "GeheimnisDrop erstellt.",
+      "createFailed": "GeheimnisDrop konnte nicht erstellt werden.",
+      "emptyMine": "Du hast noch keine GeheimnisDrops erstellt.",
+      "activeCount": "Aktive GeheimnisDrops: {{ count }}",
+      "noHint": "Kein Hinweis",
+      "unlocks": "Aufrufe",
+      "likes": "Likes / Dislikes",
+      "comments": "Kommentare",
+      "createdAt": "Erstellt",
+      "deleteConfirm": "Diesen GeheimnisDrop wirklich löschen?",
+      "deleteSuccess": "GeheimnisDrop gelöscht.",
+      "deleteFailed": "GeheimnisDrop konnte nicht gelöscht werden.",
+      "loading": "GeheimnisDrops werden geladen...",
+      "status": {
+        "active": "Aktiv",
+        "pending": "Noch nicht gültig",
+        "expired": "Abgelaufen",
+        "consumed": "Verbraucht",
+        "deleted": "Gelöscht",
+        "disabled": "Deaktiviert"
+      }
     }
   },
   "errors": {

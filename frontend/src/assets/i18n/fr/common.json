@@ -129,7 +129,9 @@
       "airQuality": "Qualité de l’air",
       "searchPlace": "Rechercher un lieu",
       "searchExperiences": "Rechercher des expériences",
-      "searchHashtags": "Rechercher des hashtags"
+      "searchHashtags": "Rechercher des hashtags",
+      "secretDrop": "SecretDrop",
+      "mySecretDrops": "Mes SecretDrops"
     },
     "hashtags": {
       "label": "Hashtags",
@@ -1747,6 +1749,49 @@
         "meme": "Mèmes"
       },
       "kindMenuLabel": "Choisir le type de média KLIPY"
+    },
+    "secretDrop": {
+      "createTitle": "Créer un SecretDrop",
+      "myTitle": "Mes SecretDrops",
+      "createAction": "Créer",
+      "messageLabel": "Contenu secret",
+      "hintLabel": "Indice / énigme",
+      "hintHelp": "Indice facultatif pour aider à deviner le mot de passe.",
+      "passwordLabel": "Mot de passe",
+      "passwordRepeatLabel": "Répéter le mot de passe",
+      "oneTimeLabel": "Lisible une seule fois",
+      "useValidFrom": "Définir le début",
+      "useValidUntil": "Définir l’expiration",
+      "validFrom": "Valide à partir de",
+      "validUntil": "Valide jusqu’au",
+      "encryptionHint": "Le contenu est chiffré dans ton navigateur. MessageDrop ne peut pas le lire ni le restaurer sans le mot de passe.",
+      "messageRequired": "Saisis un contenu secret.",
+      "passwordTooShort": "Le mot de passe doit contenir au moins 6 caractères.",
+      "passwordMismatch": "Les mots de passe ne correspondent pas.",
+      "validFromInvalid": "La date de début est invalide.",
+      "validUntilInvalid": "La date d’expiration est invalide.",
+      "validityInvalid": "La date de début doit précéder la date d’expiration.",
+      "createSuccess": "SecretDrop créé.",
+      "createFailed": "Impossible de créer le SecretDrop.",
+      "emptyMine": "Tu n’as pas encore créé de SecretDrop.",
+      "activeCount": "SecretDrops actifs : {{ count }}",
+      "noHint": "Aucun indice",
+      "unlocks": "Ouvertures",
+      "likes": "J’aime / Je n’aime pas",
+      "comments": "Commentaires",
+      "createdAt": "Créé",
+      "deleteConfirm": "Supprimer vraiment ce SecretDrop ?",
+      "deleteSuccess": "SecretDrop supprimé.",
+      "deleteFailed": "Impossible de supprimer le SecretDrop.",
+      "loading": "Chargement des SecretDrops...",
+      "status": {
+        "active": "Actif",
+        "pending": "Pas encore valide",
+        "expired": "Expiré",
+        "consumed": "Consommé",
+        "deleted": "Supprimé",
+        "disabled": "Désactivé"
+      }
     }
   },
   "errors": {
