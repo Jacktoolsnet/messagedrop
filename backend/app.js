@@ -94,6 +94,7 @@ const klipy = require('./routes/klipy');
 const unsplash = require('./routes/unsplash');
 const sticker = require('./routes/sticker');
 const publicShare = require('./routes/public-share');
+const secretDrop = require('./routes/secretDrop');
 const digitalServiceAct = require('./routes/digital-service-act');
 const dsaStatus = require('./routes/dsa-status');
 const notification = require('./routes/notification');
@@ -623,6 +624,13 @@ const frontendErrorLogLimit = rateLimit({
   message: rateLimitMessage('Too many log requests, please slow down.')
 });
 
+const secretDropLimit = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  limit: 300,
+  ...rateLimitDefaults,
+  message: rateLimitMessage('Too many SecretDrop requests, please try again later.')
+});
+
 const slowRequestDefault = slowRequestMw();
 const slowRequestOpenAiModeration = slowRequestMw({
   thresholdMs: process.env.SLOW_REQUEST_MESSAGE_CREATE_THRESHOLD_MS || 3000,
@@ -658,6 +666,7 @@ app.use('/message/moderate/hashtags', slowRequestOpenAiModeration);
 app.use('/message/internal/publish', slowRequestMessagePublish);
 app.use('/message/update', slowRequestMessagePublish);
 app.use('/message', messageLimit, slowRequestDefault, message);
+app.use('/secretdrop', secretDropLimit, slowRequestDefault, secretDrop);
 app.use('/moderation', basicLimit, slowRequestDefault, moderation);
 app.use('/notification', notificationLimit, slowRequestDefault, notification);
 app.use('/nominatim', nominatimLimit, slowRequestNominatim, nominatim);

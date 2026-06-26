@@ -16,6 +16,7 @@ const tableGeoStatistic = require('./tableGeoStatistic');
 const tableMaintenance = require('./tableMaintenance');
 const tableUsageProtection = require('./tableUsageProtection');
 const tableUserModerationAppeal = require('./tableUserModerationAppeal');
+const tableSecretDrop = require('./tableSecretDrop');
 
 
 const DEFAULT_MAX_PENDING_REQUESTS = 1000;
@@ -476,6 +477,7 @@ class Database {
           tableMaintenance.init(this.db);
           tableUsageProtection.init(this.db);
           tableUserModerationAppeal.init(this.db);
+          tableSecretDrop.init(this.db);
           this.initTriggers(this.logger);
           this.initIndexes(this.logger);
           this.db.get('SELECT 1;', (readyErr) => {

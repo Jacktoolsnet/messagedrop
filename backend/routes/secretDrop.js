@@ -1,0 +1,448 @@
+const crypto = require('crypto');
+const express = require('express');
+const rateLimit = require('express-rate-limit');
+const router = express.Router();
+const security = require('../middleware/security');
+const tableSecretDrop = require('../db/tableSecretDrop');
+const metric = require('../middleware/metric');
+const { apiError } = require('../middleware/api-error');
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const MAX_HINT_LENGTH = 512;
+const MAX_PLUS_CODE_LENGTH = 32;
+const MAX_ENCRYPTED_PAYLOAD_LENGTH = 32768;
+const MAX_CRYPTO_METADATA_LENGTH = 8192;
+const MAX_AUTH_VERIFIER_LENGTH = 4096;
+
+const unlockLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  limit: 40,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { status: 429, error: 'too_many_secret_drop_unlock_attempts' }
+});
+
+function getAuthUserId(req) {
+  return req.jwtUser?.userId ?? req.jwtUser?.id ?? null;
+}
+
+function nowSeconds() {
+  return Math.floor(Date.now() / 1000);
+}
+
+function normalizeString(value, maxLength = 1024) {
+  const normalized = String(value ?? '').trim();
+  return normalized.length > maxLength ? normalized.slice(0, maxLength) : normalized;
+}
+
+function isValidCoordinate(latitude, longitude) {
+  return Number.isFinite(latitude)
+    && Number.isFinite(longitude)
+    && latitude >= -90
+    && latitude <= 90
+    && longitude >= -180
+    && longitude <= 180;
+}
+
+function normalizePlusCode(value) {
+  const plusCode = normalizeString(value, MAX_PLUS_CODE_LENGTH).toUpperCase();
+  return plusCode || null;
+}
+
+function serializeJsonField(value, fieldName, maxLength) {
+  if (value === undefined || value === null) {
+    throw apiError.badRequest(`missing_${fieldName}`);
+  }
+  const serialized = typeof value === 'string' ? value : JSON.stringify(value);
+  if (!serialized || serialized.length > maxLength) {
+    throw apiError.badRequest(`invalid_${fieldName}`);
+  }
+  return serialized;
+}
+
+function hashAuthVerifier(authVerifier) {
+  return crypto.createHash('sha256').update(String(authVerifier), 'utf8').digest('hex');
+}
+
+function normalizeAuthVerifier(value) {
+  const authVerifier = normalizeString(value, MAX_AUTH_VERIFIER_LENGTH);
+  if (authVerifier.length < 16 || authVerifier.length > MAX_AUTH_VERIFIER_LENGTH) {
+    throw apiError.badRequest('invalid_auth_verifier');
+  }
+  return authVerifier;
+}
+
+function normalizeOptionalTimestamp(value, fieldName) {
+  if (value === undefined || value === null || value === '') {
+    return null;
+  }
+  const numeric = Number(value);
+  if (!Number.isInteger(numeric) || numeric < 0) {
+    throw apiError.badRequest(`invalid_${fieldName}`);
+  }
+  return numeric;
+}
+
+function normalizeMaxUnlocks(value) {
+  if (value === undefined || value === null || value === '') {
+    return null;
+  }
+  const numeric = Number(value);
+  if (!Number.isInteger(numeric) || numeric < 1 || numeric > 1000000) {
+    throw apiError.badRequest('invalid_max_unlocks');
+  }
+  return numeric;
+}
+
+function ensureNoPlainSecretFields(body) {
+  const forbiddenFields = ['message', 'secret', 'secretMessage', 'plaintext', 'plainText', 'password'];
+  const present = forbiddenFields.find((field) => Object.prototype.hasOwnProperty.call(body || {}, field));
+  if (present) {
+    throw apiError.badRequest(`plaintext_field_not_allowed_${present}`);
+  }
+}
+
+function mapPublicSecretDrop(drop) {
+  return {
+    uuid: drop.uuid,
+    latitude: drop.latitude,
+    longitude: drop.longitude,
+    plusCode: drop.plusCode,
+    discoveryPlusCode: drop.discoveryPlusCode,
+    hint: drop.hint,
+    maxUnlocks: drop.maxUnlocks,
+    unlockCount: drop.unlockCount,
+    validFrom: drop.validFrom,
+    validUntil: drop.validUntil,
+    status: drop.status,
+    likes: drop.likes,
+    dislikes: drop.dislikes,
+    commentsNumber: drop.commentsNumber,
+    createdAt: drop.createdAt
+  };
+}
+
+function getDb(req) {
+  return req.database?.db;
+}
+
+function getUserById(db, userId) {
+  return new Promise((resolve, reject) => {
+    db.get('SELECT id FROM tableUser WHERE id = ? LIMIT 1;', [userId], (err, row) => {
+      if (err) return reject(err);
+      resolve(row || null);
+    });
+  });
+}
+
+async function ensureExistingUser(db, userId) {
+  const user = await getUserById(db, userId);
+  if (!user) {
+    throw apiError.notFound('user_not_found');
+  }
+}
+
+async function ensureOwnerOrUnlocked(db, uuid, userId) {
+  const drop = await tableSecretDrop.getByUuid(db, uuid);
+  if (!drop || drop.status === tableSecretDrop.secretDropStatus.DELETED) {
+    throw apiError.notFound('secret_drop_not_found');
+  }
+  if (String(drop.userId) === String(userId)) {
+    return drop;
+  }
+  const unlocked = await tableSecretDrop.hasSuccessfulUnlock(db, uuid, userId);
+  if (!unlocked) {
+    throw apiError.forbidden('secret_drop_unlock_required');
+  }
+  return drop;
+}
+
+router.post('/create', [
+  security.authenticate,
+  express.json({ type: 'application/json', limit: '80kb' }),
+  metric.count('secretdrop.create', { when: 'always', timezone: 'utc', amount: 1 })
+], async (req, res, next) => {
+  try {
+    const db = getDb(req);
+    const authUserId = getAuthUserId(req);
+    const userId = normalizeString(req.body?.userId || req.body?.messageUserId, 128);
+    if (!authUserId || String(authUserId) !== String(userId)) {
+      throw apiError.forbidden('forbidden');
+    }
+    await ensureExistingUser(db, userId);
+    ensureNoPlainSecretFields(req.body);
+
+    const latitude = Number(req.body?.latitude);
+    const longitude = Number(req.body?.longitude);
+    if (!isValidCoordinate(latitude, longitude)) {
+      throw apiError.badRequest('invalid_location');
+    }
+
+    const plusCode = normalizePlusCode(req.body?.plusCode);
+    const discoveryPlusCode = normalizePlusCode(req.body?.discoveryPlusCode || req.body?.plusCode);
+    if (!plusCode || !discoveryPlusCode) {
+      throw apiError.badRequest('invalid_plus_code');
+    }
+
+    const encryptedPayload = serializeJsonField(
+      req.body?.encryptedPayload ?? req.body?.ciphertext,
+      'encrypted_payload',
+      MAX_ENCRYPTED_PAYLOAD_LENGTH
+    );
+    const cryptoMetadata = serializeJsonField(req.body?.crypto, 'crypto', MAX_CRYPTO_METADATA_LENGTH);
+    const authVerifier = normalizeAuthVerifier(req.body?.authVerifier);
+    const maxUnlocks = normalizeMaxUnlocks(req.body?.maxUnlocks);
+    const validFrom = normalizeOptionalTimestamp(req.body?.validFrom, 'valid_from');
+    const validUntil = normalizeOptionalTimestamp(req.body?.validUntil, 'valid_until');
+    if (validFrom !== null && validUntil !== null && validFrom > validUntil) {
+      throw apiError.badRequest('invalid_validity_window');
+    }
+
+    const drop = await tableSecretDrop.create(db, {
+      uuid: crypto.randomUUID(),
+      userId,
+      latitude,
+      longitude,
+      plusCode,
+      discoveryPlusCode,
+      hint: normalizeString(req.body?.hint, MAX_HINT_LENGTH),
+      encryptedPayload,
+      crypto: cryptoMetadata,
+      authVerifierHash: hashAuthVerifier(authVerifier),
+      maxUnlocks,
+      validFrom,
+      validUntil
+    });
+
+    res.status(201).json({ status: 201, secretDrop: mapPublicSecretDrop(drop) });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/discover/pluscode/:plusCode', security.authenticateOptional, async (req, res, next) => {
+  try {
+    const plusCode = normalizePlusCode(req.params.plusCode);
+    if (!plusCode) {
+      throw apiError.badRequest('invalid_plus_code');
+    }
+    const rows = await tableSecretDrop.discoverByPlusCode(getDb(req), plusCode, nowSeconds());
+    res.status(200).json({ status: 200, rows: rows.map(mapPublicSecretDrop) });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post('/unlock/:uuid', [
+  security.authenticateOptional,
+  unlockLimiter,
+  express.json({ type: 'application/json', limit: '16kb' }),
+  metric.count('secretdrop.unlock', { when: 'always', timezone: 'utc', amount: 1 })
+], async (req, res, next) => {
+  try {
+    const uuid = normalizeString(req.params.uuid, 64);
+    if (!UUID_REGEX.test(uuid)) {
+      throw apiError.badRequest('invalid_secret_drop_uuid');
+    }
+    const db = getDb(req);
+    const userId = getAuthUserId(req);
+    const raw = await tableSecretDrop.getRawByUuid(db, uuid);
+    if (!raw || raw.status === tableSecretDrop.secretDropStatus.DELETED) {
+      throw apiError.notFound('secret_drop_not_found');
+    }
+
+    const at = nowSeconds();
+    if (raw.status !== tableSecretDrop.secretDropStatus.ENABLED) {
+      throw apiError.conflict('secret_drop_not_available');
+    }
+    if ((raw.validFrom !== null && raw.validFrom !== undefined && Number(raw.validFrom) > at)
+      || (raw.validUntil !== null && raw.validUntil !== undefined && Number(raw.validUntil) < at)) {
+      throw apiError.conflict('secret_drop_not_in_validity_window');
+    }
+    if (raw.maxUnlocks !== null && raw.maxUnlocks !== undefined && Number(raw.unlockCount || 0) >= Number(raw.maxUnlocks)) {
+      throw apiError.conflict('secret_drop_consumed');
+    }
+
+    const authVerifier = normalizeAuthVerifier(req.body?.authVerifier);
+    const authVerifierHash = hashAuthVerifier(authVerifier);
+    if (authVerifierHash !== raw.authVerifierHash) {
+      await tableSecretDrop.recordFailedUnlock(db, uuid, userId || null);
+      throw apiError.forbidden('invalid_secret_drop_password');
+    }
+
+    const unlocked = await tableSecretDrop.unlock(db, uuid, authVerifierHash, userId || null, at);
+    if (!unlocked) {
+      throw apiError.conflict('secret_drop_not_available');
+    }
+
+    res.status(200).json({
+      status: 200,
+      secretDrop: {
+        ...mapPublicSecretDrop(unlocked),
+        encryptedPayload: unlocked.encryptedPayload,
+        crypto: unlocked.crypto
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/my/:userId', security.authenticate, async (req, res, next) => {
+  try {
+    const authUserId = getAuthUserId(req);
+    const userId = normalizeString(req.params.userId, 128);
+    if (!authUserId || String(authUserId) !== String(userId)) {
+      throw apiError.forbidden('forbidden');
+    }
+    const rows = await tableSecretDrop.getByUserId(getDb(req), userId);
+    res.status(200).json({ status: 200, rows: rows.map(mapPublicSecretDrop) });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/stats/:uuid', security.authenticate, async (req, res, next) => {
+  try {
+    const authUserId = getAuthUserId(req);
+    const uuid = normalizeString(req.params.uuid, 64);
+    if (!UUID_REGEX.test(uuid)) {
+      throw apiError.badRequest('invalid_secret_drop_uuid');
+    }
+    const drop = await tableSecretDrop.getByUuid(getDb(req), uuid);
+    if (!drop || drop.status === tableSecretDrop.secretDropStatus.DELETED) {
+      throw apiError.notFound('secret_drop_not_found');
+    }
+    if (String(drop.userId) !== String(authUserId)) {
+      throw apiError.forbidden('forbidden');
+    }
+    res.status(200).json({
+      status: 200,
+      secretDrop: mapPublicSecretDrop(drop),
+      stats: {
+        unlockCount: drop.unlockCount,
+        failedUnlockCount: drop.failedUnlockCount,
+        lastUnlockedAt: drop.lastUnlockedAt,
+        consumedAt: drop.consumedAt,
+        likes: drop.likes,
+        dislikes: drop.dislikes,
+        commentsNumber: drop.commentsNumber
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.delete('/delete/:uuid', security.authenticate, async (req, res, next) => {
+  try {
+    const authUserId = getAuthUserId(req);
+    const uuid = normalizeString(req.params.uuid, 64);
+    if (!UUID_REGEX.test(uuid)) {
+      throw apiError.badRequest('invalid_secret_drop_uuid');
+    }
+    const deleted = await tableSecretDrop.softDelete(getDb(req), uuid, authUserId);
+    if (!deleted) {
+      throw apiError.notFound('secret_drop_not_found');
+    }
+    res.status(200).json({ status: 200, deleted: true, uuid });
+  } catch (error) {
+    next(error);
+  }
+});
+
+async function handleReaction(req, res, next, reaction) {
+  try {
+    const uuid = normalizeString(req.params.uuid, 64);
+    if (!UUID_REGEX.test(uuid)) {
+      throw apiError.badRequest('invalid_secret_drop_uuid');
+    }
+    const userId = getAuthUserId(req);
+    await ensureOwnerOrUnlocked(getDb(req), uuid, userId);
+    const state = await tableSecretDrop.toggleReaction(getDb(req), uuid, userId, reaction);
+    res.status(200).json({ status: 200, uuid, ...state });
+  } catch (error) {
+    next(error);
+  }
+}
+
+router.post('/:uuid/like', [
+  security.authenticate,
+  express.json({ type: 'application/json', limit: '4kb' })
+], (req, res, next) => handleReaction(req, res, next, 'like'));
+
+router.post('/:uuid/dislike', [
+  security.authenticate,
+  express.json({ type: 'application/json', limit: '4kb' })
+], (req, res, next) => handleReaction(req, res, next, 'dislike'));
+
+router.get('/:uuid/reactions', security.authenticateOptional, async (req, res, next) => {
+  try {
+    const uuid = normalizeString(req.params.uuid, 64);
+    if (!UUID_REGEX.test(uuid)) {
+      throw apiError.badRequest('invalid_secret_drop_uuid');
+    }
+    const userId = getAuthUserId(req);
+    const drop = await tableSecretDrop.getByUuid(getDb(req), uuid);
+    if (!drop || drop.status === tableSecretDrop.secretDropStatus.DELETED) {
+      throw apiError.notFound('secret_drop_not_found');
+    }
+    if (userId) {
+      await ensureOwnerOrUnlocked(getDb(req), uuid, userId);
+    }
+    const state = await tableSecretDrop.getReactionState(getDb(req), uuid, userId);
+    res.status(200).json({ status: 200, uuid, ...state });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post('/:uuid/comments', [
+  security.authenticate,
+  express.json({ type: 'application/json', limit: '32kb' })
+], async (req, res, next) => {
+  try {
+    const uuid = normalizeString(req.params.uuid, 64);
+    if (!UUID_REGEX.test(uuid)) {
+      throw apiError.badRequest('invalid_secret_drop_uuid');
+    }
+    const userId = getAuthUserId(req);
+    await ensureOwnerOrUnlocked(getDb(req), uuid, userId);
+    ensureNoPlainSecretFields(req.body);
+    const encryptedPayload = serializeJsonField(
+      req.body?.encryptedPayload ?? req.body?.ciphertext,
+      'encrypted_payload',
+      MAX_ENCRYPTED_PAYLOAD_LENGTH
+    );
+    const cryptoMetadata = req.body?.crypto === undefined || req.body?.crypto === null
+      ? null
+      : serializeJsonField(req.body.crypto, 'crypto', MAX_CRYPTO_METADATA_LENGTH);
+    const comment = await tableSecretDrop.createComment(getDb(req), {
+      uuid: crypto.randomUUID(),
+      secretDropUuid: uuid,
+      userId,
+      encryptedPayload,
+      crypto: cryptoMetadata
+    });
+    res.status(201).json({ status: 201, comment });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/:uuid/comments', security.authenticate, async (req, res, next) => {
+  try {
+    const uuid = normalizeString(req.params.uuid, 64);
+    if (!UUID_REGEX.test(uuid)) {
+      throw apiError.badRequest('invalid_secret_drop_uuid');
+    }
+    const userId = getAuthUserId(req);
+    await ensureOwnerOrUnlocked(getDb(req), uuid, userId);
+    const rows = await tableSecretDrop.getComments(getDb(req), uuid);
+    res.status(200).json({ status: 200, rows });
+  } catch (error) {
+    next(error);
+  }
+});
+
+module.exports = router;
