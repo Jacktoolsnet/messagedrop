@@ -92,6 +92,34 @@ export class EditSecretDropComponent {
     return this.multimedia.type !== MultimediaType.UNDEFINED;
   }
 
+  get minStartDate(): Date {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return today;
+  }
+
+  get validFromMinTime(): Date | null {
+    if (!this.validFromDate || !this.isSameDate(this.validFromDate, new Date())) {
+      return null;
+    }
+    return this.ceilToNextMinuteInterval(new Date(), 15);
+  }
+
+  get minEndDate(): Date {
+    if (this.useValidFrom && this.validFromDate) {
+      return this.startOfDay(this.validFromDate);
+    }
+    return this.minStartDate;
+  }
+
+  get validUntilMinTime(): Date | null {
+    if (!this.validUntilDate) {
+      return null;
+    }
+    const minimum = this.getMinimumValidUntilDateTime();
+    return this.isSameDate(this.validUntilDate, minimum) ? minimum : null;
+  }
+
   async create(): Promise<void> {
     if (this.saving()) {
       return;
@@ -144,6 +172,47 @@ export class EditSecretDropComponent {
 
   updateLocation(location: Location): void {
     this.location = { ...location };
+  }
+
+  ensureValidFromNotInPast(): void {
+    if (!this.validFromDate) {
+      return;
+    }
+
+    const now = new Date();
+    if (this.isBeforeDateOnly(this.validFromDate, now)) {
+      this.validFromDate = this.minStartDate;
+      this.validFromTime = this.ceilToNextMinuteInterval(now, 15);
+      return;
+    }
+
+    if (this.isSameDate(this.validFromDate, now)) {
+      const minTime = this.ceilToNextMinuteInterval(now, 15);
+      if (!this.validFromTime || this.compareTime(this.validFromTime, minTime) < 0) {
+        this.validFromTime = minTime;
+      }
+    }
+    this.ensureValidUntilNotBeforeMinimum();
+  }
+
+  ensureValidUntilNotBeforeMinimum(): void {
+    if (!this.validUntilDate) {
+      return;
+    }
+
+    const minimum = this.getMinimumValidUntilDateTime();
+    if (this.isBeforeDateOnly(this.validUntilDate, minimum)) {
+      this.validUntilDate = this.startOfDay(minimum);
+      this.validUntilTime = new Date(minimum);
+      return;
+    }
+
+    if (this.isSameDate(this.validUntilDate, minimum)) {
+      const currentUntil = this.toDateTime(this.validUntilDate, this.validUntilTime);
+      if (currentUntil.getTime() < minimum.getTime()) {
+        this.validUntilTime = new Date(minimum);
+      }
+    }
   }
 
   applyNewMultimedia(multimedia: Multimedia): void {
@@ -288,8 +357,14 @@ export class EditSecretDropComponent {
     if (this.useValidFrom && validFrom === null) {
       return 'common.secretDrop.validFromInvalid';
     }
+    if (validFrom !== null && validFrom < Math.floor(Date.now() / 1000)) {
+      return 'common.secretDrop.validFromPast';
+    }
     if (this.useValidUntil && validUntil === null) {
       return 'common.secretDrop.validUntilInvalid';
+    }
+    if (validUntil !== null && validUntil < Math.floor(Date.now() / 1000)) {
+      return 'common.secretDrop.validUntilPast';
     }
     if (validFrom !== null && validUntil !== null && validFrom > validUntil) {
       return 'common.secretDrop.validityInvalid';
@@ -309,6 +384,54 @@ export class EditSecretDropComponent {
     combined.setHours(time?.getHours() ?? 0, time?.getMinutes() ?? 0, 0, 0);
     const millis = combined.getTime();
     return Number.isFinite(millis) ? Math.floor(millis / 1000) : null;
+  }
+
+  private toDateTime(date: Date, time: Date | null): Date {
+    const combined = new Date(date);
+    combined.setHours(time?.getHours() ?? 0, time?.getMinutes() ?? 0, 0, 0);
+    return combined;
+  }
+
+  private getMinimumValidUntilDateTime(): Date {
+    if (this.useValidFrom && this.validFromDate) {
+      return this.toDateTime(this.validFromDate, this.validFromTime);
+    }
+    return this.ceilToNextMinuteInterval(new Date(), 15);
+  }
+
+  private startOfDay(value: Date): Date {
+    const result = new Date(value);
+    result.setHours(0, 0, 0, 0);
+    return result;
+  }
+
+  private isBeforeDateOnly(value: Date, compareTo: Date): boolean {
+    const left = this.startOfDay(value);
+    const right = this.startOfDay(compareTo);
+    return left.getTime() < right.getTime();
+  }
+
+  private isSameDate(left: Date, right: Date): boolean {
+    return left.getFullYear() === right.getFullYear()
+      && left.getMonth() === right.getMonth()
+      && left.getDate() === right.getDate();
+  }
+
+  private compareTime(left: Date, right: Date): number {
+    const leftMinutes = left.getHours() * 60 + left.getMinutes();
+    const rightMinutes = right.getHours() * 60 + right.getMinutes();
+    return leftMinutes - rightMinutes;
+  }
+
+  private ceilToNextMinuteInterval(value: Date, intervalMinutes: number): Date {
+    const result = new Date(value);
+    result.setSeconds(0, 0);
+    const minutes = result.getMinutes();
+    const remainder = minutes % intervalMinutes;
+    if (remainder !== 0) {
+      result.setMinutes(minutes + intervalMinutes - remainder);
+    }
+    return result;
   }
 
   private showWarning(key: string, panelClass = 'snack-warning'): void {
