@@ -1,8 +1,8 @@
 <app-dialog-header
-  [title]="'common.messageList.deleteDialog.title' | transloco">
+  [title]="titleKey | transloco">
 </app-dialog-header>
 <mat-dialog-content class="confirm-content">
-  <div class="confirm-box">{{ 'common.messageList.deleteDialog.confirm' | transloco }}</div>
+  <div class="confirm-box">{{ confirmKey | transloco }}</div>
 </mat-dialog-content>
 <mat-dialog-actions class="sticky-actions" align="end">
   <button mat-dialog-close cdkFocusInitial [mat-dialog-close]="false" mat-icon-button [attr.aria-label]="'common.actions.abort' | transloco" class="action-close"><mat-icon>close</mat-icon></button>

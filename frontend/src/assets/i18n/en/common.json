@@ -1835,7 +1835,12 @@
       "publishSuccess": "SecretDrop published.",
       "publishFailed": "Could not publish SecretDrop.",
       "unpublishSuccess": "Publication withdrawn.",
-      "unpublishFailed": "Could not withdraw publication."
+      "unpublishFailed": "Could not withdraw publication.",
+      "updateSuccess": "SecretDrop updated.",
+      "deleteDialog": {
+        "title": "Delete SecretDrop",
+        "confirm": "Do you really want to delete this SecretDrop?"
+      }
     }
   },
   "errors": {

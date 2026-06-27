@@ -1,6 +1,6 @@
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from "@angular/material/icon";
 import { TranslocoPipe } from '@jsverse/transloco';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
@@ -15,4 +15,7 @@ import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.c
 })
 export class DeleteMessageComponent {
   readonly dialogRef = inject(MatDialogRef<DeleteMessageComponent>);
+  readonly data = inject<{ titleKey?: string; confirmKey?: string } | null>(MAT_DIALOG_DATA, { optional: true });
+  readonly titleKey = this.data?.titleKey ?? 'common.messageList.deleteDialog.title';
+  readonly confirmKey = this.data?.confirmKey ?? 'common.messageList.deleteDialog.confirm';
 }

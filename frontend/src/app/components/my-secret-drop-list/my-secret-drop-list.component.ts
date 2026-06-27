@@ -20,6 +20,7 @@ import { UserService } from '../../services/user.service';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { EditSecretDropComponent } from '../edit-secret-drop/edit-secret-drop.component';
+import { DeleteMessageComponent } from '../messagelist/delete-message/delete-message.component';
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { CreatePinComponent } from '../pin/create-pin/create-pin.component';
@@ -78,7 +79,7 @@ export class MySecretDropListComponent implements OnInit {
   }
 
   async deleteDrop(drop: SecretDrop): Promise<void> {
-    const confirmed = window.confirm(this.translation.t('common.secretDrop.deleteConfirm'));
+    const confirmed = await this.confirmDelete();
     if (!confirmed) {
       return;
     }
@@ -101,6 +102,41 @@ export class MySecretDropListComponent implements OnInit {
         panelClass: deleted ? 'snack-success' : 'snack-error'
       }
     );
+  }
+
+  editDrop(drop: SecretDrop): void {
+    const dialogRef = this.matDialog.open(EditSecretDropComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: { location: drop.location, secretDrop: drop },
+      minWidth: 'min(450px, 95vw)',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((changed?: boolean) => {
+      if (changed) {
+        void this.reload();
+      }
+    });
+  }
+
+  private async confirmDelete(): Promise<boolean> {
+    const dialogRef = this.matDialog.open(DeleteMessageComponent, {
+      closeOnNavigation: true,
+      data: {
+        titleKey: 'common.secretDrop.deleteDialog.title',
+        confirmKey: 'common.secretDrop.deleteDialog.confirm'
+      },
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false
+    });
+    return !!(await firstValueFrom(dialogRef.afterClosed()));
   }
 
   async publishDrop(drop: SecretDrop): Promise<void> {

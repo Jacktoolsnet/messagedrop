@@ -75,9 +75,9 @@ export class SecretDropService {
     const draft = this.normalizeSecretDrop({
       ...drop,
       userId,
-      status: 'disabled',
-      publishState: 'draft',
-      localOnly: true,
+      status: drop.status ?? 'disabled',
+      publishState: drop.publishState ?? 'draft',
+      localOnly: drop.localOnly ?? true,
       createdAt: drop.createdAt || Math.floor(Date.now() / 1000)
     });
     this.mySecretDropsSignal.update((drops) => [draft, ...drops.filter((entry) => entry.uuid !== draft.uuid)]);
@@ -111,11 +111,23 @@ export class SecretDropService {
   }
 
   private async updateSecretDropStatus(uuid: string, action: 'publish' | 'unpublish'): Promise<SecretDrop> {
+    const existing = this.mySecretDropsSignal().find((drop) => drop.uuid === uuid);
     const response = await firstValueFrom(
       this.http.post<SecretDropUpdateResponse>(`${this.baseUrl}/${action}/${encodeURIComponent(uuid)}`, {})
     );
-    const secretDrop = this.normalizeSecretDrop(response.secretDrop);
+    const secretDrop = this.normalizeSecretDrop({
+      ...response.secretDrop,
+      message: existing?.message ?? '',
+      messageStyle: existing?.messageStyle ?? '',
+      multimedia: existing?.multimedia ?? null,
+      publishState: action === 'publish' ? 'published' : 'unpublished',
+      localOnly: false
+    });
     this.mySecretDropsSignal.update((drops) => drops.map((drop) => drop.uuid === uuid ? secretDrop : drop));
+    const userId = secretDrop.userId || existing?.userId || '';
+    if (userId) {
+      await this.saveOwnSecretDrops(userId, this.mySecretDropsSignal());
+    }
     return secretDrop;
   }
 

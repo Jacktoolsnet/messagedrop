@@ -1835,7 +1835,12 @@
       "publishSuccess": "GeheimnisDrop veröffentlicht.",
       "publishFailed": "GeheimnisDrop konnte nicht veröffentlicht werden.",
       "unpublishSuccess": "Veröffentlichung widerrufen.",
-      "unpublishFailed": "Veröffentlichung konnte nicht widerrufen werden."
+      "unpublishFailed": "Veröffentlichung konnte nicht widerrufen werden.",
+      "updateSuccess": "GeheimnisDrop aktualisiert.",
+      "deleteDialog": {
+        "title": "GeheimnisDrop löschen",
+        "confirm": "Möchtest du diesen GeheimnisDrop wirklich löschen?"
+      }
     }
   },
   "errors": {

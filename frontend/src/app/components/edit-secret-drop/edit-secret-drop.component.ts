@@ -67,7 +67,7 @@ type SecretDropCreateAction = 'publish' | 'draft';
 export class EditSecretDropComponent {
   private readonly dialogRef = inject(MatDialogRef<EditSecretDropComponent>);
   private readonly matDialog = inject(MatDialog);
-  private readonly data = inject<{ location: Location }>(MAT_DIALOG_DATA);
+  private readonly data = inject<{ location: Location; secretDrop?: SecretDrop }>(MAT_DIALOG_DATA);
   private readonly cryptoService = inject(SecretDropCryptoService);
   private readonly secretDropService = inject(SecretDropService);
   private readonly messageService = inject(MessageService);
@@ -92,6 +92,26 @@ export class EditSecretDropComponent {
   validUntilTime: Date | null = null;
   multimedia: Multimedia = this.emptyMultimedia();
   saving = signal(false);
+
+  constructor() {
+    const drop = this.data.secretDrop;
+    if (!drop) {
+      return;
+    }
+    this.location = { ...drop.location };
+    this.message = drop.message ?? '';
+    this.messageStyle = drop.messageStyle ?? '';
+    this.hint = drop.hint ?? '';
+    this.hintStyle = drop.hintStyle ?? '';
+    this.oneTime = drop.maxUnlocks === 1;
+    this.useValidFrom = drop.validFrom !== null && drop.validFrom !== undefined;
+    this.useValidUntil = drop.validUntil !== null && drop.validUntil !== undefined;
+    this.validFromDate = drop.validFrom ? new Date(drop.validFrom * 1000) : null;
+    this.validFromTime = drop.validFrom ? new Date(drop.validFrom * 1000) : null;
+    this.validUntilDate = drop.validUntil ? new Date(drop.validUntil * 1000) : null;
+    this.validUntilTime = drop.validUntil ? new Date(drop.validUntil * 1000) : null;
+    this.multimedia = drop.multimedia ?? this.emptyMultimedia();
+  }
 
   get hasMultimedia(): boolean {
     return this.multimedia.type !== MultimediaType.UNDEFINED;
@@ -151,7 +171,7 @@ export class EditSecretDropComponent {
       }
     }
 
-    if (action === 'draft') {
+    if (this.data.secretDrop || action === 'draft') {
       await this.saveLocalDraft();
       return;
     }
@@ -204,7 +224,7 @@ export class EditSecretDropComponent {
   private async saveLocalDraft(): Promise<void> {
     const userId = this.userService.getUser().id;
     const drop: SecretDrop = {
-      uuid: crypto.randomUUID(),
+      uuid: this.data.secretDrop?.uuid ?? crypto.randomUUID(),
       userId,
       location: this.location,
       latitude: this.location.latitude,
@@ -217,20 +237,20 @@ export class EditSecretDropComponent {
       messageStyle: this.messageStyle,
       multimedia: this.hasMultimedia ? this.multimedia : null,
       maxUnlocks: this.oneTime ? 1 : null,
-      unlockCount: 0,
-      failedUnlockCount: 0,
+      unlockCount: this.data.secretDrop?.unlockCount ?? 0,
+      failedUnlockCount: this.data.secretDrop?.failedUnlockCount ?? 0,
       validFrom: this.useValidFrom ? this.toSeconds(this.validFromDate, this.validFromTime) : null,
       validUntil: this.useValidUntil ? this.toSeconds(this.validUntilDate, this.validUntilTime) : null,
-      status: 'disabled',
-      publishState: 'draft',
-      localOnly: true,
-      likes: 0,
-      dislikes: 0,
-      commentsNumber: 0,
-      createdAt: Math.floor(Date.now() / 1000)
+      status: this.data.secretDrop?.status ?? 'disabled',
+      publishState: this.data.secretDrop?.publishState ?? 'draft',
+      localOnly: this.data.secretDrop?.localOnly ?? true,
+      likes: this.data.secretDrop?.likes ?? 0,
+      dislikes: this.data.secretDrop?.dislikes ?? 0,
+      commentsNumber: this.data.secretDrop?.commentsNumber ?? 0,
+      createdAt: this.data.secretDrop?.createdAt ?? Math.floor(Date.now() / 1000)
     };
     await this.secretDropService.saveDraftSecretDrop(userId, drop);
-    this.snackBar.open(this.translation.t('common.secretDrop.draftSuccess'), undefined, {
+    this.snackBar.open(this.translation.t(this.data.secretDrop ? 'common.secretDrop.updateSuccess' : 'common.secretDrop.draftSuccess'), undefined, {
       duration: 3200,
       verticalPosition: 'top',
       panelClass: 'snack-success'
@@ -426,7 +446,7 @@ export class EditSecretDropComponent {
     if (!this.hasSecretContent) {
       return 'common.secretDrop.contentRequired';
     }
-    if (action === 'publish' && this.pin.length !== 6) {
+    if (!this.data.secretDrop && action === 'publish' && this.pin.length !== 6) {
       return 'common.secretDrop.pinRequired';
     }
     const validFrom = this.useValidFrom ? this.toSeconds(this.validFromDate, this.validFromTime) : null;
