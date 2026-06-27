@@ -1,6 +1,6 @@
 import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -24,8 +24,14 @@ import { DisplayMessageService } from '../../services/display-message.service';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { LocationPickerTileComponent } from '../utils/location-picker/location-picker-tile.component';
+import { TextComponent } from '../utils/text/text.component';
+import { FontPickerDialogComponent } from '../utils/font-picker-dialog/font-picker-dialog.component';
 import { SelectMultimediaComponent } from '../multimedia/select-multimedia/select-multimedia.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
+
+interface TextDialogResult {
+  text: string;
+}
 
 @Component({
   selector: 'app-edit-secret-drop',
@@ -55,6 +61,7 @@ import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultim
 })
 export class EditSecretDropComponent {
   private readonly dialogRef = inject(MatDialogRef<EditSecretDropComponent>);
+  private readonly matDialog = inject(MatDialog);
   private readonly data = inject<{ location: Location }>(MAT_DIALOG_DATA);
   private readonly cryptoService = inject(SecretDropCryptoService);
   private readonly secretDropService = inject(SecretDropService);
@@ -66,6 +73,7 @@ export class EditSecretDropComponent {
 
   location: Location = { ...this.data.location };
   message = '';
+  messageStyle = '';
   hint = '';
   password = '';
   passwordRepeat = '';
@@ -98,7 +106,8 @@ export class EditSecretDropComponent {
       const encrypted = await this.cryptoService.encryptSecret(
         this.message.trim(),
         this.password,
-        this.hasMultimedia ? this.multimedia : undefined
+        this.hasMultimedia ? this.multimedia : undefined,
+        this.messageStyle
       );
       const request: SecretDropCreateRequest = {
         userId: this.userService.getUser().id,
@@ -141,6 +150,50 @@ export class EditSecretDropComponent {
 
   removeMultimedia(): void {
     this.multimedia = this.emptyMultimedia();
+  }
+
+  openTextDialog(): void {
+    const dialogRef = this.matDialog.open(TextComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: { text: this.message },
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: true
+    });
+
+    dialogRef.afterClosed().subscribe((result?: TextDialogResult) => {
+      if (result?.text != null) {
+        this.message = result.text;
+        if (!this.messageStyle) {
+          this.messageStyle = this.userService.getProfile().defaultStyle ?? '';
+        }
+      }
+    });
+  }
+
+  removeText(): void {
+    this.message = '';
+  }
+
+  onFontClick(): void {
+    const dialogRef = this.matDialog.open(FontPickerDialogComponent, {
+      data: { currentStyle: this.messageStyle },
+      maxWidth: '95vw',
+      width: '95vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((style?: string) => {
+      if (style) {
+        this.messageStyle = style;
+      }
+    });
   }
 
   private validate(): string | null {

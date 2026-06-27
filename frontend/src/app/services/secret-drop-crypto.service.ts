@@ -12,14 +12,14 @@ interface EncryptResult {
 export class SecretDropCryptoService {
   private readonly iterations = 250_000;
 
-  async encryptSecret(message: string, password: string, multimedia?: Multimedia): Promise<EncryptResult> {
+  async encryptSecret(message: string, password: string, multimedia?: Multimedia, style = ''): Promise<EncryptResult> {
     this.ensureWebCrypto();
     const normalizedPassword = this.normalizePassword(password);
     const salt = crypto.getRandomValues(new Uint8Array(16));
     const iv = crypto.getRandomValues(new Uint8Array(12));
     const authSalt = crypto.getRandomValues(new Uint8Array(16));
     const key = await this.deriveAesKey(normalizedPassword, this.toArrayBuffer(salt));
-    const encoded = new TextEncoder().encode(JSON.stringify({ message, multimedia: multimedia ?? null }));
+    const encoded = new TextEncoder().encode(JSON.stringify({ message, multimedia: multimedia ?? null, style }));
     const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, encoded);
     const authVerifier = await this.deriveAuthVerifier(normalizedPassword, this.toArrayBuffer(authSalt));
 
