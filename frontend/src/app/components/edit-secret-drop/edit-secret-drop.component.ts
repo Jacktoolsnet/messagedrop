@@ -11,6 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTimepickerModule } from '@angular/material/timepicker';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { firstValueFrom } from 'rxjs';
 import { Location } from '../../interfaces/location';
 import { Multimedia } from '../../interfaces/multimedia';
 import { MultimediaType } from '../../interfaces/multimedia-type';
@@ -21,6 +22,7 @@ import { SecretDropService } from '../../services/secret-drop.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
 import { DisplayMessageService } from '../../services/display-message.service';
+import { MessageService } from '../../services/message.service';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { LocationPickerTileComponent } from '../utils/location-picker/location-picker-tile.component';
@@ -66,6 +68,7 @@ export class EditSecretDropComponent {
   private readonly data = inject<{ location: Location }>(MAT_DIALOG_DATA);
   private readonly cryptoService = inject(SecretDropCryptoService);
   private readonly secretDropService = inject(SecretDropService);
+  private readonly messageService = inject(MessageService);
   private readonly userService = inject(UserService);
   private readonly geolocationService = inject(GeolocationService);
   private readonly snackBar = inject(DisplayMessageService);
@@ -126,7 +129,23 @@ export class EditSecretDropComponent {
     }
     const validationError = this.validate();
     if (validationError) {
-      this.showWarning(validationError);
+      if (validationError === 'common.secretDrop.pinRequired') {
+        const pinCreated = await this.openPinDialog();
+        if (!pinCreated) {
+          return;
+        }
+        const validationAfterPin = this.validate();
+        if (validationAfterPin) {
+          this.showWarning(validationAfterPin);
+          return;
+        }
+      } else {
+        this.showWarning(validationError);
+        return;
+      }
+    }
+
+    if (!(await this.moderateSecretTexts())) {
       return;
     }
 
@@ -278,7 +297,7 @@ export class EditSecretDropComponent {
     this.hintStyle = '';
   }
 
-  openPinDialog(): void {
+  async openPinDialog(): Promise<boolean> {
     const dialogRef = this.matDialog.open(CreatePinComponent, {
       panelClass: '',
       closeOnNavigation: true,
@@ -295,16 +314,17 @@ export class EditSecretDropComponent {
       autoFocus: false
     });
 
-    dialogRef.afterClosed().subscribe((pin?: string) => {
-      if (pin) {
-        this.pin = pin;
-        this.snackBar.open(this.translation.t('common.secretDrop.pinCreated'), undefined, {
-          duration: 2400,
-          verticalPosition: 'top',
-          panelClass: 'snack-success'
-        });
-      }
+    const pin = await firstValueFrom(dialogRef.afterClosed());
+    if (!pin) {
+      return false;
+    }
+    this.pin = pin;
+    this.snackBar.open(this.translation.t('common.secretDrop.pinCreated'), undefined, {
+      duration: 2400,
+      verticalPosition: 'top',
+      panelClass: 'snack-success'
     });
+    return true;
   }
 
   onHintFontClick(): void {
@@ -370,6 +390,41 @@ export class EditSecretDropComponent {
       return 'common.secretDrop.validityInvalid';
     }
     return null;
+  }
+
+  private async moderateSecretTexts(): Promise<boolean> {
+    const moderationInput = [this.message, this.hint]
+      .map((value) => String(value ?? '').trim())
+      .filter(Boolean)
+      .join('\n\n');
+
+    if (!moderationInput) {
+      return true;
+    }
+
+    if (this.messageService.detectPersonalInformation(moderationInput)) {
+      this.showWarning('common.message.moderationRejectedPattern', 'snack-error');
+      return false;
+    }
+
+    try {
+      const response = await firstValueFrom(this.messageService.moderatePublicContent(moderationInput));
+      const decision = response?.moderation?.decision ?? 'approved';
+      if (decision === 'rejected') {
+        const reason = response?.moderation?.reason ?? null;
+        const key = reason === 'pattern'
+          ? 'common.message.moderationRejectedPattern'
+          : reason === 'ai'
+            ? 'common.message.moderationRejectedAi'
+            : 'common.message.moderationRejected';
+        this.showWarning(key, 'snack-error');
+        return false;
+      }
+      return true;
+    } catch {
+      this.showWarning('common.message.moderationFailed', 'snack-warning');
+      return false;
+    }
   }
 
   private resolvePlusCode(location: Location): string {

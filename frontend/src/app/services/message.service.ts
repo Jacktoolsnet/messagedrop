@@ -1614,6 +1614,14 @@ export class MessageService {
     );
   }
 
+  moderatePublicContent(text: string): Observable<MessageCreateResponse> {
+    const url = `${environment.apiUrl}/message/moderate/content`;
+    const body = { text: String(text ?? '').trim() };
+    return this.http.post<MessageCreateResponse>(url, body, this.httpOptions).pipe(
+      catchError(this.handleError)
+    );
+  }
+
   navigateToMessageLocation(message: Message) {
     const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(message.location.plusCode)}`;
     window.open(url, '_blank');

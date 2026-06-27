@@ -1287,6 +1287,35 @@ router.post('/moderate/hashtags',
     });
   });
 
+router.post('/moderate/content',
+  [
+    security.authenticate,
+    express.json({ type: 'application/json', limit: '16kb' })
+  ],
+  async function (req, res, next) {
+    try {
+      const moderationInput = String(req.body?.text ?? '').trim();
+      if (!moderationInput) {
+        return next(apiError.badRequest('invalid_text'));
+      }
+
+      const moderationResult = await moderatePublicContentInput(moderationInput, req.logger);
+
+      res.status(200).json({
+        status: 200,
+        moderation: {
+          decision: moderationResult.moderationDecision,
+          reason: moderationResult.moderationReason,
+          score: moderationResult.moderationScore,
+          flagged: moderationResult.moderationFlagged,
+          patternMatch: moderationResult.moderation.patternMatch ?? null
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
 router.post('/internal/publish',
   [
     security.checkToken,
