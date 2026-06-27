@@ -2003,12 +2003,12 @@ export class AppComponent implements OnInit {
       return;
     }
     const dialogRef = this.dialog.open(MySecretDropListComponent, {
-      panelClass: 'MessageListDialog',
+      panelClass: 'SecretDropListDialog',
       closeOnNavigation: true,
       data: { location: this.mapService.getMapLocation() },
       minWidth: 'min(450px, 95vw)',
       maxWidth: '95vw',
-      width: 'min(900px, 95vw)',
+      width: 'fit-content',
       maxHeight: '95vh',
       height: 'auto',
       hasBackdrop: true,

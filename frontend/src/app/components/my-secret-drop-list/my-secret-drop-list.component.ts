@@ -10,6 +10,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 import { ShortNumberPipe } from '../../pipes/short-number.pipe';
 import { Location } from '../../interfaces/location';
+import { Profile } from '../../interfaces/profile';
 import { SecretDrop, SecretDropCreateRequest } from '../../interfaces/secret-drop';
 import { SecretDropCryptoService } from '../../services/secret-drop-crypto.service';
 import { SecretDropService } from '../../services/secret-drop.service';
@@ -62,6 +63,7 @@ export class MySecretDropListComponent implements OnInit {
 
   readonly loading = signal(false);
   readonly secretDrops = this.secretDropService.mySecretDropsSignal;
+  readonly userProfile: Profile = this.userService.getProfile();
 
   async ngOnInit(): Promise<void> {
     await this.reload();
