@@ -1843,6 +1843,21 @@
         "title": "GeheimnisDrop löschen",
         "confirm": "Möchtest du diesen GeheimnisDrop wirklich löschen?"
       }
+    },
+    "secretDropDiscovery": {
+      "title": "Geheimnis gefunden",
+      "foundAtZoom": "Findbar ab Zoom {{ zoom }}",
+      "unlockAction": "Entsperren",
+      "pinEnterHint": "Gib den Geheimnis-PIN ein.",
+      "unlockSuccess": "Geheimnis entsperrt.",
+      "unlockFailed": "Das Geheimnis konnte nicht entsperrt werden.",
+      "invalidPin": "Der PIN ist leider nicht richtig.",
+      "consumed": "Dieses Geheimnis wurde bereits geöffnet.",
+      "notInValidityWindow": "Dieses Geheimnis ist aktuell nicht gültig.",
+      "readMode": "Lesbarkeit",
+      "oneTime": "Einmalig lesbar",
+      "multiUse": "Mehrfach lesbar",
+      "unlocked": "Entsperrt"
     }
   },
   "errors": {

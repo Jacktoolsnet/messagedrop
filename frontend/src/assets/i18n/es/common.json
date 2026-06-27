@@ -1834,6 +1834,21 @@
         "title": "Eliminar SecretDrop",
         "confirm": "¿Seguro que quieres eliminar este SecretDrop?"
       }
+    },
+    "secretDropDiscovery": {
+      "title": "Se encontró un secreto",
+      "foundAtZoom": "Se puede encontrar desde zoom {{ zoom }}",
+      "unlockAction": "Desbloquear",
+      "pinEnterHint": "Introduce el PIN del SecretDrop.",
+      "unlockSuccess": "Secreto desbloqueado.",
+      "unlockFailed": "No se pudo desbloquear el secreto.",
+      "invalidPin": "El PIN no es correcto.",
+      "consumed": "Este secreto ya fue abierto.",
+      "notInValidityWindow": "Este secreto no es válido actualmente.",
+      "readMode": "Modo de lectura",
+      "oneTime": "Legible una vez",
+      "multiUse": "Legible varias veces",
+      "unlocked": "Desbloqueado"
     }
   },
   "errors": {

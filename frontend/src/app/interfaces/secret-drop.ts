@@ -97,6 +97,17 @@ export interface SecretDropDeleteResponse {
   uuid: string;
 }
 
+export interface SecretDropUnlockResponse {
+  status: number;
+  secretDrop: SecretDrop;
+}
+
+export interface SecretDropDecryptedContent {
+  message: string;
+  multimedia: Multimedia | null;
+  style: string;
+}
+
 export interface SecretDropUpdateResponse {
   status: number;
   secretDrop: SecretDrop;

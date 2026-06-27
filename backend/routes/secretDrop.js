@@ -119,7 +119,7 @@ function ensureNoPlainSecretFields(body) {
 }
 
 function mapPublicSecretDrop(drop) {
-  return {
+  const mapped = {
     uuid: drop.uuid,
     latitude: drop.latitude,
     longitude: drop.longitude,
@@ -138,6 +138,10 @@ function mapPublicSecretDrop(drop) {
     commentsNumber: drop.commentsNumber,
     createdAt: drop.createdAt
   };
+  if (drop.crypto) {
+    mapped.crypto = drop.crypto;
+  }
+  return mapped;
 }
 
 function getDb(req) {

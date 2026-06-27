@@ -1843,6 +1843,21 @@
         "title": "Delete SecretDrop",
         "confirm": "Do you really want to delete this SecretDrop?"
       }
+    },
+    "secretDropDiscovery": {
+      "title": "Secret found",
+      "foundAtZoom": "Findable from zoom {{ zoom }}",
+      "unlockAction": "Unlock",
+      "pinEnterHint": "Enter the SecretDrop PIN.",
+      "unlockSuccess": "Secret unlocked.",
+      "unlockFailed": "The secret could not be unlocked.",
+      "invalidPin": "The PIN is not correct.",
+      "consumed": "This secret has already been opened.",
+      "notInValidityWindow": "This secret is not currently valid.",
+      "readMode": "Read mode",
+      "oneTime": "Readable once",
+      "multiUse": "Readable multiple times",
+      "unlocked": "Unlocked"
     }
   },
   "errors": {

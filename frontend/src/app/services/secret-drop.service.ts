@@ -9,6 +9,7 @@ import {
   SecretDropDeleteResponse,
   SecretDropListResponse,
   SecretDropStatsResponse,
+  SecretDropUnlockResponse,
   SecretDropUpdateResponse
 } from '../interfaces/secret-drop';
 import { IndexedDbService } from './indexed-db.service';
@@ -90,6 +91,22 @@ export class SecretDropService {
     await this.saveOwnSecretDrops(userId, this.mySecretDropsSignal());
   }
 
+
+  async discoverByPlusCode(plusCode: string, zoomLevel: number): Promise<SecretDrop[]> {
+    const encodedPlusCode = encodeURIComponent(plusCode);
+    const response = await firstValueFrom(
+      this.http.get<SecretDropListResponse>(`${this.baseUrl}/discover/pluscode/${encodedPlusCode}?zoom=${encodeURIComponent(String(Math.round(zoomLevel)))}`)
+    );
+    return (response.rows ?? []).map((row) => this.normalizeSecretDrop(row));
+  }
+
+  async unlockSecretDrop(uuid: string, authVerifier: string): Promise<SecretDrop> {
+    const response = await firstValueFrom(
+      this.http.post<SecretDropUnlockResponse>(`${this.baseUrl}/unlock/${encodeURIComponent(uuid)}`, { authVerifier })
+    );
+    return this.normalizeSecretDrop(response.secretDrop);
+  }
+
   async getStats(uuid: string): Promise<SecretDropStatsResponse> {
     return firstValueFrom(this.http.get<SecretDropStatsResponse>(`${this.baseUrl}/stats/${encodeURIComponent(uuid)}`));
   }
@@ -137,6 +154,18 @@ export class SecretDropService {
   }
 
 
+
+  private parseJsonField<T = unknown>(value: T | string | null | undefined): T | string | null {
+    if (typeof value !== 'string') {
+      return value ?? null;
+    }
+    try {
+      return JSON.parse(value) as T;
+    } catch {
+      return value;
+    }
+  }
+
   private normalizeDiscoveryZoomLevel(value: unknown): number {
     const numeric = Number(value);
     if (!Number.isFinite(numeric)) {
@@ -162,6 +191,8 @@ export class SecretDropService {
       message: source.message ?? '',
       messageStyle: source.messageStyle ?? '',
       multimedia: source.multimedia ?? null,
+      crypto: this.parseJsonField(source.crypto),
+      encryptedPayload: this.parseJsonField(source.encryptedPayload),
       publishState: source.publishState ?? (source.status === 'enabled' ? 'published' : 'unpublished'),
       localOnly: source.localOnly ?? false,
       maxUnlocks: source.maxUnlocks === null || source.maxUnlocks === undefined ? null : Number(source.maxUnlocks),

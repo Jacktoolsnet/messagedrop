@@ -50,6 +50,7 @@ function safeJsonParse(value, fallback = null) {
 function mapSecretDropRow(row, options = {}) {
   if (!row) return null;
   const includeEncryptedPayload = options.includeEncryptedPayload === true;
+  const includeCryptoMetadata = includeEncryptedPayload || options.includeCryptoMetadata === true;
   const mapped = {
     id: row.id,
     uuid: row.uuid,
@@ -75,9 +76,11 @@ function mapSecretDropRow(row, options = {}) {
     lastUnlockedAt: row.lastUnlockedAt === null || row.lastUnlockedAt === undefined ? null : Number(row.lastUnlockedAt),
     consumedAt: row.consumedAt === null || row.consumedAt === undefined ? null : Number(row.consumedAt)
   };
+  if (includeCryptoMetadata) {
+    mapped.crypto = safeJsonParse(row.crypto, null);
+  }
   if (includeEncryptedPayload) {
     mapped.encryptedPayload = safeJsonParse(row.encryptedPayload, row.encryptedPayload);
-    mapped.crypto = safeJsonParse(row.crypto, null);
   }
   return mapped;
 }
@@ -255,7 +258,7 @@ async function discoverByPlusCode(db, discoveryPlusCode, nowSeconds, zoomLevel =
     ORDER BY createdAt DESC
     LIMIT 25;
   `, [discoveryPlusCode, zoomLevel, zoomLevel, nowSeconds, nowSeconds]);
-  return rows.map((row) => mapSecretDropRow(row, { includeEncryptedPayload: false }));
+  return rows.map((row) => mapSecretDropRow(row, { includeEncryptedPayload: false, includeCryptoMetadata: true }));
 }
 
 async function getByUserId(db, userId) {

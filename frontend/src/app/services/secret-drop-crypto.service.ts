@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { SecretDropCryptoMetadata, SecretDropEncryptedPayload } from '../interfaces/secret-drop';
+import { SecretDropCryptoMetadata, SecretDropDecryptedContent, SecretDropEncryptedPayload } from '../interfaces/secret-drop';
 import { Multimedia } from '../interfaces/multimedia';
 
 interface EncryptResult {
@@ -48,7 +48,7 @@ export class SecretDropCryptoService {
     encryptedPayload: SecretDropEncryptedPayload,
     metadata: SecretDropCryptoMetadata,
     password: string
-  ): Promise<string> {
+  ): Promise<SecretDropDecryptedContent> {
     this.ensureWebCrypto();
     const key = await this.deriveAesKey(this.normalizePassword(password), this.fromBase64(metadata.salt), metadata.iterations);
     const decrypted = await crypto.subtle.decrypt(
@@ -56,8 +56,12 @@ export class SecretDropCryptoService {
       key,
       this.fromBase64(encryptedPayload.ciphertext)
     );
-    const parsed = JSON.parse(new TextDecoder().decode(decrypted)) as { message?: string };
-    return String(parsed.message ?? '');
+    const parsed = JSON.parse(new TextDecoder().decode(decrypted)) as Partial<SecretDropDecryptedContent>;
+    return {
+      message: String(parsed.message ?? ''),
+      multimedia: parsed.multimedia ?? null,
+      style: String(parsed.style ?? '')
+    };
   }
 
   private async deriveAesKey(password: string, salt: BufferSource, iterations = this.iterations): Promise<CryptoKey> {

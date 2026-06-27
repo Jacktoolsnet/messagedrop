@@ -21,6 +21,7 @@ import { DocumentlistComponent } from './components/documentlist/documentlist.co
 import { EditMessageComponent } from './components/editmessage/edit-message.component';
 import { EditSecretDropComponent } from './components/edit-secret-drop/edit-secret-drop.component';
 import { EditNoteComponent } from './components/editnote/edit-note.component';
+import { FoundSecretDropListComponent } from './components/found-secret-drop-list/found-secret-drop-list.component';
 import { GeoStatisticComponent } from './components/geo-statistic/geo-statistic.component';
 import { ImagelistComponent } from './components/imagelist/imagelist.component';
 import { OverrideExifDataComponent } from './components/imagelist/override-exif-data/override-exif-data.component';
@@ -99,6 +100,7 @@ import { PlaceService } from './services/place.service';
 import { PowService } from './services/pow.service';
 import { PublicMessageShareService } from './services/public-message-share.service';
 import { RestoreService } from './services/restore.service';
+import { SecretDropService } from './services/secret-drop.service';
 import { ServerService } from './services/server.service';
 import { SharedContentService } from './services/shared-content.service';
 import { SystemNotificationService } from './services/system-notification.service';
@@ -191,6 +193,7 @@ export class AppComponent implements OnInit {
   private readonly localImageService = inject(LocalImageService);
   private readonly localDocumentService = inject(LocalDocumentService);
   private readonly messageService = inject(MessageService);
+  private readonly secretDropService = inject(SecretDropService);
   private readonly experienceMapService = inject(ExperienceMapService);
   private readonly experienceBookmarkService = inject(ExperienceBookmarkService);
   private readonly airQualityService = inject(AirQualityService);
@@ -1578,8 +1581,42 @@ export class AppComponent implements OnInit {
     }
   }
 
-  public handleClickEvent(event: Location) {
+  public async handleClickEvent(event: Location): Promise<void> {
     this.mapService.moveTo(event);
+    await this.discoverSecretDropsAt(event);
+  }
+
+  private async discoverSecretDropsAt(location: Location): Promise<void> {
+    const zoomLevel = this.mapService.getMapZoom();
+    if (zoomLevel < 12) {
+      return;
+    }
+    const plusCode = location.plusCode || this.geolocationService.getPlusCode(location.latitude, location.longitude);
+    if (!plusCode) {
+      return;
+    }
+    try {
+      const drops = await this.secretDropService.discoverByPlusCode(plusCode, zoomLevel);
+      if (!drops.length) {
+        return;
+      }
+      this.dialog.open(FoundSecretDropListComponent, {
+        panelClass: 'SecretDropListDialog',
+        closeOnNavigation: true,
+        data: { drops, plusCode, zoomLevel },
+        minWidth: 'min(450px, 95vw)',
+        maxWidth: '95vw',
+        width: 'fit-content',
+        maxHeight: '95vh',
+        height: 'auto',
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop',
+        disableClose: false,
+        autoFocus: false
+      });
+    } catch {
+      // Discover should stay unobtrusive. If the backend is unavailable, normal map clicks still work.
+    }
   }
 
   async openMessagDialog(): Promise<void> {
