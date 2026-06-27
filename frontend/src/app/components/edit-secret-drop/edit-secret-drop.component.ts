@@ -28,6 +28,7 @@ import { TextComponent } from '../utils/text/text.component';
 import { FontPickerDialogComponent } from '../utils/font-picker-dialog/font-picker-dialog.component';
 import { SelectMultimediaComponent } from '../multimedia/select-multimedia/select-multimedia.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
+import { CreatePinComponent } from '../pin/create-pin/create-pin.component';
 
 interface TextDialogResult {
   text: string;
@@ -76,8 +77,7 @@ export class EditSecretDropComponent {
   messageStyle = '';
   hint = '';
   hintStyle = '';
-  password = '';
-  passwordRepeat = '';
+  pin = '';
   oneTime = true;
   useValidFrom = false;
   useValidUntil = false;
@@ -106,7 +106,7 @@ export class EditSecretDropComponent {
     try {
       const encrypted = await this.cryptoService.encryptSecret(
         this.message.trim(),
-        this.password,
+        this.pin,
         this.hasMultimedia ? this.multimedia : undefined,
         this.messageStyle
       );
@@ -133,8 +133,8 @@ export class EditSecretDropComponent {
       });
       this.dialogRef.close(true);
     } catch (error) {
-      const key = error instanceof Error && error.message === 'password_too_short'
-        ? 'common.secretDrop.passwordTooShort'
+      const key = error instanceof Error && (error.message === 'password_too_short' || error.message === 'pin_too_short')
+        ? 'common.secretDrop.pinRequired'
         : 'common.secretDrop.createFailed';
       this.showWarning(key, 'snack-error');
     } finally {
@@ -209,6 +209,35 @@ export class EditSecretDropComponent {
     this.hintStyle = '';
   }
 
+  openPinDialog(): void {
+    const dialogRef = this.matDialog.open(CreatePinComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: {
+        titleKey: 'common.secretDrop.pinTitle',
+        createHintKey: 'common.secretDrop.pinCreateHint',
+        confirmHintKey: 'common.secretDrop.pinConfirmHint'
+      },
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((pin?: string) => {
+      if (pin) {
+        this.pin = pin;
+        this.snackBar.open(this.translation.t('common.secretDrop.pinCreated'), undefined, {
+          duration: 2400,
+          verticalPosition: 'top',
+          panelClass: 'snack-success'
+        });
+      }
+    });
+  }
+
   onHintFontClick(): void {
     const dialogRef = this.matDialog.open(FontPickerDialogComponent, {
       data: { currentStyle: this.hintStyle },
@@ -251,11 +280,8 @@ export class EditSecretDropComponent {
     if (!this.message.trim() && !this.hasMultimedia) {
       return 'common.secretDrop.contentRequired';
     }
-    if (this.password.length < 6) {
-      return 'common.secretDrop.passwordTooShort';
-    }
-    if (this.password !== this.passwordRepeat) {
-      return 'common.secretDrop.passwordMismatch';
+    if (this.pin.length !== 6) {
+      return 'common.secretDrop.pinRequired';
     }
     const validFrom = this.useValidFrom ? this.toSeconds(this.validFromDate, this.validFromTime) : null;
     const validUntil = this.useValidUntil ? this.toSeconds(this.validUntilDate, this.validUntilTime) : null;

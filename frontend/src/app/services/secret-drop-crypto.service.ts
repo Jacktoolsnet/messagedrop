@@ -96,7 +96,7 @@ export class SecretDropCryptoService {
   private normalizePassword(password: string): string {
     const normalized = String(password ?? '');
     if (normalized.length < 6) {
-      throw new Error('password_too_short');
+      throw new Error('pin_too_short');
     }
     return normalized;
   }
