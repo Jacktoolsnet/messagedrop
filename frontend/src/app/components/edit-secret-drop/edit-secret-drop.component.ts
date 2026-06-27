@@ -2,12 +2,18 @@ import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/cor
 import { FormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatTimepickerModule } from '@angular/material/timepicker';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Location } from '../../interfaces/location';
+import { Multimedia } from '../../interfaces/multimedia';
+import { MultimediaType } from '../../interfaces/multimedia-type';
 import { SecretDropCreateRequest } from '../../interfaces/secret-drop';
 import { GeolocationService } from '../../services/geolocation.service';
 import { SecretDropCryptoService } from '../../services/secret-drop-crypto.service';
@@ -16,21 +22,31 @@ import { TranslationHelperService } from '../../services/translation-helper.serv
 import { UserService } from '../../services/user.service';
 import { DisplayMessageService } from '../../services/display-message.service';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
+import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { LocationPickerTileComponent } from '../utils/location-picker/location-picker-tile.component';
+import { SelectMultimediaComponent } from '../multimedia/select-multimedia/select-multimedia.component';
+import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 
 @Component({
   selector: 'app-edit-secret-drop',
+  providers: [provideNativeDateAdapter()],
   imports: [
     DialogHeaderComponent,
     FormsModule,
     LocationPickerTileComponent,
+    SelectMultimediaComponent,
+    ShowmultimediaComponent,
     MatButtonModule,
+    MatCardModule,
     MatCheckboxModule,
+    MatDatepickerModule,
     MatDialogActions,
     MatDialogContent,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
+    MatNativeDateModule,
+    MatTimepickerModule,
     TranslocoPipe
   ],
   templateUrl: './edit-secret-drop.component.html',
@@ -46,6 +62,7 @@ export class EditSecretDropComponent {
   private readonly geolocationService = inject(GeolocationService);
   private readonly snackBar = inject(DisplayMessageService);
   private readonly translation = inject(TranslationHelperService);
+  readonly help = inject(HelpDialogService);
 
   location: Location = { ...this.data.location };
   message = '';
@@ -55,9 +72,16 @@ export class EditSecretDropComponent {
   oneTime = true;
   useValidFrom = false;
   useValidUntil = false;
-  validFromLocal = '';
-  validUntilLocal = '';
+  validFromDate: Date | null = null;
+  validFromTime: Date | null = null;
+  validUntilDate: Date | null = null;
+  validUntilTime: Date | null = null;
+  multimedia: Multimedia = this.emptyMultimedia();
   saving = signal(false);
+
+  get hasMultimedia(): boolean {
+    return this.multimedia.type !== MultimediaType.UNDEFINED;
+  }
 
   async create(): Promise<void> {
     if (this.saving()) {
@@ -71,7 +95,11 @@ export class EditSecretDropComponent {
 
     this.saving.set(true);
     try {
-      const encrypted = await this.cryptoService.encryptSecret(this.message.trim(), this.password);
+      const encrypted = await this.cryptoService.encryptSecret(
+        this.message.trim(),
+        this.password,
+        this.hasMultimedia ? this.multimedia : undefined
+      );
       const request: SecretDropCreateRequest = {
         userId: this.userService.getUser().id,
         latitude: this.location.latitude,
@@ -83,8 +111,8 @@ export class EditSecretDropComponent {
         crypto: encrypted.crypto,
         authVerifier: encrypted.authVerifier,
         maxUnlocks: this.oneTime ? 1 : null,
-        validFrom: this.useValidFrom ? this.toSeconds(this.validFromLocal) : null,
-        validUntil: this.useValidUntil ? this.toSeconds(this.validUntilLocal) : null
+        validFrom: this.useValidFrom ? this.toSeconds(this.validFromDate, this.validFromTime) : null,
+        validUntil: this.useValidUntil ? this.toSeconds(this.validUntilDate, this.validUntilTime) : null
       };
       await this.secretDropService.createSecretDrop(request);
       this.snackBar.open(this.translation.t('common.secretDrop.createSuccess'), undefined, {
@@ -107,9 +135,17 @@ export class EditSecretDropComponent {
     this.location = { ...location };
   }
 
+  applyNewMultimedia(multimedia: Multimedia): void {
+    this.multimedia = multimedia;
+  }
+
+  removeMultimedia(): void {
+    this.multimedia = this.emptyMultimedia();
+  }
+
   private validate(): string | null {
-    if (!this.message.trim()) {
-      return 'common.secretDrop.messageRequired';
+    if (!this.message.trim() && !this.hasMultimedia) {
+      return 'common.secretDrop.contentRequired';
     }
     if (this.password.length < 6) {
       return 'common.secretDrop.passwordTooShort';
@@ -117,8 +153,8 @@ export class EditSecretDropComponent {
     if (this.password !== this.passwordRepeat) {
       return 'common.secretDrop.passwordMismatch';
     }
-    const validFrom = this.useValidFrom ? this.toSeconds(this.validFromLocal) : null;
-    const validUntil = this.useValidUntil ? this.toSeconds(this.validUntilLocal) : null;
+    const validFrom = this.useValidFrom ? this.toSeconds(this.validFromDate, this.validFromTime) : null;
+    const validUntil = this.useValidUntil ? this.toSeconds(this.validUntilDate, this.validUntilTime) : null;
     if (this.useValidFrom && validFrom === null) {
       return 'common.secretDrop.validFromInvalid';
     }
@@ -135,11 +171,13 @@ export class EditSecretDropComponent {
     return location.plusCode?.trim() || this.geolocationService.getPlusCode(location.latitude, location.longitude);
   }
 
-  private toSeconds(value: string): number | null {
-    if (!value) {
+  private toSeconds(date: Date | null, time: Date | null): number | null {
+    if (!date) {
       return null;
     }
-    const millis = new Date(value).getTime();
+    const combined = new Date(date);
+    combined.setHours(time?.getHours() ?? 0, time?.getMinutes() ?? 0, 0, 0);
+    const millis = combined.getTime();
     return Number.isFinite(millis) ? Math.floor(millis / 1000) : null;
   }
 
@@ -149,5 +187,17 @@ export class EditSecretDropComponent {
       verticalPosition: 'top',
       panelClass
     });
+  }
+
+  private emptyMultimedia(): Multimedia {
+    return {
+      type: MultimediaType.UNDEFINED,
+      url: '',
+      sourceUrl: '',
+      attribution: '',
+      title: '',
+      description: '',
+      contentId: ''
+    };
   }
 }

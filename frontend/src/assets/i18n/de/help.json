@@ -2828,5 +2828,31 @@
         "desc": "Du siehst Status, Aufrufe, Ablaufzeit und ob ein einmaliger GeheimnisDrop bereits verbraucht wurde."
       }
     }
+  },
+  "editSecretDrop": {
+    "title": "GeheimnisDrop erstellen",
+    "intro": "Erstelle einen geheimen, passwortgeschützten Drop. Text und Multimedia werden im Browser verschlüsselt; ohne Passwort kann MessageDrop den Inhalt nicht lesen.",
+    "items": {
+      "content": {
+        "title": "Inhalt hinzufügen",
+        "desc": "Füge geheimen Text und optional ein Multimedia-Element hinzu. Beides wird zusammen verschlüsselt."
+      },
+      "hint": {
+        "title": "Hinweis formulieren",
+        "desc": "Der Hinweis kann als Rätsel dienen, damit Finder das Passwort erraten können."
+      },
+      "password": {
+        "title": "Passwort setzen",
+        "desc": "Das Passwort schützt und entschlüsselt den Inhalt. Es wird nicht gespeichert und kann nicht wiederhergestellt werden."
+      },
+      "rules": {
+        "title": "Regeln festlegen",
+        "desc": "Bestimme, ob der Drop nur einmal gelesen werden kann und ob er nur in einem Zeitfenster gültig ist."
+      },
+      "location": {
+        "title": "Ort wählen",
+        "desc": "Lege fest, an welchem Kartenort der GeheimnisDrop später gefunden werden soll."
+      }
+    }
   }
 }

@@ -1800,7 +1800,22 @@
         "consumed": "Consumed",
         "deleted": "Deleted",
         "disabled": "Disabled"
-      }
+      },
+      "contentRequired": "Please enter secret text or add a multimedia item.",
+      "encryptionTitle": "End-to-end ready",
+      "contentTileTitle": "Secret content",
+      "contentTileSubtitle": "Text and multimedia are encrypted together.",
+      "riddleTileTitle": "Riddle hint",
+      "passwordTileTitle": "Password protection",
+      "passwordTileSubtitle": "The password is not stored. Keep it safe.",
+      "rulesTileTitle": "Rules",
+      "rulesTileSubtitle": "Choose how often and when the SecretDrop can be opened.",
+      "locationTileTitle": "Map hiding place",
+      "locationTileSubtitle": "Choose where the SecretDrop can be found.",
+      "validFromDate": "Start date",
+      "validFromTime": "Start time",
+      "validUntilDate": "Expiry date",
+      "validUntilTime": "Expiry time"
     }
   },
   "errors": {

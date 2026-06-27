@@ -1791,7 +1791,22 @@
         "consumed": "Consommé",
         "deleted": "Supprimé",
         "disabled": "Désactivé"
-      }
+      },
+      "contentRequired": "Saisis un texte secret ou ajoute un élément multimédia.",
+      "encryptionTitle": "Prêt pour le chiffrement de bout en bout",
+      "contentTileTitle": "Contenu secret",
+      "contentTileSubtitle": "Le texte et le multimédia sont chiffrés ensemble.",
+      "riddleTileTitle": "Indice de l’énigme",
+      "passwordTileTitle": "Protection par mot de passe",
+      "passwordTileSubtitle": "Le mot de passe n’est pas stocké. Garde-le précieusement.",
+      "rulesTileTitle": "Règles",
+      "rulesTileSubtitle": "Définis combien de fois et quand le SecretDrop peut être ouvert.",
+      "locationTileTitle": "Cachette sur la carte",
+      "locationTileSubtitle": "Choisis où le SecretDrop peut être trouvé.",
+      "validFromDate": "Date de début",
+      "validFromTime": "Heure de début",
+      "validUntilDate": "Date d’expiration",
+      "validUntilTime": "Heure d’expiration"
     }
   },
   "errors": {

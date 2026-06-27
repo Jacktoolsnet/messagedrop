@@ -2810,5 +2810,31 @@
         "desc": "Muestra estado, aperturas, caducidad y si un SecretDrop de un solo uso ya fue consumido."
       }
     }
+  },
+  "editSecretDrop": {
+    "title": "Crear SecretDrop",
+    "intro": "Crea un drop secreto protegido por contraseña. Texto y multimedia se cifran en el navegador; MessageDrop no puede leer el contenido sin la contraseña.",
+    "items": {
+      "content": {
+        "title": "Añadir contenido",
+        "desc": "Añade texto secreto y opcionalmente multimedia. Todo se cifra junto."
+      },
+      "hint": {
+        "title": "Escribir pista",
+        "desc": "La pista puede ser un acertijo para ayudar a adivinar la contraseña."
+      },
+      "password": {
+        "title": "Definir contraseña",
+        "desc": "La contraseña protege y descifra el contenido. No se guarda y no se puede recuperar."
+      },
+      "rules": {
+        "title": "Definir reglas",
+        "desc": "Elige si el drop se puede leer solo una vez y si solo es válido durante un periodo."
+      },
+      "location": {
+        "title": "Elegir ubicación",
+        "desc": "Define dónde se podrá encontrar el SecretDrop en el mapa."
+      }
+    }
   }
 }

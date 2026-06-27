@@ -2810,5 +2810,31 @@
         "desc": "Affiche le statut, les ouvertures, l’expiration et si un SecretDrop à usage unique est déjà consommé."
       }
     }
+  },
+  "editSecretDrop": {
+    "title": "Créer un SecretDrop",
+    "intro": "Crée un drop secret protégé par mot de passe. Le texte et le multimédia sont chiffrés dans le navigateur ; MessageDrop ne peut pas lire le contenu sans le mot de passe.",
+    "items": {
+      "content": {
+        "title": "Ajouter du contenu",
+        "desc": "Ajoute un texte secret et éventuellement un élément multimédia. Les deux sont chiffrés ensemble."
+      },
+      "hint": {
+        "title": "Écrire un indice",
+        "desc": "L’indice peut être une énigme pour aider à deviner le mot de passe."
+      },
+      "password": {
+        "title": "Définir le mot de passe",
+        "desc": "Le mot de passe protège et déchiffre le contenu. Il n’est pas stocké et ne peut pas être récupéré."
+      },
+      "rules": {
+        "title": "Définir les règles",
+        "desc": "Choisis si le drop n’est lisible qu’une seule fois et s’il est limité à une période."
+      },
+      "location": {
+        "title": "Choisir le lieu",
+        "desc": "Définis où le SecretDrop pourra être trouvé sur la carte."
+      }
+    }
   }
 }

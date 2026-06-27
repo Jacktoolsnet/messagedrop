@@ -1688,6 +1688,17 @@ const HELP_TOPICS = {
     introKey: 'common.intros.list',
     items: ITEMS.listBasic
   },
+  editSecretDrop: {
+    titleKey: 'editSecretDrop.title',
+    introKey: 'editSecretDrop.intro',
+    items: [
+      { icon: 'password', titleKey: 'editSecretDrop.items.content.title', descriptionKey: 'editSecretDrop.items.content.desc' },
+      { icon: 'psychology_alt', titleKey: 'editSecretDrop.items.hint.title', descriptionKey: 'editSecretDrop.items.hint.desc' },
+      { icon: 'key', titleKey: 'editSecretDrop.items.password.title', descriptionKey: 'editSecretDrop.items.password.desc' },
+      { icon: 'tune', titleKey: 'editSecretDrop.items.rules.title', descriptionKey: 'editSecretDrop.items.rules.desc' },
+      { icon: 'place', titleKey: 'editSecretDrop.items.location.title', descriptionKey: 'editSecretDrop.items.location.desc' }
+    ]
+  },
   mySecretDropList: {
     titleKey: 'mySecretDropList.title',
     introKey: 'mySecretDropList.intro',

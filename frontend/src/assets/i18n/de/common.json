@@ -1800,7 +1800,22 @@
         "consumed": "Verbraucht",
         "deleted": "Gelöscht",
         "disabled": "Deaktiviert"
-      }
+      },
+      "contentRequired": "Bitte gib einen geheimen Text oder ein Multimedia-Element ein.",
+      "encryptionTitle": "Ende-zu-Ende vorbereitet",
+      "contentTileTitle": "Geheimer Inhalt",
+      "contentTileSubtitle": "Text und Multimedia werden gemeinsam verschlüsselt.",
+      "riddleTileTitle": "Rätsel-Hinweis",
+      "passwordTileTitle": "Passwortschutz",
+      "passwordTileSubtitle": "Das Passwort wird nicht gespeichert. Merke es dir gut.",
+      "rulesTileTitle": "Regeln",
+      "rulesTileSubtitle": "Lege fest, wie oft und wann der GeheimnisDrop geöffnet werden darf.",
+      "locationTileTitle": "Versteck auf der Karte",
+      "locationTileSubtitle": "Wähle den Ort, an dem der GeheimnisDrop gefunden werden kann.",
+      "validFromDate": "Startdatum",
+      "validFromTime": "Startzeit",
+      "validUntilDate": "Ablaufdatum",
+      "validUntilTime": "Ablaufzeit"
     }
   },
   "errors": {
