@@ -2,15 +2,18 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { Component, computed, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { Location } from '../../interfaces/location';
 import { SecretDrop } from '../../interfaces/secret-drop';
 import { SecretDropService } from '../../services/secret-drop.service';
 import { DisplayMessageService } from '../../services/display-message.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
+import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
+import { EditSecretDropComponent } from '../edit-secret-drop/edit-secret-drop.component';
 
 @Component({
   selector: 'app-my-secret-drop-list',
@@ -31,10 +34,13 @@ import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.comp
 })
 export class MySecretDropListComponent implements OnInit {
   private readonly dialogRef = inject(MatDialogRef<MySecretDropListComponent>);
+  private readonly data = inject<{ location: Location }>(MAT_DIALOG_DATA);
+  private readonly matDialog = inject(MatDialog);
   private readonly secretDropService = inject(SecretDropService);
   private readonly userService = inject(UserService);
   private readonly snackBar = inject(DisplayMessageService);
   private readonly translation = inject(TranslationHelperService);
+  readonly help = inject(HelpDialogService);
 
   readonly loading = signal(false);
   readonly secretDrops = this.secretDropService.mySecretDropsSignal;
@@ -75,6 +81,30 @@ export class MySecretDropListComponent implements OnInit {
 
   close(): void {
     this.dialogRef.close();
+  }
+
+  async addSecretDropDialog(): Promise<void> {
+    if (!this.userService.hasJwt()) {
+      return;
+    }
+    const dialogRef = this.matDialog.open(EditSecretDropComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: { location: this.data.location },
+      minWidth: 'min(450px, 95vw)',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((created?: boolean) => {
+      if (created) {
+        void this.reload();
+      }
+    });
   }
 
   getStatusKey(drop: SecretDrop): string {

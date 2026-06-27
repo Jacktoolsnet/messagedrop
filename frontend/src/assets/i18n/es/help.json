@@ -2788,5 +2788,27 @@
         "desc": "La búsqueda de GIF envía solicitudes a Klipy. La app solo guarda datos de referencia del GIF seleccionado (por ejemplo URL, fuente, título); en este paso no se envía a Klipy el texto privado de notas o mensajes."
       }
     }
+  },
+  "mySecretDropList": {
+    "title": "Mis SecretDrops",
+    "intro": "Administra los SecretDrops que has creado. El contenido secreto permanece cifrado en el cliente y no se puede recuperar sin la contraseña.",
+    "items": {
+      "add": {
+        "title": "Crear SecretDrop",
+        "desc": "Crea un nuevo SecretDrop en la ubicación actual del mapa."
+      },
+      "password": {
+        "title": "Recordar la contraseña",
+        "desc": "La contraseña no se guarda. Sin ella, el contenido no se puede descifrar."
+      },
+      "delete": {
+        "title": "Eliminar SecretDrop",
+        "desc": "Elimina tu SecretDrop y hace que ya no se pueda encontrar."
+      },
+      "validity": {
+        "title": "Validez y aperturas",
+        "desc": "Muestra estado, aperturas, caducidad y si un SecretDrop de un solo uso ya fue consumido."
+      }
+    }
   }
 }

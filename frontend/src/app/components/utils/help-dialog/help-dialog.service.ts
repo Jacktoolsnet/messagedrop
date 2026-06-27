@@ -1688,6 +1688,32 @@ const HELP_TOPICS = {
     introKey: 'common.intros.list',
     items: ITEMS.listBasic
   },
+  mySecretDropList: {
+    titleKey: 'mySecretDropList.title',
+    introKey: 'mySecretDropList.intro',
+    items: [
+      {
+        icon: 'add',
+        titleKey: 'mySecretDropList.items.add.title',
+        descriptionKey: 'mySecretDropList.items.add.desc'
+      },
+      {
+        icon: 'password',
+        titleKey: 'mySecretDropList.items.password.title',
+        descriptionKey: 'mySecretDropList.items.password.desc'
+      },
+      {
+        icon: 'delete_forever',
+        titleKey: 'mySecretDropList.items.delete.title',
+        descriptionKey: 'mySecretDropList.items.delete.desc'
+      },
+      {
+        icon: 'schedule',
+        titleKey: 'mySecretDropList.items.validity.title',
+        descriptionKey: 'mySecretDropList.items.validity.desc'
+      }
+    ]
+  },
   myMessageList: {
     titleKey: 'myMessageList.title',
     introKey: 'myMessageList.intro',

@@ -2806,5 +2806,27 @@
         "desc": "GIF search sends requests to Klipy. The app stores only reference data for the GIF you select (for example URL, source, title); private note or message text is not sent to Klipy by this step."
       }
     }
+  },
+  "mySecretDropList": {
+    "title": "My SecretDrops",
+    "intro": "Manage the SecretDrops you created. Secret content stays encrypted on the client and cannot be recovered without the password.",
+    "items": {
+      "add": {
+        "title": "Create SecretDrop",
+        "desc": "Creates a new SecretDrop at the current map location."
+      },
+      "password": {
+        "title": "Remember the password",
+        "desc": "The password is not stored. Without it, the content cannot be decrypted."
+      },
+      "delete": {
+        "title": "Delete SecretDrop",
+        "desc": "Deletes your SecretDrop from management and makes it undiscoverable."
+      },
+      "validity": {
+        "title": "Validity and unlocks",
+        "desc": "See status, unlocks, expiry and whether a one-time SecretDrop has already been consumed."
+      }
+    }
   }
 }

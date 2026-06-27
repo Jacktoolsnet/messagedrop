@@ -2806,5 +2806,27 @@
         "desc": "Bei der GIF-Suche werden Anfragen an Klipy gesendet. In der App wird nur das von dir ausgewählte GIF als Referenzdaten (z. B. URL, Quelle, Titel) gespeichert; private Notiz- oder Nachrichtentexte werden dadurch nicht an Klipy übertragen."
       }
     }
+  },
+  "mySecretDropList": {
+    "title": "Meine GeheimnisDrops",
+    "intro": "Hier verwaltest du deine selbst erstellten GeheimnisDrops. Der geheime Inhalt bleibt clientseitig verschlüsselt und kann ohne Passwort nicht wiederhergestellt werden.",
+    "items": {
+      "add": {
+        "title": "GeheimnisDrop erstellen",
+        "desc": "Erstellt einen neuen GeheimnisDrop am aktuellen Kartenort."
+      },
+      "password": {
+        "title": "Passwort merken",
+        "desc": "Das Passwort wird nicht gespeichert. Ohne Passwort kann der Inhalt nicht entschlüsselt werden."
+      },
+      "delete": {
+        "title": "GeheimnisDrop löschen",
+        "desc": "Löscht deinen GeheimnisDrop aus der Verwaltung und macht ihn nicht mehr auffindbar."
+      },
+      "validity": {
+        "title": "Gültigkeit und Aufrufe",
+        "desc": "Du siehst Status, Aufrufe, Ablaufzeit und ob ein einmaliger GeheimnisDrop bereits verbraucht wurde."
+      }
+    }
   }
 }
