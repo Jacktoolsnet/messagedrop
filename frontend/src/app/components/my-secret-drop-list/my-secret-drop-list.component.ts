@@ -1,5 +1,6 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
+import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
@@ -7,6 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
+import { ShortNumberPipe } from '../../pipes/short-number.pipe';
 import { Location } from '../../interfaces/location';
 import { SecretDrop, SecretDropCreateRequest } from '../../interfaces/secret-drop';
 import { SecretDropCryptoService } from '../../services/secret-drop-crypto.service';
@@ -28,6 +30,8 @@ import { CreatePinComponent } from '../pin/create-pin/create-pin.component';
     CommonModule,
     DatePipe,
     DialogHeaderComponent,
+    ShortNumberPipe,
+    MatBadgeModule,
     MatButtonModule,
     MatCardModule,
     MatDialogActions,
@@ -187,12 +191,6 @@ export class MySecretDropListComponent implements OnInit {
   getStatusBadgeClass(drop: SecretDrop): string {
     const key = this.getStatusKey(drop).split('.').pop() || 'disabled';
     return `publish-state-badge publish-state-${key}`;
-  }
-
-  getUnlockLabel(drop: SecretDrop): string {
-    return drop.maxUnlocks === null
-      ? `${drop.unlockCount} / ∞`
-      : `${drop.unlockCount} / ${drop.maxUnlocks}`;
   }
 
   private async publishLocalDraft(drop: SecretDrop): Promise<void> {
