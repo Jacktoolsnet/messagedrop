@@ -1768,6 +1768,8 @@
       "passwordLabel": "Mot de passe",
       "passwordRepeatLabel": "Répéter le mot de passe",
       "oneTimeLabel": "Lisible une seule fois",
+      "discoveryZoomLabel": "Niveau de zoom de découverte",
+      "discoveryZoomHint": "Le SecretDrop peut être trouvé à partir du zoom {{ zoom }}.",
       "useValidFrom": "Définir le début",
       "useValidUntil": "Définir l’expiration",
       "validFrom": "Valide à partir de",

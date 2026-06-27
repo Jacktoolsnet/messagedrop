@@ -58,6 +58,7 @@ function mapSecretDropRow(row, options = {}) {
     longitude: Number(row.longitude),
     plusCode: row.plusCode,
     discoveryPlusCode: row.discoveryPlusCode,
+    discoveryZoomLevel: Number(row.discoveryZoomLevel || 18),
     hint: row.hint || '',
     hintStyle: row.hintStyle || row.hintstyle || '',
     maxUnlocks: row.maxUnlocks === null || row.maxUnlocks === undefined ? null : Number(row.maxUnlocks),
@@ -104,6 +105,7 @@ const init = function (db) {
       longitude NUMBER NOT NULL,
       plusCode TEXT NOT NULL,
       discoveryPlusCode TEXT NOT NULL,
+      discoveryZoomLevel INTEGER NOT NULL DEFAULT 18,
       hint TEXT NOT NULL DEFAULT '',
       hintStyle TEXT NOT NULL DEFAULT '',
       encryptedPayload TEXT NOT NULL,
@@ -196,15 +198,20 @@ const init = function (db) {
         throw alterErr;
       }
     });
+    db.run(`ALTER TABLE ${tableName} ADD COLUMN discoveryZoomLevel INTEGER NOT NULL DEFAULT 18;`, (alterErr) => {
+      if (alterErr && !/(duplicate column|already exists)/i.test(String(alterErr.message || ''))) {
+        throw alterErr;
+      }
+    });
   });
 };
 
 async function create(db, payload) {
   const sql = `
     INSERT INTO ${tableName} (
-      uuid, userId, latitude, longitude, plusCode, discoveryPlusCode, hint, hintStyle,
+      uuid, userId, latitude, longitude, plusCode, discoveryPlusCode, discoveryZoomLevel, hint, hintStyle,
       encryptedPayload, crypto, authVerifierHash, maxUnlocks, validFrom, validUntil, status
-    ) VALUES (?, ?, ?, ?, UPPER(?), UPPER(?), ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    ) VALUES (?, ?, ?, ?, UPPER(?), UPPER(?), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
   `;
   await runQuery(db, sql, [
     payload.uuid,
@@ -213,6 +220,7 @@ async function create(db, payload) {
     payload.longitude,
     payload.plusCode,
     payload.discoveryPlusCode,
+    payload.discoveryZoomLevel ?? 18,
     payload.hint || '',
     payload.hintStyle || '',
     payload.encryptedPayload,
@@ -235,17 +243,18 @@ async function getRawByUuid(db, uuid) {
   return getQuery(db, `SELECT * FROM ${tableName} WHERE uuid = ? LIMIT 1;`, [uuid]);
 }
 
-async function discoverByPlusCode(db, discoveryPlusCode, nowSeconds) {
+async function discoverByPlusCode(db, discoveryPlusCode, nowSeconds, zoomLevel = null) {
   const rows = await allQuery(db, `
     SELECT * FROM ${tableName}
     WHERE discoveryPlusCode = UPPER(?)
+      AND (? IS NULL OR discoveryZoomLevel <= ?)
       AND status = '${secretDropStatus.ENABLED}'
       AND (validFrom IS NULL OR validFrom <= ?)
       AND (validUntil IS NULL OR validUntil >= ?)
       AND (maxUnlocks IS NULL OR unlockCount < maxUnlocks)
     ORDER BY createdAt DESC
     LIMIT 25;
-  `, [discoveryPlusCode, nowSeconds, nowSeconds]);
+  `, [discoveryPlusCode, zoomLevel, zoomLevel, nowSeconds, nowSeconds]);
   return rows.map((row) => mapSecretDropRow(row, { includeEncryptedPayload: false }));
 }
 

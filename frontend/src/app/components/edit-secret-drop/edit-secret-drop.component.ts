@@ -4,6 +4,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDial
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSliderModule } from '@angular/material/slider';
 import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -51,6 +52,7 @@ type SecretDropCreateAction = 'publish' | 'draft';
     MatButtonModule,
     MatCardModule,
     MatSlideToggleModule,
+    MatSliderModule,
     MatDatepickerModule,
     MatDialogActions,
     MatDialogContent,
@@ -83,8 +85,11 @@ export class EditSecretDropComponent {
   messageStyle = '';
   hint = '';
   hintStyle = '';
+  readonly minDiscoveryZoomLevel = 12;
+  readonly maxDiscoveryZoomLevel = 19;
   pin = '';
   oneTime = true;
+  discoveryZoomLevel = 18;
   useValidFrom = false;
   useValidUntil = false;
   validFromDate: Date | null = null;
@@ -105,6 +110,7 @@ export class EditSecretDropComponent {
     this.hint = drop.hint ?? '';
     this.hintStyle = drop.hintStyle ?? '';
     this.oneTime = drop.maxUnlocks === 1;
+    this.discoveryZoomLevel = this.clampDiscoveryZoomLevel(drop.discoveryZoomLevel);
     this.useValidFrom = drop.validFrom !== null && drop.validFrom !== undefined;
     this.useValidUntil = drop.validUntil !== null && drop.validUntil !== undefined;
     this.validFromDate = drop.validFrom ? new Date(drop.validFrom * 1000) : null;
@@ -198,6 +204,7 @@ export class EditSecretDropComponent {
         longitude: this.location.longitude,
         plusCode: this.resolvePlusCode(this.location),
         discoveryPlusCode: this.resolvePlusCode(this.location),
+        discoveryZoomLevel: this.clampDiscoveryZoomLevel(this.discoveryZoomLevel),
         hint: this.hint.trim(),
         hintStyle: this.hintStyle,
         encryptedPayload: encrypted.encryptedPayload,
@@ -235,6 +242,7 @@ export class EditSecretDropComponent {
       longitude: this.location.longitude,
       plusCode: this.resolvePlusCode(this.location),
       discoveryPlusCode: this.resolvePlusCode(this.location),
+      discoveryZoomLevel: this.clampDiscoveryZoomLevel(this.discoveryZoomLevel),
       hint: this.hint.trim(),
       hintStyle: this.hintStyle,
       message: this.message.trim(),
@@ -266,8 +274,18 @@ export class EditSecretDropComponent {
     return {
       message: this.message.trim(),
       messageStyle: this.messageStyle,
-      multimedia: this.hasMultimedia ? this.multimedia : null
+      multimedia: this.hasMultimedia ? this.multimedia : null,
+      discoveryZoomLevel: this.clampDiscoveryZoomLevel(this.discoveryZoomLevel)
     };
+  }
+
+
+  formatZoomLevelLabel(value: number): string {
+    return `${Math.round(value)}`;
+  }
+
+  onDiscoveryZoomLevelChange(value: number): void {
+    this.discoveryZoomLevel = this.clampDiscoveryZoomLevel(value);
   }
 
   updateLocation(location: Location): void {
@@ -444,6 +462,15 @@ export class EditSecretDropComponent {
         this.messageStyle = style;
       }
     });
+  }
+
+
+  private clampDiscoveryZoomLevel(value: unknown): number {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric)) {
+      return 18;
+    }
+    return Math.min(this.maxDiscoveryZoomLevel, Math.max(this.minDiscoveryZoomLevel, Math.round(numeric)));
   }
 
   private validate(action: SecretDropCreateAction = 'publish'): string | null {

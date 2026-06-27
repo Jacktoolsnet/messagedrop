@@ -1777,6 +1777,8 @@
       "passwordLabel": "Passwort",
       "passwordRepeatLabel": "Passwort wiederholen",
       "oneTimeLabel": "Nur einmal lesbar",
+      "discoveryZoomLabel": "Fund-Zoomlevel",
+      "discoveryZoomHint": "Ab Zoom {{ zoom }} kann der GeheimnisDrop gefunden werden.",
       "useValidFrom": "Startzeit festlegen",
       "useValidUntil": "Ablaufzeit festlegen",
       "validFrom": "Gültig ab",

@@ -45,6 +45,7 @@ export class SecretDropService {
         messageStyle: local?.messageStyle,
         multimedia: local?.multimedia,
         publishState: row.status === 'enabled' ? 'published' : 'unpublished',
+        discoveryZoomLevel: local?.discoveryZoomLevel ?? row.discoveryZoomLevel,
         localOnly: false
       });
     });
@@ -135,6 +136,15 @@ export class SecretDropService {
     return secretDrop;
   }
 
+
+  private normalizeDiscoveryZoomLevel(value: unknown): number {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric)) {
+      return 18;
+    }
+    return Math.min(19, Math.max(12, Math.round(numeric)));
+  }
+
   private normalizeSecretDrop(raw: SecretDrop): SecretDrop {
     const source = raw as SecretDrop & { location?: SecretDrop['location']; latitude?: number; longitude?: number };
     const plusCode = source.plusCode ?? source.location?.plusCode ?? source.discoveryPlusCode ?? '';
@@ -147,6 +157,7 @@ export class SecretDropService {
       },
       plusCode,
       discoveryPlusCode: source.discoveryPlusCode ?? plusCode,
+      discoveryZoomLevel: this.normalizeDiscoveryZoomLevel(source.discoveryZoomLevel),
       hintStyle: source.hintStyle ?? '',
       message: source.message ?? '',
       messageStyle: source.messageStyle ?? '',

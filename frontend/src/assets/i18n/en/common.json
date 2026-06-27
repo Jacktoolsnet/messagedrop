@@ -1777,6 +1777,8 @@
       "passwordLabel": "Password",
       "passwordRepeatLabel": "Repeat password",
       "oneTimeLabel": "Readable only once",
+      "discoveryZoomLabel": "Discovery zoom level",
+      "discoveryZoomHint": "The SecretDrop can be found from zoom {{ zoom }}.",
       "useValidFrom": "Set start time",
       "useValidUntil": "Set expiry time",
       "validFrom": "Valid from",

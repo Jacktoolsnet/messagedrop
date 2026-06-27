@@ -24,6 +24,7 @@ export interface SecretDrop {
   longitude?: number;
   plusCode: string;
   discoveryPlusCode: string;
+  discoveryZoomLevel?: number;
   hint: string;
   hintStyle?: string;
   message?: string;
@@ -54,6 +55,7 @@ export interface SecretDropCreateRequest {
   longitude: number;
   plusCode: string;
   discoveryPlusCode: string;
+  discoveryZoomLevel?: number;
   hint: string;
   hintStyle: string;
   encryptedPayload: SecretDropEncryptedPayload;

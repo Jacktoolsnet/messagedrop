@@ -267,6 +267,7 @@ export class MySecretDropListComponent implements OnInit {
       longitude: drop.location.longitude,
       plusCode: drop.plusCode,
       discoveryPlusCode: drop.discoveryPlusCode || drop.plusCode,
+      discoveryZoomLevel: drop.discoveryZoomLevel ?? 18,
       hint: drop.hint ?? '',
       hintStyle: drop.hintStyle ?? '',
       encryptedPayload: encrypted.encryptedPayload,
@@ -280,7 +281,8 @@ export class MySecretDropListComponent implements OnInit {
     await this.secretDropService.createSecretDrop(request, {
       message: drop.message,
       messageStyle: drop.messageStyle,
-      multimedia: drop.multimedia ?? null
+      multimedia: drop.multimedia ?? null,
+      discoveryZoomLevel: drop.discoveryZoomLevel ?? 18
     });
     await this.secretDropService.removeLocalSecretDrop(userId, drop.uuid);
     this.snackBar.open(this.translation.t('common.secretDrop.publishSuccess'), undefined, {

@@ -37,6 +37,7 @@ export class LocationPickerTileComponent implements AfterViewInit, OnChanges, On
   @Input({ required: true }) location!: Location;
   @Input() markerType: MarkerKind = 'message';
   @Input() zoom = 13;
+  @Input() pickerZoom?: number;
   @Output() locationChange = new EventEmitter<Location>();
 
   readonly mapId = `location-preview-map-${Math.random().toString(36).slice(2)}`;
@@ -58,6 +59,9 @@ export class LocationPickerTileComponent implements AfterViewInit, OnChanges, On
     if (changes['location'] && this.map && this.location) {
       this.updateMap(this.location);
     }
+    if (changes['zoom'] && this.map) {
+      this.updateZoom(this.zoom);
+    }
   }
 
   ngOnDestroy(): void {
@@ -72,7 +76,7 @@ export class LocationPickerTileComponent implements AfterViewInit, OnChanges, On
     if (this.isDialogOpen) return;
     this.isDialogOpen = true;
     const dialogRef = this.dialog.open(LocationPickerDialogComponent, {
-      data: { location: this.location, markerType: this.markerType },
+      data: { location: this.location, markerType: this.markerType, zoom: this.pickerZoom },
       maxWidth: '95vw',
       maxHeight: '95vh',
       width: '95vw',
@@ -134,6 +138,16 @@ export class LocationPickerTileComponent implements AfterViewInit, OnChanges, On
       return;
     }
     this.marker = leaflet.marker(latLng, { icon: markerIcons[this.markerType] }).addTo(this.map);
+  }
+
+
+  private updateZoom(zoom: number): void {
+    if (!this.map) return;
+    const normalizedZoom = Math.round(Number(zoom));
+    if (!Number.isFinite(normalizedZoom)) {
+      return;
+    }
+    this.map.setZoom(normalizedZoom);
   }
 
   private observeSizeChanges(): void {

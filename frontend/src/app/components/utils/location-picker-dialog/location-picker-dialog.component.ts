@@ -21,6 +21,7 @@ type MarkerKind = 'message' | 'note';
 interface LocationPickerDialogData {
   location: Location;
   markerType: MarkerKind;
+  zoom?: number;
 }
 
 const markerIcons: Record<MarkerKind, leaflet.Icon> = {
@@ -342,11 +343,20 @@ export class LocationPickerDialogComponent implements AfterViewInit, OnDestroy {
     this.selectedPlaceId = undefined;
   }
 
+
+  private normalizeZoom(value: unknown): number {
+    const numeric = Math.round(Number(value));
+    if (!Number.isFinite(numeric)) {
+      return 2;
+    }
+    return Math.min(19, Math.max(2, numeric));
+  }
+
   private initMap(): void {
     const { latitude, longitude } = this.location;
     this.map = leaflet.map(this.mapId, {
       center: [latitude, longitude],
-      zoom: 2,
+      zoom: this.normalizeZoom(this.data.zoom),
       worldCopyJump: true
     });
 

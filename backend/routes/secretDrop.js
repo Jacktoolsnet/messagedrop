@@ -14,6 +14,9 @@ const MAX_PLUS_CODE_LENGTH = 32;
 const MAX_ENCRYPTED_PAYLOAD_LENGTH = 32768;
 const MAX_CRYPTO_METADATA_LENGTH = 8192;
 const MAX_AUTH_VERIFIER_LENGTH = 4096;
+const DEFAULT_DISCOVERY_ZOOM_LEVEL = 18;
+const MIN_DISCOVERY_ZOOM_LEVEL = 12;
+const MAX_DISCOVERY_ZOOM_LEVEL = 19;
 
 const unlockLimiter = rateLimit({
   windowMs: 5 * 60 * 1000,
@@ -84,6 +87,18 @@ function normalizeOptionalTimestamp(value, fieldName) {
   return numeric;
 }
 
+
+function normalizeDiscoveryZoomLevel(value, required = false) {
+  if (value === undefined || value === null || value === '') {
+    return required ? DEFAULT_DISCOVERY_ZOOM_LEVEL : null;
+  }
+  const numeric = Number(value);
+  if (!Number.isInteger(numeric) || numeric < MIN_DISCOVERY_ZOOM_LEVEL || numeric > MAX_DISCOVERY_ZOOM_LEVEL) {
+    throw apiError.badRequest('invalid_discovery_zoom_level');
+  }
+  return numeric;
+}
+
 function normalizeMaxUnlocks(value) {
   if (value === undefined || value === null || value === '') {
     return null;
@@ -110,6 +125,7 @@ function mapPublicSecretDrop(drop) {
     longitude: drop.longitude,
     plusCode: drop.plusCode,
     discoveryPlusCode: drop.discoveryPlusCode,
+    discoveryZoomLevel: drop.discoveryZoomLevel ?? DEFAULT_DISCOVERY_ZOOM_LEVEL,
     hint: drop.hint,
     hintStyle: drop.hintStyle || '',
     maxUnlocks: drop.maxUnlocks,
@@ -193,6 +209,7 @@ router.post('/create', [
     );
     const cryptoMetadata = serializeJsonField(req.body?.crypto, 'crypto', MAX_CRYPTO_METADATA_LENGTH);
     const authVerifier = normalizeAuthVerifier(req.body?.authVerifier);
+    const discoveryZoomLevel = normalizeDiscoveryZoomLevel(req.body?.discoveryZoomLevel, true);
     const maxUnlocks = normalizeMaxUnlocks(req.body?.maxUnlocks);
     const validFrom = normalizeOptionalTimestamp(req.body?.validFrom, 'valid_from');
     const validUntil = normalizeOptionalTimestamp(req.body?.validUntil, 'valid_until');
@@ -211,6 +228,7 @@ router.post('/create', [
       longitude,
       plusCode,
       discoveryPlusCode,
+      discoveryZoomLevel,
       hint: normalizeString(req.body?.hint, MAX_HINT_LENGTH),
       hintStyle: normalizeString(req.body?.hintStyle, MAX_HINT_STYLE_LENGTH),
       encryptedPayload,
@@ -234,7 +252,8 @@ router.get('/discover/pluscode/:plusCode', security.authenticateOptional, async 
     if (!plusCode) {
       throw apiError.badRequest('invalid_plus_code');
     }
-    const rows = await tableSecretDrop.discoverByPlusCode(getDb(req), plusCode, nowSeconds());
+    const zoomLevel = normalizeDiscoveryZoomLevel(req.query?.zoomLevel ?? req.query?.zoom, false);
+    const rows = await tableSecretDrop.discoverByPlusCode(getDb(req), plusCode, nowSeconds(), zoomLevel);
     res.status(200).json({ status: 200, rows: rows.map(mapPublicSecretDrop) });
   } catch (error) {
     next(error);
