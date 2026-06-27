@@ -95,6 +95,10 @@ export class EditSecretDropComponent {
     return this.multimedia.type !== MultimediaType.UNDEFINED;
   }
 
+  get hasSecretContent(): boolean {
+    return this.message.trim().length > 0 || this.hasMultimedia;
+  }
+
   get minStartDate(): Date {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -366,7 +370,7 @@ export class EditSecretDropComponent {
   }
 
   private validate(): string | null {
-    if (!this.message.trim() && !this.hasMultimedia) {
+    if (!this.hasSecretContent) {
       return 'common.secretDrop.contentRequired';
     }
     if (this.pin.length !== 6) {

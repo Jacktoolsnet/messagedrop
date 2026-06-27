@@ -1270,10 +1270,13 @@ router.post('/moderate/hashtags',
       return next(apiError.badRequest('invalid_hashtags'));
     }
 
-    const moderationResult = await moderatePublicContentInput(
-      formatHashtagsForModeration(hashtags),
-      req.logger
-    );
+    const text = String(req.body?.text ?? '').trim();
+    const moderationInput = [text, formatHashtagsForModeration(hashtags)].filter(Boolean).join(' ').trim();
+    if (!moderationInput) {
+      return next(apiError.badRequest('invalid_moderation_input'));
+    }
+
+    const moderationResult = await moderatePublicContentInput(moderationInput, req.logger);
 
     res.status(200).json({
       status: 200,
