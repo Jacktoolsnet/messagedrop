@@ -9,6 +9,7 @@ const { apiError } = require('../middleware/api-error');
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const MAX_HINT_LENGTH = 512;
+const MAX_HINT_STYLE_LENGTH = 4096;
 const MAX_PLUS_CODE_LENGTH = 32;
 const MAX_ENCRYPTED_PAYLOAD_LENGTH = 32768;
 const MAX_CRYPTO_METADATA_LENGTH = 8192;
@@ -110,6 +111,7 @@ function mapPublicSecretDrop(drop) {
     plusCode: drop.plusCode,
     discoveryPlusCode: drop.discoveryPlusCode,
     hint: drop.hint,
+    hintStyle: drop.hintStyle || '',
     maxUnlocks: drop.maxUnlocks,
     unlockCount: drop.unlockCount,
     validFrom: drop.validFrom,
@@ -206,6 +208,7 @@ router.post('/create', [
       plusCode,
       discoveryPlusCode,
       hint: normalizeString(req.body?.hint, MAX_HINT_LENGTH),
+      hintStyle: normalizeString(req.body?.hintStyle, MAX_HINT_STYLE_LENGTH),
       encryptedPayload,
       crypto: cryptoMetadata,
       authVerifierHash: hashAuthVerifier(authVerifier),

@@ -1757,6 +1757,7 @@
       "messageLabel": "Contenu secret",
       "hintLabel": "Indice / énigme",
       "hintHelp": "Indice facultatif pour aider à deviner le mot de passe.",
+      "addHint": "Ajouter un indice d’énigme",
       "passwordLabel": "Mot de passe",
       "passwordRepeatLabel": "Répéter le mot de passe",
       "oneTimeLabel": "Lisible une seule fois",

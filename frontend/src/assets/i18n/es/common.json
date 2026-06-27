@@ -1757,6 +1757,7 @@
       "messageLabel": "Contenido secreto",
       "hintLabel": "Pista / acertijo",
       "hintHelp": "Pista opcional para ayudar a adivinar la contraseña.",
+      "addHint": "Añadir pista del acertijo",
       "passwordLabel": "Contraseña",
       "passwordRepeatLabel": "Repetir contraseña",
       "oneTimeLabel": "Leer solo una vez",

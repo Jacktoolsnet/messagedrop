@@ -24,6 +24,7 @@ export interface SecretDrop {
   plusCode: string;
   discoveryPlusCode: string;
   hint: string;
+  hintStyle?: string;
   encryptedPayload?: SecretDropEncryptedPayload | string;
   crypto?: SecretDropCryptoMetadata | Record<string, unknown> | string | null;
   maxUnlocks: number | null;
@@ -48,6 +49,7 @@ export interface SecretDropCreateRequest {
   plusCode: string;
   discoveryPlusCode: string;
   hint: string;
+  hintStyle: string;
   encryptedPayload: SecretDropEncryptedPayload;
   crypto: SecretDropCryptoMetadata;
   authVerifier: string;

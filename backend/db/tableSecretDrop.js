@@ -59,6 +59,7 @@ function mapSecretDropRow(row, options = {}) {
     plusCode: row.plusCode,
     discoveryPlusCode: row.discoveryPlusCode,
     hint: row.hint || '',
+    hintStyle: row.hintStyle || '',
     maxUnlocks: row.maxUnlocks === null || row.maxUnlocks === undefined ? null : Number(row.maxUnlocks),
     unlockCount: Number(row.unlockCount || 0),
     failedUnlockCount: Number(row.failedUnlockCount || 0),
@@ -104,6 +105,7 @@ const init = function (db) {
       plusCode TEXT NOT NULL,
       discoveryPlusCode TEXT NOT NULL,
       hint TEXT NOT NULL DEFAULT '',
+      hintStyle TEXT NOT NULL DEFAULT '',
       encryptedPayload TEXT NOT NULL,
       crypto TEXT NOT NULL,
       authVerifierHash TEXT NOT NULL,
@@ -189,15 +191,20 @@ const init = function (db) {
   `;
   db.exec(sql, (err) => {
     if (err) throw err;
+    db.run(`ALTER TABLE ${tableName} ADD COLUMN hintStyle TEXT NOT NULL DEFAULT '';`, (alterErr) => {
+      if (alterErr && !/duplicate column/i.test(String(alterErr.message || ''))) {
+        throw alterErr;
+      }
+    });
   });
 };
 
 async function create(db, payload) {
   const sql = `
     INSERT INTO ${tableName} (
-      uuid, userId, latitude, longitude, plusCode, discoveryPlusCode, hint,
+      uuid, userId, latitude, longitude, plusCode, discoveryPlusCode, hint, hintStyle,
       encryptedPayload, crypto, authVerifierHash, maxUnlocks, validFrom, validUntil, status
-    ) VALUES (?, ?, ?, ?, UPPER(?), UPPER(?), ?, ?, ?, ?, ?, ?, ?, ?);
+    ) VALUES (?, ?, ?, ?, UPPER(?), UPPER(?), ?, ?, ?, ?, ?, ?, ?, ?, ?);
   `;
   await runQuery(db, sql, [
     payload.uuid,
@@ -207,6 +214,7 @@ async function create(db, payload) {
     payload.plusCode,
     payload.discoveryPlusCode,
     payload.hint || '',
+    payload.hintStyle || '',
     payload.encryptedPayload,
     payload.crypto,
     payload.authVerifierHash,

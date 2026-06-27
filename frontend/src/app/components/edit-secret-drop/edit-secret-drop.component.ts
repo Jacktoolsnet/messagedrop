@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -44,7 +44,7 @@ interface TextDialogResult {
     ShowmultimediaComponent,
     MatButtonModule,
     MatCardModule,
-    MatCheckboxModule,
+    MatSlideToggleModule,
     MatDatepickerModule,
     MatDialogActions,
     MatDialogContent,
@@ -75,6 +75,7 @@ export class EditSecretDropComponent {
   message = '';
   messageStyle = '';
   hint = '';
+  hintStyle = '';
   password = '';
   passwordRepeat = '';
   oneTime = true;
@@ -116,6 +117,7 @@ export class EditSecretDropComponent {
         plusCode: this.resolvePlusCode(this.location),
         discoveryPlusCode: this.resolvePlusCode(this.location),
         hint: this.hint.trim(),
+        hintStyle: this.hintStyle,
         encryptedPayload: encrypted.encryptedPayload,
         crypto: encrypted.crypto,
         authVerifier: encrypted.authVerifier,
@@ -175,6 +177,55 @@ export class EditSecretDropComponent {
 
   removeText(): void {
     this.message = '';
+  }
+
+  openHintDialog(): void {
+    const dialogRef = this.matDialog.open(TextComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: {
+        text: this.hint,
+        titleKey: 'common.secretDrop.hintLabel',
+        titleIcon: 'psychology_alt'
+      },
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: true
+    });
+
+    dialogRef.afterClosed().subscribe((result?: TextDialogResult) => {
+      if (result?.text != null) {
+        this.hint = result.text;
+        if (!this.hintStyle) {
+          this.hintStyle = this.userService.getProfile().defaultStyle ?? '';
+        }
+      }
+    });
+  }
+
+  removeHint(): void {
+    this.hint = '';
+    this.hintStyle = '';
+  }
+
+  onHintFontClick(): void {
+    const dialogRef = this.matDialog.open(FontPickerDialogComponent, {
+      data: { currentStyle: this.hintStyle },
+      maxWidth: '95vw',
+      width: '95vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((style?: string) => {
+      if (style) {
+        this.hintStyle = style;
+      }
+    });
   }
 
   onFontClick(): void {

@@ -55,6 +55,7 @@ export class SecretDropService {
       },
       plusCode,
       discoveryPlusCode: source.discoveryPlusCode ?? plusCode,
+      hintStyle: source.hintStyle ?? '',
       maxUnlocks: source.maxUnlocks === null || source.maxUnlocks === undefined ? null : Number(source.maxUnlocks),
       unlockCount: Number(source.unlockCount ?? 0),
       likes: Number(source.likes ?? 0),
