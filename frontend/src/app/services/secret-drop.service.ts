@@ -48,8 +48,7 @@ export class SecretDropService {
         localOnly: false
       });
     });
-    const serverUuids = new Set(serverRows.map((drop) => drop.uuid));
-    const localOnlyRows = localRows.filter((drop) => drop.localOnly || !serverUuids.has(drop.uuid));
+    const localOnlyRows = localRows.filter((drop) => drop.localOnly === true);
     const rows = [...localOnlyRows, ...serverRows].sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
     this.mySecretDropsSignal.set(rows);
     await this.saveOwnSecretDrops(userId, rows);
@@ -95,9 +94,14 @@ export class SecretDropService {
   }
 
   async deleteSecretDrop(uuid: string): Promise<boolean> {
+    const existing = this.mySecretDropsSignal().find((drop) => drop.uuid === uuid);
     const response = await firstValueFrom(this.http.delete<SecretDropDeleteResponse>(`${this.baseUrl}/delete/${encodeURIComponent(uuid)}`));
     if (response.deleted) {
       this.mySecretDropsSignal.update((drops) => drops.filter((drop) => drop.uuid !== uuid));
+      const userId = existing?.userId ?? '';
+      if (userId) {
+        await this.saveOwnSecretDrops(userId, this.mySecretDropsSignal());
+      }
     }
     return !!response.deleted;
   }

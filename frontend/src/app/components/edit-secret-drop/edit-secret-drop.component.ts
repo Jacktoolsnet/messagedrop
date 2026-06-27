@@ -23,6 +23,7 @@ import { TranslationHelperService } from '../../services/translation-helper.serv
 import { UserService } from '../../services/user.service';
 import { DisplayMessageService } from '../../services/display-message.service';
 import { MessageService } from '../../services/message.service';
+import { DisplayMessage } from '../utils/display-message/display-message.component';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { LocationPickerTileComponent } from '../utils/location-picker/location-picker-tile.component';
@@ -176,7 +177,10 @@ export class EditSecretDropComponent {
       return;
     }
 
-    if (!(await this.moderateSecretTexts())) {
+    const moderationErrorKey = await this.getSecretTextModerationErrorKey();
+    if (moderationErrorKey) {
+      this.dialogRef.close(true);
+      this.showModerationRejected(moderationErrorKey);
       return;
     }
 
@@ -469,19 +473,21 @@ export class EditSecretDropComponent {
     return null;
   }
 
-  private async moderateSecretTexts(): Promise<boolean> {
+  private async getSecretTextModerationErrorKey(): Promise<string | null> {
     const moderationInput = [this.message, this.hint]
       .map((value) => String(value ?? '').trim())
       .filter(Boolean)
       .join('\n\n');
 
     if (!moderationInput) {
-      return true;
+      return null;
     }
 
     if (this.messageService.detectPersonalInformation(moderationInput)) {
-      this.showWarning('common.message.moderationRejectedPattern', 'snack-error');
-      return false;
+      return 'common.message.moderationRejectedPattern';
+    }
+    if (this.detectThreateningOrAbusiveContent(moderationInput)) {
+      return 'common.message.moderationRejectedAi';
     }
 
     try {
@@ -494,14 +500,62 @@ export class EditSecretDropComponent {
           : reason === 'ai'
             ? 'common.message.moderationRejectedAi'
             : 'common.message.moderationRejected';
-        this.showWarning(key, 'snack-error');
-        return false;
+        return key;
       }
-      return true;
+      return null;
     } catch {
-      this.showWarning('common.message.moderationFailed', 'snack-warning');
+      return 'common.message.moderationFailed';
+    }
+  }
+
+  private showModerationRejected(messageKey: string): void {
+    this.matDialog.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: {
+        showAlways: true,
+        title: this.translation.t('common.moderation.title'),
+        image: '',
+        icon: messageKey === 'common.message.moderationFailed' ? 'warning' : 'block',
+        message: this.translation.t(messageKey),
+        button: this.translation.t('common.actions.ok'),
+        delay: 0,
+        showSpinner: false,
+        autoclose: false
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+  }
+
+  private detectThreateningOrAbusiveContent(text: string): boolean {
+    const normalized = String(text ?? '')
+      .toLowerCase()
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^\p{L}\p{N}]+/gu, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    if (!normalized) {
       return false;
     }
+
+    const patterns = [
+      /\bich\s+bring(?:e)?\s+(?:dich|dir|ihn|sie|euch|deine|deinen|deiner)\s+(?:um|umbringen)\b/i,
+      /\b(?:bring(?:e)?|bringe|bringen)\s+(?:dich|ihn|sie|euch)\s+um\b/i,
+      /\b(?:ich\s+)?(?:mach(?:e)?|mache)\s+(?:dich|ihn|sie|euch)\s+fertig\b/i,
+      /\b(?:ich\s+)?(?:toete|tote|kill(?:e)?|ermorde)\s+(?:dich|ihn|sie|euch)\b/i,
+      /\bdu\s+(?:bloede|blode|dumme|drecks|scheiss|scheiss)\w*\s*(?:schlampe|hure|fotze)\b/i,
+      /\bdrecks(?:schlampe|hure|fotze)\b/i,
+      /\b(?:ich\s+)?(?:werde\s+)?(?:dich|ihn|sie|euch)\s+(?:verletzen|verpruegeln|verprugeln|erschlagen|abstechen)\b/i
+    ];
+
+    return patterns.some((pattern) => pattern.test(normalized));
   }
 
   private resolvePlusCode(location: Location): string {

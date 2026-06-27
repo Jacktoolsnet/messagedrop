@@ -493,6 +493,32 @@ function detectPersonalInformation(text) {
   });
 }
 
+function detectThreateningOrAbusiveContent(text) {
+  const normalized = String(text ?? '')
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (!normalized) {
+    return false;
+  }
+
+  const patterns = [
+    /\bich\s+bring(?:e)?\s+(?:dich|dir|ihn|sie|euch|deine|deinen|deiner)\s+(?:um|umbringen)\b/i,
+    /\b(?:bring(?:e)?|bringe|bringen)\s+(?:dich|ihn|sie|euch)\s+um\b/i,
+    /\b(?:ich\s+)?(?:mach(?:e)?|mache)\s+(?:dich|ihn|sie|euch)\s+fertig\b/i,
+    /\b(?:ich\s+)?(?:toete|tote|kill(?:e)?|ermorde)\s+(?:dich|ihn|sie|euch)\b/i,
+    /\bdu\s+(?:bloede|blode|dumme|drecks|scheiss|scheiss)\w*\s*(?:schlampe|hure|fotze)\b/i,
+    /\bdrecks(?:schlampe|hure|fotze)\b/i,
+    /\b(?:ich\s+)?(?:werde\s+)?(?:dich|ihn|sie|euch)\s+(?:verletzen|verpruegeln|verprugeln|erschlagen|abstechen)\b/i
+  ];
+
+  return patterns.some((pattern) => pattern.test(normalized));
+}
+
 function extractModerationScore(moderation) {
   const result = moderation?.results?.[0];
   const scores = result?.category_scores;
@@ -646,6 +672,7 @@ async function moderatePublicContentInput(moderationInput, logger) {
 
   moderation.patternMatch = detectPersonalInformation(moderationInput);
   moderation.patternMatchAt = Date.now();
+  const threateningOrAbusiveMatch = detectThreateningOrAbusiveContent(moderationInput);
 
   if (moderation.patternMatch) {
     moderationScore = null;
@@ -655,7 +682,19 @@ async function moderatePublicContentInput(moderationInput, logger) {
     status = tableMessage.messageStatus.DISABLED;
   }
 
-  if (!moderation.patternMatch) {
+  if (!moderation.patternMatch && threateningOrAbusiveMatch) {
+    moderationScore = null;
+    moderationFlagged = true;
+    moderationDecision = 'rejected';
+    moderationReason = 'ai';
+    moderation.aiDecision = moderationDecision;
+    moderation.aiFlagged = true;
+    moderation.aiScore = null;
+    moderation.aiCheckedAt = Date.now();
+    status = tableMessage.messageStatus.DISABLED;
+  }
+
+  if (!moderation.patternMatch && !threateningOrAbusiveMatch) {
     try {
       const moderationResult = await openai.moderations.create({
         model: moderationModel,

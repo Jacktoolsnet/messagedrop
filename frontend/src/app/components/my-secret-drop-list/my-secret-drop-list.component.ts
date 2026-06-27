@@ -17,6 +17,7 @@ import { MessageService } from '../../services/message.service';
 import { DisplayMessageService } from '../../services/display-message.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
+import { DisplayMessage } from '../utils/display-message/display-message.component';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { EditSecretDropComponent } from '../edit-secret-drop/edit-secret-drop.component';
@@ -151,7 +152,15 @@ export class MySecretDropListComponent implements OnInit {
         verticalPosition: 'top',
         panelClass: 'snack-success'
       });
-    } catch {
+    } catch (error) {
+      if (error instanceof Error && (error.message === 'moderation_rejected' || error.message === 'moderation_rejected_pattern')) {
+        this.showModerationRejected(
+          error.message === 'moderation_rejected_pattern'
+            ? 'common.message.moderationRejectedPattern'
+            : 'common.message.moderationRejectedAi'
+        );
+        return;
+      }
       this.snackBar.open(this.translation.t('common.secretDrop.publishFailed'), undefined, {
         duration: 3200,
         verticalPosition: 'top',
@@ -233,11 +242,14 @@ export class MySecretDropListComponent implements OnInit {
     const userId = this.userService.getUser().id;
     const moderationInput = [drop.message, drop.hint].map((value) => String(value ?? '').trim()).filter(Boolean).join('\n\n');
     if (this.messageService.detectPersonalInformation(moderationInput)) {
+      throw new Error('moderation_rejected_pattern');
+    }
+    if (this.detectThreateningOrAbusiveContent(moderationInput)) {
       throw new Error('moderation_rejected');
     }
     const response = await firstValueFrom(this.messageService.moderatePublicContent(moderationInput));
     if ((response?.moderation?.decision ?? 'approved') === 'rejected') {
-      throw new Error('moderation_rejected');
+      throw new Error(response?.moderation?.reason === 'pattern' ? 'moderation_rejected_pattern' : 'moderation_rejected');
     }
     const pin = await this.openPinDialog();
     if (!pin) {
@@ -295,5 +307,55 @@ export class MySecretDropListComponent implements OnInit {
       autoFocus: false
     });
     return (await firstValueFrom(dialogRef.afterClosed())) ?? null;
+  }
+
+  private showModerationRejected(messageKey: string): void {
+    this.matDialog.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: {
+        showAlways: true,
+        title: this.translation.t('common.moderation.title'),
+        image: '',
+        icon: 'block',
+        message: this.translation.t(messageKey),
+        button: this.translation.t('common.actions.ok'),
+        delay: 0,
+        showSpinner: false,
+        autoclose: false
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+  }
+
+  private detectThreateningOrAbusiveContent(text: string): boolean {
+    const normalized = String(text ?? '')
+      .toLowerCase()
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^\p{L}\p{N}]+/gu, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    if (!normalized) {
+      return false;
+    }
+
+    const patterns = [
+      /\bich\s+bring(?:e)?\s+(?:dich|dir|ihn|sie|euch|deine|deinen|deiner)\s+(?:um|umbringen)\b/i,
+      /\b(?:bring(?:e)?|bringe|bringen)\s+(?:dich|ihn|sie|euch)\s+um\b/i,
+      /\b(?:ich\s+)?(?:mach(?:e)?|mache)\s+(?:dich|ihn|sie|euch)\s+fertig\b/i,
+      /\b(?:ich\s+)?(?:toete|tote|kill(?:e)?|ermorde)\s+(?:dich|ihn|sie|euch)\b/i,
+      /\bdu\s+(?:bloede|blode|dumme|drecks|scheiss|scheiss)\w*\s*(?:schlampe|hure|fotze)\b/i,
+      /\bdrecks(?:schlampe|hure|fotze)\b/i,
+      /\b(?:ich\s+)?(?:werde\s+)?(?:dich|ihn|sie|euch)\s+(?:verletzen|verpruegeln|verprugeln|erschlagen|abstechen)\b/i
+    ];
+
+    return patterns.some((pattern) => pattern.test(normalized));
   }
 }
