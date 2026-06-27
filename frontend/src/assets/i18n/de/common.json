@@ -1809,7 +1809,8 @@
         "expired": "Abgelaufen",
         "consumed": "Verbraucht",
         "deleted": "Gelöscht",
-        "disabled": "Deaktiviert"
+        "disabled": "Deaktiviert",
+        "draft": "Entwurf"
       },
       "contentRequired": "Bitte gib einen geheimen Text oder ein Multimedia-Element ein.",
       "encryptionTitle": "Ende-zu-Ende vorbereitet",
@@ -1825,7 +1826,16 @@
       "validFromDate": "Startdatum",
       "validFromTime": "Startzeit",
       "validUntilDate": "Ablaufdatum",
-      "validUntilTime": "Ablaufzeit"
+      "validUntilTime": "Ablaufzeit",
+      "secretDrop": "GeheimnisDrop",
+      "saveDraftAria": "Als Entwurf speichern",
+      "draftSuccess": "GeheimnisDrop als Entwurf gespeichert.",
+      "publishAction": "Veröffentlichen",
+      "unpublishAction": "Veröffentlichung widerrufen",
+      "publishSuccess": "GeheimnisDrop veröffentlicht.",
+      "publishFailed": "GeheimnisDrop konnte nicht veröffentlicht werden.",
+      "unpublishSuccess": "Veröffentlichung widerrufen.",
+      "unpublishFailed": "Veröffentlichung konnte nicht widerrufen werden."
     }
   },
   "errors": {

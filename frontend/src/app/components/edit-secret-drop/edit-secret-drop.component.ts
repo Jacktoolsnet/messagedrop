@@ -15,7 +15,7 @@ import { firstValueFrom } from 'rxjs';
 import { Location } from '../../interfaces/location';
 import { Multimedia } from '../../interfaces/multimedia';
 import { MultimediaType } from '../../interfaces/multimedia-type';
-import { SecretDropCreateRequest } from '../../interfaces/secret-drop';
+import { SecretDrop, SecretDropCreateRequest } from '../../interfaces/secret-drop';
 import { GeolocationService } from '../../services/geolocation.service';
 import { SecretDropCryptoService } from '../../services/secret-drop-crypto.service';
 import { SecretDropService } from '../../services/secret-drop.service';
@@ -35,6 +35,8 @@ import { CreatePinComponent } from '../pin/create-pin/create-pin.component';
 interface TextDialogResult {
   text: string;
 }
+
+type SecretDropCreateAction = 'publish' | 'draft';
 
 @Component({
   selector: 'app-edit-secret-drop',
@@ -127,18 +129,18 @@ export class EditSecretDropComponent {
     return this.isSameDate(this.validUntilDate, minimum) ? minimum : null;
   }
 
-  async create(): Promise<void> {
+  async create(action: SecretDropCreateAction = 'publish'): Promise<void> {
     if (this.saving()) {
       return;
     }
-    const validationError = this.validate();
+    const validationError = this.validate(action);
     if (validationError) {
       if (validationError === 'common.secretDrop.pinRequired') {
         const pinCreated = await this.openPinDialog();
         if (!pinCreated) {
           return;
         }
-        const validationAfterPin = this.validate();
+        const validationAfterPin = this.validate(action);
         if (validationAfterPin) {
           this.showWarning(validationAfterPin);
           return;
@@ -147,6 +149,11 @@ export class EditSecretDropComponent {
         this.showWarning(validationError);
         return;
       }
+    }
+
+    if (action === 'draft') {
+      await this.saveLocalDraft();
+      return;
     }
 
     if (!(await this.moderateSecretTexts())) {
@@ -174,9 +181,10 @@ export class EditSecretDropComponent {
         authVerifier: encrypted.authVerifier,
         maxUnlocks: this.oneTime ? 1 : null,
         validFrom: this.useValidFrom ? this.toSeconds(this.validFromDate, this.validFromTime) : null,
-        validUntil: this.useValidUntil ? this.toSeconds(this.validUntilDate, this.validUntilTime) : null
+        validUntil: this.useValidUntil ? this.toSeconds(this.validUntilDate, this.validUntilTime) : null,
+        publishState: 'published'
       };
-      await this.secretDropService.createSecretDrop(request);
+      await this.secretDropService.createSecretDrop(request, this.getLocalPlainData());
       this.snackBar.open(this.translation.t('common.secretDrop.createSuccess'), undefined, {
         duration: 3200,
         verticalPosition: 'top',
@@ -191,6 +199,51 @@ export class EditSecretDropComponent {
     } finally {
       this.saving.set(false);
     }
+  }
+
+  private async saveLocalDraft(): Promise<void> {
+    const userId = this.userService.getUser().id;
+    const drop: SecretDrop = {
+      uuid: crypto.randomUUID(),
+      userId,
+      location: this.location,
+      latitude: this.location.latitude,
+      longitude: this.location.longitude,
+      plusCode: this.resolvePlusCode(this.location),
+      discoveryPlusCode: this.resolvePlusCode(this.location),
+      hint: this.hint.trim(),
+      hintStyle: this.hintStyle,
+      message: this.message.trim(),
+      messageStyle: this.messageStyle,
+      multimedia: this.hasMultimedia ? this.multimedia : null,
+      maxUnlocks: this.oneTime ? 1 : null,
+      unlockCount: 0,
+      failedUnlockCount: 0,
+      validFrom: this.useValidFrom ? this.toSeconds(this.validFromDate, this.validFromTime) : null,
+      validUntil: this.useValidUntil ? this.toSeconds(this.validUntilDate, this.validUntilTime) : null,
+      status: 'disabled',
+      publishState: 'draft',
+      localOnly: true,
+      likes: 0,
+      dislikes: 0,
+      commentsNumber: 0,
+      createdAt: Math.floor(Date.now() / 1000)
+    };
+    await this.secretDropService.saveDraftSecretDrop(userId, drop);
+    this.snackBar.open(this.translation.t('common.secretDrop.draftSuccess'), undefined, {
+      duration: 3200,
+      verticalPosition: 'top',
+      panelClass: 'snack-success'
+    });
+    this.dialogRef.close(true);
+  }
+
+  private getLocalPlainData(): Partial<SecretDrop> {
+    return {
+      message: this.message.trim(),
+      messageStyle: this.messageStyle,
+      multimedia: this.hasMultimedia ? this.multimedia : null
+    };
   }
 
   updateLocation(location: Location): void {
@@ -369,11 +422,11 @@ export class EditSecretDropComponent {
     });
   }
 
-  private validate(): string | null {
+  private validate(action: SecretDropCreateAction = 'publish'): string | null {
     if (!this.hasSecretContent) {
       return 'common.secretDrop.contentRequired';
     }
-    if (this.pin.length !== 6) {
+    if (action === 'publish' && this.pin.length !== 6) {
       return 'common.secretDrop.pinRequired';
     }
     const validFrom = this.useValidFrom ? this.toSeconds(this.validFromDate, this.validFromTime) : null;

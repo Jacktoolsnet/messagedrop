@@ -13,6 +13,7 @@ import { Message } from '../interfaces/message';
 import { Note } from '../interfaces/note';
 import { Place } from '../interfaces/place';
 import { Profile } from '../interfaces/profile';
+import { SecretDrop } from '../interfaces/secret-drop';
 import { ShortMessage } from '../interfaces/short-message';
 import { TileSetting } from '../interfaces/tile-settings';
 import { BackupStateService } from './backup-state.service';
@@ -39,7 +40,7 @@ interface EncryptedStoreEnvelope {
 export class IndexedDbService {
   private readonly backupState = inject(BackupStateService);
   private dbName = 'MessageDrop';
-  private dbVersion = 9;
+  private dbVersion = 10;
   private settingStore = 'setting';
   private userStore = 'user';
   private profileStore = 'profile';
@@ -56,6 +57,7 @@ export class IndexedDbService {
   private fileHandleStore = 'fileHandle';
   private contactMessagePayloadStore = 'contactMessagePayload';
   private publicMessageStore = 'publicMessage';
+  private secretDropStore = 'secretDrop';
   private atRestEncryptionKey: CryptoKey | null = null;
   private readonly encryptedStores = new Set<string>([
     this.profileStore,
@@ -66,6 +68,7 @@ export class IndexedDbService {
     this.tileSettingsStore,
     this.noteStore,
     this.publicMessageStore,
+    this.secretDropStore,
     this.imageStore,
     this.documentStore,
     this.contactMessagePayloadStore
@@ -362,6 +365,9 @@ export class IndexedDbService {
         }
         if (!db.objectStoreNames.contains(this.publicMessageStore)) {
           db.createObjectStore(this.publicMessageStore);
+        }
+        if (!db.objectStoreNames.contains(this.secretDropStore)) {
+          db.createObjectStore(this.secretDropStore);
         }
         if (!db.objectStoreNames.contains(this.imageStore)) {
           db.createObjectStore(this.imageStore);
@@ -681,6 +687,53 @@ export class IndexedDbService {
     return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(this.publicMessageStore, 'readwrite');
       const store = tx.objectStore(this.publicMessageStore);
+      const request = store.delete(userId);
+      request.onsuccess = () => {
+        this.backupState.markDirty();
+        resolve();
+      };
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async setOwnSecretDrops(userId: string, secretDrops: SecretDrop[]): Promise<void> {
+    const db = await this.openDB();
+    const encoded = await this.encodeValue(this.secretDropStore, secretDrops);
+
+    return new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(this.secretDropStore, 'readwrite');
+      const store = tx.objectStore(this.secretDropStore);
+      const request = store.put(encoded, userId);
+      request.onsuccess = () => {
+        this.backupState.markDirty();
+        resolve();
+      };
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async getOwnSecretDrops(userId: string): Promise<SecretDrop[]> {
+    const db = await this.openDB();
+
+    return new Promise<SecretDrop[]>((resolve, reject) => {
+      const tx = db.transaction(this.secretDropStore, 'readonly');
+      const store = tx.objectStore(this.secretDropStore);
+      const request = store.get(userId);
+      request.onsuccess = () => {
+        this.decodeValue<SecretDrop[]>(this.secretDropStore, request.result)
+          .then((value) => resolve(Array.isArray(value) ? value : []))
+          .catch(reject);
+      };
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async deleteOwnSecretDrops(userId: string): Promise<void> {
+    const db = await this.openDB();
+
+    return new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(this.secretDropStore, 'readwrite');
+      const store = tx.objectStore(this.secretDropStore);
       const request = store.delete(userId);
       request.onsuccess = () => {
         this.backupState.markDirty();

@@ -1086,6 +1086,35 @@ function sendLegacyMessagesByBoundingBox(req, res, next) {
   );
 }
 
+router.post('/moderate/content',
+  [
+    security.authenticate,
+    express.json({ type: 'application/json', limit: '16kb' })
+  ],
+  async function (req, res, next) {
+    try {
+      const moderationInput = String(req.body?.text ?? '').trim();
+      if (!moderationInput) {
+        return next(apiError.badRequest('invalid_text'));
+      }
+
+      const moderationResult = await moderatePublicContentInput(moderationInput, req.logger);
+
+      res.status(200).json({
+        status: 200,
+        moderation: {
+          decision: moderationResult.moderationDecision,
+          reason: moderationResult.moderationReason,
+          score: moderationResult.moderationScore,
+          flagged: moderationResult.moderationFlagged,
+          patternMatch: moderationResult.moderation.patternMatch ?? null
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
 router.use((req, res, next) => {
   if (!shouldInvalidatePublicMessageSearchCache(req)) {
     return next();
@@ -1270,13 +1299,10 @@ router.post('/moderate/hashtags',
       return next(apiError.badRequest('invalid_hashtags'));
     }
 
-    const text = String(req.body?.text ?? '').trim();
-    const moderationInput = [text, formatHashtagsForModeration(hashtags)].filter(Boolean).join(' ').trim();
-    if (!moderationInput) {
-      return next(apiError.badRequest('invalid_moderation_input'));
-    }
-
-    const moderationResult = await moderatePublicContentInput(moderationInput, req.logger);
+    const moderationResult = await moderatePublicContentInput(
+      formatHashtagsForModeration(hashtags),
+      req.logger
+    );
 
     res.status(200).json({
       status: 200,
@@ -1288,35 +1314,6 @@ router.post('/moderate/hashtags',
         patternMatch: moderationResult.moderation.patternMatch ?? null
       }
     });
-  });
-
-router.post('/moderate/content',
-  [
-    security.authenticate,
-    express.json({ type: 'application/json', limit: '16kb' })
-  ],
-  async function (req, res, next) {
-    try {
-      const moderationInput = String(req.body?.text ?? '').trim();
-      if (!moderationInput) {
-        return next(apiError.badRequest('invalid_text'));
-      }
-
-      const moderationResult = await moderatePublicContentInput(moderationInput, req.logger);
-
-      res.status(200).json({
-        status: 200,
-        moderation: {
-          decision: moderationResult.moderationDecision,
-          reason: moderationResult.moderationReason,
-          score: moderationResult.moderationScore,
-          flagged: moderationResult.moderationFlagged,
-          patternMatch: moderationResult.moderation.patternMatch ?? null
-        }
-      });
-    } catch (error) {
-      next(error);
-    }
   });
 
 router.post('/internal/publish',

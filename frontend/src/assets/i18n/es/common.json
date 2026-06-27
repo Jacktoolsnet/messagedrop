@@ -1800,7 +1800,8 @@
         "expired": "Caducado",
         "consumed": "Consumido",
         "deleted": "Eliminado",
-        "disabled": "Desactivado"
+        "disabled": "Desactivado",
+        "draft": "Borrador"
       },
       "contentRequired": "Introduce texto secreto o añade un elemento multimedia.",
       "encryptionTitle": "Preparado de extremo a extremo",
@@ -1816,7 +1817,16 @@
       "validFromDate": "Fecha de inicio",
       "validFromTime": "Hora de inicio",
       "validUntilDate": "Fecha de caducidad",
-      "validUntilTime": "Hora de caducidad"
+      "validUntilTime": "Hora de caducidad",
+      "secretDrop": "SecretDrop",
+      "saveDraftAria": "Guardar como borrador",
+      "draftSuccess": "SecretDrop guardado como borrador.",
+      "publishAction": "Publicar",
+      "unpublishAction": "Retirar publicación",
+      "publishSuccess": "SecretDrop publicado.",
+      "publishFailed": "No se pudo publicar el SecretDrop.",
+      "unpublishSuccess": "Publicación retirada.",
+      "unpublishFailed": "No se pudo retirar la publicación."
     }
   },
   "errors": {

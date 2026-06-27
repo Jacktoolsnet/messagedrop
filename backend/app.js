@@ -663,6 +663,7 @@ app.use('/dsa', dsaStatusLimit, slowRequestDefault, dsaStatus);
 app.use('/geostatistic', geoStatisticLimit, slowRequestDefault, geoStatistic);
 app.use('/message/create', slowRequestOpenAiModeration);
 app.use('/message/moderate/hashtags', slowRequestOpenAiModeration);
+app.use('/message/moderate/content', slowRequestOpenAiModeration);
 app.use('/message/internal/publish', slowRequestMessagePublish);
 app.use('/message/update', slowRequestMessagePublish);
 app.use('/message', messageLimit, slowRequestDefault, message);

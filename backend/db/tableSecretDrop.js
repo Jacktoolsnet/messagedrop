@@ -320,6 +320,18 @@ async function softDelete(db, uuid, userId) {
   return Number(result.changes || 0) > 0;
 }
 
+async function updateStatus(db, uuid, userId, status) {
+  const row = await getQuery(db, `
+    UPDATE ${tableName}
+    SET status = ?, updatedAt = strftime('%s','now')
+    WHERE uuid = ?
+      AND userId = ?
+      AND status NOT IN ('${secretDropStatus.DELETED}', '${secretDropStatus.CONSUMED}')
+    RETURNING *;
+  `, [status, uuid, userId]);
+  return mapSecretDropRow(row, { includeEncryptedPayload: false });
+}
+
 async function hasSuccessfulUnlock(db, uuid, userId) {
   if (!userId) return false;
   const row = await getQuery(db, `
@@ -399,6 +411,7 @@ module.exports = {
   recordFailedUnlock,
   unlock,
   softDelete,
+  updateStatus,
   hasSuccessfulUnlock,
   toggleReaction,
   getReactionState,

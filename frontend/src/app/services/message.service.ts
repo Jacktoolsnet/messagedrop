@@ -1615,8 +1615,8 @@ export class MessageService {
   }
 
   moderatePublicContent(text: string): Observable<MessageCreateResponse> {
-    const url = `${environment.apiUrl}/message/moderate/hashtags`;
-    const body = { hashtags: [], text: String(text ?? '').trim() };
+    const url = `${environment.apiUrl}/message/moderate/content`;
+    const body = { text: String(text ?? '').trim() };
     return this.http.post<MessageCreateResponse>(url, body, this.httpOptions).pipe(
       catchError(this.handleError)
     );

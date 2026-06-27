@@ -1800,7 +1800,8 @@
         "expired": "Expiré",
         "consumed": "Consommé",
         "deleted": "Supprimé",
-        "disabled": "Désactivé"
+        "disabled": "Désactivé",
+        "draft": "Brouillon"
       },
       "contentRequired": "Saisis un texte secret ou ajoute un élément multimédia.",
       "encryptionTitle": "Prêt pour le chiffrement de bout en bout",
@@ -1816,7 +1817,16 @@
       "validFromDate": "Date de début",
       "validFromTime": "Heure de début",
       "validUntilDate": "Date d’expiration",
-      "validUntilTime": "Heure d’expiration"
+      "validUntilTime": "Heure d’expiration",
+      "secretDrop": "SecretDrop",
+      "saveDraftAria": "Enregistrer comme brouillon",
+      "draftSuccess": "SecretDrop enregistré comme brouillon.",
+      "publishAction": "Publier",
+      "unpublishAction": "Retirer la publication",
+      "publishSuccess": "SecretDrop publié.",
+      "publishFailed": "Impossible de publier le SecretDrop.",
+      "unpublishSuccess": "Publication retirée.",
+      "unpublishFailed": "Impossible de retirer la publication."
     }
   },
   "errors": {

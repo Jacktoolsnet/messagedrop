@@ -1809,7 +1809,8 @@
         "expired": "Expired",
         "consumed": "Consumed",
         "deleted": "Deleted",
-        "disabled": "Disabled"
+        "disabled": "Disabled",
+        "draft": "Draft"
       },
       "contentRequired": "Please enter secret text or add a multimedia item.",
       "encryptionTitle": "End-to-end ready",
@@ -1825,7 +1826,16 @@
       "validFromDate": "Start date",
       "validFromTime": "Start time",
       "validUntilDate": "Expiry date",
-      "validUntilTime": "Expiry time"
+      "validUntilTime": "Expiry time",
+      "secretDrop": "SecretDrop",
+      "saveDraftAria": "Save as draft",
+      "draftSuccess": "SecretDrop saved as draft.",
+      "publishAction": "Publish",
+      "unpublishAction": "Withdraw publication",
+      "publishSuccess": "SecretDrop published.",
+      "publishFailed": "Could not publish SecretDrop.",
+      "unpublishSuccess": "Publication withdrawn.",
+      "unpublishFailed": "Could not withdraw publication."
     }
   },
   "errors": {

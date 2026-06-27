@@ -1,4 +1,5 @@
 import { Location } from './location';
+import { Multimedia } from './multimedia';
 
 export interface SecretDropCryptoMetadata {
   version: number;
@@ -25,6 +26,11 @@ export interface SecretDrop {
   discoveryPlusCode: string;
   hint: string;
   hintStyle?: string;
+  message?: string;
+  messageStyle?: string;
+  multimedia?: Multimedia | null;
+  publishState?: 'published' | 'draft' | 'unpublished' | 'local_only';
+  localOnly?: boolean;
   encryptedPayload?: SecretDropEncryptedPayload | string;
   crypto?: SecretDropCryptoMetadata | Record<string, unknown> | string | null;
   maxUnlocks: number | null;
@@ -56,6 +62,7 @@ export interface SecretDropCreateRequest {
   maxUnlocks: number | null;
   validFrom: number | null;
   validUntil: number | null;
+  publishState?: 'published' | 'draft' | 'unpublished';
 }
 
 export interface SecretDropCreateResponse {
@@ -86,4 +93,9 @@ export interface SecretDropDeleteResponse {
   status: number;
   deleted: boolean;
   uuid: string;
+}
+
+export interface SecretDropUpdateResponse {
+  status: number;
+  secretDrop: SecretDrop;
 }

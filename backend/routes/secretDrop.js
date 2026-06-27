@@ -199,6 +199,10 @@ router.post('/create', [
     if (validFrom !== null && validUntil !== null && validFrom > validUntil) {
       throw apiError.badRequest('invalid_validity_window');
     }
+    const publishState = normalizeString(req.body?.publishState, 32);
+    const status = publishState === 'draft' || publishState === 'unpublished'
+      ? tableSecretDrop.secretDropStatus.DISABLED
+      : tableSecretDrop.secretDropStatus.ENABLED;
 
     const drop = await tableSecretDrop.create(db, {
       uuid: crypto.randomUUID(),
@@ -214,7 +218,8 @@ router.post('/create', [
       authVerifierHash: hashAuthVerifier(authVerifier),
       maxUnlocks,
       validFrom,
-      validUntil
+      validUntil,
+      status
     });
 
     res.status(201).json({ status: 201, secretDrop: mapPublicSecretDrop(drop) });
@@ -353,6 +358,31 @@ router.delete('/delete/:uuid', security.authenticate, async (req, res, next) => 
     next(error);
   }
 });
+
+async function updateOwnerStatus(req, res, next, status) {
+  try {
+    const authUserId = getAuthUserId(req);
+    const uuid = normalizeString(req.params.uuid, 64);
+    if (!UUID_REGEX.test(uuid)) {
+      throw apiError.badRequest('invalid_secret_drop_uuid');
+    }
+    const drop = await tableSecretDrop.updateStatus(getDb(req), uuid, authUserId, status);
+    if (!drop) {
+      throw apiError.notFound('secret_drop_not_found');
+    }
+    res.status(200).json({ status: 200, secretDrop: mapPublicSecretDrop(drop) });
+  } catch (error) {
+    next(error);
+  }
+}
+
+router.post('/publish/:uuid', security.authenticate, (req, res, next) =>
+  updateOwnerStatus(req, res, next, tableSecretDrop.secretDropStatus.ENABLED)
+);
+
+router.post('/unpublish/:uuid', security.authenticate, (req, res, next) =>
+  updateOwnerStatus(req, res, next, tableSecretDrop.secretDropStatus.DISABLED)
+);
 
 async function handleReaction(req, res, next, reaction) {
   try {
