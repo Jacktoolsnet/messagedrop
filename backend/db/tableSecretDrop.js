@@ -59,7 +59,7 @@ function mapSecretDropRow(row, options = {}) {
     plusCode: row.plusCode,
     discoveryPlusCode: row.discoveryPlusCode,
     hint: row.hint || '',
-    hintStyle: row.hintStyle || '',
+    hintStyle: row.hintStyle || row.hintstyle || '',
     maxUnlocks: row.maxUnlocks === null || row.maxUnlocks === undefined ? null : Number(row.maxUnlocks),
     unlockCount: Number(row.unlockCount || 0),
     failedUnlockCount: Number(row.failedUnlockCount || 0),
@@ -192,7 +192,7 @@ const init = function (db) {
   db.exec(sql, (err) => {
     if (err) throw err;
     db.run(`ALTER TABLE ${tableName} ADD COLUMN hintStyle TEXT NOT NULL DEFAULT '';`, (alterErr) => {
-      if (alterErr && !/duplicate column/i.test(String(alterErr.message || ''))) {
+      if (alterErr && !/(duplicate column|already exists)/i.test(String(alterErr.message || ''))) {
         throw alterErr;
       }
     });
