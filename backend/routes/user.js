@@ -14,6 +14,7 @@ const tableMessage = require('../db/tableMessage');
 const tableUserModerationAppeal = require('../db/tableUserModerationAppeal');
 const { normalizeModerationReason } = require('../constants/userModerationReasons');
 const tableUsageProtection = require('../db/tableUsageProtection');
+const tableSecretDrop = require('../db/tableSecretDrop');
 const metric = require('../middleware/metric');
 const { apiError } = require('../middleware/api-error');
 const { signServiceJwt, verifyServiceJwt } = require('../utils/serviceJwt');
@@ -27,6 +28,8 @@ const MAX_RESTORE_CONTACT_ROWS = 5000;
 const MAX_RESTORE_MESSAGE_ROWS = 20000;
 const MAX_RESTORE_PLACE_ROWS = 5000;
 const MAX_RESTORE_USER_ROWS = 10000;
+const MAX_RESTORE_SECRET_DROP_ROWS = 10000;
+const MAX_RESTORE_SECRET_DROP_EVENT_ROWS = 50000;
 
 function resolveSocketIoBaseUrl() {
   return resolveBaseUrl(process.env.SOCKETIO_BASE_URL || process.env.BASE_URL, process.env.SOCKETIO_PORT);
@@ -204,7 +207,12 @@ async function buildUserBackup(db, userId) {
     likes,
     dislikes,
     connects,
-    usageProtectionRows
+    usageProtectionRows,
+    secretDrops,
+    secretDropUnlocks,
+    secretDropLikes,
+    secretDropDislikes,
+    secretDropComments
   ] = await Promise.all([
     queryGet(db, 'SELECT * FROM tableUser WHERE id = ?', [userId]),
     queryAll(db, 'SELECT * FROM tableMessage WHERE userId = ?', [userId]),
@@ -220,7 +228,32 @@ async function buildUserBackup(db, userId) {
     queryAll(db, 'SELECT * FROM tableLike WHERE likeUserId = ?', [userId]),
     queryAll(db, 'SELECT * FROM tableDislike WHERE dislikeUserId = ?', [userId]),
     queryAll(db, 'SELECT * FROM tableConnect WHERE userId = ?', [userId]),
-    queryAll(db, 'SELECT * FROM tableUsageProtection WHERE userId = ?', [userId])
+    queryAll(db, 'SELECT * FROM tableUsageProtection WHERE userId = ?', [userId]),
+    queryAll(db, 'SELECT * FROM tableSecretDrop WHERE userId = ?', [userId]),
+    queryAll(db, `
+      SELECT u.*
+      FROM tableSecretDropUnlock u
+      INNER JOIN tableSecretDrop sd ON sd.uuid = u.secretDropUuid
+      WHERE sd.userId = ? AND (u.userId = ? OR u.userId IS NULL);
+    `, [userId, userId]),
+    queryAll(db, `
+      SELECT l.*
+      FROM tableSecretDropLike l
+      INNER JOIN tableSecretDrop sd ON sd.uuid = l.secretDropUuid
+      WHERE sd.userId = ? AND l.userId = ?;
+    `, [userId, userId]),
+    queryAll(db, `
+      SELECT d.*
+      FROM tableSecretDropDislike d
+      INNER JOIN tableSecretDrop sd ON sd.uuid = d.secretDropUuid
+      WHERE sd.userId = ? AND d.userId = ?;
+    `, [userId, userId]),
+    queryAll(db, `
+      SELECT c.*
+      FROM tableSecretDropComment c
+      INNER JOIN tableSecretDrop sd ON sd.uuid = c.secretDropUuid
+      WHERE sd.userId = ? AND c.userId = ?;
+    `, [userId, userId])
   ]);
 
   return {
@@ -237,7 +270,12 @@ async function buildUserBackup(db, userId) {
       tableLike: likes,
       tableDislike: dislikes,
       tableConnect: connects,
-      tableUsageProtection: usageProtectionRows
+      tableUsageProtection: usageProtectionRows,
+      tableSecretDrop: secretDrops,
+      tableSecretDropUnlock: secretDropUnlocks,
+      tableSecretDropLike: secretDropLikes,
+      tableSecretDropDislike: secretDropDislikes,
+      tableSecretDropComment: secretDropComments
     }
   };
 }
@@ -905,6 +943,185 @@ router.patch('/internal/moderation/appeals/:appealId',
     }
   });
 
+
+function normalizeJsonText(value, maxLength = 65535) {
+  if (value === undefined || value === null) {
+    return '';
+  }
+  const serialized = typeof value === 'string' ? value : JSON.stringify(value);
+  return String(serialized || '').slice(0, maxLength);
+}
+
+function normalizeSecretDropStatus(value) {
+  const normalized = String(value || '').trim().toLowerCase();
+  return Object.values(tableSecretDrop.secretDropStatus).includes(normalized)
+    ? normalized
+    : tableSecretDrop.secretDropStatus.ENABLED;
+}
+
+function normalizeSecretDropZoomLevel(value) {
+  const numeric = Number(value);
+  if (!Number.isInteger(numeric)) {
+    return 18;
+  }
+  return Math.min(19, Math.max(12, numeric));
+}
+
+function sanitizeRestoreSecretDrops(rawSecretDrops, userId) {
+  const rows = normalizeRows(rawSecretDrops);
+  if (rows.length > MAX_RESTORE_SECRET_DROP_ROWS) {
+    throw createInvalidBackupError();
+  }
+
+  const drops = [];
+  const seenUuids = new Set();
+  rows.forEach((row) => {
+    if (!row || String(row.userId ?? '') !== userId) {
+      return;
+    }
+    const uuid = String(row.uuid ?? '').trim();
+    if (!isUuid(uuid) || seenUuids.has(uuid)) {
+      return;
+    }
+    const latitude = Number(row.latitude);
+    const longitude = Number(row.longitude);
+    if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90) {
+      return;
+    }
+    if (!Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
+      return;
+    }
+    const plusCode = normalizeText(typeof row.plusCode === 'string' && row.plusCode.trim() ? row.plusCode : 'undefined', 64).toUpperCase();
+    const discoveryPlusCode = normalizeText(
+      typeof row.discoveryPlusCode === 'string' && row.discoveryPlusCode.trim() ? row.discoveryPlusCode : plusCode,
+      64
+    ).toUpperCase();
+    const encryptedPayload = normalizeJsonText(row.encryptedPayload, 32768);
+    const cryptoMetadata = normalizeJsonText(row.crypto, 8192);
+    const authVerifierHash = normalizeText(row.authVerifierHash, 256);
+    if (!encryptedPayload || !cryptoMetadata || !authVerifierHash) {
+      return;
+    }
+    const createdAt = normalizeRestoreMessageTimestamp(row.createdAt) ?? Math.floor(Date.now() / 1000);
+    const updatedAt = normalizeRestoreMessageTimestamp(row.updatedAt) ?? createdAt;
+    const validFrom = normalizeRestoreMessageTimestamp(row.validFrom);
+    const validUntil = normalizeRestoreMessageTimestamp(row.validUntil);
+    const maxUnlocks = row.maxUnlocks === undefined || row.maxUnlocks === null || row.maxUnlocks === ''
+      ? null
+      : normalizeRestoreCounter(row.maxUnlocks) || null;
+
+    seenUuids.add(uuid);
+    drops.push({
+      uuid,
+      userId,
+      latitude,
+      longitude,
+      plusCode,
+      discoveryPlusCode,
+      discoveryZoomLevel: normalizeSecretDropZoomLevel(row.discoveryZoomLevel),
+      hint: normalizeText(row.hint, 512),
+      hintStyle: normalizeText(row.hintStyle ?? row.hintstyle, 4096),
+      encryptedPayload,
+      crypto: cryptoMetadata,
+      authVerifierHash,
+      maxUnlocks,
+      unlockCount: normalizeRestoreCounter(row.unlockCount),
+      failedUnlockCount: normalizeRestoreCounter(row.failedUnlockCount),
+      validFrom,
+      validUntil,
+      status: normalizeSecretDropStatus(row.status),
+      likes: normalizeRestoreCounter(row.likes),
+      dislikes: normalizeRestoreCounter(row.dislikes),
+      commentsNumber: normalizeRestoreCounter(row.commentsNumber),
+      createdAt,
+      updatedAt,
+      lastUnlockedAt: normalizeRestoreMessageTimestamp(row.lastUnlockedAt),
+      consumedAt: normalizeRestoreMessageTimestamp(row.consumedAt)
+    });
+  });
+  return drops;
+}
+
+function sanitizeRestoreSecretDropUnlocks(rawUnlocks, userId, secretDropUuids) {
+  const rows = normalizeRows(rawUnlocks);
+  if (rows.length > MAX_RESTORE_SECRET_DROP_EVENT_ROWS) {
+    throw createInvalidBackupError();
+  }
+  return rows
+    .map((row) => {
+      const secretDropUuid = String(row?.secretDropUuid ?? '').trim();
+      if (!isUuid(secretDropUuid) || !secretDropUuids.has(secretDropUuid)) {
+        return null;
+      }
+      const rawUserId = String(row?.userId ?? '').trim();
+      const unlockUserId = rawUserId ? (rawUserId === userId ? userId : null) : null;
+      return {
+        secretDropUuid,
+        userId: unlockUserId,
+        success: normalizeRestoreMessageBoolean(row?.success) === 1 ? 1 : 0,
+        createdAt: normalizeRestoreMessageTimestamp(row?.createdAt) ?? Math.floor(Date.now() / 1000)
+      };
+    })
+    .filter(Boolean);
+}
+
+function sanitizeRestoreSecretDropReactions(rawRows, userId, secretDropUuids) {
+  const rows = normalizeRows(rawRows);
+  if (rows.length > MAX_RESTORE_SECRET_DROP_EVENT_ROWS) {
+    throw createInvalidBackupError();
+  }
+  const seen = new Set();
+  return rows
+    .map((row) => {
+      const secretDropUuid = String(row?.secretDropUuid ?? '').trim();
+      if (!isUuid(secretDropUuid) || !secretDropUuids.has(secretDropUuid) || String(row?.userId ?? '') !== userId) {
+        return null;
+      }
+      const key = `${secretDropUuid}:${userId}`;
+      if (seen.has(key)) {
+        return null;
+      }
+      seen.add(key);
+      return {
+        secretDropUuid,
+        userId,
+        createdAt: normalizeRestoreMessageTimestamp(row?.createdAt) ?? Math.floor(Date.now() / 1000)
+      };
+    })
+    .filter(Boolean);
+}
+
+function sanitizeRestoreSecretDropComments(rawComments, userId, secretDropUuids) {
+  const rows = normalizeRows(rawComments);
+  if (rows.length > MAX_RESTORE_SECRET_DROP_EVENT_ROWS) {
+    throw createInvalidBackupError();
+  }
+  const seen = new Set();
+  return rows
+    .map((row) => {
+      const uuid = String(row?.uuid ?? '').trim();
+      const secretDropUuid = String(row?.secretDropUuid ?? '').trim();
+      if (!isUuid(uuid) || seen.has(uuid) || !isUuid(secretDropUuid) || !secretDropUuids.has(secretDropUuid) || String(row?.userId ?? '') !== userId) {
+        return null;
+      }
+      const encryptedPayload = normalizeJsonText(row?.encryptedPayload, 32768);
+      if (!encryptedPayload) {
+        return null;
+      }
+      seen.add(uuid);
+      return {
+        uuid,
+        secretDropUuid,
+        userId,
+        encryptedPayload,
+        crypto: row?.crypto === undefined || row?.crypto === null || row?.crypto === '' ? null : normalizeJsonText(row.crypto, 8192),
+        status: String(row?.status ?? '').trim().toLowerCase() === 'deleted' ? 'deleted' : 'enabled',
+        createdAt: normalizeRestoreMessageTimestamp(row?.createdAt) ?? Math.floor(Date.now() / 1000)
+      };
+    })
+    .filter(Boolean);
+}
+
 function sanitizeRestoreContacts(rawContacts, userId) {
   const rows = normalizeRows(rawContacts);
   if (rows.length > MAX_RESTORE_CONTACT_ROWS) {
@@ -1133,6 +1350,12 @@ function sanitizeBackupForRestore(backup) {
   const messages = sanitizeRestoreMessages(tables.tableMessage, userId);
   const places = sanitizeRestorePlaces(tables.tablePlace, userId);
   const usageProtection = sanitizeRestoreUsageProtection(tables.tableUsageProtection, userId);
+  const secretDrops = sanitizeRestoreSecretDrops(tables.tableSecretDrop, userId);
+  const secretDropUuids = new Set(secretDrops.map((drop) => drop.uuid));
+  const secretDropUnlocks = sanitizeRestoreSecretDropUnlocks(tables.tableSecretDropUnlock, userId, secretDropUuids);
+  const secretDropLikes = sanitizeRestoreSecretDropReactions(tables.tableSecretDropLike, userId, secretDropUuids);
+  const secretDropDislikes = sanitizeRestoreSecretDropReactions(tables.tableSecretDropDislike, userId, secretDropUuids);
+  const secretDropComments = sanitizeRestoreSecretDropComments(tables.tableSecretDropComment, userId, secretDropUuids);
 
   const rawUserRows = normalizeRows(tables.tableUser);
   const ownUserRowRaw = rawUserRows.find((row) => row && String(row.id ?? '') === userId) || {};
@@ -1167,7 +1390,12 @@ function sanitizeBackupForRestore(backup) {
       tableLike: [],
       tableDislike: [],
       tableConnect: [],
-      tableUsageProtection: usageProtection
+      tableUsageProtection: usageProtection,
+      tableSecretDrop: secretDrops,
+      tableSecretDropUnlock: secretDropUnlocks,
+      tableSecretDropLike: secretDropLikes,
+      tableSecretDropDislike: secretDropDislikes,
+      tableSecretDropComment: secretDropComments
     }
   };
 }
@@ -1308,6 +1536,38 @@ async function restoreUserBackup(db, backup) {
     'state'
   ];
 
+  const secretDropColumns = [
+    'uuid',
+    'userId',
+    'latitude',
+    'longitude',
+    'plusCode',
+    'discoveryPlusCode',
+    'discoveryZoomLevel',
+    'hint',
+    'hintStyle',
+    'encryptedPayload',
+    'crypto',
+    'authVerifierHash',
+    'maxUnlocks',
+    'unlockCount',
+    'failedUnlockCount',
+    'validFrom',
+    'validUntil',
+    'status',
+    'likes',
+    'dislikes',
+    'commentsNumber',
+    'createdAt',
+    'updatedAt',
+    'lastUnlockedAt',
+    'consumedAt'
+  ];
+
+  const secretDropUnlockColumns = ['secretDropUuid', 'userId', 'success', 'createdAt'];
+  const secretDropReactionColumns = ['secretDropUuid', 'userId', 'createdAt'];
+  const secretDropCommentColumns = ['uuid', 'secretDropUuid', 'userId', 'encryptedPayload', 'crypto', 'status', 'createdAt'];
+
   const likeColumns = ['likeMessageUuid', 'likeUserId'];
   const dislikeColumns = ['dislikeMessageUuid', 'dislikeUserId'];
 
@@ -1409,6 +1669,56 @@ async function restoreUserBackup(db, backup) {
         continue;
       }
       await insertRows(tx, 'tableDislike', dislikeColumns, [row]);
+    }
+
+    await insertRows(tx, 'tableSecretDrop', secretDropColumns, tables.tableSecretDrop);
+
+    const secretDropUnlocks = normalizeRows(tables.tableSecretDropUnlock);
+    for (const row of secretDropUnlocks) {
+      if (!row?.secretDropUuid) {
+        continue;
+      }
+      const secretDropExists = await queryGet(tx, 'SELECT 1 FROM tableSecretDrop WHERE uuid = ? LIMIT 1;', [row.secretDropUuid]);
+      if (!secretDropExists) {
+        continue;
+      }
+      await insertRows(tx, 'tableSecretDropUnlock', secretDropUnlockColumns, [row]);
+    }
+
+    const secretDropLikes = normalizeRows(tables.tableSecretDropLike);
+    for (const row of secretDropLikes) {
+      if (!row?.secretDropUuid) {
+        continue;
+      }
+      const secretDropExists = await queryGet(tx, 'SELECT 1 FROM tableSecretDrop WHERE uuid = ? LIMIT 1;', [row.secretDropUuid]);
+      if (!secretDropExists) {
+        continue;
+      }
+      await insertRows(tx, 'tableSecretDropLike', secretDropReactionColumns, [row]);
+    }
+
+    const secretDropDislikes = normalizeRows(tables.tableSecretDropDislike);
+    for (const row of secretDropDislikes) {
+      if (!row?.secretDropUuid) {
+        continue;
+      }
+      const secretDropExists = await queryGet(tx, 'SELECT 1 FROM tableSecretDrop WHERE uuid = ? LIMIT 1;', [row.secretDropUuid]);
+      if (!secretDropExists) {
+        continue;
+      }
+      await insertRows(tx, 'tableSecretDropDislike', secretDropReactionColumns, [row]);
+    }
+
+    const secretDropComments = normalizeRows(tables.tableSecretDropComment);
+    for (const row of secretDropComments) {
+      if (!row?.secretDropUuid) {
+        continue;
+      }
+      const secretDropExists = await queryGet(tx, 'SELECT 1 FROM tableSecretDrop WHERE uuid = ? LIMIT 1;', [row.secretDropUuid]);
+      if (!secretDropExists) {
+        continue;
+      }
+      await insertRows(tx, 'tableSecretDropComment', secretDropCommentColumns, [row]);
     }
 
     return restoreSummary;
