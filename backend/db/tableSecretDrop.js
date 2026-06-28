@@ -43,53 +43,6 @@ function allQuery(db, sql, params = []) {
 }
 
 
-
-async function runSchemaQueryIgnoreDuplicate(db, sql) {
-  try {
-    await runQuery(db, sql);
-  } catch (error) {
-    if (!/(duplicate column|already exists|duplicate_object|42701|42P07)/i.test(String(error?.message || error?.code || error))) {
-      throw error;
-    }
-  }
-}
-
-async function ensureCommentSchema(db) {
-  await runSchemaQueryIgnoreDuplicate(db, `ALTER TABLE ${commentTableName} ADD COLUMN parentCommentUuid TEXT DEFAULT NULL;`);
-  await runSchemaQueryIgnoreDuplicate(db, `ALTER TABLE ${commentTableName} ADD COLUMN likes INTEGER NOT NULL DEFAULT 0;`);
-  await runSchemaQueryIgnoreDuplicate(db, `ALTER TABLE ${commentTableName} ADD COLUMN dislikes INTEGER NOT NULL DEFAULT 0;`);
-  await runSchemaQueryIgnoreDuplicate(db, `ALTER TABLE ${commentTableName} ADD COLUMN commentsNumber INTEGER NOT NULL DEFAULT 0;`);
-  await runSchemaQueryIgnoreDuplicate(db, `
-    CREATE TABLE IF NOT EXISTS ${commentLikeTableName} (
-      commentUuid TEXT NOT NULL,
-      userId TEXT NOT NULL,
-      createdAt INTEGER NOT NULL DEFAULT (strftime('%s','now')),
-      PRIMARY KEY (commentUuid, userId),
-      CONSTRAINT FK_SECRET_DROP_COMMENT_LIKE_COMMENT FOREIGN KEY (commentUuid)
-        REFERENCES ${commentTableName} (uuid)
-        ON UPDATE CASCADE ON DELETE CASCADE,
-      CONSTRAINT FK_SECRET_DROP_COMMENT_LIKE_USER FOREIGN KEY (userId)
-        REFERENCES tableUser (id)
-        ON UPDATE CASCADE ON DELETE CASCADE
-    );
-  `);
-  await runSchemaQueryIgnoreDuplicate(db, `
-    CREATE TABLE IF NOT EXISTS ${commentDislikeTableName} (
-      commentUuid TEXT NOT NULL,
-      userId TEXT NOT NULL,
-      createdAt INTEGER NOT NULL DEFAULT (strftime('%s','now')),
-      PRIMARY KEY (commentUuid, userId),
-      CONSTRAINT FK_SECRET_DROP_COMMENT_DISLIKE_COMMENT FOREIGN KEY (commentUuid)
-        REFERENCES ${commentTableName} (uuid)
-        ON UPDATE CASCADE ON DELETE CASCADE,
-      CONSTRAINT FK_SECRET_DROP_COMMENT_DISLIKE_USER FOREIGN KEY (userId)
-        REFERENCES tableUser (id)
-        ON UPDATE CASCADE ON DELETE CASCADE
-    );
-  `);
-  await runSchemaQueryIgnoreDuplicate(db, `CREATE INDEX IF NOT EXISTS idx_secret_drop_comment_parent ON ${commentTableName}(parentCommentUuid, createdAt ASC);`);
-}
-
 function pickRowValue(row, ...keys) {
   for (const key of keys) {
     if (row && row[key] !== undefined) {
@@ -97,10 +50,6 @@ function pickRowValue(row, ...keys) {
     }
   }
   return undefined;
-}
-
-function numberOrDefault(value, fallback = 0) {
-  return value === null || value === undefined ? fallback : Number(value);
 }
 
 function safeJsonParse(value, fallback = null) {
@@ -164,8 +113,6 @@ function mapCommentRow(row) {
     likes: Number(pickRowValue(row, 'likes') || 0),
     dislikes: Number(pickRowValue(row, 'dislikes') || 0),
     commentsNumber: Number(pickRowValue(row, 'commentsNumber', 'commentsnumber') || 0),
-    visibility: pickRowValue(row, 'visibility') || 'public',
-    recipientUserIds: Array.isArray(row.recipientUserIds) ? row.recipientUserIds : [],
     createdAt: Number(pickRowValue(row, 'createdAt', 'createdat') || 0),
     status: row.status
   };
@@ -318,33 +265,6 @@ const init = function (db) {
   `;
   db.exec(sql, (err) => {
     if (err) throw err;
-    db.run(`ALTER TABLE ${tableName} ADD COLUMN hintStyle TEXT NOT NULL DEFAULT '';`, (alterErr) => {
-      if (alterErr && !/(duplicate column|already exists)/i.test(String(alterErr.message || ''))) {
-        throw alterErr;
-      }
-    });
-    db.run(`ALTER TABLE ${tableName} ADD COLUMN discoveryZoomLevel INTEGER NOT NULL DEFAULT 18;`, (alterErr) => {
-      if (alterErr && !/(duplicate column|already exists)/i.test(String(alterErr.message || ''))) {
-        throw alterErr;
-      }
-    });
-    db.run(`ALTER TABLE ${tableName} ADD COLUMN visibility TEXT NOT NULL DEFAULT 'public';`, (alterErr) => {
-      if (alterErr && !/(duplicate column|already exists)/i.test(String(alterErr.message || ''))) {
-        throw alterErr;
-      }
-    });
-    for (const sql of [
-      `ALTER TABLE ${commentTableName} ADD COLUMN parentCommentUuid TEXT DEFAULT NULL;`,
-      `ALTER TABLE ${commentTableName} ADD COLUMN likes INTEGER NOT NULL DEFAULT 0;`,
-      `ALTER TABLE ${commentTableName} ADD COLUMN dislikes INTEGER NOT NULL DEFAULT 0;`,
-      `ALTER TABLE ${commentTableName} ADD COLUMN commentsNumber INTEGER NOT NULL DEFAULT 0;`
-    ]) {
-      db.run(sql, (alterErr) => {
-        if (alterErr && !/(duplicate column|already exists)/i.test(String(alterErr.message || ''))) {
-          throw alterErr;
-        }
-      });
-    }
   });
 };
 
@@ -642,7 +562,6 @@ async function getReactionState(db, uuid, userId = null) {
 }
 
 async function createComment(db, comment) {
-  await ensureCommentSchema(db);
   return db.transaction(async (tx) => {
     if (comment.parentCommentUuid) {
       const parent = await getQuery(tx, `SELECT * FROM ${commentTableName} WHERE uuid = ? AND secretDropUuid = ? AND status = 'enabled' LIMIT 1;`, [comment.parentCommentUuid, comment.secretDropUuid]);
@@ -675,7 +594,6 @@ async function createComment(db, comment) {
 }
 
 async function getComments(db, uuid) {
-  await ensureCommentSchema(db);
   const rows = await allQuery(db, `
     SELECT * FROM ${commentTableName}
     WHERE secretDropUuid = ? AND status = 'enabled'
@@ -685,13 +603,11 @@ async function getComments(db, uuid) {
 }
 
 async function getCommentByUuid(db, commentUuid) {
-  await ensureCommentSchema(db);
   const row = await getQuery(db, `SELECT * FROM ${commentTableName} WHERE uuid = ? AND status = 'enabled' LIMIT 1;`, [commentUuid]);
   return mapCommentRow(row);
 }
 
 async function updateComment(db, secretDropUuid, commentUuid, userId, payload) {
-  await ensureCommentSchema(db);
   const row = await getQuery(db, `
     UPDATE ${commentTableName}
     SET encryptedPayload = ?,
@@ -706,7 +622,6 @@ async function updateComment(db, secretDropUuid, commentUuid, userId, payload) {
 }
 
 async function deleteComment(db, secretDropUuid, commentUuid, userId) {
-  await ensureCommentSchema(db);
   return db.transaction(async (tx) => {
     const comment = await getQuery(tx, `
       SELECT * FROM ${commentTableName}
@@ -778,7 +693,6 @@ async function deleteComment(db, secretDropUuid, commentUuid, userId) {
 }
 
 async function toggleCommentReaction(db, commentUuid, userId, reaction) {
-  await ensureCommentSchema(db);
   const table = reaction === 'like' ? commentLikeTableName : commentDislikeTableName;
   const opposite = reaction === 'like' ? commentDislikeTableName : commentLikeTableName;
   return db.transaction(async (tx) => {
