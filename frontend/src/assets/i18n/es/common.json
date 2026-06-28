@@ -1865,7 +1865,8 @@
       "addTitle": "Escribir comentario",
       "addSuccess": "Comentario guardado.",
       "addFailed": "No se pudo guardar el comentario.",
-      "loadFailed": "No se pudieron cargar los comentarios."
+      "loadFailed": "No se pudieron cargar los comentarios.",
+      "replyTitle": "Escribir respuesta"
     }
   },
   "errors": {

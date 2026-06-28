@@ -1874,7 +1874,8 @@
       "addTitle": "Kommentar schreiben",
       "addSuccess": "Kommentar gespeichert.",
       "addFailed": "Kommentar konnte nicht gespeichert werden.",
-      "loadFailed": "Kommentare konnten nicht geladen werden."
+      "loadFailed": "Kommentare konnten nicht geladen werden.",
+      "replyTitle": "Antwort schreiben"
     }
   },
   "errors": {

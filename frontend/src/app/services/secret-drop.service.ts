@@ -147,7 +147,7 @@ export class SecretDropService {
 
   async addComment(
     uuid: string,
-    request: Pick<SecretDropComment, 'encryptedPayload' | 'crypto'>
+    request: Pick<SecretDropComment, 'encryptedPayload' | 'crypto'> & { parentCommentUuid?: string | null }
   ): Promise<SecretDropComment> {
     const response = await firstValueFrom(
       this.http.post<SecretDropCommentCreateResponse>(
@@ -157,6 +157,21 @@ export class SecretDropService {
       )
     );
     return this.normalizeComment(response.comment);
+  }
+
+
+  async toggleCommentReaction(
+    uuid: string,
+    commentUuid: string,
+    reaction: 'like' | 'dislike'
+  ): Promise<SecretDropReactionResponse> {
+    return firstValueFrom(
+      this.http.post<SecretDropReactionResponse>(
+        `${this.baseUrl}/${encodeURIComponent(uuid)}/comments/${encodeURIComponent(commentUuid)}/${reaction}`,
+        {},
+        { headers: new HttpHeaders({ 'x-skip-ui': 'true' }) }
+      )
+    );
   }
 
   async getStats(uuid: string): Promise<SecretDropStatsResponse> {
@@ -252,6 +267,10 @@ export class SecretDropService {
       ...raw,
       encryptedPayload: this.parseJsonField(raw.encryptedPayload) as SecretDropComment['encryptedPayload'],
       crypto: this.parseJsonField(raw.crypto) as SecretDropComment['crypto'],
+      parentCommentUuid: raw.parentCommentUuid ?? null,
+      likes: Number(raw.likes ?? 0),
+      dislikes: Number(raw.dislikes ?? 0),
+      commentsNumber: Number(raw.commentsNumber ?? 0),
       createdAt: Number(raw.createdAt ?? 0)
     };
   }

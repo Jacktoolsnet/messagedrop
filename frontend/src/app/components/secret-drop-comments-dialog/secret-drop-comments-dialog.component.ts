@@ -1,20 +1,27 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, finalize } from 'rxjs';
+import { Profile } from '../../interfaces/profile';
 import { SecretDrop, SecretDropComment, SecretDropCryptoMetadata, SecretDropDecryptedContent, SecretDropEncryptedPayload } from '../../interfaces/secret-drop';
+import { ShortNumberPipe } from '../../pipes/short-number.pipe';
+import { AppService } from '../../services/app.service';
+import { DisplayMessageService } from '../../services/display-message.service';
+import { LanguageService } from '../../services/language.service';
+import { ProfileService } from '../../services/profile.service';
 import { SecretDropCryptoService } from '../../services/secret-drop-crypto.service';
 import { SecretDropService } from '../../services/secret-drop.service';
+import { SpeechService } from '../../services/speech.service';
+import { TranslateService } from '../../services/translate.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
-import { ProfileService } from '../../services/profile.service';
-import { Profile } from '../../interfaces/profile';
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
-import { DisplayMessageService } from '../../services/display-message.service';
+import { DisplayMessage } from '../utils/display-message/display-message.component';
 import { TextComponent } from '../utils/text/text.component';
 
 interface SecretDropCommentsDialogData {
@@ -37,10 +44,12 @@ interface DecryptedComment {
     CommonModule,
     DatePipe,
     DialogHeaderComponent,
+    MatBadgeModule,
     MatButtonModule,
     MatDialogActions,
     MatDialogContent,
     MatIconModule,
+    ShortNumberPipe,
     ShowmessageComponent,
     TranslocoPipe
   ],
@@ -57,10 +66,16 @@ export class SecretDropCommentsDialogComponent implements OnInit {
   private readonly snackBar = inject(DisplayMessageService);
   private readonly translation = inject(TranslationHelperService);
   private readonly userService = inject(UserService);
+  private readonly appService = inject(AppService);
+  readonly languageService = inject(LanguageService);
+  private readonly translateService = inject(TranslateService);
+  private readonly speechService = inject(SpeechService);
   readonly profileService = inject(ProfileService);
   readonly userProfile: Profile = this.userService.getProfile();
 
   readonly loading = signal(false);
+  readonly reactingUuid = signal<string | null>(null);
+  readonly translatingUuid = signal<string | null>(null);
   readonly comments = signal<DecryptedComment[]>([]);
 
   async ngOnInit(): Promise<void> {
@@ -68,9 +83,29 @@ export class SecretDropCommentsDialogComponent implements OnInit {
   }
 
   close(): void {
-    this.dialogRef.close({ commentsNumber: this.comments().length });
+    this.dialogRef.close({ commentsNumber: this.topLevelCommentCount() });
   }
 
+  topLevelCommentCount(): number {
+    return this.comments().filter((comment) => !comment.row.parentCommentUuid).length;
+  }
+
+  visibleComments(): DecryptedComment[] {
+    return [...this.comments()].sort((a, b) => Number(a.row.createdAt || 0) - Number(b.row.createdAt || 0));
+  }
+
+  commentDepth(comment: SecretDropComment): number {
+    let depth = 0;
+    let parentUuid = comment.parentCommentUuid ?? null;
+    const byUuid = new Map(this.comments().map((entry) => [entry.row.uuid, entry.row]));
+    const visited = new Set<string>();
+    while (parentUuid && !visited.has(parentUuid) && depth < 4) {
+      visited.add(parentUuid);
+      depth += 1;
+      parentUuid = byUuid.get(parentUuid)?.parentCommentUuid ?? null;
+    }
+    return depth;
+  }
 
   isOwnComment(comment: SecretDropComment): boolean {
     return String(comment.userId) === String(this.userService.getUser().id);
@@ -89,9 +124,13 @@ export class SecretDropCommentsDialogComponent implements OnInit {
       : this.profileService.getProfile(comment.userId)?.base64Avatar || '';
   }
 
-  async addComment(): Promise<void> {
+  getCommentText(comment: DecryptedComment): string {
+    return comment.row.translatedMessage ?? comment.content.message ?? '';
+  }
+
+  async addComment(parentComment?: DecryptedComment): Promise<void> {
     if (!this.userService.hasJwt()) {
-      this.userService.loginWithBackend(() => void this.addComment());
+      this.userService.loginWithBackend(() => void this.addComment(parentComment));
       return;
     }
 
@@ -100,7 +139,7 @@ export class SecretDropCommentsDialogComponent implements OnInit {
       closeOnNavigation: true,
       data: {
         text: '',
-        titleKey: 'common.secretDropComments.addTitle',
+        titleKey: parentComment ? 'common.secretDropComments.replyTitle' : 'common.secretDropComments.addTitle',
         titleIcon: 'add_comment'
       },
       hasBackdrop: true,
@@ -124,11 +163,16 @@ export class SecretDropCommentsDialogComponent implements OnInit {
       );
       const row = await this.secretDropService.addComment(this.data.drop.uuid, {
         encryptedPayload: encrypted.encryptedPayload,
-        crypto: encrypted.crypto
+        crypto: encrypted.crypto,
+        parentCommentUuid: parentComment?.row.uuid ?? null
       });
       const content = await this.decryptComment(row);
       this.comments.update((comments) => [...comments, { row, content }]);
-      this.data.drop.commentsNumber = this.comments().length;
+      if (parentComment) {
+        this.patchCommentCounts(parentComment.row.uuid, Number(parentComment.row.commentsNumber ?? 0) + 1);
+      } else {
+        this.data.drop.commentsNumber = this.topLevelCommentCount();
+      }
       this.snackBar.open(this.translation.t('common.secretDropComments.addSuccess'), undefined, {
         duration: 2500,
         verticalPosition: 'top',
@@ -145,6 +189,106 @@ export class SecretDropCommentsDialogComponent implements OnInit {
     }
   }
 
+  async toggleReaction(comment: DecryptedComment, reaction: 'like' | 'dislike'): Promise<void> {
+    if (!this.userService.hasJwt()) {
+      this.userService.loginWithBackend(() => void this.toggleReaction(comment, reaction));
+      return;
+    }
+    if (this.reactingUuid()) {
+      return;
+    }
+    this.reactingUuid.set(comment.row.uuid);
+    try {
+      const state = await this.secretDropService.toggleCommentReaction(this.data.drop.uuid, comment.row.uuid, reaction);
+      this.patchCommentReaction(comment.row.uuid, state.likes, state.dislikes);
+    } catch {
+      this.snackBar.open(this.translation.t('errors.unknown'), undefined, {
+        duration: 3000,
+        verticalPosition: 'top',
+        panelClass: 'snack-error'
+      });
+    } finally {
+      this.reactingUuid.set(null);
+    }
+  }
+
+  translateComment(comment: DecryptedComment): void {
+    const text = String(comment.content.message ?? '').trim();
+    if (!text || this.translatingUuid()) {
+      return;
+    }
+    this.translatingUuid.set(comment.row.uuid);
+    this.translateService.translate(text, this.languageService.effectiveLanguage(), false)
+      .pipe(finalize(() => this.translatingUuid.set(null)))
+      .subscribe({
+        next: (response) => {
+          const translated = response.result?.text?.trim();
+          if (translated) {
+            this.patchTranslatedComment(comment.row.uuid, translated);
+          }
+        },
+        error: (error) => {
+          const message = this.translateService.getErrorMessage(error)
+            ?? this.translation.t('common.messageList.translateFailed');
+          this.snackBar.open(message, undefined, { duration: 3000, verticalPosition: 'top', panelClass: 'snack-error' });
+        }
+      });
+  }
+
+  toggleReadAloud(comment: DecryptedComment): void {
+    if (!this.speechService.supported()) {
+      this.showReadAloudHint('common.messageList.readAloudUnsupported');
+      return;
+    }
+    if (!this.appService.getAppSettings().speech?.enabled) {
+      this.showReadAloudHint('common.messageList.readAloudDisabled');
+      return;
+    }
+    const text = this.getCommentText(comment).trim();
+    if (!text) {
+      return;
+    }
+    this.speechService.toggle({
+      targetId: this.getSpeechTargetId(comment),
+      text,
+      lang: comment.row.translatedMessage ? this.languageService.effectiveLanguage() : undefined
+    });
+  }
+
+  getReadAloudIcon(comment: DecryptedComment): string {
+    return this.speechService.isActive(this.getSpeechTargetId(comment)) ? 'stop' : 'volume_up';
+  }
+
+  getReadAloudLabel(comment: DecryptedComment): string {
+    return this.translation.t(
+      this.speechService.isActive(this.getSpeechTargetId(comment))
+        ? 'common.messageList.stopReadAloud'
+        : 'common.messageList.readAloud'
+    );
+  }
+
+  private getSpeechTargetId(comment: DecryptedComment): string {
+    return `secret-drop-comment:${comment.row.uuid}`;
+  }
+
+  private patchCommentReaction(uuid: string, likes: number, dislikes: number): void {
+    this.comments.update((comments) => comments.map((comment) => comment.row.uuid === uuid
+      ? { ...comment, row: { ...comment.row, likes, dislikes } }
+      : comment));
+  }
+
+  private patchCommentCounts(uuid: string, commentsNumber: number): void {
+    this.comments.update((comments) => comments.map((comment) => comment.row.uuid === uuid
+      ? { ...comment, row: { ...comment.row, commentsNumber } }
+      : comment));
+  }
+
+  private patchTranslatedComment(uuid: string, translatedMessage: string): void {
+    this.comments.update((comments) => comments.map((comment) => comment.row.uuid === uuid
+      ? { ...comment, row: { ...comment.row, translatedMessage } }
+      : comment));
+  }
+
   private async loadComments(): Promise<void> {
     this.loading.set(true);
     try {
@@ -158,7 +302,7 @@ export class SecretDropCommentsDialogComponent implements OnInit {
         }
       }
       this.comments.set(decrypted);
-      this.data.drop.commentsNumber = decrypted.length;
+      this.data.drop.commentsNumber = this.topLevelCommentCount();
     } catch {
       this.snackBar.open(this.translation.t('common.secretDropComments.loadFailed'), undefined, {
         duration: 3000,
@@ -177,6 +321,29 @@ export class SecretDropCommentsDialogComponent implements OnInit {
       throw new Error('invalid_comment_payload');
     }
     return this.cryptoService.decryptSecret(encryptedPayload, cryptoMetadata, this.data.pin);
+  }
+
+  private showReadAloudHint(messageKey: string): void {
+    this.dialog.open(DisplayMessage, {
+      closeOnNavigation: false,
+      data: {
+        showAlways: true,
+        title: this.translation.t('common.messageList.readAloud'),
+        image: '',
+        icon: 'record_voice_over',
+        message: this.translation.t(messageKey),
+        button: this.translation.t('common.actions.ok'),
+        delay: 0,
+        showSpinner: false,
+        autoclose: false
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
   }
 
   private asCryptoMetadata(value: unknown): SecretDropCryptoMetadata | null {

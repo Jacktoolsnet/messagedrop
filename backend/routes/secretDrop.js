@@ -562,18 +562,54 @@ router.post('/:uuid/comments', [
     const cryptoMetadata = req.body?.crypto === undefined || req.body?.crypto === null
       ? null
       : serializeJsonField(req.body.crypto, 'crypto', MAX_CRYPTO_METADATA_LENGTH);
+    const parentCommentUuid = normalizeString(req.body?.parentCommentUuid, 64);
+    if (parentCommentUuid && !UUID_REGEX.test(parentCommentUuid)) {
+      throw apiError.badRequest('invalid_secret_drop_comment_uuid');
+    }
     const comment = await tableSecretDrop.createComment(getDb(req), {
       uuid: crypto.randomUUID(),
       secretDropUuid: uuid,
       userId,
       encryptedPayload,
-      crypto: cryptoMetadata
+      crypto: cryptoMetadata,
+      parentCommentUuid: parentCommentUuid || null
     });
     res.status(201).json({ status: 201, comment });
   } catch (error) {
     next(error);
   }
 });
+
+
+async function handleCommentReaction(req, res, next, reaction) {
+  try {
+    const uuid = normalizeString(req.params.uuid, 64);
+    const commentUuid = normalizeString(req.params.commentUuid, 64);
+    if (!UUID_REGEX.test(uuid) || !UUID_REGEX.test(commentUuid)) {
+      throw apiError.badRequest('invalid_secret_drop_comment_uuid');
+    }
+    const userId = getAuthUserId(req);
+    await ensureOwnerOrUnlocked(getDb(req), uuid, userId);
+    const comment = await tableSecretDrop.getCommentByUuid(getDb(req), commentUuid);
+    if (!comment || comment.secretDropUuid !== uuid) {
+      throw apiError.notFound('secret_drop_comment_not_found');
+    }
+    const state = await tableSecretDrop.toggleCommentReaction(getDb(req), commentUuid, userId, reaction);
+    res.status(200).json({ status: 200, uuid: commentUuid, ...state });
+  } catch (error) {
+    next(error);
+  }
+}
+
+router.post('/:uuid/comments/:commentUuid/like', [
+  security.authenticate,
+  express.json({ type: 'application/json', limit: '4kb' })
+], (req, res, next) => handleCommentReaction(req, res, next, 'like'));
+
+router.post('/:uuid/comments/:commentUuid/dislike', [
+  security.authenticate,
+  express.json({ type: 'application/json', limit: '4kb' })
+], (req, res, next) => handleCommentReaction(req, res, next, 'dislike'));
 
 router.get('/:uuid/comments', security.authenticate, async (req, res, next) => {
   try {

@@ -3,6 +3,8 @@ const unlockTableName = 'tableSecretDropUnlock';
 const likeTableName = 'tableSecretDropLike';
 const dislikeTableName = 'tableSecretDropDislike';
 const commentTableName = 'tableSecretDropComment';
+const commentLikeTableName = 'tableSecretDropCommentLike';
+const commentDislikeTableName = 'tableSecretDropCommentDislike';
 const hintTranslationTableName = 'tableSecretDropHintTranslation';
 
 const secretDropStatus = {
@@ -39,6 +41,53 @@ function allQuery(db, sql, params = []) {
   });
 }
 
+
+
+async function runSchemaQueryIgnoreDuplicate(db, sql) {
+  try {
+    await runQuery(db, sql);
+  } catch (error) {
+    if (!/(duplicate column|already exists|duplicate_object|42701|42P07)/i.test(String(error?.message || error?.code || error))) {
+      throw error;
+    }
+  }
+}
+
+async function ensureCommentSchema(db) {
+  await runSchemaQueryIgnoreDuplicate(db, `ALTER TABLE ${commentTableName} ADD COLUMN parentCommentUuid TEXT DEFAULT NULL;`);
+  await runSchemaQueryIgnoreDuplicate(db, `ALTER TABLE ${commentTableName} ADD COLUMN likes INTEGER NOT NULL DEFAULT 0;`);
+  await runSchemaQueryIgnoreDuplicate(db, `ALTER TABLE ${commentTableName} ADD COLUMN dislikes INTEGER NOT NULL DEFAULT 0;`);
+  await runSchemaQueryIgnoreDuplicate(db, `ALTER TABLE ${commentTableName} ADD COLUMN commentsNumber INTEGER NOT NULL DEFAULT 0;`);
+  await runSchemaQueryIgnoreDuplicate(db, `
+    CREATE TABLE IF NOT EXISTS ${commentLikeTableName} (
+      commentUuid TEXT NOT NULL,
+      userId TEXT NOT NULL,
+      createdAt INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+      PRIMARY KEY (commentUuid, userId),
+      CONSTRAINT FK_SECRET_DROP_COMMENT_LIKE_COMMENT FOREIGN KEY (commentUuid)
+        REFERENCES ${commentTableName} (uuid)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+      CONSTRAINT FK_SECRET_DROP_COMMENT_LIKE_USER FOREIGN KEY (userId)
+        REFERENCES tableUser (id)
+        ON UPDATE CASCADE ON DELETE CASCADE
+    );
+  `);
+  await runSchemaQueryIgnoreDuplicate(db, `
+    CREATE TABLE IF NOT EXISTS ${commentDislikeTableName} (
+      commentUuid TEXT NOT NULL,
+      userId TEXT NOT NULL,
+      createdAt INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+      PRIMARY KEY (commentUuid, userId),
+      CONSTRAINT FK_SECRET_DROP_COMMENT_DISLIKE_COMMENT FOREIGN KEY (commentUuid)
+        REFERENCES ${commentTableName} (uuid)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+      CONSTRAINT FK_SECRET_DROP_COMMENT_DISLIKE_USER FOREIGN KEY (userId)
+        REFERENCES tableUser (id)
+        ON UPDATE CASCADE ON DELETE CASCADE
+    );
+  `);
+  await runSchemaQueryIgnoreDuplicate(db, `CREATE INDEX IF NOT EXISTS idx_secret_drop_comment_parent ON ${commentTableName}(parentCommentUuid, createdAt ASC);`);
+}
 
 function pickRowValue(row, ...keys) {
   for (const key of keys) {
@@ -108,6 +157,10 @@ function mapCommentRow(row) {
     userId: row.userId,
     encryptedPayload: safeJsonParse(pickRowValue(row, 'encryptedPayload', 'encryptedpayload'), pickRowValue(row, 'encryptedPayload', 'encryptedpayload')),
     crypto: safeJsonParse(pickRowValue(row, 'crypto'), null),
+    parentCommentUuid: pickRowValue(row, 'parentCommentUuid', 'parentcommentuuid') || null,
+    likes: Number(pickRowValue(row, 'likes') || 0),
+    dislikes: Number(pickRowValue(row, 'dislikes') || 0),
+    commentsNumber: Number(pickRowValue(row, 'commentsNumber', 'commentsnumber') || 0),
     createdAt: Number(pickRowValue(row, 'createdAt', 'createdat') || 0),
     status: row.status
   };
@@ -194,12 +247,45 @@ const init = function (db) {
       userId TEXT NOT NULL,
       encryptedPayload TEXT NOT NULL,
       crypto TEXT DEFAULT NULL,
+      parentCommentUuid TEXT DEFAULT NULL,
+      likes INTEGER NOT NULL DEFAULT 0,
+      dislikes INTEGER NOT NULL DEFAULT 0,
+      commentsNumber INTEGER NOT NULL DEFAULT 0,
       status TEXT NOT NULL DEFAULT 'enabled',
       createdAt INTEGER NOT NULL DEFAULT (strftime('%s','now')),
       CONSTRAINT FK_SECRET_DROP_COMMENT_DROP FOREIGN KEY (secretDropUuid)
         REFERENCES ${tableName} (uuid)
         ON UPDATE CASCADE ON DELETE CASCADE,
       CONSTRAINT FK_SECRET_DROP_COMMENT_USER FOREIGN KEY (userId)
+        REFERENCES tableUser (id)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+      CONSTRAINT FK_SECRET_DROP_COMMENT_PARENT FOREIGN KEY (parentCommentUuid)
+        REFERENCES ${commentTableName} (uuid)
+        ON UPDATE CASCADE ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS ${commentLikeTableName} (
+      commentUuid TEXT NOT NULL,
+      userId TEXT NOT NULL,
+      createdAt INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+      PRIMARY KEY (commentUuid, userId),
+      CONSTRAINT FK_SECRET_DROP_COMMENT_LIKE_COMMENT FOREIGN KEY (commentUuid)
+        REFERENCES ${commentTableName} (uuid)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+      CONSTRAINT FK_SECRET_DROP_COMMENT_LIKE_USER FOREIGN KEY (userId)
+        REFERENCES tableUser (id)
+        ON UPDATE CASCADE ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS ${commentDislikeTableName} (
+      commentUuid TEXT NOT NULL,
+      userId TEXT NOT NULL,
+      createdAt INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+      PRIMARY KEY (commentUuid, userId),
+      CONSTRAINT FK_SECRET_DROP_COMMENT_DISLIKE_COMMENT FOREIGN KEY (commentUuid)
+        REFERENCES ${commentTableName} (uuid)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+      CONSTRAINT FK_SECRET_DROP_COMMENT_DISLIKE_USER FOREIGN KEY (userId)
         REFERENCES tableUser (id)
         ON UPDATE CASCADE ON DELETE CASCADE
     );
@@ -208,6 +294,7 @@ const init = function (db) {
     CREATE INDEX IF NOT EXISTS idx_secret_drop_owner ON ${tableName}(userId, createdAt DESC);
     CREATE INDEX IF NOT EXISTS idx_secret_drop_unlock_user ON ${unlockTableName}(secretDropUuid, userId, success);
     CREATE INDEX IF NOT EXISTS idx_secret_drop_comment_drop ON ${commentTableName}(secretDropUuid, createdAt ASC);
+    CREATE INDEX IF NOT EXISTS idx_secret_drop_comment_parent ON ${commentTableName}(parentCommentUuid, createdAt ASC);
   `;
   db.exec(sql, (err) => {
     if (err) throw err;
@@ -221,6 +308,18 @@ const init = function (db) {
         throw alterErr;
       }
     });
+    for (const sql of [
+      `ALTER TABLE ${commentTableName} ADD COLUMN parentCommentUuid TEXT DEFAULT NULL;`,
+      `ALTER TABLE ${commentTableName} ADD COLUMN likes INTEGER NOT NULL DEFAULT 0;`,
+      `ALTER TABLE ${commentTableName} ADD COLUMN dislikes INTEGER NOT NULL DEFAULT 0;`,
+      `ALTER TABLE ${commentTableName} ADD COLUMN commentsNumber INTEGER NOT NULL DEFAULT 0;`
+    ]) {
+      db.run(sql, (alterErr) => {
+        if (alterErr && !/(duplicate column|already exists)/i.test(String(alterErr.message || ''))) {
+          throw alterErr;
+        }
+      });
+    }
   });
 };
 
@@ -462,28 +561,78 @@ async function getReactionState(db, uuid, userId = null) {
 }
 
 async function createComment(db, comment) {
+  await ensureCommentSchema(db);
   return db.transaction(async (tx) => {
+    if (comment.parentCommentUuid) {
+      const parent = await getQuery(tx, `SELECT * FROM ${commentTableName} WHERE uuid = ? AND secretDropUuid = ? AND status = 'enabled' LIMIT 1;`, [comment.parentCommentUuid, comment.secretDropUuid]);
+      if (!parent) {
+        const error = new Error('secret_drop_comment_parent_not_found');
+        error.status = 404;
+        throw error;
+      }
+    }
     await runQuery(tx, `
-      INSERT INTO ${commentTableName} (uuid, secretDropUuid, userId, encryptedPayload, crypto)
-      VALUES (?, ?, ?, ?, ?);
-    `, [comment.uuid, comment.secretDropUuid, comment.userId, comment.encryptedPayload, comment.crypto || null]);
-    await runQuery(tx, `
-      UPDATE ${tableName}
-      SET commentsNumber = commentsNumber + 1, updatedAt = strftime('%s','now')
-      WHERE uuid = ?;
-    `, [comment.secretDropUuid]);
+      INSERT INTO ${commentTableName} (uuid, secretDropUuid, userId, encryptedPayload, crypto, parentCommentUuid)
+      VALUES (?, ?, ?, ?, ?, ?);
+    `, [comment.uuid, comment.secretDropUuid, comment.userId, comment.encryptedPayload, comment.crypto || null, comment.parentCommentUuid || null]);
+    if (comment.parentCommentUuid) {
+      await runQuery(tx, `
+        UPDATE ${commentTableName}
+        SET commentsNumber = commentsNumber + 1
+        WHERE uuid = ?;
+      `, [comment.parentCommentUuid]);
+    } else {
+      await runQuery(tx, `
+        UPDATE ${tableName}
+        SET commentsNumber = commentsNumber + 1, updatedAt = strftime('%s','now')
+        WHERE uuid = ?;
+      `, [comment.secretDropUuid]);
+    }
     const row = await getQuery(tx, `SELECT * FROM ${commentTableName} WHERE uuid = ? LIMIT 1;`, [comment.uuid]);
     return mapCommentRow(row);
   });
 }
 
 async function getComments(db, uuid) {
+  await ensureCommentSchema(db);
   const rows = await allQuery(db, `
     SELECT * FROM ${commentTableName}
     WHERE secretDropUuid = ? AND status = 'enabled'
     ORDER BY createdAt ASC;
   `, [uuid]);
   return rows.map(mapCommentRow);
+}
+
+async function getCommentByUuid(db, commentUuid) {
+  await ensureCommentSchema(db);
+  const row = await getQuery(db, `SELECT * FROM ${commentTableName} WHERE uuid = ? AND status = 'enabled' LIMIT 1;`, [commentUuid]);
+  return mapCommentRow(row);
+}
+
+async function toggleCommentReaction(db, commentUuid, userId, reaction) {
+  await ensureCommentSchema(db);
+  const table = reaction === 'like' ? commentLikeTableName : commentDislikeTableName;
+  const opposite = reaction === 'like' ? commentDislikeTableName : commentLikeTableName;
+  return db.transaction(async (tx) => {
+    const comment = await getQuery(tx, `SELECT * FROM ${commentTableName} WHERE uuid = ? AND status = 'enabled' LIMIT 1;`, [commentUuid]);
+    if (!comment) {
+      const error = new Error('secret_drop_comment_not_found');
+      error.status = 404;
+      throw error;
+    }
+    const deleted = await runQuery(tx, `DELETE FROM ${table} WHERE commentUuid = ? AND userId = ?;`, [commentUuid, userId]);
+    if (Number(deleted.changes || 0) === 0) {
+      await runQuery(tx, `DELETE FROM ${opposite} WHERE commentUuid = ? AND userId = ?;`, [commentUuid, userId]);
+      await runQuery(tx, `INSERT INTO ${table} (commentUuid, userId) VALUES (?, ?) ON CONFLICT(commentUuid, userId) DO NOTHING;`, [commentUuid, userId]);
+    }
+    const counts = await getQuery(tx, `
+      SELECT
+        (SELECT COUNT(*) FROM ${commentLikeTableName} WHERE commentUuid = ?) AS likes,
+        (SELECT COUNT(*) FROM ${commentDislikeTableName} WHERE commentUuid = ?) AS dislikes;
+    `, [commentUuid, commentUuid]);
+    await runQuery(tx, `UPDATE ${commentTableName} SET likes = ?, dislikes = ? WHERE uuid = ?;`, [counts.likes || 0, counts.dislikes || 0, commentUuid]);
+    return { likes: Number(counts.likes || 0), dislikes: Number(counts.dislikes || 0) };
+  });
 }
 
 module.exports = {
@@ -503,6 +652,8 @@ module.exports = {
   getReactionState,
   createComment,
   getComments,
+  getCommentByUuid,
+  toggleCommentReaction,
   secretDropStatus,
   mapSecretDropRow
 };

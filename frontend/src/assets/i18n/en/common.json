@@ -1874,7 +1874,8 @@
       "addTitle": "Write comment",
       "addSuccess": "Comment saved.",
       "addFailed": "Comment could not be saved.",
-      "loadFailed": "Comments could not be loaded."
+      "loadFailed": "Comments could not be loaded.",
+      "replyTitle": "Write reply"
     }
   },
   "errors": {

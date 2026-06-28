@@ -56,6 +56,11 @@ export interface SecretDropComment {
   userId: string;
   encryptedPayload: SecretDropEncryptedPayload | string;
   crypto: SecretDropCryptoMetadata | Record<string, unknown> | string | null;
+  parentCommentUuid?: string | null;
+  likes: number;
+  dislikes: number;
+  commentsNumber: number;
+  translatedMessage?: string;
   createdAt: number;
   status: 'enabled' | 'deleted' | string;
 }

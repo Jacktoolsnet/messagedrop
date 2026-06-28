@@ -1865,7 +1865,8 @@
       "addTitle": "Écrire un commentaire",
       "addSuccess": "Commentaire enregistré.",
       "addFailed": "Le commentaire n’a pas pu être enregistré.",
-      "loadFailed": "Les commentaires n’ont pas pu être chargés."
+      "loadFailed": "Les commentaires n’ont pas pu être chargés.",
+      "replyTitle": "Écrire une réponse"
     }
   },
   "errors": {
