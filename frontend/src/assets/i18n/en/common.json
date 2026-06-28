@@ -132,7 +132,10 @@
       "searchExperiences": "Search experiences",
       "searchHashtags": "Search hashtags",
       "secretDrop": "SecretDrop",
-      "mySecretDrops": "My SecretDrops"
+      "mySecretDrops": "My SecretDrops",
+      "contents": "Create content",
+      "settings": "Settings",
+      "legal": "Legal"
     },
     "hashtags": {
       "label": "Hashtags",

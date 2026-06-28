@@ -132,7 +132,10 @@
       "searchExperiences": "Erlebnisse suchen",
       "searchHashtags": "Hashtags suchen",
       "secretDrop": "GeheimnisDrop",
-      "mySecretDrops": "Meine GeheimnisDrops"
+      "mySecretDrops": "Meine GeheimnisDrops",
+      "contents": "Inhalte erstellen",
+      "settings": "Einstellungen",
+      "legal": "Rechtliches"
     },
     "hashtags": {
       "label": "Hashtags",

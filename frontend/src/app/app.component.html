@@ -101,7 +101,7 @@
 <mat-menu #userMenu="matMenu">
     @if (userService.isReady()) {
     <button mat-menu-item (click)="logout()">
-        <mat-icon>password</mat-icon>
+        <mat-icon>lock</mat-icon>
         <span>{{ 'common.menu.logout' | transloco }}</span>
     </button>
     }
@@ -197,84 +197,7 @@
     </button>
 </mat-menu>
 
-@if (powService.solving()) {
-<div class="pow-overlay" role="status" aria-live="polite">
-    <div class="pow-dialog">
-        <mat-progress-spinner diameter="32" mode="indeterminate"></mat-progress-spinner>
-        <div class="pow-text">{{ 'common.powSolving' | transloco }}</div>
-    </div>
-</div>
-}
-
-<mat-menu #appMenu="matMenu">
-    @if (!userService.isAccountBlocked()) {
-    <button mat-menu-item (click)="editAppSettings()">
-        <mat-icon>settings_applications</mat-icon>
-        <span>{{ 'common.menu.appSettings' | transloco }}</span>
-    </button>
-    <button mat-menu-item (click)="openUsageProtectionSettings()">
-        <mat-icon>timer</mat-icon>
-        <span>{{ 'common.menu.usageProtectionSettings' | transloco }}</span>
-    </button>
-    <button mat-menu-item (click)="openSearchSettings()">
-        <mat-icon>manage_search</mat-icon>
-        <span>{{ 'common.menu.searchSettings' | transloco }}</span>
-    </button>
-    <button mat-menu-item (click)="editExternalContentSettings()">
-        <mat-icon>public</mat-icon>
-        <span>{{ 'common.menu.externalContentSettings' | transloco }}</span>
-    </button>
-    @if (restoreBackupAvailable()) {
-    <button mat-menu-item (click)="startRestore()">
-        <mat-icon>restore</mat-icon>
-        <span>{{ 'common.menu.restoreBackup' | transloco }}</span>
-    </button>
-    }
-    }
-    <button mat-menu-item (click)="openFaqPage()">
-        <mat-icon>quiz</mat-icon>
-        <span>{{ 'common.menu.faq' | transloco }}</span>
-    </button>
-    <button mat-menu-item (click)="showTermsOfService()">
-        <mat-icon>rule</mat-icon>
-        <span>{{ 'common.menu.termsOfService' | transloco }}</span>
-    </button>
-    <button mat-menu-item (click)="showPrivacyPolicy()">
-        <mat-icon>privacy_tip</mat-icon>
-        <span>{{ 'common.menu.privacyPolicy' | transloco }}</span>
-    </button>
-    <button mat-menu-item (click)="showDisclaimer()">
-        <mat-icon>policy</mat-icon>
-        <span>{{ 'common.menu.disclaimer' | transloco }}</span>
-    </button>
-    <button mat-menu-item (click)="showLegalNotice()">
-        <mat-icon>gavel</mat-icon>
-        <span>{{ 'common.menu.imprintLegalNotice' | transloco }}</span>
-    </button>
-    <button mat-menu-item (click)="showLicenses()">
-        <mat-icon>receipt_long</mat-icon>
-        <span>{{ 'common.menu.thirdPartyLicenses' | transloco }}</span>
-    </button>
-    <button mat-menu-item (click)="openAppMenuHelp()">
-        <mat-icon>help</mat-icon>
-        <span>{{ 'common.actions.help' | transloco }}</span>
-    </button>
-</mat-menu>
-
-<mat-menu #messageMenu="matMenu">
-    <button mat-menu-item (click)="getCurrentPosition()">
-        <mat-icon [attr.aria-hidden]="locationReady">my_location</mat-icon>
-        <span>{{ 'common.menu.locateMe' | transloco }}</span>
-    </button>
-    <button mat-menu-item (click)="shareSelectedLocation()">
-        <mat-icon>share_location</mat-icon>
-        <span>{{ 'common.menu.shareLocation' | transloco }}</span>
-    </button>
-    <button mat-menu-item (click)="openSelectedLocationInMaps()">
-        <mat-icon>directions</mat-icon>
-        <span>{{ 'common.menu.openLocationInMaps' | transloco }}</span>
-    </button>
-
+<mat-menu #createContentMenu="matMenu">
     @if (!userService.isReady() || userService.hasJwt()) {
     <button mat-menu-item
         (click)="!userService.isReady() ? userService.loginWithBackend(openMessagDialog.bind(this)) : openMessagDialog()">
@@ -324,6 +247,100 @@
         }
         <span>{{ 'common.menu.privateDocument' | transloco }}</span>
     </button>
+</mat-menu>
+
+@if (powService.solving()) {
+<div class="pow-overlay" role="status" aria-live="polite">
+    <div class="pow-dialog">
+        <mat-progress-spinner diameter="32" mode="indeterminate"></mat-progress-spinner>
+        <div class="pow-text">{{ 'common.powSolving' | transloco }}</div>
+    </div>
+</div>
+}
+
+<mat-menu #appMenu="matMenu">
+    @if (!userService.isAccountBlocked()) {
+    <button mat-menu-item [matMenuTriggerFor]="appSettingsMenu">
+        <mat-icon>settings_applications</mat-icon>
+        <span>{{ 'common.menu.settings' | transloco }}</span>
+    </button>
+    }
+    <button mat-menu-item [matMenuTriggerFor]="legalMenu">
+        <mat-icon>gavel</mat-icon>
+        <span>{{ 'common.menu.legal' | transloco }}</span>
+    </button>
+    <button mat-menu-item (click)="openFaqPage()">
+        <mat-icon>quiz</mat-icon>
+        <span>{{ 'common.menu.faq' | transloco }}</span>
+    </button>
+    <button mat-menu-item (click)="openAppMenuHelp()">
+        <mat-icon>help</mat-icon>
+        <span>{{ 'common.actions.help' | transloco }}</span>
+    </button>
+</mat-menu>
+
+<mat-menu #appSettingsMenu="matMenu">
+    <button mat-menu-item (click)="editAppSettings()">
+        <mat-icon>settings_applications</mat-icon>
+        <span>{{ 'common.menu.appSettings' | transloco }}</span>
+    </button>
+    <button mat-menu-item (click)="openUsageProtectionSettings()">
+        <mat-icon>timer</mat-icon>
+        <span>{{ 'common.menu.usageProtectionSettings' | transloco }}</span>
+    </button>
+    <button mat-menu-item (click)="openSearchSettings()">
+        <mat-icon>manage_search</mat-icon>
+        <span>{{ 'common.menu.searchSettings' | transloco }}</span>
+    </button>
+    <button mat-menu-item (click)="editExternalContentSettings()">
+        <mat-icon>public</mat-icon>
+        <span>{{ 'common.menu.externalContentSettings' | transloco }}</span>
+    </button>
+    @if (restoreBackupAvailable()) {
+    <button mat-menu-item (click)="startRestore()">
+        <mat-icon>restore</mat-icon>
+        <span>{{ 'common.menu.restoreBackup' | transloco }}</span>
+    </button>
+    }
+</mat-menu>
+
+<mat-menu #legalMenu="matMenu">
+    <button mat-menu-item (click)="showTermsOfService()">
+        <mat-icon>rule</mat-icon>
+        <span>{{ 'common.menu.termsOfService' | transloco }}</span>
+    </button>
+    <button mat-menu-item (click)="showPrivacyPolicy()">
+        <mat-icon>privacy_tip</mat-icon>
+        <span>{{ 'common.menu.privacyPolicy' | transloco }}</span>
+    </button>
+    <button mat-menu-item (click)="showDisclaimer()">
+        <mat-icon>policy</mat-icon>
+        <span>{{ 'common.menu.disclaimer' | transloco }}</span>
+    </button>
+    <button mat-menu-item (click)="showLegalNotice()">
+        <mat-icon>gavel</mat-icon>
+        <span>{{ 'common.menu.imprintLegalNotice' | transloco }}</span>
+    </button>
+    <button mat-menu-item (click)="showLicenses()">
+        <mat-icon>receipt_long</mat-icon>
+        <span>{{ 'common.menu.thirdPartyLicenses' | transloco }}</span>
+    </button>
+</mat-menu>
+
+<mat-menu #messageMenu="matMenu">
+    <button mat-menu-item (click)="getCurrentPosition()">
+        <mat-icon [attr.aria-hidden]="locationReady">my_location</mat-icon>
+        <span>{{ 'common.menu.locateMe' | transloco }}</span>
+    </button>
+    <button mat-menu-item (click)="shareSelectedLocation()">
+        <mat-icon>share_location</mat-icon>
+        <span>{{ 'common.menu.shareLocation' | transloco }}</span>
+    </button>
+    <button mat-menu-item (click)="openSelectedLocationInMaps()">
+        <mat-icon>directions</mat-icon>
+        <span>{{ 'common.menu.openLocationInMaps' | transloco }}</span>
+    </button>
+
     @if (!userService.isReady() || userService.hasJwt()) {
     <!--button mat-menu-item
         (click)="!userService.isReady() ? userService.loginWithBackend(openContactListDialog.bind(this)) : openContactListDialog()">
@@ -348,6 +365,10 @@
     </button>
     }
 
+    <button mat-menu-item [matMenuTriggerFor]="createContentMenu">
+        <mat-icon>category</mat-icon>
+        <span>{{ 'common.menu.contents' | transloco }}</span>
+    </button>
     <!--button mat-menu-item (click)="showGeoStatistic()">
         <mat-icon >data_exploration</mat-icon>
         <span>Statistic</span>
