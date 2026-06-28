@@ -1400,14 +1400,18 @@ export class AppComponent implements OnInit {
         next: (position) => {
           dialogRef.close();
           this.locationReady = true;
-          this.userService.getUser().location.latitude = position.coords.latitude;
-          this.userService.getUser().location.longitude = position.coords.longitude;
-          this.userService.getUser().location.plusCode = this.geolocationService.getPlusCode(position.coords.latitude, position.coords.longitude)
+          const locatedLocation = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            plusCode: this.geolocationService.getPlusCode(position.coords.latitude, position.coords.longitude)
+          };
+          this.userService.getUser().location = locatedLocation;
           if (this.userService.isReady()) {
             this.userService.saveUser();
           }
-          this.mapService.moveToWithZoom(this.userService.getUser().location, 17);
+          this.mapService.moveToWithZoom(locatedLocation, 19);
           this.updateDataForLocation();
+          void this.discoverSecretDropsAt(locatedLocation);
         },
         error: (error) => {
           dialogRef.close();
