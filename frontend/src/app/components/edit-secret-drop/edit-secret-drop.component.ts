@@ -119,6 +119,7 @@ export class EditSecretDropComponent {
     this.validUntilDate = drop.validUntil ? new Date(drop.validUntil * 1000) : null;
     this.validUntilTime = drop.validUntil ? new Date(drop.validUntil * 1000) : null;
     this.multimedia = drop.multimedia ?? this.emptyMultimedia();
+    this.pin = typeof drop.localSecretPin === 'string' ? drop.localSecretPin : '';
   }
 
   get hasMultimedia(): boolean {
@@ -263,6 +264,7 @@ export class EditSecretDropComponent {
       message: this.message.trim(),
       messageStyle: this.messageStyle,
       multimedia: this.hasMultimedia ? this.multimedia : null,
+      localSecretPin: this.pin || this.data.secretDrop?.localSecretPin || null,
       maxUnlocks: this.oneTime ? 1 : null,
       unlockCount: this.data.secretDrop?.unlockCount ?? 0,
       failedUnlockCount: this.data.secretDrop?.failedUnlockCount ?? 0,
@@ -290,6 +292,7 @@ export class EditSecretDropComponent {
       message: this.message.trim(),
       messageStyle: this.messageStyle,
       multimedia: this.hasMultimedia ? this.multimedia : null,
+      localSecretPin: this.pin || this.data.secretDrop?.localSecretPin || null,
       discoveryZoomLevel: this.clampDiscoveryZoomLevel(this.discoveryZoomLevel),
       hint: this.hint.trim(),
       hintStyle: this.hintStyle,

@@ -165,7 +165,7 @@ export class MySecretDropListComponent implements OnInit {
     if (drop.commentsNumber <= 0) {
       return;
     }
-    const pin = await this.openCheckPinDialog();
+    const pin = drop.localSecretPin || await this.openCheckPinDialog();
     if (!pin) {
       return;
     }
@@ -358,7 +358,7 @@ export class MySecretDropListComponent implements OnInit {
   private async republishExistingDrop(drop: SecretDrop): Promise<void> {
     const userId = this.userService.getUser().id;
     await this.ensureContentAllowedForPublishing(drop);
-    const pin = await this.openPinDialog();
+    const pin = drop.localSecretPin || await this.openPinDialog();
     if (!pin) {
       return;
     }
@@ -389,7 +389,13 @@ export class MySecretDropListComponent implements OnInit {
       message: drop.message,
       messageStyle: drop.messageStyle,
       multimedia: drop.multimedia ?? null,
-      discoveryZoomLevel: drop.discoveryZoomLevel ?? 18
+      localSecretPin: pin,
+      discoveryZoomLevel: drop.discoveryZoomLevel ?? 18,
+      hint: drop.hint ?? '',
+      hintStyle: drop.hintStyle ?? '',
+      maxUnlocks: drop.maxUnlocks,
+      validFrom: drop.validFrom,
+      validUntil: drop.validUntil
     });
     this.snackBar.open(this.translation.t('common.secretDrop.publishSuccess'), undefined, {
       duration: 2600,
@@ -415,7 +421,7 @@ export class MySecretDropListComponent implements OnInit {
   private async publishLocalDraft(drop: SecretDrop): Promise<void> {
     const userId = this.userService.getUser().id;
     await this.ensureContentAllowedForPublishing(drop);
-    const pin = await this.openPinDialog();
+    const pin = drop.localSecretPin || await this.openPinDialog();
     if (!pin) {
       return;
     }
@@ -446,7 +452,13 @@ export class MySecretDropListComponent implements OnInit {
       message: drop.message,
       messageStyle: drop.messageStyle,
       multimedia: drop.multimedia ?? null,
-      discoveryZoomLevel: drop.discoveryZoomLevel ?? 18
+      localSecretPin: pin,
+      discoveryZoomLevel: drop.discoveryZoomLevel ?? 18,
+      hint: drop.hint ?? '',
+      hintStyle: drop.hintStyle ?? '',
+      maxUnlocks: drop.maxUnlocks,
+      validFrom: drop.validFrom,
+      validUntil: drop.validUntil
     });
     await this.secretDropService.removeLocalSecretDrop(userId, drop.uuid);
     this.snackBar.open(this.translation.t('common.secretDrop.publishSuccess'), undefined, {

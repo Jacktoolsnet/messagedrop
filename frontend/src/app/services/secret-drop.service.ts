@@ -57,6 +57,7 @@ export class SecretDropService {
         message: local?.message,
         messageStyle: local?.messageStyle,
         multimedia: local?.multimedia,
+        localSecretPin: local?.localSecretPin ?? null,
         publishState: row.status === 'enabled' ? 'published' : 'unpublished',
         discoveryZoomLevel: local?.discoveryZoomLevel ?? row.discoveryZoomLevel,
         localOnly: false
@@ -229,6 +230,7 @@ export class SecretDropService {
       message: existing?.message ?? '',
       messageStyle: existing?.messageStyle ?? '',
       multimedia: existing?.multimedia ?? null,
+      localSecretPin: existing?.localSecretPin ?? null,
       publishState: action === 'publish' ? 'published' : 'unpublished',
       localOnly: false
     });
@@ -292,6 +294,7 @@ export class SecretDropService {
       message: source.message ?? '',
       messageStyle: source.messageStyle ?? '',
       multimedia: source.multimedia ?? null,
+      localSecretPin: typeof source.localSecretPin === 'string' && source.localSecretPin.length > 0 ? source.localSecretPin : null,
       crypto: this.parseJsonField(source.crypto),
       encryptedPayload: this.parseJsonField(source.encryptedPayload),
       publishState: source.publishState ?? (source.status === 'enabled' ? 'published' : 'unpublished'),

@@ -1765,6 +1765,7 @@
       "pinCreateHint": "Elige un PIN de 6 dígitos para este SecretDrop.",
       "pinConfirmHint": "Introduce el PIN de nuevo para confirmarlo.",
       "createPin": "Crear PIN",
+      "pinValueLabel": "PIN: {{ pin }}",
       "changePin": "Cambiar PIN",
       "pinCreated": "PIN establecido.",
       "pinRequired": "Establece un PIN de 6 dígitos.",

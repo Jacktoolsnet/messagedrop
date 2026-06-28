@@ -30,6 +30,8 @@ export interface SecretDrop {
   message?: string;
   messageStyle?: string;
   multimedia?: Multimedia | null;
+  /** Locally stored owner PIN. In production this lives inside the User-PIN encrypted IndexedDB store and is never sent to the backend. */
+  localSecretPin?: string | null;
   publishState?: 'published' | 'draft' | 'unpublished' | 'local_only';
   localOnly?: boolean;
   encryptedPayload?: SecretDropEncryptedPayload | string;
