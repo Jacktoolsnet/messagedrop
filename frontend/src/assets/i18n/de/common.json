@@ -1863,6 +1863,14 @@
       "unlocked": "Entsperrt",
       "unlockAria": "Geheimnis entsperren",
       "translateHintAria": "Hinweis übersetzen"
+    },
+    "secretDropComments": {
+      "title": "Kommentare",
+      "empty": "Noch keine Kommentare. Schreibe den ersten Kommentar.",
+      "addTitle": "Kommentar schreiben",
+      "addSuccess": "Kommentar gespeichert.",
+      "addFailed": "Kommentar konnte nicht gespeichert werden.",
+      "loadFailed": "Kommentare konnten nicht geladen werden."
     }
   },
   "errors": {

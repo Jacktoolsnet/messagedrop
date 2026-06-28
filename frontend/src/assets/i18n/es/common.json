@@ -1854,6 +1854,14 @@
       "unlocked": "Desbloqueado",
       "unlockAria": "Desbloquear secreto",
       "translateHintAria": "Traducir pista"
+    },
+    "secretDropComments": {
+      "title": "Comentarios",
+      "empty": "Aún no hay comentarios. Escribe el primer comentario.",
+      "addTitle": "Escribir comentario",
+      "addSuccess": "Comentario guardado.",
+      "addFailed": "No se pudo guardar el comentario.",
+      "loadFailed": "No se pudieron cargar los comentarios."
     }
   },
   "errors": {

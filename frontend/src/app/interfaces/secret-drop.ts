@@ -49,6 +49,17 @@ export interface SecretDrop {
   consumedAt?: number | null;
 }
 
+
+export interface SecretDropComment {
+  uuid: string;
+  secretDropUuid: string;
+  userId: string;
+  encryptedPayload: SecretDropEncryptedPayload | string;
+  crypto: SecretDropCryptoMetadata | Record<string, unknown> | string | null;
+  createdAt: number;
+  status: 'enabled' | 'deleted' | string;
+}
+
 export interface SecretDropCreateRequest {
   userId: string;
   latitude: number;
@@ -111,4 +122,14 @@ export interface SecretDropDecryptedContent {
 export interface SecretDropUpdateResponse {
   status: number;
   secretDrop: SecretDrop;
+}
+
+export interface SecretDropCommentListResponse {
+  status: number;
+  rows: SecretDropComment[];
+}
+
+export interface SecretDropCommentCreateResponse {
+  status: number;
+  comment: SecretDropComment;
 }

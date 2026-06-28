@@ -21,6 +21,7 @@ import { DisplayMessageService } from '../../services/display-message.service';
 import { CheckPinComponent } from '../pin/check-pin/check-pin.component';
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
+import { SecretDropCommentsDialogComponent } from '../secret-drop-comments-dialog/secret-drop-comments-dialog.component';
 
 interface FoundSecretDropListData {
   drops: SecretDrop[];
@@ -31,6 +32,7 @@ interface FoundSecretDropListData {
 interface UnlockedContent {
   drop: SecretDrop;
   content: SecretDropDecryptedContent;
+  pin: string;
 }
 
 @Component({
@@ -151,6 +153,51 @@ export class FoundSecretDropListComponent {
       });
   }
 
+
+  openComments(drop: SecretDrop): void {
+    const unlocked = this.getUnlocked(drop);
+    if (!unlocked) {
+      return;
+    }
+    const dialogRef = this.matDialog.open(SecretDropCommentsDialogComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: { drop: unlocked.drop, pin: unlocked.pin },
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+    dialogRef.afterClosed().subscribe((result?: { commentsNumber?: number }) => {
+      if (typeof result?.commentsNumber !== 'number') {
+        return;
+      }
+      this.updateDropCommentCount(drop, result.commentsNumber);
+    });
+  }
+
+  private updateDropCommentCount(drop: SecretDrop, commentsNumber: number): void {
+    drop.commentsNumber = commentsNumber;
+    this.unlocked.update((state) => {
+      const unlocked = state[drop.uuid];
+      if (!unlocked) {
+        return state;
+      }
+      return {
+        ...state,
+        [drop.uuid]: {
+          ...unlocked,
+          drop: {
+            ...unlocked.drop,
+            commentsNumber
+          }
+        }
+      };
+    });
+  }
+
   async toggleReaction(drop: SecretDrop, reaction: 'like' | 'dislike'): Promise<void> {
     if (!this.userService.hasJwt()) {
       this.userService.loginWithBackend(() => void this.toggleReaction(drop, reaction));
@@ -234,7 +281,8 @@ export class FoundSecretDropListComponent {
         ...state,
         [drop.uuid]: {
           drop: unlockedDrop,
-          content
+          content,
+          pin
         }
       }));
       this.snackBar.open(this.translation.t('common.secretDropDiscovery.unlockSuccess'), undefined, {

@@ -1863,6 +1863,14 @@
       "unlocked": "Unlocked",
       "unlockAria": "Unlock secret",
       "translateHintAria": "Translate hint"
+    },
+    "secretDropComments": {
+      "title": "Comments",
+      "empty": "No comments yet. Write the first comment.",
+      "addTitle": "Write comment",
+      "addSuccess": "Comment saved.",
+      "addFailed": "Comment could not be saved.",
+      "loadFailed": "Comments could not be loaded."
     }
   },
   "errors": {

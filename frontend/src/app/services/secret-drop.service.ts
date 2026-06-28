@@ -5,6 +5,9 @@ import { environment } from '../../environments/environment';
 import {
   SecretDrop,
   SecretDropCreateRequest,
+  SecretDropComment,
+  SecretDropCommentCreateResponse,
+  SecretDropCommentListResponse,
   SecretDropCreateResponse,
   SecretDropDeleteResponse,
   SecretDropListResponse,
@@ -131,6 +134,31 @@ export class SecretDropService {
     );
   }
 
+
+  async getComments(uuid: string): Promise<SecretDropComment[]> {
+    const response = await firstValueFrom(
+      this.http.get<SecretDropCommentListResponse>(
+        `${this.baseUrl}/${encodeURIComponent(uuid)}/comments`,
+        { headers: new HttpHeaders({ 'x-skip-ui': 'true' }) }
+      )
+    );
+    return (response.rows ?? []).map((row) => this.normalizeComment(row));
+  }
+
+  async addComment(
+    uuid: string,
+    request: Pick<SecretDropComment, 'encryptedPayload' | 'crypto'>
+  ): Promise<SecretDropComment> {
+    const response = await firstValueFrom(
+      this.http.post<SecretDropCommentCreateResponse>(
+        `${this.baseUrl}/${encodeURIComponent(uuid)}/comments`,
+        request,
+        { headers: new HttpHeaders({ 'x-skip-ui': 'true' }) }
+      )
+    );
+    return this.normalizeComment(response.comment);
+  }
+
   async getStats(uuid: string): Promise<SecretDropStatsResponse> {
     return firstValueFrom(this.http.get<SecretDropStatsResponse>(`${this.baseUrl}/stats/${encodeURIComponent(uuid)}`));
   }
@@ -216,6 +244,16 @@ export class SecretDropService {
       return 18;
     }
     return Math.min(19, Math.max(12, Math.round(numeric)));
+  }
+
+
+  private normalizeComment(raw: SecretDropComment): SecretDropComment {
+    return {
+      ...raw,
+      encryptedPayload: this.parseJsonField(raw.encryptedPayload) as SecretDropComment['encryptedPayload'],
+      crypto: this.parseJsonField(raw.crypto) as SecretDropComment['crypto'],
+      createdAt: Number(raw.createdAt ?? 0)
+    };
   }
 
   private normalizeSecretDrop(raw: SecretDrop): SecretDrop {
