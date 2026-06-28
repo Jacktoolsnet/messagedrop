@@ -338,7 +338,7 @@ export class MySecretDropListComponent implements OnInit {
   }
 
   canPublishDrop(drop: SecretDrop): boolean {
-    return drop.status === 'disabled' || drop.publishState === 'draft' || !!drop.localOnly;
+    return drop.status === 'disabled' || drop.status === 'consumed' || drop.publishState === 'draft' || !!drop.localOnly;
   }
 
   canUnpublishDrop(drop: SecretDrop): boolean {

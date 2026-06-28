@@ -505,14 +505,20 @@ async function softDelete(db, uuid, userId) {
 }
 
 async function updateStatus(db, uuid, userId, status) {
+  const isPublishing = status === secretDropStatus.ENABLED;
   const row = await getQuery(db, `
     UPDATE ${tableName}
-    SET status = ?, updatedAt = strftime('%s','now')
+    SET status = ?,
+        unlockCount = CASE WHEN ? THEN 0 ELSE unlockCount END,
+        failedUnlockCount = CASE WHEN ? THEN 0 ELSE failedUnlockCount END,
+        lastUnlockedAt = CASE WHEN ? THEN NULL ELSE lastUnlockedAt END,
+        consumedAt = CASE WHEN ? THEN NULL ELSE consumedAt END,
+        updatedAt = strftime('%s','now')
     WHERE uuid = ?
       AND userId = ?
-      AND status NOT IN ('${secretDropStatus.DELETED}', '${secretDropStatus.CONSUMED}')
+      AND status <> '${secretDropStatus.DELETED}'
     RETURNING *;
-  `, [status, uuid, userId]);
+  `, [status, isPublishing, isPublishing, isPublishing, isPublishing, uuid, userId]);
   return mapSecretDropRow(row, { includeEncryptedPayload: false });
 }
 
