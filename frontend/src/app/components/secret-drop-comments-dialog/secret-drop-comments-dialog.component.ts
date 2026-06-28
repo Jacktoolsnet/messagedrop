@@ -19,18 +19,16 @@ import { SpeechService } from '../../services/speech.service';
 import { TranslateService } from '../../services/translate.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
+import { MessageService } from '../../services/message.service';
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
+import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { DisplayMessage } from '../utils/display-message/display-message.component';
-import { TextComponent } from '../utils/text/text.component';
+import { EditSecretDropCommentComponent, SecretDropCommentEditResult } from '../edit-secret-drop-comment/edit-secret-drop-comment.component';
 
 interface SecretDropCommentsDialogData {
   drop: SecretDrop;
   pin: string;
-}
-
-interface TextDialogResult {
-  text: string;
 }
 
 interface DecryptedComment {
@@ -51,6 +49,7 @@ interface DecryptedComment {
     MatIconModule,
     ShortNumberPipe,
     ShowmessageComponent,
+    ShowmultimediaComponent,
     TranslocoPipe
   ],
   templateUrl: './secret-drop-comments-dialog.component.html',
@@ -70,6 +69,7 @@ export class SecretDropCommentsDialogComponent implements OnInit {
   readonly languageService = inject(LanguageService);
   private readonly translateService = inject(TranslateService);
   private readonly speechService = inject(SpeechService);
+  private readonly messageService = inject(MessageService);
   readonly profileService = inject(ProfileService);
   readonly userProfile: Profile = this.userService.getProfile();
 
@@ -134,32 +134,35 @@ export class SecretDropCommentsDialogComponent implements OnInit {
       return;
     }
 
-    const dialogRef = this.dialog.open(TextComponent, {
+    const dialogRef = this.dialog.open(EditSecretDropCommentComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: {
-        text: '',
-        titleKey: parentComment ? 'common.secretDropComments.replyTitle' : 'common.secretDropComments.addTitle',
-        titleIcon: 'add_comment'
-      },
+      data: { titleKey: parentComment ? 'common.secretDropComments.replyTitle' : 'common.secretDropComments.addTitle' },
+      maxWidth: '95vw',
+      maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
       disableClose: false,
-      autoFocus: true
+      autoFocus: false
     });
-    const result = await firstValueFrom(dialogRef.afterClosed()) as TextDialogResult | undefined;
-    const text = String(result?.text ?? '').trim();
-    if (!text) {
+    const result = await firstValueFrom(dialogRef.afterClosed()) as SecretDropCommentEditResult | undefined;
+    if (!result || (!result.text?.trim() && !result.multimedia)) {
+      return;
+    }
+
+    const moderationErrorKey = await this.getModerationErrorKey(result.text);
+    if (moderationErrorKey) {
+      this.showModerationRejected(moderationErrorKey);
       return;
     }
 
     this.loading.set(true);
     try {
       const encrypted = await this.cryptoService.encryptSecret(
-        text,
+        result.text.trim(),
         this.data.pin,
-        undefined,
-        this.userService.getProfile().defaultStyle ?? ''
+        result.multimedia ?? undefined,
+        result.style ?? ''
       );
       const row = await this.secretDropService.addComment(this.data.drop.uuid, {
         encryptedPayload: encrypted.encryptedPayload,
@@ -287,6 +290,71 @@ export class SecretDropCommentsDialogComponent implements OnInit {
     this.comments.update((comments) => comments.map((comment) => comment.row.uuid === uuid
       ? { ...comment, row: { ...comment.row, translatedMessage } }
       : comment));
+  }
+
+
+  private async getModerationErrorKey(text: string): Promise<string | null> {
+    const moderationInput = String(text ?? '').trim();
+    if (!moderationInput) {
+      return null;
+    }
+    if (this.messageService.detectPersonalInformation(moderationInput)) {
+      return 'common.message.moderationRejectedPattern';
+    }
+    if (this.detectThreateningOrAbusiveContent(moderationInput)) {
+      return 'common.message.moderationRejectedAi';
+    }
+    try {
+      const response = await firstValueFrom(this.messageService.moderatePublicContent(moderationInput));
+      if ((response?.moderation?.decision ?? 'approved') === 'rejected') {
+        return response?.moderation?.reason === 'pattern'
+          ? 'common.message.moderationRejectedPattern'
+          : 'common.message.moderationRejectedAi';
+      }
+      return null;
+    } catch {
+      return 'common.message.moderationFailed';
+    }
+  }
+
+  private detectThreateningOrAbusiveContent(text: string): boolean {
+    const normalized = String(text ?? '')
+      .toLowerCase()
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^\p{L}\p{N}]+/gu, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    return [
+      /\bich\s+bring(?:e)?\s+(?:dich|dir|ihn|sie|euch|deine|deinen|deiner)\s+(?:um|umbringen)\b/i,
+      /\b(?:ich\s+)?(?:mach(?:e)?|mache)\s+(?:dich|ihn|sie|euch)\s+fertig\b/i,
+      /\b(?:ich\s+)?(?:toete|tote|kill(?:e)?|ermorde)\s+(?:dich|ihn|sie|euch)\b/i,
+      /\bdrecks(?:schlampe|hure|fotze)\b/i
+    ].some((pattern) => pattern.test(normalized));
+  }
+
+  private showModerationRejected(messageKey: string): void {
+    this.dialog.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: {
+        showAlways: true,
+        title: this.translation.t('common.moderation.title'),
+        image: '',
+        icon: messageKey === 'common.message.moderationFailed' ? 'warning' : 'block',
+        message: this.translation.t(messageKey),
+        button: this.translation.t('common.actions.ok'),
+        delay: 0,
+        showSpinner: false,
+        autoclose: false
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
   }
 
   private async loadComments(): Promise<void> {
