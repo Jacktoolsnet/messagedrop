@@ -10,6 +10,8 @@ import { SecretDropCryptoService } from '../../services/secret-drop-crypto.servi
 import { SecretDropService } from '../../services/secret-drop.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
+import { ProfileService } from '../../services/profile.service';
+import { Profile } from '../../interfaces/profile';
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { DisplayMessageService } from '../../services/display-message.service';
@@ -55,6 +57,8 @@ export class SecretDropCommentsDialogComponent implements OnInit {
   private readonly snackBar = inject(DisplayMessageService);
   private readonly translation = inject(TranslationHelperService);
   private readonly userService = inject(UserService);
+  readonly profileService = inject(ProfileService);
+  readonly userProfile: Profile = this.userService.getProfile();
 
   readonly loading = signal(false);
   readonly comments = signal<DecryptedComment[]>([]);
@@ -65,6 +69,24 @@ export class SecretDropCommentsDialogComponent implements OnInit {
 
   close(): void {
     this.dialogRef.close({ commentsNumber: this.comments().length });
+  }
+
+
+  isOwnComment(comment: SecretDropComment): boolean {
+    return String(comment.userId) === String(this.userService.getUser().id);
+  }
+
+  getCommentProfileName(comment: SecretDropComment): string {
+    if (this.isOwnComment(comment)) {
+      return this.userProfile.name || this.translation.t('common.messageList.myself');
+    }
+    return this.profileService.getProfile(comment.userId)?.name || this.translation.t('common.messageList.nameFallback');
+  }
+
+  getCommentAvatar(comment: SecretDropComment): string {
+    return this.isOwnComment(comment)
+      ? this.userProfile.base64Avatar || ''
+      : this.profileService.getProfile(comment.userId)?.base64Avatar || '';
   }
 
   async addComment(): Promise<void> {
