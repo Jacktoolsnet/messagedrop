@@ -1857,7 +1857,9 @@
       "readMode": "Lesbarkeit",
       "oneTime": "Einmalig lesbar",
       "multiUse": "Mehrfach lesbar",
-      "unlocked": "Entsperrt"
+      "unlocked": "Entsperrt",
+      "unlockAria": "Geheimnis entsperren",
+      "translateHintAria": "Hinweis übersetzen"
     }
   },
   "errors": {

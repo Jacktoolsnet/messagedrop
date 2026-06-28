@@ -1,15 +1,17 @@
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { firstValueFrom } from 'rxjs';
+import { finalize, firstValueFrom } from 'rxjs';
 import { SecretDrop, SecretDropCryptoMetadata, SecretDropDecryptedContent, SecretDropEncryptedPayload } from '../../interfaces/secret-drop';
 import { SecretDropCryptoService } from '../../services/secret-drop-crypto.service';
 import { SecretDropService } from '../../services/secret-drop.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
+import { LanguageService } from '../../services/language.service';
+import { TranslateService } from '../../services/translate.service';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { DisplayMessage } from '../utils/display-message/display-message.component';
 import { DisplayMessageService } from '../../services/display-message.service';
@@ -32,7 +34,6 @@ interface UnlockedContent {
   selector: 'app-found-secret-drop-list',
   imports: [
     CommonModule,
-    DatePipe,
     DialogHeaderComponent,
     MatButtonModule,
     MatCardModule,
@@ -54,9 +55,13 @@ export class FoundSecretDropListComponent {
   private readonly cryptoService = inject(SecretDropCryptoService);
   private readonly snackBar = inject(DisplayMessageService);
   private readonly translation = inject(TranslationHelperService);
+  private readonly languageService = inject(LanguageService);
+  private readonly translateService = inject(TranslateService);
   readonly data = inject<FoundSecretDropListData>(MAT_DIALOG_DATA);
   readonly unlockingUuid = signal<string | null>(null);
   readonly unlocked = signal<Record<string, UnlockedContent>>({});
+  readonly translatedHints = signal<Record<string, string>>({});
+  readonly translatingHintUuid = signal<string | null>(null);
 
   close(): void {
     this.dialogRef.close();
@@ -68,6 +73,42 @@ export class FoundSecretDropListComponent {
 
   getUnlocked(drop: SecretDrop): UnlockedContent | null {
     return this.unlocked()[drop.uuid] ?? null;
+  }
+
+
+  getHintText(drop: SecretDrop): string {
+    return this.translatedHints()[drop.uuid] ?? drop.hint ?? '';
+  }
+
+  translateHint(drop: SecretDrop): void {
+    if (!drop.hint || this.translatingHintUuid()) {
+      return;
+    }
+
+    this.translatingHintUuid.set(drop.uuid);
+    this.translateService.translateSecretDropHint(drop.hint, this.languageService.effectiveLanguage(), false, drop.uuid)
+      .pipe(finalize(() => this.translatingHintUuid.set(null)))
+      .subscribe({
+        next: (response) => {
+          const translatedText = response.result?.text?.trim();
+          if (!translatedText) {
+            return;
+          }
+          this.translatedHints.update((state) => ({
+            ...state,
+            [drop.uuid]: translatedText
+          }));
+        },
+        error: (error) => {
+          const message = this.translateService.getErrorMessage(error)
+            ?? this.translation.t('common.messageList.translateFailed');
+          this.snackBar.open(message, undefined, {
+            duration: 3000,
+            verticalPosition: 'top',
+            panelClass: 'snack-error'
+          });
+        }
+      });
   }
 
   async unlock(drop: SecretDrop): Promise<void> {

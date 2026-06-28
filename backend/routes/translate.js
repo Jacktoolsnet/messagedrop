@@ -5,6 +5,7 @@ const deepl = require('deepl-node');
 const metric = require('../middleware/metric');
 const { apiError } = require('../middleware/api-error');
 const tableMessageTranslation = require('../db/tableMessageTranslation');
+const tableSecretDropHintTranslation = require('../db/tableSecretDropHintTranslation');
 
 const systemAuthKey = typeof process.env.DEEPL_API_KEY === 'string'
   ? process.env.DEEPL_API_KEY.trim()
@@ -33,6 +34,7 @@ function extractTranslationRequest(req) {
       language: req.body?.language,
       value: req.body?.value,
       messageUuid: req.body?.messageUuid,
+      secretDropUuid: req.body?.secretDropUuid,
       deeplApiKey: req.body?.deeplApiKey
     };
   }
@@ -41,6 +43,7 @@ function extractTranslationRequest(req) {
     language: req.params.language,
     value: req.params.value,
     messageUuid: req.query?.messageUuid,
+    secretDropUuid: req.query?.secretDropUuid,
     deeplApiKey: null
   };
 }
@@ -71,6 +74,16 @@ function readCachedTranslation(db, messageUuid, targetLang, sourceText) {
       if (err) {
         return reject(err);
       }
+      resolve(row);
+    });
+  });
+}
+
+
+function readCachedSecretDropHintTranslation(db, secretDropUuid, targetLang, sourceText) {
+  return new Promise((resolve, reject) => {
+    tableSecretDropHintTranslation.getBySecretDropAndLanguage(db, secretDropUuid, targetLang, sourceText, (err, row) => {
+      if (err) return reject(err);
       resolve(row);
     });
   });
@@ -123,12 +136,17 @@ async function handleTranslate(req, res, next) {
 
   const db = req.database?.db;
   const messageUuid = typeof request.messageUuid === 'string' ? request.messageUuid.trim() : '';
-  const canReadSharedCache = !!(db && messageUuid && !usingCustomAuthKey);
-  const canWriteSharedCache = !!(db && messageUuid && !usingCustomAuthKey);
+  const secretDropUuid = typeof request.secretDropUuid === 'string' ? request.secretDropUuid.trim() : '';
+  const canUseMessageCache = !!(db && messageUuid && !usingCustomAuthKey);
+  const canUseSecretDropHintCache = !!(db && secretDropUuid && !usingCustomAuthKey);
+  const canReadSharedCache = canUseMessageCache || canUseSecretDropHintCache;
+  const canWriteSharedCache = canUseMessageCache || canUseSecretDropHintCache;
 
   if (canReadSharedCache) {
     try {
-      const cached = await readCachedTranslation(db, messageUuid, targetLang, text);
+      const cached = canUseSecretDropHintCache
+        ? await readCachedSecretDropHintTranslation(db, secretDropUuid, targetLang, text)
+        : await readCachedTranslation(db, messageUuid, targetLang, text);
       if (cached) {
         response.status = 200;
         response.result = {
@@ -148,19 +166,32 @@ async function handleTranslate(req, res, next) {
     response.result = result;
 
     if (canWriteSharedCache) {
-      tableMessageTranslation.upsert(
-        db,
-        messageUuid,
-        targetLang,
-        text,
-        result?.text || '',
-        result?.detectedSourceLang || null,
-        (err) => {
-          if (err) {
-            req.logger?.warn?.('Translation cache write failed', { error: err?.message || err });
-          }
+      const writeCallback = (err) => {
+        if (err) {
+          req.logger?.warn?.('Translation cache write failed', { error: err?.message || err });
         }
-      );
+      };
+      if (canUseSecretDropHintCache) {
+        tableSecretDropHintTranslation.upsert(
+          db,
+          secretDropUuid,
+          targetLang,
+          text,
+          result?.text || '',
+          result?.detectedSourceLang || null,
+          writeCallback
+        );
+      } else {
+        tableMessageTranslation.upsert(
+          db,
+          messageUuid,
+          targetLang,
+          text,
+          result?.text || '',
+          result?.detectedSourceLang || null,
+          writeCallback
+        );
+      }
     }
 
     return res.status(200).json(response);

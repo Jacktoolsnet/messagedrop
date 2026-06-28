@@ -1857,7 +1857,9 @@
       "readMode": "Read mode",
       "oneTime": "Readable once",
       "multiUse": "Readable multiple times",
-      "unlocked": "Unlocked"
+      "unlocked": "Unlocked",
+      "unlockAria": "Unlock secret",
+      "translateHintAria": "Translate hint"
     }
   },
   "errors": {

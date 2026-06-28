@@ -1848,7 +1848,9 @@
       "readMode": "Modo de lectura",
       "oneTime": "Legible una vez",
       "multiUse": "Legible varias veces",
-      "unlocked": "Desbloqueado"
+      "unlocked": "Desbloqueado",
+      "unlockAria": "Desbloquear secreto",
+      "translateHintAria": "Traducir pista"
     }
   },
   "errors": {

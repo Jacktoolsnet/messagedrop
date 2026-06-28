@@ -178,7 +178,7 @@ export class EditSecretDropComponent {
       }
     }
 
-    if (this.data.secretDrop || action === 'draft') {
+    if (action === 'draft') {
       await this.saveLocalDraft();
       return;
     }
@@ -192,35 +192,22 @@ export class EditSecretDropComponent {
 
     this.saving.set(true);
     try {
-      const encrypted = await this.cryptoService.encryptSecret(
-        this.message.trim(),
-        this.pin,
-        this.hasMultimedia ? this.multimedia : undefined,
-        this.messageStyle
-      );
-      const request: SecretDropCreateRequest = {
-        userId: this.userService.getUser().id,
-        latitude: this.location.latitude,
-        longitude: this.location.longitude,
-        plusCode: this.resolvePlusCode(this.location),
-        discoveryPlusCode: this.resolvePlusCode(this.location),
-        discoveryZoomLevel: this.clampDiscoveryZoomLevel(this.discoveryZoomLevel),
-        hint: this.hint.trim(),
-        hintStyle: this.hintStyle,
-        encryptedPayload: encrypted.encryptedPayload,
-        crypto: encrypted.crypto,
-        authVerifier: encrypted.authVerifier,
-        maxUnlocks: this.oneTime ? 1 : null,
-        validFrom: this.useValidFrom ? this.toSeconds(this.validFromDate, this.validFromTime) : null,
-        validUntil: this.useValidUntil ? this.toSeconds(this.validUntilDate, this.validUntilTime) : null,
-        publishState: 'published'
-      };
-      await this.secretDropService.createSecretDrop(request, this.getLocalPlainData());
-      this.snackBar.open(this.translation.t('common.secretDrop.createSuccess'), undefined, {
-        duration: 3200,
-        verticalPosition: 'top',
-        panelClass: 'snack-success'
-      });
+      const request = await this.buildPublishRequest();
+      if (this.data.secretDrop) {
+        await this.secretDropService.republishSecretDrop(this.data.secretDrop.uuid, request, this.getLocalPlainData());
+        this.snackBar.open(this.translation.t('common.secretDrop.updateSuccess'), undefined, {
+          duration: 3200,
+          verticalPosition: 'top',
+          panelClass: 'snack-success'
+        });
+      } else {
+        await this.secretDropService.createSecretDrop(request, this.getLocalPlainData());
+        this.snackBar.open(this.translation.t('common.secretDrop.createSuccess'), undefined, {
+          duration: 3200,
+          verticalPosition: 'top',
+          panelClass: 'snack-success'
+        });
+      }
       this.dialogRef.close(true);
     } catch (error) {
       const key = error instanceof Error && (error.message === 'password_too_short' || error.message === 'pin_too_short')
@@ -230,6 +217,33 @@ export class EditSecretDropComponent {
     } finally {
       this.saving.set(false);
     }
+  }
+
+
+  private async buildPublishRequest(): Promise<SecretDropCreateRequest> {
+    const encrypted = await this.cryptoService.encryptSecret(
+      this.message.trim(),
+      this.pin,
+      this.hasMultimedia ? this.multimedia : undefined,
+      this.messageStyle
+    );
+    return {
+      userId: this.userService.getUser().id,
+      latitude: this.location.latitude,
+      longitude: this.location.longitude,
+      plusCode: this.resolvePlusCode(this.location),
+      discoveryPlusCode: this.resolvePlusCode(this.location),
+      discoveryZoomLevel: this.clampDiscoveryZoomLevel(this.discoveryZoomLevel),
+      hint: this.hint.trim(),
+      hintStyle: this.hintStyle,
+      encryptedPayload: encrypted.encryptedPayload,
+      crypto: encrypted.crypto,
+      authVerifier: encrypted.authVerifier,
+      maxUnlocks: this.oneTime ? 1 : null,
+      validFrom: this.useValidFrom ? this.toSeconds(this.validFromDate, this.validFromTime) : null,
+      validUntil: this.useValidUntil ? this.toSeconds(this.validUntilDate, this.validUntilTime) : null,
+      publishState: 'published'
+    };
   }
 
   private async saveLocalDraft(): Promise<void> {
@@ -275,7 +289,12 @@ export class EditSecretDropComponent {
       message: this.message.trim(),
       messageStyle: this.messageStyle,
       multimedia: this.hasMultimedia ? this.multimedia : null,
-      discoveryZoomLevel: this.clampDiscoveryZoomLevel(this.discoveryZoomLevel)
+      discoveryZoomLevel: this.clampDiscoveryZoomLevel(this.discoveryZoomLevel),
+      hint: this.hint.trim(),
+      hintStyle: this.hintStyle,
+      maxUnlocks: this.oneTime ? 1 : null,
+      validFrom: this.useValidFrom ? this.toSeconds(this.validFromDate, this.validFromTime) : null,
+      validUntil: this.useValidUntil ? this.toSeconds(this.validUntilDate, this.validUntilTime) : null
     };
   }
 
@@ -477,7 +496,7 @@ export class EditSecretDropComponent {
     if (!this.hasSecretContent) {
       return 'common.secretDrop.contentRequired';
     }
-    if (!this.data.secretDrop && action === 'publish' && this.pin.length !== 6) {
+    if (action === 'publish' && this.pin.length !== 6) {
       return 'common.secretDrop.pinRequired';
     }
     const validFrom = this.useValidFrom ? this.toSeconds(this.validFromDate, this.validFromTime) : null;

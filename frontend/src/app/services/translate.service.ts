@@ -12,6 +12,7 @@ interface TranslateRequest {
   language: string;
   value: string;
   messageUuid?: string;
+  secretDropUuid?: string;
   deeplApiKey?: string;
 }
 
@@ -124,6 +125,33 @@ export class TranslateService {
       .pipe(
         catchError(this.handleError)
       );
+  }
+
+
+  public translateSecretDropHint(value: string, language: string, showAlways = false, secretDropUuid?: string | null) {
+    const targetLang = this.resolveTargetLanguage(language);
+    const safeSecretDropUuid = typeof secretDropUuid === 'string' ? secretDropUuid.trim() : '';
+    const customDeeplApiKey = this.userService.getDeeplApiKey();
+    const body: TranslateRequest = {
+      language: targetLang,
+      value,
+      ...(safeSecretDropUuid ? { secretDropUuid: safeSecretDropUuid } : {}),
+      ...(customDeeplApiKey ? { deeplApiKey: customDeeplApiKey } : {})
+    };
+    const url = `${environment.apiUrl}/translate`;
+    this.networkService.setNetworkMessageConfig(url, {
+      showAlways,
+      title: this.i18n.t('common.translate.title'),
+      image: '',
+      icon: '',
+      message: this.i18n.t('common.translate.message'),
+      button: '',
+      delay: 0,
+      showSpinner: true,
+      autoclose: false
+    });
+    return this.http.post<TranslateResponse>(url, body, this.httpOptions)
+      .pipe(catchError(this.handleError));
   }
 
   public validateDeeplApiKey(deeplApiKey: string) {

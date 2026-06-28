@@ -3,6 +3,7 @@ const unlockTableName = 'tableSecretDropUnlock';
 const likeTableName = 'tableSecretDropLike';
 const dislikeTableName = 'tableSecretDropDislike';
 const commentTableName = 'tableSecretDropComment';
+const hintTranslationTableName = 'tableSecretDropHintTranslation';
 
 const secretDropStatus = {
   ENABLED: 'enabled',
@@ -253,6 +254,7 @@ async function create(db, payload) {
 
 
 async function updateContent(db, uuid, userId, payload) {
+  await runQuery(db, `DELETE FROM ${hintTranslationTableName} WHERE secretDropUuid = ?;`, [uuid]);
   const row = await getQuery(db, `
     UPDATE ${tableName}
     SET latitude = ?,
@@ -396,7 +398,11 @@ async function softDelete(db, uuid, userId) {
     SET status = '${secretDropStatus.DELETED}', updatedAt = strftime('%s','now')
     WHERE uuid = ? AND userId = ?;
   `, [uuid, userId]);
-  return Number(result.changes || 0) > 0;
+  const deleted = Number(result.changes || 0) > 0;
+  if (deleted) {
+    await runQuery(db, `DELETE FROM ${hintTranslationTableName} WHERE secretDropUuid = ?;`, [uuid]);
+  }
+  return deleted;
 }
 
 async function updateStatus(db, uuid, userId, status) {
