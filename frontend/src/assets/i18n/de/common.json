@@ -1845,6 +1845,10 @@
       "deleteDialog": {
         "title": "GeheimnisDrop löschen",
         "confirm": "Möchtest du diesen GeheimnisDrop wirklich löschen?"
+      },
+      "pinChangeWarning": {
+        "title": "PIN ändern?",
+        "confirm": "Dieses Geheimnis hat bereits Kommentare. Wenn du den PIN änderst, können vorhandene Kommentare möglicherweise nicht mehr gelesen werden. Möchtest du den PIN wirklich ändern?"
       }
     },
     "secretDropDiscovery": {

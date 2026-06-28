@@ -1845,6 +1845,10 @@
       "deleteDialog": {
         "title": "Delete SecretDrop",
         "confirm": "Do you really want to delete this SecretDrop?"
+      },
+      "pinChangeWarning": {
+        "title": "Change PIN?",
+        "confirm": "This secret already has comments. If you change the PIN, existing comments may no longer be readable. Do you really want to change the PIN?"
       }
     },
     "secretDropDiscovery": {

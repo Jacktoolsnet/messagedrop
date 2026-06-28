@@ -1836,6 +1836,10 @@
       "deleteDialog": {
         "title": "Supprimer le SecretDrop",
         "confirm": "Veux-tu vraiment supprimer ce SecretDrop ?"
+      },
+      "pinChangeWarning": {
+        "title": "Changer le PIN ?",
+        "confirm": "Ce secret contient déjà des commentaires. Si tu changes le PIN, les commentaires existants pourraient ne plus être lisibles. Veux-tu vraiment changer le PIN ?"
       }
     },
     "secretDropDiscovery": {

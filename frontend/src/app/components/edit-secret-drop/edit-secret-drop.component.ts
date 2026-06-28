@@ -33,6 +33,7 @@ import { FontPickerDialogComponent } from '../utils/font-picker-dialog/font-pick
 import { SelectMultimediaComponent } from '../multimedia/select-multimedia/select-multimedia.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { CreatePinComponent } from '../pin/create-pin/create-pin.component';
+import { DeleteMessageComponent } from '../messagelist/delete-message/delete-message.component';
 
 interface TextDialogResult {
   text: string;
@@ -416,6 +417,13 @@ export class EditSecretDropComponent {
   }
 
   async openPinDialog(): Promise<boolean> {
+    if (this.shouldConfirmPinChange()) {
+      const confirmed = await this.confirmPinChangeWithExistingComments();
+      if (!confirmed) {
+        return false;
+      }
+    }
+
     const dialogRef = this.matDialog.open(CreatePinComponent, {
       panelClass: '',
       closeOnNavigation: true,
@@ -443,6 +451,25 @@ export class EditSecretDropComponent {
       panelClass: 'snack-success'
     });
     return true;
+  }
+
+
+  private shouldConfirmPinChange(): boolean {
+    return !!this.data.secretDrop && Number(this.data.secretDrop.commentsNumber ?? 0) > 0;
+  }
+
+  private async confirmPinChangeWithExistingComments(): Promise<boolean> {
+    const dialogRef = this.matDialog.open(DeleteMessageComponent, {
+      closeOnNavigation: true,
+      data: {
+        titleKey: 'common.secretDrop.pinChangeWarning.title',
+        confirmKey: 'common.secretDrop.pinChangeWarning.confirm'
+      },
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false
+    });
+    return !!(await firstValueFrom(dialogRef.afterClosed()));
   }
 
   onHintFontClick(): void {
