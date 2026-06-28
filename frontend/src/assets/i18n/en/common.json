@@ -1765,6 +1765,7 @@
     "secretDrop": {
       "createTitle": "Create SecretDrop",
       "myTitle": "My SecretDrops",
+      "editAction": "Edit secret",
       "createAction": "Create",
       "messageLabel": "Secret content",
       "hintLabel": "Hint / riddle",

@@ -1765,6 +1765,7 @@
     "secretDrop": {
       "createTitle": "GeheimnisDrop erstellen",
       "myTitle": "Meine GeheimnisDrops",
+      "editAction": "Geheimnis bearbeiten",
       "createAction": "Erstellen",
       "messageLabel": "Geheimer Inhalt",
       "hintLabel": "Hinweis / Rätsel",
