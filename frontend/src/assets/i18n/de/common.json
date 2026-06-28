@@ -1876,6 +1876,17 @@
       "addTitle": "Kommentar schreiben",
       "addSuccess": "Kommentar gespeichert.",
       "addFailed": "Kommentar konnte nicht gespeichert werden.",
+      "editTitle": "Kommentar bearbeiten",
+      "editAria": "Kommentar bearbeiten",
+      "editSuccess": "Kommentar aktualisiert.",
+      "editFailed": "Kommentar konnte nicht aktualisiert werden.",
+      "deleteAria": "Kommentar löschen",
+      "deleteSuccess": "Kommentar gelöscht.",
+      "deleteFailed": "Kommentar konnte nicht gelöscht werden.",
+      "deleteDialog": {
+        "title": "Kommentar löschen?",
+        "confirm": "Kommentar löschen"
+      },
       "loadFailed": "Kommentare konnten nicht geladen werden.",
       "replyTitle": "Antwort schreiben",
       "emptyReplies": "Noch keine Antworten. Schreibe die erste Antwort."

@@ -1876,6 +1876,17 @@
       "addTitle": "Write comment",
       "addSuccess": "Comment saved.",
       "addFailed": "Comment could not be saved.",
+      "editTitle": "Edit comment",
+      "editAria": "Edit comment",
+      "editSuccess": "Comment updated.",
+      "editFailed": "Comment could not be updated.",
+      "deleteAria": "Delete comment",
+      "deleteSuccess": "Comment deleted.",
+      "deleteFailed": "Comment could not be deleted.",
+      "deleteDialog": {
+        "title": "Delete comment?",
+        "confirm": "Delete comment"
+      },
       "loadFailed": "Comments could not be loaded.",
       "replyTitle": "Write reply",
       "emptyReplies": "No replies yet. Write the first reply."

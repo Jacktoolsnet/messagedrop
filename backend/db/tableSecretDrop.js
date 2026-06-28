@@ -609,6 +609,93 @@ async function getCommentByUuid(db, commentUuid) {
   return mapCommentRow(row);
 }
 
+async function updateComment(db, secretDropUuid, commentUuid, userId, payload) {
+  await ensureCommentSchema(db);
+  const row = await getQuery(db, `
+    UPDATE ${commentTableName}
+    SET encryptedPayload = ?,
+        crypto = ?
+    WHERE uuid = ?
+      AND secretDropUuid = ?
+      AND userId = ?
+      AND status = 'enabled'
+    RETURNING *;
+  `, [payload.encryptedPayload, payload.crypto || null, commentUuid, secretDropUuid, userId]);
+  return mapCommentRow(row);
+}
+
+async function deleteComment(db, secretDropUuid, commentUuid, userId) {
+  await ensureCommentSchema(db);
+  return db.transaction(async (tx) => {
+    const comment = await getQuery(tx, `
+      SELECT * FROM ${commentTableName}
+      WHERE uuid = ? AND secretDropUuid = ? AND userId = ? AND status = 'enabled'
+      LIMIT 1;
+    `, [commentUuid, secretDropUuid, userId]);
+    if (!comment) {
+      return false;
+    }
+
+    await runQuery(tx, `
+      DELETE FROM ${commentLikeTableName}
+      WHERE commentUuid IN (
+        WITH RECURSIVE descendants(uuid) AS (
+          SELECT uuid FROM ${commentTableName} WHERE uuid = ?
+          UNION ALL
+          SELECT child.uuid
+          FROM ${commentTableName} child
+          INNER JOIN descendants parent ON child.parentCommentUuid = parent.uuid
+        )
+        SELECT uuid FROM descendants
+      );
+    `, [commentUuid]);
+    await runQuery(tx, `
+      DELETE FROM ${commentDislikeTableName}
+      WHERE commentUuid IN (
+        WITH RECURSIVE descendants(uuid) AS (
+          SELECT uuid FROM ${commentTableName} WHERE uuid = ?
+          UNION ALL
+          SELECT child.uuid
+          FROM ${commentTableName} child
+          INNER JOIN descendants parent ON child.parentCommentUuid = parent.uuid
+        )
+        SELECT uuid FROM descendants
+      );
+    `, [commentUuid]);
+    await runQuery(tx, `
+      UPDATE ${commentTableName}
+      SET status = 'deleted'
+      WHERE uuid IN (
+        WITH RECURSIVE descendants(uuid) AS (
+          SELECT uuid FROM ${commentTableName} WHERE uuid = ?
+          UNION ALL
+          SELECT child.uuid
+          FROM ${commentTableName} child
+          INNER JOIN descendants parent ON child.parentCommentUuid = parent.uuid
+        )
+        SELECT uuid FROM descendants
+      );
+    `, [commentUuid]);
+
+    const parentCommentUuid = pickRowValue(comment, 'parentCommentUuid', 'parentcommentuuid') || null;
+    if (parentCommentUuid) {
+      await runQuery(tx, `
+        UPDATE ${commentTableName}
+        SET commentsNumber = CASE WHEN commentsNumber > 0 THEN commentsNumber - 1 ELSE 0 END
+        WHERE uuid = ?;
+      `, [parentCommentUuid]);
+    } else {
+      await runQuery(tx, `
+        UPDATE ${tableName}
+        SET commentsNumber = CASE WHEN commentsNumber > 0 THEN commentsNumber - 1 ELSE 0 END,
+            updatedAt = strftime('%s','now')
+        WHERE uuid = ?;
+      `, [secretDropUuid]);
+    }
+    return true;
+  });
+}
+
 async function toggleCommentReaction(db, commentUuid, userId, reaction) {
   await ensureCommentSchema(db);
   const table = reaction === 'like' ? commentLikeTableName : commentDislikeTableName;
@@ -653,6 +740,8 @@ module.exports = {
   createComment,
   getComments,
   getCommentByUuid,
+  updateComment,
+  deleteComment,
   toggleCommentReaction,
   secretDropStatus,
   mapSecretDropRow

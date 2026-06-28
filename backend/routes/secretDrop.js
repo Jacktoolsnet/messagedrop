@@ -581,6 +581,59 @@ router.post('/:uuid/comments', [
 });
 
 
+router.put('/:uuid/comments/:commentUuid', [
+  security.authenticate,
+  express.json({ type: 'application/json', limit: '32kb' })
+], async (req, res, next) => {
+  try {
+    const uuid = normalizeString(req.params.uuid, 64);
+    const commentUuid = normalizeString(req.params.commentUuid, 64);
+    if (!UUID_REGEX.test(uuid) || !UUID_REGEX.test(commentUuid)) {
+      throw apiError.badRequest('invalid_secret_drop_comment_uuid');
+    }
+    const userId = getAuthUserId(req);
+    await ensureOwnerOrUnlocked(getDb(req), uuid, userId);
+    ensureNoPlainSecretFields(req.body);
+    const encryptedPayload = serializeJsonField(
+      req.body?.encryptedPayload ?? req.body?.ciphertext,
+      'encrypted_payload',
+      MAX_ENCRYPTED_PAYLOAD_LENGTH
+    );
+    const cryptoMetadata = req.body?.crypto === undefined || req.body?.crypto === null
+      ? null
+      : serializeJsonField(req.body.crypto, 'crypto', MAX_CRYPTO_METADATA_LENGTH);
+    const comment = await tableSecretDrop.updateComment(getDb(req), uuid, commentUuid, userId, {
+      encryptedPayload,
+      crypto: cryptoMetadata
+    });
+    if (!comment) {
+      throw apiError.notFound('secret_drop_comment_not_found');
+    }
+    res.status(200).json({ status: 200, comment });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.delete('/:uuid/comments/:commentUuid', security.authenticate, async (req, res, next) => {
+  try {
+    const uuid = normalizeString(req.params.uuid, 64);
+    const commentUuid = normalizeString(req.params.commentUuid, 64);
+    if (!UUID_REGEX.test(uuid) || !UUID_REGEX.test(commentUuid)) {
+      throw apiError.badRequest('invalid_secret_drop_comment_uuid');
+    }
+    const userId = getAuthUserId(req);
+    await ensureOwnerOrUnlocked(getDb(req), uuid, userId);
+    const deleted = await tableSecretDrop.deleteComment(getDb(req), uuid, commentUuid, userId);
+    if (!deleted) {
+      throw apiError.notFound('secret_drop_comment_not_found');
+    }
+    res.status(200).json({ status: 200, deleted: true, uuid: commentUuid });
+  } catch (error) {
+    next(error);
+  }
+});
+
 async function handleCommentReaction(req, res, next, reaction) {
   try {
     const uuid = normalizeString(req.params.uuid, 64);

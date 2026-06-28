@@ -27,11 +27,11 @@ export class EditSecretDropCommentComponent {
   private readonly dialogRef = inject(MatDialogRef<EditSecretDropCommentComponent>);
   private readonly dialog = inject(MatDialog);
   private readonly userService = inject(UserService);
-  readonly data = inject<{ titleKey?: string }>(MAT_DIALOG_DATA, { optional: true });
+  readonly data = inject<{ titleKey?: string; text?: string; style?: string; multimedia?: Multimedia | null }>(MAT_DIALOG_DATA, { optional: true });
 
-  text = '';
-  style = this.userService.getProfile().defaultStyle ?? '';
-  multimedia: Multimedia = this.emptyMultimedia();
+  text = this.data?.text ?? '';
+  style = this.data?.style ?? this.userService.getProfile().defaultStyle ?? '';
+  multimedia: Multimedia = this.data?.multimedia ?? this.emptyMultimedia();
 
   get hasMultimedia(): boolean { return this.multimedia.type !== MultimediaType.UNDEFINED; }
   get hasContent(): boolean { return this.text.trim().length > 0 || this.hasMultimedia; }

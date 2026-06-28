@@ -140,3 +140,14 @@ export interface SecretDropCommentCreateResponse {
   status: number;
   comment: SecretDropComment;
 }
+
+export interface SecretDropCommentUpdateResponse {
+  status: number;
+  comment: SecretDropComment;
+}
+
+export interface SecretDropCommentDeleteResponse {
+  status: number;
+  deleted: boolean;
+  uuid: string;
+}

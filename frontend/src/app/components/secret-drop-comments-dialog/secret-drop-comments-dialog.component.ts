@@ -25,6 +25,7 @@ import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultim
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { DisplayMessage } from '../utils/display-message/display-message.component';
 import { EditSecretDropCommentComponent, SecretDropCommentEditResult } from '../edit-secret-drop-comment/edit-secret-drop-comment.component';
+import { DeleteMessageComponent } from '../messagelist/delete-message/delete-message.component';
 
 interface SecretDropCommentsDialogData {
   drop: SecretDrop;
@@ -196,6 +197,101 @@ export class SecretDropCommentsDialogComponent implements OnInit {
     }
   }
 
+
+  async editComment(comment: DecryptedComment): Promise<void> {
+    if (!this.isOwnComment(comment.row)) {
+      return;
+    }
+    const dialogRef = this.dialog.open(EditSecretDropCommentComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: {
+        titleKey: 'common.secretDropComments.editTitle',
+        text: comment.content.message ?? '',
+        style: comment.content.style ?? '',
+        multimedia: comment.content.multimedia ?? null
+      },
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+    const result = await firstValueFrom(dialogRef.afterClosed()) as SecretDropCommentEditResult | undefined;
+    if (!result || (!result.text?.trim() && !result.multimedia)) {
+      return;
+    }
+
+    const moderationErrorKey = await this.getModerationErrorKey(result.text);
+    if (moderationErrorKey) {
+      this.showModerationRejected(moderationErrorKey);
+      return;
+    }
+
+    this.loading.set(true);
+    try {
+      const encrypted = await this.cryptoService.encryptSecret(
+        result.text.trim(),
+        this.data.pin,
+        result.multimedia ?? undefined,
+        result.style ?? ''
+      );
+      const row = await this.secretDropService.updateComment(this.data.drop.uuid, comment.row.uuid, {
+        encryptedPayload: encrypted.encryptedPayload,
+        crypto: encrypted.crypto
+      });
+      const content = await this.decryptComment(row);
+      this.comments.update((comments) => comments.map((entry) => entry.row.uuid === comment.row.uuid
+        ? { row: { ...row, translatedMessage: undefined }, content }
+        : entry));
+      this.snackBar.open(this.translation.t('common.secretDropComments.editSuccess'), undefined, {
+        duration: 2500,
+        verticalPosition: 'top',
+        panelClass: 'snack-success'
+      });
+    } catch {
+      this.snackBar.open(this.translation.t('common.secretDropComments.editFailed'), undefined, {
+        duration: 3000,
+        verticalPosition: 'top',
+        panelClass: 'snack-error'
+      });
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  async deleteComment(comment: DecryptedComment): Promise<void> {
+    if (!this.isOwnComment(comment.row)) {
+      return;
+    }
+    const confirmed = await this.confirmDeleteComment();
+    if (!confirmed) {
+      return;
+    }
+    this.loading.set(true);
+    try {
+      const deleted = await this.secretDropService.deleteComment(this.data.drop.uuid, comment.row.uuid);
+      if (!deleted) {
+        throw new Error('delete_failed');
+      }
+      this.removeCommentLocally(comment);
+      this.snackBar.open(this.translation.t('common.secretDropComments.deleteSuccess'), undefined, {
+        duration: 2500,
+        verticalPosition: 'top',
+        panelClass: 'snack-success'
+      });
+    } catch {
+      this.snackBar.open(this.translation.t('common.secretDropComments.deleteFailed'), undefined, {
+        duration: 3000,
+        verticalPosition: 'top',
+        panelClass: 'snack-error'
+      });
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
   async toggleReaction(comment: DecryptedComment, reaction: 'like' | 'dislike'): Promise<void> {
     if (!this.userService.hasJwt()) {
       this.userService.loginWithBackend(() => void this.toggleReaction(comment, reaction));
@@ -276,6 +372,49 @@ export class SecretDropCommentsDialogComponent implements OnInit {
 
   private getSpeechTargetId(comment: DecryptedComment): string {
     return `secret-drop-comment:${comment.row.uuid}`;
+  }
+
+
+  private async confirmDeleteComment(): Promise<boolean> {
+    const dialogRef = this.dialog.open(DeleteMessageComponent, {
+      closeOnNavigation: true,
+      data: {
+        titleKey: 'common.secretDropComments.deleteDialog.title',
+        confirmKey: 'common.secretDropComments.deleteDialog.confirm'
+      },
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false
+    });
+    return !!(await firstValueFrom(dialogRef.afterClosed()));
+  }
+
+  private removeCommentLocally(comment: DecryptedComment): void {
+    const removedUuids = new Set<string>([comment.row.uuid]);
+    let changed = true;
+    while (changed) {
+      changed = false;
+      for (const entry of this.comments()) {
+        const parentUuid = entry.row.parentCommentUuid ?? null;
+        if (parentUuid && removedUuids.has(parentUuid) && !removedUuids.has(entry.row.uuid)) {
+          removedUuids.add(entry.row.uuid);
+          changed = true;
+        }
+      }
+    }
+
+    this.comments.update((comments) => comments.filter((entry) => !removedUuids.has(entry.row.uuid)));
+    const parentUuid = comment.row.parentCommentUuid ?? null;
+    if (parentUuid) {
+      const parent = this.comments().find((entry) => entry.row.uuid === parentUuid);
+      if (parent) {
+        this.patchCommentCounts(parentUuid, Math.max(0, Number(parent.row.commentsNumber ?? 0) - 1));
+      }
+    } else {
+      this.data.drop.commentsNumber = this.topLevelCommentCount();
+    }
+
+    this.levelStack.update((stack) => stack.filter((entry) => !removedUuids.has(entry.row.uuid)));
   }
 
   private patchCommentReaction(uuid: string, likes: number, dislikes: number): void {

@@ -7,13 +7,15 @@ import {
   SecretDropCreateRequest,
   SecretDropComment,
   SecretDropCommentCreateResponse,
+  SecretDropCommentDeleteResponse,
   SecretDropCommentListResponse,
   SecretDropCreateResponse,
   SecretDropDeleteResponse,
   SecretDropListResponse,
   SecretDropStatsResponse,
   SecretDropUnlockResponse,
-  SecretDropUpdateResponse
+  SecretDropUpdateResponse,
+  SecretDropCommentUpdateResponse
 } from '../interfaces/secret-drop';
 import { IndexedDbService } from './indexed-db.service';
 
@@ -158,6 +160,32 @@ export class SecretDropService {
       )
     );
     return this.normalizeComment(response.comment);
+  }
+
+
+  async updateComment(
+    uuid: string,
+    commentUuid: string,
+    request: Pick<SecretDropComment, 'encryptedPayload' | 'crypto'>
+  ): Promise<SecretDropComment> {
+    const response = await firstValueFrom(
+      this.http.put<SecretDropCommentUpdateResponse>(
+        `${this.baseUrl}/${encodeURIComponent(uuid)}/comments/${encodeURIComponent(commentUuid)}`,
+        request,
+        { headers: new HttpHeaders({ 'x-skip-ui': 'true' }) }
+      )
+    );
+    return this.normalizeComment(response.comment);
+  }
+
+  async deleteComment(uuid: string, commentUuid: string): Promise<boolean> {
+    const response = await firstValueFrom(
+      this.http.delete<SecretDropCommentDeleteResponse>(
+        `${this.baseUrl}/${encodeURIComponent(uuid)}/comments/${encodeURIComponent(commentUuid)}`,
+        { headers: new HttpHeaders({ 'x-skip-ui': 'true' }) }
+      )
+    );
+    return !!response.deleted;
   }
 
 

@@ -1867,6 +1867,17 @@
       "addTitle": "Escribir comentario",
       "addSuccess": "Comentario guardado.",
       "addFailed": "No se pudo guardar el comentario.",
+      "editTitle": "Editar comentario",
+      "editAria": "Editar comentario",
+      "editSuccess": "Comentario actualizado.",
+      "editFailed": "No se pudo actualizar el comentario.",
+      "deleteAria": "Eliminar comentario",
+      "deleteSuccess": "Comentario eliminado.",
+      "deleteFailed": "No se pudo eliminar el comentario.",
+      "deleteDialog": {
+        "title": "¿Eliminar comentario?",
+        "confirm": "Eliminar comentario"
+      },
       "loadFailed": "No se pudieron cargar los comentarios.",
       "replyTitle": "Escribir respuesta",
       "emptyReplies": "Aún no hay respuestas. Escribe la primera respuesta."
