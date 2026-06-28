@@ -275,7 +275,7 @@ export class SecretDropCommentsDialogComponent implements OnInit {
       if (!deleted) {
         throw new Error('delete_failed');
       }
-      this.removeCommentLocally(comment);
+      this.removeCommentLocally(comment, this.currentParent()?.row.uuid ?? null);
       this.snackBar.open(this.translation.t('common.secretDropComments.deleteSuccess'), undefined, {
         duration: 2500,
         verticalPosition: 'top',
@@ -389,7 +389,7 @@ export class SecretDropCommentsDialogComponent implements OnInit {
     return !!(await firstValueFrom(dialogRef.afterClosed()));
   }
 
-  private removeCommentLocally(comment: DecryptedComment): void {
+  private removeCommentLocally(comment: DecryptedComment, levelParentUuidBeforeDelete: string | null): void {
     const removedUuids = new Set<string>([comment.row.uuid]);
     let changed = true;
     while (changed) {
@@ -415,9 +415,13 @@ export class SecretDropCommentsDialogComponent implements OnInit {
     }
 
     this.levelStack.update((stack) => stack.filter((entry) => !removedUuids.has(entry.row.uuid)));
-    if (this.currentParent() && this.visibleComments().length === 0) {
+    if (levelParentUuidBeforeDelete && this.isLevelEmpty(levelParentUuidBeforeDelete)) {
       this.goBack();
     }
+  }
+
+  private isLevelEmpty(parentCommentUuid: string): boolean {
+    return !this.comments().some((entry) => (entry.row.parentCommentUuid ?? null) === parentCommentUuid);
   }
 
   private patchCommentReaction(uuid: string, likes: number, dislikes: number): void {
