@@ -77,6 +77,7 @@ export class SecretDropCommentsDialogComponent implements OnInit {
   readonly reactingUuid = signal<string | null>(null);
   readonly translatingUuid = signal<string | null>(null);
   readonly comments = signal<DecryptedComment[]>([]);
+  readonly levelStack = signal<DecryptedComment[]>([]);
 
   async ngOnInit(): Promise<void> {
     await this.loadComments();
@@ -90,21 +91,24 @@ export class SecretDropCommentsDialogComponent implements OnInit {
     return this.comments().filter((comment) => !comment.row.parentCommentUuid).length;
   }
 
-  visibleComments(): DecryptedComment[] {
-    return [...this.comments()].sort((a, b) => Number(a.row.createdAt || 0) - Number(b.row.createdAt || 0));
+  currentParent(): DecryptedComment | null {
+    const stack = this.levelStack();
+    return stack.length ? stack[stack.length - 1] : null;
   }
 
-  commentDepth(comment: SecretDropComment): number {
-    let depth = 0;
-    let parentUuid = comment.parentCommentUuid ?? null;
-    const byUuid = new Map(this.comments().map((entry) => [entry.row.uuid, entry.row]));
-    const visited = new Set<string>();
-    while (parentUuid && !visited.has(parentUuid) && depth < 4) {
-      visited.add(parentUuid);
-      depth += 1;
-      parentUuid = byUuid.get(parentUuid)?.parentCommentUuid ?? null;
-    }
-    return depth;
+  visibleComments(): DecryptedComment[] {
+    const parentUuid = this.currentParent()?.row.uuid ?? null;
+    return this.comments()
+      .filter((comment) => (comment.row.parentCommentUuid ?? null) === parentUuid)
+      .sort((a, b) => Number(a.row.createdAt || 0) - Number(b.row.createdAt || 0));
+  }
+
+  enterCommentLevel(comment: DecryptedComment): void {
+    this.levelStack.update((stack) => [...stack, comment]);
+  }
+
+  goBack(): void {
+    this.levelStack.update((stack) => stack.slice(0, -1));
   }
 
   isOwnComment(comment: SecretDropComment): boolean {
@@ -128,7 +132,7 @@ export class SecretDropCommentsDialogComponent implements OnInit {
     return comment.row.translatedMessage ?? comment.content.message ?? '';
   }
 
-  async addComment(parentComment?: DecryptedComment): Promise<void> {
+  async addComment(parentComment: DecryptedComment | null = this.currentParent()): Promise<void> {
     if (!this.userService.hasJwt()) {
       this.userService.loginWithBackend(() => void this.addComment(parentComment));
       return;
