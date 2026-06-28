@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy, computed } from '@angular/core';
+import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
@@ -12,6 +13,8 @@ import { SecretDropService } from '../../services/secret-drop.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { LanguageService } from '../../services/language.service';
 import { TranslateService } from '../../services/translate.service';
+import { UserService } from '../../services/user.service';
+import { ShortNumberPipe } from '../../pipes/short-number.pipe';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { DisplayMessage } from '../utils/display-message/display-message.component';
 import { DisplayMessageService } from '../../services/display-message.service';
@@ -35,6 +38,8 @@ interface UnlockedContent {
   imports: [
     CommonModule,
     DialogHeaderComponent,
+    ShortNumberPipe,
+    MatBadgeModule,
     MatButtonModule,
     MatCardModule,
     MatDialogActions,
@@ -57,11 +62,16 @@ export class FoundSecretDropListComponent {
   private readonly translation = inject(TranslationHelperService);
   private readonly languageService = inject(LanguageService);
   private readonly translateService = inject(TranslateService);
+  readonly userService = inject(UserService);
   readonly data = inject<FoundSecretDropListData>(MAT_DIALOG_DATA);
   readonly unlockingUuid = signal<string | null>(null);
   readonly unlocked = signal<Record<string, UnlockedContent>>({});
   readonly translatedHints = signal<Record<string, string>>({});
   readonly translatingHintUuid = signal<string | null>(null);
+  readonly translatingMessageUuid = signal<string | null>(null);
+  readonly translatedMessages = signal<Record<string, string>>({});
+  readonly reactingUuid = signal<string | null>(null);
+  readonly translationTargetLabel = computed(() => this.languageService.effectiveLanguage().toUpperCase());
 
   close(): void {
     this.dialogRef.close();
@@ -99,17 +109,103 @@ export class FoundSecretDropListComponent {
             [drop.uuid]: translatedText
           }));
         },
-        error: (error) => {
-          const message = this.translateService.getErrorMessage(error)
-            ?? this.translation.t('common.messageList.translateFailed');
-          this.snackBar.open(message, undefined, {
-            duration: 3000,
-            verticalPosition: 'top',
-            panelClass: 'snack-error'
-          });
-        }
+        error: (error) => this.showTranslateError(error)
       });
   }
+
+
+  getDisplayDrop(drop: SecretDrop): SecretDrop {
+    return this.getUnlocked(drop)?.drop ?? drop;
+  }
+
+  getUnlockedMessage(drop: SecretDrop): string {
+    const unlocked = this.getUnlocked(drop);
+    if (!unlocked) {
+      return '';
+    }
+    return this.translatedMessages()[drop.uuid] ?? unlocked.content.message ?? '';
+  }
+
+  translateUnlockedMessage(drop: SecretDrop): void {
+    const unlocked = this.getUnlocked(drop);
+    const message = unlocked?.content.message?.trim() ?? '';
+    if (!message || this.translatingMessageUuid()) {
+      return;
+    }
+
+    this.translatingMessageUuid.set(drop.uuid);
+    this.translateService.translate(message, this.languageService.effectiveLanguage(), false)
+      .pipe(finalize(() => this.translatingMessageUuid.set(null)))
+      .subscribe({
+        next: (response) => {
+          const translatedText = response.result?.text?.trim();
+          if (!translatedText) {
+            return;
+          }
+          this.translatedMessages.update((state) => ({
+            ...state,
+            [drop.uuid]: translatedText
+          }));
+        },
+        error: (error) => this.showTranslateError(error)
+      });
+  }
+
+  async toggleReaction(drop: SecretDrop, reaction: 'like' | 'dislike'): Promise<void> {
+    if (!this.userService.hasJwt()) {
+      this.userService.loginWithBackend(() => void this.toggleReaction(drop, reaction));
+      return;
+    }
+    if (this.reactingUuid()) {
+      return;
+    }
+    this.reactingUuid.set(drop.uuid);
+    try {
+      const state = await this.secretDropService.toggleReaction(drop.uuid, reaction);
+      this.updateDropReactionState(drop, state.likes, state.dislikes);
+    } catch {
+      this.snackBar.open(this.translation.t('errors.unknown'), undefined, {
+        duration: 3000,
+        verticalPosition: 'top',
+        panelClass: 'snack-error'
+      });
+    } finally {
+      this.reactingUuid.set(null);
+    }
+  }
+
+  private updateDropReactionState(drop: SecretDrop, likes: number, dislikes: number): void {
+    drop.likes = likes;
+    drop.dislikes = dislikes;
+    this.unlocked.update((state) => {
+      const unlocked = state[drop.uuid];
+      if (!unlocked) {
+        return state;
+      }
+      return {
+        ...state,
+        [drop.uuid]: {
+          ...unlocked,
+          drop: {
+            ...unlocked.drop,
+            likes,
+            dislikes
+          }
+        }
+      };
+    });
+  }
+
+  private showTranslateError(error: unknown): void {
+    const message = this.translateService.getErrorMessage(error)
+      ?? this.translation.t('common.messageList.translateFailed');
+    this.snackBar.open(message, undefined, {
+      duration: 3000,
+      verticalPosition: 'top',
+      panelClass: 'snack-error'
+    });
+  }
+
 
   async unlock(drop: SecretDrop): Promise<void> {
     if (this.unlockingUuid()) {

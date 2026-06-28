@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -13,6 +13,15 @@ import {
   SecretDropUpdateResponse
 } from '../interfaces/secret-drop';
 import { IndexedDbService } from './indexed-db.service';
+
+export interface SecretDropReactionResponse {
+  status: number;
+  uuid: string;
+  likes: number;
+  dislikes: number;
+  liked?: boolean;
+  disliked?: boolean;
+}
 
 @Injectable({ providedIn: 'root' })
 export class SecretDropService {
@@ -102,9 +111,24 @@ export class SecretDropService {
 
   async unlockSecretDrop(uuid: string, authVerifier: string): Promise<SecretDrop> {
     const response = await firstValueFrom(
-      this.http.post<SecretDropUnlockResponse>(`${this.baseUrl}/unlock/${encodeURIComponent(uuid)}`, { authVerifier })
+      this.http.post<SecretDropUnlockResponse>(
+        `${this.baseUrl}/unlock/${encodeURIComponent(uuid)}`,
+        { authVerifier },
+        { headers: new HttpHeaders({ 'x-skip-ui': 'true' }) }
+      )
     );
     return this.normalizeSecretDrop(response.secretDrop);
+  }
+
+
+  async toggleReaction(uuid: string, reaction: 'like' | 'dislike'): Promise<SecretDropReactionResponse> {
+    return firstValueFrom(
+      this.http.post<SecretDropReactionResponse>(
+        `${this.baseUrl}/${encodeURIComponent(uuid)}/${reaction}`,
+        {},
+        { headers: new HttpHeaders({ 'x-skip-ui': 'true' }) }
+      )
+    );
   }
 
   async getStats(uuid: string): Promise<SecretDropStatsResponse> {
