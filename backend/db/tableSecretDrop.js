@@ -6,6 +6,7 @@ const commentTableName = 'tableSecretDropComment';
 const commentLikeTableName = 'tableSecretDropCommentLike';
 const commentDislikeTableName = 'tableSecretDropCommentDislike';
 const hintTranslationTableName = 'tableSecretDropHintTranslation';
+const recipientTableName = 'tableSecretDropRecipient';
 
 const secretDropStatus = {
   ENABLED: 'enabled',
@@ -135,6 +136,8 @@ function mapSecretDropRow(row, options = {}) {
     likes: Number(row.likes || 0),
     dislikes: Number(row.dislikes || 0),
     commentsNumber: Number(pickRowValue(row, 'commentsNumber', 'commentsnumber') || 0),
+    visibility: pickRowValue(row, 'visibility') || 'public',
+    recipientUserIds: Array.isArray(row.recipientUserIds) ? row.recipientUserIds : [],
     createdAt: Number(pickRowValue(row, 'createdAt', 'createdat') || 0),
     updatedAt: Number(pickRowValue(row, 'updatedAt', 'updatedat') || 0),
     lastUnlockedAt: pickRowValue(row, 'lastUnlockedAt', 'lastunlockedat') === null || pickRowValue(row, 'lastUnlockedAt', 'lastunlockedat') === undefined ? null : Number(pickRowValue(row, 'lastUnlockedAt', 'lastunlockedat')),
@@ -161,6 +164,8 @@ function mapCommentRow(row) {
     likes: Number(pickRowValue(row, 'likes') || 0),
     dislikes: Number(pickRowValue(row, 'dislikes') || 0),
     commentsNumber: Number(pickRowValue(row, 'commentsNumber', 'commentsnumber') || 0),
+    visibility: pickRowValue(row, 'visibility') || 'public',
+    recipientUserIds: Array.isArray(row.recipientUserIds) ? row.recipientUserIds : [],
     createdAt: Number(pickRowValue(row, 'createdAt', 'createdat') || 0),
     status: row.status
   };
@@ -191,6 +196,7 @@ const init = function (db) {
       likes INTEGER NOT NULL DEFAULT 0,
       dislikes INTEGER NOT NULL DEFAULT 0,
       commentsNumber INTEGER NOT NULL DEFAULT 0,
+      visibility TEXT NOT NULL DEFAULT 'public',
       createdAt INTEGER NOT NULL DEFAULT (strftime('%s','now')),
       updatedAt INTEGER NOT NULL DEFAULT (strftime('%s','now')),
       lastUnlockedAt INTEGER DEFAULT NULL,
@@ -290,6 +296,20 @@ const init = function (db) {
         ON UPDATE CASCADE ON DELETE CASCADE
     );
 
+    CREATE TABLE IF NOT EXISTS ${recipientTableName} (
+      secretDropUuid TEXT NOT NULL,
+      recipientUserId TEXT NOT NULL,
+      createdAt INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+      PRIMARY KEY (secretDropUuid, recipientUserId),
+      CONSTRAINT FK_SECRET_DROP_RECIPIENT_DROP FOREIGN KEY (secretDropUuid)
+        REFERENCES ${tableName} (uuid)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+      CONSTRAINT FK_SECRET_DROP_RECIPIENT_USER FOREIGN KEY (recipientUserId)
+        REFERENCES tableUser (id)
+        ON UPDATE CASCADE ON DELETE CASCADE
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_secret_drop_recipient ON ${recipientTableName}(recipientUserId, secretDropUuid);
     CREATE INDEX IF NOT EXISTS idx_secret_drop_discovery ON ${tableName}(discoveryPlusCode, status);
     CREATE INDEX IF NOT EXISTS idx_secret_drop_owner ON ${tableName}(userId, createdAt DESC);
     CREATE INDEX IF NOT EXISTS idx_secret_drop_unlock_user ON ${unlockTableName}(secretDropUuid, userId, success);
@@ -304,6 +324,11 @@ const init = function (db) {
       }
     });
     db.run(`ALTER TABLE ${tableName} ADD COLUMN discoveryZoomLevel INTEGER NOT NULL DEFAULT 18;`, (alterErr) => {
+      if (alterErr && !/(duplicate column|already exists)/i.test(String(alterErr.message || ''))) {
+        throw alterErr;
+      }
+    });
+    db.run(`ALTER TABLE ${tableName} ADD COLUMN visibility TEXT NOT NULL DEFAULT 'public';`, (alterErr) => {
       if (alterErr && !/(duplicate column|already exists)/i.test(String(alterErr.message || ''))) {
         throw alterErr;
       }
@@ -327,8 +352,8 @@ async function create(db, payload) {
   const sql = `
     INSERT INTO ${tableName} (
       uuid, userId, latitude, longitude, plusCode, discoveryPlusCode, discoveryZoomLevel, hint, hintStyle,
-      encryptedPayload, crypto, authVerifierHash, maxUnlocks, validFrom, validUntil, status
-    ) VALUES (?, ?, ?, ?, UPPER(?), UPPER(?), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      encryptedPayload, crypto, authVerifierHash, maxUnlocks, validFrom, validUntil, status, visibility
+    ) VALUES (?, ?, ?, ?, UPPER(?), UPPER(?), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
   `;
   await runQuery(db, sql, [
     payload.uuid,
@@ -346,8 +371,10 @@ async function create(db, payload) {
     payload.maxUnlocks ?? null,
     payload.validFrom ?? null,
     payload.validUntil ?? null,
-    payload.status || secretDropStatus.ENABLED
+    payload.status || secretDropStatus.ENABLED,
+    payload.visibility || 'public'
   ]);
+  await setRecipients(db, payload.uuid, payload.recipientUserIds || []);
   return getByUuid(db, payload.uuid, { includeEncryptedPayload: false });
 }
 
@@ -372,6 +399,7 @@ async function updateContent(db, uuid, userId, payload) {
         validFrom = ?,
         validUntil = ?,
         status = ?,
+        visibility = ?,
         lastUnlockedAt = NULL,
         consumedAt = NULL,
         updatedAt = strftime('%s','now')
@@ -394,10 +422,51 @@ async function updateContent(db, uuid, userId, payload) {
     payload.validFrom ?? null,
     payload.validUntil ?? null,
     payload.status || secretDropStatus.ENABLED,
+    payload.visibility || 'public',
     uuid,
     userId
   ]);
+  if (row) {
+    await setRecipients(db, uuid, payload.recipientUserIds || []);
+  }
   return mapSecretDropRow(row, { includeEncryptedPayload: false });
+}
+
+async function setRecipients(db, secretDropUuid, recipientUserIds = []) {
+  await runQuery(db, `DELETE FROM ${recipientTableName} WHERE secretDropUuid = ?;`, [secretDropUuid]);
+  const uniqueIds = [...new Set((recipientUserIds || []).map((id) => String(id || '').trim()).filter(Boolean))];
+  for (const recipientUserId of uniqueIds) {
+    await runQuery(db, `INSERT INTO ${recipientTableName} (secretDropUuid, recipientUserId) VALUES (?, ?) ON CONFLICT(secretDropUuid, recipientUserId) DO NOTHING;`, [secretDropUuid, recipientUserId]);
+  }
+}
+
+async function getValidContactRecipientUserIds(db, ownerUserId, recipientUserIds = []) {
+  const uniqueIds = [...new Set((recipientUserIds || []).map((id) => String(id || '').trim()).filter(Boolean))];
+  if (uniqueIds.length === 0) return [];
+  const placeholders = uniqueIds.map(() => '?').join(',');
+  const rows = await allQuery(db, `
+    SELECT contactUserId FROM tableContact
+    WHERE userId = ?
+      AND COALESCE(status, 'active') = 'active'
+      AND contactUserId IN (${placeholders});
+  `, [ownerUserId, ...uniqueIds]);
+  const valid = new Set(rows.map((row) => row.contactUserId));
+  return uniqueIds.filter((id) => valid.has(id));
+}
+
+async function attachRecipients(db, drops) {
+  if (!Array.isArray(drops) || drops.length === 0) return drops;
+  const uuids = drops.map((drop) => drop.uuid).filter(Boolean);
+  if (uuids.length === 0) return drops;
+  const placeholders = uuids.map(() => '?').join(',');
+  const rows = await allQuery(db, `SELECT secretDropUuid, recipientUserId FROM ${recipientTableName} WHERE secretDropUuid IN (${placeholders});`, uuids);
+  const byDrop = new Map();
+  for (const row of rows) {
+    const list = byDrop.get(row.secretDropUuid) || [];
+    list.push(row.recipientUserId);
+    byDrop.set(row.secretDropUuid, list);
+  }
+  return drops.map((drop) => ({ ...drop, recipientUserIds: byDrop.get(drop.uuid) || [] }));
 }
 
 async function getByUuid(db, uuid, options = {}) {
@@ -409,23 +478,28 @@ async function getRawByUuid(db, uuid) {
   return getQuery(db, `SELECT * FROM ${tableName} WHERE uuid = ? LIMIT 1;`, [uuid]);
 }
 
-async function discoverByPlusCode(db, discoveryPlusCode, nowSeconds, zoomLevel = null) {
+async function discoverByPlusCode(db, discoveryPlusCode, nowSeconds, zoomLevel = null, userId = null) {
   const normalizedZoomLevel = Number.isInteger(Number(zoomLevel)) ? Number(zoomLevel) : null;
   const zoomCondition = normalizedZoomLevel === null ? '' : 'AND discoveryZoomLevel <= ?';
   const params = normalizedZoomLevel === null
-    ? [discoveryPlusCode, nowSeconds, nowSeconds]
-    : [discoveryPlusCode, normalizedZoomLevel, nowSeconds, nowSeconds];
+    ? [discoveryPlusCode]
+    : [discoveryPlusCode, normalizedZoomLevel];
+  const visibilityCondition = userId
+    ? `AND (visibility = 'public' OR userId = ? OR EXISTS (SELECT 1 FROM ${recipientTableName} r WHERE r.secretDropUuid = ${tableName}.uuid AND r.recipientUserId = ?))`
+    : `AND visibility = 'public'`;
+  const visibilityParams = userId ? [userId, userId] : [];
   const rows = await allQuery(db, `
     SELECT * FROM ${tableName}
     WHERE discoveryPlusCode = UPPER(?)
       ${zoomCondition}
+      ${visibilityCondition}
       AND status = '${secretDropStatus.ENABLED}'
       AND (validFrom IS NULL OR validFrom <= ?)
       AND (validUntil IS NULL OR validUntil >= ?)
       AND (maxUnlocks IS NULL OR unlockCount < maxUnlocks)
     ORDER BY createdAt DESC
     LIMIT 25;
-  `, params);
+  `, [...params, ...visibilityParams, nowSeconds, nowSeconds]);
   return rows.map((row) => mapSecretDropRow(row, { includeEncryptedPayload: false, includeCryptoMetadata: true }));
 }
 
@@ -436,7 +510,7 @@ async function getByUserId(db, userId) {
       AND status <> '${secretDropStatus.DELETED}'
     ORDER BY createdAt DESC;
   `, [userId]);
-  return rows.map((row) => mapSecretDropRow(row, { includeEncryptedPayload: false }));
+  return attachRecipients(db, rows.map((row) => mapSecretDropRow(row, { includeEncryptedPayload: false })));
 }
 
 async function recordFailedUnlock(db, uuid, userId = null) {
@@ -500,6 +574,7 @@ async function softDelete(db, uuid, userId) {
   const deleted = Number(result.changes || 0) > 0;
   if (deleted) {
     await runQuery(db, `DELETE FROM ${hintTranslationTableName} WHERE secretDropUuid = ?;`, [uuid]);
+    await runQuery(db, `DELETE FROM ${recipientTableName} WHERE secretDropUuid = ?;`, [uuid]);
   }
   return deleted;
 }
@@ -750,5 +825,6 @@ module.exports = {
   deleteComment,
   toggleCommentReaction,
   secretDropStatus,
+  getValidContactRecipientUserIds,
   mapSecretDropRow
 };

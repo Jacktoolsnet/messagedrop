@@ -60,6 +60,8 @@ export class SecretDropService {
         messageStyle: local?.messageStyle,
         multimedia: local?.multimedia,
         localSecretPin: local?.localSecretPin ?? null,
+        visibility: row.visibility ?? local?.visibility ?? 'public',
+        recipientUserIds: row.recipientUserIds ?? local?.recipientUserIds ?? [],
         publishState: row.status === 'enabled' ? 'published' : 'unpublished',
         discoveryZoomLevel: local?.discoveryZoomLevel ?? row.discoveryZoomLevel,
         localOnly: false
@@ -259,6 +261,8 @@ export class SecretDropService {
       messageStyle: existing?.messageStyle ?? '',
       multimedia: existing?.multimedia ?? null,
       localSecretPin: existing?.localSecretPin ?? null,
+      visibility: existing?.visibility ?? response.secretDrop.visibility ?? 'public',
+      recipientUserIds: existing?.recipientUserIds ?? response.secretDrop.recipientUserIds ?? [],
       publishState: action === 'publish' ? 'published' : 'unpublished',
       localOnly: false
     });
@@ -323,6 +327,8 @@ export class SecretDropService {
       messageStyle: source.messageStyle ?? '',
       multimedia: source.multimedia ?? null,
       localSecretPin: typeof source.localSecretPin === 'string' && source.localSecretPin.length > 0 ? source.localSecretPin : null,
+      visibility: source.visibility === 'contacts' ? 'contacts' : 'public',
+      recipientUserIds: Array.isArray(source.recipientUserIds) ? source.recipientUserIds.map((id) => String(id)).filter(Boolean) : [],
       crypto: this.parseJsonField(source.crypto),
       encryptedPayload: this.parseJsonField(source.encryptedPayload),
       publishState: source.publishState ?? (source.status === 'enabled' ? 'published' : 'unpublished'),

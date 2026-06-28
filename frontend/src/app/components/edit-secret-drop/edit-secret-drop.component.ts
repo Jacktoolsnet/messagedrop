@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSliderModule } from '@angular/material/slider';
+import { MatSelectModule } from '@angular/material/select';
 import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -13,6 +14,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTimepickerModule } from '@angular/material/timepicker';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
+import { Contact } from '../../interfaces/contact';
 import { Location } from '../../interfaces/location';
 import { Multimedia } from '../../interfaces/multimedia';
 import { MultimediaType } from '../../interfaces/multimedia-type';
@@ -20,6 +22,7 @@ import { SecretDrop, SecretDropCreateRequest } from '../../interfaces/secret-dro
 import { GeolocationService } from '../../services/geolocation.service';
 import { SecretDropCryptoService } from '../../services/secret-drop-crypto.service';
 import { SecretDropService } from '../../services/secret-drop.service';
+import { ContactService } from '../../services/contact.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
 import { DisplayMessageService } from '../../services/display-message.service';
@@ -54,6 +57,7 @@ type SecretDropCreateAction = 'publish' | 'draft';
     MatCardModule,
     MatSlideToggleModule,
     MatSliderModule,
+    MatSelectModule,
     MatDatepickerModule,
     MatDialogActions,
     MatDialogContent,
@@ -75,6 +79,7 @@ export class EditSecretDropComponent {
   private readonly cryptoService = inject(SecretDropCryptoService);
   private readonly secretDropService = inject(SecretDropService);
   private readonly messageService = inject(MessageService);
+  readonly contactService = inject(ContactService);
   private readonly userService = inject(UserService);
   private readonly geolocationService = inject(GeolocationService);
   private readonly snackBar = inject(DisplayMessageService);
@@ -90,6 +95,8 @@ export class EditSecretDropComponent {
   readonly maxDiscoveryZoomLevel = 19;
   pin = '';
   oneTime = true;
+  visibility: 'public' | 'contacts' = 'public';
+  selectedRecipientUserIds: string[] = [];
   discoveryZoomLevel = 18;
   useValidFrom = false;
   useValidUntil = false;
@@ -101,6 +108,7 @@ export class EditSecretDropComponent {
   saving = signal(false);
 
   constructor() {
+    this.contactService.initContacts();
     const drop = this.data.secretDrop;
     if (!drop) {
       return;
@@ -111,6 +119,8 @@ export class EditSecretDropComponent {
     this.hint = drop.hint ?? '';
     this.hintStyle = drop.hintStyle ?? '';
     this.oneTime = drop.maxUnlocks === 1;
+    this.visibility = drop.visibility === 'contacts' ? 'contacts' : 'public';
+    this.selectedRecipientUserIds = Array.isArray(drop.recipientUserIds) ? [...drop.recipientUserIds] : [];
     this.discoveryZoomLevel = this.clampDiscoveryZoomLevel(drop.discoveryZoomLevel);
     this.useValidFrom = drop.validFrom !== null && drop.validFrom !== undefined;
     this.useValidUntil = drop.validUntil !== null && drop.validUntil !== undefined;
@@ -128,6 +138,27 @@ export class EditSecretDropComponent {
 
   get hasSecretContent(): boolean {
     return this.message.trim().length > 0 || this.hasMultimedia;
+  }
+
+  get activeContacts(): Contact[] {
+    return this.contactService.contactsSignal().filter((contact) => contact.status !== 'removed_by_contact' && !!contact.contactUserId);
+  }
+
+  get contactRestricted(): boolean {
+    return this.visibility === 'contacts';
+  }
+
+  setContactRestricted(restricted: boolean): void {
+    this.visibility = restricted ? 'contacts' : 'public';
+    if (!restricted) {
+      this.selectedRecipientUserIds = [];
+    } else {
+      this.contactService.initContacts();
+    }
+  }
+
+  getContactDisplayName(contact: Contact): string {
+    return contact.name?.trim() || contact.hint?.trim() || contact.contactUserId;
   }
 
   get minStartDate(): Date {
@@ -244,6 +275,8 @@ export class EditSecretDropComponent {
       maxUnlocks: this.oneTime ? 1 : null,
       validFrom: this.useValidFrom ? this.toSeconds(this.validFromDate, this.validFromTime) : null,
       validUntil: this.useValidUntil ? this.toSeconds(this.validUntilDate, this.validUntilTime) : null,
+      visibility: this.visibility,
+      recipientUserIds: this.visibility === 'contacts' ? [...this.selectedRecipientUserIds] : [],
       publishState: 'published'
     };
   }
@@ -270,6 +303,8 @@ export class EditSecretDropComponent {
       failedUnlockCount: this.data.secretDrop?.failedUnlockCount ?? 0,
       validFrom: this.useValidFrom ? this.toSeconds(this.validFromDate, this.validFromTime) : null,
       validUntil: this.useValidUntil ? this.toSeconds(this.validUntilDate, this.validUntilTime) : null,
+      visibility: this.visibility,
+      recipientUserIds: this.visibility === 'contacts' ? [...this.selectedRecipientUserIds] : [],
       status: this.data.secretDrop?.status ?? 'disabled',
       publishState: this.data.secretDrop?.publishState ?? 'draft',
       localOnly: this.data.secretDrop?.localOnly ?? true,
@@ -298,7 +333,9 @@ export class EditSecretDropComponent {
       hintStyle: this.hintStyle,
       maxUnlocks: this.oneTime ? 1 : null,
       validFrom: this.useValidFrom ? this.toSeconds(this.validFromDate, this.validFromTime) : null,
-      validUntil: this.useValidUntil ? this.toSeconds(this.validUntilDate, this.validUntilTime) : null
+      validUntil: this.useValidUntil ? this.toSeconds(this.validUntilDate, this.validUntilTime) : null,
+      visibility: this.visibility,
+      recipientUserIds: this.visibility === 'contacts' ? [...this.selectedRecipientUserIds] : []
     };
   }
 
@@ -528,6 +565,9 @@ export class EditSecretDropComponent {
     }
     if (action === 'publish' && this.pin.length !== 6) {
       return 'common.secretDrop.pinRequired';
+    }
+    if (this.visibility === 'contacts' && this.selectedRecipientUserIds.length === 0) {
+      return 'common.secretDrop.recipientsRequired';
     }
     const validFrom = this.useValidFrom ? this.toSeconds(this.validFromDate, this.validFromTime) : null;
     const validUntil = this.useValidUntil ? this.toSeconds(this.validUntilDate, this.validUntilTime) : null;

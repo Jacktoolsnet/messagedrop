@@ -14,6 +14,7 @@ const MAX_PLUS_CODE_LENGTH = 32;
 const MAX_ENCRYPTED_PAYLOAD_LENGTH = 32768;
 const MAX_CRYPTO_METADATA_LENGTH = 8192;
 const MAX_AUTH_VERIFIER_LENGTH = 4096;
+const MAX_RECIPIENTS = 50;
 const DEFAULT_DISCOVERY_ZOOM_LEVEL = 18;
 const MIN_DISCOVERY_ZOOM_LEVEL = 12;
 const MAX_DISCOVERY_ZOOM_LEVEL = 19;
@@ -120,6 +121,43 @@ function normalizeMaxUnlocks(value) {
   return numeric;
 }
 
+function normalizeVisibility(value) {
+  const visibility = normalizeString(value || 'public', 32).toLowerCase();
+  if (!['public', 'contacts'].includes(visibility)) {
+    throw apiError.badRequest('invalid_secret_drop_visibility');
+  }
+  return visibility;
+}
+
+function normalizeRecipientUserIds(value) {
+  if (value === undefined || value === null) {
+    return [];
+  }
+  if (!Array.isArray(value)) {
+    throw apiError.badRequest('invalid_secret_drop_recipients');
+  }
+  const ids = [...new Set(value.map((id) => normalizeString(id, 128)).filter(Boolean))];
+  if (ids.length > MAX_RECIPIENTS) {
+    throw apiError.badRequest('too_many_secret_drop_recipients');
+  }
+  return ids;
+}
+
+async function normalizeAndValidateRecipients(db, ownerUserId, visibility, rawRecipientUserIds) {
+  if (visibility !== 'contacts') {
+    return [];
+  }
+  const recipientUserIds = normalizeRecipientUserIds(rawRecipientUserIds);
+  if (recipientUserIds.length === 0) {
+    throw apiError.badRequest('secret_drop_recipients_required');
+  }
+  const validRecipientUserIds = await tableSecretDrop.getValidContactRecipientUserIds(db, ownerUserId, recipientUserIds);
+  if (validRecipientUserIds.length !== recipientUserIds.length) {
+    throw apiError.badRequest('invalid_secret_drop_recipients');
+  }
+  return validRecipientUserIds;
+}
+
 function ensureNoPlainSecretFields(body) {
   const forbiddenFields = ['message', 'secret', 'secretMessage', 'plaintext', 'plainText', 'password'];
   const present = forbiddenFields.find((field) => Object.prototype.hasOwnProperty.call(body || {}, field));
@@ -146,6 +184,8 @@ function mapPublicSecretDrop(drop) {
     likes: drop.likes,
     dislikes: drop.dislikes,
     commentsNumber: drop.commentsNumber,
+    visibility: drop.visibility || 'public',
+    recipientUserIds: Array.isArray(drop.recipientUserIds) ? drop.recipientUserIds : [],
     createdAt: drop.createdAt
   };
   if (drop.crypto) {
@@ -234,6 +274,8 @@ router.post('/create', [
     const status = publishState === 'draft' || publishState === 'unpublished'
       ? tableSecretDrop.secretDropStatus.DISABLED
       : tableSecretDrop.secretDropStatus.ENABLED;
+    const visibility = normalizeVisibility(req.body?.visibility);
+    const recipientUserIds = await normalizeAndValidateRecipients(db, userId, visibility, req.body?.recipientUserIds);
 
     const drop = await tableSecretDrop.create(db, {
       uuid: crypto.randomUUID(),
@@ -251,7 +293,9 @@ router.post('/create', [
       maxUnlocks,
       validFrom,
       validUntil,
-      status
+      status,
+      visibility,
+      recipientUserIds
     });
 
     res.status(201).json({ status: 201, secretDrop: mapPublicSecretDrop(drop) });
@@ -306,6 +350,8 @@ router.post('/republish/:uuid', [
     if (validFrom !== null && validUntil !== null && validFrom > validUntil) {
       throw apiError.badRequest('invalid_validity_window');
     }
+    const visibility = normalizeVisibility(req.body?.visibility);
+    const recipientUserIds = await normalizeAndValidateRecipients(db, userId, visibility, req.body?.recipientUserIds);
 
     const drop = await tableSecretDrop.updateContent(db, uuid, userId, {
       latitude,
@@ -321,7 +367,9 @@ router.post('/republish/:uuid', [
       maxUnlocks,
       validFrom,
       validUntil,
-      status: tableSecretDrop.secretDropStatus.ENABLED
+      status: tableSecretDrop.secretDropStatus.ENABLED,
+      visibility,
+      recipientUserIds
     });
     if (!drop) {
       throw apiError.notFound('secret_drop_not_found');
@@ -340,7 +388,7 @@ router.get('/discover/pluscode/:plusCode', security.authenticateOptional, async 
       throw apiError.badRequest('invalid_plus_code');
     }
     const zoomLevel = normalizeDiscoveryZoomLevel(req.query?.zoomLevel ?? req.query?.zoom, false);
-    const rows = await tableSecretDrop.discoverByPlusCode(getDb(req), plusCode, nowSeconds(), zoomLevel);
+    const rows = await tableSecretDrop.discoverByPlusCode(getDb(req), plusCode, nowSeconds(), zoomLevel, getAuthUserId(req));
     res.status(200).json({ status: 200, rows: rows.map(mapPublicSecretDrop) });
   } catch (error) {
     next(error);

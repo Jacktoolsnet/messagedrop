@@ -383,6 +383,8 @@ export class MySecretDropListComponent implements OnInit {
       maxUnlocks: drop.maxUnlocks,
       validFrom: drop.validFrom,
       validUntil: drop.validUntil,
+      visibility: drop.visibility ?? 'public',
+      recipientUserIds: drop.visibility === 'contacts' ? [...(drop.recipientUserIds ?? [])] : [],
       publishState: 'published'
     };
     await this.secretDropService.republishSecretDrop(drop.uuid, request, {
@@ -395,7 +397,9 @@ export class MySecretDropListComponent implements OnInit {
       hintStyle: drop.hintStyle ?? '',
       maxUnlocks: drop.maxUnlocks,
       validFrom: drop.validFrom,
-      validUntil: drop.validUntil
+      validUntil: drop.validUntil,
+      visibility: drop.visibility ?? 'public',
+      recipientUserIds: drop.visibility === 'contacts' ? [...(drop.recipientUserIds ?? [])] : []
     });
     this.snackBar.open(this.translation.t('common.secretDrop.publishSuccess'), undefined, {
       duration: 2600,
@@ -446,6 +450,8 @@ export class MySecretDropListComponent implements OnInit {
       maxUnlocks: drop.maxUnlocks,
       validFrom: drop.validFrom,
       validUntil: drop.validUntil,
+      visibility: drop.visibility ?? 'public',
+      recipientUserIds: drop.visibility === 'contacts' ? [...(drop.recipientUserIds ?? [])] : [],
       publishState: 'published'
     };
     await this.secretDropService.createSecretDrop(request, {
@@ -458,7 +464,9 @@ export class MySecretDropListComponent implements OnInit {
       hintStyle: drop.hintStyle ?? '',
       maxUnlocks: drop.maxUnlocks,
       validFrom: drop.validFrom,
-      validUntil: drop.validUntil
+      validUntil: drop.validUntil,
+      visibility: drop.visibility ?? 'public',
+      recipientUserIds: drop.visibility === 'contacts' ? [...(drop.recipientUserIds ?? [])] : []
     });
     await this.secretDropService.removeLocalSecretDrop(userId, drop.uuid);
     this.snackBar.open(this.translation.t('common.secretDrop.publishSuccess'), undefined, {
