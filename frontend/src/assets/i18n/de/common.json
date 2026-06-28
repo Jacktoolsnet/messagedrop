@@ -1885,7 +1885,7 @@
       "deleteFailed": "Kommentar konnte nicht gelöscht werden.",
       "deleteDialog": {
         "title": "Kommentar löschen?",
-        "confirm": "Kommentar löschen"
+        "confirm": "Die Nachricht und alle zugehörigen Kommentare werden dauerhaft gelöscht. Bist du sicher?"
       },
       "loadFailed": "Kommentare konnten nicht geladen werden.",
       "replyTitle": "Antwort schreiben",

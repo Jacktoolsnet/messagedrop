@@ -415,6 +415,9 @@ export class SecretDropCommentsDialogComponent implements OnInit {
     }
 
     this.levelStack.update((stack) => stack.filter((entry) => !removedUuids.has(entry.row.uuid)));
+    if (this.currentParent() && this.visibleComments().length === 0) {
+      this.goBack();
+    }
   }
 
   private patchCommentReaction(uuid: string, likes: number, dislikes: number): void {

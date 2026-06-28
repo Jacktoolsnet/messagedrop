@@ -1876,7 +1876,7 @@
       "deleteFailed": "Le commentaire n’a pas pu être supprimé.",
       "deleteDialog": {
         "title": "Supprimer le commentaire ?",
-        "confirm": "Supprimer le commentaire"
+        "confirm": "Le commentaire et toutes les réponses associées seront définitivement supprimés. Es-tu sûr ?"
       },
       "loadFailed": "Les commentaires n’ont pas pu être chargés.",
       "replyTitle": "Écrire une réponse",

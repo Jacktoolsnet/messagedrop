@@ -1885,7 +1885,7 @@
       "deleteFailed": "Comment could not be deleted.",
       "deleteDialog": {
         "title": "Delete comment?",
-        "confirm": "Delete comment"
+        "confirm": "The comment and all related replies will be permanently deleted. Are you sure?"
       },
       "loadFailed": "Comments could not be loaded.",
       "replyTitle": "Write reply",
