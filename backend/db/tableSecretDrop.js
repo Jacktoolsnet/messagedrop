@@ -38,6 +38,20 @@ function allQuery(db, sql, params = []) {
   });
 }
 
+
+function pickRowValue(row, ...keys) {
+  for (const key of keys) {
+    if (row && row[key] !== undefined) {
+      return row[key];
+    }
+  }
+  return undefined;
+}
+
+function numberOrDefault(value, fallback = 0) {
+  return value === null || value === undefined ? fallback : Number(value);
+}
+
 function safeJsonParse(value, fallback = null) {
   if (!value) return fallback;
   try {
@@ -59,28 +73,28 @@ function mapSecretDropRow(row, options = {}) {
     longitude: Number(row.longitude),
     plusCode: row.plusCode,
     discoveryPlusCode: row.discoveryPlusCode,
-    discoveryZoomLevel: Number(row.discoveryZoomLevel || 18),
+    discoveryZoomLevel: Number(pickRowValue(row, 'discoveryZoomLevel', 'discoveryzoomlevel') || 18),
     hint: row.hint || '',
-    hintStyle: row.hintStyle || row.hintstyle || '',
-    maxUnlocks: row.maxUnlocks === null || row.maxUnlocks === undefined ? null : Number(row.maxUnlocks),
-    unlockCount: Number(row.unlockCount || 0),
-    failedUnlockCount: Number(row.failedUnlockCount || 0),
-    validFrom: row.validFrom === null || row.validFrom === undefined ? null : Number(row.validFrom),
-    validUntil: row.validUntil === null || row.validUntil === undefined ? null : Number(row.validUntil),
+    hintStyle: pickRowValue(row, 'hintStyle', 'hintstyle') || '',
+    maxUnlocks: pickRowValue(row, 'maxUnlocks', 'maxunlocks') === null || pickRowValue(row, 'maxUnlocks', 'maxunlocks') === undefined ? null : Number(pickRowValue(row, 'maxUnlocks', 'maxunlocks')),
+    unlockCount: Number(pickRowValue(row, 'unlockCount', 'unlockcount') || 0),
+    failedUnlockCount: Number(pickRowValue(row, 'failedUnlockCount', 'failedunlockcount') || 0),
+    validFrom: pickRowValue(row, 'validFrom', 'validfrom') === null || pickRowValue(row, 'validFrom', 'validfrom') === undefined ? null : Number(pickRowValue(row, 'validFrom', 'validfrom')),
+    validUntil: pickRowValue(row, 'validUntil', 'validuntil') === null || pickRowValue(row, 'validUntil', 'validuntil') === undefined ? null : Number(pickRowValue(row, 'validUntil', 'validuntil')),
     status: row.status,
     likes: Number(row.likes || 0),
     dislikes: Number(row.dislikes || 0),
-    commentsNumber: Number(row.commentsNumber || 0),
-    createdAt: Number(row.createdAt || 0),
-    updatedAt: Number(row.updatedAt || 0),
-    lastUnlockedAt: row.lastUnlockedAt === null || row.lastUnlockedAt === undefined ? null : Number(row.lastUnlockedAt),
-    consumedAt: row.consumedAt === null || row.consumedAt === undefined ? null : Number(row.consumedAt)
+    commentsNumber: Number(pickRowValue(row, 'commentsNumber', 'commentsnumber') || 0),
+    createdAt: Number(pickRowValue(row, 'createdAt', 'createdat') || 0),
+    updatedAt: Number(pickRowValue(row, 'updatedAt', 'updatedat') || 0),
+    lastUnlockedAt: pickRowValue(row, 'lastUnlockedAt', 'lastunlockedat') === null || pickRowValue(row, 'lastUnlockedAt', 'lastunlockedat') === undefined ? null : Number(pickRowValue(row, 'lastUnlockedAt', 'lastunlockedat')),
+    consumedAt: pickRowValue(row, 'consumedAt', 'consumedat') === null || pickRowValue(row, 'consumedAt', 'consumedat') === undefined ? null : Number(pickRowValue(row, 'consumedAt', 'consumedat'))
   };
   if (includeCryptoMetadata) {
-    mapped.crypto = safeJsonParse(row.crypto, null);
+    mapped.crypto = safeJsonParse(pickRowValue(row, 'crypto'), null);
   }
   if (includeEncryptedPayload) {
-    mapped.encryptedPayload = safeJsonParse(row.encryptedPayload, row.encryptedPayload);
+    mapped.encryptedPayload = safeJsonParse(pickRowValue(row, 'encryptedPayload', 'encryptedpayload'), pickRowValue(row, 'encryptedPayload', 'encryptedpayload'));
   }
   return mapped;
 }
@@ -89,11 +103,11 @@ function mapCommentRow(row) {
   if (!row) return null;
   return {
     uuid: row.uuid,
-    secretDropUuid: row.secretDropUuid,
+    secretDropUuid: pickRowValue(row, 'secretDropUuid', 'secretdropuuid'),
     userId: row.userId,
-    encryptedPayload: safeJsonParse(row.encryptedPayload, row.encryptedPayload),
-    crypto: safeJsonParse(row.crypto, null),
-    createdAt: Number(row.createdAt || 0),
+    encryptedPayload: safeJsonParse(pickRowValue(row, 'encryptedPayload', 'encryptedpayload'), pickRowValue(row, 'encryptedPayload', 'encryptedpayload')),
+    crypto: safeJsonParse(pickRowValue(row, 'crypto'), null),
+    createdAt: Number(pickRowValue(row, 'createdAt', 'createdat') || 0),
     status: row.status
   };
 }
@@ -237,6 +251,54 @@ async function create(db, payload) {
   return getByUuid(db, payload.uuid, { includeEncryptedPayload: false });
 }
 
+
+async function updateContent(db, uuid, userId, payload) {
+  const row = await getQuery(db, `
+    UPDATE ${tableName}
+    SET latitude = ?,
+        longitude = ?,
+        plusCode = UPPER(?),
+        discoveryPlusCode = UPPER(?),
+        discoveryZoomLevel = ?,
+        hint = ?,
+        hintStyle = ?,
+        encryptedPayload = ?,
+        crypto = ?,
+        authVerifierHash = ?,
+        maxUnlocks = ?,
+        unlockCount = 0,
+        failedUnlockCount = 0,
+        validFrom = ?,
+        validUntil = ?,
+        status = ?,
+        lastUnlockedAt = NULL,
+        consumedAt = NULL,
+        updatedAt = strftime('%s','now')
+    WHERE uuid = ?
+      AND userId = ?
+      AND status <> '${secretDropStatus.DELETED}'
+    RETURNING *;
+  `, [
+    payload.latitude,
+    payload.longitude,
+    payload.plusCode,
+    payload.discoveryPlusCode,
+    payload.discoveryZoomLevel ?? 18,
+    payload.hint || '',
+    payload.hintStyle || '',
+    payload.encryptedPayload,
+    payload.crypto,
+    payload.authVerifierHash,
+    payload.maxUnlocks ?? null,
+    payload.validFrom ?? null,
+    payload.validUntil ?? null,
+    payload.status || secretDropStatus.ENABLED,
+    uuid,
+    userId
+  ]);
+  return mapSecretDropRow(row, { includeEncryptedPayload: false });
+}
+
 async function getByUuid(db, uuid, options = {}) {
   const row = await getQuery(db, `SELECT * FROM ${tableName} WHERE uuid = ? LIMIT 1;`, [uuid]);
   return mapSecretDropRow(row, options);
@@ -247,17 +309,22 @@ async function getRawByUuid(db, uuid) {
 }
 
 async function discoverByPlusCode(db, discoveryPlusCode, nowSeconds, zoomLevel = null) {
+  const normalizedZoomLevel = Number.isInteger(Number(zoomLevel)) ? Number(zoomLevel) : null;
+  const zoomCondition = normalizedZoomLevel === null ? '' : 'AND discoveryZoomLevel <= ?';
+  const params = normalizedZoomLevel === null
+    ? [discoveryPlusCode, nowSeconds, nowSeconds]
+    : [discoveryPlusCode, normalizedZoomLevel, nowSeconds, nowSeconds];
   const rows = await allQuery(db, `
     SELECT * FROM ${tableName}
     WHERE discoveryPlusCode = UPPER(?)
-      AND (? IS NULL OR discoveryZoomLevel <= ?)
+      ${zoomCondition}
       AND status = '${secretDropStatus.ENABLED}'
       AND (validFrom IS NULL OR validFrom <= ?)
       AND (validUntil IS NULL OR validUntil >= ?)
       AND (maxUnlocks IS NULL OR unlockCount < maxUnlocks)
     ORDER BY createdAt DESC
     LIMIT 25;
-  `, [discoveryPlusCode, zoomLevel, zoomLevel, nowSeconds, nowSeconds]);
+  `, params);
   return rows.map((row) => mapSecretDropRow(row, { includeEncryptedPayload: false, includeCryptoMetadata: true }));
 }
 
@@ -416,6 +483,7 @@ async function getComments(db, uuid) {
 module.exports = {
   init,
   create,
+  updateContent,
   getByUuid,
   getRawByUuid,
   discoverByPlusCode,

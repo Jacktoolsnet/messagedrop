@@ -41,7 +41,11 @@ export class SecretDropCryptoService {
 
   async deriveAuthVerifierFromMetadata(password: string, metadata: SecretDropCryptoMetadata): Promise<string> {
     this.ensureWebCrypto();
-    return this.deriveAuthVerifier(this.normalizePassword(password), this.fromBase64(metadata.authSalt));
+    return this.deriveAuthVerifier(
+      this.normalizePassword(password),
+      this.fromBase64(metadata.authSalt),
+      this.normalizeIterations(metadata.iterations)
+    );
   }
 
   async decryptSecret(
@@ -81,7 +85,7 @@ export class SecretDropCryptoService {
     );
   }
 
-  private async deriveAuthVerifier(password: string, salt: BufferSource): Promise<string> {
+  private async deriveAuthVerifier(password: string, salt: BufferSource, iterations = this.iterations): Promise<string> {
     const baseKey = await crypto.subtle.importKey(
       'raw',
       new TextEncoder().encode(`SecretDrop auth:${password}`),
@@ -90,11 +94,17 @@ export class SecretDropCryptoService {
       ['deriveBits']
     );
     const bits = await crypto.subtle.deriveBits(
-      { name: 'PBKDF2', salt, iterations: this.iterations, hash: 'SHA-256' },
+      { name: 'PBKDF2', salt, iterations, hash: 'SHA-256' },
       baseKey,
       256
     );
     return this.toBase64(new Uint8Array(bits));
+  }
+
+
+  private normalizeIterations(value: unknown): number {
+    const numeric = Number(value);
+    return Number.isInteger(numeric) && numeric > 0 ? numeric : this.iterations;
   }
 
   private normalizePassword(password: string): string {

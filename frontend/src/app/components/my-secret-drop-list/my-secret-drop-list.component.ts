@@ -148,6 +148,10 @@ export class MySecretDropListComponent implements OnInit {
         await this.publishLocalDraft(drop);
         return;
       }
+      if (this.hasLocalSecretContent(drop)) {
+        await this.republishExistingDrop(drop);
+        return;
+      }
       await this.secretDropService.publishSecretDrop(drop.uuid);
       this.snackBar.open(this.translation.t('common.secretDrop.publishSuccess'), undefined, {
         duration: 2600,
@@ -240,8 +244,55 @@ export class MySecretDropListComponent implements OnInit {
     return `publish-state-badge publish-state-${key}`;
   }
 
-  private async publishLocalDraft(drop: SecretDrop): Promise<void> {
+
+  private hasLocalSecretContent(drop: SecretDrop): boolean {
+    return String(drop.message ?? '').trim().length > 0 || !!drop.multimedia;
+  }
+
+  private async republishExistingDrop(drop: SecretDrop): Promise<void> {
     const userId = this.userService.getUser().id;
+    await this.ensureContentAllowedForPublishing(drop);
+    const pin = await this.openPinDialog();
+    if (!pin) {
+      return;
+    }
+    const encrypted = await this.cryptoService.encryptSecret(
+      String(drop.message ?? '').trim(),
+      pin,
+      drop.multimedia ?? undefined,
+      drop.messageStyle ?? ''
+    );
+    const request: SecretDropCreateRequest = {
+      userId,
+      latitude: drop.location.latitude,
+      longitude: drop.location.longitude,
+      plusCode: drop.plusCode,
+      discoveryPlusCode: drop.discoveryPlusCode || drop.plusCode,
+      discoveryZoomLevel: drop.discoveryZoomLevel ?? 18,
+      hint: drop.hint ?? '',
+      hintStyle: drop.hintStyle ?? '',
+      encryptedPayload: encrypted.encryptedPayload,
+      crypto: encrypted.crypto,
+      authVerifier: encrypted.authVerifier,
+      maxUnlocks: drop.maxUnlocks,
+      validFrom: drop.validFrom,
+      validUntil: drop.validUntil,
+      publishState: 'published'
+    };
+    await this.secretDropService.republishSecretDrop(drop.uuid, request, {
+      message: drop.message,
+      messageStyle: drop.messageStyle,
+      multimedia: drop.multimedia ?? null,
+      discoveryZoomLevel: drop.discoveryZoomLevel ?? 18
+    });
+    this.snackBar.open(this.translation.t('common.secretDrop.publishSuccess'), undefined, {
+      duration: 2600,
+      verticalPosition: 'top',
+      panelClass: 'snack-success'
+    });
+  }
+
+  private async ensureContentAllowedForPublishing(drop: SecretDrop): Promise<void> {
     const moderationInput = [drop.message, drop.hint].map((value) => String(value ?? '').trim()).filter(Boolean).join('\n\n');
     if (this.messageService.detectPersonalInformation(moderationInput)) {
       throw new Error('moderation_rejected_pattern');
@@ -253,6 +304,11 @@ export class MySecretDropListComponent implements OnInit {
     if ((response?.moderation?.decision ?? 'approved') === 'rejected') {
       throw new Error(response?.moderation?.reason === 'pattern' ? 'moderation_rejected_pattern' : 'moderation_rejected');
     }
+  }
+
+  private async publishLocalDraft(drop: SecretDrop): Promise<void> {
+    const userId = this.userService.getUser().id;
+    await this.ensureContentAllowedForPublishing(drop);
     const pin = await this.openPinDialog();
     if (!pin) {
       return;

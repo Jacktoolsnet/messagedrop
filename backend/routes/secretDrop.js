@@ -26,6 +26,16 @@ const unlockLimiter = rateLimit({
   message: { status: 429, error: 'too_many_secret_drop_unlock_attempts' }
 });
 
+
+function pickRowValue(row, ...keys) {
+  for (const key of keys) {
+    if (row && row[key] !== undefined) {
+      return row[key];
+    }
+  }
+  return undefined;
+}
+
 function getAuthUserId(req) {
   return req.jwtUser?.userId ?? req.jwtUser?.id ?? null;
 }
@@ -250,6 +260,79 @@ router.post('/create', [
   }
 });
 
+
+router.post('/republish/:uuid', [
+  security.authenticate,
+  express.json({ type: 'application/json', limit: '80kb' }),
+  metric.count('secretdrop.republish', { when: 'always', timezone: 'utc', amount: 1 })
+], async (req, res, next) => {
+  try {
+    const uuid = normalizeString(req.params.uuid, 64);
+    if (!UUID_REGEX.test(uuid)) {
+      throw apiError.badRequest('invalid_secret_drop_uuid');
+    }
+    const db = getDb(req);
+    const authUserId = getAuthUserId(req);
+    const userId = normalizeString(req.body?.userId || req.body?.messageUserId, 128);
+    if (!authUserId || String(authUserId) !== String(userId)) {
+      throw apiError.forbidden('forbidden');
+    }
+    await ensureExistingUser(db, userId);
+    ensureNoPlainSecretFields(req.body);
+
+    const latitude = Number(req.body?.latitude);
+    const longitude = Number(req.body?.longitude);
+    if (!isValidCoordinate(latitude, longitude)) {
+      throw apiError.badRequest('invalid_location');
+    }
+
+    const plusCode = normalizePlusCode(req.body?.plusCode);
+    const discoveryPlusCode = normalizePlusCode(req.body?.discoveryPlusCode || req.body?.plusCode);
+    if (!plusCode || !discoveryPlusCode) {
+      throw apiError.badRequest('invalid_plus_code');
+    }
+
+    const encryptedPayload = serializeJsonField(
+      req.body?.encryptedPayload ?? req.body?.ciphertext,
+      'encrypted_payload',
+      MAX_ENCRYPTED_PAYLOAD_LENGTH
+    );
+    const cryptoMetadata = serializeJsonField(req.body?.crypto, 'crypto', MAX_CRYPTO_METADATA_LENGTH);
+    const authVerifier = normalizeAuthVerifier(req.body?.authVerifier);
+    const discoveryZoomLevel = normalizeDiscoveryZoomLevel(req.body?.discoveryZoomLevel, true);
+    const maxUnlocks = normalizeMaxUnlocks(req.body?.maxUnlocks);
+    const validFrom = normalizeOptionalTimestamp(req.body?.validFrom, 'valid_from');
+    const validUntil = normalizeOptionalTimestamp(req.body?.validUntil, 'valid_until');
+    if (validFrom !== null && validUntil !== null && validFrom > validUntil) {
+      throw apiError.badRequest('invalid_validity_window');
+    }
+
+    const drop = await tableSecretDrop.updateContent(db, uuid, userId, {
+      latitude,
+      longitude,
+      plusCode,
+      discoveryPlusCode,
+      discoveryZoomLevel,
+      hint: normalizeString(req.body?.hint, MAX_HINT_LENGTH),
+      hintStyle: normalizeString(req.body?.hintStyle, MAX_HINT_STYLE_LENGTH),
+      encryptedPayload,
+      crypto: cryptoMetadata,
+      authVerifierHash: hashAuthVerifier(authVerifier),
+      maxUnlocks,
+      validFrom,
+      validUntil,
+      status: tableSecretDrop.secretDropStatus.ENABLED
+    });
+    if (!drop) {
+      throw apiError.notFound('secret_drop_not_found');
+    }
+
+    res.status(200).json({ status: 200, secretDrop: mapPublicSecretDrop(drop) });
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get('/discover/pluscode/:plusCode', security.authenticateOptional, async (req, res, next) => {
   try {
     const plusCode = normalizePlusCode(req.params.plusCode);
@@ -286,17 +369,23 @@ router.post('/unlock/:uuid', [
     if (raw.status !== tableSecretDrop.secretDropStatus.ENABLED) {
       throw apiError.conflict('secret_drop_not_available');
     }
-    if ((raw.validFrom !== null && raw.validFrom !== undefined && Number(raw.validFrom) > at)
-      || (raw.validUntil !== null && raw.validUntil !== undefined && Number(raw.validUntil) < at)) {
+    const validFrom = pickRowValue(raw, 'validFrom', 'validfrom');
+    const validUntil = pickRowValue(raw, 'validUntil', 'validuntil');
+    const maxUnlocks = pickRowValue(raw, 'maxUnlocks', 'maxunlocks');
+    const unlockCount = pickRowValue(raw, 'unlockCount', 'unlockcount');
+    const storedAuthVerifierHash = pickRowValue(raw, 'authVerifierHash', 'authverifierhash');
+
+    if ((validFrom !== null && validFrom !== undefined && Number(validFrom) > at)
+      || (validUntil !== null && validUntil !== undefined && Number(validUntil) < at)) {
       throw apiError.conflict('secret_drop_not_in_validity_window');
     }
-    if (raw.maxUnlocks !== null && raw.maxUnlocks !== undefined && Number(raw.unlockCount || 0) >= Number(raw.maxUnlocks)) {
+    if (maxUnlocks !== null && maxUnlocks !== undefined && Number(unlockCount || 0) >= Number(maxUnlocks)) {
       throw apiError.conflict('secret_drop_consumed');
     }
 
     const authVerifier = normalizeAuthVerifier(req.body?.authVerifier);
     const authVerifierHash = hashAuthVerifier(authVerifier);
-    if (authVerifierHash !== raw.authVerifierHash) {
+    if (authVerifierHash !== storedAuthVerifierHash) {
       await tableSecretDrop.recordFailedUnlock(db, uuid, userId || null);
       throw apiError.forbidden('invalid_secret_drop_password');
     }

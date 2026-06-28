@@ -124,6 +124,26 @@ export class SecretDropService {
     return !!response.deleted;
   }
 
+
+  async republishSecretDrop(uuid: string, request: SecretDropCreateRequest, localPlainData?: Partial<SecretDrop>): Promise<SecretDrop> {
+    const response = await firstValueFrom(
+      this.http.post<SecretDropUpdateResponse>(`${this.baseUrl}/republish/${encodeURIComponent(uuid)}`, request)
+    );
+    const existing = this.mySecretDropsSignal().find((drop) => drop.uuid === uuid);
+    const secretDrop = this.normalizeSecretDrop({
+      ...response.secretDrop,
+      ...localPlainData,
+      publishState: 'published',
+      localOnly: false
+    });
+    this.mySecretDropsSignal.update((drops) => drops.map((drop) => drop.uuid === uuid ? secretDrop : drop));
+    const userId = request.userId || secretDrop.userId || existing?.userId || '';
+    if (userId) {
+      await this.saveOwnSecretDrops(userId, this.mySecretDropsSignal());
+    }
+    return secretDrop;
+  }
+
   async publishSecretDrop(uuid: string): Promise<SecretDrop> {
     return this.updateSecretDropStatus(uuid, 'publish');
   }
