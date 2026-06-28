@@ -18,6 +18,8 @@ import { MessageService } from '../../services/message.service';
 import { DisplayMessageService } from '../../services/display-message.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
+import { AppService } from '../../services/app.service';
+import { SpeechService } from '../../services/speech.service';
 import { DisplayMessage } from '../utils/display-message/display-message.component';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
@@ -26,6 +28,8 @@ import { DeleteMessageComponent } from '../messagelist/delete-message/delete-mes
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { CreatePinComponent } from '../pin/create-pin/create-pin.component';
+import { CheckPinComponent } from '../pin/check-pin/check-pin.component';
+import { SecretDropCommentsDialogComponent } from '../secret-drop-comments-dialog/secret-drop-comments-dialog.component';
 
 @Component({
   selector: 'app-my-secret-drop-list',
@@ -59,6 +63,8 @@ export class MySecretDropListComponent implements OnInit {
   private readonly userService = inject(UserService);
   private readonly snackBar = inject(DisplayMessageService);
   private readonly translation = inject(TranslationHelperService);
+  private readonly appService = inject(AppService);
+  private readonly speechService = inject(SpeechService);
   readonly help = inject(HelpDialogService);
 
   readonly loading = signal(false);
@@ -79,6 +85,106 @@ export class MySecretDropListComponent implements OnInit {
     } finally {
       this.loading.set(false);
     }
+  }
+
+
+
+  hasReadableText(drop: SecretDrop): boolean {
+    return !!this.getSpeechText(drop);
+  }
+
+  toggleReadAloud(drop: SecretDrop): void {
+    if (!this.speechService.supported()) {
+      this.showReadAloudHint('common.messageList.readAloudUnsupported');
+      return;
+    }
+
+    if (!this.appService.getAppSettings().speech?.enabled) {
+      this.showReadAloudHint('common.messageList.readAloudDisabled');
+      return;
+    }
+
+    const text = this.getSpeechText(drop);
+    if (!text) {
+      return;
+    }
+
+    this.speechService.toggle({
+      targetId: this.getSpeechTargetId(drop),
+      text
+    });
+  }
+
+  getReadAloudIcon(drop: SecretDrop): string {
+    return this.speechService.isActive(this.getSpeechTargetId(drop)) ? 'stop' : 'volume_up';
+  }
+
+  getReadAloudLabel(drop: SecretDrop): string {
+    return this.translation.t(
+      this.speechService.isActive(this.getSpeechTargetId(drop))
+        ? 'common.messageList.stopReadAloud'
+        : 'common.messageList.readAloud'
+    );
+  }
+
+  private getSpeechTargetId(drop: SecretDrop): string {
+    return `my-secret-drop:${drop.uuid}`;
+  }
+
+  private getSpeechText(drop: SecretDrop): string {
+    return [drop.message, drop.hint]
+      .map((value) => String(value ?? '').trim())
+      .filter(Boolean)
+      .join('\n\n');
+  }
+
+  private showReadAloudHint(messageKey: string): void {
+    this.matDialog.open(DisplayMessage, {
+      closeOnNavigation: false,
+      data: {
+        showAlways: true,
+        title: this.translation.t('common.messageList.readAloud'),
+        image: '',
+        icon: 'record_voice_over',
+        message: this.translation.t(messageKey),
+        button: this.translation.t('common.actions.ok'),
+        delay: 0,
+        showSpinner: false,
+        autoclose: false
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+  }
+
+  async openComments(drop: SecretDrop): Promise<void> {
+    if (drop.commentsNumber <= 0) {
+      return;
+    }
+    const pin = await this.openCheckPinDialog();
+    if (!pin) {
+      return;
+    }
+    const dialogRef = this.matDialog.open(SecretDropCommentsDialogComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: { drop, pin },
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+    dialogRef.afterClosed().subscribe((result?: { commentsNumber?: number }) => {
+      if (typeof result?.commentsNumber === 'number') {
+        drop.commentsNumber = result.commentsNumber;
+      }
+    });
   }
 
   async deleteDrop(drop: SecretDrop): Promise<void> {
@@ -348,6 +454,22 @@ export class MySecretDropListComponent implements OnInit {
       verticalPosition: 'top',
       panelClass: 'snack-success'
     });
+  }
+
+
+  private async openCheckPinDialog(): Promise<string | null> {
+    const dialogRef = this.matDialog.open(CheckPinComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: { enterHintI18nKey: 'common.secretDropDiscovery.pinEnterHint' },
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+    return (await firstValueFrom(dialogRef.afterClosed())) ?? null;
   }
 
   private async openPinDialog(): Promise<string | null> {

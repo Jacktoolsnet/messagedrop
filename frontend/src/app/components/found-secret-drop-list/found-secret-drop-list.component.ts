@@ -14,6 +14,8 @@ import { TranslationHelperService } from '../../services/translation-helper.serv
 import { LanguageService } from '../../services/language.service';
 import { TranslateService } from '../../services/translate.service';
 import { UserService } from '../../services/user.service';
+import { AppService } from '../../services/app.service';
+import { SpeechService } from '../../services/speech.service';
 import { ShortNumberPipe } from '../../pipes/short-number.pipe';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { DisplayMessage } from '../utils/display-message/display-message.component';
@@ -64,6 +66,8 @@ export class FoundSecretDropListComponent {
   private readonly translation = inject(TranslationHelperService);
   private readonly languageService = inject(LanguageService);
   private readonly translateService = inject(TranslateService);
+  private readonly appService = inject(AppService);
+  private readonly speechService = inject(SpeechService);
   readonly userService = inject(UserService);
   readonly data = inject<FoundSecretDropListData>(MAT_DIALOG_DATA);
   readonly unlockingUuid = signal<string | null>(null);
@@ -153,6 +157,93 @@ export class FoundSecretDropListComponent {
       });
   }
 
+
+
+  toggleReadAloud(drop: SecretDrop, source: 'hint' | 'message'): void {
+    if (!this.speechService.supported()) {
+      this.showReadAloudHint('common.messageList.readAloudUnsupported');
+      return;
+    }
+
+    if (!this.appService.getAppSettings().speech?.enabled) {
+      this.showReadAloudHint('common.messageList.readAloudDisabled');
+      return;
+    }
+
+    const text = this.getSpeechText(drop, source);
+    if (!text) {
+      return;
+    }
+
+    this.speechService.toggle({
+      targetId: this.getSpeechTargetId(drop, source),
+      text,
+      lang: this.isTranslatedSpeech(drop, source) ? this.languageService.effectiveLanguage() : undefined
+    });
+  }
+
+  getReadAloudIcon(drop: SecretDrop, source: 'hint' | 'message'): string {
+    return this.speechService.isActive(this.getSpeechTargetId(drop, source)) ? 'stop' : 'volume_up';
+  }
+
+  getReadAloudLabel(drop: SecretDrop, source: 'hint' | 'message'): string {
+    return this.translation.t(
+      this.speechService.isActive(this.getSpeechTargetId(drop, source))
+        ? 'common.messageList.stopReadAloud'
+        : 'common.messageList.readAloud'
+    );
+  }
+
+  private getSpeechTargetId(drop: SecretDrop, source: 'hint' | 'message'): string {
+    return `secret-drop:${source}:${drop.uuid}`;
+  }
+
+  private isTranslatedSpeech(drop: SecretDrop, source: 'hint' | 'message'): boolean {
+    if (this.appService.getAppSettings().speech?.preferTranslatedText === false) {
+      return false;
+    }
+    return source === 'hint'
+      ? !!this.translatedHints()[drop.uuid]
+      : !!this.translatedMessages()[drop.uuid];
+  }
+
+  private getSpeechText(drop: SecretDrop, source: 'hint' | 'message'): string {
+    if (source === 'hint') {
+      return (this.isTranslatedSpeech(drop, source)
+        ? this.translatedHints()[drop.uuid]
+        : drop.hint ?? '').trim();
+    }
+    const unlocked = this.getUnlocked(drop);
+    if (!unlocked) {
+      return '';
+    }
+    return (this.isTranslatedSpeech(drop, source)
+      ? this.translatedMessages()[drop.uuid]
+      : unlocked.content.message ?? '').trim();
+  }
+
+  private showReadAloudHint(messageKey: string): void {
+    this.matDialog.open(DisplayMessage, {
+      closeOnNavigation: false,
+      data: {
+        showAlways: true,
+        title: this.translation.t('common.messageList.readAloud'),
+        image: '',
+        icon: 'record_voice_over',
+        message: this.translation.t(messageKey),
+        button: this.translation.t('common.actions.ok'),
+        delay: 0,
+        showSpinner: false,
+        autoclose: false
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+  }
 
   openComments(drop: SecretDrop): void {
     const unlocked = this.getUnlocked(drop);
