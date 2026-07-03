@@ -405,8 +405,8 @@ async function discoverByPlusCode(db, discoveryPlusCode, nowSeconds, zoomLevel =
     ? [discoveryPlusCode]
     : [discoveryPlusCode, normalizedZoomLevel];
   const visibilityCondition = userId
-    ? `AND (visibility = 'public' OR userId = ? OR EXISTS (SELECT 1 FROM ${recipientTableName} r WHERE r.secretDropUuid = ${tableName}.uuid AND r.recipientUserId = ?))`
-    : `AND visibility = 'public'`;
+    ? `AND (COALESCE(visibility, 'public') = 'public' OR userId = ? OR EXISTS (SELECT 1 FROM ${recipientTableName} r WHERE r.secretDropUuid = ${tableName}.uuid AND r.recipientUserId = ?))`
+    : `AND COALESCE(visibility, 'public') = 'public'`;
   const visibilityParams = userId ? [userId, userId] : [];
   const rows = await allQuery(db, `
     SELECT * FROM ${tableName}
