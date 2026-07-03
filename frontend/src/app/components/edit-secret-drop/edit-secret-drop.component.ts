@@ -191,6 +191,10 @@ export class EditSecretDropComponent {
     return this.isSameDate(this.validUntilDate, minimum) ? minimum : null;
   }
 
+  close(): void {
+    this.dialogRef.close(false);
+  }
+
   async create(action: SecretDropCreateAction = 'publish'): Promise<void> {
     if (this.saving()) {
       return;
