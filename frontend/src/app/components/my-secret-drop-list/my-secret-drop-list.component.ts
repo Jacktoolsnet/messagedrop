@@ -162,7 +162,7 @@ export class MySecretDropListComponent implements OnInit {
   }
 
   async openComments(drop: SecretDrop): Promise<void> {
-    if (drop.commentsNumber <= 0) {
+    if (drop.localOnly) {
       return;
     }
     const pin = drop.localSecretPin || await this.openCheckPinDialog();

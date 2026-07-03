@@ -79,9 +79,11 @@ export class SecretDropCommentsDialogComponent implements OnInit {
   readonly translatingUuid = signal<string | null>(null);
   readonly comments = signal<DecryptedComment[]>([]);
   readonly levelStack = signal<DecryptedComment[]>([]);
+  private initialAddCommentOpened = false;
 
   async ngOnInit(): Promise<void> {
     await this.loadComments();
+    this.openInitialCommentDialogIfEmpty();
   }
 
   close(): void {
@@ -90,6 +92,14 @@ export class SecretDropCommentsDialogComponent implements OnInit {
 
   topLevelCommentCount(): number {
     return this.comments().filter((comment) => !comment.row.parentCommentUuid).length;
+  }
+
+  private openInitialCommentDialogIfEmpty(): void {
+    if (this.initialAddCommentOpened || this.topLevelCommentCount() > 0) {
+      return;
+    }
+    this.initialAddCommentOpened = true;
+    setTimeout(() => void this.addComment(null), 0);
   }
 
   currentParent(): DecryptedComment | null {
