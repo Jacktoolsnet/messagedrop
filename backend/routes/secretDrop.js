@@ -169,6 +169,7 @@ function ensureNoPlainSecretFields(body) {
 function mapPublicSecretDrop(drop) {
   const mapped = {
     uuid: drop.uuid,
+    userId: drop.userId,
     latitude: drop.latitude,
     longitude: drop.longitude,
     plusCode: drop.plusCode,

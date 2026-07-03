@@ -234,7 +234,9 @@ export class SecretDropService {
       publishState: 'published',
       localOnly: false
     });
-    this.mySecretDropsSignal.update((drops) => drops.map((drop) => drop.uuid === uuid ? secretDrop : drop));
+    this.mySecretDropsSignal.update((drops) => drops.some((drop) => drop.uuid === uuid)
+      ? drops.map((drop) => drop.uuid === uuid ? secretDrop : drop)
+      : [secretDrop, ...drops]);
     const userId = request.userId || secretDrop.userId || existing?.userId || '';
     if (userId) {
       await this.saveOwnSecretDrops(userId, this.mySecretDropsSignal());

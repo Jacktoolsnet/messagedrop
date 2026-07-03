@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { finalize, firstValueFrom } from 'rxjs';
 import { SecretDrop, SecretDropCryptoMetadata, SecretDropDecryptedContent, SecretDropEncryptedPayload } from '../../interfaces/secret-drop';
@@ -24,6 +25,8 @@ import { CheckPinComponent } from '../pin/check-pin/check-pin.component';
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { SecretDropCommentsDialogComponent } from '../secret-drop-comments-dialog/secret-drop-comments-dialog.component';
+import { EditSecretDropComponent } from '../edit-secret-drop/edit-secret-drop.component';
+import { DeleteMessageComponent } from '../messagelist/delete-message/delete-message.component';
 
 interface FoundSecretDropListData {
   drops: SecretDrop[];
@@ -49,6 +52,7 @@ interface UnlockedContent {
     MatDialogActions,
     MatDialogContent,
     MatIconModule,
+    MatMenuModule,
     ShowmessageComponent,
     ShowmultimediaComponent,
     TranslocoPipe
@@ -91,6 +95,170 @@ export class FoundSecretDropListComponent {
     return this.unlocked()[drop.uuid] ?? null;
   }
 
+
+
+  isOwnUnlockedDrop(drop: SecretDrop): boolean {
+    const unlocked = this.getUnlocked(drop);
+    return !!unlocked
+      && this.userService.hasJwt()
+      && String(unlocked.drop.userId || '') === String(this.userService.getUser().id || '');
+  }
+
+  canPublishDrop(drop: SecretDrop): boolean {
+    const displayDrop = this.getDisplayDrop(drop);
+    return displayDrop.status === 'disabled' || displayDrop.status === 'consumed';
+  }
+
+  canUnpublishDrop(drop: SecretDrop): boolean {
+    return this.getDisplayDrop(drop).status === 'enabled';
+  }
+
+  editOwnDrop(drop: SecretDrop): void {
+    const unlocked = this.getUnlocked(drop);
+    if (!unlocked || !this.isOwnUnlockedDrop(drop)) {
+      return;
+    }
+    const editableDrop: SecretDrop = {
+      ...unlocked.drop,
+      location: unlocked.drop.location ?? {
+        latitude: Number(unlocked.drop.latitude ?? 0),
+        longitude: Number(unlocked.drop.longitude ?? 0),
+        plusCode: unlocked.drop.plusCode
+      },
+      message: unlocked.content.message ?? '',
+      messageStyle: unlocked.content.style ?? '',
+      multimedia: unlocked.content.multimedia ?? null,
+      localSecretPin: unlocked.pin
+    };
+    const dialogRef = this.matDialog.open(EditSecretDropComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: { location: editableDrop.location, secretDrop: editableDrop },
+      minWidth: 'min(450px, 95vw)',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+    dialogRef.afterClosed().subscribe((changed?: boolean) => {
+      if (changed) {
+        this.close();
+      }
+    });
+  }
+
+  async publishOwnDrop(drop: SecretDrop): Promise<void> {
+    if (!this.isOwnUnlockedDrop(drop)) {
+      return;
+    }
+    try {
+      const updated = await this.secretDropService.publishSecretDrop(drop.uuid);
+      this.patchUnlockedDrop(drop, updated);
+      this.snackBar.open(this.translation.t('common.secretDrop.publishSuccess'), undefined, {
+        duration: 2600,
+        verticalPosition: 'top',
+        panelClass: 'snack-success'
+      });
+    } catch {
+      this.snackBar.open(this.translation.t('common.secretDrop.publishFailed'), undefined, {
+        duration: 3200,
+        verticalPosition: 'top',
+        panelClass: 'snack-error'
+      });
+    }
+  }
+
+  async unpublishOwnDrop(drop: SecretDrop): Promise<void> {
+    if (!this.isOwnUnlockedDrop(drop)) {
+      return;
+    }
+    try {
+      const updated = await this.secretDropService.unpublishSecretDrop(drop.uuid);
+      this.patchUnlockedDrop(drop, updated);
+      this.snackBar.open(this.translation.t('common.secretDrop.unpublishSuccess'), undefined, {
+        duration: 2600,
+        verticalPosition: 'top',
+        panelClass: 'snack-success'
+      });
+    } catch {
+      this.snackBar.open(this.translation.t('common.secretDrop.unpublishFailed'), undefined, {
+        duration: 3200,
+        verticalPosition: 'top',
+        panelClass: 'snack-error'
+      });
+    }
+  }
+
+  async deleteOwnDrop(drop: SecretDrop): Promise<void> {
+    if (!this.isOwnUnlockedDrop(drop)) {
+      return;
+    }
+    const confirmed = await this.confirmDelete();
+    if (!confirmed) {
+      return;
+    }
+    try {
+      const deleted = await this.secretDropService.deleteSecretDrop(drop.uuid);
+      if (deleted) {
+        await this.secretDropService.removeLocalSecretDrop(this.userService.getUser().id, drop.uuid);
+        const index = this.data.drops.findIndex((entry) => entry.uuid === drop.uuid);
+        if (index >= 0) {
+          this.data.drops.splice(index, 1);
+        }
+        this.unlocked.update((state) => {
+          const { [drop.uuid]: _removed, ...rest } = state;
+          return rest;
+        });
+      }
+      this.snackBar.open(this.translation.t(deleted ? 'common.secretDrop.deleteSuccess' : 'common.secretDrop.deleteFailed'), undefined, {
+        duration: 3200,
+        verticalPosition: 'top',
+        panelClass: deleted ? 'snack-success' : 'snack-error'
+      });
+      if (deleted && this.data.drops.length === 0) {
+        this.close();
+      }
+    } catch {
+      this.snackBar.open(this.translation.t('common.secretDrop.deleteFailed'), undefined, {
+        duration: 3200,
+        verticalPosition: 'top',
+        panelClass: 'snack-error'
+      });
+    }
+  }
+
+  private async confirmDelete(): Promise<boolean> {
+    const dialogRef = this.matDialog.open(DeleteMessageComponent, {
+      closeOnNavigation: true,
+      data: {
+        titleKey: 'common.secretDrop.deleteDialog.title',
+        confirmKey: 'common.secretDrop.deleteDialog.confirm'
+      },
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false
+    });
+    return !!(await firstValueFrom(dialogRef.afterClosed()));
+  }
+
+  private patchUnlockedDrop(drop: SecretDrop, updated: SecretDrop): void {
+    Object.assign(drop, updated);
+    this.unlocked.update((state) => {
+      const unlocked = state[drop.uuid];
+      if (!unlocked) {
+        return state;
+      }
+      return {
+        ...state,
+        [drop.uuid]: {
+          ...unlocked,
+          drop: { ...unlocked.drop, ...updated }
+        }
+      };
+    });
+  }
 
   getHintText(drop: SecretDrop): string {
     return this.translatedHints()[drop.uuid] ?? drop.hint ?? '';
