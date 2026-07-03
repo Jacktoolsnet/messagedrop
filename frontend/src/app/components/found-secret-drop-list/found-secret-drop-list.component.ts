@@ -8,6 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { finalize, firstValueFrom } from 'rxjs';
+import { Profile } from '../../interfaces/profile';
 import { SecretDrop, SecretDropCryptoMetadata, SecretDropDecryptedContent, SecretDropEncryptedPayload } from '../../interfaces/secret-drop';
 import { SecretDropCryptoService } from '../../services/secret-drop-crypto.service';
 import { SecretDropService } from '../../services/secret-drop.service';
@@ -17,6 +18,7 @@ import { TranslateService } from '../../services/translate.service';
 import { UserService } from '../../services/user.service';
 import { AppService } from '../../services/app.service';
 import { SpeechService } from '../../services/speech.service';
+import { ProfileService } from '../../services/profile.service';
 import { ShortNumberPipe } from '../../pipes/short-number.pipe';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { DisplayMessage } from '../utils/display-message/display-message.component';
@@ -25,6 +27,8 @@ import { CheckPinComponent } from '../pin/check-pin/check-pin.component';
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { SecretDropCommentsDialogComponent } from '../secret-drop-comments-dialog/secret-drop-comments-dialog.component';
+import { MessageProfileComponent } from '../messagelist/message-profile/message-profile.component';
+import { UserProfileComponent } from '../user/user-profile/user-profile.component';
 import { EditSecretDropComponent } from '../edit-secret-drop/edit-secret-drop.component';
 import { DeleteMessageComponent } from '../messagelist/delete-message/delete-message.component';
 
@@ -72,6 +76,7 @@ export class FoundSecretDropListComponent {
   private readonly translateService = inject(TranslateService);
   private readonly appService = inject(AppService);
   private readonly speechService = inject(SpeechService);
+  readonly profileService = inject(ProfileService);
   readonly userService = inject(UserService);
   readonly data = inject<FoundSecretDropListData>(MAT_DIALOG_DATA);
   readonly unlockingUuid = signal<string | null>(null);
@@ -82,6 +87,89 @@ export class FoundSecretDropListComponent {
   readonly translatedMessages = signal<Record<string, string>>({});
   readonly reactingUuid = signal<string | null>(null);
   readonly translationTargetLabel = computed(() => this.languageService.effectiveLanguage().toUpperCase());
+  readonly userProfile: Profile = this.userService.getProfile();
+
+
+  isOwnDrop(drop: SecretDrop): boolean {
+    return String(drop.userId || '') === String(this.userService.getUser().id || '');
+  }
+
+  getDropProfileName(drop: SecretDrop): string {
+    if (this.isOwnDrop(drop)) {
+      return this.userProfile.name || this.translation.t('common.messageList.myself');
+    }
+    return this.profileService.getProfile(drop.userId || '')?.name || this.translation.t('common.messageList.nameFallback');
+  }
+
+  getDropAvatar(drop: SecretDrop): string {
+    if (this.isOwnDrop(drop)) {
+      return this.userProfile.base64Avatar || '';
+    }
+    return this.profileService.getProfile(drop.userId || '')?.base64Avatar || '';
+  }
+
+  onAvatarBoxClick(drop: SecretDrop): void {
+    if (this.isOwnDrop(drop)) {
+      if (!this.userService.isReady()) {
+        this.openOwnProfileAfterLogin();
+        return;
+      }
+      this.openOwnProfile();
+      return;
+    }
+    if (!this.userService.isReady()) {
+      this.editDropUserProfileAfterLogin(drop);
+      return;
+    }
+    this.editDropUserProfile(drop);
+  }
+
+  editDropUserProfile(drop: SecretDrop): void {
+    const userId = drop.userId || '';
+    if (!userId) {
+      return;
+    }
+    let profile: Profile | undefined = this.profileService.getProfile(userId);
+    if (!profile) {
+      profile = { name: '', base64Avatar: '', defaultStyle: '' };
+    }
+    const dialogRef = this.matDialog.open(MessageProfileComponent, {
+      data: { profile, userId },
+      closeOnNavigation: true,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      if (profile) {
+        this.profileService.setProfile(userId, profile);
+      }
+    });
+  }
+
+  editDropUserProfileAfterLogin(drop: SecretDrop): void {
+    this.userService.loginWithBackend(() => this.editDropUserProfile(drop));
+  }
+
+  openOwnProfile(): void {
+    const dialogRef = this.matDialog.open(UserProfileComponent, {
+      data: {},
+      closeOnNavigation: true,
+      maxHeight: '90vh',
+      maxWidth: '90vw',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      this.userService.saveProfile();
+    });
+  }
+
+  openOwnProfileAfterLogin(): void {
+    this.userService.loginWithBackend(this.openOwnProfile.bind(this));
+  }
 
   close(): void {
     this.dialogRef.close();
