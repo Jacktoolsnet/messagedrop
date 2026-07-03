@@ -1875,7 +1875,10 @@
       "multiUse": "Mehrfach lesbar",
       "unlocked": "Entsperrt",
       "unlockAria": "Geheimnis entsperren",
-      "translateHintAria": "Hinweis übersetzen"
+      "translateHintAria": "Hinweis übersetzen",
+      "copySecretAria": "Geheimnistext kopieren",
+      "copySecretSuccess": "Geheimnistext wurde in die Zwischenablage kopiert.",
+      "copySecretFailed": "Geheimnistext konnte nicht kopiert werden."
     },
     "secretDropComments": {
       "title": "Kommentare",

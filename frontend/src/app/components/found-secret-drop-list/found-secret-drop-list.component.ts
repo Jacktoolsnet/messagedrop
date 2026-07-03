@@ -397,6 +397,57 @@ export class FoundSecretDropListComponent {
     return this.translatedMessages()[drop.uuid] ?? unlocked.content.message ?? '';
   }
 
+  async copyUnlockedMessage(drop: SecretDrop): Promise<void> {
+    const text = this.getUnlocked(drop)?.content.message?.trim() ?? '';
+    if (!text) {
+      return;
+    }
+
+    const copied = await this.copyToClipboard(text);
+    this.snackBar.open(
+      this.translation.t(copied ? 'common.secretDropDiscovery.copySecretSuccess' : 'common.secretDropDiscovery.copySecretFailed'),
+      undefined,
+      {
+        duration: 2600,
+        verticalPosition: 'top',
+        panelClass: copied ? 'snack-success' : 'snack-error'
+      }
+    );
+  }
+
+  private async copyToClipboard(text: string): Promise<boolean> {
+    if (!text) {
+      return false;
+    }
+    if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch {
+        // Try legacy fallback below.
+      }
+    }
+    if (typeof document === 'undefined') {
+      return false;
+    }
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.setAttribute('readonly', 'true');
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    textarea.style.pointerEvents = 'none';
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+    try {
+      return document.execCommand('copy');
+    } catch {
+      return false;
+    } finally {
+      document.body.removeChild(textarea);
+    }
+  }
+
   translateUnlockedMessage(drop: SecretDrop): void {
     const unlocked = this.getUnlocked(drop);
     const message = unlocked?.content.message?.trim() ?? '';

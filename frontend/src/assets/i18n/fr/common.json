@@ -1866,7 +1866,10 @@
       "multiUse": "Lisible plusieurs fois",
       "unlocked": "Déverrouillé",
       "unlockAria": "Déverrouiller le secret",
-      "translateHintAria": "Traduire l’indice"
+      "translateHintAria": "Traduire l’indice",
+      "copySecretAria": "Copier le texte secret",
+      "copySecretSuccess": "Texte secret copié dans le presse-papiers.",
+      "copySecretFailed": "Le texte secret n’a pas pu être copié."
     },
     "secretDropComments": {
       "title": "Commentaires",

@@ -1866,7 +1866,10 @@
       "multiUse": "Legible varias veces",
       "unlocked": "Desbloqueado",
       "unlockAria": "Desbloquear secreto",
-      "translateHintAria": "Traducir pista"
+      "translateHintAria": "Traducir pista",
+      "copySecretAria": "Copiar texto secreto",
+      "copySecretSuccess": "Texto secreto copiado al portapapeles.",
+      "copySecretFailed": "No se pudo copiar el texto secreto."
     },
     "secretDropComments": {
       "title": "Comentarios",

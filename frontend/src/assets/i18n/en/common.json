@@ -1875,7 +1875,10 @@
       "multiUse": "Readable multiple times",
       "unlocked": "Unlocked",
       "unlockAria": "Unlock secret",
-      "translateHintAria": "Translate hint"
+      "translateHintAria": "Translate hint",
+      "copySecretAria": "Copy secret text",
+      "copySecretSuccess": "Secret text copied to clipboard.",
+      "copySecretFailed": "Secret text could not be copied."
     },
     "secretDropComments": {
       "title": "Comments",
