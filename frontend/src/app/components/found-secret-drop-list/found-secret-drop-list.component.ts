@@ -95,6 +95,9 @@ export class FoundSecretDropListComponent {
   }
 
   getDropProfileName(drop: SecretDrop): string {
+    if (!drop.userId || drop.creatorMode === 'incognito') {
+      return this.translation.t('common.secretDrop.incognitoCreator');
+    }
     if (this.isOwnDrop(drop)) {
       return this.userProfile.name || this.translation.t('common.messageList.myself');
     }
@@ -102,6 +105,9 @@ export class FoundSecretDropListComponent {
   }
 
   getDropAvatar(drop: SecretDrop): string {
+    if (!drop.userId || drop.creatorMode === 'incognito') {
+      return '';
+    }
     if (this.isOwnDrop(drop)) {
       return this.userProfile.base64Avatar || '';
     }
@@ -109,6 +115,9 @@ export class FoundSecretDropListComponent {
   }
 
   onAvatarBoxClick(drop: SecretDrop): void {
+    if (!drop.userId || drop.creatorMode === 'incognito') {
+      return;
+    }
     if (this.isOwnDrop(drop)) {
       if (!this.userService.isReady()) {
         this.openOwnProfileAfterLogin();

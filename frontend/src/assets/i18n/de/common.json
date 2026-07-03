@@ -2316,5 +2316,10 @@
         "measured": "Messwert"
       }
     }
+  },
+  "secretDrop": {
+    "incognitoLabel": "Inkognito veröffentlichen",
+    "incognitoHint": "Der GeheimnisDrop wird nicht lokal gespeichert und erscheint nicht in „Meine Geheimnisse“. Die User-ID bleibt serverseitig für Moderation und Beschwerden gespeichert.",
+    "incognitoCreator": "Inkognito"
   }
 }

@@ -96,6 +96,7 @@ export class EditSecretDropComponent {
   pin = '';
   oneTime = true;
   visibility: 'public' | 'contacts' = 'public';
+  incognitoPublish = false;
   selectedRecipientUserIds: string[] = [];
   discoveryZoomLevel = 18;
   useValidFrom = false;
@@ -120,6 +121,7 @@ export class EditSecretDropComponent {
     this.hintStyle = drop.hintStyle ?? '';
     this.oneTime = drop.maxUnlocks === 1;
     this.visibility = drop.visibility === 'contacts' ? 'contacts' : 'public';
+    this.incognitoPublish = drop.creatorMode === 'incognito';
     this.selectedRecipientUserIds = Array.isArray(drop.recipientUserIds) ? [...drop.recipientUserIds] : [];
     this.discoveryZoomLevel = this.clampDiscoveryZoomLevel(drop.discoveryZoomLevel);
     this.useValidFrom = drop.validFrom !== null && drop.validFrom !== undefined;
@@ -276,6 +278,7 @@ export class EditSecretDropComponent {
       validFrom: this.useValidFrom ? this.toSeconds(this.validFromDate, this.validFromTime) : null,
       validUntil: this.useValidUntil ? this.toSeconds(this.validUntilDate, this.validUntilTime) : null,
       visibility: this.visibility,
+      creatorMode: this.incognitoPublish ? 'incognito' : 'normal',
       recipientUserIds: this.visibility === 'contacts' ? [...this.selectedRecipientUserIds] : [],
       publishState: 'published'
     };
@@ -304,6 +307,7 @@ export class EditSecretDropComponent {
       validFrom: this.useValidFrom ? this.toSeconds(this.validFromDate, this.validFromTime) : null,
       validUntil: this.useValidUntil ? this.toSeconds(this.validUntilDate, this.validUntilTime) : null,
       visibility: this.visibility,
+      creatorMode: this.incognitoPublish ? 'incognito' : 'normal',
       recipientUserIds: this.visibility === 'contacts' ? [...this.selectedRecipientUserIds] : [],
       status: this.data.secretDrop?.status ?? 'disabled',
       publishState: this.data.secretDrop?.publishState ?? 'draft',
@@ -335,6 +339,7 @@ export class EditSecretDropComponent {
       validFrom: this.useValidFrom ? this.toSeconds(this.validFromDate, this.validFromTime) : null,
       validUntil: this.useValidUntil ? this.toSeconds(this.validUntilDate, this.validUntilTime) : null,
       visibility: this.visibility,
+      creatorMode: this.incognitoPublish ? 'incognito' : 'normal',
       recipientUserIds: this.visibility === 'contacts' ? [...this.selectedRecipientUserIds] : []
     };
   }

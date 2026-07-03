@@ -2307,5 +2307,10 @@
         "measured": "Valeur mesurée"
       }
     }
+  },
+  "secretDrop": {
+    "incognitoLabel": "Publier en navigation privée",
+    "incognitoHint": "Le SecretDrop n’est pas enregistré localement et n’apparaîtra pas dans « Mes SecretDrops ». L’ID utilisateur reste enregistré sur le serveur pour la modération et les signalements.",
+    "incognitoCreator": "Incognito"
   }
 }

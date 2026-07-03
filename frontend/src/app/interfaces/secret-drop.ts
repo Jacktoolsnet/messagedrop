@@ -33,6 +33,7 @@ export interface SecretDrop {
   /** Locally stored owner PIN. In production this lives inside the User-PIN encrypted IndexedDB store and is never sent to the backend. */
   localSecretPin?: string | null;
   visibility?: 'public' | 'contacts';
+  creatorMode?: 'normal' | 'incognito';
   recipientUserIds?: string[];
   publishState?: 'published' | 'draft' | 'unpublished' | 'local_only';
   localOnly?: boolean;
@@ -85,6 +86,7 @@ export interface SecretDropCreateRequest {
   validFrom: number | null;
   validUntil: number | null;
   visibility?: 'public' | 'contacts';
+  creatorMode?: 'normal' | 'incognito';
   recipientUserIds?: string[];
   publishState?: 'published' | 'draft' | 'unpublished';
 }

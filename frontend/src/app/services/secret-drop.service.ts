@@ -37,12 +37,17 @@ export class SecretDropService {
 
   async createSecretDrop(request: SecretDropCreateRequest, localPlainData?: Partial<SecretDrop>): Promise<SecretDrop> {
     const response = await firstValueFrom(this.http.post<SecretDropCreateResponse>(`${this.baseUrl}/create`, request));
+    const isIncognito = request.creatorMode === 'incognito';
     const secretDrop = this.normalizeSecretDrop({
       ...response.secretDrop,
-      ...localPlainData,
+      ...(isIncognito ? {} : localPlainData),
+      creatorMode: isIncognito ? 'incognito' : (response.secretDrop.creatorMode ?? localPlainData?.creatorMode ?? 'normal'),
       publishState: 'published',
       localOnly: false
     });
+    if (isIncognito) {
+      return secretDrop;
+    }
     this.mySecretDropsSignal.update((drops) => [secretDrop, ...drops.filter((drop) => drop.uuid !== secretDrop.uuid)]);
     await this.saveOwnSecretDrops(request.userId, this.mySecretDropsSignal());
     return secretDrop;
@@ -52,7 +57,9 @@ export class SecretDropService {
     const localRows = await this.loadOwnSecretDrops(userId);
     const response = await firstValueFrom(this.http.get<SecretDropListResponse>(`${this.baseUrl}/my/${encodeURIComponent(userId)}`));
     const localByUuid = new Map(localRows.map((drop) => [drop.uuid, drop]));
-    const serverRows = (response.rows ?? []).map((row) => {
+    const serverRows = (response.rows ?? [])
+      .filter((row) => row.creatorMode !== 'incognito')
+      .map((row) => {
       const local = localByUuid.get(row.uuid);
       return this.normalizeSecretDrop({
         ...row,
@@ -61,6 +68,7 @@ export class SecretDropService {
         multimedia: local?.multimedia,
         localSecretPin: local?.localSecretPin ?? null,
         visibility: row.visibility ?? local?.visibility ?? 'public',
+        creatorMode: row.creatorMode ?? local?.creatorMode ?? 'normal',
         recipientUserIds: row.recipientUserIds ?? local?.recipientUserIds ?? [],
         publishState: row.status === 'enabled' ? 'published' : 'unpublished',
         discoveryZoomLevel: local?.discoveryZoomLevel ?? row.discoveryZoomLevel,
@@ -228,16 +236,25 @@ export class SecretDropService {
       this.http.post<SecretDropUpdateResponse>(`${this.baseUrl}/republish/${encodeURIComponent(uuid)}`, request)
     );
     const existing = this.mySecretDropsSignal().find((drop) => drop.uuid === uuid);
+    const isIncognito = request.creatorMode === 'incognito';
     const secretDrop = this.normalizeSecretDrop({
       ...response.secretDrop,
-      ...localPlainData,
+      ...(isIncognito ? {} : localPlainData),
+      creatorMode: isIncognito ? 'incognito' : (response.secretDrop.creatorMode ?? localPlainData?.creatorMode ?? 'normal'),
       publishState: 'published',
       localOnly: false
     });
+    const userId = request.userId || secretDrop.userId || existing?.userId || '';
+    if (isIncognito) {
+      this.mySecretDropsSignal.update((drops) => drops.filter((drop) => drop.uuid !== uuid));
+      if (userId) {
+        await this.saveOwnSecretDrops(userId, this.mySecretDropsSignal());
+      }
+      return secretDrop;
+    }
     this.mySecretDropsSignal.update((drops) => drops.some((drop) => drop.uuid === uuid)
       ? drops.map((drop) => drop.uuid === uuid ? secretDrop : drop)
       : [secretDrop, ...drops]);
-    const userId = request.userId || secretDrop.userId || existing?.userId || '';
     if (userId) {
       await this.saveOwnSecretDrops(userId, this.mySecretDropsSignal());
     }
@@ -264,6 +281,7 @@ export class SecretDropService {
       multimedia: existing?.multimedia ?? null,
       localSecretPin: existing?.localSecretPin ?? null,
       visibility: existing?.visibility ?? response.secretDrop.visibility ?? 'public',
+      creatorMode: existing?.creatorMode ?? response.secretDrop.creatorMode ?? 'normal',
       recipientUserIds: existing?.recipientUserIds ?? response.secretDrop.recipientUserIds ?? [],
       publishState: action === 'publish' ? 'published' : 'unpublished',
       localOnly: false
@@ -330,6 +348,7 @@ export class SecretDropService {
       multimedia: source.multimedia ?? null,
       localSecretPin: typeof source.localSecretPin === 'string' && source.localSecretPin.length > 0 ? source.localSecretPin : null,
       visibility: source.visibility === 'contacts' ? 'contacts' : 'public',
+      creatorMode: source.creatorMode === 'incognito' ? 'incognito' : 'normal',
       recipientUserIds: Array.isArray(source.recipientUserIds) ? source.recipientUserIds.map((id) => String(id)).filter(Boolean) : [],
       crypto: this.parseJsonField(source.crypto),
       encryptedPayload: this.parseJsonField(source.encryptedPayload),

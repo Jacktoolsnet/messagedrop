@@ -129,6 +129,14 @@ function normalizeVisibility(value) {
   return visibility;
 }
 
+function normalizeCreatorMode(value) {
+  const creatorMode = normalizeString(value || 'normal', 32).toLowerCase();
+  if (!['normal', 'incognito'].includes(creatorMode)) {
+    throw apiError.badRequest('invalid_secret_drop_creator_mode');
+  }
+  return creatorMode;
+}
+
 function normalizeRecipientUserIds(value) {
   if (value === undefined || value === null) {
     return [];
@@ -167,9 +175,9 @@ function ensureNoPlainSecretFields(body) {
 }
 
 function mapPublicSecretDrop(drop) {
+  const creatorMode = drop.creatorMode === 'incognito' ? 'incognito' : 'normal';
   const mapped = {
     uuid: drop.uuid,
-    userId: drop.userId,
     latitude: drop.latitude,
     longitude: drop.longitude,
     plusCode: drop.plusCode,
@@ -186,9 +194,13 @@ function mapPublicSecretDrop(drop) {
     dislikes: drop.dislikes,
     commentsNumber: drop.commentsNumber,
     visibility: drop.visibility || 'public',
+    creatorMode,
     recipientUserIds: Array.isArray(drop.recipientUserIds) ? drop.recipientUserIds : [],
     createdAt: drop.createdAt
   };
+  if (creatorMode !== 'incognito') {
+    mapped.userId = drop.userId;
+  }
   if (drop.crypto) {
     mapped.crypto = drop.crypto;
   }
@@ -276,6 +288,7 @@ router.post('/create', [
       ? tableSecretDrop.secretDropStatus.DISABLED
       : tableSecretDrop.secretDropStatus.ENABLED;
     const visibility = normalizeVisibility(req.body?.visibility);
+    const creatorMode = normalizeCreatorMode(req.body?.creatorMode);
     const recipientUserIds = await normalizeAndValidateRecipients(db, userId, visibility, req.body?.recipientUserIds);
 
     const drop = await tableSecretDrop.create(db, {
@@ -296,6 +309,7 @@ router.post('/create', [
       validUntil,
       status,
       visibility,
+      creatorMode,
       recipientUserIds
     });
 
@@ -352,6 +366,7 @@ router.post('/republish/:uuid', [
       throw apiError.badRequest('invalid_validity_window');
     }
     const visibility = normalizeVisibility(req.body?.visibility);
+    const creatorMode = normalizeCreatorMode(req.body?.creatorMode);
     const recipientUserIds = await normalizeAndValidateRecipients(db, userId, visibility, req.body?.recipientUserIds);
 
     const drop = await tableSecretDrop.updateContent(db, uuid, userId, {
@@ -370,6 +385,7 @@ router.post('/republish/:uuid', [
       validUntil,
       status: tableSecretDrop.secretDropStatus.ENABLED,
       visibility,
+      creatorMode,
       recipientUserIds
     });
     if (!drop) {

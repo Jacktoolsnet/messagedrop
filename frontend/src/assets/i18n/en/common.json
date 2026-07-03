@@ -2316,5 +2316,10 @@
         "measured": "Measured value"
       }
     }
+  },
+  "secretDrop": {
+    "incognitoLabel": "Publish incognito",
+    "incognitoHint": "The SecretDrop is not stored locally and will not appear in “My SecretDrops”. The user ID remains stored on the server for moderation and reports.",
+    "incognitoCreator": "Incognito"
   }
 }

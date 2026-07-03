@@ -86,6 +86,7 @@ function mapSecretDropRow(row, options = {}) {
     dislikes: Number(row.dislikes || 0),
     commentsNumber: Number(pickRowValue(row, 'commentsNumber', 'commentsnumber') || 0),
     visibility: pickRowValue(row, 'visibility') || 'public',
+    creatorMode: pickRowValue(row, 'creatorMode', 'creatormode') || 'normal',
     recipientUserIds: Array.isArray(row.recipientUserIds) ? row.recipientUserIds : [],
     createdAt: Number(pickRowValue(row, 'createdAt', 'createdat') || 0),
     updatedAt: Number(pickRowValue(row, 'updatedAt', 'updatedat') || 0),
@@ -144,6 +145,7 @@ const init = function (db) {
       dislikes INTEGER NOT NULL DEFAULT 0,
       commentsNumber INTEGER NOT NULL DEFAULT 0,
       visibility TEXT NOT NULL DEFAULT 'public',
+      creatorMode TEXT NOT NULL DEFAULT 'normal',
       createdAt INTEGER NOT NULL DEFAULT (strftime('%s','now')),
       updatedAt INTEGER NOT NULL DEFAULT (strftime('%s','now')),
       lastUnlockedAt INTEGER DEFAULT NULL,
@@ -272,8 +274,8 @@ async function create(db, payload) {
   const sql = `
     INSERT INTO ${tableName} (
       uuid, userId, latitude, longitude, plusCode, discoveryPlusCode, discoveryZoomLevel, hint, hintStyle,
-      encryptedPayload, crypto, authVerifierHash, maxUnlocks, validFrom, validUntil, status, visibility
-    ) VALUES (?, ?, ?, ?, UPPER(?), UPPER(?), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      encryptedPayload, crypto, authVerifierHash, maxUnlocks, validFrom, validUntil, status, visibility, creatorMode
+    ) VALUES (?, ?, ?, ?, UPPER(?), UPPER(?), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
   `;
   await runQuery(db, sql, [
     payload.uuid,
@@ -292,7 +294,8 @@ async function create(db, payload) {
     payload.validFrom ?? null,
     payload.validUntil ?? null,
     payload.status || secretDropStatus.ENABLED,
-    payload.visibility || 'public'
+    payload.visibility || 'public',
+    payload.creatorMode || 'normal'
   ]);
   await setRecipients(db, payload.uuid, payload.recipientUserIds || []);
   return getByUuid(db, payload.uuid, { includeEncryptedPayload: false });
@@ -320,6 +323,7 @@ async function updateContent(db, uuid, userId, payload) {
         validUntil = ?,
         status = ?,
         visibility = ?,
+        creatorMode = ?,
         lastUnlockedAt = NULL,
         consumedAt = NULL,
         updatedAt = strftime('%s','now')
@@ -343,6 +347,7 @@ async function updateContent(db, uuid, userId, payload) {
     payload.validUntil ?? null,
     payload.status || secretDropStatus.ENABLED,
     payload.visibility || 'public',
+    payload.creatorMode || 'normal',
     uuid,
     userId
   ]);
@@ -428,6 +433,7 @@ async function getByUserId(db, userId) {
     SELECT * FROM ${tableName}
     WHERE userId = ?
       AND status <> '${secretDropStatus.DELETED}'
+      AND COALESCE(creatorMode, 'normal') <> 'incognito'
     ORDER BY createdAt DESC;
   `, [userId]);
   return attachRecipients(db, rows.map((row) => mapSecretDropRow(row, { includeEncryptedPayload: false })));
