@@ -439,6 +439,22 @@ async function getByUserId(db, userId) {
   return attachRecipients(db, rows.map((row) => mapSecretDropRow(row, { includeEncryptedPayload: false })));
 }
 
+function cleanExpired(db, callback) {
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  const defaultLifetimeSeconds = 30 * 24 * 60 * 60;
+  const sql = `
+    DELETE FROM ${tableName}
+    WHERE status <> '${secretDropStatus.DELETED}'
+      AND (
+        (validUntil IS NOT NULL AND validUntil < ?)
+        OR (validUntil IS NULL AND createdAt < ?)
+      );
+  `;
+  db.run(sql, [nowSeconds, nowSeconds - defaultLifetimeSeconds], (err) => {
+    callback(err);
+  });
+}
+
 async function recordFailedUnlock(db, uuid, userId = null) {
   await db.transaction(async (tx) => {
     await runQuery(tx, `
@@ -731,6 +747,7 @@ module.exports = {
   getRawByUuid,
   discoverByPlusCode,
   getByUserId,
+  cleanExpired,
   recordFailedUnlock,
   unlock,
   softDelete,

@@ -117,6 +117,7 @@ const robotsSitemap = require('./middleware/robots-sitemap');
 const tableUser = require('./db/tableUser');
 const tableConnect = require('./db/tableConnect');
 const tableMessage = require('./db/tableMessage')
+const tableSecretDrop = require('./db/tableSecretDrop');
 const tableContactMessage = require('./db/tableContactMessage');
 const tableContactProfileExchange = require('./db/tableContactProfileExchange');
 const tableGeoStatistic = require('./db/tableGeoStatistic');
@@ -769,9 +770,15 @@ cron.schedule('0 * * * *', () => {
   });
 });
 
-// Clean messages clsevery 5 minutes
+// Clean messages every 5 minutes
 cron.schedule('*/5 * * * *', () => {
   tableMessage.cleanPublic(database.db, function (err) {
+    if (err) {
+      logger.error(err);
+    }
+  });
+
+  tableSecretDrop.cleanExpired(database.db, function (err) {
     if (err) {
       logger.error(err);
     }
