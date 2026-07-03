@@ -1846,7 +1846,10 @@
       "pinChangeWarning": {
         "title": "¿Cambiar PIN?",
         "confirm": "Este secreto ya tiene comentarios. Si cambias el PIN, es posible que los comentarios existentes ya no se puedan leer. ¿Realmente quieres cambiar el PIN?"
-      }
+      },
+      "incognitoLabel": "Publicar en modo incógnito",
+      "incognitoHint": "El SecretDrop no se guarda localmente y no aparecerá en “Mis SecretDrops”. El ID de usuario permanece guardado en el servidor para moderación y reclamaciones.",
+      "incognitoCreator": "Incógnito"
     },
     "secretDropDiscovery": {
       "title": "Se encontró un secreto",
@@ -2307,10 +2310,5 @@
         "measured": "Valor medido"
       }
     }
-  },
-  "secretDrop": {
-    "incognitoLabel": "Publicar en modo incógnito",
-    "incognitoHint": "El SecretDrop no se guarda localmente y no aparecerá en “Mis SecretDrops”. El ID de usuario permanece guardado en el servidor para moderación y reclamaciones.",
-    "incognitoCreator": "Incógnito"
   }
 }

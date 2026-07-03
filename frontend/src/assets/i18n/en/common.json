@@ -1855,7 +1855,10 @@
       "pinChangeWarning": {
         "title": "Change PIN?",
         "confirm": "This secret already has comments. If you change the PIN, existing comments may no longer be readable. Do you really want to change the PIN?"
-      }
+      },
+      "incognitoLabel": "Publish incognito",
+      "incognitoHint": "The SecretDrop is not stored locally and will not appear in “My SecretDrops”. The user ID remains stored on the server for moderation and reports.",
+      "incognitoCreator": "Incognito"
     },
     "secretDropDiscovery": {
       "title": "Secret found",
@@ -2316,10 +2319,5 @@
         "measured": "Measured value"
       }
     }
-  },
-  "secretDrop": {
-    "incognitoLabel": "Publish incognito",
-    "incognitoHint": "The SecretDrop is not stored locally and will not appear in “My SecretDrops”. The user ID remains stored on the server for moderation and reports.",
-    "incognitoCreator": "Incognito"
   }
 }
