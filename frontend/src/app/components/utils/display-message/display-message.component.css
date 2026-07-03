@@ -121,25 +121,25 @@
 }
 
 .display-action-button:focus-visible {
-    outline: 2px solid color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 55%, white);
+    outline: 2px solid color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 55%, var(--mat-sys-surface));
     outline-offset: 2px;
 }
 
 .display-action-button--primary {
     box-shadow:
         0 12px 26px color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 28%, transparent),
-        inset 0 1px 0 rgba(255, 255, 255, 0.18);
+        inset 0 1px 0 color-mix(in srgb, var(--mat-sys-on-surface) 10%, transparent);
 }
 
 .display-action-button--secondary {
     color: color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 78%, var(--mat-sys-on-surface));
     background:
         linear-gradient(180deg,
-            color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 10%, white) 0%,
-            color-mix(in srgb, var(--mat-sys-surface-container-high) 92%, white) 100%);
+            color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 10%, var(--mat-sys-surface-container-highest)) 0%,
+            color-mix(in srgb, var(--mat-sys-surface-container-high) 92%, var(--mat-sys-surface-container-highest)) 100%);
     border-color: color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 20%, transparent);
     box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.45),
+        inset 0 1px 0 color-mix(in srgb, var(--mat-sys-on-surface) 12%, transparent),
         0 10px 22px rgba(15, 23, 42, 0.08);
 }
 
@@ -147,22 +147,22 @@
     border-color: color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 30%, transparent);
     background:
         linear-gradient(180deg,
-            color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 14%, white) 0%,
-            color-mix(in srgb, var(--mat-sys-surface-container-high) 86%, white) 100%);
+            color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 14%, var(--mat-sys-surface-container-highest)) 0%,
+            color-mix(in srgb, var(--mat-sys-surface-container-high) 86%, var(--mat-sys-surface-container-highest)) 100%);
 }
 
 .toast-shell {
     --toast-side-size: 2.6rem;
+    color: var(--mat-sys-on-surface, var(--mat-app-text-color));
     position: relative;
     overflow: hidden;
     background:
-        radial-gradient(circle at top right, color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 14%, transparent) 0%, transparent 38%),
-        radial-gradient(circle at bottom left, color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 9%, transparent) 0%, transparent 34%),
+        radial-gradient(circle at top right, color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 10%, transparent) 0%, transparent 42%),
         linear-gradient(145deg,
-            color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 7%, var(--mat-sys-surface-container-low)) 0%,
-            color-mix(in srgb, var(--mat-sys-surface-container) 88%, white) 100%);
+            color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 5%, var(--mat-card-filled-container-color, var(--mat-sys-surface-container))) 0%,
+            var(--mat-card-filled-container-color, var(--mat-sys-surface-container)) 100%);
     box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.34),
+        inset 0 1px 0 color-mix(in srgb, var(--mat-sys-on-surface) 10%, transparent),
         inset 0 -1px 0 rgba(15, 23, 42, 0.03);
     animation: toast-enter 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
@@ -192,10 +192,7 @@
     width: var(--toast-side-size);
     height: var(--toast-side-size);
     border-radius: 18px;
-    background:
-        linear-gradient(180deg,
-            color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 18%, white) 0%,
-            color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 12%, transparent) 100%);
+    background: color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 12%, var(--mat-card-filled-container-color, var(--mat-sys-surface-container)));
     box-shadow:
         inset 0 0 0 1px color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 18%, transparent),
         0 10px 22px color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 14%, transparent);
@@ -243,7 +240,7 @@
     margin: 0;
     font-size: 0.95rem;
     line-height: 1.45;
-    color: color-mix(in srgb, var(--mat-sys-on-surface) 74%, var(--mat-sys-on-surface-variant));
+    color: var(--mat-sys-on-surface, var(--mat-app-text-color));
 }
 
 .toast-progress-row {
@@ -283,10 +280,7 @@
     place-items: center;
     border-radius: 18px;
     color: color-mix(in srgb, var(--mat-sys-on-surface-variant) 86%, var(--mat-sys-on-surface));
-    background:
-        linear-gradient(180deg,
-            color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 18%, white) 0%,
-            color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 12%, transparent) 100%);
+    background: color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 12%, var(--mat-card-filled-container-color, var(--mat-sys-surface-container)));
     border: 0;
     box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 18%, transparent);
     transition:
@@ -304,15 +298,12 @@
 
 .toast-dismiss:hover {
     color: var(--mat-sys-on-surface);
-    background:
-        linear-gradient(180deg,
-            color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 22%, white) 0%,
-            color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 16%, transparent) 100%);
+    background: color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 16%, var(--mat-card-filled-container-color, var(--mat-sys-surface-container)));
     box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 22%, transparent);
 }
 
 .toast-dismiss:focus-visible {
-    outline: 2px solid color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 58%, white);
+    outline: 2px solid color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 58%, var(--mat-sys-surface));
     outline-offset: 2px;
 }
 
@@ -326,7 +317,7 @@
     inset-block-end: 0;
     height: 2px;
     background: linear-gradient(90deg,
-            color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 56%, white) 0%,
+            color-mix(in srgb, var(--display-message-accent, var(--mat-sys-primary)) 56%, var(--mat-sys-surface)) 0%,
             var(--display-message-accent, var(--mat-sys-primary)) 100%);
     opacity: 0.72;
     transform-origin: left center;
