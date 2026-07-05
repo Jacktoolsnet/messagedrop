@@ -328,7 +328,8 @@ export class MySecretDropListComponent implements OnInit {
 
   getStatusKey(drop: SecretDrop): string {
     const now = Math.floor(Date.now() / 1000);
-    if (drop.publishState === 'draft' || drop.localOnly) return 'common.secretDrop.status.draft';
+    if (drop.publishState === 'draft' || (drop.localOnly && drop.publishState !== 'unpublished')) return 'common.secretDrop.status.draft';
+    if (drop.publishState === 'unpublished') return 'common.secretDrop.status.disabled';
     if (drop.status === 'consumed') return 'common.secretDrop.status.consumed';
     if (drop.status === 'deleted') return 'common.secretDrop.status.deleted';
     if (drop.validFrom && drop.validFrom > now) return 'common.secretDrop.status.pending';

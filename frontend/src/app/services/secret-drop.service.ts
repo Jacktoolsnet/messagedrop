@@ -75,8 +75,7 @@ export class SecretDropService {
         localOnly: false
       });
     });
-    const localOnlyRows = localRows.filter((drop) => drop.localOnly === true);
-    const rows = [...localOnlyRows, ...serverRows].sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
+    const rows = this.mergeOwnSecretDrops(localRows, serverRows);
     this.mySecretDropsSignal.set(rows);
     await this.saveOwnSecretDrops(userId, rows);
     return rows;
@@ -327,6 +326,43 @@ export class SecretDropService {
       commentsNumber: Number(raw.commentsNumber ?? 0),
       createdAt: Number(raw.createdAt ?? 0)
     };
+  }
+
+  private mergeOwnSecretDrops(localRows: SecretDrop[], serverRows: SecretDrop[]): SecretDrop[] {
+    const merged = new Map<string, SecretDrop>();
+    const serverUuids = new Set<string>();
+
+    for (const serverDrop of serverRows ?? []) {
+      const uuid = String(serverDrop?.uuid ?? '').trim();
+      if (!uuid) {
+        continue;
+      }
+      serverUuids.add(uuid);
+      merged.set(uuid, this.normalizeSecretDrop(serverDrop));
+    }
+
+    for (const localDrop of localRows ?? []) {
+      const uuid = String(localDrop?.uuid ?? '').trim();
+      if (!uuid || serverUuids.has(uuid) || localDrop.creatorMode === 'incognito') {
+        continue;
+      }
+
+      const localState = localDrop.publishState ?? (localDrop.status === 'enabled' ? 'published' : 'unpublished');
+      const nextState = localState === 'draft' || localState === 'local_only'
+        ? localState
+        : 'unpublished';
+
+      merged.set(uuid, this.normalizeSecretDrop({
+        ...localDrop,
+        status: nextState === 'draft' || nextState === 'local_only'
+          ? (localDrop.status ?? 'disabled')
+          : 'disabled',
+        publishState: nextState === 'local_only' ? 'draft' : nextState,
+        localOnly: true
+      }));
+    }
+
+    return Array.from(merged.values()).sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
   }
 
   private normalizeSecretDrop(raw: SecretDrop): SecretDrop {
