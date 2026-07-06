@@ -116,6 +116,31 @@
     }
 
     @if (userService.isReady()) {
+    <button mat-menu-item [matMenuTriggerFor]="systemMenu">
+        <mat-icon [attr.aria-hidden]="false"
+            [matBadge]="hasUnreadSystemNotifications() ? (unreadSystemNotificationCount() | shortNumber) : null"
+            [matBadgeHidden]="!hasUnreadSystemNotifications()" matBadgeColor="primary">settings_applications</mat-icon>
+        <span>{{ 'common.menu.system' | transloco }}</span>
+    </button>
+    }
+
+    @if (userService.hasJwt() && !userService.isAccountBlocked()) {
+    <button mat-menu-item [matMenuTriggerFor]="publicContentMenu">
+        <mat-icon>public</mat-icon>
+        <span>{{ 'common.menu.myPublicContents' | transloco }}</span>
+    </button>
+    }
+
+    @if (userService.isReady() && !userService.isAccountBlocked()) {
+    <button mat-menu-item [matMenuTriggerFor]="privateContentMenu">
+        <mat-icon>folder_special</mat-icon>
+        <span>{{ 'common.menu.myPrivateContents' | transloco }}</span>
+    </button>
+    }
+</mat-menu>
+
+<mat-menu #systemMenu="matMenu">
+    @if (userService.isReady()) {
     <button mat-menu-item (click)="showUser()">
         <mat-icon>account_circle</mat-icon>
         <span>{{ 'common.menu.myUser' | transloco }}</span>
@@ -137,63 +162,54 @@
         <span>{{ 'common.menu.systemMessages' | transloco }}</span>
     </button>
     }
+</mat-menu>
 
+<mat-menu #publicContentMenu="matMenu">
     @if (userService.hasJwt() && !userService.isAccountBlocked()) {
     <button mat-menu-item (click)="openUserMessagListDialog()">
         <mat-icon>speaker_notes</mat-icon>
-        <span>{{ 'common.menu.myPublicMessages' | transloco }}</span>
+        <span>{{ 'common.menu.publicContentMessages' | transloco }}</span>
     </button>
     }
-
     @if (userService.hasJwt() && !userService.isAccountBlocked()) {
     <button mat-menu-item (click)="openMySecretDropListDialog()">
         <mat-icon>password</mat-icon>
-        <span>{{ 'common.menu.mySecretDrops' | transloco }}</span>
-    </button>
-    }
-
-    @if (userService.isReady() && placeService.isReady() && !userService.isAccountBlocked()) {
-    <button mat-menu-item (click)="openPlaceListDialog()">
-        <mat-icon>personal_places</mat-icon>
-        <span>{{ 'common.menu.myPlaces' | transloco }}</span>
-    </button>
-    }
-
-    @if (userService.isReady() && !userService.isAccountBlocked()) {
-    <button mat-menu-item (click)="openMyExperiencesListDialog()">
-        <mat-icon>bookmark_star</mat-icon>
-        <span>{{ 'common.menu.myExperiences' | transloco }}</span>
-    </button>
-    }
-
-    @if (userService.isReady() && contactService.isReady() && !userService.isAccountBlocked()) {
-    <button mat-menu-item (click)="openContactListDialog()">
-        <mat-icon [attr.aria-hidden]="false" matBadge="{{ getContactsBadge() }}" [matBadgeHidden]="!getContactsBadge()"
-            matBadgeColor="warn" matBadgeOverlap="true">contacts</mat-icon>
-        <span>{{ 'common.menu.myContacts' | transloco }}</span>
-    </button>
-    }
-
-    @if (userService.isReady() && !userService.isAccountBlocked()) {
-    <button mat-menu-item [matMenuTriggerFor]="privateContentMenu">
-        <mat-icon>folder_special</mat-icon>
-        <span>{{ 'common.menu.myPrivateContents' | transloco }}</span>
+        <span>{{ 'common.menu.publicContentSecretDrops' | transloco }}</span>
     </button>
     }
 </mat-menu>
 
 <mat-menu #privateContentMenu="matMenu">
+    @if (userService.isReady() && !userService.isAccountBlocked()) {
+    <button mat-menu-item (click)="openMyExperiencesListDialog()">
+        <mat-icon>bookmark_star</mat-icon>
+        <span>{{ 'common.menu.privateContentExperiences' | transloco }}</span>
+    </button>
+    }
+    @if (userService.isReady() && placeService.isReady() && !userService.isAccountBlocked()) {
+    <button mat-menu-item (click)="openPlaceListDialog()">
+        <mat-icon>personal_places</mat-icon>
+        <span>{{ 'common.menu.privateContentPlaces' | transloco }}</span>
+    </button>
+    }
+    @if (userService.isReady() && contactService.isReady() && !userService.isAccountBlocked()) {
+    <button mat-menu-item (click)="openContactListDialog()">
+        <mat-icon [attr.aria-hidden]="false" matBadge="{{ getContactsBadge() }}" [matBadgeHidden]="!getContactsBadge()"
+            matBadgeColor="warn" matBadgeOverlap="true">contacts</mat-icon>
+        <span>{{ 'common.menu.privateContentContacts' | transloco }}</span>
+    </button>
+    }
     <button mat-menu-item (click)="openNoteListDialog()">
         <mat-icon>clinical_notes</mat-icon>
-        <span>{{ 'common.menu.myPrivateNotes' | transloco }}</span>
+        <span>{{ 'common.menu.privateContentNotes' | transloco }}</span>
     </button>
     <button mat-menu-item (click)="openImageListDialog()">
         <mat-icon>image</mat-icon>
-        <span>{{ 'common.menu.myPrivateImages' | transloco }}</span>
+        <span>{{ 'common.menu.privateContentImages' | transloco }}</span>
     </button>
     <button mat-menu-item (click)="openDocumentListDialog()">
         <mat-icon>description</mat-icon>
-        <span>{{ 'common.menu.myPrivateDocuments' | transloco }}</span>
+        <span>{{ 'common.menu.privateContentDocuments' | transloco }}</span>
     </button>
 </mat-menu>
 
