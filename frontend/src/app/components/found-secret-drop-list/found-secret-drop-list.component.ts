@@ -31,6 +31,7 @@ import { MessageProfileComponent } from '../messagelist/message-profile/message-
 import { UserProfileComponent } from '../user/user-profile/user-profile.component';
 import { EditSecretDropComponent } from '../edit-secret-drop/edit-secret-drop.component';
 import { DeleteMessageComponent } from '../messagelist/delete-message/delete-message.component';
+import { DigitalServicesActReportDialogComponent } from '../legal/digital-services-act-report-dialog/digital-services-act-report-dialog.component';
 
 interface FoundSecretDropListData {
   drops: SecretDrop[];
@@ -559,6 +560,78 @@ export class FoundSecretDropListComponent {
       disableClose: false,
       autoFocus: false
     });
+  }
+
+
+  dsaReportSecretDrop(drop: SecretDrop): void {
+    const unlocked = this.getUnlocked(drop);
+    if (!unlocked) {
+      return;
+    }
+    const displayDrop = this.getDisplayDrop(drop);
+    const contentSnapshot = this.buildDsaSecretDropSnapshot(displayDrop, unlocked);
+    const dialogRef = this.matDialog.open(DigitalServicesActReportDialogComponent, {
+      data: {
+        contentId: displayDrop.uuid,
+        contentType: 'secret drop',
+        reportedContent: contentSnapshot,
+        contentUrl: ''
+      },
+      closeOnNavigation: true,
+      autoFocus: false,
+      maxHeight: '90vh',
+      width: '800px',
+      maxWidth: '90vw',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (!result?.created) {
+        return;
+      }
+      this.snackBar.open(
+        this.translation.t('common.messageList.blockedMarked'),
+        this.translation.t('common.actions.ok'),
+        { duration: 3000, verticalPosition: 'top' }
+      );
+    });
+  }
+
+  private buildDsaSecretDropSnapshot(drop: SecretDrop, unlocked: UnlockedContent): Record<string, unknown> {
+    return {
+      id: null,
+      uuid: drop.uuid,
+      userId: drop.userId ?? null,
+      location: drop.location ?? null,
+      latitude: drop.latitude ?? drop.location?.latitude ?? null,
+      longitude: drop.longitude ?? drop.location?.longitude ?? null,
+      plusCode: drop.plusCode ?? drop.location?.plusCode ?? null,
+      discoveryPlusCode: drop.discoveryPlusCode ?? null,
+      discoveryZoomLevel: drop.discoveryZoomLevel ?? null,
+      hint: drop.hint ?? null,
+      hintStyle: drop.hintStyle ?? null,
+      message: unlocked.content.message ?? null,
+      messageStyle: unlocked.content.style ?? null,
+      multimedia: unlocked.content.multimedia ?? null,
+      visibility: drop.visibility ?? null,
+      creatorMode: drop.creatorMode ?? null,
+      maxUnlocks: drop.maxUnlocks ?? null,
+      unlockCount: drop.unlockCount ?? null,
+      failedUnlockCount: drop.failedUnlockCount ?? null,
+      validFrom: drop.validFrom ?? null,
+      validUntil: drop.validUntil ?? null,
+      status: drop.status ?? null,
+      likes: drop.likes ?? null,
+      dislikes: drop.dislikes ?? null,
+      commentsNumber: drop.commentsNumber ?? null,
+      createdAt: drop.createdAt ?? null,
+      updatedAt: drop.updatedAt ?? null,
+      lastUnlockedAt: drop.lastUnlockedAt ?? null,
+      consumedAt: drop.consumedAt ?? null,
+      reportedAfterUnlock: true
+    };
   }
 
   openComments(drop: SecretDrop): void {

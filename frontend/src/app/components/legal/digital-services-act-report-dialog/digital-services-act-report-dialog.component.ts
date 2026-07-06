@@ -15,6 +15,7 @@ import { EvidenceFileItem, EvidenceInputComponent, EvidenceUrlItem } from '../..
 
 import { firstValueFrom } from 'rxjs';
 import { DsaNoticeCategory } from '../../../interfaces/dsa-notice-category.interface';
+import { DsaNoticeType } from '../../../interfaces/dsa-notice-type.interface';
 import { Message } from '../../../interfaces/message';
 import { DigitalServicesActService, DsaSubmissionResponse } from '../../../services/digital-services-act.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
@@ -25,6 +26,9 @@ import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.c
 
 interface DigitalServicesActReportDialogData {
   message?: Partial<Message> | null;
+  contentId?: string | number | null;
+  contentType?: DsaNoticeType;
+  reportedContent?: Record<string, unknown> | null;
   contentUrl?: string;
   reporterEmail?: string;
   reporterName?: string;
@@ -64,7 +68,7 @@ export class DigitalServicesActReportDialogComponent implements OnDestroy {
 
   // Content-ID robust aus der Message ziehen
   private readonly contentIdSig = signal<string>(
-    String(this.data?.message?.uuid ?? this.data?.message?.id ?? '')
+    String(this.data?.contentId ?? this.data?.message?.uuid ?? this.data?.message?.id ?? '')
   );
 
   readonly formalForm = this.fb.group({
@@ -211,6 +215,9 @@ export class DigitalServicesActReportDialogComponent implements OnDestroy {
   }
 
   private buildReportedContent(): Record<string, unknown> | null {
+    if (this.data?.reportedContent !== undefined) {
+      return this.data.reportedContent;
+    }
     const msg = this.data?.message ?? null;
     if (!msg) return null;
     return {
@@ -255,7 +262,7 @@ export class DigitalServicesActReportDialogComponent implements OnDestroy {
       const contentId = this.contentIdSig();
       const contentUrl = this.data?.contentUrl ?? '';
       const contentSnapshot = this.buildReportedContent();
-      const contentType = 'public message';
+      const contentType: DsaNoticeType = this.data?.contentType ?? 'public message';
 
       if (this.activeTabIndex === 0) {
         // QUICK REPORT
