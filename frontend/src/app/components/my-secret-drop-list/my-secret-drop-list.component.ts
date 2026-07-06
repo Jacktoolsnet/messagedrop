@@ -328,6 +328,7 @@ export class MySecretDropListComponent implements OnInit {
 
   getStatusKey(drop: SecretDrop): string {
     const now = Math.floor(Date.now() / 1000);
+    if (this.isDsaLockedDrop(drop)) return 'common.messageList.publishState.dsaLocked';
     if (drop.publishState === 'draft' || (drop.localOnly && drop.publishState !== 'unpublished')) return 'common.secretDrop.status.draft';
     if (drop.publishState === 'unpublished') return 'common.messageList.publishState.unpublished';
     if (drop.status === 'consumed') return 'common.secretDrop.status.consumed';
@@ -338,11 +339,21 @@ export class MySecretDropListComponent implements OnInit {
     return 'common.secretDrop.status.disabled';
   }
 
+  isDsaLockedDrop(drop: SecretDrop): boolean {
+    return drop.publishState === 'dsa_locked' || (drop.status === 'disabled' && !!drop.dsaStatusToken);
+  }
+
+  canEditDrop(drop: SecretDrop): boolean {
+    return !this.isDsaLockedDrop(drop);
+  }
+
   canPublishDrop(drop: SecretDrop): boolean {
+    if (this.isDsaLockedDrop(drop)) return false;
     return drop.status === 'disabled' || drop.status === 'consumed' || drop.publishState === 'draft' || !!drop.localOnly;
   }
 
   canUnpublishDrop(drop: SecretDrop): boolean {
+    if (this.isDsaLockedDrop(drop)) return false;
     return drop.status === 'enabled';
   }
 

@@ -70,7 +70,7 @@ export class SecretDropService {
         visibility: row.visibility ?? local?.visibility ?? 'public',
         creatorMode: row.creatorMode ?? local?.creatorMode ?? 'normal',
         recipientUserIds: row.recipientUserIds ?? local?.recipientUserIds ?? [],
-        publishState: row.status === 'enabled' ? 'published' : 'unpublished',
+        publishState: row.status === 'disabled' && row.dsaStatusToken ? 'dsa_locked' : (row.status === 'enabled' ? 'published' : 'unpublished'),
         discoveryZoomLevel: local?.discoveryZoomLevel ?? row.discoveryZoomLevel,
         localOnly: false
       });
@@ -388,7 +388,9 @@ export class SecretDropService {
       recipientUserIds: Array.isArray(source.recipientUserIds) ? source.recipientUserIds.map((id) => String(id)).filter(Boolean) : [],
       crypto: this.parseJsonField(source.crypto),
       encryptedPayload: this.parseJsonField(source.encryptedPayload),
-      publishState: source.publishState ?? (source.status === 'enabled' ? 'published' : 'unpublished'),
+      dsaStatusToken: source.dsaStatusToken ?? null,
+      dsaStatusTokenCreatedAt: source.dsaStatusTokenCreatedAt === null || source.dsaStatusTokenCreatedAt === undefined ? null : Number(source.dsaStatusTokenCreatedAt),
+      publishState: source.publishState ?? (source.status === 'disabled' && source.dsaStatusToken ? 'dsa_locked' : (source.status === 'enabled' ? 'published' : 'unpublished')),
       localOnly: source.localOnly ?? false,
       maxUnlocks: source.maxUnlocks === null || source.maxUnlocks === undefined ? null : Number(source.maxUnlocks),
       unlockCount: Number(source.unlockCount ?? 0),

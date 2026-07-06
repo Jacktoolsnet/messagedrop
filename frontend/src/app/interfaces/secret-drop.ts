@@ -35,7 +35,7 @@ export interface SecretDrop {
   visibility?: 'public' | 'contacts';
   creatorMode?: 'normal' | 'incognito';
   recipientUserIds?: string[];
-  publishState?: 'published' | 'draft' | 'unpublished' | 'local_only';
+  publishState?: 'published' | 'draft' | 'unpublished' | 'local_only' | 'dsa_locked';
   localOnly?: boolean;
   encryptedPayload?: SecretDropEncryptedPayload | string;
   crypto?: SecretDropCryptoMetadata | Record<string, unknown> | string | null;
@@ -52,6 +52,8 @@ export interface SecretDrop {
   updatedAt?: number;
   lastUnlockedAt?: number | null;
   consumedAt?: number | null;
+  dsaStatusToken?: string | null;
+  dsaStatusTokenCreatedAt?: number | null;
 }
 
 

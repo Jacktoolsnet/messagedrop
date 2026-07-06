@@ -526,7 +526,14 @@ router.get('/my/:userId', security.authenticate, async (req, res, next) => {
       throw apiError.forbidden('forbidden');
     }
     const rows = await tableSecretDrop.getByUserId(getDb(req), userId);
-    res.status(200).json({ status: 200, rows: rows.map(mapPublicSecretDrop) });
+    res.status(200).json({
+      status: 200,
+      rows: rows.map((drop) => ({
+        ...mapPublicSecretDrop(drop),
+        dsaStatusToken: drop.dsaStatusToken ?? null,
+        dsaStatusTokenCreatedAt: drop.dsaStatusTokenCreatedAt ?? null
+      }))
+    });
   } catch (error) {
     next(error);
   }
