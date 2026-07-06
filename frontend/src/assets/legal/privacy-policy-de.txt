@@ -1,5 +1,5 @@
 DATENSCHUTZERKLÄRUNG
-Stand: 19. Juni 2026
+Stand: 6. Juli 2026
 
 ###
 Kurzfassung (nicht rechtsverbindlich)
@@ -20,11 +20,11 @@ Die optionale Vorlesefunktion verwendet die Sprachsynthese des Browsers bzw. Bet
 
 Ohne ein zuvor erstelltes Backup ist eine Wiederherstellung lokal gelöschter Daten nicht möglich.
 
-Öffentliche Inhalte und Kommentare werden von Nutzern erstellt und können gemäß den Vorgaben des Digital Services Act (DSA) gemeldet, überprüft und moderiert werden. Inhalte, für die ein DSA-Verfahren eingeleitet wird, werden vorübergehend nicht öffentlich sichtbar gestellt.
+Öffentliche Inhalte, Kommentare und öffentlich auffindbare SecretDrops werden von Nutzern erstellt und können gemäß den Vorgaben des Digital Services Act (DSA) gemeldet, überprüft und moderiert werden. Inhalte, für die ein DSA-Verfahren eingeleitet wird, werden vorübergehend nicht öffentlich sichtbar gestellt.
 
 Persönliche Informationen dürfen nicht öffentlich veröffentlicht werden – weder über sich selbst noch über andere Personen.
 
-Möglicherweise rechtswidrige öffentliche Inhalte können über die Meldefunktion im Dienst oder über die im Impressum genannte DSA-Kontaktstelle gemeldet werden. Betroffene Nutzer können – soweit gesetzlich vorgesehen – interne Beschwerden gegen Moderationsentscheidungen einreichen.
+Möglicherweise rechtswidrige öffentliche Inhalte, einschließlich öffentlich auffindbarer SecretDrops, können über die Meldefunktion im Dienst oder über die im Impressum genannte DSA-Kontaktstelle gemeldet werden. Betroffene Nutzer können – soweit gesetzlich vorgesehen – interne Beschwerden gegen Moderationsentscheidungen einreichen.
 
 MessageDrop verwendet kein personalisiertes Empfehlungs- oder Ranking-System. Öffentliche Inhalte werden nicht algorithmisch gefiltert oder priorisiert, sondern ausschließlich anhand des betrachteten geografischen Bereichs und der zeitlichen Veröffentlichung angezeigt.
 
@@ -71,7 +71,7 @@ Besucher
 Nutzer, der MessageDrop ohne Anlage eines Nutzerkontos verwendet.
 
 Öffentliche Inhalte
-Von Nutzern erstellte Inhalte (z. B. öffentliche Nachrichten und Kommentare), die grundsätzlich öffentlich sichtbar sind, sofern sie nicht eingeschränkt oder entfernt wurden.
+Von Nutzern erstellte Inhalte (z. B. öffentliche Nachrichten, Kommentare und öffentlich auffindbare SecretDrops), die grundsätzlich öffentlich sichtbar oder auffindbar sind, sofern sie nicht eingeschränkt oder entfernt wurden.
 
 Private Kommunikation
 Kommunikation zwischen Nutzern, die verschlüsselt übertragen wird (z. B. private Chats).
@@ -83,7 +83,7 @@ Systemmeldungen
 Interne Mitteilungen, die ausschließlich durch autorisierte administrative Systeme erzeugt und im Frontend angezeigt werden (z. B. zu DSA-Verfahren oder Wartungsarbeiten). Systemmeldungen sind kein E-Mail-Postfach.
 
 DSA-Verfahren
-Verfahren nach dem Digital Services Act (DSA), insbesondere Meldungen („Notice“) und Beschwerden („Appeal“) im Zusammenhang mit öffentlichen Inhalten.
+Verfahren nach dem Digital Services Act (DSA), insbesondere Meldungen („Notice“) und Beschwerden („Appeal“) im Zusammenhang mit öffentlichen Inhalten, einschließlich öffentlich auffindbarer SecretDrops.
 
 Öffentliche Fallseite
 Öffentlich zugängliche Seite zu einem DSA-Verfahren, auf der ausschließlich anonymisierte oder nicht personenbezogene Informationen veröffentlicht werden.
@@ -348,12 +348,14 @@ Unabhängig davon kann der Nutzer sein Nutzerkonto jederzeit selbstständig übe
 Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Bereitstellung, Verwaltung und Löschung des Nutzerkontos) sowie Art. 6 Abs. 1 lit. c DSGVO (Erfüllung gesetzlicher Pflichten), soweit gesetzliche Pflichten eine weitere Verarbeitung erfordern.
 
 ###
-3.4 Öffentliche Inhalte und Kommentare
+3.4 Öffentliche Inhalte, Kommentare und SecretDrops
 ###
 
-Nutzer können öffentliche Nachrichten und öffentliche Kommentare erstellen.
+Nutzer können öffentliche Nachrichten, öffentliche Kommentare und öffentlich auffindbare SecretDrops erstellen.
 
 Öffentliche Inhalte dürfen keine persönlichen Informationen enthalten, unabhängig davon, ob diese die eigene Person oder andere Personen betreffen. Solche Inhalte können moderiert, ausgeblendet oder entfernt werden.
+
+SecretDrops werden clientseitig verschlüsselt. Der geheime Inhalt ist für MessageDrop ohne die zugehörige PIN grundsätzlich nicht lesbar. Verarbeitet werden jedoch die für Bereitstellung, Auffindbarkeit, Status, Moderation und DSA-Verfahren erforderlichen Metadaten sowie Inhalte oder Angaben, die im Rahmen einer Meldung oder nach einer Entschlüsselung durch Nutzer bereitgestellt werden.
 
 Diese Inhalte werden verarbeitet zur:
 - Bereitstellung und Darstellung innerhalb des Dienstes,
@@ -363,11 +365,11 @@ Diese Inhalte werden verarbeitet zur:
 
 Zur Unterstützung der Moderation können Inhalte (einschließlich Hashtags) automatisiert analysiert werden. Hierbei kann – soweit technisch erforderlich – ein externer KI-Moderationsdienst eingebunden werden. Dabei kann eine Übermittlung von Inhaltsdaten und technischen Metadaten an den jeweiligen Dienstleister erfolgen. Wir verwenden die Ergebnisse ausschließlich zur Moderationsunterstützung und zur Erfüllung gesetzlicher Pflichten.
 
-Öffentliche Nachrichten und öffentliche Kommentare werden in der Regel nach 30 Tagen gelöscht. Ein Anspruch auf dauerhafte Verfügbarkeit, Archivierung oder Wiederherstellung besteht nicht.
+Öffentliche Nachrichten, öffentliche Kommentare und öffentlich auffindbare SecretDrops werden in der Regel nach 30 Tagen gelöscht, sofern keine kürzere Gültigkeit, kein vorheriger Verbrauch oder keine rechtliche bzw. technische Ausnahme greift. Ein Anspruch auf dauerhafte Verfügbarkeit, Archivierung oder Wiederherstellung besteht nicht.
 
 Öffentliche Inhalte können bewertet werden (z. B. Like / Dislike). Ein Anspruch auf bestimmte Reichweite, Sichtbarkeit oder Bewertungsergebnisse besteht nicht.
 
-Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Bereitstellung und Verarbeitung öffentlicher Inhalte und Kommentare) sowie Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an Betrieb, Sicherheit und Missbrauchsprävention) sowie Art. 6 Abs. 1 lit. c DSGVO (Erfüllung gesetzlicher Pflichten), soweit gesetzliche Pflichten einschlägig sind.
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Bereitstellung und Verarbeitung öffentlicher Inhalte, Kommentare und öffentlich auffindbarer SecretDrops) sowie Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an Betrieb, Sicherheit und Missbrauchsprävention) sowie Art. 6 Abs. 1 lit. c DSGVO (Erfüllung gesetzlicher Pflichten), soweit gesetzliche Pflichten einschlägig sind.
 
 ###
 3.5 Private Kommunikation
@@ -509,7 +511,7 @@ Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Bereitstellung der angeforderten
 4.1 DSA-Verfahren
 ###
 
-Soweit die gesetzlichen Vorgaben des Digital Services Act (DSA) auf MessageDrop anwendbar sind, kann für öffentliche Inhalte und Kommentare ein Verfahren eingeleitet werden, insbesondere durch Meldungen (Notices) oder Beschwerden (Appeals).
+Soweit die gesetzlichen Vorgaben des Digital Services Act (DSA) auf MessageDrop anwendbar sind, kann für öffentliche Inhalte, Kommentare und öffentlich auffindbare SecretDrops ein Verfahren eingeleitet werden, insbesondere durch Meldungen (Notices) oder Beschwerden (Appeals).
 
 Meldungen können über die Meldefunktion im Dienst oder über die im Impressum genannte DSA-Kontaktstelle erfolgen.
 
@@ -584,7 +586,7 @@ Im Übrigen gelten insbesondere folgende Grundsätze:
 - Besucher-/Server-Logs: Speicherung nach Erforderlichkeit für Sicherheit und Betrieb (Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an Sicherheit und Betrieb)),
 - Nutzerkonto-Metadaten (User-ID, Status, letzter Login): bis zur Löschung des Nutzerkontos, vorbehaltlich gesetzlicher Pflichten,
 - Nutzungszeit-Schutz (Einstellungen/Status, inkl. Eltern-PIN-Hash): bis zur Änderung/Löschung durch den Nutzer bzw. bis zur Löschung des Nutzerkontos,
-- öffentliche Inhalte: Löschung nach 30 Tagen,
+- öffentliche Inhalte einschließlich öffentlich auffindbarer SecretDrops: Löschung nach 30 Tagen, sofern keine kürzere Gültigkeit, kein vorheriger Verbrauch oder keine rechtliche bzw. technische Ausnahme greift,
 - gelesene private Nachrichten: Löschung nach 7 Tagen,
 - temporäre Datensätze zur Profilfreigabe bei Kontakten: Löschung nach Zustellung/Verarbeitung oder spätestens nach Fristablauf; die Frist beträgt derzeit 7 Tage,
 - lokal gespeicherte Daten: Löschung durch den Nutzer bzw. durch technische Umstände möglich.

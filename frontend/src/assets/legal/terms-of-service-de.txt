@@ -1,5 +1,5 @@
 NUTZUNGSBEDINGUNGEN
-Stand: 19. Juni 2026
+Stand: 6. Juli 2026
 
 ###
 Kurzfassung (vereinfacht, nicht rechtsverbindlich)
@@ -13,9 +13,9 @@ Kurzfassung (vereinfacht, nicht rechtsverbindlich)
 - Für Inhalte, die Du veröffentlichst oder versendest, bist Du selbst verantwortlich.
 - Unzulässige Inhalte (z. B. rechtswidrige Inhalte, Hass, Gewalt, persönliche Informationen) sind verboten.
 - Wir dürfen Inhalte moderieren, einschränken, ausblenden oder entfernen.
-- Für öffentliche Inhalte können Meldungen und Verfahren nach dem Digital Services Act (DSA) durchgeführt werden.
+- Für öffentliche Inhalte, insbesondere öffentliche Nachrichten, Kommentare und öffentlich auffindbare SecretDrops, können Meldungen und Verfahren nach dem Digital Services Act (DSA) durchgeführt werden.
 - Für DSA-Verfahren kann eine öffentliche Statusseite bereitgestellt werden (mit anonymisierten bzw. nicht personenbezogenen Verfahrensinformationen).
-- Rechtswidrige öffentliche Inhalte können über die Meldefunktion im Dienst oder über die im Impressum genannte Kontaktstelle gemeldet werden.
+- Rechtswidrige öffentliche Inhalte, einschließlich öffentlich auffindbarer SecretDrops, können über die Meldefunktion im Dienst oder über die im Impressum genannte Kontaktstelle gemeldet werden.
 - Betroffene Nutzer können bei Moderationsentscheidungen – soweit gesetzlich vorgesehen – eine interne Beschwerde einreichen.
 - Du kannst Kontakten sowie Plätzen folgen. Benachrichtigungen sind freiwillige technische Zusatzfunktionen; wir schulden keine Zustellung.
 - Private Chats sind als vertrauliche Kommunikation gedacht. Trotzdem musst Du auch dort die Gesetze einhalten.
@@ -75,7 +75,7 @@ Erklärungen mit weitergehender rechtlicher Bindung (also über die normale Nutz
 
 MessageDrop ist eine Plattform für:
 
-- öffentliche, ortsbezogene Inhalte (z. B. Nachrichten und Kommentare),
+- öffentliche, ortsbezogene Inhalte (z. B. Nachrichten, Kommentare und öffentlich auffindbare SecretDrops),
 - private Notizen (lokal auf Deinem Gerät),
 - Kontakte und private Chats,
 - optionale Benachrichtigungen, Vorlese- und Organisationsfunktionen (z. B. Folgen von Kontakten/Plätzen).
@@ -83,6 +83,8 @@ MessageDrop ist eine Plattform für:
 Datenschutz und Datensparsamkeit sind zentrale Grundsätze von MessageDrop. Wir verfolgen nach Möglichkeit einen „Local-First“-Ansatz: Viele Daten werden primär auf Deinem Endgerät gespeichert. Serverseitig verarbeiten wir nur Daten, die für den Betrieb des Dienstes erforderlich sind (z. B. öffentliche Inhalte, pseudonyme Nutzerkennung, öffentliche Schlüssel sowie notwendige Status- und Sicherheitsdaten).
 
 Soweit technisch möglich und sinnvoll, werden Daten kryptografisch geschützt. Dazu gehören insbesondere die PIN-basierte, lokale Absicherung des Nutzerkontos, die verschlüsselte Speicherung sensibler lokaler Daten sowie clientseitig verschlüsselte private Chat-Inhalte. Deine PIN wird ausschließlich lokal verarbeitet und nicht an den Server übertragen.
+
+SecretDrops werden clientseitig verschlüsselt. Der geheime Inhalt kann von MessageDrop ohne die zugehörige PIN bzw. das erforderliche Geheimnis nicht gelesen oder wiederhergestellt werden. Öffentlich sichtbar bzw. auffindbar können jedoch Metadaten, Hinweise, Standortbezug, Statusinformationen und – nach erfolgreicher Entschlüsselung durch Nutzer – gemeldete Inhalte im Rahmen gesetzlich vorgesehener Prüf- und DSA-Verfahren verarbeitet werden.
 
 Soweit technisch verfügbar, kann MessageDrop eine optionale Vorlesefunktion bereitstellen. Diese Funktion dient ausschließlich dem Komfort und der Barrierefreiheit. Welche Stimmen verfügbar sind und ob die Sprachsynthese lokal auf dem Endgerät oder über Komponenten des Browser- bzw. Plattformanbieters erfolgt, hängt vom verwendeten Browser, Betriebssystem, Endgerät und der gewählten Stimme ab.
 
@@ -144,10 +146,10 @@ Benachrichtigungen können daher verspätet, unvollständig, mehrfach oder gar n
 Wir schulden keine Zustellung von Benachrichtigungen. Ein Anspruch auf Zustellung besteht nicht. Dies gilt auch für eine teilweise, vollständige, sofortige oder fehlerfreie Zustellung.
 
 ###
-9. Öffentliche Inhalte und Deine Verantwortung
+9. Öffentliche Inhalte, SecretDrops und Deine Verantwortung
 ###
 
-Für alles, was Du veröffentlichst, bist Du selbst verantwortlich.
+Für alles, was Du veröffentlichst, öffentlich auffindbar machst oder als SecretDrop bereitstellst, bist Du selbst verantwortlich.
 
 Du bestätigst, dass:
 
@@ -160,7 +162,7 @@ Persönliche oder private Informationen dürfen nicht öffentlich veröffentlich
 Du kannst Erstellern öffentlicher Inhalte lokal eigene Anzeigenamen und Avatare zuordnen. Diese Zuordnungen dienen nur Deiner persönlichen Orientierung (z. B. um Beiträge desselben Nutzers wiederzuerkennen), werden ausschließlich lokal auf Deinem Endgerät gespeichert und sind für andere Nutzer nicht sichtbar. Solche Zuordnungen sind keine vom jeweiligen Ersteller bestätigten Profilangaben.
 
 Wichtiger Hinweis zur Speicherdauer öffentlicher Inhalte:
-Öffentliche Nachrichten werden in der Regel nach 30 Tagen gelöscht. Mit einer öffentlichen Nachricht verknüpfte öffentliche Kommentare werden in der Regel zusammen mit der jeweiligen Nachricht gelöscht.
+Öffentliche Nachrichten, öffentliche Kommentare und öffentlich auffindbare SecretDrops werden in der Regel nach 30 Tagen gelöscht, sofern keine kürzere Gültigkeit, kein vorheriger Verbrauch des SecretDrops oder keine rechtliche bzw. technische Ausnahme greift. Mit einer öffentlichen Nachricht verknüpfte öffentliche Kommentare werden in der Regel zusammen mit der jeweiligen Nachricht gelöscht.
 Aus technischen, betrieblichen oder rechtlichen Gründen kann sich die Löschung im Einzelfall verzögern, sodass öffentliche Inhalte ausnahmsweise auch länger verfügbar oder sichtbar bleiben können.
 Ein Anspruch auf dauerhafte Verfügbarkeit, Archivierung, Wiederherstellung oder Löschung zu einem bestimmten Zeitpunkt besteht nicht.
 
@@ -211,7 +213,7 @@ Soweit die gesetzlichen Vorgaben des Digital Services Act (DSA) auf MessageDrop 
 11.1 Meldung möglicher rechtswidriger Inhalte (Notice)
 ###
 
-Möglicherweise rechtswidrige öffentliche Inhalte können gemeldet werden:
+Möglicherweise rechtswidrige öffentliche Inhalte, einschließlich öffentlicher Nachrichten, Kommentare und öffentlich auffindbarer SecretDrops, können gemeldet werden:
 
 - über die dafür vorgesehene Meldefunktion im Dienst (DSA-Meldung), oder
 - über die im Impressum genannte DSA-Kontaktstelle.
@@ -410,7 +412,7 @@ Nutze in Notfällen immer die offiziellen Notrufwege.
 18. Rechte an Inhalten und App
 ###
 
-Deine Inhalte bleiben grundsätzlich Deine Inhalte.
+Deine Inhalte bleiben grundsätzlich Deine Inhalte. Dies gilt auch für Inhalte, die Du als SecretDrop bereitstellst.
 
 Damit wir den Dienst betreiben können, räumst Du uns die nötigen Nutzungsrechte ein (z. B. speichern, anzeigen, technisch verarbeiten, moderieren), soweit dies für den Betrieb erforderlich ist.
 

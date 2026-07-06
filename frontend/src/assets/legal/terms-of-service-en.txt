@@ -1,5 +1,5 @@
 TERMS OF USE
-Version: June 19, 2026
+Version: July 6, 2026
 
 IMPORTANT NOTE ON LANGUAGE
 This English translation is provided for convenience only and is not legally binding. The legally binding version is exclusively the current complete German version of these Terms of Use.
@@ -16,9 +16,9 @@ Summary (simplified, not legally binding)
 - You are responsible for the content you publish or send.
 - Prohibited content (e.g., illegal content, hate speech, violence, personal information) is not allowed.
 - We may moderate, restrict, hide, or remove content.
-- Reports and proceedings under the Digital Services Act (DSA) may be conducted for public content.
+- Reports and proceedings under the Digital Services Act (DSA) may be conducted for public content, in particular public messages, comments, and publicly discoverable SecretDrops.
 - A public status page may be provided for DSA proceedings (with anonymized or non-personal procedural information).
-- Illegal public content can be reported using the reporting function in the service or via the contact point specified in the legal notice.
+- Illegal public content, including publicly discoverable SecretDrops, can be reported using the reporting function in the service or via the contact point specified in the legal notice.
 - Affected users can submit an internal complaint regarding moderation decisions, where provided for by law.
 - You can follow contacts and places. Notifications are voluntary additional technical features; we are not obligated to deliver them.
 - Private chats are intended as confidential communication. Nevertheless, you must also comply with the law there.
@@ -78,7 +78,7 @@ Declarations with more extensive legal effect (i.e. beyond normal use) may only 
 
 MessageDrop is a platform for:
 
-- public, location-based content (e.g., messages and comments),
+- public, location-based content (e.g., messages, comments, and publicly discoverable SecretDrops),
 - private notes (stored locally on your device),
 - contacts and private chats,
 - optional notifications, read-aloud, and organization features (e.g., following contacts/places).
@@ -86,6 +86,8 @@ MessageDrop is a platform for:
 Data protection and data minimization are central principles of MessageDrop. Where possible, we pursue a “local-first” approach: much of the data is primarily stored on your device. On the server side, we only process data that is necessary for the operation of the service (e.g., public content, pseudonymous user ID, public keys, and necessary status and security data).
 
 Where technically possible and reasonable, data is protected by cryptography. This includes, in particular, PIN-based local security for user accounts, encrypted storage of sensitive local data, and client-side encryption of private chat content. Your PIN is processed locally only and is not transmitted to the server.
+
+SecretDrops are encrypted on the client side. MessageDrop cannot read or restore the secret content without the corresponding PIN or required secret. However, metadata, hints, location references, status information, and—after successful decryption by users—reported content may be processed within legally provided review and DSA proceedings.
 
 Where technically available, MessageDrop may provide an optional read-aloud function. This function is intended solely for convenience and accessibility. Which voices are available and whether speech synthesis takes place locally on the device or via components of the browser or platform provider depends on the browser, operating system, device, and selected voice.
 
@@ -147,10 +149,10 @@ Notifications may therefore be delayed, incomplete, repeated, or not delivered a
 We do not owe the delivery of notifications. There is no entitlement to delivery. This also applies to partial, complete, immediate, or error-free delivery.
 
 ###
-9. Public content and your responsibility
+9. Public content, SecretDrops, and your responsibility
 ###
 
-You are responsible for everything you publish.
+You are responsible for everything you publish, make publicly discoverable, or provide as a SecretDrop.
 
 You confirm that:
 
@@ -163,7 +165,7 @@ Personal or private information may not be published publicly or otherwise made 
 You can assign your own display names and avatars to creators of public content locally. These assignments are for your personal orientation only (e.g., to recognize posts from the same user), are stored exclusively locally on your device, and are not visible to other users. Such assignments are not profile information confirmed by the respective creator.
 
 Important note on the storage period for public content:
-Public messages are usually deleted after 30 days. Public comments linked to a public message are usually deleted together with the respective message.
+Public messages, public comments, and publicly discoverable SecretDrops are usually deleted after 30 days unless a shorter validity period, prior consumption of the SecretDrop, or a legal or technical exception applies. Public comments linked to a public message are usually deleted together with the respective message.
 For technical, operational, or legal reasons, deletion may be delayed in individual cases, so that public content may remain available or visible for longer in exceptional cases.
 There is no entitlement to permanent availability, archiving, restoration, or deletion at a specific point in time.
 
@@ -214,7 +216,7 @@ Insofar as the legal requirements of the Digital Services Act (DSA) apply to Mes
 11.1 Reporting potentially illegal content (Notice)
 ###
 
-Potentially illegal public content can be reported:
+Potentially illegal public content, including public messages, comments, and publicly discoverable SecretDrops, can be reported:
 
 - using the reporting function provided for this purpose in the service (DSA notice), or
 - via the DSA contact point specified in the legal notice.
@@ -413,7 +415,7 @@ In emergencies, always use the official emergency channels.
 18. Rights to content and app
 ###
 
-Your content remains your content.
+Your content remains your content. This also applies to content you provide as a SecretDrop.
 
 In order for us to operate the service, you grant us the rights necessary to use your content (e.g. storage, display, technical processing, moderation), to the extent required for operation.
 

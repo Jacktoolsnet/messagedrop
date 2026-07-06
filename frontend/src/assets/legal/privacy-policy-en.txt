@@ -1,5 +1,5 @@
 PRIVACY POLICY
-Effective: June 19, 2026
+Effective: July 6, 2026
 
 IMPORTANT NOTE ON LANGUAGE
 This English translation is provided for convenience only and is not legally binding. The legally binding version is exclusively the current complete German version of this Privacy Policy, including all supplements related to the Digital Services Act (DSA).
@@ -23,11 +23,11 @@ The optional read-aloud feature uses the browser’s or operating system’s spe
 
 Without a previously created backup, it is not possible to restore locally deleted data.
 
-Public content and comments are created by users and may be reported, reviewed, and moderated in accordance with the provisions of the Digital Services Act (DSA). Content for which DSA proceedings are initiated will be temporarily hidden from public view.
+Public content, comments, and publicly discoverable SecretDrops are created by users and may be reported, reviewed, and moderated in accordance with the provisions of the Digital Services Act (DSA). Content for which DSA proceedings are initiated will be temporarily hidden from public view.
 
 Personal information must not be published publicly—neither about oneself nor about other individuals.
 
-Potentially illegal public content can be reported via the reporting function within the service or through the DSA contact point listed in the legal notice. Affected users may—to the extent provided by law—file internal complaints against moderation decisions.
+Potentially illegal public content, including publicly discoverable SecretDrops, can be reported via the reporting function within the service or through the DSA contact point listed in the legal notice. Affected users may—to the extent provided by law—file internal complaints against moderation decisions.
 
 MessageDrop does not use a personalized recommendation or ranking system. Public content is not algorithmically filtered or prioritized, but is displayed exclusively based on the geographical area being viewed and the time of publication.
 
@@ -74,7 +74,7 @@ Visitor
 A user who uses MessageDrop without creating a user account.
 
 Public Content
-Content created by users (e.g., public messages and comments) that is generally publicly visible unless it has been restricted or removed.
+Content created by users (e.g., public messages, comments, and publicly discoverable SecretDrops) that is generally publicly visible or discoverable unless it has been restricted or removed.
 
 Private Communication
 Communication between users that is transmitted in encrypted form (e.g., private chats).
@@ -86,7 +86,7 @@ System Messages
 Internal messages generated exclusively by authorized administrative systems and displayed in the frontend (e.g., regarding DSA proceedings or maintenance work). System messages do not constitute an email inbox.
 
 DSA Proceedings
-Proceedings under the Digital Services Act (DSA), in particular notices and appeals in connection with public content.
+Proceedings under the Digital Services Act (DSA), in particular notices and appeals in connection with public content, including publicly discoverable SecretDrops.
 
 Public Case Page
 A publicly accessible page relating to DSA proceedings on which only anonymized or non-personal information is published.
@@ -351,12 +351,14 @@ Regardless of this, the user may delete their user account independently via the
 The legal basis is Art. 6(1)(b) GDPR (provision, administration, and deletion of the user account) as well as Art. 6(1)(c) GDPR (compliance with legal obligations), to the extent that legal obligations require further processing.
 
 ###
-3.4 Public Content and Comments
+3.4 Public Content, Comments, and SecretDrops
 ###
 
-Users may post public messages and public comments.
+Users may post public messages, public comments, and publicly discoverable SecretDrops.
 
 Public content must not contain any personal information, regardless of whether it pertains to the user or others. Such content may be moderated, hidden, or removed.
+
+SecretDrops are encrypted on the client side. The secret content is generally not readable by MessageDrop without the corresponding PIN. However, the metadata required for provision, discoverability, status, moderation, and DSA proceedings is processed, as well as content or information provided in the context of a report or after decryption by users.
 
 This content is processed for the following purposes:
 - Provision and display within the service,
@@ -366,11 +368,11 @@ This content is processed for the following purposes:
 
 To support moderation, content (including hashtags) may be analyzed automatically. If technically necessary, an external AI moderation service may be involved. This may involve the transmission of content data and technical metadata to the respective service provider. We use the results exclusively to support moderation and to fulfill legal obligations.
 
-Public messages and public comments are generally deleted after 30 days. There is no entitlement to permanent availability, archiving, or restoration.
+Public messages, public comments, and publicly discoverable SecretDrops are generally deleted after 30 days unless a shorter validity period, prior consumption, or a legal or technical exception applies. There is no entitlement to permanent availability, archiving, or restoration.
 
 Public content may be rated (e.g., like/dislike). There is no entitlement to any particular reach, visibility, or rating outcome.
 
-The legal basis is Art. 6(1)(b) GDPR (provision and processing of public content and comments) as well as Art. 6(1)(f) GDPR (legitimate interest in operation, security, and prevention of misuse) as well as Art. 6(1)(c) GDPR (compliance with legal obligations), to the extent that legal obligations apply.
+The legal basis is Art. 6(1)(b) GDPR (provision and processing of public content, comments, and publicly discoverable SecretDrops) as well as Art. 6(1)(f) GDPR (legitimate interest in operation, security, and prevention of misuse) as well as Art. 6(1)(c) GDPR (compliance with legal obligations), to the extent that legal obligations apply.
 
 ###
 3.5 Private Communication
@@ -512,7 +514,7 @@ The legal basis is Art. 6(1)(b) GDPR (provision of the requested protection feat
 4.1 DSA Proceedings
 ###
 
-To the extent that the legal requirements of the Digital Services Act (DSA) apply to MessageDrop, proceedings may be initiated in relation to public content and comments, in particular through notices or appeals.
+To the extent that the legal requirements of the Digital Services Act (DSA) apply to MessageDrop, proceedings may be initiated in relation to public content, comments, and publicly discoverable SecretDrops, in particular through notices or appeals.
 
 Notices may be submitted via the reporting function within the service or through the DSA contact point listed in the legal notice.
 
@@ -587,7 +589,7 @@ In particular, the following principles apply:
 - Visitor/server logs: storage as necessary for security and operation (Art. 6(1)(f) GDPR (legitimate interest in security and operation)),
 - User account metadata (user ID, status, last login): until the user account is deleted, subject to legal obligations,
 - Usage Time Protection (settings/status, including parent PIN hash): until modified/deleted by the user or until the user account is deleted,
-- public content: deletion after 30 days,
+- public content including publicly discoverable SecretDrops: deletion after 30 days unless a shorter validity period, prior consumption, or a legal or technical exception applies,
 - read private messages: deletion after 7 days,
 - temporary records for profile sharing with contacts: deletion after delivery/processing or, at the latest, upon expiry; the current period is 7 days,
 - locally stored data: deletion by the user or due to technical circumstances is possible.

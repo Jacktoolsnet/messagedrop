@@ -1,5 +1,5 @@
 HAFTUNGSHINWEIS (DISCLAIMER)
-Stand: 01. Mai 2026
+Stand: 6. Juli 2026
 
 ###
 Kurzfassung (nicht rechtsverbindlich)
@@ -146,7 +146,7 @@ Für Ausfälle, Änderungen, Quoten- oder Ratenbegrenzungen sowie sonstige Einsc
 7. Von Nutzern erstellte Inhalte
 ###
 
-Nutzer sind für von ihnen erstellte, veröffentlichte, geteilte oder verlinkte Inhalte selbst verantwortlich.
+Nutzer sind für von ihnen erstellte, veröffentlichte, geteilte, verlinkte oder als SecretDrop bereitgestellte Inhalte selbst verantwortlich.
 
 Wir machen uns nutzergenerierte Inhalte nicht zu eigen.
 

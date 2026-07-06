@@ -1,5 +1,5 @@
 LIABILITY NOTICE (DISCLAIMER)
-Version: May 1, 2026
+Version: July 6, 2026
 
 IMPORTANT NOTE ON LANGUAGE
 This English translation is provided for convenience only and is not legally binding. The legally binding version is exclusively the current complete German version of this Liability Notice (Disclaimer).
@@ -149,7 +149,7 @@ We assume no warranty for outages, changes, quota or rate limits, or other limit
 7. User-Created Content
 ###
 
-Users are solely responsible for content they create, publish, share, or link.
+Users are solely responsible for content they create, publish, share, link to, or provide as a SecretDrop.
 
 We do not adopt user-generated content as our own.
 
