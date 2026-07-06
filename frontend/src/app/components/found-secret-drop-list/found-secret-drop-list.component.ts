@@ -87,7 +87,9 @@ export class FoundSecretDropListComponent {
   readonly translatingMessageUuid = signal<string | null>(null);
   readonly translatedMessages = signal<Record<string, string>>({});
   readonly reactingUuid = signal<string | null>(null);
-  readonly translationTargetLabel = computed(() => this.languageService.effectiveLanguage().toUpperCase());
+  readonly translationTargetLabel = computed(() =>
+    this.translation.t(`common.languageNames.${this.languageService.effectiveLanguage()}`)
+  );
   readonly userProfile: Profile = this.userService.getProfile();
 
 
