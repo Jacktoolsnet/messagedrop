@@ -69,6 +69,10 @@ const upload = multer({
 function db(req) { return req.database?.db; }
 function asString(v) { return (v === undefined || v === null) ? null : String(v); }
 function asNum(v, d) { const n = Number(v); return Number.isFinite(n) ? n : d; }
+function normalizeReportedContentType(value) {
+    const normalized = String(value || 'public message').trim().toLowerCase();
+    return normalized === 'secret drop' ? 'secret drop' : 'public message';
+}
 
 function normalizeHostname(hostname) {
     return String(hostname || '').trim().replace(/\.$/, '').toLowerCase();
@@ -206,10 +210,13 @@ function createMessageLookupError(message, extra = {}) {
     return err;
 }
 
-async function fetchMessageByContentId(contentId, options = {}) {
+async function fetchBackendContent(contentId, reportedContentType = 'public message', options = {}) {
     const strict = options?.strict === true;
+    const normalizedType = normalizeReportedContentType(reportedContentType);
     const base = resolveBackendBase();
     const raw = String(contentId ?? '').trim();
+    const notFoundCode = normalizedType === 'secret drop' ? 'secret_drop_not_found' : 'message_not_found';
+    const lookupFailedCode = normalizedType === 'secret drop' ? 'secret_drop_lookup_failed' : 'message_lookup_failed';
     if (!base) {
         if (!strict) return null;
         throw createMessageLookupError('backend_unavailable', { status: 503 });
@@ -239,9 +246,11 @@ async function fetchMessageByContentId(contentId, options = {}) {
     }
 
     const isNumeric = /^\d+$/.test(raw);
-    const path = isNumeric
-        ? `/message/internal/id/${encodeURIComponent(raw)}`
-        : `/message/internal/uuid/${encodeURIComponent(raw)}`;
+    const path = normalizedType === 'secret drop'
+        ? `/secretdrop/internal/uuid/${encodeURIComponent(raw)}`
+        : (isNumeric
+            ? `/message/internal/id/${encodeURIComponent(raw)}`
+            : `/message/internal/uuid/${encodeURIComponent(raw)}`);
 
     try {
         const resp = await axios.get(`${base}${path}`, {
@@ -250,18 +259,20 @@ async function fetchMessageByContentId(contentId, options = {}) {
             validateStatus: () => true
         });
         if (resp.status >= 200 && resp.status < 300) {
-            return resp.data?.message ?? null;
+            return normalizedType === 'secret drop'
+                ? (resp.data?.secretDrop ?? null)
+                : (resp.data?.message ?? null);
         }
         if (!strict) {
             return null;
         }
         if (resp.status === 404) {
-            throw createMessageLookupError('message_not_found', {
+            throw createMessageLookupError(notFoundCode, {
                 status: 404,
                 upstream: resp.data
             });
         }
-        throw createMessageLookupError('message_lookup_failed', {
+        throw createMessageLookupError(lookupFailedCode, {
             status: resp.status,
             upstream: resp.data
         });
@@ -273,15 +284,25 @@ async function fetchMessageByContentId(contentId, options = {}) {
                 || error.message === 'service_token_unavailable'
                 || error.message === 'message_not_found'
                 || error.message === 'message_lookup_failed'
+                || error.message === 'secret_drop_not_found'
+                || error.message === 'secret_drop_lookup_failed'
             )) {
                 throw error;
             }
-            throw createMessageLookupError('message_lookup_failed', {
+            throw createMessageLookupError(lookupFailedCode, {
                 detail: error?.message || error
             });
         }
         return null;
     }
+}
+
+async function fetchMessageByContentId(contentId, options = {}) {
+    return fetchBackendContent(contentId, 'public message', options);
+}
+
+async function fetchSecretDropByContentId(contentId, options = {}) {
+    return fetchBackendContent(contentId, 'secret drop', options);
 }
 
 function extractModerationFields(message) {
@@ -336,11 +357,13 @@ function mergeReportedContentWithModeration(raw, moderation) {
 
 async function enrichRowWithModeration(row, cache) {
     if (!row?.contentId) return row;
-    const key = String(row.contentId);
+    const reportedContentType = normalizeReportedContentType(row.reportedContentType);
+    if (reportedContentType !== 'public message') return row;
+    const key = `${reportedContentType}:${String(row.contentId)}`;
     if (!key) return row;
 
     if (!cache.has(key)) {
-        const message = await fetchMessageByContentId(key);
+        const message = await fetchMessageByContentId(row.contentId);
         cache.set(key, extractModerationFields(message));
     }
 
@@ -1117,24 +1140,27 @@ function buildTransparencyCsv(stats) {
 router.get('/health', (_req, res) => res.json({ ok: true, service: 'dsa-backend' }));
 
 /* ----------------------------- Helper ----------------------------- */
-async function setPublicMessageVisibility(contentId, visible) {
+async function setContentVisibility(contentId, visible, reportedContentType = 'public message') {
+    const normalizedType = normalizeReportedContentType(reportedContentType);
     const base = resolveBackendBase();
     if (!base) {
         throw createMessageLookupError('backend_unavailable', { status: 503 });
     }
-    const message = await fetchMessageByContentId(contentId, { strict: true });
-    if (!message) {
-        throw createMessageLookupError('message_not_found', { status: 404 });
+    const content = await fetchBackendContent(contentId, normalizedType, { strict: true });
+    const notFoundCode = normalizedType === 'secret drop' ? 'secret_drop_not_found' : 'message_not_found';
+    if (!content) {
+        throw createMessageLookupError(notFoundCode, { status: 404 });
     }
 
     const rawContentId = String(contentId ?? '').trim();
-    const messageUuid = String(message?.uuid ?? rawContentId).trim();
-    if (!messageUuid) {
-        throw createMessageLookupError('message_not_found', { status: 404 });
+    const contentUuid = String(content?.uuid ?? rawContentId).trim();
+    if (!contentUuid) {
+        throw createMessageLookupError(notFoundCode, { status: 404 });
     }
 
     const path = visible ? 'enable' : 'disable';
-    const url = `${base}/digitalserviceact/${path}/publicmessage/${encodeURIComponent(messageUuid)}`;
+    const backendContentPath = normalizedType === 'secret drop' ? 'secretdrop' : 'publicmessage';
+    const url = `${base}/digitalserviceact/${path}/${backendContentPath}/${encodeURIComponent(contentUuid)}`;
     const backendAudience = process.env.SERVICE_JWT_AUDIENCE_BACKEND || 'service.backend';
     let serviceToken = null;
     try {
@@ -1160,8 +1186,11 @@ async function setPublicMessageVisibility(contentId, visible) {
         throw createMessageLookupError(visible ? 'enable_failed' : 'disable_failed', {
             detail: error?.message || error,
             contentId: rawContentId,
-            messageUuid,
-            messageId: message?.id ?? null
+            contentUuid,
+            messageUuid: normalizedType === 'secret drop' ? null : contentUuid,
+            secretDropUuid: normalizedType === 'secret drop' ? contentUuid : null,
+            messageId: normalizedType === 'secret drop' ? null : content?.id ?? null,
+            reportedContentType: normalizedType
         });
     }
     const json = resp.data ?? null;
@@ -1171,8 +1200,11 @@ async function setPublicMessageVisibility(contentId, visible) {
             status: resp.status,
             upstream: json,
             contentId: rawContentId,
-            messageUuid,
-            messageId: message?.id ?? null
+            contentUuid,
+            messageUuid: normalizedType === 'secret drop' ? null : contentUuid,
+            secretDropUuid: normalizedType === 'secret drop' ? contentUuid : null,
+            messageId: normalizedType === 'secret drop' ? null : content?.id ?? null,
+            reportedContentType: normalizedType
         });
     }
 
@@ -1181,9 +1213,20 @@ async function setPublicMessageVisibility(contentId, visible) {
         status: resp.status,
         json,
         contentId: rawContentId,
-        messageUuid,
-        messageId: message?.id ?? null
+        contentUuid,
+        messageUuid: normalizedType === 'secret drop' ? null : contentUuid,
+        secretDropUuid: normalizedType === 'secret drop' ? contentUuid : null,
+        messageId: normalizedType === 'secret drop' ? null : content?.id ?? null,
+        reportedContentType: normalizedType
     };
+}
+
+async function setPublicMessageVisibility(contentId, visible) {
+    return setContentVisibility(contentId, visible, 'public message');
+}
+
+async function setSecretDropVisibility(contentId, visible) {
+    return setContentVisibility(contentId, visible, 'secret drop');
 }
 
 function toVisibilityApiError(error, visible) {
@@ -1192,6 +1235,8 @@ function toVisibilityApiError(error, visible) {
             return apiError.badRequest('invalid_content_id');
         case 'message_not_found':
             return apiError.notFound('message_not_found');
+        case 'secret_drop_not_found':
+            return apiError.notFound('secret_drop_not_found');
         case 'backend_unavailable': {
             const apiErr = apiError.serviceUnavailable('backend_unavailable');
             apiErr.detail = error?.detail ?? error?.message;
@@ -1221,6 +1266,15 @@ function toVisibilityApiError(error, visible) {
             if (error?.messageUuid) {
                 apiErr.messageUuid = error.messageUuid;
             }
+            if (error?.secretDropUuid) {
+                apiErr.secretDropUuid = error.secretDropUuid;
+            }
+            if (error?.contentUuid) {
+                apiErr.contentUuid = error.contentUuid;
+            }
+            if (error?.reportedContentType) {
+                apiErr.reportedContentType = error.reportedContentType;
+            }
             if (error?.messageId) {
                 apiErr.messageId = error.messageId;
             }
@@ -1229,7 +1283,7 @@ function toVisibilityApiError(error, visible) {
     }
 }
 
-router.post('/publicmessage/visibility', async (req, res, next) => {
+async function handleContentVisibilityRequest(req, res, next, forcedReportedContentType = null) {
     const contentId = String(req.body?.contentId ?? '').trim();
     if (!contentId) {
         return next(apiError.badRequest('contentId is required'));
@@ -1238,20 +1292,33 @@ router.post('/publicmessage/visibility', async (req, res, next) => {
         return next(apiError.badRequest('visible must be boolean'));
     }
 
+    const reportedContentType = forcedReportedContentType
+        ? normalizeReportedContentType(forcedReportedContentType)
+        : normalizeReportedContentType(req.body?.reportedContentType ?? req.body?.contentType);
+
     try {
-        const result = await setPublicMessageVisibility(contentId, req.body.visible);
+        const result = await setContentVisibility(contentId, req.body.visible, reportedContentType);
         return res.json({
             ok: true,
             status: 200,
             visible: req.body.visible,
             contentId: result.contentId,
+            contentUuid: result.contentUuid,
             messageUuid: result.messageUuid,
-            messageId: result.messageId
+            secretDropUuid: result.secretDropUuid,
+            messageId: result.messageId,
+            reportedContentType: result.reportedContentType
         });
     } catch (error) {
         return next(toVisibilityApiError(error, req.body.visible));
     }
-});
+}
+
+router.post('/content/visibility', (req, res, next) => handleContentVisibilityRequest(req, res, next));
+
+router.post('/publicmessage/visibility', (req, res, next) => handleContentVisibilityRequest(req, res, next, 'public message'));
+
+router.post('/secretdrop/visibility', (req, res, next) => handleContentVisibilityRequest(req, res, next, 'secret drop'));
 
 
 function formatDecisionOutcomeLabelEn(outcome) {
@@ -1728,14 +1795,16 @@ router.post('/notices/:id/decision', async (req, res, next) => {
                     tableNotice.updateStatus(_db, req.params.id, 'DECIDED', decidedAt, () => { });
 
                     if (outcome === 'NO_ACTION' && noticeRow?.contentId) {
-                        void setPublicMessageVisibility(String(noticeRow.contentId), true).catch((error) => {
+                        void setContentVisibility(String(noticeRow.contentId), true, noticeRow.reportedContentType).catch((error) => {
                             req.logger?.warn?.('Automatic notice visibility sync failed', {
                                 noticeId: req.params.id,
                                 contentId: noticeRow.contentId,
                                 error: error?.message || error,
                                 detail: error?.detail,
                                 upstreamStatus: error?.status,
-                                messageUuid: error?.messageUuid
+                                messageUuid: error?.messageUuid,
+                                secretDropUuid: error?.secretDropUuid,
+                                reportedContentType: noticeRow.reportedContentType
                             });
                         });
                     }
@@ -3052,7 +3121,9 @@ router.post('/signals/:id/promote', (req, res, next) => {
                         reportedContentType,
                         statusUrl: buildStatusUrl(noticeToken),
                         bodySegments: [
-                            'We escalated a DSA signal into a formal notice for your message.'
+                            normalizeReportedContentType(reportedContentType) === 'secret drop'
+                                ? 'We escalated a DSA signal into a formal notice for your SecretDrop.'
+                                : 'We escalated a DSA signal into a formal notice for your message.'
                         ],
                         includeExcerpt: true,
                         title: 'DSA notice opened'
@@ -3102,7 +3173,7 @@ router.delete('/signals/:id', (req, res, next) => {
         if (!sig) return next(apiError.notFound('not_found'));
 
         try {
-            await setPublicMessageVisibility(String(sig.contentId), true);
+            await setContentVisibility(String(sig.contentId), true, sig.reportedContentType);
         } catch (error) {
             return next(toVisibilityApiError(error, true));
         }
@@ -3141,7 +3212,9 @@ router.delete('/signals/:id', (req, res, next) => {
                 caseId: id,
                 bodySegments: [
                     `We reviewed DSA signal Case #${id} and did not find a violation of our policies.`,
-                    'Your message has been made visible again.'
+                    normalizeReportedContentType(sig.reportedContentType) === 'secret drop'
+                        ? 'Your SecretDrop has been made visible again.'
+                        : 'Your message has been made visible again.'
                 ]
             });
 
