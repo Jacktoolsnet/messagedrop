@@ -1605,12 +1605,11 @@ export class AppComponent implements OnInit {
         return;
       }
       this.dialog.open(FoundSecretDropListComponent, {
-        panelClass: 'SecretDropListDialog',
+        panelClass: 'MessageListDialog',
         closeOnNavigation: true,
         data: { drops, plusCode, zoomLevel },
-        minWidth: 'min(450px, 95vw)',
+        width: 'min(900px, 95vw)',
         maxWidth: '95vw',
-        width: 'fit-content',
         maxHeight: '95vh',
         height: 'auto',
         hasBackdrop: true,
