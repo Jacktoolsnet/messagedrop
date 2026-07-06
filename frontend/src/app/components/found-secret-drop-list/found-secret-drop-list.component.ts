@@ -593,11 +593,27 @@ export class FoundSecretDropListComponent {
       if (!result?.created) {
         return;
       }
+      this.removeReportedDropFromList(drop);
       this.snackBar.open(
-        this.translation.t('common.messageList.blockedMarked'),
+        this.translation.t('common.messageList.blockedRemoved'),
         this.translation.t('common.actions.ok'),
         { duration: 3000, verticalPosition: 'top' }
       );
+      if (this.data.drops.length === 0) {
+        this.close();
+      }
+    });
+  }
+
+  private removeReportedDropFromList(drop: SecretDrop): void {
+    const uuid = drop.uuid;
+    const index = this.data.drops.findIndex((entry) => entry.uuid === uuid);
+    if (index >= 0) {
+      this.data.drops.splice(index, 1);
+    }
+    this.unlocked.update((state) => {
+      const { [uuid]: _removed, ...rest } = state;
+      return rest;
     });
   }
 
