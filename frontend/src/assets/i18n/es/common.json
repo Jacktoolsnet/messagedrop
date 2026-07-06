@@ -1792,6 +1792,7 @@
       "validUntilInvalid": "La hora de caducidad no es válida.",
       "validUntilPast": "La hora de finalización no puede estar en el pasado.",
       "validityInvalid": "La hora de inicio debe ser anterior a la caducidad.",
+      "validityTooLong": "La caducidad no puede ser más de 30 días después del inicio.",
       "createSuccess": "SecretDrop creado.",
       "createFailed": "No se pudo crear el SecretDrop.",
       "emptyMine": "Aún no has creado SecretDrops.",

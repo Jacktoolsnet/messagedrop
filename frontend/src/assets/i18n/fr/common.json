@@ -1792,6 +1792,7 @@
       "validUntilInvalid": "La date d’expiration est invalide.",
       "validUntilPast": "L’heure de fin ne doit pas être dans le passé.",
       "validityInvalid": "La date de début doit précéder la date d’expiration.",
+      "validityTooLong": "L’expiration ne peut pas dépasser 30 jours après le début.",
       "createSuccess": "SecretDrop créé.",
       "createFailed": "Impossible de créer le SecretDrop.",
       "emptyMine": "Tu n’as pas encore créé de SecretDrop.",

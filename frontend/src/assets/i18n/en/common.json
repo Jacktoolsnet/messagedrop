@@ -1801,6 +1801,7 @@
       "validUntilInvalid": "The expiry time is invalid.",
       "validUntilPast": "The end time must not be in the past.",
       "validityInvalid": "The start time must be before the expiry time.",
+      "validityTooLong": "The expiry time must be no more than 30 days after the start time.",
       "createSuccess": "SecretDrop created.",
       "createFailed": "Could not create SecretDrop.",
       "emptyMine": "You have not created any SecretDrops yet.",

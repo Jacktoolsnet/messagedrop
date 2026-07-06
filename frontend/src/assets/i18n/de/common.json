@@ -1801,6 +1801,7 @@
       "validUntilInvalid": "Der Ablaufzeitpunkt ist ungültig.",
       "validUntilPast": "Der Endzeitpunkt darf nicht in der Vergangenheit liegen.",
       "validityInvalid": "Der Startzeitpunkt muss vor dem Ablaufzeitpunkt liegen.",
+      "validityTooLong": "Der Endzeitpunkt darf höchstens 30 Tage nach dem Startzeitpunkt liegen.",
       "createSuccess": "GeheimnisDrop erstellt.",
       "createFailed": "GeheimnisDrop konnte nicht erstellt werden.",
       "emptyMine": "Du hast noch keine GeheimnisDrops erstellt.",

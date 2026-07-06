@@ -18,6 +18,7 @@ const MAX_RECIPIENTS = 50;
 const DEFAULT_DISCOVERY_ZOOM_LEVEL = 18;
 const MIN_DISCOVERY_ZOOM_LEVEL = 12;
 const MAX_DISCOVERY_ZOOM_LEVEL = 19;
+const MAX_VALIDITY_WINDOW_SECONDS = 30 * 24 * 60 * 60;
 
 const unlockLimiter = rateLimit({
   windowMs: 5 * 60 * 1000,
@@ -96,6 +97,21 @@ function normalizeOptionalTimestamp(value, fieldName) {
     throw apiError.badRequest(`invalid_${fieldName}`);
   }
   return numeric;
+}
+
+function normalizeValidityWindow(validFrom, validUntil, at = nowSeconds()) {
+  const effectiveStart = validFrom ?? at;
+  const effectiveUntil = validUntil ?? (validFrom !== null ? validFrom + MAX_VALIDITY_WINDOW_SECONDS : null);
+  if (effectiveUntil !== null && validFrom !== null && validFrom > effectiveUntil) {
+    throw apiError.badRequest('invalid_validity_window');
+  }
+  if (effectiveUntil !== null && effectiveUntil - effectiveStart > MAX_VALIDITY_WINDOW_SECONDS) {
+    throw apiError.badRequest('secret_drop_validity_window_too_long');
+  }
+  return {
+    validFrom,
+    validUntil: effectiveUntil
+  };
 }
 
 
@@ -280,9 +296,7 @@ router.post('/create', [
     const maxUnlocks = normalizeMaxUnlocks(req.body?.maxUnlocks);
     const validFrom = normalizeOptionalTimestamp(req.body?.validFrom, 'valid_from');
     const validUntil = normalizeOptionalTimestamp(req.body?.validUntil, 'valid_until');
-    if (validFrom !== null && validUntil !== null && validFrom > validUntil) {
-      throw apiError.badRequest('invalid_validity_window');
-    }
+    const validityWindow = normalizeValidityWindow(validFrom, validUntil);
     const publishState = normalizeString(req.body?.publishState, 32);
     const status = publishState === 'draft' || publishState === 'unpublished'
       ? tableSecretDrop.secretDropStatus.DISABLED
@@ -305,8 +319,8 @@ router.post('/create', [
       crypto: cryptoMetadata,
       authVerifierHash: hashAuthVerifier(authVerifier),
       maxUnlocks,
-      validFrom,
-      validUntil,
+      validFrom: validityWindow.validFrom,
+      validUntil: validityWindow.validUntil,
       status,
       visibility,
       creatorMode,
@@ -362,9 +376,7 @@ router.post('/republish/:uuid', [
     const maxUnlocks = normalizeMaxUnlocks(req.body?.maxUnlocks);
     const validFrom = normalizeOptionalTimestamp(req.body?.validFrom, 'valid_from');
     const validUntil = normalizeOptionalTimestamp(req.body?.validUntil, 'valid_until');
-    if (validFrom !== null && validUntil !== null && validFrom > validUntil) {
-      throw apiError.badRequest('invalid_validity_window');
-    }
+    const validityWindow = normalizeValidityWindow(validFrom, validUntil);
     const visibility = normalizeVisibility(req.body?.visibility);
     const creatorMode = normalizeCreatorMode(req.body?.creatorMode);
     const recipientUserIds = await normalizeAndValidateRecipients(db, userId, visibility, req.body?.recipientUserIds);
@@ -381,8 +393,8 @@ router.post('/republish/:uuid', [
       crypto: cryptoMetadata,
       authVerifierHash: hashAuthVerifier(authVerifier),
       maxUnlocks,
-      validFrom,
-      validUntil,
+      validFrom: validityWindow.validFrom,
+      validUntil: validityWindow.validUntil,
       status: tableSecretDrop.secretDropStatus.ENABLED,
       visibility,
       creatorMode,

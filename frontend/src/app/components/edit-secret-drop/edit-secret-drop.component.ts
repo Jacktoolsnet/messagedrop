@@ -85,6 +85,7 @@ export class EditSecretDropComponent {
   private readonly snackBar = inject(DisplayMessageService);
   private readonly translation = inject(TranslationHelperService);
   readonly help = inject(HelpDialogService);
+  private readonly maxValidityWindowSeconds = 30 * 24 * 60 * 60;
 
   location: Location = { ...this.data.location };
   message = '';
@@ -183,6 +184,10 @@ export class EditSecretDropComponent {
     return this.minStartDate;
   }
 
+  get maxEndDate(): Date {
+    return this.startOfDay(this.getMaximumValidUntilDateTime());
+  }
+
   get validUntilMinTime(): Date | null {
     if (!this.validUntilDate) {
       return null;
@@ -266,6 +271,7 @@ export class EditSecretDropComponent {
       this.hasMultimedia ? this.multimedia : undefined,
       this.messageStyle
     );
+    const validityWindow = this.resolveValidityWindow();
     return {
       userId: this.userService.getUser().id,
       latitude: this.location.latitude,
@@ -279,8 +285,8 @@ export class EditSecretDropComponent {
       crypto: encrypted.crypto,
       authVerifier: encrypted.authVerifier,
       maxUnlocks: this.oneTime ? 1 : null,
-      validFrom: this.useValidFrom ? this.toSeconds(this.validFromDate, this.validFromTime) : null,
-      validUntil: this.useValidUntil ? this.toSeconds(this.validUntilDate, this.validUntilTime) : null,
+      validFrom: validityWindow.validFrom,
+      validUntil: validityWindow.validUntil,
       visibility: this.visibility,
       creatorMode: this.incognitoPublish ? 'incognito' : 'normal',
       recipientUserIds: this.visibility === 'contacts' ? [...this.selectedRecipientUserIds] : [],
@@ -290,6 +296,7 @@ export class EditSecretDropComponent {
 
   private async saveLocalDraft(): Promise<void> {
     const userId = this.userService.getUser().id;
+    const validityWindow = this.resolveValidityWindow();
     const drop: SecretDrop = {
       uuid: this.data.secretDrop?.uuid ?? crypto.randomUUID(),
       userId,
@@ -308,8 +315,8 @@ export class EditSecretDropComponent {
       maxUnlocks: this.oneTime ? 1 : null,
       unlockCount: this.data.secretDrop?.unlockCount ?? 0,
       failedUnlockCount: this.data.secretDrop?.failedUnlockCount ?? 0,
-      validFrom: this.useValidFrom ? this.toSeconds(this.validFromDate, this.validFromTime) : null,
-      validUntil: this.useValidUntil ? this.toSeconds(this.validUntilDate, this.validUntilTime) : null,
+      validFrom: validityWindow.validFrom,
+      validUntil: validityWindow.validUntil,
       visibility: this.visibility,
       creatorMode: this.incognitoPublish ? 'incognito' : 'normal',
       recipientUserIds: this.visibility === 'contacts' ? [...this.selectedRecipientUserIds] : [],
@@ -331,6 +338,7 @@ export class EditSecretDropComponent {
   }
 
   private getLocalPlainData(): Partial<SecretDrop> {
+    const validityWindow = this.resolveValidityWindow();
     return {
       message: this.message.trim(),
       messageStyle: this.messageStyle,
@@ -340,8 +348,8 @@ export class EditSecretDropComponent {
       hint: this.hint.trim(),
       hintStyle: this.hintStyle,
       maxUnlocks: this.oneTime ? 1 : null,
-      validFrom: this.useValidFrom ? this.toSeconds(this.validFromDate, this.validFromTime) : null,
-      validUntil: this.useValidUntil ? this.toSeconds(this.validUntilDate, this.validUntilTime) : null,
+      validFrom: validityWindow.validFrom,
+      validUntil: validityWindow.validUntil,
       visibility: this.visibility,
       creatorMode: this.incognitoPublish ? 'incognito' : 'normal',
       recipientUserIds: this.visibility === 'contacts' ? [...this.selectedRecipientUserIds] : []
@@ -370,6 +378,7 @@ export class EditSecretDropComponent {
     if (this.isBeforeDateOnly(this.validFromDate, now)) {
       this.validFromDate = this.minStartDate;
       this.validFromTime = this.ceilToNextMinuteInterval(now, 15);
+      this.ensureValidUntilNotBeforeMinimum();
       return;
     }
 
@@ -400,6 +409,8 @@ export class EditSecretDropComponent {
         this.validUntilTime = new Date(minimum);
       }
     }
+
+    this.ensureValidUntilNotAfterMaximum();
   }
 
   applyNewMultimedia(multimedia: Multimedia): void {
@@ -595,6 +606,12 @@ export class EditSecretDropComponent {
     if (validFrom !== null && validUntil !== null && validFrom > validUntil) {
       return 'common.secretDrop.validityInvalid';
     }
+    if (validUntil !== null) {
+      const effectiveStart = validFrom ?? Math.floor(Date.now() / 1000);
+      if (validUntil - effectiveStart > this.maxValidityWindowSeconds) {
+        return 'common.secretDrop.validityTooLong';
+      }
+    }
     return null;
   }
 
@@ -703,11 +720,37 @@ export class EditSecretDropComponent {
     return combined;
   }
 
+  private resolveValidityWindow(): { validFrom: number | null; validUntil: number | null } {
+    const validFrom = this.useValidFrom ? this.toSeconds(this.validFromDate, this.validFromTime) : null;
+    const selectedValidUntil = this.useValidUntil ? this.toSeconds(this.validUntilDate, this.validUntilTime) : null;
+    const validUntil = selectedValidUntil ?? (validFrom !== null ? validFrom + this.maxValidityWindowSeconds : null);
+    return { validFrom, validUntil };
+  }
+
   private getMinimumValidUntilDateTime(): Date {
     if (this.useValidFrom && this.validFromDate) {
       return this.toDateTime(this.validFromDate, this.validFromTime);
     }
     return this.ceilToNextMinuteInterval(new Date(), 15);
+  }
+
+  private getMaximumValidUntilDateTime(): Date {
+    const start = this.useValidFrom && this.validFromDate
+      ? this.toDateTime(this.validFromDate, this.validFromTime)
+      : new Date();
+    return new Date(start.getTime() + this.maxValidityWindowSeconds * 1000);
+  }
+
+  private ensureValidUntilNotAfterMaximum(): void {
+    if (!this.validUntilDate) {
+      return;
+    }
+    const maximum = this.getMaximumValidUntilDateTime();
+    const currentUntil = this.toDateTime(this.validUntilDate, this.validUntilTime);
+    if (currentUntil.getTime() > maximum.getTime()) {
+      this.validUntilDate = this.startOfDay(maximum);
+      this.validUntilTime = new Date(maximum);
+    }
   }
 
   private startOfDay(value: Date): Date {
