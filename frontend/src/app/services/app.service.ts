@@ -23,7 +23,7 @@ export class AppService {
   private readonly _notificationAction = signal<NotificationAction | null>(null);
   readonly notificationAction = this._notificationAction.asReadonly();
 
-  private readonly legalVersion = 2;
+  private readonly legalVersion = 3;
 
   private themeListener: ((e: MediaQueryListEvent) => void) | null = null;
   private appSettings: AppSettings | undefined;
