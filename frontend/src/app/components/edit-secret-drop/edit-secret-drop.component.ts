@@ -174,7 +174,7 @@ export class EditSecretDropComponent {
     if (!this.validFromDate || !this.isSameDate(this.validFromDate, new Date())) {
       return null;
     }
-    return this.ceilToNextMinuteInterval(new Date(), 15);
+    return this.ceilToNextMinute(new Date());
   }
 
   get minEndDate(): Date {
@@ -385,13 +385,13 @@ export class EditSecretDropComponent {
     const now = new Date();
     if (this.isBeforeDateOnly(this.validFromDate, now)) {
       this.validFromDate = this.minStartDate;
-      this.validFromTime = this.ceilToNextMinuteInterval(now, 15);
+      this.validFromTime = this.ceilToNextMinute(now);
       this.ensureValidUntilNotBeforeMinimum();
       return;
     }
 
     if (this.isSameDate(this.validFromDate, now)) {
-      const minTime = this.ceilToNextMinuteInterval(now, 15);
+      const minTime = this.ceilToNextMinute(now);
       if (!this.validFromTime || this.compareTime(this.validFromTime, minTime) < 0) {
         this.validFromTime = minTime;
       }
@@ -739,7 +739,7 @@ export class EditSecretDropComponent {
     if (this.useValidFrom && this.validFromDate) {
       return this.toDateTime(this.validFromDate, this.validFromTime);
     }
-    return this.ceilToNextMinuteInterval(new Date(), 15);
+    return this.ceilToNextMinute(new Date());
   }
 
   private getMaximumValidUntilDateTime(): Date {
@@ -785,13 +785,12 @@ export class EditSecretDropComponent {
     return leftMinutes - rightMinutes;
   }
 
-  private ceilToNextMinuteInterval(value: Date, intervalMinutes: number): Date {
+  private ceilToNextMinute(value: Date): Date {
     const result = new Date(value);
+    const hasSeconds = result.getSeconds() > 0 || result.getMilliseconds() > 0;
     result.setSeconds(0, 0);
-    const minutes = result.getMinutes();
-    const remainder = minutes % intervalMinutes;
-    if (remainder !== 0) {
-      result.setMinutes(minutes + intervalMinutes - remainder);
+    if (hasSeconds) {
+      result.setMinutes(result.getMinutes() + 1);
     }
     return result;
   }
