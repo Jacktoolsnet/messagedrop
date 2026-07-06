@@ -16,7 +16,7 @@ import { DisplayMessage } from '../display-message/display-message.component';
 import { HelpDialogService } from '../help-dialog/help-dialog.service';
 import { NominatimResultsListComponent } from '../nominatim-search/components/nominatim-results-list/nominatim-results-list.component';
 
-type MarkerKind = 'message' | 'note';
+type MarkerKind = 'message' | 'note' | 'secretDrop';
 
 interface LocationPickerDialogData {
   location: Location;
@@ -32,6 +32,11 @@ const markerIcons: Record<MarkerKind, leaflet.Icon> = {
   }),
   note: leaflet.icon({
     iconUrl: 'assets/markers/note-marker.svg',
+    iconSize: [32, 40],
+    iconAnchor: [16, 40]
+  }),
+  secretDrop: leaflet.icon({
+    iconUrl: 'assets/markers/secretdrop-marker.svg',
     iconSize: [32, 40],
     iconAnchor: [16, 40]
   })

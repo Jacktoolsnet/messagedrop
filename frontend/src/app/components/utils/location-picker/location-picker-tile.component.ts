@@ -7,7 +7,7 @@ import * as leaflet from 'leaflet';
 import { Location } from '../../../interfaces/location';
 import { LocationPickerDialogComponent } from '../location-picker-dialog/location-picker-dialog.component';
 
-type MarkerKind = 'message' | 'note';
+type MarkerKind = 'message' | 'note' | 'secretDrop';
 
 const markerIcons: Record<MarkerKind, leaflet.Icon> = {
   message: leaflet.icon({
@@ -17,6 +17,11 @@ const markerIcons: Record<MarkerKind, leaflet.Icon> = {
   }),
   note: leaflet.icon({
     iconUrl: 'assets/markers/note-marker.svg',
+    iconSize: [32, 40],
+    iconAnchor: [16, 40]
+  }),
+  secretDrop: leaflet.icon({
+    iconUrl: 'assets/markers/secretdrop-marker.svg',
     iconSize: [32, 40],
     iconAnchor: [16, 40]
   })
