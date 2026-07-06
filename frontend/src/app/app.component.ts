@@ -2049,7 +2049,7 @@ export class AppComponent implements OnInit {
       data: { location: this.mapService.getMapLocation() },
       minWidth: 'min(450px, 95vw)',
       maxWidth: '95vw',
-      width: 'fit-content',
+      width: '95vw',
       maxHeight: '95vh',
       height: 'auto',
       hasBackdrop: true,

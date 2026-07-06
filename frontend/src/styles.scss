@@ -286,13 +286,13 @@ h2[mat-dialog-title].dialog-title {
 .SecretDropListDialog .mat-mdc-dialog-container {
   --mdc-dialog-container-max-width: 95vw;
   --mdc-dialog-container-min-width: min(450px, 95vw);
-  width: fit-content;
+  width: 95vw;
   max-width: 95vw;
 }
 
 .SecretDropListDialog .mat-mdc-dialog-surface {
-  width: fit-content;
-  max-width: 95vw;
+  width: 100%;
+  max-width: 100%;
 }
 
 .range-edit-dialog .mat-mdc-dialog-container {
