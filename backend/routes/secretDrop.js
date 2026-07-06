@@ -258,6 +258,36 @@ async function ensureOwnerOrUnlocked(db, uuid, userId) {
   return drop;
 }
 
+
+function mapInternalSecretDrop(drop) {
+  return {
+    ...mapPublicSecretDrop(drop),
+    userId: drop.userId,
+    status: drop.status,
+    dsaStatusToken: drop.dsaStatusToken ?? null,
+    dsaStatusTokenCreatedAt: drop.dsaStatusTokenCreatedAt ?? null,
+    updatedAt: drop.updatedAt ?? null,
+    lastUnlockedAt: drop.lastUnlockedAt ?? null,
+    consumedAt: drop.consumedAt ?? null
+  };
+}
+
+async function sendInternalSecretDropByUuid(req, res, next) {
+  try {
+    const uuid = normalizeString(req.params.uuid, 64);
+    if (!UUID_REGEX.test(uuid)) {
+      throw apiError.badRequest('invalid_secret_drop_uuid');
+    }
+    const drop = await tableSecretDrop.getByUuid(getDb(req), uuid);
+    if (!drop || drop.status === tableSecretDrop.secretDropStatus.DELETED) {
+      throw apiError.notFound('secret_drop_not_found');
+    }
+    res.status(200).json({ status: 200, secretDrop: mapInternalSecretDrop(drop) });
+  } catch (error) {
+    next(error);
+  }
+}
+
 router.post('/create', [
   security.authenticate,
   express.json({ type: 'application/json', limit: '80kb' }),
@@ -484,6 +514,9 @@ router.post('/unlock/:uuid', [
     next(error);
   }
 });
+
+
+router.get('/internal/uuid/:uuid', security.checkToken, sendInternalSecretDropByUuid);
 
 router.get('/my/:userId', security.authenticate, async (req, res, next) => {
   try {

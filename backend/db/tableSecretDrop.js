@@ -7,6 +7,8 @@ const commentLikeTableName = 'tableSecretDropCommentLike';
 const commentDislikeTableName = 'tableSecretDropCommentDislike';
 const hintTranslationTableName = 'tableSecretDropHintTranslation';
 const recipientTableName = 'tableSecretDropRecipient';
+const columnDsaStatusToken = 'dsaStatusToken';
+const columnDsaStatusTokenCreatedAt = 'dsaStatusTokenCreatedAt';
 
 const secretDropStatus = {
   ENABLED: 'enabled',
@@ -91,7 +93,9 @@ function mapSecretDropRow(row, options = {}) {
     createdAt: Number(pickRowValue(row, 'createdAt', 'createdat') || 0),
     updatedAt: Number(pickRowValue(row, 'updatedAt', 'updatedat') || 0),
     lastUnlockedAt: pickRowValue(row, 'lastUnlockedAt', 'lastunlockedat') === null || pickRowValue(row, 'lastUnlockedAt', 'lastunlockedat') === undefined ? null : Number(pickRowValue(row, 'lastUnlockedAt', 'lastunlockedat')),
-    consumedAt: pickRowValue(row, 'consumedAt', 'consumedat') === null || pickRowValue(row, 'consumedAt', 'consumedat') === undefined ? null : Number(pickRowValue(row, 'consumedAt', 'consumedat'))
+    consumedAt: pickRowValue(row, 'consumedAt', 'consumedat') === null || pickRowValue(row, 'consumedAt', 'consumedat') === undefined ? null : Number(pickRowValue(row, 'consumedAt', 'consumedat')),
+    dsaStatusToken: pickRowValue(row, columnDsaStatusToken, 'dsastatustoken') ?? null,
+    dsaStatusTokenCreatedAt: pickRowValue(row, columnDsaStatusTokenCreatedAt, 'dsastatustokencreatedat') === null || pickRowValue(row, columnDsaStatusTokenCreatedAt, 'dsastatustokencreatedat') === undefined ? null : Number(pickRowValue(row, columnDsaStatusTokenCreatedAt, 'dsastatustokencreatedat'))
   };
   if (includeCryptoMetadata) {
     mapped.crypto = safeJsonParse(pickRowValue(row, 'crypto'), null);
@@ -150,6 +154,8 @@ const init = function (db) {
       updatedAt INTEGER NOT NULL DEFAULT (strftime('%s','now')),
       lastUnlockedAt INTEGER DEFAULT NULL,
       consumedAt INTEGER DEFAULT NULL,
+      ${columnDsaStatusToken} TEXT DEFAULT NULL,
+      ${columnDsaStatusTokenCreatedAt} INTEGER DEFAULT NULL,
       CONSTRAINT FK_SECRET_DROP_USER FOREIGN KEY (userId)
         REFERENCES tableUser (id)
         ON UPDATE CASCADE ON DELETE CASCADE
@@ -265,8 +271,16 @@ const init = function (db) {
     CREATE INDEX IF NOT EXISTS idx_secret_drop_comment_drop ON ${commentTableName}(secretDropUuid, createdAt ASC);
     CREATE INDEX IF NOT EXISTS idx_secret_drop_comment_parent ON ${commentTableName}(parentCommentUuid, createdAt ASC);
   `;
+  const addColumnIfMissing = (name, definition) => {
+    db.exec(`ALTER TABLE ${tableName} ADD COLUMN ${name} ${definition};`, (err) => {
+      if (err && !/duplicate column|already exists/i.test(err.message || '')) throw err;
+    });
+  };
+
   db.exec(sql, (err) => {
     if (err) throw err;
+    addColumnIfMissing(columnDsaStatusToken, 'TEXT DEFAULT NULL');
+    addColumnIfMissing(columnDsaStatusTokenCreatedAt, 'INTEGER DEFAULT NULL');
   });
 };
 
@@ -397,6 +411,44 @@ async function attachRecipients(db, drops) {
 async function getByUuid(db, uuid, options = {}) {
   const row = await getQuery(db, `SELECT * FROM ${tableName} WHERE uuid = ? LIMIT 1;`, [uuid]);
   return mapSecretDropRow(row, options);
+}
+
+
+async function getById(db, id, options = {}) {
+  const row = await getQuery(db, `SELECT * FROM ${tableName} WHERE id = ? LIMIT 1;`, [id]);
+  return mapSecretDropRow(row, options);
+}
+
+async function disableSecretDrop(db, uuid) {
+  const result = await runQuery(db, `
+    UPDATE ${tableName}
+    SET status = '${secretDropStatus.DISABLED}', updatedAt = strftime('%s','now')
+    WHERE uuid = ?
+      AND status <> '${secretDropStatus.DELETED}';
+  `, [uuid]);
+  return Number(result.changes || 0) > 0;
+}
+
+async function enableSecretDrop(db, uuid) {
+  const result = await runQuery(db, `
+    UPDATE ${tableName}
+    SET status = '${secretDropStatus.ENABLED}', updatedAt = strftime('%s','now')
+    WHERE uuid = ?
+      AND status <> '${secretDropStatus.DELETED}';
+  `, [uuid]);
+  return Number(result.changes || 0) > 0;
+}
+
+async function setDsaStatusToken(db, uuid, token, createdAt) {
+  const result = await runQuery(db, `
+    UPDATE ${tableName}
+    SET ${columnDsaStatusToken} = ?,
+        ${columnDsaStatusTokenCreatedAt} = ?,
+        updatedAt = strftime('%s','now')
+    WHERE uuid = ?
+      AND status <> '${secretDropStatus.DELETED}';
+  `, [token || null, createdAt || Date.now(), uuid]);
+  return Number(result.changes || 0) > 0;
 }
 
 async function getRawByUuid(db, uuid) {
@@ -744,6 +796,7 @@ module.exports = {
   create,
   updateContent,
   getByUuid,
+  getById,
   getRawByUuid,
   discoverByPlusCode,
   getByUserId,
@@ -752,6 +805,9 @@ module.exports = {
   unlock,
   softDelete,
   updateStatus,
+  disableSecretDrop,
+  enableSecretDrop,
+  setDsaStatusToken,
   hasSuccessfulUnlock,
   toggleReaction,
   getReactionState,

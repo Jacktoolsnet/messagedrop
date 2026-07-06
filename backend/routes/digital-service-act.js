@@ -5,6 +5,7 @@ const rateLimit = require('express-rate-limit');
 const multer = require('multer');
 const FormData = require('form-data');
 const tableMessage = require('../db/tableMessage');
+const tableSecretDrop = require('../db/tableSecretDrop');
 const { signServiceJwt } = require('../utils/serviceJwt');
 const { createPowGuard } = require('../middleware/pow');
 const { apiError } = require('../middleware/api-error');
@@ -97,6 +98,11 @@ function buildForwardError(err) {
 }
 
 /* --------------------------------- Helper ---------------------------------- */
+function normalizeReportedContentType(value) {
+    const normalized = String(value || 'public message').trim().toLowerCase();
+    return normalized === 'secret drop' ? 'secret drop' : 'public message';
+}
+
 function findMessageByIdOrUuid(db, messageId) {
     return new Promise((resolve, reject) => {
         const raw = String(messageId ?? '').trim();
@@ -114,6 +120,22 @@ function findMessageByIdOrUuid(db, messageId) {
     });
 }
 
+
+function findSecretDropByIdOrUuid(db, secretDropId) {
+    return new Promise((resolve, reject) => {
+        const raw = String(secretDropId ?? '').trim();
+        if (!raw) return resolve(null);
+        const isNumeric = /^\d+$/.test(raw);
+        const handler = (row) => resolve(row || null);
+        const onError = (err) => reject(err);
+        if (isNumeric && typeof tableSecretDrop.getById === 'function') {
+            tableSecretDrop.getById(db, raw).then(handler).catch(onError);
+        } else {
+            tableSecretDrop.getByUuid(db, raw).then(handler).catch(onError);
+        }
+    });
+}
+
 async function ensureContentExists(req, contentId, next) {
     const db = req.database?.db;
     if (!db) {
@@ -125,13 +147,16 @@ async function ensureContentExists(req, contentId, next) {
         next(apiError.badRequest('contentId is required'));
         return null;
     }
+    const reportedContentType = normalizeReportedContentType(req.body?.reportedContentType);
     try {
-        const row = await findMessageByIdOrUuid(db, raw);
+        const row = reportedContentType === 'secret drop'
+            ? await findSecretDropByIdOrUuid(db, raw)
+            : await findMessageByIdOrUuid(db, raw);
         if (!row) {
-            next(apiError.notFound('message_not_found'));
+            next(apiError.notFound(reportedContentType === 'secret drop' ? 'secret_drop_not_found' : 'message_not_found'));
             return null;
         }
-        return row;
+        return { row, reportedContentType };
     } catch (err) {
         const apiErr = apiError.internal('db_error');
         apiErr.detail = err?.message || err;
@@ -173,13 +198,18 @@ async function forwardPostBackend(path, body, extraHeaders = {}) {
     return resp;
 }
 
-function disableLocallyIfPossible(req, messageUuid) {
+function disableLocallyIfPossible(req, contentUuid, reportedContentType = 'public message') {
     return new Promise((resolve) => {
         try {
             const db = req.database?.db;
-            if (!db || !messageUuid) return resolve(false);
+            if (!db || !contentUuid) return resolve(false);
 
-            tableMessage.disableMessage(db, messageUuid, (err) => {
+            if (reportedContentType === 'secret drop') {
+                tableSecretDrop.disableSecretDrop(db, contentUuid).then(resolve).catch(() => resolve(false));
+                return;
+            }
+
+            tableMessage.disableMessage(db, contentUuid, (err) => {
                 if (err) {
                     return resolve(false);
                 }
@@ -191,31 +221,40 @@ function disableLocallyIfPossible(req, messageUuid) {
     });
 }
 
+function setDsaStatusTokenIfPossible(req, contentUuid, token, reportedContentType = 'public message') {
+    try {
+        const db = req.database?.db;
+        if (!db || !contentUuid || !token) return;
+        if (reportedContentType === 'secret drop') {
+            tableSecretDrop.setDsaStatusToken(db, contentUuid, token, Date.now()).catch(() => { });
+            return;
+        }
+        tableMessage.setDsaStatusToken(db, contentUuid, token, Date.now(), () => { });
+    } catch {
+        // best effort only
+    }
+}
+
 /* --------------------------------- Routes ---------------------------------- */
 
 // POST /dsa/signals  -> forward an {ADMIN_BASE_URL[:ADMIN_PORT]}/dsa/frontend/signals
 router.post('/signals', signalLimiter, reportHourlyLimiter, async (req, res, next) => {
     try {
-        const messageRow = await ensureContentExists(req, req.body?.contentId, next);
-        if (!messageRow) return;
-        const canonicalContentId = String(messageRow.uuid ?? req.body?.contentId ?? '').trim();
+        const contentInfo = await ensureContentExists(req, req.body?.contentId, next);
+        if (!contentInfo) return;
+        const canonicalContentId = String(contentInfo.row.uuid ?? req.body?.contentId ?? '').trim();
+        const reportedContentType = contentInfo.reportedContentType;
         if (canonicalContentId) {
-            req.body = { ...req.body, contentId: canonicalContentId };
+            req.body = { ...req.body, contentId: canonicalContentId, reportedContentType };
         }
         const resp = await forwardPost('/signals', req.body);
 
         if (resp?.status >= 200 && resp?.status < 300 && canonicalContentId && req.database?.db) {
-            await disableLocallyIfPossible(req, canonicalContentId);
+            await disableLocallyIfPossible(req, canonicalContentId, reportedContentType);
         }
 
         if (resp?.status >= 200 && resp?.status < 300 && resp?.data?.token && canonicalContentId && req.database?.db) {
-            tableMessage.setDsaStatusToken(
-                req.database.db,
-                canonicalContentId,
-                resp.data.token,
-                Date.now(),
-                () => { }
-            );
+            setDsaStatusTokenIfPossible(req, canonicalContentId, resp.data.token, reportedContentType);
         }
 
         res.status(resp.status).json(resp.data);
@@ -227,26 +266,21 @@ router.post('/signals', signalLimiter, reportHourlyLimiter, async (req, res, nex
 // POST /dsa/notices  -> forward an {ADMIN_BASE_URL[:ADMIN_PORT]}/dsa/frontend/notices
 router.post('/notices', noticeLimiter, reportHourlyLimiter, noticePow, async (req, res, next) => {
     try {
-        const messageRow = await ensureContentExists(req, req.body?.contentId, next);
-        if (!messageRow) return;
-        const canonicalContentId = String(messageRow.uuid ?? req.body?.contentId ?? '').trim();
+        const contentInfo = await ensureContentExists(req, req.body?.contentId, next);
+        if (!contentInfo) return;
+        const canonicalContentId = String(contentInfo.row.uuid ?? req.body?.contentId ?? '').trim();
+        const reportedContentType = contentInfo.reportedContentType;
         if (canonicalContentId) {
-            req.body = { ...req.body, contentId: canonicalContentId };
+            req.body = { ...req.body, contentId: canonicalContentId, reportedContentType };
         }
         const resp = await forwardPost('/notices', req.body);
 
         if (resp?.status >= 200 && resp?.status < 300 && canonicalContentId && req.database?.db) {
-            await disableLocallyIfPossible(req, canonicalContentId);
+            await disableLocallyIfPossible(req, canonicalContentId, reportedContentType);
         }
 
         if (resp?.status >= 200 && resp?.status < 300 && resp?.data?.token && canonicalContentId && req.database?.db) {
-            tableMessage.setDsaStatusToken(
-                req.database.db,
-                canonicalContentId,
-                resp.data.token,
-                Date.now(),
-                () => { }
-            );
+            setDsaStatusTokenIfPossible(req, canonicalContentId, resp.data.token, reportedContentType);
         }
 
         res.status(resp.status).json(resp.data);
@@ -287,6 +321,43 @@ router.get('/enable/publicmessage/:messageId', moderationToggleLimiter, security
             }
             res.status(200).json({ status: 200, messageUuid: row.uuid });
         });
+    } catch (err) {
+        const apiErr = apiError.internal('db_error');
+        apiErr.detail = err?.message || err;
+        return next(apiErr);
+    }
+});
+
+
+router.get('/disable/secretdrop/:secretDropId', moderationToggleLimiter, security.checkToken, async function (req, res, next) {
+    try {
+        const row = await findSecretDropByIdOrUuid(req.database.db, req.params.secretDropId);
+        if (!row) {
+            return next(apiError.notFound('secret_drop_not_found'));
+        }
+        const disabled = await tableSecretDrop.disableSecretDrop(req.database.db, row.uuid);
+        if (!disabled) {
+            return next(apiError.notFound('secret_drop_not_found'));
+        }
+        res.status(200).json({ status: 200, secretDropUuid: row.uuid });
+    } catch (err) {
+        const apiErr = apiError.internal('db_error');
+        apiErr.detail = err?.message || err;
+        return next(apiErr);
+    }
+});
+
+router.get('/enable/secretdrop/:secretDropId', moderationToggleLimiter, security.checkToken, async function (req, res, next) {
+    try {
+        const row = await findSecretDropByIdOrUuid(req.database.db, req.params.secretDropId);
+        if (!row) {
+            return next(apiError.notFound('secret_drop_not_found'));
+        }
+        const enabled = await tableSecretDrop.enableSecretDrop(req.database.db, row.uuid);
+        if (!enabled) {
+            return next(apiError.notFound('secret_drop_not_found'));
+        }
+        res.status(200).json({ status: 200, secretDropUuid: row.uuid });
     } catch (err) {
         const apiErr = apiError.internal('db_error');
         apiErr.detail = err?.message || err;

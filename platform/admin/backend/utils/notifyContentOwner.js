@@ -15,6 +15,11 @@ function resolveBackendBase() {
     return process.env.PORT ? `${base}:${process.env.PORT}` : base;
 }
 
+function normalizeReportedContentType(value) {
+    const normalized = String(value || 'public message').trim().toLowerCase();
+    return normalized === 'secret drop' ? 'secret drop' : 'public message';
+}
+
 async function notifyContentOwner(req, notification) {
     const { contentId } = notification || {};
     const baseUrl = resolveBackendBase();
@@ -30,8 +35,12 @@ async function notifyContentOwner(req, notification) {
             Authorization: `Bearer ${serviceToken}`,
             Accept: 'application/json'
         };
-        const messageResp = await axios.get(
-            `${baseUrl}/message/internal/uuid/${encodeURIComponent(contentId)}`,
+        const reportedContentType = normalizeReportedContentType(notification.reportedContentType);
+        const lookupPath = reportedContentType === 'secret drop'
+            ? `/secretdrop/internal/uuid/${encodeURIComponent(contentId)}`
+            : `/message/internal/uuid/${encodeURIComponent(contentId)}`;
+        const contentResp = await axios.get(
+            `${baseUrl}${lookupPath}`,
             {
                 headers,
                 timeout: 5000,
@@ -39,18 +48,22 @@ async function notifyContentOwner(req, notification) {
             }
         );
 
-        if (messageResp.status !== 200 || messageResp.data?.status !== 200 || !messageResp.data?.message) {
+        const content = reportedContentType === 'secret drop'
+            ? contentResp.data?.secretDrop
+            : contentResp.data?.message;
+        if (contentResp.status !== 200 || contentResp.data?.status !== 200 || !content) {
             return false;
         }
 
-        const message = messageResp.data.message;
-        if (!message?.userId) {
+        if (!content?.userId) {
             return false;
         }
 
         const type = notification.type || 'signal';
         const event = notification.event || type;
-        const excerpt = truncate(message.message || '', 180);
+        const excerpt = reportedContentType === 'secret drop'
+            ? truncate(content.hint || '', 180)
+            : truncate(content.message || '', 180);
 
         const customSegments = Array.isArray(notification.bodySegments) && notification.bodySegments.length > 0;
         const includeExcerpt = notification.includeExcerpt !== false;
@@ -60,11 +73,17 @@ async function notifyContentOwner(req, notification) {
             segments = [...notification.bodySegments];
         } else {
             if (type === 'signal') {
-                segments.push('We received a DSA signal about one of your messages.');
+                segments.push(reportedContentType === 'secret drop'
+                    ? 'We received a DSA signal about one of your SecretDrops.'
+                    : 'We received a DSA signal about one of your messages.');
             } else if (type === 'notice') {
-                segments.push('We opened a formal DSA notice regarding your content.');
+                segments.push(reportedContentType === 'secret drop'
+                    ? 'We opened a formal DSA notice regarding one of your SecretDrops.'
+                    : 'We opened a formal DSA notice regarding your content.');
             } else {
-                segments.push('There is an update regarding one of your messages.');
+                segments.push(reportedContentType === 'secret drop'
+                    ? 'There is an update regarding one of your SecretDrops.'
+                    : 'There is an update regarding one of your messages.');
             }
 
             if (notification.category) {
@@ -76,18 +95,20 @@ async function notifyContentOwner(req, notification) {
         }
 
         if (includeExcerpt && excerpt) {
-            segments.push(`Message excerpt: "${excerpt}"`);
+            segments.push(reportedContentType === 'secret drop'
+                ? `SecretDrop hint: "${excerpt}"`
+                : `Message excerpt: "${excerpt}"`);
         }
         if (notification.statusUrl) {
             segments.push('You can review the case via the status page.');
         }
 
         const metadata = {
-            contentId: message.uuid,
-            messageId: message.id,
+            contentId: content.uuid,
+            messageId: reportedContentType === 'secret drop' ? null : content.id,
             category: notification.category ?? null,
             reasonText: notification.reasonText ?? null,
-            reportedContentType: notification.reportedContentType ?? null,
+            reportedContentType,
             dsa: {
                 type,
                 event,
@@ -98,7 +119,7 @@ async function notifyContentOwner(req, notification) {
         };
 
         const deliveryPayload = {
-            userId: message.userId,
+            userId: content.userId,
             title: notification.title || (type === 'signal' ? 'New DSA signal' : 'DSA update'),
             body: notification.body || segments.join(' '),
             category: 'dsa',
@@ -122,7 +143,7 @@ async function notifyContentOwner(req, notification) {
         if (db) {
             const stakeholder = 'uploader';
             const recordPayload = {
-                destination: message.userId,
+                destination: content.userId,
                 title: deliveryPayload?.title,
                 body: deliveryPayload?.body,
                 metadata

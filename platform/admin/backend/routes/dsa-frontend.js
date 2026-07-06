@@ -74,16 +74,21 @@ const noticeLimiter = rateLimit({
 function toStringOrNull(v) { return (v === undefined || v === null) ? null : String(v); }
 function toInt01OrNull(v) { return (v === undefined || v === null) ? null : (v ? 1 : 0); }
 function db(req) { return req.database?.db; }
+function normalizeReportedContentType(value) {
+    const normalized = String(value || 'public message').trim().toLowerCase();
+    return normalized === 'secret drop' ? 'secret drop' : 'public message';
+}
 
-function hasOpenSignal(dbInstance, contentId) {
+function hasOpenSignal(dbInstance, contentId, reportedContentType = 'public message') {
     return new Promise((resolve, reject) => {
         dbInstance.get(
             `SELECT ${tableSignal.columns.id} AS id
              FROM ${tableSignal.tableName}
              WHERE ${tableSignal.columns.contentId} = ?
+               AND ${tableSignal.columns.reportedContentType} = ?
                AND dismissedAt IS NULL
              LIMIT 1`,
-            [contentId],
+            [contentId, reportedContentType],
             (err, row) => {
                 if (err) return reject(err);
                 resolve(Boolean(row));
@@ -92,7 +97,7 @@ function hasOpenSignal(dbInstance, contentId) {
     });
 }
 
-function hasOpenNotice(dbInstance, contentId) {
+function hasOpenNotice(dbInstance, contentId, reportedContentType = 'public message') {
     return new Promise((resolve, reject) => {
         const sql = `
             SELECT n.${tableNotice.columns.id} AS id
@@ -103,17 +108,18 @@ function hasOpenNotice(dbInstance, contentId) {
               ON a.${tableAppeal.columns.decisionId} = d.${tableDecision.columns.id}
              AND a.${tableAppeal.columns.resolvedAt} IS NULL
             WHERE n.${tableNotice.columns.contentId} = ?
+              AND n.${tableNotice.columns.reportedContentType} = ?
               AND (d.${tableDecision.columns.id} IS NULL OR a.${tableAppeal.columns.id} IS NOT NULL)
             LIMIT 1
         `;
-        dbInstance.get(sql, [contentId], (err, row) => {
+        dbInstance.get(sql, [contentId, reportedContentType], (err, row) => {
             if (err) return reject(err);
             resolve(Boolean(row));
         });
     });
 }
 
-async function ensureContentExists(contentId, next) {
+async function ensureContentExists(contentId, next, reportedContentType = 'public message') {
     const raw = String(contentId ?? '').trim();
     if (!raw) {
         next(apiError.badRequest('contentId is required'));
@@ -125,10 +131,13 @@ async function ensureContentExists(contentId, next) {
         return false;
     }
 
+    const normalizedType = normalizeReportedContentType(reportedContentType);
     const isNumeric = /^\d+$/.test(raw);
-    const path = isNumeric
-        ? `/message/internal/id/${encodeURIComponent(raw)}`
-        : `/message/internal/uuid/${encodeURIComponent(raw)}`;
+    const path = normalizedType === 'secret drop'
+        ? `/secretdrop/internal/uuid/${encodeURIComponent(raw)}`
+        : (isNumeric
+            ? `/message/internal/id/${encodeURIComponent(raw)}`
+            : `/message/internal/uuid/${encodeURIComponent(raw)}`);
 
     try {
         const backendAudience = process.env.SERVICE_JWT_AUDIENCE_BACKEND || 'service.backend';
@@ -142,11 +151,12 @@ async function ensureContentExists(contentId, next) {
             validateStatus: () => true
         });
 
-        if (resp.status === 200 && resp.data?.status === 200 && resp.data?.message) {
+        const hasContent = normalizedType === 'secret drop' ? !!resp.data?.secretDrop : !!resp.data?.message;
+        if (resp.status === 200 && resp.data?.status === 200 && hasContent) {
             return true;
         }
         if (resp.status === 404) {
-            next(apiError.notFound('message_not_found'));
+            next(apiError.notFound(normalizedType === 'secret drop' ? 'secret_drop_not_found' : 'message_not_found'));
             return false;
         }
         next(apiError.badGateway('message_lookup_failed'));
@@ -159,11 +169,11 @@ async function ensureContentExists(contentId, next) {
     }
 }
 
-async function ensureNoOpenCase(dbInstance, contentId, next) {
+async function ensureNoOpenCase(dbInstance, contentId, next, reportedContentType = 'public message') {
     try {
         const [openSignal, openNotice] = await Promise.all([
-            hasOpenSignal(dbInstance, contentId),
-            hasOpenNotice(dbInstance, contentId)
+            hasOpenSignal(dbInstance, contentId, reportedContentType),
+            hasOpenNotice(dbInstance, contentId, reportedContentType)
         ]);
         if (openSignal || openNotice) {
             next(apiError.conflict('case_open'));
@@ -198,9 +208,10 @@ router.post('/signals', signalLimiter, async (req, res, next) => {
         reportedContent
     } = req.body || {};
 
+    const normalizedReportedContentType = normalizeReportedContentType(reportedContentType);
     if (!contentId) return next(apiError.badRequest('contentId is required'));
-    if (!(await ensureContentExists(contentId, next))) return;
-    if (await ensureNoOpenCase(_db, contentId, next)) return;
+    if (!(await ensureContentExists(contentId, next, normalizedReportedContentType))) return;
+    if (await ensureNoOpenCase(_db, contentId, next, normalizedReportedContentType)) return;
 
     let reportedContentJson = 'null';
     try { reportedContentJson = JSON.stringify(reportedContent ?? null); }
@@ -216,7 +227,7 @@ router.post('/signals', signalLimiter, async (req, res, next) => {
         toStringOrNull(contentUrl),
         toStringOrNull(category),
         toStringOrNull(reasonText),
-        toStringOrNull(reportedContentType),
+        normalizedReportedContentType,
         reportedContentJson,
         now,
         token,
@@ -243,7 +254,7 @@ router.post('/signals', signalLimiter, async (req, res, next) => {
                     contentId,
                     category,
                     reasonText,
-                    reportedContentType,
+                    reportedContentType: normalizedReportedContentType,
                     userAgent: req.headers['user-agent'] || null
                 }),
                 () => { }
@@ -257,14 +268,14 @@ router.post('/signals', signalLimiter, async (req, res, next) => {
                 contentId,
                 category,
                 reasonText,
-                reportedContentType,
+                reportedContentType: normalizedReportedContentType,
                 token,
                 statusUrl
             });
             // Make-Push (sehr knapp gehalten)
             notifyMake(
                 'New Signal',
-                `Type: ${reportedContentType}\nContentId: ${contentId}\nCategory: ${category || '-'}\nReason: ${reasonText || '-'}`
+                `Type: ${normalizedReportedContentType}\nContentId: ${contentId}\nCategory: ${category || '-'}\nReason: ${reasonText || '-'}`
             );
         }
     );
@@ -294,9 +305,10 @@ router.post('/notices', noticeLimiter, async (req, res, next) => {
     const normalizedReporterEmail = toStringOrNull(reporterEmail);
     const normalizedReporterName = toStringOrNull(reporterName);
 
+    const normalizedReportedContentType = normalizeReportedContentType(reportedContentType);
     if (!contentId) return next(apiError.badRequest('contentId is required'));
-    if (!(await ensureContentExists(contentId, next))) return;
-    if (await ensureNoOpenCase(_db, contentId, next)) return;
+    if (!(await ensureContentExists(contentId, next, normalizedReportedContentType))) return;
+    if (await ensureNoOpenCase(_db, contentId, next, normalizedReportedContentType)) return;
 
     let reportedContentJson = 'null';
     try { reportedContentJson = JSON.stringify(reportedContent ?? null); }
@@ -317,7 +329,7 @@ router.post('/notices', noticeLimiter, async (req, res, next) => {
         normalizedReporterEmail,
         normalizedReporterName,
         toInt01OrNull(truthAffirmation),
-        toStringOrNull(reportedContentType),
+        normalizedReportedContentType,
         reportedContentJson,
         status,
         now,
@@ -349,7 +361,7 @@ router.post('/notices', noticeLimiter, async (req, res, next) => {
                     reasonText,
                     reporterEmail,
                     reporterName,
-                    reportedContentType,
+                    reportedContentType: normalizedReportedContentType,
                     truthAffirmation,
                     userAgent: req.headers['user-agent'] || null
                 }),
@@ -364,7 +376,7 @@ router.post('/notices', noticeLimiter, async (req, res, next) => {
                 contentId,
                 category,
                 reasonText,
-                reportedContentType,
+                reportedContentType: normalizedReportedContentType,
                 token,
                 statusUrl
             });
@@ -384,7 +396,7 @@ router.post('/notices', noticeLimiter, async (req, res, next) => {
             // Make-Push (kurz & bündig)
             notifyMake(
                 'New Notice',
-                `Status: ${status}\nType: ${reportedContentType}\nContentId: ${contentId}\nReporter: ${reporterName || '-'} (${reporterEmail || '-'})\nCategory: ${category || '-'}`
+                `Status: ${status}\nType: ${normalizedReportedContentType}\nContentId: ${contentId}\nReporter: ${reporterName || '-'} (${reporterEmail || '-'})\nCategory: ${category || '-'}`
             );
         }
     );
