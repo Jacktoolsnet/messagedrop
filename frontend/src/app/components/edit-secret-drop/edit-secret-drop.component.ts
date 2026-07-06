@@ -237,7 +237,15 @@ export class EditSecretDropComponent {
     this.saving.set(true);
     try {
       const request = await this.buildPublishRequest();
-      if (this.data.secretDrop) {
+      if (this.data.secretDrop?.localOnly) {
+        await this.secretDropService.createSecretDrop(request, this.getLocalPlainData());
+        await this.secretDropService.removeLocalSecretDrop(request.userId, this.data.secretDrop.uuid);
+        this.snackBar.open(this.translation.t('common.secretDrop.createSuccess'), undefined, {
+          duration: 3200,
+          verticalPosition: 'top',
+          panelClass: 'snack-success'
+        });
+      } else if (this.data.secretDrop) {
         await this.secretDropService.republishSecretDrop(this.data.secretDrop.uuid, request, this.getLocalPlainData());
         this.snackBar.open(this.translation.t('common.secretDrop.updateSuccess'), undefined, {
           duration: 3200,
