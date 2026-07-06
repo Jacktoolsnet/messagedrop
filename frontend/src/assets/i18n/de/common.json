@@ -1854,6 +1854,7 @@
       "draftSuccess": "GeheimnisDrop als Entwurf gespeichert.",
       "publishAction": "Veröffentlichen",
       "unpublishAction": "Veröffentlichung widerrufen",
+      "reportAction": "Geheimnis melden",
       "publishSuccess": "GeheimnisDrop veröffentlicht.",
       "publishFailed": "GeheimnisDrop konnte nicht veröffentlicht werden.",
       "unpublishSuccess": "Veröffentlichung widerrufen.",

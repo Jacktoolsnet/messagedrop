@@ -1854,6 +1854,7 @@
       "draftSuccess": "SecretDrop saved as draft.",
       "publishAction": "Publish",
       "unpublishAction": "Withdraw publication",
+      "reportAction": "Report secret",
       "publishSuccess": "SecretDrop published.",
       "publishFailed": "Could not publish SecretDrop.",
       "unpublishSuccess": "Publication withdrawn.",

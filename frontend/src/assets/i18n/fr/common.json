@@ -1845,6 +1845,7 @@
       "draftSuccess": "SecretDrop enregistré comme brouillon.",
       "publishAction": "Publier",
       "unpublishAction": "Retirer la publication",
+      "reportAction": "Signaler le secret",
       "publishSuccess": "SecretDrop publié.",
       "publishFailed": "Impossible de publier le SecretDrop.",
       "unpublishSuccess": "Publication retirée.",

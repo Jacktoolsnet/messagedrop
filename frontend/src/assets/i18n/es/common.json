@@ -1845,6 +1845,7 @@
       "draftSuccess": "SecretDrop guardado como borrador.",
       "publishAction": "Publicar",
       "unpublishAction": "Retirar publicación",
+      "reportAction": "Reportar secreto",
       "publishSuccess": "SecretDrop publicado.",
       "publishFailed": "No se pudo publicar el SecretDrop.",
       "unpublishSuccess": "Publicación retirada.",
