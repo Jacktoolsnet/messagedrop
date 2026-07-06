@@ -45,6 +45,16 @@ function safeSource(value) {
   return safePath(value);
 }
 
+
+function isIgnorableFrontendErrorPayload(payload) {
+  const path = String(payload?.path || '');
+  const message = String(payload?.errorMessage || payload?.errorCode || '');
+  return payload?.event === 'http_error'
+    && Number(payload?.status) === 403
+    && path.startsWith('/secretdrop/unlock/')
+    && (message.includes('invalid_secret_drop_password') || message.includes('forbidden'));
+}
+
 function sanitizePayload(body) {
   const event = safeToken(body?.event);
   const severity = safeToken(body?.severity);
@@ -94,6 +104,10 @@ router.post('/', express.json({ limit: '64kb' }), async (req, res, next) => {
   const payload = sanitizePayload(req.body);
   if (!payload) {
     return next(apiError.badRequest('invalid_payload'));
+  }
+
+  if (isIgnorableFrontendErrorPayload(payload)) {
+    return res.status(202).json({ forwarded: false, ignored: true });
   }
 
   try {

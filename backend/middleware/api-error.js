@@ -161,8 +161,18 @@ function notFoundHandler(_req, res) {
   res.status(404).json({ error: 'not_found' });
 }
 
-function shouldSkipRequestErrorLog(req, status) {
-  return status < 500 && String(req?.headers?.['x-skip-request-error-log'] || '').toLowerCase() === 'true';
+function shouldSkipRequestErrorLog(req, status, payload, err) {
+  if (status >= 500) {
+    return false;
+  }
+  if (String(req?.headers?.['x-skip-request-error-log'] || '').toLowerCase() === 'true') {
+    return true;
+  }
+  const message = String(err?.message || payload?.message || payload?.error || '');
+  return status === 403
+    && req?.method === 'POST'
+    && /^\/secretdrop\/unlock\//.test(String(req?.originalUrl || req?.url || ''))
+    && message === 'invalid_secret_drop_password';
 }
 
 function errorHandler(err, req, res, next) {
@@ -176,7 +186,7 @@ function errorHandler(err, req, res, next) {
   sanitizeErrorPayload(payload);
 
   const logMessage = err?.message || payload.message;
-  if (shouldSkipRequestErrorLog(req, status)) {
+  if (shouldSkipRequestErrorLog(req, status, payload, err)) {
     return res.status(status).json(payload);
   }
 

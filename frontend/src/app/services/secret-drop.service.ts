@@ -129,7 +129,14 @@ export class SecretDropService {
       this.http.post<SecretDropUnlockResponse>(
         `${this.baseUrl}/unlock/${encodeURIComponent(uuid)}`,
         { authVerifier },
-        { headers: new HttpHeaders({ 'x-skip-ui': 'true' }) }
+        {
+          headers: new HttpHeaders({
+            'x-skip-ui': 'true',
+            'x-skip-diagnostics': 'true',
+            'x-skip-backend-status': 'true',
+            'x-skip-request-error-log': 'true'
+          })
+        }
       )
     );
     return this.normalizeSecretDrop(response.secretDrop);

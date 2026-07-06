@@ -32,6 +32,15 @@ function safePath(value) {
   return value.split('?')[0].split('#')[0].slice(0, 200);
 }
 
+
+function isIgnorableFrontendErrorLog({ event, path, status, errorMessage, errorCode }) {
+  const message = String(errorMessage || errorCode || '');
+  return event === 'http_error'
+    && Number(status) === 403
+    && String(path || '').startsWith('/secretdrop/unlock/')
+    && (message.includes('invalid_secret_drop_password') || message.includes('forbidden'));
+}
+
 function safeSource(value) {
   if (typeof value !== 'string') return '';
   try {
@@ -87,6 +96,10 @@ router.post('/', express.json({ limit: '64kb' }), (req, res, next) => {
 
   if (!client || !event || !severity || !allowedEvents.has(event) || !allowedSeverities.has(severity)) {
     return next(apiError.badRequest('missing_fields'));
+  }
+
+  if (isIgnorableFrontendErrorLog({ event, path, status, errorMessage, errorCode })) {
+    return res.status(202).json({ ignored: true });
   }
 
   const id = crypto.randomUUID();
