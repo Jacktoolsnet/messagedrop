@@ -66,9 +66,8 @@
             <mat-label>{{ i18n.t('Type') }}</mat-label>
             <mat-select [formControl]="filterForm.controls.reportedContentType">
                 <mat-option value="">{{ i18n.t('All') }}</mat-option>
-                <mat-option value="public_message">{{ i18n.t('Public message') }}</mat-option>
-                <mat-option value="comment">{{ i18n.t('Comment') }}</mat-option>
-                <mat-option value="profile">{{ i18n.t('Profile') }}</mat-option>
+                <mat-option value="public message">{{ i18n.t('Public message') }}</mat-option>
+                <mat-option value="secret drop">{{ i18n.t('SecretDrop') }}</mat-option>
             </mat-select>
         </mat-form-field>
 

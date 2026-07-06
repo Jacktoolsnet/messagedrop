@@ -30,6 +30,7 @@ import { DecisionDialogComponent } from '../../decisions/decision-dialog/decisio
 import { NoticeDetailComponent } from '../notice-detail/notice-detail.component';
 import { NotifyDialogComponent } from '../notify-dialog/notify-dialog.component';
 import { DisplayMessageService } from '../../../../services/display-message.service';
+import { normalizeDsaReportedContentType } from '../../../../utils/dsa-content-type.util';
 
 type NoticePreviewContent = ReportedContentPayload;
 
@@ -268,16 +269,12 @@ export class NoticesComponent implements OnInit, OnDestroy {
   }
 
   contentTypeLabel(value: string | null | undefined): string {
-    switch ((value || '').toLowerCase()) {
-      case 'public_message':
+    switch (normalizeDsaReportedContentType(value)) {
+      case 'secret drop':
+        return this.i18n.t('SecretDrop');
       case 'public message':
-        return this.i18n.t('Public message');
-      case 'comment':
-        return this.i18n.t('Comment');
-      case 'profile':
-        return this.i18n.t('Profile');
       default:
-        return value || '';
+        return this.i18n.t('Public message');
     }
   }
 }

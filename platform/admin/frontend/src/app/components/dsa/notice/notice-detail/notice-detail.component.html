@@ -69,7 +69,7 @@
                 <h3 class="tile-title">{{ i18n.t('Content') }}</h3>
                 <div class="tile-body">
                     <div class="block">
-                        <h4><mat-icon>article</mat-icon> {{ i18n.t('Reported content') }}</h4>
+                        <h4><mat-icon>{{ isSecretDrop() ? 'password' : 'article' }}</mat-icon> {{ contentTitle() }}</h4>
 
                         @if (contentObj(); as c) {
                         <div class="bubble">
@@ -100,7 +100,7 @@
 
                             <div class="meta">
                                 <div class="kv">
-                                    <div class="k">{{ i18n.t('Content ID') }}</div>
+                                    <div class="k">{{ isSecretDrop() ? i18n.t('SecretDrop ID') : i18n.t('Content ID') }}</div>
                                     <div class="v mono">{{ notice().contentId }}</div>
                                 </div>
                                 @if (c.userId; as userId) {
@@ -114,6 +114,44 @@
                                     <div class="k">{{ i18n.t('PlusCode') }}</div>
                                     <div class="v mono">{{ plusCode }}</div>
                                 </div>
+                                }
+                                @if (isSecretDrop()) {
+                                @if (c.hint; as hint) {
+                                <div class="kv">
+                                    <div class="k">{{ i18n.t('Hint') }}</div>
+                                    <div class="v">{{ hint }}</div>
+                                </div>
+                                }
+                                @if (c.plusCode || c.location?.plusCode; as plusCode) {
+                                <div class="kv">
+                                    <div class="k">{{ i18n.t('Drop PlusCode') }}</div>
+                                    <div class="v mono">{{ plusCode }}</div>
+                                </div>
+                                }
+                                @if (c.discoveryPlusCode; as discoveryPlusCode) {
+                                <div class="kv">
+                                    <div class="k">{{ i18n.t('Discovery PlusCode') }}</div>
+                                    <div class="v mono">{{ discoveryPlusCode }}</div>
+                                </div>
+                                }
+                                @if (c.status; as dropStatus) {
+                                <div class="kv">
+                                    <div class="k">{{ i18n.t('SecretDrop status') }}</div>
+                                    <div class="v">{{ dropStatus }}</div>
+                                </div>
+                                }
+                                @if (c.unlockCount !== undefined && c.unlockCount !== null) {
+                                <div class="kv">
+                                    <div class="k">{{ i18n.t('Unlocks') }}</div>
+                                    <div class="v">{{ c.unlockCount }}</div>
+                                </div>
+                                }
+                                @if (c.validUntil) {
+                                <div class="kv">
+                                    <div class="k">{{ i18n.t('Valid until') }}</div>
+                                    <div class="v">{{ c.validUntil * 1000 | date:'medium' }}</div>
+                                </div>
+                                }
                                 }
                                 @if (c.multimedia?.type; as mediaType) {
                                 <div class="kv">

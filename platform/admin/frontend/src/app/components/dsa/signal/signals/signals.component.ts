@@ -26,6 +26,7 @@ import { debounceTime, distinctUntilChanged, map, Subscription } from 'rxjs';
 import { ConfirmDialogComponent } from '../../../shared/confirm-dialog.component';
 import { SignalDetailComponent } from '../signal-detail/signal-detail.component';
 import { DisplayMessageService } from '../../../../services/display-message.service';
+import { normalizeDsaReportedContentType } from '../../../../utils/dsa-content-type.util';
 
 type SignalStatusFilter = 'open' | 'dismissed';
 type SignalRangeFilter = '24h' | '7d' | '30d' | 'all';
@@ -248,6 +249,8 @@ export class SignalsComponent implements OnInit, OnDestroy {
       data: {
         source: 'signal',
         signalId: s.id,
+        contentId: s.contentId,
+        reportedContentType: s.reportedContentType,
         reportedContent: s.reportedContent, // JSON-String aus DB
         contentUrl: s.contentUrl,
         category: s.category,
@@ -299,18 +302,15 @@ export class SignalsComponent implements OnInit, OnDestroy {
   }
 
   contentTypeLabel(value: string | null | undefined): string {
-    switch ((value || '').toLowerCase()) {
+    switch (normalizeDsaReportedContentType(value)) {
+      case 'secret drop':
+        return this.i18n.t('SecretDrop');
       case 'public message':
-      case 'public_message':
-        return this.i18n.t('Public message');
-      case 'comment':
-        return this.i18n.t('Comment');
-      case 'profile':
-        return this.i18n.t('Profile');
       default:
-        return value || '';
+        return this.i18n.t('Public message');
     }
   }
+
 
   goBack() { this.router.navigate(['/dashboard/dsa']); }
   trackById = (_: number, s: DsaSignal) => s.id;

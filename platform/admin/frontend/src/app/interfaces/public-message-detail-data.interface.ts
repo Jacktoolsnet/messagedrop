@@ -4,6 +4,8 @@ export interface PublicMessageDetailData {
     source: 'signal' | 'notice';
     // Optional: ID des Signals, falls Quelle 'signal' ist
     signalId?: string;
+    contentId?: string | null;
+    reportedContentType?: string | null;
     reportedContent: string | PublicMessage; // JSON-String aus DB ODER bereits geparst
     contentUrl?: string | null;
     category?: string | null;

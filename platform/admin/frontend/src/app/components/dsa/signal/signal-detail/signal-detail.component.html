@@ -6,6 +6,7 @@
         </div>
         <div class="right">
             <mat-chip-set>
+                <mat-chip>{{ contentTypeLabel(data.reportedContentType) }}</mat-chip>
                 @if (data.category) { <mat-chip>{{ data.category }}</mat-chip> }
                 @if (data.status) { <mat-chip class="status">{{ data.status }}</mat-chip> }
             </mat-chip-set>
@@ -18,7 +19,7 @@
                 <div class="tile-header">
                     <div class="tile-title">
                         <mat-icon>text_snippet</mat-icon>
-                        <span>{{ i18n.t('Message') }}</span>
+                        <span>{{ contentTitle() }}</span>
                     </div>
                     <button mat-icon-button [matTooltip]="i18n.t('Translate to German')" (click)="translateMessage()"
                         [disabled]="!msg()?.message || loadingMsg()">
@@ -119,6 +120,32 @@
                         <mat-icon>place</mat-icon>
                         <span><strong>{{ i18n.t('Plus Code:') }}</strong> {{ msg()?.location?.plusCode }}</span>
                     </div>
+                    }
+                    @if (isSecretDrop()) {
+                    @if (secretHint(); as hint) {
+                    <div class="kv">
+                        <mat-icon>help</mat-icon>
+                        <span><strong>{{ i18n.t('Hint:') }}</strong> {{ hint }}</span>
+                    </div>
+                    }
+                    @if (secretStatus(); as secretDropStatus) {
+                    <div class="kv">
+                        <mat-icon>toggle_on</mat-icon>
+                        <span><strong>{{ i18n.t('SecretDrop status:') }}</strong> {{ secretDropStatus }}</span>
+                    </div>
+                    }
+                    @if (secretUnlockCount() !== null) {
+                    <div class="kv">
+                        <mat-icon>lock_open</mat-icon>
+                        <span><strong>{{ i18n.t('Unlocks:') }}</strong> {{ secretUnlockCount() }}</span>
+                    </div>
+                    }
+                    @if (data.contentId) {
+                    <div class="kv">
+                        <mat-icon>fingerprint</mat-icon>
+                        <span><strong>{{ i18n.t('SecretDrop ID:') }}</strong> {{ data.contentId }}</span>
+                    </div>
+                    }
                     }
                     @if (data.signalId) {
                     <div class="kv">

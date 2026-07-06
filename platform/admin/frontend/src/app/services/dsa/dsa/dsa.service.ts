@@ -24,6 +24,7 @@ import { ListAppealsParams } from '../../../interfaces/list-appeals-params.inter
 import { DsaNotification, ListNotificationsParams, NotificationMeta, NotificationPayload } from '../../../interfaces/dsa-notification.interface';
 import { DsaTextBlock, DsaTextBlockFilters, DsaTextBlockSavePayload, DsaTextBlockTranslationPreview } from '../../../interfaces/dsa-text-block.interface';
 import { DsaAiAssessmentRecord } from '../../../interfaces/dsa-ai-assessment.interface';
+import { DsaReportedContentType, normalizeDsaReportedContentType } from '../../../utils/dsa-content-type.util';
 import { PlatformUserModerationOpenAppealsResponse, PlatformUserModerationResponse, PlatformUserModerationAppeal } from '../../../interfaces/platform-user-moderation.interface';
 import { TranslationHelperService } from '../../translation-helper.service';
 import { DisplayMessageService } from '../../display-message.service';
@@ -494,26 +495,41 @@ export class DsaService {
     );
   }
 
-  setPublicMessageVisibility(contentId: string, visible: boolean) {
+  setContentVisibility(contentId: string, visible: boolean, reportedContentType: DsaReportedContentType | string = 'public message') {
     const trimmed = contentId?.trim();
     if (!trimmed) return of({ status: 0 });
+    const normalizedType = normalizeDsaReportedContentType(reportedContentType);
 
     return this.http.post<{
       ok: boolean;
       status: number;
       visible: boolean;
       contentId: string;
-      messageUuid: string;
-      messageId: number | null;
-    }>(`${this.baseUrl}/publicmessage/visibility`, {
+      contentUuid?: string | null;
+      messageUuid?: string | null;
+      secretDropUuid?: string | null;
+      messageId?: number | null;
+      reportedContentType?: string | null;
+    }>(`${this.baseUrl}/content/visibility`, {
       contentId: trimmed,
-      visible
+      visible,
+      reportedContentType: normalizedType
     }).pipe(
       catchError(err => {
-        this.openSnack('Could not update message visibility.', 3000);
+        this.openSnack(normalizedType === 'secret drop'
+          ? 'Could not update SecretDrop visibility.'
+          : 'Could not update message visibility.', 3000);
         throw err;
       })
     );
+  }
+
+  setPublicMessageVisibility(contentId: string, visible: boolean) {
+    return this.setContentVisibility(contentId, visible, 'public message');
+  }
+
+  setSecretDropVisibility(contentId: string, visible: boolean) {
+    return this.setContentVisibility(contentId, visible, 'secret drop');
   }
 
   /** Get all evidence entries for a given notice */

@@ -22,6 +22,7 @@ import { EvidenceListComponent } from "../evidence/evidence-list/evidence-list.c
 import { ReportedContentPayload, ReportedMultimedia } from '../../../../interfaces/reported-content.interface';
 import { DsaAiAssessmentClauseMatch, DsaAiAssessmentRecord, DsaAiSuggestedDecisionOutcome, DsaAiWorkflowRecommendation } from '../../../../interfaces/dsa-ai-assessment.interface';
 import { parseReportedContentPayload } from '../../../../utils/reported-content.util';
+import { isSecretDropContentType, normalizeDsaReportedContentType } from '../../../../utils/dsa-content-type.util';
 import { DisplayMessageService } from '../../../../services/display-message.service';
 import { StickerPreviewComponent } from '../../../shared/sticker-preview/sticker-preview.component';
 import { finalize } from 'rxjs';
@@ -93,7 +94,8 @@ export class NoticeDetailComponent implements OnInit {
   });
 
   // Hilfen
-  isPublicMessage = computed(() => (this.notice()?.reportedContentType || '').toLowerCase().includes('public'));
+  isSecretDrop = computed(() => isSecretDropContentType(this.notice()?.reportedContentType));
+  isPublicMessage = computed(() => !this.isSecretDrop());
   hasModeration = computed(() => {
     const c = this.contentObj();
     if (!c) return false;
@@ -171,9 +173,10 @@ export class NoticeDetailComponent implements OnInit {
     if (!contentId) return;
 
     const visible = outcome === 'NO_ACTION';
-    this.dsa.setPublicMessageVisibility(contentId, visible).subscribe({
+    this.dsa.setContentVisibility(contentId, visible, this.notice().reportedContentType).subscribe({
       error: () => {
-        this.snack.open(this.i18n.t('Could not update public visibility.'), this.i18n.t('OK'), { duration: 3000 });
+        const key = this.isSecretDrop() ? 'Could not update SecretDrop visibility.' : 'Could not update public visibility.';
+        this.snack.open(this.i18n.t(key), this.i18n.t('OK'), { duration: 3000 });
       }
     });
   }
@@ -545,18 +548,23 @@ export class NoticeDetailComponent implements OnInit {
   }
 
   contentTypeLabel(value: string | null | undefined): string {
-    switch ((value || '').toLowerCase()) {
-      case 'public_message':
+    switch (normalizeDsaReportedContentType(value)) {
+      case 'secret drop':
+        return this.i18n.t('SecretDrop');
       case 'public message':
-        return this.i18n.t('Public message');
-      case 'comment':
-        return this.i18n.t('Comment');
-      case 'profile':
-        return this.i18n.t('Profile');
       default:
-        return value || '';
+        return this.i18n.t('Public message');
     }
   }
+
+  contentTitle(): string {
+    return this.isSecretDrop() ? this.i18n.t('SecretDrop content') : this.i18n.t('Reported content');
+  }
+
+  messageLabel(): string {
+    return this.isSecretDrop() ? this.i18n.t('Secret') : this.i18n.t('Message');
+  }
+
 
   private updateMediaFromContent(): void {
     const mm = this.contentObj()?.multimedia;

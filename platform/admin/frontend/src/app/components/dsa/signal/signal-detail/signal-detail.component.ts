@@ -19,6 +19,7 @@ import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { TranslateService } from '../../../../services/translate-service/translate-service.service';
 import { parsePublicMessageDetailContent } from '../../../../utils/reported-content.util';
+import { isSecretDropContentType, normalizeDsaReportedContentType } from '../../../../utils/dsa-content-type.util';
 import { ConfirmDialogComponent } from '../../../shared/confirm-dialog.component';
 import { DisplayMessageService } from '../../../../services/display-message.service';
 import { StickerPreviewComponent } from '../../../shared/sticker-preview/sticker-preview.component';
@@ -56,7 +57,9 @@ export class SignalDetailComponent implements OnInit {
   imageUrl = signal<string | null>(null);
 
   // Original-Quelle sichtbar?
+  readonly isSecretDrop = computed(() => isSecretDropContentType(this.data.reportedContentType));
   readonly sourceUrl = computed(() => {
+    if (this.isSecretDrop()) return null;
     const m = this.msg();
     const d = this.data;
     return this.toSafeHttpUrl(d?.contentUrl || m?.multimedia?.sourceUrl || m?.multimedia?.url);
@@ -108,8 +111,8 @@ export class SignalDetailComponent implements OnInit {
     this.msg.set(raw);
     const type = (raw.multimedia?.type || 'undefined').toLowerCase();
 
-    this.providerIcon.set(this.iconFor(type));
-    this.providerLabel.set(this.labelFor(type));
+    this.providerIcon.set(this.isSecretDrop() ? 'password' : this.iconFor(type));
+    this.providerLabel.set(this.isSecretDrop() ? this.i18n.t('SecretDrop') : this.labelFor(type));
 
     switch (type) {
       case 'youtube': {
@@ -168,6 +171,37 @@ export class SignalDetailComponent implements OnInit {
 
     this.loadLatestAiAssessment();
   }
+
+  contentTypeLabel(value: string | null | undefined): string {
+    switch (normalizeDsaReportedContentType(value)) {
+      case 'secret drop':
+        return this.i18n.t('SecretDrop');
+      case 'public message':
+      default:
+        return this.i18n.t('Public message');
+    }
+  }
+
+  contentTitle(): string {
+    return this.isSecretDrop() ? this.i18n.t('SecretDrop content') : this.i18n.t('Message');
+  }
+
+  secretHint(): string | null {
+    const candidate = this.msg() as unknown as { hint?: string | null } | null;
+    const hint = typeof candidate?.hint === 'string' ? candidate.hint.trim() : '';
+    return hint || null;
+  }
+
+  secretStatus(): string | null {
+    const candidate = this.msg() as unknown as { status?: string | null } | null;
+    return candidate?.status || null;
+  }
+
+  secretUnlockCount(): number | null {
+    const candidate = this.msg() as unknown as { unlockCount?: number | null } | null;
+    return Number.isFinite(candidate?.unlockCount) ? Number(candidate?.unlockCount) : null;
+  }
+
 
   // Actions
   close() { this.ref.close(); }
