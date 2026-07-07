@@ -227,15 +227,19 @@ export class EditSecretDropComponent {
       return;
     }
 
-    const moderationErrorKey = await this.getSecretTextModerationErrorKey();
-    if (moderationErrorKey) {
-      this.dialogRef.close(true);
-      this.showModerationRejected(moderationErrorKey);
-      return;
-    }
-
     this.saving.set(true);
+    const publishingDialogRef = this.openPublishingMessage();
     try {
+      const moderationErrorKey = await this.getSecretTextModerationErrorKey();
+      if (moderationErrorKey) {
+        if (!this.incognitoPublish) {
+          await this.saveLocalDraft({ close: false, showSnack: false });
+          this.dialogRef.close(true);
+        }
+        this.showModerationRejected(moderationErrorKey);
+        return;
+      }
+
       const request = await this.buildPublishRequest();
       if (this.data.secretDrop?.localOnly) {
         await this.secretDropService.createSecretDrop(request, this.getLocalPlainData());
@@ -267,10 +271,34 @@ export class EditSecretDropComponent {
         : 'common.secretDrop.createFailed';
       this.showWarning(key, 'snack-error');
     } finally {
+      publishingDialogRef.close();
       this.saving.set(false);
     }
   }
 
+  private openPublishingMessage(): MatDialogRef<DisplayMessage> {
+    return this.matDialog.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: {
+        showAlways: true,
+        title: this.translation.t('common.secretDrop.secretDrop'),
+        image: '',
+        icon: '',
+        message: this.translation.t('common.secretDrop.publishing'),
+        button: '',
+        delay: 0,
+        showSpinner: true,
+        autoclose: false
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: true,
+      autoFocus: false
+    });
+  }
 
   private async buildPublishRequest(): Promise<SecretDropCreateRequest> {
     const encrypted = await this.cryptoService.encryptSecret(
@@ -302,7 +330,9 @@ export class EditSecretDropComponent {
     };
   }
 
-  private async saveLocalDraft(): Promise<void> {
+  private async saveLocalDraft(options: { close?: boolean; showSnack?: boolean } = {}): Promise<void> {
+    const close = options.close !== false;
+    const showSnack = options.showSnack !== false;
     const userId = this.userService.getUser().id;
     const validityWindow = this.resolveValidityWindow();
     const drop: SecretDrop = {
@@ -328,8 +358,8 @@ export class EditSecretDropComponent {
       visibility: this.visibility,
       creatorMode: this.incognitoPublish ? 'incognito' : 'normal',
       recipientUserIds: this.visibility === 'contacts' ? [...this.selectedRecipientUserIds] : [],
-      status: this.data.secretDrop?.status ?? 'disabled',
-      publishState: this.data.secretDrop?.publishState ?? 'draft',
+      status: 'disabled',
+      publishState: 'draft',
       localOnly: this.data.secretDrop?.localOnly ?? true,
       likes: this.data.secretDrop?.likes ?? 0,
       dislikes: this.data.secretDrop?.dislikes ?? 0,
@@ -337,12 +367,16 @@ export class EditSecretDropComponent {
       createdAt: this.data.secretDrop?.createdAt ?? Math.floor(Date.now() / 1000)
     };
     await this.secretDropService.saveDraftSecretDrop(userId, drop);
-    this.snackBar.open(this.translation.t(this.data.secretDrop ? 'common.secretDrop.updateSuccess' : 'common.secretDrop.draftSuccess'), undefined, {
-      duration: 3200,
-      verticalPosition: 'top',
-      panelClass: 'snack-success'
-    });
-    this.dialogRef.close(true);
+    if (showSnack) {
+      this.snackBar.open(this.translation.t(this.data.secretDrop ? 'common.secretDrop.updateSuccess' : 'common.secretDrop.draftSuccess'), undefined, {
+        duration: 3200,
+        verticalPosition: 'top',
+        panelClass: 'snack-success'
+      });
+    }
+    if (close) {
+      this.dialogRef.close(true);
+    }
   }
 
   private getLocalPlainData(): Partial<SecretDrop> {

@@ -1809,6 +1809,7 @@
       "validityTooLong": "La caducidad no puede ser más de 30 días después del inicio.",
       "createSuccess": "SecretDrop creado.",
       "createFailed": "No se pudo crear el SecretDrop.",
+      "publishing": "El SecretDrop se está publicando…",
       "emptyMine": "Aún no has creado SecretDrops.",
       "activeCount": "SecretDrops activos: {{ count }}",
       "noHint": "Sin pista",

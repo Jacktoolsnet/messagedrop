@@ -1818,6 +1818,7 @@
       "validityTooLong": "Der Endzeitpunkt darf höchstens 30 Tage nach dem Startzeitpunkt liegen.",
       "createSuccess": "GeheimnisDrop erstellt.",
       "createFailed": "GeheimnisDrop konnte nicht erstellt werden.",
+      "publishing": "GeheimnisDrop wird veröffentlicht…",
       "emptyMine": "Du hast noch keine GeheimnisDrops erstellt.",
       "activeCount": "Aktive GeheimnisDrops: {{ count }}",
       "noHint": "Kein Hinweis",

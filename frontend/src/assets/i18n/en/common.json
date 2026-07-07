@@ -1818,6 +1818,7 @@
       "validityTooLong": "The expiry time must be no more than 30 days after the start time.",
       "createSuccess": "SecretDrop created.",
       "createFailed": "Could not create SecretDrop.",
+      "publishing": "SecretDrop is being published…",
       "emptyMine": "You have not created any SecretDrops yet.",
       "activeCount": "Active SecretDrops: {{ count }}",
       "noHint": "No hint",
