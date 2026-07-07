@@ -112,6 +112,7 @@ async function sendStatisticOverview(req, res, next, days) {
   const metricKeys = [
     'client.connect',
     'message.create',
+    'secretdrop.create',
     'message.search',
     'user.create'
   ];

@@ -56,6 +56,7 @@ export class PublicOverviewComponent implements OnInit {
   readonly metrics: PublicMetricTile[] = [
     { key: 'client.connect', title: this.i18n.t('Page views'), icon: 'visibility', color: '#2563eb' },
     { key: 'message.create', title: this.i18n.t('New messages'), icon: 'chat', color: '#16a34a' },
+    { key: 'secretdrop.create', title: this.i18n.t('New SecretDrops'), icon: 'password', color: '#0d9488' },
     { key: 'message.search', title: this.i18n.t('Search requests'), icon: 'search', color: '#ea580c' },
     { key: 'user.create', title: this.i18n.t('New users'), icon: 'person_add', color: '#7c3aed' }
   ];
