@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
@@ -31,7 +31,6 @@ import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.comp
     MatButtonModule,
     MatDialogContent,
     MatDialogActions,
-    MatDialogClose,
     MatIconModule,
     MatSelectModule,
     MatSliderModule,
@@ -87,11 +86,22 @@ export class AppSettingsComponent implements OnInit {
   public storageQuotaWarning = '';
   public pinFeedbackHapticSupported = typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function';
   private readonly storageWarningThreshold = 0.9;
+  private discardOnClose = false;
+  private applyInProgress = false;
 
   ngOnInit(): void {
+    this.dialogRef.disableClose = true;
+
     this.dialogRef.beforeClosed().subscribe(() => {
-      this.resetPreviewState();
+      if (this.discardOnClose) {
+        this.resetPreviewState();
+        return;
+      }
+
+      this.stopSpeechPreview();
+      this.languageService.endLanguagePreview();
     });
+
 
     const initialLanguage = this.appSettings.languageMode ?? this.languageService.languageMode();
     if (initialLanguage !== this.appSettings.languageMode) {
@@ -125,11 +135,16 @@ export class AppSettingsComponent implements OnInit {
   }
 
   onCloseClick(): void {
-    this.stopSpeechPreview();
+    this.discardOnClose = true;
     this.dialogRef.close();
   }
 
   async onApplyClick(): Promise<void> {
+    if (this.applyInProgress) {
+      return;
+    }
+
+    this.applyInProgress = true;
     let nextSettings = { ...this.appSettings };
     let shouldClose = true;
 
@@ -159,7 +174,10 @@ export class AppSettingsComponent implements OnInit {
 
     if (shouldClose) {
       this.dialogRef.close();
+      return;
     }
+
+    this.applyInProgress = false;
   }
 
   setTheme(themeName: string): void {
