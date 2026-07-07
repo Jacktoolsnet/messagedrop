@@ -1884,6 +1884,7 @@
       "unlockSuccess": "Geheimnis entsperrt.",
       "unlockFailed": "Das Geheimnis konnte nicht entsperrt werden.",
       "invalidPin": "Der PIN ist leider nicht richtig.",
+      "tooManyUnlockAttempts": "Zu viele PIN-Versuche. Bitte warte kurz und versuche es dann erneut.",
       "consumed": "Dieses Geheimnis wurde bereits geöffnet.",
       "notInValidityWindow": "Dieses Geheimnis ist aktuell nicht gültig.",
       "readMode": "Lesbarkeit",

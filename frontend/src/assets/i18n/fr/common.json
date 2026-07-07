@@ -1875,6 +1875,7 @@
       "unlockSuccess": "Secret déverrouillé.",
       "unlockFailed": "Le secret n’a pas pu être déverrouillé.",
       "invalidPin": "Le PIN est incorrect.",
+      "tooManyUnlockAttempts": "Trop de tentatives de PIN. Veuillez patienter un instant puis réessayer.",
       "consumed": "Ce secret a déjà été ouvert.",
       "notInValidityWindow": "Ce secret n’est pas valide actuellement.",
       "readMode": "Mode de lecture",

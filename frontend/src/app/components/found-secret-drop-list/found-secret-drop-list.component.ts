@@ -812,6 +812,11 @@ export class FoundSecretDropListComponent {
   }
 
   private resolveUnlockErrorKey(error: unknown): string {
+    const status = Number((error as { status?: unknown })?.status);
+    if (status === 429) {
+      return 'common.secretDropDiscovery.tooManyUnlockAttempts';
+    }
+
     const text = String((error as { error?: { message?: string; error?: string }, message?: string })?.error?.message
       ?? (error as { error?: { error?: string } })?.error?.error
       ?? (error as { message?: string })?.message

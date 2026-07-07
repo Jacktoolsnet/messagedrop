@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const express = require('express');
 const rateLimit = require('express-rate-limit');
+const { ipKeyGenerator } = rateLimit;
 const router = express.Router();
 const security = require('../middleware/security');
 const tableSecretDrop = require('../db/tableSecretDrop');
@@ -20,9 +21,25 @@ const MIN_DISCOVERY_ZOOM_LEVEL = 12;
 const MAX_DISCOVERY_ZOOM_LEVEL = 19;
 const MAX_VALIDITY_WINDOW_SECONDS = 30 * 24 * 60 * 60;
 
-const unlockLimiter = rateLimit({
-  windowMs: 5 * 60 * 1000,
+function secretDropUnlockRateLimitKey(req) {
+  const ipKey = ipKeyGenerator(req.ip);
+  const uuid = normalizeString(req.params?.uuid, 64).toLowerCase();
+  return `${ipKey}:${UUID_REGEX.test(uuid) ? uuid : 'invalid-secret-drop-uuid'}`;
+}
+
+const unlockBurstLimiter = rateLimit({
+  windowMs: 2 * 60 * 1000,
+  limit: 15,
+  keyGenerator: secretDropUnlockRateLimitKey,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { status: 429, error: 'too_many_secret_drop_unlock_attempts' }
+});
+
+const unlockSustainedLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
   limit: 40,
+  keyGenerator: secretDropUnlockRateLimitKey,
   standardHeaders: true,
   legacyHeaders: false,
   message: { status: 429, error: 'too_many_secret_drop_unlock_attempts' }
@@ -456,7 +473,8 @@ router.get('/discover/pluscode/:plusCode', security.authenticateOptional, async 
 
 router.post('/unlock/:uuid', [
   security.authenticateOptional,
-  unlockLimiter,
+  unlockBurstLimiter,
+  unlockSustainedLimiter,
   express.json({ type: 'application/json', limit: '16kb' }),
   metric.count('secretdrop.unlock', { when: 'always', timezone: 'utc', amount: 1 })
 ], async (req, res, next) => {
