@@ -1778,6 +1778,7 @@
       "editAction": "Geheimnis bearbeiten",
       "createAction": "Erstellen",
       "messageLabel": "Geheimer Inhalt",
+      "secretContentLabel": "Geheimer Inhalt",
       "hintLabel": "Hinweis / Rätsel",
       "hintHelp": "Optionaler Hinweis, damit Finder das Passwort erraten können.",
       "addHint": "Rätsel-Hinweis hinzufügen",

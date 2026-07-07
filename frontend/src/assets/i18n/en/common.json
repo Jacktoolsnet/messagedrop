@@ -1778,6 +1778,7 @@
       "editAction": "Edit secret",
       "createAction": "Create",
       "messageLabel": "Secret content",
+      "secretContentLabel": "Secret content",
       "hintLabel": "Hint / riddle",
       "hintHelp": "Optional hint to help finders guess the password.",
       "addHint": "Add riddle hint",

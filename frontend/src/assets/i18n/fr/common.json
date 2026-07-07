@@ -1769,6 +1769,7 @@
       "editAction": "Modifier le secret",
       "createAction": "Créer",
       "messageLabel": "Contenu secret",
+      "secretContentLabel": "Contenu secret",
       "hintLabel": "Indice / énigme",
       "hintHelp": "Indice facultatif pour aider à deviner le mot de passe.",
       "addHint": "Ajouter un indice d’énigme",

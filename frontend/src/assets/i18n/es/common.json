@@ -1769,6 +1769,7 @@
       "editAction": "Editar secreto",
       "createAction": "Crear",
       "messageLabel": "Contenido secreto",
+      "secretContentLabel": "Contenido secreto",
       "hintLabel": "Pista / acertijo",
       "hintHelp": "Pista opcional para ayudar a adivinar la contraseña.",
       "addHint": "Añadir pista del acertijo",
