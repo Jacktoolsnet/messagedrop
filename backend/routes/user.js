@@ -733,6 +733,48 @@ async function forwardAutoResolvedModerationAppeals(appeals, actor, logger) {
   }, logger)));
 }
 
+
+function getCount(db, sql, params = []) {
+    return new Promise((resolve, reject) => {
+        db.get(sql, params, (err, row) => {
+            if (err) return reject(err);
+            resolve(Number(row?.count || 0));
+        });
+    });
+}
+
+router.get('/internal/public-counts', [security.checkToken], async function (req, res, next) {
+    try {
+        const nowSeconds = Math.floor(Date.now() / 1000);
+        const [users, visibleMessages, visibleSecretDrops] = await Promise.all([
+            getCount(req.database.db, 'SELECT COUNT(*) AS count FROM tableUser WHERE userStatus = ?', [tableUser.userStatus.ENABLED]),
+            getCount(req.database.db, 'SELECT COUNT(*) AS count FROM tableMessage WHERE parentUuid IS NULL AND status = ? AND typ = ?', [tableMessage.messageStatus.ENABLED, tableMessage.messageType.PUBLIC]),
+            getCount(req.database.db, `
+                SELECT COUNT(*) AS count
+                FROM tableSecretDrop
+                WHERE status = ?
+                  AND COALESCE(visibility, 'public') = 'public'
+                  AND (validFrom IS NULL OR validFrom <= ?)
+                  AND (validUntil IS NULL OR validUntil >= ?)
+                  AND (maxUnlocks IS NULL OR unlockCount < maxUnlocks)
+            `, [tableSecretDrop.secretDropStatus.ENABLED, nowSeconds, nowSeconds])
+        ]);
+
+        return res.status(200).json({
+            status: 200,
+            totals: {
+                users,
+                visibleMessages,
+                visibleSecretDrops
+            }
+        });
+    } catch (error) {
+        const apiErr = apiError.internal('db_error');
+        apiErr.detail = error?.message || error;
+        return next(apiErr);
+    }
+});
+
 router.get('/internal/moderation/appeals/open',
   [
     security.checkToken

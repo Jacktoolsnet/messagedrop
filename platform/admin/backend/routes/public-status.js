@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const rateLimit = require('express-rate-limit');
+const axios = require('axios');
 
 const tableNotice = require('../db/tableDsaNotice');
 const tableSignal = require('../db/tableDsaSignal');
@@ -18,6 +19,7 @@ const { apiError } = require('../middleware/api-error');
 const { createPowGuard } = require('../middleware/pow');
 const { logPowEvent } = require('../utils/powLogger');
 const { isUnsupportedEvidenceFileError, persistEvidenceFile } = require('../utils/evidenceFile');
+const { signServiceJwt } = require('../utils/serviceJwt');
 
 const evidenceUploadDir = path.join(__dirname, '..', 'uploads', 'evidence');
 
@@ -71,6 +73,60 @@ const evidencePow = createPowGuard({
   onRequire: handlePowRequire
 });
 
+
+function resolveBackendBase() {
+  const base = (process.env.BASE_URL || '').replace(/\/+$/, '');
+  if (!base) return null;
+  return process.env.PORT ? `${base}:${process.env.PORT}` : base;
+}
+
+async function getPublicContentTotals() {
+  const base = resolveBackendBase();
+  if (!base) {
+    return {
+      users: 0,
+      visibleMessages: 0,
+      visibleSecretDrops: 0,
+      error: 'backend_unavailable'
+    };
+  }
+
+  try {
+    const token = await signServiceJwt({ audience: process.env.SERVICE_JWT_AUDIENCE_BACKEND || 'service.backend' });
+    const resp = await axios.get(`${base}/user/internal/public-counts`, {
+      timeout: 5000,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/json'
+      },
+      validateStatus: () => true
+    });
+
+    if (resp.status >= 200 && resp.status < 300) {
+      const totals = resp.data?.totals || {};
+      return {
+        users: Number(totals.users || 0),
+        visibleMessages: Number(totals.visibleMessages || 0),
+        visibleSecretDrops: Number(totals.visibleSecretDrops || 0)
+      };
+    }
+
+    return {
+      users: 0,
+      visibleMessages: 0,
+      visibleSecretDrops: 0,
+      error: `backend_status_${resp.status}`
+    };
+  } catch (error) {
+    return {
+      users: 0,
+      visibleMessages: 0,
+      visibleSecretDrops: 0,
+      error: error?.message || String(error)
+    };
+  }
+}
+
 function db(req) {
   return req.database?.db;
 }
@@ -122,21 +178,25 @@ async function sendStatisticOverview(req, res, next, days) {
     const from = addDays(to, -days + 1);
     const series = {};
 
-    await Promise.all(metricKeys.map(async (key) => {
-      const rows = await getStatisticRangeBetween(_db, key, from, to);
-      const points = fillMissingSeries(from, to, rows);
-      series[key] = {
-        points,
-        total: points.reduce((sum, point) => sum + point.value, 0),
-        max: points.reduce((max, point) => Math.max(max, point.value), 0)
-      };
-    }));
+    const [summary] = await Promise.all([
+      getPublicContentTotals(),
+      ...metricKeys.map(async (key) => {
+        const rows = await getStatisticRangeBetween(_db, key, from, to);
+        const points = fillMissingSeries(from, to, rows);
+        series[key] = {
+          points,
+          total: points.reduce((sum, point) => sum + point.value, 0),
+          max: points.reduce((max, point) => Math.max(max, point.value), 0)
+        };
+      })
+    ]);
 
     res.json({
       status: 200,
       from,
       to,
-      series
+      series,
+      summary
     });
   } catch (err) {
     const apiErr = apiError.internal('db_error');

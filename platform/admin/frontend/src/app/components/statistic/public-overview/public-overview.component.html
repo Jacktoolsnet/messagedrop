@@ -71,6 +71,38 @@
       </div>
 
       <div class="tiles-grid">
+
+      <section class="tile tile--summary">
+        <mat-card class="summary-chart-card">
+          <div class="summary-chart-header">
+            <div class="avatar avatar-neutral">
+              <mat-icon>bar_chart</mat-icon>
+            </div>
+            <div>
+              <h3>{{ i18n.t('Current public inventory') }}</h3>
+              <p>{{ i18n.t('Users, visible public messages and visible SecretDrops.') }}</p>
+            </div>
+          </div>
+
+          <div class="summary-bars">
+            @for (bar of summaryBars(); track bar.key) {
+              <div class="summary-bar-row">
+                <div class="summary-bar-meta">
+                  <span>{{ bar.label }}</span>
+                  <strong>{{ bar.value }}</strong>
+                </div>
+                <div class="summary-bar-track" [attr.aria-label]="bar.label + ': ' + bar.value">
+                  <div class="summary-bar-fill" [style.width.%]="bar.percent" [style.background]="bar.color"></div>
+                </div>
+              </div>
+            }
+          </div>
+
+          @if (hasSummaryError()) {
+            <p class="summary-warning">{{ i18n.t('Inventory numbers are currently unavailable.') }}</p>
+          }
+        </mat-card>
+      </section>
         @for (metric of metrics; track metric.key) {
           <section class="tile">
             <app-statistic-key-chart

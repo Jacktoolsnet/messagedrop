@@ -22,6 +22,14 @@ interface PublicMetricTile {
   color: string;
 }
 
+interface SummaryBar {
+  key: string;
+  label: string;
+  value: number;
+  percent: number;
+  color: string;
+}
+
 @Component({
   selector: 'app-public-overview',
   standalone: true,
@@ -52,6 +60,19 @@ export class PublicOverviewComponent implements OnInit {
   readonly chartKind = computed(() => this.selectedDays() === 1 ? 'bar' : 'line');
   readonly totalLabel = computed(() => this.selectedDays() === 1 ? this.i18n.t('Total today:') : this.i18n.t('Total (7 days):'));
   readonly peakLabel = computed(() => this.selectedDays() === 1 ? this.i18n.t('Peak today:') : this.i18n.t('Peak/day:'));
+  readonly summaryBars = computed<SummaryBar[]>(() => {
+    const summary = this.overview()?.summary;
+    const values = [
+      { key: 'users', label: this.i18n.t('Users'), value: Number(summary?.users || 0), color: '#7c3aed' },
+      { key: 'visibleMessages', label: this.i18n.t('Visible messages'), value: Number(summary?.visibleMessages || 0), color: '#16a34a' },
+      { key: 'visibleSecretDrops', label: this.i18n.t('Visible SecretDrops'), value: Number(summary?.visibleSecretDrops || 0), color: '#0d9488' }
+    ];
+    const max = Math.max(1, ...values.map((row) => row.value));
+    return values.map((row) => ({
+      ...row,
+      percent: Math.max(row.value > 0 ? 4 : 0, Math.round((row.value / max) * 100))
+    }));
+  });
 
   readonly metrics: PublicMetricTile[] = [
     { key: 'client.connect', title: this.i18n.t('Page views'), icon: 'visibility', color: '#2563eb' },
@@ -102,5 +123,9 @@ export class PublicOverviewComponent implements OnInit {
 
   maxFor(key: string): number {
     return this.overview()?.series?.[key]?.max ?? 0;
+  }
+
+  hasSummaryError(): boolean {
+    return !!this.overview()?.summary?.error;
   }
 }

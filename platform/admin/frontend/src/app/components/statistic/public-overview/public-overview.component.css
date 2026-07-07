@@ -326,3 +326,78 @@ mat-progress-bar {
     flex: 1 1 0;
   }
 }
+
+
+.tile--summary {
+  grid-column: 1 / -1;
+}
+
+.summary-chart-card {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+}
+
+.summary-chart-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.summary-chart-header h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.summary-chart-header p {
+  margin: 0.2rem 0 0;
+  color: var(--muted);
+}
+
+.summary-bars {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.summary-bar-row {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.summary-bar-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.summary-bar-meta strong {
+  font-size: 1.1rem;
+}
+
+.summary-bar-track {
+  overflow: hidden;
+  height: 16px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.08);
+}
+
+.summary-bar-fill {
+  height: 100%;
+  min-width: 0;
+  border-radius: inherit;
+  transition: width 180ms ease;
+}
+
+.summary-warning {
+  margin: 0;
+  color: #b45309;
+  font-weight: 600;
+}
