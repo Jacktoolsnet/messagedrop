@@ -115,7 +115,13 @@ export class SecretDropCommentsDialogComponent implements OnInit {
   }
 
   enterCommentLevel(comment: DecryptedComment): void {
+    const hasReplies = this.comments().some((entry) => (entry.row.parentCommentUuid ?? null) === comment.row.uuid);
     this.levelStack.update((stack) => [...stack, comment]);
+
+    // Same UX as public messages: if this comment has no replies yet, open the create dialog immediately.
+    if (!hasReplies && Number(comment.row.commentsNumber ?? 0) === 0) {
+      setTimeout(() => void this.addComment(comment), 0);
+    }
   }
 
   goBack(): void {
