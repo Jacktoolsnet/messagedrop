@@ -68,6 +68,7 @@
   "Search visibility": "Search visibility",
   "Visible in search": "Visible in search",
   "Hidden in search": "Hidden in search",
+  "Inventory numbers are currently unavailable.": "Inventory numbers are currently unavailable.",
   "Visible": "Visible",
   "Open sticker settings": "Open sticker settings",
   "Not-found sticker settings": "Not-found sticker settings",
@@ -235,6 +236,7 @@
   "Configured targets": "Configured targets",
   "Last check": "Last check",
   "Current status": "Current status",
+  "Current public inventory": "Current public inventory",
   "Warning": "Warning",
   "Error": "Error",
   "Valid until": "Valid until",
@@ -271,6 +273,7 @@
   "Voluntary moderation": "Voluntary moderation",
   "Finish voluntary mode": "Finish voluntary mode",
   "No new messages for voluntary moderation.": "No new messages for voluntary moderation.",
+  "New SecretDrops": "New SecretDrops",
   "Voluntary review": "Voluntary review",
   "Mark as OK": "Mark as OK",
   "No loaded messages to mark as reviewed.": "No loaded messages to mark as reviewed.",
@@ -336,5 +339,9 @@
   "Peak:": "Peak:",
   "Click the map or search for a place to set the location.": "Click the map or search for a place to set the location.",
   "Location picker map": "Location picker map",
-  "Search KLIPY": "Search KLIPY"
+  "Search KLIPY": "Search KLIPY",
+  "Users": "Users",
+  "Users, visible public messages and visible SecretDrops.": "Users, visible public messages and visible SecretDrops.",
+  "Visible messages": "Visible messages",
+  "Visible SecretDrops": "Visible SecretDrops"
 }
