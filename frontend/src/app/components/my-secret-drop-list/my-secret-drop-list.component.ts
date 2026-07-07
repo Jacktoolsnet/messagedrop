@@ -339,6 +339,24 @@ export class MySecretDropListComponent implements OnInit {
     return 'common.secretDrop.status.disabled';
   }
 
+
+  getValidityDisplay(drop: SecretDrop): { key: string; timestamp: number } | null {
+    const now = Math.floor(Date.now() / 1000);
+    const validFrom = Number(drop.validFrom ?? 0);
+    const validUntil = Number(drop.validUntil ?? 0);
+
+    if (validFrom > now) {
+      return { key: 'common.secretDrop.validityPublishesAt', timestamp: validFrom };
+    }
+    if (validUntil > 0 && validUntil < now) {
+      return { key: 'common.secretDrop.validityExpiredAt', timestamp: validUntil };
+    }
+    if (drop.status === 'enabled' && validUntil > now) {
+      return { key: 'common.secretDrop.validityWithdrawsAt', timestamp: validUntil };
+    }
+    return null;
+  }
+
   isDsaLockedDrop(drop: SecretDrop): boolean {
     return drop.publishState === 'dsa_locked' || (drop.status === 'disabled' && !!drop.dsaStatusToken);
   }
