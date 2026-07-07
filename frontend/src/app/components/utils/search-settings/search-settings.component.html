@@ -41,7 +41,7 @@
 </mat-dialog-content>
 
 <mat-dialog-actions class="sticky-actions" align="end">
-  <button mat-dialog-close cdkFocusInitial (click)="onCancel()" mat-icon-button
+  <button cdkFocusInitial type="button" (click)="onCancel()" mat-icon-button
     [attr.aria-label]="'common.actions.abort' | transloco" class="action-close">
     <mat-icon>close</mat-icon>
   </button>

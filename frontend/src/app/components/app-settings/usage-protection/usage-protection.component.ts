@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { DateAdapter, MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -55,7 +55,6 @@ type UsageTimePickerModel = Record<UsageProtectionDayKey, { start: Date; end: Da
     MatButtonModule,
     MatDialogContent,
     MatDialogActions,
-    MatDialogClose,
     MatIconModule,
     MatButtonToggleModule,
     MatSelectModule,
@@ -109,6 +108,8 @@ export class UsageProtectionComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.dialogRef.disableClose = true;
+
     const normalizedDailyWindows = this.normalizeDailyWindows(
       this.appSettings.usageProtection.dailyWindows,
       this.appSettings.usageProtection
@@ -207,11 +208,6 @@ export class UsageProtectionComponent implements OnInit {
         parentPinHash: undefined
       }
     };
-    const pinSettingsPatch: Partial<UsageProtectionSettings> = { parentPinHash: undefined };
-    if (current.mode === 'parental') {
-      pinSettingsPatch.mode = 'self';
-    }
-    await this.persistUsageProtectionPinSettings(pinSettingsPatch);
     this.usageProtectionUnlocked = true;
   }
 
@@ -252,7 +248,6 @@ export class UsageProtectionComponent implements OnInit {
         parentPinHash: hashed
       }
     };
-    await this.persistUsageProtectionPinSettings({ mode: 'parental', parentPinHash: hashed });
     this.usageProtectionUnlocked = true;
   }
 
@@ -751,14 +746,4 @@ export class UsageProtectionComponent implements OnInit {
     return this.usageModes;
   }
 
-  private async persistUsageProtectionPinSettings(patch: Partial<UsageProtectionSettings>): Promise<void> {
-    const currentSettings = this.appService.getAppSettings();
-    await this.appService.setAppSettings({
-      ...currentSettings,
-      usageProtection: {
-        ...currentSettings.usageProtection,
-        ...patch
-      }
-    });
-  }
 }

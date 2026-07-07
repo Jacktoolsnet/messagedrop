@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
@@ -66,7 +66,6 @@ interface SearchSettingsDialogData {
     MatDialogTitle,
     MatDialogContent,
     MatDialogActions,
-    MatDialogClose,
     MatButtonModule,
     MatIconModule,
     MatSlideToggleModule,
@@ -107,6 +106,8 @@ export class SearchSettingsComponent {
   searchSettings: SearchSettings = structuredClone(DEFAULT_SEARCH_SETTINGS);
 
   constructor() {
+    this.dialogRef.disableClose = true;
+
     if (this.dialogData.settings) {
       this.searchSettings = this.mergeSettings(this.dialogData.settings);
     }

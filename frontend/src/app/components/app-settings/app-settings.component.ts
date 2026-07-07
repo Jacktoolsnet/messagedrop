@@ -252,16 +252,20 @@ export class AppSettingsComponent implements OnInit {
 
   setSpeechVoiceMode(mode: SpeechVoiceMode): void {
     const recommendedVoiceUri = mode === 'custom' ? this.getRecommendedSpeechVoiceUri() : '';
+    const voiceUri = mode === 'system'
+      ? ''
+      : (this.appSettings.speech.voiceUri || recommendedVoiceUri);
+
     this.appSettings = {
       ...this.appSettings,
       speech: {
         ...this.appSettings.speech,
         voiceMode: mode,
-        voiceUri: mode === 'system'
-          ? ''
-          : (this.appSettings.speech.voiceUri || recommendedVoiceUri)
+        voiceUri
       }
     };
+
+    this.persistSpeechVoiceSelection(mode, voiceUri);
   }
 
   setSpeechVoiceUri(voiceUri: string): void {
@@ -269,9 +273,12 @@ export class AppSettingsComponent implements OnInit {
       ...this.appSettings,
       speech: {
         ...this.appSettings.speech,
+        voiceMode: 'custom',
         voiceUri
       }
     };
+
+    this.persistSpeechVoiceSelection('custom', voiceUri);
   }
 
   setSpeechRate(rate: number): void {
@@ -413,6 +420,30 @@ export class AppSettingsComponent implements OnInit {
 
   getSpeechVoiceOptionValue(voice: SpeechSynthesisVoice): string {
     return this.speechService.getVoiceStorageId(voice);
+  }
+
+
+  private persistSpeechVoiceSelection(voiceMode: SpeechVoiceMode, voiceUri: string): void {
+    const currentSettings = this.appService.getAppSettings();
+    const nextSettings = {
+      ...currentSettings,
+      speech: {
+        ...currentSettings.speech,
+        voiceMode,
+        voiceUri
+      }
+    };
+
+    void this.appService.setAppSettings(nextSettings).then(() => {
+      this.baselineSettings = {
+        ...this.baselineSettings,
+        speech: {
+          ...this.baselineSettings.speech,
+          voiceMode,
+          voiceUri
+        }
+      };
+    });
   }
 
   private getRecommendedSpeechVoiceUri(): string {
