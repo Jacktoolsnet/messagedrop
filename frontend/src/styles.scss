@@ -934,3 +934,19 @@ h2[mat-dialog-title].dialog-title {
     transform: none !important;
   }
 }
+
+/* Prevent touch/click-through when a Material menu opens under the finger on small touch screens. */
+@media (pointer: coarse) {
+  .cdk-overlay-pane .mat-mdc-menu-panel {
+    animation: menu-touch-open-guard 220ms step-end;
+  }
+}
+
+@keyframes menu-touch-open-guard {
+  0%, 99% {
+    pointer-events: none;
+  }
+  100% {
+    pointer-events: auto;
+  }
+}
