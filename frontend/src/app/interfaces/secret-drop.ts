@@ -54,6 +54,15 @@ export interface SecretDrop {
   consumedAt?: number | null;
   dsaStatusToken?: string | null;
   dsaStatusTokenCreatedAt?: number | null;
+  aiModerationDecision?: string | null;
+  aiModerationScore?: number | null;
+  aiModerationFlagged?: boolean | null;
+  patternMatch?: boolean | null;
+  aiModerationAt?: number | null;
+  manualModerationDecision?: string | null;
+  manualModerationReason?: string | null;
+  manualModerationAt?: number | null;
+  manualModerationBy?: string | null;
 }
 
 

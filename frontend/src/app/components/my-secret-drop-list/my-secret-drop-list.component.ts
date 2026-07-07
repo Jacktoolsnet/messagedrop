@@ -266,6 +266,10 @@ export class MySecretDropListComponent implements OnInit {
       });
     } catch (error) {
       if (error instanceof Error && (error.message === 'moderation_rejected' || error.message === 'moderation_rejected_pattern')) {
+        await this.secretDropService.markAutomatedModerationRejected(
+          drop.uuid,
+          error.message === 'moderation_rejected_pattern' ? 'pattern' : 'ai'
+        );
         this.showModerationRejected(
           error.message === 'moderation_rejected_pattern'
             ? 'common.message.moderationRejectedPattern'
@@ -366,8 +370,15 @@ export class MySecretDropListComponent implements OnInit {
   }
 
   canPublishDrop(drop: SecretDrop): boolean {
-    if (this.isDsaLockedDrop(drop)) return false;
+    if (this.isDsaLockedDrop(drop) || this.isRejectedByAutomatedModeration(drop)) return false;
     return drop.status === 'disabled' || drop.status === 'consumed' || drop.publishState === 'draft' || !!drop.localOnly;
+  }
+
+  private isRejectedByAutomatedModeration(drop: SecretDrop): boolean {
+    if (String(drop.manualModerationDecision ?? '').toLowerCase() === 'approved') {
+      return false;
+    }
+    return String(drop.aiModerationDecision ?? '').toLowerCase() === 'rejected' || drop.patternMatch === true;
   }
 
   canUnpublishDrop(drop: SecretDrop): boolean {

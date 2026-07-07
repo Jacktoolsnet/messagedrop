@@ -86,6 +86,9 @@ export class EditSecretDropComponent {
   private readonly translation = inject(TranslationHelperService);
   readonly help = inject(HelpDialogService);
   private readonly maxValidityWindowSeconds = 30 * 24 * 60 * 60;
+  private readonly initialModerationRejected = this.isRejectedByAutomatedModeration(this.data.secretDrop);
+  private readonly originalModerationText = String(this.data.secretDrop?.message ?? '').trim();
+  private readonly originalModerationHint = String(this.data.secretDrop?.hint ?? '').trim();
 
   location: Location = { ...this.data.location };
   message = '';
@@ -141,6 +144,12 @@ export class EditSecretDropComponent {
 
   get hasSecretContent(): boolean {
     return this.message.trim().length > 0 || this.hasMultimedia;
+  }
+
+  get publishDisabled(): boolean {
+    return this.saving()
+      || !this.hasSecretContent
+      || (this.initialModerationRejected && !this.hasModerationRelevantContentChanged());
   }
 
   get activeContacts(): Contact[] {
@@ -233,7 +242,7 @@ export class EditSecretDropComponent {
       const moderationErrorKey = await this.getSecretTextModerationErrorKey();
       if (moderationErrorKey) {
         if (!this.incognitoPublish) {
-          await this.saveLocalDraft({ close: false, showSnack: false });
+          await this.saveLocalDraft({ close: false, showSnack: false, moderationRejectedKey: moderationErrorKey });
           this.dialogRef.close(true);
         }
         this.showModerationRejected(moderationErrorKey);
@@ -330,7 +339,7 @@ export class EditSecretDropComponent {
     };
   }
 
-  private async saveLocalDraft(options: { close?: boolean; showSnack?: boolean } = {}): Promise<void> {
+  private async saveLocalDraft(options: { close?: boolean; showSnack?: boolean; moderationRejectedKey?: string | null } = {}): Promise<void> {
     const close = options.close !== false;
     const showSnack = options.showSnack !== false;
     const userId = this.userService.getUser().id;
@@ -360,6 +369,14 @@ export class EditSecretDropComponent {
       recipientUserIds: this.visibility === 'contacts' ? [...this.selectedRecipientUserIds] : [],
       status: 'disabled',
       publishState: 'draft',
+      aiModerationDecision: options.moderationRejectedKey ? 'rejected' : null,
+      aiModerationFlagged: options.moderationRejectedKey ? true : null,
+      patternMatch: options.moderationRejectedKey === 'common.message.moderationRejectedPattern' ? true : null,
+      aiModerationAt: options.moderationRejectedKey ? Date.now() : null,
+      manualModerationDecision: null,
+      manualModerationReason: null,
+      manualModerationAt: null,
+      manualModerationBy: null,
       localOnly: this.data.secretDrop?.localOnly ?? true,
       likes: this.data.secretDrop?.likes ?? 0,
       dislikes: this.data.secretDrop?.dislikes ?? 0,
@@ -714,6 +731,21 @@ export class EditSecretDropComponent {
       disableClose: false,
       autoFocus: false
     });
+  }
+
+  private isRejectedByAutomatedModeration(drop: SecretDrop | undefined): boolean {
+    if (!drop) {
+      return false;
+    }
+    if (String(drop.manualModerationDecision ?? '').toLowerCase() === 'approved') {
+      return false;
+    }
+    return String(drop.aiModerationDecision ?? '').toLowerCase() === 'rejected' || drop.patternMatch === true;
+  }
+
+  private hasModerationRelevantContentChanged(): boolean {
+    return this.message.trim() !== this.originalModerationText
+      || this.hint.trim() !== this.originalModerationHint;
   }
 
   private detectThreateningOrAbusiveContent(text: string): boolean {

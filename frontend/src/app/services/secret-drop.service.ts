@@ -110,6 +110,31 @@ export class SecretDropService {
     return draft;
   }
 
+  async markAutomatedModerationRejected(uuid: string, reason: 'pattern' | 'ai' = 'ai'): Promise<void> {
+    const existing = this.mySecretDropsSignal().find((drop) => drop.uuid === uuid);
+    if (!existing) {
+      return;
+    }
+    const updated = this.normalizeSecretDrop({
+      ...existing,
+      status: 'disabled',
+      publishState: existing.publishState ?? 'draft',
+      aiModerationDecision: 'rejected',
+      aiModerationFlagged: true,
+      patternMatch: reason === 'pattern',
+      aiModerationAt: Date.now(),
+      manualModerationDecision: null,
+      manualModerationReason: null,
+      manualModerationAt: null,
+      manualModerationBy: null
+    });
+    this.mySecretDropsSignal.update((drops) => drops.map((drop) => drop.uuid === uuid ? updated : drop));
+    const userId = updated.userId || existing.userId || '';
+    if (userId) {
+      await this.saveOwnSecretDrops(userId, this.mySecretDropsSignal());
+    }
+  }
+
   async removeLocalSecretDrop(userId: string, uuid: string): Promise<void> {
     this.mySecretDropsSignal.update((drops) => drops.filter((drop) => drop.uuid !== uuid));
     await this.saveOwnSecretDrops(userId, this.mySecretDropsSignal());
@@ -397,6 +422,15 @@ export class SecretDropService {
       encryptedPayload: this.parseJsonField(source.encryptedPayload),
       dsaStatusToken: source.dsaStatusToken ?? null,
       dsaStatusTokenCreatedAt: source.dsaStatusTokenCreatedAt === null || source.dsaStatusTokenCreatedAt === undefined ? null : Number(source.dsaStatusTokenCreatedAt),
+      aiModerationDecision: source.aiModerationDecision ?? null,
+      aiModerationScore: source.aiModerationScore === null || source.aiModerationScore === undefined ? null : Number(source.aiModerationScore),
+      aiModerationFlagged: source.aiModerationFlagged ?? null,
+      patternMatch: source.patternMatch ?? null,
+      aiModerationAt: source.aiModerationAt === null || source.aiModerationAt === undefined ? null : Number(source.aiModerationAt),
+      manualModerationDecision: source.manualModerationDecision ?? null,
+      manualModerationReason: source.manualModerationReason ?? null,
+      manualModerationAt: source.manualModerationAt === null || source.manualModerationAt === undefined ? null : Number(source.manualModerationAt),
+      manualModerationBy: source.manualModerationBy ?? null,
       publishState: source.publishState ?? (source.status === 'disabled' && source.dsaStatusToken ? 'dsa_locked' : (source.status === 'enabled' ? 'published' : 'unpublished')),
       localOnly: source.localOnly ?? false,
       maxUnlocks: source.maxUnlocks === null || source.maxUnlocks === undefined ? null : Number(source.maxUnlocks),
