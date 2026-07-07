@@ -165,14 +165,16 @@ export class SecretDropCommentsDialogComponent implements OnInit {
       return;
     }
 
-    const moderationErrorKey = await this.getModerationErrorKey(result.text);
-    if (moderationErrorKey) {
-      this.showModerationRejected(moderationErrorKey);
-      return;
-    }
-
     this.loading.set(true);
+    const publishingDialogRef = this.openCommentPublishingMessage();
     try {
+      const moderationErrorKey = await this.getModerationErrorKey(result.text);
+      if (moderationErrorKey) {
+        publishingDialogRef.close();
+        this.showModerationRejected(moderationErrorKey);
+        return;
+      }
+
       const encrypted = await this.cryptoService.encryptSecret(
         result.text.trim(),
         this.data.pin,
@@ -203,8 +205,33 @@ export class SecretDropCommentsDialogComponent implements OnInit {
         panelClass: 'snack-error'
       });
     } finally {
+      publishingDialogRef.close();
       this.loading.set(false);
     }
+  }
+
+  private openCommentPublishingMessage(): MatDialogRef<DisplayMessage> {
+    return this.dialog.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: {
+        showAlways: true,
+        title: this.translation.t('common.secretDropComments.addTitle'),
+        image: '',
+        icon: '',
+        message: this.translation.t('common.message.publishing'),
+        button: '',
+        delay: 0,
+        showSpinner: true,
+        autoclose: false
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: true,
+      autoFocus: false
+    });
   }
 
 
