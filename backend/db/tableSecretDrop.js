@@ -470,11 +470,10 @@ async function discoverByPlusCode(db, discoveryPlusCode, nowSeconds, zoomLevel =
     WHERE discoveryPlusCode = UPPER(?)
       ${zoomCondition}
       ${visibilityCondition}
-      AND status = '${secretDropStatus.ENABLED}'
+      AND status IN ('${secretDropStatus.ENABLED}', '${secretDropStatus.CONSUMED}')
       AND (validFrom IS NULL OR validFrom <= ?)
       AND (validUntil IS NULL OR validUntil >= ?)
-      AND (maxUnlocks IS NULL OR unlockCount < maxUnlocks)
-    ORDER BY createdAt DESC
+    ORDER BY CASE WHEN status = '${secretDropStatus.CONSUMED}' THEN 1 ELSE 0 END ASC, createdAt DESC
     LIMIT 25;
   `, [...params, ...visibilityParams, nowSeconds, nowSeconds]);
   return rows.map((row) => mapSecretDropRow(row, { includeEncryptedPayload: false, includeCryptoMetadata: true }));

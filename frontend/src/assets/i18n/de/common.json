@@ -1887,6 +1887,8 @@
       "invalidPin": "Der PIN ist leider nicht richtig.",
       "tooManyUnlockAttempts": "Zu viele PIN-Versuche. Bitte warte kurz und versuche es dann erneut.",
       "consumed": "Dieses Geheimnis wurde bereits geöffnet.",
+      "consumedLabel": "Hinweis",
+      "consumedHint": "Dieses einmalige Geheimnis wurde bereits geöffnet und kann nicht erneut entschlüsselt werden.",
       "notInValidityWindow": "Dieses Geheimnis ist aktuell nicht gültig.",
       "readMode": "Lesbarkeit",
       "oneTime": "Einmalig lesbar",

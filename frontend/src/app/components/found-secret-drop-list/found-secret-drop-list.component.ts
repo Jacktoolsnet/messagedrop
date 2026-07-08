@@ -187,6 +187,23 @@ export class FoundSecretDropListComponent {
     this.dialogRef.close();
   }
 
+  sortedDrops(): SecretDrop[] {
+    return [...this.data.drops].sort((a, b) => {
+      const consumedDelta = Number(this.isConsumedDrop(a)) - Number(this.isConsumedDrop(b));
+      if (consumedDelta !== 0) {
+        return consumedDelta;
+      }
+      return Number(b.createdAt ?? 0) - Number(a.createdAt ?? 0);
+    });
+  }
+
+  isConsumedDrop(drop: SecretDrop): boolean {
+    const displayDrop = this.getDisplayDrop(drop);
+    const maxUnlocks = displayDrop.maxUnlocks;
+    return displayDrop.status === 'consumed'
+      || (maxUnlocks !== null && maxUnlocks !== undefined && Number(displayDrop.unlockCount ?? 0) >= Number(maxUnlocks));
+  }
+
   isUnlocked(drop: SecretDrop): boolean {
     return !!this.unlocked()[drop.uuid];
   }
@@ -202,6 +219,10 @@ export class FoundSecretDropListComponent {
     return !!unlocked
       && this.userService.hasJwt()
       && String(unlocked.drop.userId || '') === String(this.userService.getUser().id || '');
+  }
+
+  canReportSecretDrop(drop: SecretDrop): boolean {
+    return !!this.getUnlocked(drop) && !this.isOwnUnlockedDrop(drop);
   }
 
   canPublishDrop(drop: SecretDrop): boolean {
@@ -754,6 +775,10 @@ export class FoundSecretDropListComponent {
 
   async unlock(drop: SecretDrop): Promise<void> {
     if (this.unlockingUuid()) {
+      return;
+    }
+    if (this.isConsumedDrop(drop)) {
+      this.showWarning('common.secretDropDiscovery.consumed');
       return;
     }
     const pin = await this.openPinDialog();

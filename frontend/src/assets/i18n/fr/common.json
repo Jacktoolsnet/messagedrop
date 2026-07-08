@@ -1878,6 +1878,8 @@
       "invalidPin": "Le PIN est incorrect.",
       "tooManyUnlockAttempts": "Trop de tentatives de PIN. Veuillez patienter un instant puis réessayer.",
       "consumed": "Ce secret a déjà été ouvert.",
+      "consumedLabel": "Information",
+      "consumedHint": "Ce secret à usage unique a déjà été ouvert et ne peut plus être déchiffré.",
       "notInValidityWindow": "Ce secret n’est pas valide actuellement.",
       "readMode": "Mode de lecture",
       "oneTime": "Lisible une fois",

@@ -1887,6 +1887,8 @@
       "invalidPin": "The PIN is not correct.",
       "tooManyUnlockAttempts": "Too many PIN attempts. Please wait a moment and try again.",
       "consumed": "This secret has already been opened.",
+      "consumedLabel": "Notice",
+      "consumedHint": "This one-time secret has already been opened and cannot be decrypted again.",
       "notInValidityWindow": "This secret is not currently valid.",
       "readMode": "Read mode",
       "oneTime": "Readable once",
