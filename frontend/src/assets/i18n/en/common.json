@@ -1882,6 +1882,7 @@
       "foundAtZoom": "Findable from zoom {{ zoom }}",
       "unlockAction": "Unlock",
       "pinEnterHint": "Enter the SecretDrop PIN.",
+      "pinCheckTitle": "PIN check",
       "unlockSuccess": "Secret unlocked.",
       "unlockFailed": "The secret could not be unlocked.",
       "invalidPin": "The PIN is not correct.",

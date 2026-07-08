@@ -1873,6 +1873,7 @@
       "foundAtZoom": "Se puede encontrar desde zoom {{ zoom }}",
       "unlockAction": "Desbloquear",
       "pinEnterHint": "Introduce el PIN del SecretDrop.",
+      "pinCheckTitle": "Comprobación del PIN",
       "unlockSuccess": "Secreto desbloqueado.",
       "unlockFailed": "No se pudo desbloquear el secreto.",
       "invalidPin": "El PIN no es correcto.",

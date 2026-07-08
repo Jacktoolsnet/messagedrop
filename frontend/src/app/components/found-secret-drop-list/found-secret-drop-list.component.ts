@@ -864,7 +864,7 @@ export class FoundSecretDropListComponent {
       closeOnNavigation: false,
       data: {
         showAlways: true,
-        title: this.translation.t('common.secretDropDiscovery.title'),
+        title: this.translation.t('common.secretDropDiscovery.pinCheckTitle'),
         image: '',
         icon: 'warning',
         message: this.translation.t(messageKey),

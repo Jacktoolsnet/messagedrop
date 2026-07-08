@@ -1882,6 +1882,7 @@
       "foundAtZoom": "Findbar ab Zoom {{ zoom }}",
       "unlockAction": "Entsperren",
       "pinEnterHint": "Gib den Geheimnis-PIN ein.",
+      "pinCheckTitle": "PIN-Prüfung",
       "unlockSuccess": "Geheimnis entsperrt.",
       "unlockFailed": "Das Geheimnis konnte nicht entsperrt werden.",
       "invalidPin": "Der PIN ist leider nicht richtig.",
