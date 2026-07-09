@@ -182,7 +182,6 @@
         "notes": "Notizen",
         "experiences": "Erlebnisse",
         "publicMessages": "Öffentliche Nachrichten",
-        "secretDrops": "GeheimnisDrops",
         "comments": "Kommentare"
       }
     },
@@ -1507,6 +1506,7 @@
       "zoomValue": "Zoom",
       "items": {
         "publicMessages": "Öffentliche Nachrichten",
+        "secretDrops": "GeheimnisDrops",
         "privateNotes": "Private Notizen",
         "privateImages": "Private Bilder",
         "privateDocuments": "Private Dokumente",
