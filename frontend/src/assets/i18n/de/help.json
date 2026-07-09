@@ -2831,27 +2831,47 @@
   },
   "editSecretDrop": {
     "title": "GeheimnisDrop erstellen",
-    "intro": "Erstelle einen geheimen, passwortgeschützten Drop. Text und Multimedia werden im Browser verschlüsselt; ohne Passwort kann MessageDrop den Inhalt nicht lesen.",
+    "intro": "Erstelle einen geheimen, PIN-geschützten Drop. Text und Multimedia werden im Browser verschlüsselt; ohne PIN kann MessageDrop den Inhalt nicht lesen.",
     "items": {
       "content": {
         "title": "Inhalt hinzufügen",
-        "desc": "Füge geheimen Text und optional ein Multimedia-Element hinzu. Beides wird zusammen verschlüsselt."
+        "desc": "Füge geheimen Text und optional ein Multimedia-Element hinzu. Beides wird zusammen verschlüsselt. Mindestens Text oder Multimedia ist erforderlich."
       },
       "hint": {
         "title": "Hinweis formulieren",
-        "desc": "Der Hinweis kann als Rätsel dienen, damit Finder das Passwort erraten können."
+        "desc": "Der Hinweis ist öffentlich sichtbar, sobald der Drop gefunden wurde. Er kann als Rätsel dienen, damit Finder die PIN erraten können."
       },
-      "password": {
-        "title": "Passwort setzen",
-        "desc": "Das Passwort schützt und entschlüsselt den Inhalt. Es wird nicht gespeichert und kann nicht wiederhergestellt werden."
+      "pin": {
+        "title": "PIN setzen",
+        "desc": "Die PIN schützt und entschlüsselt den Inhalt. Sie wird nicht im Klartext gespeichert und kann nicht wiederhergestellt werden."
       },
-      "rules": {
-        "title": "Regeln festlegen",
-        "desc": "Bestimme, ob der Drop nur einmal gelesen werden kann und ob er nur in einem Zeitfenster gültig ist."
+      "oneTime": {
+        "title": "Nur einmal lesbar",
+        "desc": "Ist diese Option aktiv, kann der GeheimnisDrop nach dem ersten erfolgreichen Entsperren nicht erneut geöffnet werden. Er bleibt bis zur normalen Löschung sichtbar."
+      },
+      "contacts": {
+        "title": "Kontakte einschränken",
+        "desc": "Mit „Nur für ausgewählte Kontakte auffindbar“ können nur die ausgewählten Kontakte den Drop finden. Ohne diese Einschränkung ist er öffentlich auffindbar."
+      },
+      "incognito": {
+        "title": "Inkognito veröffentlichen",
+        "desc": "Inkognito-Drops werden nach dem Veröffentlichen nicht in deiner lokalen „Meine GeheimnisDrops“-Liste gespeichert. Nutze das nur, wenn du den Drop später nicht mehr verwalten musst."
+      },
+      "showOnMap": {
+        "title": "Auf Karte anzeigen",
+        "desc": "Wenn diese Option aktiv ist, erscheint der Drop als sichtbarer Marker auf der Karte, sobald Sucheinstellung und Fund-Zoomlevel erreicht sind. Ohne diese Option kann er nur über den passenden Ort gefunden werden."
+      },
+      "validity": {
+        "title": "Start- und Ablaufzeit",
+        "desc": "Optional kannst du festlegen, ab wann der Drop gültig ist und wann er endet. Das Zeitfenster darf höchstens 30 Tage betragen; ohne Ablaufzeit wird automatisch ein passendes Ende gesetzt."
+      },
+      "zoom": {
+        "title": "Fund-Zoomlevel",
+        "desc": "Lege fest, ab welchem Kartenzoom der Drop sichtbar bzw. auffindbar wird. Zusätzlich müssen die Sucheinstellungen des Finders SecretDrops erlauben und mindestens dieses Zoomlevel erreichen."
       },
       "location": {
         "title": "Ort wählen",
-        "desc": "Lege fest, an welchem Kartenort der GeheimnisDrop später gefunden werden soll."
+        "desc": "Lege fest, an welchem Kartenort der GeheimnisDrop später gefunden werden soll. Der gewählte Ort bestimmt auch den PlusCode-Bereich für die Suche."
       }
     }
   }

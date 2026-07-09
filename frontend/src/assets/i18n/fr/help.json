@@ -2813,27 +2813,47 @@
   },
   "editSecretDrop": {
     "title": "Créer un SecretDrop",
-    "intro": "Crée un drop secret protégé par mot de passe. Le texte et le multimédia sont chiffrés dans le navigateur ; MessageDrop ne peut pas lire le contenu sans le mot de passe.",
+    "intro": "Crée un drop secret protégé par PIN. Le texte et le multimédia sont chiffrés dans le navigateur ; MessageDrop ne peut pas lire le contenu sans le PIN.",
     "items": {
       "content": {
         "title": "Ajouter du contenu",
-        "desc": "Ajoute un texte secret et éventuellement un élément multimédia. Les deux sont chiffrés ensemble."
+        "desc": "Ajoute un texte secret et éventuellement un élément multimédia. Les deux sont chiffrés ensemble. Un texte ou un média est requis au minimum."
       },
       "hint": {
         "title": "Écrire un indice",
-        "desc": "L’indice peut être une énigme pour aider à deviner le mot de passe."
+        "desc": "L’indice est visible publiquement lorsque le drop est trouvé. Il peut servir d’énigme pour aider à deviner le PIN."
       },
-      "password": {
-        "title": "Définir le mot de passe",
-        "desc": "Le mot de passe protège et déchiffre le contenu. Il n’est pas stocké et ne peut pas être récupéré."
+      "pin": {
+        "title": "Définir le PIN",
+        "desc": "Le PIN protège et déchiffre le contenu. Il n’est pas stocké en clair et ne peut pas être récupéré."
       },
-      "rules": {
-        "title": "Définir les règles",
-        "desc": "Choisis si le drop n’est lisible qu’une seule fois et s’il est limité à une période."
+      "oneTime": {
+        "title": "Lisible une seule fois",
+        "desc": "Si cette option est active, le SecretDrop ne peut plus être ouvert après le premier déverrouillage réussi. Il reste visible jusqu’à sa suppression normale."
+      },
+      "contacts": {
+        "title": "Limiter aux contacts",
+        "desc": "Avec « Trouvable uniquement par les contacts sélectionnés », seuls ces contacts peuvent trouver le drop. Sans cette restriction, il est trouvable publiquement."
+      },
+      "incognito": {
+        "title": "Publier en incognito",
+        "desc": "Les drops incognito ne sont pas enregistrés dans ta liste locale « Mes SecretDrops » après publication. Utilise cette option seulement si tu n’as pas besoin de le gérer plus tard."
+      },
+      "showOnMap": {
+        "title": "Afficher sur la carte",
+        "desc": "Si cette option est active, le drop apparaît comme marqueur visible sur la carte lorsque le réglage de recherche et le niveau de zoom de découverte sont atteints. Sans elle, il ne peut être trouvé qu’au lieu correspondant."
+      },
+      "validity": {
+        "title": "Heure de début et de fin",
+        "desc": "Tu peux définir quand le drop devient valide et quand il se termine. La période ne peut pas dépasser 30 jours ; sans heure de fin, une fin adaptée est définie automatiquement."
+      },
+      "zoom": {
+        "title": "Niveau de zoom de découverte",
+        "desc": "Définis à partir de quel zoom de carte le drop devient visible ou trouvable. Les réglages de recherche du visiteur doivent aussi autoriser les SecretDrops et atteindre au moins ce zoom."
       },
       "location": {
         "title": "Choisir le lieu",
-        "desc": "Définis où le SecretDrop pourra être trouvé sur la carte."
+        "desc": "Définis où le SecretDrop pourra être trouvé sur la carte. Le lieu choisi détermine aussi la zone PlusCode utilisée pour la recherche."
       }
     }
   }

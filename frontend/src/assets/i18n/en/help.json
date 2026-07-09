@@ -2831,27 +2831,47 @@
   },
   "editSecretDrop": {
     "title": "Create SecretDrop",
-    "intro": "Create a secret password-protected drop. Text and multimedia are encrypted in your browser; MessageDrop cannot read the content without the password.",
+    "intro": "Create a secret PIN-protected drop. Text and multimedia are encrypted in your browser; MessageDrop cannot read the content without the PIN.",
     "items": {
       "content": {
         "title": "Add content",
-        "desc": "Add secret text and optionally a multimedia item. Both are encrypted together."
+        "desc": "Add secret text and optionally a multimedia item. Both are encrypted together. At least text or multimedia is required."
       },
       "hint": {
         "title": "Write a hint",
-        "desc": "The hint can be a riddle to help finders guess the password."
+        "desc": "The hint is visible publicly once the drop is found. It can be a riddle to help finders guess the PIN."
       },
-      "password": {
-        "title": "Set password",
-        "desc": "The password protects and decrypts the content. It is not stored and cannot be recovered."
+      "pin": {
+        "title": "Set PIN",
+        "desc": "The PIN protects and decrypts the content. It is not stored in plain text and cannot be recovered."
       },
-      "rules": {
-        "title": "Set rules",
-        "desc": "Choose whether the drop is readable only once and whether it is valid only during a time window."
+      "oneTime": {
+        "title": "Readable once",
+        "desc": "When enabled, the SecretDrop cannot be opened again after the first successful unlock. It remains visible until normal deletion rules remove it."
+      },
+      "contacts": {
+        "title": "Limit to contacts",
+        "desc": "With “Only discoverable for selected contacts”, only those contacts can find the drop. Without this restriction it is publicly discoverable."
+      },
+      "incognito": {
+        "title": "Publish incognito",
+        "desc": "Incognito drops are not saved to your local “My SecretDrops” list after publishing. Use this only if you do not need to manage the drop later."
+      },
+      "showOnMap": {
+        "title": "Show on map",
+        "desc": "When enabled, the drop appears as a visible marker on the map once the search setting and discovery zoom level are reached. Without it, it can only be found at the matching location."
+      },
+      "validity": {
+        "title": "Start and end time",
+        "desc": "Optionally define when the drop becomes valid and when it ends. The window may be at most 30 days; without an end time, a suitable end is set automatically."
+      },
+      "zoom": {
+        "title": "Discovery zoom level",
+        "desc": "Choose from which map zoom the drop becomes visible or discoverable. The finder’s search settings must also allow SecretDrops and reach at least this zoom level."
       },
       "location": {
         "title": "Choose location",
-        "desc": "Set where on the map the SecretDrop can be found later."
+        "desc": "Set where on the map the SecretDrop can be found later. The selected location also determines the PlusCode area used for discovery."
       }
     }
   }

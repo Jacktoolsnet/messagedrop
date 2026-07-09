@@ -2813,27 +2813,47 @@
   },
   "editSecretDrop": {
     "title": "Crear SecretDrop",
-    "intro": "Crea un drop secreto protegido por contraseña. Texto y multimedia se cifran en el navegador; MessageDrop no puede leer el contenido sin la contraseña.",
+    "intro": "Crea un drop secreto protegido por PIN. El texto y el contenido multimedia se cifran en el navegador; MessageDrop no puede leer el contenido sin el PIN.",
     "items": {
       "content": {
         "title": "Añadir contenido",
-        "desc": "Añade texto secreto y opcionalmente multimedia. Todo se cifra junto."
+        "desc": "Añade texto secreto y, opcionalmente, un elemento multimedia. Todo se cifra junto. Se requiere al menos texto o multimedia."
       },
       "hint": {
         "title": "Escribir pista",
-        "desc": "La pista puede ser un acertijo para ayudar a adivinar la contraseña."
+        "desc": "La pista es visible públicamente cuando se encuentra el drop. Puede servir como acertijo para ayudar a adivinar el PIN."
       },
-      "password": {
-        "title": "Definir contraseña",
-        "desc": "La contraseña protege y descifra el contenido. No se guarda y no se puede recuperar."
+      "pin": {
+        "title": "Definir PIN",
+        "desc": "El PIN protege y descifra el contenido. No se guarda en texto claro y no se puede recuperar."
       },
-      "rules": {
-        "title": "Definir reglas",
-        "desc": "Elige si el drop se puede leer solo una vez y si solo es válido durante un periodo."
+      "oneTime": {
+        "title": "Legible una sola vez",
+        "desc": "Si está activado, el SecretDrop no se puede abrir de nuevo después del primer desbloqueo correcto. Sigue visible hasta que lo eliminen las reglas normales."
+      },
+      "contacts": {
+        "title": "Limitar a contactos",
+        "desc": "Con “Solo visible para contactos seleccionados”, solo esos contactos pueden encontrar el drop. Sin esta restricción, se puede encontrar públicamente."
+      },
+      "incognito": {
+        "title": "Publicar de incógnito",
+        "desc": "Los drops de incógnito no se guardan en tu lista local “Mis SecretDrops” después de publicarlos. Úsalo solo si no necesitas administrarlo más tarde."
+      },
+      "showOnMap": {
+        "title": "Mostrar en el mapa",
+        "desc": "Si está activado, el drop aparece como marcador visible cuando se cumplen la configuración de búsqueda y el nivel de zoom de descubrimiento. Sin esta opción, solo se encuentra en el lugar correspondiente."
+      },
+      "validity": {
+        "title": "Inicio y fin",
+        "desc": "Opcionalmente puedes definir cuándo el drop pasa a ser válido y cuándo termina. El periodo puede ser de máximo 30 días; sin hora de fin, se establece una automáticamente."
+      },
+      "zoom": {
+        "title": "Nivel de zoom de descubrimiento",
+        "desc": "Define desde qué zoom del mapa el drop será visible o encontrable. La configuración de búsqueda del usuario también debe permitir SecretDrops y alcanzar al menos ese zoom."
       },
       "location": {
         "title": "Elegir ubicación",
-        "desc": "Define dónde se podrá encontrar el SecretDrop en el mapa."
+        "desc": "Define dónde se podrá encontrar el SecretDrop en el mapa. La ubicación elegida también determina el área PlusCode usada para la búsqueda."
       }
     }
   }

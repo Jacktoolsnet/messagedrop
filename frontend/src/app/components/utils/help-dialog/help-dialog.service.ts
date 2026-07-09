@@ -1694,8 +1694,13 @@ const HELP_TOPICS = {
     items: [
       { icon: 'password', titleKey: 'editSecretDrop.items.content.title', descriptionKey: 'editSecretDrop.items.content.desc' },
       { icon: 'psychology_alt', titleKey: 'editSecretDrop.items.hint.title', descriptionKey: 'editSecretDrop.items.hint.desc' },
-      { icon: 'key', titleKey: 'editSecretDrop.items.password.title', descriptionKey: 'editSecretDrop.items.password.desc' },
-      { icon: 'tune', titleKey: 'editSecretDrop.items.rules.title', descriptionKey: 'editSecretDrop.items.rules.desc' },
+      { icon: 'pin', titleKey: 'editSecretDrop.items.pin.title', descriptionKey: 'editSecretDrop.items.pin.desc' },
+      { icon: 'looks_one', titleKey: 'editSecretDrop.items.oneTime.title', descriptionKey: 'editSecretDrop.items.oneTime.desc' },
+      { icon: 'group', titleKey: 'editSecretDrop.items.contacts.title', descriptionKey: 'editSecretDrop.items.contacts.desc' },
+      { icon: 'visibility_off', titleKey: 'editSecretDrop.items.incognito.title', descriptionKey: 'editSecretDrop.items.incognito.desc' },
+      { icon: 'map', titleKey: 'editSecretDrop.items.showOnMap.title', descriptionKey: 'editSecretDrop.items.showOnMap.desc' },
+      { icon: 'event', titleKey: 'editSecretDrop.items.validity.title', descriptionKey: 'editSecretDrop.items.validity.desc' },
+      { icon: 'zoom_in_map', titleKey: 'editSecretDrop.items.zoom.title', descriptionKey: 'editSecretDrop.items.zoom.desc' },
       { icon: 'place', titleKey: 'editSecretDrop.items.location.title', descriptionKey: 'editSecretDrop.items.location.desc' }
     ]
   },
