@@ -1462,16 +1462,18 @@ export class AppComponent implements OnInit {
     const zoom = this.mapService.getMapZoom();
     const ignoreSearchSettings = false;
     const isMessagesEnabled = settings.publicMessages.enabled;
+    const isSecretDropsEnabled = settings.secretDrops.enabled;
     const isNotesEnabled = settings.privateNotes.enabled;
     const isImagesEnabled = settings.privateImages.enabled;
     const isDocumentsEnabled = settings.privateDocuments.enabled;
     const isMyExperiencesEnabled = settings.myExperiences.enabled;
     const canSearchMessages = isMessagesEnabled && zoom >= settings.publicMessages.minZoom;
+    const canSearchSecretDrops = isSecretDropsEnabled && zoom >= settings.secretDrops.minZoom;
     const canSearchNotes = isNotesEnabled && zoom >= settings.privateNotes.minZoom;
     const canSearchImages = isImagesEnabled && zoom >= settings.privateImages.minZoom;
     const canSearchDocuments = isDocumentsEnabled && zoom >= settings.privateDocuments.minZoom;
     const canSearchMyExperiences = isMyExperiencesEnabled && zoom >= settings.myExperiences.minZoom;
-    const canSearchVisibleSecretDrops = this.networkService.browserOnline() && this.networkService.backendOnline() && !this.maintenanceActive() && zoom >= 12;
+    const canSearchVisibleSecretDrops = canSearchSecretDrops && this.networkService.browserOnline() && this.networkService.backendOnline() && !this.maintenanceActive();
     // notes from local device
     if (this.userService.isReady()) {
       if (canSearchNotes) {
@@ -1520,6 +1522,7 @@ export class AppComponent implements OnInit {
   private normalizeSearchSettings(settings?: SearchSettings): SearchSettings {
     return {
       publicMessages: { ...DEFAULT_SEARCH_SETTINGS.publicMessages, ...(settings?.publicMessages ?? {}) },
+      secretDrops: { ...DEFAULT_SEARCH_SETTINGS.secretDrops, ...(settings?.secretDrops ?? {}) },
       privateNotes: { ...DEFAULT_SEARCH_SETTINGS.privateNotes, ...(settings?.privateNotes ?? {}) },
       privateImages: { ...DEFAULT_SEARCH_SETTINGS.privateImages, ...(settings?.privateImages ?? {}) },
       privateDocuments: { ...DEFAULT_SEARCH_SETTINGS.privateDocuments, ...(settings?.privateDocuments ?? {}) },

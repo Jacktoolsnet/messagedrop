@@ -1,5 +1,6 @@
 export type SearchSettingsKey =
   | 'publicMessages'
+  | 'secretDrops'
   | 'privateNotes'
   | 'privateImages'
   | 'privateDocuments'
@@ -15,6 +16,7 @@ export type SearchSettings = Record<SearchSettingsKey, SearchSettingsEntry>;
 
 export const DEFAULT_SEARCH_SETTINGS: SearchSettings = {
   publicMessages: { enabled: true, minZoom: 3 },
+  secretDrops: { enabled: true, minZoom: 12 },
   privateNotes: { enabled: true, minZoom: 3 },
   privateImages: { enabled: true, minZoom: 3 },
   privateDocuments: { enabled: true, minZoom: 3 },

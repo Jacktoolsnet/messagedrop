@@ -39,6 +39,7 @@ const LANGUAGE_PREVIEW_LOCATIONS: Record<string, Location> = {
 
 const SEARCH_SETTING_MARKER_ICONS: Record<SearchSettingsKey, string> = {
   publicMessages: 'assets/markers/message-marker.svg',
+  secretDrops: 'assets/markers/secretdrop-marker.svg',
   privateNotes: 'assets/markers/note-marker.svg',
   privateImages: 'assets/markers/image-marker.svg',
   privateDocuments: 'assets/markers/document-marker.svg',
@@ -87,6 +88,7 @@ export class SearchSettingsComponent {
   readonly previewLocation = this.resolvePreviewLocation();
   private readonly allItems: SearchSettingsItem[] = [
     { key: 'publicMessages', icon: 'public', titleKey: 'common.searchSettings.items.publicMessages' },
+    { key: 'secretDrops', icon: 'password', titleKey: 'common.searchSettings.items.secretDrops' },
     { key: 'privateNotes', icon: 'sticky_note_2', titleKey: 'common.searchSettings.items.privateNotes' },
     { key: 'privateImages', icon: 'image', titleKey: 'common.searchSettings.items.privateImages' },
     { key: 'privateDocuments', icon: 'description', titleKey: 'common.searchSettings.items.privateDocuments' },
@@ -98,7 +100,7 @@ export class SearchSettingsComponent {
     if (this.userService.hasJwt()) {
       return this.allItems;
     }
-    return this.allItems.filter((item) => item.key === 'publicMessages' || item.key === 'experiences');
+    return this.allItems.filter((item) => item.key === 'publicMessages' || item.key === 'secretDrops' || item.key === 'experiences');
   });
   readonly minZoom = 3;
   readonly maxZoom = 19;
@@ -150,6 +152,7 @@ export class SearchSettingsComponent {
   private mergeSettings(settings: SearchSettings): SearchSettings {
     return {
       publicMessages: { ...DEFAULT_SEARCH_SETTINGS.publicMessages, ...settings.publicMessages },
+      secretDrops: { ...DEFAULT_SEARCH_SETTINGS.secretDrops, ...settings.secretDrops },
       privateNotes: { ...DEFAULT_SEARCH_SETTINGS.privateNotes, ...settings.privateNotes },
       privateImages: { ...DEFAULT_SEARCH_SETTINGS.privateImages, ...settings.privateImages },
       privateDocuments: { ...DEFAULT_SEARCH_SETTINGS.privateDocuments, ...settings.privateDocuments },
