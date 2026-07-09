@@ -37,6 +37,7 @@ import { SelectMultimediaComponent } from '../multimedia/select-multimedia/selec
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { CreatePinComponent } from '../pin/create-pin/create-pin.component';
 import { DeleteMessageComponent } from '../messagelist/delete-message/delete-message.component';
+import { SearchSettingsMapPreviewComponent } from '../utils/search-settings/search-settings-map-preview.component';
 
 interface TextDialogResult {
   text: string;
@@ -53,6 +54,7 @@ type SecretDropCreateAction = 'publish' | 'draft';
     LocationPickerTileComponent,
     SelectMultimediaComponent,
     ShowmultimediaComponent,
+    SearchSettingsMapPreviewComponent,
     MatButtonModule,
     MatCardModule,
     MatSlideToggleModule,
@@ -95,8 +97,8 @@ export class EditSecretDropComponent {
   messageStyle = '';
   hint = '';
   hintStyle = '';
-  readonly minDiscoveryZoomLevel = 12;
-  readonly maxDiscoveryZoomLevel = 19;
+  readonly minDiscoveryZoomLevel = 3;
+  readonly maxDiscoveryZoomLevel = 18;
   pin = '';
   oneTime = true;
   visibility: 'public' | 'contacts' = 'public';
@@ -152,6 +154,15 @@ export class EditSecretDropComponent {
     return this.saving()
       || !this.hasSecretContent
       || (this.initialModerationRejected && !this.hasModerationRelevantContentChanged());
+  }
+
+
+  get discoveryPreviewMarkers(): { latitude: number; longitude: number; iconUrl: string }[] {
+    return [{
+      latitude: this.location.latitude,
+      longitude: this.location.longitude,
+      iconUrl: 'assets/markers/secretdrop-marker.svg'
+    }];
   }
 
   get activeContacts(): Contact[] {

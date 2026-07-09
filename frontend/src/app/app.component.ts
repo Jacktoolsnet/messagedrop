@@ -1608,7 +1608,7 @@ export class AppComponent implements OnInit {
 
   private async discoverSecretDropsAt(location: Location): Promise<void> {
     const zoomLevel = this.mapService.getMapZoom();
-    if (zoomLevel < 12) {
+    if (zoomLevel < 3) {
       return;
     }
     const plusCode = location.plusCode || this.geolocationService.getPlusCode(location.latitude, location.longitude);
