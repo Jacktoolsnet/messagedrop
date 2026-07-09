@@ -82,6 +82,47 @@ function normalizePlusCode(value) {
   return plusCode || null;
 }
 
+function normalizeBoolean(value, fallback = false) {
+  if (value === undefined || value === null || value === '') {
+    return fallback;
+  }
+  if (typeof value === 'boolean') {
+    return value;
+  }
+  if (typeof value === 'number') {
+    return value === 1;
+  }
+  const text = String(value).trim().toLowerCase();
+  if (['1', 'true', 'yes', 'on'].includes(text)) {
+    return true;
+  }
+  if (['0', 'false', 'no', 'off'].includes(text)) {
+    return false;
+  }
+  return fallback;
+}
+
+function normalizeLon(value) {
+  let lon = Number(value);
+  if (!Number.isFinite(lon)) return NaN;
+  while (lon < -180) lon += 360;
+  while (lon > 180) lon -= 360;
+  return lon;
+}
+
+function parseBoundingBoxParams(params) {
+  const latMin = Number(params.latMin);
+  const latMax = Number(params.latMax);
+  const lonMin = normalizeLon(params.lonMin);
+  const lonMax = normalizeLon(params.lonMax);
+  const isValidLat = (lat) => Number.isFinite(lat) && lat >= -90 && lat <= 90;
+  const isValidLon = (lon) => Number.isFinite(lon) && lon >= -180 && lon <= 180;
+  if (!isValidLat(latMin) || !isValidLat(latMax) || !isValidLon(lonMin) || !isValidLon(lonMax) || latMin === latMax || lonMin === lonMax) {
+    throw apiError.badRequest('invalid_bounding_box');
+  }
+  return { latMin, lonMin, latMax, lonMax };
+}
+
 function serializeJsonField(value, fieldName, maxLength) {
   if (value === undefined || value === null) {
     throw apiError.badRequest(`missing_${fieldName}`);
@@ -229,6 +270,7 @@ function mapPublicSecretDrop(drop) {
     visibility: drop.visibility || 'public',
     creatorMode,
     recipientUserIds: Array.isArray(drop.recipientUserIds) ? drop.recipientUserIds : [],
+    showOnMap: drop.showOnMap === true,
     createdAt: drop.createdAt
   };
   if (creatorMode !== 'incognito') {
@@ -351,6 +393,7 @@ router.post('/create', [
     const visibility = normalizeVisibility(req.body?.visibility);
     const creatorMode = normalizeCreatorMode(req.body?.creatorMode);
     const recipientUserIds = await normalizeAndValidateRecipients(db, userId, visibility, req.body?.recipientUserIds);
+    const showOnMap = normalizeBoolean(req.body?.showOnMap, false);
 
     const drop = await tableSecretDrop.create(db, {
       uuid: crypto.randomUUID(),
@@ -371,6 +414,7 @@ router.post('/create', [
       status,
       visibility,
       creatorMode,
+      showOnMap,
       recipientUserIds
     });
 
@@ -427,6 +471,7 @@ router.post('/republish/:uuid', [
     const visibility = normalizeVisibility(req.body?.visibility);
     const creatorMode = normalizeCreatorMode(req.body?.creatorMode);
     const recipientUserIds = await normalizeAndValidateRecipients(db, userId, visibility, req.body?.recipientUserIds);
+    const showOnMap = normalizeBoolean(req.body?.showOnMap, false);
 
     const drop = await tableSecretDrop.updateContent(db, uuid, userId, {
       latitude,
@@ -445,6 +490,7 @@ router.post('/republish/:uuid', [
       status: tableSecretDrop.secretDropStatus.ENABLED,
       visibility,
       creatorMode,
+      showOnMap,
       recipientUserIds
     });
     if (!drop) {
@@ -452,6 +498,25 @@ router.post('/republish/:uuid', [
     }
 
     res.status(200).json({ status: 200, secretDrop: mapPublicSecretDrop(drop) });
+  } catch (error) {
+    next(error);
+  }
+});
+
+
+router.get('/visible/boundingbox/:latMin/:lonMin/:latMax/:lonMax', security.authenticateOptional, async (req, res, next) => {
+  try {
+    const { latMin, lonMin, latMax, lonMax } = parseBoundingBoxParams(req.params);
+    const rows = await tableSecretDrop.getVisibleOnMapByBoundingBox(
+      getDb(req),
+      latMin,
+      lonMin,
+      latMax,
+      lonMax,
+      nowSeconds(),
+      getAuthUserId(req)
+    );
+    res.status(200).json({ status: 200, rows: rows.map(mapPublicSecretDrop) });
   } catch (error) {
     next(error);
   }

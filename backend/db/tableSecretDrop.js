@@ -9,6 +9,7 @@ const hintTranslationTableName = 'tableSecretDropHintTranslation';
 const recipientTableName = 'tableSecretDropRecipient';
 const columnDsaStatusToken = 'dsaStatusToken';
 const columnDsaStatusTokenCreatedAt = 'dsaStatusTokenCreatedAt';
+const columnShowOnMap = 'showOnMap';
 
 const secretDropStatus = {
   ENABLED: 'enabled',
@@ -95,7 +96,8 @@ function mapSecretDropRow(row, options = {}) {
     lastUnlockedAt: pickRowValue(row, 'lastUnlockedAt', 'lastunlockedat') === null || pickRowValue(row, 'lastUnlockedAt', 'lastunlockedat') === undefined ? null : Number(pickRowValue(row, 'lastUnlockedAt', 'lastunlockedat')),
     consumedAt: pickRowValue(row, 'consumedAt', 'consumedat') === null || pickRowValue(row, 'consumedAt', 'consumedat') === undefined ? null : Number(pickRowValue(row, 'consumedAt', 'consumedat')),
     dsaStatusToken: pickRowValue(row, columnDsaStatusToken, 'dsastatustoken') ?? null,
-    dsaStatusTokenCreatedAt: pickRowValue(row, columnDsaStatusTokenCreatedAt, 'dsastatustokencreatedat') === null || pickRowValue(row, columnDsaStatusTokenCreatedAt, 'dsastatustokencreatedat') === undefined ? null : Number(pickRowValue(row, columnDsaStatusTokenCreatedAt, 'dsastatustokencreatedat'))
+    dsaStatusTokenCreatedAt: pickRowValue(row, columnDsaStatusTokenCreatedAt, 'dsastatustokencreatedat') === null || pickRowValue(row, columnDsaStatusTokenCreatedAt, 'dsastatustokencreatedat') === undefined ? null : Number(pickRowValue(row, columnDsaStatusTokenCreatedAt, 'dsastatustokencreatedat')),
+    showOnMap: Number(pickRowValue(row, columnShowOnMap, 'showonmap') || 0) === 1
   };
   if (includeCryptoMetadata) {
     mapped.crypto = safeJsonParse(pickRowValue(row, 'crypto'), null);
@@ -150,6 +152,7 @@ const init = function (db) {
       commentsNumber INTEGER NOT NULL DEFAULT 0,
       visibility TEXT NOT NULL DEFAULT 'public',
       creatorMode TEXT NOT NULL DEFAULT 'normal',
+      ${columnShowOnMap} INTEGER NOT NULL DEFAULT 0,
       createdAt INTEGER NOT NULL DEFAULT (strftime('%s','now')),
       updatedAt INTEGER NOT NULL DEFAULT (strftime('%s','now')),
       lastUnlockedAt INTEGER DEFAULT NULL,
@@ -281,6 +284,7 @@ const init = function (db) {
     if (err) throw err;
     addColumnIfMissing(columnDsaStatusToken, 'TEXT DEFAULT NULL');
     addColumnIfMissing(columnDsaStatusTokenCreatedAt, 'INTEGER DEFAULT NULL');
+    addColumnIfMissing(columnShowOnMap, 'INTEGER NOT NULL DEFAULT 0');
   });
 };
 
@@ -288,8 +292,8 @@ async function create(db, payload) {
   const sql = `
     INSERT INTO ${tableName} (
       uuid, userId, latitude, longitude, plusCode, discoveryPlusCode, discoveryZoomLevel, hint, hintStyle,
-      encryptedPayload, crypto, authVerifierHash, maxUnlocks, validFrom, validUntil, status, visibility, creatorMode
-    ) VALUES (?, ?, ?, ?, UPPER(?), UPPER(?), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      encryptedPayload, crypto, authVerifierHash, maxUnlocks, validFrom, validUntil, status, visibility, creatorMode, ${columnShowOnMap}
+    ) VALUES (?, ?, ?, ?, UPPER(?), UPPER(?), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
   `;
   await runQuery(db, sql, [
     payload.uuid,
@@ -309,7 +313,8 @@ async function create(db, payload) {
     payload.validUntil ?? null,
     payload.status || secretDropStatus.ENABLED,
     payload.visibility || 'public',
-    payload.creatorMode || 'normal'
+    payload.creatorMode || 'normal',
+    payload.showOnMap ? 1 : 0
   ]);
   await setRecipients(db, payload.uuid, payload.recipientUserIds || []);
   return getByUuid(db, payload.uuid, { includeEncryptedPayload: false });
@@ -338,6 +343,7 @@ async function updateContent(db, uuid, userId, payload) {
         status = ?,
         visibility = ?,
         creatorMode = ?,
+        ${columnShowOnMap} = ?,
         lastUnlockedAt = NULL,
         consumedAt = NULL,
         updatedAt = strftime('%s','now')
@@ -362,6 +368,7 @@ async function updateContent(db, uuid, userId, payload) {
     payload.status || secretDropStatus.ENABLED,
     payload.visibility || 'public',
     payload.creatorMode || 'normal',
+    payload.showOnMap ? 1 : 0,
     uuid,
     userId
   ]);
@@ -476,6 +483,35 @@ async function discoverByPlusCode(db, discoveryPlusCode, nowSeconds, zoomLevel =
     ORDER BY CASE WHEN status = '${secretDropStatus.CONSUMED}' THEN 1 ELSE 0 END ASC, createdAt DESC
     LIMIT 25;
   `, [...params, ...visibilityParams, nowSeconds, nowSeconds]);
+  return rows.map((row) => mapSecretDropRow(row, { includeEncryptedPayload: false, includeCryptoMetadata: true }));
+}
+
+async function getVisibleOnMapByBoundingBox(db, latMin, lonMin, latMax, lonMax, nowSeconds, userId = null) {
+  const latLow = Math.min(Number(latMin), Number(latMax));
+  const latHigh = Math.max(Number(latMin), Number(latMax));
+  const lonA = Number(lonMin);
+  const lonB = Number(lonMax);
+  const crossesAntiMeridian = lonA > lonB;
+  const lonCondition = crossesAntiMeridian
+    ? `(longitude BETWEEN ? AND 180 OR longitude BETWEEN -180 AND ?)`
+    : `longitude BETWEEN ? AND ?`;
+  const lonParams = crossesAntiMeridian ? [lonA, lonB] : [Math.min(lonA, lonB), Math.max(lonA, lonB)];
+  const visibilityCondition = userId
+    ? `AND (COALESCE(visibility, 'public') = 'public' OR userId = ? OR EXISTS (SELECT 1 FROM ${recipientTableName} r WHERE r.secretDropUuid = ${tableName}.uuid AND r.recipientUserId = ?))`
+    : `AND COALESCE(visibility, 'public') = 'public'`;
+  const visibilityParams = userId ? [userId, userId] : [];
+  const rows = await allQuery(db, `
+    SELECT * FROM ${tableName}
+    WHERE ${columnShowOnMap} = 1
+      AND status IN ('${secretDropStatus.ENABLED}', '${secretDropStatus.CONSUMED}')
+      AND latitude BETWEEN ? AND ?
+      AND (${lonCondition})
+      ${visibilityCondition}
+      AND (validFrom IS NULL OR validFrom <= ?)
+      AND (validUntil IS NULL OR validUntil >= ?)
+    ORDER BY CASE WHEN status = '${secretDropStatus.CONSUMED}' THEN 1 ELSE 0 END ASC, createdAt DESC
+    LIMIT 256;
+  `, [latLow, latHigh, ...lonParams, ...visibilityParams, nowSeconds, nowSeconds]);
   return rows.map((row) => mapSecretDropRow(row, { includeEncryptedPayload: false, includeCryptoMetadata: true }));
 }
 
@@ -798,6 +834,7 @@ module.exports = {
   getById,
   getRawByUuid,
   discoverByPlusCode,
+  getVisibleOnMapByBoundingBox,
   getByUserId,
   cleanExpired,
   recordFailedUnlock,

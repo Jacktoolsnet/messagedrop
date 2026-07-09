@@ -4,6 +4,7 @@ import { Location } from "./location";
 import { MarkerType } from "./marker-type";
 import { Message } from "./message";
 import { Note } from "./note";
+import { SecretDrop } from "./secret-drop";
 import { ExperienceResult, ViatorDestinationLookup } from "./viator";
 
 export interface MarkerLocation {
@@ -14,5 +15,6 @@ export interface MarkerLocation {
     documents: LocalDocument[];
     experiences?: ViatorDestinationLookup[];
     myExperiences?: ExperienceResult[];
+    secretDrops?: SecretDrop[];
     type: MarkerType
 }

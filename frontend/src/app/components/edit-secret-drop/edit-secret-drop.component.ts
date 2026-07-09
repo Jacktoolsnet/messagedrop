@@ -101,6 +101,7 @@ export class EditSecretDropComponent {
   oneTime = true;
   visibility: 'public' | 'contacts' = 'public';
   incognitoPublish = false;
+  showOnMap = false;
   selectedRecipientUserIds: string[] = [];
   discoveryZoomLevel = 18;
   useValidFrom = false;
@@ -126,6 +127,7 @@ export class EditSecretDropComponent {
     this.oneTime = drop.maxUnlocks === 1;
     this.visibility = drop.visibility === 'contacts' ? 'contacts' : 'public';
     this.incognitoPublish = drop.creatorMode === 'incognito';
+    this.showOnMap = drop.showOnMap === true;
     this.selectedRecipientUserIds = Array.isArray(drop.recipientUserIds) ? [...drop.recipientUserIds] : [];
     this.discoveryZoomLevel = this.clampDiscoveryZoomLevel(drop.discoveryZoomLevel);
     this.useValidFrom = drop.validFrom !== null && drop.validFrom !== undefined;
@@ -334,6 +336,7 @@ export class EditSecretDropComponent {
       validUntil: validityWindow.validUntil,
       visibility: this.visibility,
       creatorMode: this.incognitoPublish ? 'incognito' : 'normal',
+      showOnMap: this.showOnMap,
       recipientUserIds: this.visibility === 'contacts' ? [...this.selectedRecipientUserIds] : [],
       publishState: 'published'
     };
@@ -366,6 +369,7 @@ export class EditSecretDropComponent {
       validUntil: validityWindow.validUntil,
       visibility: this.visibility,
       creatorMode: this.incognitoPublish ? 'incognito' : 'normal',
+      showOnMap: this.showOnMap,
       recipientUserIds: this.visibility === 'contacts' ? [...this.selectedRecipientUserIds] : [],
       status: 'disabled',
       publishState: 'draft',
@@ -411,6 +415,7 @@ export class EditSecretDropComponent {
       validUntil: validityWindow.validUntil,
       visibility: this.visibility,
       creatorMode: this.incognitoPublish ? 'incognito' : 'normal',
+      showOnMap: this.showOnMap,
       recipientUserIds: this.visibility === 'contacts' ? [...this.selectedRecipientUserIds] : []
     };
   }

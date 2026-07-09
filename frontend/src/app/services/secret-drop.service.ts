@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { BoundingBox } from '../interfaces/bounding-box';
 import {
   SecretDrop,
   SecretDropCreateRequest,
@@ -18,6 +19,7 @@ import {
   SecretDropCommentUpdateResponse
 } from '../interfaces/secret-drop';
 import { IndexedDbService } from './indexed-db.service';
+import { MapService } from './map.service';
 
 export interface SecretDropReactionResponse {
   status: number;
@@ -32,8 +34,10 @@ export interface SecretDropReactionResponse {
 export class SecretDropService {
   private readonly http = inject(HttpClient);
   private readonly indexedDb = inject(IndexedDbService);
+  private readonly mapService = inject(MapService);
   private readonly baseUrl = `${environment.apiUrl}/secretdrop`;
   readonly mySecretDropsSignal = signal<SecretDrop[]>([]);
+  readonly visibleSecretDropsSignal = signal<SecretDrop[]>([]);
 
   async createSecretDrop(request: SecretDropCreateRequest, localPlainData?: Partial<SecretDrop>): Promise<SecretDrop> {
     const response = await firstValueFrom(this.http.post<SecretDropCreateResponse>(`${this.baseUrl}/create`, request));
@@ -140,6 +144,42 @@ export class SecretDropService {
     await this.saveOwnSecretDrops(userId, this.mySecretDropsSignal());
   }
 
+
+
+  async getVisibleOnMapByVisibleMapBoundingBox(): Promise<SecretDrop[]> {
+    const boundingBoxes = this.mapService.getVisibleMapBoundingBoxes();
+    if (boundingBoxes.length === 0) {
+      this.visibleSecretDropsSignal.set([]);
+      return [];
+    }
+    const results = await Promise.all(boundingBoxes.map(async (boundingBox) => {
+      try {
+        return await this.getVisibleOnMapByBoundingBox(boundingBox);
+      } catch {
+        return [] as SecretDrop[];
+      }
+    }));
+    const byUuid = new Map<string, SecretDrop>();
+    results.flat().forEach((drop) => byUuid.set(drop.uuid, drop));
+    const drops = Array.from(byUuid.values());
+    this.visibleSecretDropsSignal.set(drops);
+    return drops;
+  }
+
+  async getVisibleOnMapByBoundingBox(boundingBox: BoundingBox): Promise<SecretDrop[]> {
+    const response = await firstValueFrom(this.http.get<SecretDropListResponse>(
+      `${this.baseUrl}/visible/boundingbox/${boundingBox.latMin}/${boundingBox.lonMin}/${boundingBox.latMax}/${boundingBox.lonMax}`,
+      {
+        headers: new HttpHeaders({
+          'x-skip-ui': 'true',
+          'x-skip-diagnostics': 'true',
+          'x-skip-backend-status': 'true',
+          'x-skip-request-error-log': 'true'
+        })
+      }
+    ));
+    return (response.rows ?? []).map((row) => this.normalizeSecretDrop(row));
+  }
 
   async discoverByPlusCode(plusCode: string, zoomLevel: number): Promise<SecretDrop[]> {
     const encodedPlusCode = encodeURIComponent(plusCode);
@@ -433,6 +473,7 @@ export class SecretDropService {
       manualModerationBy: source.manualModerationBy ?? null,
       publishState: source.publishState ?? (source.status === 'disabled' && source.dsaStatusToken ? 'dsa_locked' : (source.status === 'enabled' ? 'published' : 'unpublished')),
       localOnly: source.localOnly ?? false,
+      showOnMap: source.showOnMap === true,
       maxUnlocks: source.maxUnlocks === null || source.maxUnlocks === undefined ? null : Number(source.maxUnlocks),
       unlockCount: Number(source.unlockCount ?? 0),
       likes: Number(source.likes ?? 0),

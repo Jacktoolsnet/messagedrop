@@ -426,6 +426,7 @@ export class MySecretDropListComponent implements OnInit {
       validUntil: drop.validUntil,
       visibility: drop.visibility ?? 'public',
       creatorMode: drop.creatorMode ?? 'normal',
+      showOnMap: drop.showOnMap === true,
       recipientUserIds: drop.visibility === 'contacts' ? [...(drop.recipientUserIds ?? [])] : [],
       publishState: 'published'
     };
@@ -442,6 +443,7 @@ export class MySecretDropListComponent implements OnInit {
       validUntil: drop.validUntil,
       visibility: drop.visibility ?? 'public',
       creatorMode: drop.creatorMode ?? 'normal',
+      showOnMap: drop.showOnMap === true,
       recipientUserIds: drop.visibility === 'contacts' ? [...(drop.recipientUserIds ?? [])] : []
     });
     this.snackBar.open(this.translation.t('common.secretDrop.publishSuccess'), undefined, {
@@ -495,6 +497,7 @@ export class MySecretDropListComponent implements OnInit {
       validUntil: drop.validUntil,
       visibility: drop.visibility ?? 'public',
       creatorMode: drop.creatorMode ?? 'normal',
+      showOnMap: drop.showOnMap === true,
       recipientUserIds: drop.visibility === 'contacts' ? [...(drop.recipientUserIds ?? [])] : [],
       publishState: 'published'
     };
@@ -511,6 +514,7 @@ export class MySecretDropListComponent implements OnInit {
       validUntil: drop.validUntil,
       visibility: drop.visibility ?? 'public',
       creatorMode: drop.creatorMode ?? 'normal',
+      showOnMap: drop.showOnMap === true,
       recipientUserIds: drop.visibility === 'contacts' ? [...(drop.recipientUserIds ?? [])] : []
     });
     await this.secretDropService.removeLocalSecretDrop(userId, drop.uuid);

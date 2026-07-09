@@ -470,7 +470,8 @@
         "showImages": "Bilder anzeigen",
         "showDocuments": "Dokumente anzeigen",
         "showExperiences": "Erlebnisse",
-        "showMyExperiences": "Meine Erlebnisse"
+        "showMyExperiences": "Meine Erlebnisse",
+        "showSecretDrops": "GeheimnisDrops anzeigen"
       }
     },
     "messageList": {
@@ -1794,6 +1795,7 @@
       "passwordRepeatLabel": "Passwort wiederholen",
       "oneTimeLabel": "Nur einmal lesbar",
       "contactVisibilityLabel": "Nur für ausgewählte Kontakte auffindbar",
+      "showOnMapLabel": "Auf Karte anzeigen",
       "recipientsLabel": "Kontakte auswählen",
       "recipientsHint": "Nur diese Kontakte können den GeheimnisDrop finden.",
       "recipientsRequired": "Bitte wähle mindestens einen Kontakt aus.",

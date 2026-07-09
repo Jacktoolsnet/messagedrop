@@ -470,7 +470,8 @@
         "showImages": "Show images",
         "showDocuments": "Show documents",
         "showExperiences": "Experiences",
-        "showMyExperiences": "My experiences"
+        "showMyExperiences": "My experiences",
+        "showSecretDrops": "Show SecretDrops"
       }
     },
     "messageList": {
@@ -1794,6 +1795,7 @@
       "passwordRepeatLabel": "Repeat password",
       "oneTimeLabel": "Readable only once",
       "contactVisibilityLabel": "Findable only by selected contacts",
+      "showOnMapLabel": "Show on map",
       "recipientsLabel": "Select contacts",
       "recipientsHint": "Only these contacts can find the SecretDrop.",
       "recipientsRequired": "Please select at least one contact.",

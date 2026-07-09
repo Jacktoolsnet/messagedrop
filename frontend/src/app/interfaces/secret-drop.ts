@@ -37,6 +37,7 @@ export interface SecretDrop {
   recipientUserIds?: string[];
   publishState?: 'published' | 'draft' | 'unpublished' | 'local_only' | 'dsa_locked';
   localOnly?: boolean;
+  showOnMap?: boolean;
   encryptedPayload?: SecretDropEncryptedPayload | string;
   crypto?: SecretDropCryptoMetadata | Record<string, unknown> | string | null;
   maxUnlocks: number | null;
@@ -100,6 +101,7 @@ export interface SecretDropCreateRequest {
   creatorMode?: 'normal' | 'incognito';
   recipientUserIds?: string[];
   publishState?: 'published' | 'draft' | 'unpublished';
+  showOnMap?: boolean;
 }
 
 export interface SecretDropCreateResponse {

@@ -7,5 +7,6 @@ export enum MarkerType {
     PRIVATE_DOCUMENT = "private_document",
     EXPERIENCE_DESTINATION = 'experience_destination',
     MY_EXPERIENCE = 'my_experience',
+    SECRET_DROP = 'secret_drop',
     MULTI = "multi"
 }

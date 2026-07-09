@@ -71,6 +71,7 @@ import { Place } from './interfaces/place';
 import { PlusCodeArea } from './interfaces/plus-code-area';
 import { DEFAULT_SEARCH_SETTINGS, SearchSettings } from './interfaces/search-settings';
 import { SharedContent } from './interfaces/shared-content';
+import { SecretDrop } from './interfaces/secret-drop';
 import { ExperienceResult, ViatorDestinationLookup } from './interfaces/viator';
 import { ShortNumberPipe } from './pipes/short-number.pipe';
 import { AirQualityService } from './services/air-quality.service';
@@ -1470,6 +1471,7 @@ export class AppComponent implements OnInit {
     const canSearchImages = isImagesEnabled && zoom >= settings.privateImages.minZoom;
     const canSearchDocuments = isDocumentsEnabled && zoom >= settings.privateDocuments.minZoom;
     const canSearchMyExperiences = isMyExperiencesEnabled && zoom >= settings.myExperiences.minZoom;
+    const canSearchVisibleSecretDrops = this.networkService.browserOnline() && this.networkService.backendOnline() && !this.maintenanceActive() && zoom >= 12;
     // notes from local device
     if (this.userService.isReady()) {
       if (canSearchNotes) {
@@ -1497,6 +1499,12 @@ export class AppComponent implements OnInit {
       this.messageService.clearMessages();
     } else if (canSearchMessages && !this.markerMessageListOpen) {
       this.messageService.getByVisibleMapBoundingBox();
+    }
+
+    if (canSearchVisibleSecretDrops) {
+      await this.secretDropService.getVisibleOnMapByVisibleMapBoundingBox();
+    } else {
+      this.secretDropService.visibleSecretDropsSignal.set([]);
     }
 
     await this.updateExperiencePins(settings, ignoreSearchSettings, zoom);
@@ -1565,11 +1573,15 @@ export class AppComponent implements OnInit {
           this.openMarkerMyExperienceListDialog(event.myExperiences ?? []);
         }
         break;
+      case MarkerType.SECRET_DROP:
+        this.openMarkerSecretDropListDialog(event.secretDrops ?? [], event.location.plusCode);
+        break;
       case MarkerType.MULTI:
         if (
           !canOpenPrivateContent
           && !event.messages.length
           && !(event.experiences?.length)
+          && !(event.secretDrops?.length)
         ) {
           return;
         }
@@ -1579,7 +1591,8 @@ export class AppComponent implements OnInit {
           canOpenPrivateContent ? event.images : [],
           canOpenPrivateContent ? event.documents : [],
           event.experiences ?? [],
-          canOpenPrivateContent ? (event.myExperiences ?? []) : []
+          canOpenPrivateContent ? (event.myExperiences ?? []) : [],
+          event.secretDrops ?? []
         );
         break;
     }
@@ -1703,6 +1716,12 @@ export class AppComponent implements OnInit {
     dialogRef.afterOpened().subscribe(() => {
       this.myHistory.push("secretDropDialog");
       window.history.replaceState(this.myHistory, '', '');
+    });
+
+    dialogRef.afterClosed().subscribe((changed?: boolean) => {
+      if (changed) {
+        void this.updateDataForLocation();
+      }
     });
   }
 
@@ -2180,10 +2199,11 @@ export class AppComponent implements OnInit {
     images: LocalImage[],
     documents: LocalDocument[],
     experiences: ViatorDestinationLookup[],
-    myExperiences: ExperienceResult[]
+    myExperiences: ExperienceResult[],
+    secretDrops: SecretDrop[]
   ) {
     const dialogRef = this.dialog.open(MultiMarkerComponent, {
-      data: { messages: messages, notes: notes, images: images, documents: documents, experiences: experiences, myExperiences: myExperiences },
+      data: { messages: messages, notes: notes, images: images, documents: documents, experiences: experiences, myExperiences: myExperiences, secretDrops: secretDrops },
       closeOnNavigation: true,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
@@ -2224,8 +2244,31 @@ export class AppComponent implements OnInit {
               this.openMarkerMyExperienceListDialog(result.experiences ?? []);
             }
             break
+          case 'secret_drop':
+            this.openMarkerSecretDropListDialog(result.secretDrops ?? []);
+            break
         }
       }
+    });
+  }
+
+
+  private openMarkerSecretDropListDialog(drops: SecretDrop[], plusCode?: string): void {
+    if (!drops.length) {
+      return;
+    }
+    this.dialog.open(FoundSecretDropListComponent, {
+      panelClass: 'MessageListDialog',
+      closeOnNavigation: true,
+      data: { drops, plusCode: plusCode || drops[0]?.discoveryPlusCode || drops[0]?.plusCode || '', zoomLevel: this.mapService.getMapZoom() },
+      width: 'min(900px, 95vw)',
+      maxWidth: '95vw',
+      maxHeight: '95vh',
+      height: 'auto',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
     });
   }
 
@@ -3170,6 +3213,50 @@ export class AppComponent implements OnInit {
           documents: [],
           myExperiences: [result],
           type: MarkerType.MY_EXPERIENCE
+        });
+      }
+    });
+
+
+    // Process visible SecretDrops
+    this.secretDropService.visibleSecretDropsSignal().forEach((drop) => {
+      const dropLocation: Location = {
+        latitude: Number(drop.latitude ?? drop.location?.latitude ?? 0),
+        longitude: Number(drop.longitude ?? drop.location?.longitude ?? 0),
+        plusCode: drop.plusCode || drop.discoveryPlusCode || drop.location?.plusCode || ''
+      };
+      if (!Number.isFinite(dropLocation.latitude) || !Number.isFinite(dropLocation.longitude)) {
+        return;
+      }
+      if (this.mapService.getMapZoom() > 17) {
+        center = dropLocation;
+      } else {
+        const groupedPlusCode = this.geolocationService.getGroupedPlusCodeBasedOnMapZoom(dropLocation, this.mapService.getMapZoom());
+        const plusCodeArea: PlusCodeArea = this.geolocationService.getGridFromPlusCode(groupedPlusCode);
+        center = {
+          latitude: plusCodeArea.latitudeCenter,
+          longitude: plusCodeArea.longitudeCenter,
+          plusCode: groupedPlusCode
+        };
+      }
+      if (this.markerLocations.has(center.plusCode)) {
+        const existing = this.markerLocations.get(center.plusCode)!;
+        if (!existing.secretDrops) {
+          existing.secretDrops = [];
+        }
+        existing.secretDrops.push(drop);
+        if (existing.type !== MarkerType.SECRET_DROP) {
+          existing.type = MarkerType.MULTI;
+        }
+      } else {
+        this.markerLocations.set(center.plusCode, {
+          location: center,
+          messages: [],
+          notes: [],
+          images: [],
+          documents: [],
+          secretDrops: [drop],
+          type: MarkerType.SECRET_DROP
         });
       }
     });

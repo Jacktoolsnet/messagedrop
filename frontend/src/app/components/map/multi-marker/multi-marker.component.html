@@ -45,4 +45,13 @@
     {{ 'common.map.multiMarker.showMyExperiences' | transloco }}
   </button>
   }
+
+  @if (data.secretDrops.length) {
+  <button mat-stroked-button [mat-dialog-close]="{type: 'secret_drop', secretDrops: data.secretDrops}"
+    matBadge="{{data.secretDrops.length | shortNumber}}" matBadgePosition="after" matBadgeColor="accent"
+    matBadgeOverlap="true">
+    <mat-icon>password</mat-icon>
+    {{ 'common.map.multiMarker.showSecretDrops' | transloco }}
+  </button>
+  }
 </mat-dialog-content>
