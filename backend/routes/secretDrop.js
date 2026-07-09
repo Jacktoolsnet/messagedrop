@@ -507,6 +507,7 @@ router.post('/republish/:uuid', [
 router.get('/visible/boundingbox/:latMin/:lonMin/:latMax/:lonMax', security.authenticateOptional, async (req, res, next) => {
   try {
     const { latMin, lonMin, latMax, lonMax } = parseBoundingBoxParams(req.params);
+    const zoomLevel = normalizeDiscoveryZoomLevel(req.query?.zoomLevel ?? req.query?.zoom, false);
     const rows = await tableSecretDrop.getVisibleOnMapByBoundingBox(
       getDb(req),
       latMin,
@@ -514,7 +515,8 @@ router.get('/visible/boundingbox/:latMin/:lonMin/:latMax/:lonMax', security.auth
       latMax,
       lonMax,
       nowSeconds(),
-      getAuthUserId(req)
+      getAuthUserId(req),
+      zoomLevel
     );
     res.status(200).json({ status: 200, rows: rows.map(mapPublicSecretDrop) });
   } catch (error) {

@@ -152,9 +152,10 @@ export class SecretDropService {
       this.visibleSecretDropsSignal.set([]);
       return [];
     }
+    const zoomLevel = this.mapService.getMapZoom();
     const results = await Promise.all(boundingBoxes.map(async (boundingBox) => {
       try {
-        return await this.getVisibleOnMapByBoundingBox(boundingBox);
+        return await this.getVisibleOnMapByBoundingBox(boundingBox, zoomLevel);
       } catch {
         return [] as SecretDrop[];
       }
@@ -166,9 +167,10 @@ export class SecretDropService {
     return drops;
   }
 
-  async getVisibleOnMapByBoundingBox(boundingBox: BoundingBox): Promise<SecretDrop[]> {
+  async getVisibleOnMapByBoundingBox(boundingBox: BoundingBox, zoomLevel?: number): Promise<SecretDrop[]> {
+    const zoomQuery = Number.isFinite(Number(zoomLevel)) ? `?zoom=${encodeURIComponent(String(Math.round(Number(zoomLevel))))}` : '';
     const response = await firstValueFrom(this.http.get<SecretDropListResponse>(
-      `${this.baseUrl}/visible/boundingbox/${boundingBox.latMin}/${boundingBox.lonMin}/${boundingBox.latMax}/${boundingBox.lonMax}`,
+      `${this.baseUrl}/visible/boundingbox/${boundingBox.latMin}/${boundingBox.lonMin}/${boundingBox.latMax}/${boundingBox.lonMax}${zoomQuery}`,
       {
         headers: new HttpHeaders({
           'x-skip-ui': 'true',
@@ -178,7 +180,10 @@ export class SecretDropService {
         })
       }
     ));
-    return (response.rows ?? []).map((row) => this.normalizeSecretDrop(row));
+    const currentZoom = Number.isFinite(Number(zoomLevel)) ? Math.round(Number(zoomLevel)) : null;
+    return (response.rows ?? [])
+      .map((row) => this.normalizeSecretDrop(row))
+      .filter((drop) => currentZoom === null || (drop.discoveryZoomLevel ?? 18) <= currentZoom);
   }
 
   async discoverByPlusCode(plusCode: string, zoomLevel: number): Promise<SecretDrop[]> {
@@ -383,7 +388,7 @@ export class SecretDropService {
     if (!Number.isFinite(numeric)) {
       return 18;
     }
-    return Math.min(19, Math.max(12, Math.round(numeric)));
+    return Math.min(18, Math.max(3, Math.round(numeric)));
   }
 
 

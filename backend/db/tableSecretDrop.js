@@ -486,7 +486,7 @@ async function discoverByPlusCode(db, discoveryPlusCode, nowSeconds, zoomLevel =
   return rows.map((row) => mapSecretDropRow(row, { includeEncryptedPayload: false, includeCryptoMetadata: true }));
 }
 
-async function getVisibleOnMapByBoundingBox(db, latMin, lonMin, latMax, lonMax, nowSeconds, userId = null) {
+async function getVisibleOnMapByBoundingBox(db, latMin, lonMin, latMax, lonMax, nowSeconds, userId = null, zoomLevel = null) {
   const latLow = Math.min(Number(latMin), Number(latMax));
   const latHigh = Math.max(Number(latMin), Number(latMax));
   const lonA = Number(lonMin);
@@ -500,18 +500,22 @@ async function getVisibleOnMapByBoundingBox(db, latMin, lonMin, latMax, lonMax, 
     ? `AND (COALESCE(visibility, 'public') = 'public' OR userId = ? OR EXISTS (SELECT 1 FROM ${recipientTableName} r WHERE r.secretDropUuid = ${tableName}.uuid AND r.recipientUserId = ?))`
     : `AND COALESCE(visibility, 'public') = 'public'`;
   const visibilityParams = userId ? [userId, userId] : [];
+  const normalizedZoomLevel = Number.isInteger(Number(zoomLevel)) ? Number(zoomLevel) : null;
+  const zoomCondition = normalizedZoomLevel === null ? '' : 'AND discoveryZoomLevel <= ?';
+  const zoomParams = normalizedZoomLevel === null ? [] : [normalizedZoomLevel];
   const rows = await allQuery(db, `
     SELECT * FROM ${tableName}
     WHERE ${columnShowOnMap} = 1
       AND status IN ('${secretDropStatus.ENABLED}', '${secretDropStatus.CONSUMED}')
       AND latitude BETWEEN ? AND ?
       AND (${lonCondition})
+      ${zoomCondition}
       ${visibilityCondition}
       AND (validFrom IS NULL OR validFrom <= ?)
       AND (validUntil IS NULL OR validUntil >= ?)
     ORDER BY CASE WHEN status = '${secretDropStatus.CONSUMED}' THEN 1 ELSE 0 END ASC, createdAt DESC
     LIMIT 256;
-  `, [latLow, latHigh, ...lonParams, ...visibilityParams, nowSeconds, nowSeconds]);
+  `, [latLow, latHigh, ...lonParams, ...zoomParams, ...visibilityParams, nowSeconds, nowSeconds]);
   return rows.map((row) => mapSecretDropRow(row, { includeEncryptedPayload: false, includeCryptoMetadata: true }));
 }
 

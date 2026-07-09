@@ -1608,7 +1608,8 @@ export class AppComponent implements OnInit {
 
   private async discoverSecretDropsAt(location: Location): Promise<void> {
     const zoomLevel = this.mapService.getMapZoom();
-    if (zoomLevel < 3) {
+    const settings = this.normalizeSearchSettings(this.searchSettings);
+    if (!settings.secretDrops.enabled || zoomLevel < settings.secretDrops.minZoom || zoomLevel < 3) {
       return;
     }
     const plusCode = location.plusCode || this.geolocationService.getPlusCode(location.latitude, location.longitude);
