@@ -18,7 +18,7 @@ const MAX_AUTH_VERIFIER_LENGTH = 4096;
 const MAX_RECIPIENTS = 50;
 const DEFAULT_DISCOVERY_ZOOM_LEVEL = 18;
 const MIN_DISCOVERY_ZOOM_LEVEL = 3;
-const MAX_DISCOVERY_ZOOM_LEVEL = 18;
+const MAX_DISCOVERY_ZOOM_LEVEL = 19;
 const MAX_VALIDITY_WINDOW_SECONDS = 30 * 24 * 60 * 60;
 
 function secretDropUnlockRateLimitKey(req) {
@@ -182,6 +182,17 @@ function normalizeDiscoveryZoomLevel(value, required = false) {
     throw apiError.badRequest('invalid_discovery_zoom_level');
   }
   return numeric;
+}
+
+function normalizeDiscoveryQueryZoomLevel(value) {
+  if (value === undefined || value === null || value === '') {
+    return null;
+  }
+  const numeric = Number(value);
+  if (!Number.isInteger(numeric)) {
+    throw apiError.badRequest('invalid_discovery_zoom_level');
+  }
+  return Math.min(MAX_DISCOVERY_ZOOM_LEVEL, Math.max(MIN_DISCOVERY_ZOOM_LEVEL, numeric));
 }
 
 function normalizeMaxUnlocks(value) {
@@ -507,7 +518,7 @@ router.post('/republish/:uuid', [
 router.get('/visible/boundingbox/:latMin/:lonMin/:latMax/:lonMax', security.authenticateOptional, async (req, res, next) => {
   try {
     const { latMin, lonMin, latMax, lonMax } = parseBoundingBoxParams(req.params);
-    const zoomLevel = normalizeDiscoveryZoomLevel(req.query?.zoomLevel ?? req.query?.zoom, false);
+    const zoomLevel = normalizeDiscoveryQueryZoomLevel(req.query?.zoomLevel ?? req.query?.zoom);
     const rows = await tableSecretDrop.getVisibleOnMapByBoundingBox(
       getDb(req),
       latMin,
@@ -530,7 +541,7 @@ router.get('/discover/pluscode/:plusCode', security.authenticateOptional, async 
     if (!plusCode) {
       throw apiError.badRequest('invalid_plus_code');
     }
-    const zoomLevel = normalizeDiscoveryZoomLevel(req.query?.zoomLevel ?? req.query?.zoom, false);
+    const zoomLevel = normalizeDiscoveryQueryZoomLevel(req.query?.zoomLevel ?? req.query?.zoom);
     const rows = await tableSecretDrop.discoverByPlusCode(getDb(req), plusCode, nowSeconds(), zoomLevel, getAuthUserId(req));
     res.status(200).json({ status: 200, rows: rows.map(mapPublicSecretDrop) });
   } catch (error) {

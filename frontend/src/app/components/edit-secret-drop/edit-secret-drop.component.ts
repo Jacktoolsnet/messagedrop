@@ -96,7 +96,7 @@ export class EditSecretDropComponent {
   hint = '';
   hintStyle = '';
   readonly minDiscoveryZoomLevel = 3;
-  readonly maxDiscoveryZoomLevel = 18;
+  readonly maxDiscoveryZoomLevel = 19;
   pin = '';
   oneTime = true;
   visibility: 'public' | 'contacts' = 'public';

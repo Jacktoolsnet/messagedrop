@@ -168,7 +168,8 @@ export class SecretDropService {
   }
 
   async getVisibleOnMapByBoundingBox(boundingBox: BoundingBox, zoomLevel?: number): Promise<SecretDrop[]> {
-    const zoomQuery = Number.isFinite(Number(zoomLevel)) ? `?zoom=${encodeURIComponent(String(Math.round(Number(zoomLevel))))}` : '';
+    const requestZoom = this.normalizeMapZoomForDiscoveryQuery(zoomLevel);
+    const zoomQuery = requestZoom === null ? '' : `?zoom=${encodeURIComponent(String(requestZoom))}`;
     const response = await firstValueFrom(this.http.get<SecretDropListResponse>(
       `${this.baseUrl}/visible/boundingbox/${boundingBox.latMin}/${boundingBox.lonMin}/${boundingBox.latMax}/${boundingBox.lonMax}${zoomQuery}`,
       {
@@ -180,7 +181,7 @@ export class SecretDropService {
         })
       }
     ));
-    const currentZoom = Number.isFinite(Number(zoomLevel)) ? Math.round(Number(zoomLevel)) : null;
+    const currentZoom = requestZoom;
     return (response.rows ?? [])
       .map((row) => this.normalizeSecretDrop(row))
       .filter((drop) => currentZoom === null || (drop.discoveryZoomLevel ?? 18) <= currentZoom);
@@ -188,8 +189,9 @@ export class SecretDropService {
 
   async discoverByPlusCode(plusCode: string, zoomLevel: number): Promise<SecretDrop[]> {
     const encodedPlusCode = encodeURIComponent(plusCode);
+    const requestZoom = this.normalizeMapZoomForDiscoveryQuery(zoomLevel) ?? 18;
     const response = await firstValueFrom(
-      this.http.get<SecretDropListResponse>(`${this.baseUrl}/discover/pluscode/${encodedPlusCode}?zoom=${encodeURIComponent(String(Math.round(zoomLevel)))}`)
+      this.http.get<SecretDropListResponse>(`${this.baseUrl}/discover/pluscode/${encodedPlusCode}?zoom=${encodeURIComponent(String(requestZoom))}`)
     );
     return (response.rows ?? []).map((row) => this.normalizeSecretDrop(row));
   }
@@ -388,7 +390,15 @@ export class SecretDropService {
     if (!Number.isFinite(numeric)) {
       return 18;
     }
-    return Math.min(18, Math.max(3, Math.round(numeric)));
+    return Math.min(19, Math.max(3, Math.round(numeric)));
+  }
+
+  private normalizeMapZoomForDiscoveryQuery(value: unknown): number | null {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric)) {
+      return null;
+    }
+    return Math.min(19, Math.max(3, Math.round(numeric)));
   }
 
 
