@@ -139,6 +139,71 @@ async function markAdminContentPublishedFromPublicBackend(req, row, publicMessag
   return getAdminContentById(req.database.db, row.id);
 }
 
+async function markAdminContentWithdrawnFromPublicBackend(req, row) {
+  if (!row?.id) {
+    return row || null;
+  }
+
+  await updateAdminContent(req.database.db, row.id, {
+    [tablePublicContent.columns.status]: tablePublicContent.contentStatus.WITHDRAWN,
+    [tablePublicContent.columns.withdrawnAt]: Date.now(),
+    [tablePublicContent.columns.publishedMessageId]: null,
+    updatedAt: Date.now()
+  });
+
+  await cascadeChildCommentStatus(req.database.db, row.id, tablePublicContent.contentStatus.WITHDRAWN);
+  return getAdminContentById(req.database.db, row.id);
+}
+
+async function syncPublishedAdminContentWithPublicBackend(req, row) {
+  if (!row || row.status !== tablePublicContent.contentStatus.PUBLISHED) {
+    return row || null;
+  }
+
+  const publishedMessageUuid = normalizeExternalParentMessageUuid(row.publishedMessageUuid);
+  if (!publishedMessageUuid) {
+    return markAdminContentWithdrawnFromPublicBackend(req, row);
+  }
+
+  let publicMessage;
+  try {
+    publicMessage = await findPublicBackendMessageByUuid(publishedMessageUuid);
+  } catch (error) {
+    req.logger?.warn?.('Could not verify published admin content against public backend; keeping current status', {
+      contentId: row.id,
+      publishedMessageUuid,
+      error: error?.detail || error?.message || String(error)
+    });
+    return row;
+  }
+  if (!publicMessage) {
+    req.logger?.info?.('Published admin content no longer exists in public backend; marking withdrawn', {
+      contentId: row.id,
+      publishedMessageUuid
+    });
+    return markAdminContentWithdrawnFromPublicBackend(req, row);
+  }
+
+  if (normalizeExternalCommentStatus(publicMessage.status) !== tablePublicContent.contentStatus.PUBLISHED) {
+    req.logger?.info?.('Published admin content is no longer enabled in public backend; marking withdrawn', {
+      contentId: row.id,
+      publishedMessageUuid,
+      backendStatus: publicMessage.status
+    });
+    return markAdminContentWithdrawnFromPublicBackend(req, row);
+  }
+
+  return row;
+}
+
+async function syncPublishedAdminContentRowsWithPublicBackend(req, rows) {
+  const result = [];
+  for (const row of rows || []) {
+    result.push(await syncPublishedAdminContentWithPublicBackend(req, row));
+  }
+  return result.filter(Boolean);
+}
+
 function getAdminRoles(req) {
   return Array.isArray(req.admin?.roles) ? req.admin.roles : [];
 }
@@ -1184,20 +1249,31 @@ router.get('/public-messages', requireRole(...CONTENT_ROLES), (req, res, next) =
     includeDeleted: req.query.includeDeleted === 'true'
   };
 
-  tablePublicContent.list(req.database.db, filters, (err, rows) => {
+  tablePublicContent.list(req.database.db, filters, async (err, rows) => {
     if (err) {
       return next(apiError.internal('db_error'));
     }
 
-    return res.json({
-      status: 200,
-      rows: (rows || []).map(toContentDto)
-    });
+    try {
+      const syncedRows = await syncPublishedAdminContentRowsWithPublicBackend(req, rows || []);
+      const responseRows = filters.status
+        ? syncedRows.filter((row) => row?.status === filters.status)
+        : syncedRows;
+      return res.json({
+        status: 200,
+        rows: responseRows.map(toContentDto)
+      });
+    } catch (error) {
+      if (error?.status) {
+        return next(error);
+      }
+      return next(apiError.internal('public_content_sync_failed'));
+    }
   });
 });
 
 router.get('/public-messages/:id', requireRole(...CONTENT_ROLES), (req, res, next) => {
-  tablePublicContent.getById(req.database.db, req.params.id, (err, row) => {
+  tablePublicContent.getById(req.database.db, req.params.id, async (err, row) => {
     if (err) {
       return next(apiError.internal('db_error'));
     }
@@ -1207,10 +1283,18 @@ router.get('/public-messages/:id', requireRole(...CONTENT_ROLES), (req, res, nex
     if (!ensureManageableContent(req, row)) {
       return next(apiError.forbidden('insufficient_role'));
     }
-    return res.json({
-      status: 200,
-      row: toContentDto(row)
-    });
+    try {
+      const syncedRow = await syncPublishedAdminContentWithPublicBackend(req, row);
+      return res.json({
+        status: 200,
+        row: toContentDto(syncedRow)
+      });
+    } catch (error) {
+      if (error?.status) {
+        return next(error);
+      }
+      return next(apiError.internal('public_content_sync_failed'));
+    }
   });
 });
 
