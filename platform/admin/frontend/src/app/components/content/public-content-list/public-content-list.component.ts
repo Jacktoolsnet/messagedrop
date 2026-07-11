@@ -16,7 +16,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
 import { Router, RouterLink } from '@angular/router';
-import { debounceTime, distinctUntilChanged, finalize, map } from 'rxjs';
+import { catchError, concatMap, debounceTime, distinctUntilChanged, finalize, from, map, of, toArray } from 'rxjs';
 import { Multimedia } from '../../../interfaces/multimedia.interface';
 import { PublicContentStatus } from '../../../interfaces/public-content-status.type';
 import { PublicContentType } from '../../../interfaces/public-content-type.type';
@@ -84,6 +84,7 @@ export class PublicContentListComponent {
   ));
   readonly canPublish = computed(() => ['editor', 'admin', 'root'].includes(this.role() ?? ''));
   readonly canAccess = computed(() => ['author', 'editor', 'admin', 'root'].includes(this.role() ?? ''));
+  readonly publishableRows = computed(() => this.rows().filter((row) => this.canPublishRow(row)));
   readonly selectedProfile = computed(() => {
     const profileId = this.filterForm.controls.publicProfileId.value;
     if (!profileId) {
@@ -123,7 +124,7 @@ export class PublicContentListComponent {
       contentType: 'public',
       status: this.filterForm.controls.status.value,
       q: this.filterForm.controls.q.value,
-      limit: 100,
+      limit: 500,
       offset: 0
     });
   }
@@ -330,7 +331,7 @@ export class PublicContentListComponent {
     });
   }
 
-  private openPublishingDialog(): void {
+  private openPublishingDialog(count = 1): void {
     this.closeLoadingDialog();
 
     const config: DisplayMessageConfig = {
@@ -338,7 +339,9 @@ export class PublicContentListComponent {
       title: this.i18n.t('Publishing content...'),
       image: '',
       icon: 'publish',
-      message: this.i18n.t('Please wait while the content is published.'),
+      message: count > 1
+        ? this.i18n.t('Please wait while {{count}} messages are published.', { count })
+        : this.i18n.t('Please wait while the content is published.'),
       button: '',
       delay: 0,
       showSpinner: true,
@@ -568,6 +571,73 @@ export class PublicContentListComponent {
           )
           .subscribe({ error: () => undefined });
       });
+  }
+
+  confirmPublishAll(): void {
+    const rows = this.sortRowsForPublishing(this.publishableRows());
+    if (rows.length === 0) {
+      return;
+    }
+
+    this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Publish all messages?',
+        message: 'Do you really want to publish all {{count}} currently unpublished messages?',
+        confirmText: 'Publish all',
+        cancelText: 'Cancel',
+        count: rows.length
+      }
+    }).afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((confirmed) => {
+        if (!confirmed) {
+          return;
+        }
+
+        this.openPublishingDialog(rows.length);
+        from(rows).pipe(
+          concatMap((row) => this.publicContentService.publishPublicContent(row.id, false).pipe(
+            map(() => true),
+            catchError(() => of(false))
+          )),
+          toArray(),
+          finalize(() => {
+            this.closeLoadingDialog();
+            this.load();
+          }),
+          takeUntilDestroyed(this.destroyRef)
+        ).subscribe((results) => {
+          const publishedCount = results.filter(Boolean).length;
+          const failedCount = results.length - publishedCount;
+          if (failedCount > 0) {
+            this.showMessage('{{published}} messages were published. {{failed}} messages could not be published.', {
+              published: publishedCount,
+              failed: failedCount
+            });
+          } else {
+            this.showMessage('All {{count}} messages were published.', { count: publishedCount });
+          }
+        });
+      });
+  }
+
+  private sortRowsForPublishing(rows: PublicContent[]): PublicContent[] {
+    const pending = [...rows];
+    const result: PublicContent[] = [];
+    const candidateIds = new Set(pending.map((row) => row.id));
+    const publishedIds = new Set<string>();
+
+    while (pending.length > 0) {
+      const index = pending.findIndex((row) => {
+        const parentId = row.parentContent?.id;
+        return !parentId || !candidateIds.has(parentId) || publishedIds.has(parentId);
+      });
+      const [next] = pending.splice(index >= 0 ? index : 0, 1);
+      result.push(next);
+      publishedIds.add(next.id);
+    }
+
+    return result;
   }
 
   confirmWithdraw(row: PublicContent, event?: Event): void {

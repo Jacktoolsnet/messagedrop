@@ -126,11 +126,13 @@ export class PublicContentService {
     );
   }
 
-  publishPublicContent(id: string): Observable<PublicContent> {
-    return this.http.post<PublicContentRowResponse>(`${this.baseUrl}/public-messages/${encodeURIComponent(id)}/publish`, {}).pipe(
-      map((response) => response.row),
-      catchError((error) => this.handleError(error, 'Could not publish public content.'))
+  publishPublicContent(id: string, showError = true): Observable<PublicContent> {
+    const request = this.http.post<PublicContentRowResponse>(`${this.baseUrl}/public-messages/${encodeURIComponent(id)}/publish`, {}).pipe(
+      map((response) => response.row)
     );
+    return showError
+      ? request.pipe(catchError((error) => this.handleError(error, 'Could not publish public content.')))
+      : request;
   }
 
   withdrawPublicContent(id: string): Observable<PublicContent> {

@@ -1724,5 +1724,12 @@
   "Peak:": "Spitze:",
   "Click the map or search for a place to set the location.": "Klicke in die Karte oder suche nach einem Ort, um den Ort festzulegen.",
   "Location picker map": "Karte zur Ortsauswahl",
-  "Search KLIPY": "KLIPY durchsuchen"
+  "Search KLIPY": "KLIPY durchsuchen",
+  "Publish all unpublished messages": "Alle nicht veröffentlichten Nachrichten veröffentlichen",
+  "Publish all messages?": "Alle Nachrichten veröffentlichen?",
+  "Do you really want to publish all {{count}} currently unpublished messages?": "Möchtest du wirklich alle {{count}} aktuell nicht veröffentlichten Nachrichten veröffentlichen?",
+  "Publish all": "Alle veröffentlichen",
+  "Please wait while {{count}} messages are published.": "Bitte warte, während {{count}} Nachrichten veröffentlicht werden.",
+  "{{published}} messages were published. {{failed}} messages could not be published.": "{{published}} Nachrichten wurden veröffentlicht. {{failed}} Nachrichten konnten nicht veröffentlicht werden.",
+  "All {{count}} messages were published.": "Alle {{count}} Nachrichten wurden veröffentlicht."
 }

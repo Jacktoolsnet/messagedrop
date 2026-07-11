@@ -4,7 +4,7 @@
 </app-dialog-header>
 
 <mat-dialog-content class="confirm-content">
-  <div class="confirm-box">{{ i18n.t(data.message || 'Please confirm this action.') }}</div>
+  <div class="confirm-box">{{ i18n.t(data.message || 'Please confirm this action.', { count: data.count }) }}</div>
 </mat-dialog-content>
 
 <app-dialog-action-bar>

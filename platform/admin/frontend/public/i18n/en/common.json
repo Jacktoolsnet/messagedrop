@@ -343,5 +343,12 @@
   "Users": "Users",
   "Users, visible public messages and visible SecretDrops.": "Users, visible public messages and visible SecretDrops.",
   "Visible messages": "Visible messages",
-  "Visible SecretDrops": "Visible SecretDrops"
+  "Visible SecretDrops": "Visible SecretDrops",
+  "Publish all unpublished messages": "Publish all unpublished messages",
+  "Publish all messages?": "Publish all messages?",
+  "Do you really want to publish all {{count}} currently unpublished messages?": "Do you really want to publish all {{count}} currently unpublished messages?",
+  "Publish all": "Publish all",
+  "Please wait while {{count}} messages are published.": "Please wait while {{count}} messages are published.",
+  "{{published}} messages were published. {{failed}} messages could not be published.": "{{published}} messages were published. {{failed}} messages could not be published.",
+  "All {{count}} messages were published.": "All {{count}} messages were published."
 }

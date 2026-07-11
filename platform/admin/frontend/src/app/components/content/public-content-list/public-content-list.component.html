@@ -7,6 +7,12 @@
   <span class="spacer"></span>
 
   @if (canAccess()) {
+    @if (canPublish()) {
+      <button mat-icon-button type="button" class="toolbar-action" (click)="confirmPublishAll()" [disabled]="loading() || publishableRows().length === 0" [matTooltip]="i18n.t('Publish all unpublished messages')" [attr.aria-label]="i18n.t('Publish all unpublished messages')">
+        <mat-icon>publish</mat-icon>
+      </button>
+    }
+
     <button mat-icon-button type="button" class="toolbar-action" (click)="createContent()" [attr.aria-label]="i18n.t('Create new message')">
       <mat-icon>add</mat-icon>
     </button>

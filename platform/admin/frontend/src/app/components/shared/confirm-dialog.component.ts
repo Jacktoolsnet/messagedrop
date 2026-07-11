@@ -13,6 +13,7 @@ export interface ConfirmDialogData {
   confirmText?: string;
   cancelText?: string;
   warn?: boolean;
+  count?: number;
 }
 
 @Component({
