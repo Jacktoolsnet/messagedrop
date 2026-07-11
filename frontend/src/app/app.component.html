@@ -137,6 +137,14 @@
         <span>{{ 'common.menu.myPrivateContents' | transloco }}</span>
     </button>
     }
+
+    @if (userService.isReady() && contactService.isReady() && !userService.isAccountBlocked()) {
+    <button mat-menu-item (click)="openContactListDialog()">
+        <mat-icon [attr.aria-hidden]="false" matBadge="{{ getContactsBadge() }}" [matBadgeHidden]="!getContactsBadge()"
+            matBadgeColor="warn" matBadgeOverlap="true">contacts</mat-icon>
+        <span>{{ 'common.menu.myContacts' | transloco }}</span>
+    </button>
+    }
 </mat-menu>
 
 <mat-menu #systemMenu="matMenu">
@@ -190,13 +198,6 @@
     <button mat-menu-item (click)="openPlaceListDialog()">
         <mat-icon>personal_places</mat-icon>
         <span>{{ 'common.menu.privateContentPlaces' | transloco }}</span>
-    </button>
-    }
-    @if (userService.isReady() && contactService.isReady() && !userService.isAccountBlocked()) {
-    <button mat-menu-item (click)="openContactListDialog()">
-        <mat-icon [attr.aria-hidden]="false" matBadge="{{ getContactsBadge() }}" [matBadgeHidden]="!getContactsBadge()"
-            matBadgeColor="warn" matBadgeOverlap="true">contacts</mat-icon>
-        <span>{{ 'common.menu.privateContentContacts' | transloco }}</span>
     </button>
     }
     <button mat-menu-item (click)="openNoteListDialog()">
