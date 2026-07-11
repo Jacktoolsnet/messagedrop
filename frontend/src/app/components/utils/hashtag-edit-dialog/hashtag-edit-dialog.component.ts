@@ -13,6 +13,7 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
 import { MAX_LOCAL_HASHTAGS, MAX_PUBLIC_HASHTAGS, normalizeHashtags } from '../../../utils/hashtag.util';
 import { DialogHeaderComponent } from '../dialog-header/dialog-header.component';
 import { HelpDialogService, HelpTopic } from '../help-dialog/help-dialog.service';
+import { saveDialogOnImplicitDismiss } from '../dialog-auto-save.util';
 
 export interface HashtagEditDialogData {
   titleKey: string;
@@ -47,6 +48,10 @@ export interface HashtagEditDialogResult {
   styleUrl: './hashtag-edit-dialog.component.css'
 })
 export class HashtagEditDialogComponent {
+  constructor() {
+    saveDialogOnImplicitDismiss(this.dialogRef, () => this.onApply());
+  }
+
   readonly data = inject<HashtagEditDialogData>(MAT_DIALOG_DATA);
   private readonly dialogRef = inject(MatDialogRef<HashtagEditDialogComponent, HashtagEditDialogResult>);
   private readonly i18n = inject(TranslationHelperService);
