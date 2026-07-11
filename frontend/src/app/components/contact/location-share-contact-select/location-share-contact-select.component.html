@@ -27,9 +27,13 @@
   }
 </mat-dialog-content>
 
-<mat-dialog-actions class="sticky-actions" align="end">
-  <button mat-button type="button" (click)="cancel()">{{ 'common.actions.cancel' | transloco }}</button>
-  <button mat-flat-button color="primary" type="button" (click)="share()" [disabled]="selectedCount() === 0">
-    {{ 'common.share.locationContactShareButton' | transloco:{ count: selectedCount() } }}
+<mat-dialog-actions class="sticky-actions contact-select-actions">
+  <button mat-icon-button type="button" class="action-cancel" (click)="cancel()"
+    [attr.aria-label]="'common.actions.cancel' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+  <button mat-icon-button color="primary" type="button" class="action-apply" (click)="share()"
+    [disabled]="selectedCount() === 0" [attr.aria-label]="'common.actions.apply' | transloco">
+    <mat-icon>check</mat-icon>
   </button>
 </mat-dialog-actions>

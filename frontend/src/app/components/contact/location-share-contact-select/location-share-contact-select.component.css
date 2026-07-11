@@ -64,3 +64,8 @@
   text-align: center;
   color: var(--mat-sys-on-surface-variant);
 }
+
+.contact-select-actions {
+  display: flex;
+  justify-content: space-between;
+}
