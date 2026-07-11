@@ -17,6 +17,7 @@ import { AirQualityComponent } from './components/air-quality/air-quality.compon
 import { AppSettingsComponent } from './components/app-settings/app-settings.component';
 import { UsageProtectionComponent } from './components/app-settings/usage-protection/usage-protection.component';
 import { ContactlistComponent } from './components/contactlist/contactlist.component';
+import { LocationShareContactSelectComponent } from './components/contact/location-share-contact-select/location-share-contact-select.component';
 import { DocumentlistComponent } from './components/documentlist/documentlist.component';
 import { EditMessageComponent } from './components/editmessage/edit-message.component';
 import { EditSecretDropComponent } from './components/edit-secret-drop/edit-secret-drop.component';
@@ -54,6 +55,7 @@ import { NominatimSearchComponent } from './components/utils/nominatim-search/no
 import { SearchSettingsComponent } from './components/utils/search-settings/search-settings.component';
 import { WeatherComponent } from './components/weather/weather.component';
 import { GetGeoStatisticResponse } from './interfaces/get-geo-statistic-response';
+import { Contact } from './interfaces/contact';
 import { LocalDocument } from './interfaces/local-document';
 import { LocalImage } from './interfaces/local-image';
 import { Location } from './interfaces/location';
@@ -79,6 +81,7 @@ import { AppService } from './services/app.service';
 import { BackupStateService } from './services/backup-state.service';
 import { BackupService } from './services/backup.service';
 import { ContactMessageService } from './services/contact-message.service';
+import { ContactLocationShareService } from './services/contact-location-share.service';
 import { ContactProfileExchangeService } from './services/contact-profile-exchange.service';
 import { ContactService } from './services/contact.service';
 import { DiagnosticLoggerService } from './services/diagnostic-logger.service';
@@ -211,6 +214,7 @@ export class AppComponent implements OnInit {
   private readonly locale = inject<string>(LOCALE_ID);
   readonly powService = inject(PowService);
   private readonly publicMessageShare = inject(PublicMessageShareService);
+  private readonly contactLocationShare = inject(ContactLocationShareService);
   private exitBackupPromptPending = false;
   private exitBackupDialogOpen = false;
   private exitBackupPromptTimer?: ReturnType<typeof setTimeout>;
@@ -1442,9 +1446,90 @@ export class AppComponent implements OnInit {
     });
   }
 
-  public shareSelectedLocation(): void {
+  public async shareSelectedLocation(): Promise<void> {
     const location = this.mapService.getMapLocation();
-    void this.publicMessageShare.shareLocation(location);
+    const result = await firstValueFrom(this.dialog.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: {
+        showAlways: true,
+        title: this.translation.t('common.share.locationShareChoiceTitle'),
+        image: '',
+        icon: 'share_location',
+        message: this.translation.t('common.share.locationShareChoiceMessage'),
+        button: this.translation.t('common.share.locationShareChoiceLink'),
+        secondaryButton: this.translation.t('common.share.locationShareChoiceContact'),
+        delay: 0,
+        showSpinner: false
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    }).afterClosed());
+
+    if (result === true) {
+      void this.publicMessageShare.shareLocation(location);
+      return;
+    }
+
+    if (result === 'secondary') {
+      await this.shareSelectedLocationWithContacts(location);
+    }
+  }
+
+  private async shareSelectedLocationWithContacts(location: Location): Promise<void> {
+    if (!this.userService.isReady() || !this.userService.hasJwt()) {
+      await this.userService.loginWithBackend(() => {
+        void this.openLocationContactShareDialog(location);
+      });
+      return;
+    }
+
+    await this.openLocationContactShareDialog(location);
+  }
+
+  private async openLocationContactShareDialog(location: Location): Promise<void> {
+    if (!await this.ensureUserMenuActionAllowed()) {
+      return;
+    }
+
+    if (!this.contactService.isReady()) {
+      this.contactService.initContacts(true);
+    }
+
+    const selectedContacts = await firstValueFrom(this.dialog.open(LocationShareContactSelectComponent, {
+      closeOnNavigation: true,
+      width: 'min(520px, 95vw)',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    }).afterClosed());
+
+    if (!selectedContacts?.length) {
+      return;
+    }
+
+    const result = await this.contactLocationShare.shareLocationWithContacts(location, selectedContacts as Contact[]);
+    const messageKey = result.failed === 0
+      ? 'common.share.locationContactShareSuccess'
+      : result.sent > 0
+        ? 'common.share.locationContactSharePartial'
+        : 'common.share.locationContactShareFailed';
+    this.snackBar.open(
+      this.translation.t(messageKey, { sent: result.sent, failed: result.failed }),
+      undefined,
+      {
+        duration: 3200,
+        verticalPosition: 'top',
+        panelClass: result.failed === 0 ? 'snack-success' : 'snack-warning'
+      }
+    );
   }
 
   public openSelectedLocationInMaps(): void {

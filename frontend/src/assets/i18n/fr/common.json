@@ -84,7 +84,18 @@
       "locationShareText": "Regarde ce lieu sur MessageDrop.",
       "copySuccess": "Lien copié.",
       "copyFailed": "Impossible de copier le lien.",
-      "messageUnavailable": "Ce message public n’est pas disponible."
+      "messageUnavailable": "Ce message public n’est pas disponible.",
+      "locationShareChoiceTitle": "Partager le lieu",
+      "locationShareChoiceMessage": "Comment souhaitez-vous partager ce lieu ?",
+      "locationShareChoiceLink": "Partager par lien",
+      "locationShareChoiceContact": "Partager avec un contact",
+      "locationContactSelectTitle": "Partager le lieu avec des contacts",
+      "locationContactSelectHint": "Sélectionnez un ou plusieurs contacts. Le lieu sera partagé comme message dans le chat.",
+      "locationContactSelectEmpty": "Vous n’avez pas encore de contacts actifs.",
+      "locationContactShareButton": "Partager ({{ count }})",
+      "locationContactShareSuccess": "Lieu partagé avec {{ sent }} contact(s).",
+      "locationContactSharePartial": "Lieu partagé avec {{ sent }} contact(s). {{ failed }} échec(s).",
+      "locationContactShareFailed": "Le lieu n’a pas pu être partagé avec les contacts."
     },
     "aria": {
       "wait": "Attendre",

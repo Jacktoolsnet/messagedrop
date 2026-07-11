@@ -1,0 +1,35 @@
+<app-dialog-header icon="share_location" [title]="'common.share.locationContactSelectTitle' | transloco"></app-dialog-header>
+
+<mat-dialog-content class="contact-select-content">
+  @if (contacts().length === 0) {
+  <div class="empty-state">
+    <mat-icon>person_off</mat-icon>
+    <p>{{ 'common.share.locationContactSelectEmpty' | transloco }}</p>
+  </div>
+  } @else {
+  <p class="hint">{{ 'common.share.locationContactSelectHint' | transloco }}</p>
+  <div class="contact-list">
+    @for (contact of contacts(); track contact.id) {
+    <button type="button" class="contact-row" (click)="toggle(contact)">
+      <span class="avatar" aria-hidden="true">
+        @if (contact.base64Avatar) {
+        <img [src]="contact.base64Avatar" [alt]="getContactDisplayName(contact)" />
+        } @else {
+        <mat-icon>person</mat-icon>
+        }
+      </span>
+      <span class="contact-name">{{ getContactDisplayName(contact) }}</span>
+      <mat-checkbox [checked]="isSelected(contact)" (click)="$event.stopPropagation()" (change)="toggle(contact)"
+        [attr.aria-label]="getContactDisplayName(contact)"></mat-checkbox>
+    </button>
+    }
+  </div>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-button type="button" (click)="cancel()">{{ 'common.actions.cancel' | transloco }}</button>
+  <button mat-flat-button color="primary" type="button" (click)="share()" [disabled]="selectedCount() === 0">
+    {{ 'common.share.locationContactShareButton' | transloco:{ count: selectedCount() } }}
+  </button>
+</mat-dialog-actions>

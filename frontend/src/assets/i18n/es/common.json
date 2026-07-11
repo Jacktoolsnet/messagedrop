@@ -84,7 +84,18 @@
       "locationShareText": "Mira esta ubicación en MessageDrop.",
       "copySuccess": "Enlace copiado.",
       "copyFailed": "No se pudo copiar el enlace.",
-      "messageUnavailable": "Este mensaje público no está disponible."
+      "messageUnavailable": "Este mensaje público no está disponible.",
+      "locationShareChoiceTitle": "Compartir ubicación",
+      "locationShareChoiceMessage": "¿Cómo quieres compartir esta ubicación?",
+      "locationShareChoiceLink": "Compartir por enlace",
+      "locationShareChoiceContact": "Compartir con contacto",
+      "locationContactSelectTitle": "Compartir ubicación con contactos",
+      "locationContactSelectHint": "Selecciona uno o varios contactos. La ubicación se compartirá como mensaje en el chat.",
+      "locationContactSelectEmpty": "Aún no tienes contactos activos.",
+      "locationContactShareButton": "Compartir ({{ count }})",
+      "locationContactShareSuccess": "Ubicación compartida con {{ sent }} contacto(s).",
+      "locationContactSharePartial": "Ubicación compartida con {{ sent }} contacto(s). {{ failed }} fallaron.",
+      "locationContactShareFailed": "No se pudo compartir la ubicación con los contactos."
     },
     "aria": {
       "wait": "Esperar",

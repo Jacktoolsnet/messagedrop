@@ -84,7 +84,18 @@
       "locationShareText": "Schau dir diesen Ort auf MessageDrop an.",
       "copySuccess": "Link kopiert.",
       "copyFailed": "Link konnte nicht kopiert werden.",
-      "messageUnavailable": "Diese öffentliche Nachricht ist nicht verfügbar."
+      "messageUnavailable": "Diese öffentliche Nachricht ist nicht verfügbar.",
+      "locationShareChoiceTitle": "Ort teilen",
+      "locationShareChoiceMessage": "Wie möchtest du diesen Ort teilen?",
+      "locationShareChoiceLink": "Per Link teilen",
+      "locationShareChoiceContact": "Mit Kontakt teilen",
+      "locationContactSelectTitle": "Ort mit Kontakten teilen",
+      "locationContactSelectHint": "Wähle einen oder mehrere Kontakte aus. Der Ort wird als Nachricht im Chat geteilt.",
+      "locationContactSelectEmpty": "Du hast noch keine aktiven Kontakte.",
+      "locationContactShareButton": "Teilen ({{ count }})",
+      "locationContactShareSuccess": "Ort wurde mit {{ sent }} Kontakt(en) geteilt.",
+      "locationContactSharePartial": "Ort wurde mit {{ sent }} Kontakt(en) geteilt. {{ failed }} fehlgeschlagen.",
+      "locationContactShareFailed": "Ort konnte nicht mit Kontakten geteilt werden."
     },
     "aria": {
       "wait": "Warten",
