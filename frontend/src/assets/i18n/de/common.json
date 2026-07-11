@@ -1203,6 +1203,12 @@
         "openFailed": "Datei konnte nicht geöffnet werden.",
         "saveHandlesFailed": "Dateihandles konnten nicht gespeichert werden.",
         "storageFull": "Speicher ist voll. Bitte gib Platz frei und versuche es erneut."
+      },
+      "unsavedChanges": {
+        "title": "Änderungen speichern?",
+        "message": "Es liegen ungespeicherte Änderungen vor. Möchtest du sie vor dem Schließen speichern?",
+        "discard": "Nicht speichern",
+        "keepEditing": "Weiter bearbeiten"
       }
     },
     "tileEdit": {

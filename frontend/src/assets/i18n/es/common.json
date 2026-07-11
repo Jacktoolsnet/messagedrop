@@ -1202,6 +1202,12 @@
         "openFailed": "No se puede abrir el archivo.",
         "saveHandlesFailed": "No se pudieron guardar los identificadores de archivos.",
         "storageFull": "El almacenamiento está lleno. Libera espacio e inténtalo de nuevo."
+      },
+      "unsavedChanges": {
+        "title": "¿Guardar cambios?",
+        "message": "Hay cambios sin guardar. ¿Quieres guardarlos antes de cerrar?",
+        "discard": "No guardar",
+        "keepEditing": "Seguir editando"
       }
     },
     "tileEdit": {

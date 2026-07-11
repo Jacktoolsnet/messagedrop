@@ -1202,6 +1202,12 @@
         "openFailed": "Impossible d'ouvrir le fichier.",
         "saveHandlesFailed": "Impossible d'enregistrer les références de fichiers.",
         "storageFull": "Le stockage est plein. Libérez de l'espace et réessayez."
+      },
+      "unsavedChanges": {
+        "title": "Enregistrer les modifications ?",
+        "message": "Des modifications ne sont pas enregistrées. Voulez-vous les enregistrer avant de fermer ?",
+        "discard": "Ne pas enregistrer",
+        "keepEditing": "Continuer"
       }
     },
     "tileEdit": {

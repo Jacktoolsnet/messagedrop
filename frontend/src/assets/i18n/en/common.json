@@ -1203,6 +1203,12 @@
         "openFailed": "Unable to open the file.",
         "saveHandlesFailed": "Unable to save file handles.",
         "storageFull": "Storage is full. Free up space and try again."
+      },
+      "unsavedChanges": {
+        "title": "Save changes?",
+        "message": "There are unsaved changes. Do you want to save them before closing?",
+        "discard": "Don’t save",
+        "keepEditing": "Keep editing"
       }
     },
     "tileEdit": {

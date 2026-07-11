@@ -4,10 +4,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { firstValueFrom } from 'rxjs';
 import { ShoppingCategory, ShoppingList, TileSetting } from '../../../../interfaces/tile-settings';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { DisplayMessageService } from '../../../../services/display-message.service';
 import { ShoppingImageStorageService } from '../../../../services/shopping-image-storage.service';
+import { DisplayMessage } from '../../../utils/display-message/display-message.component';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 import { saveDialogOnImplicitDismiss } from '../../../utils/dialog-auto-save.util';
@@ -54,6 +56,7 @@ export class ShoppingTileEditComponent {
   readonly icon = signal<string | undefined>(this.data.tile.payload?.icon);
   readonly selectionColor = signal(this.initialList.selectionColor);
   readonly saving = signal(false);
+  private readonly initialSnapshot = this.createSnapshot();
 
   constructor() {
     saveDialogOnImplicitDismiss(this.dialogRef, () => void this.save());
@@ -243,7 +246,16 @@ export class ShoppingTileEditComponent {
     });
   }
 
-  cancel(): void {
+  async cancel(): Promise<void> {
+    if (this.hasUnsavedChanges()) {
+      const saveChanges = await this.confirmSaveChanges();
+      if (saveChanges) {
+        await this.save();
+      } else {
+        this.dialogRef.close();
+      }
+      return;
+    }
     this.dialogRef.close();
   }
 
@@ -308,5 +320,64 @@ export class ShoppingTileEditComponent {
     this.data.onTileCommit?.(updated);
     const hydrated = await this.imageStorage.hydrate(normalizeShoppingList(shopping));
     this.categories.set(hydrated.categories);
+  }
+
+  private hasUnsavedChanges(): boolean {
+    return this.createSnapshot() !== this.initialSnapshot;
+  }
+
+  private async confirmSaveChanges(): Promise<boolean> {
+    const result = await firstValueFrom(this.dialog.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: {
+        showAlways: true,
+        title: this.translation.t('common.tiles.unsavedChanges.title'),
+        image: '',
+        icon: 'warning',
+        message: this.translation.t('common.tiles.unsavedChanges.message'),
+        button: this.translation.t('common.actions.yes'),
+        secondaryButton: this.translation.t('common.actions.no'),
+        delay: 0,
+        showSpinner: false
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    }).afterClosed());
+
+    return result === true;
+  }
+
+  private createSnapshot(): string {
+    const shopping = normalizeShoppingList({
+      categories: this.categories(),
+      currency: this.initialList.currency,
+      selectionColor: this.selectionColor()
+    });
+
+    return JSON.stringify({
+      title: this.headerTitle,
+      icon: this.icon() ?? '',
+      shopping: this.toComparableShoppingList(shopping)
+    });
+  }
+
+  private toComparableShoppingList(shopping: ShoppingList): ShoppingList {
+    return {
+      ...shopping,
+      categories: shopping.categories.map(category => ({
+        ...category,
+        image: category.imageFileId ? undefined : category.image,
+        backgroundImage: category.backgroundImageFileId ? undefined : category.backgroundImage,
+        products: category.products.map(product => ({
+          ...product,
+          image: product.imageFileId ? undefined : product.image
+        }))
+      }))
+    };
   }
 }
