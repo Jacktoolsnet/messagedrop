@@ -138,6 +138,20 @@
     </button>
     }
 
+    @if (userService.isReady() && !userService.isAccountBlocked()) {
+    <button mat-menu-item (click)="openMyExperiencesListDialog()">
+        <mat-icon>bookmark_star</mat-icon>
+        <span>{{ 'common.menu.myExperiences' | transloco }}</span>
+    </button>
+    }
+
+    @if (userService.isReady() && placeService.isReady() && !userService.isAccountBlocked()) {
+    <button mat-menu-item (click)="openPlaceListDialog()">
+        <mat-icon>personal_places</mat-icon>
+        <span>{{ 'common.menu.myPlaces' | transloco }}</span>
+    </button>
+    }
+
     @if (userService.isReady() && contactService.isReady() && !userService.isAccountBlocked()) {
     <button mat-menu-item (click)="openContactListDialog()">
         <mat-icon [attr.aria-hidden]="false" matBadge="{{ getContactsBadge() }}" [matBadgeHidden]="!getContactsBadge()"
@@ -188,18 +202,6 @@
 </mat-menu>
 
 <mat-menu #privateContentMenu="matMenu">
-    @if (userService.isReady() && !userService.isAccountBlocked()) {
-    <button mat-menu-item (click)="openMyExperiencesListDialog()">
-        <mat-icon>bookmark_star</mat-icon>
-        <span>{{ 'common.menu.privateContentExperiences' | transloco }}</span>
-    </button>
-    }
-    @if (userService.isReady() && placeService.isReady() && !userService.isAccountBlocked()) {
-    <button mat-menu-item (click)="openPlaceListDialog()">
-        <mat-icon>personal_places</mat-icon>
-        <span>{{ 'common.menu.privateContentPlaces' | transloco }}</span>
-    </button>
-    }
     <button mat-menu-item (click)="openNoteListDialog()">
         <mat-icon>clinical_notes</mat-icon>
         <span>{{ 'common.menu.privateContentNotes' | transloco }}</span>
