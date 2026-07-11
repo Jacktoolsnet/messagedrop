@@ -7,6 +7,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { Contact } from '../../../interfaces/contact';
 import { ContactService } from '../../../services/contact.service';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
+import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 
 @Component({
   selector: 'app-location-share-contact-select',
@@ -26,6 +27,7 @@ import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.c
 export class LocationShareContactSelectComponent {
   private readonly contactService = inject(ContactService);
   private readonly dialogRef = inject(MatDialogRef<LocationShareContactSelectComponent, Contact[]>);
+  readonly help = inject(HelpDialogService);
 
   readonly contacts = computed(() =>
     this.contactService.sortedContactsSignal().filter((contact) => (contact.status || 'active') === 'active')

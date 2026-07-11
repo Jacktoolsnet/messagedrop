@@ -1,10 +1,6 @@
 .contact-select-content {
   min-width: min(420px, 90vw);
-}
-
-.hint {
-  margin: 0 0 1rem;
-  color: var(--mat-sys-on-surface-variant);
+  padding-bottom: 1rem;
 }
 
 .contact-list {
@@ -67,5 +63,20 @@
 
 .contact-select-actions {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.action-spacer {
+  flex: 1 1 auto;
+}
+
+.action-group-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.action-apply {
+  margin-left: auto;
 }

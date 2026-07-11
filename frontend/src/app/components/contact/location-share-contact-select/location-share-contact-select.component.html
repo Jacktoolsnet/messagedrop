@@ -7,7 +7,6 @@
     <p>{{ 'common.share.locationContactSelectEmpty' | transloco }}</p>
   </div>
   } @else {
-  <p class="hint">{{ 'common.share.locationContactSelectHint' | transloco }}</p>
   <div class="contact-list">
     @for (contact of contacts(); track contact.id) {
     <button type="button" class="contact-row" (click)="toggle(contact)">
@@ -32,8 +31,15 @@
     [attr.aria-label]="'common.actions.cancel' | transloco">
     <mat-icon>close</mat-icon>
   </button>
-  <button mat-icon-button color="primary" type="button" class="action-apply" (click)="share()"
-    [disabled]="selectedCount() === 0" [attr.aria-label]="'common.actions.apply' | transloco">
-    <mat-icon>check</mat-icon>
-  </button>
+  <span class="action-spacer"></span>
+  <span class="action-group-right">
+    <button mat-icon-button type="button" (click)="help.open('locationShareContacts')"
+      [attr.aria-label]="'common.actions.help' | transloco">
+      <mat-icon>help</mat-icon>
+    </button>
+    <button mat-icon-button color="primary" type="button" class="action-apply" (click)="share()"
+      [disabled]="selectedCount() === 0" [attr.aria-label]="'common.actions.apply' | transloco">
+      <mat-icon>check</mat-icon>
+    </button>
+  </span>
 </mat-dialog-actions>

@@ -264,6 +264,20 @@ button,
   word-break: break-word;
 }
 
+.chat-preview-bubble__text--with-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-line-clamp: unset;
+}
+
+.chat-preview-bubble__icon {
+  width: 2rem;
+  height: 2rem;
+  font-size: 2rem;
+  color: var(--mat-primary-color);
+}
+
 .chat-preview-bubble__meta {
   display: inline-flex;
   align-items: center;

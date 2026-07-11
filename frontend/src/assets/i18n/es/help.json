@@ -2856,5 +2856,31 @@
         "desc": "Define dónde se podrá encontrar el SecretDrop en el mapa. La ubicación elegida también determina el área PlusCode usada para la búsqueda."
       }
     }
+  },
+  "locationShareContacts": {
+    "title": "Compartir ubicación con contactos",
+    "intro": "Selecciona uno o varios contactos. La ubicación se compartirá como mensaje en el chat.",
+    "items": {
+      "selection": {
+        "title": "Seleccionar contactos",
+        "desc": "Toca contactos o sus casillas para seleccionar uno o varios destinatarios."
+      },
+      "close": {
+        "title": "Cancelar",
+        "desc": "Cierra la selección sin compartir la ubicación."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Abre esta ayuda para la selección de contactos."
+      },
+      "apply": {
+        "title": "Compartir",
+        "desc": "Envía la ubicación como mensaje de chat a los contactos seleccionados."
+      },
+      "privacy": {
+        "title": "Privacidad",
+        "desc": "La ubicación se comparte mediante el mensaje de contacto cifrado existente."
+      }
+    }
   }
 }

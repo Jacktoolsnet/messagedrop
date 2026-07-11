@@ -12,6 +12,7 @@ import { Connect } from '../../interfaces/connect';
 import { Contact } from '../../interfaces/contact';
 import { ContactMessage } from '../../interfaces/contact-message';
 import { Mode } from '../../interfaces/mode';
+import { MultimediaType } from '../../interfaces/multimedia-type';
 import { ShortMessage } from '../../interfaces/short-message';
 import { ConnectService } from '../../services/connect.service';
 import { ContactMessageService } from '../../services/contact-message.service';
@@ -49,6 +50,8 @@ interface ContactMessagePreview {
   outgoing: boolean;
   status: ContactMessage['status'];
   payload: ShortMessage | null;
+  kind: 'text' | 'audio' | 'experience' | 'location' | 'media' | 'deleted' | 'unreadable';
+  hasText: boolean;
 }
 
 @Component({
@@ -663,8 +666,72 @@ export class ContactlistComponent {
       text: this.resolvePreviewText(message, payload),
       outgoing: message.direction === 'user',
       status: message.status,
-      payload
+      payload,
+      kind: this.resolvePreviewKind(message, payload),
+      hasText: this.hasPreviewText(payload)
     };
+  }
+
+  private resolvePreviewKind(message: ContactMessage, payload: ShortMessage | null): ContactMessagePreview['kind'] {
+    if (message.status === 'deleted') {
+      return 'deleted';
+    }
+    if (!payload) {
+      return 'unreadable';
+    }
+    if (payload.multimedia?.type && payload.multimedia.type !== MultimediaType.UNDEFINED) {
+      return 'media';
+    }
+    if (payload.translatedMessage?.trim() || payload.message?.trim()) {
+      return 'text';
+    }
+    if (payload.audio) {
+      return 'audio';
+    }
+    if (payload.experience) {
+      return 'experience';
+    }
+    if (payload.location) {
+      return 'location';
+    }
+    return 'unreadable';
+  }
+
+  private hasPreviewText(payload: ShortMessage | null): boolean {
+    return !!(payload?.translatedMessage?.trim() || payload?.message?.trim());
+  }
+
+  getPreviewIcon(preview: ContactMessagePreview): string {
+    if (preview.kind === 'location') {
+      return 'location_on';
+    }
+
+    if (preview.kind !== 'media') {
+      return '';
+    }
+
+    switch (preview.payload?.multimedia?.type) {
+      case MultimediaType.STICKER:
+        return 'emoji_emotions';
+      case MultimediaType.TENOR:
+      case MultimediaType.KLIPY:
+      case MultimediaType.GIPHY:
+        return 'gif_box';
+      case MultimediaType.UNSPLASH:
+      case MultimediaType.FLICKR:
+      case MultimediaType.INSTAGRAM:
+      case MultimediaType.PINTEREST:
+      case MultimediaType.SNAPCHAT:
+        return 'image';
+      case MultimediaType.YOUTUBE:
+      case MultimediaType.TIKTOK:
+        return 'smart_display';
+      case MultimediaType.SOUNDCLOUD:
+      case MultimediaType.SPOTIFY:
+        return 'music_note';
+      default:
+        return 'perm_media';
+    }
   }
 
   private resolvePreviewText(message: ContactMessage, payload: ShortMessage | null): string {
@@ -698,14 +765,11 @@ export class ContactlistComponent {
     }
 
     if (payload.location) {
-      return this.normalizePreviewText(
-        payload.location.plusCode?.trim()
-        || this.translation.t('common.contact.list.previewLocation')
-      );
+      return this.translation.t('common.contact.list.previewLocation');
     }
 
     const multimediaTitle = payload.multimedia?.title?.trim() || payload.multimedia?.description?.trim();
-    if (multimediaTitle) {
+    if (multimediaTitle && (payload.message?.trim() || payload.translatedMessage?.trim())) {
       return this.normalizePreviewText(multimediaTitle);
     }
 

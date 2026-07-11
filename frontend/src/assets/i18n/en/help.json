@@ -2874,5 +2874,31 @@
         "desc": "Set where on the map the SecretDrop can be found later. The selected location also determines the PlusCode area used for discovery."
       }
     }
+  },
+  "locationShareContacts": {
+    "title": "Share location with contacts",
+    "intro": "Select one or more contacts. The location will be shared as a chat message.",
+    "items": {
+      "selection": {
+        "title": "Select contacts",
+        "desc": "Tap contacts or their checkboxes to select one or more recipients."
+      },
+      "close": {
+        "title": "Cancel",
+        "desc": "Closes the selection without sharing the location."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "Opens this help for contact selection."
+      },
+      "apply": {
+        "title": "Share",
+        "desc": "Sends the location as a chat message to the selected contacts."
+      },
+      "privacy": {
+        "title": "Privacy",
+        "desc": "The location is shared through the existing encrypted contact message."
+      }
+    }
   }
 }

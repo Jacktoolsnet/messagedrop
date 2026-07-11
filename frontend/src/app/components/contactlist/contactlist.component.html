@@ -46,7 +46,14 @@
                             (keyup.enter)="openContactChatroom(contact, preview.messageId)"
                             (keyup.space)="openContactChatroom(contact, preview.messageId); $event.preventDefault()">
                             <div class="chat-preview-bubble">
-                                <div class="chat-preview-bubble__text" [attr.title]="preview.text">{{ preview.text }}</div>
+                                <div class="chat-preview-bubble__text" [attr.title]="preview.text"
+                                    [class.chat-preview-bubble__text--with-icon]="preview.kind === 'location'">
+                                    @if (preview.kind === 'location') {
+                                    <mat-icon class="chat-preview-bubble__icon" aria-hidden="true">location_on</mat-icon>
+                                    } @else {
+                                    <span>{{ preview.text }}</span>
+                                    }
+                                </div>
                                 <div class="chat-preview-bubble__meta"
                                     [attr.title]="preview.createdAt | date:'medium'">
                                     <span>

@@ -960,6 +960,37 @@ const HELP_TOPICS = {
     introKey: 'common.intros.editor',
     items: ITEMS.editorBasic
   },
+  locationShareContacts: {
+    titleKey: 'locationShareContacts.title',
+    introKey: 'locationShareContacts.intro',
+    items: [
+      {
+        icon: 'checklist',
+        titleKey: 'locationShareContacts.items.selection.title',
+        descriptionKey: 'locationShareContacts.items.selection.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'locationShareContacts.items.close.title',
+        descriptionKey: 'locationShareContacts.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'locationShareContacts.items.help.title',
+        descriptionKey: 'locationShareContacts.items.help.desc'
+      },
+      {
+        icon: 'check',
+        titleKey: 'locationShareContacts.items.apply.title',
+        descriptionKey: 'locationShareContacts.items.apply.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'locationShareContacts.items.privacy.title',
+        descriptionKey: 'locationShareContacts.items.privacy.desc'
+      }
+    ]
+  },
   contactSettings: {
     titleKey: 'contactSettings.title',
     introKey: 'common.intros.settings',

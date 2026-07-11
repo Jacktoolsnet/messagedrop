@@ -90,7 +90,6 @@
       "locationShareChoiceLink": "Per Link teilen",
       "locationShareChoiceContact": "Mit Kontakt teilen",
       "locationContactSelectTitle": "Ort mit Kontakten teilen",
-      "locationContactSelectHint": "Wähle einen oder mehrere Kontakte aus. Der Ort wird als Nachricht im Chat geteilt.",
       "locationContactSelectEmpty": "Du hast noch keine aktiven Kontakte.",
       "locationContactShareButton": "Teilen ({{ count }})",
       "locationContactShareSuccess": "Ort wurde mit {{ sent }} Kontakt(en) geteilt.",

@@ -90,7 +90,6 @@
       "locationShareChoiceLink": "Share by link",
       "locationShareChoiceContact": "Share with contact",
       "locationContactSelectTitle": "Share location with contacts",
-      "locationContactSelectHint": "Select one or more contacts. The location will be shared as a chat message.",
       "locationContactSelectEmpty": "You do not have any active contacts yet.",
       "locationContactShareButton": "Share ({{ count }})",
       "locationContactShareSuccess": "Location shared with {{ sent }} contact(s).",

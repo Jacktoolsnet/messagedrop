@@ -2874,5 +2874,31 @@
         "desc": "Lege fest, an welchem Kartenort der GeheimnisDrop später gefunden werden soll. Der gewählte Ort bestimmt auch den PlusCode-Bereich für die Suche."
       }
     }
+  },
+  "locationShareContacts": {
+    "title": "Ort mit Kontakten teilen",
+    "intro": "Wähle einen oder mehrere Kontakte aus. Der Ort wird als Nachricht im Chat geteilt.",
+    "items": {
+      "selection": {
+        "title": "Kontakte auswählen",
+        "desc": "Tippe auf Kontakte oder die Checkboxen, um einen oder mehrere Empfänger auszuwählen."
+      },
+      "close": {
+        "title": "Abbrechen",
+        "desc": "Schließt die Auswahl, ohne den Ort zu teilen."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Öffnet diese Hilfe zur Kontaktauswahl."
+      },
+      "apply": {
+        "title": "Teilen",
+        "desc": "Sendet den Ort als Chat-Nachricht an die ausgewählten Kontakte."
+      },
+      "privacy": {
+        "title": "Privatsphäre",
+        "desc": "Der Ort wird über die bestehende verschlüsselte Kontakt-Nachricht geteilt."
+      }
+    }
   }
 }
