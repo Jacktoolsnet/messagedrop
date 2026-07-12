@@ -33,7 +33,9 @@ async function refreshTile(db, language, tile, key, logger) {
 }
 
 async function resolveTile(db, language, tile, logger) {
-  const key = `${language}:z${tile.zoom}:x${tile.x}:y${tile.y}:v1`;
+  // v2 invalidates the former generator-based cache, which could contain only
+  // the first 20 GeoSearch entries in dense city tiles.
+  const key = `${language}:z${tile.zoom}:x${tile.x}:y${tile.y}:v2`;
   const freshMs = Number(process.env.WIKIPEDIA_CACHE_FRESH_MS || 24 * 60 * 60 * 1000);
   const staleMs = Number(process.env.WIKIPEDIA_CACHE_STALE_MS || 7 * 24 * 60 * 60 * 1000);
   const cached = await dbGet(db, key);

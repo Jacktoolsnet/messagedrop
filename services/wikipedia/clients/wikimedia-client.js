@@ -102,33 +102,46 @@ async function wikipediaGet(url, config = {}) {
 
 async function requestTile(language, bounds) {
   const timeout = Number(process.env.WIKIPEDIA_UPSTREAM_TIMEOUT_MS || 10000);
-  const params = {
-    action: 'query', format: 'json', formatversion: 2, maxlag: 5, generator: 'geosearch',
-    ggsbbox: `${bounds.north}|${bounds.west}|${bounds.south}|${bounds.east}`,
-    // TextExtracts returns at most 20 extracts per response. Keep GeoSearch batches
-    // at the same size so every returned page can receive a summary.
-    ggsprimary: 'primary', ggslimit: Math.min(20, Number(process.env.WIKIPEDIA_TILE_RESULT_LIMIT || 20)),
-    prop: 'coordinates|pageimages|extracts|pageterms|info', piprop: 'thumbnail|name',
-    pithumbsize: Number(process.env.WIKIPEDIA_THUMBNAIL_SIZE || 240),
-    exintro: 1, explaintext: 1, exlimit: 'max', exchars: Number(process.env.WIKIPEDIA_EXTRACT_CHARS || 280),
-    wbptterms: 'description',
-    inprop: 'url', redirects: 1
-  };
-  const articles = new Map();
-  let continuation = {};
   const resultLimit = Math.min(500, Number(process.env.WIKIPEDIA_MAX_RESULTS_PER_TILE || 500));
-  while (articles.size < resultLimit) {
+  const searchResponse = await wikipediaGet(`https://${language}.wikipedia.org/w/api.php`, {
+    params: {
+      action: 'query', format: 'json', formatversion: 2, maxlag: 5, list: 'geosearch',
+      gsbbox: `${bounds.north}|${bounds.west}|${bounds.south}|${bounds.east}`,
+      gsprimary: 'primary', gslimit: resultLimit
+    },
+    timeout,
+    headers: headers()
+  });
+  const locations = new Map((searchResponse.data?.query?.geosearch || []).map((entry) => [entry.pageid, entry]));
+  const pageIds = Array.from(locations.keys()).slice(0, resultLimit);
+  const articles = new Map();
+  const detailBatchSize = Math.max(1, Math.min(20, Number(process.env.WIKIPEDIA_TILE_RESULT_LIMIT || 20)));
+
+  // TextExtracts supports at most 20 pages per request. GeoSearch must therefore
+  // be fetched independently and its complete result enriched in small batches.
+  for (let offset = 0; offset < pageIds.length; offset += detailBatchSize) {
+    const batch = pageIds.slice(offset, offset + detailBatchSize);
     const response = await wikipediaGet(`https://${language}.wikipedia.org/w/api.php`, {
-      params: { ...params, ...continuation }, timeout, headers: headers()
+      params: {
+        action: 'query', format: 'json', formatversion: 2, maxlag: 5,
+        pageids: batch.join('|'), prop: 'pageimages|extracts|pageterms|info',
+        piprop: 'thumbnail|name', pithumbsize: Number(process.env.WIKIPEDIA_THUMBNAIL_SIZE || 240),
+        exintro: 1, explaintext: 1, exlimit: 'max', exchars: Number(process.env.WIKIPEDIA_EXTRACT_CHARS || 280),
+        wbptterms: 'description', inprop: 'url'
+      },
+      timeout,
+      headers: headers()
     });
     for (const page of response.data?.query?.pages || []) {
+      const location = locations.get(page.pageid);
+      if (!location) continue;
       const fallbackArticleUrl = `https://${language}.wikipedia.org/?curid=${page.pageid}`;
       const thumbnailUrl = safeHttpsUrl(page.thumbnail?.source);
       const article = {
         pageId: page.pageid,
         title: page.title,
-        latitude: page.coordinates?.[0]?.lat,
-        longitude: page.coordinates?.[0]?.lon,
+        latitude: location.lat,
+        longitude: location.lon,
         summary: page.extract || page.terms?.description?.[0] || '',
         thumbnail: thumbnailUrl ? { url: thumbnailUrl, width: page.thumbnail.width, height: page.thumbnail.height } : null,
         imageTitle: page.pageimage || null,
@@ -136,9 +149,9 @@ async function requestTile(language, bounds) {
       };
       if (Number.isFinite(article.latitude) && Number.isFinite(article.longitude)) articles.set(article.pageId, article);
     }
-    if (!response.data?.continue || articles.size >= resultLimit) break;
-    continuation = response.data.continue;
-    await sleep(Number(process.env.WIKIPEDIA_REQUEST_INTERVAL_MS || 150));
+    if (offset + detailBatchSize < pageIds.length) {
+      await sleep(Number(process.env.WIKIPEDIA_REQUEST_INTERVAL_MS || 150));
+    }
   }
   return Array.from(articles.values()).slice(0, resultLimit);
 }
