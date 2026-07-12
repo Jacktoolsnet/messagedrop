@@ -112,7 +112,8 @@ router.get('/attribution', async (req, res, next) => {
     return res.status(400).json({ errorCode: 'BAD_REQUEST', message: 'invalid_attribution_request', error: 'invalid_attribution_request' });
   }
   try {
-    const key = `attribution:${language}:${pageId}:${imageTitle || 'no-image'}:${needsSummary ? 'summary' : 'no-summary'}:v3`;
+    // v4 uses attribution scoped to the exact displayed pageimage.
+    const key = `attribution:${language}:${pageId}:${imageTitle || 'no-image'}:${needsSummary ? 'summary' : 'no-summary'}:v4`;
     const cached = await dbGet(req.database.db, key);
     const cachedPayload = cached ? parsePayload(cached.payload) : null;
     const ttl = cachedPayload?.image?.resolved !== false

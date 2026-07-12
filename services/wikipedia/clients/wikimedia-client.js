@@ -263,26 +263,33 @@ async function requestAttribution(language, title, imageTitle, needsSummary = fa
 
   let image = null;
   if (imageTitle) {
-    const signalLicense = findSignalValue(signals, ['media_license_name', 'image_license_name']);
-    const signalSourceUrl = findSignalValue(signals, ['media_source_url', 'image_source_url', 'file_description_url']);
-    const signalCreator = findSignalValue(signals, ['media_creator_name', 'image_creator_name']);
-    const signalCredit = findSignalValue(signals, ['media_credit', 'image_credit']);
-    const safeSignalSourceUrl = safeHttpsUrl(signalSourceUrl);
-    if (signalLicense && safeSignalSourceUrl && (signalCreator || signalCredit)) {
-      image = {
-        resolved: true,
-        creator: signalCreator,
-        credit: signalCredit,
-        license: signalLicense,
-        licenseUrl: safeHttpsUrl(findSignalValue(signals, ['media_license_url', 'image_license_url'])),
-        sourceUrl: safeSignalSourceUrl,
-        attributionRequired: true,
-        source: 'attribution-api'
-      };
+    // The attribution signals endpoint describes the complete article and may
+    // contain creators for several embedded media files. Query imageinfo first
+    // with the exact pageimage title so attribution matches the displayed image.
+    const exactImage = await fetchImageInfo(language, imageTitle);
+    if (exactImage) {
+      image = { ...exactImage, source: 'imageinfo' };
     } else {
       metrics.imageInfoFallbacks += 1;
-      const fallback = await fetchImageInfo(language, imageTitle);
-      image = fallback ? { ...fallback, source: 'imageinfo' } : { resolved: false, source: 'unresolved' };
+      const signalLicense = findSignalValue(signals, ['media_license_name', 'image_license_name']);
+      const signalSourceUrl = findSignalValue(signals, ['media_source_url', 'image_source_url', 'file_description_url']);
+      const signalCreator = findSignalValue(signals, ['media_creator_name', 'image_creator_name']);
+      const signalCredit = findSignalValue(signals, ['media_credit', 'image_credit']);
+      const safeSignalSourceUrl = safeHttpsUrl(signalSourceUrl);
+      if (signalLicense && safeSignalSourceUrl && (signalCreator || signalCredit)) {
+        image = {
+          resolved: true,
+          creator: signalCreator,
+          credit: signalCredit,
+          license: signalLicense,
+          licenseUrl: safeHttpsUrl(findSignalValue(signals, ['media_license_url', 'image_license_url'])),
+          sourceUrl: safeSignalSourceUrl,
+          attributionRequired: true,
+          source: 'attribution-api'
+        };
+      } else {
+        image = { resolved: false, source: 'unresolved' };
+      }
     }
   }
   const summary = needsSummary ? await fetchRestSummary(language, title) : '';
