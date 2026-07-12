@@ -1643,7 +1643,7 @@ export class AppComponent implements OnInit {
       wikipedia: {
         ...DEFAULT_SEARCH_SETTINGS.wikipedia,
         ...(settings?.wikipedia ?? {}),
-        minZoom: Math.min(19, Math.max(16, settings?.wikipedia?.minZoom ?? DEFAULT_SEARCH_SETTINGS.wikipedia.minZoom))
+        minZoom: Math.min(19, Math.max(14, settings?.wikipedia?.minZoom ?? DEFAULT_SEARCH_SETTINGS.wikipedia.minZoom))
       }
     };
   }

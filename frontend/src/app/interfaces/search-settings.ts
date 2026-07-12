@@ -23,5 +23,5 @@ export const DEFAULT_SEARCH_SETTINGS: SearchSettings = {
   privateDocuments: { enabled: true, minZoom: 3 },
   experiences: { enabled: true, minZoom: 8 },
   myExperiences: { enabled: true, minZoom: 3 },
-  wikipedia: { enabled: false, minZoom: 16 }
+  wikipedia: { enabled: false, minZoom: 14 }
 };

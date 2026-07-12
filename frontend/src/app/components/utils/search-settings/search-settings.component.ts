@@ -145,7 +145,7 @@ export class SearchSettingsComponent {
   }
 
   getMinZoom(key: SearchSettingsKey): number {
-    return key === 'wikipedia' ? 16 : this.minZoom;
+    return key === 'wikipedia' ? 14 : this.minZoom;
   }
 
   getPreviewMarkerIcon(key: SearchSettingsKey): string {
@@ -172,7 +172,7 @@ export class SearchSettingsComponent {
       wikipedia: {
         ...DEFAULT_SEARCH_SETTINGS.wikipedia,
         ...settings.wikipedia,
-        minZoom: Math.min(19, Math.max(16, settings.wikipedia?.minZoom ?? DEFAULT_SEARCH_SETTINGS.wikipedia.minZoom))
+        minZoom: Math.min(19, Math.max(14, settings.wikipedia?.minZoom ?? DEFAULT_SEARCH_SETTINGS.wikipedia.minZoom))
       }
     };
   }
