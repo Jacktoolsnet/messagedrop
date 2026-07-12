@@ -154,6 +154,10 @@ function errorHandler(err, req, res, next) {
   const logContext = buildLogContext(req, payload, status, err);
   sanitizeErrorPayload(payload);
 
+  if (Number.isFinite(err?.retryAfterSeconds) && err.retryAfterSeconds > 0) {
+    res.set('Retry-After', String(Math.ceil(err.retryAfterSeconds)));
+  }
+
   if (status >= 500) {
     req?.logger?.error?.('Request failed with server error', { ...logContext, message: err?.message, stack: err?.stack });
   } else {

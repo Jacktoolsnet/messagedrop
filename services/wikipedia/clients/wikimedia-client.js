@@ -75,7 +75,8 @@ async function wikipediaGet(url, config = {}) {
       return response;
     } catch (error) {
       lastError = error;
-      if (!isRetryable(error) || attempt === 2) {
+      const retryable = isRetryable(error);
+      if (!retryable) {
         error.status = error.status || (error.response?.status >= 400 ? error.response.status : 502);
         throw error;
       }
@@ -83,6 +84,16 @@ async function wikipediaGet(url, config = {}) {
       // Retry-After applies to this operator, not just to the current request.
       // Share the cooldown across all languages and queued Wikimedia jobs.
       upstreamBlockedUntil = Math.max(upstreamBlockedUntil, Date.now() + delay);
+      const upstreamCode = error?.response?.data?.error?.code;
+      if (error?.response?.status === 429 || upstreamCode === 'ratelimited' || upstreamCode === 'maxlag') {
+        error.status = 503;
+        error.errorCode = 'WIKIMEDIA_RATE_LIMIT';
+        error.retryAfterSeconds = Math.max(1, Math.ceil(delay / 1000));
+      }
+      if (attempt === 2) {
+        error.status = error.status || (error.response?.status >= 400 ? error.response.status : 502);
+        throw error;
+      }
       await waitForUpstreamCooldown();
     }
   }
