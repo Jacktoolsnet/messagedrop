@@ -33,8 +33,8 @@ async function refreshTile(db, language, tile, key, logger) {
 }
 
 async function resolveTile(db, language, tile, logger) {
-  // v4 aligns GeoSearch pages with TextExtracts' 20-page response limit.
-  const key = `${language}:z${tile.zoom}:x${tile.x}:y${tile.y}:v4`;
+  // v5 adds Wikidata page descriptions as a fallback for empty extracts.
+  const key = `${language}:z${tile.zoom}:x${tile.x}:y${tile.y}:v5`;
   const freshMs = Number(process.env.WIKIPEDIA_CACHE_FRESH_MS || 24 * 60 * 60 * 1000);
   const staleMs = Number(process.env.WIKIPEDIA_CACHE_STALE_MS || 7 * 24 * 60 * 60 * 1000);
   const cached = await dbGet(db, key);
@@ -104,13 +104,14 @@ router.get('/attribution', async (req, res, next) => {
   const language = String(req.query.language || '').toLowerCase();
   const title = String(req.query.title || '').trim();
   const imageTitle = String(req.query.imageTitle || '').trim() || null;
+  const needsSummary = String(req.query.needsSummary || '').toLowerCase() === 'true';
   const pageId = Number(req.query.pageId);
   if (!/^[a-z]{2,3}$/.test(language) || !title || title.length > 500 || (imageTitle && imageTitle.length > 500)
       || !Number.isInteger(pageId) || pageId <= 0) {
     return res.status(400).json({ errorCode: 'BAD_REQUEST', message: 'invalid_attribution_request', error: 'invalid_attribution_request' });
   }
   try {
-    const key = `attribution:${language}:${pageId}:${imageTitle || 'no-image'}:v2`;
+    const key = `attribution:${language}:${pageId}:${imageTitle || 'no-image'}:${needsSummary ? 'summary' : 'no-summary'}:v3`;
     const cached = await dbGet(req.database.db, key);
     const cachedPayload = cached ? parsePayload(cached.payload) : null;
     const ttl = cachedPayload?.image?.resolved !== false
@@ -121,7 +122,7 @@ router.get('/attribution', async (req, res, next) => {
       return res.status(200).json({ status: 200, ...cachedPayload, cache: 'hit' });
     }
     cacheMetrics.attributionMisses += 1;
-    const attribution = await fetchAttribution(language, title, imageTitle);
+    const attribution = await fetchAttribution(language, title, imageTitle, needsSummary);
     await dbSet(req.database.db, key, attribution);
     return res.status(200).json({ status: 200, ...attribution, cache: 'miss' });
   } catch (error) {

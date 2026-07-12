@@ -53,9 +53,10 @@ async function requestTile(language, bounds) {
     // TextExtracts returns at most 20 extracts per response. Keep GeoSearch batches
     // at the same size so every returned page can receive a summary.
     ggsprimary: 'primary', ggslimit: Math.min(20, Number(process.env.WIKIPEDIA_TILE_RESULT_LIMIT || 20)),
-    prop: 'coordinates|pageimages|extracts|info', piprop: 'thumbnail|name',
+    prop: 'coordinates|pageimages|extracts|pageterms|info', piprop: 'thumbnail|name',
     pithumbsize: Number(process.env.WIKIPEDIA_THUMBNAIL_SIZE || 240),
     exintro: 1, explaintext: 1, exlimit: 'max', exchars: Number(process.env.WIKIPEDIA_EXTRACT_CHARS || 280),
+    wbptterms: 'description',
     inprop: 'url', redirects: 1
   };
   let lastError;
@@ -83,7 +84,7 @@ async function requestTile(language, bounds) {
             title: page.title,
             latitude: page.coordinates?.[0]?.lat,
             longitude: page.coordinates?.[0]?.lon,
-            summary: page.extract || '',
+            summary: page.extract || page.terms?.description?.[0] || '',
             thumbnail: thumbnailUrl ? { url: thumbnailUrl, width: page.thumbnail.width, height: page.thumbnail.height } : null,
             imageTitle: page.pageimage || null,
             articleUrl: safeHttpsUrl(page.fullurl, fallbackArticleUrl)
@@ -176,7 +177,20 @@ async function fetchImageInfo(language, imageTitle) {
   return null;
 }
 
-async function requestAttribution(language, title, imageTitle) {
+async function fetchRestSummary(language, title) {
+  try {
+    metrics.upstreamRequests += 1;
+    const response = await axios.get(
+      `https://${language}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title.replace(/ /g, '_'))}`,
+      { timeout: Number(process.env.WIKIPEDIA_UPSTREAM_TIMEOUT_MS || 10000), headers: headers() }
+    );
+    return stripHtml(response.data?.extract || response.data?.description || '').slice(0, Number(process.env.WIKIPEDIA_EXTRACT_CHARS || 280));
+  } catch {
+    return '';
+  }
+}
+
+async function requestAttribution(language, title, imageTitle, needsSummary = false) {
   let signals = null;
   try {
     metrics.upstreamRequests += 1;
@@ -226,7 +240,8 @@ async function requestAttribution(language, title, imageTitle) {
       image = fallback ? { ...fallback, source: 'imageinfo' } : { resolved: false, source: 'unresolved' };
     }
   }
-  return { article, image };
+  const summary = needsSummary ? await fetchRestSummary(language, title) : '';
+  return { article, image, summary };
 }
 
 function enqueue(language, key, taskFactory) {
@@ -252,9 +267,9 @@ function enqueue(language, key, taskFactory) {
   });
 }
 
-function fetchAttribution(language, title, imageTitle) {
-  const key = `attribution:${language}:${title}:${imageTitle || ''}`;
-  return enqueue(language, key, () => requestAttribution(language, title, imageTitle));
+function fetchAttribution(language, title, imageTitle, needsSummary = false) {
+  const key = `attribution:${language}:${title}:${imageTitle || ''}:${needsSummary ? 'summary' : 'no-summary'}`;
+  return enqueue(language, key, () => requestAttribution(language, title, imageTitle, needsSummary));
 }
 
 function fetchTile(language, cacheKey, bounds) {

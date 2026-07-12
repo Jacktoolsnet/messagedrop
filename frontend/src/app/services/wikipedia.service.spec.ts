@@ -48,6 +48,7 @@ describe('WikipediaService', () => {
     const request = httpTesting.expectOne((candidate) => candidate.url === `${environment.apiUrl}/wikipedia/attribution`);
     expect(request.request.params.get('language')).toBe('de');
     expect(request.request.params.get('imageTitle')).toBe('Donnerburgbrücke.jpg');
+    expect(request.request.params.get('needsSummary')).toBe('true');
     expect(request.request.headers.get('x-skip-ui')).toBe('true');
     request.flush({ status: 200, article: {}, image: null, cache: 'miss' });
   });

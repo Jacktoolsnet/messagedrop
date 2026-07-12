@@ -40,6 +40,7 @@ export interface WikipediaResolvedAttribution {
   status: number;
   article: WikipediaContentAttribution;
   image: WikipediaImageAttribution | null;
+  summary?: string;
   cache: 'hit' | 'miss';
 }
 

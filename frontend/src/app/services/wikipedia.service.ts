@@ -41,6 +41,9 @@ export class WikipediaService {
     if (article.imageTitle) {
       params = params.set('imageTitle', article.imageTitle);
     }
+    if (!article.summary.trim()) {
+      params = params.set('needsSummary', true);
+    }
     return this.http.get<WikipediaResolvedAttribution>(`${environment.apiUrl}/wikipedia/attribution`, {
       params,
       headers: this.silentHeaders

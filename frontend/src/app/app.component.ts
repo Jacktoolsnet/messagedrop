@@ -2408,7 +2408,11 @@ export class AppComponent implements OnInit {
     const language = this.wikipediaMapState.language();
     const resolvedArticles = await firstValueFrom(forkJoin(articles.map((article) =>
         this.wikipediaService.getAttribution(article, language).pipe(
-          map((resolvedAttribution) => ({ ...article, resolvedAttribution })),
+          map((resolvedAttribution) => ({
+            ...article,
+            summary: article.summary || resolvedAttribution.summary || '',
+            resolvedAttribution
+          })),
           catchError(() => of({
             ...article,
             resolvedAttribution: {
