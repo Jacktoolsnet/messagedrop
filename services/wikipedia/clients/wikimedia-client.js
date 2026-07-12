@@ -50,10 +50,12 @@ async function requestTile(language, bounds) {
   const params = {
     action: 'query', format: 'json', formatversion: 2, generator: 'geosearch',
     ggsbbox: `${bounds.north}|${bounds.west}|${bounds.south}|${bounds.east}`,
-    ggsprimary: 'primary', ggslimit: Number(process.env.WIKIPEDIA_TILE_RESULT_LIMIT || 100),
+    // TextExtracts returns at most 20 extracts per response. Keep GeoSearch batches
+    // at the same size so every returned page can receive a summary.
+    ggsprimary: 'primary', ggslimit: Math.min(20, Number(process.env.WIKIPEDIA_TILE_RESULT_LIMIT || 20)),
     prop: 'coordinates|pageimages|extracts|info', piprop: 'thumbnail|name',
     pithumbsize: Number(process.env.WIKIPEDIA_THUMBNAIL_SIZE || 240),
-    exintro: 1, explaintext: 1, exchars: Number(process.env.WIKIPEDIA_EXTRACT_CHARS || 280),
+    exintro: 1, explaintext: 1, exlimit: 'max', exchars: Number(process.env.WIKIPEDIA_EXTRACT_CHARS || 280),
     inprop: 'url', redirects: 1
   };
   let lastError;

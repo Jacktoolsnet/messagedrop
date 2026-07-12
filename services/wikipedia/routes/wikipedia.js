@@ -33,8 +33,8 @@ async function refreshTile(db, language, tile, key, logger) {
 }
 
 async function resolveTile(db, language, tile, logger) {
-  // v3 explicitly requests the PageImages file name required for per-image attribution.
-  const key = `${language}:z${tile.zoom}:x${tile.x}:y${tile.y}:v3`;
+  // v4 aligns GeoSearch pages with TextExtracts' 20-page response limit.
+  const key = `${language}:z${tile.zoom}:x${tile.x}:y${tile.y}:v4`;
   const freshMs = Number(process.env.WIKIPEDIA_CACHE_FRESH_MS || 24 * 60 * 60 * 1000);
   const staleMs = Number(process.env.WIKIPEDIA_CACHE_STALE_MS || 7 * 24 * 60 * 60 * 1000);
   const cached = await dbGet(db, key);
