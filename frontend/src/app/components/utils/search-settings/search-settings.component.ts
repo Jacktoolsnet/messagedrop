@@ -44,7 +44,8 @@ const SEARCH_SETTING_MARKER_ICONS: Record<SearchSettingsKey, string> = {
   privateImages: 'assets/markers/image-marker.svg',
   privateDocuments: 'assets/markers/document-marker.svg',
   experiences: 'assets/markers/experience-marker.svg',
-  myExperiences: 'assets/markers/my-experience-marker.svg'
+  myExperiences: 'assets/markers/my-experience-marker.svg',
+  wikipedia: 'assets/markers/wikipedia-marker.svg'
 };
 
 interface SearchSettingsItem {
@@ -93,14 +94,20 @@ export class SearchSettingsComponent {
     { key: 'privateImages', icon: 'image', titleKey: 'common.searchSettings.items.privateImages' },
     { key: 'privateDocuments', icon: 'description', titleKey: 'common.searchSettings.items.privateDocuments' },
     { key: 'experiences', icon: 'local_activity', titleKey: 'common.searchSettings.items.experiences' },
-    { key: 'myExperiences', icon: 'bookmark_star', titleKey: 'common.searchSettings.items.myExperiences' }
+    { key: 'myExperiences', icon: 'bookmark_star', titleKey: 'common.searchSettings.items.myExperiences' },
+    { key: 'wikipedia', icon: 'menu_book', titleKey: 'common.searchSettings.items.wikipedia' }
   ];
   readonly items = computed(() => {
     this.userService.userSet();
     if (this.userService.hasJwt()) {
       return this.allItems;
     }
-    return this.allItems.filter((item) => item.key === 'publicMessages' || item.key === 'secretDrops' || item.key === 'experiences');
+    return this.allItems.filter((item) =>
+      item.key === 'publicMessages'
+      || item.key === 'secretDrops'
+      || item.key === 'experiences'
+      || item.key === 'wikipedia'
+    );
   });
   readonly minZoom = 3;
   readonly maxZoom = 19;
@@ -137,6 +144,10 @@ export class SearchSettingsComponent {
     };
   }
 
+  getMinZoom(key: SearchSettingsKey): number {
+    return key === 'wikipedia' ? 16 : this.minZoom;
+  }
+
   getPreviewMarkerIcon(key: SearchSettingsKey): string {
     return SEARCH_SETTING_MARKER_ICONS[key];
   }
@@ -157,7 +168,12 @@ export class SearchSettingsComponent {
       privateImages: { ...DEFAULT_SEARCH_SETTINGS.privateImages, ...settings.privateImages },
       privateDocuments: { ...DEFAULT_SEARCH_SETTINGS.privateDocuments, ...settings.privateDocuments },
       experiences: { ...DEFAULT_SEARCH_SETTINGS.experiences, ...settings.experiences },
-      myExperiences: { ...DEFAULT_SEARCH_SETTINGS.myExperiences, ...settings.myExperiences }
+      myExperiences: { ...DEFAULT_SEARCH_SETTINGS.myExperiences, ...settings.myExperiences },
+      wikipedia: {
+        ...DEFAULT_SEARCH_SETTINGS.wikipedia,
+        ...settings.wikipedia,
+        minZoom: Math.min(19, Math.max(16, settings.wikipedia?.minZoom ?? DEFAULT_SEARCH_SETTINGS.wikipedia.minZoom))
+      }
     };
   }
 

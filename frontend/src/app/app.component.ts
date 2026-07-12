@@ -1612,7 +1612,12 @@ export class AppComponent implements OnInit {
       privateImages: { ...DEFAULT_SEARCH_SETTINGS.privateImages, ...(settings?.privateImages ?? {}) },
       privateDocuments: { ...DEFAULT_SEARCH_SETTINGS.privateDocuments, ...(settings?.privateDocuments ?? {}) },
       experiences: { ...DEFAULT_SEARCH_SETTINGS.experiences, ...(settings?.experiences ?? {}) },
-      myExperiences: { ...DEFAULT_SEARCH_SETTINGS.myExperiences, ...(settings?.myExperiences ?? {}) }
+      myExperiences: { ...DEFAULT_SEARCH_SETTINGS.myExperiences, ...(settings?.myExperiences ?? {}) },
+      wikipedia: {
+        ...DEFAULT_SEARCH_SETTINGS.wikipedia,
+        ...(settings?.wikipedia ?? {}),
+        minZoom: Math.min(19, Math.max(16, settings?.wikipedia?.minZoom ?? DEFAULT_SEARCH_SETTINGS.wikipedia.minZoom))
+      }
     };
   }
 

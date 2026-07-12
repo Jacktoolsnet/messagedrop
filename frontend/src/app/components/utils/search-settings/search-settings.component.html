@@ -29,7 +29,7 @@
           <span>{{ 'common.searchSettings.zoomLabel' | transloco }}</span>
           <span class="slider-value">{{ searchSettings[item.key].minZoom }}</span>
         </div>
-        <mat-slider [min]="minZoom" [max]="maxZoom" step="1" thumbLabel tickInterval="2"
+        <mat-slider [min]="getMinZoom(item.key)" [max]="maxZoom" step="1" thumbLabel tickInterval="1"
           [disabled]="!searchSettings[item.key].enabled">
           <input matSliderThumb [ngModel]="searchSettings[item.key].minZoom"
             (ngModelChange)="updateZoom(item.key, $event)" />
