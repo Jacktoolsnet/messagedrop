@@ -6,6 +6,7 @@ import { Message } from "./message";
 import { Note } from "./note";
 import { SecretDrop } from "./secret-drop";
 import { ExperienceResult, ViatorDestinationLookup } from "./viator";
+import { WikipediaArticle } from "./wikipedia";
 
 export interface MarkerLocation {
     location: Location,
@@ -16,5 +17,6 @@ export interface MarkerLocation {
     experiences?: ViatorDestinationLookup[];
     myExperiences?: ExperienceResult[];
     secretDrops?: SecretDrop[];
+    wikipediaArticles?: WikipediaArticle[];
     type: MarkerType
 }

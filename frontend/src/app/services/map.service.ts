@@ -62,6 +62,12 @@ const myExperienceMarker = leaflet.icon({
   iconSize: [32, 40], // size of the icon
   iconAnchor: [16, 40], // point of the icon which will correspond to marker's location
 });
+
+const wikipediaMarker = leaflet.icon({
+  iconUrl: 'assets/markers/wikipedia-marker.svg',
+  iconSize: [32, 40],
+  iconAnchor: [16, 40],
+});
 @Injectable({
   providedIn: 'root'
 })
@@ -381,6 +387,8 @@ export class MapService {
         return leaflet.marker(latLng, { icon: myExperienceMarker, zIndexOffset: 12 });
       case MarkerType.SECRET_DROP:
         return leaflet.marker(latLng, { icon: secretDropMarker, zIndexOffset: 18 });
+      case MarkerType.WIKIPEDIA:
+        return leaflet.marker(latLng, { icon: wikipediaMarker, zIndexOffset: 10 });
       default:
         return null;
     }

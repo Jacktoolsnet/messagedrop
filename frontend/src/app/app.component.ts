@@ -54,6 +54,7 @@ import { HelpDialogService } from './components/utils/help-dialog/help-dialog.se
 import { NominatimSearchComponent } from './components/utils/nominatim-search/nominatim-search.component';
 import { SearchSettingsComponent } from './components/utils/search-settings/search-settings.component';
 import { WeatherComponent } from './components/weather/weather.component';
+import { WikipediaListComponent } from './components/wikipedia-list/wikipedia-list.component';
 import { GetGeoStatisticResponse } from './interfaces/get-geo-statistic-response';
 import { Contact } from './interfaces/contact';
 import { LocalDocument } from './interfaces/local-document';
@@ -75,6 +76,7 @@ import { DEFAULT_SEARCH_SETTINGS, SearchSettings } from './interfaces/search-set
 import { SharedContent } from './interfaces/shared-content';
 import { SecretDrop } from './interfaces/secret-drop';
 import { ExperienceResult, ViatorDestinationLookup } from './interfaces/viator';
+import { WikipediaArticle } from './interfaces/wikipedia';
 import { ShortNumberPipe } from './pipes/short-number.pipe';
 import { AirQualityService } from './services/air-quality.service';
 import { AppService } from './services/app.service';
@@ -108,6 +110,7 @@ import { SecretDropService } from './services/secret-drop.service';
 import { ServerService } from './services/server.service';
 import { SharedContentService } from './services/shared-content.service';
 import { SystemNotificationService } from './services/system-notification.service';
+import { WikipediaMapStateService } from './services/wikipedia-map-state.service';
 import { TranslationHelperService } from './services/translation-helper.service';
 import { UsageProtectionService } from './services/usage-protection.service';
 import { UserService } from './services/user.service';
@@ -199,6 +202,7 @@ export class AppComponent implements OnInit {
   private readonly messageService = inject(MessageService);
   private readonly secretDropService = inject(SecretDropService);
   private readonly experienceMapService = inject(ExperienceMapService);
+  private readonly wikipediaMapState = inject(WikipediaMapStateService);
   private readonly experienceBookmarkService = inject(ExperienceBookmarkService);
   private readonly airQualityService = inject(AirQualityService);
   private readonly weatherService = inject(WeatherService);
@@ -332,6 +336,11 @@ export class AppComponent implements OnInit {
           this.createMarkerLocations();
         });
       }
+    });
+
+    effect(() => {
+      this.wikipediaMapState.articles();
+      untracked(() => this.createMarkerLocations());
     });
 
     effect(() => {
@@ -1552,6 +1561,11 @@ export class AppComponent implements OnInit {
     const isImagesEnabled = settings.privateImages.enabled;
     const isDocumentsEnabled = settings.privateDocuments.enabled;
     const isMyExperiencesEnabled = settings.myExperiences.enabled;
+    const canSearchWikipedia = settings.wikipedia.enabled
+      && zoom >= settings.wikipedia.minZoom
+      && this.networkService.browserOnline()
+      && this.networkService.backendOnline()
+      && !this.maintenanceActive();
     const canSearchMessages = isMessagesEnabled && zoom >= settings.publicMessages.minZoom;
     const canSearchSecretDrops = isSecretDropsEnabled && zoom >= settings.secretDrops.minZoom;
     const canSearchNotes = isNotesEnabled && zoom >= settings.privateNotes.minZoom;
@@ -1593,6 +1607,17 @@ export class AppComponent implements OnInit {
     } else {
       this.secretDropService.visibleSecretDropsSignal.set([]);
     }
+
+    const wikipediaBounds = this.mapService.getVisibleMapBoundingBox();
+    this.wikipediaMapState.setLanguage(this.languageService.effectiveLanguage());
+    this.wikipediaMapState.setViewport({
+      north: wikipediaBounds.latMax,
+      south: wikipediaBounds.latMin,
+      east: wikipediaBounds.lonMax,
+      west: wikipediaBounds.lonMin,
+      zoom
+    });
+    this.wikipediaMapState.setEnabled(canSearchWikipedia);
 
     await this.updateExperiencePins(settings, ignoreSearchSettings, zoom);
     await this.updateMyExperiencePins(settings, ignoreSearchSettings, zoom, canSearchMyExperiences);
@@ -1669,12 +1694,16 @@ export class AppComponent implements OnInit {
       case MarkerType.SECRET_DROP:
         this.openMarkerSecretDropListDialog(event.secretDrops ?? [], event.location.plusCode);
         break;
+      case MarkerType.WIKIPEDIA:
+        this.openMarkerWikipediaListDialog(event.wikipediaArticles ?? []);
+        break;
       case MarkerType.MULTI:
         if (
           !canOpenPrivateContent
           && !event.messages.length
           && !(event.experiences?.length)
           && !(event.secretDrops?.length)
+          && !(event.wikipediaArticles?.length)
         ) {
           return;
         }
@@ -1685,7 +1714,8 @@ export class AppComponent implements OnInit {
           canOpenPrivateContent ? event.documents : [],
           event.experiences ?? [],
           canOpenPrivateContent ? (event.myExperiences ?? []) : [],
-          event.secretDrops ?? []
+          event.secretDrops ?? [],
+          event.wikipediaArticles ?? []
         );
         break;
     }
@@ -2294,10 +2324,11 @@ export class AppComponent implements OnInit {
     documents: LocalDocument[],
     experiences: ViatorDestinationLookup[],
     myExperiences: ExperienceResult[],
-    secretDrops: SecretDrop[]
+    secretDrops: SecretDrop[],
+    wikipediaArticles: WikipediaArticle[]
   ) {
     const dialogRef = this.dialog.open(MultiMarkerComponent, {
-      data: { messages: messages, notes: notes, images: images, documents: documents, experiences: experiences, myExperiences: myExperiences, secretDrops: secretDrops },
+      data: { messages, notes, images, documents, experiences, myExperiences, secretDrops, wikipediaArticles },
       closeOnNavigation: true,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
@@ -2341,8 +2372,27 @@ export class AppComponent implements OnInit {
           case 'secret_drop':
             this.openMarkerSecretDropListDialog(result.secretDrops ?? []);
             break
+          case 'wikipedia':
+            this.openMarkerWikipediaListDialog(result.wikipediaArticles ?? []);
+            break
         }
       }
+    });
+  }
+
+  private openMarkerWikipediaListDialog(articles: WikipediaArticle[]): void {
+    if (!articles.length) {
+      return;
+    }
+    this.dialog.open(WikipediaListComponent, {
+      data: { articles, attribution: this.wikipediaMapState.attribution() },
+      panelClass: 'pin-dialog',
+      width: 'min(720px, 95vw)',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      autoFocus: false
     });
   }
 
@@ -3351,6 +3401,44 @@ export class AppComponent implements OnInit {
           documents: [],
           secretDrops: [drop],
           type: MarkerType.SECRET_DROP
+        });
+      }
+    });
+
+    // Process Wikipedia articles with the same Plus Code grouping rules as other map content.
+    this.wikipediaMapState.articles().forEach((article) => {
+      const articleLocation: Location = {
+        latitude: article.latitude,
+        longitude: article.longitude,
+        plusCode: this.geolocationService.getPlusCode(article.latitude, article.longitude)
+      };
+      if (this.mapService.getMapZoom() > 17) {
+        center = articleLocation;
+      } else {
+        const groupedPlusCode = this.geolocationService.getGroupedPlusCodeBasedOnMapZoom(articleLocation, this.mapService.getMapZoom());
+        const plusCodeArea: PlusCodeArea = this.geolocationService.getGridFromPlusCode(groupedPlusCode);
+        center = {
+          latitude: plusCodeArea.latitudeCenter,
+          longitude: plusCodeArea.longitudeCenter,
+          plusCode: groupedPlusCode
+        };
+      }
+      if (this.markerLocations.has(center.plusCode)) {
+        const existing = this.markerLocations.get(center.plusCode)!;
+        existing.wikipediaArticles ??= [];
+        existing.wikipediaArticles.push(article);
+        if (existing.type !== MarkerType.WIKIPEDIA) {
+          existing.type = MarkerType.MULTI;
+        }
+      } else {
+        this.markerLocations.set(center.plusCode, {
+          location: center,
+          messages: [],
+          notes: [],
+          images: [],
+          documents: [],
+          wikipediaArticles: [article],
+          type: MarkerType.WIKIPEDIA
         });
       }
     });

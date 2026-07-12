@@ -54,4 +54,12 @@
     {{ 'common.map.multiMarker.showSecretDrops' | transloco }}
   </button>
   }
+  @if (data.wikipediaArticles.length) {
+  <button mat-stroked-button [mat-dialog-close]="{type: 'wikipedia', wikipediaArticles: data.wikipediaArticles}"
+    matBadge="{{data.wikipediaArticles.length | shortNumber}}" matBadgePosition="after" matBadgeColor="accent"
+    matBadgeOverlap="true">
+    <mat-icon>menu_book</mat-icon>
+    {{ 'common.map.multiMarker.showWikipedia' | transloco }}
+  </button>
+  }
 </mat-dialog-content>

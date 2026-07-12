@@ -1,0 +1,31 @@
+<h2 mat-dialog-title>
+  <mat-icon aria-hidden="true">menu_book</mat-icon>
+  {{ 'common.wikipedia.title' | transloco }}
+</h2>
+<mat-dialog-content>
+  <div class="article-list">
+    @for (article of data.articles; track article.pageId) {
+      <article class="article">
+        @if (article.thumbnail; as thumbnail) {
+          <img [src]="thumbnail.url" [width]="thumbnail.width" [height]="thumbnail.height" alt="" loading="lazy">
+        }
+        <div class="article__content">
+          <h3>{{ article.title }}</h3>
+          @if (article.summary) {
+            <p>{{ article.summary }}</p>
+          }
+          <a [href]="article.articleUrl" target="_blank" rel="noopener noreferrer">
+            {{ 'common.wikipedia.readArticle' | transloco }}
+          </a>
+        </div>
+      </article>
+    }
+  </div>
+  @if (data.attribution; as attribution) {
+    <p class="attribution">
+      <a [href]="attribution.url" target="_blank" rel="noopener noreferrer">{{ attribution.provider }}</a>
+      ·
+      <a [href]="attribution.licenseUrl" target="_blank" rel="noopener noreferrer">{{ attribution.textLicense }}</a>
+    </p>
+  }
+</mat-dialog-content>

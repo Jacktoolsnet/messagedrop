@@ -481,7 +481,8 @@
         "showDocuments": "Dokumente anzeigen",
         "showExperiences": "Erlebnisse",
         "showMyExperiences": "Meine Erlebnisse",
-        "showSecretDrops": "GeheimnisDrops anzeigen"
+        "showSecretDrops": "GeheimnisDrops anzeigen",
+        "showWikipedia": "Wikipedia-Artikel anzeigen"
       }
     },
     "messageList": {
@@ -1530,6 +1531,10 @@
         "myExperiences": "Meine Erlebnisse",
         "wikipedia": "Wikipedia-Artikel"
       }
+    },
+    "wikipedia": {
+      "title": "Wikipedia-Artikel",
+      "readArticle": "Auf Wikipedia lesen"
     },
     "place": {
       "title": "Ort-Dienst",
