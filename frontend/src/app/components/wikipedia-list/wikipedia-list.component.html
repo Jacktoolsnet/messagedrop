@@ -8,24 +8,31 @@
         <div class="tile-header" [style.--wikipedia-header-bg-image]="getHeaderBackgroundImage(article)"
           [style.--wikipedia-header-bg-size]="getHeaderBackgroundSize(article)">
           <div class="identity-badge">
-            <mat-icon>menu_book</mat-icon>
-            <span>{{ article.title }}</span>
+            @if (article.thumbnail && article.resolvedAttribution?.image?.resolved) {
+              <img class="avatar" [src]="article.thumbnail.url" [alt]="article.title" loading="lazy">
+            } @else {
+              <mat-icon>menu_book</mat-icon>
+            }
+            <div class="identity-text">
+              <span class="name" [attr.title]="article.title">{{ article.title }}</span>
+              <span class="subtitle">Wikipedia</span>
+            </div>
           </div>
           <div class="source-badges">
-            <a class="source-badge" [href]="article.resolvedAttribution?.article?.sourceUrl || article.articleUrl"
-              target="_blank" rel="noopener noreferrer">Wikipedia</a>
             @if (article.resolvedAttribution?.article; as articleAttribution) {
               <a class="source-badge" [href]="articleAttribution.licenseUrl" target="_blank"
                 rel="noopener noreferrer">{{ articleAttribution.license }}</a>
               <span class="source-badge">{{ articleAttribution.creator }}</span>
             }
             @if (article.resolvedAttribution?.image?.resolved && article.resolvedAttribution?.image; as imageAttribution) {
+              @if (showSeparateImageLink(imageAttribution)) {
               <a class="source-badge" [href]="imageAttribution.sourceUrl" target="_blank"
                 rel="noopener noreferrer">
-                {{ 'common.wikipedia.imageCredit' | transloco }}: {{ imageAttribution.creator || imageAttribution.credit || 'Wikimedia Commons' }}
+                {{ 'common.wikipedia.imageCredit' | transloco }}
               </a>
+              }
               @if (imageAttribution.license) {
-                <a class="source-badge" [href]="imageAttribution.licenseUrl || imageAttribution.sourceUrl" target="_blank"
+                <a class="source-badge" [href]="getImageLicenseUrl(imageAttribution)" target="_blank"
                   rel="noopener noreferrer">{{ imageAttribution.license }}</a>
               }
             }

@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialogActions, MatDialogClose, MatDialogRef } from '@angular/material/dialog';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { WikipediaArticle } from '../../interfaces/wikipedia';
+import { WikipediaArticle, WikipediaImageAttribution } from '../../interfaces/wikipedia';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 
 @Component({
@@ -37,6 +37,17 @@ export class WikipediaListComponent {
 
   getHeaderBackgroundSize(article: WikipediaArticle): string {
     return article.thumbnail && article.resolvedAttribution?.image?.resolved ? 'cover' : '96px 120px';
+  }
+
+  getImageLicenseUrl(attribution: WikipediaImageAttribution): string | undefined {
+    return attribution.licenseUrl || attribution.sourceUrl;
+  }
+
+  showSeparateImageLink(attribution: WikipediaImageAttribution): boolean {
+    return Boolean(
+      attribution.sourceUrl
+      && attribution.sourceUrl !== this.getImageLicenseUrl(attribution)
+    );
   }
 
   openNavigation(article: WikipediaArticle, event: Event): void {
