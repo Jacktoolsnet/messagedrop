@@ -2386,6 +2386,31 @@ export class AppComponent implements OnInit {
     if (!articles.length) {
       return;
     }
+
+    if (!this.appService.getAppSettings().enableWikipediaContent) {
+      const settingsRef = this.dialog.open(ExternalContentComponent, {
+        data: {
+          appSettings: this.appService.getAppSettings(),
+          visiblePlatforms: ['wikipedia']
+        },
+        width: 'min(440px, 90vw)',
+        maxWidth: '90vw',
+        maxHeight: '90vh',
+        height: 'auto',
+        autoFocus: false,
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop',
+        disableClose: false
+      });
+
+      settingsRef.afterClosed().subscribe(() => {
+        if (this.appService.getAppSettings().enableWikipediaContent) {
+          void this.openMarkerWikipediaListDialog(articles);
+        }
+      });
+      return;
+    }
+
     const loadingRef = this.dialog.open(DisplayMessage, {
       data: {
         showAlways: true,
