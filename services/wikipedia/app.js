@@ -1,6 +1,6 @@
-require('dotenv').config();
-require('winston-daily-rotate-file');
 const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
+require('winston-daily-rotate-file');
 const compression = require('compression');
 const express = require('express');
 const helmet = require('helmet');
