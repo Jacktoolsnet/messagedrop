@@ -164,6 +164,24 @@ function metadataValue(metadata, key) {
   return stripHtml(metadata?.[key]?.value || '');
 }
 
+function normalizeCreator(value) {
+  const withoutFiles = stripHtml(value)
+    .replace(/(?:File:)?[^\s:*]+\.(?:jpe?g|png|gif|svg|webp|tiff?|avif)\b/giu, ' ')
+    .replace(/\bUser:/giu, '')
+    .replace(/\bderivative work\s*:/giu, ';')
+    .replace(/[\n:*]+/gu, ';');
+  const seen = new Set();
+  const creators = [];
+  for (const part of withoutFiles.split(';')) {
+    const creator = part.replace(/^[-–—,\s]+|[-–—,\s]+$/gu, '').replace(/\s+/gu, ' ');
+    const key = creator.toLocaleLowerCase('en');
+    if (!creator || seen.has(key)) continue;
+    seen.add(key);
+    creators.push(creator);
+  }
+  return creators.join('; ');
+}
+
 function findSignalValue(value, keys, depth = 0) {
   if (!value || depth > 8) return '';
   if (Array.isArray(value)) {
@@ -202,7 +220,7 @@ async function fetchImageInfo(language, imageTitle) {
       const meta = info.extmetadata || {};
       const license = metadataValue(meta, 'LicenseShortName') || metadataValue(meta, 'UsageTerms');
       const licenseUrl = metadataValue(meta, 'LicenseUrl');
-      const creator = metadataValue(meta, 'Artist');
+      const creator = normalizeCreator(meta?.Artist?.value || '');
       const credit = metadataValue(meta, 'Credit');
       const attributionRequired = metadataValue(meta, 'AttributionRequired').toLowerCase() !== 'false';
       const sourceUrl = safeHttpsUrl(info.descriptionurl);
@@ -340,4 +358,4 @@ function getMetrics() {
   };
 }
 
-module.exports = { fetchTile, fetchAttribution, getMetrics, safeHttpsUrl, parseRetryAfterMs };
+module.exports = { fetchTile, fetchAttribution, getMetrics, safeHttpsUrl, parseRetryAfterMs, normalizeCreator };

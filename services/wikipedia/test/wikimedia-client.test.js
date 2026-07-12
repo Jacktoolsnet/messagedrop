@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { parseRetryAfterMs, safeHttpsUrl } = require('../clients/wikimedia-client');
+const { normalizeCreator, parseRetryAfterMs, safeHttpsUrl } = require('../clients/wikimedia-client');
 
 test('safeHttpsUrl accepts HTTPS Wikimedia URLs', () => {
   assert.equal(
@@ -26,4 +26,9 @@ test('parseRetryAfterMs supports delay seconds', () => {
 test('parseRetryAfterMs supports HTTP dates', () => {
   const now = Date.parse('2026-07-12T18:00:00Z');
   assert.equal(parseRetryAfterMs('Sun, 12 Jul 2026 18:00:10 GMT', now), 10000);
+});
+
+test('normalizeCreator removes file history and de-duplicates derivative creators', () => {
+  const value = ': Braunschweig.gif : * Braunschweig.png : * Braunschweig.jpg : User:Brunswyk derivative work: Parzi derivative work: Parzi';
+  assert.equal(normalizeCreator(value), 'Brunswyk; Parzi');
 });
