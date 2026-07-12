@@ -3,6 +3,7 @@ const axios = require('axios');
 const queues = new Map();
 const inFlight = new Map();
 let pendingJobs = 0;
+let upstreamBlockedUntil = 0;
 const metrics = {
   upstreamRequests: 0,
   attributionApiFallbacks: 0,
@@ -33,9 +34,17 @@ function queueFor(language) {
   return queues.get(language);
 }
 
+function parseRetryAfterMs(value, now = Date.now()) {
+  if (value === undefined || value === null || value === '') return null;
+  const seconds = Number(value);
+  if (Number.isFinite(seconds) && seconds >= 0) return seconds * 1000;
+  const date = Date.parse(String(value));
+  return Number.isFinite(date) ? Math.max(0, date - now) : null;
+}
+
 function retryDelay(error, attempt) {
-  const retryAfter = Number(error?.response?.headers?.['retry-after']);
-  if (Number.isFinite(retryAfter) && retryAfter >= 0) return retryAfter * 1000;
+  const retryAfter = parseRetryAfterMs(error?.response?.headers?.['retry-after']);
+  if (retryAfter !== null) return retryAfter;
   return Math.min(8000, 500 * (2 ** attempt)) + Math.floor(Math.random() * 250);
 }
 
@@ -45,10 +54,45 @@ function isRetryable(error) {
   return status === 429 || status === 502 || status === 503 || status === 504 || code === 'maxlag' || code === 'ratelimited';
 }
 
+async function waitForUpstreamCooldown() {
+  const remaining = upstreamBlockedUntil - Date.now();
+  if (remaining > 0) await sleep(remaining);
+}
+
+async function wikipediaGet(url, config = {}) {
+  let lastError;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      await waitForUpstreamCooldown();
+      metrics.upstreamRequests += 1;
+      const response = await axios.get(url, config);
+      if (response.data?.error) {
+        const error = new Error(response.data.error.info || response.data.error.code);
+        error.response = { status: response.status, headers: response.headers, data: response.data };
+        error.status = response.data.error.code === 'maxlag' || response.data.error.code === 'ratelimited' ? 503 : 502;
+        throw error;
+      }
+      return response;
+    } catch (error) {
+      lastError = error;
+      if (!isRetryable(error) || attempt === 2) {
+        error.status = error.status || (error.response?.status >= 400 ? error.response.status : 502);
+        throw error;
+      }
+      const delay = retryDelay(error, attempt);
+      // Retry-After applies to this operator, not just to the current request.
+      // Share the cooldown across all languages and queued Wikimedia jobs.
+      upstreamBlockedUntil = Math.max(upstreamBlockedUntil, Date.now() + delay);
+      await waitForUpstreamCooldown();
+    }
+  }
+  throw lastError;
+}
+
 async function requestTile(language, bounds) {
   const timeout = Number(process.env.WIKIPEDIA_UPSTREAM_TIMEOUT_MS || 10000);
   const params = {
-    action: 'query', format: 'json', formatversion: 2, generator: 'geosearch',
+    action: 'query', format: 'json', formatversion: 2, maxlag: 5, generator: 'geosearch',
     ggsbbox: `${bounds.north}|${bounds.west}|${bounds.south}|${bounds.east}`,
     // TextExtracts returns at most 20 extracts per response. Keep GeoSearch batches
     // at the same size so every returned page can receive a summary.
@@ -59,53 +103,33 @@ async function requestTile(language, bounds) {
     wbptterms: 'description',
     inprop: 'url', redirects: 1
   };
-  let lastError;
-  for (let attempt = 0; attempt < 3; attempt += 1) {
-    try {
-      const articles = new Map();
-      let continuation = {};
-      const resultLimit = Math.min(500, Number(process.env.WIKIPEDIA_MAX_RESULTS_PER_TILE || 500));
-      while (articles.size < resultLimit) {
-        metrics.upstreamRequests += 1;
-        const response = await axios.get(`https://${language}.wikipedia.org/w/api.php`, {
-          params: { ...params, ...continuation }, timeout, headers: headers()
-        });
-        if (response.data?.error) {
-          const error = new Error(response.data.error.info || response.data.error.code);
-          error.response = { status: response.status, headers: response.headers, data: response.data };
-          error.status = response.data.error.code === 'maxlag' || response.data.error.code === 'ratelimited' ? 503 : 502;
-          throw error;
-        }
-        for (const page of response.data?.query?.pages || []) {
-          const fallbackArticleUrl = `https://${language}.wikipedia.org/?curid=${page.pageid}`;
-          const thumbnailUrl = safeHttpsUrl(page.thumbnail?.source);
-          const article = {
-            pageId: page.pageid,
-            title: page.title,
-            latitude: page.coordinates?.[0]?.lat,
-            longitude: page.coordinates?.[0]?.lon,
-            summary: page.extract || page.terms?.description?.[0] || '',
-            thumbnail: thumbnailUrl ? { url: thumbnailUrl, width: page.thumbnail.width, height: page.thumbnail.height } : null,
-            imageTitle: page.pageimage || null,
-            articleUrl: safeHttpsUrl(page.fullurl, fallbackArticleUrl)
-          };
-          if (Number.isFinite(article.latitude) && Number.isFinite(article.longitude)) articles.set(article.pageId, article);
-        }
-        if (!response.data?.continue || articles.size >= resultLimit) break;
-        continuation = response.data.continue;
-        await sleep(Number(process.env.WIKIPEDIA_REQUEST_INTERVAL_MS || 150));
-      }
-      return Array.from(articles.values()).slice(0, resultLimit);
-    } catch (error) {
-      lastError = error;
-      if (!isRetryable(error) || attempt === 2) {
-        error.status = error.status || (error.response?.status >= 400 ? error.response.status : 502);
-        throw error;
-      }
-      await sleep(retryDelay(error, attempt));
+  const articles = new Map();
+  let continuation = {};
+  const resultLimit = Math.min(500, Number(process.env.WIKIPEDIA_MAX_RESULTS_PER_TILE || 500));
+  while (articles.size < resultLimit) {
+    const response = await wikipediaGet(`https://${language}.wikipedia.org/w/api.php`, {
+      params: { ...params, ...continuation }, timeout, headers: headers()
+    });
+    for (const page of response.data?.query?.pages || []) {
+      const fallbackArticleUrl = `https://${language}.wikipedia.org/?curid=${page.pageid}`;
+      const thumbnailUrl = safeHttpsUrl(page.thumbnail?.source);
+      const article = {
+        pageId: page.pageid,
+        title: page.title,
+        latitude: page.coordinates?.[0]?.lat,
+        longitude: page.coordinates?.[0]?.lon,
+        summary: page.extract || page.terms?.description?.[0] || '',
+        thumbnail: thumbnailUrl ? { url: thumbnailUrl, width: page.thumbnail.width, height: page.thumbnail.height } : null,
+        imageTitle: page.pageimage || null,
+        articleUrl: safeHttpsUrl(page.fullurl, fallbackArticleUrl)
+      };
+      if (Number.isFinite(article.latitude) && Number.isFinite(article.longitude)) articles.set(article.pageId, article);
     }
+    if (!response.data?.continue || articles.size >= resultLimit) break;
+    continuation = response.data.continue;
+    await sleep(Number(process.env.WIKIPEDIA_REQUEST_INTERVAL_MS || 150));
   }
-  throw lastError;
+  return Array.from(articles.values()).slice(0, resultLimit);
 }
 
 function stripHtml(value) {
@@ -141,13 +165,12 @@ async function fetchImageInfo(language, imageTitle) {
   if (!imageTitle) return null;
   const title = imageTitle.startsWith('File:') ? imageTitle : `File:${imageTitle}`;
   const params = {
-    action: 'query', format: 'json', formatversion: 2, titles: title,
+    action: 'query', format: 'json', formatversion: 2, maxlag: 5, titles: title,
     prop: 'imageinfo', iiprop: 'url|extmetadata'
   };
   for (const host of ['commons.wikimedia.org', `${language}.wikipedia.org`]) {
     try {
-      metrics.upstreamRequests += 1;
-      const response = await axios.get(`https://${host}/w/api.php`, {
+      const response = await wikipediaGet(`https://${host}/w/api.php`, {
         params, timeout: Number(process.env.WIKIPEDIA_UPSTREAM_TIMEOUT_MS || 10000), headers: headers()
       });
       const info = response.data?.query?.pages?.[0]?.imageinfo?.[0];
@@ -179,8 +202,7 @@ async function fetchImageInfo(language, imageTitle) {
 
 async function fetchRestSummary(language, title) {
   try {
-    metrics.upstreamRequests += 1;
-    const response = await axios.get(
+    const response = await wikipediaGet(
       `https://${language}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title.replace(/ /g, '_'))}`,
       { timeout: Number(process.env.WIKIPEDIA_UPSTREAM_TIMEOUT_MS || 10000), headers: headers() }
     );
@@ -193,8 +215,7 @@ async function fetchRestSummary(language, title) {
 async function requestAttribution(language, title, imageTitle, needsSummary = false) {
   let signals = null;
   try {
-    metrics.upstreamRequests += 1;
-    const response = await axios.get(
+    const response = await wikipediaGet(
       `https://${language}.wikipedia.org/w/rest.php/attribution/v0-beta/pages/${encodeURIComponent(title.replace(/ /g, '_'))}/signals`,
       { timeout: Number(process.env.WIKIPEDIA_UPSTREAM_TIMEOUT_MS || 10000), headers: headers() }
     );
@@ -254,12 +275,14 @@ function enqueue(language, key, taskFactory) {
     return Promise.reject(error);
   }
   pendingJobs += 1;
-  const previous = queueFor(language);
+  // Wikimedia rate limits apply to the service/operator as a whole. Serialize
+  // jobs globally instead of allowing one concurrent stream per language.
+  const previous = queueFor('global');
   const task = previous.catch(() => undefined).then(async () => {
     await sleep(Number(process.env.WIKIPEDIA_REQUEST_INTERVAL_MS || 150));
     return taskFactory();
   });
-  queues.set(language, task.catch(() => undefined));
+  queues.set('global', task.catch(() => undefined));
   inFlight.set(key, task);
   return task.finally(() => {
     pendingJobs = Math.max(0, pendingJobs - 1);
@@ -278,7 +301,12 @@ function fetchTile(language, cacheKey, bounds) {
 }
 
 function getMetrics() {
-  return { ...metrics, pendingJobs, inFlight: inFlight.size };
+  return {
+    ...metrics,
+    pendingJobs,
+    inFlight: inFlight.size,
+    upstreamCooldownMs: Math.max(0, upstreamBlockedUntil - Date.now())
+  };
 }
 
-module.exports = { fetchTile, fetchAttribution, getMetrics, safeHttpsUrl };
+module.exports = { fetchTile, fetchAttribution, getMetrics, safeHttpsUrl, parseRetryAfterMs };

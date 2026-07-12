@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { safeHttpsUrl } = require('../clients/wikimedia-client');
+const { parseRetryAfterMs, safeHttpsUrl } = require('../clients/wikimedia-client');
 
 test('safeHttpsUrl accepts HTTPS Wikimedia URLs', () => {
   assert.equal(
@@ -17,4 +17,13 @@ test('safeHttpsUrl rejects executable and insecure URL schemes', () => {
 
 test('safeHttpsUrl uses a trusted fallback', () => {
   assert.equal(safeHttpsUrl('', 'https://de.wikipedia.org/'), 'https://de.wikipedia.org/');
+});
+
+test('parseRetryAfterMs supports delay seconds', () => {
+  assert.equal(parseRetryAfterMs('12', 0), 12000);
+});
+
+test('parseRetryAfterMs supports HTTP dates', () => {
+  const now = Date.parse('2026-07-12T18:00:00Z');
+  assert.equal(parseRetryAfterMs('Sun, 12 Jul 2026 18:00:10 GMT', now), 10000);
 });
