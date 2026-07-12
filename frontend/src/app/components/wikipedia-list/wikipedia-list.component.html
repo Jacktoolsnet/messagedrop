@@ -2,14 +2,8 @@
 
 <mat-dialog-content class="wikipedia-dialog-content">
   <div class="article-scroll">
-  @if (data.loading()) {
-    <div class="loading" role="status" [attr.aria-label]="'common.wikipedia.loadingAttribution' | transloco">
-      <mat-spinner diameter="42"></mat-spinner>
-      <span>{{ 'common.wikipedia.loadingAttribution' | transloco }}</span>
-    </div>
-  }
   <div class="article-list" role="list">
-    @for (article of data.articles(); track article.pageId) {
+    @for (article of data.articles; track article.pageId) {
       <mat-card class="article-tile" role="listitem">
         <div class="tile-header" [style.--wikipedia-header-bg-image]="getHeaderBackgroundImage(article)"
           [style.--wikipedia-header-bg-size]="getHeaderBackgroundSize(article)">

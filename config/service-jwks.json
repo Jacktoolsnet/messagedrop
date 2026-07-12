@@ -58,5 +58,25 @@
     "x": "9c-tXgtX5Nqs36kMTzch868r12HlzMkfaYi7Orbb28uEB7MhFn4YTpE9KeqLnam5",
     "y": "qFbXYFmJtuWruFlDpZojsm5m93JEncoF0erFbtxq4SGdis9ZIKiYaBXgMVJDscKI",
     "crv": "P-384"
+  },
+  "service.sticker": {
+    "key_ops": [
+      "verify"
+    ],
+    "ext": true,
+    "kty": "EC",
+    "x": "9c-tXgtX5Nqs36kMTzch868r12HlzMkfaYi7Orbb28uEB7MhFn4YTpE9KeqLnam5",
+    "y": "qFbXYFmJtuWruFlDpZojsm5m93JEncoF0erFbtxq4SGdis9ZIKiYaBXgMVJDscKI",
+    "crv": "P-384"
+  },
+  "service.wikipedia": {
+    "key_ops": [
+      "verify"
+    ],
+    "ext": true,
+    "kty": "EC",
+    "x": "bIgKKQwUk0ClBR3zIwmHEMWidRAoV2WAwzovc1liiEEsvPeOcP-11kxJusKXt32N",
+    "y": "gBCiQKIhPmmOiVx6htjuMGHkNQHLQ0GfzxUulJ7hQ5JTihOsImIPus2tbnyEQWFk",
+    "crv": "P-384"
   }
 }

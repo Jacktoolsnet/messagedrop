@@ -2386,10 +2386,49 @@ export class AppComponent implements OnInit {
     if (!articles.length) {
       return;
     }
-    const dialogArticles = signal(articles);
-    const attributionLoading = signal(true);
+    const loadingRef = this.dialog.open(DisplayMessage, {
+      data: {
+        showAlways: true,
+        title: this.translation.t('common.wikipedia.title'),
+        image: '',
+        icon: 'menu_book',
+        message: this.translation.t('common.wikipedia.loadingAttribution'),
+        button: '',
+        delay: 0,
+        showSpinner: true,
+        autoclose: false
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+    const language = this.wikipediaMapState.language();
+    const resolvedArticles = await firstValueFrom(forkJoin(articles.map((article) =>
+        this.wikipediaService.getAttribution(article, language).pipe(
+          map((resolvedAttribution) => ({ ...article, resolvedAttribution })),
+          catchError(() => of({
+            ...article,
+            resolvedAttribution: {
+              status: 200 as const,
+              article: {
+                provider: 'Wikipedia',
+                sourceUrl: article.articleUrl,
+                license: 'CC BY-SA 4.0',
+                licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/',
+                creator: 'Wikipedia contributors',
+                source: 'terms-fallback' as const
+              },
+              image: article.imageTitle ? { resolved: false, source: 'unresolved' as const } : null,
+              cache: 'miss' as const
+            }
+          }))
+        )
+      ))).finally(() => loadingRef.close());
     const dialogRef = this.dialog.open(WikipediaListComponent, {
-      data: { articles: dialogArticles.asReadonly(), loading: attributionLoading.asReadonly() },
+      data: { articles: resolvedArticles },
       panelClass: 'pin-dialog',
       width: 'min(720px, 95vw)',
       maxWidth: '95vw',
@@ -2409,30 +2448,6 @@ export class AppComponent implements OnInit {
         plusCode: this.geolocationService.getPlusCode(article.latitude, article.longitude)
       }, Math.max(18, this.mapService.getMapZoom()));
     });
-    const language = this.wikipediaMapState.language();
-    const resolvedArticles = await firstValueFrom(forkJoin(articles.map((article) =>
-      this.wikipediaService.getAttribution(article, language).pipe(
-        map((resolvedAttribution) => ({ ...article, resolvedAttribution })),
-        catchError(() => of({
-          ...article,
-          resolvedAttribution: {
-            status: 200 as const,
-            article: {
-              provider: 'Wikipedia',
-              sourceUrl: article.articleUrl,
-              license: 'CC BY-SA 4.0',
-              licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/',
-              creator: 'Wikipedia contributors',
-              source: 'terms-fallback' as const
-            },
-            image: article.imageTitle ? { resolved: false, source: 'unresolved' as const } : null,
-            cache: 'miss' as const
-          }
-        }))
-      )
-    )));
-    dialogArticles.set(resolvedArticles);
-    attributionLoading.set(false);
   }
 
 

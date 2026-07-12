@@ -1,5 +1,8 @@
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
+process.env.SERVICE_JWT_ISSUER = process.env.WIKIPEDIA_SERVICE_JWT_ISSUER || 'service.wikipedia';
+process.env.SERVICE_JWT_AUDIENCE ||= 'service.wikipedia';
+process.env.SERVICE_JWT_TRUSTED_JWKS_PATH ||= path.join(__dirname, 'config', 'service-jwks.json');
 require('winston-daily-rotate-file');
 const compression = require('compression');
 const express = require('express');
@@ -17,6 +20,8 @@ const { normalizeErrorResponses, notFoundHandler, errorHandler } = require('./mi
 const root = require('./routes/root');
 const check = require('./routes/check');
 const wikipedia = require('./routes/wikipedia');
+const { generateOrLoadKeypairs } = require('./utils/keyStore');
+const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
 
 const logFormat = winston.format.combine(winston.format.timestamp(), winston.format.json());
 const transports = [new winston.transports.DailyRotateFile({
@@ -24,8 +29,13 @@ const transports = [new winston.transports.DailyRotateFile({
 })];
 if (process.env.NODE_ENV !== 'production') transports.push(new winston.transports.Console({ format: winston.format.simple() }));
 const logger = winston.createLogger({ level: 'info', format: logFormat, transports });
+const adminLogBase = resolveBaseUrl(process.env.ADMIN_BASE_URL, process.env.ADMIN_PORT, process.env.ADMIN_LOG_URL);
+attachForwarding(logger, {
+  baseUrl: adminLogBase,
+  audience: process.env.SERVICE_JWT_AUDIENCE_ADMIN || 'service.admin-backend',
+  source: 'wikipedia-service'
+});
 const database = new Database();
-database.init(logger);
 
 const app = express();
 app.set('trust proxy', process.env.TRUST_PROXY || 'loopback, linklocal, uniquelocal');
@@ -51,8 +61,20 @@ app.use(errorHandler);
 
 const port = Number(process.env.WIKIPEDIA_PORT);
 if (!Number.isInteger(port) || port <= 0) throw new Error(`Invalid WIKIPEDIA_PORT: ${process.env.WIKIPEDIA_PORT ?? '<not set>'}`);
-const server = app.listen(port, () => logger.info('Wikipedia service listening', { port }));
-server.on('error', (error) => logger.error('Wikipedia HTTP server error', { error: error.message }));
+let server;
+
+async function start() {
+  await generateOrLoadKeypairs();
+  logger.info('Wikipedia service keypairs ready');
+  database.init(logger);
+  server = app.listen(port, () => logger.info('Wikipedia service listening', { port }));
+  server.on('error', (error) => logger.error('Wikipedia HTTP server error', { error: error.message }));
+}
+
+start().catch((error) => {
+  logger.error('Wikipedia service startup failed', { error: error.message, stack: error.stack });
+  process.exitCode = 1;
+});
 
 cron.schedule('15 0 * * *', () => tableCache.cleanExpired(database.db, (error) => {
   if (error) logger.error('Wikipedia cache cleanup failed', { error: error.message });
@@ -60,6 +82,10 @@ cron.schedule('15 0 * * *', () => tableCache.cleanExpired(database.db, (error) =
 
 function shutdown(signal) {
   logger.info('Wikipedia service shutting down', { signal });
+  if (!server) {
+    database.close();
+    return;
+  }
   server.close(() => database.close());
 }
 process.on('SIGTERM', () => shutdown('SIGTERM'));
