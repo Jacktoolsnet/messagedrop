@@ -7,7 +7,6 @@ require('winston-daily-rotate-file');
 const compression = require('compression');
 const express = require('express');
 const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
 const cron = require('node-cron');
 const winston = require('winston');
 const Database = require('./db/database');
@@ -48,14 +47,12 @@ app.use(loggerMw(logger));
 app.use(headerMw());
 app.use(normalizeErrorResponses);
 
-const wikipediaLimit = rateLimit({
-  windowMs: 10 * 60 * 1000, limit: Number(process.env.WIKIPEDIA_RATE_LIMIT || 240),
-  standardHeaders: true, legacyHeaders: false,
-  message: { errorCode: 'RATE_LIMIT', message: 'too_many_wikipedia_requests', error: 'too_many_wikipedia_requests' }
-});
 app.use('/', root);
 app.use('/check', check);
-app.use('/wikipedia', wikipediaLimit, wikipedia);
+// Client-specific rate limiting belongs to the public main backend. All calls
+// reaching this internal service originate from that backend's single address.
+// Service JWT authentication and the upstream queue still protect this service.
+app.use('/wikipedia', wikipedia);
 app.use(notFoundHandler);
 app.use(errorHandler);
 

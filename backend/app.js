@@ -528,8 +528,11 @@ const nominatimLimit = rateLimit({
 });
 
 const wikipediaLimit = rateLimit({
-  windowMs: 10 * 60 * 1000,
-  limit: 240,
+  // This limiter runs at the public boundary where Express can distinguish
+  // clients. Do not move it to the internal Wikipedia service: all forwarded
+  // calls arrive there from this backend's single address.
+  windowMs: Number(process.env.WIKIPEDIA_PUBLIC_RATE_LIMIT_WINDOW_MS || 10 * 60 * 1000),
+  limit: Number(process.env.WIKIPEDIA_PUBLIC_RATE_LIMIT || 240),
   ...rateLimitDefaults,
   message: rateLimitMessage('Too many Wikipedia requests, please try again later.')
 });
