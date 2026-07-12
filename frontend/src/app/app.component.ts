@@ -2384,7 +2384,7 @@ export class AppComponent implements OnInit {
     if (!articles.length) {
       return;
     }
-    this.dialog.open(WikipediaListComponent, {
+    const dialogRef = this.dialog.open(WikipediaListComponent, {
       data: { articles, attribution: this.wikipediaMapState.attribution() },
       panelClass: 'pin-dialog',
       width: 'min(720px, 95vw)',
@@ -2393,6 +2393,17 @@ export class AppComponent implements OnInit {
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
       autoFocus: false
+    });
+    dialogRef.afterClosed().subscribe((result?: { action?: string; article?: WikipediaArticle }) => {
+      if (result?.action !== 'jumpToPin' || !result.article) {
+        return;
+      }
+      const article = result.article;
+      this.mapService.flyToWithZoom({
+        latitude: article.latitude,
+        longitude: article.longitude,
+        plusCode: this.geolocationService.getPlusCode(article.latitude, article.longitude)
+      }, Math.max(18, this.mapService.getMapZoom()));
     });
   }
 

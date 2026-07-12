@@ -1,24 +1,42 @@
-<h2 mat-dialog-title>
-  <mat-icon aria-hidden="true">menu_book</mat-icon>
-  {{ 'common.wikipedia.title' | transloco }}
-</h2>
-<mat-dialog-content>
-  <div class="article-list">
+<app-dialog-header icon="menu_book" [title]="'common.wikipedia.title' | transloco"></app-dialog-header>
+
+<mat-dialog-content class="wikipedia-dialog-content">
+  <div class="article-scroll">
+  <div class="article-list" role="list">
     @for (article of data.articles; track article.pageId) {
-      <article class="article">
-        @if (article.thumbnail; as thumbnail) {
-          <img [src]="thumbnail.url" [width]="thumbnail.width" [height]="thumbnail.height" alt="" loading="lazy">
-        }
-        <div class="article__content">
+      <mat-card class="article-tile" role="listitem">
+        <div class="tile-header" [style.--wikipedia-header-bg-image]="getHeaderBackgroundImage(article)">
+          <div class="identity-badge">
+            <mat-icon>menu_book</mat-icon>
+            <span>{{ article.title }}</span>
+          </div>
+          <div class="source-badge">Wikipedia</div>
+        </div>
+        <mat-card-content class="article-content">
           <h3>{{ article.title }}</h3>
           @if (article.summary) {
             <p>{{ article.summary }}</p>
           }
-          <a [href]="article.articleUrl" target="_blank" rel="noopener noreferrer">
-            {{ 'common.wikipedia.readArticle' | transloco }}
-          </a>
-        </div>
-      </article>
+        </mat-card-content>
+        <mat-card-actions class="tile-actions">
+          <div class="tile-actions__left">
+            <button mat-mini-fab color="secondary" type="button" (click)="openNavigation(article, $event)"
+              [attr.aria-label]="'common.wikipedia.navigate' | transloco">
+              <mat-icon>directions</mat-icon>
+            </button>
+            <button mat-mini-fab color="secondary" type="button" (click)="jumpToPin(article, $event)"
+              [attr.aria-label]="'common.wikipedia.jumpToPin' | transloco">
+              <mat-icon>my_location</mat-icon>
+            </button>
+          </div>
+          <div class="tile-actions__right">
+            <button mat-mini-fab color="primary" type="button" (click)="openWikipedia(article, $event)"
+              [attr.aria-label]="'common.wikipedia.readArticle' | transloco">
+              <mat-icon>open_in_new</mat-icon>
+            </button>
+          </div>
+        </mat-card-actions>
+      </mat-card>
     }
   </div>
   @if (data.attribution; as attribution) {
@@ -28,4 +46,11 @@
       <a [href]="attribution.licenseUrl" target="_blank" rel="noopener noreferrer">{{ attribution.textLicense }}</a>
     </p>
   }
+  </div>
 </mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-dialog-close mat-icon-button class="action-close" [attr.aria-label]="'common.actions.abort' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+</mat-dialog-actions>

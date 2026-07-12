@@ -1533,7 +1533,9 @@
     },
     "wikipedia": {
       "title": "Articles Wikipédia",
-      "readArticle": "Lire sur Wikipédia"
+      "readArticle": "Lire sur Wikipédia",
+      "navigate": "Démarrer la navigation avec Google Maps",
+      "jumpToPin": "Afficher le repère sur la carte"
     },
     "place": {
       "title": "Service de lieux",
