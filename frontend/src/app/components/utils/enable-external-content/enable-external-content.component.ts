@@ -32,7 +32,14 @@ const PLATFORM_META: Record<ExternalContentPlatform, PlatformMeta> = {
   youtube: { name: 'YouTube', icon: 'smart_display', settingsKey: EXTERNAL_CONTENT_SETTINGS_KEYS.youtube, terms: 'https://www.youtube.com/t/terms', privacy: 'https://www.youtube.com/intl/ALL/howyoutubeworks/privacy/' },
   spotify: { name: 'Spotify', icon: 'graphic_eq', settingsKey: EXTERNAL_CONTENT_SETTINGS_KEYS.spotify, terms: 'https://www.spotify.com/legal/end-user-agreement/', privacy: 'https://www.spotify.com/legal/privacy-policy/' },
   tiktok: { name: 'TikTok', icon: 'music_note', settingsKey: EXTERNAL_CONTENT_SETTINGS_KEYS.tiktok, terms: 'https://www.tiktok.com/legal/terms-of-service', privacy: 'https://www.tiktok.com/legal/privacy-policy' },
-  pinterest: { name: 'Pinterest', icon: 'push_pin', settingsKey: EXTERNAL_CONTENT_SETTINGS_KEYS.pinterest, terms: 'https://policy.pinterest.com/terms-of-service', privacy: 'https://policy.pinterest.com/privacy-policy' }
+  pinterest: { name: 'Pinterest', icon: 'push_pin', settingsKey: EXTERNAL_CONTENT_SETTINGS_KEYS.pinterest, terms: 'https://policy.pinterest.com/terms-of-service', privacy: 'https://policy.pinterest.com/privacy-policy' },
+  wikipedia: {
+    name: 'Wikipedia',
+    icon: 'menu_book',
+    settingsKey: EXTERNAL_CONTENT_SETTINGS_KEYS.wikipedia,
+    terms: 'https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use',
+    privacy: 'https://foundation.wikimedia.org/wiki/Policy:Privacy_policy'
+  }
 };
 
 @Component({

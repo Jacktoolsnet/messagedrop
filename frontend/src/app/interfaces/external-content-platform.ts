@@ -7,7 +7,8 @@ export const EXTERNAL_CONTENT_PLATFORMS = [
   'klipy',
   'unsplash',
   'tiktok',
-  'youtube'
+  'youtube',
+  'wikipedia'
 ] as const;
 
 export type ExternalContentPlatform = typeof EXTERNAL_CONTENT_PLATFORMS[number];
@@ -21,6 +22,7 @@ export const EXTERNAL_CONTENT_SETTINGS_KEYS: Record<ExternalContentPlatform, key
   | 'enableUnsplashContent'
   | 'enableTikTokContent'
   | 'enableYoutubeContent'
+  | 'enableWikipediaContent'
 >> = {
   pinterest: 'enablePinterestContent',
   spotify: 'enableSpotifyContent',
@@ -28,7 +30,8 @@ export const EXTERNAL_CONTENT_SETTINGS_KEYS: Record<ExternalContentPlatform, key
   klipy: 'enableKlipyContent',
   unsplash: 'enableUnsplashContent',
   tiktok: 'enableTikTokContent',
-  youtube: 'enableYoutubeContent'
+  youtube: 'enableYoutubeContent',
+  wikipedia: 'enableWikipediaContent'
 };
 
 export function isExternalContentPlatform(value: string | undefined): value is ExternalContentPlatform {

@@ -44,6 +44,7 @@ export class AppService {
     enableTenorContent: false,
     enableKlipyContent: false,
     enableUnsplashContent: false,
+    enableWikipediaContent: false,
     diagnosticLogging: false,
     backupOnExit: false,
     pinInputFeedback: { ...DEFAULT_PIN_INPUT_FEEDBACK_SETTINGS },

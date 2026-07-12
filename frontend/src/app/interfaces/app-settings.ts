@@ -17,6 +17,7 @@ export interface AppSettings {
     enableUnsplashContent: boolean,
     enableTikTokContent: boolean,
     enableYoutubeContent: boolean,
+    enableWikipediaContent: boolean,
     diagnosticLogging: boolean,
     backupOnExit: boolean,
     pinInputFeedback: PinInputFeedbackSettings,
