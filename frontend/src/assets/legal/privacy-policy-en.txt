@@ -1,5 +1,5 @@
 PRIVACY POLICY
-Effective: July 6, 2026
+Effective: July 12, 2026
 
 IMPORTANT NOTE ON LANGUAGE
 This English translation is provided for convenience only and is not legally binding. The legally binding version is exclusively the current complete German version of this Privacy Policy, including all supplements related to the Digital Services Act (DSA).
@@ -33,7 +33,7 @@ MessageDrop does not use a personalized recommendation or ranking system. Public
 
 Private chat messages are transmitted with end-to-end encryption and are generally not visible to us in plain text.
 
-External embeds (e.g., YouTube, TikTok, Pinterest, Spotify, Tenor, Klipy, Unsplash) are loaded only after the user has actively enabled the respective provider. Blanket consent for all providers is not available.
+External content (e.g., YouTube, TikTok, Pinterest, Spotify, Tenor, Klipy, Unsplash, and Wikipedia) is loaded only after the user has actively enabled the respective provider. Blanket consent for all providers is not available.
 
 This is separate from external functional services (e.g., Open-Meteo, OpenStreetMap/Nominatim, DeepL, Viator), which are used when the respective function is actively used and are not enabled via the external content toggle.
 
@@ -167,7 +167,7 @@ This provider-specific decision applies to the embedding of external content. Ex
 
 External content is embedded only after the user has deliberately and voluntarily enabled it.
 
-The integration is carried out using embedding techniques such as iframes or oEmbed. In this process, the content is loaded directly from the servers of the respective third-party provider. We have no influence over the nature, scope, and purpose of data processing by these providers.
+Depending on the provider, integration is carried out using techniques such as iframes or oEmbed as well as API and media requests. Content may be loaded directly from the servers of the respective third-party provider. We have no influence over the nature, scope, and purpose of data processing by these providers.
 
 By activating an external content provider, the following data in particular may be transmitted to the respective provider:
 - IP address,
@@ -213,6 +213,12 @@ Contact: KIKLIKO, Inc., 505 Montgomery St. Ste 1100, San Francisco, CA, 94111, U
 Unsplash (Unsplash B.V.)
 Privacy Policy: https://unsplash.com/privacy
 Terms of Use: https://unsplash.com/terms
+
+Wikipedia / Wikimedia projects (Wikimedia Foundation, Inc.)
+Privacy Policy: https://foundation.wikimedia.org/wiki/Policy:Privacy_policy
+Terms of Use: https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use
+
+Wikipedia searches are performed only if they are enabled in the search settings and the required map zoom level has been reached. Searches for articles within the visible geographic area are sent to the Wikimedia services through the MessageDrop backend. When a Wikipedia pin is opened, article information is loaded and displayed only after Wikipedia has been enabled in the external content settings. This may include retrieving article text, license and creator information, and images from Wikimedia services. If media is loaded directly by the user's device or Wikipedia links are opened, Wikimedia receives the technical request data required for delivery, in particular the IP address and browser information.
 
 Flaticon / Freepik (Freepik Company S.L.U.)
 Privacy Policy: https://www.freepik.com/legal/privacy/

@@ -1,5 +1,5 @@
 TERMS OF USE
-Version: July 6, 2026
+Version: July 12, 2026
 
 IMPORTANT NOTE ON LANGUAGE
 This English translation is provided for convenience only and is not legally binding. The legally binding version is exclusively the current complete German version of these Terms of Use.
@@ -27,7 +27,7 @@ Summary (simplified, not legally binding)
 - For translations, you may optionally use your own DeepL API key. You are yourself responsible for obtaining, keeping confidential, maintaining validity, billing, quotas, and complying with DeepL’s terms.
 - The optional Usage Time Protection (self-restriction/parental mode with parental PIN) can be technically circumvented; absolute blocking is not guaranteed.
 - External content from third-party providers is only loaded after you have given your provider-specific consent. You can withdraw this consent at any time.
-- External services and license providers (e.g., YouTube, OpenStreetMap, DeepL, Unsplash, Viator, Flaticon / Freepik) have their own terms of use and privacy policies.
+- External services and license providers (e.g., YouTube, Wikipedia, OpenStreetMap, DeepL, Unsplash, Viator, Flaticon / Freepik) have their own terms of use and privacy policies.
 - MessageDrop is not an emergency service.
 
 Only the complete version below is authoritative.
@@ -321,6 +321,7 @@ The following providers require provider-specific consent or activation within t
 - Klipy
 - Spotify
 - Unsplash
+- Wikipedia / Wikimedia projects
 
 External content is disabled by default.
 
@@ -361,6 +362,15 @@ We do not guarantee that a personal DeepL API key provided by you will remain us
 When you select Unsplash images (e.g., for avatars or backgrounds), image files are loaded from Unsplash and downloaded to your device or stored locally.
 
 In addition, technical proof of download may be transmitted to Unsplash.
+
+###
+13.4 Special feature Wikipedia / Wikimedia projects
+###
+
+Wikipedia content is displayed only if you have enabled Wikipedia in the external content settings. The respective terms of use and license conditions of the Wikimedia projects also apply to the article text, images, license information, and creator information provided. Content and license information may subsequently change. When you open external Wikipedia or Wikimedia pages, you leave MessageDrop.
+
+Privacy Policy: https://foundation.wikimedia.org/wiki/Policy:Privacy_policy
+Terms of Use: https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use
 
 ###
 14. Usage Time Protection (self-restriction / parental mode)

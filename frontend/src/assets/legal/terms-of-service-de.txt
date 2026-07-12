@@ -1,5 +1,5 @@
 NUTZUNGSBEDINGUNGEN
-Stand: 6. Juli 2026
+Stand: 12. Juli 2026
 
 ###
 Kurzfassung (vereinfacht, nicht rechtsverbindlich)
@@ -24,7 +24,7 @@ Kurzfassung (vereinfacht, nicht rechtsverbindlich)
 - Für Übersetzungen kannst Du optional Deinen eigenen DeepL-API-Key verwenden. Für Beschaffung, Geheimhaltung, Gültigkeit, Abrechnung, Quoten und die Einhaltung der Bedingungen von DeepL bist Du selbst verantwortlich.
 - Der optionale Nutzungszeit-Schutz (Selbstbeschränkung/Elternmodus mit Eltern-PIN) kann technisch umgangen werden; eine absolute Sperre ist nicht garantiert.
 - Externe Inhalte von Drittanbietern werden erst nach Deiner anbieterbezogenen Zustimmung geladen. Diese Zustimmung kannst Du jederzeit wieder zurücknehmen.
-- Externe Dienste und Lizenzanbieter (z. B. YouTube, OpenStreetMap, DeepL, Unsplash, Viator, Flaticon / Freepik) haben eigene Nutzungs- und Datenschutzbedingungen.
+- Externe Dienste und Lizenzanbieter (z. B. YouTube, Wikipedia, OpenStreetMap, DeepL, Unsplash, Viator, Flaticon / Freepik) haben eigene Nutzungs- und Datenschutzbedingungen.
 - MessageDrop ist kein Notfalldienst.
 
 Maßgeblich ist nur die vollständige Fassung unten.
@@ -318,6 +318,7 @@ Für folgende Anbieter gilt eine anbieterbezogene Einwilligungs- bzw. Freigabeen
 - Klipy
 - Spotify
 - Unsplash
+- Wikipedia / Wikimedia-Projekte
 
 Externe Inhalte sind standardmäßig deaktiviert.
 
@@ -358,6 +359,15 @@ Wir übernehmen keine Gewähr dafür, dass ein von Dir bereitgestellter eigener 
 Wenn Du Unsplash-Bilder auswählst (z. B. für Avatar oder Hintergründe), werden Bilddateien von Unsplash geladen und auf Dein Endgerät heruntergeladen bzw. lokal gespeichert.
 
 Dabei kann zusätzlich ein technischer Download-Nachweis an Unsplash übermittelt werden.
+
+###
+13.4 Besonderheit Wikipedia / Wikimedia-Projekte
+###
+
+Wikipedia-Inhalte werden nur angezeigt, wenn Du Wikipedia in den Einstellungen für externe Inhalte aktiviert hast. Für die bereitgestellten Artikeltexte, Bilder, Lizenz- und Urheberinformationen gelten zusätzlich die jeweiligen Nutzungs- und Lizenzbedingungen der Wikimedia-Projekte. Inhalte und Lizenzangaben können sich nachträglich ändern. Beim Öffnen externer Wikipedia- oder Wikimedia-Seiten verlässt Du MessageDrop.
+
+Datenschutzerklärung: https://foundation.wikimedia.org/wiki/Policy:Privacy_policy
+Nutzungsbedingungen: https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use
 
 ###
 14. Nutzungszeit-Schutz (Selbstbeschränkung / Elternmodus)

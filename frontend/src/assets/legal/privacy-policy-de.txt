@@ -1,5 +1,5 @@
 DATENSCHUTZERKLÄRUNG
-Stand: 6. Juli 2026
+Stand: 12. Juli 2026
 
 ###
 Kurzfassung (nicht rechtsverbindlich)
@@ -30,7 +30,7 @@ MessageDrop verwendet kein personalisiertes Empfehlungs- oder Ranking-System. Ö
 
 Private Chatnachrichten werden Ende-zu-Ende-verschlüsselt übertragen und sind für uns grundsätzlich nicht im Klartext einsehbar.
 
-Externe Einbettungen (z. B. YouTube, TikTok, Pinterest, Spotify, Tenor, Klipy, Unsplash) werden nur nach aktiver, anbieterbezogener Entscheidung des Nutzers geladen. Eine pauschale Zustimmung für alle Anbieter ist nicht vorgesehen.
+Externe Inhalte (z. B. YouTube, TikTok, Pinterest, Spotify, Tenor, Klipy, Unsplash und Wikipedia) werden nur nach aktiver, anbieterbezogener Entscheidung des Nutzers geladen. Eine pauschale Zustimmung für alle Anbieter ist nicht vorgesehen.
 
 Davon zu unterscheiden sind externe Funktionsdienste sowie Lizenz- und Asset-Anbieter (z. B. Open-Meteo, OpenStreetMap/Nominatim, DeepL, Viator, Flaticon / Freepik), die bei aktiver Nutzung der jeweiligen Funktion oder zur Bereitstellung lizenzierter Inhalte verwendet werden und nicht über den Externe-Inhalte-Toggle freigeschaltet werden.
 
@@ -164,7 +164,7 @@ Diese anbieterbezogene Entscheidung betrifft Einbettungen externer Inhalte. Exte
 
 Erst nach einer bewussten und freiwilligen Aktivierung durch den Nutzer werden externe Inhalte technisch eingebunden.
 
-Die Einbindung erfolgt über Einbettungstechniken wie iFrames oder oEmbed. Dabei werden die Inhalte direkt von den Servern des jeweiligen Drittanbieters geladen. Wir haben keinen Einfluss auf Art, Umfang und Zweck der Datenverarbeitung durch diese Anbieter.
+Die Einbindung erfolgt je nach Anbieter über Einbettungstechniken wie iFrames oder oEmbed sowie über API- und Medienabrufe. Dabei können Inhalte direkt von den Servern des jeweiligen Drittanbieters geladen werden. Wir haben keinen Einfluss auf Art, Umfang und Zweck der Datenverarbeitung durch diese Anbieter.
 
 Durch die Aktivierung eines externen Inhaltsanbieters können insbesondere folgende Daten an den jeweiligen Anbieter übermittelt werden:
 - IP-Adresse,
@@ -210,6 +210,12 @@ Kontakt: KIKLIKO, Inc., 505 Montgomery St. Ste 1100, San Francisco, CA, 94111, U
 Unsplash (Unsplash B.V.)
 Datenschutzerklärung: https://unsplash.com/privacy
 Nutzungsbedingungen: https://unsplash.com/terms
+
+Wikipedia / Wikimedia-Projekte (Wikimedia Foundation, Inc.)
+Datenschutzerklärung: https://foundation.wikimedia.org/wiki/Policy:Privacy_policy
+Nutzungsbedingungen: https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use
+
+Die Wikipedia-Suche wird nur ausgeführt, wenn sie in den Sucheinstellungen aktiviert ist und die erforderliche Karten-Zoomstufe erreicht wurde. Suchanfragen nach Artikeln im sichtbaren geografischen Bereich werden über das MessageDrop-Backend an die Wikimedia-Dienste gestellt. Beim Öffnen einer Wikipedia-Pinnadel werden Artikelinformationen erst geladen und angezeigt, nachdem Wikipedia in den Einstellungen für externe Inhalte aktiviert wurde. Dabei können insbesondere Artikeltexte, Lizenz- und Urheberinformationen sowie Bilder von Wikimedia-Diensten abgerufen werden. Werden Medien direkt vom Endgerät geladen oder Wikipedia-Links geöffnet, erhält Wikimedia die technisch erforderlichen Abrufdaten, insbesondere die IP-Adresse und Browserinformationen.
 
 Flaticon / Freepik (Freepik Company S.L.U.)
 Datenschutzerklärung: https://www.freepik.com/legal/privacy/
