@@ -24,6 +24,8 @@ describe('WikipediaService', () => {
     expect(request.request.params.get('language')).toBe('de');
     expect(request.request.params.get('zoom')).toBe('14');
     expect(request.request.params.get('limit')).toBe('100');
+    expect(request.request.headers.get('x-skip-ui')).toBe('true');
+    expect(request.request.headers.get('x-skip-backend-status')).toBe('true');
     request.flush({ status: 200, language: 'de', articles: [], cache: { stale: false, tiles: [] }, attribution: null });
   });
 

@@ -60,6 +60,9 @@ export class WikipediaMapStateService {
               this.loadingState.set(false);
             },
             error: (error: HttpErrorResponse) => {
+              this.articlesState.set([]);
+              this.attributionState.set(null);
+              this.staleState.set(false);
               this.errorState.set(error);
               this.loadingState.set(false);
             }

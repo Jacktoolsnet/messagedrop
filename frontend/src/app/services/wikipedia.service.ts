@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -7,6 +7,10 @@ import { WikipediaArticle, WikipediaNearbyRequest, WikipediaNearbyResponse, Wiki
 @Injectable({ providedIn: 'root' })
 export class WikipediaService {
   private readonly http = inject(HttpClient);
+  private readonly silentHeaders = new HttpHeaders({
+    'x-skip-ui': 'true',
+    'x-skip-backend-status': 'true'
+  });
 
   getNearby(request: WikipediaNearbyRequest): Observable<WikipediaNearbyResponse> {
     const params = new HttpParams()
@@ -18,7 +22,10 @@ export class WikipediaService {
       .set('language', this.normalizeLanguage(request.language))
       .set('limit', request.limit ?? 100);
 
-    return this.http.get<WikipediaNearbyResponse>(`${environment.apiUrl}/wikipedia/nearby`, { params });
+    return this.http.get<WikipediaNearbyResponse>(`${environment.apiUrl}/wikipedia/nearby`, {
+      params,
+      headers: this.silentHeaders
+    });
   }
 
   normalizeLanguage(language: string): string {
@@ -34,6 +41,9 @@ export class WikipediaService {
     if (article.imageTitle) {
       params = params.set('imageTitle', article.imageTitle);
     }
-    return this.http.get<WikipediaResolvedAttribution>(`${environment.apiUrl}/wikipedia/attribution`, { params });
+    return this.http.get<WikipediaResolvedAttribution>(`${environment.apiUrl}/wikipedia/attribution`, {
+      params,
+      headers: this.silentHeaders
+    });
   }
 }
