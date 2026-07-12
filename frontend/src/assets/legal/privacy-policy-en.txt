@@ -220,6 +220,8 @@ Terms of Use: https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use
 
 Wikipedia searches are performed only if they are enabled in the search settings and the required map zoom level has been reached. Searches for articles within the visible geographic area are sent to the Wikimedia services through the MessageDrop backend. When a Wikipedia pin is opened, article information is loaded and displayed only after Wikipedia has been enabled in the external content settings. This may include retrieving article text, license and creator information, and images from Wikimedia services. If media is loaded directly by the user's device or Wikipedia links are opened, Wikimedia receives the technical request data required for delivery, in particular the IP address and browser information.
 
+The Wikimedia Foundation is based in the United States and operates servers and data centers there. When Wikimedia services are used, particularly when media is retrieved directly or Wikipedia or Wikimedia pages are opened, personal data may therefore be transferred to, processed, and stored in the United States. The level of data protection in the United States may differ from that in the European Union. Further information about processing and possible international data transfers is available in the Wikimedia Foundation Privacy Policy linked above.
+
 Flaticon / Freepik (Freepik Company S.L.U.)
 Privacy Policy: https://www.freepik.com/legal/privacy/
 Terms of Use: https://www.flaticon.com/legal

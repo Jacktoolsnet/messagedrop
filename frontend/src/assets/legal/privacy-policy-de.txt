@@ -217,6 +217,8 @@ Nutzungsbedingungen: https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use
 
 Die Wikipedia-Suche wird nur ausgeführt, wenn sie in den Sucheinstellungen aktiviert ist und die erforderliche Karten-Zoomstufe erreicht wurde. Suchanfragen nach Artikeln im sichtbaren geografischen Bereich werden über das MessageDrop-Backend an die Wikimedia-Dienste gestellt. Beim Öffnen einer Wikipedia-Pinnadel werden Artikelinformationen erst geladen und angezeigt, nachdem Wikipedia in den Einstellungen für externe Inhalte aktiviert wurde. Dabei können insbesondere Artikeltexte, Lizenz- und Urheberinformationen sowie Bilder von Wikimedia-Diensten abgerufen werden. Werden Medien direkt vom Endgerät geladen oder Wikipedia-Links geöffnet, erhält Wikimedia die technisch erforderlichen Abrufdaten, insbesondere die IP-Adresse und Browserinformationen.
 
+Die Wikimedia Foundation hat ihren Sitz in den USA und betreibt dort Server und Rechenzentren. Bei der Nutzung von Wikimedia-Diensten, insbesondere bei direkten Medienabrufen oder beim Öffnen von Wikipedia- bzw. Wikimedia-Seiten, können personenbezogene Daten daher in die USA übermittelt und dort verarbeitet und gespeichert werden. In den USA kann ein im Vergleich zur Europäischen Union abweichendes Datenschutzniveau bestehen. Weitere Informationen zur Verarbeitung und zu möglichen internationalen Datenübermittlungen enthält die oben verlinkte Datenschutzerklärung der Wikimedia Foundation.
+
 Flaticon / Freepik (Freepik Company S.L.U.)
 Datenschutzerklärung: https://www.freepik.com/legal/privacy/
 Nutzungsbedingungen: https://www.flaticon.com/legal
