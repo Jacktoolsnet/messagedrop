@@ -1537,7 +1537,9 @@
       "readArticle": "Auf Wikipedia lesen",
       "navigate": "Navigation mit Google Maps starten",
       "jumpToPin": "Pinnadel auf der Karte anzeigen",
-      "imageCredit": "Bild"
+      "imageCredit": "Bild",
+      "imageCreator": "Urheber",
+      "loadingAttribution": "Bild- und Lizenzinformationen werden geladen"
     },
     "place": {
       "title": "Ort-Dienst",

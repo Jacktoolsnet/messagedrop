@@ -1536,7 +1536,9 @@
       "readArticle": "Lire sur Wikipédia",
       "navigate": "Démarrer la navigation avec Google Maps",
       "jumpToPin": "Afficher le repère sur la carte",
-      "imageCredit": "Image"
+      "imageCredit": "Image",
+      "imageCreator": "Auteur de l’image",
+      "loadingAttribution": "Chargement des informations sur l’image et la licence"
     },
     "place": {
       "title": "Service de lieux",

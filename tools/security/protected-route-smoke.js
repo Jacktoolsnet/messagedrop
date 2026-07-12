@@ -535,6 +535,7 @@ const concreteServiceRouteTargets = [
   ['openMeteo airquality route blocks missing service token', `${bases.openMeteo}/airquality/TESTPLUS/52.52/13.405/1`],
   ['nominatim search route blocks missing service token', `${bases.nominatim}/nominatim/search/Berlin/1`],
   ['wikipedia nearby route blocks missing service token', `${bases.wikipedia}/wikipedia/nearby?north=52.52&south=52.51&east=13.41&west=13.39&zoom=14&language=de`],
+  ['wikipedia attribution route blocks missing service token', `${bases.wikipedia}/wikipedia/attribution?pageId=8159759&title=Donnerburgbr%C3%BCcke&language=de`],
   ['sticker categories route blocks missing service token', `${bases.sticker}/sticker/categories`],
   ['sticker search route blocks missing service token', `${bases.sticker}/sticker/search?q=cat`]
 ];

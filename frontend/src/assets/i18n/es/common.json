@@ -1536,7 +1536,9 @@
       "readArticle": "Leer en Wikipedia",
       "navigate": "Iniciar navegación con Google Maps",
       "jumpToPin": "Mostrar el marcador en el mapa",
-      "imageCredit": "Imagen"
+      "imageCredit": "Imagen",
+      "imageCreator": "Autor de la imagen",
+      "loadingAttribution": "Cargando información de imagen y licencia"
     },
     "place": {
       "title": "Servicio de lugares",

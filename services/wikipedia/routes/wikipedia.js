@@ -1,11 +1,12 @@
 const express = require('express');
 const tableCache = require('../db/tableWikipediaTileCache');
-const { fetchTile, fetchAttribution } = require('../clients/wikimedia-client');
+const { fetchTile, fetchAttribution, getMetrics } = require('../clients/wikimedia-client');
 const { MAX_LATITUDE, tilesForBounds } = require('../utils/tiles');
 const { requireServiceJwt } = require('../utils/serviceJwt');
 
 const router = express.Router();
 router.use(requireServiceJwt);
+const cacheMetrics = { hits: 0, misses: 0, stale: 0, attributionHits: 0, attributionMisses: 0 };
 
 const dbGet = (db, key) => new Promise((resolve, reject) => tableCache.get(db, key, (error, row) => error ? reject(error) : resolve(row)));
 const dbSet = (db, key, value) => new Promise((resolve, reject) => tableCache.set(db, key, value, (error) => error ? reject(error) : resolve()));
@@ -37,11 +38,16 @@ async function resolveTile(db, language, tile, logger) {
   const freshMs = Number(process.env.WIKIPEDIA_CACHE_FRESH_MS || 24 * 60 * 60 * 1000);
   const staleMs = Number(process.env.WIKIPEDIA_CACHE_STALE_MS || 7 * 24 * 60 * 60 * 1000);
   const cached = await dbGet(db, key);
-  if (cached && ageMs(cached) <= freshMs) return { articles: parsePayload(cached.payload), cache: 'hit' };
+  if (cached && ageMs(cached) <= freshMs) {
+    cacheMetrics.hits += 1;
+    return { articles: parsePayload(cached.payload), cache: 'hit' };
+  }
   if (cached && ageMs(cached) <= staleMs) {
+    cacheMetrics.stale += 1;
     refreshTile(db, language, tile, key, logger).catch((error) => logger?.warn?.('Wikipedia background refresh failed', { key, error: error.message }));
     return { articles: parsePayload(cached.payload), cache: 'stale' };
   }
+  cacheMetrics.misses += 1;
   return { articles: await refreshTile(db, language, tile, key, logger), cache: 'miss' };
 }
 
@@ -99,19 +105,22 @@ router.get('/attribution', async (req, res, next) => {
   const title = String(req.query.title || '').trim();
   const imageTitle = String(req.query.imageTitle || '').trim() || null;
   const pageId = Number(req.query.pageId);
-  if (!/^[a-z]{2,3}$/.test(language) || !title || title.length > 500 || !Number.isInteger(pageId) || pageId <= 0) {
+  if (!/^[a-z]{2,3}$/.test(language) || !title || title.length > 500 || (imageTitle && imageTitle.length > 500)
+      || !Number.isInteger(pageId) || pageId <= 0) {
     return res.status(400).json({ errorCode: 'BAD_REQUEST', message: 'invalid_attribution_request', error: 'invalid_attribution_request' });
   }
   try {
-    const key = `attribution:${language}:${pageId}:${imageTitle || 'no-image'}:v1`;
+    const key = `attribution:${language}:${pageId}:${imageTitle || 'no-image'}:v2`;
     const cached = await dbGet(req.database.db, key);
     const cachedPayload = cached ? parsePayload(cached.payload) : null;
     const ttl = cachedPayload?.image?.resolved !== false
       ? Number(process.env.WIKIPEDIA_ATTRIBUTION_CACHE_MS || 7 * 24 * 60 * 60 * 1000)
       : Number(process.env.WIKIPEDIA_ATTRIBUTION_NEGATIVE_CACHE_MS || 6 * 60 * 60 * 1000);
     if (cached && ageMs(cached) <= ttl) {
+      cacheMetrics.attributionHits += 1;
       return res.status(200).json({ status: 200, ...cachedPayload, cache: 'hit' });
     }
+    cacheMetrics.attributionMisses += 1;
     const attribution = await fetchAttribution(language, title, imageTitle);
     await dbSet(req.database.db, key, attribution);
     return res.status(200).json({ status: 200, ...attribution, cache: 'miss' });
@@ -119,5 +128,11 @@ router.get('/attribution', async (req, res, next) => {
     return next(error);
   }
 });
+
+router.get('/metrics', (_req, res) => res.status(200).json({
+  status: 200,
+  cache: { ...cacheMetrics },
+  upstream: getMetrics()
+}));
 
 module.exports = router;

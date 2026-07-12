@@ -32,4 +32,23 @@ describe('WikipediaService', () => {
   it('falls back to English for unsupported language values', () => {
     expect(service.normalizeLanguage('invalid-language')).toBe('en');
   });
+
+  it('requests attribution silently with the image title', () => {
+    service.getAttribution({
+      pageId: 8159759,
+      title: 'Donnerburgbrücke',
+      latitude: 52,
+      longitude: 10,
+      summary: '',
+      thumbnail: null,
+      imageTitle: 'Donnerburgbrücke.jpg',
+      articleUrl: 'https://de.wikipedia.org/wiki/Donnerburgbr%C3%BCcke'
+    }, 'de-DE').subscribe();
+
+    const request = httpTesting.expectOne((candidate) => candidate.url === `${environment.apiUrl}/wikipedia/attribution`);
+    expect(request.request.params.get('language')).toBe('de');
+    expect(request.request.params.get('imageTitle')).toBe('Donnerburgbrücke.jpg');
+    expect(request.request.headers.get('x-skip-ui')).toBe('true');
+    request.flush({ status: 200, article: {}, image: null, cache: 'miss' });
+  });
 });

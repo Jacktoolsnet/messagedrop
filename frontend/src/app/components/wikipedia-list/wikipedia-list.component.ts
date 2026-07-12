@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Signal, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogContent } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialogActions, MatDialogClose, MatDialogRef } from '@angular/material/dialog';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { WikipediaArticle, WikipediaImageAttribution } from '../../interfaces/wikipedia';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
@@ -17,6 +18,7 @@ import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.comp
     MatIconModule,
     MatButtonModule,
     MatCardModule,
+    MatProgressSpinnerModule,
     TranslocoPipe,
     DialogHeaderComponent
   ],
@@ -25,7 +27,7 @@ import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.comp
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class WikipediaListComponent {
-  readonly data = inject<{ articles: WikipediaArticle[] }>(MAT_DIALOG_DATA);
+  readonly data = inject<{ articles: Signal<WikipediaArticle[]>; loading: Signal<boolean> }>(MAT_DIALOG_DATA);
   private readonly dialogRef = inject(MatDialogRef<WikipediaListComponent>);
 
   getHeaderBackgroundImage(article: WikipediaArticle): string {
@@ -48,6 +50,11 @@ export class WikipediaListComponent {
       attribution.sourceUrl
       && attribution.sourceUrl !== this.getImageLicenseUrl(attribution)
     );
+  }
+
+  getImageCreator(attribution: WikipediaImageAttribution): string {
+    const value = attribution.creator || attribution.credit || '';
+    return /^https?:\/\//iu.test(value) ? '' : value;
   }
 
   openNavigation(article: WikipediaArticle, event: Event): void {

@@ -2,6 +2,13 @@ const axios = require('axios');
 
 const queues = new Map();
 const inFlight = new Map();
+let pendingJobs = 0;
+const metrics = {
+  upstreamRequests: 0,
+  attributionApiFallbacks: 0,
+  imageInfoFallbacks: 0,
+  rejectedQueueJobs: 0
+};
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -10,6 +17,15 @@ function headers() {
     'User-Agent': process.env.WIKIPEDIA_USER_AGENT || 'MessageDrop-WikipediaBot/1.0 (https://messagedrop.de/; support@messagedrop.de)',
     Accept: 'application/json'
   };
+}
+
+function safeHttpsUrl(value, fallback = '') {
+  try {
+    const url = new URL(String(value || ''));
+    return url.protocol === 'https:' ? url.toString() : fallback;
+  } catch {
+    return fallback;
+  }
 }
 
 function queueFor(language) {
@@ -43,25 +59,40 @@ async function requestTile(language, bounds) {
   let lastError;
   for (let attempt = 0; attempt < 3; attempt += 1) {
     try {
-      const response = await axios.get(`https://${language}.wikipedia.org/w/api.php`, {
-        params, timeout, headers: headers()
-      });
-      if (response.data?.error) {
-        const error = new Error(response.data.error.info || response.data.error.code);
-        error.response = { status: response.status, headers: response.headers, data: response.data };
-        error.status = response.data.error.code === 'maxlag' || response.data.error.code === 'ratelimited' ? 503 : 502;
-        throw error;
+      const articles = new Map();
+      let continuation = {};
+      const resultLimit = Math.min(500, Number(process.env.WIKIPEDIA_MAX_RESULTS_PER_TILE || 500));
+      while (articles.size < resultLimit) {
+        metrics.upstreamRequests += 1;
+        const response = await axios.get(`https://${language}.wikipedia.org/w/api.php`, {
+          params: { ...params, ...continuation }, timeout, headers: headers()
+        });
+        if (response.data?.error) {
+          const error = new Error(response.data.error.info || response.data.error.code);
+          error.response = { status: response.status, headers: response.headers, data: response.data };
+          error.status = response.data.error.code === 'maxlag' || response.data.error.code === 'ratelimited' ? 503 : 502;
+          throw error;
+        }
+        for (const page of response.data?.query?.pages || []) {
+          const fallbackArticleUrl = `https://${language}.wikipedia.org/?curid=${page.pageid}`;
+          const thumbnailUrl = safeHttpsUrl(page.thumbnail?.source);
+          const article = {
+            pageId: page.pageid,
+            title: page.title,
+            latitude: page.coordinates?.[0]?.lat,
+            longitude: page.coordinates?.[0]?.lon,
+            summary: page.extract || '',
+            thumbnail: thumbnailUrl ? { url: thumbnailUrl, width: page.thumbnail.width, height: page.thumbnail.height } : null,
+            imageTitle: page.pageimage || null,
+            articleUrl: safeHttpsUrl(page.fullurl, fallbackArticleUrl)
+          };
+          if (Number.isFinite(article.latitude) && Number.isFinite(article.longitude)) articles.set(article.pageId, article);
+        }
+        if (!response.data?.continue || articles.size >= resultLimit) break;
+        continuation = response.data.continue;
+        await sleep(Number(process.env.WIKIPEDIA_REQUEST_INTERVAL_MS || 150));
       }
-      return (response.data?.query?.pages || []).map((page) => ({
-        pageId: page.pageid,
-        title: page.title,
-        latitude: page.coordinates?.[0]?.lat,
-        longitude: page.coordinates?.[0]?.lon,
-        summary: page.extract || '',
-        thumbnail: page.thumbnail ? { url: page.thumbnail.source, width: page.thumbnail.width, height: page.thumbnail.height } : null,
-        imageTitle: page.pageimage || null,
-        articleUrl: page.fullurl || `https://${language}.wikipedia.org/?curid=${page.pageid}`
-      })).filter((page) => Number.isFinite(page.latitude) && Number.isFinite(page.longitude));
+      return Array.from(articles.values()).slice(0, resultLimit);
     } catch (error) {
       lastError = error;
       if (!isRetryable(error) || attempt === 2) {
@@ -112,6 +143,7 @@ async function fetchImageInfo(language, imageTitle) {
   };
   for (const host of ['commons.wikimedia.org', `${language}.wikipedia.org`]) {
     try {
+      metrics.upstreamRequests += 1;
       const response = await axios.get(`https://${host}/w/api.php`, {
         params, timeout: Number(process.env.WIKIPEDIA_UPSTREAM_TIMEOUT_MS || 10000), headers: headers()
       });
@@ -121,15 +153,19 @@ async function fetchImageInfo(language, imageTitle) {
       const license = metadataValue(meta, 'LicenseShortName') || metadataValue(meta, 'UsageTerms');
       const licenseUrl = metadataValue(meta, 'LicenseUrl');
       const creator = metadataValue(meta, 'Artist');
-      if (!license || !info.descriptionurl) continue;
+      const credit = metadataValue(meta, 'Credit');
+      const attributionRequired = metadataValue(meta, 'AttributionRequired').toLowerCase() !== 'false';
+      const sourceUrl = safeHttpsUrl(info.descriptionurl);
+      if (!license || !sourceUrl) continue;
+      if (attributionRequired && !creator && !credit) continue;
       return {
         resolved: true,
         creator,
-        credit: metadataValue(meta, 'Credit'),
+        credit,
         license,
-        licenseUrl,
-        sourceUrl: info.descriptionurl,
-        attributionRequired: metadataValue(meta, 'AttributionRequired').toLowerCase() !== 'false'
+        licenseUrl: safeHttpsUrl(licenseUrl),
+        sourceUrl,
+        attributionRequired
       };
     } catch {
       // Try the local Wikipedia file repository after Commons.
@@ -141,21 +177,25 @@ async function fetchImageInfo(language, imageTitle) {
 async function requestAttribution(language, title, imageTitle) {
   let signals = null;
   try {
+    metrics.upstreamRequests += 1;
     const response = await axios.get(
       `https://${language}.wikipedia.org/w/rest.php/attribution/v0-beta/pages/${encodeURIComponent(title.replace(/ /g, '_'))}/signals`,
       { timeout: Number(process.env.WIKIPEDIA_UPSTREAM_TIMEOUT_MS || 10000), headers: headers() }
     );
     signals = response.data || null;
   } catch {
+    metrics.attributionApiFallbacks += 1;
     // The beta API is optional. Stable Action API metadata is used as fallback.
   }
 
   const articleUrl = `https://${language}.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, '_'))}`;
+  const signalArticleSource = safeHttpsUrl(findSignalValue(signals, ['source_url', 'page_url']));
+  const signalArticleLicense = safeHttpsUrl(findSignalValue(signals, ['license_url']));
   const article = {
     provider: findSignalValue(signals, ['provider_name', 'project_name']) || 'Wikipedia',
-    sourceUrl: findSignalValue(signals, ['source_url', 'page_url']) || articleUrl,
+    sourceUrl: signalArticleSource || articleUrl,
     license: findSignalValue(signals, ['license_name', 'license_short_name']) || 'CC BY-SA 4.0',
-    licenseUrl: findSignalValue(signals, ['license_url']) || 'https://creativecommons.org/licenses/by-sa/4.0/',
+    licenseUrl: signalArticleLicense || 'https://creativecommons.org/licenses/by-sa/4.0/',
     creator: findSignalValue(signals, ['creator_name', 'author_name', 'attribution_text']) || 'Wikipedia contributors',
     source: signals ? 'attribution-api' : 'terms-fallback'
   };
@@ -164,18 +204,22 @@ async function requestAttribution(language, title, imageTitle) {
   if (imageTitle) {
     const signalLicense = findSignalValue(signals, ['media_license_name', 'image_license_name']);
     const signalSourceUrl = findSignalValue(signals, ['media_source_url', 'image_source_url', 'file_description_url']);
-    if (signalLicense && signalSourceUrl) {
+    const signalCreator = findSignalValue(signals, ['media_creator_name', 'image_creator_name']);
+    const signalCredit = findSignalValue(signals, ['media_credit', 'image_credit']);
+    const safeSignalSourceUrl = safeHttpsUrl(signalSourceUrl);
+    if (signalLicense && safeSignalSourceUrl && (signalCreator || signalCredit)) {
       image = {
         resolved: true,
-        creator: findSignalValue(signals, ['media_creator_name', 'image_creator_name']),
-        credit: findSignalValue(signals, ['media_credit', 'image_credit']),
+        creator: signalCreator,
+        credit: signalCredit,
         license: signalLicense,
-        licenseUrl: findSignalValue(signals, ['media_license_url', 'image_license_url']),
-        sourceUrl: signalSourceUrl,
+        licenseUrl: safeHttpsUrl(findSignalValue(signals, ['media_license_url', 'image_license_url'])),
+        sourceUrl: safeSignalSourceUrl,
         attributionRequired: true,
         source: 'attribution-api'
       };
     } else {
+      metrics.imageInfoFallbacks += 1;
       const fallback = await fetchImageInfo(language, imageTitle);
       image = fallback ? { ...fallback, source: 'imageinfo' } : { resolved: false, source: 'unresolved' };
     }
@@ -183,30 +227,41 @@ async function requestAttribution(language, title, imageTitle) {
   return { article, image };
 }
 
-function fetchAttribution(language, title, imageTitle) {
-  const key = `attribution:${language}:${title}:${imageTitle || ''}`;
+function enqueue(language, key, taskFactory) {
   if (inFlight.has(key)) return inFlight.get(key);
+  const maxPending = Number(process.env.WIKIPEDIA_MAX_PENDING_UPSTREAM_JOBS || 100);
+  if (pendingJobs >= maxPending) {
+    metrics.rejectedQueueJobs += 1;
+    const error = new Error('Wikipedia upstream queue overloaded');
+    error.status = 503;
+    return Promise.reject(error);
+  }
+  pendingJobs += 1;
   const previous = queueFor(language);
   const task = previous.catch(() => undefined).then(async () => {
     await sleep(Number(process.env.WIKIPEDIA_REQUEST_INTERVAL_MS || 150));
-    return requestAttribution(language, title, imageTitle);
+    return taskFactory();
   });
   queues.set(language, task.catch(() => undefined));
   inFlight.set(key, task);
-  return task.finally(() => inFlight.delete(key));
+  return task.finally(() => {
+    pendingJobs = Math.max(0, pendingJobs - 1);
+    inFlight.delete(key);
+  });
+}
+
+function fetchAttribution(language, title, imageTitle) {
+  const key = `attribution:${language}:${title}:${imageTitle || ''}`;
+  return enqueue(language, key, () => requestAttribution(language, title, imageTitle));
 }
 
 function fetchTile(language, cacheKey, bounds) {
   const key = `${language}:${cacheKey}`;
-  if (inFlight.has(key)) return inFlight.get(key);
-  const previous = queueFor(language);
-  const task = previous.catch(() => undefined).then(async () => {
-    await sleep(Number(process.env.WIKIPEDIA_REQUEST_INTERVAL_MS || 150));
-    return requestTile(language, bounds);
-  });
-  queues.set(language, task.catch(() => undefined));
-  inFlight.set(key, task);
-  return task.finally(() => inFlight.delete(key));
+  return enqueue(language, key, () => requestTile(language, bounds));
 }
 
-module.exports = { fetchTile, fetchAttribution };
+function getMetrics() {
+  return { ...metrics, pendingJobs, inFlight: inFlight.size };
+}
+
+module.exports = { fetchTile, fetchAttribution, getMetrics, safeHttpsUrl };

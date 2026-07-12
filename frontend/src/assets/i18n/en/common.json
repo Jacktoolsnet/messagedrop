@@ -1537,7 +1537,9 @@
       "readArticle": "Read on Wikipedia",
       "navigate": "Start navigation with Google Maps",
       "jumpToPin": "Show pin on the map",
-      "imageCredit": "Image"
+      "imageCredit": "Image",
+      "imageCreator": "Creator",
+      "loadingAttribution": "Loading image and license information"
     },
     "place": {
       "title": "Place service",

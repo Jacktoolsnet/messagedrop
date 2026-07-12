@@ -2386,6 +2386,29 @@ export class AppComponent implements OnInit {
     if (!articles.length) {
       return;
     }
+    const dialogArticles = signal(articles);
+    const attributionLoading = signal(true);
+    const dialogRef = this.dialog.open(WikipediaListComponent, {
+      data: { articles: dialogArticles.asReadonly(), loading: attributionLoading.asReadonly() },
+      panelClass: 'pin-dialog',
+      width: 'min(720px, 95vw)',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      autoFocus: false
+    });
+    dialogRef.afterClosed().subscribe((result?: { action?: string; article?: WikipediaArticle }) => {
+      if (result?.action !== 'jumpToPin' || !result.article) {
+        return;
+      }
+      const article = result.article;
+      this.mapService.flyToWithZoom({
+        latitude: article.latitude,
+        longitude: article.longitude,
+        plusCode: this.geolocationService.getPlusCode(article.latitude, article.longitude)
+      }, Math.max(18, this.mapService.getMapZoom()));
+    });
     const language = this.wikipediaMapState.language();
     const resolvedArticles = await firstValueFrom(forkJoin(articles.map((article) =>
       this.wikipediaService.getAttribution(article, language).pipe(
@@ -2408,27 +2431,8 @@ export class AppComponent implements OnInit {
         }))
       )
     )));
-    const dialogRef = this.dialog.open(WikipediaListComponent, {
-      data: { articles: resolvedArticles },
-      panelClass: 'pin-dialog',
-      width: 'min(720px, 95vw)',
-      maxWidth: '95vw',
-      maxHeight: '90vh',
-      hasBackdrop: true,
-      backdropClass: 'dialog-backdrop',
-      autoFocus: false
-    });
-    dialogRef.afterClosed().subscribe((result?: { action?: string; article?: WikipediaArticle }) => {
-      if (result?.action !== 'jumpToPin' || !result.article) {
-        return;
-      }
-      const article = result.article;
-      this.mapService.flyToWithZoom({
-        latitude: article.latitude,
-        longitude: article.longitude,
-        plusCode: this.geolocationService.getPlusCode(article.latitude, article.longitude)
-      }, Math.max(18, this.mapService.getMapZoom()));
-    });
+    dialogArticles.set(resolvedArticles);
+    attributionLoading.set(false);
   }
 
 
