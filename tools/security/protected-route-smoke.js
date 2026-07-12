@@ -40,6 +40,7 @@ const bases = {
   admin: baseUrl('SECURITY_ADMIN_URL', process.env.ADMIN_PORT || 3100),
   openMeteo: baseUrl('SECURITY_OPENMETEO_URL', process.env.OPENMETEO_PORT || 3200),
   nominatim: baseUrl('SECURITY_NOMINATIM_URL', process.env.NOMINATIM_PORT || 3300),
+  wikipedia: baseUrl('SECURITY_WIKIPEDIA_URL', process.env.WIKIPEDIA_PORT || 3700),
   socketio: baseUrl('SECURITY_SOCKETIO_URL', process.env.SOCKETIO_PORT || 3400),
   viator: baseUrl('SECURITY_VIATOR_URL', process.env.VIATOR_PORT || 3500),
   sticker: baseUrl('SECURITY_STICKER_URL', process.env.STICKER_PORT || 3600)
@@ -168,6 +169,8 @@ const tests = [
   { name: 'openMeteo /check blocks public user JWT', method: 'POST', url: `${bases.openMeteo}/check`, rawToken: makeUserJwt(), expect: EXPECT_AUTH_BLOCKED },
   { name: 'nominatim /check blocks missing service token', method: 'POST', url: `${bases.nominatim}/check`, expect: EXPECT_AUTH_BLOCKED },
   { name: 'nominatim /check blocks public user JWT', method: 'POST', url: `${bases.nominatim}/check`, rawToken: makeUserJwt(), expect: EXPECT_AUTH_BLOCKED },
+  { name: 'wikipedia /check blocks missing service token', method: 'POST', url: `${bases.wikipedia}/check`, expect: EXPECT_AUTH_BLOCKED },
+  { name: 'wikipedia /check blocks public user JWT', method: 'POST', url: `${bases.wikipedia}/check`, rawToken: makeUserJwt(), expect: EXPECT_AUTH_BLOCKED },
   { name: 'socketio /emit/user blocks missing service token', method: 'POST', url: `${bases.socketio}/emit/user`, body: { userId: 'security-smoke-user', event: 'security-smoke', payload: {} }, expect: EXPECT_AUTH_BLOCKED },
   { name: 'viator non-public route blocks missing service token', method: 'GET', url: `${bases.viator}/viator/internal/security-smoke`, expect: EXPECT_AUTH_BLOCKED },
   { name: 'sticker /check blocks missing service token', method: 'POST', url: `${bases.sticker}/check`, expect: EXPECT_AUTH_BLOCKED },
@@ -531,6 +534,7 @@ const concreteServiceRouteTargets = [
   ['openMeteo weather route blocks missing service token', `${bases.openMeteo}/weather/en/TESTPLUS/52.52/13.405/1`],
   ['openMeteo airquality route blocks missing service token', `${bases.openMeteo}/airquality/TESTPLUS/52.52/13.405/1`],
   ['nominatim search route blocks missing service token', `${bases.nominatim}/nominatim/search/Berlin/1`],
+  ['wikipedia nearby route blocks missing service token', `${bases.wikipedia}/wikipedia/nearby?north=52.52&south=52.51&east=13.41&west=13.39&zoom=14&language=de`],
   ['sticker categories route blocks missing service token', `${bases.sticker}/sticker/categories`],
   ['sticker search route blocks missing service token', `${bases.sticker}/sticker/search?q=cat`]
 ];

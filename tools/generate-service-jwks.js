@@ -6,6 +6,7 @@ const services = [
   { issuer: 'service.admin-backend', keyStore: '../platform/admin/backend/utils/keyStore' },
   { issuer: 'service.openmeteo', keyStore: '../services/openMeteo/utils/keyStore' },
   { issuer: 'service.nominatim', keyStore: '../services/nominatim/utils/keyStore' },
+  { issuer: 'service.wikipedia', keyStore: '../services/wikipedia/utils/keyStore' },
   { issuer: 'service.socketio', keyStore: '../services/socketio/utils/keyStore' },
   { issuer: 'service.viator', keyStore: '../services/viator/utils/keyStore' },
   { issuer: 'service.sticker', keyStore: '../services/sticker/utils/keyStore' }
@@ -41,6 +42,7 @@ async function run() {
     path.join(process.cwd(), 'platform', 'admin', 'backend', 'config'),
     path.join(process.cwd(), 'services', 'openMeteo', 'config'),
     path.join(process.cwd(), 'services', 'nominatim', 'config'),
+    path.join(process.cwd(), 'services', 'wikipedia', 'config'),
     path.join(process.cwd(), 'services', 'socketio', 'config'),
     path.join(process.cwd(), 'services', 'viator', 'config'),
     path.join(process.cwd(), 'services', 'sticker', 'config')

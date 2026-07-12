@@ -93,6 +93,7 @@ function defaultLocalTargets() {
     { name: 'admin-backend', target: `http://127.0.0.1:${process.env.ADMIN_PORT || 3100}` },
     { name: 'openmeteo', target: `http://127.0.0.1:${process.env.OPENMETEO_PORT || 3200}` },
     { name: 'nominatim', target: `http://127.0.0.1:${process.env.NOMINATIM_PORT || 3300}` },
+    { name: 'wikipedia', target: `http://127.0.0.1:${process.env.WIKIPEDIA_PORT || 3700}` },
     { name: 'socketio', target: `http://127.0.0.1:${process.env.SOCKETIO_PORT || 3400}` },
     { name: 'viator', target: `http://127.0.0.1:${process.env.VIATOR_PORT || 3500}` },
     { name: 'sticker', target: `http://127.0.0.1:${process.env.STICKER_PORT || 3600}` }

@@ -88,6 +88,7 @@ const geoStatistic = require('./routes/geostatistic');
 const weather = require('./routes/weather');
 const airQualtiy = require('./routes/air-quality');
 const nominatim = require('./routes/nominatim');
+const wikipedia = require('./routes/wikipedia');
 const viator = require('./routes/viator');
 const tenor = require('./routes/tenor');
 const klipy = require('./routes/klipy');
@@ -526,6 +527,13 @@ const nominatimLimit = rateLimit({
   message: rateLimitMessage('Too many nominatim requests, please try again later.')
 });
 
+const wikipediaLimit = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 240,
+  ...rateLimitDefaults,
+  message: rateLimitMessage('Too many Wikipedia requests, please try again later.')
+});
+
 const viatorLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
   limit: 120,
@@ -648,6 +656,11 @@ const slowRequestNominatim = slowRequestMw({
   category: 'external-api',
   upstream: 'nominatim'
 });
+const slowRequestWikipedia = slowRequestMw({
+  thresholdMs: process.env.SLOW_REQUEST_WIKIPEDIA_THRESHOLD_MS || 3000,
+  category: 'external-api',
+  upstream: 'wikipedia'
+});
 
 // ROUTES
 app.get('/', basicLimit, slowRequestDefault, root);
@@ -672,6 +685,7 @@ app.use('/secretdrop', secretDropLimit, slowRequestDefault, secretDrop);
 app.use('/moderation', basicLimit, slowRequestDefault, moderation);
 app.use('/notification', notificationLimit, slowRequestDefault, notification);
 app.use('/nominatim', nominatimLimit, slowRequestNominatim, nominatim);
+app.use('/wikipedia', wikipediaLimit, slowRequestWikipedia, wikipedia);
 app.use('/viator', viatorLimit, slowRequestDefault, viator);
 app.use('/openai', openAiLimit, slowRequestDefault, openAi);
 app.use('/place', placeLimit, slowRequestDefault, place);

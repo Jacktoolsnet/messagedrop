@@ -82,6 +82,20 @@
             "type": "node"
         },
         {
+            "name": "Wikipedia-Service",
+            "program": "${workspaceFolder}/services/wikipedia/app.js",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "env": {
+                "SERVICE_JWT_ISSUER": "service.wikipedia",
+                "SERVICE_JWT_AUDIENCE": "service.wikipedia",
+                "SERVICE_JWT_TRUSTED_JWKS_PATH": "${workspaceFolder}/services/wikipedia/config/service-jwks.json"
+            },
+            "type": "node"
+        },
+        {
             "name": "Viator-Service",
             "program": "${workspaceFolder}/services/viator/app.js",
             "request": "launch",
@@ -346,6 +360,13 @@
             "type": "node-terminal",
             "request": "launch",
             "command": "node tools/db/open-dbeaver.js NOMINATIM",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "DBeaver Wikipedia Service",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "node tools/db/open-dbeaver.js WIKIPEDIA",
             "cwd": "${workspaceFolder}"
         }
     ]
