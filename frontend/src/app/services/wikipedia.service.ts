@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { WikipediaNearbyRequest, WikipediaNearbyResponse } from '../interfaces/wikipedia';
+import { WikipediaArticle, WikipediaNearbyRequest, WikipediaNearbyResponse, WikipediaResolvedAttribution } from '../interfaces/wikipedia';
 
 @Injectable({ providedIn: 'root' })
 export class WikipediaService {
@@ -24,5 +24,16 @@ export class WikipediaService {
   normalizeLanguage(language: string): string {
     const normalized = language.trim().toLowerCase().split(/[-_]/u)[0];
     return /^[a-z]{2,3}$/u.test(normalized) ? normalized : 'en';
+  }
+
+  getAttribution(article: WikipediaArticle, language: string): Observable<WikipediaResolvedAttribution> {
+    let params = new HttpParams()
+      .set('pageId', article.pageId)
+      .set('title', article.title)
+      .set('language', this.normalizeLanguage(language));
+    if (article.imageTitle) {
+      params = params.set('imageTitle', article.imageTitle);
+    }
+    return this.http.get<WikipediaResolvedAttribution>(`${environment.apiUrl}/wikipedia/attribution`, { params });
   }
 }

@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialogActions, MatDialogClose, MatDialogRef } from '@angular/material/dialog';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { WikipediaArticle, WikipediaAttribution } from '../../interfaces/wikipedia';
+import { WikipediaArticle } from '../../interfaces/wikipedia';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 
 @Component({
@@ -25,11 +25,18 @@ import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.comp
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class WikipediaListComponent {
-  readonly data = inject<{ articles: WikipediaArticle[]; attribution: WikipediaAttribution | null }>(MAT_DIALOG_DATA);
+  readonly data = inject<{ articles: WikipediaArticle[] }>(MAT_DIALOG_DATA);
   private readonly dialogRef = inject(MatDialogRef<WikipediaListComponent>);
 
   getHeaderBackgroundImage(article: WikipediaArticle): string {
-    return article.thumbnail ? `url("${article.thumbnail.url}")` : 'none';
+    const image = article.resolvedAttribution?.image;
+    return article.thumbnail && image?.resolved
+      ? `url("${article.thumbnail.url}")`
+      : 'url("assets/markers/wikipedia-marker.svg")';
+  }
+
+  getHeaderBackgroundSize(article: WikipediaArticle): string {
+    return article.thumbnail && article.resolvedAttribution?.image?.resolved ? 'cover' : '96px 120px';
   }
 
   openNavigation(article: WikipediaArticle, event: Event): void {

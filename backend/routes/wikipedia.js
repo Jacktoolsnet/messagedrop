@@ -50,4 +50,21 @@ router.get('/nearby', [metric.count('wikipedia.nearby', { when: 'always', timezo
   }
 });
 
+router.get('/attribution', [metric.count('wikipedia.attribution', { when: 'always', timezone: 'utc', amount: 1 })], async (req, res, next) => {
+  if (!client) return next(apiError.serviceUnavailable());
+  try {
+    const token = await signServiceJwt({ audience: process.env.SERVICE_JWT_AUDIENCE_WIKIPEDIA || 'service.wikipedia' });
+    const upstream = await client.get('/attribution', {
+      params: req.query,
+      headers: { Authorization: `Bearer ${token}`, 'x-request-id': req.traceId }
+    });
+    return res.status(upstream.status).json(upstream.data);
+  } catch (error) {
+    if (!axios.isAxiosError(error)) return next(error);
+    const apiErr = apiError.fromStatus(error.code === 'ECONNABORTED' ? 504 : 502);
+    apiErr.detail = error.message;
+    return next(apiErr);
+  }
+});
+
 module.exports = router;

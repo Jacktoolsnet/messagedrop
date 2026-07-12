@@ -1536,7 +1536,8 @@
       "title": "Wikipedia articles",
       "readArticle": "Read on Wikipedia",
       "navigate": "Start navigation with Google Maps",
-      "jumpToPin": "Show pin on the map"
+      "jumpToPin": "Show pin on the map",
+      "imageCredit": "Image"
     },
     "place": {
       "title": "Place service",

@@ -11,7 +11,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { Meta, Title } from '@angular/platform-browser';
 import { RouterOutlet } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import { firstValueFrom } from 'rxjs';
+import { catchError, firstValueFrom, forkJoin, map, of } from 'rxjs';
 import { environment } from '../environments/environment';
 import { AirQualityComponent } from './components/air-quality/air-quality.component';
 import { AppSettingsComponent } from './components/app-settings/app-settings.component';
@@ -111,6 +111,7 @@ import { ServerService } from './services/server.service';
 import { SharedContentService } from './services/shared-content.service';
 import { SystemNotificationService } from './services/system-notification.service';
 import { WikipediaMapStateService } from './services/wikipedia-map-state.service';
+import { WikipediaService } from './services/wikipedia.service';
 import { TranslationHelperService } from './services/translation-helper.service';
 import { UsageProtectionService } from './services/usage-protection.service';
 import { UserService } from './services/user.service';
@@ -203,6 +204,7 @@ export class AppComponent implements OnInit {
   private readonly secretDropService = inject(SecretDropService);
   private readonly experienceMapService = inject(ExperienceMapService);
   private readonly wikipediaMapState = inject(WikipediaMapStateService);
+  private readonly wikipediaService = inject(WikipediaService);
   private readonly experienceBookmarkService = inject(ExperienceBookmarkService);
   private readonly airQualityService = inject(AirQualityService);
   private readonly weatherService = inject(WeatherService);
@@ -2380,12 +2382,34 @@ export class AppComponent implements OnInit {
     });
   }
 
-  private openMarkerWikipediaListDialog(articles: WikipediaArticle[]): void {
+  private async openMarkerWikipediaListDialog(articles: WikipediaArticle[]): Promise<void> {
     if (!articles.length) {
       return;
     }
+    const language = this.wikipediaMapState.language();
+    const resolvedArticles = await firstValueFrom(forkJoin(articles.map((article) =>
+      this.wikipediaService.getAttribution(article, language).pipe(
+        map((resolvedAttribution) => ({ ...article, resolvedAttribution })),
+        catchError(() => of({
+          ...article,
+          resolvedAttribution: {
+            status: 200 as const,
+            article: {
+              provider: 'Wikipedia',
+              sourceUrl: article.articleUrl,
+              license: 'CC BY-SA 4.0',
+              licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/',
+              creator: 'Wikipedia contributors',
+              source: 'terms-fallback' as const
+            },
+            image: article.imageTitle ? { resolved: false, source: 'unresolved' as const } : null,
+            cache: 'miss' as const
+          }
+        }))
+      )
+    )));
     const dialogRef = this.dialog.open(WikipediaListComponent, {
-      data: { articles, attribution: this.wikipediaMapState.attribution() },
+      data: { articles: resolvedArticles },
       panelClass: 'pin-dialog',
       width: 'min(720px, 95vw)',
       maxWidth: '95vw',

@@ -11,7 +11,36 @@ export interface WikipediaArticle {
   longitude: number;
   summary: string;
   thumbnail: WikipediaThumbnail | null;
+  imageTitle: string | null;
   articleUrl: string;
+  resolvedAttribution?: WikipediaResolvedAttribution;
+}
+
+export interface WikipediaContentAttribution {
+  provider: string;
+  sourceUrl: string;
+  license: string;
+  licenseUrl: string;
+  creator: string;
+  source: 'attribution-api' | 'terms-fallback';
+}
+
+export interface WikipediaImageAttribution {
+  resolved: boolean;
+  creator?: string;
+  credit?: string;
+  license?: string;
+  licenseUrl?: string;
+  sourceUrl?: string;
+  attributionRequired?: boolean;
+  source: 'attribution-api' | 'imageinfo' | 'unresolved';
+}
+
+export interface WikipediaResolvedAttribution {
+  status: number;
+  article: WikipediaContentAttribution;
+  image: WikipediaImageAttribution | null;
+  cache: 'hit' | 'miss';
 }
 
 export interface WikipediaAttribution {

@@ -1535,7 +1535,8 @@
       "title": "Articles Wikipédia",
       "readArticle": "Lire sur Wikipédia",
       "navigate": "Démarrer la navigation avec Google Maps",
-      "jumpToPin": "Afficher le repère sur la carte"
+      "jumpToPin": "Afficher le repère sur la carte",
+      "imageCredit": "Image"
     },
     "place": {
       "title": "Service de lieux",

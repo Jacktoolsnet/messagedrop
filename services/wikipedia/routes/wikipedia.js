@@ -1,6 +1,6 @@
 const express = require('express');
 const tableCache = require('../db/tableWikipediaTileCache');
-const { fetchTile } = require('../clients/wikimedia-client');
+const { fetchTile, fetchAttribution } = require('../clients/wikimedia-client');
 const { MAX_LATITUDE, tilesForBounds } = require('../utils/tiles');
 const { requireServiceJwt } = require('../utils/serviceJwt');
 
@@ -89,6 +89,32 @@ router.get('/nearby', async (req, res, next) => {
     if (error.message === 'viewport_too_large' || error.message === 'antimeridian_not_supported') {
       return res.status(400).json({ errorCode: 'BAD_REQUEST', message: error.message, error: error.message });
     }
+    return next(error);
+  }
+});
+
+router.get('/attribution', async (req, res, next) => {
+  const language = String(req.query.language || '').toLowerCase();
+  const title = String(req.query.title || '').trim();
+  const imageTitle = String(req.query.imageTitle || '').trim() || null;
+  const pageId = Number(req.query.pageId);
+  if (!/^[a-z]{2,3}$/.test(language) || !title || title.length > 500 || !Number.isInteger(pageId) || pageId <= 0) {
+    return res.status(400).json({ errorCode: 'BAD_REQUEST', message: 'invalid_attribution_request', error: 'invalid_attribution_request' });
+  }
+  try {
+    const key = `attribution:${language}:${pageId}:${imageTitle || 'no-image'}:v1`;
+    const cached = await dbGet(req.database.db, key);
+    const cachedPayload = cached ? parsePayload(cached.payload) : null;
+    const ttl = cachedPayload?.image?.resolved !== false
+      ? Number(process.env.WIKIPEDIA_ATTRIBUTION_CACHE_MS || 7 * 24 * 60 * 60 * 1000)
+      : Number(process.env.WIKIPEDIA_ATTRIBUTION_NEGATIVE_CACHE_MS || 6 * 60 * 60 * 1000);
+    if (cached && ageMs(cached) <= ttl) {
+      return res.status(200).json({ status: 200, ...cachedPayload, cache: 'hit' });
+    }
+    const attribution = await fetchAttribution(language, title, imageTitle);
+    await dbSet(req.database.db, key, attribution);
+    return res.status(200).json({ status: 200, ...attribution, cache: 'miss' });
+  } catch (error) {
     return next(error);
   }
 });

@@ -5,12 +5,31 @@
   <div class="article-list" role="list">
     @for (article of data.articles; track article.pageId) {
       <mat-card class="article-tile" role="listitem">
-        <div class="tile-header" [style.--wikipedia-header-bg-image]="getHeaderBackgroundImage(article)">
+        <div class="tile-header" [style.--wikipedia-header-bg-image]="getHeaderBackgroundImage(article)"
+          [style.--wikipedia-header-bg-size]="getHeaderBackgroundSize(article)">
           <div class="identity-badge">
             <mat-icon>menu_book</mat-icon>
             <span>{{ article.title }}</span>
           </div>
-          <div class="source-badge">Wikipedia</div>
+          <div class="source-badges">
+            <a class="source-badge" [href]="article.resolvedAttribution?.article?.sourceUrl || article.articleUrl"
+              target="_blank" rel="noopener noreferrer">Wikipedia</a>
+            @if (article.resolvedAttribution?.article; as articleAttribution) {
+              <a class="source-badge" [href]="articleAttribution.licenseUrl" target="_blank"
+                rel="noopener noreferrer">{{ articleAttribution.license }}</a>
+              <span class="source-badge">{{ articleAttribution.creator }}</span>
+            }
+            @if (article.resolvedAttribution?.image?.resolved && article.resolvedAttribution?.image; as imageAttribution) {
+              <a class="source-badge" [href]="imageAttribution.sourceUrl" target="_blank"
+                rel="noopener noreferrer">
+                {{ 'common.wikipedia.imageCredit' | transloco }}: {{ imageAttribution.creator || imageAttribution.credit || 'Wikimedia Commons' }}
+              </a>
+              @if (imageAttribution.license) {
+                <a class="source-badge" [href]="imageAttribution.licenseUrl || imageAttribution.sourceUrl" target="_blank"
+                  rel="noopener noreferrer">{{ imageAttribution.license }}</a>
+              }
+            }
+          </div>
         </div>
         <mat-card-content class="article-content">
           <h3>{{ article.title }}</h3>
@@ -39,13 +58,6 @@
       </mat-card>
     }
   </div>
-  @if (data.attribution; as attribution) {
-    <p class="attribution">
-      <a [href]="attribution.url" target="_blank" rel="noopener noreferrer">{{ attribution.provider }}</a>
-      ·
-      <a [href]="attribution.licenseUrl" target="_blank" rel="noopener noreferrer">{{ attribution.textLicense }}</a>
-    </p>
-  }
   </div>
 </mat-dialog-content>
 

@@ -5,6 +5,13 @@ const inFlight = new Map();
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+function headers() {
+  return {
+    'User-Agent': process.env.WIKIPEDIA_USER_AGENT || 'MessageDrop-WikipediaBot/1.0 (https://messagedrop.de/; support@messagedrop.de)',
+    Accept: 'application/json'
+  };
+}
+
 function queueFor(language) {
   if (!queues.has(language)) queues.set(language, Promise.resolve());
   return queues.get(language);
@@ -24,7 +31,6 @@ function isRetryable(error) {
 
 async function requestTile(language, bounds) {
   const timeout = Number(process.env.WIKIPEDIA_UPSTREAM_TIMEOUT_MS || 10000);
-  const userAgent = process.env.WIKIPEDIA_USER_AGENT || 'MessageDrop-WikipediaBot/1.0 (https://messagedrop.de/; support@messagedrop.de)';
   const params = {
     action: 'query', format: 'json', formatversion: 2, generator: 'geosearch',
     ggsbbox: `${bounds.north}|${bounds.west}|${bounds.south}|${bounds.east}`,
@@ -38,7 +44,7 @@ async function requestTile(language, bounds) {
   for (let attempt = 0; attempt < 3; attempt += 1) {
     try {
       const response = await axios.get(`https://${language}.wikipedia.org/w/api.php`, {
-        params, timeout, headers: { 'User-Agent': userAgent, Accept: 'application/json' }
+        params, timeout, headers: headers()
       });
       if (response.data?.error) {
         const error = new Error(response.data.error.info || response.data.error.code);
@@ -53,6 +59,7 @@ async function requestTile(language, bounds) {
         longitude: page.coordinates?.[0]?.lon,
         summary: page.extract || '',
         thumbnail: page.thumbnail ? { url: page.thumbnail.source, width: page.thumbnail.width, height: page.thumbnail.height } : null,
+        imageTitle: page.pageimage || null,
         articleUrl: page.fullurl || `https://${language}.wikipedia.org/?curid=${page.pageid}`
       })).filter((page) => Number.isFinite(page.latitude) && Number.isFinite(page.longitude));
     } catch (error) {
@@ -65,6 +72,128 @@ async function requestTile(language, bounds) {
     }
   }
   throw lastError;
+}
+
+function stripHtml(value) {
+  return String(value || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function metadataValue(metadata, key) {
+  return stripHtml(metadata?.[key]?.value || '');
+}
+
+function findSignalValue(value, keys, depth = 0) {
+  if (!value || depth > 8) return '';
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const found = findSignalValue(item, keys, depth + 1);
+      if (found) return found;
+    }
+    return '';
+  }
+  if (typeof value !== 'object') return '';
+  for (const key of keys) {
+    const candidate = value[key];
+    if (typeof candidate === 'string' && candidate.trim()) return stripHtml(candidate);
+  }
+  for (const candidate of Object.values(value)) {
+    const found = findSignalValue(candidate, keys, depth + 1);
+    if (found) return found;
+  }
+  return '';
+}
+
+async function fetchImageInfo(language, imageTitle) {
+  if (!imageTitle) return null;
+  const title = imageTitle.startsWith('File:') ? imageTitle : `File:${imageTitle}`;
+  const params = {
+    action: 'query', format: 'json', formatversion: 2, titles: title,
+    prop: 'imageinfo', iiprop: 'url|extmetadata'
+  };
+  for (const host of ['commons.wikimedia.org', `${language}.wikipedia.org`]) {
+    try {
+      const response = await axios.get(`https://${host}/w/api.php`, {
+        params, timeout: Number(process.env.WIKIPEDIA_UPSTREAM_TIMEOUT_MS || 10000), headers: headers()
+      });
+      const info = response.data?.query?.pages?.[0]?.imageinfo?.[0];
+      if (!info) continue;
+      const meta = info.extmetadata || {};
+      const license = metadataValue(meta, 'LicenseShortName') || metadataValue(meta, 'UsageTerms');
+      const licenseUrl = metadataValue(meta, 'LicenseUrl');
+      const creator = metadataValue(meta, 'Artist');
+      if (!license || !info.descriptionurl) continue;
+      return {
+        resolved: true,
+        creator,
+        credit: metadataValue(meta, 'Credit'),
+        license,
+        licenseUrl,
+        sourceUrl: info.descriptionurl,
+        attributionRequired: metadataValue(meta, 'AttributionRequired').toLowerCase() !== 'false'
+      };
+    } catch {
+      // Try the local Wikipedia file repository after Commons.
+    }
+  }
+  return null;
+}
+
+async function requestAttribution(language, title, imageTitle) {
+  let signals = null;
+  try {
+    const response = await axios.get(
+      `https://${language}.wikipedia.org/w/rest.php/attribution/v0-beta/pages/${encodeURIComponent(title.replace(/ /g, '_'))}/signals`,
+      { timeout: Number(process.env.WIKIPEDIA_UPSTREAM_TIMEOUT_MS || 10000), headers: headers() }
+    );
+    signals = response.data || null;
+  } catch {
+    // The beta API is optional. Stable Action API metadata is used as fallback.
+  }
+
+  const articleUrl = `https://${language}.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, '_'))}`;
+  const article = {
+    provider: findSignalValue(signals, ['provider_name', 'project_name']) || 'Wikipedia',
+    sourceUrl: findSignalValue(signals, ['source_url', 'page_url']) || articleUrl,
+    license: findSignalValue(signals, ['license_name', 'license_short_name']) || 'CC BY-SA 4.0',
+    licenseUrl: findSignalValue(signals, ['license_url']) || 'https://creativecommons.org/licenses/by-sa/4.0/',
+    creator: findSignalValue(signals, ['creator_name', 'author_name', 'attribution_text']) || 'Wikipedia contributors',
+    source: signals ? 'attribution-api' : 'terms-fallback'
+  };
+
+  let image = null;
+  if (imageTitle) {
+    const signalLicense = findSignalValue(signals, ['media_license_name', 'image_license_name']);
+    const signalSourceUrl = findSignalValue(signals, ['media_source_url', 'image_source_url', 'file_description_url']);
+    if (signalLicense && signalSourceUrl) {
+      image = {
+        resolved: true,
+        creator: findSignalValue(signals, ['media_creator_name', 'image_creator_name']),
+        credit: findSignalValue(signals, ['media_credit', 'image_credit']),
+        license: signalLicense,
+        licenseUrl: findSignalValue(signals, ['media_license_url', 'image_license_url']),
+        sourceUrl: signalSourceUrl,
+        attributionRequired: true,
+        source: 'attribution-api'
+      };
+    } else {
+      const fallback = await fetchImageInfo(language, imageTitle);
+      image = fallback ? { ...fallback, source: 'imageinfo' } : { resolved: false, source: 'unresolved' };
+    }
+  }
+  return { article, image };
+}
+
+function fetchAttribution(language, title, imageTitle) {
+  const key = `attribution:${language}:${title}:${imageTitle || ''}`;
+  if (inFlight.has(key)) return inFlight.get(key);
+  const previous = queueFor(language);
+  const task = previous.catch(() => undefined).then(async () => {
+    await sleep(Number(process.env.WIKIPEDIA_REQUEST_INTERVAL_MS || 150));
+    return requestAttribution(language, title, imageTitle);
+  });
+  queues.set(language, task.catch(() => undefined));
+  inFlight.set(key, task);
+  return task.finally(() => inFlight.delete(key));
 }
 
 function fetchTile(language, cacheKey, bounds) {
@@ -80,4 +209,4 @@ function fetchTile(language, cacheKey, bounds) {
   return task.finally(() => inFlight.delete(key));
 }
 
-module.exports = { fetchTile };
+module.exports = { fetchTile, fetchAttribution };
