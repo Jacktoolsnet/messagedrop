@@ -23,6 +23,12 @@ const client = base ? axios.create({
   validateStatus: () => true, headers: { Accept: 'application/json' }
 }) : null;
 
+// Aggregate usage metric only. No article, position, user, or device data is
+// included in the statistic forwarded to the admin backend.
+router.post('/pin-click', [metric.count('wikipedia.pin.click', { when: 'always', timezone: 'utc', amount: 1 })], (_req, res) => {
+  res.sendStatus(204);
+});
+
 router.get('/nearby', [metric.count('wikipedia.nearby', { when: 'always', timezone: 'utc', amount: 1 })], async (req, res, next) => {
   if (!client) {
     const error = apiError.serviceUnavailable();

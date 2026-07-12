@@ -33,6 +33,16 @@ describe('WikipediaService', () => {
     expect(service.normalizeLanguage('invalid-language')).toBe('en');
   });
 
+  it('tracks a pin click without sending article or location data', () => {
+    service.trackPinClick().subscribe();
+
+    const request = httpTesting.expectOne(`${environment.apiUrl}/wikipedia/pin-click`);
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toBeNull();
+    expect(request.request.headers.get('x-skip-ui')).toBe('true');
+    request.flush(null);
+  });
+
   it('requests attribution silently with the image title', () => {
     service.getAttribution({
       pageId: 8159759,

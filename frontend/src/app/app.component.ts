@@ -2382,9 +2382,13 @@ export class AppComponent implements OnInit {
     });
   }
 
-  private async openMarkerWikipediaListDialog(articles: WikipediaArticle[]): Promise<void> {
+  private async openMarkerWikipediaListDialog(articles: WikipediaArticle[], trackClick = true): Promise<void> {
     if (!articles.length) {
       return;
+    }
+
+    if (trackClick) {
+      this.wikipediaService.trackPinClick().subscribe({ error: () => { /* Statistics must never block the UI. */ } });
     }
 
     if (!this.appService.getAppSettings().enableWikipediaContent) {
@@ -2405,7 +2409,7 @@ export class AppComponent implements OnInit {
 
       settingsRef.afterClosed().subscribe(() => {
         if (this.appService.getAppSettings().enableWikipediaContent) {
-          void this.openMarkerWikipediaListDialog(articles);
+          void this.openMarkerWikipediaListDialog(articles, false);
         }
       });
       return;

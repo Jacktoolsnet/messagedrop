@@ -28,6 +28,12 @@ export class WikipediaService {
     });
   }
 
+  trackPinClick(): Observable<void> {
+    return this.http.post<void>(`${environment.apiUrl}/wikipedia/pin-click`, null, {
+      headers: this.silentHeaders
+    });
+  }
+
   normalizeLanguage(language: string): string {
     const normalized = language.trim().toLowerCase().split(/[-_]/u)[0];
     return /^[a-z]{2,3}$/u.test(normalized) ? normalized : 'en';
