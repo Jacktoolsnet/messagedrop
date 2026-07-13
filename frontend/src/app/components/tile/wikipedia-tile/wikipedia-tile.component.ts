@@ -199,26 +199,29 @@ export class WikipediaTileComponent implements OnChanges {
     const maxLatitudeDelta = 7 / 111.32;
     const longitudeScale = Math.max(0.1, Math.cos(latitude * Math.PI / 180));
     const maxLongitudeDelta = 7 / (111.32 * longitudeScale);
+    const minLatitudeDelta = 1 / 111.32;
+    const minLongitudeDelta = 1 / (111.32 * longitudeScale);
 
     if (validBox) {
+      // Nominatim bounding boxes for individual POIs can be only a few metres
+      // wide. Wikipedia and OSM coordinates for the same object often refer to
+      // different points of the building, so keep at least a 1 km search area.
       const bounds = {
-        north: Math.min(85, box.latMax, latitude + maxLatitudeDelta),
-        south: Math.max(-85, box.latMin, latitude - maxLatitudeDelta),
-        east: Math.min(box.lonMax, longitude + maxLongitudeDelta),
-        west: Math.max(box.lonMin, longitude - maxLongitudeDelta)
+        north: Math.min(85, Math.max(box.latMax, latitude + minLatitudeDelta), latitude + maxLatitudeDelta),
+        south: Math.max(-85, Math.min(box.latMin, latitude - minLatitudeDelta), latitude - maxLatitudeDelta),
+        east: Math.min(180, Math.max(box.lonMax, longitude + minLongitudeDelta), longitude + maxLongitudeDelta),
+        west: Math.max(-180, Math.min(box.lonMin, longitude - minLongitudeDelta), longitude - maxLongitudeDelta)
       };
       if (bounds.north > bounds.south && bounds.east > bounds.west) {
         return bounds;
       }
     }
 
-    const fallbackLatitudeDelta = 1 / 111.32;
-    const fallbackLongitudeDelta = 1 / (111.32 * longitudeScale);
     return {
-      north: Math.min(85, latitude + fallbackLatitudeDelta),
-      south: Math.max(-85, latitude - fallbackLatitudeDelta),
-      east: Math.min(180, longitude + fallbackLongitudeDelta),
-      west: Math.max(-180, longitude - fallbackLongitudeDelta)
+      north: Math.min(85, latitude + minLatitudeDelta),
+      south: Math.max(-85, latitude - minLatitudeDelta),
+      east: Math.min(180, longitude + minLongitudeDelta),
+      west: Math.max(-180, longitude - minLongitudeDelta)
     };
   }
 

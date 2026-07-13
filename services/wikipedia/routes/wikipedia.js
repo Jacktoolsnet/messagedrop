@@ -26,6 +26,18 @@ function ageMs(row) {
   return Number.isFinite(timestamp) ? Date.now() - timestamp : Number.POSITIVE_INFINITY;
 }
 
+function sortByDistanceToBoundsCenter(articles, bounds) {
+  const latitude = (bounds.north + bounds.south) / 2;
+  const longitude = (bounds.east + bounds.west) / 2;
+  const longitudeScale = Math.cos(latitude * Math.PI / 180);
+  const distanceSquared = (article) => {
+    const latitudeDistance = article.latitude - latitude;
+    const longitudeDistance = (article.longitude - longitude) * longitudeScale;
+    return latitudeDistance * latitudeDistance + longitudeDistance * longitudeDistance;
+  };
+  return [...articles].sort((left, right) => distanceSquared(left) - distanceSquared(right));
+}
+
 async function refreshTile(db, language, tile, key, logger) {
   const articles = await fetchTile(language, key, tile.bounds);
   await dbSet(db, key, articles);
@@ -85,7 +97,10 @@ router.get('/nearby', async (req, res, next) => {
       }
     }
     const limit = requestedLimit;
-    const articles = Array.from(unique.values()).slice(0, limit);
+    // Tile iteration order is unrelated to proximity. In dense city centres it
+    // could fill the result limit before articles at the actual viewport centre
+    // were reached. This also keeps place tiles consistent with a close map view.
+    const articles = sortByDistanceToBoundsCenter(Array.from(unique.values()), bounds).slice(0, limit);
     return res.status(200).json({
       status: 200, language, articles,
       cache: { stale: resolved.some((entry) => entry.cache === 'stale'), tiles: resolved.map((entry) => entry.cache) },
