@@ -750,7 +750,8 @@
       "experiences": {
         "title": "Erlebnisse",
         "empty": "Noch keine Erlebnisse.",
-        "add": "Erlebnis hinzufügen"
+        "add": "Erlebnis hinzufügen",
+        "consentRequired": "Viator-Inhalte zum Anzeigen aktivieren."
       },
       "wikipedia": {
         "title": "Wikipedia-Artikel",

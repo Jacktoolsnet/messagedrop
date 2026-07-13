@@ -33,9 +33,9 @@ MessageDrop does not use a personalized recommendation or ranking system. Public
 
 Private chat messages are transmitted with end-to-end encryption and are generally not visible to us in plain text.
 
-External content (e.g., YouTube, TikTok, Pinterest, Spotify, Tenor, Klipy, Unsplash, and Wikipedia) is loaded only after the user has actively enabled the respective provider. Blanket consent for all providers is not available.
+External content (e.g., YouTube, TikTok, Pinterest, Spotify, Tenor, Klipy, Unsplash, Wikipedia, and Viator) is loaded only after the user has actively enabled the respective provider. Blanket consent for all providers is not available.
 
-This is separate from external functional services (e.g., Open-Meteo, OpenStreetMap/Nominatim, DeepL, Viator), which are used when the respective function is actively used and are not enabled via the external content toggle.
+This is separate from external functional services (e.g., Open-Meteo, OpenStreetMap/Nominatim, and DeepL), which are used when the respective function is actively used and are not enabled via the external content toggle.
 
 When Unsplash images are selected, image files can be loaded, downloaded to the device, and stored locally.
 
@@ -163,7 +163,7 @@ External content is disabled by default. Instead of the external content, a noti
 
 Blanket consent for all external providers is not provided; the decision is made separately for each provider.
 
-This provider-specific decision applies to the embedding of external content. External functional services (e.g., Open-Meteo, Nominatim / OpenStreetMap, DeepL, Viator) are described in Section 2.6.
+This provider-specific decision applies to the embedding of external content. External functional services (e.g., Open-Meteo, Nominatim / OpenStreetMap, and DeepL) are described in Section 2.6.
 
 External content is embedded only after the user has deliberately and voluntarily enabled it.
 
@@ -222,6 +222,12 @@ Wikipedia searches are performed only if they are enabled in the search settings
 
 The Wikimedia Foundation is based in the United States and operates servers and data centers there. When Wikimedia services are used, particularly when media is retrieved directly or Wikipedia or Wikimedia pages are opened, personal data may therefore be transferred to, processed, and stored in the United States. The level of data protection in the United States may differ from that in the European Union. Further information about processing and possible international data transfers is available in the Wikimedia Foundation Privacy Policy linked above.
 
+Viator (Viator, Inc.)
+Privacy Policy: https://www.viator.com/support/privacyPolicy
+Terms and Conditions: https://www.viator.com/support/termsAndConditions
+
+Viator content and experience searches are loaded only after Viator has been enabled in the external content settings. In particular, search terms, language and country settings, destination and location parameters, date and price filters, and product and media data may be processed. API communication takes place through the MessageDrop backend. Product images may be loaded directly from media servers used by Viator; the respective operator then receives the connection data technically required for delivery, in particular the IP address and browser information. When a Viator offer is opened, the user leaves MessageDrop.
+
 Flaticon / Freepik (Freepik Company S.L.U.)
 Privacy Policy: https://www.freepik.com/legal/privacy/
 Terms of Use: https://www.flaticon.com/legal
@@ -269,10 +275,9 @@ For certain functions, MessageDrop uses external information and API services th
 - Open-Meteo (weather and air quality data),
 - DeepL (translations),
 - Nominatim / OpenStreetMap (search, geocoding, map reference),
-- Viator (experience and activity data),
 - Flaticon / Freepik Company S.L.U. (licensed stickers and comparable graphic elements).
 
-When using these functions, depending on the specific use case, search terms, language and country settings, destination/location parameters, date and price filters, technical connection data, and, where applicable, reference URLs may be processed. Communication with third-party providers takes place, where technically implemented, via our servers or directly from the device.
+When using these functions, depending on the specific use case, search terms, language and country settings, destination/location parameters, technical connection data, and, where applicable, reference URLs may be processed. Communication with third-party providers takes place, where technically implemented, via our servers or directly from the device.
 
 For the translation function, the user may choose either the DeepL access provided by us or their own DeepL API key. A user-provided DeepL API key is stored locally in the encrypted user record on the device. When the user performs a translation or validates the key, that key is transmitted to our backend for processing of the respective request and used with DeepL. According to the current technical design, a user-provided DeepL API key is not stored permanently on the server.
 
@@ -286,7 +291,6 @@ Further information about the providers is available on their respective website
 - Open-Meteo: https://open-meteo.com/
 - DeepL: https://www.deepl.com/
 - OpenStreetMap / Nominatim: https://www.openstreetmap.org/
-- Viator: https://www.viator.com/
 - Unsplash: https://unsplash.com/
 - Flaticon: https://www.flaticon.com/
 - Flaticon Terms of Use: https://www.flaticon.com/legal

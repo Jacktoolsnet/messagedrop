@@ -6,6 +6,7 @@ import { ExperienceResult, ViatorDestinationLookup } from '../../../interfaces/v
 import { Place } from '../../../interfaces/place';
 import { ExperienceBookmarkService } from '../../../services/experience-bookmark.service';
 import { ExperienceMapService } from '../../../services/experience-map.service';
+import { ExternalContentConsentService } from '../../../services/external-content-consent.service';
 import { ExperienceTileDetailComponent } from './experience-tile-detail/experience-tile-detail.component';
 
 @Component({
@@ -21,6 +22,7 @@ export class ExperienceTileComponent implements OnChanges {
   private readonly dialog = inject(MatDialog);
   private readonly bookmarkService = inject(ExperienceBookmarkService);
   private readonly experienceMapService = inject(ExperienceMapService);
+  private readonly externalContentConsent = inject(ExternalContentConsentService);
 
   readonly destination = signal<ViatorDestinationLookup | null>(null);
 
@@ -38,12 +40,16 @@ export class ExperienceTileComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['place']) {
-      void this.loadDestination();
+      if (this.viatorContentEnabled()) {
+        void this.loadDestination();
+      } else {
+        this.destination.set(null);
+      }
     }
   }
 
   private async loadDestination(): Promise<void> {
-    if (!this.place?.location) {
+    if (!this.place?.location || !this.viatorContentEnabled()) {
       this.destination.set(null);
       return;
     }
@@ -54,6 +60,14 @@ export class ExperienceTileComponent implements OnChanges {
 
   openTileDialog(event?: Event): void {
     event?.stopPropagation();
+    if (!this.viatorContentEnabled()) {
+      this.externalContentConsent.request('viator').subscribe((enabled) => {
+        if (enabled) {
+          void this.loadDestination().then(() => this.openTileDialog());
+        }
+      });
+      return;
+    }
     void this.ensureDestination().then((destination) => {
       this.dialog.open(ExperienceTileDetailComponent, {
         data: {
@@ -83,7 +97,11 @@ export class ExperienceTileComponent implements OnChanges {
   }
 
   getExperienceImage(result: ExperienceResult): string | null {
-    return result.imageUrl || result.avatarUrl || null;
+    return this.viatorContentEnabled() ? result.imageUrl || result.avatarUrl || null : null;
+  }
+
+  viatorContentEnabled(): boolean {
+    return this.externalContentConsent.isEnabled('viator');
   }
 
   private async ensureDestination(): Promise<ViatorDestinationLookup | null> {

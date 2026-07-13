@@ -749,7 +749,8 @@
       "experiences": {
         "title": "Experiencias",
         "empty": "Todavía no hay experiencias.",
-        "add": "Agregar experiencia"
+        "add": "Agregar experiencia",
+        "consentRequired": "Activa el contenido de Viator para verlo."
       },
       "wikipedia": {
         "title": "Artículos de Wikipedia",

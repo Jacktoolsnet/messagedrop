@@ -39,6 +39,13 @@ const PLATFORM_META: Record<ExternalContentPlatform, PlatformMeta> = {
     settingsKey: EXTERNAL_CONTENT_SETTINGS_KEYS.wikipedia,
     terms: 'https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use',
     privacy: 'https://foundation.wikimedia.org/wiki/Policy:Privacy_policy'
+  },
+  viator: {
+    name: 'Viator',
+    icon: 'local_activity',
+    settingsKey: EXTERNAL_CONTENT_SETTINGS_KEYS.viator,
+    terms: 'https://www.viator.com/support/termsAndConditions',
+    privacy: 'https://www.viator.com/support/privacyPolicy'
   }
 };
 

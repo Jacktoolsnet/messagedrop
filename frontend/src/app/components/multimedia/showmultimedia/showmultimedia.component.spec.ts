@@ -62,6 +62,7 @@ describe('ShowmultimediaComponent', () => {
               enableTikTokContent: false,
               enableYoutubeContent: false,
               enableWikipediaContent: false,
+              enableViatorContent: false,
               diagnosticLogging: false,
               backupOnExit: false,
               speech: { ...DEFAULT_SPEECH_SETTINGS },

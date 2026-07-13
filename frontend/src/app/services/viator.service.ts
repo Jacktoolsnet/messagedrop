@@ -13,6 +13,7 @@ import {
   ViatorSuppliersResponse
 } from '../interfaces/viator';
 import { NetworkService } from './network.service';
+import { AppService } from './app.service';
 import { TranslationHelperService } from './translation-helper.service';
 
 @Injectable({
@@ -22,6 +23,7 @@ export class ViatorService {
   private readonly http = inject(HttpClient);
   private readonly networkService = inject(NetworkService);
   private readonly i18n = inject(TranslationHelperService);
+  private readonly appService = inject(AppService);
 
   private readonly httpOptions = {
     headers: new HttpHeaders({
@@ -36,6 +38,8 @@ export class ViatorService {
   }
 
   getProductTags(showAlways = false): Observable<unknown> {
+    const blocked = this.blockWhenDisabled<unknown>();
+    if (blocked) return blocked;
     const url = `${environment.apiUrl}/viator/products/tags`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
@@ -54,6 +58,8 @@ export class ViatorService {
   }
 
   searchProducts(request: ViatorProductSearchRequest, showAlways = true): Observable<ViatorProductSearchResponse> {
+    const blocked = this.blockWhenDisabled<ViatorProductSearchResponse>();
+    if (blocked) return blocked;
     const url = `${environment.apiUrl}/viator/products/search`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
@@ -72,6 +78,8 @@ export class ViatorService {
   }
 
   searchFreetext(request: ViatorFreetextSearchRequest, showAlways = true): Observable<ViatorFreetextSearchResponse> {
+    const blocked = this.blockWhenDisabled<ViatorFreetextSearchResponse>();
+    if (blocked) return blocked;
     const url = `${environment.apiUrl}/viator/search/freetext`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
@@ -90,6 +98,8 @@ export class ViatorService {
   }
 
   getProduct(productCode: string, showAlways = false): Observable<ViatorProductDetail> {
+    const blocked = this.blockWhenDisabled<ViatorProductDetail>();
+    if (blocked) return blocked;
     const url = `${environment.apiUrl}/viator/products/${encodeURIComponent(productCode)}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
@@ -108,6 +118,8 @@ export class ViatorService {
   }
 
   searchAttractions(destinationId: number, showAlways = false): Observable<unknown> {
+    const blocked = this.blockWhenDisabled<unknown>();
+    if (blocked) return blocked;
     const url = `${environment.apiUrl}/viator/attractions/search`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
@@ -126,6 +138,8 @@ export class ViatorService {
   }
 
   getDestinations(ids: number[], showAlways = false, skipUi = false): Observable<ViatorDestinationsResponse> {
+    const blocked = this.blockWhenDisabled<ViatorDestinationsResponse>();
+    if (blocked) return blocked;
     const sanitized = Array.isArray(ids)
       ? Array.from(new Set(ids.filter((id) => Number.isFinite(id) && id > 0)))
       : [];
@@ -150,6 +164,8 @@ export class ViatorService {
   }
 
   getAllDestinations(showAlways = false): Observable<ViatorDestinationsResponse> {
+    const blocked = this.blockWhenDisabled<ViatorDestinationsResponse>();
+    if (blocked) return blocked;
     const url = `${environment.apiUrl}/viator/destinations/all`;
     const headers = this.httpOptions.headers.set('x-skip-ui', 'true');
     this.networkService.setNetworkMessageConfig(url, {
@@ -169,6 +185,8 @@ export class ViatorService {
   }
 
   getLocationsBulk(references: string[], showAlways = false): Observable<ViatorLocationsResponse> {
+    const blocked = this.blockWhenDisabled<ViatorLocationsResponse>();
+    if (blocked) return blocked;
     const locations = Array.isArray(references)
       ? Array.from(new Set(references.map((ref) => String(ref).trim()).filter(Boolean)))
       : [];
@@ -190,6 +208,8 @@ export class ViatorService {
   }
 
   getSuppliersByProductCodes(productCodes: string[], showAlways = false): Observable<ViatorSuppliersResponse> {
+    const blocked = this.blockWhenDisabled<ViatorSuppliersResponse>();
+    if (blocked) return blocked;
     const codes = Array.isArray(productCodes)
       ? Array.from(new Set(productCodes.map((code) => String(code).trim()).filter(Boolean)))
       : [];
@@ -212,5 +232,11 @@ export class ViatorService {
 
     return this.http.post<ViatorSuppliersResponse>(url, { productCodes: codes }, options)
       .pipe(catchError(this.handleError));
+  }
+
+  private blockWhenDisabled<T>(): Observable<T> | null {
+    return this.appService.getAppSettings().enableViatorContent
+      ? null
+      : throwError(() => new Error('viator_content_disabled'));
   }
 }

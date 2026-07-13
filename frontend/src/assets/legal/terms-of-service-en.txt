@@ -322,6 +322,7 @@ The following providers require provider-specific consent or activation within t
 - Spotify
 - Unsplash
 - Wikipedia / Wikimedia projects
+- Viator
 
 External content is disabled by default.
 
@@ -340,7 +341,6 @@ The following external functional and information services are not activated via
 - Open-Meteo
 - OpenStreetMap / Nominatim
 - DeepL
-- Viator
 - Flaticon / Freepik Company S.L.U. (sticker/asset and license provider)
 
 These services are used when you actively use the respective function (e.g., weather query, map/location reference, translation, experience search, or sticker use) or where this is necessary to provide licensed content.
@@ -371,6 +371,15 @@ Wikipedia content is displayed only if you have enabled Wikipedia in the externa
 
 Privacy Policy: https://foundation.wikimedia.org/wiki/Policy:Privacy_policy
 Terms of Use: https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use
+
+###
+13.5 Special feature Viator
+###
+
+Viator content and experience searches are provided only if you have enabled Viator in the external content settings. Experience descriptions, prices, availability, images, and other product information are additionally subject to Viator’s terms and, where applicable, the terms of the respective experience provider. This information may change at any time. Only the information displayed on Viator when opening or booking an offer is binding. When you open a Viator offer, you leave MessageDrop.
+
+Privacy Policy: https://www.viator.com/support/privacyPolicy
+Terms and Conditions: https://www.viator.com/support/termsAndConditions
 
 ###
 14. Usage Time Protection (self-restriction / parental mode)

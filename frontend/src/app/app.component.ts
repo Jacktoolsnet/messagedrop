@@ -91,6 +91,7 @@ import { DiagnosticLoggerService } from './services/diagnostic-logger.service';
 import { DisplayMessageRef, DisplayMessageService } from './services/display-message.service';
 import { ExperienceBookmarkService } from './services/experience-bookmark.service';
 import { ExperienceMapService } from './services/experience-map.service';
+import { ExternalContentConsentService } from './services/external-content-consent.service';
 import { GeoStatisticService } from './services/geo-statistic.service';
 import { GeolocationService } from './services/geolocation.service';
 import { IndexedDbService } from './services/indexed-db.service';
@@ -204,6 +205,7 @@ export class AppComponent implements OnInit {
   private readonly messageService = inject(MessageService);
   private readonly secretDropService = inject(SecretDropService);
   private readonly experienceMapService = inject(ExperienceMapService);
+  private readonly externalContentConsent = inject(ExternalContentConsentService);
   private readonly wikipediaMapState = inject(WikipediaMapStateService);
   private readonly wikipediaService = inject(WikipediaService);
   private readonly experienceBookmarkService = inject(ExperienceBookmarkService);
@@ -2537,6 +2539,12 @@ export class AppComponent implements OnInit {
     if (!ids.length) {
       return;
     }
+    if (!this.externalContentConsent.isEnabled('viator')) {
+      this.externalContentConsent.request('viator').subscribe((enabled) => {
+        if (enabled) this.openMarkerExperienceListDialog(destinations);
+      });
+      return;
+    }
     const destinationName = ids.length === 1
       ? destinations.find((dest) => Number(dest.destinationId) === ids[0])?.name
       : undefined;
@@ -3152,6 +3160,12 @@ export class AppComponent implements OnInit {
   }
 
   showExperienceSearchDialog(): void {
+    if (!this.externalContentConsent.isEnabled('viator')) {
+      this.externalContentConsent.request('viator').subscribe((enabled) => {
+        if (enabled) this.showExperienceSearchDialog();
+      });
+      return;
+    }
     const dialogRef = this.dialog.open(ExperienceSearchComponent, {
       panelClass: '',
       closeOnNavigation: true,
@@ -3578,6 +3592,10 @@ export class AppComponent implements OnInit {
     ignoreSearchSettings: boolean,
     zoom: number
   ): Promise<void> {
+    if (!this.externalContentConsent.isEnabled('viator')) {
+      this.experienceDestinationsInView = [];
+      return;
+    }
     const bbox = this.mapService.getVisibleMapBoundingBox();
     this.experienceDestinationsInView = await this.experienceMapService.getDestinationsInView(
       bbox,
@@ -3593,7 +3611,7 @@ export class AppComponent implements OnInit {
     zoom: number,
     canSearchMyExperiences: boolean
   ): Promise<void> {
-    if (!this.userService.isReady()) {
+    if (!this.userService.isReady() || !this.externalContentConsent.isEnabled('viator')) {
       this.myExperienceLocationsInView = [];
       return;
     }

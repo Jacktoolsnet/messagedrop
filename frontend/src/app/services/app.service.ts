@@ -45,6 +45,7 @@ export class AppService {
     enableKlipyContent: false,
     enableUnsplashContent: false,
     enableWikipediaContent: false,
+    enableViatorContent: false,
     diagnosticLogging: false,
     backupOnExit: false,
     pinInputFeedback: { ...DEFAULT_PIN_INPUT_FEEDBACK_SETTINGS },

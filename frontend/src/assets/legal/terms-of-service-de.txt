@@ -319,6 +319,7 @@ Für folgende Anbieter gilt eine anbieterbezogene Einwilligungs- bzw. Freigabeen
 - Spotify
 - Unsplash
 - Wikipedia / Wikimedia-Projekte
+- Viator
 
 Externe Inhalte sind standardmäßig deaktiviert.
 
@@ -337,7 +338,6 @@ Folgende externe Funktions- und Informationsdienste werden nicht über den „Ex
 - Open-Meteo
 - OpenStreetMap / Nominatim
 - DeepL
-- Viator
 - Flaticon / Freepik Company S.L.U. (Sticker-/Asset- und Lizenzanbieter)
 
 Diese Dienste werden genutzt, wenn Du die jeweilige Funktion aktiv verwendest (z. B. Wetterabfrage, Karten-/Ortsbezug, Übersetzung, Erlebnissuche oder Sticker-Nutzung) oder soweit dies zur Bereitstellung lizenzierter Inhalte erforderlich ist.
@@ -368,6 +368,15 @@ Wikipedia-Inhalte werden nur angezeigt, wenn Du Wikipedia in den Einstellungen f
 
 Datenschutzerklärung: https://foundation.wikimedia.org/wiki/Policy:Privacy_policy
 Nutzungsbedingungen: https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use
+
+###
+13.5 Besonderheit Viator
+###
+
+Viator-Inhalte und die Erlebnissuche werden nur bereitgestellt, wenn Du Viator in den Einstellungen für externe Inhalte aktiviert hast. Für Erlebnisbeschreibungen, Preise, Verfügbarkeiten, Bilder und sonstige Produktinformationen gelten zusätzlich die Bedingungen von Viator und gegebenenfalls des jeweiligen Erlebnisanbieters. Diese Angaben können sich jederzeit ändern. Verbindlich sind ausschließlich die Informationen, die beim Öffnen oder Buchen auf der Viator-Seite angezeigt werden. Beim Öffnen eines Viator-Angebots verlässt Du MessageDrop.
+
+Datenschutzerklärung: https://www.viator.com/support/privacyPolicy
+Nutzungsbedingungen: https://www.viator.com/support/termsAndConditions
 
 ###
 14. Nutzungszeit-Schutz (Selbstbeschränkung / Elternmodus)

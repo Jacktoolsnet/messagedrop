@@ -6,6 +6,7 @@ import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ExperienceResult } from '../../../../interfaces/viator';
 import { ExperienceBookmarkService } from '../../../../services/experience-bookmark.service';
+import { ExternalContentConsentService } from '../../../../services/external-content-consent.service';
 import { UserService } from '../../../../services/user.service';
 import { ExperienceSearchDetailDialogComponent } from '../../../utils/experience-search/detail-dialog/experience-search-detail-dialog.component';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
@@ -38,6 +39,7 @@ export class ExperienceTileDetailComponent implements OnInit {
   private readonly bookmarkService = inject(ExperienceBookmarkService);
   private readonly userService = inject(UserService);
   private readonly dialog = inject(MatDialog);
+  private readonly externalContentConsent = inject(ExternalContentConsentService);
   readonly help = inject(HelpDialogService);
   readonly dialogRef = inject(MatDialogRef<ExperienceTileDetailComponent>);
 
@@ -62,6 +64,12 @@ export class ExperienceTileDetailComponent implements OnInit {
   }
 
   openSearch(): void {
+    if (!this.externalContentConsent.isEnabled('viator')) {
+      this.externalContentConsent.request('viator').subscribe((enabled) => {
+        if (enabled) this.openSearch();
+      });
+      return;
+    }
     const destinationId = Number(this.dialogData.destinationId) || 0;
     const dialogRef = this.dialog.open(ExperienceSearchComponent, {
       data: {

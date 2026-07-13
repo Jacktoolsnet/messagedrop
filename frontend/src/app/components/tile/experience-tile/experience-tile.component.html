@@ -9,7 +9,9 @@
     </div>
   </div>
 
-  @if (previewExperiences().length > 0) {
+  @if (!viatorContentEnabled()) {
+    <div class="empty">{{ 'common.tiles.experiences.consentRequired' | transloco }}</div>
+  } @else if (previewExperiences().length > 0) {
     <div class="experience-list">
       @for (experience of previewExperiences(); track experience.trackId || experience.productCode) {
         <div class="experience-item">

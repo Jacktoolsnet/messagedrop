@@ -4,6 +4,7 @@ import { BoundingBox } from '../interfaces/bounding-box';
 import { Location } from '../interfaces/location';
 import { DEFAULT_SEARCH_SETTINGS, SearchSettings } from '../interfaces/search-settings';
 import { ViatorDestinationLookup } from '../interfaces/viator';
+import { AppService } from './app.service';
 import { ViatorService } from './viator.service';
 
 @Injectable({
@@ -11,6 +12,7 @@ import { ViatorService } from './viator.service';
 })
 export class ExperienceMapService {
   private readonly viatorService = inject(ViatorService);
+  private readonly appService = inject(AppService);
 
   private destinations: ViatorDestinationLookup[] = [];
   private destinationsLoaded = false;
@@ -23,6 +25,9 @@ export class ExperienceMapService {
     settings: SearchSettings,
     ignoreSearchSettings: boolean
   ): Promise<ViatorDestinationLookup[]> {
+    if (!this.appService.getAppSettings().enableViatorContent) {
+      return [];
+    }
     const enabled = ignoreSearchSettings ? true : settings.experiences.enabled;
     const minZoom = ignoreSearchSettings
       ? DEFAULT_SEARCH_SETTINGS.experiences.minZoom
@@ -110,13 +115,13 @@ export class ExperienceMapService {
   }
 
   async getDestinationById(id: number): Promise<ViatorDestinationLookup | undefined> {
-    if (!id) return undefined;
+    if (!id || !this.appService.getAppSettings().enableViatorContent) return undefined;
     await this.ensureDestinationsLoaded();
     return this.destinations.find((dest) => dest.destinationId === id);
   }
 
   async getDestinationForLocation(location: Location): Promise<ViatorDestinationLookup | null> {
-    if (!location) return null;
+    if (!location || !this.appService.getAppSettings().enableViatorContent) return null;
     await this.ensureDestinationsLoaded();
     if (!this.destinations.length) return null;
 

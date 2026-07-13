@@ -19,6 +19,7 @@ import { ContactMessageService } from '../../services/contact-message.service';
 import { ContactService } from '../../services/contact.service';
 import { AppService } from '../../services/app.service';
 import { ExperienceBookmarkService } from '../../services/experience-bookmark.service';
+import { ExternalContentConsentService } from '../../services/external-content-consent.service';
 import { PlaceService } from '../../services/place.service';
 import { SpeechService } from '../../services/speech.service';
 import { LanguageService } from '../../services/language.service';
@@ -98,6 +99,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   private readonly socketioService = inject(SocketioService);
   private readonly contactService = inject(ContactService);
   private readonly experienceBookmarkService = inject(ExperienceBookmarkService);
+  private readonly externalContentConsent = inject(ExternalContentConsentService);
   private readonly placeService = inject(PlaceService);
   private readonly mapService = inject(MapService);
   readonly help = inject(HelpDialogService);
@@ -446,6 +448,12 @@ export class ContactChatroomComponent implements AfterViewInit {
   }
 
   openExperienceSearch(message?: ChatroomMessage): void {
+    if (!this.externalContentConsent.isEnabled('viator')) {
+      this.externalContentConsent.request('viator').subscribe((enabled) => {
+        if (enabled) this.openExperienceSearch(message);
+      });
+      return;
+    }
     const contact = this.contact();
     if (!contact) {
       return;

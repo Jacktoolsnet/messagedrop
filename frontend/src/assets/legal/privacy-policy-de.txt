@@ -30,9 +30,9 @@ MessageDrop verwendet kein personalisiertes Empfehlungs- oder Ranking-System. Ö
 
 Private Chatnachrichten werden Ende-zu-Ende-verschlüsselt übertragen und sind für uns grundsätzlich nicht im Klartext einsehbar.
 
-Externe Inhalte (z. B. YouTube, TikTok, Pinterest, Spotify, Tenor, Klipy, Unsplash und Wikipedia) werden nur nach aktiver, anbieterbezogener Entscheidung des Nutzers geladen. Eine pauschale Zustimmung für alle Anbieter ist nicht vorgesehen.
+Externe Inhalte (z. B. YouTube, TikTok, Pinterest, Spotify, Tenor, Klipy, Unsplash, Wikipedia und Viator) werden nur nach aktiver, anbieterbezogener Entscheidung des Nutzers geladen. Eine pauschale Zustimmung für alle Anbieter ist nicht vorgesehen.
 
-Davon zu unterscheiden sind externe Funktionsdienste sowie Lizenz- und Asset-Anbieter (z. B. Open-Meteo, OpenStreetMap/Nominatim, DeepL, Viator, Flaticon / Freepik), die bei aktiver Nutzung der jeweiligen Funktion oder zur Bereitstellung lizenzierter Inhalte verwendet werden und nicht über den Externe-Inhalte-Toggle freigeschaltet werden.
+Davon zu unterscheiden sind externe Funktionsdienste sowie Lizenz- und Asset-Anbieter (z. B. Open-Meteo, OpenStreetMap/Nominatim, DeepL und Flaticon / Freepik), die bei aktiver Nutzung der jeweiligen Funktion oder zur Bereitstellung lizenzierter Inhalte verwendet werden und nicht über den Externe-Inhalte-Toggle freigeschaltet werden.
 
 Wenn Unsplash-Bilder ausgewählt werden, können Bilddateien geladen, auf das Endgerät heruntergeladen und lokal gespeichert werden.
 
@@ -160,7 +160,7 @@ Externe Inhalte sind standardmäßig deaktiviert. Statt der externen Inhalte wir
 
 Eine pauschale Zustimmung für alle externen Anbieter ist nicht vorgesehen; die Entscheidung erfolgt getrennt je Anbieter.
 
-Diese anbieterbezogene Entscheidung betrifft Einbettungen externer Inhalte. Externe Funktionsdienste (z. B. Open-Meteo, Nominatim / OpenStreetMap, DeepL, Viator) werden in Abschnitt 2.6 beschrieben.
+Diese anbieterbezogene Entscheidung betrifft Einbettungen externer Inhalte. Externe Funktionsdienste (z. B. Open-Meteo, Nominatim / OpenStreetMap und DeepL) werden in Abschnitt 2.6 beschrieben.
 
 Erst nach einer bewussten und freiwilligen Aktivierung durch den Nutzer werden externe Inhalte technisch eingebunden.
 
@@ -219,6 +219,12 @@ Die Wikipedia-Suche wird nur ausgeführt, wenn sie in den Sucheinstellungen akti
 
 Die Wikimedia Foundation hat ihren Sitz in den USA und betreibt dort Server und Rechenzentren. Bei der Nutzung von Wikimedia-Diensten, insbesondere bei direkten Medienabrufen oder beim Öffnen von Wikipedia- bzw. Wikimedia-Seiten, können personenbezogene Daten daher in die USA übermittelt und dort verarbeitet und gespeichert werden. In den USA kann ein im Vergleich zur Europäischen Union abweichendes Datenschutzniveau bestehen. Weitere Informationen zur Verarbeitung und zu möglichen internationalen Datenübermittlungen enthält die oben verlinkte Datenschutzerklärung der Wikimedia Foundation.
 
+Viator (Viator, Inc.)
+Datenschutzerklärung: https://www.viator.com/support/privacyPolicy
+Nutzungsbedingungen: https://www.viator.com/support/termsAndConditions
+
+Viator-Inhalte und Erlebnis-Suchanfragen werden erst geladen, nachdem Viator in den Einstellungen für externe Inhalte aktiviert wurde. Dabei können insbesondere Suchbegriffe, Sprach- und Ländereinstellungen, Ziel- und Ortsparameter, Datums- und Preisfilter sowie Produkt- und Mediendaten verarbeitet werden. Die API-Kommunikation erfolgt über das MessageDrop-Backend. Produktbilder können direkt von durch Viator verwendeten Medienservern geladen werden; dabei erhält der jeweilige Betreiber die für die Auslieferung technisch erforderlichen Verbindungsdaten, insbesondere IP-Adresse und Browserinformationen. Beim Öffnen eines Viator-Angebots verlässt der Nutzer MessageDrop.
+
 Flaticon / Freepik (Freepik Company S.L.U.)
 Datenschutzerklärung: https://www.freepik.com/legal/privacy/
 Nutzungsbedingungen: https://www.flaticon.com/legal
@@ -266,10 +272,9 @@ Für einzelne Funktionen nutzt MessageDrop externe Informations- und API-Dienste
 - Open-Meteo (Wetter- und Luftqualitätsdaten),
 - DeepL (Übersetzungen),
 - Nominatim / OpenStreetMap (Suche, Geokodierung, Kartenbezug),
-- Viator (Erlebnis-/Aktivitätsdaten),
 - Flaticon / Freepik Company S.L.U. (lizenzierte Sticker und vergleichbare grafische Elemente).
 
-Bei Nutzung dieser Funktionen können – abhängig vom jeweiligen Anwendungsfall – insbesondere Suchbegriffe, Sprach- und Ländereinstellungen, Ziel-/Ort-Parameter, Datums- und Preisfilter, technische Verbindungsdaten sowie ggf. Referenz-URLs verarbeitet werden. Die Kommunikation mit Drittanbietern erfolgt, soweit technisch vorgesehen, über unsere Server oder direkt aus dem Endgerät.
+Bei Nutzung dieser Funktionen können – abhängig vom jeweiligen Anwendungsfall – insbesondere Suchbegriffe, Sprach- und Ländereinstellungen, Ziel-/Ort-Parameter, technische Verbindungsdaten sowie ggf. Referenz-URLs verarbeitet werden. Die Kommunikation mit Drittanbietern erfolgt, soweit technisch vorgesehen, über unsere Server oder direkt aus dem Endgerät.
 
 Für die Übersetzungsfunktion kann der Nutzer nach eigener Wahl entweder den von uns bereitgestellten DeepL-Zugang oder einen eigenen DeepL-API-Key verwenden. Ein vom Nutzer hinterlegter eigener DeepL-API-Key wird lokal im verschlüsselten Nutzerdatensatz auf dem Endgerät gespeichert. Wenn der Nutzer eine Übersetzung ausführt oder den Key prüft, wird dieser Key für die Bearbeitung der jeweiligen Anfrage an unser Backend übermittelt und gegenüber DeepL verwendet. Eine dauerhafte serverseitige Speicherung eines vom Nutzer bereitgestellten DeepL-API-Keys erfolgt nach dem aktuellen technischen Stand nicht.
 
@@ -283,7 +288,6 @@ Weiterführende Informationen zu den Anbietern sind über deren jeweilige Websit
 - Open-Meteo: https://open-meteo.com/
 - DeepL: https://www.deepl.com/
 - OpenStreetMap / Nominatim: https://www.openstreetmap.org/
-- Viator: https://www.viator.com/
 - Unsplash: https://unsplash.com/
 - Flaticon: https://www.flaticon.com/
 - Flaticon Nutzungsbedingungen: https://www.flaticon.com/legal

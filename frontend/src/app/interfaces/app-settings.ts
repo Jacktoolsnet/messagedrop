@@ -18,6 +18,7 @@ export interface AppSettings {
     enableTikTokContent: boolean,
     enableYoutubeContent: boolean,
     enableWikipediaContent: boolean,
+    enableViatorContent: boolean,
     diagnosticLogging: boolean,
     backupOnExit: boolean,
     pinInputFeedback: PinInputFeedbackSettings,

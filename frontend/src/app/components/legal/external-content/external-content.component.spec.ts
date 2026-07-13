@@ -28,6 +28,7 @@ describe('ExternalContentComponent', () => {
     enableTikTokContent: false,
     enableYoutubeContent: false,
     enableWikipediaContent: false,
+    enableViatorContent: false,
     diagnosticLogging: false,
     backupOnExit: false,
     pinInputFeedback: { ...DEFAULT_PIN_INPUT_FEEDBACK_SETTINGS },
@@ -78,8 +79,10 @@ describe('ExternalContentComponent', () => {
 
   it('updates the matching setting generically', () => {
     component.setPlatformEnabled('youtube', true);
+    component.setPlatformEnabled('viator', true);
 
     expect(component.appSettings.enableYoutubeContent).toBeTrue();
+    expect(component.appSettings.enableViatorContent).toBeTrue();
     expect(component.appSettings.enableSpotifyContent).toBeFalse();
   });
 
