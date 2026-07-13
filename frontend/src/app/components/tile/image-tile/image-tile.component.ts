@@ -13,6 +13,7 @@ import { ExperienceBookmarkService } from '../../../services/experience-bookmark
 import { LocalImageService } from '../../../services/local-image.service';
 import { PlaceService } from '../../../services/place.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
+import { resolveDefaultTileTitle } from '../../../utils/default-tile-title.util';
 import { ImageTileEditComponent } from './image-tile-edit/image-tile-edit.component';
 import { ImageTileGalleryDialogComponent, ImageTileGalleryItem } from './image-tile-gallery-dialog/image-tile-gallery-dialog.component';
 
@@ -112,7 +113,7 @@ export class ImageTileComponent implements OnChanges, OnDestroy {
   get title(): string {
     const tile = this.currentTile();
     const fallback = this.translation.t('common.tileTypes.image');
-    return tile?.payload?.title?.trim() || tile?.label || fallback;
+    return resolveDefaultTileTitle(tile, fallback, 'image');
   }
 
   get icon(): string {

@@ -27,6 +27,10 @@
       <mat-button-toggle-group [hideSingleSelectionIndicator]="true" [value]="appSettings.themeMode"
         (change)="setThemeMode($event.value)" class="theme-toggle-group" exclusive
         [attr.aria-label]="'settings.theme.modeLabel' | transloco">
+        <mat-button-toggle value="system">
+          <mat-icon>settings</mat-icon>
+          {{ 'settings.theme.mode.system' | transloco }}
+        </mat-button-toggle>
         <mat-button-toggle value="light">
           <mat-icon>light_mode</mat-icon>
           {{ 'settings.theme.mode.light' | transloco }}
@@ -34,10 +38,6 @@
         <mat-button-toggle value="dark">
           <mat-icon>dark_mode</mat-icon>
           {{ 'settings.theme.mode.dark' | transloco }}
-        </mat-button-toggle>
-        <mat-button-toggle value="system">
-          <mat-icon>settings</mat-icon>
-          {{ 'settings.theme.mode.system' | transloco }}
         </mat-button-toggle>
       </mat-button-toggle-group>
     </div>

@@ -15,6 +15,7 @@ import { TileFileEntry, TileSetting } from '../../../../interfaces/tile-settings
 import { LocalDocumentService } from '../../../../services/local-document.service';
 import { TileFileService } from '../../../../services/tile-file.service';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
+import { resolveDefaultTileTitle } from '../../../../utils/default-tile-title.util';
 import { getFileIcon } from '../../../../utils/file-icon.util';
 import { isQuotaExceededError } from '../../../../utils/storage-error.util';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
@@ -76,7 +77,7 @@ export class FileTileEditComponent implements OnInit {
   private readonly initialFiles = this.normalizeFiles(this.data.tile.payload?.files);
   private readonly initialFileIds = new Set(this.initialFiles.map((file) => file.id));
   readonly titleControl = new FormControl(
-    this.data.tile.payload?.title ?? this.data.tile.label ?? this.fallbackTitle,
+    resolveDefaultTileTitle(this.data.tile, this.fallbackTitle, 'custom-file'),
     { nonNullable: true }
   );
   readonly icon = signal<string | undefined>(this.data.tile.payload?.icon);

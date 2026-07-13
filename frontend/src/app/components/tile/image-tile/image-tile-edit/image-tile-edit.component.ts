@@ -13,6 +13,7 @@ import { IndexedDbService } from '../../../../services/indexed-db.service';
 import { LocalImageService } from '../../../../services/local-image.service';
 import { MapService } from '../../../../services/map.service';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
+import { resolveDefaultTileTitle } from '../../../../utils/default-tile-title.util';
 import { DisplayMessageService } from '../../../../services/display-message.service';
 import { isQuotaExceededError } from '../../../../utils/storage-error.util';
 import { LocalImage } from '../../../../interfaces/local-image';
@@ -87,7 +88,7 @@ export class ImageTileEditComponent implements OnInit, OnDestroy {
   private readonly missingImageIds = new Set<string>();
 
   readonly titleControl = new FormControl(
-    this.data.tile.payload?.title ?? this.data.tile.label ?? this.fallbackTitle,
+    resolveDefaultTileTitle(this.data.tile, this.fallbackTitle, 'image'),
     { nonNullable: true }
   );
   readonly icon = signal<string | undefined>(this.data.tile.payload?.icon);

@@ -15,6 +15,7 @@ import { PlaceService } from '../../../services/place.service';
 import { TileFileService } from '../../../services/tile-file.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { getFileIcon } from '../../../utils/file-icon.util';
+import { resolveDefaultTileTitle } from '../../../utils/default-tile-title.util';
 import { FileTileEditComponent } from './file-tile-edit/file-tile-edit.component';
 import { DisplayMessageService } from '../../../services/display-message.service';
 
@@ -91,7 +92,7 @@ export class FileTileComponent implements OnChanges {
   get title(): string {
     const tile = this.currentTile();
     const fallback = this.translation.t('common.tileTypes.files');
-    return tile?.payload?.title?.trim() || tile?.label || fallback;
+    return resolveDefaultTileTitle(tile, fallback, 'custom-file');
   }
 
   get icon(): string {
