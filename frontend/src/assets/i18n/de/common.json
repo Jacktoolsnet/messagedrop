@@ -721,6 +721,7 @@
       "quickActions": "Schnellaktionen",
       "files": "Dateien",
       "experiences": "Erlebnisse",
+      "wikipedia": "Wikipedia-Artikel",
       "migraine": "Wetteränderung",
       "pollution": "Luftverschmutzung"
     },
@@ -750,6 +751,11 @@
         "title": "Erlebnisse",
         "empty": "Noch keine Erlebnisse.",
         "add": "Erlebnis hinzufügen"
+      },
+      "wikipedia": {
+        "title": "Wikipedia-Artikel",
+        "empty": "Keine Artikel für diesen Ort gefunden.",
+        "consentRequired": "Wikipedia-Inhalte zum Anzeigen aktivieren."
       },
       "messages": {
         "title": "Öffentliche Nachrichten",

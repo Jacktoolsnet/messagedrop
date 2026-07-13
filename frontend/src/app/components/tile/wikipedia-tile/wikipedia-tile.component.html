@@ -1,0 +1,39 @@
+<div class="tile" role="button" tabindex="0"
+  (click)="openTileDialog()"
+  (keyup.enter)="openTileDialog()"
+  (keyup.space)="openTileDialog()">
+  <div class="tile-header">
+    <div class="tile-header__title">
+      <mat-icon class="tile-icon">menu_book</mat-icon>
+      <span class="tile-title">{{ 'common.tiles.wikipedia.title' | transloco }}</span>
+    </div>
+  </div>
+
+  @if (!wikipediaContentEnabled()) {
+    <div class="empty">{{ 'common.tiles.wikipedia.consentRequired' | transloco }}</div>
+  } @else if (loading()) {
+    <div class="loading"><mat-spinner diameter="32"></mat-spinner></div>
+  } @else if (previewArticles().length > 0) {
+    <div class="article-list">
+      @for (article of previewArticles(); track article.pageId) {
+        <div class="article-item">
+          @if (article.thumbnail && article.resolvedAttribution?.image?.resolved) {
+            <img class="article-avatar" [src]="article.thumbnail.url" [alt]="article.title" loading="lazy" />
+          } @else {
+            <div class="article-avatar article-avatar--fallback">
+              <mat-icon>menu_book</mat-icon>
+            </div>
+          }
+          <div class="article-text">
+            <span class="article-title" [attr.title]="article.title">{{ article.title }}</span>
+            @if (article.summary) {
+              <span class="article-subtitle">{{ article.summary }}</span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  } @else if (loaded()) {
+    <div class="empty">{{ 'common.tiles.wikipedia.empty' | transloco }}</div>
+  }
+</div>

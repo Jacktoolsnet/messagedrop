@@ -11,7 +11,8 @@ export type DefaultTileType =
   | 'contactPlaces'
   | 'image'
   | 'custom-file'
-  | 'custom-experience';
+  | 'custom-experience'
+  | 'custom-wikipedia';
 export type TileType = DefaultTileType | `custom-${string}`;
 export type TileLinkType = 'web' | 'phone' | 'email' | 'whatsapp' | 'sms' | 'map';
 export type TileDefaultsContext = 'place' | 'contact' | 'experience';
@@ -148,7 +149,8 @@ export const tileTypeToLabel: Record<DefaultTileType, string> = {
   contactPlaces: 'Places',
   image: 'Images',
   'custom-file': 'Documents',
-  'custom-experience': 'Experiences'
+  'custom-experience': 'Experiences',
+  'custom-wikipedia': 'Wikipedia articles'
 };
 
 const placeDefaultTileTypeOrder: DefaultTileType[] = [
@@ -161,7 +163,8 @@ const placeDefaultTileTypeOrder: DefaultTileType[] = [
   'placeContacts',
   'image',
   'custom-file',
-  'custom-experience'
+  'custom-experience',
+  'custom-wikipedia'
 ];
 const contactDefaultTileTypeOrder: DefaultTileType[] = ['contactPlaces', 'hashtags', 'image', 'custom-file'];
 const experienceDefaultTileTypeOrder: DefaultTileType[] = ['hashtags'];

@@ -29,10 +29,11 @@ import { TextTileComponent } from "../text-tile/text-tile.component";
 import { TileSettingsComponent } from '../tile-settings/tile-settings.component';
 import { TodoTileComponent } from "../todo-tile/todo-tile.component";
 import { WeatherTileComponent } from "../weather-tile/weather-tile.component";
+import { WikipediaTileComponent } from "../wikipedia-tile/wikipedia-tile.component";
 
 @Component({
   selector: 'app-tile-list',
-  imports: [DateTimeTileComponent, WeatherTileComponent, AirQualityTileComponent, NoteTileComponent, MessageTileComponent, HashtagTileComponent, RelationTileComponent, ImageTileComponent, FileTileComponent, ExperienceTileComponent, TextTileComponent, MultitextTileComponent, AnniversaryTileComponent, MigraineTileComponent, PollutionTileComponent, TodoTileComponent, QuickActionTileComponent, ShoppingTileComponent, MatButtonModule, TranslocoPipe],
+  imports: [DateTimeTileComponent, WeatherTileComponent, AirQualityTileComponent, NoteTileComponent, MessageTileComponent, HashtagTileComponent, RelationTileComponent, ImageTileComponent, FileTileComponent, ExperienceTileComponent, WikipediaTileComponent, TextTileComponent, MultitextTileComponent, AnniversaryTileComponent, MigraineTileComponent, PollutionTileComponent, TodoTileComponent, QuickActionTileComponent, ShoppingTileComponent, MatButtonModule, TranslocoPipe],
   templateUrl: './tile-list.component.html',
   styleUrl: './tile-list.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -59,6 +60,7 @@ export class TileListComponent {
     'contactPlaces',
     'image',
     'custom-experience',
+    'custom-wikipedia',
     'custom-text',
     'custom-multitext',
     'custom-date',

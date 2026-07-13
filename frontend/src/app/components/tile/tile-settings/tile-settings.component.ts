@@ -121,6 +121,7 @@ export class TileSettingsComponent {
     'custom-quickaction': 'common.tileTypes.quickActions',
     'custom-file': 'common.tileTypes.files',
     'custom-experience': 'common.tileTypes.experiences',
+    'custom-wikipedia': 'common.tileTypes.wikipedia',
     'custom-migraine': 'common.tileTypes.migraine',
     'custom-pollution': 'common.tileTypes.pollution'
   };

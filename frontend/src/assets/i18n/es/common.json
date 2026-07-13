@@ -720,6 +720,7 @@
       "quickActions": "Acciones rápidas",
       "files": "Archivos",
       "experiences": "Experiencias",
+      "wikipedia": "Artículos de Wikipedia",
       "migraine": "Cambio meteorológico",
       "pollution": "Contaminación"
     },
@@ -749,6 +750,11 @@
         "title": "Experiencias",
         "empty": "Todavía no hay experiencias.",
         "add": "Agregar experiencia"
+      },
+      "wikipedia": {
+        "title": "Artículos de Wikipedia",
+        "empty": "No se encontraron artículos para este lugar.",
+        "consentRequired": "Activa el contenido de Wikipedia para verlo."
       },
       "messages": {
         "title": "Mensajes públicos",
