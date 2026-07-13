@@ -8,9 +8,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { catchError, forkJoin, map, of, startWith, switchMap } from 'rxjs';
+import { DisplayMessageConfig } from '../../../interfaces/display-message-config';
 import { WikipediaArticle, WikipediaImageAttribution } from '../../../interfaces/wikipedia';
 import { Location } from '../../../interfaces/location';
 import { WikipediaService } from '../../../services/wikipedia.service';
+import { DisplayMessage } from '../display-message/display-message.component';
 import { SearchSettingsMapPreviewComponent } from '../search-settings/search-settings-map-preview.component';
 import { WikipediaListComponent } from '../../wikipedia-list/wikipedia-list.component';
 
@@ -70,6 +72,9 @@ export class WikipediaSearchComponent {
         this.results.set(articles);
         this.loading.set(false);
         this.hasSearched.set(true);
+        if (articles.length === 0) {
+          this.showNoResultsMessage();
+        }
       },
       error: () => {
         this.results.set([]);
@@ -126,6 +131,29 @@ export class WikipediaSearchComponent {
   getImageCreator(attribution: WikipediaImageAttribution): string {
     const value = attribution.creator || attribution.credit || '';
     return /^https?:\/\//iu.test(value) ? '' : value;
+  }
+
+  private showNoResultsMessage(): void {
+    const config: DisplayMessageConfig = {
+      showAlways: true,
+      title: this.transloco.translate('common.wikipedia.title'),
+      image: '',
+      icon: 'info',
+      message: this.transloco.translate('common.wikipedia.noGeocodedResults'),
+      button: '',
+      delay: 1500,
+      showSpinner: false,
+      autoclose: true
+    };
+    this.dialog.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: config,
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: false,
+      autoFocus: false
+    });
   }
 
   private resolveAttribution(article: WikipediaArticle, language: string) {
