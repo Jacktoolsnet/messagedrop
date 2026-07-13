@@ -150,6 +150,7 @@
       "airQuality": "Luftqualität",
       "searchPlace": "Ort suchen",
       "searchExperiences": "Erlebnisse suchen",
+      "searchWikipedia": "Wikipediaartikel suchen",
       "searchHashtags": "Hashtags suchen",
       "secretDrop": "GeheimnisDrop",
       "mySecretDrops": "Meine GeheimnisDrops",
@@ -1534,6 +1535,9 @@
     },
     "wikipedia": {
       "title": "Wikipedia-Artikel",
+      "search": "Wikipediaartikel suchen",
+      "searchPlaceholder": "Suchbegriff eingeben",
+      "noGeocodedResults": "Keine Artikel mit Kartenposition gefunden.",
       "readArticle": "Auf Wikipedia lesen",
       "navigate": "Navigation mit Google Maps starten",
       "jumpToPin": "Pinnadel auf der Karte anzeigen",

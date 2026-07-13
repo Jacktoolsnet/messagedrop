@@ -149,6 +149,7 @@
       "airQuality": "Calidad del aire",
       "searchPlace": "Buscar un lugar",
       "searchExperiences": "Buscar experiencias",
+      "searchWikipedia": "Buscar artículos de Wikipedia",
       "searchHashtags": "Buscar hashtags",
       "secretDrop": "SecretDrop",
       "mySecretDrops": "Mis SecretDrops",
@@ -1533,6 +1534,9 @@
     },
     "wikipedia": {
       "title": "Artículos de Wikipedia",
+      "search": "Buscar artículos de Wikipedia",
+      "searchPlaceholder": "Introduce un término de búsqueda",
+      "noGeocodedResults": "No se encontraron artículos con ubicación en el mapa.",
       "readArticle": "Leer en Wikipedia",
       "navigate": "Iniciar navegación con Google Maps",
       "jumpToPin": "Mostrar el marcador en el mapa",

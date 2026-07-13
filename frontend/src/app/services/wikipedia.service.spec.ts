@@ -43,6 +43,16 @@ describe('WikipediaService', () => {
     request.flush(null);
   });
 
+  it('searches Wikipedia with a normalized language and a bounded result count', () => {
+    service.search({ term: '  Van Gogh  ', language: 'de-DE' }).subscribe();
+
+    const request = httpTesting.expectOne(`${environment.apiUrl}/wikipedia/search`);
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual({ term: 'Van Gogh', language: 'de', limit: 10 });
+    expect(request.request.headers.get('x-skip-ui')).toBe('true');
+    request.flush({ status: 200, language: 'de', articles: [], cache: 'miss' });
+  });
+
   it('requests attribution silently with the image title', () => {
     service.getAttribution({
       pageId: 8159759,

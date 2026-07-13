@@ -76,3 +76,16 @@ export interface WikipediaNearbyRequest extends WikipediaViewport {
   language: string;
   limit?: number;
 }
+
+export interface WikipediaKeywordSearchRequest {
+  term: string;
+  language: string;
+  limit?: number;
+}
+
+export interface WikipediaKeywordSearchResponse {
+  status: number;
+  language: string;
+  articles: WikipediaArticle[];
+  cache: 'hit' | 'miss';
+}

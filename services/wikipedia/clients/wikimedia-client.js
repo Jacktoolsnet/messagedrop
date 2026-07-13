@@ -156,6 +156,49 @@ async function requestTile(language, bounds) {
   return Array.from(articles.values()).slice(0, resultLimit);
 }
 
+async function requestSearch(language, term, limit) {
+  const response = await wikipediaGet(`https://${language}.wikipedia.org/w/api.php`, {
+    params: {
+      action: 'query', format: 'json', formatversion: 2, maxlag: 5,
+      generator: 'search', gsrsearch: term, gsrnamespace: 0, gsrlimit: limit,
+      prop: 'coordinates|pageimages|extracts|pageterms|info', coprimary: 'primary',
+      piprop: 'thumbnail|name', pithumbsize: Number(process.env.WIKIPEDIA_THUMBNAIL_SIZE || 240),
+      exintro: 1, explaintext: 1, exlimit: 'max', exchars: Number(process.env.WIKIPEDIA_EXTRACT_CHARS || 280),
+      wbptterms: 'description', inprop: 'url'
+    },
+    timeout: Number(process.env.WIKIPEDIA_UPSTREAM_TIMEOUT_MS || 10000),
+    headers: headers()
+  });
+  return (response.data?.query?.pages || [])
+    .map((page) => {
+      const coordinates = page.coordinates?.[0];
+      const thumbnailUrl = safeHttpsUrl(page.thumbnail?.source);
+      return {
+        index: Number(page.index) || Number.MAX_SAFE_INTEGER,
+        pageId: page.pageid,
+        title: page.title,
+        latitude: coordinates?.lat,
+        longitude: coordinates?.lon,
+        summary: page.extract || page.terms?.description?.[0] || '',
+        thumbnail: thumbnailUrl ? { url: thumbnailUrl, width: page.thumbnail.width, height: page.thumbnail.height } : null,
+        imageTitle: page.pageimage || null,
+        articleUrl: safeHttpsUrl(page.fullurl, `https://${language}.wikipedia.org/?curid=${page.pageid}`)
+      };
+    })
+    .filter((article) => Number.isFinite(article.latitude) && Number.isFinite(article.longitude))
+    .sort((left, right) => left.index - right.index)
+    .map((article) => ({
+      pageId: article.pageId,
+      title: article.title,
+      latitude: article.latitude,
+      longitude: article.longitude,
+      summary: article.summary,
+      thumbnail: article.thumbnail,
+      imageTitle: article.imageTitle,
+      articleUrl: article.articleUrl
+    }));
+}
+
 function stripHtml(value) {
   return String(value || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 }
@@ -349,6 +392,11 @@ function fetchTile(language, cacheKey, bounds) {
   return enqueue(language, key, () => requestTile(language, bounds));
 }
 
+function searchArticles(language, cacheKey, term, limit) {
+  const key = `${language}:search:${cacheKey}`;
+  return enqueue(language, key, () => requestSearch(language, term, limit));
+}
+
 function getMetrics() {
   return {
     ...metrics,
@@ -358,4 +406,12 @@ function getMetrics() {
   };
 }
 
-module.exports = { fetchTile, fetchAttribution, getMetrics, safeHttpsUrl, parseRetryAfterMs, normalizeCreator };
+module.exports = {
+  fetchTile,
+  fetchAttribution,
+  searchArticles,
+  getMetrics,
+  safeHttpsUrl,
+  parseRetryAfterMs,
+  normalizeCreator
+};

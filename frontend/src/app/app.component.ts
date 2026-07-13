@@ -55,6 +55,7 @@ import { NominatimSearchComponent } from './components/utils/nominatim-search/no
 import { SearchSettingsComponent } from './components/utils/search-settings/search-settings.component';
 import { WeatherComponent } from './components/weather/weather.component';
 import { WikipediaListComponent } from './components/wikipedia-list/wikipedia-list.component';
+import { WikipediaSearchComponent } from './components/utils/wikipedia-search/wikipedia-search.component';
 import { GetGeoStatisticResponse } from './interfaces/get-geo-statistic-response';
 import { Contact } from './interfaces/contact';
 import { LocalDocument } from './interfaces/local-document';
@@ -3172,6 +3173,44 @@ export class AppComponent implements OnInit {
     dialogRef.afterClosed().subscribe(() => {
       subscription.unsubscribe();
     });
+  }
+
+  showWikipediaSearchDialog(): void {
+    if (!this.appService.getAppSettings().enableWikipediaContent) {
+      const settingsRef = this.dialog.open(ExternalContentComponent, {
+        data: { appSettings: this.appService.getAppSettings(), visiblePlatforms: ['wikipedia'] },
+        width: 'min(440px, 90vw)',
+        maxWidth: '90vw',
+        maxHeight: '90vh',
+        autoFocus: false,
+        backdropClass: 'dialog-backdrop'
+      });
+      settingsRef.afterClosed().subscribe(() => {
+        if (this.appService.getAppSettings().enableWikipediaContent) this.showWikipediaSearchDialog();
+      });
+      return;
+    }
+
+    const dialogRef = this.dialog.open(WikipediaSearchComponent, {
+      closeOnNavigation: true,
+      minWidth: 'min(450px, 95vw)',
+      width: '90vw',
+      maxWidth: '90vw',
+      height: '90vh',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      autoFocus: false
+    });
+    const subscription = dialogRef.componentInstance.selected.subscribe((article) => {
+      dialogRef.close();
+      this.mapService.flyToWithZoom({
+        latitude: article.latitude,
+        longitude: article.longitude,
+        plusCode: this.geolocationService.getPlusCode(article.latitude, article.longitude)
+      }, Math.max(18, this.mapService.getMapZoom()));
+    });
+    dialogRef.afterClosed().subscribe(() => subscription.unsubscribe());
   }
 
   showHashtagSearchDialog(): void {

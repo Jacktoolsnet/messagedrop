@@ -1,0 +1,80 @@
+<mat-dialog-content class="wikipedia-search-content">
+  <div class="search-bar">
+    <input type="search" enterkeyhint="search" [formControl]="term" (keyup.enter)="search()"
+      [placeholder]="'common.wikipedia.searchPlaceholder' | transloco" />
+    <button type="button" class="search-button" (click)="search()" [disabled]="!canSearch()"
+      [attr.aria-label]="'common.wikipedia.search' | transloco">
+      <mat-icon>search</mat-icon>
+    </button>
+  </div>
+
+  <div class="wikipedia-search-scroll">
+    @if (loading()) {
+      <div class="loading"><mat-spinner diameter="42"></mat-spinner></div>
+    } @else if (hasSearched() && results().length === 0) {
+      <div class="empty-state">
+        <mat-icon>location_off</mat-icon>
+        <p>{{ 'common.wikipedia.noGeocodedResults' | transloco }}</p>
+      </div>
+    } @else if (results().length > 0) {
+      <section class="results-panel">
+        @if (viewMode() === 'map') {
+          <app-search-settings-map-preview class="map-preview-full" [center]="worldCenter" [zoom]="3"
+            [markers]="mapMarkers()" [fitMarkers]="true" [fitMaxZoom]="16" [interactive]="true"
+            [markerIconUrl]="'assets/markers/wikipedia-marker.svg'" (markerClick)="onMarkerClick($event)">
+          </app-search-settings-map-preview>
+        } @else {
+          <div class="results" role="list">
+            @for (article of results(); track article.pageId) {
+              <mat-card class="article-tile" role="listitem" (click)="openDetails(article)">
+                <div class="tile-header" [style.--header-image]="article.thumbnail && article.resolvedAttribution?.image?.resolved ? 'url(&quot;' + article.thumbnail.url + '&quot;)' : 'url(&quot;assets/markers/wikipedia-marker.svg&quot;)'">
+                  <div class="identity-badge">
+                    @if (article.thumbnail && article.resolvedAttribution?.image?.resolved) {
+                      <img class="avatar" [src]="article.thumbnail.url" [alt]="article.title" loading="lazy" />
+                    } @else {
+                      <mat-icon>menu_book</mat-icon>
+                    }
+                    <span class="name">{{ article.title }}</span>
+                  </div>
+                  <div class="source-badges">
+                    @if (article.resolvedAttribution?.article; as attribution) {
+                      <a class="source-badge" [href]="attribution.licenseUrl" target="_blank" rel="noopener noreferrer" (click)="$event.stopPropagation()">{{ attribution.license }}</a>
+                    }
+                    @if (article.resolvedAttribution?.image?.resolved && article.resolvedAttribution?.image; as imageAttribution) {
+                      @if (imageAttribution.attributionRequired !== false) {
+                        <a class="source-badge" [href]="imageAttribution.sourceUrl" target="_blank" rel="noopener noreferrer" (click)="$event.stopPropagation()">
+                          {{ 'common.wikipedia.imageCreator' | transloco }}@if (getImageCreator(imageAttribution); as creator) {: {{ creator }}}
+                        </a>
+                      }
+                      @if (imageAttribution.license) {
+                        <a class="source-badge" [href]="getImageLicenseUrl(imageAttribution)" target="_blank" rel="noopener noreferrer" (click)="$event.stopPropagation()">{{ imageAttribution.license }}</a>
+                      }
+                    }
+                  </div>
+                </div>
+                <mat-card-content class="article-content">
+                  <h3>{{ article.title }}</h3>
+                  @if (article.summary) { <p>{{ article.summary }}</p> }
+                </mat-card-content>
+                <mat-card-actions class="tile-actions">
+                  <button mat-mini-fab color="secondary" type="button" (click)="openNavigation(article, $event)" [attr.aria-label]="'common.wikipedia.navigate' | transloco"><mat-icon>directions</mat-icon></button>
+                  <button mat-mini-fab color="secondary" type="button" (click)="jumpToPin(article, $event)" [attr.aria-label]="'common.wikipedia.jumpToPin' | transloco"><mat-icon>my_location</mat-icon></button>
+                  <span class="actions-spacer"></span>
+                  <button mat-mini-fab color="primary" type="button" (click)="openWikipedia(article, $event)" [attr.aria-label]="'common.wikipedia.readArticle' | transloco"><mat-icon>open_in_new</mat-icon></button>
+                </mat-card-actions>
+              </mat-card>
+            }
+          </div>
+        }
+      </section>
+    }
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-dialog-close mat-icon-button [attr.aria-label]="'common.actions.abort' | transloco"><mat-icon>close</mat-icon></button>
+  <button mat-icon-button type="button" (click)="toggleViewMode()" [disabled]="results().length === 0"
+    [attr.aria-label]="viewMode() === 'list' ? ('common.location.switchToMap' | transloco) : ('common.location.switchToList' | transloco)">
+    <mat-icon>{{ viewMode() === 'list' ? 'map' : 'list' }}</mat-icon>
+  </button>
+</mat-dialog-actions>

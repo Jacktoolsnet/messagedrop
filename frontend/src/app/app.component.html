@@ -407,6 +407,10 @@
         <mat-icon>local_activity</mat-icon>
         <span>{{ 'common.menu.searchExperiences' | transloco }}</span>
     </button>
+    <button mat-menu-item (click)="showWikipediaSearchDialog()">
+        <mat-icon>menu_book</mat-icon>
+        <span>{{ 'common.menu.searchWikipedia' | transloco }}</span>
+    </button>
 </mat-menu>
 }
 <router-outlet />

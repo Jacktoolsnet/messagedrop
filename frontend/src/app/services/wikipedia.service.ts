@@ -2,7 +2,14 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { WikipediaArticle, WikipediaNearbyRequest, WikipediaNearbyResponse, WikipediaResolvedAttribution } from '../interfaces/wikipedia';
+import {
+  WikipediaArticle,
+  WikipediaKeywordSearchRequest,
+  WikipediaKeywordSearchResponse,
+  WikipediaNearbyRequest,
+  WikipediaNearbyResponse,
+  WikipediaResolvedAttribution
+} from '../interfaces/wikipedia';
 
 @Injectable({ providedIn: 'root' })
 export class WikipediaService {
@@ -32,6 +39,14 @@ export class WikipediaService {
     return this.http.post<void>(`${environment.apiUrl}/wikipedia/pin-click`, null, {
       headers: this.silentHeaders
     });
+  }
+
+  search(request: WikipediaKeywordSearchRequest): Observable<WikipediaKeywordSearchResponse> {
+    return this.http.post<WikipediaKeywordSearchResponse>(`${environment.apiUrl}/wikipedia/search`, {
+      term: request.term.trim(),
+      language: this.normalizeLanguage(request.language),
+      limit: request.limit ?? 10
+    }, { headers: this.silentHeaders });
   }
 
   normalizeLanguage(language: string): string {

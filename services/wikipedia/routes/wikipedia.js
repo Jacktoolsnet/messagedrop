@@ -1,6 +1,7 @@
 const express = require('express');
+const crypto = require('crypto');
 const tableCache = require('../db/tableWikipediaTileCache');
-const { fetchTile, fetchAttribution, getMetrics } = require('../clients/wikimedia-client');
+const { fetchTile, fetchAttribution, searchArticles, getMetrics } = require('../clients/wikimedia-client');
 const { MAX_LATITUDE, tilesForBounds } = require('../utils/tiles');
 const { requireServiceJwt } = require('../utils/serviceJwt');
 
@@ -127,6 +128,31 @@ router.get('/attribution', async (req, res, next) => {
     const attribution = await fetchAttribution(language, title, imageTitle, needsSummary);
     await dbSet(req.database.db, key, attribution);
     return res.status(200).json({ status: 200, ...attribution, cache: 'miss' });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.post('/search', async (req, res, next) => {
+  const term = String(req.body?.term || '').trim().replace(/\s+/gu, ' ');
+  const language = String(req.body?.language || 'de').toLowerCase();
+  const limit = Number(req.body?.limit || 10);
+  if (term.length < 2 || term.length > 120 || !/^[a-z]{2,3}$/.test(language)
+      || !Number.isInteger(limit) || limit < 1 || limit > 20) {
+    return res.status(400).json({ errorCode: 'BAD_REQUEST', message: 'invalid_wikipedia_search', error: 'invalid_wikipedia_search' });
+  }
+  try {
+    const normalizedTerm = term.toLocaleLowerCase(language);
+    const digest = crypto.createHash('sha256').update(`${language}:${normalizedTerm}:${limit}`).digest('hex');
+    const key = `search:${language}:${digest}:v1`;
+    const cached = await dbGet(req.database.db, key);
+    const ttl = Number(process.env.WIKIPEDIA_SEARCH_CACHE_MS || 24 * 60 * 60 * 1000);
+    if (cached && ageMs(cached) <= ttl) {
+      return res.status(200).json({ status: 200, language, articles: parsePayload(cached.payload), cache: 'hit' });
+    }
+    const articles = await searchArticles(language, digest, term, limit);
+    await dbSet(req.database.db, key, articles);
+    return res.status(200).json({ status: 200, language, articles, cache: 'miss' });
   } catch (error) {
     return next(error);
   }

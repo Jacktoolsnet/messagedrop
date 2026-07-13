@@ -29,6 +29,26 @@ router.post('/pin-click', [metric.count('wikipedia.pin.click', { when: 'always',
   res.sendStatus(204);
 });
 
+router.post('/search', [
+  express.json({ type: 'application/json', limit: '4kb' }),
+  metric.count('wikipedia.search', { when: 'always', timezone: 'utc', amount: 1 })
+], async (req, res, next) => {
+  if (!client) return next(apiError.serviceUnavailable());
+  try {
+    const token = await signServiceJwt({ audience: process.env.SERVICE_JWT_AUDIENCE_WIKIPEDIA || 'service.wikipedia' });
+    const upstream = await client.post('/search', req.body, {
+      headers: { Authorization: `Bearer ${token}`, 'x-request-id': req.traceId }
+    });
+    if (upstream.headers['retry-after']) res.set('Retry-After', upstream.headers['retry-after']);
+    return res.status(upstream.status).json(upstream.data);
+  } catch (error) {
+    if (!axios.isAxiosError(error)) return next(error);
+    const apiErr = apiError.fromStatus(error.code === 'ECONNABORTED' ? 504 : 502);
+    apiErr.detail = error.message;
+    return next(apiErr);
+  }
+});
+
 router.get('/nearby', [metric.count('wikipedia.nearby', { when: 'always', timezone: 'utc', amount: 1 })], async (req, res, next) => {
   if (!client) {
     const error = apiError.serviceUnavailable();
