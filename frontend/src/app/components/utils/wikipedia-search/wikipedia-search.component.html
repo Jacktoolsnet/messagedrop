@@ -9,21 +9,31 @@
   </div>
 
   <div class="wikipedia-search-scroll">
-    @if (loading()) {
-      <div class="loading"><mat-spinner diameter="42"></mat-spinner></div>
-    } @else if (hasSearched() && results().length === 0) {
-      <div class="empty-state">
-        <mat-icon>location_off</mat-icon>
-        <p>{{ 'common.wikipedia.noGeocodedResults' | transloco }}</p>
-      </div>
-    } @else if (results().length > 0) {
-      <section class="results-panel">
-        @if (viewMode() === 'map') {
+    <section class="results-panel">
+      @if (viewMode() === 'map') {
+        <div class="map-shell">
           <app-search-settings-map-preview class="map-preview-full" [center]="worldCenter" [zoom]="3"
             [markers]="mapMarkers()" [fitMarkers]="true" [fitMaxZoom]="16" [interactive]="true"
             [markerIconUrl]="'assets/markers/wikipedia-marker.svg'" (markerClick)="onMarkerClick($event)">
           </app-search-settings-map-preview>
-        } @else {
+          @if (loading()) {
+            <div class="map-status"><mat-spinner diameter="42"></mat-spinner></div>
+          } @else if (hasSearched() && results().length === 0) {
+            <div class="map-status empty-state">
+              <mat-icon>location_off</mat-icon>
+              <p>{{ 'common.wikipedia.noGeocodedResults' | transloco }}</p>
+            </div>
+          }
+        </div>
+      } @else {
+        @if (loading()) {
+          <div class="loading"><mat-spinner diameter="42"></mat-spinner></div>
+        } @else if (hasSearched() && results().length === 0) {
+          <div class="empty-state">
+            <mat-icon>location_off</mat-icon>
+            <p>{{ 'common.wikipedia.noGeocodedResults' | transloco }}</p>
+          </div>
+        } @else if (results().length > 0) {
           <div class="results" role="list">
             @for (article of results(); track article.pageId) {
               <mat-card class="article-tile" role="listitem" (click)="openDetails(article)">
@@ -66,8 +76,8 @@
             }
           </div>
         }
-      </section>
-    }
+      }
+    </section>
   </div>
 </mat-dialog-content>
 
