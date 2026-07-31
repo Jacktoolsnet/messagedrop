@@ -466,8 +466,9 @@ export class NetworkService {
 
   private getOfflineDialogLanguage(): OfflineDialogLanguage {
     const candidates = [
-      typeof document !== 'undefined' ? document.documentElement.lang : '',
-      typeof navigator !== 'undefined' ? navigator.language : ''
+      this.readStoredLanguageMode(),
+      typeof navigator !== 'undefined' ? navigator.language : '',
+      typeof document !== 'undefined' ? document.documentElement.lang : ''
     ];
     for (const candidate of candidates) {
       const language = candidate?.trim().toLowerCase().split(/[-_]/u)[0];
@@ -476,6 +477,18 @@ export class NetworkService {
       }
     }
     return 'en';
+  }
+
+  private readStoredLanguageMode(): string {
+    if (typeof localStorage === 'undefined') {
+      return '';
+    }
+    try {
+      const mode = localStorage.getItem('messagedrop.language') ?? '';
+      return mode === 'system' ? '' : mode;
+    } catch {
+      return '';
+    }
   }
 
   getErrorTitle(status: number): string {

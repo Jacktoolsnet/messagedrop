@@ -52,8 +52,8 @@ describe('NetworkService', () => {
   });
 
   it('uses readable fallback copy when translations are not loaded yet', () => {
-    const previousLanguage = document.documentElement.lang;
-    document.documentElement.lang = 'de';
+    const previousLanguageMode = localStorage.getItem('messagedrop.language');
+    localStorage.setItem('messagedrop.language', 'de');
 
     (service as unknown as { openBrowserOfflineDialog: () => void }).openBrowserOfflineDialog();
 
@@ -62,6 +62,10 @@ describe('NetworkService', () => {
     expect(data?.title).toBe('Keine Internetverbindung');
     expect(data?.message).toBe('Bitte überprüfe deine Internetverbindung.');
     expect(data?.button).toBe('OK');
-    document.documentElement.lang = previousLanguage;
+    if (previousLanguageMode === null) {
+      localStorage.removeItem('messagedrop.language');
+    } else {
+      localStorage.setItem('messagedrop.language', previousLanguageMode);
+    }
   });
 });
