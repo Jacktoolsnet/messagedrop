@@ -137,6 +137,7 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
                                     "onActionClick": {
                                         "default": {
                                             "operation": "focusLastFocusedOrOpen",
+                                            "url": `/?contactNotification=${encodeURIComponent(row.id)}`,
                                         }
                                     },
                                 }

@@ -252,8 +252,11 @@ export class AppComponent implements OnInit {
   private sharedContentNoticeOpen = false;
   private sharedContentDialogOpen = false;
   private qStageWarningDialogOpen = false;
-  private readonly pendingContactNotificationAction = signal<NotificationAction | null>(null);
+  private readonly pendingContactNotificationAction = signal<NotificationAction | null>(
+    this.readPendingContactNotificationAction()
+  );
   private openingContactNotification = false;
+  private contactNotificationLoginRequested = false;
   private readonly pendingPublicMessageUuid = signal<string | null>(this.readPendingPublicMessageUuid());
   private readonly pendingSharedLocation = signal<Location | null>(this.readPendingSharedLocation());
   private initialPublicMessagesRequested = false;
@@ -265,6 +268,9 @@ export class AppComponent implements OnInit {
   private myExperienceLocationsInView: { result: ExperienceResult; location: Location }[] = [];
 
   constructor() {
+    if (this.pendingContactNotificationAction()) {
+      this.clearPendingContactNotificationFromUrl();
+    }
     this.setupExitBackupPrompt();
     this.destroyRef.onDestroy(() => {
       this.usageProtectionService.stopTracking();
@@ -400,6 +406,7 @@ export class AppComponent implements OnInit {
 
     effect(() => {
       const notificationAction = this.pendingContactNotificationAction();
+      this.appService.settingsSet();
       this.userService.userSet();
       this.contactService.contactsSet();
       if (!notificationAction) {
@@ -1016,8 +1023,8 @@ export class AppComponent implements OnInit {
     void this.systemNotificationService.refreshUnreadCount();
 
     if (notificationAction.type === 'contact') {
+      this.contactNotificationLoginRequested = false;
       this.pendingContactNotificationAction.set(notificationAction);
-      void this.openPendingContactNotification(notificationAction);
       return;
     }
 
@@ -1036,6 +1043,39 @@ export class AppComponent implements OnInit {
       return;
     }
 
+    if (!this.appService.isConsentCompleted()) {
+      return;
+    }
+
+    if (!this.userService.isReady()) {
+      if (!this.contactNotificationLoginRequested && !this.isCheckPinDialogOpen()) {
+        this.contactNotificationLoginRequested = true;
+        void this.userService.loginWithBackend(() => {
+          this.contactNotificationLoginRequested = false;
+          const pendingAction = this.pendingContactNotificationAction();
+          if (pendingAction) {
+            void this.openPendingContactNotification(pendingAction);
+          }
+        });
+      }
+      return;
+    }
+
+    if (!this.userService.hasJwt()) {
+      if (!this.contactNotificationLoginRequested && !this.isCheckPinDialogOpen()) {
+        this.contactNotificationLoginRequested = true;
+        void this.userService.connectToBackend(() => {
+          this.contactNotificationLoginRequested = false;
+          const pendingAction = this.pendingContactNotificationAction();
+          if (pendingAction) {
+            void this.openPendingContactNotification(pendingAction);
+          }
+        });
+      }
+      return;
+    }
+
+    this.contactNotificationLoginRequested = false;
     const contactId = typeof action.id === 'string' ? action.id.trim() : '';
     const contactUserId = typeof action.contactUserId === 'string' ? action.contactUserId.trim() : '';
     if (!contactId && !contactUserId) {
@@ -1044,12 +1084,8 @@ export class AppComponent implements OnInit {
       return;
     }
 
-    if (!this.appService.isConsentCompleted() || !this.userService.hasJwt()) {
-      return;
-    }
-
     if (!this.contactService.isReady()) {
-      this.contactService.initContacts();
+      this.contactService.initContacts(true);
       return;
     }
 
@@ -1066,6 +1102,10 @@ export class AppComponent implements OnInit {
     } finally {
       this.openingContactNotification = false;
     }
+  }
+
+  private isCheckPinDialogOpen(): boolean {
+    return this.dialog.openDialogs.some((dialogRef) => dialogRef.componentInstance instanceof CheckPinComponent);
   }
 
   private async handleMessageNotification(action: NotificationAction): Promise<void> {
@@ -1198,6 +1238,38 @@ export class AppComponent implements OnInit {
       return messageUuid || null;
     } catch {
       return null;
+    }
+  }
+
+  private readPendingContactNotificationAction(): NotificationAction | null {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+
+    try {
+      const url = new URL(window.location.href);
+      const contactId = url.searchParams.get('contactNotification')?.trim() ?? '';
+      return contactId ? { type: 'contact', id: contactId } : null;
+    } catch {
+      return null;
+    }
+  }
+
+  private clearPendingContactNotificationFromUrl(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    try {
+      const url = new URL(window.location.href);
+      if (!url.searchParams.has('contactNotification')) {
+        return;
+      }
+      url.searchParams.delete('contactNotification');
+      const nextUrl = `${url.pathname}${url.search}${url.hash}`;
+      window.history.replaceState(this.myHistory, '', nextUrl || '/');
+    } catch {
+      // ignore malformed URL state
     }
   }
 
