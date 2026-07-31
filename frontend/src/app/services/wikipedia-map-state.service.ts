@@ -6,7 +6,7 @@ import { WikipediaArticle, WikipediaAttribution, WikipediaViewport } from '../in
 import { WikipediaService } from './wikipedia.service';
 
 const MIN_ZOOM = 14;
-const REQUEST_DEBOUNCE_MS = 400;
+const REQUEST_DEBOUNCE_MS = 200;
 
 @Injectable({ providedIn: 'root' })
 export class WikipediaMapStateService {
@@ -81,6 +81,15 @@ export class WikipediaMapStateService {
   }
 
   setViewport(viewport: WikipediaViewport): void {
+    const current = this.viewportState();
+    if (current
+      && current.north === viewport.north
+      && current.south === viewport.south
+      && current.east === viewport.east
+      && current.west === viewport.west
+      && current.zoom === viewport.zoom) {
+      return;
+    }
     this.viewportState.set(viewport);
   }
 

@@ -355,6 +355,17 @@ export class AppComponent implements OnInit {
     });
 
     effect(() => {
+      const mapSetTrigger = this.mapService.mapSet();
+      this.networkService.browserOnline();
+      this.networkService.backendOnline();
+      this.networkService.maintenanceInfo();
+      if (mapSetTrigger < 2) {
+        return;
+      }
+      untracked(() => this.syncWikipediaMapState());
+    });
+
+    effect(() => {
       this.appService.settingsSet();
       if (!this.appService.isSettingsReady() || !this.appService.isConsentCompleted()) {
         this.usageProtectionService.stopTracking();
@@ -1638,11 +1649,6 @@ export class AppComponent implements OnInit {
     const isImagesEnabled = settings.privateImages.enabled;
     const isDocumentsEnabled = settings.privateDocuments.enabled;
     const isMyExperiencesEnabled = settings.myExperiences.enabled;
-    const canSearchWikipedia = settings.wikipedia.enabled
-      && zoom >= settings.wikipedia.minZoom
-      && this.networkService.browserOnline()
-      && this.networkService.backendOnline()
-      && !this.maintenanceActive();
     const canSearchMessages = isMessagesEnabled && zoom >= settings.publicMessages.minZoom;
     const canSearchSecretDrops = isSecretDropsEnabled && zoom >= settings.secretDrops.minZoom;
     const canSearchNotes = isNotesEnabled && zoom >= settings.privateNotes.minZoom;
@@ -1650,6 +1656,12 @@ export class AppComponent implements OnInit {
     const canSearchDocuments = isDocumentsEnabled && zoom >= settings.privateDocuments.minZoom;
     const canSearchMyExperiences = isMyExperiencesEnabled && zoom >= settings.myExperiences.minZoom;
     const canSearchVisibleSecretDrops = canSearchSecretDrops && this.networkService.browserOnline() && this.networkService.backendOnline() && !this.maintenanceActive();
+
+    // Start the viewport-based Wikipedia request before slower local and
+    // backend searches. Otherwise an older async map update could overwrite a
+    // newer viewport or delay Wikipedia until another map interaction.
+    this.syncWikipediaMapState(settings, zoom);
+
     // notes from local device
     if (this.userService.isReady()) {
       if (canSearchNotes) {
@@ -1685,20 +1697,31 @@ export class AppComponent implements OnInit {
       this.secretDropService.visibleSecretDropsSignal.set([]);
     }
 
-    const wikipediaBounds = this.mapService.getVisibleMapBoundingBox();
-    this.wikipediaMapState.setLanguage(this.languageService.effectiveLanguage());
-    this.wikipediaMapState.setViewport({
-      north: wikipediaBounds.latMax,
-      south: wikipediaBounds.latMin,
-      east: wikipediaBounds.lonMax,
-      west: wikipediaBounds.lonMin,
-      zoom
-    });
-    this.wikipediaMapState.setEnabled(canSearchWikipedia);
-
     await this.updateExperiencePins(settings, ignoreSearchSettings, zoom);
     await this.updateMyExperiencePins(settings, ignoreSearchSettings, zoom, canSearchMyExperiences);
     this.createMarkerLocations();
+  }
+
+  private syncWikipediaMapState(
+    settings = this.normalizeSearchSettings(this.searchSettings),
+    zoom = this.mapService.getMapZoom()
+  ): void {
+    const canSearchWikipedia = settings.wikipedia.enabled
+      && zoom >= settings.wikipedia.minZoom
+      && this.networkService.browserOnline()
+      && this.networkService.backendOnline()
+      && !this.maintenanceActive();
+    const bounds = this.mapService.getVisibleMapBoundingBox();
+
+    this.wikipediaMapState.setLanguage(this.languageService.effectiveLanguage());
+    this.wikipediaMapState.setViewport({
+      north: bounds.latMax,
+      south: bounds.latMin,
+      east: bounds.lonMax,
+      west: bounds.lonMin,
+      zoom
+    });
+    this.wikipediaMapState.setEnabled(canSearchWikipedia);
   }
 
   private async loadSearchSettings(): Promise<void> {
