@@ -87,10 +87,6 @@
       </div>
 
       @if (speechService.supported()) {
-        <p class="speech-settings-note">
-          {{ 'settings.speech.note' | transloco }}
-        </p>
-
         <mat-slide-toggle color="primary" [checked]="appSettings.speech.enabled"
           (change)="setSpeechEnabled($event.checked)">
           {{ 'settings.speech.toggle' | transloco }}
@@ -232,9 +228,6 @@
           <p class="storage-persistence-subtitle">{{ 'settings.storage.description' | transloco }}</p>
         </div>
       </div>
-      <p class="storage-persistence-note">
-        {{ 'settings.storage.note' | transloco }}
-      </p>
       <mat-slide-toggle color="primary" [checked]="appSettings.persistStorage"
           (change)="onStoragePersistenceToggle($event)" [disabled]="storagePersistenceBusy">
           {{ 'settings.storage.toggle' | transloco }}
@@ -258,9 +251,6 @@
           <p class="logging-settings-subtitle">{{ 'settings.logging.description' | transloco }}</p>
         </div>
       </div>
-      <p class="logging-settings-note">
-        {{ 'settings.logging.note' | transloco }}
-      </p>
       <mat-slide-toggle color="primary" [checked]="appSettings.diagnosticLogging"
         (change)="setDiagnosticLogging($event.checked)">
         {{ 'settings.logging.toggle' | transloco }}
@@ -274,9 +264,6 @@
           <p class="backup-exit-subtitle">{{ 'settings.backup.description' | transloco }}</p>
         </div>
       </div>
-      <p class="backup-exit-note">
-        {{ 'settings.backup.note' | transloco }}
-      </p>
       <mat-slide-toggle color="primary" [checked]="appSettings.backupOnExit"
         (change)="setBackupOnExit($event.checked)">
         {{ 'settings.backup.toggle' | transloco }}

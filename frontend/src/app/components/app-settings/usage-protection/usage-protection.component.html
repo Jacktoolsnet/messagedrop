@@ -5,10 +5,6 @@
 
 <mat-dialog-content class="content">
   <section class="usage-protection-tile">
-    <p class="usage-protection-note">
-      {{ 'settings.usageProtection.note' | transloco }}
-    </p>
-
     @if (needsUsageProtectionUnlock()) {
       <p class="usage-protection-pin-state">
         {{ 'settings.usageProtection.unlockRequired' | transloco }}

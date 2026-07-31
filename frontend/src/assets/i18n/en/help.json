@@ -508,15 +508,15 @@
       },
       "location": {
         "title": "Location on startup",
-        "desc": "Enables location detection when the app starts (only available when location permission is granted)."
+        "desc": "Enables location detection when the app starts if location permission has been granted. The location helps surface nearby content and is not continuously tracked. Processing preferably happens on the device; minimal data may be sent to our service only for a requested feature such as local weather. Permission can be revoked at any time."
       },
       "storage": {
         "title": "Request persistent storage",
-        "desc": "Requests persistent browser storage so local data is less likely to be cleared by the system."
+        "desc": "Requests persistent storage for IndexedDB data when supported by the browser. This makes local data less likely to be cleared automatically and is especially useful for offline use and large archives."
       },
       "speech": {
         "title": "Read aloud",
-        "desc": "Enables browser speech output, lets you prefer translated text, configure voice and speed, and play a sample preview."
+        "desc": "Enables the built-in speech synthesis of the browser and device, lets you prefer translated text, configure voice and speed, and play a sample preview. Available voices depend on the browser and operating system."
       },
       "pinFeedback": {
         "title": "PIN feedback",
@@ -528,11 +528,11 @@
       },
       "logging": {
         "title": "Diagnostic logging",
-        "desc": "Enables technical logs for analysis and troubleshooting."
+        "desc": "Enables anonymous error reports for analysis and troubleshooting. Only technical metadata is sent, and the setting can be changed at any time."
       },
       "backup": {
         "title": "Backup on exit",
-        "desc": "Creates a local backup automatically when leaving the app."
+        "desc": "Asks when leaving the app whether new changes should be saved in a local backup."
       },
       "version": {
         "title": "Version info",
@@ -557,8 +557,8 @@
     }
   },
   "usageProtectionLock": {
-    "title": "Usage protection lock",
-    "intro": "This screen appears when the daily usage limit is reached or when the app is outside the configured usage window.",
+    "title": "Usage protection",
+    "intro": "Use this feature to reduce screen time. You can set both the extension duration and how many extensions are allowed per day for self-managed and parental mode. The app is locked when the daily limit is reached or when it is used outside an allowed time window.",
     "items": {
       "dailyLimit": {
         "title": "Daily limit reached",

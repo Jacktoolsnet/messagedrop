@@ -508,15 +508,15 @@
       },
       "location": {
         "title": "Standort beim Start",
-        "desc": "Aktiviert die Standorterkennung beim App-Start (nur verfügbar, wenn Standortfreigabe erteilt wurde)."
+        "desc": "Aktiviert die Standorterkennung beim App-Start, wenn die Standortfreigabe erteilt wurde. Der Standort hilft, Inhalte in der Nähe zu zeigen, und wird nicht dauerhaft verfolgt. Die Verarbeitung erfolgt bevorzugt auf dem Gerät; minimale Daten können nur für die gewünschte Funktion, zum Beispiel lokales Wetter, an unseren Dienst gesendet werden. Die Berechtigung kann jederzeit entzogen werden."
       },
       "storage": {
         "title": "Dauerhaften Speicher anfragen",
-        "desc": "Fordert persistente Browser-Speicherung an, damit lokale Daten seltener durch das System bereinigt werden."
+        "desc": "Fordert, sofern vom Browser unterstützt, eine persistente Speicherung der IndexedDB-Daten an. Dadurch werden lokale Daten seltener automatisch bereinigt, was besonders für die Offline-Nutzung und große Archive hilfreich ist."
       },
       "speech": {
         "title": "Vorlesen",
-        "desc": "Aktiviert die Browser-Sprachausgabe, bevorzugt bei Bedarf übersetzten Text, konfiguriert Stimme und Sprechgeschwindigkeit und bietet eine Beispielwiedergabe."
+        "desc": "Aktiviert die eingebaute Sprachsynthese des Browsers und Geräts, bevorzugt bei Bedarf übersetzten Text, konfiguriert Stimme und Sprechgeschwindigkeit und bietet eine Beispielwiedergabe. Die verfügbaren Stimmen hängen von Browser und Betriebssystem ab."
       },
       "pinFeedback": {
         "title": "PIN-Feedback",
@@ -528,11 +528,11 @@
       },
       "logging": {
         "title": "Diagnose-Logging",
-        "desc": "Aktiviert technische Protokolle für Analyse und Fehlersuche."
+        "desc": "Aktiviert anonyme Fehlerberichte für Analyse und Fehlersuche. Es werden nur technische Metadaten gesendet; die Einstellung kann jederzeit geändert werden."
       },
       "backup": {
         "title": "Backup beim Beenden",
-        "desc": "Erstellt beim Verlassen der App automatisch ein lokales Backup."
+        "desc": "Fragt beim Verlassen der App, ob neue Änderungen in einem lokalen Backup gesichert werden sollen."
       },
       "version": {
         "title": "Versionsinfo",
@@ -557,8 +557,8 @@
     }
   },
   "usageProtectionLock": {
-    "title": "Nutzungszeit-Sperre",
-    "intro": "Dieser Bildschirm erscheint, wenn das tägliche Zeitlimit erreicht wurde oder wenn die App außerhalb des erlaubten Zeitfensters liegt.",
+    "title": "Nutzungszeit-Schutz",
+    "intro": "Mit dieser Funktion reduzierst du die Bildschirmzeit. Du kannst für Selbstmodus und Elternmodus sowohl die Dauer als auch die Anzahl der Verlängerungen pro Tag festlegen. Die App wird gesperrt, wenn das tägliche Zeitlimit erreicht wurde oder sie außerhalb eines erlaubten Zeitfensters verwendet wird.",
     "items": {
       "dailyLimit": {
         "title": "Tageslimit erreicht",

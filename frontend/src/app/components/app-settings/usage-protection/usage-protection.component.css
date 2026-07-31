@@ -24,7 +24,6 @@
   box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
 }
 
-.usage-protection-note,
 .usage-protection-pin-state {
   margin: 0;
   font-size: 0.9rem;

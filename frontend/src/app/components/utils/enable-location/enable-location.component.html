@@ -6,10 +6,6 @@
     </div>
 </div>
 
-<div class="platform-note">
-    {{ 'settings.location.note' | transloco }}
-</div>
-
 <mat-slide-toggle [checked]="enabled" (change)="onToggle($event.checked)"
     [attr.aria-label]="'settings.location.toggleAria' | transloco">
     {{ 'settings.location.toggle' | transloco }}

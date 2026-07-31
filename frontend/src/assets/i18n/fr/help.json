@@ -490,15 +490,15 @@
       },
       "location": {
         "title": "Position au démarrage",
-        "desc": "Active la détection de position au démarrage de l'app (disponible uniquement si l'autorisation de localisation est accordée)."
+        "desc": "Active la détection de position au démarrage si l’autorisation a été accordée. La position sert à afficher du contenu à proximité et n’est pas suivie en continu. Le traitement s’effectue de préférence sur l’appareil ; seules des données minimales peuvent être envoyées à notre service pour une fonction demandée, comme la météo locale. L’autorisation peut être retirée à tout moment."
       },
       "storage": {
         "title": "Demander un stockage persistant",
-        "desc": "Demande un stockage persistant du navigateur afin que les données locales soient moins souvent supprimées par le système."
+        "desc": "Demande un stockage persistant des données IndexedDB lorsque le navigateur le prend en charge. Les données locales risquent ainsi moins d’être supprimées automatiquement, ce qui est particulièrement utile hors ligne et pour les grandes archives."
       },
       "speech": {
         "title": "Lecture à voix haute",
-        "desc": "Active la voix du navigateur, permet de préférer le texte traduit, de régler la voix et la vitesse, et de lire un exemple."
+        "desc": "Active la synthèse vocale intégrée du navigateur et de l’appareil, permet de préférer le texte traduit, de régler la voix et la vitesse, et de lire un exemple. Les voix disponibles dépendent du navigateur et du système d’exploitation."
       },
       "pinFeedback": {
         "title": "Retour PIN",
@@ -510,11 +510,11 @@
       },
       "logging": {
         "title": "Journalisation de diagnostic",
-        "desc": "Active des journaux techniques pour l'analyse et le dépannage."
+        "desc": "Active des rapports d’erreurs anonymes pour l’analyse et le dépannage. Seules des métadonnées techniques sont envoyées et ce réglage peut être modifié à tout moment."
       },
       "backup": {
         "title": "Sauvegarde à la fermeture",
-        "desc": "Crée automatiquement une sauvegarde locale lorsque vous quittez l'app."
+        "desc": "Demande à la fermeture de l’app si les nouvelles modifications doivent être enregistrées dans une sauvegarde locale."
       },
       "version": {
         "title": "Informations de version",
@@ -539,8 +539,8 @@
     }
   },
   "usageProtectionLock": {
-    "title": "Verrouillage de protection d'usage",
-    "intro": "Cet écran apparaît lorsque la limite quotidienne est atteinte ou lorsque l'application est en dehors de la plage horaire autorisée.",
+    "title": "Protection d'usage",
+    "intro": "Utilisez cette fonction pour réduire le temps d'écran. Vous pouvez définir, pour les modes autonome et parental, la durée des extensions ainsi que leur nombre autorisé par jour. L'application se verrouille lorsque la limite quotidienne est atteinte ou lorsqu'elle est utilisée en dehors d'une plage horaire autorisée.",
     "items": {
       "dailyLimit": {
         "title": "Limite quotidienne atteinte",

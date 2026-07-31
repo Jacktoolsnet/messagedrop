@@ -490,15 +490,15 @@
       },
       "location": {
         "title": "Ubicación al iniciar",
-        "desc": "Activa la detección de ubicación al iniciar la app (solo disponible cuando se concede el permiso de ubicación)."
+        "desc": "Activa la detección de ubicación al iniciar la app si se ha concedido el permiso. La ubicación ayuda a mostrar contenido cercano y no se rastrea de forma continua. El procesamiento se realiza preferentemente en el dispositivo; solo pueden enviarse datos mínimos a nuestro servicio para una función solicitada, como el tiempo local. El permiso puede revocarse en cualquier momento."
       },
       "storage": {
         "title": "Solicitar almacenamiento persistente",
-        "desc": "Solicita almacenamiento persistente del navegador para que los datos locales se limpien con menos frecuencia por el sistema."
+        "desc": "Solicita almacenamiento persistente para los datos de IndexedDB cuando el navegador lo admite. Así es menos probable que los datos locales se eliminen automáticamente, lo que resulta especialmente útil para el uso sin conexión y los archivos grandes."
       },
       "speech": {
         "title": "Lectura en voz alta",
-        "desc": "Activa la voz del navegador, permite preferir texto traducido, configurar voz y velocidad, y reproducir una muestra."
+        "desc": "Activa la síntesis de voz integrada del navegador y del dispositivo, permite preferir texto traducido, configurar la voz y la velocidad, y reproducir una muestra. Las voces disponibles dependen del navegador y del sistema operativo."
       },
       "pinFeedback": {
         "title": "Retroalimentación del PIN",
@@ -510,11 +510,11 @@
       },
       "logging": {
         "title": "Registro de diagnóstico",
-        "desc": "Activa registros técnicos para análisis y solución de errores."
+        "desc": "Activa informes de errores anónimos para análisis y solución de problemas. Solo se envían metadatos técnicos y la opción puede cambiarse en cualquier momento."
       },
       "backup": {
         "title": "Copia al salir",
-        "desc": "Crea automáticamente una copia de seguridad local al salir de la app."
+        "desc": "Pregunta al salir de la app si los cambios nuevos deben guardarse en una copia de seguridad local."
       },
       "version": {
         "title": "Información de versión",
@@ -539,8 +539,8 @@
     }
   },
   "usageProtectionLock": {
-    "title": "Bloqueo por protección de uso",
-    "intro": "Esta pantalla aparece cuando se alcanza el límite diario de uso o cuando la app está fuera de la franja horaria permitida.",
+    "title": "Protección de uso",
+    "intro": "Usa esta función para reducir el tiempo de pantalla. Puedes definir tanto la duración como la cantidad de ampliaciones por día para el modo autónomo y el modo parental. La app se bloquea cuando se alcanza el límite diario o se utiliza fuera de una franja horaria permitida.",
     "items": {
       "dailyLimit": {
         "title": "Límite diario alcanzado",
