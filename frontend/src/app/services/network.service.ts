@@ -18,6 +18,32 @@ interface BackendHealthResponse {
   maintenance?: MaintenanceInfo | null;
 }
 
+const OFFLINE_DIALOG_FALLBACKS = {
+  de: {
+    title: 'Keine Internetverbindung',
+    message: 'Bitte überprüfe deine Internetverbindung.',
+    button: 'OK'
+  },
+  en: {
+    title: 'No internet connection',
+    message: 'Please check your internet connection.',
+    button: 'OK'
+  },
+  es: {
+    title: 'Sin conexión a internet',
+    message: 'Por favor, comprueba tu conexión a internet.',
+    button: 'OK'
+  },
+  fr: {
+    title: 'Pas de connexion Internet',
+    message: 'Veuillez vérifier votre connexion Internet.',
+    button: 'OK'
+  }
+} as const;
+
+type OfflineDialogLanguage = keyof typeof OFFLINE_DIALOG_FALLBACKS;
+type OfflineDialogCopyKey = keyof (typeof OFFLINE_DIALOG_FALLBACKS)['en'];
+
 @Injectable({
   providedIn: 'root'
 })
@@ -406,11 +432,11 @@ export class NetworkService {
       closeOnNavigation: false,
       data: {
         showAlways: true,
-        title: this.i18n.t('errors.offline.title'),
+        title: this.translateOfflineDialogText('errors.offline.title', 'title'),
         image: '',
         icon: 'wifi_off',
-        message: this.i18n.t('errors.offline.message'),
-        button: this.i18n.t('common.actions.ok'),
+        message: this.translateOfflineDialogText('errors.offline.message', 'message'),
+        button: this.translateOfflineDialogText('common.actions.ok', 'button'),
         delay: 4000,
         showSpinner: false,
         autoclose: true
@@ -427,6 +453,29 @@ export class NetworkService {
         this.networkDialogRef = undefined;
       }
     });
+  }
+
+  private translateOfflineDialogText(translationKey: string, copyKey: OfflineDialogCopyKey): string {
+    const translated = this.i18n.t(translationKey);
+    if (translated && translated !== translationKey) {
+      return translated;
+    }
+
+    return OFFLINE_DIALOG_FALLBACKS[this.getOfflineDialogLanguage()][copyKey];
+  }
+
+  private getOfflineDialogLanguage(): OfflineDialogLanguage {
+    const candidates = [
+      typeof document !== 'undefined' ? document.documentElement.lang : '',
+      typeof navigator !== 'undefined' ? navigator.language : ''
+    ];
+    for (const candidate of candidates) {
+      const language = candidate?.trim().toLowerCase().split(/[-_]/u)[0];
+      if (language && language in OFFLINE_DIALOG_FALLBACKS) {
+        return language as OfflineDialogLanguage;
+      }
+    }
+    return 'en';
   }
 
   getErrorTitle(status: number): string {
