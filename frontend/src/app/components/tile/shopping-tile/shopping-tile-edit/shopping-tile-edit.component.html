@@ -6,13 +6,14 @@
       @for (category of categories(); track category.id) {
         <article class="category-tile" [style.--category-tile-bg]="categoryBackground(category)"
           [style.--category-tile-bg-opacity]="categoryBackgroundOpacity(category)">
-          <div class="category-image">
+          <button class="category-image" type="button" (click)="manageProducts(category)"
+            [attr.aria-label]="'common.tiles.shopping.manageProductsAria' | transloco:{ name: category.name }">
             @if (category.image) {
               <img [src]="category.image" [alt]="category.name" />
             } @else {
               <mat-icon>category</mat-icon>
             }
-          </div>
+          </button>
           <div class="category-info">
             <h3>{{ category.name }}</h3>
             <span>{{ 'common.tiles.shopping.outstandingProducts' | transloco:{ count: outstandingCount(category) } }}</span>

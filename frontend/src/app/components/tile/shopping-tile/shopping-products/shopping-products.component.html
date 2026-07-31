@@ -8,11 +8,14 @@
       <div class="product-grid">
         @for (product of products(); track product.id) {
           <article class="product-tile" [class.product-tile--needed]="product.needed">
-            @if (product.image) {
-              <img class="product-avatar" [src]="product.image" [alt]="product.name" />
-            } @else {
-              <mat-icon class="product-symbol">inventory_2</mat-icon>
-            }
+            <button class="product-image-button" type="button" (click)="editProduct(product)"
+              [attr.aria-label]="'common.tiles.shopping.editProductAria' | transloco:{ name: product.name }">
+              @if (product.image) {
+                <img class="product-avatar" [src]="product.image" [alt]="product.name" />
+              } @else {
+                <mat-icon class="product-symbol">inventory_2</mat-icon>
+              }
+            </button>
             <h3>{{ product.name }}</h3>
             <div class="quantity-actions">
               <button mat-icon-button type="button" (click)="decreaseQuantity(product)" [disabled]="!canDecreaseQuantity(product)"
