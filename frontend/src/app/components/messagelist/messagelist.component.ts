@@ -41,6 +41,7 @@ import { MessageProfileComponent } from './message-profile/message-profile.compo
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { AppService } from '../../services/app.service';
 import { DisplayMessageService } from '../../services/display-message.service';
+import { ProtectedStickerImageComponent } from '../utils/protected-sticker-image/protected-sticker-image.component';
 
 type ResolvedDsaStatus = 'RECEIVED' | 'UNDER_REVIEW' | 'DECIDED' | 'UNKNOWN';
 type ModerationStatus = 'published' | 'review' | 'hidden';
@@ -48,6 +49,7 @@ type ModerationStatus = 'published' | 'review' | 'hidden';
 @Component({
   selector: 'app-messagelist',
   imports: [
+    ProtectedStickerImageComponent,
     DialogHeaderComponent,
     ShowmessageComponent,
     ShowmultimediaComponent,

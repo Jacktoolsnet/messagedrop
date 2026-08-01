@@ -23,6 +23,7 @@ import {
   ShoppingTileSettingsResult
 } from '../shopping-tile-settings/shopping-tile-settings.component';
 import { normalizeShoppingList } from '../shopping-list.util';
+import { ProtectedStickerImageComponent } from '../../../utils/protected-sticker-image/protected-sticker-image.component';
 
 interface ShoppingTileDialogData {
   tile: TileSetting;
@@ -32,7 +33,8 @@ interface ShoppingTileDialogData {
 @Component({
   selector: 'app-shopping-tile-edit',
   standalone: true,
-  imports: [DialogHeaderComponent, MatButtonModule, MatDialogActions, MatDialogContent, MatIcon, TranslocoPipe],
+  imports: [
+    ProtectedStickerImageComponent,DialogHeaderComponent, MatButtonModule, MatDialogActions, MatDialogContent, MatIcon, TranslocoPipe],
   templateUrl: './shopping-tile-edit.component.html',
   styleUrl: './shopping-tile-edit.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

@@ -20,12 +20,13 @@ import { LanguageService } from '../../../services/language.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { UnsplashService } from '../../../services/unsplash.service';
 import { AvatarCropperComponent } from '../../utils/avatar-cropper/avatar-cropper.component';
-import { AvatarSourceChoice, AvatarSourceDialogComponent } from '../../utils/avatar-source-dialog/avatar-source-dialog.component';
+import { AvatarSourceDialogComponent, AvatarSourceResult } from '../../utils/avatar-source-dialog/avatar-source-dialog.component';
 import { CameraCaptureDialogComponent } from '../../utils/camera-capture-dialog/camera-capture-dialog.component';
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 import { UnsplashComponent } from '../../utils/unsplash/unsplash.component';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 import { DisplayMessageService } from '../../../services/display-message.service';
+import { ProtectedStickerImageComponent } from '../../utils/protected-sticker-image/protected-sticker-image.component';
 
 @Component({
   selector: 'app-place',
@@ -41,7 +42,8 @@ import { DisplayMessageService } from '../../../services/display-message.service
     MatFormFieldModule,
     MatInputModule,
     MatSliderModule,
-    TranslocoPipe
+    TranslocoPipe,
+    ProtectedStickerImageComponent
   ],
   templateUrl: './place-settings.component.html',
   styleUrl: './place-settings.component.css',
@@ -67,6 +69,7 @@ export class PlaceProfileComponent {
   private oriIcon: string | undefined = undefined;
   private oriTileSettings: TileSetting[] | undefined = undefined;
   private oriAvatarAttribution: AvatarAttribution | undefined = undefined;
+  private oriAvatarStickerId: string | undefined = undefined;
 
   readonly dialogRef = inject(MatDialogRef<PlaceProfileComponent>);
   private readonly snackBar = inject(DisplayMessageService);
@@ -92,6 +95,7 @@ export class PlaceProfileComponent {
     this.oriBackgroundAttribution = this.data.place.placeBackgroundAttribution;
     this.oriIcon = this.data.place.icon;
     this.oriAvatarAttribution = this.data.place.avatarAttribution;
+    this.oriAvatarStickerId = this.data.place.avatarStickerId;
     const normalizedTileSettings = normalizeTileSettings(this.data.place.tileSettings);
     this.oriTileSettings = normalizedTileSettings.map((tile: TileSetting) => ({ ...tile }));
     this.data.place.tileSettings = normalizedTileSettings;
@@ -138,6 +142,7 @@ export class PlaceProfileComponent {
     this.data.place.avatarFileId = this.oriAvatarFileId;
     this.data.place.avatarOriginalFileId = this.oriAvatarOriginalFileId;
     this.data.place.avatarAttribution = this.oriAvatarAttribution;
+    this.data.place.avatarStickerId = this.oriAvatarStickerId;
     this.data.place.placeBackgroundImage = this.oriBackgroundImage;
     this.data.place.placeBackgroundFileId = this.oriBackgroundFileId;
     this.data.place.placeBackgroundOriginalFileId = this.oriBackgroundOriginalFileId;
@@ -225,6 +230,7 @@ export class PlaceProfileComponent {
     this.data.place.avatarOriginalFileId = undefined;
     this.data.place.base64Avatar = '';
     this.data.place.avatarAttribution = undefined;
+    this.data.place.avatarStickerId = undefined;
     this.cdr.markForCheck();
   }
 
@@ -276,7 +282,11 @@ export class PlaceProfileComponent {
       data: { showCamera: true }
     });
 
-    dialogRef.afterClosed().subscribe((choice?: AvatarSourceChoice) => {
+    dialogRef.afterClosed().subscribe((choice?: AvatarSourceResult) => {
+      if (choice && typeof choice === 'object') {
+        void this.applyStickerAvatar(choice.stickerId);
+        return;
+      }
       if (choice === 'file') {
         fileInput.click();
         return;
@@ -302,11 +312,12 @@ export class PlaceProfileComponent {
       data: {
         titleKey: 'common.backgroundSource.title',
         icon: 'wallpaper',
-        showCamera: true
+        showCamera: true,
+        showSticker: false
       }
     });
 
-    dialogRef.afterClosed().subscribe((choice?: AvatarSourceChoice) => {
+    dialogRef.afterClosed().subscribe((choice?: AvatarSourceResult) => {
       if (choice === 'file') {
         fileInput.click();
         return;
@@ -319,6 +330,21 @@ export class PlaceProfileComponent {
         this.openUnsplashBackground();
       }
     });
+  }
+
+  private async applyStickerAvatar(stickerId: string): Promise<void> {
+    if (this.data.place.avatarFileId && this.data.place.avatarFileId !== this.oriAvatarFileId) {
+      await this.avatarStorage.deleteImage(this.data.place.avatarFileId);
+    }
+    if (this.data.place.avatarOriginalFileId && this.data.place.avatarOriginalFileId !== this.oriAvatarOriginalFileId) {
+      await this.avatarStorage.deleteImage(this.data.place.avatarOriginalFileId);
+    }
+    this.data.place.avatarFileId = undefined;
+    this.data.place.avatarOriginalFileId = undefined;
+    this.data.place.base64Avatar = '';
+    this.data.place.avatarAttribution = undefined;
+    this.data.place.avatarStickerId = stickerId;
+    this.cdr.markForCheck();
   }
 
 
@@ -626,6 +652,7 @@ export class PlaceProfileComponent {
         this.data.place.avatarOriginalFileId = savedOriginalId;
         this.data.place.base64Avatar = saved.url;
         this.data.place.avatarAttribution = attribution;
+        this.data.place.avatarStickerId = undefined;
         this.cdr.markForCheck();
       });
     });

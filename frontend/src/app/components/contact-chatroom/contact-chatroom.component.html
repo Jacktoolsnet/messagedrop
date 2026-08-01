@@ -3,7 +3,10 @@
   <button type="button" class="chatroom-title__profile" (click)="openContactSettings(activeContact)"
     (keyup.enter)="openContactSettings(activeContact)" (keyup.space)="openContactSettings(activeContact)"
     [attr.aria-label]="'common.contact.profile.title' | transloco">
-    @if (activeContact.base64Avatar) {
+    @if (activeContact.avatarStickerId) {
+    <app-protected-sticker-image class="chatroom-title__avatar" [stickerId]="activeContact.avatarStickerId"
+      [alt]="activeContact.name || ''"></app-protected-sticker-image>
+    } @else if (activeContact.base64Avatar) {
     <img class="chatroom-title__avatar" [src]="activeContact.base64Avatar"
       [attr.alt]="activeContact.name ? ('common.contact.chatroom.avatarAltName' | transloco:{ name: activeContact.name }) : ('common.contact.chatroom.avatarAltContact' | transloco)" />
     } @else {
@@ -81,7 +84,10 @@
         <div class="bubble-row me">
           <button type="button" class="avatar-me" (click)="openUserProfile()" (keyup.enter)="openUserProfile()"
             (keyup.space)="openUserProfile()" [attr.aria-label]="'common.user.profile.title' | transloco">
-            @if (profile().base64Avatar) {
+            @if (profile().avatarStickerId) {
+            <app-protected-sticker-image class="avatar" [stickerId]="profile().avatarStickerId"
+              [alt]="profile().name"></app-protected-sticker-image>
+            } @else if (profile().base64Avatar) {
             <img class="avatar" [src]="profile().base64Avatar"
               [attr.alt]="profile().name ? ('common.contact.chatroom.avatarAltName' | transloco:{ name: profile().name }) : ('common.contact.chatroom.avatarAltMe' | transloco)" />
             } @else {
@@ -222,7 +228,10 @@
           <button type="button" class="avatar-them" (click)="openContactSettings(activeContact)"
             (keyup.enter)="openContactSettings(activeContact)" (keyup.space)="openContactSettings(activeContact)"
             [attr.aria-label]="'common.contact.profile.title' | transloco">
-            @if (activeContact.base64Avatar) {
+            @if (activeContact.avatarStickerId) {
+            <app-protected-sticker-image class="avatar" [stickerId]="activeContact.avatarStickerId"
+              [alt]="activeContact.name || ''"></app-protected-sticker-image>
+            } @else if (activeContact.base64Avatar) {
             <img class="avatar" [src]="activeContact.base64Avatar"
               [attr.alt]="activeContact.name ? ('common.contact.chatroom.avatarAltName' | transloco:{ name: activeContact.name }) : ('common.contact.chatroom.avatarAltContact' | transloco)" />
             } @else {

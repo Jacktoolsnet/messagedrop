@@ -17,6 +17,13 @@
     </button>
     }
 
+    @if (showSticker) {
+    <button mat-flat-button class="source-button" (click)="chooseSticker()">
+      <mat-icon>emoji_emotions</mat-icon>
+      <span>{{ 'common.avatarSource.sticker' | transloco }}</span>
+    </button>
+    }
+
     @if (showUnsplash) {
     <button mat-flat-button class="source-button" (click)="chooseUnsplash()">
       <mat-icon>photo_library</mat-icon>

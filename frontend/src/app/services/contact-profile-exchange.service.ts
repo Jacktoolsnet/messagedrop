@@ -326,7 +326,8 @@ export class ContactProfileExchangeService {
     return {
       name: profile.name ?? '',
       base64Avatar: avatarBase64,
-      avatarAttribution: profile.avatarAttribution
+      avatarAttribution: profile.avatarAttribution,
+      avatarStickerId: profile.avatarStickerId
     };
   }
 
@@ -401,15 +402,26 @@ export class ContactProfileExchangeService {
   private async applyProfileToContact(contact: Contact, payload: SharedContactProfilePayload): Promise<void> {
     const previousAvatarFileId = contact.avatarFileId;
     const hasIncomingAvatar = !!payload.base64Avatar;
+    const incomingStickerId = payload.avatarStickerId?.trim();
 
     contact.name = payload.name?.trim() || this.i18n.t('common.contact.notSet');
 
-    if (hasIncomingAvatar && this.avatarStorage.isSupported()) {
+    if (incomingStickerId) {
+      if (previousAvatarFileId && this.avatarStorage.isSupported()) {
+        await this.avatarStorage.deleteImage(previousAvatarFileId);
+      }
+      contact.avatarFileId = undefined;
+      contact.avatarOriginalFileId = undefined;
+      contact.base64Avatar = '';
+      contact.avatarAttribution = undefined;
+      contact.avatarStickerId = incomingStickerId;
+    } else if (hasIncomingAvatar && this.avatarStorage.isSupported()) {
       const saved = await this.avatarStorage.saveImageFromBase64('avatar', payload.base64Avatar, previousAvatarFileId);
       if (saved) {
         contact.avatarFileId = saved.id;
         contact.base64Avatar = saved.url;
         contact.avatarAttribution = payload.avatarAttribution;
+        contact.avatarStickerId = undefined;
       } else {
         if (previousAvatarFileId) {
           await this.avatarStorage.deleteImage(previousAvatarFileId);
@@ -418,6 +430,7 @@ export class ContactProfileExchangeService {
         contact.avatarOriginalFileId = undefined;
         contact.base64Avatar = '';
         contact.avatarAttribution = undefined;
+        contact.avatarStickerId = undefined;
       }
     } else {
       if (previousAvatarFileId && this.avatarStorage.isSupported()) {
@@ -427,6 +440,7 @@ export class ContactProfileExchangeService {
       contact.avatarOriginalFileId = undefined;
       contact.base64Avatar = '';
       contact.avatarAttribution = undefined;
+      contact.avatarStickerId = undefined;
     }
 
     await this.contactService.saveAditionalContactInfos();

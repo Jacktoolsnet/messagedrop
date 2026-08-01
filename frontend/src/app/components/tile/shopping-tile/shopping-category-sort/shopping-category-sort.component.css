@@ -17,6 +17,7 @@
 }
 
 .sort-row img,
+.sort-row app-protected-sticker-image,
 .image-placeholder {
   width: 2.75rem;
   height: 2.75rem;

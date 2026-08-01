@@ -8,11 +8,13 @@ import { ShoppingCategory } from '../../../../interfaces/tile-settings';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 import { saveDialogOnImplicitDismiss } from '../../../utils/dialog-auto-save.util';
+import { ProtectedStickerImageComponent } from '../../../utils/protected-sticker-image/protected-sticker-image.component';
 
 @Component({
   selector: 'app-shopping-category-sort',
   standalone: true,
-  imports: [DialogHeaderComponent, MatButtonModule, MatDialogActions, MatDialogContent, MatIcon, CdkDrag, CdkDropList, CdkDragHandle, TranslocoPipe],
+  imports: [
+    ProtectedStickerImageComponent,DialogHeaderComponent, MatButtonModule, MatDialogActions, MatDialogContent, MatIcon, CdkDrag, CdkDropList, CdkDragHandle, TranslocoPipe],
   templateUrl: './shopping-category-sort.component.html',
   styleUrl: './shopping-category-sort.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

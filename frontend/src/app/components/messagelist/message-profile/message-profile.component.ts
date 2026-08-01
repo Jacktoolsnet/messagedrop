@@ -16,11 +16,12 @@ import { LanguageService } from '../../../services/language.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { UnsplashService } from '../../../services/unsplash.service';
 import { AvatarCropperComponent } from '../../utils/avatar-cropper/avatar-cropper.component';
-import { AvatarSourceChoice, AvatarSourceDialogComponent } from '../../utils/avatar-source-dialog/avatar-source-dialog.component';
+import { AvatarSourceDialogComponent, AvatarSourceResult } from '../../utils/avatar-source-dialog/avatar-source-dialog.component';
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 import { UnsplashComponent } from '../../utils/unsplash/unsplash.component';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 import { DisplayMessageService } from '../../../services/display-message.service';
+import { ProtectedStickerImageComponent } from '../../utils/protected-sticker-image/protected-sticker-image.component';
 
 @Component({
   selector: 'app-edit-user',
@@ -34,6 +35,7 @@ import { DisplayMessageService } from '../../../services/display-message.service
     MatDialogActions,
     MatDialogClose,
     MatIcon,
+    ProtectedStickerImageComponent,
     TranslocoPipe
   ],
   templateUrl: './message-profile.component.html',
@@ -93,7 +95,11 @@ export class MessageProfileComponent {
       autoFocus: false
     });
 
-    dialogRef.afterClosed().subscribe((choice?: AvatarSourceChoice) => {
+    dialogRef.afterClosed().subscribe((choice?: AvatarSourceResult) => {
+      if (choice && typeof choice === 'object') {
+        void this.applyStickerAvatar(choice.stickerId);
+        return;
+      }
       if (choice === 'file') {
         fileInput.click();
         return;
@@ -140,6 +146,17 @@ export class MessageProfileComponent {
     this.profile.avatarFileId = undefined;
     this.profile.base64Avatar = '';
     this.profile.avatarAttribution = undefined;
+    this.profile.avatarStickerId = undefined;
+  }
+
+  private async applyStickerAvatar(stickerId: string): Promise<void> {
+    const currentId = this.profile.avatarFileId;
+    if (currentId && currentId !== this.oriProfile.avatarFileId) await this.avatarStorage.deleteImage(currentId);
+    this.profile.avatarFileId = undefined;
+    this.profile.avatarOriginalFileId = undefined;
+    this.profile.base64Avatar = '';
+    this.profile.avatarAttribution = undefined;
+    this.profile.avatarStickerId = stickerId;
   }
 
   public showPolicy() {
@@ -285,6 +302,7 @@ export class MessageProfileComponent {
       this.profile.avatarFileId = saved.id;
       this.profile.base64Avatar = saved.url;
       this.profile.avatarAttribution = attribution;
+      this.profile.avatarStickerId = undefined;
     });
   }
 }

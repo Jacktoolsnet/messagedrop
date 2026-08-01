@@ -12,7 +12,10 @@
         <mat-icon>drag_indicator</mat-icon>
       </button>
       <span class="avatar">
-        @if (contact.base64Avatar) {
+        @if (contact.avatarStickerId) {
+        <app-protected-sticker-image class="avatar__img" [stickerId]="contact.avatarStickerId"
+          [alt]="getContactName(contact)"></app-protected-sticker-image>
+        } @else if (contact.base64Avatar) {
         <img class="avatar__img" [src]="contact.base64Avatar"
           [attr.alt]="getContactName(contact)" />
         } @else {

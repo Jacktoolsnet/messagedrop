@@ -41,9 +41,14 @@ export function normalizeShoppingList(value?: ShoppingList): ShoppingList {
       id: category.id || createShoppingId('category'),
       templateKey: typeof category.templateKey === 'string' && category.templateKey.trim() ? category.templateKey : undefined,
       name: (category.name ?? '').trim(),
-      image: normalizeImageUrl(category.image),
-      imageFileId: typeof category.imageFileId === 'string' && category.imageFileId.trim() ? category.imageFileId : undefined,
-      imageAttribution: category.imageAttribution?.source === 'unsplash' ? category.imageAttribution : undefined,
+      image: normalizeStickerId(category.imageStickerId) ? undefined : normalizeImageUrl(category.image),
+      imageFileId: !normalizeStickerId(category.imageStickerId) && typeof category.imageFileId === 'string' && category.imageFileId.trim()
+        ? category.imageFileId
+        : undefined,
+      imageAttribution: !normalizeStickerId(category.imageStickerId) && category.imageAttribution?.source === 'unsplash'
+        ? category.imageAttribution
+        : undefined,
+      imageStickerId: normalizeStickerId(category.imageStickerId),
       backgroundImage: normalizeImageUrl(category.backgroundImage),
       backgroundImageFileId: typeof category.backgroundImageFileId === 'string' && category.backgroundImageFileId.trim()
         ? category.backgroundImageFileId
@@ -93,9 +98,14 @@ function normalizeProducts(products?: ShoppingProduct[]): ShoppingProduct[] {
       templateKey: typeof product.templateKey === 'string' && product.templateKey.trim() ? product.templateKey : undefined,
       name: (product.name ?? '').trim(),
       notes: typeof product.notes === 'string' && product.notes.trim() ? product.notes.trim() : undefined,
-      image: normalizeImageUrl(product.image),
-      imageFileId: typeof product.imageFileId === 'string' && product.imageFileId.trim() ? product.imageFileId : undefined,
-      imageAttribution: product.imageAttribution?.source === 'unsplash' ? product.imageAttribution : undefined,
+      image: normalizeStickerId(product.imageStickerId) ? undefined : normalizeImageUrl(product.image),
+      imageFileId: !normalizeStickerId(product.imageStickerId) && typeof product.imageFileId === 'string' && product.imageFileId.trim()
+        ? product.imageFileId
+        : undefined,
+      imageAttribution: !normalizeStickerId(product.imageStickerId) && product.imageAttribution?.source === 'unsplash'
+        ? product.imageAttribution
+        : undefined,
+      imageStickerId: normalizeStickerId(product.imageStickerId),
       unit: SHOPPING_UNITS.includes(product.unit) ? product.unit : 'piece',
       quantity: normalizeShoppingQuantity(product.quantity, SHOPPING_UNITS.includes(product.unit) ? product.unit : 'piece'),
       price: Number.isFinite(product.price) && (product.price ?? -1) >= 0 ? product.price : undefined,
@@ -106,6 +116,10 @@ function normalizeProducts(products?: ShoppingProduct[]): ShoppingProduct[] {
     .filter(product => product.name !== '')
     .sort((a, b) => a.order - b.order)
     .map((product, order) => ({ ...product, order }));
+}
+
+function normalizeStickerId(value: string | undefined): string | undefined {
+  return typeof value === 'string' && value.trim() ? value.trim() : undefined;
 }
 
 export function activeShoppingProducts(list: ShoppingList): ShoppingProduct[] {

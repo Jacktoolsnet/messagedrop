@@ -195,6 +195,7 @@ export class ContactService {
       contact.avatarFileId = contact.avatarFileId ?? current.avatarFileId;
       contact.avatarOriginalFileId = contact.avatarOriginalFileId ?? current.avatarOriginalFileId;
       contact.avatarAttribution = contact.avatarAttribution ?? current.avatarAttribution;
+      contact.avatarStickerId = contact.avatarStickerId ?? current.avatarStickerId;
       contact.chatBackgroundImage = contact.chatBackgroundImage || current.chatBackgroundImage;
       contact.chatBackgroundFileId = contact.chatBackgroundFileId ?? current.chatBackgroundFileId;
       contact.chatBackgroundOriginalFileId = contact.chatBackgroundOriginalFileId ?? current.chatBackgroundOriginalFileId;
@@ -272,6 +273,7 @@ export class ContactService {
       contact.avatarFileId = profile?.avatarFileId ?? contact.avatarFileId;
       contact.avatarOriginalFileId = profile?.avatarOriginalFileId ?? contact.avatarOriginalFileId;
       contact.avatarAttribution = profile?.avatarAttribution ?? contact.avatarAttribution;
+      contact.avatarStickerId = profile?.avatarStickerId ?? contact.avatarStickerId;
       contact.chatBackgroundFileId = profile?.chatBackgroundFileId ?? contact.chatBackgroundFileId;
       contact.chatBackgroundOriginalFileId = profile?.chatBackgroundOriginalFileId ?? contact.chatBackgroundOriginalFileId;
       contact.chatBackgroundAttribution = profile?.chatBackgroundAttribution ?? contact.chatBackgroundAttribution;
@@ -304,6 +306,7 @@ export class ContactService {
         avatarFileId: contact.avatarFileId,
         avatarOriginalFileId: contact.avatarOriginalFileId,
         avatarAttribution: contact.avatarAttribution,
+        avatarStickerId: contact.avatarStickerId,
         chatBackgroundImage: '',
         chatBackgroundFileId: contact.chatBackgroundFileId,
         chatBackgroundOriginalFileId: contact.chatBackgroundOriginalFileId,

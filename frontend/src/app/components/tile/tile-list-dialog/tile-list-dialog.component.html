@@ -3,7 +3,10 @@
   [style.--place-header-bg-opacity]="getHeaderBackgroundOpacity()">
   @if (contact) {
     <span class="tile-dialog-title__avatar">
-      @if (contact.base64Avatar) {
+      @if (contact.avatarStickerId) {
+        <app-protected-sticker-image class="tile-dialog-title__image" [stickerId]="contact.avatarStickerId"
+          [alt]="contact.name || ''"></app-protected-sticker-image>
+      } @else if (contact.base64Avatar) {
         <img class="tile-dialog-title__image" [src]="contact.base64Avatar"
           [attr.alt]="contact.name ? ('common.contact.profile.avatarAltName' | transloco:{ name: contact.name }) : ('common.contact.profile.avatarAlt' | transloco)" />
       } @else {
@@ -13,7 +16,10 @@
     <span class="tile-dialog-title__text">{{ contact.name || ('common.contact.list.nameFallback' | transloco) }}</span>
   } @else if (place) {
     <span class="tile-dialog-title__avatar">
-      @if (place.base64Avatar) {
+      @if (place.avatarStickerId) {
+        <app-protected-sticker-image class="tile-dialog-title__image" [stickerId]="place.avatarStickerId"
+          [alt]="place.name"></app-protected-sticker-image>
+      } @else if (place.base64Avatar) {
         <img class="tile-dialog-title__image" [src]="place.base64Avatar"
           [attr.alt]="place.name ? ('common.placeList.avatarAltName' | transloco:{ name: place.name }) : ('common.placeList.avatarAltFallback' | transloco)" />
       } @else {

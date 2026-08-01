@@ -25,6 +25,7 @@ export interface Contact {
     avatarFileId?: string,
     avatarOriginalFileId?: string,
     avatarAttribution?: AvatarAttribution,
+    avatarStickerId?: string,
     chatBackgroundImage?: string,
     chatBackgroundFileId?: string,
     chatBackgroundOriginalFileId?: string,

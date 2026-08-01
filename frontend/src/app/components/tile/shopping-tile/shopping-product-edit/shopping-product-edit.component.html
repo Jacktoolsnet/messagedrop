@@ -6,7 +6,7 @@
   </mat-form-field>
 
   <input #fileInput hidden type="file" accept="image/png,image/jpeg,image/webp" (change)="onImageSelected($event)" />
-  @if (!image()) {
+  @if (!image() && !imageStickerId()) {
     <div class="avatar-area">
       <button mat-flat-button color="primary" class="set-image-button" type="button" (click)="openImageSource(fileInput)">
         <mat-icon>add_photo_alternate</mat-icon>
@@ -15,7 +15,14 @@
     </div>
   } @else {
     <div class="avatar-area">
-      <div class="avatar-center"><img class="avatar" [src]="image()" [alt]="nameControl.value" /></div>
+      <div class="avatar-center">
+        @if (imageStickerId()) {
+        <app-protected-sticker-image class="avatar" [stickerId]="imageStickerId()"
+          [alt]="nameControl.value"></app-protected-sticker-image>
+        } @else {
+        <img class="avatar" [src]="image()" [alt]="nameControl.value" />
+        }
+      </div>
       @if (imageAttribution(); as attribution) {
         <p class="attribution">
           {{ 'common.avatarAttribution.photoBy' | transloco }}
@@ -25,7 +32,9 @@
         </p>
       }
       <div class="image-actions">
+        @if (!imageStickerId()) {
         <button mat-mini-fab color="primary" type="button" (click)="editImage()" [attr.aria-label]="'common.actions.edit' | transloco"><mat-icon>edit</mat-icon></button>
+        }
         <button mat-mini-fab color="warn" type="button" (click)="removeImage()" [attr.aria-label]="'common.tiles.shopping.removeProductImage' | transloco"><mat-icon>delete</mat-icon></button>
       </div>
     </div>

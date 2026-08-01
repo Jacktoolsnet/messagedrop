@@ -8,11 +8,13 @@ import { Location } from '../../../interfaces/location';
 import { Place } from '../../../interfaces/place';
 import { PlaceService } from '../../../services/place.service';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
+import { ProtectedStickerImageComponent } from '../../utils/protected-sticker-image/protected-sticker-image.component';
 
 @Component({
   selector: 'app-contact-chatroom-place-select-dialog',
   standalone: true,
   imports: [
+    ProtectedStickerImageComponent,
     DialogHeaderComponent,
     MatDialogContent,
     MatDialogActions,

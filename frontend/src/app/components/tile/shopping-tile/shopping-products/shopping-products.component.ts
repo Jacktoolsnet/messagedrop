@@ -14,11 +14,13 @@ import { ShoppingCategoryEditComponent } from '../shopping-category-edit/shoppin
 import { normalizeShoppingQuantity } from '../shopping-list.util';
 import { ShoppingProductEditComponent } from '../shopping-product-edit/shopping-product-edit.component';
 import { ShoppingProductSortComponent } from '../shopping-product-sort/shopping-product-sort.component';
+import { ProtectedStickerImageComponent } from '../../../utils/protected-sticker-image/protected-sticker-image.component';
 
 @Component({
   selector: 'app-shopping-products',
   standalone: true,
-  imports: [DialogHeaderComponent, MatButtonModule, MatDialogActions, MatDialogContent, MatIcon, MatMenuModule, TranslocoPipe],
+  imports: [
+    ProtectedStickerImageComponent,DialogHeaderComponent, MatButtonModule, MatDialogActions, MatDialogContent, MatIcon, MatMenuModule, TranslocoPipe],
   templateUrl: './shopping-products.component.html',
   styleUrl: './shopping-products.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

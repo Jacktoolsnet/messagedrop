@@ -26,6 +26,7 @@ import { DisplayMessageService } from '../../services/display-message.service';
 import { CheckPinComponent } from '../pin/check-pin/check-pin.component';
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
+import { ProtectedStickerImageComponent } from '../utils/protected-sticker-image/protected-sticker-image.component';
 import { SecretDropCommentsDialogComponent } from '../secret-drop-comments-dialog/secret-drop-comments-dialog.component';
 import { MessageProfileComponent } from '../messagelist/message-profile/message-profile.component';
 import { UserProfileComponent } from '../user/user-profile/user-profile.component';
@@ -60,7 +61,8 @@ interface UnlockedContent {
     MatMenuModule,
     ShowmessageComponent,
     ShowmultimediaComponent,
-    TranslocoPipe
+    TranslocoPipe,
+    ProtectedStickerImageComponent
   ],
   templateUrl: './found-secret-drop-list.component.html',
   styleUrl: './found-secret-drop-list.component.css',
@@ -115,6 +117,13 @@ export class FoundSecretDropListComponent {
       return this.userProfile.base64Avatar || '';
     }
     return this.profileService.getProfile(drop.userId || '')?.base64Avatar || '';
+  }
+
+  getDropAvatarStickerId(drop: SecretDrop): string {
+    if (!drop.userId || drop.creatorMode === 'incognito') return '';
+    return this.isOwnDrop(drop)
+      ? this.userProfile.avatarStickerId || ''
+      : this.profileService.getProfile(drop.userId)?.avatarStickerId || '';
   }
 
   onAvatarBoxClick(drop: SecretDrop): void {

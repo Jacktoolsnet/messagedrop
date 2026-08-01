@@ -10,6 +10,7 @@ import { ShoppingImageStorageService } from '../../../../services/shopping-image
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
 import { saveDialogOnImplicitDismiss } from '../../../utils/dialog-auto-save.util';
 import { normalizeShoppingList } from '../shopping-list.util';
+import { ProtectedStickerImageComponent } from '../../../utils/protected-sticker-image/protected-sticker-image.component';
 
 interface ShoppingModeData {
   shopping: ShoppingList;
@@ -24,7 +25,8 @@ interface ShoppingModeEntry {
 @Component({
   selector: 'app-shopping-mode',
   standalone: true,
-  imports: [DialogHeaderComponent, MatButtonModule, MatDialogActions, MatDialogContent, MatIcon, MatProgressBarModule, TranslocoPipe],
+  imports: [
+    ProtectedStickerImageComponent,DialogHeaderComponent, MatButtonModule, MatDialogActions, MatDialogContent, MatIcon, MatProgressBarModule, TranslocoPipe],
   templateUrl: './shopping-mode.component.html',
   styleUrl: './shopping-mode.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

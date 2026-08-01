@@ -8,10 +8,12 @@ import { Contact } from '../../../interfaces/contact';
 import { ContactService } from '../../../services/contact.service';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
+import { ProtectedStickerImageComponent } from '../../utils/protected-sticker-image/protected-sticker-image.component';
 
 @Component({
   selector: 'app-location-share-contact-select',
   imports: [
+    ProtectedStickerImageComponent,
     DialogHeaderComponent,
     MatButtonModule,
     MatCheckboxModule,

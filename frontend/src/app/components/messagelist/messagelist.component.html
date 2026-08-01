@@ -18,7 +18,10 @@
                     (click)="!userService.isReady() ? openOwnProfileAfterLogin() : openOwnProfile()"
                     (keyup.enter)="!userService.isReady() ? openOwnProfileAfterLogin() : openOwnProfile()"
                     (keyup.space)="!userService.isReady() ? openOwnProfileAfterLogin() : openOwnProfile()">
-                    @if (userProfile.base64Avatar) {
+                    @if (userProfile.avatarStickerId) {
+                    <app-protected-sticker-image class="avatar" [stickerId]="userProfile.avatarStickerId"
+                        [alt]="userProfile.name"></app-protected-sticker-image>
+                    } @else if (userProfile.base64Avatar) {
                     <img class="avatar" [src]="userProfile.base64Avatar"
                         [attr.alt]="userProfile.name ? ('common.messageList.avatarAltName' | transloco:{ name: userProfile.name }) : ('common.messageList.avatarAltFallback' | transloco)" />
                     } @else {
@@ -36,7 +39,10 @@
                     (click)="!userService.isReady() ? editMessageUserProfileAfterLogin(message) : editMessageUserProfile(message)"
                     (keyup.enter)="!userService.isReady() ? editMessageUserProfileAfterLogin(message) : editMessageUserProfile(message)"
                     (keyup.space)="!userService.isReady() ? editMessageUserProfileAfterLogin(message) : editMessageUserProfile(message)">
-                    @if (profileService.getProfile(message.userId)?.base64Avatar) {
+                    @if (profileService.getProfile(message.userId)?.avatarStickerId; as stickerId) {
+                    <app-protected-sticker-image class="avatar" [stickerId]="stickerId"
+                        [alt]="profileService.getProfile(message.userId)?.name || ''"></app-protected-sticker-image>
+                    } @else if (profileService.getProfile(message.userId)?.base64Avatar) {
                     <img class="avatar" [src]="$safeNavigationMigration(profileService.getProfile(message.userId)?.base64Avatar)"
                         [attr.alt]="profileService.getProfile(message.userId)?.name ? ('common.messageList.avatarAltName' | transloco:{ name: $safeNavigationMigration(profileService.getProfile(message.userId)?.name) }) : ('common.messageList.avatarAltFallback' | transloco)">
                     } @else {
@@ -204,7 +210,10 @@
                     (click)="!userService.isReady() ? openOwnProfileAfterLogin() : openOwnProfile()"
                     (keyup.enter)="!userService.isReady() ? openOwnProfileAfterLogin() : openOwnProfile()"
                     (keyup.space)="!userService.isReady() ? openOwnProfileAfterLogin() : openOwnProfile()">
-                    @if (userProfile.base64Avatar) {
+                    @if (userProfile.avatarStickerId) {
+                    <app-protected-sticker-image class="avatar" [stickerId]="userProfile.avatarStickerId"
+                        [alt]="userProfile.name"></app-protected-sticker-image>
+                    } @else if (userProfile.base64Avatar) {
                     <img class="avatar" [src]="userProfile.base64Avatar"
                         [attr.alt]="userProfile.name ? ('common.messageList.avatarAltName' | transloco:{ name: userProfile.name }) : ('common.messageList.avatarAltFallback' | transloco)" />
                     } @else {
@@ -222,7 +231,10 @@
                     (click)="!userService.isReady() ? editMessageUserProfileAfterLogin(message) : editMessageUserProfile(message)"
                     (keyup.enter)="!userService.isReady() ? editMessageUserProfileAfterLogin(message) : editMessageUserProfile(message)"
                     (keyup.space)="!userService.isReady() ? editMessageUserProfileAfterLogin(message) : editMessageUserProfile(message)">
-                    @if (profileService.getProfile(message.userId)?.base64Avatar) {
+                    @if (profileService.getProfile(message.userId)?.avatarStickerId; as stickerId) {
+                    <app-protected-sticker-image class="avatar" [stickerId]="stickerId"
+                        [alt]="profileService.getProfile(message.userId)?.name || ''"></app-protected-sticker-image>
+                    } @else if (profileService.getProfile(message.userId)?.base64Avatar) {
                     <img class="avatar" [src]="$safeNavigationMigration(profileService.getProfile(message.userId)?.base64Avatar)"
                         [attr.alt]="profileService.getProfile(message.userId)?.name ? ('common.messageList.avatarAltName' | transloco:{ name: $safeNavigationMigration(profileService.getProfile(message.userId)?.name) }) : ('common.messageList.avatarAltFallback' | transloco)">
                     } @else {

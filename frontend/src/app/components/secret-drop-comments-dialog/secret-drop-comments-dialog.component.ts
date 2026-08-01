@@ -22,6 +22,7 @@ import { UserService } from '../../services/user.service';
 import { MessageService } from '../../services/message.service';
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
+import { ProtectedStickerImageComponent } from '../utils/protected-sticker-image/protected-sticker-image.component';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { DisplayMessage } from '../utils/display-message/display-message.component';
 import { EditSecretDropCommentComponent, SecretDropCommentEditResult } from '../edit-secret-drop-comment/edit-secret-drop-comment.component';
@@ -51,7 +52,8 @@ interface DecryptedComment {
     ShortNumberPipe,
     ShowmessageComponent,
     ShowmultimediaComponent,
-    TranslocoPipe
+    TranslocoPipe,
+    ProtectedStickerImageComponent
   ],
   templateUrl: './secret-drop-comments-dialog.component.html',
   styleUrl: './secret-drop-comments-dialog.component.css',
@@ -143,6 +145,12 @@ export class SecretDropCommentsDialogComponent implements OnInit {
     return this.isOwnComment(comment)
       ? this.userProfile.base64Avatar || ''
       : this.profileService.getProfile(comment.userId)?.base64Avatar || '';
+  }
+
+  getCommentAvatarStickerId(comment: SecretDropComment): string {
+    return this.isOwnComment(comment)
+      ? this.userProfile.avatarStickerId || ''
+      : this.profileService.getProfile(comment.userId)?.avatarStickerId || '';
   }
 
   getCommentText(comment: DecryptedComment): string {

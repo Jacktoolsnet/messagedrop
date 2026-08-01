@@ -12,7 +12,7 @@
   <input type="file" id="avatar" name="avatar" accept="image/png, image/jpeg" class="file-input"
     (change)="onFileSelected($event)" #fileUpload />
 
-  @if (!profile.base64Avatar || profile.base64Avatar === '') {
+  @if (!profile.base64Avatar && !profile.avatarStickerId) {
   <div class="avatar-area">
     <button mat-flat-button class="button-set-avatar" (click)="openAvatarSourceDialog(fileUpload)">
       <span>{{ 'common.messageProfile.addAvatar' | transloco }}</span>
@@ -21,11 +21,16 @@
   </div>
   }
 
-  @if (profile.base64Avatar && profile.base64Avatar !== '') {
+  @if (profile.base64Avatar || profile.avatarStickerId) {
   <div class="avatar-area">
     <div class="center">
+      @if (profile.avatarStickerId) {
+      <app-protected-sticker-image class="avatar" [stickerId]="profile.avatarStickerId"
+        [alt]="profile.name"></app-protected-sticker-image>
+      } @else {
       <img class="avatar" [src]="profile.base64Avatar"
         [attr.alt]="profile.name ? ('common.messageProfile.avatarAltName' | transloco:{ name: profile.name }) : ('common.messageProfile.avatarAltFallback' | transloco)" /><br />
+      }
     </div>
     @if (profile.avatarAttribution?.source === 'unsplash') {
     <p class="unsplash-badge">

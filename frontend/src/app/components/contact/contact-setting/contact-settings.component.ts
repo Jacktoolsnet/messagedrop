@@ -19,12 +19,13 @@ import { SocketioService } from '../../../services/socketio.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { UnsplashService } from '../../../services/unsplash.service';
 import { AvatarCropperComponent } from '../../utils/avatar-cropper/avatar-cropper.component';
-import { AvatarSourceChoice, AvatarSourceDialogComponent } from '../../utils/avatar-source-dialog/avatar-source-dialog.component';
+import { AvatarSourceDialogComponent, AvatarSourceResult } from '../../utils/avatar-source-dialog/avatar-source-dialog.component';
 import { CameraCaptureDialogComponent } from '../../utils/camera-capture-dialog/camera-capture-dialog.component';
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 import { UnsplashComponent } from '../../utils/unsplash/unsplash.component';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 import { DisplayMessageService } from '../../../services/display-message.service';
+import { ProtectedStickerImageComponent } from '../../utils/protected-sticker-image/protected-sticker-image.component';
 
 @Component({
   selector: 'app-profile',
@@ -39,7 +40,8 @@ import { DisplayMessageService } from '../../../services/display-message.service
     MatDialogClose,
     MatIconModule,
     MatSliderModule,
-    TranslocoPipe
+    TranslocoPipe,
+    ProtectedStickerImageComponent
   ],
   templateUrl: './contact-settings.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -89,7 +91,11 @@ export class ContactSettingsComponent {
       data: { showCamera: true }
     });
 
-    dialogRef.afterClosed().subscribe((choice?: AvatarSourceChoice) => {
+    dialogRef.afterClosed().subscribe((choice?: AvatarSourceResult) => {
+      if (choice && typeof choice === 'object') {
+        void this.applyStickerAvatar(choice.stickerId);
+        return;
+      }
       if (choice === 'file') {
         fileInput.click();
         return;
@@ -115,11 +121,12 @@ export class ContactSettingsComponent {
       data: {
         titleKey: 'common.backgroundSource.title',
         icon: 'wallpaper',
-        showCamera: true
+        showCamera: true,
+        showSticker: false
       }
     });
 
-    dialogRef.afterClosed().subscribe((choice?: AvatarSourceChoice) => {
+    dialogRef.afterClosed().subscribe((choice?: AvatarSourceResult) => {
       if (choice === 'file') {
         fileInput.click();
         return;
@@ -207,6 +214,21 @@ export class ContactSettingsComponent {
     this.contact.avatarOriginalFileId = undefined;
     this.contact.base64Avatar = undefined;
     this.contact.avatarAttribution = undefined;
+    this.contact.avatarStickerId = undefined;
+  }
+
+  private async applyStickerAvatar(stickerId: string): Promise<void> {
+    if (this.contact.avatarFileId && this.contact.avatarFileId !== this.originalAvatarFileId) {
+      await this.avatarStorage.deleteImage(this.contact.avatarFileId);
+    }
+    if (this.contact.avatarOriginalFileId && this.contact.avatarOriginalFileId !== this.originalAvatarOriginalFileId) {
+      await this.avatarStorage.deleteImage(this.contact.avatarOriginalFileId);
+    }
+    this.contact.avatarFileId = undefined;
+    this.contact.avatarOriginalFileId = undefined;
+    this.contact.base64Avatar = undefined;
+    this.contact.avatarAttribution = undefined;
+    this.contact.avatarStickerId = stickerId;
   }
 
   async deleteChatBackground(): Promise<void> {
@@ -546,6 +568,7 @@ export class ContactSettingsComponent {
       this.contact.avatarOriginalFileId = savedOriginalId;
       this.contact.base64Avatar = saved.url;
       this.contact.avatarAttribution = attribution;
+      this.contact.avatarStickerId = undefined;
     });
   }
 

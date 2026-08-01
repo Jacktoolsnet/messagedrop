@@ -40,6 +40,7 @@ import { DisplayMessage } from '../utils/display-message/display-message.compone
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { DisplayMessageService } from '../../services/display-message.service';
+import { ProtectedStickerImageComponent } from '../utils/protected-sticker-image/protected-sticker-image.component';
 
 type ResolvedDsaStatus = 'RECEIVED' | 'UNDER_REVIEW' | 'DECIDED' | 'UNKNOWN';
 type ModerationStatus = 'published' | 'review' | 'hidden';
@@ -48,6 +49,7 @@ type PublishFilter = 'all' | 'published' | 'unpublished' | 'missing_online' | 'd
 @Component({
   selector: 'app-my-messagelist',
   imports: [
+    ProtectedStickerImageComponent,
     DialogHeaderComponent,
     ShowmessageComponent,
     ShowmultimediaComponent,

@@ -1,0 +1,11 @@
+@if (loading) {
+<span class="state" aria-hidden="true"></span>
+}
+@if (failed) {
+<span class="state" aria-hidden="true"><mat-icon>broken_image</mat-icon></span>
+}
+@if (imageUrl) {
+<img class="sticker" [src]="imageUrl" [attr.alt]="alt" draggable="false"
+  (load)="onImageLoaded()" (error)="onImageError()" />
+<img class="protection-overlay" [src]="protectionOverlayUrl" alt="" aria-hidden="true" draggable="false" />
+}

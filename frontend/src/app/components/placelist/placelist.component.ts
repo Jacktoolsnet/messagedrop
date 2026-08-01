@@ -32,12 +32,14 @@ import { PlaceSortDialogComponent } from './place-sort-dialog/place-sort-dialog.
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { DisplayMessage } from '../utils/display-message/display-message.component';
 import { DisplayMessageRef, DisplayMessageService } from '../../services/display-message.service';
+import { ProtectedStickerImageComponent } from '../utils/protected-sticker-image/protected-sticker-image.component';
 
 interface TimezoneResponse { status: number; timezone: string }
 
 @Component({
   selector: 'app-placelist',
   imports: [
+    ProtectedStickerImageComponent,
     DialogHeaderComponent,
     MatBadgeModule,
     MatCardModule,

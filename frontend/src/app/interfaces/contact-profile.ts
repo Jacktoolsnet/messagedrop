@@ -7,6 +7,7 @@ export interface ContactProfile {
     avatarFileId?: string,
     avatarOriginalFileId?: string,
     avatarAttribution?: AvatarAttribution,
+    avatarStickerId?: string,
     chatBackgroundImage?: string,
     chatBackgroundFileId?: string,
     chatBackgroundOriginalFileId?: string,

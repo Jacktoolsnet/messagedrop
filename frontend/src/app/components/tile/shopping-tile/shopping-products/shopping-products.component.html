@@ -1,4 +1,4 @@
-<app-dialog-header [icon]="data.category.image ? '' : 'inventory_2'" [title]="data.category.name"></app-dialog-header>
+<app-dialog-header [icon]="data.category.image || data.category.imageStickerId ? '' : 'inventory_2'" [title]="data.category.name"></app-dialog-header>
 
 <mat-dialog-content class="products-dialog" [style.--products-bg-image]="backgroundImage"
   [style.--shopping-selection-color]="data.selectionColor"
@@ -10,7 +10,10 @@
           <article class="product-tile" [class.product-tile--needed]="product.needed">
             <button class="product-image-button" type="button" (click)="editProduct(product)"
               [attr.aria-label]="'common.tiles.shopping.editProductAria' | transloco:{ name: product.name }">
-              @if (product.image) {
+              @if (product.imageStickerId) {
+                <app-protected-sticker-image class="product-avatar" [stickerId]="product.imageStickerId"
+                  [alt]="product.name"></app-protected-sticker-image>
+              } @else if (product.image) {
                 <img class="product-avatar" [src]="product.image" [alt]="product.name" />
               } @else {
                 <mat-icon class="product-symbol">inventory_2</mat-icon>

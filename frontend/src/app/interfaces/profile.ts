@@ -6,5 +6,6 @@ export interface Profile {
     avatarFileId?: string
     avatarOriginalFileId?: string
     avatarAttribution?: AvatarAttribution
+    avatarStickerId?: string
     defaultStyle?: string
 }

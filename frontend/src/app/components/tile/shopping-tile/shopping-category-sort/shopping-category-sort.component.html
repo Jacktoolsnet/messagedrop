@@ -7,7 +7,10 @@
         <button type="button" class="drag-handle" cdkDragHandle [attr.aria-label]="'common.tiles.shopping.reorderCategory' | transloco">
           <mat-icon>drag_indicator</mat-icon>
         </button>
-        @if (category.image) {
+        @if (category.imageStickerId) {
+          <app-protected-sticker-image [stickerId]="category.imageStickerId"
+            [alt]="category.name"></app-protected-sticker-image>
+        } @else if (category.image) {
           <img [src]="category.image" [alt]="category.name" />
         } @else {
           <span class="image-placeholder"><mat-icon>category</mat-icon></span>

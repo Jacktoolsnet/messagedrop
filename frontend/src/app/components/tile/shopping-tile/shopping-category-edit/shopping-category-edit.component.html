@@ -7,7 +7,7 @@
   </mat-form-field>
 
   <input #avatarInput hidden type="file" accept="image/png,image/jpeg,image/webp" (change)="onFileSelected($event, 'avatar')" />
-  @if (!image()) {
+  @if (!image() && !imageStickerId()) {
     <section class="avatar-area">
       <button mat-flat-button color="primary" class="button-set-avatar" type="button" (click)="openSourceDialog(avatarInput, 'avatar')">
         <mat-icon>account_circle</mat-icon>
@@ -17,7 +17,12 @@
   } @else {
     <section class="avatar-area">
       <div class="center">
+        @if (imageStickerId()) {
+        <app-protected-sticker-image class="avatar" [stickerId]="imageStickerId()"
+          [alt]="nameControl.value"></app-protected-sticker-image>
+        } @else {
         <img class="avatar" [src]="image()" [alt]="nameControl.value" />
+        }
       </div>
       @if (imageAttribution(); as attribution) {
         <div class="unsplash-badge-wrapper">
@@ -30,9 +35,11 @@
         </div>
       }
       <div class="button-style">
+        @if (!imageStickerId()) {
         <button mat-mini-fab color="primary" type="button" (click)="editImage('avatar')" [attr.aria-label]="'common.actions.edit' | transloco">
           <mat-icon>edit</mat-icon>
         </button>
+        }
         <button mat-mini-fab color="warn" type="button" (click)="removeImage('avatar')" [attr.aria-label]="'common.tiles.shopping.removeCategoryImage' | transloco">
           <mat-icon>delete</mat-icon>
         </button>

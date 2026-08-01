@@ -12,7 +12,10 @@
       @for (item of previewCategories; track item.category.id) {
         <section class="category-card">
           <div class="category-avatar">
-            @if (categoryImages()[item.category.id]; as image) {
+            @if (item.category.imageStickerId) {
+              <app-protected-sticker-image [stickerId]="item.category.imageStickerId"
+                [alt]="item.category.name"></app-protected-sticker-image>
+            } @else if (categoryImages()[item.category.id]; as image) {
               <img [src]="image" [alt]="item.category.name" />
             } @else {
               <mat-icon>category</mat-icon>

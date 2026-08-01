@@ -18,7 +18,8 @@ import { TranslationHelperService } from '../../../../services/translation-helpe
 import { UnsplashService } from '../../../../services/unsplash.service';
 import { ShoppingImageStorageService } from '../../../../services/shopping-image-storage.service';
 import { AvatarCropperComponent } from '../../../utils/avatar-cropper/avatar-cropper.component';
-import { AvatarSourceChoice, AvatarSourceDialogComponent } from '../../../utils/avatar-source-dialog/avatar-source-dialog.component';
+import { AvatarSourceDialogComponent, AvatarSourceResult } from '../../../utils/avatar-source-dialog/avatar-source-dialog.component';
+import { ProtectedStickerImageComponent } from '../../../utils/protected-sticker-image/protected-sticker-image.component';
 import { CameraCaptureDialogComponent } from '../../../utils/camera-capture-dialog/camera-capture-dialog.component';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
 import { UnsplashComponent } from '../../../utils/unsplash/unsplash.component';
@@ -28,7 +29,7 @@ import { createShoppingId, normalizeShoppingQuantity, SHOPPING_UNITS, shoppingUn
 @Component({
   selector: 'app-shopping-product-edit',
   standalone: true,
-  imports: [A11yModule, DialogHeaderComponent, ReactiveFormsModule, MatButtonModule, MatDialogActions, MatDialogContent, MatFormFieldModule, MatIcon, MatInputModule, MatSelectModule, TranslocoPipe],
+  imports: [A11yModule, DialogHeaderComponent, ReactiveFormsModule, MatButtonModule, MatDialogActions, MatDialogContent, MatFormFieldModule, MatIcon, MatInputModule, MatSelectModule, TranslocoPipe, ProtectedStickerImageComponent],
   templateUrl: './shopping-product-edit.component.html',
   styleUrl: './shopping-product-edit.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -49,6 +50,7 @@ export class ShoppingProductEditComponent {
   readonly priceControl = new FormControl<number | null>(this.product?.price ?? null);
   readonly image = signal<string | undefined>(this.product?.image);
   readonly imageAttribution = signal<AvatarAttribution | undefined>(this.product?.imageAttribution);
+  readonly imageStickerId = signal<string | undefined>(this.product?.imageStickerId);
   private readonly imageRemoved = signal(false);
   readonly units = SHOPPING_UNITS;
 
@@ -73,7 +75,14 @@ export class ShoppingProductEditComponent {
       disableClose: false,
       data: { showCamera: true }
     });
-    ref.afterClosed().subscribe((choice?: AvatarSourceChoice) => {
+    ref.afterClosed().subscribe((choice?: AvatarSourceResult) => {
+      if (choice && typeof choice === 'object') {
+        this.imageRemoved.set(false);
+        this.image.set(undefined);
+        this.imageAttribution.set(undefined);
+        this.imageStickerId.set(choice.stickerId);
+        return;
+      }
       if (choice === 'file') fileInput.click();
       if (choice === 'camera') this.openCamera();
       if (choice === 'unsplash') this.openUnsplash();
@@ -120,6 +129,7 @@ export class ShoppingProductEditComponent {
     this.imageRemoved.set(true);
     this.image.set(undefined);
     this.imageAttribution.set(undefined);
+    this.imageStickerId.set(undefined);
   }
 
   close(): void {
@@ -139,8 +149,11 @@ export class ShoppingProductEditComponent {
       name,
       notes: this.notesControl.value.trim() || undefined,
       image: this.image(),
-      imageFileId: !this.imageRemoved() && !this.image()?.startsWith('data:image/') ? this.product?.imageFileId : undefined,
+      imageFileId: !this.imageStickerId() && !this.imageRemoved() && !this.image()?.startsWith('data:image/')
+        ? this.product?.imageFileId
+        : undefined,
       imageAttribution: this.imageAttribution(),
+      imageStickerId: this.imageStickerId(),
       quantity: normalizeShoppingQuantity(this.quantityControl.value, unit),
       unit,
       price,
@@ -212,6 +225,7 @@ export class ShoppingProductEditComponent {
       this.imageRemoved.set(false);
       this.image.set(image);
       this.imageAttribution.set(attribution);
+      this.imageStickerId.set(undefined);
     });
   }
 

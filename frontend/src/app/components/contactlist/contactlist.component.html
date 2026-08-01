@@ -23,6 +23,9 @@
                             matBadgeColor="warn">
                             @if (contact.status === 'removed_by_contact') {
                             <mat-icon>person_off</mat-icon>
+                            } @else if (contact.avatarStickerId) {
+                            <app-protected-sticker-image class="avatar" [stickerId]="contact.avatarStickerId"
+                                [alt]="getContactDisplayName(contact)"></app-protected-sticker-image>
                             } @else if (contact.base64Avatar) {
                             <img class="avatar" [src]="contact.base64Avatar"
                                 [attr.alt]="'common.contact.profile.avatarAltName' | transloco:{ name: getContactDisplayName(contact) }" />

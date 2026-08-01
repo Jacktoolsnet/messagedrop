@@ -13,6 +13,7 @@ import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 import { PlaceProfileComponent } from '../place-settings/place-settings.component';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 import { DisplayMessageService } from '../../../services/display-message.service';
+import { ProtectedStickerImageComponent } from '../../utils/protected-sticker-image/protected-sticker-image.component';
 
 interface PlaceSortDialogData {
   places: Place[];
@@ -25,6 +26,7 @@ interface PlaceSortDialogResult {
 @Component({
   selector: 'app-place-sort-dialog',
   imports: [
+    ProtectedStickerImageComponent,
     DialogHeaderComponent,
     CommonModule,
     MatButtonModule,

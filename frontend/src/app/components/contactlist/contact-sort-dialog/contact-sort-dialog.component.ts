@@ -11,6 +11,7 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
 import { ContactSettingsComponent } from '../../contact/contact-setting/contact-settings.component';
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
+import { ProtectedStickerImageComponent } from '../../utils/protected-sticker-image/protected-sticker-image.component';
 
 interface ContactSortDialogData {
   contacts: Contact[];
@@ -23,6 +24,7 @@ interface ContactSortDialogResult {
 @Component({
   selector: 'app-contact-sort-dialog',
   imports: [
+    ProtectedStickerImageComponent,
     DialogHeaderComponent,
     CommonModule,
     MatButtonModule,

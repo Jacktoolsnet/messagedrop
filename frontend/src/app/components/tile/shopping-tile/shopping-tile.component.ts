@@ -11,11 +11,12 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
 import { ShoppingImageStorageService } from '../../../services/shopping-image-storage.service';
 import { DisplayMessageService } from '../../../services/display-message.service';
 import { activeShoppingProducts, normalizeShoppingList } from './shopping-list.util';
+import { ProtectedStickerImageComponent } from '../../utils/protected-sticker-image/protected-sticker-image.component';
 
 @Component({
   selector: 'app-shopping-tile',
   standalone: true,
-  imports: [MatButtonModule, MatIcon, TranslocoPipe],
+  imports: [MatButtonModule, MatIcon, TranslocoPipe, ProtectedStickerImageComponent],
   templateUrl: './shopping-tile.component.html',
   styleUrl: './shopping-tile.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

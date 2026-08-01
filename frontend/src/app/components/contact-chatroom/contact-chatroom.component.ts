@@ -46,6 +46,7 @@ import { ContactChatroomExperienceSelectDialogComponent } from './experience-sel
 import { ContactChatroomPlaceSelectDialogComponent } from './place-select-dialog/contact-chatroom-place-select-dialog.component';
 import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
 import { DisplayMessageService } from '../../services/display-message.service';
+import { ProtectedStickerImageComponent } from '../utils/protected-sticker-image/protected-sticker-image.component';
 
 interface ChatroomMessage {
   id: string;
@@ -77,6 +78,7 @@ interface ContactChatroomDialogData {
 @Component({
   selector: 'app-contact-chatroom',
   imports: [
+    ProtectedStickerImageComponent,
     MatCardModule,
     MatButtonModule,
     MatMenuModule,

@@ -11,7 +11,10 @@
     @for (contact of contacts(); track contact.id) {
     <button type="button" class="contact-row" (click)="toggle(contact)">
       <span class="avatar" aria-hidden="true">
-        @if (contact.base64Avatar) {
+        @if (contact.avatarStickerId) {
+        <app-protected-sticker-image [stickerId]="contact.avatarStickerId"
+          [alt]="getContactDisplayName(contact)"></app-protected-sticker-image>
+        } @else if (contact.base64Avatar) {
         <img [src]="contact.base64Avatar" [alt]="getContactDisplayName(contact)" />
         } @else {
         <mat-icon>person</mat-icon>

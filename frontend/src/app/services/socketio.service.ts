@@ -299,12 +299,14 @@ export class SocketioService {
                 this.userService.getProfile().avatarFileId
               )) || '';
               payload.contact.avatarAttribution = this.userService.getProfile().avatarAttribution;
+              payload.contact.avatarStickerId = this.userService.getProfile().avatarStickerId;
               payload.contact.provided = true;
               this.socket.emit('contact:provideUserProfile', payload.contact);
             } else {
               payload.contact.name = '';
               payload.contact.base64Avatar = '';
               payload.contact.avatarAttribution = undefined;
+              payload.contact.avatarStickerId = undefined;
               payload.contact.provided = false;
               this.socket.emit('contact:provideUserProfile', payload.contact);
             }
@@ -334,12 +336,21 @@ export class SocketioService {
       if (payload.status == 200) {
         contact.name = payload.contact.name !== '' ? payload.contact.name : this.i18n.t('common.contact.notSet');
         const incomingAvatar = payload.contact.base64Avatar || '';
-        contact.avatarAttribution = incomingAvatar ? payload.contact.avatarAttribution : undefined;
-        if (incomingAvatar !== '' && this.avatarStorage.isSupported()) {
+        const incomingStickerId = payload.contact.avatarStickerId?.trim();
+        contact.avatarAttribution = incomingAvatar && !incomingStickerId ? payload.contact.avatarAttribution : undefined;
+        contact.avatarStickerId = incomingStickerId || undefined;
+        if (incomingStickerId) {
+          if (contact.avatarFileId) void this.avatarStorage.deleteImage(contact.avatarFileId);
+          contact.avatarFileId = undefined;
+          contact.avatarOriginalFileId = undefined;
+          contact.base64Avatar = undefined;
+          this.contactService.saveAditionalContactInfos();
+        } else if (incomingAvatar !== '' && this.avatarStorage.isSupported()) {
           this.avatarStorage.saveImageFromBase64('avatar', incomingAvatar).then((saved) => {
             if (saved) {
               contact.avatarFileId = saved.id;
               contact.base64Avatar = saved.url;
+              contact.avatarStickerId = undefined;
             } else {
               contact.base64Avatar = undefined;
               contact.avatarAttribution = undefined;
@@ -349,6 +360,7 @@ export class SocketioService {
         } else {
           contact.base64Avatar = undefined;
           contact.avatarAttribution = undefined;
+          contact.avatarStickerId = undefined;
           this.contactService.saveAditionalContactInfos();
         }
       } else {

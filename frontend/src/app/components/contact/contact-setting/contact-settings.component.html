@@ -11,7 +11,7 @@
   <input type="file" id="avatar" name="avatar" accept="image/png, image/jpeg" class="file-input"
     (change)="onFileSelected($event)" #fileUpload />
 
-  @if (!contact.base64Avatar) {
+  @if (!contact.base64Avatar && !contact.avatarStickerId) {
   <div class="avatar-area">
     <button mat-flat-button class="button-set-avatar" (click)="openAvatarSourceDialog(fileUpload)">
       <span>{{ 'common.contact.profile.setAvatar' | transloco }}</span>
@@ -21,8 +21,13 @@
   } @else {
   <div class="avatar-area">
     <div class="center">
+      @if (contact.avatarStickerId) {
+      <app-protected-sticker-image class="avatar" [stickerId]="contact.avatarStickerId"
+        [alt]="contact.name || ''"></app-protected-sticker-image>
+      } @else {
       <img class="avatar" [src]="contact.base64Avatar"
         [attr.alt]="contact.name ? ('common.contact.profile.avatarAltName' | transloco:{ name: contact.name }) : ('common.contact.profile.avatarAlt' | transloco)" /><br />
+      }
     </div>
     @if (contact.avatarAttribution?.source === 'unsplash') {
     <div class="unsplash-badge-wrapper">
@@ -42,10 +47,12 @@
     </div>
     }
     <div class="button-style">
+      @if (!contact.avatarStickerId) {
       <button mat-mini-fab color="primary" class="upload-button" (click)="editAvatar()"
         [attr.aria-label]="'common.actions.edit' | transloco">
         <mat-icon>edit</mat-icon>
       </button>
+      }
       <button mat-mini-fab color="primary" class="upload-button" (click)="deleteAvatar()">
         <mat-icon>delete</mat-icon>
       </button>

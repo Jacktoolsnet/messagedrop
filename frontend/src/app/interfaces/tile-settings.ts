@@ -45,6 +45,7 @@ export interface ShoppingProduct {
   image?: string;
   imageFileId?: string;
   imageAttribution?: AvatarAttribution;
+  imageStickerId?: string;
   quantity: number;
   unit: ShoppingUnit;
   price?: number;
@@ -60,6 +61,7 @@ export interface ShoppingCategory {
   image?: string;
   imageFileId?: string;
   imageAttribution?: AvatarAttribution;
+  imageStickerId?: string;
   backgroundImage?: string;
   backgroundImageFileId?: string;
   backgroundAttribution?: AvatarAttribution;

@@ -13,7 +13,7 @@
   <input type="file" id="avatar" name="avatar" accept="image/png, image/jpeg" class="file-input"
     (change)="onFileSelected($event)" #fileUpload />
 
-  @if (userService.getProfile().base64Avatar === '') {
+  @if (!userService.getProfile().base64Avatar && !userService.getProfile().avatarStickerId) {
   <div class="avatar-area">
     <button mat-flat-button class="button-set-avatar" (click)="openAvatarSourceDialog(fileUpload)">
       <span>{{ 'common.user.profile.setAvatar' | transloco }}</span>
@@ -23,10 +23,15 @@
   } @else {
   <div class="avatar-area">
     <div class="center">
+      @if (userService.getProfile().avatarStickerId) {
+      <app-protected-sticker-image class="avatar" [stickerId]="userService.getProfile().avatarStickerId"
+        [alt]="userService.getProfile().name"></app-protected-sticker-image>
+      } @else {
       <img class="avatar" [src]="userService.getProfile().base64Avatar"
         [attr.alt]="userService.getProfile().name
           ? ('common.user.profile.avatarAltName' | transloco: { name: userService.getProfile().name })
           : ('common.user.profile.avatarAltFallback' | transloco)" /><br />
+      }
     </div>
     @if (userService.getProfile().avatarAttribution?.source === 'unsplash') {
     <div class="unsplash-badge-wrapper">
@@ -47,10 +52,12 @@
     </div>
     }
     <div class="button-style">
+      @if (!userService.getProfile().avatarStickerId) {
       <button mat-mini-fab color="primary" class="upload-button" (click)="editAvatar()"
         [attr.aria-label]="'common.actions.edit' | transloco">
         <mat-icon>edit</mat-icon>
       </button>
+      }
       <button mat-mini-fab color="primary" class="upload-button" (click)="deleteAvatar()">
         <mat-icon>delete</mat-icon>
       </button>

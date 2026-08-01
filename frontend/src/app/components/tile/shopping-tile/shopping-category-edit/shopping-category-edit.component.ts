@@ -18,7 +18,8 @@ import { TranslationHelperService } from '../../../../services/translation-helpe
 import { UnsplashService } from '../../../../services/unsplash.service';
 import { ShoppingImageStorageService } from '../../../../services/shopping-image-storage.service';
 import { AvatarCropperComponent } from '../../../utils/avatar-cropper/avatar-cropper.component';
-import { AvatarSourceChoice, AvatarSourceDialogComponent } from '../../../utils/avatar-source-dialog/avatar-source-dialog.component';
+import { AvatarSourceDialogComponent, AvatarSourceResult } from '../../../utils/avatar-source-dialog/avatar-source-dialog.component';
+import { ProtectedStickerImageComponent } from '../../../utils/protected-sticker-image/protected-sticker-image.component';
 import { CameraCaptureDialogComponent } from '../../../utils/camera-capture-dialog/camera-capture-dialog.component';
 import { DialogHeaderComponent } from '../../../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
@@ -47,7 +48,8 @@ type CategoryImageKind = 'avatar' | 'background';
     MatIcon,
     MatInputModule,
     MatSliderModule,
-    TranslocoPipe
+    TranslocoPipe,
+    ProtectedStickerImageComponent
   ],
   templateUrl: './shopping-category-edit.component.html',
   styleUrl: './shopping-category-edit.component.css',
@@ -68,6 +70,7 @@ export class ShoppingCategoryEditComponent {
   readonly nameControl = new FormControl(this.source?.name ?? '', { nonNullable: true });
   readonly image = signal<string | undefined>(this.source?.image);
   readonly imageAttribution = signal<AvatarAttribution | undefined>(this.source?.imageAttribution);
+  readonly imageStickerId = signal<string | undefined>(this.source?.imageStickerId);
   readonly backgroundImage = signal<string | undefined>(this.source?.backgroundImage);
   readonly backgroundAttribution = signal<AvatarAttribution | undefined>(this.source?.backgroundAttribution);
   private readonly imageRemoved = signal(false);
@@ -99,10 +102,18 @@ export class ShoppingCategoryEditComponent {
       data: kind === 'background' ? {
         titleKey: 'common.backgroundSource.title',
         icon: 'wallpaper',
-        showCamera: true
+        showCamera: true,
+        showSticker: false
       } : { showCamera: true }
     });
-    ref.afterClosed().subscribe((choice?: AvatarSourceChoice) => {
+    ref.afterClosed().subscribe((choice?: AvatarSourceResult) => {
+      if (choice && typeof choice === 'object' && kind === 'avatar') {
+        this.imageRemoved.set(false);
+        this.image.set(undefined);
+        this.imageAttribution.set(undefined);
+        this.imageStickerId.set(choice.stickerId);
+        return;
+      }
       if (choice === 'file') input.click();
       if (choice === 'camera') this.openCamera(kind);
       if (choice === 'unsplash') this.openUnsplash(kind);
@@ -151,6 +162,7 @@ export class ShoppingCategoryEditComponent {
       this.imageRemoved.set(true);
       this.image.set(undefined);
       this.imageAttribution.set(undefined);
+      this.imageStickerId.set(undefined);
       return;
     }
     this.backgroundRemoved.set(true);
@@ -181,8 +193,11 @@ export class ShoppingCategoryEditComponent {
       id: this.source?.id ?? createShoppingId('category'),
       name,
       image: this.image(),
-      imageFileId: !this.imageRemoved() && !this.image()?.startsWith('data:image/') ? this.source?.imageFileId : undefined,
+      imageFileId: !this.imageStickerId() && !this.imageRemoved() && !this.image()?.startsWith('data:image/')
+        ? this.source?.imageFileId
+        : undefined,
       imageAttribution: this.imageAttribution(),
+      imageStickerId: this.imageStickerId(),
       backgroundImage: this.backgroundImage(),
       backgroundImageFileId: !this.backgroundRemoved() && !this.backgroundImage()?.startsWith('data:image/')
         ? this.source?.backgroundImageFileId
@@ -252,6 +267,7 @@ export class ShoppingCategoryEditComponent {
       this.imageRemoved.set(false);
       this.image.set(cropped);
       this.imageAttribution.set(attribution);
+      this.imageStickerId.set(undefined);
     });
   }
 

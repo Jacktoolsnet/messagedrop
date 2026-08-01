@@ -33,6 +33,7 @@ import { ContactSortDialogComponent } from './contact-sort-dialog/contact-sort-d
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { DisplayMessageRef, DisplayMessageService } from '../../services/display-message.service';
 import { NetworkService } from '../../services/network.service';
+import { ProtectedStickerImageComponent } from '../utils/protected-sticker-image/protected-sticker-image.component';
 
 interface ConnectDialogResult {
   connectId?: string;
@@ -57,6 +58,7 @@ interface ContactMessagePreview {
 @Component({
   selector: 'app-contactlist',
   imports: [
+    ProtectedStickerImageComponent,
     DialogHeaderComponent,
     MatCardModule,
     CommonModule,

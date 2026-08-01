@@ -31,10 +31,12 @@ import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultim
 import { CreatePinComponent } from '../pin/create-pin/create-pin.component';
 import { CheckPinComponent } from '../pin/check-pin/check-pin.component';
 import { SecretDropCommentsDialogComponent } from '../secret-drop-comments-dialog/secret-drop-comments-dialog.component';
+import { ProtectedStickerImageComponent } from '../utils/protected-sticker-image/protected-sticker-image.component';
 
 @Component({
   selector: 'app-my-secret-drop-list',
   imports: [
+    ProtectedStickerImageComponent,
     CommonModule,
     DatePipe,
     DialogHeaderComponent,

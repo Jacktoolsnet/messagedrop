@@ -16,6 +16,7 @@ export interface Place {
     avatarFileId?: string,
     avatarOriginalFileId?: string,
     avatarAttribution?: AvatarAttribution,
+    avatarStickerId?: string,
     placeBackgroundImage?: string,
     placeBackgroundFileId?: string,
     placeBackgroundOriginalFileId?: string,

@@ -4,7 +4,10 @@
     @for (product of products(); track product.id) {
       <div class="sort-row" cdkDrag>
         <button type="button" class="drag-handle" cdkDragHandle [attr.aria-label]="'common.tiles.shopping.reorderProduct' | transloco"><mat-icon>drag_indicator</mat-icon></button>
-        @if (product.image) {
+        @if (product.imageStickerId) {
+          <app-protected-sticker-image class="product-avatar" [stickerId]="product.imageStickerId"
+            [alt]="product.name"></app-protected-sticker-image>
+        } @else if (product.image) {
           <img class="product-avatar" [src]="product.image" [alt]="product.name" />
         } @else {
           <mat-icon>inventory_2</mat-icon>

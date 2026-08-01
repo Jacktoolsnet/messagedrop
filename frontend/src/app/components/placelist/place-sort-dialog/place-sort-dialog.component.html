@@ -12,7 +12,10 @@
         <mat-icon>drag_indicator</mat-icon>
       </button>
       <span class="avatar">
-        @if (place.base64Avatar) {
+        @if (place.avatarStickerId) {
+        <app-protected-sticker-image class="avatar__img" [stickerId]="place.avatarStickerId"
+          [alt]="getPlaceName(place)"></app-protected-sticker-image>
+        } @else if (place.base64Avatar) {
         <img class="avatar__img" [src]="place.base64Avatar"
           [attr.alt]="getPlaceName(place)" />
         } @else {

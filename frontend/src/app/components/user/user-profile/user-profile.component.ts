@@ -18,12 +18,13 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
 import { UnsplashService } from '../../../services/unsplash.service';
 import { UserService } from '../../../services/user.service';
 import { AvatarCropperComponent } from '../../utils/avatar-cropper/avatar-cropper.component';
-import { AvatarSourceChoice, AvatarSourceDialogComponent } from '../../utils/avatar-source-dialog/avatar-source-dialog.component';
+import { AvatarSourceDialogComponent, AvatarSourceResult } from '../../utils/avatar-source-dialog/avatar-source-dialog.component';
 import { FontPickerDialogComponent } from '../../utils/font-picker-dialog/font-picker-dialog.component';
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 import { UnsplashComponent } from '../../utils/unsplash/unsplash.component';
 import { DialogHeaderComponent } from '../../utils/dialog-header/dialog-header.component';
 import { DisplayMessageService } from '../../../services/display-message.service';
+import { ProtectedStickerImageComponent } from '../../utils/protected-sticker-image/protected-sticker-image.component';
 
 @Component({
   selector: 'app-profile',
@@ -39,7 +40,8 @@ import { DisplayMessageService } from '../../../services/display-message.service
     MatIconModule,
     MatSelectModule,
     MatFormFieldModule,
-    TranslocoPipe
+    TranslocoPipe,
+    ProtectedStickerImageComponent
   ],
   templateUrl: './user-profile.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -76,7 +78,11 @@ export class UserProfileComponent {
       autoFocus: false
     });
 
-    dialogRef.afterClosed().subscribe((choice?: AvatarSourceChoice) => {
+    dialogRef.afterClosed().subscribe((choice?: AvatarSourceResult) => {
+      if (choice && typeof choice === 'object') {
+        void this.applyStickerAvatar(choice.stickerId);
+        return;
+      }
       if (choice === 'file') {
         fileInput.click();
         return;
@@ -147,6 +153,23 @@ export class UserProfileComponent {
     this.userService.getProfile().avatarOriginalFileId = undefined;
     this.userService.getProfile().base64Avatar = '';
     this.userService.getProfile().avatarAttribution = undefined;
+    this.userService.getProfile().avatarStickerId = undefined;
+    this.userService.notifyProfileChanged();
+  }
+
+  private async applyStickerAvatar(stickerId: string): Promise<void> {
+    const profile = this.userService.getProfile();
+    if (profile.avatarFileId && profile.avatarFileId !== this.oriProfile.avatarFileId) {
+      await this.avatarStorage.deleteImage(profile.avatarFileId);
+    }
+    if (profile.avatarOriginalFileId && profile.avatarOriginalFileId !== this.oriProfile.avatarOriginalFileId) {
+      await this.avatarStorage.deleteImage(profile.avatarOriginalFileId);
+    }
+    profile.avatarFileId = undefined;
+    profile.avatarOriginalFileId = undefined;
+    profile.base64Avatar = '';
+    profile.avatarAttribution = undefined;
+    profile.avatarStickerId = stickerId;
     this.userService.notifyProfileChanged();
   }
 
@@ -347,6 +370,7 @@ export class UserProfileComponent {
       profile.avatarOriginalFileId = savedOriginalId;
       profile.base64Avatar = saved.url;
       profile.avatarAttribution = attribution;
+      profile.avatarStickerId = undefined;
       this.userService.notifyProfileChanged();
     });
   }

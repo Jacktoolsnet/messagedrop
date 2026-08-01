@@ -17,7 +17,7 @@
   <input type="file" id="avatar" name="avatar" accept="image/png, image/jpeg" class="file-input"
     (change)="onFileSelected($event)" #fileUpload />
 
-  @if (!data.place.base64Avatar) {
+  @if (!data.place.base64Avatar && !data.place.avatarStickerId) {
   <div class="avatar-area">
     <button mat-flat-button class="button-set-avatar" (click)="openAvatarSourceDialog(fileUpload)">
       <span>{{ 'common.placeSettings.setAvatar' | transloco }}</span>
@@ -27,8 +27,13 @@
   } @else {
   <div class="avatar-area">
     <div class="center">
+      @if (data.place.avatarStickerId) {
+      <app-protected-sticker-image class="avatar" [stickerId]="data.place.avatarStickerId"
+        [alt]="data.place.name"></app-protected-sticker-image>
+      } @else {
       <img class="avatar" [src]="data.place.base64Avatar"
         [attr.alt]="data.place.name ? ('common.placeSettings.avatarAltName' | transloco:{ name: data.place.name }) : ('common.placeSettings.avatarAltFallback' | transloco)" /><br />
+      }
     </div>
     @if (data.place.avatarAttribution?.source === 'unsplash') {
     <div class="unsplash-badge-wrapper">
@@ -48,10 +53,12 @@
     </div>
     }
     <div class="button-style">
+      @if (!data.place.avatarStickerId) {
       <button mat-mini-fab color="primary" class="upload-button" (click)="editAvatar()"
         [attr.aria-label]="'common.actions.edit' | transloco">
         <mat-icon>edit</mat-icon>
       </button>
+      }
       <button mat-mini-fab color="primary" class="upload-button" (click)="deleteAvatar()"
         [attr.aria-label]="'common.placeSettings.deleteAvatarAria' | transloco">
         <mat-icon>delete</mat-icon>

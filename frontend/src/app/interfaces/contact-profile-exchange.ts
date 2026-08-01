@@ -54,4 +54,5 @@ export interface SharedContactProfilePayload {
   name: string;
   base64Avatar: string;
   avatarAttribution?: AvatarAttribution;
+  avatarStickerId?: string;
 }

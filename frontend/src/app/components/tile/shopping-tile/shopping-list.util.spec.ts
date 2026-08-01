@@ -9,12 +9,14 @@ describe('shopping list utilities', () => {
         {
           id: 'second',
           name: ' Bakery ',
+          imageStickerId: ' category-sticker ',
           imageFileId: 'category-image',
           backgroundImageFileId: 'category-background',
           order: 2,
           products: [{
             id: 'bread',
             name: ' Bread ',
+            imageStickerId: ' product-sticker ',
             imageFileId: 'product-image',
             quantity: 0,
             unit: 'piece',
@@ -33,10 +35,10 @@ describe('shopping list utilities', () => {
     expect(normalized.currency).toBe('EUR');
     expect(normalized.categories.map(category => category.id)).toEqual(['first', 'second']);
     expect(normalized.categories[1].products[0]).toEqual(jasmine.objectContaining({
-      name: 'Bread', imageFileId: 'product-image', quantity: 1, price: undefined, needed: false, done: false, order: 0
+      name: 'Bread', imageFileId: undefined, imageStickerId: 'product-sticker', quantity: 1, price: undefined, needed: false, done: false, order: 0
     }));
     expect(normalized.categories[1]).toEqual(jasmine.objectContaining({
-      imageFileId: 'category-image', backgroundImageFileId: 'category-background'
+      imageFileId: undefined, imageStickerId: 'category-sticker', backgroundImageFileId: 'category-background'
     }));
   });
 

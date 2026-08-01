@@ -1,0 +1,32 @@
+:host {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.sticker,
+.protection-overlay {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.protection-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.state {
+  display: inline-flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}

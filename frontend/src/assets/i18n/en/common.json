@@ -53,6 +53,7 @@
       "title": "Choose avatar source",
       "file": "Choose image",
       "unsplash": "Use Unsplash",
+      "sticker": "Choose sticker",
       "camera": "Take photo",
       "cameraTitle": "Take photo",
       "cameraHint": "Point the camera at the product and take the photo.",

@@ -9,10 +9,12 @@ import { Place } from '../../../interfaces/place';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 import { TileListComponent } from '../tile-list/tile-list.component';
+import { ProtectedStickerImageComponent } from '../../utils/protected-sticker-image/protected-sticker-image.component';
 
 @Component({
   selector: 'app-tile-list-dialog',
   imports: [
+    ProtectedStickerImageComponent,
     MatDialogTitle,
     MatDialogContent,
     MatDialogActions,
