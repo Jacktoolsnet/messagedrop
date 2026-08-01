@@ -80,6 +80,8 @@ export class MapService {
   private userMarker?: leaflet.Marker;
   private searchRectangle?: leaflet.Rectangle;
   private circleMarker?: leaflet.CircleMarker;
+  private zoomLevelButton?: HTMLButtonElement;
+  private zoomLevelButtonLabel = 'Search settings';
   private location: Location = { latitude: 0, longitude: 0, plusCode: '' };
 
   private markerClickEvent?: EventEmitter<MarkerLocation>;
@@ -95,7 +97,13 @@ export class MapService {
     this._mapSet.update(trigger => trigger + 1);
   }
 
-  public initMapEvents(location: Location, clickEvent: EventEmitter<Location>, moveEndEvent: EventEmitter<Location>, markerClickEvent: EventEmitter<MarkerLocation>): void {
+  public initMapEvents(
+    location: Location,
+    clickEvent: EventEmitter<Location>,
+    moveEndEvent: EventEmitter<Location>,
+    markerClickEvent: EventEmitter<MarkerLocation>,
+    searchSettingsClickEvent: EventEmitter<void>
+  ): void {
     this.markerClickEvent = markerClickEvent;
 
     if (this.map) {
@@ -114,6 +122,8 @@ export class MapService {
       worldCopyJump: true
     });
 
+    this.addZoomLevelButton(searchSettingsClickEvent);
+
     this.map.setMaxBounds([[-90, -180], [90, 180]]);
     this.setCircleMarker();
 
@@ -131,6 +141,8 @@ export class MapService {
         this.circleMarker?.remove();
       }
     });
+
+    this.map.on('zoomend', () => this.updateZoomLevelButton());
 
     // MoveEnd fires always.
     this.map.on('moveend', () => {
@@ -186,6 +198,39 @@ export class MapService {
 
   public getMapZoom(): number {
     return undefined == this.map ? 3 : this.map.getZoom()
+  }
+
+  public setZoomLevelButtonLabel(label: string): void {
+    this.zoomLevelButtonLabel = label;
+    this.updateZoomLevelButton();
+  }
+
+  private addZoomLevelButton(searchSettingsClickEvent: EventEmitter<void>): void {
+    const zoomControlContainer = this.map?.zoomControl.getContainer();
+    if (!zoomControlContainer) {
+      return;
+    }
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'leaflet-control-zoom-level-button';
+    button.addEventListener('click', () => searchSettingsClickEvent.emit());
+    leaflet.DomEvent.disableClickPropagation(button);
+    leaflet.DomEvent.disableScrollPropagation(button);
+    zoomControlContainer.appendChild(button);
+    this.zoomLevelButton = button;
+    this.updateZoomLevelButton();
+  }
+
+  private updateZoomLevelButton(): void {
+    if (!this.zoomLevelButton) {
+      return;
+    }
+
+    const zoomLevel = String(Math.round(this.getMapZoom())).padStart(2, '0');
+    this.zoomLevelButton.textContent = zoomLevel;
+    this.zoomLevelButton.title = this.zoomLevelButtonLabel;
+    this.zoomLevelButton.setAttribute('aria-label', `${this.zoomLevelButtonLabel}: ${zoomLevel}`);
   }
 
   public getMapLocation(): Location {

@@ -17,9 +17,11 @@ export class MapComponent implements AfterViewInit, OnChanges, OnDestroy {
   @Input() lastMarkerUpdate = 0;
   @Input() location: Location = { latitude: 0, longitude: 0, plusCode: '' };
   @Input() markerLocations: Map<string, MarkerLocation> = new Map<string, MarkerLocation>();
+  @Input() zoomLevelButtonLabel = 'Search settings';
   @Output() clickEvent = new EventEmitter<Location>();
   @Output() moveEndEvent = new EventEmitter<Location>();
   @Output() markerClickEvent = new EventEmitter<MarkerLocation>();
+  @Output() searchSettingsClickEvent = new EventEmitter<void>();
 
   private readonly mapService = inject(MapService);
   readonly userService = inject(UserService);
@@ -27,6 +29,7 @@ export class MapComponent implements AfterViewInit, OnChanges, OnDestroy {
 
   ngOnChanges(): void {
     this.mapService.createMarkers(this.markerLocations);
+    this.mapService.setZoomLevelButtonLabel(this.zoomLevelButtonLabel);
   }
 
   ngAfterViewInit(): void {
@@ -44,7 +47,13 @@ export class MapComponent implements AfterViewInit, OnChanges, OnDestroy {
     if (this.destroyed) {
       return;
     }
-    this.mapService.initMapEvents(this.location, this.clickEvent, this.moveEndEvent, this.markerClickEvent);
+    this.mapService.initMapEvents(
+      this.location,
+      this.clickEvent,
+      this.moveEndEvent,
+      this.markerClickEvent,
+      this.searchSettingsClickEvent
+    );
   }
 
 }

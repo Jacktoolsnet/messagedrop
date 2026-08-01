@@ -4,7 +4,9 @@
 <app-consent-gate></app-consent-gate>
 } @else {
 <app-map [lastMarkerUpdate]="lastMarkerUpdate" [location]="mapService.getMapLocation()"
-    [markerLocations]="markerLocations" (clickEvent)="handleClickEvent($event)" (moveEndEvent)="handleMoveEndEvent()"
+    [markerLocations]="markerLocations" [zoomLevelButtonLabel]="'common.menu.searchSettings' | transloco"
+    (clickEvent)="handleClickEvent($event)" (moveEndEvent)="handleMoveEndEvent()"
+    (searchSettingsClickEvent)="openSearchSettings()"
     (markerClickEvent)="handleMarkerClickEvent($event)">
 </app-map>
 

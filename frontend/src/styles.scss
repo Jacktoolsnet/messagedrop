@@ -181,7 +181,8 @@ h2[mat-dialog-title].dialog-title {
   gap: 0.35rem;
 }
 
-.leaflet-control-zoom.leaflet-bar a {
+.leaflet-control-zoom.leaflet-bar a,
+.leaflet-control-zoom.leaflet-bar .leaflet-control-zoom-level-button {
   background-color: var(--mat-fab-small-container-color) !important;
   color: var(--mat-fab-small-foreground-color) !important;
   border: 1px solid var(--mat-card-outlined-outline-color) !important;
@@ -191,15 +192,21 @@ h2[mat-dialog-title].dialog-title {
   line-height: 2.5rem;
   font-size: 1.25rem;
   font-weight: 600;
+  font-family: inherit;
+  text-align: center;
+  cursor: pointer;
+  padding: 0;
   box-shadow: 0 2px 6px var(--mat-card-outlined-outline-color);
   margin: 0 !important;
 }
 
-.leaflet-control-zoom.leaflet-bar a:hover {
+.leaflet-control-zoom.leaflet-bar a:hover,
+.leaflet-control-zoom.leaflet-bar .leaflet-control-zoom-level-button:hover {
   filter: brightness(0.97);
 }
 
-.leaflet-control-zoom.leaflet-bar a:focus-visible {
+.leaflet-control-zoom.leaflet-bar a:focus-visible,
+.leaflet-control-zoom.leaflet-bar .leaflet-control-zoom-level-button:focus-visible {
   outline: 2px solid var(--mat-fab-small-container-color);
   outline-offset: 2px;
 }
