@@ -1544,6 +1544,7 @@
       "title": "Wikipedia articles",
       "search": "Search Wikipedia articles",
       "searchPlaceholder": "Enter a search term",
+      "searching": "Searching Wikipedia for “{{ term }}”.",
       "noGeocodedResults": "No articles with a map location were found.",
       "readArticle": "Read on Wikipedia",
       "navigate": "Start navigation with Google Maps",

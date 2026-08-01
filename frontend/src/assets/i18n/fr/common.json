@@ -1543,6 +1543,7 @@
       "title": "Articles Wikipédia",
       "search": "Rechercher des articles Wikipédia",
       "searchPlaceholder": "Saisir un terme de recherche",
+      "searching": "Recherche de « {{ term }} » dans Wikipédia.",
       "noGeocodedResults": "Aucun article avec une position sur la carte n’a été trouvé.",
       "readArticle": "Lire sur Wikipédia",
       "navigate": "Démarrer la navigation avec Google Maps",

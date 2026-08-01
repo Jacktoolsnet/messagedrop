@@ -3,11 +3,11 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatDialog, MatDialogActions, MatDialogClose, MatDialogContent } from '@angular/material/dialog';
+import { MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import { catchError, forkJoin, map, of, startWith, switchMap } from 'rxjs';
+import { catchError, finalize, forkJoin, map, of, startWith, switchMap } from 'rxjs';
 import { DisplayMessageConfig } from '../../../interfaces/display-message-config';
 import { WikipediaArticle, WikipediaImageAttribution } from '../../../interfaces/wikipedia';
 import { Location } from '../../../interfaces/location';
@@ -62,10 +62,12 @@ export class WikipediaSearchComponent {
     this.loading.set(true);
     this.hasSearched.set(false);
     this.results.set([]);
+    const loadingRef = this.openLoadingMessage(term);
     this.wikipedia.search({ term, language: this.transloco.getActiveLang(), limit: 10 }).pipe(
       switchMap((response) => response.articles.length
         ? forkJoin(response.articles.map((article) => this.resolveAttribution(article, response.language)))
         : of([] as WikipediaArticle[])),
+      finalize(() => loadingRef.close()),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: (articles) => {
@@ -152,6 +154,30 @@ export class WikipediaSearchComponent {
       maxWidth: '90vw',
       maxHeight: '90vh',
       hasBackdrop: false,
+      autoFocus: false
+    });
+  }
+
+  private openLoadingMessage(term: string): MatDialogRef<DisplayMessage> {
+    const config: DisplayMessageConfig = {
+      showAlways: true,
+      title: this.transloco.translate('common.wikipedia.title'),
+      image: '',
+      icon: 'search',
+      message: this.transloco.translate('common.wikipedia.searching', { term }),
+      button: '',
+      delay: 0,
+      showSpinner: true,
+      autoclose: false
+    };
+    return this.dialog.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: config,
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
       autoFocus: false
     });
   }
