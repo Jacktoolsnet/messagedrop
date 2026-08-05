@@ -161,8 +161,8 @@ platform/admin/backend/uploads/
 # generated sticker assets
 services/sticker/storage/
 
-# local documents (e.g., downloaded API docs)
-documents/
+# Local/downloaded API documentation and captured upstream responses
+docs/external/
 
 # backups
 backups/

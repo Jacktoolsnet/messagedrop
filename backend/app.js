@@ -89,6 +89,7 @@ const weather = require('./routes/weather');
 const airQualtiy = require('./routes/air-quality');
 const nominatim = require('./routes/nominatim');
 const wikipedia = require('./routes/wikipedia');
+const tripgo = require('./routes/tripgo');
 const viator = require('./routes/viator');
 const tenor = require('./routes/tenor');
 const klipy = require('./routes/klipy');
@@ -537,6 +538,15 @@ const wikipediaLimit = rateLimit({
   message: rateLimitMessage('Too many Wikipedia requests, please try again later.')
 });
 
+const tripgoLimit = rateLimit({
+  // Keep client-specific limiting at the public boundary. The internal service
+  // only sees this backend as its caller.
+  windowMs: Number(process.env.TRIPGO_PUBLIC_RATE_LIMIT_WINDOW_MS || 10 * 60 * 1000),
+  limit: Number(process.env.TRIPGO_PUBLIC_RATE_LIMIT || 120),
+  ...rateLimitDefaults,
+  message: rateLimitMessage('Too many TripGo requests, please try again later.')
+});
+
 const viatorLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
   limit: 120,
@@ -689,6 +699,7 @@ app.use('/moderation', basicLimit, slowRequestDefault, moderation);
 app.use('/notification', notificationLimit, slowRequestDefault, notification);
 app.use('/nominatim', nominatimLimit, slowRequestNominatim, nominatim);
 app.use('/wikipedia', wikipediaLimit, slowRequestWikipedia, wikipedia);
+app.use('/tripgo', tripgoLimit, slowRequestDefault, tripgo);
 app.use('/viator', viatorLimit, slowRequestDefault, viator);
 app.use('/openai', openAiLimit, slowRequestDefault, openAi);
 app.use('/place', placeLimit, slowRequestDefault, place);

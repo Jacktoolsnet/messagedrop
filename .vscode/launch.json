@@ -125,6 +125,21 @@
             "type": "node"
         },
         {
+            "name": "TripGo-Service",
+            "program": "${workspaceFolder}/services/tripgo/app.js",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "env": {
+                "SERVICE_JWT_ISSUER": "service.tripgo",
+                "SERVICE_JWT_AUDIENCE": "service.tripgo",
+                "SERVICE_JWT_TRUSTED_JWKS_PATH": "${workspaceFolder}/services/tripgo/config/service-jwks.json"
+            },
+            "type": "node"
+        },
+        {
             "name": "Messagedrop-App",
             "type": "node",
             "request": "launch",

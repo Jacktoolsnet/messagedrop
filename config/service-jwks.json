@@ -78,5 +78,15 @@
     "x": "bIgKKQwUk0ClBR3zIwmHEMWidRAoV2WAwzovc1liiEEsvPeOcP-11kxJusKXt32N",
     "y": "gBCiQKIhPmmOiVx6htjuMGHkNQHLQ0GfzxUulJ7hQ5JTihOsImIPus2tbnyEQWFk",
     "crv": "P-384"
+  },
+  "service.tripgo": {
+    "key_ops": [
+      "verify"
+    ],
+    "ext": true,
+    "kty": "EC",
+    "x": "Vj3oKR2e0MbHV82X-hTJHZOgcqQB8ezLK6r1RDbFI9BQG8JA7ErMXTm2kp5ys4d8",
+    "y": "7-e2yXTivgb_pfbdI3I59ta3QwzDPJ_Qb8ZE8DizBrfBQm8I5LOoKYepQLM6WLu7",
+    "crv": "P-384"
   }
 }
