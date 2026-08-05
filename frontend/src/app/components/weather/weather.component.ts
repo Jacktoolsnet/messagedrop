@@ -45,7 +45,7 @@ import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.comp
 export class WeatherComponent implements OnInit {
   readonly formatHourSliderLabel = (value: number): string => String(value);
 
-  private readonly dialogData = inject<{ weather?: Weather; location: Location; place?: Place }>(MAT_DIALOG_DATA);
+  private readonly dialogData = inject<{ weather?: Weather; location: Location; place?: Place; locationName?: string }>(MAT_DIALOG_DATA);
   private readonly refreshService = inject(OpenMeteoRefreshService);
   private readonly translation = inject(TranslationHelperService);
   private readonly injector = inject(Injector);
@@ -152,6 +152,12 @@ export class WeatherComponent implements OnInit {
   }
 
   getLocationName(): void {
+    const providedLocationName = this.dialogData.locationName?.trim() || this.dialogData.place?.name?.trim();
+    if (providedLocationName) {
+      this.locationName$ = of(providedLocationName);
+      return;
+    }
+
     const fallbackPlace = this.getFallbackLocationName(this.location, 'weather.location.unknown');
     this.locationName$ = this.nomatinService
       .getNominatimPlaceByLocation(this.location)

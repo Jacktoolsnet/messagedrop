@@ -127,6 +127,22 @@ describe('AirQualityComponent', () => {
     });
   });
 
+  it('should use a provided place name without requesting Nominatim', (done) => {
+    const dialogData = TestBed.inject(MAT_DIALOG_DATA) as { locationName?: string };
+    dialogData.locationName = 'Mein gespeicherter Ort';
+    const nominatimService = TestBed.inject(NominatimService);
+    const nominatimSpy = spyOn(nominatimService, 'getNominatimPlaceByLocation').and.callThrough();
+    const fixture = TestBed.createComponent(AirQualityComponent);
+    const component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    expect(nominatimSpy).not.toHaveBeenCalled();
+    component.locationName$?.subscribe((locationName) => {
+      expect(locationName).toBe('Mein gespeicherter Ort');
+      done();
+    });
+  });
+
   it('should open the detail view for a zero-valued tile when data exists', () => {
     const fixture = TestBed.createComponent(AirQualityComponent);
     const component = fixture.componentInstance;

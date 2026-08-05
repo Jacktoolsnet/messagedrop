@@ -45,7 +45,13 @@ export class AirQualityComponent implements OnInit {
   readonly formatHourSliderLabel = (value: number): string => String(value);
 
   private readonly nominatimService = inject(NominatimService);
-  private readonly dialogData = inject<{ airQuality?: AirQualityData; selectedKey?: AirQualityMetricKey; place?: Place; location?: Location }>(MAT_DIALOG_DATA);
+  private readonly dialogData = inject<{
+    airQuality?: AirQualityData;
+    selectedKey?: AirQualityMetricKey;
+    place?: Place;
+    location?: Location;
+    locationName?: string;
+  }>(MAT_DIALOG_DATA);
   private readonly refreshService = inject(OpenMeteoRefreshService);
   private readonly translation = inject(TranslationHelperService);
   private readonly injector = inject(Injector);
@@ -330,6 +336,13 @@ export class AirQualityComponent implements OnInit {
   }
 
   getLocationName(): void {
+    const providedLocationName = this.dialogData.locationName?.trim() || this.dialogData.place?.name?.trim();
+    if (providedLocationName) {
+      this.locationName = providedLocationName;
+      this.locationName$ = of(providedLocationName);
+      return;
+    }
+
     const location = this.dialogData.location ?? this.dialogData.place?.location;
     if (!location) {
       this.locationName$ = of(this.translation.t('weather.airQuality.title'));

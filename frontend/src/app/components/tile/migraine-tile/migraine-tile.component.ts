@@ -173,7 +173,8 @@ export class MigraineTileComponent {
       data: {
         weather: this.weather,
         location: this.geolocationService.getCenterOfBoundingBox(place.boundingBox),
-        place: place
+        place: place,
+        locationName: place.name
       },
       closeOnNavigation: true,
       minWidth: '90vw',

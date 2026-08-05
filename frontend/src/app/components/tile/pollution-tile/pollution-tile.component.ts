@@ -216,7 +216,7 @@ export class PollutionTileComponent {
     const place = this.placeSignal() ?? undefined;
     const location = place?.location;
     this.dialog.open(AirQualityComponent, {
-      data: { airQuality: this.airQuality, selectedKey: metricKey, place, location },
+      data: { airQuality: this.airQuality, selectedKey: metricKey, place, location, locationName: place?.name },
       closeOnNavigation: true,
       minWidth: '90vw',
       width: '90vw',

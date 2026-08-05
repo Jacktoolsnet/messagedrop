@@ -93,7 +93,12 @@ export class WeatherTileComponent {
   openWeatherDetails(): void {
     const boundingBox: BoundingBox | undefined = this.placeRef?.boundingBox;
     this.dialog.open(WeatherComponent, {
-      data: { weather: this.weather, location: this.geolocationService.getCenterOfBoundingBox(boundingBox!), place: this.placeRef },
+      data: {
+        weather: this.weather,
+        location: this.geolocationService.getCenterOfBoundingBox(boundingBox!),
+        place: this.placeRef,
+        locationName: this.placeRef?.name
+      },
       closeOnNavigation: true,
       minWidth: '90vw',
       width: '90vw',

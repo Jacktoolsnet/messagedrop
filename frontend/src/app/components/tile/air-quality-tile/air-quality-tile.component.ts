@@ -231,7 +231,13 @@ export class AirQualityTileComponent {
   public openAirQualityDetails(selectedKey?: AirQualityMetricKey): void {
     const location = this.placeRef?.location;
     const dialogRef = this.dialog.open(AirQualityComponent, {
-      data: { airQuality: this.airQuality, selectedKey, place: this.placeRef, location },
+      data: {
+        airQuality: this.airQuality,
+        selectedKey,
+        place: this.placeRef,
+        location,
+        locationName: this.placeRef?.name
+      },
       closeOnNavigation: true,
       minWidth: '90vw',
       width: '90vw',
