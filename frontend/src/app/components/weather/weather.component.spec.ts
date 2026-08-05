@@ -134,6 +134,17 @@ describe('WeatherComponent', () => {
     expect(component.selectedTile?.type).toBe('temperature');
   });
 
+  it('should open the pressure detail view when requested by another component', () => {
+    const fixture = TestBed.createComponent(WeatherComponent);
+    const component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    component.openTileDetails('pressure');
+
+    expect(component.selectedTile?.type).toBe('pressure');
+    expect(component.tileIndex).toBe(component.tiles().findIndex((tile) => tile.type === 'pressure'));
+  });
+
   it('should keep the detail view closed when no data is available for the selected time', () => {
     const fixture = TestBed.createComponent(WeatherComponent);
     const component = fixture.componentInstance;

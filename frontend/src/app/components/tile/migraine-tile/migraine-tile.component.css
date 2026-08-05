@@ -8,7 +8,6 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  cursor: pointer;
   transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
@@ -46,8 +45,9 @@
 
 .migraine-body {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(140px, 100%), 1fr));
   gap: 10px;
+  min-width: 0;
 }
 
 .day-switch {
@@ -70,18 +70,39 @@
   border-radius: 10px;
   background: var(--mat-sys-surface-container-high, rgba(0, 0, 0, 0.04));
   border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.metric:hover {
+  box-shadow: 0 2px 6px var(--mat-card-outlined-outline-color);
+}
+
+.metric:focus-visible {
+  outline: 2px solid var(--mat-sys-primary);
+  outline-offset: 2px;
+}
+
+.metric-icon {
+  flex: 0 0 auto;
+  color: var(--mat-sys-primary);
+}
+
+.metric-content {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .metric .label {
   font-size: 0.9rem;
   color: var(--mat-card-subtitle-text-color);
-}
-
-.metric-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  hyphens: auto;
+  overflow-wrap: anywhere;
 }
 
 .metric .value {

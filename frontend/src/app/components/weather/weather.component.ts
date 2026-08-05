@@ -105,8 +105,14 @@ export class WeatherComponent implements OnInit {
   onTileClick(tile: WeatherTile): void {
     const numericValue = this.getTileNumericValue(tile.type);
     if (numericValue == null) return;
+    this.openTileDetails(tile.type);
+  }
+
+  openTileDetails(type: WeatherTileType): void {
+    const tile = this.tiles().find((entry) => entry.type === type);
+    if (!tile) return;
     this.selectedTile = tile;
-    this.tileIndex = this.tiles().findIndex(t => t.type === tile.type);
+    this.tileIndex = this.tiles().findIndex((entry) => entry.type === type);
   }
 
   selectPreviousTile(): void {

@@ -11,7 +11,7 @@ import { GeolocationService } from '../../../services/geolocation.service';
 import { DatasetState, OpenMeteoRefreshService } from '../../../services/open-meteo-refresh.service';
 import { PlaceService } from '../../../services/place.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
-import { WeatherTile } from '../../weather/weather-tile.interface';
+import { WeatherTileType } from '../../weather/weather-tile.interface';
 import { WeatherComponent } from '../../weather/weather.component';
 import { MigraineTileEditComponent } from './migraine-tile-edit/migraine-tile-edit.component';
 
@@ -164,7 +164,7 @@ export class MigraineTileComponent {
     return `${val.toFixed(1)}${unit}`;
   }
 
-  openWeatherDetails(tileType: 'temperature' | 'pressure'): void {
+  openWeatherDetails(tileType: Extract<WeatherTileType, 'temperature' | 'pressure'>): void {
     const place = this.placeSignal();
     if (!place?.boundingBox) return;
 
@@ -191,16 +191,7 @@ export class MigraineTileComponent {
       if (selectedDayIndex >= 0) {
         comp?.onDayChange(selectedDayIndex);
       }
-      const placeholder: WeatherTile = {
-        type: tileType,
-        label: '',
-        icon: '',
-        value: '',
-        levelText: '',
-        color: '',
-        minMax: { min: 0, max: 0 }
-      };
-      comp?.onTileClick(placeholder);
+      comp?.openTileDetails(tileType);
     });
   }
 

@@ -1,5 +1,4 @@
-<div class="migraine-tile" role="button" tabindex="0" (click)="edit()"
-  (keyup.enter)="edit()" (keyup.space)="edit()">
+<div class="migraine-tile">
   <div class="migraine-header">
     <div class="migraine-icon">
       <mat-icon>{{ icon }}</mat-icon>
@@ -27,27 +26,37 @@
   </div>
 
   <div class="migraine-body">
-    <div class="metric" [class.warn]="tempChange.level === 'warn'" [class.alert]="tempChange.level === 'alert'">
-      <div class="label">{{ 'common.tiles.migraine.temperatureChange' | transloco }}</div>
-      <div class="metric-row">
+    <div class="metric" role="button" tabindex="0"
+      [attr.aria-label]="'common.tiles.migraine.openTemperatureAria' | transloco"
+      [class.warn]="tempChange.level === 'warn'" [class.alert]="tempChange.level === 'alert'"
+      (click)="openWeatherDetails('temperature')" (keyup.enter)="openWeatherDetails('temperature')"
+      (keyup.space)="openWeatherDetails('temperature')">
+      <mat-icon class="metric-icon">thermostat</mat-icon>
+      <div class="metric-content">
+        <div class="label">{{ 'common.tiles.migraine.temperatureChange' | transloco }}</div>
         <div class="value">{{ formatValue(tempChange.value, '°C') }}</div>
-        <button mat-icon-button color="primary" (click)="openWeatherDetails('temperature'); $event.stopPropagation();"
-          (keyup.enter)="$event.stopPropagation()" (keyup.space)="$event.stopPropagation()"
-          type="button" [attr.aria-label]="'common.tiles.migraine.openTemperatureAria' | transloco">
-          <mat-icon>thermostat</mat-icon>
-        </button>
       </div>
+      <button mat-icon-button color="primary" (click)="edit(); $event.stopPropagation()"
+        (keyup.enter)="$event.stopPropagation()" (keyup.space)="$event.stopPropagation()"
+        type="button" [attr.aria-label]="'common.tileList.openSettings' | transloco">
+        <mat-icon>settings</mat-icon>
+      </button>
     </div>
-    <div class="metric" [class.warn]="pressureChange.level === 'warn'" [class.alert]="pressureChange.level === 'alert'">
-      <div class="label">{{ 'common.tiles.migraine.pressureChange' | transloco }}</div>
-      <div class="metric-row">
+    <div class="metric" role="button" tabindex="0"
+      [attr.aria-label]="'common.tiles.migraine.openPressureAria' | transloco"
+      [class.warn]="pressureChange.level === 'warn'" [class.alert]="pressureChange.level === 'alert'"
+      (click)="openWeatherDetails('pressure')" (keyup.enter)="openWeatherDetails('pressure')"
+      (keyup.space)="openWeatherDetails('pressure')">
+      <mat-icon class="metric-icon">compress</mat-icon>
+      <div class="metric-content">
+        <div class="label">{{ 'common.tiles.migraine.pressureChange' | transloco }}</div>
         <div class="value">{{ formatValue(pressureChange.value, ' hPa') }}</div>
-        <button mat-icon-button color="primary" (click)="openWeatherDetails('pressure'); $event.stopPropagation();"
-          (keyup.enter)="$event.stopPropagation()" (keyup.space)="$event.stopPropagation()"
-          type="button" [attr.aria-label]="'common.tiles.migraine.openPressureAria' | transloco">
-          <mat-icon>compress</mat-icon>
-        </button>
       </div>
+      <button mat-icon-button color="primary" (click)="edit(); $event.stopPropagation()"
+        (keyup.enter)="$event.stopPropagation()" (keyup.space)="$event.stopPropagation()"
+        type="button" [attr.aria-label]="'common.tileList.openSettings' | transloco">
+        <mat-icon>settings</mat-icon>
+      </button>
     </div>
   </div>
 
