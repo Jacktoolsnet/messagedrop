@@ -27,5 +27,33 @@ curl --silent --show-error --fail-with-body \
   "${api_url}/tripgo/routes" \
   --output "${output_dir}/route-berlin.json"
 
-printf 'TripGo samples written to %s\n' "${output_dir}"
+# Diagnostic route requested for the circular bus line 794. The origin is near
+# Im Kirchfeld in Halchter; all coordinates can be overridden for an exact test.
+wolf_from_lat="${TRIPGO_WOLFENBUETTEL_FROM_LAT:-52.14323}"
+wolf_from_lng="${TRIPGO_WOLFENBUETTEL_FROM_LNG:-10.54569}"
+wolf_to_lat="${TRIPGO_WOLFENBUETTEL_TO_LAT:-52.159149}"
+wolf_to_lng="${TRIPGO_WOLFENBUETTEL_TO_LNG:-10.53245}"
 
+curl --silent --show-error --fail-with-body \
+  --request POST \
+  --header 'Content-Type: application/json' \
+  --data "{
+    \"from\": { \"latitude\": ${wolf_from_lat}, \"longitude\": ${wolf_from_lng} },
+    \"to\": { \"latitude\": ${wolf_to_lat}, \"longitude\": ${wolf_to_lng} },
+    \"locale\": \"de\",
+    \"modes\": [\"pt_pub\"]
+  }" \
+  "${api_url}/tripgo/routes" \
+  --output "${output_dir}/route-wolfenbuettel.json"
+
+# Keep the unmodified upstream response for checking fields such as
+# serviceDirection, serviceName, platforms and externalData. The API key is
+# read from the ignored root .env and is never written to the sample.
+TRIPGO_SAMPLE_FROM_LAT="${wolf_from_lat}" \
+TRIPGO_SAMPLE_FROM_LNG="${wolf_from_lng}" \
+TRIPGO_SAMPLE_TO_LAT="${wolf_to_lat}" \
+TRIPGO_SAMPLE_TO_LNG="${wolf_to_lng}" \
+node "${script_dir}/../../services/tripgo/scripts/fetch-raw-route-sample.js" \
+  "${output_dir}/route-wolfenbuettel-raw.json"
+
+printf 'TripGo samples written to %s\n' "${output_dir}"
