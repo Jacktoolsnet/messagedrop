@@ -171,8 +171,11 @@ function normalizeCost(value) {
 }
 
 function totalCost(segments) {
-  const costs = segments.map((segment) => segment.cost).filter(Boolean);
-  if (costs.length === 0) return null;
+  const travelSegments = segments.filter((segment) => segment.type !== 'stationary');
+  // A zero-cost walking segment must not make a transit trip look free when
+  // TripGo did not provide a fare for the scheduled segment.
+  if (travelSegments.length === 0 || travelSegments.some((segment) => !segment.cost)) return null;
+  const costs = travelSegments.map((segment) => segment.cost);
   const currencies = new Set(costs.map((cost) => cost.currency));
   if (currencies.size !== 1) return null;
   return { amount: costs.reduce((sum, cost) => sum + cost.amount, 0), currency: costs[0].currency };

@@ -46,6 +46,26 @@ test('normalizes templates and segment references into compact route options', (
   assert.equal(normalized.routes[0].segments[0].service.operator, 'BVG');
   assert.equal(normalized.routes[0].segments[0].color, '#0a141e');
   assert.deepEqual(normalized.routes[0].segments[0].geometry, ['route']);
+  assert.equal(normalized.routes[0].cost, undefined);
+});
+
+test('does not report a whole transit route as free from walking cost alone', () => {
+  const walkingTemplate = {
+    hashCode: 11, type: 'unscheduled', modeIdentifier: 'wa_wal',
+    modeInfo: { identifier: 'wa_wal', alt: 'Fußweg' },
+    localCost: { cost: 0, currency: 'EUR' }
+  };
+  const mixedTrip = trip('mixed', 1, 1100, 11, {
+    segments: [
+      { id: 'walk', segmentTemplateHashCode: 11, startTime: 1100, endTime: 1200 },
+      { id: 'transit', segmentTemplateHashCode: 10, startTime: 1200, endTime: 1700 }
+    ]
+  });
+  const normalized = normalizeRoutingResponse({
+    groups: [{ trips: [mixedTrip] }], segmentTemplates: [walkingTemplate, scheduledTemplate]
+  });
+  assert.equal(normalized.routes[0].segments[0].cost.amount, 0);
+  assert.equal(normalized.routes[0].cost, undefined);
 });
 
 test('keeps route-group diversity before filling remaining result slots', () => {
