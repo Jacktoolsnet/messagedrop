@@ -3,6 +3,7 @@ const express = require('express');
 const axios = require('axios');
 const { requireServiceJwt } = require('../utils/serviceJwt');
 const { validateRouteRequest, normalizeLocale } = require('../validation');
+const { normalizeRoutingResponse } = require('../normalizer');
 
 function createTripGoRouter({ client, regionsCache, routeCache, inFlight, metrics, maxInFlight }) {
   const router = express.Router();
@@ -44,7 +45,13 @@ function createTripGoRouter({ client, regionsCache, routeCache, inFlight, metric
     if (cached !== undefined) return res.status(200).json({ ...cached, cache: 'hit' });
     try {
       const upstream = await coalesce(inFlight, `route:${key}`, maxInFlight, () => client.routes(validated.value));
-      const payload = { status: upstream.status, data: upstream.data };
+      const payload = {
+        status: upstream.status,
+        data: normalizeRoutingResponse(upstream.data, {
+          maxRoutes: Number(process.env.TRIPGO_MAX_ROUTE_OPTIONS || 12),
+          routesPerGroup: Number(process.env.TRIPGO_ROUTE_OPTIONS_PER_GROUP || 2)
+        })
+      };
       routeCache.set(key, payload);
       return res.status(upstream.status).json({ ...payload, cache: 'miss' });
     } catch (error) {
