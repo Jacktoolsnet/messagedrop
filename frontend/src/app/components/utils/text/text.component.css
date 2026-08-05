@@ -4,6 +4,9 @@
 
 .mat-mdc-dialog-content {
     padding: 0px !important;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 .textarea_container {
@@ -12,6 +15,8 @@
     flex-direction: column;
     align-items: center;
     width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 textarea {
@@ -21,7 +26,8 @@ textarea {
     resize: block;
     line-height: 1.6;
     min-height: 200px;
-    min-width: 300px;
+    min-width: 0;
+    max-width: calc(100% - 2rem);
     width: calc(100% - 2rem);
     box-sizing: border-box;
 }
@@ -31,4 +37,17 @@ textarea {
     margin: auto;
     width: 80%;
     height: auto;
+}
+
+@media (min-width: 768px) {
+    :host {
+        display: block;
+        width: min(40rem, 80vw);
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    textarea {
+        min-height: 300px;
+    }
 }
