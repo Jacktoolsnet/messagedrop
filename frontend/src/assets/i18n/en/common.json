@@ -142,6 +142,7 @@
       "locateMe": "Locate me",
       "shareLocation": "Share location",
       "openLocationInMaps": "Open in maps app",
+      "calculateRoute": "Calculate route",
       "publicMessage": "Public message",
       "privateNote": "Private note",
       "privateImage": "Private image",
@@ -158,6 +159,22 @@
       "contents": "Create content",
       "settings": "Settings",
       "legal": "Legal"
+    },
+    "tripGo": {
+      "title": "Calculate route",
+      "destination": "Destination",
+      "locating": "Getting a fresh fix for your current location …",
+      "routing": "Calculating suitable connections …",
+      "noRoutes": "No connections were found for this journey.",
+      "transfers": "{{ count }} transfers",
+      "segments": "Journey segments",
+      "provider": "Routing information by SkedGo / TripGo",
+      "refresh": "Refresh location and routes",
+      "errors": {
+        "locationPermission": "Location permission is required to calculate a route.",
+        "location": "Your current location could not be determined.",
+        "route": "Routes cannot be calculated at the moment."
+      }
     },
     "hashtags": {
       "label": "Hashtags",

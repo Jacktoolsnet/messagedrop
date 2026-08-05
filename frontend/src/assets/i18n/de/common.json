@@ -142,6 +142,7 @@
       "locateMe": "Standort bestimmen",
       "shareLocation": "Ort teilen",
       "openLocationInMaps": "In Karten-App öffnen",
+      "calculateRoute": "Route berechnen",
       "publicMessage": "Öffentliche Nachricht",
       "privateNote": "Private Notiz",
       "privateImage": "Privates Bild",
@@ -158,6 +159,22 @@
       "contents": "Inhalte erstellen",
       "settings": "Einstellungen",
       "legal": "Rechtliches"
+    },
+    "tripGo": {
+      "title": "Route berechnen",
+      "destination": "Ziel",
+      "locating": "Dein aktueller Standort wird neu ermittelt …",
+      "routing": "Passende Verbindungen werden berechnet …",
+      "noRoutes": "Für diese Strecke wurden keine Verbindungen gefunden.",
+      "transfers": "{{ count }} Umstiege",
+      "segments": "Abschnitte der Verbindung",
+      "provider": "Routeninformationen von SkedGo / TripGo",
+      "refresh": "Standort neu ermitteln und Routen aktualisieren",
+      "errors": {
+        "locationPermission": "Für die Routenberechnung wird die Standortberechtigung benötigt.",
+        "location": "Der aktuelle Standort konnte nicht ermittelt werden.",
+        "route": "Die Routen konnten derzeit nicht berechnet werden."
+      }
     },
     "hashtags": {
       "label": "Hashtags",

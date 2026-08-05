@@ -991,6 +991,42 @@ const HELP_TOPICS = {
       }
     ]
   },
+  tripGoRoute: {
+    titleKey: 'tripGoRoute.title',
+    introKey: 'tripGoRoute.intro',
+    items: [
+      {
+        icon: 'my_location',
+        titleKey: 'tripGoRoute.items.location.title',
+        descriptionKey: 'tripGoRoute.items.location.desc'
+      },
+      {
+        icon: 'route',
+        titleKey: 'tripGoRoute.items.routes.title',
+        descriptionKey: 'tripGoRoute.items.routes.desc'
+      },
+      {
+        icon: 'refresh',
+        titleKey: 'tripGoRoute.items.refresh.title',
+        descriptionKey: 'tripGoRoute.items.refresh.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'tripGoRoute.items.close.title',
+        descriptionKey: 'tripGoRoute.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'tripGoRoute.items.help.title',
+        descriptionKey: 'tripGoRoute.items.help.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'tripGoRoute.items.privacy.title',
+        descriptionKey: 'tripGoRoute.items.privacy.desc'
+      }
+    ]
+  },
   contactSettings: {
     titleKey: 'contactSettings.title',
     introKey: 'common.intros.settings',

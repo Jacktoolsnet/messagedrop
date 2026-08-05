@@ -1,0 +1,71 @@
+<app-dialog-header icon="route" [title]="'common.tripGo.title' | transloco"></app-dialog-header>
+
+<mat-dialog-content class="route-dialog-content">
+  <p class="destination">
+    <mat-icon aria-hidden="true">location_on</mat-icon>
+    <span>{{ 'common.tripGo.destination' | transloco }}:
+      {{ destination.latitude.toFixed(5) }}, {{ destination.longitude.toFixed(5) }}</span>
+  </p>
+
+  @if (state() === 'locating') {
+    <div class="status" role="status">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>{{ 'common.tripGo.locating' | transloco }}</p>
+    </div>
+  } @else if (state() === 'routing') {
+    <div class="status" role="status">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>{{ 'common.tripGo.routing' | transloco }}</p>
+    </div>
+  } @else if (state() === 'error') {
+    <div class="status status--error" role="alert">
+      <mat-icon>warning</mat-icon>
+      <p>{{ errorKey() | transloco }}</p>
+    </div>
+  } @else if (routes().length === 0) {
+    <div class="status" role="status">
+      <mat-icon>route</mat-icon>
+      <p>{{ 'common.tripGo.noRoutes' | transloco }}</p>
+    </div>
+  } @else {
+    <div class="route-list">
+      @for (route of routes(); track route.id) {
+        <article class="route-card">
+          <div class="route-card__summary">
+            <strong>{{ formatTime(route.departureTime) }}–{{ formatTime(route.arrivalTime) }}</strong>
+            <span>{{ formatDuration(route.durationSeconds) }}</span>
+            <span>{{ 'common.tripGo.transfers' | transloco:{ count: route.transfers } }}</span>
+          </div>
+          <div class="segments" [attr.aria-label]="'common.tripGo.segments' | transloco">
+            @for (segment of route.segments; track segment.id) {
+              <span class="segment" [style.--segment-color]="segment.color || '#6750a4'">
+                <mat-icon aria-hidden="true">{{ segmentIcon(segment) }}</mat-icon>
+                <span>{{ segmentLabel(segment) }}</span>
+              </span>
+            }
+          </div>
+        </article>
+      }
+    </div>
+  }
+
+  <p class="provider">{{ 'common.tripGo.provider' | transloco }}</p>
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions route-dialog-actions">
+  <button mat-icon-button type="button" class="action-cancel" (click)="close()"
+    [attr.aria-label]="'common.actions.close' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+  <span class="action-spacer"></span>
+  <span class="action-group-right">
+    <button mat-icon-button type="button" (click)="help.open('tripGoRoute')"
+      [attr.aria-label]="'common.actions.help' | transloco">
+      <mat-icon>help</mat-icon>
+    </button>
+    <button mat-icon-button color="primary" type="button" (click)="calculateWithFreshLocation()"
+      [disabled]="isBusy()" [attr.aria-label]="'common.tripGo.refresh' | transloco">
+      <mat-icon>refresh</mat-icon>
+    </button>
+  </span>
+</mat-dialog-actions>

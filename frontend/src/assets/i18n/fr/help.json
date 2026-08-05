@@ -2857,6 +2857,18 @@
       }
     }
   },
+  "tripGoRoute": {
+    "title": "Calculer l’itinéraire",
+    "intro": "La boîte de dialogue détermine à nouveau votre position actuelle et calcule des trajets vers le point sélectionné sur la carte.",
+    "items": {
+      "location": { "title": "Déterminer la position", "desc": "Une nouvelle demande de localisation précise est lancée à chaque ouverture ou actualisation. Le point précédemment sélectionné reste la destination." },
+      "routes": { "title": "Trajets", "desc": "Les résultats indiquent le départ, l’arrivée, la durée, les correspondances et chaque étape à pied ou en transports publics." },
+      "refresh": { "title": "Actualiser", "desc": "Détermine à nouveau votre position puis calcule de nouveaux trajets." },
+      "close": { "title": "Fermer", "desc": "Ferme la vue des itinéraires." },
+      "help": { "title": "Aide", "desc": "Ouvre cette aide sur le calcul d’itinéraire." },
+      "privacy": { "title": "Confidentialité", "desc": "Votre position actuelle et la destination ne sont envoyées à SkedGo/TripGo via le backend MessageDrop qu’après votre action. La vue ne conserve pas votre position." }
+    }
+  },
   "locationShareContacts": {
     "title": "Partager le lieu avec des contacts",
     "intro": "Sélectionnez un ou plusieurs contacts. Le lieu sera partagé comme message dans le chat.",

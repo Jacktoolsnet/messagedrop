@@ -84,7 +84,7 @@ export class GeolocationService {
     return plusCode;
   }
 
-  public getCurrentPosition(): Observable<GeolocationPosition> {
+  public getCurrentPosition(options?: PositionOptions): Observable<GeolocationPosition> {
     return new Observable<GeolocationPosition>((observer) => {
       if ('geolocation' in navigator) {
         navigator.geolocation.getCurrentPosition(
@@ -94,7 +94,8 @@ export class GeolocationService {
           },
           (error) => {
             observer.error(error);
-          }
+          },
+          options
         );
       } else {
         observer.error('Geolocation is not available in this browser.');

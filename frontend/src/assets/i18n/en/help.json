@@ -2875,6 +2875,18 @@
       }
     }
   },
+  "tripGoRoute": {
+    "title": "Calculate route",
+    "intro": "The dialog gets a fresh fix for your current location and calculates connections from there to the selected map point.",
+    "items": {
+      "location": { "title": "Get location", "desc": "A new high-accuracy location request runs whenever the dialog opens or refreshes. The previously selected map point remains the destination." },
+      "routes": { "title": "Connections", "desc": "Results show departure and arrival, duration, transfers, and each walking or public-transport segment." },
+      "refresh": { "title": "Refresh", "desc": "Gets your location again and then calculates new connections." },
+      "close": { "title": "Close", "desc": "Closes the route view." },
+      "help": { "title": "Help", "desc": "Opens this route calculation help." },
+      "privacy": { "title": "Privacy", "desc": "Only after you invoke this function are your current location and destination coordinates sent to SkedGo/TripGo through the MessageDrop backend. The route view does not persist your location." }
+    }
+  },
   "locationShareContacts": {
     "title": "Share location with contacts",
     "intro": "Select one or more contacts. The location will be shared as a chat message.",

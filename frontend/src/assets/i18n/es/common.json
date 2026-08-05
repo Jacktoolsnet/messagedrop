@@ -141,6 +141,7 @@
       "locateMe": "Localizarme",
       "shareLocation": "Compartir ubicación",
       "openLocationInMaps": "Abrir en mapas",
+      "calculateRoute": "Calcular ruta",
       "publicMessage": "Mensaje público",
       "privateNote": "Nota privada",
       "privateImage": "Imagen privada",
@@ -157,6 +158,22 @@
       "contents": "Crear contenido",
       "settings": "Ajustes",
       "legal": "Legal"
+    },
+    "tripGo": {
+      "title": "Calcular ruta",
+      "destination": "Destino",
+      "locating": "Obteniendo de nuevo tu ubicación actual …",
+      "routing": "Calculando conexiones adecuadas …",
+      "noRoutes": "No se encontraron conexiones para este trayecto.",
+      "transfers": "{{ count }} transbordos",
+      "segments": "Tramos del trayecto",
+      "provider": "Información de rutas de SkedGo / TripGo",
+      "refresh": "Actualizar ubicación y rutas",
+      "errors": {
+        "locationPermission": "Se necesita permiso de ubicación para calcular una ruta.",
+        "location": "No se pudo determinar tu ubicación actual.",
+        "route": "No se pueden calcular rutas en este momento."
+      }
     },
     "hashtags": {
       "label": "Hashtags",

@@ -44,6 +44,7 @@ import { CheckPinComponent } from './components/pin/check-pin/check-pin.componen
 import { PlacelistComponent } from './components/placelist/placelist.component';
 import { SharedContentComponent } from './components/shared-content/shared-content.component';
 import { SystemMessageDialogComponent } from './components/system-messages/system-message-dialog/system-message-dialog.component';
+import { TripGoRouteDialogComponent } from './components/tripgo-route-dialog/tripgo-route-dialog.component';
 import { DeleteUserComponent } from './components/user/delete-user/delete-user.component';
 import { UserProfileComponent } from './components/user/user-profile/user-profile.component';
 import { UserComponent } from './components/user/user.component';
@@ -1637,6 +1638,25 @@ export class AppComponent implements OnInit {
 
     const query = encodeURIComponent(`${location.latitude},${location.longitude}`);
     window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank', 'noopener');
+  }
+
+  public calculateRouteToSelectedLocation(): void {
+    const destination = this.mapService.getMapLocation();
+    if (!Number.isFinite(destination.latitude) || !Number.isFinite(destination.longitude)) {
+      return;
+    }
+
+    this.dialog.open(TripGoRouteDialogComponent, {
+      data: { destination: { ...destination } },
+      closeOnNavigation: true,
+      width: 'min(720px, 95vw)',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
   }
 
   private async updateDataForLocation() {
