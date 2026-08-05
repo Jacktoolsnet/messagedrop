@@ -95,6 +95,14 @@ export class TripGoRouteDialogComponent implements OnInit {
     return hours > 0 ? `${hours} h ${remainingMinutes} min` : `${minutes} min`;
   }
 
+  formatDistance(metres: number): string {
+    const locale = this.transloco.getActiveLang() || 'de';
+    if (metres >= 1000) {
+      return `${new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(metres / 1000)} km`;
+    }
+    return `${Math.round(metres)} m`;
+  }
+
   segmentLabel(segment: TripGoRouteSegment): string {
     return segment.service?.number || segment.modeLabel || segment.modeIdentifier || '';
   }

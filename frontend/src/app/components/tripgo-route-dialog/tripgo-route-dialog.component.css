@@ -1,5 +1,5 @@
 .route-dialog-content {
-  width: min(680px, 88vw);
+  width: min(1120px, 90vw);
   min-height: 18rem;
   padding-bottom: 1rem;
 }
@@ -32,52 +32,171 @@
 
 .route-list {
   display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(17rem, 100%), 1fr));
+  align-items: start;
   gap: 0.75rem;
 }
 
 .route-card {
-  padding: 0.85rem;
+  min-width: 0;
+  overflow: hidden;
   border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
   border-radius: 1rem;
   background: var(--mat-sys-surface-container-low);
 }
 
 .route-card__summary {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.4rem 1rem;
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.85rem;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  background: var(--mat-sys-surface-container);
 }
 
-.segments {
+.route-card__times,
+.route-card__facts,
+.fact {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.4rem;
-  margin-top: 0.7rem;
 }
 
-.segment {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.2rem 0.5rem;
-  border-left: 0.25rem solid var(--segment-color);
-  border-radius: 0.4rem;
-  background: color-mix(in srgb, var(--segment-color) 10%, transparent);
+.route-card__times {
+  gap: 0.35rem;
+  font-size: 1.15rem;
 }
 
-.segment mat-icon {
+.route-card__times mat-icon {
   width: 1.1rem;
   height: 1.1rem;
   font-size: 1.1rem;
+  color: var(--mat-sys-on-surface-variant);
 }
 
-.provider {
-  margin: 1rem 0 0;
-  font-size: 0.78rem;
-  text-align: right;
+.route-card__facts {
+  gap: 0.4rem 0.8rem;
   color: var(--mat-sys-on-surface-variant);
+  font-size: 0.86rem;
+}
+
+.fact {
+  gap: 0.25rem;
+}
+
+.fact mat-icon {
+  width: 1rem;
+  height: 1rem;
+  font-size: 1rem;
+}
+
+.timeline {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0.9rem 0.75rem 1rem;
+  list-style: none;
+}
+
+.timeline-segment,
+.timeline-arrival {
+  position: relative;
+  display: grid;
+  grid-template-columns: 3.2rem 1.65rem minmax(0, 1fr);
+  column-gap: 0.4rem;
+}
+
+.timeline-segment {
+  min-height: 5.1rem;
+  padding-bottom: 0.75rem;
+}
+
+.timeline-segment::after {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  top: 1.65rem;
+  bottom: -0.15rem;
+  left: 4.38rem;
+  width: 0.2rem;
+  border-radius: 999px;
+  background: var(--segment-color);
+}
+
+.timeline-time {
+  padding-top: 0.25rem;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.timeline-marker {
+  position: relative;
+  z-index: 1;
+  display: inline-grid;
+  place-items: center;
+  align-self: start;
+  width: 1.65rem;
+  height: 1.65rem;
+  box-sizing: border-box;
+  border: 0.18rem solid var(--segment-color);
+  border-radius: 999px;
+  background: var(--mat-sys-surface-container-low);
+  color: var(--segment-color);
+}
+
+.timeline-marker mat-icon {
+  width: 1rem;
+  height: 1rem;
+  font-size: 1rem;
+}
+
+.timeline-marker--arrival {
+  --segment-color: var(--mat-sys-primary);
+}
+
+.timeline-content {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+}
+
+.timeline-location,
+.timeline-mode,
+.timeline-detail {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.timeline-location {
+  font-size: 0.82rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.timeline-mode {
+  font-size: 0.95rem;
+}
+
+.timeline-detail {
+  font-size: 0.78rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.timeline-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.7rem;
+  margin-top: 0.15rem;
+  font-size: 0.75rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.timeline-location--arrival {
+  align-self: start;
+  padding-top: 0.25rem;
+  color: inherit;
 }
 
 .route-dialog-actions {
@@ -98,5 +217,9 @@
 @media (max-width: 600px) {
   .route-dialog-content {
     width: auto;
+  }
+
+  .route-list {
+    grid-template-columns: 1fr;
   }
 }

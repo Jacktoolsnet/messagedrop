@@ -1,4 +1,8 @@
-<app-dialog-header icon="route" [title]="'common.tripGo.title' | transloco"></app-dialog-header>
+<app-dialog-header
+  icon="route"
+  [title]="'common.tripGo.title' | transloco"
+  [subtitle]="'common.tripGo.provider' | transloco">
+</app-dialog-header>
 
 <mat-dialog-content class="route-dialog-content">
   <p class="destination">
@@ -31,25 +35,82 @@
     <div class="route-list">
       @for (route of routes(); track route.id) {
         <article class="route-card">
-          <div class="route-card__summary">
-            <strong>{{ formatTime(route.departureTime) }}–{{ formatTime(route.arrivalTime) }}</strong>
-            <span>{{ formatDuration(route.durationSeconds) }}</span>
-            <span>{{ 'common.tripGo.transfers' | transloco:{ count: route.transfers } }}</span>
-          </div>
-          <div class="segments" [attr.aria-label]="'common.tripGo.segments' | transloco">
-            @for (segment of route.segments; track segment.id) {
-              <span class="segment" [style.--segment-color]="segment.color || '#6750a4'">
-                <mat-icon aria-hidden="true">{{ segmentIcon(segment) }}</mat-icon>
-                <span>{{ segmentLabel(segment) }}</span>
+          <header class="route-card__summary">
+            <div class="route-card__times">
+              <strong>{{ formatTime(route.departureTime) }}</strong>
+              <mat-icon aria-hidden="true">arrow_forward</mat-icon>
+              <strong>{{ formatTime(route.arrivalTime) }}</strong>
+            </div>
+            <div class="route-card__facts">
+              <span class="fact fact--duration">
+                <mat-icon aria-hidden="true">schedule</mat-icon>
+                {{ formatDuration(route.durationSeconds) }}
               </span>
+              <span class="fact">
+                @if (route.transfers === 0) {
+                  {{ 'common.tripGo.direct' | transloco }}
+                } @else if (route.transfers === 1) {
+                  {{ 'common.tripGo.oneTransfer' | transloco }}
+                } @else {
+                  {{ 'common.tripGo.transfers' | transloco:{ count: route.transfers } }}
+                }
+              </span>
+            </div>
+          </header>
+
+          <ol class="timeline" [attr.aria-label]="'common.tripGo.segments' | transloco">
+            @for (segment of route.segments; track segment.id) {
+              <li class="timeline-segment" [style.--segment-color]="segment.color || '#6750a4'">
+                <time class="timeline-time" [attr.datetime]="segment.startTime">
+                  {{ segment.startTime ? formatTime(segment.startTime) : '' }}
+                </time>
+                <span class="timeline-marker" aria-hidden="true">
+                  <mat-icon>{{ segmentIcon(segment) }}</mat-icon>
+                </span>
+                <div class="timeline-content">
+                  @if (segment.from?.name) {
+                    <span class="timeline-location">{{ segment.from?.name }}</span>
+                  }
+                  <strong class="timeline-mode">{{ segmentLabel(segment) }}</strong>
+                  @if (segment.service?.direction) {
+                    <span class="timeline-detail">
+                      {{ 'common.tripGo.direction' | transloco:{ direction: segment.service?.direction } }}
+                    </span>
+                  }
+                  @if (segment.service?.startPlatform) {
+                    <span class="timeline-detail">
+                      {{ 'common.tripGo.platform' | transloco:{ platform: segment.service?.startPlatform } }}
+                    </span>
+                  }
+                  <span class="timeline-metrics">
+                    @if (segment.durationSeconds !== undefined) {
+                      <span>{{ formatDuration(segment.durationSeconds) }}</span>
+                    }
+                    @if (segment.distanceMeters !== undefined) {
+                      <span>{{ formatDistance(segment.distanceMeters) }}</span>
+                    }
+                    @if (segment.service?.stops) {
+                      <span>{{ 'common.tripGo.stops' | transloco:{ count: segment.service?.stops } }}</span>
+                    }
+                  </span>
+                </div>
+              </li>
             }
-          </div>
+            <li class="timeline-arrival">
+              <time class="timeline-time" [attr.datetime]="route.arrivalTime">{{ formatTime(route.arrivalTime) }}</time>
+              <span class="timeline-marker timeline-marker--arrival" aria-hidden="true">
+                <mat-icon>location_on</mat-icon>
+              </span>
+              <strong class="timeline-location timeline-location--arrival">
+                {{ route.segments.at(-1)?.to?.name || ('common.tripGo.destination' | transloco) }}
+              </strong>
+            </li>
+          </ol>
         </article>
       }
     </div>
   }
 
-  <p class="provider">{{ 'common.tripGo.provider' | transloco }}</p>
 </mat-dialog-content>
 
 <mat-dialog-actions class="sticky-actions route-dialog-actions">
