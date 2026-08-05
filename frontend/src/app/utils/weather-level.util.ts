@@ -47,6 +47,28 @@ export function getWeatherBaseColor(type: WeatherTileType, value: number): strin
   }
 }
 
+/** Higher-contrast precipitation colors for charts on light surfaces. */
+export function getWeatherChartColor(type: WeatherTileType, value: number, isDarkMode = false): string {
+  if (isDarkMode) return getWeatherBaseColor(type, value);
+
+  if (type === 'precipitation') {
+    if (value < 0.1) return '#0288d1';
+    if (value < 1.0) return '#0277bd';
+    if (value < 5.0) return '#01579b';
+    if (value < 10.0) return '#014a7c';
+    return '#003f67';
+  }
+
+  if (type === 'precipitationprobability') {
+    if (value < 20) return '#0277bd';
+    if (value < 50) return '#01579b';
+    if (value < 80) return '#014a7c';
+    return '#003f67';
+  }
+
+  return getWeatherBaseColor(type, value);
+}
+
 export function getWeatherLevelInfo(type: WeatherTileType, value: number, isDarkMode = false): WeatherLevelInfo {
   const baseColor = getWeatherBaseColor(type, value);
   const labelKey = getWeatherLevelLabel(type, value);

@@ -19,7 +19,7 @@ import annotationPlugin, { AnnotationOptions } from 'chartjs-plugin-annotation';
 import { HourlyWeather } from '../../../interfaces/hourly-weather';
 import { Weather } from '../../../interfaces/weather';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
-import { getWeatherBaseColor } from '../../../utils/weather-level.util';
+import { getWeatherBaseColor, getWeatherChartColor } from '../../../utils/weather-level.util';
 import { WeatherTile } from '../weather-tile.interface';
 import { selectedPointLabelPlugin } from '../../../utils/chart-selected-point-label.plugin';
 
@@ -280,7 +280,7 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit, OnDestr
     if (selectedIndex !== -1) {
       const value = this.getSelectedChartValue(dayHourly[selectedIndex]);
       const label = fullLabels[selectedIndex];
-      const color = getWeatherBaseColor(this.tile.type, value);
+      const color = this.getChartColor(value);
       annotations['selectedHour'] = {
         type: 'line',
         xMin: label,
@@ -373,7 +373,7 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit, OnDestr
     const selectedValue = this.getSelectedChartValue(dayHourly[selectedIndex] ?? dayHourly[0]);
     const selectedHourLabel = fullLabels[selectedIndex] ?? this.formatHour(selectedIndex);
     const selectedPointLabel = `${selectedHourLabel}: ${selectedValue}${this.getSelectedChartUnit()}`;
-    const selectedPointColor = getWeatherBaseColor(this.tile.type, selectedValue);
+    const selectedPointColor = this.getChartColor(selectedValue);
     const isDark = document.body.classList.contains('dark');
     const textColor = isDark ? '#ffffff' : '#000000';
     const gridColor = isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)';
@@ -545,7 +545,7 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit, OnDestr
             pointRadius,
             pointBorderWidth,
             pointBorderColor,
-            pointBackgroundColor: values.map((value) => getWeatherBaseColor(this.tile.type, value)),
+            pointBackgroundColor: values.map((value) => this.getChartColor(value)),
             borderColor: baseColor,
             backgroundColor: this.toAlpha(baseColor, 0.2)
           }
@@ -564,7 +564,7 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit, OnDestr
             pointRadius,
             pointBorderWidth,
             pointBorderColor,
-            pointBackgroundColor: values.map((value) => getWeatherBaseColor(this.tile.type, value)),
+            pointBackgroundColor: values.map((value) => this.getChartColor(value)),
             borderColor: baseColor,
             backgroundColor: this.toAlpha(baseColor, 0.2)
           }
@@ -583,7 +583,7 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit, OnDestr
             pointRadius,
             pointBorderWidth,
             pointBorderColor,
-            pointBackgroundColor: values.map((value) => getWeatherBaseColor(this.tile.type, value)),
+            pointBackgroundColor: values.map((value) => this.getChartColor(value)),
             borderColor: baseColor,
             backgroundColor: this.toAlpha(baseColor, 0.2)
           }
@@ -603,7 +603,7 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit, OnDestr
             pointRadius,
             pointBorderWidth,
             pointBorderColor,
-            pointBackgroundColor: values.map((value) => getWeatherBaseColor(this.tile.type, value)),
+            pointBackgroundColor: values.map((value) => this.getChartColor(value)),
             borderColor: baseColor,
             backgroundColor: this.toAlpha(baseColor, 0.2)
           }
@@ -632,7 +632,7 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit, OnDestr
     const label = (typeof labelValue === 'string' ? labelValue : this.formatHour(selectedIndex)).toString();
     const rawValue = this.chartData.datasets?.[0]?.data?.[selectedIndex];
     const numericValue = typeof rawValue === 'number' ? rawValue : Number(rawValue ?? 0);
-    const color = getWeatherBaseColor(this.tile.type, numericValue);
+    const color = this.getChartColor(numericValue);
 
     const annotations = this.ensureAnnotationConfig();
     const annotationKey = 'selectedHour';
@@ -697,7 +697,7 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit, OnDestr
     dataset.pointBorderColor = pointBorderColor;
 
     const selectedPointLabel = `${this.getFullHourLabel(selectedIndex)}: ${selectedValue}${this.getSelectedChartUnit()}`;
-    const selectedPointColor = getWeatherBaseColor(this.tile.type, selectedValue);
+    const selectedPointColor = this.getChartColor(selectedValue);
     const plugins = (this.chart.options.plugins ??= {}) as any;
 
     if (plugins.title) {
@@ -882,7 +882,12 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit, OnDestr
   private getBaseColorForSelectedValue(values: number[], selectedIndex: number): string {
     const safeIndex = selectedIndex >= 0 && selectedIndex < values.length ? selectedIndex : Math.floor(values.length / 2);
     const value = values[safeIndex] ?? 0;
-    return getWeatherBaseColor(this.tile.type, value);
+    return this.getChartColor(value);
+  }
+
+  private getChartColor(value: number): string {
+    const isDarkMode = typeof document !== 'undefined' && document.body.classList.contains('dark');
+    return getWeatherChartColor(this.tile.type, value, isDarkMode);
   }
 
   private toAlpha(color: string, alpha: number): string {
