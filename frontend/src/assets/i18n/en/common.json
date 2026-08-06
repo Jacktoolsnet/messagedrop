@@ -223,6 +223,16 @@
         "refreshLive": "Refresh current service data",
         "openProvider": "Open ticket or operator website"
       },
+      "nearby": {
+        "title": "Nearby",
+        "publicMessages": "Public messages",
+        "privateNotes": "Private notes",
+        "privateImages": "Private images",
+        "privateDocuments": "Private documents",
+        "secretDrops": "Visible SecretDrops",
+        "loginRequired": "Sign-in required",
+        "comingSoon": "Nearby search will be added in the next step."
+      },
       "errors": {
         "locationPermission": "Location permission is required to calculate a route.",
         "location": "Your current location could not be determined.",

@@ -42,7 +42,7 @@ export class OpenMeteoRefreshService {
     return this.toReadonly(state);
   }
 
-  refreshWeather(place: Place, force = false): void {
+  refreshWeather(place: Place, force = false, persist = true): void {
     const state = this.ensureWeatherState(place.id);
     this.syncWeatherFromPlace(place, state);
 
@@ -87,7 +87,9 @@ export class OpenMeteoRefreshService {
               }
             }
           };
-          void this.placeService.saveAdditionalPlaceInfos(updatedPlace);
+          if (persist && !this.isTransientPlace(place)) {
+            void this.placeService.saveAdditionalPlaceInfos(updatedPlace);
+          }
           this.syncWeatherFromPlace(updatedPlace, state);
         },
         error: () => {
@@ -106,7 +108,7 @@ export class OpenMeteoRefreshService {
     return this.toReadonly(state);
   }
 
-  refreshAirQuality(place: Place, force = false): void {
+  refreshAirQuality(place: Place, force = false, persist = true): void {
     const state = this.ensureAirQualityState(place.id);
     this.syncAirQualityFromPlace(place, state);
 
@@ -145,7 +147,9 @@ export class OpenMeteoRefreshService {
               }
             }
           };
-          void this.placeService.saveAdditionalPlaceInfos(updatedPlace);
+          if (persist && !this.isTransientPlace(place)) {
+            void this.placeService.saveAdditionalPlaceInfos(updatedPlace);
+          }
           this.syncAirQualityFromPlace(updatedPlace, state);
         },
         error: () => {
@@ -166,6 +170,10 @@ export class OpenMeteoRefreshService {
       state.data.set(undefined);
     }
     state.isStale.set(true);
+  }
+
+  private isTransientPlace(place: Place): boolean {
+    return place.id.startsWith('tripgo-route-point:');
   }
 
   private useCachedAirQualityAsStale(place: Place, state: DatasetStateInternal<AirQualityData>): void {

@@ -1,4 +1,4 @@
-import { Component, Input, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, OnChanges, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -18,15 +18,12 @@ import { AirQualityComponent } from '../../air-quality/air-quality.component';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './air-quality-tile.component.css'
 })
-export class AirQualityTileComponent {
+export class AirQualityTileComponent implements OnChanges {
   private placeRef?: Place;
   private airQualityState?: DatasetState<AirQualityData>;
 
-  @Input() set place(value: Place) {
-    this.placeRef = value;
-    this.airQualityState = this.refreshService.getAirQualityState(value);
-    this.refreshService.refreshAirQuality(value);
-  }
+  @Input() place?: Place;
+  @Input() persist = true;
 
   // --- Kategorien ---
   private readonly pollenKeys: AirQualityMetricKey[] = [
@@ -81,6 +78,13 @@ export class AirQualityTileComponent {
   private readonly dialog = inject(MatDialog);
   private readonly refreshService = inject(OpenMeteoRefreshService);
   private readonly translation = inject(TranslationHelperService);
+
+  ngOnChanges(): void {
+    if (!this.place) return;
+    this.placeRef = this.place;
+    this.airQualityState = this.refreshService.getAirQualityState(this.place);
+    this.refreshService.refreshAirQuality(this.place, false, this.persist);
+  }
 
   get airQuality(): AirQualityData | undefined {
     return this.airQualityState?.data() ?? undefined;

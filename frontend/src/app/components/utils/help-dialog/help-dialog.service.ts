@@ -1057,6 +1057,11 @@ const HELP_TOPICS = {
         descriptionKey: 'tripGoRoutePoint.items.live.desc'
       },
       {
+        icon: 'near_me',
+        titleKey: 'tripGoRoutePoint.items.nearby.title',
+        descriptionKey: 'tripGoRoutePoint.items.nearby.desc'
+      },
+      {
         icon: 'open_in_new',
         titleKey: 'tripGoRoutePoint.items.provider.title',
         descriptionKey: 'tripGoRoutePoint.items.provider.desc'

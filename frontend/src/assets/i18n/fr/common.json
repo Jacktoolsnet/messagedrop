@@ -222,6 +222,16 @@
         "refreshLive": "Actualiser les données du service",
         "openProvider": "Ouvrir le site de billetterie ou de l’opérateur"
       },
+      "nearby": {
+        "title": "À proximité",
+        "publicMessages": "Messages publics",
+        "privateNotes": "Notes privées",
+        "privateImages": "Images privées",
+        "privateDocuments": "Documents privés",
+        "secretDrops": "SecretDrops visibles",
+        "loginRequired": "Connexion requise",
+        "comingSoon": "La recherche à proximité sera ajoutée à l’étape suivante."
+      },
       "errors": {
         "locationPermission": "L’autorisation de localisation est nécessaire pour calculer un itinéraire.",
         "location": "Votre position actuelle n’a pas pu être déterminée.",

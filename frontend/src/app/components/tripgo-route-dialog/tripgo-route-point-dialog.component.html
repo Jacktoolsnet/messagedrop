@@ -86,6 +86,12 @@
       </div>
     </article>
   </section>
+
+  @if (location(); as point) {
+    @if (point.latitude !== undefined && point.longitude !== undefined) {
+      <app-tripgo-nearby-tiles [location]="point"></app-tripgo-nearby-tiles>
+    }
+  }
 </mat-dialog-content>
 
 <mat-dialog-actions class="sticky-actions point-dialog-actions">

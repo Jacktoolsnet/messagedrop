@@ -222,6 +222,16 @@
         "refreshLive": "Actualizar los datos del servicio",
         "openProvider": "Abrir la web de billetes o del operador"
       },
+      "nearby": {
+        "title": "Cerca",
+        "publicMessages": "Mensajes públicos",
+        "privateNotes": "Notas privadas",
+        "privateImages": "Imágenes privadas",
+        "privateDocuments": "Documentos privados",
+        "secretDrops": "SecretDrops visibles",
+        "loginRequired": "Es necesario iniciar sesión",
+        "comingSoon": "La búsqueda cercana se añadirá en el siguiente paso."
+      },
       "errors": {
         "locationPermission": "Se necesita permiso de ubicación para calcular una ruta.",
         "location": "No se pudo determinar tu ubicación actual.",

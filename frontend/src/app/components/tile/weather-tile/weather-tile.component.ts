@@ -1,4 +1,4 @@
-import { Component, Input, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, OnChanges, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -17,19 +17,23 @@ import { WeatherComponent } from '../../weather/weather.component';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './weather-tile.component.css'
 })
-export class WeatherTileComponent {
+export class WeatherTileComponent implements OnChanges {
   private placeRef?: Place;
   private weatherState?: DatasetState<Weather>;
 
-  @Input() set place(value: Place) {
-    this.placeRef = value;
-    this.weatherState = this.refreshService.getWeatherState(value);
-    this.refreshService.refreshWeather(value);
-  }
+  @Input() place?: Place;
+  @Input() persist = true;
 
   private readonly geolocationService = inject(GeolocationService);
   private readonly dialog = inject(MatDialog);
   private readonly refreshService = inject(OpenMeteoRefreshService);
+
+  ngOnChanges(): void {
+    if (!this.place) return;
+    this.placeRef = this.place;
+    this.weatherState = this.refreshService.getWeatherState(this.place);
+    this.refreshService.refreshWeather(this.place, false, this.persist);
+  }
 
   get weather(): Weather | undefined {
     return this.weatherState?.data() ?? undefined;

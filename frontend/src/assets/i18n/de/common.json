@@ -223,6 +223,16 @@
         "refreshLive": "Aktuelle Fahrtdaten neu laden",
         "openProvider": "Ticket- oder Anbieterseite öffnen"
       },
+      "nearby": {
+        "title": "In der Nähe",
+        "publicMessages": "Öffentliche Nachrichten",
+        "privateNotes": "Private Notizen",
+        "privateImages": "Private Bilder",
+        "privateDocuments": "Private Dokumente",
+        "secretDrops": "Sichtbare SecretDrops",
+        "loginRequired": "Anmeldung erforderlich",
+        "comingSoon": "Die Umkreissuche wird im nächsten Schritt ergänzt."
+      },
       "errors": {
         "locationPermission": "Für die Routenberechnung wird die Standortberechtigung benötigt.",
         "location": "Der aktuelle Standort konnte nicht ermittelt werden.",

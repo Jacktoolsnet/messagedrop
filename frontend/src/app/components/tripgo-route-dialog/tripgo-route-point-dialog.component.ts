@@ -10,6 +10,7 @@ import { TripGoService } from '../../services/tripgo.service';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { tripGoSegmentIcon } from './tripgo-route.util';
+import { TripGoNearbyTilesComponent } from './tripgo-nearby-tiles.component';
 
 export interface TripGoRoutePointDialogData {
   kind: 'segment' | 'arrival';
@@ -26,6 +27,7 @@ export interface TripGoRoutePointDialogData {
     MatDialogContent,
     MatIconModule,
     MatProgressSpinnerModule,
+    TripGoNearbyTilesComponent,
     TranslocoPipe
   ],
   templateUrl: './tripgo-route-point-dialog.component.html',

@@ -1,0 +1,11 @@
+:host { display: block; min-width: 0; }
+.nearby-section { margin-top: 1.25rem; }
+.nearby-section h3 { display: flex; align-items: center; gap: .5rem; margin: 0 0 .75rem; font-size: 1.05rem; }
+.nearby-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr)); align-items: start; gap: .75rem; }
+.nearby-grid > * { min-width: 0; }
+.nearby-tile { display: flex; min-height: 6.75rem; box-sizing: border-box; flex-direction: column; justify-content: center; gap: .65rem; padding: 1rem; border-radius: 1rem; background: var(--mat-card-filled-container-color); color: var(--mat-card-subtitle-text-color); box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color); }
+.nearby-tile header, .nearby-tile__status { display: flex; align-items: center; gap: .5rem; }
+.nearby-tile header { font-size: 1.1rem; }
+.nearby-tile__status { color: var(--mat-sys-on-surface-variant); font-size: .88rem; }
+.nearby-tile__status mat-icon { flex: 0 0 auto; }
+@media (max-width: 600px) { .nearby-grid { grid-template-columns: 1fr; } }

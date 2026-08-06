@@ -1,0 +1,25 @@
+<section class="nearby-section" [attr.aria-label]="'common.tripGo.nearby.title' | transloco">
+  <h3><mat-icon aria-hidden="true">near_me</mat-icon>{{ 'common.tripGo.nearby.title' | transloco }}</h3>
+  <div class="nearby-grid">
+    <app-weather-tile [persist]="false" [place]="place()"></app-weather-tile>
+    <app-air-quality-tile [persist]="false" [place]="place()"></app-air-quality-tile>
+    <app-wikipedia-tile [place]="place()"></app-wikipedia-tile>
+
+    @for (tile of placeholderTiles; track tile.titleKey) {
+      <article class="nearby-tile">
+        <header><mat-icon aria-hidden="true">{{ tile.icon }}</mat-icon><strong>{{ tile.titleKey | transloco }}</strong></header>
+        @if (tile.private && !isAuthenticated()) {
+          <div class="nearby-tile__status">
+            <mat-icon aria-hidden="true">lock</mat-icon>
+            <span>{{ 'common.tripGo.nearby.loginRequired' | transloco }}</span>
+          </div>
+        } @else {
+          <div class="nearby-tile__status">
+            <mat-icon aria-hidden="true">hourglass_top</mat-icon>
+            <span>{{ 'common.tripGo.nearby.comingSoon' | transloco }}</span>
+          </div>
+        }
+      </article>
+    }
+  </div>
+</section>

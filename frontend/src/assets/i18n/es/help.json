@@ -2861,15 +2861,42 @@
     "title": "Calcular ruta",
     "intro": "El diálogo obtiene de nuevo tu ubicación actual y calcula conexiones hasta el punto seleccionado en el mapa. Después puedes cambiar el inicio y el destino.",
     "items": {
-      "location": { "title": "Obtener ubicación", "desc": "Se realiza una nueva solicitud de ubicación de alta precisión al abrir o actualizar. Nominatim añade información adecuada del lugar y la dirección para el inicio y el destino." },
-      "routePoints": { "title": "Cambiar inicio o destino", "desc": "Usa el lápiz de cada tarjeta para abrir la búsqueda de lugares. Tras elegir, la ruta se vuelve a calcular con el nuevo inicio o destino." },
-      "routes": { "title": "Conexiones", "desc": "Los resultados muestran salida, llegada, duración, transbordos y cada tramo a pie o en transporte público." },
-      "map": { "title": "Vista de mapa", "desc": "El icono del mapa en la cabecera de una conexión muestra su recorrido con los colores y símbolos de transporte de la línea de tiempo. Usa el icono de lista para volver a las rutas." },
-      "destinationReached": { "title": "Ya estás en el destino", "desc": "Si el inicio y el destino están separados por 50 metros o menos, no se envía ninguna solicitud a TripGo. En su lugar se muestra que ya estás en el destino." },
-      "refresh": { "title": "Actualizar", "desc": "Obtiene de nuevo tu ubicación y calcula nuevas conexiones." },
-      "close": { "title": "Cerrar", "desc": "Cierra la vista de rutas." },
-      "help": { "title": "Ayuda", "desc": "Abre esta ayuda sobre el cálculo de rutas." },
-      "privacy": { "title": "Privacidad", "desc": "Solo al usar esta función se envían las coordenadas de inicio y destino mediante el backend de MessageDrop a SkedGo/TripGo y al servicio Nominatim configurado para identificar los lugares. La vista no guarda estas ubicaciones." }
+      "location": {
+        "title": "Obtener ubicación",
+        "desc": "Se realiza una nueva solicitud de ubicación de alta precisión al abrir o actualizar. Nominatim añade información adecuada del lugar y la dirección para el inicio y el destino."
+      },
+      "routePoints": {
+        "title": "Cambiar inicio o destino",
+        "desc": "Usa el lápiz de cada tarjeta para abrir la búsqueda de lugares. Tras elegir, la ruta se vuelve a calcular con el nuevo inicio o destino."
+      },
+      "routes": {
+        "title": "Conexiones",
+        "desc": "Los resultados muestran salida, llegada, duración, transbordos y cada tramo a pie o en transporte público."
+      },
+      "map": {
+        "title": "Vista de mapa",
+        "desc": "El icono del mapa en la cabecera de una conexión muestra su recorrido con los colores y símbolos de transporte de la línea de tiempo. Usa el icono de lista para volver a las rutas."
+      },
+      "destinationReached": {
+        "title": "Ya estás en el destino",
+        "desc": "Si el inicio y el destino están separados por 50 metros o menos, no se envía ninguna solicitud a TripGo. En su lugar se muestra que ya estás en el destino."
+      },
+      "refresh": {
+        "title": "Actualizar",
+        "desc": "Obtiene de nuevo tu ubicación y calcula nuevas conexiones."
+      },
+      "close": {
+        "title": "Cerrar",
+        "desc": "Cierra la vista de rutas."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Abre esta ayuda sobre el cálculo de rutas."
+      },
+      "privacy": {
+        "title": "Privacidad",
+        "desc": "Solo al usar esta función se envían las coordenadas de inicio y destino mediante el backend de MessageDrop a SkedGo/TripGo y al servicio Nominatim configurado para identificar los lugares. La vista no guarda estas ubicaciones."
+      }
     }
   },
   "tripGoRoutePoint": {
@@ -2884,6 +2911,10 @@
         "title": "Información en tiempo real",
         "desc": "La sección en tiempo real indica si TripGo identifica este tramo como una conexión con datos actuales. Los retrasos y cambios dependen de la región y del operador."
       },
+      "nearby": {
+        "title": "Cerca",
+        "desc": "El tiempo, la calidad del aire y Wikipedia se cargan para el punto seleccionado. Los demás mosaicos visibles preparan la búsqueda de mensajes y contenido privado."
+      },
       "provider": {
         "title": "Abrir operador",
         "desc": "Si TripGo proporciona una página segura de billetes o del operador, aparece una acción de enlace externo en el pie."
@@ -2894,7 +2925,7 @@
       },
       "privacy": {
         "title": "Privacidad",
-        "desc": "Al abrir los detalles no se envía ninguna solicitud adicional. El proveedor externo solo recibe datos si decides abrir su enlace."
+        "desc": "Al abrir la vista se cargan datos actuales del servicio, del tiempo y de la calidad del aire para las coordenadas. Wikipedia solo se consulta con consentimiento. El punto temporal no se guarda como lugar."
       }
     }
   },

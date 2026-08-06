@@ -2861,15 +2861,42 @@
     "title": "Calculer l’itinéraire",
     "intro": "La boîte de dialogue détermine à nouveau votre position actuelle et calcule des trajets vers le point sélectionné sur la carte. Le départ et la destination peuvent ensuite être modifiés.",
     "items": {
-      "location": { "title": "Déterminer la position", "desc": "Une nouvelle demande de localisation précise est lancée à chaque ouverture ou actualisation. Nominatim ajoute des informations adaptées sur le lieu et l’adresse du départ et de la destination." },
-      "routePoints": { "title": "Modifier le départ ou la destination", "desc": "Utilisez le crayon de chaque tuile pour ouvrir la recherche de lieu. Après la sélection, l’itinéraire est recalculé avec le nouveau départ ou la nouvelle destination." },
-      "routes": { "title": "Trajets", "desc": "Les résultats indiquent le départ, l’arrivée, la durée, les correspondances et chaque étape à pied ou en transports publics." },
-      "map": { "title": "Vue cartographique", "desc": "L’icône de carte dans l’en-tête d’un trajet affiche son parcours avec les couleurs et les symboles de transport de la chronologie. Utilisez l’icône de liste pour revenir aux itinéraires." },
-      "destinationReached": { "title": "Déjà à destination", "desc": "Si le départ et la destination sont distants de 50 mètres au maximum, aucune requête n’est envoyée à TripGo. Un message indique à la place que vous êtes déjà à destination." },
-      "refresh": { "title": "Actualiser", "desc": "Détermine à nouveau votre position puis calcule de nouveaux trajets." },
-      "close": { "title": "Fermer", "desc": "Ferme la vue des itinéraires." },
-      "help": { "title": "Aide", "desc": "Ouvre cette aide sur le calcul d’itinéraire." },
-      "privacy": { "title": "Confidentialité", "desc": "Après votre action, les coordonnées de départ et de destination sont transmises via le backend MessageDrop à SkedGo/TripGo et au service Nominatim configuré pour identifier les lieux. La vue ne conserve pas ces positions." }
+      "location": {
+        "title": "Déterminer la position",
+        "desc": "Une nouvelle demande de localisation précise est lancée à chaque ouverture ou actualisation. Nominatim ajoute des informations adaptées sur le lieu et l’adresse du départ et de la destination."
+      },
+      "routePoints": {
+        "title": "Modifier le départ ou la destination",
+        "desc": "Utilisez le crayon de chaque tuile pour ouvrir la recherche de lieu. Après la sélection, l’itinéraire est recalculé avec le nouveau départ ou la nouvelle destination."
+      },
+      "routes": {
+        "title": "Trajets",
+        "desc": "Les résultats indiquent le départ, l’arrivée, la durée, les correspondances et chaque étape à pied ou en transports publics."
+      },
+      "map": {
+        "title": "Vue cartographique",
+        "desc": "L’icône de carte dans l’en-tête d’un trajet affiche son parcours avec les couleurs et les symboles de transport de la chronologie. Utilisez l’icône de liste pour revenir aux itinéraires."
+      },
+      "destinationReached": {
+        "title": "Déjà à destination",
+        "desc": "Si le départ et la destination sont distants de 50 mètres au maximum, aucune requête n’est envoyée à TripGo. Un message indique à la place que vous êtes déjà à destination."
+      },
+      "refresh": {
+        "title": "Actualiser",
+        "desc": "Détermine à nouveau votre position puis calcule de nouveaux trajets."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Ferme la vue des itinéraires."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Ouvre cette aide sur le calcul d’itinéraire."
+      },
+      "privacy": {
+        "title": "Confidentialité",
+        "desc": "Après votre action, les coordonnées de départ et de destination sont transmises via le backend MessageDrop à SkedGo/TripGo et au service Nominatim configuré pour identifier les lieux. La vue ne conserve pas ces positions."
+      }
     }
   },
   "tripGoRoutePoint": {
@@ -2884,6 +2911,10 @@
         "title": "Informations en temps réel",
         "desc": "La section temps réel indique si TripGo identifie cette étape comme disposant de données actuelles. Les retards et changements dépendent de la région et de l’opérateur."
       },
+      "nearby": {
+        "title": "À proximité",
+        "desc": "La météo, la qualité de l’air et Wikipédia sont chargées pour le point sélectionné. Les autres tuiles visibles préparent la recherche de messages et de contenus privés."
+      },
       "provider": {
         "title": "Ouvrir l’opérateur",
         "desc": "Si TripGo fournit une page sécurisée de billetterie ou d’opérateur, une action de lien externe apparaît dans le pied de page."
@@ -2894,7 +2925,7 @@
       },
       "privacy": {
         "title": "Confidentialité",
-        "desc": "L’ouverture des détails n’envoie aucune requête supplémentaire. Un fournisseur externe ne reçoit des données que si vous ouvrez vous-même son lien."
+        "desc": "L’ouverture charge les données actuelles du service, de météo et de qualité de l’air pour les coordonnées. Wikipédia n’est interrogée qu’avec consentement. Le point temporaire n’est pas enregistré comme lieu."
       }
     }
   },

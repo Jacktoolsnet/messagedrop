@@ -2879,15 +2879,42 @@
     "title": "Calculate route",
     "intro": "The dialog gets a fresh fix for your current location and calculates connections from there to the selected map point. The start and destination can then be changed.",
     "items": {
-      "location": { "title": "Get location", "desc": "A new high-accuracy location request runs whenever the dialog opens or refreshes. Nominatim adds suitable place and address information for the start and destination." },
-      "routePoints": { "title": "Change start or destination", "desc": "Use the pencil in either tile to open the location search. After selection, the route is recalculated with the new start or destination." },
-      "routes": { "title": "Connections", "desc": "Results show departure and arrival, duration, transfers, and each walking or public-transport segment." },
-      "map": { "title": "Map view", "desc": "The map icon in a connection header displays its route using the timeline’s colours and transport-mode symbols. Use the list icon in the action bar to return to the route list." },
-      "destinationReached": { "title": "Already at destination", "desc": "If the start and destination are no more than 50 metres apart, no request is sent to TripGo. A notice confirms that you are already at the destination instead." },
-      "refresh": { "title": "Refresh", "desc": "Gets your location again and then calculates new connections." },
-      "close": { "title": "Close", "desc": "Closes the route view." },
-      "help": { "title": "Help", "desc": "Opens this route calculation help." },
-      "privacy": { "title": "Privacy", "desc": "Only after you invoke this function are the start and destination coordinates sent through the MessageDrop backend to SkedGo/TripGo and to the configured Nominatim service for place lookup. The route view does not persist these locations." }
+      "location": {
+        "title": "Get location",
+        "desc": "A new high-accuracy location request runs whenever the dialog opens or refreshes. Nominatim adds suitable place and address information for the start and destination."
+      },
+      "routePoints": {
+        "title": "Change start or destination",
+        "desc": "Use the pencil in either tile to open the location search. After selection, the route is recalculated with the new start or destination."
+      },
+      "routes": {
+        "title": "Connections",
+        "desc": "Results show departure and arrival, duration, transfers, and each walking or public-transport segment."
+      },
+      "map": {
+        "title": "Map view",
+        "desc": "The map icon in a connection header displays its route using the timeline’s colours and transport-mode symbols. Use the list icon in the action bar to return to the route list."
+      },
+      "destinationReached": {
+        "title": "Already at destination",
+        "desc": "If the start and destination are no more than 50 metres apart, no request is sent to TripGo. A notice confirms that you are already at the destination instead."
+      },
+      "refresh": {
+        "title": "Refresh",
+        "desc": "Gets your location again and then calculates new connections."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "Closes the route view."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "Opens this route calculation help."
+      },
+      "privacy": {
+        "title": "Privacy",
+        "desc": "Only after you invoke this function are the start and destination coordinates sent through the MessageDrop backend to SkedGo/TripGo and to the configured Nominatim service for place lookup. The route view does not persist these locations."
+      }
     }
   },
   "tripGoRoutePoint": {
@@ -2902,6 +2929,10 @@
         "title": "Real-time information",
         "desc": "The real-time section indicates whether TripGo marks this segment as currently supplied with live data. Delays and changes depend on region and operator."
       },
+      "nearby": {
+        "title": "Nearby",
+        "desc": "Weather, air quality and Wikipedia are loaded for the selected route point. Additional visible tiles prepare nearby searches for messages and private content."
+      },
       "provider": {
         "title": "Open provider",
         "desc": "When TripGo supplies a secure ticket or operator page, an external-link action appears in the footer."
@@ -2912,7 +2943,7 @@
       },
       "privacy": {
         "title": "Privacy",
-        "desc": "Opening the detail dialog sends no additional request. An external provider receives data only if you choose to open its link."
+        "desc": "Opening the view loads current service, weather and air-quality data for the coordinates. Wikipedia is queried only with prior consent. The temporary route point is not saved as a place."
       }
     }
   },
