@@ -187,6 +187,24 @@ export class SecretDropService {
       .filter((drop) => currentZoom === null || (drop.discoveryZoomLevel ?? 18) <= currentZoom);
   }
 
+  async getDiscoverableByBoundingBox(boundingBox: BoundingBox, zoomLevel = 18): Promise<SecretDrop[]> {
+    const requestZoom = this.normalizeMapZoomForDiscoveryQuery(zoomLevel) ?? 18;
+    const response = await firstValueFrom(this.http.get<SecretDropListResponse>(
+      `${this.baseUrl}/nearby/boundingbox/${boundingBox.latMin}/${boundingBox.lonMin}/${boundingBox.latMax}/${boundingBox.lonMax}?zoom=${encodeURIComponent(String(requestZoom))}`,
+      {
+        headers: new HttpHeaders({
+          'x-skip-ui': 'true',
+          'x-skip-diagnostics': 'true',
+          'x-skip-backend-status': 'true',
+          'x-skip-request-error-log': 'true'
+        })
+      }
+    ));
+    return (response.rows ?? [])
+      .map((row) => this.normalizeSecretDrop(row))
+      .filter((drop) => (drop.discoveryZoomLevel ?? 18) <= requestZoom);
+  }
+
   async discoverByPlusCode(plusCode: string, zoomLevel: number): Promise<SecretDrop[]> {
     const encodedPlusCode = encodeURIComponent(plusCode);
     const requestZoom = this.normalizeMapZoomForDiscoveryQuery(zoomLevel) ?? 18;

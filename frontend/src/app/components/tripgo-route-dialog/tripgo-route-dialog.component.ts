@@ -19,6 +19,7 @@ import { TripGoRouteMapComponent } from './tripgo-route-map.component';
 import { TripGoRouteMapPointSelection } from './tripgo-route-map.component';
 import { TripGoRoutePointDialogComponent } from './tripgo-route-point-dialog.component';
 import { tripGoSegmentIcon } from './tripgo-route.util';
+import { TripGoTimelineWeatherComponent } from './tripgo-timeline-weather.component';
 
 export interface TripGoRouteDialogData {
   destination: Location;
@@ -44,7 +45,8 @@ interface RoutePointDetails {
     MatIconModule,
     MatProgressSpinnerModule,
     TranslocoPipe,
-    TripGoRouteMapComponent
+    TripGoRouteMapComponent,
+    TripGoTimelineWeatherComponent
   ],
   templateUrl: './tripgo-route-dialog.component.html',
   styleUrl: './tripgo-route-dialog.component.css',

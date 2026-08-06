@@ -535,6 +535,26 @@ router.get('/visible/boundingbox/:latMin/:lonMin/:latMax/:lonMax', security.auth
   }
 });
 
+router.get('/nearby/boundingbox/:latMin/:lonMin/:latMax/:lonMax', security.authenticateOptional, async (req, res, next) => {
+  try {
+    const { latMin, lonMin, latMax, lonMax } = parseBoundingBoxParams(req.params);
+    const zoomLevel = normalizeDiscoveryQueryZoomLevel(req.query?.zoomLevel ?? req.query?.zoom);
+    const rows = await tableSecretDrop.getDiscoverableByBoundingBox(
+      getDb(req),
+      latMin,
+      lonMin,
+      latMax,
+      lonMax,
+      nowSeconds(),
+      getAuthUserId(req),
+      zoomLevel
+    );
+    res.status(200).json({ status: 200, rows: rows.map(mapPublicSecretDrop) });
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get('/discover/pluscode/:plusCode', security.authenticateOptional, async (req, res, next) => {
   try {
     const plusCode = normalizePlusCode(req.params.plusCode);

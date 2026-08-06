@@ -163,6 +163,7 @@
       "title": "Calcular ruta",
       "origin": "Inicio",
       "destination": "Destino",
+      "currentWeather": "Tiempo actual: {{ temperature }} grados Celsius",
       "routePoints": "Inicio y destino de la ruta",
       "editOrigin": "Cambiar punto de partida",
       "editDestination": "Cambiar destino",

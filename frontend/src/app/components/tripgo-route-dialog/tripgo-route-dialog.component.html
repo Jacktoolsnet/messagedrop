@@ -146,6 +146,9 @@
                   @if (segment.from?.name) {
                     <span class="timeline-location">{{ segment.from?.name }}</span>
                   }
+                  @if (segment.from?.latitude !== undefined && segment.from?.longitude !== undefined) {
+                    <app-tripgo-timeline-weather [location]="segment.from"></app-tripgo-timeline-weather>
+                  }
                   <strong class="timeline-mode">{{ segmentLabel(segment) }}</strong>
                   @if (segment.service?.direction) {
                     <span class="timeline-detail">
@@ -179,6 +182,11 @@
               <strong class="timeline-location timeline-location--arrival">
                 {{ route.segments.at(-1)?.to?.name || ('common.tripGo.destination' | transloco) }}
               </strong>
+              @if (route.segments.at(-1)?.to; as arrival) {
+                @if (arrival.latitude !== undefined && arrival.longitude !== undefined) {
+                  <app-tripgo-timeline-weather class="timeline-arrival-weather" [location]="arrival"></app-tripgo-timeline-weather>
+                }
+              }
             </li>
           </ol>
         </article>

@@ -163,6 +163,7 @@
       "title": "Calculer l’itinéraire",
       "origin": "Départ",
       "destination": "Destination",
+      "currentWeather": "Météo actuelle : {{ temperature }} degrés Celsius",
       "routePoints": "Départ et destination de l’itinéraire",
       "editOrigin": "Modifier le point de départ",
       "editDestination": "Modifier la destination",

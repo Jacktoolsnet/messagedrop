@@ -164,6 +164,7 @@
       "title": "Route berechnen",
       "origin": "Start",
       "destination": "Ziel",
+      "currentWeather": "Aktuelles Wetter: {{ temperature }} Grad Celsius",
       "routePoints": "Start und Ziel der Route",
       "editOrigin": "Startort ändern",
       "editDestination": "Zielort ändern",

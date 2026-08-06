@@ -8,6 +8,7 @@ import { Weather } from '../../../interfaces/weather';
 import { GeolocationService } from '../../../services/geolocation.service';
 import { DatasetState, OpenMeteoRefreshService } from '../../../services/open-meteo-refresh.service';
 import { getWeatherLevelInfo } from '../../../utils/weather-level.util';
+import { weatherIconForCode } from '../../../utils/weather-icon.util';
 import { WeatherComponent } from '../../weather/weather.component';
 
 @Component({
@@ -40,7 +41,7 @@ export class WeatherTileComponent implements OnChanges {
   }
 
   get weatherIcon(): string | undefined {
-    return this.getWeatherIcon(this.weather?.current.weatherCode);
+    return weatherIconForCode(this.weather?.current.weatherCode);
   }
 
   get minMax(): { min: number, max: number } | undefined {
@@ -55,43 +56,6 @@ export class WeatherTileComponent implements OnChanges {
     const temp = this.weather?.current?.temperature ?? 0;
     const isDarkMode = document.body.classList.contains('dark');
     return getWeatherLevelInfo('temperature', temp, isDarkMode).color;
-  }
-
-  getWeatherIcon(code?: number): string {
-    if (code === undefined) return 'na';
-
-    const map: Record<number, string> = {
-      0: 'day-sunny',
-      1: 'day-sunny-overcast',
-      2: 'day-cloudy',
-      3: 'cloudy',
-      45: 'fog',
-      48: 'fog',
-      51: 'sprinkle',
-      53: 'showers',
-      55: 'rain-mix',
-      56: 'sprinkle',
-      57: 'rain-mix',
-      61: 'rain',
-      63: 'rain',
-      65: 'rain-wind',
-      66: 'rain',
-      67: 'rain-wind',
-      71: 'snow',
-      73: 'snow',
-      75: 'snow-wind',
-      77: 'snowflake-cold',
-      80: 'showers',
-      81: 'showers',
-      82: 'rain-wind',
-      85: 'snow',
-      86: 'snow-wind',
-      95: 'thunderstorm',
-      96: 'thunderstorm',
-      99: 'thunderstorm'
-    };
-
-    return map[code] || 'na';
   }
 
   openWeatherDetails(): void {

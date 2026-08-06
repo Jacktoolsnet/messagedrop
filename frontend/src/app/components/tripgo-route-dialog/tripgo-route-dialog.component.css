@@ -291,6 +291,11 @@
   gap: 0.15rem;
 }
 
+.timeline-arrival-weather {
+  grid-column: 3;
+  margin-top: .2rem;
+}
+
 .timeline-location,
 .timeline-mode,
 .timeline-detail {

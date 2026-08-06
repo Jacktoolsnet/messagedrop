@@ -164,6 +164,7 @@
       "title": "Calculate route",
       "origin": "Start",
       "destination": "Destination",
+      "currentWeather": "Current weather: {{ temperature }} degrees Celsius",
       "routePoints": "Route start and destination",
       "editOrigin": "Change starting point",
       "editDestination": "Change destination",

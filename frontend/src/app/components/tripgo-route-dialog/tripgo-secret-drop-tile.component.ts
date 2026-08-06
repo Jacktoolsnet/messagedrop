@@ -74,7 +74,7 @@ export class TripGoSecretDropTileComponent implements OnChanges, OnDestroy {
     this.loading.set(true);
     this.drops.set([]);
     try {
-      const drops = await this.secretDropService.getVisibleOnMapByBoundingBox(this.place.boundingBox);
+      const drops = await this.secretDropService.getDiscoverableByBoundingBox(this.place.boundingBox, 18);
       if (generation !== this.requestGeneration) {
         return;
       }

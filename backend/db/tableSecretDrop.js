@@ -487,6 +487,20 @@ async function discoverByPlusCode(db, discoveryPlusCode, nowSeconds, zoomLevel =
 }
 
 async function getVisibleOnMapByBoundingBox(db, latMin, lonMin, latMax, lonMax, nowSeconds, userId = null, zoomLevel = null) {
+  return getDiscoverableByBoundingBoxQuery(
+    db, latMin, lonMin, latMax, lonMax, nowSeconds, userId, zoomLevel, true
+  );
+}
+
+async function getDiscoverableByBoundingBox(db, latMin, lonMin, latMax, lonMax, nowSeconds, userId = null, zoomLevel = null) {
+  return getDiscoverableByBoundingBoxQuery(
+    db, latMin, lonMin, latMax, lonMax, nowSeconds, userId, zoomLevel, false
+  );
+}
+
+async function getDiscoverableByBoundingBoxQuery(
+  db, latMin, lonMin, latMax, lonMax, nowSeconds, userId, zoomLevel, showOnMapOnly
+) {
   const latLow = Math.min(Number(latMin), Number(latMax));
   const latHigh = Math.max(Number(latMin), Number(latMax));
   const lonA = Number(lonMin);
@@ -503,10 +517,11 @@ async function getVisibleOnMapByBoundingBox(db, latMin, lonMin, latMax, lonMax, 
   const normalizedZoomLevel = Number.isInteger(Number(zoomLevel)) ? Number(zoomLevel) : null;
   const zoomCondition = normalizedZoomLevel === null ? '' : 'AND discoveryZoomLevel <= ?';
   const zoomParams = normalizedZoomLevel === null ? [] : [normalizedZoomLevel];
+  const mapVisibilityCondition = showOnMapOnly ? `AND ${columnShowOnMap} = 1` : '';
   const rows = await allQuery(db, `
     SELECT * FROM ${tableName}
-    WHERE ${columnShowOnMap} = 1
-      AND status IN ('${secretDropStatus.ENABLED}', '${secretDropStatus.CONSUMED}')
+    WHERE status IN ('${secretDropStatus.ENABLED}', '${secretDropStatus.CONSUMED}')
+      ${mapVisibilityCondition}
       AND latitude BETWEEN ? AND ?
       AND (${lonCondition})
       ${zoomCondition}
@@ -839,6 +854,7 @@ module.exports = {
   getRawByUuid,
   discoverByPlusCode,
   getVisibleOnMapByBoundingBox,
+  getDiscoverableByBoundingBox,
   getByUserId,
   cleanExpired,
   recordFailedUnlock,

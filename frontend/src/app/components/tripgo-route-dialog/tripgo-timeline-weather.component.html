@@ -1,0 +1,7 @@
+@if (weather) {
+  <span class="timeline-weather"
+    [attr.aria-label]="'common.tripGo.currentWeather' | transloco:{ temperature: roundedTemperature }">
+    <i class="wi wi-{{ icon }}" aria-hidden="true"></i>
+    <span>{{ roundedTemperature }} °C</span>
+  </span>
+}
