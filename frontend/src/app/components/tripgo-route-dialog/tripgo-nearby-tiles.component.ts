@@ -9,6 +9,7 @@ import { AirQualityTileComponent } from '../tile/air-quality-tile/air-quality-ti
 import { WeatherTileComponent } from '../tile/weather-tile/weather-tile.component';
 import { WikipediaTileComponent } from '../tile/wikipedia-tile/wikipedia-tile.component';
 import { MessageTileComponent } from '../tile/message-tile/messagetile.component';
+import { TripGoSecretDropTileComponent } from './tripgo-secret-drop-tile.component';
 
 interface NearbyPlaceholderTile {
   icon: string;
@@ -22,6 +23,7 @@ interface NearbyPlaceholderTile {
     AirQualityTileComponent,
     MatIconModule,
     MessageTileComponent,
+    TripGoSecretDropTileComponent,
     TranslocoPipe,
     WeatherTileComponent,
     WikipediaTileComponent
@@ -73,8 +75,7 @@ export class TripGoNearbyTilesComponent {
   readonly placeholderTiles: NearbyPlaceholderTile[] = [
     { icon: 'note', titleKey: 'common.tripGo.nearby.privateNotes', private: true },
     { icon: 'photo_library', titleKey: 'common.tripGo.nearby.privateImages', private: true },
-    { icon: 'description', titleKey: 'common.tripGo.nearby.privateDocuments', private: true },
-    { icon: 'visibility', titleKey: 'common.tripGo.nearby.secretDrops' }
+    { icon: 'description', titleKey: 'common.tripGo.nearby.privateDocuments', private: true }
   ];
 
   isAuthenticated(): boolean {

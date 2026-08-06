@@ -3,9 +3,6 @@
     <div class="tile-header">
         <mat-icon class="material-symbols-outlined tile-icon">speaker_notes</mat-icon>
         <span class="tile-title">{{ 'common.tiles.messages.title' | transloco }}</span>
-        @if (showRadius && radiusMeters) {
-        <span class="tile-radius">{{ 'common.tiles.messages.radius' | transloco: { distance: radiusMeters / 1000 } }}</span>
-        }
     </div>
 
     @if (loading()) {

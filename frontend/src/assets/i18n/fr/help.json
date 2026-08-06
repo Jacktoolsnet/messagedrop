@@ -2913,7 +2913,7 @@
       },
       "nearby": {
         "title": "À proximité",
-        "desc": "La météo, la qualité de l’air et Wikipédia sont chargées pour le point sélectionné. Les messages publics sont recherchés dans un rayon de deux kilomètres ; la tuile affiche les trois résultats les plus récents et permet d’ouvrir la liste complète. Les autres tuiles préparent des contenus supplémentaires."
+        "desc": "La météo, la qualité de l’air et Wikipédia sont chargées pour le point sélectionné. Les messages publics et les SecretDrops visibles sont recherchés dans un rayon de deux kilomètres ; chaque tuile affiche les trois résultats les plus récents et permet d’ouvrir la liste complète. Les autres tuiles préparent des contenus supplémentaires."
       },
       "provider": {
         "title": "Ouvrir l’opérateur",

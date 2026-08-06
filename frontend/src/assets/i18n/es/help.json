@@ -2913,7 +2913,7 @@
       },
       "nearby": {
         "title": "Cerca",
-        "desc": "El tiempo, la calidad del aire y Wikipedia se cargan para el punto seleccionado. Los mensajes públicos se buscan en un radio de dos kilómetros; el mosaico muestra los tres resultados más recientes y permite abrir la lista completa. Los demás mosaicos preparan contenido adicional."
+        "desc": "El tiempo, la calidad del aire y Wikipedia se cargan para el punto seleccionado. Los mensajes públicos y los SecretDrops visibles se buscan en un radio de dos kilómetros; cada mosaico muestra los tres resultados más recientes y permite abrir la lista completa. Los demás mosaicos preparan contenido adicional."
       },
       "provider": {
         "title": "Abrir operador",

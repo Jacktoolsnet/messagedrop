@@ -230,6 +230,8 @@
         "privateImages": "Private images",
         "privateDocuments": "Private documents",
         "secretDrops": "Visible SecretDrops",
+        "loadingSecretDrops": "Loading SecretDrops …",
+        "noSecretDrops": "No visible SecretDrops found.",
         "loginRequired": "Sign-in required",
         "comingSoon": "Nearby search will be added in the next step."
       },
@@ -841,7 +843,6 @@
       },
       "messages": {
         "title": "Public messages",
-        "radius": "within {{ distance }} km",
         "multimediaOnly": "Multimedia message",
         "empty": "No messages found."
       },

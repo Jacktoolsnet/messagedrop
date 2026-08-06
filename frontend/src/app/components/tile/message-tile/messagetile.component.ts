@@ -28,7 +28,6 @@ import { MessagelistComponent } from '../../messagelist/messagelist.component';
 export class MessageTileComponent implements OnChanges, OnDestroy {
   @Input() place!: Place;
   @Input() radiusMeters?: number;
-  @Input() showRadius = false;
   readonly allPlaceMessages: WritableSignal<Message[]> = signal<Message[]>([]);
   readonly loading = signal(false);
 

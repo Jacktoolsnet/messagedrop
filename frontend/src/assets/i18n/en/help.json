@@ -2931,7 +2931,7 @@
       },
       "nearby": {
         "title": "Nearby",
-        "desc": "Weather, air quality and Wikipedia are loaded for the selected route point. Public messages are searched within two kilometres; the tile shows the three newest results and opens the full list on request. Additional tiles prepare further content."
+        "desc": "Weather, air quality and Wikipedia are loaded for the selected route point. Public messages and visible SecretDrops are searched within two kilometres; each tile shows the three newest results and opens the full list on request. Additional tiles prepare further content."
       },
       "provider": {
         "title": "Open provider",

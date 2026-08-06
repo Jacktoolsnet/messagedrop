@@ -230,6 +230,8 @@
         "privateImages": "Private Bilder",
         "privateDocuments": "Private Dokumente",
         "secretDrops": "Sichtbare SecretDrops",
+        "loadingSecretDrops": "SecretDrops werden geladen …",
+        "noSecretDrops": "Keine sichtbaren SecretDrops gefunden.",
         "loginRequired": "Anmeldung erforderlich",
         "comingSoon": "Die Umkreissuche wird im nächsten Schritt ergänzt."
       },
@@ -841,7 +843,6 @@
       },
       "messages": {
         "title": "Öffentliche Nachrichten",
-        "radius": "im Umkreis von {{ distance }} km",
         "multimediaOnly": "Multimedia Nachricht",
         "empty": "Keine Nachrichten gefunden."
       },

@@ -229,6 +229,8 @@
         "privateImages": "Images privées",
         "privateDocuments": "Documents privés",
         "secretDrops": "SecretDrops visibles",
+        "loadingSecretDrops": "Chargement des SecretDrops …",
+        "noSecretDrops": "Aucun SecretDrop visible trouvé.",
         "loginRequired": "Connexion requise",
         "comingSoon": "La recherche à proximité sera ajoutée à l’étape suivante."
       },
@@ -840,7 +842,6 @@
       },
       "messages": {
         "title": "Messages publics",
-        "radius": "dans un rayon de {{ distance }} km",
         "multimediaOnly": "Message multimédia",
         "empty": "Aucun message trouvé."
       },

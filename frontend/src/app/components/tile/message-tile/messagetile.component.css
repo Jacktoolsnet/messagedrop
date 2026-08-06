@@ -30,14 +30,6 @@
     font-weight: bold;
 }
 
-.tile-radius {
-    margin-inline-start: auto;
-    font-size: 0.78rem;
-    font-weight: 500;
-    color: var(--mat-sys-on-surface-variant);
-    white-space: nowrap;
-}
-
 .tile-icon {
     width: 1.5rem;
     height: 1.5rem;
