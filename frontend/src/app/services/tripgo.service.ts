@@ -33,6 +33,10 @@ export class TripGoService {
       endStopCode: segment.to?.stopCode,
       embarkationTime: segment.startTime,
       locale
+    }, {
+      // A missing live service is an expected provider-specific result and is
+      // presented inside the detail dialog instead of as a global error dialog.
+      headers: { 'x-skip-ui': 'true' }
     }).pipe(map((response) => response.data));
   }
 }

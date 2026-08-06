@@ -48,6 +48,7 @@ describe('TripGoService', () => {
 
     const request = http.expectOne(`${environment.apiUrl}/tripgo/service`);
     expect(request.request.method).toBe('POST');
+    expect(request.request.headers.has('x-skip-ui')).toBeTrue();
     expect(request.request.body).toEqual({
       region: 'DE_NI_Hanover', serviceTripId: 'trip-1', operator: 'operator-1',
       startStopCode: 'start', endStopCode: 'end',
