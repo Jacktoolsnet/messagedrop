@@ -100,14 +100,7 @@
 
 :host ::ng-deep .tripgo-simulation-cursor {
   z-index: 4000 !important;
-  transition: transform var(--simulation-duration, .28s) linear;
   pointer-events: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  :host ::ng-deep .tripgo-simulation-cursor {
-    transition: none;
-  }
 }
 
 @media (max-width: 600px) {

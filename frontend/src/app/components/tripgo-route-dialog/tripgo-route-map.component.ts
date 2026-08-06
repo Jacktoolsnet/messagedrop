@@ -77,8 +77,10 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
   private routeBounds?: leaflet.LatLngBounds;
   private simulationMarker?: leaflet.Marker;
   private simulationPoints: TripGoSimulationPoint[] = [];
+  private readonly segmentGeometryDistanceCache = new Map<string, number>();
   private simulationIndex = -1;
   private simulationTimer?: ReturnType<typeof setTimeout>;
+  private simulationAnimationFrame?: number;
   private currentSimulationDelayMs = 3_000;
   private simulationState: TripGoSimulationState = 'idle';
 
@@ -88,6 +90,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.clearSimulationTimer();
+    this.cancelSimulationAnimation();
     this.removeSimulationMarker();
     this.map?.remove();
   }
@@ -128,6 +131,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
 
   stopSimulation(): void {
     this.clearSimulationTimer();
+    this.cancelSimulationAnimation();
     this.removeSimulationMarker();
     this.activeSimulationPoint.set(null);
     this.simulationIndex = -1;
@@ -273,14 +277,10 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
 
     const animate = !this.prefersReducedMotion();
     const movementDuration = animate ? this.simulationMovementDuration(index, initial, point.showOverlay) : 0;
-    this.moveSimulationMarker(point.location, movementDuration);
     if (initial) {
       this.map.setZoom(17, { animate });
     }
-    this.map.panTo([Number(point.location.latitude), Number(point.location.longitude)], {
-      animate,
-      duration: movementDuration
-    });
+    this.moveSimulationMarker(point.location, movementDuration, initial);
     this.currentSimulationDelayMs = point.showOverlay
       ? (this.prefersReducedMotion() ? 1_500 : 3_000)
       : (this.prefersReducedMotion() ? 0 : Math.round(movementDuration * 1_000) + 70);
@@ -302,6 +302,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
 
   private finishSimulation(): void {
     this.clearSimulationTimer();
+    this.cancelSimulationAnimation();
     this.removeSimulationMarker();
     this.activeSimulationPoint.set(null);
     this.simulationIndex = -1;
@@ -331,12 +332,11 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
     return globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
   }
 
-  private moveSimulationMarker(location: TripGoLocation, durationSeconds: number): void {
+  private moveSimulationMarker(location: TripGoLocation, durationSeconds: number, initial: boolean): void {
     if (!this.map) return;
     const latLng = leaflet.latLng(Number(location.latitude), Number(location.longitude));
     if (this.simulationMarker) {
-      this.simulationMarker.getElement()?.style.setProperty('--simulation-duration', `${durationSeconds}s`);
-      this.simulationMarker.setLatLng(latLng);
+      this.animateSimulationMovement(latLng, durationSeconds);
       return;
     }
 
@@ -353,6 +353,10 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
       pane: 'tripgoSimulationPane',
       zIndexOffset: 4_000
     }).addTo(this.map);
+    this.map.panTo(latLng, {
+      animate: durationSeconds > 0,
+      duration: initial ? durationSeconds : 0
+    });
   }
 
   private removeSimulationMarker(): void {
@@ -360,6 +364,43 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
       this.simulationMarker.removeFrom(this.map);
     }
     this.simulationMarker = undefined;
+  }
+
+  private animateSimulationMovement(target: leaflet.LatLng, durationSeconds: number): void {
+    if (!this.map || !this.simulationMarker) return;
+    this.cancelSimulationAnimation();
+    const start = this.simulationMarker.getLatLng();
+    if (durationSeconds <= 0) {
+      this.simulationMarker.setLatLng(target);
+      this.map.panTo(target, { animate: false });
+      return;
+    }
+
+    const startedAt = performance.now();
+    const durationMilliseconds = durationSeconds * 1_000;
+    const animateFrame = (timestamp: number): void => {
+      if (!this.map || !this.simulationMarker) return;
+      const progress = Math.min(1, (timestamp - startedAt) / durationMilliseconds);
+      const current = leaflet.latLng(
+        start.lat + (target.lat - start.lat) * progress,
+        start.lng + (target.lng - start.lng) * progress
+      );
+      this.simulationMarker.setLatLng(current);
+      this.map.panTo(current, { animate: false });
+      if (progress < 1) {
+        this.simulationAnimationFrame = requestAnimationFrame(animateFrame);
+      } else {
+        this.simulationAnimationFrame = undefined;
+      }
+    };
+    this.simulationAnimationFrame = requestAnimationFrame(animateFrame);
+  }
+
+  private cancelSimulationAnimation(): void {
+    if (this.simulationAnimationFrame !== undefined) {
+      cancelAnimationFrame(this.simulationAnimationFrame);
+      this.simulationAnimationFrame = undefined;
+    }
   }
 
   private simulationMovementDuration(index: number, initial: boolean, routePoint: boolean): number {
@@ -372,7 +413,36 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
 
     const distanceMeters = this.distanceInMeters(previous, current);
     if (routePoint && distanceMeters < 2) return .25;
-    return Math.min(3.5, Math.max(.24, distanceMeters / 180));
+
+    const segment = this.simulationPoints[index]?.segment;
+    const segmentDistance = segment ? this.segmentGeometryDistance(segment) : 0;
+    if (segment?.durationSeconds && segmentDistance > 0) {
+      const identifier = segment.modeIdentifier || '';
+      const isRail = identifier.includes('train') || identifier.includes('subway');
+      const compressedSegmentDuration = isRail
+        ? Math.min(30, Math.max(5, segment.durationSeconds / 30))
+        : Math.min(20, Math.max(3, segment.durationSeconds / 45));
+      const proportionalDuration = compressedSegmentDuration * distanceMeters / segmentDistance;
+      return Math.min(isRail ? 30 : 10, Math.max(.24, proportionalDuration));
+    }
+
+    return Math.min(8, Math.max(.24, distanceMeters / 100));
+  }
+
+  private segmentGeometryDistance(segment: TripGoRouteSegment): number {
+    const cached = this.segmentGeometryDistanceCache.get(segment.id);
+    if (cached !== undefined) return cached;
+
+    const locations = segment.geometry
+      .flatMap((encodedPath) => decodePolyline(encodedPath))
+      .map(([latitude, longitude]) => ({ latitude, longitude }));
+    const points = locations.length >= 2 ? locations : this.fallbackSimulationGeometry(segment);
+    let distance = 0;
+    for (let index = 1; index < points.length; index += 1) {
+      distance += this.distanceInMeters(points[index - 1], points[index]);
+    }
+    this.segmentGeometryDistanceCache.set(segment.id, distance);
+    return distance;
   }
 
   private distanceInMeters(from: TripGoLocation, to: TripGoLocation): number {
