@@ -277,8 +277,9 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
 
     const animate = !this.prefersReducedMotion();
     const movementDuration = animate ? this.simulationMovementDuration(index, initial, point.showOverlay) : 0;
-    if (initial) {
-      this.map.setZoom(19, { animate });
+    const targetZoom = this.simulationZoom(point);
+    if (targetZoom !== undefined && (initial || this.map.getZoom() !== targetZoom)) {
+      this.map.setZoom(targetZoom, { animate });
     }
     this.moveSimulationMarker(point, movementDuration, initial);
     this.currentSimulationDelayMs = point.showOverlay
@@ -330,6 +331,24 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
 
   private prefersReducedMotion(): boolean {
     return globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+  }
+
+  private simulationZoom(point: TripGoSimulationPoint): number | undefined {
+    if (!point.segment || point.segment.type === 'stationary') return undefined;
+
+    switch (tripGoSegmentIcon(point.segment)) {
+      case 'directions_walk':
+        return 19;
+      case 'directions_bus':
+      case 'tram':
+        return 17;
+      case 'train':
+        return 15;
+      case 'flight':
+        return 14;
+      default:
+        return 17;
+    }
   }
 
   private moveSimulationMarker(point: TripGoSimulationPoint, durationSeconds: number, initial: boolean): void {
