@@ -280,7 +280,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
     if (initial) {
       this.map.setZoom(17, { animate });
     }
-    this.moveSimulationMarker(point.location, movementDuration, initial);
+    this.moveSimulationMarker(point, movementDuration, initial);
     this.currentSimulationDelayMs = point.showOverlay
       ? (this.prefersReducedMotion() ? 1_500 : 3_000)
       : (this.prefersReducedMotion() ? 0 : Math.round(movementDuration * 1_000) + 70);
@@ -332,17 +332,24 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
     return globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
   }
 
-  private moveSimulationMarker(location: TripGoLocation, durationSeconds: number, initial: boolean): void {
+  private moveSimulationMarker(point: TripGoSimulationPoint, durationSeconds: number, initial: boolean): void {
     if (!this.map) return;
-    const latLng = leaflet.latLng(Number(location.latitude), Number(location.longitude));
+    const latLng = leaflet.latLng(Number(point.location.latitude), Number(point.location.longitude));
+    const cursorIcon = point.kind === 'arrival'
+      ? 'location_on'
+      : point.segment
+        ? tripGoSegmentIcon(point.segment)
+        : 'gps_fixed';
     if (this.simulationMarker) {
+      const iconElement = this.simulationMarker.getElement()?.querySelector<HTMLElement>('.material-symbols-outlined');
+      if (iconElement) iconElement.textContent = cursorIcon;
       this.animateSimulationMovement(latLng, durationSeconds);
       return;
     }
 
     const icon = leaflet.divIcon({
       className: 'tripgo-simulation-cursor',
-      html: `<span class="material-symbols-outlined" aria-hidden="true" style="display:grid;place-items:center;width:38px;height:38px;box-sizing:border-box;border:3px solid #fff;border-radius:50%;background:#000;color:#fff;box-shadow:0 3px 10px rgba(0,0,0,.5);font-size:23px;font-variation-settings:'FILL' 0,'wght' 650,'GRAD' 0,'opsz' 24">gps_fixed</span>`,
+      html: `<span class="material-symbols-outlined" aria-hidden="true" style="display:grid;place-items:center;width:38px;height:38px;box-sizing:border-box;border:3px solid #fff;border-radius:50%;background:#000;color:#fff;box-shadow:0 3px 10px rgba(0,0,0,.5);font-size:23px;font-variation-settings:'FILL' 0,'wght' 650,'GRAD' 0,'opsz' 24">${cursorIcon}</span>`,
       iconSize: [38, 38],
       iconAnchor: [19, 19]
     });

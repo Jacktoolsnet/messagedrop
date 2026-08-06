@@ -2879,7 +2879,7 @@
       },
       "simulation": {
         "title": "Simulación del viaje",
-        "desc": "El botón de reproducción desplaza el mapa suavemente desde el inicio por todos los puntos de línea proporcionados por TripGo hasta el destino. Un símbolo de objetivo marca la posición actual sobre la línea. En los puntos reales de la ruta, una capa muestra el lugar, la hora, el medio de transporte, la dirección, el andén y el tiempo. Los controles permiten pausar, avanzar, retroceder o detener la simulación. Después vuelve a mostrarse la ruta completa."
+        "desc": "El botón de reproducción desplaza el mapa suavemente desde el inicio por todos los puntos de línea proporcionados por TripGo hasta el destino. El símbolo en movimiento cambia según el tramo actual a pie, en autobús, tren u otro medio. En los puntos reales de la ruta, una capa muestra el lugar, la hora, el medio de transporte, la dirección, el andén y el tiempo. Los controles permiten pausar, avanzar, retroceder o detener la simulación. Después vuelve a mostrarse la ruta completa."
       },
       "destinationReached": {
         "title": "Ya estás en el destino",

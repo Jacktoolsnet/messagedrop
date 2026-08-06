@@ -2897,7 +2897,7 @@
       },
       "simulation": {
         "title": "Journey simulation",
-        "desc": "The play button moves the map smoothly from the start along every line point supplied by TripGo to the destination. A target symbol marks the current position on the line. At actual route points, an overlay shows the place, time, transport mode, direction, platform and weather. Additional controls pause, move backwards or forwards, and stop the simulation. The complete route is shown again afterwards."
+        "desc": "The play button moves the map smoothly from the start along every line point supplied by TripGo to the destination. The moving symbol changes to match the current walking, bus, train or other transport segment. At actual route points, an overlay shows the place, time, transport mode, direction, platform and weather. Additional controls pause, move backwards or forwards, and stop the simulation. The complete route is shown again afterwards."
       },
       "destinationReached": {
         "title": "Already at destination",
