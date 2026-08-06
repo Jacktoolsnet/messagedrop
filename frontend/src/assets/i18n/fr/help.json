@@ -2872,6 +2872,32 @@
       "privacy": { "title": "Confidentialité", "desc": "Après votre action, les coordonnées de départ et de destination sont transmises via le backend MessageDrop à SkedGo/TripGo et au service Nominatim configuré pour identifier les lieux. La vue ne conserve pas ces positions." }
     }
   },
+  "tripGoRoutePoint": {
+    "title": "Détails du point d’itinéraire",
+    "intro": "Cette vue présente les informations disponibles pour le point ou l’étape sélectionné.",
+    "items": {
+      "details": {
+        "title": "Informations de trajet",
+        "desc": "Affiche les horaires, la ligne, l’opérateur, le quai, la distance et le prix fournis par TripGo. Tous les opérateurs ne fournissent pas chaque donnée."
+      },
+      "live": {
+        "title": "Informations en temps réel",
+        "desc": "La section temps réel indique si TripGo identifie cette étape comme disposant de données actuelles. Les retards et changements dépendent de la région et de l’opérateur."
+      },
+      "provider": {
+        "title": "Ouvrir l’opérateur",
+        "desc": "Si TripGo fournit une page sécurisée de billetterie ou d’opérateur, une action de lien externe apparaît dans le pied de page."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Ferme les détails et revient à la carte de l’itinéraire."
+      },
+      "privacy": {
+        "title": "Confidentialité",
+        "desc": "L’ouverture des détails n’envoie aucune requête supplémentaire. Un fournisseur externe ne reçoit des données que si vous ouvrez vous-même son lien."
+      }
+    }
+  },
   "locationShareContacts": {
     "title": "Partager le lieu avec des contacts",
     "intro": "Sélectionnez un ou plusieurs contacts. Le lieu sera partagé comme message dans le chat.",

@@ -2890,6 +2890,32 @@
       "privacy": { "title": "Privacy", "desc": "Only after you invoke this function are the start and destination coordinates sent through the MessageDrop backend to SkedGo/TripGo and to the configured Nominatim service for place lookup. The route view does not persist these locations." }
     }
   },
+  "tripGoRoutePoint": {
+    "title": "Route point details",
+    "intro": "This view contains the available information for the selected waypoint or journey segment.",
+    "items": {
+      "details": {
+        "title": "Journey information",
+        "desc": "Shows times, line, operator, platform, distance and price information supplied by TripGo. Not every operator provides every field."
+      },
+      "live": {
+        "title": "Real-time information",
+        "desc": "The real-time section indicates whether TripGo marks this segment as currently supplied with live data. Delays and changes depend on region and operator."
+      },
+      "provider": {
+        "title": "Open provider",
+        "desc": "When TripGo supplies a secure ticket or operator page, an external-link action appears in the footer."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "Closes the point details and returns to the route map."
+      },
+      "privacy": {
+        "title": "Privacy",
+        "desc": "Opening the detail dialog sends no additional request. An external provider receives data only if you choose to open its link."
+      }
+    }
+  },
   "locationShareContacts": {
     "title": "Share location with contacts",
     "intro": "Select one or more contacts. The location will be shared as a chat message.",

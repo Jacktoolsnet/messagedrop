@@ -16,6 +16,8 @@ import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.comp
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { LocationPickerDialogComponent } from '../utils/location-picker-dialog/location-picker-dialog.component';
 import { TripGoRouteMapComponent } from './tripgo-route-map.component';
+import { TripGoRouteMapPointSelection } from './tripgo-route-map.component';
+import { TripGoRoutePointDialogComponent } from './tripgo-route-point-dialog.component';
 import { tripGoSegmentIcon } from './tripgo-route.util';
 
 export interface TripGoRouteDialogData {
@@ -116,6 +118,21 @@ export class TripGoRouteDialogComponent implements OnInit {
   showList(): void {
     this.viewMode.set('list');
     this.selectedRoute.set(null);
+  }
+
+  showRoutePointDetails(selection: TripGoRouteMapPointSelection): void {
+    const route = this.selectedRoute();
+    if (!route) return;
+    this.dialog.open(TripGoRoutePointDialogComponent, {
+      data: { ...selection, route },
+      width: 'min(720px, 95vw)',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      autoFocus: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false
+    });
   }
 
   editRoutePoint(kind: RoutePointKind): void {

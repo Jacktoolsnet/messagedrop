@@ -1,8 +1,13 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, Input, OnDestroy } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, Input, OnDestroy, output } from '@angular/core';
 import * as leaflet from 'leaflet';
 import { Location } from '../../interfaces/location';
 import { TripGoRouteOption, TripGoRouteSegment } from '../../interfaces/tripgo';
 import { tripGoSegmentIcon } from './tripgo-route.util';
+
+export interface TripGoRouteMapPointSelection {
+  kind: 'segment' | 'arrival';
+  segmentIndex: number;
+}
 
 @Component({
   selector: 'app-tripgo-route-map',
@@ -15,6 +20,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
   @Input({ required: true }) route!: TripGoRouteOption;
   @Input({ required: true }) origin!: Location;
   @Input({ required: true }) destination!: Location;
+  readonly pointSelected = output<TripGoRouteMapPointSelection>();
 
   readonly mapId = `tripgo-route-map-${Math.random().toString(36).slice(2)}`;
   private map?: leaflet.Map;
@@ -77,7 +83,8 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
         tripGoSegmentIcon(segment),
         safeColor(segment.color),
         segment.from?.name,
-        index
+        index,
+        'segment'
       );
       bounds.extend([location.latitude, location.longitude]);
     });
@@ -90,7 +97,8 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
       'location_on',
       safeColor(lastSegment?.color),
       lastSegment?.to?.name,
-      this.route.segments.length
+      this.route.segments.length,
+      'arrival'
     );
     bounds.extend([destination.latitude, destination.longitude]);
   }
@@ -100,18 +108,21 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
     iconName: string,
     color: string,
     label: string | undefined,
-    index: number
+    index: number,
+    kind: TripGoRouteMapPointSelection['kind']
   ): void {
     const icon = leaflet.divIcon({
       className: '',
-      html: `<span class="material-symbols-outlined" aria-hidden="true" style="display:grid;place-items:center;width:34px;height:34px;box-sizing:border-box;border:3px solid #fff;border-radius:50%;background:${color};color:${contrastColor(color)};box-shadow:0 2px 7px rgba(0,0,0,.4);font-size:19px;font-variation-settings:'FILL' 0,'wght' 600,'GRAD' 0,'opsz' 24">${iconName}</span>`,
+      html: `<span class="material-symbols-outlined" aria-hidden="true" style="display:grid;place-items:center;width:34px;height:34px;box-sizing:border-box;border:3px solid #fff;border-radius:50%;background:${color};color:${contrastColor(color)};box-shadow:0 2px 7px rgba(0,0,0,.4);font-size:19px;cursor:pointer;font-variation-settings:'FILL' 0,'wght' 600,'GRAD' 0,'opsz' 24">${iconName}</span>`,
       iconSize: [34, 34],
       iconAnchor: [17, 17]
     });
     const marker = leaflet.marker([location.latitude, location.longitude], {
       icon,
+      title: label,
       zIndexOffset: 1000 + index
     }).addTo(this.map!);
+    marker.on('click', () => this.pointSelected.emit({ kind, segmentIndex: index }));
     if (label) {
       const tooltip = document.createElement('span');
       tooltip.textContent = label;

@@ -11,7 +11,8 @@
         <app-tripgo-route-map
           [route]="route"
           [origin]="start"
-          [destination]="destination()">
+          [destination]="destination()"
+          (pointSelected)="showRoutePointDetails($event)">
         </app-tripgo-route-map>
       }
     }

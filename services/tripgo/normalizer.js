@@ -133,8 +133,21 @@ function normalizeService(reference, template) {
     stops: finiteNumber(reference.stops),
     routeId: stringOrNull(reference.routeID || reference.routeId),
     tripId: stringOrNull(reference.serviceTripID),
-    textColor: rgbHex(reference.serviceTextColor)
+    textColor: rgbHex(reference.serviceTextColor),
+    realTimeStatus: stringOrNull(reference.realTimeStatus),
+    ticketWebsiteUrl: safeExternalUrl(reference.ticketWebsiteURL)
   });
+}
+
+function safeExternalUrl(value) {
+  const candidate = stringOrNull(value);
+  if (!candidate) return null;
+  try {
+    const url = new URL(candidate);
+    return url.protocol === 'https:' ? url.toString() : null;
+  } catch {
+    return null;
+  }
 }
 
 function normalizeLocation(value) {

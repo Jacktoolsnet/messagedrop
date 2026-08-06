@@ -7,6 +7,7 @@ import { NominatimService } from '../../services/nominatim.service';
 import { TripGoService } from '../../services/tripgo.service';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { TripGoRouteDialogComponent } from './tripgo-route-dialog.component';
+import { TripGoRoutePointDialogComponent } from './tripgo-route-point-dialog.component';
 
 describe('TripGoRouteDialogComponent', () => {
   let fixture: ComponentFixture<TripGoRouteDialogComponent>;
@@ -126,5 +127,20 @@ describe('TripGoRouteDialogComponent', () => {
     expect(fixture.componentInstance.destination()).toEqual(destination);
     expect(tripGo.calculatePublicTransportRoute).toHaveBeenCalledTimes(2);
     expect(tripGo.calculatePublicTransportRoute.calls.mostRecent().args[1]).toEqual(destination);
+  });
+
+  it('opens the point detail dialog for a selected map marker', () => {
+    const route = {
+      id: 'route-1', groupIndex: 0, departureTime: '2026-08-06T08:00:00Z',
+      arrivalTime: '2026-08-06T08:10:00Z', durationSeconds: 600, transfers: 0, modes: [],
+      segments: [{ id: 'walk', geometry: [], from: { name: 'Start' }, to: { name: 'Ziel' } }]
+    };
+    fixture.componentInstance.selectedRoute.set(route);
+
+    fixture.componentInstance.showRoutePointDetails({ kind: 'segment', segmentIndex: 0 });
+
+    expect(dialog.open).toHaveBeenCalledWith(TripGoRoutePointDialogComponent, jasmine.objectContaining({
+      data: { kind: 'segment', segmentIndex: 0, route }
+    }));
   });
 });

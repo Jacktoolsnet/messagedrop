@@ -2890,6 +2890,32 @@
       "privacy": { "title": "Datenschutz", "desc": "Erst nach deinem Aufruf werden Start- und Zielkoordinaten über das MessageDrop-Backend an SkedGo/TripGo und zur Ortsbestimmung an den konfigurierten Nominatim-Dienst übertragen. Die Routenansicht speichert die Orte nicht dauerhaft." }
     }
   },
+  "tripGoRoutePoint": {
+    "title": "Details zum Routenpunkt",
+    "intro": "Hier findest du die verfügbaren Informationen zum ausgewählten Wegpunkt oder Reiseabschnitt.",
+    "items": {
+      "details": {
+        "title": "Reiseinformationen",
+        "desc": "Zeigt die von TripGo gelieferten Zeiten, Linien-, Betreiber-, Steig-, Entfernungs- und Preisinformationen. Nicht jeder Anbieter liefert alle Angaben."
+      },
+      "live": {
+        "title": "Echtzeitinformationen",
+        "desc": "Der Echtzeitbereich zeigt, ob TripGo diesen Abschnitt als aktuell versorgte Verbindung kennzeichnet. Verspätungen und Änderungen sind abhängig von Region und Anbieter."
+      },
+      "provider": {
+        "title": "Anbieter öffnen",
+        "desc": "Wenn TripGo eine sichere Ticket- oder Anbieterseite liefert, erscheint im Footer das Symbol zum externen Öffnen."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Schließt die Punktdetails und kehrt zur Routenkarte zurück."
+      },
+      "privacy": {
+        "title": "Datenschutz",
+        "desc": "Beim Öffnen des Detaildialogs wird keine zusätzliche Anfrage gesendet. Ein externer Anbieter erhält erst Daten, wenn du dessen Link selbst öffnest."
+      }
+    }
+  },
   "locationShareContacts": {
     "title": "Ort mit Kontakten teilen",
     "intro": "Wähle einen oder mehrere Kontakte aus. Der Ort wird als Nachricht im Chat geteilt.",

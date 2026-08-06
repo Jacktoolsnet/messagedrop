@@ -1,0 +1,71 @@
+<app-dialog-header [icon]="icon()" [title]="title()" [subtitle]="subtitle()"></app-dialog-header>
+
+<mat-dialog-content class="point-dialog-content">
+  @if (location()?.address; as address) {
+    <p class="point-address"><mat-icon aria-hidden="true">place</mat-icon><span>{{ address }}</span></p>
+  }
+
+  <section class="detail-grid" [attr.aria-label]="'common.tripGo.routePointDetails.travelData' | transloco">
+    <article class="detail-tile">
+      <header><mat-icon aria-hidden="true">schedule</mat-icon>{{ 'common.tripGo.routePointDetails.times' | transloco }}</header>
+      <div class="detail-tile__body detail-times">
+        <span><small>{{ 'common.tripGo.routePointDetails.departure' | transloco }}</small><strong>{{ formatTime(segment().startTime) }}</strong></span>
+        <mat-icon aria-hidden="true">arrow_forward</mat-icon>
+        <span><small>{{ 'common.tripGo.routePointDetails.arrivalTime' | transloco }}</small><strong>{{ formatTime(segment().endTime) }}</strong></span>
+      </div>
+    </article>
+
+    @if (segment().service; as service) {
+      <article class="detail-tile">
+        <header><mat-icon aria-hidden="true">directions_transit</mat-icon>{{ 'common.tripGo.routePointDetails.service' | transloco }}</header>
+        <dl class="detail-list">
+          @if (service.number) { <dt>{{ 'common.tripGo.routePointDetails.line' | transloco }}</dt><dd>{{ service.number }}</dd> }
+          @if (service.direction) { <dt>{{ 'common.tripGo.routePointDetails.direction' | transloco }}</dt><dd>{{ service.direction }}</dd> }
+          @if (service.operator) { <dt>{{ 'common.tripGo.routePointDetails.operator' | transloco }}</dt><dd>{{ service.operator }}</dd> }
+          @if (service.startPlatform) { <dt>{{ 'common.tripGo.routePointDetails.startPlatform' | transloco }}</dt><dd>{{ service.startPlatform }}</dd> }
+          @if (service.endPlatform) { <dt>{{ 'common.tripGo.routePointDetails.endPlatform' | transloco }}</dt><dd>{{ service.endPlatform }}</dd> }
+          @if (service.stops !== undefined) { <dt>{{ 'common.tripGo.routePointDetails.stops' | transloco }}</dt><dd>{{ service.stops }}</dd> }
+        </dl>
+      </article>
+    }
+
+    <article class="detail-tile">
+      <header><mat-icon aria-hidden="true">route</mat-icon>{{ 'common.tripGo.routePointDetails.segmentData' | transloco }}</header>
+      <dl class="detail-list">
+        @if (segment().modeLabel) { <dt>{{ 'common.tripGo.routePointDetails.mode' | transloco }}</dt><dd>{{ segment().modeLabel }}</dd> }
+        @if (segment().durationSeconds !== undefined) { <dt>{{ 'common.tripGo.routePointDetails.duration' | transloco }}</dt><dd>{{ formatDuration(segment().durationSeconds!) }}</dd> }
+        @if (segment().distanceMeters !== undefined) { <dt>{{ 'common.tripGo.routePointDetails.distance' | transloco }}</dt><dd>{{ formatDistance(segment().distanceMeters!) }}</dd> }
+        @if (segment().cost; as cost) { <dt>{{ 'common.tripGo.routePointDetails.price' | transloco }}</dt><dd>{{ formatCost(cost.amount, cost.currency) }}</dd> }
+        @if (segment().bicycleAccessible !== undefined) {
+          <dt>{{ 'common.tripGo.routePointDetails.bicycle' | transloco }}</dt>
+          <dd>{{ (segment().bicycleAccessible ? 'common.tripGo.routePointDetails.yes' : 'common.tripGo.routePointDetails.no') | transloco }}</dd>
+        }
+      </dl>
+    </article>
+
+    <article class="detail-tile detail-tile--live">
+      <header><mat-icon aria-hidden="true">online_prediction</mat-icon>{{ 'common.tripGo.routePointDetails.live' | transloco }}</header>
+      <div class="detail-tile__body live-status">
+        @if (hasLiveData()) {
+          <mat-icon aria-hidden="true">check_circle</mat-icon>
+          <span>{{ 'common.tripGo.routePointDetails.liveAvailable' | transloco }}</span>
+        } @else {
+          <mat-icon aria-hidden="true">info</mat-icon>
+          <span>{{ 'common.tripGo.routePointDetails.noLiveData' | transloco }}</span>
+        }
+      </div>
+    </article>
+  </section>
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions point-dialog-actions">
+  <button mat-icon-button type="button" class="action-cancel" (click)="close()"
+    [attr.aria-label]="'common.actions.close' | transloco"><mat-icon>close</mat-icon></button>
+  <span class="action-spacer"></span>
+  <button mat-icon-button type="button" (click)="help.open('tripGoRoutePoint')"
+    [attr.aria-label]="'common.actions.help' | transloco"><mat-icon>help</mat-icon></button>
+  @if (ticketUrl(); as url) {
+    <a mat-icon-button color="primary" [href]="url" target="_blank" rel="noopener noreferrer"
+      [attr.aria-label]="'common.tripGo.routePointDetails.openProvider' | transloco"><mat-icon>open_in_new</mat-icon></a>
+  }
+</mat-dialog-actions>
