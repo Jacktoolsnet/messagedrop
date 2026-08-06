@@ -193,6 +193,7 @@
       "oneTransfer": "1 Umstieg",
       "direction": "Richtung {{ direction }}",
       "platform": "Steig {{ platform }}",
+      "toPlatform": "{{ mode }} zum Steig {{ platform }}",
       "stops": "{{ count }} Haltestellen",
       "transfers": "{{ count }} Umstiege",
       "segments": "Abschnitte der Verbindung",

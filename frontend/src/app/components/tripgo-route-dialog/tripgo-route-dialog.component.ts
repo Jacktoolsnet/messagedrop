@@ -18,7 +18,7 @@ import { LocationPickerDialogComponent } from '../utils/location-picker-dialog/l
 import { TripGoRouteMapComponent, TripGoSimulationState } from './tripgo-route-map.component';
 import { TripGoRouteMapPointSelection } from './tripgo-route-map.component';
 import { TripGoRoutePointDialogComponent } from './tripgo-route-point-dialog.component';
-import { tripGoSegmentIcon } from './tripgo-route.util';
+import { tripGoFollowingBoardingPlatform, tripGoSegmentIcon } from './tripgo-route.util';
 import { TripGoTimelineWeatherComponent } from './tripgo-timeline-weather.component';
 
 export interface TripGoRouteDialogData {
@@ -223,8 +223,12 @@ export class TripGoRouteDialogComponent implements OnInit {
     return `${Math.round(metres)} m`;
   }
 
-  segmentLabel(segment: TripGoRouteSegment): string {
-    return segment.service?.number || segment.modeLabel || segment.modeIdentifier || '';
+  segmentLabel(route: TripGoRouteOption, segment: TripGoRouteSegment, segmentIndex: number): string {
+    const label = segment.service?.number || segment.modeLabel || segment.modeIdentifier || '';
+    const platform = tripGoFollowingBoardingPlatform(route, segmentIndex);
+    return platform
+      ? this.transloco.translate('common.tripGo.toPlatform', { mode: label, platform })
+      : label;
   }
 
   segmentIcon(segment: TripGoRouteSegment): string {

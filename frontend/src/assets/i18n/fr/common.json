@@ -192,6 +192,7 @@
       "oneTransfer": "1 correspondance",
       "direction": "Direction {{ direction }}",
       "platform": "Quai {{ platform }}",
+      "toPlatform": "{{ mode }} jusqu’au quai {{ platform }}",
       "stops": "{{ count }} arrêts",
       "transfers": "{{ count }} correspondances",
       "segments": "Étapes du trajet",

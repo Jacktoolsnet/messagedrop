@@ -155,7 +155,7 @@
                 </strong>
               </li>
             }
-            @for (segment of route.segments; track segment.id; let first = $first) {
+            @for (segment of route.segments; track segment.id; let first = $first; let segmentIndex = $index) {
               <li class="timeline-segment" [style.--segment-color]="segment.color || '#6750a4'">
                 <div class="timeline-node-meta">
                   @if (!first) {
@@ -176,7 +176,7 @@
                   @if (!first && segment.from?.name) {
                     <span class="timeline-location">{{ segment.from?.name }}</span>
                   }
-                  <strong class="timeline-mode">{{ segmentLabel(segment) }}</strong>
+                  <strong class="timeline-mode">{{ segmentLabel(route, segment, segmentIndex) }}</strong>
                   @if (segment.service?.direction) {
                     <span class="timeline-detail">
                       {{ 'common.tripGo.direction' | transloco:{ direction: segment.service?.direction } }}

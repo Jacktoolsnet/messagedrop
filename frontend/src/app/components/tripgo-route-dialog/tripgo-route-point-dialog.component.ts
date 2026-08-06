@@ -9,7 +9,7 @@ import { TripGoLiveServiceDetails, TripGoRouteOption, TripGoRouteSegment } from 
 import { TripGoService } from '../../services/tripgo.service';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
-import { tripGoSegmentIcon } from './tripgo-route.util';
+import { tripGoFollowingBoardingPlatform, tripGoSegmentIcon } from './tripgo-route.util';
 import { TripGoNearbyTilesComponent } from './tripgo-nearby-tiles.component';
 
 export interface TripGoRoutePointDialogData {
@@ -49,12 +49,19 @@ export class TripGoRoutePointDialogComponent implements OnInit {
   readonly title = computed(() => this.location()?.name
     || this.transloco.translate(this.data.kind === 'arrival' ? 'common.tripGo.destination' : 'common.tripGo.routePointDetails.title'));
   readonly icon = computed(() => this.data.kind === 'arrival' ? 'location_on' : tripGoSegmentIcon(this.segment()));
+  readonly boardingPlatform = computed(() => this.data.kind === 'segment'
+    ? tripGoFollowingBoardingPlatform(this.data.route, this.data.segmentIndex)
+    : undefined);
   readonly subtitle = computed(() => {
     const service = this.segment().service;
     if (this.data.kind === 'arrival') return this.transloco.translate('common.tripGo.routePointDetails.arrival');
-    return [service?.number, service?.direction].filter(Boolean).join(' · ')
-      || this.segment().modeLabel
+    const serviceLabel = [service?.number, service?.direction].filter(Boolean).join(' · ');
+    const modeLabel = this.segment().modeLabel
       || this.transloco.translate('common.tripGo.routePointDetails.segment');
+    const platform = this.boardingPlatform();
+    return serviceLabel || (platform
+      ? this.transloco.translate('common.tripGo.toPlatform', { mode: modeLabel, platform })
+      : modeLabel);
   });
   readonly ticketUrl = computed(() => this.safeUrl(this.segment().service?.ticketWebsiteUrl));
   readonly liveDetails = signal<TripGoLiveServiceDetails | null>(null);

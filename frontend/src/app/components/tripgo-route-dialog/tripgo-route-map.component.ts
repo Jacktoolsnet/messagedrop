@@ -5,7 +5,7 @@ import * as leaflet from 'leaflet';
 import { Location } from '../../interfaces/location';
 import { TripGoLocation, TripGoRouteOption, TripGoRouteSegment } from '../../interfaces/tripgo';
 import { TripGoTimelineWeatherComponent } from './tripgo-timeline-weather.component';
-import { tripGoSegmentIcon } from './tripgo-route.util';
+import { tripGoFollowingBoardingPlatform, tripGoSegmentIcon } from './tripgo-route.util';
 
 export interface TripGoRouteMapPointSelection {
   kind: 'segment' | 'arrival';
@@ -164,7 +164,12 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
   }
 
   segmentLabel(segment: TripGoRouteSegment): string {
-    return segment.service?.number || segment.modeLabel || segment.modeIdentifier || '';
+    const label = segment.service?.number || segment.modeLabel || segment.modeIdentifier || '';
+    const segmentIndex = this.route.segments.indexOf(segment);
+    const platform = tripGoFollowingBoardingPlatform(this.route, segmentIndex);
+    return platform
+      ? this.transloco.translate('common.tripGo.toPlatform', { mode: label, platform })
+      : label;
   }
 
   formatTime(value: string): string {
@@ -526,7 +531,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
         location,
         tripGoSegmentIcon(segment),
         safeColor(segment.color),
-        segment.from?.name,
+        [segment.from?.name, this.segmentLabel(segment)].filter(Boolean).join(' · '),
         index,
         'segment'
       );

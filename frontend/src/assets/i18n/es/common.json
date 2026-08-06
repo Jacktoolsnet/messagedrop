@@ -192,6 +192,7 @@
       "oneTransfer": "1 transbordo",
       "direction": "Dirección {{ direction }}",
       "platform": "Andén {{ platform }}",
+      "toPlatform": "{{ mode }} hasta el andén {{ platform }}",
       "stops": "{{ count }} paradas",
       "transfers": "{{ count }} transbordos",
       "segments": "Tramos del trayecto",

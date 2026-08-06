@@ -193,6 +193,7 @@
       "oneTransfer": "1 transfer",
       "direction": "Towards {{ direction }}",
       "platform": "Platform {{ platform }}",
+      "toPlatform": "{{ mode }} to platform {{ platform }}",
       "stops": "{{ count }} stops",
       "transfers": "{{ count }} transfers",
       "segments": "Journey segments",
