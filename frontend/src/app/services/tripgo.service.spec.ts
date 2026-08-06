@@ -26,6 +26,7 @@ describe('TripGoService', () => {
 
     const request = http.expectOne(`${environment.apiUrl}/tripgo/routes`);
     expect(request.request.method).toBe('POST');
+    expect(request.request.headers.get('x-skip-ui')).toBe('true');
     expect(request.request.body).toEqual({
       from: { latitude: 52.52, longitude: 13.405 },
       to: { latitude: 52.51, longitude: 13.38 },

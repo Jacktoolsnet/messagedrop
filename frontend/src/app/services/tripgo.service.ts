@@ -21,6 +21,10 @@ export class TripGoService {
       to: { latitude: to.latitude, longitude: to.longitude },
       locale,
       modes: ['pt_pub']
+    }, {
+      // Routing failures are rendered directly inside the route dialog. Avoid a
+      // second, global display-message dialog for the same expected result.
+      headers: { 'x-skip-ui': 'true' }
     }).pipe(map((response) => response.data));
   }
 

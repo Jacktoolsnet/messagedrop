@@ -59,9 +59,10 @@ interface TripGoSimulationPoint {
             </div>
           </header>
           <div class="simulation-overlay__facts">
-            @if (point.time) {
-              <span><mat-icon aria-hidden="true">schedule</mat-icon>{{ formatTime(point.time) }}</span>
-            }
+            <span class="simulation-overlay__time">
+              <mat-icon aria-hidden="true">schedule</mat-icon>
+              @if (point.time) { {{ formatTime(point.time) }} } @else { &ndash; }
+            </span>
             @if (point.segment; as segment) {
               <span><mat-icon aria-hidden="true">{{ segmentIcon(segment) }}</mat-icon>{{ segmentLabel(segment) }}</span>
               @if (segment.service?.direction) {
@@ -95,6 +96,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
   private simulationMarker?: leaflet.Marker;
   private simulationPoints: TripGoSimulationPoint[] = [];
   private readonly segmentGeometryDistanceCache = new Map<string, number>();
+  private segmentGeometryLocationsCache?: Map<TripGoRouteSegment, TripGoLocation[]>;
   private simulationIndex = -1;
   private simulationTimer?: ReturnType<typeof setTimeout>;
   private simulationAnimationFrame?: number;
@@ -119,6 +121,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     this.map = undefined;
     this.routeBounds = undefined;
     this.segmentGeometryDistanceCache.clear();
+    this.segmentGeometryLocationsCache = undefined;
     this.createMap();
   }
 
@@ -280,10 +283,17 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     });
 
     this.route.segments.forEach((segment, segmentIndex) => {
+      const geometryPoints = this.segmentGeometryLocations(segment);
+      const displayedPoints = geometryPoints.length >= 2
+        ? geometryPoints
+        : this.fallbackSimulationGeometry(segment);
       if (segmentIndex > 0 && this.validTripGoLocation(segment.from)) {
+        const geometryStart = displayedPoints[0];
         points.push({
           kind: 'segment',
-          location: segment.from,
+          location: this.validTripGoLocation(geometryStart)
+            ? { ...segment.from, latitude: geometryStart.latitude, longitude: geometryStart.longitude }
+            : segment.from,
           title: segment.from.name || segment.from.address || this.transloco.translate('common.tripGo.simulation.routePoint'),
           time: segment.startTime,
           segment,
@@ -291,10 +301,6 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
         });
       }
 
-      const geometryPoints = this.segmentGeometryLocations(segment);
-      const displayedPoints = geometryPoints.length >= 2
-        ? geometryPoints
-        : this.fallbackSimulationGeometry(segment);
       for (const location of displayedPoints) {
         if (this.isSameSimulationLocation(points.at(-1)?.location, location)) continue;
         const intermediateStop = segment.service?.intermediateStops?.find((stop) =>
@@ -304,7 +310,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
           location,
           title: intermediateStop?.name || segment.from?.name || segment.from?.address
             || this.transloco.translate('common.tripGo.simulation.routePoint'),
-          time: intermediateStop ? undefined : segment.startTime,
+          time: intermediateStop?.arrivalTime || intermediateStop?.departureTime || segment.startTime,
           segment,
           showOverlay: !!intermediateStop
         });
@@ -340,9 +346,14 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
       this.map.setZoom(targetZoom, { animate });
     }
     this.moveSimulationMarker(point, movementDuration, initial);
-    this.currentSimulationDelayMs = point.showOverlay
+    const movementDelayMs = Math.round(movementDuration * 1_000);
+    const stopDelayMs = point.showOverlay
       ? (this.prefersReducedMotion() ? 1_500 : 3_000)
-      : (this.prefersReducedMotion() ? 0 : Math.round(movementDuration * 1_000) + 70);
+      : (this.prefersReducedMotion() ? 0 : 70);
+    // Wait until the cursor has actually reached the new geometry point. This is
+    // especially important for intermediate stops: otherwise their overlay delay
+    // can end before a longer movement and the following leg cuts across the line.
+    this.currentSimulationDelayMs = movementDelayMs + stopDelayMs;
     if (this.simulationState === 'playing') {
       this.scheduleNextSimulationPoint();
     }
@@ -462,13 +473,19 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
 
     const startedAt = performance.now();
     const durationMilliseconds = durationSeconds * 1_000;
+    const projectionZoom = this.map.getZoom();
+    const projectedStart = this.map.project(start, projectionZoom);
+    const projectedTarget = this.map.project(target, projectionZoom);
     const animateFrame = (timestamp: number): void => {
       if (!this.map || !this.simulationMarker) return;
       const progress = Math.min(1, (timestamp - startedAt) / durationMilliseconds);
-      const current = leaflet.latLng(
-        start.lat + (target.lat - start.lat) * progress,
-        start.lng + (target.lng - start.lng) * progress
-      );
+      // Leaflet renders a polyline as a straight segment in projected map
+      // coordinates. Interpolating there keeps the marker exactly on that line;
+      // a linear latitude/longitude interpolation can visibly drift beside it.
+      const current = this.map.unproject(leaflet.point(
+        projectedStart.x + (projectedTarget.x - projectedStart.x) * progress,
+        projectedStart.y + (projectedTarget.y - projectedStart.y) * progress
+      ), projectionZoom);
       this.simulationMarker.setLatLng(current);
       this.map.panTo(current, { animate: false });
       if (progress < 1) {
@@ -550,12 +567,27 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
   }
 
   private segmentGeometryLocations(segment: TripGoRouteSegment): TripGoLocation[] {
+    if (!this.segmentGeometryLocationsCache) {
+      const geometries = this.route.segments.map((routeSegment) =>
+        this.rawSegmentGeometryLocations(routeSegment));
+      const snappedGeometries = snapNearbyGeometryBoundaries(
+        geometries,
+        10,
+        this.route.segments.map((routeSegment) => routeSegment.from)
+      );
+      this.segmentGeometryLocationsCache = new Map(this.route.segments.map((routeSegment, index) =>
+        [routeSegment, snappedGeometries[index]]));
+    }
+    return this.segmentGeometryLocationsCache.get(segment) || [];
+  }
+
+  private rawSegmentGeometryLocations(segment: TripGoRouteSegment): TripGoLocation[] {
     const detailedGeometry = (segment.detailedGeometry || []).filter((location) =>
       this.validTripGoLocation(location));
-    if (detailedGeometry.length >= 2) return detailedGeometry;
-    return segment.geometry
+    const geometry = detailedGeometry.length >= 2 ? detailedGeometry : segment.geometry
       .flatMap((encodedPath) => decodePolyline(encodedPath))
       .map(([latitude, longitude]) => ({ latitude, longitude }));
+    return insertStopsIntoGeometry(geometry, segment.service?.intermediateStops || []);
   }
 
   private isSameSimulationLocation(
@@ -570,27 +602,16 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
   private drawRoute(bounds: leaflet.LatLngBounds): void {
     for (const segment of this.route.segments) {
       const color = safeColor(segment.color);
-      let drewGeometry = false;
-      const detailedPoints = (segment.detailedGeometry || [])
+      const detailedPoints = this.segmentGeometryLocations(segment)
         .filter((location) => this.validTripGoLocation(location))
         .map((location): leaflet.LatLngTuple => [location.latitude, location.longitude]);
-      const hasDetailedGeometry = detailedPoints.length >= 2;
-      if (hasDetailedGeometry) {
-        drewGeometry = true;
+      if (detailedPoints.length >= 2) {
         leaflet.polyline(detailedPoints, { color: '#ffffff', weight: 9, opacity: 0.8 }).addTo(this.map!);
         leaflet.polyline(detailedPoints, { color, weight: 6, opacity: 0.9 }).addTo(this.map!);
         for (const point of detailedPoints) bounds.extend(point);
+      } else {
+        this.drawGeometryFallback(segment, color, bounds);
       }
-      for (const encodedPath of segment.geometry) {
-        if (hasDetailedGeometry) break;
-        const points = decodePolyline(encodedPath);
-        if (points.length < 2) continue;
-        drewGeometry = true;
-        leaflet.polyline(points, { color: '#ffffff', weight: 9, opacity: 0.8 }).addTo(this.map!);
-        leaflet.polyline(points, { color, weight: 6, opacity: 0.9 }).addTo(this.map!);
-        for (const point of points) bounds.extend(point);
-      }
-      if (!drewGeometry) this.drawGeometryFallback(segment, color, bounds);
     }
   }
 
@@ -711,6 +732,103 @@ function contrastColor(color: string): '#000000' | '#ffffff' {
   const blue = Number.parseInt(color.slice(5, 7), 16);
   const luminance = (red * 299 + green * 587 + blue * 114) / 1000;
   return luminance >= 150 ? '#000000' : '#ffffff';
+}
+
+export function insertStopsIntoGeometry(
+  geometry: TripGoLocation[],
+  stops: TripGoLocation[]
+): TripGoLocation[] {
+  const valid = (location: TripGoLocation): location is TripGoLocation & { latitude: number; longitude: number } =>
+    Number.isFinite(location.latitude) && Number.isFinite(location.longitude);
+  const merged = geometry.filter(valid).map((location) => ({ ...location }));
+  if (merged.length < 2) return merged;
+
+  let minimumSegmentIndex = 0;
+  for (const stop of stops.filter(valid)) {
+    const existingIndex = merged.findIndex((point, index) => index >= minimumSegmentIndex
+      && sameCoordinates(point, stop));
+    if (existingIndex >= 0) {
+      merged[existingIndex] = { ...merged[existingIndex], ...stop };
+      minimumSegmentIndex = existingIndex;
+      continue;
+    }
+
+    let bestSegmentIndex = Math.min(minimumSegmentIndex, merged.length - 2);
+    let smallestDetour = Number.POSITIVE_INFINITY;
+    for (let index = bestSegmentIndex; index < merged.length - 1; index += 1) {
+      const detour = coordinateDistance(merged[index], stop)
+        + coordinateDistance(stop, merged[index + 1])
+        - coordinateDistance(merged[index], merged[index + 1]);
+      if (detour < smallestDetour) {
+        smallestDetour = detour;
+        bestSegmentIndex = index;
+      }
+    }
+    merged.splice(bestSegmentIndex + 1, 0, { ...stop });
+    minimumSegmentIndex = bestSegmentIndex + 1;
+  }
+  return merged;
+}
+
+function sameCoordinates(left: TripGoLocation, right: TripGoLocation): boolean {
+  return Math.abs(Number(left.latitude) - Number(right.latitude)) < 0.000001
+    && Math.abs(Number(left.longitude) - Number(right.longitude)) < 0.000001;
+}
+
+function coordinateDistance(left: TripGoLocation, right: TripGoLocation): number {
+  const latitudeScale = Math.cos((Number(left.latitude) + Number(right.latitude)) * Math.PI / 360);
+  const latitude = Number(left.latitude) - Number(right.latitude);
+  const longitude = (Number(left.longitude) - Number(right.longitude)) * latitudeScale;
+  return Math.hypot(latitude, longitude);
+}
+
+export function snapNearbyGeometryBoundaries(
+  geometries: TripGoLocation[][],
+  maximumDistanceMeters = 10,
+  preferredStarts: (TripGoLocation | undefined)[] = []
+): TripGoLocation[][] {
+  const snapped = geometries.map((geometry) => geometry.map((location) => ({ ...location })));
+  for (let index = 1; index < snapped.length; index += 1) {
+    const previousGeometry = snapped[index - 1];
+    const currentGeometry = snapped[index];
+    const previousEnd = previousGeometry.at(-1);
+    const currentStart = currentGeometry[0];
+    if (!previousEnd || !currentStart
+      || locationDistanceInMeters(previousEnd, currentStart) >= maximumDistanceMeters) continue;
+
+    const preferredStart = preferredStarts[index];
+    const joint = preferredStart
+      && Number.isFinite(preferredStart.latitude)
+      && Number.isFinite(preferredStart.longitude)
+      && locationDistanceInMeters(previousEnd, preferredStart) < maximumDistanceMeters
+      && locationDistanceInMeters(currentStart, preferredStart) < maximumDistanceMeters
+      ? preferredStart
+      : currentStart;
+    // Prefer the declared boarding position so its map marker also sits exactly
+    // on the joined line. Otherwise the following geometry start is authoritative.
+    previousGeometry[previousGeometry.length - 1] = {
+      ...previousEnd,
+      latitude: joint.latitude,
+      longitude: joint.longitude
+    };
+    currentGeometry[0] = {
+      ...currentStart,
+      latitude: joint.latitude,
+      longitude: joint.longitude
+    };
+  }
+  return snapped;
+}
+
+function locationDistanceInMeters(from: TripGoLocation, to: TripGoLocation): number {
+  const toRadians = (degrees: number): number => degrees * Math.PI / 180;
+  const latitudeDelta = toRadians(Number(to.latitude) - Number(from.latitude));
+  const longitudeDelta = toRadians(Number(to.longitude) - Number(from.longitude));
+  const firstLatitude = toRadians(Number(from.latitude));
+  const secondLatitude = toRadians(Number(to.latitude));
+  const haversine = Math.sin(latitudeDelta / 2) ** 2
+    + Math.cos(firstLatitude) * Math.cos(secondLatitude) * Math.sin(longitudeDelta / 2) ** 2;
+  return 2 * 6_371_000 * Math.asin(Math.sqrt(haversine));
 }
 
 export function decodePolyline(encoded: string, precision = 5): leaflet.LatLngTuple[] {
