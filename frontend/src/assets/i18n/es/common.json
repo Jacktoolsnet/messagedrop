@@ -211,6 +211,15 @@
         "live": "Información actual",
         "liveAvailable": "TripGo identifica los datos de este tramo como información en tiempo real.",
         "noLiveData": "Actualmente no hay información en tiempo real sobre retrasos o cambios para este punto.",
+        "loadingLive": "Cargando los datos actuales del servicio …",
+        "liveError": "No se pudieron cargar los datos actuales. Los horarios previstos siguen visibles.",
+        "currentDeparture": "Salida actual",
+        "scheduledDeparture": "Salida prevista",
+        "currentPlatform": "Andén actual",
+        "onTime": "Puntual",
+        "delayed": "+{{ minutes }} min de retraso",
+        "early": "{{ minutes }} min antes",
+        "refreshLive": "Actualizar los datos del servicio",
         "openProvider": "Abrir la web de billetes o del operador"
       },
       "errors": {

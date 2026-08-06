@@ -59,6 +59,11 @@ function createApp({ client = createTripGoClient(), logger = createLogger() } = 
     maxEntries: numberSetting('TRIPGO_ROUTE_CACHE_MAX_ENTRIES', 64),
     maxBytes: numberSetting('TRIPGO_ROUTE_CACHE_MAX_BYTES', 32 * 1024 * 1024)
   });
+  const serviceCache = new BoundedTtlCache({
+    ttlMs: numberSetting('TRIPGO_SERVICE_CACHE_TTL_MS', 15000),
+    maxEntries: numberSetting('TRIPGO_SERVICE_CACHE_MAX_ENTRIES', 128),
+    maxBytes: numberSetting('TRIPGO_SERVICE_CACHE_MAX_BYTES', 16 * 1024 * 1024)
+  });
   const inFlight = new Map();
   const metrics = {};
 
@@ -74,7 +79,7 @@ function createApp({ client = createTripGoClient(), logger = createLogger() } = 
   app.use('/', root);
   app.use('/check', check);
   app.use('/tripgo', createTripGoRouter({
-    client, regionsCache, routeCache, inFlight, metrics,
+    client, regionsCache, routeCache, serviceCache, inFlight, metrics,
     maxInFlight: numberSetting('TRIPGO_MAX_IN_FLIGHT', 100)
   }));
   app.use(notFoundHandler);

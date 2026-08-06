@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { normalizeRoutingResponse, rgbHex } = require('../normalizer');
+const { normalizeRoutingResponse, normalizeServiceResponse, rgbHex } = require('../normalizer');
 
 function trip(id, score, depart, templateHash, overrides = {}) {
   return {
@@ -96,4 +96,24 @@ test('rejects responses with missing segment templates', () => {
 test('formats TripGo RGB colors', () => {
   assert.equal(rgbHex({ red: 255, green: 0, blue: 16 }), '#ff0010');
   assert.equal(rgbHex({ red: -1, green: 0, blue: 16 }), null);
+});
+
+test('normalizes current service times and calculates a delay', () => {
+  const normalized = normalizeServiceResponse({
+    service: {
+      serviceTripID: 'trip-1',
+      startTime: 1_785_956_880,
+      endTime: 1_785_957_180,
+      timetableStartTime: 1_785_956_580,
+      timetableEndTime: 1_785_956_880,
+      realTime: true,
+      platform: '2',
+      alerts: [{ title: 'Geänderter Steig' }]
+    }
+  }, { serviceTripId: 'trip-1' });
+
+  assert.equal(normalized.realTime, true);
+  assert.equal(normalized.delaySeconds, 300);
+  assert.equal(normalized.platform, '2');
+  assert.deepEqual(normalized.alerts, ['Geänderter Steig']);
 });

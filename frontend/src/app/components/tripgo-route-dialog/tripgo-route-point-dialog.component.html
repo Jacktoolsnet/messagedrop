@@ -46,7 +46,37 @@
     <article class="detail-tile detail-tile--live">
       <header><mat-icon aria-hidden="true">online_prediction</mat-icon>{{ 'common.tripGo.routePointDetails.live' | transloco }}</header>
       <div class="detail-tile__body live-status">
-        @if (hasLiveData()) {
+        @if (liveState() === 'loading') {
+          <mat-spinner diameter="24"></mat-spinner>
+          <span>{{ 'common.tripGo.routePointDetails.loadingLive' | transloco }}</span>
+        } @else if (liveState() === 'error') {
+          <mat-icon aria-hidden="true">warning</mat-icon>
+          <span>{{ 'common.tripGo.routePointDetails.liveError' | transloco }}</span>
+        } @else if (liveDetails(); as live) {
+          <div class="live-details">
+            <div class="live-departure">
+              <small>{{ 'common.tripGo.routePointDetails.currentDeparture' | transloco }}</small>
+              <strong>{{ formatTime(live.departureTime || segment().startTime) }}</strong>
+            </div>
+            @if (live.scheduledDepartureTime) {
+              <span>{{ 'common.tripGo.routePointDetails.scheduledDeparture' | transloco }}: {{ formatTime(live.scheduledDepartureTime) }}</span>
+            }
+            @if (live.delaySeconds !== undefined) {
+              <strong class="delay" [class.delay--late]="live.delaySeconds > 30">
+                {{ formatDelay(live.delaySeconds) }}
+              </strong>
+            }
+            @if (live.platform || live.endPlatform) {
+              <span>{{ 'common.tripGo.routePointDetails.currentPlatform' | transloco }}: {{ live.platform || live.endPlatform }}</span>
+            }
+            @for (alert of live.alerts; track alert) {
+              <p class="live-alert"><mat-icon aria-hidden="true">warning</mat-icon><span>{{ alert }}</span></p>
+            }
+            @if (!hasLiveData() && !live.delaySeconds && live.alerts.length === 0) {
+              <span>{{ 'common.tripGo.routePointDetails.noLiveData' | transloco }}</span>
+            }
+          </div>
+        } @else if (hasLiveData()) {
           <mat-icon aria-hidden="true">check_circle</mat-icon>
           <span>{{ 'common.tripGo.routePointDetails.liveAvailable' | transloco }}</span>
         } @else {
@@ -64,6 +94,10 @@
   <span class="action-spacer"></span>
   <button mat-icon-button type="button" (click)="help.open('tripGoRoutePoint')"
     [attr.aria-label]="'common.actions.help' | transloco"><mat-icon>help</mat-icon></button>
+  @if (canLoadLiveDetails()) {
+    <button mat-icon-button type="button" (click)="loadLiveDetails()" [disabled]="liveState() === 'loading'"
+      [attr.aria-label]="'common.tripGo.routePointDetails.refreshLive' | transloco"><mat-icon>refresh</mat-icon></button>
+  }
   @if (ticketUrl(); as url) {
     <a mat-icon-button color="primary" [href]="url" target="_blank" rel="noopener noreferrer"
       [attr.aria-label]="'common.tripGo.routePointDetails.openProvider' | transloco"><mat-icon>open_in_new</mat-icon></a>

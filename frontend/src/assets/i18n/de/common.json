@@ -212,6 +212,15 @@
         "live": "Aktuelle Informationen",
         "liveAvailable": "TripGo kennzeichnet die Daten dieses Abschnitts als Echtzeitinformationen.",
         "noLiveData": "Für diesen Punkt liegen derzeit keine Echtzeitinformationen zu Verspätungen oder Änderungen vor.",
+        "loadingLive": "Aktuelle Fahrtdaten werden geladen …",
+        "liveError": "Aktuelle Fahrtdaten konnten nicht abgerufen werden. Die geplanten Zeiten bleiben sichtbar.",
+        "currentDeparture": "Aktuelle Abfahrt",
+        "scheduledDeparture": "Planmäßige Abfahrt",
+        "currentPlatform": "Aktueller Steig",
+        "onTime": "Pünktlich",
+        "delayed": "+{{ minutes }} min Verspätung",
+        "early": "{{ minutes }} min früher",
+        "refreshLive": "Aktuelle Fahrtdaten neu laden",
         "openProvider": "Ticket- oder Anbieterseite öffnen"
       },
       "errors": {

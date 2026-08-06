@@ -26,6 +26,47 @@ function normalizeRoutingResponse(payload, { maxRoutes = 12, routesPerGroup = 2 
   };
 }
 
+function normalizeServiceResponse(payload, query = {}) {
+  if (!payload || typeof payload !== 'object') {
+    const error = new Error('invalid_tripgo_service_response');
+    error.status = 502;
+    throw error;
+  }
+  const objects = nestedObjects(payload, 7, 1500);
+  const service = objects.find((value) => value.serviceTripID === query.serviceTripId)
+    || objects.find((value) => value.serviceTripId === query.serviceTripId)
+    || objects.find((value) => hasAny(value, ['startTime', 'endTime']) && hasAny(value, ['serviceNumber', 'serviceDirection', 'realTime']))
+    || payload;
+  const departureTime = flexibleIso(firstValue(service, ['startTime', 'departureTime', 'departure']));
+  const arrivalTime = flexibleIso(firstValue(service, ['endTime', 'arrivalTime', 'arrival']));
+  const scheduledDepartureTime = flexibleIso(firstValue(service, [
+    'timetableStartTime', 'scheduledStartTime', 'scheduledDepartureTime', 'plannedDepartureTime'
+  ]));
+  const scheduledArrivalTime = flexibleIso(firstValue(service, [
+    'timetableEndTime', 'scheduledEndTime', 'scheduledArrivalTime', 'plannedArrivalTime'
+  ]));
+  const explicitDelay = finiteNumber(firstValue(service, ['departureDelay', 'delaySeconds', 'delay']));
+  const calculatedDelay = departureTime && scheduledDepartureTime
+    ? Math.round((Date.parse(departureTime) - Date.parse(scheduledDepartureTime)) / 1000)
+    : null;
+  return compact({
+    serviceTripId: stringOrNull(service.serviceTripID || service.serviceTripId || query.serviceTripId),
+    updatedAt: new Date().toISOString(),
+    departureTime,
+    arrivalTime,
+    scheduledDepartureTime,
+    scheduledArrivalTime,
+    delaySeconds: explicitDelay ?? calculatedDelay,
+    platform: stringOrNull(firstValue(service, ['startPlatform', 'platform'])),
+    endPlatform: stringOrNull(service.endPlatform),
+    direction: stringOrNull(service.serviceDirection || service.direction),
+    realTime: service.realTime === true || service.isRealTime === true
+      || (/REAL_TIME/i.test(String(service.realTimeStatus || ''))
+        && !/NOT_REAL_TIME/i.test(String(service.realTimeStatus || ''))),
+    alerts: normalizeAlerts(payload, service)
+  });
+}
+
 function selectTrips(candidates, maxRoutes, routesPerGroup) {
   const queryTime = candidates.find(({ trip }) => Number.isFinite(trip?.queryTime))?.trip.queryTime;
   const eligible = candidates.filter(({ trip }) => trip && Number.isFinite(trip.depart) && Number.isFinite(trip.arrive)
@@ -128,6 +169,7 @@ function normalizeService(reference, template) {
     number: stringOrNull(reference.serviceNumber || reference.serviceShortName || reference.serviceName),
     direction: stringOrNull(reference.serviceDirection),
     operator: stringOrNull(template.serviceOperator || template.operator || reference.externalData?.operatorName),
+    operatorId: stringOrNull(template.operatorID || reference.externalData?.operatorId),
     startPlatform: stringOrNull(reference.startPlatform || reference.platform),
     endPlatform: stringOrNull(reference.endPlatform),
     stops: finiteNumber(reference.stops),
@@ -215,6 +257,38 @@ function dateIso(value) {
   return Number.isFinite(timestamp) ? new Date(timestamp).toISOString() : null;
 }
 
+function flexibleIso(value) {
+  if (Number.isFinite(value)) return epochIso(value > 10_000_000_000 ? value / 1000 : value);
+  return dateIso(value);
+}
+
+function nestedObjects(root, maxDepth, maxObjects) {
+  const found = [];
+  const visit = (value, depth) => {
+    if (!value || typeof value !== 'object' || depth > maxDepth || found.length >= maxObjects) return;
+    if (!Array.isArray(value)) found.push(value);
+    for (const child of Object.values(value)) visit(child, depth + 1);
+  };
+  visit(root, 0);
+  return found;
+}
+
+function normalizeAlerts(payload, service) {
+  const candidates = [service.alerts, payload.alerts, payload.realtimeAlerts].filter(Array.isArray).flat();
+  return [...new Set(candidates.map((alert) => stringOrNull(
+    typeof alert === 'string' ? alert : alert?.text || alert?.message || alert?.title || alert?.headerText
+  )).filter(Boolean))].slice(0, 10);
+}
+
+function firstValue(value, keys) {
+  for (const key of keys) if (value?.[key] !== undefined && value[key] !== null) return value[key];
+  return null;
+}
+
+function hasAny(value, keys) {
+  return keys.some((key) => value?.[key] !== undefined);
+}
+
 function finiteNumber(value) {
   return Number.isFinite(value) ? value : null;
 }
@@ -232,4 +306,4 @@ function compact(value) {
   return Object.fromEntries(Object.entries(value).filter(([, entry]) => entry !== null && entry !== undefined));
 }
 
-module.exports = { normalizeRoutingResponse, selectTrips, rgbHex };
+module.exports = { normalizeRoutingResponse, normalizeServiceResponse, selectTrips, rgbHex };

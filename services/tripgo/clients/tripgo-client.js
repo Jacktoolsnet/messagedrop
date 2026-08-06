@@ -45,6 +45,21 @@ function createTripGoClient({
       if (query.time) params.set(query.time.type, String(query.time.epochSeconds));
       for (const stop of query.avoidStops) params.append('avoidStops', stop);
       return unwrap(await http.get(`/routing.json?${params.toString()}`));
+    },
+
+    async service(query) {
+      const params = new URLSearchParams({
+        region: query.region,
+        serviceTripID: query.serviceTripId,
+        startStopCode: query.startStopCode,
+        embarkationDate: String(query.embarkationTime),
+        encode: 'false'
+      });
+      if (query.endStopCode) params.set('endStopCode', query.endStopCode);
+      if (query.operator) params.set('operator', query.operator);
+      return unwrap(await http.get(`/service.json?${params.toString()}`, {
+        headers: { 'Accept-Language': query.locale }
+      }));
     }
   };
 }

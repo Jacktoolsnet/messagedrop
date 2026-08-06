@@ -34,4 +34,25 @@ describe('TripGoService', () => {
     });
     request.flush({ status: 200, data: result, cache: 'miss' });
   });
+
+  it('requests current details for a scheduled service', () => {
+    const segment = {
+      id: 'segment-1', geometry: [], startTime: '2026-08-06T08:00:00Z',
+      from: { region: 'DE_NI_Hanover', stopCode: 'start' },
+      to: { stopCode: 'end' },
+      service: { tripId: 'trip-1', operatorId: 'operator-1' }
+    };
+    const result = { updatedAt: '2026-08-06T07:59:00Z', alerts: [] };
+
+    service.getServiceDetails(segment, 'de').subscribe((value) => expect(value).toEqual(result));
+
+    const request = http.expectOne(`${environment.apiUrl}/tripgo/service`);
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual({
+      region: 'DE_NI_Hanover', serviceTripId: 'trip-1', operator: 'operator-1',
+      startStopCode: 'start', endStopCode: 'end',
+      embarkationTime: '2026-08-06T08:00:00Z', locale: 'de'
+    });
+    request.flush({ status: 200, data: result, cache: 'miss' });
+  });
 });

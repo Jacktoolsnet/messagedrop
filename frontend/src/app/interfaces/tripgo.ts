@@ -20,6 +20,7 @@ export interface TripGoServiceInfo {
   number?: string;
   direction?: string;
   operator?: string;
+  operatorId?: string;
   startPlatform?: string;
   endPlatform?: string;
   stops?: number;
@@ -93,5 +94,26 @@ export interface TripGoRouteRequest {
 export interface TripGoRoutesResponse {
   status: number;
   data: TripGoRoutingResult;
+  cache: 'hit' | 'miss';
+}
+
+export interface TripGoLiveServiceDetails {
+  serviceTripId?: string;
+  updatedAt: string;
+  departureTime?: string;
+  arrivalTime?: string;
+  scheduledDepartureTime?: string;
+  scheduledArrivalTime?: string;
+  delaySeconds?: number;
+  platform?: string;
+  endPlatform?: string;
+  direction?: string;
+  realTime?: boolean;
+  alerts: string[];
+}
+
+export interface TripGoServiceDetailsResponse {
+  status: number;
+  data: TripGoLiveServiceDetails;
   cache: 'hit' | 'miss';
 }

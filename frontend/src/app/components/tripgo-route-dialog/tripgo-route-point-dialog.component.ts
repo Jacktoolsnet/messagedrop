@@ -1,9 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import { TripGoRouteOption, TripGoRouteSegment } from '../../interfaces/tripgo';
+import { TripGoLiveServiceDetails, TripGoRouteOption, TripGoRouteSegment } from '../../interfaces/tripgo';
+import { TripGoService } from '../../services/tripgo.service';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { tripGoSegmentIcon } from './tripgo-route.util';
@@ -22,16 +25,19 @@ export interface TripGoRoutePointDialogData {
     MatDialogActions,
     MatDialogContent,
     MatIconModule,
+    MatProgressSpinnerModule,
     TranslocoPipe
   ],
   templateUrl: './tripgo-route-point-dialog.component.html',
   styleUrl: './tripgo-route-point-dialog.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TripGoRoutePointDialogComponent {
+export class TripGoRoutePointDialogComponent implements OnInit {
   readonly data = inject<TripGoRoutePointDialogData>(MAT_DIALOG_DATA);
   private readonly dialogRef = inject(MatDialogRef<TripGoRoutePointDialogComponent>);
   private readonly transloco = inject(TranslocoService);
+  private readonly tripGo = inject(TripGoService);
+  private readonly destroyRef = inject(DestroyRef);
   readonly help = inject(HelpDialogService);
 
   readonly segment = computed<TripGoRouteSegment>(() => this.data.kind === 'arrival'
@@ -49,10 +55,37 @@ export class TripGoRoutePointDialogComponent {
       || this.transloco.translate('common.tripGo.routePointDetails.segment');
   });
   readonly ticketUrl = computed(() => this.safeUrl(this.segment().service?.ticketWebsiteUrl));
+  readonly liveDetails = signal<TripGoLiveServiceDetails | null>(null);
+  readonly liveState = signal<'idle' | 'loading' | 'ready' | 'error'>('idle');
+  readonly canLoadLiveDetails = computed(() => !!(
+    this.segment().from?.region
+    && this.segment().from?.stopCode
+    && this.segment().service?.tripId
+    && this.segment().startTime
+  ));
   readonly hasLiveData = computed(() => {
     const status = this.segment().service?.realTimeStatus?.toUpperCase();
-    return !!status && status.includes('REAL_TIME') && !status.includes('NOT_');
+    return this.liveDetails()?.realTime === true
+      || (!!status && status.includes('REAL_TIME') && !status.includes('NOT_'));
   });
+
+  ngOnInit(): void {
+    this.loadLiveDetails();
+  }
+
+  loadLiveDetails(): void {
+    if (!this.canLoadLiveDetails() || this.liveState() === 'loading') return;
+    this.liveState.set('loading');
+    this.tripGo.getServiceDetails(this.segment(), this.transloco.getActiveLang() || 'de').pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: (details) => {
+        this.liveDetails.set(details);
+        this.liveState.set('ready');
+      },
+      error: () => this.liveState.set('error')
+    });
+  }
 
   close(): void {
     this.dialogRef.close();
@@ -83,6 +116,14 @@ export class TripGoRoutePointDialogComponent {
     return new Intl.NumberFormat(this.transloco.getActiveLang() || 'de', {
       style: 'currency', currency
     }).format(amount);
+  }
+
+  formatDelay(seconds: number): string {
+    const minutes = Math.round(Math.abs(seconds) / 60);
+    if (Math.abs(seconds) < 30) return this.transloco.translate('common.tripGo.routePointDetails.onTime');
+    return this.transloco.translate(seconds > 0
+      ? 'common.tripGo.routePointDetails.delayed'
+      : 'common.tripGo.routePointDetails.early', { minutes });
   }
 
   private safeUrl(value: string | undefined): string | null {

@@ -2,10 +2,10 @@ const crypto = require('crypto');
 const express = require('express');
 const axios = require('axios');
 const { requireServiceJwt } = require('../utils/serviceJwt');
-const { validateRouteRequest, normalizeLocale } = require('../validation');
-const { normalizeRoutingResponse } = require('../normalizer');
+const { validateRouteRequest, validateServiceRequest, normalizeLocale } = require('../validation');
+const { normalizeRoutingResponse, normalizeServiceResponse } = require('../normalizer');
 
-function createTripGoRouter({ client, regionsCache, routeCache, inFlight, metrics, maxInFlight }) {
+function createTripGoRouter({ client, regionsCache, routeCache, serviceCache, inFlight, metrics, maxInFlight }) {
   const router = express.Router();
   router.use(requireServiceJwt);
 
@@ -59,11 +59,32 @@ function createTripGoRouter({ client, regionsCache, routeCache, inFlight, metric
     }
   });
 
+  router.post('/service', async (req, res, next) => {
+    metrics.services = (metrics.services || 0) + 1;
+    const validated = validateServiceRequest(req.body);
+    if (!validated.ok) return res.status(400).json({ error: validated.message });
+    const key = routeKey(validated.value);
+    const cached = serviceCache?.get(key);
+    if (cached !== undefined) return res.status(200).json({ ...cached, cache: 'hit' });
+    try {
+      const upstream = await coalesce(inFlight, `service:${key}`, maxInFlight, () => client.service(validated.value));
+      const payload = {
+        status: upstream.status,
+        data: normalizeServiceResponse(upstream.data, validated.value)
+      };
+      serviceCache?.set(key, payload);
+      return res.status(upstream.status).json({ ...payload, cache: 'miss' });
+    } catch (error) {
+      return next(upstreamError(error));
+    }
+  });
+
   router.get('/metrics', (_req, res) => res.status(200).json({
     status: 200,
     inFlight: inFlight.size,
     regionsCache: regionsCache.snapshot(),
     routeCache: routeCache.snapshot(),
+    serviceCache: serviceCache?.snapshot(),
     requests: { ...metrics }
   }));
 

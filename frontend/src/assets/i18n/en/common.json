@@ -212,6 +212,15 @@
         "live": "Current information",
         "liveAvailable": "TripGo marks this segment's data as real-time information.",
         "noLiveData": "No real-time delay or change information is currently available for this point.",
+        "loadingLive": "Loading current service data …",
+        "liveError": "Current service data could not be loaded. Scheduled times remain visible.",
+        "currentDeparture": "Current departure",
+        "scheduledDeparture": "Scheduled departure",
+        "currentPlatform": "Current platform",
+        "onTime": "On time",
+        "delayed": "+{{ minutes }} min late",
+        "early": "{{ minutes }} min early",
+        "refreshLive": "Refresh current service data",
         "openProvider": "Open ticket or operator website"
       },
       "errors": {

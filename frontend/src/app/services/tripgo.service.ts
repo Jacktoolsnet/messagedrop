@@ -3,7 +3,13 @@ import { inject, Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Location } from '../interfaces/location';
-import { TripGoRoutingResult, TripGoRoutesResponse } from '../interfaces/tripgo';
+import {
+  TripGoLiveServiceDetails,
+  TripGoRouteSegment,
+  TripGoRoutingResult,
+  TripGoRoutesResponse,
+  TripGoServiceDetailsResponse
+} from '../interfaces/tripgo';
 
 @Injectable({ providedIn: 'root' })
 export class TripGoService {
@@ -15,6 +21,18 @@ export class TripGoService {
       to: { latitude: to.latitude, longitude: to.longitude },
       locale,
       modes: ['pt_pub']
+    }).pipe(map((response) => response.data));
+  }
+
+  getServiceDetails(segment: TripGoRouteSegment, locale: string): Observable<TripGoLiveServiceDetails> {
+    return this.http.post<TripGoServiceDetailsResponse>(`${environment.apiUrl}/tripgo/service`, {
+      region: segment.from?.region,
+      serviceTripId: segment.service?.tripId,
+      operator: segment.service?.operatorId,
+      startStopCode: segment.from?.stopCode,
+      endStopCode: segment.to?.stopCode,
+      embarkationTime: segment.startTime,
+      locale
     }).pipe(map((response) => response.data));
   }
 }

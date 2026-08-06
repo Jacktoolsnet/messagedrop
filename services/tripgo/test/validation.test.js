@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { validateRouteRequest } = require('../validation');
+const { validateRouteRequest, validateServiceRequest } = require('../validation');
 
 test('validates and normalizes a route request', () => {
   const result = validateRouteRequest({
@@ -27,4 +27,23 @@ test('rejects invalid coordinates and modes', () => {
     to: { latitude: 53, longitude: 14 },
     modes: ['not a mode']
   }).ok, false);
+});
+
+test('validates a live service request', () => {
+  const result = validateServiceRequest({
+    region: 'DE_NI_Hanover',
+    serviceTripId: '3245078301',
+    operator: 'de-delfi-gtfs-12096',
+    startStopCode: 'de:03158:1701:0:2',
+    endStopCode: 'de:03158:458:1:C',
+    embarkationTime: new Date(Date.now() + 60_000).toISOString(),
+    locale: 'de'
+  });
+  assert.equal(result.ok, true);
+  assert.equal(result.value.serviceTripId, '3245078301');
+  assert.equal(Number.isInteger(result.value.embarkationTime), true);
+});
+
+test('rejects incomplete live service requests', () => {
+  assert.equal(validateServiceRequest({ region: 'DE_NI_Hanover' }).ok, false);
 });

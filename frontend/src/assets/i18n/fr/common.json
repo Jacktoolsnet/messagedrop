@@ -211,6 +211,15 @@
         "live": "Informations actuelles",
         "liveAvailable": "TripGo identifie les données de cette étape comme des informations en temps réel.",
         "noLiveData": "Aucune information en temps réel sur les retards ou changements n’est disponible pour ce point.",
+        "loadingLive": "Chargement des données actuelles du service…",
+        "liveError": "Les données actuelles n’ont pas pu être chargées. Les horaires prévus restent visibles.",
+        "currentDeparture": "Départ actuel",
+        "scheduledDeparture": "Départ prévu",
+        "currentPlatform": "Quai actuel",
+        "onTime": "À l’heure",
+        "delayed": "+{{ minutes }} min de retard",
+        "early": "{{ minutes }} min d’avance",
+        "refreshLive": "Actualiser les données du service",
         "openProvider": "Ouvrir le site de billetterie ou de l’opérateur"
       },
       "errors": {

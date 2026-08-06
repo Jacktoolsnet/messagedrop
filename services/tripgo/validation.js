@@ -1,5 +1,7 @@
 const MODE_PATTERN = /^[a-z][a-z0-9]*(?:_[a-z0-9]+){1,5}$/i;
 const STOP_PATTERN = /^[a-zA-Z0-9_.:-]{1,160}$/;
+const REGION_PATTERN = /^[a-zA-Z0-9_-]{1,100}$/;
+const SERVICE_ID_PATTERN = /^[a-zA-Z0-9_.:|/-]{1,240}$/;
 
 function validateRouteRequest(body) {
   if (!isPlainObject(body)) return invalid('invalid_route_request');
@@ -25,6 +27,35 @@ function validateRouteRequest(body) {
   const time = normalizeTime(body.time);
   if (time === false) return invalid('invalid_route_time');
   return { ok: true, value: { from, to, locale, modes, avoidStops, time } };
+}
+
+function validateServiceRequest(body) {
+  if (!isPlainObject(body)) return invalid('invalid_service_request');
+  const region = normalizeString(body.region);
+  const serviceTripId = normalizeString(body.serviceTripId);
+  const startStopCode = normalizeString(body.startStopCode);
+  const endStopCode = normalizeString(body.endStopCode);
+  const operator = normalizeString(body.operator);
+  const locale = normalizeLocale(body.locale ?? 'de');
+  if (!REGION_PATTERN.test(region)) return invalid('invalid_service_region');
+  if (!SERVICE_ID_PATTERN.test(serviceTripId)) return invalid('invalid_service_trip_id');
+  if (!STOP_PATTERN.test(startStopCode)) return invalid('invalid_service_start_stop');
+  if (endStopCode && !STOP_PATTERN.test(endStopCode)) return invalid('invalid_service_end_stop');
+  if (operator.length > 200) return invalid('invalid_service_operator');
+  if (!locale) return invalid('invalid_service_locale');
+  const embarkationMs = typeof body.embarkationTime === 'number'
+    ? (body.embarkationTime < 10_000_000_000 ? body.embarkationTime * 1000 : body.embarkationTime)
+    : Date.parse(body.embarkationTime);
+  if (!Number.isFinite(embarkationMs)) return invalid('invalid_service_embarkation_time');
+  const embarkationTime = Math.floor(embarkationMs / 1000);
+  const now = Math.floor(Date.now() / 1000);
+  if (embarkationTime < now - 7 * 86400 || embarkationTime > now + 366 * 86400) {
+    return invalid('invalid_service_embarkation_time');
+  }
+  return { ok: true, value: {
+    region, serviceTripId, startStopCode, endStopCode: endStopCode || null,
+    operator: operator || null, embarkationTime, locale
+  } };
 }
 
 function normalizeLocale(value) {
@@ -67,4 +98,4 @@ function invalid(message) {
   return { ok: false, message };
 }
 
-module.exports = { validateRouteRequest, normalizeLocale };
+module.exports = { validateRouteRequest, validateServiceRequest, normalizeLocale };
