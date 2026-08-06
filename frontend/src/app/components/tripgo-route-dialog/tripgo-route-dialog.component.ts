@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { catchError, forkJoin, map, of } from 'rxjs';
 import { GetNominatimAddressResponse } from '../../interfaces/get-nominatim-address-response copy';
 import { Location } from '../../interfaces/location';
 import { NominatimPlace } from '../../interfaces/nominatim-place';
@@ -271,6 +272,13 @@ export class TripGoRouteDialogComponent implements OnInit {
     return tripGoDisplayLocationName(segment.to?.name);
   }
 
+  intermediateStopCount(segment: TripGoRouteSegment): number {
+    const detailedStops = segment.service?.intermediateStops;
+    return detailedStops
+      ? detailedStops.length
+      : Math.max(0, (segment.service?.stops || 0) - 1);
+  }
+
   segmentIcon(segment: TripGoRouteSegment): string {
     return tripGoSegmentIcon(segment);
   }
@@ -290,10 +298,55 @@ export class TripGoRouteDialogComponent implements OnInit {
       next: (result) => {
         this.routes.set(result.routes);
         this.state.set('ready');
+        this.loadServiceDetails(result.routes);
       },
       error: () => {
         this.errorKey.set('common.tripGo.errors.route');
         this.state.set('error');
+      }
+    });
+  }
+
+  private loadServiceDetails(routes: TripGoRouteOption[]): void {
+    const requests = routes.flatMap((route) => route.segments
+      .filter((segment) => segment.type === 'scheduled' && segment.service?.tripId)
+      .map((segment) => this.tripGo.getServiceDetails(
+        segment,
+        this.transloco.getActiveLang() || 'de'
+      ).pipe(
+        map((details) => ({ routeId: route.id, segmentId: segment.id, details })),
+        catchError(() => of(null))
+      )));
+    if (requests.length === 0) return;
+
+    forkJoin(requests).pipe(takeUntilDestroyed(this.destroyRef)).subscribe((results) => {
+      const detailsBySegment = new Map(results
+        .filter((result) => result !== null)
+        .map((result) => [`${result.routeId}:${result.segmentId}`, result.details]));
+      if (detailsBySegment.size === 0) return;
+
+      const currentRouteIds = new Set(this.routes().map((route) => route.id));
+      if (!routes.some((route) => currentRouteIds.has(route.id))) return;
+      const enrichedRoutes = routes.map((route) => ({
+        ...route,
+        segments: route.segments.map((segment) => {
+          const details = detailsBySegment.get(`${route.id}:${segment.id}`);
+          if (!details || !segment.service) return segment;
+          const stops = details.stops || [];
+          return {
+            ...segment,
+            detailedGeometry: details.geometry || [],
+            service: {
+              ...segment.service,
+              intermediateStops: stops.length > 2 ? stops.slice(1, -1) : []
+            }
+          };
+        })
+      }));
+      this.routes.set(enrichedRoutes);
+      const selectedRouteId = this.selectedRoute()?.id;
+      if (selectedRouteId) {
+        this.selectedRoute.set(enrichedRoutes.find((route) => route.id === selectedRouteId) || null);
       }
     });
   }

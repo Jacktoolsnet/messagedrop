@@ -147,6 +147,14 @@ export class TripGoRoutePointDialogComponent implements OnInit {
       : `${Math.round(metres)} m`;
   }
 
+  intermediateStopCount(): number | undefined {
+    const service = this.segment().service;
+    if (!service) return undefined;
+    return service.intermediateStops
+      ? service.intermediateStops.length
+      : service.stops === undefined ? undefined : Math.max(0, service.stops - 1);
+  }
+
   formatCost(amount: number, currency: string): string {
     return new Intl.NumberFormat(this.transloco.getActiveLang() || 'de', {
       style: 'currency', currency

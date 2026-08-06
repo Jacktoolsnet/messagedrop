@@ -191,6 +191,15 @@
                       }
                     </span>
                   }
+                  @if (segment.service?.intermediateStops?.length) {
+                    <ol class="timeline-intermediate-stops"
+                      [style.--stop-color]="segment.color || '#6750a4'"
+                      [attr.aria-label]="'common.tripGo.intermediateStops' | transloco">
+                      @for (stop of segment.service?.intermediateStops; track stop.stopCode || $index) {
+                        <li><span class="timeline-stop-dot" aria-hidden="true"></span><span>{{ stop.name }}</span></li>
+                      }
+                    </ol>
+                  }
                   <span class="timeline-metrics">
                     @if (segment.durationSeconds !== undefined) {
                       <span>{{ formatDuration(segment.durationSeconds) }}</span>
@@ -198,8 +207,8 @@
                     @if (segment.distanceMeters !== undefined) {
                       <span>{{ formatDistance(segment.distanceMeters) }}</span>
                     }
-                    @if (segment.service?.stops) {
-                      <span>{{ 'common.tripGo.stops' | transloco:{ count: segment.service?.stops } }}</span>
+                    @if (intermediateStopCount(segment); as count) {
+                      <span>{{ 'common.tripGo.stops' | transloco:{ count } }}</span>
                     }
                   </span>
                 </div>

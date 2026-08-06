@@ -370,6 +370,32 @@
   color: var(--mat-sys-on-surface-variant);
 }
 
+.timeline-intermediate-stops {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0.25rem 0 0;
+  padding: 0;
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.76rem;
+  list-style: none;
+}
+
+.timeline-intermediate-stops li {
+  display: grid;
+  grid-template-columns: 0.7rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.timeline-stop-dot {
+  width: 0.42rem;
+  height: 0.42rem;
+  justify-self: center;
+  border: 2px solid var(--stop-color);
+  border-radius: 50%;
+  background: var(--mat-sys-surface);
+}
+
 .timeline-metrics {
   display: flex;
   flex-wrap: wrap;

@@ -1,4 +1,15 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, inject, Input, OnDestroy, output, signal } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  Input,
+  OnChanges,
+  OnDestroy,
+  output,
+  signal,
+  SimpleChanges
+} from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import * as leaflet from 'leaflet';
@@ -69,7 +80,7 @@ interface TripGoSimulationPoint {
   styleUrl: './tripgo-route-map.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
+export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDestroy {
   @Input({ required: true }) route!: TripGoRouteOption;
   @Input({ required: true }) origin!: Location;
   @Input({ required: true }) destination!: Location;
@@ -89,8 +100,25 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
   private simulationAnimationFrame?: number;
   private currentSimulationDelayMs = 3_000;
   private simulationState: TripGoSimulationState = 'idle';
+  private viewInitialized = false;
 
   ngAfterViewInit(): void {
+    this.viewInitialized = true;
+    this.createMap();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (!this.viewInitialized || !changes['route'] || changes['route'].firstChange) return;
+    this.clearSimulationTimer();
+    this.cancelSimulationAnimation();
+    this.removeSimulationMarker();
+    this.activeSimulationPoint.set(null);
+    this.simulationIndex = -1;
+    this.setSimulationState('idle');
+    this.map?.remove();
+    this.map = undefined;
+    this.routeBounds = undefined;
+    this.segmentGeometryDistanceCache.clear();
     this.createMap();
   }
 
@@ -263,21 +291,22 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
         });
       }
 
-      const geometryPoints = segment.geometry
-        .flatMap((encodedPath) => decodePolyline(encodedPath))
-        .map(([latitude, longitude]) => ({ latitude, longitude }));
+      const geometryPoints = this.segmentGeometryLocations(segment);
       const displayedPoints = geometryPoints.length >= 2
         ? geometryPoints
         : this.fallbackSimulationGeometry(segment);
       for (const location of displayedPoints) {
         if (this.isSameSimulationLocation(points.at(-1)?.location, location)) continue;
+        const intermediateStop = segment.service?.intermediateStops?.find((stop) =>
+          this.isSameSimulationLocation(stop, location));
         points.push({
           kind: 'segment',
           location,
-          title: segment.from?.name || segment.from?.address || this.transloco.translate('common.tripGo.simulation.routePoint'),
-          time: segment.startTime,
+          title: intermediateStop?.name || segment.from?.name || segment.from?.address
+            || this.transloco.translate('common.tripGo.simulation.routePoint'),
+          time: intermediateStop ? undefined : segment.startTime,
           segment,
-          showOverlay: false
+          showOverlay: !!intermediateStop
         });
       }
     });
@@ -488,9 +517,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
     const cached = this.segmentGeometryDistanceCache.get(segment.id);
     if (cached !== undefined) return cached;
 
-    const locations = segment.geometry
-      .flatMap((encodedPath) => decodePolyline(encodedPath))
-      .map(([latitude, longitude]) => ({ latitude, longitude }));
+    const locations = this.segmentGeometryLocations(segment);
     const points = locations.length >= 2 ? locations : this.fallbackSimulationGeometry(segment);
     let distance = 0;
     for (let index = 1; index < points.length; index += 1) {
@@ -522,6 +549,15 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
     return points;
   }
 
+  private segmentGeometryLocations(segment: TripGoRouteSegment): TripGoLocation[] {
+    const detailedGeometry = (segment.detailedGeometry || []).filter((location) =>
+      this.validTripGoLocation(location));
+    if (detailedGeometry.length >= 2) return detailedGeometry;
+    return segment.geometry
+      .flatMap((encodedPath) => decodePolyline(encodedPath))
+      .map(([latitude, longitude]) => ({ latitude, longitude }));
+  }
+
   private isSameSimulationLocation(
     left: TripGoLocation | undefined,
     right: TripGoLocation | undefined
@@ -535,7 +571,18 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
     for (const segment of this.route.segments) {
       const color = safeColor(segment.color);
       let drewGeometry = false;
+      const detailedPoints = (segment.detailedGeometry || [])
+        .filter((location) => this.validTripGoLocation(location))
+        .map((location): leaflet.LatLngTuple => [location.latitude, location.longitude]);
+      const hasDetailedGeometry = detailedPoints.length >= 2;
+      if (hasDetailedGeometry) {
+        drewGeometry = true;
+        leaflet.polyline(detailedPoints, { color: '#ffffff', weight: 9, opacity: 0.8 }).addTo(this.map!);
+        leaflet.polyline(detailedPoints, { color, weight: 6, opacity: 0.9 }).addTo(this.map!);
+        for (const point of detailedPoints) bounds.extend(point);
+      }
       for (const encodedPath of segment.geometry) {
+        if (hasDetailedGeometry) break;
         const points = decodePolyline(encodedPath);
         if (points.length < 2) continue;
         drewGeometry = true;
@@ -559,6 +606,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
         index,
         'segment'
       );
+      this.addIntermediateStopMarkers(segment, index, bounds);
       bounds.extend([location.latitude, location.longitude]);
     });
 
@@ -574,6 +622,31 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
       'arrival'
     );
     bounds.extend([destination.latitude, destination.longitude]);
+  }
+
+  private addIntermediateStopMarkers(
+    segment: TripGoRouteSegment,
+    segmentIndex: number,
+    bounds: leaflet.LatLngBounds
+  ): void {
+    const color = safeColor(segment.color);
+    for (const stop of segment.service?.intermediateStops || []) {
+      if (!this.validTripGoLocation(stop)) continue;
+      const marker = leaflet.circleMarker([stop.latitude, stop.longitude], {
+        radius: 5,
+        color: '#ffffff',
+        weight: 2,
+        fillColor: color,
+        fillOpacity: 1
+      }).addTo(this.map!);
+      if (stop.name) {
+        const tooltip = document.createElement('span');
+        tooltip.textContent = stop.name;
+        marker.bindTooltip(tooltip, { direction: 'top' });
+      }
+      marker.on('click', () => this.pointSelected.emit({ kind: 'segment', segmentIndex }));
+      bounds.extend([stop.latitude, stop.longitude]);
+    }
   }
 
   private addModeMarker(

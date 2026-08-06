@@ -24,7 +24,7 @@
           @if (service.operator) { <dt>{{ 'common.tripGo.routePointDetails.operator' | transloco }}</dt><dd>{{ service.operator }}</dd> }
           @if (service.startPlatform) { <dt>{{ 'common.tripGo.routePointDetails.startPlatform' | transloco }}</dt><dd>{{ service.startPlatform }}</dd> }
           @if (service.endPlatform) { <dt>{{ 'common.tripGo.routePointDetails.endPlatform' | transloco }}</dt><dd>{{ service.endPlatform }}</dd> }
-          @if (service.stops !== undefined) { <dt>{{ 'common.tripGo.routePointDetails.stops' | transloco }}</dt><dd>{{ service.stops }}</dd> }
+          @if (intermediateStopCount() !== undefined) { <dt>{{ 'common.tripGo.routePointDetails.stops' | transloco }}</dt><dd>{{ intermediateStopCount() }}</dd> }
         </dl>
       </article>
     }

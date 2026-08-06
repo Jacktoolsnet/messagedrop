@@ -49,6 +49,9 @@ function normalizeServiceResponse(payload, query = {}) {
   const calculatedDelay = departureTime && scheduledDepartureTime
     ? Math.round((Date.parse(departureTime) - Date.parse(scheduledDepartureTime)) / 1000)
     : null;
+  const shapes = Array.isArray(payload.shapes) ? payload.shapes : [];
+  const travelledShapes = shapes.filter((shape) => shape?.travelled !== false);
+  const relevantShapes = travelledShapes.length > 0 ? travelledShapes : shapes;
   return compact({
     serviceTripId: stringOrNull(service.serviceTripID || service.serviceTripId || query.serviceTripId),
     updatedAt: new Date().toISOString(),
@@ -63,8 +66,55 @@ function normalizeServiceResponse(payload, query = {}) {
     realTime: service.realTime === true || service.isRealTime === true
       || (/REAL_TIME/i.test(String(service.realTimeStatus || ''))
         && !/NOT_REAL_TIME/i.test(String(service.realTimeStatus || ''))),
-    alerts: normalizeAlerts(payload, service)
+    alerts: normalizeAlerts(payload, service),
+    stops: uniqueBy(relevantShapes.flatMap((shape) => shape.stops || []).map(normalizeServiceStop), stopKey),
+    geometry: uniqueConsecutive(relevantShapes
+      .flatMap((shape) => shape.waypoints || [])
+      .map(normalizeServiceWaypoint)
+      .filter((point) => Number.isFinite(point.latitude) && Number.isFinite(point.longitude)))
   });
+}
+
+function normalizeServiceStop(value) {
+  return compact({
+    name: stringOrNull(value?.name),
+    stopCode: stringOrNull(value?.stopCode || value?.code),
+    latitude: finiteNumber(value?.lat),
+    longitude: finiteNumber(value?.lng),
+    arrivalTime: flexibleIso(value?.arrival),
+    departureTime: flexibleIso(value?.departure),
+    pickUpOnly: typeof value?.pickUpOnly === 'boolean' ? value.pickUpOnly : null,
+    dropOffOnly: typeof value?.dropOffOnly === 'boolean' ? value.dropOffOnly : null
+  });
+}
+
+function normalizeServiceWaypoint(value) {
+  return compact({
+    latitude: finiteNumber(value?.lat),
+    longitude: finiteNumber(value?.lng)
+  });
+}
+
+function uniqueBy(values, key) {
+  const seen = new Set();
+  return values.filter((value) => {
+    const identifier = key(value);
+    if (!identifier || seen.has(identifier)) return false;
+    seen.add(identifier);
+    return true;
+  });
+}
+
+function uniqueConsecutive(values) {
+  return values.filter((value, index) => index === 0
+    || value.latitude !== values[index - 1].latitude
+    || value.longitude !== values[index - 1].longitude);
+}
+
+function stopKey(stop) {
+  return stop.stopCode || (Number.isFinite(stop.latitude) && Number.isFinite(stop.longitude)
+    ? `${stop.latitude}:${stop.longitude}`
+    : stop.name);
 }
 
 function selectTrips(candidates, maxRoutes, routesPerGroup) {

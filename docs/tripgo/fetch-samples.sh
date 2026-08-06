@@ -27,12 +27,13 @@ curl --silent --show-error --fail-with-body \
   "${api_url}/tripgo/routes" \
   --output "${output_dir}/route-berlin.json"
 
-# Diagnostic route requested for the circular bus line 794. The origin is near
-# Im Kirchfeld in Halchter; all coordinates can be overridden for an exact test.
+# Diagnostic route from near Im Kirchfeld in Halchter via Wolfenbüttel station
+# to Braunschweig central station. It should contain bus 794 and a train. All
+# coordinates can be overridden for an exact test.
 wolf_from_lat="${TRIPGO_WOLFENBUETTEL_FROM_LAT:-52.14323}"
 wolf_from_lng="${TRIPGO_WOLFENBUETTEL_FROM_LNG:-10.54569}"
-wolf_to_lat="${TRIPGO_WOLFENBUETTEL_TO_LAT:-52.159149}"
-wolf_to_lng="${TRIPGO_WOLFENBUETTEL_TO_LNG:-10.53245}"
+wolf_to_lat="${TRIPGO_WOLFENBUETTEL_TO_LAT:-52.25232}"
+wolf_to_lng="${TRIPGO_WOLFENBUETTEL_TO_LNG:-10.54042}"
 
 curl --silent --show-error --fail-with-body \
   --request POST \
@@ -54,6 +55,7 @@ TRIPGO_SAMPLE_FROM_LNG="${wolf_from_lng}" \
 TRIPGO_SAMPLE_TO_LAT="${wolf_to_lat}" \
 TRIPGO_SAMPLE_TO_LNG="${wolf_to_lng}" \
 node "${script_dir}/../../services/tripgo/scripts/fetch-raw-route-sample.js" \
-  "${output_dir}/route-wolfenbuettel-raw.json"
+  "${output_dir}/route-wolfenbuettel-raw.json" \
+  "${output_dir}/services-wolfenbuettel-raw.json"
 
 printf 'TripGo samples written to %s\n' "${output_dir}"

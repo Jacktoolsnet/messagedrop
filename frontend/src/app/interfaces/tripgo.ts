@@ -29,6 +29,14 @@ export interface TripGoServiceInfo {
   textColor?: string;
   realTimeStatus?: string;
   ticketWebsiteUrl?: string;
+  intermediateStops?: TripGoServiceStop[];
+}
+
+export interface TripGoServiceStop extends TripGoLocation {
+  arrivalTime?: string;
+  departureTime?: string;
+  pickUpOnly?: boolean;
+  dropOffOnly?: boolean;
 }
 
 export interface TripGoRouteSegment {
@@ -49,6 +57,7 @@ export interface TripGoRouteSegment {
   cost?: TripGoCost;
   service?: TripGoServiceInfo;
   geometry: string[];
+  detailedGeometry?: TripGoLocation[];
 }
 
 export interface TripGoRouteOption {
@@ -110,6 +119,8 @@ export interface TripGoLiveServiceDetails {
   direction?: string;
   realTime?: boolean;
   alerts: string[];
+  stops: TripGoServiceStop[];
+  geometry: TripGoLocation[];
 }
 
 export interface TripGoServiceDetailsResponse {
