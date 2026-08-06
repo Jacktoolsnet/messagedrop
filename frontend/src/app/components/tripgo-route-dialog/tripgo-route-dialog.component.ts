@@ -125,9 +125,10 @@ export class TripGoRouteDialogComponent implements OnInit {
     if (!route) return;
     this.dialog.open(TripGoRoutePointDialogComponent, {
       data: { ...selection, route },
-      width: 'min(720px, 95vw)',
+      width: '95vw',
+      height: '95vh',
       maxWidth: '95vw',
-      maxHeight: '90vh',
+      maxHeight: '95vh',
       autoFocus: false,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',

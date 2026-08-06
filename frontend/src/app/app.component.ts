@@ -1649,9 +1649,10 @@ export class AppComponent implements OnInit {
     this.dialog.open(TripGoRouteDialogComponent, {
       data: { destination: { ...destination } },
       closeOnNavigation: true,
-      width: 'min(1180px, 96vw)',
-      maxWidth: '96vw',
-      maxHeight: '92vh',
+      width: '95vw',
+      height: '95vh',
+      maxWidth: '95vw',
+      maxHeight: '95vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
       disableClose: false,
