@@ -840,6 +840,7 @@
       },
       "messages": {
         "title": "Messages publics",
+        "radius": "dans un rayon de {{ distance }} km",
         "multimediaOnly": "Message multimédia",
         "empty": "Aucun message trouvé."
       },

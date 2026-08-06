@@ -8,6 +8,7 @@
       <app-weather-tile [persist]="false" [place]="place()"></app-weather-tile>
       <app-air-quality-tile [persist]="false" [place]="place()"></app-air-quality-tile>
       <app-wikipedia-tile [place]="place()"></app-wikipedia-tile>
+      <app-message-tile [place]="place()" [radiusMeters]="2000" [showRadius]="true"></app-message-tile>
 
       @for (tile of placeholderTiles; track tile.titleKey) {
         @if (!tile.private || isAuthenticated()) {

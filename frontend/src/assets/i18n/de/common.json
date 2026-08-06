@@ -841,6 +841,7 @@
       },
       "messages": {
         "title": "Öffentliche Nachrichten",
+        "radius": "im Umkreis von {{ distance }} km",
         "multimediaOnly": "Multimedia Nachricht",
         "empty": "Keine Nachrichten gefunden."
       },

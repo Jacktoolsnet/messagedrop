@@ -8,6 +8,7 @@ import { UserService } from '../../services/user.service';
 import { AirQualityTileComponent } from '../tile/air-quality-tile/air-quality-tile.component';
 import { WeatherTileComponent } from '../tile/weather-tile/weather-tile.component';
 import { WikipediaTileComponent } from '../tile/wikipedia-tile/wikipedia-tile.component';
+import { MessageTileComponent } from '../tile/message-tile/messagetile.component';
 
 interface NearbyPlaceholderTile {
   icon: string;
@@ -20,6 +21,7 @@ interface NearbyPlaceholderTile {
   imports: [
     AirQualityTileComponent,
     MatIconModule,
+    MessageTileComponent,
     TranslocoPipe,
     WeatherTileComponent,
     WikipediaTileComponent
@@ -37,7 +39,10 @@ export class TripGoNearbyTilesComponent {
     const location = this.location();
     const latitude = Number(location.latitude);
     const longitude = Number(location.longitude);
-    const radius = 0.005;
+    const radiusMeters = 2_000;
+    const latitudeDelta = radiusMeters / 111_320;
+    const longitudeDelta = radiusMeters
+      / (111_320 * Math.max(Math.abs(Math.cos(latitude * Math.PI / 180)), 0.01));
     return {
       id: `tripgo-route-point:${latitude.toFixed(5)}:${longitude.toFixed(5)}`,
       userId: '',
@@ -52,10 +57,10 @@ export class TripGoNearbyTilesComponent {
       subscribed: false,
       pinned: false,
       boundingBox: {
-        latMin: latitude - radius,
-        lonMin: longitude - radius,
-        latMax: latitude + radius,
-        lonMax: longitude + radius
+        latMin: latitude - latitudeDelta,
+        lonMin: longitude - longitudeDelta,
+        latMax: latitude + latitudeDelta,
+        lonMax: longitude + longitudeDelta
       },
       timezone: location.timezone || '',
       datasets: {
@@ -66,7 +71,6 @@ export class TripGoNearbyTilesComponent {
   });
 
   readonly placeholderTiles: NearbyPlaceholderTile[] = [
-    { icon: 'forum', titleKey: 'common.tripGo.nearby.publicMessages' },
     { icon: 'note', titleKey: 'common.tripGo.nearby.privateNotes', private: true },
     { icon: 'photo_library', titleKey: 'common.tripGo.nearby.privateImages', private: true },
     { icon: 'description', titleKey: 'common.tripGo.nearby.privateDocuments', private: true },

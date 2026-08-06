@@ -1,5 +1,12 @@
+:host {
+    display: block;
+    height: 100%;
+}
+
 .tile {
     position: relative;
+    box-sizing: border-box;
+    height: 100%;
     border-radius: 1rem;
     color: var(--mat-card-subtitle-text-color);
     background-color: var(--mat-card-filled-container-color);
@@ -21,6 +28,14 @@
     gap: 0.5rem;
     font-size: 1.2rem;
     font-weight: bold;
+}
+
+.tile-radius {
+    margin-inline-start: auto;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--mat-sys-on-surface-variant);
+    white-space: nowrap;
 }
 
 .tile-icon {

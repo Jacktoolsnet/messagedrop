@@ -2931,7 +2931,7 @@
       },
       "nearby": {
         "title": "In der Nähe",
-        "desc": "Wetter, Luftqualität und Wikipedia werden direkt für den ausgewählten Routenpunkt geladen. Weitere sichtbare Tiles bereiten die Suche nach Nachrichten und privaten Inhalten vor."
+        "desc": "Wetter, Luftqualität und Wikipedia werden direkt für den ausgewählten Routenpunkt geladen. Öffentliche Nachrichten werden in einem Umkreis von zwei Kilometern gesucht; das Tile zeigt die drei neuesten Treffer und öffnet auf Wunsch die vollständige Liste. Weitere Tiles bereiten zusätzliche Inhalte vor."
       },
       "provider": {
         "title": "Anbieter öffnen",

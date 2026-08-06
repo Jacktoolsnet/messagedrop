@@ -841,6 +841,7 @@
       },
       "messages": {
         "title": "Public messages",
+        "radius": "within {{ distance }} km",
         "multimediaOnly": "Multimedia message",
         "empty": "No messages found."
       },
