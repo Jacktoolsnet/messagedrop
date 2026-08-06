@@ -2877,14 +2877,15 @@
   },
   "tripGoRoute": {
     "title": "Calculate route",
-    "intro": "The dialog gets a fresh fix for your current location and calculates connections from there to the selected map point.",
+    "intro": "The dialog gets a fresh fix for your current location and calculates connections from there to the selected map point. The start and destination can then be changed.",
     "items": {
-      "location": { "title": "Get location", "desc": "A new high-accuracy location request runs whenever the dialog opens or refreshes. The previously selected map point remains the destination." },
+      "location": { "title": "Get location", "desc": "A new high-accuracy location request runs whenever the dialog opens or refreshes. Nominatim adds suitable place and address information for the start and destination." },
+      "routePoints": { "title": "Change start or destination", "desc": "Use the pencil in either tile to open the location search. After selection, the route is recalculated with the new start or destination." },
       "routes": { "title": "Connections", "desc": "Results show departure and arrival, duration, transfers, and each walking or public-transport segment." },
       "refresh": { "title": "Refresh", "desc": "Gets your location again and then calculates new connections." },
       "close": { "title": "Close", "desc": "Closes the route view." },
       "help": { "title": "Help", "desc": "Opens this route calculation help." },
-      "privacy": { "title": "Privacy", "desc": "Only after you invoke this function are your current location and destination coordinates sent to SkedGo/TripGo through the MessageDrop backend. The route view does not persist your location." }
+      "privacy": { "title": "Privacy", "desc": "Only after you invoke this function are the start and destination coordinates sent through the MessageDrop backend to SkedGo/TripGo and to the configured Nominatim service for place lookup. The route view does not persist these locations." }
     }
   },
   "locationShareContacts": {

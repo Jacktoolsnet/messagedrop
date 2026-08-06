@@ -5,11 +5,59 @@
 </app-dialog-header>
 
 <mat-dialog-content class="route-dialog-content">
-  <p class="destination">
-    <mat-icon aria-hidden="true">location_on</mat-icon>
-    <span>{{ 'common.tripGo.destination' | transloco }}:
-      {{ destination.latitude.toFixed(5) }}, {{ destination.longitude.toFixed(5) }}</span>
-  </p>
+  <section class="route-points" [attr.aria-label]="'common.tripGo.routePoints' | transloco">
+    <article class="route-point">
+      <header class="route-point__header">
+        <span class="route-point__label">
+          <mat-icon aria-hidden="true">my_location</mat-icon>
+          {{ 'common.tripGo.origin' | transloco }}
+        </span>
+        <button mat-icon-button type="button" (click)="editRoutePoint('origin')"
+          [disabled]="!origin() || isBusy()"
+          [attr.aria-label]="'common.tripGo.editOrigin' | transloco">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </header>
+      <div class="route-point__body">
+        @if (origin()) {
+          @if (originDetails(); as details) {
+            <strong class="route-point__name">{{ details.name }}</strong>
+            @if (details.address) {
+              <span class="route-point__address">{{ details.address }}</span>
+            }
+          } @else {
+            <span class="route-point__address">{{ 'common.tripGo.resolvingPlace' | transloco }}</span>
+          }
+        } @else {
+          <span class="route-point__address">{{ 'common.tripGo.locating' | transloco }}</span>
+        }
+      </div>
+    </article>
+
+    <article class="route-point">
+      <header class="route-point__header">
+        <span class="route-point__label">
+          <mat-icon aria-hidden="true">location_on</mat-icon>
+          {{ 'common.tripGo.destination' | transloco }}
+        </span>
+        <button mat-icon-button type="button" (click)="editRoutePoint('destination')"
+          [disabled]="isBusy()"
+          [attr.aria-label]="'common.tripGo.editDestination' | transloco">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </header>
+      <div class="route-point__body">
+        @if (destinationDetails(); as details) {
+          <strong class="route-point__name">{{ details.name }}</strong>
+          @if (details.address) {
+            <span class="route-point__address">{{ details.address }}</span>
+          }
+        } @else {
+          <span class="route-point__address">{{ 'common.tripGo.resolvingPlace' | transloco }}</span>
+        }
+      </div>
+    </article>
+  </section>
 
   @if (state() === 'locating') {
     <div class="status" role="status">

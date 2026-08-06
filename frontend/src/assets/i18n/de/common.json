@@ -162,7 +162,12 @@
     },
     "tripGo": {
       "title": "Route berechnen",
+      "origin": "Start",
       "destination": "Ziel",
+      "routePoints": "Start und Ziel der Route",
+      "editOrigin": "Startort ändern",
+      "editDestination": "Zielort ändern",
+      "resolvingPlace": "Ortsinformationen werden ermittelt …",
       "locating": "Dein aktueller Standort wird neu ermittelt …",
       "routing": "Passende Verbindungen werden berechnet …",
       "noRoutes": "Für diese Strecke wurden keine Verbindungen gefunden.",

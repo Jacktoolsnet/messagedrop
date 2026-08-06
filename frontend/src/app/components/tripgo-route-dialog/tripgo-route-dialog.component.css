@@ -4,16 +4,74 @@
   padding-bottom: 1rem;
 }
 
-.destination {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.route-points {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
   margin: 0 0 1rem;
-  color: var(--mat-sys-on-surface-variant);
 }
 
-.destination mat-icon {
+.route-point {
+  display: flex;
+  min-width: 0;
+  min-height: 7.5rem;
+  box-sizing: border-box;
+  flex-direction: column;
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: var(--mat-sys-surface-container-low);
+}
+
+.route-point__header,
+.route-point__label {
+  display: flex;
+  align-items: center;
+}
+
+.route-point__header {
+  min-height: 2.5rem;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.35rem 0.5rem 0.35rem 0.75rem;
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+}
+
+.route-point__label {
+  gap: 0.4rem;
+  font-weight: 600;
+}
+
+.route-point__label mat-icon {
   flex: 0 0 auto;
+  color: inherit;
+}
+
+.route-point__header button {
+  color: inherit;
+}
+
+.route-point__body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem;
+}
+
+.route-point__name,
+.route-point__address {
+  overflow-wrap: anywhere;
+}
+
+.route-point__name {
+  font-size: 0.95rem;
+}
+
+.route-point__address {
+  font-size: 0.82rem;
+  color: var(--mat-sys-on-surface-variant);
 }
 
 .status {
@@ -50,7 +108,8 @@
   gap: 0.5rem;
   padding: 0.85rem;
   border-bottom: 1px solid color-mix(in srgb, currentColor 12%, transparent);
-  background: var(--mat-sys-surface-container);
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
 }
 
 .route-card__times,
@@ -70,12 +129,12 @@
   width: 1.1rem;
   height: 1.1rem;
   font-size: 1.1rem;
-  color: var(--mat-sys-on-surface-variant);
+  color: inherit;
 }
 
 .route-card__facts {
   gap: 0.4rem 0.8rem;
-  color: var(--mat-sys-on-surface-variant);
+  color: var(--mat-sys-on-secondary-container);
   font-size: 0.86rem;
 }
 
@@ -219,6 +278,7 @@
     width: auto;
   }
 
+  .route-points,
   .route-list {
     grid-template-columns: 1fr;
   }

@@ -2859,14 +2859,15 @@
   },
   "tripGoRoute": {
     "title": "Calcular ruta",
-    "intro": "El diálogo obtiene de nuevo tu ubicación actual y calcula conexiones hasta el punto seleccionado en el mapa.",
+    "intro": "El diálogo obtiene de nuevo tu ubicación actual y calcula conexiones hasta el punto seleccionado en el mapa. Después puedes cambiar el inicio y el destino.",
     "items": {
-      "location": { "title": "Obtener ubicación", "desc": "Se realiza una nueva solicitud de ubicación de alta precisión al abrir o actualizar. El punto del mapa seleccionado sigue siendo el destino." },
+      "location": { "title": "Obtener ubicación", "desc": "Se realiza una nueva solicitud de ubicación de alta precisión al abrir o actualizar. Nominatim añade información adecuada del lugar y la dirección para el inicio y el destino." },
+      "routePoints": { "title": "Cambiar inicio o destino", "desc": "Usa el lápiz de cada tarjeta para abrir la búsqueda de lugares. Tras elegir, la ruta se vuelve a calcular con el nuevo inicio o destino." },
       "routes": { "title": "Conexiones", "desc": "Los resultados muestran salida, llegada, duración, transbordos y cada tramo a pie o en transporte público." },
       "refresh": { "title": "Actualizar", "desc": "Obtiene de nuevo tu ubicación y calcula nuevas conexiones." },
       "close": { "title": "Cerrar", "desc": "Cierra la vista de rutas." },
       "help": { "title": "Ayuda", "desc": "Abre esta ayuda sobre el cálculo de rutas." },
-      "privacy": { "title": "Privacidad", "desc": "Solo al usar esta función se envían tu ubicación actual y el destino a SkedGo/TripGo mediante el backend de MessageDrop. La vista no guarda tu ubicación de forma permanente." }
+      "privacy": { "title": "Privacidad", "desc": "Solo al usar esta función se envían las coordenadas de inicio y destino mediante el backend de MessageDrop a SkedGo/TripGo y al servicio Nominatim configurado para identificar los lugares. La vista no guarda estas ubicaciones." }
     }
   },
   "locationShareContacts": {

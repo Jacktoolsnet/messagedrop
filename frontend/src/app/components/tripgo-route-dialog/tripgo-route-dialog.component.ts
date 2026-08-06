@@ -1,22 +1,32 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { GetNominatimAddressResponse } from '../../interfaces/get-nominatim-address-response copy';
 import { Location } from '../../interfaces/location';
+import { NominatimPlace } from '../../interfaces/nominatim-place';
 import { TripGoRouteOption, TripGoRouteSegment } from '../../interfaces/tripgo';
 import { GeolocationService } from '../../services/geolocation.service';
+import { NominatimService } from '../../services/nominatim.service';
 import { TripGoService } from '../../services/tripgo.service';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
+import { LocationPickerDialogComponent } from '../utils/location-picker-dialog/location-picker-dialog.component';
 
 export interface TripGoRouteDialogData {
   destination: Location;
 }
 
 type RouteDialogState = 'locating' | 'routing' | 'ready' | 'error';
+type RoutePointKind = 'origin' | 'destination';
+
+interface RoutePointDetails {
+  name: string;
+  address: string;
+}
 
 @Component({
   selector: 'app-tripgo-route-dialog',
@@ -36,19 +46,25 @@ type RouteDialogState = 'locating' | 'routing' | 'ready' | 'error';
 export class TripGoRouteDialogComponent implements OnInit {
   private readonly data = inject<TripGoRouteDialogData>(MAT_DIALOG_DATA);
   private readonly dialogRef = inject(MatDialogRef<TripGoRouteDialogComponent>);
+  private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);
   private readonly geolocation = inject(GeolocationService);
+  private readonly nominatim = inject(NominatimService);
   private readonly tripGo = inject(TripGoService);
   private readonly transloco = inject(TranslocoService);
   readonly help = inject(HelpDialogService);
 
-  readonly destination = this.data.destination;
+  readonly origin = signal<Location | null>(null);
+  readonly destination = signal(this.withPlusCode(this.data.destination));
+  readonly originDetails = signal<RoutePointDetails | null>(null);
+  readonly destinationDetails = signal<RoutePointDetails | null>(null);
   readonly state = signal<RouteDialogState>('locating');
   readonly routes = signal<TripGoRouteOption[]>([]);
   readonly errorKey = signal('common.tripGo.errors.route');
   readonly isBusy = computed(() => this.state() === 'locating' || this.state() === 'routing');
 
   ngOnInit(): void {
+    this.resolveRoutePoint('destination', this.destination());
     this.calculateWithFreshLocation();
   }
 
@@ -66,7 +82,9 @@ export class TripGoRouteDialogComponent implements OnInit {
           longitude: position.coords.longitude,
           plusCode: this.geolocation.getPlusCode(position.coords.latitude, position.coords.longitude)
         };
-        this.loadRoutes(origin);
+        this.origin.set(origin);
+        this.resolveRoutePoint('origin', origin);
+        this.loadRoutes(origin, this.destination());
       },
       error: (error: GeolocationPositionError | unknown) => {
         const code = typeof error === 'object' && error !== null && 'code' in error ? Number(error.code) : 0;
@@ -80,6 +98,41 @@ export class TripGoRouteDialogComponent implements OnInit {
 
   close(): void {
     this.dialogRef.close();
+  }
+
+  editRoutePoint(kind: RoutePointKind): void {
+    const current = kind === 'origin' ? this.origin() : this.destination();
+    if (!current || this.isBusy()) return;
+
+    const dialogRef = this.dialog.open<LocationPickerDialogComponent, unknown, Location | undefined>(
+      LocationPickerDialogComponent,
+      {
+        data: { location: current, markerType: 'message' },
+        maxWidth: '95vw',
+        maxHeight: '95vh',
+        width: '95vw',
+        height: '95vh',
+        autoFocus: false,
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop',
+        disableClose: false
+      }
+    );
+
+    dialogRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((selected) => {
+      if (!selected) return;
+      const location = this.withPlusCode(selected);
+      if (kind === 'origin') {
+        this.origin.set(location);
+        this.originDetails.set(null);
+      } else {
+        this.destination.set(location);
+        this.destinationDetails.set(null);
+      }
+      this.resolveRoutePoint(kind, location);
+      const origin = this.origin();
+      if (origin) this.loadRoutes(origin, this.destination());
+    });
   }
 
   formatTime(value: string): string {
@@ -117,11 +170,11 @@ export class TripGoRouteDialogComponent implements OnInit {
     return 'directions_transit';
   }
 
-  private loadRoutes(origin: Location): void {
+  private loadRoutes(origin: Location, destination: Location): void {
     this.state.set('routing');
     this.tripGo.calculatePublicTransportRoute(
       origin,
-      this.destination,
+      destination,
       this.transloco.getActiveLang() || 'de'
     ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (result) => {
@@ -133,5 +186,65 @@ export class TripGoRouteDialogComponent implements OnInit {
         this.state.set('error');
       }
     });
+  }
+
+  private resolveRoutePoint(kind: RoutePointKind, location: Location): void {
+    this.nominatim.getNominatimPlaceByLocation(location).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: (response) => this.applyRoutePointDetails(kind, location, response),
+      error: () => this.setFallbackRoutePointDetails(kind, location)
+    });
+  }
+
+  private applyRoutePointDetails(
+    kind: RoutePointKind,
+    requestedLocation: Location,
+    response: GetNominatimAddressResponse
+  ): void {
+    if (!this.isCurrentRoutePoint(kind, requestedLocation)) return;
+    const place = response.nominatimPlace;
+    if (response.status !== 200 || !place || place.error) {
+      this.setFallbackRoutePointDetails(kind, requestedLocation);
+      return;
+    }
+    const address = this.nominatim.getFormattedAddress(place, ', ');
+    const details: RoutePointDetails = {
+      name: this.routePointName(place, requestedLocation),
+      address
+    };
+    this.routePointDetailsSignal(kind).set(details);
+  }
+
+  private routePointName(place: NominatimPlace, fallback: Location): string {
+    const address = place.address;
+    const locality = address?.city || address?.town || address?.village || address?.hamlet;
+    return place.name?.trim()
+      || this.nominatim.getFormattedStreet(place, ' ').trim()
+      || locality?.trim()
+      || place.display_name?.split(',')[0]?.trim()
+      || fallback.plusCode;
+  }
+
+  private setFallbackRoutePointDetails(kind: RoutePointKind, location: Location): void {
+    if (!this.isCurrentRoutePoint(kind, location)) return;
+    this.routePointDetailsSignal(kind).set({ name: location.plusCode, address: '' });
+  }
+
+  private routePointDetailsSignal(kind: RoutePointKind) {
+    return kind === 'origin' ? this.originDetails : this.destinationDetails;
+  }
+
+  private isCurrentRoutePoint(kind: RoutePointKind, requested: Location): boolean {
+    const current = kind === 'origin' ? this.origin() : this.destination();
+    return current?.latitude === requested.latitude && current.longitude === requested.longitude;
+  }
+
+  private withPlusCode(location: Location): Location {
+    return {
+      ...location,
+      plusCode: location.plusCode?.trim()
+        || this.geolocation.getPlusCode(location.latitude, location.longitude)
+    };
   }
 }

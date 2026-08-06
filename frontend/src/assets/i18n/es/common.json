@@ -161,7 +161,12 @@
     },
     "tripGo": {
       "title": "Calcular ruta",
+      "origin": "Inicio",
       "destination": "Destino",
+      "routePoints": "Inicio y destino de la ruta",
+      "editOrigin": "Cambiar punto de partida",
+      "editDestination": "Cambiar destino",
+      "resolvingPlace": "Obteniendo información del lugar …",
       "locating": "Obteniendo de nuevo tu ubicación actual …",
       "routing": "Calculando conexiones adecuadas …",
       "noRoutes": "No se encontraron conexiones para este trayecto.",

@@ -161,7 +161,12 @@
     },
     "tripGo": {
       "title": "Calculer l’itinéraire",
+      "origin": "Départ",
       "destination": "Destination",
+      "routePoints": "Départ et destination de l’itinéraire",
+      "editOrigin": "Modifier le point de départ",
+      "editDestination": "Modifier la destination",
+      "resolvingPlace": "Recherche des informations sur le lieu …",
       "locating": "Nouvelle détermination de votre position actuelle …",
       "routing": "Calcul des trajets adaptés …",
       "noRoutes": "Aucun trajet n’a été trouvé pour ce parcours.",

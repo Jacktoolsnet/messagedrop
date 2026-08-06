@@ -2877,14 +2877,15 @@
   },
   "tripGoRoute": {
     "title": "Route berechnen",
-    "intro": "Der Dialog ermittelt deinen aktuellen Standort neu und berechnet von dort Verbindungen zum ausgewählten Kartenpunkt.",
+    "intro": "Der Dialog ermittelt deinen aktuellen Standort neu und berechnet von dort Verbindungen zum ausgewählten Kartenpunkt. Start und Ziel können anschließend geändert werden.",
     "items": {
-      "location": { "title": "Standort ermitteln", "desc": "Bei jedem Öffnen und Aktualisieren wird eine neue Standortabfrage mit hoher Genauigkeit gestartet. Der zuvor ausgewählte Kartenpunkt bleibt das Ziel." },
+      "location": { "title": "Standort ermitteln", "desc": "Bei jedem Öffnen und Aktualisieren wird eine neue Standortabfrage mit hoher Genauigkeit gestartet. Nominatim ergänzt passende Orts- und Adressinformationen für Start und Ziel." },
+      "routePoints": { "title": "Start oder Ziel ändern", "desc": "Mit dem Bleistift im jeweiligen Tile öffnest du die Ortssuche. Nach der Auswahl wird die Route mit dem neuen Start oder Ziel erneut berechnet." },
       "routes": { "title": "Verbindungen", "desc": "Die Ergebnisse zeigen Abfahrts- und Ankunftszeit, Dauer, Umstiege sowie die einzelnen Fußweg- und ÖPNV-Abschnitte." },
       "refresh": { "title": "Aktualisieren", "desc": "Ermittelt deinen Standort erneut und berechnet anschließend neue Verbindungen." },
       "close": { "title": "Schließen", "desc": "Schließt die Routenansicht." },
       "help": { "title": "Hilfe", "desc": "Öffnet diese Hilfe zur Routenberechnung." },
-      "privacy": { "title": "Datenschutz", "desc": "Erst nach deinem Aufruf werden aktueller Standort und Zielkoordinaten über das MessageDrop-Backend an SkedGo/TripGo übertragen. Die Routenansicht speichert deinen Standort nicht dauerhaft." }
+      "privacy": { "title": "Datenschutz", "desc": "Erst nach deinem Aufruf werden Start- und Zielkoordinaten über das MessageDrop-Backend an SkedGo/TripGo und zur Ortsbestimmung an den konfigurierten Nominatim-Dienst übertragen. Die Routenansicht speichert die Orte nicht dauerhaft." }
     }
   },
   "locationShareContacts": {
