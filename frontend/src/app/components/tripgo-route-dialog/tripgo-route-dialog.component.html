@@ -12,6 +12,7 @@
           [route]="route"
           [origin]="start"
           [destination]="destination()"
+          (simulationStateChange)="simulationState.set($event)"
           (pointSelected)="showRoutePointDetails($event)">
         </app-tripgo-route-map>
       }
@@ -237,18 +238,44 @@
   <span class="action-spacer"></span>
   <span class="action-group-right">
     @if (viewMode() === 'map') {
+      @if (simulationState() !== 'idle') {
+        <button mat-icon-button type="button" (click)="previousSimulationPoint()"
+          [attr.aria-label]="'common.tripGo.simulation.previous' | transloco">
+          <mat-icon>skip_previous</mat-icon>
+        </button>
+      }
+      <button mat-icon-button type="button" (click)="toggleSimulation()"
+        [attr.aria-label]="(simulationState() === 'playing'
+          ? 'common.tripGo.simulation.pause'
+          : simulationState() === 'paused'
+            ? 'common.tripGo.simulation.resume'
+            : 'common.tripGo.simulation.start') | transloco">
+        <mat-icon>{{ simulationState() === 'playing' ? 'pause' : 'play_arrow' }}</mat-icon>
+      </button>
+      @if (simulationState() !== 'idle') {
+        <button mat-icon-button type="button" (click)="nextSimulationPoint()"
+          [attr.aria-label]="'common.tripGo.simulation.next' | transloco">
+          <mat-icon>skip_next</mat-icon>
+        </button>
+        <button mat-icon-button type="button" (click)="stopSimulation()"
+          [attr.aria-label]="'common.tripGo.simulation.stop' | transloco">
+          <mat-icon>stop</mat-icon>
+        </button>
+      }
       <button mat-icon-button type="button" (click)="showList()"
         [attr.aria-label]="'common.tripGo.backToList' | transloco">
         <mat-icon>list</mat-icon>
       </button>
     }
-    <button mat-icon-button type="button" (click)="help.open('tripGoRoute')"
-      [attr.aria-label]="'common.actions.help' | transloco">
-      <mat-icon>help</mat-icon>
-    </button>
-    <button mat-icon-button color="primary" type="button" (click)="calculateWithFreshLocation()"
-      [disabled]="isBusy()" [attr.aria-label]="'common.tripGo.refresh' | transloco">
-      <mat-icon>refresh</mat-icon>
-    </button>
+    @if (viewMode() !== 'map' || simulationState() === 'idle') {
+      <button mat-icon-button type="button" (click)="help.open('tripGoRoute')"
+        [attr.aria-label]="'common.actions.help' | transloco">
+        <mat-icon>help</mat-icon>
+      </button>
+      <button mat-icon-button color="primary" type="button" (click)="calculateWithFreshLocation()"
+        [disabled]="isBusy()" [attr.aria-label]="'common.tripGo.refresh' | transloco">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    }
   </span>
 </mat-dialog-actions>

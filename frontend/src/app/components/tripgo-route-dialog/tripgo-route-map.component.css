@@ -4,6 +4,13 @@
   min-width: 0;
 }
 
+.route-map-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
 .route-map {
   width: 100%;
   height: 100%;
@@ -14,6 +21,80 @@
   border-radius: 1rem;
   background: var(--mat-card-filled-container-color);
   box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+}
+
+.simulation-overlay {
+  position: absolute;
+  z-index: 1000;
+  top: .75rem;
+  left: 50%;
+  display: grid;
+  width: min(28rem, calc(100% - 1.5rem));
+  box-sizing: border-box;
+  gap: .65rem;
+  padding: .8rem 1rem;
+  transform: translateX(-50%);
+  border: 1px solid var(--mat-card-outlined-outline-color);
+  border-radius: .85rem;
+  background: color-mix(in srgb, var(--mat-sys-surface-container-high) 94%, transparent);
+  color: var(--mat-sys-on-surface);
+  box-shadow: 0 5px 18px color-mix(in srgb, #000000 28%, transparent);
+  backdrop-filter: blur(7px);
+  pointer-events: none;
+}
+
+.simulation-overlay header,
+.simulation-overlay__facts,
+.simulation-overlay__facts > span {
+  display: flex;
+  align-items: center;
+}
+
+.simulation-overlay header {
+  gap: .65rem;
+}
+
+.simulation-overlay header > mat-icon {
+  display: inline-grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+  background: #000000;
+  color: #ffffff;
+  box-shadow: 0 2px 7px color-mix(in srgb, #000000 40%, transparent);
+}
+
+.simulation-overlay header div {
+  display: grid;
+  min-width: 0;
+}
+
+.simulation-overlay header small {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.simulation-overlay header strong {
+  overflow-wrap: anywhere;
+}
+
+.simulation-overlay__facts {
+  flex-wrap: wrap;
+  gap: .4rem .8rem;
+  color: var(--mat-sys-on-surface-variant);
+  font-size: .82rem;
+}
+
+.simulation-overlay__facts > span {
+  gap: .25rem;
+}
+
+.simulation-overlay__facts mat-icon {
+  width: 1rem;
+  height: 1rem;
+  font-size: 1rem;
 }
 
 @media (max-width: 600px) {

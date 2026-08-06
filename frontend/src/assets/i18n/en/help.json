@@ -2895,6 +2895,10 @@
         "title": "Map view",
         "desc": "The map icon in a connection header displays its route using the timeline’s colours and transport-mode symbols. Use the list icon in the action bar to return to the route list."
       },
+      "simulation": {
+        "title": "Journey simulation",
+        "desc": "The play button moves the map smoothly from the start through each route point to the destination. An overlay shows the place, time, transport mode, direction, platform and weather. Additional controls pause, move backwards or forwards, and stop the simulation. The complete route is shown again afterwards."
+      },
       "destinationReached": {
         "title": "Already at destination",
         "desc": "If the start and destination are no more than 50 metres apart, no request is sent to TripGo. A notice confirms that you are already at the destination instead."

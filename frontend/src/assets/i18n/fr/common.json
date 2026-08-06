@@ -164,6 +164,17 @@
       "origin": "Départ",
       "destination": "Destination",
       "currentWeather": "Météo actuelle : {{ temperature }} degrés Celsius",
+      "simulation": {
+        "start": "Démarrer la simulation du trajet",
+        "pause": "Mettre la simulation en pause",
+        "resume": "Reprendre la simulation du trajet",
+        "previous": "Point précédent de l’itinéraire",
+        "next": "Point suivant de l’itinéraire",
+        "stop": "Arrêter la simulation du trajet",
+        "startPoint": "Départ",
+        "routePoint": "Point d’itinéraire",
+        "destinationPoint": "Destination"
+      },
       "routePoints": "Départ et destination de l’itinéraire",
       "editOrigin": "Modifier le point de départ",
       "editDestination": "Modifier la destination",

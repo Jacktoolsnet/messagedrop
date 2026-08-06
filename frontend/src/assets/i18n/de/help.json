@@ -2895,6 +2895,10 @@
         "title": "Kartenansicht",
         "desc": "Das Kartensymbol im Kopf einer Verbindung zeigt deren Verlauf mit den Farben und Verkehrsmittel-Symbolen der Timeline. Mit dem Listensymbol in der Aktionsleiste kehrst du zur Routenliste zurück."
       },
+      "simulation": {
+        "title": "Reisesimulation",
+        "desc": "Der Play-Button bewegt die Karte ruhig vom Start über die Routenpunkte bis zum Ziel. Ein Overlay zeigt Ort, Uhrzeit, Verkehrsmittel, Richtung, Bahnsteig und Wetter. Mit den weiteren Schaltflächen kannst du pausieren, vor- oder zurückspringen und die Simulation beenden. Anschließend wird wieder die gesamte Route angezeigt."
+      },
       "destinationReached": {
         "title": "Ziel bereits erreicht",
         "desc": "Liegen Start und Ziel höchstens 50 Meter auseinander, wird keine Anfrage an TripGo gesendet. Stattdessen erscheint der Hinweis, dass du bereits am Ziel bist."

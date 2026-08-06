@@ -165,6 +165,17 @@
       "origin": "Start",
       "destination": "Destination",
       "currentWeather": "Current weather: {{ temperature }} degrees Celsius",
+      "simulation": {
+        "start": "Start journey simulation",
+        "pause": "Pause journey simulation",
+        "resume": "Resume journey simulation",
+        "previous": "Previous route point",
+        "next": "Next route point",
+        "stop": "Stop journey simulation",
+        "startPoint": "Start",
+        "routePoint": "Route point",
+        "destinationPoint": "Destination"
+      },
       "routePoints": "Route start and destination",
       "editOrigin": "Change starting point",
       "editDestination": "Change destination",

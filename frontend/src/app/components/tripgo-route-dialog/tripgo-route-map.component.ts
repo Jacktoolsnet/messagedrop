@@ -1,7 +1,10 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, Input, OnDestroy, output } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, inject, Input, OnDestroy, output, signal } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import * as leaflet from 'leaflet';
 import { Location } from '../../interfaces/location';
-import { TripGoRouteOption, TripGoRouteSegment } from '../../interfaces/tripgo';
+import { TripGoLocation, TripGoRouteOption, TripGoRouteSegment } from '../../interfaces/tripgo';
+import { TripGoTimelineWeatherComponent } from './tripgo-timeline-weather.component';
 import { tripGoSegmentIcon } from './tripgo-route.util';
 
 export interface TripGoRouteMapPointSelection {
@@ -9,10 +12,51 @@ export interface TripGoRouteMapPointSelection {
   segmentIndex: number;
 }
 
+export type TripGoSimulationState = 'idle' | 'playing' | 'paused';
+
+interface TripGoSimulationPoint {
+  kind: 'start' | 'segment' | 'arrival';
+  location: TripGoLocation;
+  title: string;
+  time?: string;
+  segment?: TripGoRouteSegment;
+}
+
 @Component({
   selector: 'app-tripgo-route-map',
   standalone: true,
-  template: '<div class="route-map" [id]="mapId"></div>',
+  imports: [MatIconModule, TranslocoPipe, TripGoTimelineWeatherComponent],
+  template: `
+    <div class="route-map-shell">
+      <div class="route-map" [id]="mapId"></div>
+      @if (activeSimulationPoint(); as point) {
+        <aside class="simulation-overlay" role="status" aria-live="polite">
+          <header>
+            <mat-icon aria-hidden="true">{{ simulationPointIcon(point) }}</mat-icon>
+            <div>
+              <small>{{ simulationPointKindKey(point) | transloco }}</small>
+              <strong>{{ point.title }}</strong>
+            </div>
+          </header>
+          <div class="simulation-overlay__facts">
+            @if (point.time) {
+              <span><mat-icon aria-hidden="true">schedule</mat-icon>{{ formatTime(point.time) }}</span>
+            }
+            @if (point.segment; as segment) {
+              <span><mat-icon aria-hidden="true">{{ segmentIcon(segment) }}</mat-icon>{{ segmentLabel(segment) }}</span>
+              @if (segment.service?.direction) {
+                <span><mat-icon aria-hidden="true">signpost</mat-icon>{{ segment.service?.direction }}</span>
+              }
+              @if (segment.service?.startPlatform) {
+                <span><mat-icon aria-hidden="true">pin_drop</mat-icon>{{ 'common.tripGo.platform' | transloco:{ platform: segment.service?.startPlatform } }}</span>
+              }
+            }
+            <app-tripgo-timeline-weather [location]="point.location"></app-tripgo-timeline-weather>
+          </div>
+        </aside>
+      }
+    </div>
+  `,
   styleUrl: './tripgo-route-map.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -21,16 +65,93 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
   @Input({ required: true }) origin!: Location;
   @Input({ required: true }) destination!: Location;
   readonly pointSelected = output<TripGoRouteMapPointSelection>();
+  readonly simulationStateChange = output<TripGoSimulationState>();
+  readonly activeSimulationPoint = signal<TripGoSimulationPoint | null>(null);
 
   readonly mapId = `tripgo-route-map-${Math.random().toString(36).slice(2)}`;
+  private readonly transloco = inject(TranslocoService);
   private map?: leaflet.Map;
+  private routeBounds?: leaflet.LatLngBounds;
+  private simulationPoints: TripGoSimulationPoint[] = [];
+  private simulationIndex = -1;
+  private simulationTimer?: ReturnType<typeof setTimeout>;
+  private simulationState: TripGoSimulationState = 'idle';
 
   ngAfterViewInit(): void {
     this.createMap();
   }
 
   ngOnDestroy(): void {
+    this.clearSimulationTimer();
     this.map?.remove();
+  }
+
+  startSimulation(): void {
+    if (!this.map) return;
+    this.simulationPoints = this.createSimulationPoints();
+    if (!this.simulationPoints.length) return;
+    this.setSimulationState('playing');
+    this.showSimulationPoint(0, true);
+  }
+
+  pauseSimulation(): void {
+    if (this.simulationState !== 'playing') return;
+    this.clearSimulationTimer();
+    this.setSimulationState('paused');
+  }
+
+  resumeSimulation(): void {
+    if (this.simulationState !== 'paused') return;
+    this.setSimulationState('playing');
+    this.scheduleNextSimulationPoint();
+  }
+
+  showPreviousSimulationPoint(): void {
+    if (this.simulationState === 'idle') return;
+    this.showSimulationPoint(Math.max(0, this.simulationIndex - 1));
+  }
+
+  showNextSimulationPoint(): void {
+    if (this.simulationState === 'idle') return;
+    if (this.simulationIndex >= this.simulationPoints.length - 1) {
+      this.finishSimulation();
+      return;
+    }
+    this.showSimulationPoint(this.simulationIndex + 1);
+  }
+
+  stopSimulation(): void {
+    this.clearSimulationTimer();
+    this.activeSimulationPoint.set(null);
+    this.simulationIndex = -1;
+    this.setSimulationState('idle');
+    this.showEntireRoute();
+  }
+
+  simulationPointIcon(point: TripGoSimulationPoint): string {
+    if (point.kind === 'start') return 'my_location';
+    if (point.kind === 'arrival') return 'location_on';
+    return point.segment ? tripGoSegmentIcon(point.segment) : 'location_on';
+  }
+
+  simulationPointKindKey(point: TripGoSimulationPoint): string {
+    if (point.kind === 'start') return 'common.tripGo.simulation.startPoint';
+    if (point.kind === 'arrival') return 'common.tripGo.simulation.destinationPoint';
+    return 'common.tripGo.simulation.routePoint';
+  }
+
+  segmentIcon(segment: TripGoRouteSegment): string {
+    return tripGoSegmentIcon(segment);
+  }
+
+  segmentLabel(segment: TripGoRouteSegment): string {
+    return segment.service?.number || segment.modeLabel || segment.modeIdentifier || '';
+  }
+
+  formatTime(value: string): string {
+    return new Intl.DateTimeFormat(this.transloco.getActiveLang() || 'de', {
+      hour: '2-digit', minute: '2-digit'
+    }).format(new Date(value));
   }
 
   private createMap(): void {
@@ -40,6 +161,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
       worldCopyJump: true
     });
     this.map.setMaxBounds([[-90, -180], [90, 180]]);
+    this.map.on('dragstart', () => this.pauseSimulation());
 
     leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
@@ -53,9 +175,112 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
     this.drawTimelineMarkers(bounds);
 
     if (bounds.isValid()) {
-      this.map.fitBounds(bounds, { padding: [32, 32], maxZoom: 17 });
+      this.routeBounds = bounds;
+      this.showEntireRoute();
     }
     setTimeout(() => this.map?.invalidateSize(), 0);
+  }
+
+  private createSimulationPoints(): TripGoSimulationPoint[] {
+    const firstSegment = this.route.segments[0];
+    const lastSegment = this.route.segments.at(-1);
+    if (!firstSegment || !lastSegment) return [];
+
+    const points: TripGoSimulationPoint[] = [];
+    const start = firstSegment.from || {
+      latitude: this.origin.latitude,
+      longitude: this.origin.longitude
+    };
+    points.push({
+      kind: 'start',
+      location: start,
+      title: start.name || start.address || this.transloco.translate('common.tripGo.origin'),
+      time: this.route.departureTime,
+      segment: firstSegment
+    });
+
+    this.route.segments.slice(1).forEach((segment) => {
+      if (!this.validTripGoLocation(segment.from)) return;
+      points.push({
+        kind: 'segment',
+        location: segment.from,
+        title: segment.from.name || segment.from.address || this.transloco.translate('common.tripGo.simulation.routePoint'),
+        time: segment.startTime,
+        segment
+      });
+    });
+
+    const arrival = this.validTripGoLocation(lastSegment.to)
+      ? lastSegment.to
+      : { latitude: this.destination.latitude, longitude: this.destination.longitude };
+    points.push({
+      kind: 'arrival',
+      location: arrival,
+      title: arrival.name || arrival.address || this.transloco.translate('common.tripGo.destination'),
+      time: this.route.arrivalTime
+    });
+    return points;
+  }
+
+  private showSimulationPoint(index: number, initial = false): void {
+    const point = this.simulationPoints[index];
+    if (!point || !this.map) return;
+    this.clearSimulationTimer();
+    this.simulationIndex = index;
+    this.activeSimulationPoint.set(point);
+
+    const animate = !globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (initial) {
+      this.map.setZoom(17, { animate });
+    }
+    this.map.panTo([Number(point.location.latitude), Number(point.location.longitude)], {
+      animate,
+      duration: animate ? 1.1 : 0
+    });
+    if (this.simulationState === 'playing') {
+      this.scheduleNextSimulationPoint();
+    }
+  }
+
+  private scheduleNextSimulationPoint(): void {
+    this.clearSimulationTimer();
+    this.simulationTimer = setTimeout(() => {
+      if (this.simulationIndex >= this.simulationPoints.length - 1) {
+        this.finishSimulation();
+      } else {
+        this.showSimulationPoint(this.simulationIndex + 1);
+      }
+    }, 4_000);
+  }
+
+  private finishSimulation(): void {
+    this.clearSimulationTimer();
+    this.activeSimulationPoint.set(null);
+    this.simulationIndex = -1;
+    this.setSimulationState('idle');
+    this.showEntireRoute();
+  }
+
+  private showEntireRoute(): void {
+    if (this.map && this.routeBounds?.isValid()) {
+      this.map.fitBounds(this.routeBounds, { padding: [32, 32], maxZoom: 17 });
+    }
+  }
+
+  private setSimulationState(state: TripGoSimulationState): void {
+    this.simulationState = state;
+    this.simulationStateChange.emit(state);
+  }
+
+  private clearSimulationTimer(): void {
+    if (this.simulationTimer) {
+      clearTimeout(this.simulationTimer);
+      this.simulationTimer = undefined;
+    }
+  }
+
+  private validTripGoLocation(location: TripGoLocation | undefined): location is TripGoLocation & { latitude: number; longitude: number } {
+    return Number.isFinite(location?.latitude) && Number.isFinite(location?.longitude);
   }
 
   private drawRoute(bounds: leaflet.LatLngBounds): void {

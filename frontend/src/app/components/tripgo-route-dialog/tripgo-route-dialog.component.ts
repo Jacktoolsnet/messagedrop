@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -15,7 +15,7 @@ import { TripGoService } from '../../services/tripgo.service';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { LocationPickerDialogComponent } from '../utils/location-picker-dialog/location-picker-dialog.component';
-import { TripGoRouteMapComponent } from './tripgo-route-map.component';
+import { TripGoRouteMapComponent, TripGoSimulationState } from './tripgo-route-map.component';
 import { TripGoRouteMapPointSelection } from './tripgo-route-map.component';
 import { TripGoRoutePointDialogComponent } from './tripgo-route-point-dialog.component';
 import { tripGoSegmentIcon } from './tripgo-route.util';
@@ -53,6 +53,7 @@ interface RoutePointDetails {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TripGoRouteDialogComponent implements OnInit {
+  @ViewChild(TripGoRouteMapComponent) private routeMap?: TripGoRouteMapComponent;
   private readonly data = inject<TripGoRouteDialogData>(MAT_DIALOG_DATA);
   private readonly dialogRef = inject(MatDialogRef<TripGoRouteDialogComponent>);
   private readonly dialog = inject(MatDialog);
@@ -69,6 +70,7 @@ export class TripGoRouteDialogComponent implements OnInit {
   readonly destinationDetails = signal<RoutePointDetails | null>(null);
   readonly viewMode = signal<'list' | 'map'>('list');
   readonly selectedRoute = signal<TripGoRouteOption | null>(null);
+  readonly simulationState = signal<TripGoSimulationState>('idle');
   readonly state = signal<RouteDialogState>('locating');
   readonly routes = signal<TripGoRouteOption[]>([]);
   readonly errorKey = signal('common.tripGo.errors.route');
@@ -109,6 +111,7 @@ export class TripGoRouteDialogComponent implements OnInit {
   }
 
   close(): void {
+    this.routeMap?.stopSimulation();
     this.dialogRef.close();
   }
 
@@ -118,13 +121,38 @@ export class TripGoRouteDialogComponent implements OnInit {
   }
 
   showList(): void {
+    this.routeMap?.stopSimulation();
+    this.simulationState.set('idle');
     this.viewMode.set('list');
     this.selectedRoute.set(null);
+  }
+
+  toggleSimulation(): void {
+    if (this.simulationState() === 'playing') {
+      this.routeMap?.pauseSimulation();
+    } else if (this.simulationState() === 'paused') {
+      this.routeMap?.resumeSimulation();
+    } else {
+      this.routeMap?.startSimulation();
+    }
+  }
+
+  previousSimulationPoint(): void {
+    this.routeMap?.showPreviousSimulationPoint();
+  }
+
+  nextSimulationPoint(): void {
+    this.routeMap?.showNextSimulationPoint();
+  }
+
+  stopSimulation(): void {
+    this.routeMap?.stopSimulation();
   }
 
   showRoutePointDetails(selection: TripGoRouteMapPointSelection): void {
     const route = this.selectedRoute();
     if (!route) return;
+    this.routeMap?.pauseSimulation();
     this.dialog.open(TripGoRoutePointDialogComponent, {
       data: { ...selection, route },
       width: '95vw',

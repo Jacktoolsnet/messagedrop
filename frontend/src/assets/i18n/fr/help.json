@@ -2877,6 +2877,10 @@
         "title": "Vue cartographique",
         "desc": "L’icône de carte dans l’en-tête d’un trajet affiche son parcours avec les couleurs et les symboles de transport de la chronologie. Utilisez l’icône de liste pour revenir aux itinéraires."
       },
+      "simulation": {
+        "title": "Simulation du trajet",
+        "desc": "Le bouton de lecture déplace doucement la carte du départ jusqu’à la destination en passant par chaque point. Une superposition affiche le lieu, l’heure, le mode de transport, la direction, le quai et la météo. Les commandes permettent de mettre en pause, d’avancer, de revenir en arrière ou d’arrêter la simulation. L’itinéraire complet est ensuite affiché à nouveau."
+      },
       "destinationReached": {
         "title": "Déjà à destination",
         "desc": "Si le départ et la destination sont distants de 50 mètres au maximum, aucune requête n’est envoyée à TripGo. Un message indique à la place que vous êtes déjà à destination."
