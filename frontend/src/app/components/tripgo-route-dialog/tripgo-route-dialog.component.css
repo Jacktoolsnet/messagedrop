@@ -310,7 +310,7 @@
   box-sizing: border-box;
   border: 0.18rem solid var(--segment-color);
   border-radius: 999px;
-  background: var(--mat-sys-surface-container-low);
+  background-color: white;
   color: var(--segment-color);
 }
 
