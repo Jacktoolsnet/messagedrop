@@ -52,15 +52,21 @@ export class TripGoRoutePointDialogComponent implements OnInit {
   readonly boardingPlatform = computed(() => this.data.kind === 'segment'
     ? tripGoFollowingBoardingPlatform(this.data.route, this.data.segmentIndex)
     : undefined);
+  readonly modeLabel = computed(() => this.segment().type === 'stationary'
+    ? this.transloco.translate('common.tripGo.waitingTime')
+    : this.segment().modeLabel);
   readonly subtitle = computed(() => {
     const service = this.segment().service;
     if (this.data.kind === 'arrival') return this.transloco.translate('common.tripGo.routePointDetails.arrival');
     const serviceLabel = [service?.number, service?.direction].filter(Boolean).join(' · ');
-    const modeLabel = this.segment().modeLabel
+    const modeLabel = this.modeLabel()
       || this.transloco.translate('common.tripGo.routePointDetails.segment');
     const platform = this.boardingPlatform();
     return serviceLabel || (platform
-      ? this.transloco.translate('common.tripGo.toPlatform', { mode: modeLabel, platform })
+      ? this.transloco.translate(
+        this.segment().type === 'stationary' ? 'common.tripGo.atPlatform' : 'common.tripGo.toPlatform',
+        { mode: modeLabel, platform }
+      )
       : modeLabel);
   });
   readonly ticketUrl = computed(() => this.safeUrl(this.segment().service?.ticketWebsiteUrl));

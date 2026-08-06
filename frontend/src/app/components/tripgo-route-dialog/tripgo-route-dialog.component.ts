@@ -224,10 +224,15 @@ export class TripGoRouteDialogComponent implements OnInit {
   }
 
   segmentLabel(route: TripGoRouteOption, segment: TripGoRouteSegment, segmentIndex: number): string {
-    const label = segment.service?.number || segment.modeLabel || segment.modeIdentifier || '';
+    const label = segment.type === 'stationary'
+      ? this.transloco.translate('common.tripGo.waitingTime')
+      : segment.service?.number || segment.modeLabel || segment.modeIdentifier || '';
     const platform = tripGoFollowingBoardingPlatform(route, segmentIndex);
     return platform
-      ? this.transloco.translate('common.tripGo.toPlatform', { mode: label, platform })
+      ? this.transloco.translate(
+        segment.type === 'stationary' ? 'common.tripGo.atPlatform' : 'common.tripGo.toPlatform',
+        { mode: label, platform }
+      )
       : label;
   }
 

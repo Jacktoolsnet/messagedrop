@@ -32,7 +32,7 @@
     <article class="detail-tile">
       <header><mat-icon aria-hidden="true">route</mat-icon>{{ 'common.tripGo.routePointDetails.segmentData' | transloco }}</header>
       <dl class="detail-list">
-        @if (segment().modeLabel) { <dt>{{ 'common.tripGo.routePointDetails.mode' | transloco }}</dt><dd>{{ segment().modeLabel }}</dd> }
+        @if (modeLabel(); as mode) { <dt>{{ 'common.tripGo.routePointDetails.mode' | transloco }}</dt><dd>{{ mode }}</dd> }
         @if (boardingPlatform(); as platform) { <dt>{{ 'common.tripGo.routePointDetails.startPlatform' | transloco }}</dt><dd>{{ platform }}</dd> }
         @if (segment().durationSeconds !== undefined) { <dt>{{ 'common.tripGo.routePointDetails.duration' | transloco }}</dt><dd>{{ formatDuration(segment().durationSeconds!) }}</dd> }
         @if (segment().distanceMeters !== undefined) { <dt>{{ 'common.tripGo.routePointDetails.distance' | transloco }}</dt><dd>{{ formatDistance(segment().distanceMeters!) }}</dd> }
