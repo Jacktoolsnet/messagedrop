@@ -183,28 +183,7 @@
                   }
                   <strong class="timeline-mode">{{ segmentTimelineLabel(route, segment, segmentIndex) }}</strong>
                   @if (segmentDestination(segment); as destination) {
-                    @if (segment.type === 'scheduled') {
-                      <ol class="timeline-intermediate-stops"
-                        [style.--stop-color]="segment.color || '#6750a4'"
-                        [attr.aria-label]="'common.tripGo.segmentStops' | transloco">
-                        @for (stop of segment.service?.intermediateStops; track stop.stopCode || $index) {
-                          <li>
-                            <span class="timeline-stop-marker" aria-hidden="true"><mat-icon>pin_drop</mat-icon></span>
-                            <span>{{ stop.name }}</span>
-                          </li>
-                        }
-                        <li class="timeline-final-stop">
-                          <span class="timeline-stop-marker" aria-hidden="true"><mat-icon>flag</mat-icon></span>
-                          <span>
-                            @if (segmentDestinationPlatform(route, segment, segmentIndex); as platform) {
-                              {{ 'common.tripGo.untilLocationPlatform' | transloco:{ location: destination, platform } }}
-                            } @else {
-                              {{ 'common.tripGo.untilLocation' | transloco:{ location: destination } }}
-                            }
-                          </span>
-                        </li>
-                      </ol>
-                    } @else {
+                    @if (segment.type !== 'scheduled') {
                       <span class="timeline-detail">
                         @if (segmentDestinationPlatform(route, segment, segmentIndex); as platform) {
                           {{ 'common.tripGo.untilLocationPlatform' | transloco:{ location: destination, platform } }}
@@ -214,7 +193,44 @@
                       </span>
                     }
                   }
-                  <span class="timeline-metrics">
+                  @if (segment.type !== 'scheduled') {
+                    <span class="timeline-metrics">
+                      @if (segment.durationSeconds !== undefined) {
+                        <span>{{ formatDuration(segment.durationSeconds) }}</span>
+                      }
+                      @if (segment.distanceMeters !== undefined) {
+                        <span>{{ formatDistance(segment.distanceMeters) }}</span>
+                      }
+                    </span>
+                  }
+                </div>
+                @if (segment.type === 'scheduled') {
+                  <div class="timeline-service-stops" role="list"
+                    [attr.aria-label]="'common.tripGo.segmentStops' | transloco">
+                    @for (stop of segment.service?.intermediateStops; track stop.stopCode || $index) {
+                      <div class="timeline-service-stop" role="listitem">
+                        <span aria-hidden="true"></span>
+                        <span class="timeline-marker timeline-stop-marker" aria-hidden="true"><mat-icon>pin_drop</mat-icon></span>
+                        <span class="timeline-stop-name">{{ stop.name }}</span>
+                      </div>
+                    }
+                    @if (segmentDestination(segment); as destination) {
+                      <div class="timeline-service-stop timeline-final-stop" role="listitem">
+                        <span aria-hidden="true"></span>
+                        <span class="timeline-marker timeline-stop-marker" aria-hidden="true"><mat-icon>flag</mat-icon></span>
+                        <span class="timeline-stop-name">
+                          @if (segmentDestinationPlatform(route, segment, segmentIndex); as platform) {
+                            {{ 'common.tripGo.untilLocationPlatform' | transloco:{ location: destination, platform } }}
+                          } @else {
+                            {{ 'common.tripGo.untilLocation' | transloco:{ location: destination } }}
+                          }
+                        </span>
+                      </div>
+                    }
+                  </div>
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                  <span class="timeline-metrics timeline-metrics--service">
                     @if (segment.durationSeconds !== undefined) {
                       <span>{{ formatDuration(segment.durationSeconds) }}</span>
                     }
@@ -225,7 +241,7 @@
                       <span>{{ 'common.tripGo.stops' | transloco:{ count } }}</span>
                     }
                   </span>
-                </div>
+                }
               </li>
             }
             <li class="timeline-arrival">

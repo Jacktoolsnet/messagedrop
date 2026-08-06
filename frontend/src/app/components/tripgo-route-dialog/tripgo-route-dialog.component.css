@@ -373,64 +373,34 @@
   color: var(--mat-sys-on-surface-variant);
 }
 
-.timeline-intermediate-stops {
-  display: grid;
-  gap: 0.4rem;
-  margin: 0.25rem 0 0;
-  padding: 0;
-  color: var(--mat-sys-on-surface-variant);
-  font-size: 0.76rem;
-  list-style: none;
+.timeline-service-stops,
+.timeline-service-stop {
+  display: contents;
 }
 
-.timeline-intermediate-stops li {
-  position: relative;
+.timeline-stop-name {
   display: flex;
-  min-height: 1.65rem;
+  min-height: 2.05rem;
   align-items: center;
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.76rem;
 }
 
 .timeline-stop-marker {
-  position: absolute;
-  z-index: 3;
-  isolation: isolate;
-  top: 50%;
-  left: -2rem;
-  display: inline-grid;
-  width: 1.65rem;
-  height: 1.65rem;
-  place-items: center;
-  box-sizing: border-box;
-  overflow: hidden;
-  border: 0.18rem solid var(--stop-color);
-  border-radius: 50%;
-  background-color: var(--mat-sys-surface);
-  color: var(--stop-color);
-  box-shadow: 0 0 0 0.12rem var(--mat-sys-surface);
-  opacity: 1;
-  transform: translateY(-50%);
-}
-
-.timeline-stop-marker::before {
-  content: '';
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  border-radius: inherit;
-  background-color: var(--mat-sys-surface);
-}
-
-.timeline-stop-marker mat-icon {
-  position: relative;
-  z-index: 1;
-  width: 0.9rem;
-  height: 0.9rem;
-  font-size: 0.9rem;
+  align-self: center;
+  background-color: white;
+  color: var(--mat-sys-on-secondary-container);
 }
 
 .timeline-final-stop {
   font-weight: 600;
+  background-color: white;
   color: var(--mat-sys-on-surface);
+}
+
+.timeline-final-stop .timeline-stop-marker {
+  background-color: white;
+  color: var(--mat-sys-on-tertiary-container);
 }
 
 .timeline-metrics {
@@ -440,6 +410,11 @@
   margin-top: 0.15rem;
   font-size: 0.75rem;
   color: var(--mat-sys-on-surface-variant);
+}
+
+.timeline-metrics--service {
+  align-self: start;
+  padding-top: 0.15rem;
 }
 
 .timeline-location--arrival {
@@ -465,6 +440,7 @@
 }
 
 @media (max-width: 600px) {
+
   .route-points,
   .route-list {
     grid-template-columns: 1fr;
