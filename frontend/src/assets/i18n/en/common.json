@@ -170,6 +170,10 @@
       "resolvingPlace": "Getting place information …",
       "locating": "Getting a fresh fix for your current location …",
       "routing": "Calculating suitable connections …",
+      "destinationReached": {
+        "title": "Destination reached",
+        "description": "You are already at the destination. No route calculation is necessary."
+      },
       "noRoutes": "No connections were found for this journey.",
       "direct": "Direct",
       "oneTransfer": "1 transfer",

@@ -2882,6 +2882,7 @@
       "location": { "title": "Get location", "desc": "A new high-accuracy location request runs whenever the dialog opens or refreshes. Nominatim adds suitable place and address information for the start and destination." },
       "routePoints": { "title": "Change start or destination", "desc": "Use the pencil in either tile to open the location search. After selection, the route is recalculated with the new start or destination." },
       "routes": { "title": "Connections", "desc": "Results show departure and arrival, duration, transfers, and each walking or public-transport segment." },
+      "destinationReached": { "title": "Already at destination", "desc": "If the start and destination are no more than 50 metres apart, no request is sent to TripGo. A notice confirms that you are already at the destination instead." },
       "refresh": { "title": "Refresh", "desc": "Gets your location again and then calculates new connections." },
       "close": { "title": "Close", "desc": "Closes the route view." },
       "help": { "title": "Help", "desc": "Opens this route calculation help." },

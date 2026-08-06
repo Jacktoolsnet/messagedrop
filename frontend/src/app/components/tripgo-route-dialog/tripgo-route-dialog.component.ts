@@ -20,8 +20,10 @@ export interface TripGoRouteDialogData {
   destination: Location;
 }
 
-type RouteDialogState = 'locating' | 'routing' | 'ready' | 'error';
+type RouteDialogState = 'locating' | 'routing' | 'ready' | 'arrived' | 'error';
 type RoutePointKind = 'origin' | 'destination';
+
+const DESTINATION_REACHED_RADIUS_METERS = 50;
 
 interface RoutePointDetails {
   name: string;
@@ -171,6 +173,11 @@ export class TripGoRouteDialogComponent implements OnInit {
   }
 
   private loadRoutes(origin: Location, destination: Location): void {
+    this.routes.set([]);
+    if (this.distanceInMeters(origin, destination) <= DESTINATION_REACHED_RADIUS_METERS) {
+      this.state.set('arrived');
+      return;
+    }
     this.state.set('routing');
     this.tripGo.calculatePublicTransportRoute(
       origin,
@@ -186,6 +193,18 @@ export class TripGoRouteDialogComponent implements OnInit {
         this.state.set('error');
       }
     });
+  }
+
+  private distanceInMeters(first: Location, second: Location): number {
+    const earthRadiusMeters = 6_371_000;
+    const toRadians = (degrees: number) => degrees * Math.PI / 180;
+    const latitudeDelta = toRadians(second.latitude - first.latitude);
+    const longitudeDelta = toRadians(second.longitude - first.longitude);
+    const firstLatitude = toRadians(first.latitude);
+    const secondLatitude = toRadians(second.latitude);
+    const haversine = Math.sin(latitudeDelta / 2) ** 2
+      + Math.cos(firstLatitude) * Math.cos(secondLatitude) * Math.sin(longitudeDelta / 2) ** 2;
+    return 2 * earthRadiusMeters * Math.asin(Math.sqrt(haversine));
   }
 
   private resolveRoutePoint(kind: RoutePointKind, location: Location): void {

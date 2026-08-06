@@ -1,6 +1,9 @@
 .route-dialog-content {
-  width: min(1120px, 90vw);
+  width: 100%;
+  max-width: 1120px;
   min-height: 18rem;
+  box-sizing: border-box;
+  margin-inline: auto;
   padding-bottom: 1rem;
 }
 
@@ -34,8 +37,8 @@
   justify-content: space-between;
   gap: 0.5rem;
   padding: 0.35rem 0.5rem 0.35rem 0.75rem;
-  background: var(--mat-sys-primary-container);
-  color: var(--mat-sys-on-primary-container);
+  background: var(--mat-fab-container-color, var(--mat-card-filled-container-color));
+  color: var(--mat-fab-foreground-color, var(--mat-app-text-color));
 }
 
 .route-point__label {
@@ -88,6 +91,52 @@
   color: var(--mat-sys-error);
 }
 
+.arrival-tile {
+  display: flex;
+  width: min(30rem, 100%);
+  min-height: 8rem;
+  box-sizing: border-box;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem auto;
+  padding: 1rem;
+  border: 1px solid var(--mat-card-outlined-outline-color);
+  border-radius: 1rem;
+  background: var(--mat-button-tonal-container-color, var(--mat-card-filled-container-color));
+  color: var(--mat-button-tonal-label-text-color, var(--mat-app-text-color));
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+}
+
+.arrival-tile__icon {
+  display: inline-grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--mat-fab-container-color, var(--mat-card-filled-container-color));
+  color: var(--mat-fab-foreground-color, var(--mat-app-text-color));
+}
+
+.arrival-tile__icon mat-icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  font-size: 1.75rem;
+}
+
+.arrival-tile__content {
+  min-width: 0;
+}
+
+.arrival-tile__content strong {
+  font-size: 1.05rem;
+}
+
+.arrival-tile__content p {
+  margin: 0.35rem 0 0;
+  line-height: 1.4;
+}
+
 .route-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(17rem, 100%), 1fr));
@@ -108,8 +157,8 @@
   gap: 0.5rem;
   padding: 0.85rem;
   border-bottom: 1px solid color-mix(in srgb, currentColor 12%, transparent);
-  background: var(--mat-sys-secondary-container);
-  color: var(--mat-sys-on-secondary-container);
+  background: var(--mat-button-tonal-container-color, var(--mat-card-filled-container-color));
+  color: var(--mat-button-tonal-label-text-color, var(--mat-app-text-color));
 }
 
 .route-card__times,
@@ -134,7 +183,7 @@
 
 .route-card__facts {
   gap: 0.4rem 0.8rem;
-  color: var(--mat-sys-on-secondary-container);
+  color: var(--mat-button-tonal-label-text-color, var(--mat-app-text-color));
   font-size: 0.86rem;
 }
 
@@ -274,10 +323,6 @@
 }
 
 @media (max-width: 600px) {
-  .route-dialog-content {
-    width: auto;
-  }
-
   .route-points,
   .route-list {
     grid-template-columns: 1fr;

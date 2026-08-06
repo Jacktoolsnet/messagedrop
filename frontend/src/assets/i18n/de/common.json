@@ -170,6 +170,10 @@
       "resolvingPlace": "Ortsinformationen werden ermittelt …",
       "locating": "Dein aktueller Standort wird neu ermittelt …",
       "routing": "Passende Verbindungen werden berechnet …",
+      "destinationReached": {
+        "title": "Ziel erreicht",
+        "description": "Du befindest dich bereits am Ziel. Eine Routenberechnung ist nicht erforderlich."
+      },
       "noRoutes": "Für diese Strecke wurden keine Verbindungen gefunden.",
       "direct": "Direkt",
       "oneTransfer": "1 Umstieg",

@@ -102,6 +102,20 @@ describe('TripGoRouteDialogComponent', () => {
     expect(tripGo.calculatePublicTransportRoute).toHaveBeenCalledTimes(2);
   });
 
+  it('does not request a route when the destination has already been reached', () => {
+    fixture.componentInstance.destination.set({
+      latitude: 52.52,
+      longitude: 13.405,
+      plusCode: '9F4MGC9X+XX'
+    });
+
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.state()).toBe('arrived');
+    expect(fixture.componentInstance.routes()).toEqual([]);
+    expect(tripGo.calculatePublicTransportRoute).not.toHaveBeenCalled();
+  });
+
   it('recalculates the route after selecting another destination', () => {
     fixture.detectChanges();
     const destination = { latitude: 52.16, longitude: 10.53, plusCode: '9F4G5G6J+XX' };

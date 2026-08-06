@@ -169,6 +169,10 @@
       "resolvingPlace": "Recherche des informations sur le lieu …",
       "locating": "Nouvelle détermination de votre position actuelle …",
       "routing": "Calcul des trajets adaptés …",
+      "destinationReached": {
+        "title": "Destination atteinte",
+        "description": "Vous êtes déjà à destination. Aucun calcul d’itinéraire n’est nécessaire."
+      },
       "noRoutes": "Aucun trajet n’a été trouvé pour ce parcours.",
       "direct": "Direct",
       "oneTransfer": "1 correspondance",

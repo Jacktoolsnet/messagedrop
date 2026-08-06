@@ -1011,6 +1011,11 @@ const HELP_TOPICS = {
         descriptionKey: 'tripGoRoute.items.routes.desc'
       },
       {
+        icon: 'flag',
+        titleKey: 'tripGoRoute.items.destinationReached.title',
+        descriptionKey: 'tripGoRoute.items.destinationReached.desc'
+      },
+      {
         icon: 'refresh',
         titleKey: 'tripGoRoute.items.refresh.title',
         descriptionKey: 'tripGoRoute.items.refresh.desc'

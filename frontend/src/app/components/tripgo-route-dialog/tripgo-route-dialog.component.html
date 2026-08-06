@@ -69,6 +69,16 @@
       <mat-spinner diameter="40"></mat-spinner>
       <p>{{ 'common.tripGo.routing' | transloco }}</p>
     </div>
+  } @else if (state() === 'arrived') {
+    <article class="arrival-tile" role="status">
+      <span class="arrival-tile__icon" aria-hidden="true">
+        <mat-icon>flag</mat-icon>
+      </span>
+      <div class="arrival-tile__content">
+        <strong>{{ 'common.tripGo.destinationReached.title' | transloco }}</strong>
+        <p>{{ 'common.tripGo.destinationReached.description' | transloco }}</p>
+      </div>
+    </article>
   } @else if (state() === 'error') {
     <div class="status status--error" role="alert">
       <mat-icon>warning</mat-icon>

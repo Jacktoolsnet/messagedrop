@@ -2864,6 +2864,7 @@
       "location": { "title": "Déterminer la position", "desc": "Une nouvelle demande de localisation précise est lancée à chaque ouverture ou actualisation. Nominatim ajoute des informations adaptées sur le lieu et l’adresse du départ et de la destination." },
       "routePoints": { "title": "Modifier le départ ou la destination", "desc": "Utilisez le crayon de chaque tuile pour ouvrir la recherche de lieu. Après la sélection, l’itinéraire est recalculé avec le nouveau départ ou la nouvelle destination." },
       "routes": { "title": "Trajets", "desc": "Les résultats indiquent le départ, l’arrivée, la durée, les correspondances et chaque étape à pied ou en transports publics." },
+      "destinationReached": { "title": "Déjà à destination", "desc": "Si le départ et la destination sont distants de 50 mètres au maximum, aucune requête n’est envoyée à TripGo. Un message indique à la place que vous êtes déjà à destination." },
       "refresh": { "title": "Actualiser", "desc": "Détermine à nouveau votre position puis calcule de nouveaux trajets." },
       "close": { "title": "Fermer", "desc": "Ferme la vue des itinéraires." },
       "help": { "title": "Aide", "desc": "Ouvre cette aide sur le calcul d’itinéraire." },
