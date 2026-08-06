@@ -1,0 +1,23 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.route-map {
+  width: 100%;
+  height: min(62vh, 620px);
+  min-height: 360px;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 1px solid var(--mat-card-outlined-outline-color);
+  border-radius: 1rem;
+  background: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+}
+
+@media (max-width: 600px) {
+  .route-map {
+    height: 58vh;
+    min-height: 300px;
+  }
+}

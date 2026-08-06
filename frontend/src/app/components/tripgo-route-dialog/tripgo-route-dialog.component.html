@@ -5,6 +5,17 @@
 </app-dialog-header>
 
 <mat-dialog-content class="route-dialog-content">
+  @if (viewMode() === 'map') {
+    @if (selectedRoute(); as route) {
+      @if (origin(); as start) {
+        <app-tripgo-route-map
+          [route]="route"
+          [origin]="start"
+          [destination]="destination()">
+        </app-tripgo-route-map>
+      }
+    }
+  } @else {
   <section class="route-points" [attr.aria-label]="'common.tripGo.routePoints' | transloco">
     <article class="route-point">
       <header class="route-point__header">
@@ -94,6 +105,11 @@
       @for (route of routes(); track route.id) {
         <article class="route-card">
           <header class="route-card__summary">
+            <button mat-icon-button type="button" class="route-card__map-action"
+              (click)="showRouteOnMap(route)"
+              [attr.aria-label]="'common.tripGo.showOnMap' | transloco">
+              <mat-icon>map</mat-icon>
+            </button>
             <div class="route-card__times">
               <strong>{{ formatTime(route.departureTime) }}</strong>
               <mat-icon aria-hidden="true">arrow_forward</mat-icon>
@@ -168,6 +184,7 @@
       }
     </div>
   }
+  }
 
 </mat-dialog-content>
 
@@ -178,6 +195,12 @@
   </button>
   <span class="action-spacer"></span>
   <span class="action-group-right">
+    @if (viewMode() === 'map') {
+      <button mat-icon-button type="button" (click)="showList()"
+        [attr.aria-label]="'common.tripGo.backToList' | transloco">
+        <mat-icon>list</mat-icon>
+      </button>
+    }
     <button mat-icon-button type="button" (click)="help.open('tripGoRoute')"
       [attr.aria-label]="'common.actions.help' | transloco">
       <mat-icon>help</mat-icon>

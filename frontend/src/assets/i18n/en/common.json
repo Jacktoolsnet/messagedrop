@@ -167,6 +167,8 @@
       "routePoints": "Route start and destination",
       "editOrigin": "Change starting point",
       "editDestination": "Change destination",
+      "showOnMap": "Show route on the map",
+      "backToList": "Back to the route list",
       "resolvingPlace": "Getting place information …",
       "locating": "Getting a fresh fix for your current location …",
       "routing": "Calculating suitable connections …",

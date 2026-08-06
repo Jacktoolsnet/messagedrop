@@ -166,6 +166,8 @@
       "routePoints": "Départ et destination de l’itinéraire",
       "editOrigin": "Modifier le point de départ",
       "editDestination": "Modifier la destination",
+      "showOnMap": "Afficher l’itinéraire sur la carte",
+      "backToList": "Retour à la liste des itinéraires",
       "resolvingPlace": "Recherche des informations sur le lieu …",
       "locating": "Nouvelle détermination de votre position actuelle …",
       "routing": "Calcul des trajets adaptés …",

@@ -153,12 +153,20 @@
 }
 
 .route-card__summary {
+  position: relative;
   display: grid;
   gap: 0.5rem;
-  padding: 0.85rem;
+  padding: 0.85rem 3.5rem 0.85rem 0.85rem;
   border-bottom: 1px solid color-mix(in srgb, currentColor 12%, transparent);
   background: var(--mat-button-tonal-container-color, var(--mat-card-filled-container-color));
   color: var(--mat-button-tonal-label-text-color, var(--mat-app-text-color));
+}
+
+.route-card__map-action {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.35rem;
+  color: inherit;
 }
 
 .route-card__times,

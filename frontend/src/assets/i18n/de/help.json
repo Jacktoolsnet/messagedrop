@@ -2882,6 +2882,7 @@
       "location": { "title": "Standort ermitteln", "desc": "Bei jedem Öffnen und Aktualisieren wird eine neue Standortabfrage mit hoher Genauigkeit gestartet. Nominatim ergänzt passende Orts- und Adressinformationen für Start und Ziel." },
       "routePoints": { "title": "Start oder Ziel ändern", "desc": "Mit dem Bleistift im jeweiligen Tile öffnest du die Ortssuche. Nach der Auswahl wird die Route mit dem neuen Start oder Ziel erneut berechnet." },
       "routes": { "title": "Verbindungen", "desc": "Die Ergebnisse zeigen Abfahrts- und Ankunftszeit, Dauer, Umstiege sowie die einzelnen Fußweg- und ÖPNV-Abschnitte." },
+      "map": { "title": "Kartenansicht", "desc": "Das Kartensymbol im Kopf einer Verbindung zeigt deren Verlauf farbig auf der Karte. Mit dem Listensymbol in der Aktionsleiste kehrst du zur Routenliste zurück." },
       "destinationReached": { "title": "Ziel bereits erreicht", "desc": "Liegen Start und Ziel höchstens 50 Meter auseinander, wird keine Anfrage an TripGo gesendet. Stattdessen erscheint der Hinweis, dass du bereits am Ziel bist." },
       "refresh": { "title": "Aktualisieren", "desc": "Ermittelt deinen Standort erneut und berechnet anschließend neue Verbindungen." },
       "close": { "title": "Schließen", "desc": "Schließt die Routenansicht." },

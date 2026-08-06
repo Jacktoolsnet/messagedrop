@@ -15,6 +15,7 @@ import { TripGoService } from '../../services/tripgo.service';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { LocationPickerDialogComponent } from '../utils/location-picker-dialog/location-picker-dialog.component';
+import { TripGoRouteMapComponent } from './tripgo-route-map.component';
 
 export interface TripGoRouteDialogData {
   destination: Location;
@@ -39,7 +40,8 @@ interface RoutePointDetails {
     MatDialogContent,
     MatIconModule,
     MatProgressSpinnerModule,
-    TranslocoPipe
+    TranslocoPipe,
+    TripGoRouteMapComponent
   ],
   templateUrl: './tripgo-route-dialog.component.html',
   styleUrl: './tripgo-route-dialog.component.css',
@@ -60,6 +62,8 @@ export class TripGoRouteDialogComponent implements OnInit {
   readonly destination = signal(this.withPlusCode(this.data.destination));
   readonly originDetails = signal<RoutePointDetails | null>(null);
   readonly destinationDetails = signal<RoutePointDetails | null>(null);
+  readonly viewMode = signal<'list' | 'map'>('list');
+  readonly selectedRoute = signal<TripGoRouteOption | null>(null);
   readonly state = signal<RouteDialogState>('locating');
   readonly routes = signal<TripGoRouteOption[]>([]);
   readonly errorKey = signal('common.tripGo.errors.route');
@@ -71,6 +75,7 @@ export class TripGoRouteDialogComponent implements OnInit {
   }
 
   calculateWithFreshLocation(): void {
+    this.showList();
     this.routes.set([]);
     this.state.set('locating');
     this.geolocation.getCurrentPosition({
@@ -102,6 +107,16 @@ export class TripGoRouteDialogComponent implements OnInit {
     this.dialogRef.close();
   }
 
+  showRouteOnMap(route: TripGoRouteOption): void {
+    this.selectedRoute.set(route);
+    this.viewMode.set('map');
+  }
+
+  showList(): void {
+    this.viewMode.set('list');
+    this.selectedRoute.set(null);
+  }
+
   editRoutePoint(kind: RoutePointKind): void {
     const current = kind === 'origin' ? this.origin() : this.destination();
     if (!current || this.isBusy()) return;
@@ -131,6 +146,7 @@ export class TripGoRouteDialogComponent implements OnInit {
         this.destination.set(location);
         this.destinationDetails.set(null);
       }
+      this.showList();
       this.resolveRoutePoint(kind, location);
       const origin = this.origin();
       if (origin) this.loadRoutes(origin, this.destination());
