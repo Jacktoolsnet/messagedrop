@@ -58,4 +58,30 @@ node "${script_dir}/../../services/tripgo/scripts/fetch-raw-route-sample.js" \
   "${output_dir}/route-wolfenbuettel-raw.json" \
   "${output_dir}/services-wolfenbuettel-raw.json"
 
+# Long-distance diagnostic route to the Alsterhaus in Hamburg. This sample is
+# useful for comparing TripGo's public service number with its short/long names
+# and the exact rail mode (regional, long-distance, S-Bahn, subway or tram).
+hamburg_to_lat="${TRIPGO_HAMBURG_TO_LAT:-53.55361}"
+hamburg_to_lng="${TRIPGO_HAMBURG_TO_LNG:-9.99240}"
+
+curl --silent --show-error --fail-with-body \
+  --request POST \
+  --header 'Content-Type: application/json' \
+  --data "{
+    \"from\": { \"latitude\": ${wolf_from_lat}, \"longitude\": ${wolf_from_lng} },
+    \"to\": { \"latitude\": ${hamburg_to_lat}, \"longitude\": ${hamburg_to_lng} },
+    \"locale\": \"de\",
+    \"modes\": [\"pt_pub\"]
+  }" \
+  "${api_url}/tripgo/routes" \
+  --output "${output_dir}/route-wolfenbuettel-hamburg.json"
+
+TRIPGO_SAMPLE_FROM_LAT="${wolf_from_lat}" \
+TRIPGO_SAMPLE_FROM_LNG="${wolf_from_lng}" \
+TRIPGO_SAMPLE_TO_LAT="${hamburg_to_lat}" \
+TRIPGO_SAMPLE_TO_LNG="${hamburg_to_lng}" \
+node "${script_dir}/../../services/tripgo/scripts/fetch-raw-route-sample.js" \
+  "${output_dir}/route-wolfenbuettel-hamburg-raw.json" \
+  "${output_dir}/services-wolfenbuettel-hamburg-raw.json"
+
 printf 'TripGo samples written to %s\n' "${output_dir}"

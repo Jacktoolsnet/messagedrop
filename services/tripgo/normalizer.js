@@ -196,7 +196,7 @@ function normalizeSegment(reference, template) {
     id: String(reference.id),
     type: stringOrNull(template.type),
     modeIdentifier: stringOrNull(modeInfo.identifier || template.modeIdentifier),
-    modeLabel: stringOrNull(modeInfo.alt),
+    modeLabel: normalizedModeLabel(reference, template, modeInfo),
     icon: stringOrNull(modeInfo.localIcon),
     color: rgbHex(reference.serviceColor || modeInfo.color),
     startTime: epochIso(reference.startTime),
@@ -216,7 +216,7 @@ function normalizeSegment(reference, template) {
 function normalizeService(reference, template) {
   if (template.type !== 'scheduled') return null;
   return compact({
-    number: stringOrNull(reference.serviceNumber || reference.serviceShortName || reference.serviceName),
+    number: normalizedServiceNumber(reference, template),
     direction: stringOrNull(reference.serviceDirection),
     operator: stringOrNull(template.serviceOperator || template.operator || reference.externalData?.operatorName),
     operatorId: stringOrNull(template.operatorID || reference.externalData?.operatorId),
@@ -229,6 +229,52 @@ function normalizeService(reference, template) {
     realTimeStatus: stringOrNull(reference.realTimeStatus),
     ticketWebsiteUrl: safeExternalUrl(reference.ticketWebsiteURL)
   });
+}
+
+function normalizedModeLabel(reference, template, modeInfo) {
+  const fallback = stringOrNull(modeInfo.alt);
+  if (!isGermanRailService(reference, template, modeInfo)) return fallback;
+
+  switch (extendedGtfsRouteType(reference)) {
+    case 101:
+      return isDbLongDistance(reference, template) ? 'ICE' : fallback;
+    case 102:
+      return isDbLongDistance(reference, template) ? 'IC/EC' : fallback;
+    case 109:
+      return 'S-Bahn';
+    default:
+      return /train-germany-s/i.test(String(modeInfo.remoteIcon || '')) ? 'S-Bahn' : fallback;
+  }
+}
+
+function normalizedServiceNumber(reference, template) {
+  const fallback = stringOrNull(reference.serviceNumber || reference.serviceShortName || reference.serviceName);
+  const routeType = extendedGtfsRouteType(reference);
+  if ((routeType !== 101 && routeType !== 102) || !isDbLongDistance(reference, template)) return fallback;
+
+  const shortName = stringOrNull(reference.serviceShortName);
+  if (!shortName || !/^\d+$/.test(shortName)) return fallback;
+  return shortName.replace(/^0+(?=\d)/, '');
+}
+
+function extendedGtfsRouteType(reference) {
+  const routeId = stringOrNull(reference.routeID || reference.routeId || reference.externalData?.routeId);
+  const match = routeId?.match(/_(\d{3})$/);
+  return match ? Number(match[1]) : null;
+}
+
+function isGermanRailService(reference, template, modeInfo) {
+  const identifier = String(modeInfo.identifier || template.modeIdentifier || '').toLowerCase();
+  const operator = String(template.serviceOperator || template.operator
+    || reference.externalData?.operatorName || '').toLowerCase();
+  return identifier.includes('train') && (/train-germany-/i.test(String(modeInfo.remoteIcon || ''))
+    || operator.includes('db fernverkehr') || operator.includes('s-bahn'));
+}
+
+function isDbLongDistance(reference, template) {
+  const operator = String(template.serviceOperator || template.operator
+    || reference.externalData?.operatorName || '').toLowerCase();
+  return operator.includes('db fernverkehr');
 }
 
 function safeExternalUrl(value) {

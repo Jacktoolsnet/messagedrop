@@ -52,6 +52,49 @@ test('normalizes templates and segment references into compact route options', (
   assert.equal(normalized.routes[0].cost, undefined);
 });
 
+test('uses DB train numbers and specific German rail labels', () => {
+  const railCases = [
+    {
+      hashCode: 101,
+      reference: { serviceNumber: '25', serviceShortName: '000784', routeID: '162297_101' },
+      modeInfo: { identifier: 'pt_pub_train', alt: 'Zug', localIcon: 'train' },
+      operator: 'DB Fernverkehr AG',
+      expectedLabel: 'ICE', expectedNumber: '784'
+    },
+    {
+      hashCode: 102,
+      reference: { serviceNumber: '56', serviceShortName: '002032', routeID: '162316_102' },
+      modeInfo: { identifier: 'pt_pub_train', alt: 'Zug', localIcon: 'train' },
+      operator: 'DB Fernverkehr AG',
+      expectedLabel: 'IC/EC', expectedNumber: '2032'
+    },
+    {
+      hashCode: 109,
+      reference: { serviceNumber: 'S3', serviceShortName: '043230', routeID: '162846_109' },
+      modeInfo: { identifier: 'pt_pub_train', alt: 'Zug', localIcon: 'train', remoteIcon: 'train-germany-s' },
+      operator: 'S-Bahn Hamburg',
+      expectedLabel: 'S-Bahn', expectedNumber: 'S3'
+    }
+  ];
+  const templates = railCases.map(({ hashCode, modeInfo, operator }) => ({
+    hashCode, type: 'scheduled', modeInfo, operator
+  }));
+  const trips = railCases.map(({ hashCode, reference }, index) => trip(`rail-${index}`, index + 1, 1100 + index, hashCode, {
+    segments: [{
+      id: `rail-${index}-segment`, segmentTemplateHashCode: hashCode,
+      startTime: 1100 + index, endTime: 1700 + index,
+      ...reference
+    }]
+  }));
+
+  const normalized = normalizeRoutingResponse({ groups: [{ trips }], segmentTemplates: templates });
+
+  railCases.forEach(({ expectedLabel, expectedNumber }, index) => {
+    assert.equal(normalized.routes[index].segments[0].modeLabel, expectedLabel);
+    assert.equal(normalized.routes[index].segments[0].service.number, expectedNumber);
+  });
+});
+
 test('does not report a whole transit route as free from walking cost alone', () => {
   const walkingTemplate = {
     hashCode: 11, type: 'unscheduled', modeIdentifier: 'wa_wal',

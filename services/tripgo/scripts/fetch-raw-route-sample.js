@@ -70,9 +70,16 @@ async function fetchServiceSamples(client, routeResponse) {
       locale: process.env.TRIPGO_SAMPLE_LOCALE || 'de'
     };
     const description = {
-      mode: template.modeInfo?.alt || template.modeIdentifier,
-      number: reference.serviceNumber,
+      modeIdentifier: template.modeInfo?.identifier || template.modeIdentifier,
+      modeLabel: template.modeInfo?.alt,
+      localIcon: template.modeInfo?.localIcon,
+      remoteIcon: template.modeInfo?.remoteIcon,
+      serviceNumber: reference.serviceNumber,
+      serviceShortName: reference.serviceShortName,
+      serviceName: reference.serviceName,
       direction: reference.serviceDirection,
+      routeId: reference.routeID || reference.routeId,
+      operator: template.serviceOperator || template.operator || reference.externalData?.operatorName,
       from: template.from?.name,
       to: template.to?.name
     };
