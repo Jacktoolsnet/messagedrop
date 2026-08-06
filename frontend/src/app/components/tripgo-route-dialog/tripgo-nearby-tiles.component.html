@@ -1,25 +1,25 @@
-<section class="nearby-section" [attr.aria-label]="'common.tripGo.nearby.title' | transloco">
-  <h3><mat-icon aria-hidden="true">near_me</mat-icon>{{ 'common.tripGo.nearby.title' | transloco }}</h3>
-  <div class="nearby-grid">
-    <app-weather-tile [persist]="false" [place]="place()"></app-weather-tile>
-    <app-air-quality-tile [persist]="false" [place]="place()"></app-air-quality-tile>
-    <app-wikipedia-tile [place]="place()"></app-wikipedia-tile>
+<section class="nearby-panel" [attr.aria-label]="'common.tripGo.nearby.title' | transloco">
+  <header class="nearby-panel__header">
+    <mat-icon aria-hidden="true">near_me</mat-icon>
+    <strong>{{ 'common.tripGo.nearby.title' | transloco }}</strong>
+  </header>
+  <div class="nearby-panel__body">
+    <div class="nearby-grid">
+      <app-weather-tile [persist]="false" [place]="place()"></app-weather-tile>
+      <app-air-quality-tile [persist]="false" [place]="place()"></app-air-quality-tile>
+      <app-wikipedia-tile [place]="place()"></app-wikipedia-tile>
 
-    @for (tile of placeholderTiles; track tile.titleKey) {
-      <article class="nearby-tile">
-        <header><mat-icon aria-hidden="true">{{ tile.icon }}</mat-icon><strong>{{ tile.titleKey | transloco }}</strong></header>
-        @if (tile.private && !isAuthenticated()) {
-          <div class="nearby-tile__status">
-            <mat-icon aria-hidden="true">lock</mat-icon>
-            <span>{{ 'common.tripGo.nearby.loginRequired' | transloco }}</span>
-          </div>
-        } @else {
-          <div class="nearby-tile__status">
-            <mat-icon aria-hidden="true">hourglass_top</mat-icon>
-            <span>{{ 'common.tripGo.nearby.comingSoon' | transloco }}</span>
-          </div>
+      @for (tile of placeholderTiles; track tile.titleKey) {
+        @if (!tile.private || isAuthenticated()) {
+          <article class="nearby-tile">
+            <header><mat-icon aria-hidden="true">{{ tile.icon }}</mat-icon><strong>{{ tile.titleKey | transloco }}</strong></header>
+            <div class="nearby-tile__status">
+              <mat-icon aria-hidden="true">hourglass_top</mat-icon>
+              <span>{{ 'common.tripGo.nearby.comingSoon' | transloco }}</span>
+            </div>
+          </article>
         }
-      </article>
-    }
+      }
+    </div>
   </div>
 </section>

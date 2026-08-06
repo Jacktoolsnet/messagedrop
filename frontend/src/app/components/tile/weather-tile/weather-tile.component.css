@@ -1,3 +1,8 @@
+:host {
+    display: block;
+    height: 100%;
+}
+
 .tile {
     position: relative;
     border-radius: 1rem;
@@ -10,7 +15,8 @@
     flex-direction: column;
     justify-content: center;
     gap: 0.25rem;
-    height: auto;
+    height: 100%;
+    box-sizing: border-box;
 }
 
 .tile:hover {
