@@ -107,7 +107,7 @@ export class TripGoRouteDialogComponent implements OnInit {
     const dialogRef = this.dialog.open<LocationPickerDialogComponent, unknown, Location | undefined>(
       LocationPickerDialogComponent,
       {
-        data: { location: current, markerType: 'message' },
+        data: { location: current, markerType: 'message', zoom: 16 },
         maxWidth: '95vw',
         maxHeight: '95vh',
         width: '95vw',
