@@ -278,7 +278,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
     const animate = !this.prefersReducedMotion();
     const movementDuration = animate ? this.simulationMovementDuration(index, initial, point.showOverlay) : 0;
     if (initial) {
-      this.map.setZoom(17, { animate });
+      this.map.setZoom(19, { animate });
     }
     this.moveSimulationMarker(point, movementDuration, initial);
     this.currentSimulationDelayMs = point.showOverlay
