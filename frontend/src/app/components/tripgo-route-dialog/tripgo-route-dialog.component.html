@@ -173,18 +173,22 @@
                   <mat-icon>{{ segmentIcon(segment) }}</mat-icon>
                 </span>
                 <div class="timeline-content">
-                  @if (!first && segment.from?.name) {
-                    <span class="timeline-location">{{ segment.from?.name }}</span>
+                  @if (!first && segmentStartLocation(segment); as startLocation) {
+                    <span class="timeline-location">{{ startLocation }}</span>
                   }
-                  <strong class="timeline-mode">{{ segmentLabel(route, segment, segmentIndex) }}</strong>
-                  @if (segment.service?.direction) {
+                  @if (segmentPlatform(segment); as platform) {
                     <span class="timeline-detail">
-                      {{ 'common.tripGo.direction' | transloco:{ direction: segment.service?.direction } }}
+                      {{ 'common.tripGo.platform' | transloco:{ platform } }}
                     </span>
                   }
-                  @if (segment.service?.startPlatform) {
+                  <strong class="timeline-mode">{{ segmentTimelineLabel(route, segment, segmentIndex) }}</strong>
+                  @if (segmentDestination(segment); as destination) {
                     <span class="timeline-detail">
-                      {{ 'common.tripGo.platform' | transloco:{ platform: segment.service?.startPlatform } }}
+                      @if (segmentDestinationPlatform(route, segment, segmentIndex); as platform) {
+                        {{ 'common.tripGo.untilLocationPlatform' | transloco:{ location: destination, platform } }}
+                      } @else {
+                        {{ 'common.tripGo.untilLocation' | transloco:{ location: destination } }}
+                      }
                     </span>
                   }
                   <span class="timeline-metrics">

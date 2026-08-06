@@ -229,30 +229,46 @@ export class TripGoRouteDialogComponent implements OnInit {
     return `${Math.round(metres)} m`;
   }
 
-  segmentLabel(route: TripGoRouteOption, segment: TripGoRouteSegment, segmentIndex: number): string {
+  segmentTimelineLabel(route: TripGoRouteOption, segment: TripGoRouteSegment, segmentIndex: number): string {
     if (segment.type === 'scheduled') {
       const service = tripGoServiceLabel(segment) || segment.modeIdentifier || '';
-      const destination = tripGoDisplayLocationName(segment.to?.name);
-      return destination
-        ? this.transloco.translate('common.tripGo.serviceToLocation', { service, location: destination })
+      return segment.service?.direction
+        ? `${service} ${this.transloco.translate('common.tripGo.direction', { direction: segment.service.direction })}`
         : service;
     }
     const label = segment.type === 'stationary'
       ? this.transloco.translate('common.tripGo.waitingTime')
-      : segment.service?.number || segment.modeLabel || segment.modeIdentifier || '';
-    const platform = tripGoFollowingBoardingPlatform(route, segmentIndex);
+      : segment.modeLabel || segment.modeIdentifier || '';
     const location = tripGoSegmentInstructionLocation(route, segmentIndex);
     if (segment.type === 'stationary') {
       return location
         ? this.transloco.translate('common.tripGo.waitingAt', { mode: label, location })
         : label;
     }
-    if (location && platform) {
-      return this.transloco.translate('common.tripGo.toLocationPlatform', { mode: label, location, platform });
-    }
-    return location
-      ? this.transloco.translate('common.tripGo.toLocation', { mode: label, location })
-      : label;
+    return label;
+  }
+
+  segmentPlatform(segment: TripGoRouteSegment): string | undefined {
+    return segment.service?.startPlatform;
+  }
+
+  segmentDestinationPlatform(
+    route: TripGoRouteOption,
+    segment: TripGoRouteSegment,
+    segmentIndex: number
+  ): string | undefined {
+    return tripGoSegmentIcon(segment) === 'directions_walk'
+      ? tripGoFollowingBoardingPlatform(route, segmentIndex)
+      : undefined;
+  }
+
+  segmentStartLocation(segment: TripGoRouteSegment): string | undefined {
+    return tripGoDisplayLocationName(segment.from?.name);
+  }
+
+  segmentDestination(segment: TripGoRouteSegment): string | undefined {
+    if (segment.type === 'stationary') return undefined;
+    return tripGoDisplayLocationName(segment.to?.name);
   }
 
   segmentIcon(segment: TripGoRouteSegment): string {
