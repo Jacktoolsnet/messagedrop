@@ -2879,7 +2879,7 @@
       },
       "simulation": {
         "title": "Simulation du trajet",
-        "desc": "Le bouton de lecture déplace doucement la carte du départ jusqu’à la destination en passant par chaque point. Une superposition affiche le lieu, l’heure, le mode de transport, la direction, le quai et la météo. Les commandes permettent de mettre en pause, d’avancer, de revenir en arrière ou d’arrêter la simulation. L’itinéraire complet est ensuite affiché à nouveau."
+        "desc": "Le bouton de lecture déplace doucement la carte du départ jusqu’à la destination en suivant tous les points de ligne fournis par TripGo. Un symbole de cible indique la position actuelle sur la ligne. Aux véritables points de l’itinéraire, une superposition affiche le lieu, l’heure, le mode de transport, la direction, le quai et la météo. Les commandes permettent de mettre en pause, d’avancer, de revenir en arrière ou d’arrêter la simulation. L’itinéraire complet est ensuite affiché à nouveau."
       },
       "destinationReached": {
         "title": "Déjà à destination",

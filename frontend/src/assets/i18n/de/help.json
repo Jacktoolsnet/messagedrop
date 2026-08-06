@@ -2897,7 +2897,7 @@
       },
       "simulation": {
         "title": "Reisesimulation",
-        "desc": "Der Play-Button bewegt die Karte ruhig vom Start über die Routenpunkte bis zum Ziel. Ein Overlay zeigt Ort, Uhrzeit, Verkehrsmittel, Richtung, Bahnsteig und Wetter. Mit den weiteren Schaltflächen kannst du pausieren, vor- oder zurückspringen und die Simulation beenden. Anschließend wird wieder die gesamte Route angezeigt."
+        "desc": "Der Play-Button bewegt die Karte ruhig vom Start entlang aller von TripGo gelieferten Linienpunkte bis zum Ziel. Ein Zielscheiben-Symbol zeigt dabei die aktuelle Position auf der Linie. An den eigentlichen Routenpunkten zeigt ein Overlay Ort, Uhrzeit, Verkehrsmittel, Richtung, Bahnsteig und Wetter. Mit den weiteren Schaltflächen kannst du pausieren, vor- oder zurückspringen und die Simulation beenden. Anschließend wird wieder die gesamte Route angezeigt."
       },
       "destinationReached": {
         "title": "Ziel bereits erreicht",

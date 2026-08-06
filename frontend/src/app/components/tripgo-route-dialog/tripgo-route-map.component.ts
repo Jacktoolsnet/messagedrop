@@ -20,6 +20,7 @@ interface TripGoSimulationPoint {
   title: string;
   time?: string;
   segment?: TripGoRouteSegment;
+  showOverlay: boolean;
 }
 
 @Component({
@@ -30,7 +31,9 @@ interface TripGoSimulationPoint {
     <div class="route-map-shell">
       <div class="route-map" [id]="mapId"></div>
       @if (activeSimulationPoint(); as point) {
-        <aside class="simulation-overlay" role="status" aria-live="polite">
+        <aside class="simulation-overlay" role="status" aria-live="polite"
+          [style.--simulation-color]="simulationPointColor(point)"
+          [style.--simulation-contrast]="simulationPointContrast(point)">
           <header>
             <mat-icon aria-hidden="true">{{ simulationPointIcon(point) }}</mat-icon>
             <div>
@@ -72,9 +75,11 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
   private readonly transloco = inject(TranslocoService);
   private map?: leaflet.Map;
   private routeBounds?: leaflet.LatLngBounds;
+  private simulationMarker?: leaflet.Marker;
   private simulationPoints: TripGoSimulationPoint[] = [];
   private simulationIndex = -1;
   private simulationTimer?: ReturnType<typeof setTimeout>;
+  private currentSimulationDelayMs = 3_000;
   private simulationState: TripGoSimulationState = 'idle';
 
   ngAfterViewInit(): void {
@@ -83,6 +88,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.clearSimulationTimer();
+    this.removeSimulationMarker();
     this.map?.remove();
   }
 
@@ -122,6 +128,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
 
   stopSimulation(): void {
     this.clearSimulationTimer();
+    this.removeSimulationMarker();
     this.activeSimulationPoint.set(null);
     this.simulationIndex = -1;
     this.setSimulationState('idle');
@@ -138,6 +145,14 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
     if (point.kind === 'start') return 'common.tripGo.simulation.startPoint';
     if (point.kind === 'arrival') return 'common.tripGo.simulation.destinationPoint';
     return 'common.tripGo.simulation.routePoint';
+  }
+
+  simulationPointColor(point: TripGoSimulationPoint): string {
+    return point.segment ? safeColor(point.segment.color) : '#000000';
+  }
+
+  simulationPointContrast(point: TripGoSimulationPoint): string {
+    return contrastColor(this.simulationPointColor(point));
   }
 
   segmentIcon(segment: TripGoRouteSegment): string {
@@ -162,6 +177,9 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
     });
     this.map.setMaxBounds([[-90, -180], [90, 180]]);
     this.map.on('dragstart', () => this.pauseSimulation());
+    const simulationPane = this.map.createPane('tripgoSimulationPane');
+    simulationPane.style.zIndex = '1200';
+    simulationPane.style.pointerEvents = 'none';
 
     leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
@@ -196,18 +214,39 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
       location: start,
       title: start.name || start.address || this.transloco.translate('common.tripGo.origin'),
       time: this.route.departureTime,
-      segment: firstSegment
+      segment: firstSegment,
+      showOverlay: true
     });
 
-    this.route.segments.slice(1).forEach((segment) => {
-      if (!this.validTripGoLocation(segment.from)) return;
-      points.push({
-        kind: 'segment',
-        location: segment.from,
-        title: segment.from.name || segment.from.address || this.transloco.translate('common.tripGo.simulation.routePoint'),
-        time: segment.startTime,
-        segment
-      });
+    this.route.segments.forEach((segment, segmentIndex) => {
+      if (segmentIndex > 0 && this.validTripGoLocation(segment.from)) {
+        points.push({
+          kind: 'segment',
+          location: segment.from,
+          title: segment.from.name || segment.from.address || this.transloco.translate('common.tripGo.simulation.routePoint'),
+          time: segment.startTime,
+          segment,
+          showOverlay: true
+        });
+      }
+
+      const geometryPoints = segment.geometry
+        .flatMap((encodedPath) => decodePolyline(encodedPath))
+        .map(([latitude, longitude]) => ({ latitude, longitude }));
+      const displayedPoints = geometryPoints.length >= 2
+        ? geometryPoints
+        : this.fallbackSimulationGeometry(segment);
+      for (const location of displayedPoints) {
+        if (this.isSameSimulationLocation(points.at(-1)?.location, location)) continue;
+        points.push({
+          kind: 'segment',
+          location,
+          title: segment.from?.name || segment.from?.address || this.transloco.translate('common.tripGo.simulation.routePoint'),
+          time: segment.startTime,
+          segment,
+          showOverlay: false
+        });
+      }
     });
 
     const arrival = this.validTripGoLocation(lastSegment.to)
@@ -217,7 +256,8 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
       kind: 'arrival',
       location: arrival,
       title: arrival.name || arrival.address || this.transloco.translate('common.tripGo.destination'),
-      time: this.route.arrivalTime
+      time: this.route.arrivalTime,
+      showOverlay: true
     });
     return points;
   }
@@ -227,16 +267,23 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
     if (!point || !this.map) return;
     this.clearSimulationTimer();
     this.simulationIndex = index;
-    this.activeSimulationPoint.set(point);
+    if (point.showOverlay) {
+      this.activeSimulationPoint.set(point);
+    }
 
-    const animate = !globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    const animate = !this.prefersReducedMotion();
+    const movementDuration = animate ? this.simulationMovementDuration(index, initial, point.showOverlay) : 0;
+    this.moveSimulationMarker(point.location, movementDuration);
     if (initial) {
       this.map.setZoom(17, { animate });
     }
     this.map.panTo([Number(point.location.latitude), Number(point.location.longitude)], {
       animate,
-      duration: animate ? 1.1 : 0
+      duration: movementDuration
     });
+    this.currentSimulationDelayMs = point.showOverlay
+      ? (this.prefersReducedMotion() ? 1_500 : 3_000)
+      : (this.prefersReducedMotion() ? 0 : Math.round(movementDuration * 1_000) + 70);
     if (this.simulationState === 'playing') {
       this.scheduleNextSimulationPoint();
     }
@@ -250,11 +297,12 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
       } else {
         this.showSimulationPoint(this.simulationIndex + 1);
       }
-    }, 4_000);
+    }, this.currentSimulationDelayMs);
   }
 
   private finishSimulation(): void {
     this.clearSimulationTimer();
+    this.removeSimulationMarker();
     this.activeSimulationPoint.set(null);
     this.simulationIndex = -1;
     this.setSimulationState('idle');
@@ -279,8 +327,83 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
     }
   }
 
+  private prefersReducedMotion(): boolean {
+    return globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+  }
+
+  private moveSimulationMarker(location: TripGoLocation, durationSeconds: number): void {
+    if (!this.map) return;
+    const latLng = leaflet.latLng(Number(location.latitude), Number(location.longitude));
+    if (this.simulationMarker) {
+      this.simulationMarker.getElement()?.style.setProperty('--simulation-duration', `${durationSeconds}s`);
+      this.simulationMarker.setLatLng(latLng);
+      return;
+    }
+
+    const icon = leaflet.divIcon({
+      className: 'tripgo-simulation-cursor',
+      html: `<span class="material-symbols-outlined" aria-hidden="true" style="display:grid;place-items:center;width:38px;height:38px;box-sizing:border-box;border:3px solid #fff;border-radius:50%;background:#000;color:#fff;box-shadow:0 3px 10px rgba(0,0,0,.5);font-size:23px;font-variation-settings:'FILL' 0,'wght' 650,'GRAD' 0,'opsz' 24">gps_fixed</span>`,
+      iconSize: [38, 38],
+      iconAnchor: [19, 19]
+    });
+    this.simulationMarker = leaflet.marker(latLng, {
+      icon,
+      interactive: false,
+      keyboard: false,
+      pane: 'tripgoSimulationPane',
+      zIndexOffset: 4_000
+    }).addTo(this.map);
+  }
+
+  private removeSimulationMarker(): void {
+    if (this.simulationMarker && this.map) {
+      this.simulationMarker.removeFrom(this.map);
+    }
+    this.simulationMarker = undefined;
+  }
+
+  private simulationMovementDuration(index: number, initial: boolean, routePoint: boolean): number {
+    if (initial) return 1.1;
+    const previous = this.simulationPoints[index - 1]?.location;
+    const current = this.simulationPoints[index]?.location;
+    if (!this.validTripGoLocation(previous) || !this.validTripGoLocation(current)) {
+      return routePoint ? .7 : .28;
+    }
+
+    const distanceMeters = this.distanceInMeters(previous, current);
+    if (routePoint && distanceMeters < 2) return .25;
+    return Math.min(3.5, Math.max(.24, distanceMeters / 180));
+  }
+
+  private distanceInMeters(from: TripGoLocation, to: TripGoLocation): number {
+    const toRadians = (degrees: number): number => degrees * Math.PI / 180;
+    const latitudeDelta = toRadians(Number(to.latitude) - Number(from.latitude));
+    const longitudeDelta = toRadians(Number(to.longitude) - Number(from.longitude));
+    const firstLatitude = toRadians(Number(from.latitude));
+    const secondLatitude = toRadians(Number(to.latitude));
+    const haversine = Math.sin(latitudeDelta / 2) ** 2
+      + Math.cos(firstLatitude) * Math.cos(secondLatitude) * Math.sin(longitudeDelta / 2) ** 2;
+    return 2 * 6_371_000 * Math.asin(Math.sqrt(haversine));
+  }
+
   private validTripGoLocation(location: TripGoLocation | undefined): location is TripGoLocation & { latitude: number; longitude: number } {
     return Number.isFinite(location?.latitude) && Number.isFinite(location?.longitude);
+  }
+
+  private fallbackSimulationGeometry(segment: TripGoRouteSegment): TripGoLocation[] {
+    const points: TripGoLocation[] = [];
+    if (this.validTripGoLocation(segment.from)) points.push(segment.from);
+    if (this.validTripGoLocation(segment.to)) points.push(segment.to);
+    return points;
+  }
+
+  private isSameSimulationLocation(
+    left: TripGoLocation | undefined,
+    right: TripGoLocation | undefined
+  ): boolean {
+    if (!this.validTripGoLocation(left) || !this.validTripGoLocation(right)) return false;
+    return Math.abs(left.latitude - right.latitude) < 0.000001
+      && Math.abs(left.longitude - right.longitude) < 0.000001;
   }
 
   private drawRoute(bounds: leaflet.LatLngBounds): void {
