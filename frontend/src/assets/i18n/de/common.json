@@ -859,6 +859,7 @@
       "wikipedia": {
         "title": "Wikipedia-Artikel",
         "empty": "Keine Artikel für diesen Ort gefunden.",
+        "loadFailed": "Artikel konnten nicht geladen werden. Tippe zum Wiederholen.",
         "consentRequired": "Wikipedia-Inhalte zum Anzeigen aktivieren."
       },
       "messages": {

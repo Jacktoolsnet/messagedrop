@@ -13,6 +13,8 @@
     <div class="empty">{{ 'common.tiles.wikipedia.consentRequired' | transloco }}</div>
   } @else if (loading()) {
     <div class="loading"><mat-spinner diameter="32"></mat-spinner></div>
+  } @else if (loadFailed()) {
+    <div class="empty">{{ 'common.tiles.wikipedia.loadFailed' | transloco }}</div>
   } @else if (previewArticles().length > 0) {
     <div class="article-list">
       @for (article of previewArticles(); track article.pageId) {

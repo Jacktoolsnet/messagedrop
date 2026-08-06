@@ -858,6 +858,7 @@
       "wikipedia": {
         "title": "Articles Wikipédia",
         "empty": "Aucun article n’a été trouvé pour ce lieu.",
+        "loadFailed": "Impossible de charger les articles. Touchez pour réessayer.",
         "consentRequired": "Activez le contenu Wikipédia pour l’afficher."
       },
       "messages": {

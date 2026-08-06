@@ -859,6 +859,7 @@
       "wikipedia": {
         "title": "Wikipedia articles",
         "empty": "No articles were found for this place.",
+        "loadFailed": "Articles could not be loaded. Tap to retry.",
         "consentRequired": "Enable Wikipedia content to view it."
       },
       "messages": {

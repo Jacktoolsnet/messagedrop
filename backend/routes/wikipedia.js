@@ -19,7 +19,7 @@ function normalizeBaseUrl(base) {
 
 const base = normalizeBaseUrl(resolveBaseUrl(process.env.WIKIPEDIA_BASE_URL, process.env.WIKIPEDIA_PORT));
 const client = base ? axios.create({
-  baseURL: `${base}/wikipedia`, timeout: Number(process.env.WIKIPEDIA_PROXY_TIMEOUT_MS || 15000),
+  baseURL: `${base}/wikipedia`, timeout: Number(process.env.WIKIPEDIA_PROXY_TIMEOUT_MS || 30000),
   validateStatus: () => true, headers: { Accept: 'application/json' }
 }) : null;
 

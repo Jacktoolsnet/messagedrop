@@ -7,7 +7,7 @@
     <div class="nearby-grid">
       <app-weather-tile [persist]="false" [place]="place()"></app-weather-tile>
       <app-air-quality-tile [persist]="false" [place]="place()"></app-air-quality-tile>
-      <app-wikipedia-tile [place]="place()"></app-wikipedia-tile>
+      <app-wikipedia-tile [place]="place()" [maxSearchRadiusKm]="1"></app-wikipedia-tile>
       <app-message-tile [place]="place()" [radiusMeters]="2000"></app-message-tile>
       <app-tripgo-secret-drop-tile [place]="place()" [radiusMeters]="2000"></app-tripgo-secret-drop-tile>
 

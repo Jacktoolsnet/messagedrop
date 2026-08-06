@@ -23,10 +23,12 @@ import { DisplayMessage } from '../../utils/display-message/display-message.comp
 })
 export class WikipediaTileComponent implements OnChanges {
   @Input() place!: Place;
+  @Input() maxSearchRadiusKm = 7;
 
   readonly articles = signal<WikipediaArticle[]>([]);
   readonly loading = signal(false);
   readonly loaded = signal(false);
+  readonly loadFailed = signal(false);
 
   private readonly dialog = inject(MatDialog);
   private readonly appService = inject(AppService);
@@ -36,9 +38,10 @@ export class WikipediaTileComponent implements OnChanges {
   private readonly destroyRef = inject(DestroyRef);
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['place']) {
+    if (changes['place'] || changes['maxSearchRadiusKm']) {
       this.articles.set([]);
       this.loaded.set(false);
+      this.loadFailed.set(false);
       if (this.wikipediaContentEnabled()) {
         this.loadArticles();
       }
@@ -74,6 +77,7 @@ export class WikipediaTileComponent implements OnChanges {
     }
     const bounds = this.getSearchBounds();
     this.loading.set(true);
+    this.loadFailed.set(false);
     this.wikipedia.getNearby({
       ...bounds,
       zoom: 14,
@@ -101,7 +105,12 @@ export class WikipediaTileComponent implements OnChanges {
           error: () => this.finishLoading(articles)
         });
       },
-      error: () => this.finishLoading([])
+      error: () => {
+        this.articles.set([]);
+        this.loading.set(false);
+        this.loaded.set(false);
+        this.loadFailed.set(true);
+      }
     });
   }
 
@@ -196,11 +205,15 @@ export class WikipediaTileComponent implements OnChanges {
     const box = this.place.boundingBox;
     const validBox = box && [box.latMin, box.latMax, box.lonMin, box.lonMax].every(Number.isFinite)
       && box.latMax > box.latMin && box.lonMax > box.lonMin;
-    const maxLatitudeDelta = 7 / 111.32;
+    const maximumRadiusKm = Number.isFinite(this.maxSearchRadiusKm) && this.maxSearchRadiusKm > 0
+      ? Math.min(7, this.maxSearchRadiusKm)
+      : 7;
+    const maxLatitudeDelta = maximumRadiusKm / 111.32;
     const longitudeScale = Math.max(0.1, Math.cos(latitude * Math.PI / 180));
-    const maxLongitudeDelta = 7 / (111.32 * longitudeScale);
-    const minLatitudeDelta = 1 / 111.32;
-    const minLongitudeDelta = 1 / (111.32 * longitudeScale);
+    const maxLongitudeDelta = maximumRadiusKm / (111.32 * longitudeScale);
+    const minimumRadiusKm = Math.min(1, maximumRadiusKm);
+    const minLatitudeDelta = minimumRadiusKm / 111.32;
+    const minLongitudeDelta = minimumRadiusKm / (111.32 * longitudeScale);
 
     if (validBox) {
       // Nominatim bounding boxes for individual POIs can be only a few metres
