@@ -196,6 +196,7 @@
       "toLocation": "{{ mode }} hasta {{ location }}",
       "toLocationPlatform": "{{ mode }} hasta {{ location }} · andén {{ platform }}",
       "waitingAt": "{{ mode }} en {{ location }}",
+      "serviceToLocation": "{{ service }} hasta {{ location }}",
       "stops": "{{ count }} paradas",
       "transfers": "{{ count }} transbordos",
       "segments": "Tramos del trayecto",

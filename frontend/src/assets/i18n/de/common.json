@@ -197,6 +197,7 @@
       "toLocation": "{{ mode }} zum {{ location }}",
       "toLocationPlatform": "{{ mode }} zum {{ location }} · Steig {{ platform }}",
       "waitingAt": "{{ mode }} am {{ location }}",
+      "serviceToLocation": "{{ service }} bis {{ location }}",
       "stops": "{{ count }} Haltestellen",
       "transfers": "{{ count }} Umstiege",
       "segments": "Abschnitte der Verbindung",

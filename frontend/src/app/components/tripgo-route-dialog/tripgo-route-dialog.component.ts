@@ -19,7 +19,9 @@ import { TripGoRouteMapComponent, TripGoSimulationState } from './tripgo-route-m
 import { TripGoRouteMapPointSelection } from './tripgo-route-map.component';
 import { TripGoRoutePointDialogComponent } from './tripgo-route-point-dialog.component';
 import {
+  tripGoDisplayLocationName,
   tripGoFollowingBoardingPlatform,
+  tripGoServiceLabel,
   tripGoSegmentIcon,
   tripGoSegmentInstructionLocation
 } from './tripgo-route.util';
@@ -228,6 +230,13 @@ export class TripGoRouteDialogComponent implements OnInit {
   }
 
   segmentLabel(route: TripGoRouteOption, segment: TripGoRouteSegment, segmentIndex: number): string {
+    if (segment.type === 'scheduled') {
+      const service = tripGoServiceLabel(segment) || segment.modeIdentifier || '';
+      const destination = tripGoDisplayLocationName(segment.to?.name);
+      return destination
+        ? this.transloco.translate('common.tripGo.serviceToLocation', { service, location: destination })
+        : service;
+    }
     const label = segment.type === 'stationary'
       ? this.transloco.translate('common.tripGo.waitingTime')
       : segment.service?.number || segment.modeLabel || segment.modeIdentifier || '';

@@ -10,7 +10,9 @@ import { TripGoService } from '../../services/tripgo.service';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import {
+  tripGoDisplayLocationName,
   tripGoFollowingBoardingPlatform,
+  tripGoServiceLabel,
   tripGoSegmentIcon,
   tripGoSegmentInstructionLocation
 } from './tripgo-route.util';
@@ -65,12 +67,16 @@ export class TripGoRoutePointDialogComponent implements OnInit {
   readonly subtitle = computed(() => {
     const service = this.segment().service;
     if (this.data.kind === 'arrival') return this.transloco.translate('common.tripGo.routePointDetails.arrival');
-    const serviceLabel = [service?.number, service?.direction].filter(Boolean).join(' · ');
+    const serviceLabel = tripGoServiceLabel(this.segment());
+    const destination = tripGoDisplayLocationName(this.segment().to?.name);
+    const scheduledLabel = serviceLabel && destination
+      ? this.transloco.translate('common.tripGo.serviceToLocation', { service: serviceLabel, location: destination })
+      : serviceLabel;
     const modeLabel = this.modeLabel()
       || this.transloco.translate('common.tripGo.routePointDetails.segment');
     const platform = this.boardingPlatform();
     const location = this.instructionLocation();
-    if (serviceLabel) return serviceLabel;
+    if (service && scheduledLabel) return scheduledLabel;
     if (this.segment().type === 'stationary') {
       return location
         ? this.transloco.translate('common.tripGo.waitingAt', { mode: modeLabel, location })

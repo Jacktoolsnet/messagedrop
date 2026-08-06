@@ -48,11 +48,19 @@ export function tripGoSegmentInstructionLocation(
   const name = segment.type === 'stationary'
     ? followingScheduledSegment?.from?.name || segment.from?.name || segment.to?.name
     : segment.to?.name || followingScheduledSegment?.from?.name;
-  return formatTripGoLocationName(name);
+  return tripGoDisplayLocationName(name);
 }
 
-function formatTripGoLocationName(name: string | undefined): string | undefined {
+export function tripGoDisplayLocationName(name: string | undefined): string | undefined {
   if (!name) return undefined;
   const stationName = name.match(/^(.+),\s*((?:Haupt)?bahnhof)$/i);
   return stationName ? `${stationName[2]} ${stationName[1]}` : name;
+}
+
+export function tripGoServiceLabel(segment: TripGoRouteSegment): string {
+  const mode = segment.modeLabel || '';
+  const number = segment.service?.number || '';
+  if (!mode) return number;
+  if (!number || mode.toLocaleLowerCase().includes(number.toLocaleLowerCase())) return mode;
+  return `${mode} ${number}`;
 }

@@ -1,5 +1,10 @@
 import { TripGoRouteOption } from '../../interfaces/tripgo';
-import { tripGoFollowingBoardingPlatform, tripGoSegmentInstructionLocation } from './tripgo-route.util';
+import {
+  tripGoDisplayLocationName,
+  tripGoFollowingBoardingPlatform,
+  tripGoServiceLabel,
+  tripGoSegmentInstructionLocation
+} from './tripgo-route.util';
 
 describe('tripGoFollowingBoardingPlatform', () => {
   const route = {
@@ -29,8 +34,9 @@ describe('tripGoFollowingBoardingPlatform', () => {
         id: 'train',
         type: 'scheduled',
         modeIdentifier: 'pt_pub_train',
+        modeLabel: 'Zug',
         from: { name: 'Wolfenbüttel, Bahnhof' },
-        service: { startPlatform: 'A' },
+        service: { number: 'RB 45', startPlatform: 'A' },
         geometry: []
       }
     ]
@@ -54,5 +60,13 @@ describe('tripGoFollowingBoardingPlatform', () => {
 
   it('uses the next starting point as waiting location', () => {
     expect(tripGoSegmentInstructionLocation(route, 1)).toBe('Bahnhof Wolfenbüttel');
+  });
+
+  it('combines transport mode and service number', () => {
+    expect(tripGoServiceLabel(route.segments[2])).toBe('Zug RB 45');
+  });
+
+  it('formats station names for route instructions', () => {
+    expect(tripGoDisplayLocationName('Wolfenbüttel, Bahnhof')).toBe('Bahnhof Wolfenbüttel');
   });
 });

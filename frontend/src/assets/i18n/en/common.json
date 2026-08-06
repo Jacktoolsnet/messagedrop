@@ -197,6 +197,7 @@
       "toLocation": "{{ mode }} to {{ location }}",
       "toLocationPlatform": "{{ mode }} to {{ location }} · platform {{ platform }}",
       "waitingAt": "{{ mode }} at {{ location }}",
+      "serviceToLocation": "{{ service }} to {{ location }}",
       "stops": "{{ count }} stops",
       "transfers": "{{ count }} transfers",
       "segments": "Journey segments",

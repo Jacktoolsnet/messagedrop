@@ -196,6 +196,7 @@
       "toLocation": "{{ mode }} jusqu’à {{ location }}",
       "toLocationPlatform": "{{ mode }} jusqu’à {{ location }} · quai {{ platform }}",
       "waitingAt": "{{ mode }} à {{ location }}",
+      "serviceToLocation": "{{ service }} jusqu’à {{ location }}",
       "stops": "{{ count }} arrêts",
       "transfers": "{{ count }} correspondances",
       "segments": "Étapes du trajet",

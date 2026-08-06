@@ -6,7 +6,9 @@ import { Location } from '../../interfaces/location';
 import { TripGoLocation, TripGoRouteOption, TripGoRouteSegment } from '../../interfaces/tripgo';
 import { TripGoTimelineWeatherComponent } from './tripgo-timeline-weather.component';
 import {
+  tripGoDisplayLocationName,
   tripGoFollowingBoardingPlatform,
+  tripGoServiceLabel,
   tripGoSegmentIcon,
   tripGoSegmentInstructionLocation
 } from './tripgo-route.util';
@@ -168,6 +170,13 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
   }
 
   segmentLabel(segment: TripGoRouteSegment): string {
+    if (segment.type === 'scheduled') {
+      const service = tripGoServiceLabel(segment) || segment.modeIdentifier || '';
+      const destination = tripGoDisplayLocationName(segment.to?.name);
+      return destination
+        ? this.transloco.translate('common.tripGo.serviceToLocation', { service, location: destination })
+        : service;
+    }
     const label = segment.type === 'stationary'
       ? this.transloco.translate('common.tripGo.waitingTime')
       : segment.service?.number || segment.modeLabel || segment.modeIdentifier || '';
