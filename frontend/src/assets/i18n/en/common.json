@@ -251,7 +251,7 @@
         "privateDocuments": "Private documents",
         "secretDrops": "Visible SecretDrops",
         "loadingSecretDrops": "Loading SecretDrops …",
-        "noSecretDrops": "No visible SecretDrops found.",
+        "noSecretDrops": "No SecretDrops found.",
         "loginRequired": "Sign-in required",
         "comingSoon": "Nearby search will be added in the next step."
       },

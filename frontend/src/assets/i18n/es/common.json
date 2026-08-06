@@ -250,7 +250,7 @@
         "privateDocuments": "Documentos privados",
         "secretDrops": "SecretDrops visibles",
         "loadingSecretDrops": "Cargando SecretDrops …",
-        "noSecretDrops": "No se encontraron SecretDrops visibles.",
+        "noSecretDrops": "No se encontraron SecretDrops.",
         "loginRequired": "Es necesario iniciar sesión",
         "comingSoon": "La búsqueda cercana se añadirá en el siguiente paso."
       },
