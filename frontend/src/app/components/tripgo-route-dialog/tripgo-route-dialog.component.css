@@ -229,6 +229,7 @@
 .timeline-segment,
 .timeline-arrival {
   position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: 4rem 1.65rem minmax(0, 1fr);
   column-gap: 0.4rem;
@@ -247,7 +248,7 @@
 .timeline-start::after {
   content: '';
   position: absolute;
-  z-index: 0;
+  z-index: -1;
   top: 1.65rem;
   bottom: -.15rem;
   left: 5.18rem;
@@ -259,7 +260,7 @@
 .timeline-segment::after {
   content: '';
   position: absolute;
-  z-index: 0;
+  z-index: -1;
   top: 1.65rem;
   bottom: -0.15rem;
   left: 5.18rem;
@@ -336,6 +337,8 @@
 }
 
 .timeline-content {
+  position: relative;
+  z-index: 1;
   display: flex;
   min-width: 0;
   flex-direction: column;
@@ -372,7 +375,7 @@
 
 .timeline-intermediate-stops {
   display: grid;
-  gap: 0.25rem;
+  gap: 0.4rem;
   margin: 0.25rem 0 0;
   padding: 0;
   color: var(--mat-sys-on-surface-variant);
@@ -381,19 +384,53 @@
 }
 
 .timeline-intermediate-stops li {
-  display: grid;
-  grid-template-columns: 0.7rem minmax(0, 1fr);
+  position: relative;
+  display: flex;
+  min-height: 1.65rem;
   align-items: center;
-  gap: 0.35rem;
 }
 
-.timeline-stop-dot {
-  width: 0.42rem;
-  height: 0.42rem;
-  justify-self: center;
-  border: 2px solid var(--stop-color);
+.timeline-stop-marker {
+  position: absolute;
+  z-index: 3;
+  isolation: isolate;
+  top: 50%;
+  left: -2rem;
+  display: inline-grid;
+  width: 1.65rem;
+  height: 1.65rem;
+  place-items: center;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 0.18rem solid var(--stop-color);
   border-radius: 50%;
-  background: var(--mat-sys-surface);
+  background-color: var(--mat-sys-surface);
+  color: var(--stop-color);
+  box-shadow: 0 0 0 0.12rem var(--mat-sys-surface);
+  opacity: 1;
+  transform: translateY(-50%);
+}
+
+.timeline-stop-marker::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  border-radius: inherit;
+  background-color: var(--mat-sys-surface);
+}
+
+.timeline-stop-marker mat-icon {
+  position: relative;
+  z-index: 1;
+  width: 0.9rem;
+  height: 0.9rem;
+  font-size: 0.9rem;
+}
+
+.timeline-final-stop {
+  font-weight: 600;
+  color: var(--mat-sys-on-surface);
 }
 
 .timeline-metrics {

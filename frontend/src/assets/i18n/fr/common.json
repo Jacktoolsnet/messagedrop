@@ -199,7 +199,7 @@
       "serviceToLocation": "{{ service }} jusqu’à {{ location }}",
       "untilLocation": "jusqu’à {{ location }}",
       "untilLocationPlatform": "jusqu’à {{ location }} · quai {{ platform }}",
-      "intermediateStops": "Arrêts intermédiaires",
+      "segmentStops": "Arrêts de ce trajet",
       "stops": "{{ count }} arrêts intermédiaires",
       "transfers": "{{ count }} correspondances",
       "segments": "Étapes du trajet",

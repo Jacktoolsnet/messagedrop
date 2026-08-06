@@ -199,7 +199,7 @@
       "serviceToLocation": "{{ service }} hasta {{ location }}",
       "untilLocation": "hasta {{ location }}",
       "untilLocationPlatform": "hasta {{ location }} · andén {{ platform }}",
-      "intermediateStops": "Paradas intermedias",
+      "segmentStops": "Paradas de este tramo",
       "stops": "{{ count }} paradas intermedias",
       "transfers": "{{ count }} transbordos",
       "segments": "Tramos del trayecto",

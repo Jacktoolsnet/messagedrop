@@ -200,7 +200,7 @@
       "serviceToLocation": "{{ service }} to {{ location }}",
       "untilLocation": "to {{ location }}",
       "untilLocationPlatform": "to {{ location }} · platform {{ platform }}",
-      "intermediateStops": "Intermediate stops",
+      "segmentStops": "Stops on this segment",
       "stops": "{{ count }} intermediate stops",
       "transfers": "{{ count }} transfers",
       "segments": "Journey segments",

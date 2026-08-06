@@ -183,22 +183,36 @@
                   }
                   <strong class="timeline-mode">{{ segmentTimelineLabel(route, segment, segmentIndex) }}</strong>
                   @if (segmentDestination(segment); as destination) {
-                    <span class="timeline-detail">
-                      @if (segmentDestinationPlatform(route, segment, segmentIndex); as platform) {
-                        {{ 'common.tripGo.untilLocationPlatform' | transloco:{ location: destination, platform } }}
-                      } @else {
-                        {{ 'common.tripGo.untilLocation' | transloco:{ location: destination } }}
-                      }
-                    </span>
-                  }
-                  @if (segment.service?.intermediateStops?.length) {
-                    <ol class="timeline-intermediate-stops"
-                      [style.--stop-color]="segment.color || '#6750a4'"
-                      [attr.aria-label]="'common.tripGo.intermediateStops' | transloco">
-                      @for (stop of segment.service?.intermediateStops; track stop.stopCode || $index) {
-                        <li><span class="timeline-stop-dot" aria-hidden="true"></span><span>{{ stop.name }}</span></li>
-                      }
-                    </ol>
+                    @if (segment.type === 'scheduled') {
+                      <ol class="timeline-intermediate-stops"
+                        [style.--stop-color]="segment.color || '#6750a4'"
+                        [attr.aria-label]="'common.tripGo.segmentStops' | transloco">
+                        @for (stop of segment.service?.intermediateStops; track stop.stopCode || $index) {
+                          <li>
+                            <span class="timeline-stop-marker" aria-hidden="true"><mat-icon>pin_drop</mat-icon></span>
+                            <span>{{ stop.name }}</span>
+                          </li>
+                        }
+                        <li class="timeline-final-stop">
+                          <span class="timeline-stop-marker" aria-hidden="true"><mat-icon>flag</mat-icon></span>
+                          <span>
+                            @if (segmentDestinationPlatform(route, segment, segmentIndex); as platform) {
+                              {{ 'common.tripGo.untilLocationPlatform' | transloco:{ location: destination, platform } }}
+                            } @else {
+                              {{ 'common.tripGo.untilLocation' | transloco:{ location: destination } }}
+                            }
+                          </span>
+                        </li>
+                      </ol>
+                    } @else {
+                      <span class="timeline-detail">
+                        @if (segmentDestinationPlatform(route, segment, segmentIndex); as platform) {
+                          {{ 'common.tripGo.untilLocationPlatform' | transloco:{ location: destination, platform } }}
+                        } @else {
+                          {{ 'common.tripGo.untilLocation' | transloco:{ location: destination } }}
+                        }
+                      </span>
+                    }
                   }
                   <span class="timeline-metrics">
                     @if (segment.durationSeconds !== undefined) {

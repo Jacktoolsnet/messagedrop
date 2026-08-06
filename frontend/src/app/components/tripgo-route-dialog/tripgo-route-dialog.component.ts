@@ -258,6 +258,7 @@ export class TripGoRouteDialogComponent implements OnInit {
     segment: TripGoRouteSegment,
     segmentIndex: number
   ): string | undefined {
+    if (segment.type === 'scheduled') return segment.service?.endPlatform;
     return tripGoSegmentIcon(segment) === 'directions_walk'
       ? tripGoFollowingBoardingPlatform(route, segmentIndex)
       : undefined;

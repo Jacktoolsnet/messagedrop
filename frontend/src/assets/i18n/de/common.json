@@ -200,7 +200,7 @@
       "serviceToLocation": "{{ service }} bis {{ location }}",
       "untilLocation": "bis {{ location }}",
       "untilLocationPlatform": "bis {{ location }} · Steig {{ platform }}",
-      "intermediateStops": "Zwischenhaltestellen",
+      "segmentStops": "Haltestellen des Abschnitts",
       "stops": "{{ count }} Zwischenhalte",
       "transfers": "{{ count }} Umstiege",
       "segments": "Abschnitte der Verbindung",
