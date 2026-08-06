@@ -16,6 +16,7 @@ import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.comp
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { LocationPickerDialogComponent } from '../utils/location-picker-dialog/location-picker-dialog.component';
 import { TripGoRouteMapComponent } from './tripgo-route-map.component';
+import { tripGoSegmentIcon } from './tripgo-route.util';
 
 export interface TripGoRouteDialogData {
   destination: Location;
@@ -179,13 +180,7 @@ export class TripGoRouteDialogComponent implements OnInit {
   }
 
   segmentIcon(segment: TripGoRouteSegment): string {
-    const identifier = segment.modeIdentifier || '';
-    if (identifier.includes('bus')) return 'directions_bus';
-    if (identifier.includes('tram')) return 'tram';
-    if (identifier.includes('train') || identifier.includes('subway')) return 'train';
-    if (identifier.startsWith('wa_')) return 'directions_walk';
-    if (segment.type === 'stationary') return 'schedule';
-    return 'directions_transit';
+    return tripGoSegmentIcon(segment);
   }
 
   private loadRoutes(origin: Location, destination: Location): void {

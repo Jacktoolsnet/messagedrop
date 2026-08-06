@@ -2864,7 +2864,7 @@
       "location": { "title": "Obtener ubicación", "desc": "Se realiza una nueva solicitud de ubicación de alta precisión al abrir o actualizar. Nominatim añade información adecuada del lugar y la dirección para el inicio y el destino." },
       "routePoints": { "title": "Cambiar inicio o destino", "desc": "Usa el lápiz de cada tarjeta para abrir la búsqueda de lugares. Tras elegir, la ruta se vuelve a calcular con el nuevo inicio o destino." },
       "routes": { "title": "Conexiones", "desc": "Los resultados muestran salida, llegada, duración, transbordos y cada tramo a pie o en transporte público." },
-      "map": { "title": "Vista de mapa", "desc": "El icono del mapa en la cabecera de una conexión muestra su recorrido con tramos de colores. Usa el icono de lista de la barra de acciones para volver a las rutas." },
+      "map": { "title": "Vista de mapa", "desc": "El icono del mapa en la cabecera de una conexión muestra su recorrido con los colores y símbolos de transporte de la línea de tiempo. Usa el icono de lista para volver a las rutas." },
       "destinationReached": { "title": "Ya estás en el destino", "desc": "Si el inicio y el destino están separados por 50 metros o menos, no se envía ninguna solicitud a TripGo. En su lugar se muestra que ya estás en el destino." },
       "refresh": { "title": "Actualizar", "desc": "Obtiene de nuevo tu ubicación y calcula nuevas conexiones." },
       "close": { "title": "Cerrar", "desc": "Cierra la vista de rutas." },

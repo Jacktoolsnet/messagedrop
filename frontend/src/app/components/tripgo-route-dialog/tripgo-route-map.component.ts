@@ -1,19 +1,8 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, Input, OnDestroy } from '@angular/core';
 import * as leaflet from 'leaflet';
 import { Location } from '../../interfaces/location';
-import { TripGoRouteOption } from '../../interfaces/tripgo';
-
-const startIcon = leaflet.icon({
-  iconUrl: 'assets/markers/location-marker.svg',
-  iconSize: [32, 40],
-  iconAnchor: [16, 40]
-});
-
-const destinationIcon = leaflet.icon({
-  iconUrl: 'assets/markers/selected-marker.svg',
-  iconSize: [32, 40],
-  iconAnchor: [16, 40]
-});
+import { TripGoRouteOption, TripGoRouteSegment } from '../../interfaces/tripgo';
+import { tripGoSegmentIcon } from './tripgo-route.util';
 
 @Component({
   selector: 'app-tripgo-route-map',
@@ -54,9 +43,8 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
     }).addTo(this.map);
 
     const bounds = leaflet.latLngBounds([]);
-    this.addEndpoint(this.origin, startIcon, bounds);
     this.drawRoute(bounds);
-    this.addEndpoint(this.destination, destinationIcon, bounds);
+    this.drawTimelineMarkers(bounds);
 
     if (bounds.isValid()) {
       this.map.fitBounds(bounds, { padding: [32, 32], maxZoom: 17 });
@@ -66,22 +54,106 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
 
   private drawRoute(bounds: leaflet.LatLngBounds): void {
     for (const segment of this.route.segments) {
-      const color = segment.color || '#6750a4';
+      const color = safeColor(segment.color);
+      let drewGeometry = false;
       for (const encodedPath of segment.geometry) {
         const points = decodePolyline(encodedPath);
         if (points.length < 2) continue;
+        drewGeometry = true;
         leaflet.polyline(points, { color: '#ffffff', weight: 9, opacity: 0.8 }).addTo(this.map!);
         leaflet.polyline(points, { color, weight: 6, opacity: 0.9 }).addTo(this.map!);
         for (const point of points) bounds.extend(point);
       }
+      if (!drewGeometry) this.drawGeometryFallback(segment, color, bounds);
     }
   }
 
-  private addEndpoint(location: Location, icon: leaflet.Icon, bounds: leaflet.LatLngBounds): void {
-    const point = leaflet.latLng(location.latitude, location.longitude);
-    leaflet.marker(point, { icon }).addTo(this.map!);
-    bounds.extend(point);
+  private drawTimelineMarkers(bounds: leaflet.LatLngBounds): void {
+    this.route.segments.forEach((segment, index) => {
+      const location = this.segmentLocation(segment, 'from') || (index === 0 ? this.origin : null);
+      if (!location) return;
+      this.addModeMarker(
+        location,
+        tripGoSegmentIcon(segment),
+        safeColor(segment.color),
+        segment.from?.name,
+        index
+      );
+      bounds.extend([location.latitude, location.longitude]);
+    });
+
+    const lastSegment = this.route.segments.at(-1);
+    const arrival = lastSegment ? this.segmentLocation(lastSegment, 'to') : null;
+    const destination = arrival || this.destination;
+    this.addModeMarker(
+      destination,
+      'location_on',
+      safeColor(lastSegment?.color),
+      lastSegment?.to?.name,
+      this.route.segments.length
+    );
+    bounds.extend([destination.latitude, destination.longitude]);
   }
+
+  private addModeMarker(
+    location: Location,
+    iconName: string,
+    color: string,
+    label: string | undefined,
+    index: number
+  ): void {
+    const icon = leaflet.divIcon({
+      className: '',
+      html: `<span class="material-symbols-outlined" aria-hidden="true" style="display:grid;place-items:center;width:34px;height:34px;box-sizing:border-box;border:3px solid #fff;border-radius:50%;background:${color};color:${contrastColor(color)};box-shadow:0 2px 7px rgba(0,0,0,.4);font-size:19px;font-variation-settings:'FILL' 0,'wght' 600,'GRAD' 0,'opsz' 24">${iconName}</span>`,
+      iconSize: [34, 34],
+      iconAnchor: [17, 17]
+    });
+    const marker = leaflet.marker([location.latitude, location.longitude], {
+      icon,
+      zIndexOffset: 1000 + index
+    }).addTo(this.map!);
+    if (label) {
+      const tooltip = document.createElement('span');
+      tooltip.textContent = label;
+      marker.bindTooltip(tooltip, { direction: 'top', offset: [0, -16] });
+    }
+  }
+
+  private drawGeometryFallback(segment: TripGoRouteSegment, color: string, bounds: leaflet.LatLngBounds): void {
+    const from = this.segmentLocation(segment, 'from');
+    const to = this.segmentLocation(segment, 'to');
+    if (!from || !to) return;
+    const points: leaflet.LatLngTuple[] = [
+      [from.latitude, from.longitude],
+      [to.latitude, to.longitude]
+    ];
+    leaflet.polyline(points, { color: '#ffffff', weight: 8, opacity: 0.75, dashArray: '7 7' }).addTo(this.map!);
+    leaflet.polyline(points, { color, weight: 5, opacity: 0.85, dashArray: '7 7' }).addTo(this.map!);
+    bounds.extend(points[0]);
+    bounds.extend(points[1]);
+  }
+
+  private segmentLocation(segment: TripGoRouteSegment, endpoint: 'from' | 'to'): Location | null {
+    const location = segment[endpoint];
+    if (!Number.isFinite(location?.latitude) || !Number.isFinite(location?.longitude)) return null;
+    return {
+      latitude: Number(location?.latitude),
+      longitude: Number(location?.longitude),
+      plusCode: ''
+    };
+  }
+}
+
+function safeColor(value: string | undefined): string {
+  return typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value) ? value : '#6750a4';
+}
+
+function contrastColor(color: string): '#000000' | '#ffffff' {
+  const red = Number.parseInt(color.slice(1, 3), 16);
+  const green = Number.parseInt(color.slice(3, 5), 16);
+  const blue = Number.parseInt(color.slice(5, 7), 16);
+  const luminance = (red * 299 + green * 587 + blue * 114) / 1000;
+  return luminance >= 150 ? '#000000' : '#ffffff';
 }
 
 export function decodePolyline(encoded: string, precision = 5): leaflet.LatLngTuple[] {
