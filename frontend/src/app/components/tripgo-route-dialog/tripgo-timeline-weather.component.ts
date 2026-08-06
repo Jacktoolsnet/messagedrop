@@ -49,7 +49,8 @@ export class TripGoTimelineWeatherComponent implements OnChanges {
   private createTransientPlace(latitude: number, longitude: number): Place {
     const coordinateRadius = 0.0001;
     return {
-      id: `tripgo-route-point:weather:${latitude.toFixed(3)}:${longitude.toFixed(3)}`,
+      // Nearby stops share one request because weather data does not vary at metre-level resolution.
+      id: `tripgo-route-point:weather:${latitude.toFixed(2)}:${longitude.toFixed(2)}`,
       userId: '',
       location: {
         latitude,

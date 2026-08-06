@@ -2889,7 +2889,7 @@
       },
       "routes": {
         "title": "Verbindungen",
-        "desc": "Die Ergebnisse zeigen Abfahrts- und Ankunftszeit, Dauer, Umstiege sowie die einzelnen Fußweg- und ÖPNV-Abschnitte."
+        "desc": "Die Ergebnisse zeigen Abfahrts- und Ankunftszeit, Dauer, Umstiege sowie die einzelnen Fußweg- und ÖPNV-Abschnitte. An jedem Knoten erscheinen außerdem das aktuelle Wettersymbol und die Temperatur."
       },
       "map": {
         "title": "Kartenansicht",
@@ -2913,7 +2913,7 @@
       },
       "privacy": {
         "title": "Datenschutz",
-        "desc": "Erst nach deinem Aufruf werden Start- und Zielkoordinaten über das MessageDrop-Backend an SkedGo/TripGo und zur Ortsbestimmung an den konfigurierten Nominatim-Dienst übertragen. Die Routenansicht speichert die Orte nicht dauerhaft."
+        "desc": "Erst nach deinem Aufruf werden Start- und Zielkoordinaten über das MessageDrop-Backend an SkedGo/TripGo und zur Ortsbestimmung an den konfigurierten Nominatim-Dienst übertragen. Für das Wetter an den Routenknoten werden deren Koordinaten an den konfigurierten Open-Meteo-Dienst gesendet. Die Routenansicht speichert die Orte nicht dauerhaft."
       }
     }
   },

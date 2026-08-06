@@ -2889,7 +2889,7 @@
       },
       "routes": {
         "title": "Connections",
-        "desc": "Results show departure and arrival, duration, transfers, and each walking or public-transport segment."
+        "desc": "Results show departure and arrival, duration, transfers, and each walking or public-transport segment. Every node also displays the current weather icon and temperature."
       },
       "map": {
         "title": "Map view",
@@ -2913,7 +2913,7 @@
       },
       "privacy": {
         "title": "Privacy",
-        "desc": "Only after you invoke this function are the start and destination coordinates sent through the MessageDrop backend to SkedGo/TripGo and to the configured Nominatim service for place lookup. The route view does not persist these locations."
+        "desc": "Only after you invoke this function are the start and destination coordinates sent through the MessageDrop backend to SkedGo/TripGo and to the configured Nominatim service for place lookup. Route-node coordinates are sent to the configured Open-Meteo service for weather data. The route view does not persist these locations."
       }
     }
   },

@@ -2871,7 +2871,7 @@
       },
       "routes": {
         "title": "Conexiones",
-        "desc": "Los resultados muestran salida, llegada, duración, transbordos y cada tramo a pie o en transporte público."
+        "desc": "Los resultados muestran salida, llegada, duración, transbordos y cada tramo a pie o en transporte público. Cada nodo muestra también el icono del tiempo actual y la temperatura."
       },
       "map": {
         "title": "Vista de mapa",
@@ -2895,7 +2895,7 @@
       },
       "privacy": {
         "title": "Privacidad",
-        "desc": "Solo al usar esta función se envían las coordenadas de inicio y destino mediante el backend de MessageDrop a SkedGo/TripGo y al servicio Nominatim configurado para identificar los lugares. La vista no guarda estas ubicaciones."
+        "desc": "Solo al usar esta función se envían las coordenadas de inicio y destino mediante el backend de MessageDrop a SkedGo/TripGo y al servicio Nominatim configurado para identificar los lugares. Las coordenadas de los nodos se envían al servicio Open-Meteo configurado para obtener el tiempo. La vista no guarda estas ubicaciones."
       }
     }
   },

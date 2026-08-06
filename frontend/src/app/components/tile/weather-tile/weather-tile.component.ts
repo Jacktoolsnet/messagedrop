@@ -81,25 +81,21 @@ export class WeatherTileComponent implements OnChanges {
 
   getHourlyMinMax(field: 'temperature' | 'precipitationProbability' | 'precipitation' | 'wind' | 'pressure' | 'uvIndex'): { min: number, max: number } | undefined {
     const weather = this.weather;
-    if (
-      !weather ||
-      !weather.hourly ||
-      !weather.current?.time
-    ) {
+    if (!weather?.hourly || !weather.current?.time) {
       return undefined;
     }
+
     const currentDate = weather.current.time.split('T')[0];
-
     const values = weather.hourly
-      .filter((h: Weather['hourly'][number]) => h.time.startsWith(currentDate))
-      .map((h: Weather['hourly'][number]) => h[field])
-      .filter((v: unknown): v is number => typeof v === 'number');
+      .filter((hour: Weather['hourly'][number]) => hour.time.startsWith(currentDate))
+      .map((hour: Weather['hourly'][number]) => hour[field])
+      .filter((value: unknown): value is number => typeof value === 'number');
 
-    if (values.length === 0) return undefined;
+    if (!values.length) {
+      return undefined;
+    }
 
-    return {
-      min: Math.min(...values),
-      max: Math.max(...values)
-    };
+    return { min: Math.min(...values), max: Math.max(...values) };
   }
+
 }

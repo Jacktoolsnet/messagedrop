@@ -134,20 +134,46 @@
           </header>
 
           <ol class="timeline" [attr.aria-label]="'common.tripGo.segments' | transloco">
-            @for (segment of route.segments; track segment.id) {
+            @if (route.segments[0]; as firstSegment) {
+              <li class="timeline-start">
+                <div class="timeline-node-meta">
+                  <time class="timeline-time" [attr.datetime]="route.departureTime">
+                    <mat-icon aria-hidden="true">schedule</mat-icon>
+                    <span>{{ formatTime(route.departureTime) }}</span>
+                  </time>
+                  @if (firstSegment.from?.latitude !== undefined && firstSegment.from?.longitude !== undefined) {
+                    <app-tripgo-timeline-weather class="timeline-node-weather"
+                      [location]="firstSegment.from"></app-tripgo-timeline-weather>
+                  }
+                </div>
+                <span class="timeline-marker timeline-marker--start" aria-hidden="true">
+                  <mat-icon>my_location</mat-icon>
+                </span>
+                <strong class="timeline-location timeline-location--start">
+                  {{ firstSegment.from?.name || originDetails()?.name || ('common.tripGo.origin' | transloco) }}
+                </strong>
+              </li>
+            }
+            @for (segment of route.segments; track segment.id; let first = $first) {
               <li class="timeline-segment" [style.--segment-color]="segment.color || '#6750a4'">
-                <time class="timeline-time" [attr.datetime]="segment.startTime">
-                  {{ segment.startTime ? formatTime(segment.startTime) : '' }}
-                </time>
+                <div class="timeline-node-meta">
+                  @if (!first) {
+                    <time class="timeline-time" [attr.datetime]="segment.startTime">
+                      <mat-icon aria-hidden="true">schedule</mat-icon>
+                      <span>{{ segment.startTime ? formatTime(segment.startTime) : '' }}</span>
+                    </time>
+                    @if (segment.from?.latitude !== undefined && segment.from?.longitude !== undefined) {
+                      <app-tripgo-timeline-weather class="timeline-node-weather"
+                        [location]="segment.from"></app-tripgo-timeline-weather>
+                    }
+                  }
+                </div>
                 <span class="timeline-marker" aria-hidden="true">
                   <mat-icon>{{ segmentIcon(segment) }}</mat-icon>
                 </span>
                 <div class="timeline-content">
-                  @if (segment.from?.name) {
+                  @if (!first && segment.from?.name) {
                     <span class="timeline-location">{{ segment.from?.name }}</span>
-                  }
-                  @if (segment.from?.latitude !== undefined && segment.from?.longitude !== undefined) {
-                    <app-tripgo-timeline-weather [location]="segment.from"></app-tripgo-timeline-weather>
                   }
                   <strong class="timeline-mode">{{ segmentLabel(segment) }}</strong>
                   @if (segment.service?.direction) {
@@ -175,18 +201,24 @@
               </li>
             }
             <li class="timeline-arrival">
-              <time class="timeline-time" [attr.datetime]="route.arrivalTime">{{ formatTime(route.arrivalTime) }}</time>
+              <div class="timeline-node-meta">
+                <time class="timeline-time" [attr.datetime]="route.arrivalTime">
+                  <mat-icon aria-hidden="true">schedule</mat-icon>
+                  <span>{{ formatTime(route.arrivalTime) }}</span>
+                </time>
+                @if (route.segments.at(-1)?.to; as arrival) {
+                  @if (arrival.latitude !== undefined && arrival.longitude !== undefined) {
+                    <app-tripgo-timeline-weather class="timeline-node-weather"
+                      [location]="arrival"></app-tripgo-timeline-weather>
+                  }
+                }
+              </div>
               <span class="timeline-marker timeline-marker--arrival" aria-hidden="true">
                 <mat-icon>location_on</mat-icon>
               </span>
               <strong class="timeline-location timeline-location--arrival">
                 {{ route.segments.at(-1)?.to?.name || ('common.tripGo.destination' | transloco) }}
               </strong>
-              @if (route.segments.at(-1)?.to; as arrival) {
-                @if (arrival.latitude !== undefined && arrival.longitude !== undefined) {
-                  <app-tripgo-timeline-weather class="timeline-arrival-weather" [location]="arrival"></app-tripgo-timeline-weather>
-                }
-              }
             </li>
           </ol>
         </article>

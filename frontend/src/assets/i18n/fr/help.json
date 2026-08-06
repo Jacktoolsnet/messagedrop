@@ -2871,7 +2871,7 @@
       },
       "routes": {
         "title": "Trajets",
-        "desc": "Les résultats indiquent le départ, l’arrivée, la durée, les correspondances et chaque étape à pied ou en transports publics."
+        "desc": "Les résultats indiquent le départ, l’arrivée, la durée, les correspondances et chaque étape à pied ou en transports publics. Chaque nœud affiche également l’icône météo actuelle et la température."
       },
       "map": {
         "title": "Vue cartographique",
@@ -2895,7 +2895,7 @@
       },
       "privacy": {
         "title": "Confidentialité",
-        "desc": "Après votre action, les coordonnées de départ et de destination sont transmises via le backend MessageDrop à SkedGo/TripGo et au service Nominatim configuré pour identifier les lieux. La vue ne conserve pas ces positions."
+        "desc": "Après votre action, les coordonnées de départ et de destination sont transmises via le backend MessageDrop à SkedGo/TripGo et au service Nominatim configuré pour identifier les lieux. Les coordonnées des nœuds sont envoyées au service Open-Meteo configuré pour obtenir la météo. La vue ne conserve pas ces positions."
       }
     }
   },

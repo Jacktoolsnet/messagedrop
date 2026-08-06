@@ -225,17 +225,35 @@
   list-style: none;
 }
 
+.timeline-start,
 .timeline-segment,
 .timeline-arrival {
   position: relative;
   display: grid;
-  grid-template-columns: 3.2rem 1.65rem minmax(0, 1fr);
+  grid-template-columns: 4rem 1.65rem minmax(0, 1fr);
   column-gap: 0.4rem;
+}
+
+.timeline-start {
+  min-height: 4rem;
+  padding-bottom: .75rem;
 }
 
 .timeline-segment {
   min-height: 5.1rem;
   padding-bottom: 0.75rem;
+}
+
+.timeline-start::after {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  top: 1.65rem;
+  bottom: -.15rem;
+  left: 5.18rem;
+  width: .2rem;
+  border-radius: 999px;
+  background: #000000;
 }
 
 .timeline-segment::after {
@@ -244,18 +262,40 @@
   z-index: 0;
   top: 1.65rem;
   bottom: -0.15rem;
-  left: 4.38rem;
+  left: 5.18rem;
   width: 0.2rem;
   border-radius: 999px;
   background: var(--segment-color);
 }
 
 .timeline-time {
+  display: flex;
+  align-items: center;
+  gap: .2rem;
   padding-top: 0.25rem;
   font-variant-numeric: tabular-nums;
   font-size: 0.78rem;
   font-weight: 600;
   color: var(--mat-sys-on-surface-variant);
+}
+
+.timeline-time mat-icon {
+  width: .9rem;
+  height: .9rem;
+  flex: 0 0 auto;
+  font-size: .9rem;
+}
+
+.timeline-node-meta {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: .2rem;
+}
+
+.timeline-node-weather {
+  max-width: 100%;
 }
 
 .timeline-marker {
@@ -280,7 +320,19 @@
 }
 
 .timeline-marker--arrival {
-  --segment-color: var(--mat-sys-primary);
+  --segment-color: #000000;
+  border-color: #ffffff;
+  background: #000000;
+  color: #ffffff;
+  box-shadow: 0 2px 7px color-mix(in srgb, #000000 40%, transparent);
+}
+
+.timeline-marker--start {
+  --segment-color: #000000;
+  border-color: #ffffff;
+  background: #000000;
+  color: #ffffff;
+  box-shadow: 0 2px 7px color-mix(in srgb, #000000 40%, transparent);
 }
 
 .timeline-content {
@@ -289,11 +341,6 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 0.15rem;
-}
-
-.timeline-arrival-weather {
-  grid-column: 3;
-  margin-top: .2rem;
 }
 
 .timeline-location,
@@ -306,6 +353,12 @@
 .timeline-location {
   font-size: 0.82rem;
   color: var(--mat-sys-on-surface-variant);
+}
+
+.timeline-location--start {
+  padding-top: .25rem;
+  color: var(--mat-sys-on-surface);
+  font-size: .9rem;
 }
 
 .timeline-mode {

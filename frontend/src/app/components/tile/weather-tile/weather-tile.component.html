@@ -16,11 +16,10 @@
 <div class="tile weather-tile" role="button" tabindex="0" (click)="openWeatherDetails()"
     (keyup.enter)="openWeatherDetails()" (keyup.space)="openWeatherDetails()">
     <div class="tile-header">
-        <mat-icon class="tile-icon">cloud</mat-icon>
+        <i class="wi wi-{{ weatherIcon }} tile-icon" aria-hidden="true"></i>
         <span class="tile-title">{{ 'common.tileTypes.weather' | transloco }}</span>
     </div>
     <div class="tile-info">
-        <i class="wi wi-{{ weatherIcon }}"></i>
         <div class="tile-content">
             <div class="tile-temperature" [style.color]="tempColor">{{ weather.current.temperature }} °C</div>
             @if (minMax) {
