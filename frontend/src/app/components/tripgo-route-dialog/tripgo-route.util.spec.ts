@@ -1,5 +1,5 @@
 import { TripGoRouteOption } from '../../interfaces/tripgo';
-import { tripGoFollowingBoardingPlatform } from './tripgo-route.util';
+import { tripGoFollowingBoardingPlatform, tripGoSegmentInstructionLocation } from './tripgo-route.util';
 
 describe('tripGoFollowingBoardingPlatform', () => {
   const route = {
@@ -11,12 +11,25 @@ describe('tripGoFollowingBoardingPlatform', () => {
     transfers: 0,
     modes: ['wa_wal', 'pt_pub_train'],
     segments: [
-      { id: 'walk', type: 'unscheduled', modeIdentifier: 'wa_wal', geometry: [] },
-      { id: 'transfer', type: 'stationary', modeLabel: 'Transfer', geometry: [] },
+      {
+        id: 'walk',
+        type: 'unscheduled',
+        modeIdentifier: 'wa_wal',
+        to: { name: 'Wolfenbüttel, Bahnhof' },
+        geometry: []
+      },
+      {
+        id: 'transfer',
+        type: 'stationary',
+        modeLabel: 'Transfer',
+        from: { name: 'Wolfenbüttel, Bahnhof' },
+        geometry: []
+      },
       {
         id: 'train',
         type: 'scheduled',
         modeIdentifier: 'pt_pub_train',
+        from: { name: 'Wolfenbüttel, Bahnhof' },
         service: { startPlatform: 'A' },
         geometry: []
       }
@@ -33,5 +46,13 @@ describe('tripGoFollowingBoardingPlatform', () => {
 
   it('does not add a following platform to the scheduled segment itself', () => {
     expect(tripGoFollowingBoardingPlatform(route, 2)).toBeUndefined();
+  });
+
+  it('uses the next starting point as walking destination', () => {
+    expect(tripGoSegmentInstructionLocation(route, 0)).toBe('Bahnhof Wolfenbüttel');
+  });
+
+  it('uses the next starting point as waiting location', () => {
+    expect(tripGoSegmentInstructionLocation(route, 1)).toBe('Bahnhof Wolfenbüttel');
   });
 });

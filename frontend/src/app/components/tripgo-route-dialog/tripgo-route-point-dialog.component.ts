@@ -9,7 +9,11 @@ import { TripGoLiveServiceDetails, TripGoRouteOption, TripGoRouteSegment } from 
 import { TripGoService } from '../../services/tripgo.service';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
-import { tripGoFollowingBoardingPlatform, tripGoSegmentIcon } from './tripgo-route.util';
+import {
+  tripGoFollowingBoardingPlatform,
+  tripGoSegmentIcon,
+  tripGoSegmentInstructionLocation
+} from './tripgo-route.util';
 import { TripGoNearbyTilesComponent } from './tripgo-nearby-tiles.component';
 
 export interface TripGoRoutePointDialogData {
@@ -52,6 +56,9 @@ export class TripGoRoutePointDialogComponent implements OnInit {
   readonly boardingPlatform = computed(() => this.data.kind === 'segment'
     ? tripGoFollowingBoardingPlatform(this.data.route, this.data.segmentIndex)
     : undefined);
+  readonly instructionLocation = computed(() => this.data.kind === 'segment'
+    ? tripGoSegmentInstructionLocation(this.data.route, this.data.segmentIndex)
+    : undefined);
   readonly modeLabel = computed(() => this.segment().type === 'stationary'
     ? this.transloco.translate('common.tripGo.waitingTime')
     : this.segment().modeLabel);
@@ -62,12 +69,19 @@ export class TripGoRoutePointDialogComponent implements OnInit {
     const modeLabel = this.modeLabel()
       || this.transloco.translate('common.tripGo.routePointDetails.segment');
     const platform = this.boardingPlatform();
-    return serviceLabel || (platform
-      ? this.transloco.translate(
-        this.segment().type === 'stationary' ? 'common.tripGo.atPlatform' : 'common.tripGo.toPlatform',
-        { mode: modeLabel, platform }
-      )
-      : modeLabel);
+    const location = this.instructionLocation();
+    if (serviceLabel) return serviceLabel;
+    if (this.segment().type === 'stationary') {
+      return location
+        ? this.transloco.translate('common.tripGo.waitingAt', { mode: modeLabel, location })
+        : modeLabel;
+    }
+    if (location && platform) {
+      return this.transloco.translate('common.tripGo.toLocationPlatform', { mode: modeLabel, location, platform });
+    }
+    return location
+      ? this.transloco.translate('common.tripGo.toLocation', { mode: modeLabel, location })
+      : modeLabel;
   });
   readonly ticketUrl = computed(() => this.safeUrl(this.segment().service?.ticketWebsiteUrl));
   readonly liveDetails = signal<TripGoLiveServiceDetails | null>(null);

@@ -32,3 +32,27 @@ export function tripGoFollowingBoardingPlatform(
   }
   return undefined;
 }
+
+export function tripGoSegmentInstructionLocation(
+  route: TripGoRouteOption,
+  segmentIndex: number
+): string | undefined {
+  const segment = route.segments[segmentIndex];
+  if (!segment || (tripGoSegmentIcon(segment) !== 'directions_walk' && segment.type !== 'stationary')) {
+    return undefined;
+  }
+
+  const followingScheduledSegment = route.segments
+    .slice(segmentIndex + 1)
+    .find((candidate) => candidate.type === 'scheduled');
+  const name = segment.type === 'stationary'
+    ? followingScheduledSegment?.from?.name || segment.from?.name || segment.to?.name
+    : segment.to?.name || followingScheduledSegment?.from?.name;
+  return formatTripGoLocationName(name);
+}
+
+function formatTripGoLocationName(name: string | undefined): string | undefined {
+  if (!name) return undefined;
+  const stationName = name.match(/^(.+),\s*((?:Haupt)?bahnhof)$/i);
+  return stationName ? `${stationName[2]} ${stationName[1]}` : name;
+}

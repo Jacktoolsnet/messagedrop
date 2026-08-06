@@ -5,7 +5,11 @@ import * as leaflet from 'leaflet';
 import { Location } from '../../interfaces/location';
 import { TripGoLocation, TripGoRouteOption, TripGoRouteSegment } from '../../interfaces/tripgo';
 import { TripGoTimelineWeatherComponent } from './tripgo-timeline-weather.component';
-import { tripGoFollowingBoardingPlatform, tripGoSegmentIcon } from './tripgo-route.util';
+import {
+  tripGoFollowingBoardingPlatform,
+  tripGoSegmentIcon,
+  tripGoSegmentInstructionLocation
+} from './tripgo-route.util';
 
 export interface TripGoRouteMapPointSelection {
   kind: 'segment' | 'arrival';
@@ -169,11 +173,17 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnDestroy {
       : segment.service?.number || segment.modeLabel || segment.modeIdentifier || '';
     const segmentIndex = this.route.segments.indexOf(segment);
     const platform = tripGoFollowingBoardingPlatform(this.route, segmentIndex);
-    return platform
-      ? this.transloco.translate(
-        segment.type === 'stationary' ? 'common.tripGo.atPlatform' : 'common.tripGo.toPlatform',
-        { mode: label, platform }
-      )
+    const location = tripGoSegmentInstructionLocation(this.route, segmentIndex);
+    if (segment.type === 'stationary') {
+      return location
+        ? this.transloco.translate('common.tripGo.waitingAt', { mode: label, location })
+        : label;
+    }
+    if (location && platform) {
+      return this.transloco.translate('common.tripGo.toLocationPlatform', { mode: label, location, platform });
+    }
+    return location
+      ? this.transloco.translate('common.tripGo.toLocation', { mode: label, location })
       : label;
   }
 

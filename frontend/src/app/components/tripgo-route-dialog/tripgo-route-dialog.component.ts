@@ -18,7 +18,11 @@ import { LocationPickerDialogComponent } from '../utils/location-picker-dialog/l
 import { TripGoRouteMapComponent, TripGoSimulationState } from './tripgo-route-map.component';
 import { TripGoRouteMapPointSelection } from './tripgo-route-map.component';
 import { TripGoRoutePointDialogComponent } from './tripgo-route-point-dialog.component';
-import { tripGoFollowingBoardingPlatform, tripGoSegmentIcon } from './tripgo-route.util';
+import {
+  tripGoFollowingBoardingPlatform,
+  tripGoSegmentIcon,
+  tripGoSegmentInstructionLocation
+} from './tripgo-route.util';
 import { TripGoTimelineWeatherComponent } from './tripgo-timeline-weather.component';
 
 export interface TripGoRouteDialogData {
@@ -228,11 +232,17 @@ export class TripGoRouteDialogComponent implements OnInit {
       ? this.transloco.translate('common.tripGo.waitingTime')
       : segment.service?.number || segment.modeLabel || segment.modeIdentifier || '';
     const platform = tripGoFollowingBoardingPlatform(route, segmentIndex);
-    return platform
-      ? this.transloco.translate(
-        segment.type === 'stationary' ? 'common.tripGo.atPlatform' : 'common.tripGo.toPlatform',
-        { mode: label, platform }
-      )
+    const location = tripGoSegmentInstructionLocation(route, segmentIndex);
+    if (segment.type === 'stationary') {
+      return location
+        ? this.transloco.translate('common.tripGo.waitingAt', { mode: label, location })
+        : label;
+    }
+    if (location && platform) {
+      return this.transloco.translate('common.tripGo.toLocationPlatform', { mode: label, location, platform });
+    }
+    return location
+      ? this.transloco.translate('common.tripGo.toLocation', { mode: label, location })
       : label;
   }
 
