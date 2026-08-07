@@ -8,8 +8,11 @@ import {
   TripGoRouteSegment,
   TripGoRoutingResult,
   TripGoRoutesResponse,
-  TripGoServiceDetailsResponse
+  TripGoServiceDetailsResponse,
+  TripGoStop,
+  TripGoStopsResponse
 } from '../interfaces/tripgo';
+import { BoundingBox } from '../interfaces/bounding-box';
 
 @Injectable({ providedIn: 'root' })
 export class TripGoService {
@@ -43,6 +46,17 @@ export class TripGoService {
 
   calculatePublicTransportRoute(from: Location, to: Location, locale: string): Observable<TripGoRoutingResult> {
     return this.calculateRoute(from, to, locale, ['pt_pub']);
+  }
+
+  getStops(bounds: BoundingBox[], locale: string): Observable<TripGoStop[]> {
+    return this.http.post<TripGoStopsResponse>(`${environment.apiUrl}/tripgo/locations`, {
+      bounds,
+      locale
+    }, {
+      // Map-search errors should not open the global display-message dialog.
+      // The layer simply stays empty and retries after the next map movement.
+      headers: { 'x-skip-ui': 'true' }
+    }).pipe(map((response) => response.data.stops));
   }
 
   private isTransientRoutingError(error: unknown): boolean {

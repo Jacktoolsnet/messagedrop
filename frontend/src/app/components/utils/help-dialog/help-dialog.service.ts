@@ -1078,6 +1078,37 @@ const HELP_TOPICS = {
       }
     ]
   },
+  tripGoStop: {
+    titleKey: 'tripGoStop.title',
+    introKey: 'tripGoStop.intro',
+    items: [
+      {
+        icon: 'route',
+        titleKey: 'tripGoStop.items.lines.title',
+        descriptionKey: 'tripGoStop.items.lines.desc'
+      },
+      {
+        icon: 'signpost',
+        titleKey: 'tripGoStop.items.platforms.title',
+        descriptionKey: 'tripGoStop.items.platforms.desc'
+      },
+      {
+        icon: 'close',
+        titleKey: 'tripGoStop.items.close.title',
+        descriptionKey: 'tripGoStop.items.close.desc'
+      },
+      {
+        icon: 'help',
+        titleKey: 'tripGoStop.items.help.title',
+        descriptionKey: 'tripGoStop.items.help.desc'
+      },
+      {
+        icon: 'privacy_tip',
+        titleKey: 'tripGoStop.items.privacy.title',
+        descriptionKey: 'tripGoStop.items.privacy.desc'
+      }
+    ]
+  },
   contactSettings: {
     titleKey: 'contactSettings.title',
     introKey: 'common.intros.settings',

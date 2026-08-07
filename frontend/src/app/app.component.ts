@@ -45,6 +45,7 @@ import { PlacelistComponent } from './components/placelist/placelist.component';
 import { SharedContentComponent } from './components/shared-content/shared-content.component';
 import { SystemMessageDialogComponent } from './components/system-messages/system-message-dialog/system-message-dialog.component';
 import { TripGoRouteDialogComponent } from './components/tripgo-route-dialog/tripgo-route-dialog.component';
+import { TripGoStopDialogComponent } from './components/tripgo-stop-dialog/tripgo-stop-dialog.component';
 import { DeleteUserComponent } from './components/user/delete-user/delete-user.component';
 import { UserProfileComponent } from './components/user/user-profile/user-profile.component';
 import { UserComponent } from './components/user/user.component';
@@ -75,6 +76,7 @@ import { NotificationAction } from './interfaces/notification-action';
 import { Place } from './interfaces/place';
 import { PlusCodeArea } from './interfaces/plus-code-area';
 import { DEFAULT_SEARCH_SETTINGS, SearchSettings } from './interfaces/search-settings';
+import { TripGoStop } from './interfaces/tripgo';
 import { SharedContent } from './interfaces/shared-content';
 import { SecretDrop } from './interfaces/secret-drop';
 import { ExperienceResult, ViatorDestinationLookup } from './interfaces/viator';
@@ -113,6 +115,7 @@ import { SecretDropService } from './services/secret-drop.service';
 import { ServerService } from './services/server.service';
 import { SharedContentService } from './services/shared-content.service';
 import { SystemNotificationService } from './services/system-notification.service';
+import { TripGoStopsMapStateService } from './services/tripgo-stops-map-state.service';
 import { WikipediaMapStateService } from './services/wikipedia-map-state.service';
 import { WikipediaService } from './services/wikipedia.service';
 import { TranslationHelperService } from './services/translation-helper.service';
@@ -208,6 +211,7 @@ export class AppComponent implements OnInit {
   private readonly experienceMapService = inject(ExperienceMapService);
   private readonly externalContentConsent = inject(ExternalContentConsentService);
   private readonly wikipediaMapState = inject(WikipediaMapStateService);
+  private readonly tripGoStopsMapState = inject(TripGoStopsMapStateService);
   private readonly wikipediaService = inject(WikipediaService);
   private readonly experienceBookmarkService = inject(ExperienceBookmarkService);
   private readonly airQualityService = inject(AirQualityService);
@@ -356,6 +360,11 @@ export class AppComponent implements OnInit {
     });
 
     effect(() => {
+      this.tripGoStopsMapState.stops();
+      untracked(() => this.createMarkerLocations());
+    });
+
+    effect(() => {
       const mapSetTrigger = this.mapService.mapSet();
       this.networkService.browserOnline();
       this.networkService.backendOnline();
@@ -363,7 +372,10 @@ export class AppComponent implements OnInit {
       if (mapSetTrigger < 2) {
         return;
       }
-      untracked(() => this.syncWikipediaMapState());
+      untracked(() => {
+        this.syncWikipediaMapState();
+        this.syncTripGoStopsMapState();
+      });
     });
 
     effect(() => {
@@ -1682,6 +1694,7 @@ export class AppComponent implements OnInit {
     // backend searches. Otherwise an older async map update could overwrite a
     // newer viewport or delay Wikipedia until another map interaction.
     this.syncWikipediaMapState(settings, zoom);
+    this.syncTripGoStopsMapState(settings, zoom);
 
     // notes from local device
     if (this.userService.isReady()) {
@@ -1743,6 +1756,23 @@ export class AppComponent implements OnInit {
       zoom
     });
     this.wikipediaMapState.setEnabled(canSearchWikipedia);
+  }
+
+  private syncTripGoStopsMapState(
+    settings = this.normalizeSearchSettings(this.searchSettings),
+    zoom = this.mapService.getMapZoom()
+  ): void {
+    const canSearchStops = settings.publicTransportStops.enabled
+      && zoom >= settings.publicTransportStops.minZoom
+      && this.networkService.browserOnline()
+      && this.networkService.backendOnline()
+      && !this.maintenanceActive();
+    this.tripGoStopsMapState.setLanguage(this.languageService.effectiveLanguage());
+    this.tripGoStopsMapState.setViewport({
+      bounds: this.mapService.getVisibleMapBoundingBoxes(),
+      zoom
+    });
+    this.tripGoStopsMapState.setEnabled(canSearchStops);
   }
 
   private async loadSearchSettings(): Promise<void> {
@@ -1826,6 +1856,11 @@ export class AppComponent implements OnInit {
       case MarkerType.WIKIPEDIA:
         this.openMarkerWikipediaListDialog(event.wikipediaArticles ?? []);
         break;
+      case MarkerType.PUBLIC_TRANSPORT_STOP:
+        if (event.publicTransportStop) {
+          this.openPublicTransportStopDialog(event.publicTransportStop);
+        }
+        break;
       case MarkerType.MULTI:
         if (
           !canOpenPrivateContent
@@ -1853,6 +1888,21 @@ export class AppComponent implements OnInit {
   public async handleClickEvent(event: Location): Promise<void> {
     this.mapService.moveTo(event);
     await this.discoverSecretDropsAt(event);
+  }
+
+  private openPublicTransportStopDialog(stop: TripGoStop): void {
+    this.dialog.open(TripGoStopDialogComponent, {
+      data: stop,
+      closeOnNavigation: true,
+      width: 'min(680px, 95vw)',
+      maxWidth: '95vw',
+      maxHeight: '95vh',
+      height: 'auto',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
   }
 
   private async discoverSecretDropsAt(location: Location): Promise<void> {
@@ -3705,6 +3755,26 @@ export class AppComponent implements OnInit {
           type: MarkerType.WIKIPEDIA
         });
       }
+    });
+
+    // Public-transport stops keep their own marker even when other content is
+    // located at the same Plus Code. This preserves the direct stop-dialog
+    // action instead of folding it into the generic multi-marker dialog.
+    this.tripGoStopsMapState.stops().forEach((stop) => {
+      const location: Location = {
+        latitude: stop.latitude,
+        longitude: stop.longitude,
+        plusCode: this.geolocationService.getPlusCode(stop.latitude, stop.longitude)
+      };
+      this.markerLocations.set(`public-transport-stop:${stop.id}`, {
+        location,
+        messages: [],
+        notes: [],
+        images: [],
+        documents: [],
+        publicTransportStop: stop,
+        type: MarkerType.PUBLIC_TRANSPORT_STOP
+      });
     });
 
     // Save last markerupdet to fire the angular change listener

@@ -2951,6 +2951,32 @@
       }
     }
   },
+  "tripGoStop": {
+    "title": "Stop information",
+    "intro": "This view shows the information supplied by SkedGo / TripGo for the selected stop.",
+    "items": {
+      "lines": {
+        "title": "Lines",
+        "desc": "Shows all lines assigned to this stop by TripGo. Directions and departure times will be added in a following step."
+      },
+      "platforms": {
+        "title": "Platforms",
+        "desc": "Shows the individual platforms or stopping points and the lines available there."
+      },
+      "close": {
+        "title": "Close",
+        "desc": "Closes the stop information and returns to the map."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "Opens this help view."
+      },
+      "privacy": {
+        "title": "Privacy",
+        "desc": "Stops in the visible map area are loaded from SkedGo / TripGo through the MessageDrop backend and are only displayed temporarily on the map."
+      }
+    }
+  },
   "locationShareContacts": {
     "title": "Share location with contacts",
     "intro": "Select one or more contacts. The location will be shared as a chat message.",

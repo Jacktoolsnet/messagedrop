@@ -298,6 +298,17 @@
         "route": "Les itinéraires ne peuvent pas être calculés pour le moment."
       }
     },
+    "tripGoStops": {
+      "providerSubtitle": "Informations sur les arrêts de SkedGo / TripGo",
+      "details": "Informations sur l’arrêt sélectionné",
+      "lines": "Lignes",
+      "noLines": "Aucune information de ligne n’a été fournie pour cet arrêt.",
+      "platforms": "Quais",
+      "platform": "Quai",
+      "unknownPlatform": "inconnu",
+      "noPlatforms": "Aucun quai n’a été fourni pour cet arrêt.",
+      "operators": "Opérateurs de transport"
+    },
     "hashtags": {
       "label": "Hashtags",
       "placeholder": "#voyage #famille #travail",

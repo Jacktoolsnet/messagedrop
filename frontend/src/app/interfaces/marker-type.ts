@@ -9,5 +9,6 @@ export enum MarkerType {
     MY_EXPERIENCE = 'my_experience',
     SECRET_DROP = 'secret_drop',
     WIKIPEDIA = 'wikipedia',
+    PUBLIC_TRANSPORT_STOP = 'public_transport_stop',
     MULTI = "multi"
 }

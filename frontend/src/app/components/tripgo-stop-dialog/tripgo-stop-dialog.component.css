@@ -1,0 +1,130 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.stop-dialog-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 1rem;
+}
+
+.stop-address {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+  color: var(--mat-card-subtitle-text-color);
+}
+
+.stop-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.stop-tile {
+  overflow: hidden;
+  border: 1px solid var(--mat-card-outlined-outline-color);
+  border-radius: 1rem;
+  background: var(--mat-card-filled-container-color);
+}
+
+.stop-tile--wide {
+  grid-column: 1 / -1;
+}
+
+.stop-tile > header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1rem;
+  font-weight: 600;
+  color: var(--mat-sys-on-primary-container);
+  background: var(--mat-sys-primary-container);
+}
+
+.stop-tile__body {
+  padding: 1rem;
+}
+
+.line-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.line-badge {
+  min-width: 2.2rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--mat-sys-outline);
+  border-radius: 999px;
+  text-align: center;
+  font-weight: 700;
+  color: var(--mat-sys-on-secondary-container);
+  background: var(--mat-sys-secondary-container);
+}
+
+.platform-list,
+.operator-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.platform-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.platform-row + .platform-row {
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--mat-card-outlined-outline-color);
+}
+
+.platform-symbol {
+  display: grid;
+  flex: 0 0 2.25rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--mat-sys-on-primary);
+  background: var(--mat-sys-primary);
+}
+
+.platform-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 0.2rem;
+}
+
+.platform-content small,
+.empty-state {
+  color: var(--mat-card-subtitle-text-color);
+}
+
+.empty-state {
+  margin: 0;
+}
+
+.stop-dialog-actions {
+  flex: 0 0 auto;
+}
+
+.action-spacer {
+  flex: 1 1 auto;
+}
+
+@media (max-width: 650px) {
+  .stop-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stop-tile--wide {
+    grid-column: auto;
+  }
+}

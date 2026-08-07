@@ -1,7 +1,8 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
-  validateRouteRequest, validateServiceRequest, validateLatestRequest, validateRegionRequest
+  validateRouteRequest, validateServiceRequest, validateLatestRequest, validateRegionRequest,
+  validateLocationsRequest
 } = require('../validation');
 
 test('validates and normalizes a route request', () => {
@@ -72,4 +73,17 @@ test('validates region provider query options', () => {
   });
   assert.equal(validateRegionRequest({ region: '../invalid' }).ok, false);
   assert.equal(validateRegionRequest({ region: 'SE_Stockholm', onlyRealTime: 'perhaps' }).ok, false);
+});
+
+test('validates location viewport requests', () => {
+  const result = validateLocationsRequest({
+    locale: 'de',
+    bounds: [{ latMin: 52.13, lonMin: 10.52, latMax: 52.15, lonMax: 10.56 }]
+  });
+  assert.equal(result.ok, true);
+  assert.equal(result.value.bounds.length, 1);
+  assert.equal(validateLocationsRequest({ bounds: [] }).ok, false);
+  assert.equal(validateLocationsRequest({
+    bounds: [{ latMin: 53, lonMin: 10, latMax: 52, lonMax: 11 }]
+  }).ok, false);
 });

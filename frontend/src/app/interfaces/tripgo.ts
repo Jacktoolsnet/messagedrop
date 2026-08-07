@@ -1,4 +1,5 @@
 import { Location } from './location';
+import { BoundingBox } from './bounding-box';
 
 export interface TripGoLocation {
   name?: string;
@@ -155,4 +156,46 @@ export interface TripGoServiceDetailsResponse {
   status: number;
   data: TripGoLiveServiceDetails;
   cache: 'hit' | 'miss';
+}
+
+export interface TripGoStopPlatform {
+  stopCode: string;
+  platform?: string;
+  latitude: number;
+  longitude: number;
+  services: string[];
+}
+
+export interface TripGoStopOperator {
+  id?: string;
+  name: string;
+}
+
+export interface TripGoStop {
+  id: string;
+  name: string;
+  address?: string;
+  latitude: number;
+  longitude: number;
+  region: string;
+  modeIdentifiers: string[];
+  modeLabels: string[];
+  stopTypes: string[];
+  services: string[];
+  operators: TripGoStopOperator[];
+  platforms: TripGoStopPlatform[];
+}
+
+export interface TripGoStopsResponse {
+  status: number;
+  data: {
+    region?: string;
+    stops: TripGoStop[];
+  };
+  cache: 'hit' | 'miss';
+}
+
+export interface TripGoStopsViewport {
+  bounds: BoundingBox[];
+  zoom: number;
 }

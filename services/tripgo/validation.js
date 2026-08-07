@@ -77,6 +77,17 @@ function validateRegionRequest(value) {
   return { ok: true, value: { region, locale, onlyRealTime, full } };
 }
 
+function validateLocationsRequest(body) {
+  if (!isPlainObject(body)) return invalid('invalid_locations_request');
+  const locale = normalizeLocale(body.locale ?? 'de');
+  if (!locale) return invalid('invalid_locations_locale');
+  const bounds = Array.isArray(body.bounds) ? body.bounds.map(boundingBox) : [];
+  if (bounds.length < 1 || bounds.length > 2 || bounds.some((value) => !value)) {
+    return invalid('invalid_locations_bounds');
+  }
+  return { ok: true, value: { bounds, locale } };
+}
+
 function normalizeLocale(value) {
   const normalized = normalizeString(value).replace('_', '-');
   return /^[a-z]{2,3}(?:-[a-zA-Z]{2,4})?$/.test(normalized) ? normalized : null;
@@ -105,6 +116,19 @@ function location(value) {
   return { latitude, longitude };
 }
 
+function boundingBox(value) {
+  if (!isPlainObject(value)) return null;
+  const latMin = Number(value.latMin);
+  const lonMin = Number(value.lonMin);
+  const latMax = Number(value.latMax);
+  const lonMax = Number(value.lonMax);
+  if (!Number.isFinite(latMin) || !Number.isFinite(latMax)
+      || !Number.isFinite(lonMin) || !Number.isFinite(lonMax)
+      || latMin < -90 || latMax > 90 || latMin > latMax
+      || lonMin < -180 || lonMax > 180 || lonMin > lonMax) return null;
+  return { latMin, lonMin, latMax, lonMax };
+}
+
 function normalizeString(value) {
   return typeof value === 'string' ? value.trim() : '';
 }
@@ -129,5 +153,6 @@ module.exports = {
   validateServiceRequest,
   validateLatestRequest,
   validateRegionRequest,
+  validateLocationsRequest,
   normalizeLocale
 };

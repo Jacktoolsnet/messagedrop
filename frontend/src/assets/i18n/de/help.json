@@ -2951,6 +2951,32 @@
       }
     }
   },
+  "tripGoStop": {
+    "title": "Haltestelleninformationen",
+    "intro": "Hier siehst du die von SkedGo / TripGo gelieferten Informationen zur ausgewählten Haltestelle.",
+    "items": {
+      "lines": {
+        "title": "Linien",
+        "desc": "Zeigt alle Linien, die TripGo dieser Haltestelle zugeordnet hat. Fahrtrichtungen und Abfahrtszeiten werden in einem folgenden Schritt ergänzt."
+      },
+      "platforms": {
+        "title": "Steige",
+        "desc": "Zeigt die einzelnen Steige beziehungsweise Haltepunkte und die dort verfügbaren Linien."
+      },
+      "close": {
+        "title": "Schließen",
+        "desc": "Schließt die Haltestelleninformationen und kehrt zur Karte zurück."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Öffnet diese Hilfeansicht."
+      },
+      "privacy": {
+        "title": "Datenschutz",
+        "desc": "Haltestellen im sichtbaren Kartenausschnitt werden über das MessageDrop-Backend von SkedGo / TripGo geladen und nur temporär auf der Karte dargestellt."
+      }
+    }
+  },
   "locationShareContacts": {
     "title": "Ort mit Kontakten teilen",
     "intro": "Wähle einen oder mehrere Kontakte aus. Der Ort wird als Nachricht im Chat geteilt.",

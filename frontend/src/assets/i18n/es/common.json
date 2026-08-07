@@ -298,6 +298,17 @@
         "route": "No se pueden calcular rutas en este momento."
       }
     },
+    "tripGoStops": {
+      "providerSubtitle": "Información de paradas de SkedGo / TripGo",
+      "details": "Información sobre la parada seleccionada",
+      "lines": "Líneas",
+      "noLines": "No se proporcionó información de líneas para esta parada.",
+      "platforms": "Andenes",
+      "platform": "Andén",
+      "unknownPlatform": "desconocido",
+      "noPlatforms": "No se proporcionaron andenes para esta parada.",
+      "operators": "Operadores de transporte"
+    },
     "hashtags": {
       "label": "Hashtags",
       "placeholder": "#viaje #familia #trabajo",

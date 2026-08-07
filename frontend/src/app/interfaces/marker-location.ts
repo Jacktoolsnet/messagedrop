@@ -7,6 +7,7 @@ import { Note } from "./note";
 import { SecretDrop } from "./secret-drop";
 import { ExperienceResult, ViatorDestinationLookup } from "./viator";
 import { WikipediaArticle } from "./wikipedia";
+import { TripGoStop } from "./tripgo";
 
 export interface MarkerLocation {
     location: Location,
@@ -18,5 +19,6 @@ export interface MarkerLocation {
     myExperiences?: ExperienceResult[];
     secretDrops?: SecretDrop[];
     wikipediaArticles?: WikipediaArticle[];
+    publicTransportStop?: TripGoStop;
     type: MarkerType
 }

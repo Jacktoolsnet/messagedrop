@@ -2933,6 +2933,32 @@
       }
     }
   },
+  "tripGoStop": {
+    "title": "Información de la parada",
+    "intro": "Aquí se muestra la información proporcionada por SkedGo / TripGo para la parada seleccionada.",
+    "items": {
+      "lines": {
+        "title": "Líneas",
+        "desc": "Muestra todas las líneas asignadas por TripGo a esta parada. Las direcciones y horas de salida se añadirán en un paso posterior."
+      },
+      "platforms": {
+        "title": "Andenes",
+        "desc": "Muestra los andenes o puntos de parada individuales y las líneas disponibles en ellos."
+      },
+      "close": {
+        "title": "Cerrar",
+        "desc": "Cierra la información de la parada y vuelve al mapa."
+      },
+      "help": {
+        "title": "Ayuda",
+        "desc": "Abre esta vista de ayuda."
+      },
+      "privacy": {
+        "title": "Privacidad",
+        "desc": "Las paradas del área visible del mapa se cargan desde SkedGo / TripGo a través del backend de MessageDrop y solo se muestran temporalmente."
+      }
+    }
+  },
   "locationShareContacts": {
     "title": "Compartir ubicación con contactos",
     "intro": "Selecciona uno o varios contactos. La ubicación se compartirá como mensaje en el chat.",

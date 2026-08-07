@@ -3,11 +3,15 @@ const express = require('express');
 const axios = require('axios');
 const { requireServiceJwt } = require('../utils/serviceJwt');
 const {
-  validateRouteRequest, validateServiceRequest, validateLatestRequest, validateRegionRequest, normalizeLocale
+  validateRouteRequest, validateServiceRequest, validateLatestRequest, validateRegionRequest,
+  validateLocationsRequest, normalizeLocale
 } = require('../validation');
 const { normalizeRoutingResponse, normalizeServiceResponse, normalizeLatestResponse } = require('../normalizer');
+const { cellIDsForBounds, normalizeLocationsResponse, resolveRegion } = require('../locations');
 
-function createTripGoRouter({ client, regionsCache, routeCache, serviceCache, inFlight, metrics, maxInFlight }) {
+function createTripGoRouter({
+  client, regionsCache, routeCache, serviceCache, locationsCache, inFlight, metrics, maxInFlight
+}) {
   const router = express.Router();
   router.use(requireServiceJwt);
 
@@ -74,6 +78,58 @@ function createTripGoRouter({ client, regionsCache, routeCache, serviceCache, in
       const upstream = await coalesce(inFlight, key, maxInFlight, () => client.operators(validated.value));
       const payload = { status: upstream.status, data: upstream.data };
       regionsCache.set(key, payload);
+      return res.status(upstream.status).json({ ...payload, cache: 'miss' });
+    } catch (error) {
+      return next(upstreamError(error));
+    }
+  });
+
+  router.post('/locations', async (req, res, next) => {
+    metrics.locations = (metrics.locations || 0) + 1;
+    const validated = validateLocationsRequest(req.body);
+    if (!validated.ok) return res.status(400).json({ error: validated.message });
+    try {
+      const regionsKey = `regions:${validated.value.locale}`;
+      let regions = regionsCache.get(regionsKey);
+      if (regions === undefined) {
+        const upstreamRegions = await coalesce(inFlight, regionsKey, maxInFlight,
+          () => client.regions(validated.value.locale));
+        regions = { status: upstreamRegions.status, data: upstreamRegions.data };
+        regionsCache.set(regionsKey, regions);
+      }
+      const region = resolveRegion(regions.data, validated.value.bounds);
+      if (!region) {
+        return res.status(200).json({
+          status: 200,
+          data: { region: null, stops: [] },
+          cache: 'miss'
+        });
+      }
+      const cellIDs = cellIDsForBounds(validated.value.bounds);
+      const maxCells = Number(process.env.TRIPGO_LOCATIONS_MAX_CELLS || 64);
+      if (cellIDs.length > maxCells) {
+        return res.status(400).json({ error: 'locations_viewport_too_large' });
+      }
+      const key = routeKey({
+        region,
+        locale: validated.value.locale,
+        cellIDs,
+        bounds: validated.value.bounds
+      });
+      const cached = locationsCache?.get(key);
+      if (cached !== undefined) return res.status(200).json({ ...cached, cache: 'hit' });
+      const upstream = await coalesce(inFlight, `locations:${key}`, maxInFlight,
+        () => client.locations({
+          region,
+          level: 2,
+          cellIDs,
+          locale: validated.value.locale
+        }));
+      const payload = {
+        status: upstream.status,
+        data: normalizeLocationsResponse(upstream.data, region, validated.value.bounds)
+      };
+      locationsCache?.set(key, payload);
       return res.status(upstream.status).json({ ...payload, cache: 'miss' });
     } catch (error) {
       return next(upstreamError(error));
@@ -149,6 +205,7 @@ function createTripGoRouter({ client, regionsCache, routeCache, serviceCache, in
     regionsCache: regionsCache.snapshot(),
     routeCache: routeCache.snapshot(),
     serviceCache: serviceCache?.snapshot(),
+    locationsCache: locationsCache?.snapshot(),
     requests: { ...metrics }
   }));
 

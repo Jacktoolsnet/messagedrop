@@ -58,4 +58,21 @@ describe('TripGoService', () => {
     });
     request.flush({ status: 200, data: result, cache: 'miss' });
   });
+
+  it('requests public transport stops for the visible map bounds', () => {
+    const bounds = [{ latMin: 52.13, lonMin: 10.52, latMax: 52.15, lonMax: 10.56 }];
+    const stops = [{
+      id: 'stop-1', name: 'Halchter, Bernardusring', latitude: 52.14185, longitude: 10.54259,
+      region: 'DE_NI_Hanover', modeIdentifiers: ['pt_pub_bus'], modeLabels: ['Bus'],
+      stopTypes: ['bus'], services: ['794'], operators: [], platforms: []
+    }];
+
+    service.getStops(bounds, 'de').subscribe((value) => expect(value).toEqual(stops));
+
+    const request = http.expectOne(`${environment.apiUrl}/tripgo/locations`);
+    expect(request.request.method).toBe('POST');
+    expect(request.request.headers.get('x-skip-ui')).toBe('true');
+    expect(request.request.body).toEqual({ bounds, locale: 'de' });
+    request.flush({ status: 200, data: { region: 'DE_NI_Hanover', stops }, cache: 'miss' });
+  });
 });

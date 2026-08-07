@@ -72,6 +72,11 @@ router.get('/region-info', [metric.count('tripgo.regionInfo', { when: 'always', 
 router.get('/operators', [metric.count('tripgo.operators', { when: 'always', timezone: 'utc', amount: 1 })],
   (req, res, next) => forward(req, res, next, { method: 'get', path: '/operators', params: req.query }));
 
+router.post('/locations', [
+  express.json({ type: 'application/json', limit: '16kb' }),
+  metric.count('tripgo.locations', { when: 'always', timezone: 'utc', amount: 1 })
+], (req, res, next) => forward(req, res, next, { method: 'post', path: '/locations', data: req.body }));
+
 router.post('/routes', [
   express.json({ type: 'application/json', limit: '16kb' }),
   metric.count('tripgo.routes', { when: 'always', timezone: 'utc', amount: 1 })

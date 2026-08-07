@@ -1,0 +1,66 @@
+<app-dialog-header icon="directions_bus" [title]="stop.name"
+  [subtitle]="'common.tripGoStops.providerSubtitle' | transloco"></app-dialog-header>
+
+<mat-dialog-content class="stop-dialog-content">
+  @if (stop.address && stop.address !== stop.name) {
+    <p class="stop-address"><mat-icon aria-hidden="true">place</mat-icon><span>{{ stop.address }}</span></p>
+  }
+
+  <section class="stop-grid" [attr.aria-label]="'common.tripGoStops.details' | transloco">
+    <article class="stop-tile">
+      <header><mat-icon aria-hidden="true">route</mat-icon>{{ 'common.tripGoStops.lines' | transloco }}</header>
+      <div class="stop-tile__body">
+        @if (stop.services.length) {
+          <div class="line-list">
+            @for (service of stop.services; track service) {
+              <span class="line-badge">{{ service }}</span>
+            }
+          </div>
+        } @else {
+          <p class="empty-state">{{ 'common.tripGoStops.noLines' | transloco }}</p>
+        }
+      </div>
+    </article>
+
+    <article class="stop-tile">
+      <header><mat-icon aria-hidden="true">signpost</mat-icon>{{ 'common.tripGoStops.platforms' | transloco }}</header>
+      <div class="stop-tile__body platform-list">
+        @for (platform of stop.platforms; track platform.stopCode) {
+          <div class="platform-row">
+            <span class="platform-symbol"><mat-icon aria-hidden="true">directions_bus</mat-icon></span>
+            <span class="platform-content">
+              <strong>
+                {{ 'common.tripGoStops.platform' | transloco }}
+                {{ platform.platform || ('common.tripGoStops.unknownPlatform' | transloco) }}
+              </strong>
+              @if (platform.services.length) {
+                <small>{{ 'common.tripGoStops.lines' | transloco }}: {{ platform.services.join(', ') }}</small>
+              }
+            </span>
+          </div>
+        } @empty {
+          <p class="empty-state">{{ 'common.tripGoStops.noPlatforms' | transloco }}</p>
+        }
+      </div>
+    </article>
+
+    @if (stop.operators.length) {
+      <article class="stop-tile stop-tile--wide">
+        <header><mat-icon aria-hidden="true">business</mat-icon>{{ 'common.tripGoStops.operators' | transloco }}</header>
+        <div class="stop-tile__body operator-list">
+          @for (operator of stop.operators; track operator.id || operator.name) {
+            <span>{{ operator.name }}</span>
+          }
+        </div>
+      </article>
+    }
+  </section>
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions stop-dialog-actions">
+  <button mat-icon-button type="button" class="action-cancel" (click)="close()"
+    [attr.aria-label]="'common.actions.close' | transloco"><mat-icon>close</mat-icon></button>
+  <span class="action-spacer"></span>
+  <button mat-icon-button type="button" (click)="help.open('tripGoStop')"
+    [attr.aria-label]="'common.actions.help' | transloco"><mat-icon>help</mat-icon></button>
+</mat-dialog-actions>

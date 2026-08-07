@@ -299,6 +299,17 @@
         "route": "Die Routen konnten derzeit nicht berechnet werden."
       }
     },
+    "tripGoStops": {
+      "providerSubtitle": "Haltestelleninformationen von SkedGo / TripGo",
+      "details": "Informationen zur ausgewählten Haltestelle",
+      "lines": "Linien",
+      "noLines": "Für diese Haltestelle wurden keine Linienangaben geliefert.",
+      "platforms": "Steige",
+      "platform": "Steig",
+      "unknownPlatform": "unbekannt",
+      "noPlatforms": "Für diese Haltestelle wurden keine Steige geliefert.",
+      "operators": "Verkehrsunternehmen"
+    },
     "hashtags": {
       "label": "Hashtags",
       "placeholder": "#reise #familie #arbeit",

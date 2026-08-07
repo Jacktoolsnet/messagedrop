@@ -68,6 +68,12 @@ const wikipediaMarker = leaflet.icon({
   iconSize: [32, 40],
   iconAnchor: [16, 40],
 });
+
+const publicTransportStopMarker = leaflet.icon({
+  iconUrl: 'assets/markers/transport-marker.svg',
+  iconSize: [32, 40],
+  iconAnchor: [16, 40],
+});
 @Injectable({
   providedIn: 'root'
 })
@@ -434,6 +440,8 @@ export class MapService {
         return leaflet.marker(latLng, { icon: secretDropMarker, zIndexOffset: 18 });
       case MarkerType.WIKIPEDIA:
         return leaflet.marker(latLng, { icon: wikipediaMarker, zIndexOffset: 10 });
+      case MarkerType.PUBLIC_TRANSPORT_STOP:
+        return leaflet.marker(latLng, { icon: publicTransportStopMarker, zIndexOffset: 16 });
       default:
         return null;
     }

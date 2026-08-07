@@ -299,6 +299,17 @@
         "route": "Routes cannot be calculated at the moment."
       }
     },
+    "tripGoStops": {
+      "providerSubtitle": "Stop information from SkedGo / TripGo",
+      "details": "Information about the selected stop",
+      "lines": "Lines",
+      "noLines": "No line information was provided for this stop.",
+      "platforms": "Platforms",
+      "platform": "Platform",
+      "unknownPlatform": "unknown",
+      "noPlatforms": "No platforms were provided for this stop.",
+      "operators": "Transport operators"
+    },
     "hashtags": {
       "label": "Hashtags",
       "placeholder": "#travel #family #work",

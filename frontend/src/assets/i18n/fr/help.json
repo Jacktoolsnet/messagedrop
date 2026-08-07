@@ -2933,6 +2933,32 @@
       }
     }
   },
+  "tripGoStop": {
+    "title": "Informations sur l’arrêt",
+    "intro": "Cette vue présente les informations fournies par SkedGo / TripGo pour l’arrêt sélectionné.",
+    "items": {
+      "lines": {
+        "title": "Lignes",
+        "desc": "Affiche toutes les lignes attribuées à cet arrêt par TripGo. Les directions et heures de départ seront ajoutées lors d’une prochaine étape."
+      },
+      "platforms": {
+        "title": "Quais",
+        "desc": "Affiche les différents quais ou points d’arrêt ainsi que les lignes disponibles."
+      },
+      "close": {
+        "title": "Fermer",
+        "desc": "Ferme les informations sur l’arrêt et revient à la carte."
+      },
+      "help": {
+        "title": "Aide",
+        "desc": "Ouvre cette aide."
+      },
+      "privacy": {
+        "title": "Confidentialité",
+        "desc": "Les arrêts de la zone visible sont chargés depuis SkedGo / TripGo via le backend MessageDrop et ne sont affichés que temporairement."
+      }
+    }
+  },
   "locationShareContacts": {
     "title": "Partager le lieu avec des contacts",
     "intro": "Sélectionnez un ou plusieurs contacts. Le lieu sera partagé comme message dans le chat.",
