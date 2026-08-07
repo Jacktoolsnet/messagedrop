@@ -307,7 +307,18 @@
       "platform": "Quai",
       "unknownPlatform": "inconnu",
       "noPlatforms": "Aucun quai n’a été fourni pour cet arrêt.",
-      "operators": "Opérateurs de transport"
+      "operators": "Opérateurs de transport",
+      "loadingDepartures": "Chargement des départs …",
+      "unknownDirection": "Direction inconnue",
+      "showDepartures": "Horaires de départ",
+      "departuresError": "Les prochains départs n’ont pas pu être chargés.",
+      "departuresFor": "Départs de la ligne",
+      "cancelled": "Supprimé",
+      "live": "Temps réel",
+      "minutesShort": "min",
+      "scheduled": "Prévu",
+      "scheduledAt": "Prévu",
+      "refreshDepartures": "Actualiser les départs"
     },
     "hashtags": {
       "label": "Hashtags",

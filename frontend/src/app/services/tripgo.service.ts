@@ -5,6 +5,8 @@ import { environment } from '../../environments/environment';
 import { Location } from '../interfaces/location';
 import {
   TripGoLiveServiceDetails,
+  TripGoDeparture,
+  TripGoDeparturesResponse,
   TripGoRouteSegment,
   TripGoRoutingResult,
   TripGoRoutesResponse,
@@ -57,6 +59,20 @@ export class TripGoService {
       // The layer simply stays empty and retries after the next map movement.
       headers: { 'x-skip-ui': 'true' }
     }).pipe(map((response) => response.data.stops));
+  }
+
+  getDepartures(stop: TripGoStop, locale: string, limit = 40): Observable<TripGoDeparture[]> {
+    const stopCodes = [...new Set(stop.platforms.map((platform) => platform.stopCode).filter(Boolean))];
+    return this.http.post<TripGoDeparturesResponse>(`${environment.apiUrl}/tripgo/departures`, {
+      region: stop.region,
+      stopCodes,
+      locale,
+      limit
+    }, {
+      // Departure availability differs by provider. Errors are presented inside
+      // the stop dialog and must not open an additional global message dialog.
+      headers: { 'x-skip-ui': 'true' }
+    }).pipe(map((response) => response.data.departures));
   }
 
   private isTransientRoutingError(error: unknown): boolean {

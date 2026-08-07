@@ -2,7 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
   validateRouteRequest, validateServiceRequest, validateLatestRequest, validateRegionRequest,
-  validateLocationsRequest
+  validateLocationsRequest, validateDeparturesRequest
 } = require('../validation');
 
 test('validates and normalizes a route request', () => {
@@ -86,4 +86,16 @@ test('validates location viewport requests', () => {
   assert.equal(validateLocationsRequest({
     bounds: [{ latMin: 53, lonMin: 10, latMax: 52, lonMax: 11 }]
   }).ok, false);
+});
+
+test('validates departure timetable requests', () => {
+  const result = validateDeparturesRequest({
+    region: 'DE_NI_Hanover',
+    stopCodes: ['de:03158:1744:0:1', 'de:03158:1744:0:1', 'de:03158:1744:0:2'],
+    locale: 'de',
+    limit: 30
+  });
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.value.stopCodes, ['de:03158:1744:0:1', 'de:03158:1744:0:2']);
+  assert.equal(validateDeparturesRequest({ region: 'DE_NI_Hanover', stopCodes: [] }).ok, false);
 });

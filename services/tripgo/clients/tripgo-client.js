@@ -52,6 +52,16 @@ function createTripGoClient({
       }));
     },
 
+    async departures({ region, stopCodes, locale = 'en', limit = 40 }) {
+      return unwrap(await http.post('/departures.json', {
+        region,
+        embarkationStops: stopCodes,
+        limit
+      }, {
+        headers: { 'Accept-Language': locale }
+      }));
+    },
+
     async operators({ region, locale, onlyRealTime = false, full = true }) {
       return unwrap(await http.post('/info/operators.json', {
         regions: [region],

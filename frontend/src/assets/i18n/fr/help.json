@@ -2939,7 +2939,7 @@
     "items": {
       "lines": {
         "title": "Lignes",
-        "desc": "Affiche toutes les lignes attribuées à cet arrêt par TripGo. Les directions et heures de départ seront ajoutées lors d’une prochaine étape."
+        "desc": "Affiche les lignes et directions sous forme de tuiles sélectionnables. « Horaires de départ » affiche les prochains passages de la ligne."
       },
       "platforms": {
         "title": "Quais",

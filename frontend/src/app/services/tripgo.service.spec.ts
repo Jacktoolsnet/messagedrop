@@ -75,4 +75,32 @@ describe('TripGoService', () => {
     expect(request.request.body).toEqual({ bounds, locale: 'de' });
     request.flush({ status: 200, data: { region: 'DE_NI_Hanover', stops }, cache: 'miss' });
   });
+
+  it('requests departures for every platform of a stop', () => {
+    const stop = {
+      id: 'stop-1', name: 'Halchter, Bernardusring', latitude: 52.14185, longitude: 10.54259,
+      region: 'DE_NI_Hanover', modeIdentifiers: ['pt_pub_bus'], modeLabels: ['Bus'],
+      stopTypes: ['bus'], services: ['794'], operators: [], platforms: [
+        { stopCode: 'platform-1', platform: '1', latitude: 52.14, longitude: 10.54, services: ['794'] },
+        { stopCode: 'platform-2', platform: '2', latitude: 52.14, longitude: 10.54, services: ['794'] }
+      ]
+    };
+    const departures = [{
+      id: 'departure-1', region: stop.region, stopCode: 'platform-1', line: '794',
+      direction: 'Wolfenbüttel Bahnhof', departureTime: '2026-08-07T10:00:00Z',
+      realTime: false, cancelled: false, alerts: []
+    }];
+
+    service.getDepartures(stop, 'de').subscribe((value) => expect(value).toEqual(departures));
+
+    const request = http.expectOne(`${environment.apiUrl}/tripgo/departures`);
+    expect(request.request.method).toBe('POST');
+    expect(request.request.headers.get('x-skip-ui')).toBe('true');
+    expect(request.request.body).toEqual({
+      region: 'DE_NI_Hanover', stopCodes: ['platform-1', 'platform-2'], locale: 'de', limit: 40
+    });
+    request.flush({
+      status: 200, data: { region: stop.region, updatedAt: '', departures, alerts: [] }, cache: 'miss'
+    });
+  });
 });

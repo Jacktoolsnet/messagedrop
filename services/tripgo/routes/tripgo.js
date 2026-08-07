@@ -4,10 +4,11 @@ const axios = require('axios');
 const { requireServiceJwt } = require('../utils/serviceJwt');
 const {
   validateRouteRequest, validateServiceRequest, validateLatestRequest, validateRegionRequest,
-  validateLocationsRequest, normalizeLocale
+  validateLocationsRequest, validateDeparturesRequest, normalizeLocale
 } = require('../validation');
 const { normalizeRoutingResponse, normalizeServiceResponse, normalizeLatestResponse } = require('../normalizer');
 const { cellIDsForBounds, normalizeLocationsResponse, resolveRegion } = require('../locations');
+const { normalizeDeparturesResponse } = require('../departures');
 
 function createTripGoRouter({
   client, regionsCache, routeCache, serviceCache, locationsCache, inFlight, metrics, maxInFlight
@@ -153,6 +154,27 @@ function createTripGoRouter({
         })
       };
       routeCache.set(key, payload);
+      return res.status(upstream.status).json({ ...payload, cache: 'miss' });
+    } catch (error) {
+      return next(upstreamError(error));
+    }
+  });
+
+  router.post('/departures', async (req, res, next) => {
+    metrics.departures = (metrics.departures || 0) + 1;
+    const validated = validateDeparturesRequest(req.body);
+    if (!validated.ok) return res.status(400).json({ error: validated.message });
+    const key = routeKey(validated.value);
+    const cached = serviceCache?.get(`departures:${key}`);
+    if (cached !== undefined) return res.status(200).json({ ...cached, cache: 'hit' });
+    try {
+      const upstream = await coalesce(inFlight, `departures:${key}`, maxInFlight,
+        () => client.departures(validated.value));
+      const payload = {
+        status: upstream.status,
+        data: normalizeDeparturesResponse(upstream.data, validated.value.region)
+      };
+      serviceCache?.set(`departures:${key}`, payload);
       return res.status(upstream.status).json({ ...payload, cache: 'miss' });
     } catch (error) {
       return next(upstreamError(error));

@@ -88,6 +88,25 @@ function validateLocationsRequest(body) {
   return { ok: true, value: { bounds, locale } };
 }
 
+function validateDeparturesRequest(body) {
+  if (!isPlainObject(body)) return invalid('invalid_departures_request');
+  const region = normalizeString(body.region);
+  const locale = normalizeLocale(body.locale ?? 'de');
+  const stopCodes = Array.isArray(body.stopCodes)
+    ? [...new Set(body.stopCodes.map(normalizeString).filter(Boolean))]
+    : [];
+  if (!REGION_PATTERN.test(region)) return invalid('invalid_departures_region');
+  if (!locale) return invalid('invalid_departures_locale');
+  if (stopCodes.length < 1 || stopCodes.length > 20 || stopCodes.some((stop) => !STOP_PATTERN.test(stop))) {
+    return invalid('invalid_departures_stops');
+  }
+  const requestedLimit = body.limit === undefined ? 40 : Number(body.limit);
+  if (!Number.isInteger(requestedLimit) || requestedLimit < 1 || requestedLimit > 100) {
+    return invalid('invalid_departures_limit');
+  }
+  return { ok: true, value: { region, stopCodes, locale, limit: requestedLimit } };
+}
+
 function normalizeLocale(value) {
   const normalized = normalizeString(value).replace('_', '-');
   return /^[a-z]{2,3}(?:-[a-zA-Z]{2,4})?$/.test(normalized) ? normalized : null;
@@ -154,5 +173,6 @@ module.exports = {
   validateLatestRequest,
   validateRegionRequest,
   validateLocationsRequest,
+  validateDeparturesRequest,
   normalizeLocale
 };

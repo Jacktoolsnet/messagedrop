@@ -308,7 +308,18 @@
       "platform": "Steig",
       "unknownPlatform": "unbekannt",
       "noPlatforms": "Für diese Haltestelle wurden keine Steige geliefert.",
-      "operators": "Verkehrsunternehmen"
+      "operators": "Verkehrsunternehmen",
+      "loadingDepartures": "Abfahrten werden geladen …",
+      "unknownDirection": "Richtung unbekannt",
+      "showDepartures": "Abfahrtszeiten",
+      "departuresError": "Die aktuellen Abfahrten konnten nicht geladen werden.",
+      "departuresFor": "Abfahrten der Linie",
+      "cancelled": "Fällt aus",
+      "live": "Echtzeit",
+      "minutesShort": "Min.",
+      "scheduled": "Fahrplan",
+      "scheduledAt": "Planmäßig",
+      "refreshDepartures": "Abfahrten aktualisieren"
     },
     "hashtags": {
       "label": "Hashtags",

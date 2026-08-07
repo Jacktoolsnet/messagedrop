@@ -2957,7 +2957,7 @@
     "items": {
       "lines": {
         "title": "Linien",
-        "desc": "Zeigt alle Linien, die TripGo dieser Haltestelle zugeordnet hat. Fahrtrichtungen und Abfahrtszeiten werden in einem folgenden Schritt ergänzt."
+        "desc": "Zeigt Linien und Fahrtrichtungen als auswählbare Kacheln. Über „Abfahrtszeiten“ werden die nächsten Fahrten dieser Linie angezeigt."
       },
       "platforms": {
         "title": "Steige",

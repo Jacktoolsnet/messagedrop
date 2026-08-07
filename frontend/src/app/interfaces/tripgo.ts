@@ -199,3 +199,43 @@ export interface TripGoStopsViewport {
   bounds: BoundingBox[];
   zoom: number;
 }
+
+export interface TripGoDeparture {
+  id: string;
+  region: string;
+  stopCode: string;
+  serviceTripId?: string;
+  routeId?: string;
+  operator?: string;
+  operatorId?: string;
+  line?: string;
+  serviceName?: string;
+  direction?: string;
+  modeIdentifier?: string;
+  modeLabel?: string;
+  icon?: string;
+  color?: string;
+  textColor?: string;
+  scheduledDepartureTime?: string;
+  departureTime: string;
+  delaySeconds?: number;
+  platform?: string;
+  scheduledPlatform?: string;
+  realTime: boolean;
+  realTimeStatus?: string;
+  cancelled: boolean;
+  wheelchairAccessible?: boolean;
+  bicycleAccessible?: boolean;
+  alerts: string[];
+}
+
+export interface TripGoDeparturesResponse {
+  status: number;
+  data: {
+    region: string;
+    updatedAt: string;
+    departures: TripGoDeparture[];
+    alerts: string[];
+  };
+  cache: 'hit' | 'miss';
+}

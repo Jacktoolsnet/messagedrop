@@ -2957,7 +2957,7 @@
     "items": {
       "lines": {
         "title": "Lines",
-        "desc": "Shows all lines assigned to this stop by TripGo. Directions and departure times will be added in a following step."
+        "desc": "Shows lines and directions as selectable tiles. “Departure times” displays the next services for that line."
       },
       "platforms": {
         "title": "Platforms",

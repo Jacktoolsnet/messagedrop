@@ -307,7 +307,18 @@
       "platform": "Andén",
       "unknownPlatform": "desconocido",
       "noPlatforms": "No se proporcionaron andenes para esta parada.",
-      "operators": "Operadores de transporte"
+      "operators": "Operadores de transporte",
+      "loadingDepartures": "Cargando salidas …",
+      "unknownDirection": "Dirección desconocida",
+      "showDepartures": "Horarios de salida",
+      "departuresError": "No se pudieron cargar las salidas actuales.",
+      "departuresFor": "Salidas de la línea",
+      "cancelled": "Cancelado",
+      "live": "Tiempo real",
+      "minutesShort": "min",
+      "scheduled": "Programado",
+      "scheduledAt": "Programado",
+      "refreshDepartures": "Actualizar salidas"
     },
     "hashtags": {
       "label": "Hashtags",

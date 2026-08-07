@@ -308,7 +308,18 @@
       "platform": "Platform",
       "unknownPlatform": "unknown",
       "noPlatforms": "No platforms were provided for this stop.",
-      "operators": "Transport operators"
+      "operators": "Transport operators",
+      "loadingDepartures": "Loading departures …",
+      "unknownDirection": "Direction unknown",
+      "showDepartures": "Departure times",
+      "departuresError": "Current departures could not be loaded.",
+      "departuresFor": "Departures for line",
+      "cancelled": "Cancelled",
+      "live": "Live",
+      "minutesShort": "min",
+      "scheduled": "Scheduled",
+      "scheduledAt": "Scheduled",
+      "refreshDepartures": "Refresh departures"
     },
     "hashtags": {
       "label": "Hashtags",

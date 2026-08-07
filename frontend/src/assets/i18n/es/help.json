@@ -2939,7 +2939,7 @@
     "items": {
       "lines": {
         "title": "Líneas",
-        "desc": "Muestra todas las líneas asignadas por TripGo a esta parada. Las direcciones y horas de salida se añadirán en un paso posterior."
+        "desc": "Muestra líneas y direcciones como mosaicos seleccionables. «Horarios de salida» muestra los próximos servicios de esa línea."
       },
       "platforms": {
         "title": "Andenes",
