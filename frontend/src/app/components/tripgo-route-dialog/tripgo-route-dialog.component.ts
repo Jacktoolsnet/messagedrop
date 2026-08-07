@@ -127,6 +127,18 @@ export class TripGoRouteDialogComponent implements OnInit {
     this.viewMode.set('map');
   }
 
+  activateRoutePoint(event: Event, kind: RoutePointKind): void {
+    if (this.isNestedInteractiveElement(event)) return;
+    if (event instanceof KeyboardEvent) event.preventDefault();
+    this.editRoutePoint(kind);
+  }
+
+  activateRouteCard(event: Event, route: TripGoRouteOption): void {
+    if (this.isNestedInteractiveElement(event)) return;
+    if (event instanceof KeyboardEvent) event.preventDefault();
+    this.showRouteOnMap(route);
+  }
+
   showList(): void {
     this.routeMap?.stopSimulation();
     this.simulationState.set('idle');
@@ -427,5 +439,13 @@ export class TripGoRouteDialogComponent implements OnInit {
       plusCode: location.plusCode?.trim()
         || this.geolocation.getPlusCode(location.latitude, location.longitude)
     };
+  }
+
+  private isNestedInteractiveElement(event: Event): boolean {
+    const target = event.target;
+    const currentTarget = event.currentTarget;
+    return target instanceof Element
+      && target !== currentTarget
+      && target.closest('button, a, input, select, textarea') !== null;
   }
 }

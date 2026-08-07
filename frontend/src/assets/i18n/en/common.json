@@ -243,6 +243,9 @@
         "onTime": "On time",
         "delayed": "+{{ minutes }} min late",
         "early": "{{ minutes }} min early",
+        "connectionReachable": "Connection likely reachable ({{ minutes }} min buffer)",
+        "connectionTight": "Connection likely tight ({{ minutes }} min buffer)",
+        "connectionMissed": "Connection unlikely to be reached",
         "refreshLive": "Refresh current service data",
         "openProvider": "Open ticket or operator website"
       },

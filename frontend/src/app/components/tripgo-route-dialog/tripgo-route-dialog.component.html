@@ -19,13 +19,19 @@
     }
   } @else {
   <section class="route-points" [attr.aria-label]="'common.tripGo.routePoints' | transloco">
-    <article class="route-point">
+    <article class="route-point route-point--action" role="button"
+      [attr.tabindex]="!origin() || isBusy() ? -1 : 0"
+      [attr.aria-disabled]="!origin() || isBusy()"
+      [attr.aria-label]="'common.tripGo.editOrigin' | transloco"
+      (click)="activateRoutePoint($event, 'origin')"
+      (keydown.enter)="activateRoutePoint($event, 'origin')"
+      (keydown.space)="activateRoutePoint($event, 'origin')">
       <header class="route-point__header">
         <span class="route-point__label">
           <mat-icon aria-hidden="true">my_location</mat-icon>
           {{ 'common.tripGo.origin' | transloco }}
         </span>
-        <button mat-icon-button type="button" (click)="editRoutePoint('origin')"
+        <button mat-icon-button type="button" (click)="editRoutePoint('origin'); $event.stopPropagation()"
           [disabled]="!origin() || isBusy()"
           [attr.aria-label]="'common.tripGo.editOrigin' | transloco">
           <mat-icon>edit</mat-icon>
@@ -47,13 +53,19 @@
       </div>
     </article>
 
-    <article class="route-point">
+    <article class="route-point route-point--action" role="button"
+      [attr.tabindex]="isBusy() ? -1 : 0"
+      [attr.aria-disabled]="isBusy()"
+      [attr.aria-label]="'common.tripGo.editDestination' | transloco"
+      (click)="activateRoutePoint($event, 'destination')"
+      (keydown.enter)="activateRoutePoint($event, 'destination')"
+      (keydown.space)="activateRoutePoint($event, 'destination')">
       <header class="route-point__header">
         <span class="route-point__label">
           <mat-icon aria-hidden="true">location_on</mat-icon>
           {{ 'common.tripGo.destination' | transloco }}
         </span>
-        <button mat-icon-button type="button" (click)="editRoutePoint('destination')"
+        <button mat-icon-button type="button" (click)="editRoutePoint('destination'); $event.stopPropagation()"
           [disabled]="isBusy()"
           [attr.aria-label]="'common.tripGo.editDestination' | transloco">
           <mat-icon>edit</mat-icon>
@@ -109,10 +121,14 @@
   } @else {
     <div class="route-list">
       @for (route of routes(); track route.id) {
-        <article class="route-card">
+        <article class="route-card route-card--action" role="button" tabindex="0"
+          [attr.aria-label]="'common.tripGo.showOnMap' | transloco"
+          (click)="activateRouteCard($event, route)"
+          (keydown.enter)="activateRouteCard($event, route)"
+          (keydown.space)="activateRouteCard($event, route)">
           <header class="route-card__summary">
             <button mat-icon-button type="button" class="route-card__map-action"
-              (click)="showRouteOnMap(route)"
+              (click)="showRouteOnMap(route); $event.stopPropagation()"
               [attr.aria-label]="'common.tripGo.showOnMap' | transloco">
               <mat-icon>map</mat-icon>
             </button>

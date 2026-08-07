@@ -19,7 +19,7 @@
       <article class="detail-tile">
         <header><mat-icon aria-hidden="true">directions_transit</mat-icon>{{ 'common.tripGo.routePointDetails.service' | transloco }}</header>
         <dl class="detail-list">
-          @if (service.number) { <dt>{{ 'common.tripGo.routePointDetails.line' | transloco }}</dt><dd>{{ service.number }}</dd> }
+          @if (serviceLabel(); as label) { <dt>{{ 'common.tripGo.routePointDetails.line' | transloco }}</dt><dd>{{ label }}</dd> }
           @if (service.direction) { <dt>{{ 'common.tripGo.routePointDetails.direction' | transloco }}</dt><dd>{{ service.direction }}</dd> }
           @if (service.operator) { <dt>{{ 'common.tripGo.routePointDetails.operator' | transloco }}</dt><dd>{{ service.operator }}</dd> }
           @if (service.startPlatform) { <dt>{{ 'common.tripGo.routePointDetails.startPlatform' | transloco }}</dt><dd>{{ service.startPlatform }}</dd> }
@@ -55,41 +55,35 @@
           <span>{{ 'common.tripGo.routePointDetails.liveError' | transloco }}</span>
         } @else if (liveDetails(); as live) {
           <div class="live-details">
-            <div class="live-departure">
-              <small>{{ (hasLiveData()
-                ? 'common.tripGo.routePointDetails.currentDeparture'
-                : 'common.tripGo.routePointDetails.scheduledDeparture') | transloco }}</small>
-              <strong>{{ formatTime(hasLiveData()
-                ? (live.departureTime || segment().startTime)
-                : (live.scheduledDepartureTime || live.departureTime || segment().startTime)) }}</strong>
-            </div>
-            @if (hasLiveData() && live.arrivalTime) {
+            <div class="live-departures">
               <div class="live-departure">
-                <small>{{ 'common.tripGo.routePointDetails.currentArrival' | transloco }}</small>
-                <strong>{{ formatTime(live.arrivalTime) }}</strong>
+                <small>{{ 'common.tripGo.routePointDetails.scheduledDeparture' | transloco }}</small>
+                <strong>{{ formatTime(plannedDeparture(live)) }}</strong>
               </div>
-            }
-            @if (hasLiveData() && live.scheduledDepartureTime) {
-              <span>{{ 'common.tripGo.routePointDetails.scheduledDeparture' | transloco }}: {{ formatTime(live.scheduledDepartureTime) }}</span>
-            }
+              <div class="live-departure">
+                <small>{{ 'common.tripGo.routePointDetails.currentDeparture' | transloco }}</small>
+                <strong>{{ formatTime(currentDeparture(live)) }}</strong>
+              </div>
+            </div>
             @if (live.delaySeconds !== undefined) {
               <strong class="delay" [class.delay--late]="live.delaySeconds > 30">
                 {{ formatDelay(live.delaySeconds) }}
               </strong>
             }
+            @if (connectionAssessment(); as connection) {
+              <p class="connection-status" [class.connection-status--tight]="connection.state === 'tight'"
+                [class.connection-status--missed]="connection.state === 'missed'">
+                <mat-icon aria-hidden="true">{{ connection.state === 'missed' ? 'link_off' : 'transfer_within_a_station' }}</mat-icon>
+                <span>{{ connectionLabel(connection) }}</span>
+              </p>
+            }
             @if (live.cancelled) {
               <strong class="delay delay--late">{{ 'common.tripGo.routePointDetails.cancelled' | transloco }}</strong>
-            }
-            @if (live.platform || live.endPlatform) {
-              <span>{{ 'common.tripGo.routePointDetails.currentPlatform' | transloco }}: {{ live.platform || live.endPlatform }}</span>
-            }
-            @if (hasLiveData() && live.updatedAt) {
-              <span>{{ 'common.tripGo.routePointDetails.lastUpdated' | transloco }}: {{ formatTime(live.updatedAt) }}</span>
             }
             @for (alert of live.alerts; track alert) {
               <p class="live-alert"><mat-icon aria-hidden="true">warning</mat-icon><span>{{ alert }}</span></p>
             }
-            @if (!hasLiveData() && !live.delaySeconds && live.alerts.length === 0) {
+            @if (!hasLiveData() && live.alerts.length === 0) {
               <span>{{ 'common.tripGo.routePointDetails.noLiveData' | transloco }}</span>
             }
           </div>

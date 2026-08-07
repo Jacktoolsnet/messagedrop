@@ -38,6 +38,28 @@
   background: var(--mat-sys-surface-container-low);
 }
 
+.route-point--action,
+.route-card--action {
+  cursor: pointer;
+  touch-action: pan-y;
+  transition: background-color 120ms ease, box-shadow 120ms ease;
+}
+
+.route-point--action:hover,
+.route-card--action:hover {
+  background: var(--mat-sys-surface-container);
+}
+
+.route-point--action:focus-visible,
+.route-card--action:focus-visible {
+  outline: 3px solid var(--mat-sys-primary);
+  outline-offset: 2px;
+}
+
+.route-point--action[aria-disabled='true'] {
+  cursor: default;
+}
+
 .route-point__header,
 .route-point__label {
   display: flex;

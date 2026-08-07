@@ -242,6 +242,9 @@
         "onTime": "À l’heure",
         "delayed": "+{{ minutes }} min de retard",
         "early": "{{ minutes }} min d’avance",
+        "connectionReachable": "Correspondance probablement assurée ({{ minutes }} min de marge)",
+        "connectionTight": "Correspondance probablement juste ({{ minutes }} min de marge)",
+        "connectionMissed": "Correspondance probablement impossible",
         "refreshLive": "Actualiser les données du service",
         "openProvider": "Ouvrir le site de billetterie ou de l’opérateur"
       },

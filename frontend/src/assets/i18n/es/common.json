@@ -242,6 +242,9 @@
         "onTime": "Puntual",
         "delayed": "+{{ minutes }} min de retraso",
         "early": "{{ minutes }} min antes",
+        "connectionReachable": "Conexión probablemente alcanzable ({{ minutes }} min de margen)",
+        "connectionTight": "Conexión probablemente justa ({{ minutes }} min de margen)",
+        "connectionMissed": "Probablemente no se llegue a la conexión",
         "refreshLive": "Actualizar los datos del servicio",
         "openProvider": "Abrir la web de billetes o del operador"
       },

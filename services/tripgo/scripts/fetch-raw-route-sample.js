@@ -15,6 +15,7 @@ function coordinate(name) {
 async function main() {
   const outputPath = process.argv[2];
   const serviceOutputPath = process.argv[3];
+  const latestOutputPath = process.argv[4];
   if (!outputPath) throw new Error('Output path is required');
 
   const client = createTripGoClient();
@@ -42,6 +43,21 @@ async function main() {
     await fs.mkdir(path.dirname(serviceOutputPath), { recursive: true });
     await fs.writeFile(serviceOutputPath, `${JSON.stringify(serviceSamples, null, 2)}\n`, { mode: 0o600 });
     process.stdout.write(`Raw TripGo service details written to ${serviceOutputPath}\n`);
+
+    if (latestOutputPath) {
+      const latestSamples = {
+        tripId: serviceSamples.tripId,
+        services: serviceSamples.services.map(({ description, query, latest, latestError }) => ({
+          description,
+          query,
+          latest,
+          latestError
+        }))
+      };
+      await fs.mkdir(path.dirname(latestOutputPath), { recursive: true });
+      await fs.writeFile(latestOutputPath, `${JSON.stringify(latestSamples, null, 2)}\n`, { mode: 0o600 });
+      process.stdout.write(`Raw TripGo latest details written to ${latestOutputPath}\n`);
+    }
   }
 }
 
@@ -53,9 +69,9 @@ async function fetchServiceSamples(client, routeResponse) {
   const selectedTrip = trips
     .map((trip) => ({ trip, scheduled: scheduledSegments(trip, templates) }))
     .filter(({ scheduled }) => scheduled.length > 0)
-    .sort((left, right) => Number(containsOperator(right.scheduled, preferredOperator))
-      - Number(containsOperator(left.scheduled, preferredOperator))
-      || right.scheduled.length - left.scheduled.length
+    .sort((left, right) => operatorPriority(right.scheduled, preferredOperator)
+      - operatorPriority(left.scheduled, preferredOperator)
+      || left.scheduled.length - right.scheduled.length
       || Number(left.trip.weightedScore ?? Number.MAX_SAFE_INTEGER)
         - Number(right.trip.weightedScore ?? Number.MAX_SAFE_INTEGER))[0];
 
@@ -86,26 +102,38 @@ async function fetchServiceSamples(client, routeResponse) {
       from: template.from?.name,
       to: template.to?.name
     };
+    const sample = { description, query };
     try {
       const response = await client.service(query);
-      services.push({ description, query, status: response.status, data: response.data });
+      sample.status = response.status;
+      sample.data = response.data;
     } catch (error) {
-      services.push({
-        description,
-        query,
-        error: {
-          message: error.message,
-          status: error.response?.status,
-          data: error.response?.data
-        }
-      });
+      sample.error = requestError(error);
     }
+    try {
+      const latestResponse = await client.latest(query);
+      sample.latest = { status: latestResponse.status, data: latestResponse.data };
+    } catch (error) {
+      sample.latestError = requestError(error);
+    }
+    services.push(sample);
   }
   return { tripId: selectedTrip.trip.id, services };
 }
 
-function containsOperator(segments, operatorId) {
-  return Boolean(operatorId) && segments.some(({ template }) => template.operatorID === operatorId);
+function operatorPriority(segments, operatorId) {
+  if (!operatorId) return 0;
+  const matches = segments.filter(({ template }) => template.operatorID === operatorId).length;
+  if (matches === segments.length) return 2;
+  return matches > 0 ? 1 : 0;
+}
+
+function requestError(error) {
+  return {
+    message: error.message,
+    status: error.response?.status,
+    data: error.response?.data
+  };
 }
 
 function scheduledSegments(trip, templates) {

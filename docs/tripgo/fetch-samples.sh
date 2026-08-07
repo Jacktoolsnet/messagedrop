@@ -35,7 +35,8 @@ fetch_diagnostic_route() {
     TRIPGO_SAMPLE_OPERATOR="${operator}" \
     node "${script_dir}/../../services/tripgo/scripts/fetch-raw-route-sample.js" \
       "${output_dir}/route-${name}-raw.json" \
-      "${output_dir}/services-${name}-raw.json"; then
+      "${output_dir}/services-${name}-raw.json" \
+      "${output_dir}/latest-${name}-raw.json"; then
     printf 'Raw sample %s failed; continuing with the other diagnostics.\n' "${name}" >&2
   fi
 
@@ -83,12 +84,13 @@ for region in \
 done
 
 if [[ "${TRIPGO_FETCH_ROUTES:-1}" == "1" ]]; then
-  # VY Bus4You is explicitly marked as real-time capable for Stockholm. Test
-  # its complete Stockholm–Oslo relation: on the shorter section to Västerås,
-  # TripGo preferred SJ and FlixBus and returned no VY alternative.
-  fetch_diagnostic_route "stockholm-oslo-coach" \
-    "59.33167" "18.05601" "59.91110" "10.75835" "en" "pt_pub_coach" \
-    "no-entur-netex-VYB:Operator:Vybus4you"
+  # TripGo uses Sydney in its own /latest.json documentation. This short and
+  # frequent light-rail connection is therefore a stronger real-time test than
+  # an international long-distance journey. Besides routing and /service, the
+  # raw diagnostic script now stores the direct /latest response as well.
+  fetch_diagnostic_route "sydney-central-circular-quay" \
+    "-33.8830" "151.2069" "-33.8611" "151.2101" "en" "pt_pub_tram" \
+    "au-nsw-lightrail-cbd-SLR"
 fi
 
 printf 'TripGo samples written to %s\n' "${output_dir}"

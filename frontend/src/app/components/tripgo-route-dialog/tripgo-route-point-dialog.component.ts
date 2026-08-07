@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { catchError, forkJoin, of } from 'rxjs';
 import { TripGoLiveServiceDetails, TripGoRouteOption, TripGoRouteSegment } from '../../interfaces/tripgo';
 import { TripGoService } from '../../services/tripgo.service';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
@@ -22,6 +23,11 @@ export interface TripGoRoutePointDialogData {
   kind: 'segment' | 'arrival';
   route: TripGoRouteOption;
   segmentIndex: number;
+}
+
+interface TripGoConnectionAssessment {
+  state: 'reachable' | 'tight' | 'missed';
+  minutes?: number;
 }
 
 @Component({
@@ -64,10 +70,11 @@ export class TripGoRoutePointDialogComponent implements OnInit {
   readonly modeLabel = computed(() => this.segment().type === 'stationary'
     ? this.transloco.translate('common.tripGo.waitingTime')
     : this.segment().modeLabel);
+  readonly serviceLabel = computed(() => tripGoServiceLabel(this.segment()));
   readonly subtitle = computed(() => {
     const service = this.segment().service;
     if (this.data.kind === 'arrival') return this.transloco.translate('common.tripGo.routePointDetails.arrival');
-    const serviceLabel = tripGoServiceLabel(this.segment());
+    const serviceLabel = this.serviceLabel();
     const destination = tripGoDisplayLocationName(this.segment().to?.name);
     const scheduledLabel = serviceLabel && destination
       ? this.transloco.translate('common.tripGo.serviceToLocation', { service: serviceLabel, location: destination })
@@ -91,6 +98,7 @@ export class TripGoRoutePointDialogComponent implements OnInit {
   });
   readonly ticketUrl = computed(() => this.safeUrl(this.segment().service?.ticketWebsiteUrl));
   readonly liveDetails = signal<TripGoLiveServiceDetails | null>(null);
+  readonly nextLiveDetails = signal<TripGoLiveServiceDetails | null>(null);
   readonly liveState = signal<'idle' | 'loading' | 'ready' | 'error'>('idle');
   readonly canLoadLiveDetails = computed(() => !!(
     this.segment().from?.region
@@ -102,6 +110,39 @@ export class TripGoRoutePointDialogComponent implements OnInit {
     return this.liveDetails()?.realTime === true
       || this.segment().service?.realTime === true;
   });
+  readonly nextConnection = computed(() => {
+    if (this.data.kind !== 'segment' || this.segment().type !== 'scheduled') return null;
+    const segments = this.data.route.segments;
+    const nextIndex = segments.findIndex((segment, index) => index > this.data.segmentIndex
+      && segment.type === 'scheduled');
+    if (nextIndex < 0) return null;
+    const transferSeconds = segments
+      .slice(this.data.segmentIndex + 1, nextIndex)
+      .filter((segment) => segment.type !== 'stationary')
+      .reduce((total, segment) => total + (segment.durationSeconds || 0), 0);
+    return { segment: segments[nextIndex], transferSeconds };
+  });
+  readonly connectionAssessment = computed<TripGoConnectionAssessment | null>(() => {
+    const connection = this.nextConnection();
+    const current = this.liveDetails();
+    const next = this.nextLiveDetails();
+    if (!connection || !current) return null;
+    const hasPrediction = this.hasLiveData()
+      || next?.realTime === true
+      || connection.segment.service?.realTime === true;
+    if (!hasPrediction) return null;
+    if (current.cancelled || next?.cancelled) return { state: 'missed' };
+
+    const arrival = current.arrivalTime || this.segment().endTime;
+    const departure = next?.departureTime || connection.segment.startTime;
+    if (!arrival || !departure) return null;
+    const marginSeconds = (Date.parse(departure) - Date.parse(arrival)) / 1000
+      - connection.transferSeconds;
+    if (!Number.isFinite(marginSeconds)) return null;
+    const minutes = Math.max(0, Math.floor(marginSeconds / 60));
+    if (marginSeconds < 0) return { state: 'missed' };
+    return { state: marginSeconds < 300 ? 'tight' : 'reachable', minutes };
+  });
 
   ngOnInit(): void {
     this.loadLiveDetails();
@@ -110,11 +151,20 @@ export class TripGoRoutePointDialogComponent implements OnInit {
   loadLiveDetails(): void {
     if (!this.canLoadLiveDetails() || this.liveState() === 'loading') return;
     this.liveState.set('loading');
-    this.tripGo.getServiceDetails(this.segment(), this.transloco.getActiveLang() || 'de', true).pipe(
+    const locale = this.transloco.getActiveLang() || 'de';
+    const connection = this.nextConnection();
+    const nextDetails$ = connection && this.canLoadDetails(connection.segment)
+      ? this.tripGo.getServiceDetails(connection.segment, locale, true).pipe(catchError(() => of(null)))
+      : of(null);
+    forkJoin({
+      current: this.tripGo.getServiceDetails(this.segment(), locale, true),
+      next: nextDetails$
+    }).pipe(
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
-      next: (details) => {
-        this.liveDetails.set(details);
+      next: ({ current, next }) => {
+        this.liveDetails.set(current);
+        this.nextLiveDetails.set(next);
         this.liveState.set('ready');
       },
       error: () => this.liveState.set('error')
@@ -166,6 +216,30 @@ export class TripGoRoutePointDialogComponent implements OnInit {
     return this.transloco.translate(seconds > 0
       ? 'common.tripGo.routePointDetails.delayed'
       : 'common.tripGo.routePointDetails.early', { minutes });
+  }
+
+  plannedDeparture(live: TripGoLiveServiceDetails): string | undefined {
+    return live.scheduledDepartureTime || this.segment().scheduledStartTime || this.segment().startTime;
+  }
+
+  currentDeparture(live: TripGoLiveServiceDetails): string | undefined {
+    return this.hasLiveData() ? (live.departureTime || this.segment().startTime) : undefined;
+  }
+
+  connectionLabel(assessment: TripGoConnectionAssessment): string {
+    const key = assessment.state === 'reachable'
+      ? 'common.tripGo.routePointDetails.connectionReachable'
+      : assessment.state === 'tight'
+        ? 'common.tripGo.routePointDetails.connectionTight'
+        : 'common.tripGo.routePointDetails.connectionMissed';
+    return this.transloco.translate(key, { minutes: assessment.minutes });
+  }
+
+  private canLoadDetails(segment: TripGoRouteSegment): boolean {
+    return !!(segment.from?.region
+      && segment.from?.stopCode
+      && segment.service?.tripId
+      && segment.startTime);
   }
 
   private safeUrl(value: string | undefined): string | null {
