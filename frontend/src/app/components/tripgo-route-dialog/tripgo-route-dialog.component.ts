@@ -161,6 +161,23 @@ export class TripGoRouteDialogComponent implements OnInit {
     this.viewMode.set('map');
   }
 
+  showPreviousRoute(): void {
+    this.showAdjacentRoute(-1);
+  }
+
+  showNextRoute(): void {
+    this.showAdjacentRoute(1);
+  }
+
+  hasPreviousRoute(): boolean {
+    return this.selectedRouteIndex() > 0;
+  }
+
+  hasNextRoute(): boolean {
+    const index = this.selectedRouteIndex();
+    return index >= 0 && index < this.routes().length - 1;
+  }
+
   toggleRouteExpanded(event: Event, route: TripGoRouteOption): void {
     event.stopPropagation();
     const expanded = new Set(this.expandedRouteIds());
@@ -494,6 +511,19 @@ export class TripGoRouteDialogComponent implements OnInit {
         this.state.set('error');
       }
     });
+  }
+
+  private showAdjacentRoute(offset: -1 | 1): void {
+    const route = this.routes()[this.selectedRouteIndex() + offset];
+    if (!route) return;
+    this.routeMap?.stopSimulation();
+    this.simulationState.set('idle');
+    this.selectedRoute.set(route);
+  }
+
+  private selectedRouteIndex(): number {
+    const selectedId = this.selectedRoute()?.id;
+    return selectedId ? this.routes().findIndex((route) => route.id === selectedId) : -1;
   }
 
   private loadServiceDetails(routes: TripGoRouteOption[]): void {

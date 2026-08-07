@@ -376,6 +376,13 @@
           <mat-icon>skip_previous</mat-icon>
         </button>
       }
+      @if (simulationState() === 'idle') {
+        <button mat-icon-button type="button" (click)="showPreviousRoute()"
+          [disabled]="!hasPreviousRoute()"
+          [attr.aria-label]="'common.tripGo.previousRoute' | transloco">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+      }
       <button mat-icon-button type="button" (click)="toggleSimulation()"
         [attr.aria-label]="(simulationState() === 'playing'
           ? 'common.tripGo.simulation.pause'
@@ -384,6 +391,13 @@
             : 'common.tripGo.simulation.start') | transloco">
         <mat-icon>{{ simulationState() === 'playing' ? 'pause' : 'play_arrow' }}</mat-icon>
       </button>
+      @if (simulationState() === 'idle') {
+        <button mat-icon-button type="button" (click)="showNextRoute()"
+          [disabled]="!hasNextRoute()"
+          [attr.aria-label]="'common.tripGo.nextRoute' | transloco">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      }
       @if (simulationState() !== 'idle') {
         <button mat-icon-button type="button" (click)="nextSimulationPoint()"
           [attr.aria-label]="'common.tripGo.simulation.next' | transloco">

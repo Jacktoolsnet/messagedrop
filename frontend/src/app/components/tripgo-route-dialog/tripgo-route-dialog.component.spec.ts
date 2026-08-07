@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { TranslocoService } from '@jsverse/transloco';
 import { of } from 'rxjs';
+import { TripGoRouteOption } from '../../interfaces/tripgo';
 import { GeolocationService } from '../../services/geolocation.service';
 import { NominatimService } from '../../services/nominatim.service';
 import { TripGoService } from '../../services/tripgo.service';
@@ -155,5 +156,27 @@ describe('TripGoRouteDialogComponent', () => {
     expect(dialog.open).toHaveBeenCalledWith(TripGoRoutePointDialogComponent, jasmine.objectContaining({
       data: { kind: 'segment', segmentIndex: 0, route }
     }));
+  });
+
+  it('switches between calculated routes in the map view', () => {
+    const routes: TripGoRouteOption[] = ['car-transit', 'walk-transit'].map((category, index) => ({
+      id: `route-${index}`, category: category as TripGoRouteOption['category'], groupIndex: index,
+      departureTime: '2026-08-06T08:00:00Z', arrivalTime: '2026-08-06T08:10:00Z',
+      durationSeconds: 600, transfers: 0, modes: [], segments: []
+    }));
+    fixture.componentInstance.routes.set(routes);
+    fixture.componentInstance.selectedRoute.set(routes[0]);
+
+    expect(fixture.componentInstance.hasPreviousRoute()).toBeFalse();
+    expect(fixture.componentInstance.hasNextRoute()).toBeTrue();
+
+    fixture.componentInstance.showNextRoute();
+
+    expect(fixture.componentInstance.selectedRoute()).toBe(routes[1]);
+    expect(fixture.componentInstance.hasPreviousRoute()).toBeTrue();
+    expect(fixture.componentInstance.hasNextRoute()).toBeFalse();
+
+    fixture.componentInstance.showPreviousRoute();
+    expect(fixture.componentInstance.selectedRoute()).toBe(routes[0]);
   });
 });

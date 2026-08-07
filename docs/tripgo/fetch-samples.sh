@@ -110,4 +110,16 @@ if [[ "${TRIPGO_FETCH_ROUTES:-1}" == "1" ]]; then
     "52.3759" "9.7320" "48.1374" "11.5755" "de" "in_air,pt_pub"
 fi
 
+if [[ "${TRIPGO_FETCH_ROAD_SAMPLES:-0}" == "1" ]]; then
+  # Same route with all three unscheduled road/path modes. Comparing the raw
+  # segment templates shows whether TripGo structures car instructions
+  # differently from its walking and bicycle instructions.
+  fetch_diagnostic_route "wolfenbuettel-braunschweig-car" \
+    "52.1625" "10.5369" "52.2647" "10.5239" "de" "me_car"
+  fetch_diagnostic_route "wolfenbuettel-braunschweig-bicycle" \
+    "52.1625" "10.5369" "52.2647" "10.5239" "de" "me_mic_bic"
+  fetch_diagnostic_route "wolfenbuettel-braunschweig-walk" \
+    "52.1625" "10.5369" "52.2647" "10.5239" "de" "wa_wal"
+fi
+
 printf 'TripGo samples written to %s\n' "${output_dir}"

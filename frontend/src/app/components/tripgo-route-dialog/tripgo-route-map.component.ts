@@ -14,7 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import * as leaflet from 'leaflet';
 import { Location } from '../../interfaces/location';
-import { TripGoLocation, TripGoRouteOption, TripGoRouteSegment } from '../../interfaces/tripgo';
+import { TripGoLocation, TripGoRouteOption, TripGoRouteSegment, TripGoTurnInstruction } from '../../interfaces/tripgo';
 import { TripGoTimelineWeatherComponent } from './tripgo-timeline-weather.component';
 import {
   tripGoDisplayLocationName,
@@ -37,6 +37,7 @@ interface TripGoSimulationPoint {
   title: string;
   time?: string;
   segment?: TripGoRouteSegment;
+  turnInstruction?: TripGoTurnInstruction;
   showOverlay: boolean;
 }
 
@@ -47,6 +48,34 @@ interface TripGoSimulationPoint {
   template: `
     <div class="route-map-shell">
       <div class="route-map" [id]="mapId"></div>
+      @if (!activeSimulationPoint()) {
+        <aside class="route-summary-overlay" role="status" aria-live="polite"
+          [attr.aria-label]="routeCategoryLabel()">
+          <div class="route-summary-overlay__main">
+            <mat-icon class="route-summary-overlay__mode" aria-hidden="true">{{ routeCategoryIcon() }}</mat-icon>
+            <div class="route-summary-overlay__times">
+              <strong>{{ formatTime(route.departureTime) }}</strong>
+              <mat-icon aria-hidden="true">arrow_forward</mat-icon>
+              <strong>{{ formatTime(route.arrivalTime) }}</strong>
+            </div>
+          </div>
+          <div class="route-summary-overlay__facts">
+            <span>
+              <mat-icon aria-hidden="true">schedule</mat-icon>
+              {{ formatDuration(route.durationSeconds) }}
+            </span>
+            <span>
+              @if (route.transfers === 0) {
+                {{ 'common.tripGo.direct' | transloco }}
+              } @else if (route.transfers === 1) {
+                {{ 'common.tripGo.oneTransfer' | transloco }}
+              } @else {
+                {{ 'common.tripGo.transfers' | transloco:{ count: route.transfers } }}
+              }
+            </span>
+          </div>
+        </aside>
+      }
       @if (activeSimulationPoint(); as point) {
         <aside class="simulation-overlay" role="status" aria-live="polite"
           [style.--simulation-color]="simulationPointColor(point)"
@@ -59,6 +88,12 @@ interface TripGoSimulationPoint {
             </div>
           </header>
           <div class="simulation-overlay__facts">
+            @if (point.turnInstruction; as instruction) {
+              <span class="simulation-overlay__instruction">
+                <mat-icon aria-hidden="true">{{ turnInstructionIcon(instruction) }}</mat-icon>
+                <strong>{{ turnInstructionLabel(instruction) }}</strong>
+              </span>
+            }
             <span class="simulation-overlay__time">
               <mat-icon aria-hidden="true">schedule</mat-icon>
               @if (point.time) { {{ formatTime(point.time) }} } @else { &ndash; }
@@ -233,6 +268,66 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     }).format(new Date(value));
   }
 
+  formatDuration(seconds: number): string {
+    const minutes = Math.max(1, Math.round(seconds / 60));
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    return hours > 0 ? `${hours} h ${remainingMinutes} min` : `${minutes} min`;
+  }
+
+  routeCategoryIcon(): string {
+    switch (this.route.category) {
+      case 'car-transit': return 'directions_car';
+      case 'bicycle-transit': return 'directions_bike';
+      case 'flight': return 'flight';
+      default: return 'directions_walk';
+    }
+  }
+
+  routeCategoryLabel(): string {
+    return this.transloco.translate(`common.tripGo.routeCategories.${this.route.category || 'walk-transit'}`);
+  }
+
+  turnInstructionLabel(instruction: TripGoTurnInstruction): string {
+    const actionKeys: Record<string, string> = {
+      HEAD_TOWARDS: 'start',
+      CONTINUE_STRAIGHT: 'straight',
+      TURN_LEFT: 'left',
+      TURN_RIGHT: 'right',
+      TURN_SLIGHTLY_LEFT: 'slightlyLeft',
+      TURN_SLIGHTLY_RIGHT: 'slightlyRight',
+      TURN_SHARPLY_LEFT: 'sharplyLeft',
+      TURN_SHARPLY_RIGHT: 'sharplyRight',
+      U_TURN: 'uTurn',
+      ENTER_ROUNDABOUT: 'roundabout',
+      EXIT_ROUNDABOUT: 'exitRoundabout'
+    };
+    const key = actionKeys[instruction.action || ''] || 'continue';
+    const action = this.transloco.translate(`common.tripGo.turnInstructions.${key}`);
+    return instruction.streetName
+      ? this.transloco.translate('common.tripGo.turnInstructions.ontoStreet', {
+        instruction: action,
+        street: instruction.streetName
+      })
+      : action;
+  }
+
+  turnInstructionIcon(instruction: TripGoTurnInstruction): string {
+    switch (instruction.action) {
+      case 'TURN_LEFT': return 'turn_left';
+      case 'TURN_RIGHT': return 'turn_right';
+      case 'TURN_SLIGHTLY_LEFT': return 'turn_slight_left';
+      case 'TURN_SLIGHTLY_RIGHT': return 'turn_slight_right';
+      case 'TURN_SHARPLY_LEFT': return 'turn_sharp_left';
+      case 'TURN_SHARPLY_RIGHT': return 'turn_sharp_right';
+      case 'U_TURN': return 'u_turn_left';
+      case 'ENTER_ROUNDABOUT':
+      case 'EXIT_ROUNDABOUT': return 'roundabout_right';
+      case 'CONTINUE_STRAIGHT': return 'straight';
+      default: return 'navigation';
+    }
+  }
+
   private createMap(): void {
     this.map = leaflet.map(this.mapId, {
       center: [this.origin.latitude, this.origin.longitude],
@@ -284,6 +379,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
 
     this.route.segments.forEach((segment, segmentIndex) => {
       const geometryPoints = this.segmentGeometryLocations(segment);
+      const turnInstructions = this.turnInstructionsWithLocations(segment);
       const displayedPoints = geometryPoints.length >= 2
         ? geometryPoints
         : this.fallbackSimulationGeometry(segment);
@@ -302,7 +398,16 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
       }
 
       for (const location of displayedPoints) {
-        if (this.isSameSimulationLocation(points.at(-1)?.location, location)) continue;
+        const turnInstruction = turnInstructions.find((entry) =>
+          this.distanceInMeters(entry.location, location) <= 3)?.instruction;
+        const previousPoint = points.at(-1);
+        if (this.isSameSimulationLocation(previousPoint?.location, location)) {
+          if (turnInstruction && previousPoint) {
+            previousPoint.turnInstruction = turnInstruction;
+            previousPoint.showOverlay = true;
+          }
+          continue;
+        }
         const intermediateStop = segment.service?.intermediateStops?.find((stop) =>
           this.isSameSimulationLocation(stop, location));
         points.push({
@@ -312,7 +417,8 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
             || this.transloco.translate('common.tripGo.simulation.routePoint'),
           time: intermediateStop?.arrivalTime || intermediateStop?.departureTime || segment.startTime,
           segment,
-          showOverlay: !!intermediateStop
+          turnInstruction,
+          showOverlay: !!intermediateStop || !!turnInstruction
         });
       }
     });
@@ -568,6 +674,20 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     if (this.validTripGoLocation(segment.from)) points.push(segment.from);
     if (this.validTripGoLocation(segment.to)) points.push(segment.to);
     return points;
+  }
+
+  private turnInstructionsWithLocations(segment: TripGoRouteSegment): {
+    instruction: TripGoTurnInstruction;
+    location: TripGoLocation & { latitude: number; longitude: number };
+  }[] {
+    return (segment.turnInstructions || []).flatMap((instruction) => {
+      if (!instruction.encodedGeometry) return [];
+      const firstPoint = decodePolyline(instruction.encodedGeometry)[0];
+      return firstPoint ? [{
+        instruction,
+        location: { latitude: firstPoint[0], longitude: firstPoint[1] }
+      }] : [];
+    });
   }
 
   private segmentGeometryLocations(segment: TripGoRouteSegment): TripGoLocation[] {

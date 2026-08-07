@@ -281,8 +281,19 @@ function normalizeSegment(reference, template) {
     distanceMeters: finiteNumber(template.metres),
     cost: normalizeCost(template.localCost),
     service: normalizeService(reference, template),
+    turnInstructions: normalizeTurnInstructions(template.streets),
     geometry
   });
+}
+
+function normalizeTurnInstructions(streets) {
+  if (!Array.isArray(streets)) return null;
+  return streets.map((street) => compact({
+    action: stringOrNull(street?.instruction),
+    streetName: stringOrNull(street?.name),
+    distanceMeters: finiteNumber(street?.metres),
+    encodedGeometry: stringOrNull(street?.encodedWaypoints)
+  })).filter((instruction) => instruction.action || instruction.streetName);
 }
 
 function normalizeService(reference, template) {

@@ -154,6 +154,31 @@ test('accepts an empty routing result without segment templates', () => {
   assert.deepEqual(normalized.meta, { groups: 0, totalRoutes: 0, returnedRoutes: 0 });
 });
 
+test('keeps turn-by-turn street instructions for unscheduled segments', () => {
+  const walkingTemplate = {
+    hashCode: 12,
+    type: 'unscheduled',
+    modeIdentifier: 'wa_wal',
+    streets: [{
+      instruction: 'TURN_RIGHT',
+      name: 'Hauptstraße',
+      metres: 125,
+      encodedWaypoints: 'encoded-path'
+    }]
+  };
+  const normalized = normalizeRoutingResponse({
+    groups: [{ trips: [trip('walking', 1, 1100, 12)] }],
+    segmentTemplates: [walkingTemplate]
+  });
+
+  assert.deepEqual(normalized.routes[0].segments[0].turnInstructions, [{
+    action: 'TURN_RIGHT',
+    streetName: 'Hauptstraße',
+    distanceMeters: 125,
+    encodedGeometry: 'encoded-path'
+  }]);
+});
+
 test('formats TripGo RGB colors', () => {
   assert.equal(rgbHex({ red: 255, green: 0, blue: 16 }), '#ff0010');
   assert.equal(rgbHex({ red: -1, green: 0, blue: 16 }), null);

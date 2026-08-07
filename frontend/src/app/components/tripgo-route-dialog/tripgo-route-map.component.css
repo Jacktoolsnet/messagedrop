@@ -23,6 +23,72 @@
   box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
 }
 
+.route-summary-overlay {
+  position: absolute;
+  z-index: 1000;
+  top: .75rem;
+  right: .75rem;
+  display: grid;
+  width: min(18rem, calc(100% - 4.75rem));
+  box-sizing: border-box;
+  gap: .55rem;
+  padding: .7rem .85rem;
+  border: 1px solid var(--mat-card-outlined-outline-color);
+  border-radius: .85rem;
+  background: color-mix(in srgb, var(--mat-sys-surface-container-high) 94%, transparent);
+  color: var(--mat-sys-on-surface);
+  box-shadow: 0 5px 18px color-mix(in srgb, #000000 28%, transparent);
+  backdrop-filter: blur(7px);
+  pointer-events: none;
+}
+
+.route-summary-overlay__main,
+.route-summary-overlay__times,
+.route-summary-overlay__facts,
+.route-summary-overlay__facts > span {
+  display: flex;
+  align-items: center;
+}
+
+.route-summary-overlay__main {
+  gap: .65rem;
+}
+
+.route-summary-overlay__mode {
+  display: inline-grid;
+  width: 2.15rem;
+  height: 2.15rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+}
+
+.route-summary-overlay__times {
+  min-width: 0;
+  gap: .35rem;
+  font-size: 1.05rem;
+}
+
+.route-summary-overlay__times mat-icon,
+.route-summary-overlay__facts mat-icon {
+  width: 1rem;
+  height: 1rem;
+  font-size: 1rem;
+}
+
+.route-summary-overlay__facts {
+  flex-wrap: wrap;
+  gap: .35rem .8rem;
+  color: var(--mat-sys-on-surface-variant);
+  font-size: .82rem;
+}
+
+.route-summary-overlay__facts > span {
+  gap: .25rem;
+}
+
 .simulation-overlay {
   position: absolute;
   z-index: 1000;
@@ -91,6 +157,12 @@
   gap: .25rem;
 }
 
+.simulation-overlay__facts > .simulation-overlay__instruction {
+  width: 100%;
+  color: var(--mat-sys-on-surface);
+  font-size: .9rem;
+}
+
 .simulation-overlay__facts mat-icon {
   width: 1rem;
   height: 1rem;
@@ -104,6 +176,11 @@
 }
 
 @media (max-width: 600px) {
+  .route-summary-overlay {
+    right: .5rem;
+    width: min(16rem, calc(100% - 4.25rem));
+  }
+
   .route-map {
     min-height: 300px;
   }

@@ -44,6 +44,13 @@ export interface TripGoServiceStop extends TripGoLocation {
   dropOffOnly?: boolean;
 }
 
+export interface TripGoTurnInstruction {
+  action?: string;
+  streetName?: string;
+  distanceMeters?: number;
+  encodedGeometry?: string;
+}
+
 export interface TripGoRouteSegment {
   id: string;
   type?: string;
@@ -64,6 +71,7 @@ export interface TripGoRouteSegment {
   cost?: TripGoCost;
   service?: TripGoServiceInfo;
   liveDetails?: TripGoLiveServiceDetails;
+  turnInstructions?: TripGoTurnInstruction[];
   geometry: string[];
   detailedGeometry?: TripGoLocation[];
 }

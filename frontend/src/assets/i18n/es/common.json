@@ -179,6 +179,8 @@
       "editOrigin": "Cambiar punto de partida",
       "editDestination": "Cambiar destino",
       "showOnMap": "Mostrar ruta en el mapa",
+      "previousRoute": "Ruta anterior",
+      "nextRoute": "Ruta siguiente",
       "expandTimeline": "Expandir cronología",
       "collapseTimeline": "Contraer cronología",
       "routeCategories": {
@@ -186,6 +188,21 @@
         "bicycle-transit": "Bicicleta y transporte público",
         "walk-transit": "A pie y transporte público",
         "flight": "Conexión aérea"
+      },
+      "turnInstructions": {
+        "start": "Comenzar",
+        "straight": "Continuar recto",
+        "left": "Girar a la izquierda",
+        "right": "Girar a la derecha",
+        "slightlyLeft": "Mantenerse ligeramente a la izquierda",
+        "slightlyRight": "Mantenerse ligeramente a la derecha",
+        "sharplyLeft": "Girar bruscamente a la izquierda",
+        "sharplyRight": "Girar bruscamente a la derecha",
+        "uTurn": "Dar la vuelta",
+        "roundabout": "Entrar en la rotonda",
+        "exitRoundabout": "Salir de la rotonda",
+        "continue": "Continuar siguiendo la ruta",
+        "ontoStreet": "{{ instruction }} hacia {{ street }}"
       },
       "backToList": "Volver a la lista de rutas",
       "resolvingPlace": "Obteniendo información del lugar …",

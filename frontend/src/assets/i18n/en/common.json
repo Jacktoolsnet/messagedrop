@@ -180,6 +180,8 @@
       "editOrigin": "Change starting point",
       "editDestination": "Change destination",
       "showOnMap": "Show route on the map",
+      "previousRoute": "Previous route",
+      "nextRoute": "Next route",
       "expandTimeline": "Expand timeline",
       "collapseTimeline": "Collapse timeline",
       "routeCategories": {
@@ -187,6 +189,21 @@
         "bicycle-transit": "Bicycle and public transport",
         "walk-transit": "Walking and public transport",
         "flight": "Flight connection"
+      },
+      "turnInstructions": {
+        "start": "Start",
+        "straight": "Continue straight",
+        "left": "Turn left",
+        "right": "Turn right",
+        "slightlyLeft": "Keep slightly left",
+        "slightlyRight": "Keep slightly right",
+        "sharplyLeft": "Turn sharply left",
+        "sharplyRight": "Turn sharply right",
+        "uTurn": "Make a U-turn",
+        "roundabout": "Enter the roundabout",
+        "exitRoundabout": "Exit the roundabout",
+        "continue": "Continue following the route",
+        "ontoStreet": "{{ instruction }} onto {{ street }}"
       },
       "backToList": "Back to the route list",
       "resolvingPlace": "Getting place information …",
