@@ -86,7 +86,7 @@ export interface TripGoRouteOption {
   segments: TripGoRouteSegment[];
 }
 
-export type TripGoRouteCategory = 'car-transit' | 'bicycle-transit' | 'walk-transit';
+export type TripGoRouteCategory = 'car-transit' | 'bicycle-transit' | 'walk-transit' | 'flight';
 
 export interface TripGoRoutingResult {
   region?: string;

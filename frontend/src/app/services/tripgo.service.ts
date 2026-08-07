@@ -1,6 +1,6 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable, catchError, forkJoin, map, of } from 'rxjs';
+import { Observable, catchError, forkJoin, map, of, retry, throwError, timer } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Location } from '../interfaces/location';
 import {
@@ -30,11 +30,24 @@ export class TripGoService {
       // Routing failures are rendered directly inside the route dialog. Avoid a
       // second, global display-message dialog for the same expected result.
       headers: { 'x-skip-ui': 'true' }
-    }).pipe(map((response) => response.data));
+    }).pipe(
+      retry({
+        count: 1,
+        delay: (error: unknown) => this.isTransientRoutingError(error)
+          ? timer(1_000)
+          : throwError(() => error)
+      }),
+      map((response) => response.data)
+    );
   }
 
   calculatePublicTransportRoute(from: Location, to: Location, locale: string): Observable<TripGoRoutingResult> {
     return this.calculateRoute(from, to, locale, ['pt_pub']);
+  }
+
+  private isTransientRoutingError(error: unknown): boolean {
+    return error instanceof HttpErrorResponse
+      && [429, 502, 503, 504].includes(error.status);
   }
 
   getServiceDetails(

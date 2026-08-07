@@ -185,7 +185,8 @@
       "routeCategories": {
         "car-transit": "Car and public transport",
         "bicycle-transit": "Bicycle and public transport",
-        "walk-transit": "Walking and public transport"
+        "walk-transit": "Walking and public transport",
+        "flight": "Flight connection"
       },
       "backToList": "Back to the route list",
       "resolvingPlace": "Getting place information …",

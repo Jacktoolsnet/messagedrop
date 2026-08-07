@@ -184,7 +184,8 @@
       "routeCategories": {
         "car-transit": "Voiture et transports publics",
         "bicycle-transit": "Vélo et transports publics",
-        "walk-transit": "Marche et transports publics"
+        "walk-transit": "Marche et transports publics",
+        "flight": "Liaison aérienne"
       },
       "backToList": "Retour à la liste des itinéraires",
       "resolvingPlace": "Recherche des informations sur le lieu …",

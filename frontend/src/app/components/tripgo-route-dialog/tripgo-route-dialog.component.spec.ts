@@ -92,6 +92,7 @@ describe('TripGoRouteDialogComponent', () => {
       && args[1].latitude === 52.51
       && args[2] === 'de'
       && args[3].join(',') === 'me_car')).toBeTrue();
+    expect(tripGo.calculateRoute.calls.allArgs().some((args) => args[3].includes('in_air'))).toBeFalse();
     expect(fixture.componentInstance.state()).toBe('ready');
     expect(fixture.componentInstance.originDetails()?.name).toBe('Berlin');
   });
@@ -116,6 +117,17 @@ describe('TripGoRouteDialogComponent', () => {
     expect(fixture.componentInstance.state()).toBe('arrived');
     expect(fixture.componentInstance.routes()).toEqual([]);
     expect(tripGo.calculateRoute).not.toHaveBeenCalled();
+  });
+
+  it('requests a flight alternative only for a long-distance journey', () => {
+    fixture.componentInstance.destination.set({
+      latitude: 48.137, longitude: 11.575, plusCode: '8FWH4HPC+R2'
+    });
+
+    fixture.detectChanges();
+
+    expect(tripGo.calculateRoute.calls.allArgs().some((args) =>
+      args[3].join(',') === 'in_air,pt_pub')).toBeTrue();
   });
 
   it('recalculates the route after selecting another destination', () => {

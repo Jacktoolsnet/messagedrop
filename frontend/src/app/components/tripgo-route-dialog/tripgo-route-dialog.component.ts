@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import { catchError, forkJoin, map, of, switchMap } from 'rxjs';
+import { catchError, concatMap, forkJoin, from, map, of, switchMap } from 'rxjs';
 import { GetNominatimAddressResponse } from '../../interfaces/get-nominatim-address-response copy';
 import { Location } from '../../interfaces/location';
 import { NominatimPlace } from '../../interfaces/nominatim-place';
@@ -41,17 +41,25 @@ interface TimelineLiveIndicator {
   time?: string;
 }
 
-const ROUTE_CATEGORIES: readonly {
+interface RouteCategoryConfig {
   category: TripGoRouteCategory;
   primaryModes: string[];
   fallbackModes?: string[];
-}[] = [
+}
+
+const ROUTE_CATEGORIES: readonly RouteCategoryConfig[] = [
   { category: 'car-transit', primaryModes: ['me_car'], fallbackModes: ['me_car', 'pt_pub'] },
   { category: 'bicycle-transit', primaryModes: ['me_mic_bic', 'pt_pub'] },
   { category: 'walk-transit', primaryModes: ['wa_wal', 'pt_pub'] }
 ];
 
+const FLIGHT_CATEGORY: RouteCategoryConfig = {
+  category: 'flight',
+  primaryModes: ['in_air', 'pt_pub']
+};
+
 const DESTINATION_REACHED_RADIUS_METERS = 50;
+const MIN_FLIGHT_DISTANCE_METERS = 300_000;
 
 interface RoutePointDetails {
   name: string;
@@ -96,6 +104,15 @@ export class TripGoRouteDialogComponent implements OnInit {
   readonly simulationState = signal<TripGoSimulationState>('idle');
   readonly state = signal<RouteDialogState>('locating');
   readonly routes = signal<TripGoRouteOption[]>([]);
+  readonly requestedRouteCategories = signal<TripGoRouteCategory[]>([]);
+  readonly loadingRouteCategories = signal<ReadonlySet<TripGoRouteCategory>>(new Set());
+  readonly visibleRouteCategories = computed(() => {
+    const loading = this.loadingRouteCategories();
+    const routes = this.routes();
+    return this.requestedRouteCategories().filter((category) => category !== 'flight'
+      || loading.has(category)
+      || routes.some((route) => route.category === category));
+  });
   readonly expandedRouteIds = signal<ReadonlySet<string>>(new Set());
   readonly errorKey = signal('common.tripGo.errors.route');
   readonly isBusy = computed(() => this.state() === 'locating' || this.state() === 'routing');
@@ -156,16 +173,29 @@ export class TripGoRouteDialogComponent implements OnInit {
     return this.expandedRouteIds().has(route.id);
   }
 
-  routeCategoryIcon(route: TripGoRouteOption): string {
-    switch (route.category) {
+  routeCategoryIcon(routeOrCategory: TripGoRouteOption | TripGoRouteCategory): string {
+    const category = typeof routeOrCategory === 'string' ? routeOrCategory : routeOrCategory.category;
+    switch (category) {
       case 'car-transit': return 'directions_car';
       case 'bicycle-transit': return 'directions_bike';
+      case 'flight': return 'flight';
       default: return 'directions_walk';
     }
   }
 
-  routeCategoryLabel(route: TripGoRouteOption): string {
-    return this.transloco.translate(`common.tripGo.routeCategories.${route.category || 'walk-transit'}`);
+  routeCategoryLabel(routeOrCategory: TripGoRouteOption | TripGoRouteCategory): string {
+    const category = typeof routeOrCategory === 'string'
+      ? routeOrCategory
+      : routeOrCategory.category || 'walk-transit';
+    return this.transloco.translate(`common.tripGo.routeCategories.${category}`);
+  }
+
+  routeForCategory(category: TripGoRouteCategory): TripGoRouteOption | undefined {
+    return this.routes().find((route) => route.category === category);
+  }
+
+  isRouteCategoryLoading(category: TripGoRouteCategory): boolean {
+    return this.loadingRouteCategories().has(category);
   }
 
   activateRoutePoint(event: Event, kind: RoutePointKind): void {
@@ -396,42 +426,68 @@ export class TripGoRouteDialogComponent implements OnInit {
 
   private loadRoutes(origin: Location, destination: Location): void {
     this.routes.set([]);
+    this.requestedRouteCategories.set([]);
+    this.loadingRouteCategories.set(new Set());
     this.expandedRouteIds.set(new Set());
-    if (this.distanceInMeters(origin, destination) <= DESTINATION_REACHED_RADIUS_METERS) {
+    const distanceMeters = this.distanceInMeters(origin, destination);
+    if (distanceMeters <= DESTINATION_REACHED_RADIUS_METERS) {
       this.state.set('arrived');
       return;
     }
     this.state.set('routing');
     const locale = this.transloco.getActiveLang() || 'de';
-    forkJoin(ROUTE_CATEGORIES.map(({ category, primaryModes, fallbackModes }) =>
-      this.tripGo.calculateRoute(origin, destination, locale, primaryModes).pipe(
+    const categories = distanceMeters >= MIN_FLIGHT_DISTANCE_METERS
+      ? [...ROUTE_CATEGORIES, FLIGHT_CATEGORY]
+      : ROUTE_CATEGORIES;
+    this.requestedRouteCategories.set(categories.map(({ category }) => category));
+    this.loadingRouteCategories.set(new Set(categories.map(({ category }) => category)));
+    let receivedResponse = false;
+    // TripGo can reject a burst of several expensive routing requests with 503.
+    // Process the route variants one after another instead of starting them all
+    // at the same time.
+    from(categories).pipe(
+      concatMap(({ category, primaryModes, fallbackModes }) =>
+        this.tripGo.calculateRoute(origin, destination, locale, primaryModes).pipe(
         catchError(() => of(null)),
         switchMap((result) => result?.routes.length || !fallbackModes
           ? of(result)
           : this.tripGo.calculateRoute(origin, destination, locale, fallbackModes)
             .pipe(catchError(() => of(null)))),
         map((result) => ({ category, result }))
-      ))).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (results) => {
-        if (results.every(({ result }) => result === null)) {
+        )),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: ({ category, result }) => {
+        receivedResponse ||= result !== null;
+        const bestRoute = category === 'flight'
+          ? result?.routes.find((route) => route.segments.some((segment) =>
+            tripGoSegmentIcon(segment) === 'flight'))
+          : result?.routes[0];
+        if (bestRoute) {
+          const route: TripGoRouteOption = {
+            ...bestRoute,
+            id: `${category}:${bestRoute.id}`,
+            category
+          };
+          this.routes.update((routes) => [...routes, route]);
+          if (this.shouldExpandRoutesInitially()) {
+            this.expandedRouteIds.update((ids) => new Set([...ids, route.id]));
+          }
+        }
+        this.loadingRouteCategories.update((loading) => {
+          const updated = new Set(loading);
+          updated.delete(category);
+          return updated;
+        });
+      },
+      complete: () => {
+        if (!receivedResponse) {
           this.errorKey.set('common.tripGo.errors.route');
           this.state.set('error');
           return;
         }
-        const routes = results.flatMap(({ category, result }) => {
-          const bestRoute = result?.routes[0];
-          return bestRoute ? [{
-            ...bestRoute,
-            id: `${category}:${bestRoute.id}`,
-            category
-          }] : [];
-        });
-        this.routes.set(routes);
-        this.expandedRouteIds.set(this.shouldExpandRoutesInitially()
-          ? new Set(routes.map((route) => route.id))
-          : new Set());
         this.state.set('ready');
-        this.loadServiceDetails(routes);
+        this.loadServiceDetails(this.routes());
       },
       error: () => {
         this.errorKey.set('common.tripGo.errors.route');

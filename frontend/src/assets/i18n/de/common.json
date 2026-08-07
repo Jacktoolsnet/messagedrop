@@ -185,7 +185,8 @@
       "routeCategories": {
         "car-transit": "Auto und Öffis",
         "bicycle-transit": "Fahrrad und Öffis",
-        "walk-transit": "Zu Fuß und Öffis"
+        "walk-transit": "Zu Fuß und Öffis",
+        "flight": "Flugverbindung"
       },
       "backToList": "Zurück zur Routenliste",
       "resolvingPlace": "Ortsinformationen werden ermittelt …",

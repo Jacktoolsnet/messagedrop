@@ -185,6 +185,10 @@
   gap: 0.75rem;
 }
 
+.route-list--four-columns {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .route-card {
   min-width: 0;
   overflow: hidden;
@@ -201,6 +205,26 @@
   border-bottom: 1px solid color-mix(in srgb, currentColor 12%, transparent);
   background: var(--mat-button-tonal-container-color, var(--mat-card-filled-container-color));
   color: var(--mat-button-tonal-label-text-color, var(--mat-app-text-color));
+}
+
+.route-card__summary--placeholder {
+  min-height: 3rem;
+  box-sizing: border-box;
+}
+
+.route-card__placeholder-content {
+  display: flex;
+  min-height: 8rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  color: var(--mat-sys-on-surface-variant);
+  text-align: center;
+}
+
+.route-card__placeholder-content > mat-icon {
+  flex: 0 0 auto;
 }
 
 .route-card__category {
@@ -532,6 +556,12 @@
 
 @media (max-width: 1099px) {
   .route-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) and (max-width: 1399px) {
+  .route-list--four-columns {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
