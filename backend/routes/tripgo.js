@@ -82,4 +82,9 @@ router.post('/service', [
   metric.count('tripgo.services', { when: 'always', timezone: 'utc', amount: 1 })
 ], (req, res, next) => forward(req, res, next, { method: 'post', path: '/service', data: req.body }));
 
+router.post('/latest', [
+  express.json({ type: 'application/json', limit: '16kb' }),
+  metric.count('tripgo.latest', { when: 'always', timezone: 'utc', amount: 1 })
+], (req, res, next) => forward(req, res, next, { method: 'post', path: '/latest', data: req.body }));
+
 module.exports = router;

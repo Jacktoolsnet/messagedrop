@@ -58,6 +58,13 @@ function validateServiceRequest(body) {
   } };
 }
 
+function validateLatestRequest(body) {
+  const result = validateServiceRequest(body);
+  if (!result.ok) return result;
+  if (!result.value.operator) return invalid('invalid_latest_operator');
+  return result;
+}
+
 function validateRegionRequest(value) {
   if (!isPlainObject(value)) return invalid('invalid_region_request');
   const region = normalizeString(value.region);
@@ -117,4 +124,10 @@ function invalid(message) {
   return { ok: false, message };
 }
 
-module.exports = { validateRouteRequest, validateServiceRequest, validateRegionRequest, normalizeLocale };
+module.exports = {
+  validateRouteRequest,
+  validateServiceRequest,
+  validateLatestRequest,
+  validateRegionRequest,
+  normalizeLocale
+};

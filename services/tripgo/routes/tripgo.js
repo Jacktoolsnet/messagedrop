@@ -2,8 +2,10 @@ const crypto = require('crypto');
 const express = require('express');
 const axios = require('axios');
 const { requireServiceJwt } = require('../utils/serviceJwt');
-const { validateRouteRequest, validateServiceRequest, validateRegionRequest, normalizeLocale } = require('../validation');
-const { normalizeRoutingResponse, normalizeServiceResponse } = require('../normalizer');
+const {
+  validateRouteRequest, validateServiceRequest, validateLatestRequest, validateRegionRequest, normalizeLocale
+} = require('../validation');
+const { normalizeRoutingResponse, normalizeServiceResponse, normalizeLatestResponse } = require('../normalizer');
 
 function createTripGoRouter({ client, regionsCache, routeCache, serviceCache, inFlight, metrics, maxInFlight }) {
   const router = express.Router();
@@ -115,6 +117,26 @@ function createTripGoRouter({ client, regionsCache, routeCache, serviceCache, in
         data: normalizeServiceResponse(upstream.data, validated.value)
       };
       serviceCache?.set(key, payload);
+      return res.status(upstream.status).json({ ...payload, cache: 'miss' });
+    } catch (error) {
+      return next(upstreamError(error));
+    }
+  });
+
+  router.post('/latest', async (req, res, next) => {
+    metrics.latest = (metrics.latest || 0) + 1;
+    const validated = validateLatestRequest(req.body);
+    if (!validated.ok) return res.status(400).json({ error: validated.message });
+    const key = routeKey(validated.value);
+    const cached = serviceCache?.get(`latest:${key}`);
+    if (cached !== undefined) return res.status(200).json({ ...cached, cache: 'hit' });
+    try {
+      const upstream = await coalesce(inFlight, `latest:${key}`, maxInFlight, () => client.latest(validated.value));
+      const payload = {
+        status: upstream.status,
+        data: normalizeLatestResponse(upstream.data, validated.value)
+      };
+      serviceCache?.set(`latest:${key}`, payload);
       return res.status(upstream.status).json({ ...payload, cache: 'miss' });
     } catch (error) {
       return next(upstreamError(error));

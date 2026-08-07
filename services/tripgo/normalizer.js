@@ -75,6 +75,67 @@ function normalizeServiceResponse(payload, query = {}) {
   });
 }
 
+function normalizeLatestResponse(payload, query = {}) {
+  if (!payload || typeof payload !== 'object' || !Array.isArray(payload.services)) {
+    const error = new Error('invalid_tripgo_latest_response');
+    error.status = 502;
+    throw error;
+  }
+  const service = payload.services.find((value) => value?.serviceTripID === query.serviceTripId)
+    || payload.services[0]
+    || {};
+  const departureTime = flexibleIso(service.startTime);
+  const arrivalTime = flexibleIso(service.endTime);
+  const scheduledDepartureTime = flexibleIso(query.embarkationTime);
+  const delaySeconds = departureTime && scheduledDepartureTime
+    ? Math.round((Date.parse(departureTime) - Date.parse(scheduledDepartureTime)) / 1000)
+    : null;
+  const stops = Array.isArray(service.stops) ? service.stops.map(normalizeLatestStop) : [];
+  const vehicle = normalizeRealtimeVehicle(service.realtimeVehicle);
+  const cancelled = service.isCancelled === true || service.realTimeStatus === 'CANCELLED';
+  const hasPrediction = Boolean(departureTime || arrivalTime || stops.length > 0 || vehicle || cancelled);
+
+  return compact({
+    serviceTripId: stringOrNull(service.serviceTripID || query.serviceTripId),
+    updatedAt: flexibleIso(service.lastUpdate) || vehicle?.updatedAt || new Date().toISOString(),
+    departureTime,
+    arrivalTime,
+    scheduledDepartureTime,
+    delaySeconds,
+    realTime: hasPrediction,
+    cancelled,
+    alerts: normalizeAlerts(payload, service),
+    stops,
+    vehicle
+  });
+}
+
+function normalizeLatestStop(value) {
+  return compact({
+    stopCode: stringOrNull(value?.stopCode || value?.code),
+    arrivalTime: flexibleIso(value?.arrival || value?.predictedArrival || value?.actualArrival),
+    departureTime: flexibleIso(value?.departure || value?.predictedDeparture || value?.actualDeparture),
+    actualArrivalTime: flexibleIso(value?.actualArrival),
+    actualDepartureTime: flexibleIso(value?.actualDeparture),
+    updatedAt: flexibleIso(value?.lastUpdate)
+  });
+}
+
+function normalizeRealtimeVehicle(value) {
+  if (!value || typeof value !== 'object' || !value.location) return null;
+  const latitude = finiteNumber(value.location.lat);
+  const longitude = finiteNumber(value.location.lng);
+  if (latitude === null || longitude === null) return null;
+  return compact({
+    id: stringOrNull(value.id),
+    latitude,
+    longitude,
+    bearing: finiteNumber(value.location.bearing),
+    speedMetersPerSecond: finiteNumber(value.location.speed),
+    updatedAt: flexibleIso(value.lastUpdate)
+  });
+}
+
 function normalizeServiceStop(value) {
   return compact({
     name: stringOrNull(value?.name),
@@ -201,6 +262,8 @@ function normalizeSegment(reference, template) {
     color: rgbHex(reference.serviceColor || modeInfo.color),
     startTime: epochIso(reference.startTime),
     endTime: epochIso(reference.endTime),
+    scheduledStartTime: epochIso(reference.timetableStartTime),
+    scheduledEndTime: epochIso(reference.timetableEndTime),
     durationSeconds: durationSeconds(reference.startTime, reference.endTime),
     availability: stringOrNull(reference.availability),
     bicycleAccessible: typeof reference.bicycleAccessible === 'boolean' ? reference.bicycleAccessible : null,
@@ -228,7 +291,20 @@ function normalizeService(reference, template) {
     textColor: rgbHex(reference.serviceTextColor),
     realTime: optionalBoolean(reference.realTime, reference.isRealTime, template.realTime, template.isRealTime),
     realTimeStatus: stringOrNull(reference.realTimeStatus),
+    realTimeStops: Array.isArray(reference.realtimeStops)
+      ? reference.realtimeStops.map(normalizeRouteRealtimeStop)
+      : null,
     ticketWebsiteUrl: safeExternalUrl(reference.ticketWebsiteURL)
+  });
+}
+
+function normalizeRouteRealtimeStop(value) {
+  return compact({
+    stopCode: stringOrNull(value?.code || value?.stopCode),
+    arrivalTime: flexibleIso(value?.predictedArrival || value?.actualArrival),
+    departureTime: flexibleIso(value?.predictedDeparture || value?.actualDeparture),
+    actualArrivalTime: flexibleIso(value?.actualArrival),
+    actualDepartureTime: flexibleIso(value?.actualDeparture)
   });
 }
 
@@ -407,4 +483,10 @@ function compact(value) {
   return Object.fromEntries(Object.entries(value).filter(([, entry]) => entry !== null && entry !== undefined));
 }
 
-module.exports = { normalizeRoutingResponse, normalizeServiceResponse, selectTrips, rgbHex };
+module.exports = {
+  normalizeRoutingResponse,
+  normalizeServiceResponse,
+  normalizeLatestResponse,
+  selectTrips,
+  rgbHex
+};

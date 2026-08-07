@@ -1,6 +1,8 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { normalizeRoutingResponse, normalizeServiceResponse, rgbHex } = require('../normalizer');
+const {
+  normalizeRoutingResponse, normalizeServiceResponse, normalizeLatestResponse, rgbHex
+} = require('../normalizer');
 
 function trip(id, score, depart, templateHash, overrides = {}) {
   return {
@@ -175,4 +177,34 @@ test('normalizes current service times and calculates a delay', () => {
     { latitude: 52.1, longitude: 10.1 },
     { latitude: 52.2, longitude: 10.2 }
   ]);
+});
+
+test('normalizes latest predictions, update time, stops and vehicle position', () => {
+  const normalized = normalizeLatestResponse({
+    services: [{
+      serviceTripID: 'trip-live',
+      startTime: 1_785_956_880,
+      endTime: 1_785_957_480,
+      lastUpdate: 1_785_956_800,
+      stops: [{
+        stopCode: 'middle', predictedArrival: 1_785_957_100,
+        actualDeparture: 1_785_957_120, lastUpdate: 1_785_957_000
+      }],
+      realtimeVehicle: {
+        id: 'vehicle-1', lastUpdate: 1_785_956_790,
+        location: { lat: 52.1, lng: 10.2, bearing: 90, speed: 12.5 }
+      },
+      alerts: [{ title: 'Changed platform' }]
+    }]
+  }, {
+    serviceTripId: 'trip-live', embarkationTime: 1_785_956_580
+  });
+
+  assert.equal(normalized.realTime, true);
+  assert.equal(normalized.delaySeconds, 300);
+  assert.equal(normalized.updatedAt, '2026-08-05T19:06:40.000Z');
+  assert.equal(normalized.stops[0].departureTime, '2026-08-05T19:12:00.000Z');
+  assert.equal(normalized.stops[0].actualDepartureTime, '2026-08-05T19:12:00.000Z');
+  assert.equal(normalized.vehicle.latitude, 52.1);
+  assert.deepEqual(normalized.alerts, ['Changed platform']);
 });

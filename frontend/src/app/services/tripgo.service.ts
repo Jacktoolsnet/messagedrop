@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { Observable, catchError, forkJoin, map, of } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Location } from '../interfaces/location';
 import {
@@ -28,19 +28,83 @@ export class TripGoService {
     }).pipe(map((response) => response.data));
   }
 
-  getServiceDetails(segment: TripGoRouteSegment, locale: string): Observable<TripGoLiveServiceDetails> {
-    return this.http.post<TripGoServiceDetailsResponse>(`${environment.apiUrl}/tripgo/service`, {
+  getServiceDetails(
+    segment: TripGoRouteSegment,
+    locale: string,
+    includeLive = false
+  ): Observable<TripGoLiveServiceDetails> {
+    const request = {
       region: segment.from?.region,
       serviceTripId: segment.service?.tripId,
       operator: segment.service?.operatorId,
       startStopCode: segment.from?.stopCode,
       endStopCode: segment.to?.stopCode,
-      embarkationTime: segment.startTime,
+      embarkationTime: segment.scheduledStartTime || segment.startTime,
       locale
-    }, {
+    };
+    const options = {
       // A missing live service is an expected provider-specific result and is
       // presented inside the detail dialog instead of as a global error dialog.
       headers: { 'x-skip-ui': 'true' }
-    }).pipe(map((response) => response.data));
+    };
+    const scheduled$ = this.http.post<TripGoServiceDetailsResponse>(
+      `${environment.apiUrl}/tripgo/service`, request, options
+    ).pipe(map((response) => response.data));
+    if (!includeLive || !segment.service?.operatorId) return scheduled$;
+
+    const latest$ = this.http.post<TripGoServiceDetailsResponse>(
+      `${environment.apiUrl}/tripgo/latest`, request, options
+    ).pipe(
+      map((response) => response.data),
+      catchError(() => of(null))
+    );
+    return forkJoin({ scheduled: scheduled$, latest: latest$ }).pipe(
+      map(({ scheduled, latest }) => this.mergeServiceDetails(segment, scheduled, latest))
+    );
+  }
+
+  private mergeServiceDetails(
+    segment: TripGoRouteSegment,
+    scheduled: TripGoLiveServiceDetails,
+    latest: TripGoLiveServiceDetails | null
+  ): TripGoLiveServiceDetails {
+    const routeRealTime = segment.service?.realTime === true;
+    const scheduledDepartureTime = segment.scheduledStartTime
+      || (!routeRealTime ? segment.startTime : scheduled.scheduledDepartureTime);
+    const scheduledArrivalTime = segment.scheduledEndTime
+      || (!routeRealTime ? segment.endTime : scheduled.scheduledArrivalTime);
+    if (!latest) return {
+      ...scheduled,
+      departureTime: routeRealTime ? segment.startTime : scheduled.departureTime,
+      arrivalTime: routeRealTime ? segment.endTime : scheduled.arrivalTime,
+      scheduledDepartureTime,
+      scheduledArrivalTime,
+      realTime: scheduled.realTime === true || routeRealTime
+    };
+    const liveStops = new Map(latest.stops.map((stop) => [stop.stopCode, stop]));
+    const mergedStops = scheduled.stops.map((stop) => ({
+      ...stop,
+      ...(stop.stopCode ? liveStops.get(stop.stopCode) : undefined)
+    }));
+    const knownCodes = new Set(mergedStops.map((stop) => stop.stopCode).filter(Boolean));
+    mergedStops.push(...latest.stops.filter((stop) => !stop.stopCode || !knownCodes.has(stop.stopCode)));
+    const departureTime = latest.departureTime || (routeRealTime ? segment.startTime : scheduled.departureTime);
+    const arrivalTime = latest.arrivalTime || (routeRealTime ? segment.endTime : scheduled.arrivalTime);
+    const delaySeconds = departureTime && scheduledDepartureTime
+      ? Math.round((Date.parse(departureTime) - Date.parse(scheduledDepartureTime)) / 1000)
+      : latest.delaySeconds;
+    return {
+      ...scheduled,
+      ...latest,
+      departureTime,
+      arrivalTime,
+      scheduledDepartureTime,
+      scheduledArrivalTime,
+      delaySeconds,
+      realTime: latest.realTime === true || routeRealTime,
+      alerts: [...new Set([...scheduled.alerts, ...latest.alerts])],
+      stops: mergedStops,
+      geometry: scheduled.geometry
+    };
   }
 }

@@ -1,6 +1,8 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { validateRouteRequest, validateServiceRequest, validateRegionRequest } = require('../validation');
+const {
+  validateRouteRequest, validateServiceRequest, validateLatestRequest, validateRegionRequest
+} = require('../validation');
 
 test('validates and normalizes a route request', () => {
   const result = validateRouteRequest({
@@ -46,6 +48,18 @@ test('validates a live service request', () => {
 
 test('rejects incomplete live service requests', () => {
   assert.equal(validateServiceRequest({ region: 'DE_NI_Hanover' }).ok, false);
+});
+
+test('requires an operator for latest real-time requests', () => {
+  const input = {
+    region: 'SE_Stockholm',
+    serviceTripId: 'VYB:ServiceJourney:123',
+    startStopCode: 'NSR:Quay:99386',
+    embarkationTime: new Date(Date.now() + 60_000).toISOString(),
+    locale: 'en'
+  };
+  assert.equal(validateLatestRequest(input).ok, false);
+  assert.equal(validateLatestRequest({ ...input, operator: 'VYB:Operator:Vybus4you' }).ok, true);
 });
 
 test('validates region provider query options', () => {

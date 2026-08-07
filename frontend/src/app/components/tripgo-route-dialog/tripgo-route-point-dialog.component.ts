@@ -99,10 +99,8 @@ export class TripGoRoutePointDialogComponent implements OnInit {
     && this.segment().startTime
   ));
   readonly hasLiveData = computed(() => {
-    const status = this.segment().service?.realTimeStatus?.toUpperCase();
     return this.liveDetails()?.realTime === true
-      || this.segment().service?.realTime === true
-      || (!!status && status.includes('REAL_TIME') && !status.includes('NOT_'));
+      || this.segment().service?.realTime === true;
   });
 
   ngOnInit(): void {
@@ -112,7 +110,7 @@ export class TripGoRoutePointDialogComponent implements OnInit {
   loadLiveDetails(): void {
     if (!this.canLoadLiveDetails() || this.liveState() === 'loading') return;
     this.liveState.set('loading');
-    this.tripGo.getServiceDetails(this.segment(), this.transloco.getActiveLang() || 'de').pipe(
+    this.tripGo.getServiceDetails(this.segment(), this.transloco.getActiveLang() || 'de', true).pipe(
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: (details) => {

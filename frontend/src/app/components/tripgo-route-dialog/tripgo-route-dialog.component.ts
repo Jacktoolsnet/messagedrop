@@ -333,7 +333,12 @@ export class TripGoRouteDialogComponent implements OnInit {
         segments: route.segments.map((segment) => {
           const details = detailsBySegment.get(`${route.id}:${segment.id}`);
           if (!details || !segment.service) return segment;
-          const stops = details.stops || [];
+          const liveStops = new Map((segment.service.realTimeStops || [])
+            .map((stop) => [stop.stopCode, stop]));
+          const stops = (details.stops || []).map((stop) => ({
+            ...stop,
+            ...(stop.stopCode ? liveStops.get(stop.stopCode) : undefined)
+          }));
           return {
             ...segment,
             detailedGeometry: details.geometry || [],

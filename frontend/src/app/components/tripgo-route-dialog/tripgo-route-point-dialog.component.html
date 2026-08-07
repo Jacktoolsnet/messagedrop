@@ -63,6 +63,12 @@
                 ? (live.departureTime || segment().startTime)
                 : (live.scheduledDepartureTime || live.departureTime || segment().startTime)) }}</strong>
             </div>
+            @if (hasLiveData() && live.arrivalTime) {
+              <div class="live-departure">
+                <small>{{ 'common.tripGo.routePointDetails.currentArrival' | transloco }}</small>
+                <strong>{{ formatTime(live.arrivalTime) }}</strong>
+              </div>
+            }
             @if (hasLiveData() && live.scheduledDepartureTime) {
               <span>{{ 'common.tripGo.routePointDetails.scheduledDeparture' | transloco }}: {{ formatTime(live.scheduledDepartureTime) }}</span>
             }
@@ -71,8 +77,14 @@
                 {{ formatDelay(live.delaySeconds) }}
               </strong>
             }
+            @if (live.cancelled) {
+              <strong class="delay delay--late">{{ 'common.tripGo.routePointDetails.cancelled' | transloco }}</strong>
+            }
             @if (live.platform || live.endPlatform) {
               <span>{{ 'common.tripGo.routePointDetails.currentPlatform' | transloco }}: {{ live.platform || live.endPlatform }}</span>
+            }
+            @if (hasLiveData() && live.updatedAt) {
+              <span>{{ 'common.tripGo.routePointDetails.lastUpdated' | transloco }}: {{ formatTime(live.updatedAt) }}</span>
             }
             @for (alert of live.alerts; track alert) {
               <p class="live-alert"><mat-icon aria-hidden="true">warning</mat-icon><span>{{ alert }}</span></p>

@@ -31,11 +31,15 @@ export interface TripGoServiceInfo {
   realTimeStatus?: string;
   ticketWebsiteUrl?: string;
   intermediateStops?: TripGoServiceStop[];
+  realTimeStops?: TripGoServiceStop[];
 }
 
 export interface TripGoServiceStop extends TripGoLocation {
   arrivalTime?: string;
   departureTime?: string;
+  actualArrivalTime?: string;
+  actualDepartureTime?: string;
+  updatedAt?: string;
   pickUpOnly?: boolean;
   dropOffOnly?: boolean;
 }
@@ -49,6 +53,8 @@ export interface TripGoRouteSegment {
   color?: string;
   startTime?: string;
   endTime?: string;
+  scheduledStartTime?: string;
+  scheduledEndTime?: string;
   durationSeconds?: number;
   availability?: string;
   bicycleAccessible?: boolean;
@@ -119,9 +125,18 @@ export interface TripGoLiveServiceDetails {
   endPlatform?: string;
   direction?: string;
   realTime?: boolean;
+  cancelled?: boolean;
   alerts: string[];
   stops: TripGoServiceStop[];
   geometry: TripGoLocation[];
+  vehicle?: {
+    id?: string;
+    latitude: number;
+    longitude: number;
+    bearing?: number;
+    speedMetersPerSecond?: number;
+    updatedAt?: string;
+  };
 }
 
 export interface TripGoServiceDetailsResponse {
