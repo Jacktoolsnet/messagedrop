@@ -54,6 +54,12 @@
   gap: .65rem;
 }
 
+.route-summary-overlay__modes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .25rem;
+}
+
 .route-summary-overlay__mode {
   display: inline-grid;
   width: 2.15rem;

@@ -19,6 +19,7 @@ import { TripGoTimelineWeatherComponent } from './tripgo-timeline-weather.compon
 import {
   tripGoDisplayLocationName,
   tripGoFollowingBoardingPlatform,
+  tripGoRouteIcons,
   tripGoServiceLabel,
   tripGoSegmentIcon,
   tripGoSegmentInstructionLocation
@@ -53,7 +54,11 @@ interface TripGoSimulationPoint {
         <aside class="route-summary-overlay" role="status" aria-live="polite"
           [attr.aria-label]="routeCategoryLabel()">
           <div class="route-summary-overlay__main">
-            <mat-icon class="route-summary-overlay__mode" aria-hidden="true">{{ routeCategoryIcon() }}</mat-icon>
+            <span class="route-summary-overlay__modes">
+              @for (icon of routeTransportIcons(); track icon) {
+                <mat-icon class="route-summary-overlay__mode" aria-hidden="true">{{ icon }}</mat-icon>
+              }
+            </span>
             <div class="route-summary-overlay__times">
               <strong>{{ formatTime(route.departureTime) }}</strong>
               <mat-icon aria-hidden="true">arrow_forward</mat-icon>
@@ -276,13 +281,8 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     return hours > 0 ? `${hours} h ${remainingMinutes} min` : `${minutes} min`;
   }
 
-  routeCategoryIcon(): string {
-    switch (this.route.category) {
-      case 'car-transit': return 'directions_car';
-      case 'bicycle-transit': return 'directions_bike';
-      case 'flight': return 'flight';
-      default: return 'directions_walk';
-    }
+  routeTransportIcons(): string[] {
+    return tripGoRouteIcons(this.route);
   }
 
   routeCategoryLabel(): string {

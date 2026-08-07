@@ -2,6 +2,7 @@ import { TripGoRouteOption } from '../../interfaces/tripgo';
 import {
   tripGoDisplayLocationName,
   tripGoFollowingBoardingPlatform,
+  tripGoRouteIcons,
   tripGoServiceLabel,
   tripGoSegmentInstructionLocation
 } from './tripgo-route.util';
@@ -64,6 +65,10 @@ describe('tripGoFollowingBoardingPlatform', () => {
 
   it('combines transport mode and service number', () => {
     expect(tripGoServiceLabel(route.segments[2])).toBe('Zug RB 45');
+  });
+
+  it('returns every used transport icon once and in route order', () => {
+    expect(tripGoRouteIcons(route)).toEqual(['directions_walk', 'train']);
   });
 
   it('formats station names for route instructions', () => {

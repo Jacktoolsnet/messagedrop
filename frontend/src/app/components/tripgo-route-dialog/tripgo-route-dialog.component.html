@@ -124,7 +124,9 @@
           (keydown.space)="activateRouteCard($event, route)">
           <header class="route-card__summary">
             <div class="route-card__category" [attr.aria-label]="routeCategoryLabel(route)">
-              <mat-icon aria-hidden="true">{{ routeCategoryIcon(route) }}</mat-icon>
+              @for (icon of routeTransportIcons(route); track icon) {
+                <mat-icon aria-hidden="true">{{ icon }}</mat-icon>
+              }
             </div>
             <span class="route-card__actions">
               <button mat-icon-button type="button"

@@ -22,6 +22,7 @@ import { TripGoRoutePointDialogComponent } from './tripgo-route-point-dialog.com
 import {
   tripGoDisplayLocationName,
   tripGoFollowingBoardingPlatform,
+  tripGoRouteIcons,
   tripGoServiceLabel,
   tripGoSegmentIcon,
   tripGoSegmentInstructionLocation
@@ -208,6 +209,10 @@ export class TripGoRouteDialogComponent implements OnInit {
       ? routeOrCategory
       : routeOrCategory.category || 'walk-transit';
     return this.transloco.translate(`common.tripGo.routeCategories.${category}`);
+  }
+
+  routeTransportIcons(route: TripGoRouteOption): string[] {
+    return tripGoRouteIcons(route);
   }
 
   routeForCategory(category: TripGoRouteCategory): TripGoRouteOption | undefined {

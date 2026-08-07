@@ -9,10 +9,19 @@ export function tripGoSegmentIcon(segment: TripGoRouteSegment): string {
     return 'directions_bike';
   }
   if (identifier.includes('bus')) return 'directions_bus';
+  if (identifier.includes('coach')) return 'directions_bus';
+  if (identifier.includes('ferry')) return 'directions_boat';
   if (identifier.includes('tram')) return 'tram';
-  if (identifier.includes('train') || identifier.includes('subway') || identifier.includes('rail') || identifier.includes('metro')) return 'train';
+  if (identifier.includes('subway') || identifier.includes('metro')) return 'subway';
+  if (identifier.includes('train') || identifier.includes('rail')) return 'train';
   if (segment.type === 'stationary') return 'schedule';
   return 'directions_transit';
+}
+
+export function tripGoRouteIcons(route: TripGoRouteOption): string[] {
+  return [...new Set(route.segments
+    .filter((segment) => segment.type !== 'stationary')
+    .map(tripGoSegmentIcon))];
 }
 
 /**
