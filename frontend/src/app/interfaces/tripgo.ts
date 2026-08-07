@@ -27,6 +27,7 @@ export interface TripGoServiceInfo {
   routeId?: string;
   tripId?: string;
   textColor?: string;
+  realTime?: boolean;
   realTimeStatus?: string;
   ticketWebsiteUrl?: string;
   intermediateStops?: TripGoServiceStop[];

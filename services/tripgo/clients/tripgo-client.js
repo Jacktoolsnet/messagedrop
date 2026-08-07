@@ -35,11 +35,28 @@ function createTripGoClient({
       }));
     },
 
+    async regionInfo({ region, locale }) {
+      return unwrap(await http.post('/regionInfo.json', { region }, {
+        headers: { 'Accept-Language': locale }
+      }));
+    },
+
+    async operators({ region, locale, onlyRealTime = false, full = true }) {
+      return unwrap(await http.post('/info/operators.json', {
+        regions: [region],
+        onlyRealTime,
+        full
+      }, {
+        headers: { 'Accept-Language': locale }
+      }));
+    },
+
     async routes(query) {
       const params = new URLSearchParams();
       params.set('from', coordinate(query.from));
       params.set('to', coordinate(query.to));
       params.set('v', '11');
+      params.set('rt', '1');
       params.set('locale', query.locale);
       for (const mode of query.modes) params.append('modes', mode);
       if (query.time) params.set(query.time.type, String(query.time.epochSeconds));
@@ -53,6 +70,7 @@ function createTripGoClient({
         serviceTripID: query.serviceTripId,
         startStopCode: query.startStopCode,
         embarkationDate: String(query.embarkationTime),
+        rt: '1',
         encode: 'false'
       });
       if (query.endStopCode) params.set('endStopCode', query.endStopCode);

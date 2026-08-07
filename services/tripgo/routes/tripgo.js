@@ -2,7 +2,7 @@ const crypto = require('crypto');
 const express = require('express');
 const axios = require('axios');
 const { requireServiceJwt } = require('../utils/serviceJwt');
-const { validateRouteRequest, validateServiceRequest, normalizeLocale } = require('../validation');
+const { validateRouteRequest, validateServiceRequest, validateRegionRequest, normalizeLocale } = require('../validation');
 const { normalizeRoutingResponse, normalizeServiceResponse } = require('../normalizer');
 
 function createTripGoRouter({ client, regionsCache, routeCache, serviceCache, inFlight, metrics, maxInFlight }) {
@@ -28,6 +28,48 @@ function createTripGoRouter({ client, regionsCache, routeCache, serviceCache, in
     if (cached !== undefined) return res.status(200).json({ ...cached, cache: 'hit' });
     try {
       const upstream = await coalesce(inFlight, key, maxInFlight, () => client.regions(locale));
+      const payload = { status: upstream.status, data: upstream.data };
+      regionsCache.set(key, payload);
+      return res.status(upstream.status).json({ ...payload, cache: 'miss' });
+    } catch (error) {
+      return next(upstreamError(error));
+    }
+  });
+
+  router.get('/region-info', async (req, res, next) => {
+    metrics.regionInfo = (metrics.regionInfo || 0) + 1;
+    const validated = validateRegionRequest({
+      region: req.query.region,
+      locale: req.query.locale || preferredLocale(req.get('accept-language')) || 'en'
+    });
+    if (!validated.ok) return res.status(400).json({ error: validated.message });
+    const key = `region-info:${validated.value.locale}:${validated.value.region}`;
+    const cached = regionsCache.get(key);
+    if (cached !== undefined) return res.status(200).json({ ...cached, cache: 'hit' });
+    try {
+      const upstream = await coalesce(inFlight, key, maxInFlight, () => client.regionInfo(validated.value));
+      const payload = { status: upstream.status, data: upstream.data };
+      regionsCache.set(key, payload);
+      return res.status(upstream.status).json({ ...payload, cache: 'miss' });
+    } catch (error) {
+      return next(upstreamError(error));
+    }
+  });
+
+  router.get('/operators', async (req, res, next) => {
+    metrics.operators = (metrics.operators || 0) + 1;
+    const validated = validateRegionRequest({
+      region: req.query.region,
+      locale: req.query.locale || preferredLocale(req.get('accept-language')) || 'en',
+      onlyRealTime: req.query.onlyRealTime,
+      full: req.query.full
+    });
+    if (!validated.ok) return res.status(400).json({ error: validated.message });
+    const key = `operators:${routeKey(validated.value)}`;
+    const cached = regionsCache.get(key);
+    if (cached !== undefined) return res.status(200).json({ ...cached, cache: 'hit' });
+    try {
+      const upstream = await coalesce(inFlight, key, maxInFlight, () => client.operators(validated.value));
       const payload = { status: upstream.status, data: upstream.data };
       regionsCache.set(key, payload);
       return res.status(upstream.status).json({ ...payload, cache: 'miss' });

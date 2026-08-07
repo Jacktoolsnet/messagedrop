@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { validateRouteRequest, validateServiceRequest } = require('../validation');
+const { validateRouteRequest, validateServiceRequest, validateRegionRequest } = require('../validation');
 
 test('validates and normalizes a route request', () => {
   const result = validateRouteRequest({
@@ -46,4 +46,16 @@ test('validates a live service request', () => {
 
 test('rejects incomplete live service requests', () => {
   assert.equal(validateServiceRequest({ region: 'DE_NI_Hanover' }).ok, false);
+});
+
+test('validates region provider query options', () => {
+  const result = validateRegionRequest({
+    region: 'SE_Stockholm', locale: 'en', onlyRealTime: 'true', full: '1'
+  });
+  assert.deepEqual(result, {
+    ok: true,
+    value: { region: 'SE_Stockholm', locale: 'en', onlyRealTime: true, full: true }
+  });
+  assert.equal(validateRegionRequest({ region: '../invalid' }).ok, false);
+  assert.equal(validateRegionRequest({ region: 'SE_Stockholm', onlyRealTime: 'perhaps' }).ok, false);
 });

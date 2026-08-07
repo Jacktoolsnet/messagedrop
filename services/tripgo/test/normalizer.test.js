@@ -10,7 +10,7 @@ function trip(id, score, depart, templateHash, overrides = {}) {
       id: `${id}-segment`, segmentTemplateHashCode: templateHash,
       startTime: depart, endTime: depart + 600, availability: 'AVAILABLE',
       serviceNumber: 'U2', serviceDirection: 'Pankow', startPlatform: '1', endPlatform: '2', stops: 4,
-      realTimeStatus: 'IS_REAL_TIME', ticketWebsiteURL: 'https://tickets.example.test/journey'
+      realTime: true, realTimeStatus: 'IS_REAL_TIME', ticketWebsiteURL: 'https://tickets.example.test/journey'
     }],
     ...overrides
   };
@@ -45,6 +45,7 @@ test('normalizes templates and segment references into compact route options', (
   assert.deepEqual(normalized.routes[0].modes, ['pt_pub_subway']);
   assert.equal(normalized.routes[0].segments[0].service.number, 'U2');
   assert.equal(normalized.routes[0].segments[0].service.operator, 'BVG');
+  assert.equal(normalized.routes[0].segments[0].service.realTime, true);
   assert.equal(normalized.routes[0].segments[0].service.realTimeStatus, 'IS_REAL_TIME');
   assert.equal(normalized.routes[0].segments[0].service.ticketWebsiteUrl, 'https://tickets.example.test/journey');
   assert.equal(normalized.routes[0].segments[0].color, '#0a141e');

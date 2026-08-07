@@ -101,6 +101,7 @@ export class TripGoRoutePointDialogComponent implements OnInit {
   readonly hasLiveData = computed(() => {
     const status = this.segment().service?.realTimeStatus?.toUpperCase();
     return this.liveDetails()?.realTime === true
+      || this.segment().service?.realTime === true
       || (!!status && status.includes('REAL_TIME') && !status.includes('NOT_'));
   });
 

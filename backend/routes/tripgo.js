@@ -66,6 +66,12 @@ router.get('/health', [metric.count('tripgo.health', { when: 'always', timezone:
 router.get('/regions', [metric.count('tripgo.regions', { when: 'always', timezone: 'utc', amount: 1 })],
   (req, res, next) => forward(req, res, next, { method: 'get', path: '/regions', params: req.query }));
 
+router.get('/region-info', [metric.count('tripgo.regionInfo', { when: 'always', timezone: 'utc', amount: 1 })],
+  (req, res, next) => forward(req, res, next, { method: 'get', path: '/region-info', params: req.query }));
+
+router.get('/operators', [metric.count('tripgo.operators', { when: 'always', timezone: 'utc', amount: 1 })],
+  (req, res, next) => forward(req, res, next, { method: 'get', path: '/operators', params: req.query }));
+
 router.post('/routes', [
   express.json({ type: 'application/json', limit: '16kb' }),
   metric.count('tripgo.routes', { when: 'always', timezone: 'utc', amount: 1 })

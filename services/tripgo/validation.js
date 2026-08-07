@@ -58,6 +58,18 @@ function validateServiceRequest(body) {
   } };
 }
 
+function validateRegionRequest(value) {
+  if (!isPlainObject(value)) return invalid('invalid_region_request');
+  const region = normalizeString(value.region);
+  const locale = normalizeLocale(value.locale ?? 'en');
+  if (!REGION_PATTERN.test(region)) return invalid('invalid_region');
+  if (!locale) return invalid('invalid_region_locale');
+  const onlyRealTime = optionalBoolean(value.onlyRealTime, false);
+  const full = optionalBoolean(value.full, true);
+  if (onlyRealTime === null || full === null) return invalid('invalid_region_options');
+  return { ok: true, value: { region, locale, onlyRealTime, full } };
+}
+
 function normalizeLocale(value) {
   const normalized = normalizeString(value).replace('_', '-');
   return /^[a-z]{2,3}(?:-[a-zA-Z]{2,4})?$/.test(normalized) ? normalized : null;
@@ -90,6 +102,13 @@ function normalizeString(value) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+function optionalBoolean(value, fallback) {
+  if (value === undefined || value === null || value === '') return fallback;
+  if (value === true || value === 'true' || value === '1' || value === 1) return true;
+  if (value === false || value === 'false' || value === '0' || value === 0) return false;
+  return null;
+}
+
 function isPlainObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
@@ -98,4 +117,4 @@ function invalid(message) {
   return { ok: false, message };
 }
 
-module.exports = { validateRouteRequest, validateServiceRequest, normalizeLocale };
+module.exports = { validateRouteRequest, validateServiceRequest, validateRegionRequest, normalizeLocale };

@@ -226,9 +226,14 @@ function normalizeService(reference, template) {
     routeId: stringOrNull(reference.routeID || reference.routeId),
     tripId: stringOrNull(reference.serviceTripID),
     textColor: rgbHex(reference.serviceTextColor),
+    realTime: optionalBoolean(reference.realTime, reference.isRealTime, template.realTime, template.isRealTime),
     realTimeStatus: stringOrNull(reference.realTimeStatus),
     ticketWebsiteUrl: safeExternalUrl(reference.ticketWebsiteURL)
   });
+}
+
+function optionalBoolean(...values) {
+  return values.find((value) => typeof value === 'boolean') ?? null;
 }
 
 function normalizedModeLabel(reference, template, modeInfo) {
