@@ -205,6 +205,12 @@
       "segments": "Tramos del trayecto",
       "provider": "Información de rutas de SkedGo / TripGo",
       "refresh": "Actualizar ubicación y rutas",
+      "timelineLive": {
+        "unavailable": "No hay datos en tiempo real disponibles",
+        "onTime": "Hora actual {{ time }}, puntual",
+        "delayed": "Hora actual {{ time }}, con retraso",
+        "connectionMissed": "Hora actual {{ time }}, probablemente no se llegue a la conexión"
+      },
       "routePointDetails": {
         "title": "Detalles del punto",
         "arrival": "Llegada",

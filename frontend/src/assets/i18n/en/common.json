@@ -206,6 +206,12 @@
       "segments": "Journey segments",
       "provider": "Routing information by SkedGo / TripGo",
       "refresh": "Refresh location and routes",
+      "timelineLive": {
+        "unavailable": "No real-time data available",
+        "onTime": "Current time {{ time }}, on time",
+        "delayed": "Current time {{ time }}, delayed",
+        "connectionMissed": "Current time {{ time }}, connection unlikely to be reached"
+      },
       "routePointDetails": {
         "title": "Point details",
         "arrival": "Arrival",

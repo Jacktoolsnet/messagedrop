@@ -162,6 +162,19 @@
                     <mat-icon aria-hidden="true">schedule</mat-icon>
                     <span>{{ formatTime(route.departureTime) }}</span>
                   </time>
+                  @if (isLatestRoute(route)) {
+                    @if (timelineLiveIndicator(route, 0); as live) {
+                      @if (live.state !== 'unavailable') {
+                        <span class="timeline-live-indicator"
+                          [class.timeline-live-indicator--on-time]="live.state === 'on-time'"
+                          [class.timeline-live-indicator--delayed]="live.state === 'delayed'"
+                          [class.timeline-live-indicator--missed]="live.state === 'missed'"
+                          [attr.aria-label]="timelineLiveAriaLabel(live)">
+                          {{ formatLiveIndicatorTime(live) }}
+                        </span>
+                      }
+                    }
+                  }
                   @if (firstSegment.from?.latitude !== undefined && firstSegment.from?.longitude !== undefined) {
                     <app-tripgo-timeline-weather class="timeline-node-weather"
                       [location]="firstSegment.from"></app-tripgo-timeline-weather>
@@ -176,13 +189,28 @@
               </li>
             }
             @for (segment of route.segments; track segment.id; let first = $first; let segmentIndex = $index) {
-              <li class="timeline-segment" [style.--segment-color]="segment.color || '#6750a4'">
+              <li class="timeline-segment" [style.--segment-color]="segment.color || '#6750a4'"
+                [class.timeline-segment--connection-tight]="isLatestRoute(route) && timelineLineState(route, segmentIndex) === 'tight'"
+                [class.timeline-segment--connection-missed]="isLatestRoute(route) && timelineLineState(route, segmentIndex) === 'missed'">
                 <div class="timeline-node-meta">
                   @if (!first) {
                     <time class="timeline-time" [attr.datetime]="segment.startTime">
                       <mat-icon aria-hidden="true">schedule</mat-icon>
                       <span>{{ segment.startTime ? formatTime(segment.startTime) : '' }}</span>
                     </time>
+                    @if (isLatestRoute(route)) {
+                      @if (timelineLiveIndicator(route, segmentIndex); as live) {
+                        @if (live.state !== 'unavailable') {
+                          <span class="timeline-live-indicator"
+                            [class.timeline-live-indicator--on-time]="live.state === 'on-time'"
+                            [class.timeline-live-indicator--delayed]="live.state === 'delayed'"
+                            [class.timeline-live-indicator--missed]="live.state === 'missed'"
+                            [attr.aria-label]="timelineLiveAriaLabel(live)">
+                            {{ formatLiveIndicatorTime(live) }}
+                          </span>
+                        }
+                      }
+                    }
                     @if (segment.from?.latitude !== undefined && segment.from?.longitude !== undefined) {
                       <app-tripgo-timeline-weather class="timeline-node-weather"
                         [location]="segment.from"></app-tripgo-timeline-weather>
@@ -270,6 +298,19 @@
                   <mat-icon aria-hidden="true">schedule</mat-icon>
                   <span>{{ formatTime(route.arrivalTime) }}</span>
                 </time>
+                @if (isLatestRoute(route)) {
+                  @if (timelineLiveIndicator(route, route.segments.length - 1, true); as live) {
+                    @if (live.state !== 'unavailable') {
+                      <span class="timeline-live-indicator"
+                        [class.timeline-live-indicator--on-time]="live.state === 'on-time'"
+                        [class.timeline-live-indicator--delayed]="live.state === 'delayed'"
+                        [class.timeline-live-indicator--missed]="live.state === 'missed'"
+                        [attr.aria-label]="timelineLiveAriaLabel(live)">
+                        {{ formatLiveIndicatorTime(live) }}
+                      </span>
+                    }
+                  }
+                }
                 @if (route.segments.at(-1)?.to; as arrival) {
                   @if (arrival.latitude !== undefined && arrival.longitude !== undefined) {
                     <app-tripgo-timeline-weather class="timeline-node-weather"

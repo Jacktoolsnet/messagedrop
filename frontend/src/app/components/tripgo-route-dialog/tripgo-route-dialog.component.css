@@ -297,6 +297,16 @@
   background: var(--segment-color);
 }
 
+.timeline-segment--connection-tight::after {
+  background: #ef8f00;
+}
+
+.timeline-segment--connection-missed::after {
+  width: 0;
+  border-left: .2rem dashed #757575;
+  background: transparent;
+}
+
 .timeline-time {
   display: flex;
   align-items: center;
@@ -321,6 +331,41 @@
   flex-direction: column;
   align-items: flex-start;
   gap: .2rem;
+}
+
+.timeline-live-indicator {
+  --timeline-live-color: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: .2rem;
+  color: var(--mat-sys-on-surface-variant);
+  font-size: .78rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.timeline-live-indicator::before {
+  content: '';
+  width: .9rem;
+  height: .9rem;
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  border: 2px solid #000;
+  border-radius: 50%;
+  background: var(--timeline-live-color);
+}
+
+.timeline-live-indicator--on-time {
+  --timeline-live-color: #57c75b;
+}
+
+.timeline-live-indicator--delayed {
+  --timeline-live-color: #ffd54f;
+}
+
+.timeline-live-indicator--missed {
+  --timeline-live-color: #ef5350;
 }
 
 .timeline-node-weather {

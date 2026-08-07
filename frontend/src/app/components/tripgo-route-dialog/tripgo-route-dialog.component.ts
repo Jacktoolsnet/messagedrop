@@ -34,6 +34,12 @@ export interface TripGoRouteDialogData {
 
 type RouteDialogState = 'locating' | 'routing' | 'ready' | 'arrived' | 'error';
 type RoutePointKind = 'origin' | 'destination';
+type TimelineLiveState = 'unavailable' | 'on-time' | 'delayed' | 'missed';
+
+interface TimelineLiveIndicator {
+  state: TimelineLiveState;
+  time?: string;
+}
 
 const DESTINATION_REACHED_RADIUS_METERS = 50;
 
@@ -292,6 +298,63 @@ export class TripGoRouteDialogComponent implements OnInit {
       : Math.max(0, (segment.service?.stops || 0) - 1);
   }
 
+  isLatestRoute(route: TripGoRouteOption): boolean {
+    return this.routes()[0]?.id === route.id;
+  }
+
+  timelineLiveIndicator(
+    route: TripGoRouteOption,
+    segmentIndex: number,
+    useArrival = false
+  ): TimelineLiveIndicator {
+    const segment = route.segments[segmentIndex];
+    if (!segment) return { state: 'unavailable' };
+    const inheritedState = this.timelineConnectionStateBefore(route, segmentIndex);
+    const live = segment.liveDetails;
+    const hasLiveData = live?.realTime === true || segment.service?.realTime === true;
+    const time = useArrival
+      ? live?.arrivalTime || (hasLiveData ? segment.endTime : undefined)
+      : live?.departureTime || (hasLiveData ? segment.startTime : undefined);
+    if (inheritedState === 'missed') return { state: 'missed', time };
+    if (!hasLiveData) return { state: 'unavailable' };
+
+    const scheduledTime = useArrival
+      ? live?.scheduledArrivalTime || segment.scheduledEndTime
+      : live?.scheduledDepartureTime || segment.scheduledStartTime;
+    const delaySeconds = !useArrival && live?.delaySeconds !== undefined
+      ? live.delaySeconds
+      : time && scheduledTime
+        ? Math.round((Date.parse(time) - Date.parse(scheduledTime)) / 1000)
+        : 0;
+    if (delaySeconds > 30) return { state: 'delayed', time };
+    return { state: 'on-time', time };
+  }
+
+  timelineLineState(route: TripGoRouteOption, segmentIndex: number): 'normal' | 'tight' | 'missed' {
+    let tight = false;
+    for (let index = 0; index < segmentIndex; index += 1) {
+      const state = this.connectionStateAfter(route, index);
+      if (state === 'missed') return 'missed';
+      if (state === 'tight') tight = true;
+    }
+    return tight ? 'tight' : 'normal';
+  }
+
+  formatLiveIndicatorTime(indicator: TimelineLiveIndicator): string {
+    return indicator.time ? this.formatTime(indicator.time) : '--:--';
+  }
+
+  timelineLiveAriaLabel(indicator: TimelineLiveIndicator): string {
+    const key = indicator.state === 'unavailable'
+      ? 'common.tripGo.timelineLive.unavailable'
+      : indicator.state === 'on-time'
+        ? 'common.tripGo.timelineLive.onTime'
+        : indicator.state === 'delayed'
+          ? 'common.tripGo.timelineLive.delayed'
+          : 'common.tripGo.timelineLive.connectionMissed';
+    return this.transloco.translate(key, { time: this.formatLiveIndicatorTime(indicator) });
+  }
+
   segmentIcon(segment: TripGoRouteSegment): string {
     return tripGoSegmentIcon(segment);
   }
@@ -321,11 +384,13 @@ export class TripGoRouteDialogComponent implements OnInit {
   }
 
   private loadServiceDetails(routes: TripGoRouteOption[]): void {
+    const latestRouteId = routes[0]?.id;
     const requests = routes.flatMap((route) => route.segments
       .filter((segment) => segment.type === 'scheduled' && segment.service?.tripId)
       .map((segment) => this.tripGo.getServiceDetails(
         segment,
-        this.transloco.getActiveLang() || 'de'
+        this.transloco.getActiveLang() || 'de',
+        route.id === latestRouteId
       ).pipe(
         map((details) => ({ routeId: route.id, segmentId: segment.id, details })),
         catchError(() => of(null))
@@ -353,6 +418,7 @@ export class TripGoRouteDialogComponent implements OnInit {
           }));
           return {
             ...segment,
+            liveDetails: route.id === latestRouteId ? details : undefined,
             detailedGeometry: details.geometry || [],
             service: {
               ...segment.service,
@@ -367,6 +433,51 @@ export class TripGoRouteDialogComponent implements OnInit {
         this.selectedRoute.set(enrichedRoutes.find((route) => route.id === selectedRouteId) || null);
       }
     });
+  }
+
+  private timelineConnectionStateBefore(
+    route: TripGoRouteOption,
+    segmentIndex: number
+  ): 'tight' | 'missed' | null {
+    let tight = false;
+    for (let index = 0; index < segmentIndex; index += 1) {
+      const state = this.connectionStateAfter(route, index);
+      if (state === 'missed') return 'missed';
+      if (state === 'tight') tight = true;
+    }
+    return tight ? 'tight' : null;
+  }
+
+  private connectionStateAfter(
+    route: TripGoRouteOption,
+    segmentIndex: number
+  ): 'tight' | 'missed' | null {
+    const segment = route.segments[segmentIndex];
+    if (segment?.type !== 'scheduled') return null;
+    const nextIndex = route.segments.findIndex((candidate, index) => index > segmentIndex
+      && candidate.type === 'scheduled');
+    if (nextIndex < 0) return null;
+    const nextSegment = route.segments[nextIndex];
+    const currentLive = segment.liveDetails;
+    const nextLive = nextSegment.liveDetails;
+    const hasPrediction = currentLive?.realTime === true
+      || segment.service?.realTime === true
+      || nextLive?.realTime === true
+      || nextSegment.service?.realTime === true;
+    if (!hasPrediction) return null;
+    if (currentLive?.cancelled || nextLive?.cancelled) return 'missed';
+
+    const arrival = currentLive?.arrivalTime || segment.endTime;
+    const departure = nextLive?.departureTime || nextSegment.startTime;
+    if (!arrival || !departure) return null;
+    const transferSeconds = route.segments
+      .slice(segmentIndex + 1, nextIndex)
+      .filter((candidate) => candidate.type !== 'stationary')
+      .reduce((total, candidate) => total + (candidate.durationSeconds || 0), 0);
+    const marginSeconds = (Date.parse(departure) - Date.parse(arrival)) / 1000 - transferSeconds;
+    if (!Number.isFinite(marginSeconds)) return null;
+    if (marginSeconds < 0) return 'missed';
+    return marginSeconds < 300 ? 'tight' : null;
   }
 
   private distanceInMeters(first: Location, second: Location): number {

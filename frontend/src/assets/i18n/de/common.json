@@ -206,6 +206,12 @@
       "segments": "Abschnitte der Verbindung",
       "provider": "Routeninformationen von SkedGo / TripGo",
       "refresh": "Standort neu ermitteln und Routen aktualisieren",
+      "timelineLive": {
+        "unavailable": "Keine Echtzeitdaten verfügbar",
+        "onTime": "Aktuelle Zeit {{ time }}, pünktlich",
+        "delayed": "Aktuelle Zeit {{ time }}, verspätet",
+        "connectionMissed": "Aktuelle Zeit {{ time }}, Anschluss voraussichtlich nicht erreichbar"
+      },
       "routePointDetails": {
         "title": "Punktdetails",
         "arrival": "Ankunft",

@@ -63,6 +63,7 @@ export interface TripGoRouteSegment {
   distanceMeters?: number;
   cost?: TripGoCost;
   service?: TripGoServiceInfo;
+  liveDetails?: TripGoLiveServiceDetails;
   geometry: string[];
   detailedGeometry?: TripGoLocation[];
 }
