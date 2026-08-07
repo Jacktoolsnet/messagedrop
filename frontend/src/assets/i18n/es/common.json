@@ -328,7 +328,14 @@
         "ferry": "Ferri",
         "other": "Otros transportes"
       },
-      "backToLines": "Volver a las líneas"
+      "backToLines": "Volver a las líneas",
+      "journeyFor": "Recorrido",
+      "backToDepartures": "Volver a las salidas",
+      "loadingJourney": "Cargando recorrido …",
+      "journeyError": "No se pudo cargar el recorrido.",
+      "noJourneyStops": "No se proporcionaron paradas para este servicio.",
+      "unknownStop": "Parada desconocida",
+      "showJourney": "Mostrar recorrido"
     },
     "hashtags": {
       "label": "Hashtags",

@@ -75,6 +75,25 @@ export class TripGoService {
     }).pipe(map((response) => response.data.departures));
   }
 
+  getDepartureServiceDetails(
+    departure: TripGoDeparture,
+    locale: string
+  ): Observable<TripGoLiveServiceDetails> {
+    const request = {
+      region: departure.region,
+      serviceTripId: departure.serviceTripId,
+      operator: departure.operatorId || departure.operator,
+      startStopCode: departure.stopCode,
+      embarkationTime: departure.scheduledDepartureTime || departure.departureTime,
+      locale
+    };
+    return this.http.post<TripGoServiceDetailsResponse>(
+      `${environment.apiUrl}/tripgo/service`, request, {
+        headers: { 'x-skip-ui': 'true' }
+      }
+    ).pipe(map((response) => response.data));
+  }
+
   private isTransientRoutingError(error: unknown): boolean {
     return error instanceof HttpErrorResponse
       && [429, 502, 503, 504].includes(error.status);

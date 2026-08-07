@@ -149,6 +149,7 @@ function normalizeServiceStop(value) {
   return compact({
     name: stringOrNull(value?.name),
     stopCode: stringOrNull(value?.stopCode || value?.code),
+    platform: stringOrNull(value?.platformCode || value?.platform),
     latitude: finiteNumber(value?.lat),
     longitude: finiteNumber(value?.lng),
     arrivalTime: flexibleIso(value?.arrival),

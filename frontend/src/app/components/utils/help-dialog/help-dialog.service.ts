@@ -1093,6 +1093,11 @@ const HELP_TOPICS = {
         descriptionKey: 'tripGoStop.items.platforms.desc'
       },
       {
+        icon: 'account_tree',
+        titleKey: 'tripGoStop.items.journey.title',
+        descriptionKey: 'tripGoStop.items.journey.desc'
+      },
+      {
         icon: 'close',
         titleKey: 'tripGoStop.items.close.title',
         descriptionKey: 'tripGoStop.items.close.desc'

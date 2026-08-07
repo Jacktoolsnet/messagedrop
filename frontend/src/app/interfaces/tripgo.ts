@@ -36,6 +36,7 @@ export interface TripGoServiceInfo {
 }
 
 export interface TripGoServiceStop extends TripGoLocation {
+  platform?: string;
   arrivalTime?: string;
   departureTime?: string;
   actualArrivalTime?: string;

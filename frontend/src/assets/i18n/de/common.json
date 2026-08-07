@@ -329,7 +329,14 @@
         "ferry": "Fähre",
         "other": "Weitere Verkehrsmittel"
       },
-      "backToLines": "Zurück zu den Linien"
+      "backToLines": "Zurück zu den Linien",
+      "journeyFor": "Fahrtverlauf",
+      "backToDepartures": "Zurück zu den Abfahrten",
+      "loadingJourney": "Fahrtverlauf wird geladen …",
+      "journeyError": "Der Fahrtverlauf konnte nicht geladen werden.",
+      "noJourneyStops": "Für diese Fahrt wurden keine Haltepunkte geliefert.",
+      "unknownStop": "Unbekannter Halt",
+      "showJourney": "Fahrtverlauf anzeigen"
     },
     "hashtags": {
       "label": "Hashtags",

@@ -328,7 +328,14 @@
         "ferry": "Ferry",
         "other": "Autres transports"
       },
-      "backToLines": "Retour aux lignes"
+      "backToLines": "Retour aux lignes",
+      "journeyFor": "Parcours",
+      "backToDepartures": "Retour aux départs",
+      "loadingJourney": "Chargement du parcours …",
+      "journeyError": "Le parcours n’a pas pu être chargé.",
+      "noJourneyStops": "Aucun arrêt n’a été fourni pour ce service.",
+      "unknownStop": "Arrêt inconnu",
+      "showJourney": "Afficher le parcours"
     },
     "hashtags": {
       "label": "Hashtags",

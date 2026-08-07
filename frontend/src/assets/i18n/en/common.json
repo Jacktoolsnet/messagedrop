@@ -329,7 +329,14 @@
         "ferry": "Ferry",
         "other": "Other transport"
       },
-      "backToLines": "Back to lines"
+      "backToLines": "Back to lines",
+      "journeyFor": "Journey",
+      "backToDepartures": "Back to departures",
+      "loadingJourney": "Loading journey …",
+      "journeyError": "The journey could not be loaded.",
+      "noJourneyStops": "No stops were provided for this service.",
+      "unknownStop": "Unknown stop",
+      "showJourney": "Show journey"
     },
     "hashtags": {
       "label": "Hashtags",

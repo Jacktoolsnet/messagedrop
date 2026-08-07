@@ -2956,6 +2956,10 @@
       "privacy": {
         "title": "Confidentialité",
         "desc": "Les arrêts de la zone visible sont chargés depuis SkedGo / TripGo via le backend MessageDrop et ne sont affichés que temporairement."
+      },
+      "journey": {
+        "title": "Parcours",
+        "desc": "Touchez un départ précis ou son bouton pour afficher ses arrêts, horaires et quais dans une chronologie. Le bouton Retour ramène aux départs de la ligne."
       }
     }
   },

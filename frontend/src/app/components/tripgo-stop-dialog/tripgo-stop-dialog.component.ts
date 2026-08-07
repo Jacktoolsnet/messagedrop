@@ -7,11 +7,12 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTabsModule } from '@angular/material/tabs';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { finalize } from 'rxjs';
-import { TripGoDeparture, TripGoStop } from '../../interfaces/tripgo';
+import { TripGoDeparture, TripGoLiveServiceDetails, TripGoServiceStop, TripGoStop } from '../../interfaces/tripgo';
 import { LanguageService } from '../../services/language.service';
 import { TripGoService } from '../../services/tripgo.service';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
+import { TripGoTimelineWeatherComponent } from '../tripgo-route-dialog/tripgo-timeline-weather.component';
 
 @Component({
   selector: 'app-tripgo-stop-dialog',
@@ -23,6 +24,7 @@ import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
     MatIconModule,
     MatProgressSpinnerModule,
     MatTabsModule,
+    TripGoTimelineWeatherComponent,
     TranslocoPipe
   ],
   templateUrl: './tripgo-stop-dialog.component.html',
@@ -36,11 +38,21 @@ export class TripGoStopDialogComponent implements OnInit {
   readonly loadFailed = signal(false);
   readonly departures = signal<TripGoDeparture[]>([]);
   readonly selectedKey = signal<string | null>(null);
+  readonly selectedDeparture = signal<TripGoDeparture | null>(null);
+  readonly serviceDetails = signal<TripGoLiveServiceDetails | null>(null);
+  readonly detailLoading = signal(false);
+  readonly detailFailed = signal(false);
   readonly groups = computed<DepartureGroup[]>(() => groupDepartures(this.departures()));
   readonly modeGroups = computed<DepartureModeGroup[]>(() => groupDepartureModes(this.groups()));
   readonly selectedGroup = computed(() => {
     const groups = this.groups();
     return groups.find((group) => group.key === this.selectedKey()) ?? null;
+  });
+  readonly journeyStops = computed(() => {
+    const stops = this.serviceDetails()?.stops ?? [];
+    const startStopCode = this.selectedDeparture()?.stopCode;
+    const startIndex = startStopCode ? stops.findIndex((stop) => stop.stopCode === startStopCode) : -1;
+    return startIndex > 0 ? stops.slice(startIndex) : stops;
   });
   private readonly dialogRef = inject(MatDialogRef<TripGoStopDialogComponent>);
   private readonly tripGo = inject(TripGoService);
@@ -77,11 +89,46 @@ export class TripGoStopDialogComponent implements OnInit {
   }
 
   selectGroup(group: DepartureGroup): void {
+    this.selectedDeparture.set(null);
+    this.serviceDetails.set(null);
     this.selectedKey.set(group.key);
   }
 
   showLines(): void {
+    this.selectedDeparture.set(null);
+    this.serviceDetails.set(null);
     this.selectedKey.set(null);
+  }
+
+  showDepartures(): void {
+    this.selectedDeparture.set(null);
+    this.serviceDetails.set(null);
+    this.detailFailed.set(false);
+  }
+
+  openDeparture(departure: TripGoDeparture): void {
+    if (!departure.serviceTripId || this.detailLoading()) return;
+    this.selectedDeparture.set(departure);
+    this.serviceDetails.set(null);
+    this.detailFailed.set(false);
+    this.detailLoading.set(true);
+    this.tripGo.getDepartureServiceDetails(departure, this.language.effectiveLanguage())
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.detailLoading.set(false))
+      )
+      .subscribe({
+        next: (details) => this.serviceDetails.set(details),
+        error: () => this.detailFailed.set(true)
+      });
+  }
+
+  canOpenDeparture(departure: TripGoDeparture): boolean {
+    return Boolean(departure.serviceTripId);
+  }
+
+  stopTime(stop: TripGoServiceStop): string {
+    return this.time(stop.departureTime || stop.arrivalTime);
   }
 
   time(value?: string): string {

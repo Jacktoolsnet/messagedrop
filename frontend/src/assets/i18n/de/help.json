@@ -2974,6 +2974,10 @@
       "privacy": {
         "title": "Datenschutz",
         "desc": "Haltestellen im sichtbaren Kartenausschnitt werden über das MessageDrop-Backend von SkedGo / TripGo geladen und nur temporär auf der Karte dargestellt."
+      },
+      "journey": {
+        "title": "Fahrtverlauf",
+        "desc": "Tippe eine konkrete Abfahrt oder den Symbolbutton an, um ihre Haltepunkte mit Uhrzeit und Steig als Timeline zu öffnen. Der Zurück-Button führt zu den Abfahrten der Linie."
       }
     }
   },

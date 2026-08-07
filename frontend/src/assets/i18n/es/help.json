@@ -2956,6 +2956,10 @@
       "privacy": {
         "title": "Privacidad",
         "desc": "Las paradas del área visible del mapa se cargan desde SkedGo / TripGo a través del backend de MessageDrop y solo se muestran temporalmente."
+      },
+      "journey": {
+        "title": "Recorrido",
+        "desc": "Toca una salida concreta o su botón de icono para abrir sus paradas con hora y andén en una cronología. El botón Atrás vuelve a las salidas de la línea."
       }
     }
   },

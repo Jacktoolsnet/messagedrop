@@ -202,6 +202,21 @@
   opacity: 0.72;
 }
 
+.departure-row--interactive {
+  cursor: pointer;
+  border-radius: 0.65rem;
+  transition: background-color 160ms ease;
+}
+
+.departure-row--interactive:hover {
+  background: var(--mat-sys-surface-container);
+}
+
+.departure-row > button {
+  flex: 0 0 auto;
+  align-self: center;
+}
+
 .departure-time {
   display: flex;
   align-items: center;
@@ -244,6 +259,98 @@
   width: 1rem;
   height: 1rem;
   font-size: 1rem;
+}
+
+.journey-timeline {
+  display: flex;
+  flex-direction: column;
+}
+
+.journey-stop {
+  display: grid;
+  grid-template-columns: 2.75rem minmax(0, 1fr);
+  min-height: 4.5rem;
+}
+
+.journey-stop__axis {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.journey-stop__axis::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0.2rem;
+  content: '';
+  background: var(--mat-sys-outline-variant);
+}
+
+.journey-stop:first-child .journey-stop__axis::before {
+  top: 1.15rem;
+}
+
+.journey-stop:last-child .journey-stop__axis::before {
+  bottom: calc(100% - 1.15rem);
+}
+
+.journey-stop__marker {
+  z-index: 1;
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  margin-top: 0.15rem;
+  place-items: center;
+  border: 2px solid var(--mat-sys-outline);
+  border-radius: 50%;
+  color: var(--mat-sys-on-surface);
+  background: var(--mat-sys-surface-container-high);
+}
+
+.journey-stop__marker--terminal {
+  color: var(--mat-sys-on-primary);
+  background: var(--mat-sys-primary);
+}
+
+.journey-stop__marker mat-icon {
+  width: 1.15rem;
+  height: 1.15rem;
+  font-size: 1.15rem;
+}
+
+.journey-stop__content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 0.35rem;
+  padding: 0.2rem 0 1rem 0.35rem;
+}
+
+.journey-stop__meta,
+.journey-stop__meta > span {
+  display: flex;
+  align-items: center;
+}
+
+.journey-stop__meta {
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.journey-stop__meta > span {
+  gap: 0.3rem;
+}
+
+.journey-stop__meta mat-icon {
+  width: 1rem;
+  height: 1rem;
+  font-size: 1rem;
+}
+
+.journey-stop__weather {
+  min-height: 1.25rem;
 }
 
 .empty-state {

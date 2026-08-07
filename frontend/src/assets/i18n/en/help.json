@@ -2974,6 +2974,10 @@
       "privacy": {
         "title": "Privacy",
         "desc": "Stops in the visible map area are loaded from SkedGo / TripGo through the MessageDrop backend and are only displayed temporarily on the map."
+      },
+      "journey": {
+        "title": "Journey",
+        "desc": "Tap a specific departure or its icon button to open its stops with time and platform as a timeline. The back button returns to the line departures."
       }
     }
   },

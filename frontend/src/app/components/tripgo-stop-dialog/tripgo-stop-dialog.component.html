@@ -9,8 +9,17 @@
   <section class="stop-grid" [attr.aria-label]="'common.tripGoStops.details' | transloco">
     <article class="stop-tile stop-tile--wide">
       <header>
-        <mat-icon aria-hidden="true">{{ selectedGroup() ? 'departure_board' : 'route' }}</mat-icon>
-        @if (selectedGroup(); as selected) {
+        <mat-icon aria-hidden="true">{{ selectedDeparture() ? 'account_tree' : selectedGroup() ? 'departure_board' : 'route' }}</mat-icon>
+        @if (selectedDeparture(); as departure) {
+          <span class="line-view-title">
+            {{ 'common.tripGoStops.journeyFor' | transloco }} {{ selectedGroup()?.line }}
+            @if (departure.direction) { <small>· {{ departure.direction }}</small> }
+          </span>
+          <button mat-icon-button type="button" class="line-view-back" (click)="showDepartures()"
+            [attr.aria-label]="'common.tripGoStops.backToDepartures' | transloco">
+            <mat-icon>arrow_back</mat-icon>
+          </button>
+        } @else if (selectedGroup(); as selected) {
           <span class="line-view-title">
             {{ 'common.tripGoStops.departuresFor' | transloco }} {{ selected.line }}
             @if (selected.direction) { <small>· {{ selected.direction }}</small> }
@@ -29,10 +38,48 @@
             <mat-spinner diameter="32"></mat-spinner>
             <span>{{ 'common.tripGoStops.loadingDepartures' | transloco }}</span>
           </div>
+        } @else if (selectedDeparture()) {
+          @if (detailLoading()) {
+            <div class="loading-state">
+              <mat-spinner diameter="32"></mat-spinner>
+              <span>{{ 'common.tripGoStops.loadingJourney' | transloco }}</span>
+            </div>
+          } @else if (serviceDetails() && journeyStops().length) {
+            <div class="journey-timeline" role="list">
+              @for (stop of journeyStops(); track stop.stopCode || $index; let first = $first; let last = $last) {
+                <div class="journey-stop" role="listitem">
+                  <span class="journey-stop__axis">
+                    <span class="journey-stop__marker" [class.journey-stop__marker--terminal]="first || last">
+                      <mat-icon aria-hidden="true">{{ last ? 'flag' : first ? 'trip_origin' : 'location_on' }}</mat-icon>
+                    </span>
+                  </span>
+                  <span class="journey-stop__content">
+                    <strong>{{ stop.name || ('common.tripGoStops.unknownStop' | transloco) }}</strong>
+                    <span class="journey-stop__meta">
+                      <span><mat-icon aria-hidden="true">schedule</mat-icon>{{ stopTime(stop) }}</span>
+                      @if (stop.platform) {
+                        <span><mat-icon aria-hidden="true">signpost</mat-icon>
+                          {{ 'common.tripGoStops.platform' | transloco }} {{ stop.platform }}</span>
+                      }
+                    </span>
+                    <app-tripgo-timeline-weather class="journey-stop__weather"
+                      [location]="stop"></app-tripgo-timeline-weather>
+                  </span>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="inline-message inline-message--error">
+              <mat-icon aria-hidden="true">error_outline</mat-icon>
+              <span>{{ (detailFailed() ? 'common.tripGoStops.journeyError' : 'common.tripGoStops.noJourneyStops') | transloco }}</span>
+            </div>
+          }
         } @else if (selectedGroup(); as group) {
           <div class="departure-list">
             @for (departure of group.departures; track departure.id) {
-              <div class="departure-row" [class.departure-row--cancelled]="departure.cancelled">
+              <div class="departure-row" [class.departure-row--cancelled]="departure.cancelled"
+                [class.departure-row--interactive]="canOpenDeparture(departure)"
+                (click)="openDeparture(departure)">
                 <span class="departure-time">
                   <mat-icon aria-hidden="true">schedule</mat-icon>
                   <strong>{{ time(departure.departureTime) }}</strong>
@@ -61,6 +108,13 @@
                     <small class="departure-alert"><mat-icon aria-hidden="true">warning</mat-icon>{{ alert }}</small>
                   }
                 </span>
+                @if (canOpenDeparture(departure)) {
+                  <button mat-icon-button color="primary" type="button"
+                    (click)="$event.stopPropagation(); openDeparture(departure)"
+                    [attr.aria-label]="'common.tripGoStops.showJourney' | transloco">
+                    <mat-icon>account_tree</mat-icon>
+                  </button>
+                }
               </div>
             }
           </div>

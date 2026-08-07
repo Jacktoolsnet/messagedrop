@@ -191,7 +191,8 @@ test('normalizes current service times and calculates a delay', () => {
       waypoints: [{ lat: 52.1, lng: 10.1 }, { lat: 52.1, lng: 10.1 }, { lat: 52.2, lng: 10.2 }],
       stops: [
         { name: 'Start', code: 'start', lat: 52.1, lng: 10.1, departure: 1_785_956_880 },
-        { name: 'Zwischenhalt', code: 'middle', lat: 52.15, lng: 10.15, arrival: 1_785_957_000 },
+        { name: 'Zwischenhalt', code: 'middle', platformCode: '3', lat: 52.15, lng: 10.15,
+          arrival: 1_785_957_000 },
         { name: 'Ziel', code: 'end', lat: 52.2, lng: 10.2, arrival: 1_785_957_180 }
       ]
     }],
@@ -213,6 +214,7 @@ test('normalizes current service times and calculates a delay', () => {
   assert.deepEqual(normalized.alerts, ['Geänderter Steig']);
   assert.deepEqual(normalized.stops.map((stop) => stop.name), ['Start', 'Zwischenhalt', 'Ziel']);
   assert.equal(normalized.stops[1].arrivalTime, '2026-08-05T19:10:00.000Z');
+  assert.equal(normalized.stops[1].platform, '3');
   assert.deepEqual(normalized.geometry, [
     { latitude: 52.1, longitude: 10.1 },
     { latitude: 52.2, longitude: 10.2 }
