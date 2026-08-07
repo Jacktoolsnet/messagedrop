@@ -45,7 +45,8 @@ const SEARCH_SETTING_MARKER_ICONS: Record<SearchSettingsKey, string> = {
   privateDocuments: 'assets/markers/document-marker.svg',
   experiences: 'assets/markers/experience-marker.svg',
   myExperiences: 'assets/markers/my-experience-marker.svg',
-  wikipedia: 'assets/markers/wikipedia-marker.svg'
+  wikipedia: 'assets/markers/wikipedia-marker.svg',
+  publicTransportStops: 'assets/markers/transport-marker.svg'
 };
 
 interface SearchSettingsItem {
@@ -95,7 +96,12 @@ export class SearchSettingsComponent {
     { key: 'privateDocuments', icon: 'description', titleKey: 'common.searchSettings.items.privateDocuments' },
     { key: 'experiences', icon: 'local_activity', titleKey: 'common.searchSettings.items.experiences' },
     { key: 'myExperiences', icon: 'bookmark_star', titleKey: 'common.searchSettings.items.myExperiences' },
-    { key: 'wikipedia', icon: 'menu_book', titleKey: 'common.searchSettings.items.wikipedia' }
+    { key: 'wikipedia', icon: 'menu_book', titleKey: 'common.searchSettings.items.wikipedia' },
+    {
+      key: 'publicTransportStops',
+      icon: 'directions_bus',
+      titleKey: 'common.searchSettings.items.publicTransportStops'
+    }
   ];
   readonly items = computed(() => {
     this.userService.userSet();
@@ -107,6 +113,7 @@ export class SearchSettingsComponent {
       || item.key === 'secretDrops'
       || item.key === 'experiences'
       || item.key === 'wikipedia'
+      || item.key === 'publicTransportStops'
     );
   });
   readonly minZoom = 3;
@@ -145,6 +152,9 @@ export class SearchSettingsComponent {
   }
 
   getMinZoom(key: SearchSettingsKey): number {
+    if (key === 'publicTransportStops') {
+      return 16;
+    }
     return key === 'wikipedia' ? 14 : this.minZoom;
   }
 
@@ -173,6 +183,14 @@ export class SearchSettingsComponent {
         ...DEFAULT_SEARCH_SETTINGS.wikipedia,
         ...settings.wikipedia,
         minZoom: Math.min(19, Math.max(14, settings.wikipedia?.minZoom ?? DEFAULT_SEARCH_SETTINGS.wikipedia.minZoom))
+      },
+      publicTransportStops: {
+        ...DEFAULT_SEARCH_SETTINGS.publicTransportStops,
+        ...settings.publicTransportStops,
+        minZoom: Math.min(19, Math.max(
+          16,
+          settings.publicTransportStops?.minZoom ?? DEFAULT_SEARCH_SETTINGS.publicTransportStops.minZoom
+        ))
       }
     };
   }

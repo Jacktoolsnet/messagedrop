@@ -1679,7 +1679,8 @@
         "privateDocuments": "Private documents",
         "experiences": "Experiences",
         "myExperiences": "My experiences",
-        "wikipedia": "Wikipedia articles"
+        "wikipedia": "Wikipedia articles",
+        "publicTransportStops": "Public transport stops"
       }
     },
     "wikipedia": {

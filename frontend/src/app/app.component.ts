@@ -1763,6 +1763,14 @@ export class AppComponent implements OnInit {
         ...DEFAULT_SEARCH_SETTINGS.wikipedia,
         ...(settings?.wikipedia ?? {}),
         minZoom: Math.min(19, Math.max(14, settings?.wikipedia?.minZoom ?? DEFAULT_SEARCH_SETTINGS.wikipedia.minZoom))
+      },
+      publicTransportStops: {
+        ...DEFAULT_SEARCH_SETTINGS.publicTransportStops,
+        ...(settings?.publicTransportStops ?? {}),
+        minZoom: Math.min(19, Math.max(
+          16,
+          settings?.publicTransportStops?.minZoom ?? DEFAULT_SEARCH_SETTINGS.publicTransportStops.minZoom
+        ))
       }
     };
   }
