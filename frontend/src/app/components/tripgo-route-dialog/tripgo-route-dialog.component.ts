@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import { catchError, concatMap, forkJoin, from, map, of, switchMap } from 'rxjs';
+import { Subscription, catchError, concatMap, forkJoin, from, map, of, switchMap } from 'rxjs';
 import { GetNominatimAddressResponse } from '../../interfaces/get-nominatim-address-response copy';
 import { Location } from '../../interfaces/location';
 import { NominatimPlace } from '../../interfaces/nominatim-place';
@@ -93,6 +93,8 @@ export class TripGoRouteDialogComponent implements OnInit {
   private readonly nominatim = inject(NominatimService);
   private readonly tripGo = inject(TripGoService);
   private readonly transloco = inject(TranslocoService);
+  private routeLoadSubscription?: Subscription;
+  private serviceDetailsSubscription?: Subscription;
   readonly help = inject(HelpDialogService);
 
   readonly origin = signal<Location | null>(null);
@@ -123,6 +125,7 @@ export class TripGoRouteDialogComponent implements OnInit {
   }
 
   calculateWithFreshLocation(): void {
+    this.cancelRouteRequests();
     this.showList();
     this.routes.set([]);
     this.state.set('locating');
@@ -275,7 +278,7 @@ export class TripGoRouteDialogComponent implements OnInit {
 
   editRoutePoint(kind: RoutePointKind): void {
     const current = kind === 'origin' ? this.origin() : this.destination();
-    if (!current || this.isBusy()) return;
+    if (!current || this.state() === 'locating') return;
 
     const dialogRef = this.dialog.open<LocationPickerDialogComponent, unknown, Location | undefined>(
       LocationPickerDialogComponent,
@@ -442,6 +445,7 @@ export class TripGoRouteDialogComponent implements OnInit {
   }
 
   private loadRoutes(origin: Location, destination: Location): void {
+    this.cancelRouteRequests();
     this.routes.set([]);
     this.requestedRouteCategories.set([]);
     this.loadingRouteCategories.set(new Set());
@@ -462,7 +466,7 @@ export class TripGoRouteDialogComponent implements OnInit {
     // TripGo can reject a burst of several expensive routing requests with 503.
     // Process the route variants one after another instead of starting them all
     // at the same time.
-    from(categories).pipe(
+    this.routeLoadSubscription = from(categories).pipe(
       concatMap(({ category, primaryModes, fallbackModes }) =>
         this.tripGo.calculateRoute(origin, destination, locale, primaryModes).pipe(
         catchError(() => of(null)),
@@ -540,7 +544,8 @@ export class TripGoRouteDialogComponent implements OnInit {
       )));
     if (requests.length === 0) return;
 
-    forkJoin(requests).pipe(takeUntilDestroyed(this.destroyRef)).subscribe((results) => {
+    this.serviceDetailsSubscription = forkJoin(requests)
+      .pipe(takeUntilDestroyed(this.destroyRef)).subscribe((results) => {
       const detailsBySegment = new Map(results
         .filter((result) => result !== null)
         .map((result) => [`${result.routeId}:${result.segmentId}`, result.details]));
@@ -576,6 +581,13 @@ export class TripGoRouteDialogComponent implements OnInit {
         this.selectedRoute.set(enrichedRoutes.find((route) => route.id === selectedRouteId) || null);
       }
     });
+  }
+
+  private cancelRouteRequests(): void {
+    this.routeLoadSubscription?.unsubscribe();
+    this.routeLoadSubscription = undefined;
+    this.serviceDetailsSubscription?.unsubscribe();
+    this.serviceDetailsSubscription = undefined;
   }
 
   private timelineConnectionStateBefore(

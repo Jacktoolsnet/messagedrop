@@ -20,8 +20,8 @@
   } @else {
   <section class="route-points" [attr.aria-label]="'common.tripGo.routePoints' | transloco">
     <article class="route-point route-point--action" role="button"
-      [attr.tabindex]="!origin() || isBusy() ? -1 : 0"
-      [attr.aria-disabled]="!origin() || isBusy()"
+      [attr.tabindex]="!origin() || state() === 'locating' ? -1 : 0"
+      [attr.aria-disabled]="!origin() || state() === 'locating'"
       [attr.aria-label]="'common.tripGo.editOrigin' | transloco"
       (click)="activateRoutePoint($event, 'origin')"
       (keydown.enter)="activateRoutePoint($event, 'origin')"
@@ -32,7 +32,7 @@
           {{ 'common.tripGo.origin' | transloco }}
         </span>
         <button mat-icon-button type="button" (click)="editRoutePoint('origin'); $event.stopPropagation()"
-          [disabled]="!origin() || isBusy()"
+          [disabled]="!origin() || state() === 'locating'"
           [attr.aria-label]="'common.tripGo.editOrigin' | transloco">
           <mat-icon>edit</mat-icon>
         </button>
@@ -54,8 +54,8 @@
     </article>
 
     <article class="route-point route-point--action" role="button"
-      [attr.tabindex]="isBusy() ? -1 : 0"
-      [attr.aria-disabled]="isBusy()"
+      [attr.tabindex]="state() === 'locating' ? -1 : 0"
+      [attr.aria-disabled]="state() === 'locating'"
       [attr.aria-label]="'common.tripGo.editDestination' | transloco"
       (click)="activateRoutePoint($event, 'destination')"
       (keydown.enter)="activateRoutePoint($event, 'destination')"
@@ -66,7 +66,7 @@
           {{ 'common.tripGo.destination' | transloco }}
         </span>
         <button mat-icon-button type="button" (click)="editRoutePoint('destination'); $event.stopPropagation()"
-          [disabled]="isBusy()"
+          [disabled]="state() === 'locating'"
           [attr.aria-label]="'common.tripGo.editDestination' | transloco">
           <mat-icon>edit</mat-icon>
         </button>
