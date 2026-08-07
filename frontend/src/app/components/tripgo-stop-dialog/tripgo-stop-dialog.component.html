@@ -38,6 +38,7 @@
                   <strong>{{ time(departure.departureTime) }}</strong>
                 </span>
                 <span class="departure-info">
+                  <strong>{{ group.direction || ('common.tripGoStops.unknownDirection' | transloco) }}</strong>
                   @if (departure.cancelled) {
                     <strong class="status status--cancelled">{{ 'common.tripGoStops.cancelled' | transloco }}</strong>
                   } @else if (departure.realTime) {
@@ -47,8 +48,6 @@
                         · +{{ delayMinutes(departure) }} {{ 'common.tripGoStops.minutesShort' | transloco }}
                       }
                     </span>
-                  } @else {
-                    <span class="status">{{ 'common.tripGoStops.scheduled' | transloco }}</span>
                   }
                   @if (departure.platform) {
                     <small>{{ 'common.tripGoStops.platform' | transloco }} {{ departure.platform }}</small>
@@ -77,7 +76,7 @@
                 <div class="line-list mode-tab-content">
                   @for (group of modeGroup.groups; track group.key) {
                     <article class="line-card" [class.line-card--selected]="selectedGroup()?.key === group.key"
-                      [style.border-left-color]="group.color || null">
+                      [style.border-left-color]="group.color || null" (click)="selectGroup(group)">
                       <div class="line-card__heading">
                         <span class="line-symbol"><mat-icon aria-hidden="true">{{ modeIcon(group) }}</mat-icon></span>
                         <span class="line-card__title">
@@ -94,7 +93,8 @@
                             {{ time(group.departures[0].departureTime) }}
                           </small>
                         </span>
-                        <button mat-icon-button color="primary" type="button" (click)="selectGroup(group)"
+                        <button mat-icon-button color="primary" type="button"
+                          (click)="$event.stopPropagation(); selectGroup(group)"
                           [attr.aria-label]="'common.tripGoStops.showDepartures' | transloco"
                           [attr.aria-pressed]="selectedGroup()?.key === group.key">
                           <mat-icon>departure_board</mat-icon>

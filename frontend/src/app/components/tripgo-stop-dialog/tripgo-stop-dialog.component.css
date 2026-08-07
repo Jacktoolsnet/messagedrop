@@ -74,6 +74,13 @@
   border-left: 0.35rem solid var(--mat-sys-primary);
   border-radius: 0.75rem;
   background: var(--mat-sys-surface-container-low);
+  cursor: pointer;
+  transition: background-color 160ms ease, transform 160ms ease;
+}
+
+.line-card:hover {
+  transform: scale(1.01);
+  background: var(--mat-sys-surface-container);
 }
 
 .line-card--selected {
