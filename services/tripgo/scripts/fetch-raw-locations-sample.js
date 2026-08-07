@@ -44,9 +44,11 @@ async function main() {
   const radius = nonNegativeInteger('TRIPGO_LOCATIONS_CELL_RADIUS', '1');
   const query = {
     region: process.env.TRIPGO_LOCATIONS_REGION || 'DE_NI_Hanover',
-    level: 2,
+    levels: [1, 2],
     cellIDs: localCellIDs(latitude, longitude, radius),
-    locale: process.env.TRIPGO_LOCATIONS_LOCALE || 'de'
+    locale: process.env.TRIPGO_LOCATIONS_LOCALE || 'de',
+    includeChildren: true,
+    includeRoutes: true
   };
 
   const client = createTripGoClient();

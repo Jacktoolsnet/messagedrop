@@ -41,8 +41,11 @@ function createTripGoClient({
       }));
     },
 
-    async locations({ region, level = 2, cellIDs, cellIDHashCodes, locale = 'en' }) {
-      const body = { region, level };
+    async locations({
+      region, levels = [1, 2], cellIDs, cellIDHashCodes, locale = 'en',
+      includeChildren = true, includeRoutes = true
+    }) {
+      const body = { region, levels, includeChildren, includeRoutes };
       if (Array.isArray(cellIDs) && cellIDs.length > 0) body.cellIDs = cellIDs;
       if (cellIDHashCodes && typeof cellIDHashCodes === 'object') {
         body.cellIDHashCodes = cellIDHashCodes;

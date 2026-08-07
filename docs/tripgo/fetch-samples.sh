@@ -20,6 +20,15 @@ if [[ "${TRIPGO_FETCH_LOCATIONS:-1}" == "1" ]]; then
   node "${script_dir}/../../services/tripgo/scripts/fetch-raw-locations-sample.js" \
     "${output_dir}/locations-halchter-raw.json" \
     "${output_dir}/locations-halchter-request.json"
+
+  printf 'Fetching TripGo stops around Braunschweig Hauptbahnhof ...\n'
+  TRIPGO_LOCATIONS_LAT="52.2525" \
+  TRIPGO_LOCATIONS_LNG="10.5406" \
+  TRIPGO_LOCATIONS_CELL_RADIUS="1" \
+  TRIPGO_LOCATIONS_REGION="DE_NI_Hanover" \
+  node "${script_dir}/../../services/tripgo/scripts/fetch-raw-locations-sample.js" \
+    "${output_dir}/locations-braunschweig-hbf-raw.json" \
+    "${output_dir}/locations-braunschweig-hbf-request.json"
 fi
 
 fetch_diagnostic_route() {

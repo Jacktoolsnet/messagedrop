@@ -1,11 +1,15 @@
 function normalizeDeparturesResponse(data, region) {
   const embarkationStops = Array.isArray(data?.embarkationStops) ? data.embarkationStops : [];
-  const departures = embarkationStops.flatMap((stop) => {
+  const normalizedDepartures = embarkationStops.flatMap((stop) => {
     const stopCode = text(stop?.stopCode);
     return (Array.isArray(stop?.services) ? stop.services : [])
       .map((service, index) => normalizeDeparture(service, stopCode, region, index))
       .filter(Boolean);
   });
+
+  const departures = [...new Map(normalizedDepartures.map((departure) => [
+    departureIdentity(departure), departure
+  ])).values()];
 
   departures.sort((left, right) => Date.parse(left.departureTime) - Date.parse(right.departureTime));
   return {
@@ -14,6 +18,12 @@ function normalizeDeparturesResponse(data, region) {
     departures,
     alerts: normalizeAlerts(data?.alerts)
   };
+}
+
+function departureIdentity(departure) {
+  if (!departure.serviceTripId) return departure.id;
+  return [departure.serviceTripId, departure.scheduledDepartureTime || departure.departureTime,
+    departure.line, departure.direction].join('|');
 }
 
 function normalizeDeparture(service, stopCode, region, index) {

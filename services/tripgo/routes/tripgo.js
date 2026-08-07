@@ -122,9 +122,11 @@ function createTripGoRouter({
       const upstream = await coalesce(inFlight, `locations:${key}`, maxInFlight,
         () => client.locations({
           region,
-          level: 2,
+          levels: [1, 2],
           cellIDs,
-          locale: validated.value.locale
+          locale: validated.value.locale,
+          includeChildren: true,
+          includeRoutes: true
         }));
       const payload = {
         status: upstream.status,
@@ -169,7 +171,7 @@ function createTripGoRouter({
     if (cached !== undefined) return res.status(200).json({ ...cached, cache: 'hit' });
     try {
       const upstream = await coalesce(inFlight, `departures:${key}`, maxInFlight,
-        () => client.departures(validated.value));
+        () => fetchDeparturesForStops(client, validated.value));
       const payload = {
         status: upstream.status,
         data: normalizeDeparturesResponse(upstream.data, validated.value.region)
@@ -234,6 +236,25 @@ function createTripGoRouter({
   return router;
 }
 
+async function fetchDeparturesForStops(client, query) {
+  if (query.stopCodes.length === 1) return client.departures(query);
+  const results = await Promise.allSettled(query.stopCodes.map((stopCode) => client.departures({
+    ...query,
+    stopCodes: [stopCode]
+  })));
+  const successful = results.filter((result) => result.status === 'fulfilled').map((result) => result.value);
+  if (successful.length === 0) throw results[0].reason;
+  return {
+    status: successful[0].status,
+    headers: successful[0].headers,
+    data: {
+      embarkationStops: successful.flatMap((result) => result.data?.embarkationStops || []),
+      parentInfo: successful.flatMap((result) => result.data?.parentInfo || []),
+      alerts: successful.flatMap((result) => result.data?.alerts || [])
+    }
+  };
+}
+
 async function coalesce(inFlight, key, maxInFlight, factory) {
   const existing = inFlight.get(key);
   if (existing) return existing;
@@ -271,4 +292,4 @@ function preferredLocale(header) {
   return typeof header === 'string' ? header.split(',')[0]?.split(';')[0]?.trim() : null;
 }
 
-module.exports = { createTripGoRouter, coalesce, routeKey };
+module.exports = { createTripGoRouter, coalesce, fetchDeparturesForStops, routeKey };
