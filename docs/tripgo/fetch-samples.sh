@@ -7,9 +7,20 @@ api_url="${MESSAGEDROP_API_URL:-http://localhost:3000}"
 
 mkdir -p "${output_dir}"
 # These files are disposable diagnostics. Remove earlier samples so that every
-# run contains only the routes requested below and cannot be confused with
-# stale responses.
-find "${output_dir}" -maxdepth 1 -type f -name '*.json' -delete
+# run contains only the diagnostics enabled below.
+if [[ "${TRIPGO_KEEP_OLD_SAMPLES:-0}" != "1" ]]; then
+  find "${output_dir}" -maxdepth 1 -type f -name '*.json' -delete
+fi
+
+# For the current development step only the local stops around Halchter are
+# fetched by default. The older diagnostics remain available through their
+# explicit feature flags below.
+if [[ "${TRIPGO_FETCH_LOCATIONS:-1}" == "1" ]]; then
+  printf 'Fetching TripGo stops around Halchter ...\n'
+  node "${script_dir}/../../services/tripgo/scripts/fetch-raw-locations-sample.js" \
+    "${output_dir}/locations-halchter-raw.json" \
+    "${output_dir}/locations-halchter-request.json"
+fi
 
 fetch_diagnostic_route() {
   local name="$1"
@@ -75,7 +86,7 @@ fetch_region_diagnostics() {
 # Keep the region/provider catalogue from the authenticated API response. It
 # lets us inspect which providers advertise real-time capabilities before
 # choosing further diagnostic routes.
-if [[ "${TRIPGO_FETCH_REGIONS:-1}" == "1" ]]; then
+if [[ "${TRIPGO_FETCH_REGIONS:-0}" == "1" ]]; then
   curl --silent --show-error --fail-with-body \
     "${api_url}/tripgo/regions?locale=en" \
     --output "${output_dir}/regions-providers.json"
@@ -91,7 +102,7 @@ if [[ "${TRIPGO_FETCH_REGIONS:-1}" == "1" ]]; then
   done
 fi
 
-if [[ "${TRIPGO_FETCH_ROUTES:-1}" == "1" ]]; then
+if [[ "${TRIPGO_FETCH_ROUTES:-0}" == "1" ]]; then
   # TripGo uses Sydney in its own /latest.json documentation. This short and
   # frequent light-rail connection is therefore a stronger real-time test than
   # an international long-distance journey. Besides routing and /service, the

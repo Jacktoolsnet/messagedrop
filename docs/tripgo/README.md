@@ -4,39 +4,44 @@ This directory contains helper files for inspecting the TripGo integration.
 Generated API responses are written to `generated/` and deliberately ignored
 by Git because they can contain dynamic transport and location data.
 
-With the MessageDrop backend and TripGo service running, execute:
+The current sample fetch is intentionally limited by default to public-
+transport stops around Halchter. Route, provider and real-time diagnostics are
+skipped so the result remains small and unambiguous.
+
+Run it with:
 
 ```bash
 ./docs/tripgo/fetch-samples.sh
 ```
 
-The backend URL can be overridden when necessary:
+The script reads `TRIPGO_API_KEY` from the ignored root `.env` and creates:
+
+- `generated/locations-halchter-raw.json` – unmodified TripGo response
+- `generated/locations-halchter-request.json` – requested cells and counts
+
+TripGo's local location level divides the map into cells. By default the script
+requests the centre cell around Halchter plus its eight neighbours. The centre,
+region and number of neighbouring cells can be overridden:
 
 ```bash
-MESSAGEDROP_API_URL=http://localhost:3000 ./docs/tripgo/fetch-samples.sh
-```
-
-The script creates:
-
-- `generated/health.json`
-- `generated/regions-de.json`
-- `generated/route-berlin.json`
-- `generated/route-wolfenbuettel.json`
-- `generated/route-wolfenbuettel-raw.json`
-
-The Wolfenbüttel sample is intended to diagnose the direction information for
-the circular bus line 794. The `raw` file contains TripGo's unmodified upstream
-response, while the other file contains MessageDrop's normalized response.
-The raw sample is fetched directly with `TRIPGO_API_KEY` from the ignored root
-`.env`; the key itself is not included in the generated file.
-
-The default origin is near Im Kirchfeld in Halchter and the default destination
-is Wolfenbüttel station. Exact coordinates can be supplied when needed:
-
-```bash
-TRIPGO_WOLFENBUETTEL_FROM_LAT=52.14 \
-TRIPGO_WOLFENBUETTEL_FROM_LNG=10.54 \
-TRIPGO_WOLFENBUETTEL_TO_LAT=52.159149 \
-TRIPGO_WOLFENBUETTEL_TO_LNG=10.53245 \
+TRIPGO_LOCATIONS_LAT=52.14 \
+TRIPGO_LOCATIONS_LNG=10.54 \
+TRIPGO_LOCATIONS_REGION=DE_NI_Hanover \
+TRIPGO_LOCATIONS_CELL_RADIUS=1 \
 ./docs/tripgo/fetch-samples.sh
 ```
+
+Old generated JSON files are removed before each run. To retain them, set
+`TRIPGO_KEEP_OLD_SAMPLES=1`.
+
+The previous diagnostics are still available, but must now be enabled
+explicitly:
+
+```bash
+TRIPGO_FETCH_REGIONS=1 ./docs/tripgo/fetch-samples.sh
+TRIPGO_FETCH_ROUTES=1 ./docs/tripgo/fetch-samples.sh
+TRIPGO_FETCH_ROAD_SAMPLES=1 ./docs/tripgo/fetch-samples.sh
+```
+
+Set `TRIPGO_FETCH_LOCATIONS=0` in such a run if the Halchter sample is not
+needed.
