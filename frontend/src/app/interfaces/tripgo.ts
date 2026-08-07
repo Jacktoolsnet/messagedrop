@@ -70,6 +70,7 @@ export interface TripGoRouteSegment {
 
 export interface TripGoRouteOption {
   id: string;
+  category?: TripGoRouteCategory;
   groupIndex: number;
   frequencyMinutes?: number;
   departureTime: string;
@@ -84,6 +85,8 @@ export interface TripGoRouteOption {
   cost?: TripGoCost;
   segments: TripGoRouteSegment[];
 }
+
+export type TripGoRouteCategory = 'car-transit' | 'bicycle-transit' | 'walk-transit';
 
 export interface TripGoRoutingResult {
   region?: string;

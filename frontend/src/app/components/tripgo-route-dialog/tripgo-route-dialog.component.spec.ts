@@ -21,7 +21,7 @@ describe('TripGoRouteDialogComponent', () => {
     nominatim = jasmine.createSpyObj<NominatimService>('NominatimService', [
       'getNominatimPlaceByLocation', 'getFormattedAddress', 'getFormattedStreet'
     ]);
-    tripGo = jasmine.createSpyObj<TripGoService>('TripGoService', ['calculatePublicTransportRoute']);
+    tripGo = jasmine.createSpyObj<TripGoService>('TripGoService', ['calculateRoute']);
     dialog = jasmine.createSpyObj<MatDialog>('MatDialog', ['open']);
     geolocation.getCurrentPosition.and.returnValue(of({
       coords: {
@@ -55,7 +55,7 @@ describe('TripGoRouteDialogComponent', () => {
     }));
     nominatim.getFormattedAddress.and.returnValue('Berlin, Deutschland');
     nominatim.getFormattedStreet.and.returnValue('');
-    tripGo.calculatePublicTransportRoute.and.returnValue(of({
+    tripGo.calculateRoute.and.returnValue(of({
       routes: [], meta: { groups: 0, totalRoutes: 0, returnedRoutes: 0 }
     }));
 
@@ -86,11 +86,12 @@ describe('TripGoRouteDialogComponent', () => {
       maximumAge: 0,
       timeout: 20_000
     });
-    expect(tripGo.calculatePublicTransportRoute).toHaveBeenCalledWith(
-      jasmine.objectContaining({ latitude: 52.52, longitude: 13.405 }),
-      jasmine.objectContaining({ latitude: 52.51, longitude: 13.38 }),
-      'de'
-    );
+    expect(tripGo.calculateRoute).toHaveBeenCalledTimes(4);
+    expect(tripGo.calculateRoute.calls.allArgs().some((args) =>
+      args[0].latitude === 52.52
+      && args[1].latitude === 52.51
+      && args[2] === 'de'
+      && args[3].join(',') === 'me_car')).toBeTrue();
     expect(fixture.componentInstance.state()).toBe('ready');
     expect(fixture.componentInstance.originDetails()?.name).toBe('Berlin');
   });
@@ -100,7 +101,7 @@ describe('TripGoRouteDialogComponent', () => {
     fixture.componentInstance.calculateWithFreshLocation();
 
     expect(geolocation.getCurrentPosition).toHaveBeenCalledTimes(2);
-    expect(tripGo.calculatePublicTransportRoute).toHaveBeenCalledTimes(2);
+    expect(tripGo.calculateRoute).toHaveBeenCalledTimes(8);
   });
 
   it('does not request a route when the destination has already been reached', () => {
@@ -114,7 +115,7 @@ describe('TripGoRouteDialogComponent', () => {
 
     expect(fixture.componentInstance.state()).toBe('arrived');
     expect(fixture.componentInstance.routes()).toEqual([]);
-    expect(tripGo.calculatePublicTransportRoute).not.toHaveBeenCalled();
+    expect(tripGo.calculateRoute).not.toHaveBeenCalled();
   });
 
   it('recalculates the route after selecting another destination', () => {
@@ -125,8 +126,8 @@ describe('TripGoRouteDialogComponent', () => {
     fixture.componentInstance.editRoutePoint('destination');
 
     expect(fixture.componentInstance.destination()).toEqual(destination);
-    expect(tripGo.calculatePublicTransportRoute).toHaveBeenCalledTimes(2);
-    expect(tripGo.calculatePublicTransportRoute.calls.mostRecent().args[1]).toEqual(destination);
+    expect(tripGo.calculateRoute).toHaveBeenCalledTimes(8);
+    expect(tripGo.calculateRoute.calls.mostRecent().args[1]).toEqual(destination);
   });
 
   it('opens the point detail dialog for a selected map marker', () => {

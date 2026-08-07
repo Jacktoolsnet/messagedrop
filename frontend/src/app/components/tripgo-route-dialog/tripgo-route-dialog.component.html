@@ -127,11 +127,24 @@
           (keydown.enter)="activateRouteCard($event, route)"
           (keydown.space)="activateRouteCard($event, route)">
           <header class="route-card__summary">
-            <button mat-icon-button type="button" class="route-card__map-action"
-              (click)="showRouteOnMap(route); $event.stopPropagation()"
-              [attr.aria-label]="'common.tripGo.showOnMap' | transloco">
-              <mat-icon>map</mat-icon>
-            </button>
+            <div class="route-card__category" [attr.aria-label]="routeCategoryLabel(route)">
+              <mat-icon aria-hidden="true">{{ routeCategoryIcon(route) }}</mat-icon>
+            </div>
+            <span class="route-card__actions">
+              <button mat-icon-button type="button"
+                (click)="showRouteOnMap(route); $event.stopPropagation()"
+                [attr.aria-label]="'common.tripGo.showOnMap' | transloco">
+                <mat-icon>map</mat-icon>
+              </button>
+              <button mat-icon-button type="button"
+                (click)="toggleRouteExpanded($event, route)"
+                [attr.aria-expanded]="isRouteExpanded(route)"
+                [attr.aria-label]="(isRouteExpanded(route)
+                  ? 'common.tripGo.collapseTimeline'
+                  : 'common.tripGo.expandTimeline') | transloco">
+                <mat-icon>{{ isRouteExpanded(route) ? 'expand_less' : 'expand_more' }}</mat-icon>
+              </button>
+            </span>
             <div class="route-card__times">
               <strong>{{ formatTime(route.departureTime) }}</strong>
               <mat-icon aria-hidden="true">arrow_forward</mat-icon>
@@ -154,6 +167,7 @@
             </div>
           </header>
 
+          @if (isRouteExpanded(route)) {
           <ol class="timeline" [attr.aria-label]="'common.tripGo.segments' | transloco">
             @if (route.segments[0]; as firstSegment) {
               <li class="timeline-start">
@@ -326,6 +340,7 @@
               </strong>
             </li>
           </ol>
+          }
         </article>
       }
     </div>

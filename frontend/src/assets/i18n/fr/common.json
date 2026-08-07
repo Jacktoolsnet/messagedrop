@@ -179,6 +179,13 @@
       "editOrigin": "Modifier le point de départ",
       "editDestination": "Modifier la destination",
       "showOnMap": "Afficher l’itinéraire sur la carte",
+      "expandTimeline": "Développer la chronologie",
+      "collapseTimeline": "Réduire la chronologie",
+      "routeCategories": {
+        "car-transit": "Voiture et transports publics",
+        "bicycle-transit": "Vélo et transports publics",
+        "walk-transit": "Marche et transports publics"
+      },
       "backToList": "Retour à la liste des itinéraires",
       "resolvingPlace": "Recherche des informations sur le lieu …",
       "locating": "Nouvelle détermination de votre position actuelle …",

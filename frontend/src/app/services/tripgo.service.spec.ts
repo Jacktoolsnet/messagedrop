@@ -17,12 +17,13 @@ describe('TripGoService', () => {
 
   afterEach(() => http.verify());
 
-  it('requests public transport routes and unwraps the response', () => {
+  it('requests routes for the selected modes and unwraps the response', () => {
     const from: Location = { latitude: 52.52, longitude: 13.405, plusCode: 'FROM' };
     const to: Location = { latitude: 52.51, longitude: 13.38, plusCode: 'TO' };
     const result = { routes: [], meta: { groups: 0, totalRoutes: 0, returnedRoutes: 0 } };
 
-    service.calculatePublicTransportRoute(from, to, 'de').subscribe((value) => expect(value).toEqual(result));
+    service.calculateRoute(from, to, 'de', ['me_mic_bic', 'pt_pub'])
+      .subscribe((value) => expect(value).toEqual(result));
 
     const request = http.expectOne(`${environment.apiUrl}/tripgo/routes`);
     expect(request.request.method).toBe('POST');
@@ -31,7 +32,7 @@ describe('TripGoService', () => {
       from: { latitude: 52.52, longitude: 13.405 },
       to: { latitude: 52.51, longitude: 13.38 },
       locale: 'de',
-      modes: ['pt_pub']
+      modes: ['me_mic_bic', 'pt_pub']
     });
     request.flush({ status: 200, data: result, cache: 'miss' });
   });
@@ -43,7 +44,7 @@ describe('TripGoService', () => {
       to: { stopCode: 'end' },
       service: { tripId: 'trip-1', operatorId: 'operator-1' }
     };
-    const result = { updatedAt: '2026-08-06T07:59:00Z', alerts: [] };
+    const result = { updatedAt: '2026-08-06T07:59:00Z', alerts: [], stops: [], geometry: [] };
 
     service.getServiceDetails(segment, 'de').subscribe((value) => expect(value).toEqual(result));
 

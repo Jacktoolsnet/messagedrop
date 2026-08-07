@@ -180,6 +180,13 @@
       "editOrigin": "Change starting point",
       "editDestination": "Change destination",
       "showOnMap": "Show route on the map",
+      "expandTimeline": "Expand timeline",
+      "collapseTimeline": "Collapse timeline",
+      "routeCategories": {
+        "car-transit": "Car and public transport",
+        "bicycle-transit": "Bicycle and public transport",
+        "walk-transit": "Walking and public transport"
+      },
       "backToList": "Back to the route list",
       "resolvingPlace": "Getting place information …",
       "locating": "Getting a fresh fix for your current location …",

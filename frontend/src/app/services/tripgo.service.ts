@@ -15,17 +15,26 @@ import {
 export class TripGoService {
   private readonly http = inject(HttpClient);
 
-  calculatePublicTransportRoute(from: Location, to: Location, locale: string): Observable<TripGoRoutingResult> {
+  calculateRoute(
+    from: Location,
+    to: Location,
+    locale: string,
+    modes: string[]
+  ): Observable<TripGoRoutingResult> {
     return this.http.post<TripGoRoutesResponse>(`${environment.apiUrl}/tripgo/routes`, {
       from: { latitude: from.latitude, longitude: from.longitude },
       to: { latitude: to.latitude, longitude: to.longitude },
       locale,
-      modes: ['pt_pub']
+      modes
     }, {
       // Routing failures are rendered directly inside the route dialog. Avoid a
       // second, global display-message dialog for the same expected result.
       headers: { 'x-skip-ui': 'true' }
     }).pipe(map((response) => response.data));
+  }
+
+  calculatePublicTransportRoute(from: Location, to: Location, locale: string): Observable<TripGoRoutingResult> {
+    return this.calculateRoute(from, to, locale, ['pt_pub']);
   }
 
   getServiceDetails(

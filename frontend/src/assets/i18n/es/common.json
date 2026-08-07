@@ -179,6 +179,13 @@
       "editOrigin": "Cambiar punto de partida",
       "editDestination": "Cambiar destino",
       "showOnMap": "Mostrar ruta en el mapa",
+      "expandTimeline": "Expandir cronología",
+      "collapseTimeline": "Contraer cronología",
+      "routeCategories": {
+        "car-transit": "Coche y transporte público",
+        "bicycle-transit": "Bicicleta y transporte público",
+        "walk-transit": "A pie y transporte público"
+      },
       "backToList": "Volver a la lista de rutas",
       "resolvingPlace": "Obteniendo información del lugar …",
       "locating": "Obteniendo de nuevo tu ubicación actual …",

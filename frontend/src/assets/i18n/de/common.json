@@ -180,6 +180,13 @@
       "editOrigin": "Startort ändern",
       "editDestination": "Zielort ändern",
       "showOnMap": "Route auf der Karte anzeigen",
+      "expandTimeline": "Timeline aufklappen",
+      "collapseTimeline": "Timeline einklappen",
+      "routeCategories": {
+        "car-transit": "Auto und Öffis",
+        "bicycle-transit": "Fahrrad und Öffis",
+        "walk-transit": "Zu Fuß und Öffis"
+      },
       "backToList": "Zurück zur Routenliste",
       "resolvingPlace": "Ortsinformationen werden ermittelt …",
       "locating": "Dein aktueller Standort wird neu ermittelt …",

@@ -408,6 +408,10 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     switch (tripGoSegmentIcon(point.segment)) {
       case 'directions_walk':
         return 19;
+      case 'directions_bike':
+        return 18;
+      case 'directions_car':
+        return 16;
       case 'directions_bus':
       case 'tram':
         return 17;

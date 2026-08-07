@@ -179,7 +179,8 @@
 
 .route-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(17rem, 100%), 1fr));
+  width: 100%;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: start;
   gap: 0.75rem;
 }
@@ -196,16 +197,33 @@
   position: relative;
   display: grid;
   gap: 0.5rem;
-  padding: 0.85rem 3.5rem 0.85rem 0.85rem;
+  padding: 0.75rem 6.5rem 0.85rem 0.85rem;
   border-bottom: 1px solid color-mix(in srgb, currentColor 12%, transparent);
   background: var(--mat-button-tonal-container-color, var(--mat-card-filled-container-color));
   color: var(--mat-button-tonal-label-text-color, var(--mat-app-text-color));
 }
 
-.route-card__map-action {
+.route-card__category {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: .45rem;
+}
+
+.route-card__category mat-icon {
+  flex: 0 0 auto;
+}
+
+.route-card__actions {
   position: absolute;
-  top: 0.35rem;
-  right: 0.35rem;
+  top: .25rem;
+  right: .25rem;
+  display: flex;
+  align-items: center;
+  color: inherit;
+}
+
+.route-card__actions button {
   color: inherit;
 }
 
@@ -512,10 +530,21 @@
   gap: 0.25rem;
 }
 
+@media (max-width: 1099px) {
+  .route-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 699px) {
+  .route-list {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 600px) {
 
-  .route-points,
-  .route-list {
+  .route-points {
     grid-template-columns: 1fr;
   }
 }
