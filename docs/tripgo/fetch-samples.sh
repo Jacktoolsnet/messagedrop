@@ -20,6 +20,12 @@ fetch_diagnostic_route() {
   local locale="$6"
   local mode="${7:-pt_pub}"
   local operator="${8:-}"
+  local modes_json
+
+  modes_json="$(node -e '
+    const modes = process.argv[1].split(",").map((mode) => mode.trim()).filter(Boolean);
+    process.stdout.write(JSON.stringify(modes));
+  ' "${mode}")"
 
   printf 'Fetching TripGo sample %s ...\n' "${name}"
 
@@ -47,7 +53,7 @@ fetch_diagnostic_route() {
       \"from\": { \"latitude\": ${from_lat}, \"longitude\": ${from_lng} },
       \"to\": { \"latitude\": ${to_lat}, \"longitude\": ${to_lng} },
       \"locale\": \"${locale}\",
-      \"modes\": [\"${mode}\"]
+      \"modes\": ${modes_json}
     }" \
     "${api_url}/tripgo/routes" \
     --output "${output_dir}/route-${name}.json"; then
@@ -69,19 +75,21 @@ fetch_region_diagnostics() {
 # Keep the region/provider catalogue from the authenticated API response. It
 # lets us inspect which providers advertise real-time capabilities before
 # choosing further diagnostic routes.
-curl --silent --show-error --fail-with-body \
-  "${api_url}/tripgo/regions?locale=en" \
-  --output "${output_dir}/regions-providers.json"
+if [[ "${TRIPGO_FETCH_REGIONS:-1}" == "1" ]]; then
+  curl --silent --show-error --fail-with-body \
+    "${api_url}/tripgo/regions?locale=en" \
+    --output "${output_dir}/regions-providers.json"
 
-# Regions used by the route samples plus established TripGo markets.
-# regionInfo already includes every operator's realTimeStatus. Calling the
-# global /info/operators endpoint for a regional data server results in a 400,
-# so it is deliberately not needed for this diagnostic.
-for region in \
-  DE_BV_Munich DE_HH_Hamburg FR_IDF_Paris ES_MD_Madrid DK_Islands \
-  SE_Stockholm AU_NSW_Sydney US_CA_LosAngeles US_IL_Chicago BE_BRU_Brussels; do
-  fetch_region_diagnostics "${region}"
-done
+  # Regions used by the route samples plus established TripGo markets.
+  # regionInfo already includes every operator's realTimeStatus. Calling the
+  # global /info/operators endpoint for a regional data server results in a 400,
+  # so it is deliberately not needed for this diagnostic.
+  for region in \
+    DE_BV_Munich DE_HH_Hamburg FR_IDF_Paris ES_MD_Madrid DK_Islands \
+    SE_Stockholm AU_NSW_Sydney US_CA_LosAngeles US_IL_Chicago BE_BRU_Brussels; do
+    fetch_region_diagnostics "${region}"
+  done
+fi
 
 if [[ "${TRIPGO_FETCH_ROUTES:-1}" == "1" ]]; then
   # TripGo uses Sydney in its own /latest.json documentation. This short and
@@ -91,6 +99,15 @@ if [[ "${TRIPGO_FETCH_ROUTES:-1}" == "1" ]]; then
   fetch_diagnostic_route "sydney-central-circular-quay" \
     "-33.8830" "151.2069" "-33.8611" "151.2101" "en" "pt_pub_tram" \
     "au-nsw-lightrail-cbd-SLR"
+
+  # Check the flight provider independently before testing the inter-modal
+  # door-to-door combination used by the route dialog.
+  fetch_diagnostic_route "hamburg-airport-munich-airport-flight" \
+    "53.6304" "9.9882" "48.3538" "11.7861" "de" "in_air"
+  fetch_diagnostic_route "hamburg-munich-flight-transit" \
+    "53.5511" "9.9937" "48.1374" "11.5755" "de" "in_air,pt_pub"
+  fetch_diagnostic_route "hannover-munich-flight-transit" \
+    "52.3759" "9.7320" "48.1374" "11.5755" "de" "in_air,pt_pub"
 fi
 
 printf 'TripGo samples written to %s\n' "${output_dir}"

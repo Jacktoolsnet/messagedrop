@@ -139,6 +139,21 @@ test('rejects responses with missing segment templates', () => {
   }), /missing_tripgo_segment_template/);
 });
 
+test('accepts an empty routing result without segment templates', () => {
+  const normalized = normalizeRoutingResponse({
+    groups: [],
+    region: 'DE_HH_Hamburg',
+    query: {
+      from: { address: 'Hamburg Airport', lat: 53.6304, lng: 9.9882 },
+      to: { address: 'Munich Airport', lat: 48.3538, lng: 11.7861 }
+    }
+  });
+
+  assert.equal(normalized.region, 'DE_HH_Hamburg');
+  assert.deepEqual(normalized.routes, []);
+  assert.deepEqual(normalized.meta, { groups: 0, totalRoutes: 0, returnedRoutes: 0 });
+});
+
 test('formats TripGo RGB colors', () => {
   assert.equal(rgbHex({ red: 255, green: 0, blue: 16 }), '#ff0010');
   assert.equal(rgbHex({ red: -1, green: 0, blue: 16 }), null);

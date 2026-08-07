@@ -1,12 +1,21 @@
 function normalizeRoutingResponse(payload, { maxRoutes = 12, routesPerGroup = 2 } = {}) {
-  if (!payload || typeof payload !== 'object' || !Array.isArray(payload.groups)
-      || !Array.isArray(payload.segmentTemplates)) {
+  if (!payload || typeof payload !== 'object' || !Array.isArray(payload.groups)) {
     const error = new Error('invalid_tripgo_routing_response');
     error.status = 502;
     throw error;
   }
 
-  const templates = new Map(payload.segmentTemplates.map((template) => [template.hashCode, template]));
+  const hasTrips = payload.groups.some((group) => Array.isArray(group.trips) && group.trips.length > 0);
+  if (hasTrips && !Array.isArray(payload.segmentTemplates)) {
+    const error = new Error('invalid_tripgo_routing_response');
+    error.status = 502;
+    throw error;
+  }
+
+  // TripGo omits segmentTemplates entirely when no route was found. This is a
+  // valid empty routing result rather than a malformed upstream response.
+  const segmentTemplates = Array.isArray(payload.segmentTemplates) ? payload.segmentTemplates : [];
+  const templates = new Map(segmentTemplates.map((template) => [template.hashCode, template]));
   const candidates = payload.groups.flatMap((group, groupIndex) => (group.trips || []).map((trip) => ({
     groupIndex,
     frequencyMinutes: finiteNumber(group.frequency),
