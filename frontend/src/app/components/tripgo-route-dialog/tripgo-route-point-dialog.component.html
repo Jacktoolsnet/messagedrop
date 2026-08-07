@@ -56,10 +56,14 @@
         } @else if (liveDetails(); as live) {
           <div class="live-details">
             <div class="live-departure">
-              <small>{{ 'common.tripGo.routePointDetails.currentDeparture' | transloco }}</small>
-              <strong>{{ formatTime(live.departureTime || segment().startTime) }}</strong>
+              <small>{{ (hasLiveData()
+                ? 'common.tripGo.routePointDetails.currentDeparture'
+                : 'common.tripGo.routePointDetails.scheduledDeparture') | transloco }}</small>
+              <strong>{{ formatTime(hasLiveData()
+                ? (live.departureTime || segment().startTime)
+                : (live.scheduledDepartureTime || live.departureTime || segment().startTime)) }}</strong>
             </div>
-            @if (live.scheduledDepartureTime) {
+            @if (hasLiveData() && live.scheduledDepartureTime) {
               <span>{{ 'common.tripGo.routePointDetails.scheduledDeparture' | transloco }}: {{ formatTime(live.scheduledDepartureTime) }}</span>
             }
             @if (live.delaySeconds !== undefined) {

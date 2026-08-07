@@ -99,11 +99,7 @@
   color: var(--mat-sys-on-surface-variant);
 }
 
-.status--error mat-icon {
-  color: var(--mat-sys-error);
-}
-
-.arrival-tile {
+.route-message-tile {
   display: flex;
   width: min(30rem, 100%);
   min-height: 8rem;
@@ -119,7 +115,12 @@
   box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
 }
 
-.arrival-tile__icon {
+.route-message-tile--error {
+  background: var(--mat-button-tonal-container-color, var(--mat-card-filled-container-color));
+  color: var(--mat-button-tonal-label-text-color, var(--mat-app-text-color));
+}
+
+.route-message-tile__icon {
   display: inline-grid;
   place-items: center;
   width: 3.25rem;
@@ -130,21 +131,26 @@
   color: var(--mat-fab-foreground-color, var(--mat-app-text-color));
 }
 
-.arrival-tile__icon mat-icon {
+.route-message-tile--error .route-message-tile__icon {
+  background: var(--mat-sys-error);
+  color: var(--mat-sys-on-error);
+}
+
+.route-message-tile__icon mat-icon {
   width: 1.75rem;
   height: 1.75rem;
   font-size: 1.75rem;
 }
 
-.arrival-tile__content {
+.route-message-tile__content {
   min-width: 0;
 }
 
-.arrival-tile__content strong {
+.route-message-tile__content strong {
   font-size: 1.05rem;
 }
 
-.arrival-tile__content p {
+.route-message-tile__content p {
   margin: 0.35rem 0 0;
   line-height: 1.4;
 }

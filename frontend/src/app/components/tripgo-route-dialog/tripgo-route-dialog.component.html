@@ -83,20 +83,24 @@
       <p>{{ 'common.tripGo.routing' | transloco }}</p>
     </div>
   } @else if (state() === 'arrived') {
-    <article class="arrival-tile" role="status">
-      <span class="arrival-tile__icon" aria-hidden="true">
+    <article class="route-message-tile" role="status">
+      <span class="route-message-tile__icon" aria-hidden="true">
         <mat-icon>flag</mat-icon>
       </span>
-      <div class="arrival-tile__content">
+      <div class="route-message-tile__content">
         <strong>{{ 'common.tripGo.destinationReached.title' | transloco }}</strong>
         <p>{{ 'common.tripGo.destinationReached.description' | transloco }}</p>
       </div>
     </article>
   } @else if (state() === 'error') {
-    <div class="status status--error" role="alert">
-      <mat-icon>warning</mat-icon>
-      <p>{{ errorKey() | transloco }}</p>
-    </div>
+    <article class="route-message-tile route-message-tile--error" role="alert">
+      <span class="route-message-tile__icon" aria-hidden="true">
+        <mat-icon>warning</mat-icon>
+      </span>
+      <div class="route-message-tile__content">
+        <strong>{{ errorKey() | transloco }}</strong>
+      </div>
+    </article>
   } @else if (routes().length === 0) {
     <div class="status" role="status">
       <mat-icon>route</mat-icon>
