@@ -319,7 +319,17 @@
       "minutesShort": "min",
       "scheduled": "Scheduled",
       "scheduledAt": "Scheduled",
-      "refreshDepartures": "Refresh departures"
+      "refreshDepartures": "Refresh departures",
+      "modeGroups": {
+        "bus": "Bus",
+        "tram": "Tram",
+        "subway": "Subway",
+        "suburbanTrain": "Suburban train",
+        "train": "Train",
+        "ferry": "Ferry",
+        "other": "Other transport"
+      },
+      "backToLines": "Back to lines"
     },
     "hashtags": {
       "label": "Hashtags",

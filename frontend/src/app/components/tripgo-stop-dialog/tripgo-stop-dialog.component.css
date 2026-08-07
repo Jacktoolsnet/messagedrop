@@ -55,11 +55,20 @@
   gap: 0.75rem;
 }
 
+.transport-tab-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mode-tab-content {
+  padding-top: 0.85rem;
+}
+
 .line-card {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  gap: 0.75rem;
   padding: 0.75rem;
   border: 1px solid var(--mat-card-outlined-outline-color);
   border-left: 0.35rem solid var(--mat-sys-primary);
@@ -103,51 +112,39 @@
   white-space: nowrap;
 }
 
-.line-card__heading time {
-  font-weight: 700;
+.line-card__departure {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.2rem;
+  color: var(--mat-sys-on-surface-variant);
+  font-weight: 600;
+}
+
+.line-card__platform {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.line-card__departure mat-icon,
+.line-card__platform mat-icon {
+  width: 1rem;
+  height: 1rem;
+  font-size: 1rem;
 }
 
 .line-card button {
-  align-self: flex-end;
+  flex: 0 0 auto;
 }
 
-.platform-list,
 .departure-list {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
 
-.platform-row {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.platform-row + .platform-row {
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--mat-card-outlined-outline-color);
-}
-
-.platform-symbol {
-  display: grid;
-  flex: 0 0 2.25rem;
-  width: 2.25rem;
-  height: 2.25rem;
-  place-items: center;
-  border-radius: 50%;
-  color: var(--mat-sys-on-primary);
-  background: var(--mat-sys-primary);
-}
-
-.platform-content {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  gap: 0.2rem;
-}
-
-.platform-content small,
 .empty-state {
   color: var(--mat-card-subtitle-text-color);
 }
@@ -166,13 +163,21 @@
   color: var(--mat-sys-error);
 }
 
-.tile-header-direction {
-  overflow: hidden;
+.line-view-back {
   margin-left: auto;
+  color: inherit;
+}
+
+.line-view-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.3rem;
+}
+
+.line-view-title small {
   font-size: 0.85rem;
   font-weight: 400;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .departure-row {

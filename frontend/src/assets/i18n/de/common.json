@@ -319,7 +319,17 @@
       "minutesShort": "Min.",
       "scheduled": "Fahrplan",
       "scheduledAt": "Planmäßig",
-      "refreshDepartures": "Abfahrten aktualisieren"
+      "refreshDepartures": "Abfahrten aktualisieren",
+      "modeGroups": {
+        "bus": "Bus",
+        "tram": "Straßenbahn",
+        "subway": "U-Bahn",
+        "suburbanTrain": "S-Bahn",
+        "train": "Zug",
+        "ferry": "Fähre",
+        "other": "Weitere Verkehrsmittel"
+      },
+      "backToLines": "Zurück zu den Linien"
     },
     "hashtags": {
       "label": "Hashtags",

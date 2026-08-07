@@ -2939,11 +2939,11 @@
     "items": {
       "lines": {
         "title": "Lignes",
-        "desc": "Affiche les lignes et directions sous forme de tuiles sélectionnables. « Horaires de départ » affiche les prochains passages de la ligne."
+        "desc": "Affiche les lignes et directions sous forme de tuiles sélectionnables. Le bouton des départs remplace la liste par les prochains passages ; le bouton Retour ramène à la sélection."
       },
       "platforms": {
         "title": "Quais",
-        "desc": "Affiche les différents quais ou points d’arrêt ainsi que les lignes disponibles."
+        "desc": "Le quai actuel apparaît directement dans la tuile de la ligne, sous son nom, lorsque TripGo le fournit."
       },
       "close": {
         "title": "Fermer",

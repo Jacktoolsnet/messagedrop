@@ -2957,11 +2957,11 @@
     "items": {
       "lines": {
         "title": "Linien",
-        "desc": "Zeigt Linien und Fahrtrichtungen als auswählbare Kacheln. Über „Abfahrtszeiten“ werden die nächsten Fahrten dieser Linie angezeigt."
+        "desc": "Zeigt Linien und Fahrtrichtungen als auswählbare Kacheln. Der Abfahrtsbutton ersetzt die Linienansicht durch die nächsten Abfahrten; über den Zurück-Button gelangst du wieder zur Auswahl."
       },
       "platforms": {
         "title": "Steige",
-        "desc": "Zeigt die einzelnen Steige beziehungsweise Haltepunkte und die dort verfügbaren Linien."
+        "desc": "Der aktuelle Steig steht direkt im Linientile unter der Linienbezeichnung, sofern TripGo ihn liefert."
       },
       "close": {
         "title": "Schließen",

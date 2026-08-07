@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTabsModule } from '@angular/material/tabs';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { finalize } from 'rxjs';
 import { TripGoDeparture, TripGoStop } from '../../interfaces/tripgo';
@@ -21,6 +22,7 @@ import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
     MatDialogContent,
     MatIconModule,
     MatProgressSpinnerModule,
+    MatTabsModule,
     TranslocoPipe
   ],
   templateUrl: './tripgo-stop-dialog.component.html',
@@ -35,9 +37,10 @@ export class TripGoStopDialogComponent implements OnInit {
   readonly departures = signal<TripGoDeparture[]>([]);
   readonly selectedKey = signal<string | null>(null);
   readonly groups = computed<DepartureGroup[]>(() => groupDepartures(this.departures()));
+  readonly modeGroups = computed<DepartureModeGroup[]>(() => groupDepartureModes(this.groups()));
   readonly selectedGroup = computed(() => {
     const groups = this.groups();
-    return groups.find((group) => group.key === this.selectedKey()) ?? groups[0] ?? null;
+    return groups.find((group) => group.key === this.selectedKey()) ?? null;
   });
   private readonly dialogRef = inject(MatDialogRef<TripGoStopDialogComponent>);
   private readonly tripGo = inject(TripGoService);
@@ -62,7 +65,7 @@ export class TripGoStopDialogComponent implements OnInit {
           this.departures.set(departures);
           const groups = groupDepartures(departures);
           if (!groups.some((group) => group.key === this.selectedKey())) {
-            this.selectedKey.set(groups[0]?.key ?? null);
+            this.selectedKey.set(groups.length === 1 ? groups[0].key : null);
           }
         },
         error: () => {
@@ -75,6 +78,10 @@ export class TripGoStopDialogComponent implements OnInit {
 
   selectGroup(group: DepartureGroup): void {
     this.selectedKey.set(group.key);
+  }
+
+  showLines(): void {
+    this.selectedKey.set(null);
   }
 
   time(value?: string): string {
@@ -112,11 +119,19 @@ interface DepartureGroup {
   departures: TripGoDeparture[];
 }
 
+interface DepartureModeGroup {
+  key: string;
+  titleKey: string;
+  icon: string;
+  groups: DepartureGroup[];
+}
+
 function groupDepartures(departures: TripGoDeparture[]): DepartureGroup[] {
   const groups = new Map<string, DepartureGroup>();
   for (const departure of departures) {
-    const line = departure.line || departure.serviceName || '–';
-    const key = [departure.operatorId || departure.operator, departure.routeId || line, departure.direction]
+    const rawLine = departure.line || departure.serviceName || '–';
+    const line = departureServiceLabel(departure.modeLabel, rawLine);
+    const key = [departure.operatorId || departure.operator, departure.routeId || rawLine, departure.direction]
       .filter(Boolean).join('|');
     const group = groups.get(key) ?? {
       key, line, direction: departure.direction, modeIdentifier: departure.modeIdentifier,
@@ -130,4 +145,48 @@ function groupDepartures(departures: TripGoDeparture[]): DepartureGroup[] {
       - Date.parse(right.departures[0].departureTime);
     return timeDifference || left.line.localeCompare(right.line, undefined, { numeric: true });
   });
+}
+
+function departureServiceLabel(modeLabel: string | undefined, line: string): string {
+  const mode = modeLabel?.trim();
+  if (!mode) return line;
+  const normalizedMode = mode.toLocaleLowerCase();
+  const normalizedLine = line.toLocaleLowerCase();
+  if (normalizedLine.startsWith(normalizedMode) || normalizedMode.includes(normalizedLine)) return line;
+  return `${mode} ${line}`;
+}
+
+function groupDepartureModes(groups: DepartureGroup[]): DepartureModeGroup[] {
+  const modeGroups = new Map<string, DepartureModeGroup>();
+  for (const group of groups) {
+    const descriptor = departureModeDescriptor(group);
+    const modeGroup = modeGroups.get(descriptor.key) ?? { ...descriptor, groups: [] };
+    modeGroup.groups.push(group);
+    modeGroups.set(descriptor.key, modeGroup);
+  }
+  const order = ['bus', 'tram', 'subway', 's-bahn', 'train', 'ferry', 'other'];
+  return [...modeGroups.values()].sort((left, right) => order.indexOf(left.key) - order.indexOf(right.key));
+}
+
+function departureModeDescriptor(group: DepartureGroup): Omit<DepartureModeGroup, 'groups'> {
+  const mode = `${group.modeIdentifier ?? ''} ${group.modeLabel ?? ''}`.toLowerCase();
+  if (mode.includes('s-bahn')) {
+    return { key: 's-bahn', titleKey: 'common.tripGoStops.modeGroups.suburbanTrain', icon: 'train' };
+  }
+  if (mode.includes('tram')) {
+    return { key: 'tram', titleKey: 'common.tripGoStops.modeGroups.tram', icon: 'tram' };
+  }
+  if (mode.includes('subway') || mode.includes('metro')) {
+    return { key: 'subway', titleKey: 'common.tripGoStops.modeGroups.subway', icon: 'subway' };
+  }
+  if (mode.includes('train') || mode.includes('rail') || mode.includes('ice') || mode.includes('ic/ec')) {
+    return { key: 'train', titleKey: 'common.tripGoStops.modeGroups.train', icon: 'train' };
+  }
+  if (mode.includes('ferry')) {
+    return { key: 'ferry', titleKey: 'common.tripGoStops.modeGroups.ferry', icon: 'directions_boat' };
+  }
+  if (mode.includes('bus')) {
+    return { key: 'bus', titleKey: 'common.tripGoStops.modeGroups.bus', icon: 'directions_bus' };
+  }
+  return { key: 'other', titleKey: 'common.tripGoStops.modeGroups.other', icon: 'directions_transit' };
 }

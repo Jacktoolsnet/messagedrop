@@ -54,3 +54,27 @@ test('normalizes scheduled and real-time stop departures', () => {
     alerts: []
   });
 });
+
+test('uses the public train name instead of an internal German route number', () => {
+  const result = normalizeDeparturesResponse({
+    embarkationStops: [{
+      stopCode: 'de:train:stop',
+      services: [{
+        startTime: 1_800_000_000,
+        modeInfo: {
+          identifier: 'pt_pub_train', alt: 'Zug', remoteIcon: 'train-germany-ice'
+        },
+        operator: 'DB Fernverkehr AG',
+        routeID: 'db-route_101',
+        serviceNumber: '56',
+        serviceShortName: '004711',
+        serviceDirection: 'München Hbf',
+        serviceTripID: 'trip-ice'
+      }]
+    }]
+  }, 'DE_NI_Hanover');
+
+  assert.equal(result.departures[0].line, '4711');
+  assert.equal(result.departures[0].modeLabel, 'ICE');
+  assert.equal(result.departures[0].direction, 'München Hbf');
+});

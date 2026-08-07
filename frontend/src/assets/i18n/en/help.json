@@ -2957,11 +2957,11 @@
     "items": {
       "lines": {
         "title": "Lines",
-        "desc": "Shows lines and directions as selectable tiles. “Departure times” displays the next services for that line."
+        "desc": "Shows lines and directions as selectable tiles. The departure button replaces the line view with upcoming departures; the back button returns to the selection."
       },
       "platforms": {
         "title": "Platforms",
-        "desc": "Shows the individual platforms or stopping points and the lines available there."
+        "desc": "The current platform appears directly in the line tile below the line name when supplied by TripGo."
       },
       "close": {
         "title": "Close",

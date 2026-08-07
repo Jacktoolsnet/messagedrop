@@ -34,11 +34,11 @@ function normalizeDeparture(service, stopCode, region, index) {
     routeId: routeId || undefined,
     operator: text(service.operator) || undefined,
     operatorId: text(service.operatorID) || undefined,
-    line: text(service.serviceNumber) || text(service.serviceName) || undefined,
+    line: normalizedServiceNumber(service),
     serviceName: text(service.serviceName) || undefined,
     direction: text(service.serviceDirection) || undefined,
     modeIdentifier: text(service.modeInfo?.identifier) || undefined,
-    modeLabel: text(service.modeInfo?.alt) || undefined,
+    modeLabel: normalizedModeLabel(service),
     icon: text(service.modeInfo?.localIcon) || undefined,
     color: normalizeColor(service.serviceColor),
     textColor: normalizeColor(service.serviceTextColor),
@@ -54,6 +54,48 @@ function normalizeDeparture(service, stopCode, region, index) {
     bicycleAccessible: optionalBoolean(service.bicycleAccessible),
     alerts: normalizeAlerts(service.alerts)
   };
+}
+
+function normalizedModeLabel(service) {
+  const fallback = text(service.modeInfo?.alt) || undefined;
+  if (!isGermanRailService(service)) return fallback;
+  switch (extendedGtfsRouteType(service)) {
+    case 101:
+      return isDbLongDistance(service) ? 'ICE' : fallback;
+    case 102:
+      return isDbLongDistance(service) ? 'IC/EC' : fallback;
+    case 109:
+      return 'S-Bahn';
+    default:
+      return /train-germany-s/i.test(text(service.modeInfo?.remoteIcon)) ? 'S-Bahn' : fallback;
+  }
+}
+
+function normalizedServiceNumber(service) {
+  const fallback = text(service.serviceNumber) || text(service.serviceShortName)
+    || text(service.serviceName) || undefined;
+  const routeType = extendedGtfsRouteType(service);
+  if ((routeType !== 101 && routeType !== 102) || !isDbLongDistance(service)) return fallback;
+  const shortName = text(service.serviceShortName);
+  if (!shortName || !/^\d+$/.test(shortName)) return fallback;
+  return shortName.replace(/^0+(?=\d)/, '');
+}
+
+function extendedGtfsRouteType(service) {
+  const routeId = text(service.routeID || service.routeId || service.externalData?.routeId);
+  const match = routeId.match(/_(\d{3})$/);
+  return match ? Number(match[1]) : null;
+}
+
+function isGermanRailService(service) {
+  const identifier = text(service.modeInfo?.identifier).toLowerCase();
+  const operator = text(service.operator || service.externalData?.operatorName).toLowerCase();
+  return identifier.includes('train') && (/train-germany-/i.test(text(service.modeInfo?.remoteIcon))
+    || operator.includes('db fernverkehr') || operator.includes('s-bahn'));
+}
+
+function isDbLongDistance(service) {
+  return text(service.operator || service.externalData?.operatorName).toLowerCase().includes('db fernverkehr');
 }
 
 function normalizeAlerts(value) {

@@ -318,7 +318,17 @@
       "minutesShort": "min",
       "scheduled": "Prévu",
       "scheduledAt": "Prévu",
-      "refreshDepartures": "Actualiser les départs"
+      "refreshDepartures": "Actualiser les départs",
+      "modeGroups": {
+        "bus": "Bus",
+        "tram": "Tramway",
+        "subway": "Métro",
+        "suburbanTrain": "Train de banlieue",
+        "train": "Train",
+        "ferry": "Ferry",
+        "other": "Autres transports"
+      },
+      "backToLines": "Retour aux lignes"
     },
     "hashtags": {
       "label": "Hashtags",

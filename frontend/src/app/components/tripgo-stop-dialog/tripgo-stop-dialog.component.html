@@ -7,34 +7,105 @@
   }
 
   <section class="stop-grid" [attr.aria-label]="'common.tripGoStops.details' | transloco">
-    <article class="stop-tile">
-      <header><mat-icon aria-hidden="true">route</mat-icon>{{ 'common.tripGoStops.lines' | transloco }}</header>
+    <article class="stop-tile stop-tile--wide">
+      <header>
+        <mat-icon aria-hidden="true">{{ selectedGroup() ? 'departure_board' : 'route' }}</mat-icon>
+        @if (selectedGroup(); as selected) {
+          <span class="line-view-title">
+            {{ 'common.tripGoStops.departuresFor' | transloco }} {{ selected.line }}
+            @if (selected.direction) { <small>· {{ selected.direction }}</small> }
+          </span>
+          <button mat-icon-button type="button" class="line-view-back" (click)="showLines()"
+            [attr.aria-label]="'common.tripGoStops.backToLines' | transloco">
+            <mat-icon>arrow_back</mat-icon>
+          </button>
+        } @else {
+          <span>{{ 'common.tripGoStops.lines' | transloco }}</span>
+        }
+      </header>
       <div class="stop-tile__body">
         @if (loading()) {
           <div class="loading-state">
             <mat-spinner diameter="32"></mat-spinner>
             <span>{{ 'common.tripGoStops.loadingDepartures' | transloco }}</span>
           </div>
-        } @else if (groups().length) {
-          <div class="line-list">
-            @for (group of groups(); track group.key) {
-              <article class="line-card" [class.line-card--selected]="selectedGroup()?.key === group.key"
-                [style.border-left-color]="group.color || null">
-                <div class="line-card__heading">
-                  <span class="line-symbol"><mat-icon aria-hidden="true">{{ modeIcon(group) }}</mat-icon></span>
-                  <span class="line-card__title">
-                    <strong>{{ group.line }}</strong>
-                    <small>{{ group.direction || ('common.tripGoStops.unknownDirection' | transloco) }}</small>
-                  </span>
-                  <time>{{ time(group.departures[0].departureTime) }}</time>
-                </div>
-                <button mat-stroked-button type="button" (click)="selectGroup(group)"
-                  [attr.aria-pressed]="selectedGroup()?.key === group.key">
-                  <mat-icon>schedule</mat-icon>{{ 'common.tripGoStops.showDepartures' | transloco }}
-                </button>
-              </article>
+        } @else if (selectedGroup(); as group) {
+          <div class="departure-list">
+            @for (departure of group.departures; track departure.id) {
+              <div class="departure-row" [class.departure-row--cancelled]="departure.cancelled">
+                <span class="departure-time">
+                  <mat-icon aria-hidden="true">schedule</mat-icon>
+                  <strong>{{ time(departure.departureTime) }}</strong>
+                </span>
+                <span class="departure-info">
+                  @if (departure.cancelled) {
+                    <strong class="status status--cancelled">{{ 'common.tripGoStops.cancelled' | transloco }}</strong>
+                  } @else if (departure.realTime) {
+                    <span class="status status--live">
+                      {{ 'common.tripGoStops.live' | transloco }}
+                      @if (delayMinutes(departure) > 0) {
+                        · +{{ delayMinutes(departure) }} {{ 'common.tripGoStops.minutesShort' | transloco }}
+                      }
+                    </span>
+                  } @else {
+                    <span class="status">{{ 'common.tripGoStops.scheduled' | transloco }}</span>
+                  }
+                  @if (departure.platform) {
+                    <small>{{ 'common.tripGoStops.platform' | transloco }} {{ departure.platform }}</small>
+                  }
+                  @if (departure.realTime && departure.scheduledDepartureTime
+                    && departure.scheduledDepartureTime !== departure.departureTime) {
+                    <small>{{ 'common.tripGoStops.scheduledAt' | transloco }}
+                      {{ time(departure.scheduledDepartureTime) }}</small>
+                  }
+                  @for (alert of departure.alerts; track alert) {
+                    <small class="departure-alert"><mat-icon aria-hidden="true">warning</mat-icon>{{ alert }}</small>
+                  }
+                </span>
+              </div>
             }
           </div>
+        } @else if (groups().length) {
+          <mat-tab-group class="transport-tabs" animationDuration="200ms" [preserveContent]="true">
+            @for (modeGroup of modeGroups(); track modeGroup.key) {
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <span class="transport-tab-label" [attr.aria-label]="modeGroup.titleKey | transloco">
+                    <mat-icon aria-hidden="true">{{ modeGroup.icon }}</mat-icon>
+                  </span>
+                </ng-template>
+                <div class="line-list mode-tab-content">
+                  @for (group of modeGroup.groups; track group.key) {
+                    <article class="line-card" [class.line-card--selected]="selectedGroup()?.key === group.key"
+                      [style.border-left-color]="group.color || null">
+                      <div class="line-card__heading">
+                        <span class="line-symbol"><mat-icon aria-hidden="true">{{ modeIcon(group) }}</mat-icon></span>
+                        <span class="line-card__title">
+                          <strong>{{ group.line }}</strong>
+                          @if (group.departures[0].platform) {
+                            <small class="line-card__platform">
+                              <mat-icon aria-hidden="true">signpost</mat-icon>
+                              {{ 'common.tripGoStops.platform' | transloco }} {{ group.departures[0].platform }}
+                            </small>
+                          }
+                          <small>{{ group.direction || ('common.tripGoStops.unknownDirection' | transloco) }}</small>
+                          <small class="line-card__departure">
+                            <mat-icon aria-hidden="true">schedule</mat-icon>
+                            {{ time(group.departures[0].departureTime) }}
+                          </small>
+                        </span>
+                        <button mat-icon-button color="primary" type="button" (click)="selectGroup(group)"
+                          [attr.aria-label]="'common.tripGoStops.showDepartures' | transloco"
+                          [attr.aria-pressed]="selectedGroup()?.key === group.key">
+                          <mat-icon>departure_board</mat-icon>
+                        </button>
+                      </div>
+                    </article>
+                  }
+                </div>
+              </mat-tab>
+            }
+          </mat-tab-group>
         } @else if (loadFailed()) {
           <div class="inline-message inline-message--error">
             <mat-icon aria-hidden="true">error_outline</mat-icon>
@@ -45,75 +116,6 @@
         }
       </div>
     </article>
-
-    <article class="stop-tile">
-      <header><mat-icon aria-hidden="true">signpost</mat-icon>{{ 'common.tripGoStops.platforms' | transloco }}</header>
-      <div class="stop-tile__body platform-list">
-        @for (platform of stop.platforms; track platform.stopCode) {
-          <div class="platform-row">
-            <span class="platform-symbol"><mat-icon aria-hidden="true">directions_bus</mat-icon></span>
-            <span class="platform-content">
-              <strong>
-                {{ 'common.tripGoStops.platform' | transloco }}
-                {{ platform.platform || ('common.tripGoStops.unknownPlatform' | transloco) }}
-              </strong>
-              @if (platform.services.length) {
-                <small>{{ 'common.tripGoStops.lines' | transloco }}: {{ platform.services.join(', ') }}</small>
-              }
-            </span>
-          </div>
-        } @empty {
-          <p class="empty-state">{{ 'common.tripGoStops.noPlatforms' | transloco }}</p>
-        }
-      </div>
-    </article>
-
-    @if (selectedGroup(); as group) {
-      <article class="stop-tile stop-tile--wide">
-        <header>
-          <mat-icon aria-hidden="true">departure_board</mat-icon>
-          {{ 'common.tripGoStops.departuresFor' | transloco }} {{ group.line }}
-          @if (group.direction) { <span class="tile-header-direction">{{ group.direction }}</span> }
-        </header>
-        <div class="stop-tile__body departure-list">
-          @for (departure of group.departures; track departure.id) {
-            <div class="departure-row" [class.departure-row--cancelled]="departure.cancelled">
-              <span class="departure-time">
-                <mat-icon aria-hidden="true">schedule</mat-icon>
-                <strong>{{ time(departure.departureTime) }}</strong>
-              </span>
-              <span class="departure-info">
-                @if (departure.cancelled) {
-                  <strong class="status status--cancelled">{{ 'common.tripGoStops.cancelled' | transloco }}</strong>
-                } @else if (departure.realTime) {
-                  <span class="status status--live">
-                    {{ 'common.tripGoStops.live' | transloco }}
-                    @if (delayMinutes(departure) > 0) {
-                      · +{{ delayMinutes(departure) }} {{ 'common.tripGoStops.minutesShort' | transloco }}
-                    }
-                  </span>
-                } @else {
-                  <span class="status">{{ 'common.tripGoStops.scheduled' | transloco }}</span>
-                }
-                <small>
-                  @if (departure.platform) {
-                    {{ 'common.tripGoStops.platform' | transloco }} {{ departure.platform }}
-                  }
-                </small>
-                @if (departure.realTime && departure.scheduledDepartureTime
-                  && departure.scheduledDepartureTime !== departure.departureTime) {
-                  <small>{{ 'common.tripGoStops.scheduledAt' | transloco }}
-                    {{ time(departure.scheduledDepartureTime) }}</small>
-                }
-                @for (alert of departure.alerts; track alert) {
-                  <small class="departure-alert"><mat-icon aria-hidden="true">warning</mat-icon>{{ alert }}</small>
-                }
-              </span>
-            </div>
-          }
-        </div>
-      </article>
-    }
   </section>
 </mat-dialog-content>
 

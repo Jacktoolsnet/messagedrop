@@ -2939,11 +2939,11 @@
     "items": {
       "lines": {
         "title": "Líneas",
-        "desc": "Muestra líneas y direcciones como mosaicos seleccionables. «Horarios de salida» muestra los próximos servicios de esa línea."
+        "desc": "Muestra líneas y direcciones como mosaicos seleccionables. El botón de salidas sustituye la vista de líneas por las próximas salidas; el botón Atrás vuelve a la selección."
       },
       "platforms": {
         "title": "Andenes",
-        "desc": "Muestra los andenes o puntos de parada individuales y las líneas disponibles en ellos."
+        "desc": "El andén actual aparece directamente en el mosaico de la línea, debajo de su nombre, cuando TripGo lo proporciona."
       },
       "close": {
         "title": "Cerrar",
