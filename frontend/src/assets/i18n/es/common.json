@@ -171,6 +171,7 @@
         "previous": "Punto anterior de la ruta",
         "next": "Siguiente punto de la ruta",
         "stop": "Finalizar simulación del viaje",
+        "underway": "En camino",
         "startPoint": "Inicio",
         "routePoint": "Punto de ruta",
         "destinationPoint": "Destino"

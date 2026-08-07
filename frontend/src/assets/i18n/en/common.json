@@ -172,6 +172,7 @@
         "previous": "Previous route point",
         "next": "Next route point",
         "stop": "Stop journey simulation",
+        "underway": "Underway",
         "startPoint": "Start",
         "routePoint": "Route point",
         "destinationPoint": "Destination"

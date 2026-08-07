@@ -38,6 +38,7 @@ interface TripGoSimulationPoint {
   time?: string;
   segment?: TripGoRouteSegment;
   turnInstruction?: TripGoTurnInstruction;
+  updateOverlay?: boolean;
   showOverlay: boolean;
 }
 
@@ -380,6 +381,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     this.route.segments.forEach((segment, segmentIndex) => {
       const geometryPoints = this.segmentGeometryLocations(segment);
       const turnInstructions = this.turnInstructionsWithLocations(segment);
+      let progressOverlayAdded = false;
       const displayedPoints = geometryPoints.length >= 2
         ? geometryPoints
         : this.fallbackSimulationGeometry(segment);
@@ -410,14 +412,22 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
         }
         const intermediateStop = segment.service?.intermediateStops?.find((stop) =>
           this.isSameSimulationLocation(stop, location));
+        const showGenericProgress: boolean = segment.type === 'unscheduled'
+          && turnInstructions.length === 0
+          && !progressOverlayAdded;
+        progressOverlayAdded ||= showGenericProgress;
         points.push({
           kind: 'segment',
           location,
-          title: intermediateStop?.name || segment.from?.name || segment.from?.address
-            || this.transloco.translate('common.tripGo.simulation.routePoint'),
+          title: intermediateStop?.name || turnInstruction?.streetName
+            || (showGenericProgress
+              ? this.transloco.translate('common.tripGo.simulation.underway')
+              : segment.from?.name || segment.from?.address
+                || this.transloco.translate('common.tripGo.simulation.routePoint')),
           time: intermediateStop?.arrivalTime || intermediateStop?.departureTime || segment.startTime,
           segment,
           turnInstruction,
+          updateOverlay: showGenericProgress,
           showOverlay: !!intermediateStop || !!turnInstruction
         });
       }
@@ -441,7 +451,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     if (!point || !this.map) return;
     this.clearSimulationTimer();
     this.simulationIndex = index;
-    if (point.showOverlay) {
+    if (point.showOverlay || point.updateOverlay) {
       this.activeSimulationPoint.set(point);
     }
 
