@@ -49,10 +49,13 @@ async function fetchServiceSamples(client, routeResponse) {
   const templates = new Map((routeResponse.segmentTemplates || [])
     .map((template) => [template.hashCode, template]));
   const trips = (routeResponse.groups || []).flatMap((group) => group.trips || []);
+  const preferredOperator = process.env.TRIPGO_SAMPLE_OPERATOR?.trim();
   const selectedTrip = trips
     .map((trip) => ({ trip, scheduled: scheduledSegments(trip, templates) }))
     .filter(({ scheduled }) => scheduled.length > 0)
-    .sort((left, right) => right.scheduled.length - left.scheduled.length
+    .sort((left, right) => Number(containsOperator(right.scheduled, preferredOperator))
+      - Number(containsOperator(left.scheduled, preferredOperator))
+      || right.scheduled.length - left.scheduled.length
       || Number(left.trip.weightedScore ?? Number.MAX_SAFE_INTEGER)
         - Number(right.trip.weightedScore ?? Number.MAX_SAFE_INTEGER))[0];
 
@@ -99,6 +102,10 @@ async function fetchServiceSamples(client, routeResponse) {
     }
   }
   return { tripId: selectedTrip.trip.id, services };
+}
+
+function containsOperator(segments, operatorId) {
+  return Boolean(operatorId) && segments.some(({ template }) => template.operatorID === operatorId);
 }
 
 function scheduledSegments(trip, templates) {

@@ -18,6 +18,8 @@ fetch_diagnostic_route() {
   local to_lat="$4"
   local to_lng="$5"
   local locale="$6"
+  local mode="${7:-pt_pub}"
+  local operator="${8:-}"
 
   printf 'Fetching TripGo sample %s ...\n' "${name}"
 
@@ -29,6 +31,8 @@ fetch_diagnostic_route() {
     TRIPGO_SAMPLE_TO_LAT="${to_lat}" \
     TRIPGO_SAMPLE_TO_LNG="${to_lng}" \
     TRIPGO_SAMPLE_LOCALE="${locale}" \
+    TRIPGO_SAMPLE_MODES="${mode}" \
+    TRIPGO_SAMPLE_OPERATOR="${operator}" \
     node "${script_dir}/../../services/tripgo/scripts/fetch-raw-route-sample.js" \
       "${output_dir}/route-${name}-raw.json" \
       "${output_dir}/services-${name}-raw.json"; then
@@ -42,7 +46,7 @@ fetch_diagnostic_route() {
       \"from\": { \"latitude\": ${from_lat}, \"longitude\": ${from_lng} },
       \"to\": { \"latitude\": ${to_lat}, \"longitude\": ${to_lng} },
       \"locale\": \"${locale}\",
-      \"modes\": [\"pt_pub\"]
+      \"modes\": [\"${mode}\"]
     }" \
     "${api_url}/tripgo/routes" \
     --output "${output_dir}/route-${name}.json"; then
@@ -78,19 +82,13 @@ for region in \
   fetch_region_diagnostics "${region}"
 done
 
-if [[ "${TRIPGO_FETCH_ROUTES:-0}" == "1" ]]; then
-  # Optional route diagnostics. Provider discovery stays fast by default and
-  # routes can be enabled explicitly once a real-time provider was selected.
-  fetch_diagnostic_route "munich-hamburg" \
-    "48.14023" "11.55834" "53.55278" "10.00665" "de"
-  fetch_diagnostic_route "paris-versailles" \
-    "48.88095" "2.35532" "48.80018" "2.12909" "fr"
-  fetch_diagnostic_route "madrid-atocha-chamartin" \
-    "40.40659" "-3.68902" "40.47220" "-3.68259" "es"
-  fetch_diagnostic_route "copenhagen-airport" \
-    "55.67269" "12.56469" "55.62962" "12.64922" "da"
-  fetch_diagnostic_route "stockholm-arlanda" \
-    "59.33004" "18.05801" "59.64982" "17.92378" "en"
+if [[ "${TRIPGO_FETCH_ROUTES:-1}" == "1" ]]; then
+  # VY Bus4You is explicitly marked as real-time capable for Stockholm. Test
+  # its complete Stockholm–Oslo relation: on the shorter section to Västerås,
+  # TripGo preferred SJ and FlixBus and returned no VY alternative.
+  fetch_diagnostic_route "stockholm-oslo-coach" \
+    "59.33167" "18.05601" "59.91110" "10.75835" "en" "pt_pub_coach" \
+    "no-entur-netex-VYB:Operator:Vybus4you"
 fi
 
 printf 'TripGo samples written to %s\n' "${output_dir}"
