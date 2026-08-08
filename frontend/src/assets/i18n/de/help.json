@@ -2985,7 +2985,7 @@
     "title": "Routenoptionen",
     "intro": "Hier bestimmst du, welche Routenvorschläge berechnet werden.",
     "items": {
-      "variants": { "title": "Routenvorschläge", "desc": "Aktiviere Auto, Fahrrad, Fußweg oder Flugverbindungen unabhängig voneinander. Nur aktivierte Varianten werden angefragt." }
+      "variants": { "title": "Routenvorschläge", "desc": "Aktiviere Auto, Fahrrad, Fußweg oder Flugverbindungen unabhängig voneinander. Für Fahrrad und Fußweg bestimmst du per Luftlinien-Grenzwert, bis wann eine reine Route und ab wann nur eine Kombination mit öffentlichen Verkehrsmitteln gesucht wird." }
     }
   },
   "locationShareContacts": {

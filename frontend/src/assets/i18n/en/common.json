@@ -1733,8 +1733,11 @@
         "description": "Choose which variants should be offered when calculating a route.",
         "car": "Show driving route",
         "bicycle": "Show bicycle route",
+        "bicycleDistance": "Bicycle-only route up to",
         "walking": "Show walking route",
-        "flights": "Show flight connections"
+        "walkingDistance": "Walking-only route up to",
+        "flights": "Show flight connections",
+        "distanceHint": "Distance is measured as the crow flies between origin and destination. Above the limit, only a combination with public transport is requested."
       }
     },
     "wikipedia": {

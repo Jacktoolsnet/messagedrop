@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSliderModule } from '@angular/material/slider';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { RouteOptions, normalizeRouteOptions } from '../../../interfaces/route-options';
 import { DialogHeaderComponent } from '../dialog-header/dialog-header.component';
@@ -24,6 +25,7 @@ export interface RouteOptionsDialogData {
     MatDialogContent,
     MatIconModule,
     MatSlideToggleModule,
+    MatSliderModule,
     TranslocoPipe
   ],
   templateUrl: './route-options.component.html',

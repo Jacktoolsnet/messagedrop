@@ -1732,8 +1732,11 @@
         "description": "Elige qué variantes se ofrecerán al calcular una ruta.",
         "car": "Mostrar ruta en coche",
         "bicycle": "Mostrar ruta en bicicleta",
+        "bicycleDistance": "Ruta solo en bicicleta hasta",
         "walking": "Mostrar ruta a pie",
-        "flights": "Mostrar conexiones aéreas"
+        "walkingDistance": "Ruta solo a pie hasta",
+        "flights": "Mostrar conexiones aéreas",
+        "distanceHint": "La distancia se calcula en línea recta entre el inicio y el destino. Por encima del límite solo se busca una combinación con transporte público."
       }
     },
     "wikipedia": {

@@ -1732,8 +1732,11 @@
         "description": "Choisissez les variantes proposées lors du calcul d’un itinéraire.",
         "car": "Afficher l’itinéraire en voiture",
         "bicycle": "Afficher l’itinéraire à vélo",
+        "bicycleDistance": "Itinéraire uniquement à vélo jusqu’à",
         "walking": "Afficher l’itinéraire à pied",
-        "flights": "Afficher les liaisons aériennes"
+        "walkingDistance": "Itinéraire uniquement à pied jusqu’à",
+        "flights": "Afficher les liaisons aériennes",
+        "distanceHint": "La distance est calculée à vol d’oiseau entre le départ et la destination. Au-delà de la limite, seule une combinaison avec les transports publics est recherchée."
       }
     },
     "wikipedia": {

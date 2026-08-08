@@ -43,6 +43,44 @@
   gap: 0.8rem;
 }
 
+.option-control,
+.distance-setting {
+  display: flex;
+  flex-direction: column;
+}
+
+.option-control {
+  gap: 0.45rem;
+}
+
+.distance-setting {
+  gap: 0.1rem;
+  padding-inline-start: 3.1rem;
+  transition: opacity 120ms ease;
+}
+
+.distance-setting--disabled {
+  opacity: 0.48;
+}
+
+.distance-setting__label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--mat-card-subtitle-text-color);
+  font-size: 0.9rem;
+}
+
+.distance-setting mat-slider {
+  width: 100%;
+}
+
+.distance-hint {
+  padding-top: 0.25rem;
+  font-size: 0.9rem;
+}
+
 .option-label mat-icon {
   flex: 0 0 auto;
 }

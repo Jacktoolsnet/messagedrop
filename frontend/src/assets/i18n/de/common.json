@@ -1733,8 +1733,11 @@
         "description": "Lege fest, welche Varianten bei einer Berechnung angeboten werden.",
         "car": "Autoroute anzeigen",
         "bicycle": "Fahrradroute anzeigen",
+        "bicycleDistance": "Reine Fahrradroute bis",
         "walking": "Fußwegroute anzeigen",
-        "flights": "Flugverbindungen anzeigen"
+        "walkingDistance": "Reine Fußwegroute bis",
+        "flights": "Flugverbindungen anzeigen",
+        "distanceHint": "Die Entfernung wird als Luftlinie zwischen Start und Ziel berechnet. Oberhalb des Grenzwerts wird nur nach einer Kombination mit öffentlichen Verkehrsmitteln gesucht."
       }
     },
     "wikipedia": {

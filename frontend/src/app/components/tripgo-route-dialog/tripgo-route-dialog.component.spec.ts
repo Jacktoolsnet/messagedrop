@@ -63,7 +63,7 @@ describe('TripGoRouteDialogComponent', () => {
     await TestBed.configureTestingModule({
       imports: [TripGoRouteDialogComponent],
       providers: [
-        { provide: MAT_DIALOG_DATA, useValue: { destination: { latitude: 52.51, longitude: 13.38, plusCode: '' } } },
+        { provide: MAT_DIALOG_DATA, useValue: { destination: { latitude: 52.515, longitude: 13.395, plusCode: '' } } },
         { provide: MatDialogRef, useValue: { close: jasmine.createSpy('close') } },
         { provide: MatDialog, useValue: dialog },
         { provide: GeolocationService, useValue: geolocation },
@@ -100,9 +100,13 @@ describe('TripGoRouteDialogComponent', () => {
     expect(tripGo.calculateRoute).toHaveBeenCalledTimes(4);
     expect(tripGo.calculateRoute.calls.allArgs().some((args) =>
       args[0].latitude === 52.52
-      && args[1].latitude === 52.51
+      && args[1].latitude === 52.515
       && args[2] === 'de'
       && args[3].join(',') === 'me_car')).toBeTrue();
+    expect(tripGo.calculateRoute.calls.allArgs().some((args) =>
+      args[3].join(',') === 'me_mic_bic')).toBeTrue();
+    expect(tripGo.calculateRoute.calls.allArgs().some((args) =>
+      args[3].join(',') === 'wa_wal')).toBeTrue();
     expect(tripGo.calculateRoute.calls.allArgs().some((args) => args[3].includes('in_air'))).toBeFalse();
     expect(fixture.componentInstance.state()).toBe('ready');
   });
@@ -132,6 +136,12 @@ describe('TripGoRouteDialogComponent', () => {
 
     expect(tripGo.calculateRoute.calls.allArgs().some((args) =>
       args[3].join(',') === 'in_air,pt_pub')).toBeTrue();
+    expect(tripGo.calculateRoute.calls.allArgs().some((args) =>
+      args[3].join(',') === 'me_mic_bic,pt_pub')).toBeTrue();
+    expect(tripGo.calculateRoute.calls.allArgs().some((args) =>
+      args[3].join(',') === 'wa_wal,pt_pub')).toBeTrue();
+    expect(tripGo.calculateRoute.calls.allArgs().some((args) =>
+      args[3].join(',') === 'me_mic_bic' || args[3].join(',') === 'wa_wal')).toBeFalse();
   });
 
   it('waits for the explicit action after selecting another destination', () => {
