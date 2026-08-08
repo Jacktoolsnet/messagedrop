@@ -169,6 +169,10 @@
       "setAsDestination": "Establecer como destino",
       "currentWeather": "Tiempo actual: {{ temperature }} grados Celsius",
       "simulation": {
+        "wikipediaTitle": "Preparando artículos de Wikipedia",
+        "wikipediaMessage": "Se buscan artículos de Wikipedia a lo largo de la ruta.",
+        "wikipediaProgress": "{{ completed }} de {{ total }} zonas consultadas",
+        "withoutWikipedia": "Simular sin marcadores de Wikipedia",
         "start": "Iniciar simulación del viaje",
         "pause": "Pausar simulación del viaje",
         "resume": "Continuar simulación del viaje",

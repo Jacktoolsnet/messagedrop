@@ -35,8 +35,8 @@
   padding: .7rem .85rem;
   border: 1px solid var(--mat-card-outlined-outline-color);
   border-radius: .85rem;
-  background: color-mix(in srgb, var(--mat-sys-surface-container-high) 94%, transparent);
-  color: var(--mat-sys-on-surface);
+  background: color-mix(in srgb, var(--mat-card-filled-container-color, #ffffff) 98%, transparent);
+  color: var(--mat-app-text-color, #1f2937);
   box-shadow: 0 5px 18px color-mix(in srgb, #000000 28%, transparent);
   backdrop-filter: blur(7px);
   pointer-events: none;
@@ -87,7 +87,7 @@
 .route-summary-overlay__facts {
   flex-wrap: wrap;
   gap: .35rem .8rem;
-  color: var(--mat-sys-on-surface-variant);
+  color: var(--mat-sys-on-surface-variant, var(--mat-app-text-color, #1f2937));
   font-size: .82rem;
 }
 
@@ -108,8 +108,8 @@
   transform: translateX(-50%);
   border: 1px solid var(--mat-card-outlined-outline-color);
   border-radius: .85rem;
-  background: color-mix(in srgb, var(--mat-sys-surface-container-high) 94%, transparent);
-  color: var(--mat-sys-on-surface);
+  background: color-mix(in srgb, var(--mat-card-filled-container-color, #ffffff) 98%, transparent);
+  color: var(--mat-app-text-color, #1f2937);
   box-shadow: 0 5px 18px color-mix(in srgb, #000000 28%, transparent);
   backdrop-filter: blur(7px);
   pointer-events: none;
@@ -145,7 +145,7 @@
 }
 
 .simulation-overlay header small {
-  color: var(--mat-sys-on-surface-variant);
+  color: var(--mat-sys-on-surface-variant, var(--mat-app-text-color, #1f2937));
 }
 
 .simulation-overlay header strong {
@@ -155,7 +155,7 @@
 .simulation-overlay__facts {
   flex-wrap: wrap;
   gap: .4rem .8rem;
-  color: var(--mat-sys-on-surface-variant);
+  color: var(--mat-sys-on-surface-variant, var(--mat-app-text-color, #1f2937));
   font-size: .82rem;
 }
 
@@ -165,7 +165,7 @@
 
 .simulation-overlay__facts > .simulation-overlay__instruction {
   width: 100%;
-  color: var(--mat-sys-on-surface);
+  color: var(--mat-app-text-color, #1f2937);
   font-size: .9rem;
 }
 

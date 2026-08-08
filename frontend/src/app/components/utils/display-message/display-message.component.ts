@@ -61,6 +61,7 @@ export class DisplayMessage implements OnInit, OnDestroy {
   }
 
   onPrimaryClick(): void {
+    this.data.primaryAction?.();
     this.close(true);
   }
 

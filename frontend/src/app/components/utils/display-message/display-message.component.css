@@ -12,6 +12,9 @@
     max-width: 100%;
     max-height: 95dvh;
     overflow: hidden;
+    border-radius: var(--mat-dialog-container-shape, 1rem);
+    background: var(--mat-dialog-container-color, var(--mat-card-filled-container-color, #ffffff));
+    color: var(--mat-app-text-color, #1f2937);
 
     p {
         font-size: 1rem;
@@ -52,6 +55,8 @@
     padding: 0.9rem 1rem 1rem;
     margin: 0;
     box-sizing: border-box;
+    background: inherit;
+    color: inherit;
 }
 
 .dialog-body--without-actions {
@@ -64,10 +69,19 @@
 
 .display-message-actions {
     flex: 0 0 auto;
+    background: inherit;
+    color: inherit;
 }
 
 .dialog-progress-row {
     padding: 1rem 0 0.25rem;
+}
+
+.dialog-progress-row small {
+    display: block;
+    margin-top: 0.45rem;
+    text-align: center;
+    color: var(--mat-sys-on-surface-variant, var(--mat-app-text-color, #1f2937));
 }
 
 .dialog-progress-row mat-progress-bar,

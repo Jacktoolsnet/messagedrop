@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   ChangeDetectionStrategy,
   Component,
+  computed,
   inject,
   Input,
   OnChanges,
@@ -10,16 +11,18 @@ import {
   signal,
   SimpleChanges
 } from '@angular/core';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import * as leaflet from 'leaflet';
-import { Subscription } from 'rxjs';
+import { Subscription, catchError, from, map, mergeMap, of, retry, tap, timer, toArray } from 'rxjs';
 import { Location } from '../../interfaces/location';
 import { DEFAULT_SEARCH_SETTINGS, SearchSettings } from '../../interfaces/search-settings';
 import { TripGoLocation, TripGoRouteOption, TripGoRouteSegment, TripGoStop, TripGoTurnInstruction } from '../../interfaces/tripgo';
 import { WikipediaArticle } from '../../interfaces/wikipedia';
 import { publicTransportStopMarker } from '../../services/map.service';
 import { WikipediaService } from '../../services/wikipedia.service';
+import { DisplayMessage } from '../utils/display-message/display-message.component';
 import { TripGoTimelineWeatherComponent } from './tripgo-timeline-weather.component';
 import {
   tripGoDisplayLocationName,
@@ -53,6 +56,7 @@ const wikipediaMarker = leaflet.icon({
   iconSize: [32, 40],
   iconAnchor: [16, 40]
 });
+const WIKIPEDIA_ROUTE_RADIUS_METERS = 200;
 
 @Component({
   selector: 'app-tripgo-route-map',
@@ -149,6 +153,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
   readonly mapId = `tripgo-route-map-${Math.random().toString(36).slice(2)}`;
   private readonly transloco = inject(TranslocoService);
   private readonly wikipedia = inject(WikipediaService);
+  private readonly dialog = inject(MatDialog);
   private map?: leaflet.Map;
   private routeBounds?: leaflet.LatLngBounds;
   private simulationMarker?: leaflet.Marker;
@@ -165,6 +170,22 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
   private wikipediaMarkers: leaflet.Marker[] = [];
   private wikipediaRequest?: Subscription;
   private wikipediaLoadTimer?: ReturnType<typeof setTimeout>;
+  private wikipediaPreparation?: Subscription;
+  private wikipediaPreparationDialog?: MatDialogRef<DisplayMessage>;
+  private wikipediaPreparing = false;
+  private wikipediaPrepared = false;
+  private wikipediaSuppressedForSimulation = false;
+  private preparedWikipediaArticles: WikipediaArticle[] = [];
+  readonly wikipediaPreparationCompleted = signal(0);
+  readonly wikipediaPreparationTotal = signal(0);
+  readonly wikipediaPreparationProgress = computed(() => {
+    const total = this.wikipediaPreparationTotal();
+    return total > 0 ? this.wikipediaPreparationCompleted() / total * 100 : 0;
+  });
+  readonly wikipediaPreparationText = computed(() => this.transloco.translate(
+    'common.tripGo.simulation.wikipediaProgress',
+    { completed: this.wikipediaPreparationCompleted(), total: this.wikipediaPreparationTotal() }
+  ));
 
   ngAfterViewInit(): void {
     this.viewInitialized = true;
@@ -173,6 +194,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
 
   ngOnChanges(changes: SimpleChanges): void {
     if (this.viewInitialized && changes['searchSettings'] && !changes['route']) {
+      this.resetWikipediaPreparation();
       this.scheduleWikipediaLoad();
     }
     if (!this.viewInitialized || !changes['route'] || changes['route'].firstChange) return;
@@ -186,6 +208,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     this.map?.remove();
     this.map = undefined;
     this.cancelWikipediaLoad();
+    this.resetWikipediaPreparation();
     this.clearWikipediaMarkers();
     this.routeBounds = undefined;
     this.segmentGeometryDistanceCache.clear();
@@ -198,6 +221,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     this.cancelSimulationAnimation();
     this.removeSimulationMarker();
     this.cancelWikipediaLoad();
+    this.resetWikipediaPreparation();
     this.clearWikipediaMarkers();
     this.map?.remove();
   }
@@ -205,6 +229,15 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
   startSimulation(): void {
     if (!this.map) return;
     this.simulationPoints = this.createSimulationPoints();
+    if (!this.simulationPoints.length) return;
+    if (this.shouldPrepareWikipediaForSimulation()) {
+      this.prepareWikipediaForSimulation();
+      return;
+    }
+    this.beginSimulation();
+  }
+
+  private beginSimulation(): void {
     if (!this.simulationPoints.length) return;
     this.setSimulationState('playing');
     this.showSimulationPoint(0, true);
@@ -245,6 +278,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     this.simulationIndex = -1;
     this.setSimulationState('idle');
     this.showEntireRoute();
+    this.finishWikipediaSuppression();
   }
 
   simulationPointIcon(point: TripGoSimulationPoint): string {
@@ -537,6 +571,13 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     this.simulationIndex = -1;
     this.setSimulationState('idle');
     this.showEntireRoute();
+    this.finishWikipediaSuppression();
+  }
+
+  private finishWikipediaSuppression(): void {
+    if (!this.wikipediaSuppressedForSimulation) return;
+    this.wikipediaSuppressedForSimulation = false;
+    this.scheduleWikipediaLoad();
   }
 
   private showEntireRoute(): void {
@@ -668,6 +709,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
         this.simulationAnimationFrame = requestAnimationFrame(animateFrame);
       } else {
         this.simulationAnimationFrame = undefined;
+        this.scheduleWikipediaLoad();
       }
     };
     this.simulationAnimationFrame = requestAnimationFrame(animateFrame);
@@ -941,6 +983,183 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     this.zoomLevelButton.setAttribute('aria-label', `${label}: ${zoomLevel}`);
   }
 
+  private shouldPrepareWikipediaForSimulation(): boolean {
+    return this.searchSettings.wikipedia.enabled
+      && !this.wikipediaPrepared
+      && !this.wikipediaSuppressedForSimulation
+      && !this.wikipediaPreparing;
+  }
+
+  private prepareWikipediaForSimulation(): void {
+    if (!this.map || this.wikipediaPreparing) return;
+    const searches = this.wikipediaSearchBounds();
+    if (!searches.length) {
+      this.wikipediaPrepared = true;
+      this.beginSimulation();
+      return;
+    }
+
+    this.wikipediaPreparing = true;
+    this.wikipediaRequest?.unsubscribe();
+    this.wikipediaRequest = undefined;
+    this.clearWikipediaMarkers();
+    this.wikipediaPreparationCompleted.set(0);
+    this.wikipediaPreparationTotal.set(searches.length);
+    const firstPoint = this.simulationPoints[0];
+    if (firstPoint && this.validTripGoLocation(firstPoint.location)) {
+      const startZoom = this.simulationZoom(firstPoint) ?? Math.max(14, this.searchSettings.wikipedia.minZoom);
+      this.map.flyTo([firstPoint.location.latitude, firstPoint.location.longitude], startZoom, { duration: 1.2 });
+    }
+
+    const dialogRef = this.dialog.open(DisplayMessage, {
+      data: {
+        showAlways: true,
+        title: this.transloco.translate('common.tripGo.simulation.wikipediaTitle'),
+        image: '',
+        icon: 'menu_book',
+        message: this.transloco.translate('common.tripGo.simulation.wikipediaMessage'),
+        button: this.transloco.translate('common.tripGo.simulation.withoutWikipedia'),
+        delay: 0,
+        showSpinner: true,
+        progress: this.wikipediaPreparationProgress,
+        progressText: this.wikipediaPreparationText,
+        primaryAction: () => this.skipWikipediaPreparation(),
+        autoclose: false
+      },
+      width: 'min(520px, 95vw)',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      autoFocus: false,
+      hasBackdrop: true,
+      backdropClass: 'route-wikipedia-preparation-backdrop',
+      disableClose: true
+    });
+    this.wikipediaPreparationDialog = dialogRef;
+
+    const language = this.transloco.getActiveLang() || 'de';
+    const zoom = Math.max(14, this.searchSettings.wikipedia.minZoom);
+    this.wikipediaPreparation = from(searches).pipe(
+      mergeMap((bounds) => this.wikipedia.getNearby({ ...bounds, zoom, language, limit: 100 }).pipe(
+        retry({ count: 2, delay: (_error, retryCount) => timer(retryCount * 1_500) }),
+        map((response) => response.articles),
+        catchError(() => of([] as WikipediaArticle[])),
+        tap(() => this.wikipediaPreparationCompleted.update((value) => value + 1))
+      ), 1),
+      toArray()
+    ).subscribe({
+      next: (articleGroups) => {
+        if (!this.wikipediaPreparing) return;
+        const uniqueArticles = new Map<number, WikipediaArticle>();
+        articleGroups.flat().forEach((article) => {
+          if (this.distanceToRouteInMeters(article) <= WIKIPEDIA_ROUTE_RADIUS_METERS) {
+            uniqueArticles.set(article.pageId, article);
+          }
+        });
+        this.preparedWikipediaArticles = [...uniqueArticles.values()];
+        this.wikipediaPrepared = true;
+        this.wikipediaPreparing = false;
+        this.wikipediaPreparation = undefined;
+        this.wikipediaPreparationDialog?.close();
+        this.wikipediaPreparationDialog = undefined;
+        this.renderPreparedWikipediaMarkers();
+        this.beginSimulation();
+      }
+    });
+  }
+
+  private skipWikipediaPreparation(): void {
+    if (!this.wikipediaPreparing) return;
+    this.wikipediaPreparation?.unsubscribe();
+    this.wikipediaPreparation = undefined;
+    this.wikipediaPreparing = false;
+    this.wikipediaSuppressedForSimulation = true;
+    this.preparedWikipediaArticles = [];
+    this.clearWikipediaMarkers();
+    this.beginSimulation();
+  }
+
+  private wikipediaSearchBounds(): Array<{ north: number; south: number; east: number; west: number }> {
+    const routeLines: TripGoLocation[][] = [];
+    for (const segment of this.route.segments) {
+      if (tripGoSegmentIcon(segment) === 'flight') {
+        if (this.validTripGoLocation(segment.from)) routeLines.push([segment.from]);
+        if (this.validTripGoLocation(segment.to)) routeLines.push([segment.to]);
+        continue;
+      }
+      const geometry = this.segmentGeometryLocations(segment).filter((point) => this.validTripGoLocation(point));
+      const line = geometry.length ? geometry : this.fallbackSimulationGeometry(segment);
+      if (line.length) routeLines.push(line);
+    }
+    if (!routeLines.length) return [];
+
+    // Keep each request small enough that the Wikipedia tile service can
+    // process it without filling its upstream queue. Overlapping 2 km samples
+    // still cover the complete 200 m route corridor.
+    const intervalMeters = 2_000;
+    const centers: TripGoLocation[] = [];
+    for (const line of routeLines) {
+      centers.push(line[0]);
+      let distanceSinceCenter = 0;
+      for (let index = 1; index < line.length; index += 1) {
+        const start = line[index - 1];
+        const end = line[index];
+        const distance = this.distanceInMeters(start, end);
+        if (!Number.isFinite(distance) || distance <= 0) continue;
+        let consumed = 0;
+        while (distanceSinceCenter + distance - consumed >= intervalMeters) {
+          const needed = intervalMeters - distanceSinceCenter;
+          consumed += needed;
+          const ratio = Math.min(1, consumed / distance);
+          centers.push({
+            latitude: Number(start.latitude) + (Number(end.latitude) - Number(start.latitude)) * ratio,
+            longitude: Number(start.longitude) + (Number(end.longitude) - Number(start.longitude)) * ratio
+          });
+          distanceSinceCenter = 0;
+        }
+        distanceSinceCenter += distance - consumed;
+      }
+      const lastPoint = line.at(-1)!;
+      if (this.distanceInMeters(centers.at(-1)!, lastPoint) > 1_000) centers.push(lastPoint);
+    }
+
+    const uniqueCenters = centers.filter((center, index) => centers.findIndex((candidate) =>
+      this.distanceInMeters(center, candidate) < 500) === index);
+    const halfSizeMeters = 1_300;
+    return uniqueCenters.map((center) => {
+      const latitudeDelta = halfSizeMeters / 110_540;
+      const longitudeDelta = halfSizeMeters
+        / Math.max(1, 111_320 * Math.cos(Number(center.latitude) * Math.PI / 180));
+      return {
+        north: Math.min(90, Number(center.latitude) + latitudeDelta),
+        south: Math.max(-90, Number(center.latitude) - latitudeDelta),
+        east: Math.min(180, Number(center.longitude) + longitudeDelta),
+        west: Math.max(-180, Number(center.longitude) - longitudeDelta)
+      };
+    });
+  }
+
+  private renderPreparedWikipediaMarkers(): void {
+    if (!this.map || !this.wikipediaPrepared || !this.searchSettings.wikipedia.enabled
+      || this.map.getZoom() < this.searchSettings.wikipedia.minZoom) {
+      this.clearWikipediaMarkers();
+      return;
+    }
+    this.drawWikipediaMarkers(this.preparedWikipediaArticles);
+  }
+
+  private resetWikipediaPreparation(): void {
+    this.wikipediaPreparation?.unsubscribe();
+    this.wikipediaPreparation = undefined;
+    this.wikipediaPreparationDialog?.close();
+    this.wikipediaPreparationDialog = undefined;
+    this.wikipediaPreparing = false;
+    this.wikipediaPrepared = false;
+    this.wikipediaSuppressedForSimulation = false;
+    this.preparedWikipediaArticles = [];
+    this.wikipediaPreparationCompleted.set(0);
+    this.wikipediaPreparationTotal.set(0);
+  }
+
   private scheduleWikipediaLoad(): void {
     if (this.wikipediaLoadTimer) clearTimeout(this.wikipediaLoadTimer);
     this.wikipediaLoadTimer = setTimeout(() => this.loadWikipediaMarkers(), 200);
@@ -948,6 +1167,14 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
 
   private loadWikipediaMarkers(): void {
     this.wikipediaLoadTimer = undefined;
+    if (this.wikipediaPreparing || this.wikipediaSuppressedForSimulation) {
+      this.clearWikipediaMarkers();
+      return;
+    }
+    if (this.wikipediaPrepared) {
+      this.renderPreparedWikipediaMarkers();
+      return;
+    }
     if (!this.map || !this.searchSettings.wikipedia.enabled
       || this.map.getZoom() < this.searchSettings.wikipedia.minZoom) {
       this.wikipediaRequest?.unsubscribe();
@@ -968,7 +1195,8 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
       limit: 100
     }).subscribe({
       next: (response) => {
-        const articles = response.articles.filter((article) => this.distanceToRouteInMeters(article) <= 1_000);
+        const articles = response.articles.filter((article) =>
+          this.distanceToRouteInMeters(article) <= WIKIPEDIA_ROUTE_RADIUS_METERS);
         this.drawWikipediaMarkers(articles);
       },
       error: () => this.clearWikipediaMarkers()
@@ -1030,7 +1258,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
       for (let index = 1; index < points.length; index += 1) {
         shortestDistance = Math.min(shortestDistance,
           this.distanceToLineSegmentInMeters(location, points[index - 1], points[index]));
-        if (shortestDistance <= 1_000) return shortestDistance;
+        if (shortestDistance <= WIKIPEDIA_ROUTE_RADIUS_METERS) return shortestDistance;
       }
     }
     return shortestDistance;

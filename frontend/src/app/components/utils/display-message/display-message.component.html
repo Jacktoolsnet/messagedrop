@@ -100,7 +100,14 @@
 
     @if (data.showSpinner) {
     <div class="dialog-progress-row">
+        @if (data.progress) {
+        <mat-progress-bar mode="determinate" [value]="data.progress()" aria-label="Loading"></mat-progress-bar>
+        @if (data.progressText) {
+        <small>{{ data.progressText() }}</small>
+        }
+        } @else {
         <mat-progress-bar mode="indeterminate" aria-label="Loading"></mat-progress-bar>
+        }
     </div>
     }
     </mat-dialog-content>
