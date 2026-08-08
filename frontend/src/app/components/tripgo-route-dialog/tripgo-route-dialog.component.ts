@@ -100,7 +100,7 @@ type RoutePointDetails = TripGoRoutePointDetails;
 export class TripGoRouteDialogComponent implements OnInit, OnDestroy {
   @ViewChild(TripGoRouteMapComponent) private routeMap?: TripGoRouteMapComponent;
   private readonly data = inject<TripGoRouteDialogData>(MAT_DIALOG_DATA);
-  routeOptions = normalizeRouteOptions(this.data.routeOptions ?? DEFAULT_ROUTE_OPTIONS);
+  private routeOptions = normalizeRouteOptions(this.data.routeOptions ?? DEFAULT_ROUTE_OPTIONS);
   searchSettings = structuredClone(this.data.searchSettings ?? DEFAULT_SEARCH_SETTINGS);
   private readonly dialogRef = inject(MatDialogRef<TripGoRouteDialogComponent>);
   private readonly dialog = inject(MatDialog);
