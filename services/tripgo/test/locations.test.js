@@ -56,3 +56,38 @@ test('normalizes and combines platforms of the same stop', () => {
   assert.deepEqual(data.stops[0].services, ['794', '795']);
   assert.deepEqual(data.stops[0].platforms.map((platform) => platform.platform), ['1', '2']);
 });
+
+test('includes transport modes and platforms nested below a parent stop', () => {
+  const data = normalizeLocationsResponse({ groups: [{ stops: [{
+    lat: 59.91059,
+    lng: 10.72966,
+    name: 'Aker brygge',
+    region: 'NO_Oslo',
+    stopCode: 'NSR:StopPlace:58382',
+    modeInfo: { identifier: 'pt_pub_tram', alt: 'tram', localIcon: 'tram' },
+    publicTransportMode: 'pt_pub_tram',
+    stopType: 'tram',
+    children: [{
+      lat: 59.91037,
+      lng: 10.72918,
+      name: 'Aker brygge',
+      region: 'NO_Oslo',
+      stopCode: 'NSR:Quay:7478',
+      platformCode: 'BC',
+      services: 'B10',
+      modeInfo: { identifier: 'pt_pub_ferry', alt: 'ferry', localIcon: 'ferry' },
+      publicTransportMode: 'pt_pub_ferry',
+      stopType: 'ferry'
+    }]
+  }] }] }, 'NO_Oslo', [{
+    latMin: 59.90, lonMin: 10.72, latMax: 59.92, lonMax: 10.74
+  }]);
+
+  assert.equal(data.stops.length, 1);
+  assert.deepEqual(data.stops[0].modeIdentifiers, ['pt_pub_ferry', 'pt_pub_tram']);
+  assert.deepEqual(data.stops[0].modeIcons, ['ferry', 'tram']);
+  assert.deepEqual(data.stops[0].platforms.map((platform) => platform.stopCode), [
+    'NSR:Quay:7478', 'NSR:StopPlace:58382'
+  ]);
+  assert.equal(data.stops[0].platforms[0].platform, 'BC');
+});

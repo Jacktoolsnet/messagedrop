@@ -30,6 +30,34 @@ if [[ "${TRIPGO_FETCH_LOCATIONS:-0}" == "1" ]]; then
     "${output_dir}/locations-braunschweig-hbf-request.json"
 fi
 
+# Ferry-stop diagnostic for central Oslo and the inner Oslofjord islands. A
+# larger cell radius is intentional: at map zoom 16 only a small section is
+# visible at once, while the ferry terminals are spread across the waterfront
+# and several islands.
+if [[ "${TRIPGO_FETCH_OSLO_FERRY_LOCATIONS:-0}" == "1" ]]; then
+  fetch_oslo_ferry_locations() {
+    local name="$1"
+    local latitude="$2"
+    local longitude="$3"
+
+    printf 'Fetching TripGo ferry stops around %s ...\n' "${name}"
+    TRIPGO_LOCATIONS_LAT="${latitude}" \
+    TRIPGO_LOCATIONS_LNG="${longitude}" \
+    TRIPGO_LOCATIONS_CELL_RADIUS="1" \
+    TRIPGO_LOCATIONS_REGION="NO_Oslo" \
+    TRIPGO_LOCATIONS_LOCALE="en" \
+    node "${script_dir}/../../services/tripgo/scripts/fetch-raw-locations-sample.js" \
+      "${output_dir}/locations-oslo-ferries-${name}-raw.json" \
+      "${output_dir}/locations-oslo-ferries-${name}-request.json"
+  }
+
+  # Several small requests are considerably more reliable than a single
+  # 49-cell response and still cover the waterfront and the island terminals.
+  fetch_oslo_ferry_locations "waterfront" "59.9100" "10.7280"
+  fetch_oslo_ferry_locations "inner-islands" "59.8920" "10.7300"
+  fetch_oslo_ferry_locations "eastern-islands" "59.8840" "10.7550"
+fi
+
 fetch_diagnostic_route() {
   local name="$1"
   local from_lat="$2"

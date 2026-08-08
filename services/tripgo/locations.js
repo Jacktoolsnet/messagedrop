@@ -36,10 +36,13 @@ function normalizeLocationsResponse(payload, region, bounds) {
     error.status = 502;
     throw error;
   }
-  const normalizedStops = payload.groups
-    .flatMap((group) => Array.isArray(group?.stops) ? group.stops : [])
+  const normalizedStopsWithDuplicates = payload.groups
+    .flatMap((group) => Array.isArray(group?.stops) ? group.stops.flatMap(flattenLocationStop) : [])
     .map(normalizeStop)
     .filter((stop) => stop && pointInBounds(stop, bounds));
+  const normalizedStops = [...new Map(normalizedStopsWithDuplicates.map((stop) => [
+    `${stop.region || region}|${stop.stopCode}`, stop
+  ])).values()];
   const groups = [];
   for (const stop of normalizedStops) {
     let group = groups.find((candidate) => candidate.normalizedName === normalizeName(stop.name)
@@ -102,6 +105,12 @@ function normalizeLocationsResponse(payload, region, bounds) {
   };
 }
 
+function flattenLocationStop(stop) {
+  if (!stop || typeof stop !== 'object') return [];
+  const children = Array.isArray(stop.children) ? stop.children.flatMap(flattenLocationStop) : [];
+  return [stop, ...children];
+}
+
 function normalizeStop(stop) {
   const latitude = Number(stop?.lat);
   const longitude = Number(stop?.lng);
@@ -121,7 +130,7 @@ function normalizeStop(stop) {
     longitude,
     region: cleanString(stop.region),
     stopCode,
-    platform: cleanString(stop.platform || inferPlatform(stopCode)),
+    platform: cleanString(stop.platform || stop.platformCode || stop.shortName || inferPlatform(stopCode)),
     modeIdentifier: cleanString(stop.publicTransportMode || stop.modeInfo?.identifier),
     modeIcon: cleanString(stop.modeInfo?.remoteIcon || stop.modeInfo?.localIcon),
     modeLabel: cleanString(stop.modeInfo?.alt),
