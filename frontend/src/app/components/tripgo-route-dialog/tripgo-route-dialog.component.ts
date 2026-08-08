@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnDestroy, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -14,6 +14,7 @@ import { TripGoRouteCategory, TripGoRouteOption, TripGoRouteSegment, TripGoRouti
 import { GeolocationService } from '../../services/geolocation.service';
 import { NominatimService } from '../../services/nominatim.service';
 import { TripGoService } from '../../services/tripgo.service';
+import { TripGoRoutePointDetails, TripGoRouteSessionService } from '../../services/tripgo-route-session.service';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { LocationPickerDialogComponent } from '../utils/location-picker-dialog/location-picker-dialog.component';
@@ -37,6 +38,7 @@ export interface TripGoRouteDialogData {
   calculateImmediately?: boolean;
   routeOptions?: RouteOptions;
   routeOptionsChanged?: (options: RouteOptions) => void;
+  routePointsChanged?: (origin: Location, destination: Location) => void;
 }
 
 type RouteDialogState = 'idle' | 'locating' | 'routing' | 'ready' | 'arrived' | 'error';
@@ -69,10 +71,7 @@ const DESTINATION_REACHED_RADIUS_METERS = 50;
 const MAX_ROUTE_ENDPOINT_SNAP_METERS = 250;
 const MIN_FLIGHT_DISTANCE_METERS = 300_000;
 
-interface RoutePointDetails {
-  name: string;
-  address: string;
-}
+type RoutePointDetails = TripGoRoutePointDetails;
 
 @Component({
   selector: 'app-tripgo-route-dialog',
@@ -91,7 +90,7 @@ interface RoutePointDetails {
   styleUrl: './tripgo-route-dialog.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TripGoRouteDialogComponent implements OnInit {
+export class TripGoRouteDialogComponent implements OnInit, OnDestroy {
   @ViewChild(TripGoRouteMapComponent) private routeMap?: TripGoRouteMapComponent;
   private readonly data = inject<TripGoRouteDialogData>(MAT_DIALOG_DATA);
   private routeOptions = normalizeRouteOptions(this.data.routeOptions ?? DEFAULT_ROUTE_OPTIONS);
@@ -101,6 +100,7 @@ export class TripGoRouteDialogComponent implements OnInit {
   private readonly geolocation = inject(GeolocationService);
   private readonly nominatim = inject(NominatimService);
   private readonly tripGo = inject(TripGoService);
+  private readonly routeSession = inject(TripGoRouteSessionService);
   private readonly transloco = inject(TranslocoService);
   private routeLoadSubscription?: Subscription;
   private serviceDetailsSubscription?: Subscription;
@@ -129,6 +129,18 @@ export class TripGoRouteDialogComponent implements OnInit {
   readonly isBusy = computed(() => this.state() === 'locating' || this.state() === 'routing');
 
   ngOnInit(): void {
+    const restoredSession = this.routeSession.restore(this.data.destination, this.data.origin);
+    if (restoredSession) {
+      this.origin.set(restoredSession.origin);
+      this.destination.set(restoredSession.destination);
+      this.originDetails.set(restoredSession.originDetails);
+      this.destinationDetails.set(restoredSession.destinationDetails);
+      this.routes.set(restoredSession.routes);
+      this.requestedRouteCategories.set(restoredSession.requestedRouteCategories);
+      this.expandedRouteIds.set(new Set(restoredSession.expandedRouteIds));
+      this.state.set('ready');
+      return;
+    }
     if (!this.isUnsetLocation(this.destination())) {
       this.resolveRoutePoint('destination', this.destination());
     }
@@ -145,6 +157,10 @@ export class TripGoRouteDialogComponent implements OnInit {
     this.useCurrentPosition('origin', true);
   }
 
+  ngOnDestroy(): void {
+    this.saveRouteSession();
+  }
+
   calculateRoute(): void {
     const origin = this.origin();
     if (!origin || this.isBusy()) return;
@@ -153,6 +169,7 @@ export class TripGoRouteDialogComponent implements OnInit {
   }
 
   useCurrentPosition(kind: RoutePointKind, initial = false): void {
+    if (!initial) this.routeSession.clear();
     this.cancelRouteRequests();
     this.showList();
     this.routes.set([]);
@@ -532,6 +549,7 @@ export class TripGoRouteDialogComponent implements OnInit {
   }
 
   private loadRoutes(origin: Location, destination: Location): void {
+    this.data.routePointsChanged?.({ ...origin }, { ...destination });
     this.cancelRouteRequests();
     this.routes.set([]);
     this.requestedRouteCategories.set([]);
@@ -617,6 +635,7 @@ export class TripGoRouteDialogComponent implements OnInit {
           return;
         }
         this.state.set('ready');
+        this.saveRouteSession();
         this.loadServiceDetails(this.routes());
       },
       error: () => {
@@ -685,6 +704,7 @@ export class TripGoRouteDialogComponent implements OnInit {
         })
       }));
       this.routes.set(enrichedRoutes);
+      this.saveRouteSession();
       const selectedRouteId = this.selectedRoute()?.id;
       if (selectedRouteId) {
         this.selectedRoute.set(enrichedRoutes.find((route) => route.id === selectedRouteId) || null);
@@ -700,6 +720,7 @@ export class TripGoRouteDialogComponent implements OnInit {
   }
 
   private resetRouteResults(): void {
+    this.routeSession.clear();
     this.cancelRouteRequests();
     this.routeMap?.stopSimulation();
     this.routes.set([]);
@@ -709,6 +730,21 @@ export class TripGoRouteDialogComponent implements OnInit {
     this.selectedRoute.set(null);
     this.simulationState.set('idle');
     this.state.set('idle');
+  }
+
+  private saveRouteSession(): void {
+    const origin = this.origin();
+    const routes = this.routes();
+    if (!origin || this.state() !== 'ready' || routes.length === 0) return;
+    this.routeSession.save({
+      origin,
+      destination: this.destination(),
+      originDetails: this.originDetails(),
+      destinationDetails: this.destinationDetails(),
+      routes,
+      requestedRouteCategories: this.requestedRouteCategories(),
+      expandedRouteIds: [...this.expandedRouteIds()]
+    });
   }
 
   private timelineConnectionStateBefore(

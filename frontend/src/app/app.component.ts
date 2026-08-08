@@ -1691,6 +1691,9 @@ export class AppComponent implements OnInit {
         routeOptionsChanged: (options: RouteOptions) => {
           this.routeOptions = normalizeRouteOptions(options);
           void this.indexedDbService.setSetting('routeOptions', this.routeOptions);
+        },
+        routePointsChanged: (_origin: Location, routeDestination: Location) => {
+          this.mapService.setMaplocation({ ...routeDestination });
         }
       },
       closeOnNavigation: true,
@@ -1753,6 +1756,7 @@ export class AppComponent implements OnInit {
 
     const origin = { ...this.pendingRouteOrigin };
     const destination = { ...this.pendingRouteDestination };
+    this.mapService.setMaplocation({ ...destination });
     this.pendingRouteOrigin = null;
     this.pendingRouteDestination = null;
     this.routePointMenuLocation = null;
