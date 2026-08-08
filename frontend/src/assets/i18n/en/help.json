@@ -2981,6 +2981,13 @@
       }
     }
   },
+  "routeOptions": {
+    "title": "Route options",
+    "intro": "Choose which route suggestions are calculated.",
+    "items": {
+      "variants": { "title": "Route suggestions", "desc": "Enable driving, cycling, walking, or flights independently. Only enabled variants are requested." }
+    }
+  },
   "locationShareContacts": {
     "title": "Share location with contacts",
     "intro": "Select one or more contacts. The location will be shared as a chat message.",

@@ -8,6 +8,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { Subscription, catchError, concatMap, forkJoin, from, map, of, switchMap } from 'rxjs';
 import { GetNominatimAddressResponse } from '../../interfaces/get-nominatim-address-response copy';
 import { Location } from '../../interfaces/location';
+import { DEFAULT_ROUTE_OPTIONS, RouteOptions, normalizeRouteOptions } from '../../interfaces/route-options';
 import { NominatimPlace } from '../../interfaces/nominatim-place';
 import { TripGoRouteCategory, TripGoRouteOption, TripGoRouteSegment } from '../../interfaces/tripgo';
 import { GeolocationService } from '../../services/geolocation.service';
@@ -31,9 +32,10 @@ import { TripGoTimelineWeatherComponent } from './tripgo-timeline-weather.compon
 
 export interface TripGoRouteDialogData {
   destination: Location;
+  routeOptions?: RouteOptions;
 }
 
-type RouteDialogState = 'locating' | 'routing' | 'ready' | 'arrived' | 'error';
+type RouteDialogState = 'idle' | 'locating' | 'routing' | 'ready' | 'arrived' | 'error';
 type RoutePointKind = 'origin' | 'destination';
 type TimelineLiveState = 'unavailable' | 'on-time' | 'delayed' | 'missed';
 
@@ -87,6 +89,7 @@ interface RoutePointDetails {
 export class TripGoRouteDialogComponent implements OnInit {
   @ViewChild(TripGoRouteMapComponent) private routeMap?: TripGoRouteMapComponent;
   private readonly data = inject<TripGoRouteDialogData>(MAT_DIALOG_DATA);
+  private readonly routeOptions = normalizeRouteOptions(this.data.routeOptions ?? DEFAULT_ROUTE_OPTIONS);
   private readonly dialogRef = inject(MatDialogRef<TripGoRouteDialogComponent>);
   private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);
@@ -121,14 +124,22 @@ export class TripGoRouteDialogComponent implements OnInit {
   readonly isBusy = computed(() => this.state() === 'locating' || this.state() === 'routing');
 
   ngOnInit(): void {
-    this.resolveRoutePoint('destination', this.destination());
-    this.calculateWithFreshLocation();
+    if (!this.isUnsetLocation(this.destination())) {
+      this.resolveRoutePoint('destination', this.destination());
+    }
+    this.locateFreshOrigin(false);
   }
 
   calculateWithFreshLocation(): void {
+    this.locateFreshOrigin(true);
+  }
+
+  private locateFreshOrigin(calculateRoute: boolean): void {
     this.cancelRouteRequests();
     this.showList();
     this.routes.set([]);
+    this.requestedRouteCategories.set([]);
+    this.loadingRouteCategories.set(new Set());
     this.state.set('locating');
     this.geolocation.getCurrentPosition({
       enableHighAccuracy: true,
@@ -143,7 +154,14 @@ export class TripGoRouteDialogComponent implements OnInit {
         };
         this.origin.set(origin);
         this.resolveRoutePoint('origin', origin);
-        this.loadRoutes(origin, this.destination());
+        if (this.isUnsetLocation(this.destination())) {
+          const destination = { ...origin };
+          this.destination.set(destination);
+          this.destinationDetails.set(null);
+          this.resolveRoutePoint('destination', destination);
+        }
+        if (calculateRoute) this.loadRoutes(origin, this.destination());
+        else this.state.set('idle');
       },
       error: (error: GeolocationPositionError | unknown) => {
         const code = typeof error === 'object' && error !== null && 'code' in error ? Number(error.code) : 0;
@@ -312,8 +330,7 @@ export class TripGoRouteDialogComponent implements OnInit {
       }
       this.showList();
       this.resolveRoutePoint(kind, location);
-      const origin = this.origin();
-      if (origin) this.loadRoutes(origin, this.destination());
+      this.resetRouteResults();
     });
   }
 
@@ -462,9 +479,14 @@ export class TripGoRouteDialogComponent implements OnInit {
     }
     this.state.set('routing');
     const locale = this.transloco.getActiveLang() || 'de';
-    const categories = distanceMeters >= MIN_FLIGHT_DISTANCE_METERS
-      ? [...ROUTE_CATEGORIES, FLIGHT_CATEGORY]
-      : ROUTE_CATEGORIES;
+    const categories = ROUTE_CATEGORIES.filter(({ category }) =>
+      category === 'car-transit' ? this.routeOptions.car
+        : category === 'bicycle-transit' ? this.routeOptions.bicycle
+          : this.routeOptions.walking
+    );
+    if (this.routeOptions.flights && distanceMeters >= MIN_FLIGHT_DISTANCE_METERS) {
+      categories.push(FLIGHT_CATEGORY);
+    }
     this.requestedRouteCategories.set(categories.map(({ category }) => category));
     this.loadingRouteCategories.set(new Set(categories.map(({ category }) => category)));
     let receivedResponse = false;
@@ -595,6 +617,18 @@ export class TripGoRouteDialogComponent implements OnInit {
     this.serviceDetailsSubscription = undefined;
   }
 
+  private resetRouteResults(): void {
+    this.cancelRouteRequests();
+    this.routeMap?.stopSimulation();
+    this.routes.set([]);
+    this.requestedRouteCategories.set([]);
+    this.loadingRouteCategories.set(new Set());
+    this.expandedRouteIds.set(new Set());
+    this.selectedRoute.set(null);
+    this.simulationState.set('idle');
+    this.state.set('idle');
+  }
+
   private timelineConnectionStateBefore(
     route: TripGoRouteOption,
     segmentIndex: number
@@ -710,6 +744,10 @@ export class TripGoRouteDialogComponent implements OnInit {
       plusCode: location.plusCode?.trim()
         || this.geolocation.getPlusCode(location.latitude, location.longitude)
     };
+  }
+
+  private isUnsetLocation(location: Location): boolean {
+    return location.latitude === 0 && location.longitude === 0;
   }
 
   private isNestedInteractiveElement(event: Event): boolean {

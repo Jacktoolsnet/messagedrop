@@ -131,6 +131,7 @@
       "appSettings": "Paramètres de l'application",
       "usageProtectionSettings": "Protection d'usage",
       "searchSettings": "Paramètres de recherche",
+      "routeOptions": "Options d’itinéraire",
       "externalContentSettings": "Paramètres des contenus externes",
       "restoreBackup": "Restaurer la sauvegarde",
       "termsOfService": "Conditions d'utilisation",
@@ -1719,6 +1720,18 @@
         "myExperiences": "Mes expériences",
         "wikipedia": "Articles Wikipédia",
         "publicTransportStops": "Arrêts de transport public"
+      }
+    },
+    "routeOptions": {
+      "title": "Options d’itinéraire",
+      "subtitle": "Modes de transport des itinéraires proposés",
+      "variants": {
+        "title": "Propositions d’itinéraires",
+        "description": "Choisissez les variantes proposées lors du calcul d’un itinéraire.",
+        "car": "Afficher l’itinéraire en voiture",
+        "bicycle": "Afficher l’itinéraire à vélo",
+        "walking": "Afficher l’itinéraire à pied",
+        "flights": "Afficher les liaisons aériennes"
       }
     },
     "wikipedia": {

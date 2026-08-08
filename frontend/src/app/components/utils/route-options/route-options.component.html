@@ -1,0 +1,36 @@
+<app-dialog-header icon="tune" [title]="'common.routeOptions.title' | transloco"
+  [subtitle]="'common.routeOptions.subtitle' | transloco"></app-dialog-header>
+
+<mat-dialog-content class="route-options-content">
+  <section class="option-tile" aria-labelledby="route-variants-title">
+    <div class="tile-header">
+      <mat-icon aria-hidden="true">route</mat-icon>
+      <h3 id="route-variants-title">{{ 'common.routeOptions.variants.title' | transloco }}</h3>
+    </div>
+    <p>{{ 'common.routeOptions.variants.description' | transloco }}</p>
+
+    <div class="toggle-list">
+      <mat-slide-toggle [(ngModel)]="options.car">
+        <span class="option-label"><mat-icon aria-hidden="true">directions_car</mat-icon>{{ 'common.routeOptions.variants.car' | transloco }}</span>
+      </mat-slide-toggle>
+      <mat-slide-toggle [(ngModel)]="options.bicycle">
+        <span class="option-label"><mat-icon aria-hidden="true">directions_bike</mat-icon>{{ 'common.routeOptions.variants.bicycle' | transloco }}</span>
+      </mat-slide-toggle>
+      <mat-slide-toggle [(ngModel)]="options.walking">
+        <span class="option-label"><mat-icon aria-hidden="true">directions_walk</mat-icon>{{ 'common.routeOptions.variants.walking' | transloco }}</span>
+      </mat-slide-toggle>
+      <mat-slide-toggle [(ngModel)]="options.flights">
+        <span class="option-label"><mat-icon aria-hidden="true">flight</mat-icon>{{ 'common.routeOptions.variants.flights' | transloco }}</span>
+      </mat-slide-toggle>
+    </div>
+  </section>
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button cdkFocusInitial type="button" mat-icon-button class="action-close" (click)="cancel()"
+    [attr.aria-label]="'common.actions.abort' | transloco"><mat-icon>close</mat-icon></button>
+  <button type="button" mat-icon-button (click)="help.open('routeOptions')"
+    [attr.aria-label]="'common.actions.help' | transloco"><mat-icon>help</mat-icon></button>
+  <button type="button" mat-icon-button color="primary" (click)="apply()"
+    [attr.aria-label]="'common.actions.apply' | transloco"><mat-icon>check</mat-icon></button>
+</mat-dialog-actions>

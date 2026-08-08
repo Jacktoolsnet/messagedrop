@@ -2981,6 +2981,13 @@
       }
     }
   },
+  "routeOptions": {
+    "title": "Routenoptionen",
+    "intro": "Hier bestimmst du, welche Routenvorschläge berechnet werden.",
+    "items": {
+      "variants": { "title": "Routenvorschläge", "desc": "Aktiviere Auto, Fahrrad, Fußweg oder Flugverbindungen unabhängig voneinander. Nur aktivierte Varianten werden angefragt." }
+    }
+  },
   "locationShareContacts": {
     "title": "Ort mit Kontakten teilen",
     "intro": "Wähle einen oder mehrere Kontakte aus. Der Ort wird als Nachricht im Chat geteilt.",

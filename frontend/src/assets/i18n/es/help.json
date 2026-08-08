@@ -2963,6 +2963,13 @@
       }
     }
   },
+  "routeOptions": {
+    "title": "Opciones de ruta",
+    "intro": "Elige qué sugerencias de ruta se calculan.",
+    "items": {
+      "variants": { "title": "Sugerencias de ruta", "desc": "Activa de forma independiente coche, bicicleta, a pie o avión. Solo se solicitan las variantes activas." }
+    }
+  },
   "locationShareContacts": {
     "title": "Compartir ubicación con contactos",
     "intro": "Selecciona uno o varios contactos. La ubicación se compartirá como mensaje en el chat.",

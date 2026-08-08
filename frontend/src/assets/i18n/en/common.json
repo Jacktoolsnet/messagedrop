@@ -131,6 +131,7 @@
       "appSettings": "App settings",
       "usageProtectionSettings": "Usage protection",
       "searchSettings": "Search settings",
+      "routeOptions": "Route options",
       "externalContentSettings": "External content settings",
       "restoreBackup": "Restore backup",
       "faq": "FAQ",
@@ -1720,6 +1721,18 @@
         "myExperiences": "My experiences",
         "wikipedia": "Wikipedia articles",
         "publicTransportStops": "Public transport stops"
+      }
+    },
+    "routeOptions": {
+      "title": "Route options",
+      "subtitle": "Transport modes for route suggestions",
+      "variants": {
+        "title": "Route suggestions",
+        "description": "Choose which variants should be offered when calculating a route.",
+        "car": "Show driving route",
+        "bicycle": "Show bicycle route",
+        "walking": "Show walking route",
+        "flights": "Show flight connections"
       }
     },
     "wikipedia": {

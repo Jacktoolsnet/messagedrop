@@ -89,6 +89,11 @@
       <mat-spinner diameter="40"></mat-spinner>
       <p>{{ 'common.tripGo.locating' | transloco }}</p>
     </div>
+  } @else if (state() === 'idle') {
+    <div class="status" role="status">
+      <mat-icon>route</mat-icon>
+      <p>{{ 'common.tripGo.readyToCalculate' | transloco }}</p>
+    </div>
   } @else if (state() === 'arrived') {
     <article class="route-message-tile" role="status">
       <span class="route-message-tile__icon" aria-hidden="true">
@@ -420,9 +425,10 @@
         [attr.aria-label]="'common.actions.help' | transloco">
         <mat-icon>help</mat-icon>
       </button>
-      <button mat-icon-button color="primary" type="button" (click)="calculateWithFreshLocation()"
-        [disabled]="isBusy()" [attr.aria-label]="'common.tripGo.refresh' | transloco">
-        <mat-icon>refresh</mat-icon>
+      <button mat-flat-button color="primary" type="button" (click)="calculateWithFreshLocation()"
+        [disabled]="isBusy()" [attr.aria-label]="'common.tripGo.calculateRoute' | transloco">
+        <mat-icon>route</mat-icon>
+        <span>{{ 'common.tripGo.calculateRoute' | transloco }}</span>
       </button>
     }
   </span>

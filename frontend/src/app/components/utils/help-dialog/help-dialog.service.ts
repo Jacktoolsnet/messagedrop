@@ -991,6 +991,18 @@ const HELP_TOPICS = {
       }
     ]
   },
+  routeOptions: {
+    titleKey: 'routeOptions.title',
+    introKey: 'routeOptions.intro',
+    items: [
+      {
+        icon: 'route',
+        titleKey: 'routeOptions.items.variants.title',
+        descriptionKey: 'routeOptions.items.variants.desc'
+      },
+      ...STANDARD_ACTIONS
+    ]
+  },
   tripGoRoute: {
     titleKey: 'tripGoRoute.title',
     introKey: 'tripGoRoute.intro',

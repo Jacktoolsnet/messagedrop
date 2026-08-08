@@ -131,6 +131,7 @@
       "appSettings": "Ajustes de la aplicación",
       "usageProtectionSettings": "Protección de uso",
       "searchSettings": "Ajustes de búsqueda",
+      "routeOptions": "Opciones de ruta",
       "externalContentSettings": "Ajustes de contenido externo",
       "restoreBackup": "Restaurar copia de seguridad",
       "termsOfService": "Términos de servicio",
@@ -1719,6 +1720,18 @@
         "myExperiences": "Mis experiencias",
         "wikipedia": "Artículos de Wikipedia",
         "publicTransportStops": "Paradas de transporte público"
+      }
+    },
+    "routeOptions": {
+      "title": "Opciones de ruta",
+      "subtitle": "Medios de transporte para las rutas sugeridas",
+      "variants": {
+        "title": "Sugerencias de ruta",
+        "description": "Elige qué variantes se ofrecerán al calcular una ruta.",
+        "car": "Mostrar ruta en coche",
+        "bicycle": "Mostrar ruta en bicicleta",
+        "walking": "Mostrar ruta a pie",
+        "flights": "Mostrar conexiones aéreas"
       }
     },
     "wikipedia": {

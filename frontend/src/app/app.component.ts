@@ -55,6 +55,7 @@ import { HashtagSearchComponent, HashtagSearchResult } from './components/utils/
 import { HelpDialogService } from './components/utils/help-dialog/help-dialog.service';
 import { NominatimSearchComponent } from './components/utils/nominatim-search/nominatim-search.component';
 import { SearchSettingsComponent } from './components/utils/search-settings/search-settings.component';
+import { RouteOptionsComponent } from './components/utils/route-options/route-options.component';
 import { WeatherComponent } from './components/weather/weather.component';
 import { WikipediaListComponent } from './components/wikipedia-list/wikipedia-list.component';
 import { WikipediaSearchComponent } from './components/utils/wikipedia-search/wikipedia-search.component';
@@ -76,6 +77,12 @@ import { NotificationAction } from './interfaces/notification-action';
 import { Place } from './interfaces/place';
 import { PlusCodeArea } from './interfaces/plus-code-area';
 import { DEFAULT_SEARCH_SETTINGS, SearchSettings } from './interfaces/search-settings';
+import {
+  DEFAULT_ROUTE_OPTIONS,
+  RouteOptions,
+  hasEnabledRouteVariant,
+  normalizeRouteOptions
+} from './interfaces/route-options';
 import { TripGoStop } from './interfaces/tripgo';
 import { SharedContent } from './interfaces/shared-content';
 import { SecretDrop } from './interfaces/secret-drop';
@@ -177,6 +184,7 @@ export class AppComponent implements OnInit {
   locationSubscriptionError = false;
   isPartOfPlace = false;
   private searchSettings: SearchSettings = structuredClone(DEFAULT_SEARCH_SETTINGS);
+  private routeOptions: RouteOptions = structuredClone(DEFAULT_ROUTE_OPTIONS);
   private readonly mapSearchDebounceMs = Math.max(0, environment.mapSearchDebounceMs ?? 0);
   private moveEndDebounceTimer?: ReturnType<typeof setTimeout>;
 
@@ -509,6 +517,7 @@ export class AppComponent implements OnInit {
     await this.usageProtectionService.init();
     await this.userService.preloadVapidPublicKey();
     await this.loadSearchSettings();
+    await this.loadRouteOptions();
   }
 
   public ngOnInit(): void {
@@ -1658,8 +1667,20 @@ export class AppComponent implements OnInit {
       return;
     }
 
+    if (!hasEnabledRouteVariant(this.routeOptions)) {
+      this.openRouteOptions(true, destination);
+      return;
+    }
+
+    this.openRouteDialog(destination);
+  }
+
+  private openRouteDialog(destination: Location): void {
     this.dialog.open(TripGoRouteDialogComponent, {
-      data: { destination: { ...destination } },
+      data: {
+        destination: { ...destination },
+        routeOptions: structuredClone(this.routeOptions)
+      },
       closeOnNavigation: true,
       width: '95vw',
       height: '95vh',
@@ -1669,6 +1690,29 @@ export class AppComponent implements OnInit {
       backdropClass: 'dialog-backdrop',
       disableClose: false,
       autoFocus: false
+    });
+  }
+
+  public openRouteOptions(startNavigation = false, destination?: Location): void {
+    const dialogRef = this.dialog.open(RouteOptionsComponent, {
+      data: { options: structuredClone(this.routeOptions) },
+      closeOnNavigation: true,
+      width: '760px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe(async (options?: RouteOptions) => {
+      if (!options) return;
+      this.routeOptions = normalizeRouteOptions(options);
+      await this.indexedDbService.setSetting('routeOptions', this.routeOptions);
+      if (startNavigation && destination && hasEnabledRouteVariant(this.routeOptions)) {
+        this.openRouteDialog(destination);
+      }
     });
   }
 
@@ -1778,6 +1822,11 @@ export class AppComponent implements OnInit {
   private async loadSearchSettings(): Promise<void> {
     const stored = await this.indexedDbService.getSetting<SearchSettings>('searchSettings');
     this.searchSettings = this.normalizeSearchSettings(stored ?? DEFAULT_SEARCH_SETTINGS);
+  }
+
+  private async loadRouteOptions(): Promise<void> {
+    const stored = await this.indexedDbService.getSetting<RouteOptions>('routeOptions');
+    this.routeOptions = normalizeRouteOptions(stored);
   }
 
   private normalizeSearchSettings(settings?: SearchSettings): SearchSettings {
