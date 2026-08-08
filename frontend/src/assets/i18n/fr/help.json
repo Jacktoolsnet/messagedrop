@@ -2863,11 +2863,11 @@
     "items": {
       "location": {
         "title": "Déterminer la position",
-        "desc": "Une nouvelle demande de localisation précise est lancée à chaque ouverture ou actualisation. Nominatim ajoute des informations adaptées sur le lieu et l’adresse du départ et de la destination."
+        "desc": "À l’ouverture, la position actuelle précise est insérée une fois comme départ. Elle ne change ensuite que via l’icône de position. Nominatim complète les informations de lieu et d’adresse."
       },
       "routePoints": {
         "title": "Modifier le départ ou la destination",
-        "desc": "Utilisez le crayon de chaque tuile pour ouvrir la recherche de lieu. Après la sélection, l’itinéraire est recalculé avec le nouveau départ ou la nouvelle destination."
+        "desc": "Touchez une tuile ou le crayon pour modifier le point. L’icône de position insère volontairement votre position actuelle et le bouton central inverse le départ et la destination. Le calcul ne commence qu’avec « Calculer l’itinéraire »."
       },
       "routes": {
         "title": "Trajets",

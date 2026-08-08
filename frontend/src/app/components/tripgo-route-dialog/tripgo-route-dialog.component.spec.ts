@@ -94,9 +94,9 @@ describe('TripGoRouteDialogComponent', () => {
 
   it('calculates routes only after the explicit action', () => {
     fixture.detectChanges();
-    fixture.componentInstance.calculateWithFreshLocation();
+    fixture.componentInstance.calculateRoute();
 
-    expect(geolocation.getCurrentPosition).toHaveBeenCalledTimes(2);
+    expect(geolocation.getCurrentPosition).toHaveBeenCalledTimes(1);
     expect(tripGo.calculateRoute).toHaveBeenCalledTimes(4);
     expect(tripGo.calculateRoute.calls.allArgs().some((args) =>
       args[0].latitude === 52.52
@@ -119,7 +119,7 @@ describe('TripGoRouteDialogComponent', () => {
     });
 
     fixture.detectChanges();
-    fixture.componentInstance.calculateWithFreshLocation();
+    fixture.componentInstance.calculateRoute();
 
     expect(fixture.componentInstance.state()).toBe('arrived');
     expect(fixture.componentInstance.routes()).toEqual([]);
@@ -132,7 +132,7 @@ describe('TripGoRouteDialogComponent', () => {
     });
 
     fixture.detectChanges();
-    fixture.componentInstance.calculateWithFreshLocation();
+    fixture.componentInstance.calculateRoute();
 
     expect(tripGo.calculateRoute.calls.allArgs().some((args) =>
       args[3].join(',') === 'in_air,pt_pub')).toBeTrue();
@@ -152,6 +152,31 @@ describe('TripGoRouteDialogComponent', () => {
     fixture.componentInstance.editRoutePoint('destination');
 
     expect(fixture.componentInstance.destination()).toEqual(destination);
+    expect(tripGo.calculateRoute).not.toHaveBeenCalled();
+    expect(fixture.componentInstance.state()).toBe('idle');
+  });
+
+  it('keeps a manually selected origin when calculating', () => {
+    fixture.detectChanges();
+    const oslo = { latitude: 59.911, longitude: 10.752, plusCode: '9FFGWP62+C2' };
+    dialog.open.and.returnValue({ afterClosed: () => of(oslo) } as MatDialogRef<unknown>);
+
+    fixture.componentInstance.editRoutePoint('origin');
+    fixture.componentInstance.calculateRoute();
+
+    expect(geolocation.getCurrentPosition).toHaveBeenCalledTimes(1);
+    expect(tripGo.calculateRoute.calls.allArgs().every((args) => args[0].latitude === oslo.latitude)).toBeTrue();
+  });
+
+  it('swaps origin and destination without calculating automatically', () => {
+    fixture.detectChanges();
+    const previousOrigin = fixture.componentInstance.origin()!;
+    const previousDestination = fixture.componentInstance.destination();
+
+    fixture.componentInstance.swapRoutePoints();
+
+    expect(fixture.componentInstance.origin()).toEqual(previousDestination);
+    expect(fixture.componentInstance.destination()).toEqual(previousOrigin);
     expect(tripGo.calculateRoute).not.toHaveBeenCalled();
     expect(fixture.componentInstance.state()).toBe('idle');
   });

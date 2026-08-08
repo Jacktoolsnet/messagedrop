@@ -2881,11 +2881,11 @@
     "items": {
       "location": {
         "title": "Standort ermitteln",
-        "desc": "Bei jedem Öffnen und Aktualisieren wird eine neue Standortabfrage mit hoher Genauigkeit gestartet. Nominatim ergänzt passende Orts- und Adressinformationen für Start und Ziel."
+        "desc": "Beim Öffnen wird der aktuelle Standort einmal mit hoher Genauigkeit als Start eingesetzt. Danach ändert er sich nur noch über das Standort-Symbol. Nominatim ergänzt Orts- und Adressinformationen."
       },
       "routePoints": {
         "title": "Start oder Ziel ändern",
-        "desc": "Mit dem Bleistift im jeweiligen Tile öffnest du die Ortssuche. Nach der Auswahl wird die Route mit dem neuen Start oder Ziel erneut berechnet."
+        "desc": "Tippe auf ein Orts-Tile oder den Bleistift, um den Punkt zu bearbeiten. Das Standort-Symbol setzt gezielt die aktuelle Position ein, der mittlere Button tauscht Start und Ziel. Änderungen bleiben erhalten; berechnet wird erst über „Route berechnen“."
       },
       "routes": {
         "title": "Verbindungen",

@@ -2881,11 +2881,11 @@
     "items": {
       "location": {
         "title": "Get location",
-        "desc": "A new high-accuracy location request runs whenever the dialog opens or refreshes. Nominatim adds suitable place and address information for the start and destination."
+        "desc": "When the dialog opens, the current high-accuracy location is inserted once as the origin. It changes afterwards only via the location icon. Nominatim adds place and address information."
       },
       "routePoints": {
         "title": "Change start or destination",
-        "desc": "Use the pencil in either tile to open the location search. After selection, the route is recalculated with the new start or destination."
+        "desc": "Tap a location tile or the pencil to edit it. The location icon deliberately inserts your current position, while the middle button swaps origin and destination. Calculation starts only via “Calculate route”."
       },
       "routes": {
         "title": "Connections",

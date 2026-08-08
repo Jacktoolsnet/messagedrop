@@ -31,11 +31,17 @@
           <mat-icon aria-hidden="true">my_location</mat-icon>
           {{ 'common.tripGo.origin' | transloco }}
         </span>
-        <button mat-icon-button type="button" (click)="editRoutePoint('origin'); $event.stopPropagation()"
-          [disabled]="!origin() || state() === 'locating'"
-          [attr.aria-label]="'common.tripGo.editOrigin' | transloco">
-          <mat-icon>edit</mat-icon>
-        </button>
+        <span class="route-point__actions">
+          <button mat-icon-button type="button" (click)="useCurrentPosition('origin'); $event.stopPropagation()"
+            [disabled]="isBusy()" [attr.aria-label]="'common.tripGo.currentPositionAsOrigin' | transloco">
+            <mat-icon>my_location</mat-icon>
+          </button>
+          <button mat-icon-button type="button" (click)="editRoutePoint('origin'); $event.stopPropagation()"
+            [disabled]="!origin() || state() === 'locating'"
+            [attr.aria-label]="'common.tripGo.editOrigin' | transloco">
+            <mat-icon>edit</mat-icon>
+          </button>
+        </span>
       </header>
       <div class="route-point__body">
         @if (origin()) {
@@ -53,6 +59,11 @@
       </div>
     </article>
 
+    <button mat-icon-button type="button" class="route-points__swap" (click)="swapRoutePoints()"
+      [disabled]="!origin() || isBusy()" [attr.aria-label]="'common.tripGo.swapRoutePoints' | transloco">
+      <mat-icon>swap_horiz</mat-icon>
+    </button>
+
     <article class="route-point route-point--action" role="button"
       [attr.tabindex]="state() === 'locating' ? -1 : 0"
       [attr.aria-disabled]="state() === 'locating'"
@@ -65,11 +76,17 @@
           <mat-icon aria-hidden="true">location_on</mat-icon>
           {{ 'common.tripGo.destination' | transloco }}
         </span>
-        <button mat-icon-button type="button" (click)="editRoutePoint('destination'); $event.stopPropagation()"
-          [disabled]="state() === 'locating'"
-          [attr.aria-label]="'common.tripGo.editDestination' | transloco">
-          <mat-icon>edit</mat-icon>
-        </button>
+        <span class="route-point__actions">
+          <button mat-icon-button type="button" (click)="useCurrentPosition('destination'); $event.stopPropagation()"
+            [disabled]="isBusy()" [attr.aria-label]="'common.tripGo.currentPositionAsDestination' | transloco">
+            <mat-icon>my_location</mat-icon>
+          </button>
+          <button mat-icon-button type="button" (click)="editRoutePoint('destination'); $event.stopPropagation()"
+            [disabled]="state() === 'locating'"
+            [attr.aria-label]="'common.tripGo.editDestination' | transloco">
+            <mat-icon>edit</mat-icon>
+          </button>
+        </span>
       </header>
       <div class="route-point__body">
         @if (destinationDetails(); as details) {
@@ -429,8 +446,8 @@
         [attr.aria-label]="'common.actions.help' | transloco">
         <mat-icon>help</mat-icon>
       </button>
-      <button mat-flat-button color="primary" type="button" (click)="calculateWithFreshLocation()"
-        [disabled]="isBusy()" [attr.aria-label]="'common.tripGo.calculateRoute' | transloco">
+      <button mat-flat-button color="primary" type="button" (click)="calculateRoute()"
+        [disabled]="isBusy() || !origin()" [attr.aria-label]="'common.tripGo.calculateRoute' | transloco">
         <mat-icon>route</mat-icon>
         <span>{{ 'common.tripGo.calculateRoute' | transloco }}</span>
       </button>

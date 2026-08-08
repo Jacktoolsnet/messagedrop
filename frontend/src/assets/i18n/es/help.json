@@ -2863,11 +2863,11 @@
     "items": {
       "location": {
         "title": "Obtener ubicación",
-        "desc": "Se realiza una nueva solicitud de ubicación de alta precisión al abrir o actualizar. Nominatim añade información adecuada del lugar y la dirección para el inicio y el destino."
+        "desc": "Al abrir, la ubicación actual de alta precisión se inserta una vez como origen. Después solo cambia mediante el icono de ubicación. Nominatim añade la información del lugar y la dirección."
       },
       "routePoints": {
         "title": "Cambiar inicio o destino",
-        "desc": "Usa el lápiz de cada tarjeta para abrir la búsqueda de lugares. Tras elegir, la ruta se vuelve a calcular con el nuevo inicio o destino."
+        "desc": "Toca un mosaico o el lápiz para editar el punto. El icono de ubicación inserta deliberadamente tu posición actual y el botón central intercambia origen y destino. El cálculo solo comienza mediante «Calcular ruta»."
       },
       "routes": {
         "title": "Conexiones",

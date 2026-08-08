@@ -145,6 +145,10 @@ export class TripGoRouteDialogComponent implements OnInit {
     this.routes.set([]);
     this.requestedRouteCategories.set([]);
     this.loadingRouteCategories.set(new Set());
+    this.expandedRouteIds.set(new Set());
+    this.selectedRoute.set(null);
+    this.routeMap?.stopSimulation();
+    this.simulationState.set('idle');
     this.state.set('locating');
     this.geolocation.getCurrentPosition({
       enableHighAccuracy: true,
