@@ -4,6 +4,7 @@ import { BoundingBox } from '../interfaces/bounding-box';
 import { Location } from '../interfaces/location';
 import { MarkerLocation } from '../interfaces/marker-location';
 import { MarkerType } from '../interfaces/marker-type';
+import { TripGoStop } from '../interfaces/tripgo';
 import { GeolocationService } from './geolocation.service';
 
 const messageMarker = leaflet.icon({
@@ -69,11 +70,83 @@ const wikipediaMarker = leaflet.icon({
   iconAnchor: [16, 40],
 });
 
-const publicTransportStopMarker = leaflet.icon({
-  iconUrl: 'assets/markers/transport-marker.svg',
-  iconSize: [32, 40],
-  iconAnchor: [16, 40],
-});
+function publicTransportStopMarker(stop: TripGoStop): leaflet.DivIcon {
+  const icons = publicTransportIcons(stop);
+  if (icons.length === 1) {
+    return leaflet.divIcon({
+      className: 'public-transport-stop-marker-host',
+      html: `<svg class="public-transport-stop-marker" viewBox="0 0 32 40" aria-hidden="true">
+        <image href="assets/markers/empty-marker.svg" x="0" y="0" width="32" height="40" />
+        <text class="material-symbols-outlined public-transport-stop-marker__icon public-transport-stop-marker__icon--single"
+          x="16" y="10">${icons[0]}</text>
+      </svg>`,
+      iconSize: [32, 40],
+      iconAnchor: [16, 40]
+    });
+  }
+
+  const markerExtensionHeight = (icons.length - 1) * 20;
+  const markerHeight = 40 + markerExtensionHeight;
+  const markerSplitY = 16.4;
+  const markerLowerHeight = 40 - markerSplitY;
+  const iconElements = icons.map((icon, index) =>
+    `<text class="material-symbols-outlined public-transport-stop-marker__icon" x="16" y="${10 + index * 20}">${icon}</text>`
+  ).join('');
+  return leaflet.divIcon({
+    className: 'public-transport-stop-marker-host',
+    html: `<svg class="public-transport-stop-marker" viewBox="0 0 32 ${markerHeight}" aria-hidden="true">
+      <rect class="public-transport-stop-marker__extension-border"
+        x="0" y="${markerSplitY}" width="32" height="${markerExtensionHeight}" />
+      <rect class="public-transport-stop-marker__extension-background"
+        x="3.1" y="${markerSplitY}" width="25.8" height="${markerExtensionHeight}" />
+      <svg x="0" y="0" width="32" height="${markerSplitY}"
+        viewBox="0 0 32 ${markerSplitY}" preserveAspectRatio="none" overflow="hidden">
+        <image href="assets/markers/empty-marker.svg" x="0" y="0" width="32" height="40" />
+      </svg>
+      <svg x="0" y="${markerSplitY + markerExtensionHeight}" width="32" height="${markerLowerHeight}"
+        viewBox="0 ${markerSplitY} 32 ${markerLowerHeight}" preserveAspectRatio="none" overflow="hidden">
+        <image href="assets/markers/empty-marker.svg" x="0" y="0" width="32" height="40" />
+      </svg>
+      ${iconElements}
+    </svg>`,
+    iconSize: [32, markerHeight],
+    iconAnchor: [16, markerHeight]
+  });
+}
+
+function publicTransportIcons(stop: TripGoStop): string[] {
+  const identifiers = stop.modeIdentifiers.map((value) => value.toLowerCase());
+  const apiIcons = (stop.modeIcons ?? []).map((value) => value.toLowerCase());
+  const labels = [...stop.modeLabels, ...stop.stopTypes].map((value) => value.toLowerCase());
+  const values = [...identifiers, ...apiIcons, ...labels];
+  const icons: string[] = [];
+  const add = (condition: boolean, icon: string) => {
+    if (condition && !icons.includes(icon)) icons.push(icon);
+  };
+
+  add(values.some((value) => value.includes('bus') || value.includes('coach')), 'directions_bus');
+  add(values.some((value) => value.includes('tram') || value.includes('streetcar')), 'tram');
+  add(values.some((value) => value.includes('subway') || value.includes('metro') || value.includes('u-bahn')), 'subway');
+
+  const hasSuburbanRail = values.some((value) => value.includes('s-bahn')
+    || value.includes('suburban')
+    || value.includes('train-germany-s'));
+  const railApiIcons = apiIcons.filter((value) => value.includes('train') || value.includes('rail'));
+  const hasExplicitOtherRail = railApiIcons.some((value) => !value.includes('train-germany-s'))
+    || (railApiIcons.length === 0 && labels.some((value) =>
+      (value.includes('train') || value.includes('rail') || value.includes('zug'))
+      && !value.includes('s-bahn')
+      && !value.includes('suburban')));
+  const hasGenericRail = identifiers.some((value) => value.includes('train') || value.includes('rail'));
+  add(hasSuburbanRail, 'train');
+  add(hasExplicitOtherRail || (hasGenericRail && !hasSuburbanRail && railApiIcons.length === 0), 'directions_railway');
+
+  add(values.some((value) => value.includes('ferry') || value.includes('boat')), 'directions_boat');
+  add(values.some((value) => value.includes('funicular')), 'funicular');
+  add(values.some((value) => value.includes('gondola') || value.includes('cablecar')), 'gondola_lift');
+
+  return icons.length ? icons : ['directions_transit'];
+}
 @Injectable({
   providedIn: 'root'
 })
@@ -441,7 +514,14 @@ export class MapService {
       case MarkerType.WIKIPEDIA:
         return leaflet.marker(latLng, { icon: wikipediaMarker, zIndexOffset: 10 });
       case MarkerType.PUBLIC_TRANSPORT_STOP:
-        return leaflet.marker(latLng, { icon: publicTransportStopMarker, zIndexOffset: 16 });
+        return markerLocation.publicTransportStop
+          ? leaflet.marker(latLng, {
+            icon: publicTransportStopMarker(markerLocation.publicTransportStop),
+            zIndexOffset: 16,
+            title: markerLocation.publicTransportStop.name,
+            alt: markerLocation.publicTransportStop.name
+          })
+          : null;
       default:
         return null;
     }

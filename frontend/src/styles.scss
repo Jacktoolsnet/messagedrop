@@ -888,6 +888,40 @@ h2[mat-dialog-title].dialog-title {
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
+/* Dynamic public-transport stop markers rendered by Leaflet. */
+.public-transport-stop-marker-host {
+  --public-transport-marker-color: #5f6368;
+  --public-transport-marker-background: #fcfcfc;
+  border: 0;
+  background: transparent;
+}
+
+.public-transport-stop-marker {
+  display: block;
+  overflow: visible;
+  filter: drop-shadow(0 3px 4px color-mix(in srgb, var(--mat-sys-shadow) 45%, transparent));
+}
+
+.public-transport-stop-marker__extension-border {
+  fill: var(--public-transport-marker-color);
+}
+
+.public-transport-stop-marker__extension-background {
+  fill: var(--public-transport-marker-background);
+}
+
+.public-transport-stop-marker__icon {
+  color: var(--public-transport-marker-color);
+  fill: var(--public-transport-marker-color);
+  font-size: 18px;
+  text-anchor: middle;
+  dominant-baseline: hanging;
+}
+
+.public-transport-stop-marker__icon--single {
+  font-size: 18px;
+}
+
 /* Ensure dialog titles don't wrap across the app. */
 h2[mat-dialog-title].dialog-title .dialog-title__text {
   white-space: nowrap;

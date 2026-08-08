@@ -54,6 +54,7 @@ function normalizeLocationsResponse(payload, region, bounds) {
         coordinateCount: 0,
         region: stop.region || region,
         modeIdentifiers: new Set(),
+        modeIcons: new Set(),
         modeLabels: new Set(),
         stopTypes: new Set(),
         services: new Set(),
@@ -66,6 +67,7 @@ function normalizeLocationsResponse(payload, region, bounds) {
     group.longitude = ((group.longitude * group.coordinateCount) + stop.longitude) / (group.coordinateCount + 1);
     group.coordinateCount += 1;
     if (stop.modeIdentifier) group.modeIdentifiers.add(stop.modeIdentifier);
+    if (stop.modeIcon) group.modeIcons.add(stop.modeIcon);
     if (stop.modeLabel) group.modeLabels.add(stop.modeLabel);
     if (stop.stopType) group.stopTypes.add(stop.stopType);
     stop.services.forEach((service) => group.services.add(service));
@@ -82,6 +84,7 @@ function normalizeLocationsResponse(payload, region, bounds) {
       longitude: roundCoordinate(group.longitude),
       region: group.region,
       modeIdentifiers: [...group.modeIdentifiers].sort(),
+      modeIcons: [...group.modeIcons].sort(),
       modeLabels: [...group.modeLabels].sort(),
       stopTypes: [...group.stopTypes].sort(),
       services: [...group.services].sort(naturalCompare),
@@ -120,6 +123,7 @@ function normalizeStop(stop) {
     stopCode,
     platform: cleanString(stop.platform || inferPlatform(stopCode)),
     modeIdentifier: cleanString(stop.publicTransportMode || stop.modeInfo?.identifier),
+    modeIcon: cleanString(stop.modeInfo?.remoteIcon || stop.modeInfo?.localIcon),
     modeLabel: cleanString(stop.modeInfo?.alt),
     stopType: cleanString(stop.stopType),
     services: [...new Set(services)],

@@ -180,6 +180,7 @@ export interface TripGoStop {
   longitude: number;
   region: string;
   modeIdentifiers: string[];
+  modeIcons?: string[];
   modeLabels: string[];
   stopTypes: string[];
   services: string[];

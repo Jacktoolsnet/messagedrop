@@ -32,7 +32,7 @@ test('normalizes and combines platforms of the same stop', () => {
     name: 'Halchter, Bernardusring',
     stopCode: 'de:03158:1744:0:1',
     services: '794',
-    modeInfo: { identifier: 'pt_pub_bus', alt: 'Bus' },
+    modeInfo: { identifier: 'pt_pub_bus', alt: 'Bus', localIcon: 'bus' },
     publicTransportMode: 'pt_pub_bus',
     stopType: 'bus',
     operators: [{ id: 'operator', name: 'KVG Braunschweig' }]
@@ -44,7 +44,7 @@ test('normalizes and combines platforms of the same stop', () => {
     name: 'Halchter, Bernardusring',
     stopCode: 'de:03158:1744:0:2',
     services: '794, 795',
-    modeInfo: { identifier: 'pt_pub_bus', alt: 'Bus' },
+    modeInfo: { identifier: 'pt_pub_bus', alt: 'Bus', localIcon: 'bus' },
     publicTransportMode: 'pt_pub_bus',
     stopType: 'bus',
     operators: [{ id: 'operator', name: 'KVG Braunschweig' }]
@@ -52,6 +52,7 @@ test('normalizes and combines platforms of the same stop', () => {
     latMin: 52.13, lonMin: 10.53, latMax: 52.15, lonMax: 10.55
   }]);
   assert.equal(data.stops.length, 1);
+  assert.deepEqual(data.stops[0].modeIcons, ['bus']);
   assert.deepEqual(data.stops[0].services, ['794', '795']);
   assert.deepEqual(data.stops[0].platforms.map((platform) => platform.platform), ['1', '2']);
 });
