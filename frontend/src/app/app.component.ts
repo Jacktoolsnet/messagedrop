@@ -1,11 +1,11 @@
 import { formatDate, PlatformLocation } from '@angular/common';
-import { Component, computed, DestroyRef, effect, inject, LOCALE_ID, OnInit, signal, untracked, ChangeDetectionStrategy } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, LOCALE_ID, OnInit, signal, untracked, ChangeDetectionStrategy, ViewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { MatMenuModule } from '@angular/material/menu';
+import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Meta, Title } from '@angular/platform-browser';
@@ -66,6 +66,7 @@ import { LocalImage } from './interfaces/local-image';
 import { Location } from './interfaces/location';
 import { MaintenanceInfo } from './interfaces/maintenance';
 import { MarkerLocation } from './interfaces/marker-location';
+import { MapContextMenuEvent } from './interfaces/map-context-menu-event';
 import { MarkerType } from './interfaces/marker-type';
 import { Message } from './interfaces/message';
 import { Mode } from './interfaces/mode';
@@ -171,6 +172,7 @@ const Q_STAGE_WARNING_SESSION_KEY = 'messagedrop.qStageWarningSeen';
 })
 
 export class AppComponent implements OnInit {
+  @ViewChild('routePointMenuTrigger') private routePointMenuTrigger?: MatMenuTrigger;
   private readonly destroyRef = inject(DestroyRef);
   private readonly transloco = inject(TranslocoService);
   locationReady = false;
@@ -185,6 +187,10 @@ export class AppComponent implements OnInit {
   isPartOfPlace = false;
   private searchSettings: SearchSettings = structuredClone(DEFAULT_SEARCH_SETTINGS);
   private routeOptions: RouteOptions = structuredClone(DEFAULT_ROUTE_OPTIONS);
+  public pendingRouteOrigin: Location | null = null;
+  public pendingRouteDestination: Location | null = null;
+  public routePointMenuPosition = { x: 0, y: 0 };
+  private routePointMenuLocation: Location | null = null;
   private readonly mapSearchDebounceMs = Math.max(0, environment.mapSearchDebounceMs ?? 0);
   private moveEndDebounceTimer?: ReturnType<typeof setTimeout>;
 
@@ -1675,10 +1681,12 @@ export class AppComponent implements OnInit {
     this.openRouteDialog(destination);
   }
 
-  private openRouteDialog(destination: Location): void {
+  private openRouteDialog(destination: Location, origin?: Location, calculateImmediately = false): void {
     this.dialog.open(TripGoRouteDialogComponent, {
       data: {
         destination: { ...destination },
+        origin: origin ? { ...origin } : undefined,
+        calculateImmediately,
         routeOptions: structuredClone(this.routeOptions),
         routeOptionsChanged: (options: RouteOptions) => {
           this.routeOptions = normalizeRouteOptions(options);
@@ -1697,7 +1705,12 @@ export class AppComponent implements OnInit {
     });
   }
 
-  public openRouteOptions(startNavigation = false, destination?: Location): void {
+  public openRouteOptions(
+    startNavigation = false,
+    destination?: Location,
+    origin?: Location,
+    calculateImmediately = false
+  ): void {
     const dialogRef = this.dialog.open(RouteOptionsComponent, {
       data: { options: structuredClone(this.routeOptions) },
       closeOnNavigation: true,
@@ -1715,9 +1728,40 @@ export class AppComponent implements OnInit {
       this.routeOptions = normalizeRouteOptions(options);
       await this.indexedDbService.setSetting('routeOptions', this.routeOptions);
       if (startNavigation && destination && hasEnabledRouteVariant(this.routeOptions)) {
-        this.openRouteDialog(destination);
+        this.openRouteDialog(destination, origin, calculateImmediately);
       }
     });
+  }
+
+  public openRoutePointMenu(event: MapContextMenuEvent): void {
+    this.routePointMenuLocation = { ...event.location };
+    this.routePointMenuPosition = { x: event.clientX, y: event.clientY };
+    this.routePointMenuTrigger?.closeMenu();
+    setTimeout(() => this.routePointMenuTrigger?.openMenu());
+  }
+
+  public setPendingRoutePoint(kind: 'origin' | 'destination'): void {
+    if (!this.routePointMenuLocation) return;
+    const location = { ...this.routePointMenuLocation };
+    if (kind === 'origin') {
+      this.pendingRouteOrigin = location;
+    } else {
+      this.pendingRouteDestination = location;
+    }
+
+    if (!this.pendingRouteOrigin || !this.pendingRouteDestination) return;
+
+    const origin = { ...this.pendingRouteOrigin };
+    const destination = { ...this.pendingRouteDestination };
+    this.pendingRouteOrigin = null;
+    this.pendingRouteDestination = null;
+    this.routePointMenuLocation = null;
+
+    if (!hasEnabledRouteVariant(this.routeOptions)) {
+      this.openRouteOptions(true, destination, origin, true);
+      return;
+    }
+    this.openRouteDialog(destination, origin, true);
   }
 
   private async updateDataForLocation() {

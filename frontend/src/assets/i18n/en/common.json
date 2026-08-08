@@ -166,6 +166,8 @@
       "title": "Calculate route",
       "origin": "Start",
       "destination": "Destination",
+      "setAsOrigin": "Set as start",
+      "setAsDestination": "Set as destination",
       "currentWeather": "Current weather: {{ temperature }} degrees Celsius",
       "simulation": {
         "start": "Start journey simulation",

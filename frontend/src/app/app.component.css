@@ -7,6 +7,18 @@
     transition: transform 0.25s ease, filter 0.25s ease;
 }
 
+.route-point-menu-trigger {
+    position: fixed;
+    z-index: 1;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
 
 .button_app {
     position: absolute;

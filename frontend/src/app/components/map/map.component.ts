@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Location } from '../../interfaces/location';
 import { MarkerLocation } from '../../interfaces/marker-location';
+import { MapContextMenuEvent } from '../../interfaces/map-context-menu-event';
 import { MapService } from '../../services/map.service';
 import { UserService } from '../../services/user.service';
 
@@ -22,6 +23,7 @@ export class MapComponent implements AfterViewInit, OnChanges, OnDestroy {
   @Output() moveEndEvent = new EventEmitter<Location>();
   @Output() markerClickEvent = new EventEmitter<MarkerLocation>();
   @Output() searchSettingsClickEvent = new EventEmitter<void>();
+  @Output() contextMenuEvent = new EventEmitter<MapContextMenuEvent>();
 
   private readonly mapService = inject(MapService);
   readonly userService = inject(UserService);
@@ -52,7 +54,8 @@ export class MapComponent implements AfterViewInit, OnChanges, OnDestroy {
       this.clickEvent,
       this.moveEndEvent,
       this.markerClickEvent,
-      this.searchSettingsClickEvent
+      this.searchSettingsClickEvent,
+      this.contextMenuEvent
     );
   }
 

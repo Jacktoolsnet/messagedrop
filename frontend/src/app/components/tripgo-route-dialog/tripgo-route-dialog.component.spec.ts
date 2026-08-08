@@ -97,7 +97,7 @@ describe('TripGoRouteDialogComponent', () => {
     fixture.componentInstance.calculateRoute();
 
     expect(geolocation.getCurrentPosition).toHaveBeenCalledTimes(1);
-    expect(tripGo.calculateRoute).toHaveBeenCalledTimes(4);
+    expect(tripGo.calculateRoute).toHaveBeenCalledTimes(6);
     expect(tripGo.calculateRoute.calls.allArgs().some((args) =>
       args[0].latitude === 52.52
       && args[1].latitude === 52.515
@@ -109,6 +109,30 @@ describe('TripGoRouteDialogComponent', () => {
       args[3].join(',') === 'wa_wal')).toBeTrue();
     expect(tripGo.calculateRoute.calls.allArgs().some((args) => args[3].includes('in_air'))).toBeFalse();
     expect(fixture.componentInstance.state()).toBe('ready');
+  });
+
+  it('rejects a route that starts far away from the selected origin and tries the fallback', () => {
+    const disconnectedRoute: TripGoRouteOption = {
+      id: 'snapped-to-mainland', groupIndex: 0,
+      departureTime: '2026-08-08T17:30:00Z', arrivalTime: '2026-08-08T17:40:00Z',
+      durationSeconds: 600, transfers: 0, modes: ['me_car'],
+      segments: [{
+        id: 'car', modeIdentifier: 'me_car', geometry: ['encoded'],
+        from: { latitude: 52.51, longitude: 13.39 },
+        to: { latitude: 52.515, longitude: 13.395 }
+      }]
+    };
+    tripGo.calculateRoute.and.callFake((_origin, _destination, _locale, modes) => of({
+      routes: modes.join(',') === 'me_car' ? [disconnectedRoute] : [],
+      meta: { groups: 1, totalRoutes: 1, returnedRoutes: 1 }
+    }));
+
+    fixture.detectChanges();
+    fixture.componentInstance.calculateRoute();
+
+    expect(fixture.componentInstance.routes()).toEqual([]);
+    expect(tripGo.calculateRoute.calls.allArgs().some((args) =>
+      args[3].join(',') === 'me_car,pt_pub')).toBeTrue();
   });
 
   it('does not request a route when the destination has already been reached', () => {

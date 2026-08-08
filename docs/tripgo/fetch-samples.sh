@@ -130,6 +130,25 @@ if [[ "${TRIPGO_FETCH_OSLO_ROUTES:-1}" == "1" ]]; then
     "${oslo_from_lat}" "${oslo_from_lng}" "${oslo_to_lat}" "${oslo_to_lng}" "en" "wa_wal"
 fi
 
+if [[ "${TRIPGO_FETCH_OSLO_ISLAND_ROUTES:-0}" == "1" ]]; then
+  # Hovedøya has no road connection to the mainland. These variants reveal
+  # whether TripGo rejects private vehicles, combines them with the ferry, or
+  # returns an unusable straight-line segment without navigable geometry.
+  island_lat="59.89891"
+  island_lng="10.73074"
+  oslo_s_lat="59.9109"
+  oslo_s_lng="10.7522"
+
+  fetch_diagnostic_route "oslo-hovedoya-oslo-s-car" \
+    "${island_lat}" "${island_lng}" "${oslo_s_lat}" "${oslo_s_lng}" "en" "me_car"
+  fetch_diagnostic_route "oslo-hovedoya-oslo-s-car-transit" \
+    "${island_lat}" "${island_lng}" "${oslo_s_lat}" "${oslo_s_lng}" "en" "me_car,pt_pub"
+  fetch_diagnostic_route "oslo-hovedoya-oslo-s-bicycle" \
+    "${island_lat}" "${island_lng}" "${oslo_s_lat}" "${oslo_s_lng}" "en" "me_mic_bic"
+  fetch_diagnostic_route "oslo-hovedoya-oslo-s-bicycle-transit" \
+    "${island_lat}" "${island_lng}" "${oslo_s_lat}" "${oslo_s_lng}" "en" "me_mic_bic,pt_pub"
+fi
+
 fetch_region_diagnostics() {
   local region="$1"
 

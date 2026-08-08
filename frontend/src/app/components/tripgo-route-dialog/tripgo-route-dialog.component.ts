@@ -10,7 +10,7 @@ import { GetNominatimAddressResponse } from '../../interfaces/get-nominatim-addr
 import { Location } from '../../interfaces/location';
 import { DEFAULT_ROUTE_OPTIONS, RouteOptions, normalizeRouteOptions } from '../../interfaces/route-options';
 import { NominatimPlace } from '../../interfaces/nominatim-place';
-import { TripGoRouteCategory, TripGoRouteOption, TripGoRouteSegment } from '../../interfaces/tripgo';
+import { TripGoRouteCategory, TripGoRouteOption, TripGoRouteSegment, TripGoRoutingResult } from '../../interfaces/tripgo';
 import { GeolocationService } from '../../services/geolocation.service';
 import { NominatimService } from '../../services/nominatim.service';
 import { TripGoService } from '../../services/tripgo.service';
@@ -33,6 +33,8 @@ import { TripGoTimelineWeatherComponent } from './tripgo-timeline-weather.compon
 
 export interface TripGoRouteDialogData {
   destination: Location;
+  origin?: Location;
+  calculateImmediately?: boolean;
   routeOptions?: RouteOptions;
   routeOptionsChanged?: (options: RouteOptions) => void;
 }
@@ -64,6 +66,7 @@ const FLIGHT_CATEGORY: RouteCategoryConfig = {
 };
 
 const DESTINATION_REACHED_RADIUS_METERS = 50;
+const MAX_ROUTE_ENDPOINT_SNAP_METERS = 250;
 const MIN_FLIGHT_DISTANCE_METERS = 300_000;
 
 interface RoutePointDetails {
@@ -128,6 +131,16 @@ export class TripGoRouteDialogComponent implements OnInit {
   ngOnInit(): void {
     if (!this.isUnsetLocation(this.destination())) {
       this.resolveRoutePoint('destination', this.destination());
+    }
+    if (this.data.origin && !this.isUnsetLocation(this.data.origin)) {
+      const origin = this.withPlusCode(this.data.origin);
+      this.origin.set(origin);
+      this.resolveRoutePoint('origin', origin);
+      this.state.set('idle');
+      if (this.data.calculateImmediately) {
+        this.calculateRoute();
+      }
+      return;
     }
     this.useCurrentPosition('origin', true);
   }
@@ -537,14 +550,16 @@ export class TripGoRouteDialogComponent implements OnInit {
       const bicycleOnly = distanceMeters <= this.routeOptions.bicyclePureMaxKm * 1_000;
       categories.push({
         category: 'bicycle-transit',
-        primaryModes: bicycleOnly ? ['me_mic_bic'] : ['me_mic_bic', 'pt_pub']
+        primaryModes: bicycleOnly ? ['me_mic_bic'] : ['me_mic_bic', 'pt_pub'],
+        fallbackModes: bicycleOnly ? ['me_mic_bic', 'pt_pub'] : undefined
       });
     }
     if (this.routeOptions.walking) {
       const walkingOnly = distanceMeters <= this.routeOptions.walkingPureMaxKm * 1_000;
       categories.push({
         category: 'walk-transit',
-        primaryModes: walkingOnly ? ['wa_wal'] : ['wa_wal', 'pt_pub']
+        primaryModes: walkingOnly ? ['wa_wal'] : ['wa_wal', 'pt_pub'],
+        fallbackModes: walkingOnly ? ['wa_wal', 'pt_pub'] : undefined
       });
     }
     if (this.routeOptions.flights && distanceMeters >= MIN_FLIGHT_DISTANCE_METERS) {
@@ -560,10 +575,14 @@ export class TripGoRouteDialogComponent implements OnInit {
       concatMap(({ category, primaryModes, fallbackModes }) =>
         this.tripGo.calculateRoute(origin, destination, locale, primaryModes).pipe(
         catchError(() => of(null)),
+        map((result) => this.filterDisconnectedRoutes(result, origin, destination)),
         switchMap((result) => result?.routes.length || !fallbackModes
           ? of(result)
           : this.tripGo.calculateRoute(origin, destination, locale, fallbackModes)
-            .pipe(catchError(() => of(null)))),
+            .pipe(
+              catchError(() => of(null)),
+              map((fallbackResult) => this.filterDisconnectedRoutes(fallbackResult, origin, destination))
+            )),
         map((result) => ({ category, result }))
         )),
       takeUntilDestroyed(this.destroyRef)
@@ -747,6 +766,36 @@ export class TripGoRouteDialogComponent implements OnInit {
     const haversine = Math.sin(latitudeDelta / 2) ** 2
       + Math.cos(firstLatitude) * Math.cos(secondLatitude) * Math.sin(longitudeDelta / 2) ** 2;
     return 2 * earthRadiusMeters * Math.asin(Math.sqrt(haversine));
+  }
+
+  private filterDisconnectedRoutes(
+    result: TripGoRoutingResult | null,
+    origin: Location,
+    destination: Location
+  ): TripGoRoutingResult | null {
+    if (!result) return null;
+    return {
+      ...result,
+      routes: result.routes.filter((route) => this.routeConnectsSelectedPoints(route, origin, destination))
+    };
+  }
+
+  private routeConnectsSelectedPoints(
+    route: TripGoRouteOption,
+    origin: Location,
+    destination: Location
+  ): boolean {
+    const firstLocation = route.segments.find((segment) =>
+      Number.isFinite(segment.from?.latitude) && Number.isFinite(segment.from?.longitude))?.from;
+    const lastLocation = [...route.segments].reverse().find((segment) =>
+      Number.isFinite(segment.to?.latitude) && Number.isFinite(segment.to?.longitude))?.to;
+    const startsNearby = !firstLocation || this.distanceInMeters(origin, {
+      latitude: Number(firstLocation.latitude), longitude: Number(firstLocation.longitude), plusCode: ''
+    }) <= MAX_ROUTE_ENDPOINT_SNAP_METERS;
+    const endsNearby = !lastLocation || this.distanceInMeters(destination, {
+      latitude: Number(lastLocation.latitude), longitude: Number(lastLocation.longitude), plusCode: ''
+    }) <= MAX_ROUTE_ENDPOINT_SNAP_METERS;
+    return startsNearby && endsNearby;
   }
 
   private resolveRoutePoint(kind: RoutePointKind, location: Location): void {

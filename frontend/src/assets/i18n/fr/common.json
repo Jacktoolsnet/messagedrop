@@ -165,6 +165,8 @@
       "title": "Calculer l’itinéraire",
       "origin": "Départ",
       "destination": "Destination",
+      "setAsOrigin": "Définir comme départ",
+      "setAsDestination": "Définir comme destination",
       "currentWeather": "Météo actuelle : {{ temperature }} degrés Celsius",
       "simulation": {
         "start": "Démarrer la simulation du trajet",

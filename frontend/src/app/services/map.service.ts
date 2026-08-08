@@ -3,6 +3,7 @@ import * as leaflet from 'leaflet';
 import { BoundingBox } from '../interfaces/bounding-box';
 import { Location } from '../interfaces/location';
 import { MarkerLocation } from '../interfaces/marker-location';
+import { MapContextMenuEvent } from '../interfaces/map-context-menu-event';
 import { MarkerType } from '../interfaces/marker-type';
 import { TripGoStop } from '../interfaces/tripgo';
 import { GeolocationService } from './geolocation.service';
@@ -181,7 +182,8 @@ export class MapService {
     clickEvent: EventEmitter<Location>,
     moveEndEvent: EventEmitter<Location>,
     markerClickEvent: EventEmitter<MarkerLocation>,
-    searchSettingsClickEvent: EventEmitter<void>
+    searchSettingsClickEvent: EventEmitter<void>,
+    contextMenuEvent: EventEmitter<MapContextMenuEvent>
   ): void {
     this.markerClickEvent = markerClickEvent;
 
@@ -198,7 +200,8 @@ export class MapService {
     this.map = leaflet.map('map', {
       center: [location.latitude, location.longitude],
       zoom: 3,
-      worldCopyJump: true
+      worldCopyJump: true,
+      tapHold: true
     });
 
     this.addZoomLevelButton(searchSettingsClickEvent);
@@ -206,12 +209,69 @@ export class MapService {
     this.map.setMaxBounds([[-90, -180], [90, 180]]);
     this.setCircleMarker();
 
+    let suppressNextMapClick = false;
+    let longPressTimer: ReturnType<typeof setTimeout> | undefined;
+    let longPressStart: leaflet.Point | undefined;
+    const cancelLongPress = () => {
+      if (longPressTimer) clearTimeout(longPressTimer);
+      longPressTimer = undefined;
+      longPressStart = undefined;
+    };
+    const suppressFollowingClick = () => {
+      suppressNextMapClick = true;
+      setTimeout(() => suppressNextMapClick = false, 1_000);
+    };
+    const emitContextMenu = (event: leaflet.LeafletMouseEvent) => {
+      event.originalEvent?.preventDefault();
+      const originalEvent = event.originalEvent as MouseEvent | undefined;
+      const mapContainerBounds = this.map?.getContainer().getBoundingClientRect();
+      const location: Location = {
+        latitude: event.latlng.lat,
+        longitude: event.latlng.lng,
+        plusCode: this.geolocationService.getPlusCode(event.latlng.lat, event.latlng.lng)
+      };
+      contextMenuEvent.emit({
+        location,
+        clientX: Number.isFinite(originalEvent?.clientX) ? originalEvent!.clientX : (mapContainerBounds?.left ?? 0) + event.containerPoint.x,
+        clientY: Number.isFinite(originalEvent?.clientY) ? originalEvent!.clientY : (mapContainerBounds?.top ?? 0) + event.containerPoint.y
+      });
+    };
+
     this.map.on('click', (event: leaflet.LeafletMouseEvent) => {
+      if (suppressNextMapClick) {
+        suppressNextMapClick = false;
+        return;
+      }
       this.location.latitude = event.latlng.lat;
       this.location.longitude = event.latlng.lng;
       this.location.plusCode = this.geolocationService.getPlusCode(event.latlng.lat, event.latlng.lng);
       clickEvent.emit(this.location);
     });
+
+    // Leaflet maps a long touch to `contextmenu`; on desktop this also makes
+    // the same action conveniently available via the right mouse button.
+    this.map.on('contextmenu', (event: leaflet.LeafletMouseEvent) => {
+      cancelLongPress();
+      suppressFollowingClick();
+      emitContextMenu(event);
+    });
+
+    // Leaflet has no desktop equivalent for tap-and-hold, so add one while
+    // still cancelling it as soon as the user starts dragging the map.
+    this.map.on('mousedown', (event: leaflet.LeafletMouseEvent) => {
+      if ((event.originalEvent as MouseEvent | undefined)?.button !== 0) return;
+      cancelLongPress();
+      longPressStart = event.containerPoint;
+      longPressTimer = setTimeout(() => {
+        suppressFollowingClick();
+        emitContextMenu(event);
+        cancelLongPress();
+      }, 600);
+    });
+    this.map.on('mousemove', (event: leaflet.LeafletMouseEvent) => {
+      if (longPressStart && event.containerPoint.distanceTo(longPressStart) > 8) cancelLongPress();
+    });
+    this.map.on('mouseup mouseout dragstart', cancelLongPress);
 
     this.map.on('zoomstart', () => {
       if (this.map) {

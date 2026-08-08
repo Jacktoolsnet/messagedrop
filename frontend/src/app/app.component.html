@@ -7,8 +7,27 @@
     [markerLocations]="markerLocations" [zoomLevelButtonLabel]="'common.menu.searchSettings' | transloco"
     (clickEvent)="handleClickEvent($event)" (moveEndEvent)="handleMoveEndEvent()"
     (searchSettingsClickEvent)="openSearchSettings()"
+    (contextMenuEvent)="openRoutePointMenu($event)"
     (markerClickEvent)="handleMarkerClickEvent($event)">
 </app-map>
+
+<button #routePointMenuTrigger="matMenuTrigger" class="route-point-menu-trigger"
+    [style.left.px]="routePointMenuPosition.x" [style.top.px]="routePointMenuPosition.y"
+    [matMenuTriggerFor]="routePointMenu" tabindex="-1" aria-hidden="true"></button>
+<mat-menu #routePointMenu="matMenu">
+    @if (!pendingRouteOrigin) {
+    <button mat-menu-item (click)="setPendingRoutePoint('origin')">
+        <mat-icon>trip_origin</mat-icon>
+        <span>{{ 'common.tripGo.setAsOrigin' | transloco }}</span>
+    </button>
+    }
+    @if (!pendingRouteDestination) {
+    <button mat-menu-item (click)="setPendingRoutePoint('destination')">
+        <mat-icon>flag</mat-icon>
+        <span>{{ 'common.tripGo.setAsDestination' | transloco }}</span>
+    </button>
+    }
+</mat-menu>
 
 @if (usageProtectionLocked()) {
 <div class="usage-protection-overlay" role="dialog" aria-modal="true" [attr.aria-label]="'common.usageProtection.title' | transloco">
