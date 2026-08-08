@@ -326,6 +326,8 @@
       "minutesShort": "Min.",
       "scheduled": "Fahrplan",
       "scheduledAt": "Planmäßig",
+      "current": "Aktuell",
+      "deviation": "Abweichung",
       "refreshDepartures": "Abfahrten aktualisieren",
       "modeGroups": {
         "bus": "Bus",

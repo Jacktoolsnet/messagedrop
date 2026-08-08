@@ -148,7 +148,22 @@ export class TripGoStopDialogComponent implements OnInit {
   }
 
   delayMinutes(departure: TripGoDeparture): number {
-    return Math.max(0, Math.round((departure.delaySeconds ?? 0) / 60));
+    return Math.round((departure.delaySeconds ?? 0) / 60);
+  }
+
+  scheduledTime(departure: TripGoDeparture): string {
+    return this.time(departure.scheduledDepartureTime || departure.departureTime);
+  }
+
+  signedDelayMinutes(departure: TripGoDeparture): string {
+    const minutes = this.delayMinutes(departure);
+    const sign = minutes > 0 ? '+' : minutes < 0 ? '−' : '±';
+    return `${sign}${Math.abs(minutes)}`;
+  }
+
+  delayState(departure: TripGoDeparture): 'early' | 'on-time' | 'late' {
+    const minutes = this.delayMinutes(departure);
+    return minutes > 0 ? 'late' : minutes < 0 ? 'early' : 'on-time';
   }
 
   close(): void {

@@ -80,29 +80,38 @@
               <div class="departure-row" [class.departure-row--cancelled]="departure.cancelled"
                 [class.departure-row--interactive]="canOpenDeparture(departure)"
                 (click)="openDeparture(departure)">
-                <span class="departure-time">
-                  <mat-icon aria-hidden="true">schedule</mat-icon>
-                  <strong>{{ time(departure.departureTime) }}</strong>
+                <span class="departure-times">
+                  <span class="departure-times__row"
+                    [attr.aria-label]="('common.tripGoStops.scheduledAt' | transloco) + ' ' + scheduledTime(departure)">
+                    <mat-icon aria-hidden="true">schedule</mat-icon>
+                    <strong>{{ scheduledTime(departure) }}</strong>
+                  </span>
+                  @if (departure.cancelled) {
+                    <span class="departure-times__row departure-times__row--cancelled">
+                      <mat-icon aria-hidden="true">event_busy</mat-icon>
+                      <strong>{{ 'common.tripGoStops.cancelled' | transloco }}</strong>
+                    </span>
+                  } @else if (departure.realTime) {
+                    <span class="departure-times__row departure-times__row--current"
+                      [attr.aria-label]="('common.tripGoStops.current' | transloco) + ' ' + time(departure.departureTime)">
+                      <mat-icon aria-hidden="true">sensors</mat-icon>
+                      <strong>{{ time(departure.departureTime) }}</strong>
+                    </span>
+                    <span class="departure-times__row departure-times__row--difference"
+                      [class.departure-times__row--early]="delayState(departure) === 'early'"
+                      [class.departure-times__row--on-time]="delayState(departure) === 'on-time'"
+                      [class.departure-times__row--late]="delayState(departure) === 'late'"
+                      [attr.aria-label]="('common.tripGoStops.deviation' | transloco) + ' '
+                        + signedDelayMinutes(departure) + ' ' + ('common.tripGoStops.minutesShort' | transloco)">
+                      <mat-icon aria-hidden="true">more_time</mat-icon>
+                      <strong>{{ signedDelayMinutes(departure) }}</strong>
+                    </span>
+                  }
                 </span>
                 <span class="departure-info">
                   <strong>{{ group.direction || ('common.tripGoStops.unknownDirection' | transloco) }}</strong>
-                  @if (departure.cancelled) {
-                    <strong class="status status--cancelled">{{ 'common.tripGoStops.cancelled' | transloco }}</strong>
-                  } @else if (departure.realTime) {
-                    <span class="status status--live">
-                      {{ 'common.tripGoStops.live' | transloco }}
-                      @if (delayMinutes(departure) > 0) {
-                        · +{{ delayMinutes(departure) }} {{ 'common.tripGoStops.minutesShort' | transloco }}
-                      }
-                    </span>
-                  }
                   @if (departure.platform) {
                     <small>{{ 'common.tripGoStops.platform' | transloco }} {{ departure.platform }}</small>
-                  }
-                  @if (departure.realTime && departure.scheduledDepartureTime
-                    && departure.scheduledDepartureTime !== departure.departureTime) {
-                    <small>{{ 'common.tripGoStops.scheduledAt' | transloco }}
-                      {{ time(departure.scheduledDepartureTime) }}</small>
                   }
                   @for (alert of departure.alerts; track alert) {
                     <small class="departure-alert"><mat-icon aria-hidden="true">warning</mat-icon>{{ alert }}</small>
@@ -132,7 +141,37 @@
                     <article class="line-card" [class.line-card--selected]="selectedGroup()?.key === group.key"
                       [style.border-left-color]="group.color || null" (click)="selectGroup(group)">
                       <div class="line-card__heading">
-                        <span class="line-symbol"><mat-icon aria-hidden="true">{{ modeIcon(group) }}</mat-icon></span>
+                        <span class="departure-times departure-times--compact">
+                          <span class="departure-times__row"
+                            [attr.aria-label]="('common.tripGoStops.scheduledAt' | transloco) + ' '
+                              + scheduledTime(group.departures[0])">
+                            <mat-icon aria-hidden="true">schedule</mat-icon>
+                            <strong>{{ scheduledTime(group.departures[0]) }}</strong>
+                          </span>
+                          @if (group.departures[0].cancelled) {
+                            <span class="departure-times__row departure-times__row--cancelled">
+                              <mat-icon aria-hidden="true">event_busy</mat-icon>
+                              <strong>{{ 'common.tripGoStops.cancelled' | transloco }}</strong>
+                            </span>
+                          } @else if (group.departures[0].realTime) {
+                            <span class="departure-times__row departure-times__row--current"
+                              [attr.aria-label]="('common.tripGoStops.current' | transloco) + ' '
+                                + time(group.departures[0].departureTime)">
+                              <mat-icon aria-hidden="true">sensors</mat-icon>
+                              <strong>{{ time(group.departures[0].departureTime) }}</strong>
+                            </span>
+                            <span class="departure-times__row departure-times__row--difference"
+                              [class.departure-times__row--early]="delayState(group.departures[0]) === 'early'"
+                              [class.departure-times__row--on-time]="delayState(group.departures[0]) === 'on-time'"
+                              [class.departure-times__row--late]="delayState(group.departures[0]) === 'late'"
+                              [attr.aria-label]="('common.tripGoStops.deviation' | transloco) + ' '
+                                + signedDelayMinutes(group.departures[0]) + ' '
+                                + ('common.tripGoStops.minutesShort' | transloco)">
+                              <mat-icon aria-hidden="true">more_time</mat-icon>
+                              <strong>{{ signedDelayMinutes(group.departures[0]) }}</strong>
+                            </span>
+                          }
+                        </span>
                         <span class="line-card__title">
                           <strong>{{ group.line }}</strong>
                           @if (group.departures[0].platform) {
@@ -142,16 +181,12 @@
                             </small>
                           }
                           <small>{{ group.direction || ('common.tripGoStops.unknownDirection' | transloco) }}</small>
-                          <small class="line-card__departure">
-                            <mat-icon aria-hidden="true">schedule</mat-icon>
-                            {{ time(group.departures[0].departureTime) }}
-                          </small>
                         </span>
                         <button mat-icon-button color="primary" type="button"
                           (click)="$event.stopPropagation(); selectGroup(group)"
                           [attr.aria-label]="'common.tripGoStops.showDepartures' | transloco"
                           [attr.aria-pressed]="selectedGroup()?.key === group.key">
-                          <mat-icon>departure_board</mat-icon>
+                          <mat-icon>{{ modeIcon(group) }}</mat-icon>
                         </button>
                       </div>
                     </article>

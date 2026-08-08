@@ -326,6 +326,8 @@
       "minutesShort": "min",
       "scheduled": "Scheduled",
       "scheduledAt": "Scheduled",
+      "current": "Current",
+      "deviation": "Difference",
       "refreshDepartures": "Refresh departures",
       "modeGroups": {
         "bus": "Bus",

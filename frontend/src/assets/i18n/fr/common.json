@@ -325,6 +325,8 @@
       "minutesShort": "min",
       "scheduled": "Prévu",
       "scheduledAt": "Prévu",
+      "current": "Actuel",
+      "deviation": "Écart",
       "refreshDepartures": "Actualiser les départs",
       "modeGroups": {
         "bus": "Bus",
