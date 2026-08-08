@@ -44,6 +44,14 @@ export class TripGoStopDialogComponent implements OnInit {
   readonly detailFailed = signal(false);
   readonly groups = computed<DepartureGroup[]>(() => groupDepartures(this.departures()));
   readonly modeGroups = computed<DepartureModeGroup[]>(() => groupDepartureModes(this.groups()));
+  readonly headerIcon = computed(() => {
+    const modeGroups = this.modeGroups();
+    if (modeGroups.length === 1) return modeGroups[0].icon;
+    if (modeGroups.length > 1) return 'web_stories';
+    const stopIcons = stopModeIcons(this.stop);
+    if (stopIcons.length === 1) return stopIcons[0];
+    return stopIcons.length > 1 ? 'web_stories' : 'directions_transit';
+  });
   readonly selectedGroup = computed(() => {
     const groups = this.groups();
     return groups.find((group) => group.key === this.selectedKey()) ?? null;
@@ -251,4 +259,20 @@ function departureModeDescriptor(group: DepartureGroup): Omit<DepartureModeGroup
     return { key: 'bus', titleKey: 'common.tripGoStops.modeGroups.bus', icon: 'directions_bus' };
   }
   return { key: 'other', titleKey: 'common.tripGoStops.modeGroups.other', icon: 'directions_transit' };
+}
+
+function stopModeIcons(stop: TripGoStop): string[] {
+  const values = [...stop.modeIdentifiers, ...stop.modeLabels, ...stop.stopTypes]
+    .map((value) => value.toLowerCase());
+  const icons = new Set<string>();
+  if (values.some((value) => value.includes('bus') || value.includes('coach'))) icons.add('directions_bus');
+  if (values.some((value) => value.includes('tram') || value.includes('streetcar'))) icons.add('tram');
+  if (values.some((value) => value.includes('subway') || value.includes('metro'))) icons.add('subway');
+  if (values.some((value) => value.includes('train') || value.includes('rail') || value.includes('s-bahn'))) {
+    icons.add('train');
+  }
+  if (values.some((value) => value.includes('ferry') || value.includes('boat'))) icons.add('directions_boat');
+  if (values.some((value) => value.includes('funicular'))) icons.add('funicular');
+  if (values.some((value) => value.includes('gondola') || value.includes('cablecar'))) icons.add('gondola_lift');
+  return [...icons];
 }
