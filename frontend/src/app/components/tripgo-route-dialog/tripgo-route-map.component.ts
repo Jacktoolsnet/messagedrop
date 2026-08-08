@@ -13,9 +13,13 @@ import {
 import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import * as leaflet from 'leaflet';
+import { Subscription } from 'rxjs';
 import { Location } from '../../interfaces/location';
+import { DEFAULT_SEARCH_SETTINGS, SearchSettings } from '../../interfaces/search-settings';
 import { TripGoLocation, TripGoRouteOption, TripGoRouteSegment, TripGoStop, TripGoTurnInstruction } from '../../interfaces/tripgo';
+import { WikipediaArticle } from '../../interfaces/wikipedia';
 import { publicTransportStopMarker } from '../../services/map.service';
+import { WikipediaService } from '../../services/wikipedia.service';
 import { TripGoTimelineWeatherComponent } from './tripgo-timeline-weather.component';
 import {
   tripGoDisplayLocationName,
@@ -43,6 +47,17 @@ interface TripGoSimulationPoint {
   updateOverlay?: boolean;
   showOverlay: boolean;
 }
+
+interface WikipediaRouteAnchor {
+  location: TripGoLocation;
+  radiusMeters: number;
+}
+
+const wikipediaMarker = leaflet.icon({
+  iconUrl: 'assets/markers/wikipedia-marker.svg',
+  iconSize: [32, 40],
+  iconAnchor: [16, 40]
+});
 
 @Component({
   selector: 'app-tripgo-route-map',
@@ -127,13 +142,18 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
   @Input({ required: true }) route!: TripGoRouteOption;
   @Input({ required: true }) origin!: Location;
   @Input({ required: true }) destination!: Location;
+  @Input() searchSettings: SearchSettings = structuredClone(DEFAULT_SEARCH_SETTINGS);
+  @Input() walkingRadiusKm = 1;
   readonly pointSelected = output<TripGoRouteMapPointSelection>();
   readonly stopSelected = output<TripGoStop>();
+  readonly wikipediaSelected = output<WikipediaArticle[]>();
+  readonly searchSettingsClick = output<void>();
   readonly simulationStateChange = output<TripGoSimulationState>();
   readonly activeSimulationPoint = signal<TripGoSimulationPoint | null>(null);
 
   readonly mapId = `tripgo-route-map-${Math.random().toString(36).slice(2)}`;
   private readonly transloco = inject(TranslocoService);
+  private readonly wikipedia = inject(WikipediaService);
   private map?: leaflet.Map;
   private routeBounds?: leaflet.LatLngBounds;
   private simulationMarker?: leaflet.Marker;
@@ -146,6 +166,10 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
   private currentSimulationDelayMs = 3_000;
   private simulationState: TripGoSimulationState = 'idle';
   private viewInitialized = false;
+  private zoomLevelButton?: HTMLButtonElement;
+  private wikipediaMarkers: leaflet.Marker[] = [];
+  private wikipediaRequest?: Subscription;
+  private wikipediaLoadTimer?: ReturnType<typeof setTimeout>;
 
   ngAfterViewInit(): void {
     this.viewInitialized = true;
@@ -153,6 +177,9 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (this.viewInitialized && changes['searchSettings'] && !changes['route']) {
+      this.scheduleWikipediaLoad();
+    }
     if (!this.viewInitialized || !changes['route'] || changes['route'].firstChange) return;
     this.clearSimulationTimer();
     this.cancelSimulationAnimation();
@@ -162,6 +189,8 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     this.setSimulationState('idle');
     this.map?.remove();
     this.map = undefined;
+    this.cancelWikipediaLoad();
+    this.clearWikipediaMarkers();
     this.routeBounds = undefined;
     this.segmentGeometryDistanceCache.clear();
     this.segmentGeometryLocationsCache = undefined;
@@ -172,6 +201,8 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     this.clearSimulationTimer();
     this.cancelSimulationAnimation();
     this.removeSimulationMarker();
+    this.cancelWikipediaLoad();
+    this.clearWikipediaMarkers();
     this.map?.remove();
   }
 
@@ -339,6 +370,12 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     });
     this.map.setMaxBounds([[-90, -180], [90, 180]]);
     this.map.on('dragstart', () => this.pauseSimulation());
+    this.map.on('zoomend', () => {
+      this.updateZoomLevelButton();
+      this.scheduleWikipediaLoad();
+    });
+    this.map.on('moveend', () => this.scheduleWikipediaLoad());
+    this.addZoomLevelButton();
     const simulationPane = this.map.createPane('tripgoSimulationPane');
     simulationPane.style.zIndex = '1200';
     simulationPane.style.pointerEvents = 'none';
@@ -359,6 +396,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
       this.showEntireRoute();
     }
     setTimeout(() => this.map?.invalidateSize(), 0);
+    this.scheduleWikipediaLoad();
   }
 
   private createSimulationPoints(): TripGoSimulationPoint[] {
@@ -829,6 +867,151 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
       marker.bindTooltip(tooltip, { direction: 'top', offset: [0, -16] });
       bounds.extend([stop.latitude, stop.longitude]);
     }
+  }
+
+  private addZoomLevelButton(): void {
+    const container = this.map?.zoomControl.getContainer();
+    if (!container) return;
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'leaflet-control-zoom-level-button';
+    button.addEventListener('click', () => this.searchSettingsClick.emit());
+    leaflet.DomEvent.disableClickPropagation(button);
+    leaflet.DomEvent.disableScrollPropagation(button);
+    container.appendChild(button);
+    this.zoomLevelButton = button;
+    this.updateZoomLevelButton();
+  }
+
+  private updateZoomLevelButton(): void {
+    if (!this.map || !this.zoomLevelButton) return;
+    const zoomLevel = String(Math.round(this.map.getZoom())).padStart(2, '0');
+    const label = this.transloco.translate('common.menu.searchSettings');
+    this.zoomLevelButton.textContent = zoomLevel;
+    this.zoomLevelButton.title = label;
+    this.zoomLevelButton.setAttribute('aria-label', `${label}: ${zoomLevel}`);
+  }
+
+  private scheduleWikipediaLoad(): void {
+    if (this.wikipediaLoadTimer) clearTimeout(this.wikipediaLoadTimer);
+    this.wikipediaLoadTimer = setTimeout(() => this.loadWikipediaMarkers(), 200);
+  }
+
+  private loadWikipediaMarkers(): void {
+    this.wikipediaLoadTimer = undefined;
+    if (!this.map || !this.searchSettings.wikipedia.enabled
+      || this.map.getZoom() < this.searchSettings.wikipedia.minZoom) {
+      this.wikipediaRequest?.unsubscribe();
+      this.wikipediaRequest = undefined;
+      this.clearWikipediaMarkers();
+      return;
+    }
+    const bounds = this.map.getBounds();
+    if (bounds.getWest() > bounds.getEast()) return;
+    const anchors = this.wikipediaRouteAnchors();
+    if (!anchors.length) {
+      this.clearWikipediaMarkers();
+      return;
+    }
+    this.wikipediaRequest?.unsubscribe();
+    this.wikipediaRequest = this.wikipedia.getNearby({
+      north: bounds.getNorth(),
+      south: bounds.getSouth(),
+      east: bounds.getEast(),
+      west: bounds.getWest(),
+      zoom: Math.round(this.map.getZoom()),
+      language: this.transloco.getActiveLang() || 'de',
+      limit: 100
+    }).subscribe({
+      next: (response) => {
+        const articles = response.articles.filter((article) => anchors.some((anchor) =>
+          this.distanceInMeters(anchor.location, article) <= anchor.radiusMeters));
+        this.drawWikipediaMarkers(articles);
+      },
+      error: () => this.clearWikipediaMarkers()
+    });
+  }
+
+  private drawWikipediaMarkers(articles: WikipediaArticle[]): void {
+    this.clearWikipediaMarkers();
+    if (!this.map) return;
+    for (const article of articles) {
+      const marker = leaflet.marker([article.latitude, article.longitude], {
+        icon: wikipediaMarker,
+        title: article.title,
+        alt: article.title,
+        zIndexOffset: 1_500
+      }).addTo(this.map);
+      marker.on('click', (event) => {
+        leaflet.DomEvent.stopPropagation(event.originalEvent);
+        this.pauseSimulation();
+        this.wikipediaSelected.emit([article]);
+      });
+      const tooltip = document.createElement('span');
+      tooltip.textContent = article.title;
+      marker.bindTooltip(tooltip, { direction: 'top', offset: [0, -16] });
+      this.wikipediaMarkers.push(marker);
+    }
+  }
+
+  private clearWikipediaMarkers(): void {
+    for (const marker of this.wikipediaMarkers) marker.remove();
+    this.wikipediaMarkers = [];
+  }
+
+  private cancelWikipediaLoad(): void {
+    if (this.wikipediaLoadTimer) clearTimeout(this.wikipediaLoadTimer);
+    this.wikipediaLoadTimer = undefined;
+    this.wikipediaRequest?.unsubscribe();
+    this.wikipediaRequest = undefined;
+  }
+
+  private wikipediaRouteAnchors(): WikipediaRouteAnchor[] {
+    const walkingRadius = Math.max(250, this.walkingRadiusKm * 1_000);
+    const anchors: WikipediaRouteAnchor[] = [];
+    const addAnchor = (location: TripGoLocation | undefined, radiusMeters: number) => {
+      if (!this.validTripGoLocation(location)) return;
+      const existing = anchors.find((anchor) => this.distanceInMeters(anchor.location, location) < 25);
+      if (existing) {
+        existing.radiusMeters = Math.max(existing.radiusMeters, radiusMeters);
+      } else {
+        anchors.push({ location, radiusMeters });
+      }
+    };
+    addAnchor(this.origin, walkingRadius);
+    addAnchor(this.destination, walkingRadius);
+
+    for (const segment of this.route.segments) {
+      const icon = tripGoSegmentIcon(segment);
+      if (segment.type === 'scheduled' || segment.modeIdentifier?.startsWith('pt_')) {
+        addAnchor(segment.from, walkingRadius);
+        for (const stop of segment.service?.intermediateStops || []) addAnchor(stop, walkingRadius);
+        addAnchor(segment.to, walkingRadius);
+        continue;
+      }
+      if (icon === 'flight') {
+        addAnchor(segment.from, walkingRadius);
+        addAnchor(segment.to, walkingRadius);
+        continue;
+      }
+
+      const isWalking = icon === 'directions_walk';
+      const isBicycle = icon === 'directions_bike';
+      const radiusMeters = isWalking ? walkingRadius : isBicycle ? 1_500 : 3_000;
+      const intervalMeters = isWalking ? Math.max(1_000, walkingRadius * 1.5) : isBicycle ? 5_000 : 25_000;
+      const geometry = this.segmentGeometryLocations(segment).filter((point) => this.validTripGoLocation(point));
+      addAnchor(segment.from, radiusMeters);
+      let distanceSinceAnchor = 0;
+      for (let index = 1; index < geometry.length; index += 1) {
+        distanceSinceAnchor += this.distanceInMeters(geometry[index - 1], geometry[index]);
+        if (distanceSinceAnchor >= intervalMeters) {
+          addAnchor(geometry[index], radiusMeters);
+          distanceSinceAnchor = 0;
+        }
+      }
+      addAnchor(segment.to, radiusMeters);
+    }
+    return anchors;
   }
 
   private routePublicTransportStops(): TripGoStop[] {

@@ -12,8 +12,12 @@
           [route]="route"
           [origin]="start"
           [destination]="destination()"
+          [searchSettings]="searchSettings"
+          [walkingRadiusKm]="routeOptions.walkingPureMaxKm"
           (simulationStateChange)="simulationState.set($event)"
           (stopSelected)="showPublicTransportStop($event)"
+          (wikipediaSelected)="showWikipediaArticles($event)"
+          (searchSettingsClick)="openSearchSettings()"
           (pointSelected)="showRoutePointDetails($event)">
         </app-tripgo-route-map>
       }

@@ -1687,6 +1687,7 @@ export class AppComponent implements OnInit {
         destination: { ...destination },
         origin: origin ? { ...origin } : undefined,
         calculateImmediately,
+        searchSettings: structuredClone(this.searchSettings),
         routeOptions: structuredClone(this.routeOptions),
         routeOptionsChanged: (options: RouteOptions) => {
           this.routeOptions = normalizeRouteOptions(options);
@@ -1694,6 +1695,15 @@ export class AppComponent implements OnInit {
         },
         routePointsChanged: (_origin: Location, routeDestination: Location) => {
           this.mapService.setMaplocation({ ...routeDestination });
+        },
+        searchSettingsChanged: (settings: SearchSettings) => {
+          const normalized = this.normalizeSearchSettings(settings);
+          this.searchSettings = normalized;
+          void this.indexedDbService.setSetting('searchSettings', normalized);
+          void this.updateDataForLocation();
+        },
+        wikipediaArticlesSelected: (articles: WikipediaArticle[]) => {
+          void this.openMarkerWikipediaListDialog(articles);
         }
       },
       closeOnNavigation: true,

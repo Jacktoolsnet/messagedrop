@@ -9,6 +9,8 @@ import { Subscription, catchError, concatMap, forkJoin, from, map, of, switchMap
 import { GetNominatimAddressResponse } from '../../interfaces/get-nominatim-address-response copy';
 import { Location } from '../../interfaces/location';
 import { DEFAULT_ROUTE_OPTIONS, RouteOptions, normalizeRouteOptions } from '../../interfaces/route-options';
+import { DEFAULT_SEARCH_SETTINGS, SearchSettings } from '../../interfaces/search-settings';
+import { WikipediaArticle } from '../../interfaces/wikipedia';
 import { NominatimPlace } from '../../interfaces/nominatim-place';
 import { TripGoRouteCategory, TripGoRouteOption, TripGoRouteSegment, TripGoRoutingResult, TripGoStop } from '../../interfaces/tripgo';
 import { GeolocationService } from '../../services/geolocation.service';
@@ -19,6 +21,7 @@ import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.comp
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { LocationPickerDialogComponent } from '../utils/location-picker-dialog/location-picker-dialog.component';
 import { RouteOptionsComponent } from '../utils/route-options/route-options.component';
+import { SearchSettingsComponent } from '../utils/search-settings/search-settings.component';
 import { TripGoRouteMapComponent, TripGoSimulationState } from './tripgo-route-map.component';
 import { TripGoRouteMapPointSelection } from './tripgo-route-map.component';
 import { TripGoRoutePointDialogComponent } from './tripgo-route-point-dialog.component';
@@ -40,6 +43,9 @@ export interface TripGoRouteDialogData {
   routeOptions?: RouteOptions;
   routeOptionsChanged?: (options: RouteOptions) => void;
   routePointsChanged?: (origin: Location, destination: Location) => void;
+  searchSettings?: SearchSettings;
+  searchSettingsChanged?: (settings: SearchSettings) => void;
+  wikipediaArticlesSelected?: (articles: WikipediaArticle[]) => void;
 }
 
 type RouteDialogState = 'idle' | 'locating' | 'routing' | 'ready' | 'arrived' | 'error';
@@ -94,7 +100,8 @@ type RoutePointDetails = TripGoRoutePointDetails;
 export class TripGoRouteDialogComponent implements OnInit, OnDestroy {
   @ViewChild(TripGoRouteMapComponent) private routeMap?: TripGoRouteMapComponent;
   private readonly data = inject<TripGoRouteDialogData>(MAT_DIALOG_DATA);
-  private routeOptions = normalizeRouteOptions(this.data.routeOptions ?? DEFAULT_ROUTE_OPTIONS);
+  routeOptions = normalizeRouteOptions(this.data.routeOptions ?? DEFAULT_ROUTE_OPTIONS);
+  searchSettings = structuredClone(this.data.searchSettings ?? DEFAULT_SEARCH_SETTINGS);
   private readonly dialogRef = inject(MatDialogRef<TripGoRouteDialogComponent>);
   private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);
@@ -395,6 +402,33 @@ export class TripGoRouteDialogComponent implements OnInit, OnDestroy {
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
       disableClose: false
+    });
+  }
+
+  showWikipediaArticles(articles: WikipediaArticle[]): void {
+    this.routeMap?.pauseSimulation();
+    this.data.wikipediaArticlesSelected?.(articles);
+  }
+
+  openSearchSettings(): void {
+    const dialogRef = this.dialog.open<SearchSettingsComponent, unknown, SearchSettings | undefined>(
+      SearchSettingsComponent,
+      {
+        data: { settings: structuredClone(this.searchSettings), location: this.destination() },
+        closeOnNavigation: true,
+        maxHeight: '90vh',
+        width: '900px',
+        maxWidth: '95vw',
+        autoFocus: false,
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop',
+        disableClose: false
+      }
+    );
+    dialogRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((settings) => {
+      if (!settings) return;
+      this.searchSettings = structuredClone(settings);
+      this.data.searchSettingsChanged?.(structuredClone(settings));
     });
   }
 
