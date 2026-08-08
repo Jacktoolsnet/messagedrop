@@ -12,10 +12,9 @@ if [[ "${TRIPGO_KEEP_OLD_SAMPLES:-0}" != "1" ]]; then
   find "${output_dir}" -maxdepth 1 -type f -name '*.json' -delete
 fi
 
-# For the current development step only the local stops around Halchter are
-# fetched by default. The older diagnostics remain available through their
-# explicit feature flags below.
-if [[ "${TRIPGO_FETCH_LOCATIONS:-1}" == "1" ]]; then
+# Location diagnostics are optional while the Oslo routing issue is being
+# investigated. Enable them explicitly with TRIPGO_FETCH_LOCATIONS=1.
+if [[ "${TRIPGO_FETCH_LOCATIONS:-0}" == "1" ]]; then
   printf 'Fetching TripGo stops around Halchter ...\n'
   node "${script_dir}/../../services/tripgo/scripts/fetch-raw-locations-sample.js" \
     "${output_dir}/locations-halchter-raw.json" \
@@ -80,6 +79,28 @@ fetch_diagnostic_route() {
     printf 'Normalized sample %s failed; continuing with its raw response.\n' "${name}" >&2
   fi
 }
+
+# Current default diagnostic: a central Oslo journey from Oslo S to the
+# Vigeland sculpture park. The separate requests make it possible to tell
+# whether the regional data supports public transport generally and whether
+# one of the exact mode combinations used by the route dialog is rejected.
+if [[ "${TRIPGO_FETCH_OSLO_ROUTES:-1}" == "1" ]]; then
+  oslo_from_lat="59.9109"
+  oslo_from_lng="10.7522"
+  oslo_to_lat="59.9271"
+  oslo_to_lng="10.7003"
+
+  fetch_diagnostic_route "oslo-central-vigeland-transit" \
+    "${oslo_from_lat}" "${oslo_from_lng}" "${oslo_to_lat}" "${oslo_to_lng}" "en" "pt_pub"
+  fetch_diagnostic_route "oslo-central-vigeland-car" \
+    "${oslo_from_lat}" "${oslo_from_lng}" "${oslo_to_lat}" "${oslo_to_lng}" "en" "me_car"
+  fetch_diagnostic_route "oslo-central-vigeland-bicycle" \
+    "${oslo_from_lat}" "${oslo_from_lng}" "${oslo_to_lat}" "${oslo_to_lng}" "en" "me_mic_bic"
+  fetch_diagnostic_route "oslo-central-vigeland-walk-transit" \
+    "${oslo_from_lat}" "${oslo_from_lng}" "${oslo_to_lat}" "${oslo_to_lng}" "en" "wa_wal,pt_pub"
+  fetch_diagnostic_route "oslo-central-vigeland-walk" \
+    "${oslo_from_lat}" "${oslo_from_lng}" "${oslo_to_lat}" "${oslo_to_lng}" "en" "wa_wal"
+fi
 
 fetch_region_diagnostics() {
   local region="$1"

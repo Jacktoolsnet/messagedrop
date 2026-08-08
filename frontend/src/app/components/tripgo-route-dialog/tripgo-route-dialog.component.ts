@@ -129,14 +129,17 @@ export class TripGoRouteDialogComponent implements OnInit {
     if (!this.isUnsetLocation(this.destination())) {
       this.resolveRoutePoint('destination', this.destination());
     }
-    this.locateFreshOrigin(false);
+    this.useCurrentPosition('origin', true);
   }
 
-  calculateWithFreshLocation(): void {
-    this.locateFreshOrigin(true);
+  calculateRoute(): void {
+    const origin = this.origin();
+    if (!origin || this.isBusy()) return;
+    this.showList();
+    this.loadRoutes(origin, this.destination());
   }
 
-  private locateFreshOrigin(calculateRoute: boolean): void {
+  useCurrentPosition(kind: RoutePointKind, initial = false): void {
     this.cancelRouteRequests();
     this.showList();
     this.routes.set([]);
@@ -149,21 +152,26 @@ export class TripGoRouteDialogComponent implements OnInit {
       timeout: 20_000
     }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (position) => {
-        const origin: Location = {
+        const location: Location = {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
           plusCode: this.geolocation.getPlusCode(position.coords.latitude, position.coords.longitude)
         };
-        this.origin.set(origin);
-        this.resolveRoutePoint('origin', origin);
-        if (this.isUnsetLocation(this.destination())) {
-          const destination = { ...origin };
+        if (kind === 'origin') {
+          this.origin.set(location);
+          this.originDetails.set(null);
+        } else {
+          this.destination.set(location);
+          this.destinationDetails.set(null);
+        }
+        this.resolveRoutePoint(kind, location);
+        if (initial && this.isUnsetLocation(this.destination())) {
+          const destination = { ...location };
           this.destination.set(destination);
           this.destinationDetails.set(null);
           this.resolveRoutePoint('destination', destination);
         }
-        if (calculateRoute) this.loadRoutes(origin, this.destination());
-        else this.state.set('idle');
+        this.state.set('idle');
       },
       error: (error: GeolocationPositionError | unknown) => {
         const code = typeof error === 'object' && error !== null && 'code' in error ? Number(error.code) : 0;
@@ -173,6 +181,20 @@ export class TripGoRouteDialogComponent implements OnInit {
         this.state.set('error');
       }
     });
+  }
+
+  swapRoutePoints(): void {
+    const origin = this.origin();
+    if (!origin || this.isBusy()) return;
+    const destination = this.destination();
+    const originDetails = this.originDetails();
+    const destinationDetails = this.destinationDetails();
+    this.origin.set(destination);
+    this.destination.set(origin);
+    this.originDetails.set(destinationDetails);
+    this.destinationDetails.set(originDetails);
+    this.showList();
+    this.resetRouteResults();
   }
 
   close(): void {
