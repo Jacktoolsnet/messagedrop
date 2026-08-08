@@ -13,6 +13,7 @@
           [origin]="start"
           [destination]="destination()"
           (simulationStateChange)="simulationState.set($event)"
+          (stopSelected)="showPublicTransportStop($event)"
           (pointSelected)="showRoutePointDetails($event)">
         </app-tripgo-route-map>
       }

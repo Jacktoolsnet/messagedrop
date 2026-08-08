@@ -10,7 +10,7 @@ import { GetNominatimAddressResponse } from '../../interfaces/get-nominatim-addr
 import { Location } from '../../interfaces/location';
 import { DEFAULT_ROUTE_OPTIONS, RouteOptions, normalizeRouteOptions } from '../../interfaces/route-options';
 import { NominatimPlace } from '../../interfaces/nominatim-place';
-import { TripGoRouteCategory, TripGoRouteOption, TripGoRouteSegment, TripGoRoutingResult } from '../../interfaces/tripgo';
+import { TripGoRouteCategory, TripGoRouteOption, TripGoRouteSegment, TripGoRoutingResult, TripGoStop } from '../../interfaces/tripgo';
 import { GeolocationService } from '../../services/geolocation.service';
 import { NominatimService } from '../../services/nominatim.service';
 import { TripGoService } from '../../services/tripgo.service';
@@ -22,6 +22,7 @@ import { RouteOptionsComponent } from '../utils/route-options/route-options.comp
 import { TripGoRouteMapComponent, TripGoSimulationState } from './tripgo-route-map.component';
 import { TripGoRouteMapPointSelection } from './tripgo-route-map.component';
 import { TripGoRoutePointDialogComponent } from './tripgo-route-point-dialog.component';
+import { TripGoStopDialogComponent } from '../tripgo-stop-dialog/tripgo-stop-dialog.component';
 import {
   tripGoDisplayLocationName,
   tripGoFollowingBoardingPlatform,
@@ -374,6 +375,22 @@ export class TripGoRouteDialogComponent implements OnInit, OnDestroy {
       height: '95vh',
       maxWidth: '95vw',
       maxHeight: '95vh',
+      autoFocus: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false
+    });
+  }
+
+  showPublicTransportStop(stop: TripGoStop): void {
+    this.routeMap?.pauseSimulation();
+    this.dialog.open(TripGoStopDialogComponent, {
+      data: stop,
+      closeOnNavigation: true,
+      width: 'min(680px, 95vw)',
+      maxWidth: '95vw',
+      maxHeight: '95vh',
+      height: 'auto',
       autoFocus: false,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',

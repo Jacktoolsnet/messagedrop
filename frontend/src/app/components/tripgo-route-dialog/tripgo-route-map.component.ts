@@ -14,7 +14,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import * as leaflet from 'leaflet';
 import { Location } from '../../interfaces/location';
-import { TripGoLocation, TripGoRouteOption, TripGoRouteSegment, TripGoTurnInstruction } from '../../interfaces/tripgo';
+import { TripGoLocation, TripGoRouteOption, TripGoRouteSegment, TripGoStop, TripGoTurnInstruction } from '../../interfaces/tripgo';
+import { publicTransportStopMarker } from '../../services/map.service';
 import { TripGoTimelineWeatherComponent } from './tripgo-timeline-weather.component';
 import {
   tripGoDisplayLocationName,
@@ -127,6 +128,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
   @Input({ required: true }) origin!: Location;
   @Input({ required: true }) destination!: Location;
   readonly pointSelected = output<TripGoRouteMapPointSelection>();
+  readonly stopSelected = output<TripGoStop>();
   readonly simulationStateChange = output<TripGoSimulationState>();
   readonly activeSimulationPoint = signal<TripGoSimulationPoint | null>(null);
 
@@ -777,6 +779,8 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
       'arrival'
     );
     bounds.extend([destination.latitude, destination.longitude]);
+
+    this.addPublicTransportStopMarkers(bounds);
   }
 
   private addIntermediateStopMarkers(
@@ -787,6 +791,9 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     const color = safeColor(segment.color);
     for (const stop of segment.service?.intermediateStops || []) {
       if (!this.validTripGoLocation(stop)) continue;
+      // Stops with a TripGo stop code receive the full, clickable transport
+      // pin below. Keep the circle only as a fallback for incomplete data.
+      if (stop.stopCode) continue;
       const marker = leaflet.circleMarker([stop.latitude, stop.longitude], {
         radius: 5,
         color: '#ffffff',
@@ -802,6 +809,92 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
       marker.on('click', () => this.pointSelected.emit({ kind: 'segment', segmentIndex }));
       bounds.extend([stop.latitude, stop.longitude]);
     }
+  }
+
+  private addPublicTransportStopMarkers(bounds: leaflet.LatLngBounds): void {
+    for (const stop of this.routePublicTransportStops()) {
+      const marker = leaflet.marker([stop.latitude, stop.longitude], {
+        icon: publicTransportStopMarker(stop),
+        title: stop.name,
+        alt: stop.name,
+        zIndexOffset: 2_000
+      }).addTo(this.map!);
+      marker.on('click', (event) => {
+        leaflet.DomEvent.stopPropagation(event.originalEvent);
+        this.pauseSimulation();
+        this.stopSelected.emit(stop);
+      });
+      const tooltip = document.createElement('span');
+      tooltip.textContent = stop.name;
+      marker.bindTooltip(tooltip, { direction: 'top', offset: [0, -16] });
+      bounds.extend([stop.latitude, stop.longitude]);
+    }
+  }
+
+  private routePublicTransportStops(): TripGoStop[] {
+    const stops: TripGoStop[] = [];
+    const addStop = (
+      location: TripGoLocation | undefined,
+      segment: TripGoRouteSegment,
+      platform?: string
+    ) => {
+      if (!this.validTripGoLocation(location) || !location.stopCode) return;
+      const name = tripGoDisplayLocationName(location.name) || location.address || location.stopCode;
+      let stop = stops.find((candidate) => candidate.region === (location.region || segment.from?.region || '')
+        && (candidate.platforms.some((entry) => entry.stopCode === location.stopCode)
+          || (candidate.name === name && this.distanceInMeters(candidate, location) <= 150)));
+      if (!stop) {
+        stop = {
+          id: `${location.region || segment.from?.region || ''}|${location.stopCode}`,
+          name,
+          address: location.address,
+          latitude: location.latitude!,
+          longitude: location.longitude!,
+          region: location.region || segment.from?.region || '',
+          modeIdentifiers: [],
+          modeIcons: [],
+          modeLabels: [],
+          stopTypes: [],
+          services: [],
+          operators: [],
+          platforms: []
+        };
+        stops.push(stop);
+      }
+      this.addUnique(stop.modeIdentifiers, segment.modeIdentifier);
+      this.addUnique(stop.modeIcons!, segment.icon);
+      this.addUnique(stop.modeLabels, segment.modeLabel);
+      this.addUnique(stop.stopTypes, segment.modeIdentifier);
+      this.addUnique(stop.services, tripGoServiceLabel(segment) || segment.service?.number);
+      if (segment.service?.operator) {
+        const operatorId = segment.service.operatorId;
+        if (!stop.operators.some((operator) => (operator.id || operator.name) === (operatorId || segment.service!.operator))) {
+          stop.operators.push({ id: operatorId, name: segment.service.operator });
+        }
+      }
+      const existingPlatform = stop.platforms.find((entry) => entry.stopCode === location.stopCode);
+      if (existingPlatform) {
+        this.addUnique(existingPlatform.services, tripGoServiceLabel(segment) || segment.service?.number);
+      } else {
+        stop.platforms.push({
+          stopCode: location.stopCode,
+          platform,
+          latitude: location.latitude!,
+          longitude: location.longitude!,
+          services: [tripGoServiceLabel(segment) || segment.service?.number].filter((value): value is string => !!value)
+        });
+      }
+    };
+
+    for (const segment of this.route.segments) {
+      if (segment.type !== 'scheduled' && !segment.modeIdentifier?.startsWith('pt_')) continue;
+      for (const stop of segment.service?.intermediateStops || []) addStop(stop, segment, stop.platform);
+    }
+    return stops;
+  }
+
+  private addUnique(values: string[], value?: string): void {
+    if (value && !values.includes(value)) values.push(value);
   }
 
   private addModeMarker(

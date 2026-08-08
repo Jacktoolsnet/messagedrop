@@ -71,7 +71,7 @@ const wikipediaMarker = leaflet.icon({
   iconAnchor: [16, 40],
 });
 
-function publicTransportStopMarker(stop: TripGoStop): leaflet.DivIcon {
+export function publicTransportStopMarker(stop: TripGoStop): leaflet.DivIcon {
   const icons = publicTransportIcons(stop);
   if (icons.length === 1) {
     return leaflet.divIcon({
