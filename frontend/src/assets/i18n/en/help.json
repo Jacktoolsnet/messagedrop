@@ -2904,8 +2904,8 @@
         "desc": "If the start and destination are no more than 50 metres apart, no request is sent to TripGo. A notice confirms that you are already at the destination instead."
       },
       "refresh": {
-        "title": "Refresh",
-        "desc": "Gets your location again and then calculates new connections."
+        "title": "Calculate route",
+        "desc": "Gets your location again and calculates suitable connections only after this deliberate action."
       },
       "close": {
         "title": "Close",

@@ -210,6 +210,8 @@
       "resolvingPlace": "Recherche des informations sur le lieu …",
       "locating": "Nouvelle détermination de votre position actuelle …",
       "routing": "Calcul des trajets adaptés …",
+      "readyToCalculate": "Vérifiez le départ et la destination, puis lancez le calcul de l’itinéraire.",
+      "calculateRoute": "Calculer l’itinéraire",
       "destinationReached": {
         "title": "Destination atteinte",
         "description": "Vous êtes déjà à destination. Aucun calcul d’itinéraire n’est nécessaire."
@@ -231,7 +233,7 @@
       "transfers": "{{ count }} correspondances",
       "segments": "Étapes du trajet",
       "provider": "Informations d’itinéraire par SkedGo / TripGo",
-      "refresh": "Actualiser la position et les itinéraires",
+      "refresh": "Recalculer l’itinéraire",
       "timelineLive": {
         "unavailable": "Aucune donnée en temps réel disponible",
         "onTime": "Heure actuelle {{ time }}, à l’heure",

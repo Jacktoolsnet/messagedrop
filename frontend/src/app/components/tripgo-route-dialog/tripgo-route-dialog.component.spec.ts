@@ -79,7 +79,7 @@ describe('TripGoRouteDialogComponent', () => {
     fixture = TestBed.createComponent(TripGoRouteDialogComponent);
   });
 
-  it('requests a fresh high-accuracy location before calculating routes', () => {
+  it('prepares a fresh high-accuracy origin without calculating routes automatically', () => {
     fixture.detectChanges();
 
     expect(geolocation.getCurrentPosition).toHaveBeenCalledWith({
@@ -87,6 +87,16 @@ describe('TripGoRouteDialogComponent', () => {
       maximumAge: 0,
       timeout: 20_000
     });
+    expect(tripGo.calculateRoute).not.toHaveBeenCalled();
+    expect(fixture.componentInstance.state()).toBe('idle');
+    expect(fixture.componentInstance.originDetails()?.name).toBe('Berlin');
+  });
+
+  it('calculates routes only after the explicit action', () => {
+    fixture.detectChanges();
+    fixture.componentInstance.calculateWithFreshLocation();
+
+    expect(geolocation.getCurrentPosition).toHaveBeenCalledTimes(2);
     expect(tripGo.calculateRoute).toHaveBeenCalledTimes(4);
     expect(tripGo.calculateRoute.calls.allArgs().some((args) =>
       args[0].latitude === 52.52
@@ -95,15 +105,6 @@ describe('TripGoRouteDialogComponent', () => {
       && args[3].join(',') === 'me_car')).toBeTrue();
     expect(tripGo.calculateRoute.calls.allArgs().some((args) => args[3].includes('in_air'))).toBeFalse();
     expect(fixture.componentInstance.state()).toBe('ready');
-    expect(fixture.componentInstance.originDetails()?.name).toBe('Berlin');
-  });
-
-  it('starts another location request when refreshed', () => {
-    fixture.detectChanges();
-    fixture.componentInstance.calculateWithFreshLocation();
-
-    expect(geolocation.getCurrentPosition).toHaveBeenCalledTimes(2);
-    expect(tripGo.calculateRoute).toHaveBeenCalledTimes(8);
   });
 
   it('does not request a route when the destination has already been reached', () => {
@@ -114,6 +115,7 @@ describe('TripGoRouteDialogComponent', () => {
     });
 
     fixture.detectChanges();
+    fixture.componentInstance.calculateWithFreshLocation();
 
     expect(fixture.componentInstance.state()).toBe('arrived');
     expect(fixture.componentInstance.routes()).toEqual([]);
@@ -126,12 +128,13 @@ describe('TripGoRouteDialogComponent', () => {
     });
 
     fixture.detectChanges();
+    fixture.componentInstance.calculateWithFreshLocation();
 
     expect(tripGo.calculateRoute.calls.allArgs().some((args) =>
       args[3].join(',') === 'in_air,pt_pub')).toBeTrue();
   });
 
-  it('recalculates the route after selecting another destination', () => {
+  it('waits for the explicit action after selecting another destination', () => {
     fixture.detectChanges();
     const destination = { latitude: 52.16, longitude: 10.53, plusCode: '9F4G5G6J+XX' };
     dialog.open.and.returnValue({ afterClosed: () => of(destination) } as MatDialogRef<unknown>);
@@ -139,8 +142,8 @@ describe('TripGoRouteDialogComponent', () => {
     fixture.componentInstance.editRoutePoint('destination');
 
     expect(fixture.componentInstance.destination()).toEqual(destination);
-    expect(tripGo.calculateRoute).toHaveBeenCalledTimes(8);
-    expect(tripGo.calculateRoute.calls.mostRecent().args[1]).toEqual(destination);
+    expect(tripGo.calculateRoute).not.toHaveBeenCalled();
+    expect(fixture.componentInstance.state()).toBe('idle');
   });
 
   it('opens the point detail dialog for a selected map marker', () => {

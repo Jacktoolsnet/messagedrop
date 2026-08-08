@@ -211,6 +211,8 @@
       "resolvingPlace": "Getting place information …",
       "locating": "Getting a fresh fix for your current location …",
       "routing": "Calculating suitable connections …",
+      "readyToCalculate": "Check the origin and destination, then start calculating the route.",
+      "calculateRoute": "Calculate route",
       "destinationReached": {
         "title": "Destination reached",
         "description": "You are already at the destination. No route calculation is necessary."
@@ -232,7 +234,7 @@
       "transfers": "{{ count }} transfers",
       "segments": "Journey segments",
       "provider": "Routing information by SkedGo / TripGo",
-      "refresh": "Refresh location and routes",
+      "refresh": "Calculate route again",
       "timelineLive": {
         "unavailable": "No real-time data available",
         "onTime": "Current time {{ time }}, on time",

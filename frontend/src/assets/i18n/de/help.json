@@ -2904,8 +2904,8 @@
         "desc": "Liegen Start und Ziel höchstens 50 Meter auseinander, wird keine Anfrage an TripGo gesendet. Stattdessen erscheint der Hinweis, dass du bereits am Ziel bist."
       },
       "refresh": {
-        "title": "Aktualisieren",
-        "desc": "Ermittelt deinen Standort erneut und berechnet anschließend neue Verbindungen."
+        "title": "Route berechnen",
+        "desc": "Ermittelt deinen Standort erneut und berechnet erst nach dieser bewussten Aktion passende Verbindungen."
       },
       "close": {
         "title": "Schließen",

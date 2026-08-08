@@ -1033,7 +1033,7 @@ const HELP_TOPICS = {
         descriptionKey: 'tripGoRoute.items.destinationReached.desc'
       },
       {
-        icon: 'refresh',
+        icon: 'route',
         titleKey: 'tripGoRoute.items.refresh.title',
         descriptionKey: 'tripGoRoute.items.refresh.desc'
       },

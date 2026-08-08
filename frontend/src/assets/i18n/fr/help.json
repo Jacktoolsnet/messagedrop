@@ -2886,8 +2886,8 @@
         "desc": "Si le départ et la destination sont distants de 50 mètres au maximum, aucune requête n’est envoyée à TripGo. Un message indique à la place que vous êtes déjà à destination."
       },
       "refresh": {
-        "title": "Actualiser",
-        "desc": "Détermine à nouveau votre position puis calcule de nouveaux trajets."
+        "title": "Calculer l’itinéraire",
+        "desc": "Détermine à nouveau votre position et ne calcule les trajets qu’après cette action volontaire."
       },
       "close": {
         "title": "Fermer",

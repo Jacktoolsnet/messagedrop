@@ -211,6 +211,8 @@
       "resolvingPlace": "Ortsinformationen werden ermittelt …",
       "locating": "Dein aktueller Standort wird neu ermittelt …",
       "routing": "Passende Verbindungen werden berechnet …",
+      "readyToCalculate": "Prüfe Start und Ziel und starte anschließend die Routenberechnung.",
+      "calculateRoute": "Route berechnen",
       "destinationReached": {
         "title": "Ziel erreicht",
         "description": "Du befindest dich bereits am Ziel. Eine Routenberechnung ist nicht erforderlich."
@@ -232,7 +234,7 @@
       "transfers": "{{ count }} Umstiege",
       "segments": "Abschnitte der Verbindung",
       "provider": "Routeninformationen von SkedGo / TripGo",
-      "refresh": "Standort neu ermitteln und Routen aktualisieren",
+      "refresh": "Route neu berechnen",
       "timelineLive": {
         "unavailable": "Keine Echtzeitdaten verfügbar",
         "onTime": "Aktuelle Zeit {{ time }}, pünktlich",
