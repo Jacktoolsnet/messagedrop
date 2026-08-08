@@ -2907,6 +2907,10 @@
         "title": "Route berechnen",
         "desc": "Ermittelt deinen Standort erneut und berechnet erst nach dieser bewussten Aktion passende Verbindungen."
       },
+      "routeOptions": {
+        "title": "Routenoptionen",
+        "desc": "Öffnet die Routenoptionen direkt aus der Navigation. Nach einer Änderung werden vorhandene Ergebnisse verworfen und erst über „Route berechnen“ neu geladen."
+      },
       "close": {
         "title": "Schließen",
         "desc": "Schließt die Routenansicht."

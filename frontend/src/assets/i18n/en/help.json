@@ -2907,6 +2907,10 @@
         "title": "Calculate route",
         "desc": "Gets your location again and calculates suitable connections only after this deliberate action."
       },
+      "routeOptions": {
+        "title": "Route options",
+        "desc": "Opens route options directly from navigation. After a change, existing results are cleared and reloaded only via “Calculate route”."
+      },
       "close": {
         "title": "Close",
         "desc": "Closes the route view."

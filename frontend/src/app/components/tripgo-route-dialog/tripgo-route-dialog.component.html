@@ -421,6 +421,10 @@
       </button>
     }
     @if (viewMode() !== 'map' || simulationState() === 'idle') {
+      <button mat-icon-button type="button" (click)="openRouteOptions()"
+        [disabled]="isBusy()" [attr.aria-label]="'common.tripGo.routeOptions' | transloco">
+        <mat-icon>settings</mat-icon>
+      </button>
       <button mat-icon-button type="button" (click)="help.open('tripGoRoute')"
         [attr.aria-label]="'common.actions.help' | transloco">
         <mat-icon>help</mat-icon>

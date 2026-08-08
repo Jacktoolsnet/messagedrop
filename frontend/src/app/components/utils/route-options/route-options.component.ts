@@ -38,6 +38,8 @@ export class RouteOptionsComponent {
   readonly help = inject(HelpDialogService);
   options = normalizeRouteOptions(this.data.options);
 
+  readonly formatDistanceLabel = (value: number): string => `${value} km`;
+
   cancel(): void {
     this.dialogRef.close();
   }

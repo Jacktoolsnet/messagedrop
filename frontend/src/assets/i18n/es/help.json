@@ -2889,6 +2889,10 @@
         "title": "Calcular ruta",
         "desc": "Obtiene de nuevo tu ubicación y solo calcula las conexiones después de esta acción deliberada."
       },
+      "routeOptions": {
+        "title": "Opciones de ruta",
+        "desc": "Abre las opciones directamente desde la navegación. Tras un cambio, los resultados existentes se eliminan y solo se vuelven a cargar mediante «Calcular ruta»."
+      },
       "close": {
         "title": "Cerrar",
         "desc": "Cierra la vista de rutas."

@@ -1679,7 +1679,11 @@ export class AppComponent implements OnInit {
     this.dialog.open(TripGoRouteDialogComponent, {
       data: {
         destination: { ...destination },
-        routeOptions: structuredClone(this.routeOptions)
+        routeOptions: structuredClone(this.routeOptions),
+        routeOptionsChanged: (options: RouteOptions) => {
+          this.routeOptions = normalizeRouteOptions(options);
+          void this.indexedDbService.setSetting('routeOptions', this.routeOptions);
+        }
       },
       closeOnNavigation: true,
       width: '95vw',

@@ -17,6 +17,7 @@ import { TripGoService } from '../../services/tripgo.service';
 import { DialogHeaderComponent } from '../utils/dialog-header/dialog-header.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { LocationPickerDialogComponent } from '../utils/location-picker-dialog/location-picker-dialog.component';
+import { RouteOptionsComponent } from '../utils/route-options/route-options.component';
 import { TripGoRouteMapComponent, TripGoSimulationState } from './tripgo-route-map.component';
 import { TripGoRouteMapPointSelection } from './tripgo-route-map.component';
 import { TripGoRoutePointDialogComponent } from './tripgo-route-point-dialog.component';
@@ -33,6 +34,7 @@ import { TripGoTimelineWeatherComponent } from './tripgo-timeline-weather.compon
 export interface TripGoRouteDialogData {
   destination: Location;
   routeOptions?: RouteOptions;
+  routeOptionsChanged?: (options: RouteOptions) => void;
 }
 
 type RouteDialogState = 'idle' | 'locating' | 'routing' | 'ready' | 'arrived' | 'error';
@@ -89,7 +91,7 @@ interface RoutePointDetails {
 export class TripGoRouteDialogComponent implements OnInit {
   @ViewChild(TripGoRouteMapComponent) private routeMap?: TripGoRouteMapComponent;
   private readonly data = inject<TripGoRouteDialogData>(MAT_DIALOG_DATA);
-  private readonly routeOptions = normalizeRouteOptions(this.data.routeOptions ?? DEFAULT_ROUTE_OPTIONS);
+  private routeOptions = normalizeRouteOptions(this.data.routeOptions ?? DEFAULT_ROUTE_OPTIONS);
   private readonly dialogRef = inject(MatDialogRef<TripGoRouteDialogComponent>);
   private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);
@@ -176,6 +178,30 @@ export class TripGoRouteDialogComponent implements OnInit {
   close(): void {
     this.routeMap?.stopSimulation();
     this.dialogRef.close();
+  }
+
+  openRouteOptions(): void {
+    const dialogRef = this.dialog.open<RouteOptionsComponent, { options: RouteOptions }, RouteOptions | undefined>(
+      RouteOptionsComponent,
+      {
+        data: { options: structuredClone(this.routeOptions) },
+        closeOnNavigation: true,
+        width: '760px',
+        maxWidth: '95vw',
+        maxHeight: '90vh',
+        autoFocus: false,
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop',
+        disableClose: false
+      }
+    );
+    dialogRef.afterClosed().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((options) => {
+      if (!options) return;
+      this.routeOptions = normalizeRouteOptions(options);
+      this.data.routeOptionsChanged?.(structuredClone(this.routeOptions));
+      this.showList();
+      this.resetRouteResults();
+    });
   }
 
   showRouteOnMap(route: TripGoRouteOption): void {

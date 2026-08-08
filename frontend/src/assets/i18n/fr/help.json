@@ -2889,6 +2889,10 @@
         "title": "Calculer l’itinéraire",
         "desc": "Détermine à nouveau votre position et ne calcule les trajets qu’après cette action volontaire."
       },
+      "routeOptions": {
+        "title": "Options d’itinéraire",
+        "desc": "Ouvre les options directement depuis la navigation. Après une modification, les résultats existants sont supprimés et recalculés uniquement via « Calculer l’itinéraire »."
+      },
       "close": {
         "title": "Fermer",
         "desc": "Ferme la vue des itinéraires."
