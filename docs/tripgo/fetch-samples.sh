@@ -67,6 +67,7 @@ fetch_diagnostic_route() {
   local locale="$6"
   local mode="${7:-pt_pub}"
   local operator="${8:-}"
+  local timeout_ms="${9:-${TRIPGO_API_TIMEOUT_MS:-15000}}"
   local modes_json
 
   modes_json="$(node -e '
@@ -86,6 +87,7 @@ fetch_diagnostic_route() {
     TRIPGO_SAMPLE_LOCALE="${locale}" \
     TRIPGO_SAMPLE_MODES="${mode}" \
     TRIPGO_SAMPLE_OPERATOR="${operator}" \
+    TRIPGO_API_TIMEOUT_MS="${timeout_ms}" \
     node "${script_dir}/../../services/tripgo/scripts/fetch-raw-route-sample.js" \
       "${output_dir}/route-${name}-raw.json" \
       "${output_dir}/services-${name}-raw.json" \
@@ -108,11 +110,11 @@ fetch_diagnostic_route() {
   fi
 }
 
-# Current default diagnostic: a central Oslo journey from Oslo S to the
+# Optional diagnostic: a central Oslo journey from Oslo S to the
 # Vigeland sculpture park. The separate requests make it possible to tell
 # whether the regional data supports public transport generally and whether
 # one of the exact mode combinations used by the route dialog is rejected.
-if [[ "${TRIPGO_FETCH_OSLO_ROUTES:-1}" == "1" ]]; then
+if [[ "${TRIPGO_FETCH_OSLO_ROUTES:-0}" == "1" ]]; then
   oslo_from_lat="59.9109"
   oslo_from_lng="10.7522"
   oslo_to_lat="59.9271"
@@ -128,6 +130,31 @@ if [[ "${TRIPGO_FETCH_OSLO_ROUTES:-1}" == "1" ]]; then
     "${oslo_from_lat}" "${oslo_from_lng}" "${oslo_to_lat}" "${oslo_to_lng}" "en" "wa_wal,pt_pub"
   fetch_diagnostic_route "oslo-central-vigeland-walk" \
     "${oslo_from_lat}" "${oslo_from_lng}" "${oslo_to_lat}" "${oslo_to_lng}" "en" "wa_wal"
+fi
+
+# Current default diagnostic: allow TripGo's dedicated car-ferry mode for the
+# previously failing Hamburg-to-Copenhagen route. Both coordinates remain in
+# the respective city centre. The direct request gets a generous timeout.
+if [[ "${TRIPGO_FETCH_LONG_ROUTES:-1}" == "1" ]]; then
+  fetch_diagnostic_route "hamburg-copenhagen-car-ferry" \
+    "53.5505" "9.9925" "55.6761" "12.5683" "en" \
+    "me_car,pt_pub_carferry" "" "120000"
+fi
+
+# The successful and failing baseline requests can be repeated explicitly when
+# needed, but stay disabled during the focused car-ferry diagnostic.
+if [[ "${TRIPGO_FETCH_LONG_BASELINES:-0}" == "1" ]]; then
+  # Long route within Germany: Marienplatz to Hamburg Rathausmarkt.
+  fetch_diagnostic_route "munich-hamburg-car" \
+    "48.1374" "11.5755" "53.5505" "9.9925" "de" "me_car" "" "120000"
+
+  # Shorter international route: Gustav Adolfs torg to Jernbanetorget.
+  fetch_diagnostic_route "gothenburg-oslo-car" \
+    "57.7075" "11.9675" "59.9110" "10.7528" "en" "me_car" "" "120000"
+
+  # Medium international route: Hamburg Rathausmarkt to Radhuspladsen.
+  fetch_diagnostic_route "hamburg-copenhagen-car" \
+    "53.5505" "9.9925" "55.6761" "12.5683" "en" "me_car" "" "120000"
 fi
 
 if [[ "${TRIPGO_FETCH_OSLO_ISLAND_ROUTES:-0}" == "1" ]]; then

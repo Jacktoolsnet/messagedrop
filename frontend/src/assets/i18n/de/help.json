@@ -2989,7 +2989,7 @@
     "title": "Routenoptionen",
     "intro": "Hier bestimmst du, welche Routenvorschläge berechnet werden.",
     "items": {
-      "variants": { "title": "Routenvorschläge", "desc": "Aktiviere Auto, Fahrrad, Fußweg oder Flugverbindungen unabhängig voneinander. Fahrrad- und Fußwegrouten können mit öffentlichen Verkehrsmitteln kombiniert werden. Ist die Kombination deaktiviert, wird ausschließlich das jeweilige Verkehrsmittel verwendet und der Luftlinien-Grenzwert ist ohne Bedeutung." }
+      "variants": { "title": "Routenvorschläge", "desc": "Aktiviere Auto, Fahrrad, Fußweg oder Flugverbindungen unabhängig voneinander. Auto-, Fahrrad- und Fußwegrouten können mit öffentlichen Verkehrsmitteln kombiniert werden. Beim Auto ist diese Kombination standardmäßig deaktiviert. Ist sie bei Fahrrad oder Fußweg deaktiviert, ist der Luftlinien-Grenzwert ohne Bedeutung." }
     }
   },
   "locationShareContacts": {

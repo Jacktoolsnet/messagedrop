@@ -1,5 +1,6 @@
 export interface RouteOptions {
   car: boolean;
+  carPublicTransport: boolean;
   bicycle: boolean;
   bicyclePublicTransport: boolean;
   bicyclePureMaxKm: number;
@@ -11,6 +12,7 @@ export interface RouteOptions {
 
 export const DEFAULT_ROUTE_OPTIONS: RouteOptions = {
   car: true,
+  carPublicTransport: false,
   bicycle: true,
   bicyclePublicTransport: true,
   bicyclePureMaxKm: 8,
@@ -23,6 +25,7 @@ export const DEFAULT_ROUTE_OPTIONS: RouteOptions = {
 export function normalizeRouteOptions(options?: Partial<RouteOptions> | null): RouteOptions {
   return {
     car: options?.car ?? DEFAULT_ROUTE_OPTIONS.car,
+    carPublicTransport: options?.carPublicTransport ?? DEFAULT_ROUTE_OPTIONS.carPublicTransport,
     bicycle: options?.bicycle ?? DEFAULT_ROUTE_OPTIONS.bicycle,
     bicyclePublicTransport: options?.bicyclePublicTransport ?? DEFAULT_ROUTE_OPTIONS.bicyclePublicTransport,
     bicyclePureMaxKm: clamp(options?.bicyclePureMaxKm, 3, 15, DEFAULT_ROUTE_OPTIONS.bicyclePureMaxKm),

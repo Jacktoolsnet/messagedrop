@@ -98,7 +98,7 @@ describe('TripGoRouteDialogComponent', () => {
     fixture.componentInstance.calculateRoute();
 
     expect(geolocation.getCurrentPosition).toHaveBeenCalledTimes(1);
-    expect(tripGo.calculateRoute).toHaveBeenCalledTimes(6);
+    expect(tripGo.calculateRoute).toHaveBeenCalledTimes(5);
     expect(tripGo.calculateRoute.calls.allArgs().some((args) =>
       args[0].latitude === 52.52
       && args[1].latitude === 52.515
@@ -108,6 +108,8 @@ describe('TripGoRouteDialogComponent', () => {
       args[3].join(',') === 'me_mic_bic')).toBeTrue();
     expect(tripGo.calculateRoute.calls.allArgs().some((args) =>
       args[3].join(',') === 'wa_wal')).toBeTrue();
+    expect(tripGo.calculateRoute.calls.allArgs().some((args) =>
+      args[3].join(',') === 'me_car,pt_pub')).toBeFalse();
     expect(tripGo.calculateRoute.calls.allArgs().some((args) => args[3].includes('in_air'))).toBeFalse();
     expect(fixture.componentInstance.state()).toBe('ready');
   });
@@ -127,6 +129,8 @@ describe('TripGoRouteDialogComponent', () => {
       routes: modes.join(',') === 'me_car' ? [disconnectedRoute] : [],
       meta: { groups: 1, totalRoutes: 1, returnedRoutes: 1 }
     }));
+    const componentWithOptions = fixture.componentInstance as unknown as { routeOptions: RouteOptions };
+    componentWithOptions.routeOptions = normalizeRouteOptions({ carPublicTransport: true });
 
     fixture.detectChanges();
     fixture.componentInstance.calculateRoute();

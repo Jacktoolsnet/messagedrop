@@ -10,9 +10,15 @@
     <p>{{ 'common.routeOptions.variants.description' | transloco }}</p>
 
     <div class="toggle-list">
-      <mat-slide-toggle [(ngModel)]="options.car">
-        <span class="option-label"><mat-icon aria-hidden="true">directions_car</mat-icon>{{ 'common.routeOptions.variants.car' | transloco }}</span>
-      </mat-slide-toggle>
+      <div class="option-control">
+        <mat-slide-toggle [(ngModel)]="options.car">
+          <span class="option-label"><mat-icon aria-hidden="true">directions_car</mat-icon>{{ 'common.routeOptions.variants.car' | transloco }}</span>
+        </mat-slide-toggle>
+        <mat-slide-toggle class="suboption-setting" [(ngModel)]="options.carPublicTransport"
+          [disabled]="!options.car">
+          {{ 'common.routeOptions.variants.combinePublicTransport' | transloco }}
+        </mat-slide-toggle>
+      </div>
       <div class="option-control">
         <mat-slide-toggle [(ngModel)]="options.bicycle">
           <span class="option-label"><mat-icon aria-hidden="true">directions_bike</mat-icon>{{ 'common.routeOptions.variants.bicycle' | transloco }}</span>

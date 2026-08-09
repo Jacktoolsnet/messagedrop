@@ -2971,7 +2971,7 @@
     "title": "Opciones de ruta",
     "intro": "Elige qué sugerencias de ruta se calculan.",
     "items": {
-      "variants": { "title": "Sugerencias de ruta", "desc": "Activa de forma independiente coche, bicicleta, a pie o avión. Las rutas en bicicleta y a pie pueden combinarse con transporte público. Si la combinación está desactivada, solo se usa el modo correspondiente y el límite en línea recta no se aplica." }
+      "variants": { "title": "Sugerencias de ruta", "desc": "Activa de forma independiente coche, bicicleta, a pie o avión. Las rutas en coche, bicicleta y a pie pueden combinarse con transporte público. Esta combinación está desactivada por defecto para el coche. Si está desactivada para bicicleta o a pie, el límite en línea recta no se aplica." }
     }
   },
   "locationShareContacts": {

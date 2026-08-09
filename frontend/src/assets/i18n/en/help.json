@@ -2989,7 +2989,7 @@
     "title": "Route options",
     "intro": "Choose which route suggestions are calculated.",
     "items": {
-      "variants": { "title": "Route suggestions", "desc": "Enable driving, cycling, walking, or flights independently. Cycling and walking routes can be combined with public transport. When combination is disabled, only the respective mode is used and the straight-line limit does not apply." }
+      "variants": { "title": "Route suggestions", "desc": "Enable driving, cycling, walking, or flights independently. Driving, cycling, and walking routes can be combined with public transport. This combination is disabled by default for driving. When disabled for cycling or walking, the straight-line limit does not apply." }
     }
   },
   "locationShareContacts": {

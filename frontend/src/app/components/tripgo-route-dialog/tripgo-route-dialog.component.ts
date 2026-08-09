@@ -65,8 +65,7 @@ interface RouteCategoryConfig {
 
 const CAR_CATEGORY: RouteCategoryConfig = {
   category: 'car-transit',
-  primaryModes: ['me_car'],
-  fallbackModes: ['me_car', 'pt_pub']
+  primaryModes: ['me_car']
 };
 
 const FLIGHT_CATEGORY: RouteCategoryConfig = {
@@ -614,7 +613,12 @@ export class TripGoRouteDialogComponent implements OnInit, OnDestroy {
     this.state.set('routing');
     const locale = this.transloco.getActiveLang() || 'de';
     const categories: RouteCategoryConfig[] = [];
-    if (this.routeOptions.car) categories.push(CAR_CATEGORY);
+    if (this.routeOptions.car) {
+      categories.push({
+        ...CAR_CATEGORY,
+        fallbackModes: this.routeOptions.carPublicTransport ? ['me_car', 'pt_pub'] : undefined
+      });
+    }
     if (this.routeOptions.bicycle) {
       const bicycleOnly = !this.routeOptions.bicyclePublicTransport
         || distanceMeters <= this.routeOptions.bicyclePureMaxKm * 1_000;
