@@ -246,6 +246,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
   pauseSimulation(): void {
     if (this.simulationState !== 'playing') return;
     this.clearSimulationTimer();
+    this.cancelSimulationAnimation();
     this.setSimulationState('paused');
   }
 
@@ -557,9 +558,190 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
       if (this.simulationIndex >= this.simulationPoints.length - 1) {
         this.finishSimulation();
       } else {
-        this.showSimulationPoint(this.simulationIndex + 1);
+        this.showNextSimulationLeg();
       }
     }, this.currentSimulationDelayMs);
+  }
+
+  /**
+   * Moves through all geometry points of one TripGo segment in a single
+   * animation. Starting a separate animation for every geometry point caused
+   * a visible stop-and-go effect, especially for detailed walking geometries.
+   */
+  private showNextSimulationLeg(): void {
+    const nextIndex = this.simulationIndex + 1;
+    const nextPoint = this.simulationPoints[nextIndex];
+    if (!nextPoint) {
+      this.finishSimulation();
+      return;
+    }
+
+    const currentPoint = this.simulationPoints[this.simulationIndex];
+    const startsNewSegment = nextPoint.kind === 'arrival'
+      || !nextPoint.segment
+      || nextPoint.segment !== currentPoint?.segment;
+    if (startsNewSegment) {
+      this.showSimulationPoint(nextIndex);
+      return;
+    }
+
+    let endIndex = nextIndex;
+    while (endIndex + 1 < this.simulationPoints.length) {
+      const candidate = this.simulationPoints[endIndex + 1];
+      if (candidate.kind === 'arrival' || candidate.segment !== nextPoint.segment) break;
+      endIndex += 1;
+    }
+    this.animateSimulationRange(nextIndex, endIndex, nextPoint.segment!);
+  }
+
+  private animateSimulationRange(
+    startIndex: number,
+    endIndex: number,
+    segment: TripGoRouteSegment
+  ): void {
+    if (!this.map || !this.simulationMarker) {
+      this.showSimulationPoint(startIndex);
+      return;
+    }
+    this.clearSimulationTimer();
+    this.cancelSimulationAnimation();
+
+    const path: Array<{ index: number; point: TripGoSimulationPoint; latLng: leaflet.LatLng }> = [{
+      index: this.simulationIndex,
+      point: {
+        ...this.simulationPoints[this.simulationIndex],
+        time: this.simulatedTime() || this.simulationPoints[this.simulationIndex]?.time
+      },
+      latLng: this.simulationMarker.getLatLng()
+    }];
+    for (let index = startIndex; index <= endIndex; index += 1) {
+      const point = this.simulationPoints[index];
+      if (!point || !this.validTripGoLocation(point.location)) continue;
+      const latLng = leaflet.latLng(point.location.latitude, point.location.longitude);
+      if (latLng.distanceTo(path.at(-1)!.latLng) < .05) {
+        path[path.length - 1] = { index, point, latLng };
+      } else {
+        path.push({ index, point, latLng });
+      }
+    }
+    if (path.length < 2 || this.prefersReducedMotion()) {
+      this.showSimulationPoint(endIndex);
+      return;
+    }
+
+    const projectionZoom = this.map.getZoom();
+    const projected = path.map(({ latLng }) => this.map!.project(latLng, projectionZoom));
+    const distances = [0];
+    for (let index = 1; index < path.length; index += 1) {
+      distances[index] = distances[index - 1] + path[index - 1].latLng.distanceTo(path[index].latLng);
+    }
+    const distanceMeters = distances.at(-1) || 0;
+    if (distanceMeters <= 0) {
+      this.showSimulationPoint(endIndex);
+      return;
+    }
+
+    const durationMilliseconds = this.simulationRangeDuration(segment, distanceMeters) * 1_000;
+    const startedAt = performance.now();
+    let reachedPathIndex = 0;
+    let lastCameraUpdate = 0;
+    this.currentSimulationDelayMs = 0;
+    this.setSimulationCursorIcon(tripGoSegmentIcon(segment));
+    const targetZoom = this.simulationZoom(path[1].point);
+    if (targetZoom !== undefined && this.map.getZoom() !== targetZoom) {
+      this.map.setZoom(targetZoom, { animate: true });
+    }
+
+    const animateFrame = (timestamp: number): void => {
+      if (!this.map || !this.simulationMarker) return;
+      const progress = Math.min(1, (timestamp - startedAt) / durationMilliseconds);
+      const travelled = distanceMeters * progress;
+      while (reachedPathIndex + 1 < path.length && distances[reachedPathIndex + 1] <= travelled) {
+        reachedPathIndex += 1;
+        this.applySimulationMilestone(path[reachedPathIndex]);
+      }
+
+      const targetPathIndex = Math.min(path.length - 1, reachedPathIndex + 1);
+      const edgeStartDistance = distances[reachedPathIndex];
+      const edgeDistance = Math.max(0.0001, distances[targetPathIndex] - edgeStartDistance);
+      const edgeProgress = targetPathIndex === reachedPathIndex
+        ? 1
+        : Math.min(1, Math.max(0, (travelled - edgeStartDistance) / edgeDistance));
+      const projectedStart = projected[reachedPathIndex];
+      const projectedTarget = projected[targetPathIndex];
+      const current = this.map.unproject(leaflet.point(
+        projectedStart.x + (projectedTarget.x - projectedStart.x) * edgeProgress,
+        projectedStart.y + (projectedTarget.y - projectedStart.y) * edgeProgress
+      ), projectionZoom);
+      this.simulationMarker.setLatLng(current);
+      if (timestamp - lastCameraUpdate >= 33 || progress >= 1) {
+        this.map.panTo(current, { animate: false });
+        lastCameraUpdate = timestamp;
+      }
+      this.updateSimulatedTime(
+        path[reachedPathIndex].point?.time || this.simulatedTime() || undefined,
+        path[targetPathIndex].point?.time,
+        edgeProgress
+      );
+
+      if (progress < 1) {
+        this.simulationAnimationFrame = requestAnimationFrame(animateFrame);
+        return;
+      }
+
+      while (reachedPathIndex + 1 < path.length) {
+        reachedPathIndex += 1;
+        this.applySimulationMilestone(path[reachedPathIndex]);
+      }
+      this.simulationIndex = endIndex;
+      this.simulationAnimationFrame = undefined;
+      this.currentSimulationDelayMs = 0;
+      this.scheduleWikipediaLoad();
+      if (this.simulationState === 'playing') this.scheduleNextSimulationPoint();
+    };
+    this.simulationAnimationFrame = requestAnimationFrame(animateFrame);
+  }
+
+  private applySimulationMilestone(entry: { index: number; point: TripGoSimulationPoint }): void {
+    this.simulationIndex = entry.index;
+    if (entry.point.showOverlay || entry.point.updateOverlay) {
+      this.activeSimulationPoint.set(entry.point);
+    }
+  }
+
+  private simulationRangeDuration(segment: TripGoRouteSegment, distanceMeters: number): number {
+    const segmentDistance = this.segmentGeometryDistance(segment);
+    const identifier = `${segment.modeIdentifier || ''} ${tripGoSegmentIcon(segment)}`;
+    let compression = 45;
+    let fallbackMetersPerSecond = 250;
+    let minimumDuration = 3;
+    let maximumDuration = 25;
+
+    if (identifier.includes('walk')) {
+      compression = 18;
+      fallbackMetersPerSecond = 45;
+      maximumDuration = 35;
+    } else if (identifier.includes('bic') || identifier.includes('bike')) {
+      compression = 30;
+      fallbackMetersPerSecond = 110;
+      maximumDuration = 30;
+    } else if (identifier.includes('train') || identifier.includes('subway')) {
+      compression = 60;
+      fallbackMetersPerSecond = 450;
+      minimumDuration = 4;
+      maximumDuration = 30;
+    } else if (identifier.includes('flight') || identifier.includes('air')) {
+      compression = 120;
+      fallbackMetersPerSecond = 1_500;
+      minimumDuration = 4;
+      maximumDuration = 25;
+    }
+
+    const fullDuration = segment.durationSeconds
+      ? Math.min(maximumDuration, Math.max(minimumDuration, segment.durationSeconds / compression))
+      : Math.min(maximumDuration, Math.max(minimumDuration, segmentDistance / fallbackMetersPerSecond));
+    if (segmentDistance <= 0) return Math.max(.1, distanceMeters / fallbackMetersPerSecond);
+    return Math.max(.1, fullDuration * distanceMeters / segmentDistance);
   }
 
   private finishSimulation(): void {
@@ -638,8 +820,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
         ? tripGoSegmentIcon(point.segment)
         : 'gps_fixed';
     if (this.simulationMarker) {
-      const iconElement = this.simulationMarker.getElement()?.querySelector<HTMLElement>('.material-symbols-outlined');
-      if (iconElement) iconElement.textContent = cursorIcon;
+      this.setSimulationCursorIcon(cursorIcon);
       this.animateSimulationMovement(latLng, durationSeconds, previousTime, point.time);
       return;
     }
@@ -662,6 +843,12 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
       animate: durationSeconds > 0,
       duration: initial ? durationSeconds : 0
     });
+  }
+
+  private setSimulationCursorIcon(icon: string): void {
+    const iconElement = this.simulationMarker?.getElement()
+      ?.querySelector<HTMLElement>('.material-symbols-outlined');
+    if (iconElement) iconElement.textContent = icon;
   }
 
   private removeSimulationMarker(): void {
