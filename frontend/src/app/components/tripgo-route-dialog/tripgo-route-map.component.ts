@@ -58,6 +58,7 @@ const wikipediaMarker = leaflet.icon({
   iconAnchor: [16, 40]
 });
 const WIKIPEDIA_ROUTE_RADIUS_METERS = 200;
+const MAX_WIKIPEDIA_SIMULATION_SEARCHES = 80;
 
 @Component({
   selector: 'app-tripgo-route-map',
@@ -730,21 +731,25 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     let compression = 45;
     let fallbackMetersPerSecond = 250;
     let minimumDuration = 3;
-    let maximumDuration = 150;
+    let maximumDuration = 600;
 
     if (identifier.includes('walk')) {
       compression = 18;
       fallbackMetersPerSecond = 45;
-      maximumDuration = 180;
+      maximumDuration = 900;
     } else if (identifier.includes('bic') || identifier.includes('bike')) {
       compression = 30;
       fallbackMetersPerSecond = 110;
-      maximumDuration = 180;
+      maximumDuration = 900;
+    } else if (identifier.includes('car')) {
+      compression = 45;
+      fallbackMetersPerSecond = 250;
+      maximumDuration = 900;
     } else if (identifier.includes('train') || identifier.includes('subway')) {
       compression = 60;
       fallbackMetersPerSecond = 450;
       minimumDuration = 4;
-      maximumDuration = 150;
+      maximumDuration = 600;
     } else if (identifier.includes('flight') || identifier.includes('air')) {
       compression = 120;
       fallbackMetersPerSecond = 1_500;
@@ -1284,26 +1289,34 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
   }
 
   private wikipediaSearchBounds(): Array<{ north: number; south: number; east: number; west: number }> {
-    const routeLines: TripGoLocation[][] = [];
+    const routeLines: Array<{ points: TripGoLocation[]; intervalMeters?: number }> = [];
     for (const segment of this.route.segments) {
-      if (tripGoSegmentIcon(segment) === 'flight') {
-        if (this.validTripGoLocation(segment.from)) routeLines.push([segment.from]);
-        if (this.validTripGoLocation(segment.to)) routeLines.push([segment.to]);
+      const icon = tripGoSegmentIcon(segment);
+      const endpointsOnly = icon === 'flight'
+        || icon === 'train'
+        || icon === 'directions_boat'
+        || segment.type === 'stationary';
+      if (endpointsOnly) {
+        if (this.validTripGoLocation(segment.from)) routeLines.push({ points: [segment.from] });
+        if (this.validTripGoLocation(segment.to)) routeLines.push({ points: [segment.to] });
         continue;
       }
       const geometry = this.segmentGeometryLocations(segment).filter((point) => this.validTripGoLocation(point));
       const line = geometry.length ? geometry : this.fallbackSimulationGeometry(segment);
-      if (line.length) routeLines.push(line);
+      if (line.length) routeLines.push({
+        points: line,
+        intervalMeters: this.wikipediaSearchIntervalMeters(icon)
+      });
     }
     if (!routeLines.length) return [];
 
-    // Keep each request small enough that the Wikipedia tile service can
-    // process it without filling its upstream queue. Overlapping 2 km samples
-    // still cover the complete 200 m route corridor.
-    const intervalMeters = 2_000;
+    // Slow modes retain the dense two-kilometre sampling. Faster modes use a
+    // wider grid, while trains, ferries and flights are searched only at their
+    // boarding and alighting points because they cannot stop along the way.
     const centers: TripGoLocation[] = [];
-    for (const line of routeLines) {
+    for (const { points: line, intervalMeters } of routeLines) {
       centers.push(line[0]);
+      if (!intervalMeters) continue;
       let distanceSinceCenter = 0;
       for (let index = 1; index < line.length; index += 1) {
         const start = line[index - 1];
@@ -1329,8 +1342,13 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
 
     const uniqueCenters = centers.filter((center, index) => centers.findIndex((candidate) =>
       this.distanceInMeters(center, candidate) < 500) === index);
+    const limitedCenters = uniqueCenters.length <= MAX_WIKIPEDIA_SIMULATION_SEARCHES
+      ? uniqueCenters
+      : Array.from({ length: MAX_WIKIPEDIA_SIMULATION_SEARCHES }, (_, index) =>
+        uniqueCenters[Math.round(index * (uniqueCenters.length - 1)
+          / (MAX_WIKIPEDIA_SIMULATION_SEARCHES - 1))]);
     const halfSizeMeters = 1_300;
-    return uniqueCenters.map((center) => {
+    return limitedCenters.map((center) => {
       const latitudeDelta = halfSizeMeters / 110_540;
       const longitudeDelta = halfSizeMeters
         / Math.max(1, 111_320 * Math.cos(Number(center.latitude) * Math.PI / 180));
@@ -1341,6 +1359,24 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
         west: Math.max(-180, Number(center.longitude) - longitudeDelta)
       };
     });
+  }
+
+  private wikipediaSearchIntervalMeters(icon: string): number {
+    switch (icon) {
+      case 'directions_walk':
+      case 'directions_bike':
+        return 2_000;
+      case 'directions_bus':
+        return 5_000;
+      case 'tram':
+      case 'subway':
+      case 'directions_transit':
+        return 10_000;
+      case 'directions_car':
+        return 15_000;
+      default:
+        return 10_000;
+    }
   }
 
   private renderPreparedWikipediaMarkers(): void {
