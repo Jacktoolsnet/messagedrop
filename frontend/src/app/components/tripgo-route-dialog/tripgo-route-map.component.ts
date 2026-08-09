@@ -644,7 +644,6 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     const durationMilliseconds = this.simulationRangeDuration(segment, distanceMeters) * 1_000;
     const startedAt = performance.now();
     let reachedPathIndex = 0;
-    let lastCameraUpdate = 0;
     this.currentSimulationDelayMs = 0;
     this.setSimulationCursorIcon(tripGoSegmentIcon(segment));
     const targetZoom = this.simulationZoom(path[1].point);
@@ -674,10 +673,10 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
         projectedStart.y + (projectedTarget.y - projectedStart.y) * edgeProgress
       ), projectionZoom);
       this.simulationMarker.setLatLng(current);
-      if (timestamp - lastCameraUpdate >= 33 || progress >= 1) {
-        this.map.panTo(current, { animate: false });
-        lastCameraUpdate = timestamp;
-      }
+      // Keep marker and camera in the same animation frame. Updating the marker
+      // at 60 fps but the map only at 30 fps made the cursor alternate between
+      // moving away from the centre and snapping back to it.
+      this.map.panTo(current, { animate: false });
       this.updateSimulatedTime(
         path[reachedPathIndex].point?.time || this.simulatedTime() || undefined,
         path[targetPathIndex].point?.time,
