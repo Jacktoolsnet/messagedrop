@@ -49,6 +49,7 @@ interface TripGoSimulationPoint {
   turnInstruction?: TripGoTurnInstruction;
   updateOverlay?: boolean;
   showOverlay: boolean;
+  showWeather?: boolean;
 }
 
 const wikipediaMarker = leaflet.icon({
@@ -128,7 +129,9 @@ const WIKIPEDIA_ROUTE_RADIUS_METERS = 200;
                 <span><mat-icon aria-hidden="true">pin_drop</mat-icon>{{ 'common.tripGo.platform' | transloco:{ platform: segment.service?.startPlatform } }}</span>
               }
             }
-            <app-tripgo-timeline-weather [location]="point.location"></app-tripgo-timeline-weather>
+            @if (point.showWeather) {
+              <app-tripgo-timeline-weather [location]="point.location"></app-tripgo-timeline-weather>
+            }
           </div>
         </aside>
       }
@@ -447,7 +450,8 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
       title: start.name || start.address || this.transloco.translate('common.tripGo.origin'),
       time: this.route.departureTime,
       segment: firstSegment,
-      showOverlay: true
+      showOverlay: true,
+      showWeather: true
     });
 
     this.route.segments.forEach((segment, segmentIndex) => {
@@ -468,7 +472,8 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
           title: segment.from.name || segment.from.address || this.transloco.translate('common.tripGo.simulation.routePoint'),
           time: segment.startTime,
           segment,
-          showOverlay: true
+          showOverlay: true,
+          showWeather: true
         });
       }
 
@@ -517,7 +522,8 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
       location: arrival,
       title: arrival.name || arrival.address || this.transloco.translate('common.tripGo.destination'),
       time: this.route.arrivalTime,
-      showOverlay: true
+      showOverlay: true,
+      showWeather: true
     });
     return points;
   }
@@ -714,28 +720,30 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     let compression = 45;
     let fallbackMetersPerSecond = 250;
     let minimumDuration = 3;
-    let maximumDuration = 25;
+    let maximumDuration = 150;
 
     if (identifier.includes('walk')) {
       compression = 18;
       fallbackMetersPerSecond = 45;
-      maximumDuration = 35;
+      maximumDuration = 180;
     } else if (identifier.includes('bic') || identifier.includes('bike')) {
       compression = 30;
       fallbackMetersPerSecond = 110;
-      maximumDuration = 30;
+      maximumDuration = 180;
     } else if (identifier.includes('train') || identifier.includes('subway')) {
       compression = 60;
       fallbackMetersPerSecond = 450;
       minimumDuration = 4;
-      maximumDuration = 30;
+      maximumDuration = 150;
     } else if (identifier.includes('flight') || identifier.includes('air')) {
       compression = 120;
       fallbackMetersPerSecond = 1_500;
       minimumDuration = 4;
-      maximumDuration = 25;
+      maximumDuration = 120;
     }
 
+    // Limit only unusually long complete segments. Small caps made an hour-long
+    // route rush past in a few seconds and left no time to notice nearby places.
     const fullDuration = segment.durationSeconds
       ? Math.min(maximumDuration, Math.max(minimumDuration, segment.durationSeconds / compression))
       : Math.min(maximumDuration, Math.max(minimumDuration, segmentDistance / fallbackMetersPerSecond));

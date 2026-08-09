@@ -42,7 +42,7 @@ export class OpenMeteoRefreshService {
     return this.toReadonly(state);
   }
 
-  refreshWeather(place: Place, force = false, persist = true): void {
+  refreshWeather(place: Place, force = false, persist = true, silent = false): void {
     const state = this.ensureWeatherState(place.id);
     this.syncWeatherFromPlace(place, state);
 
@@ -68,7 +68,9 @@ export class OpenMeteoRefreshService {
         location.plusCode,
         location.latitude,
         location.longitude,
-        3
+        3,
+        false,
+        silent
       )
       .subscribe({
         next: (weather) => {

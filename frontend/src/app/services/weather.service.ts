@@ -50,7 +50,15 @@ export class WeatherService {
     return throwError(() => error);
   }
 
-  getWeather(locale: string, pluscode: string, latitude: number, longitude: number, days: number, showAlways = false): Observable<Weather> {
+  getWeather(
+    locale: string,
+    pluscode: string,
+    latitude: number,
+    longitude: number,
+    days: number,
+    showAlways = false,
+    silent = false
+  ): Observable<Weather> {
     const url = `${environment.apiUrl}/weather/${locale}/${pluscode}/${latitude}/${longitude}/${days}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
@@ -64,7 +72,10 @@ export class WeatherService {
       autoclose: false
     });
 
-    return this.http.get<{ status: number; data: WeatherApiResponse }>(url, this.httpOptions)
+    const httpOptions = silent
+      ? { headers: this.httpOptions.headers.set('x-skip-ui', 'true') }
+      : this.httpOptions;
+    return this.http.get<{ status: number; data: WeatherApiResponse }>(url, httpOptions)
       .pipe(
         map((res) => this.mapToWeather(res.data)),
         catchError(this.handleError)

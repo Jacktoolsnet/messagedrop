@@ -31,7 +31,10 @@ export class TripGoTimelineWeatherComponent implements OnChanges {
 
     const place = this.createTransientPlace(latitude, longitude);
     this.weatherState = this.refreshService.getWeatherState(place);
-    this.refreshService.refreshWeather(place, false, false);
+    // Weather is supplementary information in the route timeline and
+    // simulation. Rate limits or temporary failures must not interrupt the
+    // route with a global display-message dialog.
+    this.refreshService.refreshWeather(place, false, false, true);
   }
 
   get weather(): Weather | undefined {
