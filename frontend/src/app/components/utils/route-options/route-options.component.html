@@ -17,13 +17,18 @@
         <mat-slide-toggle [(ngModel)]="options.bicycle">
           <span class="option-label"><mat-icon aria-hidden="true">directions_bike</mat-icon>{{ 'common.routeOptions.variants.bicycle' | transloco }}</span>
         </mat-slide-toggle>
-        <div class="distance-setting" [class.distance-setting--disabled]="!options.bicycle">
+        <mat-slide-toggle class="suboption-setting" [(ngModel)]="options.bicyclePublicTransport"
+          [disabled]="!options.bicycle">
+          {{ 'common.routeOptions.variants.combinePublicTransport' | transloco }}
+        </mat-slide-toggle>
+        <div class="distance-setting"
+          [class.distance-setting--disabled]="!options.bicycle || !options.bicyclePublicTransport">
           <div class="distance-setting__label">
             <span>{{ 'common.routeOptions.variants.bicycleDistance' | transloco }}</span>
             <strong>{{ options.bicyclePureMaxKm }} km</strong>
           </div>
           <mat-slider min="3" max="15" step="1" discrete [displayWith]="formatDistanceLabel"
-            [disabled]="!options.bicycle">
+            [disabled]="!options.bicycle || !options.bicyclePublicTransport">
             <input matSliderThumb [(ngModel)]="options.bicyclePureMaxKm" />
           </mat-slider>
         </div>
@@ -32,13 +37,18 @@
         <mat-slide-toggle [(ngModel)]="options.walking">
           <span class="option-label"><mat-icon aria-hidden="true">directions_walk</mat-icon>{{ 'common.routeOptions.variants.walking' | transloco }}</span>
         </mat-slide-toggle>
-        <div class="distance-setting" [class.distance-setting--disabled]="!options.walking">
+        <mat-slide-toggle class="suboption-setting" [(ngModel)]="options.walkingPublicTransport"
+          [disabled]="!options.walking">
+          {{ 'common.routeOptions.variants.combinePublicTransport' | transloco }}
+        </mat-slide-toggle>
+        <div class="distance-setting"
+          [class.distance-setting--disabled]="!options.walking || !options.walkingPublicTransport">
           <div class="distance-setting__label">
             <span>{{ 'common.routeOptions.variants.walkingDistance' | transloco }}</span>
             <strong>{{ options.walkingPureMaxKm }} km</strong>
           </div>
           <mat-slider min="1" max="3" step="0.5" discrete [displayWith]="formatDistanceLabel"
-            [disabled]="!options.walking">
+            [disabled]="!options.walking || !options.walkingPublicTransport">
             <input matSliderThumb [(ngModel)]="options.walkingPureMaxKm" />
           </mat-slider>
         </div>

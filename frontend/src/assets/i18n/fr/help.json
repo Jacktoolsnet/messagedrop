@@ -2971,7 +2971,7 @@
     "title": "Options d’itinéraire",
     "intro": "Choisissez les itinéraires qui sont calculés.",
     "items": {
-      "variants": { "title": "Propositions d’itinéraires", "desc": "Activez indépendamment la voiture, le vélo, la marche ou l’avion. Pour le vélo et la marche, la limite à vol d’oiseau détermine si l’itinéraire utilise uniquement ce mode ou une combinaison avec les transports publics." }
+      "variants": { "title": "Propositions d’itinéraires", "desc": "Activez indépendamment la voiture, le vélo, la marche ou l’avion. Les itinéraires à vélo et à pied peuvent être combinés avec les transports publics. Si la combinaison est désactivée, seul le mode correspondant est utilisé et la limite à vol d’oiseau ne s’applique pas." }
     }
   },
   "locationShareContacts": {

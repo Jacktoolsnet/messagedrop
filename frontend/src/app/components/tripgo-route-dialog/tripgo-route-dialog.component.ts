@@ -616,19 +616,25 @@ export class TripGoRouteDialogComponent implements OnInit, OnDestroy {
     const categories: RouteCategoryConfig[] = [];
     if (this.routeOptions.car) categories.push(CAR_CATEGORY);
     if (this.routeOptions.bicycle) {
-      const bicycleOnly = distanceMeters <= this.routeOptions.bicyclePureMaxKm * 1_000;
+      const bicycleOnly = !this.routeOptions.bicyclePublicTransport
+        || distanceMeters <= this.routeOptions.bicyclePureMaxKm * 1_000;
       categories.push({
         category: 'bicycle-transit',
         primaryModes: bicycleOnly ? ['me_mic_bic'] : ['me_mic_bic', 'pt_pub'],
-        fallbackModes: bicycleOnly ? ['me_mic_bic', 'pt_pub'] : undefined
+        fallbackModes: bicycleOnly && this.routeOptions.bicyclePublicTransport
+          ? ['me_mic_bic', 'pt_pub']
+          : undefined
       });
     }
     if (this.routeOptions.walking) {
-      const walkingOnly = distanceMeters <= this.routeOptions.walkingPureMaxKm * 1_000;
+      const walkingOnly = !this.routeOptions.walkingPublicTransport
+        || distanceMeters <= this.routeOptions.walkingPureMaxKm * 1_000;
       categories.push({
         category: 'walk-transit',
         primaryModes: walkingOnly ? ['wa_wal'] : ['wa_wal', 'pt_pub'],
-        fallbackModes: walkingOnly ? ['wa_wal', 'pt_pub'] : undefined
+        fallbackModes: walkingOnly && this.routeOptions.walkingPublicTransport
+          ? ['wa_wal', 'pt_pub']
+          : undefined
       });
     }
     if (this.routeOptions.flights && distanceMeters >= MIN_FLIGHT_DISTANCE_METERS) {

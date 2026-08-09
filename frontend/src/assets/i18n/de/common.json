@@ -1744,11 +1744,12 @@
         "description": "Lege fest, welche Varianten bei einer Berechnung angeboten werden.",
         "car": "Autoroute anzeigen",
         "bicycle": "Fahrradroute anzeigen",
+        "combinePublicTransport": "Mit öffentlichen Verkehrsmitteln kombinieren",
         "bicycleDistance": "Reine Fahrradroute bis",
         "walking": "Fußwegroute anzeigen",
         "walkingDistance": "Reine Fußwegroute bis",
         "flights": "Flugverbindungen anzeigen",
-        "distanceHint": "Die Entfernung wird als Luftlinie zwischen Start und Ziel berechnet. Oberhalb des Grenzwerts wird nur nach einer Kombination mit öffentlichen Verkehrsmitteln gesucht."
+        "distanceHint": "Bei aktivierter Kombination wird die Entfernung als Luftlinie zwischen Start und Ziel berechnet. Oberhalb des Grenzwerts wird nur nach einer Kombination mit öffentlichen Verkehrsmitteln gesucht."
       }
     },
     "wikipedia": {

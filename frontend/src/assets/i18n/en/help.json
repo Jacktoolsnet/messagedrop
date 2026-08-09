@@ -2989,7 +2989,7 @@
     "title": "Route options",
     "intro": "Choose which route suggestions are calculated.",
     "items": {
-      "variants": { "title": "Route suggestions", "desc": "Enable driving, cycling, walking, or flights independently. For cycling and walking, the straight-line limit determines whether a route uses that mode alone or is combined with public transport." }
+      "variants": { "title": "Route suggestions", "desc": "Enable driving, cycling, walking, or flights independently. Cycling and walking routes can be combined with public transport. When combination is disabled, only the respective mode is used and the straight-line limit does not apply." }
     }
   },
   "locationShareContacts": {

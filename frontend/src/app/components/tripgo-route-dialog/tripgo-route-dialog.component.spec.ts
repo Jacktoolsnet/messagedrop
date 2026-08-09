@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { TranslocoService } from '@jsverse/transloco';
 import { of } from 'rxjs';
+import { RouteOptions, normalizeRouteOptions } from '../../interfaces/route-options';
 import { TripGoRouteOption } from '../../interfaces/tripgo';
 import { GeolocationService } from '../../services/geolocation.service';
 import { NominatimService } from '../../services/nominatim.service';
@@ -166,6 +167,27 @@ describe('TripGoRouteDialogComponent', () => {
       args[3].join(',') === 'wa_wal,pt_pub')).toBeTrue();
     expect(tripGo.calculateRoute.calls.allArgs().some((args) =>
       args[3].join(',') === 'me_mic_bic' || args[3].join(',') === 'wa_wal')).toBeFalse();
+  });
+
+  it('excludes public transport from bicycle and walking routes when combination is disabled', () => {
+    fixture.componentInstance.destination.set({
+      latitude: 48.137, longitude: 11.575, plusCode: '8FWH4HPC+R2'
+    });
+    const componentWithOptions = fixture.componentInstance as unknown as { routeOptions: RouteOptions };
+    componentWithOptions.routeOptions = normalizeRouteOptions({
+      car: false,
+      bicycle: true,
+      bicyclePublicTransport: false,
+      walking: true,
+      walkingPublicTransport: false,
+      flights: false
+    });
+
+    fixture.detectChanges();
+    fixture.componentInstance.calculateRoute();
+
+    expect(tripGo.calculateRoute.calls.allArgs().map((args) => args[3].join(',')))
+      .toEqual(['me_mic_bic', 'wa_wal']);
   });
 
   it('waits for the explicit action after selecting another destination', () => {

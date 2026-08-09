@@ -53,6 +53,7 @@
   gap: 0.45rem;
 }
 
+.suboption-setting,
 .distance-setting {
   gap: 0.1rem;
   padding-inline-start: 3.1rem;
