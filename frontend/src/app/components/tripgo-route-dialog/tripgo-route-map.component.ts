@@ -1292,13 +1292,16 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     const routeLines: Array<{ points: TripGoLocation[]; intervalMeters?: number }> = [];
     for (const segment of this.route.segments) {
       const icon = tripGoSegmentIcon(segment);
-      const endpointsOnly = icon === 'flight'
-        || icon === 'train'
-        || icon === 'directions_boat'
-        || segment.type === 'stationary';
-      if (endpointsOnly) {
-        if (this.validTripGoLocation(segment.from)) routeLines.push({ points: [segment.from] });
-        if (this.validTripGoLocation(segment.to)) routeLines.push({ points: [segment.to] });
+      const publicTransport = segment.type === 'scheduled'
+        || ['directions_bus', 'tram', 'subway', 'train', 'directions_boat', 'flight']
+          .includes(icon);
+      if (publicTransport || segment.type === 'stationary') {
+        const stops = [
+          segment.from,
+          ...(segment.service?.intermediateStops || []),
+          segment.to
+        ].filter((location) => this.validTripGoLocation(location));
+        stops.forEach((location) => routeLines.push({ points: [location] }));
         continue;
       }
       const geometry = this.segmentGeometryLocations(segment).filter((point) => this.validTripGoLocation(point));
@@ -1310,9 +1313,9 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     }
     if (!routeLines.length) return [];
 
-    // Slow modes retain the dense two-kilometre sampling. Faster modes use a
-    // wider grid, while trains, ferries and flights are searched only at their
-    // boarding and alighting points because they cannot stop along the way.
+    // Walking and cycling retain the dense two-kilometre sampling and cars use
+    // a wider grid. Public transport is searched only at the boarding,
+    // intermediate and alighting stops collected above.
     const centers: TripGoLocation[] = [];
     for (const { points: line, intervalMeters } of routeLines) {
       centers.push(line[0]);
@@ -1366,12 +1369,6 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
       case 'directions_walk':
       case 'directions_bike':
         return 2_000;
-      case 'directions_bus':
-        return 5_000;
-      case 'tram':
-      case 'subway':
-      case 'directions_transit':
-        return 10_000;
       case 'directions_car':
         return 15_000;
       default:
