@@ -541,10 +541,20 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     const animate = !this.prefersReducedMotion();
     const movementDuration = animate ? this.simulationMovementDuration(index, initial, point.showOverlay) : 0;
     const targetZoom = this.simulationZoom(point);
-    if (targetZoom !== undefined && (initial || this.map.getZoom() !== targetZoom)) {
+    if (initial && this.validTripGoLocation(point.location)) {
+      const target = leaflet.latLng(point.location.latitude, point.location.longitude);
+      const zoom = targetZoom ?? this.map.getZoom();
+      const alreadyAtStart = this.map.distance(this.map.getCenter(), target) < 1
+        && this.map.getZoom() === zoom;
+      if (!alreadyAtStart) {
+        // Move and zoom in one operation. Zooming at the route overview first
+        // and panning afterwards looked like a detour via an unrelated place.
+        this.map.setView(target, zoom, { animate, duration: movementDuration });
+      }
+    } else if (targetZoom !== undefined && this.map.getZoom() !== targetZoom) {
       this.map.setZoom(targetZoom, { animate });
     }
-    this.moveSimulationMarker(point, movementDuration, initial, previousPoint?.time);
+    this.moveSimulationMarker(point, movementDuration, previousPoint?.time);
     const movementDelayMs = Math.round(movementDuration * 1_000);
     const stopDelayMs = point.showOverlay
       ? (this.prefersReducedMotion() ? 1_500 : 3_000)
@@ -816,7 +826,6 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
   private moveSimulationMarker(
     point: TripGoSimulationPoint,
     durationSeconds: number,
-    initial: boolean,
     previousTime?: string
   ): void {
     if (!this.map) return;
@@ -846,10 +855,6 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
       zIndexOffset: 4_000
     }).addTo(this.map);
     this.simulatedTime.set(point.time || null);
-    this.map.panTo(latLng, {
-      animate: durationSeconds > 0,
-      duration: initial ? durationSeconds : 0
-    });
   }
 
   private setSimulationCursorIcon(icon: string): void {
@@ -1202,7 +1207,13 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     const firstPoint = this.simulationPoints[0];
     if (firstPoint && this.validTripGoLocation(firstPoint.location)) {
       const startZoom = this.simulationZoom(firstPoint) ?? Math.max(14, this.searchSettings.wikipedia.minZoom);
-      this.map.flyTo([firstPoint.location.latitude, firstPoint.location.longitude], startZoom, { duration: 1.2 });
+      // setView changes centre and zoom together without flyTo's intentional
+      // zoom-out arc, which can look as though the map visits another place.
+      this.map.setView(
+        [firstPoint.location.latitude, firstPoint.location.longitude],
+        startZoom,
+        { animate: !this.prefersReducedMotion(), duration: 1.2 }
+      );
     }
 
     const dialogRef = this.dialog.open(DisplayMessage, {

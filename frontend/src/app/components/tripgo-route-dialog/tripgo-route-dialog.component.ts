@@ -124,13 +124,10 @@ export class TripGoRouteDialogComponent implements OnInit, OnDestroy {
   readonly routes = signal<TripGoRouteOption[]>([]);
   readonly requestedRouteCategories = signal<TripGoRouteCategory[]>([]);
   readonly loadingRouteCategories = signal<ReadonlySet<TripGoRouteCategory>>(new Set());
-  readonly visibleRouteCategories = computed(() => {
-    const loading = this.loadingRouteCategories();
-    const routes = this.routes();
-    return this.requestedRouteCategories().filter((category) => category !== 'flight'
-      || loading.has(category)
-      || routes.some((route) => route.category === category));
-  });
+  // Keep every requested variant visible after routing has finished. A missing
+  // flight result should use the same placeholder card as car, bicycle and
+  // walking instead of making the complete column disappear.
+  readonly visibleRouteCategories = computed(() => this.requestedRouteCategories());
   readonly expandedRouteIds = signal<ReadonlySet<string>>(new Set());
   readonly errorKey = signal('common.tripGo.errors.route');
   readonly isBusy = computed(() => this.state() === 'locating' || this.state() === 'routing');
