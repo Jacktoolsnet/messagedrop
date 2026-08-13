@@ -929,6 +929,28 @@ h2[mat-dialog-title].dialog-title {
   font-size: 18px;
 }
 
+/* Dynamic Overpass markers use the same pin shell and render the icon for the
+   selected main category into its light centre. */
+.overpass-poi-marker-host {
+  border: 0;
+  background: transparent;
+}
+
+.overpass-poi-marker {
+  display: block;
+  overflow: visible;
+  filter: drop-shadow(0 3px 4px color-mix(in srgb, var(--mat-sys-shadow) 45%, transparent));
+}
+
+.overpass-poi-marker__icon {
+  color: #5f6368;
+  fill: #5f6368;
+  font-size: 17px;
+  text-anchor: middle;
+  dominant-baseline: hanging;
+  font-variation-settings: 'FILL' 0, 'wght' 600, 'GRAD' 0, 'opsz' 20;
+}
+
 /* Ensure dialog titles don't wrap across the app. */
 h2[mat-dialog-title].dialog-title .dialog-title__text {
   white-space: nowrap;

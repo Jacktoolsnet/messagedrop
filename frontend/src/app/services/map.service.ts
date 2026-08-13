@@ -166,10 +166,10 @@ export function overpassCategoryMarker(category: OverpassCategory): leaflet.DivI
   const icon = OVERPASS_MARKER_ICONS[category] || 'location_on';
   return leaflet.divIcon({
     className: 'overpass-poi-marker-host',
-    html: `<svg viewBox="0 0 32 40" width="32" height="40" aria-hidden="true">
+    html: `<svg class="overpass-poi-marker" viewBox="0 0 32 40" width="32" height="40" aria-hidden="true">
       <image href="assets/markers/empty-marker.svg" x="0" y="0" width="32" height="40" />
-      <text x="16" y="16" text-anchor="middle" dominant-baseline="middle"
-        style="font-family:'Material Symbols Outlined';font-size:16px;fill:white">${icon}</text>
+      <text class="material-symbols-outlined overpass-poi-marker__icon"
+        x="16" y="10">${icon}</text>
     </svg>`,
     iconSize: [32, 40],
     iconAnchor: [16, 40]
