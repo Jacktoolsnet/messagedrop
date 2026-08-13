@@ -36,11 +36,15 @@ function createOverpassRouter({
     return res.status(200).json({ status: 200, categories: categoryNames(), catalog: categoryCatalog() });
   });
 
-  router.get('/import-catalog', (_req, res) => res.status(200).json({
-    status: 200,
-    datasets: importJobManager?.catalog?.() || [],
-    categories: categoryCatalog()
-  }));
+  router.get('/import-catalog', async (_req, res, next) => {
+    try {
+      return res.status(200).json({
+        status: 200,
+        datasets: await importJobManager?.catalog?.() || [],
+        categories: categoryCatalog()
+      });
+    } catch (error) { return next(error); }
+  });
 
   router.post('/import-jobs', async (req, res, next) => {
     if (!importJobManager) return res.status(503).json({ error: 'import_jobs_unavailable' });

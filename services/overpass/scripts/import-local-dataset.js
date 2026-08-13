@@ -11,41 +11,15 @@ const Database = require('../db/database');
 const tableOverpassPoi = require('../db/tableOverpassPoi');
 const { CATEGORY_DEFINITIONS, categoryNames, subcategoryNames } = require('../categories');
 const { normalizeElement } = require('../normalizer');
+const { FALLBACK_DATASETS } = require('../geofabrik-catalog');
 
 const DATASETS = Object.freeze({
-  germany: Object.freeze({
-    id: 'germany',
-    label: 'Germany',
-    continentCode: 'EU',
-    continentLabel: 'Europe',
-    countryCode: 'DE',
-    countryLabel: 'Germany',
-    regionCode: null,
-    level: 'country',
-    supersedes: Object.freeze(['wolfenbuettel']),
-    sourceUrl: 'https://download.geofabrik.de/europe/germany-latest.osm.pbf',
-    sourceFile: 'germany-latest.osm.pbf',
-    bounds: Object.freeze({ south: 47.2701, west: 5.8663, north: 55.0992, east: 15.0419 })
-  }),
-  wolfenbuettel: Object.freeze({
-    id: 'wolfenbuettel',
-    label: 'Wolfenbüttel',
-    continentCode: 'EU',
-    continentLabel: 'Europe',
-    countryCode: 'DE',
-    countryLabel: 'Germany',
-    regionCode: 'DE-NI',
-    level: 'test',
-    clipToBounds: true,
-    sourceUrl: 'https://download.geofabrik.de/europe/germany/niedersachsen-latest.osm.pbf',
-    sourceFile: 'niedersachsen-latest.osm.pbf',
-    bounds: Object.freeze({ south: 52.05, west: 10.40, north: 52.30, east: 10.75 })
-  })
+  ...FALLBACK_DATASETS
 });
 
 async function main() {
   const options = parseArguments(process.argv.slice(2));
-  const dataset = DATASETS[options.dataset];
+  const dataset = options.datasetDefinition || DATASETS[options.dataset];
   if (!dataset) throw new Error(`Unknown dataset: ${options.dataset}`);
   await requireCommand('curl');
   await requireCommand('osmium', 'Install it first with: sudo apt install osmium-tool');
@@ -276,6 +250,9 @@ function parseArguments(args) {
     else if (args[index] === '--keep-versions' && args[index + 1]) options.keepVersions = Number(args[++index]);
     else if (args[index] === '--job-id' && args[index + 1]) options.jobId = args[++index];
     else if (args[index] === '--subcategories-json' && args[index + 1]) options.subcategories = JSON.parse(args[++index]);
+    else if (args[index] === '--dataset-json-base64' && args[index + 1]) {
+      options.datasetDefinition = JSON.parse(Buffer.from(args[++index], 'base64url').toString('utf8'));
+    }
     else throw new Error(`Unknown argument: ${args[index]}`);
   }
   if (!options.categories.length || options.categories.some((category) => !categoryNames().includes(category))) {

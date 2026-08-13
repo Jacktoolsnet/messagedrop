@@ -96,7 +96,8 @@ export class OverpassImportSettingsComponent {
           this.catalog.set(catalog);
           this.settings.set(settings.settings);
           this.enabledCategories.set(new Set(settings.settings.categories));
-          this.enabledDatasets.set(new Set(settings.settings.datasets));
+          const availableDatasets = new Set(catalog.datasets.map((dataset) => dataset.id));
+          this.enabledDatasets.set(new Set(settings.settings.datasets.filter((dataset) => availableDatasets.has(dataset))));
           this.importsEnabled.set(settings.settings.enabled);
           this.scheduleType.set(settings.settings.scheduleType);
           this.weekday.set(settings.settings.weekday);
@@ -125,8 +126,9 @@ export class OverpassImportSettingsComponent {
   }
 
   countryLabel(countryCode: string): string {
-    const labels: Record<string, string> = { DE: 'Germany', SE: 'Sweden', DK: 'Denmark' };
-    return this.i18n.t(labels[countryCode] ?? countryCode);
+    try {
+      return new Intl.DisplayNames([this.i18n.lang() || 'de'], { type: 'region' }).of(countryCode) || countryCode;
+    } catch { return countryCode; }
   }
 
   selectContinent(continentCode: string): void {

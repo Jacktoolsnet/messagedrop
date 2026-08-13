@@ -1,7 +1,7 @@
 const tableName = 'tableOverpassImportSettings';
 
 const DEFAULTS = Object.freeze({
-  id: 1, enabled: false, datasets: ['wolfenbuettel'],
+  id: 1, enabled: false, datasets: ['germany'],
   categories: ['accommodation', 'tourism', 'leisure', 'food_drink', 'amenities'],
   subcategories: {},
   scheduleType: 'weekly', weekday: 0, hour: 3, minute: 0,
@@ -35,6 +35,7 @@ function init(db) {
   db.run(`ALTER TABLE ${tableName} ADD COLUMN subcategories TEXT NOT NULL DEFAULT '{}'`, [], (err) => {
     if (err && !String(err.message || '').includes('duplicate column name')) throw err;
   });
+  db.run(`UPDATE ${tableName} SET datasets = '["germany"]' WHERE datasets = '["wolfenbuettel"]'`);
 }
 
 function decode(row) {

@@ -3,7 +3,7 @@ const fs = require('node:fs/promises');
 const { spawn } = require('node:child_process');
 const { randomUUID } = require('node:crypto');
 const table = require('./db/tableOverpassPoi');
-const { DATASETS } = require('./scripts/import-local-dataset');
+const { GeofabrikCatalog } = require('./geofabrik-catalog');
 const { categoryNames, subcategoryNames } = require('./categories');
 
 function callbackResult(register) {
@@ -11,11 +11,12 @@ function callbackResult(register) {
 }
 
 class ImportJobManager {
-  constructor({ database, logger = console }) {
+  constructor({ database, logger = console, datasetCatalog } = {}) {
     this.database = database;
     this.logger = logger;
     this.children = new Map();
     this.launching = false;
+    this.datasetCatalog = datasetCatalog || new GeofabrikCatalog({ logger });
     void this.recover();
   }
 
@@ -38,14 +39,16 @@ class ImportJobManager {
     await Promise.all(generated.map((name) => fs.rm(path.join(directory, name), { force: true })));
   }
 
-  catalog() {
-    return Object.values(DATASETS).map(({ id, label, continentCode, continentLabel, countryCode, countryLabel, regionCode, level, bounds, sourceUrl }) => ({
-      id, label, continentCode, continentLabel, countryCode, countryLabel, regionCode, level, bounds, sourceUrl
+  async catalog() {
+    const catalog = await this.datasetCatalog.get();
+    return catalog.display.map(({ id, label, continentCode, continentLabel, countryCode, countryLabel, regionCode, level }) => ({
+      id, label, continentCode, continentLabel, countryCode, countryLabel, regionCode, level
     }));
   }
 
   async start({ datasetId, categories = categoryNames(), subcategories = {}, refresh = true }) {
-    const dataset = DATASETS[datasetId];
+    const catalog = await this.datasetCatalog.get();
+    const dataset = catalog.definitions[datasetId];
     if (!dataset) throw Object.assign(new Error('unknown_import_dataset'), { status: 400 });
     const selected = [...new Set(categories)];
     if (!selected.length || selected.some((value) => !categoryNames().includes(value))) {
@@ -84,24 +87,30 @@ class ImportJobManager {
   async launchNext() {
     if (this.launching || this.children.size) return;
     this.launching = true;
+    let job = null;
     try {
       const running = await callbackResult((callback) => table.findRunningJob(this.database.db, callback));
       if (running) return;
-      const job = await callbackResult((callback) => table.findQueuedJob(this.database.db, callback));
+      job = await callbackResult((callback) => table.findQueuedJob(this.database.db, callback));
       if (!job) return;
       const config = typeof job.requestedConfig === 'string' ? JSON.parse(job.requestedConfig) : job.requestedConfig;
-      this.launch(job.jobId, job.datasetId, config);
+      const catalog = await this.datasetCatalog.get();
+      const dataset = catalog.definitions[job.datasetId];
+      if (!dataset) throw new Error(`Import dataset is no longer available: ${job.datasetId}`);
+      this.launch(job.jobId, dataset, config);
     } catch (error) {
       this.logger.error('Could not launch queued Overpass import', { error: error.message });
+      if (job) await this.fail(job.jobId, error);
     } finally {
       this.launching = false;
     }
   }
 
-  launch(jobId, datasetId, config) {
+  launch(jobId, dataset, config) {
     const args = [
       path.join(__dirname, 'scripts', 'import-local-dataset.js'),
-      '--dataset', datasetId, '--categories', config.categories.join(','), '--job-id', jobId
+      '--dataset', dataset.id, '--categories', config.categories.join(','), '--job-id', jobId,
+      '--dataset-json-base64', Buffer.from(JSON.stringify(dataset)).toString('base64url')
     ];
     args.push('--subcategories-json', JSON.stringify(config.subcategories || {}));
     if (config.refresh) args.push('--refresh');

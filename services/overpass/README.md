@@ -129,8 +129,11 @@ For the complete German extract:
 npm run dataset:import:germany
 ```
 
-The administration catalog groups datasets by continent and country. Selecting
-Germany uses Geofabrik's country extract. The import applies the selected
+The administration catalog is built from Geofabrik's machine-readable download
+index and cached locally for 24 hours. It lists all currently importable
+continents and countries plus the directly available country subdivisions.
+The last catalog remains usable if Geofabrik is temporarily unavailable.
+Selecting Germany uses Geofabrik's country extract. The import applies the selected
 Osmium tag expressions before conversion, so only the configured POI categories
 and subcategories enter PostgreSQL—not the full OSM country dataset.
 
@@ -151,8 +154,9 @@ npm run dataset:import:wolfenbuettel -- \
   --categories accommodation,tourism,amenities
 ```
 
-The initial Geofabrik download is several hundred megabytes. It is retained in
-`docs/overpass/datasets/` and reused on later imports. To download a fresh PBF:
+The initial Geofabrik download can be several gigabytes. The source PBF is
+deleted immediately after filtering and is downloaded again for the next
+update. To force refresh semantics for a manual import:
 
 ```bash
 npm run dataset:import:wolfenbuettel -- --refresh
