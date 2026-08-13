@@ -2,7 +2,7 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const axios = require('axios');
 
-const INDEX_URL = 'https://download.geofabrik.de/index-v1-nogeom.json';
+const INDEX_URL = 'https://download.geofabrik.de/index-v1.json';
 const CONTINENTS = Object.freeze({
   africa: { code: 'AF', label: 'Africa' },
   antarctica: { code: 'AN', label: 'Antarctica' },
@@ -20,7 +20,8 @@ const FALLBACK_DATASETS = Object.freeze({
     countryCode: 'DE', countryLabel: 'Germany', regionCode: null, level: 'country',
     supersedes: Object.freeze(['wolfenbuettel']),
     sourceUrl: 'https://download.geofabrik.de/europe/germany-latest.osm.pbf',
-    sourceFile: 'germany-latest.osm.pbf'
+    sourceFile: 'germany-latest.osm.pbf',
+    bounds: Object.freeze({ south: 47.2701, west: 5.8663, north: 55.0992, east: 15.0419 })
   }),
   wolfenbuettel: Object.freeze({
     id: 'wolfenbuettel', label: 'Wolfenbüttel', continentCode: 'EU', continentLabel: 'Europe',
@@ -39,9 +40,30 @@ function array(value) {
   return Array.isArray(value) ? value.filter(Boolean).map(String) : value ? [String(value)] : [];
 }
 
+function geometryBounds(geometry) {
+  let south = Infinity;
+  let west = Infinity;
+  let north = -Infinity;
+  let east = -Infinity;
+  const visit = (coordinates) => {
+    if (Array.isArray(coordinates) && coordinates.length >= 2
+        && Number.isFinite(coordinates[0]) && Number.isFinite(coordinates[1])) {
+      west = Math.min(west, coordinates[0]);
+      east = Math.max(east, coordinates[0]);
+      south = Math.min(south, coordinates[1]);
+      north = Math.max(north, coordinates[1]);
+      return;
+    }
+    if (Array.isArray(coordinates)) coordinates.forEach(visit);
+  };
+  visit(geometry?.coordinates);
+  return Number.isFinite(south) && south < north && west < east ? { south, west, north, east } : null;
+}
+
 function buildCatalog(index) {
   const features = Array.isArray(index?.features) ? index.features : [];
   const properties = features.map((feature) => feature?.properties).filter(Boolean);
+  const geometryById = new Map(features.map((feature) => [feature?.properties?.id, feature?.geometry]));
   const byId = new Map(properties.map((item) => [item.id, item]));
   const countryCodes = new Map();
   for (const item of properties) {
@@ -73,7 +95,8 @@ function buildCatalog(index) {
     const country = ownCodes.length ? item : parentCountry(item);
     const codes = ownCodes.length ? ownCodes : (countryCodes.get(country?.id) || []);
     const continent = continentFor(item);
-    if (!country || !codes.length || !continent) continue;
+    const bounds = geometryBounds(geometryById.get(item.id));
+    if (!country || !codes.length || !continent || !bounds) continue;
     const id = safeId(item.id);
     const level = ownCodes.length ? 'country' : 'state';
     const definition = {
@@ -86,7 +109,8 @@ function buildCatalog(index) {
       regionCode: level === 'state' ? (array(item['iso3166-2'])[0] || item.id) : null,
       level,
       sourceUrl,
-      sourceFile: path.basename(new URL(sourceUrl).pathname)
+      sourceFile: path.basename(new URL(sourceUrl).pathname),
+      bounds
     };
     if (id === 'germany') definition.supersedes = ['wolfenbuettel'];
     definitions[id] = definition;
@@ -106,7 +130,7 @@ function buildCatalog(index) {
 class GeofabrikCatalog {
   constructor({ logger = console, cachePath, ttlMs, client } = {}) {
     this.logger = logger;
-    this.cachePath = cachePath || path.resolve(__dirname, '../../docs/overpass/datasets/geofabrik-index-v1-nogeom.json');
+    this.cachePath = cachePath || path.resolve(__dirname, '../../docs/overpass/datasets/geofabrik-index-v1.json');
     this.ttlMs = Number(ttlMs || process.env.OVERPASS_GEOFABRIK_CATALOG_TTL_MS || 24 * 60 * 60 * 1000);
     this.client = client || axios;
     this.value = null;
@@ -126,7 +150,7 @@ class GeofabrikCatalog {
       try {
         const stat = await fs.stat(this.cachePath);
         const cached = buildCatalog(JSON.parse(await fs.readFile(this.cachePath, 'utf8')));
-        if (Object.keys(cached.definitions).length) {
+        if (cached.display.length) {
           this.value = cached;
           this.loadedAt = stat.mtimeMs;
           if (Date.now() - stat.mtimeMs < this.ttlMs) return cached;
@@ -134,9 +158,9 @@ class GeofabrikCatalog {
       } catch { /* no usable persistent cache yet */ }
     }
     try {
-      const response = await this.client.get(INDEX_URL, { timeout: 10000, maxContentLength: 5 * 1024 * 1024 });
+      const response = await this.client.get(INDEX_URL, { timeout: 15000, maxContentLength: 50 * 1024 * 1024 });
       const next = buildCatalog(response.data);
-      if (!Object.keys(next.definitions).length) throw new Error('empty_geofabrik_catalog');
+      if (!next.display.length) throw new Error('empty_geofabrik_catalog');
       await fs.mkdir(path.dirname(this.cachePath), { recursive: true });
       await fs.writeFile(this.cachePath, `${JSON.stringify(response.data)}\n`, { mode: 0o600 });
       this.value = next;
@@ -155,4 +179,4 @@ class GeofabrikCatalog {
   }
 }
 
-module.exports = { CONTINENTS, FALLBACK_DATASETS, GeofabrikCatalog, buildCatalog, safeId };
+module.exports = { CONTINENTS, FALLBACK_DATASETS, GeofabrikCatalog, buildCatalog, geometryBounds, safeId };

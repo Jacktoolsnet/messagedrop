@@ -2,8 +2,8 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { buildCatalog } = require('../geofabrik-catalog');
 
-function feature(properties) {
-  return { type: 'Feature', properties };
+function feature(properties, geometry = { type: 'Polygon', coordinates: [[[5, 47], [16, 47], [16, 56], [5, 56], [5, 47]]] }) {
+  return { type: 'Feature', properties, geometry };
 }
 
 test('builds country imports but keeps subdivisions out of the administration catalog', () => {
@@ -18,6 +18,7 @@ test('builds country imports but keeps subdivisions out of the administration ca
   ] });
 
   assert.equal(catalog.definitions.germany.level, 'country');
+  assert.deepEqual(catalog.definitions.germany.bounds, { south: 47, west: 5, north: 56, east: 16 });
   assert.deepEqual(catalog.definitions.germany.supersedes, ['wolfenbuettel']);
   assert.equal(catalog.definitions.niedersachsen.level, 'state');
   assert.equal(catalog.definitions.niedersachsen.regionCode, 'DE-NI');

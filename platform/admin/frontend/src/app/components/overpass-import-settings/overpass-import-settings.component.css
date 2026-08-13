@@ -68,6 +68,7 @@ mat-toolbar {
 .section-card { overflow: hidden; }
 .section-card mat-card-content { padding-top: 1rem; }
 .selection-list { display: grid; gap: .55rem; }
+.country-selection-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
 .selection-row {
   display: flex;
@@ -177,12 +178,14 @@ mat-toolbar {
 .job-row > mat-icon { color: #64748b; }
 .job-row > span:nth-child(2) { flex: 1; display: grid; gap: .15rem; }
 .job-row small { color: var(--muted); }
+.job-row .job-error { color: #b91c1c; overflow-wrap: anywhere; }
 .job-status { padding: .25rem .55rem; border-radius: 999px; background: #e2e8f0; font-size: .78rem; }
 .status-succeeded { color: #047857; background: #d1fae5; }
 .status-failed { color: #b91c1c; background: #fee2e2; }
 .status-running, .status-queued { color: #1d4ed8; background: #dbeafe; }
 
 @media (max-width: 760px) {
+  .country-selection-list { grid-template-columns: 1fr; }
   .settings-layout { grid-template-columns: 1fr; }
   .subcategory-grid { grid-template-columns: 1fr; }
   .region-grid, .schedule-grid, .database-stats { grid-template-columns: 1fr; }
