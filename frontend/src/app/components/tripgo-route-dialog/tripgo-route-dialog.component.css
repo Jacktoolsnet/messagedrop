@@ -99,6 +99,17 @@
   color: inherit;
 }
 
+/* The header deliberately inherits its foreground colour. Without this more
+   specific disabled state, that rule also makes disabled Material buttons look
+   active while the current position is being resolved. */
+.route-point__header button:disabled {
+  color: var(
+    --mat-icon-button-disabled-icon-color,
+    color-mix(in srgb, var(--mat-sys-on-surface) 38%, transparent)
+  );
+  cursor: default;
+}
+
 .route-point__body {
   display: flex;
   flex: 1 1 auto;

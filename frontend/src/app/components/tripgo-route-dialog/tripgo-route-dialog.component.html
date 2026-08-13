@@ -42,7 +42,7 @@
             <mat-icon>my_location</mat-icon>
           </button>
           <button mat-icon-button type="button" (click)="editRoutePoint('origin'); $event.stopPropagation()"
-            [disabled]="!origin() || state() === 'locating'"
+            [disabled]="!origin() || isBusy()"
             [attr.aria-label]="'common.tripGo.editOrigin' | transloco">
             <mat-icon>edit</mat-icon>
           </button>
@@ -87,7 +87,7 @@
             <mat-icon>my_location</mat-icon>
           </button>
           <button mat-icon-button type="button" (click)="editRoutePoint('destination'); $event.stopPropagation()"
-            [disabled]="state() === 'locating'"
+            [disabled]="isBusy()"
             [attr.aria-label]="'common.tripGo.editDestination' | transloco">
             <mat-icon>edit</mat-icon>
           </button>
