@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, computed, inject, ChangeDetectionStrategy, DestroyRef, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -14,13 +15,15 @@ import {
   PoiSearchSettingsEntry,
   SearchSettings,
   SearchSettingsKey,
+  applyOverpassAvailability,
   normalizePoiSetting
 } from '../../../interfaces/search-settings';
-import { OVERPASS_SUBCATEGORIES, OverpassCategory } from '../../../interfaces/overpass';
+import { OVERPASS_SUBCATEGORIES, OverpassAvailability, OverpassCategory } from '../../../interfaces/overpass';
 import { HelpDialogService } from '../help-dialog/help-dialog.service';
 import { SearchSettingsMapPreviewComponent } from './search-settings-map-preview.component';
 import { UserService } from '../../../services/user.service';
 import { LanguageService } from '../../../services/language.service';
+import { OverpassService } from '../../../services/overpass.service';
 
 const REGION_PREVIEW_LOCATIONS: Record<string, Location> = {
   DE: { latitude: 51.1657, longitude: 10.4515, plusCode: '' },
@@ -100,7 +103,11 @@ export class SearchSettingsComponent {
   private readonly dialogData = inject<SearchSettingsDialogData>(MAT_DIALOG_DATA);
   private readonly userService = inject(UserService);
   private readonly languageService = inject(LanguageService);
+  private readonly overpassService = inject(OverpassService);
+  private readonly destroyRef = inject(DestroyRef);
   readonly help = inject(HelpDialogService);
+  readonly overpassAvailability = signal<OverpassAvailability>({});
+  readonly overpassAvailabilityLoaded = signal(false);
 
   readonly previewLocation = this.resolvePreviewLocation();
   private readonly allItems: SearchSettingsItem[] = [
@@ -141,16 +148,16 @@ export class SearchSettingsComponent {
   readonly items = computed(() => {
     this.userService.userSet();
     if (this.userService.hasJwt()) {
-      return this.allItems;
+      return this.availableItems(this.allItems);
     }
-    return this.allItems.filter((item) =>
+    return this.availableItems(this.allItems.filter((item) =>
       item.key === 'publicMessages'
       || item.key === 'secretDrops'
       || item.key === 'experiences'
       || item.key === 'wikipedia'
       || item.key === 'publicTransportStops'
       || item.poiCategory !== undefined
-    );
+    ));
   });
   readonly minZoom = 3;
   readonly maxZoom = 19;
@@ -163,6 +170,20 @@ export class SearchSettingsComponent {
     if (this.dialogData.settings) {
       this.searchSettings = this.mergeSettings(this.dialogData.settings);
     }
+    this.overpassService.getAvailability()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (availability) => {
+          this.overpassAvailability.set(availability);
+          this.searchSettings = applyOverpassAvailability(this.searchSettings, availability);
+          this.overpassAvailabilityLoaded.set(true);
+        },
+        error: () => {
+          this.overpassAvailability.set({});
+          this.searchSettings = applyOverpassAvailability(this.searchSettings, {});
+          this.overpassAvailabilityLoaded.set(true);
+        }
+      });
   }
 
   onCancel(): void {
@@ -199,7 +220,7 @@ export class SearchSettingsComponent {
   }
 
   getSubcategories(category: OverpassCategory): readonly string[] {
-    return OVERPASS_SUBCATEGORIES[category];
+    return this.overpassAvailability()[category] ?? [];
   }
 
   isSubcategoryEnabled(category: OverpassCategory, subcategory: string): boolean {
@@ -261,6 +282,11 @@ export class SearchSettingsComponent {
       food_drink: normalizePoiSetting('food_drink', settings.food_drink),
       amenities: normalizePoiSetting('amenities', settings.amenities)
     };
+  }
+
+  private availableItems(items: SearchSettingsItem[]): SearchSettingsItem[] {
+    const availability = this.overpassAvailability();
+    return items.filter((item) => !item.poiCategory || (availability[item.poiCategory]?.length ?? 0) > 0);
   }
 
   private resolvePreviewLocation(): Location {

@@ -1,10 +1,12 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, forkJoin, map, of } from 'rxjs';
+import { Observable, forkJoin, map, of, shareReplay } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { BoundingBox } from '../interfaces/bounding-box';
 import {
   OverpassCategory,
+  OverpassAvailability,
+  OverpassAvailabilityResponse,
   OverpassNearbyResponse,
   OverpassPoi,
   OverpassSubcategory
@@ -17,6 +19,17 @@ export class OverpassService {
     'x-skip-ui': 'true',
     'x-skip-backend-status': 'true'
   });
+  private readonly availabilityRequest = this.http.get<OverpassAvailabilityResponse>(
+    `${environment.apiUrl}/overpass/availability`,
+    { headers: this.silentHeaders }
+  ).pipe(
+    map((response) => this.normalizeAvailability(response)),
+    shareReplay({ bufferSize: 1, refCount: false })
+  );
+
+  getAvailability(): Observable<OverpassAvailability> {
+    return this.availabilityRequest;
+  }
 
   getNearby(
     bounds: BoundingBox[],
@@ -43,5 +56,12 @@ export class OverpassService {
       responses.flatMap((response) => response.pois ?? []).forEach((poi) => unique.set(poi.id, poi));
       return [...unique.values()];
     }));
+  }
+
+  private normalizeAvailability(response: OverpassAvailabilityResponse): OverpassAvailability {
+    const activeCategories = new Set(response.categories ?? []);
+    return Object.fromEntries((Object.keys(response.subcategories ?? {}) as OverpassCategory[])
+      .filter((category) => activeCategories.has(category))
+      .map((category) => [category, response.subcategories?.[category] ?? []]));
   }
 }

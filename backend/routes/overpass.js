@@ -20,12 +20,14 @@ function normalizeBaseUrl(base) {
 }
 
 const base = normalizeBaseUrl(resolveBaseUrl(process.env.OVERPASS_BASE_URL, process.env.OVERPASS_PORT));
+const adminBase = normalizeBaseUrl(resolveBaseUrl(process.env.ADMIN_BASE_URL, process.env.ADMIN_PORT));
 const client = base ? axios.create({
   baseURL: `${base}/overpass`,
   timeout: Number(process.env.OVERPASS_PROXY_TIMEOUT_MS || 25000),
   validateStatus: () => true,
   headers: { Accept: 'application/json' }
 }) : null;
+let availabilityCache = null;
 
 async function forward(req, res, next, { method, path, data }) {
   if (!client) {
@@ -61,6 +63,40 @@ router.get('/health', [metric.count('overpass.health', { when: 'always', timezon
 
 router.get('/categories', [metric.count('overpass.categories', { when: 'always', timezone: 'utc', amount: 1 })],
   (req, res, next) => forward(req, res, next, { method: 'get', path: '/categories' }));
+
+router.get('/availability', [metric.count('overpass.availability', { when: 'always', timezone: 'utc', amount: 1 })],
+  async (req, res, next) => {
+    if (!adminBase) {
+      const error = apiError.serviceUnavailable();
+      error.detail = 'ADMIN_BASE_URL is missing or invalid';
+      return next(error);
+    }
+    if (availabilityCache?.expiresAt > Date.now()) {
+      return res.status(200).json(availabilityCache.payload);
+    }
+    try {
+      const token = await signServiceJwt({
+        audience: process.env.SERVICE_JWT_AUDIENCE_ADMIN || 'service.admin-backend'
+      });
+      const upstream = await axios.get(`${adminBase}/overpass-import/active-categories`, {
+        timeout: Number(process.env.ADMIN_PROXY_TIMEOUT_MS || 5000),
+        validateStatus: () => true,
+        headers: { Authorization: `Bearer ${token}`, Accept: 'application/json', 'x-request-id': req.traceId }
+      });
+      if (upstream.status >= 200 && upstream.status < 300) {
+        availabilityCache = {
+          payload: upstream.data,
+          expiresAt: Date.now() + Math.max(1000, Number(process.env.OVERPASS_AVAILABILITY_CACHE_MS || 60000))
+        };
+      }
+      return res.status(upstream.status).json(upstream.data);
+    } catch (error) {
+      if (!axios.isAxiosError(error)) return next(error);
+      const apiErr = apiError.fromStatus(error.code === 'ECONNABORTED' ? 504 : 502);
+      apiErr.detail = error.message;
+      return next(apiErr);
+    }
+  });
 
 router.post('/nearby', [
   express.json({ type: 'application/json', limit: '16kb' }),

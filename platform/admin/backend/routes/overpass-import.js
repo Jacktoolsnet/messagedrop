@@ -1,11 +1,24 @@
 const express = require('express');
-const { requireAdminJwt, requireRole } = require('../middleware/security');
+const { checkToken, requireAdminJwt, requireRole } = require('../middleware/security');
 const { apiError } = require('../middleware/api-error');
 const settingsTable = require('../db/tableOverpassImportSettings');
 const dispatchTable = require('../db/tableOverpassImportDispatch');
 const { callbackResult, dispatchImports, requestService, validateSettings } = require('../utils/overpassImport');
 
 const router = express.Router();
+
+router.get('/active-categories', checkToken, async (req, res, next) => {
+  try {
+    const settings = await callbackResult((cb) => settingsTable.get(req.database.db, cb));
+    const categories = [...new Set(settings.categories || [])];
+    const subcategories = Object.fromEntries(categories.map((category) => [
+      category,
+      [...new Set(Array.isArray(settings.subcategories?.[category]) ? settings.subcategories[category] : [])]
+    ]));
+    return res.json({ status: 200, categories, subcategories, updatedAt: settings.updatedAt });
+  } catch (error) { return next(error); }
+});
+
 router.use(requireAdminJwt, requireRole('admin', 'root'));
 
 router.get('/settings', async (req, res, next) => {

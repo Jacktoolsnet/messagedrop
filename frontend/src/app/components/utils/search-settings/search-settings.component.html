@@ -64,7 +64,8 @@
     [attr.aria-label]="'common.actions.help' | transloco">
     <mat-icon>help</mat-icon>
   </button>
-  <button mat-icon-button color="primary" (click)="onApply()" [attr.aria-label]="'common.actions.apply' | transloco">
+  <button mat-icon-button color="primary" (click)="onApply()" [disabled]="!overpassAvailabilityLoaded()"
+    [attr.aria-label]="'common.actions.apply' | transloco">
     <mat-icon>check</mat-icon>
   </button>
 </mat-dialog-actions>

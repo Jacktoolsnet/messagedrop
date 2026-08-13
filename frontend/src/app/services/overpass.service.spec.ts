@@ -40,4 +40,20 @@ describe('OverpassService', () => {
     });
     request.flush({ status: 200, pois: [poi], count: 1, cache: 'miss' });
   });
+
+  it('loads and normalizes categories enabled by the admin settings', () => {
+    service.getAvailability().subscribe((availability) => expect(availability).toEqual({
+      accommodation: ['hotel'], amenities: ['toilets']
+    }));
+
+    const request = http.expectOne(`${environment.apiUrl}/overpass/availability`);
+    expect(request.request.method).toBe('GET');
+    expect(request.request.headers.get('x-skip-ui')).toBe('true');
+    request.flush({
+      status: 200,
+      categories: ['accommodation', 'amenities'],
+      subcategories: { accommodation: ['hotel'], amenities: ['toilets'], tourism: ['museum'] },
+      updatedAt: 123
+    });
+  });
 });

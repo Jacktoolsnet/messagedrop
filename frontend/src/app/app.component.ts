@@ -78,7 +78,7 @@ import { Note } from './interfaces/note';
 import { NotificationAction } from './interfaces/notification-action';
 import { Place } from './interfaces/place';
 import { PlusCodeArea } from './interfaces/plus-code-area';
-import { DEFAULT_SEARCH_SETTINGS, SearchSettings, normalizePoiSetting } from './interfaces/search-settings';
+import { applyOverpassAvailability, DEFAULT_SEARCH_SETTINGS, SearchSettings, normalizePoiSetting } from './interfaces/search-settings';
 import { OVERPASS_SUBCATEGORIES, OverpassCategory, OverpassPoi, OverpassSubcategory } from './interfaces/overpass';
 import {
   DEFAULT_ROUTE_OPTIONS,
@@ -128,6 +128,7 @@ import { SystemNotificationService } from './services/system-notification.servic
 import { TripGoStopsMapStateService } from './services/tripgo-stops-map-state.service';
 import { WikipediaMapStateService } from './services/wikipedia-map-state.service';
 import { OverpassMapStateService } from './services/overpass-map-state.service';
+import { OverpassService } from './services/overpass.service';
 import { WikipediaService } from './services/wikipedia.service';
 import { TranslationHelperService } from './services/translation-helper.service';
 import { UsageProtectionService } from './services/usage-protection.service';
@@ -230,6 +231,7 @@ export class AppComponent implements OnInit {
   private readonly wikipediaMapState = inject(WikipediaMapStateService);
   private readonly tripGoStopsMapState = inject(TripGoStopsMapStateService);
   private readonly overpassMapState = inject(OverpassMapStateService);
+  private readonly overpassService = inject(OverpassService);
   private readonly wikipediaService = inject(WikipediaService);
   private readonly experienceBookmarkService = inject(ExperienceBookmarkService);
   private readonly airQualityService = inject(AirQualityService);
@@ -1921,6 +1923,13 @@ export class AppComponent implements OnInit {
   private async loadSearchSettings(): Promise<void> {
     const stored = await this.indexedDbService.getSetting<SearchSettings>('searchSettings');
     this.searchSettings = this.normalizeSearchSettings(stored ?? DEFAULT_SEARCH_SETTINGS);
+    try {
+      const availability = await firstValueFrom(this.overpassService.getAvailability());
+      this.searchSettings = applyOverpassAvailability(this.searchSettings, availability);
+      await this.indexedDbService.setSetting('searchSettings', this.searchSettings);
+    } catch {
+      this.searchSettings = applyOverpassAvailability(this.searchSettings, {});
+    }
   }
 
   private async loadRouteOptions(): Promise<void> {

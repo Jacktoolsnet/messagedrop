@@ -22,6 +22,15 @@ export const OVERPASS_SUBCATEGORIES = {
 export type OverpassCategory = keyof typeof OVERPASS_SUBCATEGORIES;
 export type OverpassSubcategory = typeof OVERPASS_SUBCATEGORIES[OverpassCategory][number];
 
+export type OverpassAvailability = Partial<Record<OverpassCategory, readonly OverpassSubcategory[]>>;
+
+export interface OverpassAvailabilityResponse {
+  status: number;
+  categories: OverpassCategory[];
+  subcategories: Partial<Record<OverpassCategory, OverpassSubcategory[]>>;
+  updatedAt: number;
+}
+
 export interface OverpassPoi {
   id: string;
   osmType: 'node' | 'way' | 'relation';

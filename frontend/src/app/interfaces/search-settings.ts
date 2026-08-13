@@ -1,4 +1,4 @@
-import { OVERPASS_SUBCATEGORIES, OverpassCategory } from './overpass';
+import { OVERPASS_SUBCATEGORIES, OverpassAvailability, OverpassCategory } from './overpass';
 
 export interface SearchSettingsEntry {
   enabled: boolean;
@@ -66,4 +66,22 @@ export function normalizePoiSetting(
     subcategories: Object.fromEntries(OVERPASS_SUBCATEGORIES[category]
       .map((subcategory) => [subcategory, stored[subcategory] ?? fallback.subcategories[subcategory]]))
   };
+}
+
+export function applyOverpassAvailability(
+  settings: SearchSettings,
+  availability: OverpassAvailability
+): SearchSettings {
+  const result = { ...settings };
+  for (const category of Object.keys(OVERPASS_SUBCATEGORIES) as OverpassCategory[]) {
+    const setting = settings[category];
+    const allowed = new Set(availability[category] ?? []);
+    result[category] = {
+      ...setting,
+      enabled: setting.enabled && allowed.size > 0,
+      subcategories: Object.fromEntries(OVERPASS_SUBCATEGORIES[category]
+        .map((subcategory) => [subcategory, allowed.has(subcategory) && !!setting.subcategories[subcategory]]))
+    };
+  }
+  return result;
 }
