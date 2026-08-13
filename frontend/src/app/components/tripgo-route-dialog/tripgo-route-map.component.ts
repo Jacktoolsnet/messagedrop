@@ -405,6 +405,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
       worldCopyJump: true
     });
     this.map.setMaxBounds([[-90, -180], [90, 180]]);
+    this.map.on('click', (event) => this.toggleSimulationFromMapClick(event));
     this.map.on('dragstart', () => this.pauseSimulation());
     this.map.on('zoomend', () => {
       this.updateZoomLevelButton();
@@ -433,6 +434,20 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     }
     setTimeout(() => this.map?.invalidateSize(), 0);
     this.scheduleWikipediaLoad();
+  }
+
+  private toggleSimulationFromMapClick(event: leaflet.LeafletMouseEvent): void {
+    // Marker clicks open details and must not also toggle the simulation. Marker
+    // click events bubble to the map with the marker as their source target.
+    if (event.sourceTarget instanceof leaflet.Marker
+      || event.sourceTarget instanceof leaflet.CircleMarker) {
+      return;
+    }
+    if (this.simulationState === 'playing') {
+      this.pauseSimulation();
+    } else if (this.simulationState === 'paused') {
+      this.resumeSimulation();
+    }
   }
 
   private createSimulationPoints(): TripGoSimulationPoint[] {
