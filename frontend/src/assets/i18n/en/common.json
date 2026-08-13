@@ -169,10 +169,10 @@
       "setAsDestination": "Set as destination",
       "currentWeather": "Current weather: {{ temperature }} degrees Celsius",
       "simulation": {
-        "wikipediaTitle": "Preparing Wikipedia articles",
-        "wikipediaMessage": "Searching for Wikipedia articles along the route.",
+        "wikipediaTitle": "Preparing content along the route",
+        "wikipediaMessage": "Searching for content along the route.",
         "wikipediaProgress": "Searched {{ completed }} of {{ total }} areas",
-        "withoutWikipedia": "Simulate without Wikipedia pins",
+        "withoutWikipedia": "Simulate without additional pins",
         "start": "Start journey simulation",
         "pause": "Pause journey simulation",
         "resume": "Resume journey simulation",

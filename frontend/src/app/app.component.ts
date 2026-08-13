@@ -1704,6 +1704,9 @@ export class AppComponent implements OnInit {
         },
         wikipediaArticlesSelected: (articles: WikipediaArticle[]) => {
           void this.openMarkerWikipediaListDialog(articles);
+        },
+        routeContentSelected: (content: MarkerLocation) => {
+          this.handleMarkerClickEvent(content);
         }
       },
       closeOnNavigation: true,

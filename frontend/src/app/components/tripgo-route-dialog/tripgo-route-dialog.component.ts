@@ -8,6 +8,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { Subscription, catchError, concatMap, forkJoin, from, map, of, switchMap } from 'rxjs';
 import { GetNominatimAddressResponse } from '../../interfaces/get-nominatim-address-response copy';
 import { Location } from '../../interfaces/location';
+import { MarkerLocation } from '../../interfaces/marker-location';
 import { DEFAULT_ROUTE_OPTIONS, RouteOptions, normalizeRouteOptions } from '../../interfaces/route-options';
 import { DEFAULT_SEARCH_SETTINGS, SearchSettings } from '../../interfaces/search-settings';
 import { WikipediaArticle } from '../../interfaces/wikipedia';
@@ -46,6 +47,7 @@ export interface TripGoRouteDialogData {
   searchSettings?: SearchSettings;
   searchSettingsChanged?: (settings: SearchSettings) => void;
   wikipediaArticlesSelected?: (articles: WikipediaArticle[]) => void;
+  routeContentSelected?: (content: MarkerLocation) => void;
 }
 
 type RouteDialogState = 'idle' | 'locating' | 'routing' | 'ready' | 'arrived' | 'error';
@@ -404,6 +406,11 @@ export class TripGoRouteDialogComponent implements OnInit, OnDestroy {
   showWikipediaArticles(articles: WikipediaArticle[]): void {
     this.routeMap?.pauseSimulation();
     this.data.wikipediaArticlesSelected?.(articles);
+  }
+
+  showRouteContent(content: MarkerLocation): void {
+    this.routeMap?.pauseSimulation();
+    this.data.routeContentSelected?.(content);
   }
 
   openSearchSettings(): void {

@@ -15,12 +15,15 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import * as leaflet from 'leaflet';
-import { Subscription, catchError, from, map, mergeMap, of, retry, tap, timer, toArray } from 'rxjs';
+import { Subscription, catchError, forkJoin, from, map, mergeMap, of, retry, tap, timer, toArray } from 'rxjs';
 import { Location } from '../../interfaces/location';
+import { MarkerLocation } from '../../interfaces/marker-location';
+import { MarkerType } from '../../interfaces/marker-type';
 import { DEFAULT_SEARCH_SETTINGS, SearchSettings } from '../../interfaces/search-settings';
 import { TripGoLocation, TripGoRouteOption, TripGoRouteSegment, TripGoStop, TripGoTurnInstruction } from '../../interfaces/tripgo';
 import { WikipediaArticle } from '../../interfaces/wikipedia';
 import { publicTransportStopMarker } from '../../services/map.service';
+import { TripGoRouteContent, TripGoRouteContentService } from '../../services/tripgo-route-content.service';
 import { WikipediaService } from '../../services/wikipedia.service';
 import { DisplayMessage } from '../utils/display-message/display-message.component';
 import { TripGoTimelineWeatherComponent } from './tripgo-timeline-weather.component';
@@ -57,8 +60,21 @@ const wikipediaMarker = leaflet.icon({
   iconSize: [32, 40],
   iconAnchor: [16, 40]
 });
+const routeContentIcons: Partial<Record<MarkerType, leaflet.Icon>> = {
+  [MarkerType.PUBLIC_MESSAGE]: leaflet.icon({ iconUrl: 'assets/markers/message-marker.svg', iconSize: [32, 40], iconAnchor: [16, 40] }),
+  [MarkerType.PRIVATE_NOTE]: leaflet.icon({ iconUrl: 'assets/markers/note-marker.svg', iconSize: [32, 40], iconAnchor: [16, 40] }),
+  [MarkerType.PRIVATE_IMAGE]: leaflet.icon({ iconUrl: 'assets/markers/image-marker.svg', iconSize: [32, 40], iconAnchor: [16, 40] }),
+  [MarkerType.PRIVATE_DOCUMENT]: leaflet.icon({ iconUrl: 'assets/markers/document-marker.svg', iconSize: [32, 40], iconAnchor: [16, 40] }),
+  [MarkerType.EXPERIENCE_DESTINATION]: leaflet.icon({ iconUrl: 'assets/markers/experience-marker.svg', iconSize: [32, 40], iconAnchor: [16, 40] }),
+  [MarkerType.MY_EXPERIENCE]: leaflet.icon({ iconUrl: 'assets/markers/my-experience-marker.svg', iconSize: [32, 40], iconAnchor: [16, 40] }),
+  [MarkerType.SECRET_DROP]: leaflet.icon({ iconUrl: 'assets/markers/secretdrop-marker.svg', iconSize: [32, 40], iconAnchor: [16, 40] }),
+  [MarkerType.MULTI]: leaflet.icon({ iconUrl: 'assets/markers/multi-marker.svg', iconSize: [32, 40], iconAnchor: [16, 40] })
+};
 const WIKIPEDIA_ROUTE_RADIUS_METERS = 200;
 const MAX_WIKIPEDIA_SIMULATION_SEARCHES = 80;
+const EMPTY_ROUTE_CONTENT: TripGoRouteContent = {
+  messages: [], notes: [], images: [], documents: [], experiences: [], myExperiences: [], secretDrops: []
+};
 
 @Component({
   selector: 'app-tripgo-route-map',
@@ -149,6 +165,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
   readonly pointSelected = output<TripGoRouteMapPointSelection>();
   readonly stopSelected = output<TripGoStop>();
   readonly wikipediaSelected = output<WikipediaArticle[]>();
+  readonly routeContentSelected = output<MarkerLocation>();
   readonly searchSettingsClick = output<void>();
   readonly simulationStateChange = output<TripGoSimulationState>();
   readonly activeSimulationPoint = signal<TripGoSimulationPoint | null>(null);
@@ -157,6 +174,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
   readonly mapId = `tripgo-route-map-${Math.random().toString(36).slice(2)}`;
   private readonly transloco = inject(TranslocoService);
   private readonly wikipedia = inject(WikipediaService);
+  private readonly routeContent = inject(TripGoRouteContentService);
   private readonly dialog = inject(MatDialog);
   private map?: leaflet.Map;
   private routeBounds?: leaflet.LatLngBounds;
@@ -180,6 +198,9 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
   private wikipediaPrepared = false;
   private wikipediaSuppressedForSimulation = false;
   private preparedWikipediaArticles: WikipediaArticle[] = [];
+  private preparedRouteContent: TripGoRouteContent = structuredClone(EMPTY_ROUTE_CONTENT);
+  private routeContentMarkers: leaflet.Marker[] = [];
+  private routeContentLoadToken = 0;
   readonly wikipediaPreparationCompleted = signal(0);
   readonly wikipediaPreparationTotal = signal(0);
   readonly wikipediaPreparationProgress = computed(() => {
@@ -214,6 +235,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     this.cancelWikipediaLoad();
     this.resetWikipediaPreparation();
     this.clearWikipediaMarkers();
+    this.clearRouteContentMarkers();
     this.routeBounds = undefined;
     this.segmentGeometryDistanceCache.clear();
     this.segmentGeometryLocationsCache = undefined;
@@ -227,6 +249,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     this.cancelWikipediaLoad();
     this.resetWikipediaPreparation();
     this.clearWikipediaMarkers();
+    this.clearRouteContentMarkers();
     this.map?.remove();
   }
 
@@ -1203,7 +1226,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
   }
 
   private shouldPrepareWikipediaForSimulation(): boolean {
-    return this.searchSettings.wikipedia.enabled
+    return Object.values(this.searchSettings).some((setting) => setting.enabled)
       && !this.wikipediaPrepared
       && !this.wikipediaSuppressedForSimulation
       && !this.wikipediaPreparing;
@@ -1222,6 +1245,7 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     this.wikipediaRequest?.unsubscribe();
     this.wikipediaRequest = undefined;
     this.clearWikipediaMarkers();
+    this.clearRouteContentMarkers();
     this.wikipediaPreparationCompleted.set(0);
     this.wikipediaPreparationTotal.set(searches.length);
     const firstPoint = this.simulationPoints[0];
@@ -1264,29 +1288,37 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     const language = this.transloco.getActiveLang() || 'de';
     const zoom = Math.max(14, this.searchSettings.wikipedia.minZoom);
     this.wikipediaPreparation = from(searches).pipe(
-      mergeMap((bounds) => this.wikipedia.getNearby({ ...bounds, zoom, language, limit: 100 }).pipe(
-        retry({ count: 2, delay: (_error, retryCount) => timer(retryCount * 1_500) }),
-        map((response) => response.articles),
-        catchError(() => of([] as WikipediaArticle[])),
+      mergeMap((bounds) => forkJoin({
+        articles: this.searchSettings.wikipedia.enabled
+          ? this.wikipedia.getNearby({ ...bounds, zoom, language, limit: 100 }).pipe(
+            retry({ count: 2, delay: (_error, retryCount) => timer(retryCount * 1_500) }),
+            map((response) => response.articles),
+            catchError(() => of([] as WikipediaArticle[])))
+          : of([] as WikipediaArticle[]),
+        content: from(this.routeContent.loadBounds(this.toBoundingBox(bounds), this.searchSettings, 19))
+          .pipe(catchError(() => of(structuredClone(EMPTY_ROUTE_CONTENT))))
+      }).pipe(
         tap(() => this.wikipediaPreparationCompleted.update((value) => value + 1))
       ), 1),
       toArray()
     ).subscribe({
-      next: (articleGroups) => {
+      next: (results) => {
         if (!this.wikipediaPreparing) return;
         const uniqueArticles = new Map<number, WikipediaArticle>();
-        articleGroups.flat().forEach((article) => {
+        results.flatMap((result) => result.articles).forEach((article) => {
           if (this.distanceToRouteInMeters(article) <= WIKIPEDIA_ROUTE_RADIUS_METERS) {
             uniqueArticles.set(article.pageId, article);
           }
         });
         this.preparedWikipediaArticles = [...uniqueArticles.values()];
+        this.preparedRouteContent = this.mergeRouteContent(results.map((result) => result.content));
         this.wikipediaPrepared = true;
         this.wikipediaPreparing = false;
         this.wikipediaPreparation = undefined;
         this.wikipediaPreparationDialog?.close();
         this.wikipediaPreparationDialog = undefined;
         this.renderPreparedWikipediaMarkers();
+        this.renderPreparedRouteContentMarkers();
         this.beginSimulation();
       }
     });
@@ -1299,7 +1331,9 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     this.wikipediaPreparing = false;
     this.wikipediaSuppressedForSimulation = true;
     this.preparedWikipediaArticles = [];
+    this.preparedRouteContent = structuredClone(EMPTY_ROUTE_CONTENT);
     this.clearWikipediaMarkers();
+    this.clearRouteContentMarkers();
     this.beginSimulation();
   }
 
@@ -1409,6 +1443,8 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     this.wikipediaPrepared = false;
     this.wikipediaSuppressedForSimulation = false;
     this.preparedWikipediaArticles = [];
+    this.preparedRouteContent = structuredClone(EMPTY_ROUTE_CONTENT);
+    this.clearRouteContentMarkers();
     this.wikipediaPreparationCompleted.set(0);
     this.wikipediaPreparationTotal.set(0);
   }
@@ -1422,12 +1458,15 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     this.wikipediaLoadTimer = undefined;
     if (this.wikipediaPreparing || this.wikipediaSuppressedForSimulation) {
       this.clearWikipediaMarkers();
+      this.clearRouteContentMarkers();
       return;
     }
     if (this.wikipediaPrepared) {
       this.renderPreparedWikipediaMarkers();
+      this.renderPreparedRouteContentMarkers();
       return;
     }
+    this.loadRouteContentMarkersForCurrentView();
     if (!this.map || !this.searchSettings.wikipedia.enabled
       || this.map.getZoom() < this.searchSettings.wikipedia.minZoom) {
       this.wikipediaRequest?.unsubscribe();
@@ -1483,11 +1522,159 @@ export class TripGoRouteMapComponent implements AfterViewInit, OnChanges, OnDest
     this.wikipediaMarkers = [];
   }
 
+  private loadRouteContentMarkersForCurrentView(): void {
+    if (!this.map) return;
+    const bounds = this.map.getBounds();
+    if (bounds.getWest() > bounds.getEast()) return;
+    const token = ++this.routeContentLoadToken;
+    const zoom = Math.round(this.map.getZoom());
+    void this.routeContent.loadBounds({
+      latMin: bounds.getSouth(),
+      lonMin: bounds.getWest(),
+      latMax: bounds.getNorth(),
+      lonMax: bounds.getEast()
+    }, this.searchSettings, zoom).then((content) => {
+      if (token !== this.routeContentLoadToken || this.wikipediaPrepared || this.wikipediaPreparing) return;
+      this.drawRouteContentMarkers(this.filterRouteContent(content), zoom);
+    }).catch(() => {
+      if (token === this.routeContentLoadToken) this.clearRouteContentMarkers();
+    });
+  }
+
+  private renderPreparedRouteContentMarkers(): void {
+    if (!this.map || !this.wikipediaPrepared) {
+      this.clearRouteContentMarkers();
+      return;
+    }
+    this.drawRouteContentMarkers(this.preparedRouteContent, Math.round(this.map.getZoom()));
+  }
+
+  private drawRouteContentMarkers(content: TripGoRouteContent, zoom: number): void {
+    this.clearRouteContentMarkers();
+    if (!this.map) return;
+    const groups = new Map<string, MarkerLocation>();
+    const add = (type: MarkerType, item: unknown, location?: Location) => {
+      if (!location || !Number.isFinite(location.latitude) || !Number.isFinite(location.longitude)) return;
+      const key = `${Number(location.latitude).toFixed(5)}:${Number(location.longitude).toFixed(5)}`;
+      let group = groups.get(key);
+      if (!group) {
+        group = {
+          location: { ...location, plusCode: location.plusCode || `route:${key}` },
+          messages: [], notes: [], images: [], documents: [], experiences: [], myExperiences: [], secretDrops: [],
+          type
+        };
+        groups.set(key, group);
+      } else if (group.type !== type) {
+        group.type = MarkerType.MULTI;
+      }
+      switch (type) {
+        case MarkerType.PUBLIC_MESSAGE: group.messages.push(item as typeof group.messages[number]); break;
+        case MarkerType.PRIVATE_NOTE: group.notes.push(item as typeof group.notes[number]); break;
+        case MarkerType.PRIVATE_IMAGE: group.images.push(item as typeof group.images[number]); break;
+        case MarkerType.PRIVATE_DOCUMENT: group.documents.push(item as typeof group.documents[number]); break;
+        case MarkerType.EXPERIENCE_DESTINATION: group.experiences?.push(item as NonNullable<typeof group.experiences>[number]); break;
+        case MarkerType.MY_EXPERIENCE: group.myExperiences?.push(item as NonNullable<typeof group.myExperiences>[number]); break;
+        case MarkerType.SECRET_DROP: group.secretDrops?.push(item as NonNullable<typeof group.secretDrops>[number]); break;
+      }
+    };
+
+    if (this.routeContentVisible('publicMessages', zoom)) {
+      content.messages.forEach((item) => add(MarkerType.PUBLIC_MESSAGE, item, item.location));
+    }
+    if (this.routeContentVisible('privateNotes', zoom)) {
+      content.notes.forEach((item) => add(MarkerType.PRIVATE_NOTE, item, item.location));
+    }
+    if (this.routeContentVisible('privateImages', zoom)) {
+      content.images.filter((item) => item.showOnMap !== false)
+        .forEach((item) => add(MarkerType.PRIVATE_IMAGE, item, item.location));
+    }
+    if (this.routeContentVisible('privateDocuments', zoom)) {
+      content.documents.forEach((item) => add(MarkerType.PRIVATE_DOCUMENT, item, item.location));
+    }
+    if (this.routeContentVisible('experiences', zoom)) {
+      content.experiences.forEach((item) => add(MarkerType.EXPERIENCE_DESTINATION, item,
+        item.center ? { latitude: item.center.latitude ?? 0, longitude: item.center.longitude ?? 0,
+          plusCode: item.plusCode || '' } : undefined));
+    }
+    if (this.routeContentVisible('myExperiences', zoom)) {
+      content.myExperiences.forEach((item) => add(MarkerType.MY_EXPERIENCE, item.result, item.location));
+    }
+    if (this.routeContentVisible('secretDrops', zoom)) {
+      content.secretDrops.filter((item) => (item.discoveryZoomLevel ?? 18) <= zoom).forEach((item) =>
+        add(MarkerType.SECRET_DROP, item, {
+          latitude: Number(item.latitude ?? item.location?.latitude),
+          longitude: Number(item.longitude ?? item.location?.longitude),
+          plusCode: item.plusCode || item.discoveryPlusCode || item.location?.plusCode || ''
+        }));
+    }
+
+    groups.forEach((group) => {
+      const icon = routeContentIcons[group.type] ?? routeContentIcons[MarkerType.MULTI];
+      if (!icon) return;
+      const marker = leaflet.marker([group.location.latitude, group.location.longitude], {
+        icon, zIndexOffset: 1_450
+      }).addTo(this.map!);
+      marker.on('click', (event) => {
+        leaflet.DomEvent.stopPropagation(event.originalEvent);
+        this.pauseSimulation();
+        this.routeContentSelected.emit(group);
+      });
+      this.routeContentMarkers.push(marker);
+    });
+  }
+
+  private clearRouteContentMarkers(): void {
+    this.routeContentLoadToken += 1;
+    for (const marker of this.routeContentMarkers) marker.remove();
+    this.routeContentMarkers = [];
+  }
+
+  private routeContentVisible(key: keyof SearchSettings, zoom: number): boolean {
+    const setting = this.searchSettings[key];
+    return setting.enabled && zoom >= setting.minZoom;
+  }
+
+  private filterRouteContent(content: TripGoRouteContent): TripGoRouteContent {
+    return {
+      messages: content.messages.filter((item) => this.distanceToRouteInMeters(item.location) <= WIKIPEDIA_ROUTE_RADIUS_METERS),
+      notes: content.notes.filter((item) => this.distanceToRouteInMeters(item.location) <= WIKIPEDIA_ROUTE_RADIUS_METERS),
+      images: content.images.filter((item) => this.distanceToRouteInMeters(item.location) <= WIKIPEDIA_ROUTE_RADIUS_METERS),
+      documents: content.documents.filter((item) => this.distanceToRouteInMeters(item.location) <= WIKIPEDIA_ROUTE_RADIUS_METERS),
+      experiences: content.experiences.filter((item) => item.center
+        && this.distanceToRouteInMeters(item.center as TripGoLocation) <= WIKIPEDIA_ROUTE_RADIUS_METERS),
+      myExperiences: content.myExperiences.filter((item) =>
+        this.distanceToRouteInMeters(item.location) <= WIKIPEDIA_ROUTE_RADIUS_METERS),
+      secretDrops: content.secretDrops.filter((item) => this.distanceToRouteInMeters({
+        latitude: Number(item.latitude ?? item.location?.latitude),
+        longitude: Number(item.longitude ?? item.location?.longitude)
+      }) <= WIKIPEDIA_ROUTE_RADIUS_METERS)
+    };
+  }
+
+  private mergeRouteContent(contents: TripGoRouteContent[]): TripGoRouteContent {
+    const unique = <T>(items: T[], key: (item: T) => string | number) =>
+      [...new Map(items.map((item) => [key(item), item])).values()];
+    return this.filterRouteContent({
+      messages: unique(contents.flatMap((item) => item.messages), (item) => item.uuid || item.id),
+      notes: unique(contents.flatMap((item) => item.notes), (item) => item.id),
+      images: unique(contents.flatMap((item) => item.images), (item) => item.id),
+      documents: unique(contents.flatMap((item) => item.documents), (item) => item.id),
+      experiences: unique(contents.flatMap((item) => item.experiences), (item) => item.destinationId),
+      myExperiences: unique(contents.flatMap((item) => item.myExperiences), (item) => item.result.productCode || item.result.trackId),
+      secretDrops: unique(contents.flatMap((item) => item.secretDrops), (item) => item.uuid)
+    });
+  }
+
+  private toBoundingBox(bounds: { north: number; south: number; east: number; west: number }) {
+    return { latMin: bounds.south, lonMin: bounds.west, latMax: bounds.north, lonMax: bounds.east };
+  }
+
   private cancelWikipediaLoad(): void {
     if (this.wikipediaLoadTimer) clearTimeout(this.wikipediaLoadTimer);
     this.wikipediaLoadTimer = undefined;
     this.wikipediaRequest?.unsubscribe();
     this.wikipediaRequest = undefined;
+    this.routeContentLoadToken += 1;
   }
 
   private distanceToRouteInMeters(location: TripGoLocation): number {
