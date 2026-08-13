@@ -1,21 +1,27 @@
+import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterLink } from '@angular/router';
 import { finalize, forkJoin } from 'rxjs';
-import { OverpassImportCatalog, OverpassImportSettings } from '../../interfaces/overpass-import.interface';
+import { OverpassDatabaseInfo, OverpassImportCatalog, OverpassImportSettings } from '../../interfaces/overpass-import.interface';
 import { DisplayMessageService } from '../../services/display-message.service';
 import { OverpassImportService } from '../../services/overpass-import.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 
 @Component({
   selector: 'app-overpass-import-settings',
-  imports: [RouterLink, MatButtonModule, MatCardModule, MatIconModule, MatProgressBarModule, MatSlideToggleModule, MatToolbarModule],
+  imports: [DatePipe, RouterLink, MatButtonModule, MatCardModule, MatFormFieldModule, MatIconModule, MatInputModule,
+    MatProgressBarModule, MatSelectModule, MatSlideToggleModule, MatTabsModule, MatToolbarModule],
   templateUrl: './overpass-import-settings.component.html',
   styleUrl: './overpass-import-settings.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -28,24 +34,46 @@ export class OverpassImportSettingsComponent {
 
   readonly loading = signal(true);
   readonly saving = signal(false);
+  readonly importing = signal(false);
+  readonly loadingDatabaseInfo = signal(false);
   readonly catalog = signal<OverpassImportCatalog | null>(null);
   readonly settings = signal<OverpassImportSettings | null>(null);
+  readonly databaseInfo = signal<OverpassDatabaseInfo | null>(null);
   readonly enabledCategories = signal<ReadonlySet<string>>(new Set());
+  readonly enabledDatasets = signal<ReadonlySet<string>>(new Set());
   readonly selectedSubcategories = signal<Record<string, string[]>>({});
   readonly selectedCategory = signal<string | null>(null);
+  readonly importsEnabled = signal(false);
+  readonly scheduleType = signal<'daily' | 'weekly'>('weekly');
+  readonly weekday = signal(0);
+  readonly hour = signal(3);
+  readonly minute = signal(0);
+  readonly timezone = signal('Europe/Berlin');
+  readonly refreshSource = signal(true);
+  readonly weekdays = [
+    { value: 0, label: 'Sunday' }, { value: 1, label: 'Monday' }, { value: 2, label: 'Tuesday' },
+    { value: 3, label: 'Wednesday' }, { value: 4, label: 'Thursday' }, { value: 5, label: 'Friday' },
+    { value: 6, label: 'Saturday' }
+  ];
+  readonly timezones = ['Europe/Berlin', 'Europe/Stockholm', 'Europe/Copenhagen', 'UTC'];
   readonly categoryNames = computed(() => Object.keys(this.catalog()?.categories ?? {}));
   readonly visibleSubcategories = computed(() => {
     const category = this.selectedCategory();
     return category ? this.catalog()?.categories[category] ?? [] : [];
   });
+  readonly countryGroups = computed(() => {
+    const groups = new Map<string, OverpassImportCatalog['datasets']>();
+    for (const dataset of this.catalog()?.datasets ?? []) {
+      const rows = groups.get(dataset.countryCode) ?? [];
+      rows.push(dataset);
+      groups.set(dataset.countryCode, rows);
+    }
+    return [...groups.entries()].map(([countryCode, datasets]) => ({ countryCode, datasets }));
+  });
   readonly hasChanges = computed(() => {
     const settings = this.settings();
     if (!settings) return false;
-    const currentCategories = [...this.enabledCategories()].sort();
-    const storedCategories = [...settings.categories].sort();
-    if (JSON.stringify(currentCategories) !== JSON.stringify(storedCategories)) return true;
-    return currentCategories.some((category) => JSON.stringify([...(this.selectedSubcategories()[category] ?? [])].sort())
-      !== JSON.stringify([...this.initialSubcategories(settings, category)].sort()));
+    return JSON.stringify(this.comparable(this.buildPayload(settings))) !== JSON.stringify(this.comparable(settings));
   });
 
   constructor() {
@@ -61,13 +89,45 @@ export class OverpassImportSettingsComponent {
           this.catalog.set(catalog);
           this.settings.set(settings.settings);
           this.enabledCategories.set(new Set(settings.settings.categories));
+          this.enabledDatasets.set(new Set(settings.settings.datasets));
+          this.importsEnabled.set(settings.settings.enabled);
+          this.scheduleType.set(settings.settings.scheduleType);
+          this.weekday.set(settings.settings.weekday);
+          this.hour.set(settings.settings.hour);
+          this.minute.set(settings.settings.minute);
+          this.timezone.set(settings.settings.timezone);
+          this.refreshSource.set(settings.settings.refreshSource);
           this.selectedSubcategories.set(Object.fromEntries(settings.settings.categories.map((category) => [
             category, this.initialSubcategories(settings.settings, category, catalog)
           ])));
           this.selectedCategory.set(settings.settings.categories[0] ?? Object.keys(catalog.categories)[0] ?? null);
+          this.loadDatabaseInfo();
         },
         error: () => this.showError(this.i18n.t('Could not load Overpass settings.'))
       });
+  }
+
+  isDatasetEnabled(datasetId: string): boolean {
+    return this.enabledDatasets().has(datasetId);
+  }
+
+  toggleDataset(datasetId: string, enabled: boolean): void {
+    const next = new Set(this.enabledDatasets());
+    if (enabled) next.add(datasetId); else next.delete(datasetId);
+    this.enabledDatasets.set(next);
+  }
+
+  countryLabel(countryCode: string): string {
+    const labels: Record<string, string> = { DE: 'Germany', SE: 'Sweden', DK: 'Denmark' };
+    return this.i18n.t(labels[countryCode] ?? countryCode);
+  }
+
+  setHour(value: string): void {
+    this.hour.set(Math.max(0, Math.min(23, Number(value) || 0)));
+  }
+
+  setMinute(value: string): void {
+    this.minute.set(Math.max(0, Math.min(59, Number(value) || 0)));
   }
 
   selectCategory(category: string): void {
@@ -119,19 +179,39 @@ export class OverpassImportSettingsComponent {
 
   save(): void {
     const settings = this.settings();
-    if (!settings || this.saving() || this.enabledCategories().size === 0) return;
-    const categories = [...this.enabledCategories()];
-    const payload: OverpassImportSettings = { ...settings, categories,
-      subcategories: Object.fromEntries(categories.map((category) => [category, this.selectedSubcategories()[category] ?? []])) };
+    if (!settings || this.saving() || this.enabledCategories().size === 0 || this.enabledDatasets().size === 0) return;
+    const payload = this.buildPayload(settings);
     this.saving.set(true);
     this.service.updateSettings(payload)
       .pipe(finalize(() => this.saving.set(false)), takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
           this.settings.set(response.settings);
-          this.messages.open(this.i18n.t('Overpass categories saved.'), undefined, { panelClass: 'snack-success', verticalPosition: 'top' });
+          this.enabledDatasets.set(new Set(response.settings.datasets));
+          this.messages.open(this.i18n.t('Overpass settings saved.'), undefined, { panelClass: 'snack-success', verticalPosition: 'top' });
         },
         error: () => this.showError(this.i18n.t('Could not save Overpass settings.'))
+      });
+  }
+
+  loadDatabaseInfo(): void {
+    this.loadingDatabaseInfo.set(true);
+    this.service.getDatabaseInfo()
+      .pipe(finalize(() => this.loadingDatabaseInfo.set(false)), takeUntilDestroyed(this.destroyRef))
+      .subscribe({ next: (value) => this.databaseInfo.set(value), error: () => this.databaseInfo.set(null) });
+  }
+
+  startImport(): void {
+    if (this.importing() || this.hasChanges()) return;
+    this.importing.set(true);
+    this.service.startImport()
+      .pipe(finalize(() => this.importing.set(false)), takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.messages.open(this.i18n.t('Import started.'), undefined, { panelClass: 'snack-success', verticalPosition: 'top' });
+          this.loadDatabaseInfo();
+        },
+        error: () => this.showError(this.i18n.t('Could not start import.'))
       });
   }
 
@@ -155,6 +235,41 @@ export class OverpassImportSettingsComponent {
     return Object.hasOwn(settings.subcategories ?? {}, category)
       ? [...(settings.subcategories[category] ?? [])]
       : [...(catalog?.categories[category] ?? [])];
+  }
+
+  private buildPayload(settings: OverpassImportSettings): OverpassImportSettings {
+    const categories = [...this.enabledCategories()];
+    return {
+      ...settings,
+      enabled: this.importsEnabled(),
+      datasets: [...this.enabledDatasets()],
+      categories,
+      subcategories: Object.fromEntries(categories.map((category) => [category, this.selectedSubcategories()[category] ?? []])),
+      scheduleType: this.scheduleType(),
+      weekday: this.weekday(),
+      hour: this.hour(),
+      minute: this.minute(),
+      timezone: this.timezone(),
+      refreshSource: this.refreshSource()
+    };
+  }
+
+  private comparable(settings: OverpassImportSettings): unknown {
+    const categories = [...settings.categories].sort();
+    return {
+      enabled: settings.enabled,
+      datasets: [...settings.datasets].sort(),
+      categories,
+      subcategories: Object.fromEntries(categories.map((category) => [category,
+        [...this.initialSubcategories(settings, category)].sort()
+      ])),
+      scheduleType: settings.scheduleType,
+      weekday: settings.weekday,
+      hour: settings.hour,
+      minute: settings.minute,
+      timezone: settings.timezone,
+      refreshSource: settings.refreshSource
+    };
   }
 
   private showError(message: string): void {

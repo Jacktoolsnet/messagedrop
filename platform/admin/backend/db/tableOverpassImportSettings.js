@@ -41,9 +41,16 @@ function decode(row) {
   if (!row) return { ...DEFAULTS };
   const json = (value, fallback) => { try { return JSON.parse(value); } catch { return fallback; } };
   return {
-    ...row,
+    id: Number(row.id ?? DEFAULTS.id),
     enabled: Boolean(row.enabled),
-    refreshSource: Boolean(row.refreshSource),
+    scheduleType: row.scheduleType ?? row.scheduletype ?? DEFAULTS.scheduleType,
+    weekday: Number(row.weekday ?? DEFAULTS.weekday),
+    hour: Number(row.hour ?? DEFAULTS.hour),
+    minute: Number(row.minute ?? DEFAULTS.minute),
+    timezone: row.timezone ?? DEFAULTS.timezone,
+    refreshSource: Boolean(row.refreshSource ?? row.refreshsource),
+    lastTriggeredAt: Number(row.lastTriggeredAt ?? row.lasttriggeredat ?? DEFAULTS.lastTriggeredAt),
+    updatedAt: Number(row.updatedAt ?? row.updatedat ?? DEFAULTS.updatedAt),
     datasets: json(row.datasets, DEFAULTS.datasets),
     categories: json(row.categories, DEFAULTS.categories),
     subcategories: json(row.subcategories, DEFAULTS.subcategories)
@@ -72,4 +79,4 @@ function markTriggered(db, timestamp, callback = () => {}) {
   db.run(`UPDATE ${tableName} SET lastTriggeredAt = ? WHERE id = 1`, [timestamp], callback);
 }
 
-module.exports = { tableName, DEFAULTS, init, get, upsert, markTriggered };
+module.exports = { tableName, DEFAULTS, decode, init, get, upsert, markTriggered };

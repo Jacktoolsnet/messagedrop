@@ -29,3 +29,29 @@ export interface OverpassImportSettingsResponse {
   status: number;
   settings: OverpassImportSettings;
 }
+
+export interface OverpassImportJob {
+  jobId: string;
+  datasetId: string;
+  status: 'queued' | 'running' | 'succeeded' | 'failed';
+  stage: string;
+  progress: number;
+  error: string | null;
+  createdAt: string;
+  startedAt: string | null;
+  completedAt: string | null;
+}
+
+export interface OverpassDatabaseInfo {
+  status: number;
+  health: {
+    status: number;
+    mode?: string;
+    local?: {
+      datasetCount: number;
+      poiCount: number;
+      importedAt: string | null;
+    };
+  };
+  jobs: OverpassImportJob[];
+}

@@ -40,6 +40,18 @@ mat-toolbar {
   box-shadow: 0 20px 50px rgba(15, 23, 42, .1);
 }
 
+.settings-tabs {
+  border-radius: 22px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, .72);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, .1);
+  overflow: hidden;
+}
+
+.settings-tabs ::ng-deep .mat-mdc-tab .mdc-tab__content { gap: .45rem; }
+.tab-content { padding: 1rem; }
+.wide-card { width: 100%; }
+
 .hero-card p { margin: 1rem 0 0; color: var(--muted); line-height: 1.55; }
 .avatar { display: grid; place-items: center; color: #fff; border-radius: 15px; }
 .avatar-map { background: linear-gradient(135deg, #0f766e, #10b981); }
@@ -111,8 +123,51 @@ mat-toolbar {
 }
 .category-hint { margin-bottom: .8rem; padding: .65rem; border-radius: 12px; background: rgba(59, 130, 246, .08); }
 
+.country-list, .country-group { display: grid; gap: .8rem; }
+.country-group { padding: 1rem; border: 1px solid rgba(148, 163, 184, .22); border-radius: 18px; background: rgba(248, 250, 252, .72); }
+.country-group header { display: flex; align-items: center; gap: .55rem; }
+.country-group header mat-icon { color: #2563eb; }
+.country-group header span { margin-left: auto; color: var(--muted); font-size: .8rem; }
+.region-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem; }
+.region-row, .setting-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .8rem;
+  border: 1px solid rgba(148, 163, 184, .22);
+  border-radius: 15px;
+  background: #fff;
+}
+.region-row > span, .setting-toggle > span { display: grid; gap: .2rem; }
+.region-row small, .setting-toggle small { color: var(--muted); }
+.validation-hint { display: flex; align-items: center; gap: .5rem; color: #b45309; padding: .7rem; }
+
+.update-settings { display: grid; gap: 1rem; }
+.schedule-grid { display: grid; grid-template-columns: repeat(3, minmax(140px, 1fr)); gap: .75rem; transition: opacity .18s ease; }
+.schedule-grid mat-form-field { width: 100%; }
+.disabled-section { opacity: .58; }
+.manual-actions { display: flex; align-items: center; flex-wrap: wrap; gap: .75rem; }
+.manual-actions small { color: var(--muted); }
+
+.header-spacer { flex: 1 1 auto; }
+.database-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .7rem; margin-bottom: 1.2rem; }
+.database-stats article { display: grid; gap: .35rem; padding: .9rem; border-radius: 16px; background: rgba(248, 250, 252, .9); border: 1px solid rgba(148, 163, 184, .22); }
+.database-stats span { color: var(--muted); font-size: .82rem; }
+.database-stats strong { overflow-wrap: anywhere; }
+.job-list { display: grid; gap: .55rem; }
+.job-row { display: flex; align-items: center; gap: .75rem; padding: .75rem; border: 1px solid rgba(148, 163, 184, .22); border-radius: 14px; background: rgba(248, 250, 252, .82); }
+.job-row > mat-icon { color: #64748b; }
+.job-row > span:nth-child(2) { flex: 1; display: grid; gap: .15rem; }
+.job-row small { color: var(--muted); }
+.job-status { padding: .25rem .55rem; border-radius: 999px; background: #e2e8f0; font-size: .78rem; }
+.status-succeeded { color: #047857; background: #d1fae5; }
+.status-failed { color: #b91c1c; background: #fee2e2; }
+.status-running, .status-queued { color: #1d4ed8; background: #dbeafe; }
+
 @media (max-width: 760px) {
   .settings-layout { grid-template-columns: 1fr; }
   .subcategory-grid { grid-template-columns: 1fr; }
+  .region-grid, .schedule-grid, .database-stats { grid-template-columns: 1fr; }
   .toolbar-title { font-size: 1.2rem; }
 }

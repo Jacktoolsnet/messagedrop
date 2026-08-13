@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { OverpassImportCatalog, OverpassImportSettings, OverpassImportSettingsResponse } from '../interfaces/overpass-import.interface';
+import { OverpassDatabaseInfo, OverpassImportCatalog, OverpassImportSettings, OverpassImportSettingsResponse } from '../interfaces/overpass-import.interface';
 
 @Injectable({ providedIn: 'root' })
 export class OverpassImportService {
@@ -19,5 +19,13 @@ export class OverpassImportService {
 
   updateSettings(settings: OverpassImportSettings): Observable<OverpassImportSettingsResponse> {
     return this.http.put<OverpassImportSettingsResponse>(`${this.baseUrl}/settings`, settings);
+  }
+
+  getDatabaseInfo(): Observable<OverpassDatabaseInfo> {
+    return this.http.get<OverpassDatabaseInfo>(`${this.baseUrl}/database-info`);
+  }
+
+  startImport(): Observable<{ status: number; jobs: unknown[] }> {
+    return this.http.post<{ status: number; jobs: unknown[] }>(`${this.baseUrl}/jobs`, {});
   }
 }

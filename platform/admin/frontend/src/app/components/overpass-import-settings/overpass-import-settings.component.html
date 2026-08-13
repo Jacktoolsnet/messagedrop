@@ -8,7 +8,7 @@
     <mat-icon>refresh</mat-icon>
   </button>
   <button mat-icon-button type="button" class="save-button" (click)="save()"
-    [disabled]="!hasChanges() || saving() || enabledCategories().size === 0" [attr.aria-label]="i18n.t('Save settings')">
+    [disabled]="!hasChanges() || saving() || enabledCategories().size === 0 || enabledDatasets().size === 0" [attr.aria-label]="i18n.t('Save settings')">
     <mat-icon>save</mat-icon>
   </button>
 </mat-toolbar>
@@ -34,8 +34,11 @@
       <mat-card-content><mat-icon>cloud_off</mat-icon> {{ i18n.t('The Overpass catalog currently contains no categories.') }}</mat-card-content>
     </mat-card>
   } @else {
-    <section class="settings-layout">
-      <mat-card class="section-card">
+    <mat-tab-group class="settings-tabs" animationDuration="180ms">
+      <mat-tab>
+        <ng-template mat-tab-label><mat-icon>category</mat-icon><span>{{ i18n.t('Categories') }}</span></ng-template>
+        <section class="tab-content settings-layout">
+          <mat-card class="section-card">
         <mat-card-header>
           <div mat-card-avatar class="avatar avatar-category"><mat-icon>category</mat-icon></div>
           <mat-card-title>{{ i18n.t('Categories') }}</mat-card-title>
@@ -56,9 +59,9 @@
             </div>
           }
         </mat-card-content>
-      </mat-card>
+          </mat-card>
 
-      <mat-card class="section-card">
+          <mat-card class="section-card">
         <mat-card-header>
           <div mat-card-avatar class="avatar avatar-detail"><mat-icon>account_tree</mat-icon></div>
           <mat-card-title>{{ selectedCategory() ? label(selectedCategory() ?? '') : i18n.t('Subcategories') }}</mat-card-title>
@@ -87,7 +90,144 @@
             <div class="empty-state"><mat-icon>touch_app</mat-icon> {{ i18n.t('Please select a category.') }}</div>
           }
         </mat-card-content>
-      </mat-card>
-    </section>
+          </mat-card>
+        </section>
+      </mat-tab>
+
+      <mat-tab>
+        <ng-template mat-tab-label><mat-icon>public</mat-icon><span>{{ i18n.t('Regions') }}</span></ng-template>
+        <section class="tab-content">
+          <mat-card class="section-card wide-card">
+            <mat-card-header>
+              <div mat-card-avatar class="avatar avatar-map"><mat-icon>map</mat-icon></div>
+              <mat-card-title>{{ i18n.t('Imported regions') }}</mat-card-title>
+              <mat-card-subtitle>{{ i18n.t('Select the countries and regions whose geodata should be maintained.') }}</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content class="country-list">
+              @for (group of countryGroups(); track group.countryCode) {
+                <section class="country-group">
+                  <header><mat-icon>flag</mat-icon><strong>{{ countryLabel(group.countryCode) }}</strong><span>{{ group.countryCode }}</span></header>
+                  <div class="region-grid">
+                    @for (dataset of group.datasets; track dataset.id) {
+                      <label class="region-row">
+                        <span><strong>{{ dataset.label }}</strong><small>{{ dataset.regionCode }}</small></span>
+                        <mat-slide-toggle [checked]="isDatasetEnabled(dataset.id)"
+                          (change)="toggleDataset(dataset.id, $event.checked)"
+                          [attr.aria-label]="i18n.t('Enable {{name}}', { name: dataset.label })"></mat-slide-toggle>
+                      </label>
+                    }
+                  </div>
+                </section>
+              } @empty {
+                <div class="empty-state"><mat-icon>location_off</mat-icon>{{ i18n.t('No importable regions are currently available.') }}</div>
+              }
+              @if (enabledDatasets().size === 0) {
+                <div class="validation-hint"><mat-icon>warning</mat-icon>{{ i18n.t('Select at least one region.') }}</div>
+              }
+            </mat-card-content>
+          </mat-card>
+        </section>
+      </mat-tab>
+
+      <mat-tab>
+        <ng-template mat-tab-label><mat-icon>update</mat-icon><span>{{ i18n.t('Update settings') }}</span></ng-template>
+        <section class="tab-content">
+          <mat-card class="section-card wide-card">
+            <mat-card-header>
+              <div mat-card-avatar class="avatar avatar-detail"><mat-icon>schedule</mat-icon></div>
+              <mat-card-title>{{ i18n.t('Automatic updates') }}</mat-card-title>
+              <mat-card-subtitle>{{ i18n.t('Define when the selected regions should be refreshed.') }}</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content class="update-settings">
+              <label class="setting-toggle">
+                <span><strong>{{ i18n.t('Enable automatic imports') }}</strong><small>{{ i18n.t('The admin backend checks the schedule every five minutes.') }}</small></span>
+                <mat-slide-toggle [checked]="importsEnabled()" (change)="importsEnabled.set($event.checked)"></mat-slide-toggle>
+              </label>
+              <div class="schedule-grid" [class.disabled-section]="!importsEnabled()">
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ i18n.t('Frequency') }}</mat-label>
+                  <mat-select [value]="scheduleType()" [disabled]="!importsEnabled()" (selectionChange)="scheduleType.set($event.value)">
+                    <mat-option value="daily">{{ i18n.t('Daily') }}</mat-option>
+                    <mat-option value="weekly">{{ i18n.t('Weekly') }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+                @if (scheduleType() === 'weekly') {
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ i18n.t('Weekday') }}</mat-label>
+                    <mat-select [value]="weekday()" [disabled]="!importsEnabled()" (selectionChange)="weekday.set($event.value)">
+                      @for (day of weekdays; track day.value) { <mat-option [value]="day.value">{{ i18n.t(day.label) }}</mat-option> }
+                    </mat-select>
+                  </mat-form-field>
+                }
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ i18n.t('Hour') }}</mat-label>
+                  <input matInput type="number" min="0" max="23" [value]="hour()" [disabled]="!importsEnabled()" (input)="setHour($any($event.target).value)">
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ i18n.t('Minute') }}</mat-label>
+                  <input matInput type="number" min="0" max="59" [value]="minute()" [disabled]="!importsEnabled()" (input)="setMinute($any($event.target).value)">
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ i18n.t('Timezone') }}</mat-label>
+                  <mat-select [value]="timezone()" [disabled]="!importsEnabled()" (selectionChange)="timezone.set($event.value)">
+                    @for (zone of timezones; track zone) { <mat-option [value]="zone">{{ zone }}</mat-option> }
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <label class="setting-toggle">
+                <span><strong>{{ i18n.t('Download a fresh source file') }}</strong><small>{{ i18n.t('Fetch the latest Geofabrik extract before each scheduled import.') }}</small></span>
+                <mat-slide-toggle [checked]="refreshSource()" (change)="refreshSource.set($event.checked)"></mat-slide-toggle>
+              </label>
+              <div class="manual-actions">
+                <button mat-flat-button type="button" (click)="startImport()" [disabled]="hasChanges() || importing()">
+                  <mat-icon>play_arrow</mat-icon>{{ importing() ? i18n.t('Starting…') : i18n.t('Import now') }}
+                </button>
+                @if (hasChanges()) { <small>{{ i18n.t('Save your changes before starting a manual import.') }}</small> }
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </section>
+      </mat-tab>
+
+      <mat-tab>
+        <ng-template mat-tab-label><mat-icon>database</mat-icon><span>{{ i18n.t('Database information') }}</span></ng-template>
+        <section class="tab-content">
+          <mat-card class="section-card wide-card">
+            <mat-card-header>
+              <div mat-card-avatar class="avatar avatar-category"><mat-icon>storage</mat-icon></div>
+              <mat-card-title>{{ i18n.t('Local POI database') }}</mat-card-title>
+              <mat-card-subtitle>{{ i18n.t('Active data and recent import jobs') }}</mat-card-subtitle>
+              <span class="header-spacer"></span>
+              <button mat-icon-button type="button" (click)="loadDatabaseInfo()" [disabled]="loadingDatabaseInfo()"><mat-icon>refresh</mat-icon></button>
+            </mat-card-header>
+            <mat-card-content>
+              @if (loadingDatabaseInfo()) { <mat-progress-bar mode="indeterminate"></mat-progress-bar> }
+              @if (databaseInfo(); as info) {
+                <div class="database-stats">
+                  <article><span>{{ i18n.t('Mode') }}</span><strong>{{ info.health.mode || '—' }}</strong></article>
+                  <article><span>{{ i18n.t('Datasets') }}</span><strong>{{ info.health.local?.datasetCount ?? 0 }}</strong></article>
+                  <article><span>{{ i18n.t('POIs') }}</span><strong>{{ info.health.local?.poiCount ?? 0 }}</strong></article>
+                  <article><span>{{ i18n.t('Last activation') }}</span><strong>{{ info.health.local?.importedAt ? (info.health.local.importedAt | date:'medium') : '—' }}</strong></article>
+                </div>
+                <h3>{{ i18n.t('Recent import jobs') }}</h3>
+                <div class="job-list">
+                  @for (job of info.jobs; track job.jobId) {
+                    <article class="job-row">
+                      <mat-icon>{{ job.status === 'succeeded' ? 'check_circle' : job.status === 'failed' ? 'error' : 'sync' }}</mat-icon>
+                      <span><strong>{{ job.datasetId }}</strong><small>{{ job.stage }} · {{ job.progress }} %</small></span>
+                      <span class="job-status" [class]="'job-status status-' + job.status">{{ job.status }}</span>
+                    </article>
+                  } @empty {
+                    <div class="empty-state"><mat-icon>history</mat-icon>{{ i18n.t('No import jobs recorded yet.') }}</div>
+                  }
+                </div>
+              } @else if (!loadingDatabaseInfo()) {
+                <div class="empty-state"><mat-icon>cloud_off</mat-icon>{{ i18n.t('Database information is currently unavailable.') }}</div>
+              }
+            </mat-card-content>
+          </mat-card>
+        </section>
+      </mat-tab>
+    </mat-tab-group>
   }
 </main>
