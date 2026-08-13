@@ -8,7 +8,7 @@ const { normalizeOverpassResponse } = require('../normalizer');
 const { categoryNames, categoryCatalog } = require('../categories');
 
 function createOverpassRouter({
-  client, metadataClient, cache, persistentCache,
+  client, metadataClient, cache, persistentCache, localPoiStore,
   refreshAfterMs = 24 * 60 * 60 * 1000,
   cacheTtlMs = 7 * 24 * 60 * 60 * 1000,
   staleIfErrorMs = 30 * 24 * 60 * 60 * 1000,
@@ -20,6 +20,10 @@ function createOverpassRouter({
   router.get('/health', async (_req, res, next) => {
     metrics.health = (metrics.health || 0) + 1;
     try {
+      const localStatus = await localPoiStore?.status();
+      if (localStatus?.datasetCount > 0) {
+        return res.status(200).json({ status: 200, mode: 'local', local: localStatus });
+      }
       const upstream = await client.health();
       return res.status(200).json({ status: 200, upstreamStatus: upstream.status });
     } catch (error) {
@@ -36,6 +40,8 @@ function createOverpassRouter({
     metrics.nearby = (metrics.nearby || 0) + 1;
     const validated = validateNearbyRequest(req.body);
     if (!validated.ok) return res.status(400).json({ error: validated.message });
+    const local = await localPoiStore?.getNearby(validated.value);
+    if (local) return res.status(200).json({ ...local, cache: 'local' });
     const key = requestKey(validated.value);
     const cached = cache.get(key);
     if (cached !== undefined) return res.status(200).json({ ...cached, cache: 'hit' });
@@ -150,6 +156,7 @@ function createOverpassRouter({
     inFlight: inFlight.size,
     cache: cache.snapshot(),
     persistentCache: persistentCache?.snapshot(),
+    localPoiStore: localPoiStore?.snapshot(),
     requests: { ...metrics }
   }));
 

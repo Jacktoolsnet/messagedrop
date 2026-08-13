@@ -1,4 +1,5 @@
 const tableOverpassCache = require('./tableOverpassCache');
+const tableOverpassPoi = require('./tableOverpassPoi');
 
 
 const DEFAULT_MAX_PENDING_REQUESTS = 1000;
@@ -24,7 +25,13 @@ function createQueueOverloadedError(pendingCount, maxPendingRequests) {
 const ROW_KEY_MAP = new Map(Object.entries({
   cachekey: 'cacheKey',
   fetchedat: 'fetchedAt',
-  lastaccessed: 'lastAccessed'
+  lastaccessed: 'lastAccessed',
+  datasetid: 'datasetId',
+  sourceurl: 'sourceUrl',
+  sourcetimestamp: 'sourceTimestamp',
+  importedat: 'importedAt',
+  poicount: 'poiCount',
+  datasetcount: 'datasetCount'
 }));
 
 function normalizeRow(row) {
@@ -337,6 +344,10 @@ class Database {
       this.db = new PostgresCompat(createDbConfigFromEnv(), this.logger);
 
       await new Promise((resolve, reject) => tableOverpassCache.init(this.db, (error) => {
+        if (error) reject(error);
+        else resolve();
+      }));
+      await new Promise((resolve, reject) => tableOverpassPoi.init(this.db, (error) => {
         if (error) reject(error);
         else resolve();
       }));

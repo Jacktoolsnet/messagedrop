@@ -9,6 +9,7 @@
     "test": "node --test",
     "lint": "eslint .",
     "db:create": "node scripts/create-database.js",
+    "dataset:import:wolfenbuettel": "node scripts/import-local-dataset.js --dataset wolfenbuettel",
     "sample:fetch": "node scripts/fetch-raw-poi-sample.js",
     "sample:analyze": "node scripts/analyze-poi-sample.js"
   },

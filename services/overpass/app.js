@@ -11,6 +11,7 @@ const winston = require('winston');
 const { BoundedTtlCache } = require('./cache');
 const Database = require('./db/database');
 const { PersistentOverpassCache } = require('./persistent-cache');
+const { LocalPoiStore } = require('./local-poi-store');
 const { createOverpassClient } = require('./clients/overpass-client');
 const { createWebsiteMetadataClient } = require('./website-metadata');
 const loggerMw = require('./middleware/logger');
@@ -55,7 +56,8 @@ function createApp({
   client = createOverpassClient(),
   metadataClient = createWebsiteMetadataClient(),
   logger = createLogger(),
-  persistentCache
+  persistentCache,
+  localPoiStore
 } = {}) {
   const cache = new BoundedTtlCache({
     ttlMs: numberSetting('OVERPASS_CACHE_TTL_MS', 6 * 60 * 60 * 1000),
@@ -76,7 +78,7 @@ function createApp({
   app.use('/', root);
   app.use('/check', check);
   app.use('/overpass', createOverpassRouter({
-    client, metadataClient, cache, persistentCache, inFlight, metrics,
+    client, metadataClient, cache, persistentCache, localPoiStore, inFlight, metrics,
     refreshAfterMs: numberSetting('OVERPASS_CACHE_REFRESH_AFTER_MS', 24 * 60 * 60 * 1000),
     cacheTtlMs: numberSetting('OVERPASS_DATABASE_CACHE_TTL_MS', 7 * 24 * 60 * 60 * 1000),
     staleIfErrorMs: numberSetting('OVERPASS_CACHE_STALE_IF_ERROR_MS', 30 * 24 * 60 * 60 * 1000),
@@ -98,12 +100,13 @@ async function start() {
   const database = new Database();
   await database.init(logger);
   const persistentCache = new PersistentOverpassCache({ database, logger });
+  const localPoiStore = new LocalPoiStore({ database, logger });
   void persistentCache.cleanExpired(numberSetting('OVERPASS_DATABASE_RETENTION_DAYS', 90));
   const cleanupTimer = setInterval(() => {
     void persistentCache.cleanExpired(numberSetting('OVERPASS_DATABASE_RETENTION_DAYS', 90));
   }, 24 * 60 * 60 * 1000);
   cleanupTimer.unref();
-  const app = createApp({ logger, persistentCache });
+  const app = createApp({ logger, persistentCache, localPoiStore });
   const server = app.listen(port, () => logger.info('Overpass service listening', { port }));
   server.on('error', (error) => logger.error('Overpass HTTP server error', { error: error.message }));
   const shutdown = (signal) => {

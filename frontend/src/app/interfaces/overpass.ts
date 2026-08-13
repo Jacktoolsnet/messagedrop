@@ -55,7 +55,7 @@ export interface OverpassNearbyResponse {
   status: number;
   pois: OverpassPoi[];
   count: number;
-  cache: 'hit' | 'database' | 'stale' | 'stale-if-error' | 'miss';
+  cache: 'local' | 'hit' | 'database' | 'stale' | 'stale-if-error' | 'miss';
 }
 
 export interface OverpassViewport {

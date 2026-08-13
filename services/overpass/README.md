@@ -85,6 +85,48 @@ the public Overpass endpoint is unavailable. Retention and freshness windows
 are configured with the `OVERPASS_*CACHE*` and `OVERPASS_DATABASE_RETENTION_DAYS`
 settings in `.env.overpass.example`.
 
+## Local POI dataset
+
+For interactive map requests the service prefers imported OSM data over the
+public Overpass instances. A request is answered locally when one imported
+dataset completely covers its bounding box. An empty local result is final and
+does not trigger an upstream request. Outside imported regions, the existing
+cached Overpass fallback remains available.
+
+The repeatable Wolfenbüttel import downloads the current Niedersachsen PBF
+extract from Geofabrik, cuts out the wider Wolfenbüttel area, filters the tags
+defined in `categories.js`, converts all supported nodes, ways and relations,
+and atomically replaces that dataset in PostgreSQL.
+
+Install the required Osmium command once on Debian/Ubuntu:
+
+```bash
+sudo apt update
+sudo apt install osmium-tool
+```
+
+Then run from the service directory:
+
+```bash
+npm run dataset:import:wolfenbuettel
+```
+
+The initial Geofabrik download is several hundred megabytes. It is retained in
+`docs/overpass/datasets/` and reused on later imports. To download a fresh PBF:
+
+```bash
+npm run dataset:import:wolfenbuettel -- --refresh
+```
+
+Generated PBF and GeoJSON sequence files are ignored by Git. The database
+tables `tableOverpassDataset` and `tableOverpassPoi` are created automatically
+both by the service and by the import command. No PostGIS extension is needed;
+bounded latitude/longitude indexes are sufficient for the current POI queries.
+
+After a successful import, restart the service. `GET /overpass/health` then
+reports `mode: "local"`, and local nearby responses contain `cache: "local"`
+plus the dataset ID and import timestamp in `source`.
+
 ## Capture a raw sample
 
 For the repeatable multi-city capture, use the repository-level wrapper:

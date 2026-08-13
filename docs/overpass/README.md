@@ -4,6 +4,10 @@ This directory contains the repeatable data capture used to evaluate the
 OpenStreetMap hotel and accommodation data. Generated upstream responses and
 analysis reports are written to `generated/` and deliberately ignored by Git.
 
+The production-style local dataset import is documented in
+`services/overpass/README.md`. Its disposable downloads and intermediate files
+are stored separately in `docs/overpass/datasets/`.
+
 Run all configured city samples from the repository root:
 
 ```bash
