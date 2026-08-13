@@ -1,4 +1,5 @@
 const path = require('node:path');
+const fs = require('node:fs/promises');
 const { spawn } = require('node:child_process');
 const { randomUUID } = require('node:crypto');
 const table = require('./db/tableOverpassPoi');
@@ -21,10 +22,20 @@ class ImportJobManager {
   async recover() {
     try {
       await callbackResult((callback) => table.failInterruptedJobs(this.database.db, callback));
+      await this.cleanupInterruptedFiles();
       await this.launchNext();
     } catch (error) {
       this.logger.error('Could not recover Overpass import queue', { error: error.message });
     }
+  }
+
+  async cleanupInterruptedFiles() {
+    const directory = path.resolve(__dirname, '../../docs/overpass/datasets');
+    let entries;
+    try { entries = await fs.readdir(directory); } catch { return; }
+    const generated = entries.filter((name) => name.endsWith('.osm.pbf') || name.endsWith('.osm.pbf.part')
+      || name.endsWith('.geojsonseq') || name.endsWith('-poi-filter-expressions.txt'));
+    await Promise.all(generated.map((name) => fs.rm(path.join(directory, name), { force: true })));
   }
 
   catalog() {

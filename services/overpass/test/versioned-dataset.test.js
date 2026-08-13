@@ -12,6 +12,7 @@ function recordingDatabase() {
   };
   return {
     calls,
+    run: transaction.run,
     transaction: async (factory) => factory(transaction)
   };
 }

@@ -123,6 +123,26 @@ Then run from the service directory:
 npm run dataset:import:wolfenbuettel
 ```
 
+For the complete German extract:
+
+```bash
+npm run dataset:import:germany
+```
+
+The administration catalog groups datasets by continent and country. Selecting
+Germany uses Geofabrik's country extract. The import applies the selected
+Osmium tag expressions before conversion, so only the configured POI categories
+and subcategories enter PostgreSQL—not the full OSM country dataset.
+
+Import jobs are queued globally and processed strictly one at a time. The large
+downloaded PBF is deleted immediately after tag filtering; each smaller working
+file is likewise deleted as soon as the following stage has completed. Cleanup
+also runs after failures. POIs are normalized and inserted in bounded batches,
+so a country import does not accumulate the complete GeoJSON result in memory.
+When the Germany version becomes active it replaces the old Wolfenbüttel test
+dataset, avoiding duplicate storage while preserving the old active data until
+the atomic switch succeeds.
+
 The default imports every configured main category. A subset can be selected
 without changing the program:
 

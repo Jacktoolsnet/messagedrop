@@ -170,7 +170,10 @@ function findQueuedJob(db, callback) {
 function failInterruptedJobs(db, callback) {
   db.run(`UPDATE ${JOB_TABLE} SET status = 'failed', stage = 'failed',
     error = 'Service restarted during import', completedAt = CURRENT_TIMESTAMP
-    WHERE status = 'running'`, [], callback);
+    WHERE status = 'running'`, [], (error) => {
+    if (error) return callback?.(error);
+    db.run(`DELETE FROM ${VERSION_TABLE} WHERE status = 'importing'`, [], callback);
+  });
 }
 
 async function stageVersion(db, { versionId, dataset, categories }) {
@@ -243,6 +246,12 @@ function cleanupRetiredVersions(db, datasetId, keepCount, callback) {
   `, [datasetId, keep], callback);
 }
 
+function deleteDatasets(db, datasetIds, callback) {
+  const ids = [...new Set((datasetIds || []).filter(Boolean))];
+  if (!ids.length) return callback?.(null);
+  db.run(`DELETE FROM ${DATASET_TABLE} WHERE datasetId = ANY(?::text[])`, [ids], callback);
+}
+
 function runStatements(db, statements, callback) {
   let index = 0;
   const next = (error) => {
@@ -280,5 +289,6 @@ module.exports = {
   activateVersion,
   discardVersion,
   publishVersion,
-  cleanupRetiredVersions
+  cleanupRetiredVersions,
+  deleteDatasets
 };

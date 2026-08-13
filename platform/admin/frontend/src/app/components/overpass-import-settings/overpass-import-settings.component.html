@@ -107,7 +107,7 @@
               <mat-form-field appearance="outline" class="continent-select">
                 <mat-label>{{ i18n.t('Continent') }}</mat-label>
                 <mat-select [value]="selectedContinent()" (selectionChange)="selectedContinent.set($event.value)">
-                  @for (continent of continents(); track continent.code) { <mat-option [value]="continent.code">{{ continent.label }}</mat-option> }
+                  @for (continent of continents(); track continent.code) { <mat-option [value]="continent.code">{{ i18n.t(continent.label) }}</mat-option> }
                 </mat-select>
               </mat-form-field>
               @for (group of countryGroups(); track group.countryCode) {

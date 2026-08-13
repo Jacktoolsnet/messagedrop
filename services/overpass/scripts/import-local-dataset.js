@@ -15,13 +15,14 @@ const { normalizeElement } = require('../normalizer');
 const DATASETS = Object.freeze({
   germany: Object.freeze({
     id: 'germany',
-    label: 'Deutschland',
+    label: 'Germany',
     continentCode: 'EU',
-    continentLabel: 'Europa',
+    continentLabel: 'Europe',
     countryCode: 'DE',
-    countryLabel: 'Deutschland',
+    countryLabel: 'Germany',
     regionCode: null,
     level: 'country',
+    supersedes: Object.freeze(['wolfenbuettel']),
     sourceUrl: 'https://download.geofabrik.de/europe/germany-latest.osm.pbf',
     sourceFile: 'germany-latest.osm.pbf',
     bounds: Object.freeze({ south: 47.2701, west: 5.8663, north: 55.0992, east: 15.0419 })
@@ -30,9 +31,9 @@ const DATASETS = Object.freeze({
     id: 'wolfenbuettel',
     label: 'Wolfenbüttel',
     continentCode: 'EU',
-    continentLabel: 'Europa',
+    continentLabel: 'Europe',
     countryCode: 'DE',
-    countryLabel: 'Deutschland',
+    countryLabel: 'Germany',
     regionCode: 'DE-NI',
     level: 'test',
     clipToBounds: true,
@@ -74,6 +75,9 @@ async function main() {
     });
     await updateProgress('activating', 95);
     await tableOverpassPoi.activateVersion(database.db, { jobId, versionId, datasetId: dataset.id, poiCount });
+    if (dataset.supersedes?.length) {
+      await callbackResult((callback) => tableOverpassPoi.deleteDatasets(database.db, dataset.supersedes, callback));
+    }
     process.stdout.write(`Activated version ${versionId} with ${poiCount} local POIs for ${dataset.id}.\n`);
     try {
       await callbackResult((callback) => tableOverpassPoi.cleanupRetiredVersions(
