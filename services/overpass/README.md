@@ -11,6 +11,7 @@ The service-to-service endpoints require a JWT with audience `service.overpass`:
 - `GET /overpass/health`
 - `GET /overpass/categories`
 - `POST /overpass/nearby`
+- `POST /overpass/website-metadata`
 - `GET /overpass/metrics`
 
 Example request body:
@@ -29,6 +30,29 @@ Example request body:
 ```
 
 Supported categories are defined in `categories.js`. The viewport area and result count are limited by `OVERPASS_MAX_BBOX_AREA` and `OVERPASS_MAX_RESULTS`.
+
+## Website header metadata
+
+Metadata for a POI website can be loaded separately after obtaining its URL
+from a nearby result:
+
+```json
+POST /overpass/website-metadata
+{
+  "url": "https://www.parkhotel-wolfenbuettel.de/"
+}
+```
+
+The endpoint reads only a bounded HTML `<head>` and returns publisher-provided
+title, description, canonical URL, language, favicon, Open Graph, Twitter Card,
+and JSON-LD metadata when present. It does not derive values from the visible
+page body. Results use the same bounded memory and PostgreSQL cache as nearby
+queries.
+
+For SSRF protection, only public HTTPS targets on the standard port are
+accepted. Every DNS result and redirect target is checked; local and private
+addresses are rejected. Download size, timeout, and redirect limits are
+configured with `OVERPASS_WEBSITE_METADATA_*`.
 
 ## Persistent cache
 

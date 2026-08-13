@@ -8,7 +8,7 @@ const { normalizeOverpassResponse } = require('../normalizer');
 const { categoryNames } = require('../categories');
 
 function createOverpassRouter({
-  client, cache, persistentCache,
+  client, metadataClient, cache, persistentCache,
   refreshAfterMs = 24 * 60 * 60 * 1000,
   cacheTtlMs = 7 * 24 * 60 * 60 * 1000,
   staleIfErrorMs = 30 * 24 * 60 * 60 * 1000,
@@ -91,6 +91,56 @@ function createOverpassRouter({
     }
   });
 
+  router.post('/website-metadata', async (req, res, next) => {
+    metrics.websiteMetadata = (metrics.websiteMetadata || 0) + 1;
+    if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)
+        || typeof req.body.url !== 'string' || !req.body.url.trim()) {
+      return res.status(400).json({ error: 'invalid_website_metadata_request' });
+    }
+    let normalizedUrl;
+    try {
+      normalizedUrl = new URL(req.body.url).toString();
+    } catch {
+      return res.status(400).json({ error: 'invalid_website_url' });
+    }
+    const key = metadataRequestKey(normalizedUrl);
+    const cached = cache.get(key);
+    if (cached !== undefined) return res.status(200).json({ ...cached, cache: 'hit' });
+
+    const fetchAndCache = async () => {
+      const metadata = await metadataClient.fetch(normalizedUrl);
+      const result = { status: 200, metadata };
+      cache.set(key, result);
+      await persistentCache?.set(key, result);
+      return result;
+    };
+
+    try {
+      const persisted = await persistentCache?.get(key);
+      if (persisted && persisted.ageMs <= cacheTtlMs) {
+        cache.set(key, persisted.payload);
+        if (persisted.ageMs <= refreshAfterMs) {
+          return res.status(200).json({ ...persisted.payload, cache: 'database' });
+        }
+        refreshInBackground({ key, fetchAndCache, inFlight, maxInFlight, logger });
+        return res.status(200).json({ ...persisted.payload, cache: 'stale' });
+      }
+      try {
+        const payload = await coalesce(inFlight, key, maxInFlight, fetchAndCache);
+        return res.status(200).json({ ...payload, cache: 'miss' });
+      } catch (error) {
+        if (persisted && persisted.ageMs <= staleIfErrorMs) {
+          cache.set(key, persisted.payload);
+          return res.status(200).json({ ...persisted.payload, cache: 'stale-if-error' });
+        }
+        throw error;
+      }
+    } catch (error) {
+      logger?.warn?.('Website metadata request failed', { url: normalizedUrl, error: error.message });
+      return next(error);
+    }
+  });
+
   router.get('/metrics', (_req, res) => res.status(200).json({
     status: 200,
     inFlight: inFlight.size,
@@ -132,6 +182,10 @@ function requestKey(value) {
   return `nearby:${crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex')}`;
 }
 
+function metadataRequestKey(url) {
+  return `website-metadata:${crypto.createHash('sha256').update(url).digest('hex')}`;
+}
+
 function upstreamError(error) {
   if (!axios.isAxiosError(error)) return error;
   const normalized = new Error('overpass_upstream_error');
@@ -142,4 +196,6 @@ function upstreamError(error) {
   return normalized;
 }
 
-module.exports = { createOverpassRouter, coalesce, refreshInBackground, requestKey, upstreamError };
+module.exports = {
+  createOverpassRouter, coalesce, refreshInBackground, requestKey, metadataRequestKey, upstreamError
+};

@@ -12,6 +12,7 @@ const { BoundedTtlCache } = require('./cache');
 const Database = require('./db/database');
 const { PersistentOverpassCache } = require('./persistent-cache');
 const { createOverpassClient } = require('./clients/overpass-client');
+const { createWebsiteMetadataClient } = require('./website-metadata');
 const loggerMw = require('./middleware/logger');
 const traceId = require('./middleware/trace-id');
 const headerMw = require('./middleware/header');
@@ -50,7 +51,12 @@ function createLogger() {
   return logger;
 }
 
-function createApp({ client = createOverpassClient(), logger = createLogger(), persistentCache } = {}) {
+function createApp({
+  client = createOverpassClient(),
+  metadataClient = createWebsiteMetadataClient(),
+  logger = createLogger(),
+  persistentCache
+} = {}) {
   const cache = new BoundedTtlCache({
     ttlMs: numberSetting('OVERPASS_CACHE_TTL_MS', 6 * 60 * 60 * 1000),
     maxEntries: numberSetting('OVERPASS_CACHE_MAX_ENTRIES', 256),
@@ -70,7 +76,7 @@ function createApp({ client = createOverpassClient(), logger = createLogger(), p
   app.use('/', root);
   app.use('/check', check);
   app.use('/overpass', createOverpassRouter({
-    client, cache, persistentCache, inFlight, metrics,
+    client, metadataClient, cache, persistentCache, inFlight, metrics,
     refreshAfterMs: numberSetting('OVERPASS_CACHE_REFRESH_AFTER_MS', 24 * 60 * 60 * 1000),
     cacheTtlMs: numberSetting('OVERPASS_DATABASE_CACHE_TTL_MS', 7 * 24 * 60 * 60 * 1000),
     staleIfErrorMs: numberSetting('OVERPASS_CACHE_STALE_IF_ERROR_MS', 30 * 24 * 60 * 60 * 1000),
