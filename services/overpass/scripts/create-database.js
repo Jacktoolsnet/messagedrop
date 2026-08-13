@@ -6,11 +6,26 @@ const { Client } = require('pg');
 
 async function main() {
   const settings = databaseSettings();
+  const reset = process.argv.includes('--reset');
+  if (reset && !process.argv.includes('--yes')) {
+    throw new Error('Database reset requires the explicit --yes argument');
+  }
   const client = new Client(settings.connection);
   await client.connect();
   try {
     const existing = await client.query('SELECT 1 FROM pg_database WHERE datname = $1', [settings.database]);
     if (existing.rowCount > 0) {
+      if (reset) {
+        await client.query(`
+          SELECT pg_terminate_backend(pid)
+          FROM pg_stat_activity
+          WHERE datname = $1 AND pid <> pg_backend_pid()
+        `, [settings.database]);
+        await client.query(`DROP DATABASE ${quoteIdentifier(settings.database)}`);
+        await client.query(`CREATE DATABASE ${quoteIdentifier(settings.database)} OWNER ${quoteIdentifier(settings.owner)}`);
+        process.stdout.write(`Database ${settings.database} recreated for ${settings.owner}.\n`);
+        return;
+      }
       process.stdout.write(`Database ${settings.database} already exists.\n`);
       return;
     }

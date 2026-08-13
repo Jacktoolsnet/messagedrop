@@ -8,7 +8,7 @@ const { normalizeOverpassResponse } = require('../normalizer');
 const { categoryNames, categoryCatalog } = require('../categories');
 
 function createOverpassRouter({
-  client, metadataClient, cache, persistentCache, localPoiStore,
+  client, metadataClient, cache, persistentCache, localPoiStore, importJobManager,
   refreshAfterMs = 24 * 60 * 60 * 1000,
   cacheTtlMs = 7 * 24 * 60 * 60 * 1000,
   staleIfErrorMs = 30 * 24 * 60 * 60 * 1000,
@@ -34,6 +34,42 @@ function createOverpassRouter({
   router.get('/categories', (_req, res) => {
     metrics.categories = (metrics.categories || 0) + 1;
     return res.status(200).json({ status: 200, categories: categoryNames(), catalog: categoryCatalog() });
+  });
+
+  router.get('/import-catalog', (_req, res) => res.status(200).json({
+    status: 200,
+    datasets: importJobManager?.catalog?.() || [],
+    categories: categoryCatalog()
+  }));
+
+  router.post('/import-jobs', async (req, res, next) => {
+    if (!importJobManager) return res.status(503).json({ error: 'import_jobs_unavailable' });
+    try {
+      const result = await importJobManager.start(req.body || {});
+      return res.status(result.created ? 202 : 200).json({ status: result.created ? 202 : 200, ...result });
+    } catch (error) {
+      return next(error);
+    }
+  });
+
+  router.get('/import-jobs', async (req, res, next) => {
+    if (!importJobManager) return res.status(503).json({ error: 'import_jobs_unavailable' });
+    try {
+      const jobs = await importJobManager.list(req.query.limit);
+      return res.status(200).json({ status: 200, jobs });
+    } catch (error) {
+      return next(error);
+    }
+  });
+
+  router.get('/import-jobs/:jobId', async (req, res, next) => {
+    if (!importJobManager) return res.status(503).json({ error: 'import_jobs_unavailable' });
+    try {
+      const job = await importJobManager.get(req.params.jobId);
+      return job ? res.status(200).json({ status: 200, job }) : res.status(404).json({ error: 'import_job_not_found' });
+    } catch (error) {
+      return next(error);
+    }
   });
 
   router.post('/nearby', async (req, res, next) => {

@@ -75,6 +75,14 @@ For the local development configuration, create the database once with:
 npm run db:create
 ```
 
+During development, an obsolete schema can be replaced explicitly. Stop the
+Overpass service first; this command irreversibly removes its cache, jobs,
+versions, and POIs:
+
+```bash
+npm run db:reset -- --yes
+```
+
 The configured PostgreSQL user needs `CREATEDB` permission for that command.
 Alternatively, create `messagedrop_overpass` with an administrator account and
 assign ownership to the configured `OVERPASS_DB_USER`.
@@ -134,9 +142,9 @@ Generated PBF and GeoJSON sequence files are ignored by Git. The database
 tables `tableOverpassDataset`, `tableOverpassDatasetVersion`,
 `tableOverpassPoiVersion`, and `tableOverpassImportJob` are created
 automatically both by the service and by the import command. A previously
-imported, unversioned dataset is migrated to an active legacy version without
-requiring another download. No PostGIS extension is needed; bounded
-latitude/longitude indexes are sufficient for the current POI queries.
+created development database from before the versioned model should be
+recreated once. No PostGIS extension is needed; bounded latitude/longitude
+indexes are sufficient for the current POI queries.
 
 Successful imports delete retired versions after the atomic switch by default.
 For a temporary database rollback window, retain a number of old versions with
@@ -150,6 +158,26 @@ Failed jobs keep the active version unchanged and store their error in
 `tableOverpassImportJob`. A partial or failed import can therefore never become
 visible to nearby requests. The job table also prevents two active imports for
 the same dataset.
+
+## Admin-controlled imports
+
+The admin backend can start imports through service-JWT protected endpoints:
+
+- `GET /overpass/import-catalog`
+- `POST /overpass/import-jobs`
+- `GET /overpass/import-jobs`
+- `GET /overpass/import-jobs/:jobId`
+
+The POST body contains `datasetId`, `categories`, and `refresh`. It returns
+immediately with a job record; Osmium continues in a child process. Starting an
+already active dataset is idempotent and returns the existing job.
+
+The admin backend stores its schedule in `tableOverpassImportSettings` and its
+trigger history in `tableOverpassImportDispatch`. Both tables are created with
+`CREATE TABLE IF NOT EXISTS` during a normal admin-backend startup, including
+on an existing production database. Configure `OVERPASS_BASE_URL` and, when
+needed, `OVERPASS_PORT` for the admin backend. Its service signing key must be
+trusted by the Overpass service as issuer `service.admin-backend`.
 
 After a successful import, restart the service. `GET /overpass/health` then
 reports `mode: "local"`, and local nearby responses contain `cache: "local"`

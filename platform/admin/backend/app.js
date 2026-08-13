@@ -92,6 +92,7 @@ const frontendErrorLog = require('./routes/frontend-error-log');
 const powLog = require('./routes/pow-log');
 const moderation = require('./routes/moderation');
 const content = require('./routes/content');
+const overpassImport = require('./routes/overpass-import');
 const cors = require('cors')
 const helmet = require('helmet');
 const cron = require('node-cron');
@@ -104,6 +105,7 @@ const { normalizeErrorResponses, notFoundHandler, errorHandler } = require('./mi
 const { cleanupClosedDsaCases } = require('./utils/dsaCleanup');
 const { parseRetentionMs, DAY_MS } = require('./utils/logRetention');
 const { runCertificateHealthCheck } = require('./utils/certificateHealth');
+const { runScheduledImports } = require('./utils/overpassImport');
 const robotsSitemap = require('./middleware/robots-sitemap');
 
 // ExpressJs
@@ -599,6 +601,7 @@ app.use('/moderation', adminLogLimit, moderation);
 app.use('/content', adminContentLimit, content);
 app.use('/maintenance', adminUserLimit, maintenance);
 app.use('/certificate-health', adminUserLimit, certificateHealth);
+app.use('/overpass-import', adminUserLimit, overpassImport);
 
 
 // DSA
@@ -684,6 +687,14 @@ cron.schedule('5 0 * * *', () => {
     if (err) {
       logger.error(err);
     }
+  });
+});
+
+// Dynamic import schedules are stored in the admin database. This lightweight
+// poller makes changed schedules effective without restarting the process.
+cron.schedule('*/5 * * * *', () => {
+  void runScheduledImports(database.db, logger).catch((error) => {
+    logger.error('Scheduled Overpass import failed', { error: error?.message || error });
   });
 });
 

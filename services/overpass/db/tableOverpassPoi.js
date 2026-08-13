@@ -7,23 +7,16 @@ function init(db, callback) {
   runStatements(db, [
     `CREATE TABLE IF NOT EXISTS ${DATASET_TABLE} (
       datasetId TEXT PRIMARY KEY,
-      sourceUrl TEXT NOT NULL,
-      sourceTimestamp TIMESTAMPTZ,
       south DOUBLE PRECISION NOT NULL,
       west DOUBLE PRECISION NOT NULL,
       north DOUBLE PRECISION NOT NULL,
       east DOUBLE PRECISION NOT NULL,
-      importedAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      poiCount INTEGER NOT NULL DEFAULT 0,
       activeVersionId TEXT,
       createdAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updatedAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
       CHECK (south < north),
       CHECK (west < east)
     )`,
-    `ALTER TABLE ${DATASET_TABLE} ADD COLUMN activeVersionId TEXT`,
-    `ALTER TABLE ${DATASET_TABLE} ADD COLUMN createdAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP`,
-    `ALTER TABLE ${DATASET_TABLE} ADD COLUMN updatedAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP`,
     `CREATE TABLE IF NOT EXISTS ${VERSION_TABLE} (
       versionId TEXT PRIMARY KEY,
       datasetId TEXT NOT NULL REFERENCES ${DATASET_TABLE}(datasetId) ON DELETE CASCADE,
@@ -65,31 +58,12 @@ function init(db, callback) {
       startedAt TIMESTAMPTZ,
       completedAt TIMESTAMPTZ
     )`,
-    `ALTER TABLE ${JOB_TABLE} ADD COLUMN stage TEXT NOT NULL DEFAULT 'queued'`,
-    `ALTER TABLE ${JOB_TABLE} ADD COLUMN progress INTEGER NOT NULL DEFAULT 0`,
     `CREATE INDEX IF NOT EXISTS idx_overpass_import_job_dataset_created
       ON ${JOB_TABLE} (datasetId, createdAt DESC)`,
     `CREATE UNIQUE INDEX IF NOT EXISTS idx_overpass_import_job_one_active
       ON ${JOB_TABLE} (datasetId)
-      WHERE status IN ('queued', 'running')`,
-    `INSERT INTO ${VERSION_TABLE}
-      (versionId, datasetId, status, sourceUrl, sourceTimestamp, categories, createdAt, activatedAt, poiCount)
-      SELECT 'legacy:' || datasetId, datasetId, 'active', sourceUrl, sourceTimestamp,
-        '["accommodation","tourism","leisure","food_drink","amenities"]'::jsonb,
-        importedAt, importedAt, poiCount
-      FROM ${DATASET_TABLE}
-      WHERE activeVersionId IS NULL
-      ON CONFLICT (versionId) DO NOTHING`,
-    `INSERT INTO ${POI_TABLE}
-      (versionId, osmType, osmId, category, subtype, latitude, longitude, payload)
-      SELECT 'legacy:' || datasetId, osmType, osmId, category, subtype, latitude, longitude, payload
-      FROM tableOverpassPoi
-      ON CONFLICT (versionId, osmType, osmId) DO NOTHING`,
-    `UPDATE ${DATASET_TABLE}
-      SET activeVersionId = 'legacy:' || datasetId, updatedAt = CURRENT_TIMESTAMP
-      WHERE activeVersionId IS NULL`,
-    'DROP TABLE IF EXISTS tableOverpassPoi'
-  ], callback, { ignoredCodes: new Set(['42701', '42P01']) });
+      WHERE status IN ('queued', 'running')`
+  ], callback);
 }
 
 function coveringDataset(db, bounds, categories, callback) {
@@ -171,23 +145,33 @@ function getJob(db, jobId, callback) {
   db.get(`SELECT * FROM ${JOB_TABLE} WHERE jobId = ?`, [jobId], callback);
 }
 
+function listJobs(db, limit, callback) {
+  const safeLimit = Math.max(1, Math.min(100, Number(limit) || 20));
+  db.all(`SELECT * FROM ${JOB_TABLE} ORDER BY createdAt DESC LIMIT ?`, [safeLimit], callback);
+}
+
+function findActiveJob(db, datasetId, callback) {
+  db.get(`
+    SELECT * FROM ${JOB_TABLE}
+    WHERE datasetId = ? AND status IN ('queued', 'running')
+    ORDER BY createdAt DESC LIMIT 1
+  `, [datasetId], callback);
+}
+
 async function publishVersion(db, { jobId, versionId, dataset, categories, pois }) {
   await db.transaction(async (transaction) => {
     await run(transaction, `
       INSERT INTO ${DATASET_TABLE}
-        (datasetId, sourceUrl, sourceTimestamp, south, west, north, east, importedAt, poiCount, createdAt, updatedAt)
-      VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        (datasetId, south, west, north, east, createdAt, updatedAt)
+      VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
       ON CONFLICT (datasetId) DO UPDATE SET
-        sourceUrl = EXCLUDED.sourceUrl,
-        sourceTimestamp = EXCLUDED.sourceTimestamp,
         south = EXCLUDED.south,
         west = EXCLUDED.west,
         north = EXCLUDED.north,
         east = EXCLUDED.east,
         updatedAt = CURRENT_TIMESTAMP
     `, [
-      dataset.id, dataset.sourceUrl, dataset.sourceTimestamp || null,
-      dataset.bounds.south, dataset.bounds.west, dataset.bounds.north, dataset.bounds.east
+      dataset.id, dataset.bounds.south, dataset.bounds.west, dataset.bounds.north, dataset.bounds.east
     ]);
     await run(transaction, `
       INSERT INTO ${VERSION_TABLE}
@@ -216,9 +200,9 @@ async function publishVersion(db, { jobId, versionId, dataset, categories, pois 
     `, [pois.length, versionId]);
     await run(transaction, `
       UPDATE ${DATASET_TABLE}
-      SET activeVersionId = ?, importedAt = CURRENT_TIMESTAMP, poiCount = ?, updatedAt = CURRENT_TIMESTAMP
+      SET activeVersionId = ?, updatedAt = CURRENT_TIMESTAMP
       WHERE datasetId = ?
-    `, [versionId, pois.length, dataset.id]);
+    `, [versionId, dataset.id]);
     await run(transaction, `
       UPDATE ${JOB_TABLE}
       SET status = 'succeeded', stage = 'completed', progress = 100,
@@ -241,10 +225,10 @@ function cleanupRetiredVersions(db, datasetId, keepCount, callback) {
   `, [datasetId, keep], callback);
 }
 
-function runStatements(db, statements, callback, { ignoredCodes = new Set() } = {}) {
+function runStatements(db, statements, callback) {
   let index = 0;
   const next = (error) => {
-    if (error && !ignoredCodes.has(error.code)) return callback?.(error);
+    if (error) return callback?.(error);
     if (index >= statements.length) return callback?.(null);
     db.run(statements[index++], [], next);
   };
@@ -268,6 +252,8 @@ module.exports = {
   updateJobProgress,
   failJob,
   getJob,
+  listJobs,
+  findActiveJob,
   publishVersion,
   cleanupRetiredVersions
 };

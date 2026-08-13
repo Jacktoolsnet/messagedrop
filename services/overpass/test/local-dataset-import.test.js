@@ -48,7 +48,8 @@ test('parses the repeatable Wolfenbuettel import options', () => {
       dataset: 'wolfenbuettel',
       refresh: true,
       categories: ['accommodation', 'amenities'],
-      keepVersions: 1
+      keepVersions: 1,
+      jobId: null
     }
   );
   assert.throws(() => parseArguments(['--unknown']), /Unknown argument/u);

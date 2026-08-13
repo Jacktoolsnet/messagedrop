@@ -15,6 +15,9 @@ const { normalizeElement } = require('../normalizer');
 const DATASETS = Object.freeze({
   wolfenbuettel: Object.freeze({
     id: 'wolfenbuettel',
+    label: 'Wolfenbüttel',
+    countryCode: 'DE',
+    regionCode: 'DE-NI',
     sourceUrl: 'https://download.geofabrik.de/europe/germany/niedersachsen-latest.osm.pbf',
     sourceFile: 'niedersachsen-latest.osm.pbf',
     bounds: Object.freeze({ south: 52.05, west: 10.40, north: 52.30, east: 10.75 })
@@ -29,13 +32,15 @@ async function main() {
   await requireCommand('osmium', 'Install it first with: sudo apt install osmium-tool');
   const database = new Database();
   await database.init(console);
-  const jobId = randomUUID();
+  const jobId = options.jobId || randomUUID();
   const versionId = randomUUID();
-  await callbackResult((callback) => tableOverpassPoi.createJob(database.db, {
-    id: jobId,
-    datasetId: dataset.id,
-    requestedConfig: { categories: options.categories, refresh: options.refresh }
-  }, callback));
+  if (!options.jobId) {
+    await callbackResult((callback) => tableOverpassPoi.createJob(database.db, {
+      id: jobId,
+      datasetId: dataset.id,
+      requestedConfig: { categories: options.categories, refresh: options.refresh }
+    }, callback));
+  }
   await callbackResult((callback) => tableOverpassPoi.startJob(database.db, jobId, callback));
   process.stdout.write(`Started import job ${jobId}.\n`);
   try {
@@ -210,7 +215,8 @@ function parseArguments(args) {
     dataset: 'wolfenbuettel',
     refresh: false,
     categories: categoryNames(),
-    keepVersions: Number(process.env.OVERPASS_DATASET_RETIRED_VERSIONS || 0)
+    keepVersions: Number(process.env.OVERPASS_DATASET_RETIRED_VERSIONS || 0),
+    jobId: null
   };
   for (let index = 0; index < args.length; index += 1) {
     if (args[index] === '--refresh') options.refresh = true;
@@ -219,6 +225,7 @@ function parseArguments(args) {
       options.categories = [...new Set(args[++index].split(',').map((value) => value.trim()).filter(Boolean))];
     }
     else if (args[index] === '--keep-versions' && args[index + 1]) options.keepVersions = Number(args[++index]);
+    else if (args[index] === '--job-id' && args[index + 1]) options.jobId = args[++index];
     else throw new Error(`Unknown argument: ${args[index]}`);
   }
   if (!options.categories.length || options.categories.some((category) => !categoryNames().includes(category))) {

@@ -416,13 +416,6 @@
             "request": "launch",
             "command": "node tools/db/open-dbeaver.js OVERPASS",
             "cwd": "${workspaceFolder}"
-        },
-        {
-            "name": "Create Overpass Database",
-            "type": "node-terminal",
-            "request": "launch",
-            "command": "npm --prefix services/overpass run db:create",
-            "cwd": "${workspaceFolder}"
         }
     ]
 }
