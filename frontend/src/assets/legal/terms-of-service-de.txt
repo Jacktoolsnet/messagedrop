@@ -1,5 +1,5 @@
 NUTZUNGSBEDINGUNGEN
-Stand: 12. Juli 2026
+Stand: 13. August 2026
 
 ###
 Kurzfassung (vereinfacht, nicht rechtsverbindlich)
@@ -24,7 +24,8 @@ Kurzfassung (vereinfacht, nicht rechtsverbindlich)
 - Für Übersetzungen kannst Du optional Deinen eigenen DeepL-API-Key verwenden. Für Beschaffung, Geheimhaltung, Gültigkeit, Abrechnung, Quoten und die Einhaltung der Bedingungen von DeepL bist Du selbst verantwortlich.
 - Der optionale Nutzungszeit-Schutz (Selbstbeschränkung/Elternmodus mit Eltern-PIN) kann technisch umgangen werden; eine absolute Sperre ist nicht garantiert.
 - Externe Inhalte von Drittanbietern werden erst nach Deiner anbieterbezogenen Zustimmung geladen. Diese Zustimmung kannst Du jederzeit wieder zurücknehmen.
-- Externe Dienste und Lizenzanbieter (z. B. YouTube, Wikipedia, OpenStreetMap, DeepL, Unsplash, Viator, Flaticon / Freepik) haben eigene Nutzungs- und Datenschutzbedingungen.
+- Externe Dienste und Lizenzanbieter (z. B. YouTube, Wikipedia, OpenStreetMap, SkedGo / TripGo, DeepL, Unsplash, Viator, Flaticon / Freepik) haben eigene Nutzungs- und Datenschutzbedingungen.
+- Routen-, Fahrplan- und Echtzeitinformationen sind unverbindliche Orientierungshilfen. Örtliche Beschilderung, Verkehrsregeln und Informationen der Verkehrsunternehmen haben Vorrang. Die App darf nicht vom Straßenverkehr oder von der Umgebung ablenken.
 - MessageDrop ist kein Notfalldienst.
 
 Maßgeblich ist nur die vollständige Fassung unten.
@@ -337,6 +338,7 @@ Folgende externe Funktions- und Informationsdienste werden nicht über den „Ex
 
 - Open-Meteo
 - OpenStreetMap / Nominatim
+- SkedGo / TripGo
 - DeepL
 - Flaticon / Freepik Company S.L.U. (Sticker-/Asset- und Lizenzanbieter)
 
@@ -377,6 +379,22 @@ Viator-Inhalte und die Erlebnissuche werden nur bereitgestellt, wenn Du Viator i
 
 Datenschutzerklärung: https://www.viator.com/support/privacyPolicy
 Nutzungsbedingungen: https://www.viator.com/support/termsAndConditions
+
+###
+13.6 Besonderheit SkedGo / TripGo
+###
+
+MessageDrop nutzt die TripGo API der SkedGo Pty Limited zur Berechnung und Darstellung von Routen, Haltestellen, Linien, Abfahrtszeiten und – soweit verfügbar – Echtzeitinformationen. Hierfür werden insbesondere Start- und Zielkoordinaten, gewünschte Verkehrsmittel, Reisezeit, Sprache sowie technische Anfrageparameter verarbeitet.
+
+Die angezeigten Informationen können von SkedGo, Verkehrsunternehmen, Kartendiensten und weiteren Datenlieferanten stammen. Verbindungen, Abfahrtszeiten, Verspätungen, Preise, Bahnsteige, Streckenverläufe und Anschlussinformationen können unvollständig, ungenau, verspätet oder kurzfristig geändert sein. Maßgeblich sind im Zweifel die Informationen des jeweiligen Verkehrsunternehmens, die örtliche Beschilderung sowie behördliche Anordnungen.
+
+MessageDrop ist kein sicherheitskritisches Navigationssystem. Die Routenfunktion darf insbesondere nicht so verwendet werden, dass sie vom Straßenverkehr, der Umgebung oder bestehenden Verkehrsregeln ablenkt. Während der Teilnahme am Straßenverkehr darf das Endgerät nur bedient werden, soweit dies sicher und gesetzlich zulässig ist.
+
+Routeninformationen werden mit der vorgeschriebenen Kennzeichnung „Powered by SkedGo/TripGo“ dargestellt.
+
+Entwicklerseite: https://developer.tripgo.com/
+Datenschutzerklärung: https://skedgo.com/privacy-policy/
+Nutzungsbedingungen: https://skedgo.com/home/terms-of-use/
 
 ###
 14. Nutzungszeit-Schutz (Selbstbeschränkung / Elternmodus)

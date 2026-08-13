@@ -1,5 +1,5 @@
 PRIVACY POLICY
-Effective: July 12, 2026
+Effective: August 13, 2026
 
 IMPORTANT NOTE ON LANGUAGE
 This English translation is provided for convenience only and is not legally binding. The legally binding version is exclusively the current complete German version of this Privacy Policy, including all supplements related to the Digital Services Act (DSA).
@@ -35,7 +35,7 @@ Private chat messages are transmitted with end-to-end encryption and are general
 
 External content (e.g., YouTube, TikTok, Pinterest, Spotify, Tenor, Klipy, Unsplash, Wikipedia, and Viator) is loaded only after the user has actively enabled the respective provider. Blanket consent for all providers is not available.
 
-This is separate from external functional services (e.g., Open-Meteo, OpenStreetMap/Nominatim, and DeepL), which are used when the respective function is actively used and are not enabled via the external content toggle.
+This is separate from external functional services (e.g., Open-Meteo, OpenStreetMap/Nominatim, SkedGo/TripGo, and DeepL), which are used when the respective function is actively used and are not enabled via the external content toggle.
 
 When Unsplash images are selected, image files can be loaded, downloaded to the device, and stored locally.
 
@@ -275,6 +275,7 @@ For certain functions, MessageDrop uses external information and API services th
 - Open-Meteo (weather and air quality data),
 - DeepL (translations),
 - Nominatim / OpenStreetMap (search, geocoding, map reference),
+- SkedGo / TripGo (route, stop, timetable, and real-time information),
 - Flaticon / Freepik Company S.L.U. (licensed stickers and comparable graphic elements).
 
 When using these functions, depending on the specific use case, search terms, language and country settings, destination/location parameters, technical connection data, and, where applicable, reference URLs may be processed. Communication with third-party providers takes place, where technically implemented, via our servers or directly from the device.
@@ -282,6 +283,12 @@ When using these functions, depending on the specific use case, search terms, la
 For the translation function, the user may choose either the DeepL access provided by us or their own DeepL API key. A user-provided DeepL API key is stored locally in the encrypted user record on the device. When the user performs a translation or validates the key, that key is transmitted to our backend for processing of the respective request and used with DeepL. According to the current technical design, a user-provided DeepL API key is not stored permanently on the server.
 
 There is no separate external content toggle for these functional services. They are only used when the user actively uses the respective function.
+
+When the routing feature is actively used, MessageDrop transmits the data required for the request through its own TripGo service to the TripGo API provided by SkedGo Pty Limited. This includes, in particular, start and destination coordinates, requested transport modes, requested departure or arrival time, language and, where applicable, stop, line, and connection identifiers. A location determined on the device is used for a route request only when the user invokes the corresponding function. Communication with SkedGo takes place through the MessageDrop server.
+
+SkedGo processes the technically required connection and request data in accordance with its own privacy policy. Processing outside the European Economic Area, in particular in Australia or other countries used by SkedGo or participating transport data providers, cannot be excluded.
+
+To reduce external API requests and provide stable operation, route and transport information is cached for limited periods. Routes are currently cached only briefly in memory for approximately 15 seconds. Stop and line information is normally stored for up to 7 days and may be used as stale data for up to 30 days during temporary failures of the external service. Entries in the persistent stop cache that are no longer required are currently removed after 30 days. Region information may currently be cached for up to 6 hours. These periods may be adjusted in the future for technical or operational reasons.
 
 According to the current technical design, stickers and comparable graphic elements from Flaticon / Freepik are not loaded as external Flaticon embeds on the user’s device, but are delivered via the MessageDrop sticker function and our systems. The technical data required for use is processed by MessageDrop. If Flaticon / Freepik source pages, license information, or external links are accessed in an individual case, Flaticon / Freepik may process data under its own responsibility.
 
@@ -291,6 +298,9 @@ Further information about the providers is available on their respective website
 - Open-Meteo: https://open-meteo.com/
 - DeepL: https://www.deepl.com/
 - OpenStreetMap / Nominatim: https://www.openstreetmap.org/
+- SkedGo / TripGo: https://developer.tripgo.com/
+- SkedGo Privacy Policy: https://skedgo.com/privacy-policy/
+- SkedGo Terms of Use: https://skedgo.com/home/terms-of-use/
 - Unsplash: https://unsplash.com/
 - Flaticon: https://www.flaticon.com/
 - Flaticon Terms of Use: https://www.flaticon.com/legal

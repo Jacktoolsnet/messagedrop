@@ -1,5 +1,5 @@
 TERMS OF USE
-Version: July 12, 2026
+Version: August 13, 2026
 
 IMPORTANT NOTE ON LANGUAGE
 This English translation is provided for convenience only and is not legally binding. The legally binding version is exclusively the current complete German version of these Terms of Use.
@@ -27,7 +27,8 @@ Summary (simplified, not legally binding)
 - For translations, you may optionally use your own DeepL API key. You are yourself responsible for obtaining, keeping confidential, maintaining validity, billing, quotas, and complying with DeepL’s terms.
 - The optional Usage Time Protection (self-restriction/parental mode with parental PIN) can be technically circumvented; absolute blocking is not guaranteed.
 - External content from third-party providers is only loaded after you have given your provider-specific consent. You can withdraw this consent at any time.
-- External services and license providers (e.g., YouTube, Wikipedia, OpenStreetMap, DeepL, Unsplash, Viator, Flaticon / Freepik) have their own terms of use and privacy policies.
+- External services and license providers (e.g., YouTube, Wikipedia, OpenStreetMap, SkedGo / TripGo, DeepL, Unsplash, Viator, Flaticon / Freepik) have their own terms of use and privacy policies.
+- Route, timetable, and real-time information is provided only as non-binding guidance. Local signs, traffic rules, and information from transport operators take precedence. The app must not distract users from traffic or their surroundings.
 - MessageDrop is not an emergency service.
 
 Only the complete version below is authoritative.
@@ -340,6 +341,7 @@ The following external functional and information services are not activated via
 
 - Open-Meteo
 - OpenStreetMap / Nominatim
+- SkedGo / TripGo
 - DeepL
 - Flaticon / Freepik Company S.L.U. (sticker/asset and license provider)
 
@@ -380,6 +382,22 @@ Viator content and experience searches are provided only if you have enabled Via
 
 Privacy Policy: https://www.viator.com/support/privacyPolicy
 Terms and Conditions: https://www.viator.com/support/termsAndConditions
+
+###
+13.6 Special feature SkedGo / TripGo
+###
+
+MessageDrop uses the TripGo API provided by SkedGo Pty Limited to calculate and display routes, stops, lines, departure times and, where available, real-time information. For this purpose, in particular start and destination coordinates, requested transport modes, travel time, language and technical request parameters are processed.
+
+The displayed information may originate from SkedGo, transport operators, map services, and other data providers. Connections, departure times, delays, prices, platforms, route geometries, and connection information may be incomplete, inaccurate, delayed, or changed at short notice. In case of doubt, information provided by the relevant transport operator, local signs, and official directions take precedence.
+
+MessageDrop is not a safety-critical navigation system. In particular, the routing feature must not be used in a way that distracts from traffic, the surroundings, or applicable traffic rules. While participating in traffic, the device may only be operated where this is safe and legally permitted.
+
+Route information is displayed with the required attribution “Powered by SkedGo/TripGo”.
+
+Developer website: https://developer.tripgo.com/
+Privacy Policy: https://skedgo.com/privacy-policy/
+Terms of Use: https://skedgo.com/home/terms-of-use/
 
 ###
 14. Usage Time Protection (self-restriction / parental mode)

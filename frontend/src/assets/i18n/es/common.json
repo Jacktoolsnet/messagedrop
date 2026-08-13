@@ -241,7 +241,7 @@
       "stops": "{{ count }} paradas intermedias",
       "transfers": "{{ count }} transbordos",
       "segments": "Tramos del trayecto",
-      "provider": "Información de rutas de SkedGo / TripGo",
+      "provider": "Powered by SkedGo/TripGo",
       "refresh": "Volver a calcular la ruta",
       "timelineLive": {
         "unavailable": "No hay datos en tiempo real disponibles",

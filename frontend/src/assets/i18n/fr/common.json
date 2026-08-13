@@ -241,7 +241,7 @@
       "stops": "{{ count }} arrêts intermédiaires",
       "transfers": "{{ count }} correspondances",
       "segments": "Étapes du trajet",
-      "provider": "Informations d’itinéraire par SkedGo / TripGo",
+      "provider": "Powered by SkedGo/TripGo",
       "refresh": "Recalculer l’itinéraire",
       "timelineLive": {
         "unavailable": "Aucune donnée en temps réel disponible",

@@ -1,5 +1,5 @@
 DATENSCHUTZERKLÄRUNG
-Stand: 12. Juli 2026
+Stand: 13. August 2026
 
 ###
 Kurzfassung (nicht rechtsverbindlich)
@@ -32,7 +32,7 @@ Private Chatnachrichten werden Ende-zu-Ende-verschlüsselt übertragen und sind 
 
 Externe Inhalte (z. B. YouTube, TikTok, Pinterest, Spotify, Tenor, Klipy, Unsplash, Wikipedia und Viator) werden nur nach aktiver, anbieterbezogener Entscheidung des Nutzers geladen. Eine pauschale Zustimmung für alle Anbieter ist nicht vorgesehen.
 
-Davon zu unterscheiden sind externe Funktionsdienste sowie Lizenz- und Asset-Anbieter (z. B. Open-Meteo, OpenStreetMap/Nominatim, DeepL und Flaticon / Freepik), die bei aktiver Nutzung der jeweiligen Funktion oder zur Bereitstellung lizenzierter Inhalte verwendet werden und nicht über den Externe-Inhalte-Toggle freigeschaltet werden.
+Davon zu unterscheiden sind externe Funktionsdienste sowie Lizenz- und Asset-Anbieter (z. B. Open-Meteo, OpenStreetMap/Nominatim, SkedGo/TripGo, DeepL und Flaticon / Freepik), die bei aktiver Nutzung der jeweiligen Funktion oder zur Bereitstellung lizenzierter Inhalte verwendet werden und nicht über den Externe-Inhalte-Toggle freigeschaltet werden.
 
 Wenn Unsplash-Bilder ausgewählt werden, können Bilddateien geladen, auf das Endgerät heruntergeladen und lokal gespeichert werden.
 
@@ -272,6 +272,7 @@ Für einzelne Funktionen nutzt MessageDrop externe Informations- und API-Dienste
 - Open-Meteo (Wetter- und Luftqualitätsdaten),
 - DeepL (Übersetzungen),
 - Nominatim / OpenStreetMap (Suche, Geokodierung, Kartenbezug),
+- SkedGo / TripGo (Routen-, Haltestellen-, Fahrplan- und Echtzeitinformationen),
 - Flaticon / Freepik Company S.L.U. (lizenzierte Sticker und vergleichbare grafische Elemente).
 
 Bei Nutzung dieser Funktionen können – abhängig vom jeweiligen Anwendungsfall – insbesondere Suchbegriffe, Sprach- und Ländereinstellungen, Ziel-/Ort-Parameter, technische Verbindungsdaten sowie ggf. Referenz-URLs verarbeitet werden. Die Kommunikation mit Drittanbietern erfolgt, soweit technisch vorgesehen, über unsere Server oder direkt aus dem Endgerät.
@@ -279,6 +280,12 @@ Bei Nutzung dieser Funktionen können – abhängig vom jeweiligen Anwendungsfal
 Für die Übersetzungsfunktion kann der Nutzer nach eigener Wahl entweder den von uns bereitgestellten DeepL-Zugang oder einen eigenen DeepL-API-Key verwenden. Ein vom Nutzer hinterlegter eigener DeepL-API-Key wird lokal im verschlüsselten Nutzerdatensatz auf dem Endgerät gespeichert. Wenn der Nutzer eine Übersetzung ausführt oder den Key prüft, wird dieser Key für die Bearbeitung der jeweiligen Anfrage an unser Backend übermittelt und gegenüber DeepL verwendet. Eine dauerhafte serverseitige Speicherung eines vom Nutzer bereitgestellten DeepL-API-Keys erfolgt nach dem aktuellen technischen Stand nicht.
 
 Für diese Funktionsdienste besteht kein separater Externe-Inhalte-Toggle. Sie werden nur genutzt, wenn der Nutzer die jeweilige Funktion aktiv verwendet.
+
+Bei aktiver Nutzung der Routenplanung übermittelt MessageDrop die für die Anfrage erforderlichen Daten über den eigenen TripGo-Service an die TripGo API der SkedGo Pty Limited. Dazu gehören insbesondere Start- und Zielkoordinaten, gewünschte Verkehrsmittel, gewünschte Abfahrts- oder Ankunftszeit, Sprache sowie gegebenenfalls Haltestellen-, Linien- und Verbindungskennungen. Der auf dem Endgerät ermittelte Standort wird nur dann für eine Routenanfrage verwendet, wenn der Nutzer die entsprechende Funktion ausführt. Die Kommunikation mit SkedGo erfolgt über den MessageDrop-Server.
+
+SkedGo verarbeitet die technisch erforderlichen Verbindungs- und Anfragedaten nach Maßgabe seiner eigenen Datenschutzerklärung. Eine Verarbeitung außerhalb des Europäischen Wirtschaftsraums, insbesondere in Australien oder weiteren von SkedGo beziehungsweise beteiligten Verkehrsdatenanbietern genutzten Staaten, kann nicht ausgeschlossen werden.
+
+Zur Reduzierung externer API-Anfragen und für einen stabilen Betrieb werden Routen- und Verkehrsinformationen zeitlich begrenzt zwischengespeichert. Routen werden derzeit nur kurzfristig für etwa 15 Sekunden im Arbeitsspeicher zwischengespeichert. Haltestellen- und Linieninformationen werden regulär bis zu 7 Tage gespeichert und können bei vorübergehenden Fehlern des externen Dienstes als veralteter Datenbestand bis zu 30 Tage verwendet werden. Nicht mehr benötigte Einträge des dauerhaften Haltestellen-Caches werden derzeit nach 30 Tagen bereinigt. Regionsinformationen können derzeit bis zu 6 Stunden zwischengespeichert werden. Diese Zeiträume können aus technischen oder betrieblichen Gründen künftig angepasst werden.
 
 Sticker und vergleichbare grafische Elemente von Flaticon / Freepik werden nach aktuellem technischen Stand nicht als externe Einbettung von Flaticon im Endgerät des Nutzers geladen, sondern über die von MessageDrop bereitgestellte Sticker-Funktion bzw. unsere Systeme ausgeliefert. Dabei werden die für die Nutzung erforderlichen technischen Daten gegenüber MessageDrop verarbeitet. Soweit im Einzelfall Flaticon-/Freepik-Quellen, Lizenzinformationen oder externe Links aufgerufen werden, kann eine Datenverarbeitung durch Flaticon / Freepik in eigener Verantwortung erfolgen.
 
@@ -288,6 +295,9 @@ Weiterführende Informationen zu den Anbietern sind über deren jeweilige Websit
 - Open-Meteo: https://open-meteo.com/
 - DeepL: https://www.deepl.com/
 - OpenStreetMap / Nominatim: https://www.openstreetmap.org/
+- SkedGo / TripGo: https://developer.tripgo.com/
+- SkedGo Datenschutzerklärung: https://skedgo.com/privacy-policy/
+- SkedGo Nutzungsbedingungen: https://skedgo.com/home/terms-of-use/
 - Unsplash: https://unsplash.com/
 - Flaticon: https://www.flaticon.com/
 - Flaticon Nutzungsbedingungen: https://www.flaticon.com/legal

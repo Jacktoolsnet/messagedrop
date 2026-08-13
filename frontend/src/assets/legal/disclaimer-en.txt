@@ -1,5 +1,5 @@
 LIABILITY NOTICE (DISCLAIMER)
-Version: July 6, 2026
+Version: August 13, 2026
 
 IMPORTANT NOTE ON LANGUAGE
 This English translation is provided for convenience only and is not legally binding. The legally binding version is exclusively the current complete German version of this Liability Notice (Disclaimer).
@@ -29,6 +29,8 @@ Much of the data is stored locally on the device. Local data may be lost. Withou
 The optional read-aloud function depends on the browser, operating system, device, installed language packs, and selected voice. We do not guarantee the availability or functionality of the read-aloud function itself, nor the availability of particular voices, local processing, any particular pronunciation quality, or freedom from errors.
 
 External content, services, and linked websites are the responsibility of the respective third-party providers.
+
+Route, timetable, and real-time information is non-binding. MessageDrop is not a safety-critical navigation system. Local signs, traffic rules, official directions, and information from transport operators take precedence. Users must remain attentive to their surroundings and traffic at all times.
 
 MessageDrop does not provide access to emergency services.
 
@@ -144,6 +146,20 @@ The respective third-party provider is solely responsible for the content, avail
 We do not adopt third-party content as our own.
 
 We assume no warranty for outages, changes, quota or rate limits, or other limitations of external services.
+
+###
+6.1 Route Planning and Transport Information
+###
+
+MessageDrop provides routes, timetables, departure times, delays, connection information, prices, platforms, stops, route geometries, and other mobility information solely as non-binding guidance.
+
+This information originates wholly or partly from SkedGo / TripGo, transport operators, map services, and other data providers. We do not warrant its accuracy, completeness, timeliness, availability, or suitability. Real-time information may be unavailable, delayed, or differ from actual traffic conditions. A displayed journey or connection does not guarantee that the trip can be completed as shown.
+
+Map positions, route lines, and intermediate points may be inaccurate. Displayed paths may be temporarily or permanently impassable, closed, dangerous, or unsuitable for the selected transport mode. Traffic signs, applicable laws, official directions, local signs, and instructions from transport personnel always take precedence.
+
+Users must remain attentive to their surroundings and the traffic situation at all times. The app must not be operated while travelling or driving where doing so would be distracting or legally prohibited. When hiking or cycling, users are responsible for considering terrain, weather, personal abilities, equipment, and current route conditions.
+
+The route simulation is provided solely as a preview and is not a precise representation of actual movement, travel time, or traffic conditions. MessageDrop is not an emergency, rescue, or safety-critical navigation system.
 
 ###
 7. User-Created Content

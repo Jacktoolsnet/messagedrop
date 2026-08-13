@@ -242,7 +242,7 @@
       "stops": "{{ count }} intermediate stops",
       "transfers": "{{ count }} transfers",
       "segments": "Journey segments",
-      "provider": "Routing information by SkedGo / TripGo",
+      "provider": "Powered by SkedGo/TripGo",
       "refresh": "Calculate route again",
       "timelineLive": {
         "unavailable": "No real-time data available",

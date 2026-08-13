@@ -1,5 +1,5 @@
 HAFTUNGSHINWEIS (DISCLAIMER)
-Stand: 6. Juli 2026
+Stand: 13. August 2026
 
 ###
 Kurzfassung (nicht rechtsverbindlich)
@@ -26,6 +26,8 @@ Viele Daten werden lokal auf dem Endgerät gespeichert. Lokale Daten können ver
 Die optionale Vorlesefunktion hängt von Browser, Betriebssystem, Endgerät, installierten Sprachpaketen und gewählter Stimme ab. Wir garantieren weder die Verfügbarkeit oder Funktionsfähigkeit der Vorlesefunktion selbst noch die Verfügbarkeit bestimmter Stimmen, eine lokale Verarbeitung, eine bestimmte Aussprachequalität oder Fehlerfreiheit.
 
 Externe Inhalte, Dienste und verlinkte Webseiten liegen im Verantwortungsbereich der jeweiligen Drittanbieter.
+
+Routen-, Fahrplan- und Echtzeitinformationen sind unverbindlich. MessageDrop ist kein sicherheitskritisches Navigationssystem. Örtliche Beschilderung, Verkehrsregeln, behördliche Anordnungen und Informationen der Verkehrsunternehmen haben Vorrang. Nutzer müssen ihre Umgebung und den Straßenverkehr jederzeit aufmerksam beobachten.
 
 MessageDrop bietet keinen Zugang zu Notfalldiensten.
 
@@ -141,6 +143,20 @@ Für Inhalte, Verfügbarkeit, Rechtmäßigkeit, Sicherheit, Lizenzlage, Datensch
 Wir machen uns Inhalte Dritter nicht zu eigen.
 
 Für Ausfälle, Änderungen, Quoten- oder Ratenbegrenzungen sowie sonstige Einschränkungen externer Dienste übernehmen wir keine Gewähr.
+
+###
+6.1 Routenplanung und Verkehrsinformationen
+###
+
+MessageDrop stellt Routen, Fahrpläne, Abfahrtszeiten, Verspätungen, Anschlussinformationen, Preise, Bahnsteige, Haltestellen, Streckenverläufe und sonstige Mobilitätsinformationen ausschließlich als unverbindliche Orientierungshilfe bereit.
+
+Diese Angaben stammen ganz oder teilweise von SkedGo / TripGo, Verkehrsunternehmen, Kartendiensten und weiteren Datenlieferanten. Wir übernehmen keine Gewähr für Richtigkeit, Vollständigkeit, Aktualität, Verfügbarkeit oder Eignung dieser Angaben. Echtzeitinformationen können fehlen, verspätet eintreffen oder von der tatsächlichen Verkehrslage abweichen. Eine angezeigte Verbindung oder ein Anschluss ist keine Garantie dafür, dass die Reise wie dargestellt durchgeführt werden kann.
+
+Kartenpositionen, Streckenlinien und Zwischenpunkte können ungenau sein. Angezeigte Wege können vorübergehend oder dauerhaft unpassierbar, gesperrt, gefährlich oder für das gewählte Verkehrsmittel ungeeignet sein. Verkehrszeichen, gesetzliche Vorschriften, behördliche Anordnungen, örtliche Beschilderung und Anweisungen des Verkehrspersonals haben immer Vorrang.
+
+Nutzer müssen ihre Umgebung und die Verkehrssituation jederzeit selbst aufmerksam beobachten. Die Bedienung der App während der Fahrt oder beim Führen eines Fahrzeugs ist zu unterlassen, soweit sie ablenkt oder gesetzlich nicht zulässig ist. Bei Wanderungen und Fahrradtouren sind insbesondere Gelände, Wetter, persönliche Fähigkeiten, Ausrüstung und aktuelle Wegbedingungen eigenverantwortlich zu berücksichtigen.
+
+Die Routensimulation dient ausschließlich der Vorschau und ist keine präzise Wiedergabe der tatsächlichen Bewegung, Reisezeit oder Verkehrssituation. MessageDrop ist weder ein Notfall-, Rettungs- noch ein sicherheitskritisches Navigationssystem.
 
 ###
 7. Von Nutzern erstellte Inhalte
