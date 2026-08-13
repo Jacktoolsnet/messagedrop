@@ -9,6 +9,8 @@ const express = require('express');
 const helmet = require('helmet');
 const winston = require('winston');
 const { BoundedTtlCache } = require('./cache');
+const Database = require('./db/database');
+const { PersistentOverpassCache } = require('./persistent-cache');
 const { createOverpassClient } = require('./clients/overpass-client');
 const loggerMw = require('./middleware/logger');
 const traceId = require('./middleware/trace-id');
@@ -48,7 +50,7 @@ function createLogger() {
   return logger;
 }
 
-function createApp({ client = createOverpassClient(), logger = createLogger() } = {}) {
+function createApp({ client = createOverpassClient(), logger = createLogger(), persistentCache } = {}) {
   const cache = new BoundedTtlCache({
     ttlMs: numberSetting('OVERPASS_CACHE_TTL_MS', 6 * 60 * 60 * 1000),
     maxEntries: numberSetting('OVERPASS_CACHE_MAX_ENTRIES', 256),
@@ -68,7 +70,10 @@ function createApp({ client = createOverpassClient(), logger = createLogger() } 
   app.use('/', root);
   app.use('/check', check);
   app.use('/overpass', createOverpassRouter({
-    client, cache, inFlight, metrics,
+    client, cache, persistentCache, inFlight, metrics,
+    refreshAfterMs: numberSetting('OVERPASS_CACHE_REFRESH_AFTER_MS', 24 * 60 * 60 * 1000),
+    cacheTtlMs: numberSetting('OVERPASS_DATABASE_CACHE_TTL_MS', 7 * 24 * 60 * 60 * 1000),
+    staleIfErrorMs: numberSetting('OVERPASS_CACHE_STALE_IF_ERROR_MS', 30 * 24 * 60 * 60 * 1000),
     maxInFlight: numberSetting('OVERPASS_MAX_IN_FLIGHT', 10), logger
   }));
   app.use(notFoundHandler);
@@ -81,12 +86,21 @@ async function start() {
   if (!Number.isInteger(port) || port <= 0) throw new Error(`Invalid OVERPASS_PORT: ${process.env.OVERPASS_PORT ?? '<not set>'}`);
   await generateOrLoadKeypairs();
   const logger = createLogger();
-  const app = createApp({ logger });
+  const database = new Database();
+  await database.init(logger);
+  const persistentCache = new PersistentOverpassCache({ database, logger });
+  void persistentCache.cleanExpired(numberSetting('OVERPASS_DATABASE_RETENTION_DAYS', 90));
+  const cleanupTimer = setInterval(() => {
+    void persistentCache.cleanExpired(numberSetting('OVERPASS_DATABASE_RETENTION_DAYS', 90));
+  }, 24 * 60 * 60 * 1000);
+  cleanupTimer.unref();
+  const app = createApp({ logger, persistentCache });
   const server = app.listen(port, () => logger.info('Overpass service listening', { port }));
   server.on('error', (error) => logger.error('Overpass HTTP server error', { error: error.message }));
   const shutdown = (signal) => {
     logger.info('Overpass service shutting down', { signal });
-    server.close();
+    clearInterval(cleanupTimer);
+    server.close(() => database.close());
   };
   process.on('SIGTERM', () => shutdown('SIGTERM'));
   process.on('SIGINT', () => shutdown('SIGINT'));

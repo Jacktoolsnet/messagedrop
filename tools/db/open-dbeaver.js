@@ -11,7 +11,8 @@ const SERVICE_LABELS = {
   OPENMETEO: 'OpenMeteo Service',
   NOMINATIM: 'Nominatim Service',
   WIKIPEDIA: 'Wikipedia Service',
-  TRIPGO: 'TripGo Service'
+  TRIPGO: 'TripGo Service',
+  OVERPASS: 'Overpass Service'
 };
 
 function parseEnvFile(filePath) {

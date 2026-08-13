@@ -7,7 +7,13 @@ const { buildNearbyQuery } = require('../query-builder');
 const { normalizeOverpassResponse } = require('../normalizer');
 const { categoryNames } = require('../categories');
 
-function createOverpassRouter({ client, cache, inFlight, metrics, maxInFlight, logger = console }) {
+function createOverpassRouter({
+  client, cache, persistentCache,
+  refreshAfterMs = 24 * 60 * 60 * 1000,
+  cacheTtlMs = 7 * 24 * 60 * 60 * 1000,
+  staleIfErrorMs = 30 * 24 * 60 * 60 * 1000,
+  inFlight, metrics, maxInFlight, logger = console
+}) {
   const router = express.Router();
   router.use(requireServiceJwt);
 
@@ -35,7 +41,7 @@ function createOverpassRouter({ client, cache, inFlight, metrics, maxInFlight, l
     if (cached !== undefined) return res.status(200).json({ ...cached, cache: 'hit' });
 
     try {
-      const payload = await coalesce(inFlight, key, maxInFlight, async () => {
+      const fetchAndCache = async () => {
         const query = buildNearbyQuery(validated.value);
         const upstream = await client.query(query);
         const pois = normalizeOverpassResponse(upstream.data, validated.value.categories);
@@ -55,9 +61,30 @@ function createOverpassRouter({ client, cache, inFlight, metrics, maxInFlight, l
           }
         };
         cache.set(key, result);
+        await persistentCache?.set(key, result);
         return result;
-      });
-      return res.status(200).json({ ...payload, cache: 'miss' });
+      };
+
+      const persisted = await persistentCache?.get(key);
+      if (persisted && persisted.ageMs <= cacheTtlMs) {
+        cache.set(key, persisted.payload);
+        if (persisted.ageMs <= refreshAfterMs) {
+          return res.status(200).json({ ...persisted.payload, cache: 'database' });
+        }
+        refreshInBackground({ key, fetchAndCache, inFlight, maxInFlight, logger });
+        return res.status(200).json({ ...persisted.payload, cache: 'stale' });
+      }
+
+      try {
+        const payload = await coalesce(inFlight, key, maxInFlight, fetchAndCache);
+        return res.status(200).json({ ...payload, cache: 'miss' });
+      } catch (error) {
+        if (persisted && persisted.ageMs <= staleIfErrorMs) {
+          cache.set(key, persisted.payload);
+          return res.status(200).json({ ...persisted.payload, cache: 'stale-if-error' });
+        }
+        throw error;
+      }
     } catch (error) {
       logger?.warn?.('Overpass nearby request failed', { key, error: error.message });
       return next(upstreamError(error));
@@ -68,10 +95,19 @@ function createOverpassRouter({ client, cache, inFlight, metrics, maxInFlight, l
     status: 200,
     inFlight: inFlight.size,
     cache: cache.snapshot(),
+    persistentCache: persistentCache?.snapshot(),
     requests: { ...metrics }
   }));
 
   return router;
+}
+
+function refreshInBackground({ key, fetchAndCache, inFlight, maxInFlight, logger }) {
+  void coalesce(inFlight, key, maxInFlight, fetchAndCache)
+    .catch((error) => logger?.warn?.('Overpass cache background refresh failed', {
+      key,
+      error: error.message
+    }));
 }
 
 async function coalesce(inFlight, key, maxInFlight, factory) {
@@ -106,4 +142,4 @@ function upstreamError(error) {
   return normalized;
 }
 
-module.exports = { createOverpassRouter, coalesce, requestKey, upstreamError };
+module.exports = { createOverpassRouter, coalesce, refreshInBackground, requestKey, upstreamError };

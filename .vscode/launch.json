@@ -33,6 +33,9 @@
                 "<node_internals>/**"
             ],
             "env": {
+                "OVERPASS_BASE_URL": "http://localhost",
+                "OVERPASS_PORT": "3900",
+                "SERVICE_JWT_AUDIENCE_OVERPASS": "service.overpass",
                 "SERVICE_JWT_ISSUER": "service.backend",
                 "SERVICE_JWT_AUDIENCE": "service.backend",
                 "SERVICE_JWT_TRUSTED_JWKS_PATH": "${workspaceFolder}/backend/config/service-jwks.json"
@@ -148,6 +151,7 @@
                 "<node_internals>/**"
             ],
             "env": {
+                "OVERPASS_PORT": "3900",
                 "SERVICE_JWT_ISSUER": "service.overpass",
                 "SERVICE_JWT_AUDIENCE": "service.overpass",
                 "SERVICE_JWT_TRUSTED_JWKS_PATH": "${workspaceFolder}/services/overpass/config/service-jwks.json"
@@ -404,6 +408,20 @@
             "type": "node-terminal",
             "request": "launch",
             "command": "node tools/db/open-dbeaver.js TRIPGO",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "DBeaver Overpass Service",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "node tools/db/open-dbeaver.js OVERPASS",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Create Overpass Database",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "npm --prefix services/overpass run db:create",
             "cwd": "${workspaceFolder}"
         }
     ]

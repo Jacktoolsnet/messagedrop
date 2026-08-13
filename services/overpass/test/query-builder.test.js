@@ -10,5 +10,6 @@ test('builds a fixed allowlisted query with an output limit', () => {
   }, { timeoutSeconds: 12 });
   assert.match(query, /^\[out:json\]\[timeout:12\];/u);
   assert.match(query, /nwr\["tourism"="hotel"\]\(52\.1,10\.1,52\.2,10\.2\);/u);
+  assert.match(query, /nwr\["building"="hotel"\]\(52\.1,10\.1,52\.2,10\.2\);/u);
   assert.match(query, /out tags center qt 25;/u);
 });

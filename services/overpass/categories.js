@@ -1,6 +1,10 @@
 const CATEGORY_DEFINITIONS = Object.freeze({
   hotel: Object.freeze([
-    Object.freeze({ key: 'tourism', values: Object.freeze(['hotel']) })
+    Object.freeze({ key: 'tourism', values: Object.freeze(['hotel']) }),
+    // Some hotels in OSM are mapped only as hotel buildings and do not carry
+    // the otherwise customary tourism=hotel tag (for example the ParkHotel
+    // Altes Kaffeehaus in Wolfenbüttel).
+    Object.freeze({ key: 'building', values: Object.freeze(['hotel']) })
   ]),
   accommodation: Object.freeze([
     Object.freeze({

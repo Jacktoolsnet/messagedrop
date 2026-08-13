@@ -30,7 +30,42 @@ Example request body:
 
 Supported categories are defined in `categories.js`. The viewport area and result count are limited by `OVERPASS_MAX_BBOX_AREA` and `OVERPASS_MAX_RESULTS`.
 
+## Persistent cache
+
+The service uses PostgreSQL as its durable cache and a bounded in-memory cache
+for hot entries. Create the database configured by `OVERPASS_DATABASE_URL` or
+the `OVERPASS_DB_*` settings before starting the service. On startup the service
+creates `tableOverpassCache` and its index automatically.
+
+For the local development configuration, create the database once with:
+
+```bash
+npm run db:create
+```
+
+The configured PostgreSQL user needs `CREATEDB` permission for that command.
+Alternatively, create `messagedrop_overpass` with an administrator account and
+assign ownership to the configured `OVERPASS_DB_USER`.
+
+Fresh database entries are returned directly. Older entries are returned while
+they are refreshed in the background, and may be used as `stale-if-error` when
+the public Overpass endpoint is unavailable. Retention and freshness windows
+are configured with the `OVERPASS_*CACHE*` and `OVERPASS_DATABASE_RETENTION_DAYS`
+settings in `.env.overpass.example`.
+
 ## Capture a raw sample
+
+For the repeatable multi-city capture, use the repository-level wrapper:
+
+```bash
+./docs/overpass/fetch-samples.sh
+```
+
+It writes the fixed Hannover, Wolfenbüttel, Ingolstadt, Stockholm, and
+Kopenhagen samples to `docs/overpass/generated/`. See
+`docs/overpass/README.md` for selecting individual cities and other options.
+
+The lower-level capture command is available for one-off bounding boxes:
 
 The capture script talks directly to the configured Overpass upstream and stores both the untouched response and optional request diagnostics:
 

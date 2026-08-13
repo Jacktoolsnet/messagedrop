@@ -1,0 +1,40 @@
+const TABLE = 'tableOverpassCache';
+
+function init(db, callback) {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS ${TABLE} (
+      cacheKey TEXT PRIMARY KEY,
+      payload JSONB NOT NULL,
+      fetchedAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      lastAccessed TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+    CREATE INDEX IF NOT EXISTS idx_overpass_cache_last_accessed
+      ON ${TABLE} (lastAccessed);
+  `, callback);
+}
+
+function get(db, cacheKey, callback) {
+  db.get(`SELECT cacheKey, payload, fetchedAt, lastAccessed FROM ${TABLE} WHERE cacheKey = ?`, [cacheKey], (error, row) => {
+    if (error || !row) return callback?.(error || null, row || null);
+    db.run(`UPDATE ${TABLE} SET lastAccessed = CURRENT_TIMESTAMP WHERE cacheKey = ?`, [cacheKey]);
+    callback?.(null, row);
+  });
+}
+
+function set(db, cacheKey, payload, callback) {
+  db.run(`
+    INSERT INTO ${TABLE} (cacheKey, payload, fetchedAt, lastAccessed)
+    VALUES (?, ?::jsonb, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    ON CONFLICT (cacheKey) DO UPDATE SET
+      payload = EXCLUDED.payload,
+      fetchedAt = CURRENT_TIMESTAMP,
+      lastAccessed = CURRENT_TIMESTAMP
+  `, [cacheKey, JSON.stringify(payload)], callback);
+}
+
+function cleanExpired(db, maxAgeDays, callback) {
+  const days = Math.max(1, Math.round(Number(maxAgeDays) || 90));
+  db.run(`DELETE FROM ${TABLE} WHERE lastAccessed < CURRENT_TIMESTAMP - (? * INTERVAL '1 day')`, [days], callback);
+}
+
+module.exports = { init, get, set, cleanExpired };

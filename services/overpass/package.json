@@ -8,6 +8,7 @@
     "start": "node app.js",
     "test": "node --test",
     "lint": "eslint .",
+    "db:create": "node scripts/create-database.js",
     "sample:fetch": "node scripts/fetch-raw-poi-sample.js",
     "sample:analyze": "node scripts/analyze-poi-sample.js"
   },
@@ -19,6 +20,7 @@
     "express": "^5.1.0",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
+    "pg": "^8.13.1",
     "winston": "^3.18.3",
     "winston-daily-rotate-file": "^5.0.0"
   },
