@@ -1,6 +1,7 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const axios = require('axios');
+const { downloadDirectory } = require('./storage-paths');
 
 const INDEX_URL = 'https://download.geofabrik.de/index-v1.json';
 const CONTINENTS = Object.freeze({
@@ -130,7 +131,7 @@ function buildCatalog(index) {
 class GeofabrikCatalog {
   constructor({ logger = console, cachePath, ttlMs, client } = {}) {
     this.logger = logger;
-    this.cachePath = cachePath || path.resolve(__dirname, '../../docs/overpass/datasets/geofabrik-index-v1.json');
+    this.cachePath = cachePath || path.join(downloadDirectory(), 'geofabrik-index-v1.json');
     this.ttlMs = Number(ttlMs || process.env.OVERPASS_GEOFABRIK_CATALOG_TTL_MS || 24 * 60 * 60 * 1000);
     this.client = client || axios;
     this.value = null;

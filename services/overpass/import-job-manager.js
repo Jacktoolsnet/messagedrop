@@ -5,6 +5,7 @@ const { randomUUID } = require('node:crypto');
 const table = require('./db/tableOverpassPoi');
 const { GeofabrikCatalog } = require('./geofabrik-catalog');
 const { categoryNames, subcategoryNames } = require('./categories');
+const { downloadDirectory } = require('./storage-paths');
 
 function callbackResult(register) {
   return new Promise((resolve, reject) => register((error, value) => error ? reject(error) : resolve(value)));
@@ -31,7 +32,7 @@ class ImportJobManager {
   }
 
   async cleanupInterruptedFiles() {
-    const directory = path.resolve(__dirname, '../../docs/overpass/datasets');
+    const directory = downloadDirectory();
     let entries;
     try { entries = await fs.readdir(directory); } catch { return; }
     const generated = entries.filter((name) => name.endsWith('.osm.pbf') || name.endsWith('.osm.pbf.part')

@@ -12,6 +12,7 @@ const tableOverpassPoi = require('../db/tableOverpassPoi');
 const { CATEGORY_DEFINITIONS, categoryNames, subcategoryNames } = require('../categories');
 const { normalizeElement } = require('../normalizer');
 const { FALLBACK_DATASETS } = require('../geofabrik-catalog');
+const { downloadDirectory } = require('../storage-paths');
 
 const DATASETS = Object.freeze({
   ...FALLBACK_DATASETS
@@ -75,7 +76,7 @@ async function main() {
 }
 
 async function prepareDataset(dataset, options, updateProgress = async () => {}, persistBatch = null) {
-  const outputDirectory = path.resolve(__dirname, '../../../docs/overpass/datasets');
+  const outputDirectory = downloadDirectory();
   await fsPromises.mkdir(outputDirectory, { recursive: true });
   const sourcePath = path.join(outputDirectory, dataset.sourceFile);
   const partialSourcePath = `${sourcePath}.part`;

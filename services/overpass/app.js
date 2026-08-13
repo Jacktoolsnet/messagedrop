@@ -24,6 +24,7 @@ const check = require('./routes/check');
 const { createOverpassRouter } = require('./routes/overpass');
 const { generateOrLoadKeypairs } = require('./utils/keyStore');
 const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
+const { ensureDownloadDirectory } = require('./storage-paths');
 
 function numberSetting(name, fallback) {
   const parsed = Number(process.env[name]);
@@ -97,6 +98,7 @@ function createApp({
 async function start() {
   const port = Number(process.env.OVERPASS_PORT);
   if (!Number.isInteger(port) || port <= 0) throw new Error(`Invalid OVERPASS_PORT: ${process.env.OVERPASS_PORT ?? '<not set>'}`);
+  await ensureDownloadDirectory();
   await generateOrLoadKeypairs();
   const logger = createLogger();
   const database = new Database();

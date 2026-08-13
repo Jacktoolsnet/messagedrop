@@ -162,6 +162,14 @@ update. To force refresh semantics for a manual import:
 npm run dataset:import:wolfenbuettel -- --refresh
 ```
 
+Temporary downloads and the cached Geofabrik catalog are stored below
+`services/overpass/downloads/` by default. Set `OVERPASS_DOWNLOAD_DIR` to use
+another writable directory; relative values are resolved from the Overpass
+service directory. The directory is created automatically and its contents are
+excluded from Git. The service creates the directory during startup, before it
+initializes import jobs. All automatically downloaded runtime files (country
+PBFs and the Geofabrik catalog) use this directory.
+
 Generated PBF and GeoJSON sequence files are ignored by Git. The database
 tables `tableOverpassDataset`, `tableOverpassDatasetVersion`,
 `tableOverpassPoiVersion`, and `tableOverpassImportJob` are created
