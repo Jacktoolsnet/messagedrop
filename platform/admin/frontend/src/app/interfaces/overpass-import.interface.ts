@@ -51,6 +51,7 @@ export interface OverpassDatabaseInfo {
       datasetCount: number;
       poiCount: number;
       importedAt: string | null;
+      databaseBytes: number | null;
     };
   };
   jobs: OverpassImportJob[];

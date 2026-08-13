@@ -207,6 +207,7 @@
                   <article><span>{{ i18n.t('Mode') }}</span><strong>{{ info.health.mode || '—' }}</strong></article>
                   <article><span>{{ i18n.t('Datasets') }}</span><strong>{{ info.health.local?.datasetCount ?? 0 }}</strong></article>
                   <article><span>{{ i18n.t('POIs') }}</span><strong>{{ info.health.local?.poiCount ?? 0 }}</strong></article>
+                  <article><span>{{ i18n.t('Database size') }}</span><strong>{{ info.health.local?.databaseBytes ? (info.health.local!.databaseBytes! / 1048576 | number:'1.1-1') + ' MB' : '—' }}</strong></article>
                   <article><span>{{ i18n.t('Last activation') }}</span><strong>{{ info.health.local?.importedAt ? (info.health.local.importedAt | date:'medium') : '—' }}</strong></article>
                 </div>
                 <h3>{{ i18n.t('Recent import jobs') }}</h3>

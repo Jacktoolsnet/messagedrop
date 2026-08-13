@@ -82,7 +82,8 @@ function coveringDataset(db, bounds, categories, callback) {
 function status(db, callback) {
   db.get(`
     SELECT COUNT(*)::integer AS datasetCount, COALESCE(SUM(v.poiCount), 0)::integer AS poiCount,
-      MAX(v.activatedAt) AS importedAt
+      MAX(v.activatedAt) AS importedAt,
+      pg_database_size(current_database())::bigint AS databaseBytes
     FROM ${DATASET_TABLE} d
     JOIN ${VERSION_TABLE} v ON v.versionId = d.activeVersionId AND v.status = 'active'
   `, [], callback);

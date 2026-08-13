@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -20,7 +20,7 @@ import { TranslationHelperService } from '../../services/translation-helper.serv
 
 @Component({
   selector: 'app-overpass-import-settings',
-  imports: [DatePipe, RouterLink, MatButtonModule, MatCardModule, MatFormFieldModule, MatIconModule, MatInputModule,
+  imports: [DatePipe, DecimalPipe, RouterLink, MatButtonModule, MatCardModule, MatFormFieldModule, MatIconModule, MatInputModule,
     MatProgressBarModule, MatSelectModule, MatSlideToggleModule, MatTabsModule, MatToolbarModule],
   templateUrl: './overpass-import-settings.component.html',
   styleUrl: './overpass-import-settings.component.css',

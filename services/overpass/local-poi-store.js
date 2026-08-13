@@ -56,13 +56,13 @@ class LocalPoiStore {
   }
 
   async status() {
-    if (!this.enabled) return { datasetCount: 0, poiCount: 0, importedAt: null };
+    if (!this.enabled) return { datasetCount: 0, poiCount: 0, importedAt: null, databaseBytes: null };
     try {
       return await callbackResult((callback) => tableOverpassPoi.status(this.database.db, callback));
     } catch (error) {
       this.metrics.errors += 1;
       this.logger?.warn?.('Local Overpass POI status failed', { error: error.message });
-      return { datasetCount: 0, poiCount: 0, importedAt: null };
+      return { datasetCount: 0, poiCount: 0, importedAt: null, databaseBytes: null };
     }
   }
 
