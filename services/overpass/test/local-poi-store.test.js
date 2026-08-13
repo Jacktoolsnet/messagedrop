@@ -38,3 +38,13 @@ test('returns undefined when no imported dataset covers the viewport', async () 
   assert.equal(await store.getNearby(request()), undefined);
   assert.equal(store.snapshot().misses, 1);
 });
+
+test('returns the PostgreSQL database size as a JSON number', async () => {
+  const database = { db: {
+    get(_sql, _params, callback) {
+      callback(null, { datasetCount: 1, poiCount: 91371, importedAt: '2026-08-13T18:21:33Z', databaseBytes: '73400320' });
+    }
+  } };
+  const status = await new LocalPoiStore({ database }).status();
+  assert.equal(status.databaseBytes, 73400320);
+});

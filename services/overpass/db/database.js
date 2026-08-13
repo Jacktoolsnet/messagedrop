@@ -32,6 +32,7 @@ const ROW_KEY_MAP = new Map(Object.entries({
   importedat: 'importedAt',
   poicount: 'poiCount',
   datasetcount: 'datasetCount',
+  databasebytes: 'databaseBytes',
   versionid: 'versionId',
   jobid: 'jobId',
   requestedconfig: 'requestedConfig',
