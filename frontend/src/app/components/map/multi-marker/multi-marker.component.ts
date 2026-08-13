@@ -16,6 +16,7 @@ import { SecretDrop } from '../../../interfaces/secret-drop';
 import { ExperienceResult, ViatorDestinationLookup } from '../../../interfaces/viator';
 import { ShortNumberPipe } from '../../../pipes/short-number.pipe';
 import { WikipediaArticle } from '../../../interfaces/wikipedia';
+import { OverpassPoi } from '../../../interfaces/overpass';
 
 @Component({
     selector: 'app-edit-user',
@@ -46,5 +47,6 @@ export class MultiMarkerComponent {
         myExperiences: ExperienceResult[];
         secretDrops: SecretDrop[];
         wikipediaArticles: WikipediaArticle[];
+        overpassPois: OverpassPoi[];
     }>(MAT_DIALOG_DATA);
 }

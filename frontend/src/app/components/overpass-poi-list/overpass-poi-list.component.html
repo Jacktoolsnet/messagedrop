@@ -1,0 +1,14 @@
+<h2 mat-dialog-title>{{ 'common.overpass.places' | transloco }}</h2>
+<mat-dialog-content>
+  <mat-nav-list>
+    @for (poi of data.pois; track poi.id) {
+    <button mat-list-item type="button" (click)="select(poi)">
+      <mat-icon matListItemIcon>location_on</mat-icon>
+      <span matListItemTitle>{{ poi.name || (('common.searchSettings.subcategoryItems.' + poi.subtype) | transloco) }}</span>
+      @if (address(poi)) {
+      <span matListItemLine>{{ address(poi) }}</span>
+      }
+    </button>
+    }
+  </mat-nav-list>
+</mat-dialog-content>

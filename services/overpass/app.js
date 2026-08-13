@@ -80,7 +80,10 @@ function createApp({
     refreshAfterMs: numberSetting('OVERPASS_CACHE_REFRESH_AFTER_MS', 24 * 60 * 60 * 1000),
     cacheTtlMs: numberSetting('OVERPASS_DATABASE_CACHE_TTL_MS', 7 * 24 * 60 * 60 * 1000),
     staleIfErrorMs: numberSetting('OVERPASS_CACHE_STALE_IF_ERROR_MS', 30 * 24 * 60 * 60 * 1000),
-    maxInFlight: numberSetting('OVERPASS_MAX_IN_FLIGHT', 10), logger
+    // Public Overpass instances grant only a small number of concurrent slots
+    // per client. Keep the default conservative to avoid 429 responses during
+    // map interaction; deployments with their own instance can override it.
+    maxInFlight: numberSetting('OVERPASS_MAX_IN_FLIGHT', 2), logger
   }));
   app.use(notFoundHandler);
   app.use(errorHandler);

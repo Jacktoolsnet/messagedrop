@@ -676,7 +676,8 @@
         "showExperiences": "Experiencias",
         "showMyExperiences": "Mis experiencias",
         "showSecretDrops": "Mostrar SecretDrops",
-        "showWikipedia": "Mostrar artículos de Wikipedia"
+        "showWikipedia": "Mostrar artículos de Wikipedia",
+        "showPlaces": "Mostrar lugares"
       }
     },
     "messageList": {
@@ -2219,6 +2220,9 @@
       "loadFailed": "No se pudieron cargar los comentarios.",
       "replyTitle": "Escribir respuesta",
       "emptyReplies": "Aún no hay respuestas. Escribe la primera respuesta."
+    },
+    "overpass": {
+      "places": "Lugares en esta zona"
     }
   },
   "errors": {

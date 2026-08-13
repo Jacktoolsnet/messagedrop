@@ -677,7 +677,8 @@
         "showExperiences": "Experiences",
         "showMyExperiences": "My experiences",
         "showSecretDrops": "Show SecretDrops",
-        "showWikipedia": "Show Wikipedia articles"
+        "showWikipedia": "Show Wikipedia articles",
+        "showPlaces": "Show places"
       }
     },
     "messageList": {
@@ -2228,6 +2229,9 @@
       "loadFailed": "Comments could not be loaded.",
       "replyTitle": "Write reply",
       "emptyReplies": "No replies yet. Write the first reply."
+    },
+    "overpass": {
+      "places": "Places in this area"
     }
   },
   "errors": {

@@ -22,5 +22,6 @@ export interface MarkerLocation {
     wikipediaArticles?: WikipediaArticle[];
     publicTransportStop?: TripGoStop;
     overpassPoi?: OverpassPoi;
+    overpassPois?: OverpassPoi[];
     type: MarkerType
 }

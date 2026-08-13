@@ -194,7 +194,7 @@ function upstreamError(error) {
   if (!axios.isAxiosError(error)) return error;
   const normalized = new Error('overpass_upstream_error');
   normalized.status = error.code === 'ECONNABORTED' ? 504 : (error.response?.status || 502);
-  normalized.detail = error.response?.data || error.message;
+  normalized.detail = error.response?.data || error.message || error.code || 'Overpass upstream request failed';
   const retryAfter = Number(error.response?.headers?.['retry-after']);
   if (Number.isFinite(retryAfter) && retryAfter > 0) normalized.retryAfterSeconds = retryAfter;
   return normalized;

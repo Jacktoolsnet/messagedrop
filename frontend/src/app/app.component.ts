@@ -46,6 +46,7 @@ import { SharedContentComponent } from './components/shared-content/shared-conte
 import { SystemMessageDialogComponent } from './components/system-messages/system-message-dialog/system-message-dialog.component';
 import { TripGoRouteDialogComponent } from './components/tripgo-route-dialog/tripgo-route-dialog.component';
 import { TripGoStopDialogComponent } from './components/tripgo-stop-dialog/tripgo-stop-dialog.component';
+import { OverpassPoiListComponent } from './components/overpass-poi-list/overpass-poi-list.component';
 import { DeleteUserComponent } from './components/user/delete-user/delete-user.component';
 import { UserProfileComponent } from './components/user/user-profile/user-profile.component';
 import { UserComponent } from './components/user/user.component';
@@ -78,7 +79,7 @@ import { NotificationAction } from './interfaces/notification-action';
 import { Place } from './interfaces/place';
 import { PlusCodeArea } from './interfaces/plus-code-area';
 import { DEFAULT_SEARCH_SETTINGS, SearchSettings, normalizePoiSetting } from './interfaces/search-settings';
-import { OVERPASS_SUBCATEGORIES, OverpassCategory, OverpassSubcategory } from './interfaces/overpass';
+import { OVERPASS_SUBCATEGORIES, OverpassCategory, OverpassPoi, OverpassSubcategory } from './interfaces/overpass';
 import {
   DEFAULT_ROUTE_OPTIONS,
   RouteOptions,
@@ -2014,9 +2015,7 @@ export class AppComponent implements OnInit {
         }
         break;
       case MarkerType.OVERPASS_POI:
-        // A dedicated POI detail dialog, including lazy website metadata, is
-        // intentionally the next frontend step. The marker already exposes
-        // the publisher name as its accessible title/tooltip.
+        this.openOverpassPoiList(event.overpassPois ?? (event.overpassPoi ? [event.overpassPoi] : []));
         break;
       case MarkerType.MULTI:
         if (
@@ -2025,6 +2024,7 @@ export class AppComponent implements OnInit {
           && !(event.experiences?.length)
           && !(event.secretDrops?.length)
           && !(event.wikipediaArticles?.length)
+          && !(event.overpassPois?.length)
         ) {
           return;
         }
@@ -2036,7 +2036,8 @@ export class AppComponent implements OnInit {
           event.experiences ?? [],
           canOpenPrivateContent ? (event.myExperiences ?? []) : [],
           event.secretDrops ?? [],
-          event.wikipediaArticles ?? []
+          event.wikipediaArticles ?? [],
+          event.overpassPois ?? []
         );
         break;
     }
@@ -2661,10 +2662,13 @@ export class AppComponent implements OnInit {
     experiences: ViatorDestinationLookup[],
     myExperiences: ExperienceResult[],
     secretDrops: SecretDrop[],
-    wikipediaArticles: WikipediaArticle[]
+    wikipediaArticles: WikipediaArticle[],
+    overpassPois: OverpassPoi[]
   ) {
     const dialogRef = this.dialog.open(MultiMarkerComponent, {
-      data: { messages, notes, images, documents, experiences, myExperiences, secretDrops, wikipediaArticles },
+      data: {
+        messages, notes, images, documents, experiences, myExperiences, secretDrops, wikipediaArticles, overpassPois
+      },
       closeOnNavigation: true,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
@@ -2711,8 +2715,31 @@ export class AppComponent implements OnInit {
           case 'wikipedia':
             this.openMarkerWikipediaListDialog(result.wikipediaArticles ?? []);
             break
+          case 'overpass':
+            this.openOverpassPoiList(result.overpassPois ?? []);
+            break
         }
       }
+    });
+  }
+
+  private openOverpassPoiList(pois: OverpassPoi[]): void {
+    if (!pois.length) return;
+    const dialogRef = this.dialog.open(OverpassPoiListComponent, {
+      data: { pois: [...pois].sort((left, right) => (left.name || '').localeCompare(right.name || '')) },
+      width: 'min(620px, 95vw)',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      backdropClass: 'dialog-backdrop',
+      autoFocus: false
+    });
+    dialogRef.afterClosed().subscribe((poi?: OverpassPoi) => {
+      if (!poi) return;
+      this.mapService.flyToWithZoom({
+        latitude: poi.latitude,
+        longitude: poi.longitude,
+        plusCode: this.geolocationService.getPlusCode(poi.latitude, poi.longitude)
+      }, Math.max(18, this.mapService.getMapZoom()));
     });
   }
 
@@ -3934,24 +3961,47 @@ export class AppComponent implements OnInit {
       });
     });
 
-    // Overpass POIs intentionally keep individual markers so their main
-    // category icon remains visible instead of being folded into generic
-    // Plus-Code clusters.
+    // Apply the same Plus-Code grouping as Wikipedia and other map content.
+    // At close zoom levels each POI gets its own category marker; farther out
+    // nearby POIs are represented by the generic summary marker.
     this.overpassMapState.pois().forEach((poi) => {
-      const location: Location = {
+      const poiLocation: Location = {
         latitude: poi.latitude,
         longitude: poi.longitude,
         plusCode: this.geolocationService.getPlusCode(poi.latitude, poi.longitude)
       };
-      this.markerLocations.set(`overpass:${poi.id}`, {
-        location,
-        messages: [],
-        notes: [],
-        images: [],
-        documents: [],
-        overpassPoi: poi,
-        type: MarkerType.OVERPASS_POI
-      });
+      if (this.mapService.getMapZoom() > 17) {
+        center = poiLocation;
+      } else {
+        const groupedPlusCode = this.geolocationService.getGroupedPlusCodeBasedOnMapZoom(
+          poiLocation,
+          this.mapService.getMapZoom()
+        );
+        const plusCodeArea = this.geolocationService.getGridFromPlusCode(groupedPlusCode);
+        center = {
+          latitude: plusCodeArea.latitudeCenter,
+          longitude: plusCodeArea.longitudeCenter,
+          plusCode: groupedPlusCode
+        };
+      }
+      const key = this.mapService.getMapZoom() > 17 ? `overpass:${poi.id}` : center.plusCode;
+      const existing = this.markerLocations.get(key);
+      if (existing) {
+        existing.overpassPois ??= existing.overpassPoi ? [existing.overpassPoi] : [];
+        existing.overpassPois.push(poi);
+        existing.type = MarkerType.MULTI;
+      } else {
+        this.markerLocations.set(key, {
+          location: center,
+          messages: [],
+          notes: [],
+          images: [],
+          documents: [],
+          overpassPoi: poi,
+          overpassPois: [poi],
+          type: MarkerType.OVERPASS_POI
+        });
+      }
     });
 
     // Save last markerupdet to fire the angular change listener

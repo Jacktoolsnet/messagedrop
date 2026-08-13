@@ -5,7 +5,10 @@ import { Subscription } from 'rxjs';
 import { OverpassPoi, OverpassViewport } from '../interfaces/overpass';
 import { OverpassService } from './overpass.service';
 
-const REQUEST_DEBOUNCE_MS = 200;
+// Map interactions can emit many viewport updates in quick succession. A
+// slightly longer pause protects the public Overpass instance from requests
+// that would be obsolete before their response arrives.
+const REQUEST_DEBOUNCE_MS = 750;
 
 @Injectable({ providedIn: 'root' })
 export class OverpassMapStateService {
@@ -43,7 +46,8 @@ export class OverpassMapStateService {
               this.loadingState.set(false);
             },
             error: (error: HttpErrorResponse) => {
-              this.poisState.set([]);
+              // Keep the last successful result visible while the public
+              // upstream is busy or rate-limits us.
               this.errorState.set(error);
               this.loadingState.set(false);
             }
@@ -58,8 +62,33 @@ export class OverpassMapStateService {
   }
 
   setViewport(viewport: OverpassViewport | null): void {
+    viewport = viewport ? normalizeViewport(viewport) : null;
     const current = this.viewportState();
     if (current && viewport && JSON.stringify(current) === JSON.stringify(viewport)) return;
     this.viewportState.set(viewport);
   }
+}
+
+function normalizeViewport(viewport: OverpassViewport): OverpassViewport {
+  // Stable grid-aligned boxes make nearby map movements reuse the same
+  // database cache entry instead of hammering the public Overpass instance
+  // with a new query for every few moved pixels.
+  const grid = viewport.zoom >= 17 ? 0.01 : viewport.zoom >= 15 ? 0.02 : 0.05;
+  return {
+    ...viewport,
+    bounds: viewport.bounds.map((box) => ({
+      latMin: roundDown(box.latMin, grid),
+      lonMin: roundDown(box.lonMin, grid),
+      latMax: roundUp(box.latMax, grid),
+      lonMax: roundUp(box.lonMax, grid)
+    }))
+  };
+}
+
+function roundDown(value: number, grid: number): number {
+  return Number((Math.floor(value / grid) * grid).toFixed(7));
+}
+
+function roundUp(value: number, grid: number): number {
+  return Number((Math.ceil(value / grid) * grid).toFixed(7));
 }
