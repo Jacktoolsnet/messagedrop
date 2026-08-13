@@ -31,7 +31,9 @@ class LocalPoiStore {
       this.metrics.hits += 1;
       return {
         status: 200,
-        pois: rows.map(({ payload }) => payload),
+        pois: rows.map(({ payload, websiteMetadata }) => websiteMetadata
+          ? { ...payload, websiteMetadata }
+          : payload),
         count: rows.length,
         attribution: {
           provider: 'OpenStreetMap',
@@ -56,7 +58,7 @@ class LocalPoiStore {
   }
 
   async status() {
-    if (!this.enabled) return { datasetCount: 0, poiCount: 0, importedAt: null, databaseBytes: null };
+    if (!this.enabled) return emptyStatus();
     try {
       const status = await callbackResult((callback) => tableOverpassPoi.status(this.database.db, callback));
       return {
@@ -66,13 +68,24 @@ class LocalPoiStore {
     } catch (error) {
       this.metrics.errors += 1;
       this.logger?.warn?.('Local Overpass POI status failed', { error: error.message });
-      return { datasetCount: 0, poiCount: 0, importedAt: null, databaseBytes: null };
+      return emptyStatus();
     }
   }
 
   snapshot() {
     return { enabled: this.enabled, ...this.metrics };
   }
+}
+
+function emptyStatus() {
+  return {
+    datasetCount: 0,
+    poiCount: 0,
+    websitePoiCount: 0,
+    websiteMetadataPoiCount: 0,
+    importedAt: null,
+    databaseBytes: null
+  };
 }
 
 function callbackResult(register) {

@@ -8,7 +8,7 @@ const { normalizeOverpassResponse } = require('../normalizer');
 const { categoryNames, categoryCatalog } = require('../categories');
 
 function createOverpassRouter({
-  client, metadataClient, cache, persistentCache, localPoiStore, importJobManager,
+  client, metadataClient, cache, persistentCache, localPoiStore, importJobManager, websiteMetadataJobManager,
   refreshAfterMs = 24 * 60 * 60 * 1000,
   cacheTtlMs = 7 * 24 * 60 * 60 * 1000,
   staleIfErrorMs = 30 * 24 * 60 * 60 * 1000,
@@ -74,6 +74,13 @@ function createOverpassRouter({
     } catch (error) {
       return next(error);
     }
+  });
+
+  router.get('/metadata-jobs', async (req, res, next) => {
+    if (!websiteMetadataJobManager) return res.status(503).json({ error: 'metadata_jobs_unavailable' });
+    try {
+      return res.status(200).json({ status: 200, jobs: await websiteMetadataJobManager.list(req.query.limit) });
+    } catch (error) { return next(error); }
   });
 
   router.post('/nearby', async (req, res, next) => {
@@ -166,6 +173,10 @@ function createOverpassRouter({
     };
 
     try {
+      if (websiteMetadataJobManager) {
+        const result = await websiteMetadataJobManager.getOrFetch(normalizedUrl);
+        return res.status(200).json({ status: 200, metadata: result.metadata, cache: result.cache });
+      }
       const persisted = await persistentCache?.get(key);
       if (persisted && persisted.ageMs <= cacheTtlMs) {
         cache.set(key, persisted.payload);

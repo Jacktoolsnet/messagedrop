@@ -83,7 +83,23 @@ function status(db, callback) {
   db.get(`
     SELECT COUNT(*)::integer AS datasetCount, COALESCE(SUM(v.poiCount), 0)::integer AS poiCount,
       MAX(v.activatedAt) AS importedAt,
-      pg_database_size(current_database())::bigint AS databaseBytes
+      pg_database_size(current_database())::bigint AS databaseBytes,
+      (SELECT COUNT(*)::integer
+        FROM ${POI_TABLE} p
+        JOIN ${VERSION_TABLE} pv ON pv.versionId = p.versionId AND pv.status = 'active'
+        JOIN ${DATASET_TABLE} pd ON pd.activeVersionId = pv.versionId
+        WHERE NULLIF(BTRIM(p.payload #>> '{contact,website}'), '') IS NOT NULL
+      ) AS websitePoiCount,
+      (SELECT COUNT(*)::integer
+        FROM ${POI_TABLE} p
+        JOIN ${VERSION_TABLE} pv ON pv.versionId = p.versionId AND pv.status = 'active'
+        JOIN ${DATASET_TABLE} pd ON pd.activeVersionId = pv.versionId
+        JOIN tableOverpassWebsiteReference r
+          ON r.websiteUrl = p.payload #>> '{contact,website}'
+        JOIN tableOverpassWebsiteMetadata m
+          ON m.websiteUrl = r.normalizedUrl AND m.metadata IS NOT NULL
+        WHERE NULLIF(BTRIM(p.payload #>> '{contact,website}'), '') IS NOT NULL
+      ) AS websiteMetadataPoiCount
     FROM ${DATASET_TABLE} d
     JOIN ${VERSION_TABLE} v ON v.versionId = d.activeVersionId AND v.status = 'active'
   `, [], callback);
@@ -98,13 +114,17 @@ function nearby(db, versionId, bounds, selections, limit, callback) {
   }
   params.push(limit);
   db.all(`
-    SELECT payload
-    FROM ${POI_TABLE}
-    WHERE versionId = ?
-      AND latitude BETWEEN ? AND ?
-      AND longitude BETWEEN ? AND ?
+    SELECT p.payload, m.metadata AS websiteMetadata
+    FROM ${POI_TABLE} p
+    LEFT JOIN tableOverpassWebsiteReference r
+      ON r.websiteUrl = p.payload #>> '{contact,website}'
+    LEFT JOIN tableOverpassWebsiteMetadata m
+      ON m.websiteUrl = r.normalizedUrl AND m.metadata IS NOT NULL
+    WHERE p.versionId = ?
+      AND p.latitude BETWEEN ? AND ?
+      AND p.longitude BETWEEN ? AND ?
       AND (${clauses.join(' OR ')})
-    ORDER BY category, subtype, osmType, osmId
+    ORDER BY p.category, p.subtype, p.osmType, p.osmId
     LIMIT ?
   `, params, callback);
 }

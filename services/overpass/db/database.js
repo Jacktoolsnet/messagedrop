@@ -1,5 +1,6 @@
 const tableOverpassCache = require('./tableOverpassCache');
 const tableOverpassPoi = require('./tableOverpassPoi');
+const tableWebsiteMetadata = require('./tableWebsiteMetadata');
 
 
 const DEFAULT_MAX_PENDING_REQUESTS = 1000;
@@ -31,6 +32,8 @@ const ROW_KEY_MAP = new Map(Object.entries({
   sourcetimestamp: 'sourceTimestamp',
   importedat: 'importedAt',
   poicount: 'poiCount',
+  websitepoicount: 'websitePoiCount',
+  websitemetadatapoicount: 'websiteMetadataPoiCount',
   datasetcount: 'datasetCount',
   databasebytes: 'databaseBytes',
   versionid: 'versionId',
@@ -40,7 +43,19 @@ const ROW_KEY_MAP = new Map(Object.entries({
   startedat: 'startedAt',
   completedat: 'completedAt',
   activatedat: 'activatedAt',
-  activeversionid: 'activeVersionId'
+  activeversionid: 'activeVersionId',
+  websiteurl: 'websiteUrl',
+  websitemetadata: 'websiteMetadata',
+  metadatajobid: 'metadataJobId',
+  triggerreason: 'triggerReason',
+  totalurls: 'totalUrls',
+  processedurls: 'processedUrls',
+  succeededurls: 'succeededUrls',
+  failedurls: 'failedUrls',
+  attemptcount: 'attemptCount',
+  lastattemptat: 'lastAttemptAt',
+  nextattemptat: 'nextAttemptAt',
+  lasterror: 'lastError'
 }));
 
 function normalizeRow(row) {
@@ -357,6 +372,10 @@ class Database {
         else resolve();
       }));
       await new Promise((resolve, reject) => tableOverpassPoi.init(this.db, (error) => {
+        if (error) reject(error);
+        else resolve();
+      }));
+      await new Promise((resolve, reject) => tableWebsiteMetadata.init(this.db, (error) => {
         if (error) reject(error);
         else resolve();
       }));

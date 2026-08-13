@@ -54,9 +54,23 @@ export interface OverpassDatabaseInfo {
     local?: {
       datasetCount: number;
       poiCount: number;
+      websitePoiCount?: number;
+      websiteMetadataPoiCount?: number;
       importedAt: string | null;
       databaseBytes: number | null;
     };
   };
   jobs: OverpassImportJob[];
+  metadataJobs?: Array<{
+    metadataJobId: string;
+    status: 'running' | 'succeeded' | 'failed';
+    triggerReason: string;
+    totalUrls: number;
+    processedUrls: number;
+    succeededUrls: number;
+    failedUrls: number;
+    error: string | null;
+    createdAt: string;
+    completedAt: string | null;
+  }>;
 }

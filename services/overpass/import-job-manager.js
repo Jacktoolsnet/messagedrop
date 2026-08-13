@@ -12,12 +12,13 @@ function callbackResult(register) {
 }
 
 class ImportJobManager {
-  constructor({ database, logger = console, datasetCatalog } = {}) {
+  constructor({ database, logger = console, datasetCatalog, websiteMetadataJobManager } = {}) {
     this.database = database;
     this.logger = logger;
     this.children = new Map();
     this.launching = false;
     this.datasetCatalog = datasetCatalog || new GeofabrikCatalog({ logger });
+    this.websiteMetadataJobManager = websiteMetadataJobManager;
     void this.recover();
   }
 
@@ -124,8 +125,10 @@ class ImportJobManager {
       this.children.delete(jobId);
       const completion = code !== 0
         ? this.fail(jobId, new Error(`Import process failed (${signal || `exit ${code}`})`))
-        : Promise.resolve();
-      void completion.finally(() => this.launchNext());
+        : Promise.resolve(this.websiteMetadataJobManager?.trigger('import-completed'));
+      void completion
+        .catch((error) => this.logger.error('Could not trigger post-import processing', { jobId, error: error.message }))
+        .finally(() => this.launchNext());
     });
   }
 

@@ -449,6 +449,8 @@
   "Mode": "Mode",
   "Datasets": "Datasets",
   "POIs": "POIs",
+  "POIs with website": "POIs with website",
+  "POIs with website metadata": "POIs with website metadata",
   "Last activation": "Last activation",
   "Recent import jobs": "Recent import jobs",
   "No import jobs recorded yet.": "No import jobs recorded yet.",
@@ -476,6 +478,10 @@
   "Countries": "Countries",
   "Enable countries and optionally choose a subdivision": "Enable countries and optionally choose a subdivision",
   "Select the countries to import completely.": "Select the countries to import completely.",
+  "Website metadata jobs": "Website metadata jobs",
+  "No website metadata jobs recorded yet.": "No website metadata jobs recorded yet.",
+  "successful": "successful",
+  "failed": "failed",
   "Federal states and test regions": "Federal states and test regions",
   "No subdivisions are currently available.": "No subdivisions are currently available."
 }

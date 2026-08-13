@@ -48,11 +48,12 @@ router.get('/jobs', async (req, res, next) => {
 
 router.get('/database-info', async (_req, res, next) => {
   try {
-    const [health, service] = await Promise.all([
+    const [health, service, metadata] = await Promise.all([
       requestService('get', '/overpass/health'),
-      requestService('get', '/overpass/import-jobs?limit=20')
+      requestService('get', '/overpass/import-jobs?limit=20'),
+      requestService('get', '/overpass/metadata-jobs?limit=20')
     ]);
-    return res.json({ status: 200, health, jobs: service.jobs || [] });
+    return res.json({ status: 200, health, jobs: service.jobs || [], metadataJobs: metadata.jobs || [] });
   } catch (error) { return next(error); }
 });
 

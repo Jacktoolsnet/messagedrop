@@ -12,6 +12,7 @@ The service-to-service endpoints require a JWT with audience `service.overpass`:
 - `GET /overpass/categories`
 - `POST /overpass/nearby`
 - `POST /overpass/website-metadata`
+- `GET /overpass/metadata-jobs`
 - `GET /overpass/metrics`
 
 Example request body:
@@ -61,6 +62,20 @@ For SSRF protection, only public HTTPS targets on the standard port are
 accepted. Every DNS result and redirect target is checked; local and private
 addresses are rejected. Download size, timeout, and redirect limits are
 configured with `OVERPASS_WEBSITE_METADATA_*`.
+
+After every successful country import, a separate durable enrichment job finds
+the distinct HTTPS websites referenced by active POIs. Each normalized website
+is requested only once per refresh cycle. Requests run sequentially with a
+one-second delay by default. Successful metadata is refreshed after seven days;
+failed websites are retried after 24 hours. On every service start, interrupted
+jobs are recovered and missing or stale metadata is processed automatically.
+Metadata is stored once per normalized URL and added to local POI responses as
+`websiteMetadata`.
+
+Configure this lifecycle with `OVERPASS_WEBSITE_METADATA_REFRESH_DAYS`,
+`OVERPASS_WEBSITE_METADATA_RETRY_HOURS`,
+`OVERPASS_WEBSITE_METADATA_DELAY_MS`, and
+`OVERPASS_WEBSITE_METADATA_JOB_MAX_URLS`.
 
 ## Persistent cache
 

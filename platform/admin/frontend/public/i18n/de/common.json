@@ -1830,6 +1830,8 @@
   "Mode": "Modus",
   "Datasets": "Datensätze",
   "POIs": "POIs",
+  "POIs with website": "POIs mit Webseite",
+  "POIs with website metadata": "POIs mit Webseiten-Metadaten",
   "Last activation": "Letzte Aktivierung",
   "Recent import jobs": "Letzte Importaufträge",
   "No import jobs recorded yet.": "Es wurden noch keine Importaufträge erfasst.",
@@ -1857,6 +1859,10 @@
   "Countries": "Länder",
   "Enable countries and optionally choose a subdivision": "Aktiviere Länder und wähle bei Bedarf eine Unterregion aus",
   "Select the countries to import completely.": "Wähle die Länder aus, die vollständig importiert werden sollen.",
+  "Website metadata jobs": "Webseiten-Metadaten-Jobs",
+  "No website metadata jobs recorded yet.": "Noch keine Webseiten-Metadaten-Jobs vorhanden.",
+  "successful": "erfolgreich",
+  "failed": "fehlgeschlagen",
   "Federal states and test regions": "Bundesländer und Testregionen",
   "No subdivisions are currently available.": "Momentan sind keine Unterregionen verfügbar."
 }
