@@ -90,7 +90,9 @@ function buildCatalog(index) {
     };
     if (id === 'germany') definition.supersedes = ['wolfenbuettel'];
     definitions[id] = definition;
-    for (const countryCode of codes) display.push({ ...definition, countryCode });
+    if (level === 'country') {
+      for (const countryCode of codes) display.push({ ...definition, countryCode });
+    }
   }
   display.sort((left, right) => left.continentLabel.localeCompare(right.continentLabel)
     || left.countryCode.localeCompare(right.countryCode) || (left.level === 'country' ? -1 : 1)

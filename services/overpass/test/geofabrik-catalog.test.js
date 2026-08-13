@@ -6,7 +6,7 @@ function feature(properties) {
   return { type: 'Feature', properties };
 }
 
-test('builds importable continents, countries and direct country subdivisions from the Geofabrik index', () => {
+test('builds country imports but keeps subdivisions out of the administration catalog', () => {
   const catalog = buildCatalog({ features: [
     feature({ id: 'europe', name: 'Europe', urls: { pbf: 'https://download.test/europe.pbf' } }),
     feature({ id: 'germany', parent: 'europe', name: 'Germany', 'iso3166-1:alpha2': ['DE'],
@@ -23,6 +23,7 @@ test('builds importable continents, countries and direct country subdivisions fr
   assert.equal(catalog.definitions.niedersachsen.regionCode, 'DE-NI');
   assert.equal(catalog.definitions.braunschweig, undefined);
   assert.ok(!catalog.display.some((dataset) => dataset.id === 'wolfenbuettel'));
+  assert.ok(!catalog.display.some((dataset) => dataset.id === 'niedersachsen'));
   assert.ok(catalog.display.every((dataset) => dataset.continentCode === 'EU' && dataset.countryCode === 'DE'));
 });
 

@@ -65,7 +65,8 @@ export class OverpassImportSettingsComponent {
   });
   readonly countryGroups = computed(() => {
     const groups = new Map<string, OverpassImportCatalog['datasets']>();
-    for (const dataset of (this.catalog()?.datasets ?? []).filter((row) => row.continentCode === this.selectedContinent())) {
+    for (const dataset of (this.catalog()?.datasets ?? [])
+      .filter((row) => row.continentCode === this.selectedContinent() && row.level === 'country')) {
       const rows = groups.get(dataset.countryCode) ?? [];
       rows.push(dataset);
       groups.set(dataset.countryCode, rows);
@@ -75,8 +76,6 @@ export class OverpassImportSettingsComponent {
   readonly continents = computed(() => [...new Map((this.catalog()?.datasets ?? [])
     .map((dataset) => [dataset.continentCode, dataset.continentLabel])).entries()]
     .map(([code, label]) => ({ code, label })));
-  readonly selectedCountryGroup = computed(() => this.countryGroups()
-    .find((group) => group.countryCode === this.selectedCountry()) ?? null);
   readonly hasChanges = computed(() => {
     const settings = this.settings();
     if (!settings) return false;
@@ -117,12 +116,6 @@ export class OverpassImportSettingsComponent {
 
   isDatasetEnabled(datasetId: string): boolean {
     return this.enabledDatasets().has(datasetId);
-  }
-
-  toggleDataset(datasetId: string, enabled: boolean): void {
-    const next = new Set(this.enabledDatasets());
-    if (enabled) next.add(datasetId); else next.delete(datasetId);
-    this.enabledDatasets.set(next);
   }
 
   countryLabel(countryCode: string): string {

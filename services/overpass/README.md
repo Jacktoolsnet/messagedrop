@@ -130,8 +130,8 @@ npm run dataset:import:germany
 ```
 
 The administration catalog is built from Geofabrik's machine-readable download
-index and cached locally for 24 hours. It lists all currently importable
-continents and countries plus the directly available country subdivisions.
+index and cached locally for 24 hours. It lists all countries for which a
+complete country extract is currently available, grouped by continent.
 The last catalog remains usable if Geofabrik is temporarily unavailable.
 Selecting Germany uses Geofabrik's country extract. The import applies the selected
 Osmium tag expressions before conversion, so only the configured POI categories
