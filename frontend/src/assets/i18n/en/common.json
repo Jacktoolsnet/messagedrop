@@ -312,7 +312,7 @@
       }
     },
     "tripGoStops": {
-      "providerSubtitle": "Stop information from SkedGo / TripGo",
+      "providerSubtitle": "Powered by SkedGo/TripGo",
       "details": "Information about the selected stop",
       "lines": "Lines",
       "noLines": "No line information was provided for this stop.",

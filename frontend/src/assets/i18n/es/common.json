@@ -311,7 +311,7 @@
       }
     },
     "tripGoStops": {
-      "providerSubtitle": "Información de paradas de SkedGo / TripGo",
+      "providerSubtitle": "Powered by SkedGo/TripGo",
       "details": "Información sobre la parada seleccionada",
       "lines": "Líneas",
       "noLines": "No se proporcionó información de líneas para esta parada.",
