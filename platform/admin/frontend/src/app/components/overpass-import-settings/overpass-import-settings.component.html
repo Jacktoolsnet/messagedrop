@@ -1,0 +1,93 @@
+<mat-toolbar color="primary">
+  <button mat-icon-button routerLink="/dashboard" [attr.aria-label]="i18n.t('Back to dashboard')">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <span class="toolbar-title">{{ i18n.t('Geodata') }}</span>
+  <span class="spacer"></span>
+  <button mat-icon-button type="button" (click)="load()" [disabled]="loading() || saving()" [attr.aria-label]="i18n.t('Reload settings')">
+    <mat-icon>refresh</mat-icon>
+  </button>
+  <button mat-icon-button type="button" class="save-button" (click)="save()"
+    [disabled]="!hasChanges() || saving() || enabledCategories().size === 0" [attr.aria-label]="i18n.t('Save settings')">
+    <mat-icon>save</mat-icon>
+  </button>
+</mat-toolbar>
+
+@if (loading() || saving()) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+<main class="page">
+  <mat-card class="hero-card">
+    <mat-card-header>
+      <div mat-card-avatar class="avatar avatar-map"><mat-icon>travel_explore</mat-icon></div>
+      <mat-card-title>{{ i18n.t('OpenStreetMap geodata') }}</mat-card-title>
+      <mat-card-subtitle>{{ i18n.t('Configure categories for all imported countries and regions') }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <p>{{ i18n.t('This selection applies to every geodata set. Changes take effect with the next import or update.') }}</p>
+    </mat-card-content>
+  </mat-card>
+
+  @if (!loading() && categoryNames().length === 0) {
+    <mat-card class="empty-card">
+      <mat-card-content><mat-icon>cloud_off</mat-icon> {{ i18n.t('The Overpass catalog currently contains no categories.') }}</mat-card-content>
+    </mat-card>
+  } @else {
+    <section class="settings-layout">
+      <mat-card class="section-card">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-category"><mat-icon>category</mat-icon></div>
+          <mat-card-title>{{ i18n.t('Categories') }}</mat-card-title>
+          <mat-card-subtitle>{{ i18n.t('{{enabled}} of {{total}} enabled', { enabled: enabledCategories().size, total: categoryNames().length }) }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content class="selection-list">
+          @for (category of categoryNames(); track category) {
+            <div class="selection-row" [class.selected]="selectedCategory() === category" (click)="selectCategory(category)">
+              <button type="button" class="selection-copy" (click)="selectCategory(category)">
+                <mat-icon>{{ category === 'accommodation' ? 'hotel' : category === 'tourism' ? 'museum' : category === 'leisure' ? 'park' : category === 'food_drink' ? 'restaurant' : 'wc' }}</mat-icon>
+                <span>
+                  <strong>{{ label(category) }}</strong>
+                  <small>{{ catalog()?.categories?.[category]?.length ?? 0 }} {{ i18n.t('subcategories') }}</small>
+                </span>
+              </button>
+              <mat-slide-toggle [checked]="isCategoryEnabled(category)" (click)="$event.stopPropagation()"
+                (change)="toggleCategory(category, $event.checked)" [attr.aria-label]="i18n.t('Enable {{name}}', { name: label(category) })"></mat-slide-toggle>
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="section-card">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-detail"><mat-icon>account_tree</mat-icon></div>
+          <mat-card-title>{{ selectedCategory() ? label(selectedCategory() ?? '') : i18n.t('Subcategories') }}</mat-card-title>
+          <mat-card-subtitle>{{ i18n.t('Enable or disable individual types') }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          @if (selectedCategory(); as category) {
+            @if (!isCategoryEnabled(category)) {
+              <div class="category-hint"><mat-icon>info</mat-icon> {{ i18n.t('The main category is currently disabled.') }}</div>
+            }
+            <div class="bulk-actions">
+              <button mat-stroked-button type="button" (click)="enableAllSubcategories()" [disabled]="!isCategoryEnabled(category)">{{ i18n.t('Enable all') }}</button>
+              <button mat-stroked-button type="button" (click)="disableAllSubcategories()" [disabled]="!isCategoryEnabled(category)">{{ i18n.t('Disable all') }}</button>
+            </div>
+            <div class="subcategory-grid">
+              @for (subcategory of visibleSubcategories(); track subcategory) {
+                <label class="subcategory-row">
+                  <span>{{ label(subcategory) }}</span>
+                  <mat-slide-toggle [checked]="isSubcategoryEnabled(subcategory)"
+                    [disabled]="!isCategoryEnabled(category)" (change)="toggleSubcategory(subcategory, $event.checked)"
+                    [attr.aria-label]="i18n.t('Enable {{name}}', { name: label(subcategory) })"></mat-slide-toggle>
+                </label>
+              }
+            </div>
+          } @else {
+            <div class="empty-state"><mat-icon>touch_app</mat-icon> {{ i18n.t('Please select a category.') }}</div>
+          }
+        </mat-card-content>
+      </mat-card>
+    </section>
+  }
+</main>

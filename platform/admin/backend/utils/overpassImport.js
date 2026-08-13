@@ -39,6 +39,10 @@ function validateSettings(body) {
   const value = body && typeof body === 'object' ? body : {};
   const datasets = [...new Set(Array.isArray(value.datasets) ? value.datasets : [])];
   const categories = [...new Set(Array.isArray(value.categories) ? value.categories : [])];
+  const subcategories = value.subcategories && typeof value.subcategories === 'object' && !Array.isArray(value.subcategories)
+    ? Object.fromEntries(categories.map((category) => [category,
+      [...new Set(Array.isArray(value.subcategories[category]) ? value.subcategories[category] : [])]
+    ])) : {};
   const scheduleType = value.scheduleType === 'daily' ? 'daily' : value.scheduleType === 'weekly' ? 'weekly' : null;
   const weekday = Number(value.weekday);
   const hour = Number(value.hour);
@@ -50,7 +54,9 @@ function validateSettings(body) {
   if (!scheduleType || !Number.isInteger(weekday) || weekday < 0 || weekday > 6
       || !Number.isInteger(hour) || hour < 0 || hour > 23
       || !Number.isInteger(minute) || minute < 0 || minute > 59) throw new Error('invalid_schedule');
-  return { enabled: Boolean(value.enabled), datasets, categories, scheduleType, weekday, hour, minute,
+  if (Object.entries(subcategories).some(([category, values]) => !CATEGORIES.includes(category)
+      || values.some((item) => typeof item !== 'string' || !/^[a-z0-9_-]+$/.test(item)))) throw new Error('invalid_subcategories');
+  return { enabled: Boolean(value.enabled), datasets, categories, subcategories, scheduleType, weekday, hour, minute,
     timezone, refreshSource: value.refreshSource !== false };
 }
 
@@ -77,7 +83,7 @@ async function dispatchImports(db, settings, triggerType) {
   const results = [];
   for (const datasetId of settings.datasets) {
     const dispatchId = randomUUID();
-    const config = { datasetId, categories: settings.categories, refresh: settings.refreshSource };
+    const config = { datasetId, categories: settings.categories, subcategories: settings.subcategories || {}, refresh: settings.refreshSource };
     try {
       const response = await requestService('post', '/overpass/import-jobs', config);
       await callbackResult((callback) => dispatchTable.create(db, { dispatchId, serviceJobId: response.job?.jobId,

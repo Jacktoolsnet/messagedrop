@@ -16,6 +16,12 @@ test('creates Osmium filters from the shared category definitions', () => {
   assert.equal(new Set(expressions).size, expressions.length);
 });
 
+test('limits Osmium filters to the selected subcategories', () => {
+  const expressions = filterExpressions(['accommodation'], { accommodation: ['hotel'] });
+  assert.ok(expressions.includes('nwr/tourism=hotel'));
+  assert.ok(!expressions.includes('nwr/tourism=guest_house'));
+});
+
 test('converts exported GeoJSON points into normalizable OSM elements', () => {
   const element = featureToElement({
     type: 'Feature',
@@ -49,7 +55,8 @@ test('parses the repeatable Wolfenbuettel import options', () => {
       refresh: true,
       categories: ['accommodation', 'amenities'],
       keepVersions: 1,
-      jobId: null
+      jobId: null,
+      subcategories: null
     }
   );
   assert.throws(() => parseArguments(['--unknown']), /Unknown argument/u);

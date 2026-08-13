@@ -60,6 +60,7 @@ export class AdminDashboardComponent implements OnInit {
   readonly canAccessModeration = computed(() => hasAllowedRole(this.role(), MODERATION_MODULE_ROLES));
   readonly canAccessLogs = computed(() => hasAllowedRole(this.role(), ROOT_ADMIN_ROLES));
   readonly canAccessStatistics = computed(() => hasAllowedRole(this.role(), ROOT_ADMIN_ROLES));
+  readonly canManageGeodata = computed(() => hasAllowedRole(this.role(), ROOT_ADMIN_ROLES));
 
   readonly errorCountToday = signal<number | null>(null);
   readonly infoCountToday = signal<number | null>(null);

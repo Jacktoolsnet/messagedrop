@@ -3,6 +3,7 @@ const tableName = 'tableOverpassImportSettings';
 const DEFAULTS = Object.freeze({
   id: 1, enabled: false, datasets: ['wolfenbuettel'],
   categories: ['accommodation', 'tourism', 'leisure', 'food_drink', 'amenities'],
+  subcategories: {},
   scheduleType: 'weekly', weekday: 0, hour: 3, minute: 0,
   timezone: 'Europe/Berlin', refreshSource: true, lastTriggeredAt: 0, updatedAt: 0
 });
@@ -14,6 +15,7 @@ function init(db) {
       enabled INTEGER NOT NULL DEFAULT 0,
       datasets TEXT NOT NULL DEFAULT '["wolfenbuettel"]',
       categories TEXT NOT NULL DEFAULT '[]',
+      subcategories TEXT NOT NULL DEFAULT '{}',
       scheduleType TEXT NOT NULL DEFAULT 'weekly',
       weekday INTEGER NOT NULL DEFAULT 0,
       hour INTEGER NOT NULL DEFAULT 3,
@@ -30,6 +32,9 @@ function init(db) {
     VALUES (1, 0, ?, ?, 'weekly', 0, 3, 0, 'Europe/Berlin', 1)
     ON CONFLICT(id) DO NOTHING
   `, [JSON.stringify(DEFAULTS.datasets), JSON.stringify(DEFAULTS.categories)]);
+  db.run(`ALTER TABLE ${tableName} ADD COLUMN subcategories TEXT NOT NULL DEFAULT '{}'`, [], (err) => {
+    if (err && !String(err.message || '').includes('duplicate column name')) throw err;
+  });
 }
 
 function decode(row) {
@@ -40,7 +45,8 @@ function decode(row) {
     enabled: Boolean(row.enabled),
     refreshSource: Boolean(row.refreshSource),
     datasets: json(row.datasets, DEFAULTS.datasets),
-    categories: json(row.categories, DEFAULTS.categories)
+    categories: json(row.categories, DEFAULTS.categories),
+    subcategories: json(row.subcategories, DEFAULTS.subcategories)
   };
 }
 
@@ -51,10 +57,10 @@ function get(db, callback = () => {}) {
 function upsert(db, value, callback = () => {}) {
   const updatedAt = Date.now();
   db.run(`
-    UPDATE ${tableName} SET enabled = ?, datasets = ?, categories = ?, scheduleType = ?,
+    UPDATE ${tableName} SET enabled = ?, datasets = ?, categories = ?, subcategories = ?, scheduleType = ?,
       weekday = ?, hour = ?, minute = ?, timezone = ?, refreshSource = ?, updatedAt = ?
     WHERE id = 1
-  `, [value.enabled ? 1 : 0, JSON.stringify(value.datasets), JSON.stringify(value.categories),
+  `, [value.enabled ? 1 : 0, JSON.stringify(value.datasets), JSON.stringify(value.categories), JSON.stringify(value.subcategories || {}),
     value.scheduleType, value.weekday, value.hour, value.minute, value.timezone,
     value.refreshSource ? 1 : 0, updatedAt], (err) => {
     if (err) return callback(err);

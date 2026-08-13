@@ -3,7 +3,7 @@ const { spawn } = require('node:child_process');
 const { randomUUID } = require('node:crypto');
 const table = require('./db/tableOverpassPoi');
 const { DATASETS } = require('./scripts/import-local-dataset');
-const { categoryNames } = require('./categories');
+const { categoryNames, subcategoryNames } = require('./categories');
 
 function callbackResult(register) {
   return new Promise((resolve, reject) => register((error, value) => error ? reject(error) : resolve(value)));
@@ -22,24 +22,32 @@ class ImportJobManager {
     }));
   }
 
-  async start({ datasetId, categories = categoryNames(), refresh = true }) {
+  async start({ datasetId, categories = categoryNames(), subcategories = {}, refresh = true }) {
     const dataset = DATASETS[datasetId];
     if (!dataset) throw Object.assign(new Error('unknown_import_dataset'), { status: 400 });
     const selected = [...new Set(categories)];
     if (!selected.length || selected.some((value) => !categoryNames().includes(value))) {
       throw Object.assign(new Error('invalid_import_categories'), { status: 400 });
     }
+    const selectedSubcategories = Object.fromEntries(selected
+      .filter((category) => Object.hasOwn(subcategories || {}, category))
+      .map((category) => [category, [...new Set(subcategories[category])]]));
+    if (Object.entries(selectedSubcategories).some(([category, values]) =>
+      values.some((value) => !subcategoryNames(category).includes(value)))) {
+      throw Object.assign(new Error('invalid_import_subcategories'), { status: 400 });
+    }
     const active = await callbackResult((callback) => table.findActiveJob(this.database.db, datasetId, callback));
     if (active) return { job: active, created: false };
 
     const jobId = randomUUID();
     await callbackResult((callback) => table.createJob(this.database.db, {
-      id: jobId, datasetId, requestedConfig: { categories: selected, refresh: Boolean(refresh) }
+      id: jobId, datasetId, requestedConfig: { categories: selected, subcategories: selectedSubcategories, refresh: Boolean(refresh) }
     }, callback));
     const args = [
       path.join(__dirname, 'scripts', 'import-local-dataset.js'),
       '--dataset', datasetId, '--categories', selected.join(','), '--job-id', jobId
     ];
+    args.push('--subcategories-json', JSON.stringify(selectedSubcategories));
     if (refresh) args.push('--refresh');
     const child = spawn(process.execPath, args, { cwd: __dirname, env: process.env, stdio: ['ignore', 'pipe', 'pipe'] });
     this.children.set(jobId, child);

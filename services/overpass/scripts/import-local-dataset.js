@@ -38,7 +38,7 @@ async function main() {
     await callbackResult((callback) => tableOverpassPoi.createJob(database.db, {
       id: jobId,
       datasetId: dataset.id,
-      requestedConfig: { categories: options.categories, refresh: options.refresh }
+      requestedConfig: { categories: options.categories, subcategories: options.subcategories, refresh: options.refresh }
     }, callback));
   }
   await callbackResult((callback) => tableOverpassPoi.startJob(database.db, jobId, callback));
@@ -111,7 +111,7 @@ async function prepareDataset(dataset, options, updateProgress = async () => {})
   ]);
   await fsPromises.writeFile(
     expressionsPath,
-    `${filterExpressions(options.categories).join('\n')}\n`,
+    `${filterExpressions(options.categories, options.subcategories).join('\n')}\n`,
     { mode: 0o600 }
   );
   await updateProgress('filtering', 55);
@@ -129,13 +129,17 @@ async function prepareDataset(dataset, options, updateProgress = async () => {})
   ]);
 
   await updateProgress('normalizing', 80);
-  const pois = await readPois(geoJsonPath, options.categories);
+  const pois = await readPois(geoJsonPath, options.categories, options.subcategories);
   if (!pois.length) throw new Error('The filtered dataset contains no supported POIs');
   return pois;
 }
 
-async function readPois(inputPath, categories = categoryNames()) {
-  const subcategories = Object.fromEntries(categories.map((category) => [category, subcategoryNames(category)]));
+async function readPois(inputPath, categories = categoryNames(), selectedSubcategories = null) {
+  const subcategories = Object.fromEntries(categories.map((category) => [category,
+    Array.isArray(selectedSubcategories?.[category])
+      ? selectedSubcategories[category]
+      : subcategoryNames(category)
+  ]));
   const unique = new Map();
   const lines = readline.createInterface({
     input: fs.createReadStream(inputPath, { encoding: 'utf8' }),
@@ -199,10 +203,12 @@ function collectCoordinates(value, points) {
   }
 }
 
-function filterExpressions(categories = categoryNames()) {
+function filterExpressions(categories = categoryNames(), selectedSubcategories = null) {
   const expressions = new Set();
   for (const category of categories) {
-    const definitions = CATEGORY_DEFINITIONS[category] || [];
+    const selected = selectedSubcategories?.[category];
+    const definitions = (CATEGORY_DEFINITIONS[category] || [])
+      .filter((definition) => !Array.isArray(selected) || selected.includes(definition.subcategory));
     for (const definition of definitions) {
       for (const value of definition.values) expressions.add(`nwr/${definition.key}=${value}`);
     }
@@ -216,7 +222,8 @@ function parseArguments(args) {
     refresh: false,
     categories: categoryNames(),
     keepVersions: Number(process.env.OVERPASS_DATASET_RETIRED_VERSIONS || 0),
-    jobId: null
+    jobId: null,
+    subcategories: null
   };
   for (let index = 0; index < args.length; index += 1) {
     if (args[index] === '--refresh') options.refresh = true;
@@ -226,6 +233,7 @@ function parseArguments(args) {
     }
     else if (args[index] === '--keep-versions' && args[index + 1]) options.keepVersions = Number(args[++index]);
     else if (args[index] === '--job-id' && args[index + 1]) options.jobId = args[++index];
+    else if (args[index] === '--subcategories-json' && args[index + 1]) options.subcategories = JSON.parse(args[++index]);
     else throw new Error(`Unknown argument: ${args[index]}`);
   }
   if (!options.categories.length || options.categories.some((category) => !categoryNames().includes(category))) {

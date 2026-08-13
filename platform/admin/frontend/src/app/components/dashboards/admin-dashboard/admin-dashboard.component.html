@@ -96,6 +96,18 @@
       </mat-card>
     }
 
+    @if (canManageGeodata()) {
+      <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/geodata" role="button" tabindex="0">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar avatar-success">
+            <mat-icon>travel_explore</mat-icon>
+          </div>
+          <mat-card-title class="tile-title">{{ i18n.t('Geodata') }}</mat-card-title>
+          <mat-card-subtitle class="tile-subtitle"></mat-card-subtitle>
+        </mat-card-header>
+      </mat-card>
+    }
+
     @if (canAccessDsa()) {
       <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/dsa" role="button" tabindex="0">
         <mat-card-header>
