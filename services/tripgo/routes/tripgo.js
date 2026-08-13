@@ -11,7 +11,11 @@ const { cellIDsForBounds, normalizeLocationsResponse, resolveRegion } = require(
 const { normalizeDeparturesResponse } = require('../departures');
 
 function createTripGoRouter({
-  client, regionsCache, routeCache, serviceCache, locationsCache, inFlight, metrics, maxInFlight
+  client, regionsCache, routeCache, serviceCache, locationsCache, persistentLocationsCache,
+  locationsRefreshAfterMs = 24 * 60 * 60 * 1000,
+  locationsCacheTtlMs = 7 * 24 * 60 * 60 * 1000,
+  locationsStaleIfErrorMs = 30 * 24 * 60 * 60 * 1000,
+  inFlight, metrics, maxInFlight, logger = console
 }) {
   const router = express.Router();
   router.use(requireServiceJwt);
@@ -114,26 +118,67 @@ function createTripGoRouter({
       const key = routeKey({
         region,
         locale: validated.value.locale,
-        cellIDs,
-        bounds: validated.value.bounds
+        cellIDs
       });
       const cached = locationsCache?.get(key);
-      if (cached !== undefined) return res.status(200).json({ ...cached, cache: 'hit' });
-      const upstream = await coalesce(inFlight, `locations:${key}`, maxInFlight,
-        () => client.locations({
+      if (cached !== undefined) {
+        return res.status(200).json({
+          ...normalizeCachedLocations(cached, region, validated.value.bounds),
+          cache: 'hit'
+        });
+      }
+
+      const fetchAndCache = async () => {
+        const upstream = await client.locations({
           region,
           levels: [1, 2],
           cellIDs,
           locale: validated.value.locale,
           includeChildren: true,
           includeRoutes: true
-        }));
-      const payload = {
-        status: upstream.status,
-        data: normalizeLocationsResponse(upstream.data, region, validated.value.bounds)
+        });
+        const cachedPayload = {
+          status: upstream.status,
+          data: upstream.data
+        };
+        locationsCache?.set(key, cachedPayload);
+        await persistentLocationsCache?.set(key, cachedPayload);
+        return cachedPayload;
       };
-      locationsCache?.set(key, payload);
-      return res.status(upstream.status).json({ ...payload, cache: 'miss' });
+
+      const persisted = await persistentLocationsCache?.get(key);
+      if (persisted && persisted.ageMs <= locationsCacheTtlMs) {
+        if (persisted.ageMs <= locationsRefreshAfterMs) {
+          locationsCache?.set(key, persisted.payload);
+          return res.status(200).json({
+            ...normalizeCachedLocations(persisted.payload, region, validated.value.bounds),
+            cache: 'database'
+          });
+        }
+        refreshLocationsInBackground({
+          key, fetchAndCache, inFlight, maxInFlight, logger
+        });
+        return res.status(200).json({
+          ...normalizeCachedLocations(persisted.payload, region, validated.value.bounds),
+          cache: 'stale'
+        });
+      }
+
+      try {
+        const payload = await coalesce(inFlight, `locations:${key}`, maxInFlight, fetchAndCache);
+        return res.status(payload.status).json({
+          ...normalizeCachedLocations(payload, region, validated.value.bounds),
+          cache: 'miss'
+        });
+      } catch (error) {
+        if (persisted && persisted.ageMs <= locationsStaleIfErrorMs) {
+          return res.status(200).json({
+            ...normalizeCachedLocations(persisted.payload, region, validated.value.bounds),
+            cache: 'stale-if-error'
+          });
+        }
+        throw error;
+      }
     } catch (error) {
       return next(upstreamError(error));
     }
@@ -230,10 +275,26 @@ function createTripGoRouter({
     routeCache: routeCache.snapshot(),
     serviceCache: serviceCache?.snapshot(),
     locationsCache: locationsCache?.snapshot(),
+    persistentLocationsCache: persistentLocationsCache?.snapshot(),
     requests: { ...metrics }
   }));
 
   return router;
+}
+
+function normalizeCachedLocations(cachedPayload, region, bounds) {
+  return {
+    status: cachedPayload.status,
+    data: normalizeLocationsResponse(cachedPayload.data, region, bounds)
+  };
+}
+
+function refreshLocationsInBackground({ key, fetchAndCache, inFlight, maxInFlight, logger }) {
+  void coalesce(inFlight, `locations:${key}`, maxInFlight, fetchAndCache)
+    .catch((error) => logger?.warn?.('TripGo locations background refresh failed', {
+      key,
+      error: error.message
+    }));
 }
 
 async function fetchDeparturesForStops(client, query) {
@@ -292,4 +353,6 @@ function preferredLocale(header) {
   return typeof header === 'string' ? header.split(',')[0]?.split(';')[0]?.trim() : null;
 }
 
-module.exports = { createTripGoRouter, coalesce, fetchDeparturesForStops, routeKey };
+module.exports = {
+  createTripGoRouter, coalesce, fetchDeparturesForStops, refreshLocationsInBackground, routeKey
+};

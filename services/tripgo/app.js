@@ -9,6 +9,8 @@ const express = require('express');
 const helmet = require('helmet');
 const winston = require('winston');
 const { BoundedTtlCache } = require('./cache');
+const Database = require('./db/database');
+const { PersistentLocationsCache } = require('./locations-cache');
 const { createTripGoClient } = require('./clients/tripgo-client');
 const loggerMw = require('./middleware/logger');
 const traceId = require('./middleware/trace-id');
@@ -48,7 +50,9 @@ function createLogger() {
   return logger;
 }
 
-function createApp({ client = createTripGoClient(), logger = createLogger() } = {}) {
+function createApp({
+  client = createTripGoClient(), logger = createLogger(), persistentLocationsCache
+} = {}) {
   const regionsCache = new BoundedTtlCache({
     ttlMs: numberSetting('TRIPGO_REGIONS_CACHE_TTL_MS', 6 * 60 * 60 * 1000),
     maxEntries: numberSetting('TRIPGO_REGIONS_CACHE_MAX_ENTRIES', 8),
@@ -65,7 +69,7 @@ function createApp({ client = createTripGoClient(), logger = createLogger() } = 
     maxBytes: numberSetting('TRIPGO_SERVICE_CACHE_MAX_BYTES', 16 * 1024 * 1024)
   });
   const locationsCache = new BoundedTtlCache({
-    ttlMs: numberSetting('TRIPGO_LOCATIONS_CACHE_TTL_MS', 6 * 60 * 60 * 1000),
+    ttlMs: numberSetting('TRIPGO_LOCATIONS_MEMORY_CACHE_TTL_MS', 60 * 60 * 1000),
     maxEntries: numberSetting('TRIPGO_LOCATIONS_CACHE_MAX_ENTRIES', 256),
     maxBytes: numberSetting('TRIPGO_LOCATIONS_CACHE_MAX_BYTES', 32 * 1024 * 1024)
   });
@@ -84,8 +88,14 @@ function createApp({ client = createTripGoClient(), logger = createLogger() } = 
   app.use('/', root);
   app.use('/check', check);
   app.use('/tripgo', createTripGoRouter({
-    client, regionsCache, routeCache, serviceCache, locationsCache, inFlight, metrics,
-    maxInFlight: numberSetting('TRIPGO_MAX_IN_FLIGHT', 100)
+    client, regionsCache, routeCache, serviceCache, locationsCache, persistentLocationsCache,
+    locationsRefreshAfterMs: numberSetting('TRIPGO_LOCATIONS_REFRESH_AFTER_MS', 24 * 60 * 60 * 1000),
+    locationsCacheTtlMs: numberSetting('TRIPGO_LOCATIONS_CACHE_TTL_MS', 7 * 24 * 60 * 60 * 1000),
+    locationsStaleIfErrorMs: numberSetting('TRIPGO_LOCATIONS_STALE_IF_ERROR_MS', 30 * 24 * 60 * 60 * 1000),
+    inFlight,
+    metrics,
+    maxInFlight: numberSetting('TRIPGO_MAX_IN_FLIGHT', 100),
+    logger
   }));
   app.use(notFoundHandler);
   app.use(errorHandler);
@@ -97,12 +107,21 @@ async function start() {
   if (!Number.isInteger(port) || port <= 0) throw new Error(`Invalid TRIPGO_PORT: ${process.env.TRIPGO_PORT ?? '<not set>'}`);
   await generateOrLoadKeypairs();
   const logger = createLogger();
-  const app = createApp({ logger });
+  const database = new Database();
+  database.init(logger);
+  const persistentLocationsCache = new PersistentLocationsCache({ database, logger });
+  void persistentLocationsCache.cleanExpired(numberSetting('TRIPGO_LOCATIONS_DATABASE_RETENTION_DAYS', 30));
+  const cleanupTimer = setInterval(() => {
+    void persistentLocationsCache.cleanExpired(numberSetting('TRIPGO_LOCATIONS_DATABASE_RETENTION_DAYS', 30));
+  }, 24 * 60 * 60 * 1000);
+  cleanupTimer.unref();
+  const app = createApp({ logger, persistentLocationsCache });
   const server = app.listen(port, () => logger.info('TripGo service listening', { port }));
   server.on('error', (error) => logger.error('TripGo HTTP server error', { error: error.message }));
   const shutdown = (signal) => {
     logger.info('TripGo service shutting down', { signal });
-    server.close();
+    clearInterval(cleanupTimer);
+    server.close(() => database.close());
   };
   process.on('SIGTERM', () => shutdown('SIGTERM'));
   process.on('SIGINT', () => shutdown('SIGINT'));
