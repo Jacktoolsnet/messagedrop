@@ -96,44 +96,72 @@
 
       <mat-tab>
         <ng-template mat-tab-label><mat-icon>public</mat-icon><span>{{ i18n.t('Regions') }}</span></ng-template>
-        <section class="tab-content">
-          <mat-card class="section-card wide-card">
+        <section class="tab-content settings-layout">
+          <mat-card class="section-card">
             <mat-card-header>
-              <div mat-card-avatar class="avatar avatar-map"><mat-icon>map</mat-icon></div>
-              <mat-card-title>{{ i18n.t('Imported regions') }}</mat-card-title>
-              <mat-card-subtitle>{{ i18n.t('Select the countries and regions whose geodata should be maintained.') }}</mat-card-subtitle>
+              <div mat-card-avatar class="avatar avatar-map"><mat-icon>public</mat-icon></div>
+              <mat-card-title>{{ i18n.t('Continents') }}</mat-card-title>
+              <mat-card-subtitle>{{ i18n.t('Select a continent') }}</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content class="selection-list">
+              @for (continent of continents(); track continent.code) {
+                <button type="button" class="selection-row region-selection-button"
+                  [class.selected]="selectedContinent() === continent.code" (click)="selectContinent(continent.code)">
+                  <mat-icon>public</mat-icon>
+                  <span><strong>{{ i18n.t(continent.label) }}</strong><small>{{ continent.code }}</small></span>
+                  <mat-icon class="radio-indicator">{{ selectedContinent() === continent.code ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
+                </button>
+              }
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="section-card">
+            <mat-card-header>
+              <div mat-card-avatar class="avatar avatar-category"><mat-icon>flag</mat-icon></div>
+              <mat-card-title>{{ i18n.t('Countries') }}</mat-card-title>
+              <mat-card-subtitle>{{ i18n.t('Enable countries and optionally choose a subdivision') }}</mat-card-subtitle>
             </mat-card-header>
             <mat-card-content class="country-list">
-              <mat-form-field appearance="outline" class="continent-select">
-                <mat-label>{{ i18n.t('Continent') }}</mat-label>
-                <mat-select [value]="selectedContinent()" (selectionChange)="selectedContinent.set($event.value)">
-                  @for (continent of continents(); track continent.code) { <mat-option [value]="continent.code">{{ i18n.t(continent.label) }}</mat-option> }
-                </mat-select>
-              </mat-form-field>
-              @for (group of countryGroups(); track group.countryCode) {
-                <section class="country-group">
-                  <header>
-                    <mat-icon>flag</mat-icon><strong>{{ countryLabel(group.countryCode) }}</strong><span>{{ group.countryCode }}</span>
+              <div class="selection-list">
+                @for (group of countryGroups(); track group.countryCode) {
+                  <div class="selection-row" [class.selected]="selectedCountry() === group.countryCode"
+                    (click)="selectCountry(group.countryCode)">
+                    <button type="button" class="selection-copy" (click)="selectCountry(group.countryCode)">
+                      <mat-icon>flag</mat-icon>
+                      <span><strong>{{ countryLabel(group.countryCode) }}</strong><small>{{ group.countryCode }}</small></span>
+                    </button>
                     @if (countryDataset(group.datasets); as country) {
-                      <mat-slide-toggle [checked]="isDatasetEnabled(country.id)" (change)="toggleCountry(group.datasets, $event.checked)"></mat-slide-toggle>
+                      <mat-slide-toggle [checked]="isDatasetEnabled(country.id)" (click)="$event.stopPropagation()"
+                        (change)="toggleCountry(group.datasets, $event.checked)"
+                        [attr.aria-label]="i18n.t('Enable {{name}}', { name: countryLabel(group.countryCode) })"></mat-slide-toggle>
                     }
-                  </header>
+                  </div>
+                } @empty {
+                  <div class="empty-state"><mat-icon>location_off</mat-icon>{{ i18n.t('No importable regions are currently available.') }}</div>
+                }
+              </div>
+
+              @if (selectedCountryGroup(); as group) {
+                <div class="subdivision-section">
+                  <div class="subdivision-heading">
+                    <div><strong>{{ i18n.t('Federal states and test regions') }}</strong><small>{{ countryLabel(group.countryCode) }}</small></div>
+                  </div>
                   <div class="region-grid">
                     @for (dataset of group.datasets; track dataset.id) {
                       @if (dataset.level !== 'country') {
                         <label class="region-row">
-                        <span><strong>{{ dataset.label }}</strong><small>{{ dataset.regionCode }} · {{ dataset.level === 'test' ? i18n.t('Test region') : i18n.t('Federal state') }}</small></span>
-                        <mat-slide-toggle [checked]="isDatasetEnabled(dataset.id)"
-                          [disabled]="!!countryDataset(group.datasets) && isDatasetEnabled(countryDataset(group.datasets)!.id)"
-                          (change)="toggleDataset(dataset.id, $event.checked)"
-                          [attr.aria-label]="i18n.t('Enable {{name}}', { name: dataset.label })"></mat-slide-toggle>
+                          <span><strong>{{ dataset.label }}</strong><small>{{ dataset.regionCode }} · {{ dataset.level === 'test' ? i18n.t('Test region') : i18n.t('Federal state') }}</small></span>
+                          <mat-slide-toggle [checked]="isDatasetEnabled(dataset.id)"
+                            [disabled]="!!countryDataset(group.datasets) && isDatasetEnabled(countryDataset(group.datasets)!.id)"
+                            (change)="toggleDataset(dataset.id, $event.checked)"
+                            [attr.aria-label]="i18n.t('Enable {{name}}', { name: dataset.label })"></mat-slide-toggle>
                         </label>
                       }
+                    } @empty {
+                      <div class="empty-state"><mat-icon>map</mat-icon>{{ i18n.t('No subdivisions are currently available.') }}</div>
                     }
                   </div>
-                </section>
-              } @empty {
-                <div class="empty-state"><mat-icon>location_off</mat-icon>{{ i18n.t('No importable regions are currently available.') }}</div>
+                </div>
               }
               @if (enabledDatasets().size === 0) {
                 <div class="validation-hint"><mat-icon>warning</mat-icon>{{ i18n.t('Select at least one region.') }}</div>

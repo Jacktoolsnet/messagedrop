@@ -470,5 +470,11 @@
   "Continent": "Continent",
   "Test region": "Test region",
   "Federal state": "Federal state",
-  "Europe": "Europe"
+  "Europe": "Europe",
+  "Continents": "Continents",
+  "Select a continent": "Select a continent",
+  "Countries": "Countries",
+  "Enable countries and optionally choose a subdivision": "Enable countries and optionally choose a subdivision",
+  "Federal states and test regions": "Federal states and test regions",
+  "No subdivisions are currently available.": "No subdivisions are currently available."
 }

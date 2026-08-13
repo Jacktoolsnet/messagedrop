@@ -51,18 +51,31 @@ class ImportJobManager {
     if (!selected.length || selected.some((value) => !categoryNames().includes(value))) {
       throw Object.assign(new Error('invalid_import_categories'), { status: 400 });
     }
-    const selectedSubcategories = Object.fromEntries(selected
-      .filter((category) => Object.hasOwn(subcategories || {}, category))
-      .map((category) => [category, [...new Set(subcategories[category])]]));
+    const selectedSubcategories = Object.fromEntries(selected.map((category) => [
+      category,
+      Object.hasOwn(subcategories || {}, category)
+        ? [...new Set(subcategories[category])]
+        : subcategoryNames(category)
+    ]));
     if (Object.entries(selectedSubcategories).some(([category, values]) =>
       values.some((value) => !subcategoryNames(category).includes(value)))) {
       throw Object.assign(new Error('invalid_import_subcategories'), { status: 400 });
     }
+    const importCategories = selected.filter((category) => selectedSubcategories[category].length > 0);
+    if (!importCategories.length) {
+      throw Object.assign(new Error('no_import_subcategories_selected'), { status: 400 });
+    }
+    const importSubcategories = Object.fromEntries(importCategories
+      .map((category) => [category, selectedSubcategories[category]]));
     const active = await callbackResult((callback) => table.findActiveJob(this.database.db, datasetId, callback));
     if (active) return { job: active, created: false };
     const jobId = randomUUID();
     await callbackResult((callback) => table.createJob(this.database.db, {
-      id: jobId, datasetId, requestedConfig: { categories: selected, subcategories: selectedSubcategories, refresh: Boolean(refresh) }
+      id: jobId, datasetId, requestedConfig: {
+        categories: importCategories,
+        subcategories: importSubcategories,
+        refresh: Boolean(refresh)
+      }
     }, callback));
     void this.launchNext();
     return { job: await this.get(jobId), created: true };

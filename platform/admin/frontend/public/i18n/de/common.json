@@ -1851,5 +1851,11 @@
   "Continent": "Kontinent",
   "Test region": "Testregion",
   "Federal state": "Bundesland",
-  "Europe": "Europa"
+  "Europe": "Europa",
+  "Continents": "Kontinente",
+  "Select a continent": "Wähle einen Kontinent aus",
+  "Countries": "Länder",
+  "Enable countries and optionally choose a subdivision": "Aktiviere Länder und wähle bei Bedarf eine Unterregion aus",
+  "Federal states and test regions": "Bundesländer und Testregionen",
+  "No subdivisions are currently available.": "Momentan sind keine Unterregionen verfügbar."
 }

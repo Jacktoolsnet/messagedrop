@@ -44,6 +44,7 @@ export class OverpassImportSettingsComponent {
   readonly selectedSubcategories = signal<Record<string, string[]>>({});
   readonly selectedCategory = signal<string | null>(null);
   readonly selectedContinent = signal('EU');
+  readonly selectedCountry = signal<string | null>('DE');
   readonly importsEnabled = signal(false);
   readonly scheduleType = signal<'daily' | 'weekly'>('weekly');
   readonly weekday = signal(0);
@@ -74,6 +75,8 @@ export class OverpassImportSettingsComponent {
   readonly continents = computed(() => [...new Map((this.catalog()?.datasets ?? [])
     .map((dataset) => [dataset.continentCode, dataset.continentLabel])).entries()]
     .map(([code, label]) => ({ code, label })));
+  readonly selectedCountryGroup = computed(() => this.countryGroups()
+    .find((group) => group.countryCode === this.selectedCountry()) ?? null);
   readonly hasChanges = computed(() => {
     const settings = this.settings();
     if (!settings) return false;
@@ -124,6 +127,16 @@ export class OverpassImportSettingsComponent {
   countryLabel(countryCode: string): string {
     const labels: Record<string, string> = { DE: 'Germany', SE: 'Sweden', DK: 'Denmark' };
     return this.i18n.t(labels[countryCode] ?? countryCode);
+  }
+
+  selectContinent(continentCode: string): void {
+    this.selectedContinent.set(continentCode);
+    const firstCountry = this.countryGroups()[0]?.countryCode ?? null;
+    this.selectedCountry.set(firstCountry);
+  }
+
+  selectCountry(countryCode: string): void {
+    this.selectedCountry.set(countryCode);
   }
 
   countryDataset(datasets: OverpassImportCatalog['datasets']): OverpassImportCatalog['datasets'][number] | null {

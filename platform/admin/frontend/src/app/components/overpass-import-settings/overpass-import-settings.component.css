@@ -84,6 +84,18 @@ mat-toolbar {
 .selection-row:hover { transform: translateY(-1px); border-color: rgba(5, 165, 29, .35); }
 .selection-row.selected { background: rgba(5, 165, 29, .08); border-color: rgba(5, 165, 29, .42); }
 
+.region-selection-button {
+  width: 100%;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+.region-selection-button > mat-icon:first-child { color: #2563eb; }
+.region-selection-button > span { flex: 1; display: grid; gap: .16rem; }
+.region-selection-button small { color: var(--muted); }
+.radio-indicator { color: var(--primary); }
+
 .selection-copy {
   flex: 1 1 auto;
   min-width: 0;
@@ -144,6 +156,9 @@ mat-toolbar {
 .region-row > span, .setting-toggle > span { display: grid; gap: .2rem; }
 .region-row small, .setting-toggle small { color: var(--muted); }
 .validation-hint { display: flex; align-items: center; gap: .5rem; color: #b45309; padding: .7rem; }
+.subdivision-section { display: grid; gap: .65rem; margin-top: .35rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+.subdivision-heading > div { display: grid; gap: .15rem; }
+.subdivision-heading small { color: var(--muted); }
 
 .update-settings { display: grid; gap: 1rem; }
 .schedule-grid { display: grid; grid-template-columns: repeat(3, minmax(140px, 1fr)); gap: .75rem; transition: opacity .18s ease; }
