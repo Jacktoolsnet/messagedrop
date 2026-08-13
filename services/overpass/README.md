@@ -93,10 +93,14 @@ dataset completely covers its bounding box. An empty local result is final and
 does not trigger an upstream request. Outside imported regions, the existing
 cached Overpass fallback remains available.
 
-The repeatable Wolfenbüttel import downloads the current Niedersachsen PBF
+The repeatable Wolfenbüttel import creates a durable import job, downloads the current Niedersachsen PBF
 extract from Geofabrik, cuts out the wider Wolfenbüttel area, filters the tags
-defined in `categories.js`, converts all supported nodes, ways and relations,
-and atomically replaces that dataset in PostgreSQL.
+defined in `categories.js`, and converts all supported nodes, ways and
+relations. POIs are first written to a new immutable dataset version. Only
+after that version is complete does a short transaction switch the active
+version pointer. Nearby requests therefore keep using the previous complete
+version throughout an update and start using the new one immediately after the
+switch.
 
 Install the required Osmium command once on Debian/Ubuntu:
 
@@ -111,6 +115,14 @@ Then run from the service directory:
 npm run dataset:import:wolfenbuettel
 ```
 
+The default imports every configured main category. A subset can be selected
+without changing the program:
+
+```bash
+npm run dataset:import:wolfenbuettel -- \
+  --categories accommodation,tourism,amenities
+```
+
 The initial Geofabrik download is several hundred megabytes. It is retained in
 `docs/overpass/datasets/` and reused on later imports. To download a fresh PBF:
 
@@ -119,9 +131,25 @@ npm run dataset:import:wolfenbuettel -- --refresh
 ```
 
 Generated PBF and GeoJSON sequence files are ignored by Git. The database
-tables `tableOverpassDataset` and `tableOverpassPoi` are created automatically
-both by the service and by the import command. No PostGIS extension is needed;
-bounded latitude/longitude indexes are sufficient for the current POI queries.
+tables `tableOverpassDataset`, `tableOverpassDatasetVersion`,
+`tableOverpassPoiVersion`, and `tableOverpassImportJob` are created
+automatically both by the service and by the import command. A previously
+imported, unversioned dataset is migrated to an active legacy version without
+requiring another download. No PostGIS extension is needed; bounded
+latitude/longitude indexes are sufficient for the current POI queries.
+
+Successful imports delete retired versions after the atomic switch by default.
+For a temporary database rollback window, retain a number of old versions with
+`OVERPASS_DATASET_RETIRED_VERSIONS` or `--keep-versions`:
+
+```bash
+npm run dataset:import:wolfenbuettel -- --keep-versions 1
+```
+
+Failed jobs keep the active version unchanged and store their error in
+`tableOverpassImportJob`. A partial or failed import can therefore never become
+visible to nearby requests. The job table also prevents two active imports for
+the same dataset.
 
 After a successful import, restart the service. `GET /overpass/health` then
 reports `mode: "local"`, and local nearby responses contain `cache: "local"`

@@ -5,6 +5,7 @@ const fsPromises = require('node:fs/promises');
 const path = require('node:path');
 const readline = require('node:readline');
 const { spawn } = require('node:child_process');
+const { randomUUID } = require('node:crypto');
 require('dotenv').config({ path: path.resolve(__dirname, '../../../.env'), quiet: true });
 const Database = require('../db/database');
 const tableOverpassPoi = require('../db/tableOverpassPoi');
@@ -26,7 +27,49 @@ async function main() {
   if (!dataset) throw new Error(`Unknown dataset: ${options.dataset}`);
   await requireCommand('curl');
   await requireCommand('osmium', 'Install it first with: sudo apt install osmium-tool');
+  const database = new Database();
+  await database.init(console);
+  const jobId = randomUUID();
+  const versionId = randomUUID();
+  await callbackResult((callback) => tableOverpassPoi.createJob(database.db, {
+    id: jobId,
+    datasetId: dataset.id,
+    requestedConfig: { categories: options.categories, refresh: options.refresh }
+  }, callback));
+  await callbackResult((callback) => tableOverpassPoi.startJob(database.db, jobId, callback));
+  process.stdout.write(`Started import job ${jobId}.\n`);
+  try {
+    const updateProgress = (stage, progress) => callbackResult((callback) =>
+      tableOverpassPoi.updateJobProgress(database.db, jobId, stage, progress, callback));
+    const pois = await prepareDataset(dataset, options, updateProgress);
+    await updateProgress('importing', 85);
+    await tableOverpassPoi.publishVersion(database.db, {
+      jobId,
+      versionId,
+      dataset: { ...dataset, sourceTimestamp: null },
+      categories: options.categories,
+      pois
+    });
+    process.stdout.write(`Activated version ${versionId} with ${pois.length} local POIs for ${dataset.id}.\n`);
+    try {
+      await callbackResult((callback) => tableOverpassPoi.cleanupRetiredVersions(
+        database.db,
+        dataset.id,
+        options.keepVersions,
+        callback
+      ));
+    } catch (cleanupError) {
+      process.stderr.write(`Version cleanup will be retried later: ${cleanupError.message}\n`);
+    }
+  } catch (error) {
+    await callbackResult((callback) => tableOverpassPoi.failJob(database.db, jobId, error.message, callback));
+    throw error;
+  } finally {
+    database.close();
+  }
+}
 
+async function prepareDataset(dataset, options, updateProgress = async () => {}) {
   const outputDirectory = path.resolve(__dirname, '../../../docs/overpass/datasets');
   await fsPromises.mkdir(outputDirectory, { recursive: true });
   const sourcePath = path.join(outputDirectory, dataset.sourceFile);
@@ -43,6 +86,7 @@ async function main() {
     ]);
   }
   if (!await exists(sourcePath)) {
+    await updateProgress('downloading', 5);
     await command('curl', [
       '--fail', '--location', '--retry', '3', '--continue-at', '-',
       '--output', partialSourcePath, dataset.sourceUrl
@@ -53,18 +97,25 @@ async function main() {
   }
 
   const bounds = dataset.bounds;
+  await updateProgress('extracting', 35);
   await command('osmium', [
     'extract', '--overwrite',
     '--bbox', `${bounds.west},${bounds.south},${bounds.east},${bounds.north}`,
     '--output', extractPath,
     sourcePath
   ]);
-  await fsPromises.writeFile(expressionsPath, `${filterExpressions().join('\n')}\n`, { mode: 0o600 });
+  await fsPromises.writeFile(
+    expressionsPath,
+    `${filterExpressions(options.categories).join('\n')}\n`,
+    { mode: 0o600 }
+  );
+  await updateProgress('filtering', 55);
   await command('osmium', [
     'tags-filter', '--overwrite', '--expressions', expressionsPath,
     '--output', filteredPath,
     extractPath
   ]);
+  await updateProgress('converting', 70);
   await command('osmium', [
     'export', '--overwrite', '--output-format', 'geojsonseq',
     '--attributes', 'type,id', '--format-option', 'print_record_separator=false',
@@ -72,23 +123,13 @@ async function main() {
     filteredPath
   ]);
 
-  const pois = await readPois(geoJsonPath);
+  await updateProgress('normalizing', 80);
+  const pois = await readPois(geoJsonPath, options.categories);
   if (!pois.length) throw new Error('The filtered dataset contains no supported POIs');
-  const database = new Database();
-  await database.init(console);
-  try {
-    await tableOverpassPoi.replaceDataset(database.db, {
-      ...dataset,
-      sourceTimestamp: null
-    }, pois);
-  } finally {
-    database.close();
-  }
-  process.stdout.write(`Imported ${pois.length} local POIs for ${dataset.id}.\n`);
+  return pois;
 }
 
-async function readPois(inputPath) {
-  const categories = categoryNames();
+async function readPois(inputPath, categories = categoryNames()) {
   const subcategories = Object.fromEntries(categories.map((category) => [category, subcategoryNames(category)]));
   const unique = new Map();
   const lines = readline.createInterface({
@@ -153,9 +194,10 @@ function collectCoordinates(value, points) {
   }
 }
 
-function filterExpressions() {
+function filterExpressions(categories = categoryNames()) {
   const expressions = new Set();
-  for (const definitions of Object.values(CATEGORY_DEFINITIONS)) {
+  for (const category of categories) {
+    const definitions = CATEGORY_DEFINITIONS[category] || [];
     for (const definition of definitions) {
       for (const value of definition.values) expressions.add(`nwr/${definition.key}=${value}`);
     }
@@ -164,13 +206,35 @@ function filterExpressions() {
 }
 
 function parseArguments(args) {
-  const options = { dataset: 'wolfenbuettel', refresh: false };
+  const options = {
+    dataset: 'wolfenbuettel',
+    refresh: false,
+    categories: categoryNames(),
+    keepVersions: Number(process.env.OVERPASS_DATASET_RETIRED_VERSIONS || 0)
+  };
   for (let index = 0; index < args.length; index += 1) {
     if (args[index] === '--refresh') options.refresh = true;
     else if (args[index] === '--dataset' && args[index + 1]) options.dataset = args[++index];
+    else if (args[index] === '--categories' && args[index + 1]) {
+      options.categories = [...new Set(args[++index].split(',').map((value) => value.trim()).filter(Boolean))];
+    }
+    else if (args[index] === '--keep-versions' && args[index + 1]) options.keepVersions = Number(args[++index]);
     else throw new Error(`Unknown argument: ${args[index]}`);
   }
+  if (!options.categories.length || options.categories.some((category) => !categoryNames().includes(category))) {
+    throw new Error('Categories must contain supported comma-separated category names');
+  }
+  if (!Number.isInteger(options.keepVersions) || options.keepVersions < 0) {
+    throw new Error('keep-versions must be a non-negative integer');
+  }
   return options;
+}
+
+function callbackResult(register) {
+  return new Promise((resolve, reject) => register((error, value) => {
+    if (error) reject(error);
+    else resolve(value);
+  }));
 }
 
 async function requireCommand(name, hint = '') {

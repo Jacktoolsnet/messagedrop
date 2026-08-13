@@ -37,7 +37,20 @@ test('uses the Overpass-compatible bounding-box centre for polygon features', ()
 });
 
 test('parses the repeatable Wolfenbuettel import options', () => {
-  assert.deepEqual(parseArguments([]), { dataset: 'wolfenbuettel', refresh: false });
-  assert.deepEqual(parseArguments(['--refresh']), { dataset: 'wolfenbuettel', refresh: true });
+  const defaults = parseArguments([]);
+  assert.equal(defaults.dataset, 'wolfenbuettel');
+  assert.equal(defaults.refresh, false);
+  assert.equal(defaults.keepVersions, 0);
+  assert.ok(defaults.categories.includes('accommodation'));
+  assert.deepEqual(
+    parseArguments(['--refresh', '--categories', 'accommodation,amenities', '--keep-versions', '1']),
+    {
+      dataset: 'wolfenbuettel',
+      refresh: true,
+      categories: ['accommodation', 'amenities'],
+      keepVersions: 1
+    }
+  );
   assert.throws(() => parseArguments(['--unknown']), /Unknown argument/u);
+  assert.throws(() => parseArguments(['--categories', 'invalid']), /Categories/u);
 });

@@ -15,14 +15,14 @@ class LocalPoiStore {
     if (!this.enabled) return undefined;
     try {
       const dataset = await callbackResult((callback) =>
-        tableOverpassPoi.coveringDataset(this.database.db, request.bounds, callback));
+        tableOverpassPoi.coveringDataset(this.database.db, request.bounds, request.categories, callback));
       if (!dataset) {
         this.metrics.misses += 1;
         return undefined;
       }
       const rows = await callbackResult((callback) => tableOverpassPoi.nearby(
         this.database.db,
-        dataset.datasetId,
+        dataset.versionId,
         request.bounds,
         request.subcategories,
         request.limit,
@@ -42,6 +42,7 @@ class LocalPoiStore {
         source: {
           type: 'local-dataset',
           datasetId: dataset.datasetId,
+          versionId: dataset.versionId,
           timestamp: dataset.sourceTimestamp || null,
           importedAt: dataset.importedAt,
           url: dataset.sourceUrl

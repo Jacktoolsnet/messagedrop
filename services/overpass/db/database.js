@@ -31,7 +31,15 @@ const ROW_KEY_MAP = new Map(Object.entries({
   sourcetimestamp: 'sourceTimestamp',
   importedat: 'importedAt',
   poicount: 'poiCount',
-  datasetcount: 'datasetCount'
+  datasetcount: 'datasetCount',
+  versionid: 'versionId',
+  jobid: 'jobId',
+  requestedconfig: 'requestedConfig',
+  createdat: 'createdAt',
+  startedat: 'startedAt',
+  completedat: 'completedAt',
+  activatedat: 'activatedAt',
+  activeversionid: 'activeVersionId'
 }));
 
 function normalizeRow(row) {

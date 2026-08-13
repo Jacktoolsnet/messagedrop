@@ -15,7 +15,7 @@ test('serves a covered viewport from the local dataset, including empty results'
   const database = { db: {
     get(_sql, _params, callback) {
       callback(null, {
-        datasetId: 'wolfenbuettel', sourceUrl: 'https://example.test/data.pbf',
+        datasetId: 'wolfenbuettel', versionId: 'version-2', sourceUrl: 'https://example.test/data.pbf',
         importedAt: '2026-08-13T12:00:00Z', sourceTimestamp: null
       });
     },
@@ -26,6 +26,7 @@ test('serves a covered viewport from the local dataset, including empty results'
   assert.equal(result.status, 200);
   assert.equal(result.count, 0);
   assert.equal(result.source.type, 'local-dataset');
+  assert.equal(result.source.versionId, 'version-2');
   assert.equal(store.snapshot().hits, 1);
 });
 

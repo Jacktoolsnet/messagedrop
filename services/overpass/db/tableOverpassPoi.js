@@ -1,9 +1,11 @@
 const DATASET_TABLE = 'tableOverpassDataset';
-const POI_TABLE = 'tableOverpassPoi';
+const VERSION_TABLE = 'tableOverpassDatasetVersion';
+const POI_TABLE = 'tableOverpassPoiVersion';
+const JOB_TABLE = 'tableOverpassImportJob';
 
 function init(db, callback) {
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS ${DATASET_TABLE} (
+  runStatements(db, [
+    `CREATE TABLE IF NOT EXISTS ${DATASET_TABLE} (
       datasetId TEXT PRIMARY KEY,
       sourceUrl TEXT NOT NULL,
       sourceTimestamp TIMESTAMPTZ,
@@ -13,11 +15,28 @@ function init(db, callback) {
       east DOUBLE PRECISION NOT NULL,
       importedAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
       poiCount INTEGER NOT NULL DEFAULT 0,
+      activeVersionId TEXT,
+      createdAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updatedAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
       CHECK (south < north),
       CHECK (west < east)
-    );
-    CREATE TABLE IF NOT EXISTS ${POI_TABLE} (
+    )`,
+    `ALTER TABLE ${DATASET_TABLE} ADD COLUMN activeVersionId TEXT`,
+    `ALTER TABLE ${DATASET_TABLE} ADD COLUMN createdAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP`,
+    `ALTER TABLE ${DATASET_TABLE} ADD COLUMN updatedAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP`,
+    `CREATE TABLE IF NOT EXISTS ${VERSION_TABLE} (
+      versionId TEXT PRIMARY KEY,
       datasetId TEXT NOT NULL REFERENCES ${DATASET_TABLE}(datasetId) ON DELETE CASCADE,
+      status TEXT NOT NULL CHECK (status IN ('importing', 'active', 'retired', 'failed')),
+      sourceUrl TEXT NOT NULL,
+      sourceTimestamp TIMESTAMPTZ,
+      categories JSONB NOT NULL DEFAULT '[]'::jsonb,
+      createdAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      activatedAt TIMESTAMPTZ,
+      poiCount INTEGER NOT NULL DEFAULT 0
+    )`,
+    `CREATE TABLE IF NOT EXISTS ${POI_TABLE} (
+      versionId TEXT NOT NULL REFERENCES ${VERSION_TABLE}(versionId) ON DELETE CASCADE,
       osmType TEXT NOT NULL CHECK (osmType IN ('node', 'way', 'relation')),
       osmId BIGINT NOT NULL,
       category TEXT NOT NULL,
@@ -25,36 +44,79 @@ function init(db, callback) {
       latitude DOUBLE PRECISION NOT NULL,
       longitude DOUBLE PRECISION NOT NULL,
       payload JSONB NOT NULL,
-      PRIMARY KEY (datasetId, osmType, osmId)
-    );
-    CREATE INDEX IF NOT EXISTS idx_overpass_poi_bounds
-      ON ${POI_TABLE} (latitude, longitude);
-    CREATE INDEX IF NOT EXISTS idx_overpass_poi_category_subtype
-      ON ${POI_TABLE} (category, subtype);
-  `, callback);
+      PRIMARY KEY (versionId, osmType, osmId)
+    )`,
+    `CREATE INDEX IF NOT EXISTS idx_overpass_version_dataset_status
+      ON ${VERSION_TABLE} (datasetId, status, activatedAt DESC)`,
+    `CREATE INDEX IF NOT EXISTS idx_overpass_poi_version_bounds
+      ON ${POI_TABLE} (versionId, latitude, longitude)`,
+    `CREATE INDEX IF NOT EXISTS idx_overpass_poi_version_category_subtype
+      ON ${POI_TABLE} (versionId, category, subtype)`,
+    `CREATE TABLE IF NOT EXISTS ${JOB_TABLE} (
+      jobId TEXT PRIMARY KEY,
+      datasetId TEXT NOT NULL,
+      status TEXT NOT NULL CHECK (status IN ('queued', 'running', 'succeeded', 'failed')),
+      stage TEXT NOT NULL DEFAULT 'queued',
+      progress INTEGER NOT NULL DEFAULT 0 CHECK (progress BETWEEN 0 AND 100),
+      requestedConfig JSONB NOT NULL DEFAULT '{}'::jsonb,
+      versionId TEXT,
+      error TEXT,
+      createdAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      startedAt TIMESTAMPTZ,
+      completedAt TIMESTAMPTZ
+    )`,
+    `ALTER TABLE ${JOB_TABLE} ADD COLUMN stage TEXT NOT NULL DEFAULT 'queued'`,
+    `ALTER TABLE ${JOB_TABLE} ADD COLUMN progress INTEGER NOT NULL DEFAULT 0`,
+    `CREATE INDEX IF NOT EXISTS idx_overpass_import_job_dataset_created
+      ON ${JOB_TABLE} (datasetId, createdAt DESC)`,
+    `CREATE UNIQUE INDEX IF NOT EXISTS idx_overpass_import_job_one_active
+      ON ${JOB_TABLE} (datasetId)
+      WHERE status IN ('queued', 'running')`,
+    `INSERT INTO ${VERSION_TABLE}
+      (versionId, datasetId, status, sourceUrl, sourceTimestamp, categories, createdAt, activatedAt, poiCount)
+      SELECT 'legacy:' || datasetId, datasetId, 'active', sourceUrl, sourceTimestamp,
+        '["accommodation","tourism","leisure","food_drink","amenities"]'::jsonb,
+        importedAt, importedAt, poiCount
+      FROM ${DATASET_TABLE}
+      WHERE activeVersionId IS NULL
+      ON CONFLICT (versionId) DO NOTHING`,
+    `INSERT INTO ${POI_TABLE}
+      (versionId, osmType, osmId, category, subtype, latitude, longitude, payload)
+      SELECT 'legacy:' || datasetId, osmType, osmId, category, subtype, latitude, longitude, payload
+      FROM tableOverpassPoi
+      ON CONFLICT (versionId, osmType, osmId) DO NOTHING`,
+    `UPDATE ${DATASET_TABLE}
+      SET activeVersionId = 'legacy:' || datasetId, updatedAt = CURRENT_TIMESTAMP
+      WHERE activeVersionId IS NULL`,
+    'DROP TABLE IF EXISTS tableOverpassPoi'
+  ], callback, { ignoredCodes: new Set(['42701', '42P01']) });
 }
 
-function coveringDataset(db, bounds, callback) {
+function coveringDataset(db, bounds, categories, callback) {
   db.get(`
-    SELECT datasetId, sourceUrl, sourceTimestamp, south, west, north, east, importedAt, poiCount
-    FROM ${DATASET_TABLE}
-    WHERE south <= ? AND west <= ? AND north >= ? AND east >= ?
-    ORDER BY ((north - south) * (east - west)) ASC, importedAt DESC
+    SELECT d.datasetId, d.south, d.west, d.north, d.east,
+      v.versionId, v.sourceUrl, v.sourceTimestamp, v.activatedAt AS importedAt, v.poiCount
+    FROM ${DATASET_TABLE} d
+    JOIN ${VERSION_TABLE} v ON v.versionId = d.activeVersionId AND v.status = 'active'
+    WHERE d.south <= ? AND d.west <= ? AND d.north >= ? AND d.east >= ?
+      AND v.categories @> ?::jsonb
+    ORDER BY ((d.north - d.south) * (d.east - d.west)) ASC, v.activatedAt DESC
     LIMIT 1
-  `, [bounds.south, bounds.west, bounds.north, bounds.east], callback);
+  `, [bounds.south, bounds.west, bounds.north, bounds.east, JSON.stringify(categories)], callback);
 }
 
 function status(db, callback) {
   db.get(`
-    SELECT COUNT(*)::integer AS datasetCount, COALESCE(SUM(poiCount), 0)::integer AS poiCount,
-      MAX(importedAt) AS importedAt
-    FROM ${DATASET_TABLE}
+    SELECT COUNT(*)::integer AS datasetCount, COALESCE(SUM(v.poiCount), 0)::integer AS poiCount,
+      MAX(v.activatedAt) AS importedAt
+    FROM ${DATASET_TABLE} d
+    JOIN ${VERSION_TABLE} v ON v.versionId = d.activeVersionId AND v.status = 'active'
   `, [], callback);
 }
 
-function nearby(db, datasetId, bounds, selections, limit, callback) {
+function nearby(db, versionId, bounds, selections, limit, callback) {
   const clauses = [];
-  const params = [datasetId, bounds.south, bounds.north, bounds.west, bounds.east];
+  const params = [versionId, bounds.south, bounds.north, bounds.west, bounds.east];
   for (const [category, subtypes] of Object.entries(selections)) {
     clauses.push('(category = ? AND subtype = ANY(?::text[]))');
     params.push(category, subtypes);
@@ -63,7 +125,7 @@ function nearby(db, datasetId, bounds, selections, limit, callback) {
   db.all(`
     SELECT payload
     FROM ${POI_TABLE}
-    WHERE datasetId = ?
+    WHERE versionId = ?
       AND latitude BETWEEN ? AND ?
       AND longitude BETWEEN ? AND ?
       AND (${clauses.join(' OR ')})
@@ -72,34 +134,121 @@ function nearby(db, datasetId, bounds, selections, limit, callback) {
   `, params, callback);
 }
 
-async function replaceDataset(db, dataset, pois) {
+function createJob(db, job, callback) {
+  db.run(`
+    INSERT INTO ${JOB_TABLE} (jobId, datasetId, status, requestedConfig)
+    VALUES (?, ?, 'queued', ?::jsonb)
+  `, [job.id, job.datasetId, JSON.stringify(job.requestedConfig || {})], callback);
+}
+
+function startJob(db, jobId, callback) {
+  db.run(`
+    UPDATE ${JOB_TABLE}
+    SET status = 'running', stage = 'starting', progress = 1,
+      startedAt = CURRENT_TIMESTAMP, error = NULL
+    WHERE jobId = ? AND status = 'queued'
+  `, [jobId], callback);
+}
+
+function updateJobProgress(db, jobId, stage, progress, callback) {
+  const normalizedProgress = Math.max(0, Math.min(99, Math.round(Number(progress) || 0)));
+  db.run(`
+    UPDATE ${JOB_TABLE}
+    SET stage = ?, progress = ?
+    WHERE jobId = ? AND status = 'running'
+  `, [String(stage || 'running').slice(0, 100), normalizedProgress, jobId], callback);
+}
+
+function failJob(db, jobId, error, callback) {
+  db.run(`
+    UPDATE ${JOB_TABLE}
+    SET status = 'failed', stage = 'failed', error = ?, completedAt = CURRENT_TIMESTAMP
+    WHERE jobId = ? AND status IN ('queued', 'running')
+  `, [String(error || 'Import failed').slice(0, 4000), jobId], callback);
+}
+
+function getJob(db, jobId, callback) {
+  db.get(`SELECT * FROM ${JOB_TABLE} WHERE jobId = ?`, [jobId], callback);
+}
+
+async function publishVersion(db, { jobId, versionId, dataset, categories, pois }) {
   await db.transaction(async (transaction) => {
-    await run(transaction, `DELETE FROM ${DATASET_TABLE} WHERE datasetId = ?`, [dataset.id]);
     await run(transaction, `
       INSERT INTO ${DATASET_TABLE}
-        (datasetId, sourceUrl, sourceTimestamp, south, west, north, east, importedAt, poiCount)
-      VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)
+        (datasetId, sourceUrl, sourceTimestamp, south, west, north, east, importedAt, poiCount, createdAt, updatedAt)
+      VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+      ON CONFLICT (datasetId) DO UPDATE SET
+        sourceUrl = EXCLUDED.sourceUrl,
+        sourceTimestamp = EXCLUDED.sourceTimestamp,
+        south = EXCLUDED.south,
+        west = EXCLUDED.west,
+        north = EXCLUDED.north,
+        east = EXCLUDED.east,
+        updatedAt = CURRENT_TIMESTAMP
     `, [
-      dataset.id,
-      dataset.sourceUrl,
-      dataset.sourceTimestamp || null,
-      dataset.bounds.south,
-      dataset.bounds.west,
-      dataset.bounds.north,
-      dataset.bounds.east,
-      pois.length
+      dataset.id, dataset.sourceUrl, dataset.sourceTimestamp || null,
+      dataset.bounds.south, dataset.bounds.west, dataset.bounds.north, dataset.bounds.east
     ]);
+    await run(transaction, `
+      INSERT INTO ${VERSION_TABLE}
+        (versionId, datasetId, status, sourceUrl, sourceTimestamp, categories, poiCount)
+      VALUES (?, ?, 'importing', ?, ?, ?::jsonb, 0)
+    `, [versionId, dataset.id, dataset.sourceUrl, dataset.sourceTimestamp || null, JSON.stringify(categories)]);
     for (const poi of pois) {
       await run(transaction, `
         INSERT INTO ${POI_TABLE}
-          (datasetId, osmType, osmId, category, subtype, latitude, longitude, payload)
+          (versionId, osmType, osmId, category, subtype, latitude, longitude, payload)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?::jsonb)
       `, [
-        dataset.id, poi.osmType, poi.osmId, poi.category, poi.subtype,
+        versionId, poi.osmType, poi.osmId, poi.category, poi.subtype,
         poi.latitude, poi.longitude, JSON.stringify(poi)
       ]);
     }
+    await run(transaction, `
+      UPDATE ${VERSION_TABLE}
+      SET status = 'retired'
+      WHERE datasetId = ? AND status = 'active'
+    `, [dataset.id]);
+    await run(transaction, `
+      UPDATE ${VERSION_TABLE}
+      SET status = 'active', activatedAt = CURRENT_TIMESTAMP, poiCount = ?
+      WHERE versionId = ? AND status = 'importing'
+    `, [pois.length, versionId]);
+    await run(transaction, `
+      UPDATE ${DATASET_TABLE}
+      SET activeVersionId = ?, importedAt = CURRENT_TIMESTAMP, poiCount = ?, updatedAt = CURRENT_TIMESTAMP
+      WHERE datasetId = ?
+    `, [versionId, pois.length, dataset.id]);
+    await run(transaction, `
+      UPDATE ${JOB_TABLE}
+      SET status = 'succeeded', stage = 'completed', progress = 100,
+        versionId = ?, completedAt = CURRENT_TIMESTAMP
+      WHERE jobId = ? AND status = 'running'
+    `, [versionId, jobId]);
   });
+}
+
+function cleanupRetiredVersions(db, datasetId, keepCount, callback) {
+  const keep = Math.max(0, Number(keepCount) || 0);
+  db.run(`
+    DELETE FROM ${VERSION_TABLE}
+    WHERE versionId IN (
+      SELECT versionId FROM ${VERSION_TABLE}
+      WHERE datasetId = ? AND status = 'retired'
+      ORDER BY activatedAt DESC NULLS LAST, createdAt DESC
+      OFFSET ?
+    )
+  `, [datasetId, keep], callback);
+}
+
+function runStatements(db, statements, callback, { ignoredCodes = new Set() } = {}) {
+  let index = 0;
+  const next = (error) => {
+    if (error && !ignoredCodes.has(error.code)) return callback?.(error);
+    if (index >= statements.length) return callback?.(null);
+    db.run(statements[index++], [], next);
+  };
+  next();
 }
 
 function run(db, sql, params) {
@@ -109,4 +258,16 @@ function run(db, sql, params) {
   }));
 }
 
-module.exports = { init, status, coveringDataset, nearby, replaceDataset };
+module.exports = {
+  init,
+  status,
+  coveringDataset,
+  nearby,
+  createJob,
+  startJob,
+  updateJobProgress,
+  failJob,
+  getJob,
+  publishVersion,
+  cleanupRetiredVersions
+};
