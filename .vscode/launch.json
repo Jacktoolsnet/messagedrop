@@ -12,6 +12,13 @@
             "cwd": "${workspaceFolder}"
         },
         {
+            "name": "TripGo-Datenbank (DBeaver)",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "dbeaver -reuseWorkspace",
+            "cwd": "${workspaceFolder}"
+        },
+        {
             "name": "Admin-Service",
             "program": "${workspaceFolder}/platform/admin/backend/app.js",
             "request": "launch",
