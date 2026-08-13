@@ -14,11 +14,22 @@ class ImportJobManager {
     this.database = database;
     this.logger = logger;
     this.children = new Map();
+    this.launching = false;
+    void this.recover();
+  }
+
+  async recover() {
+    try {
+      await callbackResult((callback) => table.failInterruptedJobs(this.database.db, callback));
+      await this.launchNext();
+    } catch (error) {
+      this.logger.error('Could not recover Overpass import queue', { error: error.message });
+    }
   }
 
   catalog() {
-    return Object.values(DATASETS).map(({ id, label, countryCode, regionCode, bounds, sourceUrl }) => ({
-      id, label, countryCode, regionCode, bounds, sourceUrl
+    return Object.values(DATASETS).map(({ id, label, continentCode, continentLabel, countryCode, countryLabel, regionCode, level, bounds, sourceUrl }) => ({
+      id, label, continentCode, continentLabel, countryCode, countryLabel, regionCode, level, bounds, sourceUrl
     }));
   }
 
@@ -38,27 +49,50 @@ class ImportJobManager {
     }
     const active = await callbackResult((callback) => table.findActiveJob(this.database.db, datasetId, callback));
     if (active) return { job: active, created: false };
-
     const jobId = randomUUID();
     await callbackResult((callback) => table.createJob(this.database.db, {
       id: jobId, datasetId, requestedConfig: { categories: selected, subcategories: selectedSubcategories, refresh: Boolean(refresh) }
     }, callback));
+    void this.launchNext();
+    return { job: await this.get(jobId), created: true };
+  }
+
+  async launchNext() {
+    if (this.launching || this.children.size) return;
+    this.launching = true;
+    try {
+      const running = await callbackResult((callback) => table.findRunningJob(this.database.db, callback));
+      if (running) return;
+      const job = await callbackResult((callback) => table.findQueuedJob(this.database.db, callback));
+      if (!job) return;
+      const config = typeof job.requestedConfig === 'string' ? JSON.parse(job.requestedConfig) : job.requestedConfig;
+      this.launch(job.jobId, job.datasetId, config);
+    } catch (error) {
+      this.logger.error('Could not launch queued Overpass import', { error: error.message });
+    } finally {
+      this.launching = false;
+    }
+  }
+
+  launch(jobId, datasetId, config) {
     const args = [
       path.join(__dirname, 'scripts', 'import-local-dataset.js'),
-      '--dataset', datasetId, '--categories', selected.join(','), '--job-id', jobId
+      '--dataset', datasetId, '--categories', config.categories.join(','), '--job-id', jobId
     ];
-    args.push('--subcategories-json', JSON.stringify(selectedSubcategories));
-    if (refresh) args.push('--refresh');
+    args.push('--subcategories-json', JSON.stringify(config.subcategories || {}));
+    if (config.refresh) args.push('--refresh');
     const child = spawn(process.execPath, args, { cwd: __dirname, env: process.env, stdio: ['ignore', 'pipe', 'pipe'] });
     this.children.set(jobId, child);
     child.stdout.on('data', (data) => this.logger.info('Overpass import', { jobId, output: String(data).trim() }));
     child.stderr.on('data', (data) => this.logger.warn('Overpass import', { jobId, output: String(data).trim() }));
-    child.once('error', (error) => void this.fail(jobId, error));
+    child.once('error', (error) => void this.fail(jobId, error).finally(() => this.launchNext()));
     child.once('exit', (code, signal) => {
       this.children.delete(jobId);
-      if (code !== 0) void this.fail(jobId, new Error(`Import process failed (${signal || `exit ${code}`})`));
+      const completion = code !== 0
+        ? this.fail(jobId, new Error(`Import process failed (${signal || `exit ${code}`})`))
+        : Promise.resolve();
+      void completion.finally(() => this.launchNext());
     });
-    return { job: await this.get(jobId), created: true };
   }
 
   get(jobId) {

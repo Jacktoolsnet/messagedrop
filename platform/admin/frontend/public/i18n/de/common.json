@@ -1847,5 +1847,9 @@
   "Thursday": "Donnerstag",
   "Friday": "Freitag",
   "Saturday": "Samstag",
-  "Database size": "Datenbankgröße"
+  "Database size": "Datenbankgröße",
+  "Continent": "Kontinent",
+  "Test region": "Testregion",
+  "Federal state": "Bundesland",
+  "Europe": "Europa"
 }

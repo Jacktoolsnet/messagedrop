@@ -124,10 +124,12 @@ mat-toolbar {
 .category-hint { margin-bottom: .8rem; padding: .65rem; border-radius: 12px; background: rgba(59, 130, 246, .08); }
 
 .country-list, .country-group { display: grid; gap: .8rem; }
+.continent-select { width: min(100%, 360px); }
 .country-group { padding: 1rem; border: 1px solid rgba(148, 163, 184, .22); border-radius: 18px; background: rgba(248, 250, 252, .72); }
 .country-group header { display: flex; align-items: center; gap: .55rem; }
 .country-group header mat-icon { color: #2563eb; }
 .country-group header span { margin-left: auto; color: var(--muted); font-size: .8rem; }
+.country-group header mat-slide-toggle { margin-left: .35rem; }
 .region-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem; }
 .region-row, .setting-toggle {
   display: flex;

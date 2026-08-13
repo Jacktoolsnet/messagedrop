@@ -104,17 +104,31 @@
               <mat-card-subtitle>{{ i18n.t('Select the countries and regions whose geodata should be maintained.') }}</mat-card-subtitle>
             </mat-card-header>
             <mat-card-content class="country-list">
+              <mat-form-field appearance="outline" class="continent-select">
+                <mat-label>{{ i18n.t('Continent') }}</mat-label>
+                <mat-select [value]="selectedContinent()" (selectionChange)="selectedContinent.set($event.value)">
+                  @for (continent of continents(); track continent.code) { <mat-option [value]="continent.code">{{ continent.label }}</mat-option> }
+                </mat-select>
+              </mat-form-field>
               @for (group of countryGroups(); track group.countryCode) {
                 <section class="country-group">
-                  <header><mat-icon>flag</mat-icon><strong>{{ countryLabel(group.countryCode) }}</strong><span>{{ group.countryCode }}</span></header>
+                  <header>
+                    <mat-icon>flag</mat-icon><strong>{{ countryLabel(group.countryCode) }}</strong><span>{{ group.countryCode }}</span>
+                    @if (countryDataset(group.datasets); as country) {
+                      <mat-slide-toggle [checked]="isDatasetEnabled(country.id)" (change)="toggleCountry(group.datasets, $event.checked)"></mat-slide-toggle>
+                    }
+                  </header>
                   <div class="region-grid">
                     @for (dataset of group.datasets; track dataset.id) {
-                      <label class="region-row">
-                        <span><strong>{{ dataset.label }}</strong><small>{{ dataset.regionCode }}</small></span>
+                      @if (dataset.level !== 'country') {
+                        <label class="region-row">
+                        <span><strong>{{ dataset.label }}</strong><small>{{ dataset.regionCode }} · {{ dataset.level === 'test' ? i18n.t('Test region') : i18n.t('Federal state') }}</small></span>
                         <mat-slide-toggle [checked]="isDatasetEnabled(dataset.id)"
+                          [disabled]="!!countryDataset(group.datasets) && isDatasetEnabled(countryDataset(group.datasets)!.id)"
                           (change)="toggleDataset(dataset.id, $event.checked)"
                           [attr.aria-label]="i18n.t('Enable {{name}}', { name: dataset.label })"></mat-slide-toggle>
-                      </label>
+                        </label>
+                      }
                     }
                   </div>
                 </section>

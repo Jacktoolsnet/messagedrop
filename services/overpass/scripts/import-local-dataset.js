@@ -13,11 +13,29 @@ const { CATEGORY_DEFINITIONS, categoryNames, subcategoryNames } = require('../ca
 const { normalizeElement } = require('../normalizer');
 
 const DATASETS = Object.freeze({
+  germany: Object.freeze({
+    id: 'germany',
+    label: 'Deutschland',
+    continentCode: 'EU',
+    continentLabel: 'Europa',
+    countryCode: 'DE',
+    countryLabel: 'Deutschland',
+    regionCode: null,
+    level: 'country',
+    sourceUrl: 'https://download.geofabrik.de/europe/germany-latest.osm.pbf',
+    sourceFile: 'germany-latest.osm.pbf',
+    bounds: Object.freeze({ south: 47.2701, west: 5.8663, north: 55.0992, east: 15.0419 })
+  }),
   wolfenbuettel: Object.freeze({
     id: 'wolfenbuettel',
     label: 'Wolfenbüttel',
+    continentCode: 'EU',
+    continentLabel: 'Europa',
     countryCode: 'DE',
+    countryLabel: 'Deutschland',
     regionCode: 'DE-NI',
+    level: 'test',
+    clipToBounds: true,
     sourceUrl: 'https://download.geofabrik.de/europe/germany/niedersachsen-latest.osm.pbf',
     sourceFile: 'niedersachsen-latest.osm.pbf',
     bounds: Object.freeze({ south: 52.05, west: 10.40, north: 52.30, east: 10.75 })
@@ -34,6 +52,7 @@ async function main() {
   await database.init(console);
   const jobId = options.jobId || randomUUID();
   const versionId = randomUUID();
+  let staged = false;
   if (!options.jobId) {
     await callbackResult((callback) => tableOverpassPoi.createJob(database.db, {
       id: jobId,
@@ -46,16 +65,16 @@ async function main() {
   try {
     const updateProgress = (stage, progress) => callbackResult((callback) =>
       tableOverpassPoi.updateJobProgress(database.db, jobId, stage, progress, callback));
-    const pois = await prepareDataset(dataset, options, updateProgress);
-    await updateProgress('importing', 85);
-    await tableOverpassPoi.publishVersion(database.db, {
-      jobId,
-      versionId,
-      dataset: { ...dataset, sourceTimestamp: null },
-      categories: options.categories,
-      pois
+    await tableOverpassPoi.stageVersion(database.db, {
+      versionId, dataset: { ...dataset, sourceTimestamp: null }, categories: options.categories
     });
-    process.stdout.write(`Activated version ${versionId} with ${pois.length} local POIs for ${dataset.id}.\n`);
+    staged = true;
+    const poiCount = await prepareDataset(dataset, options, updateProgress, async (batch) => {
+      await tableOverpassPoi.insertPoiBatch(database.db, versionId, batch);
+    });
+    await updateProgress('activating', 95);
+    await tableOverpassPoi.activateVersion(database.db, { jobId, versionId, datasetId: dataset.id, poiCount });
+    process.stdout.write(`Activated version ${versionId} with ${poiCount} local POIs for ${dataset.id}.\n`);
     try {
       await callbackResult((callback) => tableOverpassPoi.cleanupRetiredVersions(
         database.db,
@@ -67,6 +86,9 @@ async function main() {
       process.stderr.write(`Version cleanup will be retried later: ${cleanupError.message}\n`);
     }
   } catch (error) {
+    if (staged) {
+      try { await callbackResult((callback) => tableOverpassPoi.discardVersion(database.db, versionId, callback)); } catch { /* best effort */ }
+    }
     await callbackResult((callback) => tableOverpassPoi.failJob(database.db, jobId, error.message, callback));
     throw error;
   } finally {
@@ -74,22 +96,17 @@ async function main() {
   }
 }
 
-async function prepareDataset(dataset, options, updateProgress = async () => {}) {
+async function prepareDataset(dataset, options, updateProgress = async () => {}, persistBatch = null) {
   const outputDirectory = path.resolve(__dirname, '../../../docs/overpass/datasets');
   await fsPromises.mkdir(outputDirectory, { recursive: true });
   const sourcePath = path.join(outputDirectory, dataset.sourceFile);
   const partialSourcePath = `${sourcePath}.part`;
-  const extractPath = path.join(outputDirectory, `${dataset.id}.osm.pbf`);
   const filteredPath = path.join(outputDirectory, `${dataset.id}-poi.osm.pbf`);
+  const clippedPath = path.join(outputDirectory, `${dataset.id}-poi-clipped.osm.pbf`);
   const geoJsonPath = path.join(outputDirectory, `${dataset.id}-poi.geojsonseq`);
-  const expressionsPath = path.join(outputDirectory, 'poi-filter-expressions.txt');
-
-  if (options.refresh) {
-    await Promise.all([
-      fsPromises.rm(sourcePath, { force: true }),
-      fsPromises.rm(partialSourcePath, { force: true })
-    ]);
-  }
+  const expressionsPath = path.join(outputDirectory, `${dataset.id}-poi-filter-expressions.txt`);
+  await cleanupWorkingFiles([sourcePath, partialSourcePath, filteredPath, clippedPath, geoJsonPath, expressionsPath]);
+  try {
   if (!await exists(sourcePath)) {
     await updateProgress('downloading', 5);
     await command('curl', [
@@ -97,18 +114,7 @@ async function prepareDataset(dataset, options, updateProgress = async () => {})
       '--output', partialSourcePath, dataset.sourceUrl
     ]);
     await fsPromises.rename(partialSourcePath, sourcePath);
-  } else {
-    process.stdout.write(`Using existing source file ${sourcePath}\n`);
   }
-
-  const bounds = dataset.bounds;
-  await updateProgress('extracting', 35);
-  await command('osmium', [
-    'extract', '--overwrite',
-    '--bbox', `${bounds.west},${bounds.south},${bounds.east},${bounds.north}`,
-    '--output', extractPath,
-    sourcePath
-  ]);
   await fsPromises.writeFile(
     expressionsPath,
     `${filterExpressions(options.categories, options.subcategories).join('\n')}\n`,
@@ -118,29 +124,45 @@ async function prepareDataset(dataset, options, updateProgress = async () => {})
   await command('osmium', [
     'tags-filter', '--overwrite', '--expressions', expressionsPath,
     '--output', filteredPath,
-    extractPath
+    sourcePath
   ]);
+  await fsPromises.rm(sourcePath, { force: true });
+  let exportPath = filteredPath;
+  if (dataset.clipToBounds) {
+    const bounds = dataset.bounds;
+    await updateProgress('extracting', 65);
+    await command('osmium', ['extract', '--overwrite',
+      '--bbox', `${bounds.west},${bounds.south},${bounds.east},${bounds.north}`,
+      '--output', clippedPath, filteredPath]);
+    await fsPromises.rm(filteredPath, { force: true });
+    exportPath = clippedPath;
+  }
   await updateProgress('converting', 70);
   await command('osmium', [
     'export', '--overwrite', '--output-format', 'geojsonseq',
     '--attributes', 'type,id', '--format-option', 'print_record_separator=false',
     '--output', geoJsonPath,
-    filteredPath
+    exportPath
   ]);
+  await fsPromises.rm(exportPath, { force: true });
 
   await updateProgress('normalizing', 80);
-  const pois = await readPois(geoJsonPath, options.categories, options.subcategories);
-  if (!pois.length) throw new Error('The filtered dataset contains no supported POIs');
-  return pois;
+  const poiCount = await readPois(geoJsonPath, options.categories, options.subcategories, persistBatch);
+  if (!poiCount) throw new Error('The filtered dataset contains no supported POIs');
+  return poiCount;
+  } finally {
+    await cleanupWorkingFiles([sourcePath, partialSourcePath, filteredPath, clippedPath, geoJsonPath, expressionsPath]);
+  }
 }
 
-async function readPois(inputPath, categories = categoryNames(), selectedSubcategories = null) {
+async function readPois(inputPath, categories = categoryNames(), selectedSubcategories = null, persistBatch = null) {
   const subcategories = Object.fromEntries(categories.map((category) => [category,
     Array.isArray(selectedSubcategories?.[category])
       ? selectedSubcategories[category]
       : subcategoryNames(category)
   ]));
   const unique = new Map();
+  let poiCount = 0;
   const lines = readline.createInterface({
     input: fs.createReadStream(inputPath, { encoding: 'utf8' }),
     crlfDelay: Infinity
@@ -152,8 +174,24 @@ async function readPois(inputPath, categories = categoryNames(), selectedSubcate
     const element = featureToElement(feature);
     const poi = element ? normalizeElement(element, categories, subcategories) : null;
     if (poi) unique.set(poi.id, poi);
+    if (persistBatch && unique.size >= 1000) {
+      const batch = [...unique.values()];
+      await persistBatch(batch);
+      poiCount += batch.length;
+      unique.clear();
+    }
   }
-  return [...unique.values()];
+  if (!persistBatch) return [...unique.values()];
+  if (unique.size) {
+    const batch = [...unique.values()];
+    await persistBatch(batch);
+    poiCount += batch.length;
+  }
+  return poiCount;
+}
+
+async function cleanupWorkingFiles(paths) {
+  await Promise.all(paths.map((filePath) => fsPromises.rm(filePath, { force: true })));
 }
 
 function featureToElement(feature) {

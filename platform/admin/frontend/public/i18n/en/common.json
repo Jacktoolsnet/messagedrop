@@ -466,5 +466,9 @@
   "Thursday": "Thursday",
   "Friday": "Friday",
   "Saturday": "Saturday",
-  "Database size": "Database size"
+  "Database size": "Database size",
+  "Continent": "Continent",
+  "Test region": "Test region",
+  "Federal state": "Federal state",
+  "Europe": "Europe"
 }

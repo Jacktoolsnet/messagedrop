@@ -11,6 +11,7 @@
     "db:create": "node scripts/create-database.js",
     "db:reset": "node scripts/create-database.js --reset",
     "dataset:import:wolfenbuettel": "node scripts/import-local-dataset.js --dataset wolfenbuettel",
+    "dataset:import:germany": "node scripts/import-local-dataset.js --dataset germany",
     "sample:fetch": "node scripts/fetch-raw-poi-sample.js",
     "sample:analyze": "node scripts/analyze-poi-sample.js"
   },

@@ -19,8 +19,12 @@ export interface OverpassImportCatalog {
   datasets: Array<{
     id: string;
     label: string;
+    continentCode: string;
+    continentLabel: string;
     countryCode: string;
-    regionCode: string;
+    countryLabel: string;
+    regionCode: string | null;
+    level: 'country' | 'state' | 'test';
   }>;
   categories: Record<string, string[]>;
 }

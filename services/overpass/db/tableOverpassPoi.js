@@ -159,58 +159,75 @@ function findActiveJob(db, datasetId, callback) {
   `, [datasetId], callback);
 }
 
-async function publishVersion(db, { jobId, versionId, dataset, categories, pois }) {
+function findRunningJob(db, callback) {
+  db.get(`SELECT * FROM ${JOB_TABLE} WHERE status = 'running' ORDER BY startedAt ASC LIMIT 1`, [], callback);
+}
+
+function findQueuedJob(db, callback) {
+  db.get(`SELECT * FROM ${JOB_TABLE} WHERE status = 'queued' ORDER BY createdAt ASC LIMIT 1`, [], callback);
+}
+
+function failInterruptedJobs(db, callback) {
+  db.run(`UPDATE ${JOB_TABLE} SET status = 'failed', stage = 'failed',
+    error = 'Service restarted during import', completedAt = CURRENT_TIMESTAMP
+    WHERE status = 'running'`, [], callback);
+}
+
+async function stageVersion(db, { versionId, dataset, categories }) {
   await db.transaction(async (transaction) => {
     await run(transaction, `
       INSERT INTO ${DATASET_TABLE}
         (datasetId, south, west, north, east, createdAt, updatedAt)
       VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-      ON CONFLICT (datasetId) DO UPDATE SET
-        south = EXCLUDED.south,
-        west = EXCLUDED.west,
-        north = EXCLUDED.north,
-        east = EXCLUDED.east,
-        updatedAt = CURRENT_TIMESTAMP
-    `, [
-      dataset.id, dataset.bounds.south, dataset.bounds.west, dataset.bounds.north, dataset.bounds.east
-    ]);
+      ON CONFLICT (datasetId) DO UPDATE SET south = EXCLUDED.south, west = EXCLUDED.west,
+        north = EXCLUDED.north, east = EXCLUDED.east, updatedAt = CURRENT_TIMESTAMP
+    `, [dataset.id, dataset.bounds.south, dataset.bounds.west, dataset.bounds.north, dataset.bounds.east]);
     await run(transaction, `
       INSERT INTO ${VERSION_TABLE}
         (versionId, datasetId, status, sourceUrl, sourceTimestamp, categories, poiCount)
       VALUES (?, ?, 'importing', ?, ?, ?::jsonb, 0)
     `, [versionId, dataset.id, dataset.sourceUrl, dataset.sourceTimestamp || null, JSON.stringify(categories)]);
-    for (const poi of pois) {
-      await run(transaction, `
-        INSERT INTO ${POI_TABLE}
-          (versionId, osmType, osmId, category, subtype, latitude, longitude, payload)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?::jsonb)
-      `, [
-        versionId, poi.osmType, poi.osmId, poi.category, poi.subtype,
-        poi.latitude, poi.longitude, JSON.stringify(poi)
-      ]);
-    }
-    await run(transaction, `
-      UPDATE ${VERSION_TABLE}
-      SET status = 'retired'
-      WHERE datasetId = ? AND status = 'active'
-    `, [dataset.id]);
-    await run(transaction, `
-      UPDATE ${VERSION_TABLE}
-      SET status = 'active', activatedAt = CURRENT_TIMESTAMP, poiCount = ?
-      WHERE versionId = ? AND status = 'importing'
-    `, [pois.length, versionId]);
-    await run(transaction, `
-      UPDATE ${DATASET_TABLE}
-      SET activeVersionId = ?, updatedAt = CURRENT_TIMESTAMP
-      WHERE datasetId = ?
-    `, [versionId, dataset.id]);
-    await run(transaction, `
-      UPDATE ${JOB_TABLE}
-      SET status = 'succeeded', stage = 'completed', progress = 100,
-        versionId = ?, completedAt = CURRENT_TIMESTAMP
-      WHERE jobId = ? AND status = 'running'
-    `, [versionId, jobId]);
   });
+}
+
+function insertPoiBatch(db, versionId, pois) {
+  if (!pois.length) return Promise.resolve();
+  const params = [];
+  const rows = pois.map((poi) => {
+    params.push(versionId, poi.osmType, poi.osmId, poi.category, poi.subtype,
+      poi.latitude, poi.longitude, JSON.stringify(poi));
+    return '(?, ?, ?, ?, ?, ?, ?, ?::jsonb)';
+  });
+  return run(db, `INSERT INTO ${POI_TABLE}
+    (versionId, osmType, osmId, category, subtype, latitude, longitude, payload)
+    VALUES ${rows.join(',')} ON CONFLICT DO NOTHING`, params);
+}
+
+async function activateVersion(db, { jobId, versionId, datasetId, poiCount }) {
+  await db.transaction(async (transaction) => {
+    await run(transaction, `UPDATE ${VERSION_TABLE} SET status = 'retired'
+      WHERE datasetId = ? AND status = 'active'`, [datasetId]);
+    await run(transaction, `UPDATE ${VERSION_TABLE}
+      SET status = 'active', activatedAt = CURRENT_TIMESTAMP, poiCount = ?
+      WHERE versionId = ? AND status = 'importing'`, [poiCount, versionId]);
+    await run(transaction, `UPDATE ${DATASET_TABLE} SET activeVersionId = ?, updatedAt = CURRENT_TIMESTAMP
+      WHERE datasetId = ?`, [versionId, datasetId]);
+    await run(transaction, `UPDATE ${JOB_TABLE}
+      SET status = 'succeeded', stage = 'completed', progress = 100, versionId = ?, completedAt = CURRENT_TIMESTAMP
+      WHERE jobId = ? AND status = 'running'`, [versionId, jobId]);
+  });
+}
+
+function discardVersion(db, versionId, callback) {
+  db.run(`DELETE FROM ${VERSION_TABLE} WHERE versionId = ? AND status = 'importing'`, [versionId], callback);
+}
+
+async function publishVersion(db, { jobId, versionId, dataset, categories, pois }) {
+  await stageVersion(db, { versionId, dataset, categories });
+  for (let index = 0; index < pois.length; index += 250) {
+    await insertPoiBatch(db, versionId, pois.slice(index, index + 250));
+  }
+  await activateVersion(db, { jobId, versionId, datasetId: dataset.id, poiCount: pois.length });
 }
 
 function cleanupRetiredVersions(db, datasetId, keepCount, callback) {
@@ -255,6 +272,13 @@ module.exports = {
   getJob,
   listJobs,
   findActiveJob,
+  findRunningJob,
+  findQueuedJob,
+  failInterruptedJobs,
+  stageVersion,
+  insertPoiBatch,
+  activateVersion,
+  discardVersion,
   publishVersion,
   cleanupRetiredVersions
 };

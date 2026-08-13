@@ -43,6 +43,7 @@ export class OverpassImportSettingsComponent {
   readonly enabledDatasets = signal<ReadonlySet<string>>(new Set());
   readonly selectedSubcategories = signal<Record<string, string[]>>({});
   readonly selectedCategory = signal<string | null>(null);
+  readonly selectedContinent = signal('EU');
   readonly importsEnabled = signal(false);
   readonly scheduleType = signal<'daily' | 'weekly'>('weekly');
   readonly weekday = signal(0);
@@ -63,13 +64,16 @@ export class OverpassImportSettingsComponent {
   });
   readonly countryGroups = computed(() => {
     const groups = new Map<string, OverpassImportCatalog['datasets']>();
-    for (const dataset of this.catalog()?.datasets ?? []) {
+    for (const dataset of (this.catalog()?.datasets ?? []).filter((row) => row.continentCode === this.selectedContinent())) {
       const rows = groups.get(dataset.countryCode) ?? [];
       rows.push(dataset);
       groups.set(dataset.countryCode, rows);
     }
     return [...groups.entries()].map(([countryCode, datasets]) => ({ countryCode, datasets }));
   });
+  readonly continents = computed(() => [...new Map((this.catalog()?.datasets ?? [])
+    .map((dataset) => [dataset.continentCode, dataset.continentLabel])).entries()]
+    .map(([code, label]) => ({ code, label })));
   readonly hasChanges = computed(() => {
     const settings = this.settings();
     if (!settings) return false;
@@ -120,6 +124,19 @@ export class OverpassImportSettingsComponent {
   countryLabel(countryCode: string): string {
     const labels: Record<string, string> = { DE: 'Germany', SE: 'Sweden', DK: 'Denmark' };
     return this.i18n.t(labels[countryCode] ?? countryCode);
+  }
+
+  countryDataset(datasets: OverpassImportCatalog['datasets']): OverpassImportCatalog['datasets'][number] | null {
+    return datasets.find((dataset) => dataset.level === 'country') ?? null;
+  }
+
+  toggleCountry(datasets: OverpassImportCatalog['datasets'], enabled: boolean): void {
+    const country = this.countryDataset(datasets);
+    if (!country) return;
+    const next = new Set(this.enabledDatasets());
+    for (const dataset of datasets) next.delete(dataset.id);
+    if (enabled) next.add(country.id);
+    this.enabledDatasets.set(next);
   }
 
   setHour(value: string): void {
