@@ -12,13 +12,6 @@
             "cwd": "${workspaceFolder}"
         },
         {
-            "name": "TripGo-Datenbank (DBeaver)",
-            "type": "node-terminal",
-            "request": "launch",
-            "command": "dbeaver -reuseWorkspace",
-            "cwd": "${workspaceFolder}"
-        },
-        {
             "name": "Admin-Service",
             "program": "${workspaceFolder}/platform/admin/backend/app.js",
             "request": "launch",
@@ -389,6 +382,13 @@
             "type": "node-terminal",
             "request": "launch",
             "command": "node tools/db/open-dbeaver.js WIKIPEDIA",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "DBeaver TripGo Service",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "node tools/db/open-dbeaver.js TRIPGO",
             "cwd": "${workspaceFolder}"
         }
     ]
